@@ -7,9 +7,10 @@
 
 import Foundation
 import SwiftUI
+import Atomics
 
+@MainActor
 class SortViewModel: ObservableObject {
-    private let queue = DispatchQueue.global(qos: .utility)
     var algorithm: Algorithms = .quickSort
     
     private let toner = FMSynthesizer()
@@ -21,93 +22,129 @@ class SortViewModel: ObservableObject {
             self.arraySizeBacking = Float($0)
         })
     }
-    @Published var data: [SortItem] = SortView.genData(numItems: 128)
-    lazy var sortableData: [SortItem] = data
-    @Published var operations: Int = 0
+    @Published var data: [SortItem] = SortItem.syncSequenceOf(numItems: 128)
+    @Published var operations: ManagedAtomic<Int> = ManagedAtomic(0)
     @Published var isSorted: Bool = false
     @Published var running: Bool = false
     @Published var sound: Bool = false
-    @Published var delay: Float = 45.0
-    // Last change indexes. Kinda-sorta deprecated...
-    var lastSwapIndexOne: Int = -1
-    var lastSwapIndexTwo: Int = -1
-    var lastCompareIndexOne: Int = -1
-    var lastCompareIndexTwo: Int = -1
+    @Published var delay: Float = 0.1
+    var sortTaskRef: Task<Void, Error>? = nil
+    var recreateTaskRef: Task<Void, Error>? = nil
     
-    private func enforceIndex(index: Int) {
+    @MainActor
+    private func enforceIndex(_ data: [SortItem], _ index: Int) {
         precondition(data.indices.contains(index), "The index \(index) does not exist on an array of length \(data.endIndex)!")
     }
     
+    @MainActor
+    func setData(_ data: [SortItem]) async {
+        self.data = data
+    }
+    
+    @MainActor
+    func operate() async {
+        guard !Task.isCancelled else {
+            return
+        }
+        operations.wrappingIncrement(by: 1, ordering: .relaxed)
+    }
+    
+    @MainActor
+    func getOperations() -> Int {
+        return operations.load(ordering: .relaxed)
+    }
+    
+    @MainActor
     func setAlgo(algo: Algorithms) {
         self.algorithm = algo
     }
     
     /// Shuffle the array using Swift's built-in shuffle method.
-    func shuffle() {
-        data.shuffle()
-        sortableData = data
+    @MainActor
+    func shuffle() async {
+        guard !Task.isCancelled else {
+            return
+        }
+        if (running) {
+            sortTaskRef!.cancel()
+        }
+        await MainActor.run {
+            data.shuffle()
+        }
     }
     
     /// Recreate the array, with a specified set of values.
-    func recreate(numItems: Int = 128) {
-        if numItems == arraySize.wrappedValue {
-            data = SortView.genData(numItems: numItems)
-        } else {
-            data = SortView.genData(numItems: arraySize.wrappedValue)
+    @MainActor
+    func recreate(numItems: Int = 128) async {
+        guard !Task.isCancelled else {
+            return
         }
-        sortableData = data
+        // Reset isSorted to false
+        isSorted = false
+        // Reset running to false
+        running = false
+        // Reset operations counter to 0
+        let _ = operations.exchange(0, ordering: .relaxed)
+        // Recreate the array from scratch
+        if numItems == arraySize.wrappedValue {
+            data = await SortItem.sequenceOf(numItems: numItems)
+        } else {
+            data = await SortItem.sequenceOf(numItems: arraySize.wrappedValue)
+        }
     }
     
     /// Swap the values at the firstIndex and secondIndex, with a specified delay between the two operations.
-    func swap(firstIndex: Int, secondIndex: Int) {
-        let group = DispatchGroup()
-        group.enter()
-        enforceIndex(index: firstIndex)
-        enforceIndex(index: secondIndex)
-        if (lastSwapIndexOne != -1 && lastSwapIndexTwo != -1) {
-            resetColor(index: lastSwapIndexOne)
-            resetColor(index: lastSwapIndexTwo)
+    @MainActor
+    func swap(_ firstIndex: Int, _ secondIndex: Int) async {
+        guard !Task.isCancelled else {
+            return
         }
-        lastSwapIndexOne = firstIndex
-        lastSwapIndexTwo = secondIndex
+        let delayNs = UInt64(delay * 1_000_000)
+        enforceIndex(data, firstIndex)
+        enforceIndex(data, secondIndex)
         if (sound) {
-            let xFreq = calculateFrequency(index: firstIndex)
-            let yFreq = calculateFrequency(index: secondIndex)
+            let xFreq = await calculateFrequency(index: firstIndex)
+            let yFreq = await calculateFrequency(index: secondIndex)
             toner.play(carrierFrequency: xFreq)
             toner.play(carrierFrequency: yFreq)
         }
         if (!running || firstIndex == secondIndex) {
             return
         }
-        queue.asyncAfter(deadline: floatDelay(millis: delay + 1.0)) { [self] in
-            changeColor(index: firstIndex, color: .red)
-            changeColor(index: secondIndex, color: .orange)
-            DispatchQueue.main.async { [self] in
-                data = sortableData
-            }
-            sortableData.swapAt(firstIndex, secondIndex)
-            resetColor(index: firstIndex)
-            resetColor(index: secondIndex)
-            group.leave()
-        }
-        group.notify(queue: queue) {
-            print("Proceeding to next operation")
-        }
+        await operate()
+        await changeColor(index: firstIndex, color: .red)
+        await changeColor(index: secondIndex, color: .orange)
+        data.swapAt(firstIndex, secondIndex)
+        try? await Task.sleep(nanoseconds: delayNs)
+        await resetColor(index: firstIndex)
+        await resetColor(index: secondIndex)
     }
     
-    /// Check if the array is sorted. Maybe deprecated.
-    func isArraySorted() -> Bool {
+    /// Check if the array is sorted.
+    @MainActor
+    func isArraySorted() async -> Bool {
+        guard !Task.isCancelled else {
+            return false
+        }
         for i in 1..<data.count {
-            if (!compare(firstIndex: i, secondIndex: i - 1)) {
+            do {
+                if (try await !compare(firstIndex: i, secondIndex: i - 1)) {
+                    return false
+                }
+            } catch _ {
                 return false
             }
         }
         return true
     }
     
-    /// Calculate the frequency of an array access. Deprecated.
-    func calculateFrequency(index: Int) -> Float {
-        enforceIndex(index: index)
+    /// Calculate the frequency of an array access.
+    @MainActor
+    func calculateFrequency(index: Int) async -> Float {
+        guard !Task.isCancelled else {
+            return Float(minFreq)
+        }
+        enforceIndex(data, index)
         return floatRatio(
             x: Float(index),
             oldRange: 0.0...Float(data.count),
@@ -115,56 +152,99 @@ class SortViewModel: ObservableObject {
        )
     }
     
-    /// Get the integer value of a SortItem at the specified index. Deprecated.
-    func getValue(index: Int) -> Int {
-        enforceIndex(index: index)
-        toner.play(carrierFrequency: calculateFrequency(index: index))
+    /// Get the integer value of a SortItem at the specified index.
+    @MainActor
+    func getValue(index: Int) async -> Optional<Int> {
+        guard !Task.isCancelled else {
+            return Optional.none
+        }
+        enforceIndex(data, index)
+        if (sound) {
+            toner.play(carrierFrequency: await calculateFrequency(index: index))
+        }
         return data[index].value
     }
     
-    /// Compare the values of two SortItems at their specified indexes. Deprecated.
-    func compare(firstIndex: Int, secondIndex: Int) -> Bool {
-        enforceIndex(index: firstIndex)
-        enforceIndex(index: secondIndex)
-        if (lastCompareIndexOne != -1 && lastCompareIndexTwo != -1) {
-            resetColor(index: lastCompareIndexOne)
-            resetColor(index: lastCompareIndexTwo)
+    /// Compare the values of two SortItems at their specified indexes.
+    @MainActor
+    func compare(firstIndex: Int, secondIndex: Int, by: ((Int, Int) -> Bool) = (>=)) async throws -> Bool {
+        guard !Task.isCancelled else {
+            throw TaskCancelledError()
         }
-        lastCompareIndexOne = firstIndex
-        lastCompareIndexTwo = secondIndex
-        changeColor(index: firstIndex, color: .blue)
-        changeColor(index: secondIndex, color: .green)
-        return getValue(index: firstIndex) >= getValue(index: secondIndex)
+        enforceIndex(data, firstIndex)
+        enforceIndex(data, secondIndex)
+        await changeColor(index: firstIndex, color: .blue)
+        await changeColor(index: secondIndex, color: .green)
+        guard
+            let lhs = await getValue(index: firstIndex),
+            let rhs = await getValue(index: secondIndex)
+        else {
+            throw TaskCancelledError()
+        }
+        await operate()
+        return by(lhs, rhs)
     }
     
-    /// Change the color of a SortItem at the specified index. Deprecated.
-    func changeColor(index: Int, color: Color) {
-        enforceIndex(index: index)
+    /// Moves a value at index `j` right. Used by insertion sort.
+    @MainActor
+    func shiftRight(_ data: inout [SortItem], _ j: inout Int) async {
+        guard !Task.isCancelled else {
+            return
+        }
+        data[j + 1] = data[j]
+        j -= 1
+    }
+    
+    /// Change the color of a SortItem at the specified index.
+    @MainActor
+    func changeColor(index: Int, color: Color) async {
+        guard !Task.isCancelled else {
+            return
+        }
+        enforceIndex(data, index)
         data[index].color = color
     }
     
-    /// Reset the color of a SortItem to white at the specified index. Deprecated.
-    func resetColor(index: Int) {
-        enforceIndex(index: index)
+    /// Reset the color of a SortItem to white at the specified index.
+    @MainActor
+    func resetColor(index: Int) async {
+        guard !Task.isCancelled else {
+            return
+        }
+        enforceIndex(data, index)
         data[index].color = .white
     }
 
     /// Run the sorting algorithm of choice on the dataset.
-    func doSort() -> Bool {
-        switch (algorithm) {
-        case .quickSort:
-            data = quickSort()
-        case .bubbleSort:
-            data = bubbleSort()
-        case .insertionSort:
-            data = insertionSort()
-        case .selectionSort:
-            data = selectionSort()
-        case .mergeSort:
-            data = emMergeSort()
-        default:
+    @MainActor
+    func doSort() async -> Bool {
+        func innerDoSort(_ algorithm: Algorithms) async -> Optional<[SortItem]> {
+            switch (algorithm) {
+            case .quickSort:
+                return await quickSort()
+            case .bubbleSort:
+                return await bubbleSort()
+            case .insertionSort:
+                return await insertionSort()
+            case .selectionSort:
+                return await selectionSort()
+            case .mergeSort:
+                return await emMergeSort()
+            default:
+                return Optional.none
+            }
+        }
+        guard !Task.isCancelled else {
             return false
         }
+        guard
+            let result = await innerDoSort(self.algorithm),
+            result != Optional.none
+        else {
+            return false
+        }
+        await setData(data)
+        let _ = await isArraySorted()
         return data == data.sorted()
     }
 }

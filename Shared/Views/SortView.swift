@@ -12,7 +12,8 @@ let minFreq = 200
 
 struct SortView: View {
     var algorithm: Algorithms
-    /// UI state
+    // This warns of global actors or something. We can't fix it for now.
+    // Just ignore it.
     @StateObject var state: SortViewModel = SortViewModel()
     @State var showWarning: Bool = false
     
@@ -28,14 +29,15 @@ struct SortView: View {
                             .frame(width: rectWidth, height: rectMinHeight * CGFloat(item.value))
                     }.id(UUID())
                 }.frame(width: geo.size.width, height: geo.size.height, alignment: .bottomLeading)
-                    .alert("Warning", isPresented: $showWarning) {
-                        VStack {
-                            Text("Either the result returned by the sorting algorithm is incorrect (a bug), or the sorting algorithm is not yet implemented. Sorry!")
-                            Button("OK", role: .cancel) {
-                                showWarning = false
-                            }
+                    .alert("Sorry!", isPresented: $showWarning, actions: {
+                        Button("OK", role: .cancel) {
+                            showWarning = false
                         }
-                    }
+                    }, message: {
+                        VStack {
+                            Text("The result is invalid, the algorithm isn't implemented, or the sorting operation was cancelled by the system.")
+                        }
+                    })
                 GroupBox(label: Label("Settings", systemImage: "gear").padding(.top, 2).padding(.bottom, 2)) {
                     // Settings:
                     // Running and Sound toggles
@@ -43,15 +45,17 @@ struct SortView: View {
                         Toggle(isOn: $state.running) {
                             Label("Running", systemImage: "play.fill")
                         }.frame(maxWidth: 150).toggleStyle(.switch).onChange(of: state.running) { newValue in
-                            Task.init {
+                            DispatchQueue.main.async {
                                 if (newValue) {
-                                    if (!state.doSort()) {
-                                        //showWarning = true
-                                        print("Bad result? Maybe. Or maybe we're not waiting enough time.")
+                                    state.sortTaskRef = Task.init {
+                                        if (await !state.doSort()) {
+                                            showWarning = true
+                                        }
                                     }
-                                    // TODO: Make sorting functions async and await, because otherwise it will be called while the sorting is still happening.
                                 } else {
-                                    state.recreate()
+                                    if (state.sortTaskRef != nil) {
+                                        state.sortTaskRef!.cancel()
+                                    }
                                 }
                             }
                         }
@@ -62,7 +66,9 @@ struct SortView: View {
                     // Reset and Step buttons
                     HStack(spacing: 10) {
                         Button(action: {
-                            state.recreate()
+                            state.recreateTaskRef = Task.init {
+                                await state.recreate()
+                            }
                         }) {
                             Label("Reset", systemImage: "repeat")
                         }.frame(maxWidth: 150)
@@ -83,16 +89,15 @@ struct SortView: View {
                         Text("Array Size")
                         Slider(value: $state.arraySizeBacking, in: 16...1024)
                             .onChange(of: state.arraySizeBacking) { newValue in
-                                if (state.running) {
-                                    state.running = false
+                                state.recreateTaskRef = Task.init {
+                                    await state.recreate(numItems: Int(newValue))
                                 }
-                                state.recreate(numItems: Int(newValue))
                             }
                             .frame(maxWidth: 192)
                         Text(String(format: "%d", state.arraySize.wrappedValue))
                             .foregroundColor(.blue)
                     }
-                    Text("Operations: ") + Text("\(state.operations)").foregroundColor(.blue)
+                    Text("Operations: ") + Text("\(state.getOperations())").foregroundColor(.blue)
                 }.background(.black).cornerRadius(15).frame(minWidth: 300, maxWidth: 450, minHeight: 64).padding(.all, 8)
             }
         }.onAppear {
@@ -100,9 +105,8 @@ struct SortView: View {
         }
     }
     
-    /// Used to generate values at initialization, on array size change, and on recreation.
-    static func genData(numItems: Int = 128) -> [SortItem] {
-        return (1...numItems).map { SortItem.fromInt(value: $0) }.shuffled()
+    func onCancelTask() {
+        state.running = false
     }
 }
 

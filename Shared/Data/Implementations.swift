@@ -9,18 +9,26 @@ import Foundation
 
 extension SortViewModel {
     /// A naive bubble sort implementation. Thanks to: https://medium.com/@EnnioMa/back-to-the-fundamentals-sorting-algorithms-in-swift-from-scratch-fccf8a3daea3
-    func bubbleSort(by areInIncreasingOrder: ((SortItem, SortItem) -> Bool) = (<)) -> [SortItem] {
+    @MainActor
+    func bubbleSort(by areInIncreasingOrder: ((SortItem, SortItem) -> Bool) = (<)) async -> [SortItem] {
+        guard !Task.isCancelled else {
+            return data
+        }
         for i in 0..<(data.count - 1) {
             for j in 0..<(data.count - i - 1) where areInIncreasingOrder(data[j + 1], data[j]) {
                 // theData.swapAt(j, j + 1)
-                swap(firstIndex: j, secondIndex: j + 1)
+                await swap(j, j + 1)
             }
         }
         return data
     }
     
     /// A naive insertion sort implementation.
-    func insertionSort(by areInIncreasingOrder: ((SortItem, SortItem) -> Bool) = (<)) -> [SortItem] {
+    @MainActor
+    func insertionSort(by areInIncreasingOrder: ((SortItem, SortItem) -> Bool) = (<)) async -> [SortItem] {
+        guard !Task.isCancelled else {
+            return data
+        }
         var theData = self.data
         for i in 1..<theData.count {
             let key = theData[i]
@@ -35,7 +43,11 @@ extension SortViewModel {
     }
     
     /// A naive selection sort implementation.
-    func selectionSort(by areInIncreasingOrder: ((SortItem, SortItem) -> Bool) = (<)) -> [SortItem] {
+    @MainActor
+    func selectionSort(by areInIncreasingOrder: ((SortItem, SortItem) -> Bool) = (<)) async -> [SortItem] {
+        guard !Task.isCancelled else {
+            return data
+        }
         for i in 0..<(data.count-1) {
             var key = i
             for j in i+1..<data.count where areInIncreasingOrder(data[j], data[key]) {
@@ -43,13 +55,17 @@ extension SortViewModel {
             }
             guard i != key else { continue }
             // data.swapAt(i, key)
-            swap(firstIndex: i, secondIndex: key)
+            await swap(i, key)
         }
         return data
     }
     
     /// A naive mergesort implementation.
-    private func merge(left: [SortItem], right: [SortItem], by areInIncreasingOrder: ((SortItem, SortItem) -> Bool) = (<)) -> [SortItem] {
+    @MainActor
+    private func merge(left: [SortItem], right: [SortItem], by areInIncreasingOrder: ((SortItem, SortItem) -> Bool) = (<)) async -> Optional<[SortItem]> {
+        guard !Task.isCancelled else {
+            return Optional.none
+        }
         var output: [SortItem] = []
         var mutableLeft = left
         var mutableRight = right
@@ -68,31 +84,50 @@ extension SortViewModel {
         output.append(contentsOf: mutableRight)
         return output
     }
-     
-    private func _emMergeSort(data: [SortItem], by areInIncreasingOrder: ((SortItem, SortItem) -> Bool) = (<)) -> [SortItem] {
+    
+    @MainActor
+    private func _emMergeSort(data: [SortItem], by areInIncreasingOrder: ((SortItem, SortItem) -> Bool) = (<)) async -> [SortItem] {
+        guard !Task.isCancelled else {
+            return data
+        }
         if data.count < 2 { return data }
-        
         let leftArray = Array(data[..<Int(data.count / 2)])
         let rightArray = Array(data[Int(data.count / 2)..<data.count])
-        return merge(left: _emMergeSort(data: leftArray, by: areInIncreasingOrder), right: _emMergeSort(data: rightArray, by: areInIncreasingOrder), by: areInIncreasingOrder)
+        let result = await merge(left: await _emMergeSort(data: leftArray, by: areInIncreasingOrder), right: _emMergeSort(data: rightArray, by: areInIncreasingOrder), by: areInIncreasingOrder)
+        return result ?? data
     }
     
-    func emMergeSort(by: ((SortItem, SortItem) -> Bool) = (<)) -> [SortItem] {
-        return _emMergeSort(data: data, by: by)
+    @MainActor
+    func emMergeSort(by: ((SortItem, SortItem) -> Bool) = (<)) async -> [SortItem] {
+        guard !Task.isCancelled else {
+            return data
+        }
+        return await _emMergeSort(data: data, by: by)
     }
     
     /// A naive quicksort implementation.
-    private func _quickSort(_ array: inout [SortItem], by areInIncreasingOrder: ((SortItem, SortItem) -> Bool)) -> [SortItem] {
+    @MainActor
+    private func _quickSort(_ array: inout [SortItem], by areInIncreasingOrder: ((SortItem, SortItem) -> Bool)) async -> [SortItem] {
+        guard !Task.isCancelled else {
+            return data
+        }
         if array.count < 2 { return array }
         var data = array
         let pivot = data.remove(at: 0)
         var left = data.filter { areInIncreasingOrder($0, pivot) }
         var right = data.filter { !areInIncreasingOrder($0, pivot) }
         let middle = [pivot]
-        return _quickSort(&left, by: areInIncreasingOrder) + middle + _quickSort(&right, by: areInIncreasingOrder)
+        let lhs = await _quickSort(&left, by: areInIncreasingOrder)
+        let rhs = await _quickSort(&right, by: areInIncreasingOrder)
+        return lhs + middle + rhs
     }
     
-    func quickSort(by areInIncreasingOrder: ((SortItem, SortItem) -> Bool) = (<)) -> [SortItem] {
-        return _quickSort(&data, by: areInIncreasingOrder)
+    @MainActor
+    func quickSort(by areInIncreasingOrder: ((SortItem, SortItem) -> Bool) = (<)) async -> [SortItem] {
+        guard !Task.isCancelled else {
+            return data
+        }
+        var myData = data
+        return await _quickSort(&myData, by: areInIncreasingOrder)
     }
 }
