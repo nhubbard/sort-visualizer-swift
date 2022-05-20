@@ -343,6 +343,7 @@ extension SortViewModel {
     }
     
     // MARK: - Weird - Bitonic Sort
+    @MainActor
     func bitonicSort() async {
         let n = data.count
         var k = 2
@@ -368,6 +369,7 @@ extension SortViewModel {
     }
     
     // MARK: - Weird - Radix Sort
+    @MainActor
     func radixSort() async {
         let colors: [Color] = [.red, .orange, .yellow, .green, .blue, .indigo, .purple, .teal, .cyan, .mint, .pink].shuffled()
         let base = colors.count
@@ -410,7 +412,8 @@ extension SortViewModel {
         }
     }
     
-    // MARK: Weird - Shell Sort
+    // MARK: - Weird - Shell Sort
+    @MainActor
     func shellSort() async {
         let n = data.count
         var interval = ~(~(n / 2))
@@ -446,12 +449,38 @@ extension SortViewModel {
         }
     }
     
-    // MARK: Weird - Comb Sort
-    // TODO: Implement comb sort
+    // MARK: - Weird - Comb Sort
+    @MainActor
+    func combSort() async {
+        let length = data.count
+        let shrink = 1.3
+        var gap = length
+        var sorted = false
+        while !sorted {
+            if !running {
+                return
+            }
+            gap = Int(Double(gap) / shrink)
+            if gap <= 1 {
+                sorted = true
+                gap = 1
+            }
+            for i in 0..<(length - gap) {
+                if !running {
+                    return
+                }
+                let sm = gap + i
+                if try! await compare(firstIndex: i, secondIndex: sm) {
+                    await swap(i, sm)
+                    sorted = false
+                }
+            }
+        }
+    }
     
-    // MARK: Weird - Bogo Sort
+    // MARK: - Weird - Bogo Sort
     // TODO: Implement bogo sort
     
-    // MARK: Weird - Stooge Sort
+    // MARK: - Weird - Stooge Sort
     // TODO: Implement stooge sort
 }

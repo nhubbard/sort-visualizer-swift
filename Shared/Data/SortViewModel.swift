@@ -261,6 +261,7 @@ class SortViewModel: ObservableObject {
                 case .pancakeSort:
                     await pancakeSort()
                     return data
+                // Weird algorithms
                 case .bitonicSort:
                     await bitonicSort()
                     return data
@@ -269,6 +270,9 @@ class SortViewModel: ObservableObject {
                     return data
                 case .shellSort:
                     await shellSort()
+                    return data
+                case .combSort:
+                    await combSort()
                     return data
                 // Weird algorithms
                 default:
