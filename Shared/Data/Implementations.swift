@@ -63,7 +63,7 @@ extension SortViewModel {
     }
     
     @MainActor
-    func quickSort() async -> [SortItem] {
+    @discardableResult func quickSort() async -> [SortItem] {
         var proxy: [SortItem] = data
         await _quickSort(&proxy, 0, proxy.count - 1)
         proxy = data
@@ -120,7 +120,7 @@ extension SortViewModel {
     }
     
     @MainActor
-    func mergeSort() async -> [SortItem] {
+    @discardableResult func mergeSort() async -> [SortItem] {
         await _mergeSort(0, data.count)
         return data
     }
@@ -176,25 +176,9 @@ extension SortViewModel {
     }
     
     // MARK: - Quadratic - Bubble Sort
-    /// A naive bubble sort implementation. Thanks to: https://medium.com/@EnnioMa/back-to-the-fundamentals-sorting-algorithms-in-swift-from-scratch-fccf8a3daea3
-    @MainActor
-    func bubbleSort(by areInIncreasingOrder: ((SortItem, SortItem) -> Bool) = (<)) async -> [SortItem] {
-        guard !Task.isCancelled else {
-            return data
-        }
-        for i in 0..<(data.count - 1) {
-            for j in 0..<(data.count - i - 1) where areInIncreasingOrder(data[j + 1], data[j]) {
-                // theData.swapAt(j, j + 1)
-                await swap(j, j + 1)
-            }
-        }
-        return data
-    }
-    
-    // MARK: - Quadratic - Bubble Sort v2
     // Based on inspiration (github:Myphz/sortvisualizer)
     @MainActor
-    func bubbleSort2() async {
+    func bubbleSort() async {
         for i in 1..<data.count {
             for j in 0..<(data.count - i) {
                 if !running {
@@ -208,7 +192,7 @@ extension SortViewModel {
     }
     
     // MARK: - Quadratic - Selection Sort
-    /// A naive selection sort implementation.
+    // This is the one algorithm that I didn't rewrite following the JS implementation; it ended up taking 400x longer and required a ton of iterations and concurrency helpers.
     @MainActor
     func selectionSort(by areInIncreasingOrder: ((SortItem, SortItem) -> Bool) = (<)) async -> [SortItem] {
         guard !Task.isCancelled else {
@@ -220,30 +204,29 @@ extension SortViewModel {
                 key = j
             }
             guard i != key else { continue }
-            // data.swapAt(i, key)
+            try? await Task.sleep(nanoseconds: UInt64(delay * 1_000_000))
             await swap(i, key)
         }
         return data
     }
     
-    // MARK: Quadratic - Insertion Sort
-    /// A naive insertion sort implementation.
+    // MARK: - Quadratic - Insertion Sort
     @MainActor
-    func insertionSort(by areInIncreasingOrder: ((SortItem, SortItem) -> Bool) = (<)) async -> [SortItem] {
-        guard !Task.isCancelled else {
-            return data
-        }
-        var theData = self.data
-        for i in 1..<theData.count {
-            let key = theData[i]
-            var j = i - 1
-            while j >= 0 && areInIncreasingOrder(key, theData[j]) {
-                theData[j+1] = theData[j]
-                j = j - 1
+    func insertionSort() async {
+        while data != data.sorted() {
+            for i in (1..<data.count) {
+                if !running {
+                    return
+                }
+                var j = i
+                while j > 0 {
+                    if data[j] < data[j - 1] {
+                        await swap(j, j - 1)
+                    }
+                    j--
+                }
             }
-            theData[j + 1] = key
         }
-        return theData
     }
     
     // MARK: Quadratic - Gnome Sort

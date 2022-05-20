@@ -228,22 +228,23 @@ class SortViewModel: ObservableObject {
             switch (algorithm) {
                 // Logarithmic algorithms
                 case .quickSort:
-                    _ = await quickSort()
+                    await quickSort()
                     return data
                 case .mergeSort:
-                    _ = await mergeSort()
+                    await mergeSort()
                     return data
                 case .heapSort:
                     await heapSort()
                     return data
                 // Quadratic algorithms
                 case .bubbleSort:
-                    await bubbleSort2()
+                    await bubbleSort()
                     return data
                 case .selectionSort:
                     return await selectionSort()
                 case .insertionSort:
-                    return await insertionSort()
+                    await insertionSort()
+                    return data
                 default:
                     return Optional.none
             }
