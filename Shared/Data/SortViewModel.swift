@@ -37,6 +37,14 @@ class SortViewModel: ObservableObject {
         precondition(data.indices.contains(index), "The index \(index) does not exist on an array of length \(data.endIndex)!")
     }
     
+    /// Delay an action within an `async` closure.
+    @MainActor
+    func delay() async {
+        if (delay > 0.0) {
+            try? await Task.sleep(nanoseconds: UInt64(delay * 1_000_000))
+        }
+    }
+    
     /// Set the contents of the data array asynchronously.
     @MainActor
     func setData(_ data: [SortItem]) async {
@@ -103,7 +111,6 @@ class SortViewModel: ObservableObject {
         guard !Task.isCancelled else {
             return
         }
-        let delayNs = UInt64(delay * 1_000_000)
         enforceIndex(data, firstIndex)
         enforceIndex(data, secondIndex)
         if (sound) {
@@ -119,7 +126,7 @@ class SortViewModel: ObservableObject {
         await changeColor(index: firstIndex, color: .red)
         await changeColor(index: secondIndex, color: .orange)
         data.swapAt(firstIndex, secondIndex)
-        try? await Task.sleep(nanoseconds: delayNs)
+        await delay()
         await resetColor(index: firstIndex)
         await resetColor(index: secondIndex)
     }
@@ -166,7 +173,7 @@ class SortViewModel: ObservableObject {
         if (sound) {
             toner.play(carrierFrequency: await calculateFrequency(index: index))
         }
-        try? await Task.sleep(nanoseconds: UInt64(delay * 1_000_000))
+        await delay()
         return data[index].value
     }
     
@@ -189,7 +196,7 @@ class SortViewModel: ObservableObject {
         await operate()
         if clear {
             Task.detached { [self] in
-                try? await Task.sleep(nanoseconds: UInt64(delay * 1_000_000))
+                await delay()
                 await resetColor(index: firstIndex)
                 await resetColor(index: secondIndex)
             }
@@ -259,6 +266,9 @@ class SortViewModel: ObservableObject {
                     return data
                 case .radixSort:
                     await radixSort()
+                    return data
+                case .shellSort:
+                    await shellSort()
                     return data
                 // Weird algorithms
                 default:

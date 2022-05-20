@@ -114,7 +114,7 @@ extension SortViewModel {
                     newRange: Float(200)...Float(600)
                 ))
             }
-            try? await Task.sleep(nanoseconds: UInt64(delay * 1_000_000))
+            await delay()
             await resetColor(index: i + start)
         }
     }
@@ -203,7 +203,7 @@ extension SortViewModel {
                 key = j
             }
             guard i != key else { continue }
-            try? await Task.sleep(nanoseconds: UInt64(delay * 1_000_000))
+            await delay()
             await swap(i, key)
         }
     }
@@ -397,21 +397,54 @@ extension SortViewModel {
                     await changeColor(index: counter, color: color)
                     coloredIndices.append(counter)
                     counter++
-                    try? await Task.sleep(nanoseconds: UInt64(delay * 1_000_000))
+                    await delay()
                 }
-                try? await Task.sleep(nanoseconds: UInt64(delay * 1_000_000))
+                await delay()
                 await coloredIndices.concurrentForEach { [self] index in
                     await resetColor(index: index)
                 }
                 coloredIndices.removeAll()
             }
             counter = 0
-            try? await Task.sleep(nanoseconds: UInt64(delay * 1_000_000))
+            await delay()
         }
     }
     
     // MARK: Weird - Shell Sort
-    // TODO: Implement shell sort
+    func shellSort() async {
+        let n = data.count
+        var interval = ~(~(n / 2))
+        var j: Int
+        while interval > 0 {
+            for i in interval..<n {
+                if !running {
+                    return
+                }
+                let temp = data[i]
+                j = i
+                let value = await getValue(index: j - interval)!
+                while j >= interval && value > temp.value {
+                    if !running {
+                        return
+                    }
+                    await swap(j, j - interval)
+                    await changeColor(index: j, color: .red)
+                    data[j].value = j + 1
+                    // toner.play(await calculateFrequency(j))
+                    await delay()
+                    await resetColor(index: j)
+                    j -= interval
+                }
+                data[j] = temp
+                // toner.play(await calculateFrequency(j))
+                data[j].value = j + 1
+                await changeColor(index: j, color: .blue)
+                await delay()
+                await resetColor(index: j)
+            }
+            interval = ~(~(interval / 2))
+        }
+    }
     
     // MARK: Weird - Comb Sort
     // TODO: Implement comb sort
