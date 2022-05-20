@@ -14,7 +14,7 @@ class SortViewModel: ObservableObject {
     var algorithm: Algorithms = .quickSort
     
     let toner = FMSynthesizer()
-    @Published var arraySizeBacking: Float = 128.0
+    @Published var arraySizeBacking: Float = 256.0
     var arraySize: Binding<Int>{
         Binding<Int>(get: {
             return Int(self.arraySizeBacking)
@@ -253,6 +253,9 @@ class SortViewModel: ObservableObject {
                     return data
                 case .pancakeSort:
                     await pancakeSort()
+                    return data
+                case .bitonicSort:
+                    await bitonicSort()
                     return data
                 // Weird algorithms
                 default:

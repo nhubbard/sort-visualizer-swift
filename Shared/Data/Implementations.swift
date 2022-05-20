@@ -341,8 +341,30 @@ extension SortViewModel {
         }
     }
     
-    // MARK: Weird - Bitonic Sort
-    // TODO: Implement bitonic sort
+    // MARK: - Weird - Bitonic Sort
+    func bitonicSort() async {
+        let n = data.count
+        var k = 2
+        while k <= n {
+            var j = Int(floor(Double(k / 2)))
+            while j > 0 {
+                for i in 0..<n {
+                    if !running {
+                        return
+                    }
+                    let l = i ^ j
+                    if l > i {
+                        let comp = try! await compare(firstIndex: i, secondIndex: l)
+                        if (((i & k) == 0) && (comp) || (((i & k) != 0) && (!comp))) {
+                            await swap(i, l)
+                        }
+                    }
+                }
+                j = Int(floor(Double(j / 2)))
+            }
+            k *= 2
+        }
+    }
     
     // MARK: Weird - Radix Sort
     // TODO: Implement radix sort

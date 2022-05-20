@@ -87,7 +87,7 @@ struct SortView: View {
                     }
                     HStack(spacing: 10) {
                         Text("Array Size")
-                        Slider(value: $state.arraySizeBacking, in: 16...256)
+                        Slider(value: $state.arraySizeBacking, in: 16...512, step: 2)
                             .onChange(of: state.arraySizeBacking) { newValue in
                                 if (state.running) {
                                     state.running = false
