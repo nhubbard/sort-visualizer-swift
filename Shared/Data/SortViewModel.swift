@@ -22,7 +22,7 @@ class SortViewModel: ObservableObject {
             self.arraySizeBacking = Float($0)
         })
     }
-    @Published var data: [SortItem] = SortItem.syncSequenceOf(numItems: 128)
+    @Published var data: [SortItem] = SortItem.syncSequenceOf(numItems: 256)
     @Published var operations: ManagedAtomic<Int> = ManagedAtomic(0)
     @Published var isSorted: Bool = false
     @Published var running: Bool = false
@@ -256,6 +256,9 @@ class SortViewModel: ObservableObject {
                     return data
                 case .bitonicSort:
                     await bitonicSort()
+                    return data
+                case .radixSort:
+                    await radixSort()
                     return data
                 // Weird algorithms
                 default:
