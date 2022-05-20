@@ -29,13 +29,13 @@ struct SortView: View {
                             .frame(width: rectWidth, height: rectMinHeight * CGFloat(item.value))
                     }.id(UUID())
                 }.frame(width: geo.size.width, height: geo.size.height, alignment: .bottomLeading)
-                    .alert("Sorry!", isPresented: $showWarning, actions: {
+                    .alert("Sort Finished Incorrectly", isPresented: $showWarning, actions: {
                         Button("OK", role: .cancel) {
                             showWarning = false
                         }
                     }, message: {
                         VStack {
-                            Text("The result is invalid, the algorithm isn't implemented, or the sorting operation was cancelled by the system.")
+                            Text("This can happen when: (a) you stopped the algorithm while it was running; (b) the algorithm implementation has a bug and returned an incorrect result, or; (c) the algorithm isn't implemented at all.")
                         }
                     })
                 GroupBox(label: Label("Settings", systemImage: "gear").padding(.top, 2).padding(.bottom, 2)) {
@@ -87,8 +87,11 @@ struct SortView: View {
                     }
                     HStack(spacing: 10) {
                         Text("Array Size")
-                        Slider(value: $state.arraySizeBacking, in: 16...1024)
+                        Slider(value: $state.arraySizeBacking, in: 16...256)
                             .onChange(of: state.arraySizeBacking) { newValue in
+                                if (state.running) {
+                                    state.running = false
+                                }
                                 state.recreateTaskRef = Task.init {
                                     await state.recreate(numItems: Int(newValue))
                                 }

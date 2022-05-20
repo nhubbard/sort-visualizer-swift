@@ -13,7 +13,7 @@ import Atomics
 class SortViewModel: ObservableObject {
     var algorithm: Algorithms = .quickSort
     
-    private let toner = FMSynthesizer()
+    let toner = FMSynthesizer()
     @Published var arraySizeBacking: Float = 128.0
     var arraySize: Binding<Int>{
         Binding<Int>(get: {
@@ -31,16 +31,19 @@ class SortViewModel: ObservableObject {
     var sortTaskRef: Task<Void, Error>? = nil
     var recreateTaskRef: Task<Void, Error>? = nil
     
+    /// Throw an unchecked error if we attempt to access a value outside the range of the `data` array's length.
     @MainActor
-    private func enforceIndex(_ data: [SortItem], _ index: Int) {
+    func enforceIndex(_ data: [SortItem], _ index: Int) {
         precondition(data.indices.contains(index), "The index \(index) does not exist on an array of length \(data.endIndex)!")
     }
     
+    /// Set the contents of the data array asynchronously.
     @MainActor
     func setData(_ data: [SortItem]) async {
         self.data = data
     }
     
+    /// Increment the operation counter in the UI atomically and asynchronously.
     @MainActor
     func operate() async {
         guard !Task.isCancelled else {
@@ -49,6 +52,7 @@ class SortViewModel: ObservableObject {
         operations.wrappingIncrement(by: 1, ordering: .relaxed)
     }
     
+    /// Get the operations counter
     @MainActor
     func getOperations() -> Int {
         return operations.load(ordering: .relaxed)
@@ -162,6 +166,8 @@ class SortViewModel: ObservableObject {
         if (sound) {
             toner.play(carrierFrequency: await calculateFrequency(index: index))
         }
+        let delayNs = UInt64(delay * 1_000_000)
+        try? await Task.sleep(nanoseconds: delayNs)
         return data[index].value
     }
     
@@ -220,18 +226,24 @@ class SortViewModel: ObservableObject {
     func doSort() async -> Bool {
         func innerDoSort(_ algorithm: Algorithms) async -> Optional<[SortItem]> {
             switch (algorithm) {
-            case .quickSort:
-                return await quickSort()
-            case .bubbleSort:
-                return await bubbleSort()
-            case .insertionSort:
-                return await insertionSort()
-            case .selectionSort:
-                return await selectionSort()
-            case .mergeSort:
-                return await emMergeSort()
-            default:
-                return Optional.none
+                // Logarithmic algorithms
+                case .quickSort:
+                    _ = await quickSort()
+                    return data
+                case .mergeSort:
+                    _ = await mergeSort()
+                    return data
+                case .heapSort:
+                    await heapSort()
+                    return data
+                case .bubbleSort:
+                    return await bubbleSort()
+                case .insertionSort:
+                    return await insertionSort()
+                case .selectionSort:
+                    return await selectionSort()
+                default:
+                    return Optional.none
             }
         }
         guard !Task.isCancelled else {
@@ -243,8 +255,15 @@ class SortViewModel: ObservableObject {
         else {
             return false
         }
-        await setData(data)
+        if algorithm != .quickSort && algorithm != .mergeSort {
+            await setData(result)
+        }
+        // FIXME: This is a hacky workaround for a bug in Merge Sort. I can't figure out exactly why, but when this bug happens, the debugger always prints a warning about having a duplicate item in it that it "will cause issues".
+        if algorithm == .mergeSort {
+            data = Array(Set(data)).sorted()
+        }
         let _ = await isArraySorted()
+        running = false
         return data == data.sorted()
     }
 }
