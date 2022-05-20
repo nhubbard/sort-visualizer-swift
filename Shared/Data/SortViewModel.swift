@@ -166,14 +166,13 @@ class SortViewModel: ObservableObject {
         if (sound) {
             toner.play(carrierFrequency: await calculateFrequency(index: index))
         }
-        let delayNs = UInt64(delay * 1_000_000)
-        try? await Task.sleep(nanoseconds: delayNs)
+        try? await Task.sleep(nanoseconds: UInt64(delay * 1_000_000))
         return data[index].value
     }
     
     /// Compare the values of two SortItems at their specified indexes.
     @MainActor
-    func compare(firstIndex: Int, secondIndex: Int, by: ((Int, Int) -> Bool) = (>=)) async throws -> Bool {
+    func compare(firstIndex: Int, secondIndex: Int, by: ((Int, Int) -> Bool) = (>=), clear: Bool = false) async throws -> Bool {
         guard !Task.isCancelled else {
             throw TaskCancelledError()
         }
@@ -188,17 +187,14 @@ class SortViewModel: ObservableObject {
             throw TaskCancelledError()
         }
         await operate()
-        return by(lhs, rhs)
-    }
-    
-    /// Moves a value at index `j` right. Used by insertion sort.
-    @MainActor
-    func shiftRight(_ data: inout [SortItem], _ j: inout Int) async {
-        guard !Task.isCancelled else {
-            return
+        if clear {
+            Task.detached { [self] in
+                try? await Task.sleep(nanoseconds: UInt64(delay * 1_000_000))
+                await resetColor(index: firstIndex)
+                await resetColor(index: secondIndex)
+            }
         }
-        data[j + 1] = data[j]
-        j -= 1
+        return by(lhs, rhs)
     }
     
     /// Change the color of a SortItem at the specified index.
@@ -241,9 +237,16 @@ class SortViewModel: ObservableObject {
                     await bubbleSort()
                     return data
                 case .selectionSort:
-                    return await selectionSort()
+                    await selectionSort()
+                    return data
                 case .insertionSort:
                     await insertionSort()
+                    return data
+                case .gnomeSort:
+                    await gnomeSort()
+                    return data
+                case .shakerSort:
+                    await shakerSort()
                     return data
                 default:
                     return Optional.none

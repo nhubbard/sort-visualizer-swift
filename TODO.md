@@ -20,15 +20,15 @@
     * [x] Introduce delays
     * [x] Introduce operations counting
     * [x] Verify visualization
-* [ ] Bubble Sort
-    * [ ] Introduce delays
-    * [ ] Introduce operations counting
-    * [ ] Verify visualization
-* [ ] Selection Sort
-    * [ ] Introduce delays
-    * [ ] Introduce operations counting
-    * [ ] Verify visualization
-* [ ] Insertion Sort
-    * [ ] Introduce delays
-    * [ ] Introduce operations counting
-    * [ ] Make visualization more useful
+* [x] Bubble Sort
+    * [x] Introduce delays
+    * [x] Introduce operations counting
+    * [x] Verify visualization
+* [x] Selection Sort
+    * [x] Introduce delays
+    * [x] Introduce operations counting
+    * [x] Verify visualization
+* [x] Insertion Sort
+    * [x] Introduce delays
+    * [x] Introduce operations counting
+    * [x] Make visualization more useful

@@ -63,11 +63,10 @@ extension SortViewModel {
     }
     
     @MainActor
-    @discardableResult func quickSort() async -> [SortItem] {
+    func quickSort() async {
         var proxy: [SortItem] = data
         await _quickSort(&proxy, 0, proxy.count - 1)
         proxy = data
-        return proxy
     }
     
     // MARK: - Logarithmic - Merge Sort
@@ -120,9 +119,8 @@ extension SortViewModel {
     }
     
     @MainActor
-    @discardableResult func mergeSort() async -> [SortItem] {
+    func mergeSort() async {
         await _mergeSort(0, data.count)
-        return data
     }
 
     // MARK: - Logarithmic - Heap Sort
@@ -194,20 +192,19 @@ extension SortViewModel {
     // MARK: - Quadratic - Selection Sort
     // This is the one algorithm that I didn't rewrite following the JS implementation; it ended up taking 400x longer and required a ton of iterations and concurrency helpers.
     @MainActor
-    func selectionSort(by areInIncreasingOrder: ((SortItem, SortItem) -> Bool) = (<)) async -> [SortItem] {
+    func selectionSort(by areInIncreasingOrder: ((SortItem, SortItem) -> Bool) = (<)) async {
         guard !Task.isCancelled else {
-            return data
+            return
         }
         for i in 0..<(data.count-1) {
             var key = i
-            for j in i+1..<data.count where areInIncreasingOrder(data[j], data[key]) {
+            for j in i+1..<data.count where try! await compare(firstIndex: key, secondIndex: j) {
                 key = j
             }
             guard i != key else { continue }
             try? await Task.sleep(nanoseconds: UInt64(delay * 1_000_000))
             await swap(i, key)
         }
-        return data
     }
     
     // MARK: - Quadratic - Insertion Sort
@@ -229,11 +226,58 @@ extension SortViewModel {
         }
     }
     
-    // MARK: Quadratic - Gnome Sort
-    // TODO: Implement gnome sort
+    // MARK: - Quadratic - Gnome Sort
+    @MainActor
+    func gnomeSort() async {
+        var i = 1
+        var j = 2
+        while i < data.count {
+            if !running {
+                return
+            }
+            if try! await !compare(firstIndex: i - 1, secondIndex: i) {
+                i = j
+                j++
+            } else {
+                await swap(i - 1, i)
+                i--
+                if i == 0 {
+                    i = j
+                    j++
+                }
+            }
+        }
+    }
     
-    // MARK: Quadratic - Shaker Sort
-    // TODO: Implement shaker sort
+    // MARK: - Quadratic - Shaker Sort
+    @MainActor
+    func shakerSort() async {
+        var sorted = true
+        while sorted {
+            for i in 0..<(data.count - 1) {
+                if !running {
+                    return
+                }
+                if try! await compare(firstIndex: i, secondIndex: i + 1) {
+                    await swap(i, i + 1)
+                    sorted = true
+                }
+            }
+            if !sorted {
+                break
+            }
+            sorted = false
+            for j in (1..<(data.count - 1)).reversed() {
+                if !running {
+                    return
+                }
+                if try! await compare(firstIndex: j - 1, secondIndex: j) {
+                    await swap(j - 1, j)
+                    sorted = true
+                }
+            }
+        }
+    }
     
     // MARK: Quadratic - Odd-Even Sort
     // TODO: Implement odd-even sort
