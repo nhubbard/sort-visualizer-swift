@@ -9,7 +9,7 @@ import Foundation
 import CollectionConcurrencyKit
 
 extension SortViewModel {
-    // MARK: Logarithmic - Quick Sort
+    // MARK: - Logarithmic - Quick Sort
     // Based on the original inspiration for this app (github:Myphz/sortvisualizer)
     @MainActor
     func _quickSort(_ array: inout [SortItem], _ left: Int, _ right: Int) async {
@@ -70,7 +70,7 @@ extension SortViewModel {
         return proxy
     }
     
-    // MARK: Logarithmic - Merge Sort
+    // MARK: - Logarithmic - Merge Sort
     // Based on original inspiration (github:Myphz/sortvisualizer)
     @MainActor
     func _mergeSort(_ start: Int, _ end: Int) async {
@@ -125,7 +125,7 @@ extension SortViewModel {
         return data
     }
 
-    // MARK: Logarithmic - Heap Sort
+    // MARK: - Logarithmic - Heap Sort
     @MainActor
     func _heapify(_ length: Int, _ i: Int) async {
         let indices = data.indices
@@ -175,7 +175,7 @@ extension SortViewModel {
         }
     }
     
-    // MARK: Quadratic - Bubble Sort
+    // MARK: - Quadratic - Bubble Sort
     /// A naive bubble sort implementation. Thanks to: https://medium.com/@EnnioMa/back-to-the-fundamentals-sorting-algorithms-in-swift-from-scratch-fccf8a3daea3
     @MainActor
     func bubbleSort(by areInIncreasingOrder: ((SortItem, SortItem) -> Bool) = (<)) async -> [SortItem] {
@@ -191,7 +191,23 @@ extension SortViewModel {
         return data
     }
     
-    // MARK: Quadratic - Selection Sort
+    // MARK: - Quadratic - Bubble Sort v2
+    // Based on inspiration (github:Myphz/sortvisualizer)
+    @MainActor
+    func bubbleSort2() async {
+        for i in 1..<data.count {
+            for j in 0..<(data.count - i) {
+                if !running {
+                    return
+                }
+                if try! await compare(firstIndex: j, secondIndex: j + 1) {
+                    await swap(j, j + 1)
+                }
+            }
+        }
+    }
+    
+    // MARK: - Quadratic - Selection Sort
     /// A naive selection sort implementation.
     @MainActor
     func selectionSort(by areInIncreasingOrder: ((SortItem, SortItem) -> Bool) = (<)) async -> [SortItem] {

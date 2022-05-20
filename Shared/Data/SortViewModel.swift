@@ -236,12 +236,14 @@ class SortViewModel: ObservableObject {
                 case .heapSort:
                     await heapSort()
                     return data
+                // Quadratic algorithms
                 case .bubbleSort:
-                    return await bubbleSort()
-                case .insertionSort:
-                    return await insertionSort()
+                    await bubbleSort2()
+                    return data
                 case .selectionSort:
                     return await selectionSort()
+                case .insertionSort:
+                    return await insertionSort()
                 default:
                     return Optional.none
             }
