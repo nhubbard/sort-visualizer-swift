@@ -248,6 +248,9 @@ class SortViewModel: ObservableObject {
                 case .shakerSort:
                     await shakerSort()
                     return data
+                case .oddEvenSort:
+                    await oddEvenSort()
+                    return data
                 default:
                     return Optional.none
             }

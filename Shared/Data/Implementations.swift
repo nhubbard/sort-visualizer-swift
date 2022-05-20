@@ -279,8 +279,25 @@ extension SortViewModel {
         }
     }
     
-    // MARK: Quadratic - Odd-Even Sort
-    // TODO: Implement odd-even sort
+    // MARK: - Quadratic - Odd-Even Sort
+    @MainActor
+    func oddEvenSort() async {
+        var sorted = false
+        while !sorted {
+            sorted = true
+            for first in [1, 0] {
+                for i in stride(from: first, to: data.count - 1, by: 2) {
+                    if !running {
+                        return
+                    }
+                    if try! await compare(firstIndex: i, secondIndex: i + 1) {
+                        await swap(i, i + 1)
+                        sorted = false
+                    }
+                }
+            }
+        }
+    }
     
     // MARK: Quadratic - Pancake Sort
     // TODO: Implement pancake sort
