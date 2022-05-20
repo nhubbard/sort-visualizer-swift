@@ -251,6 +251,10 @@ class SortViewModel: ObservableObject {
                 case .oddEvenSort:
                     await oddEvenSort()
                     return data
+                case .pancakeSort:
+                    await pancakeSort()
+                    return data
+                // Weird algorithms
                 default:
                     return Optional.none
             }
