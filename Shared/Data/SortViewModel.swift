@@ -42,6 +42,9 @@ class SortViewModel: ObservableObject {
     func delay() async {
         if (delay > 0.0) {
             try? await Task.sleep(nanoseconds: UInt64(delay * 1_000_000))
+        } else {
+            // 0.01 ms (prevents freezing of the UI by moving the slider to 0.0 ms)
+            try? await Task.sleep(nanoseconds: UInt64(10_000))
         }
     }
     
@@ -273,6 +276,9 @@ class SortViewModel: ObservableObject {
                     return data
                 case .combSort:
                     await combSort()
+                    return data
+                case .bogoSort:
+                    await bogoSort()
                     return data
                 // Weird algorithms
                 default:

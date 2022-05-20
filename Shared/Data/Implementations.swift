@@ -479,7 +479,21 @@ extension SortViewModel {
     }
     
     // MARK: - Weird - Bogo Sort
-    // TODO: Implement bogo sort
+    func _shuffleBogo() async {
+        for i in 0..<data.count {
+            await swap(i, Int.random(in: data.indices))
+            await delay()
+        }
+    }
+    
+    func bogoSort() async {
+        while data != data.sorted() {
+            if !running {
+                return
+            }
+            await _shuffleBogo()
+        }
+    }
     
     // MARK: - Weird - Stooge Sort
     // TODO: Implement stooge sort
