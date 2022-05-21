@@ -1,6 +1,6 @@
 # TODO List
 
-## General Issues
+## General
 
 * [x] Migrate manual layout engine to use HStack with alignment bottom and no spacing
 * [x] Wire up array size and delay changes
@@ -14,9 +14,11 @@
 
 ## User Interface
 
-* [ ] Add warning to Bogo Sort, because it's uselessly slow and is almost guaranteed to never finish.
-* [ ] Replace Step button with Record functionality; maybe use [frolovilya/SwiftUIViewRecorder](https://github.com/frolovilya/SwiftUIViewRecorder).
-* [ ] Enhance sort algorithm pages with descriptions of algorithms, big-O notation values, and implementation code for various languages.
+* [ ] Add warning to Bogo Sort
+* [ ] Enable user to collapse Settings panel
+* [ ] Add transparency to Settings panel
+* [ ] Replace Step button with Record functionality; maybe use [SwiftUIViewRecorder](https://github.com/frolovilya/SwiftUIViewRecorder) as an example
+* [ ] Enhance sort algorithm pages with descriptions of algorithms, big-O notation values, and implementation code for various languages
 
 ## Algorithms
 
