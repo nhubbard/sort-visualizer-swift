@@ -14,55 +14,41 @@ extension SortViewModel {
     // Based on the original inspiration for this app (github:Myphz/sortvisualizer)
     @MainActor
     func _quickSort(_ left: Int, _ right: Int) async {
-        func _subCompare1(i: Int, j: Int, pivot: Int, _ by: (Int, Int) -> Bool = (>=)) async -> Bool {
-            guard !Task.isCancelled else {
-                return false
-            }
-            let result = await compare(firstIndex: pivot, secondIndex: i, by: by)
-            return result && i < j
-        }
-        func _subCompare2(pivot: Int, j: Int, _ by: (Int, Int) -> Bool = (>=)) async -> Bool {
-            guard !Task.isCancelled else {
-                return false
-            }
-            return await compare(firstIndex: pivot, secondIndex: j, by: by)
-        }
         guard !Task.isCancelled else {
             return
         }
-        guard (left <= right && left >= 0 && right >= 0) else {
-            return
-        }
-        let pivot = left
-        await changeColor(index: left, color: .red)
-        var i = left
-        var j = right
-        await changeColor(index: j, color: .blue)
-        while i < j {
-            guard running else {
-                return
-            }
-            while await _subCompare1(i: i, j: j, pivot: pivot) {
-                await resetColor(index: i)
-                i++
-                await changeColor(index: i, color: .green)
-            }
-            while await !_subCompare2(pivot: pivot, j: j) {
-                await resetColor(index: j)
-                j--
-                await changeColor(index: j, color: .blue)
-            }
+        if left < right {
+            let pivot = left
             await changeColor(index: pivot, color: .red)
-            if i < j {
-                await swap(i, j)
+            var i = left
+            var j = right
+            await changeColor(index: j, color: .blue)
+            while i < j {
+                if !running || Task.isCancelled {
+                    return
+                }
+                while await compare(firstIndex: pivot, secondIndex: i) && i < j {
+                    await resetColor(index: i)
+                    i++
+                    await changeColor(index: i, color: .green)
+                }
+                while await !compare(firstIndex: pivot, secondIndex: j) {
+                    await resetColor(index: j)
+                    j--
+                    await changeColor(index: j, color: .blue)
+                }
+                await changeColor(index: pivot, color: .red)
+                if i < j {
+                    await swap(i, j)
+                }
             }
+            await swap(pivot, j)
+            for index in [i, j, pivot] {
+                await resetColor(index: index)
+            }
+            await _quickSort(left, j - 1)
+            await _quickSort(j + 1, right)
         }
-        await swap(pivot, j)
-        for index in [i, j, pivot] {
-            await resetColor(index: index)
-        }
-        await _quickSort(left, j - 1)
-        await _quickSort(j + 1, right)
     }
     
     @MainActor

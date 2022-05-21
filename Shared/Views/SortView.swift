@@ -45,17 +45,15 @@ struct SortView: View {
                         Toggle(isOn: $state.running) {
                             Label("Running", systemImage: "play.fill")
                         }.frame(maxWidth: 150).toggleStyle(.switch).onChange(of: state.running) { newValue in
-                            DispatchQueue.main.async {
-                                if (newValue) {
-                                    state.sortTaskRef = Task.init {
-                                        if (await !state.doSort()) {
-                                            showWarning = true
-                                        }
+                            if (newValue) {
+                                state.sortTaskRef = Task.init {
+                                    if (await !state.doSort()) {
+                                        showWarning = true
                                     }
-                                } else {
-                                    if (state.sortTaskRef != nil) {
-                                        state.sortTaskRef!.cancel()
-                                    }
+                                }
+                            } else {
+                                if (state.sortTaskRef != nil) {
+                                    state.sortTaskRef!.cancel()
                                 }
                             }
                         }
