@@ -50,9 +50,7 @@
 		71D4DC2128186393001DBD0E /* StoogeSort.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71D4DC2028186393001DBD0E /* StoogeSort.swift */; };
 		71D4DC2528186A0F001DBD0E /* MarkdownUI in Frameworks */ = {isa = PBXBuildFile; productRef = 71D4DC2428186A0F001DBD0E /* MarkdownUI */; };
 		71ED4EAE2831575500880755 /* Atomics in Frameworks */ = {isa = PBXBuildFile; productRef = 71ED4EAD2831575500880755 /* Atomics */; };
-		71F2BA59283293F6001D7370 /* TaskCancelledError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71F2BA58283293F6001D7370 /* TaskCancelledError.swift */; };
 		71F2BA5C2832A052001D7370 /* CollectionConcurrencyKit in Frameworks */ = {isa = PBXBuildFile; productRef = 71F2BA5B2832A052001D7370 /* CollectionConcurrencyKit */; };
-		71F2BA5E2832A2F6001D7370 /* NotImplementedError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71F2BA5D2832A2F6001D7370 /* NotImplementedError.swift */; };
 		71F38EB82819B42C0085BAAA /* SortView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71F38EB72819B42C0085BAAA /* SortView.swift */; };
 		71F4B35028207C02006B68E6 /* SortViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71F4B34F28207C02006B68E6 /* SortViewModel.swift */; };
 		71FD4A43281C1F2C00E1E6FA /* SortItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71FD4A42281C1F2C00E1E6FA /* SortItem.swift */; };
@@ -104,8 +102,6 @@
 		71D4DC1D2818638B001DBD0E /* BogoSort.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BogoSort.swift; sourceTree = "<group>"; };
 		71D4DC2028186393001DBD0E /* StoogeSort.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoogeSort.swift; sourceTree = "<group>"; };
 		71E6B239282033D300672D55 /* Sort2--iOS--Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "Sort2--iOS--Info.plist"; sourceTree = "<group>"; };
-		71F2BA58283293F6001D7370 /* TaskCancelledError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskCancelledError.swift; sourceTree = "<group>"; };
-		71F2BA5D2832A2F6001D7370 /* NotImplementedError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotImplementedError.swift; sourceTree = "<group>"; };
 		71F38EB72819B42C0085BAAA /* SortView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SortView.swift; sourceTree = "<group>"; };
 		71F4B34F28207C02006B68E6 /* SortViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SortViewModel.swift; sourceTree = "<group>"; };
 		71FD4A42281C1F2C00E1E6FA /* SortItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SortItem.swift; sourceTree = "<group>"; };
@@ -134,8 +130,6 @@
 				71F4B34F28207C02006B68E6 /* SortViewModel.swift */,
 				710BF0532821885300F7B066 /* Range+Extensions.swift */,
 				716A5CE02821AB0D008B792A /* Algorithms.swift */,
-				71F2BA58283293F6001D7370 /* TaskCancelledError.swift */,
-				71F2BA5D2832A2F6001D7370 /* NotImplementedError.swift */,
 				71610A9528357F5C00F6176E /* Int+Extensions.swift */,
 				71B55E0D28383D5C00CA74CB /* Cycle.swift */,
 			);
@@ -359,7 +353,6 @@
 				71B55E0E28383D5C00CA74CB /* Cycle.swift in Sources */,
 				71CFAC1828396F81004672DB /* BogoSortImpl.swift in Sources */,
 				71FD4A43281C1F2C00E1E6FA /* SortItem.swift in Sources */,
-				71F2BA5E2832A2F6001D7370 /* NotImplementedError.swift in Sources */,
 				71CFABFE2839528A004672DB /* HeapSortImpl.swift in Sources */,
 				71D4DBF4281862FC001DBD0E /* MergeSort.swift in Sources */,
 				71CFAC1A28396F9A004672DB /* StoogeSortImpl.swift in Sources */,
@@ -381,7 +374,6 @@
 				71D4DBF728186306001DBD0E /* HeapSort.swift in Sources */,
 				71D4DC182818637F001DBD0E /* ShellSort.swift in Sources */,
 				71CFAC1428396F32004672DB /* ShellSortImpl.swift in Sources */,
-				71F2BA59283293F6001D7370 /* TaskCancelledError.swift in Sources */,
 				71D4DC1E2818638B001DBD0E /* BogoSort.swift in Sources */,
 				71D4DC0528186340001DBD0E /* GnomeSort.swift in Sources */,
 				71D4DBEC28185B59001DBD0E /* QuickSort.swift in Sources */,

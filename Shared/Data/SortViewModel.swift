@@ -40,7 +40,7 @@ class SortViewModel: ObservableObject {
     /// Delay an action within an `async` closure.
     @MainActor
     func delay() async {
-        if (delay > 0.0) {
+        if delay > 0.0 {
             try? await Task.sleep(nanoseconds: UInt64(delay * 1_000_000))
         } else {
             // 0.01 ms (prevents freezing of the UI by moving the slider to 0.0 ms)
@@ -80,7 +80,7 @@ class SortViewModel: ObservableObject {
         guard !Task.isCancelled else {
             return
         }
-        if (running) {
+        if running {
             sortTaskRef!.cancel()
         }
         await MainActor.run {
@@ -116,13 +116,13 @@ class SortViewModel: ObservableObject {
         }
         enforceIndex(data, firstIndex)
         enforceIndex(data, secondIndex)
-        if (sound) {
+        if sound {
             let xFreq = await calculateFrequency(index: firstIndex)
             let yFreq = await calculateFrequency(index: secondIndex)
             toner.play(carrierFrequency: xFreq)
             toner.play(carrierFrequency: yFreq)
         }
-        if (!running || firstIndex == secondIndex) {
+        if !running || firstIndex == secondIndex {
             return
         }
         await operate()
@@ -141,7 +141,7 @@ class SortViewModel: ObservableObject {
             return false
         }
         for i in 1..<data.count {
-            if (await !compare(firstIndex: i, secondIndex: i - 1)) {
+            if await !compare(firstIndex: i, secondIndex: i - 1) {
                 return false
             }
         }
@@ -169,7 +169,7 @@ class SortViewModel: ObservableObject {
             return Optional.none
         }
         enforceIndex(data, index)
-        if (sound) {
+        if sound {
             toner.play(carrierFrequency: await calculateFrequency(index: index))
         }
         await delay()
@@ -227,7 +227,7 @@ class SortViewModel: ObservableObject {
     @MainActor
     func doSort() async -> Bool {
         func innerDoSort(_ algorithm: Algorithms) async -> Optional<[SortItem]> {
-            switch (algorithm) {
+            switch algorithm {
                 // Logarithmic algorithms
                 case .quickSort:
                     await quickSort()
@@ -293,7 +293,7 @@ class SortViewModel: ObservableObject {
         if algorithm != .quickSort && algorithm != .mergeSort {
             await setData(result)
         }
-        // FIXME: This is a hacky workaround for a bug in Merge Sort. I can't figure out exactly why, but when this bug happens, the debugger always prints a warning about having a duplicate item in it that it "will cause issues".
+        // FIXME: This is a hacky workaround for a bug in Merge Sort. I can't figure out exactly why, but when this bug happens, the debugger always prints a warning about having a duplicate item in it that it "will cause issues". For whatever reason, a single item appears to be duplicated late in the sorting process.
         if algorithm == .mergeSort {
             data = Array(Set(data)).sorted()
         }

@@ -1,5 +1,5 @@
 //
-//  FMSynth.swift
+//  FMSynthesizer.swift
 //  Sort2 (iOS)
 //
 //  Created by Nicholas Hubbard on 5/2/22.
@@ -58,7 +58,7 @@ class FMSynthesizer {
         }
     }
 
-    public func play(carrierFrequency: Float32, modulatorFrequency: Float32 = 679.0, modulatorAmplitude: Float32 = 0.8, duration: Int = 5) {
+    public func play(carrierFrequency: Float32, modulatorFrequency: Float32 = 679.0, modulatorAmplitude: Float32 = 0.8) {
         let unitVelocity = Float32(2.0 * .pi / audioFormat!.sampleRate)
         let carrierVelocity = carrierFrequency * unitVelocity
         let modulatorVelocity = modulatorFrequency * unitVelocity

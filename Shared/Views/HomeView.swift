@@ -47,11 +47,9 @@ struct HomeView: View {
      * Randomized header animation type.
      */
     func doHeaderAnimation() async {
-        var header = "SORT VISUALIZER"
         for _ in 0..<48 {
-            header = String(header.shuffled()).uppercased()
-            titleText = "\(header)"
-            usleep(useconds_t(50 * 1000))
+            titleText = String("SORT VISUALIZER".shuffled())
+            try? await Task.sleep(nanoseconds: UInt64(50_000_000))
         }
         titleText = "SORT VISUALIZER"
     }

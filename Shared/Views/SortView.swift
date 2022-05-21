@@ -12,8 +12,6 @@ let minFreq = 200
 
 struct SortView: View {
     var algorithm: Algorithms
-    // This warns of global actors or something. We can't fix it for now.
-    // Just ignore it.
     @StateObject var state: SortViewModel = SortViewModel()
     @State var showWarning: Bool = false
     
@@ -104,10 +102,6 @@ struct SortView: View {
         }.onAppear {
             state.setAlgo(algo: algorithm)
         }
-    }
-    
-    func onCancelTask() {
-        state.running = false
     }
 }
 

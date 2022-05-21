@@ -19,24 +19,24 @@ func floatRatio(x: Float, oldRange: ClosedRange<Float>, newRange: ClosedRange<Fl
     var reverseInput = false
     let oldMin = min(oMin, oMax)
     let oldMax = max(oMin, oMax)
-    if (oldMin != oMin) {
+    if oldMin != oMin {
         reverseInput = true
     }
     // Check reversed output range.
     var reverseOutput = false
     let newMin = min(nMin, nMax)
     let newMax = max(nMin, nMax)
-    if (newMin != nMin) {
+    if newMin != nMin {
         reverseOutput = true
     }
     // Calculate portions.
     var portion = (x - oldMin) * (newMax - newMin) / (oldMax - oldMin)
-    if (reverseInput) {
+    if reverseInput {
         portion = (oldMax - x) * (newMax - newMin) / (oldMax - oldMin)
     }
     // Calculate result.
     var result = portion + newMin
-    if (reverseOutput) {
+    if reverseOutput {
         result = newMax - portion
     }
     return result

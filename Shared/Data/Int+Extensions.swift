@@ -18,15 +18,3 @@ postfix operator -- // i--
    defer {left -= 1}
    return left
 }
-
-prefix operator ++ // ++i
-@discardableResult prefix func ++ ( right: inout Int) -> Int {
-   right += 1
-   return right
-}
-
-prefix operator -- // --i
-@discardableResult prefix func -- ( right: inout Int) -> Int {
-   right -= 1
-   return right
-}

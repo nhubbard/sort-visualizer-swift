@@ -8,7 +8,6 @@
 import Foundation
 
 public extension Sequence {
-
     /**
      Returns an iterator-sequence cycling infinitely through the sequence.
      ```
@@ -20,43 +19,11 @@ public extension Sequence {
     func cycle() -> CycleIterator<Self> {
         return CycleIterator(sequence: self)
     }
-
-    /**
-     Returns an array of `times` cycles of self.
-     ```
-     let values = [1, 2, 3].cycle(times: 2)
-     // [1, 2, 3, 1, 2, 3]
-     ```
-     - Parameter times: The number of times to cycle through the sequence.
-     - Returns: An array of `times` cycles of self.
-     */
-    func cycle(times: Int) -> [Iterator.Element] {
-        return Array(CycleIterator(sequence: self, times: times))
-    }
 }
-
-
-public extension LazySequenceProtocol {
-
-    /**
-     Returns an iterator-sequence of `times` cycles of self.
-     ```
-     let values = [1, 2, 3].lazy.cycle(times: 2)
-     // 1, 2, 3, 1, 2, 3
-     ```
-     - Parameter times: The number of times to cycle through the sequence.
-     - Returns: An iterator-sequence of `times` cycles of self.
-     */
-    func cycle(times: Int) -> CycleIterator<Self> {
-        return CycleIterator(sequence: self, times: times)
-    }
-}
-
 
 /// An iterator-sequence for cycling through a collection.
 /// See the `cycle` and `cycle(times:)` Sequence and LazySequenceProtocol methods.
 public struct CycleIterator<S: Sequence>: IteratorProtocol, LazySequenceProtocol {
-
     private let sequence: S
     private var iterator: S.Iterator
     private var times: Int
