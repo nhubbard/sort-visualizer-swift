@@ -9,10 +9,25 @@
 /* Begin PBXBuildFile section */
 		71052D3528203F3100935228 /* FMSynthesizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71052D3428203F3100935228 /* FMSynthesizer.swift */; };
 		710BF0542821885300F7B066 /* Range+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 710BF0532821885300F7B066 /* Range+Extensions.swift */; };
-		71411F92282C1AD4003E8B8A /* Implementations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71411F91282C1AD4003E8B8A /* Implementations.swift */; };
 		71610A9628357F5C00F6176E /* Int+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71610A9528357F5C00F6176E /* Int+Extensions.swift */; };
 		716A5CE12821AB0D008B792A /* Algorithms.swift in Sources */ = {isa = PBXBuildFile; fileRef = 716A5CE02821AB0D008B792A /* Algorithms.swift */; };
 		71B55E0E28383D5C00CA74CB /* Cycle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71B55E0D28383D5C00CA74CB /* Cycle.swift */; };
+		71CFABF9283951C5004672DB /* QuickSortImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71CFABF8283951C5004672DB /* QuickSortImpl.swift */; };
+		71CFABFC28395264004672DB /* MergeSortImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71CFABFB28395264004672DB /* MergeSortImpl.swift */; };
+		71CFABFE2839528A004672DB /* HeapSortImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71CFABFD2839528A004672DB /* HeapSortImpl.swift */; };
+		71CFAC0128396D08004672DB /* BubbleSortImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71CFAC0028396D08004672DB /* BubbleSortImpl.swift */; };
+		71CFAC0328396D2A004672DB /* SelectionSortImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71CFAC0228396D2A004672DB /* SelectionSortImpl.swift */; };
+		71CFAC0528396D4C004672DB /* InsertionSortImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71CFAC0428396D4C004672DB /* InsertionSortImpl.swift */; };
+		71CFAC0728396D6C004672DB /* GnomeSortImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71CFAC0628396D6C004672DB /* GnomeSortImpl.swift */; };
+		71CFAC0928396D90004672DB /* ShakerSortImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71CFAC0828396D90004672DB /* ShakerSortImpl.swift */; };
+		71CFAC0B28396DAE004672DB /* OddEvenSortImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71CFAC0A28396DAE004672DB /* OddEvenSortImpl.swift */; };
+		71CFAC0D28396DD4004672DB /* PancakeSortImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71CFAC0C28396DD4004672DB /* PancakeSortImpl.swift */; };
+		71CFAC1028396E05004672DB /* BitonicSortImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71CFAC0F28396E05004672DB /* BitonicSortImpl.swift */; };
+		71CFAC1228396EC3004672DB /* RadixSortImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71CFAC1128396EC3004672DB /* RadixSortImpl.swift */; };
+		71CFAC1428396F32004672DB /* ShellSortImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71CFAC1328396F32004672DB /* ShellSortImpl.swift */; };
+		71CFAC1628396F63004672DB /* CombSortImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71CFAC1528396F63004672DB /* CombSortImpl.swift */; };
+		71CFAC1828396F81004672DB /* BogoSortImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71CFAC1728396F81004672DB /* BogoSortImpl.swift */; };
+		71CFAC1A28396F9A004672DB /* StoogeSortImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71CFAC1928396F9A004672DB /* StoogeSortImpl.swift */; };
 		71D4DBDA28185905001DBD0E /* Sort2App.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71D4DBCA28185905001DBD0E /* Sort2App.swift */; };
 		71D4DBDC28185905001DBD0E /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71D4DBCB28185905001DBD0E /* ContentView.swift */; };
 		71D4DBDE28185905001DBD0E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 71D4DBCC28185905001DBD0E /* Assets.xcassets */; };
@@ -46,11 +61,26 @@
 /* Begin PBXFileReference section */
 		71052D3428203F3100935228 /* FMSynthesizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FMSynthesizer.swift; sourceTree = "<group>"; };
 		710BF0532821885300F7B066 /* Range+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Range+Extensions.swift"; sourceTree = "<group>"; };
-		71411F91282C1AD4003E8B8A /* Implementations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Implementations.swift; sourceTree = "<group>"; };
 		71610A9528357F5C00F6176E /* Int+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Int+Extensions.swift"; sourceTree = "<group>"; };
 		716A5CE02821AB0D008B792A /* Algorithms.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Algorithms.swift; sourceTree = "<group>"; };
 		71934841281979490058FD9E /* TODO.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = TODO.md; sourceTree = "<group>"; };
 		71B55E0D28383D5C00CA74CB /* Cycle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Cycle.swift; sourceTree = "<group>"; };
+		71CFABF8283951C5004672DB /* QuickSortImpl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickSortImpl.swift; sourceTree = "<group>"; };
+		71CFABFB28395264004672DB /* MergeSortImpl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MergeSortImpl.swift; sourceTree = "<group>"; };
+		71CFABFD2839528A004672DB /* HeapSortImpl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeapSortImpl.swift; sourceTree = "<group>"; };
+		71CFAC0028396D08004672DB /* BubbleSortImpl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BubbleSortImpl.swift; sourceTree = "<group>"; };
+		71CFAC0228396D2A004672DB /* SelectionSortImpl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectionSortImpl.swift; sourceTree = "<group>"; };
+		71CFAC0428396D4C004672DB /* InsertionSortImpl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsertionSortImpl.swift; sourceTree = "<group>"; };
+		71CFAC0628396D6C004672DB /* GnomeSortImpl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GnomeSortImpl.swift; sourceTree = "<group>"; };
+		71CFAC0828396D90004672DB /* ShakerSortImpl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShakerSortImpl.swift; sourceTree = "<group>"; };
+		71CFAC0A28396DAE004672DB /* OddEvenSortImpl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OddEvenSortImpl.swift; sourceTree = "<group>"; };
+		71CFAC0C28396DD4004672DB /* PancakeSortImpl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PancakeSortImpl.swift; sourceTree = "<group>"; };
+		71CFAC0F28396E05004672DB /* BitonicSortImpl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BitonicSortImpl.swift; sourceTree = "<group>"; };
+		71CFAC1128396EC3004672DB /* RadixSortImpl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RadixSortImpl.swift; sourceTree = "<group>"; };
+		71CFAC1328396F32004672DB /* ShellSortImpl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShellSortImpl.swift; sourceTree = "<group>"; };
+		71CFAC1528396F63004672DB /* CombSortImpl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CombSortImpl.swift; sourceTree = "<group>"; };
+		71CFAC1728396F81004672DB /* BogoSortImpl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BogoSortImpl.swift; sourceTree = "<group>"; };
+		71CFAC1928396F9A004672DB /* StoogeSortImpl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoogeSortImpl.swift; sourceTree = "<group>"; };
 		71D4DBCA28185905001DBD0E /* Sort2App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sort2App.swift; sourceTree = "<group>"; };
 		71D4DBCB28185905001DBD0E /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		71D4DBCC28185905001DBD0E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -98,7 +128,7 @@
 		71052D2D2820352A00935228 /* Data */ = {
 			isa = PBXGroup;
 			children = (
-				71411F91282C1AD4003E8B8A /* Implementations.swift */,
+				71CFABF7283951B3004672DB /* Implementations */,
 				71FD4A42281C1F2C00E1E6FA /* SortItem.swift */,
 				71052D3428203F3100935228 /* FMSynthesizer.swift */,
 				71F4B34F28207C02006B68E6 /* SortViewModel.swift */,
@@ -110,6 +140,53 @@
 				71B55E0D28383D5C00CA74CB /* Cycle.swift */,
 			);
 			path = Data;
+			sourceTree = "<group>";
+		};
+		71CFABF7283951B3004672DB /* Implementations */ = {
+			isa = PBXGroup;
+			children = (
+				71CFAC0E28396DFC004672DB /* Weird */,
+				71CFABFF28396CFB004672DB /* Quadratic */,
+				71CFABFA28395255004672DB /* Logarithmic */,
+			);
+			path = Implementations;
+			sourceTree = "<group>";
+		};
+		71CFABFA28395255004672DB /* Logarithmic */ = {
+			isa = PBXGroup;
+			children = (
+				71CFABF8283951C5004672DB /* QuickSortImpl.swift */,
+				71CFABFB28395264004672DB /* MergeSortImpl.swift */,
+				71CFABFD2839528A004672DB /* HeapSortImpl.swift */,
+			);
+			path = Logarithmic;
+			sourceTree = "<group>";
+		};
+		71CFABFF28396CFB004672DB /* Quadratic */ = {
+			isa = PBXGroup;
+			children = (
+				71CFAC0028396D08004672DB /* BubbleSortImpl.swift */,
+				71CFAC0228396D2A004672DB /* SelectionSortImpl.swift */,
+				71CFAC0428396D4C004672DB /* InsertionSortImpl.swift */,
+				71CFAC0628396D6C004672DB /* GnomeSortImpl.swift */,
+				71CFAC0828396D90004672DB /* ShakerSortImpl.swift */,
+				71CFAC0A28396DAE004672DB /* OddEvenSortImpl.swift */,
+				71CFAC0C28396DD4004672DB /* PancakeSortImpl.swift */,
+			);
+			path = Quadratic;
+			sourceTree = "<group>";
+		};
+		71CFAC0E28396DFC004672DB /* Weird */ = {
+			isa = PBXGroup;
+			children = (
+				71CFAC0F28396E05004672DB /* BitonicSortImpl.swift */,
+				71CFAC1128396EC3004672DB /* RadixSortImpl.swift */,
+				71CFAC1328396F32004672DB /* ShellSortImpl.swift */,
+				71CFAC1528396F63004672DB /* CombSortImpl.swift */,
+				71CFAC1728396F81004672DB /* BogoSortImpl.swift */,
+				71CFAC1928396F9A004672DB /* StoogeSortImpl.swift */,
+			);
+			path = Weird;
 			sourceTree = "<group>";
 		};
 		71D4DBC428185904001DBD0E = {
@@ -280,22 +357,30 @@
 			buildActionMask = 2147483647;
 			files = (
 				71B55E0E28383D5C00CA74CB /* Cycle.swift in Sources */,
+				71CFAC1828396F81004672DB /* BogoSortImpl.swift in Sources */,
 				71FD4A43281C1F2C00E1E6FA /* SortItem.swift in Sources */,
 				71F2BA5E2832A2F6001D7370 /* NotImplementedError.swift in Sources */,
+				71CFABFE2839528A004672DB /* HeapSortImpl.swift in Sources */,
 				71D4DBF4281862FC001DBD0E /* MergeSort.swift in Sources */,
+				71CFAC1A28396F9A004672DB /* StoogeSortImpl.swift in Sources */,
 				71D4DC0E28186356001DBD0E /* PancakeSort.swift in Sources */,
-				71411F92282C1AD4003E8B8A /* Implementations.swift in Sources */,
 				71D4DC0828186347001DBD0E /* ShakerSort.swift in Sources */,
 				71D4DC0228186339001DBD0E /* InsertionSort.swift in Sources */,
+				71CFAC0328396D2A004672DB /* SelectionSortImpl.swift in Sources */,
 				71F38EB82819B42C0085BAAA /* SortView.swift in Sources */,
 				71610A9628357F5C00F6176E /* Int+Extensions.swift in Sources */,
+				71CFAC0B28396DAE004672DB /* OddEvenSortImpl.swift in Sources */,
 				71D4DC1B28186385001DBD0E /* CombSort.swift in Sources */,
+				71CFAC1028396E05004672DB /* BitonicSortImpl.swift in Sources */,
+				71CFAC0928396D90004672DB /* ShakerSortImpl.swift in Sources */,
 				71D4DBDC28185905001DBD0E /* ContentView.swift in Sources */,
 				71F4B35028207C02006B68E6 /* SortViewModel.swift in Sources */,
+				71CFAC1228396EC3004672DB /* RadixSortImpl.swift in Sources */,
 				71D4DC0B2818634E001DBD0E /* OddEvenSort.swift in Sources */,
 				71D4DBDA28185905001DBD0E /* Sort2App.swift in Sources */,
 				71D4DBF728186306001DBD0E /* HeapSort.swift in Sources */,
 				71D4DC182818637F001DBD0E /* ShellSort.swift in Sources */,
+				71CFAC1428396F32004672DB /* ShellSortImpl.swift in Sources */,
 				71F2BA59283293F6001D7370 /* TaskCancelledError.swift in Sources */,
 				71D4DC1E2818638B001DBD0E /* BogoSort.swift in Sources */,
 				71D4DC0528186340001DBD0E /* GnomeSort.swift in Sources */,
@@ -303,10 +388,17 @@
 				71D4DC1528186377001DBD0E /* RadixSort.swift in Sources */,
 				710BF0542821885300F7B066 /* Range+Extensions.swift in Sources */,
 				716A5CE12821AB0D008B792A /* Algorithms.swift in Sources */,
+				71CFABFC28395264004672DB /* MergeSortImpl.swift in Sources */,
+				71CFAC0D28396DD4004672DB /* PancakeSortImpl.swift in Sources */,
 				71D4DC122818636E001DBD0E /* BitonicSort.swift in Sources */,
 				71052D3528203F3100935228 /* FMSynthesizer.swift in Sources */,
+				71CFABF9283951C5004672DB /* QuickSortImpl.swift in Sources */,
 				71D4DBF028185DFD001DBD0E /* HomeView.swift in Sources */,
+				71CFAC0528396D4C004672DB /* InsertionSortImpl.swift in Sources */,
+				71CFAC0728396D6C004672DB /* GnomeSortImpl.swift in Sources */,
 				71D4DC2128186393001DBD0E /* StoogeSort.swift in Sources */,
+				71CFAC1628396F63004672DB /* CombSortImpl.swift in Sources */,
+				71CFAC0128396D08004672DB /* BubbleSortImpl.swift in Sources */,
 				71D4DBFF2818632F001DBD0E /* SelectionSort.swift in Sources */,
 				71D4DBFA28186310001DBD0E /* BubbleSort.swift in Sources */,
 			);

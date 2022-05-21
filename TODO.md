@@ -4,6 +4,7 @@
 
 * [x] Migrate manual layout engine to use HStack with alignment bottom and no spacing
 * [x] Wire up array size and delay changes
+* [x] Separate algorithm implementations into separate files
 * [ ] Clean up any dead code from prior changes
 
 ## Audio
