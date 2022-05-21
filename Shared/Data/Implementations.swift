@@ -13,22 +13,24 @@ extension SortViewModel {
     // MARK: - Logarithmic - Quick Sort
     // Based on the original inspiration for this app (github:Myphz/sortvisualizer)
     @MainActor
-    func _quickSort(_ array: inout [SortItem], _ left: Int, _ right: Int) async {
+    func _quickSort(_ left: Int, _ right: Int) async {
         func _subCompare1(i: Int, j: Int, pivot: Int, _ by: (Int, Int) -> Bool = (>=)) async -> Bool {
-            let result = try? await compare(firstIndex: pivot, secondIndex: i, by: by)
-            guard result != nil else {
+            guard !Task.isCancelled else {
                 return false
             }
-            return result! && i < j
+            let result = await compare(firstIndex: pivot, secondIndex: i, by: by)
+            return result && i < j
         }
         func _subCompare2(pivot: Int, j: Int, _ by: (Int, Int) -> Bool = (>=)) async -> Bool {
-            let result = try? await compare(firstIndex: pivot, secondIndex: j, by: by)
-            guard result != nil else {
+            guard !Task.isCancelled else {
                 return false
             }
-            return result!
+            return await compare(firstIndex: pivot, secondIndex: j, by: by)
         }
-        guard (!Task.isCancelled && left <= right && left >= 0 && right >= 0) else {
+        guard !Task.isCancelled else {
+            return
+        }
+        guard (left <= right && left >= 0 && right >= 0) else {
             return
         }
         let pivot = left
@@ -59,21 +61,25 @@ extension SortViewModel {
         for index in [i, j, pivot] {
             await resetColor(index: index)
         }
-        await _quickSort(&array, left, j - 1)
-        await _quickSort(&array, j + 1, right)
+        await _quickSort(left, j - 1)
+        await _quickSort(j + 1, right)
     }
     
     @MainActor
     func quickSort() async {
-        var proxy: [SortItem] = data
-        await _quickSort(&proxy, 0, proxy.count - 1)
-        proxy = data
+        guard !Task.isCancelled else {
+            return
+        }
+        await _quickSort(0, data.count - 1)
     }
     
     // MARK: - Logarithmic - Merge Sort
     // Based on original inspiration (github:Myphz/sortvisualizer)
     @MainActor
     func _mergeSort(_ start: Int, _ end: Int) async {
+        guard !Task.isCancelled else {
+            return
+        }
         if (start >= end - 1) {
             return
         }
@@ -121,12 +127,18 @@ extension SortViewModel {
     
     @MainActor
     func mergeSort() async {
+        guard !Task.isCancelled else {
+            return
+        }
         await _mergeSort(0, data.count)
     }
 
     // MARK: - Logarithmic - Heap Sort
     @MainActor
     func _heapify(_ length: Int, _ i: Int) async {
+        guard !Task.isCancelled else {
+            return
+        }
         let indices = data.indices
         if (!running) {
             return
@@ -135,13 +147,13 @@ extension SortViewModel {
         let left = i * 2 + 1
         let right = left + 1
         if indices.contains(left) && indices.contains(largest) {
-            let firstCompare = try! await compare(firstIndex: left, secondIndex: largest)
+            let firstCompare = await compare(firstIndex: left, secondIndex: largest)
             if left < length && firstCompare {
                 largest = left
             }
         }
         if indices.contains(right) && indices.contains(largest) {
-            let secondCompare = try! await compare(firstIndex: right, secondIndex: largest)
+            let secondCompare = await compare(firstIndex: right, secondIndex: largest)
             if right < length && secondCompare {
                 largest = right
             }
@@ -154,6 +166,9 @@ extension SortViewModel {
     
     @MainActor
     func heapSort() async {
+        guard !Task.isCancelled else {
+            return
+        }
         let length = data.count
         var i = length / 2 - 1
         var k = length - 1
@@ -178,12 +193,15 @@ extension SortViewModel {
     // Based on inspiration (github:Myphz/sortvisualizer)
     @MainActor
     func bubbleSort() async {
+        guard !Task.isCancelled else {
+            return
+        }
         for i in 1..<data.count {
             for j in 0..<(data.count - i) {
                 if !running {
                     return
                 }
-                if try! await compare(firstIndex: j, secondIndex: j + 1) {
+                if await compare(firstIndex: j, secondIndex: j + 1) {
                     await swap(j, j + 1)
                 }
             }
@@ -199,7 +217,7 @@ extension SortViewModel {
         }
         for i in 0..<(data.count-1) {
             var key = i
-            for j in i+1..<data.count where try! await compare(firstIndex: key, secondIndex: j) {
+            for j in i+1..<data.count where await compare(firstIndex: key, secondIndex: j) {
                 key = j
             }
             guard i != key else { continue }
@@ -211,6 +229,9 @@ extension SortViewModel {
     // MARK: - Quadratic - Insertion Sort
     @MainActor
     func insertionSort() async {
+        guard !Task.isCancelled else {
+            return
+        }
         while data != data.sorted() {
             for i in (1..<data.count) {
                 if !running {
@@ -230,13 +251,16 @@ extension SortViewModel {
     // MARK: - Quadratic - Gnome Sort
     @MainActor
     func gnomeSort() async {
+        guard !Task.isCancelled else {
+            return
+        }
         var i = 1
         var j = 2
         while i < data.count {
             if !running {
                 return
             }
-            if try! await !compare(firstIndex: i - 1, secondIndex: i) {
+            if await !compare(firstIndex: i - 1, secondIndex: i) {
                 i = j
                 j++
             } else {
@@ -253,13 +277,16 @@ extension SortViewModel {
     // MARK: - Quadratic - Shaker Sort
     @MainActor
     func shakerSort() async {
+        guard !Task.isCancelled else {
+            return
+        }
         var sorted = true
         while sorted {
             for i in 0..<(data.count - 1) {
                 if !running {
                     return
                 }
-                if try! await compare(firstIndex: i, secondIndex: i + 1) {
+                if await compare(firstIndex: i, secondIndex: i + 1) {
                     await swap(i, i + 1)
                     sorted = true
                 }
@@ -272,7 +299,7 @@ extension SortViewModel {
                 if !running {
                     return
                 }
-                if try! await compare(firstIndex: j - 1, secondIndex: j) {
+                if await compare(firstIndex: j - 1, secondIndex: j) {
                     await swap(j - 1, j)
                     sorted = true
                 }
@@ -283,6 +310,9 @@ extension SortViewModel {
     // MARK: - Quadratic - Odd-Even Sort
     @MainActor
     func oddEvenSort() async {
+        guard !Task.isCancelled else {
+            return
+        }
         var sorted = false
         while !sorted {
             sorted = true
@@ -291,7 +321,7 @@ extension SortViewModel {
                     if !running {
                         return
                     }
-                    if try! await compare(firstIndex: i, secondIndex: i + 1) {
+                    if await compare(firstIndex: i, secondIndex: i + 1) {
                         await swap(i, i + 1)
                         sorted = false
                     }
@@ -303,6 +333,9 @@ extension SortViewModel {
     // MARK: - Quadratic - Pancake Sort
     @MainActor
     func _flip(_ k: Int) async {
+        guard !Task.isCancelled else {
+            return
+        }
         var k = k
         var left = 0
         while left < k {
@@ -319,7 +352,7 @@ extension SortViewModel {
     func _maxIndex(_ k: Int) async -> Int {
         var index = 0
         for i in 0..<k {
-            if try! await compare(firstIndex: i, secondIndex: index) {
+            if await compare(firstIndex: i, secondIndex: index) {
                 index = i
             }
         }
@@ -328,6 +361,9 @@ extension SortViewModel {
     
     @MainActor
     func pancakeSort() async {
+        guard !Task.isCancelled else {
+            return
+        }
         var n = data.count
         while n > 1 {
             if !running {
@@ -345,6 +381,9 @@ extension SortViewModel {
     // MARK: - Weird - Bitonic Sort
     @MainActor
     func bitonicSort() async {
+        guard !Task.isCancelled else {
+            return
+        }
         let n = data.count
         var k = 2
         while k <= n {
@@ -356,7 +395,7 @@ extension SortViewModel {
                     }
                     let l = i ^ j
                     if l > i {
-                        let comp = try! await compare(firstIndex: i, secondIndex: l)
+                        let comp = await compare(firstIndex: i, secondIndex: l)
                         if (((i & k) == 0) && (comp) || (((i & k) != 0) && (!comp))) {
                             await swap(i, l)
                         }
@@ -371,6 +410,9 @@ extension SortViewModel {
     // MARK: - Weird - Radix Sort
     @MainActor
     func radixSort() async {
+        guard !Task.isCancelled else {
+            return
+        }
         let colors: [Color] = [.red, .orange, .yellow, .green, .blue, .indigo, .purple, .teal, .cyan, .mint, .pink].shuffled()
         let base = colors.count
         var done = false
@@ -415,6 +457,9 @@ extension SortViewModel {
     // MARK: - Weird - Shell Sort
     @MainActor
     func shellSort() async {
+        guard !Task.isCancelled else {
+            return
+        }
         let n = data.count
         var interval = ~(~(n / 2))
         var j: Int
@@ -452,6 +497,9 @@ extension SortViewModel {
     // MARK: - Weird - Comb Sort
     @MainActor
     func combSort() async {
+        guard !Task.isCancelled else {
+            return
+        }
         let length = data.count
         let shrink = 1.3
         var gap = length
@@ -470,7 +518,7 @@ extension SortViewModel {
                     return
                 }
                 let sm = gap + i
-                if try! await compare(firstIndex: i, secondIndex: sm) {
+                if await compare(firstIndex: i, secondIndex: sm) {
                     await swap(i, sm)
                     sorted = false
                 }
@@ -480,6 +528,9 @@ extension SortViewModel {
     
     // MARK: - Weird - Bogo Sort
     func _shuffleBogo() async {
+        guard !Task.isCancelled else {
+            return
+        }
         for i in 0..<data.count {
             await swap(i, Int.random(in: data.indices))
             await delay()
@@ -487,6 +538,9 @@ extension SortViewModel {
     }
     
     func bogoSort() async {
+        guard !Task.isCancelled else {
+            return
+        }
         while data != data.sorted() {
             if !running {
                 return
@@ -496,5 +550,31 @@ extension SortViewModel {
     }
     
     // MARK: - Weird - Stooge Sort
-    // TODO: Implement stooge sort
+    func _stoogeSort(_ start: Int, _ end: Int) async {
+        guard !Task.isCancelled else {
+            return
+        }
+        if !running {
+            return
+        }
+        let len = end - start + 1
+        if len <= 1 {
+            return
+        } else if len == 2 {
+            let startValue = await getValue(index: start)!
+            let endValue = await getValue(index: end)!
+            if startValue > endValue {
+                await swap(start, end)
+            }
+            return
+        }
+        let len23 = Int(ceil(Double(len) * 2 / 3))
+        await _stoogeSort(start, start + len23 - 1)
+        await _stoogeSort(end - len23 + 1, end)
+        await _stoogeSort(start, start + len23 - 1)
+    }
+    
+    func stoogeSort() async {
+        await _stoogeSort(0, data.count - 1)
+    }
 }

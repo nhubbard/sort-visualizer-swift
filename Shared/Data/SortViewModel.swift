@@ -141,11 +141,7 @@ class SortViewModel: ObservableObject {
             return false
         }
         for i in 1..<data.count {
-            do {
-                if (try await !compare(firstIndex: i, secondIndex: i - 1)) {
-                    return false
-                }
-            } catch _ {
+            if (await !compare(firstIndex: i, secondIndex: i - 1)) {
                 return false
             }
         }
@@ -182,9 +178,9 @@ class SortViewModel: ObservableObject {
     
     /// Compare the values of two SortItems at their specified indexes.
     @MainActor
-    func compare(firstIndex: Int, secondIndex: Int, by: ((Int, Int) -> Bool) = (>=), clear: Bool = false) async throws -> Bool {
+    func compare(firstIndex: Int, secondIndex: Int, by: ((Int, Int) -> Bool) = (>=), clear: Bool = false) async -> Bool {
         guard !Task.isCancelled else {
-            throw TaskCancelledError()
+            return false
         }
         enforceIndex(data, firstIndex)
         enforceIndex(data, secondIndex)
@@ -194,7 +190,7 @@ class SortViewModel: ObservableObject {
             let lhs = await getValue(index: firstIndex),
             let rhs = await getValue(index: secondIndex)
         else {
-            throw TaskCancelledError()
+            return false
         }
         await operate()
         if clear {
@@ -280,9 +276,9 @@ class SortViewModel: ObservableObject {
                 case .bogoSort:
                     await bogoSort()
                     return data
-                // Weird algorithms
-                default:
-                    return Optional.none
+                case .stoogeSort:
+                    await stoogeSort()
+                    return data
             }
         }
         guard !Task.isCancelled else {
