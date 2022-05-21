@@ -28,11 +28,17 @@ extension SortViewModel {
                     return
                 }
                 while await compare(firstIndex: pivot, secondIndex: i) && i < j {
+                    if !running || Task.isCancelled {
+                        return
+                    }
                     await resetColor(index: i)
                     i++
                     await changeColor(index: i, color: .green)
                 }
                 while await !compare(firstIndex: pivot, secondIndex: j) {
+                    if !running || Task.isCancelled {
+                        return
+                    }
                     await resetColor(index: j)
                     j--
                     await changeColor(index: j, color: .blue)
