@@ -10,18 +10,23 @@ import Foundation
 extension SortViewModel {
     // This is the one algorithm that I didn't rewrite following the JS implementation; it ended up taking 400x longer and required a ton of iterations and concurrency helpers.
     @MainActor
-    func selectionSort(by areInIncreasingOrder: ((SortItem, SortItem) -> Bool) = (<)) async {
+    func insertionSort() async {
         guard !Task.isCancelled else {
             return
         }
-        for i in 0..<(data.count-1) {
-            var key = i
-            for j in i+1..<data.count where await compare(firstIndex: key, secondIndex: j) {
-                key = j
+        while data != data.sorted() {
+            for i in (1..<data.count) {
+                if !running {
+                    return
+                }
+                var j = i
+                while j > 0 {
+                    if data[j] < data[j - 1] {
+                        await swap(j, j - 1)
+                    }
+                    j--
+                }
             }
-            guard i != key else { continue }
-            await delay()
-            await swap(i, key)
         }
     }
 }
