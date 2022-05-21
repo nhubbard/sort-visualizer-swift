@@ -47,13 +47,7 @@ extension SortViewModel {
             data[i + start] = cache[i]
             data[i + start].value = 1 + i + start
             await changeColor(index: i + start, color: .red)
-            if (sound) {
-                toner.play(carrierFrequency: floatRatio(
-                    x: Float(i + start),
-                    oldRange: Float(0)...Float(data.endIndex - 1),
-                    newRange: Float(200)...Float(600)
-                ))
-            }
+            await playNote(i + start)
             await delay()
             await resetColor(index: i + start)
         }

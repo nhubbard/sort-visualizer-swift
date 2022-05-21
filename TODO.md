@@ -5,12 +5,11 @@
 * [x] Migrate manual layout engine to use HStack with alignment bottom and no spacing
 * [x] Wire up array size and delay changes
 * [x] Separate algorithm implementations into separate files
-* [ ] Clean up any dead code from prior changes
+* [x] Clean up any dead code from prior changes
 
 ## Audio
 
-* [ ] Replace custom implementation with AudioKit
-* [ ] Replace Grand Central Dispatch with Structured Concurrency (`async`/`await`)
+* [x] Replace custom implementation with AudioKit
 * [ ] Wire up audio capabilities in all operations
 
 ## User Interface

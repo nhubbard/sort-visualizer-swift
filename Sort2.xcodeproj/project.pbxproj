@@ -7,8 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		71052D3528203F3100935228 /* FMSynthesizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71052D3428203F3100935228 /* FMSynthesizer.swift */; };
 		710BF0542821885300F7B066 /* Range+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 710BF0532821885300F7B066 /* Range+Extensions.swift */; };
+		7120CB9728397DDF0019D976 /* AudioKit in Frameworks */ = {isa = PBXBuildFile; productRef = 7120CB9628397DDF0019D976 /* AudioKit */; };
+		7120CB9928397DF00019D976 /* Synthesizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7120CB9828397DF00019D976 /* Synthesizer.swift */; };
+		7120CB9C28397E410019D976 /* AudioKitEX in Frameworks */ = {isa = PBXBuildFile; productRef = 7120CB9B28397E410019D976 /* AudioKitEX */; };
+		7120CB9F28397E5B0019D976 /* AudioKitUI in Frameworks */ = {isa = PBXBuildFile; productRef = 7120CB9E28397E5B0019D976 /* AudioKitUI */; };
+		7120CBA228397EE40019D976 /* SoundpipeAudioKit in Frameworks */ = {isa = PBXBuildFile; productRef = 7120CBA128397EE40019D976 /* SoundpipeAudioKit */; };
 		71610A9628357F5C00F6176E /* Int+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71610A9528357F5C00F6176E /* Int+Extensions.swift */; };
 		716A5CE12821AB0D008B792A /* Algorithms.swift in Sources */ = {isa = PBXBuildFile; fileRef = 716A5CE02821AB0D008B792A /* Algorithms.swift */; };
 		71B55E0E28383D5C00CA74CB /* Cycle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71B55E0D28383D5C00CA74CB /* Cycle.swift */; };
@@ -57,8 +61,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		71052D3428203F3100935228 /* FMSynthesizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FMSynthesizer.swift; sourceTree = "<group>"; };
 		710BF0532821885300F7B066 /* Range+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Range+Extensions.swift"; sourceTree = "<group>"; };
+		7120CB9828397DF00019D976 /* Synthesizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Synthesizer.swift; sourceTree = "<group>"; };
 		71610A9528357F5C00F6176E /* Int+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Int+Extensions.swift"; sourceTree = "<group>"; };
 		716A5CE02821AB0D008B792A /* Algorithms.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Algorithms.swift; sourceTree = "<group>"; };
 		71934841281979490058FD9E /* TODO.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = TODO.md; sourceTree = "<group>"; };
@@ -113,7 +117,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				71D4DC2528186A0F001DBD0E /* MarkdownUI in Frameworks */,
+				7120CB9C28397E410019D976 /* AudioKitEX in Frameworks */,
 				71ED4EAE2831575500880755 /* Atomics in Frameworks */,
+				7120CB9728397DDF0019D976 /* AudioKit in Frameworks */,
+				7120CB9F28397E5B0019D976 /* AudioKitUI in Frameworks */,
+				7120CBA228397EE40019D976 /* SoundpipeAudioKit in Frameworks */,
 				71F2BA5C2832A052001D7370 /* CollectionConcurrencyKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -126,12 +134,12 @@
 			children = (
 				71CFABF7283951B3004672DB /* Implementations */,
 				71FD4A42281C1F2C00E1E6FA /* SortItem.swift */,
-				71052D3428203F3100935228 /* FMSynthesizer.swift */,
 				71F4B34F28207C02006B68E6 /* SortViewModel.swift */,
 				710BF0532821885300F7B066 /* Range+Extensions.swift */,
 				716A5CE02821AB0D008B792A /* Algorithms.swift */,
 				71610A9528357F5C00F6176E /* Int+Extensions.swift */,
 				71B55E0D28383D5C00CA74CB /* Cycle.swift */,
+				7120CB9828397DF00019D976 /* Synthesizer.swift */,
 			);
 			path = Data;
 			sourceTree = "<group>";
@@ -291,6 +299,10 @@
 				71D4DC2428186A0F001DBD0E /* MarkdownUI */,
 				71ED4EAD2831575500880755 /* Atomics */,
 				71F2BA5B2832A052001D7370 /* CollectionConcurrencyKit */,
+				7120CB9628397DDF0019D976 /* AudioKit */,
+				7120CB9B28397E410019D976 /* AudioKitEX */,
+				7120CB9E28397E5B0019D976 /* AudioKitUI */,
+				7120CBA128397EE40019D976 /* SoundpipeAudioKit */,
 			);
 			productName = "Sort2 (iOS)";
 			productReference = 71D4DBD128185905001DBD0E /* Sort Visualizer.app */;
@@ -324,6 +336,10 @@
 				71D4DC2328186A0F001DBD0E /* XCRemoteSwiftPackageReference "MarkdownUI" */,
 				71ED4EAC2831575500880755 /* XCRemoteSwiftPackageReference "swift-atomics" */,
 				71F2BA5A2832A052001D7370 /* XCRemoteSwiftPackageReference "CollectionConcurrencyKit" */,
+				7120CB9528397DDF0019D976 /* XCRemoteSwiftPackageReference "AudioKit" */,
+				7120CB9A28397E410019D976 /* XCRemoteSwiftPackageReference "AudioKitEX" */,
+				7120CB9D28397E5B0019D976 /* XCRemoteSwiftPackageReference "AudioKitUI" */,
+				7120CBA028397EE40019D976 /* XCRemoteSwiftPackageReference "SoundpipeAudioKit" */,
 			);
 			productRefGroup = 71D4DBD228185905001DBD0E /* Products */;
 			projectDirPath = "";
@@ -367,6 +383,7 @@
 				71CFAC1028396E05004672DB /* BitonicSortImpl.swift in Sources */,
 				71CFAC0928396D90004672DB /* ShakerSortImpl.swift in Sources */,
 				71D4DBDC28185905001DBD0E /* ContentView.swift in Sources */,
+				7120CB9928397DF00019D976 /* Synthesizer.swift in Sources */,
 				71F4B35028207C02006B68E6 /* SortViewModel.swift in Sources */,
 				71CFAC1228396EC3004672DB /* RadixSortImpl.swift in Sources */,
 				71D4DC0B2818634E001DBD0E /* OddEvenSort.swift in Sources */,
@@ -383,7 +400,6 @@
 				71CFABFC28395264004672DB /* MergeSortImpl.swift in Sources */,
 				71CFAC0D28396DD4004672DB /* PancakeSortImpl.swift in Sources */,
 				71D4DC122818636E001DBD0E /* BitonicSort.swift in Sources */,
-				71052D3528203F3100935228 /* FMSynthesizer.swift in Sources */,
 				71CFABF9283951C5004672DB /* QuickSortImpl.swift in Sources */,
 				71D4DBF028185DFD001DBD0E /* HomeView.swift in Sources */,
 				71CFAC0528396D4C004672DB /* InsertionSortImpl.swift in Sources */,
@@ -615,6 +631,38 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		7120CB9528397DDF0019D976 /* XCRemoteSwiftPackageReference "AudioKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/AudioKit/AudioKit.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.0.0;
+			};
+		};
+		7120CB9A28397E410019D976 /* XCRemoteSwiftPackageReference "AudioKitEX" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/AudioKit/AudioKitEX.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.0.0;
+			};
+		};
+		7120CB9D28397E5B0019D976 /* XCRemoteSwiftPackageReference "AudioKitUI" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/AudioKit/AudioKitUI.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.1.5;
+			};
+		};
+		7120CBA028397EE40019D976 /* XCRemoteSwiftPackageReference "SoundpipeAudioKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/AudioKit/SoundpipeAudioKit.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.0.0;
+			};
+		};
 		71D4DC2328186A0F001DBD0E /* XCRemoteSwiftPackageReference "MarkdownUI" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/gonzalezreal/MarkdownUI";
@@ -642,6 +690,26 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		7120CB9628397DDF0019D976 /* AudioKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 7120CB9528397DDF0019D976 /* XCRemoteSwiftPackageReference "AudioKit" */;
+			productName = AudioKit;
+		};
+		7120CB9B28397E410019D976 /* AudioKitEX */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 7120CB9A28397E410019D976 /* XCRemoteSwiftPackageReference "AudioKitEX" */;
+			productName = AudioKitEX;
+		};
+		7120CB9E28397E5B0019D976 /* AudioKitUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 7120CB9D28397E5B0019D976 /* XCRemoteSwiftPackageReference "AudioKitUI" */;
+			productName = AudioKitUI;
+		};
+		7120CBA128397EE40019D976 /* SoundpipeAudioKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 7120CBA028397EE40019D976 /* XCRemoteSwiftPackageReference "SoundpipeAudioKit" */;
+			productName = SoundpipeAudioKit;
+		};
 		71D4DC2428186A0F001DBD0E /* MarkdownUI */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 71D4DC2328186A0F001DBD0E /* XCRemoteSwiftPackageReference "MarkdownUI" */;

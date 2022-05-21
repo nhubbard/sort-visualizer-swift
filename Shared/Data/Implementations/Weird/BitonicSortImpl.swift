@@ -25,7 +25,7 @@ extension SortViewModel {
                     let l = i ^ j
                     if l > i {
                         let comp = await compare(firstIndex: i, secondIndex: l)
-                        if (((i & k) == 0) && (comp) || (((i & k) != 0) && (!comp))) {
+                        if (i & k) == 0 && comp || (i & k) != 0 && (!comp) {
                             await swap(i, l)
                         }
                     }

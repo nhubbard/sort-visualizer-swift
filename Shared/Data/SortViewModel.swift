@@ -13,7 +13,7 @@ import Atomics
 class SortViewModel: ObservableObject {
     var algorithm: Algorithms = .quickSort
     
-    let toner = FMSynthesizer()
+    let toner = Synthesizer()
     @Published var arraySizeBacking: Float = 256.0
     var arraySize: Binding<Int>{
         Binding<Int>(get: {
@@ -46,6 +46,18 @@ class SortViewModel: ObservableObject {
             // 0.01 ms (prevents freezing of the UI by moving the slider to 0.0 ms)
             try? await Task.sleep(nanoseconds: UInt64(10_000))
         }
+    }
+    
+    /// Play a note using the data ranges and the current delay.
+    @MainActor
+    func playNote(_ index: Int) async {
+        guard !Task.isCancelled else {
+            return
+        }
+        guard sound else {
+            return
+        }
+        await toner.playNote(value: index, range: data.indices.lowerBound...data.indices.upperBound, time: delay)
     }
     
     /// Set the contents of the data array asynchronously.
@@ -116,12 +128,8 @@ class SortViewModel: ObservableObject {
         }
         enforceIndex(data, firstIndex)
         enforceIndex(data, secondIndex)
-        if sound {
-            let xFreq = await calculateFrequency(index: firstIndex)
-            let yFreq = await calculateFrequency(index: secondIndex)
-            toner.play(carrierFrequency: xFreq)
-            toner.play(carrierFrequency: yFreq)
-        }
+        await playNote(firstIndex)
+        await playNote(secondIndex)
         if !running || firstIndex == secondIndex {
             return
         }
@@ -169,9 +177,7 @@ class SortViewModel: ObservableObject {
             return Optional.none
         }
         enforceIndex(data, index)
-        if sound {
-            toner.play(carrierFrequency: await calculateFrequency(index: index))
-        }
+        await playNote(index)
         await delay()
         return data[index].value
     }
@@ -186,6 +192,8 @@ class SortViewModel: ObservableObject {
         enforceIndex(data, secondIndex)
         await changeColor(index: firstIndex, color: .blue)
         await changeColor(index: secondIndex, color: .green)
+        await playNote(firstIndex)
+        await playNote(secondIndex)
         guard
             let lhs = await getValue(index: firstIndex),
             let rhs = await getValue(index: secondIndex)
