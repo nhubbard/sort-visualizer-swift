@@ -2,33 +2,38 @@
 
 ## General Issues
 
-* [x] Migrate manual spacing system to use HStack with alignment bottom and no spacing
-* [x] Wire up array size changes
-* [ ] Fix the FM synthesis so that it's less droney without breaking the sound quality; maybe use AudioKit if I can figure it out?
+* [x] Migrate manual layout engine to use HStack with alignment bottom and no spacing
+* [x] Wire up array size and delay changes
+* [ ] Clean up any dead code from prior changes
 
-## Algorithm Issues
+## Audio
 
-* [x] Quick Sort
-    * [x] Introduce delays
-    * [x] Introduce operations counting
-    * [x] Verify visualization
-* [x] Merge Sort
-    * [x] Introduce delays
-    * [x] Introduce operations counting
-    * [x] Verify visualization
-* [x] Heap Sort
-    * [x] Introduce delays
-    * [x] Introduce operations counting
-    * [x] Verify visualization
-* [x] Bubble Sort
-    * [x] Introduce delays
-    * [x] Introduce operations counting
-    * [x] Verify visualization
-* [x] Selection Sort
-    * [x] Introduce delays
-    * [x] Introduce operations counting
-    * [x] Verify visualization
-* [x] Insertion Sort
-    * [x] Introduce delays
-    * [x] Introduce operations counting
-    * [x] Make visualization more useful
+* [ ] Replace custom implementation with AudioKit
+* [ ] Replace Grand Central Dispatch with Structured Concurrency (`async`/`await`)
+* [ ] Wire up audio capabilities in all operations
+
+## User Interface
+
+* [ ] Add warning to Bogo Sort, because it's uselessly slow and is almost guaranteed to never finish.
+* [ ] Replace Step button with Record functionality; maybe use [frolovilya/SwiftUIViewRecorder](https://github.com/frolovilya/SwiftUIViewRecorder).
+* [ ] Enhance sort algorithm pages with descriptions of algorithms, big-O notation values, and implementation code for various languages.
+
+## Algorithms
+
+* [x] Implement and validate all algorithms:
+    * [x] Quick Sort
+    * [x] Merge Sort
+    * [x] Heap Sort
+    * [x] Bubble Sort
+    * [x] Selection Sort
+    * [x] Insertion Sort
+    * [x] Gnome Sort
+    * [x] Shaker Sort
+    * [x] Odd-Even Sort
+    * [x] Pancake Sort
+    * [x] Bitonic Sort
+    * [x] Radix Sort
+    * [x] Shell Sort
+    * [x] Comb Sort
+    * [x] Bogo Sort
+    * [x] Stooge Sort
