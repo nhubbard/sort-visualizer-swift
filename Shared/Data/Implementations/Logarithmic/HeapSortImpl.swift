@@ -14,7 +14,7 @@ extension SortViewModel {
             return
         }
         let indices = data.indices
-        if (!running) {
+        if !running {
             return
         }
         var largest = i
@@ -47,14 +47,14 @@ extension SortViewModel {
         var i = length / 2 - 1
         var k = length - 1
         while i >= 0 {
-            if (!running) {
+            if !running {
                 return
             }
             await _heapify(length, i)
             i--
         }
         while k >= 0 {
-            if (!running) {
+            if !running {
                 return
             }
             await swap(0, k)

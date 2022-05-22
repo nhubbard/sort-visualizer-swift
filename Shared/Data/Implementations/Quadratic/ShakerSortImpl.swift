@@ -28,7 +28,8 @@ extension SortViewModel {
                 break
             }
             sorted = false
-            for j in (1..<(data.count - 1)).reversed() {
+            let sequence = 1..<(data.count - 1)
+            for j in sequence.reversed() {
                 if !running {
                     return
                 }

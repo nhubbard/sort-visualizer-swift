@@ -15,7 +15,7 @@ extension SortViewModel {
             return
         }
         while data != data.sorted() {
-            for i in (1..<data.count) {
+            for i in 1..<data.count {
                 if !running {
                     return
                 }

@@ -8,6 +8,7 @@
 import Foundation
 
 extension SortViewModel {
+    @MainActor
     func _shuffleBogo() async {
         guard !Task.isCancelled else {
             return
@@ -18,6 +19,7 @@ extension SortViewModel {
         }
     }
     
+    @MainActor
     func bogoSort() async {
         guard !Task.isCancelled else {
             return

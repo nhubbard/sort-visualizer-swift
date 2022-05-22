@@ -10,7 +10,7 @@ import Foundation
 extension SortViewModel {
     // This is the one algorithm that I didn't rewrite following the JS implementation; it ended up taking 400x longer and required a ton of iterations and concurrency helpers.
     @MainActor
-    func selectionSort(by areInIncreasingOrder: ((SortItem, SortItem) -> Bool) = (<)) async {
+    func selectionSort() async {
         guard !Task.isCancelled else {
             return
         }

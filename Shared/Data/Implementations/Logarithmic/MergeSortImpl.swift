@@ -14,7 +14,7 @@ extension SortViewModel {
         guard !Task.isCancelled else {
             return
         }
-        if (start >= end - 1) {
+        if start >= end - 1 {
             return
         }
         // ~ is bitwise NOT operator; the JS version uses a unique ~~ operator for double bitwise NOT.
@@ -27,7 +27,7 @@ extension SortViewModel {
         // for (var i = start, r = 0; i < mid; r++, i++)
         var r = 0
         for i in start..<mid {
-            if (!running) {
+            if !running {
                 return
             }
             let kVal = await getValue(index: k)!
@@ -41,7 +41,7 @@ extension SortViewModel {
             r++
         }
         for i in 0..<(k - start) {
-            if (!running) {
+            if !running {
                 return
             }
             data[i + start] = cache[i]

@@ -8,6 +8,7 @@
 import Foundation
 
 extension SortViewModel {
+    @MainActor
     func _stoogeSort(_ start: Int, _ end: Int) async {
         guard !Task.isCancelled else {
             return
@@ -32,6 +33,7 @@ extension SortViewModel {
         await _stoogeSort(start, start + len23 - 1)
     }
     
+    @MainActor
     func stoogeSort() async {
         await _stoogeSort(0, data.count - 1)
     }

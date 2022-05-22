@@ -31,13 +31,13 @@ extension SortViewModel {
                     await swap(j, j - interval)
                     await changeColor(index: j, color: .red)
                     data[j].value = j + 1
-                    // TODO: toner.play(await calculateFrequency(j))
+                    await playNote(j)
                     await delay()
                     await resetColor(index: j)
                     j -= interval
                 }
                 data[j] = temp
-                // TODO: toner.play(await calculateFrequency(j))
+                await playNote(j)
                 data[j].value = j + 1
                 await changeColor(index: j, color: .blue)
                 await delay()
