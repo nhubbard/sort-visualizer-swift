@@ -6,8 +6,8 @@
 * [x] Wire up array size and delay changes
 * [x] Separate algorithm implementations into separate files
 * [x] Clean up any dead code from prior changes
-* [x] Make sure that stopping an in-progress sort functions as expected
-    * [x] Radix Sort
+* [ ] Make sure that stopping an in-progress sort functions as expected
+    * [ ] Merge Sort
 * [x] Make sure operations counter is updated by all algorithms
     * [x] Merge Sort
     * [x] Radix Sort
