@@ -10,22 +10,25 @@ import Foundation
 extension SortViewModel {
     @MainActor
     func shellSort() async {
-        guard !Task.isCancelled else {
+        guard await enforceRunning() else {
             return
         }
         let n = data.count
         var interval = ~(~(n / 2))
         var j: Int
         while interval > 0 {
+            guard await enforceRunning() else {
+                return
+            }
             for i in interval..<n {
-                if !running {
+                guard await enforceRunning() else {
                     return
                 }
                 let temp = data[i]
                 j = i
                 let value = await getValue(index: j - interval)!
                 while j >= interval && value > temp.value {
-                    if !running {
+                    guard await enforceRunning() else {
                         return
                     }
                     await swap(j, j - interval)

@@ -10,10 +10,7 @@ import Foundation
 extension SortViewModel {
     @MainActor
     func _stoogeSort(_ start: Int, _ end: Int) async {
-        guard !Task.isCancelled else {
-            return
-        }
-        if !running {
+        guard await enforceRunning() else {
             return
         }
         let len = end - start + 1

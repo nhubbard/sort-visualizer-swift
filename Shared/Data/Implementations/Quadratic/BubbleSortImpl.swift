@@ -11,12 +11,15 @@ extension SortViewModel {
     // Based on inspiration (github:Myphz/sortvisualizer)
     @MainActor
     func bubbleSort() async {
-        guard !Task.isCancelled else {
+        guard await enforceRunning() else {
             return
         }
         for i in 1..<data.count {
+            guard await enforceRunning() else {
+                return
+            }
             for j in 0..<(data.count - i) {
-                if !running {
+                guard await enforceRunning() else {
                     return
                 }
                 if await compare(firstIndex: j, secondIndex: j + 1) {

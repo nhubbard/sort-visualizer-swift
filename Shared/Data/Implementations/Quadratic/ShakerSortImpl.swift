@@ -10,13 +10,16 @@ import Foundation
 extension SortViewModel {
     @MainActor
     func shakerSort() async {
-        guard !Task.isCancelled else {
+        guard await enforceRunning() else {
             return
         }
         var sorted = true
         while sorted {
+            guard await enforceRunning() else {
+                return
+            }
             for i in 0..<(data.count - 1) {
-                if !running {
+                guard await enforceRunning() else {
                     return
                 }
                 if await compare(firstIndex: i, secondIndex: i + 1) {
@@ -30,7 +33,7 @@ extension SortViewModel {
             sorted = false
             let sequence = 1..<(data.count - 1)
             for j in sequence.reversed() {
-                if !running {
+                guard await enforceRunning() else {
                     return
                 }
                 if await compare(firstIndex: j - 1, secondIndex: j) {

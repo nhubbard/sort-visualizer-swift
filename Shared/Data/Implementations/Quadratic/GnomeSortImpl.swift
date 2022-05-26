@@ -10,13 +10,13 @@ import Foundation
 extension SortViewModel {
     @MainActor
     func gnomeSort() async {
-        guard !Task.isCancelled else {
+        guard await enforceRunning() else {
             return
         }
         var i = 1
         var j = 2
         while i < data.count {
-            if !running {
+            guard await enforceRunning() else {
                 return
             }
             if await !compare(firstIndex: i - 1, secondIndex: i) {

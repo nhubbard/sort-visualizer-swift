@@ -10,7 +10,7 @@ import Foundation
 extension SortViewModel {
     @MainActor
     func combSort() async {
-        guard !Task.isCancelled else {
+        guard await enforceRunning() else {
             return
         }
         let length = data.count
@@ -18,7 +18,7 @@ extension SortViewModel {
         var gap = length
         var sorted = false
         while !sorted {
-            if !running {
+            guard await enforceRunning() else {
                 return
             }
             gap = Int(Double(gap) / shrink)
@@ -27,7 +27,7 @@ extension SortViewModel {
                 gap = 1
             }
             for i in 0..<(length - gap) {
-                if !running {
+                guard await enforceRunning() else {
                     return
                 }
                 let sm = gap + i

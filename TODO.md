@@ -7,7 +7,7 @@
 * [x] Separate algorithm implementations into separate files
 * [x] Clean up any dead code from prior changes
 * [ ] Make sure that stopping an in-progress sort functions as expected
-    * [ ] Merge Sort
+    * [ ] Merge Sort: No longer crashes, but warning dialog does not appear as expected.
 * [x] Make sure operations counter is updated by all algorithms
     * [x] Merge Sort
     * [x] Radix Sort

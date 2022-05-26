@@ -10,16 +10,22 @@ import Foundation
 extension SortViewModel {
     @MainActor
     func bitonicSort() async {
-        guard !Task.isCancelled else {
+        guard await enforceRunning() else {
             return
         }
         let n = data.count
         var k = 2
         while k <= n {
+            guard await enforceRunning() else {
+                return
+            }
             var j = Int(floor(Double(k / 2)))
             while j > 0 {
+                guard await enforceRunning() else {
+                    return
+                }
                 for i in 0..<n {
-                    if !running {
+                    guard await enforceRunning() else {
                         return
                     }
                     let l = i ^ j

@@ -11,7 +11,7 @@ extension SortViewModel {
     // Based on the original inspiration for this app (github:Myphz/sortvisualizer)
     @MainActor
     func _quickSort(_ left: Int, _ right: Int) async {
-        guard !Task.isCancelled else {
+        guard await enforceRunning() else {
             return
         }
         if left < right {
@@ -21,11 +21,11 @@ extension SortViewModel {
             var j = right
             await changeColor(index: j, color: .blue)
             while i < j {
-                if !running || Task.isCancelled {
+                guard await enforceRunning() else {
                     return
                 }
                 while await compare(firstIndex: pivot, secondIndex: i) && i < j {
-                    if !running || Task.isCancelled {
+                    guard await enforceRunning() else {
                         return
                     }
                     await resetColor(index: i)
@@ -33,7 +33,7 @@ extension SortViewModel {
                     await changeColor(index: i, color: .green)
                 }
                 while await !compare(firstIndex: pivot, secondIndex: j) {
-                    if !running || Task.isCancelled {
+                    guard await enforceRunning() else {
                         return
                     }
                     await resetColor(index: j)
@@ -47,6 +47,9 @@ extension SortViewModel {
             }
             await swap(pivot, j)
             for index in [i, j, pivot] {
+                guard await enforceRunning() else {
+                    return
+                }
                 await resetColor(index: index)
             }
             await _quickSort(left, j - 1)
@@ -56,7 +59,7 @@ extension SortViewModel {
     
     @MainActor
     func quickSort() async {
-        guard !Task.isCancelled else {
+        guard await enforceRunning() else {
             return
         }
         await _quickSort(0, data.count - 1)

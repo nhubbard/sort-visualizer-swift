@@ -10,13 +10,10 @@ import Foundation
 extension SortViewModel {
     @MainActor
     func _heapify(_ length: Int, _ i: Int) async {
-        guard !Task.isCancelled else {
+        guard await enforceRunning() else {
             return
         }
         let indices = data.indices
-        if !running {
-            return
-        }
         var largest = i
         let left = i * 2 + 1
         let right = left + 1
@@ -40,21 +37,21 @@ extension SortViewModel {
     
     @MainActor
     func heapSort() async {
-        guard !Task.isCancelled else {
+        guard await enforceRunning() else {
             return
         }
         let length = data.count
         var i = length / 2 - 1
         var k = length - 1
         while i >= 0 {
-            if !running {
+            guard await enforceRunning() else {
                 return
             }
             await _heapify(length, i)
             i--
         }
         while k >= 0 {
-            if !running {
+            guard await enforceRunning() else {
                 return
             }
             await swap(0, k)

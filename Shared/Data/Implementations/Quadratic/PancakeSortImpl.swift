@@ -10,13 +10,13 @@ import Foundation
 extension SortViewModel {
     @MainActor
     func _flip(_ k: Int) async {
-        guard !Task.isCancelled else {
+        guard await enforceRunning() else {
             return
         }
         var k = k
         var left = 0
         while left < k {
-            if !running {
+            guard await enforceRunning() else {
                 return
             }
             await swap(left, k)
@@ -27,8 +27,14 @@ extension SortViewModel {
     
     @MainActor
     func _maxIndex(_ k: Int) async -> Int {
+        guard await enforceRunning() else {
+            return -1
+        }
         var index = 0
         for i in 0..<k {
+            guard await enforceRunning() else {
+                return -1
+            }
             if await compare(firstIndex: i, secondIndex: index) {
                 index = i
             }
@@ -38,12 +44,12 @@ extension SortViewModel {
     
     @MainActor
     func pancakeSort() async {
-        guard !Task.isCancelled else {
+        guard await enforceRunning() else {
             return
         }
         var n = data.count
         while n > 1 {
-            if !running {
+            guard await enforceRunning() else {
                 return
             }
             let maxIndex = await _maxIndex(n)

@@ -37,6 +37,12 @@ class SortViewModel: ObservableObject {
         precondition(data.indices.contains(index), "The index \(index) does not exist on an array of length \(data.endIndex)!")
     }
     
+    /// Check to see that the algorithm isn't stopped or the Task isn't cancelled.
+    @MainActor
+    func enforceRunning() async -> Bool {
+        return !Task.isCancelled && running
+    }
+    
     /// Delay an action within an `async` closure.
     @MainActor
     func delay() async {
