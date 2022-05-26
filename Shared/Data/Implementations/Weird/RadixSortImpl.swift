@@ -20,9 +20,15 @@ extension SortViewModel {
         var done = false
         var digits = 1
         while !done {
+            guard running || !Task.isCancelled else {
+                return
+            }
             done = true
             var buckets: [[SortItem]] = .init(repeating: [], count: base)
-            data.forEach { number in
+            for number in data {
+                guard running || !Task.isCancelled else {
+                    return
+                }
                 let remainingPart = number.value / digits
                 let digit = remainingPart % base
                 buckets[digit].append(number)
@@ -34,12 +40,17 @@ extension SortViewModel {
             var counter = 0
             var colorSequence = colors.cycle()
             for bucket in buckets {
+                guard running || !Task.isCancelled else {
+                    return
+                }
                 let color = colorSequence.next()!
                 var coloredIndices: [Int] = []
                 for item in bucket {
                     var newItem = item
                     newItem.id = UUID.init()
                     data[counter] = newItem
+                    await operate()
+                    await playNote(counter)
                     await changeColor(index: counter, color: color)
                     coloredIndices.append(counter)
                     counter++

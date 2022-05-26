@@ -46,6 +46,7 @@ extension SortViewModel {
             }
             data[i + start] = cache[i]
             data[i + start].value = 1 + i + start
+            await operate()
             await changeColor(index: i + start, color: .red)
             await playNote(i + start)
             await delay()

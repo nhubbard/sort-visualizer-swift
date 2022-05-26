@@ -6,11 +6,17 @@
 * [x] Wire up array size and delay changes
 * [x] Separate algorithm implementations into separate files
 * [x] Clean up any dead code from prior changes
+* [x] Make sure that stopping an in-progress sort functions as expected
+    * [x] Radix Sort
+* [x] Make sure operations counter is updated by all algorithms
+    * [x] Merge Sort
+    * [x] Radix Sort
 
 ## Audio
 
 * [x] Replace custom implementation with AudioKit
-* [ ] Wire up audio capabilities in all operations
+* [x] Wire up audio capabilities in all operations
+    * [x] Radix Sort
 
 ## User Interface
 
