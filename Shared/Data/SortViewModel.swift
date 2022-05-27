@@ -30,6 +30,7 @@ class SortViewModel: ObservableObject {
     @Published var delay: Float = 0.1
     @Published var showIncompleteWarning: Bool = false
     @Published var showBogoSortWarning: Bool = false
+    @Published var bogoSortAccepted: Bool = false
     var sortTaskRef: Task<Void, Error>? = nil
     var recreateTaskRef: Task<Void, Error>? = nil
     

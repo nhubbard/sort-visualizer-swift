@@ -19,9 +19,11 @@
 
 * [x] Icons in navigation
 * [x] Add warning to Bogo Sort
-* [ ] Enable user to collapse Settings panel
-* [ ] Add transparency to Settings panel
+* [x] Add transparency to Settings panel
 * [ ] Replace Step button with Record functionality; maybe use [SwiftUIViewRecorder](https://github.com/frolovilya/SwiftUIViewRecorder) as an example
+    * [ ] Replace Step button
+    * [ ] Add SwiftUIViewRecorder dependency
+    * [ ] Implement recording functionality
 * [ ] *Big project:* Enhance sort algorithm pages with descriptions of algorithms, big-O notation values, and implementation code for various languages
 
 ## Algorithms

@@ -32,12 +32,13 @@ struct SortView: View {
                             Label("Running", systemImage: "play.fill")
                         }.frame(maxWidth: 150).toggleStyle(.switch).onChange(of: state.running) { newValue in
                             if newValue {
-                                if algorithm == .bogoSort {
+                                if algorithm == .bogoSort && !state.bogoSortAccepted {
                                     state.showBogoSortWarning = true
-                                }
-                                state.sortTaskRef = Task.init {
-                                    if await !state.doSort() {
-                                        state.showIncompleteWarning = true
+                                } else {
+                                    state.sortTaskRef = Task.init {
+                                        if await !state.doSort() {
+                                            state.showIncompleteWarning = true
+                                        }
                                     }
                                 }
                             } else {
@@ -60,9 +61,9 @@ struct SortView: View {
                             Label("Reset", systemImage: "repeat")
                         }.frame(maxWidth: 150)
                         Button(action: {
-                            print("Step button pressed")
+                            print("Record button pressed")
                         }) {
-                            Label("Step", systemImage: "figure.walk")
+                            Label("Record", systemImage: "record.circle")
                         }.frame(maxWidth: 150)
                     }.padding(.horizontal, 20)
                     HStack(spacing: 10) {
@@ -88,7 +89,7 @@ struct SortView: View {
                             .foregroundColor(.blue)
                     }
                     Text("Operations: ") + Text("\(state.getOperations())").foregroundColor(.blue)
-                }.background(.black).cornerRadius(15).frame(minWidth: 300, maxWidth: 450, minHeight: 64).padding(.all, 8)
+                }.background(.black.opacity(0.9)).cornerRadius(15).frame(minWidth: 300, maxWidth: 450, minHeight: 64).padding(.all, 8)
             }
         }.onAppear {
             state.setAlgo(algo: algorithm)
@@ -100,7 +101,14 @@ struct SortView: View {
             Text("This can happen in one of two scenarios:\n1. You stopped the algorithm while it was running.\n2. The algorithm implementation has a bug and returned an incorrect result.")
         }).alert("Algorithm Warning", isPresented: $state.showBogoSortWarning, actions: {
             Button("Accept", role: .cancel) {
+                state.bogoSortAccepted = true
                 state.showBogoSortWarning = false
+                state.running = true
+                state.sortTaskRef = Task.init {
+                    if await !state.doSort() {
+                        state.showIncompleteWarning = true
+                    }
+                }
             }
             Button("Decline", role: .destructive) {
                 state.showBogoSortWarning = false
