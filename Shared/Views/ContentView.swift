@@ -29,7 +29,11 @@ struct ContentView: View {
                         Label("Merge Sort", systemImage: "arrow.triangle.merge")
                     }
                     NavigationLink(destination: HeapSort(), tag: 3, selection: self.$selection) {
-                        Label("Heap Sort", systemImage: "square.stack.3d.forward.dottedline.fill")
+                        Label {
+                            Text("Heap Sort")
+                        } icon: {
+                            Image.ofAsset("heap")
+                        }
                     }
                 }
                 Divider()
@@ -37,25 +41,53 @@ struct ContentView: View {
                 Group {
                     Label("Quadratic", systemImage: "function").foregroundColor(.blue)
                     NavigationLink(destination: BubbleSort(), tag: 4, selection: self.$selection) {
-                        Label("Bubble Sort", systemImage: "bubble.left.fill")
+                        Label {
+                            Text("Bubble Sort")
+                        } icon: {
+                            Image.ofAsset("bubble")
+                        }
                     }
                     NavigationLink(destination: SelectionSort(), tag: 5, selection: self.$selection) {
-                        Label("Selection Sort", systemImage: "selection.pin.in.out")
+                        Label {
+                            Text("Selection Sort")
+                        } icon: {
+                            Image.ofAsset("selection")
+                        }
                     }
                     NavigationLink(destination: InsertionSort(), tag: 6, selection: self.$selection) {
-                        Label("Insertion Sort", systemImage: "text.insert")
+                        Label {
+                            Text("Insertion Sort")
+                        } icon: {
+                            Image.ofAsset("insertion")
+                        }
                     }
                     NavigationLink(destination: GnomeSort(), tag: 7, selection: self.$selection) {
-                        Label("Gnome Sort", systemImage: "rectangle.3.group.fill")
+                        Label {
+                            Text("Gnome Sort")
+                        } icon: {
+                            Image.ofAsset("gnome")
+                        }
                     }
                     NavigationLink(destination: ShakerSort(), tag: 8, selection: self.$selection) {
-                        Label("Shaker Sort", systemImage: "crop.rotate")
+                        Label {
+                            Text("Shaker Sort")
+                        } icon: {
+                            Image.ofAsset("cocktail-shaker")
+                        }
                     }
                     NavigationLink(destination: OddEvenSort(), tag: 9, selection: self.$selection) {
-                        Label("Odd-Even Sort", systemImage: "arrow.up.and.down.righttriangle.up.righttriangle.down.fill")
+                        Label {
+                            Text("Odd-Even Sort")
+                        } icon: {
+                            Image.ofAsset("odd-even")
+                        }
                     }
                     NavigationLink(destination: PancakeSort(), tag: 10, selection: self.$selection) {
-                        Label("Pancake Sort", systemImage: "camera.metering.multispot")
+                        Label {
+                            Text("Pancake Sort")
+                        } icon: {
+                            Image.ofAsset("pancake")
+                        }
                     }
                 }
                 Divider()
@@ -69,7 +101,11 @@ struct ContentView: View {
                         Label("Radix Sort", systemImage: "arrow.triangle.swap")
                     }
                     NavigationLink(destination: ShellSort(), tag: 13, selection: self.$selection) {
-                        Label("Shell Sort", systemImage: "rectangle.dashed")
+                        Label {
+                            Text("Shell Sort")
+                        } icon: {
+                            Image.ofAsset("shell")
+                        }
                     }
                     NavigationLink(destination: CombSort(), tag: 14, selection: self.$selection) {
                         Label("Comb Sort", systemImage: "comb.fill")
@@ -78,7 +114,11 @@ struct ContentView: View {
                         Label("Bogo Sort", systemImage: "shuffle")
                     }
                     NavigationLink(destination: StoogeSort(), tag: 16, selection: self.$selection) {
-                        Label("Stooge Sort", systemImage: "desktopcomputer.trianglebadge.exclamationmark")
+                        Label {
+                            Text("Stooge Sort")
+                        } icon: {
+                            Image.ofAsset("stooge")
+                        }
                     }
                 }
             }.onAppear {

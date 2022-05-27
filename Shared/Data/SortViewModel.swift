@@ -240,77 +240,49 @@ class SortViewModel: ObservableObject {
     /// Run the sorting algorithm of choice on the dataset.
     @MainActor
     func doSort() async -> Bool {
-        func innerDoSort(_ algorithm: Algorithms) async -> Optional<[SortItem]> {
+        func innerDoSort(_ algorithm: Algorithms) async {
             switch algorithm {
                 // Logarithmic algorithms
                 case .quickSort:
                     await quickSort()
-                    return data
                 case .mergeSort:
                     await mergeSort()
-                    return data
                 case .heapSort:
                     await heapSort()
-                    return data
                 // Quadratic algorithms
                 case .bubbleSort:
                     await bubbleSort()
-                    return data
                 case .selectionSort:
                     await selectionSort()
-                    return data
                 case .insertionSort:
                     await insertionSort()
-                    return data
                 case .gnomeSort:
                     await gnomeSort()
-                    return data
                 case .shakerSort:
                     await shakerSort()
-                    return data
                 case .oddEvenSort:
                     await oddEvenSort()
-                    return data
                 case .pancakeSort:
                     await pancakeSort()
-                    return data
                 // Weird algorithms
                 case .bitonicSort:
                     await bitonicSort()
-                    return data
                 case .radixSort:
                     await radixSort()
-                    return data
                 case .shellSort:
                     await shellSort()
-                    return data
                 case .combSort:
                     await combSort()
-                    return data
                 case .bogoSort:
                     await bogoSort()
-                    return data
                 case .stoogeSort:
                     await stoogeSort()
-                    return data
             }
         }
-        guard !Task.isCancelled else {
+        guard await enforceRunning() else {
             return false
         }
-        guard
-            let result = await innerDoSort(self.algorithm),
-            result != Optional.none
-        else {
-            return false
-        }
-        if algorithm != .quickSort && algorithm != .mergeSort {
-            await setData(result)
-        }
-        // FIXME: This is a hacky workaround for a bug in Merge Sort. I can't figure out exactly why, but when this bug happens, the debugger always prints a warning about having a duplicate item in it that it "will cause issues". For whatever reason, a single item appears to be duplicated late in the sorting process.
-        if algorithm == .mergeSort {
-            data = Array(Set(data)).sorted()
-        }
+        await innerDoSort(self.algorithm)
         let _ = await isArraySorted()
         running = false
         return data == data.sorted()
