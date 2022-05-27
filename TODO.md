@@ -8,6 +8,7 @@
 * [x] Clean up any dead code from prior changes
 * [x] Make sure that stopping an in-progress sort functions as expected
 * [x] Make sure operations counter is updated by all algorithms
+* [ ] Write lots of tests for everything
 
 ## Audio
 
@@ -17,7 +18,7 @@
 ## User Interface
 
 * [x] Icons in navigation
-* [ ] Add warning to Bogo Sort
+* [x] Add warning to Bogo Sort
 * [ ] Enable user to collapse Settings panel
 * [ ] Add transparency to Settings panel
 * [ ] Replace Step button with Record functionality; maybe use [SwiftUIViewRecorder](https://github.com/frolovilya/SwiftUIViewRecorder) as an example

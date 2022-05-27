@@ -6,14 +6,11 @@
 //
 
 import SwiftUI
-
-let maxFreq = 600
-let minFreq = 200
+import MarkdownUI
 
 struct SortView: View {
     var algorithm: Algorithms
     @StateObject var state: SortViewModel = SortViewModel()
-    @State var showWarning: Bool = false
     
     var body: some View {
         ZStack {
@@ -27,15 +24,6 @@ struct SortView: View {
                             .frame(width: rectWidth, height: rectMinHeight * CGFloat(item.value))
                     }.id(UUID())
                 }.frame(width: geo.size.width, height: geo.size.height, alignment: .bottomLeading)
-                    .alert("Sort Finished Incorrectly", isPresented: $showWarning, actions: {
-                        Button("OK", role: .cancel) {
-                            showWarning = false
-                        }
-                    }, message: {
-                        VStack {
-                            Text("This can happen when: (a) you stopped the algorithm while it was running; (b) the algorithm implementation has a bug and returned an incorrect result, or; (c) the algorithm isn't implemented at all.")
-                        }
-                    })
                 GroupBox(label: Label("Settings", systemImage: "gear").padding(.top, 2).padding(.bottom, 2)) {
                     // Settings:
                     // Running and Sound toggles
@@ -43,14 +31,17 @@ struct SortView: View {
                         Toggle(isOn: $state.running) {
                             Label("Running", systemImage: "play.fill")
                         }.frame(maxWidth: 150).toggleStyle(.switch).onChange(of: state.running) { newValue in
-                            if (newValue) {
+                            if newValue {
+                                if algorithm == .bogoSort {
+                                    state.showBogoSortWarning = true
+                                }
                                 state.sortTaskRef = Task.init {
-                                    if (await !state.doSort()) {
-                                        showWarning = true
+                                    if await !state.doSort() {
+                                        state.showIncompleteWarning = true
                                     }
                                 }
                             } else {
-                                if (state.sortTaskRef != nil) {
+                                if state.sortTaskRef != nil {
                                     state.sortTaskRef!.cancel()
                                 }
                             }
@@ -85,7 +76,7 @@ struct SortView: View {
                         Text("Array Size")
                         Slider(value: $state.arraySizeBacking, in: 16...512, step: 2)
                             .onChange(of: state.arraySizeBacking) { newValue in
-                                if (state.running) {
+                                if state.running {
                                     state.running = false
                                 }
                                 state.recreateTaskRef = Task.init {
@@ -101,7 +92,24 @@ struct SortView: View {
             }
         }.onAppear {
             state.setAlgo(algo: algorithm)
-        }
+        }.alert("Sort Finished Incorrectly", isPresented: $state.showIncompleteWarning, actions: {
+            Button("OK", role: .cancel) {
+                state.showIncompleteWarning = false
+            }
+        }, message: {
+            Text("This can happen in one of two scenarios:\n1. You stopped the algorithm while it was running.\n2. The algorithm implementation has a bug and returned an incorrect result.")
+        }).alert("Algorithm Warning", isPresented: $state.showBogoSortWarning, actions: {
+            Button("Accept", role: .cancel) {
+                state.showBogoSortWarning = false
+            }
+            Button("Decline", role: .destructive) {
+                state.showBogoSortWarning = false
+                state.running = false
+                state.showIncompleteWarning = false
+            }
+        }, message: {
+            Text("Bogo sort will likely never finish sorting.\n\nThis is always true, even on very fast systems with a zero second delay.\n\nIf you leave it running, it will consume system resources, including significant battery life, for a very long time.\n\nIf you wish to continue, press the Accept button; if you wish to stop the sorting, press the Decline button.")
+        })
     }
 }
 

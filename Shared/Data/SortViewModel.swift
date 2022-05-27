@@ -28,6 +28,8 @@ class SortViewModel: ObservableObject {
     @Published var running: Bool = false
     @Published var sound: Bool = false
     @Published var delay: Float = 0.1
+    @Published var showIncompleteWarning: Bool = false
+    @Published var showBogoSortWarning: Bool = false
     var sortTaskRef: Task<Void, Error>? = nil
     var recreateTaskRef: Task<Void, Error>? = nil
     
@@ -160,20 +162,6 @@ class SortViewModel: ObservableObject {
             }
         }
         return true
-    }
-    
-    /// Calculate the frequency of an array access.
-    @MainActor
-    func calculateFrequency(index: Int) async -> Float {
-        guard !Task.isCancelled else {
-            return Float(minFreq)
-        }
-        enforceIndex(data, index)
-        return floatRatio(
-            x: Float(index),
-            oldRange: 0.0...Float(data.count),
-            newRange: Float(minFreq)...Float(maxFreq)
-       )
     }
     
     /// Get the integer value of a SortItem at the specified index.
