@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import MarkdownUI
 
 struct SortView: View {
     var algorithm: Algorithms
