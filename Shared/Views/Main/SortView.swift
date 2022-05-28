@@ -17,9 +17,9 @@ struct SortView: View {
                 let rectWidth = geo.size.width / CGFloat(state.data.count)
                 let rectMinHeight = geo.size.height / CGFloat(state.data.count)
                 HStack(alignment: .bottom, spacing: 0) {
-                    ForEach(state.data, id: \.self) { item in
+                    ForEach(state.data) { item in
                         Rectangle().fill(item.color).frame(width: rectWidth, height: rectMinHeight * CGFloat(item.value))
-                    }.id(UUID())
+                    }
                 }.frame(width: geo.size.width, height: geo.size.height, alignment: .bottomLeading)
                 GroupBox(label: Label("Settings", systemImage: "gear").padding(.top, 2).padding(.bottom, 2)) {
                     // Settings:
@@ -81,6 +81,7 @@ struct SortView: View {
     }
     
     func onRunning(newValue: Bool) {
+        // TODO: Start and stop the Synthesizer? Might prevent the occasional popping noise.
         if newValue {
             if algorithm == .bogoSort && !state.bogoSortAccepted {
                 state.showBogoSortWarning = true

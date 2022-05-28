@@ -24,7 +24,7 @@ struct HomeView: View {
     /**
      * "Marketing" copy used on the homepage.
      */
-    let copyText = """
+    let copyText = #"""
     Sorting algorithms are used to sort a data structure according to a specific order relationship, such as numerical order or lexicographical order.
     
     This operation is one of the most important and widespread in computer science. For a long time, new methods have been developed to make this procedure faster and faster.
@@ -41,7 +41,7 @@ struct HomeView: View {
     Space and time complexity can also be further subdivided into 3 different cases: best case, average case, and worst case.
     
     Sorting algorithms can be difficult to understand, and it's easy to get confused. This app aims to help you understand sorting algorithms by showing their actions in real time. Without further ado, let's get started -- choose an algorithm from the sidebar on the left!
-    """
+    """#
 }
 
 struct HomeView_Previews: PreviewProvider {
