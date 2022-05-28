@@ -1,6 +1,6 @@
 //
 //  BogoSort.swift
-//  Sort2
+//  Sort2 (Shared)
 //
 //  Created by Nicholas Hubbard on 4/26/22.
 //

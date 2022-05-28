@@ -1,6 +1,6 @@
 //
 //  Cycle.swift
-//  Sort2 (iOS)
+//  Sort2 (Shared)
 //
 //  Created by Nicholas Hubbard on 5/20/22.
 //

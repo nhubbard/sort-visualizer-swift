@@ -1,6 +1,6 @@
 //
 //  HomeView.swift
-//  Sort2
+//  Sort2 (Shared)
 //
 //  Created by Nicholas Hubbard on 4/26/22.
 //
@@ -9,49 +9,16 @@ import SwiftUI
 import MarkdownUI
 
 struct HomeView: View {
-    @State var titleText: String = "sort visualizer".uppercased()
-    
     var body: some View {
         VStack(spacing: 2) {
             Text("Welcome to").bold()
-            Text(titleText)
-                .font(.system(size: 48, weight: .bold, design: .default))
-                .multilineTextAlignment(.leading)
-                .onTapGesture {
-                    animateHeader()
-                }
+            RandomizingHeader(text: "SORT VISUALIZER")
             Markdown(copyText)
-                .markdownStyle(MarkdownStyle(
-                    font: .system(size: 16)
-                ))
+                .markdownStyle(MarkdownStyle(font: .system(size: 16)))
                 .lineSpacing(1.75)
                 .padding()
         }
         .navigationTitle("Home")
-        .onAppear {
-            animateHeader()
-        }
-    }
-    
-    /**
-     * Start animating the header text with an asynchronous Task.
-     * This function is simply a wrapper to make starting the animation easier in the two situations I use them in.
-     */
-    func animateHeader() {
-        Task.init {
-            await doHeaderAnimation()
-        }
-    }
-    
-    /**
-     * Randomized header animation type.
-     */
-    func doHeaderAnimation() async {
-        for _ in 0..<48 {
-            titleText = String("SORT VISUALIZER".shuffled())
-            try? await Task.sleep(nanoseconds: UInt64(50_000_000))
-        }
-        titleText = "SORT VISUALIZER"
     }
     
     /**
