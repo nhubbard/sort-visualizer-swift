@@ -8,6 +8,7 @@
 * [x] Clean up any dead code from prior changes
 * [x] Make sure that stopping an in-progress sort functions as expected
 * [x] Make sure operations counter is updated by all algorithms
+* [ ] Implement step functionality?
 * [ ] Write lots of tests for everything
 
 ## Audio
@@ -20,10 +21,6 @@
 * [x] Icons in navigation
 * [x] Add warning to Bogo Sort
 * [x] Add transparency to Settings panel
-* [ ] Replace Step button with Record functionality; maybe use [SwiftUIViewRecorder](https://github.com/frolovilya/SwiftUIViewRecorder) as an example
-    * [ ] Replace Step button
-    * [ ] Add SwiftUIViewRecorder dependency
-    * [ ] Implement recording functionality
 * [ ] *Big project:* Enhance sort algorithm pages with descriptions of algorithms, big-O notation values, and implementation code for various languages
 
 ## Algorithms

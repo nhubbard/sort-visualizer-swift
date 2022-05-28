@@ -61,9 +61,9 @@ struct SortView: View {
                             Label("Reset", systemImage: "repeat")
                         }.frame(maxWidth: 150)
                         Button(action: {
-                            print("Record button pressed")
+                            print("Step button pressed")
                         }) {
-                            Label("Record", systemImage: "record.circle")
+                            Label("Step", systemImage: "figure.walk")
                         }.frame(maxWidth: 150)
                     }.padding(.horizontal, 20)
                     HStack(spacing: 10) {
