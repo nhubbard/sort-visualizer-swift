@@ -260,7 +260,6 @@
 		71D4DBC928185905001DBD0E /* Shared */ = {
 			isa = PBXGroup;
 			children = (
-				71E4E9CA2843F738005B3F99 /* MathUI */,
 				71052D2D2820352A00935228 /* Data */,
 				71D4DBF2281862E8001DBD0E /* Views */,
 				71D4DBCA28185905001DBD0E /* Sort2App.swift */,
@@ -328,13 +327,6 @@
 			children = (
 			);
 			name = Frameworks;
-			sourceTree = "<group>";
-		};
-		71E4E9CA2843F738005B3F99 /* MathUI */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = MathUI;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
