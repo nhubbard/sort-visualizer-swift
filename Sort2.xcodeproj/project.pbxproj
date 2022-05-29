@@ -176,6 +176,9 @@
 		71650A342842922C00A23BC2 /* Main */ = {
 			isa = PBXGroup;
 			children = (
+				71D4DC1028186364001DBD0E /* Weird */,
+				71D4DBFD28186320001DBD0E /* Quadratic */,
+				71D4DBFC28186315001DBD0E /* Logarithmic */,
 				71D4DBCB28185905001DBD0E /* ContentView.swift */,
 				71D4DBEF28185DFD001DBD0E /* HomeView.swift */,
 				71F38EB72819B42C0085BAAA /* SortView.swift */,
@@ -257,6 +260,7 @@
 		71D4DBC928185905001DBD0E /* Shared */ = {
 			isa = PBXGroup;
 			children = (
+				71E4E9CA2843F738005B3F99 /* MathUI */,
 				71052D2D2820352A00935228 /* Data */,
 				71D4DBF2281862E8001DBD0E /* Views */,
 				71D4DBCA28185905001DBD0E /* Sort2App.swift */,
@@ -278,9 +282,6 @@
 			children = (
 				71650A342842922C00A23BC2 /* Main */,
 				71650A292842693000A23BC2 /* Utilities */,
-				71D4DC1028186364001DBD0E /* Weird */,
-				71D4DBFD28186320001DBD0E /* Quadratic */,
-				71D4DBFC28186315001DBD0E /* Logarithmic */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -327,6 +328,13 @@
 			children = (
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		71E4E9CA2843F738005B3F99 /* MathUI */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = MathUI;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */

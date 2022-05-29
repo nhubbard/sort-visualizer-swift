@@ -8,40 +8,57 @@
 import SwiftUI
 import MarkdownUI
 
+struct ComplexityEntry: Identifiable {
+    let id = UUID()
+    var name: String
+    var bigOValue: String
+}
+
 struct ScrollingSortView: View {
     var algorithm: Algorithms
     var description: String
-    var averageComplexity: String
-    var bestCase: String
-    var worstCase: String
-    var spaceComplexity: String
-    private let metaPadding: CGFloat = CGFloat(32)
+    var entries: [ComplexityEntry]
     
     var body: some View {
         GeometryReader { geo in
             ScrollView {
-                VStack(spacing: 4) {
-                    // TODO: File a Radar issue. I have to add -2x padding to this item if I use padding *anywhere else* within the view. Even if I don't apply padding to this, it magically inherits the padding of everything else.
+                VStack(alignment: .leading, spacing: 4) {
                     SortView(algorithm: algorithm)
                         .frame(width: geo.size.width, height: geo.size.height)
-                        .padding(.leading, metaPadding * -2)
                     Group {
-                        Markdown("""
-                        ## Description
-                        
-                        \(description)
-                        
-                        ## Complexity
-                        
-                        * **Average Complexity:** \(averageComplexity)
-                        * **Best Case:** \(bestCase)
-                        * **Worst Case:** \(worstCase)
-                        * **Space Complexity:** \(spaceComplexity)
-                        """)
-                            .markdownStyle(MarkdownStyle(font: .system(size: 16)))
-                            .multilineTextAlignment(.leading)
-                            .lineSpacing(1.75)
-                    }.padding(.all, metaPadding)
+                        HStack(spacing: 16) {
+                            VStack(spacing: 4) {
+                                Text("Description")
+                                    .font(.system(size: 24, weight: .bold, design: .default))
+                                    .multilineTextAlignment(.leading)
+                                Spacer()
+                                Markdown(description)
+                                    .font(.system(size: 16, design: .default))
+                                    .lineSpacing(1.75)
+                            }.frame(width: 0.6 * geo.size.width, height: nil, alignment: .leading)
+                            VStack(spacing: 4) {
+                                Text("Complexity")
+                                    .font(.system(size: 24, weight: .bold, design: .default))
+                                    .multilineTextAlignment(.leading)
+                                Spacer()
+                                // This is a really stupid solution to an artificial limitation: the Table view is only available on macOS in SwiftUI 2.
+                                VStack(spacing: 2) {
+                                    ForEach(entries) { entry in
+                                        HStack(spacing: 1) {
+                                            Text("• \(entry.name): ")
+                                                .bold()
+                                                .font(.system(size: 16, design: .default)) +
+                                            Text(entry.bigOValue)
+                                                .foregroundColor(.blue)
+                                                .font(.system(size: 16, design: .default))
+                                            Spacer()
+                                        }
+                                    }
+                                    Spacer()
+                                }
+                            }.frame(width: 0.4 * geo.size.height, height: nil, alignment: .leading)
+                        }
+                    }.padding(.all, 32)
                 }
             }
         }

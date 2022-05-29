@@ -1,0 +1,3 @@
+[submodule "Shared/MathUI/iosMath"]
+	path = Shared/MathUI/iosMath
+	url = https://github.com/kostub/iosMath.git
