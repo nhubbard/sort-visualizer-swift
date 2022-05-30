@@ -28,7 +28,7 @@ struct QuickSort: View {
             ComplexityEntry(name: "Best Case", bigOValue: bestCase),
             ComplexityEntry(name: "Worst Case", bigOValue: worstCase),
             ComplexityEntry(name: "Space Complexity", bigOValue: spaceComplexity)
-        ]).navigationTitle("Quick Sort")
+        ], key: "quicksort").navigationTitle("Quick Sort")
     }
 }
 
