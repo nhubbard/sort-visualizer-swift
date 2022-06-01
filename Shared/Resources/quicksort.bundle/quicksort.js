@@ -6,7 +6,8 @@ function quickSort(array, start, end) {
     return array;
   }
   var rStart = start, rEnd = end;
-  var pivot = array[Math.floor(Math.random() * (end - start + 1) + start)];
+  var pivotIndex = Math.random() * (end - start + 1) + start;
+  var pivot = array[Math.floor(pivotIndex)];
   while (start < end) {
     while (array[start] <= pivot) start++;
     while (array[end] > pivot) end--;
@@ -19,3 +20,7 @@ function quickSort(array, start, end) {
   quickSort(array, rStart, start - 1);
   quickSort(array, start, rEnd);
 }
+
+var array = [1, 5, 2, 3, 7, 4, 8, 9];
+quickSort(array, 0, array.length - 1);
+console.log(array);

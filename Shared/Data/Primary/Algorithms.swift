@@ -7,26 +7,26 @@
 
 import Foundation
 
-enum Algorithms: Identifiable, CaseIterable {
+enum Algorithms: String, Identifiable, CaseIterable {
     // Logarithmic algorithms
-    case quickSort
-    case mergeSort
-    case heapSort
+    case quickSort = "quicksort"
+    case mergeSort = "mergesort"
+    case heapSort = "heapsort"
     // Quadratic algorithms
-    case bubbleSort
-    case selectionSort
-    case insertionSort
-    case gnomeSort
-    case shakerSort
-    case oddEvenSort
-    case pancakeSort
+    case bubbleSort = "bubblesort"
+    case selectionSort = "selectionsort"
+    case insertionSort = "insertionsort"
+    case gnomeSort = "gnomesort"
+    case shakerSort = "shakersort"
+    case oddEvenSort = "oddevensort"
+    case pancakeSort = "pancakesort"
     // Weird algorithms
-    case bitonicSort
-    case radixSort
-    case shellSort
-    case combSort
-    case bogoSort
-    case stoogeSort
+    case bitonicSort = "bitonicsort"
+    case radixSort = "radixsort"
+    case shellSort = "shellsort"
+    case combSort = "combsort"
+    case bogoSort = "bogosort"
+    case stoogeSort = "stoogesort"
     
     var id: Self { self }
 }

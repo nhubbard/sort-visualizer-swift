@@ -8,19 +8,10 @@
 import SwiftUI
 import MarkdownUI
 
-struct ComplexityEntry: Identifiable {
-    let id = UUID()
-    var name: String
-    var bigOValue: String
-}
-
 struct ScrollingSortView: View {
     var algorithm: Algorithms
-    var description: String
     var entries: [ComplexityEntry]
-    var key: String
-    private let codeWidth: CGFloat = 512
-    private let codeHeight: CGFloat = 1240
+    private let implementationGrid: [GridItem] = Array(repeating: .init(.flexible()), count: 2)
     
     var body: some View {
         GeometryReader { geo in
@@ -29,106 +20,52 @@ struct ScrollingSortView: View {
                     SortView(algorithm: algorithm)
                         .frame(width: geo.size.width, height: geo.size.height)
                     Group {
-                        HStack(spacing: 16) {
-                            VStack(spacing: 4) {
-                                Text("Description")
-                                    .font(.system(size: 24, weight: .bold, design: .default))
-                                    .multilineTextAlignment(.leading)
-                                Spacer()
-                                Markdown(description)
-                                    .font(.system(size: 16, design: .default))
-                                    .lineSpacing(1.75)
-                            }.frame(width: 0.6 * geo.size.width, height: nil, alignment: .leading)
-                            VStack(spacing: 4) {
-                                Text("Complexity")
-                                    .font(.system(size: 24, weight: .bold, design: .default))
-                                    .multilineTextAlignment(.leading)
-                                Spacer()
-                                // This is a really stupid solution to an artificial limitation: the Table view is only available on macOS in SwiftUI 2.
-                                VStack(spacing: 2) {
-                                    ForEach(entries) { entry in
-                                        HStack(spacing: 1) {
-                                            Text("• \(entry.name): ")
-                                                .bold()
-                                                .font(.system(size: 16, design: .default)) +
-                                            Text(entry.bigOValue)
-                                                .foregroundColor(.blue)
-                                                .font(.system(size: 16, design: .default))
-                                            Spacer()
-                                        }
+                        LazyVGrid(columns: [.init(.fixed(0.6 * geo.size.width)), .init(.fixed(0.4 * geo.size.width))]) {
+                            Text("Description")
+                                .font(.system(size: 24, weight: .bold, design: .default))
+                                .multilineTextAlignment(.leading)
+                            Text("Complexity")
+                                .font(.system(size: 24, weight: .bold, design: .default))
+                                .multilineTextAlignment(.leading)
+                            Markdown(loadResource("description", "md"))
+                                .font(.system(size: 16, design: .default))
+                                .lineSpacing(1.75)
+                            VStack(spacing: 2) {
+                                ForEach(loadComplexityResource()) { entry in
+                                    HStack(spacing: 1) {
+                                        Text("• \(entry.key): ")
+                                            .bold()
+                                            .font(.system(size: 16, design: .default)) +
+                                        Text(entry.value)
+                                            .foregroundColor(.blue)
+                                            .font(.system(size: 16, design: .default))
+                                        Spacer()
                                     }
-                                    Spacer()
                                 }
-                            }.frame(width: 0.4 * geo.size.height, height: nil, alignment: .leading)
+                                Spacer()
+                            }
                         }
                     }.padding(.all, 32)
                     Group {
                         Text("Implementations")
                             .font(.system(size: 24, weight: .bold, design: .default))
                             .multilineTextAlignment(.leading)
-                        ScrollView(.horizontal) {
-                            HStack(spacing: 8) {
+                        LazyVGrid(columns: implementationGrid) {
+                            ForEach(languages) { language in
                                 VStack(spacing: 4) {
                                     Label {
-                                        Text("ANSI C")
+                                        Text(language.title)
                                     } icon: {
-                                        Image.ofAsset("c").foregroundColor(.blue)
+                                        if language.iconColor != nil {
+                                            Image.ofAsset(language.icon, width: CGFloat(language.iconWidth), height: CGFloat(language.iconHeight))
+                                                .foregroundColor(language.iconColor!)
+                                        } else {
+                                            Image.ofAsset(language.icon, width: CGFloat(language.iconWidth), height: CGFloat( language.iconHeight))
+                                        }
                                     }.font(.headline)
-                                    Text(loadResource(key, "c"))
-                                        .font(.system(size: 14, weight: .regular, design: .monospaced))
-                                        .fixedSize(horizontal: false, vertical: true)
-                                        .frame(maxWidth: codeWidth, alignment: .topLeading)
-                                    Spacer()
+                                    CodeView(tokens: loadHighlightResource(language.fileExtension))
                                 }
-                                VStack(spacing: 4) {
-                                    Label {
-                                        Text("C++")
-                                    } icon: {
-                                        Image.ofAsset("cpp").foregroundColor(.blue)
-                                    }.font(.headline)
-                                    Text(loadResource(key, "cpp"))
-                                        .font(.system(size: 14, weight: .regular, design: .monospaced))
-                                        .fixedSize(horizontal: false, vertical: true)
-                                        .frame(maxWidth: codeWidth, alignment: .topLeading)
-                                    Spacer()
-                                }
-                                VStack(spacing: 4) {
-                                    Label {
-                                        Text("Java")
-                                    } icon: {
-                                        Image.ofAsset("java").foregroundColor(.red)
-                                    }.font(.headline)
-                                    Text(loadResource(key, "java"))
-                                        .font(.system(size: 14, weight: .regular, design: .monospaced))
-                                        .fixedSize(horizontal: false, vertical: true)
-                                        .frame(maxWidth: codeWidth, alignment: .topLeading)
-                                    Spacer()
-                                }
-                                VStack(spacing: 4) {
-                                    Label {
-                                        Text("JavaScript")
-                                    } icon: {
-                                        Image.ofAsset("javascript").foregroundColor(.yellow)
-                                    }.font(.headline)
-                                    Text(loadResource(key, "js"))
-                                        .font(.system(size: 14, weight: .regular, design: .monospaced))
-                                        .fixedSize(horizontal: false, vertical: true)
-                                        .frame(maxWidth: codeWidth, alignment: .topLeading)
-                                    Spacer()
-                                }
-                                VStack(spacing: 4) {
-                                    Label {
-                                        Text("Python")
-                                    } icon: {
-                                        Image.ofAsset("python").foregroundColor(.yellow)
-                                    }.font(.headline)
-                                    Text(loadResource(key, "py"))
-                                        .font(.system(size: 14, weight: .regular, design: .monospaced))
-                                        .fixedSize(horizontal: false, vertical: true)
-                                        .frame(maxWidth: codeWidth, alignment: .topLeading)
-                                    Spacer()
-                                }
-                            }.frame(minHeight: 512)
+                            }
                         }
                     }.padding(.all, 32)
                 }
@@ -139,17 +76,66 @@ struct ScrollingSortView: View {
 
 extension ScrollingSortView {
     func loadResource(_ filename: String, _ ext: String) -> String {
+        let key = algorithm.rawValue
         let data: String
         guard let path = Bundle.main.path(forResource: key, ofType: "bundle"),
               let bundle = Bundle(path: path),
               let url = bundle.path(forResource: filename, ofType: ext) else {
-            fatalError("Couldn't find \(filename).\(ext) in main bundle.")
+            fatalError("Couldn't find \(filename).\(ext) in \(key).bundle!")
         }
         do {
             data = try String(contentsOfFile: String(url))
         } catch {
-            fatalError("Couldn't load \(filename).\(ext) from main bundle:\n\(error)")
+            fatalError("Couldn't load \(filename).\(ext) from \(key).bundle:\n\(error)")
         }
         return data
+    }
+    
+    func loadComplexityResource() -> [ComplexityEntry] {
+        let key = algorithm.rawValue
+        var result: [ComplexityEntry] = []
+        guard let path = Bundle.main.path(forResource: key, ofType: "bundle"),
+              let bundle = Bundle(path: path),
+              let url = bundle.path(forResource: "complexity", ofType: "json") else {
+            fatalError("Couldn't find complexity.json in \(key).bundle!")
+        }
+        let data = try! Data(contentsOf: URL(fileURLWithPath: url))
+        if let json = try! JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
+            guard let items = json["complexities"] as? [[String: String]] else {
+                return result
+            }
+            for item in items {
+                guard let key = item["key"],
+                      let value = item["value"] else {
+                    continue
+                }
+                result.append(ComplexityEntry(key: key, value: value))
+            }
+        }
+        return result
+    }
+    
+    func loadHighlightResource(_ ext: String) -> [Token] {
+        let key = algorithm.rawValue
+        var result: [Token] = []
+        guard let path = Bundle.main.path(forResource: key, ofType: "bundle"),
+              let bundle = Bundle(path: path),
+              let url = bundle.path(forResource: key, ofType: "\(ext).json") else {
+            fatalError("Couldn't find \(key).\(ext).json in \(key).bundle!")
+        }
+        let data = try! Data(contentsOf: URL(fileURLWithPath: url))
+        if let json = try! JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
+            guard let items = json["result"] as? [[String: String]] else {
+                return result
+            }
+            for item in items {
+                guard let rawType = item["type"],
+                      let value = item["value"] else {
+                    continue
+                }
+                result.append(Token(type: .fromRaw(rawType), value: value))
+            }
+        }
+        return result
     }
 }

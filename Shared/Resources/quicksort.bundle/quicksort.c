@@ -1,3 +1,6 @@
+#include <stdio.h>
+#include <stdlib.h>
+
 void swap(int *a, int *b) {
   int t = *a;
   *a = *b;
@@ -23,4 +26,13 @@ void quickSort(int array[], int low, int high) {
     quickSort(array, low, pi - 1);
     quickSort(array, pi + 1, high);
   }
+}
+
+int main(int argc, char *argv[]) {
+  int items[8] = {1, 5, 2, 3, 7, 4, 8, 9};
+  quickSort(items, 0, sizeof(items) / sizeof(items[0]));
+  for (int i = 0; i < sizeof(items) / sizeof(items[0]); i++) {
+    printf("%d", items[i]);
+  }
+  return 0;
 }
