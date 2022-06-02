@@ -9,8 +9,7 @@ import SwiftUI
 
 struct MergeSort: View {
     var body: some View {
-        SortView(algorithm: .mergeSort)
-            .navigationTitle("Merge Sort")
+        ScrollingSortView(algorithm: .mergeSort).navigationTitle("Merge Sort")
     }
 }
 

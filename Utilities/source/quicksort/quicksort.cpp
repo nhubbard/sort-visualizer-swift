@@ -26,8 +26,8 @@ int main(int argc, char *argv[]) {
   int items[8] = {1, 5, 2, 3, 7, 4, 8, 9};
   int size = sizeof(items) / sizeof(items[0]);
   quickSort(items, 0, size);
-  for (int item : items) {
-    printf("%d", item);
+  for (int i = 0; i < size; i++) {
+    printf("%d", items[i]);
   }
   return 0;
 }

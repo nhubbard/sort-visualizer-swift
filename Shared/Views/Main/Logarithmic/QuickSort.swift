@@ -8,18 +8,8 @@
 import SwiftUI
 
 struct QuickSort: View {
-    let averageComplexity = "O(n × log n)"
-    let bestCase = "O(n × log n)"
-    let worstCase = "O(n²)"
-    let spaceComplexity = "O(n)"
-
     var body: some View {
-        ScrollingSortView(algorithm: .quickSort, entries: [
-            ComplexityEntry(key: "Average Complexity", value: averageComplexity),
-            ComplexityEntry(key: "Best Case", value: bestCase),
-            ComplexityEntry(key: "Worst Case", value: worstCase),
-            ComplexityEntry(key: "Space Complexity", value: spaceComplexity)
-        ]).navigationTitle("Quick Sort")
+        ScrollingSortView(algorithm: .quickSort).navigationTitle("Quick Sort")
     }
 }
 

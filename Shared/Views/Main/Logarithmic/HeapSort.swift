@@ -9,8 +9,7 @@ import SwiftUI
 
 struct HeapSort: View {
     var body: some View {
-        SortView(algorithm: .heapSort)
-            .navigationTitle("Heap Sort")
+        ScrollingSortView(algorithm: .heapSort).navigationTitle("Heap Sort")
     }
 }
 

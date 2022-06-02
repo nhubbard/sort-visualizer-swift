@@ -10,7 +10,6 @@ import MarkdownUI
 
 struct ScrollingSortView: View {
     var algorithm: Algorithms
-    var entries: [ComplexityEntry]
     private let implementationGrid: [GridItem] = Array(repeating: .init(.flexible()), count: 2)
     
     var body: some View {

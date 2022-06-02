@@ -29,6 +29,8 @@
 		718246DF284685F6003842E3 /* LanguageEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 718246DE284685F6003842E3 /* LanguageEntry.swift */; };
 		71847C51284100180018E66C /* Image+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71847C50284100180018E66C /* Image+Extensions.swift */; };
 		71B55E0E28383D5C00CA74CB /* Sequence+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71B55E0D28383D5C00CA74CB /* Sequence+Extensions.swift */; };
+		71BCE0FE2847B8B6007C8254 /* mergesort.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 71BCE0FD2847B8B6007C8254 /* mergesort.bundle */; };
+		71BCE1002847D963007C8254 /* heapsort.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 71BCE0FF2847D963007C8254 /* heapsort.bundle */; };
 		71CFABF9283951C5004672DB /* QuickSortImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71CFABF8283951C5004672DB /* QuickSortImpl.swift */; };
 		71CFABFC28395264004672DB /* MergeSortImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71CFABFB28395264004672DB /* MergeSortImpl.swift */; };
 		71CFABFE2839528A004672DB /* HeapSortImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71CFABFD2839528A004672DB /* HeapSortImpl.swift */; };
@@ -93,6 +95,8 @@
 		71847C50284100180018E66C /* Image+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Image+Extensions.swift"; sourceTree = "<group>"; };
 		71934841281979490058FD9E /* TODO.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = TODO.md; sourceTree = "<group>"; };
 		71B55E0D28383D5C00CA74CB /* Sequence+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sequence+Extensions.swift"; sourceTree = "<group>"; };
+		71BCE0FD2847B8B6007C8254 /* mergesort.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = mergesort.bundle; sourceTree = "<group>"; };
+		71BCE0FF2847D963007C8254 /* heapsort.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = heapsort.bundle; sourceTree = "<group>"; };
 		71CFABF8283951C5004672DB /* QuickSortImpl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickSortImpl.swift; sourceTree = "<group>"; };
 		71CFABFB28395264004672DB /* MergeSortImpl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MergeSortImpl.swift; sourceTree = "<group>"; };
 		71CFABFD2839528A004672DB /* HeapSortImpl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeapSortImpl.swift; sourceTree = "<group>"; };
@@ -179,6 +183,8 @@
 			isa = PBXGroup;
 			children = (
 				71610C0D2844213900A2696C /* quicksort.bundle */,
+				71BCE0FD2847B8B6007C8254 /* mergesort.bundle */,
+				71BCE0FF2847D963007C8254 /* heapsort.bundle */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -442,6 +448,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				71BCE0FE2847B8B6007C8254 /* mergesort.bundle in Resources */,
+				71BCE1002847D963007C8254 /* heapsort.bundle in Resources */,
 				71D4DBDE28185905001DBD0E /* Assets.xcassets in Resources */,
 				71610C0E2844213900A2696C /* quicksort.bundle in Resources */,
 			);
