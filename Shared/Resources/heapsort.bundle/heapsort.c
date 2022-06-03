@@ -1,11 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
-
-void swap(int *a, int *b) {
-	int temp = *a;
-	*a = *b;
-	*b = temp;
-}
+// The common header includes the random numbers
+// list, along with the swap and printList functions.
+#include "../common.h"
 
 void heapify(int arr[], int n, int i) {
 	int largest = i;
@@ -37,8 +34,6 @@ int main(int argc, char* argv[]) {
   int items[8] = {1, 5, 2, 3, 7, 4, 8, 9};
   int size = sizeof(items) / sizeof(items[0]);
   heapSort(items, size);
-  for (int i = 0; i < size; i++) {
-    printf("%d", items[i]);
-  }
+  printList(items, size);
   return 0;
 }

@@ -78,6 +78,8 @@
 /* Begin PBXFileReference section */
 		710BF0532821885300F7B066 /* Range+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Range+Extensions.swift"; sourceTree = "<group>"; };
 		7120CB9828397DF00019D976 /* Synthesizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Synthesizer.swift; sourceTree = "<group>"; };
+		713FA7AD284A4F2F00F12327 /* common.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = common.h; sourceTree = "<group>"; };
+		713FA7AF284A5DAE00F12327 /* highlight.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = highlight.py; sourceTree = "<group>"; };
 		714AA7802845013200D92535 /* Color+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Extensions.swift"; sourceTree = "<group>"; };
 		714AA79528453B6100D92535 /* Token.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Token.swift; sourceTree = "<group>"; };
 		714AA79728453EFA00D92535 /* MonokaiTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonokaiTheme.swift; sourceTree = "<group>"; };
@@ -185,6 +187,8 @@
 				71610C0D2844213900A2696C /* quicksort.bundle */,
 				71BCE0FD2847B8B6007C8254 /* mergesort.bundle */,
 				71BCE0FF2847D963007C8254 /* heapsort.bundle */,
+				713FA7AD284A4F2F00F12327 /* common.h */,
+				713FA7AF284A5DAE00F12327 /* highlight.py */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -379,6 +383,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 71D4DBE228185905001DBD0E /* Build configuration list for PBXNativeTarget "Sort2 (iOS)" */;
 			buildPhases = (
+				713FA7AE284A5D8A00F12327 /* ShellScript */,
 				71D4DBCD28185905001DBD0E /* Sources */,
 				71D4DBCE28185905001DBD0E /* Frameworks */,
 				71D4DBCF28185905001DBD0E /* Resources */,
@@ -456,6 +461,27 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		713FA7AE284A5D8A00F12327 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\n/opt/homebrew/bin/python3 /Users/nhubbard/XcodeProjects/Sort2/Shared/Resources/highlight.py\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		71D4DBCD28185905001DBD0E /* Sources */ = {

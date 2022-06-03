@@ -1,4 +1,7 @@
 #include <cstdio>
+// The common header includes the random numbers
+// list, along with the swap and printList functions.
+#include "../common.h"
 
 void merge(int *array, int l, int m, int r) {
   int i, j, k, nl, nr;
@@ -45,11 +48,8 @@ void mergeSort(int *array, int l, int r) {
 }
 
 int main(int argc, char *argv[]) {
-  int items[8] = {1, 5, 2, 3, 7, 4, 8, 9};
   int size = sizeof(items) / sizeof(items[0]);
   mergeSort(items, 0, size);
-  for (int item : items) {
-    printf("%d", item);
-  }
+  printList(items, size);
   return 0;
 }

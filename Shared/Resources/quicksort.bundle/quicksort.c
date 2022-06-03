@@ -1,40 +1,33 @@
 #include <stdio.h>
 #include <stdlib.h>
+// The common header includes the random numbers
+// list, along with the swap and printList functions.
+#include "../common.h"
 
-void swap(int *a, int *b) {
-  int t = *a;
-  *a = *b;
-  *b = t;
-}
-
-int partition(int array[], int low, int high) {
-  int pivot = array[high];
-  int i = (low - 1);
+int partition(int arr[], int low, int high) {
+  int pivot = arr[high];
+  int i = low - 1;
   for (int j = low; j < high; j++) {
-    if (array[j] <= pivot) {
+    if (arr[j] <= pivot) {
       i++;
-      swap(&array[i], &array[j]);
+      swap(&arr[i], &arr[j]);
     }
   }
-  swap(&array[i + 1], &array[high]);
-  return (i + 1);
+  swap(&arr[i + 1], &arr[high]);
+  return i + 1;
 }
 
-void quickSort(int array[], int low, int high) {
+void quickSort(int arr[], int low, int high) {
   if (low < high) {
-    int pi = partition(array, low, high);
-    quickSort(array, low, pi - 1);
-    quickSort(array, pi + 1, high);
+    int pivot = partition(arr, low, high);
+    quickSort(arr, low, pivot - 1);
+    quickSort(arr, pivot + 1, high);
   }
 }
 
 int main(int argc, char *argv[]) {
-  int items[8] = {1, 5, 2, 3, 7, 4, 8, 9};
   int size = sizeof(items) / sizeof(items[0]);
   quickSort(items, 0, size);
-  for (int i = 0; i < size; i++) {
-    printf("%d", items[i]);
-  }
+  printList(items, size);
   return 0;
 }
-

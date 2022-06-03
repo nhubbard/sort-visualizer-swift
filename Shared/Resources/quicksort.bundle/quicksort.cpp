@@ -1,17 +1,19 @@
 #include <cstdio>
-#include <utility>
+// The common header includes the random numbers
+// list, along with the swap and printList functions.
+#include "../common.h"
 
 int partition(int arr[], int low, int high) {
   int pivot = arr[high];
-  int i = (low - 1);
-  for (int j = low; j <= high - 1; j++) {
+  int i = low - 1;
+  for (int j = low; j < high; j++) {
     if (arr[j] <= pivot) {
       i++;
-      std::swap(arr[i], arr[j]);
+      swap(&arr[i], &arr[j]);
     }
   }
-  std::swap(arr[i + 1], arr[high]);
-  return (i + 1);
+  swap(&arr[i + 1], &arr[high]);
+  return i + 1;
 }
 
 void quickSort(int arr[], int low, int high) {
@@ -23,11 +25,8 @@ void quickSort(int arr[], int low, int high) {
 }
 
 int main(int argc, char *argv[]) {
-  int items[8] = {1, 5, 2, 3, 7, 4, 8, 9};
   int size = sizeof(items) / sizeof(items[0]);
   quickSort(items, 0, size);
-  for (int item : items) {
-    printf("%d", item);
-  }
+  printList(items, size);
   return 0;
 }
