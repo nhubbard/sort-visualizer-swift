@@ -37,5 +37,5 @@ func merge(_ left: [Int], _ right: [Int]) -> [Int] {
   return orderedArray
 }
 
-var items: [Int] = [1, 5, 2, 3, 7, 4, 8, 9]
+var items: [Int] = [35, 95, 74, 71, 72, 30, 96, 53, 9, 0]
 print(mergeSort(items))

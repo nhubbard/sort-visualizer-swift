@@ -19,5 +19,5 @@ function merge(left, right) {
   return [...arr, ...left, ...right];
 }
 
-var array = [1, 5, 2, 3, 7, 4, 8, 9];
+var array = [35, 95, 74, 71, 72, 30, 96, 53, 9, 0];
 console.log(mergeSort(array));

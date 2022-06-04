@@ -28,7 +28,7 @@ fun sort(arr: Array<Int>) {
 }
 
 fun main() {
-	var items = arrayOf<Int>(1, 5, 2, 3, 7, 4, 8, 9)
+	var items = arrayOf<Int>(35, 95, 74, 71, 72, 30, 96, 53, 9, 0)
 	sort(items)
 	println("[%s]".format(items.joinToString(", ")))
 }

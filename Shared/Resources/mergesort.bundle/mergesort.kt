@@ -33,7 +33,7 @@ fun merge(left: List<Int>, right: List<Int>): List<Int>  {
 }
 
 fun main() {
-  var items = mutableListOf<Int>(1, 5, 2, 3, 7, 4, 8, 9)
+  var items = mutableListOf<Int>(35, 95, 74, 71, 72, 30, 96, 53, 9, 0)
   println("[%s]".format(
     mergeSort(items).joinToString(", ")
   ))

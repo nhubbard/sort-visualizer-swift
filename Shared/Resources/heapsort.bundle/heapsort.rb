@@ -29,5 +29,5 @@ def heapify(a, parent, limit)
   a[parent] = root
 end
 
-items = [1, 5, 2, 3, 7, 4, 8, 9]
+items = [35, 95, 74, 71, 72, 30, 96, 53, 9, 0]
 p heap_sort(items)

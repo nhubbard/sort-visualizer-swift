@@ -1,7 +1,19 @@
 #include <cstdio>
-// The common header includes the random numbers
-// list, along with the swap and printList functions.
-#include "../common.h"
+#include <utility>
+
+int items[10] = {35, 95, 74, 71, 72, 30, 96, 53, 9, 0};
+
+void printList(int items[], int size) {
+  for (int i = 0; i < size; i++) {
+    if (i == 0) {
+      printf("[%d, ", items[i]);
+    } else if (i != size - 1) {
+      printf("%d, ", items[i]);
+    } else {
+      printf("%d]", items[i]);
+    }
+  }
+}
 
 int partition(int arr[], int low, int high) {
   int pivot = arr[high];
@@ -9,10 +21,10 @@ int partition(int arr[], int low, int high) {
   for (int j = low; j < high; j++) {
     if (arr[j] <= pivot) {
       i++;
-      swap(&arr[i], &arr[j]);
+      std::swap(arr[i], arr[j]);
     }
   }
-  swap(&arr[i + 1], &arr[high]);
+  std::swap(arr[i + 1], arr[high]);
   return i + 1;
 }
 

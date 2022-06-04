@@ -24,7 +24,7 @@ fun partition(arr: Array<Int>, begin: Int, end: Int): Int {
 }
 
 fun main() {
-  var items = arrayOf<Int>(1, 5, 2, 3, 7, 4, 8, 9)
+  var items = arrayOf<Int>(35, 95, 74, 71, 72, 30, 96, 53, 9, 0)
   quickSort(items, 0, items.size - 1)
   println("[%s]".format(items.joinToString(", ")))
 }

@@ -40,7 +40,7 @@ public class MergeSort {
   }
 
   public static void Main(String[] args) {
-    int[] array = {1, 5, 2, 3, 7, 4, 8, 9};
+    int[] array = {35, 95, 74, 71, 72, 30, 96, 53, 9, 0};
     Sort(array, 0, array.Length - 1);
     string result = "[" + String.Join(", ", array) + "]";
     Console.WriteLine(result);

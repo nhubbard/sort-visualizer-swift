@@ -21,6 +21,6 @@ func quickSort(_ array: inout [Int], _ begin: Int, _ end: Int) {
 	}
 }
 
-var items: [Int] = [1, 5, 2, 3, 7, 4, 8, 9]
+var items: [Int] = [35, 95, 74, 71, 72, 30, 96, 53, 9, 0]
 quickSort(&items, 0, items.count - 1)
 print(items)

@@ -31,7 +31,7 @@ func heapSort(arr []int, n int) {
 }
 
 func main() {
-	items := []int{1, 5, 2, 3, 7, 4, 8, 9}
+	items := []int{35, 95, 74, 71, 72, 30, 96, 53, 9, 0}
 	heapSort(items, len(items) - 1)
 	fmt.Println(items)
 }
