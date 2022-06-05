@@ -1,6 +1,6 @@
 //
 //  Token.swift
-//  Sort2 (iOS)
+//  PygmentsKit
 //
 //  Created by Nicholas Hubbard on 6/3/22.
 //
@@ -88,112 +88,27 @@ struct Token: Identifiable {
     case genericSubheading = "Token.Generic.Subheading"
     case genericTraceback = "Token.Generic.Traceback"
     
-    var classNames: [TokenType: String] = [
-      .token: "",
-      // Artificial separator. Please ignore.
-      .text: "",
-      .whitespace: "w",
-      .escape: "esc",
-      .error: "err",
-      .other: "x",
-      // Artificial separator. Please ignore.
-      .keyword: "k",
-      .keywordConstant: "kc",
-      .keywordDeclaration: "kd",
-      .keywordNamespace: "kn",
-      .keywordPseudo: "kp",
-      .keywordReserved: "kr",
-      .keywordType: "kt",
-      // Artificial separator. Please ignore.
-      .name: "n",
-      .nameAttribute: "na",
-      .nameBuiltin: "nb",
-      .nameBuiltinPseudo: "bp",
-      .nameClass: "nc",
-      .nameConstant: "no",
-      .nameDecorator: "nd",
-      .nameEntity: "ni",
-      .nameException: "ne",
-      .nameFunction: "nf",
-      .nameFunctionMagic: "fm",
-      .nameProperty: "py",
-      .nameLabel: "nl",
-      .nameNamespace: "nn",
-      .nameOther: "nx",
-      .nameTag: "nt",
-      .nameVariable: "nv",
-      .nameVariableClass: "vc",
-      .nameVariableGlobal: "vg",
-      .nameVariableInstance: "vi",
-      .nameVariableMagic: "vm",
-      // Artifical separator. Please ignore.
-      .literal: "l",
-      .literalDate: "ld",
-      // Artifical separator. Please ignore.
-      .string: "s",
-      .stringAffix: "sa",
-      .stringBacktick: "sb",
-      .stringChar: "sc",
-      .stringDelimiter: "dl",
-      .stringDoc: "sd",
-      .stringDouble: "s2",
-      .stringEscape: "se",
-      .stringHeredoc: "sh",
-      .stringInterpol: "si",
-      .stringOther: "sx",
-      .stringRegex: "sr",
-      .stringSingle: "s1",
-      .stringSymbol: "ss",
-      // Artifical separator. Please ignore.
-      .number: "m",
-      .numberBin: "mb",
-      .numberFloat: "mf",
-      .numberHex: "mh",
-      .numberInteger: "mi",
-      .numberIntegerLong: "il",
-      .numberOct: "mo",
-      // Artificial separator. Please ignore.
-      .operator: "o",
-      .operatorWord: "ow",
-      // Artificial separator. Please ignore.
-      .punctuation: "p",
-      // Artificial separator. Please ignore.
-      .comment: "c",
-      .commentHashbang: "ch",
-      .commentMultiline: "cm",
-      .commentPreproc: "cp",
-      .commentPreprocFile: "cpf",
-      .commentSingle: "c1",
-      .commentSpecial: "cs",
-      // Artificial separator. Please ignore.
-      .generic: "g",
-      .genericDeleted: "gd",
-      .genericEmph: "ge",
-      .genericError: "gr",
-      .genericHeading: "gh",
-      .genericInserted: "gi",
-      .genericOutput: "go",
-      .genericPrompt: "gp",
-      .genericStrong: "gs",
-      .genericSubheading: "gu",
-      .genericTraceback: "gt"
-    ]
+    /**
+     * Get the `TokenType` from a string representation of the token type. Defaults to `.generic` if there is no match.
+     */
+    static func fromString(value: String) -> TokenType {
+      for tokenType in TokenType.allCases {
+        if tokenType.rawValue == value {
+          return tokenType
+        }
+      }
+      return TokenType.generic
+    }
   }
+  
   let id = UUID()
   var type: TokenType
   var value: String
-  
-  func fromString(value: String) -> TokenType {
-    for tokenType in TokenType.allCases {
-      if tokenType.rawValue == value {
-        return tokenType
-      }
-    }
-    return TokenType.generic
-  }
-  
-  /// Return `true` if `rhs` is a subtype of `lhs`.
-  func isSubType(lhs: TokenType, rhs: TokenType) -> Bool {
-    return rhs.rawValue.starts(with: lhs.rawValue)
+}
+
+extension Token.TokenType {
+  /// Return `true` if the token type of `self` is a child type of `parent`.
+  func isSubType(parent: Token.TokenType) -> Bool {
+    return self.rawValue.starts(with: parent.rawValue)
   }
 }

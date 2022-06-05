@@ -1,85 +1,66 @@
 //
 //  Utilities.swift
-//  Sort2 (iOS)
+//  PygmentsKit
 //
 //  Created by Nicholas Hubbard on 6/3/22.
 //
 
 import Foundation
 
-// I hope these are able to be compiled successfully. Otherwise we're in for a rough time...
-let splitPathRegex = try! NSRegularExpression(pattern: #"[/\\ ]"#)
-fileprivate let doctypeLookupRegexPattern = #"""
-<!DOCTYPE\s+(
- [a-zA-Z_][a-zA-Z0-9]*
- (?: \s+      # optional in HTML5
- [a-zA-Z_][a-zA-Z0-9]*\s+
- "[^"]*")?
- )
- [^>]*>
-"""#
-let doctypeLookupRegex = try! NSRegularExpression(pattern: doctypeLookupRegexPattern, options: [.dotMatchesLineSeparators, .allowCommentsAndWhitespace, .anchorsMatchLines])
-let tagRegex = try! NSRegularExpression(pattern: #"<(.+?)(\s.*?)?>.*?</.+?>"#, options: [.caseInsensitive, .dotMatchesLineSeparators, .allowCommentsAndWhitespace, .anchorsMatchLines])
-let xmlDeclRegex = try! NSRegularExpression(pattern: #"\s*<\?xml[^>]*\?>"#, options: [.caseInsensitive])
-
-/// An error from Pygments. Might not end up being used.
-struct ClassNotFound: Error, CustomStringConvertible {
-  public var description: String = "Could not find a matching class to load."
+/**
+ * Given a Unicode character code with a length greater than 16 bits, return the two 16 bit surrogate pair.
+ * See example D28 on http://www.unicode.org/book/ch03.pdf for more information.
+ * Returns (-1, -1) if the conversion from `Character` to `Int` fails.
+ */
+func surrogatePair(_ c: Character) -> (Int, Int) {
+  let cc = Int(String(c))
+  guard cc != nil else {
+    return (-1, -1)
+  }
+  return (0xd7c0 + (cc! >> 10), 0xdc00 + (cc! & 0x3ff))
 }
-
-/// Another error from Pygments. Might not end up being used.
-struct OptionError: Error, CustomStringConvertible {
-  public var description: String = "This option is invalid."
-}
-
-// We're going to try to do strongly typed options. This might not work out well, but
-// at least it will be a fun experiment.
-
-// getChoiceOpt(options: [String: Any], optionName: String, default: Any, normalCase: Bool = false) -> String
-// Replace this with an enum for each choice.
-// This kind of function is repeated for booleans, integers, and lists/arrays of items.
-
-// Skipping function docstring_headline; it's very Python-specific, and I don't know
-// of any way to introspect the headline of the documentation for a function in Swift.
-
-// Skipping function make_analysator; I can't comprehend what it actually does.
 
 /**
- * Check if the given regexp matches the last part of the shebang, if one exists.
- *
- * Examples:
- *   - `shebangMatches(shebang: "#!/usr/bin/env python", regexp: #"python(2\.\d)?"#)` returns `true`
- *   - `shebangMatches(shebang: "#!/usr/bin/python-ruby", regexp: #"python(2\.\d)?"#)` returns `false`
- *
- * It also checks for common Windows executable file extensions:
- *   - `shebangMatches(shebang: "#!C:\\Python2.4\\Python.exe", regexp: #"python(2\.\d)?"#)` returns `true`
- *
- * Parameters are ignored, so a shebang like `perl -e` is the same as `perl`.
- *
- * Note that this method automatically searches the whole string; the regexp is implicitly wrapped in `'^$'`.
+ * Format a sequence of strings for output.
  */
-// TODO: I give up. This is absolute madness in Swift.
-/*
-func shebangMatches(shebang: String, regexp: NSRegularExpression) -> Bool {
-  var index = shebang.firstIndex(of: "\n")
-  var firstLine: String
-  if index != nil {
-    firstLine = shebang[..<index!].lowercased()
-  } else {
-    firstLine = shebang.lowercased()
-  }
-  if firstLine.starts(with: "#!") {
-    var found: [String] = []
-    let strippedInput = firstLine.dropFirst(2).trimmingCharacters(in: .whitespacesAndNewlines)
-    for x in strippedInput.ranges(of: #"[/\\ ]"#, options: .regularExpression) {
-      let xString = String(strippedInput[x])
-      if !xString.starts(with: "-") {
-        found.append(xString)
-      }
+func formatLines(varName: String, seq: [String], raw: Bool = false, indentLevel: Int = 0) -> String {
+  var lines: [String] = []
+  let baseIndent = String(repeating: " ", count: indentLevel * 4)
+  let innerIndent = String(repeating: " ", count: (indentLevel + 1) * 4)
+  lines.append("\(baseIndent)\(innerIndent) = (")
+  if raw {
+    // These should be preformatted reprs of, say, tuples.
+    for i in seq {
+      lines.append("\(innerIndent)\(i),")
     }
-    let trueFound = found.last
-    let regex = #"^%s(\.(exe|cmd|bat|bin))?$"#
+  } else {
+    for i in seq {
+      // Force use of single quotes.
+      // This part is untested; I can't find the equivalent of the Python repr function.
+      let r = "'\(i)'\""
+      let lastTwo = r.index(r.endIndex, offsetBy: -2)..<r.endIndex
+      lines.append(innerIndent + r[lastTwo] + String(r.last!) + ",")
+    }
   }
-}*/
+  lines.append(baseIndent + ")")
+  return lines.joined(separator: "\n")
+}
 
-// TODO: This utilities file is kinda crazy. I'm going to skip writing the functions until I absolutely need them.
+/**
+ * Returns a list with duplicates removed from the iterable `it`.
+ * Order is preserved.
+ */
+func duplicatesRemoved<T>(_ it: [T], alreadySeen: [T] = []) -> [T] where T : Equatable {
+  var output: [T] = []
+  var seen: [T] = []
+  for i in it {
+    if seen.contains(i) {
+      continue
+    } else if alreadySeen.contains(i) {
+      continue
+    }
+    output.append(i)
+    seen.append(i)
+  }
+  return output
+}
