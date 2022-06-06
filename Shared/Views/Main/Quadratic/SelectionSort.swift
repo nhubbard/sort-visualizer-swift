@@ -8,14 +8,14 @@
 import SwiftUI
 
 struct SelectionSort: View {
-    var body: some View {
-        SortView(algorithm: .selectionSort)
-            .navigationTitle("Selection Sort")
-    }
+  var body: some View {
+    SortView(algorithm: .selectionSort)
+      .navigationTitle("Selection Sort")
+  }
 }
 
 struct SelectionSort_Previews: PreviewProvider {
-    static var previews: some View {
-        SelectionSort()
-    }
+  static var previews: some View {
+    SelectionSort()
+  }
 }

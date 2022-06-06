@@ -8,14 +8,14 @@
 import SwiftUI
 
 struct ShakerSort: View {
-    var body: some View {
-        SortView(algorithm: .shakerSort)
-            .navigationTitle("Shaker Sort")
-    }
+  var body: some View {
+    SortView(algorithm: .shakerSort)
+      .navigationTitle("Shaker Sort")
+  }
 }
 
 struct ShakerSort_Previews: PreviewProvider {
-    static var previews: some View {
-        ShakerSort()
-    }
+  static var previews: some View {
+    ShakerSort()
+  }
 }

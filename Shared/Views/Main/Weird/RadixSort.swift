@@ -8,14 +8,14 @@
 import SwiftUI
 
 struct RadixSort: View {
-    var body: some View {
-        SortView(algorithm: .radixSort)
-            .navigationTitle("Radix Sort")
-    }
+  var body: some View {
+    SortView(algorithm: .radixSort)
+      .navigationTitle("Radix Sort")
+  }
 }
 
 struct RadixSort_Previews: PreviewProvider {
-    static var previews: some View {
-        RadixSort()
-    }
+  static var previews: some View {
+    RadixSort()
+  }
 }

@@ -26,49 +26,53 @@ typealias UnprocessedToken = (String.Index, Token.TokenType, String)
  * - Parameter ensureNewlines: Whether to ensure newlines are present. Defaults to `true`.
  * - Parameter tabSize: The size of tabs to use. Defaults to `2`.
  */
-class BaseLexer {
+protocol BaseLexer {
   /// Name of the lexer.
-  var name: String = ""
+  var name: String { get }
   
   /// URL of the language specification/definition.
-  var url: String = ""
+  var url: String { get }
   
   /// Shortcuts for the lexer.
-  var aliases: [String] = []
+  var aliases: [String] { get }
   
   /// File name globs
-  var filenames: [String] = []
+  var filenames: [String] { get }
   
   /// Secondary file name globs
-  var aliasFilenames: [String] = []
+  var aliasFilenames: [String] { get }
   
   /// Mime types
-  var mimetypes: [String] = []
+  var mimetypes: [String] { get }
   
   /// Priority, should multiple lexers match and no content is provided.
-  var priority: Int = 0
+  var priority: Int { get }
   
   /// Should we strip newlines out?
-  var stripNewlines: Bool = true
+  var stripNewlines: Bool { get }
   
   /// Should we strip all spacing out?
-  var stripAll: Bool = false
+  var stripAll: Bool { get }
   
   /// Should we ensure there are newlines?
-  var ensureNewlines: Bool = true
+  var ensureNewlines: Bool { get }
   
   /// Tab size
-  var tabSize: Int = 2
+  var tabSize: Int { get }
   
   /**
    * Return a float between 0 and 1 indicating the confidence of the lexer in highlighting the text. 0 means 'will not highlight', 1 means 'guaranteed to highlight'.
-   *
-   * In subclasses, implementing this function is **required**.
    */
-  static func analyzeText(text: String) -> Float {
-    preconditionFailure("This function must be implemented by the child class.")
-  }
+  func analyzeText(text: String) -> Float
   
+  /**
+   * Return an `Observable` of (`index`, `tokenType`, `value`) tuples where `index`
+   * is the starting position of the token within the input text.
+   */
+  func getTokensUnprocessed(text: String) -> Observable<UnprocessedToken>
+}
+
+extension BaseLexer {
   /**
    * Return an iterable of (index, tokentype, value) pairs where "index" is the starting position of the token within the input text.
    * If `unfiltered` is set to true, the filtering mechanism is bypassed even if filters are defined.
@@ -94,15 +98,146 @@ class BaseLexer {
       Token(type: token.1, value: token.2)
     }.toArray().value
   }
+}
+
+/**
+ * This lexer takes two lexers as arguments. A root lexer and a language lexer. First, everything is scanned using the
+ * language lexer, and then all `Other` tokens are lexed using the root lexer.
+ *
+ * The lexers from the `template` lexer package use this base lexer.
+ */
+class DelegatingLexer: BaseLexer {
+  // Base lexer properties
+  var name: String
+  var url: String
+  var aliases: [String]
+  var filenames: [String]
+  var aliasFilenames: [String]
+  var mimetypes: [String]
+  var priority: Int
+  var stripNewlines: Bool
+  var stripAll: Bool
+  var ensureNewlines: Bool
+  var tabSize: Int
   
-  /**
-   * Return an `Observable` of (`index`, `tokenType`, `value`) tuples where `index`
-   * is the starting position of the token within the input text.
-   *
-   * In subclasses, implementing this function is **required**.
-   */
+  // Delegating lexer-specific properties
+  var rootLexer: BaseLexer
+  var languageLexer: BaseLexer
+  var needle: Token.TokenType
+  var options: [String: Any] = [:]
+  
+  init(rootLexer: BaseLexer, languageLexer: BaseLexer, needle: Token.TokenType = .other, options: [String: Any] = [:]) {
+    // Base lexer properties
+    self.name = "delegating\(languageLexer.name.capitalized)And\(rootLexer.name.capitalized)"
+    self.url = languageLexer.url
+    self.aliases = languageLexer.aliases
+    self.filenames = languageLexer.filenames
+    self.aliasFilenames = languageLexer.aliasFilenames
+    self.mimetypes = languageLexer.mimetypes
+    self.priority = languageLexer.priority
+    self.stripNewlines = languageLexer.stripNewlines
+    self.stripAll = languageLexer.stripAll
+    self.ensureNewlines = languageLexer.ensureNewlines
+    self.tabSize = languageLexer.tabSize
+    
+    // Delegating lexer-specific properties
+    self.rootLexer = rootLexer
+    self.languageLexer = languageLexer
+    self.needle = needle
+    self.options = options
+  }
+  
+  func analyzeText(text: String) -> Float {
+    return languageLexer.analyzeText(text: text)
+  }
+  
   func getTokensUnprocessed(text: String) -> Observable<UnprocessedToken> {
-    preconditionFailure("This function must be implemented by the child class.")
+    var buffered: String = ""
+    var insertions: [(Int, [UnprocessedToken])] = []
+    var lngBuffer: [UnprocessedToken] = []
+    _ = self.languageLexer.getTokensUnprocessed(text: text).subscribe { event in
+      if let (i, t, v) = event.element {
+        if t == self.needle {
+          if !lngBuffer.isEmpty {
+            insertions.append((buffered.count, lngBuffer))
+            lngBuffer = []
+          }
+          buffered += v
+        } else {
+          lngBuffer.append((i, t, v))
+        }
+      }
+    }
+    if !lngBuffer.isEmpty {
+      insertions.append((buffered.count, lngBuffer))
+    }
+    // TODO: return doInsertions(insertions, self.rootLexer.getTokensUnprocessed(text: buffered))
+    return Observable.empty()
   }
 }
 
+/// Indicates that a state should include rules from another state.
+protocol IncludeProtocol {
+  // Replacement for descending from `str` in Python (can't be done in Swift)
+  func asString() -> String
+}
+
+/// Indicates that a state should inherit from its superclass.
+protocol InheritProtocol {}
+
+/// Indicates that a state is combined from multiple states.
+protocol CombinedProtocol {}
+
+/// A pseudo-match object constructed from a string.
+class PseudoMatch {
+  var _text: String
+  var _start: Int
+  
+  init(start: Int, text: String) {
+    self._text = text
+    self._start = start
+  }
+  
+  func start(arg: Any? = nil) -> Int {
+    return self._start
+  }
+  
+  func end(arg: Any? = nil) -> Int {
+    return self._start + self._text.count
+  }
+  
+  func group(arg: Any? = nil) -> String {
+    if arg != nil {
+      fatalError("No such group")
+    }
+    return self._text
+  }
+  
+  func groups() -> [String] {
+    return [self._text]
+  }
+  
+  func groupdict() -> [String: String] {
+    return [:]
+  }
+}
+
+/**
+ * Callback that yields multiple actions for each group in the match.
+ */
+/*
+func byGroups(args: [Int: Any?]) -> (BaseLexer, Match, Any?) -> Observable<Any> {
+  func callback(lexer: BaseLexer, match: Match, context: Any? = nil) -> Observable<Any> {
+    for (i, action) in args {
+      if action == nil {
+        continue
+      } else if action is Token.TokenType {
+        var data = match.group(at: i + 1)
+        if data != nil {
+          return Observable((match.start, action, data))
+        }
+      }
+    }
+  }
+}
+*/

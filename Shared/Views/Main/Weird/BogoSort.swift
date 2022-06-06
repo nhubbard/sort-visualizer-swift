@@ -8,14 +8,14 @@
 import SwiftUI
 
 struct BogoSort: View {
-    var body: some View {
-        SortView(algorithm: .bogoSort)
-            .navigationTitle("Bogo Sort")
-    }
+  var body: some View {
+    SortView(algorithm: .bogoSort)
+      .navigationTitle("Bogo Sort")
+  }
 }
 
 struct BogoSort_Previews: PreviewProvider {
-    static var previews: some View {
-        BogoSort()
-    }
+  static var previews: some View {
+    BogoSort()
+  }
 }

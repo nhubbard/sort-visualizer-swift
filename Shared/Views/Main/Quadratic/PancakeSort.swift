@@ -8,14 +8,14 @@
 import SwiftUI
 
 struct PancakeSort: View {
-    var body: some View {
-        SortView(algorithm: .pancakeSort)
-            .navigationTitle("Pancake Sort")
-    }
+  var body: some View {
+    SortView(algorithm: .pancakeSort)
+      .navigationTitle("Pancake Sort")
+  }
 }
 
 struct PancakeSort_Previews: PreviewProvider {
-    static var previews: some View {
-        PancakeSort()
-    }
+  static var previews: some View {
+    PancakeSort()
+  }
 }

@@ -8,14 +8,14 @@
 import SwiftUI
 
 struct BubbleSort: View {
-    var body: some View {
-        SortView(algorithm: .bubbleSort)
-            .navigationTitle("Bubble Sort")
-    }
+  var body: some View {
+    SortView(algorithm: .bubbleSort)
+      .navigationTitle("Bubble Sort")
+  }
 }
 
 struct BubbleSort_Previews: PreviewProvider {
-    static var previews: some View {
-        BubbleSort()
-    }
+  static var previews: some View {
+    BubbleSort()
+  }
 }

@@ -129,7 +129,7 @@ extension TextFormat {
       return TextFormat(fg: _fg, bg: _bg, border: _border, bold: _bold, italic: _italic, underline: _underline)
     }
   }
-
+  
   static func getBuilder(bg: Color) -> Builder {
     return TextFormat.Builder(bg)
   }

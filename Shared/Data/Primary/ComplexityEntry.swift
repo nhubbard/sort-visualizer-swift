@@ -8,7 +8,7 @@
 import Foundation
 
 struct ComplexityEntry: Identifiable {
-    let id = UUID()
-    var key: String
-    var value: String
+  let id = UUID()
+  var key: String
+  var value: String
 }

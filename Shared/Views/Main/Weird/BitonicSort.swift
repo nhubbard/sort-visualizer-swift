@@ -8,14 +8,14 @@
 import SwiftUI
 
 struct BitonicSort: View {
-    var body: some View {
-        SortView(algorithm: .bitonicSort)
-            .navigationTitle("Bitonic Sort")
-    }
+  var body: some View {
+    SortView(algorithm: .bitonicSort)
+      .navigationTitle("Bitonic Sort")
+  }
 }
 
 struct BitonicSort_Previews: PreviewProvider {
-    static var previews: some View {
-        BitonicSort()
-    }
+  static var previews: some View {
+    BitonicSort()
+  }
 }

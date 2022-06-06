@@ -8,14 +8,14 @@
 import SwiftUI
 
 struct CombSort: View {
-    var body: some View {
-        SortView(algorithm: .combSort)
-            .navigationTitle("Comb Sort")
-    }
+  var body: some View {
+    SortView(algorithm: .combSort)
+      .navigationTitle("Comb Sort")
+  }
 }
 
 struct CombSort_Previews: PreviewProvider {
-    static var previews: some View {
-        CombSort()
-    }
+  static var previews: some View {
+    CombSort()
+  }
 }

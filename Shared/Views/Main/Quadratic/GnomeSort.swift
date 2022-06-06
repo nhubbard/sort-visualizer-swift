@@ -8,14 +8,14 @@
 import SwiftUI
 
 struct GnomeSort: View {
-    var body: some View {
-        SortView(algorithm: .gnomeSort)
-            .navigationTitle("Gnome Sort")
-    }
+  var body: some View {
+    SortView(algorithm: .gnomeSort)
+      .navigationTitle("Gnome Sort")
+  }
 }
 
 struct GnomeSort_Previews: PreviewProvider {
-    static var previews: some View {
-        GnomeSort()
-    }
+  static var previews: some View {
+    GnomeSort()
+  }
 }

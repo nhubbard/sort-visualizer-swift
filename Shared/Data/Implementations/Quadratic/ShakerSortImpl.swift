@@ -8,39 +8,39 @@
 import Foundation
 
 extension SortViewModel {
-    @MainActor
-    func shakerSort() async {
-        guard await enforceRunning() else {
-            return
-        }
-        var sorted = true
-        while sorted {
-            guard await enforceRunning() else {
-                return
-            }
-            for i in 0..<(data.count - 1) {
-                guard await enforceRunning() else {
-                    return
-                }
-                if await compare(firstIndex: i, secondIndex: i + 1) {
-                    await swap(i, i + 1)
-                    sorted = true
-                }
-            }
-            if !sorted {
-                break
-            }
-            sorted = false
-            let sequence = 1..<(data.count - 1)
-            for j in sequence.reversed() {
-                guard await enforceRunning() else {
-                    return
-                }
-                if await compare(firstIndex: j - 1, secondIndex: j) {
-                    await swap(j - 1, j)
-                    sorted = true
-                }
-            }
-        }
+  @MainActor
+  func shakerSort() async {
+    guard await enforceRunning() else {
+      return
     }
+    var sorted = true
+    while sorted {
+      guard await enforceRunning() else {
+        return
+      }
+      for i in 0..<(data.count - 1) {
+        guard await enforceRunning() else {
+          return
+        }
+        if await compare(firstIndex: i, secondIndex: i + 1) {
+          await swap(i, i + 1)
+          sorted = true
+        }
+      }
+      if !sorted {
+        break
+      }
+      sorted = false
+      let sequence = 1..<(data.count - 1)
+      for j in sequence.reversed() {
+        guard await enforceRunning() else {
+          return
+        }
+        if await compare(firstIndex: j - 1, secondIndex: j) {
+          await swap(j - 1, j)
+          sorted = true
+        }
+      }
+    }
+  }
 }

@@ -8,13 +8,13 @@
 import SwiftUI
 
 struct HeapSort: View {
-    var body: some View {
-        ScrollingSortView(algorithm: .heapSort).navigationTitle("Heap Sort")
-    }
+  var body: some View {
+    ScrollingSortView(algorithm: .heapSort).navigationTitle("Heap Sort")
+  }
 }
 
 struct HeapSort_Previews: PreviewProvider {
-    static var previews: some View {
-        HeapSort()
-    }
+  static var previews: some View {
+    HeapSort()
+  }
 }

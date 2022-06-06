@@ -8,13 +8,13 @@
 import SwiftUI
 
 struct QuickSort: View {
-    var body: some View {
-        ScrollingSortView(algorithm: .quickSort).navigationTitle("Quick Sort")
-    }
+  var body: some View {
+    ScrollingSortView(algorithm: .quickSort).navigationTitle("Quick Sort")
+  }
 }
 
 struct QuickSort_Previews: PreviewProvider {
-    static var previews: some View {
-        QuickSort()
-    }
+  static var previews: some View {
+    QuickSort()
+  }
 }

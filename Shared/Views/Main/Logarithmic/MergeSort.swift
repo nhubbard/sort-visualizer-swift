@@ -8,13 +8,13 @@
 import SwiftUI
 
 struct MergeSort: View {
-    var body: some View {
-        ScrollingSortView(algorithm: .mergeSort).navigationTitle("Merge Sort")
-    }
+  var body: some View {
+    ScrollingSortView(algorithm: .mergeSort).navigationTitle("Merge Sort")
+  }
 }
 
 struct MergeSort_Previews: PreviewProvider {
-    static var previews: some View {
-        MergeSort()
-    }
+  static var previews: some View {
+    MergeSort()
+  }
 }

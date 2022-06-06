@@ -8,14 +8,14 @@
 import SwiftUI
 
 struct StoogeSort: View {
-    var body: some View {
-        SortView(algorithm: .stoogeSort)
-            .navigationTitle("Stooge Sort")
-    }
+  var body: some View {
+    SortView(algorithm: .stoogeSort)
+      .navigationTitle("Stooge Sort")
+  }
 }
 
 struct StoogeSort_Previews: PreviewProvider {
-    static var previews: some View {
-        StoogeSort()
-    }
+  static var previews: some View {
+    StoogeSort()
+  }
 }

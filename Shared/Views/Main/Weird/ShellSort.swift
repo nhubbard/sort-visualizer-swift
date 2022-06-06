@@ -8,14 +8,14 @@
 import SwiftUI
 
 struct ShellSort: View {
-    var body: some View {
-        SortView(algorithm: .shellSort)
-            .navigationTitle("Shell Sort")
-    }
+  var body: some View {
+    SortView(algorithm: .shellSort)
+      .navigationTitle("Shell Sort")
+  }
 }
 
 struct ShellSort_Previews: PreviewProvider {
-    static var previews: some View {
-        ShellSort()
-    }
+  static var previews: some View {
+    ShellSort()
+  }
 }

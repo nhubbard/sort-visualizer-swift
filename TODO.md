@@ -27,9 +27,8 @@
     * [x] Implement big-O values
     * [x] Implement top 10 programming language examples for QuickSort as test
     * [ ] Implement top 10 programming language examples for all other algorithms
-        * [x] Quick Sort
-        * [ ] Merge Sort
-        * [ ] Heap Sort
+        * [x] Merge Sort
+        * [x] Heap Sort
         * [ ] Bubble Sort
         * [ ] Selection Sort
         * [ ] Insertion Sort
@@ -46,23 +45,26 @@
 * [ ] String resources for all strings throughout the app. Sounds like a pain in the butt to do...
 * [ ] Settings panel that allows you to change various defaults, like the sound tuning, or the lowest and highest notes.    
 
+## Future Ideas from WWDC 2022
+
+* [ ] Regex literals in Swift! Praise be to the Apple gods!
+* [ ] New Grid API for Code Previews... this is a game changer for my use case!
+* [ ] New Swift Charts API!
+
 ## Far-Out Ideas
 
 * [ ] Reimplement the entire Pygments stack in Swift to reduce preprocessing and assets size?
     * Could call it something like `PygmentsUI` or whatnot. Sounds like a really fun project.
+    * It hasn't been a fun project so far. Regex is driving me insane, and this isn't going to get any easier.
+    * Fun fact: Apple must have read my mind, because Swift is apparently gaining a regex literal and several convenience features for regex support soon!
 * [ ] Reimplement iosMath in Swift because I really want to?
     * Could call it something like `MathUI`. Sounds like a less fun project because Objective-C bad.
     * Swiftify is really expensive too, so I would have to do a manual conversion process... 😳
-    
-## External Services (Ads, Crash Reporting)
 
-* [ ] Implement crash reporting
-    * Crashlytics?
-* [ ] Implement advertisements
-    * *Pro:* Automatic passive revenue
-    * *Con:* Privacy policy and stuff
-* [ ] If implementing advertisements, implement in-app purchase using StoreKit (App Store) and/or Paddle (Self-Distribution)
-    * Allows users to opt-out of advertisements and not give up their private information
+## External Services (Crash Reporting, Monetization)
+
+* [ ] Implement Crashlytics
+* [ ] Implement StoreKit: either a $0.99/month subscription, or a one-time purchase (~$5)
 
 ## Algorithms
 
