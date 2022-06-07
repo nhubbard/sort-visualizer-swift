@@ -9,8 +9,7 @@ import SwiftUI
 
 struct BubbleSort: View {
   var body: some View {
-    SortView(algorithm: .bubbleSort)
-      .navigationTitle("Bubble Sort")
+    ScrollingSortView(algorithm: .bubbleSort).navigationTitle("Bubble Sort")
   }
 }
 

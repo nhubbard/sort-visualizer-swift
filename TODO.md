@@ -29,7 +29,7 @@
     * [ ] Implement top 10 programming language examples for all other algorithms
         * [x] Merge Sort
         * [x] Heap Sort
-        * [ ] Bubble Sort
+        * [x] Bubble Sort
         * [ ] Selection Sort
         * [ ] Insertion Sort
         * [ ] Gnome Sort
@@ -42,7 +42,7 @@
         * [ ] Comb Sort
         * [ ] Bogo Sort
         * [ ] Stooge Sort
-* [ ] String resources for all strings throughout the app. Sounds like a pain in the butt to do...
+* [ ] String resources for all strings throughout the app.
 * [ ] Settings panel that allows you to change various defaults, like the sound tuning, or the lowest and highest notes.    
 
 ## Future Ideas from WWDC 2022

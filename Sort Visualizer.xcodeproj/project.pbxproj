@@ -28,6 +28,7 @@
 		71650A32284272FD00A23BC2 /* RandomizingHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71650A31284272FD00A23BC2 /* RandomizingHeader.swift */; };
 		71650A3E28429DB200A23BC2 /* ScrollingSortView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71650A3D28429DB200A23BC2 /* ScrollingSortView.swift */; };
 		716A5CE12821AB0D008B792A /* Algorithms.swift in Sources */ = {isa = PBXBuildFile; fileRef = 716A5CE02821AB0D008B792A /* Algorithms.swift */; };
+		716D2992284FBEBD00772CBD /* bubblesort.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 716D2991284FBEBD00772CBD /* bubblesort.bundle */; };
 		717D6A05284A881500B7B645 /* PygmentsKit.docc in Sources */ = {isa = PBXBuildFile; fileRef = 717D6A04284A881500B7B645 /* PygmentsKit.docc */; };
 		717D6A11284A881500B7B645 /* PygmentsKit.h in Headers */ = {isa = PBXBuildFile; fileRef = 717D6A03284A881500B7B645 /* PygmentsKit.h */; };
 		717D6A19284A882400B7B645 /* Token.swift in Sources */ = {isa = PBXBuildFile; fileRef = 717D69DE284A83FB00B7B645 /* Token.swift */; };
@@ -110,6 +111,7 @@
 		71650A31284272FD00A23BC2 /* RandomizingHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RandomizingHeader.swift; sourceTree = "<group>"; };
 		71650A3D28429DB200A23BC2 /* ScrollingSortView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollingSortView.swift; sourceTree = "<group>"; };
 		716A5CE02821AB0D008B792A /* Algorithms.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Algorithms.swift; sourceTree = "<group>"; };
+		716D2991284FBEBD00772CBD /* bubblesort.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = bubblesort.bundle; sourceTree = "<group>"; };
 		717D69D7284A744900B7B645 /* Utilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utilities.swift; sourceTree = "<group>"; };
 		717D69DC284A7CFB00B7B645 /* MatchSequence+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MatchSequence+Extensions.swift"; sourceTree = "<group>"; };
 		717D69DE284A83FB00B7B645 /* Token.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Token.swift; sourceTree = "<group>"; };
@@ -240,6 +242,7 @@
 				71BCE0FD2847B8B6007C8254 /* mergesort.bundle */,
 				71BCE0FF2847D963007C8254 /* heapsort.bundle */,
 				713FA7AF284A5DAE00F12327 /* highlight.py */,
+				716D2991284FBEBD00772CBD /* bubblesort.bundle */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -592,6 +595,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				71BCE0FE2847B8B6007C8254 /* mergesort.bundle in Resources */,
+				716D2992284FBEBD00772CBD /* bubblesort.bundle in Resources */,
 				71BCE1002847D963007C8254 /* heapsort.bundle in Resources */,
 				71D4DBDE28185905001DBD0E /* Assets.xcassets in Resources */,
 				71610C0E2844213900A2696C /* quicksort.bundle in Resources */,
@@ -1013,32 +1017,32 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/AudioKit/AudioKit.git";
 			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 5.0.0;
+				branch = main;
+				kind = branch;
 			};
 		};
 		7120CB9A28397E410019D976 /* XCRemoteSwiftPackageReference "AudioKitEX" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/AudioKit/AudioKitEX.git";
 			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 5.0.0;
+				branch = main;
+				kind = branch;
 			};
 		};
 		7120CB9D28397E5B0019D976 /* XCRemoteSwiftPackageReference "AudioKitUI" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/AudioKit/AudioKitUI.git";
 			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 0.1.5;
+				branch = main;
+				kind = branch;
 			};
 		};
 		7120CBA028397EE40019D976 /* XCRemoteSwiftPackageReference "SoundpipeAudioKit" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/AudioKit/SoundpipeAudioKit.git";
 			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 5.0.0;
+				branch = main;
+				kind = branch;
 			};
 		};
 		71404D19284D17BD00639E5B /* XCRemoteSwiftPackageReference "RxSwift" */ = {
