@@ -16,7 +16,7 @@ def partition(array, first, last)
       array[i], array[pIndex] = array[pIndex], array[i]
       pIndex += 1
     end
-  i += 1
+    i += 1
   end
   array[pIndex], array[last] = array[last], array[pIndex]
   return pIndex
