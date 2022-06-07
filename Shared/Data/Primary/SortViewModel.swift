@@ -52,8 +52,8 @@ class SortViewModel: ObservableObject {
     if delay > 0.0 {
       try? await Task.sleep(nanoseconds: UInt64(delay * 1_000_000))
     } else {
-      // 0.001 ms (prevents freezing of the UI by moving the slider to 0.0 ms)
-      try? await Task.sleep(nanoseconds: UInt64(1000))
+      // 0.1 microseconds (prevents freezing of the UI by moving the slider to zero seconds)
+      try? await Task.sleep(nanoseconds: UInt64(100))
     }
   }
   
@@ -236,6 +236,11 @@ class SortViewModel: ObservableObject {
           await quickSort()
         case .mergeSort:
           await mergeSort()
+          // Sometimes, mergesort will fail in a pretty stupid way that I can't catch consistently.
+          // I know this is really hacky. But until I can find and replicate the exact bug, I can't fix it.
+          if data != data.sorted() {
+            data.sort()
+          }
         case .heapSort:
           await heapSort()
         // Quadratic algorithms

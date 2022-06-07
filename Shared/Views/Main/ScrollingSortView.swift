@@ -49,9 +49,9 @@ struct ScrollingSortView: View {
             Text("Implementations")
               .font(.system(size: 24, weight: .bold, design: .default))
               .multilineTextAlignment(.leading)
-            LazyVGrid(columns: implementationGrid) {
+            LazyVGrid(columns: implementationGrid, alignment: .leading, spacing: 16) {
               ForEach(languages) { language in
-                VStack(spacing: 4) {
+                VStack(alignment: .center, spacing: 4) {
                   Label {
                     Text(language.title)
                   } icon: {
@@ -63,6 +63,7 @@ struct ScrollingSortView: View {
                     }
                   }.font(.headline)
                   CodeView(tokens: loadHighlightResource(language.fileExtension))
+                    .frame(alignment: .center)
                 }
               }
             }

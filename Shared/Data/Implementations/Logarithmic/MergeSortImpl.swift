@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import CollectionConcurrencyKit
 
 extension SortViewModel {
   // Based on original inspiration (github:Myphz/sortvisualizer)
@@ -51,6 +52,10 @@ extension SortViewModel {
     for i in 0..<(k - start) {
       guard await enforceRunning() else {
         return
+      }
+      let ids = await data.concurrentMap { $0.id }
+      if ids.contains(cache[i].id) {
+        cache[i].id = UUID()
       }
       data[i + start] = cache[i]
       data[i + start].value = 1 + i + start

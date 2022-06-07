@@ -47,7 +47,7 @@
 
 ## Future Ideas from WWDC 2022
 
-* [ ] Regex literals in Swift! Praise be to the Apple gods!
+* [ ] Regex literals, builders, and other enhancements! Praise be to the Apple gods, they must have read my mind!
 * [ ] New Grid API for Code Previews... this is a game changer for my use case!
 * [ ] New Swift Charts API!
 
