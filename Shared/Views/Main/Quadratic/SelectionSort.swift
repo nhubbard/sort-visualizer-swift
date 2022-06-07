@@ -9,7 +9,7 @@ import SwiftUI
 
 struct SelectionSort: View {
   var body: some View {
-    SortView(algorithm: .selectionSort)
+    ScrollingSortView(algorithm: .selectionSort)
       .navigationTitle("Selection Sort")
   }
 }

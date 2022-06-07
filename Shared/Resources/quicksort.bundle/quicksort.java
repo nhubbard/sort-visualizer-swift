@@ -15,14 +15,14 @@ public class quicksort {
     for (int j = begin; j < end; j++) {
       if (arr[j] <= pivot) {
         i++;
-        int swapTemp = arr[i];
+        int temp = arr[i];
         arr[i] = arr[j];
-        arr[j] = swapTemp;
+        arr[j] = temp;
       }
     }
-    int swapTemp = arr[i + 1];
+    int temp = arr[i + 1];
     arr[i + 1] = arr[end];
-    arr[end] = swapTemp;
+    arr[end] = temp;
     return i + 1;
   }
 

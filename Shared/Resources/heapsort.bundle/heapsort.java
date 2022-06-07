@@ -12,9 +12,9 @@ public class heapsort {
       largest = r;
     }
     if (largest != i) {
-      int swap = arr[i];
+      int temp = arr[i];
       arr[i] = arr[largest];
-      arr[largest] = swap;
+      arr[largest] = temp;
       heapify(arr, n, largest);
     }
   }

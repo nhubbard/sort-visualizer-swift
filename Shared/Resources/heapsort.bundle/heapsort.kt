@@ -1,5 +1,3 @@
-import java.util.Collections
-
 fun heapify(arr: Array<Int>, n: Int, i: Int) {
 	var largest = i
 	var l = 2 * i + 1
@@ -11,7 +9,9 @@ fun heapify(arr: Array<Int>, n: Int, i: Int) {
 		largest = r
 	}
 	if (largest != i) {
-		Collections.swap(arr.asList(), i, largest)
+		var temp = arr[i]
+		arr[i] = arr[largest]
+		arr[largest] = temp
 		heapify(arr, n, largest)
 	}
 }
@@ -22,7 +22,9 @@ fun sort(arr: Array<Int>) {
 		heapify(arr, n, i)
 	}
 	for (i in (n - 1) downTo 0) {
-		Collections.swap(arr.asList(), 0, i)
+		var temp = arr[0]
+		arr[0] = arr[i]
+		arr[i] = temp
 		heapify(arr, i, 0)
 	}
 }

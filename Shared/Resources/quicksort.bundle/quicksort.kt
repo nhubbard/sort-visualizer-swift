@@ -12,9 +12,9 @@ fun partition(arr: Array<Int>, begin: Int, end: Int): Int {
   for (j in begin..(end - 1)) {
     if (arr[j] <= pivot) {
       i++
-      val swapTemp = arr[i]
+      var temp = arr[i]
       arr[i] = arr[j]
-      arr[j] = swapTemp
+      arr[j] = temp
     }
   }
   val swapTemp = arr[i + 1]
