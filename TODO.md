@@ -30,7 +30,7 @@
         * [x] Merge Sort
         * [x] Heap Sort
         * [x] Bubble Sort
-        * [ ] Selection Sort
+        * [x] Selection Sort
         * [ ] Insertion Sort
         * [ ] Gnome Sort
         * [ ] Shaker Sort
@@ -42,8 +42,10 @@
         * [ ] Comb Sort
         * [ ] Bogo Sort
         * [ ] Stooge Sort
-* [ ] String resources for all strings throughout the app.
-* [ ] Settings panel that allows you to change various defaults, like the sound tuning, or the lowest and highest notes.    
+* [ ] Set up Prettier to keep algorithm example code properly formatted
+* [ ] Set up a testing system that validates algorithm example code results
+* [ ] String resources/localization for all strings throughout the app.
+* [ ] Settings panel that allows you to change various defaults, like the sound tuning, note range, and more settings.
 
 ## Future Ideas from WWDC 2022
 
@@ -56,15 +58,17 @@
 * [ ] Reimplement the entire Pygments stack in Swift to reduce preprocessing and assets size?
     * Could call it something like `PygmentsUI` or whatnot. Sounds like a really fun project.
     * It hasn't been a fun project so far. Regex is driving me insane, and this isn't going to get any easier.
-    * Fun fact: Apple must have read my mind, because Swift is apparently gaining a regex literal and several convenience features for regex support soon!
+    * Fun fact: Apple must have read my mind, because Swift is apparently gaining a regex literal and several convenience features for regex support in v5.7 (can't use it yet because there's an AudioKitEX bug 😢)
 * [ ] Reimplement iosMath in Swift because I really want to?
     * Could call it something like `MathUI`. Sounds like a less fun project because Objective-C bad.
-    * Swiftify is really expensive too, so I would have to do a manual conversion process... 😳
+    * Swiftify is really expensive too, so I would have to do a manual conversion process, or complete the entire conversion process within their free limits (super annoying)
 
-## External Services (Crash Reporting, Monetization)
+## BizDev and Analytics
 
 * [ ] Implement Crashlytics
-* [ ] Implement StoreKit: either a $0.99/month subscription, or a one-time purchase (~$5)
+    * This is really important, but will also necessitate app tracking transparency, privacy policy, terms and conditions, and more otherwise unnecessary content because Apple demands it.
+* [ ] Implement StoreKit
+    * I've settled on between a $1.99 and $4.99 one-time purchase, with an education discount of 50% if desired.
 
 ## Algorithms
 

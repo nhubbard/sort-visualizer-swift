@@ -18,6 +18,7 @@
 		714AA79628453B6100D92535 /* Token.swift in Sources */ = {isa = PBXBuildFile; fileRef = 714AA79528453B6100D92535 /* Token.swift */; };
 		714AA79828453EFA00D92535 /* MonokaiTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 714AA79728453EFA00D92535 /* MonokaiTheme.swift */; };
 		714AA79A284543F800D92535 /* CodeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 714AA799284543F800D92535 /* CodeView.swift */; };
+		7156FB742850CF9E00A75F7F /* insertionsort.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 7156FB732850CF9E00A75F7F /* insertionsort.bundle */; };
 		715D01EA284BCBA000A624C5 /* Regex in Frameworks */ = {isa = PBXBuildFile; productRef = 715D01E9284BCBA000A624C5 /* Regex */; };
 		715D01ED284BF23700A624C5 /* BaseLexer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 715D01EC284BF23700A624C5 /* BaseLexer.swift */; };
 		71610A9628357F5C00F6176E /* Int+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71610A9528357F5C00F6176E /* Int+Extensions.swift */; };
@@ -103,6 +104,7 @@
 		714AA79528453B6100D92535 /* Token.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Token.swift; sourceTree = "<group>"; };
 		714AA79728453EFA00D92535 /* MonokaiTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonokaiTheme.swift; sourceTree = "<group>"; };
 		714AA799284543F800D92535 /* CodeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodeView.swift; sourceTree = "<group>"; };
+		7156FB732850CF9E00A75F7F /* insertionsort.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = insertionsort.bundle; sourceTree = "<group>"; };
 		715D01EC284BF23700A624C5 /* BaseLexer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseLexer.swift; sourceTree = "<group>"; };
 		71610A9528357F5C00F6176E /* Int+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Int+Extensions.swift"; sourceTree = "<group>"; };
 		71610C0D2844213900A2696C /* quicksort.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = quicksort.bundle; sourceTree = "<group>"; };
@@ -246,6 +248,7 @@
 				71BCE0FF2847D963007C8254 /* heapsort.bundle */,
 				713FA7AF284A5DAE00F12327 /* highlight.py */,
 				716D2991284FBEBD00772CBD /* bubblesort.bundle */,
+				7156FB732850CF9E00A75F7F /* insertionsort.bundle */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -599,6 +602,7 @@
 			files = (
 				71BCE0FE2847B8B6007C8254 /* mergesort.bundle in Resources */,
 				716D2992284FBEBD00772CBD /* bubblesort.bundle in Resources */,
+				7156FB742850CF9E00A75F7F /* insertionsort.bundle in Resources */,
 				71BCE1002847D963007C8254 /* heapsort.bundle in Resources */,
 				71D4DBDE28185905001DBD0E /* Assets.xcassets in Resources */,
 				71B4C0DE284FCC9800E42DB1 /* selectionsort.bundle in Resources */,
