@@ -14,4 +14,4 @@ Gnome sort performs at least as many comparisons as insertion sort and has the s
 
 > Boundary conditions: if there is no previous pot, he steps forwards; if there is no pot next to him, he is done.
 
-> > - "Gnome Sort - The Simplest Sort Algorithm". *Dickgrune.com*
+> > ⸺ "Gnome Sort - The Simplest Sort Algorithm". *Dickgrune.com*

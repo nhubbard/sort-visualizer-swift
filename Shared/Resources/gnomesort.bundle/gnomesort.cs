@@ -1,9 +1,20 @@
 using System;
 
-/* TODO: Rename class to match algorithm name. */
-public class SortAlgo {
+public class GnomeSort {
   public static void Sort(int[] arr) {
-    /* TODO: Insert C# algorithm implementation here. */
+    int n = arr.Length;
+    int index = 0;
+    while (index < n) {
+      if (index == 0) {
+        index++;
+      }
+      if (arr[index] >= arr[index - 1]) {
+        index++;
+      } else {
+        (arr[index], arr[index - 1]) = (arr[index - 1], arr[index]);
+        index--;
+      }
+    }
   }
 
   public static void Main(String[] args) {

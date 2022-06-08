@@ -1,7 +1,23 @@
-/* TODO: Insert Kotlin implementation of algorithm here. */
+fun gnomeSort(arr: Array<Int>) {
+  val n = arr.size
+  var index = 0
+  while (index < n) {
+    if (index == 0) {
+      index++
+    }
+    if (arr[index] >= arr[index - 1]) {
+      index++
+    } else {
+      val swapTemp = arr[index]
+      arr[index] = arr[index - 1]
+      arr[index - 1] = swapTemp
+      index--
+    }
+  }
+}
 
 fun main() {
   var items = arrayOf<Int>(35, 95, 74, 71, 72, 30, 96, 53, 9, 0)
-  sort(items)
+  gnomeSort(items)
   println("[%s]".format(items.joinToString(", ")))
 }

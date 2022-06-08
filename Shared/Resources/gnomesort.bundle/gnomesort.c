@@ -21,11 +21,24 @@ void printList(int items[], int size) {
   }
 }
 
-/* TODO: Insert C algorithm implementation here. */
+void gnomeSort(int arr[], int n) {
+  int index = 0;
+  while (index < n) {
+    if (index == 0) {
+      index++;
+    }
+    if (arr[index] >= arr[index - 1]) {
+      index++;
+    } else {
+      swap(&arr[index], &arr[index - 1]);
+      index--;
+    }
+  }
+}
 
 int main(int argc, char *argv[]) {
   int size = sizeof(items) / sizeof(items[0]);
-  sort(items, size);
+  gnomeSort(items, size);
   printList(items, size);
   return 0;
 }
