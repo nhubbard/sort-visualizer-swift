@@ -1,4 +1,3 @@
-/* TODO: Insert JavaScript implementation of algorithm here. */
 function insertionSort(arr) {
   let n = arr.length;
   for (let i = 1; i < n; i++) {

@@ -9,7 +9,7 @@ import SwiftUI
 
 struct InsertionSort: View {
   var body: some View {
-    SortView(algorithm: .insertionSort)
+    ScrollingSortView(algorithm: .insertionSort)
       .navigationTitle("Insertion Sort")
   }
 }
