@@ -1,8 +1,7 @@
 using System;
 
-/* TODO: Rename class to match algorithm name. */
-public class SortAlgo {
-  public static int[] Sort(int[] arr) {
+public class InsertionSort {
+  public static void Sort(int[] arr) {
     int n = arr.Length;
     for (int i = 1; i < n; i++) {
       int key = arr[i];

@@ -8,5 +8,5 @@ import (
 
 func main() {
   items := []int{35, 95, 74, 71, 72, 30, 96, 53, 9, 0}
-  fmt.Println(quickSort(items, 0, len(items) - 1))
+  fmt.Println(sort(items))
 }

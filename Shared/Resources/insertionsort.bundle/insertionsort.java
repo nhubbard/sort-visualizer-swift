@@ -6,7 +6,7 @@ public class quicksort {
 
   public static void main(String[] args) {
     int[] items = new int[]{35, 95, 74, 71, 72, 30, 96, 53, 9, 0};
-    quickSort(items, 0, items.length - 1);
+    sort(items);
     System.out.println(Arrays.toString(items));
   }
 }

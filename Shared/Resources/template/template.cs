@@ -2,7 +2,7 @@ using System;
 
 /* TODO: Rename class to match algorithm name. */
 public class SortAlgo {
-  public static int[] Sort(int[] array) {
+  public static void Sort(int[] arr) {
     /* TODO: Insert C# algorithm implementation here. */
   }
 

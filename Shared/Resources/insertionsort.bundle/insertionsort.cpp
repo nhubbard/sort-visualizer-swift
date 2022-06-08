@@ -28,7 +28,7 @@ void insertionSort(int arr[], int n) {
 
 int main(int argc, char *argv[]) {
   int size = sizeof(items) / sizeof(items[0]);
-  sort(items, size);
+  insertionSort(items, size);
   printList(items, size);
   return 0;
 }
