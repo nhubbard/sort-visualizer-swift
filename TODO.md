@@ -31,7 +31,7 @@
         * [x] Heap Sort
         * [x] Bubble Sort
         * [x] Selection Sort
-        * [ ] Insertion Sort
+        * [x] Insertion Sort
         * [ ] Gnome Sort
         * [ ] Shaker Sort
         * [ ] Odd-Even Sort
