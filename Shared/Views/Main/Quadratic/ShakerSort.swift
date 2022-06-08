@@ -9,7 +9,7 @@ import SwiftUI
 
 struct ShakerSort: View {
   var body: some View {
-    SortView(algorithm: .shakerSort)
+    ScrollingSortView(algorithm: .shakerSort)
       .navigationTitle("Shaker Sort")
   }
 }
