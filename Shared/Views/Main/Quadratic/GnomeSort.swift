@@ -9,7 +9,7 @@ import SwiftUI
 
 struct GnomeSort: View {
   var body: some View {
-    SortView(algorithm: .gnomeSort)
+    ScrollingSortView(algorithm: .gnomeSort)
       .navigationTitle("Gnome Sort")
   }
 }

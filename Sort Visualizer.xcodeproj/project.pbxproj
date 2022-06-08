@@ -35,6 +35,7 @@
 		717D6A19284A882400B7B645 /* Token.swift in Sources */ = {isa = PBXBuildFile; fileRef = 717D69DE284A83FB00B7B645 /* Token.swift */; };
 		717D6A1A284A882400B7B645 /* MatchSequence+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 717D69DC284A7CFB00B7B645 /* MatchSequence+Extensions.swift */; };
 		717D6A1C284A882400B7B645 /* Utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 717D69D7284A744900B7B645 /* Utilities.swift */; };
+		7180DC272850EA160059D1DB /* gnomesort.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 7180DC262850EA160059D1DB /* gnomesort.bundle */; };
 		718246DD284685E4003842E3 /* ComplexityEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 718246DC284685E4003842E3 /* ComplexityEntry.swift */; };
 		718246DF284685F6003842E3 /* LanguageEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 718246DE284685F6003842E3 /* LanguageEntry.swift */; };
 		71847C51284100180018E66C /* Image+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71847C50284100180018E66C /* Image+Extensions.swift */; };
@@ -121,6 +122,7 @@
 		717D6A01284A881500B7B645 /* PygmentsKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = PygmentsKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		717D6A03284A881500B7B645 /* PygmentsKit.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PygmentsKit.h; sourceTree = "<group>"; };
 		717D6A04284A881500B7B645 /* PygmentsKit.docc */ = {isa = PBXFileReference; lastKnownFileType = folder.documentationcatalog; path = PygmentsKit.docc; sourceTree = "<group>"; };
+		7180DC262850EA160059D1DB /* gnomesort.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = gnomesort.bundle; sourceTree = "<group>"; };
 		718246DC284685E4003842E3 /* ComplexityEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComplexityEntry.swift; sourceTree = "<group>"; };
 		718246DE284685F6003842E3 /* LanguageEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LanguageEntry.swift; sourceTree = "<group>"; };
 		71847C50284100180018E66C /* Image+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Image+Extensions.swift"; sourceTree = "<group>"; };
@@ -242,6 +244,7 @@
 		71610BF82844101700A2696C /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				7180DC262850EA160059D1DB /* gnomesort.bundle */,
 				71B4C0DD284FCC9800E42DB1 /* selectionsort.bundle */,
 				71610C0D2844213900A2696C /* quicksort.bundle */,
 				71BCE0FD2847B8B6007C8254 /* mergesort.bundle */,
@@ -606,6 +609,7 @@
 				71BCE1002847D963007C8254 /* heapsort.bundle in Resources */,
 				71D4DBDE28185905001DBD0E /* Assets.xcassets in Resources */,
 				71B4C0DE284FCC9800E42DB1 /* selectionsort.bundle in Resources */,
+				7180DC272850EA160059D1DB /* gnomesort.bundle in Resources */,
 				71610C0E2844213900A2696C /* quicksort.bundle in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
