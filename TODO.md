@@ -11,6 +11,35 @@
 * [ ] Implement step functionality, if possible
 * [ ] Write lots of tests for everything
 
+## Algorithms
+
+* [x] Implement and validate all algorithms:
+    * [x] Quick Sort
+    * [x] Merge Sort
+    * [x] Heap Sort
+    * [x] Bubble Sort
+    * [x] Selection Sort
+    * [x] Insertion Sort
+    * [x] Gnome Sort
+    * [x] Shaker Sort
+    * [x] Odd-Even Sort
+    * [x] Pancake Sort
+    * [x] Bitonic Sort
+    * [x] Radix Sort
+    * [x] Shell Sort
+    * [x] Comb Sort
+    * [x] Bogo Sort
+    * [x] Stooge Sort
+    
+## Visualization Improvements
+
+* [ ] Merge Sort: Mark the previous comparison for each group
+* [ ] Merge Sort: Create a visualization for copying from cache array
+* [ ] Selection Sort: Clear green items for each iteration, it looks really weird
+* [ ] Radix Sort: Might need to adjust the nanoseconds delay to 10 or 100 instead of 1, it might cause seizures otherwise 😬
+* [ ] Shell Sort: Why does it repeat the process multiple times after the sort is finished?
+* [ ] Bogo Sort: Might add a modified bogo sort, which only randomizes the segments that aren't in order, or maybe moves one item to the correct position and randomizes the rest of the array every 50K operations? idk.
+
 ## Audio
 
 * [x] Replace custom implementation with AudioKit
@@ -32,7 +61,7 @@
         * [x] Bubble Sort
         * [x] Selection Sort
         * [x] Insertion Sort
-        * [ ] Gnome Sort
+        * [x] Gnome Sort
         * [ ] Shaker Sort
         * [ ] Odd-Even Sort
         * [ ] Pancake Sort
@@ -52,6 +81,7 @@
 * [ ] Regex literals, builders, and other enhancements! Praise be to the Apple gods, they must have read my mind!
 * [ ] New Grid API for Code Previews... this is a game changer for my use case!
 * [ ] New Swift Charts API!
+* [ ] All-new *Typed* Navigation System for SwiftUI!
 
 ## Far-Out Ideas
 
@@ -69,23 +99,3 @@
     * This is really important, but will also necessitate app tracking transparency, privacy policy, terms and conditions, and more otherwise unnecessary content because Apple demands it.
 * [ ] Implement StoreKit
     * I've settled on between a $1.99 and $4.99 one-time purchase, with an education discount of 50% if desired.
-
-## Algorithms
-
-* [x] Implement and validate all algorithms:
-    * [x] Quick Sort
-    * [x] Merge Sort
-    * [x] Heap Sort
-    * [x] Bubble Sort
-    * [x] Selection Sort
-    * [x] Insertion Sort
-    * [x] Gnome Sort
-    * [x] Shaker Sort
-    * [x] Odd-Even Sort
-    * [x] Pancake Sort
-    * [x] Bitonic Sort
-    * [x] Radix Sort
-    * [x] Shell Sort
-    * [x] Comb Sort
-    * [x] Bogo Sort
-    * [x] Stooge Sort

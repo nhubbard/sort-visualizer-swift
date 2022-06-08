@@ -13,5 +13,3 @@ Gnome sort performs at least as many comparisons as insertion sort and has the s
 > Basically, he looks at the flower pot next to him and the previous one; if they are in the right order he steps one pot forward, otherwise, he swaps them and steps one pot backward.
 
 > Boundary conditions: if there is no previous pot, he steps forwards; if there is no pot next to him, he is done.
-
-> > ⸺ "Gnome Sort - The Simplest Sort Algorithm". *Dickgrune.com*

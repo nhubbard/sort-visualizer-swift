@@ -9,6 +9,7 @@ import SwiftUI
 struct SortView: View {
   var algorithm: Algorithms
   @StateObject var state: SortViewModel = SortViewModel()
+  @State private var showStepPopover: Bool = false
   
   var body: some View {
     ZStack {
@@ -42,7 +43,12 @@ struct SortView: View {
             // Step button
             Button(action: onStep) {
               Label("Step", systemImage: "figure.walk")
-            }.frame(maxWidth: 150)
+            }
+              .frame(maxWidth: 150)
+              .popover(isPresented: $showStepPopover, arrowEdge: .trailing) {
+                Text("Sorry, this function is not implemented yet.")
+                  .padding(.all, 4)
+              }
           }.padding(.horizontal, 20)
           // Delay slider
           HStack(spacing: 10) {
@@ -92,8 +98,8 @@ struct SortView: View {
         }
       }
     } else {
-      if state.sortTaskRef != nil {
-        state.sortTaskRef!.cancel()
+      if let task = state.sortTaskRef {
+        task.cancel()
       }
     }
   }
@@ -105,7 +111,7 @@ struct SortView: View {
   }
   
   func onStep() {
-    print("Step button pressed")
+    showStepPopover.toggle()
   }
   
   func onArraySizeChange(newValue: Float) {

@@ -55,9 +55,9 @@ struct ScrollingSortView: View {
                   Label {
                     Text(language.title)
                   } icon: {
-                    if language.iconColor != nil {
+                    if let iconColor = language.iconColor {
                       Image.ofAsset(language.icon, width: CGFloat(language.iconWidth), height: CGFloat(language.iconHeight))
-                        .foregroundColor(language.iconColor!)
+                        .foregroundColor(iconColor)
                     } else {
                       Image.ofAsset(language.icon, width: CGFloat(language.iconWidth), height: CGFloat( language.iconHeight))
                     }

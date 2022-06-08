@@ -52,8 +52,8 @@ class SortViewModel: ObservableObject {
     if delay > 0.0 {
       try? await Task.sleep(nanoseconds: UInt64(delay * 1_000_000))
     } else {
-      // 0.1 microseconds (prevents freezing of the UI by moving the slider to zero seconds)
-      try? await Task.sleep(nanoseconds: UInt64(100))
+      // 1 nanosecond delay; prevents the UI from freezing when all operations on the array happen at once by moving the slider to zero seconds
+      try? await Task.sleep(nanoseconds: UInt64(1))
     }
   }
   
