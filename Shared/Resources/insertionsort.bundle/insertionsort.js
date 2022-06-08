@@ -1,5 +1,17 @@
 /* TODO: Insert JavaScript implementation of algorithm here. */
+function insertionSort(arr) {
+  let n = arr.length;
+  for (let i = 1; i < n; i++) {
+    let key = arr[i];
+    let j = i - 1;
+    while (j >= 0 && arr[j] > key) {
+      arr[j + 1] = arr[j];
+      j = j - 1;
+    }
+    arr[j + 1] = key;
+  }
+}
 
 var array = [35, 95, 74, 71, 72, 30, 96, 53, 9, 0];
-sort(array);
+insertionSort(array);
 console.log(array);
