@@ -9,12 +9,16 @@ import Foundation
 
 postfix operator ++ // i++
 @discardableResult postfix func ++ ( left: inout Int) -> Int {
-  defer {left += 1}
+  defer {
+    left += 1
+  }
   return left
 }
 
 postfix operator -- // i--
 @discardableResult postfix func -- ( left: inout Int) -> Int {
-  defer {left -= 1}
+  defer {
+    left -= 1
+  }
   return left
 }

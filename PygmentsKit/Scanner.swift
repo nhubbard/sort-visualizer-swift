@@ -13,7 +13,7 @@ struct EndOfText: Error, CustomStringConvertible {
 }
 
 /**
- * A simple scanner. All method patterns are regular expresison strings.
+ * A simple scanner. All method patterns are regular expression strings.
  */
 class Scanner {
   var data: String
@@ -31,25 +31,25 @@ class Scanner {
    * - Parameter text: The text to scan
    * - Parameter options: `RegexOptions` flags (it's an array but also not, see `OptionSet` for details)
    */
-  init(text: String, options: RegexOptions = [RegexOptions.default]) {
-    self.data = text
-    self.dataLength = text.count
-    self.startPosition = 0
-    self.position = 0
+  init(text: String , options: RegexOptions = [RegexOptions.default]) {
+    data = text
+    dataLength = text.count
+    startPosition = 0
+    position = 0
     self.options = options
-    self.last = nil
-    self.match = nil
-    self._regexCache = [:]
+    last = nil
+    match = nil
+    _regexCache = [:]
   }
   
   /// `true` if the scanner has reached the end of the text.
   var eos: Bool {
-    return position >= dataLength
+    position >= dataLength
   }
   
   /// Gets an up-to-date `Range` for use with the `check` and `scan` functions.
   private func currentRange() -> Range<String.Index> {
-    return data.index(data.startIndex, offsetBy: position)..<data.endIndex
+    data.index(data.startIndex, offsetBy: position)..<data.endIndex
   }
   
   /// Compile, cache, and return the specified regular expression pattern.
@@ -77,7 +77,7 @@ class Scanner {
   
   /// Apply a pattern to the current position and check if it matches. Doesn't touch `pos`.
   func test(pattern: String) throws -> Bool {
-    return try !check(pattern: pattern).isEmpty
+    try !check(pattern: pattern).isEmpty
   }
   
   /// Scan the text for the given pattern and update the `pos` and `match` and related fields.
@@ -110,6 +110,6 @@ class Scanner {
   
   /// Scan exactly one character.
   func getCharacter() throws -> Bool {
-    return try scan(pattern: ".")
+    try scan(pattern: ".")
   }
 }

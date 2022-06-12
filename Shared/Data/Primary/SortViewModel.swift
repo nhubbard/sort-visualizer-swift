@@ -17,7 +17,7 @@ class SortViewModel: ObservableObject {
   @Published var arraySizeBacking: Float = 256.0
   var arraySize: Binding<Int>{
     Binding<Int>(get: {
-      return Int(self.arraySizeBacking)
+      Int(self.arraySizeBacking)
     }, set: {
       self.arraySizeBacking = Float($0)
     })
@@ -43,7 +43,7 @@ class SortViewModel: ObservableObject {
   /// Check to see that the algorithm isn't stopped or the Task isn't cancelled.
   @MainActor
   func enforceRunning() async -> Bool {
-    return !Task.isCancelled && running
+    !Task.isCancelled && running
   }
   
   /// Delay an action within an `async` closure.
@@ -60,10 +60,7 @@ class SortViewModel: ObservableObject {
   /// Play a note using the data ranges and the current delay.
   @MainActor
   func playNote(_ index: Int) async {
-    guard !Task.isCancelled else {
-      return
-    }
-    guard sound else {
+    guard await enforceRunning() && sound else {
       return
     }
     await toner.playNote(value: index, range: data.indices.lowerBound...data.indices.upperBound, time: delay)
@@ -78,7 +75,7 @@ class SortViewModel: ObservableObject {
   /// Increment the operation counter in the UI atomically and asynchronously.
   @MainActor
   func operate() async {
-    guard !Task.isCancelled else {
+    guard await enforceRunning() else {
       return
     }
     operations.wrappingIncrement(by: 1, ordering: .relaxed)
@@ -87,17 +84,18 @@ class SortViewModel: ObservableObject {
   /// Get the operations counter
   @MainActor
   func getOperations() -> Int {
-    return operations.load(ordering: .relaxed)
+    operations.load(ordering: .relaxed)
   }
   
   @MainActor
   func setAlgo(algo: Algorithms) {
-    self.algorithm = algo
+    algorithm = algo
   }
   
   /// Shuffle the array using Swift's built-in shuffle method.
   @MainActor
   func shuffle() async {
+    // Don't change to await enforceRunning(); will break reset function.
     guard !Task.isCancelled else {
       return
     }
@@ -112,6 +110,7 @@ class SortViewModel: ObservableObject {
   /// Recreate the array, with a specified set of values.
   @MainActor
   func recreate(numItems: Int = 128) async {
+    // Don't change to await enforceRunning(); will break array size changes.
     guard !Task.isCancelled else {
       return
     }
@@ -132,7 +131,7 @@ class SortViewModel: ObservableObject {
   /// Swap the values at the firstIndex and secondIndex, with a specified delay between the two operations.
   @MainActor
   func swap(_ firstIndex: Int, _ secondIndex: Int) async {
-    guard !Task.isCancelled else {
+    guard await enforceRunning() else {
       return
     }
     enforceIndex(data, firstIndex)
@@ -154,7 +153,7 @@ class SortViewModel: ObservableObject {
   /// Check if the array is sorted.
   @MainActor
   func isArraySorted() async -> Bool {
-    guard !Task.isCancelled else {
+    guard await enforceRunning() else {
       return false
     }
     for i in 1..<data.count {
@@ -168,7 +167,7 @@ class SortViewModel: ObservableObject {
   /// Get the integer value of a SortItem at the specified index.
   @MainActor
   func getValue(index: Int) async -> Optional<Int> {
-    guard !Task.isCancelled else {
+    guard await enforceRunning() else {
       return Optional.none
     }
     enforceIndex(data, index)
@@ -179,8 +178,8 @@ class SortViewModel: ObservableObject {
   
   /// Compare the values of two SortItems at their specified indexes.
   @MainActor
-  func compare(firstIndex: Int, secondIndex: Int, by: ((Int, Int) -> Bool) = (>=), clear: Bool = false) async -> Bool {
-    guard !Task.isCancelled else {
+  func compare(firstIndex: Int, secondIndex: Int, by: (Int, Int) -> Bool = (>=), clear: Bool = false) async -> Bool {
+    guard await enforceRunning() else {
       return false
     }
     enforceIndex(data, firstIndex)
@@ -209,7 +208,7 @@ class SortViewModel: ObservableObject {
   /// Change the color of a SortItem at the specified index.
   @MainActor
   func changeColor(index: Int, color: Color) async {
-    guard !Task.isCancelled else {
+    guard await enforceRunning() else {
       return
     }
     enforceIndex(data, index)
@@ -219,7 +218,7 @@ class SortViewModel: ObservableObject {
   /// Reset the color of a SortItem to white at the specified index.
   @MainActor
   func resetColor(index: Int) async {
-    guard !Task.isCancelled else {
+    guard await enforceRunning() else {
       return
     }
     enforceIndex(data, index)
@@ -276,7 +275,7 @@ class SortViewModel: ObservableObject {
     guard await enforceRunning() else {
       return false
     }
-    await innerDoSort(self.algorithm)
+    await innerDoSort(algorithm)
     let _ = await isArraySorted()
     running = false
     return data == data.sorted()

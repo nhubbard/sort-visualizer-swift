@@ -41,7 +41,7 @@
 		718246DF284685F6003842E3 /* LanguageEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 718246DE284685F6003842E3 /* LanguageEntry.swift */; };
 		71847C51284100180018E66C /* Image+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71847C50284100180018E66C /* Image+Extensions.swift */; };
 		718A5FC3284A8CFD007824E7 /* BaseStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 718A5FC2284A8CFD007824E7 /* BaseStyle.swift */; };
-		718A5FC5284A975F007824E7 /* Scanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 718A5FC4284A975F007824E7 /* Scanner.swift */; };
+		719F7D2128539F2500D87AF7 /* Scanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 718A5FC4284A975F007824E7 /* Scanner.swift */; };
 		71B4C0DE284FCC9800E42DB1 /* selectionsort.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 71B4C0DD284FCC9800E42DB1 /* selectionsort.bundle */; };
 		71B55E0E28383D5C00CA74CB /* Sequence+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71B55E0D28383D5C00CA74CB /* Sequence+Extensions.swift */; };
 		71BCE0FE2847B8B6007C8254 /* mergesort.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 71BCE0FD2847B8B6007C8254 /* mergesort.bundle */; };
@@ -653,13 +653,13 @@
 				717D6A19284A882400B7B645 /* Token.swift in Sources */,
 				71F05C47284D2F68004EE620 /* Color+Extensions.swift in Sources */,
 				71F05C52284D5997004EE620 /* MaterialStyle.swift in Sources */,
-				718A5FC5284A975F007824E7 /* Scanner.swift in Sources */,
 				71F05C56284D6EB0004EE620 /* SolarizedStyle.swift in Sources */,
 				71F05C4B284D3762004EE620 /* DefaultStyle.swift in Sources */,
 				717D6A05284A881500B7B645 /* PygmentsKit.docc in Sources */,
 				71F05C58284D77AB004EE620 /* PythonLexer.swift in Sources */,
 				717D6A1A284A882400B7B645 /* MatchSequence+Extensions.swift in Sources */,
 				718A5FC3284A8CFD007824E7 /* BaseStyle.swift in Sources */,
+				719F7D2128539F2500D87AF7 /* Scanner.swift in Sources */,
 				715D01ED284BF23700A624C5 /* BaseLexer.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -754,11 +754,12 @@
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
-				SUPPORTED_PLATFORMS = "watchsimulator watchos macosx iphonesimulator iphoneos driverkit appletvsimulator appletvos";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = YES;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2,6";
+				TARGETED_DEVICE_FAMILY = "2,6";
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
 			};
@@ -789,11 +790,12 @@
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
-				SUPPORTED_PLATFORMS = "watchsimulator watchos macosx iphonesimulator iphoneos driverkit appletvsimulator appletvos";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = YES;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2,6";
+				TARGETED_DEVICE_FAMILY = "2,6";
 				VALIDATE_PRODUCT = YES;
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";

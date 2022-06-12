@@ -11,7 +11,7 @@ import Regex
 extension MatchSequence {
   public var isEmpty: Bool {
     var array: [Match] = []
-    self.makeIterator().forEach { match in
+    makeIterator().forEach { match in
       array.append(match)
     }
     return array.isEmpty

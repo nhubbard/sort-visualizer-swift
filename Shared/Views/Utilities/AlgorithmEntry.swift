@@ -10,7 +10,7 @@ import SwiftUI
 
 struct AlgorithmEntry: Hashable, Equatable {
   static func == (lhs: AlgorithmEntry, rhs: AlgorithmEntry) -> Bool {
-    return lhs.id == rhs.id && lhs.name == rhs.name && lhs.icon == rhs.icon && lhs.tag == rhs.tag
+    lhs.id == rhs.id && lhs.name == rhs.name && lhs.icon == rhs.icon && lhs.tag == rhs.tag
   }
   
   var id: UUID = .init()

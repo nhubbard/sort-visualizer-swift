@@ -10,6 +10,7 @@ import SwiftUI
 
 extension Color {
   private static func getGroupValue(string: String, range: Range<Int>) -> CGFloat {
+    // I *hate* string indexing in Swift. I understand that there's a reason... but it's not a good one.
     let group = string[string.index(string.startIndex, offsetBy: range.lowerBound)..<string.index(string.startIndex, offsetBy: range.upperBound)]
     guard group.count == 2,
           let intVal = Int(group, radix: 16) else {

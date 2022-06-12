@@ -48,7 +48,7 @@ class PythonLexer: BaseLexer {
   }
   
   private func innerStringRules(_ tokenType: Token.TokenType) -> [([Regex], Token.TokenType)] {
-    return [
+    [
       // Matches the older-style '%s' % (...) string formatting. 2 groups.
       ([regexCache(.innerStringOldFormat)], .stringInterpol),
       // Matches the new style '{}'.format(...) string formatting. 5 groups.
@@ -63,7 +63,7 @@ class PythonLexer: BaseLexer {
   }
   
   private func fStringRules(_ tokenType: Token.TokenType) -> [([Regex], Token.TokenType)] {
-    return [
+    [
       // Assuming that a '}' is the closing brace after the format specifier. We can't detect syntax errors this way.
       ([regexCache(.fStringStart)], .stringInterpol),
       ([regexCache(.fStringEnd)], .stringInterpol),
@@ -75,10 +75,10 @@ class PythonLexer: BaseLexer {
   
   // TODO: Hacky as fuck. I couldn't stand attempting to port the shebang analysis function, so I skipped it. I can live with just explicitly specifying the lexer every time I use it.
   func analyzeText(text: String) -> Float {
-    return Float(1.0)
+    Float(1.0)
   }
   
   func getTokensUnprocessed(text: String) -> Observable<UnprocessedToken> {
-    return Observable.empty()
+    Observable.empty()
   }
 }

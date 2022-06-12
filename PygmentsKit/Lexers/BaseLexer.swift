@@ -94,7 +94,7 @@ extension BaseLexer {
     if ensureNewlines && _text.last != Character("\n") {
       _text += "\n"
     }
-    return try await self.getTokensUnprocessed(text: _text).map { token in
+    return try await getTokensUnprocessed(text: _text).map { token in
       Token(type: token.1, value: token.2)
     }.toArray().value
   }
@@ -128,17 +128,17 @@ class DelegatingLexer: BaseLexer {
   
   init(rootLexer: BaseLexer, languageLexer: BaseLexer, needle: Token.TokenType = .other, options: [String: Any] = [:]) {
     // Base lexer properties
-    self.name = "delegating\(languageLexer.name.capitalized)And\(rootLexer.name.capitalized)"
-    self.url = languageLexer.url
-    self.aliases = languageLexer.aliases
-    self.filenames = languageLexer.filenames
-    self.aliasFilenames = languageLexer.aliasFilenames
-    self.mimetypes = languageLexer.mimetypes
-    self.priority = languageLexer.priority
-    self.stripNewlines = languageLexer.stripNewlines
-    self.stripAll = languageLexer.stripAll
-    self.ensureNewlines = languageLexer.ensureNewlines
-    self.tabSize = languageLexer.tabSize
+    name = "delegating\(languageLexer.name.capitalized)And\(rootLexer.name.capitalized)"
+    url = languageLexer.url
+    aliases = languageLexer.aliases
+    filenames = languageLexer.filenames
+    aliasFilenames = languageLexer.aliasFilenames
+    mimetypes = languageLexer.mimetypes
+    priority = languageLexer.priority
+    stripNewlines = languageLexer.stripNewlines
+    stripAll = languageLexer.stripAll
+    ensureNewlines = languageLexer.ensureNewlines
+    tabSize = languageLexer.tabSize
     
     // Delegating lexer-specific properties
     self.rootLexer = rootLexer
@@ -148,14 +148,14 @@ class DelegatingLexer: BaseLexer {
   }
   
   func analyzeText(text: String) -> Float {
-    return languageLexer.analyzeText(text: text)
+    languageLexer.analyzeText(text: text)
   }
   
   func getTokensUnprocessed(text: String) -> Observable<UnprocessedToken> {
     var buffered: String = ""
     var insertions: [(Int, [UnprocessedToken])] = []
     var lngBuffer: [UnprocessedToken] = []
-    _ = self.languageLexer.getTokensUnprocessed(text: text).subscribe { event in
+    _ = languageLexer.getTokensUnprocessed(text: text).subscribe { event in
       if let (i, t, v) = event.element {
         if t == self.needle {
           if !lngBuffer.isEmpty {
@@ -194,31 +194,31 @@ class PseudoMatch {
   var _start: Int
   
   init(start: Int, text: String) {
-    self._text = text
-    self._start = start
+    _text = text
+    _start = start
   }
   
   func start(arg: Any? = nil) -> Int {
-    return self._start
+    _start
   }
   
   func end(arg: Any? = nil) -> Int {
-    return self._start + self._text.count
+    _start + _text.count
   }
   
   func group(arg: Any? = nil) -> String {
     if arg != nil {
       fatalError("No such group")
     }
-    return self._text
+    return _text
   }
   
   func groups() -> [String] {
-    return [self._text]
+    [_text]
   }
   
   func groupdict() -> [String: String] {
-    return [:]
+    [:]
   }
 }
 

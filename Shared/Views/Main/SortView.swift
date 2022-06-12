@@ -105,6 +105,13 @@ struct SortView: View {
   }
   
   func onReset() {
+    // App could crash if reset is clicked while it's running.
+    if state.running {
+      state.running = false
+      if let task = state.sortTaskRef {
+        task.cancel()
+      }
+    }
     state.recreateTaskRef = Task.init {
       await state.recreate()
     }

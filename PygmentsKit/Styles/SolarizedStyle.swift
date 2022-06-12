@@ -56,11 +56,16 @@ class SolarizedLightStyle: BaseStyle {
   
   /// Get a `TextFormat` definition for the style of a specific `TokenType`.
   func getStyle(tokenType: Token.TokenType) -> TextFormat {
-    return TextFormat.getBuilder(bg: backgroundColor).then { it in
+    TextFormat.getBuilder(bg: backgroundColor).then { it in
       switch tokenType {
-        case .nameBuiltin, .nameBuiltinPseudo, .nameClass, .nameConstant, .nameDecorator, .nameEntity, .nameException, .nameFunction, .nameFunctionMagic, .nameLabel, .nameNamespace, .nameTag, .nameVariable, .nameVariableGlobal, .nameVariableMagic, .genericTraceback:
+        case .nameBuiltin, .nameBuiltinPseudo, .nameClass, .nameConstant, .nameDecorator, .nameEntity, .nameException,
+             .nameFunction, .nameFunctionMagic, .nameLabel, .nameNamespace, .nameTag, .nameVariable,
+             .nameVariableGlobal, .nameVariableMagic, .genericTraceback:
           it.fg(LightColors.blue.rawValue)
-        case .keywordConstant, .keywordDeclaration, .string, .stringChar, .stringAffix, .stringOther, .stringDouble, .stringEscape, .stringSingle, .stringSymbol, .stringHeredoc, .stringBacktick, .stringInterpol, .stringDelimiter, .number, .numberInteger, .numberIntegerLong, .numberBin, .numberHex, .numberOct, .numberFloat:
+        case .keywordConstant, .keywordDeclaration, .string, .stringChar, .stringAffix, .stringOther, .stringDouble,
+             .stringEscape, .stringSingle, .stringSymbol, .stringHeredoc, .stringBacktick, .stringInterpol,
+             .stringDelimiter, .number, .numberInteger, .numberIntegerLong, .numberBin, .numberHex, .numberOct,
+             .numberFloat:
           it.fg(LightColors.cyan.rawValue)
         case .token, .generic, .genericOutput:
           it.fg(LightColors.base0.rawValue)
@@ -106,11 +111,16 @@ class SolarizedDarkStyle: BaseStyle {
   
   /// Get a `TextFormat` definition for the style of a specific `TokenType`.
   func getStyle(tokenType: Token.TokenType) -> TextFormat {
-    return TextFormat.getBuilder(bg: backgroundColor).then { it in
+    TextFormat.getBuilder(bg: backgroundColor).then { it in
       switch tokenType {
-        case .nameBuiltin, .nameBuiltinPseudo, .nameClass, .nameConstant, .nameDecorator, .nameEntity, .nameException, .nameFunction, .nameFunctionMagic, .nameLabel, .nameNamespace, .nameTag, .nameVariable, .nameVariableGlobal, .nameVariableMagic, .genericTraceback:
+        case .nameBuiltin, .nameBuiltinPseudo, .nameClass, .nameConstant, .nameDecorator, .nameEntity, .nameException,
+             .nameFunction, .nameFunctionMagic, .nameLabel, .nameNamespace, .nameTag, .nameVariable,
+             .nameVariableGlobal, .nameVariableMagic, .genericTraceback:
           it.fg(DarkColors.blue.rawValue)
-        case .keywordConstant, .keywordDeclaration, .string, .stringChar, .stringAffix, .stringOther, .stringDouble, .stringEscape, .stringSingle, .stringSymbol, .stringHeredoc, .stringBacktick, .stringInterpol, .stringDelimiter, .number, .numberInteger, .numberIntegerLong, .numberBin, .numberHex, .numberOct, .numberFloat:
+        case .keywordConstant, .keywordDeclaration, .string, .stringChar, .stringAffix, .stringOther, .stringDouble,
+             .stringEscape, .stringSingle, .stringSymbol, .stringHeredoc, .stringBacktick, .stringInterpol,
+             .stringDelimiter, .number, .numberInteger, .numberIntegerLong, .numberBin, .numberHex, .numberOct,
+             .numberFloat:
           it.fg(DarkColors.cyan.rawValue)
         case .token, .generic, .genericOutput:
           it.fg(DarkColors.base0.rawValue)

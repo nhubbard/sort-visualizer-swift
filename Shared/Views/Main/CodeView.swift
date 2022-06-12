@@ -11,6 +11,7 @@ struct CodeView: View {
   var tokens: [Token]
   
   var body: some View {
+    // TODO: Cache this reduce call. Should significantly improve lazy grid performance.
     tokens.reduce(
       Text("")
         .font(.system(size: 14, weight: .regular, design: .monospaced))

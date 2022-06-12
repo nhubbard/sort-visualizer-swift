@@ -101,7 +101,7 @@ extension Token.TokenType {
   }
   
   func color() -> Color {
-    return colorMap[self] ?? colorMap[Token.TokenType.text]!
+    colorMap[self] ?? colorMap[Token.TokenType.text]!
   }
 }
 

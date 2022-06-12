@@ -109,6 +109,6 @@ struct Token: Identifiable {
 extension Token.TokenType {
   /// Return `true` if the token type of `self` is a child type of `parent`.
   func isSubType(parent: Token.TokenType) -> Bool {
-    return self.rawValue.starts(with: parent.rawValue)
+    self.rawValue.starts(with: parent.rawValue)
   }
 }

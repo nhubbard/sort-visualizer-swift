@@ -19,7 +19,7 @@ struct DefaultStyle: BaseStyle {
   
   /// Get a `TextFormat` definition for the style of a specific `TokenType`.
   func getStyle(tokenType: Token.TokenType) -> TextFormat {
-    return TextFormat.getBuilder(bg: backgroundColor).then { it in
+    TextFormat.getBuilder(bg: backgroundColor).then { it in
       switch tokenType {
         case .whitespace:
           it.fg(0xbbbbbb)
@@ -86,6 +86,7 @@ struct DefaultStyle: BaseStyle {
         default:
           it.fg(0x000000)
       }
-    }.build()
+    }
+    .build()
   }
 }

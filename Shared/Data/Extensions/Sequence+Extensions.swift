@@ -17,7 +17,7 @@ public extension Sequence {
    - Returns: An iterator-sequence cycling infinitely through the sequence.
    */
   func cycle() -> CycleIterator<Self> {
-    return CycleIterator(sequence: self)
+    CycleIterator(sequence: self)
   }
 }
 
@@ -30,7 +30,7 @@ public struct CycleIterator<S: Sequence>: IteratorProtocol, LazySequenceProtocol
   
   fileprivate init(sequence: S, times: Int = -1) {
     self.sequence = sequence
-    self.iterator = sequence.makeIterator()
+    iterator = sequence.makeIterator()
     self.times = times
   }
   

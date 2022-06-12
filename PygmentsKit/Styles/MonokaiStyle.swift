@@ -18,7 +18,7 @@ class MonokaiStyle: BaseStyle {
   
   /// Get a `TextFormat` definition for the style of a specific `TokenType`.
   func getStyle(tokenType: Token.TokenType) -> TextFormat {
-    return TextFormat.getBuilder(bg: backgroundColor).then { it in
+    TextFormat.getBuilder(bg: backgroundColor).then { it in
       switch tokenType {
         case .keyword, .nameConstant, .genericOutput:
           it.fg(0x66d9ef)
@@ -28,9 +28,11 @@ class MonokaiStyle: BaseStyle {
           it.fg(0x960050).bg(0x1e0010)
         case .nameAttribute, .nameClass, .nameDecorator, .nameException, .nameFunction, .nameOther, .genericInserted:
           it.fg(0xa6e22e)
-        case .number, .numberInteger, .numberIntegerLong, .numberBin, .numberHex, .numberOct, .numberFloat, .literal, .stringEscape:
+        case .number, .numberInteger, .numberIntegerLong, .numberBin, .numberHex, .numberOct, .numberFloat, .literal,
+             .stringEscape:
           it.fg(0xae81ff)
-        case .literalDate, .string, .stringDoc, .stringChar, .stringAffix, .stringOther, .stringRegex, .stringDouble, .stringSingle, .stringSymbol, .stringHeredoc, .stringBacktick, .stringInterpol, .stringDelimiter:
+        case .literalDate, .string, .stringDoc, .stringChar, .stringAffix, .stringOther, .stringRegex, .stringDouble,
+             .stringSingle, .stringSymbol, .stringHeredoc, .stringBacktick, .stringInterpol, .stringDelimiter:
           it.fg(0xe6db74)
         case .punctuation, .name:
           it.fg(0xf8f8f2)

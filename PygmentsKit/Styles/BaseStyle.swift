@@ -78,71 +78,71 @@ extension TextFormat {
     private var _underline: Bool = false
     
     init(_ bg: Color) {
-      self._bg = bg
+      _bg = bg
     }
     
     @discardableResult
     func fg(_ fg: UInt = 0xffffff) -> TextFormat.Builder {
-      self._fg = Color(hex: fg)
+      _fg = Color(hex: fg)
       return self
     }
     
     @discardableResult
     func bg(_ bg: UInt = 0xffffff) -> TextFormat.Builder {
-      self._bg = Color(hex: bg)
+      _bg = Color(hex: bg)
       return self
     }
     
     @discardableResult
     func border(_ bd: UInt = 0xffffff) -> TextFormat.Builder {
-      self._border = Color(hex: bd)
+      _border = Color(hex: bd)
       return self
     }
     
     @discardableResult
     func bold() -> TextFormat.Builder {
       // SwiftUI limitation: bold and italic is really hard.
-      if self._italic {
-        self._italic = false
+      if _italic {
+        _italic = false
       }
-      self._bold = true
+      _bold = true
       return self
     }
     
     @discardableResult
     func italic() -> TextFormat.Builder {
       // SwiftUI limitation: bold and italic is really hard.
-      if self._bold {
-        self._bold = false
+      if _bold {
+        _bold = false
       }
-      self._italic = true
+      _italic = true
       return self
     }
     
     @discardableResult
     func underline() -> TextFormat.Builder {
-      self._underline = true
+      _underline = true
       return self
     }
     
     func build() -> TextFormat {
-      return TextFormat(fg: _fg, bg: _bg, border: _border, bold: _bold, italic: _italic, underline: _underline)
+      TextFormat(fg: _fg, bg: _bg, border: _border, bold: _bold, italic: _italic, underline: _underline)
     }
   }
   
   static func getBuilder(bg: Color) -> Builder {
-    return TextFormat.Builder(bg)
+    TextFormat.Builder(bg)
   }
   
   static func getBuilder(hexBg: UInt) -> Builder {
-    return self.getBuilder(bg: Color(hex: hexBg))
+    self.getBuilder(bg: Color(hex: hexBg))
   }
 }
 
 extension TextFormat.Builder: Then {
   var final: TextFormat {
     get {
-      return self.build()
+      build()
     }
   }
 }
