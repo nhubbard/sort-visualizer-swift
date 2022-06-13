@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import Regex
+import Regexp
 
 struct EndOfText: Error, CustomStringConvertible {
   public var description: String = "The end of the text has been reached, but the match function was called to continue!"
@@ -20,18 +20,18 @@ class Scanner {
   var dataLength: Int
   var startPosition: Int
   var position: Int
-  var options: RegexOptions = [RegexOptions.default]
+  var options: RegexpOptions = [RegexpOptions.default]
   var last: String?
   var match: String?
-  var _regexCache: [String: Regex]
+  var _regexCache: [String: Regexp]
   
   /**
    * Default initializer.
    *
    * - Parameter text: The text to scan
-   * - Parameter options: `RegexOptions` flags (it's an array but also not, see `OptionSet` for details)
+   * - Parameter options: `RegexpOptions` flags (it's an array but also not, see `OptionSet` for details)
    */
-  init(text: String , options: RegexOptions = [RegexOptions.default]) {
+  init(text: String , options: RegexpOptions = [RegexpOptions.default]) {
     data = text
     dataLength = text.count
     startPosition = 0
@@ -53,9 +53,9 @@ class Scanner {
   }
   
   /// Compile, cache, and return the specified regular expression pattern.
-  private func cachePattern(pattern: String, groupNames: [String] = []) throws -> Regex {
+  private func cachePattern(pattern: String, groupNames: [String] = []) throws -> Regexp {
     if _regexCache[pattern] == nil {
-      _regexCache[pattern] = try Regex(pattern: pattern, options: options, groupNames: groupNames)
+      _regexCache[pattern] = try Regexp(pattern: pattern, options: options, groupNames: groupNames)
     }
     return _regexCache[pattern]!
   }

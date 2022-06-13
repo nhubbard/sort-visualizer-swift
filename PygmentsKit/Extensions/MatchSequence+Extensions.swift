@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import Regex
+import Regexp
 
 extension MatchSequence {
   public var isEmpty: Bool {

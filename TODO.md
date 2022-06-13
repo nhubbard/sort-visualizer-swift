@@ -101,9 +101,9 @@
   * Could call it something like `MathUI`. Sounds like a less fun project because Objective-C bad.
   * Swiftify is really expensive too, so I would have to do a manual conversion process, or complete the entire conversion process within their free limits (super annoying)
 * [ ] Rewrite selected packages, since they haven't been frequently updated and will probably break in Swift 5.7/SwiftUI 4
-  * [ ] Then
-  * [ ] Regex (rename to Regexp to avoid conflicts)
-  * [ ] CollectionConcurrencyKit
+  * [x] Then
+  * [x] Regex (rename to Regexp to avoid conflicts w/ future Swift 5.7 Regex support)
+  * [x] CollectionConcurrencyKit
   * [ ] MarkdownUI
 
 ## BizDev

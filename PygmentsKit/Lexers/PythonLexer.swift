@@ -7,9 +7,9 @@
 
 import Foundation
 import RxSwift
-import Regex
+import Regexp
 
-let lineRegex = try? Regex(pattern: #".*?\n"#, groupNames: [])
+let lineRegex = try? Regexp(pattern: #".*?\n"#, groupNames: [])
 
 class PythonLexer: BaseLexer {
   var name: String = "python"
@@ -23,7 +23,7 @@ class PythonLexer: BaseLexer {
   var stripAll: Bool = false
   var ensureNewlines: Bool = true
   var tabSize: Int = 2
-  private var cache: [PythonRegexCacheKey: Regex] = [:]
+  private var cache: [PythonRegexCacheKey: Regexp] = [:]
   
   private enum PythonRegexCacheKey: String {
     case lineRegex = #".*?\n"#
@@ -40,14 +40,14 @@ class PythonLexer: BaseLexer {
     // fStringSecondSpecial is not unique; merged with innerStringSecondSpecial
   }
   
-  private func regexCache(_ key: PythonRegexCacheKey) -> Regex {
+  private func regexCache(_ key: PythonRegexCacheKey) -> Regexp {
     if !cache.keys.contains(key) {
       cache[key] = key.rawValue.r!
     }
     return cache[key]!
   }
   
-  private func innerStringRules(_ tokenType: Token.TokenType) -> [([Regex], Token.TokenType)] {
+  private func innerStringRules(_ tokenType: Token.TokenType) -> [([Regexp], Token.TokenType)] {
     [
       // Matches the older-style '%s' % (...) string formatting. 2 groups.
       ([regexCache(.innerStringOldFormat)], .stringInterpol),
@@ -62,7 +62,7 @@ class PythonLexer: BaseLexer {
     ]
   }
   
-  private func fStringRules(_ tokenType: Token.TokenType) -> [([Regex], Token.TokenType)] {
+  private func fStringRules(_ tokenType: Token.TokenType) -> [([Regexp], Token.TokenType)] {
     [
       // Assuming that a '}' is the closing brace after the format specifier. We can't detect syntax errors this way.
       ([regexCache(.fStringStart)], .stringInterpol),

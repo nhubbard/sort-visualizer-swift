@@ -19,7 +19,6 @@
 		714AA79828453EFA00D92535 /* MonokaiTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 714AA79728453EFA00D92535 /* MonokaiTheme.swift */; };
 		714AA79A284543F800D92535 /* CodeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 714AA799284543F800D92535 /* CodeView.swift */; };
 		7156FB742850CF9E00A75F7F /* insertionsort.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 7156FB732850CF9E00A75F7F /* insertionsort.bundle */; };
-		715D01EA284BCBA000A624C5 /* Regex in Frameworks */ = {isa = PBXBuildFile; productRef = 715D01E9284BCBA000A624C5 /* Regex */; };
 		715D01ED284BF23700A624C5 /* BaseLexer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 715D01EC284BF23700A624C5 /* BaseLexer.swift */; };
 		71610A9628357F5C00F6176E /* Int+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71610A9528357F5C00F6176E /* Int+Extensions.swift */; };
 		71610C0E2844213900A2696C /* quicksort.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 71610C0D2844213900A2696C /* quicksort.bundle */; };
@@ -40,6 +39,7 @@
 		718246DD284685E4003842E3 /* ComplexityEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 718246DC284685E4003842E3 /* ComplexityEntry.swift */; };
 		718246DF284685F6003842E3 /* LanguageEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 718246DE284685F6003842E3 /* LanguageEntry.swift */; };
 		71847C51284100180018E66C /* Image+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71847C50284100180018E66C /* Image+Extensions.swift */; };
+		7189D56D2857CD7F00E2707D /* Regexp in Frameworks */ = {isa = PBXBuildFile; productRef = 7189D56C2857CD7F00E2707D /* Regexp */; };
 		718A5FC3284A8CFD007824E7 /* BaseStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 718A5FC2284A8CFD007824E7 /* BaseStyle.swift */; };
 		719F7D2128539F2500D87AF7 /* Scanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 718A5FC4284A975F007824E7 /* Scanner.swift */; };
 		71B4C0DE284FCC9800E42DB1 /* selectionsort.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 71B4C0DD284FCC9800E42DB1 /* selectionsort.bundle */; };
@@ -126,6 +126,7 @@
 		718246DC284685E4003842E3 /* ComplexityEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComplexityEntry.swift; sourceTree = "<group>"; };
 		718246DE284685F6003842E3 /* LanguageEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LanguageEntry.swift; sourceTree = "<group>"; };
 		71847C50284100180018E66C /* Image+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Image+Extensions.swift"; sourceTree = "<group>"; };
+		7189D56B285781B400E2707D /* Regexp */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = Regexp; path = Packages/Regexp; sourceTree = "<group>"; };
 		718A5FC2284A8CFD007824E7 /* BaseStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseStyle.swift; sourceTree = "<group>"; };
 		718A5FC4284A975F007824E7 /* Scanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Scanner.swift; sourceTree = "<group>"; };
 		7191A6FB28566A9C0032EE6F /* Then */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = Then; path = Packages/Then; sourceTree = "<group>"; };
@@ -192,7 +193,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				71404D1B284D17BD00639E5B /* RxSwift in Frameworks */,
-				715D01EA284BCBA000A624C5 /* Regex in Frameworks */,
+				7189D56D2857CD7F00E2707D /* Regexp in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -373,6 +374,7 @@
 		71D4DBC428185904001DBD0E = {
 			isa = PBXGroup;
 			children = (
+				7189D56B285781B400E2707D /* Regexp */,
 				7191A6FC28566EB80032EE6F /* CollectionConcurrencyKit */,
 				7191A6FB28566A9C0032EE6F /* Then */,
 				71E6B239282033D300672D55 /* Sort Visualizer--iOS--Info.plist */,
@@ -510,8 +512,8 @@
 			);
 			name = PygmentsKit;
 			packageProductDependencies = (
-				715D01E9284BCBA000A624C5 /* Regex */,
 				71404D1A284D17BD00639E5B /* RxSwift */,
+				7189D56C2857CD7F00E2707D /* Regexp */,
 			);
 			productName = PygmentsKit;
 			productReference = 717D6A01284A881500B7B645 /* PygmentsKit.framework */;
@@ -577,7 +579,6 @@
 				7120CB9A28397E410019D976 /* XCRemoteSwiftPackageReference "AudioKitEX" */,
 				7120CB9D28397E5B0019D976 /* XCRemoteSwiftPackageReference "AudioKitUI" */,
 				7120CBA028397EE40019D976 /* XCRemoteSwiftPackageReference "SoundpipeAudioKit" */,
-				715D01E8284BCBA000A624C5 /* XCRemoteSwiftPackageReference "Regex" */,
 				71404D19284D17BD00639E5B /* XCRemoteSwiftPackageReference "RxSwift" */,
 			);
 			productRefGroup = 71D4DBD228185905001DBD0E /* Products */;
@@ -1067,14 +1068,6 @@
 				minimumVersion = 6.0.0;
 			};
 		};
-		715D01E8284BCBA000A624C5 /* XCRemoteSwiftPackageReference "Regex" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/crossroadlabs/Regex.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.0.0;
-			};
-		};
 		71D4DC2328186A0F001DBD0E /* XCRemoteSwiftPackageReference "MarkdownUI" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/gonzalezreal/MarkdownUI";
@@ -1119,10 +1112,9 @@
 			package = 71404D19284D17BD00639E5B /* XCRemoteSwiftPackageReference "RxSwift" */;
 			productName = RxSwift;
 		};
-		715D01E9284BCBA000A624C5 /* Regex */ = {
+		7189D56C2857CD7F00E2707D /* Regexp */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 715D01E8284BCBA000A624C5 /* XCRemoteSwiftPackageReference "Regex" */;
-			productName = Regex;
+			productName = Regexp;
 		};
 		71D4DC2428186A0F001DBD0E /* MarkdownUI */ = {
 			isa = XCSwiftPackageProductDependency;

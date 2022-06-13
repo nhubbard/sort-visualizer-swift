@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import Regex
+import Regexp
 import RxSwift
 
 typealias UnprocessedToken = (String.Index, Token.TokenType, String)
