@@ -28,6 +28,16 @@
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       shouldUseLaunchSchemeArgsEnv = "YES">
       <Testables>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "7191A6F128566A1A0032EE6F"
+               BuildableName = "Sort Visualizer Unit Tests.xctest"
+               BlueprintName = "Sort Visualizer Unit Tests"
+               ReferencedContainer = "container:Sort Visualizer.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction

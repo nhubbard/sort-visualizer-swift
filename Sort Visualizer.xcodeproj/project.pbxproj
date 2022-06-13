@@ -86,13 +86,11 @@
 		71ED4EAE2831575500880755 /* Atomics in Frameworks */ = {isa = PBXBuildFile; productRef = 71ED4EAD2831575500880755 /* Atomics */; };
 		71F05C47284D2F68004EE620 /* Color+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71F05C46284D2F68004EE620 /* Color+Extensions.swift */; };
 		71F05C4B284D3762004EE620 /* DefaultStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71F05C4A284D3762004EE620 /* DefaultStyle.swift */; };
-		71F05C4E284D41E2004EE620 /* Then in Frameworks */ = {isa = PBXBuildFile; productRef = 71F05C4D284D41E2004EE620 /* Then */; };
 		71F05C50284D4800004EE620 /* DraculaStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71F05C4F284D4800004EE620 /* DraculaStyle.swift */; };
 		71F05C52284D5997004EE620 /* MaterialStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71F05C51284D5997004EE620 /* MaterialStyle.swift */; };
 		71F05C54284D5C52004EE620 /* MonokaiStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71F05C53284D5C52004EE620 /* MonokaiStyle.swift */; };
 		71F05C56284D6EB0004EE620 /* SolarizedStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71F05C55284D6EB0004EE620 /* SolarizedStyle.swift */; };
 		71F05C58284D77AB004EE620 /* PythonLexer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71F05C57284D77AB004EE620 /* PythonLexer.swift */; };
-		71F2BA5C2832A052001D7370 /* CollectionConcurrencyKit in Frameworks */ = {isa = PBXBuildFile; productRef = 71F2BA5B2832A052001D7370 /* CollectionConcurrencyKit */; };
 		71F38EB82819B42C0085BAAA /* SortView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71F38EB72819B42C0085BAAA /* SortView.swift */; };
 		71F4B35028207C02006B68E6 /* SortViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71F4B34F28207C02006B68E6 /* SortViewModel.swift */; };
 		71FD4A43281C1F2C00E1E6FA /* SortItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71FD4A42281C1F2C00E1E6FA /* SortItem.swift */; };
@@ -130,6 +128,8 @@
 		71847C50284100180018E66C /* Image+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Image+Extensions.swift"; sourceTree = "<group>"; };
 		718A5FC2284A8CFD007824E7 /* BaseStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseStyle.swift; sourceTree = "<group>"; };
 		718A5FC4284A975F007824E7 /* Scanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Scanner.swift; sourceTree = "<group>"; };
+		7191A6FB28566A9C0032EE6F /* Then */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = Then; path = Packages/Then; sourceTree = "<group>"; };
+		7191A6FC28566EB80032EE6F /* CollectionConcurrencyKit */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = CollectionConcurrencyKit; path = Packages/CollectionConcurrencyKit; sourceTree = "<group>"; };
 		71934841281979490058FD9E /* TODO.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = TODO.md; sourceTree = "<group>"; };
 		71B4C0DD284FCC9800E42DB1 /* selectionsort.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = selectionsort.bundle; sourceTree = "<group>"; };
 		71B55E0D28383D5C00CA74CB /* Sequence+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sequence+Extensions.swift"; sourceTree = "<group>"; };
@@ -193,7 +193,6 @@
 			files = (
 				71404D1B284D17BD00639E5B /* RxSwift in Frameworks */,
 				715D01EA284BCBA000A624C5 /* Regex in Frameworks */,
-				71F05C4E284D41E2004EE620 /* Then in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -207,7 +206,6 @@
 				7120CB9728397DDF0019D976 /* AudioKit in Frameworks */,
 				7120CB9F28397E5B0019D976 /* AudioKitUI in Frameworks */,
 				7120CBA228397EE40019D976 /* SoundpipeAudioKit in Frameworks */,
-				71F2BA5C2832A052001D7370 /* CollectionConcurrencyKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -375,6 +373,8 @@
 		71D4DBC428185904001DBD0E = {
 			isa = PBXGroup;
 			children = (
+				7191A6FC28566EB80032EE6F /* CollectionConcurrencyKit */,
+				7191A6FB28566A9C0032EE6F /* Then */,
 				71E6B239282033D300672D55 /* Sort Visualizer--iOS--Info.plist */,
 				71934841281979490058FD9E /* TODO.md */,
 				71D4DBEE28185D6E001DBD0E /* Sort Visualizer (iOS).entitlements */,
@@ -512,7 +512,6 @@
 			packageProductDependencies = (
 				715D01E9284BCBA000A624C5 /* Regex */,
 				71404D1A284D17BD00639E5B /* RxSwift */,
-				71F05C4D284D41E2004EE620 /* Then */,
 			);
 			productName = PygmentsKit;
 			productReference = 717D6A01284A881500B7B645 /* PygmentsKit.framework */;
@@ -535,7 +534,6 @@
 			packageProductDependencies = (
 				71D4DC2428186A0F001DBD0E /* MarkdownUI */,
 				71ED4EAD2831575500880755 /* Atomics */,
-				71F2BA5B2832A052001D7370 /* CollectionConcurrencyKit */,
 				7120CB9628397DDF0019D976 /* AudioKit */,
 				7120CB9B28397E410019D976 /* AudioKitEX */,
 				7120CB9E28397E5B0019D976 /* AudioKitUI */,
@@ -552,7 +550,7 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 1340;
+				LastSwiftUpdateCheck = 1400;
 				LastUpgradeCheck = 1400;
 				TargetAttributes = {
 					717D6A00284A881500B7B645 = {
@@ -575,14 +573,12 @@
 			packageReferences = (
 				71D4DC2328186A0F001DBD0E /* XCRemoteSwiftPackageReference "MarkdownUI" */,
 				71ED4EAC2831575500880755 /* XCRemoteSwiftPackageReference "swift-atomics" */,
-				71F2BA5A2832A052001D7370 /* XCRemoteSwiftPackageReference "CollectionConcurrencyKit" */,
 				7120CB9528397DDF0019D976 /* XCRemoteSwiftPackageReference "AudioKit" */,
 				7120CB9A28397E410019D976 /* XCRemoteSwiftPackageReference "AudioKitEX" */,
 				7120CB9D28397E5B0019D976 /* XCRemoteSwiftPackageReference "AudioKitUI" */,
 				7120CBA028397EE40019D976 /* XCRemoteSwiftPackageReference "SoundpipeAudioKit" */,
 				715D01E8284BCBA000A624C5 /* XCRemoteSwiftPackageReference "Regex" */,
 				71404D19284D17BD00639E5B /* XCRemoteSwiftPackageReference "RxSwift" */,
-				71F05C4C284D41E2004EE620 /* XCRemoteSwiftPackageReference "Then" */,
 			);
 			productRefGroup = 71D4DBD228185905001DBD0E /* Products */;
 			projectDirPath = "";
@@ -1095,22 +1091,6 @@
 				minimumVersion = 1.0.0;
 			};
 		};
-		71F05C4C284D41E2004EE620 /* XCRemoteSwiftPackageReference "Then" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/devxoul/Then";
-			requirement = {
-				branch = master;
-				kind = branch;
-			};
-		};
-		71F2BA5A2832A052001D7370 /* XCRemoteSwiftPackageReference "CollectionConcurrencyKit" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/JohnSundell/CollectionConcurrencyKit.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 0.2.0;
-			};
-		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -1153,16 +1133,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 71ED4EAC2831575500880755 /* XCRemoteSwiftPackageReference "swift-atomics" */;
 			productName = Atomics;
-		};
-		71F05C4D284D41E2004EE620 /* Then */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 71F05C4C284D41E2004EE620 /* XCRemoteSwiftPackageReference "Then" */;
-			productName = Then;
-		};
-		71F2BA5B2832A052001D7370 /* CollectionConcurrencyKit */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 71F2BA5A2832A052001D7370 /* XCRemoteSwiftPackageReference "CollectionConcurrencyKit" */;
-			productName = CollectionConcurrencyKit;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
