@@ -8,23 +8,9 @@
 import SwiftUI
 import MarkdownUI
 
-struct HomeView: View {
-  var body: some View {
-    VStack(spacing: 2) {
-      Text("Welcome to").bold()
-      RandomizingHeader(text: "SORT VISUALIZER")
-      Markdown(copyText)
-        .markdownStyle(MarkdownStyle(font: .system(size: 16)))
-        .lineSpacing(1.75)
-        .padding()
-    }
-    .navigationTitle("Home")
-  }
-  
-  /**
-   * "Marketing" copy used on the homepage.
-   */
-  let copyText = #"""
+/// Copy text used on the homepage.
+// TODO: Replace with Wikipedia text for localization?
+fileprivate let copyText = #"""
   Sorting algorithms are used to sort a data structure according to a specific order relationship, such as numerical order or lexicographical order.
   
   This operation is one of the most important and widespread in computer science. For a long time, new methods have been developed to make this procedure faster and faster.
@@ -42,6 +28,19 @@ struct HomeView: View {
   
   Sorting algorithms can be difficult to understand, and it's easy to get confused. This app aims to help you understand sorting algorithms by showing their actions in real time. Without further ado, let's get started -- choose an algorithm from the sidebar on the left!
   """#
+
+struct HomeView: View {
+  var body: some View {
+    VStack(spacing: 2) {
+      Text("Welcome to").bold()
+      RandomizingHeader(text: "SORT VISUALIZER")
+      Markdown(copyText)
+        .markdownStyle(MarkdownStyle(font: .system(size: 16)))
+        .lineSpacing(1.75)
+        .padding()
+    }
+    .navigationTitle("Home")
+  }
 }
 
 struct HomeView_Previews: PreviewProvider {

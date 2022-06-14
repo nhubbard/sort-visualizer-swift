@@ -51,7 +51,7 @@ struct SortItem: Identifiable, Equatable, Comparable, Hashable {
   /// Used to generate values at initialization, on array size change, and on recreation. Parallelized for speed.
   static func sequenceOf(numItems: Int = 128) async -> [SortItem] {
     await (1...numItems)
-      .concurrentMap {
+      .concurrentMap(useGroups: true) {
         SortItem.fromInt(value: $0)
       }
       .shuffled()

@@ -40,6 +40,7 @@
 		718246DF284685F6003842E3 /* LanguageEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 718246DE284685F6003842E3 /* LanguageEntry.swift */; };
 		71847C51284100180018E66C /* Image+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71847C50284100180018E66C /* Image+Extensions.swift */; };
 		7189D56D2857CD7F00E2707D /* Regexp in Frameworks */ = {isa = PBXBuildFile; productRef = 7189D56C2857CD7F00E2707D /* Regexp */; };
+		7189D56F2857D5DA00E2707D /* CollectionConcurrencyKit in Frameworks */ = {isa = PBXBuildFile; productRef = 7189D56E2857D5DA00E2707D /* CollectionConcurrencyKit */; };
 		718A5FC3284A8CFD007824E7 /* BaseStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 718A5FC2284A8CFD007824E7 /* BaseStyle.swift */; };
 		719F7D2128539F2500D87AF7 /* Scanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 718A5FC4284A975F007824E7 /* Scanner.swift */; };
 		71B4C0DE284FCC9800E42DB1 /* selectionsort.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 71B4C0DD284FCC9800E42DB1 /* selectionsort.bundle */; };
@@ -205,6 +206,7 @@
 				7120CB9C28397E410019D976 /* AudioKitEX in Frameworks */,
 				71ED4EAE2831575500880755 /* Atomics in Frameworks */,
 				7120CB9728397DDF0019D976 /* AudioKit in Frameworks */,
+				7189D56F2857D5DA00E2707D /* CollectionConcurrencyKit in Frameworks */,
 				7120CB9F28397E5B0019D976 /* AudioKitUI in Frameworks */,
 				7120CBA228397EE40019D976 /* SoundpipeAudioKit in Frameworks */,
 			);
@@ -540,6 +542,7 @@
 				7120CB9B28397E410019D976 /* AudioKitEX */,
 				7120CB9E28397E5B0019D976 /* AudioKitUI */,
 				7120CBA128397EE40019D976 /* SoundpipeAudioKit */,
+				7189D56E2857D5DA00E2707D /* CollectionConcurrencyKit */,
 			);
 			productName = "Sort2 (iOS)";
 			productReference = 71D4DBD128185905001DBD0E /* Sort Visualizer.app */;
@@ -854,7 +857,10 @@
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_ENFORCE_EXCLUSIVE_ACCESS = "debug-only";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
 		};
@@ -906,7 +912,10 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_ENFORCE_EXCLUSIVE_ACCESS = "debug-only";
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_STRICT_CONCURRENCY = minimal;
+				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
 		};
@@ -938,6 +947,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
+				OTHER_SWIFT_FLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.nhubbard.Sort2.mobile;
 				PRODUCT_NAME = "Sort Visualizer";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -1115,6 +1125,10 @@
 		7189D56C2857CD7F00E2707D /* Regexp */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = Regexp;
+		};
+		7189D56E2857D5DA00E2707D /* CollectionConcurrencyKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = CollectionConcurrencyKit;
 		};
 		71D4DC2428186A0F001DBD0E /* MarkdownUI */ = {
 			isa = XCSwiftPackageProductDependency;

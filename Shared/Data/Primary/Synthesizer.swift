@@ -46,6 +46,7 @@ class Synthesizer {
   }
   
   func playNote(value: Int, range: ClosedRange<Int>, time: Float) async {
+    // Cannot be replaced with await enforceRunning(); the Synthesizer class isn't an extension of the SortViewModel, and I'm not putting an instance of SortViewModel into the parameters.
     guard !Task.isCancelled else {
       return
     }
@@ -62,8 +63,8 @@ class Synthesizer {
     }
     osc.frequency = freq
     env.openGate()
-    // Wait the specified number of milliseconds, or 1 ms, because the notes will be functionally useless if they are too short.
-    let delay = UInt64(max(time * 1_000_000, 1_000_000))
+    // Wait the specified number of milliseconds, or 0.25 ms, because the notes will be functionally useless if they are too short.
+    let delay = UInt64(max(time * 1_000_000, 250_000))
     try? await Task.sleep(nanoseconds: delay)
     // Stop playing the note.
     env.closeGate()

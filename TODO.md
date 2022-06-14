@@ -8,8 +8,10 @@
 * [x] Clean up any dead code from prior changes
 * [x] Make sure that stopping an in-progress sort functions as expected
 * [x] Make sure operations counter is updated by all algorithms
-* [ ] Implement step functionality, if possible
-* [ ] Write lots of tests for everything
+* [ ] Implement step functionality, possibly using delay as a catalyst?
+* [ ] Write lots of tests for everything in the app
+* [ ] Set up Prettier to keep algorithm example code properly formatted
+* [ ] Set up a testing system that validates algorithm example code results
 
 ## Algorithms
 
@@ -72,23 +74,21 @@
     * [ ] Comb Sort
     * [ ] Bogo Sort
     * [ ] Stooge Sort
-* [ ] Set up Prettier to keep algorithm example code properly formatted
-* [ ] Set up a testing system that validates algorithm example code results
 * [ ] String resources/localization for all strings throughout the app.
 * [ ] Settings panel that allows you to change various defaults, like the sound tuning, note range, and more settings.
+* [ ] Replace homepage content with Wikipedia text for "Sorting algorithm"
 
 ## Future Ideas from WWDC 2022
 
-*Warning:* These features won't be available until Swift 5.7 enters actual, usable beta and we switch to targeting iPadOS 16/macOS Ventura beta for the SwiftUI 4 changes. Also, doing that will require that the absolute latest versions of iPadOS and macOS are required. I'd be on the bleeding edge, and might get cut.
+*Warning:* These features won't be available until Swift 5.7 becomes a *usable* beta (not this kinda-usable but also not usable at all custom toolchain crap I have to deal with right now) and we switch to targeting iPadOS 16/macOS Ventura beta for the SwiftUI 4 changes. I'd be on the bleeding edge, and might get cut.
 
 * [ ] Regex literals, regex builders, and other enhancements!
   * Praise be to the Apple gods! They must have read my mind with all of the annoying frustrations I've been dealing with...
-  * Sounds awesome in theory, but will conflict with the Regex module.
 * [ ] Grid API for SwiftUI 4
   * Could alleviate performance concerns for the code views, unless I implement some kind of cacheing in the ScrollingSortView.
+  * For now, the plan is to introduce some kind of caching.
 * [ ] Swift Charts for SwiftUI 4
-  * Could we replace our custom grid type, while magically introducing animations?
-  * We'll see!
+  * Could we replace our custom grid type, while magically introducing animations? We'll see...
 * [ ] Navigation API for SwiftUI 4
   * I will not implement this until I retarget the app to iPadOS 16/macOS Ventura, since the old navigation components are deprecated in these releases.
 

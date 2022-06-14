@@ -53,7 +53,7 @@ extension SortViewModel {
       guard await enforceRunning() else {
         return
       }
-      let ids = await data.concurrentMap { $0.id }
+      let ids = await data.concurrentMap(useGroups: true) { $0.id }
       if ids.contains(cache[i].id) {
         cache[i].id = UUID()
       }
