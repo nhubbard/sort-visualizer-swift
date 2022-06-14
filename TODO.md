@@ -8,6 +8,7 @@
 * [x] Clean up any dead code from prior changes
 * [x] Make sure that stopping an in-progress sort functions as expected
 * [x] Make sure operations counter is updated by all algorithms
+* [ ] Convert PygmentsKit to Swift package
 * [ ] Implement step functionality, possibly using delay as a catalyst?
 * [ ] Write lots of tests for everything in the app
 * [ ] Set up Prettier to keep algorithm example code properly formatted
@@ -101,8 +102,6 @@
   * Could call it something like `MathUI`. Sounds like a less fun project because Objective-C bad.
   * Swiftify is really expensive too, so I would have to do a manual conversion process, or complete the entire conversion process within their free limits (super annoying)
 * [ ] Rewrite selected packages, since they haven't been frequently updated and will probably break in Swift 5.7/SwiftUI 4
-  * [x] Then
-  * [x] Regex (rename to Regexp to avoid conflicts w/ future Swift 5.7 Regex support)
   * [x] CollectionConcurrencyKit
   * [ ] MarkdownUI
 
