@@ -36,11 +36,12 @@
     
 ## Visualization Improvements
 
-* [ ] Merge Sort: Mark the previous comparison for each group
-* [ ] Merge Sort: Create a visualization for copying from cache array
+* [x] Merge Sort: Still not stopping correctly... my fault again, trying to get merge sort to actually work correctly.
+* [x] Merge Sort: Mark the previous comparison for each group.
 * [x] Selection Sort: Clear green items for each iteration, it looks really weird
 * [ ] Radix Sort: Might need to adjust the nanoseconds delay to 10 or 100 instead of 1, it might cause seizures otherwise 😬
 * [ ] Shell Sort: Why does it repeat the process multiple times after the sort is finished?
+* [ ] Shell Sort: Not incrementing operation counter correctly
 * [ ] Bogo Sort: Might add a modified bogo sort, which only randomizes the segments that aren't in order, or maybe moves one item to the correct position and randomizes the rest of the array every 50K operations? idk.
 
 ## Audio
@@ -77,7 +78,7 @@
     * [ ] Stooge Sort
 * [ ] String resources/localization for all strings throughout the app.
 * [ ] Settings panel that allows you to change various defaults, like the sound tuning, note range, and more settings.
-* [ ] Replace homepage content with Wikipedia text for "Sorting algorithm"
+* [ ] Replace homepage content with Wikipedia text for "Sorting algorithm". Only necessary for localization purposes.
 
 ## Future Ideas from WWDC 2022
 
@@ -96,14 +97,16 @@
 ## Far-Out Ideas
 
 * [ ] Reimplement the entire Pygments stack in Swift to reduce preprocessing and assets size?
-  * Could call it something like `PygmentsUI` or whatnot. Sounds like a really fun project.
-  * It hasn't been a fun project so far. Regex is driving me insane, and this isn't going to get any easier until Swift 5.7 is actually usable.
+  * Could call it something like `PygmentsUI` or whatnot. Sounds like a **not** fun project.
+  * *Project update:* Currently abandoned. I was sinking an insane amount of time into directly porting Pygments to Swift. I would probably re-architect it to make it more reasonable and easier to use if I were to proceed forward.
 * [ ] Reimplement iosMath in Swift because I really want to?
   * Could call it something like `MathUI`. Sounds like a less fun project because Objective-C bad.
   * Swiftify is really expensive too, so I would have to do a manual conversion process, or complete the entire conversion process within their free limits (super annoying)
 * [ ] Rewrite selected packages, since they haven't been frequently updated and will probably break in Swift 5.7/SwiftUI 4
   * [x] CollectionConcurrencyKit
   * [ ] MarkdownUI
+* [ ] Allow for data collection for ensuring that algorithms always finish sorting correctly?
+  * App tracking transparency, server spinups, data collection apparatus, etc. are going to be difficult. That's why this is a far-out idea.
 
 ## BizDev
 

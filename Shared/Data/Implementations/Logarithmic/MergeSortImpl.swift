@@ -6,17 +6,22 @@
 //
 
 import Foundation
-import CollectionConcurrencyKit
+
+enum SortStatus {
+  case finished
+  case stopped
+}
 
 extension SortViewModel {
-  // Based on original inspiration (github:Myphz/sortvisualizer)
+  // Loosely based on original inspiration (github:Myphz/sortvisualizer)
   @MainActor
-  func _mergeSort(_ start: Int, _ end: Int) async {
+  @discardableResult
+  func _mergeSort(_ start: Int, _ end: Int) async -> SortStatus {
     guard await enforceRunning() else {
-      return
+      return .stopped
     }
     if start >= end - 1 {
-      return
+      return .finished
     }
     // ~ is bitwise NOT operator; the JS version uses a unique ~~ operator for double bitwise NOT.
     let mid = start + ~(~((end - start) / 2))
@@ -29,20 +34,18 @@ extension SortViewModel {
     var r = 0
     for i in start..<mid {
       guard await enforceRunning() else {
-        return
+        return .stopped
       }
-      let kV = await getValue(index: k)
-      let iV = await getValue(index: i)
-      if kV == nil || iV == nil {
+      guard let kVal = await getValue(index: k),
+            let iVal = await getValue(index: i) else {
         continue
       }
-      let kVal = kV!
-      let iVal = iV!
       while k < end && kVal < iVal {
         guard await enforceRunning() else {
-          return
+          return .stopped
         }
         cache[r] = data[k]
+        cache[r].id = UUID()
         r++
         k++
       }
@@ -51,27 +54,28 @@ extension SortViewModel {
     }
     for i in 0..<(k - start) {
       guard await enforceRunning() else {
-        return
+        return .stopped
       }
-      let ids = await data.concurrentMap(useGroups: true) { $0.id }
-      if ids.contains(cache[i].id) {
-        cache[i].id = UUID()
-      }
+      cache[i].value = 1 + i + start
       data[i + start] = cache[i]
-      data[i + start].value = 1 + i + start
       await operate()
+      await (0..<i + start).concurrentForEach { [self] prev in
+        await changeColor(index: prev, color: .green)
+      }
       await changeColor(index: i + start, color: .red)
       await playNote(i + start)
       await delay()
       await resetColor(index: i + start)
     }
+    return .finished
   }
   
   @MainActor
-  func mergeSort() async {
+  @discardableResult
+  func mergeSort() async -> SortStatus {
     guard await enforceRunning() else {
-      return
+      return .stopped
     }
-    await _mergeSort(0, data.count)
+    return await _mergeSort(0, data.count)
   }
 }

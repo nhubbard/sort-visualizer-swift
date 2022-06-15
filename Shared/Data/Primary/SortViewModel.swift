@@ -8,6 +8,7 @@
 import Foundation
 import SwiftUI
 import Atomics
+import CollectionConcurrencyKit
 
 @MainActor
 class SortViewModel: ObservableObject {
@@ -234,11 +235,23 @@ class SortViewModel: ObservableObject {
         case .quickSort:
           await quickSort()
         case .mergeSort:
-          await mergeSort()
-          // Sometimes, mergesort will fail in a pretty stupid way that I can't catch consistently.
-          // I know this is really hacky. But until I can find and replicate the exact bug, I can't fix it.
-          if data != data.sorted() {
-            data.sort()
+          if await mergeSort() == .finished {
+            // TODO: Send feedback in some way if the merge sort finished incorrectly?
+            // Sometimes, mergesort will fail in a pretty stupid way that I can't catch consistently.
+            // I know this is really hacky. But until I can find and replicate the exact bug, I can't fix it.
+            if data != data.sorted() {
+              print("WARN: Merge sort did not correctly sort the dataset!")
+              data.sort()
+            }
+            let setData = await data.concurrentMap(useGroups: true) { $0.value }
+            if Set(setData).count != data.count {
+              print("WARN: Merge sort left a duplicate value in the dataset!")
+              await data.indices.concurrentForEach { [self] i in
+                if data[i + 1].value == data[i].value {
+                  data[i + 1].value += 1
+                }
+              }
+            }
           }
         case .heapSort:
           await heapSort()
