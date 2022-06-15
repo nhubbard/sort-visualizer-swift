@@ -38,7 +38,7 @@
 
 * [ ] Merge Sort: Mark the previous comparison for each group
 * [ ] Merge Sort: Create a visualization for copying from cache array
-* [ ] Selection Sort: Clear green items for each iteration, it looks really weird
+* [x] Selection Sort: Clear green items for each iteration, it looks really weird
 * [ ] Radix Sort: Might need to adjust the nanoseconds delay to 10 or 100 instead of 1, it might cause seizures otherwise 😬
 * [ ] Shell Sort: Why does it repeat the process multiple times after the sort is finished?
 * [ ] Bogo Sort: Might add a modified bogo sort, which only randomizes the segments that aren't in order, or maybe moves one item to the correct position and randomizes the rest of the array every 50K operations? idk.

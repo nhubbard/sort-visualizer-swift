@@ -452,7 +452,6 @@
 				7120CB9A28397E410019D976 /* XCRemoteSwiftPackageReference "AudioKitEX" */,
 				7120CB9D28397E5B0019D976 /* XCRemoteSwiftPackageReference "AudioKitUI" */,
 				7120CBA028397EE40019D976 /* XCRemoteSwiftPackageReference "SoundpipeAudioKit" */,
-				71404D19284D17BD00639E5B /* XCRemoteSwiftPackageReference "RxSwift" */,
 			);
 			productRefGroup = 71D4DBD228185905001DBD0E /* Products */;
 			projectDirPath = "";
@@ -827,14 +826,6 @@
 			requirement = {
 				branch = main;
 				kind = branch;
-			};
-		};
-		71404D19284D17BD00639E5B /* XCRemoteSwiftPackageReference "RxSwift" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/ReactiveX/RxSwift.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 6.0.0;
 			};
 		};
 		71D4DC2328186A0F001DBD0E /* XCRemoteSwiftPackageReference "MarkdownUI" */ = {
