@@ -8,7 +8,6 @@
 * [x] Clean up any dead code from prior changes
 * [x] Make sure that stopping an in-progress sort functions as expected
 * [x] Make sure operations counter is updated by all algorithms
-* [ ] Convert PygmentsKit to Swift package
 * [ ] Implement step functionality, possibly using delay as a catalyst?
 * [ ] Write lots of tests for everything in the app
 * [ ] Set up Prettier to keep algorithm example code properly formatted
@@ -45,7 +44,7 @@
 
 * [x] Replace custom implementation with AudioKit
 * [x] Wire up audio capabilities in all operations
-* [ ] Start up and shut down the synthesizer automatically to prevent popping and other audio weirdness
+* [ ] Start up and shut down the synthesizer automatically to prevent popping and other audio weirdness∑
 
 ## User Interface
 

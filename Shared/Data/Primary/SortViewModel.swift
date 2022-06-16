@@ -37,29 +37,29 @@ class SortViewModel: ObservableObject {
   
   /// Throw an unchecked error if we attempt to access a value outside the range of the `data` array's length.
   @MainActor
+  @inline(__always)
   func enforceIndex(_ data: [SortItem], _ index: Int) {
     precondition(data.indices.contains(index), "The index \(index) does not exist on an array of length \(data.endIndex)!")
   }
   
   /// Check to see that the algorithm isn't stopped or the Task isn't cancelled.
   @MainActor
+  @inline(__always)
   func enforceRunning() async -> Bool {
     !Task.isCancelled && running
   }
   
   /// Delay an action within an `async` closure.
   @MainActor
+  @inline(__always)
   func delay() async {
-    if delay > 0.0 {
-      try? await Task.sleep(nanoseconds: UInt64(delay * 1_000_000))
-    } else {
-      // 1 nanosecond delay; prevents the UI from freezing when all operations on the array happen at once by moving the slider to zero seconds
-      try? await Task.sleep(nanoseconds: UInt64(1))
-    }
+    // 1 nanosecond delay; prevents the UI from freezing when all operations on the array happen at once by moving the slider to zero seconds
+    try? await Task.sleep(nanoseconds: UInt64(delay > 0.0 ? delay * 1_000_000 : 1))
   }
   
   /// Play a note using the data ranges and the current delay.
   @MainActor
+  @inline(__always)
   func playNote(_ index: Int) async {
     guard await enforceRunning() && sound else {
       return
@@ -69,12 +69,14 @@ class SortViewModel: ObservableObject {
   
   /// Set the contents of the data array asynchronously.
   @MainActor
+  @inline(__always)
   func setData(_ data: [SortItem]) async {
     self.data = data
   }
   
   /// Increment the operation counter in the UI atomically and asynchronously.
   @MainActor
+  @inline(__always)
   func operate() async {
     guard await enforceRunning() else {
       return
@@ -84,17 +86,20 @@ class SortViewModel: ObservableObject {
   
   /// Get the operations counter
   @MainActor
+  @inline(__always)
   func getOperations() -> Int {
     operations.load(ordering: .relaxed)
   }
   
   @MainActor
+  @inline(__always)
   func setAlgo(algo: Algorithms) {
     algorithm = algo
   }
   
   /// Shuffle the array using Swift's built-in shuffle method.
   @MainActor
+  @inlinable
   func shuffle() async {
     // Don't change to await enforceRunning(); will break reset function.
     guard !Task.isCancelled else {
@@ -103,13 +108,12 @@ class SortViewModel: ObservableObject {
     if running {
       sortTaskRef!.cancel()
     }
-    await MainActor.run {
-      data.shuffle()
-    }
+    data.shuffle()
   }
   
   /// Recreate the array, with a specified set of values.
   @MainActor
+  @inlinable
   func recreate(numItems: Int = 128) async {
     // Don't change to await enforceRunning(); will break array size changes.
     guard !Task.isCancelled else {
@@ -122,15 +126,12 @@ class SortViewModel: ObservableObject {
     // Reset operations counter to 0
     let _ = operations.exchange(0, ordering: .relaxed)
     // Recreate the array from scratch
-    if numItems == arraySize.wrappedValue {
-      data = await SortItem.sequenceOf(numItems: numItems)
-    } else {
-      data = await SortItem.sequenceOf(numItems: arraySize.wrappedValue)
-    }
+    data = await SortItem.sequenceOf(numItems: numItems == arraySize.wrappedValue ? numItems : arraySize.wrappedValue)
   }
   
   /// Swap the values at the firstIndex and secondIndex, with a specified delay between the two operations.
   @MainActor
+  @inlinable
   func swap(_ firstIndex: Int, _ secondIndex: Int) async {
     guard await enforceRunning() else {
       return
@@ -153,6 +154,8 @@ class SortViewModel: ObservableObject {
   
   /// Check if the array is sorted.
   @MainActor
+  @inlinable
+  @discardableResult
   func isArraySorted() async -> Bool {
     guard await enforceRunning() else {
       return false
@@ -167,6 +170,7 @@ class SortViewModel: ObservableObject {
   
   /// Get the integer value of a SortItem at the specified index.
   @MainActor
+  @inline(__always)
   func getValue(index: Int) async -> Optional<Int> {
     guard await enforceRunning() else {
       return Optional.none
@@ -179,6 +183,7 @@ class SortViewModel: ObservableObject {
   
   /// Compare the values of two SortItems at their specified indexes.
   @MainActor
+  @inlinable
   func compare(firstIndex: Int, secondIndex: Int, by: (Int, Int) -> Bool = (>=), clear: Bool = false) async -> Bool {
     guard await enforceRunning() else {
       return false
@@ -208,6 +213,7 @@ class SortViewModel: ObservableObject {
   
   /// Change the color of a SortItem at the specified index.
   @MainActor
+  @inline(__always)
   func changeColor(index: Int, color: Color) async {
     guard await enforceRunning() else {
       return
@@ -218,6 +224,7 @@ class SortViewModel: ObservableObject {
   
   /// Reset the color of a SortItem to white at the specified index.
   @MainActor
+  @inline(__always)
   func resetColor(index: Int) async {
     guard await enforceRunning() else {
       return
@@ -228,68 +235,67 @@ class SortViewModel: ObservableObject {
   
   /// Run the sorting algorithm of choice on the dataset.
   @MainActor
+  @inlinable
   func doSort() async -> Bool {
-    func innerDoSort(_ algorithm: Algorithms) async {
-      switch algorithm {
-        // Logarithmic algorithms
-        case .quickSort:
-          await quickSort()
-        case .mergeSort:
-          if await mergeSort() == .finished {
-            // TODO: Send feedback in some way if the merge sort finished incorrectly?
-            // Sometimes, mergesort will fail in a pretty stupid way that I can't catch consistently.
-            // I know this is really hacky. But until I can find and replicate the exact bug, I can't fix it.
-            if data != data.sorted() {
-              print("WARN: Merge sort did not correctly sort the dataset!")
-              data.sort()
-            }
-            let setData = await data.concurrentMap(useGroups: true) { $0.value }
-            if Set(setData).count != data.count {
-              print("WARN: Merge sort left a duplicate value in the dataset!")
-              await data.indices.concurrentForEach { [self] i in
-                if data[i + 1].value == data[i].value {
-                  data[i + 1].value += 1
-                }
-              }
-            }
-          }
-        case .heapSort:
-          await heapSort()
-        // Quadratic algorithms
-        case .bubbleSort:
-          await bubbleSort()
-        case .selectionSort:
-          await selectionSort()
-        case .insertionSort:
-          await insertionSort()
-        case .gnomeSort:
-          await gnomeSort()
-        case .shakerSort:
-          await shakerSort()
-        case .oddEvenSort:
-          await oddEvenSort()
-        case .pancakeSort:
-          await pancakeSort()
-        // Weird algorithms
-        case .bitonicSort:
-          await bitonicSort()
-        case .radixSort:
-          await radixSort()
-        case .shellSort:
-          await shellSort()
-        case .combSort:
-          await combSort()
-        case .bogoSort:
-          await bogoSort()
-        case .stoogeSort:
-          await stoogeSort()
-      }
-    }
     guard await enforceRunning() else {
       return false
     }
-    await innerDoSort(algorithm)
-    let _ = await isArraySorted()
+    switch algorithm {
+        // Logarithmic algorithms
+      case .quickSort:
+        await quickSort()
+      case .mergeSort:
+        if await mergeSort() == .finished {
+          // TODO: Send feedback in some way if the merge sort finished incorrectly?
+          // Sometimes, mergesort will fail in a pretty stupid way that I can't catch consistently.
+          // I know this is really hacky. But until I can find and replicate the exact bug, I can't fix it.
+          if data != data.sorted() {
+            print("WARN: Merge sort did not correctly sort the dataset!")
+            data.sort()
+          }
+          let setData = await data.concurrentMap { $0.value }
+          if Set(setData).count != data.count {
+            print("WARN: Merge sort left a duplicate value in the dataset!")
+            for i in data.indices {
+              let range = data.indices
+              if range.contains(i + 1) && range.contains(i) && data[i + 1].value == data[i].value {
+                data[i + 1].value += 1
+              }
+            }
+          }
+        }
+      case .heapSort:
+        await heapSort()
+        // Quadratic algorithms
+      case .bubbleSort:
+        await bubbleSort()
+      case .selectionSort:
+        await selectionSort()
+      case .insertionSort:
+        await insertionSort()
+      case .gnomeSort:
+        await gnomeSort()
+      case .shakerSort:
+        await shakerSort()
+      case .oddEvenSort:
+        await oddEvenSort()
+      case .pancakeSort:
+        await pancakeSort()
+        // Weird algorithms
+      case .bitonicSort:
+        await bitonicSort()
+      case .radixSort:
+        await radixSort()
+      case .shellSort:
+        await shellSort()
+      case .combSort:
+        await combSort()
+      case .bogoSort:
+        await bogoSort()
+      case .stoogeSort:
+        await stoogeSort()
+    }
+    await isArraySorted()
     running = false
     return data == data.sorted()
   }

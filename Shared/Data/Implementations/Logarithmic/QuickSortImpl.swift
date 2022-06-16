@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import CollectionConcurrencyKit
 
 extension SortViewModel {
   // Based on the original inspiration for this app (github:Myphz/sortvisualizer)
@@ -46,7 +47,7 @@ extension SortViewModel {
         }
       }
       await swap(pivot, j)
-      for index in [i, j, pivot] {
+      await [i, j, pivot].concurrentForEach { [self] index in
         guard await enforceRunning() else {
           return
         }

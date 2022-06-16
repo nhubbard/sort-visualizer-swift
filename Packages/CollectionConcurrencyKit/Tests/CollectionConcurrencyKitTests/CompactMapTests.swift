@@ -43,27 +43,9 @@ final class CompactMapTests: TestCase {
     }
   }
   
-  func testNonThrowingConcurrentCompactMapWithGroups() {
-    runAsyncTest { array, collector in
-      let values = await array.concurrentCompactMap(useGroups: true) { int in
-        await int == 3 ? nil : collector.collectAndTransform(int)
-      }
-      XCTAssertEqual(values, ["0", "1", "2", "4"])
-    }
-  }
-  
   func testThrowingConcurrentCompactMapThatDoesNotThrow() {
     runAsyncTest { array, collector in
       let values = try await array.concurrentCompactMap { int in
-        try await int == 3 ? nil : collector.tryCollectAndTransform(int)
-      }
-      XCTAssertEqual(values, ["0", "1", "2", "4"])
-    }
-  }
-  
-  func testThrowingConcurrentCompactMapThatDoesNotThrowWithGroups() {
-    runAsyncTest { array, collector in
-      let values = try await array.concurrentCompactMap(useGroups: true) { int in
         try await int == 3 ? nil : collector.tryCollectAndTransform(int)
       }
       XCTAssertEqual(values, ["0", "1", "2", "4"])
@@ -74,19 +56,6 @@ final class CompactMapTests: TestCase {
     runAsyncTest { array, collector in
       await self.verifyErrorThrown { error in
         try await array.concurrentCompactMap { int in
-          try await self.collector.tryCollectAndTransform(
-            int,
-            throwError: int == 3 ? error : nil
-          )
-        }
-      }
-    }
-  }
-  
-  func testThrowingConcurrentCompactMapThatThrowsWithGroups() {
-    runAsyncTest { array, collector in
-      await self.verifyErrorThrown { error in
-        try await array.concurrentCompactMap(useGroups: true) { int in
           try await self.collector.tryCollectAndTransform(
             int,
             throwError: int == 3 ? error : nil

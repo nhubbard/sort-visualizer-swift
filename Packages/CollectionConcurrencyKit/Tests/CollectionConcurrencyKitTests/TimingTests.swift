@@ -58,27 +58,9 @@ final class TimingTests: TestCase {
     }
   }
   
-  func testConcurrentMapExecutionIsParallelWithGroups() {
-    runConcurrentTest { array in
-      try await array.concurrentMap(useGroups: true) { int -> Int in
-        try await self.delay()
-        return int
-      }
-    }
-  }
-  
   func testConcurrentCompactMapExecutionIsParallel() {
     runConcurrentTest { array in
       try await array.concurrentCompactMap { int -> Int? in
-        try await self.delay()
-        return int
-      }
-    }
-  }
-  
-  func testConcurrentCompactMapExecutionIsParallelWithGroups() {
-    runConcurrentTest { array in
-      try await array.concurrentCompactMap(useGroups: true) { int -> Int? in
         try await self.delay()
         return int
       }
@@ -90,17 +72,6 @@ final class TimingTests: TestCase {
       try await array.concurrentFlatMap { int -> [Int] in
         try await self.delay()
         return [int]
-      }
-    }
-  }
-  
-  func testConcurrentFlatMapExecutionIsParallelWithGroups() {
-    func testConcurrentFlatMapExecutionIsParallel() {
-      runConcurrentTest { array in
-        try await array.concurrentFlatMap(useGroups: true) { int -> [Int] in
-          try await self.delay()
-          return [int]
-        }
       }
     }
   }

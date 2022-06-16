@@ -41,27 +41,9 @@ final class MapTests: TestCase {
     }
   }
   
-  func testNonThrowingConcurrentMapWithGroups() {
-    runAsyncTest { array, collector in
-      let values = await array.concurrentMap(useGroups: true) {
-        await collector.collectAndTransform($0)
-      }
-      XCTAssertEqual(values, array.map(String.init))
-    }
-  }
-  
   func testThrowingConcurrentMapThatDoesNotThrow() {
     runAsyncTest { array, collector in
       let values = try await array.concurrentMap {
-        try await collector.tryCollectAndTransform($0)
-      }
-      XCTAssertEqual(values, array.map(String.init))
-    }
-  }
-  
-  func testThrowingConcurrentMapThatDoesNotThrowWithGroups() {
-    runAsyncTest { array, collector in
-      let values = try await array.concurrentMap(useGroups: true) {
         try await collector.tryCollectAndTransform($0)
       }
       XCTAssertEqual(values, array.map(String.init))
@@ -72,19 +54,6 @@ final class MapTests: TestCase {
     runAsyncTest { array, collector in
       await self.verifyErrorThrown { error in
         try await array.concurrentMap { int in
-          try await collector.tryCollectAndTransform(
-            int,
-            throwError: int == 3 ? error : nil
-          )
-        }
-      }
-    }
-  }
-  
-  func testThrowingConcurrentMapThatThrowsWithGroups() {
-    runAsyncTest { array, collector in
-      await self.verifyErrorThrown { error in
-        try await array.concurrentMap(useGroups: true) { int in
           try await collector.tryCollectAndTransform(
             int,
             throwError: int == 3 ? error : nil
