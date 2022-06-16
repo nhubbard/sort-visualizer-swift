@@ -51,6 +51,8 @@
 * [x] Icons in navigation
 * [x] Add warning to Bogo Sort
 * [x] Add transparency to Settings panel
+* [x] Fix jumping on Scrolling Sort View
+  * The issue was the LazyVGrid. Replacing it with a really ugly VStack+HStack combo eliminated the project.
 * [ ] *Big project:* Enhance sort algorithm pages with descriptions of algorithms, big-O notation values, and implementation code for various languages
   * [x] Create initial concept
   * [x] Implement description
@@ -82,9 +84,6 @@
 
 * [ ] Regex literals, regex builders, and other enhancements!
   * Praise be to the Apple gods! They must have read my mind with all of the annoying frustrations I've been dealing with...
-* [ ] Grid API for SwiftUI 4
-  * Could alleviate performance concerns for the code views, unless I implement some kind of cacheing in the ScrollingSortView.
-  * For now, the plan is to introduce some kind of caching.
 * [ ] Swift Charts for SwiftUI 4
   * Could we replace our custom grid type, while magically introducing animations? We'll see...
 * [ ] Navigation API for SwiftUI 4
