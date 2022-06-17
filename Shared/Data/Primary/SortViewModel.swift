@@ -229,8 +229,9 @@ class SortViewModel: ObservableObject {
     guard await enforceRunning() else {
       return
     }
+    let env = EnvironmentValues()
     enforceIndex(data, index)
-    data[index].color = .white
+    data[index].color = env.colorScheme == .light ? .primary : .white
   }
   
   /// Run the sorting algorithm of choice on the dataset.

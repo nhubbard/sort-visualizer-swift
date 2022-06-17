@@ -74,6 +74,8 @@ struct ScrollingSortView: View {
             Text("Implementations")
               .font(.system(size: 24, weight: .bold, design: .default))
               .multilineTextAlignment(.leading)
+            #if targetEnvironment(macCatalyst)
+            // Manually spaced grid. LazyVGrid was causing a top of performance issues.
             VStack(alignment: .leading, spacing: 16) {
               ForEach(0..<5) { i in
                 HStack(alignment: .top, spacing: 16) {
@@ -81,11 +83,19 @@ struct ScrollingSortView: View {
                   // The first ForEach is [0, 1, 2, 3, 4]. This converts it to [[0, 2], [2, 4], [4, 6], [6, 8], [8, 10]].
                   ForEach(languages[(i * 2)..<((i * 2) + 2)]) { language in
                     LanguageView(algorithm: algorithm, language: language)
-                      .frame(width: geo.size.width * 0.45, height: .infinity, alignment: .center)
+                      .frame(width: geo.size.width * 0.45, height: nil, alignment: .center)
                   }
                 }
               }
             }
+            #elseif os(iOS)
+            // This was added after testing on an iPad. It's not a bad experience per se, but it's a better experience than having multiple code views stuck on top of one another.
+            VStack(alignment: .leading, spacing: 8) {
+              ForEach(languages) { language in
+                LanguageView(algorithm: algorithm, language: language)
+              }
+            }
+            #endif
           }.padding(.all, 32)
         }
       }
