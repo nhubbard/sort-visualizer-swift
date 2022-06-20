@@ -16,6 +16,7 @@ extension SortViewModel {
   // Loosely based on original inspiration (github:Myphz/sortvisualizer)
   @MainActor
   @discardableResult
+  @inlinable
   func _mergeSort(_ start: Int, _ end: Int) async -> SortStatus {
     guard await enforceRunning() else {
       return .stopped
@@ -44,12 +45,18 @@ extension SortViewModel {
         guard await enforceRunning() else {
           return .stopped
         }
-        cache[r] = data[k]
+        guard let kV = await getItem(index: k) else {
+          return .stopped
+        }
+        cache[r] = kV
         cache[r].id = UUID()
         r++
         k++
       }
-      cache[r] = data[i]
+      guard let iV = await getItem(index: i) else {
+        return .stopped
+      }
+      cache[r] = iV
       r++
     }
     for i in 0..<(k - start) {
@@ -57,7 +64,7 @@ extension SortViewModel {
         return .stopped
       }
       cache[i].value = 1 + i + start
-      data[i + start] = cache[i]
+      await setItem(index: i + start, value: cache[i])
       await operate()
       await (0..<i + start).concurrentForEach { [self] prev in
         await changeColor(index: prev, color: .green)
@@ -72,6 +79,7 @@ extension SortViewModel {
   
   @MainActor
   @discardableResult
+  @inlinable
   func mergeSort() async -> SortStatus {
     guard await enforceRunning() else {
       return .stopped

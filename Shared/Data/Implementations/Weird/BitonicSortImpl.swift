@@ -9,6 +9,7 @@ import Foundation
 
 extension SortViewModel {
   @MainActor
+  @inlinable
   func bitonicSort() async {
     guard await enforceRunning() else {
       return

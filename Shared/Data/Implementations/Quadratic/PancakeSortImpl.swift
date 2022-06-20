@@ -9,6 +9,7 @@ import Foundation
 
 extension SortViewModel {
   @MainActor
+  @inlinable
   func _flip(_ k: Int) async {
     guard await enforceRunning() else {
       return
@@ -26,6 +27,7 @@ extension SortViewModel {
   }
   
   @MainActor
+  @inlinable
   func _maxIndex(_ k: Int) async -> Int {
     guard await enforceRunning() else {
       return -1
@@ -43,6 +45,7 @@ extension SortViewModel {
   }
   
   @MainActor
+  @inlinable
   func pancakeSort() async {
     guard await enforceRunning() else {
       return

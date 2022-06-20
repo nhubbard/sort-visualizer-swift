@@ -9,6 +9,7 @@ import Foundation
 
 extension SortViewModel {
   @MainActor
+  @inlinable
   func combSort() async {
     guard await enforceRunning() else {
       return

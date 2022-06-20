@@ -9,6 +9,7 @@ import Foundation
 
 extension SortViewModel {
   @MainActor
+  @inlinable
   func shellSort() async {
     guard await enforceRunning() else {
       return
@@ -24,7 +25,9 @@ extension SortViewModel {
         guard await enforceRunning() else {
           return
         }
-        let temp = data[i]
+        guard let temp = await getItem(index: i) else {
+          continue
+        }
         j = i
         let value = await getValue(index: j - interval)!
         while j >= interval && value > temp.value {
@@ -33,15 +36,15 @@ extension SortViewModel {
           }
           await swap(j, j - interval)
           await changeColor(index: j, color: .red)
-          data[j].value = j + 1
+          await setValue(index: j, newValue: j + 1)
           await playNote(j)
           await delay()
           await resetColor(index: j)
           j -= interval
         }
         await operate()
-        data[j] = temp
-        data[j].value = j + 1
+        await setItem(index: j, value: temp)
+        await setValue(index: j, newValue: j + 1)
         await playNote(j)
         await changeColor(index: j, color: .blue)
         await delay()

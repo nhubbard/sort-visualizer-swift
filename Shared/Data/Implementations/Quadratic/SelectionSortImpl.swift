@@ -10,6 +10,7 @@ import Foundation
 extension SortViewModel {
   // This is the one algorithm that I didn't rewrite following the JS implementation; it ended up taking 400x longer and required a ton of iterations and concurrency helpers.
   @MainActor
+  @inlinable
   func selectionSort() async {
     guard await enforceRunning() else {
       return

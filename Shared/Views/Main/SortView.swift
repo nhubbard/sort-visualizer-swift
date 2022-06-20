@@ -81,7 +81,7 @@ struct SortView: View {
       Button("Accept", role: .cancel, action: onBogoAccept)
       Button("Decline", role: .destructive, action: onBogoDecline)
     }, message: {
-      Text("Bogo sort will likely never finish sorting.\n\nThis is always true, even on very fast systems with a zero second delay.\n\nIf you leave it running, it will consume system resources, including significant battery life, for a very long time.\n\nIf you wish to continue, press the Accept button; if you wish to stop the sorting, press the Decline button.")
+      Text("Bogo sort will likely never finish sorting.\n\nThis is always true, even on very fast systems with a zero second delay.\n\nIf you leave it running, it will consume system resources, including significant battery life, for a very long time.\n\nAdditionally, if you are sensitive to rapidly strobing lights, bogo sort may induce seizures.\n\nIf you wish to continue, press the Accept button; if you wish to stop the sorting, press the Decline button.")
     })
   }
   

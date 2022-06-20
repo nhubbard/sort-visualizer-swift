@@ -11,6 +11,7 @@ import CollectionConcurrencyKit
 extension SortViewModel {
   // Based on the original inspiration for this app (github:Myphz/sortvisualizer)
   @MainActor
+  @inlinable
   func _quickSort(_ left: Int, _ right: Int) async {
     guard await enforceRunning() else {
       return
@@ -59,6 +60,7 @@ extension SortViewModel {
   }
   
   @MainActor
+  @inlinable
   func quickSort() async {
     guard await enforceRunning() else {
       return

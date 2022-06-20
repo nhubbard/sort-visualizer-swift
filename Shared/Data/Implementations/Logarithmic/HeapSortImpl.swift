@@ -9,6 +9,7 @@ import Foundation
 
 extension SortViewModel {
   @MainActor
+  @inlinable
   func _heapify(_ length: Int, _ i: Int) async {
     guard await enforceRunning() else {
       return
@@ -36,6 +37,7 @@ extension SortViewModel {
   }
   
   @MainActor
+  @inlinable
   func heapSort() async {
     guard await enforceRunning() else {
       return

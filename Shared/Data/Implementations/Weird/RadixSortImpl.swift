@@ -11,6 +11,7 @@ import CollectionConcurrencyKit
 
 extension SortViewModel {
   @MainActor
+  @inlinable
   func radixSort() async {
     guard await enforceRunning() else {
       return
@@ -51,7 +52,7 @@ extension SortViewModel {
           }
           var newItem = item
           newItem.id = UUID.init()
-          data[counter] = newItem
+          await setItem(index: counter, value: newItem)
           await operate()
           await playNote(counter)
           await changeColor(index: counter, color: color)

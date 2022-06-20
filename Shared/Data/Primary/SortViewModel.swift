@@ -211,6 +211,36 @@ class SortViewModel: ObservableObject {
     return by(lhs, rhs)
   }
   
+  @MainActor
+  @inline(__always)
+  func getItem(index: Int) async -> SortItem? {
+    guard await enforceRunning() else {
+      return nil
+    }
+    enforceIndex(data, index)
+    return data[index]
+  }
+  
+  @MainActor
+  @inline(__always)
+  func setValue(index: Int, newValue: Int) async {
+    guard await enforceRunning() else {
+      return
+    }
+    enforceIndex(data, index)
+    data[index].value = newValue
+  }
+  
+  @MainActor
+  @inline(__always)
+  func setItem(index: Int, value: SortItem) async {
+    guard await enforceRunning() else {
+      return
+    }
+    enforceIndex(data, index)
+    data[index] = value
+  }
+  
   /// Change the color of a SortItem at the specified index.
   @MainActor
   @inline(__always)

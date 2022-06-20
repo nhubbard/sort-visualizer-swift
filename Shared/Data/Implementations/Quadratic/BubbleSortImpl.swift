@@ -10,6 +10,7 @@ import Foundation
 extension SortViewModel {
   // Based on inspiration (github:Myphz/sortvisualizer)
   @MainActor
+  @inlinable
   func bubbleSort() async {
     guard await enforceRunning() else {
       return

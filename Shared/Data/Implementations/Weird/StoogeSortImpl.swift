@@ -6,39 +6,26 @@
 //
 
 import Foundation
-import CollectionConcurrencyKit
 
 extension SortViewModel {
   @MainActor
+  @inlinable
   func _stoogeSort(_ start: Int, _ end: Int) async {
     guard await enforceRunning() else {
       return
     }
     // Only present to ensure that users don't think the program has frozen
-    Task.detached {
-      await (start..<end).concurrentForEach { [self] i in
-        await changeColor(index: i, color: .orange)
-        await delay()
-      }
-    }
     let len = end - start + 1
     if len <= 1 {
       return
     } else if len == 2 {
-      guard let startValue = await getValue(index: start),
-            let endValue = await getValue(index: end) else {
+      guard await getValue(index: start) != nil, await getValue(index: end) != nil else {
         return
       }
-      if startValue > endValue {
+      if await compare(firstIndex: start, secondIndex: end, by: (>)) {
         await swap(start, end)
       }
       return
-    }
-    Task.detached {
-      await (start..<end).concurrentForEach { [self] i in
-        await delay()
-        await resetColor(index: i)
-      }
     }
     let len23 = Int(ceil(Double(len) * 2 / 3))
     await _stoogeSort(start, start + len23 - 1)
@@ -47,6 +34,7 @@ extension SortViewModel {
   }
   
   @MainActor
+  @inlinable
   func stoogeSort() async {
     await _stoogeSort(0, data.count - 1)
   }

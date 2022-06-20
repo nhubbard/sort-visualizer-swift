@@ -10,6 +10,7 @@ import Foundation
 extension SortViewModel {
   // This is the one algorithm that I didn't rewrite following the JS implementation; it ended up taking 400x longer and required a ton of iterations and concurrency helpers.
   @MainActor
+  @inlinable
   func insertionSort() async {
     guard await enforceRunning() else {
       return
@@ -27,7 +28,7 @@ extension SortViewModel {
           guard await enforceRunning() else {
             return
           }
-          if data[j] < data[j - 1] {
+          if await compare(firstIndex: j, secondIndex: j - 1, by: (<)) {
             await swap(j, j - 1)
           }
           j--

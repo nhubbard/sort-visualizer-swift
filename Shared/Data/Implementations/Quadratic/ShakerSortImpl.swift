@@ -9,6 +9,7 @@ import Foundation
 
 extension SortViewModel {
   @MainActor
+  @inlinable
   func shakerSort() async {
     guard await enforceRunning() else {
       return

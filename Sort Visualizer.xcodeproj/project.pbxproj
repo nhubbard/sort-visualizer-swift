@@ -8,11 +8,13 @@
 
 /* Begin PBXBuildFile section */
 		710BF0542821885300F7B066 /* Range+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 710BF0532821885300F7B066 /* Range+Extensions.swift */; };
+		711EF294285CC174001EB6AC /* BogoSortImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 711EF293285CC174001EB6AC /* BogoSortImpl.swift */; };
 		7120CB9728397DDF0019D976 /* AudioKit in Frameworks */ = {isa = PBXBuildFile; productRef = 7120CB9628397DDF0019D976 /* AudioKit */; };
 		7120CB9928397DF00019D976 /* Synthesizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7120CB9828397DF00019D976 /* Synthesizer.swift */; };
 		7120CB9C28397E410019D976 /* AudioKitEX in Frameworks */ = {isa = PBXBuildFile; productRef = 7120CB9B28397E410019D976 /* AudioKitEX */; };
 		7120CB9F28397E5B0019D976 /* AudioKitUI in Frameworks */ = {isa = PBXBuildFile; productRef = 7120CB9E28397E5B0019D976 /* AudioKitUI */; };
 		7120CBA228397EE40019D976 /* SoundpipeAudioKit in Frameworks */ = {isa = PBXBuildFile; productRef = 7120CBA128397EE40019D976 /* SoundpipeAudioKit */; };
+		712FAC49285E2A2B0045B50A /* Algorithms in Frameworks */ = {isa = PBXBuildFile; productRef = 712FAC48285E2A2B0045B50A /* Algorithms */; };
 		714AA7812845013200D92535 /* Color+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 714AA7802845013200D92535 /* Color+Extensions.swift */; };
 		714AA79628453B6100D92535 /* Token.swift in Sources */ = {isa = PBXBuildFile; fileRef = 714AA79528453B6100D92535 /* Token.swift */; };
 		714AA79828453EFA00D92535 /* MonokaiTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 714AA79728453EFA00D92535 /* MonokaiTheme.swift */; };
@@ -51,7 +53,6 @@
 		71CFAC1228396EC3004672DB /* RadixSortImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71CFAC1128396EC3004672DB /* RadixSortImpl.swift */; };
 		71CFAC1428396F32004672DB /* ShellSortImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71CFAC1328396F32004672DB /* ShellSortImpl.swift */; };
 		71CFAC1628396F63004672DB /* CombSortImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71CFAC1528396F63004672DB /* CombSortImpl.swift */; };
-		71CFAC1828396F81004672DB /* BogoSortImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71CFAC1728396F81004672DB /* BogoSortImpl.swift */; };
 		71CFAC1A28396F9A004672DB /* StoogeSortImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71CFAC1928396F9A004672DB /* StoogeSortImpl.swift */; };
 		71D4DBDA28185905001DBD0E /* Sort2App.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71D4DBCA28185905001DBD0E /* Sort2App.swift */; };
 		71D4DBDC28185905001DBD0E /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71D4DBCB28185905001DBD0E /* ContentView.swift */; };
@@ -82,6 +83,7 @@
 
 /* Begin PBXFileReference section */
 		710BF0532821885300F7B066 /* Range+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Range+Extensions.swift"; sourceTree = "<group>"; };
+		711EF293285CC174001EB6AC /* BogoSortImpl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BogoSortImpl.swift; sourceTree = "<group>"; };
 		7120CB9828397DF00019D976 /* Synthesizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Synthesizer.swift; sourceTree = "<group>"; };
 		713FA7AF284A5DAE00F12327 /* highlight.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = highlight.py; sourceTree = "<group>"; };
 		714AA7802845013200D92535 /* Color+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Extensions.swift"; sourceTree = "<group>"; };
@@ -123,7 +125,6 @@
 		71CFAC1128396EC3004672DB /* RadixSortImpl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RadixSortImpl.swift; sourceTree = "<group>"; };
 		71CFAC1328396F32004672DB /* ShellSortImpl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShellSortImpl.swift; sourceTree = "<group>"; };
 		71CFAC1528396F63004672DB /* CombSortImpl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CombSortImpl.swift; sourceTree = "<group>"; };
-		71CFAC1728396F81004672DB /* BogoSortImpl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BogoSortImpl.swift; sourceTree = "<group>"; };
 		71CFAC1928396F9A004672DB /* StoogeSortImpl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoogeSortImpl.swift; sourceTree = "<group>"; };
 		71D4DBCA28185905001DBD0E /* Sort2App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sort2App.swift; sourceTree = "<group>"; };
 		71D4DBCB28185905001DBD0E /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -162,6 +163,7 @@
 				7120CB9C28397E410019D976 /* AudioKitEX in Frameworks */,
 				71ED4EAE2831575500880755 /* Atomics in Frameworks */,
 				7120CB9728397DDF0019D976 /* AudioKit in Frameworks */,
+				712FAC49285E2A2B0045B50A /* Algorithms in Frameworks */,
 				7189D56F2857D5DA00E2707D /* CollectionConcurrencyKit in Frameworks */,
 				7120CB9F28397E5B0019D976 /* AudioKitUI in Frameworks */,
 				7120CBA228397EE40019D976 /* SoundpipeAudioKit in Frameworks */,
@@ -299,8 +301,8 @@
 				71CFAC1128396EC3004672DB /* RadixSortImpl.swift */,
 				71CFAC1328396F32004672DB /* ShellSortImpl.swift */,
 				71CFAC1528396F63004672DB /* CombSortImpl.swift */,
-				71CFAC1728396F81004672DB /* BogoSortImpl.swift */,
 				71CFAC1928396F9A004672DB /* StoogeSortImpl.swift */,
+				711EF293285CC174001EB6AC /* BogoSortImpl.swift */,
 			);
 			path = Weird;
 			sourceTree = "<group>";
@@ -415,6 +417,7 @@
 				7120CB9E28397E5B0019D976 /* AudioKitUI */,
 				7120CBA128397EE40019D976 /* SoundpipeAudioKit */,
 				7189D56E2857D5DA00E2707D /* CollectionConcurrencyKit */,
+				712FAC48285E2A2B0045B50A /* Algorithms */,
 			);
 			productName = "Sort2 (iOS)";
 			productReference = 71D4DBD128185905001DBD0E /* Sort Visualizer.app */;
@@ -451,6 +454,7 @@
 				7120CB9A28397E410019D976 /* XCRemoteSwiftPackageReference "AudioKitEX" */,
 				7120CB9D28397E5B0019D976 /* XCRemoteSwiftPackageReference "AudioKitUI" */,
 				7120CBA028397EE40019D976 /* XCRemoteSwiftPackageReference "SoundpipeAudioKit" */,
+				712FAC47285E2A2B0045B50A /* XCRemoteSwiftPackageReference "swift-algorithms" */,
 			);
 			productRefGroup = 71D4DBD228185905001DBD0E /* Products */;
 			projectDirPath = "";
@@ -486,7 +490,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				71B55E0E28383D5C00CA74CB /* Sequence+Extensions.swift in Sources */,
-				71CFAC1828396F81004672DB /* BogoSortImpl.swift in Sources */,
 				71650A2B2842693C00A23BC2 /* CustomIconLabel.swift in Sources */,
 				71FD4A43281C1F2C00E1E6FA /* SortItem.swift in Sources */,
 				71CFABFE2839528A004672DB /* HeapSortImpl.swift in Sources */,
@@ -540,6 +543,7 @@
 				71CFAC0128396D08004672DB /* BubbleSortImpl.swift in Sources */,
 				71D4DBFF2818632F001DBD0E /* SelectionSort.swift in Sources */,
 				71D4DBFA28186310001DBD0E /* BubbleSort.swift in Sources */,
+				711EF294285CC174001EB6AC /* BogoSortImpl.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -605,7 +609,7 @@
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_ENFORCE_EXCLUSIVE_ACCESS = "debug-only";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_STRICT_CONCURRENCY = minimal;
 				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
@@ -812,6 +816,14 @@
 				kind = branch;
 			};
 		};
+		712FAC47285E2A2B0045B50A /* XCRemoteSwiftPackageReference "swift-algorithms" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/apple/swift-algorithms.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.0;
+			};
+		};
 		71D4DC2328186A0F001DBD0E /* XCRemoteSwiftPackageReference "MarkdownUI" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/gonzalezreal/MarkdownUI";
@@ -850,6 +862,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 7120CBA028397EE40019D976 /* XCRemoteSwiftPackageReference "SoundpipeAudioKit" */;
 			productName = SoundpipeAudioKit;
+		};
+		712FAC48285E2A2B0045B50A /* Algorithms */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 712FAC47285E2A2B0045B50A /* XCRemoteSwiftPackageReference "swift-algorithms" */;
+			productName = Algorithms;
 		};
 		7189D56E2857D5DA00E2707D /* CollectionConcurrencyKit */ = {
 			isa = XCSwiftPackageProductDependency;
