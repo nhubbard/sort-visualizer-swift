@@ -54,8 +54,8 @@ extension SortViewModel {
         }
         await resetColor(index: index)
       }
-      await _quickSort(left, j - 1)
-      await _quickSort(j + 1, right)
+      await _quickSort(left, j &- 1)
+      await _quickSort(j &+ 1, right)
     }
   }
   
@@ -65,6 +65,6 @@ extension SortViewModel {
     guard await enforceRunning() else {
       return
     }
-    await _quickSort(0, data.count - 1)
+    await _quickSort(0, data.count &- 1)
   }
 }

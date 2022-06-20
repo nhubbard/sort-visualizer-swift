@@ -11,7 +11,7 @@ import Atomics
 import CollectionConcurrencyKit
 
 @MainActor
-class SortViewModel: ObservableObject {
+final class SortViewModel: ObservableObject {
   var algorithm: Algorithms = .quickSort
   
   let toner = Synthesizer()
@@ -272,7 +272,7 @@ class SortViewModel: ObservableObject {
       return false
     }
     switch algorithm {
-        // Logarithmic algorithms
+      // Logarithmic algorithms
       case .quickSort:
         await quickSort()
       case .mergeSort:
@@ -289,15 +289,15 @@ class SortViewModel: ObservableObject {
             print("WARN: Merge sort left a duplicate value in the dataset!")
             for i in data.indices {
               let range = data.indices
-              if range.contains(i + 1) && range.contains(i) && data[i + 1].value == data[i].value {
-                data[i + 1].value += 1
+              if range.contains(i &+ 1) && range.contains(i) && data[i &+ 1].value == data[i].value {
+                data[i &+ 1].value &+= 1
               }
             }
           }
         }
       case .heapSort:
         await heapSort()
-        // Quadratic algorithms
+      // Quadratic algorithms
       case .bubbleSort:
         await bubbleSort()
       case .selectionSort:
@@ -312,7 +312,7 @@ class SortViewModel: ObservableObject {
         await oddEvenSort()
       case .pancakeSort:
         await pancakeSort()
-        // Weird algorithms
+      // Weird algorithms
       case .bitonicSort:
         await bitonicSort()
       case .radixSort:
@@ -322,7 +322,9 @@ class SortViewModel: ObservableObject {
       case .combSort:
         await combSort()
       case .bogoSort:
-        await bogoSort()
+        if await bogoSort() == .stopped {
+          return false
+        }
       case .stoogeSort:
         await stoogeSort()
     }

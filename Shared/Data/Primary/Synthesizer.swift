@@ -15,7 +15,7 @@ import SoundpipeAudioKit
 let floatFrequencyRange = UInt8(36).midiNoteToFrequency()...UInt8(72).midiNoteToFrequency()
 
 // A major improvement over the previous FM synthesizer!
-class Synthesizer {
+final class Synthesizer {
   private var isStarted = false
   let engine = AudioEngine()
   var currentFreq: Float = 0.0

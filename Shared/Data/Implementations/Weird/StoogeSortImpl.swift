@@ -15,7 +15,7 @@ extension SortViewModel {
       return
     }
     // Only present to ensure that users don't think the program has frozen
-    let len = end - start + 1
+    let len = end &- start &+ 1
     if len <= 1 {
       return
     } else if len == 2 {
@@ -28,9 +28,9 @@ extension SortViewModel {
       return
     }
     let len23 = Int(ceil(Double(len) * 2 / 3))
-    await _stoogeSort(start, start + len23 - 1)
-    await _stoogeSort(end - len23 + 1, end)
-    await _stoogeSort(start, start + len23 - 1)
+    await _stoogeSort(start, start &+ len23 - 1)
+    await _stoogeSort(end - len23 &+ 1, end)
+    await _stoogeSort(start, start &+ len23 - 1)
   }
   
   @MainActor

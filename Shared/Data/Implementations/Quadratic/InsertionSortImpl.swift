@@ -28,8 +28,8 @@ extension SortViewModel {
           guard await enforceRunning() else {
             return
           }
-          if await compare(firstIndex: j, secondIndex: j - 1, by: (<)) {
-            await swap(j, j - 1)
+          if await compare(firstIndex: j, secondIndex: j &- 1, by: (<)) {
+            await swap(j, j &- 1)
           }
           j--
         }

@@ -24,12 +24,12 @@ extension SortViewModel {
         guard await enforceRunning() else {
           return
         }
-        for i in stride(from: first, to: data.count - 1, by: 2) {
+        for i in stride(from: first, to: data.count &- 1, by: 2) {
           guard await enforceRunning() else {
             return
           }
-          if await compare(firstIndex: i, secondIndex: i + 1) {
-            await swap(i, i + 1)
+          if await compare(firstIndex: i, secondIndex: i &+ 1) {
+            await swap(i, i &+ 1)
             sorted = false
           }
         }

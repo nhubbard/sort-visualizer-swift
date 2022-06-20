@@ -10,7 +10,7 @@
 * [x] Make sure operations counter is updated by all algorithms
 * [ ] Implement step functionality, possibly using delay as a catalyst?
 * [ ] Write lots of tests for everything in the app
-* [ ] Set up Prettier to keep algorithm example code properly formatted
+* [ ] Set up Unibeautify to keep algorithm example code properly formatted
 * [ ] Set up a testing system that validates algorithm example code results
 
 ## Algorithms

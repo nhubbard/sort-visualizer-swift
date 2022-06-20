@@ -12,37 +12,29 @@ import CollectionConcurrencyKit
 extension SortViewModel {
   @MainActor
   @inlinable
-  func bogoSort() async {
+  func bogoSort() async -> SortStatus {
     guard await enforceRunning() else {
-      return
+      return .stopped
     }
     let values = await data.concurrentMap { $0.value }
-    var iterator = values.uniquePermutations().makeIterator()
-    var finished = false
-    while !finished {
-      var cache: [[Int]?] = []
-      for _ in (0..<64) {
-        cache.append(iterator.next())
-        await cache.concurrentForEach { [self] p in
-          if p != nil {
-            guard await enforceRunning() && !finished else { return }
-            await data.indices.concurrentForEach { [self] index in
-              guard await enforceRunning(), let pV = p![index], await getValue(index: index) != pV else { return }
-              await changeColor(index: index, color: .orange)
-              await setValue(index: index, newValue: pV)
-              await operate()
-              await delay()
-              await resetColor(index: index)
-            }
-            await delay()
-            if data == data.sorted() {
-              finished = true
-              return
-            }
-          }
-        }
-        cache.removeAll()
+    let permutations = values.uniquePermutations()
+    for p in permutations {
+      guard await enforceRunning() else { return .stopped }
+      await data.indices.concurrentForEach { [self] i in
+        guard
+          await enforceRunning(),
+          let pV = p[i],
+          await getValue(index: i) != pV else { return }
+        await changeColor(index: i, color: .orange)
+        await setValue(index: i, newValue: pV)
+        await operate()
+        await delay()
+        await resetColor(index: i)
+      }
+      if data == data.sorted() {
+        break
       }
     }
+    return data == data.sorted() ? .finished : .stopped
   }
 }

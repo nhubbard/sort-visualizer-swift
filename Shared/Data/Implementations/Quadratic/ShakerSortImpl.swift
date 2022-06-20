@@ -23,8 +23,8 @@ extension SortViewModel {
         guard await enforceRunning() else {
           return
         }
-        if await compare(firstIndex: i, secondIndex: i + 1) {
-          await swap(i, i + 1)
+        if await compare(firstIndex: i, secondIndex: i &+ 1) {
+          await swap(i, i &+ 1)
           sorted = true
         }
       }
@@ -32,13 +32,13 @@ extension SortViewModel {
         break
       }
       sorted = false
-      let sequence = 1..<(data.count - 1)
+      let sequence = 1..<(data.count &- 1)
       for j in sequence.reversed() {
         guard await enforceRunning() else {
           return
         }
-        if await compare(firstIndex: j - 1, secondIndex: j) {
-          await swap(j - 1, j)
+        if await compare(firstIndex: j &- 1, secondIndex: j) {
+          await swap(j &- 1, j)
           sorted = true
         }
       }

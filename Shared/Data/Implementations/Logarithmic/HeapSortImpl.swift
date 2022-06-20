@@ -16,8 +16,8 @@ extension SortViewModel {
     }
     let indices = data.indices
     var largest = i
-    let left = i * 2 + 1
-    let right = left + 1
+    let left = i &* 2 &+ 1
+    let right = left &+ 1
     if indices.contains(left) && indices.contains(largest) {
       let firstCompare = await compare(firstIndex: left, secondIndex: largest)
       if left < length && firstCompare {
@@ -43,8 +43,8 @@ extension SortViewModel {
       return
     }
     let length = data.count
-    var i = length / 2 - 1
-    var k = length - 1
+    var i = length / 2 &- 1
+    var k = length &- 1
     while i >= 0 {
       guard await enforceRunning() else {
         return

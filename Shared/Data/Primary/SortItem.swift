@@ -30,8 +30,8 @@ struct SortItem: Identifiable, Equatable, Comparable, Hashable {
     lhs.id == rhs.id && lhs.value == rhs.value
   }
   
-  static func fromInt(value: Int, color: Color = .white) -> SortItem {
-    SortItem(value: value, color: color)
+  static func fromInt(value: Int) -> SortItem {
+    SortItem(value: value)
   }
   
   func hash(into hasher: inout Hasher) {
@@ -41,26 +41,24 @@ struct SortItem: Identifiable, Equatable, Comparable, Hashable {
   
   /// Used to generate values at initialization, on array size change, and on recreation. Not parallelized for SortViewModel initializer.
   static func syncSequenceOf(numItems: Int = 128) -> [SortItem] {
-    let env = EnvironmentValues()
-    return (1...numItems)
+    (1...numItems)
       .map {
-        SortItem.fromInt(value: $0, color: env.colorScheme == .light ? .primary : .white)
+        SortItem.fromInt(value: $0)
       }
       .shuffled()
   }
   
   /// Used to generate values at initialization, on array size change, and on recreation. Parallelized for speed.
   static func sequenceOf(numItems: Int = 128) async -> [SortItem] {
-    let env = EnvironmentValues()
-    return await (1...numItems)
+    await (1...numItems)
       .concurrentMap {
-        SortItem.fromInt(value: $0, color: env.colorScheme == .light ? .primary : .white)
+        SortItem.fromInt(value: $0)
       }
       .shuffled()
   }
   
   var id: UUID = UUID.init()
   var value: Int
-  var color: Color
+  var color: Color = .white
   var width: CGFloat = 0
 }

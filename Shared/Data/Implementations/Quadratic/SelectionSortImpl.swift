@@ -20,7 +20,7 @@ extension SortViewModel {
         return
       }
       var key = i
-      for j in i+1..<data.count where await compare(firstIndex: key, secondIndex: j, clear: true) {
+      for j in (i &+ 1)..<(data.count) where await compare(firstIndex: key, secondIndex: j, clear: true) {
         guard await enforceRunning() else {
           return
         }

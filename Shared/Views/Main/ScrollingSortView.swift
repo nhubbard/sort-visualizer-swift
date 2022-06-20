@@ -81,7 +81,7 @@ struct ScrollingSortView: View {
                 HStack(alignment: .top, spacing: 16) {
                   // This is a really weird way to remove extra complexity.
                   // The first ForEach is [0, 1, 2, 3, 4]. This converts it to [[0, 2], [2, 4], [4, 6], [6, 8], [8, 10]].
-                  ForEach(languages[(i * 2)..<((i * 2) + 2)]) { language in
+                  ForEach(languages[(i * 2)..<((i * 2) &+ 2)]) { language in
                     LanguageView(algorithm: algorithm, language: language)
                       .frame(width: geo.size.width * 0.45, height: nil, alignment: .center)
                   }

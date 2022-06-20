@@ -20,11 +20,11 @@ extension SortViewModel {
       guard await enforceRunning() else {
         return
       }
-      if await !compare(firstIndex: i - 1, secondIndex: i) {
+      if await !compare(firstIndex: i &- 1, secondIndex: i) {
         i = j
         j++
       } else {
-        await swap(i - 1, i)
+        await swap(i &- 1, i)
         i--
         if i == 0 {
           i = j

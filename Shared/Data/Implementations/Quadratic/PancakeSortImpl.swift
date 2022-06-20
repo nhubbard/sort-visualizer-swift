@@ -58,7 +58,7 @@ extension SortViewModel {
       let maxIndex = await _maxIndex(n)
       if maxIndex != n {
         await _flip(maxIndex)
-        await _flip(n - 1)
+        await _flip(n &- 1)
       }
       n--
     }

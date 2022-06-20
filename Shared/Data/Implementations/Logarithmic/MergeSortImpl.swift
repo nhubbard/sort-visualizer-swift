@@ -7,11 +7,6 @@
 
 import Foundation
 
-enum SortStatus {
-  case finished
-  case stopped
-}
-
 extension SortViewModel {
   // Loosely based on original inspiration (github:Myphz/sortvisualizer)
   @MainActor
@@ -21,17 +16,15 @@ extension SortViewModel {
     guard await enforceRunning() else {
       return .stopped
     }
-    if start >= end - 1 {
+    if start >= end &- 1 {
       return .finished
     }
     // ~ is bitwise NOT operator; the JS version uses a unique ~~ operator for double bitwise NOT.
-    let mid = start + ~(~((end - start) / 2))
+    let mid = start &+ ~(~((end - start) / 2))
     await _mergeSort(start, mid)
     await _mergeSort(mid, end)
-    var cache = Array(repeating: data[0], count: end - start)
+    var cache = Array(repeating: data[0], count: end &- start)
     var k = mid
-    // This was previously a C-style for loop with *two* updates, written as such:
-    // for (var i = start, r = 0; i < mid; r++, i++)
     var r = 0
     for i in start..<mid {
       guard await enforceRunning() else {
@@ -59,20 +52,20 @@ extension SortViewModel {
       cache[r] = iV
       r++
     }
-    for i in 0..<(k - start) {
+    for i in 0..<(k &- start) {
       guard await enforceRunning() else {
         return .stopped
       }
-      cache[i].value = 1 + i + start
-      await setItem(index: i + start, value: cache[i])
+      cache[i].value = 1 &+ i &+ start
+      await setItem(index: i &+ start, value: cache[i])
       await operate()
-      await (0..<i + start).concurrentForEach { [self] prev in
+      await (0..<i &+ start).concurrentForEach { [self] prev in
         await changeColor(index: prev, color: .green)
       }
-      await changeColor(index: i + start, color: .red)
-      await playNote(i + start)
+      await changeColor(index: i &+ start, color: .red)
+      await playNote(i &+ start)
       await delay()
-      await resetColor(index: i + start)
+      await resetColor(index: i &+ start)
     }
     return .finished
   }
