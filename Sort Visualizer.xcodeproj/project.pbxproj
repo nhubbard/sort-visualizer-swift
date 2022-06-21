@@ -81,6 +81,7 @@
 		71F4B35028207C02006B68E6 /* SortViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71F4B34F28207C02006B68E6 /* SortViewModel.swift */; };
 		71F9C46028622C9F00159EF5 /* oddevensort.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 71F9C45F28622C9F00159EF5 /* oddevensort.bundle */; };
 		71F9C46228623A8200159EF5 /* pancakesort.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 71F9C46128623A8200159EF5 /* pancakesort.bundle */; };
+		71F9C464286261DC00159EF5 /* bitonicsort.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 71F9C463286261DC00159EF5 /* bitonicsort.bundle */; };
 		71FD4A43281C1F2C00E1E6FA /* SortItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71FD4A42281C1F2C00E1E6FA /* SortItem.swift */; };
 /* End PBXBuildFile section */
 
@@ -157,6 +158,7 @@
 		71F4B34F28207C02006B68E6 /* SortViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SortViewModel.swift; sourceTree = "<group>"; };
 		71F9C45F28622C9F00159EF5 /* oddevensort.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = oddevensort.bundle; sourceTree = "<group>"; };
 		71F9C46128623A8200159EF5 /* pancakesort.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = pancakesort.bundle; sourceTree = "<group>"; };
+		71F9C463286261DC00159EF5 /* bitonicsort.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = bitonicsort.bundle; sourceTree = "<group>"; };
 		71FD4A42281C1F2C00E1E6FA /* SortItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SortItem.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -202,6 +204,7 @@
 		71610BF82844101700A2696C /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				71F9C463286261DC00159EF5 /* bitonicsort.bundle */,
 				71F9C46128623A8200159EF5 /* pancakesort.bundle */,
 				71F9C45F28622C9F00159EF5 /* oddevensort.bundle */,
 				7180DC262850EA160059D1DB /* gnomesort.bundle */,
@@ -489,6 +492,7 @@
 				71B4C0DE284FCC9800E42DB1 /* selectionsort.bundle in Resources */,
 				7180DC272850EA160059D1DB /* gnomesort.bundle in Resources */,
 				71F9C46228623A8200159EF5 /* pancakesort.bundle in Resources */,
+				71F9C464286261DC00159EF5 /* bitonicsort.bundle in Resources */,
 				71610C0E2844213900A2696C /* quicksort.bundle in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

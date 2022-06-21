@@ -9,7 +9,7 @@ import SwiftUI
 
 struct BitonicSort: View {
   var body: some View {
-    SortView(algorithm: .bitonicSort)
+    ScrollingSortView(algorithm: .bitonicSort)
       .navigationTitle("Bitonic Sort")
   }
 }

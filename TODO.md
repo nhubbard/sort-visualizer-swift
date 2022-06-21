@@ -8,6 +8,7 @@
 * [x] Clean up any dead code from prior changes
 * [x] Make sure that stopping an in-progress sort functions as expected
 * [x] Make sure operations counter is updated by all algorithms
+* [ ] Add error to bitonic sort if the array size isn't a power of 2
 * [ ] Implement step functionality, possibly using delay as a catalyst?
 * [ ] Unit testing and UI testing.
   * I tried doing unit testing with a protocol and a separate implementation in the unit tests target, but it just... failed over and over and over again.
