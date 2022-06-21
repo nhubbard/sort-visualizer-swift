@@ -4,9 +4,7 @@ function heapSort(array) {
     heapify(array, size, i);
   }
   for (let i = size - 1; i >= 0; i--) {
-    let temp = array[0];
-    array[0] = array[i];
-    array[i] = temp;
+    [array[0], array[i]] = [array[i], array[0]];
     heapify(array, i, 0);
   }
 }
@@ -22,9 +20,7 @@ function heapify(array, size, i) {
     max = right;
   }
   if (max != i) {
-    let temp = array[i];
-    array[i] = array[max];
-    array[max] = temp;
+    [array[i], array[max]] = [array[max], array[i]];
     heapify(array, size, max);
   }
 }

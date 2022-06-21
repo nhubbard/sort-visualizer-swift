@@ -2,9 +2,7 @@ function bubbleSort(arr, n) {
   for (let c = 0; c < n - 1; c++) {
     for (let d = 0; d < n - c - 1; d++) {
       if (arr[d] > arr[d + 1]) {
-        let temp = arr[d];
-        arr[d] = arr[d + 1];
-        arr[d + 1] = temp;
+        [arr[d], arr[d + 1]] = [arr[d + 1], arr[d]];
       }
     }
   }

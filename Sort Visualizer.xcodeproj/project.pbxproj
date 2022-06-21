@@ -79,6 +79,8 @@
 		71ED4EAE2831575500880755 /* Atomics in Frameworks */ = {isa = PBXBuildFile; productRef = 71ED4EAD2831575500880755 /* Atomics */; };
 		71F38EB82819B42C0085BAAA /* SortView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71F38EB72819B42C0085BAAA /* SortView.swift */; };
 		71F4B35028207C02006B68E6 /* SortViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71F4B34F28207C02006B68E6 /* SortViewModel.swift */; };
+		71F9C46028622C9F00159EF5 /* oddevensort.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 71F9C45F28622C9F00159EF5 /* oddevensort.bundle */; };
+		71F9C46228623A8200159EF5 /* pancakesort.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 71F9C46128623A8200159EF5 /* pancakesort.bundle */; };
 		71FD4A43281C1F2C00E1E6FA /* SortItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71FD4A42281C1F2C00E1E6FA /* SortItem.swift */; };
 /* End PBXBuildFile section */
 
@@ -153,6 +155,8 @@
 		71E6B239282033D300672D55 /* Sort Visualizer--iOS--Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Sort Visualizer--iOS--Info.plist"; sourceTree = "<group>"; };
 		71F38EB72819B42C0085BAAA /* SortView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SortView.swift; sourceTree = "<group>"; };
 		71F4B34F28207C02006B68E6 /* SortViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SortViewModel.swift; sourceTree = "<group>"; };
+		71F9C45F28622C9F00159EF5 /* oddevensort.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = oddevensort.bundle; sourceTree = "<group>"; };
+		71F9C46128623A8200159EF5 /* pancakesort.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = pancakesort.bundle; sourceTree = "<group>"; };
 		71FD4A42281C1F2C00E1E6FA /* SortItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SortItem.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -198,6 +202,8 @@
 		71610BF82844101700A2696C /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				71F9C46128623A8200159EF5 /* pancakesort.bundle */,
+				71F9C45F28622C9F00159EF5 /* oddevensort.bundle */,
 				7180DC262850EA160059D1DB /* gnomesort.bundle */,
 				71B4C0DD284FCC9800E42DB1 /* selectionsort.bundle */,
 				71610C0D2844213900A2696C /* quicksort.bundle */,
@@ -216,7 +222,6 @@
 			children = (
 				71650A2A2842693C00A23BC2 /* CustomIconLabel.swift */,
 				71650A2D28426C5700A23BC2 /* Category.swift */,
-				71650A2F28426CAF00A23BC2 /* AlgorithmEntry.swift */,
 				71650A31284272FD00A23BC2 /* RandomizingHeader.swift */,
 			);
 			path = Utilities;
@@ -252,6 +257,7 @@
 		71650A352842923800A23BC2 /* Primary */ = {
 			isa = PBXGroup;
 			children = (
+				71650A2F28426CAF00A23BC2 /* AlgorithmEntry.swift */,
 				71FD4A42281C1F2C00E1E6FA /* SortItem.swift */,
 				71F4B34F28207C02006B68E6 /* SortViewModel.swift */,
 				716A5CE02821AB0D008B792A /* Algorithms.swift */,
@@ -476,11 +482,13 @@
 				71BCE0FE2847B8B6007C8254 /* mergesort.bundle in Resources */,
 				716D2992284FBEBD00772CBD /* bubblesort.bundle in Resources */,
 				7156FB742850CF9E00A75F7F /* insertionsort.bundle in Resources */,
+				71F9C46028622C9F00159EF5 /* oddevensort.bundle in Resources */,
 				71BCE1002847D963007C8254 /* heapsort.bundle in Resources */,
 				71D4DBDE28185905001DBD0E /* Assets.xcassets in Resources */,
 				7180DC2B285116400059D1DB /* shakersort.bundle in Resources */,
 				71B4C0DE284FCC9800E42DB1 /* selectionsort.bundle in Resources */,
 				7180DC272850EA160059D1DB /* gnomesort.bundle in Resources */,
+				71F9C46228623A8200159EF5 /* pancakesort.bundle in Resources */,
 				71610C0E2844213900A2696C /* quicksort.bundle in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

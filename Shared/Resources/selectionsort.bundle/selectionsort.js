@@ -7,9 +7,7 @@ function selectionSort(arr) {
         minIdx = j;
       }
     }
-    let temp = arr[minIdx];
-    arr[minIdx] = arr[i];
-    arr[i] = temp;
+    [arr[minIdx], arr[i]] = [arr[i], arr[minIdx]];
   }
 }
 

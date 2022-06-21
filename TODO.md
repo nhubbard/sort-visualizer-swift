@@ -67,14 +67,18 @@
     * [x] Insertion Sort
     * [x] Gnome Sort
     * [x] Shaker Sort
-    * [ ] Odd-Even Sort
-    * [ ] Pancake Sort
+    * [x] Odd-Even Sort
+    * [x] Pancake Sort
     * [ ] Bitonic Sort
     * [ ] Radix Sort
     * [ ] Shell Sort
     * [ ] Comb Sort
     * [ ] Bogo Sort
     * [ ] Stooge Sort
+  * [ ] Implementation consistency
+    * [ ] C/C++: Rename sort functions to "sort", and arguments to arr and n
+    * [ ] C#: Use "var" instead of concrete built-in types
+    * [ ] Ruby: Switch simple incrementing while loops to for loops
 * [ ] String resources/localization for all strings throughout the app.
 * [ ] Settings panel that allows you to change various defaults, like the sound tuning, note range, and more settings.
 * [ ] Replace homepage content with Wikipedia text for "Sorting algorithm". Only necessary for localization purposes.

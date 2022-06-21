@@ -8,9 +8,7 @@ function gnomeSort(arr) {
     if (arr[index] >= arr[index - 1]) {
       index++;
     } else {
-      let swapTemp = arr[index];
-      arr[index] = arr[index - 1];
-      arr[index - 1] = swapTemp;
+      [arr[index], arr[index - 1]] = [arr[index - 1], arr[index]];
       index--;
     }
   }

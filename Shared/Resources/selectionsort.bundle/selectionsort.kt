@@ -7,9 +7,7 @@ fun selectionSort(arr: Array<Int>) {
         minIdx = j
       }
     }
-    val temp = arr[minIdx]
-    arr[minIdx] = arr[i]
-    arr[i] = temp
+    arr[minIdx] = arr[i].also { arr[i] = arr[minIdx] }
   }
 }
 

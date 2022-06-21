@@ -7,9 +7,7 @@ function shakerSort(arr) {
     swapped = false;
     for (let i = start; i < end; i++) {
       if (arr[i] > arr[i + 1]) {
-        let temp = arr[i];
-        arr[i] = arr[i + 1];
-        arr[i + 1] = temp;
+        [arr[i], arr[i + 1]] = [arr[i + 1], arr[i]];
         swapped = true;
       }
     }
@@ -20,9 +18,7 @@ function shakerSort(arr) {
     end--;
     for (let i = end - 1; i >= start; i--) {
       if (arr[i] > arr[i + 1]) {
-        let temp = arr[i];
-        arr[i] = arr[i + 1];
-        arr[i + 1] = temp;
+        [arr[i], arr[i + 1]] = [arr[i + 1], arr[i]];
         swapped = true;
       }
     }

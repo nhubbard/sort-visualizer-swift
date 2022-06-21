@@ -7,9 +7,7 @@ fun shakerSort(arr: Array<Int>) {
     swapped = false
     for (i in start until end) {
       if (arr[i] > arr[i + 1]) {
-        val temp = arr[i]
-        arr[i] = arr[i + 1]
-        arr[i + 1] = temp
+        arr[i] = arr[i + 1].also { arr[i + 1] = arr[i] }
         swapped = true
       }
     }
@@ -20,9 +18,7 @@ fun shakerSort(arr: Array<Int>) {
     end--
     for (i in (end - 1) downTo start) {
       if (arr[i] > arr[i + 1]) {
-        val temp = arr[i]
-        arr[i] = arr[i + 1]
-        arr[i + 1] = temp
+        arr[i] = arr[i + 1].also { arr[i + 1] = arr[i] }
         swapped = true
       }
     }

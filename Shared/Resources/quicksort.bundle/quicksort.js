@@ -12,9 +12,7 @@ function quickSort(array, start, end) {
     while (array[start] <= pivot) start++;
     while (array[end] > pivot) end--;
     if (start < end) {
-      var temp = array[start];
-      array[start] = array[end];
-      array[end] = temp;
+      [array[start], array[end]] = [array[end], array[start]];
     }
   }
   quickSort(array, rStart, start - 1);

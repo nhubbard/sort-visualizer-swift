@@ -9,7 +9,7 @@ import SwiftUI
 
 struct PancakeSort: View {
   var body: some View {
-    SortView(algorithm: .pancakeSort)
+    ScrollingSortView(algorithm: .pancakeSort)
       .navigationTitle("Pancake Sort")
   }
 }

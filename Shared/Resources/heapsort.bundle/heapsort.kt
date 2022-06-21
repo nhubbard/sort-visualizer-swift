@@ -9,9 +9,7 @@ fun heapify(arr: Array<Int>, n: Int, i: Int) {
 		largest = r
 	}
 	if (largest != i) {
-		var temp = arr[i]
-		arr[i] = arr[largest]
-		arr[largest] = temp
+    arr[i] = arr[largest].also { arr[largest] = arr[i] }
 		heapify(arr, n, largest)
 	}
 }
@@ -22,9 +20,7 @@ fun sort(arr: Array<Int>) {
 		heapify(arr, n, i)
 	}
 	for (i in (n - 1) downTo 0) {
-		var temp = arr[0]
-		arr[0] = arr[i]
-		arr[i] = temp
+    arr[0] = arr[i].also { arr[i] = arr[0] }
 		heapify(arr, i, 0)
 	}
 }

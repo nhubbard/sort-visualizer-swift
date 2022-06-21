@@ -9,7 +9,7 @@ import SwiftUI
 
 struct OddEvenSort: View {
   var body: some View {
-    SortView(algorithm: .oddEvenSort)
+    ScrollingSortView(algorithm: .oddEvenSort)
       .navigationTitle("Odd-Even Sort")
   }
 }

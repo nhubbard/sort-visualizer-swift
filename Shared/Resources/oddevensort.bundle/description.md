@@ -1,0 +1,7 @@
+*From Wikipedia, the free encyclopedia*
+
+Odd-even sort or odd-even transposition sort (also known as brick sort or parity sort) is a relatively simple sorting algorithm, developed originally for use on parallel processors with local interconnections. It is a comparison sort related to bubble sort, with which it shares many characteristics. It functions by comparing all odd/even indexed pairs of adjacent elements in the list and, if a pair is in the wrong order (the first is larger than the second) the elements are switched. The next step repeats this for even/odd indexed pairs (of adjacent elements). Then it alternates between odd/even and even/odd steps until the list is sorted.
+
+On parallel processors, with one value per processor and only local left-right neighbor connections, the processors all concurrently do a compare-exchange operation with their neighbors, alternating between odd-even and even-odd pairings. This algorithm was originally presented, and shown to be efficient on such processors, by [Nico Habermann](https://en.wikipedia.org/wiki/Nico_Habermann) in 1972.
+
+The algorithm extends efficiently to the case of multiple items per processor. In the Baudet-Stevenson odd-even merge-splitting algorithm, each processor sorts its own sublist at each step, using any efficient sort algorithm, and then performs a merge splitting, or transposition-merge, operation with its neighbor, with neighbor pairing alternating between odd-even and even-odd on each step.

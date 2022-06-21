@@ -1,6 +1,7 @@
 #!/usr/bin/env zsh
 name=$1
 folder="$name.bundle"
+mkdir "$folder"
 echo "Scaffolding $name.bundle..."
 # Copy Git ignore file
 cp template/.gitignore $folder/.gitignore

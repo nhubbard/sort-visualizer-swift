@@ -4,7 +4,7 @@ from pygments import highlight
 from pygments.lexers import get_lexer_for_filename
 from pygments.formatter import Formatter
 
-algorithms = ["quicksort", "mergesort", "heapsort", "bubblesort", "selectionsort", "insertionsort", "gnomesort", "shakersort"]
+algorithms = ["quicksort", "mergesort", "heapsort", "bubblesort", "selectionsort", "insertionsort", "gnomesort", "shakersort", "oddevensort", "pancakesort"]
 extensions = ["c", "cpp", "cs", "go", "java", "js", "kt", "py", "rb", "swift"]
 
 class JsonFormatter(Formatter):

@@ -8,9 +8,7 @@ fun gnomeSort(arr: Array<Int>) {
     if (arr[index] >= arr[index - 1]) {
       index++
     } else {
-      val swapTemp = arr[index]
-      arr[index] = arr[index - 1]
-      arr[index - 1] = swapTemp
+      arr[index] = arr[index - 1].also { arr[index - 1] = arr[index] }
       index--
     }
   }
