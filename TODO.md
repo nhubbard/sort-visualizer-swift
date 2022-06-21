@@ -9,7 +9,8 @@
 * [x] Make sure that stopping an in-progress sort functions as expected
 * [x] Make sure operations counter is updated by all algorithms
 * [ ] Implement step functionality, possibly using delay as a catalyst?
-* [ ] Write lots of tests for everything in the app
+* [ ] Unit testing and UI testing.
+  * I tried doing unit testing with a protocol and a separate implementation in the unit tests target, but it just... failed over and over and over again.
 * [ ] Set up Unibeautify to keep algorithm example code properly formatted
 * [ ] Set up a testing system that validates algorithm example code results
 
@@ -44,7 +45,7 @@
 
 * [x] Replace custom implementation with AudioKit
 * [x] Wire up audio capabilities in all operations
-* [ ] Start up and shut down the synthesizer automatically to prevent popping and other audio weirdness∑
+* [x] Start up and shut down the synthesizer automatically to prevent popping and other audio weirdness
 
 ## User Interface
 
@@ -52,7 +53,7 @@
 * [x] Add warning to Bogo Sort
 * [x] Add transparency to Settings panel
 * [x] Fix jumping on Scrolling Sort View
-  * The issue was the LazyVGrid. Replacing it with a really ugly VStack+HStack combo eliminated the project.
+  * The issue was the LazyVGrid. Replacing it with a really ugly VStack+HStack combo eliminated the problem.
 * [ ] *Big project:* Enhance sort algorithm pages with descriptions of algorithms, big-O notation values, and implementation code for various languages
   * [x] Create initial concept
   * [x] Implement description
@@ -85,7 +86,7 @@
 * [ ] Regex literals, regex builders, and other enhancements!
   * Praise be to the Apple gods! They must have read my mind with all of the annoying frustrations I've been dealing with...
 * [ ] Swift Charts for SwiftUI 4
-  * Could we replace our custom grid type, while magically introducing animations? We'll see...
+  * Could we replace our custom sorting rectangles implementation, while magically introducing animations? We'll see...
 * [ ] Navigation API for SwiftUI 4
   * I will not implement this until I retarget the app to iPadOS 16/macOS Ventura, since the old navigation components are deprecated in these releases.
 
@@ -100,8 +101,6 @@
 * [ ] Rewrite selected packages, since they haven't been frequently updated and will probably break in Swift 5.7/SwiftUI 4
   * [x] CollectionConcurrencyKit
   * [ ] MarkdownUI
-* [ ] Allow for data collection for ensuring that algorithms always finish sorting correctly?
-  * App tracking transparency, server spinups, data collection apparatus, etc. are going to be difficult. That's why this is a far-out idea.
 
 ## BizDev
 
