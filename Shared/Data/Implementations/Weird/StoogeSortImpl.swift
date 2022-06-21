@@ -19,10 +19,10 @@ extension SortViewModel {
     if len <= 1 {
       return
     } else if len == 2 {
-      guard await getValue(index: start) != nil, await getValue(index: end) != nil else {
+      guard await getValue(start) != nil, await getValue(end) != nil else {
         return
       }
-      if await compare(firstIndex: start, secondIndex: end, by: (>)) {
+      if await compare(start, end, by: (>)) {
         await swap(start, end)
       }
       return

@@ -24,9 +24,9 @@ extension SortViewModel {
         guard
           await enforceRunning(),
           let pV = p[i],
-          await getValue(index: i) != pV else { return }
+          await getValue(i) != pV else { return }
         await changeColor(index: i, color: .orange)
-        await setValue(index: i, newValue: pV)
+        await setValue(i, pV)
         await operate()
         await delay()
         await resetColor(index: i)

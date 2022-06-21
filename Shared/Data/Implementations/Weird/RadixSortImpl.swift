@@ -52,7 +52,7 @@ extension SortViewModel {
           }
           var newItem = item
           newItem.id = UUID.init()
-          await setItem(index: counter, value: newItem)
+          await setItem(counter, newItem)
           await operate()
           await playNote(counter)
           await changeColor(index: counter, color: color)

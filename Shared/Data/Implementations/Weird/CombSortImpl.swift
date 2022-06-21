@@ -32,7 +32,7 @@ extension SortViewModel {
           return
         }
         let sm = gap &+ i
-        if await compare(firstIndex: i, secondIndex: sm) {
+        if await compare(i, sm) {
           await swap(i, sm)
           sorted = false
         }

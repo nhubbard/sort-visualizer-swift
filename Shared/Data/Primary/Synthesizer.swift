@@ -17,13 +17,17 @@ let floatFrequencyRange = UInt8(36).midiNoteToFrequency()...UInt8(72).midiNoteTo
 // A major improvement over the previous FM synthesizer!
 final class Synthesizer {
   private var isStarted = false
-  let engine = AudioEngine()
-  var currentFreq: Float = 0.0
-  var osc: Oscillator
-  var env: AmplitudeEnvelope
-  var fader: Fader
+  private let engine = AudioEngine()
+  private var currentFreq: Float = 0.0
+  private var osc: Oscillator
+  private var env: AmplitudeEnvelope
+  private var fader: Fader
   
-  init() {
+  /**
+   * Create the synthesizer.
+   * - Parameter autoStart: Automatically attempt to start the synthesizer on initialization.
+   */
+  init(autoStart: Bool = false) {
     osc = Oscillator()
     env = AmplitudeEnvelope(osc)
     fader = Fader(env)
@@ -35,24 +39,42 @@ final class Synthesizer {
     env.decayDuration = 0.5
     env.sustainLevel = 0.5
     env.releaseDuration = 0.5
-    // Start it automatically.
+    // Start it automatically, if enabled.
+    if autoStart {
+      Task { [self] in
+        await self.start()
+      }
+    }
+  }
+  
+  func start() async -> Result<Bool, Error> {
+    guard !isStarted else {
+      print("Engine already running.")
+      return .success(true)
+    }
     osc.start()
     do {
       try engine.start()
       isStarted = true
+      return .success(true)
     } catch let err {
       print("Failed to start audio engine. Error: \(err)")
+      return .failure(err)
     }
+  }
+  
+  func shutdown() async {
+    guard isStarted else { return }
+    osc.stop()
+    engine.stop()
   }
   
   func playNote(value: Int, range: ClosedRange<Int>, time: Float) async {
     // Cannot be replaced with await enforceRunning(); the Synthesizer class isn't an extension of the SortViewModel, and I'm not putting an instance of SortViewModel into the parameters.
-    guard !Task.isCancelled else {
-      return
-    }
-    // Only play the note if the system is started correctly.
-    guard isStarted else {
-      print("Refusing to play note; engine did not successfully start.")
+    guard !Task.isCancelled && isStarted else {
+      if !isStarted {
+        print("Refusing to play note; engine did not successfully start.")
+      }
       return
     }
     // Convert the index to the frequency within the range of C1 to C5.
@@ -68,10 +90,5 @@ final class Synthesizer {
     try? await Task.sleep(nanoseconds: delay)
     // Stop playing the note.
     env.closeGate()
-  }
-  
-  func shutdown() async {
-    osc.stop()
-    engine.stop()
   }
 }

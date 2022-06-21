@@ -19,13 +19,13 @@ extension SortViewModel {
     let left = i &* 2 &+ 1
     let right = left &+ 1
     if indices.contains(left) && indices.contains(largest) {
-      let firstCompare = await compare(firstIndex: left, secondIndex: largest)
+      let firstCompare = await compare(left, largest)
       if left < length && firstCompare {
         largest = left
       }
     }
     if indices.contains(right) && indices.contains(largest) {
-      let secondCompare = await compare(firstIndex: right, secondIndex: largest)
+      let secondCompare = await compare(right, largest)
       if right < length && secondCompare {
         largest = right
       }

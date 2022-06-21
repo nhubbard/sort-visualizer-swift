@@ -26,7 +26,7 @@ extension SortViewModel {
         guard await enforceRunning() else {
           return
         }
-        while await compare(firstIndex: pivot, secondIndex: i) && i < j {
+        while await compare(pivot, i) && i < j {
           guard await enforceRunning() else {
             return
           }
@@ -34,7 +34,7 @@ extension SortViewModel {
           i++
           await changeColor(index: i, color: .green)
         }
-        while await !compare(firstIndex: pivot, secondIndex: j) {
+        while await !compare(pivot, j) {
           guard await enforceRunning() else {
             return
           }
@@ -60,7 +60,7 @@ extension SortViewModel {
   }
   
   @MainActor
-  @inlinable
+  @inline(__always)
   func quickSort() async {
     guard await enforceRunning() else {
       return

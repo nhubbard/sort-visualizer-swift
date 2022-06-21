@@ -23,7 +23,7 @@ extension SortViewModel {
         guard await enforceRunning() else {
           return
         }
-        if await compare(firstIndex: i, secondIndex: i &+ 1) {
+        if await compare(i, i &+ 1) {
           await swap(i, i &+ 1)
           sorted = true
         }
@@ -37,7 +37,7 @@ extension SortViewModel {
         guard await enforceRunning() else {
           return
         }
-        if await compare(firstIndex: j &- 1, secondIndex: j) {
+        if await compare(j &- 1, j) {
           await swap(j &- 1, j)
           sorted = true
         }

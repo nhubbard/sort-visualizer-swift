@@ -28,7 +28,7 @@ extension SortViewModel {
           guard await enforceRunning() else {
             return
           }
-          if await compare(firstIndex: i, secondIndex: i &+ 1) {
+          if await compare(i, i &+ 1) {
             await swap(i, i &+ 1)
             sorted = false
           }

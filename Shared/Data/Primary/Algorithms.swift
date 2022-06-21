@@ -29,4 +29,10 @@ enum Algorithms: String, Identifiable, CaseIterable {
   case stoogeSort = "stoogesort"
   
   var id: Self { self }
+  var sizeRange: ClosedRange<Float> {
+    self == .bogoSort ? 4.0...16.0 : 16.0...512.0
+  }
+  var defaultSize: Int {
+    self == .bogoSort ? 12 : 256
+  }
 }

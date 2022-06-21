@@ -8,75 +8,45 @@
 import Foundation
 
 extension SortViewModel {
-  // Loosely based on original inspiration (github:Myphz/sortvisualizer)
   @MainActor
-  @discardableResult
   @inlinable
-  func _mergeSort(_ start: Int, _ end: Int) async -> SortStatus {
-    guard await enforceRunning() else {
-      return .stopped
-    }
-    if start >= end &- 1 {
-      return .finished
-    }
-    // ~ is bitwise NOT operator; the JS version uses a unique ~~ operator for double bitwise NOT.
-    let mid = start &+ ~(~((end - start) / 2))
-    await _mergeSort(start, mid)
-    await _mergeSort(mid, end)
-    var cache = Array(repeating: data[0], count: end &- start)
-    var k = mid
-    var r = 0
-    for i in start..<mid {
-      guard await enforceRunning() else {
-        return .stopped
-      }
-      guard let kVal = await getValue(index: k),
-            let iVal = await getValue(index: i) else {
-        continue
-      }
-      while k < end && kVal < iVal {
-        guard await enforceRunning() else {
-          return .stopped
+  func _merge(_ s: Int, _ m: Int, _ end: Int) async {
+    var start = s
+    var mid = m
+    var start2 = mid &+ 1
+    guard await compare(mid, start2, by: (>)) else { return }
+    while start <= mid && start2 <= end {
+      if await compare(start, start2, by: (<=)) {
+        start++
+      } else {
+        guard let value = await getItem(start2) else { return }
+        var index = start2
+        while index != start {
+          await swap(index, index &- 1)
+          index--
         }
-        guard let kV = await getItem(index: k) else {
-          return .stopped
-        }
-        cache[r] = kV
-        cache[r].id = UUID()
-        r++
-        k++
+        await setItem(start, value)
+        start++
+        mid++
+        start2++
       }
-      guard let iV = await getItem(index: i) else {
-        return .stopped
-      }
-      cache[r] = iV
-      r++
     }
-    for i in 0..<(k &- start) {
-      guard await enforceRunning() else {
-        return .stopped
-      }
-      cache[i].value = 1 &+ i &+ start
-      await setItem(index: i &+ start, value: cache[i])
-      await operate()
-      await (0..<i &+ start).concurrentForEach { [self] prev in
-        await changeColor(index: prev, color: .green)
-      }
-      await changeColor(index: i &+ start, color: .red)
-      await playNote(i &+ start)
-      await delay()
-      await resetColor(index: i &+ start)
-    }
-    return .finished
   }
   
   @MainActor
-  @discardableResult
   @inlinable
-  func mergeSort() async -> SortStatus {
-    guard await enforceRunning() else {
-      return .stopped
+  func _mergeSort(_ left: Int, _ right: Int) async {
+    if left < right {
+      let mid = (left &+ right) / 2
+      await _mergeSort(left, mid)
+      await _mergeSort(mid &+ 1, right)
+      await _merge(left, mid, right)
     }
-    return await _mergeSort(0, data.count)
+  }
+  
+  @MainActor
+  @inline(__always)
+  func mergeSort() async {
+    await _mergeSort(0, data.count - 1)
   }
 }

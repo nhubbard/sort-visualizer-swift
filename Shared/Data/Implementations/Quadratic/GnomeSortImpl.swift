@@ -20,7 +20,7 @@ extension SortViewModel {
       guard await enforceRunning() else {
         return
       }
-      if await !compare(firstIndex: i &- 1, secondIndex: i) {
+      if await !compare(i &- 1, i) {
         i = j
         j++
       } else {

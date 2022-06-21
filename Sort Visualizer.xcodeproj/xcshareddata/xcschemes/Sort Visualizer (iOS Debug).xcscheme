@@ -38,6 +38,16 @@
                ReferencedContainer = "container:Sort Visualizer.xcodeproj">
             </BuildableReference>
          </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "71619A4D2860DDB700CCA31C"
+               BuildableName = "SortVisualizerUnitTests.xctest"
+               BlueprintName = "SortVisualizerUnitTests"
+               ReferencedContainer = "container:Sort Visualizer.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction

@@ -10,6 +10,9 @@ struct SortView: View {
   var algorithm: Algorithms
   @StateObject var state: SortViewModel = SortViewModel()
   @State private var showStepPopover: Bool = false
+  @State private var soundDisabled: Bool = false
+  @State private var showSoundError: Bool = false
+  @State private var soundErrorText: String = ""
   
   var body: some View {
     ZStack {
@@ -32,7 +35,11 @@ struct SortView: View {
             // Sound toggle
             Toggle(isOn: $state.sound) {
               Label("Sound", systemImage: "speaker.wave.2")
-            }.frame(maxWidth: 150).toggleStyle(.switch)
+            }
+            .frame(maxWidth: 150)
+            .toggleStyle(.switch)
+            .disabled(soundDisabled)
+            .onChange(of: state.sound, perform: onSound)
           }.padding(.horizontal, 20)
           // Reset and Step buttons
           HStack(spacing: 10) {
@@ -61,10 +68,10 @@ struct SortView: View {
           // Array Size slider
           HStack(spacing: 10) {
             Text("Array Size")
-            Slider(value: $state.arraySizeBacking, in: 16...512, step: 2)
+            Slider(value: $state.arraySizeBacking, in: algorithm.sizeRange, step: 2)
               .onChange(of: state.arraySizeBacking, perform: onArraySizeChange)
               .frame(maxWidth: 192)
-            Text(String(format: "%d", state.arraySize.wrappedValue))
+            Text(String(format: "%d", Int(state.arraySizeBacking)))
               .foregroundColor(.blue)
           }
           // Operations counter
@@ -81,12 +88,15 @@ struct SortView: View {
       Button("Accept", role: .cancel, action: onBogoAccept)
       Button("Decline", role: .destructive, action: onBogoDecline)
     }, message: {
-      Text("Bogo sort will likely never finish sorting.\n\nThis is always true, even on very fast systems with a zero second delay.\n\nIf you leave it running, it will consume system resources, including significant battery life, for a very long time.\n\nAdditionally, if you are sensitive to rapidly strobing lights, bogo sort may induce seizures.\n\nIf you wish to continue, press the Accept button; if you wish to stop the sorting, press the Decline button.")
+      Text("Bogo sort will take an insanely long time to finish sorting on any array with more than 12 items.\n\nThis is always true, even on very fast systems with a zero second delay.\n\nIf you leave it running, it will consume system resources, including significant battery life, for a very long time.\n\nAdditionally, if you are sensitive to rapidly strobing lights, running bogo sort with a delay of less than 1 ms may induce seizures.\n\nIf you wish to continue, press the Accept button; if you wish to stop the sorting, press the Decline button.")
+    }).alert("Sound Unavailable", isPresented: $showSoundError, actions: {
+      Button("OK", role: .cancel, action: onSoundErrorAccept)
+    }, message: {
+      Text("Sound is unavailable at this time because the Audio Engine returned \(soundErrorText != "" ? "the following error during startup: \(soundErrorText)" : "an unknown error during startup.")\n\nSound will not be available until the app is restarted and/or any audio-related issue is resolved.")
     })
   }
   
   func onRunning(newValue: Bool) {
-    // TODO: Start and stop the Synthesizer? Might prevent the occasional popping noise.
     if newValue {
       if algorithm == .bogoSort && !state.bogoSortAccepted {
         state.showBogoSortWarning = true
@@ -100,6 +110,17 @@ struct SortView: View {
     } else {
       if let task = state.sortTaskRef {
         task.cancel()
+      }
+    }
+  }
+  
+  func onSound(newValue: Bool) {
+    if newValue {
+      Task { [self] in
+        if case .failure(let error) = await state.toner.start() {
+          soundErrorText = error.localizedDescription
+          showSoundError = true
+        }
       }
     }
   }
@@ -149,6 +170,12 @@ struct SortView: View {
     state.showBogoSortWarning = false
     state.running = false
     state.showIncompleteWarning = false
+  }
+  
+  func onSoundErrorAccept() {
+    state.sound.toggle()
+    showSoundError = false
+    soundDisabled = true
   }
   
   func onRender() {
