@@ -1,15 +1,16 @@
 #include <cstdio>
 
-int items[10] = {35, 95, 74, 71, 72, 30, 96, 53, 9, 0};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
+                 90, 69, 51, 81, 68, 83, 32, 56};
 
-void printList(int items[], int size) {
-  for (int i = 0; i < size; i++) {
+void printList(int arr[], int n) {
+  for (int i = 0; i < n; i++) {
     if (i == 0) {
-      printf("[%d, ", items[i]);
-    } else if (i != size - 1) {
-      printf("%d, ", items[i]);
+      printf("[%d, ", arr[i]);
+    } else if (i != n - 1) {
+      printf("%d, ", arr[i]);
     } else {
-      printf("%d]", items[i]);
+      printf("%d]", arr[i]);
     }
   }
 }
@@ -48,19 +49,19 @@ void merge(int *array, int l, int m, int r) {
   }
 }
 
-void mergeSort(int *array, int l, int r) {
+void sort(int *array, int l, int r) {
   int m;
   if (l < r) {
     int m = l + (r - l) / 2;
-    mergeSort(array, l, m);
-    mergeSort(array, m + 1, r);
+    sort(array, l, m);
+    sort(array, m + 1, r);
     merge(array, l, m, r);
   }
 }
 
 int main(int argc, char *argv[]) {
-  int size = sizeof(items) / sizeof(items[0]);
-  mergeSort(items, 0, size);
-  printList(items, size);
+  int size = sizeof(array) / sizeof(array[0]);
+  sort(array, 0, size - 1);
+  printList(array, size);
   return 0;
 }

@@ -1,4 +1,4 @@
-fun shakerSort(arr: Array<Int>) {
+fun sort(arr: Array<Int>) {
   val n = arr.size
   var swapped = true
   var start = 0
@@ -27,7 +27,8 @@ fun shakerSort(arr: Array<Int>) {
 }
 
 fun main() {
-  var items = arrayOf<Int>(35, 95, 74, 71, 72, 30, 96, 53, 9, 0)
-  shakerSort(items)
-  println("[%s]".format(items.joinToString(", ")))
+  var array = arrayOf<Int>(0, 39, 21, 62, 91, 77, 14, 23,
+    90, 69, 51, 81, 68, 83, 32, 56)
+  sort(array)
+  println("[%s]".format(array.joinToString(", ")))
 }

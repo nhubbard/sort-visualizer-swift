@@ -4,7 +4,8 @@ import (
   "fmt"
 )
 
-func bubbleSort(arr []int, n int) []int {
+func sort(arr []int) []int {
+  n := len(arr)
   for c := 0; c < n - 1; c++ {
     for d := 0; d < n - c - 1; d++ {
       if arr[d] > arr[d + 1] {
@@ -16,6 +17,7 @@ func bubbleSort(arr []int, n int) []int {
 }
 
 func main() {
-  items := []int{35, 95, 74, 71, 72, 30, 96, 53, 9, 0}
-  fmt.Println(bubbleSort(items, len(items)))
+  array := []int{0, 39, 21, 62, 91, 77, 14, 23,
+    90, 69, 51, 81, 68, 83, 32, 56}
+  fmt.Println(sort(array))
 }

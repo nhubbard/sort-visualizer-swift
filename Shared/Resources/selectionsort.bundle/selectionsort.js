@@ -1,4 +1,4 @@
-function selectionSort(arr) {
+function sort(arr) {
   let n = array.length;
   for (let i = 0; i < n - 1; i++) {
     let minIdx = i;
@@ -11,6 +11,7 @@ function selectionSort(arr) {
   }
 }
 
-var array = [35, 95, 74, 71, 72, 30, 96, 53, 9, 0];
-selectionSort(array);
-console.log(array);
+var array = [0, 39, 21, 62, 91, 77, 14, 23,
+  90, 69, 51, 81, 68, 83, 32, 56];
+sort(array);
+console.log("[" + array.join(", ") + "]");

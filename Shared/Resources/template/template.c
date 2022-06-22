@@ -1,7 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int items[10] = {35, 95, 74, 71, 72, 30, 96, 53, 9, 0};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
+                 90, 69, 51, 81, 68, 83, 32, 56};
 
 void swap(int *a, int *b) {
   int t = *a;
@@ -21,11 +22,13 @@ void printList(int items[], int size) {
   }
 }
 
-/* TODO: Insert C algorithm implementation here. */
+void sort(int arr[], int n) {
+  /* TODO: Insert C algorithm implementation here. */
+}
 
 int main(int argc, char *argv[]) {
-  int size = sizeof(items) / sizeof(items[0]);
-  sort(items, size);
-  printList(items, size);
+  int size = sizeof(array) / sizeof(array[0]);
+  sort(array, size);
+  printList(array, size);
   return 0;
 }

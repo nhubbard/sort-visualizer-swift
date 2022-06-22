@@ -1,12 +1,3 @@
-def quick_sort(array, first, last)
-  if first < last
-    j = partition(array, first, last)
-    quick_sort(array, first, j-1)
-    quick_sort(array, j+1, last)
-  end
-  return array
-end
-
 def partition(array, first, last)
   pivot = array[last]
   pIndex = first
@@ -22,6 +13,20 @@ def partition(array, first, last)
   return pIndex
 end
 
-items = [35, 95, 74, 71, 72, 30, 96, 53, 9, 0]
-quick_sort(items, 0, items.length() - 1)
-p items
+def quick_sort(array, first, last)
+  if first < last
+    j = partition(array, first, last)
+    quick_sort(array, first, j-1)
+    quick_sort(array, j+1, last)
+  end
+  return array
+end
+
+def sort(array)
+  return quick_sort(array, 0, array.length() - 1)
+end
+
+array = [0, 39, 21, 62, 91, 77, 14, 23,
+  90, 69, 51, 81, 68, 83, 32, 56]
+sort(array)
+p array

@@ -1,4 +1,4 @@
-function gnomeSort(arr) {
+function sort(arr) {
   const n = arr.length;
   let index = 0;
   while (index < n) {
@@ -14,6 +14,7 @@ function gnomeSort(arr) {
   }
 }
 
-var array = [35, 95, 74, 71, 72, 30, 96, 53, 9, 0];
-gnomeSort(array);
-console.log(array);
+var array = [0, 39, 21, 62, 91, 77, 14, 23,
+  90, 69, 51, 81, 68, 83, 32, 56];
+sort(array);
+console.log("[" + array.join(", ") + "]");

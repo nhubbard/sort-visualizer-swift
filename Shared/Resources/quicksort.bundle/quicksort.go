@@ -27,7 +27,12 @@ func quickSort(arr []int, low, high int) []int {
   return arr
 }
 
+func sort(arr []int) []int {
+  return quickSort(arr, 0, len(arr) - 1)
+}
+
 func main() {
-  items := []int{35, 95, 74, 71, 72, 30, 96, 53, 9, 0}
-  fmt.Println(quickSort(items, 0, len(items) - 1))
+  array := []int{0, 39, 21, 62, 91, 77, 14, 23,
+    90, 69, 51, 81, 68, 83, 32, 56}
+  fmt.Println(sort(array))
 }

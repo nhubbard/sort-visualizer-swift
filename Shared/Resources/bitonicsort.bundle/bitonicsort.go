@@ -23,7 +23,7 @@ func sort(arr []int) []int {
 }
 
 func main() {
-  // Specific to bitonic sort: size must be power of 2.
-  items := []int{35, 74, 71, 72, 30, 53, 9, 0}
-  fmt.Println(sort(items))
+  array := []int{0, 39, 21, 62, 91, 77, 14, 23,
+    90, 69, 51, 81, 68, 83, 32, 56}
+  fmt.Println(sort(array))
 }

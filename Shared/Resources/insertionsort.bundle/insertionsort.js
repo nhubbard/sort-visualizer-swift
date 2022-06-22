@@ -1,4 +1,4 @@
-function insertionSort(arr) {
+function sort(arr) {
   let n = arr.length;
   for (let i = 1; i < n; i++) {
     let key = arr[i];
@@ -11,6 +11,7 @@ function insertionSort(arr) {
   }
 }
 
-var array = [35, 95, 74, 71, 72, 30, 96, 53, 9, 0];
-insertionSort(array);
-console.log(array);
+var array = [0, 39, 21, 62, 91, 77, 14, 23,
+  90, 69, 51, 81, 68, 83, 32, 56];
+sort(array);
+console.log("[" + array.join(", ") + "]");

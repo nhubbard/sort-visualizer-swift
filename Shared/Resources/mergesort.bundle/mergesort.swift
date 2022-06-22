@@ -1,11 +1,3 @@
-func mergeSort(_ array: [Int]) -> [Int] {
-  guard array.count > 1 else { return array }
-  let middleIndex = array.count / 2
-  let leftArray = mergeSort(Array(array[0..<middleIndex]))
-  let rightArray = mergeSort(Array(array[middleIndex..<array.count]))
-  return merge(leftArray, rightArray)
-}
-
 func merge(_ left: [Int], _ right: [Int]) -> [Int] {
   var leftIndex = 0
   var rightIndex = 0
@@ -37,5 +29,15 @@ func merge(_ left: [Int], _ right: [Int]) -> [Int] {
   return orderedArray
 }
 
-var items: [Int] = [35, 95, 74, 71, 72, 30, 96, 53, 9, 0]
-print(mergeSort(items))
+func sort(_ array: [Int]) -> [Int] {
+  guard array.count > 1 else { return array }
+  let middleIndex = array.count / 2
+  let leftArray = sort(Array(array[0..<middleIndex]))
+  let rightArray = sort(Array(array[middleIndex..<array.count]))
+  return merge(leftArray, rightArray)
+}
+
+var array: [Int] = [0, 39, 21, 62, 91, 77, 14, 23,
+  90, 69, 51, 81, 68, 83, 32, 56]
+array = sort(array)
+print(array)

@@ -4,9 +4,14 @@ import (
   "fmt"
 )
 
-/* TODO: Insert Go algorithm implementation here. */
+func sort(arr []int) []int {
+  n := len(arr)
+  /* TODO: Insert Go algorithm implementation here. */
+  return arr
+}
 
 func main() {
-  items := []int{35, 95, 74, 71, 72, 30, 96, 53, 9, 0}
-  fmt.Println(sort(items))
+  array := []int{0, 39, 21, 62, 91, 77, 14, 23,
+    90, 69, 51, 81, 68, 83, 32, 56}
+  fmt.Println(sort(array))
 }

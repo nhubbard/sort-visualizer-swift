@@ -1,11 +1,3 @@
-fun quickSort(arr: Array<Int>, begin: Int, end: Int) {
-  if (begin < end) {
-    val partitionIndex = partition(arr, begin, end)
-    quickSort(arr, begin, partitionIndex - 1)
-    quickSort(arr, partitionIndex + 1, end)
-  }
-}
-
 fun partition(arr: Array<Int>, begin: Int, end: Int): Int {
   val pivot = arr[end]
   var i = begin - 1
@@ -15,14 +7,25 @@ fun partition(arr: Array<Int>, begin: Int, end: Int): Int {
       arr[i] = arr[j].also { arr[j] = arr[i] }
     }
   }
-  val swapTemp = arr[i + 1]
-  arr[i + 1] = arr[end]
-  arr[end] = swapTemp
+  arr[i + 1] = arr[end].also { arr[end] = arr[i + 1] }
   return i + 1
 }
 
+fun quickSort(arr: Array<Int>, begin: Int, end: Int) {
+  if (begin < end) {
+    val partitionIndex = partition(arr, begin, end)
+    quickSort(arr, begin, partitionIndex - 1)
+    quickSort(arr, partitionIndex + 1, end)
+  }
+}
+
+fun sort(arr: Array<Int>) {
+  quickSort(arr, 0, arr.size - 1)
+}
+
 fun main() {
-  var items = arrayOf<Int>(35, 95, 74, 71, 72, 30, 96, 53, 9, 0)
-  quickSort(items, 0, items.size - 1)
-  println("[%s]".format(items.joinToString(", ")))
+  var array = arrayOf<Int>(0, 39, 21, 62, 91, 77, 14, 23,
+    90, 69, 51, 81, 68, 83, 32, 56)
+  sort(array)
+  println("[%s]".format(array.joinToString(", ")))
 }

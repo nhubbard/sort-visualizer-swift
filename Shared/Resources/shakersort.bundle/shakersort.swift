@@ -1,6 +1,4 @@
-import Foundation
-
-func shakerSort(_ arr: inout [Int]) {
+func sort(_ arr: inout [Int]) {
   let n = arr.count
   var swapped = true
   var start = 0
@@ -30,6 +28,7 @@ func shakerSort(_ arr: inout [Int]) {
   }
 }
 
-var items: [Int] = [35, 95, 74, 71, 72, 30, 96, 53, 9, 0]
-shakerSort(&items)
-print(items)
+var array: [Int] = [0, 39, 21, 62, 91, 77, 14, 23,
+  90, 69, 51, 81, 68, 83, 32, 56]
+sort(&array)
+print(array)

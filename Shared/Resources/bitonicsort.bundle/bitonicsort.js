@@ -16,6 +16,7 @@ function sort(arr) {
 }
 
 // Specific to bitonic sort: size must be power of 2.
-var array = [35, 74, 71, 72, 30, 53, 9, 0];
+var array = [0, 39, 21, 62, 91, 77, 14, 23,
+  90, 69, 51, 81, 68, 83, 32, 56];
 sort(array);
-console.log(array);
+console.log("[" + array.join(", ") + "]");

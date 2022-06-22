@@ -21,8 +21,8 @@ class JsonFormatter(Formatter):
 if __name__ == "__main__":
   for algo in algorithms:
     for ext in extensions:
-      filename = "./{algo}.bundle/{algo}.{ext}".format(algo=algo, ext=ext)
-      output_filename = "{filename}.json".format(filename=filename)
+      filename = f"./{algo}.bundle/{algo}.{ext}"
+      output_filename = f"{filename}.json"
       try:
         with open(filename) as fp:
           code = fp.read()
@@ -33,4 +33,4 @@ if __name__ == "__main__":
         with open(output_filename, "w") as fp:
           json.dump({"result": formatter.result()}, fp)
       except FileNotFoundError:
-        print("Warning: skipping {filename} highlighting (file not found)".format(filename=filename))
+        print(f"Warning: skipping {filename} highlighting (file not found)")

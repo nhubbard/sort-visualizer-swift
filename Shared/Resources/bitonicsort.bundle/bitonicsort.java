@@ -9,7 +9,7 @@ public class bitonicsort {
           int l = i ^ j;
           if (l > i) {
             if (((i & k) == 0) && (arr[i] > arr[l]) ||
-                (((i & k) != 0) && (arr[i] < arr[j]))) {
+                (((i & k) != 0) && (arr[i] < arr[l]))) {
               int temp = arr[i];
               arr[i] = arr[l];
               arr[l] = temp;
@@ -21,9 +21,9 @@ public class bitonicsort {
   }
 
   public static void main(String[] args) {
-    // Specific to bitonic sort: size must be power of 2.
-    int[] items = new int[]{35, 74, 71, 72, 30, 53, 9, 0};
-    sort(items);
-    System.out.println(Arrays.toString(items));
+    int[] array = new int[]{0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56};
+    sort(array);
+    System.out.println(Arrays.toString(array));
   }
 }

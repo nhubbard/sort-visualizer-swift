@@ -19,8 +19,8 @@ public class BitonicSort {
   }
 
   public static void Main(String[] args) {
-    // Specific to bitonic sort: size must be power of 2.
-    int[] array = {35, 74, 71, 72, 30, 53, 9, 0};
+    int[] array = {0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56};
     Sort(array);
     string result = "[" + String.Join(", ", array) + "]";
     Console.WriteLine(result);

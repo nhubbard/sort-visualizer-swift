@@ -19,6 +19,11 @@ function quickSort(array, start, end) {
   quickSort(array, start, rEnd);
 }
 
-var array = [35, 95, 74, 71, 72, 30, 96, 53, 9, 0];
-quickSort(array, 0, array.length - 1);
-console.log(array);
+function sort(arr) {
+  quickSort(arr, 0, arr.length - 1);
+}
+
+var array = [0, 39, 21, 62, 91, 77, 14, 23,
+  90, 69, 51, 81, 68, 83, 32, 56];
+sort(array);
+console.log("[" + array.join(", ") + "]");

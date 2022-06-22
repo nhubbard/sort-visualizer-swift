@@ -1,4 +1,4 @@
-def bubble_sort(array)
+def sort(array)
   n = array.length()
   c = 0
   while c < n - 1
@@ -13,6 +13,7 @@ def bubble_sort(array)
   end
 end
 
-items = [35, 95, 74, 71, 72, 30, 96, 53, 9, 0]
-bubble_sort(items)
-p items
+array = [0, 39, 21, 62, 91, 77, 14, 23,
+  90, 69, 51, 81, 68, 83, 32, 56]
+sort(array)
+p array

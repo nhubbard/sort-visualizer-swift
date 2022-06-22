@@ -1,4 +1,4 @@
-def insertionSort(arr):
+def sort(arr):
   n = len(arr)
   for i in range(1, n):
     key = arr[i]
@@ -9,6 +9,7 @@ def insertionSort(arr):
     arr[j + 1] = key
 
 if __name__ == "__main__":
-  array = [35, 95, 74, 71, 72, 30, 96, 53, 9, 0]
-  insertionSort(array)
+  array = [0, 39, 21, 62, 91, 77, 14, 23,
+    90, 69, 51, 81, 68, 83, 32, 56]
+  sort(array)
   print(array)

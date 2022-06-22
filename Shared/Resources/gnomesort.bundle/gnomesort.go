@@ -4,7 +4,7 @@ import (
   "fmt"
 )
 
-func gnomeSort(arr []int) []int {
+func sort(arr []int) []int {
   n := len(arr)
   index := 0
   for index < n {
@@ -22,6 +22,7 @@ func gnomeSort(arr []int) []int {
 }
 
 func main() {
-  items := []int{35, 95, 74, 71, 72, 30, 96, 53, 9, 0}
-  fmt.Println(gnomeSort(items))
+  array := []int{0, 39, 21, 62, 91, 77, 14, 23,
+    90, 69, 51, 81, 68, 83, 32, 56}
+  fmt.Println(sort(array))
 }

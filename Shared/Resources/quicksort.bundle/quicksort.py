@@ -21,7 +21,11 @@ def quick_sort(array, start, end):
   quick_sort(array, start, p-1)
   quick_sort(array, p+1, end)
 
+def sort(arr):
+  quick_sort(arr, 0, len(arr) - 1)
+
 if __name__ == "__main__":
-  array = [35, 95, 74, 71, 72, 30, 96, 53, 9, 0]
-  quick_sort(array, 0, len(array) - 1)
+  array = [0, 39, 21, 62, 91, 77, 14, 23,
+    90, 69, 51, 81, 68, 83, 32, 56]
+  sort(array)
   print(array)

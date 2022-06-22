@@ -34,18 +34,23 @@ public class mergesort {
     }
   }
 
-  public static void sort(int arr[], int l, int r) {
+  public static void mergeSort(int arr[], int l, int r) {
     if (l < r) {
       int m =l + (r - l) / 2;
-      sort(arr, l, m);
-      sort(arr, m + 1, r);
+      mergeSort(arr, l, m);
+      mergeSort(arr, m + 1, r);
       merge(arr, l, m, r);
     }
   }
 
+  public static void sort(int arr[]) {
+    mergeSort(arr, 0, arr.length - 1);
+  }
+
   public static void main(String[] args) {
-    int[] items = new int[]{35, 95, 74, 71, 72, 30, 96, 53, 9, 0};
-    sort(items, 0, items.length - 1);
-    System.out.println(Arrays.toString(items));
+    int[] array = new int[]{0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56};
+    sort(array);
+    System.out.println(Arrays.toString(array));
   }
 }

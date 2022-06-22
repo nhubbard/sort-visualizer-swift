@@ -1,12 +1,3 @@
-function mergeSort(array) {
-  const half = array.length / 2;
-  if (array.length < 2) {
-    return array;
-  }
-  const left = array.splice(0, half);
-  return merge(mergeSort(left), mergeSort(array));
-}
-
 function merge(left, right) {
   let arr = [];
   while (left.length && right.length) {
@@ -19,5 +10,16 @@ function merge(left, right) {
   return [...arr, ...left, ...right];
 }
 
-var array = [35, 95, 74, 71, 72, 30, 96, 53, 9, 0];
-console.log(mergeSort(array));
+function sort(array) {
+  const half = array.length / 2;
+  if (array.length < 2) {
+    return array;
+  }
+  const left = array.splice(0, half);
+  return merge(sort(left), sort(array));
+}
+
+var array = [0, 39, 21, 62, 91, 77, 14, 23,
+  90, 69, 51, 81, 68, 83, 32, 56];
+array = sort(array);
+console.log("[" + array.join(", ") + "]");

@@ -1,4 +1,5 @@
-function bubbleSort(arr, n) {
+function sort(arr) {
+  let n = arr.length;
   for (let c = 0; c < n - 1; c++) {
     for (let d = 0; d < n - c - 1; d++) {
       if (arr[d] > arr[d + 1]) {
@@ -8,6 +9,7 @@ function bubbleSort(arr, n) {
   }
 }
 
-var array = [35, 95, 74, 71, 72, 30, 96, 53, 9, 0];
-bubbleSort(array, array.length - 1);
-console.log(array);
+var array = [0, 39, 21, 62, 91, 77, 14, 23,
+  90, 69, 51, 81, 68, 83, 32, 56];
+sort(array);
+console.log("[" + array.join(", ") + "]");

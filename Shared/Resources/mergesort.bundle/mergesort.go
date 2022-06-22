@@ -26,16 +26,17 @@ func merge(a []int, b []int) []int {
     return final
 }
 
-func mergeSort(items []int) []int {
-    if len(items) < 2 {
-        return items
+func sort(arr []int) []int {
+    if len(arr) < 2 {
+        return arr
     }
-    first := mergeSort(items[:len(items)/2])
-    second := mergeSort(items[len(items)/2:])
+    first := sort(arr[:len(arr)/2])
+    second := sort(arr[len(arr)/2:])
     return merge(first, second)
 }
 
 func main() {
-  items := []int{35, 95, 74, 71, 72, 30, 96, 53, 9, 0}
-  fmt.Println(mergeSort(items))
+  array := []int{0, 39, 21, 62, 91, 77, 14, 23,
+    90, 69, 51, 81, 68, 83, 32, 56}
+  fmt.Println(sort(array))
 }

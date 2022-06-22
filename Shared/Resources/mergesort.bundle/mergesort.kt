@@ -1,14 +1,4 @@
-fun mergeSort(list: List<Int>): List<Int> {
-  if (list.size <= 1) {
-    return list
-  }
-  val middle = list.size / 2
-  var left = list.subList(0, middle)
-  var right = list.subList(middle, list.size)
-  return merge(mergeSort(left), mergeSort(right))
-}
-
-fun merge(left: List<Int>, right: List<Int>): List<Int>  {
+fun merge(left: List<Int>, right: List<Int>): List<Int> {
   var indexLeft = 0
   var indexRight = 0
   var newList: MutableList<Int> = mutableListOf()
@@ -32,9 +22,19 @@ fun merge(left: List<Int>, right: List<Int>): List<Int>  {
   return newList;
 }
 
+fun sort(list: List<Int>): List<Int> {
+  if (list.size <= 1) {
+    return list
+  }
+  val middle = list.size / 2
+  var left = list.subList(0, middle)
+  var right = list.subList(middle, list.size)
+  return merge(sort(left), sort(right))
+}
+
 fun main() {
-  var items = mutableListOf<Int>(35, 95, 74, 71, 72, 30, 96, 53, 9, 0)
-  println("[%s]".format(
-    mergeSort(items).joinToString(", ")
-  ))
+  var array = mutableListOf<Int>(0, 39, 21, 62, 91, 77, 14, 23,
+    90, 69, 51, 81, 68, 83, 32, 56)
+  sort(array)
+  println("[%s]".format(sort(array).joinToString(", ")))
 }

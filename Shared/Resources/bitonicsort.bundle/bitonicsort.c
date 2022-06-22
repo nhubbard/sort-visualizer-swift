@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-// Specific to bitonic sort: size must be power of 2.
-int items[8] = {35, 74, 71, 72, 30, 53, 9, 0};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
+                 90, 69, 51, 81, 68, 83, 32, 56};
 
 void swap(int *a, int *b) {
   int t = *a;
@@ -10,14 +10,14 @@ void swap(int *a, int *b) {
   *b = t;
 }
 
-void printList(int items[], int size) {
-  for (int i = 0; i < size; i++) {
+void printList(int arr[], int n) {
+  for (int i = 0; i < n; i++) {
     if (i == 0) {
-      printf("[%d, ", items[i]);
-    } else if (i != size - 1) {
-      printf("%d, ", items[i]);
+      printf("[%d, ", arr[i]);
+    } else if (i != n - 1) {
+      printf("%d, ", arr[i]);
     } else {
-      printf("%d]", items[i]);
+      printf("%d]", arr[i]);
     }
   }
 }
@@ -40,8 +40,8 @@ void sort(int arr[], int n) {
 
 
 int main(int argc, char *argv[]) {
-  int size = sizeof(items) / sizeof(items[0]);
-  sort(items, size);
-  printList(items, size);
+  int size = sizeof(array) / sizeof(array[0]);
+  sort(array, size);
+  printList(array, size);
   return 0;
 }

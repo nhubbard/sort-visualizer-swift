@@ -22,8 +22,8 @@ fun sort(arr: Array<Int>) {
 }
 
 fun main() {
-  // Specific to bitonic sort: size must be power of 2.
-  var items = arrayOf<Int>(35, 74, 71, 72, 30, 53, 9, 0)
-  sort(items)
-  println("[%s]".format(items.joinToString(", ")))
+  var array = arrayOf<Int>(0, 39, 21, 62, 91, 77, 14, 23,
+    90, 69, 51, 81, 68, 83, 32, 56)
+  sort(array)
+  println("[%s]".format(array.joinToString(", ")))
 }

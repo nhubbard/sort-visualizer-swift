@@ -1,7 +1,8 @@
 import java.util.Arrays;
 
 public class bubblesort {
-  public static void bubbleSort(int arr[], int n) {
+  public static void sort(int arr[]) {
+    int n = arr.length;
     for (int c = 0; c < n - 1; c++) {
       for (int d = 0; d < n - c - 1; d++) {
         if (arr[d] > arr[d + 1]) {
@@ -14,8 +15,9 @@ public class bubblesort {
   }
 
   public static void main(String[] args) {
-    int[] items = new int[]{35, 95, 74, 71, 72, 30, 96, 53, 9, 0};
-    bubbleSort(items, items.length);
-    System.out.println(Arrays.toString(items));
+    int[] array = new int[]{0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56};
+    sort(array);
+    System.out.println(Arrays.toString(array));
   }
 }

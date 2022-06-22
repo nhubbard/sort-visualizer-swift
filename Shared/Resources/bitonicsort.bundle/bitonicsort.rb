@@ -21,7 +21,7 @@ def sort(arr)
   end
 end
     
-# Specific to bitonic sort: size must be power of 2.
-items = [35, 74, 71, 72, 30, 53, 9, 0]
-sort(items)
-p items
+array = [0, 39, 21, 62, 91, 77, 14, 23,
+  90, 69, 51, 81, 68, 83, 32, 56]
+sort(array)
+p array
