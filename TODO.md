@@ -8,12 +8,12 @@
 * [x] Clean up any dead code from prior changes
 * [x] Make sure that stopping an in-progress sort functions as expected
 * [x] Make sure operations counter is updated by all algorithms
-* [ ] Add error to bitonic sort if the array size isn't a power of 2
+* [x] Add error to bitonic sort if the array size isn't a power of 2
 * [ ] Implement step functionality, possibly using delay as a catalyst?
 * [ ] Unit testing and UI testing.
   * I tried doing unit testing with a protocol and a separate implementation in the unit tests target, but it just... failed over and over and over again.
 * [ ] Set up Unibeautify to keep algorithm example code properly formatted
-* [ ] Set up a testing system that validates algorithm example code results
+* [x] Set up a testing system that validates algorithm example code results
 
 ## Algorithms
 
@@ -70,16 +70,12 @@
     * [x] Shaker Sort
     * [x] Odd-Even Sort
     * [x] Pancake Sort
-    * [ ] Bitonic Sort
-    * [ ] Radix Sort
+    * [x] Bitonic Sort
+    * [x] Radix Sort
     * [ ] Shell Sort
     * [ ] Comb Sort
     * [ ] Bogo Sort
     * [ ] Stooge Sort
-  * [ ] Implementation consistency
-    * [ ] C/C++: Rename sort functions to "sort", and arguments to arr and n
-    * [ ] C#: Use "var" instead of concrete built-in types
-    * [ ] Ruby: Switch simple incrementing while loops to for loops
 * [ ] String resources/localization for all strings throughout the app.
 * [ ] Settings panel that allows you to change various defaults, like the sound tuning, note range, and more settings.
 * [ ] Replace homepage content with Wikipedia text for "Sorting algorithm". Only necessary for localization purposes.

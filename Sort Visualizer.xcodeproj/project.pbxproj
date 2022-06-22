@@ -79,6 +79,7 @@
 		71ED4EAE2831575500880755 /* Atomics in Frameworks */ = {isa = PBXBuildFile; productRef = 71ED4EAD2831575500880755 /* Atomics */; };
 		71F38EB82819B42C0085BAAA /* SortView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71F38EB72819B42C0085BAAA /* SortView.swift */; };
 		71F4B35028207C02006B68E6 /* SortViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71F4B34F28207C02006B68E6 /* SortViewModel.swift */; };
+		71F4E8232863B1730057FF71 /* radixsort.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 71F4E8222863B1730057FF71 /* radixsort.bundle */; };
 		71F9C46028622C9F00159EF5 /* oddevensort.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 71F9C45F28622C9F00159EF5 /* oddevensort.bundle */; };
 		71F9C46228623A8200159EF5 /* pancakesort.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 71F9C46128623A8200159EF5 /* pancakesort.bundle */; };
 		71F9C464286261DC00159EF5 /* bitonicsort.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 71F9C463286261DC00159EF5 /* bitonicsort.bundle */; };
@@ -156,6 +157,7 @@
 		71E6B239282033D300672D55 /* Sort Visualizer--iOS--Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Sort Visualizer--iOS--Info.plist"; sourceTree = "<group>"; };
 		71F38EB72819B42C0085BAAA /* SortView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SortView.swift; sourceTree = "<group>"; };
 		71F4B34F28207C02006B68E6 /* SortViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SortViewModel.swift; sourceTree = "<group>"; };
+		71F4E8222863B1730057FF71 /* radixsort.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = radixsort.bundle; sourceTree = "<group>"; };
 		71F9C45F28622C9F00159EF5 /* oddevensort.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = oddevensort.bundle; sourceTree = "<group>"; };
 		71F9C46128623A8200159EF5 /* pancakesort.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = pancakesort.bundle; sourceTree = "<group>"; };
 		71F9C463286261DC00159EF5 /* bitonicsort.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = bitonicsort.bundle; sourceTree = "<group>"; };
@@ -204,6 +206,7 @@
 		71610BF82844101700A2696C /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				71F4E8222863B1730057FF71 /* radixsort.bundle */,
 				71F9C463286261DC00159EF5 /* bitonicsort.bundle */,
 				71F9C46128623A8200159EF5 /* pancakesort.bundle */,
 				71F9C45F28622C9F00159EF5 /* oddevensort.bundle */,
@@ -489,6 +492,7 @@
 				71BCE1002847D963007C8254 /* heapsort.bundle in Resources */,
 				71D4DBDE28185905001DBD0E /* Assets.xcassets in Resources */,
 				7180DC2B285116400059D1DB /* shakersort.bundle in Resources */,
+				71F4E8232863B1730057FF71 /* radixsort.bundle in Resources */,
 				71B4C0DE284FCC9800E42DB1 /* selectionsort.bundle in Resources */,
 				7180DC272850EA160059D1DB /* gnomesort.bundle in Resources */,
 				71F9C46228623A8200159EF5 /* pancakesort.bundle in Resources */,

@@ -1,0 +1,20 @@
+{
+  "complexities": [
+    {
+      "key": "Average Complexity",
+      "value": "O(d × (n + b))"
+    },
+    {
+      "key": "Best Case",
+      "value": "O(d × (n + b))"
+    },
+    {
+      "key": "Worst Case",
+      "value": "O(d × (n + b))"
+    },
+    {
+      "key": "Space Complexity",
+      "value": "O(n + 2^d)"
+    }
+  ]
+}

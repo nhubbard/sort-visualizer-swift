@@ -9,7 +9,7 @@ import SwiftUI
 
 struct RadixSort: View {
   var body: some View {
-    SortView(algorithm: .radixSort)
+    ScrollingSortView(algorithm: .radixSort)
       .navigationTitle("Radix Sort")
   }
 }
