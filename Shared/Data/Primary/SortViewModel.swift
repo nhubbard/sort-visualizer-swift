@@ -15,28 +15,33 @@ final class SortViewModel: ObservableObject {
   // File-specific variables
   let toner = Synthesizer()
   
-  // Published state variables
-  @Published var arraySizeBacking: Float
-  @Published var data: [SortItem]
+  // Published sorting state variables
+  @Published var arraySizeBacking: Float = Float(256)
+  @Published var data: [SortItem] = SortItem.syncSequenceOf(numItems: 256)
   @Published var operations: ManagedAtomic<Int> = ManagedAtomic(0)
   @Published var isSorted: Bool = false
   @Published var running: Bool = false
   @Published var sound: Bool = false
   @Published var delay: Float = 0.1
+  @Published var sizeRange: ClosedRange<Float> = 16...512
+  
+  // Published UI state variables
   @Published var showIncompleteWarning: Bool = false
   @Published var showBogoSortWarning: Bool = false
   @Published var bogoSortAccepted: Bool = false
+  @Published var showStepPopover: Bool = false
+  // Sound error state variables
+  @Published var soundDisabled: Bool = false
+  @Published var showSoundError: Bool = false
+  @Published var soundErrorText: String = ""
+  // Bitonic sort warning
+  @Published var showBitonicWarning: Bool = false
+  @Published var shouldShowBitonicWarning: Bool = true
   
   // Standard variables
-  // TODO: Figure out a way to make this a parameter without running into circular uninitialized variable errors?
   var algorithm: Algorithms = .quickSort
   var sortTaskRef: Task<Void, Error>? = nil
   var recreateTaskRef: Task<Void, Error>? = nil
-  
-  init() {
-    arraySizeBacking = Float(algorithm == .bogoSort ? 12 : 256)
-    data = SortItem.syncSequenceOf(numItems: algorithm == .bogoSort ? 12 : 256)
-  }
   
   /// Throw an unchecked error if we attempt to access a value outside the range of the `data` array's length.
   @MainActor
@@ -101,7 +106,9 @@ final class SortViewModel: ObservableObject {
   
   @MainActor
   @inline(__always)
-  func setAlgo(algo: Algorithms) { algorithm = algo }
+  func setAlgo(algo: Algorithms) {
+    algorithm = algo
+  }
   
   /// Shuffle the array using Swift's built-in shuffle method.
   @MainActor
@@ -124,7 +131,9 @@ final class SortViewModel: ObservableObject {
     // Reset isSorted to false
     isSorted = false
     // Reset running to false
-    running = false
+    if running && algorithm != .bitonicSort {
+      running = false
+    }
     // Reset operations counter to 0
     let _ = operations.exchange(0, ordering: .relaxed)
     // Recreate the array from scratch

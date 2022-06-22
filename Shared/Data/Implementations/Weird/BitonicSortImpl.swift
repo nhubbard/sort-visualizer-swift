@@ -14,6 +14,19 @@ extension SortViewModel {
     guard await enforceRunning() else {
       return
     }
+    if ![16, 32, 64, 128, 256, 512].contains(Int(arraySizeBacking)) {
+      let original = arraySizeBacking
+      let currDouble = Double(original)
+      let logged = log2(currDouble)
+      let ceiling = ceil(logged)
+      let intCeiling = Int(ceiling)
+      let base2 = pow(Decimal(2), intCeiling)
+      let nsDecimal = NSDecimalNumber(decimal: base2)
+      let truncated = Int(truncating: nsDecimal)
+      let asFloat = Float(truncated)
+      arraySizeBacking = asFloat
+      data = await SortItem.sequenceOf(numItems: Int(arraySizeBacking))
+    }
     let n = data.count
     var k = 2
     while k <= n {

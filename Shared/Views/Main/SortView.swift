@@ -9,10 +9,6 @@ import SwiftUI
 struct SortView: View {
   var algorithm: Algorithms
   @StateObject var state: SortViewModel = SortViewModel()
-  @State private var showStepPopover: Bool = false
-  @State private var soundDisabled: Bool = false
-  @State private var showSoundError: Bool = false
-  @State private var soundErrorText: String = ""
   
   var body: some View {
     ZStack {
@@ -38,7 +34,7 @@ struct SortView: View {
             }
             .frame(maxWidth: 150)
             .toggleStyle(.switch)
-            .disabled(soundDisabled)
+            .disabled(state.soundDisabled)
             .onChange(of: state.sound, perform: onSound)
           }.padding(.horizontal, 20)
           // Reset and Step buttons
@@ -52,7 +48,7 @@ struct SortView: View {
               Label("Step", systemImage: "figure.walk")
             }
               .frame(maxWidth: 150)
-              .popover(isPresented: $showStepPopover, arrowEdge: .trailing) {
+              .popover(isPresented: $state.showStepPopover, arrowEdge: .trailing) {
                 Text("Sorry, this function is not implemented yet.")
                   .padding(.all, 4)
               }
@@ -68,7 +64,7 @@ struct SortView: View {
           // Array Size slider
           HStack(spacing: 10) {
             Text("Array Size")
-            Slider(value: $state.arraySizeBacking, in: algorithm.sizeRange, step: 2)
+            Slider(value: $state.arraySizeBacking, in: state.sizeRange, step: 2)
               .onChange(of: state.arraySizeBacking, perform: onArraySizeChange)
               .frame(maxWidth: 192)
             Text(String(format: "%d", Int(state.arraySizeBacking)))
@@ -89,10 +85,14 @@ struct SortView: View {
       Button("Decline", role: .destructive, action: onBogoDecline)
     }, message: {
       Text("Bogo sort will take an insanely long time to finish sorting on any array with more than 12 items.\n\nThis is always true, even on very fast systems with a zero second delay.\n\nIf you leave it running, it will consume system resources, including significant battery life, for a very long time.\n\nAdditionally, if you are sensitive to rapidly strobing lights, running bogo sort with a delay of less than 1 ms may induce seizures.\n\nIf you wish to continue, press the Accept button; if you wish to stop the sorting, press the Decline button.")
-    }).alert("Sound Unavailable", isPresented: $showSoundError, actions: {
+    }).alert("Sound Unavailable", isPresented: $state.showSoundError, actions: {
       Button("OK", role: .cancel, action: onSoundErrorAccept)
     }, message: {
-      Text("Sound is unavailable at this time because the Audio Engine returned \(soundErrorText != "" ? "the following error during startup: \(soundErrorText)" : "an unknown error during startup.")\n\nSound will not be available until the app is restarted and/or any audio-related issue is resolved.")
+      Text("Sound is unavailable at this time because the Audio Engine returned \(state.soundErrorText != "" ? "the following error during startup: \(state.soundErrorText)" : "an unknown error during startup.")\n\nSound will not be available until the app is restarted and/or any audio-related issue is resolved.")
+    }).alert("Algorithm Warning", isPresented: $state.showBitonicWarning, actions: {
+      Button("OK", role: .cancel, action: onBitonicAccept)
+    }, message: {
+      Text("Bitonic sort will fail unless the the array size is a power of two. This is a known limitation of bitonic sort and cannot be worked around.\n\nTo prevent the app from crashing, Sort Visualizer will automatically round the array size to the next highest power of two to prevent errors. This warning will not be shown again while the app is running.\n\nPress OK to continue.")
     })
   }
   
@@ -100,6 +100,8 @@ struct SortView: View {
     if newValue {
       if algorithm == .bogoSort && !state.bogoSortAccepted {
         state.showBogoSortWarning = true
+      } else if algorithm == .bitonicSort && state.shouldShowBitonicWarning {
+        state.showBitonicWarning = true
       } else {
         state.sortTaskRef = Task.init {
           if await !state.doSort() {
@@ -118,8 +120,8 @@ struct SortView: View {
     if newValue {
       Task { [self] in
         if case .failure(let error) = await state.toner.start() {
-          soundErrorText = error.localizedDescription
-          showSoundError = true
+          state.soundErrorText = error.localizedDescription
+          state.showSoundError = true
         }
       }
     }
@@ -139,11 +141,13 @@ struct SortView: View {
   }
   
   func onStep() {
-    showStepPopover.toggle()
+    state.showStepPopover.toggle()
   }
   
   func onArraySizeChange(newValue: Float) {
-    if state.running {
+    // Bitonic sort will modify the array size to be a power of two while running.
+    // Therefore, it should not stop.
+    if state.running && algorithm != .bitonicSort {
       state.running = false
     }
     state.recreateTaskRef = Task.init {
@@ -174,19 +178,27 @@ struct SortView: View {
   
   func onSoundErrorAccept() {
     state.sound.toggle()
-    showSoundError = false
-    soundDisabled = true
+    state.showSoundError = false
+    state.soundDisabled = true
+  }
+  
+  func onBitonicAccept() {
+    state.showBitonicWarning = false
+    state.shouldShowBitonicWarning = false
+    state.running = true
+    state.sortTaskRef = Task.init {
+      if await !state.doSort() {
+        state.showIncompleteWarning = true
+      }
+    }
   }
   
   func onRender() {
     state.setAlgo(algo: algorithm)
-  }
-}
-
-struct SortView_Previews: PreviewProvider {
-  static var previews: some View {
-    SortView(algorithm: .quickSort)
-      .previewDevice(PreviewDevice(rawValue: "iPad Pro (12.9-inch) (5th generation)"))
-      .previewDisplayName("iPad Pro 12.9")
+    if algorithm == .bogoSort {
+      state.sizeRange = Float(4)...Float(16)
+      state.arraySizeBacking = Float(12)
+      state.data = SortItem.syncSequenceOf(numItems: 12)
+    }
   }
 }
