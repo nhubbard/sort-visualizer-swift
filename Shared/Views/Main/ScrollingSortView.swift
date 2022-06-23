@@ -17,15 +17,9 @@ struct LanguageView: View {
       Label {
         Text(language.title)
       } icon: {
-        if let iconColor = language.iconColor {
-          Image.ofAsset(language.icon, width: CGFloat(language.iconWidth), height: CGFloat(language.iconHeight))
-            .foregroundColor(iconColor)
-        } else {
-          Image.ofAsset(language.icon, width: CGFloat(language.iconWidth), height: CGFloat( language.iconHeight))
-        }
+        Image.ofAsset(language.icon, width: CGFloat(language.iconWidth), height: CGFloat(language.iconHeight)).foregroundColor(language.iconColor ?? .white)
       }.font(.headline)
-      CodeView(tokens: loadHighlightResource(algorithm, language.fileExtension))
-        .frame(alignment: .center)
+      AttributedCode(loadHighlightResource(algorithm, language.fileExtension))
     }
   }
 }
@@ -143,26 +137,18 @@ func loadComplexityResource(_ algorithm: Algorithms) -> [ComplexityEntry] {
   return result
 }
 
-func loadHighlightResource(_ algorithm: Algorithms, _ ext: String) -> [Token] {
+func loadHighlightResource(_ algorithm: Algorithms, _ ext: String) -> String {
   let key = algorithm.rawValue
-  var result: [Token] = []
+  let data: String
   guard let path = Bundle.main.path(forResource: key, ofType: "bundle"),
         let bundle = Bundle(path: path),
-        let url = bundle.path(forResource: key, ofType: "\(ext).json") else {
-    fatalError("Couldn't find \(key).\(ext).json in \(key).bundle!")
+        let url = bundle.path(forResource: key, ofType: "\(ext).md") else {
+    fatalError("Couldn't find \(key).\(ext).md in \(key).bundle!")
   }
-  let data = try! Data(contentsOf: URL(fileURLWithPath: url))
-  if let json = try! JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
-    guard let items = json["result"] as? [[String: String]] else {
-      return result
-    }
-    for item in items {
-      guard let rawType = item["type"],
-            let value = item["value"] else {
-        continue
-      }
-      result.append(Token(type: .fromRaw(rawType), value: value))
-    }
+  do {
+    data = try String(contentsOfFile: String(url))
+  } catch {
+    fatalError("Couldn't load \(algorithm.rawValue).\(ext).md from \(key).bundle:\n\(error)")
   }
-  return result
+  return data
 }
