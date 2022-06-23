@@ -18,8 +18,8 @@ def quick_sort(array, start, end):
   if start >= end:
     return
   p = partition(array, start, end)
-  quick_sort(array, start, p-1)
-  quick_sort(array, p+1, end)
+  quick_sort(array, start, p - 1)
+  quick_sort(array, p + 1, end)
 
 def sort(arr):
   quick_sort(arr, 0, len(arr) - 1)
