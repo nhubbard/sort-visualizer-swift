@@ -38,6 +38,18 @@
 		71B55E0E28383D5C00CA74CB /* Sequence+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71B55E0D28383D5C00CA74CB /* Sequence+Extensions.swift */; };
 		71BCE0FE2847B8B6007C8254 /* mergesort.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 71BCE0FD2847B8B6007C8254 /* mergesort.bundle */; };
 		71BCE1002847D963007C8254 /* heapsort.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 71BCE0FF2847D963007C8254 /* heapsort.bundle */; };
+		71CCA0592865F48900E4D666 /* AttributeDynamicLookup+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71CCA0582865F48900E4D666 /* AttributeDynamicLookup+Extensions.swift */; };
+		71CCA05B2865F4BF00E4D666 /* AttributeScopes+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71CCA05A2865F4BF00E4D666 /* AttributeScopes+Extensions.swift */; };
+		71CCA05D2865F4D500E4D666 /* CodeAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71CCA05C2865F4D500E4D666 /* CodeAttributes.swift */; };
+		71CCA05F2865F54B00E4D666 /* CodeTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71CCA05E2865F54B00E4D666 /* CodeTheme.swift */; };
+		71CCA0612865F57E00E4D666 /* MonokaiTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71CCA0602865F57E00E4D666 /* MonokaiTheme.swift */; };
+		71CCA0642865FBCF00E4D666 /* DefaultTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71CCA0632865FBCF00E4D666 /* DefaultTheme.swift */; };
+		71CCA0662865FC9D00E4D666 /* TextFormat.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71CCA0652865FC9D00E4D666 /* TextFormat.swift */; };
+		71CCA0692865FD7300E4D666 /* Then in Frameworks */ = {isa = PBXBuildFile; productRef = 71CCA0682865FD7300E4D666 /* Then */; };
+		71CCA06B2866332D00E4D666 /* ArduinoTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71CCA06A2866332D00E4D666 /* ArduinoTheme.swift */; };
+		71CCA06D28663CFF00E4D666 /* ColorfulTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71CCA06C28663CFF00E4D666 /* ColorfulTheme.swift */; };
+		71CCA06F2866446800E4D666 /* DraculaTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71CCA06E2866446800E4D666 /* DraculaTheme.swift */; };
+		71CCA0712866475A00E4D666 /* EmacsTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71CCA0702866475A00E4D666 /* EmacsTheme.swift */; };
 		71CFABF9283951C5004672DB /* QuickSortImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71CFABF8283951C5004672DB /* QuickSortImpl.swift */; };
 		71CFABFC28395264004672DB /* MergeSortImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71CFABFB28395264004672DB /* MergeSortImpl.swift */; };
 		71CFABFE2839528A004672DB /* HeapSortImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71CFABFD2839528A004672DB /* HeapSortImpl.swift */; };
@@ -113,6 +125,17 @@
 		71B55E0D28383D5C00CA74CB /* Sequence+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sequence+Extensions.swift"; sourceTree = "<group>"; };
 		71BCE0FD2847B8B6007C8254 /* mergesort.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = mergesort.bundle; sourceTree = "<group>"; };
 		71BCE0FF2847D963007C8254 /* heapsort.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = heapsort.bundle; sourceTree = "<group>"; };
+		71CCA0582865F48900E4D666 /* AttributeDynamicLookup+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AttributeDynamicLookup+Extensions.swift"; sourceTree = "<group>"; };
+		71CCA05A2865F4BF00E4D666 /* AttributeScopes+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AttributeScopes+Extensions.swift"; sourceTree = "<group>"; };
+		71CCA05C2865F4D500E4D666 /* CodeAttributes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodeAttributes.swift; sourceTree = "<group>"; };
+		71CCA05E2865F54B00E4D666 /* CodeTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodeTheme.swift; sourceTree = "<group>"; };
+		71CCA0602865F57E00E4D666 /* MonokaiTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonokaiTheme.swift; sourceTree = "<group>"; };
+		71CCA0632865FBCF00E4D666 /* DefaultTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultTheme.swift; sourceTree = "<group>"; };
+		71CCA0652865FC9D00E4D666 /* TextFormat.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextFormat.swift; sourceTree = "<group>"; };
+		71CCA06A2866332D00E4D666 /* ArduinoTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArduinoTheme.swift; sourceTree = "<group>"; };
+		71CCA06C28663CFF00E4D666 /* ColorfulTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorfulTheme.swift; sourceTree = "<group>"; };
+		71CCA06E2866446800E4D666 /* DraculaTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DraculaTheme.swift; sourceTree = "<group>"; };
+		71CCA0702866475A00E4D666 /* EmacsTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmacsTheme.swift; sourceTree = "<group>"; };
 		71CFABF8283951C5004672DB /* QuickSortImpl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickSortImpl.swift; sourceTree = "<group>"; };
 		71CFABFB28395264004672DB /* MergeSortImpl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MergeSortImpl.swift; sourceTree = "<group>"; };
 		71CFABFD2839528A004672DB /* HeapSortImpl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeapSortImpl.swift; sourceTree = "<group>"; };
@@ -166,6 +189,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				71D4DC2528186A0F001DBD0E /* MarkdownUI in Frameworks */,
+				71CCA0692865FD7300E4D666 /* Then in Frameworks */,
 				7120CB9C28397E410019D976 /* AudioKitEX in Frameworks */,
 				71ED4EAE2831575500880755 /* Atomics in Frameworks */,
 				7120CB9728397DDF0019D976 /* AudioKit in Frameworks */,
@@ -228,6 +252,8 @@
 				710BF0532821885300F7B066 /* Range+Extensions.swift */,
 				71610A9528357F5C00F6176E /* Int+Extensions.swift */,
 				714AA7802845013200D92535 /* Color+Extensions.swift */,
+				71CCA0582865F48900E4D666 /* AttributeDynamicLookup+Extensions.swift */,
+				71CCA05A2865F4BF00E4D666 /* AttributeScopes+Extensions.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -259,6 +285,30 @@
 				71619A462860A3FA00CCA31C /* SortStatus.swift */,
 			);
 			path = Primary;
+			sourceTree = "<group>";
+		};
+		71CCA0572865F47400E4D666 /* Code */ = {
+			isa = PBXGroup;
+			children = (
+				71CCA0622865FBC300E4D666 /* Themes */,
+				71CCA05C2865F4D500E4D666 /* CodeAttributes.swift */,
+				71CCA05E2865F54B00E4D666 /* CodeTheme.swift */,
+				71CCA0652865FC9D00E4D666 /* TextFormat.swift */,
+			);
+			path = Code;
+			sourceTree = "<group>";
+		};
+		71CCA0622865FBC300E4D666 /* Themes */ = {
+			isa = PBXGroup;
+			children = (
+				71CCA0602865F57E00E4D666 /* MonokaiTheme.swift */,
+				71CCA0632865FBCF00E4D666 /* DefaultTheme.swift */,
+				71CCA06A2866332D00E4D666 /* ArduinoTheme.swift */,
+				71CCA06C28663CFF00E4D666 /* ColorfulTheme.swift */,
+				71CCA06E2866446800E4D666 /* DraculaTheme.swift */,
+				71CCA0702866475A00E4D666 /* EmacsTheme.swift */,
+			);
+			path = Themes;
 			sourceTree = "<group>";
 		};
 		71CFABF7283951B3004672DB /* Implementations */ = {
@@ -344,6 +394,7 @@
 		71D4DBF2281862E8001DBD0E /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				71CCA0572865F47400E4D666 /* Code */,
 				71650A342842922C00A23BC2 /* Main */,
 				71650A292842693000A23BC2 /* Utilities */,
 			);
@@ -419,6 +470,7 @@
 				7120CBA128397EE40019D976 /* SoundpipeAudioKit */,
 				7189D56E2857D5DA00E2707D /* CollectionConcurrencyKit */,
 				712FAC48285E2A2B0045B50A /* Algorithms */,
+				71CCA0682865FD7300E4D666 /* Then */,
 			);
 			productName = "Sort2 (iOS)";
 			productReference = 71D4DBD128185905001DBD0E /* Sort Visualizer.app */;
@@ -456,6 +508,7 @@
 				7120CB9D28397E5B0019D976 /* XCRemoteSwiftPackageReference "AudioKitUI" */,
 				7120CBA028397EE40019D976 /* XCRemoteSwiftPackageReference "SoundpipeAudioKit" */,
 				712FAC47285E2A2B0045B50A /* XCRemoteSwiftPackageReference "swift-algorithms" */,
+				71CCA0672865FD7300E4D666 /* XCRemoteSwiftPackageReference "Then" */,
 			);
 			productRefGroup = 71D4DBD228185905001DBD0E /* Products */;
 			projectDirPath = "";
@@ -498,9 +551,11 @@
 				71650A2B2842693C00A23BC2 /* CustomIconLabel.swift in Sources */,
 				71FD4A43281C1F2C00E1E6FA /* SortItem.swift in Sources */,
 				71CFABFE2839528A004672DB /* HeapSortImpl.swift in Sources */,
+				71CCA0612865F57E00E4D666 /* MonokaiTheme.swift in Sources */,
 				71D4DBF4281862FC001DBD0E /* MergeSort.swift in Sources */,
 				71CFAC1A28396F9A004672DB /* StoogeSortImpl.swift in Sources */,
 				71650A32284272FD00A23BC2 /* RandomizingHeader.swift in Sources */,
+				71CCA0662865FC9D00E4D666 /* TextFormat.swift in Sources */,
 				71D4DC0E28186356001DBD0E /* PancakeSort.swift in Sources */,
 				71D4DC0828186347001DBD0E /* ShakerSort.swift in Sources */,
 				71D4DC0228186339001DBD0E /* InsertionSort.swift in Sources */,
@@ -508,25 +563,30 @@
 				71F38EB82819B42C0085BAAA /* SortView.swift in Sources */,
 				71610A9628357F5C00F6176E /* Int+Extensions.swift in Sources */,
 				71CFAC0B28396DAE004672DB /* OddEvenSortImpl.swift in Sources */,
+				71CCA06D28663CFF00E4D666 /* ColorfulTheme.swift in Sources */,
 				71650A3E28429DB200A23BC2 /* ScrollingSortView.swift in Sources */,
 				71D4DC1B28186385001DBD0E /* CombSort.swift in Sources */,
 				71CFAC1028396E05004672DB /* BitonicSortImpl.swift in Sources */,
 				71847C51284100180018E66C /* Image+Extensions.swift in Sources */,
 				718246DF284685F6003842E3 /* LanguageEntry.swift in Sources */,
+				71CCA0592865F48900E4D666 /* AttributeDynamicLookup+Extensions.swift in Sources */,
 				71CFAC0928396D90004672DB /* ShakerSortImpl.swift in Sources */,
 				71D4DBDC28185905001DBD0E /* ContentView.swift in Sources */,
 				71619A472860A3FA00CCA31C /* SortStatus.swift in Sources */,
 				7120CB9928397DF00019D976 /* Synthesizer.swift in Sources */,
 				71F4B35028207C02006B68E6 /* SortViewModel.swift in Sources */,
+				71CCA06F2866446800E4D666 /* DraculaTheme.swift in Sources */,
 				71CFAC1228396EC3004672DB /* RadixSortImpl.swift in Sources */,
 				71D4DC0B2818634E001DBD0E /* OddEvenSort.swift in Sources */,
 				71D4DBDA28185905001DBD0E /* Sort2App.swift in Sources */,
 				71D4DBF728186306001DBD0E /* HeapSort.swift in Sources */,
+				71CCA0712866475A00E4D666 /* EmacsTheme.swift in Sources */,
 				71D4DC182818637F001DBD0E /* ShellSort.swift in Sources */,
 				71CFAC1428396F32004672DB /* ShellSortImpl.swift in Sources */,
 				71D4DC1E2818638B001DBD0E /* BogoSort.swift in Sources */,
 				71D4DC0528186340001DBD0E /* GnomeSort.swift in Sources */,
 				71D4DBEC28185B59001DBD0E /* QuickSort.swift in Sources */,
+				71CCA06B2866332D00E4D666 /* ArduinoTheme.swift in Sources */,
 				71D4DC1528186377001DBD0E /* RadixSort.swift in Sources */,
 				710BF0542821885300F7B066 /* Range+Extensions.swift in Sources */,
 				716A5CE12821AB0D008B792A /* Algorithms.swift in Sources */,
@@ -537,16 +597,20 @@
 				71CFABF9283951C5004672DB /* QuickSortImpl.swift in Sources */,
 				71650A2E28426C5700A23BC2 /* Category.swift in Sources */,
 				718246DD284685E4003842E3 /* ComplexityEntry.swift in Sources */,
+				71CCA0642865FBCF00E4D666 /* DefaultTheme.swift in Sources */,
 				71D4DBF028185DFD001DBD0E /* HomeView.swift in Sources */,
 				714AA7812845013200D92535 /* Color+Extensions.swift in Sources */,
 				71CFAC0528396D4C004672DB /* InsertionSortImpl.swift in Sources */,
 				71CFAC0728396D6C004672DB /* GnomeSortImpl.swift in Sources */,
 				71D4DC2128186393001DBD0E /* StoogeSort.swift in Sources */,
+				71CCA05F2865F54B00E4D666 /* CodeTheme.swift in Sources */,
 				71CFAC1628396F63004672DB /* CombSortImpl.swift in Sources */,
 				71548F162864E4A200043680 /* AttributedCodeView.swift in Sources */,
+				71CCA05D2865F4D500E4D666 /* CodeAttributes.swift in Sources */,
 				71CFAC0128396D08004672DB /* BubbleSortImpl.swift in Sources */,
 				71D4DBFF2818632F001DBD0E /* SelectionSort.swift in Sources */,
 				71D4DBFA28186310001DBD0E /* BubbleSort.swift in Sources */,
+				71CCA05B2865F4BF00E4D666 /* AttributeScopes+Extensions.swift in Sources */,
 				711EF294285CC174001EB6AC /* BogoSortImpl.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -832,6 +896,14 @@
 				minimumVersion = 1.0.0;
 			};
 		};
+		71CCA0672865FD7300E4D666 /* XCRemoteSwiftPackageReference "Then" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/devxoul/Then";
+			requirement = {
+				branch = master;
+				kind = branch;
+			};
+		};
 		71D4DC2328186A0F001DBD0E /* XCRemoteSwiftPackageReference "MarkdownUI" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/gonzalezreal/MarkdownUI";
@@ -879,6 +951,11 @@
 		7189D56E2857D5DA00E2707D /* CollectionConcurrencyKit */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = CollectionConcurrencyKit;
+		};
+		71CCA0682865FD7300E4D666 /* Then */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 71CCA0672865FD7300E4D666 /* XCRemoteSwiftPackageReference "Then" */;
+			productName = Then;
 		};
 		71D4DC2428186A0F001DBD0E /* MarkdownUI */ = {
 			isa = XCSwiftPackageProductDependency;

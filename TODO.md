@@ -12,7 +12,7 @@
 * [x] *Urgent:* Rewrite CodeView to use AttributedString instead of a reduce operation.
   * This is what was causing the crashes on mom's iPad. It was overflowing the stack with too many variables.
 * [ ] Implement step functionality, possibly using delay as a catalyst?
-* [ ] Unit testing and UI testing.
+* [ ] Unit testing and UI testing
   * I tried doing unit testing with a protocol and a separate implementation in the unit tests target, but it just... failed over and over and over again.
 * [ ] Set up Unibeautify to keep algorithm example code properly formatted
 * [x] Set up a testing system that validates algorithm example code results
@@ -79,7 +79,11 @@
     * [ ] Bogo Sort
     * [ ] Stooge Sort
 * [ ] String resources/localization for all strings throughout the app.
-* [ ] Settings panel that allows you to change various defaults, like the sound tuning, note range, and more settings.
+* [ ] Settings panel that allows you to change lots of options
+  * Synthesizer: note range, attack, decay, sustain, release
+  * Sort view: auto-enable sound, default delay, default array size, array size range
+  * Bogo sort: disable bogo sort prompt
+  * Bitonic sort: disable bitonic sort warning
 * [ ] Replace homepage content with Wikipedia text for "Sorting algorithm". Only necessary for localization purposes.
 
 ## Future Ideas from WWDC 2022
