@@ -50,7 +50,7 @@ if __name__ == "__main__":
             output_filename = f"{filename}.md"
             try:
                 with open(filename) as fp:
-                    code = fp.read()
+                    code = fp.read().rstrip("\n")
                 lexer = get_lexer_for_filename(filename)
                 formatter = AttributedTextFormatter()
                 highlight(code, lexer, formatter)

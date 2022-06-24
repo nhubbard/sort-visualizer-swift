@@ -5,7 +5,7 @@ import subprocess
 import logging
 import coloredlogs
 
-algorithms = [
+algorithms = sorted([
     "quicksort",
     "mergesort",
     "heapsort",
@@ -18,10 +18,11 @@ algorithms = [
     "pancakesort",
     "bitonicsort",
     "radixsort",
-]
+])
 extensions = ["c", "cpp", "cs", "go", "java", "js", "kt", "py", "rb", "swift"]
 standard_expected = "[0, 14, 21, 23, 32, 39, 51, 56, 62, 68, 69, 77, 81, 83, 90, 91]"
 go_expected = standard_expected.replace(",", "")
+success = []
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 coloredlogs.install(
@@ -405,23 +406,30 @@ if __name__ == "__main__":
     for file in files:
         ext = file.split(".")[-1]
         if ext == "c":
-            test_c(file)
+            success.append(test_c(file))
         elif ext == "cpp":
-            test_cpp(file)
+            success.append(test_cpp(file))
         elif ext == "cs":
-            test_cs(file)
+            success.append(test_cs(file))
         elif ext == "go":
-            test_go(file)
+            success.append(test_go(file))
         elif ext == "java":
-            test_java(file)
+            success.append(test_java(file))
         elif ext == "js":
-            test_js(file)
+            success.append(test_js(file))
         elif ext == "kt":
-            test_kt(file)
+            success.append(test_kt(file))
         elif ext == "py":
-            test_py(file)
+            success.append(test_py(file))
         elif ext == "rb":
-            test_rb(file)
+            success.append(test_rb(file))
         elif ext == "swift":
-            test_swift(file)
-    logger.info("All files compiled and/or run successfully with correct outputs.")
+            success.append(test_swift(file))
+    # Loop over success results.
+    final_result = True
+    for result in success:
+        final_result = final_result and result
+    if final_result:
+        logger.info("All files compiled and/or run successfully with correct outputs.")
+    else:
+        logger.error("One or more files compiled and/or run unsuccessfully. Check the log for errors.")
