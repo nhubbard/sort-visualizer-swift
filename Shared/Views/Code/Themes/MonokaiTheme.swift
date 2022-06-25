@@ -32,7 +32,7 @@ struct MonokaiTheme: CodeTheme {
           it.fg(errorFg).bg(errorBg)
         case .escape, .generic, .name, .other, .punctuation, .genericError, .genericHeading, .genericTraceback, .nameBuiltin, .nameEntity, .nameLabel, .nameNamespace, .nameProperty, .nameVariable, .whitespace, .nameBuiltinPseudo, .nameVariableClass, .nameVariableGlobal, .nameVariableInstance, .nameVariableMagic:
           it.fg(text)
-        case .keyword, .genericOutput, .keywordConstant, .keywordDeclaration, .keywordPseudo, .keywordReserved, .keywordType, .nameConstant:
+        case .keyword, .genericOutput, .keywordConstant, .keywordNamespace, .keywordDeclaration, .keywordPseudo, .keywordReserved, .keywordType, .nameConstant:
           it.fg(keyword)
         case .literal, .number, .numberBin, .numberFloat, .numberHex, .numberInteger, .numberOct, .stringEscape, .numberIntegerLong:
           it.fg(number)

@@ -9,7 +9,7 @@ import SwiftUI
 
 struct ShellSort: View {
   var body: some View {
-    SortView(algorithm: .shellSort)
+    ScrollingSortView(algorithm: .shellSort)
       .navigationTitle("Shell Sort")
   }
 }

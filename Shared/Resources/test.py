@@ -18,6 +18,7 @@ algorithms = sorted([
     "pancakesort",
     "bitonicsort",
     "radixsort",
+    "shellsort"
 ])
 extensions = ["c", "cpp", "cs", "go", "java", "js", "kt", "py", "rb", "swift"]
 standard_expected = "[0, 14, 21, 23, 32, 39, 51, 56, 62, 68, 69, 77, 81, 83, 90, 91]"
@@ -399,9 +400,14 @@ def test_swift(filename: str) -> bool:
 if __name__ == "__main__":
     # Create list of files to test
     files = []
-    for algorithm in algorithms:
+    if len(sys.argv) > 1:
+        algorithm = sys.argv[1]
         for extension in extensions:
             files.append(f"{algorithm}.bundle/{algorithm}.{extension}")
+    else:
+        for algorithm in algorithms:
+            for extension in extensions:
+                files.append(f"{algorithm}.bundle/{algorithm}.{extension}")
     # Loop over each file
     for file in files:
         ext = file.split(".")[-1]
@@ -426,10 +432,7 @@ if __name__ == "__main__":
         elif ext == "swift":
             success.append(test_swift(file))
     # Loop over success results.
-    final_result = True
-    for result in success:
-        final_result = final_result and result
-    if final_result:
+    if all(success):
         logger.info("All files compiled and/or run successfully with correct outputs.")
     else:
         logger.error("One or more files compiled and/or run unsuccessfully. Check the log for errors.")

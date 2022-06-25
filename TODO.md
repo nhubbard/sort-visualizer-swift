@@ -74,10 +74,11 @@
     * [x] Pancake Sort
     * [x] Bitonic Sort
     * [x] Radix Sort
-    * [ ] Shell Sort
+    * [x] Shell Sort
     * [ ] Comb Sort
     * [ ] Bogo Sort
     * [ ] Stooge Sort
+* [ ] Add copy/paste floating button to AttributedCodeView
 * [ ] String resources/localization for all strings throughout the app.
 * [ ] Settings panel that allows you to change lots of options
   * Synthesizer: note range, attack, decay, sustain, release

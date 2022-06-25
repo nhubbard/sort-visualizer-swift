@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		710BF0542821885300F7B066 /* Range+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 710BF0532821885300F7B066 /* Range+Extensions.swift */; };
 		7113FCB328674D1B00665F09 /* CollectionConcurrencyKit in Frameworks */ = {isa = PBXBuildFile; productRef = 7113FCB228674D1B00665F09 /* CollectionConcurrencyKit */; };
+		7113FCB5286758DF00665F09 /* shellsort.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 7113FCB4286758DF00665F09 /* shellsort.bundle */; };
 		711EF294285CC174001EB6AC /* BogoSortImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 711EF293285CC174001EB6AC /* BogoSortImpl.swift */; };
 		7120CB9728397DDF0019D976 /* AudioKit in Frameworks */ = {isa = PBXBuildFile; productRef = 7120CB9628397DDF0019D976 /* AudioKit */; };
 		7120CB9928397DF00019D976 /* Synthesizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7120CB9828397DF00019D976 /* Synthesizer.swift */; };
@@ -98,6 +99,7 @@
 
 /* Begin PBXFileReference section */
 		710BF0532821885300F7B066 /* Range+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Range+Extensions.swift"; sourceTree = "<group>"; };
+		7113FCB4286758DF00665F09 /* shellsort.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = shellsort.bundle; sourceTree = "<group>"; };
 		711EF293285CC174001EB6AC /* BogoSortImpl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BogoSortImpl.swift; sourceTree = "<group>"; };
 		7120CB9828397DF00019D976 /* Synthesizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Synthesizer.swift; sourceTree = "<group>"; };
 		713FA7AF284A5DAE00F12327 /* highlight.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = highlight.py; sourceTree = "<group>"; };
@@ -215,6 +217,7 @@
 		71610BF82844101700A2696C /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				7113FCB4286758DF00665F09 /* shellsort.bundle */,
 				71F4E8222863B1730057FF71 /* radixsort.bundle */,
 				71F9C463286261DC00159EF5 /* bitonicsort.bundle */,
 				71F9C46128623A8200159EF5 /* pancakesort.bundle */,
@@ -535,6 +538,7 @@
 				7180DC272850EA160059D1DB /* gnomesort.bundle in Resources */,
 				71F9C46228623A8200159EF5 /* pancakesort.bundle in Resources */,
 				71F9C464286261DC00159EF5 /* bitonicsort.bundle in Resources */,
+				7113FCB5286758DF00665F09 /* shellsort.bundle in Resources */,
 				71610C0E2844213900A2696C /* quicksort.bundle in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
