@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		710BF0542821885300F7B066 /* Range+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 710BF0532821885300F7B066 /* Range+Extensions.swift */; };
+		7113FCB328674D1B00665F09 /* CollectionConcurrencyKit in Frameworks */ = {isa = PBXBuildFile; productRef = 7113FCB228674D1B00665F09 /* CollectionConcurrencyKit */; };
 		711EF294285CC174001EB6AC /* BogoSortImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 711EF293285CC174001EB6AC /* BogoSortImpl.swift */; };
 		7120CB9728397DDF0019D976 /* AudioKit in Frameworks */ = {isa = PBXBuildFile; productRef = 7120CB9628397DDF0019D976 /* AudioKit */; };
 		7120CB9928397DF00019D976 /* Synthesizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7120CB9828397DF00019D976 /* Synthesizer.swift */; };
@@ -33,7 +34,6 @@
 		718246DD284685E4003842E3 /* ComplexityEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 718246DC284685E4003842E3 /* ComplexityEntry.swift */; };
 		718246DF284685F6003842E3 /* LanguageEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 718246DE284685F6003842E3 /* LanguageEntry.swift */; };
 		71847C51284100180018E66C /* Image+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71847C50284100180018E66C /* Image+Extensions.swift */; };
-		7189D56F2857D5DA00E2707D /* CollectionConcurrencyKit in Frameworks */ = {isa = PBXBuildFile; productRef = 7189D56E2857D5DA00E2707D /* CollectionConcurrencyKit */; };
 		71B4C0DE284FCC9800E42DB1 /* selectionsort.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 71B4C0DD284FCC9800E42DB1 /* selectionsort.bundle */; };
 		71B55E0E28383D5C00CA74CB /* Sequence+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71B55E0D28383D5C00CA74CB /* Sequence+Extensions.swift */; };
 		71BCE0FE2847B8B6007C8254 /* mergesort.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 71BCE0FD2847B8B6007C8254 /* mergesort.bundle */; };
@@ -119,7 +119,6 @@
 		718246DC284685E4003842E3 /* ComplexityEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComplexityEntry.swift; sourceTree = "<group>"; };
 		718246DE284685F6003842E3 /* LanguageEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LanguageEntry.swift; sourceTree = "<group>"; };
 		71847C50284100180018E66C /* Image+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Image+Extensions.swift"; sourceTree = "<group>"; };
-		7191A6FC28566EB80032EE6F /* CollectionConcurrencyKit */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = CollectionConcurrencyKit; path = Packages/CollectionConcurrencyKit; sourceTree = "<group>"; };
 		71934841281979490058FD9E /* TODO.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = TODO.md; sourceTree = "<group>"; };
 		71B4C0DD284FCC9800E42DB1 /* selectionsort.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = selectionsort.bundle; sourceTree = "<group>"; };
 		71B55E0D28383D5C00CA74CB /* Sequence+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sequence+Extensions.swift"; sourceTree = "<group>"; };
@@ -193,8 +192,8 @@
 				7120CB9C28397E410019D976 /* AudioKitEX in Frameworks */,
 				71ED4EAE2831575500880755 /* Atomics in Frameworks */,
 				7120CB9728397DDF0019D976 /* AudioKit in Frameworks */,
+				7113FCB328674D1B00665F09 /* CollectionConcurrencyKit in Frameworks */,
 				712FAC49285E2A2B0045B50A /* Algorithms in Frameworks */,
-				7189D56F2857D5DA00E2707D /* CollectionConcurrencyKit in Frameworks */,
 				7120CB9F28397E5B0019D976 /* AudioKitUI in Frameworks */,
 				7120CBA228397EE40019D976 /* SoundpipeAudioKit in Frameworks */,
 			);
@@ -361,7 +360,6 @@
 		71D4DBC428185904001DBD0E = {
 			isa = PBXGroup;
 			children = (
-				7191A6FC28566EB80032EE6F /* CollectionConcurrencyKit */,
 				71E6B239282033D300672D55 /* Sort Visualizer--iOS--Info.plist */,
 				71934841281979490058FD9E /* TODO.md */,
 				71D4DBEE28185D6E001DBD0E /* Sort Visualizer (iOS).entitlements */,
@@ -468,9 +466,9 @@
 				7120CB9B28397E410019D976 /* AudioKitEX */,
 				7120CB9E28397E5B0019D976 /* AudioKitUI */,
 				7120CBA128397EE40019D976 /* SoundpipeAudioKit */,
-				7189D56E2857D5DA00E2707D /* CollectionConcurrencyKit */,
 				712FAC48285E2A2B0045B50A /* Algorithms */,
 				71CCA0682865FD7300E4D666 /* Then */,
+				7113FCB228674D1B00665F09 /* CollectionConcurrencyKit */,
 			);
 			productName = "Sort2 (iOS)";
 			productReference = 71D4DBD128185905001DBD0E /* Sort Visualizer.app */;
@@ -509,6 +507,7 @@
 				7120CBA028397EE40019D976 /* XCRemoteSwiftPackageReference "SoundpipeAudioKit" */,
 				712FAC47285E2A2B0045B50A /* XCRemoteSwiftPackageReference "swift-algorithms" */,
 				71CCA0672865FD7300E4D666 /* XCRemoteSwiftPackageReference "Then" */,
+				7113FCB128674D1B00665F09 /* XCRemoteSwiftPackageReference "CollectionConcurrencyKit" */,
 			);
 			productRefGroup = 71D4DBD228185905001DBD0E /* Products */;
 			projectDirPath = "";
@@ -856,6 +855,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		7113FCB128674D1B00665F09 /* XCRemoteSwiftPackageReference "CollectionConcurrencyKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/nhubbard/CollectionConcurrencyKit";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.0.0;
+			};
+		};
 		7120CB9528397DDF0019D976 /* XCRemoteSwiftPackageReference "AudioKit" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/AudioKit/AudioKit.git";
@@ -923,6 +930,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		7113FCB228674D1B00665F09 /* CollectionConcurrencyKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 7113FCB128674D1B00665F09 /* XCRemoteSwiftPackageReference "CollectionConcurrencyKit" */;
+			productName = CollectionConcurrencyKit;
+		};
 		7120CB9628397DDF0019D976 /* AudioKit */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 7120CB9528397DDF0019D976 /* XCRemoteSwiftPackageReference "AudioKit" */;
@@ -947,10 +959,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 712FAC47285E2A2B0045B50A /* XCRemoteSwiftPackageReference "swift-algorithms" */;
 			productName = Algorithms;
-		};
-		7189D56E2857D5DA00E2707D /* CollectionConcurrencyKit */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = CollectionConcurrencyKit;
 		};
 		71CCA0682865FD7300E4D666 /* Then */ = {
 			isa = XCSwiftPackageProductDependency;
