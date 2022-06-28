@@ -18,7 +18,8 @@ algorithms = sorted([
     "pancakesort",
     "bitonicsort",
     "radixsort",
-    "shellsort"
+    "shellsort",
+    "combsort"
 ])
 extensions = ["c", "cpp", "cs", "go", "java", "js", "kt", "py", "rb", "swift"]
 standard_expected = "[0, 14, 21, 23, 32, 39, 51, 56, 62, 68, 69, 77, 81, 83, 90, 91]"

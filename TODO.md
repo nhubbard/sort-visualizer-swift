@@ -75,7 +75,7 @@
     * [x] Bitonic Sort
     * [x] Radix Sort
     * [x] Shell Sort
-    * [ ] Comb Sort
+    * [x] Comb Sort
     * [ ] Bogo Sort
     * [ ] Stooge Sort
 * [ ] Add copy/paste floating button to AttributedCodeView

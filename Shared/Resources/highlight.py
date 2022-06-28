@@ -16,7 +16,8 @@ algorithms = [
     "pancakesort",
     "bitonicsort",
     "radixsort",
-    "shellsort"
+    "shellsort",
+    "combsort"
 ]
 extensions = ["c", "cpp", "cs", "go", "java", "js", "kt", "py", "rb", "swift"]
 

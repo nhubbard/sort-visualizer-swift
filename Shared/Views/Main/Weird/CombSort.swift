@@ -9,7 +9,7 @@ import SwiftUI
 
 struct CombSort: View {
   var body: some View {
-    SortView(algorithm: .combSort)
+    ScrollingSortView(algorithm: .combSort)
       .navigationTitle("Comb Sort")
   }
 }
