@@ -247,7 +247,6 @@
 		71650A292842693000A23BC2 /* Utilities */ = {
 			isa = PBXGroup;
 			children = (
-				71548F152864E4A200043680 /* AttributedCodeView.swift */,
 				71650A2A2842693C00A23BC2 /* CustomIconLabel.swift */,
 				71650A2D28426C5700A23BC2 /* Category.swift */,
 				71650A31284272FD00A23BC2 /* RandomizingHeader.swift */,
@@ -301,6 +300,7 @@
 		71CCA0572865F47400E4D666 /* Code */ = {
 			isa = PBXGroup;
 			children = (
+				71548F152864E4A200043680 /* AttributedCodeView.swift */,
 				71CCA0622865FBC300E4D666 /* Themes */,
 				71CCA05C2865F4D500E4D666 /* CodeAttributes.swift */,
 				71CCA05E2865F54B00E4D666 /* CodeTheme.swift */,

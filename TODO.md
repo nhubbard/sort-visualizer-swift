@@ -10,7 +10,7 @@
 * [x] Make sure operations counter is updated by all algorithms
 * [x] Add error to bitonic sort if the array size isn't a power of 2
 * [x] *Urgent:* Rewrite CodeView to use AttributedString instead of a reduce operation.
-  * This is what was causing the crashes on mom's iPad. It was overflowing the stack with too many variables.
+  * This is what was causing the crashes on Mom's iPad. It was overflowing the stack with too many variables.
 * [ ] Implement step functionality, possibly using delay as a catalyst?
 * [ ] Unit testing and UI testing
   * I tried doing unit testing with a protocol and a separate implementation in the unit tests target, but it just... failed over and over and over again.
