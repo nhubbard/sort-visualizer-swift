@@ -4,12 +4,11 @@
 //
 //  Created by Nicholas Hubbard on 4/26/22.
 //
-
 import SwiftUI
 
 struct BogoSort: View {
   var body: some View {
-    SortView(algorithm: .bogoSort)
+    ScrollingSortView(algorithm: .bogoSort)
       .navigationTitle("Bogo Sort")
   }
 }

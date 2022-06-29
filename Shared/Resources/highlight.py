@@ -3,22 +3,25 @@ from pygments import highlight
 from pygments.lexers import get_lexer_for_filename
 from pygments.formatter import Formatter
 
-algorithms = [
-    "quicksort",
-    "mergesort",
-    "heapsort",
-    "bubblesort",
-    "selectionsort",
-    "insertionsort",
-    "gnomesort",
-    "shakersort",
-    "oddevensort",
-    "pancakesort",
-    "bitonicsort",
-    "radixsort",
-    "shellsort",
-    "combsort"
-]
+algorithms = sorted(
+    [
+        "quicksort",
+        "mergesort",
+        "heapsort",
+        "bubblesort",
+        "selectionsort",
+        "insertionsort",
+        "gnomesort",
+        "shakersort",
+        "oddevensort",
+        "pancakesort",
+        "bitonicsort",
+        "radixsort",
+        "shellsort",
+        "combsort",
+        "bogosort",
+    ]
+)
 extensions = ["c", "cpp", "cs", "go", "java", "js", "kt", "py", "rb", "swift"]
 
 
@@ -26,7 +29,7 @@ class AttributedTextFormatter(Formatter):
     def __init__(self):
         self.output = ""
 
-    def format(self, tokensource, outfile):
+    def format(self, tokensource, _):
         for ttype, value in tokensource:
             value = (
                 value.replace("[", "\\[")

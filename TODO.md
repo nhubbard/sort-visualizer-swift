@@ -76,7 +76,7 @@
     * [x] Radix Sort
     * [x] Shell Sort
     * [x] Comb Sort
-    * [ ] Bogo Sort
+    * [x] Bogo Sort
     * [ ] Stooge Sort
 * [ ] Add copy/paste floating button to AttributedCodeView
 * [ ] String resources/localization for all strings throughout the app.
@@ -97,18 +97,11 @@
   * Could we replace our custom sorting rectangles implementation, while magically introducing animations? We'll see...
 * [ ] Navigation API for SwiftUI 4
   * I will not implement this until I retarget the app to iPadOS 16/macOS Ventura, since the old navigation components are deprecated in these releases.
+  * It's also completely different and involves some weird magic that isn't documented yet.
 
 ## Far-Out Ideas
 
-* [ ] Reimplement the entire Pygments stack in Swift to reduce preprocessing and assets size?
-  * Could call it something like `PygmentsUI` or whatnot. Sounds like a **not** fun project.
-  * *Project update:* Currently abandoned. I was sinking an insane amount of time into directly porting Pygments to Swift. I would probably re-architect it to make it more reasonable and easier to use if I were to proceed forward.
-* [ ] Reimplement iosMath in Swift because I really want to?
-  * Could call it something like `MathUI`. Sounds like a less fun project because Objective-C bad.
-  * Swiftify is really expensive too, so I would have to do a manual conversion process, or complete the entire conversion process within their free limits (super annoying)
-* [ ] Rewrite selected packages, since they haven't been frequently updated and will probably break in Swift 5.7/SwiftUI 4
-  * [x] CollectionConcurrencyKit
-  * [ ] MarkdownUI
+* [ ] Rewrite MarkdownUI, since they haven't been frequently updated and will probably break in Swift 5.7/SwiftUI 4
 
 ## BizDev
 

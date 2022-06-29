@@ -5,25 +5,32 @@ import subprocess
 import logging
 import coloredlogs
 
-algorithms = sorted([
-    "quicksort",
-    "mergesort",
-    "heapsort",
-    "bubblesort",
-    "selectionsort",
-    "insertionsort",
-    "gnomesort",
-    "shakersort",
-    "oddevensort",
-    "pancakesort",
-    "bitonicsort",
-    "radixsort",
-    "shellsort",
-    "combsort"
-])
+algorithms = sorted(
+    [
+        "quicksort",
+        "mergesort",
+        "heapsort",
+        "bubblesort",
+        "selectionsort",
+        "insertionsort",
+        "gnomesort",
+        "shakersort",
+        "oddevensort",
+        "pancakesort",
+        "bitonicsort",
+        "radixsort",
+        "shellsort",
+        "combsort",
+        "bogosort",
+    ]
+)
 extensions = ["c", "cpp", "cs", "go", "java", "js", "kt", "py", "rb", "swift"]
 standard_expected = "[0, 14, 21, 23, 32, 39, 51, 56, 62, 68, 69, 77, 81, 83, 90, 91]"
 go_expected = standard_expected.replace(",", "")
+# Bogo sort is *very* slow on arrays larger than ~10 items.
+# I intentionally shortened the array to make it finish faster.
+bogo_expected = "[0, 14, 21, 23, 39, 62, 77, 91]"
+go_bogo_expected = bogo_expected.replace(",", "")
 success = []
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -48,9 +55,10 @@ def test_c(filename: str) -> bool:
             logger.debug(f"Compiler stdout:\n{compile_stdout}")
     except subprocess.CalledProcessError as e:
         logger.error(
-            f"Compilation of {filename} failed! See next entry for error message."
+            f"Compilation of {filename} failed! See next entry for error message(s)."
         )
-        logger.error(e.output.decode("utf-8").strip())
+        logger.error(e.stdout.decode("utf-8").strip())
+        logger.error(e.stderr.decode("utf-8").strip())
         sys.exit(1)
     logger.debug(f"Running ./{outfile}")
     output = (
@@ -58,10 +66,12 @@ def test_c(filename: str) -> bool:
         .stdout.decode("utf-8")
         .strip()
     )
-    if standard_expected != output:
-        logger.error(
-            f"{filename}: Failed! Expected {standard_expected}, found {output}"
-        )
+    if filename.startswith("bogosort"):
+        expected = bogo_expected
+    else:
+        expected = standard_expected
+    if expected != output:
+        logger.error(f"{filename}: Failed! Expected {expected}, found {output}")
         if os.path.exists(outfile):
             logger.debug(f"Deleting {outfile}")
             os.remove(outfile)
@@ -90,9 +100,10 @@ def test_cpp(filename: str) -> bool:
             logger.debug(f"Compiler stdout:\n{compile_stdout}")
     except subprocess.CalledProcessError as e:
         logger.error(
-            f"Compilation of {filename} failed! See next entry for error message."
+            f"Compilation of {filename} failed! See next entry for error message(s)."
         )
-        logger.error(e.output.decode("utf-8").strip())
+        logger.error(e.stdout.decode("utf-8").strip())
+        logger.error(e.stderr.decode("utf-8").strip())
         sys.exit(1)
     logger.debug(f"Running ./{outfile}")
     output = (
@@ -100,10 +111,12 @@ def test_cpp(filename: str) -> bool:
         .stdout.decode("utf-8")
         .strip()
     )
-    if standard_expected != output:
-        logger.error(
-            f"{filename}: Failed! Expected {standard_expected}, found {output}"
-        )
+    if filename.startswith("bogosort"):
+        expected = bogo_expected
+    else:
+        expected = standard_expected
+    if expected != output:
+        logger.error(f"{filename}: Failed! Expected {expected}, found {output}")
         if os.path.exists(outfile):
             logger.debug(f"Deleting {outfile}")
             os.remove(outfile)
@@ -129,9 +142,10 @@ def test_cs(filename: str) -> bool:
         )
     except subprocess.CalledProcessError as e:
         logger.error(
-            f"Compilation of {filename} failed! See next entry for error message."
+            f"Compilation of {filename} failed! See next entry for error message(s)."
         )
-        logger.error(e.output.decode("utf-8").strip())
+        logger.error(e.stdout.decode("utf-8").strip())
+        logger.error(e.stderr.decode("utf-8").strip())
         sys.exit(1)
     logger.debug(f"Running ./{outfile}")
     output = (
@@ -141,10 +155,12 @@ def test_cs(filename: str) -> bool:
         .stdout.decode("utf-8")
         .strip()
     )
-    if standard_expected != output:
-        logger.error(
-            f"{filename}: Failed! Expected {standard_expected}, found {output}"
-        )
+    if filename.startswith("bogosort"):
+        expected = bogo_expected
+    else:
+        expected = standard_expected
+    if expected != output:
+        logger.error(f"{filename}: Failed! Expected {expected}, found {output}")
         if os.path.exists(outfile):
             logger.debug(f"Deleting {outfile}")
             os.remove(outfile)
@@ -170,15 +186,20 @@ def test_go(filename: str) -> bool:
             .stdout.decode("utf-8")
             .strip()
         )
-        if go_expected != output:
-            logger.error(f"{filename}: Failed! Expected {go_expected}, found {output}")
+        if filename.startswith("bogosort"):
+            expected = go_bogo_expected
+        else:
+            expected = go_expected
+        if expected != output:
+            logger.error(f"{filename}: Failed! Expected {expected}, found {output}")
             return False
         else:
             logger.info(f"{filename}: Passed!")
             return True
     except subprocess.CalledProcessError as e:
         logger.error(f"Failed to execute {filename}! See next entry for error message.")
-        logger.error(e.output.decode("utf-8").strip())
+        logger.error(e.stdout.decode("utf-8").strip())
+        logger.error(e.stderr.decode("utf-8").strip())
         sys.exit(1)
 
 
@@ -196,9 +217,10 @@ def test_java(filename: str) -> bool:
             logger.debug(f"Compiler stdout:\n{compile_stdout}")
     except subprocess.CalledProcessError as e:
         logger.error(
-            f"Compilation of {filename} failed! See next entry for error message."
+            f"Compilation of {filename} failed! See next entry for error message(s)."
         )
-        logger.error(e.output.decode("utf-8").strip())
+        logger.error(e.stdout.decode("utf-8").strip())
+        logger.error(e.stderr.decode("utf-8").strip())
         sys.exit(1)
     logger.debug(f"Running ./{outfile}")
     output = (
@@ -213,10 +235,12 @@ def test_java(filename: str) -> bool:
         .stdout.decode("utf-8")
         .strip()
     )
-    if standard_expected != output:
-        logger.error(
-            f"{filename}: Failed! Expected {standard_expected}, found {output}"
-        )
+    if filename.startswith("bogosort"):
+        expected = bogo_expected
+    else:
+        expected = standard_expected
+    if expected != output:
+        logger.error(f"{filename}: Failed! Expected {expected}, found {output}")
         if os.path.exists(outfile):
             logger.debug(f"Deleting {outfile}")
             os.remove(outfile)
@@ -242,17 +266,20 @@ def test_js(filename: str) -> bool:
             .stdout.decode("utf-8")
             .strip()
         )
-        if standard_expected != output:
-            logger.error(
-                f"{filename}: Failed! Expected {standard_expected}, found {output}"
-            )
+        if filename.startswith("bogosort"):
+            expected = bogo_expected
+        else:
+            expected = standard_expected
+        if expected != output:
+            logger.error(f"{filename}: Failed! Expected {expected}, found {output}")
             return False
         else:
             logger.info(f"{filename}: Passed!")
             return True
     except subprocess.CalledProcessError as e:
         logger.error(f"Failed to run {filename}! See next entry for error message.")
-        logger.error(e.output.decode("utf-8").strip())
+        logger.error(e.stdout.decode("utf-8").strip())
+        logger.error(e.stderr.decode("utf-8").strip())
         sys.exit(1)
 
 
@@ -260,6 +287,7 @@ def test_kt(filename: str) -> bool:
     logger.debug(f"Testing {filename}")
     outfile = filename.split("/")[1].capitalize().replace(".kt", "Kt")
     classfile = outfile + ".class"
+    bogo_extra = "BogosortKt$isSorted$1.class"
     metafolder = os.path.abspath("./META-INF")
     logger.debug(f"Compiling {filename} into {outfile}")
     try:
@@ -271,9 +299,10 @@ def test_kt(filename: str) -> bool:
             logger.debug(f"Compiler stdout:\n{compile_stdout}")
     except subprocess.CalledProcessError as e:
         logger.error(
-            f"Compilation of {filename} failed! See next entry for error message."
+            f"Compilation of {filename} failed! See next entry for error message(s)."
         )
-        logger.error(e.output.decode("utf-8").strip())
+        logger.error(e.stdout.decode("utf-8").strip())
+        logger.error(e.stderr.decode("utf-8").strip())
         sys.exit(1)
     logger.debug(f"Running ./{outfile}")
     output = (
@@ -283,13 +312,19 @@ def test_kt(filename: str) -> bool:
         .stdout.decode("utf-8")
         .strip()
     )
-    if standard_expected != output:
-        logger.error(
-            f"{filename}: Failed! Expected {standard_expected}, found {output}"
-        )
+    if filename.startswith("bogosort"):
+        expected = bogo_expected
+    else:
+        expected = standard_expected
+    if expected != output:
+        logger.error(f"{filename}: Failed! Expected {expected}, found {output}")
         if os.path.exists(classfile):
             logger.debug(f"Deleting {classfile}")
             os.remove(classfile)
+        # Bogosort impl produces 2 class files for whatever reason.
+        if os.path.exists(bogo_extra):
+            logger.debug(f"Deleting {bogo_extra}")
+            os.remove(bogo_extra)
         if os.path.exists(metafolder) and os.path.isdir(metafolder):
             logger.debug("Deleting META-INF")
             shutil.rmtree(metafolder)
@@ -299,6 +334,10 @@ def test_kt(filename: str) -> bool:
         if os.path.exists(classfile):
             logger.debug(f"Deleting {classfile}")
             os.remove(classfile)
+            # Bogosort impl produces 2 class files for whatever reason.
+        if os.path.exists(bogo_extra):
+            logger.debug(f"Deleting {bogo_extra}")
+            os.remove(bogo_extra)
         if os.path.exists(metafolder) and os.path.isdir(metafolder):
             logger.debug("Deleting META-INF")
             shutil.rmtree(metafolder)
@@ -318,17 +357,20 @@ def test_py(filename: str) -> bool:
             .stdout.decode("utf-8")
             .strip()
         )
-        if standard_expected != output:
-            logger.error(
-                f"{filename}: Failed! Expected {standard_expected}, found {output}"
-            )
+        if filename.startswith("bogosort"):
+            expected = bogo_expected
+        else:
+            expected = standard_expected
+        if expected != output:
+            logger.error(f"{filename}: Failed! Expected {expected}, found {output}")
             return False
         else:
             logger.info(f"{filename}: Passed!")
             return True
     except subprocess.CalledProcessError as e:
         logger.error(f"Failed to run {filename}! See next entry for error message.")
-        logger.error(e.output.decode("utf-8").strip())
+        logger.error(e.stdout.decode("utf-8").strip())
+        logger.error(e.stderr.decode("utf-8").strip())
         sys.exit(1)
 
 
@@ -345,17 +387,20 @@ def test_rb(filename: str) -> bool:
             .stdout.decode("utf-8")
             .strip()
         )
-        if standard_expected != output:
-            logger.error(
-                f"{filename}: Failed! Expected {standard_expected}, found {output}"
-            )
+        if filename.startswith("bogosort"):
+            expected = bogo_expected
+        else:
+            expected = standard_expected
+        if expected != output:
+            logger.error(f"{filename}: Failed! Expected {expected}, found {output}")
             return False
         else:
             logger.info(f"{filename}: Passed!")
             return True
     except subprocess.CalledProcessError as e:
         logger.error(f"Failed to run {filename}! See next entry for error message.")
-        logger.error(e.output.decode("utf-8").strip())
+        logger.error(e.stdout.decode("utf-8").strip())
+        logger.error(e.stderr.decode("utf-8").strip())
         sys.exit(1)
 
 
@@ -372,9 +417,10 @@ def test_swift(filename: str) -> bool:
             logger.debug(f"Compiler stdout:\n{compile_stdout}")
     except subprocess.CalledProcessError as e:
         logger.error(
-            f"Compilation of {filename} failed! See next entry for error message."
+            f"Compilation of {filename} failed! See next entry for error message(s)."
         )
-        logger.error(e.output.decode("utf-8").strip())
+        logger.error(e.stdout.decode("utf-8").strip())
+        logger.error(e.stderr.decode("utf-8").strip())
         sys.exit(1)
     logger.debug(f"Running ./{outfile}")
     output = (
@@ -382,10 +428,12 @@ def test_swift(filename: str) -> bool:
         .stdout.decode("utf-8")
         .strip()
     )
-    if standard_expected != output:
-        logger.error(
-            f"{filename}: Failed! Expected {standard_expected}, found {output}"
-        )
+    if filename.startswith("bogosort"):
+        expected = bogo_expected
+    else:
+        expected = standard_expected
+    if expected != output:
+        logger.error(f"{filename}: Failed! Expected {expected}, found {output}")
         if os.path.exists(outfile):
             logger.debug(f"Deleting {outfile}")
             os.remove(outfile)
@@ -436,4 +484,6 @@ if __name__ == "__main__":
     if all(success):
         logger.info("All files compiled and/or run successfully with correct outputs.")
     else:
-        logger.error("One or more files compiled and/or run unsuccessfully. Check the log for errors.")
+        logger.error(
+            "One or more files compiled and/or run unsuccessfully. Check the log for errors."
+        )
