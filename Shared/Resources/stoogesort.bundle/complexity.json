@@ -1,0 +1,20 @@
+{
+  "complexities": [
+    {
+      "key": "Average Complexity",
+      "value": "O(n^(2.7095...))"
+    },
+    {
+      "key": "Best Case",
+      "value": "O(n^(2.7095...))"
+    },
+    {
+      "key": "Worst Case",
+      "value": "O(n^(2.7095...))"
+    },
+    {
+      "key": "Space Complexity",
+      "value": "O(n)"
+    }
+  ]
+}

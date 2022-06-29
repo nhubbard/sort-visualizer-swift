@@ -57,12 +57,12 @@
 * [x] Add transparency to Settings panel
 * [x] Fix jumping on Scrolling Sort View
   * The issue was the LazyVGrid. Replacing it with a really ugly VStack+HStack combo eliminated the problem.
-* [ ] *Big project:* Enhance sort algorithm pages with descriptions of algorithms, big-O notation values, and implementation code for various languages
+* [x] *Big project:* Enhance sort algorithm pages with descriptions of algorithms, big-O notation values, and implementation code for various languages
   * [x] Create initial concept
   * [x] Implement description
   * [x] Implement big-O values
   * [x] Implement top 10 programming language examples for QuickSort as test
-  * [ ] Implement top 10 programming language examples for all other algorithms
+  * [x] Implement top 10 programming language examples for all other algorithms
     * [x] Merge Sort
     * [x] Heap Sort
     * [x] Bubble Sort
@@ -77,12 +77,12 @@
     * [x] Shell Sort
     * [x] Comb Sort
     * [x] Bogo Sort
-    * [ ] Stooge Sort
+    * [x] Stooge Sort
 * [ ] Add copy/paste floating button to AttributedCodeView
 * [ ] String resources/localization for all strings throughout the app.
 * [ ] Settings panel that allows you to change lots of options
   * Synthesizer: note range, attack, decay, sustain, release
-  * Sort view: auto-enable sound, default delay, default array size, array size range
+  * Sort view: default sound on, default delay, default array size, array size range
   * Bogo sort: disable bogo sort prompt
   * Bitonic sort: disable bitonic sort warning
 * [ ] Replace homepage content with Wikipedia text for "Sorting algorithm". Only necessary for localization purposes.

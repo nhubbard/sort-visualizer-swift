@@ -22,6 +22,7 @@ algorithms = sorted(
         "shellsort",
         "combsort",
         "bogosort",
+        "stoogesort",
     ]
 )
 extensions = ["c", "cpp", "cs", "go", "java", "js", "kt", "py", "rb", "swift"]

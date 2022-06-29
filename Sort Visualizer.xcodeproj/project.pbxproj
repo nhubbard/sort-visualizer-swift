@@ -22,6 +22,7 @@
 		714AA7812845013200D92535 /* Color+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 714AA7802845013200D92535 /* Color+Extensions.swift */; };
 		71548F162864E4A200043680 /* AttributedCodeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71548F152864E4A200043680 /* AttributedCodeView.swift */; };
 		7156FB742850CF9E00A75F7F /* insertionsort.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 7156FB732850CF9E00A75F7F /* insertionsort.bundle */; };
+		715B11FD286C9C8D0087E837 /* stoogesort.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 715B11FC286C9C8D0087E837 /* stoogesort.bundle */; };
 		71610A9628357F5C00F6176E /* Int+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71610A9528357F5C00F6176E /* Int+Extensions.swift */; };
 		71610C0E2844213900A2696C /* quicksort.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 71610C0D2844213900A2696C /* quicksort.bundle */; };
 		71619A472860A3FA00CCA31C /* SortStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71619A462860A3FA00CCA31C /* SortStatus.swift */; };
@@ -110,6 +111,7 @@
 		714AA7802845013200D92535 /* Color+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Extensions.swift"; sourceTree = "<group>"; };
 		71548F152864E4A200043680 /* AttributedCodeView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AttributedCodeView.swift; sourceTree = "<group>"; };
 		7156FB732850CF9E00A75F7F /* insertionsort.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = insertionsort.bundle; sourceTree = "<group>"; };
+		715B11FC286C9C8D0087E837 /* stoogesort.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = stoogesort.bundle; sourceTree = "<group>"; };
 		71610A9528357F5C00F6176E /* Int+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Int+Extensions.swift"; sourceTree = "<group>"; };
 		71610C0D2844213900A2696C /* quicksort.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = quicksort.bundle; sourceTree = "<group>"; };
 		71619A462860A3FA00CCA31C /* SortStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SortStatus.swift; sourceTree = "<group>"; };
@@ -221,6 +223,7 @@
 		71610BF82844101700A2696C /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				715B11FC286C9C8D0087E837 /* stoogesort.bundle */,
 				7145E2CC286B298B0038940D /* bogosort.bundle */,
 				7145E2CA286B24430038940D /* combsort.bundle */,
 				7113FCB4286758DF00665F09 /* shellsort.bundle */,
@@ -547,6 +550,7 @@
 				71F9C46228623A8200159EF5 /* pancakesort.bundle in Resources */,
 				71F9C464286261DC00159EF5 /* bitonicsort.bundle in Resources */,
 				7113FCB5286758DF00665F09 /* shellsort.bundle in Resources */,
+				715B11FD286C9C8D0087E837 /* stoogesort.bundle in Resources */,
 				71610C0E2844213900A2696C /* quicksort.bundle in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
