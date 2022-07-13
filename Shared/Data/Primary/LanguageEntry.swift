@@ -8,7 +8,7 @@
 import Foundation
 import SwiftUI
 
-struct LanguageEntry: Identifiable {
+struct LanguageEntry: Identifiable, Hashable {
   let id = UUID()
   var title: String
   var icon: String

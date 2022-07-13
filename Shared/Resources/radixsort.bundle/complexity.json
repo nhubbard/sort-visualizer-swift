@@ -2,19 +2,23 @@
   "complexities": [
     {
       "key": "Average Complexity",
-      "value": "O(d × (n + b))"
+      "value": "O(d × (n + b))",
+      "mathml": "\\(O(d\\times{}(n + b))\\)"
     },
     {
       "key": "Best Case",
-      "value": "O(d × (n + b))"
+      "value": "O(d × (n + b))",
+      "mathml": "\\(O(d\\times{}(n + b))\\)"
     },
     {
       "key": "Worst Case",
-      "value": "O(d × (n + b))"
+      "value": "O(d × (n + b))",
+      "mathml": "\\(O(d\\times{}(n + b))\\)"
     },
     {
       "key": "Space Complexity",
-      "value": "O(n + 2^d)"
+      "value": "O(n + 2^d)",
+      "mathml": "\\(O(n + 2^d)\\)"
     }
   ]
 }

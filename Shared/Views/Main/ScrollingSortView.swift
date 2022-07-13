@@ -8,6 +8,8 @@
 import SwiftUI
 import MarkdownUI
 
+fileprivate let adaptiveWidthValue: CGFloat = CGFloat(0.465)
+
 struct LanguageView: View {
   var algorithm: Algorithms
   var language: LanguageEntry
@@ -17,7 +19,8 @@ struct LanguageView: View {
       Label {
         Text(language.title)
       } icon: {
-        Image.ofAsset(language.icon, width: CGFloat(language.iconWidth), height: CGFloat(language.iconHeight)).foregroundColor(language.iconColor ?? .white)
+        Image.ofAsset(language.icon, width: CGFloat(language.iconWidth), height: CGFloat(language.iconHeight))
+          .foregroundColor(language.iconColor ?? .white)
       }.font(.headline)
       AttributedCode(loadHighlightResource(algorithm, language.fileExtension))
     }
@@ -26,6 +29,7 @@ struct LanguageView: View {
 
 struct ScrollingSortView: View {
   var algorithm: Algorithms
+  @State private var selectedLanguage: Int = 0
   
   var body: some View {
     GeometryReader { geo in
@@ -42,54 +46,82 @@ struct ScrollingSortView: View {
                 Markdown(loadResource(algorithm, "description", "md"))
                   .font(.system(size: 16, design: .default))
                   .lineSpacing(1.75)
-              }.frame(maxWidth: 0.75 * geo.size.width)
+              }.frame(maxWidth: 0.65 * geo.size.width)
               VStack(alignment: .center, spacing: 16) {
                 Text("Complexity")
                   .font(.system(size: 24, weight: .bold, design: .default))
                   .multilineTextAlignment(.leading)
                 VStack(spacing: 2) {
                   ForEach(loadComplexityResource(algorithm)) { entry in
-                    HStack(spacing: 1) {
-                      Text("• \(entry.key): ")
-                        .bold()
-                        .font(.system(size: 16, design: .default)) +
-                      Text(entry.value)
-                        .foregroundColor(.blue)
-                        .font(.system(size: 16, design: .default))
+                    HStack(alignment: .center, spacing: 1) {
+                      Group {
+                        if entry.mathml != "" {
+                          MathView(text: entry.key, unicode: entry.value, math: entry.mathml)
+                            .frame(width: nil, height: 36)
+                        } else {
+                          Text("• \(entry.key): ")
+                            .bold()
+                            .font(.system(size: 16, design: .default)) +
+                          Text(entry.value)
+                            .foregroundColor(.blue)
+                            .font(.system(size: 16, design: .default))
+                        }
+                      }
                       Spacer()
                     }
                   }
                   Spacer()
                 }
-              }.frame(maxWidth: 0.25 * geo.size.width)
+              }.frame(maxWidth: 0.35 * geo.size.width)
             }
           }.padding(.all, 32)
           Group {
-            Text("Implementations")
-              .font(.system(size: 24, weight: .bold, design: .default))
-              .multilineTextAlignment(.leading)
-            #if targetEnvironment(macCatalyst)
-            // Manually spaced grid. LazyVGrid was causing a top of performance issues.
-            VStack(alignment: .leading, spacing: 16) {
-              ForEach(0..<5) { i in
-                HStack(alignment: .top, spacing: 16) {
-                  // This is a really weird way to remove extra complexity.
-                  // The first ForEach is [0, 1, 2, 3, 4]. This converts it to [[0, 2], [2, 4], [4, 6], [6, 8], [8, 10]].
-                  ForEach(languages[(i * 2)..<((i * 2) &+ 2)]) { language in
-                    LanguageView(algorithm: algorithm, language: language)
-                      .frame(width: geo.size.width * 0.45, height: nil, alignment: .center)
+            HStack {
+              Text("Implementations")
+                .font(.system(size: 24, weight: .bold, design: .default))
+                .multilineTextAlignment(.leading)
+              HStack(alignment: .center, spacing: 0) {
+                ForEach(0..<languages.count, id: \.self) { i in
+                  HStack {
+                    Label {
+                      Text(languages[i].title)
+                    } icon: {
+                      Image.ofAsset(
+                        languages[i].icon,
+                        width: CGFloat(languages[i].iconWidth),
+                        height: CGFloat(languages[i].iconHeight)
+                      )
+                      .foregroundColor(languages[i].iconColor ?? .primary)
+                    }
                   }
+                  .padding(.all, 10)
+                  .background(
+                    Capsule()
+                      .fill(.primary)
+                      .opacity(self.selectedLanguage == i ? 0.24 : 0)
+                  )
+                  .onTapGesture { self.selectedLanguage = i }
                 }
               }
+              .frame(alignment: .center)
+              .padding(.all, 3)
+              .background(Capsule().fill(Color.primary.opacity(0.06)))
             }
-            #elseif os(iOS)
-            // This was added after testing on an iPad. It's not a bad experience per se, but it's a better experience than having multiple code views stuck on top of one another.
-            VStack(alignment: .leading, spacing: 8) {
-              ForEach(languages) { language in
-                LanguageView(algorithm: algorithm, language: language)
-              }
-            }
-            #endif
+            AttributedCode(loadHighlightResource(algorithm, languages[self.selectedLanguage].fileExtension))
+            /*
+            VStack(alignment: .center, spacing: 4) {
+              Picker(selection: $selectedLanguage, label: Text("Select Programming Language")) {
+                ForEach(0..<languages.count, id: \.self) { i in
+                  Label {
+                    Text(languages[i].title)
+                  } icon: {
+                    Image.ofAsset(languages[i].icon, width: CGFloat(languages[i].iconWidth), height: CGFloat(languages[i].iconHeight))
+                      .foregroundColor(languages[i].iconColor ?? .white)
+                  }.font(.headline)
+                }
+              }.pickerStyle(SegmentedPickerStyle())
+              AttributedCode(loadHighlightResource(algorithm, languages[selectedLanguage].fileExtension))
+            }*/
           }.padding(.all, 32)
         }
       }
@@ -115,26 +147,17 @@ func loadResource(_ algorithm: Algorithms, _ filename: String, _ ext: String) ->
 
 func loadComplexityResource(_ algorithm: Algorithms) -> [ComplexityEntry] {
   let key = algorithm.rawValue
-  var result: [ComplexityEntry] = []
   guard let path = Bundle.main.path(forResource: key, ofType: "bundle"),
         let bundle = Bundle(path: path),
         let url = bundle.path(forResource: "complexity", ofType: "json") else {
     fatalError("Couldn't find complexity.json in \(key).bundle!")
   }
   let data = try! Data(contentsOf: URL(fileURLWithPath: url))
-  if let json = try! JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
-    guard let items = json["complexities"] as? [[String: String]] else {
-      return result
-    }
-    for item in items {
-      guard let key = item["key"],
-            let value = item["value"] else {
-        continue
-      }
-      result.append(ComplexityEntry(key: key, value: value))
-    }
+  let decoder = JSONDecoder()
+  guard let contents = try? decoder.decode(ComplexityFile.self, from: data) else {
+    return []
   }
-  return result
+  return contents.complexities
 }
 
 func loadHighlightResource(_ algorithm: Algorithms, _ ext: String) -> String {

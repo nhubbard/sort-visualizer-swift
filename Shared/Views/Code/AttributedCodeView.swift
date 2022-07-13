@@ -16,6 +16,7 @@ struct AttributedCode: View {
       .fixedSize(horizontal: true, vertical: true)
       .background(theme.getBgColor())
       .cornerRadius(15)
+      .textSelection(.enabled)
   }
   
   init(_ key: String) {

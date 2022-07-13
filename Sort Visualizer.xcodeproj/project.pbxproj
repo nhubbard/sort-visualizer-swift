@@ -17,6 +17,7 @@
 		7120CB9F28397E5B0019D976 /* AudioKitUI in Frameworks */ = {isa = PBXBuildFile; productRef = 7120CB9E28397E5B0019D976 /* AudioKitUI */; };
 		7120CBA228397EE40019D976 /* SoundpipeAudioKit in Frameworks */ = {isa = PBXBuildFile; productRef = 7120CBA128397EE40019D976 /* SoundpipeAudioKit */; };
 		712FAC49285E2A2B0045B50A /* Algorithms in Frameworks */ = {isa = PBXBuildFile; productRef = 712FAC48285E2A2B0045B50A /* Algorithms */; };
+		713371F128775DAE00DE2D7E /* MathView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 713371F028775DAE00DE2D7E /* MathView.swift */; };
 		7145E2CB286B24430038940D /* combsort.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 7145E2CA286B24430038940D /* combsort.bundle */; };
 		7145E2CD286B298B0038940D /* bogosort.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 7145E2CC286B298B0038940D /* bogosort.bundle */; };
 		714AA7812845013200D92535 /* Color+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 714AA7802845013200D92535 /* Color+Extensions.swift */; };
@@ -105,6 +106,7 @@
 		7113FCB4286758DF00665F09 /* shellsort.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = shellsort.bundle; sourceTree = "<group>"; };
 		711EF293285CC174001EB6AC /* BogoSortImpl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BogoSortImpl.swift; sourceTree = "<group>"; };
 		7120CB9828397DF00019D976 /* Synthesizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Synthesizer.swift; sourceTree = "<group>"; };
+		713371F028775DAE00DE2D7E /* MathView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MathView.swift; sourceTree = "<group>"; };
 		713FA7AF284A5DAE00F12327 /* highlight.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = highlight.py; sourceTree = "<group>"; };
 		7145E2CA286B24430038940D /* combsort.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = combsort.bundle; sourceTree = "<group>"; };
 		7145E2CC286B298B0038940D /* bogosort.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = bogosort.bundle; sourceTree = "<group>"; };
@@ -278,6 +280,7 @@
 				71D4DBEF28185DFD001DBD0E /* HomeView.swift */,
 				71F38EB72819B42C0085BAAA /* SortView.swift */,
 				71650A3D28429DB200A23BC2 /* ScrollingSortView.swift */,
+				713371F028775DAE00DE2D7E /* MathView.swift */,
 			);
 			path = Main;
 			sourceTree = "<group>";
@@ -590,6 +593,7 @@
 				71619A472860A3FA00CCA31C /* SortStatus.swift in Sources */,
 				7120CB9928397DF00019D976 /* Synthesizer.swift in Sources */,
 				71F4B35028207C02006B68E6 /* SortViewModel.swift in Sources */,
+				713371F128775DAE00DE2D7E /* MathView.swift in Sources */,
 				71CCA06F2866446800E4D666 /* DraculaTheme.swift in Sources */,
 				71CFAC1228396EC3004672DB /* RadixSortImpl.swift in Sources */,
 				71D4DC0B2818634E001DBD0E /* OddEvenSort.swift in Sources */,

@@ -2,19 +2,23 @@
   "complexities": [
     {
       "key": "Average Complexity",
-      "value": "O(log²(n))"
+      "value": "O(log²(n))",
+      "mathml": "\\(O(log^{2}(n))\\)"
     },
     {
       "key": "Best Case",
-      "value": "O(log²(n))"
+      "value": "O(log²(n))",
+      "mathml": "\\(O(log^{2}(n))\\)"
     },
     {
       "key": "Worst Case",
-      "value": "O(log²(n))"
+      "value": "O(log²(n))",
+      "mathml": "\\(O(log^{2}(n))\\)"
     },
     {
       "key": "Space Complexity",
-      "value": "O(n × log²(n))"
+      "value": "O(n × log²(n))",
+      "mathml": "\\(O(n\\times{}log^{2}(n))\\)"
     }
   ]
 }
