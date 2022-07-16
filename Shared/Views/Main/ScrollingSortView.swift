@@ -8,25 +8,6 @@
 import SwiftUI
 import MarkdownUI
 
-fileprivate let adaptiveWidthValue: CGFloat = CGFloat(0.465)
-
-struct LanguageView: View {
-  var algorithm: Algorithms
-  var language: LanguageEntry
-  
-  var body: some View {
-    VStack(alignment: .center, spacing: 4) {
-      Label {
-        Text(language.title)
-      } icon: {
-        Image.ofAsset(language.icon, width: CGFloat(language.iconWidth), height: CGFloat(language.iconHeight))
-          .foregroundColor(language.iconColor ?? .white)
-      }.font(.headline)
-      AttributedCode(loadHighlightResource(algorithm, language.fileExtension))
-    }
-  }
-}
-
 struct ScrollingSortView: View {
   var algorithm: Algorithms
   @State private var selectedLanguage: Int = 0
@@ -108,20 +89,6 @@ struct ScrollingSortView: View {
               .background(Capsule().fill(Color.primary.opacity(0.06)))
             }
             AttributedCode(loadHighlightResource(algorithm, languages[self.selectedLanguage].fileExtension))
-            /*
-            VStack(alignment: .center, spacing: 4) {
-              Picker(selection: $selectedLanguage, label: Text("Select Programming Language")) {
-                ForEach(0..<languages.count, id: \.self) { i in
-                  Label {
-                    Text(languages[i].title)
-                  } icon: {
-                    Image.ofAsset(languages[i].icon, width: CGFloat(languages[i].iconWidth), height: CGFloat(languages[i].iconHeight))
-                      .foregroundColor(languages[i].iconColor ?? .white)
-                  }.font(.headline)
-                }
-              }.pickerStyle(SegmentedPickerStyle())
-              AttributedCode(loadHighlightResource(algorithm, languages[selectedLanguage].fileExtension))
-            }*/
           }.padding(.all, 32)
         }
       }
@@ -145,33 +112,15 @@ func loadResource(_ algorithm: Algorithms, _ filename: String, _ ext: String) ->
   return data
 }
 
+func loadHighlightResource(_ algorithm: Algorithms, _ ext: String) -> String {
+  loadResource(algorithm, "\(algorithm.rawValue).\(ext)", "md")
+}
+
 func loadComplexityResource(_ algorithm: Algorithms) -> [ComplexityEntry] {
-  let key = algorithm.rawValue
-  guard let path = Bundle.main.path(forResource: key, ofType: "bundle"),
-        let bundle = Bundle(path: path),
-        let url = bundle.path(forResource: "complexity", ofType: "json") else {
-    fatalError("Couldn't find complexity.json in \(key).bundle!")
-  }
-  let data = try! Data(contentsOf: URL(fileURLWithPath: url))
+  let data = loadResource(algorithm, "complexity", "json").data(using: .utf8)!
   let decoder = JSONDecoder()
   guard let contents = try? decoder.decode(ComplexityFile.self, from: data) else {
     return []
   }
   return contents.complexities
-}
-
-func loadHighlightResource(_ algorithm: Algorithms, _ ext: String) -> String {
-  let key = algorithm.rawValue
-  let data: String
-  guard let path = Bundle.main.path(forResource: key, ofType: "bundle"),
-        let bundle = Bundle(path: path),
-        let url = bundle.path(forResource: key, ofType: "\(ext).md") else {
-    fatalError("Couldn't find \(key).\(ext).md in \(key).bundle!")
-  }
-  do {
-    data = try String(contentsOfFile: String(url))
-  } catch {
-    fatalError("Couldn't load \(algorithm.rawValue).\(ext).md from \(key).bundle:\n\(error)")
-  }
-  return data
 }

@@ -7,6 +7,7 @@
 
 import Foundation
 
+@inlinable
 func floatRatio(x: Float, oldRange: ClosedRange<Float>, newRange: ClosedRange<Float>) -> Float {
   let oMin = oldRange.lowerBound
   let oMax = oldRange.upperBound

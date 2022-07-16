@@ -45,7 +45,7 @@ extension SortViewModel {
   }
   
   @MainActor
-  @inline(__always)
+  @inlinable
   func mergeSort() async {
     await _mergeSort(0, data.count - 1)
   }

@@ -23,7 +23,7 @@ final class SortViewModel: ObservableObject {
   @Published var running: Bool = false
   @Published var sound: Bool = false
   @Published var delay: Float = 0.1
-  @Published var sizeRange: ClosedRange<Float> = 16...512
+  @Published var sizeRange: ClosedRange<Float> = 16...2048
   
   // Published UI state variables
   @Published var showIncompleteWarning: Bool = false
@@ -45,38 +45,38 @@ final class SortViewModel: ObservableObject {
   
   /// Throw an unchecked error if we attempt to access a value outside the range of the `data` array's length.
   @MainActor
-  @inline(__always)
+  @inlinable
   func enforceIndex(_ index: Int) async {
     precondition(data.indices.contains(index), "The index \(index) does not exist on an array of length \(data.endIndex)!")
   }
   
   /// Throw an unchecked error if we attempt to access a value at any one of the `indices` outside the range of the `data` array's length.
   @MainActor
-  @inline(__always)
+  @inlinable
   func enforceIndices(_ indices: Int...) async {
-    for index in indices {
+    await indices.concurrentForEach { [self] index in
       await enforceIndex(index)
     }
   }
   
   /// Check to see that the algorithm isn't stopped or the Task isn't cancelled.
   @MainActor
-  @inline(__always)
+  @inlinable
   func enforceRunning() async -> Bool {
     !Task.isCancelled && running
   }
   
   /// Delay an action within an `async` closure.
   @MainActor
-  @inline(__always)
+  @inlinable
   func delay() async {
     // 1 nanosecond delay; prevents the UI from freezing when all operations on the array happen at once by moving the slider to zero seconds
-    try? await Task.sleep(nanoseconds: UInt64(delay > 0.0 ? delay * 1_000_000 : 1))
+    try? await Task.sleep(nanoseconds: UInt64(max(delay * 1_000_000, 1)))
   }
   
   /// Play a note using the data ranges and the current delay.
   @MainActor
-  @inline(__always)
+  @inlinable
   func playNote(_ index: Int) async {
     guard await enforceRunning() && sound else { return }
     await toner.playNote(value: index, range: data.indices.lowerBound...data.indices.upperBound, time: delay)
@@ -84,28 +84,30 @@ final class SortViewModel: ObservableObject {
   
   /// Set the contents of the data array asynchronously.
   @MainActor
-  @inline(__always)
+  @inlinable
   func setData(_ data: [SortItem]) async {
     self.data = data
   }
   
   /// Increment the operation counter in the UI atomically and asynchronously.
   @MainActor
-  @inline(__always)
+  @inlinable
   func operate() async {
     guard await enforceRunning() else { return }
-    operations.wrappingIncrement(by: 1, ordering: .relaxed)
+    Task.detached { [self] in
+      await operations.wrappingIncrement(by: 1, ordering: .relaxed)
+    }
   }
   
   /// Get the operations counter
   @MainActor
-  @inline(__always)
+  @inlinable
   func getOperations() -> Int {
     operations.load(ordering: .relaxed)
   }
   
   @MainActor
-  @inline(__always)
+  @inlinable
   func setAlgo(algo: Algorithms) {
     algorithm = algo
   }
@@ -202,7 +204,7 @@ final class SortViewModel: ObservableObject {
   
   /// Get the integer value of a SortItem at the specified index.
   @MainActor
-  @inline(__always)
+  @inlinable
   func getValue(_ index: Int) async -> Int? {
     guard await enforceRunning() else { return nil }
     await enforceIndex(index)
@@ -213,7 +215,7 @@ final class SortViewModel: ObservableObject {
   
   /// Get the SortItem from an index. Nullable.
   @MainActor
-  @inline(__always)
+  @inlinable
   func getItem(_ index: Int) async -> SortItem? {
     guard await enforceRunning() else { return nil }
     await enforceIndex(index)
@@ -224,7 +226,7 @@ final class SortViewModel: ObservableObject {
   
   /// Set the SortItem value at an index.
   @MainActor
-  @inline(__always)
+  @inlinable
   func setValue(_ index: Int, _ newValue: Int) async {
     guard await enforceRunning() else { return }
     await enforceIndex(index)
@@ -235,7 +237,7 @@ final class SortViewModel: ObservableObject {
   
   /// Set the SortItem at an index.
   @MainActor
-  @inline(__always)
+  @inlinable
   func setItem(_ index: Int, _ value: SortItem) async {
     guard await enforceRunning() else { return }
     await enforceIndex(index)
@@ -246,7 +248,7 @@ final class SortViewModel: ObservableObject {
   
   /// Change the color of a SortItem at the specified index.
   @MainActor
-  @inline(__always)
+  @inlinable
   func changeColor(index: Int, color: Color) async {
     guard await enforceRunning() else { return }
     await enforceIndex(index)
@@ -255,7 +257,7 @@ final class SortViewModel: ObservableObject {
   
   /// Reset the color of a SortItem to white at the specified index.
   @MainActor
-  @inline(__always)
+  @inlinable
   func resetColor(index: Int) async {
     guard await enforceRunning() else { return }
     await enforceIndex(index)

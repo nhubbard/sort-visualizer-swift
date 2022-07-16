@@ -58,9 +58,7 @@ extension SortViewModel {
           await changeColor(index: counter, color: color)
           coloredIndices.append(counter)
           counter++
-          await delay()
         }
-        await delay()
         await coloredIndices.concurrentForEach { [self] index in
           guard await enforceRunning() else {
             return
@@ -70,7 +68,6 @@ extension SortViewModel {
         coloredIndices.removeAll()
       }
       counter = 0
-      await delay()
     }
   }
 }

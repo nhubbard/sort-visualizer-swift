@@ -27,7 +27,6 @@ extension SortViewModel {
         key = j
       }
       guard i != key else { continue }
-      await delay()
       await swap(i, key)
     }
   }

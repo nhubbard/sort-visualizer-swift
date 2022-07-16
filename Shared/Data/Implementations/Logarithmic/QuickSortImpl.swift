@@ -60,7 +60,7 @@ extension SortViewModel {
   }
   
   @MainActor
-  @inline(__always)
+  @inlinable
   func quickSort() async {
     guard await enforceRunning() else {
       return

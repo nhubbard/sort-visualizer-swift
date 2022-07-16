@@ -11,13 +11,14 @@
 * [x] Add error to bitonic sort if the array size isn't a power of 2
 * [x] Rewrite CodeView to use AttributedString instead of a reduce operation.
   * This is what was causing the crashes on Mom's iPad. It was overflowing the stack with too many variables.
-* [ ] Implement step functionality, possibly using delay as a catalyst?
 * [ ] Unit testing and UI testing
   * I tried doing unit testing with a protocol and a separate implementation in the unit tests target, but it just... failed over and over and over again.
   * This may necessitate creating a brand-new Xcode project with tests enabled by default, copying all of the files and settings from the old project, and working from there. Ugh.
-* [ ] Set up Unibeautify to keep algorithm example code properly formatted
 * [x] Set up a testing system that validates algorithm example code results
 * [x] Replace manual JSON parsing with Decodable
+* [ ] **Crazy cool idea:** Decouple array changes from the UI to improve performance.
+  * My best idea of how to implement this revolves around a sealed enum with various parameters being put into a queue, using either Combine or RxSwift, that will communicate array changes to the UI to be displayed.
+  * Algorithms will generally perform better, and strict concurrency checking will be possible without a ton of warnings.
 
 ## Algorithms
 
@@ -92,17 +93,14 @@
   
 ### In Progress
 
-* [ ] **Project BigView** Full-screen SortView
-  * Dependency for ScreenCaptureKit support in macOS Ventura.
-  * Add text in the top left corner of the SortView showing the information that's already visible in the SortView options pane, for recording and full-screen purposes.
-* [ ] **Project Market**: Branding and general customization
+* [ ] Branding and general customization
   * [ ] App icon
-  * [ ] About dialog
-* [ ] **Project Understand**: Translation/localization
+  * [x] About dialog (see Shared/Resources/Credits.rtf)
+* [ ] Translation/localization
   * [ ] Replace homepage content with Wikipedia text for "Sorting algorithm".
   * [ ] String resources/localization for all strings throughout the app.
   * [ ] Add copyright and license attribution for Wikipedia-sourced content.
-* [ ] **Project Configure**: Settings Panel
+* [ ] Settings Panel
   * [ ] First things first: type-safe configuration lookup is an absolute requirement. We might be able to accomplish this using SwiftUI's awesome "environment" dependency injection.
   * [ ] Synthesizer
     * [ ] Note range (use piano control from AudioKitUI, see Cookbook app for examples)
@@ -126,6 +124,10 @@
     * [ ] Disable bogo sort warning prompt
   * [ ] Bitonic sort
     * [ ] Disable bitonic sort warning
+* [ ] Expand the counters from just "Operations" to the standard set of metrics (array accesses, inversions, reversals, etc.)
+* [ ] Add more sorting algorithms. Port them from Gaming32/ArrayV, if possible.
+* [ ] Add a timer that appears when the sort finishes
+* [ ] Finally implement step functionality, possibly using delay as a catalyst
 
 ## Future Ideas from WWDC 2022
 

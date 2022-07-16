@@ -11,69 +11,63 @@ struct SortView: View {
   @StateObject var state: SortViewModel = SortViewModel()
   
   var body: some View {
-    ZStack {
-      GeometryReader { geo in
-        let rectWidth = geo.size.width / CGFloat(state.data.count)
-        let rectMinHeight = geo.size.height / CGFloat(state.data.count)
-        HStack(alignment: .bottom, spacing: 0) {
-          ForEach(state.data) { item in
-            Rectangle().fill(item.color).frame(width: rectWidth, height: rectMinHeight * CGFloat(item.value))
-          }
-        }.frame(width: geo.size.width, height: geo.size.height, alignment: .bottomLeading)
-        GroupBox(label: Label("Settings", systemImage: "gear").padding(.top, 2).padding(.bottom, 2)) {
-          // Settings:
-          // Running and Sound toggles
-          HStack(spacing: 10) {
-            // Running toggle
-            Toggle(isOn: $state.running) {
-              Label("Running", systemImage: "play.fill")
-            }.frame(maxWidth: 150).toggleStyle(.switch).onChange(of: state.running, perform: onRunning)
-            // Sound toggle
-            Toggle(isOn: $state.sound) {
-              Label("Sound", systemImage: "speaker.wave.2")
-            }
-            .frame(maxWidth: 150)
-            .toggleStyle(.switch)
+    GeometryReader { geo in
+      let rectWidth = geo.size.width / CGFloat(state.data.count)
+      let rectMinHeight = geo.size.height / CGFloat(state.data.count)
+      HStack(alignment: .bottom, spacing: 0) {
+        ForEach(state.data) { item in
+          Rectangle().fill(item.color).frame(width: rectWidth, height: rectMinHeight * CGFloat(item.value))
+        }
+      }.frame(width: geo.size.width, height: geo.size.height, alignment: .bottomLeading)
+    }
+    .overlay(alignment: .topLeading) {
+      GroupBox(label: Label("Settings", systemImage: "gear").padding(.top, 2).padding(.bottom, 2)) {
+        // Running and Sound toggles
+        HStack(spacing: 10) {
+          // Running toggle
+          StateToggle(binding: $state.running, name: "Running", iconName: "play.fill")
+            .onChange(of: state.running, perform: onRunning)
+          // Sound toggle
+          StateToggle(binding: $state.sound, name: "Sound", iconName: "speaker.wave.2")
             .disabled(state.soundDisabled)
             .onChange(of: state.sound, perform: onSound)
-          }.padding(.horizontal, 20)
-          // Reset and Step buttons
-          HStack(spacing: 10) {
-            // Reset button
-            Button(action: onReset) {
-              Label("Reset", systemImage: "repeat")
-            }.frame(maxWidth: 150)
-            // Step button
-            Button(action: onStep) {
-              Label("Step", systemImage: "figure.walk")
-            }
-              .frame(maxWidth: 150)
-              .popover(isPresented: $state.showStepPopover, arrowEdge: .trailing) {
-                Text("Sorry, this function is not implemented yet.")
-                  .padding(.all, 4)
-              }
-          }.padding(.horizontal, 20)
-          // Delay slider
-          HStack(spacing: 10) {
-            Text("Delay")
-            Slider(value: $state.delay, in: 0...100)
-              .frame(maxWidth: 192)
-            Text(String(format: "%.1f ms", state.delay))
-              .foregroundColor(.blue)
+        }.padding(.horizontal, 20)
+        // Reset and Step buttons
+        HStack(spacing: 10) {
+          // Reset button
+          Button(action: onReset) {
+            Label("Reset", systemImage: "repeat")
+          }.frame(maxWidth: 150)
+          // Step button
+          Button(action: onStep) {
+            Label("Step", systemImage: "figure.walk")
           }
-          // Array Size slider
-          HStack(spacing: 10) {
-            Text("Array Size")
-            Slider(value: $state.arraySizeBacking, in: state.sizeRange, step: 2)
-              .onChange(of: state.arraySizeBacking, perform: onArraySizeChange)
-              .frame(maxWidth: 192)
-            Text(String(format: "%d", Int(state.arraySizeBacking)))
-              .foregroundColor(.blue)
+          .frame(maxWidth: 150)
+          .popover(isPresented: $state.showStepPopover, arrowEdge: .trailing) {
+            Text("Sorry, this function is not implemented yet.")
+              .padding(.all, 4)
           }
-          // Operations counter
-          Text("Operations: ") + Text("\(state.getOperations())").foregroundColor(.blue)
-        }.background(.black.opacity(0.9)).cornerRadius(15).frame(minWidth: 300, maxWidth: 450, minHeight: 64).padding(.all, 8)
-      }
+        }.padding(.horizontal, 20)
+        // Delay slider
+        HStack(spacing: 10) {
+          Text("Delay")
+          Slider(value: $state.delay, in: 0...100)
+            .frame(maxWidth: 192)
+          Text(String(format: "%.1f ms", state.delay))
+            .foregroundColor(.blue)
+        }
+        // Array Size slider
+        HStack(spacing: 10) {
+          Text("Array Size")
+          Slider(value: $state.arraySizeBacking, in: state.sizeRange, step: 2)
+            .onChange(of: state.arraySizeBacking, perform: onArraySizeChange)
+            .frame(maxWidth: 192)
+          Text(String(format: "%d", Int(state.arraySizeBacking)))
+            .foregroundColor(.blue)
+        }
+        // Operations counter
+        Text("Operations: ") + Text("\(state.getOperations())").foregroundColor(.blue)
+      }.background(.black.opacity(0.9)).cornerRadius(15).frame(minWidth: 300, maxWidth: 450, minHeight: 64)
     }
     .onAppear(perform: onRender)
     .alert("Sort Finished Incorrectly", isPresented: $state.showIncompleteWarning, actions: {

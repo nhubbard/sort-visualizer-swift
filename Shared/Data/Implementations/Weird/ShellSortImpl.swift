@@ -38,7 +38,6 @@ extension SortViewModel {
           await changeColor(index: j, color: .red)
           await setValue(j, j &+ 1)
           await playNote(j)
-          await delay()
           await resetColor(index: j)
           j &-= interval
         }
@@ -47,7 +46,6 @@ extension SortViewModel {
         await setValue(j, j &+ 1)
         await playNote(j)
         await changeColor(index: j, color: .blue)
-        await delay()
         await resetColor(index: j)
       }
       interval = ~(~(interval / 2))

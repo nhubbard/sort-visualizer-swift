@@ -29,7 +29,6 @@ extension SortViewModel {
         await changeColor(index: i, color: .orange)
         await setValue(i, pV)
         await operate()
-        await delay()
         await resetColor(index: i)
       }
       if data == data.sorted() {
