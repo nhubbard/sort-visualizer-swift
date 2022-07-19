@@ -16,9 +16,6 @@
   * This may necessitate creating a brand-new Xcode project with tests enabled by default, copying all of the files and settings from the old project, and working from there. Ugh.
 * [x] Set up a testing system that validates algorithm example code results
 * [x] Replace manual JSON parsing with Decodable
-* [ ] **Crazy cool idea:** Decouple array changes from the UI to improve performance.
-  * My best idea of how to implement this revolves around a sealed enum with various parameters being put into a queue, using either Combine or RxSwift, that will communicate array changes to the UI to be displayed.
-  * Algorithms will generally perform better, and strict concurrency checking will be possible without a ton of warnings.
 
 ## Algorithms
 
@@ -125,8 +122,8 @@
   * [ ] Bitonic sort
     * [ ] Disable bitonic sort warning
 * [ ] Expand the counters from just "Operations" to the standard set of metrics (array accesses, inversions, reversals, etc.)
-* [ ] Add more sorting algorithms. Port them from Gaming32/ArrayV, if possible.
-* [ ] Add a timer that appears when the sort finishes
+* [ ] Add more sorting algorithms? Port them from Gaming32/ArrayV, if possible.
+* [x] Add a timer
 * [ ] Finally implement step functionality, possibly using delay as a catalyst
 
 ## Future Ideas from WWDC 2022
