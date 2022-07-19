@@ -4,6 +4,7 @@
 //
 //  Created by Nicholas Hubbard on 4/27/22.
 //
+import Foundation
 import SwiftUI
 
 struct SortView: View {
@@ -66,7 +67,10 @@ struct SortView: View {
             .foregroundColor(.blue)
         }
         // Operations counter
-        Text("Operations: ") + Text("\(state.getOperations())").foregroundColor(.blue)
+        VStack(spacing: 4) {
+          Text("Operations: ") + Text("\(state.getOperations())").foregroundColor(.blue)
+          Text("Runtime: ") + Text(state.getRunTime()).foregroundColor(.blue)
+        }
       }.background(.black.opacity(0.9)).cornerRadius(15).frame(minWidth: 300, maxWidth: 450, minHeight: 64)
     }
     .onAppear(perform: onRender)
@@ -100,6 +104,8 @@ struct SortView: View {
         state.sortTaskRef = Task.init {
           if await !state.doSort() {
             state.showIncompleteWarning = true
+          } else {
+            state.endTime = CFAbsoluteTimeGetCurrent()
           }
         }
       }

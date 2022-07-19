@@ -38,6 +38,10 @@ final class SortViewModel: ObservableObject {
   @Published var showBitonicWarning: Bool = false
   @Published var shouldShowBitonicWarning: Bool = true
   
+  // Timer
+  @Published var startTime: CFAbsoluteTime = CFAbsoluteTimeGetCurrent()
+  @Published var endTime: CFAbsoluteTime? = nil
+  
   // Standard variables
   var algorithm: Algorithms = .quickSort
   var sortTaskRef: Task<Void, Error>? = nil
@@ -108,6 +112,22 @@ final class SortViewModel: ObservableObject {
   
   @MainActor
   @inlinable
+  func getRunTime() -> String {
+    if !running && endTime == nil {
+      return String("0.0 sec (0.0 ops/sec)")
+    } else if let endTime = endTime {
+      let duration = endTime - startTime
+      let perSecond = Double(getOperations()) / duration
+      return String(format: "%.1f sec (%.1f ops/sec)", duration, perSecond)
+    } else {
+      let duration = CFAbsoluteTimeGetCurrent() - startTime
+      let perSecond = Double(getOperations()) / duration
+      return String(format: "%.1f sec (%.1f ops/sec)", duration, perSecond)
+    }
+  }
+  
+  @MainActor
+  @inlinable
   func setAlgo(algo: Algorithms) {
     algorithm = algo
   }
@@ -140,7 +160,8 @@ final class SortViewModel: ObservableObject {
     let _ = operations.exchange(0, ordering: .relaxed)
     // Recreate the array from scratch
     if let number = numItems {
-      data = await SortItem.sequenceOf(numItems: number == Int(arraySizeBacking) ? number : Int(arraySizeBacking))
+      let size = number == Int(arraySizeBacking) ? number : Int(arraySizeBacking)
+      data = await SortItem.sequenceOf(numItems: size)
     } else {
       data = await SortItem.sequenceOf(numItems: Int(arraySizeBacking))
     }
@@ -269,6 +290,8 @@ final class SortViewModel: ObservableObject {
   @inlinable
   func doSort() async -> Bool {
     guard await enforceRunning() else { return false }
+    endTime = nil
+    startTime = CFAbsoluteTimeGetCurrent()
     switch algorithm {
       // Logarithmic algorithms
       case .quickSort:
