@@ -63,13 +63,16 @@ struct SortView: View {
           Slider(value: $state.arraySizeBacking, in: state.sizeRange, step: 2)
             .onChange(of: state.arraySizeBacking, perform: onArraySizeChange)
             .frame(maxWidth: 192)
+            .disabled(state.running)
           Text(String(format: "%d", Int(state.arraySizeBacking)))
             .foregroundColor(.blue)
         }
         // Operations counter
         VStack(spacing: 4) {
           Text("Operations: ") + Text("\(state.getOperations())").foregroundColor(.blue)
-          Text("Runtime: ") + Text(state.getRunTime()).foregroundColor(.blue)
+          (Text("Runtime: ") + Text(state.getRunTime()).foregroundColor(.blue)).onTapGesture(perform: {
+            state.asSeconds.toggle()
+          })
         }
       }.background(.black.opacity(0.9)).cornerRadius(15).frame(minWidth: 300, maxWidth: 450, minHeight: 64)
     }

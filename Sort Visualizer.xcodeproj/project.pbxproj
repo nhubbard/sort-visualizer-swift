@@ -21,6 +21,7 @@
 		7145E2CB286B24430038940D /* combsort.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 7145E2CA286B24430038940D /* combsort.bundle */; };
 		7145E2CD286B298B0038940D /* bogosort.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 7145E2CC286B298B0038940D /* bogosort.bundle */; };
 		714AA7812845013200D92535 /* Color+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 714AA7802845013200D92535 /* Color+Extensions.swift */; };
+		71523D5128901D3100CF4D36 /* NumberFormatter+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71523D5028901D3100CF4D36 /* NumberFormatter+Extensions.swift */; };
 		71548F162864E4A200043680 /* AttributedCodeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71548F152864E4A200043680 /* AttributedCodeView.swift */; };
 		7156FB742850CF9E00A75F7F /* insertionsort.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 7156FB732850CF9E00A75F7F /* insertionsort.bundle */; };
 		715B11FD286C9C8D0087E837 /* stoogesort.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 715B11FC286C9C8D0087E837 /* stoogesort.bundle */; };
@@ -113,6 +114,7 @@
 		7145E2CA286B24430038940D /* combsort.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = combsort.bundle; sourceTree = "<group>"; };
 		7145E2CC286B298B0038940D /* bogosort.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = bogosort.bundle; sourceTree = "<group>"; };
 		714AA7802845013200D92535 /* Color+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Extensions.swift"; sourceTree = "<group>"; };
+		71523D5028901D3100CF4D36 /* NumberFormatter+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NumberFormatter+Extensions.swift"; sourceTree = "<group>"; };
 		71548F152864E4A200043680 /* AttributedCodeView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AttributedCodeView.swift; sourceTree = "<group>"; };
 		7156FB732850CF9E00A75F7F /* insertionsort.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = insertionsort.bundle; sourceTree = "<group>"; };
 		715B11FC286C9C8D0087E837 /* stoogesort.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = stoogesort.bundle; sourceTree = "<group>"; };
@@ -272,6 +274,7 @@
 				714AA7802845013200D92535 /* Color+Extensions.swift */,
 				71CCA0582865F48900E4D666 /* AttributeDynamicLookup+Extensions.swift */,
 				71CCA05A2865F4BF00E4D666 /* AttributeScopes+Extensions.swift */,
+				71523D5028901D3100CF4D36 /* NumberFormatter+Extensions.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -590,6 +593,7 @@
 				718FE3FA287F3E7F00620341 /* StateToggle.swift in Sources */,
 				71CFAC0B28396DAE004672DB /* OddEvenSortImpl.swift in Sources */,
 				71CCA06D28663CFF00E4D666 /* ColorfulTheme.swift in Sources */,
+				71523D5128901D3100CF4D36 /* NumberFormatter+Extensions.swift in Sources */,
 				71650A3E28429DB200A23BC2 /* ScrollingSortView.swift in Sources */,
 				71D4DC1B28186385001DBD0E /* CombSort.swift in Sources */,
 				71CFAC1028396E05004672DB /* BitonicSortImpl.swift in Sources */,

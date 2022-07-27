@@ -14,6 +14,19 @@ import CollectionConcurrencyKit
 final class SortViewModel: ObservableObject {
   // File-specific variables
   let toner = Synthesizer()
+  private let dateFormatter: DateComponentsFormatter = {
+    var fmt = DateComponentsFormatter()
+    fmt.unitsStyle = .abbreviated
+    fmt.allowedUnits = [.day, .hour, .minute, .second]
+    return fmt
+  }()
+  private let numberFormatter: NumberFormatter = {
+    var fmt = NumberFormatter()
+    fmt.numberStyle = .decimal
+    fmt.minimumFractionDigits = 1
+    fmt.maximumFractionDigits = 1
+    return fmt
+  }()
   
   // Published sorting state variables
   @Published var arraySizeBacking: Float = Float(256)
@@ -41,6 +54,7 @@ final class SortViewModel: ObservableObject {
   // Timer
   @Published var startTime: CFAbsoluteTime = CFAbsoluteTimeGetCurrent()
   @Published var endTime: CFAbsoluteTime? = nil
+  @Published var asSeconds: Bool = false
   
   // Standard variables
   var algorithm: Algorithms = .quickSort
@@ -113,15 +127,20 @@ final class SortViewModel: ObservableObject {
   @MainActor
   @inlinable
   func getRunTime() -> String {
+    let duration: Double
     if !running && endTime == nil {
       return String("0.0 sec (0.0 ops/sec)")
     } else if let endTime = endTime {
-      let duration = endTime - startTime
-      let perSecond = Double(getOperations()) / duration
-      return String(format: "%.1f sec (%.1f ops/sec)", duration, perSecond)
+      duration = endTime - startTime
     } else {
-      let duration = CFAbsoluteTimeGetCurrent() - startTime
-      let perSecond = Double(getOperations()) / duration
+      duration = CFAbsoluteTimeGetCurrent() - startTime
+    }
+    let perSecond = Double(getOperations()) / duration
+    if !asSeconds, let formatString = dateFormatter.string(from: duration as TimeInterval) {
+      return String(format: "\(formatString) (%.1f ops/sec)", perSecond)
+    } else if asSeconds, let formatString = numberFormatter.fmt(value: duration) {
+      return String(format: "\(formatString) sec (%.1f ops/sec)", perSecond)
+    } else {
       return String(format: "%.1f sec (%.1f ops/sec)", duration, perSecond)
     }
   }

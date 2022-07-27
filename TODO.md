@@ -16,6 +16,7 @@
   * This may necessitate creating a brand-new Xcode project with tests enabled by default, copying all of the files and settings from the old project, and working from there. Ugh.
 * [x] Set up a testing system that validates algorithm example code results
 * [x] Replace manual JSON parsing with Decodable
+* [ ] **Potential performance improvement:** Instead of using an observable queue to update the UI, have the sorting algorithm put the operations into the queue, and then "replay" them into the UI. Would work wonders for performance for everything except high *n* BogoSort, and also enable step functionality without having to completely rewrite delay handling.
 
 ## Algorithms
 
@@ -87,6 +88,7 @@
   * Following [this guide](https://tiborsimon.io/articles/programming/ios-mathjax-integration/), but modernizing the code by using WKWebView instead of UIWebView. 
   * Alternatively, if the information can be made into a constant, we can render every equation to an SVG file and display it that way. It might be faster in-app, but it will also involve a lot of tooling.
   * *Rant:* I've given up on rewriting iosMath for modern Swift and/or SwiftUI. It's *heavily* bound to very old (OS X El Capitan/iOS 9 era) APIs that have long since been deprecated, and doesn't appear to be actively maintained. Swiftify got my business once, and their software did an excellent job converting the project, but there's too much work to do in order to modernize the library, like type-safe reading of font configuration tables (which I rewrote the generation script for the latest versions of Python), and so many more issues that just can't be fixed.
+* [x] Add a timer
   
 ### In Progress
 
@@ -97,7 +99,7 @@
   * [ ] Replace homepage content with Wikipedia text for "Sorting algorithm".
   * [ ] String resources/localization for all strings throughout the app.
   * [ ] Add copyright and license attribution for Wikipedia-sourced content.
-* [ ] Settings Panel
+* [ ] Settings Panel (use new SwiftUI 4 forms interface?)
   * [ ] First things first: type-safe configuration lookup is an absolute requirement. We might be able to accomplish this using SwiftUI's awesome "environment" dependency injection.
   * [ ] Synthesizer
     * [ ] Note range (use piano control from AudioKitUI, see Cookbook app for examples)
@@ -106,6 +108,7 @@
     * [ ] Default sound to on or off (toggle)
     * [ ] Default delay (slider and/or input box)
     * [ ] Default array size (slider and/or input box)
+    * [ ] Default timer to formatted interval or seconds (toggle?)
     * [ ] Array size range for normal algorithms (slider and/or input box, result should auto update the default array size constraints)
     * [ ] Code view themes (combo box of some kind)
     * [ ] Code font size (slider, will have to constrain because otherwise we have to resize views)
@@ -123,12 +126,10 @@
     * [ ] Disable bitonic sort warning
 * [ ] Expand the counters from just "Operations" to the standard set of metrics (array accesses, inversions, reversals, etc.)
 * [ ] Add more sorting algorithms? Port them from Gaming32/ArrayV, if possible.
-* [x] Add a timer
 * [ ] Finally implement step functionality, possibly using delay as a catalyst
+* [ ] Don't count the `isArraySorted` comparisons toward the operations count
 
 ## Future Ideas from WWDC 2022
-
-*Warning:* These features won't be available until Swift 5.7 becomes a *usable* beta (not this kinda-usable but also not usable at all custom toolchain crap I have to deal with right now) and we switch to targeting iPadOS 16/macOS Ventura beta for the SwiftUI 4 changes. I'd be on the bleeding edge, and might get cut.
 
 * [ ] Swift Charts for SwiftUI 4
   * [ ] Attempt to use as a replacement for SortView; probably won't work very well, but we won't know until we try it out.

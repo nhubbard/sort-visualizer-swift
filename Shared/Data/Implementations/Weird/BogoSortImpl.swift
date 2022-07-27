@@ -17,11 +17,13 @@ extension SortViewModel {
       return .stopped
     }
     let values = await data.concurrentMap { $0.value }
-    let permutations = values.uniquePermutations()
+    // Don't use uniquePermutations(); we're guaranteed to not have any duplicate values in the array, and the unique check slows down the operation from O(1) to O(n)
+    let permutations = values.permutations()
     for p in permutations {
       guard await enforceRunning() else { return .stopped }
       await data.indices.concurrentForEach { [self] i in
-        // It may look weird that I'm wrapping a kinda-sorta non-null value in an Optional result, but it stops the compiler from complaining about it, so I call that a win.
+        // It may look weird that I'm wrapping a "non-null" value in an Optional result, but it stops the compiler from complaining about it, so I call that a win.
+        // The result is actually nullable, since we're attempting to get an index from an array that might be out of bounds.
         guard
           await enforceRunning(),
           let pV = Optional(p[i]),
