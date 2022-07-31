@@ -210,7 +210,7 @@ final class SortViewModel: ObservableObject {
   func isArraySorted() async -> Bool {
     guard await enforceRunning() else { return false }
     for i in 1..<data.count {
-      if await !compare(i, i - 1) {
+      if await !compare(i, i - 1, count: false) {
         return false
       }
     }
@@ -220,7 +220,7 @@ final class SortViewModel: ObservableObject {
   /// Compare the values of two SortItems at their specified indexes.
   @MainActor
   @inlinable
-  func compare(_ firstIndex: Int, _ secondIndex: Int, by: (Int, Int) -> Bool = (>=), clear: Bool = false) async -> Bool {
+  func compare(_ firstIndex: Int, _ secondIndex: Int, by: (Int, Int) -> Bool = (>=), clear: Bool = false, count: Bool = true) async -> Bool {
     guard await enforceRunning() else { return false }
     await enforceIndices(firstIndex, secondIndex)
     await changeColor(index: firstIndex, color: .blue)
@@ -231,7 +231,9 @@ final class SortViewModel: ObservableObject {
       let lhs = await getValue(firstIndex),
       let rhs = await getValue(secondIndex)
     else { return false }
-    await operate()
+    if count {
+      await operate()
+    }
     if clear {
       Task.detached { [self] in
         await delay()
@@ -348,8 +350,16 @@ final class SortViewModel: ObservableObject {
       case .stoogeSort:
         await stoogeSort()
     }
-    await isArraySorted()
+    endTime = CFAbsoluteTimeGetCurrent()
+    let isDone = await isArraySorted()
     running = false
-    return data == data.sorted()
+    if isDone {
+      let unformattedSeconds = (endTime ?? CFAbsoluteTimeGetCurrent()) - startTime
+      let formattedSeconds = numberFormatter.string(from: NSNumber(value: unformattedSeconds)) ?? "[error formatting as seconds]"
+      let pace = Double(getOperations()) / unformattedSeconds
+      let formattedPace = numberFormatter.string(from: NSNumber(value: pace)) ?? "[error formatting pace]"
+      print("BENCHMARK: \(algorithm.rawValue), \(data.count) items, \(getOperations()) operations, \(formattedSeconds)s time, \(formattedPace) op/s, \(delay)ms delay")
+    }
+    return isDone
   }
 }

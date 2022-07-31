@@ -107,8 +107,6 @@ struct SortView: View {
         state.sortTaskRef = Task.init {
           if await !state.doSort() {
             state.showIncompleteWarning = true
-          } else {
-            state.endTime = CFAbsoluteTimeGetCurrent()
           }
         }
       }
