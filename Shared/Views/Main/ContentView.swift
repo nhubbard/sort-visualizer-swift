@@ -7,73 +7,179 @@
 
 import SwiftUI
 
-fileprivate let logEntries: [AlgorithmEntry] = [
-  AlgorithmEntry(name: "Quick Sort", icon: "quick", destination: AnyView(QuickSort()), tag: 1),
-  AlgorithmEntry(name: "Merge Sort", icon: "merge", destination: AnyView(MergeSort()), tag: 2),
-  AlgorithmEntry(name: "Heap Sort", icon: "heap", destination: AnyView(HeapSort()), tag: 3)
-]
+private enum PageCategory: Identifiable, Hashable, CaseIterable {
+  // No category (home, future settings page, etc)
+  case none
+  // Logarithmic algorithms
+  case logarithmic
+  // Quadratic algorithms
+  case quadratic
+  // Weird algorithms
+  case weird
+  
+  var id: Self { self }
+  
+  var displayName: String {
+    switch self {
+      case .none: return ""
+      case .logarithmic: return "Logarithmic"
+      case .quadratic: return "Quadratic"
+      case .weird: return "Weird"
+    }
+  }
+  
+  var iconName: String {
+    switch self {
+      case .none: return ""
+      case .logarithmic: return "logarithmic-algos"
+      case .quadratic: return "quadratic-algos"
+      case .weird: return "weird-algos"
+    }
+  }
+  
+  var pages: [Page] {
+    switch self {
+      case .none: return [.home]
+      case .logarithmic: return [.quickSort, .mergeSort, .heapSort]
+      case .quadratic: return [.bubbleSort, .selectionSort, .insertionSort, .gnomeSort, .shakerSort, .oddEvenSort, .pancakeSort]
+      case .weird: return [.bitonicSort, .radixSort, .shellSort, .combSort, .bogoSort, .stoogeSort]
+    }
+  }
+}
 
-fileprivate let quadraticEntries: [AlgorithmEntry] = [
-  AlgorithmEntry(name: "Bubble Sort", icon: "bubble", destination: AnyView(BubbleSort()), tag: 4),
-  AlgorithmEntry(name: "Selection Sort", icon: "selection", destination: AnyView(SelectionSort()), tag: 5),
-  AlgorithmEntry(name: "Insertion Sort", icon: "insertion", destination: AnyView(InsertionSort()), tag: 6),
-  AlgorithmEntry(name: "Gnome Sort", icon: "gnome", destination: AnyView(GnomeSort()), tag: 7),
-  AlgorithmEntry(name: "Shaker Sort", icon: "shaker", destination: AnyView(ShakerSort()), tag: 8),
-  AlgorithmEntry(name: "Odd-Even Sort", icon: "odd-even", destination: AnyView(OddEvenSort()), tag: 9),
-  AlgorithmEntry(name: "Pancake Sort", icon: "pancake", destination: AnyView(PancakeSort()), tag: 10)
-]
-
-fileprivate let weirdEntries: [AlgorithmEntry] = [
-  AlgorithmEntry(name: "Bitonic Sort", icon: "bitonic", destination: AnyView(BitonicSort()), tag: 11),
-  AlgorithmEntry(name: "Radix Sort", icon: "radix", destination: AnyView(RadixSort()), tag: 12),
-  AlgorithmEntry(name: "Shell Sort", icon: "shell", destination: AnyView(ShellSort()), tag: 13),
-  AlgorithmEntry(name: "Comb Sort", icon: "comb", destination: AnyView(CombSort()), tag: 14),
-  AlgorithmEntry(name: "Bogo Sort", icon: "bogo", destination: AnyView(BogoSort()), tag: 15),
-  AlgorithmEntry(name: "Stooge Sort", icon: "stooge", destination: AnyView(StoogeSort()), tag: 16)
-]
+private enum Page: Identifiable, Hashable, CaseIterable {
+  case home
+  // Logarithmic algorithms
+  case quickSort
+  case mergeSort
+  case heapSort
+  // Quadratic algorithms
+  case bubbleSort
+  case selectionSort
+  case insertionSort
+  case gnomeSort
+  case shakerSort
+  case oddEvenSort
+  case pancakeSort
+  // Weird entries
+  case bitonicSort
+  case radixSort
+  case shellSort
+  case combSort
+  case bogoSort
+  case stoogeSort
+  
+  var id: Self { self }
+  
+  var isSystemIcon: Bool {
+    self == .home
+  }
+  
+  var algorithm: Algorithms? {
+    switch self {
+      case .home:          return nil
+      case .quickSort:     return .quickSort
+      case .mergeSort:     return .mergeSort
+      case .heapSort:      return .heapSort
+      case .bubbleSort:    return .bubbleSort
+      case .selectionSort: return .selectionSort
+      case .insertionSort: return .insertionSort
+      case .gnomeSort:     return .gnomeSort
+      case .shakerSort:    return .shakerSort
+      case .oddEvenSort:   return .oddEvenSort
+      case .pancakeSort:   return .pancakeSort
+      case .bitonicSort:   return .bitonicSort
+      case .radixSort:     return .radixSort
+      case .shellSort:     return .shellSort
+      case .combSort:      return .combSort
+      case .bogoSort:      return .bogoSort
+      case .stoogeSort:    return .stoogeSort
+    }
+  }
+  
+  var displayName: String {
+    switch self {
+      case .home:          return "Home"
+      case .quickSort:     return "Quick Sort"
+      case .mergeSort:     return "Merge Sort"
+      case .heapSort:      return "Heap Sort"
+      case .bubbleSort:    return "Bubble Sort"
+      case .selectionSort: return "Selection Sort"
+      case .insertionSort: return "Insertion Sort"
+      case .gnomeSort:     return "Gnome Sort"
+      case .shakerSort:    return "Shaker Sort"
+      case .oddEvenSort:   return "Odd-Even Sort"
+      case .pancakeSort:   return "Pancake Sort"
+      case .bitonicSort:   return "Bitonic Sort"
+      case .radixSort:     return "Radix Sort"
+      case .shellSort:     return "Shell Sort"
+      case .combSort:      return "Comb Sort"
+      case .bogoSort:      return "Bogo Sort"
+      case .stoogeSort:    return "Stooge Sort"
+    }
+  }
+  
+  var iconName: String {
+    switch self {
+      case .home:          return "house"
+      case .quickSort:     return "quick"
+      case .mergeSort:     return "merge"
+      case .heapSort:      return "heap"
+      case .bubbleSort:    return "bubble"
+      case .selectionSort: return "selection"
+      case .insertionSort: return "insertion"
+      case .gnomeSort:     return "gnome"
+      case .shakerSort:    return "shaker"
+      case .oddEvenSort:   return "odd-even"
+      case .pancakeSort:   return "pancake"
+      case .bitonicSort:   return "bitonic"
+      case .radixSort:     return "radix"
+      case .shellSort:     return "shell"
+      case .combSort:      return "comb"
+      case .bogoSort:      return "bogo"
+      case .stoogeSort:    return "stooge"
+    }
+  }
+  
+  // First part is name, second part is icon
+  var category: PageCategory {
+    switch self {
+      case .home:
+        return .none
+      case .quickSort, .mergeSort, .heapSort:
+        return .logarithmic
+      case .bubbleSort, .selectionSort, .insertionSort, .gnomeSort, .shakerSort, .oddEvenSort, .pancakeSort:
+        return .quadratic
+      case .bitonicSort, .radixSort, .shellSort, .combSort, .bogoSort, .stoogeSort:
+        return .weird
+    }
+  }
+}
 
 struct ContentView: View {
-  @State var selection: Int? = 0
+  @State private var selection: Page? = .home
+  
   var body: some View {
-    NavigationView {
-      // Sidebar content
-      List {
-        // Homepage
-        NavigationLink(destination: HomeView(), tag: 0, selection: self.$selection) {
-          Label("Home", systemImage: "house")
+    NavigationSplitView {
+      List(Page.allCases, selection: $selection) { page in
+        if page.isSystemIcon {
+          Label(page.displayName, systemImage: page.iconName)
+        } else {
+          CustomIconLabel(text: page.displayName, iconName: page.iconName)
         }
-        Divider()
-        // Logarithmic sorting algorithms
-        Group {
-          Category(text: "Logarithmic", iconName: "logarithmic-algos")
-          ForEach(logEntries, id: \.self) { entry in
-            NavigationLink(destination: entry.destination, tag: entry.tag, selection: self.$selection) {
-              CustomIconLabel(text: entry.name, iconName: entry.icon)
-            }
-          }
+      }
+    } detail: {
+      if let selection {
+        switch selection {
+          case .home:
+            HomeView()
+          default:
+            ScrollingSortView(algorithm: selection.algorithm!).navigationTitle(selection.displayName)
         }
-        Divider()
-        // Quadratic sorting algorithms
-        Group {
-          Category(text: "Quadratic", iconName: "quadratic-algos")
-          ForEach(quadraticEntries, id: \.self) { entry in
-            NavigationLink(destination: entry.destination, tag: entry.tag, selection: self.$selection) {
-              CustomIconLabel(text: entry.name, iconName: entry.icon)
-            }
-          }
-        }
-        Divider()
-        // Weird sorting algorithms
-        Group {
-          Category(text: "Weird", iconName: "weird-algos")
-          ForEach(weirdEntries, id: \.self) { entry in
-            NavigationLink(destination: entry.destination, tag: entry.tag, selection: self.$selection) {
-              CustomIconLabel(text: entry.name, iconName: entry.icon)
-            }
-          }
-        }
-      }.padding(.top, 1)
-    }.listStyle(.sidebar).navigationViewStyle(.columns)
+      } else {
+        HomeView()
+      }
+    }
   }
 }
 

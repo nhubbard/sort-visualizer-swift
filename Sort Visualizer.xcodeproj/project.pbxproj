@@ -30,7 +30,6 @@
 		71619A472860A3FA00CCA31C /* SortStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71619A462860A3FA00CCA31C /* SortStatus.swift */; };
 		71650A2B2842693C00A23BC2 /* CustomIconLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71650A2A2842693C00A23BC2 /* CustomIconLabel.swift */; };
 		71650A2E28426C5700A23BC2 /* Category.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71650A2D28426C5700A23BC2 /* Category.swift */; };
-		71650A3028426CAF00A23BC2 /* AlgorithmEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71650A2F28426CAF00A23BC2 /* AlgorithmEntry.swift */; };
 		71650A32284272FD00A23BC2 /* RandomizingHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71650A31284272FD00A23BC2 /* RandomizingHeader.swift */; };
 		71650A3E28429DB200A23BC2 /* ScrollingSortView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71650A3D28429DB200A23BC2 /* ScrollingSortView.swift */; };
 		716A5CE12821AB0D008B792A /* Algorithms.swift in Sources */ = {isa = PBXBuildFile; fileRef = 716A5CE02821AB0D008B792A /* Algorithms.swift */; };
@@ -76,23 +75,7 @@
 		71D4DBDA28185905001DBD0E /* Sort2App.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71D4DBCA28185905001DBD0E /* Sort2App.swift */; };
 		71D4DBDC28185905001DBD0E /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71D4DBCB28185905001DBD0E /* ContentView.swift */; };
 		71D4DBDE28185905001DBD0E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 71D4DBCC28185905001DBD0E /* Assets.xcassets */; };
-		71D4DBEC28185B59001DBD0E /* QuickSort.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71D4DBEB28185B59001DBD0E /* QuickSort.swift */; };
 		71D4DBF028185DFD001DBD0E /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71D4DBEF28185DFD001DBD0E /* HomeView.swift */; };
-		71D4DBF4281862FC001DBD0E /* MergeSort.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71D4DBF3281862FC001DBD0E /* MergeSort.swift */; };
-		71D4DBF728186306001DBD0E /* HeapSort.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71D4DBF628186306001DBD0E /* HeapSort.swift */; };
-		71D4DBFA28186310001DBD0E /* BubbleSort.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71D4DBF928186310001DBD0E /* BubbleSort.swift */; };
-		71D4DBFF2818632F001DBD0E /* SelectionSort.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71D4DBFE2818632F001DBD0E /* SelectionSort.swift */; };
-		71D4DC0228186339001DBD0E /* InsertionSort.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71D4DC0128186339001DBD0E /* InsertionSort.swift */; };
-		71D4DC0528186340001DBD0E /* GnomeSort.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71D4DC0428186340001DBD0E /* GnomeSort.swift */; };
-		71D4DC0828186347001DBD0E /* ShakerSort.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71D4DC0728186347001DBD0E /* ShakerSort.swift */; };
-		71D4DC0B2818634E001DBD0E /* OddEvenSort.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71D4DC0A2818634E001DBD0E /* OddEvenSort.swift */; };
-		71D4DC0E28186356001DBD0E /* PancakeSort.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71D4DC0D28186356001DBD0E /* PancakeSort.swift */; };
-		71D4DC122818636E001DBD0E /* BitonicSort.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71D4DC112818636E001DBD0E /* BitonicSort.swift */; };
-		71D4DC1528186377001DBD0E /* RadixSort.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71D4DC1428186377001DBD0E /* RadixSort.swift */; };
-		71D4DC182818637F001DBD0E /* ShellSort.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71D4DC172818637F001DBD0E /* ShellSort.swift */; };
-		71D4DC1B28186385001DBD0E /* CombSort.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71D4DC1A28186385001DBD0E /* CombSort.swift */; };
-		71D4DC1E2818638B001DBD0E /* BogoSort.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71D4DC1D2818638B001DBD0E /* BogoSort.swift */; };
-		71D4DC2128186393001DBD0E /* StoogeSort.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71D4DC2028186393001DBD0E /* StoogeSort.swift */; };
 		71D4DC2528186A0F001DBD0E /* MarkdownUI in Frameworks */ = {isa = PBXBuildFile; productRef = 71D4DC2428186A0F001DBD0E /* MarkdownUI */; };
 		71ED4EAE2831575500880755 /* Atomics in Frameworks */ = {isa = PBXBuildFile; productRef = 71ED4EAD2831575500880755 /* Atomics */; };
 		71F38EB82819B42C0085BAAA /* SortView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71F38EB72819B42C0085BAAA /* SortView.swift */; };
@@ -123,7 +106,6 @@
 		71619A462860A3FA00CCA31C /* SortStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SortStatus.swift; sourceTree = "<group>"; };
 		71650A2A2842693C00A23BC2 /* CustomIconLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomIconLabel.swift; sourceTree = "<group>"; };
 		71650A2D28426C5700A23BC2 /* Category.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Category.swift; sourceTree = "<group>"; };
-		71650A2F28426CAF00A23BC2 /* AlgorithmEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlgorithmEntry.swift; sourceTree = "<group>"; };
 		71650A31284272FD00A23BC2 /* RandomizingHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RandomizingHeader.swift; sourceTree = "<group>"; };
 		71650A3D28429DB200A23BC2 /* ScrollingSortView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollingSortView.swift; sourceTree = "<group>"; };
 		716A5CE02821AB0D008B792A /* Algorithms.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Algorithms.swift; sourceTree = "<group>"; };
@@ -170,24 +152,8 @@
 		71D4DBCB28185905001DBD0E /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		71D4DBCC28185905001DBD0E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		71D4DBD128185905001DBD0E /* Sort Visualizer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Sort Visualizer.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		71D4DBEB28185B59001DBD0E /* QuickSort.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickSort.swift; sourceTree = "<group>"; };
 		71D4DBEE28185D6E001DBD0E /* Sort Visualizer (iOS).entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Sort Visualizer (iOS).entitlements"; sourceTree = "<group>"; };
 		71D4DBEF28185DFD001DBD0E /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
-		71D4DBF3281862FC001DBD0E /* MergeSort.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MergeSort.swift; sourceTree = "<group>"; };
-		71D4DBF628186306001DBD0E /* HeapSort.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeapSort.swift; sourceTree = "<group>"; };
-		71D4DBF928186310001DBD0E /* BubbleSort.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BubbleSort.swift; sourceTree = "<group>"; };
-		71D4DBFE2818632F001DBD0E /* SelectionSort.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectionSort.swift; sourceTree = "<group>"; };
-		71D4DC0128186339001DBD0E /* InsertionSort.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsertionSort.swift; sourceTree = "<group>"; };
-		71D4DC0428186340001DBD0E /* GnomeSort.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GnomeSort.swift; sourceTree = "<group>"; };
-		71D4DC0728186347001DBD0E /* ShakerSort.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShakerSort.swift; sourceTree = "<group>"; };
-		71D4DC0A2818634E001DBD0E /* OddEvenSort.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OddEvenSort.swift; sourceTree = "<group>"; };
-		71D4DC0D28186356001DBD0E /* PancakeSort.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PancakeSort.swift; sourceTree = "<group>"; };
-		71D4DC112818636E001DBD0E /* BitonicSort.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BitonicSort.swift; sourceTree = "<group>"; };
-		71D4DC1428186377001DBD0E /* RadixSort.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RadixSort.swift; sourceTree = "<group>"; };
-		71D4DC172818637F001DBD0E /* ShellSort.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShellSort.swift; sourceTree = "<group>"; };
-		71D4DC1A28186385001DBD0E /* CombSort.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CombSort.swift; sourceTree = "<group>"; };
-		71D4DC1D2818638B001DBD0E /* BogoSort.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BogoSort.swift; sourceTree = "<group>"; };
-		71D4DC2028186393001DBD0E /* StoogeSort.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoogeSort.swift; sourceTree = "<group>"; };
 		71E6B239282033D300672D55 /* Sort Visualizer--iOS--Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Sort Visualizer--iOS--Info.plist"; sourceTree = "<group>"; };
 		71F38EB72819B42C0085BAAA /* SortView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SortView.swift; sourceTree = "<group>"; };
 		71F4B34F28207C02006B68E6 /* SortViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SortViewModel.swift; sourceTree = "<group>"; };
@@ -282,9 +248,6 @@
 		71650A342842922C00A23BC2 /* Main */ = {
 			isa = PBXGroup;
 			children = (
-				71D4DC1028186364001DBD0E /* Weird */,
-				71D4DBFD28186320001DBD0E /* Quadratic */,
-				71D4DBFC28186315001DBD0E /* Logarithmic */,
 				71D4DBCB28185905001DBD0E /* ContentView.swift */,
 				71D4DBEF28185DFD001DBD0E /* HomeView.swift */,
 				71F38EB72819B42C0085BAAA /* SortView.swift */,
@@ -297,7 +260,6 @@
 		71650A352842923800A23BC2 /* Primary */ = {
 			isa = PBXGroup;
 			children = (
-				71650A2F28426CAF00A23BC2 /* AlgorithmEntry.swift */,
 				71FD4A42281C1F2C00E1E6FA /* SortItem.swift */,
 				71F4B34F28207C02006B68E6 /* SortViewModel.swift */,
 				716A5CE02821AB0D008B792A /* Algorithms.swift */,
@@ -423,43 +385,6 @@
 			path = Views;
 			sourceTree = "<group>";
 		};
-		71D4DBFC28186315001DBD0E /* Logarithmic */ = {
-			isa = PBXGroup;
-			children = (
-				71D4DBEB28185B59001DBD0E /* QuickSort.swift */,
-				71D4DBF3281862FC001DBD0E /* MergeSort.swift */,
-				71D4DBF628186306001DBD0E /* HeapSort.swift */,
-			);
-			path = Logarithmic;
-			sourceTree = "<group>";
-		};
-		71D4DBFD28186320001DBD0E /* Quadratic */ = {
-			isa = PBXGroup;
-			children = (
-				71D4DBF928186310001DBD0E /* BubbleSort.swift */,
-				71D4DBFE2818632F001DBD0E /* SelectionSort.swift */,
-				71D4DC0128186339001DBD0E /* InsertionSort.swift */,
-				71D4DC0428186340001DBD0E /* GnomeSort.swift */,
-				71D4DC0728186347001DBD0E /* ShakerSort.swift */,
-				71D4DC0A2818634E001DBD0E /* OddEvenSort.swift */,
-				71D4DC0D28186356001DBD0E /* PancakeSort.swift */,
-			);
-			path = Quadratic;
-			sourceTree = "<group>";
-		};
-		71D4DC1028186364001DBD0E /* Weird */ = {
-			isa = PBXGroup;
-			children = (
-				71D4DC112818636E001DBD0E /* BitonicSort.swift */,
-				71D4DC1428186377001DBD0E /* RadixSort.swift */,
-				71D4DC172818637F001DBD0E /* ShellSort.swift */,
-				71D4DC1A28186385001DBD0E /* CombSort.swift */,
-				71D4DC1D2818638B001DBD0E /* BogoSort.swift */,
-				71D4DC2028186393001DBD0E /* StoogeSort.swift */,
-			);
-			path = Weird;
-			sourceTree = "<group>";
-		};
 		71D4DC2628186A29001DBD0E /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -580,13 +505,9 @@
 				71FD4A43281C1F2C00E1E6FA /* SortItem.swift in Sources */,
 				71CFABFE2839528A004672DB /* HeapSortImpl.swift in Sources */,
 				71CCA0612865F57E00E4D666 /* MonokaiTheme.swift in Sources */,
-				71D4DBF4281862FC001DBD0E /* MergeSort.swift in Sources */,
 				71CFAC1A28396F9A004672DB /* StoogeSortImpl.swift in Sources */,
 				71650A32284272FD00A23BC2 /* RandomizingHeader.swift in Sources */,
 				71CCA0662865FC9D00E4D666 /* TextFormat.swift in Sources */,
-				71D4DC0E28186356001DBD0E /* PancakeSort.swift in Sources */,
-				71D4DC0828186347001DBD0E /* ShakerSort.swift in Sources */,
-				71D4DC0228186339001DBD0E /* InsertionSort.swift in Sources */,
 				71CFAC0328396D2A004672DB /* SelectionSortImpl.swift in Sources */,
 				71F38EB82819B42C0085BAAA /* SortView.swift in Sources */,
 				71610A9628357F5C00F6176E /* Int+Extensions.swift in Sources */,
@@ -595,7 +516,6 @@
 				71CCA06D28663CFF00E4D666 /* ColorfulTheme.swift in Sources */,
 				71523D5128901D3100CF4D36 /* NumberFormatter+Extensions.swift in Sources */,
 				71650A3E28429DB200A23BC2 /* ScrollingSortView.swift in Sources */,
-				71D4DC1B28186385001DBD0E /* CombSort.swift in Sources */,
 				71CFAC1028396E05004672DB /* BitonicSortImpl.swift in Sources */,
 				71847C51284100180018E66C /* Image+Extensions.swift in Sources */,
 				718246DF284685F6003842E3 /* LanguageEntry.swift in Sources */,
@@ -608,23 +528,14 @@
 				713371F128775DAE00DE2D7E /* MathView.swift in Sources */,
 				71CCA06F2866446800E4D666 /* DraculaTheme.swift in Sources */,
 				71CFAC1228396EC3004672DB /* RadixSortImpl.swift in Sources */,
-				71D4DC0B2818634E001DBD0E /* OddEvenSort.swift in Sources */,
 				71D4DBDA28185905001DBD0E /* Sort2App.swift in Sources */,
-				71D4DBF728186306001DBD0E /* HeapSort.swift in Sources */,
 				71CCA0712866475A00E4D666 /* EmacsTheme.swift in Sources */,
-				71D4DC182818637F001DBD0E /* ShellSort.swift in Sources */,
 				71CFAC1428396F32004672DB /* ShellSortImpl.swift in Sources */,
-				71D4DC1E2818638B001DBD0E /* BogoSort.swift in Sources */,
-				71D4DC0528186340001DBD0E /* GnomeSort.swift in Sources */,
-				71D4DBEC28185B59001DBD0E /* QuickSort.swift in Sources */,
 				71CCA06B2866332D00E4D666 /* ArduinoTheme.swift in Sources */,
-				71D4DC1528186377001DBD0E /* RadixSort.swift in Sources */,
 				710BF0542821885300F7B066 /* Range+Extensions.swift in Sources */,
 				716A5CE12821AB0D008B792A /* Algorithms.swift in Sources */,
 				71CFABFC28395264004672DB /* MergeSortImpl.swift in Sources */,
 				71CFAC0D28396DD4004672DB /* PancakeSortImpl.swift in Sources */,
-				71D4DC122818636E001DBD0E /* BitonicSort.swift in Sources */,
-				71650A3028426CAF00A23BC2 /* AlgorithmEntry.swift in Sources */,
 				71CFABF9283951C5004672DB /* QuickSortImpl.swift in Sources */,
 				71650A2E28426C5700A23BC2 /* Category.swift in Sources */,
 				718246DD284685E4003842E3 /* ComplexityEntry.swift in Sources */,
@@ -633,14 +544,11 @@
 				714AA7812845013200D92535 /* Color+Extensions.swift in Sources */,
 				71CFAC0528396D4C004672DB /* InsertionSortImpl.swift in Sources */,
 				71CFAC0728396D6C004672DB /* GnomeSortImpl.swift in Sources */,
-				71D4DC2128186393001DBD0E /* StoogeSort.swift in Sources */,
 				71CCA05F2865F54B00E4D666 /* CodeTheme.swift in Sources */,
 				71CFAC1628396F63004672DB /* CombSortImpl.swift in Sources */,
 				71548F162864E4A200043680 /* AttributedCodeView.swift in Sources */,
 				71CCA05D2865F4D500E4D666 /* CodeAttributes.swift in Sources */,
 				71CFAC0128396D08004672DB /* BubbleSortImpl.swift in Sources */,
-				71D4DBFF2818632F001DBD0E /* SelectionSort.swift in Sources */,
-				71D4DBFA28186310001DBD0E /* BubbleSort.swift in Sources */,
 				71CCA05B2865F4BF00E4D666 /* AttributeScopes+Extensions.swift in Sources */,
 				711EF294285CC174001EB6AC /* BogoSortImpl.swift in Sources */,
 			);
@@ -700,7 +608,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.5;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -758,7 +666,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.5;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SUPPORTED_PLATFORMS = macosx;
@@ -795,7 +703,7 @@
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UIUserInterfaceStyle = Dark;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.5;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -842,7 +750,7 @@
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UIUserInterfaceStyle = Dark;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.5;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

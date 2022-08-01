@@ -14,8 +14,14 @@ struct Sort2App: App {
   var body: some Scene {
     WindowGroup {
       ContentView()
-    }.commands {
+        #if targetEnvironment(macCatalyst)
+        .frame(minWidth: 800, minHeight: 600)
+        #endif
+    }
+    #if targetEnvironment(macCatalyst)
+    .commands {
       SidebarCommands()
     }
+    #endif
   }
 }
