@@ -9,7 +9,7 @@ import Foundation
 import SwiftUI
 import CollectionConcurrencyKit
 
-struct SortItem: Identifiable, Equatable, Comparable, Hashable {
+struct SortItem: Identifiable, Equatable, Comparable, Hashable, @unchecked Sendable {
   static func <(lhs: SortItem, rhs: SortItem) -> Bool {
     lhs.value < rhs.value
   }
@@ -49,6 +49,7 @@ struct SortItem: Identifiable, Equatable, Comparable, Hashable {
   }
   
   /// Used to generate values at initialization, on array size change, and on recreation. Parallelized for speed.
+  @MainActor
   static func sequenceOf(numItems: Int = 128) async -> [SortItem] {
     await (1...numItems)
       .concurrentMap {

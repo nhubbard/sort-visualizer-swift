@@ -7,7 +7,7 @@
 
 import Foundation
 
-extension AttributeScopes {
+extension AttributeScopes: @unchecked Sendable {
   struct SortVisualizerAttributes: AttributeScope {
     let code: CodeAttributes
   }

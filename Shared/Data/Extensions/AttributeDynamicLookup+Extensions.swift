@@ -7,7 +7,9 @@
 
 import Foundation
 
-extension AttributeDynamicLookup {
+extension KeyPath: @unchecked Sendable {}
+
+extension AttributeDynamicLookup: @unchecked Sendable {
   subscript<T: AttributedStringKey>(dynamicMember keyPath: KeyPath<AttributeScopes.SortVisualizerAttributes, T>) -> T {
     self[T.self]
   }

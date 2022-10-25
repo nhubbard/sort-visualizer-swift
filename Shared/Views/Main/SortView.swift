@@ -27,20 +27,24 @@ struct SortView: View {
         HStack(spacing: 10) {
           // Running toggle
           StateToggle(binding: $state.running, name: "Running", iconName: "play.fill")
-            .onChange(of: state.running, perform: onRunning)
+            .onChange(of: state.running) { onRunning(newValue: $0) }
           // Sound toggle
           StateToggle(binding: $state.sound, name: "Sound", iconName: "speaker.wave.2")
             .disabled(state.soundDisabled)
-            .onChange(of: state.sound, perform: onSound)
+            .onChange(of: state.sound) { onSound(newValue: $0) }
         }.padding(.horizontal, 20)
         // Reset and Step buttons
         HStack(spacing: 10) {
           // Reset button
-          Button(action: onReset) {
+          Button {
+            onReset()
+          } label: {
             Label("Reset", systemImage: "repeat")
           }.frame(maxWidth: 150)
           // Step button
-          Button(action: onStep) {
+          Button {
+            onStep()
+          } label: {
             Label("Step", systemImage: "figure.walk")
           }
           .frame(maxWidth: 150)
@@ -61,7 +65,7 @@ struct SortView: View {
         HStack(spacing: 10) {
           Text("Array Size")
           Slider(value: $state.arraySizeBacking, in: state.sizeRange, step: 2)
-            .onChange(of: state.arraySizeBacking, perform: onArraySizeChange)
+            .onChange(of: state.arraySizeBacking) { onArraySizeChange(newValue: $0) }
             .frame(maxWidth: 192)
             .disabled(state.running)
           Text(String(format: "%d", Int(state.arraySizeBacking)))
@@ -74,24 +78,24 @@ struct SortView: View {
             state.asSeconds.toggle()
           })
         }
-      }.background(.black.opacity(0.9)).cornerRadius(15).frame(minWidth: 300, maxWidth: 450, minHeight: 64)
+      }.background(.black.opacity(0.9)).cornerRadius(15).frame(minWidth: 300, maxWidth: 450, minHeight: 64).padding(.top, 16)
     }
-    .onAppear(perform: onRender)
+    .onAppear { onRender() }
     .alert("Sort Finished Incorrectly", isPresented: $state.showIncompleteWarning, actions: {
-      Button("OK", role: .cancel, action: onIncompleteAccept)
+      Button("OK", role: .cancel) { onIncompleteAccept() }
     }, message: {
       Text("This can happen in one of two scenarios:\n1. You stopped the algorithm while it was running.\n2. The algorithm implementation has a bug and returned an incorrect result.")
     }).alert("Algorithm Warning", isPresented: $state.showBogoSortWarning, actions: {
-      Button("Accept", role: .cancel, action: onBogoAccept)
-      Button("Decline", role: .destructive, action: onBogoDecline)
+      Button("Accept", role: .cancel) { onBogoAccept() }
+      Button("Decline", role: .destructive) { onBogoDecline() }
     }, message: {
-      Text("Bogo sort will take an insanely long time to finish sorting on any array with more than 12 items.\n\nThis is always true, even on very fast systems with a zero second delay.\n\nIf you leave it running, it will consume system resources, including significant battery life, for a very long time.\n\nAdditionally, if you are sensitive to rapidly strobing lights, running bogo sort with a delay of less than 1 ms may induce seizures.\n\nIf you wish to continue, press the Accept button; if you wish to stop the sorting, press the Decline button.")
+      Text("Bogo sort will never finish on any array with more than 12 items.\n\nIf you leave it running, it will consume system resources indefinitely.\n\nAdditionally, if you have photosensitive epilepsy, running bogo sort with a delay of less than 1 millisecond may induce seizures.\n\nIf you wish to continue, press the Accept button; if you wish to stop the sorting, press the Decline button.")
     }).alert("Sound Unavailable", isPresented: $state.showSoundError, actions: {
-      Button("OK", role: .cancel, action: onSoundErrorAccept)
+      Button("OK", role: .cancel) { onSoundErrorAccept() }
     }, message: {
       Text("Sound is unavailable at this time because the Audio Engine returned \(state.soundErrorText != "" ? "the following error during startup: \(state.soundErrorText)" : "an unknown error during startup.")\n\nSound will not be available until the app is restarted and/or any audio-related issue is resolved.")
     }).alert("Algorithm Warning", isPresented: $state.showBitonicWarning, actions: {
-      Button("OK", role: .cancel, action: onBitonicAccept)
+      Button("OK", role: .cancel) { onBitonicAccept() }
     }, message: {
       Text("Bitonic sort will fail unless the the array size is a power of two. This is a known limitation of bitonic sort and cannot be worked around.\n\nTo prevent the app from crashing, Sort Visualizer will automatically round the array size to the next highest power of two to prevent errors. This warning will not be shown again while the app is running.\n\nPress OK to continue.")
     })

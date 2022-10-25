@@ -67,7 +67,7 @@ internal struct MathWebView: UIViewRepresentable {
   }
   
   func updateUIView(_ webView: WKWebView, context: Context) {
-    webView.loadHTMLString(
+    let _ = webView.loadHTMLString(
       template
         .replacingOccurrences(of: "[math]", with: math)
         .replacingOccurrences(of: "[text]", with: text),

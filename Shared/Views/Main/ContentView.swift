@@ -173,11 +173,59 @@ struct ContentView: View {
         switch selection {
           case .home:
             HomeView()
-          default:
-            ScrollingSortView(algorithm: selection.algorithm!).navigationTitle(selection.displayName)
+              .navigationTitle(selection.displayName)
+          case .quickSort:
+            ScrollingSortView(algorithm: .quickSort)
+              .navigationTitle(selection.displayName)
+          case .mergeSort:
+            ScrollingSortView(algorithm: .mergeSort)
+              .navigationTitle(selection.displayName)
+          case .heapSort:
+            ScrollingSortView(algorithm: .heapSort)
+              .navigationTitle(selection.displayName)
+          case .bubbleSort:
+            ScrollingSortView(algorithm: .bubbleSort)
+              .navigationTitle(selection.displayName)
+          case .selectionSort:
+            ScrollingSortView(algorithm: .selectionSort)
+              .navigationTitle(selection.displayName)
+          case .insertionSort:
+            ScrollingSortView(algorithm: .insertionSort)
+              .navigationTitle(selection.displayName)
+          case .gnomeSort:
+            ScrollingSortView(algorithm: .gnomeSort)
+              .navigationTitle(selection.displayName)
+          case .shakerSort:
+            ScrollingSortView(algorithm: .shakerSort)
+              .navigationTitle(selection.displayName)
+          case .oddEvenSort:
+            ScrollingSortView(algorithm: .oddEvenSort)
+              .navigationTitle(selection.displayName)
+          case .pancakeSort:
+            ScrollingSortView(algorithm: .pancakeSort)
+              .navigationTitle(selection.displayName)
+          case .bitonicSort:
+            ScrollingSortView(algorithm: .bitonicSort)
+              .navigationTitle(selection.displayName)
+          case .radixSort:
+            ScrollingSortView(algorithm: .radixSort)
+              .navigationTitle(selection.displayName)
+          case .shellSort:
+            ScrollingSortView(algorithm: .shellSort)
+              .navigationTitle(selection.displayName)
+          case .combSort:
+            ScrollingSortView(algorithm: .combSort)
+              .navigationTitle(selection.displayName)
+          case .bogoSort:
+            ScrollingSortView(algorithm: .bogoSort)
+              .navigationTitle(selection.displayName)
+          case .stoogeSort:
+            ScrollingSortView(algorithm: .stoogeSort)
+              .navigationTitle(selection.displayName)
         }
       } else {
         HomeView()
+          .navigationTitle(Page.home.displayName)
       }
     }
   }

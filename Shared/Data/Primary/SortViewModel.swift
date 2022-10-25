@@ -7,7 +7,7 @@
 
 import Foundation
 import SwiftUI
-import Atomics
+@preconcurrency import Atomics
 import CollectionConcurrencyKit
 
 @MainActor
@@ -89,7 +89,7 @@ final class SortViewModel: ObservableObject {
   @inlinable
   func delay() async {
     // 1 nanosecond delay; prevents the UI from freezing when all operations on the array happen at once by moving the slider to zero seconds
-    try? await Task.sleep(nanoseconds: UInt64(max(delay * 1_000_000, 1)))
+    try? await Task.sleep(nanoseconds: delay > 0.0 ? UInt64(delay * 1_000_000) : UInt64(0))
   }
   
   /// Play a note using the data ranges and the current delay.

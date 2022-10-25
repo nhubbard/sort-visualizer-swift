@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct RandomizingHeader: View {
+struct RandomizingHeader: View, @unchecked Sendable {
   let text: String
   @State var currentText: String = ""
   
@@ -20,7 +20,7 @@ struct RandomizingHeader: View {
       }
       .onAppear {
         currentText = text
-        animateHeader()
+        // animateHeader()
       }
   }
   

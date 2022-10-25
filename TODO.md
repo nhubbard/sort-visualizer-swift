@@ -89,6 +89,7 @@
   * Alternatively, if the information can be made into a constant, we can render every equation to an SVG file and display it that way. It might be faster in-app, but it will also involve a lot of tooling.
   * *Rant:* I've given up on rewriting iosMath for modern Swift and/or SwiftUI. It's *heavily* bound to very old (OS X El Capitan/iOS 9 era) APIs that have long since been deprecated, and doesn't appear to be actively maintained. Swiftify got my business once, and their software did an excellent job converting the project, but there's too much work to do in order to modernize the library, like type-safe reading of font configuration tables (which I rewrote the generation script for the latest versions of Python), and so many more issues that just can't be fixed.
 * [x] Add a timer
+* [x] Don't count the `isArraySorted` comparisons toward the operations count
   
 ### In Progress
 
@@ -127,16 +128,13 @@
 * [ ] Expand the counters from just "Operations" to the standard set of metrics (array accesses, inversions, reversals, etc.)
 * [ ] Add more sorting algorithms? Port them from Gaming32/ArrayV, if possible.
 * [ ] Finally implement step functionality, possibly using delay as a catalyst
-* [ ] Don't count the `isArraySorted` comparisons toward the operations count
+* [ ] Make slider values able to be typed instead of just modified by the mouse
 
 ## Future Ideas from WWDC 2022
 
 * [ ] Swift Charts for SwiftUI 4
-  * [ ] Attempt to use as a replacement for SortView; probably won't work very well, but we won't know until we try it out.
   * [ ] Attempt to add complexity graphs to the ScrollingSortView.
-* [ ] Navigation API for SwiftUI 4
-  * I will not implement this until I retarget the app to iPadOS 16/macOS Ventura, since the old navigation components are deprecated in these releases.
-  * It's also completely different and involves some weird magic that isn't documented yet.
+* [x] Navigation API for SwiftUI 4
 * [ ] ScreenCaptureKit for Record functionality?
   * Looks like exactly what I was looking for with regards to implementing recording functionality.
 
