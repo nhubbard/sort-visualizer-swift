@@ -7,7 +7,7 @@
 
 import Foundation
 import SwiftUI
-@preconcurrency import Atomics
+import Atomics
 import CollectionConcurrencyKit
 
 @MainActor
@@ -30,7 +30,7 @@ final class SortViewModel: ObservableObject {
   
   // Published sorting state variables
   @Published var arraySizeBacking: Float = Float(256)
-  @Published var data: [SortItem] = SortItem.syncSequenceOf(numItems: 256)
+  @Published var data: [SortItem] = ShuffleMethod.createSync(maximum: 256)
   @Published var operations: ManagedAtomic<Int> = ManagedAtomic(0)
   @Published var isSorted: Bool = false
   @Published var running: Bool = false
@@ -112,9 +112,9 @@ final class SortViewModel: ObservableObject {
   @inlinable
   func operate() async {
     guard await enforceRunning() else { return }
-    Task.detached { [self] in
-      await operations.wrappingIncrement(by: 1, ordering: .relaxed)
-    }
+    // Task.detached { [self] in
+      /*await*/ operations.wrappingIncrement(by: 1, ordering: .relaxed)
+    // }
   }
   
   /// Get the operations counter
@@ -180,9 +180,9 @@ final class SortViewModel: ObservableObject {
     // Recreate the array from scratch
     if let number = numItems {
       let size = number == Int(arraySizeBacking) ? number : Int(arraySizeBacking)
-      data = await SortItem.sequenceOf(numItems: size)
+      data = await ShuffleMethod.create(maximum: size)
     } else {
-      data = await SortItem.sequenceOf(numItems: Int(arraySizeBacking))
+      data = await ShuffleMethod.create(maximum: Int(arraySizeBacking))
     }
   }
   

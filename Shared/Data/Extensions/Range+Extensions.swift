@@ -17,28 +17,15 @@ func floatRatio(x: Float, oldRange: ClosedRange<Float>, newRange: ClosedRange<Fl
   precondition(oMin != oMax, "Old range bounds cannot be equal!")
   precondition(nMin != nMax, "New range bounds cannot be equal!")
   // Check reversed input range.
-  var reverseInput = false
   let oldMin = min(oMin, oMax)
   let oldMax = max(oMin, oMax)
-  if oldMin != oMin {
-    reverseInput = true
-  }
+  let reverseInput = oldMin != oMin
   // Check reversed output range.
-  var reverseOutput = false
   let newMin = min(nMin, nMax)
   let newMax = max(nMin, nMax)
-  if newMin != nMin {
-    reverseOutput = true
-  }
-  // Calculate portions.
-  var portion = (x - oldMin) * (newMax - newMin) / (oldMax - oldMin)
-  if reverseInput {
-    portion = (oldMax - x) * (newMax - newMin) / (oldMax - oldMin)
-  }
+  let reverseOutput = newMin != nMin
+  // Calculate portion.
+  let portion = (reverseInput ? (oldMax - x) : (x - oldMin)) * (newMax - newMin) / (oldMax - oldMin)
   // Calculate result.
-  var result = portion + newMin
-  if reverseOutput {
-    result = newMax - portion
-  }
-  return result
+  return reverseOutput ? (newMax - portion) : (portion + newMin)
 }

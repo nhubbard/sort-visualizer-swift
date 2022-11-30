@@ -103,19 +103,17 @@
 * [ ] Settings Panel (use new SwiftUI 4 forms interface?)
   * [ ] First things first: type-safe configuration lookup is an absolute requirement. We might be able to accomplish this using SwiftUI's awesome "environment" dependency injection.
   * [ ] Synthesizer
-    * [ ] Note range (use piano control from AudioKitUI, see Cookbook app for examples)
-    * [ ] Attack, decay, sustain, release (use freq curve control from AudioKitUI, see Cookbook app for examples)
+    * [x] Note range (use piano control from AudioKitUI, see Cookbook app for examples)
+    * [x] Amplitude, attack, decay, sustain, release (use freq curve control from AudioKitUI, see Cookbook app for examples)
   * [ ] Sort view
-    * [ ] Default sound to on or off (toggle)
-    * [ ] Default delay (slider and/or input box)
-    * [ ] Default array size (slider and/or input box)
-    * [ ] Default timer to formatted interval or seconds (toggle?)
-    * [ ] Array size range for normal algorithms (slider and/or input box, result should auto update the default array size constraints)
-    * [ ] Code view themes (combo box of some kind)
-    * [ ] Code font size (slider, will have to constrain because otherwise we have to resize views)
-      * This may also prompt us to actually implement a tabbed view for code, so that we don't have to deal with grids.
-    * [ ] Shuffle/generation method?
-      * [ ] Random shuffle
+    * [x] Default sound to on or off (toggle)
+    * [x] Default delay (slider and/or input box)
+    * [x] Default array size (slider and/or input box)
+    * [x] Default timer to formatted interval or seconds (toggle?)
+    * [x] Array size range for normal algorithms (slider and/or input box, result should auto update the default array size constraints)
+    * [x] Code view themes (combo box of some kind)
+    * [ ] Shuffle/generation method (implementation in SortItem.swift and Shuffle.swift in progress)
+      * [x] Random shuffle
       * [ ] Ascending
       * [ ] Descending
       * [ ] Shuffled Cubic

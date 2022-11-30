@@ -39,23 +39,27 @@ struct SortItem: Identifiable, Equatable, Comparable, Hashable, @unchecked Senda
     hasher.combine(value)
   }
   
+  // TODO: Add custom shuffles
   /// Used to generate values at initialization, on array size change, and on recreation. Not parallelized for SortViewModel initializer.
-  static func syncSequenceOf(numItems: Int = 128) -> [SortItem] {
-    (1...numItems)
+  static func syncSequenceOf(numItems: Int = 128, with method: ShuffleMethod = .random) -> [SortItem] {
+    let newItems = (1...numItems)
       .map {
         SortItem.fromInt(value: $0)
       }
-      .shuffled()
+    // Temporary measure while other shuffles are implemented
+    return newItems.shuffled()
   }
   
+  // TODO: Add custom shuffles
   /// Used to generate values at initialization, on array size change, and on recreation. Parallelized for speed.
   @MainActor
-  static func sequenceOf(numItems: Int = 128) async -> [SortItem] {
-    await (1...numItems)
+  static func sequenceOf(numItems: Int = 128, with method: ShuffleMethod = .random) async -> [SortItem] {
+    let newItems = await (1...numItems)
       .concurrentMap {
         SortItem.fromInt(value: $0)
       }
-      .shuffled()
+    // Temporary measure while other shuffles are implemented.
+    return newItems.shuffled()
   }
   
   var id: UUID = UUID.init()

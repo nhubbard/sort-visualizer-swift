@@ -10,26 +10,32 @@ import Foundation
 extension SortViewModel {
   @MainActor
   @inlinable
-  func _merge(_ s: Int, _ m: Int, _ end: Int) async {
-    var start = s
-    var mid = m
-    var start2 = mid &+ 1
-    guard await compare(mid, start2, by: (>)) else { return }
-    while start <= mid && start2 <= end {
-      if await compare(start, start2, by: (<=)) {
-        start++
+  func _merge(_ low: Int, _ mid: Int, _ high: Int) async {
+    var i = low
+    var j = mid &+ 1
+    var k = 0
+    var temp = [Int](repeating: 0, count: high &- low &+ 1)
+    while i <= mid && j <= high {
+      guard await enforceRunning() else { return }
+      if await compare(i, j, by: (<)) {
+        temp[k++] = data[i++].value
       } else {
-        guard let value = await getItem(start2) else { return }
-        var index = start2
-        while index != start {
-          await swap(index, index &- 1)
-          index--
-        }
-        await setItem(start, value)
-        start++
-        mid++
-        start2++
+        temp[k++] = data[j++].value
       }
+    }
+    while j <= high {
+      temp[k++] = data[j++].value
+    }
+    while i <= mid {
+      temp[k++] = data[i++].value
+    }
+    i = low
+    k = 0
+    while i <= high {
+      await setValue(i, temp[k])
+      await resetColor(index: i)
+      i++
+      k++
     }
   }
   
@@ -40,13 +46,15 @@ extension SortViewModel {
       let mid = (left &+ right) / 2
       await _mergeSort(left, mid)
       await _mergeSort(mid &+ 1, right)
-      await _merge(left, mid, right)
+      if await compare(mid, mid &+ 1, by: (>)) {
+        await _merge(left, mid, right)
+      }
     }
   }
   
   @MainActor
   @inlinable
   func mergeSort() async {
-    await _mergeSort(0, data.count - 1)
+    await _mergeSort(0, data.count &- 1)
   }
 }

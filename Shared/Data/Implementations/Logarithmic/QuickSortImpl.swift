@@ -13,9 +13,7 @@ extension SortViewModel {
   @MainActor
   @inlinable
   func _quickSort(_ left: Int, _ right: Int) async {
-    guard await enforceRunning() else {
-      return
-    }
+    guard await enforceRunning() else { return }
     if left < right {
       let pivot = left
       await changeColor(index: pivot, color: .red)
@@ -23,21 +21,15 @@ extension SortViewModel {
       var j = right
       await changeColor(index: j, color: .blue)
       while i < j {
-        guard await enforceRunning() else {
-          return
-        }
+        guard await enforceRunning() else { return }
         while await compare(pivot, i) && i < j {
-          guard await enforceRunning() else {
-            return
-          }
+          guard await enforceRunning() else { return }
           await resetColor(index: i)
           i++
           await changeColor(index: i, color: .green)
         }
         while await !compare(pivot, j) {
-          guard await enforceRunning() else {
-            return
-          }
+          guard await enforceRunning() else { return }
           await resetColor(index: j)
           j--
           await changeColor(index: j, color: .blue)
@@ -49,9 +41,7 @@ extension SortViewModel {
       }
       await swap(pivot, j)
       await [i, j, pivot].concurrentForEach { [self] index in
-        guard await enforceRunning() else {
-          return
-        }
+        guard await enforceRunning() else { return }
         await resetColor(index: index)
       }
       await _quickSort(left, j &- 1)
@@ -62,9 +52,7 @@ extension SortViewModel {
   @MainActor
   @inlinable
   func quickSort() async {
-    guard await enforceRunning() else {
-      return
-    }
+    guard await enforceRunning() else { return }
     await _quickSort(0, data.count &- 1)
   }
 }

@@ -88,7 +88,7 @@ struct ScrollingSortView: View {
               .padding(.all, 3)
               .background(Capsule().fill(Color.primary.opacity(0.06)))
             }
-            AttributedCode(loadHighlightResource(algorithm, languages[self.selectedLanguage].fileExtension))
+            AttributedCode(loadHighlightResource(algorithm, languages[self.selectedLanguage].fileExtension)).drawingGroup()
           }.padding(.all, 32)
         }
       }

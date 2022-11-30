@@ -21,6 +21,8 @@
 		7145E2CB286B24430038940D /* combsort.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 7145E2CA286B24430038940D /* combsort.bundle */; };
 		7145E2CD286B298B0038940D /* bogosort.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 7145E2CC286B298B0038940D /* bogosort.bundle */; };
 		714AA7812845013200D92535 /* Color+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 714AA7802845013200D92535 /* Color+Extensions.swift */; };
+		714ED65F291E85E900731003 /* UserDefaults+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 714ED65E291E85E900731003 /* UserDefaults+Extensions.swift */; };
+		714ED663291E9BD400731003 /* ShuffleMethod.swift in Sources */ = {isa = PBXBuildFile; fileRef = 714ED662291E9BD400731003 /* ShuffleMethod.swift */; };
 		71523D5128901D3100CF4D36 /* NumberFormatter+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71523D5028901D3100CF4D36 /* NumberFormatter+Extensions.swift */; };
 		71548F162864E4A200043680 /* AttributedCodeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71548F152864E4A200043680 /* AttributedCodeView.swift */; };
 		7156FB742850CF9E00A75F7F /* insertionsort.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 7156FB732850CF9E00A75F7F /* insertionsort.bundle */; };
@@ -97,6 +99,8 @@
 		7145E2CA286B24430038940D /* combsort.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = combsort.bundle; sourceTree = "<group>"; };
 		7145E2CC286B298B0038940D /* bogosort.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = bogosort.bundle; sourceTree = "<group>"; };
 		714AA7802845013200D92535 /* Color+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Extensions.swift"; sourceTree = "<group>"; };
+		714ED65E291E85E900731003 /* UserDefaults+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UserDefaults+Extensions.swift"; sourceTree = "<group>"; };
+		714ED662291E9BD400731003 /* ShuffleMethod.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShuffleMethod.swift; sourceTree = "<group>"; };
 		71523D5028901D3100CF4D36 /* NumberFormatter+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NumberFormatter+Extensions.swift"; sourceTree = "<group>"; };
 		71548F152864E4A200043680 /* AttributedCodeView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AttributedCodeView.swift; sourceTree = "<group>"; };
 		7156FB732850CF9E00A75F7F /* insertionsort.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = insertionsort.bundle; sourceTree = "<group>"; };
@@ -187,11 +191,20 @@
 		71052D2D2820352A00935228 /* Data */ = {
 			isa = PBXGroup;
 			children = (
+				714ED65D291E85DC00731003 /* Settings */,
 				71650A352842923800A23BC2 /* Primary */,
 				71650A332842751300A23BC2 /* Extensions */,
 				71CFABF7283951B3004672DB /* Implementations */,
 			);
 			path = Data;
+			sourceTree = "<group>";
+		};
+		714ED65D291E85DC00731003 /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				714ED65E291E85E900731003 /* UserDefaults+Extensions.swift */,
+			);
+			path = Settings;
 			sourceTree = "<group>";
 		};
 		71610BF82844101700A2696C /* Resources */ = {
@@ -267,6 +280,7 @@
 				718246DC284685E4003842E3 /* ComplexityEntry.swift */,
 				718246DE284685F6003842E3 /* LanguageEntry.swift */,
 				71619A462860A3FA00CCA31C /* SortStatus.swift */,
+				714ED662291E9BD400731003 /* ShuffleMethod.swift */,
 			);
 			path = Primary;
 			sourceTree = "<group>";
@@ -526,6 +540,7 @@
 				7120CB9928397DF00019D976 /* Synthesizer.swift in Sources */,
 				71F4B35028207C02006B68E6 /* SortViewModel.swift in Sources */,
 				713371F128775DAE00DE2D7E /* MathView.swift in Sources */,
+				714ED65F291E85E900731003 /* UserDefaults+Extensions.swift in Sources */,
 				71CCA06F2866446800E4D666 /* DraculaTheme.swift in Sources */,
 				71CFAC1228396EC3004672DB /* RadixSortImpl.swift in Sources */,
 				71D4DBDA28185905001DBD0E /* Sort2App.swift in Sources */,
@@ -546,6 +561,7 @@
 				71CFAC0728396D6C004672DB /* GnomeSortImpl.swift in Sources */,
 				71CCA05F2865F54B00E4D666 /* CodeTheme.swift in Sources */,
 				71CFAC1628396F63004672DB /* CombSortImpl.swift in Sources */,
+				714ED663291E9BD400731003 /* ShuffleMethod.swift in Sources */,
 				71548F162864E4A200043680 /* AttributedCodeView.swift in Sources */,
 				71CCA05D2865F4D500E4D666 /* CodeAttributes.swift in Sources */,
 				71CFAC0128396D08004672DB /* BubbleSortImpl.swift in Sources */,
@@ -693,6 +709,7 @@
 				ENABLE_PREVIEWS = YES;
 				ENABLE_TESTING_SEARCH_PATHS = NO;
 				GENERATE_INFOPLIST_FILE = YES;
+				GENERATE_PROFILING_CODE = YES;
 				INFOPLIST_FILE = "Sort Visualizer--iOS--Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "Sort Visualizer";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.education";

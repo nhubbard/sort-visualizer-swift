@@ -10,6 +10,7 @@ import SwiftUI
 struct SortView: View {
   var algorithm: Algorithms
   @StateObject var state: SortViewModel = SortViewModel()
+  @State var isEditingSize: Bool = false
   
   var body: some View {
     GeometryReader { geo in
@@ -64,10 +65,13 @@ struct SortView: View {
         // Array Size slider
         HStack(spacing: 10) {
           Text("Array Size")
-          Slider(value: $state.arraySizeBacking, in: state.sizeRange, step: 2)
-            .onChange(of: state.arraySizeBacking) { onArraySizeChange(newValue: $0) }
-            .frame(maxWidth: 192)
-            .disabled(state.running)
+          Slider(value: $state.arraySizeBacking, in: state.sizeRange, step: 2) { editing in
+              if !editing {
+                onArraySizeChange(newValue: state.arraySizeBacking)
+              }
+            }
+              .frame(maxWidth: 192)
+              .disabled(state.running)
           Text(String(format: "%d", Int(state.arraySizeBacking)))
             .foregroundColor(.blue)
         }
@@ -203,7 +207,7 @@ struct SortView: View {
     if algorithm == .bogoSort {
       state.sizeRange = Float(4)...Float(16)
       state.arraySizeBacking = Float(12)
-      state.data = SortItem.syncSequenceOf(numItems: 12)
+      state.data = ShuffleMethod.createSync(maximum: 12)
     }
   }
 }

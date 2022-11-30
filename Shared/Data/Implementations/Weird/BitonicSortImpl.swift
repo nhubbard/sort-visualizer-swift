@@ -25,7 +25,7 @@ extension SortViewModel {
       let truncated = Int(truncating: nsDecimal)
       let asFloat = Float(truncated)
       arraySizeBacking = asFloat
-      data = await SortItem.sequenceOf(numItems: Int(arraySizeBacking))
+      data = await ShuffleMethod.create(maximum: Int(arraySizeBacking))
     }
     let n = data.count
     var k = 2
