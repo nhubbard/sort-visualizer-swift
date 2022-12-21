@@ -8,7 +8,7 @@
 import SwiftUI
 import WebKit
 
-internal struct MathWebView: UIViewRepresentable {
+@frozen public struct MathWebView: UIViewRepresentable {
   var text: String
   var math: String
   
@@ -56,7 +56,7 @@ internal struct MathWebView: UIViewRepresentable {
   </html>
   """#
   
-  func makeUIView(context: Context) -> WKWebView {
+  public func makeUIView(context: Context) -> WKWebView {
     let preferences = WKPreferences()
     preferences.isTextInteractionEnabled = false
     let config = WKWebViewConfiguration()
@@ -66,7 +66,7 @@ internal struct MathWebView: UIViewRepresentable {
     return view
   }
   
-  func updateUIView(_ webView: WKWebView, context: Context) {
+  public func updateUIView(_ webView: WKWebView, context: Context) {
     let _ = webView.loadHTMLString(
       template
         .replacingOccurrences(of: "[math]", with: math)
@@ -76,12 +76,12 @@ internal struct MathWebView: UIViewRepresentable {
   }
 }
 
-struct MathView: View {
-  var text: String
-  var unicode: String
-  var math: String
+@frozen public struct MathView: View {
+  public var text: String
+  public var unicode: String
+  public var math: String
 
-  var body: some View {
+  public var body: some View {
     MathWebView(text: text, math: math)
       .accessibilityValue("\(text): \(unicode)")
   }

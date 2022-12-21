@@ -7,14 +7,14 @@
 
 import Foundation
 
-struct ComplexityFile: Decodable {
-  var complexities: [ComplexityEntry]
+@frozen public struct ComplexityFile: Decodable, Sendable {
+  public var complexities: [ComplexityEntry]
 }
 
-struct ComplexityEntry: Identifiable, Decodable {
-  var key: String
-  var value: String
-  var mathml: String = ""
+@frozen public struct ComplexityEntry: Identifiable, Decodable, Sendable {
+  public var key: String
+  public var value: String
+  public var mathml: String = ""
   
-  var id: String { key }
+  public var id: String { key }
 }

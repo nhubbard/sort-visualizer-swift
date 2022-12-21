@@ -6,16 +6,16 @@
 //
 
 import Foundation
-import SwiftUI
+@preconcurrency import SwiftUI
 
-struct LanguageEntry: Identifiable, Hashable {
-  let id = UUID()
-  var title: String
-  var icon: String
-  var iconColor: Color? = nil
-  var iconWidth: CGFloat = 16
-  var iconHeight: CGFloat = 16
-  var fileExtension: String
+@frozen public struct LanguageEntry: Identifiable, Hashable, Sendable {
+  public let id = UUID()
+  public var title: String
+  public var icon: String
+  public var iconColor: Color? = nil
+  public var iconWidth: CGFloat = 16
+  public var iconHeight: CGFloat = 16
+  public var fileExtension: String
 }
 
 let languages: [LanguageEntry] = [

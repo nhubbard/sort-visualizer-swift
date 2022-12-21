@@ -7,13 +7,13 @@
 
 import SwiftUI
 
-struct Category: View {
+@frozen public struct Category: View {
   var text: String
   var iconName: String
   var isCustomIcon: Bool = true
   var color: Color = .blue
   
-  var body: some View {
+  public var body: some View {
     if isCustomIcon {
       CustomIconLabel(text: text, iconName: iconName).foregroundColor(.blue)
     } else {

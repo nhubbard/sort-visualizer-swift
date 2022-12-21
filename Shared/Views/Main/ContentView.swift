@@ -7,8 +7,8 @@
 
 import SwiftUI
 
-private enum PageCategory: Identifiable, Hashable, CaseIterable {
-  // No category (home, future settings page, etc)
+@frozen public enum PageCategory: Identifiable, Hashable, CaseIterable {
+  // No category (home, settings page, etc)
   case none
   // Logarithmic algorithms
   case logarithmic
@@ -17,9 +17,9 @@ private enum PageCategory: Identifiable, Hashable, CaseIterable {
   // Weird algorithms
   case weird
   
-  var id: Self { self }
+  public var id: Self { self }
   
-  var displayName: String {
+  public var displayName: String {
     switch self {
       case .none: return ""
       case .logarithmic: return "Logarithmic"
@@ -28,7 +28,7 @@ private enum PageCategory: Identifiable, Hashable, CaseIterable {
     }
   }
   
-  var iconName: String {
+  public var iconName: String {
     switch self {
       case .none: return ""
       case .logarithmic: return "logarithmic-algos"
@@ -37,7 +37,7 @@ private enum PageCategory: Identifiable, Hashable, CaseIterable {
     }
   }
   
-  var pages: [Page] {
+  public var pages: [Page] {
     switch self {
       case .none: return [.home]
       case .logarithmic: return [.quickSort, .mergeSort, .heapSort]
@@ -47,8 +47,9 @@ private enum PageCategory: Identifiable, Hashable, CaseIterable {
   }
 }
 
-private enum Page: Identifiable, Hashable, CaseIterable {
+@frozen public enum Page: Identifiable, Hashable, CaseIterable {
   case home
+  case settings
   // Logarithmic algorithms
   case quickSort
   case mergeSort
@@ -69,37 +70,38 @@ private enum Page: Identifiable, Hashable, CaseIterable {
   case bogoSort
   case stoogeSort
   
-  var id: Self { self }
+  public var id: Self { self }
   
-  var isSystemIcon: Bool {
-    self == .home
+  public var isSystemIcon: Bool {
+    self == .home || self == .settings
   }
   
-  var algorithm: Algorithms? {
+  public var algorithm: Algorithms? {
     switch self {
-      case .home:          return nil
-      case .quickSort:     return .quickSort
-      case .mergeSort:     return .mergeSort
-      case .heapSort:      return .heapSort
-      case .bubbleSort:    return .bubbleSort
-      case .selectionSort: return .selectionSort
-      case .insertionSort: return .insertionSort
-      case .gnomeSort:     return .gnomeSort
-      case .shakerSort:    return .shakerSort
-      case .oddEvenSort:   return .oddEvenSort
-      case .pancakeSort:   return .pancakeSort
-      case .bitonicSort:   return .bitonicSort
-      case .radixSort:     return .radixSort
-      case .shellSort:     return .shellSort
-      case .combSort:      return .combSort
-      case .bogoSort:      return .bogoSort
-      case .stoogeSort:    return .stoogeSort
+      case .home, .settings: return nil
+      case .quickSort:       return .quickSort
+      case .mergeSort:       return .mergeSort
+      case .heapSort:        return .heapSort
+      case .bubbleSort:      return .bubbleSort
+      case .selectionSort:   return .selectionSort
+      case .insertionSort:   return .insertionSort
+      case .gnomeSort:       return .gnomeSort
+      case .shakerSort:      return .shakerSort
+      case .oddEvenSort:     return .oddEvenSort
+      case .pancakeSort:     return .pancakeSort
+      case .bitonicSort:     return .bitonicSort
+      case .radixSort:       return .radixSort
+      case .shellSort:       return .shellSort
+      case .combSort:        return .combSort
+      case .bogoSort:        return .bogoSort
+      case .stoogeSort:      return .stoogeSort
     }
   }
   
-  var displayName: String {
+  public var displayName: String {
     switch self {
       case .home:          return "Home"
+      case .settings:      return "Settings"
       case .quickSort:     return "Quick Sort"
       case .mergeSort:     return "Merge Sort"
       case .heapSort:      return "Heap Sort"
@@ -119,9 +121,10 @@ private enum Page: Identifiable, Hashable, CaseIterable {
     }
   }
   
-  var iconName: String {
+  public var iconName: String {
     switch self {
       case .home:          return "house"
+      case .settings:      return "gear"
       case .quickSort:     return "quick"
       case .mergeSort:     return "merge"
       case .heapSort:      return "heap"
@@ -141,10 +144,9 @@ private enum Page: Identifiable, Hashable, CaseIterable {
     }
   }
   
-  // First part is name, second part is icon
-  var category: PageCategory {
+  public var category: PageCategory {
     switch self {
-      case .home:
+      case .home, .settings:
         return .none
       case .quickSort, .mergeSort, .heapSort:
         return .logarithmic
@@ -171,8 +173,12 @@ struct ContentView: View {
     } detail: {
       if let selection {
         switch selection {
+          // TODO: Move settings to it's own page.
           case .home:
             HomeView()
+              .navigationTitle(selection.displayName)
+          case .settings:
+            SettingsView()
               .navigationTitle(selection.displayName)
           case .quickSort:
             ScrollingSortView(algorithm: .quickSort)

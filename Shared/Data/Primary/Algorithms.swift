@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum Algorithms: String, Identifiable, CaseIterable {
+@frozen public enum Algorithms: String, Identifiable, CaseIterable, Sendable {
   // Logarithmic algorithms
   case quickSort = "quicksort"
   case mergeSort = "mergesort"
@@ -28,11 +28,11 @@ enum Algorithms: String, Identifiable, CaseIterable {
   case bogoSort = "bogosort"
   case stoogeSort = "stoogesort"
   
-  var id: Self { self }
-  var sizeRange: ClosedRange<Float> {
+  public var id: Self { self }
+  public var sizeRange: ClosedRange<Float> {
     self == .bogoSort ? 4.0...16.0 : 16.0...512.0
   }
-  var defaultSize: Int {
+  public var defaultSize: Int {
     self == .bogoSort ? 12 : 256
   }
 }

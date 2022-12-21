@@ -9,7 +9,7 @@ import Foundation
 import SwiftUI
 import Then
 
-struct EmacsTheme: CodeTheme {
+@frozen public struct EmacsTheme: CodeTheme {
   func getBgColor() -> Color { Color(fromHex: "#f8f8f8")! }
   func getFormat(token: CodeAttributes.Value) -> TextFormat {
     TextFormat.getBuilder(bg: getBgColor()).then { it in

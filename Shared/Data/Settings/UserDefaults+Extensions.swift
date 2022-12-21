@@ -205,12 +205,12 @@ extension UserDefaults {
   
   /// The default theme for the code view.
   /// Defaults to "monokai".
-  var sortCodeViewTheme: String {
+  var sortCodeViewTheme: CodeThemes {
     get {
-      string(forKey: Keys.sortCodeViewTheme) ?? "monokai"
+      CodeThemes.fromInt(integer(forKey: Keys.sortCodeViewTheme))
     }
     set(theme) {
-      set(theme, forKey: Keys.sortCodeViewTheme)
+      set(theme.rawValue, forKey: Keys.sortCodeViewTheme)
     }
   }
   

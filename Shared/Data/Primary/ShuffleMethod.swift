@@ -23,12 +23,27 @@ private func genShuffledN(power: Double, size: Int = 256) -> [Int] {
   return out
 }
 
-enum ShuffleMethod: Int {
+@frozen public enum ShuffleMethod: Int, Sendable {
   case random = 0
   case ascending
   case descending
   case shuffledCubic
   case shuffledQuintic
+  
+  var name: String {
+    switch self {
+      case .random:
+        return "Random"
+      case .ascending:
+        return "Ascending"
+      case .descending:
+        return "Descending"
+      case .shuffledCubic:
+        return "Shuffled cubic"
+      case .shuffledQuintic:
+        return "Shuffled quintic"
+    }
+  }
   
   static func fromInt(_ value: Int) -> ShuffleMethod {
     switch value {

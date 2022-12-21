@@ -21,7 +21,7 @@ fileprivate let name = Color(fromHex: "#A6E22E")!
 fileprivate let number = Color(fromHex: "#AE81FF")!
 fileprivate let string = Color(fromHex: "#E6DB74")!
 
-struct MonokaiTheme: CodeTheme {
+@frozen public struct MonokaiTheme: CodeTheme {
   func getBgColor() -> Color { bgColor }
   func getFormat(token: CodeAttributes.Value) -> TextFormat {
     TextFormat.getBuilder(bg: bgColor).then { it in

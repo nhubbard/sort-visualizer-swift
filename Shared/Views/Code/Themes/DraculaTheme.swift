@@ -9,7 +9,7 @@ import Foundation
 import SwiftUI
 import Then
 
-struct DraculaTheme: CodeTheme {
+@frozen public struct DraculaTheme: CodeTheme {
   func getBgColor() -> Color { Color(fromHex: "#282a36")! }
   func getFormat(token: CodeAttributes.Value) -> TextFormat {
     TextFormat.getBuilder(bg: getBgColor()).then { it in

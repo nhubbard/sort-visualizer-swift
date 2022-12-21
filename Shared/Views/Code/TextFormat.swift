@@ -12,12 +12,12 @@ import Then
 /**
  * A structure representing the text formatting to use on a `Text` SwiftUI view.
  */
-struct TextFormat {
-  var fg: Color = .white
-  var bg: Color = .black
-  var bold: Bool = false
-  var italic: Bool = false
-  var underline: Bool = false
+@frozen public struct TextFormat {
+  public var fg: Color = .white
+  public var bg: Color = .black
+  public var bold: Bool = false
+  public var italic: Bool = false
+  public var underline: Bool = false
 }
 
 /**

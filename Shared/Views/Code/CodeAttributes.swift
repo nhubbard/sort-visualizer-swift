@@ -7,8 +7,8 @@
 
 import Foundation
 
-enum CodeAttributes: CodableAttributedStringKey, MarkdownDecodableAttributedStringKey {
-  enum Value: String, Codable, Hashable {
+@frozen public enum CodeAttributes: CodableAttributedStringKey, MarkdownDecodableAttributedStringKey {
+  @frozen public enum Value: String, Codable, Hashable {
     case token = "Token"
     case text = "Token.Text"
     case whitespace = "Token.Text.Whitespace"
@@ -88,5 +88,5 @@ enum CodeAttributes: CodableAttributedStringKey, MarkdownDecodableAttributedStri
     case genericSubheading = "Token.Generic.Subheading"
     case genericTraceback = "Token.Generic.Traceback"
   }
-  static var name = "code"
+  public static var name = "code"
 }

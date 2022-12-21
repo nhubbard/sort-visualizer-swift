@@ -1,5 +1,5 @@
 //
-//  DefaultTheme.swift
+//  PygmentsTheme.swift
 //  Sort Visualizer (iOS)
 //
 //  Created by Nicholas Hubbard on 6/24/22.
@@ -61,7 +61,7 @@ fileprivate let se = Color(fromHex: "#AA5D1F")!
 // String.{Interpol,Regex}
 fileprivate let si = Color(fromHex: "#A45A77")!
 
-struct DefaultTheme: CodeTheme {
+@frozen public struct PygmentsTheme: CodeTheme {
   func getBgColor() -> Color { hl }
   func getFormat(token: CodeAttributes.Value) -> TextFormat {
     TextFormat.getBuilder(bg: hl).then { it in

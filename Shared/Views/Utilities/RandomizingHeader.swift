@@ -5,13 +5,13 @@
 //  Created by Nicholas Hubbard on 5/28/22.
 //
 
-import SwiftUI
+@preconcurrency import SwiftUI
 
-struct RandomizingHeader: View, @unchecked Sendable {
+@frozen public struct RandomizingHeader: View, Sendable {
   let text: String
   @State var currentText: String = ""
   
-  var body: some View {
+  public var body: some View {
     Text(currentText)
       .font(.system(size: 48, weight: .bold, design: .default))
       .multilineTextAlignment(.leading)
@@ -20,7 +20,7 @@ struct RandomizingHeader: View, @unchecked Sendable {
       }
       .onAppear {
         currentText = text
-        // animateHeader()
+        animateHeader()
       }
   }
   

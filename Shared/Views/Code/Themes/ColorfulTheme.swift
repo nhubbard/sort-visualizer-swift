@@ -9,7 +9,7 @@ import Foundation
 import SwiftUI
 import Then
 
-struct ColorfulTheme: CodeTheme {
+@frozen public struct ColorfulTheme: CodeTheme {
   func getBgColor() -> Color { .white }
   func getFormat(token: CodeAttributes.Value) -> TextFormat {
     TextFormat.getBuilder(bg: .white).then { it in

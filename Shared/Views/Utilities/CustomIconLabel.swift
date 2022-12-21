@@ -7,11 +7,11 @@
 
 import SwiftUI
 
-struct CustomIconLabel: View {
+@frozen public struct CustomIconLabel: View {
   var text: String
   var iconName: String
   
-  var body: some View {
+  public var body: some View {
     Label {
       Text(text)
     } icon: {

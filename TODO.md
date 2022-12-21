@@ -101,24 +101,23 @@
   * [ ] String resources/localization for all strings throughout the app.
   * [ ] Add copyright and license attribution for Wikipedia-sourced content.
 * [ ] Settings Panel (use new SwiftUI 4 forms interface?)
-  * [ ] First things first: type-safe configuration lookup is an absolute requirement. We might be able to accomplish this using SwiftUI's awesome "environment" dependency injection.
+  * [x] First things first: type-safe configuration lookup is an absolute requirement. We might be able to accomplish this using SwiftUI's awesome "environment" dependency injection.
   * [ ] Synthesizer
+    * [x] Default to on or off (toggle)
     * [x] Note range (use piano control from AudioKitUI, see Cookbook app for examples)
     * [x] Amplitude, attack, decay, sustain, release (use freq curve control from AudioKitUI, see Cookbook app for examples)
   * [ ] Sort view
-    * [x] Default sound to on or off (toggle)
     * [x] Default delay (slider and/or input box)
     * [x] Default array size (slider and/or input box)
     * [x] Default timer to formatted interval or seconds (toggle?)
     * [x] Array size range for normal algorithms (slider and/or input box, result should auto update the default array size constraints)
     * [x] Code view themes (combo box of some kind)
-    * [ ] Shuffle/generation method (implementation in SortItem.swift and Shuffle.swift in progress)
+    * [x] Shuffle/generation method (implementation in SortItem.swift and Shuffle.swift in progress)
       * [x] Random shuffle
-      * [ ] Ascending
-      * [ ] Descending
-      * [ ] Shuffled Cubic
-      * [ ] Shuffled Quintic
-      * [ ] Shuffled n-2 Equal
+      * [x] Ascending
+      * [x] Descending
+      * [x] Shuffled Cubic
+      * [x] Shuffled Quintic
   * [ ] Bogo sort
     * [ ] Disable bogo sort warning prompt
   * [ ] Bitonic sort

@@ -26,7 +26,7 @@ fileprivate let string = Color(fromHex: "#7f8c8d")!
 // Function names
 fileprivate let functionName = Color(fromHex: "#d35400")!
 
-struct ArduinoTheme: CodeTheme {
+@frozen public struct ArduinoTheme: CodeTheme {
   func getBgColor() -> Color { .white }
   func getFormat(token: CodeAttributes.Value) -> TextFormat {
     TextFormat.getBuilder(bg: .white).then { it in

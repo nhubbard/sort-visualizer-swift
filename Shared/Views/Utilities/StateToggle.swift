@@ -7,13 +7,13 @@
 
 import SwiftUI
 
-struct StateToggle: View {
+@frozen public struct StateToggle: View {
   var binding: Binding<Bool>
   var name: String
   var iconName: String
   var maxWidth: CGFloat = 150
   
-  var body: some View {
+  public var body: some View {
     Toggle(isOn: binding) {
       Label(name, systemImage: iconName)
     }

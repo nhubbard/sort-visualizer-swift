@@ -11,7 +11,7 @@ import AudioKit
 import AudioKitEX
 import SoundpipeAudioKit
 
-// The frequency range from the lowest MIDI note to the highest MIDI note. 36 is C1 and 72 is C5.
+// The frequency range from the lowest MIDI note to the highest MIDI note. 36 is C2 and 72 is C5.
 let floatFrequencyRange = UInt8(36).midiNoteToFrequency()...UInt8(72).midiNoteToFrequency()
 
 // A major improvement over the previous FM synthesizer!
