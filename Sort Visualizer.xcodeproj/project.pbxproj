@@ -17,6 +17,8 @@
 		7120CB9F28397E5B0019D976 /* AudioKitUI in Frameworks */ = {isa = PBXBuildFile; productRef = 7120CB9E28397E5B0019D976 /* AudioKitUI */; };
 		7120CBA228397EE40019D976 /* SoundpipeAudioKit in Frameworks */ = {isa = PBXBuildFile; productRef = 7120CBA128397EE40019D976 /* SoundpipeAudioKit */; };
 		712FAC49285E2A2B0045B50A /* Algorithms in Frameworks */ = {isa = PBXBuildFile; productRef = 712FAC48285E2A2B0045B50A /* Algorithms */; };
+		71301B7B295346B30010E430 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71301B7A295346B30010E430 /* SettingsView.swift */; };
+		71301B7D295346E80010E430 /* CodeThemes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71301B7C295346E80010E430 /* CodeThemes.swift */; };
 		713371F128775DAE00DE2D7E /* MathView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 713371F028775DAE00DE2D7E /* MathView.swift */; };
 		7145E2CB286B24430038940D /* combsort.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 7145E2CA286B24430038940D /* combsort.bundle */; };
 		7145E2CD286B298B0038940D /* bogosort.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 7145E2CC286B298B0038940D /* bogosort.bundle */; };
@@ -52,7 +54,7 @@
 		71CCA05D2865F4D500E4D666 /* CodeAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71CCA05C2865F4D500E4D666 /* CodeAttributes.swift */; };
 		71CCA05F2865F54B00E4D666 /* CodeTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71CCA05E2865F54B00E4D666 /* CodeTheme.swift */; };
 		71CCA0612865F57E00E4D666 /* MonokaiTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71CCA0602865F57E00E4D666 /* MonokaiTheme.swift */; };
-		71CCA0642865FBCF00E4D666 /* DefaultTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71CCA0632865FBCF00E4D666 /* DefaultTheme.swift */; };
+		71CCA0642865FBCF00E4D666 /* PygmentsTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71CCA0632865FBCF00E4D666 /* PygmentsTheme.swift */; };
 		71CCA0662865FC9D00E4D666 /* TextFormat.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71CCA0652865FC9D00E4D666 /* TextFormat.swift */; };
 		71CCA0692865FD7300E4D666 /* Then in Frameworks */ = {isa = PBXBuildFile; productRef = 71CCA0682865FD7300E4D666 /* Then */; };
 		71CCA06B2866332D00E4D666 /* ArduinoTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71CCA06A2866332D00E4D666 /* ArduinoTheme.swift */; };
@@ -94,6 +96,8 @@
 		7113FCB4286758DF00665F09 /* shellsort.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = shellsort.bundle; sourceTree = "<group>"; };
 		711EF293285CC174001EB6AC /* BogoSortImpl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BogoSortImpl.swift; sourceTree = "<group>"; };
 		7120CB9828397DF00019D976 /* Synthesizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Synthesizer.swift; sourceTree = "<group>"; };
+		71301B7A295346B30010E430 /* SettingsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		71301B7C295346E80010E430 /* CodeThemes.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CodeThemes.swift; sourceTree = "<group>"; };
 		713371F028775DAE00DE2D7E /* MathView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MathView.swift; sourceTree = "<group>"; };
 		713FA7AF284A5DAE00F12327 /* highlight.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = highlight.py; sourceTree = "<group>"; };
 		7145E2CA286B24430038940D /* combsort.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = combsort.bundle; sourceTree = "<group>"; };
@@ -131,7 +135,7 @@
 		71CCA05C2865F4D500E4D666 /* CodeAttributes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodeAttributes.swift; sourceTree = "<group>"; };
 		71CCA05E2865F54B00E4D666 /* CodeTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodeTheme.swift; sourceTree = "<group>"; };
 		71CCA0602865F57E00E4D666 /* MonokaiTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonokaiTheme.swift; sourceTree = "<group>"; };
-		71CCA0632865FBCF00E4D666 /* DefaultTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultTheme.swift; sourceTree = "<group>"; };
+		71CCA0632865FBCF00E4D666 /* PygmentsTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PygmentsTheme.swift; sourceTree = "<group>"; };
 		71CCA0652865FC9D00E4D666 /* TextFormat.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextFormat.swift; sourceTree = "<group>"; };
 		71CCA06A2866332D00E4D666 /* ArduinoTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArduinoTheme.swift; sourceTree = "<group>"; };
 		71CCA06C28663CFF00E4D666 /* ColorfulTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorfulTheme.swift; sourceTree = "<group>"; };
@@ -261,6 +265,7 @@
 		71650A342842922C00A23BC2 /* Main */ = {
 			isa = PBXGroup;
 			children = (
+				71301B7A295346B30010E430 /* SettingsView.swift */,
 				71D4DBCB28185905001DBD0E /* ContentView.swift */,
 				71D4DBEF28185DFD001DBD0E /* HomeView.swift */,
 				71F38EB72819B42C0085BAAA /* SortView.swift */,
@@ -300,8 +305,9 @@
 		71CCA0622865FBC300E4D666 /* Themes */ = {
 			isa = PBXGroup;
 			children = (
+				71301B7C295346E80010E430 /* CodeThemes.swift */,
 				71CCA0602865F57E00E4D666 /* MonokaiTheme.swift */,
-				71CCA0632865FBCF00E4D666 /* DefaultTheme.swift */,
+				71CCA0632865FBCF00E4D666 /* PygmentsTheme.swift */,
 				71CCA06A2866332D00E4D666 /* ArduinoTheme.swift */,
 				71CCA06C28663CFF00E4D666 /* ColorfulTheme.swift */,
 				71CCA06E2866446800E4D666 /* DraculaTheme.swift */,
@@ -524,8 +530,10 @@
 				71CCA0662865FC9D00E4D666 /* TextFormat.swift in Sources */,
 				71CFAC0328396D2A004672DB /* SelectionSortImpl.swift in Sources */,
 				71F38EB82819B42C0085BAAA /* SortView.swift in Sources */,
+				71301B7B295346B30010E430 /* SettingsView.swift in Sources */,
 				71610A9628357F5C00F6176E /* Int+Extensions.swift in Sources */,
 				718FE3FA287F3E7F00620341 /* StateToggle.swift in Sources */,
+				71301B7D295346E80010E430 /* CodeThemes.swift in Sources */,
 				71CFAC0B28396DAE004672DB /* OddEvenSortImpl.swift in Sources */,
 				71CCA06D28663CFF00E4D666 /* ColorfulTheme.swift in Sources */,
 				71523D5128901D3100CF4D36 /* NumberFormatter+Extensions.swift in Sources */,
@@ -554,7 +562,7 @@
 				71CFABF9283951C5004672DB /* QuickSortImpl.swift in Sources */,
 				71650A2E28426C5700A23BC2 /* Category.swift in Sources */,
 				718246DD284685E4003842E3 /* ComplexityEntry.swift in Sources */,
-				71CCA0642865FBCF00E4D666 /* DefaultTheme.swift in Sources */,
+				71CCA0642865FBCF00E4D666 /* PygmentsTheme.swift in Sources */,
 				71D4DBF028185DFD001DBD0E /* HomeView.swift in Sources */,
 				714AA7812845013200D92535 /* Color+Extensions.swift in Sources */,
 				71CFAC0528396D4C004672DB /* InsertionSortImpl.swift in Sources */,
