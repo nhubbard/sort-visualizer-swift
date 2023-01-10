@@ -11,17 +11,13 @@ extension SortViewModel {
   @MainActor
   @inlinable
   func _stoogeSort(_ start: Int, _ end: Int) async {
-    guard await enforceRunning() else {
-      return
-    }
+    guard await enforceRunning() else { return }
     // Only present to ensure that users don't think the program has frozen
     let len = end &- start &+ 1
     if len <= 1 {
       return
     } else if len == 2 {
-      guard await getValue(start) != nil, await getValue(end) != nil else {
-        return
-      }
+      guard await getValue(start) != nil, await getValue(end) != nil else { return }
       if await compare(start, end, by: (>)) {
         await swap(start, end)
       }

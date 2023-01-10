@@ -29,10 +29,12 @@ struct SortView: View {
           // Running toggle
           StateToggle(binding: $state.running, name: "Running", iconName: "play.fill")
             .onChange(of: state.running) { onRunning(newValue: $0) }
+            .keyboardShortcut("r", modifiers: [.command, .shift])
           // Sound toggle
           StateToggle(binding: $state.sound, name: "Sound", iconName: "speaker.wave.2")
             .disabled(state.soundDisabled)
             .onChange(of: state.sound) { onSound(newValue: $0) }
+            .keyboardShortcut("s", modifiers: [.command, .shift])
         }.padding(.horizontal, 20)
         // Reset and Step buttons
         HStack(spacing: 10) {
@@ -42,6 +44,7 @@ struct SortView: View {
           } label: {
             Label("Reset", systemImage: "repeat")
           }.frame(maxWidth: 150)
+            .keyboardShortcut("z", modifiers: [.command, .shift])
           // Step button
           Button {
             onStep()

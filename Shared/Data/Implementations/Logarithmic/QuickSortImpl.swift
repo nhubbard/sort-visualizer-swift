@@ -40,7 +40,7 @@ extension SortViewModel {
         }
       }
       await swap(pivot, j)
-      await [i, j, pivot].concurrentForEach { [self] index in
+      await [i, j, pivot].concurrentForEach(withPriority: .high) { [self] index in
         guard await enforceRunning() else { return }
         await resetColor(index: index)
       }

@@ -32,33 +32,22 @@ private func genShuffledN(power: Double, size: Int = 256) -> [Int] {
   
   var name: String {
     switch self {
-      case .random:
-        return "Random"
-      case .ascending:
-        return "Ascending"
-      case .descending:
-        return "Descending"
-      case .shuffledCubic:
-        return "Shuffled cubic"
-      case .shuffledQuintic:
-        return "Shuffled quintic"
+      case .random:          return "Random"
+      case .ascending:       return "Ascending"
+      case .descending:      return "Descending"
+      case .shuffledCubic:   return "Shuffled cubic"
+      case .shuffledQuintic: return "Shuffled quintic"
     }
   }
   
   static func fromInt(_ value: Int) -> ShuffleMethod {
     switch value {
-      case 0:
-        return .random
-      case 1:
-        return .ascending
-      case 2:
-        return .descending
-      case 3:
-        return .shuffledCubic
-      case 4:
-        return .shuffledQuintic
-      default:
-        return .random
+      case 0:  return .random
+      case 1:  return .ascending
+      case 2:  return .descending
+      case 3:  return .shuffledCubic
+      case 4:  return .shuffledQuintic
+      default: return .random
     }
   }
   
@@ -68,16 +57,11 @@ private func genShuffledN(power: Double, size: Int = 256) -> [Int] {
   /// - Returns: An array of `SortItem`s, with their values shuffled according to the chosen method.
   static func createSync(method: ShuffleMethod = .random, maximum: Int = 256) -> [SortItem] {
     switch method {
-      case .random:
-        return (1...maximum).map { SortItem.fromInt(value: $0) }.shuffled()
-      case .ascending:
-        return (1...maximum).map { SortItem.fromInt(value: $0) }
-      case .descending:
-        return (1...maximum).map { SortItem.fromInt(value: $0) }.reversed()
-      case .shuffledCubic:
-        return genShuffledN(power: 3, size: maximum).map { SortItem.fromInt(value: $0) }.shuffled()
-      case .shuffledQuintic:
-        return genShuffledN(power: 5, size: maximum).map { SortItem.fromInt(value: $0) }.shuffled()
+      case .random:          return (1...maximum).map { SortItem.fromInt(value: $0) }.shuffled()
+      case .ascending:       return (1...maximum).map { SortItem.fromInt(value: $0) }
+      case .descending:      return (1...maximum).map { SortItem.fromInt(value: $0) }.reversed()
+      case .shuffledCubic:   return genShuffledN(power: 3, size: maximum).map { SortItem.fromInt(value: $0) }.shuffled()
+      case .shuffledQuintic: return genShuffledN(power: 5, size: maximum).map { SortItem.fromInt(value: $0) }.shuffled()
     }
   }
   
@@ -88,16 +72,11 @@ private func genShuffledN(power: Double, size: Int = 256) -> [Int] {
   @MainActor
   static func create(method: ShuffleMethod = .random, maximum: Int = 256) async -> [SortItem] {
     switch method {
-      case .random:
-        return await (1...maximum).concurrentMap { SortItem.fromInt(value: $0) }.shuffled()
-      case .ascending:
-        return await (1...maximum).concurrentMap { SortItem.fromInt(value: $0) }
-      case .descending:
-        return await (1...maximum).concurrentMap { SortItem.fromInt(value: $0) }.reversed()
-      case .shuffledCubic:
-        return await genShuffledN(power: 3, size: maximum).concurrentMap { SortItem.fromInt(value: $0) }.shuffled()
-      case .shuffledQuintic:
-        return await genShuffledN(power: 5, size: maximum).concurrentMap { SortItem.fromInt(value: $0) }.shuffled()
+      case .random:          return await (1...maximum).concurrentMap(withPriority: .high) { SortItem.fromInt(value: $0) }.shuffled()
+      case .ascending:       return await (1...maximum).concurrentMap(withPriority: .high) { SortItem.fromInt(value: $0) }
+      case .descending:      return await (1...maximum).concurrentMap(withPriority: .high) { SortItem.fromInt(value: $0) }.reversed()
+      case .shuffledCubic:   return await genShuffledN(power: 3, size: maximum).concurrentMap(withPriority: .high) { SortItem.fromInt(value: $0) }.shuffled()
+      case .shuffledQuintic: return await genShuffledN(power: 5, size: maximum).concurrentMap(withPriority: .high) { SortItem.fromInt(value: $0) }.shuffled()
     }
   }
 }

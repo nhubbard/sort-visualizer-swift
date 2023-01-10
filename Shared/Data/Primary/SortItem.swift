@@ -55,7 +55,7 @@ import CollectionConcurrencyKit
   @MainActor
   public static func sequenceOf(numItems: Int = 128, with method: ShuffleMethod = .random) async -> [SortItem] {
     let newItems = await (1...numItems)
-      .concurrentMap {
+      .concurrentMap(withPriority: .high) {
         SortItem.fromInt(value: $0)
       }
     // Temporary measure while other shuffles are implemented.

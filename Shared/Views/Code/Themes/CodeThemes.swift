@@ -17,37 +17,24 @@ import Foundation
   
   var name: String {
     switch self {
-      case .monokai:
-        return "Monokai"
-      case .pygments:
-        return "Pygments"
-      case .arduino:
-        return "Arduino"
-      case .colorful:
-        return "Colorful"
-      case .dracula:
-        return "Dracula"
-      case .emacs:
-        return "Emacs"
+      case .monokai:  return "Monokai"
+      case .pygments: return "Pygments"
+      case .arduino:  return "Arduino"
+      case .colorful: return "Colorful"
+      case .dracula:  return "Dracula"
+      case .emacs:    return "Emacs"
     }
   }
   
   static func fromInt(_ value: Int) -> CodeThemes {
     switch value {
-      case 0:
-        return .monokai
-      case 1:
-        return .pygments
-      case 2:
-        return .arduino
-      case 3:
-        return .colorful
-      case 4:
-        return .dracula
-      case 5:
-        return .emacs
-      default:
-        return .monokai
+      case 0:  return .monokai
+      case 1:  return .pygments
+      case 2:  return .arduino
+      case 3:  return .colorful
+      case 4:  return .dracula
+      case 5:  return .emacs
+      default: return .monokai
     }
   }
 }

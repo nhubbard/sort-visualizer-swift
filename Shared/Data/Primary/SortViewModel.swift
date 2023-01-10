@@ -7,7 +7,7 @@
 
 import Foundation
 import SwiftUI
-import Atomics
+@preconcurrency import Atomics
 import CollectionConcurrencyKit
 
 @MainActor
@@ -72,7 +72,7 @@ final class SortViewModel: ObservableObject {
   @MainActor
   @inlinable
   func enforceIndices(_ indices: Int...) async {
-    await indices.concurrentForEach { [self] index in
+    await indices.concurrentForEach(withPriority: .high) { [self] index in
       await enforceIndex(index)
     }
   }
@@ -112,9 +112,9 @@ final class SortViewModel: ObservableObject {
   @inlinable
   func operate() async {
     guard await enforceRunning() else { return }
-    // Task.detached { [self] in
-      /*await*/ operations.wrappingIncrement(by: 1, ordering: .relaxed)
-    // }
+    Task.detached { [self] in
+      await operations.wrappingIncrement(by: 1, ordering: .relaxed)
+    }
   }
   
   /// Get the operations counter
@@ -315,40 +315,24 @@ final class SortViewModel: ObservableObject {
     startTime = CFAbsoluteTimeGetCurrent()
     switch algorithm {
       // Logarithmic algorithms
-      case .quickSort:
-        await quickSort()
-      case .mergeSort:
-        await mergeSort()
-      case .heapSort:
-        await heapSort()
+      case .quickSort:     await quickSort()
+      case .mergeSort:     await mergeSort()
+      case .heapSort:      await heapSort()
       // Quadratic algorithms
-      case .bubbleSort:
-        await bubbleSort()
-      case .selectionSort:
-        await selectionSort()
-      case .insertionSort:
-        await insertionSort()
-      case .gnomeSort:
-        await gnomeSort()
-      case .shakerSort:
-        await shakerSort()
-      case .oddEvenSort:
-        await oddEvenSort()
-      case .pancakeSort:
-        await pancakeSort()
+      case .bubbleSort:    await bubbleSort()
+      case .selectionSort: await selectionSort()
+      case .insertionSort: await insertionSort()
+      case .gnomeSort:     await gnomeSort()
+      case .shakerSort:    await shakerSort()
+      case .oddEvenSort:   await oddEvenSort()
+      case .pancakeSort:   await pancakeSort()
       // Weird algorithms
-      case .bitonicSort:
-        await bitonicSort()
-      case .radixSort:
-        await radixSort()
-      case .shellSort:
-        await shellSort()
-      case .combSort:
-        await combSort()
-      case .bogoSort:
-        if await bogoSort() == .stopped { return false }
-      case .stoogeSort:
-        await stoogeSort()
+      case .bitonicSort:   await bitonicSort()
+      case .radixSort:     await radixSort()
+      case .shellSort:     await shellSort()
+      case .combSort:      await combSort()
+      case .bogoSort:      if await bogoSort() == .stopped { return false }
+      case .stoogeSort:    await stoogeSort()
     }
     endTime = CFAbsoluteTimeGetCurrent()
     let isDone = await isArraySorted()

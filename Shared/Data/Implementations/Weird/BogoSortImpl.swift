@@ -13,15 +13,13 @@ extension SortViewModel {
   @MainActor
   @inlinable
   func bogoSort() async -> SortStatus {
-    guard await enforceRunning() else {
-      return .stopped
-    }
-    let values = await data.concurrentMap { $0.value }
+    guard await enforceRunning() else { return .stopped }
+    let values = await data.concurrentMap(withPriority: .high) { $0.value }
     // Don't use uniquePermutations(); we're guaranteed to not have any duplicate values in the array, and the unique check slows down the operation from O(1) to O(n)
     let permutations = values.permutations()
     for p in permutations {
       guard await enforceRunning() else { return .stopped }
-      await data.indices.concurrentForEach { [self] i in
+      await data.indices.concurrentForEach(withPriority: .high) { [self] i in
         // It may look weird that I'm wrapping a "non-null" value in an Optional result, but it stops the compiler from complaining about it, so I call that a win.
         // The result is actually nullable, since we're attempting to get an index from an array that might be out of bounds.
         guard
@@ -33,9 +31,7 @@ extension SortViewModel {
         await operate()
         await resetColor(index: i)
       }
-      if data == data.sorted() {
-        break
-      }
+      if data == data.sorted() { break }
     }
     return data == data.sorted() ? .finished : .stopped
   }

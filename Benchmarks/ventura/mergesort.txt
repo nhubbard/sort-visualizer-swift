@@ -1,3 +1,6 @@
+Previous
+========
+
 BENCHMARK: mergesort, 16 items, 124 operations, 0.9s time, 138.0 op/s, 0.0ms delay
 BENCHMARK: mergesort, 16 items, 117 operations, 0.9s time, 137.3 op/s, 0.0ms delay
 BENCHMARK: mergesort, 16 items, 126 operations, 0.9s time, 136.0 op/s, 0.0ms delay
@@ -58,3 +61,67 @@ BENCHMARK: mergesort, 512 items, 67046 operations, 822.4s time, 81.5 op/s, 0.0ms
 BENCHMARK: mergesort, 512 items, 70005 operations, 858.0s time, 81.6 op/s, 0.0ms delay
 BENCHMARK: mergesort, 512 items, 75079 operations, 916.2s time, 81.9 op/s, 0.0ms delay
 BENCHMARK: mergesort, 512 items, 66683 operations, 808.7s time, 82.5 op/s, 0.0ms delay
+
+Current
+=======
+
+BENCHMARK: mergesort, 16 items, 52 operations, 0.5s time, 105.4 op/s, 0.0ms delay
+BENCHMARK: mergesort, 16 items, 57 operations, 0.5s time, 116.5 op/s, 0.0ms delay
+BENCHMARK: mergesort, 16 items, 56 operations, 0.5s time, 102.3 op/s, 0.0ms delay
+BENCHMARK: mergesort, 16 items, 56 operations, 0.5s time, 104.7 op/s, 0.0ms delay
+BENCHMARK: mergesort, 16 items, 60 operations, 0.6s time, 106.2 op/s, 0.0ms delay
+BENCHMARK: mergesort, 16 items, 56 operations, 0.6s time, 101.4 op/s, 0.0ms delay
+BENCHMARK: mergesort, 16 items, 53 operations, 0.5s time, 117.7 op/s, 0.0ms delay
+BENCHMARK: mergesort, 16 items, 54 operations, 0.5s time, 116.3 op/s, 0.0ms delay
+BENCHMARK: mergesort, 16 items, 60 operations, 0.6s time, 98.6 op/s, 0.0ms delay
+BENCHMARK: mergesort, 16 items, 53 operations, 0.5s time, 107.3 op/s, 0.0ms delay
+BENCHMARK: mergesort, 32 items, 140 operations, 1.2s time, 115.4 op/s, 0.0ms delay
+BENCHMARK: mergesort, 32 items, 146 operations, 1.4s time, 107.4 op/s, 0.0ms delay
+BENCHMARK: mergesort, 32 items, 139 operations, 1.3s time, 110.0 op/s, 0.0ms delay
+BENCHMARK: mergesort, 32 items, 143 operations, 1.3s time, 108.2 op/s, 0.0ms delay
+BENCHMARK: mergesort, 32 items, 139 operations, 1.2s time, 111.8 op/s, 0.0ms delay
+BENCHMARK: mergesort, 32 items, 143 operations, 1.3s time, 110.7 op/s, 0.0ms delay
+BENCHMARK: mergesort, 32 items, 142 operations, 1.3s time, 111.0 op/s, 0.0ms delay
+BENCHMARK: mergesort, 32 items, 135 operations, 1.3s time, 107.4 op/s, 0.0ms delay
+BENCHMARK: mergesort, 32 items, 139 operations, 1.3s time, 108.7 op/s, 0.0ms delay
+BENCHMARK: mergesort, 32 items, 142 operations, 1.3s time, 110.6 op/s, 0.0ms delay
+BENCHMARK: mergesort, 64 items, 343 operations, 3.1s time, 109.0 op/s, 0.0ms delay
+BENCHMARK: mergesort, 64 items, 346 operations, 3.2s time, 107.2 op/s, 0.0ms delay
+BENCHMARK: mergesort, 64 items, 340 operations, 3.2s time, 105.6 op/s, 0.0ms delay
+BENCHMARK: mergesort, 64 items, 348 operations, 3.2s time, 108.7 op/s, 0.0ms delay
+BENCHMARK: mergesort, 64 items, 341 operations, 3.2s time, 108.1 op/s, 0.0ms delay
+BENCHMARK: mergesort, 64 items, 338 operations, 3.2s time, 107.1 op/s, 0.0ms delay
+BENCHMARK: mergesort, 64 items, 338 operations, 3.2s time, 106.0 op/s, 0.0ms delay
+BENCHMARK: mergesort, 64 items, 345 operations, 3.2s time, 108.4 op/s, 0.0ms delay
+BENCHMARK: mergesort, 64 items, 350 operations, 3.3s time, 106.8 op/s, 0.0ms delay
+BENCHMARK: mergesort, 64 items, 338 operations, 3.1s time, 108.0 op/s, 0.0ms delay
+BENCHMARK: mergesort, 128 items, 821 operations, 8.2s time, 100.7 op/s, 0.0ms delay
+BENCHMARK: mergesort, 128 items, 822 operations, 8.2s time, 100.1 op/s, 0.0ms delay
+BENCHMARK: mergesort, 128 items, 811 operations, 8.1s time, 100.4 op/s, 0.0ms delay
+BENCHMARK: mergesort, 128 items, 812 operations, 8.0s time, 101.4 op/s, 0.0ms delay
+BENCHMARK: mergesort, 128 items, 816 operations, 8.0s time, 101.9 op/s, 0.0ms delay
+BENCHMARK: mergesort, 128 items, 826 operations, 8.2s time, 100.7 op/s, 0.0ms delay
+BENCHMARK: mergesort, 128 items, 824 operations, 8.1s time, 101.5 op/s, 0.0ms delay
+BENCHMARK: mergesort, 128 items, 826 operations, 8.2s time, 101.3 op/s, 0.0ms delay
+BENCHMARK: mergesort, 128 items, 829 operations, 8.2s time, 100.5 op/s, 0.0ms delay
+BENCHMARK: mergesort, 128 items, 814 operations, 8.0s time, 101.4 op/s, 0.0ms delay
+BENCHMARK: mergesort, 256 items, 1915 operations, 21.7s time, 88.2 op/s, 0.0ms delay
+BENCHMARK: mergesort, 256 items, 1899 operations, 21.7s time, 87.5 op/s, 0.0ms delay
+BENCHMARK: mergesort, 256 items, 1883 operations, 21.4s time, 88.0 op/s, 0.0ms delay
+BENCHMARK: mergesort, 256 items, 1918 operations, 23.0s time, 83.4 op/s, 0.0ms delay
+BENCHMARK: mergesort, 256 items, 1899 operations, 21.7s time, 87.7 op/s, 0.0ms delay
+BENCHMARK: mergesort, 256 items, 1888 operations, 18.1s time, 104.4 op/s, 0.0ms delay
+BENCHMARK: mergesort, 256 items, 1901 operations, 18.1s time, 105.0 op/s, 0.0ms delay
+BENCHMARK: mergesort, 256 items, 1912 operations, 18.5s time, 103.5 op/s, 0.0ms delay
+BENCHMARK: mergesort, 256 items, 1903 operations, 18.0s time, 105.8 op/s, 0.0ms delay
+BENCHMARK: mergesort, 256 items, 1887 operations, 18.0s time, 104.9 op/s, 0.0ms delay
+BENCHMARK: mergesort, 512 items, 4303 operations, 85.3s time, 50.5 op/s, 0.0ms delay
+BENCHMARK: mergesort, 512 items, 4305 operations, 69.2s time, 62.2 op/s, 0.0ms delay
+BENCHMARK: mergesort, 512 items, 4279 operations, 52.7s time, 81.2 op/s, 0.0ms delay
+BENCHMARK: mergesort, 512 items, 4249 operations, 62.2s time, 68.3 op/s, 0.0ms delay
+BENCHMARK: mergesort, 512 items, 4310 operations, 55.5s time, 77.6 op/s, 0.0ms delay
+BENCHMARK: mergesort, 512 items, 4317 operations, 60.8s time, 71.1 op/s, 0.0ms delay
+BENCHMARK: mergesort, 512 items, 4275 operations, 106.3s time, 40.2 op/s, 0.0ms delay
+BENCHMARK: mergesort, 512 items, 4305 operations, 52.5s time, 82.0 op/s, 0.0ms delay
+BENCHMARK: mergesort, 512 items, 4292 operations, 105.7s time, 40.6 op/s, 0.0ms delay
+BENCHMARK: mergesort, 512 items, 4280 operations, 62.2s time, 68.8 op/s, 0.0ms delay

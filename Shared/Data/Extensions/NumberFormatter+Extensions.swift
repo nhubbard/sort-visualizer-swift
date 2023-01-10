@@ -9,6 +9,6 @@ import Foundation
 
 extension NumberFormatter {
   func fmt(value: Double) -> String? {
-    self.string(from: NSNumber(value: value))
+    string(from: NSNumber(value: value))
   }
 }

@@ -11,9 +11,7 @@ extension SortViewModel {
   @MainActor
   @inlinable
   func _heapify(_ length: Int, _ i: Int) async {
-    guard await enforceRunning() else {
-      return
-    }
+    guard await enforceRunning() else { return }
     let indices = data.indices
     var largest = i
     let left = i &* 2 &+ 1
@@ -39,23 +37,17 @@ extension SortViewModel {
   @MainActor
   @inlinable
   func heapSort() async {
-    guard await enforceRunning() else {
-      return
-    }
+    guard await enforceRunning() else { return }
     let length = data.count
     var i = length / 2 &- 1
     var k = length &- 1
     while i >= 0 {
-      guard await enforceRunning() else {
-        return
-      }
+      guard await enforceRunning() else { return }
       await _heapify(length, i)
       i--
     }
     while k >= 0 {
-      guard await enforceRunning() else {
-        return
-      }
+      guard await enforceRunning() else { return }
       await swap(0, k)
       await _heapify(k, 0)
       k--

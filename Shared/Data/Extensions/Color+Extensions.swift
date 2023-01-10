@@ -8,9 +8,10 @@
 import Foundation
 import SwiftUI
 
+/// Shamelessly stolen from SwifterSwift. Thanks for the excellent code!
 extension Color {
   private static func getGroupValue(string: String, range: Range<Int>) -> CGFloat {
-    // I *hate* string indexing in Swift. I understand that there's a reason... but it's not a good one.
+    // I *hate* string indexing in Swift. I understand that there's a reason pertaining to UTF-16/UTF-8 compatibility... but it's not a good one, in my opinion.
     let group = string[string.index(string.startIndex, offsetBy: range.lowerBound)..<string.index(string.startIndex, offsetBy: range.upperBound)]
     guard group.count == 2,
           let intVal = Int(group, radix: 16) else {
@@ -20,24 +21,27 @@ extension Color {
   }
   
   init?(fromHex string: String) {
-    var stringValue: String = {
+    let result: String
+    scope: do {
       if string.first == "#" {
-        return String(string.dropFirst())
+        result = String(string.dropFirst())
+        break scope
       }
-      return string
-    }()
+      result = string
+    }
+    var stringValue: String = result
     switch stringValue.count {
       case 3: // RGB
         let r = String(stringValue[stringValue.index(stringValue.startIndex, offsetBy: 0)])
         let g = String(stringValue[stringValue.index(stringValue.startIndex, offsetBy: 1)])
         let b = String(stringValue[stringValue.index(stringValue.startIndex, offsetBy: 2)])
-        stringValue = r + r + g + g + b + b + "FF"
+        stringValue = "\(r)\(r)\(g)\(g)\(b)\(b)FF"
       case 4: // RGBA
         let r = String(stringValue[stringValue.index(stringValue.startIndex, offsetBy: 0)])
         let g = String(stringValue[stringValue.index(stringValue.startIndex, offsetBy: 1)])
         let b = String(stringValue[stringValue.index(stringValue.startIndex, offsetBy: 2)])
         let a = String(stringValue[stringValue.index(stringValue.startIndex, offsetBy: 3)])
-        stringValue = r + r + g + g + b + b + a + a
+        stringValue = "\(r)\(r)\(g)\(g)\(b)\(b)\(a)\(a)"
       case 6: // RRGGBB
         stringValue += "FF"
       case 8: // RRGGBBAA

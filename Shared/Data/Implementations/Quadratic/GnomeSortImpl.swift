@@ -11,15 +11,11 @@ extension SortViewModel {
   @MainActor
   @inlinable
   func gnomeSort() async {
-    guard await enforceRunning() else {
-      return
-    }
+    guard await enforceRunning() else { return }
     var i = 1
     var j = 2
     while i < data.count {
-      guard await enforceRunning() else {
-        return
-      }
+      guard await enforceRunning() else { return }
       if await !compare(i &- 1, i) {
         i = j
         j++

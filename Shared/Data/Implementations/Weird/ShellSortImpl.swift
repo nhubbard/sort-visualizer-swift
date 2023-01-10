@@ -11,29 +11,19 @@ extension SortViewModel {
   @MainActor
   @inlinable
   func shellSort() async {
-    guard await enforceRunning() else {
-      return
-    }
+    guard await enforceRunning() else { return }
     let n = data.count
     var interval = ~(~(n / 2))
     var j: Int
     while interval > 0 {
-      guard await enforceRunning() else {
-        return
-      }
+      guard await enforceRunning() else { return }
       for i in interval..<n {
-        guard await enforceRunning() else {
-          return
-        }
-        guard let temp = await getItem(i) else {
-          continue
-        }
+        guard await enforceRunning() else { return }
+        guard let temp = await getItem(i) else { continue }
         j = i
         let value = await getValue(j - interval)!
         while j >= interval && value > temp.value {
-          guard await enforceRunning() else {
-            return
-          }
+          guard await enforceRunning() else { return }
           await swap(j, j - interval)
           await changeColor(index: j, color: .red)
           await setValue(j, j &+ 1)

@@ -11,10 +11,10 @@ extension SortViewModel {
   @MainActor
   @inlinable
   func bitonicSort() async {
-    guard await enforceRunning() else {
-      return
-    }
-    if ![16, 32, 64, 128, 256, 512].contains(Int(arraySizeBacking)) {
+    guard await enforceRunning() else { return }
+    // This code may look awful, and that's because it is, but all it does is round the array size to the nearest power
+    // of two.
+    if ![16, 32, 64, 128, 256, 512, 1024, 2048].contains(Int(arraySizeBacking)) {
       let original = arraySizeBacking
       let currDouble = Double(original)
       let logged = log2(currDouble)
@@ -30,18 +30,12 @@ extension SortViewModel {
     let n = data.count
     var k = 2
     while k <= n {
-      guard await enforceRunning() else {
-        return
-      }
+      guard await enforceRunning() else { return }
       var j = Int(floor(Double(k / 2)))
       while j > 0 {
-        guard await enforceRunning() else {
-          return
-        }
+        guard await enforceRunning() else { return }
         for i in 0..<n {
-          guard await enforceRunning() else {
-            return
-          }
+          guard await enforceRunning() else { return }
           let l = i ^ j
           if l > i {
             let comp = await compare(i, l)

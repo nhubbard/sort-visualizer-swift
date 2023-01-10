@@ -19,13 +19,14 @@
 		712FAC49285E2A2B0045B50A /* Algorithms in Frameworks */ = {isa = PBXBuildFile; productRef = 712FAC48285E2A2B0045B50A /* Algorithms */; };
 		71301B7B295346B30010E430 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71301B7A295346B30010E430 /* SettingsView.swift */; };
 		71301B7D295346E80010E430 /* CodeThemes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71301B7C295346E80010E430 /* CodeThemes.swift */; };
+		71301B91295367B40010E430 /* AsyncObjects in Frameworks */ = {isa = PBXBuildFile; productRef = 71301B90295367B40010E430 /* AsyncObjects */; };
 		713371F128775DAE00DE2D7E /* MathView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 713371F028775DAE00DE2D7E /* MathView.swift */; };
 		7145E2CB286B24430038940D /* combsort.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 7145E2CA286B24430038940D /* combsort.bundle */; };
 		7145E2CD286B298B0038940D /* bogosort.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 7145E2CC286B298B0038940D /* bogosort.bundle */; };
 		714AA7812845013200D92535 /* Color+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 714AA7802845013200D92535 /* Color+Extensions.swift */; };
-		714ED65F291E85E900731003 /* UserDefaults+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 714ED65E291E85E900731003 /* UserDefaults+Extensions.swift */; };
 		714ED663291E9BD400731003 /* ShuffleMethod.swift in Sources */ = {isa = PBXBuildFile; fileRef = 714ED662291E9BD400731003 /* ShuffleMethod.swift */; };
 		71523D5128901D3100CF4D36 /* NumberFormatter+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71523D5028901D3100CF4D36 /* NumberFormatter+Extensions.swift */; };
+		7153F09129620B4F005D8E45 /* Float+RawRepresentable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7153F09029620B4F005D8E45 /* Float+RawRepresentable.swift */; };
 		71548F162864E4A200043680 /* AttributedCodeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71548F152864E4A200043680 /* AttributedCodeView.swift */; };
 		7156FB742850CF9E00A75F7F /* insertionsort.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 7156FB732850CF9E00A75F7F /* insertionsort.bundle */; };
 		715B11FD286C9C8D0087E837 /* stoogesort.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 715B11FC286C9C8D0087E837 /* stoogesort.bundle */; };
@@ -81,6 +82,7 @@
 		71D4DBDE28185905001DBD0E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 71D4DBCC28185905001DBD0E /* Assets.xcassets */; };
 		71D4DBF028185DFD001DBD0E /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71D4DBEF28185DFD001DBD0E /* HomeView.swift */; };
 		71D4DC2528186A0F001DBD0E /* MarkdownUI in Frameworks */ = {isa = PBXBuildFile; productRef = 71D4DC2428186A0F001DBD0E /* MarkdownUI */; };
+		71ECC8C5296D95E000034BE9 /* Binding+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71ECC8C4296D95E000034BE9 /* Binding+Extensions.swift */; };
 		71ED4EAE2831575500880755 /* Atomics in Frameworks */ = {isa = PBXBuildFile; productRef = 71ED4EAD2831575500880755 /* Atomics */; };
 		71F38EB82819B42C0085BAAA /* SortView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71F38EB72819B42C0085BAAA /* SortView.swift */; };
 		71F4B35028207C02006B68E6 /* SortViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71F4B34F28207C02006B68E6 /* SortViewModel.swift */; };
@@ -103,9 +105,9 @@
 		7145E2CA286B24430038940D /* combsort.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = combsort.bundle; sourceTree = "<group>"; };
 		7145E2CC286B298B0038940D /* bogosort.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = bogosort.bundle; sourceTree = "<group>"; };
 		714AA7802845013200D92535 /* Color+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Extensions.swift"; sourceTree = "<group>"; };
-		714ED65E291E85E900731003 /* UserDefaults+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UserDefaults+Extensions.swift"; sourceTree = "<group>"; };
 		714ED662291E9BD400731003 /* ShuffleMethod.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShuffleMethod.swift; sourceTree = "<group>"; };
 		71523D5028901D3100CF4D36 /* NumberFormatter+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NumberFormatter+Extensions.swift"; sourceTree = "<group>"; };
+		7153F09029620B4F005D8E45 /* Float+RawRepresentable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Float+RawRepresentable.swift"; sourceTree = "<group>"; };
 		71548F152864E4A200043680 /* AttributedCodeView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AttributedCodeView.swift; sourceTree = "<group>"; };
 		7156FB732850CF9E00A75F7F /* insertionsort.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = insertionsort.bundle; sourceTree = "<group>"; };
 		715B11FC286C9C8D0087E837 /* stoogesort.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = stoogesort.bundle; sourceTree = "<group>"; };
@@ -163,6 +165,7 @@
 		71D4DBEE28185D6E001DBD0E /* Sort Visualizer (iOS).entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Sort Visualizer (iOS).entitlements"; sourceTree = "<group>"; };
 		71D4DBEF28185DFD001DBD0E /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		71E6B239282033D300672D55 /* Sort Visualizer--iOS--Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Sort Visualizer--iOS--Info.plist"; sourceTree = "<group>"; };
+		71ECC8C4296D95E000034BE9 /* Binding+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Binding+Extensions.swift"; sourceTree = "<group>"; };
 		71F38EB72819B42C0085BAAA /* SortView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SortView.swift; sourceTree = "<group>"; };
 		71F4B34F28207C02006B68E6 /* SortViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SortViewModel.swift; sourceTree = "<group>"; };
 		71F4E8222863B1730057FF71 /* radixsort.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = radixsort.bundle; sourceTree = "<group>"; };
@@ -183,6 +186,7 @@
 				71ED4EAE2831575500880755 /* Atomics in Frameworks */,
 				7120CB9728397DDF0019D976 /* AudioKit in Frameworks */,
 				7113FCB328674D1B00665F09 /* CollectionConcurrencyKit in Frameworks */,
+				71301B91295367B40010E430 /* AsyncObjects in Frameworks */,
 				712FAC49285E2A2B0045B50A /* Algorithms in Frameworks */,
 				7120CB9F28397E5B0019D976 /* AudioKitUI in Frameworks */,
 				7120CBA228397EE40019D976 /* SoundpipeAudioKit in Frameworks */,
@@ -206,7 +210,8 @@
 		714ED65D291E85DC00731003 /* Settings */ = {
 			isa = PBXGroup;
 			children = (
-				714ED65E291E85E900731003 /* UserDefaults+Extensions.swift */,
+				7153F09029620B4F005D8E45 /* Float+RawRepresentable.swift */,
+				71ECC8C4296D95E000034BE9 /* Binding+Extensions.swift */,
 			);
 			path = Settings;
 			sourceTree = "<group>";
@@ -438,6 +443,7 @@
 				712FAC48285E2A2B0045B50A /* Algorithms */,
 				71CCA0682865FD7300E4D666 /* Then */,
 				7113FCB228674D1B00665F09 /* CollectionConcurrencyKit */,
+				71301B90295367B40010E430 /* AsyncObjects */,
 			);
 			productName = "Sort2 (iOS)";
 			productReference = 71D4DBD128185905001DBD0E /* Sort Visualizer.app */;
@@ -450,7 +456,7 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 1400;
+				LastSwiftUpdateCheck = 1410;
 				LastUpgradeCheck = 1400;
 				TargetAttributes = {
 					71D4DBD028185905001DBD0E = {
@@ -477,6 +483,7 @@
 				712FAC47285E2A2B0045B50A /* XCRemoteSwiftPackageReference "swift-algorithms" */,
 				71CCA0672865FD7300E4D666 /* XCRemoteSwiftPackageReference "Then" */,
 				7113FCB128674D1B00665F09 /* XCRemoteSwiftPackageReference "CollectionConcurrencyKit" */,
+				71301B8F295367B40010E430 /* XCRemoteSwiftPackageReference "AsyncObjects" */,
 			);
 			productRefGroup = 71D4DBD228185905001DBD0E /* Products */;
 			projectDirPath = "";
@@ -533,6 +540,7 @@
 				71301B7B295346B30010E430 /* SettingsView.swift in Sources */,
 				71610A9628357F5C00F6176E /* Int+Extensions.swift in Sources */,
 				718FE3FA287F3E7F00620341 /* StateToggle.swift in Sources */,
+				71ECC8C5296D95E000034BE9 /* Binding+Extensions.swift in Sources */,
 				71301B7D295346E80010E430 /* CodeThemes.swift in Sources */,
 				71CFAC0B28396DAE004672DB /* OddEvenSortImpl.swift in Sources */,
 				71CCA06D28663CFF00E4D666 /* ColorfulTheme.swift in Sources */,
@@ -548,7 +556,7 @@
 				7120CB9928397DF00019D976 /* Synthesizer.swift in Sources */,
 				71F4B35028207C02006B68E6 /* SortViewModel.swift in Sources */,
 				713371F128775DAE00DE2D7E /* MathView.swift in Sources */,
-				714ED65F291E85E900731003 /* UserDefaults+Extensions.swift in Sources */,
+				7153F09129620B4F005D8E45 /* Float+RawRepresentable.swift in Sources */,
 				71CCA06F2866446800E4D666 /* DraculaTheme.swift in Sources */,
 				71CFAC1228396EC3004672DB /* RadixSortImpl.swift in Sources */,
 				71D4DBDA28185905001DBD0E /* Sort2App.swift in Sources */,
@@ -711,6 +719,7 @@
 				CLANG_USE_OPTIMIZATION_PROFILE = YES;
 				CODE_SIGN_ENTITLEMENTS = "Sort Visualizer (iOS).entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 676UP3S3AH;
@@ -759,6 +768,7 @@
 				CLANG_USE_OPTIMIZATION_PROFILE = YES;
 				CODE_SIGN_ENTITLEMENTS = "Sort Visualizer (iOS).entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 676UP3S3AH;
@@ -789,7 +799,9 @@
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = YES;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_DISABLE_SAFETY_CHECKS = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_ENFORCE_EXCLUSIVE_ACCESS = "debug-only";
 				SWIFT_STRICT_CONCURRENCY = complete;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "2,6";
@@ -869,6 +881,14 @@
 				minimumVersion = 1.0.0;
 			};
 		};
+		71301B8F295367B40010E430 /* XCRemoteSwiftPackageReference "AsyncObjects" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SwiftyLab/AsyncObjects.git";
+			requirement = {
+				kind = exactVersion;
+				version = 1.0.0;
+			};
+		};
 		71CCA0672865FD7300E4D666 /* XCRemoteSwiftPackageReference "Then" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/devxoul/Then";
@@ -925,6 +945,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 712FAC47285E2A2B0045B50A /* XCRemoteSwiftPackageReference "swift-algorithms" */;
 			productName = Algorithms;
+		};
+		71301B90295367B40010E430 /* AsyncObjects */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 71301B8F295367B40010E430 /* XCRemoteSwiftPackageReference "AsyncObjects" */;
+			productName = AsyncObjects;
 		};
 		71CCA0682865FD7300E4D666 /* Then */ = {
 			isa = XCSwiftPackageProductDependency;
