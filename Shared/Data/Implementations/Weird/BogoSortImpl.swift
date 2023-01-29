@@ -16,7 +16,7 @@ extension SortViewModel {
     guard await enforceRunning() else { return .stopped }
     let values = await data.concurrentMap(withPriority: .high) { $0.value }
     // Don't use uniquePermutations(); we're guaranteed to not have any duplicate values in the array, and the unique check slows down the operation from O(1) to O(n)
-    let permutations = values.permutations()
+    let permutations = values.permutations(ofCount: data.count)
     for p in permutations {
       guard await enforceRunning() else { return .stopped }
       await data.indices.concurrentForEach(withPriority: .high) { [self] i in

@@ -13,7 +13,7 @@ extension SortViewModel {
   @inlinable
   func selectionSort() async {
     guard await enforceRunning() else { return }
-    for i in 0..<(data.count-1) {
+    for i in 0..<(data.count &- 1) {
       guard await enforceRunning() else { return }
       var key = i
       for j in (i &+ 1)..<(data.count) where await compare(key, j, clear: true) {

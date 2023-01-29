@@ -24,9 +24,9 @@ extension SortViewModel {
       return
     }
     let len23 = Int(ceil(Double(len) * 2 / 3))
-    await _stoogeSort(start, start &+ len23 - 1)
-    await _stoogeSort(end - len23 &+ 1, end)
-    await _stoogeSort(start, start &+ len23 - 1)
+    await _stoogeSort(start, start &+ len23 &- 1)
+    await _stoogeSort(end &- len23 &+ 1, end)
+    await _stoogeSort(start, start &+ len23 &- 1)
   }
   
   @MainActor

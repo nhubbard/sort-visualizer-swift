@@ -12,19 +12,29 @@ extension SortViewModel {
   @inlinable
   func bitonicSort() async {
     guard await enforceRunning() else { return }
-    // This code may look awful, and that's because it is, but all it does is round the array size to the nearest power
-    // of two.
-    if ![16, 32, 64, 128, 256, 512, 1024, 2048].contains(Int(arraySizeBacking)) {
+    /// This code may look awful, and that's because it is, but all it does is round the array size to the nearest power of two.
+    if ![16, 32, 64, 128, 256, 512, 1024, 2048, 4096].contains(Int(arraySizeBacking)) {
+      /// The original value.
       let original = arraySizeBacking
+      /// The original value as a double.
       let currDouble = Double(original)
+      /// Take the base-2/binary logarithm of the double value.
       let logged = log2(currDouble)
+      /// Get the ceiling of this base 2 logarithm.
       let ceiling = ceil(logged)
+      /// Convert the ceiling value to an integer.
       let intCeiling = Int(ceiling)
+      /// Get the value of 2^(intCeiling).
       let base2 = pow(Decimal(2), intCeiling)
+      /// Convert it to an NSDecimalNumber.
       let nsDecimal = NSDecimalNumber(decimal: base2)
+      /// Truncate the number to an integer.
       let truncated = Int(truncating: nsDecimal)
+      /// Convert it to a Float for the Slider backing value.
       let asFloat = Float(truncated)
+      /// Set the value.
       arraySizeBacking = asFloat
+      /// Create a new array with the new size.
       data = await ShuffleMethod.create(maximum: Int(arraySizeBacking))
     }
     let n = data.count

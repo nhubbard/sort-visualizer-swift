@@ -12,6 +12,39 @@ struct ScrollingSortView: View {
   var algorithm: Algorithms
   @State private var selectedLanguage: Int = 0
   
+  @ViewBuilder
+  func implementations() -> some View {
+    Text("Implementations")
+      .font(.system(size: 24, weight: .bold, design: .default))
+      .multilineTextAlignment(.leading)
+    HStack(alignment: .center, spacing: 0) {
+      ForEach(0..<languages.count, id: \.self) { i in
+        HStack {
+          Label {
+            Text(languages[i].title)
+          } icon: {
+            Image.ofAsset(
+              languages[i].icon,
+              width: CGFloat(languages[i].iconWidth),
+              height: CGFloat(languages[i].iconHeight)
+            )
+            .foregroundColor(languages[i].iconColor ?? .primary)
+          }
+        }
+        .padding(.all, 10)
+        .background(
+          Capsule()
+            .fill(.primary)
+            .opacity(self.selectedLanguage == i ? 0.24 : 0)
+        )
+        .onTapGesture { self.selectedLanguage = i }
+      }
+    }
+    .frame(alignment: .center)
+    .padding(.all, 3)
+    .background(Capsule().fill(Color.primary.opacity(0.06)))
+  }
+  
   var body: some View {
     GeometryReader { geo in
       ScrollView {
@@ -57,37 +90,15 @@ struct ScrollingSortView: View {
             }
           }.padding(.all, 32)
           Group {
-            HStack {
-              Text("Implementations")
-                .font(.system(size: 24, weight: .bold, design: .default))
-                .multilineTextAlignment(.leading)
-              HStack(alignment: .center, spacing: 0) {
-                ForEach(0..<languages.count, id: \.self) { i in
-                  HStack {
-                    Label {
-                      Text(languages[i].title)
-                    } icon: {
-                      Image.ofAsset(
-                        languages[i].icon,
-                        width: CGFloat(languages[i].iconWidth),
-                        height: CGFloat(languages[i].iconHeight)
-                      )
-                      .foregroundColor(languages[i].iconColor ?? .primary)
-                    }
-                  }
-                  .padding(.all, 10)
-                  .background(
-                    Capsule()
-                      .fill(.primary)
-                      .opacity(self.selectedLanguage == i ? 0.24 : 0)
-                  )
-                  .onTapGesture { self.selectedLanguage = i }
-                }
-              }
-              .frame(alignment: .center)
-              .padding(.all, 3)
-              .background(Capsule().fill(Color.primary.opacity(0.06)))
+            #if os(iOS)
+            VStack {
+              implementations()
             }
+            #else
+            HStack {
+              implementations()
+            }
+            #endif
             AttributedCode(loadHighlightResource(algorithm, languages[self.selectedLanguage].fileExtension)).drawingGroup()
           }.padding(.all, 32)
         }

@@ -102,11 +102,11 @@
   * [ ] Add copyright and license attribution for Wikipedia-sourced content.
 * [ ] Settings Panel (use new SwiftUI 4 forms interface?)
   * [x] First things first: type-safe configuration lookup is an absolute requirement. We might be able to accomplish this using SwiftUI's awesome "environment" dependency injection.
-  * [ ] Synthesizer
+  * [x] Synthesizer
     * [x] Default to on or off (toggle)
     * [x] Note range (use piano control from AudioKitUI, see Cookbook app for examples)
     * [x] Amplitude, attack, decay, sustain, release (use freq curve control from AudioKitUI, see Cookbook app for examples)
-  * [ ] Sort view
+  * [x] Sort view
     * [x] Default delay (slider and/or input box)
     * [x] Default array size (slider and/or input box)
     * [x] Default timer to formatted interval or seconds (toggle?)
@@ -118,10 +118,10 @@
       * [x] Descending
       * [x] Shuffled Cubic
       * [x] Shuffled Quintic
-  * [ ] Bogo sort
-    * [ ] Disable bogo sort warning prompt
-  * [ ] Bitonic sort
-    * [ ] Disable bitonic sort warning
+  * [x] Bogo sort
+    * [x] Disable bogo sort warning prompt
+  * [x] Bitonic sort
+    * [x] Disable bitonic sort warning
 * [ ] Expand the counters from just "Operations" to the standard set of metrics (array accesses, inversions, reversals, etc.)
 * [ ] Add more sorting algorithms? Port them from Gaming32/ArrayV, if possible.
 * [ ] Finally implement step functionality, possibly using delay as a catalyst

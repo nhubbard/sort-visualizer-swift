@@ -112,7 +112,7 @@ final class SortViewModel: ObservableObject {
   @inlinable
   func operate() async {
     guard await enforceRunning() else { return }
-    Task.detached { [self] in
+    Task.detached(priority: .high) { [self] in
       await operations.wrappingIncrement(by: 1, ordering: .relaxed)
     }
   }
@@ -274,7 +274,9 @@ final class SortViewModel: ObservableObject {
     await enforceIndex(index)
     await playNote(index)
     await delay()
+    await changeColor(index: index, color: .cyan)
     data[index].value = newValue
+    await resetColor(index: index)
   }
   
   /// Set the SortItem at an index.
@@ -285,7 +287,9 @@ final class SortViewModel: ObservableObject {
     await enforceIndex(index)
     await playNote(index)
     await delay()
+    await changeColor(index: index, color: .purple)
     data[index] = value
+    await resetColor(index: index)
   }
   
   /// Change the color of a SortItem at the specified index.

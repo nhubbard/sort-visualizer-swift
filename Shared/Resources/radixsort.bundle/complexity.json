@@ -2,17 +2,17 @@
   "complexities": [
     {
       "key": "Average Complexity",
-      "value": "O(d × (n + b))",
+      "value": "O(d \\times (n + b))",
       "mathml": "\\(O(d\\times{}(n + b))\\)"
     },
     {
       "key": "Best Case",
-      "value": "O(d × (n + b))",
+      "value": "O(d \\times (n + b))",
       "mathml": "\\(O(d\\times{}(n + b))\\)"
     },
     {
       "key": "Worst Case",
-      "value": "O(d × (n + b))",
+      "value": "O(d \\times (n + b))",
       "mathml": "\\(O(d\\times{}(n + b))\\)"
     },
     {

@@ -42,7 +42,7 @@ final class Synthesizer: Sendable {
     env.releaseDuration = 0.5
     // Start it automatically, if enabled.
     if autoStart {
-      Task { [self] in
+      Task(priority: .high) { [self] in
         await self.start()
       }
     }

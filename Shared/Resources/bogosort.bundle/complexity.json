@@ -2,7 +2,7 @@
   "complexities": [
     {
       "key": "Average Complexity",
-      "value": "O(n × n!)",
+      "value": "O(n \\times n!)",
       "mathml": "\\(O(n\\times{}n!)\\)"
     },
     {
@@ -12,7 +12,7 @@
     },
     {
       "key": "Worst Case",
-      "value": "O(∞)",
+      "value": "O(\\infty)",
       "mathml": "\\(O(\\infty)\\)"
     },
     {

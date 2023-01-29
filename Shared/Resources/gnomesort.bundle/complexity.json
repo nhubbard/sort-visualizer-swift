@@ -2,7 +2,7 @@
   "complexities": [
     {
       "key": "Average Complexity",
-      "value": "O(n²)",
+      "value": "O(n^2)",
       "mathml": "\\(O(n^2)\\)"
     },
     {
@@ -12,7 +12,7 @@
     },
     {
       "key": "Worst Case",
-      "value": "O(n²)",
+      "value": "O(n^2)",
       "mathml": "\\(O(n^2)\\)"
     },
     {

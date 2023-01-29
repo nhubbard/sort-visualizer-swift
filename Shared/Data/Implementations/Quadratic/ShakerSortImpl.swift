@@ -15,7 +15,7 @@ extension SortViewModel {
     var sorted = true
     while sorted {
       guard await enforceRunning() else { return }
-      for i in 0..<(data.count - 1) {
+      for i in 0..<(data.count &- 1) {
         guard await enforceRunning() else { return }
         if await compare(i, i &+ 1) {
           await swap(i, i &+ 1)

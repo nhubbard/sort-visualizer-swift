@@ -15,7 +15,7 @@ extension SortViewModel {
     guard await enforceRunning() else { return }
     for i in 1..<data.count {
       guard await enforceRunning() else { return }
-      for j in 0..<(data.count - i) {
+      for j in 0..<(data.count &- i) {
         guard await enforceRunning() else { return }
         if await compare(j, j &+ 1) {
           await swap(j, j &+ 1)

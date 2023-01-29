@@ -29,7 +29,7 @@
    * This function is simply a wrapper to make starting the animation easier in the two situations I use them in.
    */
   func animateHeader() {
-    Task.init {
+    Task.init(priority: .high) {
       await doHeaderAnimation()
     }
   }

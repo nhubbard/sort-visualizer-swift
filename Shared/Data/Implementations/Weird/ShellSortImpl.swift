@@ -21,10 +21,10 @@ extension SortViewModel {
         guard await enforceRunning() else { return }
         guard let temp = await getItem(i) else { continue }
         j = i
-        let value = await getValue(j - interval)!
+        let value = await getValue(j &- interval)!
         while j >= interval && value > temp.value {
           guard await enforceRunning() else { return }
-          await swap(j, j - interval)
+          await swap(j, j &- interval)
           await changeColor(index: j, color: .red)
           await setValue(j, j &+ 1)
           await playNote(j)
@@ -36,6 +36,7 @@ extension SortViewModel {
         await setValue(j, j &+ 1)
         await playNote(j)
         await changeColor(index: j, color: .blue)
+        try? await Task.sleep(for: .microseconds(500))
         await resetColor(index: j)
       }
       interval = ~(~(interval / 2))

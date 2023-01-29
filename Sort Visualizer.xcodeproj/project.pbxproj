@@ -19,7 +19,6 @@
 		712FAC49285E2A2B0045B50A /* Algorithms in Frameworks */ = {isa = PBXBuildFile; productRef = 712FAC48285E2A2B0045B50A /* Algorithms */; };
 		71301B7B295346B30010E430 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71301B7A295346B30010E430 /* SettingsView.swift */; };
 		71301B7D295346E80010E430 /* CodeThemes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71301B7C295346E80010E430 /* CodeThemes.swift */; };
-		71301B91295367B40010E430 /* AsyncObjects in Frameworks */ = {isa = PBXBuildFile; productRef = 71301B90295367B40010E430 /* AsyncObjects */; };
 		713371F128775DAE00DE2D7E /* MathView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 713371F028775DAE00DE2D7E /* MathView.swift */; };
 		7145E2CB286B24430038940D /* combsort.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 7145E2CA286B24430038940D /* combsort.bundle */; };
 		7145E2CD286B298B0038940D /* bogosort.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 7145E2CC286B298B0038940D /* bogosort.bundle */; };
@@ -46,6 +45,7 @@
 		71847C51284100180018E66C /* Image+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71847C50284100180018E66C /* Image+Extensions.swift */; };
 		718FE3F6287F365500620341 /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 718FE3F5287F365500620341 /* Credits.rtf */; };
 		718FE3FA287F3E7F00620341 /* StateToggle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 718FE3F9287F3E7F00620341 /* StateToggle.swift */; };
+		71AEEDD8298707BC00506954 /* iosMath in Frameworks */ = {isa = PBXBuildFile; productRef = 71AEEDD7298707BC00506954 /* iosMath */; };
 		71B4C0DE284FCC9800E42DB1 /* selectionsort.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 71B4C0DD284FCC9800E42DB1 /* selectionsort.bundle */; };
 		71B55E0E28383D5C00CA74CB /* Sequence+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71B55E0D28383D5C00CA74CB /* Sequence+Extensions.swift */; };
 		71BCE0FE2847B8B6007C8254 /* mergesort.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 71BCE0FD2847B8B6007C8254 /* mergesort.bundle */; };
@@ -186,9 +186,9 @@
 				71ED4EAE2831575500880755 /* Atomics in Frameworks */,
 				7120CB9728397DDF0019D976 /* AudioKit in Frameworks */,
 				7113FCB328674D1B00665F09 /* CollectionConcurrencyKit in Frameworks */,
-				71301B91295367B40010E430 /* AsyncObjects in Frameworks */,
 				712FAC49285E2A2B0045B50A /* Algorithms in Frameworks */,
 				7120CB9F28397E5B0019D976 /* AudioKitUI in Frameworks */,
+				71AEEDD8298707BC00506954 /* iosMath in Frameworks */,
 				7120CBA228397EE40019D976 /* SoundpipeAudioKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -443,7 +443,7 @@
 				712FAC48285E2A2B0045B50A /* Algorithms */,
 				71CCA0682865FD7300E4D666 /* Then */,
 				7113FCB228674D1B00665F09 /* CollectionConcurrencyKit */,
-				71301B90295367B40010E430 /* AsyncObjects */,
+				71AEEDD7298707BC00506954 /* iosMath */,
 			);
 			productName = "Sort2 (iOS)";
 			productReference = 71D4DBD128185905001DBD0E /* Sort Visualizer.app */;
@@ -483,7 +483,7 @@
 				712FAC47285E2A2B0045B50A /* XCRemoteSwiftPackageReference "swift-algorithms" */,
 				71CCA0672865FD7300E4D666 /* XCRemoteSwiftPackageReference "Then" */,
 				7113FCB128674D1B00665F09 /* XCRemoteSwiftPackageReference "CollectionConcurrencyKit" */,
-				71301B8F295367B40010E430 /* XCRemoteSwiftPackageReference "AsyncObjects" */,
+				71AEEDD6298707BC00506954 /* XCRemoteSwiftPackageReference "iosMath" */,
 			);
 			productRefGroup = 71D4DBD228185905001DBD0E /* Products */;
 			projectDirPath = "";
@@ -753,6 +753,7 @@
 				SUPPORTS_MACCATALYST = YES;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_ENFORCE_EXCLUSIVE_ACCESS = on;
 				SWIFT_STRICT_CONCURRENCY = complete;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "2,6";
@@ -799,9 +800,9 @@
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = YES;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
-				SWIFT_DISABLE_SAFETY_CHECKS = NO;
+				SWIFT_DISABLE_SAFETY_CHECKS = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_ENFORCE_EXCLUSIVE_ACCESS = "debug-only";
+				SWIFT_ENFORCE_EXCLUSIVE_ACCESS = off;
 				SWIFT_STRICT_CONCURRENCY = complete;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "2,6";
@@ -881,12 +882,12 @@
 				minimumVersion = 1.0.0;
 			};
 		};
-		71301B8F295367B40010E430 /* XCRemoteSwiftPackageReference "AsyncObjects" */ = {
+		71AEEDD6298707BC00506954 /* XCRemoteSwiftPackageReference "iosMath" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/SwiftyLab/AsyncObjects.git";
+			repositoryURL = "https://github.com/maitbayev/iosMath";
 			requirement = {
-				kind = exactVersion;
-				version = 1.0.0;
+				branch = master;
+				kind = branch;
 			};
 		};
 		71CCA0672865FD7300E4D666 /* XCRemoteSwiftPackageReference "Then" */ = {
@@ -946,10 +947,10 @@
 			package = 712FAC47285E2A2B0045B50A /* XCRemoteSwiftPackageReference "swift-algorithms" */;
 			productName = Algorithms;
 		};
-		71301B90295367B40010E430 /* AsyncObjects */ = {
+		71AEEDD7298707BC00506954 /* iosMath */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 71301B8F295367B40010E430 /* XCRemoteSwiftPackageReference "AsyncObjects" */;
-			productName = AsyncObjects;
+			package = 71AEEDD6298707BC00506954 /* XCRemoteSwiftPackageReference "iosMath" */;
+			productName = iosMath;
 		};
 		71CCA0682865FD7300E4D666 /* Then */ = {
 			isa = XCSwiftPackageProductDependency;

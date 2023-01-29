@@ -2,17 +2,17 @@
   "complexities": [
     {
       "key": "Average Complexity",
-      "value": "O(n^1.25) or O(n × log n)",
+      "value": "O(n^{1.25})\\text{ or }O(n \\times \\log n)",
       "mathml": "\\(O(n^{1.25})\\) or \\(O(n\\times{}\\log{n})\\)"
     },
     {
       "key": "Best Case",
-      "value": "O(n × log n)",
+      "value": "O(n \\times \\log n)",
       "mathml": "\\(O(n\\times{}\\log{n})\\)"
     },
     {
       "key": "Worst Case",
-      "value": "O(n²)",
+      "value": "O(n^2)",
       "mathml": "\\(O(n^2)\\)"
     },
     {

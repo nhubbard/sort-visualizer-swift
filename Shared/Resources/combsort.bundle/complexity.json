@@ -2,17 +2,17 @@
   "complexities": [
     {
       "key": "Average Complexity",
-      "value": "Ω(n² / 2^p)",
+      "value": "\\Omega\\left(\\frac{n^2}{2^p}\\right)",
       "mathml": "\\(\\Omega(n^{2} / 2^{p})\\)"
     },
     {
       "key": "Best Case",
-      "value": "Θ(n × log n)",
+      "value": "\\Theta(n \\times \\log n)",
       "mathml": "\\(\\Theta(n\\times{}\\log{n})\\)"
     },
     {
       "key": "Worst Case",
-      "value": "O(n²)",
+      "value": "O(n^2)",
       "mathml": "\\(O(n^2)\\)"
     },
     {
