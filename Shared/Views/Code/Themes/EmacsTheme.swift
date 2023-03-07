@@ -48,7 +48,8 @@ import Then
           it.fg("#04d")
         case .keywordType:
           it.fg("#0b0").bold()
-        case .string, .nameAttribute, .stringAffix, .stringBacktick, .stringChar, .stringDelimiter, .stringDouble, .stringHeredoc, .stringSingle:
+        case .string, .nameAttribute, .stringAffix, .stringBacktick, .stringChar, .stringDelimiter, .stringDouble,
+             .stringHeredoc, .stringSingle:
           it.fg("#b44")
         case .stringDoc:
           it.fg("#b44").italic()

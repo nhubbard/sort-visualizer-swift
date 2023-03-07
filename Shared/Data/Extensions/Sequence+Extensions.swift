@@ -1,5 +1,5 @@
 //
-//  Cycle.swift
+//  Sequence+Extensions.swift
 //  Sort2 (Shared)
 //
 //  Created by Nicholas Hubbard on 5/20/22.
@@ -27,27 +27,27 @@ public struct CycleIterator<S: Sequence>: IteratorProtocol, LazySequenceProtocol
   private let sequence: S
   private var iterator: S.Iterator
   private var times: Int
-  
+
   fileprivate init(sequence: S, times: Int = -1) {
     self.sequence = sequence
     iterator = sequence.makeIterator()
     self.times = times
   }
-  
+
   public mutating func next() -> S.Iterator.Element? {
     guard times != 0 else {
       return nil
     }
-    
+
     if let next = iterator.next() {
       return next
     }
-    
+
     times -= 1
     guard times != 0 else {
       return nil
     }
-    
+
     iterator = sequence.makeIterator()
     return iterator.next()
   }

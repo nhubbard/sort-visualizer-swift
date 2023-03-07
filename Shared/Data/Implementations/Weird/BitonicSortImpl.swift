@@ -12,7 +12,8 @@ extension SortViewModel {
   @inlinable
   func bitonicSort() async {
     guard await enforceRunning() else { return }
-    /// This code may look awful, and that's because it is, but all it does is round the array size to the nearest power of two.
+    /// This code may look awful, and that's because it is, but all it does is round the array size to the nearest
+    /// power of two.
     if ![16, 32, 64, 128, 256, 512, 1024, 2048, 4096].contains(Int(arraySizeBacking)) {
       /// The original value.
       let original = arraySizeBacking

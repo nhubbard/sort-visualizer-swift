@@ -7,7 +7,8 @@
 
 import Foundation
 
-/// A RawRepresentable implementation for the built-in Float type, which allows for Float values to be used with @AppStorage.
+/// A RawRepresentable implementation for the built-in Float type, which allows for Float values to be used with
+/// @AppStorage.
 extension Float: RawRepresentable {
   public init?(rawValue: String) {
     guard let data = rawValue.data(using: .utf8) else {
@@ -20,7 +21,7 @@ extension Float: RawRepresentable {
       return nil
     }
   }
-  
+
   public var rawValue: String {
     guard let data = try? JSONEncoder().encode(self),
           let result = String(data: data, encoding: .utf8) else {

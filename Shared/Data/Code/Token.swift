@@ -92,14 +92,12 @@ struct Token: Identifiable {
 
 extension Token.TokenType {
   static func fromRaw(_ rawType: String) -> Token.TokenType {
-    for type in Token.TokenType.allCases {
-      if type.rawValue == rawType {
-        return type
-      }
+    for type in Token.TokenType.allCases where type.rawType == rawType {
+      return type
     }
     return .text
   }
-  
+
   func color() -> Color {
     colorMap[self] ?? colorMap[Token.TokenType.text]!
   }

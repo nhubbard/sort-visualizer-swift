@@ -11,7 +11,7 @@ import MarkdownUI
 struct ScrollingSortView: View {
   var algorithm: Algorithms
   @State private var selectedLanguage: Int = 0
-  
+
   @ViewBuilder
   func implementations() -> some View {
     Text("Implementations")
@@ -44,7 +44,7 @@ struct ScrollingSortView: View {
     .padding(.all, 3)
     .background(Capsule().fill(Color.primary.opacity(0.06)))
   }
-  
+
   var body: some View {
     GeometryReader { geo in
       ScrollView {
@@ -99,7 +99,8 @@ struct ScrollingSortView: View {
               implementations()
             }
             #endif
-            AttributedCode(loadHighlightResource(algorithm, languages[self.selectedLanguage].fileExtension)).drawingGroup()
+            AttributedCode(loadHighlightResource(algorithm, languages[self.selectedLanguage].fileExtension))
+              .drawingGroup()
           }.padding(.all, 32)
         }
       }

@@ -15,6 +15,6 @@ import Foundation
   public var key: String
   public var value: String
   public var mathml: String = ""
-  
+
   public var id: String { key }
 }

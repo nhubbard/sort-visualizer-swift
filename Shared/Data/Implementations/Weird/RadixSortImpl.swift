@@ -14,7 +14,8 @@ extension SortViewModel {
   @inlinable
   func radixSort() async {
     guard await enforceRunning() else { return }
-    let colors: [Color] = [.red, .orange, .yellow, .green, .blue, .indigo, .purple, .teal, .cyan, .mint, .pink].shuffled()
+    let colors: [Color] = [.red, .orange, .yellow, .green, .blue, .indigo, .purple, .teal, .cyan, .mint,
+                           .pink].shuffled()
     let base = colors.count
     var done = false
     var digits = 1

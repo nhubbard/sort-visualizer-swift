@@ -16,7 +16,9 @@ import Then
       switch token {
         case .comment, .commentHashbang, .commentMultiline, .commentPreprocFile, .commentSingle, .commentSpecial:
           it.fg("#6272a4")
-        case .error, .generic, .literal, .name, .other, .punctuation, .genericError, .genericPrompt, .genericStrong, .genericTraceback, .literalDate, .nameConstant, .nameDecorator, .nameEntity, .nameException, .nameNamespace, .nameOther, .nameProperty:
+        case .error, .generic, .literal, .name, .other, .punctuation, .genericError, .genericPrompt, .genericStrong,
+             .genericTraceback, .literalDate, .nameConstant, .nameDecorator, .nameEntity, .nameException,
+             .nameNamespace, .nameOther, .nameProperty:
           it.fg("#f8f8f2")
         case .nameBuiltinPseudo:
           it.fg("#f8f8f2").italic()
@@ -24,7 +26,8 @@ import Then
           it.fg("#f8f8f2").underline()
         case .genericHeading, .genericSubheading, .genericInserted:
           it.fg("#f8f8f2").bold()
-        case .keyword, .operator, .commentPreproc, .keywordConstant, .keywordNamespace, .keywordPseudo, .keywordReserved, .nameTag, .operatorWord:
+        case .keyword, .operator, .commentPreproc, .keywordConstant, .keywordNamespace, .keywordPseudo,
+             .keywordReserved, .nameTag, .operatorWord:
           it.fg("#ff79c6")
         case .genericDeleted:
           it.fg("#8b080b")
@@ -36,7 +39,9 @@ import Then
           it.fg("#8be9fd").italic()
         case .number, .numberBin, .numberFloat, .numberHex, .numberInteger, .numberOct, .numberIntegerLong:
           it.fg("#ffb86c")
-        case .string, .stringAffix, .stringBacktick, .stringChar, .stringDelimiter, .stringDoc, .stringDouble, .stringEscape, .stringHeredoc, .stringInterpol, .stringOther, .stringRegex, .stringSingle, .stringSymbol:
+        case .string, .stringAffix, .stringBacktick, .stringChar, .stringDelimiter, .stringDoc, .stringDouble,
+             .stringEscape, .stringHeredoc, .stringInterpol, .stringOther, .stringRegex, .stringSingle,
+             .stringSymbol:
           it.fg("#bd93f9")
         case .nameAttribute, .nameClass, .nameFunction, .nameFunctionMagic:
           it.fg("#50fa7b")

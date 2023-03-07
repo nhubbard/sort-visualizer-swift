@@ -1,5 +1,5 @@
 //
-//  ThemeProtocol.swift
+//  CodeTheme.swift
 //  Sort Visualizer (iOS)
 //
 //  Created by Nicholas Hubbard on 6/24/22.

@@ -16,9 +16,9 @@ import SwiftUI
   case quadratic
   // Weird algorithms
   case weird
-  
+
   public var id: Self { self }
-  
+
   public var displayName: String {
     switch self {
       case .none: return ""
@@ -27,7 +27,7 @@ import SwiftUI
       case .weird: return "Weird"
     }
   }
-  
+
   public var iconName: String {
     switch self {
       case .none: return ""
@@ -36,12 +36,13 @@ import SwiftUI
       case .weird: return "weird-algos"
     }
   }
-  
+
   public var pages: [Page] {
     switch self {
       case .none: return [.home]
       case .logarithmic: return [.quickSort, .mergeSort, .heapSort]
-      case .quadratic: return [.bubbleSort, .selectionSort, .insertionSort, .gnomeSort, .shakerSort, .oddEvenSort, .pancakeSort]
+      case .quadratic: return [.bubbleSort, .selectionSort, .insertionSort, .gnomeSort, .shakerSort, .oddEvenSort,
+                               .pancakeSort]
       case .weird: return [.bitonicSort, .radixSort, .shellSort, .combSort, .bogoSort, .stoogeSort]
     }
   }
@@ -69,13 +70,13 @@ import SwiftUI
   case combSort
   case bogoSort
   case stoogeSort
-  
+
   public var id: Self { self }
-  
+
   public var isSystemIcon: Bool {
     self == .home || self == .settings
   }
-  
+
   public var algorithm: Algorithms? {
     switch self {
       case .home, .settings: return nil
@@ -97,7 +98,7 @@ import SwiftUI
       case .stoogeSort:      return .stoogeSort
     }
   }
-  
+
   public var displayName: String {
     switch self {
       case .home:          return "Home"
@@ -120,7 +121,7 @@ import SwiftUI
       case .stoogeSort:    return "Stooge Sort"
     }
   }
-  
+
   public var iconName: String {
     switch self {
       case .home:          return "house"
@@ -143,12 +144,13 @@ import SwiftUI
       case .stoogeSort:    return "stooge"
     }
   }
-  
+
   public var category: PageCategory {
     switch self {
       case .home, .settings: return .none
       case .quickSort, .mergeSort, .heapSort: return .logarithmic
-      case .bubbleSort, .selectionSort, .insertionSort, .gnomeSort, .shakerSort, .oddEvenSort, .pancakeSort: return .quadratic
+      case .bubbleSort, .selectionSort, .insertionSort, .gnomeSort, .shakerSort, .oddEvenSort,
+           .pancakeSort: return .quadratic
       case .bitonicSort, .radixSort, .shellSort, .combSort, .bogoSort, .stoogeSort: return .weird
     }
   }
@@ -156,7 +158,7 @@ import SwiftUI
 
 struct ContentView: View {
   @State private var selection: Page? = .home
-  
+
   var body: some View {
     NavigationSplitView {
       List(Page.allCases, selection: $selection) { page in

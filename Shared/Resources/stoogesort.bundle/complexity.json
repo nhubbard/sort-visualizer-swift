@@ -2,17 +2,17 @@
   "complexities": [
     {
       "key": "Average Complexity",
-      "value": "O(n^(2.7095...))",
+      "value": "O(n^{2.7095...})",
       "mathml": "\\(O(n^{\\log{3}/\\log{1.5}})\\)"
     },
     {
       "key": "Best Case",
-      "value": "O(n^(2.7095...))",
+      "value": "O(n^{2.7095...})",
       "mathml": "\\(O(n^{\\log{3}/\\log{1.5}})\\)"
     },
     {
       "key": "Worst Case",
-      "value": "O(n^(2.7095...))",
+      "value": "O(n^{2.7095...})",
       "mathml": "\\(O(n^{\\log{3}/\\log{1.5}})\\)"
     },
     {

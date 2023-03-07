@@ -8,18 +8,18 @@
 import Foundation
 import SwiftUI
 
-struct AlgorithmEntry: Hashable, Equatable {
-  static func == (lhs: AlgorithmEntry, rhs: AlgorithmEntry) -> Bool {
+@frozen public struct AlgorithmEntry: Hashable, Equatable {
+  public static func == (lhs: AlgorithmEntry, rhs: AlgorithmEntry) -> Bool {
     lhs.id == rhs.id && lhs.name == rhs.name && lhs.icon == rhs.icon && lhs.tag == rhs.tag
   }
-  
-  var id: UUID = .init()
-  var name: String
-  var icon: String
-  var destination: AnyView
-  var tag: Int
-  
-  func hash(into hasher: inout Hasher) {
+
+  public var id: UUID = .init()
+  public var name: String
+  public var icon: String
+  public var destination: AnyView
+  public var tag: Int
+
+  public func hash(into hasher: inout Hasher) {
     hasher.combine(id)
     hasher.combine(name)
     hasher.combine(icon)

@@ -38,7 +38,7 @@ extension SortViewModel {
       k++
     }
   }
-  
+
   @MainActor
   @inlinable
   func _mergeSort(_ left: Int, _ right: Int) async {
@@ -51,7 +51,7 @@ extension SortViewModel {
       }
     }
   }
-  
+
   @MainActor
   @inlinable
   func mergeSort() async {

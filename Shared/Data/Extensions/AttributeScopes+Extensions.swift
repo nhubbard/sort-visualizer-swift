@@ -11,6 +11,6 @@ extension AttributeScopes: @unchecked Sendable {
   struct SortVisualizerAttributes: AttributeScope {
     let code: CodeAttributes
   }
-  
+
   var sortVisualizerApp: SortVisualizerAttributes.Type { SortVisualizerAttributes.self }
 }

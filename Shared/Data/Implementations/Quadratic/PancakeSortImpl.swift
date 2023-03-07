@@ -21,7 +21,7 @@ extension SortViewModel {
       left++
     }
   }
-  
+
   @MainActor
   @inlinable
   func _maxIndex(_ k: Int) async -> Int {
@@ -35,7 +35,7 @@ extension SortViewModel {
     }
     return index
   }
-  
+
   @MainActor
   @inlinable
   func pancakeSort() async {

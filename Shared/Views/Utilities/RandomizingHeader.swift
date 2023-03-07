@@ -1,5 +1,5 @@
 //
-//  RandomizingText.swift
+//  RandomizingHeader.swift
 //  Sort2 (Shared)
 //
 //  Created by Nicholas Hubbard on 5/28/22.
@@ -10,7 +10,7 @@
 @frozen public struct RandomizingHeader: View, Sendable {
   let text: String
   @State var currentText: String = ""
-  
+
   public var body: some View {
     Text(currentText)
       .font(.system(size: 48, weight: .bold, design: .default))
@@ -23,7 +23,7 @@
         animateHeader()
       }
   }
-  
+
   /**
    * Start animating the header text with an asynchronous Task.
    * This function is simply a wrapper to make starting the animation easier in the two situations I use them in.
@@ -33,7 +33,7 @@
       await doHeaderAnimation()
     }
   }
-  
+
   /**
    * Randomized header animation type.
    */

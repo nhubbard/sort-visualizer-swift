@@ -14,7 +14,7 @@ import Foundation
   case colorful
   case dracula
   case emacs
-  
+
   var name: String {
     switch self {
       case .monokai:  return "Monokai"
@@ -25,7 +25,7 @@ import Foundation
       case .emacs:    return "Emacs"
     }
   }
-  
+
   static func fromInt(_ value: Int) -> CodeThemes {
     switch value {
       case 0:  return .monokai

@@ -12,7 +12,7 @@ import Foundation
   public let id = UUID()
   public var title: String
   public var icon: String
-  public var iconColor: Color? = nil
+  public var iconColor: Color?
   public var iconWidth: CGFloat = 16
   public var iconHeight: CGFloat = 16
   public var fileExtension: String
@@ -22,7 +22,8 @@ let languages: [LanguageEntry] = [
   .init(title: "Python", icon: "python", iconColor: .yellow, fileExtension: "py"),
   .init(title: "JavaScript", icon: "javascript", iconColor: .yellow, fileExtension: "js"),
   // Golang's logo has a 2:1 ratio, not 1:1 like everyone else
-  .init(title: "Golang", icon: "go", iconColor: Color(fromHex: "#00ADD8")!, iconWidth: 32, iconHeight: 16, fileExtension: "go"),
+  .init(title: "Golang", icon: "go", iconColor: Color(fromHex: "#00ADD8")!, iconWidth: 32, iconHeight: 16,
+        fileExtension: "go"),
   .init(title: "Java", icon: "java", iconColor: .red, fileExtension: "java"),
   .init(title: "ANSI C", icon: "c", iconColor: .blue, fileExtension: "c"),
   .init(title: "C++", icon: "cpp", iconColor: .blue, fileExtension: "cpp"),

@@ -132,6 +132,7 @@
 		71B55E0D28383D5C00CA74CB /* Sequence+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sequence+Extensions.swift"; sourceTree = "<group>"; };
 		71BCE0FD2847B8B6007C8254 /* mergesort.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = mergesort.bundle; sourceTree = "<group>"; };
 		71BCE0FF2847D963007C8254 /* heapsort.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = heapsort.bundle; sourceTree = "<group>"; };
+		71CBE19D29A64BE800C7DEC9 /* .swiftlint.yml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = .swiftlint.yml; sourceTree = "<group>"; };
 		71CCA0582865F48900E4D666 /* AttributeDynamicLookup+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AttributeDynamicLookup+Extensions.swift"; sourceTree = "<group>"; };
 		71CCA05A2865F4BF00E4D666 /* AttributeScopes+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AttributeScopes+Extensions.swift"; sourceTree = "<group>"; };
 		71CCA05C2865F4D500E4D666 /* CodeAttributes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodeAttributes.swift; sourceTree = "<group>"; };
@@ -371,6 +372,7 @@
 		71D4DBC428185904001DBD0E = {
 			isa = PBXGroup;
 			children = (
+				71CBE19D29A64BE800C7DEC9 /* .swiftlint.yml */,
 				71E6B239282033D300672D55 /* Sort Visualizer--iOS--Info.plist */,
 				71934841281979490058FD9E /* TODO.md */,
 				71D4DBEE28185D6E001DBD0E /* Sort Visualizer (iOS).entitlements */,
@@ -427,6 +429,7 @@
 				71D4DBCD28185905001DBD0E /* Sources */,
 				71D4DBCE28185905001DBD0E /* Frameworks */,
 				71D4DBCF28185905001DBD0E /* Resources */,
+				71CBE19C29A6460F00C7DEC9 /* Run SwiftLint */,
 			);
 			buildRules = (
 			);
@@ -457,7 +460,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1410;
-				LastUpgradeCheck = 1400;
+				LastUpgradeCheck = 1420;
 				TargetAttributes = {
 					71D4DBD028185905001DBD0E = {
 						CreatedOnToolsVersion = 13.3.1;
@@ -521,6 +524,28 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		71CBE19C29A6460F00C7DEC9 /* Run SwiftLint */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Run SwiftLint";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "export PATH=\"$PATH:/opt/homebrew/bin\"\nif which swiftlint > /dev/null; then\n  swiftlint\nelse\n  echo \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		71D4DBCD28185905001DBD0E /* Sources */ = {
@@ -646,9 +671,10 @@
 				ONLY_ACTIVE_ARCH = YES;
 				SUPPORTED_PLATFORMS = macosx;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
-				SWIFT_ENFORCE_EXCLUSIVE_ACCESS = "debug-only";
+				SWIFT_DISABLE_SAFETY_CHECKS = YES;
+				SWIFT_ENFORCE_EXCLUSIVE_ACCESS = off;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_STRICT_CONCURRENCY = minimal;
+				SWIFT_STRICT_CONCURRENCY = complete;
 				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
@@ -703,9 +729,10 @@
 				MTL_FAST_MATH = YES;
 				SUPPORTED_PLATFORMS = macosx;
 				SWIFT_COMPILATION_MODE = wholemodule;
-				SWIFT_ENFORCE_EXCLUSIVE_ACCESS = "debug-only";
+				SWIFT_DISABLE_SAFETY_CHECKS = YES;
+				SWIFT_ENFORCE_EXCLUSIVE_ACCESS = off;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
-				SWIFT_STRICT_CONCURRENCY = minimal;
+				SWIFT_STRICT_CONCURRENCY = complete;
 				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
@@ -846,32 +873,32 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/AudioKit/AudioKit.git";
 			requirement = {
-				branch = main;
-				kind = branch;
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.5.8;
 			};
 		};
 		7120CB9A28397E410019D976 /* XCRemoteSwiftPackageReference "AudioKitEX" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/AudioKit/AudioKitEX.git";
 			requirement = {
-				branch = main;
-				kind = branch;
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.5.2;
 			};
 		};
 		7120CB9D28397E5B0019D976 /* XCRemoteSwiftPackageReference "AudioKitUI" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/AudioKit/AudioKitUI.git";
 			requirement = {
-				branch = main;
-				kind = branch;
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.3.4;
 			};
 		};
 		7120CBA028397EE40019D976 /* XCRemoteSwiftPackageReference "SoundpipeAudioKit" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/AudioKit/SoundpipeAudioKit.git";
 			requirement = {
-				branch = main;
-				kind = branch;
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.5.3;
 			};
 		};
 		712FAC47285E2A2B0045B50A /* XCRemoteSwiftPackageReference "swift-algorithms" */ = {
@@ -894,8 +921,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/devxoul/Then";
 			requirement = {
-				branch = master;
-				kind = branch;
+				kind = upToNextMajorVersion;
+				minimumVersion = 3.0.0;
 			};
 		};
 		71D4DC2328186A0F001DBD0E /* XCRemoteSwiftPackageReference "MarkdownUI" */ = {

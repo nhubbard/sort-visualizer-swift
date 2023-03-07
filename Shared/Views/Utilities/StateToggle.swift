@@ -12,7 +12,7 @@ import SwiftUI
   var name: String
   var iconName: String
   var maxWidth: CGFloat = 150
-  
+
   public var body: some View {
     Toggle(isOn: binding) {
       Label(name, systemImage: iconName)

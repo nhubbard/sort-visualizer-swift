@@ -11,34 +11,38 @@ import AudioKitUI
 import AudioKit
 import AVFoundation
 
-fileprivate func rangeOfNotes(_ octave: Int) -> [String] {
+private func rangeOfNotes(_ octave: Int) -> [String] {
   precondition((0...8).contains(octave), "Invalid octave: must be 0 <= octave <= 8")
   if octave == 0 {
     return ["A0", "A♯0/B♭0", "B0"]
   } else if octave == 8 {
     return ["C8"]
   } else {
-    return ["C\(octave)", "C♯\(octave)/D♭\(octave)", "D\(octave)", "D♯\(octave)/E♭\(octave)", "E\(octave)", "F\(octave)", "F♯\(octave)/G♭\(octave)", "G\(octave)", "G♯\(octave)/A♭\(octave)", "A\(octave)", "A♯\(octave)/B♭\(octave)", "B\(octave)"]
+    return ["C\(octave)", "C♯\(octave)/D♭\(octave)", "D\(octave)", "D♯\(octave)/E♭\(octave)", "E\(octave)",
+            "F\(octave)", "F♯\(octave)/G♭\(octave)", "G\(octave)", "G♯\(octave)/A♭\(octave)", "A\(octave)",
+            "A♯\(octave)/B♭\(octave)", "B\(octave)"]
   }
 }
-fileprivate let noteOptions: [String] = Array([rangeOfNotes(0), rangeOfNotes(1), rangeOfNotes(2), rangeOfNotes(3), rangeOfNotes(4), rangeOfNotes(5), rangeOfNotes(6), rangeOfNotes(7), rangeOfNotes(8)].joined())
-fileprivate let noteCount = noteOptions.count
-fileprivate let shuffleOptions: [ShuffleMethod] = [.random, .ascending, .descending, .shuffledCubic, .shuffledQuintic]
-fileprivate let themeOptions: [CodeThemes] = [.monokai, .pygments, .arduino, .colorful, .dracula, .emacs]
+private let noteOptions: [String] = Array([rangeOfNotes(0), rangeOfNotes(1), rangeOfNotes(2), rangeOfNotes(3),
+                                           rangeOfNotes(4), rangeOfNotes(5), rangeOfNotes(6), rangeOfNotes(7),
+                                           rangeOfNotes(8)].joined())
+private let noteCount = noteOptions.count
+private let shuffleOptions: [ShuffleMethod] = [.random, .ascending, .descending, .shuffledCubic, .shuffledQuintic]
+private let themeOptions: [CodeThemes] = [.monokai, .pygments, .arduino, .colorful, .dracula, .emacs]
 
 @frozen public struct CustomADSRWidget: UIViewRepresentable {
   @AppStorage("synthAttack") var attack: Float = 0.5
   @AppStorage("synthDecay") var decay: Float = 0.5
   @AppStorage("synthSustain") var sustain: Float = 0.5
   @AppStorage("synthRelease") var release: Float = 0.5
-  
+
   public typealias UIViewType = ADSRView
   var initialAttack: AUValue = 0.5
   var initialDecay: AUValue = 0.5
   var initialSustain: AUValue = 0.5
   var initialRelease: AUValue = 0.5
   let view: ADSRView!
-  
+
   @MainActor
   public init(
     attack: AUValue = 0.5,
@@ -52,7 +56,7 @@ fileprivate let themeOptions: [CodeThemes] = [.monokai, .pygments, .arduino, .co
     self.initialRelease = release
     self.view = ADSRView()
   }
-  
+
   public func makeUIView(context _: Context) -> ADSRView {
     view.attack = initialAttack
     view.decay = initialDecay
@@ -67,7 +71,7 @@ fileprivate let themeOptions: [CodeThemes] = [.monokai, .pygments, .arduino, .co
     // view.bgColor = .systemGray2
     return view
   }
-  
+
   public func updateUIView(_: ADSRView, context _: Context) {
     view.attack = attack
     view.decay = decay
@@ -94,7 +98,7 @@ struct SettingsView: View {
   @AppStorage("sortCodeViewTheme") private var codeThemeIndex: Int = 0
   @AppStorage("warnBogoSort") private var warnBogoSort: Bool = true
   @AppStorage("warnBitonicSort") private var warnBitonicSort: Bool = true
-  
+
   var body: some View {
     Form {
       Section(header: Text("Synthesizer".uppercased())) {
@@ -160,7 +164,11 @@ struct SettingsView: View {
         // Default array size
         LabeledContent {
           HStack(spacing: 8) {
-            Slider(value: .convert(from: $sortArraySize), in: Float(sortArraySizeMin)...Float(sortArraySizeMax), step: 2)
+            Slider(
+              value: .convert(from: $sortArraySize),
+              in: Float(sortArraySizeMin)...Float(sortArraySizeMax),
+              step: 2
+            )
             Text("\(sortArraySize)")
           }.frame(maxWidth: 350)
         } label: {

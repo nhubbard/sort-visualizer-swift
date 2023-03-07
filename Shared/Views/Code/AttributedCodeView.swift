@@ -18,12 +18,12 @@ struct AttributedCode: View {
       .cornerRadius(15)
       .textSelection(.enabled)
   }
-  
+
   init(_ key: String) {
     attributedString = AttributedCode.annotateCode(
       from: AttributedString(localized: String.LocalizationValue(key), including: \.sortVisualizerApp), theme: theme)
   }
-  
+
   private static func annotateCode(from source: AttributedString, theme: CodeTheme) -> AttributedString {
     var attrString = source
     for run in attrString.runs {

@@ -27,7 +27,7 @@ import Foundation
   case combSort = "combsort"
   case bogoSort = "bogosort"
   case stoogeSort = "stoogesort"
-  
+
   public var id: Self { self }
   public var sizeRange: ClosedRange<Float> {
     self == .bogoSort ? 4.0...16.0 : 16.0...512.0

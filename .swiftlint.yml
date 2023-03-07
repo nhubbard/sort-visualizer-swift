@@ -1,0 +1,9 @@
+excluded:
+  - Shared/Resources
+disabled_rules:
+  - identifier_name
+  - cyclomatic_complexity
+  - function_body_length
+  - type_body_length
+  - switch_case_alignment
+  - todo

@@ -1,5 +1,5 @@
 //
-//  NSColor+Extensions.swift
+//  Color+Extensions.swift
 //  Sort2 (iOS)
 //
 //  Created by Nicholas Hubbard on 5/30/22.
@@ -11,15 +11,24 @@ import SwiftUI
 /// Shamelessly stolen from SwifterSwift. Thanks for the excellent code!
 extension Color {
   private static func getGroupValue(string: String, range: Range<Int>) -> CGFloat {
-    // I *hate* string indexing in Swift. I understand that there's a reason pertaining to UTF-16/UTF-8 compatibility... but it's not a good one, in my opinion.
-    let group = string[string.index(string.startIndex, offsetBy: range.lowerBound)..<string.index(string.startIndex, offsetBy: range.upperBound)]
+    // I *hate* string indexing in Swift. I understand that there's a reason pertaining to UTF-16/UTF-8
+    // compatibility... but it's not a good one, in my opinion.
+    let group = string[
+      string.index(
+        string.startIndex,
+        offsetBy: range.lowerBound
+      )..<string.index(
+        string.startIndex,
+        offsetBy: range.upperBound
+      )
+    ]
     guard group.count == 2,
           let intVal = Int(group, radix: 16) else {
       return 1.0
     }
     return CGFloat(Double(intVal) / 255.0)
   }
-  
+
   init?(fromHex string: String) {
     let result: String
     scope: do {

@@ -1,5 +1,5 @@
 //
-//  NewSynth.swift
+//  Synthesizer.swift
 //  Sort2 (Shared)
 //
 //  Created by Nicholas Hubbard on 5/21/22.
@@ -23,7 +23,7 @@ final class Synthesizer: Sendable {
   private var osc: Oscillator
   private var env: AmplitudeEnvelope
   private var fader: Fader
-  
+
   /**
    * Create the synthesizer.
    * - Parameter autoStart: Automatically attempt to start the synthesizer on initialization.
@@ -47,7 +47,7 @@ final class Synthesizer: Sendable {
       }
     }
   }
-  
+
   func start() async -> Result<Bool, Error> {
     guard !isStarted else {
       print("Engine already running.")
@@ -63,15 +63,16 @@ final class Synthesizer: Sendable {
       return .failure(err)
     }
   }
-  
+
   func shutdown() async {
     guard isStarted else { return }
     osc.stop()
     engine.stop()
   }
-  
+
   func playNote(value: Int, range: ClosedRange<Int>, time: Float) async {
-    // Cannot be replaced with await enforceRunning(); the Synthesizer class isn't an extension of the SortViewModel, and I'm not putting an instance of SortViewModel into the parameters.
+    // Cannot be replaced with await enforceRunning(); the Synthesizer class isn't an extension of the SortViewModel,
+    // and I'm not putting an instance of SortViewModel into the parameters.
     guard !Task.isCancelled && isStarted else {
       if !isStarted {
         print("Refusing to play note; engine did not successfully start.")
@@ -79,14 +80,17 @@ final class Synthesizer: Sendable {
       return
     }
     // Convert the index to the frequency within the range of C1 to C5.
-    let freq = floatRatio(x: Float(value), oldRange: Float(range.lowerBound)...Float(range.upperBound), newRange: floatFrequencyRange)
+    let freq = floatRatio(x: Float(value),
+                          oldRange: Float(range.lowerBound)...Float(range.upperBound),
+                          newRange: floatFrequencyRange)
     // Play the frequency/note.
     if freq != currentFreq {
       env.closeGate()
     }
     osc.frequency = freq
     env.openGate()
-    // Wait the specified number of milliseconds, or 0.25 ms, because the notes will be functionally useless if they are too short.
+    // Wait the specified number of milliseconds, or 0.25 ms, because the notes will be functionally useless if they
+    // are too short.
     let delay = UInt64(max(time * 1_000_000, 250_000))
     try? await Task.sleep(nanoseconds: delay)
     // Stop playing the note.

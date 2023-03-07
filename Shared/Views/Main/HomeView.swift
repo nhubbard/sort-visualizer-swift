@@ -8,9 +8,10 @@
 import SwiftUI
 import MarkdownUI
 
+// swiftlint:disable trailing_whitespace line_length
 /// Copy text used on the homepage.
-// TODO: Replace with Wikipedia text for localization?
-fileprivate let copyText = #"""
+/// TODO: Replace with Wikipedia text for localization?
+private let copyText = #"""
   Sorting algorithms are used to sort a data structure according to a specific order relationship, such as numerical order or lexicographical order.
   
   This operation is one of the most important and widespread in computer science. For a long time, new methods have been developed to make this procedure faster and faster.
@@ -28,6 +29,7 @@ fileprivate let copyText = #"""
   
   Sorting algorithms can be difficult to understand, and it's easy to get confused. This app aims to help you understand sorting algorithms by showing their actions in real time. Without further ado, let's get started -- choose an algorithm from the sidebar on the left!
   """#
+// swiftlint:enable trailing_whitespace line_length
 
 @frozen public struct HomeView: View {
   public var body: some View {

@@ -11,7 +11,7 @@ struct SortView: View {
   var algorithm: Algorithms
   @StateObject var state: SortViewModel = SortViewModel()
   @State var isEditingSize: Bool = false
-  
+
   @ViewBuilder
   func bars(_ geo: GeometryProxy) -> some View {
     let rectWidth = geo.size.width / CGFloat(state.data.count)
@@ -22,14 +22,14 @@ struct SortView: View {
       }
     }.frame(width: geo.size.width, height: geo.size.height, alignment: .bottomLeading)
   }
-  
+
   @ViewBuilder
   func runningToggle() -> some View {
     StateToggle(binding: $state.running, name: "Running", iconName: "play.fill")
       .onChange(of: state.running) { onRunning(newValue: $0) }
       .keyboardShortcut("r", modifiers: [.command, .shift])
   }
-  
+
   @ViewBuilder
   func soundToggle() -> some View {
     StateToggle(binding: $state.sound, name: "Sound", iconName: "speaker.wave.2")
@@ -37,7 +37,7 @@ struct SortView: View {
       .onChange(of: state.sound) { onSound(newValue: $0) }
       .keyboardShortcut("s", modifiers: [.command, .shift])
   }
-  
+
   @ViewBuilder
   func toggleRow() -> some View {
     HStack(spacing: 10) {
@@ -45,7 +45,7 @@ struct SortView: View {
       soundToggle()
     }.padding(.horizontal, 20)
   }
-  
+
   @ViewBuilder
   func resetButton() -> some View {
     Button {
@@ -54,7 +54,7 @@ struct SortView: View {
       Label("Reset", systemImage: "repeat")
     }.frame(maxWidth: 150).keyboardShortcut("z", modifiers: [.command, .shift])
   }
-  
+
   @ViewBuilder
   func stepButton() -> some View {
     Button {
@@ -65,7 +65,7 @@ struct SortView: View {
       Text("Sorry, this function is not implemented yet.").padding(.all, 4)
     }
   }
-  
+
   @ViewBuilder
   func buttonRow() -> some View {
     HStack(spacing: 10) {
@@ -74,7 +74,7 @@ struct SortView: View {
       stepButton()
     }.padding(.horizontal, 20)
   }
-  
+
   @ViewBuilder
   func delaySlider() -> some View {
     HStack(spacing: 10) {
@@ -83,7 +83,7 @@ struct SortView: View {
       Text(String(format: "%.1f ms", state.delay)).foregroundColor(.blue)
     }
   }
-  
+
   @ViewBuilder
   func sizeSlider() -> some View {
     HStack(spacing: 10) {
@@ -93,10 +93,14 @@ struct SortView: View {
           onArraySizeChange(newValue: state.arraySizeBacking)
         }
       }.frame(maxWidth: 192).disabled(state.running)
-      Text(String(format: "%d", Int(state.arraySizeBacking))).foregroundColor(.blue)
+      Text(String(format: "%d", Int(state.arraySizeBacking)))
+        .foregroundColor(.blue)
+        .onTapGesture {
+          state.showArraySizePopup.toggle()
+        }
     }
   }
-  
+
   @ViewBuilder
   func opsCounter() -> some View {
     VStack(spacing: 4) {
@@ -106,7 +110,7 @@ struct SortView: View {
       })
     }
   }
-  
+
   @ViewBuilder
   func settingsBox() -> some View {
     GroupBox(label: Label("Settings", systemImage: "gear").padding(.top, 2).padding(.bottom, 2)) {
@@ -115,9 +119,12 @@ struct SortView: View {
       delaySlider()
       sizeSlider()
       opsCounter()
-    }.background(.black.opacity(0.5)).cornerRadius(15).frame(minWidth: 300, maxWidth: 450, minHeight: 64).padding([.top, .leading], 16)
+    }.background(.black.opacity(0.9))
+      .cornerRadius(15)
+      .frame(minWidth: 300, maxWidth: 450, minHeight: 64)
+      .padding([.top, .leading], 16)
   }
-  
+
   var body: some View {
     GeometryReader { geo in bars(geo) }
       .overlay(alignment: .topLeading) { settingsBox() }
@@ -125,6 +132,7 @@ struct SortView: View {
       .alert("Sort Finished Incorrectly", isPresented: $state.showIncompleteWarning, actions: {
         Button("OK", role: .cancel) { onIncompleteAccept() }
       }, message: {
+        // swiftlint:disable line_length
         Text("This can happen in one of two scenarios:\n1. You stopped the algorithm while it was running.\n2. The algorithm implementation has a bug and returned an incorrect result.")
       }).alert("Algorithm Warning", isPresented: $state.showBogoSortWarning, actions: {
         Button("Accept", role: .cancel) { onBogoAccept() }
@@ -139,9 +147,30 @@ struct SortView: View {
         Button("OK", role: .cancel) { onBitonicAccept() }
       }, message: {
         Text("Bitonic sort will fail unless the the array size is a power of two. This is a known limitation of bitonic sort and cannot be worked around.\n\nTo prevent the app from crashing, Sort Visualizer will automatically round the array size to the next highest power of two to prevent errors. This warning will not be shown again while the app is running.\n\nPress OK to continue.")
+        // swiftlint:enable line_length
+      }).alert("Array Size", isPresented: $state.showArraySizePopup, actions: {
+        TextField("New Array Size", text: $state.newArraySizeValue)
+          .autocorrectionDisabled(true)
+          .keyboardType(.asciiCapableNumberPad)
+        Button("OK") {
+          state.showArraySizePopup.toggle()
+          guard var newValue = Int(state.newArraySizeValue) else { return }
+          newValue = min(newValue, 2048)
+          newValue = max(newValue, 16)
+          if newValue % 2 != 0 {
+            newValue += newValue % 2
+          }
+          state.arraySizeBacking = Float(newValue)
+          onArraySizeChange(newValue: state.arraySizeBacking)
+        }
+        Button("Cancel", role: .cancel) {
+          state.showArraySizePopup.toggle()
+        }
+      }, message: {
+        Text("Enter a new array size. The size will be rounded up to the nearest even number.")
       })
   }
-  
+
   func onRunning(newValue: Bool) {
     if newValue {
       if algorithm == .bogoSort && !state.bogoSortAccepted {
@@ -161,7 +190,7 @@ struct SortView: View {
       }
     }
   }
-  
+
   func onSound(newValue: Bool) {
     if newValue {
       Task(priority: .high) { [self] in
@@ -172,7 +201,7 @@ struct SortView: View {
       }
     }
   }
-  
+
   func onReset() {
     // App could crash if reset is clicked while it's running.
     if state.running {
@@ -185,11 +214,11 @@ struct SortView: View {
       await state.recreate()
     }
   }
-  
+
   func onStep() {
     state.showStepPopover.toggle()
   }
-  
+
   func onArraySizeChange(newValue: Float) {
     // Bitonic sort will modify the array size to be a power of two while running.
     // Therefore, it should not stop.
@@ -200,11 +229,11 @@ struct SortView: View {
       await state.recreate(numItems: Int(newValue))
     }
   }
-  
+
   func onIncompleteAccept() {
     state.showIncompleteWarning = false
   }
-  
+
   func onBogoAccept() {
     state.bogoSortAccepted = true
     state.showBogoSortWarning = false
@@ -215,19 +244,19 @@ struct SortView: View {
       }
     }
   }
-  
+
   func onBogoDecline() {
     state.showBogoSortWarning = false
     state.running = false
     state.showIncompleteWarning = false
   }
-  
+
   func onSoundErrorAccept() {
     state.sound.toggle()
     state.showSoundError = false
     state.soundDisabled = true
   }
-  
+
   func onBitonicAccept() {
     state.showBitonicWarning = false
     state.shouldShowBitonicWarning = false
@@ -238,7 +267,7 @@ struct SortView: View {
       }
     }
   }
-  
+
   func onRender() {
     state.setAlgo(algo: algorithm)
     if algorithm == .bogoSort {

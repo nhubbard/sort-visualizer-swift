@@ -12,7 +12,7 @@ import SwiftUI
   var iconName: String
   var isCustomIcon: Bool = true
   var color: Color = .blue
-  
+
   public var body: some View {
     if isCustomIcon {
       CustomIconLabel(text: text, iconName: iconName).foregroundColor(.blue)

@@ -10,7 +10,7 @@ import SwiftUI
 @frozen public struct CustomIconLabel: View {
   var text: String
   var iconName: String
-  
+
   public var body: some View {
     Label {
       Text(text)

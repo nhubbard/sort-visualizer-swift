@@ -28,7 +28,7 @@ extension SortViewModel {
     await _stoogeSort(end &- len23 &+ 1, end)
     await _stoogeSort(start, start &+ len23 &- 1)
   }
-  
+
   @MainActor
   @inlinable
   func stoogeSort() async {

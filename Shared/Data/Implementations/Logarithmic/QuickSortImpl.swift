@@ -48,7 +48,7 @@ extension SortViewModel {
       await _quickSort(j &+ 1, right)
     }
   }
-  
+
   @MainActor
   @inlinable
   func quickSort() async {

@@ -33,7 +33,7 @@ extension SortViewModel {
       await _heapify(length, largest)
     }
   }
-  
+
   @MainActor
   @inlinable
   func heapSort() async {

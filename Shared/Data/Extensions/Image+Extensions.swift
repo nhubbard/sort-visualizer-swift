@@ -1,5 +1,5 @@
 //
-//  UIImage+Extensions.swift
+//  Image+Extensions.swift
 //  Sort2 (Shared)
 //
 //  Created by Nicholas Hubbard on 5/27/22.

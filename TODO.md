@@ -125,7 +125,7 @@
 * [ ] Expand the counters from just "Operations" to the standard set of metrics (array accesses, inversions, reversals, etc.)
 * [ ] Add more sorting algorithms? Port them from Gaming32/ArrayV, if possible.
 * [ ] Finally implement step functionality, possibly using delay as a catalyst
-* [ ] Make slider values able to be typed instead of just modified by the mouse
+* [x] Make slider values able to be typed instead of just modified by the mouse
 
 ## Future Ideas from WWDC 2022
 

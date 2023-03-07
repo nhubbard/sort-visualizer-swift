@@ -10,14 +10,14 @@ import iosMath
 
 @frozen public struct IosMathView: UIViewRepresentable {
   var math: String
-  
+
   public func makeUIView(context: Context) -> MTMathUILabel {
     let label = MTMathUILabel()
     label.latex = math
     label.textColor = .white
     return label
   }
-  
+
   public func updateUIView(_ view: MTMathUILabel, context: Context) {
     // This view does not need state.
   }

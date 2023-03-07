@@ -8,19 +8,21 @@
 import Foundation
 import SwiftUI
 
+// Yet another unreferenced file found by SwiftLint. Where are these located at!?!
+
 let codeBgColor = Color(fromHex: "#272822")!
 let codeHlColor = Color(fromHex: "#49483E")!
 
-fileprivate let text = Color(fromHex: "#F8F8F2")!
-fileprivate let baseColor = text
-fileprivate let error = Color(fromHex: "#960050")!
-fileprivate let comment = Color(fromHex: "#75715E")!
-fileprivate let keyword = Color(fromHex: "#66D9EF")!
-fileprivate let `operator` = Color(fromHex: "#F92672")!
-fileprivate let punctuation = Color(fromHex: "#F8F8F2")!
-fileprivate let name = Color(fromHex: "#A6E22E")!
-fileprivate let number = Color(fromHex: "#AE81FF")!
-fileprivate let string = Color(fromHex: "#E6DB74")!
+private let text = Color(fromHex: "#F8F8F2")!
+private let baseColor = text
+private let error = Color(fromHex: "#960050")!
+private let comment = Color(fromHex: "#75715E")!
+private let keyword = Color(fromHex: "#66D9EF")!
+private let `operator` = Color(fromHex: "#F92672")!
+private let punctuation = Color(fromHex: "#F8F8F2")!
+private let name = Color(fromHex: "#A6E22E")!
+private let number = Color(fromHex: "#AE81FF")!
+private let string = Color(fromHex: "#E6DB74")!
 
 let colorMap: [Token.TokenType: Color] = [
   .text: text,
