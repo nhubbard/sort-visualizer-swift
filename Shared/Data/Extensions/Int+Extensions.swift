@@ -7,6 +7,8 @@
 
 import Foundation
 
+// https://stackoverflow.com/a/36239949/2579761
+
 postfix operator ++ // i++
 
 @inlinable

@@ -7,25 +7,21 @@
 
 import Foundation
 
+extension ClosedRange where Bound == Float {
+  public var min: Float {
+    Swift.min(lowerBound, upperBound)
+  }
+
+  public var max: Float {
+    Swift.max(lowerBound, upperBound)
+  }
+}
+
 @inlinable
 func floatRatio(x: Float, oldRange: ClosedRange<Float>, newRange: ClosedRange<Float>) -> Float {
-  let oMin = oldRange.lowerBound
-  let oMax = oldRange.upperBound
-  let nMin = newRange.lowerBound
-  let nMax = newRange.upperBound
   // Complete a range check.
-  precondition(oMin != oMax, "Old range bounds cannot be equal!")
-  precondition(nMin != nMax, "New range bounds cannot be equal!")
-  // Check reversed input range.
-  let oldMin = min(oMin, oMax)
-  let oldMax = max(oMin, oMax)
-  let reverseInput = oldMin != oMin
-  // Check reversed output range.
-  let newMin = min(nMin, nMax)
-  let newMax = max(nMin, nMax)
-  let reverseOutput = newMin != nMin
-  // Calculate portion.
-  let portion = (reverseInput ? (oldMax - x) : (x - oldMin)) * (newMax - newMin) / (oldMax - oldMin)
-  // Calculate result.
-  return reverseOutput ? (newMax - portion) : (portion + newMin)
+  precondition(oldRange.lowerBound != oldRange.upperBound, "Old range bounds cannot be equal!")
+  precondition(newRange.lowerBound != newRange.upperBound, "New range bounds cannot be equal!")
+  // Calculate new range.
+  return (x - oldRange.min) * (newRange.max - newRange.min) / (oldRange.max - oldRange.min) + newRange.min
 }

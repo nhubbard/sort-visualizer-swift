@@ -14,7 +14,7 @@ struct ScrollingSortView: View {
 
   @ViewBuilder
   func implementations() -> some View {
-    Text("Implementations")
+    Text(String(localized: "Implementations"))
       .font(.system(size: 24, weight: .bold, design: .default))
       .multilineTextAlignment(.leading)
     HStack(alignment: .center, spacing: 0) {
@@ -54,7 +54,7 @@ struct ScrollingSortView: View {
           Group {
             HStack(alignment: .top, spacing: 16) {
               VStack(alignment: .center, spacing: 16) {
-                Text("Description")
+                Text(String(localized: "Description"))
                   .font(.system(size: 24, weight: .bold, design: .default))
                   .multilineTextAlignment(.leading)
                 Markdown(loadResource(algorithm, "description", "md"))
@@ -62,7 +62,7 @@ struct ScrollingSortView: View {
                   .lineSpacing(1.75)
               }.frame(maxWidth: 0.65 * geo.size.width)
               VStack(alignment: .center, spacing: 16) {
-                Text("Complexity")
+                Text(String(localized: "Complexity"))
                   .font(.system(size: 24, weight: .bold, design: .default))
                   .multilineTextAlignment(.leading)
                 VStack(spacing: 2) {
@@ -73,7 +73,7 @@ struct ScrollingSortView: View {
                           MathView(text: entry.key, unicode: entry.value, math: entry.mathml)
                             .frame(width: nil, height: 36)
                         } else {
-                          Text("• \(entry.key): ")
+                          Text("• \(String(localized: String.LocalizationValue(entry.key))): ")
                             .bold()
                             .font(.system(size: 16, design: .default)) +
                           Text(entry.value)

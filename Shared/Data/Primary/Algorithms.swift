@@ -29,9 +29,11 @@ import Foundation
   case stoogeSort = "stoogesort"
 
   public var id: Self { self }
+
   public var sizeRange: ClosedRange<Float> {
     self == .bogoSort ? 4.0...16.0 : 16.0...512.0
   }
+
   public var defaultSize: Int {
     self == .bogoSort ? 12 : 256
   }

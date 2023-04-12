@@ -4,6 +4,7 @@
 //
 //  Created by Nicholas Hubbard on 4/27/22.
 //
+
 import Foundation
 import SwiftUI
 
@@ -11,6 +12,11 @@ struct SortView: View {
   var algorithm: Algorithms
   @StateObject var state: SortViewModel = SortViewModel()
   @State var isEditingSize: Bool = false
+
+  func formatMillis(_ millis: Double) -> String {
+    Duration.milliseconds(millis)
+      .formatted(.units(allowed: [.milliseconds], fractionalPart: .show(length: 1)))
+  }
 
   @ViewBuilder
   func bars(_ geo: GeometryProxy) -> some View {
@@ -25,14 +31,14 @@ struct SortView: View {
 
   @ViewBuilder
   func runningToggle() -> some View {
-    StateToggle(binding: $state.running, name: "Running", iconName: "play.fill")
+    StateToggle(binding: $state.running, name: String(localized: "Running"), iconName: "play.fill")
       .onChange(of: state.running) { onRunning(newValue: $0) }
       .keyboardShortcut("r", modifiers: [.command, .shift])
   }
 
   @ViewBuilder
   func soundToggle() -> some View {
-    StateToggle(binding: $state.sound, name: "Sound", iconName: "speaker.wave.2")
+    StateToggle(binding: $state.sound, name: String(localized: "Sound"), iconName: "speaker.wave.2")
       .disabled(state.soundDisabled)
       .onChange(of: state.sound) { onSound(newValue: $0) }
       .keyboardShortcut("s", modifiers: [.command, .shift])
@@ -51,7 +57,7 @@ struct SortView: View {
     Button {
       onReset()
     } label: {
-      Label("Reset", systemImage: "repeat")
+      Label(String(localized: "Reset"), systemImage: "repeat")
     }.frame(maxWidth: 150).keyboardShortcut("z", modifiers: [.command, .shift])
   }
 
@@ -60,9 +66,9 @@ struct SortView: View {
     Button {
       onStep()
     } label: {
-      Label("Step", systemImage: "figure.walk")
+      Label(String(localized: "Step"), systemImage: "figure.walk")
     }.frame(maxWidth: 150).popover(isPresented: $state.showStepPopover, arrowEdge: .trailing) {
-      Text("Sorry, this function is not implemented yet.").padding(.all, 4)
+      Text(String(localized: "Sorry, this function is not implemented yet.")).padding(.all, 4)
     }
   }
 
@@ -78,16 +84,20 @@ struct SortView: View {
   @ViewBuilder
   func delaySlider() -> some View {
     HStack(spacing: 10) {
-      Text("Delay")
+      Text(String(localized: "Delay"))
       Slider(value: $state.delay, in: 0...100).frame(maxWidth: 192)
-      Text(String(format: "%.1f ms", state.delay)).foregroundColor(.blue)
+      Text(formatMillis(Double(state.delay)))
+        .foregroundColor(.blue)
+        .onTapGesture {
+          state.showDelayPopup.toggle()
+        }
     }
   }
 
   @ViewBuilder
   func sizeSlider() -> some View {
     HStack(spacing: 10) {
-      Text("Array Size")
+      Text(String(localized: "Array Size"))
       Slider(value: $state.arraySizeBacking, in: state.sizeRange, step: 2) { editing in
         if !editing {
           onArraySizeChange(newValue: state.arraySizeBacking)
@@ -104,8 +114,8 @@ struct SortView: View {
   @ViewBuilder
   func opsCounter() -> some View {
     VStack(spacing: 4) {
-      Text("Operations: ") + Text("\(state.getOperations())").foregroundColor(.blue)
-      (Text("Runtime: ") + Text(state.getRunTime()).foregroundColor(.blue)).onTapGesture(perform: {
+      Text(String(localized: "Operations: ")) + Text("\(state.getOperations())").foregroundColor(.blue)
+      (Text(String(localized: "Runtime: ")) + Text(state.getRunTime()).foregroundColor(.blue)).onTapGesture(perform: {
         state.asSeconds.toggle()
       })
     }
@@ -113,7 +123,8 @@ struct SortView: View {
 
   @ViewBuilder
   func settingsBox() -> some View {
-    GroupBox(label: Label("Settings", systemImage: "gear").padding(.top, 2).padding(.bottom, 2)) {
+    // Note: this uses the Settings page label in the localized strings file.
+    GroupBox(label: Label(String(localized: "Settings"), systemImage: "gear").padding(.top, 2).padding(.bottom, 2)) {
       toggleRow()
       buttonRow()
       delaySlider()
@@ -129,46 +140,70 @@ struct SortView: View {
     GeometryReader { geo in bars(geo) }
       .overlay(alignment: .topLeading) { settingsBox() }
       .onAppear { onRender() }
-      .alert("Sort Finished Incorrectly", isPresented: $state.showIncompleteWarning, actions: {
-        Button("OK", role: .cancel) { onIncompleteAccept() }
+      .alert(String(localized: "Sort Finished Incorrectly"), isPresented: $state.showIncompleteWarning, actions: {
+        Button(String(localized: "OK"), role: .cancel) { onIncompleteAccept() }
+      }, message: {
+        Text(String(localized: "Sort Finished Incorrectly Message"))
+      })
+      .alert(String(localized: "Algorithm Warning"), isPresented: $state.showBogoSortWarning, actions: {
+        Button(String(localized: "Accept"), role: .cancel) { onBogoAccept() }
+        Button(String(localized: "Decline"), role: .destructive) { onBogoDecline() }
+      }, message: {
+        Text(String(localized: "Bogo Sort Warning Message"))
+      })
+      .alert(String(localized: "Sound Unavailable"), isPresented: $state.showSoundError, actions: {
+        Button(String(localized: "OK"), role: .cancel) { onSoundErrorAccept() }
       }, message: {
         // swiftlint:disable line_length
-        Text("This can happen in one of two scenarios:\n1. You stopped the algorithm while it was running.\n2. The algorithm implementation has a bug and returned an incorrect result.")
-      }).alert("Algorithm Warning", isPresented: $state.showBogoSortWarning, actions: {
-        Button("Accept", role: .cancel) { onBogoAccept() }
-        Button("Decline", role: .destructive) { onBogoDecline() }
-      }, message: {
-        Text("Bogo sort will never finish on any array with more than 12 items.\n\nIf you leave it running, it will consume system resources indefinitely.\n\nAdditionally, if you have photosensitive epilepsy, running bogo sort with a delay of less than 1 millisecond may induce seizures.\n\nIf you wish to continue, press the Accept button; if you wish to stop the sorting, press the Decline button.")
-      }).alert("Sound Unavailable", isPresented: $state.showSoundError, actions: {
-        Button("OK", role: .cancel) { onSoundErrorAccept() }
-      }, message: {
-        Text("Sound is unavailable at this time because the Audio Engine returned \(state.soundErrorText != "" ? "the following error during startup: \(state.soundErrorText)" : "an unknown error during startup.")\n\nSound will not be available until the app is restarted and/or any audio-related issue is resolved.")
-      }).alert("Algorithm Warning", isPresented: $state.showBitonicWarning, actions: {
-        Button("OK", role: .cancel) { onBitonicAccept() }
-      }, message: {
-        Text("Bitonic sort will fail unless the the array size is a power of two. This is a known limitation of bitonic sort and cannot be worked around.\n\nTo prevent the app from crashing, Sort Visualizer will automatically round the array size to the next highest power of two to prevent errors. This warning will not be shown again while the app is running.\n\nPress OK to continue.")
+        Text(String(localized: state.soundErrorText != "" ? "Sound Unavailable Message \(state.soundErrorText)" : "Sound Unavailable Generic Message"))
         // swiftlint:enable line_length
-      }).alert("Array Size", isPresented: $state.showArraySizePopup, actions: {
-        TextField("New Array Size", text: $state.newArraySizeValue)
-          .autocorrectionDisabled(true)
-          .keyboardType(.asciiCapableNumberPad)
-        Button("OK") {
-          state.showArraySizePopup.toggle()
-          guard var newValue = Int(state.newArraySizeValue) else { return }
-          newValue = min(newValue, 2048)
-          newValue = max(newValue, 16)
-          if newValue % 2 != 0 {
-            newValue += newValue % 2
-          }
-          state.arraySizeBacking = Float(newValue)
-          onArraySizeChange(newValue: state.arraySizeBacking)
-        }
-        Button("Cancel", role: .cancel) {
-          state.showArraySizePopup.toggle()
-        }
-      }, message: {
-        Text("Enter a new array size. The size will be rounded up to the nearest even number.")
       })
+      .alert(String(localized: "Algorithm Warning"), isPresented: $state.showBitonicWarning, actions: {
+        Button(String(localized: "OK"), role: .cancel) { onBitonicAccept() }
+      }, message: {
+        Text(String(localized: "Bitonic Sort Warning Message"))
+      })
+      .alert(String(localized: "Set Array Size"), isPresented: $state.showArraySizePopup, actions: {
+        TextField(String(localized: "New Array Size"), text: $state.newArraySizeValue)
+          .autocorrectionDisabled(true)
+        #if os(iOS)
+          .keyboardType(.asciiCapableNumberPad)
+        #endif
+        Button(String(localized: "OK")) { onArraySizeChangePopup() }
+        Button(String(localized: "Cancel"), role: .cancel) { state.showArraySizePopup.toggle() }
+      }, message: {
+        Text(String(localized: "Set Array Size Message"))
+      })
+      .alert(String(localized: "Set Delay"), isPresented: $state.showDelayPopup, actions: {
+        TextField(String(localized: "New Delay Value"), text: $state.newDelayValue)
+          .autocorrectionDisabled(true)
+        #if os(iOS)
+          .keyboardType(.asciiCapableNumberPad)
+        #endif
+        Button(String(localized: "OK")) { onDelayChangePopup() }
+        Button(String(localized: "Cancel"), role: .cancel) { state.showDelayPopup.toggle() }
+      }, message: {
+        Text(String(localized: "New Delay Value Message \(formatMillis(0.0)) to \(formatMillis(100.0))"))
+      })
+  }
+
+  func onArraySizeChangePopup() {
+    state.showArraySizePopup.toggle()
+    guard var newValue = Int(state.newArraySizeValue) else { return }
+    newValue = min(newValue, 2048)
+    newValue = max(newValue, 16)
+    if newValue % 2 != 0 {
+      newValue += newValue % 2
+    }
+    state.arraySizeBacking = Float(newValue)
+    onArraySizeChange(newValue: state.arraySizeBacking)
+  }
+
+  func onDelayChangePopup() {
+    state.showDelayPopup.toggle()
+    guard var newValue = Float(state.newDelayValue) else { return }
+    newValue = min(newValue, 100.0)
+    state.delay = newValue
   }
 
   func onRunning(newValue: Bool) {
@@ -185,9 +220,7 @@ struct SortView: View {
         }
       }
     } else {
-      if let task = state.sortTaskRef {
-        task.cancel()
-      }
+      state.sortTaskRef?.cancel()
     }
   }
 
@@ -205,9 +238,7 @@ struct SortView: View {
   func onReset() {
     // App could crash if reset is clicked while it's running.
     if state.running {
-      if let task = state.sortTaskRef {
-        task.cancel()
-      }
+      state.sortTaskRef?.cancel()
       state.running = false
     }
     state.recreateTaskRef = Task.init(priority: .high) {

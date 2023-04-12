@@ -1,0 +1,225 @@
+//
+//  Localizable.strings (English)
+//  Sort Visualizer (iOS)
+//
+//  Created by Nicholas Hubbard on 05/12/2023.
+//
+
+// MARK: General items
+"OK" = "OK";
+"Cancel" = "Cancel";
+"Accept" = "Accept";
+"Decline" = "Decline";
+
+// MARK: Home page
+"Home" = "Home";
+"Welcome to" = "Welcome to";
+"SORT VISUALIZER" = "SORT VISUALIZER";
+"home_copy" = "Sorting algorithms are used to sort a data structure according to a specific order relationship, such as numerical order or lexicographical order.
+
+This operation is one of the most important and widespread in computer science. For a long time, new methods have been developed to make this procedure faster and faster.
+
+There are hundreds of different sorting algorithms available, each with their own characteristics. They are classified according to two metrics: space complexity and time complexity.
+
+Those two kinds of complexity are represented with asymptotic notations, mainly with the symbols O, Θ, and Ω, which represent the upper bound, the tight bound, and the lower bound of an algorithm's complexity. The numeric value of these bounds is specified in parentheses in terms of the number *n*, which is the number of elements in the data structure.
+
+Most sorting algorithms fall into two specific categories:
+
+* **Logarithmic**: The complexity is proportional to the binary logarithm of *n* (i.e. log₂(*n*)). An example of a logarithmic sorting algorithm is **Quick Sort**, which has space and time complexity of O(*n* log *n*).
+* **Quadratic**: The complexity is proportional to the square of *n*. An example of a quadratic sorting algorithm is **Bubble Sort**, with a time complexity of O(*n*²).
+
+There is also a third category: **Weird** algorithms. These don't follow a Logarithmic or Quadratic complexity, and are a bit more difficult to compare.
+
+Space and time complexity can also be further subdivided into 3 different cases: best case, average case, and worst case.
+
+Sorting algorithms can be difficult to understand, and it's easy to get confused. This app aims to help you understand sorting algorithms by showing their actions in real time. Without further ado, let's get started -- choose an algorithm from the sidebar on the left!";
+
+// MARK: Settings page
+"Settings" = "Settings";
+// Synthesizer section
+"SYNTHESIZER" = "SYNTHESIZER";
+"Lowest synthesizer note" = "Lowest synthesizer note";
+"Highest synthesizer note" = "Highest synthesizer note";
+// Found out while writing this that different languages write musical notes differently. Lots of localized string keys, yay!
+"A0" = "A0";
+"A♯0/B♭0" = "A♯0/B♭0";
+"B0" = "B0";
+"C1" = "C1";
+"C♯1/D♭1" = "C♯1/D♭1";
+"D1" = "D1";
+"D♯1/E♭1" = "D♯1/E♭1";
+"E1" = "E1";
+"F1" = "F1";
+"F♯1/G♭1" = "F♯1/G♭1";
+"G1" = "G1";
+"G♯1/A♭1" = "G♯1/A♭1";
+"A1" = "A1";
+"A♯1/B♭1" = "A♯1/B♭1";
+"B1" = "B1";
+"C2" = "C2";
+"C♯2/D♭2" = "C♯2/D♭2";
+"D2" = "D2";
+"D♯2/E♭2" = "D♯2/E♭2";
+"E2" = "E2";
+"F2" = "F2";
+"F♯2/G♭2" = "F♯2/G♭2";
+"G2" = "G2";
+"G♯2/A♭2" = "G♯2/A♭2";
+"A2" = "A2";
+"A♯2/B♭2" = "A♯2/B♭2";
+"B2" = "B2";
+"C3" = "C3";
+"C♯3/D♭3" = "C♯3/D♭3";
+"D3" = "D3";
+"D♯3/E♭3" = "D♯3/E♭3";
+"E3" = "E3";
+"F3" = "F3";
+"F♯3/G♭3" = "F♯3/G♭3";
+"G3" = "G3";
+"G♯3/A♭3" = "G♯3/A♭3";
+"A3" = "A3";
+"A♯3/B♭3" = "A♯3/B♭3";
+"B3" = "B3";
+"C4" = "C4";
+"C♯4/D♭4" = "C♯4/D♭4";
+"D4" = "D4";
+"D♯4/E♭4" = "D♯4/E♭4";
+"E4" = "E4";
+"F4" = "F4";
+"F♯4/G♭4" = "F♯4/G♭4";
+"G4" = "G4";
+"G♯4/A♭4" = "G♯4/A♭4";
+"A4" = "A4";
+"A♯4/B♭4" = "A♯4/B♭4";
+"B4" = "B4";
+"C5" = "C5";
+"C♯5/D♭5" = "C♯5/D♭5";
+"D5" = "D5";
+"D♯5/E♭5" = "D♯5/E♭5";
+"E5" = "E5";
+"F5" = "F5";
+"F♯5/G♭5" = "F♯5/G♭5";
+"G5" = "G5";
+"G♯5/A♭5" = "G♯5/A♭5";
+"A5" = "A5";
+"A♯5/B♭5" = "A♯5/B♭5";
+"B5" = "B5";
+"C6" = "C6";
+"C♯6/D♭6" = "C♯6/D♭6";
+"D6" = "D6";
+"D♯6/E♭6" = "D♯6/E♭6";
+"E6" = "E6";
+"F6" = "F6";
+"F♯6/G♭6" = "F♯6/G♭6";
+"G6" = "G6";
+"G♯6/A♭6" = "G♯6/A♭6";
+"A6" = "A6";
+"A♯6/B♭6" = "A♯6/B♭6";
+"B6" = "B6";
+"C7" = "C7";
+"C♯7/D♭7" = "C♯7/D♭7";
+"D7" = "D7";
+"D♯7/E♭7" = "D♯7/E♭7";
+"E7" = "E7";
+"F7" = "F7";
+"F♯7/G♭7" = "F♯7/G♭7";
+"G7" = "G7";
+"G♯7/A♭7" = "G♯7/A♭7";
+"A7" = "A7";
+"A♯7/B♭7" = "A♯7/B♭7";
+"B7" = "B7";
+"C8" = "C8";
+// Back to your regularly scheduled settings.
+"Amplitude" = "Amplitude";
+"Reset to defaults" = "Reset to defaults";
+"Attack, decay, sustain, and release" = "Attack, decay, sustain, and release";
+// Sorting section
+"SORTING" = "SORTING";
+"Enable sound by default" = "Enable sound by default";
+"Format running time" = "Format running time";
+"Default sorting delay" = "Default sorting delay";
+"Default array size" = "Default array size";
+"Shuffle method" = "Shuffle method";
+// Shuffle methods
+"Random" = "Random";
+"Ascending" = "Ascending";
+"Descending" = "Descending";
+"Shuffled cubic" = "Shuffled cubic";
+"Shuffled quintic" = "Shuffled quintic";
+// Code section
+"CODE" = "CODE";
+"Code theme" = "Code theme";
+// Note that code theme names are intentionally *not* localized. They are typically not translatable and are left in English.
+// Warnings section
+"WARNINGS" = "WARNINGS";
+"Show bogo sort warning" = "Show bogo sort warning";
+"Show bitonic sort warning" = "Show bitonic sort warning";
+
+// MARK: Algorithms
+// Note: Algorithm descriptions are localized within their resource bundles.
+"Quick Sort" = "Quick Sort";
+"Merge Sort" = "Merge Sort";
+"Heap Sort" = "Heap Sort";
+"Bubble Sort" = "Bubble Sort";
+"Selection Sort" = "Selection Sort";
+"Insertion Sort" = "Insertion Sort";
+"Gnome Sort" = "Gnome Sort";
+"Shaker Sort" = "Shaker Sort";
+"Odd-Even Sort" = "Odd-Even Sort";
+"Pancake Sort" = "Pancake Sort";
+"Bitonic Sort" = "Bitonic Sort";
+"Radix Sort" = "Radix Sort";
+"Shell Sort" = "Shell Sort";
+"Comb Sort" = "Comb Sort";
+"Bogo Sort" = "Bogo Sort";
+"Stooge Sort" = "Stooge Sort";
+
+// MARK: Sorting
+"Running" = "Running";
+"Sound" = "Sound";
+"Reset" = "Reset";
+"Step" = "Step";
+"Sorry, this function is not implemented yet." = "Sorry, this function is not implemented yet.";
+"Delay" = "Delay";
+"Array Size" = "Array Size";
+"Operations: " = "Operations: ";
+"Runtime: " = "Runtime: ";
+"%@ (%.1f ops/sec)" = "%@ sec (%@ ops/sec)";
+"Sort Finished Incorrectly" = "Sort Finished Incorrectly";
+"Sort Finished Incorrectly Message" = "This can happen in one of two scenarios:
+1. You stopped the algorithm while it was running.
+2. The algorithm implementation has a bug and returned an incorrect result.";
+"Algorithm Warning" = "Algorithm Warning";
+"Bogo Sort Warning Message" = "Bogo sort will never finish on any array with more than 12 items.
+
+If you leave it running, it will consume system resources indefinitely.
+
+Additionally, if you have photosensitive epilepsy, running bogo sort with a delay of less than 1 millisecond may induce seizures.
+
+If you wish to continue, press the Accept button; if you wish to stop the sorting, press the Decline button.";
+"Sound Unavailable" = "Sound Unavailable";
+"Sound Unavailable Generic Message" = "Sound is unavailable at this time because the Audio Engine returned an unknown error during startup.
+
+Sound will not be available until the app is restarted and/or any audio-related issue is resolved.";
+"Sound Unavailable Message %@" = "Sound is unavailable at this time because the Audio Engine returned the following error during startup: %@
+
+Sound will not be available until the app is restarted and/or any audio-related issue is resolved.";
+"Bitonic Sort Warning Message" = "Bitonic sort will fail unless the the array size is a power of two. This is a known limitation of bitonic sort and cannot be worked around.
+
+To prevent the app from crashing, Sort Visualizer will automatically round the array size to the next highest power of two to prevent errors. This warning will not be shown again while the app is running.
+
+Press OK to continue.";
+"Set Array Size" = "Set Array Size";
+"New Array Size" = "New Array Size";
+"Set Array Size Message" = "Enter a new array size. The size will be rounded up to the nearest even number, and it will be constrained to a range of 16 to 2,048.";
+"Set Delay" = "Set Delay";
+"New Delay Value" = "New Delay Value";
+"New Delay Value Message %@ to %@" = "Enter a new delay value in milliseconds. It must be between %@ and %@.";
+"Description" = "Description";
+"Complexity" = "Complexity";
+"Average Complexity" = "Average Complexity";
+"Best Case" = "Best Case";
+"Worst Case" = "Worst Case";
+"Space Complexity" = "Space Complexity";
+"Implementations" = "Implementations";
+// Note: like code themes, programming language names are not localized.

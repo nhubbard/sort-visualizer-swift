@@ -45,6 +45,8 @@ final class SortViewModel: ObservableObject {
   @Published var showStepPopover: Bool = false
   @Published var showArraySizePopup: Bool = false
   @Published var newArraySizeValue: String = ""
+  @Published var showDelayPopup: Bool = false
+  @Published var newDelayValue: String = ""
 
   // Sound error state variables
   @Published var soundDisabled: Bool = false
@@ -136,19 +138,20 @@ final class SortViewModel: ObservableObject {
   func getRunTime() -> String {
     let duration: Double
     if !running && endTime == nil {
-      return String("0.0 sec (0.0 ops/sec)")
-    } else if let endTime = endTime {
+      return String(localized: "0.0 sec (0.0 ops/sec)")
+    } else if let endTime {
       duration = endTime - startTime
     } else {
       duration = CFAbsoluteTimeGetCurrent() - startTime
     }
     let perSecond = Double(getOperations()) / duration
+    let formatted = numberFormatter.format(value: perSecond)!
     if !asSeconds, let formatString = dateFormatter.string(from: duration as TimeInterval) {
-      return String(format: "\(formatString) (%.1f ops/sec)", perSecond)
-    } else if asSeconds, let formatString = numberFormatter.fmt(value: duration) {
-      return String(format: "\(formatString) sec (%.1f ops/sec)", perSecond)
+      return String(localized: "\(formatString) (\(formatted) ops/sec)")
+    } else if asSeconds, let formatString = numberFormatter.format(value: duration) {
+      return String(localized: "\(formatString) sec (\(formatted) ops/sec)")
     } else {
-      return String(format: "%.1f sec (%.1f ops/sec)", duration, perSecond)
+      return String(localized: "\(String(duration)) sec (\(formatted) ops/sec)")
     }
   }
 
@@ -354,10 +357,10 @@ final class SortViewModel: ObservableObject {
     running = false
     if isDone {
       let unformattedSeconds = (endTime ?? CFAbsoluteTimeGetCurrent()) - startTime
-      let formattedSeconds = numberFormatter.string(from: NSNumber(value: unformattedSeconds))
+      let formattedSeconds = numberFormatter.format(value: unformattedSeconds)
                              ?? "[error formatting as seconds]"
       let pace = Double(getOperations()) / unformattedSeconds
-      let formattedPace = numberFormatter.string(from: NSNumber(value: pace)) ?? "[error formatting pace]"
+      let formattedPace = numberFormatter.format(value: pace) ?? "[error formatting pace]"
       let formatString = "BENCHMARK: %@, %d items, %d operations, %@s time, %@ op/s, %.1f delay"
       print(String(format: formatString, algorithm.rawValue, data.count, getOperations(), formattedSeconds,
                    formattedPace, delay))

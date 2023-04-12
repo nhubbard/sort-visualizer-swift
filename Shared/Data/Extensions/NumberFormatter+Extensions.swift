@@ -8,7 +8,7 @@
 import Foundation
 
 extension NumberFormatter {
-  func fmt(value: Double) -> String? {
+  func format(value: Double) -> String? {
     string(from: NSNumber(value: value))
   }
 }

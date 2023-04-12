@@ -38,6 +38,8 @@
 		71650A3E28429DB200A23BC2 /* ScrollingSortView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71650A3D28429DB200A23BC2 /* ScrollingSortView.swift */; };
 		716A5CE12821AB0D008B792A /* Algorithms.swift in Sources */ = {isa = PBXBuildFile; fileRef = 716A5CE02821AB0D008B792A /* Algorithms.swift */; };
 		716D2992284FBEBD00772CBD /* bubblesort.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 716D2991284FBEBD00772CBD /* bubblesort.bundle */; };
+		717DC94C29DC5D0200F175DD /* CustomADSRWidget+AppKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 717DC94B29DC5D0200F175DD /* CustomADSRWidget+AppKit.swift */; };
+		717DC94E29DC5D6F00F175DD /* IosMathView+AppKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 717DC94D29DC5D6F00F175DD /* IosMathView+AppKit.swift */; };
 		7180DC272850EA160059D1DB /* gnomesort.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 7180DC262850EA160059D1DB /* gnomesort.bundle */; };
 		7180DC2B285116400059D1DB /* shakersort.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 7180DC2A285116400059D1DB /* shakersort.bundle */; };
 		718246DD284685E4003842E3 /* ComplexityEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 718246DC284685E4003842E3 /* ComplexityEntry.swift */; };
@@ -45,6 +47,11 @@
 		71847C51284100180018E66C /* Image+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71847C50284100180018E66C /* Image+Extensions.swift */; };
 		718FE3F6287F365500620341 /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 718FE3F5287F365500620341 /* Credits.rtf */; };
 		718FE3FA287F3E7F00620341 /* StateToggle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 718FE3F9287F3E7F00620341 /* StateToggle.swift */; };
+		7191A99129E6DC780035C9E5 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 7191A99329E6DC780035C9E5 /* Localizable.strings */; };
+		7191A99529E724210035C9E5 /* PageCategory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7191A99429E724210035C9E5 /* PageCategory.swift */; };
+		7191A99729E724400035C9E5 /* Page.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7191A99629E724400035C9E5 /* Page.swift */; };
+		7196E25829DAF40F000E9CB7 /* CustomADSRWidget+UIKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7196E25729DAF40F000E9CB7 /* CustomADSRWidget+UIKit.swift */; };
+		7196E25C29DAF6F9000E9CB7 /* IosMathView+UIKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7196E25B29DAF6F9000E9CB7 /* IosMathView+UIKit.swift */; };
 		71AEEDD8298707BC00506954 /* iosMath in Frameworks */ = {isa = PBXBuildFile; productRef = 71AEEDD7298707BC00506954 /* iosMath */; };
 		71B4C0DE284FCC9800E42DB1 /* selectionsort.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 71B4C0DD284FCC9800E42DB1 /* selectionsort.bundle */; };
 		71B55E0E28383D5C00CA74CB /* Sequence+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71B55E0D28383D5C00CA74CB /* Sequence+Extensions.swift */; };
@@ -120,6 +127,8 @@
 		71650A3D28429DB200A23BC2 /* ScrollingSortView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollingSortView.swift; sourceTree = "<group>"; };
 		716A5CE02821AB0D008B792A /* Algorithms.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Algorithms.swift; sourceTree = "<group>"; };
 		716D2991284FBEBD00772CBD /* bubblesort.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = bubblesort.bundle; sourceTree = "<group>"; };
+		717DC94B29DC5D0200F175DD /* CustomADSRWidget+AppKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CustomADSRWidget+AppKit.swift"; sourceTree = "<group>"; };
+		717DC94D29DC5D6F00F175DD /* IosMathView+AppKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "IosMathView+AppKit.swift"; sourceTree = "<group>"; };
 		7180DC262850EA160059D1DB /* gnomesort.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = gnomesort.bundle; sourceTree = "<group>"; };
 		7180DC2A285116400059D1DB /* shakersort.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = shakersort.bundle; sourceTree = "<group>"; };
 		718246DC284685E4003842E3 /* ComplexityEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComplexityEntry.swift; sourceTree = "<group>"; };
@@ -127,7 +136,12 @@
 		71847C50284100180018E66C /* Image+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Image+Extensions.swift"; sourceTree = "<group>"; };
 		718FE3F5287F365500620341 /* Credits.rtf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.rtf; path = Credits.rtf; sourceTree = "<group>"; };
 		718FE3F9287F3E7F00620341 /* StateToggle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StateToggle.swift; sourceTree = "<group>"; };
+		7191A99229E6DC780035C9E5 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
+		7191A99429E724210035C9E5 /* PageCategory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageCategory.swift; sourceTree = "<group>"; };
+		7191A99629E724400035C9E5 /* Page.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Page.swift; sourceTree = "<group>"; };
 		71934841281979490058FD9E /* TODO.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = TODO.md; sourceTree = "<group>"; };
+		7196E25729DAF40F000E9CB7 /* CustomADSRWidget+UIKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CustomADSRWidget+UIKit.swift"; sourceTree = "<group>"; };
+		7196E25B29DAF6F9000E9CB7 /* IosMathView+UIKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "IosMathView+UIKit.swift"; sourceTree = "<group>"; };
 		71B4C0DD284FCC9800E42DB1 /* selectionsort.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = selectionsort.bundle; sourceTree = "<group>"; };
 		71B55E0D28383D5C00CA74CB /* Sequence+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sequence+Extensions.swift"; sourceTree = "<group>"; };
 		71BCE0FD2847B8B6007C8254 /* mergesort.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = mergesort.bundle; sourceTree = "<group>"; };
@@ -277,6 +291,8 @@
 				71F38EB72819B42C0085BAAA /* SortView.swift */,
 				71650A3D28429DB200A23BC2 /* ScrollingSortView.swift */,
 				713371F028775DAE00DE2D7E /* MathView.swift */,
+				7191A99429E724210035C9E5 /* PageCategory.swift */,
+				7191A99629E724400035C9E5 /* Page.swift */,
 			);
 			path = Main;
 			sourceTree = "<group>";
@@ -294,6 +310,24 @@
 				714ED662291E9BD400731003 /* ShuffleMethod.swift */,
 			);
 			path = Primary;
+			sourceTree = "<group>";
+		};
+		717DC94A29DC5CF400F175DD /* Mac */ = {
+			isa = PBXGroup;
+			children = (
+				717DC94B29DC5D0200F175DD /* CustomADSRWidget+AppKit.swift */,
+				717DC94D29DC5D6F00F175DD /* IosMathView+AppKit.swift */,
+			);
+			path = Mac;
+			sourceTree = "<group>";
+		};
+		7196E25629DAF398000E9CB7 /* iOS */ = {
+			isa = PBXGroup;
+			children = (
+				7196E25729DAF40F000E9CB7 /* CustomADSRWidget+UIKit.swift */,
+				7196E25B29DAF6F9000E9CB7 /* IosMathView+UIKit.swift */,
+			);
+			path = iOS;
 			sourceTree = "<group>";
 		};
 		71CCA0572865F47400E4D666 /* Code */ = {
@@ -372,6 +406,9 @@
 		71D4DBC428185904001DBD0E = {
 			isa = PBXGroup;
 			children = (
+				7191A99329E6DC780035C9E5 /* Localizable.strings */,
+				717DC94A29DC5CF400F175DD /* Mac */,
+				7196E25629DAF398000E9CB7 /* iOS */,
 				71CBE19D29A64BE800C7DEC9 /* .swiftlint.yml */,
 				71E6B239282033D300672D55 /* Sort Visualizer--iOS--Info.plist */,
 				71934841281979490058FD9E /* TODO.md */,
@@ -518,6 +555,7 @@
 				71F9C46228623A8200159EF5 /* pancakesort.bundle in Resources */,
 				71F9C464286261DC00159EF5 /* bitonicsort.bundle in Resources */,
 				7113FCB5286758DF00665F09 /* shellsort.bundle in Resources */,
+				7191A99129E6DC780035C9E5 /* Localizable.strings in Resources */,
 				715B11FD286C9C8D0087E837 /* stoogesort.bundle in Resources */,
 				71610C0E2844213900A2696C /* quicksort.bundle in Resources */,
 			);
@@ -552,11 +590,14 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				717DC94C29DC5D0200F175DD /* CustomADSRWidget+AppKit.swift in Sources */,
 				71B55E0E28383D5C00CA74CB /* Sequence+Extensions.swift in Sources */,
 				71650A2B2842693C00A23BC2 /* CustomIconLabel.swift in Sources */,
+				7191A99529E724210035C9E5 /* PageCategory.swift in Sources */,
 				71FD4A43281C1F2C00E1E6FA /* SortItem.swift in Sources */,
 				71CFABFE2839528A004672DB /* HeapSortImpl.swift in Sources */,
 				71CCA0612865F57E00E4D666 /* MonokaiTheme.swift in Sources */,
+				7196E25C29DAF6F9000E9CB7 /* IosMathView+UIKit.swift in Sources */,
 				71CFAC1A28396F9A004672DB /* StoogeSortImpl.swift in Sources */,
 				71650A32284272FD00A23BC2 /* RandomizingHeader.swift in Sources */,
 				71CCA0662865FC9D00E4D666 /* TextFormat.swift in Sources */,
@@ -593,6 +634,7 @@
 				71CFABFC28395264004672DB /* MergeSortImpl.swift in Sources */,
 				71CFAC0D28396DD4004672DB /* PancakeSortImpl.swift in Sources */,
 				71CFABF9283951C5004672DB /* QuickSortImpl.swift in Sources */,
+				7196E25829DAF40F000E9CB7 /* CustomADSRWidget+UIKit.swift in Sources */,
 				71650A2E28426C5700A23BC2 /* Category.swift in Sources */,
 				718246DD284685E4003842E3 /* ComplexityEntry.swift in Sources */,
 				71CCA0642865FBCF00E4D666 /* PygmentsTheme.swift in Sources */,
@@ -600,6 +642,7 @@
 				714AA7812845013200D92535 /* Color+Extensions.swift in Sources */,
 				71CFAC0528396D4C004672DB /* InsertionSortImpl.swift in Sources */,
 				71CFAC0728396D6C004672DB /* GnomeSortImpl.swift in Sources */,
+				717DC94E29DC5D6F00F175DD /* IosMathView+AppKit.swift in Sources */,
 				71CCA05F2865F54B00E4D666 /* CodeTheme.swift in Sources */,
 				71CFAC1628396F63004672DB /* CombSortImpl.swift in Sources */,
 				714ED663291E9BD400731003 /* ShuffleMethod.swift in Sources */,
@@ -607,11 +650,23 @@
 				71CCA05D2865F4D500E4D666 /* CodeAttributes.swift in Sources */,
 				71CFAC0128396D08004672DB /* BubbleSortImpl.swift in Sources */,
 				71CCA05B2865F4BF00E4D666 /* AttributeScopes+Extensions.swift in Sources */,
+				7191A99729E724400035C9E5 /* Page.swift in Sources */,
 				711EF294285CC174001EB6AC /* BogoSortImpl.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		7191A99329E6DC780035C9E5 /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				7191A99229E6DC780035C9E5 /* en */,
+			);
+			name = Localizable.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
 		71D4DBE028185905001DBD0E /* Debug */ = {
@@ -764,7 +819,7 @@
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UIUserInterfaceStyle = Dark;
-				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -776,8 +831,8 @@
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "";
 				SDKROOT = iphoneos;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
-				SUPPORTS_MACCATALYST = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_ENFORCE_EXCLUSIVE_ACCESS = on;
@@ -813,7 +868,7 @@
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UIUserInterfaceStyle = Dark;
-				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -824,8 +879,8 @@
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "";
 				SDKROOT = iphoneos;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
-				SUPPORTS_MACCATALYST = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_DISABLE_SAFETY_CHECKS = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;

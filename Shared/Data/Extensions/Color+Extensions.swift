@@ -11,8 +11,6 @@ import SwiftUI
 /// Shamelessly stolen from SwifterSwift. Thanks for the excellent code!
 extension Color {
   private static func getGroupValue(string: String, range: Range<Int>) -> CGFloat {
-    // I *hate* string indexing in Swift. I understand that there's a reason pertaining to UTF-16/UTF-8
-    // compatibility... but it's not a good one, in my opinion.
     let group = string[
       string.index(
         string.startIndex,

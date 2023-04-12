@@ -2,103 +2,21 @@
 
 ## General
 
-* [x] Migrate manual layout engine to use HStack with alignment bottom and no spacing
-* [x] Wire up array size and delay changes
-* [x] Separate algorithm implementations into separate files
-* [x] Clean up any dead code from prior changes
-* [x] Make sure that stopping an in-progress sort functions as expected
-* [x] Make sure operations counter is updated by all algorithms
-* [x] Add error to bitonic sort if the array size isn't a power of 2
-* [x] Rewrite CodeView to use AttributedString instead of a reduce operation.
-  * This is what was causing the crashes on Mom's iPad. It was overflowing the stack with too many variables.
 * [ ] Unit testing and UI testing
   * I tried doing unit testing with a protocol and a separate implementation in the unit tests target, but it just... failed over and over and over again.
   * This may necessitate creating a brand-new Xcode project with tests enabled by default, copying all of the files and settings from the old project, and working from there. Ugh.
-* [x] Set up a testing system that validates algorithm example code results
-* [x] Replace manual JSON parsing with Decodable
-* [ ] **Potential performance improvement:** Instead of using an observable queue to update the UI, have the sorting algorithm put the operations into the queue, and then "replay" them into the UI. Would work wonders for performance for everything except high *n* BogoSort, and also enable step functionality without having to completely rewrite delay handling.
-
-## Algorithms
-
-* [x] Implement and validate all algorithms:
-  * [x] Quick Sort
-  * [x] Merge Sort
-  * [x] Heap Sort
-  * [x] Bubble Sort
-  * [x] Selection Sort
-  * [x] Insertion Sort
-  * [x] Gnome Sort
-  * [x] Shaker Sort
-  * [x] Odd-Even Sort
-  * [x] Pancake Sort
-  * [x] Bitonic Sort
-  * [x] Radix Sort
-  * [x] Shell Sort
-  * [x] Comb Sort
-  * [x] Bogo Sort
-  * [x] Stooge Sort
-    
-## Visualization Improvements
-
-* [x] Merge Sort: Still not stopping correctly... my fault again, trying to get merge sort to actually work correctly.
-* [x] Merge Sort: Mark the previous comparison for each group.
-* [x] Selection Sort: Clear green items for each iteration, it looks really weird
-* [x] Shell Sort: Not incrementing operation counter correctly
-
-## Audio
-
-* [x] Replace custom implementation with AudioKit
-* [x] Wire up audio capabilities in all operations
-* [x] Start up and shut down the synthesizer automatically to prevent popping and other audio weirdness
+* [ ] **Potential performance improvement:** Instead of using an observable list to update the UI, have the sorting algorithm put operations into a queue, and then "replay" them into the UI. Would work wonders for performance for everything except high *n* BogoSort, and also enable step functionality without having to completely rewrite delay handling.
 
 ## User Interface
-
-### Completed
-
-* [x] Icons in navigation
-* [x] Add warning to Bogo Sort
-* [x] Add transparency to Settings panel
-* [x] Fix jumping on Scrolling Sort View
-  * The issue was the LazyVGrid. Replacing it with a really ugly VStack+HStack combo eliminated the problem.
-* [x] *Big project:* Enhance sort algorithm pages with descriptions of algorithms, big-O notation values, and implementation code for various languages
-  * [x] Create initial concept
-  * [x] Implement description
-  * [x] Implement big-O values
-  * [x] Implement top 10 programming language examples for QuickSort as test
-  * [x] Implement top 10 programming language examples for all other algorithms
-    * [x] Merge Sort
-    * [x] Heap Sort
-    * [x] Bubble Sort
-    * [x] Selection Sort
-    * [x] Insertion Sort
-    * [x] Gnome Sort
-    * [x] Shaker Sort
-    * [x] Odd-Even Sort
-    * [x] Pancake Sort
-    * [x] Bitonic Sort
-    * [x] Radix Sort
-    * [x] Shell Sort
-    * [x] Comb Sort
-    * [x] Bogo Sort
-    * [x] Stooge Sort
-* [x] Make code copyable and wrapped to container size.
-  * Copy: Dead simple!
-  * Wrapping: Not so simple. If I try to make it happen, it just... doesn't work as expected.
-* [x] Replace simple text in complexity with a WKWebView (wrapped in a UIViewRepresentable) and MathJax, using LaTeX syntax.
-  * Following [this guide](https://tiborsimon.io/articles/programming/ios-mathjax-integration/), but modernizing the code by using WKWebView instead of UIWebView. 
-  * Alternatively, if the information can be made into a constant, we can render every equation to an SVG file and display it that way. It might be faster in-app, but it will also involve a lot of tooling.
-  * *Rant:* I've given up on rewriting iosMath for modern Swift and/or SwiftUI. It's *heavily* bound to very old (OS X El Capitan/iOS 9 era) APIs that have long since been deprecated, and doesn't appear to be actively maintained. Swiftify got my business once, and their software did an excellent job converting the project, but there's too much work to do in order to modernize the library, like type-safe reading of font configuration tables (which I rewrote the generation script for the latest versions of Python), and so many more issues that just can't be fixed.
-* [x] Add a timer
-* [x] Don't count the `isArraySorted` comparisons toward the operations count
   
 ### In Progress
 
 * [ ] Branding and general customization
   * [ ] App icon
   * [x] About dialog (see Shared/Resources/Credits.rtf)
-* [ ] Translation/localization
+* [x] Translation/localization
   * [ ] Replace homepage content with Wikipedia text for "Sorting algorithm".
-  * [ ] String resources/localization for all strings throughout the app.
+  * [x] String resources/localization for all strings throughout the app.
   * [ ] Add copyright and license attribution for Wikipedia-sourced content.
 * [ ] Settings Panel (use new SwiftUI 4 forms interface?)
   * [x] First things first: type-safe configuration lookup is an absolute requirement. We might be able to accomplish this using SwiftUI's awesome "environment" dependency injection.
@@ -110,7 +28,6 @@
     * [x] Default delay (slider and/or input box)
     * [x] Default array size (slider and/or input box)
     * [x] Default timer to formatted interval or seconds (toggle?)
-    * [x] Array size range for normal algorithms (slider and/or input box, result should auto update the default array size constraints)
     * [x] Code view themes (combo box of some kind)
     * [x] Shuffle/generation method (implementation in SortItem.swift and Shuffle.swift in progress)
       * [x] Random shuffle
@@ -122,24 +39,25 @@
     * [x] Disable bogo sort warning prompt
   * [x] Bitonic sort
     * [x] Disable bitonic sort warning
+  * [ ] Fix layout of settings on Mac Catalyst
+  * [ ] Make the settings actually apply to the application!
 * [ ] Expand the counters from just "Operations" to the standard set of metrics (array accesses, inversions, reversals, etc.)
+
+### Not Started/Future Plans
+
 * [ ] Add more sorting algorithms? Port them from Gaming32/ArrayV, if possible.
 * [ ] Finally implement step functionality, possibly using delay as a catalyst
-* [x] Make slider values able to be typed instead of just modified by the mouse
 
 ## Future Ideas from WWDC 2022
 
-* [ ] Swift Charts for SwiftUI 4
-  * [ ] Attempt to add complexity graphs to the ScrollingSortView.
-* [x] Navigation API for SwiftUI 4
-* [ ] ScreenCaptureKit for Record functionality?
-  * Looks like exactly what I was looking for with regards to implementing recording functionality.
+* [ ] Use Swift Charts to add complexity graphs to the ScrollingSortView.
+* [ ] Collect up to 10 samples of every size of the algorithms (with the exception of Bogo Sort and Stooge Sort) and place them on the complexity graphs relative to the known size
+* [ ] Implement either ScreenCaptureKit or serialized operation recording functionality
 
 ## Far-Out Ideas
 
-* [ ] Rewrite MarkdownUI, since it hasn't been frequently updated and will probably break in Swift 5.7/SwiftUI 4
+* [ ] Rewrite MarkdownUI, since it hasn't been frequently updated and might break in iOS 17/macOS 14
 * [ ] Implement Fastlane or similar build tooling
-* [ ] Implement SwiftLint for build-time code checking
 
 ## BizDev
 
