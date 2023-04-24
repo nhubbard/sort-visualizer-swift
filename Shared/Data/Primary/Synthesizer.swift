@@ -11,9 +11,6 @@ import AudioKit
 import AudioKitEX
 import SoundpipeAudioKit
 
-// The frequency range from the lowest MIDI note to the highest MIDI note. 36 is C2 and 72 is C5.
-let floatFrequencyRange = UInt8(36).midiNoteToFrequency()...UInt8(72).midiNoteToFrequency()
-
 // A major improvement over the previous FM synthesizer!
 @MainActor
 final class Synthesizer: Sendable {
@@ -32,14 +29,13 @@ final class Synthesizer: Sendable {
     osc = Oscillator()
     env = AmplitudeEnvelope(osc)
     fader = Fader(env)
-    osc.amplitude = 1
+    osc.amplitude = UserDefaults.standard.float(forKey: "synthAmplitude")
+    print("Amplitude: \(UserDefaults.standard.float(forKey: "synthAmplitude")), \(osc.amplitude)")
     engine.output = fader
-    // Tuned manually using a modified version of the AudioKit Cookbook app.
-    // (Not really, I took most of the default values because I thought they sounded good.)
-    env.attackDuration = 0.5
-    env.decayDuration = 0.5
-    env.sustainLevel = 0.5
-    env.releaseDuration = 0.5
+    env.attackDuration = UserDefaults.standard.float(forKey: "synthAttack")
+    env.decayDuration = UserDefaults.standard.float(forKey: "synthDecay")
+    env.sustainLevel = UserDefaults.standard.float(forKey: "synthSustain")
+    env.releaseDuration = UserDefaults.standard.float(forKey: "synthRelease")
     // Start it automatically, if enabled.
     if autoStart {
       Task(priority: .high) { [self] in
@@ -70,7 +66,7 @@ final class Synthesizer: Sendable {
     engine.stop()
   }
 
-  func playNote(value: Int, range: ClosedRange<Int>, time: Float) async {
+  func playNote(value: Int, range: ClosedRange<Int>, freqRange: ClosedRange<Float>, time: Float) async {
     // Cannot be replaced with await enforceRunning(); the Synthesizer class isn't an extension of the SortViewModel,
     // and I'm not putting an instance of SortViewModel into the parameters.
     guard !Task.isCancelled && isStarted else {
@@ -79,10 +75,9 @@ final class Synthesizer: Sendable {
       }
       return
     }
-    // Convert the index to the frequency within the range of C1 to C5.
     let freq = floatRatio(x: Float(value),
                           oldRange: Float(range.lowerBound)...Float(range.upperBound),
-                          newRange: floatFrequencyRange)
+                          newRange: freqRange)
     // Play the frequency/note.
     if freq != currentFreq {
       env.closeGate()

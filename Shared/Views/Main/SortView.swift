@@ -31,7 +31,7 @@ struct SortView: View {
 
   @ViewBuilder
   func runningToggle() -> some View {
-    StateToggle(binding: $state.running, name: String(localized: "Running"), iconName: "play.fill")
+    StateToggle(binding: $state.running, name: String(localized: "Running"), iconName: "play.fill", maxWidth: 170)
       .onChange(of: state.running) { onRunning(newValue: $0) }
       .keyboardShortcut("r", modifiers: [.command, .shift])
   }

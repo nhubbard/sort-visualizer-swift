@@ -14,10 +14,6 @@
 * [ ] Branding and general customization
   * [ ] App icon
   * [x] About dialog (see Shared/Resources/Credits.rtf)
-* [x] Translation/localization
-  * [ ] Replace homepage content with Wikipedia text for "Sorting algorithm".
-  * [x] String resources/localization for all strings throughout the app.
-  * [ ] Add copyright and license attribution for Wikipedia-sourced content.
 * [ ] Settings Panel (use new SwiftUI 4 forms interface?)
   * [x] First things first: type-safe configuration lookup is an absolute requirement. We might be able to accomplish this using SwiftUI's awesome "environment" dependency injection.
   * [x] Synthesizer

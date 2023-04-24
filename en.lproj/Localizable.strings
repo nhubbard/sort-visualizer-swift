@@ -36,6 +36,7 @@ Sorting algorithms can be difficult to understand, and it's easy to get confused
 
 // MARK: Settings page
 "Settings" = "Settings";
+"Settings Page" = "Settings";
 // Synthesizer section
 "SYNTHESIZER" = "SYNTHESIZER";
 "Lowest synthesizer note" = "Lowest synthesizer note";

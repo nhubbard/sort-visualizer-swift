@@ -31,21 +31,21 @@ private let shuffleOptions: [ShuffleMethod] = [.random, .ascending, .descending,
 private let themeOptions: [CodeThemes] = [.monokai, .pygments, .arduino, .colorful, .dracula, .emacs]
 
 struct SettingsView: View {
-  @AppStorage("synthLowNote") private var lowestNoteIndex: Int = 36
-  @AppStorage("synthHighNote") private var highestNoteIndex: Int = 72
-  @AppStorage("synthAmplitude") private var synthAmplitude: Float = 0.5
-  @AppStorage("synthAttack") var attack: Float = 0.5
-  @AppStorage("synthDecay") var decay: Float = 0.5
-  @AppStorage("synthSustain") var sustain: Float = 0.5
-  @AppStorage("synthRelease") var release: Float = 0.5
-  @AppStorage("sortSoundOn") private var defaultSoundOn: Bool = false
-  @AppStorage("sortDelay") private var sortDelay: Float = 0.1
-  @AppStorage("sortArraySize") private var sortArraySize: Int = 256
-  @AppStorage("sortFormatRuntime") private var sortFormatRuntime: Bool = false
-  @AppStorage("sortShuffleMethod") private var sortShuffleMethodIndex: Int = 0
-  @AppStorage("sortCodeViewTheme") private var codeThemeIndex: Int = 0
-  @AppStorage("warnBogoSort") private var warnBogoSort: Bool = true
-  @AppStorage("warnBitonicSort") private var warnBitonicSort: Bool = true
+  @AppStorage("synthLowNote", store: .standard) private var lowestNoteIndex: Int = 36
+  @AppStorage("synthHighNote", store: .standard) private var highestNoteIndex: Int = 72
+  @AppStorage("synthAmplitude", store: .standard) private var synthAmplitude: Float = 0.5
+  @AppStorage("synthAttack", store: .standard) var attack: Float = 0.5
+  @AppStorage("synthDecay", store: .standard) var decay: Float = 0.5
+  @AppStorage("synthSustain", store: .standard) var sustain: Float = 0.5
+  @AppStorage("synthRelease", store: .standard) var release: Float = 0.5
+  @AppStorage("sortSoundOn", store: .standard) private var defaultSoundOn: Bool = false
+  @AppStorage("sortDelay", store: .standard) private var sortDelay: Float = 0.1
+  @AppStorage("sortArraySize", store: .standard) private var sortArraySize: Int = 256
+  @AppStorage("sortFormatRuntime", store: .standard) private var sortFormatRuntime: Bool = false
+  @AppStorage("sortShuffleMethod", store: .standard) private var sortShuffleMethodIndex: Int = 0
+  @AppStorage("sortCodeViewTheme", store: .standard) private var codeThemeIndex: Int = 0
+  @AppStorage("warnBogoSort", store: .standard) private var warnBogoSort: Bool = true
+  @AppStorage("warnBitonicSort", store: .standard) private var warnBitonicSort: Bool = true
 
   func formatMillis(_ millis: Double) -> String {
     // AudioKit has a "Duration" as well. We have to prefix it for Swift to resolve the Foundation class.

@@ -1,0 +1,232 @@
+//
+//  Localizable.strings (English)
+//  Sort Visualizer (iOS)
+//
+//  Created by Nicholas Hubbard on 05/12/2023.
+//
+
+// MARK: General items
+"OK" = "OK";
+"Cancel" = "Cancelar";
+"Accept" = "Aceptar";
+"Decline" = "Recharzar";
+
+// MARK: Home page
+"Home" = "Página principal";
+"Welcome to" = "Bienvenido a";
+"SORT VISUALIZER" = "SORT VISUALIZER";
+"home_copy" = "Los algoritmos de ordenación se utilizan para ordenar una estructura de datos según una relación de orden específica, como el orden numérico o el orden lexicográfico.
+
+Esta operación es una de las más importantes y extendidas en informática. Durante mucho tiempo se han desarrollado nuevos métodos para que este procedimiento sea cada vez más rápido.
+
+Existen cientos de algoritmos de ordenación diferentes, cada uno con sus propias características. Se clasifican según dos métricas: complejidad espacial y complejidad temporal.
+
+Estos dos tipos de complejidad se representan con notaciones asintóticas, principalmente con los símbolos O, Θ y Ω, que representan el límite superior, el límite estrecho y el límite inferior de la complejidad de un algoritmo. El valor numérico de estos límites se especifica entre paréntesis en función del número *n*, que es el número de elementos de la estructura de datos.
+
+La mayoría de los algoritmos de clasificación se dividen en dos categorías específicas:
+
+* **Logarítmico**: La complejidad es proporcional al logaritmo binario de *n* (es decir, log₂(*n*)). Un ejemplo de algoritmo de ordenación logarítmico es **ordenamiento rápido**, que tiene una complejidad espacial y temporal de O(*n* log *n*).
+* **Cuadrático**: La complejidad es proporcional al cuadrado de *n*. Un ejemplo de algoritmo de ordenación cuadrático es **ordenamiento de burbuja**, con una complejidad temporal de O(*n*²).
+
+También existe una tercera categoría: **algoritmos extraños**. Estos no siguen una complejidad logarítmica o cuadrática, y son un poco más difíciles de comparar.
+
+La complejidad espacial y temporal también puede subdividirse en 3 casos diferentes: el mejor caso, el caso medio y el peor caso.
+
+Los algoritmos de ordenación pueden ser difíciles de entender y es fácil confundirse. Esta aplicación pretende ayudarte a entender los algoritmos de ordenación mostrando sus acciones en tiempo real. Sin más preámbulos, empecemos: ¡elige un algoritmo de la barra lateral de la izquierda!";
+
+// MARK: Settings page
+// https://es.wikipedia.org/wiki/Configuración_(informática)
+"Settings" = "Configuración";
+"Settings Page" = "Configuraciónes";
+// Synthesizer section
+// https://es.wikipedia.org/wiki/Sintetizador
+"SYNTHESIZER" = "SINTETIZADOR";
+"Lowest synthesizer note" = "Nota más baja del sintetizador";
+"Highest synthesizer note" = "Nota más alta del sintetizador";
+// Found out while writing this that different languages write musical notes differently. Lots of localized string keys, yay!
+"A0" = "A0";
+"A♯0/B♭0" = "A♯0/B♭0";
+"B0" = "B0";
+"C1" = "C1";
+"C♯1/D♭1" = "C♯1/D♭1";
+"D1" = "D1";
+"D♯1/E♭1" = "D♯1/E♭1";
+"E1" = "E1";
+"F1" = "F1";
+"F♯1/G♭1" = "F♯1/G♭1";
+"G1" = "G1";
+"G♯1/A♭1" = "G♯1/A♭1";
+"A1" = "A1";
+"A♯1/B♭1" = "A♯1/B♭1";
+"B1" = "B1";
+"C2" = "C2";
+"C♯2/D♭2" = "C♯2/D♭2";
+"D2" = "D2";
+"D♯2/E♭2" = "D♯2/E♭2";
+"E2" = "E2";
+"F2" = "F2";
+"F♯2/G♭2" = "F♯2/G♭2";
+"G2" = "G2";
+"G♯2/A♭2" = "G♯2/A♭2";
+"A2" = "A2";
+"A♯2/B♭2" = "A♯2/B♭2";
+"B2" = "B2";
+"C3" = "C3";
+"C♯3/D♭3" = "C♯3/D♭3";
+"D3" = "D3";
+"D♯3/E♭3" = "D♯3/E♭3";
+"E3" = "E3";
+"F3" = "F3";
+"F♯3/G♭3" = "F♯3/G♭3";
+"G3" = "G3";
+"G♯3/A♭3" = "G♯3/A♭3";
+"A3" = "A3";
+"A♯3/B♭3" = "A♯3/B♭3";
+"B3" = "B3";
+"C4" = "C4";
+"C♯4/D♭4" = "C♯4/D♭4";
+"D4" = "D4";
+"D♯4/E♭4" = "D♯4/E♭4";
+"E4" = "E4";
+"F4" = "F4";
+"F♯4/G♭4" = "F♯4/G♭4";
+"G4" = "G4";
+"G♯4/A♭4" = "G♯4/A♭4";
+"A4" = "A4";
+"A♯4/B♭4" = "A♯4/B♭4";
+"B4" = "B4";
+"C5" = "C5";
+"C♯5/D♭5" = "C♯5/D♭5";
+"D5" = "D5";
+"D♯5/E♭5" = "D♯5/E♭5";
+"E5" = "E5";
+"F5" = "F5";
+"F♯5/G♭5" = "F♯5/G♭5";
+"G5" = "G5";
+"G♯5/A♭5" = "G♯5/A♭5";
+"A5" = "A5";
+"A♯5/B♭5" = "A♯5/B♭5";
+"B5" = "B5";
+"C6" = "C6";
+"C♯6/D♭6" = "C♯6/D♭6";
+"D6" = "D6";
+"D♯6/E♭6" = "D♯6/E♭6";
+"E6" = "E6";
+"F6" = "F6";
+"F♯6/G♭6" = "F♯6/G♭6";
+"G6" = "G6";
+"G♯6/A♭6" = "G♯6/A♭6";
+"A6" = "A6";
+"A♯6/B♭6" = "A♯6/B♭6";
+"B6" = "B6";
+"C7" = "C7";
+"C♯7/D♭7" = "C♯7/D♭7";
+"D7" = "D7";
+"D♯7/E♭7" = "D♯7/E♭7";
+"E7" = "E7";
+"F7" = "F7";
+"F♯7/G♭7" = "F♯7/G♭7";
+"G7" = "G7";
+"G♯7/A♭7" = "G♯7/A♭7";
+"A7" = "A7";
+"A♯7/B♭7" = "A♯7/B♭7";
+"B7" = "B7";
+"C8" = "C8";
+// Back to your regularly scheduled settings.
+// https://es.wikipedia.org/wiki/Amplitud_(física) maybe?
+"Amplitude" = "Amplitud";
+"Reset to defaults" = "Restablecer";
+// https://es.wikipedia.org/wiki/Envolvente_acústico
+"Attack, decay, sustain, and release" = "Envolvente acústico";
+// Sorting section
+"SORTING" = "ORDENACIÓN";
+"Enable sound by default" = "Activar el sonido por defecto";
+"Format running time" = "Formato del reloj en marcha";
+"Default sorting delay" = "Retraso de ordenación por defecto";
+"Default array size" = "Tamaño por defecto de la matriz";
+"Shuffle method" = "Método de barajado";
+// Shuffle methods
+"Random" = "Barajado aleatorio";
+"Ascending" = "Barajado ascendente";
+"Descending" = "Barajado descendente";
+"Shuffled cubic" = "Barajado cúbico";
+"Shuffled quintic" = "Barajado quintic";
+// Code section
+"CODE" = "CÓDIGO FUENTE";
+"Code theme" = "Tema del código fuente";
+// Note that code theme names are intentionally *not* localized. They are typically not translatable and are left in English.
+// Warnings section
+"WARNINGS" = "DIÁLOGOS DE ADVERTENCIA";
+"Show bogo sort warning" = "Mostrar diálogo de aviso de ordenación inefectivo";
+"Show bitonic sort warning" = "Mostrar diálogo de aviso de ordenación bitónica";
+
+// MARK: Algorithms
+// Note: Algorithm descriptions are localized within their resource bundles.
+"Quick Sort" = "Ordenamiento rápido";
+"Merge Sort" = "Ordenamiento por mezcla";
+"Heap Sort" = "Ordenamiento por montículo";
+"Bubble Sort" = "Ordenamiento de burbuja";
+"Selection Sort" = "Ordenamiento por selección";
+"Insertion Sort" = "Ordenamiento por inserción";
+"Gnome Sort" = "Ordenamiento de gnomos";
+"Shaker Sort" = "Ordenamiento de burbuja bidireccional";
+"Odd-Even Sort" = "Ordenamiento impar-par";
+"Pancake Sort" = "Ordenamiento de panqueques";
+"Bitonic Sort" = "Ordenamiento bitónico";
+"Radix Sort" = "Ordenamiento Radix";
+"Shell Sort" = "Ordenamiento Shell";
+"Comb Sort" = "Ordenamiento de peine";
+"Bogo Sort" = "Ordenamiento inefectivo";
+"Stooge Sort" = "Ordenamiento loco";
+
+// MARK: Sorting
+"Running" = "Ejecutando";
+"Sound" = "Sonido";
+"Reset" = "Restablecer";
+"Step" = "Siguiente paso";
+"Sorry, this function is not implemented yet." = "Lo sentimos, esta función aún no está implementada.";
+"Delay" = "Retraso";
+"Array Size" = "Tamaño de la matriz";
+"Operations: " = "Operaciones: ";
+"Runtime: " = "Tiempo de ejecución: ";
+// This string is incomplete; test with all variants of the runtime counter.
+"0.0 sec (0.0 ops/sec)" = "0,0 s (0,0 ops/seg)";
+"%@ (%@ ops/sec)" = "%@ (%@ ops/seg)";
+"Sort Finished Incorrectly" = "Ordenar Incorrectamente";
+"Sort Finished Incorrectly Message" = "Esto puede ocurrir en uno de estos dos escenarios:
+1. Has detenido el algoritmo mientras se estaba ejecutando.
+2. La implementación del algoritmo tiene un error y devuelve un resultado incorrecto.";
+"Algorithm Warning" = "Algoritmo Advertencia";
+"Bogo Sort Warning Message" = "Ordenamiento inefectivo nunca terminará en ningúna matriz con más de 12 elementos.
+
+Si lo deja funcionando, consumirá recursos del sistema indefinidamente.
+
+Además, si padece de epilepsia fotosensible, ejecutar ordenamiento inefectivo con un retardo inferior a 1 milisegundo puede inducir convulsiones.
+
+Si desea continuar, pulse el botón Aceptar; si desea detener la ordenación, pulse el botón Rechazar.";
+"Sound Unavailable" = "Sonido No Disponible";
+"Sound Unavailable Generic Message" = "El sonido no está disponible en este momento debido a un error desconocido durante el inicio.
+
+El sonido no estará disponible hasta que se reinicie la aplicación y/o se resuelva cualquier problema relacionado con el audio.";
+"Sound Unavailable Message %@" = "El sonido no está disponible en este momento debido al siguiente error que se produjo durante el inicio: %@
+
+El sonido no estará disponible hasta que se reinicie la aplicación y/o se resuelva cualquier problema relacionado con el audio.";
+"Bitonic Sort Warning Message" = "La ordenación bitónica fallará a menos que el tamaño de la matriz sea una potencia de dos. Esta es una limitación conocida de la ordenación bitónica y no se puede evitar.
+
+Para evitar que la aplicación se bloquee, el Sort Visualizer redondeará automáticamente el tamaño de la matriz a la siguiente potencia mas alta de dos para evitar errores. Esta advertencia no se volverá a mostrar mientras la aplicación esté en funcionamiento.
+
+Pulsa OK para continuar.";
+"Set Array Size" = "Establecer tamaño de matriz";
+"New Array Size" = "Nuevo tamaño de matriz";
+"Set Array Size Message" = "Introduzca un nuevo tamaño de array. El tamaño se redondeará al número par más próximo y se limitará a un rango de 16 a 2.048.";
+"Set Delay" = "Fijar retardo";
+"New Delay Value" = "Nuevo valor de retardo";
+"New Delay Value Message %@ to %@" = "Introduzca un nuevo valor de retardo en milisegundos. Debe estar entre %@ y %@.";
+"Description" = "Descripción del algoritmo";
+"Complexity" = "Complejidad";
+"Average Complexity" = "Average de Complejidad";
+"Best Case" = "El mejor caso";
+"Worst Case" = "El peor caso";
+"Space Complexity" = "Complejidad espacial";
+"Implementations" = "Aplicaciónes";
+// Note: like code themes, programming language names are not localized.

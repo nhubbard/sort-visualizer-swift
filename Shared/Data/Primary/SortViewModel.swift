@@ -62,6 +62,17 @@ final class SortViewModel: ObservableObject {
   @Published var endTime: CFAbsoluteTime?
   @Published var asSeconds: Bool = false
 
+  // Settings
+  @AppStorage("synthLowNote") var synthLowNote: Int = 36
+  @AppStorage("synthHighNote") var synthHighNote: Int = 72
+  var synthRange: ClosedRange<Float> {
+    UInt8(synthLowNote).midiNoteToFrequency()...UInt8(synthHighNote).midiNoteToFrequency()
+  }
+  @AppStorage("synthAttack") var synthAttack: Float = 0.5
+  @AppStorage("synthDecay") var synthDecay: Float = 0.5
+  @AppStorage("synthSustain") var synthSustain: Float = 0.5
+  @AppStorage("synthRelease") var synthRelease: Float = 0.5
+
   // Standard variables
   var algorithm: Algorithms = .quickSort
   var sortTaskRef: Task<Void, Error>?
@@ -106,7 +117,10 @@ final class SortViewModel: ObservableObject {
   @inlinable
   func playNote(_ index: Int) async {
     guard await enforceRunning() && sound else { return }
-    await toner.playNote(value: index, range: data.indices.lowerBound...data.indices.upperBound, time: delay)
+    await toner.playNote(value: index,
+                         range: data.indices.lowerBound...data.indices.upperBound,
+                         freqRange: synthRange,
+                         time: delay)
   }
 
   /// Set the contents of the data array asynchronously.

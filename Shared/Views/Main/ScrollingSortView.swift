@@ -73,7 +73,7 @@ struct ScrollingSortView: View {
                           MathView(text: entry.key, unicode: entry.value, math: entry.mathml)
                             .frame(width: nil, height: 36)
                         } else {
-                          Text("• \(String(localized: String.LocalizationValue(entry.key))): ")
+                          Text("• \(NSLocalizedString(entry.key, comment: "")): ")
                             .bold()
                             .font(.system(size: 16, design: .default)) +
                           Text(entry.value)

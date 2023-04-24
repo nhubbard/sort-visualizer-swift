@@ -61,7 +61,7 @@ import Foundation
   public var displayName: String {
     switch self {
       case .home:          return String(localized: "Home")
-      case .settings:      return String(localized: "Settings")
+      case .settings:      return String(localized: "Settings Page")
       case .quickSort:     return String(localized: "Quick Sort")
       case .mergeSort:     return String(localized: "Merge Sort")
       case .heapSort:      return String(localized: "Heap Sort")
