@@ -22,24 +22,78 @@ struct ContentView: View {
     } detail: {
       if let selection {
         switch selection {
-          case .home: HomeView().navigationTitle(selection.displayName)
-          case .settings: SettingsView().navigationTitle(selection.displayName)
-          case .quickSort: ScrollingSortView(algorithm: .quickSort).navigationTitle(selection.displayName)
-          case .mergeSort: ScrollingSortView(algorithm: .mergeSort).navigationTitle(selection.displayName)
-          case .heapSort: ScrollingSortView(algorithm: .heapSort).navigationTitle(selection.displayName)
-          case .bubbleSort: ScrollingSortView(algorithm: .bubbleSort).navigationTitle(selection.displayName)
-          case .selectionSort: ScrollingSortView(algorithm: .selectionSort).navigationTitle(selection.displayName)
-          case .insertionSort: ScrollingSortView(algorithm: .insertionSort).navigationTitle(selection.displayName)
-          case .gnomeSort: ScrollingSortView(algorithm: .gnomeSort).navigationTitle(selection.displayName)
-          case .shakerSort: ScrollingSortView(algorithm: .shakerSort).navigationTitle(selection.displayName)
-          case .oddEvenSort: ScrollingSortView(algorithm: .oddEvenSort).navigationTitle(selection.displayName)
-          case .pancakeSort: ScrollingSortView(algorithm: .pancakeSort).navigationTitle(selection.displayName)
-          case .bitonicSort: ScrollingSortView(algorithm: .bitonicSort).navigationTitle(selection.displayName)
-          case .radixSort: ScrollingSortView(algorithm: .radixSort).navigationTitle(selection.displayName)
-          case .shellSort: ScrollingSortView(algorithm: .shellSort).navigationTitle(selection.displayName)
-          case .combSort: ScrollingSortView(algorithm: .combSort).navigationTitle(selection.displayName)
-          case .bogoSort: ScrollingSortView(algorithm: .bogoSort).navigationTitle(selection.displayName)
-          case .stoogeSort: ScrollingSortView(algorithm: .stoogeSort).navigationTitle(selection.displayName)
+          case .home:
+            HomeView()
+              .navigationTitle(selection.displayName)
+              .accessibilityLabel(selection.displayName)
+          case .settings:
+            SettingsView()
+              .navigationTitle(selection.displayName)
+              .accessibilityLabel(selection.displayName)
+          case .quickSort:
+            ScrollingSortView(algorithm: .quickSort)
+              .navigationTitle(selection.displayName)
+              .accessibilityLabel(selection.displayName)
+          case .mergeSort:
+            ScrollingSortView(algorithm: .mergeSort)
+              .navigationTitle(selection.displayName)
+              .accessibilityLabel(selection.displayName)
+          case .heapSort:
+            ScrollingSortView(algorithm: .heapSort)
+              .navigationTitle(selection.displayName)
+              .accessibilityLabel(selection.displayName)
+          case .bubbleSort:
+            ScrollingSortView(algorithm: .bubbleSort)
+              .navigationTitle(selection.displayName)
+              .accessibilityLabel(selection.displayName)
+          case .selectionSort:
+            ScrollingSortView(algorithm: .selectionSort)
+              .navigationTitle(selection.displayName)
+              .accessibilityLabel(selection.displayName)
+          case .insertionSort:
+            ScrollingSortView(algorithm: .insertionSort)
+              .navigationTitle(selection.displayName)
+              .accessibilityLabel(selection.displayName)
+          case .gnomeSort:
+            ScrollingSortView(algorithm: .gnomeSort)
+              .navigationTitle(selection.displayName)
+              .accessibilityLabel(selection.displayName)
+          case .shakerSort:
+            ScrollingSortView(algorithm: .shakerSort)
+              .navigationTitle(selection.displayName)
+              .accessibilityLabel(selection.displayName)
+          case .oddEvenSort:
+            ScrollingSortView(algorithm: .oddEvenSort)
+              .navigationTitle(selection.displayName)
+              .accessibilityLabel(selection.displayName)
+          case .pancakeSort:
+            ScrollingSortView(algorithm: .pancakeSort)
+              .navigationTitle(selection.displayName)
+              .accessibilityLabel(selection.displayName)
+          case .bitonicSort:
+            ScrollingSortView(algorithm: .bitonicSort)
+              .navigationTitle(selection.displayName)
+              .accessibilityLabel(selection.displayName)
+          case .radixSort:
+            ScrollingSortView(algorithm: .radixSort)
+              .navigationTitle(selection.displayName)
+              .accessibilityLabel(selection.displayName)
+          case .shellSort:
+            ScrollingSortView(algorithm: .shellSort)
+              .navigationTitle(selection.displayName)
+              .accessibilityLabel(selection.displayName)
+          case .combSort:
+            ScrollingSortView(algorithm: .combSort)
+              .navigationTitle(selection.displayName)
+              .accessibilityLabel(selection.displayName)
+          case .bogoSort:
+            ScrollingSortView(algorithm: .bogoSort)
+              .navigationTitle(selection.displayName)
+              .accessibilityLabel(selection.displayName)
+          case .stoogeSort:
+            ScrollingSortView(algorithm: .stoogeSort)
+              .navigationTitle(selection.displayName)
+              .accessibilityLabel(selection.displayName)
         }
       } else {
         HomeView()

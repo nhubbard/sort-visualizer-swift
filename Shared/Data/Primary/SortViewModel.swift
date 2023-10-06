@@ -7,8 +7,12 @@
 
 import Foundation
 import SwiftUI
-@preconcurrency import Atomics
+import Atomics
 import CollectionConcurrencyKit
+#if !os(macOS)
+import DeviceKit
+#endif
+import CloudKit
 
 @MainActor
 final class SortViewModel: ObservableObject {
@@ -378,6 +382,26 @@ final class SortViewModel: ObservableObject {
       let formatString = "BENCHMARK: %@, %d items, %d operations, %@s time, %@ op/s, %.1f delay"
       print(String(format: formatString, algorithm.rawValue, data.count, getOperations(), formattedSeconds,
                    formattedPace, delay))
+#if !os(macOS)
+      do {
+        try await CKContainer.default().publicCloudDatabase.save(
+          try CloudKitRecordEncoder().encode(
+            RunRecord(
+              systemModel: Device.current.realDevice.safeDescription,
+              created: Int(NSDate().timeIntervalSince1970),
+              algorithmName: algorithm.rawValue,
+              arraySize: data.count,
+              operations: getOperations(),
+              elapsedTime: unformattedSeconds,
+              pace: pace,
+              delay: delay
+            )
+          )
+        )
+      } catch let error {
+        debugPrint("Failed to encode RunRecord for CloudKit: \(error)")
+      }
+#endif
     }
     return isDone
   }

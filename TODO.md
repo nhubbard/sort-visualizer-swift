@@ -11,8 +11,8 @@
   
 ### In Progress
 
-* [ ] Branding and general customization
-  * [ ] App icon
+* [x] Branding and general customization
+  * [x] App icon
   * [x] About dialog (see Shared/Resources/Credits.rtf)
 * [ ] Settings Panel (use new SwiftUI 4 forms interface?)
   * [x] First things first: type-safe configuration lookup is an absolute requirement. We might be able to accomplish this using SwiftUI's awesome "environment" dependency injection.
@@ -31,20 +31,20 @@
       * [x] Descending
       * [x] Shuffled Cubic
       * [x] Shuffled Quintic
-  * [x] Bogo sort
-    * [x] Disable bogo sort warning prompt
-  * [x] Bitonic sort
-    * [x] Disable bitonic sort warning
+  * [x] Disable bogo sort warning prompt
+  * [x] Disable bitonic sort warning
   * [ ] Fix layout of settings on Mac Catalyst
   * [ ] Make the settings actually apply to the application!
+* [ ] Make local sort settings a DisclosureGroup
 * [ ] Expand the counters from just "Operations" to the standard set of metrics (array accesses, inversions, reversals, etc.)
 
 ### Not Started/Future Plans
 
+* [ ] Make navigation three-tiered? Allows for more categories.
 * [ ] Add more sorting algorithms? Port them from Gaming32/ArrayV, if possible.
 * [ ] Finally implement step functionality, possibly using delay as a catalyst
 
-## Future Ideas from WWDC 2022
+## Future Ideas from WWDC 2022+
 
 * [ ] Use Swift Charts to add complexity graphs to the ScrollingSortView.
 * [ ] Collect up to 10 samples of every size of the algorithms (with the exception of Bogo Sort and Stooge Sort) and place them on the complexity graphs relative to the known size

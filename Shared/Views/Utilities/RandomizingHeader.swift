@@ -5,7 +5,7 @@
 //  Created by Nicholas Hubbard on 5/28/22.
 //
 
-@preconcurrency import SwiftUI
+import SwiftUI
 
 @frozen public struct RandomizingHeader: View, Sendable {
   let text: String

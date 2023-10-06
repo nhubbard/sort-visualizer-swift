@@ -6,7 +6,7 @@
 //
 
 import Foundation
-@preconcurrency import SwiftUI
+import SwiftUI
 
 @frozen public struct LanguageEntry: Identifiable, Hashable, Sendable {
   public let id = UUID()

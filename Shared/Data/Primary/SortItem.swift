@@ -6,7 +6,7 @@
 //
 
 import Foundation
-@preconcurrency import SwiftUI
+import SwiftUI
 import CollectionConcurrencyKit
 
 @frozen public struct SortItem: Identifiable, Equatable, Comparable, Hashable, Sendable {

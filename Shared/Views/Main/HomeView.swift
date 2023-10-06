@@ -13,8 +13,14 @@ import MarkdownUI
     VStack(spacing: 2) {
       Text(String(localized: "Welcome to")).bold()
       RandomizingHeader(text: String(localized: "SORT VISUALIZER"))
-      Markdown(String(localized: "home_copy"))
-        .markdownStyle(MarkdownStyle(font: .system(size: 16)))
+        Markdown {
+            String(localized: "home_copy")
+        }
+        .markdownTextStyle {
+            FontFamilyVariant(.normal)
+            FontFamily(.system())
+            FontSize(.em(1))
+        }
         .lineSpacing(1.75)
         .padding()
     }

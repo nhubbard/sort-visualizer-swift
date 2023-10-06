@@ -32,6 +32,7 @@ struct SortView: View {
   @ViewBuilder
   func runningToggle() -> some View {
     StateToggle(binding: $state.running, name: String(localized: "Running"), iconName: "play.fill", maxWidth: 170)
+      .accessibilityLabel("Running toggle")
       .onChange(of: state.running) { onRunning(newValue: $0) }
       .keyboardShortcut("r", modifiers: [.command, .shift])
   }
@@ -39,6 +40,7 @@ struct SortView: View {
   @ViewBuilder
   func soundToggle() -> some View {
     StateToggle(binding: $state.sound, name: String(localized: "Sound"), iconName: "speaker.wave.2")
+      .accessibilityLabel("Sound toggle")
       .disabled(state.soundDisabled)
       .onChange(of: state.sound) { onSound(newValue: $0) }
       .keyboardShortcut("s", modifiers: [.command, .shift])
@@ -58,7 +60,7 @@ struct SortView: View {
       onReset()
     } label: {
       Label(String(localized: "Reset"), systemImage: "repeat")
-    }.frame(maxWidth: 150).keyboardShortcut("z", modifiers: [.command, .shift])
+    }.frame(maxWidth: 150).keyboardShortcut("z", modifiers: [.command, .shift]).accessibilityLabel("Reset button")
   }
 
   @ViewBuilder
@@ -69,7 +71,7 @@ struct SortView: View {
       Label(String(localized: "Step"), systemImage: "figure.walk")
     }.frame(maxWidth: 150).popover(isPresented: $state.showStepPopover, arrowEdge: .trailing) {
       Text(String(localized: "Sorry, this function is not implemented yet.")).padding(.all, 4)
-    }
+    }.accessibilityLabel("Step button")
   }
 
   @ViewBuilder
@@ -86,11 +88,13 @@ struct SortView: View {
     HStack(spacing: 10) {
       Text(String(localized: "Delay"))
       Slider(value: $state.delay, in: 0...100).frame(maxWidth: 192)
+        .accessibilityLabel("Delay slider")
       Text(formatMillis(Double(state.delay)))
         .foregroundColor(.blue)
         .onTapGesture {
           state.showDelayPopup.toggle()
         }
+        .accessibilityHint("Formatted delay value")
     }
   }
 
@@ -102,12 +106,13 @@ struct SortView: View {
         if !editing {
           onArraySizeChange(newValue: state.arraySizeBacking)
         }
-      }.frame(maxWidth: 192).disabled(state.running)
+      }.frame(maxWidth: 192).disabled(state.running).accessibilityLabel("Array size slider")
       Text(String(format: "%d", Int(state.arraySizeBacking)))
         .foregroundColor(.blue)
         .onTapGesture {
           state.showArraySizePopup.toggle()
         }
+        .accessibilityHint("Formatted array size value")
     }
   }
 
@@ -134,6 +139,7 @@ struct SortView: View {
       .cornerRadius(15)
       .frame(minWidth: 300, maxWidth: 450, minHeight: 64)
       .padding([.top, .leading], 16)
+      .accessibilityLabel("Settings box")
   }
 
   var body: some View {
