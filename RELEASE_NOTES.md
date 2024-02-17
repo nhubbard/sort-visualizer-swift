@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+v1.2
+----
+
+- Fixed window resizing bug on macOS.
+- Replaced language implementation selector with standard SwiftUI component.
+
 v1.1
 ----
 
