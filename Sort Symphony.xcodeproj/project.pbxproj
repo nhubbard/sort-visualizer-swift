@@ -131,7 +131,6 @@
 		71650A3D28429DB200A23BC2 /* ScrollingSortView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollingSortView.swift; sourceTree = "<group>"; };
 		716A5CE02821AB0D008B792A /* Algorithms.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Algorithms.swift; sourceTree = "<group>"; };
 		716D2991284FBEBD00772CBD /* bubblesort.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = bubblesort.bundle; sourceTree = "<group>"; };
-		717DC94D29DC5D6F00F175DD /* IosMathView+AppKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "IosMathView+AppKit.swift"; sourceTree = "<group>"; };
 		7180DC262850EA160059D1DB /* gnomesort.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = gnomesort.bundle; sourceTree = "<group>"; };
 		7180DC2A285116400059D1DB /* shakersort.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = shakersort.bundle; sourceTree = "<group>"; };
 		718246DC284685E4003842E3 /* ComplexityEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComplexityEntry.swift; sourceTree = "<group>"; };
@@ -332,14 +331,6 @@
 			path = Primary;
 			sourceTree = "<group>";
 		};
-		717DC94A29DC5CF400F175DD /* Mac */ = {
-			isa = PBXGroup;
-			children = (
-				717DC94D29DC5D6F00F175DD /* IosMathView+AppKit.swift */,
-			);
-			path = Mac;
-			sourceTree = "<group>";
-		};
 		7196E25629DAF398000E9CB7 /* iOS */ = {
 			isa = PBXGroup;
 			children = (
@@ -427,7 +418,6 @@
 			children = (
 				71EFDE812AD0492A00D893FC /* PrivacyInfo.xcprivacy */,
 				7191A99329E6DC780035C9E5 /* Localizable.strings */,
-				717DC94A29DC5CF400F175DD /* Mac */,
 				7196E25629DAF398000E9CB7 /* iOS */,
 				71CBE19D29A64BE800C7DEC9 /* .swiftlint.yml */,
 				71E6B239282033D300672D55 /* Sort Symphony--iOS--Info.plist */,
