@@ -22,8 +22,8 @@ import SwiftUI
   }
 }
 
-struct Category_Previews: PreviewProvider {
-  static var previews: some View {
+#Preview {
+  Group {
     Category(text: "Logarithmic", iconName: "logarithmic-algos")
     Category(text: "Quadratic", iconName: "quadratic-algos")
     Category(text: "Weird", iconName: "weird-algos")

@@ -103,14 +103,4 @@ import Foundation
       case .stoogeSort:    return "stooge"
     }
   }
-
-  public var category: PageCategory {
-    switch self {
-      case .home, .settings: return .none
-      case .quickSort, .mergeSort, .heapSort: return .logarithmic
-      case .bubbleSort, .selectionSort, .insertionSort, .gnomeSort, .shakerSort, .oddEvenSort,
-          .pancakeSort: return .quadratic
-      case .bitonicSort, .radixSort, .shellSort, .combSort, .bogoSort, .stoogeSort: return .weird
-    }
-  }
 }

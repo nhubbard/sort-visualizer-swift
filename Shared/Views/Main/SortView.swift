@@ -11,7 +11,6 @@ import SwiftUI
 struct SortView: View {
   var algorithm: Algorithms
   @StateObject var state: SortViewModel = SortViewModel()
-  @State var isEditingSize: Bool = false
 
   func formatMillis(_ millis: Double) -> String {
     Duration
@@ -73,7 +72,8 @@ struct SortView: View {
     .accessibilityLabel("Reset button")
   }
 
-  @ViewBuilder
+  // FIXME: Uncomment when step function actually works
+  /*@ViewBuilder
   func stepButton() -> some View {
     Button {
       onStep()
@@ -88,7 +88,7 @@ struct SortView: View {
     .keyboardShortcut("w", modifiers: [.command, .shift])
     .disabled(state.running)
     .accessibilityLabel("Step button")
-  }
+  }*/
 
   @ViewBuilder
   func buttonRow() -> some View {
@@ -256,6 +256,10 @@ struct SortView: View {
           state.soundErrorText = error.localizedDescription
           state.showSoundError = true
         }
+      }
+    } else {
+      Task(priority: .high) { [self] in
+        await state.toner.shutdown()
       }
     }
   }

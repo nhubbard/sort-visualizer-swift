@@ -48,8 +48,6 @@ import SwiftUI
   }
 }
 
-struct RandomizingHeader_Previews: PreviewProvider {
-  static var previews: some View {
-    RandomizingHeader(text: "SORT SYMPHONY")
-  }
+#Preview {
+  RandomizingHeader(text: "SORT SYMPHONY")
 }

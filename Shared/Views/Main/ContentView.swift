@@ -103,8 +103,6 @@ struct ContentView: View {
   }
 }
 
-struct ContentView_Previews: PreviewProvider {
-  static var previews: some View {
-    ContentView().frame(minWidth: 1000, minHeight: 600)
-  }
+#Preview {
+  ContentView().frame(minWidth: 1000, minHeight: 600)
 }

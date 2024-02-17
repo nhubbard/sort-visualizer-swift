@@ -11,6 +11,8 @@ import Atomics
 import CollectionConcurrencyKit
 #if !os(macOS) && !targetEnvironment(macCatalyst)
 import DeviceKit
+#else
+import IOKit
 #endif
 import CloudKit
 
@@ -381,15 +383,38 @@ final class SortViewModel: ObservableObject {
                              ?? "[error formatting as seconds]"
       let pace = Double(getOperations()) / unformattedSeconds
       let formattedPace = numberFormatter.format(value: pace) ?? "[error formatting pace]"
+      #if DEBUG
       let formatString = "BENCHMARK: %@, %d items, %d operations, %@s time, %@ op/s, %.1f delay"
       print(String(format: formatString, algorithm.rawValue, data.count, getOperations(), formattedSeconds,
                    formattedPace, delay))
-#if !os(macOS) && !targetEnvironment(macCatalyst)
+      #endif
+      var modelIdentifier: String?
+      #if targetEnvironment(macCatalyst)
+      let service = IOServiceGetMatchingService(
+        kIOMasterPortDefault,
+        IOServiceMatching("IOPlatformExpertDevice")
+      )
+      if let modelData = IORegistryEntryCreateCFProperty(
+        service,
+        "model" as CFString,
+        kCFAllocatorDefault,
+        0
+      ).takeRetainedValue() as? Data {
+        if let modelIdentifierCString = String(data: modelData, encoding: .utf8)?.cString(using: .utf8) {
+          modelIdentifier = String(cString: modelIdentifierCString)
+        }
+      }
+      IOObjectRelease(service)
+      #else
+      modelIdentifier = Device.current.realDevice.safeDescription
+      #endif
+      // FIXME: Migrate this to Swift Data instead of using a manual serializer.
       do {
         try await CKContainer.default().publicCloudDatabase.save(
           try CloudKitRecordEncoder().encode(
             RunRecord(
-              systemModel: Device.current.realDevice.safeDescription,
+              // Technically this is still valid, just a default in case IOKit doesn't work
+              systemModel: modelIdentifier ?? "VirtualMac1,1",
               created: Int(NSDate().timeIntervalSince1970),
               algorithmName: algorithm.rawValue,
               arraySize: data.count,
@@ -403,7 +428,6 @@ final class SortViewModel: ObservableObject {
       } catch let error {
         debugPrint("Failed to encode RunRecord for CloudKit: \(error)")
       }
-#endif
     }
     return isDone
   }
