@@ -7,3 +7,6 @@ disabled_rules:
   - type_body_length
   - switch_case_alignment
   - todo
+  - type_name
+  - force_cast
+  - file_length

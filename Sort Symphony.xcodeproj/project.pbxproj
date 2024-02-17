@@ -40,7 +40,6 @@
 		71650A3E28429DB200A23BC2 /* ScrollingSortView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71650A3D28429DB200A23BC2 /* ScrollingSortView.swift */; };
 		716A5CE12821AB0D008B792A /* Algorithms.swift in Sources */ = {isa = PBXBuildFile; fileRef = 716A5CE02821AB0D008B792A /* Algorithms.swift */; };
 		716D2992284FBEBD00772CBD /* bubblesort.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 716D2991284FBEBD00772CBD /* bubblesort.bundle */; };
-		717DC94E29DC5D6F00F175DD /* IosMathView+AppKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 717DC94D29DC5D6F00F175DD /* IosMathView+AppKit.swift */; };
 		7180DC272850EA160059D1DB /* gnomesort.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 7180DC262850EA160059D1DB /* gnomesort.bundle */; };
 		7180DC2B285116400059D1DB /* shakersort.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 7180DC2A285116400059D1DB /* shakersort.bundle */; };
 		718246DD284685E4003842E3 /* ComplexityEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 718246DC284685E4003842E3 /* ComplexityEntry.swift */; };
@@ -48,7 +47,6 @@
 		71847C51284100180018E66C /* Image+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71847C50284100180018E66C /* Image+Extensions.swift */; };
 		718FE3F6287F365500620341 /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 718FE3F5287F365500620341 /* Credits.rtf */; };
 		718FE3FA287F3E7F00620341 /* StateToggle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 718FE3F9287F3E7F00620341 /* StateToggle.swift */; };
-		7191A99129E6DC780035C9E5 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 7191A99329E6DC780035C9E5 /* Localizable.strings */; };
 		7191A99529E724210035C9E5 /* PageCategory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7191A99429E724210035C9E5 /* PageCategory.swift */; };
 		7191A99729E724400035C9E5 /* Page.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7191A99629E724400035C9E5 /* Page.swift */; };
 		7196E25829DAF40F000E9CB7 /* CustomADSRWidget+UIKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7196E25729DAF40F000E9CB7 /* CustomADSRWidget+UIKit.swift */; };
@@ -71,6 +69,7 @@
 		71CCA06D28663CFF00E4D666 /* ColorfulTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71CCA06C28663CFF00E4D666 /* ColorfulTheme.swift */; };
 		71CCA06F2866446800E4D666 /* DraculaTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71CCA06E2866446800E4D666 /* DraculaTheme.swift */; };
 		71CCA0712866475A00E4D666 /* EmacsTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71CCA0702866475A00E4D666 /* EmacsTheme.swift */; };
+		71CF1BAB2B810C5A00E6F5D1 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 7191A99329E6DC780035C9E5 /* Localizable.strings */; };
 		71CFABF9283951C5004672DB /* QuickSortImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71CFABF8283951C5004672DB /* QuickSortImpl.swift */; };
 		71CFABFC28395264004672DB /* MergeSortImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71CFABFB28395264004672DB /* MergeSortImpl.swift */; };
 		71CFABFE2839528A004672DB /* HeapSortImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71CFABFD2839528A004672DB /* HeapSortImpl.swift */; };
@@ -134,7 +133,6 @@
 		71650A3D28429DB200A23BC2 /* ScrollingSortView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollingSortView.swift; sourceTree = "<group>"; };
 		716A5CE02821AB0D008B792A /* Algorithms.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Algorithms.swift; sourceTree = "<group>"; };
 		716D2991284FBEBD00772CBD /* bubblesort.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = bubblesort.bundle; sourceTree = "<group>"; };
-		717A66F729F6CB640028B46F /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/Localizable.strings; sourceTree = "<group>"; };
 		717DC94D29DC5D6F00F175DD /* IosMathView+AppKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "IosMathView+AppKit.swift"; sourceTree = "<group>"; };
 		7180DC262850EA160059D1DB /* gnomesort.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = gnomesort.bundle; sourceTree = "<group>"; };
 		7180DC2A285116400059D1DB /* shakersort.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = shakersort.bundle; sourceTree = "<group>"; };
@@ -541,7 +539,6 @@
 			knownRegions = (
 				en,
 				Base,
-				es,
 			);
 			mainGroup = 71D4DBC428185904001DBD0E;
 			packageReferences = (
@@ -571,6 +568,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				71CF1BAB2B810C5A00E6F5D1 /* Localizable.strings in Resources */,
 				71BCE0FE2847B8B6007C8254 /* mergesort.bundle in Resources */,
 				718FE3F6287F365500620341 /* Credits.rtf in Resources */,
 				716D2992284FBEBD00772CBD /* bubblesort.bundle in Resources */,
@@ -587,7 +585,6 @@
 				71F9C46228623A8200159EF5 /* pancakesort.bundle in Resources */,
 				71F9C464286261DC00159EF5 /* bitonicsort.bundle in Resources */,
 				7113FCB5286758DF00665F09 /* shellsort.bundle in Resources */,
-				7191A99129E6DC780035C9E5 /* Localizable.strings in Resources */,
 				715B11FD286C9C8D0087E837 /* stoogesort.bundle in Resources */,
 				71610C0E2844213900A2696C /* quicksort.bundle in Resources */,
 			);
@@ -679,7 +676,6 @@
 				714AA7812845013200D92535 /* Color+Extensions.swift in Sources */,
 				71CFAC0528396D4C004672DB /* InsertionSortImpl.swift in Sources */,
 				71CFAC0728396D6C004672DB /* GnomeSortImpl.swift in Sources */,
-				717DC94E29DC5D6F00F175DD /* IosMathView+AppKit.swift in Sources */,
 				71CCA05F2865F54B00E4D666 /* CodeTheme.swift in Sources */,
 				71CFAC1628396F63004672DB /* CombSortImpl.swift in Sources */,
 				714ED663291E9BD400731003 /* ShuffleMethod.swift in Sources */,
@@ -699,7 +695,6 @@
 			isa = PBXVariantGroup;
 			children = (
 				7191A99229E6DC780035C9E5 /* en */,
-				717A66F729F6CB640028B46F /* es */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
