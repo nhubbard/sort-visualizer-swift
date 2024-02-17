@@ -15,6 +15,7 @@ struct Sort2App: App {
     WindowGroup {
       ContentView()
         .frame(minWidth: 1400, minHeight: 900)
+        .padding(.all, 2)
         .task {
           // Create default settings
           if !UserDefaults.standard.bool(forKey: "isConfigured") {
@@ -41,7 +42,7 @@ struct Sort2App: App {
     .commands {
       SidebarCommands()
     }
-    #endif
     .windowResizability(.contentMinSize)
+    #endif
   }
 }

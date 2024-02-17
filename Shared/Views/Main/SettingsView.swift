@@ -26,7 +26,6 @@ private func rangeOfNotes(_ octave: Int) -> [String] {
 private let noteOptions: [String] = Array([rangeOfNotes(0), rangeOfNotes(1), rangeOfNotes(2), rangeOfNotes(3),
                                            rangeOfNotes(4), rangeOfNotes(5), rangeOfNotes(6), rangeOfNotes(7),
                                            rangeOfNotes(8)].joined())
-private let noteCount = noteOptions.count
 private let shuffleOptions: [ShuffleMethod] = [.random, .ascending, .descending, .shuffledCubic, .shuffledQuintic]
 private let themeOptions: [CodeThemes] = [.monokai, .pygments, .arduino, .colorful, .dracula, .emacs]
 

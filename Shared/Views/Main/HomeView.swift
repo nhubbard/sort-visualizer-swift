@@ -30,9 +30,7 @@ import MarkdownUI
   }
 }
 
-struct HomeView_Previews: PreviewProvider {
-  static var previews: some View {
-    HomeView()
-      .frame(minWidth: 900, minHeight: 600)
-  }
+#Preview {
+  HomeView()
+    .frame(minWidth: 900, minHeight: 600)
 }

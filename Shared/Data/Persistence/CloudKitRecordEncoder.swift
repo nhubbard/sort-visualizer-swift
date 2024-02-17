@@ -168,11 +168,6 @@ extension _CloudKitRecordEncoder.KeyedContainer: KeyedEncodingContainerProtocol 
     }
   }
 
-  private func produceReference(for value: CustomCloudKitEncodable) throws -> CKRecord.Reference {
-    let childRecord = try CloudKitRecordEncoder().encode(value)
-    return CKRecord.Reference(record: childRecord, action: .deleteSelf)
-  }
-
   private func prepareMetaRecord(with systemFields: Data) throws {
     let coder = try NSKeyedUnarchiver(forReadingFrom: systemFields)
     coder.requiresSecureCoding = true

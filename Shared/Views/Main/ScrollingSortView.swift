@@ -12,39 +12,6 @@ struct ScrollingSortView: View {
   var algorithm: Algorithms
   @State private var selectedLanguage: LanguageEntry = languages[0]
 
-  @ViewBuilder
-  func implementations() -> some View {
-    /*VStack(alignment: .center, spacing: 0) {
-      ForEach(0..<languages.count, id: \.self) { i in
-        VStack {
-          Label {
-            Text(languages[i].title)
-          } icon: {
-            Image.ofAsset(
-              languages[i].icon,
-              width: CGFloat(languages[i].iconWidth),
-              height: CGFloat(languages[i].iconHeight)
-            )
-            .foregroundColor(languages[i].iconColor ?? .primary)
-          }
-        }
-        .padding(.all, 10)
-        .background(
-          Capsule()
-            .fill(.primary)
-            .opacity(self.selectedLanguage == i ? 0.24 : 0)
-        )
-        .onTapGesture { self.selectedLanguage = i }
-      }
-    }
-    .frame(alignment: .center)
-    .padding(.all, 3)
-    .background(
-      RoundedRectangle(cornerSize: CGSize(width: 4, height: 4))
-        .fill(Color.primary.opacity(0.06))
-    )*/
-  }
-
   var body: some View {
     GeometryReader { geo in
       ScrollView {
@@ -98,13 +65,6 @@ struct ScrollingSortView: View {
             Picker("Language", selection: $selectedLanguage) {
               ForEach(languages, id: \.self) { language in
                 Text(language.title)
-                /*Image.ofAsset(
-                  language.icon,
-                  width: CGFloat(language.iconWidth),
-                  height: CGFloat(language.iconHeight)
-                )
-                .foregroundColor(language.iconColor ?? .primary)
-                .padding(.all, 4)*/
               }
             }.pickerStyle(.palette)
             AttributedCode(loadHighlightResource(algorithm, selectedLanguage.fileExtension))

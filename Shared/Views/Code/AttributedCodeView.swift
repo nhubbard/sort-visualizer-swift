@@ -38,8 +38,6 @@ struct AttributedCode: View {
   }
 }
 
-struct AttributedCode_Previews: PreviewProvider {
-  static var previews: some View {
-    AttributedCode("^[// Testing, testing, 123.](code: 'Token.Comment.Preproc')")
-  }
+#Preview {
+  AttributedCode("^[// Testing, testing, 123.](code: 'Token.Comment.Preproc')")
 }

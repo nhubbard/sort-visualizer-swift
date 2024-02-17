@@ -49,7 +49,3 @@
 * [ ] Use Swift Charts to add complexity graphs to the ScrollingSortView.
 * [x] Collect up to 10 samples of every size of the algorithms (with the exception of Bogo Sort and Stooge Sort) and place them on the complexity graphs relative to the known size
 * [ ] Implement either ScreenCaptureKit or serialized operation recording functionality
-
-## Far-Out Ideas
-
-* [x] Implement Fastlane or similar build tooling
