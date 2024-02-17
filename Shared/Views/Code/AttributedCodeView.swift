@@ -1,14 +1,18 @@
 //
 //  AttributedCodeView.swift
-//  Sort Visualizer (iOS)
+//  Sort Symphony (iOS)
 //
 //  Created by Nicholas Hubbard on 6/23/22.
 //
 import SwiftUI
 
 struct AttributedCode: View {
-  let theme: CodeTheme = MonokaiTheme()
-  private var attributedString: AttributedString
+  // Defaults to CodeThemes.monokai
+  @AppStorage("sortCodeViewTheme") var codeThemeId: Int = 0
+  var theme: CodeTheme {
+    CodeThemes.fromInt(codeThemeId).theme()
+  }
+  private var attributedString: AttributedString!
 
   var body: some View {
     Text(attributedString)
@@ -21,7 +25,7 @@ struct AttributedCode: View {
 
   init(_ key: String) {
     attributedString = AttributedCode.annotateCode(
-      from: AttributedString(localized: String.LocalizationValue(key), including: \.sortVisualizerApp), theme: theme)
+      from: AttributedString(localized: String.LocalizationValue(key), including: \.sortSymphonyApp), theme: theme)
   }
 
   private static func annotateCode(from source: AttributedString, theme: CodeTheme) -> AttributedString {

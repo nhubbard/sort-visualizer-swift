@@ -1,6 +1,6 @@
 //
 //  ShuffleMethod.swift
-//  Sort Visualizer (iOS)
+//  Sort Symphony (iOS)
 //
 //  Created by Nicholas Hubbard on 11/11/22.
 //
@@ -52,10 +52,13 @@ private func genShuffledN(power: Double, size: Int = 256) -> [Int] {
   }
 
   /// Create an array of numbers, shuffled using the defined method. Synchronous.
-  /// - Parameter method: The method to shuffle with.
+  /// - Parameter method: The shuffle method. Defaults to the current UserDefaults value for the key sortShuffleMethod.
   /// - Parameter maximum: The largest number in the sequence.
   /// - Returns: An array of `SortItem`s, with their values shuffled according to the chosen method.
-  static func createSync(method: ShuffleMethod = .random, maximum: Int = 256) -> [SortItem] {
+  static func createSync(
+    method: ShuffleMethod = fromInt(UserDefaults.standard.integer(forKey: "sortShuffleMethod")),
+    maximum: Int = 256
+  ) -> [SortItem] {
     switch method {
       case .random:
         return (1...maximum).map {
@@ -82,11 +85,14 @@ private func genShuffledN(power: Double, size: Int = 256) -> [Int] {
 
   /// Create an array of numbers, shuffled using the defined method. Parallel asynchronous. Isolated to main actor,
   /// because that's the only place this function is used.
-  /// - Parameter method: The method to shuffle with.
+  /// - Parameter method: The shuffle method. Defaults to the current UserDefaults value for the key sortShuffleMethod.
   /// - Parameter maximum: The largest number in the sequence.
   /// - Returns: An array of `SortItem`s, with their values shuffled according to the chosen method.
   @MainActor
-  static func create(method: ShuffleMethod = .random, maximum: Int = 256) async -> [SortItem] {
+  static func create(
+    method: ShuffleMethod = fromInt(UserDefaults.standard.integer(forKey: "sortShuffleMethod")),
+    maximum: Int = 256
+  ) async -> [SortItem] {
     switch method {
       case .random:
         return await (1...maximum).concurrentMap(withPriority: .high) {

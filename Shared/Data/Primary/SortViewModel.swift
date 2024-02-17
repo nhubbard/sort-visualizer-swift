@@ -9,7 +9,7 @@ import Foundation
 import SwiftUI
 import Atomics
 import CollectionConcurrencyKit
-#if !os(macOS)
+#if !os(macOS) && !targetEnvironment(macCatalyst)
 import DeviceKit
 #endif
 import CloudKit
@@ -33,13 +33,13 @@ final class SortViewModel: ObservableObject {
   }()
 
   // Published sorting state variables
-  @Published var arraySizeBacking: Float = Float(256)
+  @Published var arraySizeBacking: Float = Float(max(16, UserDefaults.standard.integer(forKey: "sortArraySize")))
   @Published var data: [SortItem] = ShuffleMethod.createSync(maximum: 256)
   @Published var operations: ManagedAtomic<Int> = ManagedAtomic(0)
   @Published var isSorted: Bool = false
   @Published var running: Bool = false
-  @Published var sound: Bool = false
-  @Published var delay: Float = 0.1
+  @AppStorage("sortSoundOn", store: .standard) var sound: Bool = false
+  @AppStorage("sortDelay", store: .standard) var delay: Float = 0.1
   @Published var sizeRange: ClosedRange<Float> = 16...2048
 
   // Published UI state variables
@@ -64,18 +64,17 @@ final class SortViewModel: ObservableObject {
   // Timer
   @Published var startTime: CFAbsoluteTime = CFAbsoluteTimeGetCurrent()
   @Published var endTime: CFAbsoluteTime?
-  @Published var asSeconds: Bool = false
+  @AppStorage("sortFormatRuntime") var sortFormatRuntime: Bool = false
 
   // Settings
-  @AppStorage("synthLowNote") var synthLowNote: Int = 36
-  @AppStorage("synthHighNote") var synthHighNote: Int = 72
+  @AppStorage("synthLowNote", store: .standard) var synthLowNote: Int = 36
+  @AppStorage("synthHighNote", store: .standard) var synthHighNote: Int = 72
   var synthRange: ClosedRange<Float> {
     UInt8(synthLowNote).midiNoteToFrequency()...UInt8(synthHighNote).midiNoteToFrequency()
   }
-  @AppStorage("synthAttack") var synthAttack: Float = 0.5
-  @AppStorage("synthDecay") var synthDecay: Float = 0.5
-  @AppStorage("synthSustain") var synthSustain: Float = 0.5
-  @AppStorage("synthRelease") var synthRelease: Float = 0.5
+  @AppStorage("sortSoundOn", store: .standard) var defaultSoundOn: Bool = false
+  @AppStorage("warnBogoSort", store: .standard) var enableBogoSortWarning: Bool = true
+  @AppStorage("warnBitonicSort", store: .standard) var enableBitonicSortWarning: Bool = true
 
   // Standard variables
   var algorithm: Algorithms = .quickSort
@@ -156,6 +155,9 @@ final class SortViewModel: ObservableObject {
   func getRunTime() -> String {
     let duration: Double
     if !running && endTime == nil {
+      if sortFormatRuntime {
+        return String(localized: "0s (0.0 ops/sec)")
+      }
       return String(localized: "0.0 sec (0.0 ops/sec)")
     } else if let endTime {
       duration = endTime - startTime
@@ -164,9 +166,9 @@ final class SortViewModel: ObservableObject {
     }
     let perSecond = Double(getOperations()) / duration
     let formatted = numberFormatter.format(value: perSecond)!
-    if !asSeconds, let formatString = dateFormatter.string(from: duration as TimeInterval) {
+    if sortFormatRuntime, let formatString = dateFormatter.string(from: duration as TimeInterval) {
       return String(localized: "\(formatString) (\(formatted) ops/sec)")
-    } else if asSeconds, let formatString = numberFormatter.format(value: duration) {
+    } else if !sortFormatRuntime, let formatString = numberFormatter.format(value: duration) {
       return String(localized: "\(formatString) sec (\(formatted) ops/sec)")
     } else {
       return String(localized: "\(String(duration)) sec (\(formatted) ops/sec)")
@@ -382,7 +384,7 @@ final class SortViewModel: ObservableObject {
       let formatString = "BENCHMARK: %@, %d items, %d operations, %@s time, %@ op/s, %.1f delay"
       print(String(format: formatString, algorithm.rawValue, data.count, getOperations(), formattedSeconds,
                    formattedPace, delay))
-#if !os(macOS)
+#if !os(macOS) && !targetEnvironment(macCatalyst)
       do {
         try await CKContainer.default().publicCloudDatabase.save(
           try CloudKitRecordEncoder().encode(

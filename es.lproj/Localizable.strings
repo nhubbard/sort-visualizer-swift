@@ -1,6 +1,6 @@
 //
 //  Localizable.strings (English)
-//  Sort Visualizer (iOS)
+//  Sort Symphony (iOS)
 //
 //  Created by Nicholas Hubbard on 05/12/2023.
 //
@@ -14,7 +14,7 @@
 // MARK: Home page
 "Home" = "Página principal";
 "Welcome to" = "Bienvenido a";
-"SORT VISUALIZER" = "SORT VISUALIZER";
+"SORT SYMPHONY" = "SORT SYMPHONY";
 "home_copy" = "Los algoritmos de ordenación se utilizan para ordenar una estructura de datos según una relación de orden específica, como el orden numérico o el orden lexicográfico.
 
 Esta operación es una de las más importantes y extendidas en informática. Durante mucho tiempo se han desarrollado nuevos métodos para que este procedimiento sea cada vez más rápido.
@@ -213,7 +213,7 @@ El sonido no estará disponible hasta que se reinicie la aplicación y/o se resu
 El sonido no estará disponible hasta que se reinicie la aplicación y/o se resuelva cualquier problema relacionado con el audio.";
 "Bitonic Sort Warning Message" = "La ordenación bitónica fallará a menos que el tamaño de la matriz sea una potencia de dos. Esta es una limitación conocida de la ordenación bitónica y no se puede evitar.
 
-Para evitar que la aplicación se bloquee, el Sort Visualizer redondeará automáticamente el tamaño de la matriz a la siguiente potencia mas alta de dos para evitar errores. Esta advertencia no se volverá a mostrar mientras la aplicación esté en funcionamiento.
+Para evitar que la aplicación se bloquee, el Sort Symphony redondeará automáticamente el tamaño de la matriz a la siguiente potencia mas alta de dos para evitar errores. Esta advertencia no se volverá a mostrar mientras la aplicación esté en funcionamiento.
 
 Pulsa OK para continuar.";
 "Set Array Size" = "Establecer tamaño de matriz";

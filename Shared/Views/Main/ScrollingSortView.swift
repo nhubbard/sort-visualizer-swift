@@ -10,16 +10,13 @@ import MarkdownUI
 
 struct ScrollingSortView: View {
   var algorithm: Algorithms
-  @State private var selectedLanguage: Int = 0
+  @State private var selectedLanguage: LanguageEntry = languages[0]
 
   @ViewBuilder
   func implementations() -> some View {
-    Text(String(localized: "Implementations"))
-      .font(.system(size: 24, weight: .bold, design: .default))
-      .multilineTextAlignment(.leading)
-    HStack(alignment: .center, spacing: 0) {
+    /*VStack(alignment: .center, spacing: 0) {
       ForEach(0..<languages.count, id: \.self) { i in
-        HStack {
+        VStack {
           Label {
             Text(languages[i].title)
           } icon: {
@@ -42,7 +39,10 @@ struct ScrollingSortView: View {
     }
     .frame(alignment: .center)
     .padding(.all, 3)
-    .background(Capsule().fill(Color.primary.opacity(0.06)))
+    .background(
+      RoundedRectangle(cornerSize: CGSize(width: 4, height: 4))
+        .fill(Color.primary.opacity(0.06))
+    )*/
   }
 
   var body: some View {
@@ -53,6 +53,7 @@ struct ScrollingSortView: View {
             .frame(width: geo.size.width, height: geo.size.height)
           Group {
             HStack(alignment: .top, spacing: 16) {
+              // Description
               VStack(alignment: .center, spacing: 16) {
                 Text(String(localized: "Description"))
                   .font(.system(size: 24, weight: .bold, design: .default))
@@ -61,6 +62,7 @@ struct ScrollingSortView: View {
                   .font(.system(size: 16, design: .default))
                   .lineSpacing(1.75)
               }.frame(maxWidth: 0.65 * geo.size.width)
+              // Complexity
               VStack(alignment: .center, spacing: 16) {
                 Text(String(localized: "Complexity"))
                   .font(.system(size: 24, weight: .bold, design: .default))
@@ -68,7 +70,7 @@ struct ScrollingSortView: View {
                 VStack(spacing: 2) {
                   ForEach(loadComplexityResource(algorithm)) { entry in
                     HStack(alignment: .center, spacing: 1) {
-                      Group {
+                        Group {
                         if entry.mathml != "" {
                           MathView(text: entry.key, unicode: entry.value, math: entry.mathml)
                             .frame(width: nil, height: 36)
@@ -89,17 +91,23 @@ struct ScrollingSortView: View {
               }.frame(maxWidth: 0.35 * geo.size.width)
             }
           }.padding(.all, 32)
-          Group {
-            #if os(iOS)
-            VStack {
-              implementations()
-            }
-            #else
-            HStack {
-              implementations()
-            }
-            #endif
-            AttributedCode(loadHighlightResource(algorithm, languages[self.selectedLanguage].fileExtension))
+          VStack(alignment: .center, spacing: 8) {
+            Text(String(localized: "Implementations"))
+              .font(.system(size: 24, weight: .bold, design: .default))
+              .multilineTextAlignment(.leading)
+            Picker("Language", selection: $selectedLanguage) {
+              ForEach(languages, id: \.self) { language in
+                Text(language.title)
+                /*Image.ofAsset(
+                  language.icon,
+                  width: CGFloat(language.iconWidth),
+                  height: CGFloat(language.iconHeight)
+                )
+                .foregroundColor(language.iconColor ?? .primary)
+                .padding(.all, 4)*/
+              }
+            }.pickerStyle(.palette)
+            AttributedCode(loadHighlightResource(algorithm, selectedLanguage.fileExtension))
               .drawingGroup()
           }.padding(.all, 32)
         }

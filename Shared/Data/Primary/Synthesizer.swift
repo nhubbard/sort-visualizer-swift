@@ -29,9 +29,8 @@ final class Synthesizer: Sendable {
     osc = Oscillator()
     env = AmplitudeEnvelope(osc)
     fader = Fader(env)
-    osc.amplitude = UserDefaults.standard.float(forKey: "synthAmplitude")
-    print("Amplitude: \(UserDefaults.standard.float(forKey: "synthAmplitude")), \(osc.amplitude)")
     engine.output = fader
+    osc.amplitude = UserDefaults.standard.float(forKey: "synthAmplitude")
     env.attackDuration = UserDefaults.standard.float(forKey: "synthAttack")
     env.decayDuration = UserDefaults.standard.float(forKey: "synthDecay")
     env.sustainLevel = UserDefaults.standard.float(forKey: "synthSustain")

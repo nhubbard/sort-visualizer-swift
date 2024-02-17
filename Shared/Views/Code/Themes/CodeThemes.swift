@@ -1,6 +1,6 @@
 //
 //  CodeThemes.swift
-//  Sort Visualizer (iOS)
+//  Sort Symphony (iOS)
 //
 //  Created by Nicholas Hubbard on 12/10/22.
 //
@@ -35,6 +35,17 @@ import Foundation
       case 4:  return .dracula
       case 5:  return .emacs
       default: return .monokai
+    }
+  }
+
+  func theme() -> CodeTheme {
+    switch self {
+      case .arduino: return ArduinoTheme()
+      case .colorful: return ColorfulTheme()
+      case .dracula: return DraculaTheme()
+      case .emacs: return EmacsTheme()
+      case .monokai: return MonokaiTheme()
+      case .pygments: return PygmentsTheme()
     }
   }
 }

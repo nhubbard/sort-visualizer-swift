@@ -14,11 +14,11 @@
 * [x] Branding and general customization
   * [x] App icon
   * [x] About dialog (see Shared/Resources/Credits.rtf)
-* [ ] Settings Panel (use new SwiftUI 4 forms interface?)
+* [x] Settings Panel (use new SwiftUI 4 forms interface)
   * [x] First things first: type-safe configuration lookup is an absolute requirement. We might be able to accomplish this using SwiftUI's awesome "environment" dependency injection.
   * [x] Synthesizer
     * [x] Default to on or off (toggle)
-    * [x] Note range (use piano control from AudioKitUI, see Cookbook app for examples)
+    * [x] Note range (use piano control from AudioKitUI? see Cookbook app for examples)
     * [x] Amplitude, attack, decay, sustain, release (use freq curve control from AudioKitUI, see Cookbook app for examples)
   * [x] Sort view
     * [x] Default delay (slider and/or input box)
@@ -33,9 +33,8 @@
       * [x] Shuffled Quintic
   * [x] Disable bogo sort warning prompt
   * [x] Disable bitonic sort warning
-  * [ ] Fix layout of settings on Mac Catalyst
-  * [ ] Make the settings actually apply to the application!
-* [ ] Make local sort settings a DisclosureGroup
+  * [x] Fix layout of settings on Mac Catalyst
+  * [x] Make the settings actually apply to the application!
 * [ ] Expand the counters from just "Operations" to the standard set of metrics (array accesses, inversions, reversals, etc.)
 
 ### Not Started/Future Plans
@@ -43,22 +42,14 @@
 * [ ] Make navigation three-tiered? Allows for more categories.
 * [ ] Add more sorting algorithms? Port them from Gaming32/ArrayV, if possible.
 * [ ] Finally implement step functionality, possibly using delay as a catalyst
+  * Commented out step functionality with v1.1 to reduce confusion. The code is still there, but the button is not rendered.
 
 ## Future Ideas from WWDC 2022+
 
 * [ ] Use Swift Charts to add complexity graphs to the ScrollingSortView.
-* [ ] Collect up to 10 samples of every size of the algorithms (with the exception of Bogo Sort and Stooge Sort) and place them on the complexity graphs relative to the known size
+* [x] Collect up to 10 samples of every size of the algorithms (with the exception of Bogo Sort and Stooge Sort) and place them on the complexity graphs relative to the known size
 * [ ] Implement either ScreenCaptureKit or serialized operation recording functionality
 
 ## Far-Out Ideas
 
-* [ ] Rewrite MarkdownUI, since it hasn't been frequently updated and might break in iOS 17/macOS 14
-* [ ] Implement Fastlane or similar build tooling
-
-## BizDev
-
-* [ ] Implement Apple crash reporting (if I have to do anything)
-* [ ] Implement StoreKit
-  * I've settled on between a $1.99 and $4.99 one-time purchase, with an education discount of 50% if I can implement it.
-  * Before doing this, make sure to apply to the Apple Small Business program so I only have to pay 15% commissions.
-  * I'm okay with the high commission, since I don't want to deal with the absolute hell that is third-party payment systems.
+* [x] Implement Fastlane or similar build tooling

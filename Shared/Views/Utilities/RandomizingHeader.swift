@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-@frozen public struct RandomizingHeader: View, Sendable {
+@frozen public struct RandomizingHeader: View, @unchecked Sendable {
   let text: String
   @State var currentText: String = ""
 
@@ -50,6 +50,6 @@ import SwiftUI
 
 struct RandomizingHeader_Previews: PreviewProvider {
   static var previews: some View {
-    RandomizingHeader(text: "SORT VISUALIZER")
+    RandomizingHeader(text: "SORT SYMPHONY")
   }
 }

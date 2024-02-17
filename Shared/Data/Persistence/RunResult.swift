@@ -1,6 +1,6 @@
 //
 //  RunResult.swift
-//  Sort Visualizer (iOS)
+//  Sort Symphony (iOS)
 //
 //  Created by Nicholas Hubbard on 5/17/23.
 //

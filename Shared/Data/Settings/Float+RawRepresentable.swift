@@ -1,6 +1,6 @@
 //
 //  Float+RawRepresentable.swift
-//  Sort Visualizer (iOS)
+//  Sort Symphony (iOS)
 //
 //  Created by Nicholas Hubbard on 1/1/23.
 //

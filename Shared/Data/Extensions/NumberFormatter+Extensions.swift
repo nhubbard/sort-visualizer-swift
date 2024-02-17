@@ -1,6 +1,6 @@
 //
 //  NumberFormatter+Extensions.swift
-//  Sort Visualizer (iOS)
+//  Sort Symphony (iOS)
 //
 //  Created by Nicholas Hubbard on 7/26/22.
 //

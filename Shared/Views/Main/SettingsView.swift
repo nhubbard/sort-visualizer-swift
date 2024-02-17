@@ -1,6 +1,6 @@
 //
 //  SettingsView.swift
-//  Sort Visualizer (iOS)
+//  Sort Symphony (iOS)
 //
 //  Created by Nicholas Hubbard on 11/30/22.
 //
@@ -72,10 +72,46 @@ struct SettingsView: View {
           HStack(spacing: 8) {
             Slider(value: $synthAmplitude, in: 0.0...5.0, step: 0.05)
             Text(String(format: "%.2f", synthAmplitude))
-          }.frame(maxWidth: 375)
+          }
         } label: {
           Text(String(localized: "Amplitude"))
         }
+        #if os(macOS)
+        Group {
+          LabeledContent {
+            HStack(spacing: 8) {
+              Slider(value: $attack, in: 0.0...1.0, step: 0.05)
+              Text(String(format: "%.2f", attack))
+            }
+          } label: {
+            Text("Attack")
+          }
+          LabeledContent {
+            HStack(spacing: 8) {
+              Slider(value: $decay, in: 0.0...1.0, step: 0.05)
+              Text(String(format: "%.2f", decay))
+            }
+          } label: {
+            Text("Decay")
+          }
+          LabeledContent {
+            HStack(spacing: 8) {
+              Slider(value: $sustain, in: 0.0...1.0, step: 0.05)
+              Text(String(format: "%.2f", sustain))
+            }
+          } label: {
+            Text("Sustain")
+          }
+          LabeledContent {
+            HStack(spacing: 8) {
+              Slider(value: $release, in: 0.0...1.0, step: 0.05)
+              Text(String(format: "%.2f", release))
+            }
+          } label: {
+            Text("Release")
+          }
+        }
+        #else
         LabeledContent {
           VStack {
             CustomADSRWidget().frame(maxWidth: 440, minHeight: 150)
@@ -91,6 +127,7 @@ struct SettingsView: View {
         } label: {
           Text(String(localized: "Attack, decay, sustain, and release"))
         }
+        #endif
       }
       Section(header: Text(String(localized: "SORTING"))) {
         // Sound on by default
@@ -142,6 +179,5 @@ struct SettingsView: View {
           .toggleStyle(.switch)
       }
     }
-    .padding()
   }
 }

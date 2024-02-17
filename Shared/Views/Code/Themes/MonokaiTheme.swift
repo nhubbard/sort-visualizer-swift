@@ -1,6 +1,6 @@
 //
 //  MonokaiTheme.swift
-//  Sort Visualizer (iOS)
+//  Sort Symphony (iOS)
 //
 //  Created by Nicholas Hubbard on 6/24/22.
 //

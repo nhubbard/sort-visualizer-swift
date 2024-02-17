@@ -1,6 +1,6 @@
 //
 //  CloudKitCodable.swift
-//  Sort Visualizer (iOS)
+//  Sort Symphony (iOS)
 //
 //  Created by Nicholas Hubbard on 5/18/23.
 //

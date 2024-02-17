@@ -1,6 +1,6 @@
 //
 //  Localizable.strings (English)
-//  Sort Visualizer (iOS)
+//  Sort Symphony (iOS)
 //
 //  Created by Nicholas Hubbard on 05/12/2023.
 //
@@ -14,7 +14,7 @@
 // MARK: Home page
 "Home" = "Home";
 "Welcome to" = "Welcome to";
-"SORT VISUALIZER" = "SORT VISUALIZER";
+"SORT SYMPHONY" = "SORT SYMPHONY";
 "home_copy" = "Sorting algorithms are used to sort a data structure according to a specific order relationship, such as numerical order or lexicographical order.
 
 This operation is one of the most important and widespread in computer science. For a long time, new methods have been developed to make this procedure faster and faster.
@@ -207,7 +207,7 @@ Sound will not be available until the app is restarted and/or any audio-related 
 Sound will not be available until the app is restarted and/or any audio-related issue is resolved.";
 "Bitonic Sort Warning Message" = "Bitonic sort will fail unless the the array size is a power of two. This is a known limitation of bitonic sort and cannot be worked around.
 
-To prevent the app from crashing, Sort Visualizer will automatically round the array size to the next highest power of two to prevent errors. This warning will not be shown again while the app is running.
+To prevent unexpected crashes, the app will automatically round the array size to the next highest power of two to prevent errors. This warning will not be shown again while the app is running.
 
 Press OK to continue.";
 "Set Array Size" = "Set Array Size";

@@ -14,7 +14,8 @@ struct SortView: View {
   @State var isEditingSize: Bool = false
 
   func formatMillis(_ millis: Double) -> String {
-    Duration.milliseconds(millis)
+    Duration
+      .milliseconds(millis)
       .formatted(.units(allowed: [.milliseconds], fractionalPart: .show(length: 1)))
   }
 
@@ -24,7 +25,9 @@ struct SortView: View {
     let rectMinHeight = geo.size.height / CGFloat(state.data.count)
     HStack(alignment: .bottom, spacing: 0) {
       ForEach(state.data) { item in
-        Rectangle().fill(item.color).frame(width: rectWidth, height: rectMinHeight * CGFloat(item.value))
+        Rectangle()
+          .fill(item.color)
+          .frame(width: rectWidth, height: rectMinHeight * CGFloat(item.value))
       }
     }.frame(width: geo.size.width, height: geo.size.height, alignment: .bottomLeading)
   }
@@ -33,8 +36,10 @@ struct SortView: View {
   func runningToggle() -> some View {
     StateToggle(binding: $state.running, name: String(localized: "Running"), iconName: "play.fill", maxWidth: 170)
       .accessibilityLabel("Running toggle")
-      .onChange(of: state.running) { onRunning(newValue: $0) }
-      .keyboardShortcut("r", modifiers: [.command, .shift])
+      .onChange(of: state.running, initial: true) { _, newValue in
+        onRunning(newValue: newValue)
+      }
+      .keyboardShortcut("s", modifiers: [.command, .shift])
   }
 
   @ViewBuilder
@@ -42,8 +47,10 @@ struct SortView: View {
     StateToggle(binding: $state.sound, name: String(localized: "Sound"), iconName: "speaker.wave.2")
       .accessibilityLabel("Sound toggle")
       .disabled(state.soundDisabled)
-      .onChange(of: state.sound) { onSound(newValue: $0) }
-      .keyboardShortcut("s", modifiers: [.command, .shift])
+      .onChange(of: state.sound, initial: true) { _, newValue in
+        onSound(newValue: newValue)
+      }
+      .keyboardShortcut("a", modifiers: [.command, .shift])
   }
 
   @ViewBuilder
@@ -60,7 +67,10 @@ struct SortView: View {
       onReset()
     } label: {
       Label(String(localized: "Reset"), systemImage: "repeat")
-    }.frame(maxWidth: 150).keyboardShortcut("z", modifiers: [.command, .shift]).accessibilityLabel("Reset button")
+    }
+    .frame(maxWidth: 150)
+    .keyboardShortcut("r", modifiers: [.command, .shift])
+    .accessibilityLabel("Reset button")
   }
 
   @ViewBuilder
@@ -69,9 +79,15 @@ struct SortView: View {
       onStep()
     } label: {
       Label(String(localized: "Step"), systemImage: "figure.walk")
-    }.frame(maxWidth: 150).popover(isPresented: $state.showStepPopover, arrowEdge: .trailing) {
-      Text(String(localized: "Sorry, this function is not implemented yet.")).padding(.all, 4)
-    }.accessibilityLabel("Step button")
+    }
+    .frame(maxWidth: 150)
+    .popover(isPresented: $state.showStepPopover, arrowEdge: .trailing) {
+      Text(String(localized: "Sorry, this function is not implemented yet."))
+        .padding(.all, 4)
+    }
+    .keyboardShortcut("w", modifiers: [.command, .shift])
+    .disabled(state.running)
+    .accessibilityLabel("Step button")
   }
 
   @ViewBuilder
@@ -79,7 +95,7 @@ struct SortView: View {
     HStack(spacing: 10) {
       resetButton()
       // Step button
-      stepButton()
+      // FIXME: stepButton()
     }.padding(.horizontal, 20)
   }
 
@@ -121,7 +137,7 @@ struct SortView: View {
     VStack(spacing: 4) {
       Text(String(localized: "Operations: ")) + Text("\(state.getOperations())").foregroundColor(.blue)
       (Text(String(localized: "Runtime: ")) + Text(state.getRunTime()).foregroundColor(.blue)).onTapGesture(perform: {
-        state.asSeconds.toggle()
+        state.sortFormatRuntime.toggle()
       })
     }
   }
@@ -129,13 +145,16 @@ struct SortView: View {
   @ViewBuilder
   func settingsBox() -> some View {
     // Note: this uses the Settings page label in the localized strings file.
-    GroupBox(label: Label(String(localized: "Settings"), systemImage: "gear").padding(.top, 2).padding(.bottom, 2)) {
-      toggleRow()
-      buttonRow()
-      delaySlider()
-      sizeSlider()
-      opsCounter()
-    }.background(.black.opacity(0.9))
+    GroupBox(label: Label(String(localized: "Settings"), systemImage: "gear").padding(.all, 4)) {
+      Group {
+          toggleRow()
+          buttonRow()
+          delaySlider()
+          sizeSlider()
+          opsCounter()
+      }.padding(.all, 2)
+    }
+      .background(.black.opacity(0.9))
       .cornerRadius(15)
       .frame(minWidth: 300, maxWidth: 450, minHeight: 64)
       .padding([.top, .leading], 16)
@@ -214,9 +233,9 @@ struct SortView: View {
 
   func onRunning(newValue: Bool) {
     if newValue {
-      if algorithm == .bogoSort && !state.bogoSortAccepted {
+      if algorithm == .bogoSort && !state.bogoSortAccepted && state.enableBogoSortWarning {
         state.showBogoSortWarning = true
-      } else if algorithm == .bitonicSort && state.shouldShowBitonicWarning {
+      } else if algorithm == .bitonicSort && state.shouldShowBitonicWarning && state.enableBitonicSortWarning {
         state.showBitonicWarning = true
       } else {
         state.sortTaskRef = Task.init(priority: .high) {

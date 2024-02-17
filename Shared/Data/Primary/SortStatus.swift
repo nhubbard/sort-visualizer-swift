@@ -1,6 +1,6 @@
 //
 //  SortStatus.swift
-//  Sort Visualizer (iOS)
+//  Sort Symphony (iOS)
 //
 //  Created by Nicholas Hubbard on 6/20/22.
 //

@@ -1,6 +1,6 @@
 //
 //  IosMathView+AppKit.swift
-//  Sort Visualizer (iOS)
+//  Sort Symphony (iOS)
 //
 //  Created by Nicholas Hubbard on 4/4/23.
 //

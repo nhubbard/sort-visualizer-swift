@@ -10,21 +10,23 @@ import MarkdownUI
 
 @frozen public struct HomeView: View {
   public var body: some View {
-    VStack(spacing: 2) {
-      Text(String(localized: "Welcome to")).bold()
-      RandomizingHeader(text: String(localized: "SORT VISUALIZER"))
+    ScrollView {
+      VStack(spacing: 2) {
+        Text(String(localized: "Welcome to")).bold()
+        RandomizingHeader(text: String(localized: "SORT SYMPHONY"))
         Markdown {
-            String(localized: "home_copy")
+          String(localized: "home_copy")
         }
         .markdownTextStyle {
-            FontFamilyVariant(.normal)
-            FontFamily(.system())
-            FontSize(.em(1))
+          FontFamilyVariant(.normal)
+          FontFamily(.system())
+          FontSize(.em(1))
         }
         .lineSpacing(1.75)
         .padding()
-    }
-    .navigationTitle(String(localized: "Home"))
+      }
+      .navigationTitle(String(localized: "Home"))
+    }.padding()
   }
 }
 
