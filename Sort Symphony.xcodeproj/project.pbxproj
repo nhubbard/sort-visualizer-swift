@@ -92,6 +92,9 @@
 		71DFD5F02A166D380030ED48 /* CloudKitCodable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71DFD5EF2A166D380030ED48 /* CloudKitCodable.swift */; };
 		71DFD5F22A166D5D0030ED48 /* CloudKitRecordEncoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71DFD5F12A166D5D0030ED48 /* CloudKitRecordEncoder.swift */; };
 		71DFD5F42A166E050030ED48 /* CustomCloudKitEncodable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71DFD5F32A166E050030ED48 /* CustomCloudKitEncodable.swift */; };
+		71E858EC2B83A86D003A8849 /* SortArrayAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71E858EB2B83A86D003A8849 /* SortArrayAction.swift */; };
+		71E858EE2B83A8CF003A8849 /* ModelProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71E858ED2B83A8CF003A8849 /* ModelProtocol.swift */; };
+		71E858F02B83A8FF003A8849 /* SortActor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71E858EF2B83A8FF003A8849 /* SortActor.swift */; };
 		71ECC8C5296D95E000034BE9 /* Binding+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71ECC8C4296D95E000034BE9 /* Binding+Extensions.swift */; };
 		71ED4EAE2831575500880755 /* Atomics in Frameworks */ = {isa = PBXBuildFile; productRef = 71ED4EAD2831575500880755 /* Atomics */; };
 		71F38EB82819B42C0085BAAA /* SortView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71F38EB72819B42C0085BAAA /* SortView.swift */; };
@@ -185,6 +188,9 @@
 		71DFD5F12A166D5D0030ED48 /* CloudKitRecordEncoder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudKitRecordEncoder.swift; sourceTree = "<group>"; };
 		71DFD5F32A166E050030ED48 /* CustomCloudKitEncodable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomCloudKitEncodable.swift; sourceTree = "<group>"; };
 		71E6B239282033D300672D55 /* Sort Symphony--iOS--Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Sort Symphony--iOS--Info.plist"; sourceTree = "<group>"; };
+		71E858EB2B83A86D003A8849 /* SortArrayAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SortArrayAction.swift; sourceTree = "<group>"; };
+		71E858ED2B83A8CF003A8849 /* ModelProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelProtocol.swift; sourceTree = "<group>"; };
+		71E858EF2B83A8FF003A8849 /* SortActor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SortActor.swift; sourceTree = "<group>"; };
 		71ECC8C4296D95E000034BE9 /* Binding+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Binding+Extensions.swift"; sourceTree = "<group>"; };
 		71EFDE812AD0492A00D893FC /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		71F38EB72819B42C0085BAAA /* SortView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SortView.swift; sourceTree = "<group>"; };
@@ -233,6 +239,9 @@
 		714AD4D02B83A198009CF97B /* Service */ = {
 			isa = PBXGroup;
 			children = (
+				71E858EB2B83A86D003A8849 /* SortArrayAction.swift */,
+				71E858ED2B83A8CF003A8849 /* ModelProtocol.swift */,
+				71E858EF2B83A8FF003A8849 /* SortActor.swift */,
 			);
 			path = Service;
 			sourceTree = "<group>";
@@ -613,6 +622,7 @@
 			files = (
 				71B55E0E28383D5C00CA74CB /* Sequence+Extensions.swift in Sources */,
 				71650A2B2842693C00A23BC2 /* CustomIconLabel.swift in Sources */,
+				71E858EC2B83A86D003A8849 /* SortArrayAction.swift in Sources */,
 				71FD4A43281C1F2C00E1E6FA /* SortItem.swift in Sources */,
 				71CFABFE2839528A004672DB /* HeapSortImpl.swift in Sources */,
 				71CCA0612865F57E00E4D666 /* MonokaiTheme.swift in Sources */,
@@ -631,6 +641,7 @@
 				71301B7D295346E80010E430 /* CodeThemes.swift in Sources */,
 				71CFAC0B28396DAE004672DB /* OddEvenSortImpl.swift in Sources */,
 				71CCA06D28663CFF00E4D666 /* ColorfulTheme.swift in Sources */,
+				71E858F02B83A8FF003A8849 /* SortActor.swift in Sources */,
 				71523D5128901D3100CF4D36 /* NumberFormatter+Extensions.swift in Sources */,
 				71650A3E28429DB200A23BC2 /* ScrollingSortView.swift in Sources */,
 				71DFD5EE2A1668440030ED48 /* CloudKitRecordDecoder.swift in Sources */,
@@ -641,6 +652,7 @@
 				71CFAC0928396D90004672DB /* ShakerSortImpl.swift in Sources */,
 				71D4DBDC28185905001DBD0E /* ContentView.swift in Sources */,
 				71619A472860A3FA00CCA31C /* SortStatus.swift in Sources */,
+				71E858EE2B83A8CF003A8849 /* ModelProtocol.swift in Sources */,
 				7120CB9928397DF00019D976 /* Synthesizer.swift in Sources */,
 				71F4B35028207C02006B68E6 /* SortViewModel.swift in Sources */,
 				713371F128775DAE00DE2D7E /* MathView.swift in Sources */,
