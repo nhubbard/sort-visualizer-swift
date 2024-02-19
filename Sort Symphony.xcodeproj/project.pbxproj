@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 56;
+	objectVersion = 60;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -230,6 +230,13 @@
 			path = Data;
 			sourceTree = "<group>";
 		};
+		714AD4D02B83A198009CF97B /* Service */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Service;
+			sourceTree = "<group>";
+		};
 		714ED65D291E85DC00731003 /* Settings */ = {
 			isa = PBXGroup;
 			children = (
@@ -432,6 +439,7 @@
 		71D4DBC928185905001DBD0E /* Shared */ = {
 			isa = PBXGroup;
 			children = (
+				714AD4D02B83A198009CF97B /* Service */,
 				71610BF82844101700A2696C /* Resources */,
 				71052D2D2820352A00935228 /* Data */,
 				71D4DBF2281862E8001DBD0E /* Views */,
@@ -517,7 +525,7 @@
 				};
 			};
 			buildConfigurationList = 71D4DBC828185904001DBD0E /* Build configuration list for PBXProject "Sort Symphony" */;
-			compatibilityVersion = "Xcode 14.0";
+			compatibilityVersion = "Xcode 15.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
