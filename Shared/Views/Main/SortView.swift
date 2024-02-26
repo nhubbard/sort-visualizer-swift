@@ -250,16 +250,12 @@ struct SortView: View {
   }
 
   func onSound(newValue: Bool) {
-    if newValue {
-      Task(priority: .high) { [self] in
+    Task(priority: .high) { [self] in
+      if newValue {
         if case .failure(let error) = await state.toner.start() {
           state.soundErrorText = error.localizedDescription
           state.showSoundError = true
         }
-      }
-    } else {
-      Task(priority: .high) { [self] in
-        await state.toner.shutdown()
       }
     }
   }
