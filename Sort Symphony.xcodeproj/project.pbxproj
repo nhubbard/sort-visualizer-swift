@@ -970,7 +970,7 @@
 			repositoryURL = "https://github.com/AudioKit/AudioKitUI.git";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 0.3.6;
+				minimumVersion = 0.3.7;
 			};
 		};
 		7120CBA028397EE40019D976 /* XCRemoteSwiftPackageReference "SoundpipeAudioKit" */ = {
@@ -1018,7 +1018,7 @@
 			repositoryURL = "https://github.com/gonzalezreal/MarkdownUI";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 2.2.0;
+				minimumVersion = 2.3.0;
 			};
 		};
 		71ED4EAC2831575500880755 /* XCRemoteSwiftPackageReference "swift-atomics" */ = {
