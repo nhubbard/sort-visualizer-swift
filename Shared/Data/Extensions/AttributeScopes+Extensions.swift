@@ -7,7 +7,7 @@
 
 import Foundation
 
-extension AttributeScopes: @unchecked Sendable {
+extension AttributeScopes: @unchecked @retroactive Sendable {
   struct SortSymphonyAttributes: AttributeScope {
     let code: CodeAttributes
   }

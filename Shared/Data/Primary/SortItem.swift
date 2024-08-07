@@ -25,10 +25,6 @@ import SwiftUI
     lhs.value >= rhs.value
   }
 
-  public static func == (lhs: SortItem, rhs: SortItem) -> Bool {
-    lhs.id == rhs.id && lhs.value == rhs.value
-  }
-
   public static func fromInt(value: Int) -> SortItem {
     SortItem(value: value)
   }
@@ -36,6 +32,7 @@ import SwiftUI
   public func hash(into hasher: inout Hasher) {
     hasher.combine(id)
     hasher.combine(value)
+    hasher.combine(color.hashValue)
   }
 
   public var id: UUID = UUID.init()

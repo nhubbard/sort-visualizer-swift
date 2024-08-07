@@ -85,7 +85,7 @@ func loadResource(_ algorithm: Algorithms, _ filename: String, _ ext: String) ->
     fatalError("Couldn't find \(filename).\(ext) in \(key).bundle!")
   }
   do {
-    data = try String(contentsOfFile: String(url))
+    data = try String(contentsOfFile: String(url), encoding: .utf8)
   } catch {
     fatalError("Couldn't load \(filename).\(ext) from \(key).bundle:\n\(error)")
   }
