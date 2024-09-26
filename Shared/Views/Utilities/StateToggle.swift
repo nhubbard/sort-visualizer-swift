@@ -21,3 +21,15 @@ import SwiftUI
     .toggleStyle(.switch)
   }
 }
+
+#Preview("Checked") {
+  StateToggle(binding: Binding {
+    true
+  } set: { _ in }, name: "Running", iconName: "play.fill")
+}
+
+#Preview("Unchecked") {
+  StateToggle(binding: Binding {
+    false
+  } set: { _ in }, name: "Running", iconName: "play.fill")
+}

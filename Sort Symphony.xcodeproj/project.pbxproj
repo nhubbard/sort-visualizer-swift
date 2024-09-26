@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		710A29FA2CA5AB8500970E0A /* Then in Frameworks */ = {isa = PBXBuildFile; productRef = 710A29F92CA5AB8500970E0A /* Then */; };
 		710BF0542821885300F7B066 /* Range+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 710BF0532821885300F7B066 /* Range+Extensions.swift */; };
 		7113FCB328674D1B00665F09 /* CollectionConcurrencyKit in Frameworks */ = {isa = PBXBuildFile; productRef = 7113FCB228674D1B00665F09 /* CollectionConcurrencyKit */; };
 		7113FCB5286758DF00665F09 /* shellsort.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 7113FCB4286758DF00665F09 /* shellsort.bundle */; };
@@ -62,7 +63,6 @@
 		71CCA0612865F57E00E4D666 /* MonokaiTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71CCA0602865F57E00E4D666 /* MonokaiTheme.swift */; };
 		71CCA0642865FBCF00E4D666 /* PygmentsTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71CCA0632865FBCF00E4D666 /* PygmentsTheme.swift */; };
 		71CCA0662865FC9D00E4D666 /* TextFormat.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71CCA0652865FC9D00E4D666 /* TextFormat.swift */; };
-		71CCA0692865FD7300E4D666 /* Then in Frameworks */ = {isa = PBXBuildFile; productRef = 71CCA0682865FD7300E4D666 /* Then */; };
 		71CCA06B2866332D00E4D666 /* ArduinoTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71CCA06A2866332D00E4D666 /* ArduinoTheme.swift */; };
 		71CCA06D28663CFF00E4D666 /* ColorfulTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71CCA06C28663CFF00E4D666 /* ColorfulTheme.swift */; };
 		71CCA06F2866446800E4D666 /* DraculaTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71CCA06E2866446800E4D666 /* DraculaTheme.swift */; };
@@ -202,8 +202,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				71D4DC2528186A0F001DBD0E /* MarkdownUI in Frameworks */,
-				71CCA0692865FD7300E4D666 /* Then in Frameworks */,
 				7120CB9C28397E410019D976 /* AudioKitEX in Frameworks */,
+				710A29FA2CA5AB8500970E0A /* Then in Frameworks */,
 				71ED4EAE2831575500880755 /* Atomics in Frameworks */,
 				7120CB9728397DDF0019D976 /* AudioKit in Frameworks */,
 				7113FCB328674D1B00665F09 /* CollectionConcurrencyKit in Frameworks */,
@@ -491,10 +491,10 @@
 				7120CB9E28397E5B0019D976 /* AudioKitUI */,
 				7120CBA128397EE40019D976 /* SoundpipeAudioKit */,
 				712FAC48285E2A2B0045B50A /* Algorithms */,
-				71CCA0682865FD7300E4D666 /* Then */,
 				7113FCB228674D1B00665F09 /* CollectionConcurrencyKit */,
 				71AEEDD7298707BC00506954 /* iosMath */,
 				716147FA2A152BA2005FBA5B /* DeviceKit */,
+				710A29F92CA5AB8500970E0A /* Then */,
 			);
 			productName = "Sort2 (iOS)";
 			productReference = 71D4DBD128185905001DBD0E /* Sort Symphony.app */;
@@ -507,7 +507,7 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 1520;
+				LastSwiftUpdateCheck = 1600;
 				LastUpgradeCheck = 1500;
 				TargetAttributes = {
 					71D4DBD028185905001DBD0E = {
@@ -533,10 +533,10 @@
 				7120CB9D28397E5B0019D976 /* XCRemoteSwiftPackageReference "AudioKitUI" */,
 				7120CBA028397EE40019D976 /* XCRemoteSwiftPackageReference "SoundpipeAudioKit" */,
 				712FAC47285E2A2B0045B50A /* XCRemoteSwiftPackageReference "swift-algorithms" */,
-				71CCA0672865FD7300E4D666 /* XCRemoteSwiftPackageReference "Then" */,
 				7113FCB128674D1B00665F09 /* XCRemoteSwiftPackageReference "CollectionConcurrencyKit" */,
 				71AEEDD6298707BC00506954 /* XCRemoteSwiftPackageReference "iosMath" */,
 				716147F92A152BA2005FBA5B /* XCRemoteSwiftPackageReference "DeviceKit" */,
+				710A29F82CA5AB8500970E0A /* XCRemoteSwiftPackageReference "then" */,
 			);
 			productRefGroup = 71D4DBD228185905001DBD0E /* Products */;
 			projectDirPath = "";
@@ -742,7 +742,7 @@
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
-				SUPPORTED_PLATFORMS = macosx;
+				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_DISABLE_SAFETY_CHECKS = YES;
 				SWIFT_ENFORCE_EXCLUSIVE_ACCESS = off;
@@ -803,7 +803,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
-				SUPPORTED_PLATFORMS = macosx;
+				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos";
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_DISABLE_SAFETY_CHECKS = YES;
 				SWIFT_ENFORCE_EXCLUSIVE_ACCESS = off;
@@ -841,12 +841,12 @@
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UIUserInterfaceStyle = Dark;
-				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.3.2;
+				MARKETING_VERSION = 1.4.0;
 				OTHER_SWIFT_FLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.nhubbard.Sort2.mobile;
 				PRODUCT_NAME = "Sort Symphony";
@@ -860,7 +860,7 @@
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_ENFORCE_EXCLUSIVE_ACCESS = on;
 				SWIFT_STRICT_CONCURRENCY = complete;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "2,6";
 			};
 			name = Debug;
@@ -892,12 +892,12 @@
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UIUserInterfaceStyle = Dark;
-				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.3.2;
+				MARKETING_VERSION = 1.4.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.nhubbard.Sort2.mobile;
 				PRODUCT_NAME = "Sort Symphony";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -911,7 +911,7 @@
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_ENFORCE_EXCLUSIVE_ACCESS = off;
 				SWIFT_STRICT_CONCURRENCY = complete;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "2,6";
 				VALIDATE_PRODUCT = YES;
 			};
@@ -941,6 +941,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		710A29F82CA5AB8500970E0A /* XCRemoteSwiftPackageReference "then" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/devxoul/then";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 3.0.0;
+			};
+		};
 		7113FCB128674D1B00665F09 /* XCRemoteSwiftPackageReference "CollectionConcurrencyKit" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/nhubbard/CollectionConcurrencyKit";
@@ -954,7 +962,7 @@
 			repositoryURL = "https://github.com/AudioKit/AudioKit.git";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 5.6.3;
+				minimumVersion = 5.6.4;
 			};
 		};
 		7120CB9A28397E410019D976 /* XCRemoteSwiftPackageReference "AudioKitEX" */ = {
@@ -994,7 +1002,7 @@
 			repositoryURL = "https://github.com/devicekit/DeviceKit.git";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 5.2.2;
+				minimumVersion = 5.5.0;
 			};
 		};
 		71AEEDD6298707BC00506954 /* XCRemoteSwiftPackageReference "iosMath" */ = {
@@ -1005,20 +1013,12 @@
 				kind = branch;
 			};
 		};
-		71CCA0672865FD7300E4D666 /* XCRemoteSwiftPackageReference "Then" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/devxoul/Then";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 3.0.0;
-			};
-		};
 		71D4DC2328186A0F001DBD0E /* XCRemoteSwiftPackageReference "MarkdownUI" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/gonzalezreal/MarkdownUI";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 2.3.0;
+				minimumVersion = 2.4.0;
 			};
 		};
 		71ED4EAC2831575500880755 /* XCRemoteSwiftPackageReference "swift-atomics" */ = {
@@ -1032,6 +1032,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		710A29F92CA5AB8500970E0A /* Then */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 710A29F82CA5AB8500970E0A /* XCRemoteSwiftPackageReference "then" */;
+			productName = Then;
+		};
 		7113FCB228674D1B00665F09 /* CollectionConcurrencyKit */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 7113FCB128674D1B00665F09 /* XCRemoteSwiftPackageReference "CollectionConcurrencyKit" */;
@@ -1071,11 +1076,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 71AEEDD6298707BC00506954 /* XCRemoteSwiftPackageReference "iosMath" */;
 			productName = iosMath;
-		};
-		71CCA0682865FD7300E4D666 /* Then */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 71CCA0672865FD7300E4D666 /* XCRemoteSwiftPackageReference "Then" */;
-			productName = Then;
 		};
 		71D4DC2428186A0F001DBD0E /* MarkdownUI */ = {
 			isa = XCSwiftPackageProductDependency;

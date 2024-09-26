@@ -333,3 +333,7 @@ struct SortView: View {
     }
   }
 }
+
+#Preview {
+  SortView(algorithm: .quickSort)
+}

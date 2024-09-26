@@ -21,3 +21,7 @@ import SwiftUI
     }
   }
 }
+
+#Preview {
+  MathView(text: "Example", unicode: "x^2", math: "x^2")
+}

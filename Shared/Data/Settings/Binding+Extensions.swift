@@ -10,7 +10,7 @@ import SwiftUI
 
 /// https://stackoverflow.com/a/74356845/2579761
 public extension Binding {
-  static func convert<TInt, TFloat>(from intBinding: Binding<TInt>) -> Binding<TFloat>
+  static func convert<TInt: Sendable, TFloat: Sendable>(from intBinding: Binding<TInt>) -> Binding<TFloat>
     where TInt: BinaryInteger, TFloat: BinaryFloatingPoint {
     Binding<TFloat>(
       get: { TFloat(intBinding.wrappedValue) },
@@ -18,7 +18,7 @@ public extension Binding {
     )
   }
 
-  static func convert<TFloat, TInt>(from floatBinding: Binding<TFloat>) -> Binding<TInt>
+  static func convert<TFloat: Sendable, TInt: Sendable>(from floatBinding: Binding<TFloat>) -> Binding<TInt>
     where TFloat: BinaryFloatingPoint, TInt: BinaryInteger {
     Binding<TInt>(
       get: { TInt(floatBinding.wrappedValue) },

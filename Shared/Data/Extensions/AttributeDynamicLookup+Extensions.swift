@@ -7,9 +7,9 @@
 
 import Foundation
 
-extension KeyPath: @unchecked Sendable {}
+extension KeyPath: @unchecked @retroactive Sendable {}
 
-extension AttributeDynamicLookup: @unchecked Sendable {
+extension AttributeDynamicLookup: @unchecked @retroactive Sendable {
   subscript<T: AttributedStringKey>(dynamicMember keyPath: KeyPath<AttributeScopes.SortSymphonyAttributes, T>) -> T {
     self[T.self]
   }

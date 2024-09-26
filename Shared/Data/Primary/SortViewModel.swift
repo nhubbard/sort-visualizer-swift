@@ -400,9 +400,7 @@ final class SortViewModel: ObservableObject {
         kCFAllocatorDefault,
         0
       ).takeRetainedValue() as? Data {
-        if let modelIdentifierCString = String(data: modelData, encoding: .utf8)?.cString(using: .utf8) {
-          modelIdentifier = String(cString: modelIdentifierCString)
-        }
+        modelIdentifier = String(data: modelData, encoding: .utf8)
       }
       IOObjectRelease(service)
       #else
