@@ -13,7 +13,7 @@ import SoundpipeAudioKit
 
 // A major improvement over the previous FM synthesizer!
 @MainActor
-final class Synthesizer: Sendable {
+final class Synthesizer {
   internal var isStarted = false
   private let engine = AudioEngine()
   private var currentFreq: Float = 0.0

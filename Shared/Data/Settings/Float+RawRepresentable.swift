@@ -26,6 +26,6 @@ extension Float: @retroactive RawRepresentable {
     guard let data = try? JSONEncoder().encode(self) else {
       return "0.0"
     }
-    return String(decoding: data, as: UTF8.self)
+    return String(data: data, encoding: .utf8)!
   }
 }

@@ -101,7 +101,7 @@ extension TextFormat {
 
 extension TextFormat.Builder: Then {
   public typealias T = TextFormat.Builder
-  
+
   var final: TextFormat {
     build()
   }
