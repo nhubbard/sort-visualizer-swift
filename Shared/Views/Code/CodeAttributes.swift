@@ -88,5 +88,5 @@ import Foundation
     case genericSubheading = "Token.Generic.Subheading"
     case genericTraceback = "Token.Generic.Traceback"
   }
-  public static var name = "code"
+  public static let name = "code"
 }

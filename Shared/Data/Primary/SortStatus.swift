@@ -7,7 +7,7 @@
 
 import Foundation
 
-@frozen enum SortStatus: Sendable {
+enum SortStatus: Sendable {
   case finished
   case stopped
 }
