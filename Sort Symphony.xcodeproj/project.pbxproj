@@ -106,6 +106,7 @@
 /* Begin PBXFileReference section */
 		710BF0532821885300F7B066 /* Range+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Range+Extensions.swift"; sourceTree = "<group>"; };
 		7113FCB4286758DF00665F09 /* shellsort.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = shellsort.bundle; sourceTree = "<group>"; };
+		7119A27E2DA1E77A009E7F5C /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		711EF293285CC174001EB6AC /* BogoSortImpl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BogoSortImpl.swift; sourceTree = "<group>"; };
 		7120CB9828397DF00019D976 /* Synthesizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Synthesizer.swift; sourceTree = "<group>"; };
 		71301B7A295346B30010E430 /* SettingsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
@@ -416,6 +417,7 @@
 		71D4DBC428185904001DBD0E = {
 			isa = PBXGroup;
 			children = (
+				7119A27E2DA1E77A009E7F5C /* README.md */,
 				71EFDE812AD0492A00D893FC /* PrivacyInfo.xcprivacy */,
 				7191A99329E6DC780035C9E5 /* Localizable.strings */,
 				7196E25629DAF398000E9CB7 /* iOS */,
