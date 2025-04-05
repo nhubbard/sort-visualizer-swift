@@ -16,7 +16,7 @@ struct SwiftMathView: UIViewRepresentable {
     var fontSize: CGFloat = 30
     var labelMode: MTMathUILabelMode = .text
     var insets: MTEdgeInsets = MTEdgeInsets()
-  
+
     func makeUIView(context: Context) -> MTMathUILabel {
         let view = MTMathUILabel()
         return view

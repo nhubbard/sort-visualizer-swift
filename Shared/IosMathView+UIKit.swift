@@ -17,7 +17,7 @@ struct SwiftMathView: UIViewRepresentable {
     var fontSize: CGFloat = 30
     var labelMode: MTMathUILabelMode = .text
     var insets: MTEdgeInsets = MTEdgeInsets()
-    
+
     func makeUIView(context: Context) -> MTMathUILabel {
         let view = MTMathUILabel()
         return view
@@ -39,12 +39,12 @@ struct SwiftMathView: NSViewRepresentable {
     var fontSize: CGFloat = 30
     var labelMode: MTMathUILabelMode = .text
     var insets: MTEdgeInsets = MTEdgeInsets()
-    
+
     func makeNSView(context: Context) -> MTMathUILabel {
         let view = MTMathUILabel()
         return view
     }
-    
+
     func updateNSView(_ view: MTMathUILabel, context: Context) {
         view.latex = equation
         view.font = MTFontManager().font(withName: font.rawValue, size: fontSize)

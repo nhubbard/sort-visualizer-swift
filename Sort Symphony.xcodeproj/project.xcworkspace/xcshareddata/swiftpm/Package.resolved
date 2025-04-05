@@ -6,8 +6,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/AudioKit/AudioKit.git",
       "state" : {
-        "revision" : "2ebd422855e4645d3169f83d1765d1c8196b4f46",
-        "version" : "5.6.4"
+        "revision" : "5b3fd238ef8ee95c9842ca4ea83ca58ee151e630",
+        "version" : "5.6.5"
       }
     },
     {
@@ -15,8 +15,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/AudioKit/AudioKitEX.git",
       "state" : {
-        "revision" : "cb1a1276978ffc08e00d4774c0617aa8a58a17c4",
-        "version" : "5.6.1"
+        "revision" : "23e8e3bffd9fbc1dffa72f1d47c7f714dd777288",
+        "version" : "5.6.2"
       }
     },
     {
@@ -51,8 +51,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/devicekit/DeviceKit.git",
       "state" : {
-        "revision" : "7ff5331960151aec74fb422e1d45f54ef6cc086d",
-        "version" : "5.5.0"
+        "revision" : "513b9d7e7a1bd46504a1009bbab943b75ce2f195",
+        "version" : "5.6.0"
       }
     },
     {
@@ -96,8 +96,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-algorithms.git",
       "state" : {
-        "revision" : "f6919dfc309e7f1b56224378b11e28bab5bccc42",
-        "version" : "1.2.0"
+        "revision" : "87e50f483c54e6efd60e885f7f5aa946cee68023",
+        "version" : "1.2.1"
       }
     },
     {
