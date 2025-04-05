@@ -13,13 +13,14 @@ import SoundpipeAudioKit
 
 // A major improvement over the previous FM synthesizer!
 @MainActor
-final class Synthesizer: Sendable {
+final class Synthesizer {
   internal var isStarted = false
   private let engine = AudioEngine()
   private var currentFreq: Float = 0.0
   private var osc: Oscillator
   private var env: AmplitudeEnvelope
   private var fader: Fader
+  private let defaultAmplitude = UserDefaults.standard.float(forKey: "synthAmplitude")
 
   /**
    * Create the synthesizer.
@@ -30,7 +31,7 @@ final class Synthesizer: Sendable {
     env = AmplitudeEnvelope(osc)
     fader = Fader(env)
     engine.output = fader
-    osc.amplitude = UserDefaults.standard.float(forKey: "synthAmplitude")
+    osc.amplitude = defaultAmplitude
     env.attackDuration = UserDefaults.standard.float(forKey: "synthAttack")
     env.decayDuration = UserDefaults.standard.float(forKey: "synthDecay")
     env.sustainLevel = UserDefaults.standard.float(forKey: "synthSustain")
@@ -89,5 +90,9 @@ final class Synthesizer: Sendable {
     try? await Task.sleep(nanoseconds: delay)
     // Stop playing the note.
     env.closeGate()
+  }
+
+  func setMute(_ muted: Bool) async {
+    osc.amplitude = muted ? 0.0 : defaultAmplitude
   }
 }

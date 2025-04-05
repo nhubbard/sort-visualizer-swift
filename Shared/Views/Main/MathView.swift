@@ -17,7 +17,11 @@ import SwiftUI
       Text("\(text): ")
         .font(.system(size: 16, weight: .bold, design: .default))
         .multilineTextAlignment(.center)
-      IosMathView(math: unicode)
+      SwiftMathView(equation: unicode, textAlignment: .right)
     }
   }
+}
+
+#Preview {
+  MathView(text: "Example", unicode: "x^2", math: "x^2")
 }

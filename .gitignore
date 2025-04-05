@@ -1064,14 +1064,4 @@ $RECYCLE.BIN/
 
 ### Xcode ###
 
-## Xcode 8 and earlier
-
-### Xcode Patch ###
-*.xcodeproj/*
-!*.xcodeproj/project.pbxproj
-!*.xcodeproj/xcshareddata/
-!*.xcworkspace/contents.xcworkspacedata
-/*.gcno
-**/xcshareddata/WorkspaceSettings.xcsettings
-
 # End of https://www.toptal.com/developers/gitignore/api/windows,macos,linux,sublimetext,xcode,python,node,go,c++,c,csharp,kotlin,ruby,swift,java

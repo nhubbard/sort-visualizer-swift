@@ -86,7 +86,7 @@ import Then
         case .stringSymbol, .nameVariableClass, .nameVariableGlobal, .nameVariableInstance, .nameVariableMagic:
           it.fg("#b8860b")
         default:
-          it.fg(.black).bg(getBgColor())
+          it.fg(Color.black).bg(getBgColor())
       }
     }.build()
   }
