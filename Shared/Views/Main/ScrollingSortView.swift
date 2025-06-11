@@ -37,19 +37,8 @@ struct ScrollingSortView: View {
                 VStack(spacing: 2) {
                   ForEach(loadComplexityResource(algorithm)) { entry in
                     HStack(alignment: .center, spacing: 1) {
-                        Group {
-                        if entry.mathml != "" {
-                          MathView(text: entry.key, unicode: entry.value, math: entry.mathml)
-                            .frame(width: nil, height: 36)
-                        } else {
-                          Text("• \(NSLocalizedString(entry.key, comment: "")): ")
-                            .bold()
-                            .font(.system(size: 16, design: .default)) +
-                          Text(entry.value)
-                            .foregroundColor(.blue)
-                            .font(.system(size: 16, design: .default))
-                        }
-                      }
+                      MathView(text: entry.key, unicode: entry.value, math: entry.mathml)
+                        .frame(width: nil, height: 36)
                       Spacer()
                     }
                   }

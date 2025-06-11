@@ -89,7 +89,6 @@
 		71D4DBF028185DFD001DBD0E /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71D4DBEF28185DFD001DBD0E /* HomeView.swift */; };
 		71D4DC2528186A0F001DBD0E /* MarkdownUI in Frameworks */ = {isa = PBXBuildFile; productRef = 71D4DC2428186A0F001DBD0E /* MarkdownUI */; };
 		71DFD5EE2A1668440030ED48 /* CloudKitRecordDecoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71DFD5ED2A1668440030ED48 /* CloudKitRecordDecoder.swift */; };
-		71DFD5F02A166D380030ED48 /* CloudKitCodable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71DFD5EF2A166D380030ED48 /* CloudKitCodable.swift */; };
 		71DFD5F22A166D5D0030ED48 /* CloudKitRecordEncoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71DFD5F12A166D5D0030ED48 /* CloudKitRecordEncoder.swift */; };
 		71DFD5F42A166E050030ED48 /* CustomCloudKitEncodable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71DFD5F32A166E050030ED48 /* CustomCloudKitEncodable.swift */; };
 		71ECC8C5296D95E000034BE9 /* Binding+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71ECC8C4296D95E000034BE9 /* Binding+Extensions.swift */; };
@@ -182,7 +181,6 @@
 		71D4DBEE28185D6E001DBD0E /* Sort Symphony (iOS).entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Sort Symphony (iOS).entitlements"; sourceTree = "<group>"; };
 		71D4DBEF28185DFD001DBD0E /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		71DFD5ED2A1668440030ED48 /* CloudKitRecordDecoder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudKitRecordDecoder.swift; sourceTree = "<group>"; };
-		71DFD5EF2A166D380030ED48 /* CloudKitCodable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudKitCodable.swift; sourceTree = "<group>"; };
 		71DFD5F12A166D5D0030ED48 /* CloudKitRecordEncoder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudKitRecordEncoder.swift; sourceTree = "<group>"; };
 		71DFD5F32A166E050030ED48 /* CustomCloudKitEncodable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomCloudKitEncodable.swift; sourceTree = "<group>"; };
 		71E6B239282033D300672D55 /* Sort Symphony--iOS--Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Sort Symphony--iOS--Info.plist"; sourceTree = "<group>"; };
@@ -270,7 +268,6 @@
 			children = (
 				716147FD2A1538B4005FBA5B /* RunResult.swift */,
 				71DFD5ED2A1668440030ED48 /* CloudKitRecordDecoder.swift */,
-				71DFD5EF2A166D380030ED48 /* CloudKitCodable.swift */,
 				71DFD5F12A166D5D0030ED48 /* CloudKitRecordEncoder.swift */,
 				71DFD5F32A166E050030ED48 /* CustomCloudKitEncodable.swift */,
 			);
@@ -510,7 +507,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1600;
-				LastUpgradeCheck = 1500;
+				LastUpgradeCheck = 2600;
 				TargetAttributes = {
 					71D4DBD028185905001DBD0E = {
 						CreatedOnToolsVersion = 13.3.1;
@@ -615,7 +612,6 @@
 				71650A32284272FD00A23BC2 /* RandomizingHeader.swift in Sources */,
 				71CCA0662865FC9D00E4D666 /* TextFormat.swift in Sources */,
 				71DFD5F42A166E050030ED48 /* CustomCloudKitEncodable.swift in Sources */,
-				71DFD5F02A166D380030ED48 /* CloudKitCodable.swift in Sources */,
 				71CFAC0328396D2A004672DB /* SelectionSortImpl.swift in Sources */,
 				71F38EB82819B42C0085BAAA /* SortView.swift in Sources */,
 				71301B7B295346B30010E430 /* SettingsView.swift in Sources */,
@@ -723,6 +719,7 @@
 				COPY_PHASE_STRIP = NO;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = 676UP3S3AH;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -744,6 +741,7 @@
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_DISABLE_SAFETY_CHECKS = YES;
@@ -791,6 +789,7 @@
 				COPY_PHASE_STRIP = NO;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = 676UP3S3AH;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -805,6 +804,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos";
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_DISABLE_SAFETY_CHECKS = YES;
@@ -821,13 +821,24 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
+				CLANG_ADDRESS_SANITIZER_CONTAINER_OVERFLOW = YES;
+				CLANG_ANALYZER_GCD_PERFORMANCE = YES;
+				CLANG_ANALYZER_LOCALIZABILITY_EMPTY_CONTEXT = YES;
+				CLANG_ANALYZER_OSOBJECT_C_STYLE_CAST = YES;
+				CLANG_ANALYZER_SECURITY_FLOATLOOPCOUNTER = YES;
+				CLANG_ANALYZER_SECURITY_INSECUREAPI_RAND = YES;
+				CLANG_ANALYZER_SECURITY_INSECUREAPI_STRCPY = YES;
+				CLANG_STATIC_ANALYZER_MODE = deep;
+				CLANG_TIDY_BUGPRONE_REDUNDANT_BRANCH_CONDITION = YES;
+				CLANG_TIDY_MISC_REDUNDANT_EXPRESSION = YES;
 				CLANG_USE_OPTIMIZATION_PROFILE = YES;
 				CODE_SIGN_ENTITLEMENTS = "Sort Symphony (iOS).entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 676UP3S3AH;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
 				ENABLE_PREVIEWS = YES;
 				ENABLE_TESTING_SEARCH_PATHS = NO;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
@@ -838,32 +849,37 @@
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.education";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UIRequiresFullScreen = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UIUserInterfaceStyle = Dark;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MACOSX_DEPLOYMENT_TARGET = 26.0;
 				MARKETING_VERSION = 1.4.2;
 				OTHER_SWIFT_FLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.nhubbard.Sort2.mobile;
 				PRODUCT_NAME = "Sort Symphony";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "";
+				RUN_CLANG_STATIC_ANALYZER = YES;
 				SDKROOT = iphoneos;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = YES;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_DISABLE_SAFETY_CHECKS = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_ENFORCE_EXCLUSIVE_ACCESS = on;
 				SWIFT_STRICT_CONCURRENCY = complete;
 				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "2,6";
+				TVOS_DEPLOYMENT_TARGET = 26.0;
+				WATCHOS_DEPLOYMENT_TARGET = 26.0;
+				XROS_DEPLOYMENT_TARGET = 26.0;
 			};
 			name = Debug;
 		};
@@ -873,13 +889,24 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
+				CLANG_ADDRESS_SANITIZER_CONTAINER_OVERFLOW = YES;
+				CLANG_ANALYZER_GCD_PERFORMANCE = YES;
+				CLANG_ANALYZER_LOCALIZABILITY_EMPTY_CONTEXT = YES;
+				CLANG_ANALYZER_OSOBJECT_C_STYLE_CAST = YES;
+				CLANG_ANALYZER_SECURITY_FLOATLOOPCOUNTER = YES;
+				CLANG_ANALYZER_SECURITY_INSECUREAPI_RAND = YES;
+				CLANG_ANALYZER_SECURITY_INSECUREAPI_STRCPY = YES;
+				CLANG_STATIC_ANALYZER_MODE = deep;
+				CLANG_TIDY_BUGPRONE_REDUNDANT_BRANCH_CONDITION = YES;
+				CLANG_TIDY_MISC_REDUNDANT_EXPRESSION = YES;
 				CLANG_USE_OPTIMIZATION_PROFILE = YES;
 				CODE_SIGN_ENTITLEMENTS = "Sort Symphony (iOS).entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 676UP3S3AH;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
 				ENABLE_PREVIEWS = YES;
 				ENABLE_TESTING_SEARCH_PATHS = NO;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
@@ -889,33 +916,37 @@
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.education";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UIRequiresFullScreen = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UIUserInterfaceStyle = Dark;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MACOSX_DEPLOYMENT_TARGET = 26.0;
 				MARKETING_VERSION = 1.4.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.nhubbard.Sort2.mobile;
 				PRODUCT_NAME = "Sort Symphony";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "";
+				RUN_CLANG_STATIC_ANALYZER = YES;
 				SDKROOT = iphoneos;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = YES;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
-				SWIFT_DISABLE_SAFETY_CHECKS = YES;
+				SWIFT_DISABLE_SAFETY_CHECKS = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_ENFORCE_EXCLUSIVE_ACCESS = off;
+				SWIFT_ENFORCE_EXCLUSIVE_ACCESS = "debug-only";
 				SWIFT_STRICT_CONCURRENCY = complete;
 				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "2,6";
+				TVOS_DEPLOYMENT_TARGET = 26.0;
 				VALIDATE_PRODUCT = YES;
+				WATCHOS_DEPLOYMENT_TARGET = 26.0;
+				XROS_DEPLOYMENT_TARGET = 26.0;
 			};
 			name = Release;
 		};
@@ -963,32 +994,32 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/AudioKit/AudioKit.git";
 			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 5.6.5;
+				branch = main;
+				kind = branch;
 			};
 		};
 		7120CB9A28397E410019D976 /* XCRemoteSwiftPackageReference "AudioKitEX" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/AudioKit/AudioKitEX.git";
 			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 5.6.2;
+				branch = main;
+				kind = branch;
 			};
 		};
 		7120CB9D28397E5B0019D976 /* XCRemoteSwiftPackageReference "AudioKitUI" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/AudioKit/AudioKitUI.git";
 			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 0.3.7;
+				branch = main;
+				kind = branch;
 			};
 		};
 		7120CBA028397EE40019D976 /* XCRemoteSwiftPackageReference "SoundpipeAudioKit" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/AudioKit/SoundpipeAudioKit.git";
 			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 5.6.1;
+				branch = main;
+				kind = branch;
 			};
 		};
 		712FAC47285E2A2B0045B50A /* XCRemoteSwiftPackageReference "swift-algorithms" */ = {

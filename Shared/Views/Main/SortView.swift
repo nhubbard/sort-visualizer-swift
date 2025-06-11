@@ -132,13 +132,29 @@ struct SortView: View {
     }
   }
 
+  var formattedOps: AttributedString {
+    var prefix = AttributedString(localized: "Operations: ")
+    var ops = AttributedString("\(state.getOperations().formatted(.number.grouping(.automatic)))")
+    ops.foregroundColor = .blue
+    prefix += ops
+    return prefix
+  }
+
+  var formattedRuntime: AttributedString {
+    var prefix = AttributedString(localized: "Runtime: ")
+    var time = AttributedString("\(state.getRunTime())")
+    time.foregroundColor = .blue
+    prefix += time
+    return prefix
+  }
+
   @ViewBuilder
   func opsCounter() -> some View {
     VStack(spacing: 4) {
-      Text(String(localized: "Operations: ")) + Text("\(state.getOperations())").foregroundColor(.blue)
-      (Text(String(localized: "Runtime: ")) + Text(state.getRunTime()).foregroundColor(.blue)).onTapGesture(perform: {
+      Text(formattedOps)
+      Text(formattedRuntime).onTapGesture {
         state.sortFormatRuntime.toggle()
-      })
+      }
     }
   }
 

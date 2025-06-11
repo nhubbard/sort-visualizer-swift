@@ -6,8 +6,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/AudioKit/AudioKit.git",
       "state" : {
-        "revision" : "5b3fd238ef8ee95c9842ca4ea83ca58ee151e630",
-        "version" : "5.6.5"
+        "branch" : "main",
+        "revision" : "037023fb07d572f48ff12e6a4ce7801c0bbeaa0a"
       }
     },
     {
@@ -15,8 +15,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/AudioKit/AudioKitEX.git",
       "state" : {
-        "revision" : "23e8e3bffd9fbc1dffa72f1d47c7f714dd777288",
-        "version" : "5.6.2"
+        "branch" : "main",
+        "revision" : "23e8e3bffd9fbc1dffa72f1d47c7f714dd777288"
       }
     },
     {
@@ -24,8 +24,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/AudioKit/AudioKitUI.git",
       "state" : {
-        "revision" : "1a61e8a96c7ee24c3e5abe06dc3334a31fd7571d",
-        "version" : "0.3.7"
+        "branch" : "main",
+        "revision" : "83bacdba297ad921f793ead02f0ebaf8619c7b41"
       }
     },
     {
@@ -87,8 +87,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/AudioKit/SoundpipeAudioKit.git",
       "state" : {
-        "revision" : "ee7d9542078ae48b24744a67c0350a12f9de354b",
-        "version" : "5.6.1"
+        "branch" : "main",
+        "revision" : "7a4b0216b1d9f8b1e06e3217b68c061cf1704fdc"
       }
     },
     {
@@ -143,6 +143,15 @@
       "state" : {
         "revision" : "d41ef523faef0f911369f79c0b96815d9dbb6d7a",
         "version" : "3.0.0"
+      }
+    },
+    {
+      "identity" : "tonic",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/AudioKit/Tonic",
+      "state" : {
+        "revision" : "227c89ea047f928787bec571e487239547f21fe6",
+        "version" : "2.1.0"
       }
     }
   ],
