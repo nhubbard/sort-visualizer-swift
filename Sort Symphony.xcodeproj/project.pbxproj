@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		710727B02DFB4AF40051CBFE /* AudioKitEX in Frameworks */ = {isa = PBXBuildFile; productRef = 710727AF2DFB4AF40051CBFE /* AudioKitEX */; };
 		710A29FA2CA5AB8500970E0A /* Then in Frameworks */ = {isa = PBXBuildFile; productRef = 710A29F92CA5AB8500970E0A /* Then */; };
 		710BF0542821885300F7B066 /* Range+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 710BF0532821885300F7B066 /* Range+Extensions.swift */; };
 		7113FCB328674D1B00665F09 /* CollectionConcurrencyKit in Frameworks */ = {isa = PBXBuildFile; productRef = 7113FCB228674D1B00665F09 /* CollectionConcurrencyKit */; };
@@ -14,7 +15,6 @@
 		711EF294285CC174001EB6AC /* BogoSortImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 711EF293285CC174001EB6AC /* BogoSortImpl.swift */; };
 		7120CB9728397DDF0019D976 /* AudioKit in Frameworks */ = {isa = PBXBuildFile; productRef = 7120CB9628397DDF0019D976 /* AudioKit */; };
 		7120CB9928397DF00019D976 /* Synthesizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7120CB9828397DF00019D976 /* Synthesizer.swift */; };
-		7120CB9C28397E410019D976 /* AudioKitEX in Frameworks */ = {isa = PBXBuildFile; productRef = 7120CB9B28397E410019D976 /* AudioKitEX */; };
 		7120CB9F28397E5B0019D976 /* AudioKitUI in Frameworks */ = {isa = PBXBuildFile; productRef = 7120CB9E28397E5B0019D976 /* AudioKitUI */; };
 		7120CBA228397EE40019D976 /* SoundpipeAudioKit in Frameworks */ = {isa = PBXBuildFile; productRef = 7120CBA128397EE40019D976 /* SoundpipeAudioKit */; };
 		712FAC49285E2A2B0045B50A /* Algorithms in Frameworks */ = {isa = PBXBuildFile; productRef = 712FAC48285E2A2B0045B50A /* Algorithms */; };
@@ -202,8 +202,8 @@
 			files = (
 				71D4DC2528186A0F001DBD0E /* MarkdownUI in Frameworks */,
 				717254AB2D56497C00CF6929 /* SwiftMath in Frameworks */,
-				7120CB9C28397E410019D976 /* AudioKitEX in Frameworks */,
 				710A29FA2CA5AB8500970E0A /* Then in Frameworks */,
+				710727B02DFB4AF40051CBFE /* AudioKitEX in Frameworks */,
 				71ED4EAE2831575500880755 /* Atomics in Frameworks */,
 				7120CB9728397DDF0019D976 /* AudioKit in Frameworks */,
 				7113FCB328674D1B00665F09 /* CollectionConcurrencyKit in Frameworks */,
@@ -486,7 +486,6 @@
 				71D4DC2428186A0F001DBD0E /* MarkdownUI */,
 				71ED4EAD2831575500880755 /* Atomics */,
 				7120CB9628397DDF0019D976 /* AudioKit */,
-				7120CB9B28397E410019D976 /* AudioKitEX */,
 				7120CB9E28397E5B0019D976 /* AudioKitUI */,
 				7120CBA128397EE40019D976 /* SoundpipeAudioKit */,
 				712FAC48285E2A2B0045B50A /* Algorithms */,
@@ -494,6 +493,7 @@
 				716147FA2A152BA2005FBA5B /* DeviceKit */,
 				710A29F92CA5AB8500970E0A /* Then */,
 				717254AA2D56497C00CF6929 /* SwiftMath */,
+				710727AF2DFB4AF40051CBFE /* AudioKitEX */,
 			);
 			productName = "Sort2 (iOS)";
 			productReference = 71D4DBD128185905001DBD0E /* Sort Symphony.app */;
@@ -528,7 +528,6 @@
 				71D4DC2328186A0F001DBD0E /* XCRemoteSwiftPackageReference "MarkdownUI" */,
 				71ED4EAC2831575500880755 /* XCRemoteSwiftPackageReference "swift-atomics" */,
 				7120CB9528397DDF0019D976 /* XCRemoteSwiftPackageReference "AudioKit" */,
-				7120CB9A28397E410019D976 /* XCRemoteSwiftPackageReference "AudioKitEX" */,
 				7120CB9D28397E5B0019D976 /* XCRemoteSwiftPackageReference "AudioKitUI" */,
 				7120CBA028397EE40019D976 /* XCRemoteSwiftPackageReference "SoundpipeAudioKit" */,
 				712FAC47285E2A2B0045B50A /* XCRemoteSwiftPackageReference "swift-algorithms" */,
@@ -536,6 +535,7 @@
 				716147F92A152BA2005FBA5B /* XCRemoteSwiftPackageReference "DeviceKit" */,
 				710A29F82CA5AB8500970E0A /* XCRemoteSwiftPackageReference "then" */,
 				717254A92D56497C00CF6929 /* XCRemoteSwiftPackageReference "SwiftMath" */,
+				710727AE2DFB4AF40051CBFE /* XCRemoteSwiftPackageReference "AudioKitEX" */,
 			);
 			productRefGroup = 71D4DBD228185905001DBD0E /* Products */;
 			projectDirPath = "";
@@ -974,6 +974,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		710727AE2DFB4AF40051CBFE /* XCRemoteSwiftPackageReference "AudioKitEX" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/NickCulbertson/AudioKitEX.git";
+			requirement = {
+				branch = DeallocBugFix;
+				kind = branch;
+			};
+		};
 		710A29F82CA5AB8500970E0A /* XCRemoteSwiftPackageReference "then" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/devxoul/then";
@@ -993,14 +1001,6 @@
 		7120CB9528397DDF0019D976 /* XCRemoteSwiftPackageReference "AudioKit" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/AudioKit/AudioKit.git";
-			requirement = {
-				branch = main;
-				kind = branch;
-			};
-		};
-		7120CB9A28397E410019D976 /* XCRemoteSwiftPackageReference "AudioKitEX" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/AudioKit/AudioKitEX.git";
 			requirement = {
 				branch = main;
 				kind = branch;
@@ -1065,6 +1065,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		710727AF2DFB4AF40051CBFE /* AudioKitEX */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 710727AE2DFB4AF40051CBFE /* XCRemoteSwiftPackageReference "AudioKitEX" */;
+			productName = AudioKitEX;
+		};
 		710A29F92CA5AB8500970E0A /* Then */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 710A29F82CA5AB8500970E0A /* XCRemoteSwiftPackageReference "then" */;
@@ -1079,11 +1084,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 7120CB9528397DDF0019D976 /* XCRemoteSwiftPackageReference "AudioKit" */;
 			productName = AudioKit;
-		};
-		7120CB9B28397E410019D976 /* AudioKitEX */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 7120CB9A28397E410019D976 /* XCRemoteSwiftPackageReference "AudioKitEX" */;
-			productName = AudioKitEX;
 		};
 		7120CB9E28397E5B0019D976 /* AudioKitUI */ = {
 			isa = XCSwiftPackageProductDependency;

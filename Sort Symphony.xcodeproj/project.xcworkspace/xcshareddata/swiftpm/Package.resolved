@@ -1,5 +1,5 @@
 {
-  "originHash" : "320e8fa711d4e2805d6b9aa804fc4d54c7bbd31f1eb7f0d857b9fd048b711e0a",
+  "originHash" : "191378fcca29582c763870f0edb2e64087b4821230165800fe3e260d3864ba84",
   "pins" : [
     {
       "identity" : "audiokit",
@@ -13,10 +13,10 @@
     {
       "identity" : "audiokitex",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/AudioKit/AudioKitEX.git",
+      "location" : "https://github.com/NickCulbertson/AudioKitEX.git",
       "state" : {
-        "branch" : "main",
-        "revision" : "23e8e3bffd9fbc1dffa72f1d47c7f714dd777288"
+        "branch" : "DeallocBugFix",
+        "revision" : "3c9134302223922fe0af212dc3882bd3f5127dc2"
       }
     },
     {
