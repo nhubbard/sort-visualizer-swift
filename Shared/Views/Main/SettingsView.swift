@@ -12,7 +12,7 @@ import AudioKit
 import AVFoundation
 
 private func rangeOfNotes(_ octave: Int) -> [String] {
-  precondition((0...8).contains(octave), "Invalid octave: must be 0 <= octave <= 8")
+  assert((0...8).contains(octave), "Invalid octave: must be 0 <= octave <= 8")
   if octave == 0 {
     return ["A0", "A♯0/B♭0", "B0"].map { it in String(localized: it) }
   } else if octave == 8 {
@@ -60,7 +60,7 @@ struct SettingsView: View {
           ForEach(0..<88) {
             Text(noteOptions[$0])
           }
-        }
+        }.buttonSizing(.fitted)
         // Highest synth note
         Picker(String(localized: "Highest synthesizer note"), selection: $highestNoteIndex) {
           ForEach(0..<88) {

@@ -20,8 +20,8 @@ extension ClosedRange where Bound == Float {
 @inlinable
 func floatRatio(x: Float, oldRange: ClosedRange<Float>, newRange: ClosedRange<Float>) -> Float {
   // Complete a range check.
-  precondition(oldRange.lowerBound != oldRange.upperBound, "Old range bounds cannot be equal!")
-  precondition(newRange.lowerBound != newRange.upperBound, "New range bounds cannot be equal!")
+  assert(oldRange.lowerBound != oldRange.upperBound, "Old range bounds cannot be equal!")
+  assert(newRange.lowerBound != newRange.upperBound, "New range bounds cannot be equal!")
   // Calculate new range.
   return (x - oldRange.min) * (newRange.max - newRange.min) / (oldRange.max - oldRange.min) + newRange.min
 }

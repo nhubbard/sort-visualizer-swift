@@ -56,6 +56,7 @@
 		71B55E0E28383D5C00CA74CB /* Sequence+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71B55E0D28383D5C00CA74CB /* Sequence+Extensions.swift */; };
 		71BCE0FE2847B8B6007C8254 /* mergesort.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 71BCE0FD2847B8B6007C8254 /* mergesort.bundle */; };
 		71BCE1002847D963007C8254 /* heapsort.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 71BCE0FF2847D963007C8254 /* heapsort.bundle */; };
+		71BCECAB2DFF4302007B2A62 /* BarLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71BCECAA2DFF4302007B2A62 /* BarLayout.swift */; };
 		71CCA0592865F48900E4D666 /* AttributeDynamicLookup+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71CCA0582865F48900E4D666 /* AttributeDynamicLookup+Extensions.swift */; };
 		71CCA05B2865F4BF00E4D666 /* AttributeScopes+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71CCA05A2865F4BF00E4D666 /* AttributeScopes+Extensions.swift */; };
 		71CCA05D2865F4D500E4D666 /* CodeAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71CCA05C2865F4D500E4D666 /* CodeAttributes.swift */; };
@@ -147,6 +148,7 @@
 		71B55E0D28383D5C00CA74CB /* Sequence+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sequence+Extensions.swift"; sourceTree = "<group>"; };
 		71BCE0FD2847B8B6007C8254 /* mergesort.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = mergesort.bundle; sourceTree = "<group>"; };
 		71BCE0FF2847D963007C8254 /* heapsort.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = heapsort.bundle; sourceTree = "<group>"; };
+		71BCECAA2DFF4302007B2A62 /* BarLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BarLayout.swift; sourceTree = "<group>"; };
 		71CBE19D29A64BE800C7DEC9 /* .swiftlint.yml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = .swiftlint.yml; sourceTree = "<group>"; };
 		71CCA0582865F48900E4D666 /* AttributeDynamicLookup+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AttributeDynamicLookup+Extensions.swift"; sourceTree = "<group>"; };
 		71CCA05A2865F4BF00E4D666 /* AttributeScopes+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AttributeScopes+Extensions.swift"; sourceTree = "<group>"; };
@@ -277,6 +279,7 @@
 		71650A292842693000A23BC2 /* Utilities */ = {
 			isa = PBXGroup;
 			children = (
+				71BCECAA2DFF4302007B2A62 /* BarLayout.swift */,
 				71650A2A2842693C00A23BC2 /* CustomIconLabel.swift */,
 				71650A2D28426C5700A23BC2 /* Category.swift */,
 				71650A31284272FD00A23BC2 /* RandomizingHeader.swift */,
@@ -663,6 +666,7 @@
 				71CCA05D2865F4D500E4D666 /* CodeAttributes.swift in Sources */,
 				71CFAC0128396D08004672DB /* BubbleSortImpl.swift in Sources */,
 				71CCA05B2865F4BF00E4D666 /* AttributeScopes+Extensions.swift in Sources */,
+				71BCECAB2DFF4302007B2A62 /* BarLayout.swift in Sources */,
 				7191A99729E724400035C9E5 /* Page.swift in Sources */,
 				711EF294285CC174001EB6AC /* BogoSortImpl.swift in Sources */,
 			);
@@ -838,6 +842,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
 				ENABLE_PREVIEWS = YES;
 				ENABLE_TESTING_SEARCH_PATHS = NO;
@@ -865,6 +870,7 @@
 				PRODUCT_NAME = "Sort Symphony";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "";
+				REGISTER_APP_GROUPS = YES;
 				RUN_CLANG_STATIC_ANALYZER = YES;
 				SDKROOT = iphoneos;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -906,6 +912,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
 				ENABLE_PREVIEWS = YES;
 				ENABLE_TESTING_SEARCH_PATHS = NO;
@@ -931,6 +938,7 @@
 				PRODUCT_NAME = "Sort Symphony";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "";
+				REGISTER_APP_GROUPS = YES;
 				RUN_CLANG_STATIC_ANALYZER = YES;
 				SDKROOT = iphoneos;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";

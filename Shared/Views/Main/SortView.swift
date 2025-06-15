@@ -19,16 +19,13 @@ struct SortView: View {
   }
 
   @ViewBuilder
-  func bars(_ geo: GeometryProxy) -> some View {
-    let rectWidth = geo.size.width / CGFloat(state.data.count)
-    let rectMinHeight = geo.size.height / CGFloat(state.data.count)
-    HStack(alignment: .bottom, spacing: 0) {
+  func bars() -> some View {
+    BarLayout(items: state.data) {
       ForEach(state.data) { item in
         Rectangle()
           .fill(item.color)
-          .frame(width: rectWidth, height: rectMinHeight * CGFloat(item.value))
       }
-    }.frame(width: geo.size.width, height: geo.size.height, alignment: .bottomLeading)
+    }
   }
 
   @ViewBuilder
@@ -178,7 +175,7 @@ struct SortView: View {
   }
 
   var body: some View {
-    GeometryReader { geo in bars(geo) }
+    bars()
       .overlay(alignment: .topLeading) { settingsBox() }
       .onAppear { onRender() }
       .alert(String(localized: "Sort Finished Incorrectly"), isPresented: $state.showIncompleteWarning, actions: {

@@ -86,7 +86,7 @@ extension _CloudKitRecordEncoder: Encoder {
   }
 
   fileprivate func assertCanCreateContainer() {
-    precondition(self.container == nil)
+    assert(self.container == nil)
   }
 
   func container<Key>(keyedBy type: Key.Type) -> KeyedEncodingContainer<Key> where Key: CodingKey {

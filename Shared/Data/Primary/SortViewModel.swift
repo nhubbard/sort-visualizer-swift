@@ -87,7 +87,7 @@ final class SortViewModel: ObservableObject {
   @MainActor
   @inlinable
   func enforceIndex(_ index: Int) async {
-    precondition(
+    assert(
       data.indices.contains(index),
       "The index \(index) does not exist on an array of length \(data.endIndex)!"
     )
@@ -389,7 +389,7 @@ final class SortViewModel: ObservableObject {
                    formattedPace, delay))
       #endif
       var modelIdentifier: String?
-      #if targetEnvironment(macCatalyst)
+      #if targetEnvironment(macCatalyst) || os(macOS)
       let service = IOServiceGetMatchingService(
         kIOMasterPortDefault,
         IOServiceMatching("IOPlatformExpertDevice")

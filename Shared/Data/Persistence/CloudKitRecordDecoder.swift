@@ -30,7 +30,7 @@ final class _CloudKitRecordDecoder {
 
 extension _CloudKitRecordDecoder: Decoder {
   fileprivate func assertCanCreateContainer() {
-    precondition(self.container == nil)
+    assert(self.container == nil)
   }
 
   func container<Key>(keyedBy type: Key.Type) -> KeyedDecodingContainer<Key> where Key: CodingKey {
