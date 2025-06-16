@@ -11,11 +11,16 @@ import SwiftUI
 struct SortView: View {
   var algorithm: Algorithms
   @StateObject var state: SortViewModel = SortViewModel()
+  @Namespace private var ns
 
-  func formatMillis(_ millis: Double) -> String {
+  func formatMillis(_ v: Float) -> String {
     Duration
-      .milliseconds(millis)
+      .milliseconds(Double(v))
       .formatted(.units(allowed: [.milliseconds], fractionalPart: .show(length: 1)))
+  }
+
+  func formatCount(_ v: Float) -> String {
+    String(Int(v))
   }
 
   @ViewBuilder
@@ -29,103 +34,17 @@ struct SortView: View {
   }
 
   @ViewBuilder
-  func runningToggle() -> some View {
-    StateToggle(binding: $state.running, name: String(localized: "Running"), iconName: "play.fill", maxWidth: 170)
-      .accessibilityLabel("Running toggle")
-      .onChange(of: state.running, initial: true) { _, newValue in
-        onRunning(newValue: newValue)
-      }
-      .keyboardShortcut("s", modifiers: [.command, .shift])
-  }
-
-  @ViewBuilder
-  func soundToggle() -> some View {
-    StateToggle(binding: $state.sound, name: String(localized: "Sound"), iconName: "speaker.wave.2")
-      .accessibilityLabel("Sound toggle")
-      .disabled(state.soundDisabled)
-      .onChange(of: state.sound, initial: true) { _, newValue in
-        onSound(newValue: newValue)
-      }
-      .keyboardShortcut("a", modifiers: [.command, .shift])
-  }
-
-  @ViewBuilder
-  func toggleRow() -> some View {
-    HStack(spacing: 10) {
-      runningToggle()
-      soundToggle()
-    }.padding(.horizontal, 20)
-  }
-
-  @ViewBuilder
-  func resetButton() -> some View {
-    Button {
-      onReset()
-    } label: {
-      Label(String(localized: "Reset"), systemImage: "repeat")
-    }
-    .frame(maxWidth: 150)
-    .keyboardShortcut("r", modifiers: [.command, .shift])
-    .accessibilityLabel("Reset button")
-  }
-
-  // FIXME: Uncomment when step function actually works
-  /*@ViewBuilder
-  func stepButton() -> some View {
-    Button {
-      onStep()
-    } label: {
-      Label(String(localized: "Step"), systemImage: "figure.walk")
-    }
-    .frame(maxWidth: 150)
-    .popover(isPresented: $state.showStepPopover, arrowEdge: .trailing) {
-      Text(String(localized: "Sorry, this function is not implemented yet."))
-        .padding(.all, 4)
-    }
-    .keyboardShortcut("w", modifiers: [.command, .shift])
-    .disabled(state.running)
-    .accessibilityLabel("Step button")
-  }*/
-
-  @ViewBuilder
-  func buttonRow() -> some View {
-    HStack(spacing: 10) {
-      resetButton()
-      // Step button
-      // FIXME: stepButton()
-    }.padding(.horizontal, 20)
-  }
-
-  @ViewBuilder
   func delaySlider() -> some View {
     HStack(spacing: 10) {
       Text(String(localized: "Delay"))
       Slider(value: $state.delay, in: 0...100).frame(maxWidth: 192)
         .accessibilityLabel("Delay slider")
-      Text(formatMillis(Double(state.delay)))
+      Text(formatMillis(state.delay))
         .foregroundColor(.blue)
         .onTapGesture {
           state.showDelayPopup.toggle()
         }
         .accessibilityHint("Formatted delay value")
-    }
-  }
-
-  @ViewBuilder
-  func sizeSlider() -> some View {
-    HStack(spacing: 10) {
-      Text(String(localized: "Array Size"))
-      Slider(value: $state.arraySizeBacking, in: state.sizeRange, step: 2) { editing in
-        if !editing {
-          onArraySizeChange(newValue: state.arraySizeBacking)
-        }
-      }.frame(maxWidth: 192).disabled(state.running).accessibilityLabel("Array size slider")
-      Text(String(format: "%d", Int(state.arraySizeBacking)))
-        .foregroundColor(.blue)
-        .onTapGesture {
-          state.showArraySizePopup.toggle()
-        }
-        .accessibilityHint("Formatted array size value")
     }
   }
 
@@ -155,28 +74,78 @@ struct SortView: View {
     }
   }
 
-  @ViewBuilder
-  func settingsBox() -> some View {
-    // Note: this uses the Settings page label in the localized strings file.
-    GroupBox(label: Label(String(localized: "Settings"), systemImage: "gear").padding(.all, 4)) {
-      Group {
-          toggleRow()
-          buttonRow()
-          delaySlider()
-          sizeSlider()
-          opsCounter()
-      }.padding(.all, 2)
-    }
-      .background(.black.opacity(0.9))
-      .cornerRadius(15)
-      .frame(minWidth: 300, maxWidth: 450, minHeight: 64)
-      .padding([.top, .leading], 16)
-      .accessibilityLabel("Settings box")
-  }
-
   var body: some View {
     bars()
-      .overlay(alignment: .topLeading) { settingsBox() }
+      .overlay(alignment: .topLeading) {
+        VStack {
+          HStack(spacing: 4) {
+            Button {
+              withAnimation(.interactiveSpring()) {
+                state.running.toggle()
+                onRunning(newValue: state.running)
+              }
+            } label: {
+              HStack {
+                Group {
+                  Image(systemName: state.running ? "pause.fill" : "play.fill")
+                    .matchedGeometryEffect(id: "startStopIcon", in: ns)
+                  Text(state.running ? "Stop" : "Start")
+                    .matchedGeometryEffect(id: "startStopText", in: ns)
+                }
+              }
+            }.controlSize(.large).glassEffect(.regular.interactive())
+            Button {
+              withAnimation(.interactiveSpring()) {
+                state.sound.toggle()
+                onSound(newValue: state.sound)
+              }
+            } label: {
+              HStack {
+                Group {
+                  Image(systemName: state.sound ? "speaker.slash.fill" : "speaker.wave.3.fill")
+                    .matchedGeometryEffect(id: "soundIcon", in: ns)
+                  Text(state.sound ? "Turn Sound Off" : "Turn Sound On")
+                    .matchedGeometryEffect(id: "soundText", in: ns)
+                }
+              }
+            }.controlSize(.large).glassEffect(.regular.interactive())
+            Button {
+              onReset()
+            } label: {
+              Label {
+                Text("Reset")
+              } icon: {
+                Image(systemName: "arrow.clockwise")
+              }
+            }.controlSize(.large).glassEffect(.regular.interactive())
+            TouchBarSlider(
+              value: $state.arraySizeBacking,
+              range: state.sizeRange,
+              step: 2,
+              formatter: formatCount
+            ) {
+              Label("Array Size", systemImage: "square.resize")
+            }
+            .disabled(state.running)
+            .onChange(of: state.arraySizeBacking) { _, newVal in
+              onArraySizeChange(newValue: newVal)
+            }
+            .glassEffect()
+            TouchBarSlider(
+              value: $state.delay,
+              range: 0.0...100.0,
+              step: 1.0,
+              formatter: formatMillis
+            ) {
+              Label("Delay", systemImage: "stopwatch")
+            }
+            .glassEffect()
+          }.padding([.all], 16)
+          Button("") {
+            state.showArraySizePopup.toggle()
+          }.keyboardShortcut("r", modifiers: [.command]).hidden()
+        }
+      }
       .onAppear { onRender() }
       .alert(String(localized: "Sort Finished Incorrectly"), isPresented: $state.showIncompleteWarning, actions: {
         Button(String(localized: "OK"), role: .cancel) { onIncompleteAccept() }

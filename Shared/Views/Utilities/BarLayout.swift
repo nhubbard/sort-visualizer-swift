@@ -10,7 +10,6 @@ import SwiftUI
 struct BarLayout: Layout {
   let items: [SortItem]
 
-  // Accept whatever size the parent offers
   func sizeThatFits(
     proposal: ProposedViewSize,
     subviews: Subviews,
@@ -25,36 +24,34 @@ struct BarLayout: Layout {
     subviews: Subviews,
     cache: inout ()
   ) {
-    guard !items.isEmpty, items.count == subviews.count else { return }
+    guard !items.isEmpty, subviews.count == items.count else { return }
 
     // ------------------------------------------------------------------
     // 1.  Pixel-snapped X grid
     // ------------------------------------------------------------------
-    let count     = items.count
-    let step      = Double(bounds.width) / Double(count)   // ideal width (may be fractional)
+    let count  = items.count
+    let step   = Double(bounds.width) / Double(count)
 
-    // pre-compute the X coordinates of every bar’s left edge
-    let edges: [CGFloat] = (0...count).map { i in
-      CGFloat(round(Double(i) * step))                    // <-- ROUND here
+    var edges: [CGFloat] = (0...count).map { i in
+      CGFloat(round(Double(i) * step))
     }
-    // edges.count == count + 1;  edges[i+1] - edges[i] is the bar’s integer width
+    edges[edges.endIndex - 1] = bounds.width   // ← ensures full width
 
     // ------------------------------------------------------------------
-    // 2.  Common Y/height maths
+    // 2.  Height math
     // ------------------------------------------------------------------
     let maxValue = CGFloat(items.map(\.value).max() ?? 1)
 
     // ------------------------------------------------------------------
-    // 3.  Place each sub-view
+    // 3.  Place each bar
     // ------------------------------------------------------------------
     for (index, subview) in subviews.enumerated() {
-
-      let barWidth  = edges[index + 1] - edges[index]      //  either ⌊step⌋ or ⌈step⌉
+      let barWidth  = edges[index + 1] - edges[index]
       let barX      = bounds.minX + edges[index]
 
       let heightRatio = CGFloat(items[index].value) / maxValue
       let barHeight   = bounds.height * heightRatio
-      let barY        = bounds.maxY                        // bottom baseline
+      let barY        = bounds.maxY
 
       subview.place(
         at: CGPoint(x: barX, y: barY),

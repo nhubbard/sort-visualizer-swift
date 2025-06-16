@@ -52,6 +52,7 @@
 		7191A99729E724400035C9E5 /* Page.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7191A99629E724400035C9E5 /* Page.swift */; };
 		7196E25829DAF40F000E9CB7 /* CustomADSRWidget+UIKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7196E25729DAF40F000E9CB7 /* CustomADSRWidget+UIKit.swift */; };
 		7196E25C29DAF6F9000E9CB7 /* SwiftMathView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7196E25B29DAF6F9000E9CB7 /* SwiftMathView.swift */; };
+		719DFEDE2E007039000B489B /* TouchBarSlider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 719DFEDD2E007039000B489B /* TouchBarSlider.swift */; };
 		71B4C0DE284FCC9800E42DB1 /* selectionsort.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 71B4C0DD284FCC9800E42DB1 /* selectionsort.bundle */; };
 		71B55E0E28383D5C00CA74CB /* Sequence+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71B55E0D28383D5C00CA74CB /* Sequence+Extensions.swift */; };
 		71BCE0FE2847B8B6007C8254 /* mergesort.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 71BCE0FD2847B8B6007C8254 /* mergesort.bundle */; };
@@ -144,6 +145,7 @@
 		71934841281979490058FD9E /* TODO.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = TODO.md; sourceTree = "<group>"; };
 		7196E25729DAF40F000E9CB7 /* CustomADSRWidget+UIKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CustomADSRWidget+UIKit.swift"; sourceTree = "<group>"; };
 		7196E25B29DAF6F9000E9CB7 /* SwiftMathView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftMathView.swift; sourceTree = "<group>"; };
+		719DFEDD2E007039000B489B /* TouchBarSlider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TouchBarSlider.swift; sourceTree = "<group>"; };
 		71B4C0DD284FCC9800E42DB1 /* selectionsort.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = selectionsort.bundle; sourceTree = "<group>"; };
 		71B55E0D28383D5C00CA74CB /* Sequence+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sequence+Extensions.swift"; sourceTree = "<group>"; };
 		71BCE0FD2847B8B6007C8254 /* mergesort.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = mergesort.bundle; sourceTree = "<group>"; };
@@ -279,6 +281,7 @@
 		71650A292842693000A23BC2 /* Utilities */ = {
 			isa = PBXGroup;
 			children = (
+				719DFEDD2E007039000B489B /* TouchBarSlider.swift */,
 				71BCECAA2DFF4302007B2A62 /* BarLayout.swift */,
 				71650A2A2842693C00A23BC2 /* CustomIconLabel.swift */,
 				71650A2D28426C5700A23BC2 /* Category.swift */,
@@ -607,6 +610,7 @@
 			files = (
 				71B55E0E28383D5C00CA74CB /* Sequence+Extensions.swift in Sources */,
 				71650A2B2842693C00A23BC2 /* CustomIconLabel.swift in Sources */,
+				719DFEDE2E007039000B489B /* TouchBarSlider.swift in Sources */,
 				71FD4A43281C1F2C00E1E6FA /* SortItem.swift in Sources */,
 				71CFABFE2839528A004672DB /* HeapSortImpl.swift in Sources */,
 				71CCA0612865F57E00E4D666 /* MonokaiTheme.swift in Sources */,
