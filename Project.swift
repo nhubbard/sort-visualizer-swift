@@ -48,7 +48,13 @@ let app = Target.target(
         ],
     ]),
     sources: ["App/Sources/**"],
-    resources: ["App/Resources/**"],
+    resources: [
+        .glob(pattern: "App/Resources/**", excluding: ["App/Resources/Algorithms/**"]),
+        // A real folder reference, not a glob — AlgorithmRegistry's script loader (§2.4) looks
+        // up `Bundle.main.url(forResource: "Algorithms", withExtension: nil)` expecting an actual
+        // subdirectory, which a glob of loose files wouldn't preserve.
+        .folderReference(path: "App/Resources/Algorithms"),
+    ],
     entitlements: .file(path: "App/Resources/Sort Symphony.entitlements"),
     dependencies: [
         .target(name: "SortFeature"), .target(name: "SettingsFeature"),
