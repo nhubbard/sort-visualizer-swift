@@ -52,11 +52,12 @@ let app = Target.target(
     ]),
     sources: ["App/Sources/**"],
     resources: [
-        .glob(pattern: "App/Resources/**", excluding: ["App/Resources/Algorithms/**"]),
-        // A real folder reference, not a glob — AlgorithmRegistry's script loader (§2.4) looks
-        // up `Bundle.main.url(forResource: "Algorithms", withExtension: nil)` expecting an actual
-        // subdirectory, which a glob of loose files wouldn't preserve.
+        .glob(pattern: "App/Resources/**", excluding: ["App/Resources/Algorithms/**", "App/Resources/Shuffles/**"]),
+        // Real folder references, not globs — the script loaders (§2.4/§2A.4) look up
+        // `Bundle.main.url(forResource:withExtension: nil)` expecting an actual subdirectory,
+        // which a glob of loose files wouldn't preserve.
         .folderReference(path: "App/Resources/Algorithms"),
+        .folderReference(path: "App/Resources/Shuffles"),
     ],
     entitlements: .file(path: "App/Resources/Sort Symphony.entitlements"),
     dependencies: [
@@ -69,6 +70,9 @@ let app = Target.target(
         // implicit (BuiltInAlgorithms/BuiltInVisualizers are still never referenced by SortFeature
         // itself, only by whoever composes the app).
         .target(name: "BuiltInAlgorithms"), .target(name: "BuiltInVisualizers"),
+        // Composition-root registry wiring (AlgorithmKit's ShuffleRegistry, ScriptingKit's
+        // ScriptShuffleLoader) needs both directly — neither is re-exported by any of the above.
+        .target(name: "AlgorithmKit"), .target(name: "ScriptingKit"),
     ],
     settings: .settings(base: [
         "CODE_SIGN_ENTITLEMENTS": "App/Resources/Sort Symphony.entitlements",

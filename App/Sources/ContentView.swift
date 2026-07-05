@@ -1,3 +1,4 @@
+import AlgorithmKit
 import BuiltInAlgorithms
 import SettingsFeature
 import SortFeature
@@ -13,7 +14,7 @@ struct ContentView: View {
         NavigationStack {
             List {
                 NavigationLink("Debug: Quick Sort") {
-                    ScrollingSortView(algorithm: QuickSort(), arraySize: 24)
+                    ScrollingSortView(algorithm: QuickSort(), shuffle: debugShuffle, arraySize: 24)
                         .toolbar {
                             ToolbarItem(placement: .primaryAction) {
                                 Button {
@@ -43,5 +44,15 @@ struct ContentView: View {
             }
             .navigationTitle("Sort Symphony v2")
         }
+    }
+
+    /// `ShuffleRegistry` is populated synchronously in `Sort2App.init()`, before this view can ever
+    /// appear — a missing "random" shuffle here means the bundled `Shuffles/` resources are broken,
+    /// which should fail loudly in development rather than silently falling back to something else.
+    private var debugShuffle: any ShuffleAlgorithm {
+        guard let shuffle = ShuffleRegistry.shared.shuffle(id: ShuffleID(rawValue: "random")) else {
+            fatalError("Shuffles/random.js failed to load — check App/Resources/Shuffles bundling")
+        }
+        return shuffle
     }
 }

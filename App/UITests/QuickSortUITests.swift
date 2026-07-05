@@ -25,6 +25,14 @@ final class QuickSortUITests: XCTestCase {
         let statusLabel = app.staticTexts["sortStatusLabel"]
         XCTAssertTrue(statusLabel.waitForExistence(timeout: 5), "status label never appeared")
 
+        // Phase 6's checkpoint: a shuffle now plays before the sort, as part of the same
+        // recorded/visualized tape. Grab a mid-flight screenshot to prove it's actually visible,
+        // not just structurally present in the tape.
+        let midFlightScreenshot = XCTAttachment(screenshot: app.screenshot())
+        midFlightScreenshot.name = "quicksort-mid-flight-state"
+        midFlightScreenshot.lifetime = .keepAlways
+        add(midFlightScreenshot)
+
         let terminalState = NSPredicate(format: "value == %@ OR value == %@", "sorted", "sort-failed")
         let reachedTerminalState = XCTNSPredicateExpectation(predicate: terminalState, object: statusLabel)
         let result = XCTWaiter().wait(for: [reachedTerminalState], timeout: 30)

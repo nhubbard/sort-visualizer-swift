@@ -7,10 +7,10 @@ public struct ScrollingSortView: View {
     @State private var session: SortSession
 
     @MainActor
-    public init(algorithm: any SortAlgorithm, arraySize: Int = 48) {
+    public init(algorithm: any SortAlgorithm, shuffle: any ShuffleAlgorithm, arraySize: Int = 48) {
         self.algorithm = algorithm
         self.arraySize = arraySize
-        _session = State(wrappedValue: SortSession(algorithm: algorithm))
+        _session = State(wrappedValue: SortSession(algorithm: algorithm, shuffle: shuffle))
     }
 
     public var body: some View {
@@ -18,7 +18,7 @@ public struct ScrollingSortView: View {
             .navigationTitle(algorithm.metadata.displayName)
             .task {
                 let size = min(max(arraySize, algorithm.metadata.sizeRange.lowerBound), algorithm.metadata.sizeRange.upperBound)
-                await session.start(values: Array(1...size).shuffled())
+                await session.start(size: size)
             }
     }
 }

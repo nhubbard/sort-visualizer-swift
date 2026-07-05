@@ -20,6 +20,15 @@ public struct TapeHeader: Sendable, Codable, Equatable {
     /// Wall-clock time to RECORD — this is the real perf number, decoupled from playback speed.
     public let recordingDuration: TimeInterval
     public let recordedAt: Date
+    /// `nil` for a tape with no recorded shuffle (e.g. a hand-built test fixture, or an algorithm
+    /// recorded directly against a specific input) — matches `Marker.bucket`-style optionality
+    /// rather than a sentinel string.
+    public let shuffleID: String?
+    /// Where the sort's operations begin within `Tape.operations` — `0` when there's no shuffle.
+    /// A shuffle-then-sort is just one longer tape from `ReplayEngine`'s point of view; this is
+    /// the one piece of bookkeeping that lets a future consumer (step/scrub UI, a "skip shuffle"
+    /// button) distinguish the two phases without re-deriving it (§2A.4).
+    public let sortStartIndex: Int
 
     public init(
         algorithmID: String,
@@ -28,7 +37,9 @@ public struct TapeHeader: Sendable, Codable, Equatable {
         compareCount: Int,
         swapCount: Int,
         recordingDuration: TimeInterval,
-        recordedAt: Date
+        recordedAt: Date,
+        shuffleID: String? = nil,
+        sortStartIndex: Int = 0
     ) {
         self.algorithmID = algorithmID
         self.initialValues = initialValues
@@ -37,6 +48,8 @@ public struct TapeHeader: Sendable, Codable, Equatable {
         self.swapCount = swapCount
         self.recordingDuration = recordingDuration
         self.recordedAt = recordedAt
+        self.shuffleID = shuffleID
+        self.sortStartIndex = sortStartIndex
     }
 }
 

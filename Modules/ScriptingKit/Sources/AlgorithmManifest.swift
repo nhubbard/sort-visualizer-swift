@@ -74,47 +74,16 @@ extension AlgorithmManifest {
 /// pair that fails manifest decoding, fails validation, or has a duplicate `id`.
 public enum ScriptAlgorithmLoader {
     public static func loadScripts(from directory: URL) -> [any SortAlgorithm] {
-        let manifestURLs = ((try? FileManager.default.contentsOfDirectory(
-            at: directory,
-            includingPropertiesForKeys: nil
-        )) ?? [])
-        .filter { $0.lastPathComponent.hasSuffix(".manifest.json") }
-        .sorted { $0.lastPathComponent < $1.lastPathComponent }
-
-        var algorithms: [any SortAlgorithm] = []
-        var seenIDs: Set<String> = []
-
-        for manifestURL in manifestURLs {
-            do {
-                let manifest = try JSONDecoder().decode(AlgorithmManifest.self, from: Data(contentsOf: manifestURL))
-
-                guard !seenIDs.contains(manifest.id) else {
-                    logSkip("duplicate id \"\(manifest.id)\"", manifestURL: manifestURL)
-                    continue
-                }
-
-                let metadata = try manifest.makeMetadata()
-                let scriptURL = directory
-                    .appendingPathComponent(manifest.id)
-                    .appendingPathExtension("js")
-                let source = try String(contentsOf: scriptURL, encoding: .utf8)
-
-                seenIDs.insert(manifest.id)
-                algorithms.append(JSAlgorithmAdapter(
+        ScriptDiscovery.discover(
+            in: directory,
+            idOf: { (manifest: AlgorithmManifest) in manifest.id },
+            build: { manifest, source in
+                JSAlgorithmAdapter(
                     id: AlgorithmID(rawValue: manifest.id),
-                    metadata: metadata,
+                    metadata: try manifest.makeMetadata(),
                     source: source
-                ))
-            } catch {
-                logSkip("\(error)", manifestURL: manifestURL)
+                )
             }
-        }
-        return algorithms
-    }
-
-    private static func logSkip(_ reason: String, manifestURL: URL) {
-        #if DEBUG
-        print("[ScriptAlgorithmLoader] Skipping \(manifestURL.lastPathComponent): \(reason)")
-        #endif
+        )
     }
 }

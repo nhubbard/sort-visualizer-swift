@@ -23,4 +23,8 @@ public final class AlgorithmRegistry {
     public func discover() {
         algorithms = builtIns + (scriptLoader?() ?? [])
     }
+
+    public func algorithm(id: AlgorithmID) -> (any SortAlgorithm)? {
+        algorithms.first { $0.id == id }
+    }
 }

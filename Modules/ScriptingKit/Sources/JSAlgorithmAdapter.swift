@@ -1,16 +1,6 @@
 import AlgorithmKit
-import JavaScriptCore
+import Foundation
 import SortEngineKit
-
-public enum ScriptExecutionError: Error, Equatable, CustomStringConvertible {
-    case scriptFailed(String)
-
-    public var description: String {
-        switch self {
-        case let .scriptFailed(message): "Script failed: \(message)"
-        }
-    }
-}
 
 /// Native and scripted algorithms produce the exact same thing — a `Tape` — through the exact
 /// same `RecordingEngine` primitive surface (§2.1). From the rest of the app's point of view there
@@ -36,31 +26,7 @@ public struct JSAlgorithmAdapter: SortAlgorithm {
         try? recordThrowing(into: &engine)
     }
 
-    @discardableResult
-    public func recordThrowing(into engine: inout RecordingEngine, timeout: TimeInterval = 5.0) throws -> RecordingEngine {
-        let bridge = JSRecordingEngineBridge(engine: engine)
-        guard let context = JSContext() else {
-            throw ScriptExecutionError.scriptFailed("Failed to create JSContext")
-        }
-        context.setObject(bridge, forKeyedSubscript: "engine" as NSString)
-
-        var caughtError: String?
-        context.exceptionHandler = { _, exception in
-            caughtError = exception?.toString()
-        }
-
-        // A hard wall-clock ceiling on untrusted script execution — a badly written or malicious
-        // plugin cannot hang the app.
-        installExecutionTimeLimit(on: context, seconds: timeout)
-
-        context.evaluateScript(source)
-        context.evaluateScript("sort(engine)")
-
-        engine = bridge.engine
-
-        if let caughtError {
-            throw ScriptExecutionError.scriptFailed(caughtError)
-        }
-        return engine
+    public func recordThrowing(into engine: inout RecordingEngine, timeout: TimeInterval = 5.0) throws {
+        try runScript(source, entryPoint: "sort", into: &engine, timeout: timeout)
     }
 }
