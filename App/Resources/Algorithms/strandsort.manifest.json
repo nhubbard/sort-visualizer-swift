@@ -1,0 +1,11 @@
+{
+    "id": "strandsort",
+    "displayName": "Strand Sort",
+    "category": "logarithmic",
+    "stable": true,
+    "sizeRange": [16, 512],
+    "timeComplexity": { "best": "O(n)", "average": "O(n log n)", "worst": "O(n^2)" },
+    "spaceComplexity": "O(n)",
+    "iconName": "list.number",
+    "confirmationWarning": null
+}
