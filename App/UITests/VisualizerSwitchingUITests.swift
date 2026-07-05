@@ -11,9 +11,10 @@ final class VisualizerSwitchingUITests: XCTestCase {
 
     func testSwitchingVisualizerMidSortDoesNotDisruptTheRunningSession() throws {
         let app = XCUIApplication()
+        app.launchEnvironment = ["UI_TEST_ARRAY_SIZE": "24"]
         app.launch()
 
-        app.buttons["debugQuickSortLink"].tap()
+        app.buttons["algorithmLink.quicksort"].tap()
 
         let canvas = app.descendants(matching: .any).matching(identifier: "sortVisualizationCanvas").firstMatch
         XCTAssertTrue(canvas.waitForExistence(timeout: 5), "canvas never appeared")

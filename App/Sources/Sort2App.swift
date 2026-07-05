@@ -1,5 +1,6 @@
 import AlgorithmKit
 import BuiltInVisualizers
+import Foundation
 import ScriptingKit
 import SettingsKit
 import SwiftUI
@@ -27,6 +28,15 @@ struct Sort2App: App {
             ScriptShuffleLoader.loadScripts(from: Bundle.main.url(forResource: "Shuffles", withExtension: nil)!)
         }
         ShuffleRegistry.shared.discover()
+
+        // UI-test-only override (never set by a real launch): AppSettings.defaultArraySize's real
+        // default (256) is deliberately large, and a quadratic/factorial algorithm at that size can
+        // take minutes to visually finish — correct, pedagogically-honest behavior in the running
+        // app, but impractical for a UI test's timeout. Tests set this via `launchEnvironment`.
+        if let overrideValue = ProcessInfo.processInfo.environment["UI_TEST_ARRAY_SIZE"],
+           let overrideSize = Int(overrideValue) {
+            AppSettings.shared.defaultArraySize = overrideSize
+        }
     }
 
     var body: some Scene {

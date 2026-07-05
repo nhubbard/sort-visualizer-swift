@@ -1,42 +1,41 @@
 import AlgorithmKit
+import DesignSystemKit
+import HomeFeature
 import SettingsFeature
+import SettingsKit
 import SortFeature
 import SwiftUI
 
-// Placeholder — replaced with the real, AlgorithmRegistry-driven navigation in Phase 9. The debug
-// links below are Phase 4's explicit "wire exactly one entry point" checkpoint, extended in this
-// Phase 7 batch with a second link so a newly-ported algorithm gets the same live, in-app proof
-// quicksort got — not just a unit test.
+/// Phase 9's data-driven navigation (§4.4 of ARCHITECTURE_V2.md) — the sidebar is generated
+/// directly from `AlgorithmRegistry.shared.algorithms(in:)`, sectioned by `AlgorithmCategory`.
+/// Adding a new algorithm from here on is "drop a `.js` + manifest pair in `Algorithms/`," with
+/// zero changes to this file — `Page.swift`'s five parallel hand-maintained switches are gone.
 struct ContentView: View {
+    @State private var selection: AlgorithmID?
     @State private var isShowingSettings = false
 
     var body: some View {
-        NavigationStack {
-            List {
-                // NavigationLink(_:destination:)'s closure-based initializer builds its
-                // destination *eagerly*, as soon as the List renders — not lazily on tap. With two
-                // links that would construct both ScrollingSortViews (and hit debugAlgorithm's
-                // fatalError for anything not yet bundled) at launch. NavigationLink(_:value:) +
-                // .navigationDestination(for:) defers construction until actually navigated to.
-                NavigationLink("Debug: Quick Sort", value: "quicksort")
-                    .accessibilityIdentifier("debugQuickSortLink")
-                NavigationLink("Debug: Gnome Sort", value: "gnomesort")
-                    .accessibilityIdentifier("debugGnomeSortLink")
-            }
-            .navigationDestination(for: String.self) { algorithmID in
-                debugDestination(algorithmID: algorithmID)
+        NavigationSplitView {
+            List(selection: $selection) {
+                ForEach(AlgorithmCategory.allCases) { category in
+                    let algorithms = AlgorithmRegistry.shared.algorithms(in: category)
+                    if !algorithms.isEmpty {
+                        Section(category.displayName) {
+                            ForEach(algorithms, id: \.id) { algorithm in
+                                NavigationLink(value: algorithm.id) {
+                                    CustomIconLabel(text: algorithm.metadata.displayName, iconName: algorithm.metadata.iconName)
+                                }
+                                .accessibilityIdentifier("algorithmLink.\(algorithm.id.rawValue)")
+                            }
+                        }
+                    }
+                }
             }
             .navigationTitle("Sort Symphony v2")
-        }
-    }
-
-    @ViewBuilder
-    private func debugDestination(algorithmID: String) -> some View {
-        // Deliberately a small constant, not AppSettings.shared.defaultArraySize (256): this is a
-        // temporary demo screen for algorithms across a wide range of sizeRanges (O(n^2)/O(n!)
-        // ones included), and 256 elements makes a quadratic algorithm take minutes to visually
-        // finish. Phase 9's real, data-driven UI is where the user's actual default belongs.
-        ScrollingSortView(algorithm: debugAlgorithm(id: algorithmID), shuffle: debugShuffle, arraySize: 24)
+            // Attached to the sidebar column specifically — a `.toolbar` on the NavigationSplitView
+            // itself never actually renders a button in this SwiftUI version, so Settings needs a
+            // home on whichever column has a real navigation bar. The sheet lives at this level too
+            // (not per-detail-view) so it's reachable from Home as well as from a running sort.
             .toolbar {
                 ToolbarItem(placement: .primaryAction) {
                     Button {
@@ -47,35 +46,42 @@ struct ContentView: View {
                     .accessibilityIdentifier("settingsButton")
                 }
             }
-            // A sheet, not a navigation push — pushing to Settings and back would tear down and
-            // recreate ScrollingSortView's @State session, losing whatever the sort was in the
-            // middle of doing. This is Phase 5's actual checkpoint: switching visualizers mid-sort
-            // without disturbing SortSession/ReplayEngine.
-            .sheet(isPresented: $isShowingSettings) {
-                NavigationStack {
-                    SettingsView()
-                        .toolbar {
-                            ToolbarItem(placement: .cancellationAction) {
-                                Button("Done") { isShowingSettings = false }
-                            }
-                        }
-                }
+        } detail: {
+            if let selection, let algorithm = AlgorithmRegistry.shared.algorithm(id: selection) {
+                ScrollingSortView(algorithm: algorithm, shuffle: defaultShuffle, arraySize: arraySize)
+                    .id(selection)
+            } else {
+                HomeView()
             }
+        }
+        .sheet(isPresented: $isShowingSettings) {
+            NavigationStack {
+                SettingsView()
+                    .toolbar {
+                        ToolbarItem(placement: .cancellationAction) {
+                            Button("Done") { isShowingSettings = false }
+                        }
+                    }
+            }
+        }
+    }
+
+    /// UI tests override this via the `UI_TEST_ARRAY_SIZE` launch environment variable (read in
+    /// `Sort2App.init()`) — `AppSettings.defaultArraySize`'s real default (256) is deliberately
+    /// large, and a quadratic/factorial algorithm at that size can take minutes to visually
+    /// finish, which is correct, pedagogically-honest behavior in the running app but impractical
+    /// for a UI test's timeout. Production launches never set that variable, so this is a no-op
+    /// outside of tests.
+    private var arraySize: Int {
+        AppSettings.shared.defaultArraySize
     }
 
     /// `AlgorithmRegistry`/`ShuffleRegistry` are populated synchronously in `Sort2App.init()`,
     /// before this view can ever appear — a missing lookup here means the bundled resources are
     /// broken, which should fail loudly in development rather than silently falling back.
-    private func debugAlgorithm(id: String) -> any SortAlgorithm {
-        guard let algorithm = AlgorithmRegistry.shared.algorithm(id: AlgorithmID(rawValue: id)) else {
-            fatalError("Algorithms/\(id).js failed to load — check App/Resources/Algorithms bundling")
-        }
-        return algorithm
-    }
-
-    private var debugShuffle: any ShuffleAlgorithm {
-        guard let shuffle = ShuffleRegistry.shared.shuffle(id: ShuffleID(rawValue: "random")) else {
-            fatalError("Shuffles/random.js failed to load — check App/Resources/Shuffles bundling")
+    private var defaultShuffle: any ShuffleAlgorithm {
+        guard let shuffle = ShuffleRegistry.shared.shuffle(id: AppSettings.shared.defaultShuffleID) else {
+            fatalError("Shuffles/\(AppSettings.shared.defaultShuffleID.rawValue).js failed to load — check App/Resources/Shuffles bundling")
         }
         return shuffle
     }

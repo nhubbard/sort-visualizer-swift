@@ -1,3 +1,4 @@
+import AlgorithmKit
 import Foundation
 import Testing
 import VisualizationKit
@@ -22,6 +23,7 @@ struct AppSettingsTests {
         #expect(settings.synthNoteRange == 36...72)
         #expect(settings.defaultArraySize == 256)
         #expect(settings.codeTheme == CodeThemeID(rawValue: "monokai"))
+        #expect(settings.defaultShuffleID == ShuffleID(rawValue: "random"))
     }
 
     @Test
@@ -34,6 +36,7 @@ struct AppSettingsTests {
         first.synthNoteRange = 24...96
         first.defaultArraySize = 128
         first.codeTheme = CodeThemeID(rawValue: "dracula")
+        first.defaultShuffleID = ShuffleID(rawValue: "shuffledcubic")
 
         let second = AppSettings(store: store)
         #expect(second.selectedVisualizerID == VisualizerID(rawValue: "rainbow"))
@@ -42,5 +45,6 @@ struct AppSettingsTests {
         #expect(second.synthNoteRange == 24...96)
         #expect(second.defaultArraySize == 128)
         #expect(second.codeTheme == CodeThemeID(rawValue: "dracula"))
+        #expect(second.defaultShuffleID == ShuffleID(rawValue: "shuffledcubic"))
     }
 }

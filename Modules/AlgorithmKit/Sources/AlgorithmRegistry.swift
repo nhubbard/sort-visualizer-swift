@@ -27,4 +27,12 @@ public final class AlgorithmRegistry {
     public func algorithm(id: AlgorithmID) -> (any SortAlgorithm)? {
         algorithms.first { $0.id == id }
     }
+
+    /// Feeds Phase 9's data-driven `ContentView` directly (§4.4) — sorted by display name so the
+    /// sidebar's section order doesn't depend on discovery/file-system order.
+    public func algorithms(in category: AlgorithmCategory) -> [any SortAlgorithm] {
+        algorithms
+            .filter { $0.metadata.category == category }
+            .sorted { $0.metadata.displayName < $1.metadata.displayName }
+    }
 }

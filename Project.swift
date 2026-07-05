@@ -21,7 +21,7 @@ let modules: [Target] =
     ) +
     Module.framework(name: "BuiltInAlgorithms", dependencies: [.target(name: "AlgorithmKit")]) +
     Module.framework(name: "BuiltInVisualizers", dependencies: [.target(name: "VisualizationKit")]) +
-    Module.framework(name: "SettingsKit", dependencies: [.target(name: "VisualizationKit")]) +
+    Module.framework(name: "SettingsKit", dependencies: [.target(name: "VisualizationKit"), .target(name: "AlgorithmKit")]) +
     Module.framework(name: "AudioEngineKit", dependencies: [
         .external(name: "AudioKit"), .external(name: "AudioKitUI"), .external(name: "SoundpipeAudioKit"),
         // AudioService imports AudioKitEX directly for Fader — Tuist needs this link edge even
@@ -33,18 +33,24 @@ let modules: [Target] =
     Module.framework(name: "PersistenceKit", dependencies: [
         .external(name: "DeviceKit"), .target(name: "SortEngineKit"), .target(name: "AlgorithmKit"),
     ]) +
-    Module.framework(name: "DesignSystemKit") +
-    Module.framework(name: "MathRenderingKit", dependencies: [.external(name: "SwiftMath")]) +
+    Module.framework(name: "DesignSystemKit", dependencies: [
+        .external(name: "Then"), .target(name: "SettingsKit"),
+    ]) +
+    Module.framework(name: "MathRenderingKit", dependencies: [
+        .external(name: "SwiftMath"), .target(name: "AlgorithmKit"),
+    ]) +
     Module.framework(name: "SortFeature", dependencies: [
         .target(name: "SortEngineKit"), .target(name: "AlgorithmKit"), .target(name: "VisualizationKit"),
         .target(name: "AudioEngineKit"), .target(name: "SettingsKit"), .target(name: "DesignSystemKit"),
-        .target(name: "PersistenceKit"),
+        .target(name: "PersistenceKit"), .target(name: "MathRenderingKit"), .external(name: "MarkdownUI"),
     ]) +
     Module.framework(name: "SettingsFeature", dependencies: [
-        .target(name: "SettingsKit"), .target(name: "VisualizationKit"),
+        .target(name: "SettingsKit"), .target(name: "VisualizationKit"), .target(name: "AlgorithmKit"),
         .target(name: "AudioEngineKit"), .target(name: "DesignSystemKit"),
     ]) +
-    Module.framework(name: "HomeFeature", dependencies: [.target(name: "DesignSystemKit")]) +
+    Module.framework(name: "HomeFeature", dependencies: [
+        .target(name: "DesignSystemKit"), .external(name: "MarkdownUI"),
+    ]) +
     Module.framework(name: "BenchmarkFeature", dependencies: [
         .target(name: "SortEngineKit"), .target(name: "AlgorithmKit"), .target(name: "PersistenceKit"),
     ])
@@ -68,12 +74,17 @@ let app = Target.target(
     ]),
     sources: ["App/Sources/**"],
     resources: [
-        .glob(pattern: "App/Resources/**", excluding: ["App/Resources/Algorithms/**", "App/Resources/Shuffles/**"]),
+        .glob(pattern: "App/Resources/**", excluding: [
+            "App/Resources/Algorithms/**", "App/Resources/Shuffles/**", "App/Resources/AlgorithmDetails/**",
+        ]),
         // Real folder references, not globs — the script loaders (§2.4/§2A.4) look up
         // `Bundle.main.url(forResource:withExtension: nil)` expecting an actual subdirectory,
-        // which a glob of loose files wouldn't preserve.
+        // which a glob of loose files wouldn't preserve. Same story for AlgorithmDetails' nested
+        // per-algorithm subdirectories (description.md + one .md per code sample language) —
+        // Phase 9's detail section reads a specific algorithm's folder as a real subdirectory.
         .folderReference(path: "App/Resources/Algorithms"),
         .folderReference(path: "App/Resources/Shuffles"),
+        .folderReference(path: "App/Resources/AlgorithmDetails"),
     ],
     entitlements: .file(path: "App/Resources/Sort Symphony.entitlements"),
     dependencies: [
@@ -89,8 +100,11 @@ let app = Target.target(
         .target(name: "BuiltInVisualizers"),
         // Composition-root registry wiring (AlgorithmKit's Algorithm/ShuffleRegistry,
         // ScriptingKit's Script*Loader) needs both directly — neither is re-exported by any of the
-        // above.
-        .target(name: "AlgorithmKit"), .target(name: "ScriptingKit"),
+        // above. DesignSystemKit is needed directly too, for ContentView's CustomIconLabel sidebar
+        // rows (Phase 9) — SortFeature/SettingsFeature/HomeFeature all depend on it already, but
+        // don't re-export it.
+        .target(name: "AlgorithmKit"), .target(name: "ScriptingKit"), .target(name: "DesignSystemKit"),
+        .target(name: "SettingsKit"),
     ],
     settings: .settings(base: [
         "CODE_SIGN_ENTITLEMENTS": "App/Resources/Sort Symphony.entitlements",

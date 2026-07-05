@@ -1,8 +1,9 @@
 import XCTest
 
 /// Phase 4's "does the whole idea actually work" checkpoint, proven by actually driving the app
-/// rather than trusting a unit test: launch, navigate to the temporary debug entry point, and
-/// confirm record -> replay -> draw produces a genuinely correctly-sorted result, not just "some
+/// rather than trusting a unit test: launch, navigate to Quick Sort via the real, data-driven
+/// sidebar (Phase 9 — `algorithmLink.quicksort`, not a temporary debug link), and confirm
+/// record -> replay -> draw produces a genuinely correctly-sorted result, not just "some
 /// completion event fired." A `Canvas` has no discrete accessible bars to individually inspect, so
 /// `SortView` exposes `sortStatusLabel`'s accessibility value as the correctness signal — the app
 /// itself checks `frame.values == frame.values.sorted()` and reports the answer.
@@ -13,11 +14,14 @@ final class QuickSortUITests: XCTestCase {
 
     func testQuickSortEndToEndProducesACorrectlySortedResult() throws {
         let app = XCUIApplication()
+        // Small, fast array size — AppSettings.defaultArraySize's real default (256) is
+        // deliberately large and would make even Quick Sort's own timeout unreliable.
+        app.launchEnvironment = ["UI_TEST_ARRAY_SIZE": "24"]
         app.launch()
 
-        let debugLink = app.buttons["debugQuickSortLink"]
-        XCTAssertTrue(debugLink.waitForExistence(timeout: 5), "debug entry point never appeared")
-        debugLink.tap()
+        let sidebarLink = app.buttons["algorithmLink.quicksort"]
+        XCTAssertTrue(sidebarLink.waitForExistence(timeout: 5), "Quick Sort sidebar link never appeared")
+        sidebarLink.tap()
 
         let canvas = app.descendants(matching: .any).matching(identifier: "sortVisualizationCanvas").firstMatch
         XCTAssertTrue(canvas.waitForExistence(timeout: 5), "visualization canvas never appeared — recording/replay wiring is broken")
@@ -49,11 +53,18 @@ final class QuickSortUITests: XCTestCase {
         )
     }
 
-    func testDebugEntryPointIsReachableFromLaunch() throws {
+    func testSidebarIsReachableFromLaunchAndDataDriven() throws {
         let app = XCUIApplication()
+        // Small, fast array size — AppSettings.defaultArraySize's real default (256) is
+        // deliberately large and would make even Quick Sort's own timeout unreliable.
+        app.launchEnvironment = ["UI_TEST_ARRAY_SIZE": "24"]
         app.launch()
 
         XCTAssertTrue(app.navigationBars["Sort Symphony v2"].waitForExistence(timeout: 5))
-        XCTAssertTrue(app.buttons["debugQuickSortLink"].exists)
+        // Proves Phase 9's actual claim: the sidebar is generated from AlgorithmRegistry, not a
+        // hand-maintained list — Quick Sort (Logarithmic) and Bubble Sort (Quadratic) both being
+        // present confirms category sectioning works, not just a single flat list.
+        XCTAssertTrue(app.buttons["algorithmLink.quicksort"].exists)
+        XCTAssertTrue(app.buttons["algorithmLink.bubblesort"].exists)
     }
 }

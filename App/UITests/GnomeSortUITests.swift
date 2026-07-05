@@ -10,11 +10,15 @@ final class GnomeSortUITests: XCTestCase {
 
     func testGnomeSortEndToEndProducesACorrectlySortedResult() throws {
         let app = XCUIApplication()
+        // Small, fast array size — AppSettings.defaultArraySize's real default (256) would make
+        // Gnome Sort's O(n^2) tape take minutes, which is correct/expected in the real app but
+        // impractical for a UI test's timeout.
+        app.launchEnvironment = ["UI_TEST_ARRAY_SIZE": "24"]
         app.launch()
 
-        let debugLink = app.buttons["debugGnomeSortLink"]
-        XCTAssertTrue(debugLink.waitForExistence(timeout: 5), "debug entry point never appeared")
-        debugLink.tap()
+        let sidebarLink = app.buttons["algorithmLink.gnomesort"]
+        XCTAssertTrue(sidebarLink.waitForExistence(timeout: 5), "Gnome Sort sidebar link never appeared")
+        sidebarLink.tap()
 
         let canvas = app.descendants(matching: .any).matching(identifier: "sortVisualizationCanvas").firstMatch
         XCTAssertTrue(canvas.waitForExistence(timeout: 5), "visualization canvas never appeared")

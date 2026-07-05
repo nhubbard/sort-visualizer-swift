@@ -6,5 +6,5 @@
     "sizeRange": [4, 16],
     "timeComplexity": { "best": "O(n)", "average": "O(n * n!)", "worst": "O(n * n!)" },
     "spaceComplexity": "O(1)",
-    "iconName": "bogo"
+    "iconName": "die.face.5.fill"
 }

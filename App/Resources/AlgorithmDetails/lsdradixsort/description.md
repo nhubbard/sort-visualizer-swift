@@ -1,0 +1,7 @@
+*From Wikipedia, the free encyclopedia*
+
+In computer science, radix sort is a non-[comparative](https://en.wikipedia.org/wiki/Comparison_sort) sorting algorithm. It avoids comparison by creating and distributing elements into buckets according to their radix. For elements with more than one [significant digit](https://en.wikipedia.org/wiki/Significant_digit), this bucketing process is repeated for each digit, while preserving the ordering of the prior step, until all digits have been considered. For this reason, radix sort has also been called [bucket sort](https://en.wikipedia.org/wiki/Bucket_sort) and digital sort.
+
+The first memory-efficient computer algorithm for this sorting method was developed in 1954 at MIT by [Harold H. Seward](https://en.wikipedia.org/wiki/Harold_H._Seward). Computerized radix sorts had previously been dismissed as impractical because of the perceived need for variable allocation of buckets of unknown size. Seward's innovation was to use a linear scan to determine the required bucket sizes and offsets beforehand, allowing for a single static allocation of auxiliary memory. The linear scan is closely related to Seward's other algorithm - [counting sort](https://en.wikipedia.org/wiki/Counting_sort).
+
+In the modera era, radix sorts are most commonly applied to collections of binary strings and integers. It has been shown in some benchmarks to be faster than other more general-purpose sorting algorithms, sometimes 50% to three times faster.

@@ -1,10 +1,20 @@
 import SortEngineKit
 
 /// The same three groups the app already uses (`Shared/Assets.xcassets/Algorithm Icons/{Logarithmic,Quadratic,Weird}`).
-public enum AlgorithmCategory: String, Sendable, Codable, CaseIterable {
+public enum AlgorithmCategory: String, Sendable, Codable, CaseIterable, Identifiable {
     case logarithmic
     case quadratic
     case weird
+
+    public var id: Self { self }
+
+    public var displayName: String {
+        switch self {
+        case .logarithmic: "Logarithmic"
+        case .quadratic: "Quadratic"
+        case .weird: "Weird"
+        }
+    }
 }
 
 /// Best/average/worst, as free-form display strings — feeds the existing `complexity.json`-style

@@ -23,12 +23,24 @@ public struct ScrollingSortView: View {
     }
 
     public var body: some View {
-        SortView(session: session)
-            .navigationTitle(algorithm.metadata.displayName)
-            .task {
-                // SortSession.start(size:) clamps into algorithm.metadata.sizeRange itself, so
-                // every caller gets that enforcement, not just this one.
-                await session.start(size: arraySize)
+        // Matches Legacy/Shared/Views/Main/ScrollingSortView.swift's own GeometryReader approach:
+        // the sort visualization fills the whole visible viewport on first appearance (not a
+        // fixed/minimum height), with the detail section sitting below the fold — a deliberate
+        // "the animation is the main event" layout, not a byproduct of ScrollView's own sizing.
+        GeometryReader { geometry in
+            ScrollView {
+                VStack(alignment: .leading, spacing: 0) {
+                    SortView(session: session)
+                        .frame(width: geometry.size.width, height: geometry.size.height)
+                    AlgorithmDetailSection(algorithm: algorithm)
+                }
             }
+        }
+        .navigationTitle(algorithm.metadata.displayName)
+        .task {
+            // SortSession.start(size:) clamps into algorithm.metadata.sizeRange itself, so
+            // every caller gets that enforcement, not just this one.
+            await session.start(size: arraySize)
+        }
     }
 }
