@@ -11,5 +11,8 @@
 public protocol AudioPlaying: Sendable {
     func start() throws
     func stop()
-    func play(value: Int, in range: ClosedRange<Int>)
+    /// `holdSeconds` comes from the caller (derived from the *current* replay speed, which may
+    /// have changed live since playback started) rather than this type reading a global default
+    /// itself — otherwise a per-session speed override would leave notes held for a stale duration.
+    func play(value: Int, in range: ClosedRange<Int>, holdSeconds: Double)
 }

@@ -24,14 +24,22 @@ public struct SortView: View {
         case .idle, .recording, .ready:
             ProgressView()
         case let .replaying(replay), let .complete(replay):
-            if let visualizer = VisualizerRegistry.shared.visualizer(id: settings.selectedVisualizerID) {
-                VisualizationCanvas(replay: replay, visualizer: visualizer)
-                    .accessibilityIdentifier("sortVisualizationCanvas")
-            } else {
-                ProgressView()
-            }
+            canvas(for: replay)
+                .safeAreaInset(edge: .bottom) {
+                    RunControlBar(session: session, replay: replay)
+                }
         case .failed:
             ContentUnavailableView("Sort Failed", systemImage: "exclamationmark.triangle")
+        }
+    }
+
+    @ViewBuilder
+    private func canvas(for replay: ReplayEngine) -> some View {
+        if let visualizer = VisualizerRegistry.shared.visualizer(id: settings.selectedVisualizerID) {
+            VisualizationCanvas(replay: replay, visualizer: visualizer)
+                .accessibilityIdentifier("sortVisualizationCanvas")
+        } else {
+            ProgressView()
         }
     }
 

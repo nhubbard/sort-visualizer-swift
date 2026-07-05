@@ -27,11 +27,17 @@ public final class SortSession {
 
     public private(set) var phase: Phase = .idle
 
+    /// Local to this session, seeded from `AppSettings.soundEnabled` at construction but never
+    /// written back — the global setting is the *default* for new sessions, this is the
+    /// currently-running sort's own on/off switch (a run-control-bar toggle, not a Settings toggle).
+    public var soundEnabled: Bool
+
     public let algorithm: any SortAlgorithm
     public let shuffle: any ShuffleAlgorithm
     private let audio: any AudioPlaying
     private let analytics: AnalyticsService
     private let settings: AppSettings
+    private var monitorTask: Task<Void, Never>?
 
     public init(
         algorithm: any SortAlgorithm,
@@ -51,6 +57,7 @@ public final class SortSession {
         self.audio = audio
         self.analytics = analytics
         self.settings = settings
+        self.soundEnabled = settings.soundEnabled
     }
 
     /// Unconditionally clamps into `algorithm.metadata.sizeRange` rather than warning past it —
@@ -109,33 +116,64 @@ public final class SortSession {
 
     private func startReplay(_ tape: Tape) {
         let replay = ReplayEngine(tape: tape)
+        replay.speed = settings.playbackSpeed
         phase = .replaying(replay)
-        let audio = self.audio
-        let settings = self.settings
-        let playbackTask = replay.play(operationsPerSecond: settings.playbackSpeed) { [weak replay] operation in
-            guard settings.soundEnabled, let replay else { return }
-            SortSession.playAudio(for: operation, frame: replay.frame, audio: audio)
-        }
-        Task {
+        beginPlayback(replay)
+    }
+
+    /// Starts (or resumes, after a `pause()`) the timed playback loop, and (re-)arms a monitor
+    /// that only transitions `phase` to `.complete` — and records analytics — once the replay has
+    /// *genuinely* finished (`stepIndex` reached the end), not merely whenever the current
+    /// `playbackTask` stops running. A `pause()` also stops that task (by cancellation), so without
+    /// this distinction, pausing would immediately look like completion and both mark the sort done
+    /// early and double-record analytics on a later real completion.
+    private func beginPlayback(_ replay: ReplayEngine) {
+        let playbackTask = replay.play(onStep: makeOnStepClosure(for: replay))
+        monitorTask?.cancel()
+        monitorTask = Task { [weak self] in
             await playbackTask.value
-            phase = .complete(replay)
-            try? await analytics.record(tape.header, algorithmID: algorithm.id)
+            guard let self, replay.stepIndex >= replay.totalOperationCount else { return }
+            self.phase = .complete(replay)
+            try? await self.analytics.record(replay.header, algorithmID: self.algorithm.id)
+        }
+    }
+
+    /// Toggles between playing and paused. A no-op once `phase` has actually reached `.complete`
+    /// — a stray tap on a play button the UI failed to disable can't re-trigger analytics
+    /// recording. Deliberately does *not* also gate on `stepIndex < totalOperationCount`: if the
+    /// user has manually stepped all the way to the end while paused, `phase` is still
+    /// `.replaying` (only `beginPlayback`'s monitor ever flips it), so resuming must still call
+    /// `beginPlayback` — its `play()` loop finishes instantly and the monitor correctly detects
+    /// genuine completion from there, rather than getting stuck unable to ever reach `.complete`.
+    public func togglePlayback() {
+        guard case let .replaying(replay) = phase else { return }
+        if replay.isPlaying {
+            replay.pause()
+        } else {
+            beginPlayback(replay)
         }
     }
 
     /// One note per touched index, keyed on that index's **current** value (post-operation) —
     /// matches v1's "play a note per touched index" behavior (`compare`/`swap` both play both
     /// indices; `setValue` plays the one it touched), but pitch tracks value, not index (§3.1).
-    private static func playAudio(for operation: SortOperation, frame: [ReplayEngine.BarState], audio: any AudioPlaying) {
-        let range = 1...frame.count
-        switch operation {
-        case let .compare(i, j), let .swap(i, j):
-            audio.play(value: frame[i].value, in: range)
-            audio.play(value: frame[j].value, in: range)
-        case let .setValue(i, _):
-            audio.play(value: frame[i].value, in: range)
-        default:
-            break
+    /// Reads `soundEnabled`/`replay.speed` live on every call (both are `weak`/reference-captured),
+    /// so toggling sound or adjusting speed mid-replay takes effect on the very next operation.
+    private func makeOnStepClosure(for replay: ReplayEngine) -> (SortOperation) -> Void {
+        let audio = self.audio
+        return { [weak self, weak replay] operation in
+            guard let self, self.soundEnabled, let replay else { return }
+            let holdSeconds = max(1.0 / replay.speed, 0.03)
+            let range = 1...replay.frame.count
+            switch operation {
+            case let .compare(i, j), let .swap(i, j):
+                audio.play(value: replay.frame[i].value, in: range, holdSeconds: holdSeconds)
+                audio.play(value: replay.frame[j].value, in: range, holdSeconds: holdSeconds)
+            case let .setValue(i, _):
+                audio.play(value: replay.frame[i].value, in: range, holdSeconds: holdSeconds)
+            default:
+                break
+            }
         }
     }
 }

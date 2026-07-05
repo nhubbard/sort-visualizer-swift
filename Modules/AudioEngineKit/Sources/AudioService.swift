@@ -61,7 +61,7 @@ public final class AudioService: AudioPlaying {
     /// can outrun AudioKit's note-scheduling and glitch, because note-firing is woven into the
     /// algorithm's own timing"). This method returns immediately regardless of hold duration, so
     /// `ReplayEngine`'s playback loop is never slowed down by audio.
-    public func play(value: Int, in range: ClosedRange<Int>) {
+    public func play(value: Int, in range: ClosedRange<Int>, holdSeconds: Double) {
         if !isStarted { try? start() }
         guard isStarted else { return }
 
@@ -73,7 +73,6 @@ public final class AudioService: AudioPlaying {
         osc.frequency = frequency
         env.openGate()
 
-        let holdSeconds = max(1.0 / settings.playbackSpeed, 0.03)
         let env = self.env
         Task {
             try? await Task.sleep(for: .seconds(holdSeconds))

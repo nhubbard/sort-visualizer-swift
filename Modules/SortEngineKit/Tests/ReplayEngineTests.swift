@@ -35,6 +35,47 @@ struct ReplayEngineTests {
         #expect(engine.frame.map(\.value) == [1, 3, 2])
         #expect(engine.frame[0].isSorted)
         #expect(engine.compareCount == 1)
+        #expect(engine.swapCount == 1)
+        #expect(engine.stepIndex == tape.operations.count)
+    }
+
+    @Test
+    func seekToNonCheckpointIndexRestoresSwapCountAlongsideCompareCount() {
+        let operations: [SortOperation] = (0..<1200).map { i in
+            i.isMultiple(of: 2) ? .compare(0, 1) : .swap(0, 1)
+        }
+        let tape = makeTape(initialValues: [1, 2], operations: operations)
+
+        let reference = ReplayEngine(tape: tape)
+        for _ in 0..<900 { reference.stepForward() }
+
+        let seeking = ReplayEngine(tape: tape)
+        seeking.seek(to: 733)
+        for _ in 733..<900 { seeking.stepForward() }
+
+        #expect(seeking.swapCount == reference.swapCount)
+    }
+
+    /// The direct regression test for the reported bug: changing `speed` while `play()` is
+    /// already running must change the cadence of the *current* replay, not just future ones.
+    @Test
+    func liveSpeedChangeDuringPlayAffectsCurrentReplayImmediately() async {
+        let operations: [SortOperation] = (0..<20).map { _ in .compare(0, 1) }
+        let tape = makeTape(initialValues: [1, 2], operations: operations)
+        let engine = ReplayEngine(tape: tape)
+        engine.speed = 5.0 // 0.2s/op — 20 ops would take ~4s at this rate
+
+        let task = engine.play()
+        engine.speed = 100_000.0 // crank it up immediately after starting
+
+        let deadline = ContinuousClock.now + .seconds(2)
+        while ContinuousClock.now < deadline, engine.stepIndex < tape.operations.count {
+            try? await Task.sleep(for: .milliseconds(5))
+        }
+        task.cancel()
+
+        // If the loop had captured the original speed instead of reading it live, this would
+        // still be stuck near step 0-1 two seconds in (at 5 ops/sec).
         #expect(engine.stepIndex == tape.operations.count)
     }
 

@@ -126,6 +126,56 @@ struct SortSessionTests {
         #expect(replay.frame.map(\.value) == Array(1...8))
     }
 
+    /// Regression test for the pause/resume redesign: pausing mid-replay must not prematurely
+    /// flip `phase` to `.complete` (the old one-shot "await the first playbackTask" design would
+    /// have, since a cancelled task's `.value` still resolves), and resuming must continue from
+    /// where it left off rather than restarting or getting stuck.
+    @Test
+    func pausingThenResumingReachesCompletionWithoutLosingProgress() async throws {
+        let settings = makeFastSettings()
+        settings.playbackSpeed = 20.0 // slow enough to reliably catch mid-replay for this test
+        let session = SortSession(algorithm: FakeAlgorithm(), shuffle: FakeReverseShuffle(), settings: settings)
+
+        await session.start(size: 12)
+        guard case let .replaying(replay) = session.phase else {
+            Issue.record("expected .replaying immediately after start, got \(session.phase)")
+            return
+        }
+
+        try await Task.sleep(for: .milliseconds(50))
+        session.togglePlayback() // pause
+        #expect(!replay.isPlaying)
+        let stepIndexAtPause = replay.stepIndex
+        #expect(stepIndexAtPause > 0)
+        #expect(stepIndexAtPause < replay.totalOperationCount)
+
+        try await Task.sleep(for: .milliseconds(50))
+        #expect(replay.stepIndex == stepIndexAtPause) // nothing advances while paused
+
+        replay.speed = 100_000.0 // finish quickly once resumed
+        session.togglePlayback() // resume
+        try await waitUntilTerminal(session)
+
+        guard case let .complete(finished) = session.phase else {
+            Issue.record("expected .complete, got \(session.phase)")
+            return
+        }
+        #expect(finished.frame.map(\.value) == Array(1...12))
+        #expect(finished.stepIndex >= stepIndexAtPause)
+    }
+
+    @Test
+    func soundEnabledIsLocalToTheSessionNotWrittenBackToSettings() {
+        let settings = makeFastSettings()
+        settings.soundEnabled = true
+        let session = SortSession(algorithm: FakeAlgorithm(), shuffle: FakeReverseShuffle(), settings: settings)
+
+        #expect(session.soundEnabled) // seeded from the global default at construction
+        session.soundEnabled = false
+
+        #expect(settings.soundEnabled) // toggling the session-local flag never touches the global default
+    }
+
     // MARK: - Phase 6: shuffle+sort concatenation
 
     @Test

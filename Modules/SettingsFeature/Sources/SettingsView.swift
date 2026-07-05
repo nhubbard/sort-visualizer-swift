@@ -29,19 +29,6 @@ public struct SettingsView: View {
                 .pickerStyle(.inline)
                 .accessibilityIdentifier("shufflePicker")
             }
-            Section("Playback Speed") {
-                Slider(value: $settings.playbackSpeed, in: 1...200, step: 1) {
-                    Text("Speed")
-                } minimumValueLabel: {
-                    Text("Slow")
-                } maximumValueLabel: {
-                    Text("Fast")
-                }
-                .accessibilityIdentifier("playbackSpeedSlider")
-                Text("\(Int(settings.playbackSpeed)) operations/second")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-            }
             Section("Sound") {
                 Toggle("Sound Effects", isOn: $settings.soundEnabled)
                     .accessibilityIdentifier("soundEnabledToggle")

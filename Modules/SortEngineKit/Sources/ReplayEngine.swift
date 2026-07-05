@@ -30,10 +30,27 @@ public final class ReplayEngine {
     public private(set) var stepIndex = 0
     public private(set) var isPlaying = false
     public private(set) var compareCount = 0
+    public private(set) var swapCount = 0
+
+    /// Operations per second — a live knob, not a one-shot parameter: `play()`'s loop re-reads
+    /// this on every iteration, so a caller (e.g. a run-control slider) can change it while
+    /// replay is in progress and see the cadence change on the very next step.
+    public var speed: Double = 30.0
 
     /// So consumers (e.g. `VisualizationCanvas`, for `colorSeed`) can read tape metadata without
     /// `ReplayEngine` handing out the operations array itself.
     public var header: TapeHeader { tape.header }
+    public var totalOperationCount: Int { tape.operations.count }
+
+    /// Active playback time — accumulated across pause/resume cycles, excluding time spent
+    /// paused. Consistent with `compareCount`/`swapCount`, which also only reflect genuine
+    /// progress through the tape, not wall-clock time the session happened to be open.
+    public var elapsedPlaybackDuration: TimeInterval {
+        activePlaybackDuration + (currentSegmentStart.map { Date().timeIntervalSince($0) } ?? 0)
+    }
+
+    private var activePlaybackDuration: TimeInterval = 0
+    private var currentSegmentStart: Date?
 
     private let tape: Tape
     /// Every ~500 operations, so `seek(to:)` never replays more than ~500 ops from the nearest one.
@@ -47,6 +64,7 @@ public final class ReplayEngine {
         let frame: [BarState]
         let auxArrays: [Int: [Int]]
         let compareCount: Int
+        let swapCount: Int
     }
 
     public init(tape: Tape) {
@@ -56,21 +74,30 @@ public final class ReplayEngine {
         self.frame = initialFrame
         self.auxArrays = [:]
         self.compareCount = 0
+        self.swapCount = 0
         self.stepIndex = 0
 
-        var checkpoints = [Checkpoint(step: 0, frame: initialFrame, auxArrays: [:], compareCount: 0)]
+        var checkpoints = [Checkpoint(step: 0, frame: initialFrame, auxArrays: [:], compareCount: 0, swapCount: 0)]
         var workingFrame = initialFrame
         var workingAuxArrays: [Int: [Int]] = [:]
         var workingCompareCount = 0
+        var workingSwapCount = 0
         for (index, operation) in tape.operations.enumerated() {
-            Self.apply(operation, to: &workingFrame, auxArrays: &workingAuxArrays, compareCount: &workingCompareCount)
+            Self.apply(
+                operation,
+                to: &workingFrame,
+                auxArrays: &workingAuxArrays,
+                compareCount: &workingCompareCount,
+                swapCount: &workingSwapCount
+            )
             let step = index + 1
             if step.isMultiple(of: Self.checkpointInterval) {
                 checkpoints.append(Checkpoint(
                     step: step,
                     frame: workingFrame,
                     auxArrays: workingAuxArrays,
-                    compareCount: workingCompareCount
+                    compareCount: workingCompareCount,
+                    swapCount: workingSwapCount
                 ))
             }
         }
@@ -79,7 +106,13 @@ public final class ReplayEngine {
 
     public func stepForward() {
         guard stepIndex < tape.operations.count else { return }
-        Self.apply(tape.operations[stepIndex], to: &frame, auxArrays: &auxArrays, compareCount: &compareCount)
+        Self.apply(
+            tape.operations[stepIndex],
+            to: &frame,
+            auxArrays: &auxArrays,
+            compareCount: &compareCount,
+            swapCount: &swapCount
+        )
         stepIndex += 1
     }
 
@@ -95,6 +128,7 @@ public final class ReplayEngine {
         frame = checkpoint.frame
         auxArrays = checkpoint.auxArrays
         compareCount = checkpoint.compareCount
+        swapCount = checkpoint.swapCount
         stepIndex = checkpoint.step
         while stepIndex < target {
             stepForward()
@@ -107,18 +141,21 @@ public final class ReplayEngine {
     /// `onStep`, when provided, is called with each operation immediately after it's applied —
     /// this is the seam `SortSession` uses to fire audio per touched index (§3.1 of
     /// ARCHITECTURE_V2.md) without `SortEngineKit` itself knowing `AudioPlaying`/`AppSettings`
-    /// exist. Deliberately scoped to this loop only, not `stepForward()` itself, so a future
-    /// scrub UI (Phase 12) calling `stepForward()`/`stepBackward()`/`seek(to:)` directly never
-    /// triggers audio from rapid manual scrubbing.
+    /// exist. Deliberately scoped to this loop only, not `stepForward()` itself, so scrubbing via
+    /// `stepForward()`/`stepBackward()`/`seek(to:)` directly never triggers audio.
+    ///
+    /// Reads `speed` fresh on every iteration (rather than capturing it once as a parameter) so a
+    /// caller can change it live, mid-replay, and see the new cadence take effect on the next step.
     @discardableResult
-    public func play(operationsPerSecond: Double, onStep: ((SortOperation) -> Void)? = nil) -> Task<Void, Never> {
+    public func play(onStep: ((SortOperation) -> Void)? = nil) -> Task<Void, Never> {
         isPlaying = true
+        currentSegmentStart = Date()
         let task = Task { [weak self] in
             while let self, self.stepIndex < self.tape.operations.count, !Task.isCancelled {
                 let operation = self.tape.operations[self.stepIndex]
                 self.stepForward()
                 onStep?(operation)
-                try? await Task.sleep(for: .seconds(1.0 / operationsPerSecond))
+                try? await Task.sleep(for: .seconds(1.0 / self.speed))
             }
             self?.isPlaying = false
         }
@@ -129,6 +166,10 @@ public final class ReplayEngine {
     public func pause() {
         playbackTask?.cancel()
         isPlaying = false
+        if let currentSegmentStart {
+            activePlaybackDuration += Date().timeIntervalSince(currentSegmentStart)
+        }
+        currentSegmentStart = nil
     }
 
     /// Binary search for the latest checkpoint at or before `step` — `checkpoints` is sorted
@@ -153,13 +194,15 @@ public final class ReplayEngine {
         _ operation: SortOperation,
         to frame: inout [BarState],
         auxArrays: inout [Int: [Int]],
-        compareCount: inout Int
+        compareCount: inout Int,
+        swapCount: inout Int
     ) {
         switch operation {
         case let .swap(i, j):
             let temp = frame[i].value
             frame[i].value = frame[j].value
             frame[j].value = temp
+            swapCount += 1
         case let .setValue(i, value):
             frame[i].value = value
         case let .mark(marker, index):

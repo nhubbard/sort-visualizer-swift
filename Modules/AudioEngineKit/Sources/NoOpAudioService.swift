@@ -4,5 +4,5 @@ public struct NoOpAudioService: AudioPlaying {
     public init() {}
     public func start() throws {}
     public func stop() {}
-    public func play(value: Int, in range: ClosedRange<Int>) {}
+    public func play(value: Int, in range: ClosedRange<Int>, holdSeconds: Double) {}
 }
