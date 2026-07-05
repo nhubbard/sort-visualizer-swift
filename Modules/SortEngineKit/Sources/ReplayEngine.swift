@@ -103,12 +103,21 @@ public final class ReplayEngine {
 
     /// Returns the playback `Task` so callers (e.g. `SortSession`) can `await` its completion
     /// instead of polling `isPlaying`.
+    ///
+    /// `onStep`, when provided, is called with each operation immediately after it's applied —
+    /// this is the seam `SortSession` uses to fire audio per touched index (§3.1 of
+    /// ARCHITECTURE_V2.md) without `SortEngineKit` itself knowing `AudioPlaying`/`AppSettings`
+    /// exist. Deliberately scoped to this loop only, not `stepForward()` itself, so a future
+    /// scrub UI (Phase 12) calling `stepForward()`/`stepBackward()`/`seek(to:)` directly never
+    /// triggers audio from rapid manual scrubbing.
     @discardableResult
-    public func play(operationsPerSecond: Double) -> Task<Void, Never> {
+    public func play(operationsPerSecond: Double, onStep: ((SortOperation) -> Void)? = nil) -> Task<Void, Never> {
         isPlaying = true
         let task = Task { [weak self] in
             while let self, self.stepIndex < self.tape.operations.count, !Task.isCancelled {
+                let operation = self.tape.operations[self.stepIndex]
                 self.stepForward()
+                onStep?(operation)
                 try? await Task.sleep(for: .seconds(1.0 / operationsPerSecond))
             }
             self?.isPlaying = false

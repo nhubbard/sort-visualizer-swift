@@ -1,6 +1,7 @@
 import Testing
 @testable import AudioEngineKit
 
+@MainActor
 @Suite
 struct NoOpAudioServiceTests {
     @Test

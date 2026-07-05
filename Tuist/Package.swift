@@ -23,9 +23,14 @@ let packageSettings = PackageSettings(
 let package = Package(
     name: "SortSymphonyDependencies",
     dependencies: [
-        .package(url: "https://github.com/AudioKit/AudioKit.git", branch: "main"),
-        .package(url: "https://github.com/AudioKit/AudioKitUI.git", branch: "main"),
-        .package(url: "https://github.com/AudioKit/SoundpipeAudioKit.git", branch: "main"),
+        // Pinned to stable tagged releases, not branch: "main" — Phase 8 discovered that HEAD of
+        // AudioKit/SoundpipeAudioKit's main branch crashes at Oscillator() construction
+        // ("akGetParameterAddress: Fatal error: parameter map not initialized"), while AudioKitEX
+        // (already pinned to the tagged 5.7.0 below) expects the parameter-registration contract
+        // a stable, matching-vintage AudioKit/SoundpipeAudioKit release actually provides.
+        .package(url: "https://github.com/AudioKit/AudioKit.git", from: "5.7.0"),
+        .package(url: "https://github.com/AudioKit/AudioKitUI.git", from: "0.3.0"),
+        .package(url: "https://github.com/AudioKit/SoundpipeAudioKit.git", from: "5.7.0"),
         .package(url: "https://github.com/devxoul/Then", from: "3.0.0"),
         .package(url: "https://github.com/nhubbard/CollectionConcurrencyKit", from: "2.1.0"),
         .package(url: "https://github.com/apple/swift-algorithms.git", from: "1.2.1"),

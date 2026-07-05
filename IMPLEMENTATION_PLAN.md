@@ -621,23 +621,29 @@ translation turns out to have a mistake worth bisecting to.
 
 ## Phase 8 — Service decomposition, replacing `SortViewModel`
 
-**Goal:** `AudioService`, `AnalyticsService` (with real CloudKit sync), the rest of `AppSettings`,
-`SortGate` (§3.1–§3.4) replace their stub/partial versions from Phase 4; `SortSession` (§3.5) is
-wired to the real services.
+**Goal:** `AudioService`, `AnalyticsService` (with real CloudKit sync), the rest of `AppSettings`
+replace their stub/partial versions from Phase 4; `SortSession` (§3.5) is wired to the real
+services.
+
+**Deviation from §3.1–§3.5 as drafted:** `SortGate`/`AlgorithmWarning`/
+`AlgorithmMetadata.confirmationWarning` (§3.4) were removed rather than finished — see the "resolved
+decisions" bullet added to §9 during this phase. `AnalyticsService`'s CloudKit sync also uses plain
+SwiftData (`ModelConfiguration(cloudKitDatabase: .automatic)`), not `NSPersistentCloudKitContainer`
+— §3.2 as drafted undersold how directly SwiftData handles this itself.
 
 **Files:** `Modules/AudioEngineKit/Sources/AudioService.swift` (move `Legacy/Shared/.../Synthesizer.swift`'s
 body over, rename, add the `AudioPlaying` protocol), `Modules/PersistenceKit/Sources/{RunSummary,AnalyticsService,DeviceInfoProvider}.swift`
-(SwiftData model + `NSPersistentCloudKitContainer` sync against the existing
-`iCloud.com.nhubbard.Sort2.mobile` container — §9 confirms retention specifically for cross-device
-comparison), `Modules/SettingsKit/Sources/AppSettings.swift` (fill in the rest: `soundEnabled`,
-`synthNoteRange`, `defaultArraySize`, `codeTheme`, the Bogo/Bitonic warning toggles),
-`Modules/SortEngineKit/Sources/SortGate.swift`.
+(pure-SwiftData model + sync against the existing `iCloud.com.nhubbard.Sort2.mobile` container — §9
+confirms retention specifically for cross-device comparison), `Modules/SettingsKit/Sources/AppSettings.swift`
+(fill in the rest: `soundEnabled`, `synthNoteRange`, `defaultArraySize`, `codeTheme` — no Bogo/Bitonic
+warning toggles, per the §9 deviation above).
 
-**How to write it:** §3.1–§3.5 are implementation-ready. The one sequencing detail worth calling
-out: wire `AnalyticsService.record(...)` to fire from `SortSession`'s `.complete` transition, and
-verify with a real device (or two, if you have them) that `RunSummary` rows actually sync through
-CloudKit before considering this phase done — `Legacy/`'s `CloudKitRecordEncoder` is reference
-material at this point (§0.2), not something you need to touch or migrate data out of.
+**How to write it:** §3.1–§3.3/§3.5 are implementation-ready (§3.4 is not — see the deviation note).
+The one sequencing detail worth calling out: wire `AnalyticsService.record(...)` to fire from
+`SortSession`'s `.complete` transition, and verify with a real device (or two, if you have them)
+that `RunSummary` rows actually sync through CloudKit before considering this phase done —
+`Legacy/`'s `CloudKitRecordEncoder` is reference material at this point (§0.2), not something you
+need to touch or migrate data out of.
 
 **No mid-stream deletion needed:** unlike an earlier draft of this plan, there's nothing to delete
 here — `Legacy/Shared/Data/Primary/SortViewModel.swift` and the `*Impl.swift` files were already cut
@@ -650,7 +656,7 @@ real audio and real CloudKit-synced analytics.
 **Commit:**
 ```
 git add -A
-git commit -m "Phase 8: AudioService, AnalyticsService (CloudKit), AppSettings, SortGate"
+git commit -m "Phase 8: AudioService, AnalyticsService (CloudKit), AppSettings"
 ```
 
 ---

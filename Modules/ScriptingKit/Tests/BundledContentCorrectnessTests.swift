@@ -22,12 +22,29 @@ private func bundledDirectory(named name: String) throws -> URL {
     return url
 }
 
+/// The number of `*.manifest.json` files actually on disk — the loader is expected to load
+/// exactly this many, never fewer. Comparing against `!isEmpty` alone previously let a real bug
+/// (`bogosort.manifest.json`'s `confirmationWarning` field failing to decode, silently skipped by
+/// `ScriptDiscovery`) hide for an entire batch of algorithms; this catches any future silent skip
+/// the same way would cause.
+private func manifestFileCount(in directory: URL) throws -> Int {
+    try FileManager.default
+        .contentsOfDirectory(at: directory, includingPropertiesForKeys: nil)
+        .filter { $0.lastPathComponent.hasSuffix(".manifest.json") }
+        .count
+}
+
 @Suite
 struct BundledContentCorrectnessTests {
     @Test
     func everyBundledAlgorithmSortsRandomInputsCorrectly() throws {
-        let algorithms = ScriptAlgorithmLoader.loadScripts(from: try bundledDirectory(named: "Algorithms"))
-        #expect(!algorithms.isEmpty, "no algorithms loaded — check App/Resources/Algorithms bundling")
+        let directory = try bundledDirectory(named: "Algorithms")
+        let algorithms = ScriptAlgorithmLoader.loadScripts(from: directory)
+        let expectedCount = try manifestFileCount(in: directory)
+        #expect(
+            algorithms.count == expectedCount,
+            "expected every *.manifest.json in Algorithms/ to load — one or more silently failed decoding"
+        )
 
         for algorithm in algorithms {
             // Each algorithm's own sizeRange lower bound — always in its comfortable range, and
@@ -49,8 +66,13 @@ struct BundledContentCorrectnessTests {
 
     @Test
     func everyBundledShuffleRunsWithoutCrashingAndPreservesArrayLength() throws {
-        let shuffles = ScriptShuffleLoader.loadScripts(from: try bundledDirectory(named: "Shuffles"))
-        #expect(!shuffles.isEmpty, "no shuffles loaded — check App/Resources/Shuffles bundling")
+        let directory = try bundledDirectory(named: "Shuffles")
+        let shuffles = ScriptShuffleLoader.loadScripts(from: directory)
+        let expectedCount = try manifestFileCount(in: directory)
+        #expect(
+            shuffles.count == expectedCount,
+            "expected every *.manifest.json in Shuffles/ to load — one or more silently failed decoding"
+        )
 
         let size = 24
         let identity = Array(1...size)

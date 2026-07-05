@@ -6,6 +6,5 @@
     "sizeRange": [4, 16],
     "timeComplexity": { "best": "O(n)", "average": "O(n * n!)", "worst": "O(n * n!)" },
     "spaceComplexity": "O(1)",
-    "iconName": "bogo",
-    "confirmationWarning": "Bogo Sort can take an extremely long time even for small arrays. Keep the array size small."
+    "iconName": "bogo"
 }

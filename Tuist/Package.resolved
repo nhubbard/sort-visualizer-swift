@@ -1,13 +1,13 @@
 {
-  "originHash" : "e3bd5bb24a1dbec170fa8c75a1b76d56549c9aa5503c8ca64d721a72e3c2df63",
+  "originHash" : "676f1de74f902daf881506b5cc2fd1158503ca0df5473446e0e06609f47aff6f",
   "pins" : [
     {
       "identity" : "audiokit",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/AudioKit/AudioKit.git",
       "state" : {
-        "branch" : "main",
-        "revision" : "dc0b113a2dc679a090e7abe080978c8da5c841fb"
+        "revision" : "97a35fe04cd8e3d13b8744e1216b8673f825bef6",
+        "version" : "5.7.2"
       }
     },
     {
@@ -24,8 +24,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/AudioKit/AudioKitUI.git",
       "state" : {
-        "branch" : "main",
-        "revision" : "1b3156035025f8f6c96d41d8c4c44f22e0b68753"
+        "revision" : "1a61e8a96c7ee24c3e5abe06dc3334a31fd7571d",
+        "version" : "0.3.7"
       }
     },
     {
@@ -87,8 +87,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/AudioKit/SoundpipeAudioKit.git",
       "state" : {
-        "branch" : "main",
-        "revision" : "68c59e21c554b0047bc545ff511ed4e79afb5bcd"
+        "revision" : "d8afd31b3710a0efd5f9ecb11f1169ca493795e9",
+        "version" : "5.7.4"
       }
     },
     {

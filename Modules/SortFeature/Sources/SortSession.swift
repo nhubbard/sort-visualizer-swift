@@ -26,7 +26,6 @@ public final class SortSession {
     }
 
     public private(set) var phase: Phase = .idle
-    public private(set) var gate: SortGate = .clear
 
     public let algorithm: any SortAlgorithm
     public let shuffle: any ShuffleAlgorithm
@@ -34,15 +33,17 @@ public final class SortSession {
     private let analytics: AnalyticsService
     private let settings: AppSettings
 
-    /// Stashed when a confirmation gate blocks `start(size:)`, so `acceptWarning()` can resume
-    /// recording with the same size once the user says yes.
-    private var pendingSize: Int?
-
     public init(
         algorithm: any SortAlgorithm,
         shuffle: any ShuffleAlgorithm,
+        // NOT AudioService.shared: merely constructing AudioService builds a live AudioKit graph
+        // (Oscillator/AmplitudeEnvelope's inits call into AudioKit's native parameter-map setup
+        // unconditionally), which crashes outside a real running app with an active audio session
+        // — see AudioServiceTests.swift's comment. Every test that constructs a SortSession without
+        // overriding `audio:` would hit that crash if this defaulted to the real service. The real
+        // app's composition root (ScrollingSortView) passes AudioService.shared explicitly instead.
         audio: any AudioPlaying = NoOpAudioService(),
-        analytics: AnalyticsService = AnalyticsService(),
+        analytics: AnalyticsService = .shared,
         settings: AppSettings = .shared
     ) {
         self.algorithm = algorithm
@@ -52,37 +53,18 @@ public final class SortSession {
         self.settings = settings
     }
 
+    /// Unconditionally clamps into `algorithm.metadata.sizeRange` rather than warning past it —
+    /// this is ArrayV's own `unreasonableLimit` precedent (a per-sort size threshold, not a
+    /// user-toggleable confirmation dialog), enforced here so every caller gets it, not just
+    /// whichever view happens to clamp its own slider (§9 of ARCHITECTURE_V2.md).
     public func start(size: Int) async {
-        if let warning = algorithm.metadata.confirmationWarning, gate != .accepted {
-            pendingSize = size
-            gate = .needsConfirmation(warning)
-            return
-        }
-        await performRecording(size: size)
-    }
-
-    /// Called after the user accepts a `.needsConfirmation` dialog — resumes recording with the
-    /// size `start(size:)` stashed when it was blocked.
-    public func acceptWarning() async {
-        gate = .accepted
-        guard let size = pendingSize else { return }
-        pendingSize = nil
-        await performRecording(size: size)
-    }
-
-    public func declineWarning() {
-        gate = .declined
-        phase = .idle
-        pendingSize = nil
-    }
-
-    private func performRecording(size: Int) async {
+        let clampedSize = min(max(size, algorithm.metadata.sizeRange.lowerBound), algorithm.metadata.sizeRange.upperBound)
         phase = .recording
 
         let algorithm = self.algorithm
         let shuffle = self.shuffle
         let tape = await Task.detached(priority: .userInitiated) {
-            SortSession.makeTape(algorithm: algorithm, shuffle: shuffle, size: size)
+            SortSession.makeTape(algorithm: algorithm, shuffle: shuffle, size: clampedSize)
         }.value
 
         phase = .ready(tape)
@@ -128,11 +110,32 @@ public final class SortSession {
     private func startReplay(_ tape: Tape) {
         let replay = ReplayEngine(tape: tape)
         phase = .replaying(replay)
-        let playbackTask = replay.play(operationsPerSecond: settings.playbackSpeed)
+        let audio = self.audio
+        let settings = self.settings
+        let playbackTask = replay.play(operationsPerSecond: settings.playbackSpeed) { [weak replay] operation in
+            guard settings.soundEnabled, let replay else { return }
+            SortSession.playAudio(for: operation, frame: replay.frame, audio: audio)
+        }
         Task {
             await playbackTask.value
             phase = .complete(replay)
             try? await analytics.record(tape.header, algorithmID: algorithm.id)
+        }
+    }
+
+    /// One note per touched index, keyed on that index's **current** value (post-operation) —
+    /// matches v1's "play a note per touched index" behavior (`compare`/`swap` both play both
+    /// indices; `setValue` plays the one it touched), but pitch tracks value, not index (§3.1).
+    private static func playAudio(for operation: SortOperation, frame: [ReplayEngine.BarState], audio: any AudioPlaying) {
+        let range = 1...frame.count
+        switch operation {
+        case let .compare(i, j), let .swap(i, j):
+            audio.play(value: frame[i].value, in: range)
+            audio.play(value: frame[j].value, in: range)
+        case let .setValue(i, _):
+            audio.play(value: frame[i].value, in: range)
+        default:
+            break
         }
     }
 }

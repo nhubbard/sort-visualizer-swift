@@ -18,8 +18,8 @@ classes that are never ported directly — only their concrete subclasses are)
 
 ### `sorts/exchange/` (41)
 
-- [v1] BubbleSort — done (Phase 3), ported from `Legacy/` (`bubblesort.js`)
-- [v1] QuickSort — done (Phase 7 batch), ported from `Legacy/`'s two-pointer partition scheme, via
+- [x] BubbleSort — done (Phase 3), ported from `Legacy/` (`bubblesort.js`)
+- [x] QuickSort — done (Phase 7 batch), ported from `Legacy/`'s two-pointer partition scheme, via
   the native PoC from Phase 2 (`quicksort.js`) — **not** a port of ArrayV's `LLQuickSort`/
   `LRQuickSort` (different partition scheme; those remain unported below)
 - [x] GnomeSort — done (Phase 7 batch, easy pick), `gnomesort.js`

@@ -6,6 +6,5 @@
     "sizeRange": [16, 512],
     "timeComplexity": { "best": "O(n)", "average": "O(n^2)", "worst": "O(n^2)" },
     "spaceComplexity": "O(1)",
-    "iconName": "insertion",
-    "confirmationWarning": null
+    "iconName": "insertion"
 }

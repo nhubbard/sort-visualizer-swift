@@ -32,6 +32,10 @@ struct ContentView: View {
 
     @ViewBuilder
     private func debugDestination(algorithmID: String) -> some View {
+        // Deliberately a small constant, not AppSettings.shared.defaultArraySize (256): this is a
+        // temporary demo screen for algorithms across a wide range of sizeRanges (O(n^2)/O(n!)
+        // ones included), and 256 elements makes a quadratic algorithm take minutes to visually
+        // finish. Phase 9's real, data-driven UI is where the user's actual default belongs.
         ScrollingSortView(algorithm: debugAlgorithm(id: algorithmID), shuffle: debugShuffle, arraySize: 24)
             .toolbar {
                 ToolbarItem(placement: .primaryAction) {

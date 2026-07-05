@@ -3,20 +3,12 @@ import Foundation
 import SortEngineKit
 
 /// Trivially `Codable`, versionable, and validated at load time instead of regex-scraped from
-/// JSDoc comments (§2.3). Plain-`String` `confirmationWarning` fields, not `AlgorithmWarning`
-/// itself — `LocalizedStringResource`'s own `Codable` conformance round-trips its *internal*
-/// representation, not a bare author-facing string, so manifests describe warnings as plain
-/// strings and `makeMetadata()` below does the conversion.
+/// JSDoc comments (§2.3).
 struct AlgorithmManifest: Decodable {
     struct ComplexityBoundsPayload: Decodable {
         let best: String
         let average: String
         let worst: String
-    }
-
-    struct ConfirmationWarningPayload: Decodable {
-        let title: String
-        let message: String
     }
 
     let id: String
@@ -28,7 +20,6 @@ struct AlgorithmManifest: Decodable {
     let timeComplexity: ComplexityBoundsPayload
     let spaceComplexity: String
     let iconName: String
-    let confirmationWarning: ConfirmationWarningPayload?
 }
 
 enum AlgorithmManifestError: Error, CustomStringConvertible {
@@ -58,12 +49,6 @@ extension AlgorithmManifest {
                 worst: timeComplexity.worst
             ),
             spaceComplexity: spaceComplexity,
-            confirmationWarning: confirmationWarning.map {
-                AlgorithmWarning(
-                    title: LocalizedStringResource(stringLiteral: $0.title),
-                    message: LocalizedStringResource(stringLiteral: $0.message)
-                )
-            },
             iconName: iconName
         )
     }

@@ -19,6 +19,28 @@ public struct SettingsView: View {
                 .pickerStyle(.inline)
                 .accessibilityIdentifier("visualizerPicker")
             }
+            Section("Sound") {
+                Toggle("Sound Effects", isOn: $settings.soundEnabled)
+                    .accessibilityIdentifier("soundEnabledToggle")
+            }
+            Section("Array Size") {
+                Stepper(
+                    "Default Size: \(settings.defaultArraySize)",
+                    value: $settings.defaultArraySize,
+                    in: 16...512,
+                    step: 16
+                )
+                .accessibilityIdentifier("defaultArraySizeStepper")
+            }
+            Section("Code Sample Theme") {
+                Picker("Theme", selection: $settings.codeTheme) {
+                    ForEach(CodeThemeID.knownIDs, id: \.self) { theme in
+                        Text(theme.displayName).tag(theme)
+                    }
+                }
+                .pickerStyle(.inline)
+                .accessibilityIdentifier("codeThemePicker")
+            }
         }
         .navigationTitle("Settings")
     }

@@ -24,13 +24,15 @@ public struct ComplexityBounds: Sendable, Codable, Equatable {
 public struct AlgorithmMetadata: Sendable, Codable, Equatable {
     public var displayName: String
     public var category: AlgorithmCategory
+    /// Doubles as ArrayV's `unreasonableLimit` (`Sort.setUnreasonableLimit`): rather than warning
+    /// once the chosen array size exceeds a per-algorithm threshold, `SortSession.start(size:)`
+    /// unconditionally clamps into this range, so e.g. Bogo Sort's `[4, 16]` never lets a caller
+    /// pick a size that would run effectively forever. No separate confirmation-dialog mechanism
+    /// needed on top of it (§9 of ARCHITECTURE_V2.md).
     public var sizeRange: ClosedRange<Int>
     public var stable: Bool
     public var timeComplexity: ComplexityBounds
     public var spaceComplexity: String
-    /// Replaces the bespoke Bogo/Bitonic boolean pairs (§3.4) — a new algorithm that deserves a
-    /// warning just sets this one field.
-    public var confirmationWarning: AlgorithmWarning?
     public var iconName: String
 
     public init(
@@ -40,7 +42,6 @@ public struct AlgorithmMetadata: Sendable, Codable, Equatable {
         stable: Bool,
         timeComplexity: ComplexityBounds,
         spaceComplexity: String,
-        confirmationWarning: AlgorithmWarning? = nil,
         iconName: String
     ) {
         self.displayName = displayName
@@ -49,7 +50,6 @@ public struct AlgorithmMetadata: Sendable, Codable, Equatable {
         self.stable = stable
         self.timeComplexity = timeComplexity
         self.spaceComplexity = spaceComplexity
-        self.confirmationWarning = confirmationWarning
         self.iconName = iconName
     }
 }

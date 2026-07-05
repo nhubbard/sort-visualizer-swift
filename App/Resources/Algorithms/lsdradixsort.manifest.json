@@ -6,6 +6,5 @@
     "sizeRange": [16, 512],
     "timeComplexity": { "best": "O(d*(n+b))", "average": "O(d*(n+b))", "worst": "O(d*(n+b))" },
     "spaceComplexity": "O(n + b)",
-    "iconName": "radix",
-    "confirmationWarning": null
+    "iconName": "radix"
 }

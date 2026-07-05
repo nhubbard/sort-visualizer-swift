@@ -16,20 +16,6 @@ public struct SortView: View {
             statusLabel
             content
         }
-        .confirmationDialog(
-            warningTitle,
-            isPresented: isShowingConfirmation,
-            titleVisibility: .visible
-        ) {
-            Button("Continue", role: .destructive) {
-                Task { await session.acceptWarning() }
-            }
-            Button("Cancel", role: .cancel) {
-                session.declineWarning()
-            }
-        } message: {
-            Text(warningMessage)
-        }
     }
 
     @ViewBuilder
@@ -85,28 +71,5 @@ public struct SortView: View {
         guard case let .complete(replay) = session.phase else { return false }
         let values = replay.frame.map(\.value)
         return values == values.sorted()
-    }
-
-    private var isShowingConfirmation: Binding<Bool> {
-        Binding(
-            get: { if case .needsConfirmation = session.gate { true } else { false } },
-            set: { if !$0 { session.declineWarning() } }
-        )
-    }
-
-    private var warningTitle: String {
-        if case let .needsConfirmation(warning) = session.gate {
-            String(localized: warning.title)
-        } else {
-            ""
-        }
-    }
-
-    private var warningMessage: String {
-        if case let .needsConfirmation(warning) = session.gate {
-            String(localized: warning.message)
-        } else {
-            ""
-        }
     }
 }

@@ -21,13 +21,18 @@ let modules: [Target] =
     ) +
     Module.framework(name: "BuiltInAlgorithms", dependencies: [.target(name: "AlgorithmKit")]) +
     Module.framework(name: "BuiltInVisualizers", dependencies: [.target(name: "VisualizationKit")]) +
+    Module.framework(name: "SettingsKit", dependencies: [.target(name: "VisualizationKit")]) +
     Module.framework(name: "AudioEngineKit", dependencies: [
         .external(name: "AudioKit"), .external(name: "AudioKitUI"), .external(name: "SoundpipeAudioKit"),
+        // AudioService imports AudioKitEX directly for Fader — Tuist needs this link edge even
+        // though SoundpipeAudioKit already pulls AudioKitEX in transitively for the app target as
+        // a whole; a module's own compilation unit still needs to link what it directly imports.
+        .external(name: "AudioKitEX"),
+        .target(name: "SettingsKit"),
     ]) +
     Module.framework(name: "PersistenceKit", dependencies: [
         .external(name: "DeviceKit"), .target(name: "SortEngineKit"), .target(name: "AlgorithmKit"),
     ]) +
-    Module.framework(name: "SettingsKit", dependencies: [.target(name: "VisualizationKit")]) +
     Module.framework(name: "DesignSystemKit") +
     Module.framework(name: "MathRenderingKit", dependencies: [.external(name: "SwiftMath")]) +
     Module.framework(name: "SortFeature", dependencies: [

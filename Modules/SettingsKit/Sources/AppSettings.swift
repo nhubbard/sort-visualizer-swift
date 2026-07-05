@@ -2,11 +2,10 @@ import Foundation
 import Observation
 import VisualizationKit
 
-/// Just enough of §3.3 to unblock Phase 4 (`selectedVisualizerID`, `playbackSpeed`) — the rest
-/// (`soundEnabled`, `synthNoteRange`, `defaultArraySize`, `shuffleMethod`, `codeTheme`,
-/// `warnBeforeBogoSort`/`warnBeforeBitonicSort`) lands in Phase 8. Follows the same
-/// `UserDefaults`-backed, `didSet`-persisted pattern the full version will use, so Phase 8 only
-/// adds properties rather than retrofitting persistence onto these two.
+/// §3.3, in full as of Phase 8. No `shuffleMethod` (shuffles are already data-driven via
+/// `ShuffleRegistry`, not a settings-level enum — see Phase 6) and no `warnBeforeBogoSort`/
+/// `warnBeforeBitonicSort` (the confirmation-dialog system they'd gate was removed in Phase 8, see
+/// §9 of ARCHITECTURE_V2.md — `AlgorithmMetadata.sizeRange` already does that job unconditionally).
 @Observable
 @MainActor
 public final class AppSettings {
@@ -20,9 +19,33 @@ public final class AppSettings {
         didSet { store.set(playbackSpeed, forKey: Keys.playbackSpeed) }
     }
 
+    public var soundEnabled: Bool {
+        didSet { store.set(soundEnabled, forKey: Keys.soundEnabled) }
+    }
+
+    /// MIDI note numbers (matching `Legacy/Shared/Data/Primary/SortViewModel.swift`'s
+    /// `synthLowNote`/`synthHighNote`), not Hz — `AudioEngineKit`'s `AudioService` converts to
+    /// frequency at play time, so this stays a plain, portable `ClosedRange<Int>` here.
+    public var synthNoteRange: ClosedRange<Int> {
+        didSet { persistNoteRange() }
+    }
+
+    public var defaultArraySize: Int {
+        didSet { store.set(defaultArraySize, forKey: Keys.defaultArraySize) }
+    }
+
+    public var codeTheme: CodeThemeID {
+        didSet { store.set(codeTheme.rawValue, forKey: Keys.codeTheme) }
+    }
+
     private enum Keys {
         static let selectedVisualizerID = "selectedVisualizerID"
         static let playbackSpeed = "playbackSpeed"
+        static let soundEnabled = "soundEnabled"
+        static let synthLowNote = "synthLowNote"
+        static let synthHighNote = "synthHighNote"
+        static let defaultArraySize = "defaultArraySize"
+        static let codeTheme = "codeTheme"
     }
 
     private let store: UserDefaults
@@ -32,8 +55,22 @@ public final class AppSettings {
         store.register(defaults: [
             Keys.selectedVisualizerID: "bargraph",
             Keys.playbackSpeed: 30.0,
+            Keys.soundEnabled: true,
+            Keys.synthLowNote: 36,
+            Keys.synthHighNote: 72,
+            Keys.defaultArraySize: 256,
+            Keys.codeTheme: "monokai",
         ])
         selectedVisualizerID = VisualizerID(rawValue: store.string(forKey: Keys.selectedVisualizerID) ?? "bargraph")
         playbackSpeed = store.double(forKey: Keys.playbackSpeed)
+        soundEnabled = store.bool(forKey: Keys.soundEnabled)
+        synthNoteRange = store.integer(forKey: Keys.synthLowNote)...store.integer(forKey: Keys.synthHighNote)
+        defaultArraySize = store.integer(forKey: Keys.defaultArraySize)
+        codeTheme = CodeThemeID(rawValue: store.string(forKey: Keys.codeTheme) ?? "monokai")
+    }
+
+    private func persistNoteRange() {
+        store.set(synthNoteRange.lowerBound, forKey: Keys.synthLowNote)
+        store.set(synthNoteRange.upperBound, forKey: Keys.synthHighNote)
     }
 }

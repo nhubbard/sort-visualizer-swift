@@ -808,7 +808,12 @@ it is idempotent by construction and needs no guard. `SettingsView`, `SortSessio
 `ShuffleMethod.create(maximum:)` all take `AppSettings` as a dependency instead of independently
 declaring `@AppStorage("sameStringLiteral")`.
 
-### 3.4 The confirmation-dialog state machine
+### 3.4 The confirmation-dialog state machine — superseded, see §9
+
+**Removed during Phase 8** in favor of unconditional `AlgorithmMetadata.sizeRange` clamping,
+matching ArrayV's own `unreasonableLimit` precedent rather than v1's per-algorithm toggle design —
+see the "Confirmation-dialog/warning-toggle system... removed, not built" bullet in §9. The section
+below is left as-drafted for historical context; none of it exists in the codebase anymore.
 
 Replaces `showBogoSortWarning`/`bogoSortAccepted`/`showBitonicWarning`/`shouldShowBitonicWarning`
 and `SortView`'s `onBogoAccept`/`onBogoDecline`/`onBitonicAccept` handler family:
@@ -1216,6 +1221,19 @@ The following were open questions in an earlier draft of this document; all five
 - **Tuist structure — single project, many targets.** Confirmed per §5.3: a multi-project Tuist
   workspace is unnecessary ceremony at this scale and for a single developer; the `Module.framework`
   helper is the whole story.
+- **Confirmation-dialog/warning-toggle system (§3.4, as originally drafted) — removed, not built.**
+  `SortGate.needsConfirmation`/`AlgorithmWarning`/`AlgorithmMetadata.confirmationWarning` and
+  `SortView`'s `.confirmationDialog` existed briefly (built ahead of the phase that was meant to
+  finalize them) as a direct copy of v1's bespoke `showBogoSortWarning`/`showBitonicWarning` boolean
+  pairs, generalized into one metadata field plus a settings toggle per warning-worthy algorithm.
+  Checking ArrayV's own solution (`~/ArrayV`'s `Sort.java`/`RunSort.java`) turned up something
+  simpler: no per-algorithm settings toggle at all, just an `unreasonableLimit` int per sort (`0` =
+  none; e.g. BogoSort's is `10`) that the runner compares against the *currently selected* array
+  size. `AlgorithmMetadata.sizeRange.upperBound` already does this job — Bogo Sort is already
+  clamped to `[4, 16]` — just enforced unconditionally by `SortSession.start(size:)` rather than
+  warned-past. Removing the dialog/toggle system entirely avoids both v1's leftover complexity and a
+  hypothetical future need for scripts/settings to interact just to support two algorithms out of
+  hundreds.
 
 **Noted stretch goal, explicitly deferred (not designed):** visually indicating what each
 algorithmic step *means* as a teaching tool (e.g. captioning "this compare decided the pivot side"),
