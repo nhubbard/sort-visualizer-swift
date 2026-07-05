@@ -36,7 +36,7 @@ public enum Module {
         ]
     }
 
-    static let baseSettings: SettingsDictionary = [
+    public static let baseSettings: SettingsDictionary = [
         "SWIFT_VERSION": "6.0",
         "SWIFT_STRICT_CONCURRENCY": "complete",
     ]

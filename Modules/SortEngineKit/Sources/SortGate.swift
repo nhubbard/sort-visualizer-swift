@@ -13,8 +13,11 @@ public struct AlgorithmWarning: Equatable, Sendable, Codable {
     }
 }
 
+/// `.accepted` gates `SortSession.start(values:)` past a warning it has already been shown once
+/// this session — `.declined` means the user said no and the sort should not proceed at all.
 public enum SortGate: Equatable, Sendable {
     case clear
     case needsConfirmation(AlgorithmWarning)
+    case accepted
     case declined
 }

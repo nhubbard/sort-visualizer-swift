@@ -13,13 +13,16 @@ let modules: [Target] =
     Module.framework(name: "AudioEngineKit", dependencies: [
         .external(name: "AudioKit"), .external(name: "AudioKitUI"), .external(name: "SoundpipeAudioKit"),
     ]) +
-    Module.framework(name: "PersistenceKit", dependencies: [.external(name: "DeviceKit")]) +
-    Module.framework(name: "SettingsKit") +
+    Module.framework(name: "PersistenceKit", dependencies: [
+        .external(name: "DeviceKit"), .target(name: "SortEngineKit"), .target(name: "AlgorithmKit"),
+    ]) +
+    Module.framework(name: "SettingsKit", dependencies: [.target(name: "VisualizationKit")]) +
     Module.framework(name: "DesignSystemKit") +
     Module.framework(name: "MathRenderingKit", dependencies: [.external(name: "SwiftMath")]) +
     Module.framework(name: "SortFeature", dependencies: [
         .target(name: "SortEngineKit"), .target(name: "AlgorithmKit"), .target(name: "VisualizationKit"),
         .target(name: "AudioEngineKit"), .target(name: "SettingsKit"), .target(name: "DesignSystemKit"),
+        .target(name: "PersistenceKit"),
     ]) +
     Module.framework(name: "SettingsFeature", dependencies: [
         .target(name: "SettingsKit"), .target(name: "VisualizationKit"),
@@ -60,6 +63,12 @@ let app = Target.target(
         .target(name: "SortFeature"), .target(name: "SettingsFeature"),
         .target(name: "HomeFeature"), .target(name: "BenchmarkFeature"),
         .target(name: "MathRenderingKit"),
+        // Temporary, direct composition-root wiring for Phase 4's debug entry point
+        // (ScrollingSortView(algorithm: QuickSort())) — Phase 9 replaces this with data-driven
+        // navigation off AlgorithmRegistry/VisualizerRegistry, at which point these become
+        // implicit (BuiltInAlgorithms/BuiltInVisualizers are still never referenced by SortFeature
+        // itself, only by whoever composes the app).
+        .target(name: "BuiltInAlgorithms"), .target(name: "BuiltInVisualizers"),
     ],
     settings: .settings(base: [
         "CODE_SIGN_ENTITLEMENTS": "App/Resources/Sort Symphony.entitlements",
@@ -79,7 +88,18 @@ let app = Target.target(
     ])
 )
 
+let appUITests = Target.target(
+    name: "Sort SymphonyUITests",
+    destinations: Module.destinations,
+    product: .uiTests,
+    bundleId: "com.nhubbard.Sort2.mobile.uitests",
+    deploymentTargets: Module.deploymentTargets,
+    sources: ["App/UITests/**"],
+    dependencies: [.target(name: "Sort Symphony")],
+    settings: .settings(base: Module.baseSettings)
+)
+
 let project = Project(
     name: "Sort Symphony",
-    targets: modules + [app]
+    targets: modules + [app, appUITests]
 )

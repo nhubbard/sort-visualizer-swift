@@ -31,6 +31,10 @@ public final class ReplayEngine {
     public private(set) var isPlaying = false
     public private(set) var compareCount = 0
 
+    /// So consumers (e.g. `VisualizationCanvas`, for `colorSeed`) can read tape metadata without
+    /// `ReplayEngine` handing out the operations array itself.
+    public var header: TapeHeader { tape.header }
+
     private let tape: Tape
     /// Every ~500 operations, so `seek(to:)` never replays more than ~500 ops from the nearest one.
     private let checkpoints: [Checkpoint]
@@ -97,15 +101,20 @@ public final class ReplayEngine {
         }
     }
 
-    public func play(operationsPerSecond: Double) {
+    /// Returns the playback `Task` so callers (e.g. `SortSession`) can `await` its completion
+    /// instead of polling `isPlaying`.
+    @discardableResult
+    public func play(operationsPerSecond: Double) -> Task<Void, Never> {
         isPlaying = true
-        playbackTask = Task { [weak self] in
+        let task = Task { [weak self] in
             while let self, self.stepIndex < self.tape.operations.count, !Task.isCancelled {
                 self.stepForward()
                 try? await Task.sleep(for: .seconds(1.0 / operationsPerSecond))
             }
             self?.isPlaying = false
         }
+        playbackTask = task
+        return task
     }
 
     public func pause() {
