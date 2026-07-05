@@ -1071,3 +1071,7 @@ $RECYCLE.BIN/
 Derived/
 # Claude Code session transcripts
 .transcripts/
+# Tuist regenerates these from Project.swift/Tuist/Package.swift on every `tuist generate` —
+# Project.swift is the source of truth, not the generated Xcode project/workspace.
+/*.xcodeproj/
+/*.xcworkspace/
