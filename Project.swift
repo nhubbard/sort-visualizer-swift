@@ -64,14 +64,16 @@ let app = Target.target(
         .target(name: "SortFeature"), .target(name: "SettingsFeature"),
         .target(name: "HomeFeature"), .target(name: "BenchmarkFeature"),
         .target(name: "MathRenderingKit"),
-        // Temporary, direct composition-root wiring for Phase 4's debug entry point
-        // (ScrollingSortView(algorithm: QuickSort())) — Phase 9 replaces this with data-driven
-        // navigation off AlgorithmRegistry/VisualizerRegistry, at which point these become
-        // implicit (BuiltInAlgorithms/BuiltInVisualizers are still never referenced by SortFeature
-        // itself, only by whoever composes the app).
-        .target(name: "BuiltInAlgorithms"), .target(name: "BuiltInVisualizers"),
-        // Composition-root registry wiring (AlgorithmKit's ShuffleRegistry, ScriptingKit's
-        // ScriptShuffleLoader) needs both directly — neither is re-exported by any of the above.
+        // Temporary, direct composition-root wiring for Phase 4/5's debug entry point — Phase 9
+        // replaces this with data-driven navigation off AlgorithmRegistry/VisualizerRegistry.
+        // `BuiltInAlgorithms` is empty again (§2.6 — quicksort is scripted now too) and never
+        // referenced directly by the App target; `BuiltInVisualizers` still is (Sort2App wires its
+        // concrete Visualizer conformances into VisualizerRegistry, which has no visibility into
+        // that module itself).
+        .target(name: "BuiltInVisualizers"),
+        // Composition-root registry wiring (AlgorithmKit's Algorithm/ShuffleRegistry,
+        // ScriptingKit's Script*Loader) needs both directly — neither is re-exported by any of the
+        // above.
         .target(name: "AlgorithmKit"), .target(name: "ScriptingKit"),
     ],
     settings: .settings(base: [
