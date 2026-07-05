@@ -9,7 +9,8 @@ public enum Module {
     public static func framework(
         name: String,
         dependencies: [TargetDependency] = [],
-        resources: ResourceFileElements? = nil
+        resources: ResourceFileElements? = nil,
+        testResources: ResourceFileElements? = nil
     ) -> [Target] {
         [
             .target(
@@ -30,6 +31,7 @@ public enum Module {
                 bundleId: "com.nhubbard.Sort2.mobile.modules.\(name.lowercased()).tests",
                 deploymentTargets: deploymentTargets,
                 sources: ["Modules/\(name)/Tests/**"],
+                resources: testResources,
                 dependencies: [.target(name: name)],
                 settings: .settings(base: baseSettings)
             ),

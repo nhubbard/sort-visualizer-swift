@@ -5,9 +5,20 @@ let modules: [Target] =
     Module.framework(name: "SortEngineKit") +
     Module.framework(name: "AlgorithmKit", dependencies: [.target(name: "SortEngineKit")]) +
     Module.framework(name: "VisualizationKit", dependencies: [.target(name: "SortEngineKit")]) +
-    Module.framework(name: "ScriptingKit", dependencies: [
-        .target(name: "AlgorithmKit"), .target(name: "VisualizationKit"),
-    ]) +
+    Module.framework(
+        name: "ScriptingKit",
+        dependencies: [
+            .target(name: "AlgorithmKit"), .target(name: "VisualizationKit"),
+        ],
+        // Same real files the app bundles, referenced directly (no duplication) — lets
+        // ScriptingKitTests verify every bundled algorithm/shuffle actually sorts/shuffles
+        // correctly via ScriptAlgorithmLoader/ScriptShuffleLoader, the exact code path the real
+        // app uses, rather than a hand-picked sample.
+        testResources: [
+            .folderReference(path: "App/Resources/Algorithms"),
+            .folderReference(path: "App/Resources/Shuffles"),
+        ]
+    ) +
     Module.framework(name: "BuiltInAlgorithms", dependencies: [.target(name: "AlgorithmKit")]) +
     Module.framework(name: "BuiltInVisualizers", dependencies: [.target(name: "VisualizationKit")]) +
     Module.framework(name: "AudioEngineKit", dependencies: [

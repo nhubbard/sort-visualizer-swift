@@ -83,4 +83,36 @@ struct JSAlgorithmAdapterTests {
             try adapter.recordThrowing(into: &engine)
         }
     }
+
+    /// The bridge only ever exposed compare/swap/getValue/setValue/count/markSorted until this
+    /// Phase 7 batch needed aux arrays for LSD Radix Sort — this locks in the rest of the surface
+    /// (aux arrays, manual mark/unmark) actually reaches `RecordingEngine` correctly.
+    @Test
+    func auxArraysAndManualMarksReachTheRecordingEngine() throws {
+        var engine = RecordingEngine(values: [3, 1, 2])
+        let adapter = makeAdapter(source: """
+        function sort(engine) {
+            engine.mark(7, 0);
+            const handle = engine.createAuxArray(2);
+            engine.writeAux(handle, 0, 99);
+            engine.writeAux(handle, 1, 42);
+            engine.deleteAuxArray(handle);
+            engine.unmark(7);
+            engine.unmarkAll();
+        }
+        """)
+        try adapter.recordThrowing(into: &engine)
+
+        let (tape, _, _, auxWriteCount) = engine.finish()
+        #expect(tape == [
+            .mark(marker: 7, index: 0),
+            .auxCreate(handle: 0, length: 2),
+            .auxWrite(handle: 0, index: 0, value: 99),
+            .auxWrite(handle: 0, index: 1, value: 42),
+            .auxDelete(handle: 0),
+            .unmark(marker: 7),
+            .unmarkAll,
+        ])
+        #expect(auxWriteCount == 2)
+    }
 }
