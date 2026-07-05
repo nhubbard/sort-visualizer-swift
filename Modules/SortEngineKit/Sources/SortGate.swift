@@ -3,7 +3,7 @@ import Foundation
 /// Replaces the bespoke `showBogoSortWarning`/`bogoSortAccepted`/`showBitonicWarning` boolean-pair
 /// dance. `AlgorithmMetadata.confirmationWarning` drives this directly — a new algorithm that
 /// deserves a warning just sets that one metadata field, no new flags, no new handler functions.
-public struct AlgorithmWarning: Equatable, Sendable {
+public struct AlgorithmWarning: Equatable, Sendable, Codable {
     public let title: LocalizedStringResource
     public let message: LocalizedStringResource
 
