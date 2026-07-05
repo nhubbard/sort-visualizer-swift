@@ -63,7 +63,12 @@ final class RunControlBarUITests: XCTestCase {
         XCTAssertEqual(statusLabel.value as? String, "sorted", "sort produced an incorrect result after pause/step/resume")
     }
 
-    func testSpeedPopoverExposesLiveSpeedSlider() throws {
+    /// Speed deliberately expands inline (not via `.popover`) — a `.popover`'s
+    /// `UIPopoverPresentationController` demands to support every interface orientation, which
+    /// has no overlap with this app's deliberately landscape-only orientation support, producing
+    /// "Supported orientations has no common orientation with the application" and unreliable
+    /// popover behavior.
+    func testSpeedButtonExpandsInlineLiveSpeedSlider() throws {
         let app = XCUIApplication()
         app.launchEnvironment = ["UI_TEST_ARRAY_SIZE": "24"]
         app.launch()
@@ -75,6 +80,9 @@ final class RunControlBarUITests: XCTestCase {
         speedButton.tap()
 
         let speedSlider = app.sliders["runControlSpeedSlider"]
-        XCTAssertTrue(speedSlider.waitForExistence(timeout: 5), "speed popover never revealed its slider")
+        XCTAssertTrue(speedSlider.waitForExistence(timeout: 5), "speed row never expanded to reveal its slider")
+
+        speedButton.tap()
+        XCTAssertFalse(speedSlider.waitForExistence(timeout: 2), "tapping again should collapse the speed row")
     }
 }

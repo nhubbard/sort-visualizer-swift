@@ -5,23 +5,32 @@ import SwiftUI
 /// space rather than floating on top of the visualization (v1's `TouchBarSlider`/`GroupBox`
 /// overlay obscured bars it sat over and didn't reserve any space at all). Modeled on a standard
 /// media-player transport: a thin scrub bar, a live stats caption, then a row of transport
-/// buttons. Speed lives behind a compact popover rather than an always-visible inline slider, so
-/// the always-visible row stays a row of icon-sized buttons instead of competing for width.
+/// buttons. Speed expands inline below the transport row on tap, rather than living behind a
+/// `.popover` — a `.popover`'s `UIPopoverPresentationController` unconditionally wants to support
+/// every interface orientation, which has no overlap with this app's deliberately
+/// landscape-only `UISupportedInterfaceOrientations` (bar visualizations read better wide),
+/// producing "Supported orientations has no common orientation with the application" and
+/// unreliable popover behavior. An inline expand/collapse never touches that presentation-
+/// controller machinery at all.
 struct RunControlBar: View {
     @Bindable var session: SortSession
     @Bindable var replay: ReplayEngine
 
-    @State private var isShowingSpeedPopover = false
+    @State private var isSpeedExpanded = false
 
     var body: some View {
         VStack(spacing: 8) {
             scrubSlider
             statsCaption
             transportRow
+            if isSpeedExpanded {
+                speedRow
+            }
         }
         .padding(12)
         .glassEffect(.regular.interactive(), in: .rect(cornerRadius: 20))
         .padding([.horizontal, .bottom])
+        .animation(.easeInOut(duration: 0.2), value: isSpeedExpanded)
     }
 
     private var scrubSlider: some View {
@@ -91,15 +100,12 @@ struct RunControlBar: View {
             .accessibilityIdentifier("runControlSoundToggle")
 
             Button {
-                isShowingSpeedPopover = true
+                isSpeedExpanded.toggle()
             } label: {
                 Text("\(Int(replay.speed))/s")
                     .font(.footnote.monospacedDigit())
             }
             .accessibilityIdentifier("runControlSpeedButton")
-            .popover(isPresented: $isShowingSpeedPopover) {
-                speedPopoverContent
-            }
         }
         .buttonStyle(.borderless)
         .controlSize(.large)
@@ -109,23 +115,20 @@ struct RunControlBar: View {
         replay.stepIndex >= replay.totalOperationCount
     }
 
-    private var speedPopoverContent: some View {
-        VStack(spacing: 8) {
-            Text("Playback Speed")
-                .font(.headline)
-            Slider(value: $replay.speed, in: 1...200, step: 1) {
-                Text("Speed")
-            } minimumValueLabel: {
-                Text("Slow")
-            } maximumValueLabel: {
-                Text("Fast")
-            }
-            .accessibilityIdentifier("runControlSpeedSlider")
-            .frame(minWidth: 240)
-            Text("\(Int(replay.speed)) operations/second")
+    private var speedRow: some View {
+        HStack(spacing: 8) {
+            Text("Slow")
                 .font(.caption)
                 .foregroundStyle(.secondary)
+            Slider(value: $replay.speed, in: 1...200, step: 1)
+                .accessibilityIdentifier("runControlSpeedSlider")
+            Text("Fast")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+            Text("\(Int(replay.speed)) ops/sec")
+                .font(.caption.monospacedDigit())
+                .foregroundStyle(.secondary)
+                .frame(minWidth: 80, alignment: .trailing)
         }
-        .padding()
     }
 }
