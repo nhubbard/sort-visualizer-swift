@@ -869,7 +869,7 @@ cython_debug/
 #  be found at https://github.com/github/gitignore/blob/main/Global/JetBrains.gitignore
 #  and can be added to the global gitignore or merged into this file.  For a more nuclear
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
-#.idea/
+.idea/
 
 ### Ruby ###
 *.gem
@@ -1065,3 +1065,9 @@ $RECYCLE.BIN/
 ### Xcode ###
 
 # End of https://www.toptal.com/developers/gitignore/api/windows,macos,linux,sublimetext,xcode,python,node,go,c++,c,csharp,kotlin,ruby,swift,java
+
+### Project-specific ###
+# Tuist-generated derived sources/Info.plists
+Derived/
+# Claude Code session transcripts
+.transcripts/

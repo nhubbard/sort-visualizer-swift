@@ -1,0 +1,557 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Scheme
+   LastUpgradeVersion = "1010"
+   version = "1.3">
+   <BuildAction
+      parallelizeBuildables = "YES"
+      buildImplicitDependencies = "YES">
+      <BuildActionEntries>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "A1794ABEF889A33E6D27E466"
+               BuildableName = "Algorithms.framework"
+               BlueprintName = "Algorithms"
+               ReferencedContainer = "container:Tuist/.build/tuist-derived/swift-algorithms/swift-algorithms.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "B55B2CB883D6F4AC79C162BF"
+               BuildableName = "Atomics.framework"
+               BlueprintName = "Atomics"
+               ReferencedContainer = "container:Tuist/.build/tuist-derived/swift-atomics/swift-atomics.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "7CF0A0ACFD8D59CE627FCA4D"
+               BuildableName = "AudioKit.framework"
+               BlueprintName = "AudioKit"
+               ReferencedContainer = "container:Tuist/.build/tuist-derived/AudioKit/AudioKit.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "D8CEFCC9CEE817DF30599400"
+               BuildableName = "AudioKitEX.framework"
+               BlueprintName = "AudioKitEX"
+               ReferencedContainer = "container:Tuist/.build/tuist-derived/AudioKitEX/AudioKitEX.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "BDC8B5D1476803BD81EF4609"
+               BuildableName = "AudioKitUI.framework"
+               BlueprintName = "AudioKitUI"
+               ReferencedContainer = "container:Tuist/.build/tuist-derived/AudioKitUI/AudioKitUI.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "A16183F9EB4766D2DD46CBF9"
+               BuildableName = "CAudioKitEX.framework"
+               BlueprintName = "CAudioKitEX"
+               ReferencedContainer = "container:Tuist/.build/tuist-derived/AudioKitEX/AudioKitEX.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "DDADDCDFEBD1AF19CDECFAED"
+               BuildableName = "CSoundpipeAudioKit.framework"
+               BlueprintName = "CSoundpipeAudioKit"
+               ReferencedContainer = "container:Tuist/.build/tuist-derived/SoundpipeAudioKit/SoundpipeAudioKit.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "F012D87DBB729140C4D57654"
+               BuildableName = "CollectionConcurrencyKit.framework"
+               BlueprintName = "CollectionConcurrencyKit"
+               ReferencedContainer = "container:Tuist/.build/tuist-derived/CollectionConcurrencyKit/CollectionConcurrencyKit.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "309265274E10B8A7D6F006FE"
+               BuildableName = "Controls.framework"
+               BlueprintName = "Controls"
+               ReferencedContainer = "container:Tuist/.build/tuist-derived/Controls/Controls.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "494F3B93D4FD371D0C8081C1"
+               BuildableName = "DeviceKit.framework"
+               BlueprintName = "DeviceKit"
+               ReferencedContainer = "container:Tuist/.build/tuist-derived/DeviceKit/DeviceKit.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "036BF84D76A9C8E3A587DEA7"
+               BuildableName = "DeviceKit_DeviceKit.bundle"
+               BlueprintName = "DeviceKit_DeviceKit"
+               ReferencedContainer = "container:Tuist/.build/tuist-derived/DeviceKit/DeviceKit.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "1FE00EE01F32D73738F482E8"
+               BuildableName = "HeapSortPlugin.framework"
+               BlueprintName = "HeapSortPlugin"
+               ReferencedContainer = "container:Sort Symphony-Tuist.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "383EE0D23119779925561D61"
+               BuildableName = "HeapSortPluginTests.xctest"
+               BlueprintName = "HeapSortPluginTests"
+               ReferencedContainer = "container:Sort Symphony-Tuist.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "E434B9898099541BD1629E9E"
+               BuildableName = "KissFFT.framework"
+               BlueprintName = "KissFFT"
+               ReferencedContainer = "container:Tuist/.build/tuist-derived/KissFFT/KissFFT.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "0EFD49CA40C9AACC780C6594"
+               BuildableName = "MarkdownUI.framework"
+               BlueprintName = "MarkdownUI"
+               ReferencedContainer = "container:Tuist/.build/tuist-derived/swift-markdown-ui/swift-markdown-ui.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "53258E08082D50A9909E27A1"
+               BuildableName = "MergeSortPlugin.framework"
+               BlueprintName = "MergeSortPlugin"
+               ReferencedContainer = "container:Sort Symphony-Tuist.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "0DC05C140BC5A89044EC420C"
+               BuildableName = "MergeSortPluginTests.xctest"
+               BlueprintName = "MergeSortPluginTests"
+               ReferencedContainer = "container:Sort Symphony-Tuist.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "5DE8C255CF802593D7C19B9F"
+               BuildableName = "NetworkImage.framework"
+               BlueprintName = "NetworkImage"
+               ReferencedContainer = "container:Tuist/.build/tuist-derived/NetworkImage/NetworkImage.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "E2CF2F52B09269575913E056"
+               BuildableName = "QuickSortPlugin.framework"
+               BlueprintName = "QuickSortPlugin"
+               ReferencedContainer = "container:Sort Symphony-Tuist.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "7D508302D9E13740D43677EF"
+               BuildableName = "QuickSortPluginTests.xctest"
+               BlueprintName = "QuickSortPluginTests"
+               ReferencedContainer = "container:Sort Symphony-Tuist.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "665DB30C45B2A77DEB71A41F"
+               BuildableName = "RealModule.framework"
+               BlueprintName = "RealModule"
+               ReferencedContainer = "container:Tuist/.build/tuist-derived/swift-numerics/swift-numerics.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "C84ECCB9BAD00505F77DE7A8"
+               BuildableName = "SortAlgorithmCore.framework"
+               BlueprintName = "SortAlgorithmCore"
+               ReferencedContainer = "container:Sort Symphony-Tuist.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "7B0B381F1F23806A69C23952"
+               BuildableName = "SortSymphony_iOS.app"
+               BlueprintName = "SortSymphony-iOS"
+               ReferencedContainer = "container:Sort Symphony-Tuist.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "F29E868E411FA1839B13A64C"
+               BuildableName = "Soundpipe.framework"
+               BlueprintName = "Soundpipe"
+               ReferencedContainer = "container:Tuist/.build/tuist-derived/SoundpipeAudioKit/SoundpipeAudioKit.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "DC90255E9002F9C09058656A"
+               BuildableName = "SoundpipeAudioKit.framework"
+               BlueprintName = "SoundpipeAudioKit"
+               ReferencedContainer = "container:Tuist/.build/tuist-derived/SoundpipeAudioKit/SoundpipeAudioKit.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "ED9325E674C6759DDA4E4547"
+               BuildableName = "SwiftMath.framework"
+               BlueprintName = "SwiftMath"
+               ReferencedContainer = "container:Tuist/.build/tuist-derived/SwiftMath/SwiftMath.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "AF424BCD41700EE26299548A"
+               BuildableName = "SwiftMath_SwiftMath.bundle"
+               BlueprintName = "SwiftMath_SwiftMath"
+               ReferencedContainer = "container:Tuist/.build/tuist-derived/SwiftMath/SwiftMath.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "FE3DC8F97DB86B8D9A0E5C08"
+               BuildableName = "Then.framework"
+               BlueprintName = "Then"
+               ReferencedContainer = "container:Tuist/.build/tuist-derived/Then/Then.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "70EFAD821350C3A77F477A5F"
+               BuildableName = "Tonic.framework"
+               BlueprintName = "Tonic"
+               ReferencedContainer = "container:Tuist/.build/tuist-derived/Tonic/Tonic.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "BCA8148C831D4C46AD399A47"
+               BuildableName = "_AtomicsShims.framework"
+               BlueprintName = "_AtomicsShims"
+               ReferencedContainer = "container:Tuist/.build/tuist-derived/swift-atomics/swift-atomics.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "F5FFA0FE6DB8AA7BA170A64C"
+               BuildableName = "_NumericsShims.framework"
+               BlueprintName = "_NumericsShims"
+               ReferencedContainer = "container:Tuist/.build/tuist-derived/swift-numerics/swift-numerics.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "614CE18CEE4C821A1781AB8E"
+               BuildableName = "cmark_gfm.framework"
+               BlueprintName = "cmark-gfm"
+               ReferencedContainer = "container:Tuist/.build/tuist-derived/cmark-gfm/cmark-gfm.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "0A59298AE6AFD06C6C57744D"
+               BuildableName = "cmark_gfm_extensions.framework"
+               BlueprintName = "cmark-gfm-extensions"
+               ReferencedContainer = "container:Tuist/.build/tuist-derived/cmark-gfm/cmark-gfm.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+      </BuildActionEntries>
+   </BuildAction>
+   <TestAction
+      buildConfiguration = "Debug"
+      selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
+      selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
+      shouldUseLaunchSchemeArgsEnv = "YES">
+      <Testables>
+         <TestableReference
+            skipped = "NO"
+            parallelizable = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "383EE0D23119779925561D61"
+               BuildableName = "HeapSortPluginTests.xctest"
+               BlueprintName = "HeapSortPluginTests"
+               ReferencedContainer = "container:Sort Symphony-Tuist.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO"
+            parallelizable = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "0DC05C140BC5A89044EC420C"
+               BuildableName = "MergeSortPluginTests.xctest"
+               BlueprintName = "MergeSortPluginTests"
+               ReferencedContainer = "container:Sort Symphony-Tuist.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO"
+            parallelizable = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "7D508302D9E13740D43677EF"
+               BuildableName = "QuickSortPluginTests.xctest"
+               BlueprintName = "QuickSortPluginTests"
+               ReferencedContainer = "container:Sort Symphony-Tuist.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
+      </Testables>
+   </TestAction>
+   <LaunchAction
+      buildConfiguration = "Debug"
+      selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
+      selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
+      launchStyle = "0"
+      useCustomWorkingDirectory = "NO"
+      ignoresPersistentStateOnLaunch = "NO"
+      debugDocumentVersioning = "YES"
+      debugServiceExtension = "internal"
+      allowLocationSimulation = "YES">
+      <MacroExpansion>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "A1794ABEF889A33E6D27E466"
+            BuildableName = "Algorithms.framework"
+            BlueprintName = "Algorithms"
+            ReferencedContainer = "container:Tuist/.build/tuist-derived/swift-algorithms/swift-algorithms.xcodeproj">
+         </BuildableReference>
+      </MacroExpansion>
+   </LaunchAction>
+   <ProfileAction
+      buildConfiguration = "Release"
+      shouldUseLaunchSchemeArgsEnv = "YES"
+      savedToolIdentifier = ""
+      useCustomWorkingDirectory = "NO"
+      debugDocumentVersioning = "YES">
+      <MacroExpansion>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "A1794ABEF889A33E6D27E466"
+            BuildableName = "Algorithms.framework"
+            BlueprintName = "Algorithms"
+            ReferencedContainer = "container:Tuist/.build/tuist-derived/swift-algorithms/swift-algorithms.xcodeproj">
+         </BuildableReference>
+      </MacroExpansion>
+   </ProfileAction>
+   <AnalyzeAction
+      buildConfiguration = "Debug">
+   </AnalyzeAction>
+   <ArchiveAction
+      buildConfiguration = "Release"
+      revealArchiveInOrganizer = "YES">
+   </ArchiveAction>
+</Scheme>

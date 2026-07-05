@@ -1,0 +1,2310 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 55;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		00D94CF7B38CE4233BDC727B /* MarkdownUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D39AE4CDFD15C120A5B72352 /* MarkdownUI.framework */; };
+		02942965D630361B2900AC21 /* CodeThemes.swift in Sources */ = {isa = PBXBuildFile; fileRef = D002FCD113767D7E2FE77C44 /* CodeThemes.swift */; };
+		03684375D5D05B707C2CA450 /* CloudKitRecordDecoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30743FE16E35E91AC26C0F52 /* CloudKitRecordDecoder.swift */; };
+		0373537A8E41A26616A909F7 /* DeviceKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 894AADA10CF7D12642F8C73F /* DeviceKit.framework */; };
+		07ECABF636FD3A172CB1B97F /* EmacsTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB9A1C9C82613B20389EB74C /* EmacsTheme.swift */; };
+		10BB4CB54B04EAAA33D61023 /* SelectionSortImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = E257FDE571F765E088F3B20B /* SelectionSortImpl.swift */; };
+		132DC9D25694B34225FD8405 /* SortView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB1BD229152E6B7E6197C2E6 /* SortView.swift */; };
+		13703643A15ED19E1A4B79B3 /* SortAlgorithmCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B2835D5611929F95F426154B /* SortAlgorithmCore.framework */; };
+		13E052F139CA06C9281CBB67 /* AudioKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2F08554B1C8FD2C19F9DDBB0 /* AudioKit.framework */; };
+		14FB43221B8651F101692F2E /* Controls.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C4AC0F498CD50BB38470A00D /* Controls.framework */; };
+		1509AEF6CB88FEE236432AD8 /* TestSortViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4042B2444B1841498A177ABA /* TestSortViewModel.swift */; };
+		191B106779F1C781796D754A /* MergeSortPluginRegistry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C4E11F26BE8272C2D8055B8 /* MergeSortPluginRegistry.swift */; };
+		192184C04B7EBD9B76609B7B /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED680E8D8AA149643CD9CCAF /* HomeView.swift */; };
+		1BA327B4F43E6AF4FFA239FA /* QuickSortPlugin.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 7DB9EE69FEE6FDCDFCACCCFE /* QuickSortPlugin.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		1BCA628F6F39879A7FC0C4DB /* DeviceKit_DeviceKit.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 04A5537AF80CC6A3CC0E7A07 /* DeviceKit_DeviceKit.bundle */; };
+		1CC31623A35E2A8B3015B4F7 /* InsertionSortImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = F96B9CDA41E9F720997794EF /* InsertionSortImpl.swift */; };
+		1D8714E47F7253C16BEF1930 /* QuickSortPlugin.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7DB9EE69FEE6FDCDFCACCCFE /* QuickSortPlugin.framework */; };
+		215B43C4AC35483AFD8F64AD /* ShuffleMethod.swift in Sources */ = {isa = PBXBuildFile; fileRef = 488552AD4439B6BD85D14F69 /* ShuffleMethod.swift */; };
+		237EC0DF84730FE7E835CCEB /* CustomADSRWidget+UIKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77F12EFB29E221CD80582FED /* CustomADSRWidget+UIKit.swift */; };
+		2659D1FCD0976670398D5E0E /* ArduinoTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D1C3D0A5E80B64992D148F7 /* ArduinoTheme.swift */; };
+		26CB14C6B1FBC9A4E301D1DA /* SortAlgorithmCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B2835D5611929F95F426154B /* SortAlgorithmCore.framework */; };
+		281199CAE585C848B5433A05 /* StoogeSortImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10964A0198BC8B59183283A6 /* StoogeSortImpl.swift */; };
+		287DA404B4FEF76DF44D0284 /* cmark_gfm_extensions.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A81D1409202D789266E034D5 /* cmark_gfm_extensions.framework */; };
+		2CCC865DB2846F9874FC12B2 /* HeapSortImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4D5CF0FA5320F3217940C7B /* HeapSortImpl.swift */; };
+		2D76988FCDE8DBC77E2F93FC /* PancakeSortImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0638B450D24B2C8990EE5134 /* PancakeSortImpl.swift */; };
+		2DAFCE9144C1E50DD11FCC17 /* AudioKitUI.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = D47AB56421AD68E6C9FC8F87 /* AudioKitUI.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		30FCE60E2E26C849F3F8C540 /* AttributeDynamicLookup+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C7E901EE05D51D0EDFCDB4F /* AttributeDynamicLookup+Extensions.swift */; };
+		35FBE90966CEE4C57405ADB7 /* OddEvenSortImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29D5F98E7C2415E492109222 /* OddEvenSortImpl.swift */; };
+		37897E661D04B1B211E859FF /* AudioKitEX.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 44BE1594621E995972FE1723 /* AudioKitEX.framework */; };
+		382A772B215072B43F894CD0 /* HeapSortPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1E8596B582A8AB46F7D5F2B /* HeapSortPlugin.swift */; };
+		395B84D82B60DCEF54AEA074 /* QuickSortPluginRegistry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14981E18DF15E355DC6CD383 /* QuickSortPluginRegistry.swift */; };
+		3A6A75474E70BB65859DBE14 /* Int+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 429A64A8F5AE4303326204DA /* Int+Extensions.swift */; };
+		3A6E5951921C958EDA5B09D5 /* MonokaiTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE33E0FB19AC53DA5095D46D /* MonokaiTheme.swift */; };
+		3FDDF2785596EFA6D0FD29F9 /* NumberFormatter+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CB4C7AFE608DC440367A98E /* NumberFormatter+Extensions.swift */; };
+		40533AFECC4BFDB246E2B934 /* DeviceKit_DeviceKit.bundle in Dependencies */ = {isa = PBXBuildFile; fileRef = 04A5537AF80CC6A3CC0E7A07 /* DeviceKit_DeviceKit.bundle */; };
+		416B026E9132FB51F2E57CEE /* Atomics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3E13744A611A34E12C1E72A8 /* Atomics.framework */; };
+		422DB6C607DB35D3ADC3F320 /* MergeSortPlugin.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 727FA3F44614319728DD4167 /* MergeSortPlugin.framework */; };
+		42C05BB2087EBBC58E589366 /* SortAlgorithm.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D32F31A2E52F5CC05867008 /* SortAlgorithm.swift */; };
+		42C65C50BF505E41A9C73A23 /* GnomeSortImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D52920DBBDEB70972DF3EAE /* GnomeSortImpl.swift */; };
+		42F9516D5B570C2A886342FC /* AudioKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 2F08554B1C8FD2C19F9DDBB0 /* AudioKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		44522140F3D1CC78A9001046 /* QuickSortPlugin.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7DB9EE69FEE6FDCDFCACCCFE /* QuickSortPlugin.framework */; };
+		46158A43E8DC41350BC2E64A /* SwiftMath_SwiftMath.bundle in Dependencies */ = {isa = PBXBuildFile; fileRef = 0CE0D376713A81BD7E1A1640 /* SwiftMath_SwiftMath.bundle */; };
+		4654C3FFFB4AE9BBEC3E1D72 /* ScrollingSortView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 90D32F99CD645C7BB91EC83D /* ScrollingSortView.swift */; };
+		47718D0FD3E88C16071F2727 /* Algorithms.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EEAB1E71FEA96C74A22B8072 /* Algorithms.framework */; };
+		4DAE6892F7E428123A0DE300 /* MergeSortPlugin.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 727FA3F44614319728DD4167 /* MergeSortPlugin.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		4EE399C29586443BBC3FBB6C /* BubbleSortImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EF39B1744A4EDC2D22A8BB4 /* BubbleSortImpl.swift */; };
+		50C52F8B4AAB2FF478DAC349 /* SoundpipeAudioKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 1A25B13A9FCBCAFD639AE679 /* SoundpipeAudioKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		51669EE95BE1B423EC3AB604 /* AudioKitEX.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 44BE1594621E995972FE1723 /* AudioKitEX.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		54699B3DBB955B561F3D07DF /* CodeTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9DAEAE94F772386D14267F1C /* CodeTheme.swift */; };
+		54E866992D7D4428B9B5B00E /* RandomizingHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 044414AADCB4702A042EA2A5 /* RandomizingHeader.swift */; };
+		5C28EA51C22396C038361D10 /* Algorithms.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E44C2E68CD9100D62A578CF /* Algorithms.swift */; };
+		6385AE50AD3FC58ED00836AC /* CollectionConcurrencyKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D8D52C95265A03C4F48E1E /* CollectionConcurrencyKit.swift */; };
+		654D100ABB57488E47831EEF /* BogoSortImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 193D13D8717F0F6C0B3EE0C4 /* BogoSortImpl.swift */; };
+		661FE7A73A28EFE6C2AEB1DE /* Sort2App.swift in Sources */ = {isa = PBXBuildFile; fileRef = F773EF227EC5B4C55DCFE6CB /* Sort2App.swift */; };
+		680E3E28666B3BAB96EA9C64 /* NetworkImage.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7024FB738A6A849BA9D55EE7 /* NetworkImage.framework */; };
+		682804C846D9EDBB95062C8C /* HeapSortPlugin.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = D11AA17D2F879F6065719B45 /* HeapSortPlugin.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		6A5750E84FED526F9FF34BF7 /* AlgorithmRegistry.swift in Sources */ = {isa = PBXBuildFile; fileRef = C11E5663B3F2D4516D9FAB43 /* AlgorithmRegistry.swift */; };
+		6B6B081025F33731D764D2A0 /* LanguageEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1953D684A34E08B6A677556B /* LanguageEntry.swift */; };
+		6D02C9065276265DA3EB5E91 /* Page.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A63D4C5EDC67BA68365C0DC /* Page.swift */; };
+		7143DCC32C4D56AB8B3E588B /* ColorfulTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50DD5EB96ED7FBCDB60E449B /* ColorfulTheme.swift */; };
+		717F34184C68B9DFA29AE348 /* MergeSortPlugin.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 727FA3F44614319728DD4167 /* MergeSortPlugin.framework */; };
+		742EB51FBC01A7E5A9BA0364 /* _AtomicsShims.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF786746FCF3E0F96AED3B3D /* _AtomicsShims.framework */; };
+		74B166B80B6F1F123D578BA8 /* SwiftMathView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B381AE060E2822BE47C6ABD /* SwiftMathView.swift */; };
+		7555066A6E3EBFBA1B86B2AC /* HeapSortPlugin.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D11AA17D2F879F6065719B45 /* HeapSortPlugin.framework */; };
+		758ADD347EB624F18D36E3B1 /* HeapSortPluginTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BA3A5F5B326068ACCF21BD1 /* HeapSortPluginTests.swift */; };
+		79097468906B81A1C362043A /* MergeSortAlgorithm.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24FDA3DE30B75CFAF1040A74 /* MergeSortAlgorithm.swift */; };
+		7AD83784C22098B71C7A86BA /* Category.swift in Sources */ = {isa = PBXBuildFile; fileRef = 279814502EC085836BF351EA /* Category.swift */; };
+		7B99750AB75026F4D50CC03D /* TuistBundle+SortSymphonyIOS.swift in Sources */ = {isa = PBXBuildFile; fileRef = 766E7975EDA48B987B87DB61 /* TuistBundle+SortSymphonyIOS.swift */; };
+		8061DDEABF3E63A5CE3A10B4 /* BitonicSortImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 923B3D2EF22FAF292CEA8D3B /* BitonicSortImpl.swift */; };
+		83CE7FCBF4888301913AF729 /* AttributedCodeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0FE20F05107C39618E1EF773 /* AttributedCodeView.swift */; };
+		8529B77978771F12134F9EFE /* Range+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7DD7FB473D71CE81E16AD5A /* Range+Extensions.swift */; };
+		8799B373AD3DC7B7984FF066 /* Color+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFF46134DE40D25A664650D8 /* Color+Extensions.swift */; };
+		88385137F8902E71FC926AD0 /* AttributeScopes+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D516DC90028B4FA5F64EBF2 /* AttributeScopes+Extensions.swift */; };
+		88779D56FEF25C63585B5CE0 /* RealModule.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9FA89F28BE91688FFF6D652C /* RealModule.framework */; };
+		8998DC8F24DC7831CF3B4165 /* SortAlgorithmCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B2835D5611929F95F426154B /* SortAlgorithmCore.framework */; };
+		8AF0AB771CCAACC39C3D8547 /* TuistAssets+SortSymphonyIOS.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14EACE0ED31C74B6E0E4FE0D /* TuistAssets+SortSymphonyIOS.swift */; };
+		8B9E28EAEC8FC7036B3F4936 /* AlgorithmPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 892F3ADCB9F20AF104D9D950 /* AlgorithmPlugin.swift */; };
+		95229C59E8E4DEF9D59BE450 /* Then.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8599331244562093FD4A847D /* Then.framework */; };
+		978A16EE63DA2DB813ED606D /* CustomCloudKitEncodable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 214A3E838A37430713ABA550 /* CustomCloudKitEncodable.swift */; };
+		99E0C177C019E725313650CF /* CombSortImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEDFCE310F152FE6DE7F21EE /* CombSortImpl.swift */; };
+		9D3455D0E2CE3AB4CA5B40F4 /* HeapSortPlugin.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D11AA17D2F879F6065719B45 /* HeapSortPlugin.framework */; };
+		9D8A894B644BD0FC9130A02D /* CAudioKitEX.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = DBCFCB5D511079D38ACBF9D1 /* CAudioKitEX.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		A1B5FDD298EEEF3283E5A737 /* cmark_gfm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6E6B5B218BEBCF6E86873511 /* cmark_gfm.framework */; };
+		A26ADCB40E9BAC5AF2C341F2 /* SortViewModelProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20EC0AAAB663CA53E1842B19 /* SortViewModelProtocol.swift */; };
+		A43F26EA511C84EBE1C6778D /* MergeSortPluginTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3911FB311F86691C3BB33F20 /* MergeSortPluginTests.swift */; };
+		A5BD8C344B2D56248E647C12 /* Soundpipe.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 47E3D10E56A574E90819D530 /* Soundpipe.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		A5DA82B24E2ACD31866BBA28 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A3316E2D44CF61B5DD1F06E0 /* Assets.xcassets */; };
+		A9ED85EC6FFA9BE778190D08 /* SortItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF64377A772174CC5A0EED1F /* SortItem.swift */; };
+		AA2F67D2A5A857605657CD67 /* SwiftMath_SwiftMath.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 0CE0D376713A81BD7E1A1640 /* SwiftMath_SwiftMath.bundle */; };
+		ABFA5C2E9BAA3129C80719A0 /* SortAlgorithmCore.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = B2835D5611929F95F426154B /* SortAlgorithmCore.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		ACAB4E5C0B1D6E9E30963747 /* CSoundpipeAudioKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = BB6FA3EA2DD57A1EFE62AE74 /* CSoundpipeAudioKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		ADBE6DAB27C938C178264704 /* DraculaTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1009F8291319CEB68B00E00 /* DraculaTheme.swift */; };
+		AE1CF08242296DE652C5E705 /* SwiftMath.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4368103625640017262AA36B /* SwiftMath.framework */; };
+		AF3FAF00E6C090BD05C59386 /* CollectionConcurrencyKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1F6329EE869F04CA4C034C62 /* CollectionConcurrencyKit.framework */; };
+		B1AED64F529F804C15286E58 /* CodeAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BE5266C6C6ACD2255185363 /* CodeAttributes.swift */; };
+		B290675E3FD5A8E3F2C23C83 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 9ACEAAC35049AAFADEC0596B /* PrivacyInfo.xcprivacy */; };
+		BA1DF401540F284631E910A1 /* Sequence+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = F61F263EDF440E03EF8CE04F /* Sequence+Extensions.swift */; };
+		BCBF1AD0C77017262E1CA8F1 /* SortAlgorithmCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B2835D5611929F95F426154B /* SortAlgorithmCore.framework */; };
+		BF8EB29A8B8AACDE2803C6C1 /* SortItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 038DC1EB7B78AE545F7D429B /* SortItem.swift */; };
+		BFBBF9C2B0132CD50A29DEA3 /* SortAlgorithmCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B2835D5611929F95F426154B /* SortAlgorithmCore.framework */; };
+		BFBF1A6A84A1A212B412F43F /* SortViewModel+Protocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = D78193A49721E4BFD49677D4 /* SortViewModel+Protocol.swift */; };
+		C1C9DB79A61DF98D0549A68A /* RadixSortImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC7E8D0ECCDF80F979FC35EC /* RadixSortImpl.swift */; };
+		C2AEF4B054F42CD86E06F837 /* ShellSortImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F26E48A0EB9A1D3F80D1F5C /* ShellSortImpl.swift */; };
+		C3BDA33A8A0D7CF11F8458C8 /* SortStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = A778D6AF71D09485DC084211 /* SortStatus.swift */; };
+		C7EFC21831333D5F0F4EF0D1 /* CloudKitRecordEncoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCE23F18D9E9AB1ABA0E78AD /* CloudKitRecordEncoder.swift */; };
+		C8627BC72E13337CB56850D7 /* Image+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CE998381A9B609874DA14DD /* Image+Extensions.swift */; };
+		CBECC677408FA51F718C6C16 /* PluginLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DA2B9D3FBE26028DFB44487 /* PluginLoader.swift */; };
+		CE0F5E72129C304A7AF78199 /* SoundpipeAudioKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1A25B13A9FCBCAFD639AE679 /* SoundpipeAudioKit.framework */; };
+		D5C3FD7E93A7BDB2D924B23D /* StateToggle.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEC8892537301181B9F071B1 /* StateToggle.swift */; };
+		D5DB29F86231EBE0AFD48B71 /* RunResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = E18548F2706CEDDD17F70F7F /* RunResult.swift */; };
+		D673EB2C4721A5E798A6742F /* TextFormat.swift in Sources */ = {isa = PBXBuildFile; fileRef = F01A77D4F75EBF1ED4E4D903 /* TextFormat.swift */; };
+		D79F6D0147F222293C011171 /* SortAlgorithmCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B2835D5611929F95F426154B /* SortAlgorithmCore.framework */; };
+		DAB8139FB17CB1945A62B3EA /* Resources in Resources */ = {isa = PBXBuildFile; fileRef = BC001320D4E362EF7C8EF1AE /* Resources */; };
+		DB598C2AF5C7323E67D03E01 /* Int+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC6897EE763E28ACB8FB4A31 /* Int+Extensions.swift */; };
+		DB6E41E9608D15F99638A3EB /* CustomIconLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7272D4B6221942BA7FD89ADC /* CustomIconLabel.swift */; };
+		DBAA1D015DE2D2E642719EBA /* ComplexityEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0FCE6B532E2E017B5DD0C96E /* ComplexityEntry.swift */; };
+		DE4255A281E5DC27DE8C92C2 /* _NumericsShims.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0C4DFE107D5ABE7029351FBD /* _NumericsShims.framework */; };
+		E5FBDA7D3851005DB1B50E79 /* QuickSortAlgorithm.swift in Sources */ = {isa = PBXBuildFile; fileRef = 120E139FEB724345DEC765D3 /* QuickSortAlgorithm.swift */; };
+		E73F7040F5FB30AE6C376ED9 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 256315F0A88177C62D9CC8E9 /* SettingsView.swift */; };
+		E7545089F62FD1742E7CE8D3 /* Controls.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C4AC0F498CD50BB38470A00D /* Controls.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		EA64E28FDA0B3CDE6456A44A /* MathView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03B4B433B7D8A2FE83EB9791 /* MathView.swift */; };
+		EBF2DEF3FF905176BEBA6373 /* AudioKitUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D47AB56421AD68E6C9FC8F87 /* AudioKitUI.framework */; };
+		EFB4F820F7E3A90894C095C6 /* QuickSortPluginTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B74FA44393EA4C390D2EBE0B /* QuickSortPluginTests.swift */; };
+		EFCE036F0F93EA2B36E3D5E2 /* Synthesizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA12F578FEC9C4A9D32861A5 /* Synthesizer.swift */; };
+		F28E3E59A8F2D25451BCA156 /* ShakerSortImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BAA6A4E5913422372CD7DD7 /* ShakerSortImpl.swift */; };
+		F2E14A478BA026FB34A1662B /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4FA506281CB0D66664B7F9E /* ContentView.swift */; };
+		F3F83DFFC006A437D67E2BDE /* IosMathView+UIKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = F48421C9E62C870C5A03716E /* IosMathView+UIKit.swift */; };
+		F728031A036AAC3F695A2319 /* PygmentsTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8A6AEC0BCC832059E9A7C38 /* PygmentsTheme.swift */; };
+		F7FB658D21357101913F2DF9 /* SortAlgorithmCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B2835D5611929F95F426154B /* SortAlgorithmCore.framework */; };
+		FB20B13538209B6FC19E4D3F /* Float+RawRepresentable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A9AD314ADCB8B3CEEA373AC /* Float+RawRepresentable.swift */; };
+		FF8BADB4BC49E44FD7062D26 /* SortViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB4A73B712378BC8B41D6309 /* SortViewModel.swift */; };
+		FF936FA90B3D57883395B870 /* Binding+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0094080EB96B4F0C57D5F394 /* Binding+Extensions.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		03BF16756A2A398897233738 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 5699267C640898D255F7D84C /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = C84ECCB9BAD00505F77DE7A8;
+			remoteInfo = SortAlgorithmCore;
+		};
+		24D897A60D849AA2A993C37B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 5699267C640898D255F7D84C /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = C84ECCB9BAD00505F77DE7A8;
+			remoteInfo = SortAlgorithmCore;
+		};
+		27D755FCD06E14F95F5C855A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 5699267C640898D255F7D84C /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = E2CF2F52B09269575913E056;
+			remoteInfo = QuickSortPlugin;
+		};
+		2EB5E8E22925DB699ED2D19C /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 5699267C640898D255F7D84C /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = C84ECCB9BAD00505F77DE7A8;
+			remoteInfo = SortAlgorithmCore;
+		};
+		3A08D923FB2BC49A809EE546 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 5699267C640898D255F7D84C /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = C84ECCB9BAD00505F77DE7A8;
+			remoteInfo = SortAlgorithmCore;
+		};
+		48B4F4C82EDDEF212F3AF8C5 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 5699267C640898D255F7D84C /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 53258E08082D50A9909E27A1;
+			remoteInfo = MergeSortPlugin;
+		};
+		7DB9585EAC9EF022F1A86CF1 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 5699267C640898D255F7D84C /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = E2CF2F52B09269575913E056;
+			remoteInfo = QuickSortPlugin;
+		};
+		8D515F074FBCB23225FE966F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 5699267C640898D255F7D84C /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = C84ECCB9BAD00505F77DE7A8;
+			remoteInfo = SortAlgorithmCore;
+		};
+		B4CE8FE604D7F1A0E2C10D6E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 5699267C640898D255F7D84C /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = C84ECCB9BAD00505F77DE7A8;
+			remoteInfo = SortAlgorithmCore;
+		};
+		CECAA57FB1108F27A4509312 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 5699267C640898D255F7D84C /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 1FE00EE01F32D73738F482E8;
+			remoteInfo = HeapSortPlugin;
+		};
+		D0821DCEC906344548E46BAA /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 5699267C640898D255F7D84C /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = C84ECCB9BAD00505F77DE7A8;
+			remoteInfo = SortAlgorithmCore;
+		};
+		E6BE46A142A310483DC6E388 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 5699267C640898D255F7D84C /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 53258E08082D50A9909E27A1;
+			remoteInfo = MergeSortPlugin;
+		};
+		EDB7D4C29F2BC9070988F7EB /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 5699267C640898D255F7D84C /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 1FE00EE01F32D73738F482E8;
+			remoteInfo = HeapSortPlugin;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		1417EC4D2FCC8F8EBF422008 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		17CF46E4D6A9855000DEAAAE /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		1C6B8A83FF24DD2B6E4AE7E7 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		33218572FFA548D8EC5D0202 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		50526E88DBCD167C9CC21C48 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		882F8AFEA7215DD6314524C3 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				42F9516D5B570C2A886342FC /* AudioKit.framework in Embed Frameworks */,
+				51669EE95BE1B423EC3AB604 /* AudioKitEX.framework in Embed Frameworks */,
+				2DAFCE9144C1E50DD11FCC17 /* AudioKitUI.framework in Embed Frameworks */,
+				9D8A894B644BD0FC9130A02D /* CAudioKitEX.framework in Embed Frameworks */,
+				ACAB4E5C0B1D6E9E30963747 /* CSoundpipeAudioKit.framework in Embed Frameworks */,
+				E7545089F62FD1742E7CE8D3 /* Controls.framework in Embed Frameworks */,
+				682804C846D9EDBB95062C8C /* HeapSortPlugin.framework in Embed Frameworks */,
+				4DAE6892F7E428123A0DE300 /* MergeSortPlugin.framework in Embed Frameworks */,
+				1BA327B4F43E6AF4FFA239FA /* QuickSortPlugin.framework in Embed Frameworks */,
+				ABFA5C2E9BAA3129C80719A0 /* SortAlgorithmCore.framework in Embed Frameworks */,
+				A5BD8C344B2D56248E647C12 /* Soundpipe.framework in Embed Frameworks */,
+				50C52F8B4AAB2FF478DAC349 /* SoundpipeAudioKit.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CCDCFE2DBF37114AC38106E6 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		EC6EFEE5DBC3AF10E2F12695 /* Dependencies */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 8;
+			dstSubfolderSpec = 16;
+			files = (
+				40533AFECC4BFDB246E2B934 /* DeviceKit_DeviceKit.bundle in Dependencies */,
+				46158A43E8DC41350BC2E64A /* SwiftMath_SwiftMath.bundle in Dependencies */,
+			);
+			name = Dependencies;
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+		F3D94809419D69CDD7C51087 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		0094080EB96B4F0C57D5F394 /* Binding+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Binding+Extensions.swift"; sourceTree = "<group>"; };
+		017E9B512C54FAF62E2656D7 /* MergeSortPluginTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MergeSortPluginTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		038DC1EB7B78AE545F7D429B /* SortItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SortItem.swift; sourceTree = "<group>"; };
+		03B4B433B7D8A2FE83EB9791 /* MathView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MathView.swift; sourceTree = "<group>"; };
+		044414AADCB4702A042EA2A5 /* RandomizingHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RandomizingHeader.swift; sourceTree = "<group>"; };
+		04A5537AF80CC6A3CC0E7A07 /* DeviceKit_DeviceKit.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DeviceKit_DeviceKit.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
+		050FD0156301D21F97AB0021 /* SortAlgorithmCore.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = SortAlgorithmCore.xcconfig; sourceTree = "<group>"; };
+		0638B450D24B2C8990EE5134 /* PancakeSortImpl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PancakeSortImpl.swift; sourceTree = "<group>"; };
+		0A9AD314ADCB8B3CEEA373AC /* Float+RawRepresentable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Float+RawRepresentable.swift"; sourceTree = "<group>"; };
+		0C4DFE107D5ABE7029351FBD /* _NumericsShims.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = _NumericsShims.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		0CE0D376713A81BD7E1A1640 /* SwiftMath_SwiftMath.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SwiftMath_SwiftMath.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
+		0CE998381A9B609874DA14DD /* Image+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Image+Extensions.swift"; sourceTree = "<group>"; };
+		0E44C2E68CD9100D62A578CF /* Algorithms.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Algorithms.swift; sourceTree = "<group>"; };
+		0FCE6B532E2E017B5DD0C96E /* ComplexityEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComplexityEntry.swift; sourceTree = "<group>"; };
+		0FE20F05107C39618E1EF773 /* AttributedCodeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttributedCodeView.swift; sourceTree = "<group>"; };
+		10964A0198BC8B59183283A6 /* StoogeSortImpl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoogeSortImpl.swift; sourceTree = "<group>"; };
+		120E139FEB724345DEC765D3 /* QuickSortAlgorithm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickSortAlgorithm.swift; sourceTree = "<group>"; };
+		14981E18DF15E355DC6CD383 /* QuickSortPluginRegistry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickSortPluginRegistry.swift; sourceTree = "<group>"; };
+		14DBE4F4662DFBD3CD471EF0 /* QuickSortPlugin-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "QuickSortPlugin-Info.plist"; sourceTree = "<group>"; };
+		14EACE0ED31C74B6E0E4FE0D /* TuistAssets+SortSymphonyIOS.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistAssets+SortSymphonyIOS.swift"; sourceTree = "<group>"; };
+		193D13D8717F0F6C0B3EE0C4 /* BogoSortImpl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BogoSortImpl.swift; sourceTree = "<group>"; };
+		1953D684A34E08B6A677556B /* LanguageEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LanguageEntry.swift; sourceTree = "<group>"; };
+		1A25B13A9FCBCAFD639AE679 /* SoundpipeAudioKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SoundpipeAudioKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		1D05058DB39EAFB8BC5D724F /* Sort Symphony (iOS).entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Sort Symphony (iOS).entitlements"; sourceTree = "<group>"; };
+		1D516DC90028B4FA5F64EBF2 /* AttributeScopes+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AttributeScopes+Extensions.swift"; sourceTree = "<group>"; };
+		1DA2B9D3FBE26028DFB44487 /* PluginLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PluginLoader.swift; sourceTree = "<group>"; };
+		1EE1300E7492FADC984CDB0D /* QuickSortPlugin.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = QuickSortPlugin.xcconfig; sourceTree = "<group>"; };
+		1F6329EE869F04CA4C034C62 /* CollectionConcurrencyKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = CollectionConcurrencyKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		20EC0AAAB663CA53E1842B19 /* SortViewModelProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SortViewModelProtocol.swift; sourceTree = "<group>"; };
+		214A3E838A37430713ABA550 /* CustomCloudKitEncodable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomCloudKitEncodable.swift; sourceTree = "<group>"; };
+		21D330E34B267551C527ACA8 /* HeapSortPlugin-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "HeapSortPlugin-Info.plist"; sourceTree = "<group>"; };
+		24FDA3DE30B75CFAF1040A74 /* MergeSortAlgorithm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MergeSortAlgorithm.swift; sourceTree = "<group>"; };
+		256315F0A88177C62D9CC8E9 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		279814502EC085836BF351EA /* Category.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Category.swift; sourceTree = "<group>"; };
+		29D5F98E7C2415E492109222 /* OddEvenSortImpl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OddEvenSortImpl.swift; sourceTree = "<group>"; };
+		2A51D3A74715E2B02AF49CA8 /* QuickSortPluginTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "QuickSortPluginTests-Info.plist"; sourceTree = "<group>"; };
+		2BA3A5F5B326068ACCF21BD1 /* HeapSortPluginTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeapSortPluginTests.swift; sourceTree = "<group>"; };
+		2BE5266C6C6ACD2255185363 /* CodeAttributes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodeAttributes.swift; sourceTree = "<group>"; };
+		2C7E901EE05D51D0EDFCDB4F /* AttributeDynamicLookup+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AttributeDynamicLookup+Extensions.swift"; sourceTree = "<group>"; };
+		2D32F31A2E52F5CC05867008 /* SortAlgorithm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SortAlgorithm.swift; sourceTree = "<group>"; };
+		2F08554B1C8FD2C19F9DDBB0 /* AudioKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = AudioKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		30743FE16E35E91AC26C0F52 /* CloudKitRecordDecoder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudKitRecordDecoder.swift; sourceTree = "<group>"; };
+		31AF0116E31A5D9EEBF20530 /* SortSymphony-Project.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "SortSymphony-Project.xcconfig"; sourceTree = "<group>"; };
+		37D8D52C95265A03C4F48E1E /* CollectionConcurrencyKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionConcurrencyKit.swift; sourceTree = "<group>"; };
+		3911FB311F86691C3BB33F20 /* MergeSortPluginTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MergeSortPluginTests.swift; sourceTree = "<group>"; };
+		3E13744A611A34E12C1E72A8 /* Atomics.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Atomics.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		3EF39B1744A4EDC2D22A8BB4 /* BubbleSortImpl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BubbleSortImpl.swift; sourceTree = "<group>"; };
+		4042B2444B1841498A177ABA /* TestSortViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestSortViewModel.swift; sourceTree = "<group>"; };
+		429A64A8F5AE4303326204DA /* Int+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Int+Extensions.swift"; sourceTree = "<group>"; };
+		4368103625640017262AA36B /* SwiftMath.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SwiftMath.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		44BE1594621E995972FE1723 /* AudioKitEX.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = AudioKitEX.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		47E3D10E56A574E90819D530 /* Soundpipe.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Soundpipe.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		488552AD4439B6BD85D14F69 /* ShuffleMethod.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShuffleMethod.swift; sourceTree = "<group>"; };
+		4CB4C7AFE608DC440367A98E /* NumberFormatter+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NumberFormatter+Extensions.swift"; sourceTree = "<group>"; };
+		4D52920DBBDEB70972DF3EAE /* GnomeSortImpl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GnomeSortImpl.swift; sourceTree = "<group>"; };
+		50DD5EB96ED7FBCDB60E449B /* ColorfulTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorfulTheme.swift; sourceTree = "<group>"; };
+		58717203BF15B4E2D7021B14 /* HeapSortPluginTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HeapSortPluginTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		5881D58F73CE607C85FD65A1 /* HeapSortPlugin.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = HeapSortPlugin.xcconfig; sourceTree = "<group>"; };
+		5BAA6A4E5913422372CD7DD7 /* ShakerSortImpl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShakerSortImpl.swift; sourceTree = "<group>"; };
+		5D1C3D0A5E80B64992D148F7 /* ArduinoTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArduinoTheme.swift; sourceTree = "<group>"; };
+		5F26E48A0EB9A1D3F80D1F5C /* ShellSortImpl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShellSortImpl.swift; sourceTree = "<group>"; };
+		62A9417F50718B8F98499F72 /* SortSymphony-iOS.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "SortSymphony-iOS.xcconfig"; sourceTree = "<group>"; };
+		6582419AC0331264B95CB5B2 /* MergeSortPluginTests.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = MergeSortPluginTests.xcconfig; sourceTree = "<group>"; };
+		6A63D4C5EDC67BA68365C0DC /* Page.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Page.swift; sourceTree = "<group>"; };
+		6C4E11F26BE8272C2D8055B8 /* MergeSortPluginRegistry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MergeSortPluginRegistry.swift; sourceTree = "<group>"; };
+		6E6B5B218BEBCF6E86873511 /* cmark_gfm.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = cmark_gfm.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		6F29F1667DE7142759BAF990 /* QuickSortPluginTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = QuickSortPluginTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		7024FB738A6A849BA9D55EE7 /* NetworkImage.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = NetworkImage.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		7272D4B6221942BA7FD89ADC /* CustomIconLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomIconLabel.swift; sourceTree = "<group>"; };
+		727FA3F44614319728DD4167 /* MergeSortPlugin.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = MergeSortPlugin.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		766E7975EDA48B987B87DB61 /* TuistBundle+SortSymphonyIOS.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistBundle+SortSymphonyIOS.swift"; sourceTree = "<group>"; };
+		77F12EFB29E221CD80582FED /* CustomADSRWidget+UIKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CustomADSRWidget+UIKit.swift"; sourceTree = "<group>"; };
+		782B0AA58D9912E799B219D8 /* SortSymphony_iOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SortSymphony_iOS.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		79810215531BECF0E08D1DAB /* Sort Symphony--iOS--Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "Sort Symphony--iOS--Info.plist"; sourceTree = "<group>"; };
+		7B381AE060E2822BE47C6ABD /* SwiftMathView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftMathView.swift; sourceTree = "<group>"; };
+		7DB9EE69FEE6FDCDFCACCCFE /* QuickSortPlugin.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = QuickSortPlugin.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		8599331244562093FD4A847D /* Then.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Then.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		892F3ADCB9F20AF104D9D950 /* AlgorithmPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlgorithmPlugin.swift; sourceTree = "<group>"; };
+		894AADA10CF7D12642F8C73F /* DeviceKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = DeviceKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		90D32F99CD645C7BB91EC83D /* ScrollingSortView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollingSortView.swift; sourceTree = "<group>"; };
+		923B3D2EF22FAF292CEA8D3B /* BitonicSortImpl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BitonicSortImpl.swift; sourceTree = "<group>"; };
+		9ACEAAC35049AAFADEC0596B /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		9DAEAE94F772386D14267F1C /* CodeTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodeTheme.swift; sourceTree = "<group>"; };
+		9FA89F28BE91688FFF6D652C /* RealModule.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = RealModule.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		A3316E2D44CF61B5DD1F06E0 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		A3F313F1F739BB053D70C1D4 /* MergeSortPlugin.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = MergeSortPlugin.xcconfig; sourceTree = "<group>"; };
+		A778D6AF71D09485DC084211 /* SortStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SortStatus.swift; sourceTree = "<group>"; };
+		A787283F6688442105E41D62 /* SortAlgorithmCore-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "SortAlgorithmCore-Info.plist"; sourceTree = "<group>"; };
+		A81D1409202D789266E034D5 /* cmark_gfm_extensions.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = cmark_gfm_extensions.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		AB1BD229152E6B7E6197C2E6 /* SortView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SortView.swift; sourceTree = "<group>"; };
+		AE3BF0D4EDB699748A094178 /* HeapSortPluginTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "HeapSortPluginTests-Info.plist"; sourceTree = "<group>"; };
+		B2835D5611929F95F426154B /* SortAlgorithmCore.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SortAlgorithmCore.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		B74FA44393EA4C390D2EBE0B /* QuickSortPluginTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickSortPluginTests.swift; sourceTree = "<group>"; };
+		B8A6AEC0BCC832059E9A7C38 /* PygmentsTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PygmentsTheme.swift; sourceTree = "<group>"; };
+		BA12F578FEC9C4A9D32861A5 /* Synthesizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Synthesizer.swift; sourceTree = "<group>"; };
+		BB4A73B712378BC8B41D6309 /* SortViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SortViewModel.swift; sourceTree = "<group>"; };
+		BB6FA3EA2DD57A1EFE62AE74 /* CSoundpipeAudioKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = CSoundpipeAudioKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		BC001320D4E362EF7C8EF1AE /* Resources */ = {isa = PBXFileReference; path = Resources; sourceTree = "<group>"; };
+		BF786746FCF3E0F96AED3B3D /* _AtomicsShims.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = _AtomicsShims.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		C11E5663B3F2D4516D9FAB43 /* AlgorithmRegistry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlgorithmRegistry.swift; sourceTree = "<group>"; };
+		C4AC0F498CD50BB38470A00D /* Controls.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Controls.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		C4D5CF0FA5320F3217940C7B /* HeapSortImpl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeapSortImpl.swift; sourceTree = "<group>"; };
+		C822AA360D482AF7C3D1A310 /* QuickSortPluginTests.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = QuickSortPluginTests.xcconfig; sourceTree = "<group>"; };
+		CA505CD77224BBE38F614CA2 /* HeapSortPluginTests.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = HeapSortPluginTests.xcconfig; sourceTree = "<group>"; };
+		CE33E0FB19AC53DA5095D46D /* MonokaiTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonokaiTheme.swift; sourceTree = "<group>"; };
+		CEC8892537301181B9F071B1 /* StateToggle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StateToggle.swift; sourceTree = "<group>"; };
+		CF64377A772174CC5A0EED1F /* SortItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SortItem.swift; sourceTree = "<group>"; };
+		D002FCD113767D7E2FE77C44 /* CodeThemes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodeThemes.swift; sourceTree = "<group>"; };
+		D1009F8291319CEB68B00E00 /* DraculaTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DraculaTheme.swift; sourceTree = "<group>"; };
+		D11AA17D2F879F6065719B45 /* HeapSortPlugin.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = HeapSortPlugin.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		D1E8596B582A8AB46F7D5F2B /* HeapSortPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeapSortPlugin.swift; sourceTree = "<group>"; };
+		D39AE4CDFD15C120A5B72352 /* MarkdownUI.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = MarkdownUI.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		D47AB56421AD68E6C9FC8F87 /* AudioKitUI.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = AudioKitUI.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		D4FA506281CB0D66664B7F9E /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		D78193A49721E4BFD49677D4 /* SortViewModel+Protocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SortViewModel+Protocol.swift"; sourceTree = "<group>"; };
+		D7DD7FB473D71CE81E16AD5A /* Range+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Range+Extensions.swift"; sourceTree = "<group>"; };
+		DB9A1C9C82613B20389EB74C /* EmacsTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmacsTheme.swift; sourceTree = "<group>"; };
+		DBCFCB5D511079D38ACBF9D1 /* CAudioKitEX.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = CAudioKitEX.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		DBE1E41577DCB8D6F36687E8 /* MergeSortPlugin-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "MergeSortPlugin-Info.plist"; sourceTree = "<group>"; };
+		DCE23F18D9E9AB1ABA0E78AD /* CloudKitRecordEncoder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudKitRecordEncoder.swift; sourceTree = "<group>"; };
+		DFF46134DE40D25A664650D8 /* Color+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Extensions.swift"; sourceTree = "<group>"; };
+		E18548F2706CEDDD17F70F7F /* RunResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunResult.swift; sourceTree = "<group>"; };
+		E257FDE571F765E088F3B20B /* SelectionSortImpl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectionSortImpl.swift; sourceTree = "<group>"; };
+		EC6897EE763E28ACB8FB4A31 /* Int+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Int+Extensions.swift"; sourceTree = "<group>"; };
+		EC7E8D0ECCDF80F979FC35EC /* RadixSortImpl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RadixSortImpl.swift; sourceTree = "<group>"; };
+		ED680E8D8AA149643CD9CCAF /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
+		EEAB1E71FEA96C74A22B8072 /* Algorithms.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Algorithms.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		F01A77D4F75EBF1ED4E4D903 /* TextFormat.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextFormat.swift; sourceTree = "<group>"; };
+		F48421C9E62C870C5A03716E /* IosMathView+UIKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "IosMathView+UIKit.swift"; sourceTree = "<group>"; };
+		F61F263EDF440E03EF8CE04F /* Sequence+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sequence+Extensions.swift"; sourceTree = "<group>"; };
+		F773EF227EC5B4C55DCFE6CB /* Sort2App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sort2App.swift; sourceTree = "<group>"; };
+		F96B9CDA41E9F720997794EF /* InsertionSortImpl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsertionSortImpl.swift; sourceTree = "<group>"; };
+		FE8BA4B38D2947BBCFA71659 /* MergeSortPluginTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "MergeSortPluginTests-Info.plist"; sourceTree = "<group>"; };
+		FEDFCE310F152FE6DE7F21EE /* CombSortImpl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CombSortImpl.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		5C3ED4CC959F42B5161BB8FD /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				717F34184C68B9DFA29AE348 /* MergeSortPlugin.framework in Frameworks */,
+				BFBBF9C2B0132CD50A29DEA3 /* SortAlgorithmCore.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		65BEEE83064C9479CFB87CF6 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F7FB658D21357101913F2DF9 /* SortAlgorithmCore.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		85BF2F8FD01F94224A680267 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9D3455D0E2CE3AB4CA5B40F4 /* HeapSortPlugin.framework in Frameworks */,
+				8998DC8F24DC7831CF3B4165 /* SortAlgorithmCore.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A1E2DEDB3DDAAEDB857973A2 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AF3FAF00E6C090BD05C59386 /* CollectionConcurrencyKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A304031932A9CC0FB234F268 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				44522140F3D1CC78A9001046 /* QuickSortPlugin.framework in Frameworks */,
+				BCBF1AD0C77017262E1CA8F1 /* SortAlgorithmCore.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CC48E99A298508E8AB35AC22 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				47718D0FD3E88C16071F2727 /* Algorithms.framework in Frameworks */,
+				416B026E9132FB51F2E57CEE /* Atomics.framework in Frameworks */,
+				13E052F139CA06C9281CBB67 /* AudioKit.framework in Frameworks */,
+				37897E661D04B1B211E859FF /* AudioKitEX.framework in Frameworks */,
+				EBF2DEF3FF905176BEBA6373 /* AudioKitUI.framework in Frameworks */,
+				14FB43221B8651F101692F2E /* Controls.framework in Frameworks */,
+				0373537A8E41A26616A909F7 /* DeviceKit.framework in Frameworks */,
+				7555066A6E3EBFBA1B86B2AC /* HeapSortPlugin.framework in Frameworks */,
+				00D94CF7B38CE4233BDC727B /* MarkdownUI.framework in Frameworks */,
+				422DB6C607DB35D3ADC3F320 /* MergeSortPlugin.framework in Frameworks */,
+				680E3E28666B3BAB96EA9C64 /* NetworkImage.framework in Frameworks */,
+				1D8714E47F7253C16BEF1930 /* QuickSortPlugin.framework in Frameworks */,
+				88779D56FEF25C63585B5CE0 /* RealModule.framework in Frameworks */,
+				26CB14C6B1FBC9A4E301D1DA /* SortAlgorithmCore.framework in Frameworks */,
+				CE0F5E72129C304A7AF78199 /* SoundpipeAudioKit.framework in Frameworks */,
+				AE1CF08242296DE652C5E705 /* SwiftMath.framework in Frameworks */,
+				95229C59E8E4DEF9D59BE450 /* Then.framework in Frameworks */,
+				742EB51FBC01A7E5A9BA0364 /* _AtomicsShims.framework in Frameworks */,
+				DE4255A281E5DC27DE8C92C2 /* _NumericsShims.framework in Frameworks */,
+				A1B5FDD298EEEF3283E5A737 /* cmark_gfm.framework in Frameworks */,
+				287DA404B4FEF76DF44D0284 /* cmark_gfm_extensions.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		EA1F2A9854964022F10A5ACF /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D79F6D0147F222293C011171 /* SortAlgorithmCore.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FFA6709CAD246DB1E39CBED7 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				13703643A15ED19E1A4B79B3 /* SortAlgorithmCore.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		11359E96F28CE8396E2A762E /* Utilities */ = {
+			isa = PBXGroup;
+			children = (
+				279814502EC085836BF351EA /* Category.swift */,
+				7272D4B6221942BA7FD89ADC /* CustomIconLabel.swift */,
+				044414AADCB4702A042EA2A5 /* RandomizingHeader.swift */,
+				CEC8892537301181B9F071B1 /* StateToggle.swift */,
+				7B381AE060E2822BE47C6ABD /* SwiftMathView.swift */,
+			);
+			path = Utilities;
+			sourceTree = "<group>";
+		};
+		1940299EB0DB3FD9242BA9EA /* Main */ = {
+			isa = PBXGroup;
+			children = (
+				D4FA506281CB0D66664B7F9E /* ContentView.swift */,
+				ED680E8D8AA149643CD9CCAF /* HomeView.swift */,
+				03B4B433B7D8A2FE83EB9791 /* MathView.swift */,
+				6A63D4C5EDC67BA68365C0DC /* Page.swift */,
+				90D32F99CD645C7BB91EC83D /* ScrollingSortView.swift */,
+				256315F0A88177C62D9CC8E9 /* SettingsView.swift */,
+				AB1BD229152E6B7E6197C2E6 /* SortView.swift */,
+			);
+			path = Main;
+			sourceTree = "<group>";
+		};
+		1A27C3DEE6D5DB3FB97E8339 /* QuickSortPluginTests */ = {
+			isa = PBXGroup;
+			children = (
+				B74FA44393EA4C390D2EBE0B /* QuickSortPluginTests.swift */,
+			);
+			path = QuickSortPluginTests;
+			sourceTree = "<group>";
+		};
+		1F0A6C7BFED669963728EEF0 /* Persistence */ = {
+			isa = PBXGroup;
+			children = (
+				30743FE16E35E91AC26C0F52 /* CloudKitRecordDecoder.swift */,
+				DCE23F18D9E9AB1ABA0E78AD /* CloudKitRecordEncoder.swift */,
+				214A3E838A37430713ABA550 /* CustomCloudKitEncodable.swift */,
+				E18548F2706CEDDD17F70F7F /* RunResult.swift */,
+			);
+			path = Persistence;
+			sourceTree = "<group>";
+		};
+		1FCA8ACFC1C806F331A992BA /* Code */ = {
+			isa = PBXGroup;
+			children = (
+				A6D6FDFC080297B4C705C5E6 /* Themes */,
+				0FE20F05107C39618E1EF773 /* AttributedCodeView.swift */,
+				2BE5266C6C6ACD2255185363 /* CodeAttributes.swift */,
+				9DAEAE94F772386D14267F1C /* CodeTheme.swift */,
+				F01A77D4F75EBF1ED4E4D903 /* TextFormat.swift */,
+			);
+			path = Code;
+			sourceTree = "<group>";
+		};
+		319B6641A8012449BFBC7C91 /* Primary */ = {
+			isa = PBXGroup;
+			children = (
+				C11E5663B3F2D4516D9FAB43 /* AlgorithmRegistry.swift */,
+				0FCE6B532E2E017B5DD0C96E /* ComplexityEntry.swift */,
+				1953D684A34E08B6A677556B /* LanguageEntry.swift */,
+				1DA2B9D3FBE26028DFB44487 /* PluginLoader.swift */,
+				488552AD4439B6BD85D14F69 /* ShuffleMethod.swift */,
+				CF64377A772174CC5A0EED1F /* SortItem.swift */,
+				A778D6AF71D09485DC084211 /* SortStatus.swift */,
+				BB4A73B712378BC8B41D6309 /* SortViewModel.swift */,
+				D78193A49721E4BFD49677D4 /* SortViewModel+Protocol.swift */,
+				BA12F578FEC9C4A9D32861A5 /* Synthesizer.swift */,
+			);
+			path = Primary;
+			sourceTree = "<group>";
+		};
+		330F255AD56887D3FB390231 /* Logarithmic */ = {
+			isa = PBXGroup;
+			children = (
+				C4D5CF0FA5320F3217940C7B /* HeapSortImpl.swift */,
+			);
+			path = Logarithmic;
+			sourceTree = "<group>";
+		};
+		3ED84F44D1976900197AB8E4 /* xcconfigs */ = {
+			isa = PBXGroup;
+			children = (
+				5881D58F73CE607C85FD65A1 /* HeapSortPlugin.xcconfig */,
+				CA505CD77224BBE38F614CA2 /* HeapSortPluginTests.xcconfig */,
+				A3F313F1F739BB053D70C1D4 /* MergeSortPlugin.xcconfig */,
+				6582419AC0331264B95CB5B2 /* MergeSortPluginTests.xcconfig */,
+				1EE1300E7492FADC984CDB0D /* QuickSortPlugin.xcconfig */,
+				C822AA360D482AF7C3D1A310 /* QuickSortPluginTests.xcconfig */,
+				050FD0156301D21F97AB0021 /* SortAlgorithmCore.xcconfig */,
+				62A9417F50718B8F98499F72 /* SortSymphony-iOS.xcconfig */,
+				31AF0116E31A5D9EEBF20530 /* SortSymphony-Project.xcconfig */,
+			);
+			path = xcconfigs;
+			sourceTree = "<group>";
+		};
+		40E620AB19AFF5709B67A9B8 /* MergeSortPluginTests */ = {
+			isa = PBXGroup;
+			children = (
+				3911FB311F86691C3BB33F20 /* MergeSortPluginTests.swift */,
+			);
+			path = MergeSortPluginTests;
+			sourceTree = "<group>";
+		};
+		4C57A3333B1E1D5F3DC3F77E /* InfoPlists */ = {
+			isa = PBXGroup;
+			children = (
+				21D330E34B267551C527ACA8 /* HeapSortPlugin-Info.plist */,
+				AE3BF0D4EDB699748A094178 /* HeapSortPluginTests-Info.plist */,
+				DBE1E41577DCB8D6F36687E8 /* MergeSortPlugin-Info.plist */,
+				FE8BA4B38D2947BBCFA71659 /* MergeSortPluginTests-Info.plist */,
+				14DBE4F4662DFBD3CD471EF0 /* QuickSortPlugin-Info.plist */,
+				2A51D3A74715E2B02AF49CA8 /* QuickSortPluginTests-Info.plist */,
+				A787283F6688442105E41D62 /* SortAlgorithmCore-Info.plist */,
+			);
+			path = InfoPlists;
+			sourceTree = "<group>";
+		};
+		554C066245367CA90F7ABE35 /* iOS */ = {
+			isa = PBXGroup;
+			children = (
+				77F12EFB29E221CD80582FED /* CustomADSRWidget+UIKit.swift */,
+			);
+			path = iOS;
+			sourceTree = "<group>";
+		};
+		594AAE0DE716C0B36F6B75CC /* Quadratic */ = {
+			isa = PBXGroup;
+			children = (
+				3EF39B1744A4EDC2D22A8BB4 /* BubbleSortImpl.swift */,
+				4D52920DBBDEB70972DF3EAE /* GnomeSortImpl.swift */,
+				F96B9CDA41E9F720997794EF /* InsertionSortImpl.swift */,
+				29D5F98E7C2415E492109222 /* OddEvenSortImpl.swift */,
+				0638B450D24B2C8990EE5134 /* PancakeSortImpl.swift */,
+				E257FDE571F765E088F3B20B /* SelectionSortImpl.swift */,
+				5BAA6A4E5913422372CD7DD7 /* ShakerSortImpl.swift */,
+			);
+			path = Quadratic;
+			sourceTree = "<group>";
+		};
+		5AFA89901FAC9FA6A9F24886 /* MergeSortPlugin */ = {
+			isa = PBXGroup;
+			children = (
+				24FDA3DE30B75CFAF1040A74 /* MergeSortAlgorithm.swift */,
+				6C4E11F26BE8272C2D8055B8 /* MergeSortPluginRegistry.swift */,
+			);
+			path = MergeSortPlugin;
+			sourceTree = "<group>";
+		};
+		600837FC0EC03FE77F7D039D /* Weird */ = {
+			isa = PBXGroup;
+			children = (
+				923B3D2EF22FAF292CEA8D3B /* BitonicSortImpl.swift */,
+				193D13D8717F0F6C0B3EE0C4 /* BogoSortImpl.swift */,
+				FEDFCE310F152FE6DE7F21EE /* CombSortImpl.swift */,
+				EC7E8D0ECCDF80F979FC35EC /* RadixSortImpl.swift */,
+				5F26E48A0EB9A1D3F80D1F5C /* ShellSortImpl.swift */,
+				10964A0198BC8B59183283A6 /* StoogeSortImpl.swift */,
+			);
+			path = Weird;
+			sourceTree = "<group>";
+		};
+		6B3A0DF14FF7A2060A64D4A4 /* Plugin Tests */ = {
+			isa = PBXGroup;
+			children = (
+				F0D8DF767FEC8772F01D6510 /* HeapSortPluginTests */,
+				40E620AB19AFF5709B67A9B8 /* MergeSortPluginTests */,
+				1A27C3DEE6D5DB3FB97E8339 /* QuickSortPluginTests */,
+			);
+			path = "Plugin Tests";
+			sourceTree = "<group>";
+		};
+		6F8EF6D98C3414F6F9DA8181 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				BF786746FCF3E0F96AED3B3D /* _AtomicsShims.framework */,
+				0C4DFE107D5ABE7029351FBD /* _NumericsShims.framework */,
+				EEAB1E71FEA96C74A22B8072 /* Algorithms.framework */,
+				3E13744A611A34E12C1E72A8 /* Atomics.framework */,
+				2F08554B1C8FD2C19F9DDBB0 /* AudioKit.framework */,
+				44BE1594621E995972FE1723 /* AudioKitEX.framework */,
+				D47AB56421AD68E6C9FC8F87 /* AudioKitUI.framework */,
+				DBCFCB5D511079D38ACBF9D1 /* CAudioKitEX.framework */,
+				A81D1409202D789266E034D5 /* cmark_gfm_extensions.framework */,
+				6E6B5B218BEBCF6E86873511 /* cmark_gfm.framework */,
+				1F6329EE869F04CA4C034C62 /* CollectionConcurrencyKit.framework */,
+				C4AC0F498CD50BB38470A00D /* Controls.framework */,
+				BB6FA3EA2DD57A1EFE62AE74 /* CSoundpipeAudioKit.framework */,
+				04A5537AF80CC6A3CC0E7A07 /* DeviceKit_DeviceKit.bundle */,
+				894AADA10CF7D12642F8C73F /* DeviceKit.framework */,
+				D11AA17D2F879F6065719B45 /* HeapSortPlugin.framework */,
+				58717203BF15B4E2D7021B14 /* HeapSortPluginTests.xctest */,
+				D39AE4CDFD15C120A5B72352 /* MarkdownUI.framework */,
+				727FA3F44614319728DD4167 /* MergeSortPlugin.framework */,
+				017E9B512C54FAF62E2656D7 /* MergeSortPluginTests.xctest */,
+				7024FB738A6A849BA9D55EE7 /* NetworkImage.framework */,
+				7DB9EE69FEE6FDCDFCACCCFE /* QuickSortPlugin.framework */,
+				6F29F1667DE7142759BAF990 /* QuickSortPluginTests.xctest */,
+				9FA89F28BE91688FFF6D652C /* RealModule.framework */,
+				B2835D5611929F95F426154B /* SortAlgorithmCore.framework */,
+				782B0AA58D9912E799B219D8 /* SortSymphony_iOS.app */,
+				47E3D10E56A574E90819D530 /* Soundpipe.framework */,
+				1A25B13A9FCBCAFD639AE679 /* SoundpipeAudioKit.framework */,
+				0CE0D376713A81BD7E1A1640 /* SwiftMath_SwiftMath.bundle */,
+				4368103625640017262AA36B /* SwiftMath.framework */,
+				8599331244562093FD4A847D /* Then.framework */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		789269E4D05F52EABDA4153F /* Plugins */ = {
+			isa = PBXGroup;
+			children = (
+				D80050F027D1045922671A12 /* HeapSortPlugin */,
+				5AFA89901FAC9FA6A9F24886 /* MergeSortPlugin */,
+				DB5C360D903E317BDC4BB3D3 /* QuickSortPlugin */,
+				EEABD895CE71BF12A31F2928 /* SortAlgorithmCore */,
+			);
+			path = Plugins;
+			sourceTree = "<group>";
+		};
+		83C2DE515D4DCBEBA14DB3FE /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				0094080EB96B4F0C57D5F394 /* Binding+Extensions.swift */,
+				0A9AD314ADCB8B3CEEA373AC /* Float+RawRepresentable.swift */,
+			);
+			path = Settings;
+			sourceTree = "<group>";
+		};
+		8591F9BB8096FF262FE07585 /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				14EACE0ED31C74B6E0E4FE0D /* TuistAssets+SortSymphonyIOS.swift */,
+				766E7975EDA48B987B87DB61 /* TuistBundle+SortSymphonyIOS.swift */,
+			);
+			path = Sources;
+			sourceTree = "<group>";
+		};
+		8F5752EC0A4023D326B28327 /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				CE7B14EB46CEFE6D2E11914B /* Data */,
+				E386A29847C9975267CB8CB1 /* Views */,
+				A3316E2D44CF61B5DD1F06E0 /* Assets.xcassets */,
+				BC001320D4E362EF7C8EF1AE /* Resources */,
+				F773EF227EC5B4C55DCFE6CB /* Sort2App.swift */,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
+		A6D6FDFC080297B4C705C5E6 /* Themes */ = {
+			isa = PBXGroup;
+			children = (
+				5D1C3D0A5E80B64992D148F7 /* ArduinoTheme.swift */,
+				D002FCD113767D7E2FE77C44 /* CodeThemes.swift */,
+				50DD5EB96ED7FBCDB60E449B /* ColorfulTheme.swift */,
+				D1009F8291319CEB68B00E00 /* DraculaTheme.swift */,
+				DB9A1C9C82613B20389EB74C /* EmacsTheme.swift */,
+				CE33E0FB19AC53DA5095D46D /* MonokaiTheme.swift */,
+				B8A6AEC0BCC832059E9A7C38 /* PygmentsTheme.swift */,
+			);
+			path = Themes;
+			sourceTree = "<group>";
+		};
+		B5140A96670BAEBE92E3EB2F /* Implementations */ = {
+			isa = PBXGroup;
+			children = (
+				330F255AD56887D3FB390231 /* Logarithmic */,
+				594AAE0DE716C0B36F6B75CC /* Quadratic */,
+				600837FC0EC03FE77F7D039D /* Weird */,
+			);
+			path = Implementations;
+			sourceTree = "<group>";
+		};
+		C6169CB7E89CF949802BB4E0 /* Derived */ = {
+			isa = PBXGroup;
+			children = (
+				4C57A3333B1E1D5F3DC3F77E /* InfoPlists */,
+				8591F9BB8096FF262FE07585 /* Sources */,
+			);
+			path = Derived;
+			sourceTree = "<group>";
+		};
+		CC5E25F52EB5CEE40544FB6A = {
+			isa = PBXGroup;
+			children = (
+				6F8EF6D98C3414F6F9DA8181 /* Products */,
+				ED40DCA9890DC1E5A2CAE045 /* Project */,
+			);
+			sourceTree = "<group>";
+		};
+		CE7B14EB46CEFE6D2E11914B /* Data */ = {
+			isa = PBXGroup;
+			children = (
+				E4EE303292AEC2B30150063A /* Extensions */,
+				B5140A96670BAEBE92E3EB2F /* Implementations */,
+				1F0A6C7BFED669963728EEF0 /* Persistence */,
+				319B6641A8012449BFBC7C91 /* Primary */,
+				83C2DE515D4DCBEBA14DB3FE /* Settings */,
+			);
+			path = Data;
+			sourceTree = "<group>";
+		};
+		D80050F027D1045922671A12 /* HeapSortPlugin */ = {
+			isa = PBXGroup;
+			children = (
+				D1E8596B582A8AB46F7D5F2B /* HeapSortPlugin.swift */,
+			);
+			path = HeapSortPlugin;
+			sourceTree = "<group>";
+		};
+		DB5C360D903E317BDC4BB3D3 /* QuickSortPlugin */ = {
+			isa = PBXGroup;
+			children = (
+				120E139FEB724345DEC765D3 /* QuickSortAlgorithm.swift */,
+				14981E18DF15E355DC6CD383 /* QuickSortPluginRegistry.swift */,
+			);
+			path = QuickSortPlugin;
+			sourceTree = "<group>";
+		};
+		E386A29847C9975267CB8CB1 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				1FCA8ACFC1C806F331A992BA /* Code */,
+				1940299EB0DB3FD9242BA9EA /* Main */,
+				11359E96F28CE8396E2A762E /* Utilities */,
+				F48421C9E62C870C5A03716E /* IosMathView+UIKit.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		E4EE303292AEC2B30150063A /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				2C7E901EE05D51D0EDFCDB4F /* AttributeDynamicLookup+Extensions.swift */,
+				1D516DC90028B4FA5F64EBF2 /* AttributeScopes+Extensions.swift */,
+				DFF46134DE40D25A664650D8 /* Color+Extensions.swift */,
+				0CE998381A9B609874DA14DD /* Image+Extensions.swift */,
+				EC6897EE763E28ACB8FB4A31 /* Int+Extensions.swift */,
+				4CB4C7AFE608DC440367A98E /* NumberFormatter+Extensions.swift */,
+				D7DD7FB473D71CE81E16AD5A /* Range+Extensions.swift */,
+				F61F263EDF440E03EF8CE04F /* Sequence+Extensions.swift */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
+		ED40DCA9890DC1E5A2CAE045 /* Project */ = {
+			isa = PBXGroup;
+			children = (
+				C6169CB7E89CF949802BB4E0 /* Derived */,
+				554C066245367CA90F7ABE35 /* iOS */,
+				6B3A0DF14FF7A2060A64D4A4 /* Plugin Tests */,
+				789269E4D05F52EABDA4153F /* Plugins */,
+				8F5752EC0A4023D326B28327 /* Shared */,
+				3ED84F44D1976900197AB8E4 /* xcconfigs */,
+				9ACEAAC35049AAFADEC0596B /* PrivacyInfo.xcprivacy */,
+				1D05058DB39EAFB8BC5D724F /* Sort Symphony (iOS).entitlements */,
+				79810215531BECF0E08D1DAB /* Sort Symphony--iOS--Info.plist */,
+			);
+			name = Project;
+			sourceTree = "<group>";
+		};
+		EEABD895CE71BF12A31F2928 /* SortAlgorithmCore */ = {
+			isa = PBXGroup;
+			children = (
+				892F3ADCB9F20AF104D9D950 /* AlgorithmPlugin.swift */,
+				0E44C2E68CD9100D62A578CF /* Algorithms.swift */,
+				37D8D52C95265A03C4F48E1E /* CollectionConcurrencyKit.swift */,
+				429A64A8F5AE4303326204DA /* Int+Extensions.swift */,
+				2D32F31A2E52F5CC05867008 /* SortAlgorithm.swift */,
+				038DC1EB7B78AE545F7D429B /* SortItem.swift */,
+				20EC0AAAB663CA53E1842B19 /* SortViewModelProtocol.swift */,
+				4042B2444B1841498A177ABA /* TestSortViewModel.swift */,
+			);
+			path = SortAlgorithmCore;
+			sourceTree = "<group>";
+		};
+		F0D8DF767FEC8772F01D6510 /* HeapSortPluginTests */ = {
+			isa = PBXGroup;
+			children = (
+				2BA3A5F5B326068ACCF21BD1 /* HeapSortPluginTests.swift */,
+			);
+			path = HeapSortPluginTests;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		0DC05C140BC5A89044EC420C /* MergeSortPluginTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 396855983A8567FA2B72A9E6 /* Build configuration list for PBXNativeTarget "MergeSortPluginTests" */;
+			buildPhases = (
+				49B5C124D9ED8510DDBD798E /* Sources */,
+				BB4EA15FFBF32331ED1FFFEF /* Resources */,
+				5C3ED4CC959F42B5161BB8FD /* Frameworks */,
+				F3D94809419D69CDD7C51087 /* Embed Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				DC1976E1D58047DB75B33BB3 /* PBXTargetDependency */,
+				A6D2991D50C25E49502488CD /* PBXTargetDependency */,
+			);
+			name = MergeSortPluginTests;
+			packageProductDependencies = (
+			);
+			productName = MergeSortPluginTests;
+			productReference = 017E9B512C54FAF62E2656D7 /* MergeSortPluginTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		1FE00EE01F32D73738F482E8 /* HeapSortPlugin */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D96B399C0E3DEA4FCB593F79 /* Build configuration list for PBXNativeTarget "HeapSortPlugin" */;
+			buildPhases = (
+				E0E11BB90D1F8C1942EE96CC /* Sources */,
+				E44790E18F3F050AD76D589F /* Resources */,
+				EA1F2A9854964022F10A5ACF /* Frameworks */,
+				1417EC4D2FCC8F8EBF422008 /* Embed Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				3F7F9362710DFFEA6AF39202 /* PBXTargetDependency */,
+			);
+			name = HeapSortPlugin;
+			packageProductDependencies = (
+			);
+			productName = HeapSortPlugin;
+			productReference = D11AA17D2F879F6065719B45 /* HeapSortPlugin.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+		383EE0D23119779925561D61 /* HeapSortPluginTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F1EB7F5275EB0A0520DD5BBC /* Build configuration list for PBXNativeTarget "HeapSortPluginTests" */;
+			buildPhases = (
+				F8DFE8F74E0304DE64BC55E9 /* Sources */,
+				B2D4C3579504C0F516A4422A /* Resources */,
+				85BF2F8FD01F94224A680267 /* Frameworks */,
+				1C6B8A83FF24DD2B6E4AE7E7 /* Embed Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				F165449E7B4A51E40EA29705 /* PBXTargetDependency */,
+				4EEF48421A1306544D530251 /* PBXTargetDependency */,
+			);
+			name = HeapSortPluginTests;
+			packageProductDependencies = (
+			);
+			productName = HeapSortPluginTests;
+			productReference = 58717203BF15B4E2D7021B14 /* HeapSortPluginTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		53258E08082D50A9909E27A1 /* MergeSortPlugin */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 0DB06341B9FBB02CC6493B07 /* Build configuration list for PBXNativeTarget "MergeSortPlugin" */;
+			buildPhases = (
+				24D3753E0ABF41FD841F0DC8 /* Sources */,
+				482DFD86F7EE612B58B1D3FB /* Resources */,
+				FFA6709CAD246DB1E39CBED7 /* Frameworks */,
+				33218572FFA548D8EC5D0202 /* Embed Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				8A710506392E3A2B52DF67FA /* PBXTargetDependency */,
+			);
+			name = MergeSortPlugin;
+			packageProductDependencies = (
+			);
+			productName = MergeSortPlugin;
+			productReference = 727FA3F44614319728DD4167 /* MergeSortPlugin.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+		7B0B381F1F23806A69C23952 /* SortSymphony-iOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 4CBDCEC48F06012FC1437447 /* Build configuration list for PBXNativeTarget "SortSymphony-iOS" */;
+			buildPhases = (
+				AD7AAF89BB44B322DBEBF84D /* Sources */,
+				37FC8580CB9ECEE9E45625D2 /* Resources */,
+				CC48E99A298508E8AB35AC22 /* Frameworks */,
+				882F8AFEA7215DD6314524C3 /* Embed Frameworks */,
+				EC6EFEE5DBC3AF10E2F12695 /* Dependencies */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				295273948B43C990BFB82C08 /* PBXTargetDependency */,
+				600AE54E6C1C3D7C41DB152C /* PBXTargetDependency */,
+				9D62952E313B52F66A3B1E68 /* PBXTargetDependency */,
+				046399ED28C3ED4E2E894321 /* PBXTargetDependency */,
+			);
+			name = "SortSymphony-iOS";
+			packageProductDependencies = (
+			);
+			productName = SortSymphony_iOS;
+			productReference = 782B0AA58D9912E799B219D8 /* SortSymphony_iOS.app */;
+			productType = "com.apple.product-type.application";
+		};
+		7D508302D9E13740D43677EF /* QuickSortPluginTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 31D05160759BFE7F2DEA8F48 /* Build configuration list for PBXNativeTarget "QuickSortPluginTests" */;
+			buildPhases = (
+				F901629F9EC9E224D62EBA4A /* Sources */,
+				20E2D1930FBD68FE2DEF579B /* Resources */,
+				A304031932A9CC0FB234F268 /* Frameworks */,
+				CCDCFE2DBF37114AC38106E6 /* Embed Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				37604C7EC649024C50B418BB /* PBXTargetDependency */,
+				1D57FF09CF2DCE12F7265DCF /* PBXTargetDependency */,
+			);
+			name = QuickSortPluginTests;
+			packageProductDependencies = (
+			);
+			productName = QuickSortPluginTests;
+			productReference = 6F29F1667DE7142759BAF990 /* QuickSortPluginTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		C84ECCB9BAD00505F77DE7A8 /* SortAlgorithmCore */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = FC59B895921B6616751DD0A1 /* Build configuration list for PBXNativeTarget "SortAlgorithmCore" */;
+			buildPhases = (
+				4C9DAAC61EAA36FD1A979C47 /* Sources */,
+				A035860A1409EBE08FBC3951 /* Resources */,
+				A1E2DEDB3DDAAEDB857973A2 /* Frameworks */,
+				17CF46E4D6A9855000DEAAAE /* Embed Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = SortAlgorithmCore;
+			packageProductDependencies = (
+			);
+			productName = SortAlgorithmCore;
+			productReference = B2835D5611929F95F426154B /* SortAlgorithmCore.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+		E2CF2F52B09269575913E056 /* QuickSortPlugin */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 85D5AA0C960D448CDB4B9B01 /* Build configuration list for PBXNativeTarget "QuickSortPlugin" */;
+			buildPhases = (
+				04F86CCF731547CDADD60169 /* Sources */,
+				DB27AF5E21E614728FE48D20 /* Resources */,
+				65BEEE83064C9479CFB87CF6 /* Frameworks */,
+				50526E88DBCD167C9CC21C48 /* Embed Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				061BB1D22697B149F0BE028D /* PBXTargetDependency */,
+			);
+			name = QuickSortPlugin;
+			packageProductDependencies = (
+			);
+			productName = QuickSortPlugin;
+			productReference = 7DB9EE69FEE6FDCDFCACCCFE /* QuickSortPlugin.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		5699267C640898D255F7D84C /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				TargetAttributes = {
+				};
+			};
+			buildConfigurationList = 67C09403D40FC733A98D1F7D /* Build configuration list for PBXProject "Sort Symphony-Tuist" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = CC5E25F52EB5CEE40544FB6A;
+			productRefGroup = 6F8EF6D98C3414F6F9DA8181 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				1FE00EE01F32D73738F482E8 /* HeapSortPlugin */,
+				383EE0D23119779925561D61 /* HeapSortPluginTests */,
+				53258E08082D50A9909E27A1 /* MergeSortPlugin */,
+				0DC05C140BC5A89044EC420C /* MergeSortPluginTests */,
+				E2CF2F52B09269575913E056 /* QuickSortPlugin */,
+				7D508302D9E13740D43677EF /* QuickSortPluginTests */,
+				C84ECCB9BAD00505F77DE7A8 /* SortAlgorithmCore */,
+				7B0B381F1F23806A69C23952 /* SortSymphony-iOS */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		20E2D1930FBD68FE2DEF579B /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		37FC8580CB9ECEE9E45625D2 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B290675E3FD5A8E3F2C23C83 /* PrivacyInfo.xcprivacy in Resources */,
+				A5DA82B24E2ACD31866BBA28 /* Assets.xcassets in Resources */,
+				DAB8139FB17CB1945A62B3EA /* Resources in Resources */,
+				1BCA628F6F39879A7FC0C4DB /* DeviceKit_DeviceKit.bundle in Resources */,
+				AA2F67D2A5A857605657CD67 /* SwiftMath_SwiftMath.bundle in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		482DFD86F7EE612B58B1D3FB /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A035860A1409EBE08FBC3951 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B2D4C3579504C0F516A4422A /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		BB4EA15FFBF32331ED1FFFEF /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DB27AF5E21E614728FE48D20 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E44790E18F3F050AD76D589F /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		04F86CCF731547CDADD60169 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E5FBDA7D3851005DB1B50E79 /* QuickSortAlgorithm.swift in Sources */,
+				395B84D82B60DCEF54AEA074 /* QuickSortPluginRegistry.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		24D3753E0ABF41FD841F0DC8 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				79097468906B81A1C362043A /* MergeSortAlgorithm.swift in Sources */,
+				191B106779F1C781796D754A /* MergeSortPluginRegistry.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		49B5C124D9ED8510DDBD798E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A43F26EA511C84EBE1C6778D /* MergeSortPluginTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4C9DAAC61EAA36FD1A979C47 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8B9E28EAEC8FC7036B3F4936 /* AlgorithmPlugin.swift in Sources */,
+				5C28EA51C22396C038361D10 /* Algorithms.swift in Sources */,
+				6385AE50AD3FC58ED00836AC /* CollectionConcurrencyKit.swift in Sources */,
+				3A6A75474E70BB65859DBE14 /* Int+Extensions.swift in Sources */,
+				42C05BB2087EBBC58E589366 /* SortAlgorithm.swift in Sources */,
+				BF8EB29A8B8AACDE2803C6C1 /* SortItem.swift in Sources */,
+				A26ADCB40E9BAC5AF2C341F2 /* SortViewModelProtocol.swift in Sources */,
+				1509AEF6CB88FEE236432AD8 /* TestSortViewModel.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AD7AAF89BB44B322DBEBF84D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8AF0AB771CCAACC39C3D8547 /* TuistAssets+SortSymphonyIOS.swift in Sources */,
+				7B99750AB75026F4D50CC03D /* TuistBundle+SortSymphonyIOS.swift in Sources */,
+				30FCE60E2E26C849F3F8C540 /* AttributeDynamicLookup+Extensions.swift in Sources */,
+				88385137F8902E71FC926AD0 /* AttributeScopes+Extensions.swift in Sources */,
+				8799B373AD3DC7B7984FF066 /* Color+Extensions.swift in Sources */,
+				C8627BC72E13337CB56850D7 /* Image+Extensions.swift in Sources */,
+				DB598C2AF5C7323E67D03E01 /* Int+Extensions.swift in Sources */,
+				3FDDF2785596EFA6D0FD29F9 /* NumberFormatter+Extensions.swift in Sources */,
+				8529B77978771F12134F9EFE /* Range+Extensions.swift in Sources */,
+				BA1DF401540F284631E910A1 /* Sequence+Extensions.swift in Sources */,
+				2CCC865DB2846F9874FC12B2 /* HeapSortImpl.swift in Sources */,
+				4EE399C29586443BBC3FBB6C /* BubbleSortImpl.swift in Sources */,
+				42C65C50BF505E41A9C73A23 /* GnomeSortImpl.swift in Sources */,
+				1CC31623A35E2A8B3015B4F7 /* InsertionSortImpl.swift in Sources */,
+				35FBE90966CEE4C57405ADB7 /* OddEvenSortImpl.swift in Sources */,
+				2D76988FCDE8DBC77E2F93FC /* PancakeSortImpl.swift in Sources */,
+				10BB4CB54B04EAAA33D61023 /* SelectionSortImpl.swift in Sources */,
+				F28E3E59A8F2D25451BCA156 /* ShakerSortImpl.swift in Sources */,
+				8061DDEABF3E63A5CE3A10B4 /* BitonicSortImpl.swift in Sources */,
+				654D100ABB57488E47831EEF /* BogoSortImpl.swift in Sources */,
+				99E0C177C019E725313650CF /* CombSortImpl.swift in Sources */,
+				C1C9DB79A61DF98D0549A68A /* RadixSortImpl.swift in Sources */,
+				C2AEF4B054F42CD86E06F837 /* ShellSortImpl.swift in Sources */,
+				281199CAE585C848B5433A05 /* StoogeSortImpl.swift in Sources */,
+				03684375D5D05B707C2CA450 /* CloudKitRecordDecoder.swift in Sources */,
+				C7EFC21831333D5F0F4EF0D1 /* CloudKitRecordEncoder.swift in Sources */,
+				978A16EE63DA2DB813ED606D /* CustomCloudKitEncodable.swift in Sources */,
+				D5DB29F86231EBE0AFD48B71 /* RunResult.swift in Sources */,
+				6A5750E84FED526F9FF34BF7 /* AlgorithmRegistry.swift in Sources */,
+				DBAA1D015DE2D2E642719EBA /* ComplexityEntry.swift in Sources */,
+				6B6B081025F33731D764D2A0 /* LanguageEntry.swift in Sources */,
+				CBECC677408FA51F718C6C16 /* PluginLoader.swift in Sources */,
+				215B43C4AC35483AFD8F64AD /* ShuffleMethod.swift in Sources */,
+				A9ED85EC6FFA9BE778190D08 /* SortItem.swift in Sources */,
+				C3BDA33A8A0D7CF11F8458C8 /* SortStatus.swift in Sources */,
+				BFBF1A6A84A1A212B412F43F /* SortViewModel+Protocol.swift in Sources */,
+				FF8BADB4BC49E44FD7062D26 /* SortViewModel.swift in Sources */,
+				EFCE036F0F93EA2B36E3D5E2 /* Synthesizer.swift in Sources */,
+				FF936FA90B3D57883395B870 /* Binding+Extensions.swift in Sources */,
+				FB20B13538209B6FC19E4D3F /* Float+RawRepresentable.swift in Sources */,
+				661FE7A73A28EFE6C2AEB1DE /* Sort2App.swift in Sources */,
+				83CE7FCBF4888301913AF729 /* AttributedCodeView.swift in Sources */,
+				B1AED64F529F804C15286E58 /* CodeAttributes.swift in Sources */,
+				54699B3DBB955B561F3D07DF /* CodeTheme.swift in Sources */,
+				D673EB2C4721A5E798A6742F /* TextFormat.swift in Sources */,
+				2659D1FCD0976670398D5E0E /* ArduinoTheme.swift in Sources */,
+				02942965D630361B2900AC21 /* CodeThemes.swift in Sources */,
+				7143DCC32C4D56AB8B3E588B /* ColorfulTheme.swift in Sources */,
+				ADBE6DAB27C938C178264704 /* DraculaTheme.swift in Sources */,
+				07ECABF636FD3A172CB1B97F /* EmacsTheme.swift in Sources */,
+				3A6E5951921C958EDA5B09D5 /* MonokaiTheme.swift in Sources */,
+				F728031A036AAC3F695A2319 /* PygmentsTheme.swift in Sources */,
+				F3F83DFFC006A437D67E2BDE /* IosMathView+UIKit.swift in Sources */,
+				F2E14A478BA026FB34A1662B /* ContentView.swift in Sources */,
+				192184C04B7EBD9B76609B7B /* HomeView.swift in Sources */,
+				EA64E28FDA0B3CDE6456A44A /* MathView.swift in Sources */,
+				6D02C9065276265DA3EB5E91 /* Page.swift in Sources */,
+				4654C3FFFB4AE9BBEC3E1D72 /* ScrollingSortView.swift in Sources */,
+				E73F7040F5FB30AE6C376ED9 /* SettingsView.swift in Sources */,
+				132DC9D25694B34225FD8405 /* SortView.swift in Sources */,
+				7AD83784C22098B71C7A86BA /* Category.swift in Sources */,
+				DB6E41E9608D15F99638A3EB /* CustomIconLabel.swift in Sources */,
+				54E866992D7D4428B9B5B00E /* RandomizingHeader.swift in Sources */,
+				D5C3FD7E93A7BDB2D924B23D /* StateToggle.swift in Sources */,
+				74B166B80B6F1F123D578BA8 /* SwiftMathView.swift in Sources */,
+				237EC0DF84730FE7E835CCEB /* CustomADSRWidget+UIKit.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E0E11BB90D1F8C1942EE96CC /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				382A772B215072B43F894CD0 /* HeapSortPlugin.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F8DFE8F74E0304DE64BC55E9 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				758ADD347EB624F18D36E3B1 /* HeapSortPluginTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F901629F9EC9E224D62EBA4A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EFB4F820F7E3A90894C095C6 /* QuickSortPluginTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		046399ED28C3ED4E2E894321 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = SortAlgorithmCore;
+			target = C84ECCB9BAD00505F77DE7A8 /* SortAlgorithmCore */;
+			targetProxy = 8D515F074FBCB23225FE966F /* PBXContainerItemProxy */;
+		};
+		061BB1D22697B149F0BE028D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = SortAlgorithmCore;
+			target = C84ECCB9BAD00505F77DE7A8 /* SortAlgorithmCore */;
+			targetProxy = B4CE8FE604D7F1A0E2C10D6E /* PBXContainerItemProxy */;
+		};
+		1D57FF09CF2DCE12F7265DCF /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = SortAlgorithmCore;
+			target = C84ECCB9BAD00505F77DE7A8 /* SortAlgorithmCore */;
+			targetProxy = 24D897A60D849AA2A993C37B /* PBXContainerItemProxy */;
+		};
+		295273948B43C990BFB82C08 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = HeapSortPlugin;
+			target = 1FE00EE01F32D73738F482E8 /* HeapSortPlugin */;
+			targetProxy = CECAA57FB1108F27A4509312 /* PBXContainerItemProxy */;
+		};
+		37604C7EC649024C50B418BB /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = QuickSortPlugin;
+			target = E2CF2F52B09269575913E056 /* QuickSortPlugin */;
+			targetProxy = 7DB9585EAC9EF022F1A86CF1 /* PBXContainerItemProxy */;
+		};
+		3F7F9362710DFFEA6AF39202 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = SortAlgorithmCore;
+			target = C84ECCB9BAD00505F77DE7A8 /* SortAlgorithmCore */;
+			targetProxy = 2EB5E8E22925DB699ED2D19C /* PBXContainerItemProxy */;
+		};
+		4EEF48421A1306544D530251 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = SortAlgorithmCore;
+			target = C84ECCB9BAD00505F77DE7A8 /* SortAlgorithmCore */;
+			targetProxy = 3A08D923FB2BC49A809EE546 /* PBXContainerItemProxy */;
+		};
+		600AE54E6C1C3D7C41DB152C /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = MergeSortPlugin;
+			target = 53258E08082D50A9909E27A1 /* MergeSortPlugin */;
+			targetProxy = 48B4F4C82EDDEF212F3AF8C5 /* PBXContainerItemProxy */;
+		};
+		8A710506392E3A2B52DF67FA /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = SortAlgorithmCore;
+			target = C84ECCB9BAD00505F77DE7A8 /* SortAlgorithmCore */;
+			targetProxy = D0821DCEC906344548E46BAA /* PBXContainerItemProxy */;
+		};
+		9D62952E313B52F66A3B1E68 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = QuickSortPlugin;
+			target = E2CF2F52B09269575913E056 /* QuickSortPlugin */;
+			targetProxy = 27D755FCD06E14F95F5C855A /* PBXContainerItemProxy */;
+		};
+		A6D2991D50C25E49502488CD /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = SortAlgorithmCore;
+			target = C84ECCB9BAD00505F77DE7A8 /* SortAlgorithmCore */;
+			targetProxy = 03BF16756A2A398897233738 /* PBXContainerItemProxy */;
+		};
+		DC1976E1D58047DB75B33BB3 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = MergeSortPlugin;
+			target = 53258E08082D50A9909E27A1 /* MergeSortPlugin */;
+			targetProxy = E6BE46A142A310483DC6E388 /* PBXContainerItemProxy */;
+		};
+		F165449E7B4A51E40EA29705 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = HeapSortPlugin;
+			target = 1FE00EE01F32D73738F482E8 /* HeapSortPlugin */;
+			targetProxy = EDB7D4C29F2BC9070988F7EB /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		3CBE17D53575861C57AD7517 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 6582419AC0331264B95CB5B2 /* MergeSortPluginTests.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				INFOPLIST_FILE = "Derived/InfoPlists/MergeSortPluginTests-Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-L$(DT_TOOLCHAIN_DIR)/usr/lib/swift/$(PLATFORM_NAME)",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.nhubbard.sort-symphony.MergeSortPluginTests";
+				PRODUCT_NAME = MergeSortPluginTests;
+				SDKROOT = iphoneos;
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		41032CEB8A8D60F144759650 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 1EE1300E7492FADC984CDB0D /* QuickSortPlugin.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "";
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				INFOPLIST_FILE = "Derived/InfoPlists/QuickSortPlugin-Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-L$(DT_TOOLCHAIN_DIR)/usr/lib/swift/$(PLATFORM_NAME)",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.nhubbard.sort-symphony.QuickSortPlugin";
+				PRODUCT_NAME = QuickSortPlugin;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Release;
+		};
+		410DC2621ED6B94A2C0DAFBF /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = A3F313F1F739BB053D70C1D4 /* MergeSortPlugin.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "";
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				INFOPLIST_FILE = "Derived/InfoPlists/MergeSortPlugin-Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-L$(DT_TOOLCHAIN_DIR)/usr/lib/swift/$(PLATFORM_NAME)",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.nhubbard.sort-symphony.MergeSortPlugin";
+				PRODUCT_NAME = MergeSortPlugin;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = (
+					"$(inherited)",
+					DEBUG,
+				);
+				SWIFT_COMPILATION_MODE = singlefile;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Debug;
+		};
+		49CF559A17D9109D5EB26EC8 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 31AF0116E31A5D9EEBF20530 /* SortSymphony-Project.xcconfig */;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		575C6AA45ADC3EE92B2C569E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 050FD0156301D21F97AB0021 /* SortAlgorithmCore.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "";
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				INFOPLIST_FILE = "Derived/InfoPlists/SortAlgorithmCore-Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-L$(DT_TOOLCHAIN_DIR)/usr/lib/swift/$(PLATFORM_NAME)",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.nhubbard.sort-symphony.SortAlgorithmCore";
+				PRODUCT_NAME = SortAlgorithmCore;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = (
+					"$(inherited)",
+					DEBUG,
+				);
+				SWIFT_COMPILATION_MODE = singlefile;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Debug;
+		};
+		5FD6A331CD106ACDA6BD7FDF /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 31AF0116E31A5D9EEBF20530 /* SortSymphony-Project.xcconfig */;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		625D308497A2BFCD84F32213 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = CA505CD77224BBE38F614CA2 /* HeapSortPluginTests.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				INFOPLIST_FILE = "Derived/InfoPlists/HeapSortPluginTests-Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-L$(DT_TOOLCHAIN_DIR)/usr/lib/swift/$(PLATFORM_NAME)",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.nhubbard.sort-symphony.HeapSortPluginTests";
+				PRODUCT_NAME = HeapSortPluginTests;
+				SDKROOT = iphoneos;
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		7D80BF917C044525D96EE1CA /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 62A9417F50718B8F98499F72 /* SortSymphony-iOS.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = "Sort Symphony (iOS).entitlements";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				ENABLE_PREVIEWS = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/Tuist/.build/checkouts/AudioKitEX/Sources/CAudioKitEX",
+					"$(SRCROOT)/Tuist/.build/checkouts/AudioKitEX/Sources/CAudioKitEX/include",
+					"$(SRCROOT)/Tuist/.build/checkouts/KissFFT/Sources/KissFFT/include",
+					"$(SRCROOT)/Tuist/.build/checkouts/SoundpipeAudioKit/Sources/CSoundpipeAudioKit/include",
+					"$(SRCROOT)/Tuist/.build/checkouts/SoundpipeAudioKit/Sources/Soundpipe/Sources/soundpipe/lib/inih",
+					"$(SRCROOT)/Tuist/.build/checkouts/SoundpipeAudioKit/Sources/Soundpipe/external",
+					"$(SRCROOT)/Tuist/.build/checkouts/SoundpipeAudioKit/Sources/Soundpipe/include",
+					"$(SRCROOT)/Tuist/.build/checkouts/SoundpipeAudioKit/Sources/Soundpipe/lib/inih",
+					"$(SRCROOT)/Tuist/.build/checkouts/SoundpipeAudioKit/Sources/Soundpipe/modules",
+					"$(SRCROOT)/Tuist/.build/checkouts/swift-atomics/Sources/_AtomicsShims/include",
+					"$(SRCROOT)/Tuist/.build/checkouts/swift-cmark/extensions/include",
+					"$(SRCROOT)/Tuist/.build/checkouts/swift-cmark/src/include",
+					"$(SRCROOT)/Tuist/.build/checkouts/swift-numerics/Sources/_NumericsShims/include",
+				);
+				INFOPLIST_FILE = "Sort Symphony--iOS--Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				OTHER_CFLAGS = (
+					"$(inherited)",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-atomics/Sources/_AtomicsShims/include/module.modulemap",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-cmark/extensions/include/module.modulemap",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-cmark/src/include/module.modulemap",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-numerics/Sources/_NumericsShims/include/module.modulemap",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/CAudioKitEX/CAudioKitEX.modulemap",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/CSoundpipeAudioKit/CSoundpipeAudioKit.modulemap",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/KissFFT/KissFFT.modulemap",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/Soundpipe/Soundpipe.modulemap",
+				);
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-L$(DT_TOOLCHAIN_DIR)/usr/lib/swift/$(PLATFORM_NAME)",
+				);
+				OTHER_SWIFT_FLAGS = (
+					"$(inherited)",
+					"-Xcc",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-atomics/Sources/_AtomicsShims/include/module.modulemap",
+					"-Xcc",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-cmark/extensions/include/module.modulemap",
+					"-Xcc",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-cmark/src/include/module.modulemap",
+					"-Xcc",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-numerics/Sources/_NumericsShims/include/module.modulemap",
+					"-Xcc",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/CAudioKitEX/CAudioKitEX.modulemap",
+					"-Xcc",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/CSoundpipeAudioKit/CSoundpipeAudioKit.modulemap",
+					"-Xcc",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/KissFFT/KissFFT.modulemap",
+					"-Xcc",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/Soundpipe/Soundpipe.modulemap",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.nhubbard.sort-symphony";
+				PRODUCT_NAME = SortSymphony_iOS;
+				SDKROOT = iphoneos;
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = (
+					"$(inherited)",
+					DEBUG,
+				);
+				SWIFT_COMPILATION_MODE = singlefile;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		94AADED85ACD8A63E19B9AD3 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = C822AA360D482AF7C3D1A310 /* QuickSortPluginTests.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				INFOPLIST_FILE = "Derived/InfoPlists/QuickSortPluginTests-Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-L$(DT_TOOLCHAIN_DIR)/usr/lib/swift/$(PLATFORM_NAME)",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.nhubbard.sort-symphony.QuickSortPluginTests";
+				PRODUCT_NAME = QuickSortPluginTests;
+				SDKROOT = iphoneos;
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		9861CD37F38292EF58FEE525 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = CA505CD77224BBE38F614CA2 /* HeapSortPluginTests.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				INFOPLIST_FILE = "Derived/InfoPlists/HeapSortPluginTests-Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-L$(DT_TOOLCHAIN_DIR)/usr/lib/swift/$(PLATFORM_NAME)",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.nhubbard.sort-symphony.HeapSortPluginTests";
+				PRODUCT_NAME = HeapSortPluginTests;
+				SDKROOT = iphoneos;
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = (
+					"$(inherited)",
+					DEBUG,
+				);
+				SWIFT_COMPILATION_MODE = singlefile;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		A38287722FBD8A4038C77108 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 5881D58F73CE607C85FD65A1 /* HeapSortPlugin.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "";
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				INFOPLIST_FILE = "Derived/InfoPlists/HeapSortPlugin-Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-L$(DT_TOOLCHAIN_DIR)/usr/lib/swift/$(PLATFORM_NAME)",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.nhubbard.sort-symphony.HeapSortPlugin";
+				PRODUCT_NAME = HeapSortPlugin;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = (
+					"$(inherited)",
+					DEBUG,
+				);
+				SWIFT_COMPILATION_MODE = singlefile;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Debug;
+		};
+		C371D7305C30D9D5115FE1E1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = A3F313F1F739BB053D70C1D4 /* MergeSortPlugin.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "";
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				INFOPLIST_FILE = "Derived/InfoPlists/MergeSortPlugin-Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-L$(DT_TOOLCHAIN_DIR)/usr/lib/swift/$(PLATFORM_NAME)",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.nhubbard.sort-symphony.MergeSortPlugin";
+				PRODUCT_NAME = MergeSortPlugin;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Release;
+		};
+		C7117FA744B8146C800EABC9 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 62A9417F50718B8F98499F72 /* SortSymphony-iOS.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = "Sort Symphony (iOS).entitlements";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				ENABLE_PREVIEWS = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/Tuist/.build/checkouts/AudioKitEX/Sources/CAudioKitEX",
+					"$(SRCROOT)/Tuist/.build/checkouts/AudioKitEX/Sources/CAudioKitEX/include",
+					"$(SRCROOT)/Tuist/.build/checkouts/KissFFT/Sources/KissFFT/include",
+					"$(SRCROOT)/Tuist/.build/checkouts/SoundpipeAudioKit/Sources/CSoundpipeAudioKit/include",
+					"$(SRCROOT)/Tuist/.build/checkouts/SoundpipeAudioKit/Sources/Soundpipe/Sources/soundpipe/lib/inih",
+					"$(SRCROOT)/Tuist/.build/checkouts/SoundpipeAudioKit/Sources/Soundpipe/external",
+					"$(SRCROOT)/Tuist/.build/checkouts/SoundpipeAudioKit/Sources/Soundpipe/include",
+					"$(SRCROOT)/Tuist/.build/checkouts/SoundpipeAudioKit/Sources/Soundpipe/lib/inih",
+					"$(SRCROOT)/Tuist/.build/checkouts/SoundpipeAudioKit/Sources/Soundpipe/modules",
+					"$(SRCROOT)/Tuist/.build/checkouts/swift-atomics/Sources/_AtomicsShims/include",
+					"$(SRCROOT)/Tuist/.build/checkouts/swift-cmark/extensions/include",
+					"$(SRCROOT)/Tuist/.build/checkouts/swift-cmark/src/include",
+					"$(SRCROOT)/Tuist/.build/checkouts/swift-numerics/Sources/_NumericsShims/include",
+				);
+				INFOPLIST_FILE = "Sort Symphony--iOS--Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				OTHER_CFLAGS = (
+					"$(inherited)",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-atomics/Sources/_AtomicsShims/include/module.modulemap",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-cmark/extensions/include/module.modulemap",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-cmark/src/include/module.modulemap",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-numerics/Sources/_NumericsShims/include/module.modulemap",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/CAudioKitEX/CAudioKitEX.modulemap",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/CSoundpipeAudioKit/CSoundpipeAudioKit.modulemap",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/KissFFT/KissFFT.modulemap",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/Soundpipe/Soundpipe.modulemap",
+				);
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-L$(DT_TOOLCHAIN_DIR)/usr/lib/swift/$(PLATFORM_NAME)",
+				);
+				OTHER_SWIFT_FLAGS = (
+					"$(inherited)",
+					"-Xcc",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-atomics/Sources/_AtomicsShims/include/module.modulemap",
+					"-Xcc",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-cmark/extensions/include/module.modulemap",
+					"-Xcc",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-cmark/src/include/module.modulemap",
+					"-Xcc",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-numerics/Sources/_NumericsShims/include/module.modulemap",
+					"-Xcc",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/CAudioKitEX/CAudioKitEX.modulemap",
+					"-Xcc",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/CSoundpipeAudioKit/CSoundpipeAudioKit.modulemap",
+					"-Xcc",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/KissFFT/KissFFT.modulemap",
+					"-Xcc",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/Soundpipe/Soundpipe.modulemap",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.nhubbard.sort-symphony";
+				PRODUCT_NAME = SortSymphony_iOS;
+				SDKROOT = iphoneos;
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		D45FD99D64499679ADAD1D33 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 050FD0156301D21F97AB0021 /* SortAlgorithmCore.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "";
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				INFOPLIST_FILE = "Derived/InfoPlists/SortAlgorithmCore-Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-L$(DT_TOOLCHAIN_DIR)/usr/lib/swift/$(PLATFORM_NAME)",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.nhubbard.sort-symphony.SortAlgorithmCore";
+				PRODUCT_NAME = SortAlgorithmCore;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Release;
+		};
+		DE0858B797AD42F6067602FB /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = C822AA360D482AF7C3D1A310 /* QuickSortPluginTests.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				INFOPLIST_FILE = "Derived/InfoPlists/QuickSortPluginTests-Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-L$(DT_TOOLCHAIN_DIR)/usr/lib/swift/$(PLATFORM_NAME)",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.nhubbard.sort-symphony.QuickSortPluginTests";
+				PRODUCT_NAME = QuickSortPluginTests;
+				SDKROOT = iphoneos;
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = (
+					"$(inherited)",
+					DEBUG,
+				);
+				SWIFT_COMPILATION_MODE = singlefile;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		E1079393A56A9B93A6A9AE48 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 5881D58F73CE607C85FD65A1 /* HeapSortPlugin.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "";
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				INFOPLIST_FILE = "Derived/InfoPlists/HeapSortPlugin-Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-L$(DT_TOOLCHAIN_DIR)/usr/lib/swift/$(PLATFORM_NAME)",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.nhubbard.sort-symphony.HeapSortPlugin";
+				PRODUCT_NAME = HeapSortPlugin;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Release;
+		};
+		F1D0D4898AF7E92E21AF691D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 6582419AC0331264B95CB5B2 /* MergeSortPluginTests.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				INFOPLIST_FILE = "Derived/InfoPlists/MergeSortPluginTests-Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-L$(DT_TOOLCHAIN_DIR)/usr/lib/swift/$(PLATFORM_NAME)",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.nhubbard.sort-symphony.MergeSortPluginTests";
+				PRODUCT_NAME = MergeSortPluginTests;
+				SDKROOT = iphoneos;
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = (
+					"$(inherited)",
+					DEBUG,
+				);
+				SWIFT_COMPILATION_MODE = singlefile;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		F3435BA451A460927B35B452 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 1EE1300E7492FADC984CDB0D /* QuickSortPlugin.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "";
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				INFOPLIST_FILE = "Derived/InfoPlists/QuickSortPlugin-Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-L$(DT_TOOLCHAIN_DIR)/usr/lib/swift/$(PLATFORM_NAME)",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.nhubbard.sort-symphony.QuickSortPlugin";
+				PRODUCT_NAME = QuickSortPlugin;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = (
+					"$(inherited)",
+					DEBUG,
+				);
+				SWIFT_COMPILATION_MODE = singlefile;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		0DB06341B9FBB02CC6493B07 /* Build configuration list for PBXNativeTarget "MergeSortPlugin" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				410DC2621ED6B94A2C0DAFBF /* Debug */,
+				C371D7305C30D9D5115FE1E1 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		31D05160759BFE7F2DEA8F48 /* Build configuration list for PBXNativeTarget "QuickSortPluginTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DE0858B797AD42F6067602FB /* Debug */,
+				94AADED85ACD8A63E19B9AD3 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		396855983A8567FA2B72A9E6 /* Build configuration list for PBXNativeTarget "MergeSortPluginTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F1D0D4898AF7E92E21AF691D /* Debug */,
+				3CBE17D53575861C57AD7517 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		4CBDCEC48F06012FC1437447 /* Build configuration list for PBXNativeTarget "SortSymphony-iOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7D80BF917C044525D96EE1CA /* Debug */,
+				C7117FA744B8146C800EABC9 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		67C09403D40FC733A98D1F7D /* Build configuration list for PBXProject "Sort Symphony-Tuist" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5FD6A331CD106ACDA6BD7FDF /* Debug */,
+				49CF559A17D9109D5EB26EC8 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		85D5AA0C960D448CDB4B9B01 /* Build configuration list for PBXNativeTarget "QuickSortPlugin" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F3435BA451A460927B35B452 /* Debug */,
+				41032CEB8A8D60F144759650 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		D96B399C0E3DEA4FCB593F79 /* Build configuration list for PBXNativeTarget "HeapSortPlugin" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A38287722FBD8A4038C77108 /* Debug */,
+				E1079393A56A9B93A6A9AE48 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		F1EB7F5275EB0A0520DD5BBC /* Build configuration list for PBXNativeTarget "HeapSortPluginTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9861CD37F38292EF58FEE525 /* Debug */,
+				625D308497A2BFCD84F32213 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		FC59B895921B6616751DD0A1 /* Build configuration list for PBXNativeTarget "SortAlgorithmCore" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				575C6AA45ADC3EE92B2C569E /* Debug */,
+				D45FD99D64499679ADAD1D33 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 5699267C640898D255F7D84C /* Project object */;
+}
