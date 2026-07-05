@@ -9,6 +9,13 @@ let packageSettings = PackageSettings(
         "AudioKit": .framework,
         "AudioKitUI": .framework,
         "SoundpipeAudioKit": .framework,
+        // Soundpipe is an internal C target (not an SPM product) that SoundpipeAudioKit and
+        // CSoundpipeAudioKit both link — as a Tuist-synthesized framework it gets a "Copy Module
+        // Map" script phase that races against its own module-readiness gate under Xcode's new
+        // build system ("Cycle inside Soundpipe"). It has no Swift-facing API of its own (only
+        // consumed via C interop from CSoundpipeAudioKit), so it doesn't need a Clang module at
+        // all — building it as a static library instead removes the module map phase entirely.
+        "Soundpipe": .staticLibrary,
     ]
 )
 #endif
