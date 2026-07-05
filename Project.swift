@@ -61,6 +61,15 @@ let app = Target.target(
         "CURRENT_PROJECT_VERSION": "1",
         "SWIFT_VERSION": "6.0",
         "SWIFT_STRICT_CONCURRENCY": "complete",
+        "CODE_SIGN_STYLE": "Automatic",
+        "DEVELOPMENT_TEAM": "676UP3S3AH",
+        // Tuist's default template sets CODE_SIGN_IDENTITY[sdk=macosx*] to "-" (ad-hoc) on every
+        // target, which silently overrides DEVELOPMENT_TEAM for Mac Catalyst specifically (it
+        // builds against the macosx SDK) and breaks entitlements requiring a real certificate
+        // (CloudKit, aps-environment). Override back to a real identity, matching the shipping
+        // v1 project's explicit setting.
+        "CODE_SIGN_IDENTITY": "Apple Development",
+        "CODE_SIGN_IDENTITY[sdk=macosx*]": "Apple Development",
     ])
 )
 
