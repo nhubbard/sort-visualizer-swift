@@ -3,9 +3,11 @@ import SortEngineKit
 import Testing
 @testable import ScriptingKit
 
-/// Test-only, never shipped in `BuiltInAlgorithms` (§7) — mirrors
-/// `App/Resources/Algorithms/bubblesort.js` exactly, purely to prove the JS bridge produces an
-/// identical operation sequence to a native implementation for the same input.
+/// Test-only, independent of the real `Modules/BuiltInAlgorithms/Sources/BubbleSort.swift` (§7) —
+/// exists purely to prove the JS bridge produces an identical operation sequence to a native
+/// implementation for the same input, a check that stays relevant even though every shipped
+/// algorithm is native now (§2.6 of ARCHITECTURE_V2.md): it's what would catch a bridge
+/// regression the next time an algorithm is prototyped in `App/Resources/Algorithms/`.
 private struct BubbleSortReference: SortAlgorithm {
     let id = AlgorithmID(rawValue: "bubblesort-reference")
     let metadata = AlgorithmMetadata(
@@ -28,7 +30,6 @@ private struct BubbleSortReference: SortAlgorithm {
     }
 }
 
-/// Must stay byte-for-byte in sync with `App/Resources/Algorithms/bubblesort.js`.
 private let bubbleSortJS = """
 function sort(engine) {
     const n = engine.count();

@@ -1,4 +1,5 @@
 import AlgorithmKit
+import BuiltInAlgorithms
 import BuiltInVisualizers
 import Foundation
 import ScriptingKit
@@ -20,9 +21,18 @@ struct Sort2App: App {
         ]
         VisualizerRegistry.shared.discover()
 
-        // Algorithms and shuffles are both scripted from day one (§2.6/§2A.4) — no native
-        // BuiltInAlgorithms/BuiltInShuffles equivalents exist, so builtIns stays empty on each and
-        // everything comes from the bundled Algorithms/Shuffles directories.
+        // Native Swift is the target for every algorithm now — JavaScriptCore only gets an
+        // interpreter (no JIT) in an ordinary app, which is slow enough in practice that JS is
+        // reserved for prototyping a brand-new algorithm before it's ported here and its script
+        // retired. `App/Resources/Algorithms/` is empty until the next one is being proven out;
+        // `scriptLoader` stays wired so dropping a `.js` + manifest there still works without a
+        // recompile, exactly as before. Shuffles remain scripted-only for now.
+        AlgorithmRegistry.shared.builtIns = [
+            BinaryMergeSort(), BitonicSortIterative(), BogoSort(), BubbleSort(), BurntPancakeSort(),
+            CombSort(), GnomeSort(), InsertionSort(), IntroSort(), LSDRadixSort(),
+            MaxHeapSort(), MergeSort(), OddEvenMergeSortIterative(), PancakeSort(), QuickSort(),
+            SelectionSort(), ShellSort(), StrandSort(), TernaryLLQuickSort(), TernaryLRQuickSort(),
+        ]
         AlgorithmRegistry.shared.scriptLoader = {
             ScriptAlgorithmLoader.loadScripts(from: Bundle.main.url(forResource: "Algorithms", withExtension: nil)!)
         }
