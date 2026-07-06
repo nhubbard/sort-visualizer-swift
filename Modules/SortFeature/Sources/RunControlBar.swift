@@ -64,12 +64,24 @@ struct RunControlBar: View {
     private var transportRow: some View {
         HStack(spacing: 20) {
             Button {
+                replay.seek(to: 0)
+            } label: {
+                Image(systemName: "backward.end.fill")
+            }
+            .accessibilityIdentifier("runControlJumpToStartButton")
+            .accessibilityLabel("Jump to Start")
+            .help("Jump to the very beginning of the recording, before shuffling")
+            .disabled(replay.stepIndex <= 0)
+
+            Button {
                 replay.pause()
                 replay.stepBackward()
             } label: {
                 Image(systemName: "backward.frame.fill")
             }
             .accessibilityIdentifier("runControlStepBackButton")
+            .accessibilityLabel("Step Back")
+            .help("Step back one operation")
             .disabled(replay.stepIndex <= 0)
 
             Button {
@@ -79,6 +91,8 @@ struct RunControlBar: View {
                     .font(.title2)
             }
             .accessibilityIdentifier("runControlPlayPauseButton")
+            .accessibilityLabel(replay.isPlaying ? "Pause" : "Play")
+            .help(replay.isPlaying ? "Pause playback" : "Resume playback")
             .disabled(isFinished)
 
             Button {
@@ -88,9 +102,31 @@ struct RunControlBar: View {
                 Image(systemName: "forward.frame.fill")
             }
             .accessibilityIdentifier("runControlStepForwardButton")
+            .accessibilityLabel("Step Forward")
+            .help("Step forward one operation")
+            .disabled(isFinished)
+
+            Button {
+                replay.seek(to: replay.totalOperationCount)
+            } label: {
+                Image(systemName: "forward.end.fill")
+            }
+            .accessibilityIdentifier("runControlJumpToEndButton")
+            .accessibilityLabel("Jump to End")
+            .help("Jump to the fully sorted end of the recording")
             .disabled(isFinished)
 
             Spacer()
+
+            Button {
+                replay.seek(to: replay.header.sortStartIndex)
+            } label: {
+                Image(systemName: "arrow.counterclockwise")
+            }
+            .accessibilityIdentifier("runControlResetButton")
+            .accessibilityLabel("Reset to Shuffled Input")
+            .help("Replay the sort from the shuffled input, skipping the shuffle")
+            .disabled(replay.stepIndex == replay.header.sortStartIndex)
 
             Button {
                 session.soundEnabled.toggle()
@@ -98,6 +134,8 @@ struct RunControlBar: View {
                 Image(systemName: session.soundEnabled ? "speaker.wave.2.fill" : "speaker.slash.fill")
             }
             .accessibilityIdentifier("runControlSoundToggle")
+            .accessibilityLabel(session.soundEnabled ? "Mute" : "Unmute")
+            .help(session.soundEnabled ? "Turn off sort sound effects" : "Turn on sort sound effects")
 
             Button {
                 isSpeedExpanded.toggle()
@@ -106,6 +144,8 @@ struct RunControlBar: View {
                     .font(.footnote.monospacedDigit())
             }
             .accessibilityIdentifier("runControlSpeedButton")
+            .accessibilityLabel("Playback Speed")
+            .help("Show or hide the playback speed slider")
         }
         .buttonStyle(.borderless)
         .controlSize(.large)
@@ -129,6 +169,7 @@ struct RunControlBar: View {
                 .font(.caption.monospacedDigit())
                 .foregroundStyle(.secondary)
                 .frame(minWidth: 80, alignment: .trailing)
+                .accessibilityIdentifier("runControlSpeedValueLabel")
         }
     }
 }
