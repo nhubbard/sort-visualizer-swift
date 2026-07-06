@@ -36,9 +36,13 @@ final class VisualizerSwitchingUITests: XCTestCase {
         // driven by the SortSession that was already running before the detour through Settings.
         XCTAssertTrue(canvas.waitForExistence(timeout: 5), "canvas disappeared after switching visualizers mid-sort")
 
+        // 60s (not 30s): RecordingEngine's primary/secondary auto-retraction (every compare/swap
+        // past the first emits 2 extra raw tape entries un-highlighting the previous pair)
+        // inflates total tape length, and therefore real playback time at a fixed ops/sec, by
+        // roughly 5/3 versus before that fix.
         let terminalState = NSPredicate(format: "value == %@ OR value == %@", "sorted", "sort-failed")
         let reachedTerminalState = XCTNSPredicateExpectation(predicate: terminalState, object: statusLabel)
-        let result = XCTWaiter().wait(for: [reachedTerminalState], timeout: 30)
+        let result = XCTWaiter().wait(for: [reachedTerminalState], timeout: 60)
 
         let screenshot = XCTAttachment(screenshot: app.screenshot())
         screenshot.name = "rainbow-after-switch-final-state"

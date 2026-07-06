@@ -53,6 +53,44 @@ struct RecordingEngineTests {
     }
 
     @Test
+    func secondCompareRetractsThePreviousPairsMarksBeforeMarkingTheNewOne() {
+        var engine = RecordingEngine(values: [5, 3, 8])
+        _ = engine.compare(0, 1)
+        _ = engine.compare(1, 2)
+
+        let (tape, _, _, _) = engine.finish()
+        #expect(tape == [
+            .mark(marker: Marker.primary, index: 0),
+            .mark(marker: Marker.secondary, index: 1),
+            .compare(0, 1),
+            .unmarkIndex(marker: Marker.primary, index: 0),
+            .unmarkIndex(marker: Marker.secondary, index: 1),
+            .mark(marker: Marker.primary, index: 1),
+            .mark(marker: Marker.secondary, index: 2),
+            .compare(1, 2),
+        ])
+    }
+
+    @Test
+    func swapAfterCompareRetractsCompareSMarksToo() {
+        var engine = RecordingEngine(values: [5, 3, 8])
+        _ = engine.compare(0, 1)
+        engine.swap(1, 2)
+
+        let (tape, _, _, _) = engine.finish()
+        #expect(tape == [
+            .mark(marker: Marker.primary, index: 0),
+            .mark(marker: Marker.secondary, index: 1),
+            .compare(0, 1),
+            .unmarkIndex(marker: Marker.primary, index: 0),
+            .unmarkIndex(marker: Marker.secondary, index: 1),
+            .mark(marker: Marker.primary, index: 1),
+            .mark(marker: Marker.secondary, index: 2),
+            .swap(1, 2),
+        ])
+    }
+
+    @Test
     func finishCountsMatchHandComputedSequence() {
         var engine = RecordingEngine(values: [3, 1, 2])
         _ = engine.compare(0, 1)

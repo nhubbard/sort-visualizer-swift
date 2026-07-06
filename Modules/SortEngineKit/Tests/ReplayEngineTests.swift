@@ -193,4 +193,45 @@ struct ReplayEngineTests {
 
         #expect(engine.frame.allSatisfy { !$0.markers.contains(Marker.pivot) })
     }
+
+    @Test
+    func unmarkIndexClearsOnlyTheOneIndexNotEveryIndex() {
+        let tape = makeTape(initialValues: [1, 2, 3], operations: [
+            .mark(marker: Marker.primary, index: 0),
+            .mark(marker: Marker.primary, index: 2),
+            .unmarkIndex(marker: Marker.primary, index: 0),
+        ])
+        let engine = ReplayEngine(tape: tape)
+        for _ in 0..<tape.operations.count { engine.stepForward() }
+
+        #expect(!engine.frame[0].markers.contains(Marker.primary))
+        #expect(engine.frame[2].markers.contains(Marker.primary))
+    }
+
+    /// End-to-end regression test for the "everything turns red and stays red" bug: recording a
+    /// realistic sequence of compares/swaps (not just replaying hand-authored ops) must leave at
+    /// most one index carrying `.primary` and one carrying `.secondary` at any point along the
+    /// tape, never an ever-growing accumulation of every index a sort has ever touched.
+    @Test
+    func recordedComparesAndSwapsNeverLeaveMoreThanOnePrimaryOrSecondaryMarkedAtOnce() {
+        var recording = RecordingEngine(values: [5, 3, 8, 1, 9, 2])
+        _ = recording.compare(0, 1)
+        recording.swap(0, 1)
+        _ = recording.compare(1, 2)
+        _ = recording.compare(2, 3)
+        recording.swap(2, 3)
+        _ = recording.compare(3, 4)
+        recording.swap(3, 4)
+        let (operations, _, _, _) = recording.finish()
+
+        let tape = makeTape(initialValues: [5, 3, 8, 1, 9, 2], operations: operations)
+        let engine = ReplayEngine(tape: tape)
+        for _ in 0..<tape.operations.count {
+            engine.stepForward()
+            let primaryCount = engine.frame.filter { $0.markers.contains(Marker.primary) }.count
+            let secondaryCount = engine.frame.filter { $0.markers.contains(Marker.secondary) }.count
+            #expect(primaryCount <= 1)
+            #expect(secondaryCount <= 1)
+        }
+    }
 }

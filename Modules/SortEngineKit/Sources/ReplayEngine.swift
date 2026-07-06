@@ -266,6 +266,8 @@ public final class ReplayEngine {
             frame[index].markers.insert(marker)
         case let .unmark(marker):
             for i in frame.indices { frame[i].markers.remove(marker) }
+        case let .unmarkIndex(marker, index):
+            frame[index].markers.remove(marker)
         case .unmarkAll:
             for i in frame.indices { frame[i].markers.removeAll() }
         case .compare:

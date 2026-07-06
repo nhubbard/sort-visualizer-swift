@@ -37,16 +37,20 @@ final class QuickSortUITests: XCTestCase {
         midFlightScreenshot.lifetime = .keepAlways
         add(midFlightScreenshot)
 
+        // 60s (not 30s): RecordingEngine's primary/secondary auto-retraction (every compare/swap
+        // past the first emits 2 extra raw tape entries un-highlighting the previous pair)
+        // inflates total tape length, and therefore real playback time at a fixed ops/sec, by
+        // roughly 5/3 versus before that fix.
         let terminalState = NSPredicate(format: "value == %@ OR value == %@", "sorted", "sort-failed")
         let reachedTerminalState = XCTNSPredicateExpectation(predicate: terminalState, object: statusLabel)
-        let result = XCTWaiter().wait(for: [reachedTerminalState], timeout: 30)
+        let result = XCTWaiter().wait(for: [reachedTerminalState], timeout: 60)
 
         let screenshot = XCTAttachment(screenshot: app.screenshot())
         screenshot.name = "quicksort-final-state"
         screenshot.lifetime = .keepAlways
         add(screenshot)
 
-        XCTAssertEqual(result, .completed, "sort never reached a terminal state within 30s — replay likely hung")
+        XCTAssertEqual(result, .completed, "sort never reached a terminal state within 60s — replay likely hung")
         XCTAssertEqual(
             statusLabel.value as? String, "sorted",
             "algorithm completed but the app's own sortedness check reported failure"
