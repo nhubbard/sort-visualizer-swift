@@ -9,9 +9,15 @@ counts below come from reading that repo, not from `ARCHITECTURE_V2.md`'s illust
 (noted inline) · `[v1]` done, but ported from `Legacy/` rather than directly from ArrayV (a
 different implementation of the same idea, not a 1:1 translation).
 
-Every "done" row should have a corresponding `App/Resources/Algorithms/<id>.js` +
-`.manifest.json`, `App/Resources/Shuffles/<id>.js` + `.manifest.json`, or
-`Modules/BuiltInVisualizers/Sources/<Name>.swift`.
+As of the native-porting batch (`ARCHITECTURE_V2.md` §2.6, revised), a "done" **sorting algorithm**
+row means a native `Modules/BuiltInAlgorithms/Sources/<Name>.swift` `SortAlgorithm` conformance
+registered in `AlgorithmRegistry.shared.builtIns` — not a `.js`/`.manifest.json` pair. JavaScript
+(`App/Resources/Algorithms/<id>.js` + `.manifest.json`) is now only ever a *temporary* stage for a
+brand-new algorithm you're still proving out — expect to see at most a handful of `.js` files
+there at any time, never all of them, and expect any given one to be retired (deleted, with its
+logic ported to `BuiltInAlgorithms`) once it's confirmed correct. Shuffles remain scripted-only
+(`App/Resources/Shuffles/<id>.js` + `.manifest.json`, no native equivalent yet) and visualizations
+remain native-only (`Modules/BuiltInVisualizers/Sources/<Name>.swift`) — neither of those changed.
 
 ## Sorting algorithms (208 ArrayV classes across 9 categories, + 21 shared `templates/` base
 classes that are never ported directly — only their concrete subclasses are)

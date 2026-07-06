@@ -467,7 +467,7 @@ final class AlgorithmRegistry {
     private(set) var algorithms: [any SortAlgorithm] = []
 
     func discover() {
-        algorithms = builtIns   // empty by default (§2.6) — an escape hatch, not the primary content path
+        algorithms = builtIns   // the primary content path now (§2.6) — every proven algorithm lives here
         algorithms += loadScripts(from: Bundle.main.url(forResource: "Algorithms", withExtension: nil)!)
     }
 
@@ -503,7 +503,44 @@ for algorithm in AlgorithmRegistry.shared.algorithms {
 This is the direct fix for the abandoned unit-testing attempt in `TODO.md` ("I tried doing unit
 testing with a protocol and a separate implementation... it just failed over and over").
 
-### 2.6 Everything is scripted — except visualizations
+### 2.6 Native Swift is the target — JavaScript is a proving ground, not a destination
+
+**Revised policy, as of the native-porting batch that shipped all 20 algorithms in
+`BuiltInAlgorithms`.** The original policy here (quoted below for history) was "everything is
+scripted, not a fallback," chosen to maximize authoring velocity for the "port everything from
+ArrayV" goal — a script is trivial to generate en masse compared to hand-writing 189 Swift
+`SortAlgorithm` conformances. That velocity argument still holds, but it traded away something the
+original policy didn't account for: **on iOS, `JSContext` only ever gets JavaScriptCore's bytecode
+interpreter — the JIT tiers are reserved for WebKit's own content process** — so every
+`compare`/`swap` pays interpreter overhead *and* a per-call Objective-C bridge crossing
+(`JSRecordingEngineExport` dynamic dispatch), on top of a fresh `JSContext` being constructed and
+the script re-parsed on every single `record(into:)` call (§2.2's `JSAlgorithmAdapter` never caches
+a compiled context across runs). Running the app for real exposed this as a genuinely slow
+recording step, especially for the O(n log n) algorithms people run at the largest sizes.
+
+The new policy: **native Swift, in `BuiltInAlgorithms`, is the target end state for every
+algorithm and shuffle.** JavaScript keeps exactly one job — a fast, zero-recompile *proving ground*
+for a brand-new algorithm's logic, before it's translated to native Swift and its script retired.
+Concretely:
+- `App/Resources/Algorithms/` is empty by default now, not because algorithms are scripted by
+  default, but because nothing is *currently being prototyped* — it's the drop point for the next
+  new algorithm's `.js` + manifest, exactly as described in §2.3/§2.4, until that algorithm is
+  proven out and ported.
+- `AlgorithmRegistry.builtIns` (§2.4) is where every proven algorithm actually lives now — the
+  "escape hatch, not the primary content path" framing is inverted: `builtIns` is the primary path,
+  `scriptLoader`'s discovery of `Algorithms/` is the temporary staging path.
+- Everything else about the bridge (§2.1's App Store rationale, §2.2's mechanism, §2.3's
+  script+manifest contract, §2.4's discovery, §2.5's shared test-suite shape) is unchanged and
+  still real — a new algorithm still starts life exactly as described there. It just doesn't stay
+  there once proven.
+
+**Visualizations remain the deliberate, permanent exception** (§2A.3): `BuiltInVisualizers` is the
+*only* location for `Visualizer` conformances, native-only from day one — there was never a
+scripted stage for these, and there still isn't. There is no `Visualizations/*.js` bundle and no
+`VisualizerRegistry` script-discovery step at all.
+
+<details>
+<summary>Original policy (superseded above, kept for history)</summary>
 
 Per your decision: `.js` + manifest is the *default and primary* authoring path for **algorithms
 and shuffles** — not a fallback for "the ones you didn't get around to compiling."
@@ -515,10 +552,7 @@ you happen to port first while bootstrapping the system. This maximizes the "por
 ArrayV" goal, since a script is trivial to generate en masse (by hand or by a one-off translation
 pass) compared to hand-writing 189 Swift `SortAlgorithm` conformances.
 
-**Visualizations are the deliberate exception** (§2A.3): `BuiltInVisualizers` is the *only* location
-for `Visualizer` conformances, and it is **not** empty by default — it's where every visualization,
-including the ones ported from ArrayV, actually lives. There is no `Visualizations/*.js` bundle and
-no `VisualizerRegistry` script-discovery step at all.
+</details>
 
 ---
 
@@ -670,8 +704,8 @@ extra thought before porting:
 - **`concurrent/` (23 files)**: these assume real OS threads (`Thread`/`ExecutorService` in Java).
   `JSContext` is single-threaded, so port these as *sequential simulations* of the same algorithmic
   idea (interleave the "threads'" work deterministically, tape-record the interleaving) rather than
-  literal parallelism — or leave them as a `BuiltInAlgorithms` native entry if true concurrency
-  matters to the demonstration (§2.6's stated escape hatch).
+  literal parallelism — or, since native Swift is the target for everything now anyway (§2.6), just
+  write them directly as a `BuiltInAlgorithms` entry without a JS prototyping stage at all.
 - **Bogo/Stooge/slowsort-style "Impractical Sorts"**: no special handling needed structurally (they
   use the same `Reads`/`Writes` calls as anything else) — just keep `AlgorithmMetadata.sizeRange`
   tight and `confirmationWarning` set (§3.4), same as v1's existing Bogo/Bitonic gate.
@@ -1055,7 +1089,7 @@ rarely change, unlike "one more sorting algorithm."
 | `AlgorithmKit` | `SortAlgorithm`, `ShuffleAlgorithm` (§2A.4), metadata types, `AlgorithmID`/`ShuffleID`, `AlgorithmRegistry`/`ShuffleRegistry` | `SortEngineKit` |
 | `VisualizationKit` *(new, §2A)* | `Visualizer` protocol, `DrawCommand`, `VisualizationContext`, `VisualizerID`/`VisualizerMetadata`, `VisualizerRegistry`, native `Canvas`-based `VisualizationCanvas` renderer | `SortEngineKit` |
 | `ScriptingKit` | `JSRecordingEngineBridge`/`JSAlgorithmAdapter` (§2.2), manifest decoding, execution-time watchdog — **algorithms and shuffles only**, no visualization bridge (§2A.3) | `AlgorithmKit`, `JavaScriptCore` |
-| `BuiltInAlgorithms` | Native `SortAlgorithm`/`ShuffleAlgorithm` conformances — **empty by default** (§2.6), an escape hatch only | `AlgorithmKit` |
+| `BuiltInAlgorithms` | Native `SortAlgorithm`/`ShuffleAlgorithm` conformances — **the target for every algorithm** (§2.6, revised); `Algorithms/`'s scripts are a temporary proving ground, not a permanent home | `AlgorithmKit` |
 | `BuiltInVisualizers` *(new)* | Native `Visualizer` conformances — **every** visualization lives here (§2.6); not an escape hatch, the primary and only location | `VisualizationKit` |
 | `AudioEngineKit` | `AudioService`, `AudioPlaying` | AudioKit family (SPM) |
 | `PersistenceKit` | `RunSummary` (SwiftData + CloudKit sync, retained per §9), `AnalyticsService`, `DeviceInfoProvider` | SwiftData, CloudKit |
@@ -1131,7 +1165,10 @@ synchronous) `RecordingEngine` — there's no concurrent writer left to protect 
               (SortAlgorithm, ShuffleAlgorithm)   (Visualizer, DrawCommand)
                   │              │                          │
            ScriptingKit    BuiltInAlgorithms          BuiltInVisualizers
-        (JS plugin bridge)  (empty by default)   (every visualizer lives here — §2.6)
+       (proving ground —   (target for every       (every visualizer lives here — §2.6)
+        empty until a new   algorithm — §2.6,
+        algorithm is being     revised)
+        prototyped)
                        └──────┬───────┘                     │
                               │                              │
                               └──────────────┬───────────────┘
@@ -1164,12 +1201,13 @@ Shuffles/*.js + *.manifest.json          ──discovered at runtime──▶  S
 - **`ReplayEngine`**: assert `frame` after N `stepForward()` calls matches the array state a
   reference (e.g. `Array.sorted()`-based) implementation would produce at the same operation index;
   assert `seek(to:)` and seeking-then-stepping agree.
-- **`JSAlgorithmAdapter`** (algorithms and shuffles; no visualization equivalent, §2A.3): since
-  those two ship scripted by default (§2.6), keep exactly one algorithm as a permanent **test-only**
-  native fixture (never shipped in `BuiltInAlgorithms`) purely so the bridge itself has a
-  known-correct reference to diff against — run the native fixture and its JS-authored twin through
-  identical input and assert identical tapes. This is a bridge-correctness check, not a claim that
-  native and JS versions both ship.
+- **`JSAlgorithmAdapter`** (algorithms and shuffles; no visualization equivalent, §2A.3): the bridge
+  itself (§2.2) stays exercised even though every shipped algorithm is native now (§2.6, revised) —
+  keep exactly one algorithm as a permanent **test-only** native fixture (never shipped in
+  `BuiltInAlgorithms`) purely so the bridge has a known-correct reference to diff against — run the
+  native fixture and its JS-authored twin through identical input and assert identical tapes. This
+  is a bridge-correctness check, proving the proving-ground path (§2.6) still works for whatever
+  algorithm gets prototyped there next, not a claim that native and JS versions both ship.
 - **`Visualizer`**: plain unit tests per conformance — feed a hand-built `VisualizationContext` in,
   assert the expected `[DrawCommand]` out. No bridge, no timeout case, no manifest to validate —
   it's ordinary pure-function testing (§2A.3).
@@ -1202,9 +1240,11 @@ The following were open questions in an earlier draft of this document; all five
   Catalyst doesn't have this problem. Catalyst's other rough edges are a known, accepted tradeoff
   against that specific AppKit regression. `Module.framework`'s `destinations` default stays
   `[.iPhone, .iPad, .macCatalyst]`; no true native macOS destination is planned.
-- **How many algorithms/shuffles stay native vs. move to JS — as many as possible, scripted by
-  default; visualizations are always native.** See §2.6/§2A.3: the goal is porting *every*
-  algorithm ArrayV has, which is only realistic as scripts, while every visualization is a native
+- **How many algorithms/shuffles stay native vs. move to JS — revised: every shipped algorithm
+  goes native eventually; JS is a temporary proving-ground stage, not a permanent home.** See
+  §2.6 (revised) — the original "scripted by default, as many as possible" answer optimized for
+  authoring velocity while porting all of ArrayV, but running the app for real exposed JS-on-iOS's
+  lack of a JIT as a genuine recording-speed cost. Every visualization is, and always was, a native
   `Visualizer` conformance regardless (a JS bridge for drawing was considered and rejected — see
   §2A.3 — since it would require either reimplementing `GraphicsContext` for scripts to target, or
   some dynamic-dispatch scene-graph layer over SwiftUI, for a plugin axis simple enough that native
