@@ -65,4 +65,32 @@ struct AnalyticsServiceTests {
         let rows = try await service.fetchAllForTesting()
         #expect(rows.count == 3)
     }
+
+    /// `BenchmarkFeature`'s `DeviceComparisonView` relies on this filtering to one algorithm and
+    /// sorting newest-first — both are asserted directly here rather than only indirectly through
+    /// a UI test.
+    @Test
+    func fetchSummariesFiltersByAlgorithmAndSortsNewestFirst() async throws {
+        let service = try makeInMemoryService()
+        let older = Date(timeIntervalSince1970: 1000)
+        let newer = Date(timeIntervalSince1970: 2000)
+
+        for (algorithmID, recordedAt) in [("quicksort", older), ("quicksort", newer), ("gnomesort", newer)] {
+            let header = TapeHeader(
+                algorithmID: algorithmID,
+                initialValues: [1, 2, 3],
+                visualSeed: 0,
+                compareCount: 1,
+                swapCount: 1,
+                recordingDuration: 0,
+                recordedAt: recordedAt
+            )
+            try await service.record(header, algorithmID: AlgorithmID(rawValue: algorithmID))
+        }
+
+        let quickSortRows = try await service.fetchSummaries(algorithmID: AlgorithmID(rawValue: "quicksort"))
+        #expect(quickSortRows.count == 2)
+        #expect(quickSortRows.map(\.recordedAt) == [newer, older])
+        #expect(quickSortRows.allSatisfy { $0.algorithmID == "quicksort" })
+    }
 }

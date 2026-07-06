@@ -1,4 +1,5 @@
 import AlgorithmKit
+import BenchmarkFeature
 import DesignSystemKit
 import HomeFeature
 import SettingsFeature
@@ -13,6 +14,7 @@ import SwiftUI
 struct ContentView: View {
     @State private var selection: AlgorithmID?
     @State private var isShowingSettings = false
+    @State private var isShowingBenchmark = false
 
     var body: some View {
         NavigationSplitView {
@@ -39,6 +41,14 @@ struct ContentView: View {
             .toolbar {
                 ToolbarItem(placement: .primaryAction) {
                     Button {
+                        isShowingBenchmark = true
+                    } label: {
+                        Image(systemName: "chart.xyaxis.line")
+                    }
+                    .accessibilityIdentifier("benchmarkButton")
+                }
+                ToolbarItem(placement: .primaryAction) {
+                    Button {
                         isShowingSettings = true
                     } label: {
                         Image(systemName: "gearshape")
@@ -60,6 +70,16 @@ struct ContentView: View {
                     .toolbar {
                         ToolbarItem(placement: .cancellationAction) {
                             Button("Done") { isShowingSettings = false }
+                        }
+                    }
+            }
+        }
+        .sheet(isPresented: $isShowingBenchmark) {
+            NavigationStack {
+                BenchmarkView()
+                    .toolbar {
+                        ToolbarItem(placement: .cancellationAction) {
+                            Button("Done") { isShowingBenchmark = false }
                         }
                     }
             }

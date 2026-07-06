@@ -42,6 +42,18 @@ public actor AnalyticsService {
         try modelContext.fetch(FetchDescriptor<RunSummary>()).map(RunSummarySnapshot.init)
     }
 
+    /// `BenchmarkFeature`'s `DeviceComparisonView` — every recorded run for one algorithm, across
+    /// every device that's ever completed a sort while signed into the same iCloud account (§9 of
+    /// ARCHITECTURE_V2.md: this is the entire reason `AnalyticsService` tags rows by device at
+    /// all). Sorted newest-first so a device that's run the algorithm many times shows its most
+    /// recent result first.
+    public func fetchSummaries(algorithmID: AlgorithmID) throws -> [RunSummarySnapshot] {
+        let rawID = algorithmID.rawValue
+        var descriptor = FetchDescriptor<RunSummary>(predicate: #Predicate { $0.algorithmID == rawID })
+        descriptor.sortBy = [SortDescriptor(\.recordedAt, order: .reverse)]
+        return try modelContext.fetch(descriptor).map(RunSummarySnapshot.init)
+    }
+
     /// A broken schema/container should fail loudly at launch, not be swallowed — matches the
     /// "fail loudly on a mis-configured app" precedent already used elsewhere (e.g. `ContentView`'s
     /// `fatalError` for missing bundled algorithm resources).
@@ -52,14 +64,16 @@ public actor AnalyticsService {
     }
 }
 
-struct RunSummarySnapshot: Sendable, Equatable {
-    let algorithmID: String
-    let arraySize: Int
-    let compareCount: Int
-    let swapCount: Int
-    let recordingDuration: TimeInterval
-    let deviceModel: String
-    let recordedAt: Date
+public struct RunSummarySnapshot: Sendable, Equatable, Identifiable {
+    public let algorithmID: String
+    public let arraySize: Int
+    public let compareCount: Int
+    public let swapCount: Int
+    public let recordingDuration: TimeInterval
+    public let deviceModel: String
+    public let recordedAt: Date
+
+    public var id: String { "\(deviceModel)-\(recordedAt.timeIntervalSinceReferenceDate)" }
 
     init(_ summary: RunSummary) {
         algorithmID = summary.algorithmID
