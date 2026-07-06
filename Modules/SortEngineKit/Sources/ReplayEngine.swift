@@ -135,6 +135,11 @@ public final class ReplayEngine {
         }
     }
 
+    /// Above this many renders per second, a batch of operations is applied per tick instead of
+    /// one, capped at `maxOpsPerTick` — see `play()`'s doc comment for why both exist.
+    private static let targetRenderHz = 30.0
+    private static let maxOpsPerTick = 20
+
     /// Returns the playback `Task` so callers (e.g. `SortSession`) can `await` its completion
     /// instead of polling `isPlaying`.
     ///
@@ -145,17 +150,69 @@ public final class ReplayEngine {
     /// `stepForward()`/`stepBackward()`/`seek(to:)` directly never triggers audio.
     ///
     /// Reads `speed` fresh on every iteration (rather than capturing it once as a parameter) so a
-    /// caller can change it live, mid-replay, and see the new cadence take effect on the next step.
+    /// caller can change it live, mid-replay, and see the new cadence take effect on the next tick.
+    ///
+    /// Applies a *batch* of operations per tick rather than one, sized so ticks never demand more
+    /// than `targetRenderHz` renders per second, capped at `maxOpsPerTick`. The batch is
+    /// accumulated into local variables and written back to `frame`/`stepIndex`/`compareCount`/
+    /// `swapCount` **exactly once per tick**, not once per operation — calling `stepForward()` in
+    /// a loop would still mutate each `@Observable` property once per operation, leaving the same
+    /// total mutation count as before batching, since coalescing render *requests* doesn't reduce
+    /// how many times observed state actually changed.
+    ///
+    /// NOTE: measured on-device throughput at high `speed` still falls well short of what this
+    /// formula alone predicts — real per-tick overhead in a live view hierarchy is substantially
+    /// higher than `targetRenderHz` assumes, by a factor this implementation doesn't fully close.
+    /// An adaptive variant that sized `opsPerTick` off each tick's *measured* duration was tried
+    /// and rejected: it grew `opsPerTick` into the 80s-90s without converging, while throughput
+    /// stayed flat — a runaway rather than a stabilizing feedback loop, whose root cause (traced
+    /// through ruling out audio, canvas content, array size, `.glassEffect`, and a heavy sibling
+    /// view) is not yet understood and likely needs Instruments/real-device profiling to isolate.
+    /// `maxOpsPerTick` keeps this simpler, fixed-formula version bounded and predictable rather
+    /// than risking that same instability.
     @discardableResult
     public func play(onStep: ((SortOperation) -> Void)? = nil) -> Task<Void, Never> {
         isPlaying = true
         currentSegmentStart = Date()
         let task = Task { [weak self] in
             while let self, self.stepIndex < self.tape.operations.count, !Task.isCancelled {
-                let operation = self.tape.operations[self.stepIndex]
-                self.stepForward()
-                onStep?(operation)
-                try? await Task.sleep(for: .seconds(1.0 / self.speed))
+                let opsPerTick = max(1, min(Self.maxOpsPerTick, Int((self.speed / Self.targetRenderHz).rounded())))
+
+                var workingFrame = self.frame
+                var workingAuxArrays = self.auxArrays
+                var workingCompareCount = self.compareCount
+                var workingSwapCount = self.swapCount
+                var workingStepIndex = self.stepIndex
+                var appliedOperations: [SortOperation] = []
+                appliedOperations.reserveCapacity(opsPerTick)
+
+                for _ in 0..<opsPerTick {
+                    guard workingStepIndex < self.tape.operations.count else { break }
+                    let operation = self.tape.operations[workingStepIndex]
+                    Self.apply(
+                        operation,
+                        to: &workingFrame,
+                        auxArrays: &workingAuxArrays,
+                        compareCount: &workingCompareCount,
+                        swapCount: &workingSwapCount
+                    )
+                    workingStepIndex += 1
+                    appliedOperations.append(operation)
+                }
+
+                // One assignment per observed property per tick, regardless of opsPerTick.
+                self.frame = workingFrame
+                self.auxArrays = workingAuxArrays
+                self.compareCount = workingCompareCount
+                self.swapCount = workingSwapCount
+                self.stepIndex = workingStepIndex
+
+                for operation in appliedOperations {
+                    onStep?(operation)
+                }
+
+                guard self.stepIndex < self.tape.operations.count else { break }
+                try? await Task.sleep(for: .seconds(Double(appliedOperations.count) / self.speed))
             }
             self?.isPlaying = false
         }

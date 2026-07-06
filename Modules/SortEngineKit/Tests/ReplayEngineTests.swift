@@ -79,6 +79,49 @@ struct ReplayEngineTests {
         #expect(engine.stepIndex == tape.operations.count)
     }
 
+    /// Regression test for the render-rate decoupling fix: batching operations per tick at high
+    /// speed must not change *what* gets applied — every operation still lands in order, with the
+    /// same final compare/swap counts as stepping through one at a time.
+    @Test
+    func highSpeedBatchedPlaybackAppliesEveryOperationInOrder() async {
+        let operations: [SortOperation] = (0..<50).map { i in
+            i.isMultiple(of: 2) ? .compare(0, 1) : .swap(0, 1)
+        }
+        let tape = makeTape(initialValues: [1, 2], operations: operations)
+
+        let reference = ReplayEngine(tape: tape)
+        for _ in 0..<operations.count { reference.stepForward() }
+
+        let batched = ReplayEngine(tape: tape)
+        batched.speed = 100_000.0 // far above targetRenderHz, so many ops apply per tick
+
+        let task = batched.play()
+        await task.value
+
+        #expect(batched.stepIndex == reference.stepIndex)
+        #expect(batched.frame.map(\.value) == reference.frame.map(\.value))
+        #expect(batched.compareCount == reference.compareCount)
+        #expect(batched.swapCount == reference.swapCount)
+    }
+
+    /// At a speed below the render-rate cap, batching should compute to exactly one operation per
+    /// tick — i.e. no behavior change from before this fix for ordinary, non-extreme speeds.
+    @Test
+    func lowSpeedPlaybackAppliesOneOperationPerTick() async {
+        let operations: [SortOperation] = (0..<3).map { _ in .compare(0, 1) }
+        let tape = makeTape(initialValues: [1, 2], operations: operations)
+        let engine = ReplayEngine(tape: tape)
+        engine.speed = 10.0 // well under targetRenderHz (60) -> opsPerTick rounds to 1
+
+        let task = engine.play()
+
+        // Give it enough time for exactly one tick (100ms at 10/sec) but not two.
+        try? await Task.sleep(for: .milliseconds(60))
+        #expect(engine.stepIndex == 1, "expected exactly one operation applied per tick at low speed")
+
+        task.cancel()
+    }
+
     @Test
     func auxArraysCreateWriteAndDeleteAcrossReplay() {
         let tape = makeTape(initialValues: [1, 2], operations: [
