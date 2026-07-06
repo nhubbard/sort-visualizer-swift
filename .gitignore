@@ -1075,3 +1075,5 @@ Derived/
 # Project.swift is the source of truth, not the generated Xcode project/workspace.
 /*.xcodeproj/
 /*.xcworkspace/
+# Instruments traces
+*.trace
