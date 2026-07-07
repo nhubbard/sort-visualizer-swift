@@ -8,15 +8,16 @@ struct RecordingEngineTests {
         var engine = RecordingEngine(values: [5, 3])
         _ = engine.compare(0, 1)
 
-        let (tape, compareCount, swapCount, auxWriteCount) = engine.finish()
-        #expect(tape == [
+        let summary = engine.finish()
+        #expect(summary.tape == [
             .mark(marker: Marker.primary, index: 0),
             .mark(marker: Marker.secondary, index: 1),
             .compare(0, 1),
         ])
-        #expect(compareCount == 1)
-        #expect(swapCount == 0)
-        #expect(auxWriteCount == 0)
+        #expect(summary.compareCount == 1)
+        #expect(summary.swapCount == 0)
+        #expect(summary.mainWriteCount == 0)
+        #expect(summary.auxWriteCount == 0)
     }
 
     @Test
@@ -25,13 +26,53 @@ struct RecordingEngineTests {
         engine.swap(0, 1)
 
         #expect(engine.values == [3, 5])
-        let (tape, _, swapCount, _) = engine.finish()
-        #expect(tape == [
+        let summary = engine.finish()
+        #expect(summary.tape == [
             .mark(marker: Marker.primary, index: 0),
             .mark(marker: Marker.secondary, index: 1),
             .swap(0, 1),
         ])
-        #expect(swapCount == 1)
+        #expect(summary.swapCount == 1)
+        // A swap is two array writes (ArrayV's `Writes.updateSwap` convention), not one.
+        #expect(summary.mainWriteCount == 2)
+    }
+
+    @Test
+    func setValueIncrementsMainWriteCount() {
+        var engine = RecordingEngine(values: [1, 2])
+        engine.setValue(0, 9)
+        engine.setValue(1, 8)
+
+        #expect(engine.values == [9, 8])
+        let summary = engine.finish()
+        #expect(summary.mainWriteCount == 2)
+        #expect(summary.swapCount == 0)
+    }
+
+    @Test
+    func reversalPerformsSwapsAndCountsAsOneOperation() {
+        var engine = RecordingEngine(values: [1, 2, 3, 4, 5])
+        engine.reversal(0, 4)
+
+        #expect(engine.values == [5, 4, 3, 2, 1])
+        let summary = engine.finish()
+        #expect(summary.reversalCount == 1)
+        // Built from swap() internally — still contributes element-by-element to swapCount/
+        // mainWriteCount, matching ArrayV's own reversal()-is-built-from-swap() convention.
+        #expect(summary.swapCount == 2)
+        #expect(summary.mainWriteCount == 4)
+        #expect(summary.tape.first == .reversal)
+    }
+
+    @Test
+    func reversalOfADegenerateRangePerformsNoSwapsButStillCounts() {
+        var engine = RecordingEngine(values: [1, 2, 3])
+        engine.reversal(0, 0)
+
+        #expect(engine.values == [1, 2, 3])
+        let summary = engine.finish()
+        #expect(summary.reversalCount == 1)
+        #expect(summary.swapCount == 0)
     }
 
     @Test
@@ -42,14 +83,15 @@ struct RecordingEngineTests {
         engine.writeAux(handle, at: 1, value: 7)
         engine.deleteAuxArray(handle)
 
-        let (tape, _, _, auxWriteCount) = engine.finish()
-        #expect(tape == [
+        let summary = engine.finish()
+        #expect(summary.tape == [
             .auxCreate(handle: handle.rawValue, length: 2),
             .auxWrite(handle: handle.rawValue, index: 0, value: 42),
             .auxWrite(handle: handle.rawValue, index: 1, value: 7),
             .auxDelete(handle: handle.rawValue),
         ])
-        #expect(auxWriteCount == 2)
+        #expect(summary.auxWriteCount == 2)
+        #expect(summary.mainWriteCount == 0)
     }
 
     @Test
@@ -58,8 +100,8 @@ struct RecordingEngineTests {
         _ = engine.compare(0, 1)
         _ = engine.compare(1, 2)
 
-        let (tape, _, _, _) = engine.finish()
-        #expect(tape == [
+        let summary = engine.finish()
+        #expect(summary.tape == [
             .mark(marker: Marker.primary, index: 0),
             .mark(marker: Marker.secondary, index: 1),
             .compare(0, 1),
@@ -77,8 +119,8 @@ struct RecordingEngineTests {
         _ = engine.compare(0, 1)
         engine.swap(1, 2)
 
-        let (tape, _, _, _) = engine.finish()
-        #expect(tape == [
+        let summary = engine.finish()
+        #expect(summary.tape == [
             .mark(marker: Marker.primary, index: 0),
             .mark(marker: Marker.secondary, index: 1),
             .compare(0, 1),
@@ -99,9 +141,10 @@ struct RecordingEngineTests {
         engine.swap(1, 2)
         _ = engine.compare(0, 1)
 
-        let (_, compareCount, swapCount, _) = engine.finish()
-        #expect(compareCount == 3)
-        #expect(swapCount == 2)
+        let summary = engine.finish()
+        #expect(summary.compareCount == 3)
+        #expect(summary.swapCount == 2)
+        #expect(summary.mainWriteCount == 4)
         #expect(engine.values == [1, 2, 3])
     }
 
@@ -112,8 +155,8 @@ struct RecordingEngineTests {
         engine.unmark(Marker.pivot)
         engine.unmarkAll()
 
-        let (tape, _, _, _) = engine.finish()
-        #expect(tape == [
+        let summary = engine.finish()
+        #expect(summary.tape == [
             .mark(marker: Marker.pivot, index: 0),
             .unmark(marker: Marker.pivot),
             .unmarkAll,

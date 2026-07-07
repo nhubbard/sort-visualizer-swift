@@ -5,7 +5,7 @@ public struct MergeSort: SortAlgorithm {
     public let id = AlgorithmID(rawValue: "mergesort")
     public let metadata = AlgorithmMetadata(
         displayName: "Merge Sort",
-        category: .logarithmic,
+        category: .merge,
         sizeRange: 16...512,
         stable: true,
         timeComplexity: ComplexityBounds(best: "O(n log n)", average: "O(n log n)", worst: "O(n log n)"),

@@ -5,7 +5,7 @@ public struct BurntPancakeSort: SortAlgorithm {
     public let id = AlgorithmID(rawValue: "burntpancakesort")
     public let metadata = AlgorithmMetadata(
         displayName: "Burnt Pancake Sort",
-        category: .quadratic,
+        category: .miscellaneous,
         sizeRange: 16...512,
         stable: false,
         timeComplexity: ComplexityBounds(best: "O(n^2)", average: "O(n^2)", worst: "O(n^2)"),
@@ -19,13 +19,7 @@ public struct BurntPancakeSort: SortAlgorithm {
         let n = engine.count
 
         func flip(_ end: Int) {
-            var start = 0
-            var end = end
-            while start < end {
-                engine.swap(start, end)
-                start += 1
-                end -= 1
-            }
+            engine.reversal(0, end)
         }
 
         var i = n - 1

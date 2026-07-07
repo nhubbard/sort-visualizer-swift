@@ -56,6 +56,23 @@ struct RunControlBar: View {
             statSlot(replay.swapCount, digits: 6)
             Text("swaps")
             dot
+            // Matches ArrayV's own on-screen order (Comparisons, Swaps, Reversals, Writes to Main
+            // Array, Writes to Auxiliary Array(s), Items in External Arrays) — always shown, even
+            // at zero, same as ArrayV itself never conditionally hides a stat an algorithm doesn't
+            // happen to use. Conditionally showing/hiding would also reflow the row exactly when
+            // the fixed-width slots above exist to prevent.
+            statSlot(replay.reversalCount, digits: 4)
+            Text("reversals")
+            dot
+            statSlot(replay.mainWriteCount, digits: 6)
+            Text("writes")
+            dot
+            statSlot(replay.auxWriteCount, digits: 6)
+            Text("aux writes")
+            dot
+            statSlot(replay.externalArrayItemCount, digits: 5)
+            Text("in external arrays")
+            dot
             statSlot(String(format: "%.1fs", replay.elapsedPlaybackDuration), digits: 6)
             dot
             statSlot(String(format: "%.0f ops/sec", opsPerSecond), digits: 4)

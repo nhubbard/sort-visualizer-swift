@@ -17,6 +17,16 @@ public struct TapeHeader: Sendable, Codable, Equatable {
     public let visualSeed: UInt64
     public let compareCount: Int
     public let swapCount: Int
+    /// Writes to the main array — a swap counts as 2, matching ArrayV's `Writes.updateSwap`
+    /// convention (two elements physically move), plus 1 per `.setValue`.
+    public let mainWriteCount: Int
+    /// Writes to auxiliary/scratch buffers created via `createAuxArray` (merge sort's temp array,
+    /// radix sort's digit registers, etc.) — ArrayV's `Writes.auxWrites`.
+    public let auxWriteCount: Int
+    /// Whole-range-reverse operations (`RecordingEngine.reversal(_:_:)`) — ArrayV's
+    /// `Writes.reversals`. Each one also contributes to `swapCount`/`mainWriteCount`
+    /// element-by-element; this counts the operation, not the element moves.
+    public let reversalCount: Int
     /// Wall-clock time to RECORD — this is the real perf number, decoupled from playback speed.
     public let recordingDuration: TimeInterval
     public let recordedAt: Date
@@ -36,6 +46,9 @@ public struct TapeHeader: Sendable, Codable, Equatable {
         visualSeed: UInt64,
         compareCount: Int,
         swapCount: Int,
+        mainWriteCount: Int = 0,
+        auxWriteCount: Int = 0,
+        reversalCount: Int = 0,
         recordingDuration: TimeInterval,
         recordedAt: Date,
         shuffleID: String? = nil,
@@ -46,6 +59,9 @@ public struct TapeHeader: Sendable, Codable, Equatable {
         self.visualSeed = visualSeed
         self.compareCount = compareCount
         self.swapCount = swapCount
+        self.mainWriteCount = mainWriteCount
+        self.auxWriteCount = auxWriteCount
+        self.reversalCount = reversalCount
         self.recordingDuration = recordingDuration
         self.recordedAt = recordedAt
         self.shuffleID = shuffleID

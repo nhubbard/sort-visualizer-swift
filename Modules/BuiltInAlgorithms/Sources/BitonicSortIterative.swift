@@ -5,7 +5,7 @@ public struct BitonicSortIterative: SortAlgorithm {
     public let id = AlgorithmID(rawValue: "bitonicsortiterative")
     public let metadata = AlgorithmMetadata(
         displayName: "Bitonic Sort (Iterative)",
-        category: .weird,
+        category: .concurrent,
         sizeRange: 16...512,
         stable: false,
         timeComplexity: ComplexityBounds(best: "O(log^2 n)", average: "O(log^2 n)", worst: "O(log^2 n)"),

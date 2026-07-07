@@ -5,7 +5,7 @@ public struct QuickSort: SortAlgorithm {
     public let id = AlgorithmID(rawValue: "quicksort")
     public let metadata = AlgorithmMetadata(
         displayName: "Quick Sort",
-        category: .logarithmic,
+        category: .exchange,
         sizeRange: 16...512,
         stable: false,
         timeComplexity: ComplexityBounds(best: "O(n log n)", average: "O(n log n)", worst: "O(n^2)"),

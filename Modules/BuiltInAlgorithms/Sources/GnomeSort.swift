@@ -5,7 +5,7 @@ public struct GnomeSort: SortAlgorithm {
     public let id = AlgorithmID(rawValue: "gnomesort")
     public let metadata = AlgorithmMetadata(
         displayName: "Gnome Sort",
-        category: .quadratic,
+        category: .exchange,
         sizeRange: 16...512,
         stable: true,
         timeComplexity: ComplexityBounds(best: "O(n)", average: "O(n^2)", worst: "O(n^2)"),

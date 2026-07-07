@@ -14,7 +14,7 @@ private struct FakeAlgorithm: SortAlgorithm {
     var metadata: AlgorithmMetadata {
         AlgorithmMetadata(
             displayName: "Fake",
-            category: .weird,
+            category: .exchange,
             sizeRange: sizeRange,
             stable: true,
             timeComplexity: ComplexityBounds(best: "O(n)", average: "O(n^2)", worst: "O(n^2)"),

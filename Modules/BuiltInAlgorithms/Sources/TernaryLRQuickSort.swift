@@ -5,7 +5,7 @@ public struct TernaryLRQuickSort: SortAlgorithm {
     public let id = AlgorithmID(rawValue: "ternarylrquicksort")
     public let metadata = AlgorithmMetadata(
         displayName: "Ternary Quick Sort (LR)",
-        category: .logarithmic,
+        category: .quick,
         sizeRange: 16...512,
         stable: false,
         timeComplexity: ComplexityBounds(best: "O(n log n)", average: "O(n log n)", worst: "O(n^2)"),

@@ -36,6 +36,9 @@ struct ReplayEngineTests {
         #expect(engine.frame[0].isSorted)
         #expect(engine.compareCount == 1)
         #expect(engine.swapCount == 1)
+        // A swap is two array writes (ArrayV's `Writes.updateSwap` convention).
+        #expect(engine.mainWriteCount == 2)
+        #expect(engine.auxWriteCount == 0)
         #expect(engine.stepIndex == tape.operations.count)
     }
 
@@ -133,11 +136,37 @@ struct ReplayEngineTests {
         for _ in 0..<tape.operations.count { engine.stepForward() }
 
         #expect(engine.auxArrays[0] == [9, 4])
+        #expect(engine.auxWriteCount == 2)
+        #expect(engine.mainWriteCount == 0)
+        // `auxCreate` allocates a 2-element buffer up front — "items in external arrays" reflects
+        // the live buffer size, not the number of writes into it.
+        #expect(engine.externalArrayItemCount == 2)
 
         let deleteTape = makeTape(initialValues: [1], operations: tape.operations + [.auxDelete(handle: 0)])
         let deleteEngine = ReplayEngine(tape: deleteTape)
         for _ in 0..<deleteTape.operations.count { deleteEngine.stepForward() }
         #expect(deleteEngine.auxArrays[0] == nil)
+        #expect(deleteEngine.externalArrayItemCount == 0)
+    }
+
+    @Test
+    func reversalMarkerIsStructurallyInertButCountsAndStepsLikeAnyOtherOperation() {
+        var recording = RecordingEngine(values: [1, 2, 3, 4, 5])
+        recording.reversal(0, 4)
+        let tape = makeTape(initialValues: [1, 2, 3, 4, 5], operations: recording.finish().tape)
+
+        let engine = ReplayEngine(tape: tape)
+        // Step to just past the `.reversal` marker itself (before the swaps it's built from) —
+        // it must count immediately without touching `frame`, matching `.compare`'s "counted,
+        // structurally inert" behavior.
+        engine.stepForward()
+        #expect(engine.reversalCount == 1)
+        #expect(engine.frame.map(\.value) == [1, 2, 3, 4, 5])
+
+        for _ in 1..<tape.operations.count { engine.stepForward() }
+        #expect(engine.frame.map(\.value) == [5, 4, 3, 2, 1])
+        #expect(engine.reversalCount == 1)
+        #expect(engine.swapCount == 2)
     }
 
     @Test
@@ -222,7 +251,7 @@ struct ReplayEngineTests {
         recording.swap(2, 3)
         _ = recording.compare(3, 4)
         recording.swap(3, 4)
-        let (operations, _, _, _) = recording.finish()
+        let operations = recording.finish().tape
 
         let tape = makeTape(initialValues: [5, 3, 8, 1, 9, 2], operations: operations)
         let engine = ReplayEngine(tape: tape)

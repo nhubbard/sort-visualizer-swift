@@ -5,7 +5,7 @@ public struct BogoSort: SortAlgorithm {
     public let id = AlgorithmID(rawValue: "bogosort")
     public let metadata = AlgorithmMetadata(
         displayName: "Bogo Sort",
-        category: .weird,
+        category: .impractical,
         sizeRange: 4...16,
         stable: false,
         timeComplexity: ComplexityBounds(best: "O(n)", average: "O(n * n!)", worst: "O(n * n!)"),

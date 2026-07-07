@@ -6,7 +6,7 @@ public struct IntroSort: SortAlgorithm {
     public let id = AlgorithmID(rawValue: "introsort")
     public let metadata = AlgorithmMetadata(
         displayName: "Intro Sort",
-        category: .logarithmic,
+        category: .hybrid,
         sizeRange: 16...512,
         stable: false,
         timeComplexity: ComplexityBounds(best: "O(n log n)", average: "O(n log n)", worst: "O(n log n)"),

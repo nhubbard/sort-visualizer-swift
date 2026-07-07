@@ -5,7 +5,7 @@ public struct PancakeSort: SortAlgorithm {
     public let id = AlgorithmID(rawValue: "pancakesort")
     public let metadata = AlgorithmMetadata(
         displayName: "Pancake Sort",
-        category: .quadratic,
+        category: .miscellaneous,
         sizeRange: 16...512,
         stable: false,
         timeComplexity: ComplexityBounds(best: "O(n^2)", average: "O(n^2)", worst: "O(n^2)"),
@@ -17,13 +17,7 @@ public struct PancakeSort: SortAlgorithm {
         let n = engine.count
 
         func flip(_ end: Int) {
-            var end = end
-            var start = 0
-            while start < end {
-                engine.swap(start, end)
-                start += 1
-                end -= 1
-            }
+            engine.reversal(0, end)
         }
 
         func findMaxIndex(_ end: Int) -> Int {

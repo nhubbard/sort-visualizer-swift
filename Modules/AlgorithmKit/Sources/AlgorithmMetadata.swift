@@ -1,18 +1,43 @@
 import SortEngineKit
 
-/// The same three groups the app already uses (`Shared/Assets.xcassets/Algorithm Icons/{Logarithmic,Quadratic,Weird}`).
+/// ArrayV's own taxonomy (`Sort.setCategory(...)`/`@SortMeta`/`@SortPackageMeta` across
+/// `~/ArrayV/src/main/java/io/github/arrayv/sorts/`), not this app's own invention — matching it
+/// means every ported algorithm files under the same category ArrayV itself assigns, including
+/// cases where that disagrees with ArrayV's own physical package layout (e.g. `BogoSort.java`
+/// lives in `sorts/distribute/` but is actually categorized `.impractical`). ArrayV's own
+/// `"Distributive Sorts"` (a one-off misspelling of `"Distribution Sorts"` affecting exactly one
+/// algorithm, `SimplisticGravitySort`) and `"Tests"` (an internal correctness check, not a real
+/// sort) aren't represented here — the former files under `.distribution` when ported, correcting
+/// the typo rather than perpetuating it; the latter isn't a sort at all.
+///
+/// `iconName` (on `AlgorithmMetadata` below) is a real SF Symbol name, resolved via
+/// `CustomIconLabel` — v2 never ported Legacy's per-algorithm custom icon-image assets.
 public enum AlgorithmCategory: String, Sendable, Codable, CaseIterable, Identifiable {
-    case logarithmic
-    case quadratic
-    case weird
+    case concurrent
+    case distribution
+    case exchange
+    case hybrid
+    case impractical
+    case insertion
+    case merge
+    case miscellaneous
+    case quick
+    case selection
 
     public var id: Self { self }
 
     public var displayName: String {
         switch self {
-        case .logarithmic: "Logarithmic"
-        case .quadratic: "Quadratic"
-        case .weird: "Weird"
+        case .concurrent: "Concurrent Sorts"
+        case .distribution: "Distribution Sorts"
+        case .exchange: "Exchange Sorts"
+        case .hybrid: "Hybrid Sorts"
+        case .impractical: "Impractical Sorts"
+        case .insertion: "Insertion Sorts"
+        case .merge: "Merge Sorts"
+        case .miscellaneous: "Miscellaneous Sorts"
+        case .quick: "Quick Sorts"
+        case .selection: "Selection Sorts"
         }
     }
 }

@@ -12,7 +12,7 @@ private struct BubbleSortReference: SortAlgorithm {
     let id = AlgorithmID(rawValue: "bubblesort-reference")
     let metadata = AlgorithmMetadata(
         displayName: "Bubble Sort (native reference)",
-        category: .quadratic,
+        category: .exchange,
         sizeRange: 1...512,
         stable: true,
         timeComplexity: ComplexityBounds(best: "O(n)", average: "O(n^2)", worst: "O(n^2)"),
@@ -104,8 +104,8 @@ struct JSAlgorithmAdapterTests {
         """)
         try adapter.recordThrowing(into: &engine)
 
-        let (tape, _, _, auxWriteCount) = engine.finish()
-        #expect(tape == [
+        let summary = engine.finish()
+        #expect(summary.tape == [
             .mark(marker: 7, index: 0),
             .auxCreate(handle: 0, length: 2),
             .auxWrite(handle: 0, index: 0, value: 99),
@@ -114,6 +114,6 @@ struct JSAlgorithmAdapterTests {
             .unmark(marker: 7),
             .unmarkAll,
         ])
-        #expect(auxWriteCount == 2)
+        #expect(summary.auxWriteCount == 2)
     }
 }

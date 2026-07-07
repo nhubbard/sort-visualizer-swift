@@ -5,7 +5,7 @@ public struct StrandSort: SortAlgorithm {
     public let id = AlgorithmID(rawValue: "strandsort")
     public let metadata = AlgorithmMetadata(
         displayName: "Strand Sort",
-        category: .logarithmic,
+        category: .merge,
         sizeRange: 16...512,
         stable: true,
         timeComplexity: ComplexityBounds(best: "O(n)", average: "O(n log n)", worst: "O(n^2)"),

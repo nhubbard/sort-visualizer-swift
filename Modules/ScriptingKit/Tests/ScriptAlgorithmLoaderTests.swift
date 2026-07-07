@@ -18,7 +18,7 @@ struct ScriptAlgorithmLoaderTests {
         {
             "id": "\(id)",
             "displayName": "Test Algorithm",
-            "category": "quadratic",
+            "category": "exchange",
             "stable": true,
             "sizeRange": [4, 64],
             "timeComplexity": { "best": "O(n)", "average": "O(n^2)", "worst": "O(n^2)" },
@@ -57,7 +57,7 @@ struct ScriptAlgorithmLoaderTests {
 
         let badRangeJSON = """
         {
-            "id": "badrange", "displayName": "Bad Range", "category": "weird", "stable": false,
+            "id": "badrange", "displayName": "Bad Range", "category": "exchange", "stable": false,
             "sizeRange": [64, 4],
             "timeComplexity": { "best": "O(n)", "average": "O(n)", "worst": "O(n)" },
             "spaceComplexity": "O(1)", "iconName": "test"
@@ -128,7 +128,7 @@ private struct FakeNativeAlgorithm: SortAlgorithm {
     let id = AlgorithmID(rawValue: "native")
     let metadata = AlgorithmMetadata(
         displayName: "Fake",
-        category: .weird,
+        category: .exchange,
         sizeRange: 1...10,
         stable: true,
         timeComplexity: ComplexityBounds(best: "O(1)", average: "O(1)", worst: "O(1)"),

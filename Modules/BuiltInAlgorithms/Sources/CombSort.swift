@@ -5,7 +5,7 @@ public struct CombSort: SortAlgorithm {
     public let id = AlgorithmID(rawValue: "combsort")
     public let metadata = AlgorithmMetadata(
         displayName: "Comb Sort",
-        category: .weird,
+        category: .exchange,
         sizeRange: 16...512,
         stable: false,
         timeComplexity: ComplexityBounds(best: "O(n log n)", average: "O(n^2)", worst: "O(n^2)"),

@@ -20,4 +20,11 @@ public enum SortOperation: Sendable, Codable, Equatable {
     case auxCreate(handle: Int, length: Int)
     case auxWrite(handle: Int, index: Int, value: Int)
     case auxDelete(handle: Int)
+    /// Counted, structurally inert — like `.compare`, never changes `values` on its own. Emitted
+    /// once per `RecordingEngine.reversal(_:_:)` call, immediately before the individual `.swap`s
+    /// that actually perform the flip, so a whole-range reverse is still visible swap-by-swap
+    /// while scrubbing/stepping, but also counts as one `reversalCount`, matching ArrayV's
+    /// `Writes.reversals` — a reversal is one *operation* built from many swaps, not its own kind
+    /// of element move.
+    case reversal
 }

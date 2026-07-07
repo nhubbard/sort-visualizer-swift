@@ -5,7 +5,7 @@ public struct SelectionSort: SortAlgorithm {
     public let id = AlgorithmID(rawValue: "selectionsort")
     public let metadata = AlgorithmMetadata(
         displayName: "Selection Sort",
-        category: .quadratic,
+        category: .selection,
         sizeRange: 16...512,
         stable: false,
         timeComplexity: ComplexityBounds(best: "O(n^2)", average: "O(n^2)", worst: "O(n^2)"),

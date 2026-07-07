@@ -6,7 +6,7 @@ private struct FakeAlgorithm: SortAlgorithm {
     let id: AlgorithmID
     let metadata = AlgorithmMetadata(
         displayName: "Fake",
-        category: .weird,
+        category: .exchange,
         sizeRange: 1...10,
         stable: true,
         timeComplexity: ComplexityBounds(best: "O(1)", average: "O(1)", worst: "O(1)"),

@@ -5,7 +5,7 @@ public struct MaxHeapSort: SortAlgorithm {
     public let id = AlgorithmID(rawValue: "maxheapsort")
     public let metadata = AlgorithmMetadata(
         displayName: "Max Heap Sort",
-        category: .logarithmic,
+        category: .selection,
         sizeRange: 16...512,
         stable: false,
         timeComplexity: ComplexityBounds(best: "O(n log n)", average: "O(n log n)", worst: "O(n log n)"),

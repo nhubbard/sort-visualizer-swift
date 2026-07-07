@@ -5,7 +5,7 @@ public struct InsertionSort: SortAlgorithm {
     public let id = AlgorithmID(rawValue: "insertionsort")
     public let metadata = AlgorithmMetadata(
         displayName: "Insertion Sort",
-        category: .quadratic,
+        category: .insertion,
         sizeRange: 16...512,
         stable: true,
         timeComplexity: ComplexityBounds(best: "O(n)", average: "O(n^2)", worst: "O(n^2)"),

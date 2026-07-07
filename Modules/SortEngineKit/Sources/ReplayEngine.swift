@@ -34,17 +34,27 @@ public final class ReplayEngine {
         public internal(set) var auxArrays: [Int: [Int]]
         public internal(set) var compareCount: Int
         public internal(set) var swapCount: Int
+        /// Writes to the main array — a swap counts as 2 (ArrayV's `Writes.updateSwap`
+        /// convention), plus 1 per `.setValue`.
+        public internal(set) var mainWriteCount: Int
+        /// Writes to auxiliary/scratch buffers (ArrayV's `Writes.auxWrites`).
+        public internal(set) var auxWriteCount: Int
+        /// Whole-range-reverse operations (ArrayV's `Writes.reversals`) — counts the operation,
+        /// not the element moves it's built from (those already land in `swapCount`).
+        public internal(set) var reversalCount: Int
         public internal(set) var stepIndex: Int
     }
 
     /// The one `@Observable`-tracked stored property behind `frame`/`auxArrays`/`compareCount`/
-    /// `swapCount`/`stepIndex` below. Profiling a live replay showed the main thread pegged inside
-    /// SwiftUI's AttributeGraph dirty-propagation machinery, not inside any view body — caused by
-    /// this type previously exposing those five as *separate* stored properties, each mutated
-    /// independently every tick, each firing its own Observable dirty-propagation. Bundling them
-    /// into one value and writing it exactly once per mutation (`stepForward`/`seek`/each `play()`
-    /// tick) cuts that fan-out 5x. Future stat categories belong here too, as new `PlaybackState`
-    /// fields — that's the whole point of consolidating rather than adding a sixth stored property.
+    /// `swapCount`/`mainWriteCount`/`auxWriteCount`/`reversalCount`/`stepIndex` below. Profiling a
+    /// live replay showed the main thread pegged inside SwiftUI's AttributeGraph dirty-propagation
+    /// machinery, not inside any view body — caused by this type previously exposing five of these
+    /// as *separate* stored properties, each mutated independently every tick, each firing its own
+    /// Observable dirty-propagation. Bundling them into one value and writing it exactly once per
+    /// mutation (`stepForward`/`seek`/each `play()` tick) cut that fan-out 5x at the time. Every
+    /// ArrayV-parity statistic added since (`mainWriteCount`/`auxWriteCount`/`reversalCount`, and
+    /// whatever comes next) is a new `PlaybackState` field for exactly that reason — adding it as
+    /// its own stored property on `ReplayEngine` would reopen the fan-out this consolidation closed.
     public private(set) var state: PlaybackState
 
     public var frame: [BarState] { state.frame }
@@ -52,6 +62,17 @@ public final class ReplayEngine {
     public var stepIndex: Int { state.stepIndex }
     public var compareCount: Int { state.compareCount }
     public var swapCount: Int { state.swapCount }
+    public var mainWriteCount: Int { state.mainWriteCount }
+    public var auxWriteCount: Int { state.auxWriteCount }
+    public var reversalCount: Int { state.reversalCount }
+
+    /// Live element count across all currently-allocated auxiliary/scratch buffers (ArrayV's
+    /// "Items in External Arrays" — `Writes.allocAmount`). Derived on demand from `auxArrays`
+    /// rather than tracked as its own counter — the live buffer contents are already `state`,
+    /// so a separate stored count would just be a second source of truth for the same number.
+    public var externalArrayItemCount: Int {
+        state.auxArrays.values.reduce(0) { $0 + $1.count }
+    }
 
     public private(set) var isPlaying = false
 
@@ -87,7 +108,8 @@ public final class ReplayEngine {
 
         let initialFrame = tape.header.initialValues.map { BarState(id: UUID(), value: $0) }
         let initialState = PlaybackState(
-            frame: initialFrame, auxArrays: [:], compareCount: 0, swapCount: 0, stepIndex: 0
+            frame: initialFrame, auxArrays: [:], compareCount: 0, swapCount: 0,
+            mainWriteCount: 0, auxWriteCount: 0, reversalCount: 0, stepIndex: 0
         )
         self.state = initialState
 
@@ -226,8 +248,10 @@ public final class ReplayEngine {
             state.frame[i].value = state.frame[j].value
             state.frame[j].value = temp
             state.swapCount += 1
+            state.mainWriteCount += 2
         case let .setValue(i, value):
             state.frame[i].value = value
+            state.mainWriteCount += 1
         case let .mark(marker, index):
             state.frame[index].markers.insert(marker)
         case let .unmark(marker):
@@ -244,8 +268,11 @@ public final class ReplayEngine {
             state.auxArrays[handle] = Array(repeating: 0, count: length)
         case let .auxWrite(handle, index, value):
             state.auxArrays[handle]![index] = value
+            state.auxWriteCount += 1
         case let .auxDelete(handle):
             state.auxArrays.removeValue(forKey: handle)
+        case .reversal:
+            state.reversalCount += 1
         }
         state.stepIndex += 1
     }

@@ -88,7 +88,7 @@ public final class SortSession {
 
         var shuffleEngine = RecordingEngine(values: identity)
         shuffle.record(into: &shuffleEngine)
-        let (shuffleOperations, _, _, _) = shuffleEngine.finish()
+        let shuffleSummary = shuffleEngine.finish()
 
         // recordingDuration measures only the sort, not the shuffle — it's the real algorithmic
         // performance number (§1.1), and a shuffle's cost isn't the algorithm's to answer for.
@@ -96,21 +96,24 @@ public final class SortSession {
         var sortEngine = RecordingEngine(values: shuffleEngine.values)
         algorithm.record(into: &sortEngine)
         let recordingDuration = Date().timeIntervalSince(recordingStart)
-        let (sortOperations, compareCount, swapCount, _) = sortEngine.finish()
+        let sortSummary = sortEngine.finish()
 
         return Tape(
             header: TapeHeader(
                 algorithmID: algorithm.id.rawValue,
                 initialValues: identity,
                 visualSeed: UInt64.random(in: .min ... .max),
-                compareCount: compareCount,
-                swapCount: swapCount,
+                compareCount: sortSummary.compareCount,
+                swapCount: sortSummary.swapCount,
+                mainWriteCount: sortSummary.mainWriteCount,
+                auxWriteCount: sortSummary.auxWriteCount,
+                reversalCount: sortSummary.reversalCount,
                 recordingDuration: recordingDuration,
                 recordedAt: Date(),
                 shuffleID: shuffle.id.rawValue,
-                sortStartIndex: shuffleOperations.count
+                sortStartIndex: shuffleSummary.tape.count
             ),
-            operations: shuffleOperations + sortOperations
+            operations: shuffleSummary.tape + sortSummary.tape
         )
     }
 
