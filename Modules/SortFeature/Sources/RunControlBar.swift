@@ -44,21 +44,52 @@ struct RunControlBar: View {
         .accessibilityIdentifier("runControlScrubSlider")
     }
 
+    /// Fixed-minimum-width digit slots, not one formatted `Text` — a single `Text` reflows (and
+    /// nudges every sibling in `transportRow` below it) every time a value's digit count changes,
+    /// which at real playback speeds is constantly. Reserving width up front means the row's total
+    /// width stays put; a value only grows into its own slot's padding.
     private var statsCaption: some View {
-        Text(statsText)
-            .font(.caption)
-            .foregroundStyle(.secondary)
-            .accessibilityIdentifier("runControlStatsCaption")
+        HStack(spacing: 4) {
+            statSlot(replay.compareCount, digits: 6)
+            Text("compares")
+            dot
+            statSlot(replay.swapCount, digits: 6)
+            Text("swaps")
+            dot
+            statSlot(String(format: "%.1fs", replay.elapsedPlaybackDuration), digits: 6)
+            dot
+            statSlot(String(format: "%.0f ops/sec", opsPerSecond), digits: 4)
+        }
+        .font(.caption)
+        .foregroundStyle(.secondary)
+        .accessibilityElement(children: .combine)
+        .accessibilityIdentifier("runControlStatsCaption")
     }
 
-    private var statsText: String {
+    // `stepIndex`, not `compareCount + swapCount` — merge-family algorithms record most of their
+    // tape as `.setValue`/`.auxWrite` (writing merged runs back), not `.compare`/`.swap`, so a
+    // compare+swap-only numerator badly undercounts real throughput for them while still looking
+    // correct for compare/swap-heavy algorithms like quicksort. `stepIndex` is the actual count of
+    // tape operations `ReplayEngine` has applied, regardless of type.
+    private var opsPerSecond: Double {
         let elapsed = replay.elapsedPlaybackDuration
-        let totalOps = replay.compareCount + replay.swapCount
-        let opsPerSecond = elapsed > 0 ? Double(totalOps) / elapsed : 0
-        return String(
-            format: "%d compares · %d swaps · %.1fs · %.0f ops/sec",
-            replay.compareCount, replay.swapCount, elapsed, opsPerSecond
-        )
+        return elapsed > 0 ? Double(replay.stepIndex) / elapsed : 0
+    }
+
+    private func statSlot(_ value: Int, digits: Int) -> some View {
+        Text("\(value)")
+            .monospacedDigit()
+            .frame(minWidth: CGFloat(digits) * 7.5, alignment: .trailing)
+    }
+
+    private func statSlot(_ text: String, digits: Int) -> some View {
+        Text(text)
+            .monospacedDigit()
+            .frame(minWidth: CGFloat(digits) * 7.5, alignment: .trailing)
+    }
+
+    private var dot: some View {
+        Text("·")
     }
 
     private var transportRow: some View {

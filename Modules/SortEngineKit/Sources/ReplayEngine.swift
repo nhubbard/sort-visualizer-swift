@@ -12,7 +12,7 @@ public final class ReplayEngine {
     /// marks/unmarks specific indices, independent of whatever value currently sits there), so
     /// keeping `id` pinned to the slot is what makes that model consistent, and it means a
     /// `Visualizer` never needs identity-tracking machinery to draw a frame correctly.
-    public struct BarState: Identifiable, Sendable {
+    public struct BarState: Identifiable, Sendable, Equatable {
         public let id: UUID
         public internal(set) var value: Int
         public internal(set) var markers: Set<Int> = []
@@ -24,13 +24,36 @@ public final class ReplayEngine {
         }
     }
 
-    public private(set) var frame: [BarState]
-    /// `AuxHandle.rawValue` -> current contents, for `VisualizationContext`.
-    public private(set) var auxArrays: [Int: [Int]] = [:]
-    public private(set) var stepIndex = 0
+    /// Everything that changes once per applied tape operation, bundled into one value so
+    /// `ReplayEngine` only ever performs a single `@Observable` write per mutation — see `state`'s
+    /// doc comment for why that matters. Distinct from `isPlaying`/`speed` below, which are
+    /// playback *controls*, not state derived from replaying the tape.
+    public struct PlaybackState: Sendable, Equatable {
+        public internal(set) var frame: [BarState]
+        /// `AuxHandle.rawValue` -> current contents, for `VisualizationContext`.
+        public internal(set) var auxArrays: [Int: [Int]]
+        public internal(set) var compareCount: Int
+        public internal(set) var swapCount: Int
+        public internal(set) var stepIndex: Int
+    }
+
+    /// The one `@Observable`-tracked stored property behind `frame`/`auxArrays`/`compareCount`/
+    /// `swapCount`/`stepIndex` below. Profiling a live replay showed the main thread pegged inside
+    /// SwiftUI's AttributeGraph dirty-propagation machinery, not inside any view body — caused by
+    /// this type previously exposing those five as *separate* stored properties, each mutated
+    /// independently every tick, each firing its own Observable dirty-propagation. Bundling them
+    /// into one value and writing it exactly once per mutation (`stepForward`/`seek`/each `play()`
+    /// tick) cuts that fan-out 5x. Future stat categories belong here too, as new `PlaybackState`
+    /// fields — that's the whole point of consolidating rather than adding a sixth stored property.
+    public private(set) var state: PlaybackState
+
+    public var frame: [BarState] { state.frame }
+    public var auxArrays: [Int: [Int]] { state.auxArrays }
+    public var stepIndex: Int { state.stepIndex }
+    public var compareCount: Int { state.compareCount }
+    public var swapCount: Int { state.swapCount }
+
     public private(set) var isPlaying = false
-    public private(set) var compareCount = 0
-    public private(set) var swapCount = 0
 
     /// Operations per second — a live knob, not a one-shot parameter: `play()`'s loop re-reads
     /// this on every iteration, so a caller (e.g. a run-control slider) can change it while
@@ -54,85 +77,51 @@ public final class ReplayEngine {
 
     private let tape: Tape
     /// Every ~500 operations, so `seek(to:)` never replays more than ~500 ops from the nearest one.
-    private let checkpoints: [Checkpoint]
+    private let checkpoints: [PlaybackState]
     private var playbackTask: Task<Void, Never>?
 
     private static let checkpointInterval = 500
-
-    private struct Checkpoint {
-        let step: Int
-        let frame: [BarState]
-        let auxArrays: [Int: [Int]]
-        let compareCount: Int
-        let swapCount: Int
-    }
 
     public init(tape: Tape) {
         self.tape = tape
 
         let initialFrame = tape.header.initialValues.map { BarState(id: UUID(), value: $0) }
-        self.frame = initialFrame
-        self.auxArrays = [:]
-        self.compareCount = 0
-        self.swapCount = 0
-        self.stepIndex = 0
+        let initialState = PlaybackState(
+            frame: initialFrame, auxArrays: [:], compareCount: 0, swapCount: 0, stepIndex: 0
+        )
+        self.state = initialState
 
-        var checkpoints = [Checkpoint(step: 0, frame: initialFrame, auxArrays: [:], compareCount: 0, swapCount: 0)]
-        var workingFrame = initialFrame
-        var workingAuxArrays: [Int: [Int]] = [:]
-        var workingCompareCount = 0
-        var workingSwapCount = 0
-        for (index, operation) in tape.operations.enumerated() {
-            Self.apply(
-                operation,
-                to: &workingFrame,
-                auxArrays: &workingAuxArrays,
-                compareCount: &workingCompareCount,
-                swapCount: &workingSwapCount
-            )
-            let step = index + 1
-            if step.isMultiple(of: Self.checkpointInterval) {
-                checkpoints.append(Checkpoint(
-                    step: step,
-                    frame: workingFrame,
-                    auxArrays: workingAuxArrays,
-                    compareCount: workingCompareCount,
-                    swapCount: workingSwapCount
-                ))
+        var checkpoints = [initialState]
+        var working = initialState
+        for operation in tape.operations {
+            Self.apply(operation, to: &working)
+            if working.stepIndex.isMultiple(of: Self.checkpointInterval) {
+                checkpoints.append(working)
             }
         }
         self.checkpoints = checkpoints
     }
 
     public func stepForward() {
-        guard stepIndex < tape.operations.count else { return }
-        Self.apply(
-            tape.operations[stepIndex],
-            to: &frame,
-            auxArrays: &auxArrays,
-            compareCount: &compareCount,
-            swapCount: &swapCount
-        )
-        stepIndex += 1
+        guard state.stepIndex < tape.operations.count else { return }
+        var working = state
+        Self.apply(tape.operations[working.stepIndex], to: &working)
+        state = working
     }
 
     public func stepBackward() {
-        guard stepIndex > 0 else { return }
-        seek(to: stepIndex - 1)
+        guard state.stepIndex > 0 else { return }
+        seek(to: state.stepIndex - 1)
     }
 
     public func seek(to index: Int) {
         pause()
         let target = max(0, min(index, tape.operations.count))
-        let checkpoint = nearestCheckpoint(atOrBefore: target)
-        frame = checkpoint.frame
-        auxArrays = checkpoint.auxArrays
-        compareCount = checkpoint.compareCount
-        swapCount = checkpoint.swapCount
-        stepIndex = checkpoint.step
-        while stepIndex < target {
-            stepForward()
+        var working = nearestCheckpoint(atOrBefore: target)
+        while working.stepIndex < target {
+            Self.apply(tape.operations[working.stepIndex], to: &working)
         }
+        state = working
     }
 
     /// Above this many renders per second, a batch of operations is applied per tick instead of
@@ -154,64 +143,47 @@ public final class ReplayEngine {
     ///
     /// Applies a *batch* of operations per tick rather than one, sized so ticks never demand more
     /// than `targetRenderHz` renders per second, capped at `maxOpsPerTick`. The batch is
-    /// accumulated into local variables and written back to `frame`/`stepIndex`/`compareCount`/
-    /// `swapCount` **exactly once per tick**, not once per operation — calling `stepForward()` in
-    /// a loop would still mutate each `@Observable` property once per operation, leaving the same
-    /// total mutation count as before batching, since coalescing render *requests* doesn't reduce
-    /// how many times observed state actually changed.
+    /// accumulated into a local `PlaybackState` and written back to `state` **exactly once per
+    /// tick**, not once per operation — calling `stepForward()` in a loop would still mutate the
+    /// observed state once per operation, leaving the same total mutation count as before
+    /// batching, since coalescing render *requests* doesn't reduce how many times observed state
+    /// actually changed.
     ///
-    /// NOTE: measured on-device throughput at high `speed` still falls well short of what this
-    /// formula alone predicts — real per-tick overhead in a live view hierarchy is substantially
-    /// higher than `targetRenderHz` assumes, by a factor this implementation doesn't fully close.
-    /// An adaptive variant that sized `opsPerTick` off each tick's *measured* duration was tried
-    /// and rejected: it grew `opsPerTick` into the 80s-90s without converging, while throughput
-    /// stayed flat — a runaway rather than a stabilizing feedback loop, whose root cause (traced
-    /// through ruling out audio, canvas content, array size, `.glassEffect`, and a heavy sibling
-    /// view) is not yet understood and likely needs Instruments/real-device profiling to isolate.
-    /// `maxOpsPerTick` keeps this simpler, fixed-formula version bounded and predictable rather
-    /// than risking that same instability.
+    /// Measured on-device throughput at high `speed` used to fall well short of what this formula
+    /// alone predicts. Instruments profiling traced the gap to `ReplayEngine` previously exposing
+    /// `frame`/`auxArrays`/`compareCount`/`swapCount`/`stepIndex` as five separately-mutated
+    /// `@Observable` properties — each tick fired five independent AttributeGraph dirty-propagation
+    /// events instead of one, and that fan-out (not any view's own rendering cost) dominated the
+    /// main thread. Consolidating them into the single `state: PlaybackState` write above is the
+    /// fix; `maxOpsPerTick` still keeps this fixed-formula version bounded and predictable on top
+    /// of that.
     @discardableResult
     public func play(onStep: ((SortOperation) -> Void)? = nil) -> Task<Void, Never> {
         isPlaying = true
         currentSegmentStart = Date()
         let task = Task { [weak self] in
-            while let self, self.stepIndex < self.tape.operations.count, !Task.isCancelled {
+            while let self, self.state.stepIndex < self.tape.operations.count, !Task.isCancelled {
                 let opsPerTick = max(1, min(Self.maxOpsPerTick, Int((self.speed / Self.targetRenderHz).rounded())))
 
-                var workingFrame = self.frame
-                var workingAuxArrays = self.auxArrays
-                var workingCompareCount = self.compareCount
-                var workingSwapCount = self.swapCount
-                var workingStepIndex = self.stepIndex
+                var working = self.state
                 var appliedOperations: [SortOperation] = []
                 appliedOperations.reserveCapacity(opsPerTick)
 
                 for _ in 0..<opsPerTick {
-                    guard workingStepIndex < self.tape.operations.count else { break }
-                    let operation = self.tape.operations[workingStepIndex]
-                    Self.apply(
-                        operation,
-                        to: &workingFrame,
-                        auxArrays: &workingAuxArrays,
-                        compareCount: &workingCompareCount,
-                        swapCount: &workingSwapCount
-                    )
-                    workingStepIndex += 1
+                    guard working.stepIndex < self.tape.operations.count else { break }
+                    let operation = self.tape.operations[working.stepIndex]
+                    Self.apply(operation, to: &working)
                     appliedOperations.append(operation)
                 }
 
-                // One assignment per observed property per tick, regardless of opsPerTick.
-                self.frame = workingFrame
-                self.auxArrays = workingAuxArrays
-                self.compareCount = workingCompareCount
-                self.swapCount = workingSwapCount
-                self.stepIndex = workingStepIndex
+                // One assignment to `state` per tick, regardless of opsPerTick.
+                self.state = working
 
                 for operation in appliedOperations {
                     onStep?(operation)
                 }
 
-                guard self.stepIndex < self.tape.operations.count else { break }
+                guard self.state.stepIndex < self.tape.operations.count else { break }
                 try? await Task.sleep(for: .seconds(Double(appliedOperations.count) / self.speed))
             }
             self?.isPlaying = false
@@ -231,13 +203,13 @@ public final class ReplayEngine {
 
     /// Binary search for the latest checkpoint at or before `step` — `checkpoints` is sorted
     /// ascending by construction.
-    private func nearestCheckpoint(atOrBefore step: Int) -> Checkpoint {
+    private func nearestCheckpoint(atOrBefore step: Int) -> PlaybackState {
         var low = 0
         var high = checkpoints.count - 1
         var result = checkpoints[0]
         while low <= high {
             let mid = (low + high) / 2
-            if checkpoints[mid].step <= step {
+            if checkpoints[mid].stepIndex <= step {
                 result = checkpoints[mid]
                 low = mid + 1
             } else {
@@ -247,39 +219,34 @@ public final class ReplayEngine {
         return result
     }
 
-    private static func apply(
-        _ operation: SortOperation,
-        to frame: inout [BarState],
-        auxArrays: inout [Int: [Int]],
-        compareCount: inout Int,
-        swapCount: inout Int
-    ) {
+    private static func apply(_ operation: SortOperation, to state: inout PlaybackState) {
         switch operation {
         case let .swap(i, j):
-            let temp = frame[i].value
-            frame[i].value = frame[j].value
-            frame[j].value = temp
-            swapCount += 1
+            let temp = state.frame[i].value
+            state.frame[i].value = state.frame[j].value
+            state.frame[j].value = temp
+            state.swapCount += 1
         case let .setValue(i, value):
-            frame[i].value = value
+            state.frame[i].value = value
         case let .mark(marker, index):
-            frame[index].markers.insert(marker)
+            state.frame[index].markers.insert(marker)
         case let .unmark(marker):
-            for i in frame.indices { frame[i].markers.remove(marker) }
+            for i in state.frame.indices { state.frame[i].markers.remove(marker) }
         case let .unmarkIndex(marker, index):
-            frame[index].markers.remove(marker)
+            state.frame[index].markers.remove(marker)
         case .unmarkAll:
-            for i in frame.indices { frame[i].markers.removeAll() }
+            for i in state.frame.indices { state.frame[i].markers.removeAll() }
         case .compare:
-            compareCount += 1
+            state.compareCount += 1
         case let .markSorted(i):
-            frame[i].isSorted = true
+            state.frame[i].isSorted = true
         case let .auxCreate(handle, length):
-            auxArrays[handle] = Array(repeating: 0, count: length)
+            state.auxArrays[handle] = Array(repeating: 0, count: length)
         case let .auxWrite(handle, index, value):
-            auxArrays[handle]![index] = value
+            state.auxArrays[handle]![index] = value
         case let .auxDelete(handle):
-            auxArrays.removeValue(forKey: handle)
+            state.auxArrays.removeValue(forKey: handle)
         }
+        state.stepIndex += 1
     }
 }

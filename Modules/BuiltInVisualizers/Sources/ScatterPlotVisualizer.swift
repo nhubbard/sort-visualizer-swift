@@ -27,16 +27,20 @@ public struct ScatterPlotVisualizer: Visualizer {
         let count = context.values.count
         let columnWidth = context.canvasSize.width / Double(count)
         let spanLength = Double(context.valueRange.upperBound - context.valueRange.lowerBound)
+        let radius = Self.dotDiameter / 2
 
         return context.values.enumerated().map { index, value in
             let normalized = spanLength > 0
                 ? Double(value - context.valueRange.lowerBound) / spanLength
                 : 1.0
             let centerX = Double(index) * columnWidth + columnWidth / 2
-            let centerY = context.canvasSize.height * (1 - normalized)
+            // Inset by the dot's own radius so a value at either extreme (0 or 1) centers its dot
+            // fully inside the canvas instead of on the literal edge, where half of it would hang
+            // off and get clipped.
+            let centerY = radius + (context.canvasSize.height - 2 * radius) * (1 - normalized)
             return .ellipse(
-                x: centerX - Self.dotDiameter / 2,
-                y: centerY - Self.dotDiameter / 2,
+                x: centerX - radius,
+                y: centerY - radius,
                 width: Self.dotDiameter,
                 height: Self.dotDiameter,
                 color: color(forIndex: index, in: context)

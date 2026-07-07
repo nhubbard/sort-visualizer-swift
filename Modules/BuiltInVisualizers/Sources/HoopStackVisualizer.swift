@@ -34,7 +34,9 @@ public struct HoopStackVisualizer: Visualizer {
         let count = context.values.count
         let centerX = context.canvasSize.width / 2
         let spanLength = Double(context.valueRange.upperBound - context.valueRange.lowerBound)
-        let baseRadiusX = context.canvasSize.height / 6
+        // Clamped to half the canvas width too — on a tall, narrow canvas a height-derived radius
+        // can otherwise exceed half the width, overflowing the left/right edges.
+        let baseRadiusX = min(context.canvasSize.height / 6, context.canvasSize.width / 2)
         let baseRadiusY = context.canvasSize.height / 18
 
         return stride(from: count - 1, through: 0, by: -1).map { index in
@@ -42,8 +44,11 @@ public struct HoopStackVisualizer: Visualizer {
             let normalized = spanLength > 0
                 ? Double(value - context.valueRange.lowerBound) / spanLength
                 : 1.0
+            // Inset by `baseRadiusY` (the largest a hoop can be) on both ends, so even the
+            // tallest possible hoop at either end of the stack lands fully inside the canvas
+            // instead of hanging its top/bottom half off the edge, where `Canvas` clips it.
             let y = count > 1
-                ? context.canvasSize.height * Double(index) / Double(count - 1)
+                ? baseRadiusY + (context.canvasSize.height - 2 * baseRadiusY) * Double(index) / Double(count - 1)
                 : context.canvasSize.height / 2
             // Even a zero-normalized value still draws a visible sliver of a hoop.
             let scale = 0.2 + 0.8 * normalized

@@ -52,11 +52,18 @@ public final class AudioService: AudioPlaying {
         isStarted = false
     }
 
+    /// Deadline the currently-open gate should close at — updated on every `play()` call.
+    /// `gateCloserTask`, once running, re-reads this after every wake rather than being torn down
+    /// and recreated per note (see `play()`'s doc comment: that per-note `Task` churn was the
+    /// actual throughput ceiling on replay, not the `speed`/render-rate math).
+    private var nextGateCloseDeadline: ContinuousClock.Instant?
+    private var gateCloserTask: Task<Void, Never>?
+
     /// Self-starts on first call so composition-root code doesn't need to remember to call
     /// `start()` — a caller that never plays a note never pays for a running engine.
     ///
     /// Retriggers the envelope on a pitch change (matching `Synthesizer.swift`'s behavior), then
-    /// schedules the gate's close via a **fire-and-forget** `Task`, not a blocking `Task.sleep` in
+    /// pushes the gate's close deadline out via `scheduleGateClose`, not a blocking `Task.sleep` in
     /// this call — v1's blocking version is exactly the bug §3.1 calls out ("a fast algorithm...
     /// can outrun AudioKit's note-scheduling and glitch, because note-firing is woven into the
     /// algorithm's own timing"). This method returns immediately regardless of hold duration, so
@@ -73,10 +80,32 @@ public final class AudioService: AudioPlaying {
         osc.frequency = frequency
         env.openGate()
 
-        let env = self.env
-        Task {
-            try? await Task.sleep(for: .seconds(holdSeconds))
-            env.closeGate()
+        scheduleGateClose(after: holdSeconds)
+    }
+
+    /// Pushes `nextGateCloseDeadline` out to `holdSeconds` from now, and — only if no closer is
+    /// currently running — starts the one `gateCloserTask` that will ever exist for this
+    /// `AudioService`. A note arriving mid-hold (the common case at real playback speeds) just
+    /// moves the deadline; it never spawns a second `Task`. Without the "already running" guard,
+    /// this degenerates back into one `Task` per note — exactly the per-op Swift Concurrency
+    /// scheduling churn that capped replay throughput far below its theoretical ops/sec.
+    private func scheduleGateClose(after holdSeconds: Double) {
+        let deadline = ContinuousClock.now.advanced(by: .seconds(holdSeconds))
+        nextGateCloseDeadline = deadline
+        guard gateCloserTask == nil else { return }
+
+        gateCloserTask = Task { [weak self] in
+            while let self {
+                guard let deadline = self.nextGateCloseDeadline else { break }
+                try? await Task.sleep(until: deadline, clock: .continuous)
+                // A newer note pushed the deadline out while we were asleep — sleep again instead
+                // of closing the gate early.
+                if let latest = self.nextGateCloseDeadline, latest > deadline { continue }
+                self.env.closeGate()
+                self.nextGateCloseDeadline = nil
+                break
+            }
+            self?.gateCloserTask = nil
         }
     }
 

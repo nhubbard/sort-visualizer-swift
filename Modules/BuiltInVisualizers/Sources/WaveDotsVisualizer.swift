@@ -31,8 +31,12 @@ public struct WaveDotsVisualizer: Visualizer {
         let count = context.values.count
         let columnWidth = context.canvasSize.width / Double(count)
         let spanLength = Double(context.valueRange.upperBound - context.valueRange.lowerBound)
+        let radius = Self.dotDiameter / 2
         let verticalCenter = context.canvasSize.height / 2
-        let amplitude = context.canvasSize.height * 0.4
+        // Sized so the wave's extremes (sin = ±1) land exactly at the canvas edge minus the dot's
+        // own radius, rather than a fixed fraction of the height that only happens to leave enough
+        // margin at typical canvas sizes.
+        let amplitude = context.canvasSize.height / 2 - radius
 
         return context.values.enumerated().map { index, value in
             let normalized = spanLength > 0
@@ -41,8 +45,8 @@ public struct WaveDotsVisualizer: Visualizer {
             let centerX = Double(index) * columnWidth + columnWidth / 2
             let centerY = verticalCenter + amplitude * sin(2 * Double.pi * normalized)
             return .ellipse(
-                x: centerX - Self.dotDiameter / 2,
-                y: centerY - Self.dotDiameter / 2,
+                x: centerX - radius,
+                y: centerY - radius,
                 width: Self.dotDiameter,
                 height: Self.dotDiameter,
                 color: color(forIndex: index, in: context)
