@@ -42,6 +42,21 @@ algorithms = sorted(
         "mergeexchangesortiterative",
         "bozosort",
         "cocktailmergesort",
+        "optimizedbubblesort",
+        "swaplessbubblesort",
+        "slowsort",
+        "dualpivotquicksort",
+        "doubleinsertionsort",
+        "simplifiedlibrarysort",
+        "doubleselectionsort",
+        "stableselectionsort",
+        "pigeonholesort",
+        "flashsort",
+        "gravitysort",
+        "rotatemergesort",
+        "bitonicsortrecursive",
+        "oddevenmergesortrecursive",
+        "hybridcombsort",
     ]
 )
 extensions = ["c", "cpp", "cs", "go", "java", "js", "kt", "py", "rb", "swift"]

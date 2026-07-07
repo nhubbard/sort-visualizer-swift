@@ -1,0 +1,24 @@
+{
+  "complexities": [
+    {
+      "key": "Average Complexity",
+      "value": "O(n \\times k)",
+      "mathml": "\\(O(n\\times{}k)\\)"
+    },
+    {
+      "key": "Best Case",
+      "value": "O(n \\times k)",
+      "mathml": "\\(O(n\\times{}k)\\)"
+    },
+    {
+      "key": "Worst Case",
+      "value": "O(n \\times k)",
+      "mathml": "\\(O(n\\times{}k)\\)"
+    },
+    {
+      "key": "Space Complexity",
+      "value": "O(n+k)",
+      "mathml": "\\(O(n+k)\\)"
+    }
+  ]
+}
