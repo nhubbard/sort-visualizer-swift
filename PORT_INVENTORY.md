@@ -30,10 +30,16 @@ classes that are never ported directly — only their concrete subclasses are)
   `LRQuickSort` (different partition scheme; those remain unported below)
 - [x] GnomeSort — done (Phase 7 batch, easy pick), `gnomesort.js`
 - [x] CombSort — done (Phase 7 batch, medium pick), `combsort.js`
-- [ ] BinaryGnomeSort
+- [x] BinaryGnomeSort — done (native port batch 4), real category `.exchange`; despite the name,
+      ArrayV's implementation is structurally Binary Insertion Sort (binary-search the sorted
+      prefix, shift via adjacent swaps) — not the classic gnome-sort walk — noted in the port's doc
+      comment and `description.md` rather than inventing gnome-sort behavior that isn't actually
+      there, `Modules/BuiltInAlgorithms/Sources/BinaryGnomeSort.swift`
 - [ ] BubbleBogoSort
-- [ ] CircleSortIterative
-- [ ] CircleSortRecursive
+- [x] CircleSortIterative — done (native port batch 4), real category `.exchange`,
+      `Modules/BuiltInAlgorithms/Sources/CircleSortIterative.swift`
+- [x] CircleSortRecursive — done (native port batch 4), real category `.exchange`,
+      `Modules/BuiltInAlgorithms/Sources/CircleSortRecursive.swift`
 - [ ] CircloidSort
 - [ ] ClassicThreeSmoothCombSort
 - [x] CocktailShakerSort — done (native port batch), real category `.exchange` (matches its package
@@ -45,7 +51,9 @@ classes that are never ported directly — only their concrete subclasses are)
 - [ ] ExchangeBogoSort
 - [ ] ForcedStableQuickSort
 - [ ] FunSort
-- [ ] LLQuickSort (ArrayV's actual classic quicksort — distinct from our `quicksort.js`)
+- [x] LLQuickSort — done (native port batch 4), real category `.exchange`, ArrayV's actual classic
+      quicksort (Lomuto partition, last-element pivot, distinct from our `quicksort.js`),
+      `Modules/BuiltInAlgorithms/Sources/LLQuickSort.swift`
 - [ ] LRQuickSort
 - [ ] LRQuickSortParallel — `[~]` parallel, needs sequential-simulation decision
 - [x] OddEvenSort — done (native port batch), real category `.exchange`, distinct `AlgorithmID` from
@@ -81,7 +89,9 @@ classes that are never ported directly — only their concrete subclasses are)
 - [ ] ThreeSmoothCombSortIterative
 - [ ] ThreeSmoothCombSortParallel — `[~]` parallel
 - [ ] ThreeSmoothCombSortRecursive
-- [ ] UnoptimizedBubbleSort
+- [x] UnoptimizedBubbleSort — done (native port batch 4), real category `.exchange`, the plain
+      full-scan-every-pass Bubble Sort with no early-exit optimization,
+      `Modules/BuiltInAlgorithms/Sources/UnoptimizedBubbleSort.swift`
 - [ ] UnoptimizedCocktailShakerSort
 
 ### `sorts/insert/` (18)

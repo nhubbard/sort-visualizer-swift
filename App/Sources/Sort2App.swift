@@ -28,16 +28,18 @@ struct Sort2App: App {
         // `scriptLoader` stays wired so dropping a `.js` + manifest there still works without a
         // recompile, exactly as before. Shuffles remain scripted-only for now.
         AlgorithmRegistry.shared.builtIns = [
-            BinaryInsertionSort(), BinaryMergeSort(), BitonicSortIterative(), BitonicSortRecursive(),
-            BogoSort(), BoseNelsonSortIterative(), BottomUpMergeSort(), BozoSort(), BubbleSort(),
-            BurntPancakeSort(), CocktailMergeSort(), CocktailShakerSort(), CombSort(), CountingSort(),
-            CycleSort(), DoubleInsertionSort(), DoubleSelectionSort(), DualPivotQuickSort(), FlashSort(),
+            BinaryGnomeSort(), BinaryInsertionSort(), BinaryMergeSort(), BitonicSortIterative(),
+            BitonicSortRecursive(), BogoSort(), BoseNelsonSortIterative(), BottomUpMergeSort(),
+            BozoSort(), BubbleSort(), BurntPancakeSort(), CircleSortIterative(), CircleSortRecursive(),
+            CocktailMergeSort(), CocktailShakerSort(), CombSort(), CountingSort(), CycleSort(),
+            DoubleInsertionSort(), DoubleSelectionSort(), DualPivotQuickSort(), FlashSort(),
             GnomeSort(), GravitySort(), HybridCombSort(), InPlaceMergeSort(), InsertionSort(), IntroSort(),
-            LSDRadixSort(), MaxHeapSort(), MergeExchangeSortIterative(), MergeSort(), MinHeapSort(),
-            MSDRadixSort(), OddEvenMergeSortIterative(), OddEvenMergeSortRecursive(), OddEvenSort(),
-            PancakeSort(), PigeonholeSort(), QuickSort(), RecursiveShellSort(), RotateMergeSort(),
-            SelectionSort(), ShellSort(), SimplifiedLibrarySort(), SlowSort(), StableSelectionSort(),
-            StoogeSort(), StrandSort(), SwaplessBubbleSort(), TernaryLLQuickSort(), TernaryLRQuickSort(),
+            LLQuickSort(), LSDRadixSort(), MaxHeapSort(), MergeExchangeSortIterative(), MergeSort(),
+            MinHeapSort(), MSDRadixSort(), OddEvenMergeSortIterative(), OddEvenMergeSortRecursive(),
+            OddEvenSort(), PancakeSort(), PigeonholeSort(), QuickSort(), RecursiveShellSort(),
+            RotateMergeSort(), SelectionSort(), ShellSort(), SimplifiedLibrarySort(), SlowSort(),
+            StableSelectionSort(), StoogeSort(), StrandSort(), SwaplessBubbleSort(),
+            TernaryLLQuickSort(), TernaryLRQuickSort(), UnoptimizedBubbleSort(),
         ]
         AlgorithmRegistry.shared.scriptLoader = {
             ScriptAlgorithmLoader.loadScripts(from: Bundle.main.url(forResource: "Algorithms", withExtension: nil)!)

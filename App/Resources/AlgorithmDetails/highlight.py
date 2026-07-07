@@ -57,6 +57,11 @@ algorithms = sorted(
         "bitonicsortrecursive",
         "oddevenmergesortrecursive",
         "hybridcombsort",
+        "unoptimizedbubblesort",
+        "binarygnomesort",
+        "llquicksort",
+        "circlesortiterative",
+        "circlesortrecursive",
     ]
 )
 extensions = ["c", "cpp", "cs", "go", "java", "js", "kt", "py", "rb", "swift"]
