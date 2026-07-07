@@ -1,6 +1,14 @@
 import ProjectDescription
 import ProjectDescriptionHelpers
 
+// Discovered once, at manifest-generation time, rather than hardcoded — see
+// `Module.algorithmDetailCopyFiles`'s doc comment for why.
+let algorithmDetailCopyFiles = Module.algorithmDetailCopyFiles()
+precondition(
+    !algorithmDetailCopyFiles.isEmpty,
+    "No AlgorithmDetails output folders discovered — check App/Resources/AlgorithmDetails/"
+)
+
 let modules: [Target] =
     Module.framework(name: "SortEngineKit") +
     Module.framework(name: "AlgorithmKit", dependencies: [.target(name: "SortEngineKit")]) +
@@ -79,12 +87,18 @@ let app = Target.target(
         ]),
         // Real folder references, not globs — the script loaders (§2.4/§2A.4) look up
         // `Bundle.main.url(forResource:withExtension: nil)` expecting an actual subdirectory,
-        // which a glob of loose files wouldn't preserve. Same story for AlgorithmDetails' nested
-        // per-algorithm subdirectories (description.md + one .md per code sample language) —
-        // Phase 9's detail section reads a specific algorithm's folder as a real subdirectory.
+        // which a glob of loose files wouldn't preserve.
         .folderReference(path: "App/Resources/Algorithms"),
         .folderReference(path: "App/Resources/Shuffles"),
-        .folderReference(path: "App/Resources/AlgorithmDetails"),
+    ],
+    // AlgorithmDetails/ also holds the authoring pipeline (`<id>.bundle/`, highlight.py, test.py,
+    // template.bundle/, ...) as siblings of the shipped `<algorithmID>/` output folders — a plain
+    // top-level `.folderReference` would ship all of that too. This Copy Files phase re-nests just
+    // the shipped output folders under a literal `AlgorithmDetails/` in the bundle, so
+    // `AlgorithmDetailContent.load` keeps reading `Bundle.main.url(forResource: "AlgorithmDetails",
+    // withExtension: nil)` unmodified.
+    copyFiles: [
+        .resources(name: "AlgorithmDetails", subpath: "AlgorithmDetails", files: algorithmDetailCopyFiles),
     ],
     entitlements: .file(path: "App/Resources/Sort Symphony.entitlements"),
     dependencies: [

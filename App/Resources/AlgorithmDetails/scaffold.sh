@@ -4,14 +4,14 @@ folder="$name.bundle"
 mkdir "$folder"
 echo "Scaffolding $name.bundle..."
 # Copy Git ignore file
-cp template/.gitignore $folder/.gitignore
+cp template.bundle/.gitignore $folder/.gitignore
 # Copy description template
-cp template/description.md $folder/description.md
+cp template.bundle/description.md $folder/description.md
 # Copy complexity JSON file
-cp template/complexity.json $folder/complexity.json
+cp template.bundle/complexity.json $folder/complexity.json
 # Copy and rename implementation templates
 for ext in "c" "cpp" "cs" "go" "java" "js" "kt" "py" "rb" "swift"; do
-  cp template/template.$ext $folder/$name.$ext
+  cp template.bundle/template.$ext $folder/$name.$ext
 done
 # Finished.
 echo "Finished scaffolding $name.bundle."

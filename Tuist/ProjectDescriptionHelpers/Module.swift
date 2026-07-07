@@ -1,3 +1,4 @@
+import Foundation
 import ProjectDescription
 
 public enum Module {
@@ -42,4 +43,27 @@ public enum Module {
         "SWIFT_VERSION": "6.0",
         "SWIFT_STRICT_CONCURRENCY": "complete",
     ]
+
+    /// Discovers shipped `App/Resources/AlgorithmDetails/<id>/` output folders, skipping the
+    /// sibling `<name>.bundle/` authoring bundles (raw source + the Pygments highlighting
+    /// pipeline, see that directory's own README) — a plain top-level `.folderReference` would
+    /// ship those too, so each shipped folder is named individually here instead. Matches this
+    /// project's existing "no hardcoded lists" approach to registering content (see
+    /// `ContentView.swift`'s algorithm-sidebar comment). `callerFilePath` defaults to the call
+    /// site's own path (via `#filePath`), so the manifest-relative root is computed from wherever
+    /// this is actually called rather than assumed from this file's own location.
+    public static func algorithmDetailCopyFiles(callerFilePath: StaticString = #filePath) -> [CopyFileElement] {
+        let root = URL(fileURLWithPath: "\(callerFilePath)")
+            .deletingLastPathComponent()
+            .appendingPathComponent("App/Resources/AlgorithmDetails")
+        let entries = (try? FileManager.default.contentsOfDirectory(
+            at: root, includingPropertiesForKeys: [.isDirectoryKey], options: [.skipsHiddenFiles]
+        )) ?? []
+        let shippedNames = entries
+            .filter { (try? $0.resourceValues(forKeys: [.isDirectoryKey]))?.isDirectory == true }
+            .map(\.lastPathComponent)
+            .filter { !$0.hasSuffix(".bundle") }
+            .sorted()
+        return shippedNames.map { .folderReference(path: .path("App/Resources/AlgorithmDetails/\($0)")) }
+    }
 }
