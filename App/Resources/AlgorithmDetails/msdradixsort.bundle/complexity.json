@@ -1,0 +1,24 @@
+{
+  "complexities": [
+    {
+      "key": "Average Complexity",
+      "value": "O(d \\times n)",
+      "mathml": "\\(O(d\\times{}n)\\)"
+    },
+    {
+      "key": "Best Case",
+      "value": "O(d \\times n)",
+      "mathml": "\\(O(d\\times{}n)\\)"
+    },
+    {
+      "key": "Worst Case",
+      "value": "O(d \\times n)",
+      "mathml": "\\(O(d\\times{}n)\\)"
+    },
+    {
+      "key": "Space Complexity",
+      "value": "O(n + b)",
+      "mathml": "\\(O(n + b)\\)"
+    }
+  ]
+}

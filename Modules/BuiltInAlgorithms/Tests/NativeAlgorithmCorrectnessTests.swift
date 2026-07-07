@@ -9,10 +9,13 @@ import Testing
 @Suite
 struct NativeAlgorithmCorrectnessTests {
     private static let algorithms: [any SortAlgorithm] = [
-        BinaryMergeSort(), BitonicSortIterative(), BogoSort(), BubbleSort(), BurntPancakeSort(),
-        CombSort(), GnomeSort(), InsertionSort(), IntroSort(), LSDRadixSort(),
-        MaxHeapSort(), MergeSort(), OddEvenMergeSortIterative(), PancakeSort(), QuickSort(),
-        SelectionSort(), ShellSort(), StrandSort(), TernaryLLQuickSort(), TernaryLRQuickSort(),
+        BinaryInsertionSort(), BinaryMergeSort(), BitonicSortIterative(), BogoSort(),
+        BoseNelsonSortIterative(), BottomUpMergeSort(), BozoSort(), BubbleSort(), BurntPancakeSort(),
+        CocktailMergeSort(), CocktailShakerSort(), CombSort(), CountingSort(), CycleSort(),
+        GnomeSort(), InPlaceMergeSort(), InsertionSort(), IntroSort(), LSDRadixSort(),
+        MaxHeapSort(), MergeExchangeSortIterative(), MergeSort(), MinHeapSort(), MSDRadixSort(),
+        OddEvenMergeSortIterative(), OddEvenSort(), PancakeSort(), QuickSort(), RecursiveShellSort(),
+        SelectionSort(), ShellSort(), StoogeSort(), StrandSort(), TernaryLLQuickSort(), TernaryLRQuickSort(),
     ]
 
     @Test

@@ -36,7 +36,8 @@ classes that are never ported directly — only their concrete subclasses are)
 - [ ] CircleSortRecursive
 - [ ] CircloidSort
 - [ ] ClassicThreeSmoothCombSort
-- [ ] CocktailShakerSort (v1 has "shakersort" — good next pick)
+- [x] CocktailShakerSort — done (native port batch), real category `.exchange` (matches its package
+      location here), `Modules/BuiltInAlgorithms/Sources/CocktailShakerSort.swift`
 - [ ] CompleteGraphSort
 - [ ] DualPivotQuickSort
 - [ ] ExchangeBogoSort
@@ -45,7 +46,8 @@ classes that are never ported directly — only their concrete subclasses are)
 - [ ] LLQuickSort (ArrayV's actual classic quicksort — distinct from our `quicksort.js`)
 - [ ] LRQuickSort
 - [ ] LRQuickSortParallel — `[~]` parallel, needs sequential-simulation decision
-- [ ] OddEvenSort (v1 has "oddevensort" — good next pick)
+- [x] OddEvenSort — done (native port batch), real category `.exchange`, distinct `AlgorithmID` from
+      the already-shipped `oddevenmergesortiterative`, `Modules/BuiltInAlgorithms/Sources/OddEvenSort.swift`
 - [ ] OptimizedBubbleSort
 - [ ] OptimizedCocktailShakerSort
 - [ ] OptimizedGnomeSort
@@ -60,7 +62,10 @@ classes that are never ported directly — only their concrete subclasses are)
 - [ ] StablePermutationSort
 - [ ] StableQuickSort
 - [ ] StableQuickSortParallel — `[~]` parallel
-- [ ] StoogeSort (v1 has "stoogesort" — good next pick)
+- [x] StoogeSort — done (native port batch), real category `.impractical` (**not** `.exchange`
+      despite this package location — ArrayV's own `setCategory("Impractical Sorts")` is
+      authoritative), `Modules/BuiltInAlgorithms/Sources/StoogeSort.swift`; content bundle reused
+      and repaired from a pre-existing legacy-pipeline `stoogesort.bundle/`, not built from scratch
 - [ ] SwaplessBubbleSort
 - [ ] TableSort
 - [ ] ThreeSmoothCombSortIterative
@@ -76,14 +81,16 @@ classes that are never ported directly — only their concrete subclasses are)
 - [ ] AATreeSort
 - [ ] AVLTreeSort
 - [ ] BinaryDoubleInsertionSort
-- [ ] BinaryInsertionSort
+- [x] BinaryInsertionSort — done (native port batch), real category `.insertion`,
+      `Modules/BuiltInAlgorithms/Sources/BinaryInsertionSort.swift`
 - [ ] BlockInsertionSort
 - [ ] ClassicTreeSort
 - [ ] DoubleInsertionSort
 - [ ] HanoiSort
 - [ ] LibrarySort
 - [ ] PatienceSort
-- [ ] RecursiveShellSort
+- [x] RecursiveShellSort — done (native port batch), real category `.insertion`,
+      `Modules/BuiltInAlgorithms/Sources/RecursiveShellSort.swift`
 - [ ] RedBlackTreeSort
 - [ ] ShellSortParallel — `[~]` parallel
 - [ ] SimplifiedLibrarySort
@@ -102,11 +109,13 @@ classes that are never ported directly — only their concrete subclasses are)
 - [ ] BinomialSmoothSort
 - [ ] BottomUpHeapSort
 - [ ] ClassicTournamentSort
-- [ ] CycleSort
+- [x] CycleSort — done (native port batch), real category `.selection`, deterministic single-write
+      cycle-following (Cycle Sort's defining minimal-writes property), `Modules/BuiltInAlgorithms/Sources/CycleSort.swift`
 - [ ] DoubleSelectionSort
 - [ ] FlippedMinHeapSort
 - [ ] LazyHeapSort
-- [ ] MinHeapSort (v1 has "heapsort" mapped to MaxHeapSort above; this is its mirror)
+- [x] MinHeapSort — done (native port batch), real category `.selection`, mirrors the already-shipped
+      `MaxHeapSort`'s sift-down with the child comparison flipped, `Modules/BuiltInAlgorithms/Sources/MinHeapSort.swift`
 - [ ] MinMaxHeapSort
 - [ ] OutOfPlaceHeapSort
 - [ ] PoplarHeapSort
@@ -120,16 +129,27 @@ classes that are never ported directly — only their concrete subclasses are)
 
 ### `sorts/distribute/` (36)
 
-- [x] BogoSort — done (Phase 7 batch, easy pick), `bogosort.js`
+- [x] BogoSort — done (Phase 7 batch, easy pick), `bogosort.js`; **rewritten in the native port
+      batch** from a literal random-shuffle-until-sorted loop to a deterministic lexicographic
+      `next_permutation` walk (with `sizeRange` shrunk to `4...7`) — `RecordingEngine` has to
+      pre-record the *entire* tape before playback, and an open-ended random walk has no ceiling on
+      how large that tape can grow before it happens to land on sorted; the deterministic walk
+      keeps the "try every arrangement" spirit with a hard n!-step ceiling instead
 - [x] LSDRadixSort — done (Phase 7 batch, medium pick), `lsdradixsort.js`
 - [ ] AmericanFlagSort
 - [ ] BinaryQuickSortIterative
 - [ ] BinaryQuickSortRecursive
 - [ ] BogoBogoSort
-- [ ] BozoSort (29 lines — simplest in this category, good next "easy" elsewhere if needed)
+- [x] BozoSort — done (native port batch), real category `.impractical` (**not** `.distribute`
+      despite this package location — ArrayV's own `setCategory("Impractical Sorts")` is
+      authoritative); ArrayV's "swap two random indices, check if sorted, repeat" was ported as a
+      deterministic single-swap-per-step permutation walk (Heap's algorithm) instead of a literal
+      random walk — see the note on `BogoSort` below for why,
+      `Modules/BuiltInAlgorithms/Sources/BozoSort.swift`
 - [ ] ClassicGravitySort
 - [ ] CocktailBogoSort
-- [ ] CountingSort
+- [x] CountingSort — done (native port batch), real category `.distribution`,
+      `Modules/BuiltInAlgorithms/Sources/CountingSort.swift`
 - [ ] DeterministicBogoSort
 - [ ] FlashSort
 - [ ] GravitySort
@@ -139,7 +159,8 @@ classes that are never ported directly — only their concrete subclasses are)
 - [ ] LessBogoSort
 - [ ] MedianQuickBogoSort
 - [ ] MergeBogoSort
-- [ ] MSDRadixSort
+- [x] MSDRadixSort — done (native port batch), real category `.distribution`, recursive per-bucket
+      variant of the already-shipped `LSDRadixSort`, `Modules/BuiltInAlgorithms/Sources/MSDRadixSort.swift`
 - [ ] OptimizedGuessSort
 - [ ] PigeonholeSort
 - [ ] QuickBogoSort
@@ -163,10 +184,15 @@ classes that are never ported directly — only their concrete subclasses are)
 - [x] StrandSort — done (Phase 7 batch, medium pick), `strandsort.js`
 - [ ] AndreySort
 - [ ] BlockSwapMergeSort
-- [ ] BottomUpMergeSort
+- [x] BottomUpMergeSort — done (native port batch), real category `.merge`, non-recursive
+      doubling-width variant of the already-shipped `MergeSort`, `Modules/BuiltInAlgorithms/Sources/BottomUpMergeSort.swift`
 - [ ] BufferedStoogeSort
-- [ ] ImprovedInPlaceMergeSort
-- [ ] InPlaceMergeSort
+- [ ] ImprovedInPlaceMergeSort (**not** ported — distinct from plain `InPlaceMergeSort` below)
+- [x] InPlaceMergeSort — done (native port batch), real category `.merge`; merges via rotation/
+      insertion-shift instead of an aux buffer, so despite the name it's `spaceComplexity: O(log n)`
+      (recursion stack only) at the cost of a worse `O(n^2)` average/worst merge step — **not**
+      stable (positional swaps let equal elements leapfrog each other across recursion levels,
+      verified empirically), `Modules/BuiltInAlgorithms/Sources/InPlaceMergeSort.swift`
 - [ ] IterativeTopDownMergeSort
 - [ ] LazyStableSort
 - [ ] MergeSortParallel — `[~]` parallel
@@ -200,7 +226,11 @@ classes that are never ported directly — only their concrete subclasses are)
 - [x] OddEvenMergeSortIterative — done (Phase 7 batch, medium pick), `oddevenmergesortiterative.js`
 - [ ] BitonicSortParallel — `[~]` parallel
 - [ ] BitonicSortRecursive
-- [ ] BoseNelsonSortIterative
+- [x] BoseNelsonSortIterative — done (native port batch), real category `.concurrent` (ArrayV's
+      "Concurrent Sorts" here really means *sorting network* — a fixed, data-independent
+      compare-swap sequence, historically designed for parallel/hardware execution but run
+      sequentially here, same as the already-shipped `BitonicSortIterative`/
+      `OddEvenMergeSortIterative`), `Modules/BuiltInAlgorithms/Sources/BoseNelsonSortIterative.swift`
 - [ ] BoseNelsonSortParallel — `[~]` parallel
 - [ ] BoseNelsonSortRecursive
 - [ ] CreaseSort
@@ -208,7 +238,8 @@ classes that are never ported directly — only their concrete subclasses are)
 - [ ] DiamondSortRecursive
 - [ ] FoldSort
 - [ ] MatrixSort
-- [ ] MergeExchangeSortIterative
+- [x] MergeExchangeSortIterative — done (native port batch), real category `.concurrent` (Batcher's
+      odd-even merge sorting network), `Modules/BuiltInAlgorithms/Sources/MergeExchangeSortIterative.swift`
 - [ ] OddEvenMergeSortParallel — `[~]` parallel
 - [ ] OddEvenMergeSortRecursive
 - [ ] PairwiseMergeSortIterative
@@ -240,7 +271,12 @@ classes that are never ported directly — only their concrete subclasses are)
 - [ ] BufferPartitionMergeSort
 - [ ] ChaliceSort (767 lines — very complex)
 - [ ] CircularGrailSort
-- [ ] CocktailMergeSort
+- [x] CocktailMergeSort — done (native port batch), real category `.hybrid`; simplifies ArrayV's
+      ~950-line galloping-mode `TimSorting` merge phase down to a plain bottom-up pairwise merge
+      (same technique as the already-shipped `BottomUpMergeSort`, starting from a run width of
+      `minRunLen` instead of 1) — correctness-preserving since galloping mode only changes how many
+      comparisons a merge of two known-sorted runs takes, never the resulting order,
+      `Modules/BuiltInAlgorithms/Sources/CocktailMergeSort.swift`
 - [ ] DropMergeSort
 - [ ] EctaSort
 - [ ] FifthMergeSort

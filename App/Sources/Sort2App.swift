@@ -28,10 +28,13 @@ struct Sort2App: App {
         // `scriptLoader` stays wired so dropping a `.js` + manifest there still works without a
         // recompile, exactly as before. Shuffles remain scripted-only for now.
         AlgorithmRegistry.shared.builtIns = [
-            BinaryMergeSort(), BitonicSortIterative(), BogoSort(), BubbleSort(), BurntPancakeSort(),
-            CombSort(), GnomeSort(), InsertionSort(), IntroSort(), LSDRadixSort(),
-            MaxHeapSort(), MergeSort(), OddEvenMergeSortIterative(), PancakeSort(), QuickSort(),
-            SelectionSort(), ShellSort(), StrandSort(), TernaryLLQuickSort(), TernaryLRQuickSort(),
+            BinaryInsertionSort(), BinaryMergeSort(), BitonicSortIterative(), BogoSort(),
+            BoseNelsonSortIterative(), BottomUpMergeSort(), BozoSort(), BubbleSort(), BurntPancakeSort(),
+            CocktailMergeSort(), CocktailShakerSort(), CombSort(), CountingSort(), CycleSort(),
+            GnomeSort(), InPlaceMergeSort(), InsertionSort(), IntroSort(), LSDRadixSort(),
+            MaxHeapSort(), MergeExchangeSortIterative(), MergeSort(), MinHeapSort(), MSDRadixSort(),
+            OddEvenMergeSortIterative(), OddEvenSort(), PancakeSort(), QuickSort(), RecursiveShellSort(),
+            SelectionSort(), ShellSort(), StoogeSort(), StrandSort(), TernaryLLQuickSort(), TernaryLRQuickSort(),
         ]
         AlgorithmRegistry.shared.scriptLoader = {
             ScriptAlgorithmLoader.loadScripts(from: Bundle.main.url(forResource: "Algorithms", withExtension: nil)!)

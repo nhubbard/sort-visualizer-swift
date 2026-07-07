@@ -1,4 +1,4 @@
-func sort(
+func stoogeSort(
   _ arr: inout [Int],
   _ i: Int,
   _ j: Int
@@ -8,13 +8,17 @@ func sort(
   }
   if j - i > 1 {
     let t = (j - i + 1) / 3
-    sort(&arr, i, j - t)
-    sort(&arr, i + t, j)
-    sort(&arr, i, j - t)
+    stoogeSort(&arr, i, j - t)
+    stoogeSort(&arr, i + t, j)
+    stoogeSort(&arr, i, j - t)
   }
+}
+
+func sort(_ array: inout [Int]) {
+  stoogeSort(&array, 0, array.count - 1)
 }
 
 var array: [Int] = [0, 39, 21, 62, 91, 77, 14, 23,
   90, 69, 51, 81, 68, 83, 32, 56]
-sort(&array, 0, array.count - 1)
+sort(&array)
 print(array)

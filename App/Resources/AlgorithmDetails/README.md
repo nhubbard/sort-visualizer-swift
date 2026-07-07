@@ -57,6 +57,8 @@ because the mismatched folders now sit as literal siblings, where they're easy t
 
 - `heapsort.bundle/` authors content for what ships as `maxheapsort/`.
 - `bitonicsort.bundle/` authors content for what ships as `bitonicsortiterative/`.
-- `oddevensort.bundle/`, `radixsort.bundle/`, `shakersort.bundle/`, `stoogesort.bundle/` have no
-  shipped `<algorithm-id>/` counterpart at all.
+- `radixsort.bundle/`, `shakersort.bundle/` have no shipped `<algorithm-id>/` counterpart at all —
+  dead leftovers from before `cocktailshakersort`/the radix sorts were ported under their current
+  ids; `oddevensort.bundle/` and `stoogesort.bundle/` used to be in this same boat but now ship as
+  `oddevensort/`/`stoogesort/` (the native port batch that added `OddEvenSort`/`StoogeSort`).
 - `lsdradixsort/` ships without any authoring bundle behind it.

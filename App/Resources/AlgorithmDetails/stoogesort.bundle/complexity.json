@@ -17,8 +17,8 @@
     },
     {
       "key": "Space Complexity",
-      "value": "O(n)",
-      "mathml": "\\(O(n)\\)"
+      "value": "O(\\log n)",
+      "mathml": "\\(O(\\log{n})\\)"
     }
   ]
 }

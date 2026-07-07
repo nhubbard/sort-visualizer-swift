@@ -28,6 +28,20 @@ algorithms = sorted(
         "strandsort",
         "ternaryllquicksort",
         "ternarylrquicksort",
+        "cocktailshakersort",
+        "oddevensort",
+        "recursiveshellsort",
+        "binaryinsertionsort",
+        "minheapsort",
+        "cyclesort",
+        "countingsort",
+        "msdradixsort",
+        "bottomupmergesort",
+        "inplacemergesort",
+        "bosenelsonsortiterative",
+        "mergeexchangesortiterative",
+        "bozosort",
+        "cocktailmergesort",
     ]
 )
 extensions = ["c", "cpp", "cs", "go", "java", "js", "kt", "py", "rb", "swift"]
