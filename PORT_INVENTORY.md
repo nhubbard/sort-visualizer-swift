@@ -100,7 +100,9 @@ classes that are never ported directly — only their concrete subclasses are)
 - [x] ShellSort — done (Phase 7 batch, medium pick), `shellsort.js`
 - [ ] AATreeSort
 - [ ] AVLTreeSort
-- [ ] BinaryDoubleInsertionSort
+- [x] BinaryDoubleInsertionSort — done (native port batch 4), real category `.insertion`,
+      binary-search-accelerated version of the already-shipped `DoubleInsertionSort`,
+      `Modules/BuiltInAlgorithms/Sources/BinaryDoubleInsertionSort.swift`
 - [x] BinaryInsertionSort — done (native port batch), real category `.insertion`,
       `Modules/BuiltInAlgorithms/Sources/BinaryInsertionSort.swift`
 - [ ] BlockInsertionSort
@@ -132,7 +134,9 @@ classes that are never ported directly — only their concrete subclasses are)
 - [ ] AsynchronousSort
 - [ ] BadSort
 - [ ] BaseNMaxHeapSort
-- [ ] BingoSort
+- [x] BingoSort — done (native port batch 4), real category `.selection`, targets a *value* (not
+      an item) per pass so it clears every duplicate occurrence in one sweep,
+      `Modules/BuiltInAlgorithms/Sources/BingoSort.swift`
 - [ ] BinomialHeapSort
 - [ ] BinomialSmoothSort
 - [ ] BottomUpHeapSort
@@ -152,7 +156,10 @@ classes that are never ported directly — only their concrete subclasses are)
 - [ ] OutOfPlaceHeapSort
 - [ ] PoplarHeapSort
 - [ ] SmoothSort
-- [ ] StableCycleSort
+- [x] StableCycleSort — done (native port batch 4), real category `.selection`, a stable variant of
+      the already-shipped `CycleSort` that tracks resolved positions and not-yet-resolved duplicates
+      within each cycle's original span to preserve relative order among ties,
+      `Modules/BuiltInAlgorithms/Sources/StableCycleSort.swift`
 - [x] StableSelectionSort — done (native port batch 3), real category `.selection`, rotates the
       found minimum into place via single-element shifts instead of a direct swap, making it
       genuinely stable unlike plain `SelectionSort`,
@@ -224,7 +231,9 @@ classes that are never ported directly — only their concrete subclasses are)
 - [ ] SmartGuessSort
 - [ ] StacklessAmericanFlagSort
 - [ ] StacklessBinaryQuickSort
-- [ ] StaticSort
+- [x] StaticSort — done (native port batch 4), real category `.distribution`, classify-into-n-buckets
+      + cycle-permute + size-dependent insertion/heap-sort finish,
+      `Modules/BuiltInAlgorithms/Sources/StaticSort.swift`
 - [ ] TimeSort
 
 ### `sorts/merge/` (19)
@@ -258,7 +267,9 @@ classes that are never ported directly — only their concrete subclasses are)
 - [ ] TwinSort (ArrayV files it under `merge/`'s sibling `hybrid/` package per its template
       location; tracked once, under hybrid below — originally picked as this batch's hybrid/medium
       but swapped for IntroSort, see hybrid/ section)
-- [ ] WeavedMergeSort
+- [x] WeavedMergeSort — done (native port batch 4), real category `.merge`, splits into interleaved/
+      strided sub-sequences instead of contiguous halves before recursing,
+      `Modules/BuiltInAlgorithms/Sources/WeavedMergeSort.swift`
 
 ### `sorts/misc/` (4)
 

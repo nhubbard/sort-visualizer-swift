@@ -62,6 +62,11 @@ algorithms = sorted(
         "llquicksort",
         "circlesortiterative",
         "circlesortrecursive",
+        "binarydoubleinsertionsort",
+        "bingosort",
+        "stablecyclesort",
+        "staticsort",
+        "weavedmergesort",
     ]
 )
 extensions = ["c", "cpp", "cs", "go", "java", "js", "kt", "py", "rb", "swift"]

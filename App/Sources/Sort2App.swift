@@ -28,18 +28,19 @@ struct Sort2App: App {
         // `scriptLoader` stays wired so dropping a `.js` + manifest there still works without a
         // recompile, exactly as before. Shuffles remain scripted-only for now.
         AlgorithmRegistry.shared.builtIns = [
-            BinaryGnomeSort(), BinaryInsertionSort(), BinaryMergeSort(), BitonicSortIterative(),
-            BitonicSortRecursive(), BogoSort(), BoseNelsonSortIterative(), BottomUpMergeSort(),
-            BozoSort(), BubbleSort(), BurntPancakeSort(), CircleSortIterative(), CircleSortRecursive(),
-            CocktailMergeSort(), CocktailShakerSort(), CombSort(), CountingSort(), CycleSort(),
-            DoubleInsertionSort(), DoubleSelectionSort(), DualPivotQuickSort(), FlashSort(),
-            GnomeSort(), GravitySort(), HybridCombSort(), InPlaceMergeSort(), InsertionSort(), IntroSort(),
-            LLQuickSort(), LSDRadixSort(), MaxHeapSort(), MergeExchangeSortIterative(), MergeSort(),
-            MinHeapSort(), MSDRadixSort(), OddEvenMergeSortIterative(), OddEvenMergeSortRecursive(),
-            OddEvenSort(), PancakeSort(), PigeonholeSort(), QuickSort(), RecursiveShellSort(),
-            RotateMergeSort(), SelectionSort(), ShellSort(), SimplifiedLibrarySort(), SlowSort(),
-            StableSelectionSort(), StoogeSort(), StrandSort(), SwaplessBubbleSort(),
-            TernaryLLQuickSort(), TernaryLRQuickSort(), UnoptimizedBubbleSort(),
+            BinaryDoubleInsertionSort(), BinaryGnomeSort(), BinaryInsertionSort(), BinaryMergeSort(),
+            BingoSort(), BitonicSortIterative(), BitonicSortRecursive(), BogoSort(),
+            BoseNelsonSortIterative(), BottomUpMergeSort(), BozoSort(), BubbleSort(), BurntPancakeSort(),
+            CircleSortIterative(), CircleSortRecursive(), CocktailMergeSort(), CocktailShakerSort(),
+            CombSort(), CountingSort(), CycleSort(), DoubleInsertionSort(), DoubleSelectionSort(),
+            DualPivotQuickSort(), FlashSort(), GnomeSort(), GravitySort(), HybridCombSort(),
+            InPlaceMergeSort(), InsertionSort(), IntroSort(), LLQuickSort(), LSDRadixSort(),
+            MaxHeapSort(), MergeExchangeSortIterative(), MergeSort(), MinHeapSort(), MSDRadixSort(),
+            OddEvenMergeSortIterative(), OddEvenMergeSortRecursive(), OddEvenSort(), PancakeSort(),
+            PigeonholeSort(), QuickSort(), RecursiveShellSort(), RotateMergeSort(), SelectionSort(),
+            ShellSort(), SimplifiedLibrarySort(), SlowSort(), StableCycleSort(), StableSelectionSort(),
+            StaticSort(), StoogeSort(), StrandSort(), SwaplessBubbleSort(), TernaryLLQuickSort(),
+            TernaryLRQuickSort(), UnoptimizedBubbleSort(), WeavedMergeSort(),
         ]
         AlgorithmRegistry.shared.scriptLoader = {
             ScriptAlgorithmLoader.loadScripts(from: Bundle.main.url(forResource: "Algorithms", withExtension: nil)!)
