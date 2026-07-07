@@ -133,9 +133,15 @@ public final class SortSession {
     private func beginPlayback(_ replay: ReplayEngine) {
         let playbackTask = replay.play(onStep: makeOnStepClosure(for: replay))
         monitorTask?.cancel()
-        monitorTask = Task { [weak self] in
+        // `replay` must be captured weakly, same as `self` — this closure `await`s the *entire*
+        // remaining playback, however long that takes, so a strong capture here would keep the
+        // whole `ReplayEngine` (its full tape, checkpoints, frame) alive for that entire duration
+        // even after `self` (and whatever view owned it) is long gone — e.g. navigating away from
+        // a still-playing sort. `SortSession`'s own `deinit` below cancels this promptly instead
+        // of waiting on it to resolve on its own.
+        monitorTask = Task { [weak self, weak replay] in
             await playbackTask.value
-            guard let self, replay.stepIndex >= replay.totalOperationCount else { return }
+            guard let self, let replay, replay.stepIndex >= replay.totalOperationCount else { return }
             self.phase = .complete(replay)
             try? await self.analytics.record(replay.header, algorithmID: self.algorithm.id)
         }

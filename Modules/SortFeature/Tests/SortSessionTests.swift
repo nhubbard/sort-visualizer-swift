@@ -126,6 +126,48 @@ struct SortSessionTests {
         #expect(replay.frame.map(\.value) == Array(1...8))
     }
 
+    /// Investigates whether `SortSession`/`ReplayEngine` genuinely leak when the last strong reference
+    /// to them is dropped mid-playback — the scenario a user hits by switching detail pages (or
+    /// algorithms) while a sort is actively running, not paused/complete. `beginPlayback`'s
+    /// `monitorTask` and `ReplayEngine.play()`'s own loop both capture `self` as `[weak self]`, so
+    /// nothing on this call chain should hold either object alive past the caller's own last strong
+    /// reference — this proves that (or catches a regression if a future edit accidentally adds a
+    /// strong capture back in).
+    @Test
+    func sortSessionAndReplayEngineDeallocateAfterLastReferenceDroppedMidPlayback() async throws {
+        weak var weakSession: SortSession?
+        weak var weakReplay: ReplayEngine?
+
+        do {
+            let settings = makeFastSettings()
+            settings.playbackSpeed = 20.0 // slow enough that playback is still mid-flight below
+            let session = SortSession(algorithm: FakeAlgorithm(), shuffle: FakeReverseShuffle(), settings: settings)
+            weakSession = session
+
+            await session.start(size: 12)
+            guard case let .replaying(replay) = session.phase else {
+                Issue.record("expected .replaying immediately after start, got \(session.phase)")
+                return
+            }
+            weakReplay = replay
+
+            try await Task.sleep(for: .milliseconds(50)) // genuinely mid-flight, not yet complete
+            #expect(replay.isPlaying)
+        }
+        // `session`/`replay` were the only strong references in this test — both are now out of scope.
+
+        // Give any already-suspended `Task` closures many chances to actually resume, notice
+        // `self` is nil through their weak captures, and exit — poll instead of a single fixed
+        // wait so this isn't sensitive to exactly how long that takes.
+        let deadline = ContinuousClock.now + .seconds(3)
+        while ContinuousClock.now < deadline, weakReplay != nil {
+            try await Task.sleep(for: .milliseconds(20))
+        }
+
+        #expect(weakSession == nil, "SortSession should deallocate once nothing outside it holds a reference, even mid-playback")
+        #expect(weakReplay == nil, "ReplayEngine should deallocate once nothing outside it holds a reference, even mid-playback")
+    }
+
     /// Regression test for the pause/resume redesign: pausing mid-replay must not prematurely
     /// flip `phase` to `.complete` (the old one-shot "await the first playbackTask" design would
     /// have, since a cancelled task's `.value` still resolves), and resuming must continue from

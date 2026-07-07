@@ -27,6 +27,11 @@ extension AlgorithmMetadata {
     private static func toLatex(_ complexity: String) -> String {
         complexity
             .replacingOccurrences(of: "log", with: "\\log")
-            .replacingOccurrences(of: "*", with: "\\times")
+            // Padded with spaces on both sides — LaTeX command names greedily consume any
+            // following letters, so an unspaced "*n" would become "\timesn" (parsed as one
+            // invalid command instead of "\times" followed by "n"). Extra whitespace around an
+            // already-spaced "*" (e.g. "n * n!") is harmless: LaTeX math mode's own spacing rules
+            // ignore literal source whitespace.
+            .replacingOccurrences(of: "*", with: " \\times ")
     }
 }
