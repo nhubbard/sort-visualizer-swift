@@ -164,6 +164,41 @@ struct SortSessionTests {
         #expect(finished.stepIndex >= stepIndexAtPause)
     }
 
+    /// Regression test for the reset-then-play bug: Reset (and step-back, and the scrub slider)
+    /// call `seek(to:)`/`stepBackward()` directly on `ReplayEngine`, bypassing `SortSession`
+    /// entirely — so after a sort reaches `.complete`, scrubbing backward must still let
+    /// `togglePlayback()` resume playback, not silently no-op forever because `phase` never left
+    /// `.complete`.
+    @Test
+    func togglePlaybackResumesAfterScrubbingBackwardFromComplete() async throws {
+        let session = SortSession(algorithm: FakeAlgorithm(), shuffle: FakeReverseShuffle(), settings: makeFastSettings())
+
+        await session.start(size: 10)
+        try await waitUntilTerminal(session)
+
+        guard case let .complete(replay) = session.phase else {
+            Issue.record("expected .complete, got \(session.phase)")
+            return
+        }
+
+        replay.seek(to: replay.header.sortStartIndex) // what the Reset button does
+        #expect(replay.stepIndex < replay.totalOperationCount)
+
+        session.togglePlayback()
+        guard case .replaying = session.phase else {
+            Issue.record("expected .replaying after resuming from a scrubbed-back .complete, got \(session.phase)")
+            return
+        }
+        #expect(replay.isPlaying)
+
+        try await waitUntilTerminal(session)
+        guard case let .complete(finished) = session.phase else {
+            Issue.record("expected .complete again after replaying to the end, got \(session.phase)")
+            return
+        }
+        #expect(finished.frame.map(\.value) == Array(1...10))
+    }
+
     @Test
     func soundEnabledIsLocalToTheSessionNotWrittenBackToSettings() {
         let settings = makeFastSettings()

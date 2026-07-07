@@ -138,19 +138,28 @@ public final class SortSession {
         }
     }
 
-    /// Toggles between playing and paused. A no-op once `phase` has actually reached `.complete`
-    /// — a stray tap on a play button the UI failed to disable can't re-trigger analytics
-    /// recording. Deliberately does *not* also gate on `stepIndex < totalOperationCount`: if the
-    /// user has manually stepped all the way to the end while paused, `phase` is still
-    /// `.replaying` (only `beginPlayback`'s monitor ever flips it), so resuming must still call
-    /// `beginPlayback` — its `play()` loop finishes instantly and the monitor correctly detects
-    /// genuine completion from there, rather than getting stuck unable to ever reach `.complete`.
+    /// Toggles between playing and paused. In `.replaying`, this is a normal pause/resume.
+    ///
+    /// In `.complete`, it resumes only if `stepIndex` is no longer at the very end — the scrub
+    /// slider, step-back, and Reset all call `seek(to:)`/`stepBackward()` directly on `replay`,
+    /// bypassing `SortSession` entirely, so none of them ever transition `phase` back to
+    /// `.replaying` on their own; without this case, scrubbing backward after a sort finishes
+    /// would leave the play button looking enabled but silently doing nothing. A `.complete` sort
+    /// still sitting at the very end remains a no-op — a stray tap on a play button the UI failed
+    /// to disable can't re-trigger analytics recording.
     public func togglePlayback() {
-        guard case let .replaying(replay) = phase else { return }
-        if replay.isPlaying {
-            replay.pause()
-        } else {
+        switch phase {
+        case let .replaying(replay):
+            if replay.isPlaying {
+                replay.pause()
+            } else {
+                beginPlayback(replay)
+            }
+        case let .complete(replay) where replay.stepIndex < replay.totalOperationCount:
+            phase = .replaying(replay)
             beginPlayback(replay)
+        default:
+            break
         }
     }
 
