@@ -38,6 +38,9 @@ public struct AlgorithmDetailSection: View {
                     ForEach(algorithm.metadata.complexityRows) { row in
                         MathView(text: row.label, equation: row.latex)
                     }
+
+                    Text("Performance by Device").font(.title2.bold()).padding(.top, 8)
+                    DeviceSpeedPerformanceChart(algorithm: algorithm)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
