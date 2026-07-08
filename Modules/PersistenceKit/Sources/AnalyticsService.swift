@@ -20,7 +20,7 @@ public actor AnalyticsService {
         self.modelContext = ModelContext(modelContainer ?? Self.makeDefaultContainer())
     }
 
-    public func record(_ header: TapeHeader, algorithmID: AlgorithmID) async throws {
+    public func record(_ header: TapeHeader, algorithmID: AlgorithmID, speed: Double = 30.0) async throws {
         let device = DeviceInfoProvider.current()
         let summary = RunSummary(
             algorithmID: algorithmID.rawValue,
@@ -29,7 +29,8 @@ public actor AnalyticsService {
             swapCount: header.swapCount,
             recordingDuration: header.recordingDuration,
             deviceModel: device.model,
-            recordedAt: header.recordedAt
+            recordedAt: header.recordedAt,
+            speed: speed
         )
         modelContext.insert(summary)
         try modelContext.save()
@@ -72,6 +73,7 @@ public struct RunSummarySnapshot: Sendable, Equatable, Identifiable {
     public let recordingDuration: TimeInterval
     public let deviceModel: String
     public let recordedAt: Date
+    public let speed: Double
 
     public var id: String { "\(deviceModel)-\(recordedAt.timeIntervalSinceReferenceDate)" }
 
@@ -83,5 +85,6 @@ public struct RunSummarySnapshot: Sendable, Equatable, Identifiable {
         recordingDuration = summary.recordingDuration
         deviceModel = summary.deviceModel
         recordedAt = summary.recordedAt
+        speed = summary.speed
     }
 }

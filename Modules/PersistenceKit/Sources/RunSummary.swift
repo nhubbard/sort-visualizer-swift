@@ -17,6 +17,7 @@ public final class RunSummary {
     public var recordingDuration: TimeInterval = 0
     public var deviceModel: String = ""
     public var recordedAt: Date = Date.distantPast
+    public var speed: Double = 30.0
 
     public init(
         algorithmID: String,
@@ -25,7 +26,8 @@ public final class RunSummary {
         swapCount: Int,
         recordingDuration: TimeInterval,
         deviceModel: String,
-        recordedAt: Date
+        recordedAt: Date,
+        speed: Double
     ) {
         self.algorithmID = algorithmID
         self.arraySize = arraySize
@@ -34,5 +36,6 @@ public final class RunSummary {
         self.recordingDuration = recordingDuration
         self.deviceModel = deviceModel
         self.recordedAt = recordedAt
+        self.speed = speed
     }
 }
