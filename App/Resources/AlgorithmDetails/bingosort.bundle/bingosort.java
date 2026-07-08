@@ -1,6 +1,6 @@
 import java.util.Arrays;
 
-public class BingoSort {
+public class bingosort {
   public static void sort(int[] arr) {
     int n = arr.length;
     if (n < 2) {

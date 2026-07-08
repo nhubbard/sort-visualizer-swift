@@ -23,6 +23,52 @@ algorithms = sorted(
         "combsort",
         "bogosort",
         "stoogesort",
+        "binarymergesort",
+        "burntpancakesort",
+        "introsort",
+        "oddevenmergesortiterative",
+        "strandsort",
+        "ternaryllquicksort",
+        "ternarylrquicksort",
+        "cocktailshakersort",
+        "oddevensort",
+        "recursiveshellsort",
+        "binaryinsertionsort",
+        "minheapsort",
+        "cyclesort",
+        "countingsort",
+        "msdradixsort",
+        "bottomupmergesort",
+        "inplacemergesort",
+        "bosenelsonsortiterative",
+        "mergeexchangesortiterative",
+        "bozosort",
+        "cocktailmergesort",
+        "optimizedbubblesort",
+        "swaplessbubblesort",
+        "slowsort",
+        "dualpivotquicksort",
+        "doubleinsertionsort",
+        "simplifiedlibrarysort",
+        "doubleselectionsort",
+        "stableselectionsort",
+        "pigeonholesort",
+        "flashsort",
+        "gravitysort",
+        "rotatemergesort",
+        "bitonicsortrecursive",
+        "oddevenmergesortrecursive",
+        "hybridcombsort",
+        "unoptimizedbubblesort",
+        "binarygnomesort",
+        "llquicksort",
+        "circlesortiterative",
+        "circlesortrecursive",
+        "binarydoubleinsertionsort",
+        "bingosort",
+        "stablecyclesort",
+        "staticsort",
+        "weavedmergesort",
     ]
 )
 extensions = ["c", "cpp", "cs", "go", "java", "js", "kt", "py", "rb", "swift"]
@@ -32,6 +78,9 @@ go_expected = standard_expected.replace(",", "")
 # I intentionally shortened the array to make it finish faster.
 bogo_expected = "[0, 14, 21, 23, 39, 62, 77, 91]"
 go_bogo_expected = bogo_expected.replace(",", "")
+# Bozo sort is also a random-shuffle sort, so it gets a shortened array too.
+bozo_expected = "[0, 21, 39, 62, 77, 91]"
+go_bozo_expected = bozo_expected.replace(",", "")
 success = []
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -69,6 +118,8 @@ def test_c(filename: str) -> bool:
     )
     if filename.startswith("bogosort"):
         expected = bogo_expected
+    elif filename.startswith("bozosort"):
+        expected = bozo_expected
     else:
         expected = standard_expected
     if expected != output:
@@ -114,6 +165,8 @@ def test_cpp(filename: str) -> bool:
     )
     if filename.startswith("bogosort"):
         expected = bogo_expected
+    elif filename.startswith("bozosort"):
+        expected = bozo_expected
     else:
         expected = standard_expected
     if expected != output:
@@ -132,45 +185,24 @@ def test_cpp(filename: str) -> bool:
 
 def test_cs(filename: str) -> bool:
     logger.debug(f"Testing {filename}")
-    outfile = filename.replace(".cs", ".exe")
-    logger.debug(f"Compiling {filename} into {outfile}")
-    try:
-        subprocess.run(
-            " ".join(["csc", f'-out:"{outfile}"', f'"{filename}"']),
-            shell=True,
-            check=True,
-            capture_output=True,
-        )
-    except subprocess.CalledProcessError as e:
-        logger.error(
-            f"Compilation of {filename} failed! See next entry for error message(s)."
-        )
-        logger.error(e.stdout.decode("utf-8").strip())
-        logger.error(e.stderr.decode("utf-8").strip())
-        sys.exit(1)
-    logger.debug(f"Running ./{outfile}")
     output = (
         subprocess.run(
-            " ".join(["mono", outfile]), shell=True, check=True, capture_output=True
+            " ".join(["dotnet", "run", "--file", filename]), shell=True, check=True, capture_output=True
         )
         .stdout.decode("utf-8")
         .strip()
     )
     if filename.startswith("bogosort"):
         expected = bogo_expected
+    elif filename.startswith("bozosort"):
+        expected = bozo_expected
     else:
         expected = standard_expected
     if expected != output:
         logger.error(f"{filename}: Failed! Expected {expected}, found {output}")
-        if os.path.exists(outfile):
-            logger.debug(f"Deleting {outfile}")
-            os.remove(outfile)
         return False
     else:
         logger.info(f"{filename}: Passed!")
-        if os.path.exists(outfile):
-            logger.debug(f"Deleting {outfile}")
-            os.remove(outfile)
         return True
 
 
@@ -189,6 +221,8 @@ def test_go(filename: str) -> bool:
         )
         if filename.startswith("bogosort"):
             expected = go_bogo_expected
+        elif filename.startswith("bozosort"):
+            expected = go_bozo_expected
         else:
             expected = go_expected
         if expected != output:
@@ -238,6 +272,8 @@ def test_java(filename: str) -> bool:
     )
     if filename.startswith("bogosort"):
         expected = bogo_expected
+    elif filename.startswith("bozosort"):
+        expected = bozo_expected
     else:
         expected = standard_expected
     if expected != output:
@@ -269,6 +305,8 @@ def test_js(filename: str) -> bool:
         )
         if filename.startswith("bogosort"):
             expected = bogo_expected
+        elif filename.startswith("bozosort"):
+            expected = bozo_expected
         else:
             expected = standard_expected
         if expected != output:
@@ -315,6 +353,8 @@ def test_kt(filename: str) -> bool:
     )
     if filename.startswith("bogosort"):
         expected = bogo_expected
+    elif filename.startswith("bozosort"):
+        expected = bozo_expected
     else:
         expected = standard_expected
     if expected != output:
@@ -360,6 +400,8 @@ def test_py(filename: str) -> bool:
         )
         if filename.startswith("bogosort"):
             expected = bogo_expected
+        elif filename.startswith("bozosort"):
+            expected = bozo_expected
         else:
             expected = standard_expected
         if expected != output:
@@ -390,6 +432,8 @@ def test_rb(filename: str) -> bool:
         )
         if filename.startswith("bogosort"):
             expected = bogo_expected
+        elif filename.startswith("bozosort"):
+            expected = bozo_expected
         else:
             expected = standard_expected
         if expected != output:
@@ -407,11 +451,14 @@ def test_rb(filename: str) -> bool:
 
 def test_swift(filename: str) -> bool:
     logger.debug(f"Testing {filename}")
-    outfile = filename.split("/")[1].replace(".swift", "")
+    outfile = filename.replace(".swift", "")
     logger.debug(f"Compiling {filename} into {outfile}")
     try:
         compiler = subprocess.run(
-            " ".join(["swiftc", filename]), shell=True, check=True, capture_output=True
+            " ".join(["swiftc", "-o", f'"{outfile}"', f'"{filename}"']),
+            shell=True,
+            check=True,
+            capture_output=True,
         )
         compile_stdout = compiler.stdout.decode("utf-8")
         if compile_stdout != "":
@@ -431,6 +478,8 @@ def test_swift(filename: str) -> bool:
     )
     if filename.startswith("bogosort"):
         expected = bogo_expected
+    elif filename.startswith("bozosort"):
+        expected = bozo_expected
     else:
         expected = standard_expected
     if expected != output:
