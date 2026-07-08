@@ -69,7 +69,12 @@ struct ContentView: View {
                 SettingsView()
                     .toolbar {
                         ToolbarItem(placement: .cancellationAction) {
-                            Button("Done") { isShowingSettings = false }
+                            Button { isShowingSettings = false }
+                          label: {
+                            Text("Done").fixedSize(horizontal: true, vertical: false)
+                          }
+                            .frame(width: 48)
+                            .buttonSizing(.flexible)
                         }
                     }
             }
@@ -79,7 +84,9 @@ struct ContentView: View {
                 BenchmarkView()
                     .toolbar {
                         ToolbarItem(placement: .cancellationAction) {
-                            Button("Done") { isShowingBenchmark = false }
+                          Button { isShowingBenchmark = false } label: { Text("Done").fixedSize(horizontal: true, vertical: false) }
+                            .frame(width: 48)
+                            .buttonSizing(.flexible)
                         }
                     }
             }

@@ -12,20 +12,20 @@ public struct SettingsView: View {
         @Bindable var settings = settings
         Form {
             Section("Visualization") {
-                Picker("Visualizer", selection: $settings.selectedVisualizerID) {
+                Picker(selection: $settings.selectedVisualizerID) {
                     ForEach(VisualizerRegistry.shared.visualizers, id: \.id) { visualizer in
                         Text(visualizer.metadata.displayName).tag(visualizer.id)
                     }
-                }
+                } label: {}
                 .pickerStyle(.inline)
                 .accessibilityIdentifier("visualizerPicker")
             }
             Section("Shuffle") {
-                Picker("Shuffle", selection: $settings.defaultShuffleID) {
+                Picker(selection: $settings.defaultShuffleID) {
                     ForEach(ShuffleRegistry.shared.shuffles, id: \.id) { shuffle in
                         Text(shuffle.metadata.displayName).tag(shuffle.id)
                     }
-                }
+                } label: {}
                 .pickerStyle(.inline)
                 .accessibilityIdentifier("shufflePicker")
             }
@@ -64,11 +64,11 @@ public struct SettingsView: View {
                 .accessibilityIdentifier("defaultArraySizeStepper")
             }
             Section("Code Sample Theme") {
-                Picker("Theme", selection: $settings.codeTheme) {
+                Picker(selection: $settings.codeTheme) {
                     ForEach(CodeThemeID.knownIDs, id: \.self) { theme in
                         Text(theme.displayName).tag(theme)
                     }
-                }
+                } label: {}
                 .pickerStyle(.inline)
                 .accessibilityIdentifier("codeThemePicker")
             }
