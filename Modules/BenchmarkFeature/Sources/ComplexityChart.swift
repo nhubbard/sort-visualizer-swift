@@ -23,7 +23,9 @@ struct ComplexityChart: View {
 
     /// Multiple trials per size, averaged — a single shuffle can land on an unrepresentative
     /// permutation (best/worst case), especially for anything comparison-count-sensitive.
-    private static let trialsPerSize = 5
+    // nonisolated: read from `benchmark(algorithm:size:)`, itself nonisolated so it can run inside
+    // `Task.detached` — safe since it's an immutable Sendable Int, not actual mutable shared state.
+    private nonisolated static let trialsPerSize = 5
     private static let sampleSizeCount = 6
 
     var body: some View {
