@@ -13,7 +13,8 @@ public enum Module {
         resources: ResourceFileElements? = nil,
         testResources: ResourceFileElements? = nil
     ) -> [Target] {
-        [
+        let frameworkSettings = name.hasSuffix("Kit") ? baseSettings.merging(moduleVerifierSettings) { _, new in new } : baseSettings
+        return [
             .target(
                 name: name,
                 destinations: destinations,
@@ -23,7 +24,7 @@ public enum Module {
                 sources: ["Modules/\(name)/Sources/**"],
                 resources: resources,
                 dependencies: dependencies,
-                settings: .settings(base: baseSettings)
+                settings: .settings(base: frameworkSettings)
             ),
             .target(
                 name: "\(name)Tests",
@@ -42,6 +43,18 @@ public enum Module {
     public static let baseSettings: SettingsDictionary = [
         "SWIFT_VERSION": "6.0",
         "SWIFT_STRICT_CONCURRENCY": "complete",
+        "ENABLE_USER_SCRIPT_SANDBOXING": "YES",
+        "STRING_CATALOG_GENERATE_SYMBOLS": "YES",
+    ]
+
+    /// Module Verifier settings (Xcode 14.3+) applied only to targets whose name ends in "Kit" —
+    /// these are the modules meant to behave like standalone distributable frameworks (a stable
+    /// public interface, buildable in isolation), unlike the `*Feature` modules, which are app
+    /// screens that only ever get consumed by `Sort Symphony` itself.
+    private static let moduleVerifierSettings: SettingsDictionary = [
+        "ENABLE_MODULE_VERIFIER": "YES",
+        "MODULE_VERIFIER_SUPPORTED_LANGUAGES": "objective-c objective-c++",
+        "MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS": "gnu11 gnu++14",
     ]
 
     /// Discovers shipped `App/Resources/AlgorithmDetails/<id>/` output folders, skipping the

@@ -16,6 +16,28 @@ let packageSettings = PackageSettings(
         // consumed via C interop from CSoundpipeAudioKit), so it doesn't need a Clang module at
         // all — building it as a static library instead removes the module map phase entirely.
         "Soundpipe": .staticLibrary,
+        // These default to static products and are each linked from more than one target
+        // (MarkdownUI from SortFeature + HomeFeature; NetworkImage transitively via MarkdownUI) —
+        // Tuist warns "static product linked from multiple targets, may introduce unwanted side
+        // effects" for each. Forcing them dynamic gives every target a single shared copy instead
+        // of independently-duplicated static linkage. Both are pure-Swift targets, so this is safe.
+        "MarkdownUI": .framework,
+        "NetworkImage": .framework,
+        //
+        // AudioKitEX/CAudioKitEX/cmark-gfm/cmark-gfm-extensions are deliberately NOT overridden
+        // here despite triggering the same warning — they're all C/C++ targets with a module map,
+        // and forcing a C/C++-with-modulemap target to build as a dynamic framework breaks in two
+        // different ways under this project's other new settings:
+        //  - AudioKitEX/CAudioKitEX: their C++ classes (DSPBase et al.) aren't annotated for dynamic
+        //    export, so the default framework visibility hides them and CSoundpipeAudioKit's link
+        //    fails ("Undefined symbols ... DSPBase").
+        //  - cmark-gfm/cmark-gfm-extensions: Tuist synthesizes a "Copy Module Map" Run Script phase
+        //    for dynamic C-target frameworks (see Soundpipe's note above for the same pattern), and
+        //    that script's plain `cp` isn't declared as a sandboxed output — with
+        //    ENABLE_USER_SCRIPT_SANDBOXING on, Mac Catalyst builds fail with "Permission denied"
+        //    copying module.modulemap.
+        // Leaving all four static keeps the build working on every destination; the multiple-targets
+        // warning for these four is an accepted tradeoff (see Project.swift generation notes).
     ]
 )
 #endif

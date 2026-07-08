@@ -67,6 +67,7 @@ let app = Target.target(
     name: "Sort Symphony",
     destinations: Module.destinations,
     product: .app,
+    productName: "SortSymphony",
     bundleId: "com.nhubbard.Sort2.mobile",
     deploymentTargets: Module.deploymentTargets,
     infoPlist: .extendingDefault(with: [
@@ -84,6 +85,9 @@ let app = Target.target(
     resources: [
         .glob(pattern: "App/Resources/**", excluding: [
             "App/Resources/Algorithms/**", "App/Resources/Shuffles/**", "App/Resources/AlgorithmDetails/**",
+            // Already referenced directly via `entitlements:`/`CODE_SIGN_ENTITLEMENTS` below — left
+            // in this glob too, Tuist warns it's being copied into the product as a plain resource.
+            "App/Resources/SortSymphony.entitlements",
         ]),
         // Real folder references, not globs — the script loaders (§2.4/§2A.4) look up
         // `Bundle.main.url(forResource:withExtension: nil)` expecting an actual subdirectory,
@@ -100,7 +104,7 @@ let app = Target.target(
     copyFiles: [
         .resources(name: "AlgorithmDetails", subpath: "AlgorithmDetails", files: algorithmDetailCopyFiles),
     ],
-    entitlements: .file(path: "App/Resources/Sort Symphony.entitlements"),
+    entitlements: .file(path: "App/Resources/SortSymphony.entitlements"),
     dependencies: [
         .target(name: "SortFeature"), .target(name: "SettingsFeature"),
         .target(name: "HomeFeature"), .target(name: "BenchmarkFeature"),
@@ -118,7 +122,7 @@ let app = Target.target(
         .target(name: "SettingsKit"),
     ],
     settings: .settings(base: [
-        "CODE_SIGN_ENTITLEMENTS": "App/Resources/Sort Symphony.entitlements",
+        "CODE_SIGN_ENTITLEMENTS": "App/Resources/SortSymphony.entitlements",
         "MARKETING_VERSION": "1.4.2",
         "CURRENT_PROJECT_VERSION": "1",
         "SWIFT_VERSION": "6.0",
@@ -132,6 +136,9 @@ let app = Target.target(
         // v1 project's explicit setting.
         "CODE_SIGN_IDENTITY": "Apple Development",
         "CODE_SIGN_IDENTITY[sdk=macosx*]": "Apple Development",
+        "ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS": "YES",
+        "ENABLE_USER_SCRIPT_SANDBOXING": "YES",
+        "STRING_CATALOG_GENERATE_SYMBOLS": "YES",
     ])
 )
 
@@ -139,6 +146,7 @@ let appUITests = Target.target(
     name: "Sort SymphonyUITests",
     destinations: Module.destinations,
     product: .uiTests,
+    productName: "SortSymphonyUITests",
     bundleId: "com.nhubbard.Sort2.mobile.uitests",
     deploymentTargets: Module.deploymentTargets,
     sources: ["App/UITests/**"],
