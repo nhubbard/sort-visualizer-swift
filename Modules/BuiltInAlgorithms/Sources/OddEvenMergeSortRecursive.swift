@@ -9,12 +9,12 @@ public struct OddEvenMergeSortRecursive: SortAlgorithm {
         sizeRange: 16...512,
         stable: false,
         timeComplexity: ComplexityBounds(
-            best: "O(\\log^2{n})", average: "O(\\log^2{n})", worst: "O(\\log^2{n})"),
+            best: "O(log^2 n)", average: "O(log^2 n)", worst: "O(log^2 n)"),
         // Unlike `OddEvenMergeSortIterative`, this formulation never materializes an aux array —
         // it's pure recursive index/size arithmetic over the live array, so the honest bound here
         // is recursion stack depth (same reasoning as the Bitonic Recursive sibling), not the
         // iterative sibling's O(n log^2 n).
-        spaceComplexity: "O(\\log{n})",
+        spaceComplexity: "O(log n)",
         iconName: "network"
     )
 

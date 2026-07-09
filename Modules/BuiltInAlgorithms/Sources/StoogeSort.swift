@@ -9,7 +9,7 @@ public struct StoogeSort: SortAlgorithm {
         sizeRange: 16...128,
         stable: false,
         timeComplexity: ComplexityBounds(best: "O(n^{2.71})", average: "O(n^{2.71})", worst: "O(n^{2.71})"),
-        spaceComplexity: "O(\\log{n})",
+        spaceComplexity: "O(log n)",
         iconName: "theatermasks.fill"
     )
 

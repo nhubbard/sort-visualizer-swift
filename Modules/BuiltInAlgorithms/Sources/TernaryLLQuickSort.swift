@@ -8,8 +8,8 @@ public struct TernaryLLQuickSort: SortAlgorithm {
         category: .quick,
         sizeRange: 16...512,
         stable: false,
-        timeComplexity: ComplexityBounds(best: "O(n\\log{n})", average: "O(n\\log{n})", worst: "O(n^2)"),
-        spaceComplexity: "O(\\log{n})",
+        timeComplexity: ComplexityBounds(best: "O(n log n)", average: "O(n log n)", worst: "O(n^2)"),
+        spaceComplexity: "O(log n)",
         iconName: "arrow.triangle.branch"
     )
 

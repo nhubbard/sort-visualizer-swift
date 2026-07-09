@@ -9,7 +9,7 @@ public struct BoseNelsonSortIterative: SortAlgorithm {
         sizeRange: 16...256,
         stable: false,
         timeComplexity: ComplexityBounds(
-            best: "O(n \\log^2{n})", average: "O(n \\log^2{n})", worst: "O(n \\log^2{n})"),
+            best: "O(n log^2 n)", average: "O(n log^2 n)", worst: "O(n log^2 n)"),
         spaceComplexity: "O(1)",
         iconName: "point.3.connected.trianglepath.dotted"
     )

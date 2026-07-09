@@ -35,11 +35,11 @@ public struct CircleSortRecursive: SortAlgorithm {
         sizeRange: 16...512,
         stable: false,
         timeComplexity: ComplexityBounds(
-            best: "O(n \\log{n})", average: "O(n \\log^2{n})", worst: "O(n \\log^2{n})"),
+            best: "O(n log n)", average: "O(n log^2 n)", worst: "O(n log^2 n)"),
         // Distinct from CircleSortIterative's O(1): this version genuinely recurses into two
         // half-ranges per level, so it carries a real O(log n) recursion-stack depth on top of the
         // otherwise in-place compare-and-swap work.
-        spaceComplexity: "O(\\log{n})",
+        spaceComplexity: "O(log n)",
         iconName: "repeat.circle.fill"
     )
 

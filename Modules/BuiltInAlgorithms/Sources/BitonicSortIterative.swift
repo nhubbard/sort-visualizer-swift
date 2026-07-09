@@ -9,8 +9,8 @@ public struct BitonicSortIterative: SortAlgorithm {
         sizeRange: 16...512,
         stable: false,
         timeComplexity: ComplexityBounds(
-            best: "O(\\log^2{n})", average: "O(\\log^2{n})", worst: "O(\\log^2{n})"),
-        spaceComplexity: "O(n\\log^2{n})",
+            best: "O(log^2 n)", average: "O(log^2 n)", worst: "O(log^2 n)"),
+        spaceComplexity: "O(n log^2 n)",
         iconName: "waveform"
     )
 

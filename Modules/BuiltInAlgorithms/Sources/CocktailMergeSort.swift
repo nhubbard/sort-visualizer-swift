@@ -42,7 +42,7 @@ public struct CocktailMergeSort: SortAlgorithm {
         sizeRange: 16...512,
         stable: true,
         timeComplexity: ComplexityBounds(
-            best: "O(n \\log{n})", average: "O(n \\log{n})", worst: "O(n^2)"),
+            best: "O(n log n)", average: "O(n log n)", worst: "O(n^2)"),
         spaceComplexity: "O(n)",
         iconName: "arrow.triangle.merge"
     )

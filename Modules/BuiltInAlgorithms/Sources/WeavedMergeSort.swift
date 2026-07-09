@@ -51,7 +51,7 @@ public struct WeavedMergeSort: SortAlgorithm {
         // reordered relative to their original input order, so this is NOT a stable sort.
         stable: false,
         timeComplexity: ComplexityBounds(
-            best: "O(n\\log{n})", average: "O(n\\log{n})", worst: "O(n\\log{n})"),
+            best: "O(n log n)", average: "O(n log n)", worst: "O(n log n)"),
         spaceComplexity: "O(n)",
         iconName: "shuffle"
     )

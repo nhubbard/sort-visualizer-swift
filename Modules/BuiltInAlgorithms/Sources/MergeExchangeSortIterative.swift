@@ -10,7 +10,7 @@ public struct MergeExchangeSortIterative: SortAlgorithm {
         sizeRange: 16...512,
         stable: false,
         timeComplexity: ComplexityBounds(
-            best: "O(n \\log^2{n})", average: "O(n \\log^2{n})", worst: "O(n \\log^2{n})"),
+            best: "O(n log^2 n)", average: "O(n log^2 n)", worst: "O(n log^2 n)"),
         spaceComplexity: "O(1)",
         iconName: "arrow.triangle.merge"
     )

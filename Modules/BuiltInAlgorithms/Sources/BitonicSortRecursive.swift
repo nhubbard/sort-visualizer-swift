@@ -28,11 +28,11 @@ public struct BitonicSortRecursive: SortAlgorithm {
         sizeRange: 16...512,
         stable: false,
         timeComplexity: ComplexityBounds(
-            best: "O(\\log^2{n})", average: "O(\\log^2{n})", worst: "O(\\log^2{n})"),
+            best: "O(log^2 n)", average: "O(log^2 n)", worst: "O(log^2 n)"),
         // Unlike BitonicSortIterative's stated O(n log^2 n), this recursive formulation allocates
         // no auxiliary array at all — every comparison/swap happens directly on the live array —
         // so the only real memory cost is recursion-stack depth, which is O(log n).
-        spaceComplexity: "O(\\log{n})",
+        spaceComplexity: "O(log n)",
         iconName: "arrow.up.and.down.righttriangle.up.righttriangle.down"
     )
 
