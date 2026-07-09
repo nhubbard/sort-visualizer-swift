@@ -143,7 +143,7 @@ public final class SortSession {
             await playbackTask.value
             guard let self, let replay, replay.stepIndex >= replay.totalOperationCount else { return }
             self.phase = .complete(replay)
-            try? await self.analytics.record(replay.header, algorithmID: self.algorithm.id, speed: replay.speed)
+            try? await self.analytics.record(replay.header, algorithmID: self.algorithm.id)
         }
     }
 

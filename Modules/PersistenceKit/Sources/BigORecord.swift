@@ -5,37 +5,44 @@ import SwiftData
 /// ARCHITECTURE_V2.md) — plain SwiftData, synced via `ModelConfiguration(cloudKitDatabase:
 /// .automatic)` rather than a hand-rolled CloudKit encoder or `NSPersistentCloudKitContainer`.
 ///
+/// Records the same ArrayV-style operation counters `TapeHeader` already tracks per run — the
+/// point of collecting these across every device signed into the same iCloud account is charting
+/// how they actually grow with array size against the classic Big-O reference curves
+/// (`BigOCorrelation.bigOChartPoints`), not comparing device speed (a prior revision recorded
+/// `deviceModel`/`speed`/`recordingDuration` for that; playback speed no longer reflects device
+/// performance since the replay engine was reworked).
+///
 /// Every property has a default value even though `AnalyticsService.record(...)` always supplies
 /// real ones — CloudKit-backed SwiftData models require every attribute to have a default (or be
 /// optional); a model without one fails to sync at runtime, not at compile time.
 @Model
-public final class RunSummary {
+public final class BigORecord {
     public var algorithmID: String = ""
     public var arraySize: Int = 0
     public var compareCount: Int = 0
     public var swapCount: Int = 0
-    public var recordingDuration: TimeInterval = 0
-    public var deviceModel: String = ""
+    public var mainWriteCount: Int = 0
+    public var auxWriteCount: Int = 0
+    public var reversalCount: Int = 0
     public var recordedAt: Date = Date.distantPast
-    public var speed: Double = 30.0
 
     public init(
         algorithmID: String,
         arraySize: Int,
         compareCount: Int,
         swapCount: Int,
-        recordingDuration: TimeInterval,
-        deviceModel: String,
-        recordedAt: Date,
-        speed: Double
+        mainWriteCount: Int,
+        auxWriteCount: Int,
+        reversalCount: Int,
+        recordedAt: Date
     ) {
         self.algorithmID = algorithmID
         self.arraySize = arraySize
         self.compareCount = compareCount
         self.swapCount = swapCount
-        self.recordingDuration = recordingDuration
-        self.deviceModel = deviceModel
+        self.mainWriteCount = mainWriteCount
+        self.auxWriteCount = auxWriteCount
+        self.reversalCount = reversalCount
         self.recordedAt = recordedAt
-        self.speed = speed
     }
 }

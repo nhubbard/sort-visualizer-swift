@@ -39,8 +39,8 @@ public struct AlgorithmDetailSection: View {
                         MathView(text: row.label, equation: row.latex)
                     }
 
-                    Text("Performance by Device").font(.title2.bold()).padding(.top, 8)
-                    DeviceSpeedPerformanceChart(algorithm: algorithm)
+                    Text("Big-O Correlation").font(.title2.bold()).padding(.top, 8)
+                    BigOCorrelationChart(algorithm: algorithm)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
             }

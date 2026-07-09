@@ -20,71 +20,69 @@ public actor AnalyticsService {
         self.modelContext = ModelContext(modelContainer ?? Self.makeDefaultContainer())
     }
 
-    public func record(_ header: TapeHeader, algorithmID: AlgorithmID, speed: Double = 30.0) async throws {
-        let device = DeviceInfoProvider.current()
-        let summary = RunSummary(
+    public func record(_ header: TapeHeader, algorithmID: AlgorithmID) async throws {
+        let summary = BigORecord(
             algorithmID: algorithmID.rawValue,
             arraySize: header.initialValues.count,
             compareCount: header.compareCount,
             swapCount: header.swapCount,
-            recordingDuration: header.recordingDuration,
-            deviceModel: device.model,
-            recordedAt: header.recordedAt,
-            speed: speed
+            mainWriteCount: header.mainWriteCount,
+            auxWriteCount: header.auxWriteCount,
+            reversalCount: header.reversalCount,
+            recordedAt: header.recordedAt
         )
         modelContext.insert(summary)
         try modelContext.save()
     }
 
-    /// Test-only: `ModelContext`/`RunSummary` aren't `Sendable`, so tests can't reach into
+    /// Test-only: `ModelContext`/`BigORecord` aren't `Sendable`, so tests can't reach into
     /// `modelContext` directly from outside the actor without a concurrency error — this stays
     /// isolated and hands back plain `Sendable` values instead.
-    func fetchAllForTesting() throws -> [RunSummarySnapshot] {
-        try modelContext.fetch(FetchDescriptor<RunSummary>()).map(RunSummarySnapshot.init)
+    func fetchAllForTesting() throws -> [BigORecordSnapshot] {
+        try modelContext.fetch(FetchDescriptor<BigORecord>()).map(BigORecordSnapshot.init)
     }
 
-    /// `BenchmarkFeature`'s `DeviceComparisonView` — every recorded run for one algorithm, across
-    /// every device that's ever completed a sort while signed into the same iCloud account (§9 of
-    /// ARCHITECTURE_V2.md: this is the entire reason `AnalyticsService` tags rows by device at
-    /// all). Sorted newest-first so a device that's run the algorithm many times shows its most
-    /// recent result first.
-    public func fetchSummaries(algorithmID: AlgorithmID) throws -> [RunSummarySnapshot] {
+    /// Every recorded run for one algorithm, across every device that's ever completed a sort
+    /// while signed into the same iCloud account — the real-world data `BigOCorrelation` charts
+    /// against the classic Big-O reference curves. Sorted newest-first, matching the "most recent
+    /// result first" convention the fetch already had before this data fed a chart.
+    public func fetchSummaries(algorithmID: AlgorithmID) throws -> [BigORecordSnapshot] {
         let rawID = algorithmID.rawValue
-        var descriptor = FetchDescriptor<RunSummary>(predicate: #Predicate { $0.algorithmID == rawID })
+        var descriptor = FetchDescriptor<BigORecord>(predicate: #Predicate { $0.algorithmID == rawID })
         descriptor.sortBy = [SortDescriptor(\.recordedAt, order: .reverse)]
-        return try modelContext.fetch(descriptor).map(RunSummarySnapshot.init)
+        return try modelContext.fetch(descriptor).map(BigORecordSnapshot.init)
     }
 
     /// A broken schema/container should fail loudly at launch, not be swallowed — matches the
     /// "fail loudly on a mis-configured app" precedent already used elsewhere (e.g. `ContentView`'s
     /// `fatalError` for missing bundled algorithm resources).
     private static func makeDefaultContainer() -> ModelContainer {
-        let schema = Schema([RunSummary.self])
+        let schema = Schema([BigORecord.self])
         let configuration = ModelConfiguration(schema: schema, cloudKitDatabase: .automatic)
         return try! ModelContainer(for: schema, configurations: [configuration])
     }
 }
 
-public struct RunSummarySnapshot: Sendable, Equatable, Identifiable {
+public struct BigORecordSnapshot: Sendable, Equatable, Identifiable {
     public let algorithmID: String
     public let arraySize: Int
     public let compareCount: Int
     public let swapCount: Int
-    public let recordingDuration: TimeInterval
-    public let deviceModel: String
+    public let mainWriteCount: Int
+    public let auxWriteCount: Int
+    public let reversalCount: Int
     public let recordedAt: Date
-    public let speed: Double
 
-    public var id: String { "\(deviceModel)-\(recordedAt.timeIntervalSinceReferenceDate)" }
+    public var id: String { "\(algorithmID)-\(arraySize)-\(recordedAt.timeIntervalSinceReferenceDate)-\(compareCount)" }
 
-    init(_ summary: RunSummary) {
+    init(_ summary: BigORecord) {
         algorithmID = summary.algorithmID
         arraySize = summary.arraySize
         compareCount = summary.compareCount
         swapCount = summary.swapCount
-        recordingDuration = summary.recordingDuration
-        deviceModel = summary.deviceModel
+        mainWriteCount = summary.mainWriteCount
+        auxWriteCount = summary.auxWriteCount
+        reversalCount = summary.reversalCount
         recordedAt = summary.recordedAt
-        speed = summary.speed
     }
 }

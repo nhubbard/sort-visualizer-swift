@@ -39,7 +39,7 @@ let modules: [Target] =
         .target(name: "SettingsKit"),
     ]) +
     Module.framework(name: "PersistenceKit", dependencies: [
-        .external(name: "DeviceKit"), .target(name: "SortEngineKit"), .target(name: "AlgorithmKit"),
+        .target(name: "SortEngineKit"), .target(name: "AlgorithmKit"),
     ]) +
     Module.framework(name: "DesignSystemKit", dependencies: [
         .external(name: "Then"), .target(name: "SettingsKit"),

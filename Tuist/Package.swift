@@ -56,7 +56,6 @@ let package = Package(
         .package(url: "https://github.com/devxoul/Then", from: "3.0.0"),
         .package(url: "https://github.com/nhubbard/CollectionConcurrencyKit", from: "2.1.0"),
         .package(url: "https://github.com/apple/swift-algorithms.git", from: "1.2.1"),
-        .package(url: "https://github.com/devicekit/DeviceKit.git", from: "5.6.0"),
         .package(url: "https://github.com/mgriebling/SwiftMath.git", from: "1.7.1"),
         .package(url: "https://github.com/gonzalezreal/MarkdownUI", from: "2.4.1"),
         // swift-atomics intentionally omitted — §5.3: operation counting in RecordingEngine is a

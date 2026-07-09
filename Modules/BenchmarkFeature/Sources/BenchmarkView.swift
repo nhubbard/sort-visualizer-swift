@@ -26,8 +26,8 @@ public struct BenchmarkView: View {
                 Section("Complexity") {
                     ComplexityChart(algorithm: algorithm)
                 }
-                Section("Across Your Devices") {
-                    DeviceComparisonView(algorithm: algorithm)
+                Section("Big-O Correlation") {
+                    BigOCorrelationChart(algorithm: algorithm)
                 }
             }
         }

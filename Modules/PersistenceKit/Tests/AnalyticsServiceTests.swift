@@ -10,14 +10,14 @@ struct AnalyticsServiceTests {
     /// Isolated, in-memory, non-CloudKit container per test — never touches the real disk or
     /// account-bound CloudKit database that `AnalyticsService.shared`'s default container would.
     private func makeInMemoryService() throws -> AnalyticsService {
-        let schema = Schema([RunSummary.self])
+        let schema = Schema([BigORecord.self])
         let configuration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
         let container = try ModelContainer(for: schema, configurations: [configuration])
         return AnalyticsService(modelContainer: container)
     }
 
     @Test
-    func recordInsertsAFetchableRunSummaryWithTheExpectedFields() async throws {
+    func recordInsertsAFetchableBigORecordWithTheExpectedFields() async throws {
         let service = try makeInMemoryService()
         let recordedAt = Date()
         let header = TapeHeader(
@@ -26,6 +26,9 @@ struct AnalyticsServiceTests {
             visualSeed: 0,
             compareCount: 7,
             swapCount: 4,
+            mainWriteCount: 8,
+            auxWriteCount: 2,
+            reversalCount: 1,
             recordingDuration: 0.042,
             recordedAt: recordedAt
         )
@@ -40,9 +43,10 @@ struct AnalyticsServiceTests {
         #expect(row.arraySize == 3)
         #expect(row.compareCount == 7)
         #expect(row.swapCount == 4)
-        #expect(row.recordingDuration == 0.042)
+        #expect(row.mainWriteCount == 8)
+        #expect(row.auxWriteCount == 2)
+        #expect(row.reversalCount == 1)
         #expect(row.recordedAt == recordedAt)
-        #expect(!row.deviceModel.isEmpty)
     }
 
     @Test
@@ -66,7 +70,7 @@ struct AnalyticsServiceTests {
         #expect(rows.count == 3)
     }
 
-    /// `BenchmarkFeature`'s `DeviceComparisonView` relies on this filtering to one algorithm and
+    /// `BenchmarkFeature`'s `BigOCorrelationChart` relies on this filtering to one algorithm and
     /// sorting newest-first — both are asserted directly here rather than only indirectly through
     /// a UI test.
     @Test
