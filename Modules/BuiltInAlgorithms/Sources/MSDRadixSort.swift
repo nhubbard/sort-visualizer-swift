@@ -20,7 +20,7 @@ public struct MSDRadixSort: SortAlgorithm {
         category: .distribution,
         sizeRange: 16...512,
         stable: true,
-        timeComplexity: ComplexityBounds(best: "O(d*n)", average: "O(d*n)", worst: "O(d*n)"),
+        timeComplexity: ComplexityBounds(best: "O(d \\times n)", average: "O(d \\times n)", worst: "O(d \\times n)"),
         spaceComplexity: "O(n+b)",
         iconName: "square.stack.3d.forward.dottedline"
     )

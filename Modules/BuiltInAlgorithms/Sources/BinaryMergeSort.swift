@@ -8,7 +8,7 @@ public struct BinaryMergeSort: SortAlgorithm {
         category: .hybrid,
         sizeRange: 16...512,
         stable: true,
-        timeComplexity: ComplexityBounds(best: "O(n log n)", average: "O(n log n)", worst: "O(n log n)"),
+        timeComplexity: ComplexityBounds(best: "O(n \\log n)", average: "O(n \\log n)", worst: "O(n \\log n)"),
         spaceComplexity: "O(n)",
         iconName: "arrow.triangle.merge"
     )

@@ -30,7 +30,7 @@ public struct SimplifiedLibrarySort: SortAlgorithm {
         category: .insertion,
         sizeRange: 32...512,
         stable: true,
-        timeComplexity: ComplexityBounds(best: "O(n)", average: "O(n log n)", worst: "O(n^2)"),
+        timeComplexity: ComplexityBounds(best: "O(n)", average: "O(n\\log{n})", worst: "O(n^2)"),
         spaceComplexity: "O(n)",
         iconName: "books.vertical.fill"
     )

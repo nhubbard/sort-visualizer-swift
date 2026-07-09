@@ -50,7 +50,8 @@ public struct WeavedMergeSort: SortAlgorithm {
         // (index-tagged values sorted purely on an untagged key): equal-valued tags come out
         // reordered relative to their original input order, so this is NOT a stable sort.
         stable: false,
-        timeComplexity: ComplexityBounds(best: "O(n log n)", average: "O(n log n)", worst: "O(n log n)"),
+        timeComplexity: ComplexityBounds(
+            best: "O(n\\log{n})", average: "O(n\\log{n})", worst: "O(n\\log{n})"),
         spaceComplexity: "O(n)",
         iconName: "shuffle"
     )

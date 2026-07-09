@@ -26,7 +26,7 @@ public struct GravitySort: SortAlgorithm {
         category: .distribution,
         sizeRange: 16...512,
         stable: false,
-        timeComplexity: ComplexityBounds(best: "O(n*k)", average: "O(n*k)", worst: "O(n*k)"),
+        timeComplexity: ComplexityBounds(best: "O(n \\times k)", average: "O(n \\times k)", worst: "O(n \\times k)"),
         spaceComplexity: "O(n+k)",
         iconName: "arrow.down.circle.fill"
     )

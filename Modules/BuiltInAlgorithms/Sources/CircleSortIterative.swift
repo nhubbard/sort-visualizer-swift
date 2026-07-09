@@ -8,7 +8,8 @@ public struct CircleSortIterative: SortAlgorithm {
         category: .exchange,
         sizeRange: 16...512,
         stable: false,
-        timeComplexity: ComplexityBounds(best: "O(n log n)", average: "O(n log n)", worst: "O(n log^2 n)"),
+        timeComplexity: ComplexityBounds(
+            best: "O(n \\log{n})", average: "O(n \\log{n})", worst: "O(n \\log^2{n})"),
         spaceComplexity: "O(1)",
         iconName: "arrow.down.right.and.arrow.up.left"
     )

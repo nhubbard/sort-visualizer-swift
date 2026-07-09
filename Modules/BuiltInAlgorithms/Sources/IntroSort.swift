@@ -9,8 +9,8 @@ public struct IntroSort: SortAlgorithm {
         category: .hybrid,
         sizeRange: 16...512,
         stable: false,
-        timeComplexity: ComplexityBounds(best: "O(n log n)", average: "O(n log n)", worst: "O(n log n)"),
-        spaceComplexity: "O(log n)",
+        timeComplexity: ComplexityBounds(best: "O(n \\log{n})", average: "O(n \\log{n})", worst: "O(n \\log{n})"),
+        spaceComplexity: "O(\\log{n})",
         iconName: "square.stack.3d.up"
     )
 

@@ -8,7 +8,8 @@ public struct ShellSort: SortAlgorithm {
         category: .insertion,
         sizeRange: 16...512,
         stable: false,
-        timeComplexity: ComplexityBounds(best: "O(n log n)", average: "O(n^1.25)", worst: "O(n^2)"),
+        timeComplexity: ComplexityBounds(
+            best: "O(n\\log{n})", average: "O(n^{1.25})", worst: "O(n^2)"),
         spaceComplexity: "O(1)",
         iconName: "shell"
     )

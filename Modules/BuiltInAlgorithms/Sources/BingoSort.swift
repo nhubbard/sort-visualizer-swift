@@ -20,7 +20,7 @@ public struct BingoSort: SortAlgorithm {
         category: .selection,
         sizeRange: 16...512,
         stable: false,
-        timeComplexity: ComplexityBounds(best: "O(n+m^2)", average: "O(n*m)", worst: "O(n*m)"),
+        timeComplexity: ComplexityBounds(best: "O(n+m^2)", average: "O(n\\times m)", worst: "O(n\\times m)"),
         spaceComplexity: "O(1)",
         iconName: "target"
     )

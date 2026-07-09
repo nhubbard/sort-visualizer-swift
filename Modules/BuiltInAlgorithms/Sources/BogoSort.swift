@@ -8,7 +8,7 @@ public struct BogoSort: SortAlgorithm {
         category: .impractical,
         sizeRange: 4...7,
         stable: false,
-        timeComplexity: ComplexityBounds(best: "O(n)", average: "O(n * n!)", worst: "O(n * n!)"),
+        timeComplexity: ComplexityBounds(best: "O(n)", average: "O(n \\times n!)", worst: "O(n \\times n!)"),
         spaceComplexity: "O(1)",
         iconName: "die.face.5.fill"
     )

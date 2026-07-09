@@ -39,7 +39,8 @@ public struct RotateMergeSort: SortAlgorithm {
         // summed across the doubling bottom-up passes this is the ordinary merge sort O(n log n),
         // not `InPlaceMergeSort`'s degraded O(n^2) (that algorithm's `push` step can rescan an
         // entire run per out-of-order element, which this rotation-based merge never does).
-        timeComplexity: ComplexityBounds(best: "O(n log n)", average: "O(n log n)", worst: "O(n log n)"),
+        timeComplexity: ComplexityBounds(
+            best: "O(n\\log{n})", average: "O(n\\log{n})", worst: "O(n\\log{n})"),
         // No aux array is ever created — `rotate`/`multiSwap` shuffle elements within the array
         // itself. The only extra memory is the recursion stack `rotateMerge` uses.
         spaceComplexity: "O(1)",

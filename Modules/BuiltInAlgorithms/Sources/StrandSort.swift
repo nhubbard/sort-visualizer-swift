@@ -8,7 +8,7 @@ public struct StrandSort: SortAlgorithm {
         category: .merge,
         sizeRange: 16...512,
         stable: true,
-        timeComplexity: ComplexityBounds(best: "O(n)", average: "O(n log n)", worst: "O(n^2)"),
+        timeComplexity: ComplexityBounds(best: "O(n)", average: "O(n\\log{n})", worst: "O(n^2)"),
         spaceComplexity: "O(n)",
         iconName: "list.number"
     )

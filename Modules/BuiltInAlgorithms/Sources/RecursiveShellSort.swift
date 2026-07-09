@@ -8,8 +8,9 @@ public struct RecursiveShellSort: SortAlgorithm {
         category: .insertion,
         sizeRange: 16...512,
         stable: false,
-        timeComplexity: ComplexityBounds(best: "O(n log n)", average: "O(n^1.25)", worst: "O(n^2)"),
-        spaceComplexity: "O(log n)",
+        timeComplexity: ComplexityBounds(
+            best: "O(n\\log{n})", average: "O(n^{1.25})", worst: "O(n^2)"),
+        spaceComplexity: "O(\\log{n})",
         iconName: "shell.fill"
     )
 

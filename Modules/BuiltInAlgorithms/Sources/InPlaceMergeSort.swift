@@ -31,10 +31,10 @@ public struct InPlaceMergeSort: SortAlgorithm {
         // so summed across the recursion this is O(n^2), not O(n log n) — verified empirically:
         // at n = 512 this algorithm performs roughly as many compares/swaps as Bubble Sort's
         // worst case, not plain Merge Sort's ~n log n.
-        timeComplexity: ComplexityBounds(best: "O(n log n)", average: "O(n^2)", worst: "O(n^2)"),
+        timeComplexity: ComplexityBounds(best: "O(n \\log{n})", average: "O(n^2)", worst: "O(n^2)"),
         // No aux array is ever created — the merge works by swapping and bubbling elements
         // within the array itself. The only extra memory is the recursion stack.
-        spaceComplexity: "O(log n)",
+        spaceComplexity: "O(\\log{n})",
         iconName: "rectangle.compress.vertical"
     )
 

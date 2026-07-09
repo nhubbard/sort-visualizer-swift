@@ -9,7 +9,7 @@ public struct LSDRadixSort: SortAlgorithm {
         category: .distribution,
         sizeRange: 16...512,
         stable: true,
-        timeComplexity: ComplexityBounds(best: "O(d*(n+b))", average: "O(d*(n+b))", worst: "O(d*(n+b))"),
+        timeComplexity: ComplexityBounds(best: "O(d \\times (n+b))", average: "O(d \\times (n+b))", worst: "O(d \\times (n+b))"),
         spaceComplexity: "O(n + b)",
         iconName: "number"
     )
