@@ -61,8 +61,13 @@ classes that are never ported directly — only their concrete subclasses are)
 - [x] OptimizedBubbleSort — done (native port batch 3), real category `.exchange`, the classic
       "shrink by last-swap distance" early-exit optimization,
       `Modules/BuiltInAlgorithms/Sources/OptimizedBubbleSort.swift`
-- [ ] OptimizedCocktailShakerSort
-- [ ] OptimizedGnomeSort
+- [x] OptimizedCocktailShakerSort — done (native port batch 4), real category `.exchange`, the same
+      "shrink by trailing sorted run" trick as OptimizedBubbleSort but bidirectional (forward + backward
+      sweep each pass), `Modules/BuiltInAlgorithms/Sources/OptimizedCocktailShakerSort.swift`
+- [x] OptimizedGnomeSort — done (native port batch 4), real category `.exchange`, Wikipedia's "smart
+      Gnome Sort" — per-prefix backward-swapping insertion pass, structurally Insertion Sort rather than
+      classic Gnome Sort's single forward/backward pointer,
+      `Modules/BuiltInAlgorithms/Sources/OptimizedGnomeSort.swift`
 - [ ] OptimizedStoogeSort
 - [ ] OptimizedStoogeSortStudio
 - [ ] QuadStoogeSort

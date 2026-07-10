@@ -43,6 +43,8 @@ algorithms = sorted(
         "bozosort",
         "cocktailmergesort",
         "optimizedbubblesort",
+        "optimizedcocktailshakersort",
+        "optimizedgnomesort",
         "swaplessbubblesort",
         "slowsort",
         "dualpivotquicksort",
