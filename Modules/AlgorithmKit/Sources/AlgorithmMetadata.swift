@@ -65,6 +65,13 @@ public struct AlgorithmMetadata: Sendable, Codable, Equatable {
     /// pick a size that would run effectively forever. No separate confirmation-dialog mechanism
     /// needed on top of it (§9 of ARCHITECTURE_V2.md).
     public var sizeRange: ClosedRange<Int>
+    /// The increment the manual size stepper (and the `⌘⇧A` automation loop) moves by: 16 at a
+    /// time for wide ranges (matching the global Settings default step), or the full range's
+    /// width for narrow ones — e.g. Bogo Sort's `4...7` steps by 1, so every valid size stays
+    /// reachable instead of only the two endpoints.
+    public var sizeStep: Int {
+        sizeRange.steppedSizeStep
+    }
     public var stable: Bool
     public var timeComplexity: ComplexityBounds
     public var spaceComplexity: String

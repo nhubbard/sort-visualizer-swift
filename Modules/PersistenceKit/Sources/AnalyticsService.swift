@@ -29,7 +29,8 @@ public actor AnalyticsService {
             mainWriteCount: header.mainWriteCount,
             auxWriteCount: header.auxWriteCount,
             reversalCount: header.reversalCount,
-            recordedAt: header.recordedAt
+            recordedAt: header.recordedAt,
+            uniqueValueCount: header.uniqueValueCount
         )
         modelContext.insert(summary)
         try modelContext.save()
@@ -72,6 +73,7 @@ public struct BigORecordSnapshot: Sendable, Equatable, Identifiable {
     public let auxWriteCount: Int
     public let reversalCount: Int
     public let recordedAt: Date
+    public let uniqueValueCount: Int?
 
     public var id: String { "\(algorithmID)-\(arraySize)-\(recordedAt.timeIntervalSinceReferenceDate)-\(compareCount)" }
 
@@ -84,5 +86,6 @@ public struct BigORecordSnapshot: Sendable, Equatable, Identifiable {
         auxWriteCount = summary.auxWriteCount
         reversalCount = summary.reversalCount
         recordedAt = summary.recordedAt
+        uniqueValueCount = summary.uniqueValueCount
     }
 }

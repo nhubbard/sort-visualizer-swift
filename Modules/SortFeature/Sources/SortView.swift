@@ -13,9 +13,34 @@ public struct SortView: View {
 
     public var body: some View {
         VStack(spacing: 12) {
-            statusLabel
+            if session.isAutomating {
+                automationBanner
+            } else {
+                statusLabel
+            }
             content
         }
+    }
+
+    /// Shown instead of the normal status label while the `⌘⇧A` loop is driving this session —
+    /// same "machine-readable via accessibilityIdentifier" shape as `statusLabel`, plus a way to
+    /// stop the loop without needing to remember the keyboard shortcut that started it.
+    private var automationBanner: some View {
+        HStack(spacing: 8) {
+            ProgressView()
+                .controlSize(.small)
+            Text(automationProgressText)
+                .font(.caption)
+                .accessibilityIdentifier("automationProgressLabel")
+            Button("Stop") { session.toggleAutomation() }
+                .font(.caption)
+                .accessibilityIdentifier("automationStopButton")
+        }
+    }
+
+    private var automationProgressText: String {
+        guard let progress = session.automationProgress else { return "Automating…" }
+        return "Automating: size \(session.arraySize) (\(progress.sizeIndex + 1)/\(progress.sizeCount)) · run \(progress.runIndex + 1)/\(progress.runCount)"
     }
 
     @ViewBuilder
@@ -26,7 +51,7 @@ public struct SortView: View {
         case let .replaying(replay), let .complete(replay):
             canvas(for: replay)
                 .safeAreaInset(edge: .bottom) {
-                    RunControlBar(session: session, replay: replay)
+                    RunControlBar(session: session, replay: replay, algorithm: session.algorithm)
                 }
         case .failed:
             ContentUnavailableView("Sort Failed", systemImage: "exclamationmark.triangle")

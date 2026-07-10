@@ -26,7 +26,6 @@ struct ComplexityChart: View {
     // nonisolated: read from `benchmark(algorithm:size:)`, itself nonisolated so it can run inside
     // `Task.detached` — safe since it's an immutable Sendable Int, not actual mutable shared state.
     private nonisolated static let trialsPerSize = 5
-    private static let sampleSizeCount = 6
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -49,6 +48,11 @@ struct ComplexityChart: View {
                         y: .value("Comparisons", point.averageCompareCount)
                     )
                 }
+                // Every tick lands on a size this algorithm's own stepper could actually reach —
+                // not whatever round numbers Swift Charts' automatic ticks would otherwise pick.
+                .chartXAxis {
+                    AxisMarks(values: dataPoints.map(\.size))
+                }
                 .frame(height: 160)
 
                 Text("Recording Time vs. Array Size")
@@ -62,6 +66,9 @@ struct ComplexityChart: View {
                         x: .value("Size", point.size),
                         y: .value("Milliseconds", point.averageRecordingDuration * 1000)
                     )
+                }
+                .chartXAxis {
+                    AxisMarks(values: dataPoints.map(\.size))
                 }
                 .frame(height: 160)
             }
@@ -106,14 +113,11 @@ struct ComplexityChart: View {
         )
     }
 
-    /// `sampleSizeCount` sizes evenly spaced across the algorithm's own allowed range — every
-    /// algorithm gets a chart shaped by what it actually supports, not a hardcoded size list that
-    /// might fall outside a narrow-range algorithm's `sizeRange` (e.g. Bogo Sort's `4...16`).
+    /// Every size reachable across the algorithm's own allowed range, stepping by the same
+    /// increment its manual size stepper uses (`steppedSizeStep`) — not a handful of evenly-spaced
+    /// samples. A narrow range (e.g. Bogo Sort's `4...16`) already gets every value from that step;
+    /// a wide one now gets every 16th size instead of just 6 points spanning it.
     static func sampleSizes(for range: ClosedRange<Int>) -> [Int] {
-        guard range.upperBound > range.lowerBound else { return [range.lowerBound] }
-        let step = max(1, (range.upperBound - range.lowerBound) / (sampleSizeCount - 1))
-        var sizes = Array(Swift.stride(from: range.lowerBound, through: range.upperBound, by: step))
-        if sizes.last != range.upperBound { sizes.append(range.upperBound) }
-        return sizes
+        range.steppedValues(by: range.steppedSizeStep)
     }
 }

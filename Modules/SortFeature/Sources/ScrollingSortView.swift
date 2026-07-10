@@ -42,5 +42,15 @@ public struct ScrollingSortView: View {
             // every caller gets that enforcement, not just this one.
             await session.start(size: arraySize)
         }
+        .background {
+            // Zero-size, fully transparent — this button exists only to give ⌘⇧A somewhere to
+            // land, scoped to whichever algorithm screen is currently showing. A global `Commands`
+            // scene would need `FocusedValue` plumbing to reach this specific session instead.
+            Button("") { session.toggleAutomation() }
+                .keyboardShortcut("a", modifiers: [.command, .shift])
+                .opacity(0)
+                .frame(width: 0, height: 0)
+                .accessibilityHidden(true)
+        }
     }
 }

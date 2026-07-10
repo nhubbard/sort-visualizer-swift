@@ -32,12 +32,32 @@ public final class SortSession {
     /// currently-running sort's own on/off switch (a run-control-bar toggle, not a Settings toggle).
     public var soundEnabled: Bool
 
+    /// The size of whatever's currently running or queued, set by `start(size:)` right after
+    /// clamping — same "local, seeded-from-global-default, never-written-back" shape as
+    /// `soundEnabled` above, but read-only from outside since changing it always has to go through
+    /// `start(size:)` (regenerating the tape), never a bare assignment. Its initial value is a
+    /// placeholder overwritten by the first real `start(size:)` call, before any size-dependent UI
+    /// can appear.
+    public private(set) var arraySize: Int
+
+    /// Whether the `⌘⇧A` automation loop (see `toggleAutomation`) is currently driving this
+    /// session — the run control bar disables its own manual controls while this is true, so a
+    /// stray scrub/resize/pause can't collide with the loop's own repeated `start(size:)` calls.
+    public private(set) var isAutomating = false
+    /// `nil` outside automation; otherwise the loop's current position, for a progress banner.
+    public private(set) var automationProgress: (sizeIndex: Int, sizeCount: Int, runIndex: Int, runCount: Int)?
+
     public let algorithm: any SortAlgorithm
     public let shuffle: any ShuffleAlgorithm
     private let audio: any AudioPlaying
     private let analytics: AnalyticsService
     private let settings: AppSettings
     private var monitorTask: Task<Void, Never>?
+    private var automationTask: Task<Void, Never>?
+    /// Resolved (and cleared) the moment `phase` genuinely reaches `.complete` — lets
+    /// `runAutomation` `await` one real, fully-animated run finishing before starting the next,
+    /// without polling `phase` itself.
+    private var completionContinuations: [CheckedContinuation<Void, Never>] = []
 
     public init(
         algorithm: any SortAlgorithm,
@@ -58,6 +78,7 @@ public final class SortSession {
         self.analytics = analytics
         self.settings = settings
         self.soundEnabled = settings.soundEnabled
+        self.arraySize = algorithm.metadata.sizeRange.lowerBound
     }
 
     /// Unconditionally clamps into `algorithm.metadata.sizeRange` rather than warning past it —
@@ -65,7 +86,12 @@ public final class SortSession {
     /// user-toggleable confirmation dialog), enforced here so every caller gets it, not just
     /// whichever view happens to clamp its own slider (§9 of ARCHITECTURE_V2.md).
     public func start(size: Int) async {
+        // Stops the current sort's sound/visuals immediately instead of leaving them running
+        // until the orphaned `ReplayEngine` self-terminates on its own — see the size stepper and
+        // automation loop, both of which call this repeatedly on an already-running session.
+        if case let .replaying(replay) = phase { replay.pause() }
         let clampedSize = min(max(size, algorithm.metadata.sizeRange.lowerBound), algorithm.metadata.sizeRange.upperBound)
+        arraySize = clampedSize
         phase = .recording
 
         let algorithm = self.algorithm
@@ -88,6 +114,7 @@ public final class SortSession {
 
         var shuffleEngine = RecordingEngine(values: identity)
         shuffle.record(into: &shuffleEngine)
+        let uniqueValueCount = Set(shuffleEngine.values).count
         let shuffleSummary = shuffleEngine.finish()
 
         // recordingDuration measures only the sort, not the shuffle — it's the real algorithmic
@@ -111,7 +138,8 @@ public final class SortSession {
                 recordingDuration: recordingDuration,
                 recordedAt: Date(),
                 shuffleID: shuffle.id.rawValue,
-                sortStartIndex: shuffleSummary.tape.count
+                sortStartIndex: shuffleSummary.tape.count,
+                uniqueValueCount: uniqueValueCount
             ),
             operations: shuffleSummary.tape + sortSummary.tape
         )
@@ -144,6 +172,48 @@ public final class SortSession {
             guard let self, let replay, replay.stepIndex >= replay.totalOperationCount else { return }
             self.phase = .complete(replay)
             try? await self.analytics.record(replay.header, algorithmID: self.algorithm.id)
+            let continuations = self.completionContinuations
+            self.completionContinuations = []
+            for continuation in continuations { continuation.resume() }
+        }
+    }
+
+    /// Suspends until the current run reaches `.complete` — used by `runAutomation` to sequence
+    /// real, fully-animated runs one after another instead of firing them all at once.
+    private func waitUntilComplete() async {
+        if case .complete = phase { return }
+        await withCheckedContinuation { completionContinuations.append($0) }
+    }
+
+    /// Starts or stops the `⌘⇧A` bulk-data-generation loop: starting from the algorithm's minimum
+    /// size, run 3 fresh, fully-animated sorts before stepping up by `sizeStep` (the same increment
+    /// the manual size stepper uses — every value for a narrow range, 16 at a time for a wide one)
+    /// to the next size, in ascending order, through the maximum. Toggling again mid-run cancels it
+    /// once the in-flight sort finishes playing, rather than yanking the tape out from under
+    /// `ReplayEngine` mid-playback.
+    public func toggleAutomation() {
+        if isAutomating {
+            automationTask?.cancel()
+        } else {
+            automationTask = Task { await runAutomation() }
+        }
+    }
+
+    private func runAutomation() async {
+        isAutomating = true
+        defer {
+            isAutomating = false
+            automationProgress = nil
+            automationTask = nil
+        }
+        let sizes = algorithm.metadata.sizeRange.steppedValues(by: algorithm.metadata.sizeStep)
+        for (sizeIndex, size) in sizes.enumerated() {
+            for runIndex in 0..<3 {
+                guard !Task.isCancelled else { return }
+                automationProgress = (sizeIndex, sizes.count, runIndex, 3)
+                await start(size: size)
+                await waitUntilComplete()
+            }
         }
     }
 

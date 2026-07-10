@@ -1,3 +1,4 @@
+import AlgorithmKit
 import SortEngineKit
 import SwiftUI
 
@@ -15,8 +16,10 @@ import SwiftUI
 struct RunControlBar: View {
     @Bindable var session: SortSession
     @Bindable var replay: ReplayEngine
+    let algorithm: any SortAlgorithm
 
     @State private var isSpeedExpanded = false
+    @State private var isSizeExpanded = false
 
     var body: some View {
         VStack(spacing: 8) {
@@ -26,11 +29,18 @@ struct RunControlBar: View {
             if isSpeedExpanded {
                 speedRow
             }
+            if isSizeExpanded {
+                sizeRow
+            }
         }
         .padding(12)
         .glassEffect(.regular.interactive(), in: .rect(cornerRadius: 20))
         .padding([.horizontal, .bottom])
         .animation(.easeInOut(duration: 0.2), value: isSpeedExpanded)
+        .animation(.easeInOut(duration: 0.2), value: isSizeExpanded)
+        // Manual scrubbing/resizing would otherwise collide with the automation loop's own
+        // repeated `start(size:)` calls — this bar goes fully inert while it's running.
+        .disabled(session.isAutomating)
     }
 
     private var scrubSlider: some View {
@@ -167,14 +177,13 @@ struct RunControlBar: View {
             Spacer()
 
             Button {
-                replay.seek(to: replay.header.sortStartIndex)
+                Task { await session.start(size: session.arraySize) }
             } label: {
                 Image(systemName: "arrow.counterclockwise")
             }
             .accessibilityIdentifier("runControlResetButton")
-            .accessibilityLabel("Reset to Shuffled Input")
-            .help("Replay the sort from the shuffled input, skipping the shuffle")
-            .disabled(replay.stepIndex == replay.header.sortStartIndex)
+            .accessibilityLabel("Reset and Reshuffle")
+            .help("Stop the current sort, shuffle a fresh array at this size, and sort it again")
 
             Button {
                 session.soundEnabled.toggle()
@@ -194,6 +203,16 @@ struct RunControlBar: View {
             .accessibilityIdentifier("runControlSpeedButton")
             .accessibilityLabel("Playback Speed")
             .help("Show or hide the playback speed slider")
+
+            Button {
+                isSizeExpanded.toggle()
+            } label: {
+                Text("n=\(session.arraySize)")
+                    .font(.footnote.monospacedDigit())
+            }
+            .accessibilityIdentifier("runControlSizeButton")
+            .accessibilityLabel("Array Size")
+            .help("Show or hide the array size stepper")
         }
         .buttonStyle(.borderless)
         .controlSize(.large)
@@ -218,6 +237,30 @@ struct RunControlBar: View {
                 .foregroundStyle(.secondary)
                 .frame(minWidth: 80, alignment: .trailing)
                 .accessibilityIdentifier("runControlSpeedValueLabel")
+        }
+    }
+
+    /// Bound through a custom `Binding`, same idiom as `scrubSlider` above — every tap doesn't
+    /// just change a number, it immediately stops the current sort and re-records+replays a fresh
+    /// one at the new size (`SortSession.start(size:)` already pauses any in-flight playback).
+    private var sizeRow: some View {
+        HStack(spacing: 8) {
+            Text("Size")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+            Stepper(
+                value: Binding(
+                    get: { session.arraySize },
+                    set: { newValue in Task { await session.start(size: newValue) } }
+                ),
+                in: algorithm.metadata.sizeRange,
+                step: algorithm.metadata.sizeStep
+            ) {
+                Text("\(session.arraySize) elements")
+                    .font(.caption.monospacedDigit())
+                    .frame(minWidth: 90, alignment: .trailing)
+            }
+            .accessibilityIdentifier("runControlSizeStepper")
         }
     }
 }

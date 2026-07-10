@@ -47,6 +47,30 @@ struct AnalyticsServiceTests {
         #expect(row.auxWriteCount == 2)
         #expect(row.reversalCount == 1)
         #expect(row.recordedAt == recordedAt)
+        #expect(row.uniqueValueCount == nil)
+    }
+
+    /// `SortSession.makeTape` measures this from the post-shuffle array before the sort runs — a
+    /// plain round-trip check that `record`/`fetchAllForTesting` carry it through unchanged.
+    @Test
+    func recordCarriesThroughUniqueValueCountWhenPresent() async throws {
+        let service = try makeInMemoryService()
+        let header = TapeHeader(
+            algorithmID: "bingosort",
+            initialValues: [1, 2, 3, 4],
+            visualSeed: 0,
+            compareCount: 3,
+            swapCount: 2,
+            recordingDuration: 0,
+            recordedAt: Date(),
+            uniqueValueCount: 3
+        )
+
+        try await service.record(header, algorithmID: AlgorithmID(rawValue: "bingosort"))
+
+        let rows = try await service.fetchAllForTesting()
+        #expect(rows.count == 1)
+        #expect(rows[0].uniqueValueCount == 3)
     }
 
     @Test

@@ -35,24 +35,13 @@ public enum BigOShape: Sendable, Equatable {
         }
     }
 
-    /// The fixed backdrop drawn on every Big-O correlation chart — every algorithm's real data is
-    /// compared against this same family, not just against its own declared complexity, so a chart
-    /// stays meaningful even for algorithms whose declared string isn't parseable (see `parse`).
-    public static let referenceFamily: [(label: String, shape: BigOShape)] = [
-        ("O(1)", .constant),
-        ("O(log n)", .logarithmic),
-        ("O(n)", .linear),
-        ("O(n log n)", .linearithmic),
-        ("O(n^2)", .polynomial(2)),
-        ("O(n^3)", .polynomial(3)),
-    ]
-
-    /// Parses one of `AlgorithmMetadata`'s hand-authored complexity strings (e.g. `"O(n^2)"`,
-    /// `"O(n \log n)"`, `"O(n^{2.71})"`) into a `BigOShape`, or `nil` when the string isn't a pure
-    /// function of `n` (contains another free variable) or isn't one of the recognized shapes.
-    /// Tolerant of this codebase's inconsistent authoring: `*` vs `\times`, `\log n` vs `\log{n}`
-    /// vs `log n`, and `n^2.71` vs `n^{2.71}` all normalize to the same form before matching.
-    public static func parse(_ complexity: String) -> BigOShape? {
+    /// Strips an `AlgorithmMetadata` complexity string down to a bare, order-preserved token — the
+    /// shared first step behind both `parse` (matches the result against the pure-`n` shapes below)
+    /// and `BigOCorrelation`'s app-specific resolver (matches the same result against templates
+    /// like `"d*n"`/`"n+k"`/`"n*m"` that reference another variable `parse` won't touch). Tolerant
+    /// of this codebase's inconsistent authoring: `*` vs `\times`, `\log n` vs `\log{n}` vs `log n`,
+    /// and `n^2.71` vs `n^{2.71}` all normalize to the same form.
+    public static func normalize(_ complexity: String) -> String? {
         guard let openParen = complexity.firstIndex(of: "("), let closeParen = complexity.lastIndex(of: ")"),
               openParen < closeParen else { return nil }
 
@@ -61,7 +50,23 @@ public enum BigOShape: Sendable, Equatable {
         normalized = normalized.replacingOccurrences(of: "\\log", with: "log")
         normalized = normalized.replacingOccurrences(of: "{", with: "")
         normalized = normalized.replacingOccurrences(of: "}", with: "")
+        // `n^(log n)` and `n^{log n}` are both used across `AlgorithmMetadata` for the same shape —
+        // collapsing the wrapping parens here (in addition to the braces above) lets both forms
+        // normalize to the same "n^logn" key instead of only recognizing one of them. It also means
+        // a grouped multi-variable form like `"d*(n+b)"` normalizes to the flattened `"d*n+b"` —
+        // fine here since callers match this as an opaque lookup key, not as an expression to
+        // literally evaluate.
+        normalized = normalized.replacingOccurrences(of: "(", with: "")
+        normalized = normalized.replacingOccurrences(of: ")", with: "")
         normalized = normalized.replacingOccurrences(of: " ", with: "")
+        return normalized
+    }
+
+    /// Parses one of `AlgorithmMetadata`'s hand-authored complexity strings (e.g. `"O(n^2)"`,
+    /// `"O(n \log n)"`, `"O(n^{2.71})"`) into a `BigOShape`, or `nil` when the string isn't a pure
+    /// function of `n` (contains another free variable) or isn't one of the recognized shapes.
+    public static func parse(_ complexity: String) -> BigOShape? {
+        guard let normalized = normalize(complexity) else { return nil }
 
         switch normalized {
         case "1": return .constant
@@ -70,7 +75,7 @@ public enum BigOShape: Sendable, Equatable {
         case "log^2n": return .logarithmicSquared
         case "nlogn": return .linearithmic
         case "nlog^2n": return .linearithmicSquared
-        case "n^(logn)": return .superLinearithmic
+        case "n^logn": return .superLinearithmic
         case "2^n": return .exponential
         case "n!", "n*n!": return .factorial
         default: break

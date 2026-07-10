@@ -10,13 +10,14 @@ struct BigOShapeTests {
         ("O(log^2 n)", .logarithmicSquared),
         ("O(n log n)", .linearithmic),
         ("O(n \\log n)", .linearithmic),
-        ("O(n )", .linearithmic),
+        ("O(n log n )", .linearithmic),
         ("O(n\\log{n})", .linearithmic),
         ("O(n log^2 n)", .linearithmicSquared),
         ("O(n^2)", .polynomial(2)),
         ("O(n^1.25)", .polynomial(1.25)),
         ("O(n^{2.71})", .polynomial(2.71)),
         ("O(n^(log n))", .superLinearithmic),
+        ("O(n^{log n})", .superLinearithmic),
         ("O(2^n)", .exponential),
         ("O(n \\times n!)", .factorial),
     ])
@@ -33,14 +34,13 @@ struct BigOShapeTests {
     }
 
     @Test
-    func referenceFamilyCoversTheClassicLadder() {
-        let labels = BigOShape.referenceFamily.map(\.label)
-        #expect(labels == ["O(1)", "O(log n)", "O(n)", "O(n log n)", "O(n^2)", "O(n^3)"])
-    }
-
-    @Test
-    func valueGrowsMonotonicallyForEveryReferenceShape() {
-        for (_, shape) in BigOShape.referenceFamily {
+    func valueGrowsMonotonicallyForEveryShape() {
+        let shapes: [BigOShape] = [
+            .constant, .logarithmic, .logarithmicSquared, .linear, .linearithmic,
+            .linearithmicSquared, .polynomial(2), .polynomial(3), .superLinearithmic,
+            .exponential, .factorial,
+        ]
+        for shape in shapes {
             #expect(shape.value(n: 100) >= shape.value(n: 10))
         }
     }

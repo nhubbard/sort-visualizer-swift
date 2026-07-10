@@ -4,8 +4,8 @@ import PersistenceKit
 import SwiftUI
 
 /// Same `AnalyticsService`-backed data `BenchmarkFeature`'s `BigOCorrelationChart` charts — the
-/// real, observed operation-count growth against the classic Big-O reference family
-/// (`BigOCorrelation.bigOChartPoints`). Lives in `SortFeature` too rather than reusing
+/// real, observed operation-count growth against that same algorithm's own best/average/worst-case
+/// curves (`BigOCorrelation.bigOChartPoints`). Lives in `SortFeature` too rather than reusing
 /// `BenchmarkFeature`'s view directly: `SortFeature` doesn't depend on `BenchmarkFeature`, so
 /// duplicating this ~60-line view is cheaper than adding a cross-module dependency for it.
 struct BigOCorrelationChart: View {
@@ -27,27 +27,44 @@ struct BigOCorrelationChart: View {
                         "Complete a \(algorithm.metadata.displayName) sort at a couple of different array sizes to chart it here."
                     )
                 )
-                .frame(minHeight: 120)
+                .frame(maxWidth: .infinity, minHeight: 120)
             } else {
+                // Every algorithm needs at least 2 distinct recorded sizes to reach this branch
+                // (`bigOChartPoints` returns `[]` otherwise), so `observedSizes` is never empty.
+                // Derived from `.observedTrend` specifically — exactly one per distinct recorded
+                // size, unlike the raw scatter which can have several points at the same size.
+                let observedSizes = points.filter { $0.kind == .observedTrend }.map(\.size).sorted()
                 Chart(points) { point in
-                    LineMark(
-                        x: .value("Array Size", point.size),
-                        y: .value("Normalized Work", point.normalizedValue)
-                    )
-                    .foregroundStyle(by: .value("Series", point.series))
-                    .lineStyle(point.isObserved ? StrokeStyle() : StrokeStyle(dash: [4, 4]))
-
-                    if point.isObserved {
+                    switch point.kind {
+                    case .observedRun:
                         PointMark(
                             x: .value("Array Size", point.size),
                             y: .value("Normalized Work", point.normalizedValue)
                         )
                         .foregroundStyle(by: .value("Series", point.series))
+                    case .observedTrend:
+                        LineMark(
+                            x: .value("Array Size", point.size),
+                            y: .value("Normalized Work", point.normalizedValue)
+                        )
+                        .foregroundStyle(by: .value("Series", point.series))
+                        .lineStyle(StrokeStyle())
+                    case .reference:
+                        LineMark(
+                            x: .value("Array Size", point.size),
+                            y: .value("Normalized Work", point.normalizedValue)
+                        )
+                        .foregroundStyle(by: .value("Series", point.series))
+                        .lineStyle(StrokeStyle(dash: [4, 4]))
                     }
+                }
+                .chartXScale(domain: observedSizes[0]...observedSizes[observedSizes.count - 1])
+                .chartXAxis {
+                    AxisMarks(values: observedSizes)
                 }
                 .chartXAxisLabel("Array Size")
                 .chartYAxisLabel("Normalized Work")
-                .frame(height: 200)
+                .frame(maxWidth: .infinity, minHeight: 200)
                 .accessibilityIdentifier("bigOCorrelationChart")
             }
         }
@@ -59,7 +76,7 @@ struct BigOCorrelationChart: View {
     private func load() async {
         isLoading = true
         let summaries = (try? await AnalyticsService.shared.fetchSummaries(algorithmID: algorithm.id)) ?? []
-        points = bigOChartPoints(for: summaries)
+        points = bigOChartPoints(for: summaries, timeComplexity: algorithm.metadata.timeComplexity)
         isLoading = false
     }
 }

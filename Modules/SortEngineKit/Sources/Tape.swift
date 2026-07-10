@@ -39,6 +39,13 @@ public struct TapeHeader: Sendable, Codable, Equatable {
     /// the one piece of bookkeeping that lets a future consumer (step/scrub UI, a "skip shuffle"
     /// button) distinguish the two phases without re-deriving it (§2A.4).
     public let sortStartIndex: Int
+    /// Distinct value count in the array immediately after the shuffle, before the sort runs —
+    /// ArrayV's `m`. `nil` when the caller has no shuffle output to count (e.g. a hand-built test
+    /// fixture). Every built-in shuffle keeps values within `~[1, n]`, but two of the five
+    /// (`shuffledcubic`/`shuffledquintic`) resample through a skewed curve and can collapse several
+    /// positions onto the same value — so unlike the array's value range (always `~n`, regardless
+    /// of shuffle), `m` genuinely isn't a fixed function of `n` and has to be measured per run.
+    public let uniqueValueCount: Int?
 
     public init(
         algorithmID: String,
@@ -52,7 +59,8 @@ public struct TapeHeader: Sendable, Codable, Equatable {
         recordingDuration: TimeInterval,
         recordedAt: Date,
         shuffleID: String? = nil,
-        sortStartIndex: Int = 0
+        sortStartIndex: Int = 0,
+        uniqueValueCount: Int? = nil
     ) {
         self.algorithmID = algorithmID
         self.initialValues = initialValues
@@ -66,6 +74,7 @@ public struct TapeHeader: Sendable, Codable, Equatable {
         self.recordedAt = recordedAt
         self.shuffleID = shuffleID
         self.sortStartIndex = sortStartIndex
+        self.uniqueValueCount = uniqueValueCount
     }
 }
 

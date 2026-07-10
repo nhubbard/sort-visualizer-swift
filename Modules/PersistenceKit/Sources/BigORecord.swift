@@ -25,6 +25,11 @@ public final class BigORecord {
     public var auxWriteCount: Int = 0
     public var reversalCount: Int = 0
     public var recordedAt: Date = Date.distantPast
+    /// Distinct value count right after the shuffle, before the sort ran (`TapeHeader.uniqueValueCount`)
+    /// — nullable because records written before this field existed predate it, not because a real
+    /// run can't measure it. `BigOCorrelation` uses this to estimate Bingo sort's `m`, the one
+    /// declared-complexity variable that isn't a fixed function of `n` in this app.
+    public var uniqueValueCount: Int?
 
     public init(
         algorithmID: String,
@@ -34,7 +39,8 @@ public final class BigORecord {
         mainWriteCount: Int,
         auxWriteCount: Int,
         reversalCount: Int,
-        recordedAt: Date
+        recordedAt: Date,
+        uniqueValueCount: Int? = nil
     ) {
         self.algorithmID = algorithmID
         self.arraySize = arraySize
@@ -44,5 +50,6 @@ public final class BigORecord {
         self.auxWriteCount = auxWriteCount
         self.reversalCount = reversalCount
         self.recordedAt = recordedAt
+        self.uniqueValueCount = uniqueValueCount
     }
 }
