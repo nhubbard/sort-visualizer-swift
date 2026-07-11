@@ -34,6 +34,50 @@ a different name — real thread interleaving has no meaning in a model with one
 it would be visual theater over duplicate content, not new algorithmic behavior. Removed from the
 per-category lists below rather than left as "Decision Required" — the decision is already made.
 
+**Effort tiers** (2026-07-11 pass): every remaining "Not Started" row below is now grouped by how
+complex the *ArrayV Java source* actually is, not by category or alphabetical order. The number
+cited per algorithm is "effective lines" — its own concrete class's line count, plus (when it
+`extends` a shared `sorts/templates/` class rather than the bare `Sort` base) that template's own
+line count, since that inherited logic is real complexity a port has to actually understand and
+translate, not optional reading:
+
+- **Trivial** (≤50 effective lines) — under an hour, usually a single self-contained loop.
+- **Easy** (51–100) — comparable to this project's own "easy pick" batches so far.
+- **Medium** (101–200) — comparable to "medium pick"/"relatively medium" batches so far.
+- **Hard** (201–400, or a same-category prerequisite that isn't ported yet) — multi-session.
+- **Very Hard** (400+, or extends one of the five largest templates — `GrailSorting` 780,
+  `QuadSorting` 875, `TimSorting` 950, `WikiSorting` 1068, `KotaSorting` 1142, `PDQSorting` 570) —
+  multi-day, matches the "very complex" language already used for `AdaptiveGrailSort`/`ChaliceSort`.
+
+Several clusters share one large template or one unported prerequisite — porting the shared piece
+once makes every sibling in that cluster much cheaper than its tier alone suggests, so tackle a
+cluster together rather than picking its members apart on separate days:
+
+- **The Bogo/Guess family (16 algorithms, spread across exchange + distribute below)** all extend
+  `BogoSorting` (261 lines), but the *real* blocker isn't that template — it's the same
+  "`RecordingEngine` can't pre-record an open-ended random search" problem `BogoSort`/`BozoSort`
+  already solved by rewriting as a deterministic permutation walk (see
+  `Modules/BuiltInAlgorithms/Sources/BogoSort.swift`'s doc comment). Every one of these 16 needs
+  that same rewrite treatment, not a literal port of `BogoSorting` — apply the established pattern
+  per variant rather than re-deriving it, and expect each variant to be cheap once the first one in
+  a session re-establishes the pattern.
+- **The Grail cluster**: `BlockInsertionSort` (insert), `GrailSort`, `OptimizedLazyStableSort`
+  (hybrid), and `LazyStableSort` (merge) all extend `GrailSorting` (780 lines) — port the template
+  once, then all four wrapper algorithms are comparatively small.
+- **The Quad cluster**: `QuadSort` (merge) and `FluxSort` (hybrid) both extend `QuadSorting`
+  (875 lines).
+- **The PDQ cluster**: `PDQBranchedSort` and `PDQBranchlessSort` (both hybrid) both extend
+  `PDQSorting` (570 lines).
+- **The MultiWayMerge cluster**: `FlanSort` and `RemiSort` (both hybrid) both extend
+  `MultiWayMergeSorting` (82 lines) — a much smaller shared template, so this pair is cheaper than
+  its members' own size alone suggests.
+- **The BlockMerge cluster**: `ChaliceSort` and `SynchronousSqrtSort` (both hybrid) both extend
+  `BlockMergeSorting` (352 lines).
+- `NewShuffleMergeSort` (merge) directly extends the not-yet-ported `IterativeTopDownMergeSort`
+  (merge) — port that prerequisite first, not just its shared template.
+- `IntroCircleSortIterative`/`IntroCircleSortRecursive` (hybrid) extend the already-small
+  `IterativeCircleSorting`/`CircleSorting` templates (44/48 lines) — trivial once `CircleSort*` (already shipped) established the pattern.
+
 ### a. Exchange sorts (`sorts/exchange/`, 41)
 
 #### Completed
@@ -91,27 +135,32 @@ per-category lists below rather than left as "Decision Required" — the decisio
 
 #### Not Started
 
-- [ ] BubbleBogoSort
-- [ ] CircloidSort
-- [ ] ClassicThreeSmoothCombSort
-- [ ] CompleteGraphSort
-- [ ] ExchangeBogoSort
-- [ ] ForcedStableQuickSort
-- [ ] FunSort
-- [ ] LRQuickSort
-- [ ] OptimizedStoogeSort
-- [ ] OptimizedStoogeSortStudio
-- [ ] QuadStoogeSort
-- [ ] ShoveSort
-- [ ] SillySort
-- [ ] SlopeSort
-- [ ] SnuffleSort
-- [ ] StablePermutationSort
-- [ ] StableQuickSort
-- [ ] TableSort
-- [ ] ThreeSmoothCombSortIterative
-- [ ] ThreeSmoothCombSortRecursive
-- [ ] UnoptimizedCocktailShakerSort
+**Trivial:**
+- [ ] ExchangeBogoSort — 35 lines (Bogo family — see cluster note above)
+- [ ] SnuffleSort — 44 lines
+- [ ] SlopeSort — 46 lines
+
+**Easy:**
+- [ ] ShoveSort — 52 lines
+- [ ] SillySort — 57 lines
+- [ ] BubbleBogoSort — 59 lines (Bogo family — see cluster note above)
+- [ ] ClassicThreeSmoothCombSort — 60 lines
+- [ ] QuadStoogeSort — 61 lines
+- [ ] ThreeSmoothCombSortIterative — 66 lines
+- [ ] ThreeSmoothCombSortRecursive — 69 lines
+- [ ] LRQuickSort — 71 lines
+- [ ] OptimizedStoogeSortStudio — 75 lines
+- [ ] CircloidSort — 77 lines
+- [ ] UnoptimizedCocktailShakerSort — 83 lines
+- [ ] StablePermutationSort — 86 lines (Bogo family — see cluster note above)
+- [ ] FunSort — 88 lines
+- [ ] OptimizedStoogeSort — 91 lines
+
+**Medium:**
+- [ ] CompleteGraphSort — 109 lines
+- [ ] StableQuickSort — 112 lines
+- [ ] ForcedStableQuickSort — 115 lines
+- [ ] TableSort — 132 lines
 
 ### b. Insertion sorts (`sorts/insert/`, 18)
 
@@ -139,16 +188,24 @@ per-category lists below rather than left as "Decision Required" — the decisio
 
 #### Not Started
 
-- [ ] AATreeSort
-- [ ] AVLTreeSort
-- [ ] BlockInsertionSort
-- [ ] ClassicTreeSort
-- [ ] HanoiSort
-- [ ] LibrarySort
-- [ ] PatienceSort
-- [ ] RedBlackTreeSort
-- [ ] SplaySort
-- [ ] TreeSort
+**Easy:**
+- [ ] ClassicTreeSort — 96 lines
+
+**Medium:**
+- [ ] PatienceSort — 127 lines
+- [ ] SplaySort — 157 lines
+- [ ] TreeSort — 168 lines
+
+**Hard:**
+- [ ] LibrarySort — 233 lines
+- [ ] AATreeSort — 248 lines
+- [ ] HanoiSort — 326 lines
+- [ ] RedBlackTreeSort — 336 lines
+- [ ] AVLTreeSort — 373 lines
+
+**Very Hard:**
+- [ ] BlockInsertionSort — 86 own lines, but extends `GrailSorting` (780 lines, Grail cluster —
+      see note above); ~866 effective lines
 
 ### c. Selection sorts (`sorts/select/`, 25)
 
@@ -179,23 +236,34 @@ per-category lists below rather than left as "Decision Required" — the decisio
 
 #### Not Started
 
-- [ ] AsynchronousSort
-- [ ] BadSort
-- [ ] BaseNMaxHeapSort
-- [ ] BinomialHeapSort
-- [ ] BinomialSmoothSort
-- [ ] BottomUpHeapSort
-- [ ] ClassicTournamentSort
-- [ ] FlippedMinHeapSort
-- [ ] LazyHeapSort
-- [ ] MinMaxHeapSort
-- [ ] OutOfPlaceHeapSort
-- [ ] PoplarHeapSort
-- [ ] SmoothSort
-- [ ] TernaryHeapSort
-- [ ] TournamentSort
-- [ ] TriangularHeapSort
-- [ ] WeakHeapSort
+`SmoothSort`/`PoplarHeapSort`/`TriangularHeapSort` below are also each a hard prerequisite for a
+shuffle (§2's `SMOOTH`/`POPLAR`/`TRI_HEAP`, which literally call these sorts' own heapify step) —
+not just their own tier, they unblock a shuffle too.
+
+**Trivial:**
+- [ ] BaseNMaxHeapSort — 50 lines
+
+**Easy:**
+- [ ] BadSort — 54 lines
+- [ ] BinomialSmoothSort — 54 lines
+- [ ] BinomialHeapSort — 60 lines
+- [ ] FlippedMinHeapSort — 64 lines
+- [ ] BottomUpHeapSort — 66 lines
+- [ ] LazyHeapSort — 75 lines
+- [ ] TernaryHeapSort — 79 lines
+- [ ] TriangularHeapSort — 80 lines (also a shuffle prerequisite — see note above)
+- [ ] WeakHeapSort — 84 lines
+- [ ] AsynchronousSort — 85 lines
+
+**Medium:**
+- [ ] OutOfPlaceHeapSort — 102 lines
+- [ ] MinMaxHeapSort — 123 lines
+- [ ] ClassicTournamentSort — 140 lines
+- [ ] TournamentSort — 156 lines
+
+**Hard:**
+- [ ] SmoothSort — 205 lines (also a shuffle prerequisite — see note above)
+- [ ] PoplarHeapSort — 209 lines (also a shuffle prerequisite — see note above)
 
 ### d. Distribution sorts (`sorts/distribute/`, 36)
 
@@ -241,33 +309,38 @@ per-category lists below rather than left as "Decision Required" — the decisio
 
 #### Not Started
 
-- [ ] AmericanFlagSort
-- [ ] BinaryQuickSortIterative
-- [ ] BinaryQuickSortRecursive
-- [ ] BogoBogoSort
-- [ ] ClassicGravitySort
-- [ ] CocktailBogoSort
-- [ ] DeterministicBogoSort
-- [ ] GuessSort
-- [ ] InPlaceLSDRadixSort
-- [ ] IndexSort
-- [ ] LessBogoSort
-- [ ] MedianQuickBogoSort
-- [ ] MergeBogoSort
-- [ ] OptimizedGuessSort
-- [ ] QuickBogoSort
-- [ ] RandomGuessSort
-- [ ] RotateLSDRadixSort
-- [ ] RotateMSDRadixSort
-- [ ] SelectionBogoSort
-- [ ] ShatterSort
-- [ ] SimpleShatterSort
-- [ ] SimplisticGravitySort
-- [ ] SmartBogoBogoSort
-- [ ] SmartGuessSort
-- [ ] StacklessAmericanFlagSort
-- [ ] StacklessBinaryQuickSort
-- [ ] TimeSort
+**Trivial:**
+- [ ] LessBogoSort — 33 lines (Bogo family — see cluster note above)
+- [ ] CocktailBogoSort — 46 lines (Bogo family — see cluster note above)
+
+**Easy:**
+- [ ] RandomGuessSort — 55 lines (Bogo family — see cluster note above)
+- [ ] OptimizedGuessSort — 59 lines (Bogo family — see cluster note above)
+- [ ] SmartGuessSort — 60 lines (Bogo family — see cluster note above)
+- [ ] IndexSort — 64 lines
+- [ ] SimplisticGravitySort — 64 lines
+- [ ] GuessSort — 65 lines (Bogo family — see cluster note above)
+- [ ] DeterministicBogoSort — 67 lines (Bogo family — see cluster note above)
+- [ ] MedianQuickBogoSort — 67 lines (Bogo family — see cluster note above)
+- [ ] SelectionBogoSort — 68 lines (Bogo family — see cluster note above)
+- [ ] SmartBogoBogoSort — 72 lines (Bogo family — see cluster note above)
+- [ ] ClassicGravitySort — 77 lines
+- [ ] QuickBogoSort — 83 lines (Bogo family — see cluster note above)
+- [ ] MergeBogoSort — 86 lines (Bogo family — see cluster note above)
+- [ ] InPlaceLSDRadixSort — 87 lines
+
+**Medium:**
+- [ ] BogoBogoSort — 102 lines (Bogo family — see cluster note above)
+- [ ] StacklessBinaryQuickSort — 105 lines
+- [ ] RotateLSDRadixSort — 118 lines
+- [ ] TimeSort — 120 lines
+- [ ] BinaryQuickSortIterative — 43 own + 101 `BinaryQuickSorting` template = 144 lines
+- [ ] BinaryQuickSortRecursive — 43 own + 101 `BinaryQuickSorting` template = 144 lines
+- [ ] StacklessAmericanFlagSort — 144 lines
+- [ ] ShatterSort — 51 own + 102 `ShatterSorting` template = 153 lines
+- [ ] SimpleShatterSort — 51 own + 102 `ShatterSorting` template = 153 lines
+- [ ] AmericanFlagSort — 155 lines
+- [ ] RotateMSDRadixSort — 164 lines
 
 ### e. Merge sorts (`sorts/merge/`, 19)
 
@@ -293,16 +366,26 @@ per-category lists below rather than left as "Decision Required" — the decisio
 
 #### Not Started
 
-- [ ] AndreySort
-- [ ] BlockSwapMergeSort
-- [ ] BufferedStoogeSort
-- [ ] ImprovedInPlaceMergeSort (**not** ported — distinct from plain `InPlaceMergeSort` above)
-- [ ] IterativeTopDownMergeSort
-- [ ] LazyStableSort
-- [ ] NewShuffleMergeSort
-- [ ] PDMergeSort
-- [ ] QuadSort
-- [ ] StacklessRotateMergeSort
+**Easy:**
+- [ ] ImprovedInPlaceMergeSort — 92 lines (**not** ported — distinct from plain `InPlaceMergeSort` above)
+- [ ] BufferedStoogeSort — 96 lines
+- [ ] BlockSwapMergeSort — 98 lines
+
+**Medium:**
+- [ ] StacklessRotateMergeSort — 125 lines
+- [ ] IterativeTopDownMergeSort — 137 lines (also a same-category prerequisite — see note above)
+- [ ] AndreySort — 158 lines
+- [ ] PDMergeSort — 183 lines
+
+**Hard:**
+- [ ] NewShuffleMergeSort — 203 lines, and directly extends the not-yet-ported
+      `IterativeTopDownMergeSort` above rather than just a shared template — port that one first
+
+**Very Hard:**
+- [ ] LazyStableSort — 60 own + 780 `GrailSorting` template = 840 lines (Grail cluster — see note above)
+- [ ] QuadSort — 51 own + 875 `QuadSorting` template = 926 lines (Quad cluster — see note above)
+
+**Tracked elsewhere:**
 - [ ] TwinSort (ArrayV files it under `merge/`'s sibling `hybrid/` package per its template
       location; tracked once, under the hybrid section below — originally picked as this batch's hybrid/medium
       but swapped for IntroSort, see hybrid/ section)
@@ -319,7 +402,10 @@ per-category lists below rather than left as "Decision Required" — the decisio
 
 #### Not Started
 
-- [ ] PancakeInsertionSort — deferred (see substitution note above); still worth a real port later
+**Medium (by line count — see caveat):**
+- [ ] PancakeInsertionSort — 128 lines, deferred (see substitution note above); still worth a real
+      port later. Line count alone undersells this one — the held-value binary-search "monobound"
+      helpers plus the direction-flip state machine make it feel more like a Hard port in practice.
 
 #### Decision Required
 
@@ -358,18 +444,23 @@ per-category lists below rather than left as "Decision Required" — the decisio
 
 #### Not Started
 
-- [ ] BoseNelsonSortRecursive
-- [ ] CreaseSort
-- [ ] DiamondSortIterative
-- [ ] DiamondSortRecursive
-- [ ] FoldSort
-- [ ] MatrixSort
-- [ ] PairwiseMergeSortIterative
-- [ ] PairwiseMergeSortRecursive
-- [ ] PairwiseSortIterative
-- [ ] PairwiseSortRecursive
-- [ ] WeaveSortIterative
-- [ ] WeaveSortRecursive
+**Trivial:**
+- [ ] DiamondSortRecursive — 39 lines
+
+**Easy:**
+- [ ] BoseNelsonSortRecursive — 55 lines
+- [ ] WeaveSortIterative — 63 lines
+- [ ] CreaseSort — 65 lines
+- [ ] DiamondSortIterative — 67 lines
+- [ ] PairwiseMergeSortIterative — 67 lines
+- [ ] FoldSort — 77 lines
+- [ ] WeaveSortRecursive — 77 lines
+- [ ] PairwiseMergeSortRecursive — 80 lines
+- [ ] PairwiseSortRecursive — 81 lines
+- [ ] PairwiseSortIterative — 88 lines
+
+**Medium:**
+- [ ] MatrixSort — 120 lines
 
 ### h. Quick sorts (`sorts/quick/`, 2 — the entire category)
 
@@ -378,7 +469,10 @@ per-category lists below rather than left as "Decision Required" — the decisio
 - [x] TernaryLLQuickSort — done (Phase 7 batch, easy pick), `ternaryllquicksort.js`
 - [x] TernaryLRQuickSort — done (Phase 7 batch, medium pick), `ternarylrquicksort.js`
 
-### i. Hybrid sorts (`sorts/hybrid/`, 41 — generally the most complex category; no file here is genuinely "easy")
+### i. Hybrid sorts (`sorts/hybrid/`, 41)
+
+Generally the most complex category, and home to most of the Very Hard tier below — but a handful
+of small wrapper algorithms over an already-shipped template keep it from being uniformly hard.
 
 #### Completed
 
@@ -405,42 +499,59 @@ per-category lists below rather than left as "Decision Required" — the decisio
 
 #### Not Started
 
-- [ ] TwinSort — deferred (see substitution note above); still worth a real port later
-- [ ] AdaptiveGrailSort (915 lines — very complex)
-- [ ] BufferPartitionMergeSort
-- [ ] ChaliceSort (767 lines — very complex)
-- [ ] CircularGrailSort
-- [ ] DropMergeSort
-- [ ] EctaSort
-- [ ] FifthMergeSort
-- [ ] FlanSort
-- [ ] FluxSort
-- [ ] GrailSort (780-line template)
-- [ ] ImprovedBlockSelectionSort
-- [ ] IntroCircleSortIterative
-- [ ] IntroCircleSortRecursive
-- [ ] KotaSort (1142-line template — largest in the whole `sorts/` tree)
-- [ ] LazierestSort
-- [ ] LaziestSort
-- [ ] MedianMergeSort
-- [ ] MergeInsertionSort
-- [ ] OptimizedBottomUpMergeSort
-- [ ] OptimizedDualPivotQuickSort
-- [ ] OptimizedLazyStableSort
-- [ ] OptimizedRotateMergeSort
-- [ ] OptimizedWeaveMergeSort
-- [ ] PDQBranchedSort (570-line template)
-- [ ] PDQBranchlessSort
-- [ ] RemiSort
-- [ ] SqrtSort
-- [ ] StacklessDualPivotQuickSort
-- [ ] StacklessHybridQuickSort
-- [ ] SynchronousSqrtSort
-- [ ] TimSort (950-line template)
-- [ ] UnstableGrailSort
-- [ ] WeaveMergeSort
-- [ ] WikiSort (1068-line template)
-- [ ] YujisBufferedMergeSort2
+**Easy:**
+- [ ] WeaveMergeSort — 97 lines
+- [ ] IntroCircleSortIterative — 53 own + 44 `IterativeCircleSorting` template = 97 lines (trivial
+      once `CircleSort*`, already shipped, established the pattern)
+
+**Medium:**
+- [ ] IntroCircleSortRecursive — 53 own + 48 `CircleSorting` template = 101 lines
+- [ ] MergeInsertionSort — 125 lines
+- [ ] OptimizedDualPivotQuickSort — 140 lines
+- [ ] OptimizedBottomUpMergeSort — 144 lines
+- [ ] LaziestSort — 153 lines
+- [ ] StacklessDualPivotQuickSort — 156 lines
+- [ ] StacklessHybridQuickSort — 163 lines
+- [ ] DropMergeSort — 166 lines
+- [ ] OptimizedWeaveMergeSort — 172 lines
+- [ ] ImprovedBlockSelectionSort — 184 lines
+
+**Hard:**
+- [ ] YujisBufferedMergeSort2 — 202 lines
+- [ ] MedianMergeSort — 204 lines
+- [ ] LazierestSort — 209 lines
+- [ ] CircularGrailSort — 209 lines (self-contained despite the name — doesn't actually extend
+      `GrailSorting`)
+- [ ] FifthMergeSort — 221 lines
+- [ ] TwinSort — 57 own + 217 `TwinSorting` template = 274 lines; deferred (see substitution note
+      above, and §1e's redirect note) — still worth a real port later
+- [ ] BufferPartitionMergeSort — 290 lines
+- [ ] OptimizedRotateMergeSort — 305 lines
+- [ ] RemiSort — 270 own + 82 `MultiWayMergeSorting` template = 352 lines (MultiWayMerge cluster —
+      see note above)
+- [ ] EctaSort — 362 lines
+
+**Very Hard:**
+- [ ] SqrtSort — 425 lines
+- [ ] UnstableGrailSort — 71 own + 355 `UnstableGrailSorting` template = 426 lines
+- [ ] FlanSort — 367 own + 82 `MultiWayMergeSorting` template = 449 lines (MultiWayMerge cluster —
+      see note above)
+- [ ] SynchronousSqrtSort — 190 own + 352 `BlockMergeSorting` template = 542 lines (BlockMerge
+      cluster — see note above)
+- [ ] PDQBranchlessSort — 46 own + 570 `PDQSorting` template = 616 lines (PDQ cluster — see note above)
+- [ ] PDQBranchedSort — 49 own + 570-line `PDQSorting` template = 619 lines (PDQ cluster — see note above)
+- [ ] GrailSort — 91 own + 780 `GrailSorting` template = 871 lines (Grail cluster — see note above)
+- [ ] OptimizedLazyStableSort — 106 own + 780 `GrailSorting` template = 886 lines (Grail cluster —
+      see note above)
+- [ ] AdaptiveGrailSort — 915 lines — very complex, but self-contained (extends the bare `Sort`
+      base directly, despite the name)
+- [ ] TimSort — 45-line composition wrapper + 950 `TimSorting` template = 995 effective lines
+- [ ] FluxSort — 202 own + 875 `QuadSorting` template = 1077 lines (Quad cluster — see note above)
+- [ ] ChaliceSort — 767 own + 352 `BlockMergeSorting` template = 1119 lines — very complex
+      (BlockMerge cluster — see note above)
+- [ ] WikiSort — 75-line wrapper + 1068 `WikiSorting` template = 1143 effective lines
+- [ ] KotaSort — 33-line wrapper + 1142 `KotaSorting` template = 1175 effective lines — the largest
+      template in the whole `sorts/` tree
 
 ## 2. Shuffles
 
@@ -472,47 +583,72 @@ shuffle is being proven out in JS first, same as `Algorithms/`.
 
 ### b. Not Started
 
-- [ ] ALMOST ("Slight Shuffle")
-- [ ] NAIVE ("Naive Randomly")
-- [ ] NOISY ("Noisy")
-- [ ] BLOCK_RANDOMLY ("Randomly w/ Blocks")
-- [ ] SHUFFLED_TAIL ("Scrambled Tail")
-- [ ] SHUFFLED_HEAD ("Scrambled Head")
-- [ ] MOVED_ELEMENT ("Shifted Element")
-- [ ] SHUFFLED_ODDS ("Scrambled Odds")
-- [ ] SHUFFLED_HALF ("Shuffled Half")
-- [ ] PARTITIONED ("Partitioned")
-- [ ] PARTIAL_REVERSE ("Half Reversed")
-- [ ] HALF_ROTATION ("Half Rotation")
-- [ ] DOUBLE_LAYERED ("Double Layered")
-- [ ] FINAL_MERGE ("Final Merge Pass")
-- [ ] REAL_FINAL_MERGE ("Shuffled Final Merge")
-- [ ] SAWTOOTH ("Sawtooth")
-- [ ] ORGAN ("Pipe Organ")
-- [ ] FINAL_BITONIC ("Final Bitonic Pass")
-- [ ] INTERLACED ("Interlaced")
-- [ ] FINAL_RADIX ("Final Radix")
-- [ ] REAL_FINAL_RADIX ("Real Final Radix")
-- [ ] REC_RADIX ("Recursive Final Radix")
-- [ ] BST_TRAVERSAL ("BST Traversal")
-- [ ] INV_BST ("Inverted BST")
-- [ ] LOG_SLOPES ("Logarithmic Slopes")
-- [ ] CIRCLE ("First Circle Pass")
-- [ ] PAIRWISE ("Final Pairwise Pass")
-- [ ] REC_REV ("Recursive Reversal")
-- [ ] GRAY_CODE ("Gray Code Fractal")
-- [ ] SIERPINSKI ("Sierpinski Triangle")
-- [ ] TRIANGULAR ("Triangular")
-- [ ] BIT_REVERSE ("Bit Reversal")
-- [ ] BLOCK_REVERSE ("Block Reverse")
-- [ ] HEAPIFIED ("Heapified")
-- [ ] SMOOTH ("Smoothified")
-- [ ] POPLAR ("Poplarified")
-- [ ] TRI_HEAP ("Triangular Heapified")
-- [ ] QSORT_BAD ("Quicksort Adversary")
-- [ ] PDQ_BAD ("PDQ Adversary" — ~345 lines, embeds most of pdqsort's own logic)
-- [ ] GRAIL_BAD ("Grailsort Adversary")
-- [ ] SHUF_MERGE_BAD ("Shuffle Merge Adversary")
+Every shuffle lives as one enum constant's method body inside ArrayV's single 1,484-line
+`Shuffles.java`, not a separate file — "effective lines" below is that one method's own body
+(`~/ArrayV`'s `utils/Shuffles.java`), since there's no shared shuffle template to inherit
+complexity from. Shuffles compress into a much narrower range than sorts do: nearly all of them are
+Trivial by the same thresholds §1 uses, so within that tier they're listed in ascending order rather
+than subdivided further.
+
+`HEAPIFIED`/`SMOOTH`/`POPLAR`/`TRI_HEAP` each call directly into a sort's own heapify step
+(`MaxHeapSort.makeHeap`/`SmoothSort.smoothHeapify`/`PoplarHeapSort.poplarHeapify`/
+`TriangularHeapSort.triangularHeapify`) rather than reimplementing it — `HEAPIFIED` is portable now
+(`MaxHeapSort` already shipped), but `SMOOTH`/`POPLAR`/`TRI_HEAP` are each blocked on their
+same-named sort being ported first (see §1c), regardless of how trivial their own body looks.
+
+`QSORT_BAD`/`PDQ_BAD`/`GRAIL_BAD`/`SHUF_MERGE_BAD` sound like they'd need their namesake sort
+already ported (to reverse-engineer its worst case), but don't — each embeds its own self-contained
+adversarial-input construction, independent of whether `LLQuickSort`(shipped)/`PDQBranchedSort`/
+`GrailSort`/`NewShuffleMergeSort` exist as Swift code.
+
+**Trivial:**
+- [ ] SMOOTH ("Smoothified") — 12 lines, but blocked on `SmoothSort` (§1c) — see note above
+- [ ] POPLAR ("Poplarified") — 12 lines, but blocked on `PoplarHeapSort` (§1c) — see note above
+- [ ] PARTIAL_REVERSE ("Half Reversed") — 13 lines
+- [ ] QSORT_BAD ("Quicksort Adversary") — 13 lines
+- [ ] HEAPIFIED ("Heapified") — 13 lines
+- [ ] NAIVE ("Naive Randomly") — 14 lines
+- [ ] SHUFFLED_HALF ("Shuffled Half") — 14 lines
+- [ ] DOUBLE_LAYERED ("Double Layered") — 14 lines
+- [ ] PARTITIONED ("Partitioned") — 15 lines
+- [ ] REAL_FINAL_MERGE ("Shuffled Final Merge") — 15 lines
+- [ ] ALMOST ("Slight Shuffle") — 16 lines
+- [ ] NOISY ("Noisy") — 16 lines
+- [ ] SHUFFLED_ODDS ("Scrambled Odds") — 17 lines
+- [ ] MOVED_ELEMENT ("Shifted Element") — 19 lines
+- [ ] TRI_HEAP ("Triangular Heapified") — 19 lines, but blocked on `TriangularHeapSort` (§1c) — see
+      note above
+- [ ] FINAL_MERGE ("Final Merge Pass") — 21 lines
+- [ ] SAWTOOTH ("Sawtooth") — 21 lines
+- [ ] ORGAN ("Pipe Organ") — 21 lines
+- [ ] FINAL_RADIX ("Final Radix") — 22 lines
+- [ ] LOG_SLOPES ("Logarithmic Slopes") — 22 lines
+- [ ] REC_REV ("Recursive Reversal") — 22 lines
+- [ ] SHUFFLED_TAIL ("Scrambled Tail") — 23 lines
+- [ ] SHUFFLED_HEAD ("Scrambled Head") — 23 lines
+- [ ] FINAL_BITONIC ("Final Bitonic Pass") — 23 lines
+- [ ] HALF_ROTATION ("Half Rotation") — 24 lines
+- [ ] INTERLACED ("Interlaced") — 24 lines
+- [ ] GRAY_CODE ("Gray Code Fractal") — 24 lines
+- [ ] REAL_FINAL_RADIX ("Real Final Radix") — 28 lines
+- [ ] SIERPINSKI ("Sierpinski Triangle") — 31 lines
+- [ ] REC_RADIX ("Recursive Final Radix") — 32 lines
+- [ ] BLOCK_RANDOMLY ("Randomly w/ Blocks") — 33 lines
+- [ ] TRIANGULAR ("Triangular") — 37 lines
+- [ ] BST_TRAVERSAL ("BST Traversal") — 37 lines
+- [ ] CIRCLE ("First Circle Pass") — 38 lines
+- [ ] PAIRWISE ("Final Pairwise Pass") — 39 lines
+- [ ] INV_BST ("Inverted BST") — 42 lines
+
+**Easy:**
+- [ ] BIT_REVERSE ("Bit Reversal") — 53 lines
+- [ ] GRAIL_BAD ("Grailsort Adversary") — 55 lines — see adversary note above
+- [ ] SHUF_MERGE_BAD ("Shuffle Merge Adversary") — 63 lines — see adversary note above
+- [ ] BLOCK_REVERSE ("Block Reverse") — 68 lines
+
+**Hard:**
+- [ ] PDQ_BAD ("PDQ Adversary") — 345 lines, embeds most of pdqsort's own logic — see adversary
+      note above
 
 ## 3. Visualizers
 
@@ -533,10 +669,18 @@ shuffle is being proven out in JS first, same as `Algorithms/`.
 
 ### b. Not Started
 
-- [ ] DisparityBarGraph — needs `originalIndices` (§2A.6 disparity family)
-- [ ] DisparityCircle — needs `originalIndices`
-- [ ] DisparityChords — needs `originalIndices`; most geometrically complex of the circle group
-- [ ] DisparityDots — needs `originalIndices`
+All four below share the same real blocker regardless of their own tier: none is portable until
+`originalIndices` tracking (§2A.6) exists as a shared engine/visualization feature — that shared
+prerequisite, not any one file's size, is the actual gate here.
+
+**Easy:**
+- [ ] DisparityBarGraph — 54 lines — needs `originalIndices` (§2A.6 disparity family, see note above)
+- [ ] DisparityCircle — 85 lines — needs `originalIndices`, see note above
+- [ ] DisparityChords — 92 lines — needs `originalIndices`, see note above; most geometrically
+      complex of the circle group despite the modest line count
+
+**Medium:**
+- [ ] DisparityDots — 114 lines — needs `originalIndices`, see note above
 
 ### c. Decision Required
 
