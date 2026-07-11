@@ -1,0 +1,24 @@
+{
+  "complexities": [
+    {
+      "key": "Average Complexity",
+      "value": "O(n \\times \\log^2 n)",
+      "mathml": "\\(O(n\\times{}\\log^2{n})\\)"
+    },
+    {
+      "key": "Best Case",
+      "value": "O(n \\times \\log n)",
+      "mathml": "\\(O(n\\times{}\\log{n})\\)"
+    },
+    {
+      "key": "Worst Case",
+      "value": "O(n \\times \\log^2 n)",
+      "mathml": "\\(O(n\\times{}\\log^2{n})\\)"
+    },
+    {
+      "key": "Space Complexity",
+      "value": "O(\\log n)",
+      "mathml": "\\(O(\\log{n})\\)"
+    }
+  ]
+}

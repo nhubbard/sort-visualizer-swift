@@ -13,12 +13,13 @@ struct NativeAlgorithmCorrectnessTests {
         BinaryInsertionSort(), BinaryMergeSort(), BingoSort(), BitonicSortIterative(),
         BitonicSortRecursive(), BlockSwapMergeSort(), BogoSort(), BoseNelsonSortIterative(),
         BottomUpMergeSort(), BozoSort(), BubbleSort(), BurntPancakeSort(),
-        CircleSortIterative(), CircleSortRecursive(), ClassicTreeSort(), CocktailBogoSort(),
+        CircleSortIterative(), CircleSortRecursive(), CircloidSort(), ClassicTreeSort(),
+        CocktailBogoSort(),
         CocktailMergeSort(), CocktailShakerSort(), CombSort(), CountingSort(), CycleSort(),
         DiamondSortRecursive(), DoubleInsertionSort(), DoubleSelectionSort(),
         DualPivotQuickSort(), ExchangeBogoSort(), FlashSort(), GnomeSort(), GravitySort(),
         HybridCombSort(), InPlaceMergeSort(), InsertionSort(), IntroCircleSortIterative(),
-        IntroSort(), LessBogoSort(), LLQuickSort(), LSDRadixSort(), MaxHeapSort(),
+        IntroSort(), LessBogoSort(), LLQuickSort(), LRQuickSort(), LSDRadixSort(), MaxHeapSort(),
         MergeExchangeSortIterative(), MergeSort(), MinHeapSort(), MSDRadixSort(),
         OddEvenMergeSortIterative(), OddEvenMergeSortRecursive(), OddEvenSort(),
         OptimizedBubbleSort(), OptimizedCocktailShakerSort(), OptimizedGnomeSort(),
@@ -27,7 +28,7 @@ struct NativeAlgorithmCorrectnessTests {
         SimplifiedLibrarySort(), SlopeSort(), SlowSort(), SnuffleSort(), StableCycleSort(),
         StableSelectionSort(), StaticSort(), StoogeSort(), StrandSort(), SwaplessBubbleSort(),
         TernaryLLQuickSort(), TernaryLRQuickSort(), TriangularHeapSort(), UnoptimizedBubbleSort(),
-        WeavedMergeSort(), WeaveMergeSort()
+        UnoptimizedCocktailShakerSort(), WeavedMergeSort(), WeaveMergeSort()
     ]
 
     @Test

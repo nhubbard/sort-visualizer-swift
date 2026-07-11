@@ -82,7 +82,9 @@ cluster together rather than picking its members apart on separate days:
 
 #### Completed
 
-Move algorithms here when you finish them.
+- [x] CircloidSort
+- [x] UnoptimizedCocktailShakerSort
+- [x] LRQuickSort
 
 #### Not Started
 
@@ -92,16 +94,32 @@ Move algorithms here when you finish them.
 - [ ] SillySort — 57 lines
 - [ ] BubbleBogoSort — 59 lines (Bogo family — see cluster note above)
 - [ ] ClassicThreeSmoothCombSort — 60 lines
-- [ ] QuadStoogeSort — 61 lines
+- [ ] QuadStoogeSort — 61 lines (ArrayV's own `setCategory` call for this one is actually
+      `"Impractical Sorts"`, not `"Exchange Sorts"`, despite living in `sorts/exchange/` — port as
+      `.impractical`, not `.exchange`, per `AlgorithmCategory`'s "match ArrayV's `setCategory` call,
+      not its package directory" rule. Also `setUnreasonablySlow(true)`/limit 2048.)
 - [ ] ThreeSmoothCombSortIterative — 66 lines
 - [ ] ThreeSmoothCombSortRecursive — 69 lines
-- [ ] LRQuickSort — 71 lines
 - [ ] OptimizedStoogeSortStudio — 75 lines
-- [ ] CircloidSort — 77 lines
-- [ ] UnoptimizedCocktailShakerSort — 83 lines
 - [ ] StablePermutationSort — 86 lines (Bogo family — see cluster note above)
-- [ ] FunSort — 88 lines
 - [ ] OptimizedStoogeSort — 91 lines
+
+##### Decision required
+
+- [~] FunSort — 88 lines. **Do not port as a literal translation.** ArrayV's own algorithm
+      (`Reads.compareIndices(array, pos, i, 0, false) != 0`, which resolves to a plain value
+      comparison per `Reads.compareIndices`'s implementation) treats "the binary search landed on
+      *some* index holding an equal value" as sufficient to mark index `i` permanently settled, even
+      when that index isn't `i`'s own eventual home. On duplicate-heavy input this repeatedly leaves
+      the array genuinely **unsorted** (not merely unstable) once the loop moves past `i` and never
+      revisits it — confirmed against a faithful line-for-line Python re-implementation of the Java
+      source itself (i.e. not a porting bug): 1,680/2,000 randomized duplicate-heavy trials (values
+      drawn from a small range, sizes 2–24) ended with an unsorted final array, e.g. `[3, 0, 5, 3, 1,
+      0] -> [0, 1, 3, 3, 5, 0]`. 2,000/2,000 trials with all-distinct values passed, so the defect is
+      specific to duplicates. This codebase's own `NativeAlgorithmCorrectnessTests` mandates that
+      *every* registered algorithm sorts duplicate-heavy input correctly with no exceptions, so a
+      literal port cannot be registered as-is — either find/design a corrected convergence check
+      before porting (which would no longer be a faithful translation) or skip this one.
 
 ##### Medium
 
