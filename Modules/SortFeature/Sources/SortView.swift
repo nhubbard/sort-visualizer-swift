@@ -75,13 +75,25 @@ public struct SortView: View {
         }
     }
 
+    /// `.id(ObjectIdentifier(replay))` on the `.metal` branch forces SwiftUI to treat each new run
+    /// as a genuinely new view — see `MetalRendererView`'s own doc comment for why its
+    /// `Coordinator` tracking needs that reset rather than carrying over stale bookkeeping from
+    /// whatever ran before. `.immediate` doesn't need it: `VisualizationCanvas` has no per-run
+    /// state of its own to reset.
     @ViewBuilder
     private func canvas(for replay: ReplayEngine) -> some View {
-        if let visualizer = VisualizerRegistry.shared.visualizer(id: settings.selectedVisualizerID) {
-            VisualizationCanvas(replay: replay, visualizer: visualizer)
+        switch settings.rendererBackend {
+        case .immediate:
+            if let visualizer = VisualizerRegistry.shared.visualizer(id: settings.selectedVisualizerID) {
+                VisualizationCanvas(replay: replay, visualizer: visualizer)
+                    .accessibilityIdentifier("sortVisualizationCanvas")
+            } else {
+                ProgressView()
+            }
+        case .metal:
+            MetalRendererView(replay: replay)
+                .id(ObjectIdentifier(replay))
                 .accessibilityIdentifier("sortVisualizationCanvas")
-        } else {
-            ProgressView()
         }
     }
 

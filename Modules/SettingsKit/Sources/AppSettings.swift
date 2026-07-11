@@ -44,6 +44,14 @@ public final class AppSettings {
         didSet { store.set(defaultShuffleID.rawValue, forKey: Keys.defaultShuffleID) }
     }
 
+    /// Experimental/diagnostic — see `RendererBackendKind`'s own doc comment. Not part of the
+    /// original §3.3 settings surface; added to A/B the rendering-cost hypothesis behind
+    /// "visualization time grows disproportionately with array size" without needing to rebuild
+    /// and relaunch to switch backends.
+    public var rendererBackend: RendererBackendKind {
+        didSet { store.set(rendererBackend.rawValue, forKey: Keys.rendererBackend) }
+    }
+
     private enum Keys {
         static let selectedVisualizerID = "selectedVisualizerID"
         static let playbackSpeed = "playbackSpeed"
@@ -53,6 +61,7 @@ public final class AppSettings {
         static let defaultArraySize = "defaultArraySize"
         static let codeTheme = "codeTheme"
         static let defaultShuffleID = "defaultShuffleID"
+        static let rendererBackend = "rendererBackend"
     }
 
     private let store: UserDefaults
@@ -70,7 +79,8 @@ public final class AppSettings {
             Keys.synthHighNote: 72,
             Keys.defaultArraySize: 256,
             Keys.codeTheme: "monokai",
-            Keys.defaultShuffleID: "random"
+            Keys.defaultShuffleID: "random",
+            Keys.rendererBackend: RendererBackendKind.immediate.rawValue
         ])
         selectedVisualizerID = VisualizerID(rawValue: store.string(forKey: Keys.selectedVisualizerID) ?? "bargraph")
         playbackSpeed = store.double(forKey: Keys.playbackSpeed)
@@ -79,6 +89,8 @@ public final class AppSettings {
         defaultArraySize = store.integer(forKey: Keys.defaultArraySize)
         codeTheme = CodeThemeID(rawValue: store.string(forKey: Keys.codeTheme) ?? "monokai")
         defaultShuffleID = ShuffleID(rawValue: store.string(forKey: Keys.defaultShuffleID) ?? "random")
+        rendererBackend = RendererBackendKind(
+            rawValue: store.string(forKey: Keys.rendererBackend) ?? "immediate") ?? .immediate
     }
 
     private func persistNoteRange() {

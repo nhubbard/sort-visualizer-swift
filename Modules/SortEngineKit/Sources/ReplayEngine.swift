@@ -136,6 +136,17 @@ public final class ReplayEngine {
         state.auxArrays.values.reduce(0) { $0 + $1.count }
     }
 
+    /// A second, independent per-operation observer, orthogonal to `play(onStep:)`'s own
+    /// parameter — set directly on whichever `ReplayEngine` instance a view currently holds
+    /// (views already get one, e.g. `VisualizationCanvas`), rather than threaded through
+    /// `SortSession`'s audio-specific wiring. Exists so an incremental renderer can repaint just
+    /// the touched positions without `SortEngineKit`/`SortSession` needing to know renderers
+    /// exist at all — the same "engine stays unaware of who's listening" shape `onStep` itself
+    /// already has for audio. Fires immediately after `onStep`, with the same post-batch `frame`
+    /// state (see `play()`'s doc comment on `onStep` for why a batch's intermediate per-operation
+    /// values are never individually observable — both hooks share that same limitation).
+    public var onOperationApplied: ((SortOperation) -> Void)?
+
     public private(set) var isPlaying = false
 
     /// Operations per second — a live knob, not a one-shot parameter: `play()`'s loop re-reads
@@ -331,6 +342,7 @@ public final class ReplayEngine {
 
                 for operation in appliedOperations {
                     onStep?(operation)
+                    onOperationApplied?(operation)
                 }
 
                 if self.state.stepIndex >= self.tape.operations.count { break }

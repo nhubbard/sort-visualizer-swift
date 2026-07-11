@@ -74,6 +74,23 @@ public struct SettingsView: View {
                 .pickerStyle(.menu)
                 .accessibilityIdentifier("codeThemePicker")
             }
+            Section {
+                Picker("Renderer", selection: $settings.rendererBackend) {
+                    ForEach(RendererBackendKind.allCases) { kind in
+                        Text(kind.displayName).tag(kind)
+                    }
+                }
+                .pickerStyle(.menu)
+                .accessibilityIdentifier("rendererBackendPicker")
+            } header: {
+                Text("Renderer (Experimental)")
+            } footer: {
+                Text(
+                    "Metal repaints incrementally and only draws a bar graph, regardless of the "
+                        + "Visualizer chosen above. For comparing rendering cost across array "
+                        + "sizes, not for everyday use."
+                )
+            }
         }
         .navigationTitle("Settings")
     }
