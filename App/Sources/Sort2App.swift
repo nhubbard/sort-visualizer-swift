@@ -54,7 +54,15 @@ struct Sort2App: App {
         AlgorithmRegistry.shared.discover()
 
         ShuffleRegistry.shared.builtIns = [
-            AscendingShuffle(), DescendingShuffle(), RandomShuffle(), ShuffledCubicShuffle(), ShuffledQuinticShuffle()
+            AlmostShuffle(), AscendingShuffle(), BlockRandomShuffle(), BSTTraversalShuffle(), CircleShuffle(),
+            DescendingShuffle(), DoubleLayeredShuffle(), FinalBitonicShuffle(), FinalMergeShuffle(),
+            FinalRadixShuffle(), GrayCodeShuffle(), HalfRotationShuffle(), HeapifiedShuffle(),
+            InterlacedShuffle(), InvertedBSTShuffle(), LogarithmicSlopesShuffle(), MovedElementShuffle(),
+            NaiveShuffle(), NoisyShuffle(), OrganShuffle(), PairwiseShuffle(), PartialReverseShuffle(),
+            PartitionedShuffle(), QuicksortAdversaryShuffle(), RandomShuffle(), RealFinalMergeShuffle(),
+            RealFinalRadixShuffle(), RecursiveRadixShuffle(), RecursiveReversalShuffle(), SawtoothShuffle(),
+            ShuffledCubicShuffle(), ShuffledHalfShuffle(), ShuffledHeadShuffle(), ShuffledOddsShuffle(),
+            ShuffledQuinticShuffle(), ShuffledTailShuffle(), SierpinskiShuffle(), TriangularShuffle()
         ]
         ShuffleRegistry.shared.scriptLoader = {
             ScriptShuffleLoader.loadScripts(from: Bundle.main.url(forResource: "Shuffles", withExtension: nil)!)

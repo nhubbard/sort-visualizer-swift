@@ -9,7 +9,37 @@ import Testing
 @Suite
 struct NativeShuffleCorrectnessTests {
     private static let shuffles: [any ShuffleAlgorithm] = [
-        AscendingShuffle(), DescendingShuffle(), RandomShuffle(), ShuffledCubicShuffle(), ShuffledQuinticShuffle()
+        AlmostShuffle(), AscendingShuffle(), BlockRandomShuffle(), BSTTraversalShuffle(), CircleShuffle(),
+        DescendingShuffle(), DoubleLayeredShuffle(), FinalBitonicShuffle(), FinalMergeShuffle(),
+        FinalRadixShuffle(), GrayCodeShuffle(), HalfRotationShuffle(), HeapifiedShuffle(),
+        InterlacedShuffle(), InvertedBSTShuffle(), LogarithmicSlopesShuffle(), MovedElementShuffle(),
+        NaiveShuffle(), NoisyShuffle(), OrganShuffle(), PairwiseShuffle(), PartialReverseShuffle(),
+        PartitionedShuffle(), QuicksortAdversaryShuffle(), RandomShuffle(), RealFinalMergeShuffle(),
+        RealFinalRadixShuffle(), RecursiveRadixShuffle(), RecursiveReversalShuffle(), SawtoothShuffle(),
+        ShuffledCubicShuffle(), ShuffledHalfShuffle(), ShuffledHeadShuffle(), ShuffledOddsShuffle(),
+        ShuffledQuinticShuffle(), ShuffledTailShuffle(), SierpinskiShuffle(), TriangularShuffle()
+    ]
+
+    /// Every one of these 33 new shuffles rearranges the array's *existing* values — unlike the
+    /// curve shuffles (`ShuffledCubicShuffle`/`ShuffledQuinticShuffle`), none of them compute a
+    /// brand-new value out of thin air — so, unlike the generic length-only check above, they all
+    /// owe a stronger guarantee: the output must be a genuine permutation of the input.
+    ///
+    /// `LogarithmicSlopesShuffle` is deliberately excluded: hand-tracing ArrayV's own
+    /// `2 * (i - power) + 1` index formula against a plain identity array shows it reads the same
+    /// handful of low indices repeatedly (e.g. at size 4, both `i = 1` and `i = 2` read index 1),
+    /// producing genuine duplicate values and dropping others entirely — true under ArrayV's own
+    /// 0-indexed convention too, not an artifact of this app's 1-indexed values, so it belongs in
+    /// the same "doesn't guarantee a permutation" bucket the curve shuffles occupy below.
+    private static let permutingShuffles: [any ShuffleAlgorithm] = [
+        AlmostShuffle(), BlockRandomShuffle(), BSTTraversalShuffle(), CircleShuffle(), DoubleLayeredShuffle(),
+        FinalBitonicShuffle(), FinalMergeShuffle(), FinalRadixShuffle(), GrayCodeShuffle(),
+        HalfRotationShuffle(), HeapifiedShuffle(), InterlacedShuffle(), InvertedBSTShuffle(),
+        MovedElementShuffle(), NaiveShuffle(), NoisyShuffle(), OrganShuffle(),
+        PairwiseShuffle(), PartialReverseShuffle(), PartitionedShuffle(), QuicksortAdversaryShuffle(),
+        RealFinalMergeShuffle(), RealFinalRadixShuffle(), RecursiveRadixShuffle(), RecursiveReversalShuffle(),
+        SawtoothShuffle(), ShuffledHalfShuffle(), ShuffledHeadShuffle(), ShuffledOddsShuffle(),
+        ShuffledTailShuffle(), SierpinskiShuffle(), TriangularShuffle()
     ]
 
     @Test
@@ -61,6 +91,27 @@ struct NativeShuffleCorrectnessTests {
         RandomShuffle().record(into: &engine)
 
         #expect(engine.values.sorted() == identity)
+    }
+
+    @Test
+    func everyPermutingShuffleIsAGenuinePermutationAcrossManySizes() {
+        // 16 covers most of these comfortably; a couple (BSTTraversalShuffle/InvertedBSTShuffle's
+        // queue-based level order, TriangularShuffle/SierpinskiShuffle's recursive index-permutation
+        // builders) are index-structural rather than size-sensitive, so one mid-sized value per
+        // shuffle is enough to catch a real permutation bug without re-deriving each one's own
+        // preferred size range.
+        for size in [1, 2, 3, 4, 5, 8, 16, 17, 32, 63, 100] {
+            let identity = Array(1...size)
+            for shuffle in Self.permutingShuffles {
+                var engine = RecordingEngine(values: identity)
+                shuffle.record(into: &engine)
+
+                #expect(
+                    engine.values.sorted() == identity,
+                    "\(shuffle.id.rawValue) at size \(size) produced a non-permutation: \(identity) -> \(engine.values)"
+                )
+            }
+        }
     }
 
     @Test

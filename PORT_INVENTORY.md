@@ -387,54 +387,22 @@ than subdivided further.
 
 `HEAPIFIED`/`SMOOTH`/`POPLAR`/`TRI_HEAP` each call directly into a sort's own heapify step
 (`MaxHeapSort.makeHeap`/`SmoothSort.smoothHeapify`/`PoplarHeapSort.poplarHeapify`/
-`TriangularHeapSort.triangularHeapify`) rather than reimplementing it — `HEAPIFIED` is portable now
-(`MaxHeapSort` already shipped), but `SMOOTH`/`POPLAR`/`TRI_HEAP` are each blocked on their
+`TriangularHeapSort.triangularHeapify`) rather than reimplementing it — `HEAPIFIED` shipped by reusing
+`MaxHeapSort`'s own heapify step directly; `SMOOTH`/`POPLAR`/`TRI_HEAP` remain blocked on their
 same-named sort being ported first (see §1c), regardless of how trivial their own body looks.
 
 `QSORT_BAD`/`PDQ_BAD`/`GRAIL_BAD`/`SHUF_MERGE_BAD` sound like they'd need their namesake sort
 already ported (to reverse-engineer its worst case), but don't — each embeds its own self-contained
 adversarial-input construction, independent of whether `LLQuickSort`(shipped)/`PDQBranchedSort`/
-`GrailSort`/`NewShuffleMergeSort` exist as Swift code.
+`GrailSort`/`NewShuffleMergeSort` exist as Swift code. `QSORT_BAD` shipped this batch; `PDQ_BAD`/
+`GRAIL_BAD`/`SHUF_MERGE_BAD` remain (Easy/Hard tier, out of this batch's Trivial-only scope).
 
 #### Trivial
 
 - [ ] SMOOTH ("Smoothified") — 12 lines, but blocked on `SmoothSort` (§1c) — see note above
 - [ ] POPLAR ("Poplarified") — 12 lines, but blocked on `PoplarHeapSort` (§1c) — see note above
-- [ ] PARTIAL_REVERSE ("Half Reversed") — 13 lines
-- [ ] QSORT_BAD ("Quicksort Adversary") — 13 lines
-- [ ] HEAPIFIED ("Heapified") — 13 lines
-- [ ] NAIVE ("Naive Randomly") — 14 lines
-- [ ] SHUFFLED_HALF ("Shuffled Half") — 14 lines
-- [ ] DOUBLE_LAYERED ("Double Layered") — 14 lines
-- [ ] PARTITIONED ("Partitioned") — 15 lines
-- [ ] REAL_FINAL_MERGE ("Shuffled Final Merge") — 15 lines
-- [ ] ALMOST ("Slight Shuffle") — 16 lines
-- [ ] NOISY ("Noisy") — 16 lines
-- [ ] SHUFFLED_ODDS ("Scrambled Odds") — 17 lines
-- [ ] MOVED_ELEMENT ("Shifted Element") — 19 lines
 - [ ] TRI_HEAP ("Triangular Heapified") — 19 lines, but blocked on `TriangularHeapSort` (§1c) — see
       note above
-- [ ] FINAL_MERGE ("Final Merge Pass") — 21 lines
-- [ ] SAWTOOTH ("Sawtooth") — 21 lines
-- [ ] ORGAN ("Pipe Organ") — 21 lines
-- [ ] FINAL_RADIX ("Final Radix") — 22 lines
-- [ ] LOG_SLOPES ("Logarithmic Slopes") — 22 lines
-- [ ] REC_REV ("Recursive Reversal") — 22 lines
-- [ ] SHUFFLED_TAIL ("Scrambled Tail") — 23 lines
-- [ ] SHUFFLED_HEAD ("Scrambled Head") — 23 lines
-- [ ] FINAL_BITONIC ("Final Bitonic Pass") — 23 lines
-- [ ] HALF_ROTATION ("Half Rotation") — 24 lines
-- [ ] INTERLACED ("Interlaced") — 24 lines
-- [ ] GRAY_CODE ("Gray Code Fractal") — 24 lines
-- [ ] REAL_FINAL_RADIX ("Real Final Radix") — 28 lines
-- [ ] SIERPINSKI ("Sierpinski Triangle") — 31 lines
-- [ ] REC_RADIX ("Recursive Final Radix") — 32 lines
-- [ ] BLOCK_RANDOMLY ("Randomly w/ Blocks") — 33 lines
-- [ ] TRIANGULAR ("Triangular") — 37 lines
-- [ ] BST_TRAVERSAL ("BST Traversal") — 37 lines
-- [ ] CIRCLE ("First Circle Pass") — 38 lines
-- [ ] PAIRWISE ("Final Pairwise Pass") — 39 lines
-- [ ] INV_BST ("Inverted BST") — 42 lines
 
 #### Easy
 
