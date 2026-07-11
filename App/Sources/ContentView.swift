@@ -15,6 +15,10 @@ struct ContentView: View {
     @State private var selection: AlgorithmID?
     @State private var isShowingSettings = false
     @State private var isShowingBenchmark = false
+    // Session-only (not AppSettings-backed): every category starts expanded on each launch, so
+    // the existing `algorithmLink.<id>` UI tests (which tap straight into the sidebar with no
+    // "expand first" step) keep working unmodified.
+    @State private var collapsedCategories: Set<AlgorithmCategory> = []
 
     var body: some View {
         NavigationSplitView {
@@ -22,14 +26,23 @@ struct ContentView: View {
                 ForEach(AlgorithmCategory.allCases) { category in
                     let algorithms = AlgorithmRegistry.shared.algorithms(in: category)
                     if !algorithms.isEmpty {
-                        Section(category.displayName) {
-                            ForEach(algorithms, id: \.id) { algorithm in
-                                NavigationLink(value: algorithm.id) {
-                                    CustomIconLabel(
-                                        text: algorithm.metadata.displayName,
-                                        iconName: algorithm.metadata.iconName)
+                        Section {
+                            if !collapsedCategories.contains(category) {
+                                ForEach(algorithms, id: \.id) { algorithm in
+                                    NavigationLink(value: algorithm.id) {
+                                        CustomIconLabel(
+                                            text: algorithm.metadata.displayName,
+                                            iconName: algorithm.metadata.iconName)
+                                    }
+                                    .accessibilityIdentifier("algorithmLink.\(algorithm.id.rawValue)")
                                 }
-                                .accessibilityIdentifier("algorithmLink.\(algorithm.id.rawValue)")
+                            }
+                        } header: {
+                            CategorySectionHeader(
+                                category: category,
+                                isCollapsed: collapsedCategories.contains(category)
+                            ) {
+                                toggleCollapsed(category)
                             }
                         }
                     }
@@ -119,5 +132,42 @@ struct ContentView: View {
             )
         }
         return shuffle
+    }
+
+    private func toggleCollapsed(_ category: AlgorithmCategory) {
+        withAnimation(.snappy) {
+            if collapsedCategories.contains(category) {
+                collapsedCategories.remove(category)
+            } else {
+                collapsedCategories.insert(category)
+            }
+        }
+    }
+}
+
+/// A `Section` header for `ContentView`'s sidebar with an explicit collapse/expand button next to
+/// the category name — rather than relying on `Section(isExpanded:)`'s built-in disclosure
+/// triangle, which only actually renders as a collapsible control under `.listStyle(.sidebar)` and
+/// ties the tap target to the whole header row. A dedicated `Button` works the same regardless of
+/// list style and keeps the tap target scoped to the chevron itself.
+private struct CategorySectionHeader: View {
+    let category: AlgorithmCategory
+    let isCollapsed: Bool
+    let onToggle: () -> Void
+
+    var body: some View {
+        HStack {
+            Text(category.displayName)
+            Spacer()
+            Button(action: onToggle) {
+                Image(systemName: "chevron.right")
+                    .rotationEffect(.degrees(isCollapsed ? 0 : 90))
+                    .imageScale(.small)
+            }
+            .buttonStyle(.plain)
+            .accessibilityIdentifier("categoryToggle.\(category.rawValue)")
+            .accessibilityLabel(
+                isCollapsed ? "Expand \(category.displayName)" : "Collapse \(category.displayName)")
+        }
     }
 }
