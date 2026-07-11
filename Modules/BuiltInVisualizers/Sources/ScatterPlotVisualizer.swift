@@ -8,7 +8,6 @@ public struct ScatterPlotVisualizer: Visualizer {
     public let metadata = VisualizerMetadata(
         displayName: "Scatter Plot",
         supportsAuxArrays: false,
-        needsOriginalIndices: false,
         iconName: "circle.grid.3x3.fill"
     )
 

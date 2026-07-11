@@ -9,7 +9,6 @@ public struct BarGraphVisualizer: Visualizer {
     public let metadata = VisualizerMetadata(
         displayName: "Bar Graph",
         supportsAuxArrays: true,
-        needsOriginalIndices: false,
         iconName: "chart.bar.fill"
     )
 

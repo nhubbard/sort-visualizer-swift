@@ -17,7 +17,6 @@ struct PixelMeshVisualizerTests {
             valueRange: valueRange ?? (values.min() ?? 0)...(values.max() ?? 1),
             markers: markers,
             auxArrays: [:],
-            originalIndices: nil,
             canvasSize: canvasSize,
             colorSeed: 0
         )

@@ -17,7 +17,6 @@ public struct HoopStackVisualizer: Visualizer {
     public let metadata = VisualizerMetadata(
         displayName: "Hoop Stack",
         supportsAuxArrays: false,
-        needsOriginalIndices: false,
         iconName: "circle.dashed"
     )
 

@@ -696,23 +696,18 @@ adversarial-input construction, independent of whether `LLQuickSort`(shipped)/`P
 - [x] Spiral
 - [x] SpiralDots
 - [x] WaveDots
+- [x] DisparityBarGraph — done (native port batch), `DisparityBarGraphVisualizer.swift`; the
+      "needs `originalIndices`" note this row used to carry was wrong — ArrayV's real source uses
+      nothing but the current value and current index, exactly like every other visualizer (see
+      `ARCHITECTURE_V2.md` §2A.6's correction)
+- [x] DisparityCircle — done (native port batch), `DisparityCircleVisualizer.swift`
+- [x] DisparityChords — done (native port batch), `DisparityChordsVisualizer.swift`; no disp/wave
+      math at all, just a line per index from its position's angle to its value's angle
+- [x] DisparityDots — done (native port batch), `DisparityDotsVisualizer.swift`
 
 ### b. Not Started
 
-All four below share the same real blocker regardless of their own tier: none is portable until
-`originalIndices` tracking (§2A.6) exists as a shared engine/visualization feature — that shared
-prerequisite, not any one file's size, is the actual gate here.
-
-##### Easy
-
-- [ ] DisparityBarGraph — 54 lines — needs `originalIndices` (§2A.6 disparity family, see note above)
-- [ ] DisparityCircle — 85 lines — needs `originalIndices`, see note above
-- [ ] DisparityChords — 92 lines — needs `originalIndices`, see note above; most geometrically
-      complex of the circle group despite the modest line count
-
-##### Medium
-
-- [ ] DisparityDots — 114 lines — needs `originalIndices`, see note above
+None — every ArrayV visualizer style is now native except `CustomImage` below.
 
 ### c. Decision Required
 

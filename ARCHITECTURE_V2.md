@@ -605,14 +605,13 @@ public struct VisualizationContext: Sendable {
     public let valueRange: ClosedRange<Int>      // for normalizing height/hue/radius
     public let markers: [Int: Set<Int>]          // index -> marker IDs active on it (inverse of BarState.markers)
     public let auxArrays: [Int: [Int]]           // AuxHandle.rawValue -> contents, drawn as extra strips
-    public let originalIndices: [Int]?           // value -> its start-of-run index; nil unless the Visualizer opts in (disparity styles, §2A.6)
     public let canvasSize: CGSize
     public let colorSeed: UInt64                 // == TapeHeader.visualSeed, for deterministic per-run color choices
 }
 
 public protocol Visualizer: Sendable {
     var id: VisualizerID { get }
-    var metadata: VisualizerMetadata { get }     // displayName, supportsAuxArrays, needsOriginalIndices, iconName
+    var metadata: VisualizerMetadata { get }     // displayName, supportsAuxArrays, iconName
     func draw(_ context: VisualizationContext) -> [DrawCommand]
 }
 ```
@@ -714,20 +713,22 @@ extra thought before porting:
   visualization plugin surface itself — not part of this port; revisit only if you want a "watch N
   algorithms run in sequence" showcase mode later.
 
-**Visualizations** (15 styles): 12 of the 15 port cleanly onto `VisualizationContext` as pure
-functions of `values`/`markers`/`auxArrays` (BarGraph, Rainbow, SineWave, ColorCircle,
-DisparityChords, Spiral, ScatterPlot, WaveDots, SpiralDots, HoopStack, PixelMesh, and a
-straightforward circular variant). Two families need one extra context field each, already reserved
-above:
-- **Disparity family** (DisparityBarGraph/DisparityCircle/DisparityDots): needs each value's
-  *original/home index* to compute `sin(π(value - index)/n)`-style displacement — that's
-  `VisualizationContext.originalIndices`, populated by `ReplayEngine` only when
-  `metadata.needsOriginalIndices` is true (avoids computing it every frame for the 13 styles that
-  don't need it).
-- **CustomImage** (user-supplied image, remapped per current permutation): deferred. It's the one
-  ArrayV style that needs an asset-picker UI and per-pixel remap logic disproportionate to its
-  value here — a good "phase 6+" nice-to-have (§ `IMPLEMENTATION_PLAN.md`), not a blocker for
-  shipping the other 14.
+**Visualizations** (15 styles): 14 of the 15 port cleanly onto `VisualizationContext` as pure
+functions of `values`/`markers`/`auxArrays` — BarGraph, Rainbow, SineWave, ColorCircle, Spiral,
+ScatterPlot, WaveDots, SpiralDots, HoopStack, PixelMesh, a straightforward circular variant, and
+**the whole Disparity family** (DisparityBarGraph/DisparityCircle/DisparityChords/DisparityDots).
+An earlier version of this doc claimed the Disparity family needed a new
+`VisualizationContext.originalIndices` field to track each value's "original/home index" — that was
+wrong, caught only once someone actually read ArrayV's real source
+(`visuals/{bars,circles,dots}/Disparity*.java`) instead of pattern-matching the
+`sin(π(value - index)/n)`-shaped formula in ArrayV's own comments. `index` there is just the
+ordinary current loop index into the current array — the exact same `values`/position data every
+other `Visualizer` already receives — not a tracked start-of-run index. No engine feature was ever
+needed; all four ship as ordinary `BuiltInVisualizers` conformances alongside the rest.
+- **CustomImage** (user-supplied image, remapped per current permutation): deferred, the one
+  genuine exception. It's the one ArrayV style that needs an asset-picker UI and per-pixel remap
+  logic disproportionate to its value here — a good "phase 6+" nice-to-have
+  (§ `IMPLEMENTATION_PLAN.md`), not a blocker for shipping the other 14.
 
 **Stretch goal — teaching-mode step annotations**: your longer-term idea of visually indicating
 *what a step means*, not just that it happened (e.g. "this compare decided the pivot side," "this
@@ -998,7 +999,7 @@ struct VisualizationCanvas: View {
             let ctx = VisualizationContext(
                 values: replay.frame.map(\.value), valueRange: 0...replay.frame.count,
                 markers: /* invert BarState.markers into index->markers */ [:],
-                auxArrays: replay.auxArrays, originalIndices: nil, canvasSize: size,
+                auxArrays: replay.auxArrays, canvasSize: size,
                 colorSeed: /* tape.header.visualSeed, threaded down from SortSession */ 0)
             for command in visualizer.draw(ctx) { context.draw(command) }   // one switch over DrawCommand cases
         }

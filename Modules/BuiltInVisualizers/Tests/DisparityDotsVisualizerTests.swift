@@ -5,12 +5,12 @@ import Testing
 @testable import VisualizationKit
 
 @Suite
-struct WaveDotsVisualizerTests {
+struct DisparityDotsVisualizerTests {
     private func makeContext(
         values: [Int],
         valueRange: ClosedRange<Int>? = nil,
         markers: [Int: Set<Int>] = [:],
-        canvasSize: CGSize = CGSize(width: 100, height: 50)
+        canvasSize: CGSize = CGSize(width: 100, height: 100)
     ) -> VisualizationContext {
         VisualizationContext(
             values: values,
@@ -24,22 +24,22 @@ struct WaveDotsVisualizerTests {
 
     @Test
     func emitsOneEllipsePerValue() {
-        let context = makeContext(values: [1, 2, 3])
-        let commands = WaveDotsVisualizer().draw(context)
+        let context = makeContext(values: [1, 2, 3, 4])
+        let commands = DisparityDotsVisualizer().draw(context)
 
-        #expect(commands.count == 3)
+        #expect(commands.count == 4)
         for command in commands {
             guard case .ellipse = command else {
-                Issue.record("expected .ellipse, proving this isn't secretly bar-shaped")
+                Issue.record("expected .ellipse")
                 return
             }
         }
     }
 
     @Test
-    func dotsAreFixedSizeRegardlessOfValue() {
-        let context = makeContext(values: [1, 4], valueRange: 1...4)
-        let commands = WaveDotsVisualizer().draw(context)
+    func dotsAreFixedSizeRegardlessOfDisparity() {
+        let context = makeContext(values: [4, 3, 2, 1])
+        let commands = DisparityDotsVisualizer().draw(context)
 
         guard case let .ellipse(_, _, w0, h0, _) = commands[0],
               case let .ellipse(_, _, w1, h1, _) = commands[1]
@@ -51,27 +51,29 @@ struct WaveDotsVisualizerTests {
         #expect(h0 == h1)
     }
 
+    /// Same underlying formula `DisparityCircleVisualizerTests`' hand-computed case checks — a
+    /// sorted `1...n` array has a constant `value - index`, so every dot should sit the same
+    /// distance from center.
     @Test
-    func valueAffectsVerticalPosition() {
-        // Low and high ends of the range land at different phases of the sine wave, so their
-        // y positions should differ — we don't assert the exact curve shape, just that the
-        // value (not just the index) drives where the dot sits vertically.
-        let context = makeContext(values: [1, 4], valueRange: 1...4, canvasSize: CGSize(width: 100, height: 40))
-        let commands = WaveDotsVisualizer().draw(context)
+    func sortedArrayProducesUniformRadiusDots() {
+        let context = makeContext(values: [1, 2, 3, 4])
+        let commands = DisparityDotsVisualizer().draw(context)
+        let center = SIMD2<Double>(50, 50)
 
-        guard case let .ellipse(_, yLow, _, _, _) = commands[0],
-              case let .ellipse(_, yHigh, _, _, _) = commands[1]
-        else {
-            Issue.record("expected .ellipse")
-            return
+        let radii = commands.compactMap { command -> Double? in
+            guard case let .ellipse(x, y, w, h, _) = command else { return nil }
+            let dotCenter = SIMD2<Double>(x + w / 2, y + h / 2)
+            let delta = dotCenter - center
+            return (delta.x * delta.x + delta.y * delta.y).squareRoot()
         }
-        #expect(yLow != yHigh)
+        #expect(radii.count == 4)
+        #expect(radii.allSatisfy { abs($0 - radii[0]) < 0.01 })
     }
 
     @Test
     func colorsReflectMarkerState() {
         let context = makeContext(values: [5, 5, 5], markers: [0: [Marker.primary], 1: [Marker.secondary]])
-        let commands = WaveDotsVisualizer().draw(context)
+        let commands = DisparityDotsVisualizer().draw(context)
 
         guard case let .ellipse(_, _, _, _, color0) = commands[0],
               case let .ellipse(_, _, _, _, color1) = commands[1],
@@ -87,11 +89,11 @@ struct WaveDotsVisualizerTests {
 
     @Test
     func emptyValuesProducesNoCommands() {
-        #expect(WaveDotsVisualizer().draw(makeContext(values: [], valueRange: 0...1)).isEmpty)
+        #expect(DisparityDotsVisualizer().draw(makeContext(values: [], valueRange: 0...1)).isEmpty)
     }
 
     @Test
     func degenerateCanvasSizeProducesNoCommands() {
-        #expect(WaveDotsVisualizer().draw(makeContext(values: [1, 2], canvasSize: .zero)).isEmpty)
+        #expect(DisparityDotsVisualizer().draw(makeContext(values: [1, 2], canvasSize: .zero)).isEmpty)
     }
 }

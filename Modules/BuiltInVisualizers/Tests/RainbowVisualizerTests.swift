@@ -15,7 +15,6 @@ struct RainbowVisualizerTests {
             valueRange: valueRange ?? (values.min() ?? 0)...(values.max() ?? 1),
             markers: [:],
             auxArrays: [:],
-            originalIndices: nil,
             canvasSize: canvasSize,
             colorSeed: 0
         )
@@ -51,7 +50,6 @@ struct RainbowVisualizerTests {
             valueRange: 1...4,
             markers: [0: [1], 1: [2]],
             auxArrays: [:],
-            originalIndices: nil,
             canvasSize: CGSize(width: 100, height: 50),
             colorSeed: 0
         )

@@ -10,7 +10,6 @@ public struct PixelMeshVisualizer: Visualizer {
     public let metadata = VisualizerMetadata(
         displayName: "Pixel Mesh",
         supportsAuxArrays: false,
-        needsOriginalIndices: false,
         iconName: "square.grid.3x3.fill"
     )
 

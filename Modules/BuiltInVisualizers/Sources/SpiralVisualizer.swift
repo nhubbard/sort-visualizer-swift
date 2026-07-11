@@ -18,7 +18,6 @@ public struct SpiralVisualizer: Visualizer {
     public let metadata = VisualizerMetadata(
         displayName: "Spiral",
         supportsAuxArrays: false,
-        needsOriginalIndices: false,
         iconName: "tornado"
     )
 

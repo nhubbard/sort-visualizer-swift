@@ -3,7 +3,7 @@ import Testing
 
 private struct FakeVisualizer: Visualizer {
     let id: VisualizerID
-    let metadata = VisualizerMetadata(displayName: "Fake", supportsAuxArrays: false, needsOriginalIndices: false, iconName: "fake")
+    let metadata = VisualizerMetadata(displayName: "Fake", supportsAuxArrays: false, iconName: "fake")
 
     func draw(_ context: VisualizationContext) -> [DrawCommand] { [] }
 }

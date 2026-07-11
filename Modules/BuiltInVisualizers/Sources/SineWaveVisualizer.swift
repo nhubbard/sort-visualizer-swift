@@ -12,7 +12,6 @@ public struct SineWaveVisualizer: Visualizer {
     public let metadata = VisualizerMetadata(
         displayName: "Sine Wave",
         supportsAuxArrays: false,
-        needsOriginalIndices: false,
         iconName: "waveform.path"
     )
 

@@ -8,7 +8,6 @@ public struct RainbowVisualizer: Visualizer {
     public let metadata = VisualizerMetadata(
         displayName: "Rainbow",
         supportsAuxArrays: true,
-        needsOriginalIndices: false,
         iconName: "paintpalette.fill"
     )
 

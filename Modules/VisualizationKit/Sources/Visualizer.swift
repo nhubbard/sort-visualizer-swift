@@ -9,13 +9,11 @@ public struct VisualizerID: Hashable, Sendable, Codable, RawRepresentable {
 public struct VisualizerMetadata: Sendable, Codable, Equatable {
     public var displayName: String
     public var supportsAuxArrays: Bool
-    public var needsOriginalIndices: Bool
     public var iconName: String
 
-    public init(displayName: String, supportsAuxArrays: Bool, needsOriginalIndices: Bool, iconName: String) {
+    public init(displayName: String, supportsAuxArrays: Bool, iconName: String) {
         self.displayName = displayName
         self.supportsAuxArrays = supportsAuxArrays
-        self.needsOriginalIndices = needsOriginalIndices
         self.iconName = iconName
     }
 }

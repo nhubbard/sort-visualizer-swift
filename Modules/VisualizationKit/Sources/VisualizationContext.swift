@@ -12,8 +12,6 @@ public struct VisualizationContext: Sendable {
     public let markers: [Int: Set<Int>]
     /// `AuxHandle.rawValue` -> contents, drawn as extra strips.
     public let auxArrays: [Int: [Int]]
-    /// value -> its start-of-run index; `nil` unless the `Visualizer` opts in (disparity styles, §2A.6).
-    public let originalIndices: [Int]?
     public let canvasSize: CGSize
     /// `TapeHeader.visualSeed`, for deterministic per-run color choices.
     public let colorSeed: UInt64
@@ -23,7 +21,6 @@ public struct VisualizationContext: Sendable {
         valueRange: ClosedRange<Int>,
         markers: [Int: Set<Int>],
         auxArrays: [Int: [Int]],
-        originalIndices: [Int]?,
         canvasSize: CGSize,
         colorSeed: UInt64
     ) {
@@ -31,7 +28,6 @@ public struct VisualizationContext: Sendable {
         self.valueRange = valueRange
         self.markers = markers
         self.auxArrays = auxArrays
-        self.originalIndices = originalIndices
         self.canvasSize = canvasSize
         self.colorSeed = colorSeed
     }

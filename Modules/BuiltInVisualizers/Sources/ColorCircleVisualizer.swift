@@ -11,7 +11,6 @@ public struct ColorCircleVisualizer: Visualizer {
     public let metadata = VisualizerMetadata(
         displayName: "Color Circle",
         supportsAuxArrays: false,
-        needsOriginalIndices: false,
         iconName: "circle.hexagongrid.fill"
     )
 

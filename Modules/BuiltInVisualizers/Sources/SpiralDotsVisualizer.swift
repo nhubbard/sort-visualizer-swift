@@ -12,7 +12,6 @@ public struct SpiralDotsVisualizer: Visualizer {
     public let metadata = VisualizerMetadata(
         displayName: "Spiral Dots",
         supportsAuxArrays: false,
-        needsOriginalIndices: false,
         iconName: "circles.hexagongrid"
     )
 

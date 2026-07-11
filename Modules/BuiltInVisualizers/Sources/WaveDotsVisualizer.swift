@@ -12,7 +12,6 @@ public struct WaveDotsVisualizer: Visualizer {
     public let metadata = VisualizerMetadata(
         displayName: "Wave Dots",
         supportsAuxArrays: false,
-        needsOriginalIndices: false,
         iconName: "water.waves"
     )
 

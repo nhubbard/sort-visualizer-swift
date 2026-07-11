@@ -21,7 +21,6 @@ struct VisualizationCanvas: View {
                 valueRange: Self.valueRange(for: values),
                 markers: markers,
                 auxArrays: replay.auxArrays,
-                originalIndices: nil,
                 canvasSize: size,
                 colorSeed: replay.header.visualSeed
             )
