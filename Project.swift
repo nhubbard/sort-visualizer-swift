@@ -30,13 +30,12 @@ let modules: [Target] =
     Module.framework(name: "BuiltInAlgorithms", dependencies: [.target(name: "AlgorithmKit")]) +
     Module.framework(name: "BuiltInVisualizers", dependencies: [.target(name: "VisualizationKit")]) +
     Module.framework(name: "SettingsKit", dependencies: [.target(name: "VisualizationKit"), .target(name: "AlgorithmKit")]) +
+    // ToneKit reimplements just the AudioKit/AudioKitEX/SoundpipeAudioKit subset AudioService
+    // actually needs directly on AVAudioEngine — see Modules/ToneKit/NOTICE.md — so AudioEngineKit
+    // no longer needs any external audio package at all.
+    Module.framework(name: "ToneKit") +
     Module.framework(name: "AudioEngineKit", dependencies: [
-        .external(name: "AudioKit"), .external(name: "AudioKitUI"), .external(name: "SoundpipeAudioKit"),
-        // AudioService imports AudioKitEX directly for Fader — Tuist needs this link edge even
-        // though SoundpipeAudioKit already pulls AudioKitEX in transitively for the app target as
-        // a whole; a module's own compilation unit still needs to link what it directly imports.
-        .external(name: "AudioKitEX"),
-        .target(name: "SettingsKit"),
+        .target(name: "ToneKit"), .target(name: "SettingsKit"),
     ]) +
     Module.framework(name: "PersistenceKit", dependencies: [
         .target(name: "SortEngineKit"), .target(name: "AlgorithmKit"),

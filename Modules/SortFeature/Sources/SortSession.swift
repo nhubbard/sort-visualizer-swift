@@ -67,12 +67,15 @@ public final class SortSession {
     public init(
         algorithm: any SortAlgorithm,
         shuffle: any ShuffleAlgorithm,
-        // NOT AudioService.shared: merely constructing AudioService builds a live AudioKit graph
-        // (Oscillator/AmplitudeEnvelope's inits call into AudioKit's native parameter-map setup
-        // unconditionally), which crashes outside a real running app with an active audio session
-        // — see AudioServiceTests.swift's comment. Every test that constructs a SortSession without
-        // overriding `audio:` would hit that crash if this defaulted to the real service. The real
-        // app's composition root (ScrollingSortView) passes AudioService.shared explicitly instead.
+        // NOT AudioService.shared: every test that constructs a SortSession without overriding
+        // `audio:` gets a real, running AudioService if this defaulted to the shared instance —
+        // undesirable in a test host regardless of backend (see AudioServiceTests.swift's
+        // comment). This used to also be a hard crash risk specifically because of AudioKit's
+        // native parameter-map setup; that risk is gone since the ToneKit migration (see
+        // Modules/ToneKit/NOTICE.md), but the default here stays NoOpAudioService() either way.
+        // ScrollingSortView — the real app's composition root — currently doesn't override this
+        // either (see its own comment for why sound isn't wired up yet), so today nothing in the
+        // shipped app ever constructs the real AudioService.shared at all.
         audio: any AudioPlaying = NoOpAudioService(),
         analytics: AnalyticsService = .shared,
         settings: AppSettings = .shared,

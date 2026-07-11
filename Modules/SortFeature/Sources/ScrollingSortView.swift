@@ -10,15 +10,17 @@ public struct ScrollingSortView: View {
     public init(algorithm: any SortAlgorithm, shuffle: any ShuffleAlgorithm, arraySize: Int = 48) {
         self.algorithm = algorithm
         self.arraySize = arraySize
-        // NOT audio: AudioService.shared here — constructing a live AudioKit graph crashes in
-        // this project's current toolchain/simulator combination at native AudioComponent
-        // registration ("Fatal error: node factory not initialized" inside AudioKitEX/
-        // SoundpipeAudioKit), a crash Swift cannot catch or recover from (it's a C++ assert ->
-        // SIGABRT). AudioService.swift is fully implemented and unit-tested (its pure
-        // frequency(forValue:in:noteRange:) math), but wiring it into the one screen every UI test
-        // exercises is deferred until this is verified safe on a real device — see PORT_INVENTORY-
-        // style tracking in this phase's commit message. SortSession's own default
-        // (NoOpAudioService()) keeps this screen — and every test — safe in the meantime.
+        // NOT audio: AudioService.shared here — this predates the ToneKit migration (see
+        // Modules/ToneKit/NOTICE.md), when constructing a live AudioKit graph crashed in this
+        // project's toolchain/simulator combination at native AudioComponent registration, a crash
+        // Swift couldn't catch (a C++ assert -> SIGABRT). That specific crash risk no longer
+        // exists — ToneKit is plain AVAudioEngine/AVAudioSourceNode — but wiring the real
+        // AudioService.shared into the one screen every UI test exercises is still a real,
+        // separate decision (every UI test would start exercising live audio) rather than
+        // something to flip as a side effect of the AudioKit removal. AudioService.swift remains
+        // fully implemented and unit-tested (its pure frequency(forValue:in:noteRange:) math);
+        // SortSession's own default (NoOpAudioService()) keeps this screen silent until that
+        // decision is made deliberately.
         _session = State(wrappedValue: SortSession(algorithm: algorithm, shuffle: shuffle))
     }
 

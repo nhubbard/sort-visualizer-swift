@@ -4,7 +4,7 @@
 /// bars visually update at, so audio and animation can never drift apart (§3.1).
 ///
 /// `@MainActor`, not just `Sendable`: every real caller (`SortSession`, `ReplayEngine`'s playback
-/// loop) is already MainActor-isolated, and `AudioService`'s AudioKit graph is only ever touched
+/// loop) is already MainActor-isolated, and `AudioService`'s `ToneKit` graph is only ever touched
 /// from there — isolating the protocol itself, rather than leaving conformances to reconcile
 /// isolation ad hoc, is what lets `AudioService` (a `@MainActor` class) conform at all.
 @MainActor

@@ -26,10 +26,9 @@ struct AudioServiceTests {
         #expect(frequency > 0)
     }
 
-    // No test constructs a live `AudioService()` here: doing so builds a real AudioKit DSP graph
-    // (Oscillator -> AmplitudeEnvelope -> Fader -> AudioEngine), and instantiating that outside a
-    // running app with a real audio session crashes at AudioKit's native layer ("parameter map
-    // not initialized") — a bare test host, not a bug in this code. `frequency(forValue:in:
-    // noteRange:)` above covers the actual logic; `AudioService`'s wiring is verified by actually
-    // running the app (this phase's checkpoint) rather than by a unit test exercising live audio.
+    // No test constructs a live `AudioService()` here: doing so builds a real `AVAudioEngine`
+    // graph (Oscillator -> AmplitudeEnvelope -> AudioEngine, via ToneKit) and calling `start()`
+    // needs a real audio session route this test host doesn't reliably have. `frequency(forValue:
+    // in:noteRange:)` above covers the actual logic; `AudioService`'s wiring is verified by
+    // actually running the app rather than by a unit test exercising live audio.
 }

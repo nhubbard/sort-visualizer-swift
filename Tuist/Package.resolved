@@ -1,33 +1,6 @@
 {
-  "originHash" : "2c7c402c1f4be390eda834002e9bc2ca3f72fdbf9d8e3c8c2d630d6d3f18154b",
+  "originHash" : "166daf25d8fe29524d59afeeb0fa1322c5c67475a9cdff9327b6e3938b208be2",
   "pins" : [
-    {
-      "identity" : "audiokit",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/AudioKit/AudioKit.git",
-      "state" : {
-        "revision" : "97a35fe04cd8e3d13b8744e1216b8673f825bef6",
-        "version" : "5.7.2"
-      }
-    },
-    {
-      "identity" : "audiokitex",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/AudioKit/AudioKitEX",
-      "state" : {
-        "revision" : "c33dac0f581e4ef5bf179e550394f3152aafabfd",
-        "version" : "5.7.0"
-      }
-    },
-    {
-      "identity" : "audiokitui",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/AudioKit/AudioKitUI.git",
-      "state" : {
-        "revision" : "1a61e8a96c7ee24c3e5abe06dc3334a31fd7571d",
-        "version" : "0.3.7"
-      }
-    },
     {
       "identity" : "collectionconcurrencykit",
       "kind" : "remoteSourceControl",
@@ -35,24 +8,6 @@
       "state" : {
         "revision" : "03e9bc854e0fbb3e841bd591b8d62082e84c0bc9",
         "version" : "2.1.0"
-      }
-    },
-    {
-      "identity" : "controls",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/AudioKit/Controls.git",
-      "state" : {
-        "revision" : "4dd10370125af7f1e26d7a71b2c5929bb3c95087",
-        "version" : "1.1.4"
-      }
-    },
-    {
-      "identity" : "kissfft",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/AudioKit/KissFFT",
-      "state" : {
-        "revision" : "dd0636e151724b8ba2e0908eba4d99a6ff24d00c",
-        "version" : "1.0.0"
       }
     },
     {
@@ -71,15 +26,6 @@
       "state" : {
         "revision" : "2849f5323265386e200484b0d0f896e73c3411b9",
         "version" : "6.0.1"
-      }
-    },
-    {
-      "identity" : "soundpipeaudiokit",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/AudioKit/SoundpipeAudioKit.git",
-      "state" : {
-        "revision" : "d8afd31b3710a0efd5f9ecb11f1169ca493795e9",
-        "version" : "5.7.4"
       }
     },
     {
@@ -125,15 +71,6 @@
       "state" : {
         "revision" : "d41ef523faef0f911369f79c0b96815d9dbb6d7a",
         "version" : "3.0.0"
-      }
-    },
-    {
-      "identity" : "tonic",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/AudioKit/Tonic",
-      "state" : {
-        "revision" : "601eeb26b06ff6edfa391b2fd2d8815ec8231a9b",
-        "version" : "2.1.2"
       }
     }
   ],
