@@ -25,7 +25,7 @@ public struct BitonicSortRecursive: SortAlgorithm {
     public let metadata = AlgorithmMetadata(
         displayName: "Bitonic Sort (Recursive)",
         category: .concurrent,
-        sizeRange: 16...512,
+        sizeRange: 16...256,
         stable: false,
         timeComplexity: ComplexityBounds(
             best: "O(log^2 n)", average: "O(log^2 n)", worst: "O(log^2 n)"),

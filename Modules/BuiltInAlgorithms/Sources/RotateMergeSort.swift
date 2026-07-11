@@ -28,7 +28,7 @@ public struct RotateMergeSort: SortAlgorithm {
     public let metadata = AlgorithmMetadata(
         displayName: "Rotate Merge Sort",
         category: .merge,
-        sizeRange: 16...512,
+        sizeRange: 16...256,
         // The `left`/`right`-biased binary search exists specifically to preserve relative order
         // among equal elements across the rotation — verified empirically with tagged-duplicate
         // input (index-tagged values sorted purely on the untagged key retain their original

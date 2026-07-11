@@ -38,7 +38,7 @@ public struct WeavedMergeSort: SortAlgorithm {
     public let metadata = AlgorithmMetadata(
         displayName: "Weaved Merge Sort",
         category: .merge,
-        sizeRange: 16...512,
+        sizeRange: 16...256,
         // The tie-break rule `cmp == 0 && low > high` decides which of two EQUAL values to place
         // next based on the numeric value of their current strided *positions* in `array`, not on
         // which one originally appeared first in the input. Because the interleaved residue/modulus

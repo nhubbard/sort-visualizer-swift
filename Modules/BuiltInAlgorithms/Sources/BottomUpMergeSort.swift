@@ -21,7 +21,7 @@ public struct BottomUpMergeSort: SortAlgorithm {
     public let metadata = AlgorithmMetadata(
         displayName: "Bottom-up Merge Sort",
         category: .merge,
-        sizeRange: 16...512,
+        sizeRange: 16...256,
         stable: true,
         timeComplexity: ComplexityBounds(
             best: "O(n log n)", average: "O(n log n)", worst: "O(n log n)"),

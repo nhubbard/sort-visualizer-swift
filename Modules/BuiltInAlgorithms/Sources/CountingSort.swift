@@ -7,7 +7,7 @@ public struct CountingSort: SortAlgorithm {
     public let metadata = AlgorithmMetadata(
         displayName: "Counting Sort",
         category: .distribution,
-        sizeRange: 16...1024,
+        sizeRange: 16...256,
         stable: true,
         timeComplexity: ComplexityBounds(best: "O(n+k)", average: "O(n+k)", worst: "O(n+k)"),
         spaceComplexity: "O(n+k)",

@@ -6,7 +6,7 @@ public struct StableCycleSort: SortAlgorithm {
     public let metadata = AlgorithmMetadata(
         displayName: "Stable Cycle Sort",
         category: .selection,
-        sizeRange: 16...512,
+        sizeRange: 16...256,
         stable: true,
         timeComplexity: ComplexityBounds(best: "O(n^2)", average: "O(n^2)", worst: "O(n^2)"),
         spaceComplexity: "O(n)",

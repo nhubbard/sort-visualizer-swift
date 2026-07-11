@@ -28,7 +28,7 @@ public struct SimplifiedLibrarySort: SortAlgorithm {
     public let metadata = AlgorithmMetadata(
         displayName: "Simplified Library Sort",
         category: .insertion,
-        sizeRange: 32...512,
+        sizeRange: 32...256,
         stable: true,
         timeComplexity: ComplexityBounds(best: "O(n)", average: "O(n log n)", worst: "O(n^2)"),
         spaceComplexity: "O(n)",

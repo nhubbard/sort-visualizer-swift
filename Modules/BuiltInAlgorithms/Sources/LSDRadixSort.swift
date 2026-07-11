@@ -7,7 +7,7 @@ public struct LSDRadixSort: SortAlgorithm {
     public let metadata = AlgorithmMetadata(
         displayName: "LSD Radix Sort",
         category: .distribution,
-        sizeRange: 16...512,
+        sizeRange: 16...256,
         stable: true,
         timeComplexity: ComplexityBounds(best: "O(d \\times (n+b))", average: "O(d \\times (n+b))", worst: "O(d \\times (n+b))"),
         spaceComplexity: "O(n + b)",

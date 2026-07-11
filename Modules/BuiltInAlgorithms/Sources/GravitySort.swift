@@ -24,7 +24,7 @@ public struct GravitySort: SortAlgorithm {
     public let metadata = AlgorithmMetadata(
         displayName: "Gravity (Bead) Sort",
         category: .distribution,
-        sizeRange: 16...512,
+        sizeRange: 16...256,
         stable: false,
         timeComplexity: ComplexityBounds(best: "O(n \\times k)", average: "O(n \\times k)", worst: "O(n \\times k)"),
         spaceComplexity: "O(n+k)",

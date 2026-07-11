@@ -6,7 +6,7 @@ public struct RecursiveShellSort: SortAlgorithm {
     public let metadata = AlgorithmMetadata(
         displayName: "Recursive Shell Sort",
         category: .insertion,
-        sizeRange: 16...512,
+        sizeRange: 16...256,
         stable: false,
         timeComplexity: ComplexityBounds(
             best: "O(n log n)", average: "O(n^{1.25})", worst: "O(n^2)"),

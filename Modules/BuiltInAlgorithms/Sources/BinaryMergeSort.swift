@@ -6,7 +6,7 @@ public struct BinaryMergeSort: SortAlgorithm {
     public let metadata = AlgorithmMetadata(
         displayName: "Binary Merge Sort",
         category: .hybrid,
-        sizeRange: 16...512,
+        sizeRange: 16...256,
         stable: true,
         timeComplexity: ComplexityBounds(best: "O(n log n)", average: "O(n log n)", worst: "O(n log n)"),
         spaceComplexity: "O(n)",

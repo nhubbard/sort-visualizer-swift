@@ -13,7 +13,7 @@ public struct OptimizedGnomeSort: SortAlgorithm {
     public let metadata = AlgorithmMetadata(
         displayName: "Optimized Gnome Sort",
         category: .exchange,
-        sizeRange: 16...512,
+        sizeRange: 16...256,
         stable: true,
         timeComplexity: ComplexityBounds(best: "O(n)", average: "O(n^2)", worst: "O(n^2)"),
         spaceComplexity: "O(1)",

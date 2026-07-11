@@ -23,7 +23,7 @@ public struct HybridCombSort: SortAlgorithm {
     public let metadata = AlgorithmMetadata(
         displayName: "Hybrid Comb Sort",
         category: .hybrid,
-        sizeRange: 16...512,
+        sizeRange: 16...256,
         stable: false,
         timeComplexity: ComplexityBounds(best: "O(n log n)", average: "O(n^2)", worst: "O(n^2)"),
         spaceComplexity: "O(1)",

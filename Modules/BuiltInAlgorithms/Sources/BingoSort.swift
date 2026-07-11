@@ -18,7 +18,7 @@ public struct BingoSort: SortAlgorithm {
     public let metadata = AlgorithmMetadata(
         displayName: "Bingo Sort",
         category: .selection,
-        sizeRange: 16...512,
+        sizeRange: 16...256,
         stable: false,
         timeComplexity: ComplexityBounds(best: "O(n+m^2)", average: "O(n \\times m)", worst: "O(n \\times m)"),
         spaceComplexity: "O(1)",

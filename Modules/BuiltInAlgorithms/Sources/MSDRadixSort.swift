@@ -18,7 +18,7 @@ public struct MSDRadixSort: SortAlgorithm {
     public let metadata = AlgorithmMetadata(
         displayName: "MSD Radix Sort",
         category: .distribution,
-        sizeRange: 16...512,
+        sizeRange: 16...256,
         stable: true,
         timeComplexity: ComplexityBounds(best: "O(d \\times n)", average: "O(d \\times n)", worst: "O(d \\times n)"),
         spaceComplexity: "O(n+b)",

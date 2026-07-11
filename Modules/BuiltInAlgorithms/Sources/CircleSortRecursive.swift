@@ -32,7 +32,7 @@ public struct CircleSortRecursive: SortAlgorithm {
     public let metadata = AlgorithmMetadata(
         displayName: "Circle Sort (Recursive)",
         category: .exchange,
-        sizeRange: 16...512,
+        sizeRange: 16...256,
         stable: false,
         timeComplexity: ComplexityBounds(
             best: "O(n log n)", average: "O(n log^2 n)", worst: "O(n log^2 n)"),

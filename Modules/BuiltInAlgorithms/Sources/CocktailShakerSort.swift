@@ -6,7 +6,7 @@ public struct CocktailShakerSort: SortAlgorithm {
     public let metadata = AlgorithmMetadata(
         displayName: "Cocktail Shaker Sort",
         category: .exchange,
-        sizeRange: 16...512,
+        sizeRange: 16...256,
         stable: true,
         timeComplexity: ComplexityBounds(best: "O(n)", average: "O(n^2)", worst: "O(n^2)"),
         spaceComplexity: "O(1)",

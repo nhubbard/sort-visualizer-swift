@@ -15,7 +15,7 @@ public struct InPlaceMergeSort: SortAlgorithm {
     public let metadata = AlgorithmMetadata(
         displayName: "In-Place Merge Sort",
         category: .merge,
-        sizeRange: 16...512,
+        sizeRange: 16...256,
         // Not stable, despite superficially resembling a textbook (stable) merge. `merge`'s swaps
         // are positional — driven by the fixed index `mid + 1`, not by tracking "the right run's
         // current front element" — so `push` can walk a duplicate value past another occurrence of

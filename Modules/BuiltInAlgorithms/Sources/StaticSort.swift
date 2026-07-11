@@ -43,7 +43,7 @@ public struct StaticSort: SortAlgorithm {
     public let metadata = AlgorithmMetadata(
         displayName: "Static Sort",
         category: .distribution,
-        sizeRange: 16...512,
+        sizeRange: 16...256,
         stable: false,
         timeComplexity: ComplexityBounds(best: "O(n)", average: "O(n)", worst: "O(n^2)"),
         spaceComplexity: "O(n)",

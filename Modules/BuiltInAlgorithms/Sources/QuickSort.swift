@@ -6,7 +6,7 @@ public struct QuickSort: SortAlgorithm {
     public let metadata = AlgorithmMetadata(
         displayName: "Quick Sort",
         category: .exchange,
-        sizeRange: 16...512,
+        sizeRange: 16...256,
         stable: false,
         timeComplexity: ComplexityBounds(
             best: "O(n log n)", average: "O(n log n)", worst: "O(n^2)"),

@@ -7,7 +7,7 @@ public struct MergeExchangeSortIterative: SortAlgorithm {
     public let metadata = AlgorithmMetadata(
         displayName: "Iterative Merge-Exchange Sort",
         category: .concurrent,
-        sizeRange: 16...512,
+        sizeRange: 16...256,
         stable: false,
         timeComplexity: ComplexityBounds(
             best: "O(n log^2 n)", average: "O(n log^2 n)", worst: "O(n log^2 n)"),
