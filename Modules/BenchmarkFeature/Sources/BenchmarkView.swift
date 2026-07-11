@@ -26,9 +26,6 @@ public struct BenchmarkView: View {
                 Section("Complexity") {
                     ComplexityChart(algorithm: algorithm)
                 }
-                Section("Big-O Correlation") {
-                    BigOCorrelationChart(algorithm: algorithm)
-                }
             }
         }
         .navigationTitle("Benchmark")

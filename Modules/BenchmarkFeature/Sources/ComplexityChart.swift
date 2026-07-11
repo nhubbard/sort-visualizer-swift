@@ -79,11 +79,14 @@ struct ComplexityChart: View {
             }
             .disabled(isBenchmarking)
             .accessibilityIdentifier("runBenchmarkButton")
+            .padding(EdgeInsets(top: 4, leading: 24, bottom: 4, trailing: 24))
+            .glassEffect()
         }
         .task(id: algorithm.id) {
             dataPoints = []
             await runBenchmark()
         }
+        .padding()
     }
 
     private func runBenchmark() async {
