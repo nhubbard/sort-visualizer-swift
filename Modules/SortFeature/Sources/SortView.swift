@@ -7,6 +7,16 @@ public struct SortView: View {
     @Bindable var session: SortSession
     @Environment(AppSettings.self) private var settings
 
+    // Owned here, not by `RunControlBar` itself: `start(size:)` (the size stepper's own action)
+    // routes `session.phase` through `.recording`/`.ready` before landing back on `.replaying`,
+    // and `content` below renders a bare `ProgressView()` for those in-between phases — tearing
+    // down `RunControlBar` and rebuilding a fresh instance once phase settles. `@State` living on
+    // that instance would reset every time, collapsing the row the very stepper tap just opened.
+    // `SortView` sits outside the phase `switch`, so it keeps its identity (and this state) across
+    // the whole churn.
+    @State private var isSpeedExpanded = false
+    @State private var isSizeExpanded = false
+
     public init(session: SortSession) {
         self.session = session
     }
@@ -51,7 +61,13 @@ public struct SortView: View {
         case let .replaying(replay), let .complete(replay):
             canvas(for: replay)
                 .safeAreaInset(edge: .bottom) {
-                    RunControlBar(session: session, replay: replay, algorithm: session.algorithm)
+                    RunControlBar(
+                        session: session,
+                        replay: replay,
+                        algorithm: session.algorithm,
+                        isSpeedExpanded: $isSpeedExpanded,
+                        isSizeExpanded: $isSizeExpanded
+                    )
                 }
         case .failed:
             ContentUnavailableView("Sort Failed", systemImage: "exclamationmark.triangle")

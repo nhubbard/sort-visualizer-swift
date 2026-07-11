@@ -58,7 +58,7 @@ public struct SettingsView: View {
                 Stepper(
                     "Default Size: \(settings.defaultArraySize)",
                     value: $settings.defaultArraySize,
-                    in: 16...512,
+                    in: 16...256,
                     step: 16
                 )
                 .accessibilityIdentifier("defaultArraySizeStepper")

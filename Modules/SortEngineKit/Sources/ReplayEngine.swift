@@ -1,5 +1,49 @@
 import Foundation
 import Observation
+import QuartzCore
+
+/// Abstracts the redraw clock so `ReplayEngine` doesn't require a live display link to be
+/// testable. `onTick` fires once per frame with the elapsed time since the previous tick (0 for
+/// the very first tick after `start`).
+protocol DisplayLinkDriving: AnyObject {
+    func start(onTick: @escaping (TimeInterval) -> Void)
+    func stop()
+}
+
+/// Real production driver — paces ticks on true hardware vsync via `CADisplayLink`.
+final class CADisplayLinkDriver: DisplayLinkDriving {
+    /// `CADisplayLink` has no closure-based initializer, only target/selector, so this plain
+    /// `NSObject` exists solely to be that target and forward each callback into a closure.
+    private final class Proxy: NSObject {
+        let callback: (CADisplayLink) -> Void
+        init(callback: @escaping (CADisplayLink) -> Void) { self.callback = callback }
+        @objc func tick(_ link: CADisplayLink) { callback(link) }
+    }
+
+    private var displayLink: CADisplayLink?
+    private var proxy: Proxy?
+    private var lastTimestamp: CFTimeInterval?
+
+    func start(onTick: @escaping (TimeInterval) -> Void) {
+        let proxy = Proxy { [weak self] link in
+            guard let self else { return }
+            let elapsed = self.lastTimestamp.map { link.timestamp - $0 } ?? 0
+            self.lastTimestamp = link.timestamp
+            onTick(elapsed)
+        }
+        self.proxy = proxy
+        let link = CADisplayLink(target: proxy, selector: #selector(Proxy.tick(_:)))
+        link.add(to: .main, forMode: .common)
+        displayLink = link
+    }
+
+    func stop() {
+        displayLink?.invalidate()
+        displayLink = nil
+        proxy = nil
+        lastTimestamp = nil
+    }
+}
 
 /// The **only** `@Observable` type that touches per-element sort state. Every mutation happens
 /// inside a single `@MainActor` method, one `stepIndex` at a time — there is no concurrent writer,
@@ -43,6 +87,16 @@ public final class ReplayEngine {
         /// not the element moves it's built from (those already land in `swapCount`).
         public internal(set) var reversalCount: Int
         public internal(set) var stepIndex: Int
+
+        /// Hand-written, not synthesized: `@Observable`'s macro-generated `state` setter calls
+        /// this on every plain assignment (`stepForward`/`seek`) to decide whether to notify
+        /// observers at all, and the synthesized field-by-field `==` would walk the whole `frame`
+        /// array to answer that. `stepIndex` alone determines every other field for a given tape
+        /// (both sides are always produced by replaying the same deterministic operation list),
+        /// so comparing it is equivalent and O(1).
+        public static func == (lhs: PlaybackState, rhs: PlaybackState) -> Bool {
+            lhs.stepIndex == rhs.stepIndex
+        }
     }
 
     /// The one `@Observable`-tracked stored property behind `frame`/`auxArrays`/`compareCount`/
@@ -100,11 +154,24 @@ public final class ReplayEngine {
     /// Every ~500 operations, so `seek(to:)` never replays more than ~500 ops from the nearest one.
     private let checkpoints: [PlaybackState]
     private var playbackTask: Task<Void, Never>?
+    /// The driver behind whatever `play()` call is currently in flight, kept here (not just
+    /// captured locally inside `play()`'s `Task`) so `pause()` can silence it immediately instead
+    /// of waiting for the `Task`'s own cancellation check to run on the next tick.
+    private var activeDriver: DisplayLinkDriving?
+    private let displayLinkFactory: () -> DisplayLinkDriving
 
     private static let checkpointInterval = 500
 
-    public init(tape: Tape) {
+    public convenience init(tape: Tape) {
+        self.init(tape: tape, displayLinkFactory: { CADisplayLinkDriver() })
+    }
+
+    /// Not `public` — the display-link seam exists so tests can inject a deterministic fake
+    /// instead of depending on a real `CADisplayLink` firing inside this module's host-less
+    /// `.unitTests` bundle. Production code and `@testable import`ing tests are the only callers.
+    init(tape: Tape, displayLinkFactory: @escaping () -> DisplayLinkDriving) {
         self.tape = tape
+        self.displayLinkFactory = displayLinkFactory
 
         let initialFrame = tape.header.initialValues.map { BarState(id: UUID(), value: $0) }
         let initialState = PlaybackState(
@@ -126,9 +193,9 @@ public final class ReplayEngine {
 
     public func stepForward() {
         guard state.stepIndex < tape.operations.count else { return }
-        var working = state
-        Self.apply(tape.operations[working.stepIndex], to: &working)
-        state = working
+        mutatingState { working in
+            Self.apply(tape.operations[working.stepIndex], to: &working)
+        }
     }
 
     public func stepBackward() {
@@ -139,17 +206,46 @@ public final class ReplayEngine {
     public func seek(to index: Int) {
         pause()
         let target = max(0, min(index, tape.operations.count))
-        var working = nearestCheckpoint(atOrBefore: target)
-        while working.stepIndex < target {
-            Self.apply(tape.operations[working.stepIndex], to: &working)
+        let checkpoint = nearestCheckpoint(atOrBefore: target)
+        mutatingState { working in
+            working = checkpoint
+            while working.stepIndex < target {
+                Self.apply(tape.operations[working.stepIndex], to: &working)
+            }
         }
-        state = working
     }
 
-    /// Above this many renders per second, a batch of operations is applied per tick instead of
-    /// one, capped at `maxOpsPerTick` — see `play()`'s doc comment for why both exist.
-    private static let targetRenderHz = 30.0
-    private static let maxOpsPerTick = 20
+    /// Routes a mutation through `@Observable`'s synthesized `_modify` accessor for `state`
+    /// (via `&state`) instead of `var working = state; ...; state = working`. The latter leaves
+    /// `state` and `working` referencing the same `frame` buffer until the write-back — `Array`
+    /// is copy-on-write, so the very first element mutation inside `body` forces a full O(n) copy
+    /// of `frame` before it can write to it. Yielding `state` directly keeps only one reference to
+    /// that buffer alive for the whole batch, so no copy happens regardless of how many operations
+    /// `body` applies. `_modify` also unconditionally calls `willSet`/`didSet` exactly once for the
+    /// whole access rather than routing through the `Equatable`-based `shouldNotifyObservers` the
+    /// plain setter uses — batched callers (`play()`) always mutate `state`, so that's moot; this
+    /// helper exists for the copy-avoidance, not to dodge the (already-cheap, see `PlaybackState.
+    /// ==`) equality check.
+    private func mutatingState(_ body: (inout PlaybackState) -> Void) {
+        body(&state)
+    }
+
+    /// Elapsed time between ticks is clamped to this before feeding the accumulator, so a real
+    /// gap (backgrounding, a debugger pause, a genuine hitch) can't turn into one enormous burst
+    /// of operations applied in a single tick.
+    private static let maxCatchUpInterval: TimeInterval = 0.25
+
+    /// The pure pacing math, factored out of `play()` so it's directly unit-testable without a
+    /// driver: how many operations are due given `elapsed` real seconds at `speed` operations per
+    /// second, carrying any fractional remainder forward in `accumulator` so slow speeds don't
+    /// lose operations to rounding, and never returning more than `remaining` (the tape doesn't
+    /// have more to give).
+    static func opsToApply(elapsed: TimeInterval, speed: Double, accumulator: inout Double, remaining: Int) -> Int {
+        accumulator += min(elapsed, maxCatchUpInterval) * speed
+        let ops = min(Int(accumulator), remaining)
+        accumulator -= Double(ops)
+        return ops
+    }
 
     /// Returns the playback `Task` so callers (e.g. `SortSession`) can `await` its completion
     /// instead of polling `isPlaying`.
@@ -160,54 +256,58 @@ public final class ReplayEngine {
     /// exist. Deliberately scoped to this loop only, not `stepForward()` itself, so scrubbing via
     /// `stepForward()`/`stepBackward()`/`seek(to:)` directly never triggers audio.
     ///
-    /// Reads `speed` fresh on every iteration (rather than capturing it once as a parameter) so a
-    /// caller can change it live, mid-replay, and see the new cadence take effect on the next tick.
+    /// Reads `speed` fresh on every tick (rather than capturing it once) so a caller can change it
+    /// live, mid-replay, and see the new cadence take effect immediately.
     ///
-    /// Applies a *batch* of operations per tick rather than one, sized so ticks never demand more
-    /// than `targetRenderHz` renders per second, capped at `maxOpsPerTick`. The batch is
-    /// accumulated into a local `PlaybackState` and written back to `state` **exactly once per
-    /// tick**, not once per operation — calling `stepForward()` in a loop would still mutate the
-    /// observed state once per operation, leaving the same total mutation count as before
-    /// batching, since coalescing render *requests* doesn't reduce how many times observed state
-    /// actually changed.
-    ///
-    /// Measured on-device throughput at high `speed` used to fall well short of what this formula
-    /// alone predicts. Instruments profiling traced the gap to `ReplayEngine` previously exposing
-    /// `frame`/`auxArrays`/`compareCount`/`swapCount`/`stepIndex` as five separately-mutated
-    /// `@Observable` properties — each tick fired five independent AttributeGraph dirty-propagation
-    /// events instead of one, and that fan-out (not any view's own rendering cost) dominated the
-    /// main thread. Consolidating them into the single `state: PlaybackState` write above is the
-    /// fix; `maxOpsPerTick` still keeps this fixed-formula version bounded and predictable on top
-    /// of that.
+    /// Ticks come from `displayLinkFactory()` — real hardware vsync (`CADisplayLinkDriver`) in
+    /// production, a deterministic fake in tests — rather than a fixed sleep interval derived from
+    /// `speed`. This decouples *simulation* (how many tape operations are due, governed purely by
+    /// `opsToApply`'s `elapsed × speed` accumulator, uncapped) from *render* (when the display
+    /// actually gets a new frame): a fast machine at a high `speed` just accumulates and applies
+    /// more operations per real vsync interval, instead of being capped by an assumed render rate.
+    /// A tick that has no operation due yet (`opsToApply == 0`, common at low `speed`) is skipped
+    /// entirely — no `mutatingState` write, no redraw. Whatever batch *is* due within one tick
+    /// still applies through one `mutatingState` call, preserving the single-`@Observable`-write-
+    /// per-tick property the type's other doc comments (see `state`) depend on.
     @discardableResult
     public func play(onStep: ((SortOperation) -> Void)? = nil) -> Task<Void, Never> {
         isPlaying = true
         currentSegmentStart = Date()
+
+        let driver = displayLinkFactory()
+        activeDriver = driver
+        let (stream, continuation) = AsyncStream<TimeInterval>.makeStream()
+        driver.start { elapsed in continuation.yield(elapsed) }
+
         let task = Task { [weak self] in
-            while let self, self.state.stepIndex < self.tape.operations.count, !Task.isCancelled {
-                let opsPerTick = max(1, min(Self.maxOpsPerTick, Int((self.speed / Self.targetRenderHz).rounded())))
+            var accumulator = 0.0
+            for await elapsed in stream {
+                guard let self, !Task.isCancelled else { break }
+                let remaining = self.tape.operations.count - self.state.stepIndex
+                guard remaining > 0 else { break }
 
-                var working = self.state
+                let opsToApply = Self.opsToApply(elapsed: elapsed, speed: self.speed, accumulator: &accumulator, remaining: remaining)
+                guard opsToApply > 0 else { continue }
+
                 var appliedOperations: [SortOperation] = []
-                appliedOperations.reserveCapacity(opsPerTick)
-
-                for _ in 0..<opsPerTick {
-                    guard working.stepIndex < self.tape.operations.count else { break }
-                    let operation = self.tape.operations[working.stepIndex]
-                    Self.apply(operation, to: &working)
-                    appliedOperations.append(operation)
+                appliedOperations.reserveCapacity(opsToApply)
+                self.mutatingState { working in
+                    for _ in 0..<opsToApply {
+                        guard working.stepIndex < self.tape.operations.count else { break }
+                        let operation = self.tape.operations[working.stepIndex]
+                        Self.apply(operation, to: &working)
+                        appliedOperations.append(operation)
+                    }
                 }
-
-                // One assignment to `state` per tick, regardless of opsPerTick.
-                self.state = working
 
                 for operation in appliedOperations {
                     onStep?(operation)
                 }
 
-                guard self.state.stepIndex < self.tape.operations.count else { break }
-                try? await Task.sleep(for: .seconds(Double(appliedOperations.count) / self.speed))
+                if self.state.stepIndex >= self.tape.operations.count { break }
             }
+            driver.stop()
+            self?.activeDriver = nil
             self?.isPlaying = false
         }
         playbackTask = task
@@ -216,6 +316,8 @@ public final class ReplayEngine {
 
     public func pause() {
         playbackTask?.cancel()
+        activeDriver?.stop()
+        activeDriver = nil
         isPlaying = false
         if let currentSegmentStart {
             activePlaybackDuration += Date().timeIntervalSince(currentSegmentStart)

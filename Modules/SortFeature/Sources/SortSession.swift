@@ -52,6 +52,11 @@ public final class SortSession {
     private let audio: any AudioPlaying
     private let analytics: AnalyticsService
     private let settings: AppSettings
+    /// Not a public init parameter: the only override this session ever needs is a test injecting
+    /// a deterministic tick driver in place of `ReplayEngine`'s real `CADisplayLink` (see
+    /// `ReplayEngine`'s own non-public `displayLinkFactory` seam, kept internal for the same
+    /// reason) — `@testable import`ing tests are the only callers.
+    private let replayEngineFactory: (Tape) -> ReplayEngine
     private var monitorTask: Task<Void, Never>?
     private var automationTask: Task<Void, Never>?
     /// Resolved (and cleared) the moment `phase` genuinely reaches `.complete` — lets
@@ -70,13 +75,15 @@ public final class SortSession {
         // app's composition root (ScrollingSortView) passes AudioService.shared explicitly instead.
         audio: any AudioPlaying = NoOpAudioService(),
         analytics: AnalyticsService = .shared,
-        settings: AppSettings = .shared
+        settings: AppSettings = .shared,
+        replayEngineFactory: @escaping (Tape) -> ReplayEngine = { ReplayEngine(tape: $0) }
     ) {
         self.algorithm = algorithm
         self.shuffle = shuffle
         self.audio = audio
         self.analytics = analytics
         self.settings = settings
+        self.replayEngineFactory = replayEngineFactory
         self.soundEnabled = settings.soundEnabled
         self.arraySize = algorithm.metadata.sizeRange.lowerBound
     }
@@ -146,7 +153,7 @@ public final class SortSession {
     }
 
     private func startReplay(_ tape: Tape) {
-        let replay = ReplayEngine(tape: tape)
+        let replay = replayEngineFactory(tape)
         replay.speed = settings.playbackSpeed
         phase = .replaying(replay)
         beginPlayback(replay)

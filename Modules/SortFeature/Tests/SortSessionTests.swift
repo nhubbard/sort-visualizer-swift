@@ -1,9 +1,31 @@
 import AlgorithmKit
 import Foundation
 import SettingsKit
-import SortEngineKit
 import Testing
+@testable import SortEngineKit
 @testable import SortFeature
+
+/// Test-only stand-in for `ReplayEngine`'s internal `DisplayLinkDriving` seam (see
+/// `ReplayEngineTests.swift`'s identical `ManualTickDriver` in `SortEngineKit`'s own test target —
+/// duplicated here rather than shared because test targets can't import each other's test code)
+/// — gives a test full, instant control over "how much time just passed" via `fireTick(elapsed:)`
+/// instead of racing a real `CADisplayLink`, which has no guaranteed tick latency in this
+/// module's host-less `.unitTests` bundle.
+private final class ManualTickDriver: DisplayLinkDriving {
+    private var onTick: ((TimeInterval) -> Void)?
+
+    func start(onTick: @escaping (TimeInterval) -> Void) {
+        self.onTick = onTick
+    }
+
+    func stop() {
+        onTick = nil
+    }
+
+    func fireTick(elapsed: TimeInterval) {
+        onTick?(elapsed)
+    }
+}
 
 /// Bubble sort — mirrors `Legacy/.../BubbleSortImpl.swift`'s logic, duplicated here (rather than
 /// depending on `BuiltInAlgorithms`/`ScriptingKit`) so this test target only needs
@@ -172,30 +194,54 @@ struct SortSessionTests {
     /// flip `phase` to `.complete` (the old one-shot "await the first playbackTask" design would
     /// have, since a cancelled task's `.value` still resolves), and resuming must continue from
     /// where it left off rather than restarting or getting stuck.
+    ///
+    /// Drives a `ManualTickDriver` directly instead of sleeping and hoping enough real
+    /// `CADisplayLink` ticks land in the window — this test used to sleep 50ms at `speed: 20`
+    /// (1 op/50ms) and assert `stepIndexAtPause > 0`, which depended on a real display link
+    /// ticking at least once in that window. In this module's host-less `.unitTests` bundle a real
+    /// `CADisplayLink` has no guaranteed tick latency, so that assertion failed outright rather
+    /// than flaking occasionally — the fix is determinism, not a longer sleep.
     @Test
     func pausingThenResumingReachesCompletionWithoutLosingProgress() async throws {
         let settings = makeFastSettings()
-        settings.playbackSpeed = 20.0 // slow enough to reliably catch mid-replay for this test
-        let session = SortSession(algorithm: FakeAlgorithm(), shuffle: FakeReverseShuffle(), settings: settings)
+        let driver = ManualTickDriver()
+        let session = SortSession(
+            algorithm: FakeAlgorithm(),
+            shuffle: FakeReverseShuffle(),
+            settings: settings,
+            replayEngineFactory: { ReplayEngine(tape: $0, displayLinkFactory: { driver }) }
+        )
 
         await session.start(size: 12)
         guard case let .replaying(replay) = session.phase else {
             Issue.record("expected .replaying immediately after start, got \(session.phase)")
             return
         }
+        // `ReplayEngine.opsToApply` clamps a tick's elapsed time to `maxCatchUpInterval` (0.25s)
+        // before multiplying by speed, so `speed` must be high enough that even the clamped
+        // elapsed still yields a whole, nonzero op count — a slow speed here would silently
+        // round down to 0 regardless of how large `elapsed` is.
+        replay.speed = 20.0
 
-        try await Task.sleep(for: .milliseconds(50))
+        driver.fireTick(elapsed: 0) // the very first tick always carries zero elapsed time
+        driver.fireTick(elapsed: 1.0) // clamped to 0.25s * 20 ops/sec = 5 ops due — partway through
+        try await Task.sleep(for: .milliseconds(20)) // let play()'s Task actually process the tick
+        #expect(replay.isPlaying)
+
         session.togglePlayback() // pause
         #expect(!replay.isPlaying)
         let stepIndexAtPause = replay.stepIndex
         #expect(stepIndexAtPause > 0)
         #expect(stepIndexAtPause < replay.totalOperationCount)
 
-        try await Task.sleep(for: .milliseconds(50))
+        driver.fireTick(elapsed: 1.0) // fired while paused — pause() already stopped the driver
+        try await Task.sleep(for: .milliseconds(20))
         #expect(replay.stepIndex == stepIndexAtPause) // nothing advances while paused
 
         replay.speed = 100_000.0 // finish quickly once resumed
-        session.togglePlayback() // resume
+        session.togglePlayback() // resume — starts a fresh play() Task against the same driver
+        driver.fireTick(elapsed: 0) // the very first tick of this new play() also carries zero elapsed time
+        driver.fireTick(elapsed: 1.0) // hugely overdue at the new speed — the rest of the tape in one tick
         try await waitUntilTerminal(session)
 
         guard case let .complete(finished) = session.phase else {

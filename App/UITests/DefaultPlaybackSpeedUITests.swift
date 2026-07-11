@@ -38,7 +38,7 @@ final class DefaultPlaybackSpeedUITests: XCTestCase {
 
         let speedValueLabel = app.staticTexts["runControlSpeedValueLabel"]
         XCTAssertTrue(speedValueLabel.waitForExistence(timeout: 5))
-        let sessionSpeed = try XCTUnwrap(Int(speedValueLabel.label.split(separator: " ").first ?? ""))
+        let sessionSpeed = try XCTUnwrap(speedValueLabel.label.split(separator: " ").compactMap { Int($0) }.first)
         XCTAssertEqual(
             sessionSpeed, Int(raisedSpeed),
             "a freshly opened sort should start at the new default speed, not the old one"

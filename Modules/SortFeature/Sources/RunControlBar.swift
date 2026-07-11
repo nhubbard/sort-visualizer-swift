@@ -18,8 +18,11 @@ struct RunControlBar: View {
     @Bindable var replay: ReplayEngine
     let algorithm: any SortAlgorithm
 
-    @State private var isSpeedExpanded = false
-    @State private var isSizeExpanded = false
+    // Bindings, not local `@State` — owned by `SortView`, which survives the phase churn
+    // `session.start(size:)` (the size stepper's own action) drives this view through. See
+    // `SortView`'s doc comment on its own copies of these for why.
+    @Binding var isSpeedExpanded: Bool
+    @Binding var isSizeExpanded: Bool
 
     var body: some View {
         VStack(spacing: 8) {
@@ -232,10 +235,10 @@ struct RunControlBar: View {
             Text("Fast")
                 .font(.caption)
                 .foregroundStyle(.secondary)
-            Text("\(Int(replay.speed)) ops/sec")
+            Text("target: \(Int(replay.speed)) ops/sec")
                 .font(.caption.monospacedDigit())
                 .foregroundStyle(.secondary)
-                .frame(minWidth: 80, alignment: .trailing)
+                .frame(minWidth: 120, alignment: .trailing)
                 .accessibilityIdentifier("runControlSpeedValueLabel")
         }
     }

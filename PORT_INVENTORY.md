@@ -520,22 +520,22 @@ doesn't map 1:1 onto ArrayV's list — noted inline where there's a rough equiva
 ### a. Completed
 
 - [x] BarGraph — done (Phase 4), `BarGraphVisualizer.swift`
+- [x] ColorCircle
+- [x] HoopStack
+- [x] PixelMesh
 - [x] Rainbow — done (Phase 5), `RainbowVisualizer.swift`
 - [x] ScatterPlot (ArrayV: "Dots") — done (Phase 5), `ScatterPlotVisualizer.swift`
+- [x] SineWave
+- [x] Spiral
+- [x] SpiralDots
+- [x] WaveDots
 
 ### b. Not Started
 
 - [ ] DisparityBarGraph — needs `originalIndices` (§2A.6 disparity family)
-- [ ] SineWave
-- [ ] ColorCircle
 - [ ] DisparityCircle — needs `originalIndices`
 - [ ] DisparityChords — needs `originalIndices`; most geometrically complex of the circle group
-- [ ] Spiral
-- [ ] SpiralDots
 - [ ] DisparityDots — needs `originalIndices`
-- [ ] WaveDots
-- [ ] PixelMesh
-- [ ] HoopStack
 
 ### c. Decision Required
 

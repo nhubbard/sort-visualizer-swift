@@ -2,6 +2,26 @@ import Foundation
 import Testing
 @testable import SortEngineKit
 
+/// Deterministic test stand-in for `DisplayLinkDriving` (see `ReplayEngine.swift`) — gives a test
+/// full, instant control over "how much time just passed" via `fireTick(elapsed:)`, without
+/// waiting on real time or depending on a real `CADisplayLink` firing inside this module's
+/// host-less `.unitTests` bundle.
+final class ManualTickDriver: DisplayLinkDriving {
+    private var onTick: ((TimeInterval) -> Void)?
+
+    func start(onTick: @escaping (TimeInterval) -> Void) {
+        self.onTick = onTick
+    }
+
+    func stop() {
+        onTick = nil
+    }
+
+    func fireTick(elapsed: TimeInterval) {
+        onTick?(elapsed)
+    }
+}
+
 @MainActor
 @Suite
 struct ReplayEngineTests {
@@ -65,20 +85,22 @@ struct ReplayEngineTests {
     func liveSpeedChangeDuringPlayAffectsCurrentReplayImmediately() async {
         let operations: [SortOperation] = (0..<20).map { _ in .compare(0, 1) }
         let tape = makeTape(initialValues: [1, 2], operations: operations)
-        let engine = ReplayEngine(tape: tape)
-        engine.speed = 5.0 // 0.2s/op — 20 ops would take ~4s at this rate
+        let driver = ManualTickDriver()
+        let engine = ReplayEngine(tape: tape, displayLinkFactory: { driver })
+        engine.speed = 5.0 // 0.2s/op
 
-        let task = engine.play()
-        engine.speed = 100_000.0 // crank it up immediately after starting
+        _ = engine.play()
+        driver.fireTick(elapsed: 0) // the very first tick always carries zero elapsed time
+        driver.fireTick(elapsed: 0.1) // 0.5 ops due at speed 5 — not enough to apply one yet
+        try? await Task.sleep(for: .milliseconds(20))
+        #expect(engine.stepIndex == 0, "half an operation's worth of elapsed time shouldn't apply anything")
 
-        let deadline = ContinuousClock.now + .seconds(2)
-        while ContinuousClock.now < deadline, engine.stepIndex < tape.operations.count {
-            try? await Task.sleep(for: .milliseconds(5))
-        }
-        task.cancel()
+        engine.speed = 100_000.0 // crank it up immediately, mid-playback
+        driver.fireTick(elapsed: 1.0) // hugely overdue at the new speed
+        try? await Task.sleep(for: .milliseconds(20))
 
-        // If the loop had captured the original speed instead of reading it live, this would
-        // still be stuck near step 0-1 two seconds in (at 5 ops/sec).
+        // If `play()` had captured the original speed instead of reading it live, this would
+        // still be stuck at step 0 after a mere 1.1s of simulated elapsed time (at 5 ops/sec).
         #expect(engine.stepIndex == tape.operations.count)
     }
 
@@ -95,10 +117,13 @@ struct ReplayEngineTests {
         let reference = ReplayEngine(tape: tape)
         for _ in 0..<operations.count { reference.stepForward() }
 
-        let batched = ReplayEngine(tape: tape)
-        batched.speed = 100_000.0 // far above targetRenderHz, so many ops apply per tick
+        let driver = ManualTickDriver()
+        let batched = ReplayEngine(tape: tape, displayLinkFactory: { driver })
+        batched.speed = 100_000.0 // one tick's worth of elapsed time covers the whole tape
 
         let task = batched.play()
+        driver.fireTick(elapsed: 0)
+        driver.fireTick(elapsed: 1.0) // 100,000 ops due, capped by `remaining` at exactly 50
         await task.value
 
         #expect(batched.stepIndex == reference.stepIndex)
@@ -107,22 +132,86 @@ struct ReplayEngineTests {
         #expect(batched.swapCount == reference.swapCount)
     }
 
-    /// At a speed below the render-rate cap, batching should compute to exactly one operation per
-    /// tick — i.e. no behavior change from before this fix for ordinary, non-extreme speeds.
+    /// A tick whose elapsed time accumulates to less than one full operation at the configured
+    /// `speed` must apply nothing at all — no operation, no `mutatingState` write — while the
+    /// fractional remainder still carries forward, so the next tick that pushes the accumulator
+    /// past 1.0 applies exactly the (single) operation now due.
     @Test
-    func lowSpeedPlaybackAppliesOneOperationPerTick() async {
+    func ticksBelowOneOperationsWorthOfElapsedTimeApplyNothingUntilEnoughAccumulates() async {
         let operations: [SortOperation] = (0..<3).map { _ in .compare(0, 1) }
         let tape = makeTape(initialValues: [1, 2], operations: operations)
-        let engine = ReplayEngine(tape: tape)
-        engine.speed = 10.0 // well under targetRenderHz (60) -> opsPerTick rounds to 1
+        let driver = ManualTickDriver()
+        let engine = ReplayEngine(tape: tape, displayLinkFactory: { driver })
+        engine.speed = 10.0
 
-        let task = engine.play()
+        _ = engine.play()
+        driver.fireTick(elapsed: 0) // the very first tick always carries zero elapsed time
+        driver.fireTick(elapsed: 0.05) // 0.5 ops due — not enough
+        try? await Task.sleep(for: .milliseconds(20))
+        #expect(engine.stepIndex == 0)
 
-        // Give it enough time for exactly one tick (100ms at 10/sec) but not two.
-        try? await Task.sleep(for: .milliseconds(60))
-        #expect(engine.stepIndex == 1, "expected exactly one operation applied per tick at low speed")
+        driver.fireTick(elapsed: 0.06) // accumulator now at 1.1 ops due — exactly one applies
+        try? await Task.sleep(for: .milliseconds(20))
+        #expect(engine.stepIndex == 1)
 
-        task.cancel()
+        engine.pause()
+    }
+
+    /// Direct regression test for the reported throughput ceiling: sustained playback at a
+    /// configured `speed` must apply (approximately) that many operations per second of
+    /// *simulated* elapsed time, regardless of how many discrete ticks that time is split across
+    /// — the accumulator, not the tick count or any assumed render rate, governs throughput.
+    @Test
+    func sustainedPlaybackAtConfiguredSpeedAppliesApproximatelyThatManyOperations() async {
+        let operations: [SortOperation] = (0..<200).map { _ in .compare(0, 1) }
+        let tape = makeTape(initialValues: [1, 2], operations: operations)
+        let driver = ManualTickDriver()
+        let engine = ReplayEngine(tape: tape, displayLinkFactory: { driver })
+        engine.speed = 200.0
+
+        _ = engine.play()
+        driver.fireTick(elapsed: 0) // the very first tick always carries zero elapsed time
+        // Simulate one second of real 60Hz vsync ticks, split into 60 discrete frames.
+        for _ in 0..<60 {
+            driver.fireTick(elapsed: 1.0 / 60.0)
+        }
+        try? await Task.sleep(for: .milliseconds(50))
+
+        #expect(abs(engine.stepIndex - 200) <= 1)
+        engine.pause()
+    }
+
+    /// The pure accumulator underlying `play()`'s pacing, tested directly without any driver: no
+    /// operation is ever lost to rounding — a fractional remainder from one call carries forward
+    /// into the next.
+    @Test
+    func opsToApplyCarriesFractionalRemainderForwardAcrossCalls() {
+        var accumulator = 0.0
+        // 3 ticks of 0.1 simulated seconds each (well under the 0.25s catch-up clamp) at 25
+        // ops/sec = 2.5 ops due per tick, 7.5 ops due in total.
+        let first = ReplayEngine.opsToApply(elapsed: 0.1, speed: 25.0, accumulator: &accumulator, remaining: 1000)
+        let second = ReplayEngine.opsToApply(elapsed: 0.1, speed: 25.0, accumulator: &accumulator, remaining: 1000)
+        let third = ReplayEngine.opsToApply(elapsed: 0.1, speed: 25.0, accumulator: &accumulator, remaining: 1000)
+
+        #expect(first + second + third == 7)
+        #expect(accumulator == 0.5) // the 0.5 op not yet due is still waiting, not discarded
+    }
+
+    @Test
+    func opsToApplyNeverExceedsRemaining() {
+        var accumulator = 0.0
+        let ops = ReplayEngine.opsToApply(elapsed: 1.0, speed: 100.0, accumulator: &accumulator, remaining: 3)
+        #expect(ops == 3)
+    }
+
+    /// A pathologically large elapsed gap (backgrounding, a debugger pause, a genuine hitch) must
+    /// not translate into a single tick applying thousands of operations — it should be clamped
+    /// well below the raw, unclamped `elapsed * speed` value.
+    @Test
+    func opsToApplyClampsPathologicallyLargeElapsedTime() {
+        var accumulator = 0.0
+        let ops = ReplayEngine.opsToApply(elapsed: 1000.0, speed: 4.0, accumulator: &accumulator, remaining: 1_000_000)
+        #expect(ops < 100)
     }
 
     @Test
