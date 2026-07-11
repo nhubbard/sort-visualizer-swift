@@ -1,150 +1,20 @@
 {
-  "color-space-for-untagged-svg-colors" : "display-p3",
-  "fill-specializations" : [
-    {
-      "value" : "system-light"
-    },
-    {
-      "appearance" : "dark",
-      "value" : "system-dark"
-    }
-  ],
+  "fill" : {
+    "automatic-gradient" : "extended-srgb:0.00000,0.53333,1.00000,1.00000"
+  },
   "groups" : [
     {
       "layers" : [
         {
-          "fill-specializations" : [
-            {
-              "value" : {
-                "solid" : "extended-srgb:0.00000,0.53333,1.00000,1.00000"
-              }
-            },
-            {
-              "appearance" : "dark",
-              "value" : {
-                "solid" : "srgb:1.00000,1.00000,1.00000,0.84706"
-              }
-            }
-          ],
-          "glass" : false,
-          "image-name" : "path_9.svg",
-          "name" : "path_9"
-        },
-        {
-          "fill-specializations" : [
-            {
-              "value" : {
-                "solid" : "extended-srgb:0.00000,0.53333,1.00000,1.00000"
-              }
-            },
-            {
-              "appearance" : "dark",
-              "value" : {
-                "automatic-gradient" : "srgb:1.00000,1.00000,1.00000,0.84706"
-              }
-            }
-          ],
-          "glass" : false,
-          "image-name" : "path_8.svg",
-          "name" : "path_8"
-        },
-        {
-          "fill" : {
-            "solid" : "extended-gray:0.25000,1.00000"
-          },
-          "glass" : false,
-          "image-name" : "path_7.svg",
-          "name" : "path_7"
-        },
-        {
-          "fill-specializations" : [
-            {
-              "value" : {
-                "solid" : "extended-gray:0.25000,1.00000"
-              }
-            },
-            {
-              "appearance" : "dark",
-              "value" : {
-                "solid" : "extended-gray:0.75000,1.00000"
-              }
-            }
-          ],
-          "glass" : false,
-          "image-name" : "path_6.svg",
-          "name" : "path_6"
-        },
-        {
-          "fill-specializations" : [
-            {
-              "value" : {
-                "solid" : "extended-gray:0.25000,1.00000"
-              }
-            },
-            {
-              "appearance" : "dark",
-              "value" : {
-                "solid" : "extended-gray:0.75000,1.00000"
-              }
-            }
-          ],
-          "glass" : false,
-          "image-name" : "path_5.svg",
-          "name" : "path_5"
-        },
-        {
-          "fill-specializations" : [
-            {
-              "value" : {
-                "solid" : "extended-gray:0.25000,1.00000"
-              }
-            },
-            {
-              "appearance" : "dark",
-              "value" : {
-                "solid" : "extended-gray:0.75000,1.00000"
-              }
-            }
-          ],
-          "glass" : false,
-          "image-name" : "path_4.svg",
-          "name" : "path_4"
-        },
-        {
-          "fill-specializations" : [
-            {
-              "value" : {
-                "solid" : "extended-gray:0.25000,1.00000"
-              }
-            },
-            {
-              "appearance" : "dark",
-              "value" : {
-                "solid" : "extended-gray:0.75000,1.00000"
-              }
-            }
-          ],
-          "glass" : false,
-          "image-name" : "path_3.svg",
-          "name" : "path_3"
-        },
-        {
-          "fill-specializations" : [
-            {
-              "value" : {
-                "solid" : "extended-gray:0.25000,1.00000"
-              }
-            },
-            {
-              "appearance" : "dark",
-              "value" : {
-                "solid" : "extended-gray:0.75000,1.00000"
-              }
-            }
-          ],
-          "glass" : false,
-          "image-name" : "path_2.svg",
-          "name" : "path_2"
+          "image-name" : "03-bars.svg",
+          "name" : "03-bars",
+          "position" : {
+            "scale" : 1.3,
+            "translation-in-points" : [
+              0,
+              -2.6000000000000227
+            ]
+          }
         }
       ],
       "shadow" : {
