@@ -1,6 +1,8 @@
 import AlgorithmKit
 import Foundation
+import PersistenceKit
 import SettingsKit
+import SwiftData
 import Testing
 @testable import SortEngineKit
 @testable import SortFeature
@@ -106,6 +108,16 @@ private func makeFastSettings() -> AppSettings {
     let settings = AppSettings(store: store)
     settings.playbackSpeed = 100_000
     return settings
+}
+
+/// Isolated, in-memory, non-CloudKit container per test — mirrors `AnalyticsServiceTests`'
+/// `makeInMemoryService()` (duplicated rather than shared, same "test targets can't import each
+/// other's test code" reason `ManualTickDriver` above is duplicated).
+private func makeInMemoryAnalytics() throws -> AnalyticsService {
+    let schema = Schema([BigORecord.self])
+    let configuration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
+    let container = try ModelContainer(for: schema, configurations: [configuration])
+    return AnalyticsService(modelContainer: container)
 }
 
 @MainActor
@@ -295,6 +307,41 @@ struct SortSessionTests {
             return
         }
         #expect(finished.frame.map(\.value) == Array(1...10))
+    }
+
+    /// End-to-end check of the full pipeline the persisted-timing feature depends on: a genuinely
+    /// completed run's `analytics.record` call must carry a real, positive `playbackDuration`
+    /// (measured off `replay.elapsedPlaybackDuration` at the moment `monitorTask` observes genuine
+    /// completion) and the exact `speed` the session's `AppSettings.playbackSpeed` was configured
+    /// with — not the defaults `record`'s two playback parameters fall back to when omitted.
+    @Test
+    func completingASortRecordsAPositivePlaybackDurationAndTheConfiguredSpeed() async throws {
+        // Deliberately reuses `makeFastSettings()` unmodified (100,000 ops/sec) rather than a
+        // slower speed: this test uses the REAL production `ReplayEngine`/`CADisplayLink` (no
+        // injected `replayEngineFactory`), and a slow speed here would need many real, closely-
+        // spaced display-link ticks to accumulate enough operations — `sortEndToEndProducesCorrectlySortedFrame`
+        // above already proves this exact real-driver setup completes reliably at this speed; a
+        // sluggish speed made this test time out in practice.
+        let settings = makeFastSettings()
+        let analytics = try makeInMemoryAnalytics()
+        let session = SortSession(
+            algorithm: FakeAlgorithm(), shuffle: FakeReverseShuffle(),
+            analytics: analytics, settings: settings
+        )
+
+        await session.start(size: 12)
+        try await waitUntilTerminal(session)
+        guard case .complete = session.phase else {
+            Issue.record("expected .complete, got \(session.phase)")
+            return
+        }
+
+        let rows = try await analytics.fetchSummaries(algorithmID: AlgorithmID(rawValue: "fake"))
+        #expect(rows.count == 1)
+        let playbackDuration = try #require(rows[0].playbackDuration)
+        #expect(playbackDuration > 0)
+        #expect(rows[0].playbackSpeed == settings.playbackSpeed)
+        #expect(rows[0].recordingDuration >= 0)
     }
 
     @Test

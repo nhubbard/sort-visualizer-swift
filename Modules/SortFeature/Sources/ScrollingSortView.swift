@@ -44,11 +44,20 @@ public struct ScrollingSortView: View {
             await session.start(size: arraySize)
         }
         .background {
-            // Zero-size, fully transparent — this button exists only to give ⌘⇧A somewhere to
-            // land, scoped to whichever algorithm screen is currently showing. A global `Commands`
-            // scene would need `FocusedValue` plumbing to reach this specific session instead.
+            // Zero-size, fully transparent — these buttons exist only to give ⌘⇧A/⌘⌥⇧A somewhere
+            // to land, scoped to whichever algorithm screen is currently showing. A global
+            // `Commands` scene would need `FocusedValue` plumbing to reach this specific session
+            // instead.
             Button("") { session.toggleAutomation() }
                 .keyboardShortcut("a", modifiers: [.command, .shift])
+                .opacity(0)
+                .frame(width: 0, height: 0)
+                .accessibilityHidden(true)
+            // Same bulk-data-generation loop, constrained to this algorithm's own maximum size —
+            // for generating fresh recording/playback-duration samples at the size most likely to
+            // show a visualization-time anomaly, without waiting through every smaller size first.
+            Button("") { session.toggleMaxSizeAutomation() }
+                .keyboardShortcut("a", modifiers: [.command, .option, .shift])
                 .opacity(0)
                 .frame(width: 0, height: 0)
                 .accessibilityHidden(true)

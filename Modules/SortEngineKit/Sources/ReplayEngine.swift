@@ -1,6 +1,14 @@
 import Foundation
 import Observation
+import os
 import QuartzCore
+
+/// Labels `play()`'s per-tick batch-apply interval for a manual Instruments capture — the exact
+/// mechanism behind a past perf bug (see `state`'s doc comment) was invisible in a generic Time
+/// Profiler trace until it was traced back to this call by hand; a signpost interval here means a
+/// future trace shows "TickApply" spans directly, with the batch size as its message, instead of
+/// requiring that same manual detective work again.
+private let replaySignposter = OSSignposter(subsystem: "com.nhubbard.Sort2.SortEngineKit", category: "ReplayEngine")
 
 /// Abstracts the redraw clock so `ReplayEngine` doesn't require a live display link to be
 /// testable. `onTick` fires once per frame with the elapsed time since the previous tick (0 for
@@ -150,6 +158,22 @@ public final class ReplayEngine {
     private var activePlaybackDuration: TimeInterval = 0
     private var currentSegmentStart: Date?
 
+    /// Folds the currently-open segment (if any) into `activePlaybackDuration` and clears
+    /// `currentSegmentStart` — shared by `pause()` and `play()`'s own natural-completion path.
+    /// Idempotent: `currentSegmentStart` is `nil` after the first call, so whichever of "the tape
+    /// ran out" or "the user paused" happens first wins outright; the other is a no-op. Without
+    /// this shared close on the natural-completion path too, `elapsedPlaybackDuration`'s getter
+    /// (which adds live `Date()` time for any still-open segment) would keep growing, unbounded,
+    /// on every read after a sort finishes on its own — until the next `pause()`/`seek(to:)`
+    /// happened to close it. `RunControlBar` reads `elapsedPlaybackDuration` on every body
+    /// evaluation, so this was a real, user-visible drift, not just a theoretical one.
+    private func closeActiveSegmentIfNeeded() {
+        if let currentSegmentStart {
+            activePlaybackDuration += Date().timeIntervalSince(currentSegmentStart)
+            self.currentSegmentStart = nil
+        }
+    }
+
     private let tape: Tape
     /// Every ~500 operations, so `seek(to:)` never replays more than ~500 ops from the nearest one.
     private let checkpoints: [PlaybackState]
@@ -293,6 +317,8 @@ public final class ReplayEngine {
 
                 var appliedOperations: [SortOperation] = []
                 appliedOperations.reserveCapacity(opsToApply)
+                let tickInterval = replaySignposter.beginInterval(
+                    "TickApply", id: replaySignposter.makeSignpostID(), "\(opsToApply) ops")
                 self.mutatingState { working in
                     for _ in 0..<opsToApply {
                         guard working.stepIndex < self.tape.operations.count else { break }
@@ -301,6 +327,7 @@ public final class ReplayEngine {
                         appliedOperations.append(operation)
                     }
                 }
+                replaySignposter.endInterval("TickApply", tickInterval)
 
                 for operation in appliedOperations {
                     onStep?(operation)
@@ -311,6 +338,10 @@ public final class ReplayEngine {
             driver.stop()
             self?.activeDriver = nil
             self?.isPlaying = false
+            // Natural completion (the tape ran out, `break` above) never went through `pause()`,
+            // so it needs its own close of the active segment — see `closeActiveSegmentIfNeeded`'s
+            // doc comment for why this can't be skipped.
+            self?.closeActiveSegmentIfNeeded()
         }
         playbackTask = task
         return task
@@ -321,10 +352,7 @@ public final class ReplayEngine {
         activeDriver?.stop()
         activeDriver = nil
         isPlaying = false
-        if let currentSegmentStart {
-            activePlaybackDuration += Date().timeIntervalSince(currentSegmentStart)
-        }
-        currentSegmentStart = nil
+        closeActiveSegmentIfNeeded()
     }
 
     /// Binary search for the latest checkpoint at or before `step` — `checkpoints` is sorted

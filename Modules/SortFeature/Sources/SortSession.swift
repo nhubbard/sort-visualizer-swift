@@ -180,7 +180,14 @@ public final class SortSession {
             await playbackTask.value
             guard let self, let replay, replay.stepIndex >= replay.totalOperationCount else { return }
             self.phase = .complete(replay)
-            try? await self.analytics.record(replay.header, algorithmID: self.algorithm.id)
+            // Read here, at the exact moment genuine completion is observed — not later, and not
+            // cached from an earlier tick — so this reflects the real elapsed wall-clock up to
+            // this instant regardless of anything else that might read `elapsedPlaybackDuration`
+            // afterward (e.g. `RunControlBar`, still displaying `.complete` state).
+            try? await self.analytics.record(
+                replay.header, algorithmID: self.algorithm.id,
+                playbackDuration: replay.elapsedPlaybackDuration, playbackSpeed: replay.speed
+            )
             let continuations = self.completionContinuations
             self.completionContinuations = []
             for continuation in continuations { continuation.resume() }
@@ -204,22 +211,38 @@ public final class SortSession {
         if isAutomating {
             automationTask?.cancel()
         } else {
-            automationTask = Task { await runAutomation() }
+            automationTask = Task { await runAutomation(sizes: algorithm.metadata.sizeRange.steppedValues(
+                by: algorithm.metadata.sizeStep)) }
         }
     }
 
-    private func runAutomation() async {
+    /// Same loop as `toggleAutomation()`, constrained to a single size — the algorithm's own
+    /// `sizeRange.upperBound` — for generating repeatable samples at the size most likely to show
+    /// visualization-time anomalies (large arrays, more ticks, more chances for per-tick/per-op
+    /// overhead to compound) without waiting through every smaller size first. Shares every bit of
+    /// `toggleAutomation()`'s machinery (`isAutomating`, `automationProgress`,
+    /// `completionContinuations` via `waitUntilComplete()`) — `SortView`'s automation banner and
+    /// its "Stop" button work unchanged for this mode too, since neither reads which method
+    /// started the loop.
+    public func toggleMaxSizeAutomation() {
+        if isAutomating {
+            automationTask?.cancel()
+        } else {
+            automationTask = Task { await runAutomation(sizes: [algorithm.metadata.sizeRange.upperBound]) }
+        }
+    }
+
+    private func runAutomation(sizes: [Int], runsPerSize: Int = 3) async {
         isAutomating = true
         defer {
             isAutomating = false
             automationProgress = nil
             automationTask = nil
         }
-        let sizes = algorithm.metadata.sizeRange.steppedValues(by: algorithm.metadata.sizeStep)
         for (sizeIndex, size) in sizes.enumerated() {
-            for runIndex in 0..<3 {
+            for runIndex in 0..<runsPerSize {
                 guard !Task.isCancelled else { return }
-                automationProgress = (sizeIndex, sizes.count, runIndex, 3)
+                automationProgress = (sizeIndex, sizes.count, runIndex, runsPerSize)
                 await start(size: size)
                 await waitUntilComplete()
             }

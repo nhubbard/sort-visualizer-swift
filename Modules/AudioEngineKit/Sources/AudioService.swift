@@ -1,6 +1,14 @@
 import Foundation
+import os
 import SettingsKit
 import ToneKit
+
+/// Labels the two spots that were, historically, the actual bottleneck behind "recording is fast
+/// but playback is slow" symptoms (see `ReplayEngine`'s own signposter doc comment) — a per-note
+/// `play()` call taking longer than expected, or the gate-closer task waking up far more often
+/// than "once per held note" would predict (a regression back toward the fixed per-note `Task`
+/// churn `scheduleGateClose`'s own doc comment describes as already-fixed).
+private let audioSignposter = OSSignposter(subsystem: "com.nhubbard.Sort2.AudioEngineKit", category: "AudioService")
 
 /// `ToneKit`-backed `AudioPlaying`, replacing `Legacy/Shared/Data/Primary/Synthesizer.swift`'s
 /// graph (`Oscillator` → `AmplitudeEnvelope` → `Fader` → `AudioEngine`, originally AudioKit-backed)
@@ -60,6 +68,9 @@ public final class AudioService: AudioPlaying {
     /// algorithm's own timing"). This method returns immediately regardless of hold duration, so
     /// `ReplayEngine`'s playback loop is never slowed down by audio.
     public func play(value: Int, in range: ClosedRange<Int>, holdSeconds: Double) {
+        let interval = audioSignposter.beginInterval("PlayNote", id: audioSignposter.makeSignpostID())
+        defer { audioSignposter.endInterval("PlayNote", interval) }
+
         if !isStarted { try? start() }
         guard isStarted else { return }
 
@@ -88,7 +99,9 @@ public final class AudioService: AudioPlaying {
         gateCloserTask = Task { [weak self] in
             while let self {
                 guard let deadline = self.nextGateCloseDeadline else { break }
+                let wait = audioSignposter.beginInterval("GateCloseWait", id: audioSignposter.makeSignpostID())
                 try? await Task.sleep(until: deadline, clock: .continuous)
+                audioSignposter.endInterval("GateCloseWait", wait)
                 // A newer note pushed the deadline out while we were asleep — sleep again instead
                 // of closing the gate early.
                 if let latest = self.nextGateCloseDeadline, latest > deadline { continue }

@@ -48,6 +48,40 @@ struct AnalyticsServiceTests {
         #expect(row.reversalCount == 1)
         #expect(row.recordedAt == recordedAt)
         #expect(row.uniqueValueCount == nil)
+        // `header.recordingDuration` (0.042, set above) — this specific assertion is what would
+        // have caught `record(_:algorithmID:)` silently dropping it before it was wired through.
+        #expect(row.recordingDuration == 0.042)
+        // Neither supplied to this call — `record`'s two playback params both default to `nil`.
+        #expect(row.playbackDuration == nil)
+        #expect(row.playbackSpeed == nil)
+    }
+
+    /// `SortSession`'s `monitorTask` supplies these from `replay.elapsedPlaybackDuration`/
+    /// `replay.speed` at the exact moment it observes genuine completion — a plain round-trip
+    /// check that `record`/`fetchAllForTesting` carry both through unchanged, mirroring
+    /// `recordCarriesThroughUniqueValueCountWhenPresent` below.
+    @Test
+    func recordCarriesThroughPlaybackDurationAndSpeedWhenPresent() async throws {
+        let service = try makeInMemoryService()
+        let header = TapeHeader(
+            algorithmID: "bitonicsortiterative",
+            initialValues: [1, 2, 3, 4],
+            visualSeed: 0,
+            compareCount: 3,
+            swapCount: 2,
+            recordingDuration: 0.003,
+            recordedAt: Date()
+        )
+
+        try await service.record(
+            header, algorithmID: AlgorithmID(rawValue: "bitonicsortiterative"),
+            playbackDuration: 12.5, playbackSpeed: 30.0
+        )
+
+        let rows = try await service.fetchAllForTesting()
+        #expect(rows.count == 1)
+        #expect(rows[0].playbackDuration == 12.5)
+        #expect(rows[0].playbackSpeed == 30.0)
     }
 
     /// `SortSession.makeTape` measures this from the post-shuffle array before the sort runs — a

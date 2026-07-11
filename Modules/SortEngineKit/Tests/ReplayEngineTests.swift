@@ -352,4 +352,55 @@ struct ReplayEngineTests {
             #expect(secondaryCount <= 1)
         }
     }
+
+    /// Regression test for a real bug found while wiring up persisted playback timing: `play()`'s
+    /// natural-completion path (the tape running out, as opposed to an explicit `pause()`) used to
+    /// skip closing the active timing segment, so `elapsedPlaybackDuration`'s getter — which adds
+    /// live `Date()` time for any still-open segment — kept growing on every subsequent read, with
+    /// no bound, until the next `pause()`/`seek(to:)` happened to close it. Two reads with real
+    /// time elapsing in between, after the tape has genuinely finished, must return the same value.
+    @Test
+    func elapsedPlaybackDurationStopsGrowingAfterNaturalCompletion() async {
+        let operations: [SortOperation] = (0..<3).map { _ in .compare(0, 1) }
+        let tape = makeTape(initialValues: [1, 2], operations: operations)
+        let driver = ManualTickDriver()
+        let engine = ReplayEngine(tape: tape, displayLinkFactory: { driver })
+        engine.speed = 100_000.0 // one tick's worth of elapsed time covers the whole tape
+
+        let task = engine.play()
+        driver.fireTick(elapsed: 0)
+        driver.fireTick(elapsed: 1.0)
+        await task.value
+        #expect(engine.stepIndex == tape.operations.count, "the tape must have genuinely finished")
+
+        let firstRead = engine.elapsedPlaybackDuration
+        try? await Task.sleep(for: .milliseconds(50))
+        let secondRead = engine.elapsedPlaybackDuration
+
+        #expect(firstRead == secondRead)
+    }
+
+    /// Same guarantee, but for the already-working `pause()` path — a regression check that
+    /// extracting `closeActiveSegmentIfNeeded()` out of `pause()` (to share it with the natural-
+    /// completion fix above) didn't change `pause()`'s own existing behavior.
+    @Test
+    func elapsedPlaybackDurationStopsGrowingAfterPause() async {
+        let operations: [SortOperation] = (0..<3).map { _ in .compare(0, 1) }
+        let tape = makeTape(initialValues: [1, 2], operations: operations)
+        let driver = ManualTickDriver()
+        let engine = ReplayEngine(tape: tape, displayLinkFactory: { driver })
+        engine.speed = 10.0
+
+        _ = engine.play()
+        driver.fireTick(elapsed: 0)
+        driver.fireTick(elapsed: 0.1)
+        try? await Task.sleep(for: .milliseconds(20))
+        engine.pause()
+
+        let firstRead = engine.elapsedPlaybackDuration
+        try? await Task.sleep(for: .milliseconds(50))
+        let secondRead = engine.elapsedPlaybackDuration
+
+        #expect(firstRead == secondRead)
+    }
 }

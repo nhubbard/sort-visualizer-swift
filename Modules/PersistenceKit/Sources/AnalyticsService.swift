@@ -20,7 +20,18 @@ public actor AnalyticsService {
         self.modelContext = ModelContext(modelContainer ?? Self.makeDefaultContainer())
     }
 
-    public func record(_ header: TapeHeader, algorithmID: AlgorithmID) async throws {
+    /// `playbackDuration`/`playbackSpeed` aren't on `TapeHeader` itself (unlike `recordingDuration`,
+    /// which is baked in at recording time) — `TapeHeader`/`Tape` are fully immutable (every field
+    /// a `let`), and a playback duration isn't knowable until playback actually finishes, well
+    /// after the header already exists. `SortSession`'s `monitorTask` is the only caller, and it
+    /// already has `replay.elapsedPlaybackDuration`/`replay.speed` in hand at the exact moment it
+    /// observes genuine completion, so those are passed straight through here instead — both
+    /// default to `nil`, so recording without a playback in progress (e.g. a caller that only
+    /// ever runs `RecordingEngine`, never `ReplayEngine`) needs no dummy values.
+    public func record(
+        _ header: TapeHeader, algorithmID: AlgorithmID,
+        playbackDuration: TimeInterval? = nil, playbackSpeed: Double? = nil
+    ) async throws {
         let summary = BigORecord(
             algorithmID: algorithmID.rawValue,
             arraySize: header.initialValues.count,
@@ -30,7 +41,10 @@ public actor AnalyticsService {
             auxWriteCount: header.auxWriteCount,
             reversalCount: header.reversalCount,
             recordedAt: header.recordedAt,
-            uniqueValueCount: header.uniqueValueCount
+            uniqueValueCount: header.uniqueValueCount,
+            recordingDuration: header.recordingDuration,
+            playbackDuration: playbackDuration,
+            playbackSpeed: playbackSpeed
         )
         modelContext.insert(summary)
         try modelContext.save()
@@ -78,6 +92,9 @@ public struct BigORecordSnapshot: Sendable, Equatable, Identifiable {
     public let reversalCount: Int
     public let recordedAt: Date
     public let uniqueValueCount: Int?
+    public let recordingDuration: TimeInterval
+    public let playbackDuration: TimeInterval?
+    public let playbackSpeed: Double?
 
     public var id: String { "\(algorithmID)-\(arraySize)-\(recordedAt.timeIntervalSinceReferenceDate)-\(compareCount)" }
 
@@ -91,5 +108,8 @@ public struct BigORecordSnapshot: Sendable, Equatable, Identifiable {
         reversalCount = summary.reversalCount
         recordedAt = summary.recordedAt
         uniqueValueCount = summary.uniqueValueCount
+        recordingDuration = summary.recordingDuration
+        playbackDuration = summary.playbackDuration
+        playbackSpeed = summary.playbackSpeed
     }
 }

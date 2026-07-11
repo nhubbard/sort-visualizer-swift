@@ -41,6 +41,9 @@ public struct AlgorithmDetailSection: View {
 
                     Text("Big-O Correlation").font(.title2.bold()).padding(.top, 8)
                     BigOCorrelationChart(algorithm: algorithm)
+
+                    Text("Recording vs. Visualization Time").font(.title2.bold()).padding(.top, 8)
+                    PlaybackOverheadChart(algorithm: algorithm)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
