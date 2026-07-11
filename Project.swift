@@ -87,12 +87,21 @@ let app = Target.target(
             // Already referenced directly via `entitlements:`/`CODE_SIGN_ENTITLEMENTS` below — left
             // in this glob too, Tuist warns it's being copied into the product as a plain resource.
             "App/Resources/SortSymphony.entitlements",
+            // Icon Composer's `.icon` bundle isn't a resource type Tuist's generator recognizes
+            // yet (unlike `.imageset`/`.colorset`/`.xcassets` itself) — globbing its individual
+            // files (icon.json, Assets/*.svg), whether loose or nested inside Assets.xcassets,
+            // fails generation ("trying to add a file... to a build phase that hasn't been added
+            // to the project"). Kept as a sibling of Assets.xcassets (not nested inside it) and
+            // referenced as its own `.folderReference` below instead.
+            "App/Resources/AppIcon.icon/**",
         ]),
         // Real folder references, not globs — the script loaders (§2.4/§2A.4) look up
         // `Bundle.main.url(forResource:withExtension: nil)` expecting an actual subdirectory,
-        // which a glob of loose files wouldn't preserve.
+        // which a glob of loose files wouldn't preserve. `AppIcon.icon` joins them for the
+        // unrelated reason explained in the exclusion comment above.
         .folderReference(path: "App/Resources/Algorithms"),
         .folderReference(path: "App/Resources/Shuffles"),
+        .folderReference(path: "App/Resources/AppIcon.icon"),
     ],
     // AlgorithmDetails/ also holds the authoring pipeline (`<id>.bundle/`, highlight.py, test.py,
     // template.bundle/, ...) as siblings of the shipped `<algorithmID>/` output folders — a plain
