@@ -9,20 +9,22 @@ import Testing
 @Suite
 struct NativeAlgorithmCorrectnessTests {
     private static let algorithms: [any SortAlgorithm] = [
-        BinaryDoubleInsertionSort(), BinaryGnomeSort(), BinaryInsertionSort(), BinaryMergeSort(),
-        BingoSort(), BitonicSortIterative(), BitonicSortRecursive(), BogoSort(),
+        BaseNMaxHeapSort(), BinaryDoubleInsertionSort(), BinaryGnomeSort(), BinaryInsertionSort(),
+        BinaryMergeSort(), BingoSort(), BitonicSortIterative(), BitonicSortRecursive(), BogoSort(),
         BoseNelsonSortIterative(), BottomUpMergeSort(), BozoSort(), BubbleSort(), BurntPancakeSort(),
-        CircleSortIterative(), CircleSortRecursive(), CocktailMergeSort(), CocktailShakerSort(),
-        CombSort(), CountingSort(), CycleSort(), DoubleInsertionSort(), DoubleSelectionSort(),
-        DualPivotQuickSort(), FlashSort(), GnomeSort(), GravitySort(), HybridCombSort(),
-        InPlaceMergeSort(), InsertionSort(), IntroSort(), LLQuickSort(), LSDRadixSort(),
+        CircleSortIterative(), CircleSortRecursive(), CocktailBogoSort(), CocktailMergeSort(),
+        CocktailShakerSort(), CombSort(), CountingSort(), CycleSort(), DiamondSortRecursive(),
+        DoubleInsertionSort(), DoubleSelectionSort(), DualPivotQuickSort(), ExchangeBogoSort(),
+        FlashSort(), GnomeSort(), GravitySort(), HybridCombSort(), InPlaceMergeSort(),
+        InsertionSort(), IntroSort(), LessBogoSort(), LLQuickSort(), LSDRadixSort(),
         MaxHeapSort(), MergeExchangeSortIterative(), MergeSort(), MinHeapSort(), MSDRadixSort(),
         OddEvenMergeSortIterative(), OddEvenMergeSortRecursive(), OddEvenSort(),
         OptimizedBubbleSort(), OptimizedCocktailShakerSort(), OptimizedGnomeSort(), PancakeSort(),
         PigeonholeSort(), QuickSort(), RecursiveShellSort(), RotateMergeSort(), SelectionSort(),
-        ShellSort(), SimplifiedLibrarySort(), SlowSort(), StableCycleSort(), StableSelectionSort(),
-        StaticSort(), StoogeSort(), StrandSort(), SwaplessBubbleSort(), TernaryLLQuickSort(),
-        TernaryLRQuickSort(), UnoptimizedBubbleSort(), WeavedMergeSort()
+        ShellSort(), SimplifiedLibrarySort(), SlopeSort(), SlowSort(), SnuffleSort(),
+        StableCycleSort(), StableSelectionSort(), StaticSort(), StoogeSort(), StrandSort(),
+        SwaplessBubbleSort(), TernaryLLQuickSort(), TernaryLRQuickSort(), UnoptimizedBubbleSort(),
+        WeavedMergeSort()
     ]
 
     @Test
