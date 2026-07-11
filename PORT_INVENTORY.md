@@ -85,6 +85,9 @@ cluster together rather than picking its members apart on separate days:
 - [x] CircloidSort
 - [x] UnoptimizedCocktailShakerSort
 - [x] LRQuickSort
+- [x] ClassicThreeSmoothCombSort
+- [x] ThreeSmoothCombSortIterative
+- [x] ThreeSmoothCombSortRecursive
 
 #### Not Started
 
@@ -93,13 +96,10 @@ cluster together rather than picking its members apart on separate days:
 - [ ] ShoveSort — 52 lines
 - [ ] SillySort — 57 lines
 - [ ] BubbleBogoSort — 59 lines (Bogo family — see cluster note above)
-- [ ] ClassicThreeSmoothCombSort — 60 lines
 - [ ] QuadStoogeSort — 61 lines (ArrayV's own `setCategory` call for this one is actually
       `"Impractical Sorts"`, not `"Exchange Sorts"`, despite living in `sorts/exchange/` — port as
       `.impractical`, not `.exchange`, per `AlgorithmCategory`'s "match ArrayV's `setCategory` call,
       not its package directory" rule. Also `setUnreasonablySlow(true)`/limit 2048.)
-- [ ] ThreeSmoothCombSortIterative — 66 lines
-- [ ] ThreeSmoothCombSortRecursive — 69 lines
 - [ ] OptimizedStoogeSortStudio — 75 lines
 - [ ] StablePermutationSort — 86 lines (Bogo family — see cluster note above)
 - [ ] OptimizedStoogeSort — 91 lines

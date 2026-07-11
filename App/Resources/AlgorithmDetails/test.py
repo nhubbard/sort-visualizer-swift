@@ -72,6 +72,9 @@ algorithms = sorted(
         "circloidsort",
         "unoptimizedcocktailshakersort",
         "lrquicksort",
+        "classicthreesmoothcombsort",
+        "threesmoothcombsortiterative",
+        "threesmoothcombsortrecursive",
     ]
 )
 extensions = ["c", "cpp", "cs", "go", "java", "js", "kt", "py", "rb", "swift"]
