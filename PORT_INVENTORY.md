@@ -297,15 +297,13 @@ Move algorithms here when you finish them.
 
 #### Completed
 
-Move algorithms here when you finish them.
+- [x] IntroCircleSortIterative
 
 #### Not Started
 
 ##### Easy
 
 - [ ] WeaveMergeSort — 97 lines
-- [ ] IntroCircleSortIterative — 53 own + 44 `IterativeCircleSorting` template = 97 lines (trivial
-      once `CircleSort*`, already shipped, established the pattern)
 
 ##### Medium
 

@@ -76,6 +76,7 @@ algorithms = sorted(
         "snufflesort",
         "basenmaxheapsort",
         "diamondsortrecursive",
+        "introcirclesortiterative",
     ]
 )
 extensions = ["c", "cpp", "cs", "go", "java", "js", "kt", "py", "rb", "swift"]

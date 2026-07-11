@@ -16,9 +16,9 @@ struct NativeAlgorithmCorrectnessTests {
         CocktailShakerSort(), CombSort(), CountingSort(), CycleSort(), DiamondSortRecursive(),
         DoubleInsertionSort(), DoubleSelectionSort(), DualPivotQuickSort(), ExchangeBogoSort(),
         FlashSort(), GnomeSort(), GravitySort(), HybridCombSort(), InPlaceMergeSort(),
-        InsertionSort(), IntroSort(), LessBogoSort(), LLQuickSort(), LSDRadixSort(),
-        MaxHeapSort(), MergeExchangeSortIterative(), MergeSort(), MinHeapSort(), MSDRadixSort(),
-        OddEvenMergeSortIterative(), OddEvenMergeSortRecursive(), OddEvenSort(),
+        InsertionSort(), IntroCircleSortIterative(), IntroSort(), LessBogoSort(), LLQuickSort(),
+        LSDRadixSort(), MaxHeapSort(), MergeExchangeSortIterative(), MergeSort(), MinHeapSort(),
+        MSDRadixSort(), OddEvenMergeSortIterative(), OddEvenMergeSortRecursive(), OddEvenSort(),
         OptimizedBubbleSort(), OptimizedCocktailShakerSort(), OptimizedGnomeSort(), PancakeSort(),
         PigeonholeSort(), QuickSort(), RecursiveShellSort(), RotateMergeSort(), SelectionSort(),
         ShellSort(), SimplifiedLibrarySort(), SlopeSort(), SlowSort(), SnuffleSort(),
@@ -102,5 +102,54 @@ struct NativeAlgorithmCorrectnessTests {
                 """
             )
         }
+    }
+
+    /// No existing test in this suite exercises stability, so this one verifies
+    /// `IntroCircleSortIterative`'s `stable: false` conclusion (see its doc comment) empirically,
+    /// with tagged-duplicate input: each element's *original* index is tracked independently of
+    /// its (heavily duplicated) compared value by replaying the recorded tape's `.swap` operations
+    /// onto a parallel identity array — `originalIndex[k]` ends up holding whichever starting index
+    /// the element now sitting at final position `k` came from. A stable sort would leave every
+    /// group of equal final values with strictly increasing original indices (since equal values
+    /// are scanned left-to-right into the input in increasing-index order); finding any group where
+    /// a later position's original index is smaller than an earlier one directly witnesses two
+    /// equal elements crossing each other's original relative order.
+    @Test
+    func introCircleSortIterativeIsNotStable() {
+        let algorithm = IntroCircleSortIterative()
+        let size = algorithm.metadata.sizeRange.lowerBound
+
+        var foundReordering = false
+        for _ in 0..<25 {
+            let input = (0..<size).map { _ in Int.random(in: 0...3) }
+            var engine = RecordingEngine(values: input)
+            algorithm.record(into: &engine)
+            let summary = engine.finish()
+
+            var originalIndex = Array(0..<size)
+            for operation in summary.tape {
+                if case let .swap(i, j) = operation {
+                    originalIndex.swapAt(i, j)
+                }
+            }
+
+            var lastOriginalIndexForValue: [Int: Int] = [:]
+            for position in 0..<size {
+                let value = engine.values[position]
+                let tag = originalIndex[position]
+                if let previousTag = lastOriginalIndexForValue[value], previousTag > tag {
+                    foundReordering = true
+                    break
+                }
+                lastOriginalIndexForValue[value] = tag
+            }
+
+            if foundReordering { break }
+        }
+
+        #expect(
+            foundReordering,
+            "expected at least one tagged-duplicate trial to reorder equal elements, confirming introcirclesortiterative is not stable"
+        )
     }
 }
