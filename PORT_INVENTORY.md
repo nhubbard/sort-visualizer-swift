@@ -114,13 +114,9 @@ Move algorithms here when you finish them.
 
 #### Completed
 
-Move algorithms here when you finish them.
+- [x] ClassicTreeSort
 
 #### Not Started
-
-##### Easy
-
-- [ ] ClassicTreeSort — 96 lines
 
 ##### Medium
 
@@ -145,24 +141,25 @@ Move algorithms here when you finish them.
 
 #### Completed
 
-Move algorithms here when you finish them.
+- [x] BadSort
+- [x] TriangularHeapSort — also unblocks the `TRI_HEAP` shuffle (§2) now that its own
+      `triangularHeapify` step exists natively
 
 #### Not Started
 
-`SmoothSort`/`PoplarHeapSort`/`TriangularHeapSort` below are also each a hard prerequisite for a
-shuffle (§2's `SMOOTH`/`POPLAR`/`TRI_HEAP`, which literally call these sorts' own heapify step) —
-not just their own tier, they unblock a shuffle too.
+`SmoothSort`/`PoplarHeapSort` below are also each a hard prerequisite for a shuffle (§2's
+`SMOOTH`/`POPLAR`, which literally call these sorts' own heapify step) — not just their own tier,
+they unblock a shuffle too. (`TriangularHeapSort`, the third sort in this cluster, is now shipped —
+see Completed above.)
 
 ##### Easy
 
-- [ ] BadSort — 54 lines
 - [ ] BinomialSmoothSort — 54 lines
 - [ ] BinomialHeapSort — 60 lines
 - [ ] FlippedMinHeapSort — 64 lines
 - [ ] BottomUpHeapSort — 66 lines
 - [ ] LazyHeapSort — 75 lines
 - [ ] TernaryHeapSort — 79 lines
-- [ ] TriangularHeapSort — 80 lines (also a shuffle prerequisite — see note above)
 - [ ] WeakHeapSort — 84 lines
 - [ ] AsynchronousSort — 85 lines
 
@@ -221,7 +218,7 @@ Move algorithms here when you finish them.
 
 #### Completed
 
-Move algorithms here when you finish them.
+- [x] BlockSwapMergeSort
 
 #### Not Started
 
@@ -229,7 +226,6 @@ Move algorithms here when you finish them.
 
 - [ ] ImprovedInPlaceMergeSort — 92 lines (**not** ported — distinct from plain `InPlaceMergeSort` above)
 - [ ] BufferedStoogeSort — 96 lines
-- [ ] BlockSwapMergeSort — 98 lines
 
 ##### Medium
 
@@ -272,7 +268,7 @@ Move algorithms here when you finish them.
 
 #### Completed
 
-Move algorithms here when you finish them.
+- [x] PairwiseSortIterative
 
 #### Not Started
 
@@ -287,7 +283,6 @@ Move algorithms here when you finish them.
 - [ ] WeaveSortRecursive — 77 lines
 - [ ] PairwiseMergeSortRecursive — 80 lines
 - [ ] PairwiseSortRecursive — 81 lines
-- [ ] PairwiseSortIterative — 88 lines
 
 ##### Medium
 
@@ -383,8 +378,11 @@ than subdivided further.
 `HEAPIFIED`/`SMOOTH`/`POPLAR`/`TRI_HEAP` each call directly into a sort's own heapify step
 (`MaxHeapSort.makeHeap`/`SmoothSort.smoothHeapify`/`PoplarHeapSort.poplarHeapify`/
 `TriangularHeapSort.triangularHeapify`) rather than reimplementing it — `HEAPIFIED` shipped by reusing
-`MaxHeapSort`'s own heapify step directly; `SMOOTH`/`POPLAR`/`TRI_HEAP` remain blocked on their
-same-named sort being ported first (see §1c), regardless of how trivial their own body looks.
+`MaxHeapSort`'s own heapify step directly; `SMOOTH`/`POPLAR` remain blocked on their same-named sort
+being ported first (see §1c), regardless of how trivial their own body looks. `TRI_HEAP` is now
+unblocked — `TriangularHeapSort` shipped this batch — but still needs its own port, duplicating
+`TriangularHeapSort.swift`'s `triangularRoot`/`siftDown`/heapify logic inline the way
+`HeapifiedShuffle.swift` duplicates `MaxHeapSort`'s (see that sort's own doc comment).
 
 `QSORT_BAD`/`PDQ_BAD`/`GRAIL_BAD`/`SHUF_MERGE_BAD` sound like they'd need their namesake sort
 already ported (to reverse-engineer its worst case), but don't — each embeds its own self-contained
@@ -396,8 +394,8 @@ adversarial-input construction, independent of whether `LLQuickSort`(shipped)/`P
 
 - [ ] SMOOTH ("Smoothified") — 12 lines, but blocked on `SmoothSort` (§1c) — see note above
 - [ ] POPLAR ("Poplarified") — 12 lines, but blocked on `PoplarHeapSort` (§1c) — see note above
-- [ ] TRI_HEAP ("Triangular Heapified") — 19 lines, but blocked on `TriangularHeapSort` (§1c) — see
-      note above
+- [ ] TRI_HEAP ("Triangular Heapified") — 19 lines, no longer blocked — `TriangularHeapSort` (§1c)
+      shipped this batch — see note above
 
 #### Easy
 
