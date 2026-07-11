@@ -46,7 +46,7 @@ struct Sort2App: App {
             ShellSort(), SimplifiedLibrarySort(), SlopeSort(), SlowSort(), SnuffleSort(),
             StableCycleSort(), StableSelectionSort(), StaticSort(), StoogeSort(), StrandSort(),
             SwaplessBubbleSort(), TernaryLLQuickSort(), TernaryLRQuickSort(), UnoptimizedBubbleSort(),
-            WeavedMergeSort()
+            WeavedMergeSort(), WeaveMergeSort()
         ]
         AlgorithmRegistry.shared.scriptLoader = {
             ScriptAlgorithmLoader.loadScripts(from: Bundle.main.url(forResource: "Algorithms", withExtension: nil)!)

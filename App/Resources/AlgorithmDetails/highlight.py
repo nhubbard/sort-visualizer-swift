@@ -69,6 +69,7 @@ algorithms = sorted(
         "stablecyclesort",
         "staticsort",
         "weavedmergesort",
+        "weavemergesort",
         "exchangebogosort",
         "lessbogosort",
         "cocktailbogosort",

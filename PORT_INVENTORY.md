@@ -298,12 +298,9 @@ Move algorithms here when you finish them.
 #### Completed
 
 - [x] IntroCircleSortIterative
+- [x] WeaveMergeSort
 
 #### Not Started
-
-##### Easy
-
-- [ ] WeaveMergeSort — 97 lines
 
 ##### Medium
 

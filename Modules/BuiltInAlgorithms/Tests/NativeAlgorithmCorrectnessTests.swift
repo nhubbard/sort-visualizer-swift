@@ -24,7 +24,7 @@ struct NativeAlgorithmCorrectnessTests {
         ShellSort(), SimplifiedLibrarySort(), SlopeSort(), SlowSort(), SnuffleSort(),
         StableCycleSort(), StableSelectionSort(), StaticSort(), StoogeSort(), StrandSort(),
         SwaplessBubbleSort(), TernaryLLQuickSort(), TernaryLRQuickSort(), UnoptimizedBubbleSort(),
-        WeavedMergeSort()
+        WeavedMergeSort(), WeaveMergeSort()
     ]
 
     @Test
@@ -150,6 +150,63 @@ struct NativeAlgorithmCorrectnessTests {
         #expect(
             foundReordering,
             "expected at least one tagged-duplicate trial to reorder equal elements, confirming introcirclesortiterative is not stable"
+        )
+    }
+
+    /// `WeaveMergeSort`'s own doc comment reasons that `weaveInsert`'s non-strict (`<=`)
+    /// tie-swapping shift condition should reorder equal elements, but calls that conclusion
+    /// untractable to hand-prove given how it interacts with the position-blind weave step and the
+    /// recursive calls beneath it — so, mirroring how `WeavedMergeSort`/`StaticSort`/`FlashSort`
+    /// were each verified, this replays the recorded tape's `.swap` operations against a shadow
+    /// array of original indices (rather than encoding tags into the values themselves, which
+    /// would eliminate the very ties being tested) to see where every element with a given input
+    /// value actually ends up, independent of what value it carries.
+    @Test
+    func weaveMergeSortTiedElementsCanLoseTheirOriginalRelativeOrder() {
+        let algorithm = WeaveMergeSort()
+        let size = 64
+        var sawReordering = false
+
+        for _ in 0..<50 {
+            let input = (0..<size).map { _ in Int.random(in: 0...3) }
+            var engine = RecordingEngine(values: input)
+            algorithm.record(into: &engine)
+
+            // `shadow[finalPosition]` is the ORIGINAL index of whichever element now sits at
+            // `finalPosition` — start as the identity permutation and replay every recorded swap
+            // onto it in lockstep with the engine's own `values` swaps (this algorithm never calls
+            // `setValue`/aux writes, only `swap`, so replaying `.swap` alone fully reconstructs the
+            // final permutation).
+            var shadow = Array(0..<size)
+            for operation in engine.finish().tape {
+                if case let .swap(i, j) = operation {
+                    shadow.swapAt(i, j)
+                }
+            }
+
+            // For each distinct input value, the original indices of every element sharing that
+            // value, read off in FINAL array order. A stable sort would leave each such list
+            // already ascending (original order preserved); this checks whether any is not.
+            var originalIndicesByValueInFinalOrder: [Int: [Int]] = [:]
+            for finalPosition in 0..<size {
+                let originalIndex = shadow[finalPosition]
+                let value = input[originalIndex]
+                originalIndicesByValueInFinalOrder[value, default: []].append(originalIndex)
+            }
+
+            if originalIndicesByValueInFinalOrder.values.contains(where: { $0 != $0.sorted() }) {
+                sawReordering = true
+                break
+            }
+        }
+
+        #expect(
+            sawReordering,
+            """
+            expected WeaveMergeSort's tie-swapping weaveInsert shift to reorder at least one run \
+            of equal-valued elements relative to their original input order across randomized \
+            duplicate-heavy trials, confirming it is not a stable sort
+            """
         )
     }
 }
