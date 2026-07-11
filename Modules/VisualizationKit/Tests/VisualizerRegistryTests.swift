@@ -14,7 +14,9 @@ struct VisualizerRegistryTests {
     @Test
     func discoverPopulatesFromBuiltIns() {
         let registry = VisualizerRegistry()
-        registry.builtIns = [FakeVisualizer(id: VisualizerID(rawValue: "a")), FakeVisualizer(id: VisualizerID(rawValue: "b"))]
+        registry.builtIns = [
+            FakeVisualizer(id: VisualizerID(rawValue: "a")), FakeVisualizer(id: VisualizerID(rawValue: "b"))
+        ]
 
         #expect(registry.visualizers.isEmpty)
         registry.discover()

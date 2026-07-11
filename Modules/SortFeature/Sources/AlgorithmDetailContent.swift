@@ -20,7 +20,8 @@ struct AlgorithmDetailContent {
         guard let baseURL = Bundle.main.url(forResource: "AlgorithmDetails", withExtension: nil) else { return nil }
         let algorithmURL = baseURL.appendingPathComponent(algorithmID, isDirectory: true)
         var isDirectory: ObjCBool = false
-        guard FileManager.default.fileExists(atPath: algorithmURL.path, isDirectory: &isDirectory), isDirectory.boolValue else {
+        guard FileManager.default.fileExists(atPath: algorithmURL.path, isDirectory: &isDirectory),
+            isDirectory.boolValue else {
             return nil
         }
 

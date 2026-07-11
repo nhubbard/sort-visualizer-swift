@@ -17,10 +17,8 @@ public struct BubbleSort: SortAlgorithm {
         let n = engine.count
         guard n > 1 else { return }
         for i in 1..<n {
-            for j in 0..<(n - i) {
-                if engine.compare(j, j + 1) {
-                    engine.swap(j, j + 1)
-                }
+            for j in 0..<(n - i) where engine.compare(j, j + 1) {
+                engine.swap(j, j + 1)
             }
         }
     }

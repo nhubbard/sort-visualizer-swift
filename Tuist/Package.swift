@@ -12,7 +12,7 @@ let packageSettings = PackageSettings(
         // effects" for each. Forcing them dynamic gives every target a single shared copy instead
         // of independently-duplicated static linkage. Both are pure-Swift targets, so this is safe.
         "MarkdownUI": .framework,
-        "NetworkImage": .framework,
+        "NetworkImage": .framework
         //
         // cmark-gfm/cmark-gfm-extensions are deliberately NOT overridden here despite triggering
         // the same warning — they're C targets with a module map, and Tuist synthesizes a "Copy
@@ -32,7 +32,7 @@ let package = Package(
         .package(url: "https://github.com/nhubbard/CollectionConcurrencyKit", from: "2.1.0"),
         .package(url: "https://github.com/apple/swift-algorithms.git", from: "1.2.1"),
         .package(url: "https://github.com/mgriebling/SwiftMath.git", from: "1.7.1"),
-        .package(url: "https://github.com/gonzalezreal/MarkdownUI", from: "2.4.1"),
+        .package(url: "https://github.com/gonzalezreal/MarkdownUI", from: "2.4.1")
         // swift-atomics intentionally omitted — §5.3: operation counting in RecordingEngine is a
         // plain Int now that there's no concurrent writer to protect against. Re-add only if a
         // real need for ManagedAtomic shows up later.

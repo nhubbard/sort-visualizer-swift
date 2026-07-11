@@ -39,13 +39,14 @@ public struct MonokaiTheme: CodeTheme {
                 it.fg(text).italic()
             case .genericStrong:
                 it.fg(text).bold()
-            case .genericInserted, .nameAttribute, .nameClass, .nameDecorator, .nameException, .nameFunction, .nameOther,
-                 .nameFunctionMagic:
+            case .genericInserted, .nameAttribute, .nameClass, .nameDecorator, .nameException, .nameFunction,
+                 .nameOther, .nameFunctionMagic:
                 it.fg(name)
             case .genericPrompt:
                 it.fg(operatorColor).bold()
             case .literalDate, .string, .stringAffix, .stringBacktick, .stringChar, .stringDelimiter, .stringDoc,
-                 .stringDouble, .stringHeredoc, .stringInterpol, .stringOther, .stringRegex, .stringSingle, .stringSymbol:
+                 .stringDouble, .stringHeredoc, .stringInterpol, .stringOther, .stringRegex, .stringSingle,
+                 .stringSymbol:
                 it.fg(string)
             default:
                 it.fg(text)

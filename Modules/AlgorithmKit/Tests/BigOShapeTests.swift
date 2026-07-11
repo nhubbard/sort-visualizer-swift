@@ -19,7 +19,7 @@ struct BigOShapeTests {
         ("O(n^(log n))", .superLinearithmic),
         ("O(n^{log n})", .superLinearithmic),
         ("O(2^n)", .exponential),
-        ("O(n \\times n!)", .factorial),
+        ("O(n \\times n!)", .factorial)
     ])
     func parsesPureNShapes(complexity: String, expected: BigOShape) {
         #expect(BigOShape.parse(complexity) == expected)
@@ -27,7 +27,7 @@ struct BigOShapeTests {
 
     @Test(arguments: [
         "O(n*k)", "O(n+k)", "O(d*n)", "O(d*(n+b))", "O(d \\times n)", "O(d \\times (n+b))",
-        "O(n \\times m)", "O(n+m^2)", "O(n \\times k)",
+        "O(n \\times m)", "O(n+m^2)", "O(n \\times k)"
     ])
     func returnsNilForShapesWithAnotherFreeVariable(complexity: String) {
         #expect(BigOShape.parse(complexity) == nil)
@@ -38,7 +38,7 @@ struct BigOShapeTests {
         let shapes: [BigOShape] = [
             .constant, .logarithmic, .logarithmicSquared, .linear, .linearithmic,
             .linearithmicSquared, .polynomial(2), .polynomial(3), .superLinearithmic,
-            .exponential, .factorial,
+            .exponential, .factorial
         ]
         for shape in shapes {
             #expect(shape.value(n: 100) >= shape.value(n: 10))

@@ -79,7 +79,9 @@ struct PixelMeshVisualizerTests {
 
     @Test
     func colorsReflectMarkerState() {
-        let context = makeContext(values: Array(0..<9), valueRange: 0...8, markers: [0: [Marker.primary], 1: [Marker.secondary]])
+        let context = makeContext(
+            values: Array(0..<9), valueRange: 0...8, markers: [0: [Marker.primary], 1: [Marker.secondary]]
+        )
         let commands = PixelMeshVisualizer().draw(context)
 
         guard case let .rect(_, _, _, _, color0) = commands[0],

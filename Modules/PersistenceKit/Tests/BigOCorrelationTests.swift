@@ -22,7 +22,8 @@ struct BigOCorrelationTests {
     }
 
     private func record(
-        _ service: AnalyticsService, size: Int, total: Int, algorithmID: String = "quicksort", uniqueValueCount: Int? = nil
+        _ service: AnalyticsService, size: Int, total: Int,
+        algorithmID: String = "quicksort", uniqueValueCount: Int? = nil
     ) async throws {
         let header = TapeHeader(
             algorithmID: algorithmID,

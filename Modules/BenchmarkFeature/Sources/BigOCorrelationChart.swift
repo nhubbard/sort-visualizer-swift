@@ -27,7 +27,8 @@ struct BigOCorrelationChart: View {
                     "Not Enough Recorded Runs Yet",
                     systemImage: "chart.xyaxis.line",
                     description: Text(
-                        "Complete a \(algorithm.metadata.displayName) sort at a couple of different array sizes to chart it here."
+                        "Complete a \(algorithm.metadata.displayName) sort at a couple of different array sizes "
+                            + "to chart it here."
                     )
                 )
                 .frame(maxWidth: .infinity, minHeight: 120)

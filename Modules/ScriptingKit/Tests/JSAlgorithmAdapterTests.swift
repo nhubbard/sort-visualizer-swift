@@ -112,7 +112,7 @@ struct JSAlgorithmAdapterTests {
             .auxWrite(handle: 0, index: 1, value: 42),
             .auxDelete(handle: 0),
             .unmark(marker: 7),
-            .unmarkAll,
+            .unmarkAll
         ])
         #expect(summary.auxWriteCount == 2)
     }

@@ -19,11 +19,9 @@ public struct UnoptimizedBubbleSort: SortAlgorithm {
         var sorted = false
         while !sorted {
             sorted = true
-            for i in 0..<(n - 1) {
-                if engine.compare(i, i + 1, by: (>)) {
-                    engine.swap(i, i + 1)
-                    sorted = false
-                }
+            for i in 0..<(n - 1) where engine.compare(i, i + 1, by: (>)) {
+                engine.swap(i, i + 1)
+                sorted = false
             }
         }
     }

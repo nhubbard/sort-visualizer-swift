@@ -47,7 +47,7 @@ struct ReplayEngineTests {
             .mark(marker: Marker.secondary, index: 1),
             .compare(0, 1),
             .swap(0, 1),
-            .markSorted(0),
+            .markSorted(0)
         ])
         let engine = ReplayEngine(tape: tape)
         for _ in 0..<tape.operations.count { engine.stepForward() }
@@ -219,7 +219,7 @@ struct ReplayEngineTests {
         let tape = makeTape(initialValues: [1, 2], operations: [
             .auxCreate(handle: 0, length: 2),
             .auxWrite(handle: 0, index: 0, value: 9),
-            .auxWrite(handle: 0, index: 1, value: 4),
+            .auxWrite(handle: 0, index: 1, value: 4)
         ])
         let engine = ReplayEngine(tape: tape)
         for _ in 0..<tape.operations.count { engine.stepForward() }
@@ -283,7 +283,7 @@ struct ReplayEngineTests {
         let operations: [SortOperation] = [
             .compare(0, 1), .swap(0, 1),
             .compare(1, 2), .swap(1, 2),
-            .markSorted(2),
+            .markSorted(2)
         ]
         let tape = makeTape(initialValues: [3, 1, 2], operations: operations)
 
@@ -304,7 +304,7 @@ struct ReplayEngineTests {
         let tape = makeTape(initialValues: [1, 2, 3], operations: [
             .mark(marker: Marker.pivot, index: 0),
             .mark(marker: Marker.pivot, index: 2),
-            .unmark(marker: Marker.pivot),
+            .unmark(marker: Marker.pivot)
         ])
         let engine = ReplayEngine(tape: tape)
         for _ in 0..<tape.operations.count { engine.stepForward() }
@@ -317,7 +317,7 @@ struct ReplayEngineTests {
         let tape = makeTape(initialValues: [1, 2, 3], operations: [
             .mark(marker: Marker.primary, index: 0),
             .mark(marker: Marker.primary, index: 2),
-            .unmarkIndex(marker: Marker.primary, index: 0),
+            .unmarkIndex(marker: Marker.primary, index: 0)
         ])
         let engine = ReplayEngine(tape: tape)
         for _ in 0..<tape.operations.count { engine.stepForward() }

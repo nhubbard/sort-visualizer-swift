@@ -24,7 +24,8 @@ final class QuickSortUITests: XCTestCase {
         sidebarLink.tap()
 
         let canvas = app.descendants(matching: .any).matching(identifier: "sortVisualizationCanvas").firstMatch
-        XCTAssertTrue(canvas.waitForExistence(timeout: 5), "visualization canvas never appeared — recording/replay wiring is broken")
+        XCTAssertTrue(canvas.waitForExistence(timeout: 5),
+            "visualization canvas never appeared — recording/replay wiring is broken")
 
         let statusLabel = app.staticTexts["sortStatusLabel"]
         XCTAssertTrue(statusLabel.waitForExistence(timeout: 5), "status label never appeared")

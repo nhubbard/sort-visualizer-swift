@@ -286,7 +286,9 @@ public final class ReplayEngine {
                 let remaining = self.tape.operations.count - self.state.stepIndex
                 guard remaining > 0 else { break }
 
-                let opsToApply = Self.opsToApply(elapsed: elapsed, speed: self.speed, accumulator: &accumulator, remaining: remaining)
+                let opsToApply = Self.opsToApply(
+                    elapsed: elapsed, speed: self.speed, accumulator: &accumulator, remaining: remaining
+                )
                 guard opsToApply > 0 else { continue }
 
                 var appliedOperations: [SortOperation] = []

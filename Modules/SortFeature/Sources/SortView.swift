@@ -50,6 +50,7 @@ public struct SortView: View {
 
     private var automationProgressText: String {
         guard let progress = session.automationProgress else { return "Automating…" }
+        // swiftlint:disable:next line_length
         return "Automating: size \(session.arraySize) (\(progress.sizeIndex + 1)/\(progress.sizeCount)) · run \(progress.runIndex + 1)/\(progress.runCount)"
     }
 

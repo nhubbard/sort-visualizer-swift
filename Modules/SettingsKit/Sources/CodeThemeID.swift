@@ -18,7 +18,7 @@ extension CodeThemeID {
         CodeThemeID(rawValue: "arduino"),
         CodeThemeID(rawValue: "colorful"),
         CodeThemeID(rawValue: "dracula"),
-        CodeThemeID(rawValue: "emacs"),
+        CodeThemeID(rawValue: "emacs")
     ]
 
     public var displayName: String {

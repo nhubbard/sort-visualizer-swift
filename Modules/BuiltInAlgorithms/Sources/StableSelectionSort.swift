@@ -18,10 +18,8 @@ public struct StableSelectionSort: SortAlgorithm {
         guard n > 1 else { return }
         for i in 0..<(n - 1) {
             var min = i
-            for j in (i + 1)..<n {
-                if engine.compare(j, min, by: (<)) {
-                    min = j
-                }
+            for j in (i + 1)..<n where engine.compare(j, min, by: (<)) {
+                min = j
             }
             let tmp = engine.values[min]
             var pos = min

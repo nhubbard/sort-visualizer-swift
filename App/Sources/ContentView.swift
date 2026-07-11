@@ -25,7 +25,9 @@ struct ContentView: View {
                         Section(category.displayName) {
                             ForEach(algorithms, id: \.id) { algorithm in
                                 NavigationLink(value: algorithm.id) {
-                                    CustomIconLabel(text: algorithm.metadata.displayName, iconName: algorithm.metadata.iconName)
+                                    CustomIconLabel(
+                                        text: algorithm.metadata.displayName,
+                                        iconName: algorithm.metadata.iconName)
                                 }
                                 .accessibilityIdentifier("algorithmLink.\(algorithm.id.rawValue)")
                             }
@@ -84,7 +86,11 @@ struct ContentView: View {
                 BenchmarkView()
                     .toolbar {
                         ToolbarItem(placement: .cancellationAction) {
-                          Button { isShowingBenchmark = false } label: { Text("Done").fixedSize(horizontal: true, vertical: false) }
+                            Button {
+                                isShowingBenchmark = false
+                            } label: {
+                                Text("Done").fixedSize(horizontal: true, vertical: false)
+                            }
                             .frame(width: 48)
                             .buttonSizing(.flexible)
                         }
@@ -108,7 +114,9 @@ struct ContentView: View {
     /// broken, which should fail loudly in development rather than silently falling back.
     private var defaultShuffle: any ShuffleAlgorithm {
         guard let shuffle = ShuffleRegistry.shared.shuffle(id: AppSettings.shared.defaultShuffleID) else {
-            fatalError("Shuffles/\(AppSettings.shared.defaultShuffleID.rawValue).js failed to load — check App/Resources/Shuffles bundling")
+            fatalError(
+                "Shuffles/\(AppSettings.shared.defaultShuffleID.rawValue).js failed to load"
+            )
         }
         return shuffle
     }

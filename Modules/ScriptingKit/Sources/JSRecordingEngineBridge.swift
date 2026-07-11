@@ -37,6 +37,8 @@ import SortEngineKit
     func unmark(_ marker: Int) { engine.unmark(marker) }
     func unmarkAll() { engine.unmarkAll() }
     func createAuxArray(_ length: Int) -> Int { engine.createAuxArray(length: length).rawValue }
-    func writeAux(_ handle: Int, _ index: Int, _ value: Int) { engine.writeAux(AuxHandle(rawValue: handle), at: index, value: value) }
+    func writeAux(_ handle: Int, _ index: Int, _ value: Int) {
+        engine.writeAux(AuxHandle(rawValue: handle), at: index, value: value)
+    }
     func deleteAuxArray(_ handle: Int) { engine.deleteAuxArray(AuxHandle(rawValue: handle)) }
 }

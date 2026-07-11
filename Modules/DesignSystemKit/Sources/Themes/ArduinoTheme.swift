@@ -23,16 +23,17 @@ public struct ArduinoTheme: CodeTheme {
             case .keyword, .operator, .commentPreproc, .keywordDeclaration, .keywordNamespace, .nameBuiltin, .nameOther,
                  .operatorWord, .nameBuiltinPseudo:
                 it.fg(keyword)
-            case .name, .nameAttribute, .nameClass, .nameConstant, .nameDecorator, .nameEntity, .nameException, .nameLabel,
-                 .nameNamespace, .nameProperty, .nameTag, .nameVariable, .nameVariableClass, .nameVariableGlobal,
-                 .nameVariableInstance, .nameVariableMagic:
+            case .name, .nameAttribute, .nameClass, .nameConstant, .nameDecorator, .nameEntity, .nameException,
+                 .nameLabel, .nameNamespace, .nameProperty, .nameTag, .nameVariable, .nameVariableClass,
+                 .nameVariableGlobal, .nameVariableInstance, .nameVariableMagic:
                 it.fg(name)
             case .keywordConstant, .keywordPseudo, .keywordReserved, .keywordType:
                 it.fg(otherKeyword)
             case .number, .numberBin, .numberFloat, .numberHex, .numberInteger, .numberOct, .numberIntegerLong:
                 it.fg(number)
             case .string, .stringAffix, .stringBacktick, .stringChar, .stringDelimiter, .stringDoc, .stringDouble,
-                 .stringEscape, .stringHeredoc, .stringInterpol, .stringOther, .stringRegex, .stringSingle, .stringSymbol:
+                 .stringEscape, .stringHeredoc, .stringInterpol, .stringOther, .stringRegex, .stringSingle,
+                 .stringSymbol:
                 it.fg(string)
             case .nameFunction, .nameFunctionMagic:
                 it.fg(functionName)

@@ -12,7 +12,9 @@ private final class BundleAnchor {}
 
 private struct MissingBundledResource: Error, CustomStringConvertible {
     let name: String
-    var description: String { "\(name) folder reference missing from ScriptingKitTests bundle — check Project.swift's testResources" }
+    var description: String {
+        "\(name) folder reference missing from ScriptingKitTests bundle — check Project.swift's testResources"
+    }
 }
 
 private func bundledDirectory(named name: String) throws -> URL {
@@ -58,7 +60,10 @@ struct BundledContentCorrectnessTests {
 
                 #expect(
                     engine.values == input.sorted(),
-                    "\(algorithm.id.rawValue) failed to sort attempt \(attempt) of size \(size): \(input) -> \(engine.values)"
+                    """
+                    \(algorithm.id.rawValue) failed to sort attempt \(attempt) of size \(size): \
+                    \(input) -> \(engine.values)
+                    """
                 )
             }
         }

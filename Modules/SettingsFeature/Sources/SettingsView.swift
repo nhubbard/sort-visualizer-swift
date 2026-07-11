@@ -48,7 +48,10 @@ public struct SettingsView: View {
                 // run-control bar's own speed slider still governs an already-running sort live,
                 // matching every other per-run-vs-global split on this screen (visualizer/shuffle
                 // choice are global too, but sound and start/stop are per-run).
-                Text("Applies to sorts you open after changing this. Adjust an already-running sort from its own speed control.")
+                Text(
+                    "Applies to sorts you open after changing this. "
+                        + "Adjust an already-running sort from its own speed control."
+                )
             }
             Section("Sound") {
                 Toggle("Sound Effects", isOn: $settings.soundEnabled)

@@ -26,7 +26,9 @@ final class VisualizerSwitchingUITests: XCTestCase {
         XCTAssertTrue(settingsButton.waitForExistence(timeout: 5), "settings button never appeared")
         settingsButton.tap()
 
-        let rainbowOption = app.descendants(matching: .any).matching(NSPredicate(format: "label == %@", "Rainbow")).firstMatch
+        let rainbowOption = app.descendants(matching: .any)
+            .matching(NSPredicate(format: "label == %@", "Rainbow"))
+            .firstMatch
         XCTAssertTrue(rainbowOption.waitForExistence(timeout: 5), "visualizer picker option \"Rainbow\" never appeared")
         rainbowOption.tap()
 

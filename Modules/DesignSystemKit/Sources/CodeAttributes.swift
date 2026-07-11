@@ -97,7 +97,9 @@ extension AttributeScopes {
 }
 
 extension AttributeDynamicLookup {
-    public subscript<T: AttributedStringKey>(dynamicMember keyPath: KeyPath<AttributeScopes.SortSymphonyAttributes, T>) -> T {
+    public subscript<T: AttributedStringKey>(
+        dynamicMember keyPath: KeyPath<AttributeScopes.SortSymphonyAttributes, T>
+    ) -> T {
         self[T.self]
     }
 }

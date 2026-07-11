@@ -31,11 +31,9 @@ public struct MergeExchangeSortIterative: SortAlgorithm {
             var d = p
             while true {
                 if n - d > 0 {
-                    for i in 0..<(n - d) {
-                        if (i & p) == r {
-                            if !engine.compare(i + d, i) {
-                                engine.swap(i, i + d)
-                            }
+                    for i in 0..<(n - d) where (i & p) == r {
+                        if !engine.compare(i + d, i) {
+                            engine.swap(i, i + d)
                         }
                     }
                 }

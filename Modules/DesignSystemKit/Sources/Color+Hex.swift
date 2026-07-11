@@ -4,9 +4,9 @@ import SwiftUI
 /// SwifterSwift") — the one piece of hex-color parsing every `CodeTheme` needs.
 extension Color {
     private static func getGroupValue(string: String, range: Range<Int>) -> CGFloat {
-        let group = string[
-            string.index(string.startIndex, offsetBy: range.lowerBound)..<string.index(string.startIndex, offsetBy: range.upperBound)
-        ]
+        let lowerIndex = string.index(string.startIndex, offsetBy: range.lowerBound)
+        let upperIndex = string.index(string.startIndex, offsetBy: range.upperBound)
+        let group = string[lowerIndex..<upperIndex]
         guard group.count == 2, let intVal = Int(group, radix: 16) else {
             return 1.0
         }

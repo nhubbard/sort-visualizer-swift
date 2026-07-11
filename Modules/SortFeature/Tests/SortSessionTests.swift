@@ -113,7 +113,10 @@ private func makeFastSettings() -> AppSettings {
 struct SortSessionTests {
     @Test
     func sortEndToEndProducesCorrectlySortedFrame() async throws {
-        let session = SortSession(algorithm: FakeAlgorithm(), shuffle: FakeReverseShuffle(), settings: makeFastSettings())
+        let session = SortSession(
+            algorithm: FakeAlgorithm(),
+            shuffle: FakeReverseShuffle(),
+            settings: makeFastSettings())
         let size = 9
 
         await session.start(size: size)
@@ -186,8 +189,12 @@ struct SortSessionTests {
             try await Task.sleep(for: .milliseconds(20))
         }
 
-        #expect(weakSession == nil, "SortSession should deallocate once nothing outside it holds a reference, even mid-playback")
-        #expect(weakReplay == nil, "ReplayEngine should deallocate once nothing outside it holds a reference, even mid-playback")
+        #expect(
+            weakSession == nil,
+            "SortSession should deallocate once nothing outside it holds a reference, even mid-playback")
+        #expect(
+            weakReplay == nil,
+            "ReplayEngine should deallocate once nothing outside it holds a reference, even mid-playback")
     }
 
     /// Regression test for the pause/resume redesign: pausing mid-replay must not prematurely
@@ -259,7 +266,10 @@ struct SortSessionTests {
     /// `.complete`.
     @Test
     func togglePlaybackResumesAfterScrubbingBackwardFromComplete() async throws {
-        let session = SortSession(algorithm: FakeAlgorithm(), shuffle: FakeReverseShuffle(), settings: makeFastSettings())
+        let session = SortSession(
+            algorithm: FakeAlgorithm(),
+            shuffle: FakeReverseShuffle(),
+            settings: makeFastSettings())
 
         await session.start(size: 10)
         try await waitUntilTerminal(session)
@@ -326,7 +336,7 @@ struct SortSessionTests {
     @Test(arguments: [
         FakeIdentityShuffle() as any ShuffleAlgorithm,
         FakeReverseShuffle() as any ShuffleAlgorithm,
-        FakeRotateShuffle() as any ShuffleAlgorithm,
+        FakeRotateShuffle() as any ShuffleAlgorithm
     ])
     func replayingConcatenatedTapeProducesSortedFrameRegardlessOfShuffle(shuffle: any ShuffleAlgorithm) {
         let size = 15

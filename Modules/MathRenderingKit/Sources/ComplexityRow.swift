@@ -20,7 +20,7 @@ extension AlgorithmMetadata {
             ComplexityRow(id: "best", label: "Best Case", latex: Self.toLatex(timeComplexity.best)),
             ComplexityRow(id: "average", label: "Average Complexity", latex: Self.toLatex(timeComplexity.average)),
             ComplexityRow(id: "worst", label: "Worst Case", latex: Self.toLatex(timeComplexity.worst)),
-            ComplexityRow(id: "space", label: "Space Complexity", latex: Self.toLatex(spaceComplexity)),
+            ComplexityRow(id: "space", label: "Space Complexity", latex: Self.toLatex(spaceComplexity))
         ]
     }
 

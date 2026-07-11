@@ -68,7 +68,8 @@ public struct PygmentsTheme: CodeTheme {
                 it.fg(k)
             case .keywordType:
                 it.fg(kt)
-            case .operator, .number, .numberBin, .numberFloat, .numberHex, .numberInteger, .numberOct, .numberIntegerLong:
+            case .operator, .number, .numberBin, .numberFloat, .numberHex, .numberInteger, .numberOct,
+                 .numberIntegerLong:
                 it.fg(o)
             case .string, .stringAffix, .stringBacktick, .stringChar, .stringDelimiter, .stringDouble, .stringHeredoc,
                  .stringSingle:

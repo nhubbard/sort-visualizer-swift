@@ -70,12 +70,9 @@ public final class SortSession {
         // NOT AudioService.shared: every test that constructs a SortSession without overriding
         // `audio:` gets a real, running AudioService if this defaulted to the shared instance —
         // undesirable in a test host regardless of backend (see AudioServiceTests.swift's
-        // comment). This used to also be a hard crash risk specifically because of AudioKit's
-        // native parameter-map setup; that risk is gone since the ToneKit migration (see
-        // Modules/ToneKit/NOTICE.md), but the default here stays NoOpAudioService() either way.
-        // ScrollingSortView — the real app's composition root — currently doesn't override this
-        // either (see its own comment for why sound isn't wired up yet), so today nothing in the
-        // shipped app ever constructs the real AudioService.shared at all.
+        // comment). ScrollingSortView — the real app's composition root — passes AudioService
+        // .shared explicitly instead (see its own comment), so the real app still hears sound;
+        // this default just keeps every other caller (tests, previews) silent unless they ask.
         audio: any AudioPlaying = NoOpAudioService(),
         analytics: AnalyticsService = .shared,
         settings: AppSettings = .shared,
@@ -100,7 +97,9 @@ public final class SortSession {
         // until the orphaned `ReplayEngine` self-terminates on its own — see the size stepper and
         // automation loop, both of which call this repeatedly on an already-running session.
         if case let .replaying(replay) = phase { replay.pause() }
-        let clampedSize = min(max(size, algorithm.metadata.sizeRange.lowerBound), algorithm.metadata.sizeRange.upperBound)
+        let clampedSize = min(
+            max(size, algorithm.metadata.sizeRange.lowerBound),
+            algorithm.metadata.sizeRange.upperBound)
         arraySize = clampedSize
         phase = .recording
 

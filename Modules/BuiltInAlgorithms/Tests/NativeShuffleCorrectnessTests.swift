@@ -9,7 +9,7 @@ import Testing
 @Suite
 struct NativeShuffleCorrectnessTests {
     private static let shuffles: [any ShuffleAlgorithm] = [
-        AscendingShuffle(), DescendingShuffle(), RandomShuffle(), ShuffledCubicShuffle(), ShuffledQuinticShuffle(),
+        AscendingShuffle(), DescendingShuffle(), RandomShuffle(), ShuffledCubicShuffle(), ShuffledQuinticShuffle()
     ]
 
     @Test

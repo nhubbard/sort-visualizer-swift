@@ -29,9 +29,7 @@ public struct BozoSort: SortAlgorithm {
         guard n > 1 else { return }
 
         func isSorted() -> Bool {
-            for i in 1..<n {
-                if !engine.compare(i, i - 1) { return false }
-            }
+            for i in 1..<n where !engine.compare(i, i - 1) { return false }
             return true
         }
 

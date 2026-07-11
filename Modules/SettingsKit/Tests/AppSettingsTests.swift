@@ -19,7 +19,7 @@ struct AppSettingsTests {
         let settings = AppSettings(store: makeIsolatedStore())
         #expect(settings.selectedVisualizerID == VisualizerID(rawValue: "bargraph"))
         #expect(settings.playbackSpeed == 30.0)
-        #expect(settings.soundEnabled == true)
+        #expect(settings.soundEnabled == false)
         #expect(settings.synthNoteRange == 36...72)
         #expect(settings.defaultArraySize == 256)
         #expect(settings.codeTheme == CodeThemeID(rawValue: "monokai"))

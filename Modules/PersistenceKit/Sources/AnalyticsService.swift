@@ -60,7 +60,11 @@ public actor AnalyticsService {
     private static func makeDefaultContainer() -> ModelContainer {
         let schema = Schema([BigORecord.self])
         let configuration = ModelConfiguration(schema: schema, cloudKitDatabase: .automatic)
-        return try! ModelContainer(for: schema, configurations: [configuration])
+        do {
+            return try ModelContainer(for: schema, configurations: [configuration])
+        } catch {
+            fatalError("Failed to create default ModelContainer: \(error)")
+        }
     }
 }
 

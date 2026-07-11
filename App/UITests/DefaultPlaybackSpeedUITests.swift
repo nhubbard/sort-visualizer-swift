@@ -27,8 +27,10 @@ final class DefaultPlaybackSpeedUITests: XCTestCase {
         let speedSlider = app.sliders["playbackSpeedSlider"]
         scrollUntilVisible(speedSlider, in: app)
         speedSlider.adjust(toNormalizedSliderPosition: 1.0) // slider's maximum: 200/sec
-        let raisedSpeed = try XCTUnwrap(operationsPerSecond(fromCaptionIn: app), "no '<n> operations/second' caption found after raising the slider")
-        XCTAssertGreaterThan(raisedSpeed, 150, "dragging to the slider's maximum should land near 200, not close to the old default")
+        let raisedSpeed = try XCTUnwrap(operationsPerSecond(fromCaptionIn: app),
+            "no '<n> operations/second' caption found after raising the slider")
+        XCTAssertGreaterThan(raisedSpeed, 150,
+            "dragging to the slider's maximum should land near 200, not close to the old default")
         app.buttons["Done"].tap()
 
         app.buttons["algorithmLink.quicksort"].tap()
@@ -48,8 +50,10 @@ final class DefaultPlaybackSpeedUITests: XCTestCase {
         settingsButton.tap()
         scrollUntilVisible(speedSlider, in: app)
         speedSlider.adjust(toNormalizedSliderPosition: (30.0 - 1.0) / (200.0 - 1.0))
-        let restoredSpeed = try XCTUnwrap(operationsPerSecond(fromCaptionIn: app), "no '<n> operations/second' caption found after restoring the slider")
-        XCTAssertTrue((20...40).contains(restoredSpeed), "restoring the slider toward its documented default landed too far from 30/sec: \(restoredSpeed)")
+        let restoredSpeed = try XCTUnwrap(operationsPerSecond(fromCaptionIn: app),
+            "no '<n> operations/second' caption found after restoring the slider")
+        XCTAssertTrue((20...40).contains(restoredSpeed),
+            "restoring the slider toward its documented default landed too far from 30/sec: \(restoredSpeed)")
         app.buttons["Done"].tap()
     }
 

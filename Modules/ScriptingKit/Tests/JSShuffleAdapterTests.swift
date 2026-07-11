@@ -6,7 +6,9 @@ import Testing
 @Suite
 struct JSShuffleAdapterTests {
     private func makeAdapter(source: String) -> JSShuffleAdapter {
-        JSShuffleAdapter(id: ShuffleID(rawValue: "test"), metadata: ShuffleMetadata(displayName: "Test"), source: source)
+        JSShuffleAdapter(
+            id: ShuffleID(rawValue: "test"), metadata: ShuffleMetadata(displayName: "Test"), source: source
+        )
     }
 
     @Test

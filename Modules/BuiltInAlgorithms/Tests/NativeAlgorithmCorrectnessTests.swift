@@ -22,7 +22,7 @@ struct NativeAlgorithmCorrectnessTests {
         PigeonholeSort(), QuickSort(), RecursiveShellSort(), RotateMergeSort(), SelectionSort(),
         ShellSort(), SimplifiedLibrarySort(), SlowSort(), StableCycleSort(), StableSelectionSort(),
         StaticSort(), StoogeSort(), StrandSort(), SwaplessBubbleSort(), TernaryLLQuickSort(),
-        TernaryLRQuickSort(), UnoptimizedBubbleSort(), WeavedMergeSort(),
+        TernaryLRQuickSort(), UnoptimizedBubbleSort(), WeavedMergeSort()
     ]
 
     @Test
@@ -45,7 +45,10 @@ struct NativeAlgorithmCorrectnessTests {
 
                 #expect(
                     engine.values == input.sorted(),
-                    "\(algorithm.id.rawValue) failed to sort random attempt \(attempt) of size \(size): \(input) -> \(engine.values)"
+                    """
+                    \(algorithm.id.rawValue) failed to sort random attempt \(attempt) of size \(size): \
+                    \(input) -> \(engine.values)
+                    """
                 )
             }
         }
@@ -91,7 +94,10 @@ struct NativeAlgorithmCorrectnessTests {
 
             #expect(
                 engine.values == input.sorted(),
-                "\(algorithm.id.rawValue) failed on heavily-duplicated input of size \(size): \(input) -> \(engine.values)"
+                """
+                \(algorithm.id.rawValue) failed on heavily-duplicated input of size \(size): \
+                \(input) -> \(engine.values)
+                """
             )
         }
     }

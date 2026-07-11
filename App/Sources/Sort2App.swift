@@ -19,7 +19,7 @@ struct Sort2App: App {
             SineWaveVisualizer(), ColorCircleVisualizer(), SpiralVisualizer(), SpiralDotsVisualizer(),
             WaveDotsVisualizer(), PixelMeshVisualizer(), HoopStackVisualizer(),
             DisparityBarGraphVisualizer(), DisparityCircleVisualizer(), DisparityChordsVisualizer(),
-            DisparityDotsVisualizer(),
+            DisparityDotsVisualizer()
         ]
         VisualizerRegistry.shared.discover()
 
@@ -44,7 +44,7 @@ struct Sort2App: App {
             PigeonholeSort(), QuickSort(), RecursiveShellSort(), RotateMergeSort(), SelectionSort(),
             ShellSort(), SimplifiedLibrarySort(), SlowSort(), StableCycleSort(), StableSelectionSort(),
             StaticSort(), StoogeSort(), StrandSort(), SwaplessBubbleSort(), TernaryLLQuickSort(),
-            TernaryLRQuickSort(), UnoptimizedBubbleSort(), WeavedMergeSort(),
+            TernaryLRQuickSort(), UnoptimizedBubbleSort(), WeavedMergeSort()
         ]
         AlgorithmRegistry.shared.scriptLoader = {
             ScriptAlgorithmLoader.loadScripts(from: Bundle.main.url(forResource: "Algorithms", withExtension: nil)!)
@@ -52,7 +52,7 @@ struct Sort2App: App {
         AlgorithmRegistry.shared.discover()
 
         ShuffleRegistry.shared.builtIns = [
-            AscendingShuffle(), DescendingShuffle(), RandomShuffle(), ShuffledCubicShuffle(), ShuffledQuinticShuffle(),
+            AscendingShuffle(), DescendingShuffle(), RandomShuffle(), ShuffledCubicShuffle(), ShuffledQuinticShuffle()
         ]
         ShuffleRegistry.shared.scriptLoader = {
             ScriptShuffleLoader.loadScripts(from: Bundle.main.url(forResource: "Shuffles", withExtension: nil)!)

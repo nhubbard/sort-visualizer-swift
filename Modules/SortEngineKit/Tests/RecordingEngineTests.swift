@@ -12,7 +12,7 @@ struct RecordingEngineTests {
         #expect(summary.tape == [
             .mark(marker: Marker.primary, index: 0),
             .mark(marker: Marker.secondary, index: 1),
-            .compare(0, 1),
+            .compare(0, 1)
         ])
         #expect(summary.compareCount == 1)
         #expect(summary.swapCount == 0)
@@ -30,7 +30,7 @@ struct RecordingEngineTests {
         #expect(summary.tape == [
             .mark(marker: Marker.primary, index: 0),
             .mark(marker: Marker.secondary, index: 1),
-            .swap(0, 1),
+            .swap(0, 1)
         ])
         #expect(summary.swapCount == 1)
         // A swap is two array writes (ArrayV's `Writes.updateSwap` convention), not one.
@@ -88,7 +88,7 @@ struct RecordingEngineTests {
             .auxCreate(handle: handle.rawValue, length: 2),
             .auxWrite(handle: handle.rawValue, index: 0, value: 42),
             .auxWrite(handle: handle.rawValue, index: 1, value: 7),
-            .auxDelete(handle: handle.rawValue),
+            .auxDelete(handle: handle.rawValue)
         ])
         #expect(summary.auxWriteCount == 2)
         #expect(summary.mainWriteCount == 0)
@@ -109,7 +109,7 @@ struct RecordingEngineTests {
             .unmarkIndex(marker: Marker.secondary, index: 1),
             .mark(marker: Marker.primary, index: 1),
             .mark(marker: Marker.secondary, index: 2),
-            .compare(1, 2),
+            .compare(1, 2)
         ])
     }
 
@@ -128,7 +128,7 @@ struct RecordingEngineTests {
             .unmarkIndex(marker: Marker.secondary, index: 1),
             .mark(marker: Marker.primary, index: 1),
             .mark(marker: Marker.secondary, index: 2),
-            .swap(1, 2),
+            .swap(1, 2)
         ])
     }
 
@@ -159,7 +159,7 @@ struct RecordingEngineTests {
         #expect(summary.tape == [
             .mark(marker: Marker.pivot, index: 0),
             .unmark(marker: Marker.pivot),
-            .unmarkAll,
+            .unmarkAll
         ])
     }
 }

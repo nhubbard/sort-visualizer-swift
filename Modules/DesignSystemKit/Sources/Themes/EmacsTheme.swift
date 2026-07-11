@@ -19,7 +19,8 @@ public struct EmacsTheme: CodeTheme {
                 it.fg("#a2f")
             case .keywordConstant, .keywordDeclaration, .keywordNamespace, .keyword, .keywordReserved:
                 it.fg("#a2f").bold()
-            case .number, .operator, .numberBin, .numberFloat, .numberHex, .numberInteger, .numberOct, .numberIntegerLong:
+            case .number, .operator, .numberBin, .numberFloat, .numberHex, .numberInteger, .numberOct,
+                 .numberIntegerLong:
                 it.fg("#666")
             case .genericDeleted:
                 it.fg("#a00000")

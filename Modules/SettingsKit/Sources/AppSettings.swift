@@ -62,12 +62,15 @@ public final class AppSettings {
         store.register(defaults: [
             Keys.selectedVisualizerID: "bargraph",
             Keys.playbackSpeed: 30.0,
-            Keys.soundEnabled: true,
+            // Off by default — real audio now plays through ScrollingSortView (ToneKit-backed
+            // AudioService.shared, see Modules/ToneKit/NOTICE.md), and a brand-new user shouldn't
+            // have sound start playing on their very first sort without having chosen it.
+            Keys.soundEnabled: false,
             Keys.synthLowNote: 36,
             Keys.synthHighNote: 72,
             Keys.defaultArraySize: 256,
             Keys.codeTheme: "monokai",
-            Keys.defaultShuffleID: "random",
+            Keys.defaultShuffleID: "random"
         ])
         selectedVisualizerID = VisualizerID(rawValue: store.string(forKey: Keys.selectedVisualizerID) ?? "bargraph")
         playbackSpeed = store.double(forKey: Keys.playbackSpeed)

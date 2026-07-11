@@ -64,7 +64,8 @@ final class RunControlBarUITests: XCTestCase {
         add(screenshot)
 
         XCTAssertEqual(result, .completed, "sort never reached a terminal state after pause/step/resume")
-        XCTAssertEqual(statusLabel.value as? String, "sorted", "sort produced an incorrect result after pause/step/resume")
+        XCTAssertEqual(statusLabel.value as? String, "sorted",
+            "sort produced an incorrect result after pause/step/resume")
     }
 
     /// Covers the transport buttons beyond step-back/step-forward: jump-to-start and jump-to-end
@@ -101,14 +102,16 @@ final class RunControlBarUITests: XCTestCase {
         XCTAssertFalse(jumpToEndButton.isEnabled, "jump-to-end should disable itself once at the last step")
         XCTAssertFalse(playPauseButton.isEnabled, "play/pause should disable itself once fully finished")
         XCTAssertTrue(jumpToStartButton.isEnabled)
-        XCTAssertTrue(resetButton.isEnabled, "reset should stay enabled at the end — there's a full sort left to replay")
+        XCTAssertTrue(resetButton.isEnabled,
+            "reset should stay enabled at the end — there's a full sort left to replay")
 
         // Reset to the shuffled input: neither the true start nor the end, so every transport
         // button re-enables except reset itself.
         resetButton.tap()
         Thread.sleep(forTimeInterval: 0.3)
         XCTAssertFalse(resetButton.isEnabled, "reset should disable itself once exactly at the shuffled-input position")
-        XCTAssertTrue(jumpToStartButton.isEnabled, "jump-to-start should stay enabled — the shuffle recorded operations before this position")
+        XCTAssertTrue(jumpToStartButton.isEnabled,
+            "jump-to-start should stay enabled — the shuffle recorded operations before this position")
         XCTAssertTrue(jumpToEndButton.isEnabled)
         XCTAssertTrue(playPauseButton.isEnabled)
 
@@ -117,7 +120,8 @@ final class RunControlBarUITests: XCTestCase {
         jumpToStartButton.tap()
         Thread.sleep(forTimeInterval: 0.3)
         XCTAssertFalse(jumpToStartButton.isEnabled, "jump-to-start should disable itself once at step 0")
-        XCTAssertTrue(resetButton.isEnabled, "reset should stay enabled after jump-to-start, since the shuffle moved stepIndex away from sortStartIndex")
+        XCTAssertTrue(resetButton.isEnabled,
+            "reset should stay enabled after jump-to-start, since the shuffle moved stepIndex away from sortStartIndex")
         XCTAssertTrue(jumpToEndButton.isEnabled)
     }
 

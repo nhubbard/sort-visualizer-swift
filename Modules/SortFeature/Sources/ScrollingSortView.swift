@@ -1,4 +1,5 @@
 import AlgorithmKit
+import AudioEngineKit
 import SwiftUI
 
 public struct ScrollingSortView: View {
@@ -10,18 +11,16 @@ public struct ScrollingSortView: View {
     public init(algorithm: any SortAlgorithm, shuffle: any ShuffleAlgorithm, arraySize: Int = 48) {
         self.algorithm = algorithm
         self.arraySize = arraySize
-        // NOT audio: AudioService.shared here — this predates the ToneKit migration (see
-        // Modules/ToneKit/NOTICE.md), when constructing a live AudioKit graph crashed in this
-        // project's toolchain/simulator combination at native AudioComponent registration, a crash
-        // Swift couldn't catch (a C++ assert -> SIGABRT). That specific crash risk no longer
-        // exists — ToneKit is plain AVAudioEngine/AVAudioSourceNode — but wiring the real
-        // AudioService.shared into the one screen every UI test exercises is still a real,
-        // separate decision (every UI test would start exercising live audio) rather than
-        // something to flip as a side effect of the AudioKit removal. AudioService.swift remains
-        // fully implemented and unit-tested (its pure frequency(forValue:in:noteRange:) math);
-        // SortSession's own default (NoOpAudioService()) keeps this screen silent until that
-        // decision is made deliberately.
-        _session = State(wrappedValue: SortSession(algorithm: algorithm, shuffle: shuffle))
+        // AudioService.shared, for real: this used to default to NoOpAudioService() because
+        // constructing a live AudioKit graph crashed in this project's toolchain/simulator
+        // combination at native AudioComponent registration, a crash Swift couldn't catch (a C++
+        // assert -> SIGABRT). That risk doesn't exist for ToneKit (plain AVAudioEngine/
+        // AVAudioSourceNode — see Modules/ToneKit/NOTICE.md), and `AudioService.play()`'s `try?
+        // start()` already fails silently rather than crashing if a given host has no usable
+        // audio route (e.g. a sandboxed CI runner), so there's no reason left to keep this screen
+        // silent. `AppSettings.soundEnabled` (Settings) still gates whether a sort plays anything
+        // at all; this is just which backend answers when it does.
+        _session = State(wrappedValue: SortSession(algorithm: algorithm, shuffle: shuffle, audio: AudioService.shared))
     }
 
     public var body: some View {

@@ -23,10 +23,8 @@ public struct CountingSort: SortAlgorithm {
         // ArrayV's `Reads.analyzeMax` reads values directly (no stat-tracked compares), so the
         // scan for the maximum here does the same via `engine.values` rather than `engine.compare`.
         var maxValue = engine.values[0]
-        for i in 1..<n {
-            if engine.values[i] > maxValue {
-                maxValue = engine.values[i]
-            }
+        for i in 1..<n where engine.values[i] > maxValue {
+            maxValue = engine.values[i]
         }
 
         var values = [Int]()

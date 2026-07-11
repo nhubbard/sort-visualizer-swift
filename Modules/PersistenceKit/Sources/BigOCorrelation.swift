@@ -72,7 +72,7 @@ private func mergedComplexityCases(_ timeComplexity: ComplexityBounds) -> [(labe
     let rawCases: [(label: String, complexity: String)] = [
         ("Best", timeComplexity.best),
         ("Average", timeComplexity.average),
-        ("Worst", timeComplexity.worst),
+        ("Worst", timeComplexity.worst)
     ]
     let keys = rawCases.map { BigOShape.normalize($0.complexity) ?? $0.complexity }
 
@@ -83,7 +83,8 @@ private func mergedComplexityCases(_ timeComplexity: ComplexityBounds) -> [(labe
         guard !handledKeys.contains(key) else { continue }
         handledKeys.insert(key)
         let matchingLabels = rawCases.indices.filter { keys[$0] == key }.map { rawCases[$0].label }
-        let combinedLabel = (matchingLabels.count == 1 ? matchingLabels[0] : matchingLabels.joined(separator: " & ")) + " Case"
+        let joinedLabel = matchingLabels.count == 1 ? matchingLabels[0] : matchingLabels.joined(separator: " & ")
+        let combinedLabel = joinedLabel + " Case"
         cases.append((combinedLabel, entry.complexity))
     }
     return cases

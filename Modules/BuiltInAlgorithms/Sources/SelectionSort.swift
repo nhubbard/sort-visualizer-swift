@@ -18,10 +18,8 @@ public struct SelectionSort: SortAlgorithm {
         guard n > 1 else { return }
         for i in 0..<(n - 1) {
             var lowestIndex = i
-            for j in (i + 1)..<n {
-                if !engine.compare(j, lowestIndex) {
-                    lowestIndex = j
-                }
+            for j in (i + 1)..<n where !engine.compare(j, lowestIndex) {
+                lowestIndex = j
             }
             engine.swap(i, lowestIndex)
         }
