@@ -64,7 +64,7 @@ func quicksortTernaryLR(_ arr: inout [Int], _ lo: Int, _ hi: Int) {
   let numGreater = q - j
 
   j = i - 1
-  i = i + 1
+  i += 1
 
   let pe = lo + min(p - lo, numLess)
   var k = lo

@@ -7,11 +7,9 @@ func partition(
 ) -> Int {
   let pivot = array[hi]
   var i = lo
-  for j in lo..<hi {
-    if array[j] < pivot {
-      array.swapAt(i, j)
-      i += 1
-    }
+  for j in lo..<hi where array[j] < pivot {
+    array.swapAt(i, j)
+    i += 1
   }
   array.swapAt(i, hi)
   return i

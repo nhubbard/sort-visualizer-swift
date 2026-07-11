@@ -12,10 +12,8 @@ func sort(_ arr: inout [Int]) {
   let n = arr.count
   for i in stride(from: n - 1, through: 1, by: -1) {
     var max = 0
-    for j in (max + 1)...i {
-      if arr[j] > arr[max] {
-        max = j
-      }
+    for j in (max + 1)...i where arr[j] > arr[max] {
+      max = j
     }
     if max != i {
       flip(&arr, max)

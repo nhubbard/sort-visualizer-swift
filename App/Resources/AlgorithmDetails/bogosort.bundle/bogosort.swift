@@ -1,5 +1,5 @@
 func sort(_ arr: inout [Int]) {
-  while (arr != arr.sorted()) {
+  while arr != arr.sorted() {
     arr.shuffle()
   }
 }

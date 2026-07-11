@@ -2,10 +2,8 @@ func sort(_ arr: inout [Int]) {
   let n = arr.count
   for i in 0..<(n - 1) {
     var minIdx = i
-    for j in (i + 1)..<n {
-      if arr[j] < arr[minIdx] {
-        minIdx = j
-      }
+    for j in (i + 1)..<n where arr[j] < arr[minIdx] {
+      minIdx = j
     }
     arr.swapAt(minIdx, i)
   }

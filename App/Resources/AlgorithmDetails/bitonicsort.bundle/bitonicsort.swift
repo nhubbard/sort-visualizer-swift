@@ -8,8 +8,8 @@ func sort(_ arr: inout [Int]) {
       while i < n {
         let l = i ^ j
         if l > i {
-          if (((i & k) == 0) && (arr[i] > arr[l]) ||
-             (((i & k) != 0) && (arr[i] < arr[l]))) {
+          if i & k == 0 && arr[i] > arr[l] ||
+             i & k != 0 && arr[i] < arr[l] {
             arr.swapAt(i, l)
           }
         }

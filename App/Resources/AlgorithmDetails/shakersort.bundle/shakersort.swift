@@ -5,11 +5,9 @@ func sort(_ arr: inout [Int]) {
   var end = n - 1
   while swapped {
     swapped = false
-    for i in start..<end {
-      if arr[i] > arr[i + 1] {
-        arr.swapAt(i, i + 1)
-        swapped = true
-      }
+    for i in start..<end where arr[i] > arr[i + 1] {
+      arr.swapAt(i, i + 1)
+      swapped = true
     }
     if !swapped {
       break

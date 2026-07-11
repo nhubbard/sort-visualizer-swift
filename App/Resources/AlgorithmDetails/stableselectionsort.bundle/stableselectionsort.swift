@@ -3,10 +3,8 @@ import Foundation
 func sort(_ array: inout [Int]) {
   for i in 0..<(array.count - 1) {
     var min = i
-    for j in (i + 1)..<array.count {
-      if array[j] < array[min] {
-        min = j
-      }
+    for j in (i + 1)..<array.count where array[j] < array[min] {
+      min = j
     }
     let tmp = array[min]
     var pos = min

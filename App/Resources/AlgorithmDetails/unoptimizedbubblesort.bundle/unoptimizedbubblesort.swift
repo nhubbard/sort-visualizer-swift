@@ -4,11 +4,9 @@ func sort(_ array: inout [Int]) {
   var sorted = false
   while !sorted {
     sorted = true
-    for i in 0..<(array.count - 1) {
-      if array[i] > array[i + 1] {
-        array.swapAt(i, i + 1)
-        sorted = false
-      }
+    for i in 0..<(array.count - 1) where array[i] > array[i + 1] {
+      array.swapAt(i, i + 1)
+      sorted = false
     }
   }
 }

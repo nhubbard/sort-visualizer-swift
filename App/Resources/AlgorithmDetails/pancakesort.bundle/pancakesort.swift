@@ -10,10 +10,8 @@ func flip(_ arr: inout [Int], _ k: Int) {
 
 func maxIndex(_ arr: inout [Int], _ n: Int) -> Int {
   var index = 0
-  for i in 0..<n {
-    if arr[i] > arr[index] {
-      index = i
-    }
+  for i in 0..<n where arr[i] > arr[index] {
+    index = i
   }
   return index
 }

@@ -11,7 +11,7 @@ func merge(_ left: [Int], _ right: [Int]) -> [Int] {
     } else if leftElement > rightElement {
       orderedArray.append(rightElement)
       rightIndex += 1
-    } else { 
+    } else {
       orderedArray.append(leftElement)
       leftIndex += 1
       orderedArray.append(rightElement)

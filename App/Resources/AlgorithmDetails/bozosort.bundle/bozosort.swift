@@ -1,10 +1,8 @@
 import Foundation
 
 func isSorted(_ arr: [Int]) -> Bool {
-  for i in 1..<arr.count {
-    if arr[i - 1] > arr[i] {
-      return false
-    }
+  for i in 1..<arr.count where arr[i - 1] > arr[i] {
+    return false
   }
   return true
 }

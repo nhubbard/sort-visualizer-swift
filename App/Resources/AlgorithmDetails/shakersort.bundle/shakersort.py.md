@@ -1,4 +1,4 @@
-^[def](code: 'Token.Keyword')^[ ](code: 'Token.Text')^[sort](code: 'Token.Name.Function')^[(](code: 'Token.Punctuation')^[arr](code: 'Token.Name')^[)](code: 'Token.Punctuation')^[:](code: 'Token.Punctuation')
+^[def](code: 'Token.Keyword')^[ ](code: 'Token.Text.Whitespace')^[sort](code: 'Token.Name.Function')^[(](code: 'Token.Punctuation')^[arr](code: 'Token.Name')^[)](code: 'Token.Punctuation')^[:](code: 'Token.Punctuation')
 ^[  ](code: 'Token.Text')^[n](code: 'Token.Name')^[ ](code: 'Token.Text')^[=](code: 'Token.Operator')^[ ](code: 'Token.Text')^[len](code: 'Token.Name.Builtin')^[(](code: 'Token.Punctuation')^[arr](code: 'Token.Name')^[)](code: 'Token.Punctuation')
 ^[  ](code: 'Token.Text')^[swapped](code: 'Token.Name')^[ ](code: 'Token.Text')^[=](code: 'Token.Operator')^[ ](code: 'Token.Text')^[True](code: 'Token.Keyword.Constant')
 ^[  ](code: 'Token.Text')^[start](code: 'Token.Name')^[ ](code: 'Token.Text')^[=](code: 'Token.Operator')^[ ](code: 'Token.Text')^[0](code: 'Token.Literal.Number.Integer')

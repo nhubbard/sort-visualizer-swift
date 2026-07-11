@@ -1,6 +1,6 @@
-^[import](code: 'Token.Keyword.Namespace')^[ ](code: 'Token.Text')^[random](code: 'Token.Name.Namespace')
+^[import](code: 'Token.Keyword.Namespace')^[ ](code: 'Token.Text.Whitespace')^[random](code: 'Token.Name.Namespace')
 
-^[def](code: 'Token.Keyword')^[ ](code: 'Token.Text')^[sort](code: 'Token.Name.Function')^[(](code: 'Token.Punctuation')^[arr](code: 'Token.Name')^[)](code: 'Token.Punctuation')^[:](code: 'Token.Punctuation')
+^[def](code: 'Token.Keyword')^[ ](code: 'Token.Text.Whitespace')^[sort](code: 'Token.Name.Function')^[(](code: 'Token.Punctuation')^[arr](code: 'Token.Name')^[)](code: 'Token.Punctuation')^[:](code: 'Token.Punctuation')
 ^[  ](code: 'Token.Text')^[expected](code: 'Token.Name')^[ ](code: 'Token.Text')^[=](code: 'Token.Operator')^[ ](code: 'Token.Text')^[arr](code: 'Token.Name')^[\[](code: 'Token.Punctuation')^[:](code: 'Token.Punctuation')^[\]](code: 'Token.Punctuation')
 ^[  ](code: 'Token.Text')^[expected](code: 'Token.Name')^[.](code: 'Token.Operator')^[sort](code: 'Token.Name')^[(](code: 'Token.Punctuation')^[)](code: 'Token.Punctuation')
 ^[  ](code: 'Token.Text')^[while](code: 'Token.Keyword')^[ ](code: 'Token.Text')^[not](code: 'Token.Operator.Word')^[ ](code: 'Token.Text')^[(](code: 'Token.Punctuation')^[arr](code: 'Token.Name')^[ ](code: 'Token.Text')^[==](code: 'Token.Operator')^[ ](code: 'Token.Text')^[expected](code: 'Token.Name')^[)](code: 'Token.Punctuation')^[:](code: 'Token.Punctuation')
