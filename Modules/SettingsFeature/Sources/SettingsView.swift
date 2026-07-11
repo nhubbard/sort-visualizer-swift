@@ -11,22 +11,21 @@ public struct SettingsView: View {
     public var body: some View {
         @Bindable var settings = settings
         Form {
-            Section("Visualization") {
-                Picker(selection: $settings.selectedVisualizerID) {
+            Section("Sorting") {
+                Picker("Visualizer", selection: $settings.selectedVisualizerID) {
                     ForEach(VisualizerRegistry.shared.visualizers, id: \.id) { visualizer in
                         Text(visualizer.metadata.displayName).tag(visualizer.id)
                     }
-                } label: {}
-                .pickerStyle(.inline)
+                }
+                .pickerStyle(.menu)
                 .accessibilityIdentifier("visualizerPicker")
-            }
-            Section("Shuffle") {
-                Picker(selection: $settings.defaultShuffleID) {
+
+                Picker("Shuffle Method", selection: $settings.defaultShuffleID) {
                     ForEach(ShuffleRegistry.shared.shuffles, id: \.id) { shuffle in
                         Text(shuffle.metadata.displayName).tag(shuffle.id)
                     }
-                } label: {}
-                .pickerStyle(.inline)
+                }
+                .pickerStyle(.menu)
                 .accessibilityIdentifier("shufflePicker")
             }
             Section {
@@ -66,13 +65,13 @@ public struct SettingsView: View {
                 )
                 .accessibilityIdentifier("defaultArraySizeStepper")
             }
-            Section("Code Sample Theme") {
-                Picker(selection: $settings.codeTheme) {
+            Section("Code") {
+                Picker("Code Sample Theme", selection: $settings.codeTheme) {
                     ForEach(CodeThemeID.knownIDs, id: \.self) { theme in
                         Text(theme.displayName).tag(theme)
                     }
-                } label: {}
-                .pickerStyle(.inline)
+                }
+                .pickerStyle(.menu)
                 .accessibilityIdentifier("codeThemePicker")
             }
         }
