@@ -14,14 +14,25 @@ registered in `AlgorithmRegistry.shared.builtIns` — not a `.js`/`.manifest.jso
 (`App/Resources/Algorithms/<id>.js` + `.manifest.json`) is now only ever a *temporary* stage for a
 brand-new algorithm you're still proving out — expect to see at most a handful of `.js` files
 there at any time, never all of them, and expect any given one to be retired (deleted, with its
-logic ported to `BuiltInAlgorithms`) once it's confirmed correct. Shuffles remain scripted-only
-(`App/Resources/Shuffles/<id>.js` + `.manifest.json`, no native equivalent yet) and visualizations
-remain native-only (`Modules/BuiltInVisualizers/Sources/<Name>.swift`) — neither of those changed.
+logic ported to `BuiltInAlgorithms`) once it's confirmed correct. Shuffles followed the same path
+as of the native shuffle port batch — see §2's preamble. Visualizations remain native-only
+(`Modules/BuiltInVisualizers/Sources/<Name>.swift`), unchanged.
+
+The eventual goal is to retire the JS bridge (`ScriptingKit`'s `JSAlgorithmAdapter`/`ScriptRunner`/
+`JSRecordingEngineBridge`) entirely, once new-algorithm prototyping in JS is no longer a live
+workflow — not yet, while there's still a large unported backlog below.
 
 ## 1. Sorting algorithms
 
 208 ArrayV classes across 9 categories, + 21 shared `templates/` base classes that are never
 ported directly — only their concrete subclasses are.
+
+ArrayV's `*Parallel` variants (12 across the categories below) are declined outright, not tracked
+as pending: `RecordingEngine`'s tape is a single deterministic writer, so a "parallel" port would
+just re-record the identical compare/swap sequence as the already-shipped sequential version under
+a different name — real thread interleaving has no meaning in a model with one writer, and faking
+it would be visual theater over duplicate content, not new algorithmic behavior. Removed from the
+per-category lists below rather than left as "Decision Required" — the decision is already made.
 
 ### a. Exchange sorts (`sorts/exchange/`, 41)
 
@@ -102,12 +113,6 @@ ported directly — only their concrete subclasses are.
 - [ ] ThreeSmoothCombSortRecursive
 - [ ] UnoptimizedCocktailShakerSort
 
-#### Decision Required
-
-- [~] LRQuickSortParallel — parallel, needs sequential-simulation decision
-- [~] StableQuickSortParallel — parallel
-- [~] ThreeSmoothCombSortParallel — parallel
-
 ### b. Insertion sorts (`sorts/insert/`, 18)
 
 #### Completed
@@ -144,10 +149,6 @@ ported directly — only their concrete subclasses are.
 - [ ] RedBlackTreeSort
 - [ ] SplaySort
 - [ ] TreeSort
-
-#### Decision Required
-
-- [~] ShellSortParallel — parallel
 
 ### c. Selection sorts (`sorts/select/`, 25)
 
@@ -306,11 +307,6 @@ ported directly — only their concrete subclasses are.
       location; tracked once, under the hybrid section below — originally picked as this batch's hybrid/medium
       but swapped for IntroSort, see hybrid/ section)
 
-#### Decision Required
-
-- [~] MergeSortParallel — parallel
-- [~] RotateMergeSortParallel — parallel
-
 ### f. Miscellaneous sorts (`sorts/misc/`, 4)
 
 #### Completed
@@ -330,7 +326,9 @@ ported directly — only their concrete subclasses are.
 - [~] StalinSort — **not portable as-is**: it deletes out-of-order elements rather than
       repositioning them (a shrinking result, not a permutation). `SortOperation` has no
       remove/shrink case. Would need either a new engine primitive or a "fake it with duplicate
-      values" hack — deferred until there's a real reason to add one.
+      values" hack — deferred until there's a real reason to add one. Kept in this list rather than
+      dropped like the `*Parallel` variants above, but unlikely to actually be implemented — no
+      other algorithm currently needs a shrink primitive to justify adding one just for this.
 
 ### g. Concurrent sorts (`sorts/concurrent/`, 22)
 
@@ -372,13 +370,6 @@ ported directly — only their concrete subclasses are.
 - [ ] PairwiseSortRecursive
 - [ ] WeaveSortIterative
 - [ ] WeaveSortRecursive
-
-#### Decision Required
-
-- [~] BitonicSortParallel — parallel
-- [~] BoseNelsonSortParallel — parallel
-- [~] OddEvenMergeSortParallel — parallel
-- [~] WeaveSortParallel — parallel
 
 ### h. Quick sorts (`sorts/quick/`, 2 — the entire category)
 
@@ -451,23 +442,33 @@ ported directly — only their concrete subclasses are.
 - [ ] WikiSort (1068-line template)
 - [ ] YujisBufferedMergeSort2
 
-#### Decision Required
-
-- [~] ParallelBlockMergeSort — parallel
-- [~] ParallelGrailSort — parallel
-
 ## 2. Shuffles
 
 Forty-five in ArrayV's `Shuffles.java` enum — no subdirectories, listed flat. v1's original 5 (Phase 6)
 doesn't map 1:1 onto ArrayV's list — noted inline where there's a rough equivalent.
 
+As of the native shuffle port batch, a "done" row means a native
+`Modules/BuiltInAlgorithms/Sources/<Name>.swift` `ShuffleAlgorithm` conformance registered in
+`ShuffleRegistry.shared.builtIns` — not a `.js`/`.manifest.json` pair, the same convention §1's
+preamble describes for sorting algorithms. `App/Resources/Shuffles/` is empty until the next
+shuffle is being proven out in JS first, same as `Algorithms/`.
+
 ### a. Completed
 
-- [x] random.js — done (Phase 6), ports v1's "Random" (Fisher-Yates) ≈ ArrayV's `RANDOM`
-- [x] ascending.js — done (Phase 6), ports v1's "Ascending" (no-op) ≈ ArrayV's `ALREADY`/`SORTED`
-- [x] descending.js — done (Phase 6), ports v1's "Descending" (reverse) ≈ ArrayV's `REVERSE`
-- [x] shuffledcubic.js — done (Phase 6), v1-original curve shuffle, no ArrayV equivalent
-- [x] shuffledquintic.js — done (Phase 6), v1-original curve shuffle, no ArrayV equivalent
+- [x] Random — done (native shuffle port batch; originally Phase 6 as `random.js`), ports v1's
+      "Random" (Fisher-Yates) ≈ ArrayV's `RANDOM`, `Modules/BuiltInAlgorithms/Sources/RandomShuffle.swift`
+- [x] Ascending — done (native shuffle port batch; originally Phase 6 as `ascending.js`), ports
+      v1's "Ascending" (no-op) ≈ ArrayV's `ALREADY`/`SORTED`,
+      `Modules/BuiltInAlgorithms/Sources/AscendingShuffle.swift`
+- [x] Descending — done (native shuffle port batch; originally Phase 6 as `descending.js`), ports
+      v1's "Descending" (reverse) ≈ ArrayV's `REVERSE`,
+      `Modules/BuiltInAlgorithms/Sources/DescendingShuffle.swift`
+- [x] Shuffled cubic — done (native shuffle port batch; originally Phase 6 as `shuffledcubic.js`),
+      v1-original curve shuffle, no ArrayV equivalent,
+      `Modules/BuiltInAlgorithms/Sources/ShuffledCubicShuffle.swift`
+- [x] Shuffled quintic — done (native shuffle port batch; originally Phase 6 as
+      `shuffledquintic.js`), v1-original curve shuffle, no ArrayV equivalent,
+      `Modules/BuiltInAlgorithms/Sources/ShuffledQuinticShuffle.swift`
 
 ### b. Not Started
 
@@ -540,4 +541,6 @@ doesn't map 1:1 onto ArrayV's list — noted inline where there's a rough equiva
 ### c. Decision Required
 
 - [~] CustomImage — deferred per §2A.6 (needs an image-picker UI + per-pixel remap; the
-      largest/most novelty-heavy visual, explicitly a Phase 12 stretch goal candidate)
+      largest/most novelty-heavy visual, explicitly a Phase 12 stretch goal candidate;
+      this is not going to work well since 256 is our upper bound for visuals for
+      performance and memory usage)

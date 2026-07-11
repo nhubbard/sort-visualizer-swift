@@ -26,7 +26,8 @@ struct Sort2App: App {
         // reserved for prototyping a brand-new algorithm before it's ported here and its script
         // retired. `App/Resources/Algorithms/` is empty until the next one is being proven out;
         // `scriptLoader` stays wired so dropping a `.js` + manifest there still works without a
-        // recompile, exactly as before. Shuffles remain scripted-only for now.
+        // recompile, exactly as before. Shuffles followed the same path as of the native shuffle
+        // port batch — `App/Resources/Shuffles/` is empty for the same reason.
         AlgorithmRegistry.shared.builtIns = [
             BinaryDoubleInsertionSort(), BinaryGnomeSort(), BinaryInsertionSort(), BinaryMergeSort(),
             BingoSort(), BitonicSortIterative(), BitonicSortRecursive(), BogoSort(),
@@ -48,6 +49,9 @@ struct Sort2App: App {
         }
         AlgorithmRegistry.shared.discover()
 
+        ShuffleRegistry.shared.builtIns = [
+            AscendingShuffle(), DescendingShuffle(), RandomShuffle(), ShuffledCubicShuffle(), ShuffledQuinticShuffle(),
+        ]
         ShuffleRegistry.shared.scriptLoader = {
             ScriptShuffleLoader.loadScripts(from: Bundle.main.url(forResource: "Shuffles", withExtension: nil)!)
         }
