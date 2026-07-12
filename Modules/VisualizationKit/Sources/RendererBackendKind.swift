@@ -9,11 +9,11 @@
 /// unresolved performance regression relative to `.immediate` — not worth continuing to chase once
 /// `.metal` already covers the same "incremental repaint" hypothesis without that cost.
 ///
-/// `.metal` is bar-graph-specific (see `MetalBarRenderer` in `SortFeature`) — picking it fixes the
-/// visualization style to a bar graph regardless of `AppSettings.selectedVisualizerID`, since
-/// incremental per-operation repainting needs to know the touched positions' on-screen geometry
-/// directly, which only the bar-graph layout has been taught. `.immediate` is unaffected and
-/// continues to honor whichever `Visualizer` is selected.
+/// `.metal` follows `AppSettings.selectedVisualizerID` like `.immediate` does, but only for the
+/// styles `MetalRendererFactory` (in `SortFeature`) has an incremental GPU path for — each one
+/// needs to know its touched positions' on-screen geometry directly, which only a taught
+/// `MetalBarRenderer`/`MetalShapeLayout` conformance can do. `SortView.canvas(for:)` falls back to
+/// `.immediate` automatically for any `Visualizer` without one.
 public enum RendererBackendKind: String, CaseIterable, Codable, Sendable, Identifiable {
     /// The original, always-correct path: `Canvas` regenerates every draw command from the whole
     /// frame on every redraw. Works with any `Visualizer`.

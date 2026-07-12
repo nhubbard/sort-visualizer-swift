@@ -1,11 +1,13 @@
 import AlgorithmKit
 import AudioEngineKit
+import SettingsKit
 import SwiftUI
 
 public struct ScrollingSortView: View {
     let algorithm: any SortAlgorithm
     let arraySize: Int
     @State private var session: SortSession
+    @Environment(AppSettings.self) private var settings
 
     @MainActor
     public init(algorithm: any SortAlgorithm, shuffle: any ShuffleAlgorithm, arraySize: Int = 48) {
@@ -44,10 +46,10 @@ public struct ScrollingSortView: View {
             await session.start(size: arraySize)
         }
         .background {
-            // Zero-size, fully transparent — these buttons exist only to give ⌘⇧A/⌘⌥⇧A somewhere
-            // to land, scoped to whichever algorithm screen is currently showing. A global
-            // `Commands` scene would need `FocusedValue` plumbing to reach this specific session
-            // instead.
+            // Zero-size, fully transparent — these buttons exist only to give ⌘⇧A/⌘⌥⇧A/⌘⇧V
+            // somewhere to land, scoped to whichever algorithm screen is currently showing. A
+            // global `Commands` scene would need `FocusedValue` plumbing to reach this specific
+            // session instead.
             Button("") { session.toggleAutomation() }
                 .keyboardShortcut("a", modifiers: [.command, .shift])
                 .opacity(0)
@@ -58,6 +60,17 @@ public struct ScrollingSortView: View {
             // show a visualization-time anomaly, without waiting through every smaller size first.
             Button("") { session.toggleMaxSizeAutomation() }
                 .keyboardShortcut("a", modifiers: [.command, .option, .shift])
+                .opacity(0)
+                .frame(width: 0, height: 0)
+                .accessibilityHidden(true)
+            // On-demand visualizer cycling — unlike the two automations above, this isn't a loop:
+            // one press advances `AppSettings.selectedVisualizerID` by exactly one step through
+            // `VisualizerRegistry`'s stable order, ring-buffer-wrapping back to the first past the
+            // last. Not gated on `session.isAutomating`/run completion — switching mid-run just
+            // changes what's drawn going forward from the same `ReplayEngine` state, which is
+            // already safe (every renderer reads `selectedVisualizerID` reactively).
+            Button("") { settings.cycleVisualizer() }
+                .keyboardShortcut("v", modifiers: [.command, .shift])
                 .opacity(0)
                 .frame(width: 0, height: 0)
                 .accessibilityHidden(true)

@@ -86,9 +86,9 @@ public struct SettingsView: View {
                 Text("Renderer (Experimental)")
             } footer: {
                 Text(
-                    "Metal repaints incrementally and only draws a bar graph, regardless of the "
-                        + "Visualizer chosen above. For comparing rendering cost across array "
-                        + "sizes, not for everyday use."
+                    "Metal repaints incrementally for most Visualizers; any without a GPU path "
+                        + "yet fall back to Immediate automatically. For comparing rendering cost "
+                        + "across array sizes, not for everyday use."
                 )
             }
         }

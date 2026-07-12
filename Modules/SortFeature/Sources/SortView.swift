@@ -80,6 +80,10 @@ public struct SortView: View {
     /// `Coordinator` tracking needs that reset rather than carrying over stale bookkeeping from
     /// whatever ran before. `.immediate` doesn't need it: `VisualizationCanvas` has no per-run
     /// state of its own to reset.
+    ///
+    /// `.metal` falls back to Immediate for any `Visualizer` `MetalRendererFactory` doesn't
+    /// support yet (`ColorCircle`/`DisparityCircle`/`Spiral`/`DisparityChords` — the
+    /// polygon/line-based styles with no `MetalShapeLayout`) rather than showing a blank canvas.
     @ViewBuilder
     private func canvas(for replay: ReplayEngine) -> some View {
         switch settings.rendererBackend {
@@ -91,9 +95,16 @@ public struct SortView: View {
                 ProgressView()
             }
         case .metal:
-            MetalRendererView(replay: replay)
-                .id(ObjectIdentifier(replay))
-                .accessibilityIdentifier("sortVisualizationCanvas")
+            if MetalRendererFactory.supportedVisualizerIDs.contains(settings.selectedVisualizerID) {
+                MetalRendererView(replay: replay, visualizerID: settings.selectedVisualizerID)
+                    .id(ObjectIdentifier(replay))
+                    .accessibilityIdentifier("sortVisualizationCanvas")
+            } else if let visualizer = VisualizerRegistry.shared.visualizer(id: settings.selectedVisualizerID) {
+                VisualizationCanvas(replay: replay, visualizer: visualizer)
+                    .accessibilityIdentifier("sortVisualizationCanvas")
+            } else {
+                ProgressView()
+            }
         }
     }
 

@@ -97,4 +97,18 @@ public final class AppSettings {
         store.set(synthNoteRange.lowerBound, forKey: Keys.synthLowNote)
         store.set(synthNoteRange.upperBound, forKey: Keys.synthHighNote)
     }
+
+    /// Advances `selectedVisualizerID` to the next entry in `VisualizerRegistry.shared.visualizers`
+    /// (that registry's own stable, app-composition-root-defined order), wrapping back to the
+    /// first after the last — a ring buffer, not a forward-only walk that stops at the end. If the
+    /// current ID isn't found there at all (registry not yet populated, or a stale/removed ID),
+    /// this lands on the first entry rather than doing nothing, same as it would for any other
+    /// "index not found" case feeding into the same wraparound arithmetic.
+    public func cycleVisualizer() {
+        let visualizers = VisualizerRegistry.shared.visualizers
+        guard !visualizers.isEmpty else { return }
+        let currentIndex = visualizers.firstIndex { $0.id == selectedVisualizerID } ?? -1
+        let nextIndex = (currentIndex + 1) % visualizers.count
+        selectedVisualizerID = visualizers[nextIndex].id
+    }
 }

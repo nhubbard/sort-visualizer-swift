@@ -1,26 +1,42 @@
 import MetalKit
 import SortEngineKit
 import SwiftUI
+import VisualizationKit
 
-/// Bridges `MetalBarRenderer` into SwiftUI. `.id(ObjectIdentifier(replay))` at the call site
-/// (`SortView.canvas(for:)`) matters: a new run needs a fresh `Coordinator`'s tracking state, not
-/// a stale one left over from a previous, possibly differently-sized run.
+/// Bridges whichever `MetalIncrementalRenderer` `MetalRendererFactory` builds for `visualizerID`
+/// into SwiftUI. `.id(ObjectIdentifier(replay))` at the call site (`SortView.canvas(for:)`)
+/// matters: a new run needs a fresh `Coordinator`'s tracking state, not a stale one left over from
+/// a previous, possibly differently-sized (or differently-styled) run.
 struct MetalRendererView: UIViewRepresentable {
     let replay: ReplayEngine
+    let visualizerID: VisualizerID
 
     func makeUIView(context: Context) -> MTKView {
         let view = MTKView()
         view.clearColor = MTLClearColor(red: 0, green: 0, blue: 0, alpha: 0)
         view.isOpaque = false
         view.layer.isOpaque = false
-        // Both already the documented defaults — explicit so "does MTKView even run its own
-        // draw loop" isn't one more thing to guess about while chasing the blank-screen bug.
-        view.isPaused = false
-        view.enableSetNeedsDisplay = false
-        guard let device = MTLCreateSystemDefaultDevice(), let renderer = MetalBarRenderer(device: device) else {
+        // `isPaused = true` + `enableSetNeedsDisplay = true` puts this view on the SAME clock as
+        // `ReplayEngine.onOperationApplied` (which explicitly calls `setNeedsDisplay()` below)
+        // instead of MTKView's own independent internal display-link loop, which redrew
+        // unconditionally every vsync — including every idle frame where the sort had produced
+        // nothing new. `VisualizationCanvas`'s `Canvas` already only redraws when `replay.frame`
+        // actually changes; this makes Metal match that instead of doing strictly more work.
+        view.isPaused = true
+        view.enableSetNeedsDisplay = true
+        guard let device = MTLCreateSystemDefaultDevice() else { return view }
+        view.device = device
+        // 4x MSAA (falling back to 1, no antialiasing, only if the device somehow can't support
+        // it) — smooths the hard-pixelated edges the GPU shapes would otherwise have, matching
+        // what `VisualizationCanvas`'s `Canvas` already antialiases for free. Must be set before
+        // building the renderer: its pipeline's `rasterSampleCount` has to match this exactly.
+        let sampleCount = MetalSampleCount.preferred(for: device)
+        view.sampleCount = sampleCount
+        guard
+            let renderer = MetalRendererFactory.makeRenderer(for: visualizerID, device: device, sampleCount: sampleCount)
+        else {
             return view
         }
-        view.device = device
         // Wire the Coordinator (which sets `renderer.onDrawableSizeChange`) BEFORE handing the
         // renderer to the view as its delegate — eliminates any chance of the view's very first
         // layout firing `drawableSizeWillChange` before anything is listening for it.
@@ -52,11 +68,11 @@ struct MetalRendererView: UIViewRepresentable {
         // this Coordinator retains either one — `weak` here would let both deallocate the instant
         // `makeUIView` returns, leaving `view.delegate` dangling and this whole renderer inert.
         private weak var replay: ReplayEngine?
-        private var renderer: MetalBarRenderer?
+        private var renderer: (any MetalIncrementalRenderer)?
         private var view: MTKView?
         private var trackedStepIndex = -1
 
-        func setUp(replay: ReplayEngine, renderer: MetalBarRenderer, view: MTKView) {
+        func setUp(replay: ReplayEngine, renderer: any MetalIncrementalRenderer, view: MTKView) {
             self.replay = replay
             self.renderer = renderer
             self.view = view
@@ -70,6 +86,27 @@ struct MetalRendererView: UIViewRepresentable {
                     markers: Self.markers(for: replay.frame)
                 )
                 self.trackedStepIndex += 1
+                // Multiple operations can land here within the same `CADisplayLink` tick (catch-up
+                // batching during fast playback) — `setNeedsDisplay()` just marks the view dirty,
+                // so N calls before the next vsync still coalesce into exactly one `draw(in:)`,
+                // matching `VisualizationCanvas`'s own "one redraw per tick, with the final state"
+                // behavior rather than drawing every intermediate step.
+                self.view?.setNeedsDisplay()
+
+                // The operation that reaches natural completion gets a forced, SYNCHRONOUS extra
+                // draw right here, on top of the routine `setNeedsDisplay()` above — a real,
+                // reported bug: a long monotonic run of single-index writes at the very end of
+                // playback (Counting Sort's final pass writes index 0, 1, 2, ... in order) could
+                // still be showing a stale tail of pre-final-write values on screen even though
+                // the instance buffer itself is already fully correct, until something unrelated
+                // (e.g. a sidebar toggle resizing the view) forced a fresh full redraw. Exactly one
+                // extra `view.draw()` per run, right at completion, costs nothing during normal
+                // fast playback and removes any dependency on `setNeedsDisplay()`'s coalesced,
+                // deferred scheduling actually landing one more time before nothing else ever
+                // prompts this view to redraw again.
+                if replay.stepIndex >= replay.totalOperationCount {
+                    self.view?.draw()
+                }
             }
 
             // The authoritative "you have a real size now" signal — see this callback's own doc
@@ -98,6 +135,7 @@ struct MetalRendererView: UIViewRepresentable {
                 canvasSize: canvasSize, scale: scale
             )
             trackedStepIndex = replay.stepIndex
+            view.setNeedsDisplay()
         }
 
         private static func valueRange(for values: [Int]) -> ClosedRange<Int> {

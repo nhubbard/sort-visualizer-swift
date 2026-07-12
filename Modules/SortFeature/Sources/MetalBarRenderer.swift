@@ -17,7 +17,7 @@ import SortEngineKit
 /// shader's NDC conversion has to agree — `reset`/`apply` take points + a scale factor (matching
 /// `IncrementalBarRenderer`'s shared contract) and convert internally.
 @MainActor
-final class MetalBarRenderer: NSObject, IncrementalBarRenderer, MTKViewDelegate {
+final class MetalBarRenderer: NSObject, MetalIncrementalRenderer {
     struct BarInstance {
         var origin: SIMD2<Float>
         var size: SIMD2<Float>
@@ -43,7 +43,13 @@ final class MetalBarRenderer: NSObject, IncrementalBarRenderer, MTKViewDelegate 
     /// happen given `BarRenderer.metal` ships in this same target, but defensively — the default
     /// library is missing the expected functions). Callers should fall back to a different
     /// backend rather than force-unwrap.
-    init?(device: MTLDevice) {
+    ///
+    /// `sampleCount` defaults to `1` (no MSAA) so existing tests driving `encodeDraw` against a
+    /// plain, non-multisampled offscreen texture keep working unchanged — a render pipeline's
+    /// `rasterSampleCount` must exactly match whatever render pass it's encoded into, or Metal
+    /// fails validation. `MetalRendererView` is the only caller that passes a real value, matching
+    /// whatever it set `MTKView.sampleCount` to.
+    init?(device: MTLDevice, sampleCount: Int = 1) {
         guard let queue = device.makeCommandQueue() else { return nil }
         // `device.makeDefaultLibrary()` (no bundle argument) looks for `default.metallib` in
         // `Bundle.main` — the HOST APP's bundle, not the caller's own. `BarRenderer.metal`
@@ -65,6 +71,7 @@ final class MetalBarRenderer: NSObject, IncrementalBarRenderer, MTKViewDelegate 
         descriptor.colorAttachments[0].isBlendingEnabled = true
         descriptor.colorAttachments[0].sourceRGBBlendFactor = .sourceAlpha
         descriptor.colorAttachments[0].destinationRGBBlendFactor = .oneMinusSourceAlpha
+        descriptor.rasterSampleCount = sampleCount
 
         guard let pipelineState = try? device.makeRenderPipelineState(descriptor: descriptor) else { return nil }
 
