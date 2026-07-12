@@ -262,7 +262,9 @@ struct RunControlBar: View {
             }
         } label: {
             Image(systemName: "gearshape.2.fill")
+              .foregroundStyle(Color.accentColor)
         }
+        .buttonStyle(.plain)
         .accessibilityIdentifier("runControlAutomatorButton")
         .accessibilityLabel("Automations")
         .help("Run a size-sweep or max-size automation")
