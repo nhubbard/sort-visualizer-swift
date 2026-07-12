@@ -1,26 +1,13 @@
 import Metal
 import VisualizationKit
 
-/// The single place that knows which `VisualizerID`s have a working incremental Metal path.
-/// `SortView.canvas(for:)` checks `supportedVisualizerIDs` (no device needed) to decide whether to
-/// mount `MetalRendererView` at all, falling back to `VisualizationCanvas` (Immediate) for anything
-/// not listed here — the .metal/.polygon/.line visualizers (`ColorCircle`, `DisparityCircle`,
-/// `Spiral`, `DisparityChords`) don't have a `MetalShapeLayout` yet.
+/// The single place that maps a `VisualizerID` to its concrete Metal renderer — every built-in
+/// `Visualizer` has one as of the wedge/chord batch (`MetalTriangleRenderer`/
+/// `MetalDisparityChordsRenderer`), so `makeRenderer` returning `nil` only happens for an unknown
+/// ID (never a current, registered one) — `MetalRendererView` still handles that case
+/// defensively rather than force-unwrapping.
 @MainActor
 enum MetalRendererFactory {
-    static let supportedVisualizerIDs: Set<VisualizerID> = [
-        VisualizerID(rawValue: "bargraph"),
-        VisualizerID(rawValue: "disparitybargraph"),
-        VisualizerID(rawValue: "pixelmesh"),
-        VisualizerID(rawValue: "rainbow"),
-        VisualizerID(rawValue: "sinewave"),
-        VisualizerID(rawValue: "disparitydots"),
-        VisualizerID(rawValue: "hoopstack"),
-        VisualizerID(rawValue: "scatterplot"),
-        VisualizerID(rawValue: "spiraldots"),
-        VisualizerID(rawValue: "wavedots"),
-    ]
-
     /// `sampleCount` must match whatever the caller set `MTKView.sampleCount` to — a render
     /// pipeline's `rasterSampleCount` has to agree exactly with the render pass it's encoded into.
     static func makeRenderer(
@@ -37,6 +24,10 @@ enum MetalRendererFactory {
         case "scatterplot": MetalShapeRenderer<ScatterPlotMetalLayout>(device: device, sampleCount: sampleCount)
         case "spiraldots": MetalShapeRenderer<SpiralDotsMetalLayout>(device: device, sampleCount: sampleCount)
         case "wavedots": MetalShapeRenderer<WaveDotsMetalLayout>(device: device, sampleCount: sampleCount)
+        case "colorcircle": MetalTriangleRenderer<ColorCircleMetalLayout>(device: device, sampleCount: sampleCount)
+        case "disparitycircle": MetalTriangleRenderer<DisparityCircleMetalLayout>(device: device, sampleCount: sampleCount)
+        case "spiral": MetalTriangleRenderer<SpiralMetalLayout>(device: device, sampleCount: sampleCount)
+        case "disparitychords": MetalDisparityChordsRenderer(device: device, sampleCount: sampleCount)
         default: nil
         }
     }

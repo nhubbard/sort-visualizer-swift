@@ -1,7 +1,6 @@
 import SettingsKit
 import SortEngineKit
 import SwiftUI
-import VisualizationKit
 
 public struct SortView: View {
     @Bindable var session: SortSession
@@ -75,37 +74,17 @@ public struct SortView: View {
         }
     }
 
-    /// `.id(ObjectIdentifier(replay))` on the `.metal` branch forces SwiftUI to treat each new run
-    /// as a genuinely new view — see `MetalRendererView`'s own doc comment for why its
-    /// `Coordinator` tracking needs that reset rather than carrying over stale bookkeeping from
-    /// whatever ran before. `.immediate` doesn't need it: `VisualizationCanvas` has no per-run
-    /// state of its own to reset.
+    /// `.id(ObjectIdentifier(replay))` forces SwiftUI to treat each new run as a genuinely new
+    /// view — see `MetalRendererView`'s own doc comment for why its `Coordinator` tracking needs
+    /// that reset rather than carrying over stale bookkeeping from whatever ran before.
     ///
-    /// `.metal` falls back to Immediate for any `Visualizer` `MetalRendererFactory` doesn't
-    /// support yet (`ColorCircle`/`DisparityCircle`/`Spiral`/`DisparityChords` — the
-    /// polygon/line-based styles with no `MetalShapeLayout`) rather than showing a blank canvas.
-    @ViewBuilder
+    /// Metal is the only renderer — every built-in `Visualizer` has a working
+    /// `MetalRendererFactory` path as of the wedge/chord batch (`MetalTriangleRenderer`/
+    /// `MetalDisparityChordsRenderer`), so there's no fallback branch left to take.
     private func canvas(for replay: ReplayEngine) -> some View {
-        switch settings.rendererBackend {
-        case .immediate:
-            if let visualizer = VisualizerRegistry.shared.visualizer(id: settings.selectedVisualizerID) {
-                VisualizationCanvas(replay: replay, visualizer: visualizer)
-                    .accessibilityIdentifier("sortVisualizationCanvas")
-            } else {
-                ProgressView()
-            }
-        case .metal:
-            if MetalRendererFactory.supportedVisualizerIDs.contains(settings.selectedVisualizerID) {
-                MetalRendererView(replay: replay, visualizerID: settings.selectedVisualizerID)
-                    .id(ObjectIdentifier(replay))
-                    .accessibilityIdentifier("sortVisualizationCanvas")
-            } else if let visualizer = VisualizerRegistry.shared.visualizer(id: settings.selectedVisualizerID) {
-                VisualizationCanvas(replay: replay, visualizer: visualizer)
-                    .accessibilityIdentifier("sortVisualizationCanvas")
-            } else {
-                ProgressView()
-            }
-        }
+        MetalRendererView(replay: replay, visualizerID: settings.selectedVisualizerID)
+            .id(ObjectIdentifier(replay))
+            .accessibilityIdentifier("sortVisualizationCanvas")
     }
 
     /// Machine-readable phase/correctness signal for UI tests — a `Canvas` has no discrete

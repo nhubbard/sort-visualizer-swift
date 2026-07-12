@@ -138,7 +138,7 @@ public final class ReplayEngine {
 
     /// A second, independent per-operation observer, orthogonal to `play(onStep:)`'s own
     /// parameter — set directly on whichever `ReplayEngine` instance a view currently holds
-    /// (views already get one, e.g. `VisualizationCanvas`), rather than threaded through
+    /// (views already get one, e.g. `MetalRendererView`), rather than threaded through
     /// `SortSession`'s audio-specific wiring. Exists so an incremental renderer can repaint just
     /// the touched positions without `SortEngineKit`/`SortSession` needing to know renderers
     /// exist at all — the same "engine stays unaware of who's listening" shape `onStep` itself
@@ -154,7 +154,7 @@ public final class ReplayEngine {
     /// replay is in progress and see the cadence change on the very next step.
     public var speed: Double = 30.0
 
-    /// So consumers (e.g. `VisualizationCanvas`, for `colorSeed`) can read tape metadata without
+    /// So consumers (e.g. Metal layouts, for `colorSeed`) can read tape metadata without
     /// `ReplayEngine` handing out the operations array itself.
     public var header: TapeHeader { tape.header }
     public var totalOperationCount: Int { tape.operations.count }

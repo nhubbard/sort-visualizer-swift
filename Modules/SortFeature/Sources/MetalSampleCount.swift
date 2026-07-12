@@ -9,9 +9,8 @@ import Metal
 /// textures keep working unchanged; only `MetalRendererView` opts into real antialiasing.
 enum MetalSampleCount {
     /// Highest MSAA sample count `device` actually supports, smoothing the hard-pixelated edges
-    /// `ShapeRenderer.metal`/`BarRenderer.metal` otherwise produce (no fragment-shader edge
-    /// falloff of their own) — matching, visually, what `VisualizationCanvas`'s `Canvas`/
-    /// `GraphicsContext` already antialiases for free.
+    /// `ShapeRenderer.metal`/`BarRenderer.metal`/`PolygonRenderer.metal` otherwise produce (none of
+    /// them do their own fragment-shader edge falloff).
     ///
     /// Tried in descending order rather than assuming one fixed value: Apple GPUs universally
     /// guarantee 1x/4x (the Metal Feature Set tables' only REQUIRED counts), but 8x — and even 2x —

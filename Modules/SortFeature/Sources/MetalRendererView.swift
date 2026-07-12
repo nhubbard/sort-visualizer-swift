@@ -20,15 +20,14 @@ struct MetalRendererView: UIViewRepresentable {
         // `ReplayEngine.onOperationApplied` (which explicitly calls `setNeedsDisplay()` below)
         // instead of MTKView's own independent internal display-link loop, which redrew
         // unconditionally every vsync — including every idle frame where the sort had produced
-        // nothing new. `VisualizationCanvas`'s `Canvas` already only redraws when `replay.frame`
-        // actually changes; this makes Metal match that instead of doing strictly more work.
+        // nothing new — so this only redraws when `replay.frame` actually changes, not strictly
+        // more than that.
         view.isPaused = true
         view.enableSetNeedsDisplay = true
         guard let device = MTLCreateSystemDefaultDevice() else { return view }
         view.device = device
-        // 4x MSAA (falling back to 1, no antialiasing, only if the device somehow can't support
-        // it) — smooths the hard-pixelated edges the GPU shapes would otherwise have, matching
-        // what `VisualizationCanvas`'s `Canvas` already antialiases for free. Must be set before
+        // The highest MSAA sample count this device actually supports (see `MetalSampleCount`) —
+        // smooths the hard-pixelated edges the GPU shapes would otherwise have. Must be set before
         // building the renderer: its pipeline's `rasterSampleCount` has to match this exactly.
         let sampleCount = MetalSampleCount.preferred(for: device)
         view.sampleCount = sampleCount
@@ -89,8 +88,8 @@ struct MetalRendererView: UIViewRepresentable {
                 // Multiple operations can land here within the same `CADisplayLink` tick (catch-up
                 // batching during fast playback) — `setNeedsDisplay()` just marks the view dirty,
                 // so N calls before the next vsync still coalesce into exactly one `draw(in:)`,
-                // matching `VisualizationCanvas`'s own "one redraw per tick, with the final state"
-                // behavior rather than drawing every intermediate step.
+                // one redraw per tick with the final state, rather than drawing every intermediate
+                // step.
                 self.view?.setNeedsDisplay()
 
                 // The operation that reaches natural completion gets a forced, SYNCHRONOUS extra

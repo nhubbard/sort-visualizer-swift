@@ -2,7 +2,7 @@ import AlgorithmKit
 import SortEngineKit
 import SwiftUI
 
-/// Docked below `VisualizationCanvas` via `.safeAreaInset(edge: .bottom)` — reserves real layout
+/// Docked below the sort visualization via `.safeAreaInset(edge: .bottom)` — reserves real layout
 /// space rather than floating on top of the visualization (v1's `TouchBarSlider`/`GroupBox`
 /// overlay obscured bars it sat over and didn't reserve any space at all). Modeled on a standard
 /// media-player transport: a thin scrub bar, a live stats caption, then a row of transport

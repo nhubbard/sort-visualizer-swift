@@ -1,14 +1,13 @@
 import CoreGraphics
 import SortEngineKit
 
-/// A bar-graph-specific incremental renderer — see `RendererBackendKind`'s own doc comment
-/// (`VisualizationKit`) for why this is scoped to one visualization style rather than going
-/// through the general `Visualizer` protocol: `Visualizer.draw(_:) -> [DrawCommand]` is a pure
-/// pull — "give me everything, every time" — with no way to say "only positions 3 and 7 changed
-/// since you last asked." Getting genuine per-operation incremental repainting means knowing the
-/// touched positions' on-screen geometry directly, which only this bar-graph-shaped conformance
-/// is taught (matching `BarGraphVisualizer`'s own layout math exactly, so switching to an
-/// incremental renderer looks the same on screen as switching to the "Bar Graph" style).
+/// A per-visualizer incremental renderer contract: `Visualizer.draw(_:) -> [DrawCommand]` is a
+/// pure pull — "give me everything, every time" — with no way to say "only positions 3 and 7
+/// changed since you last asked." Getting genuine per-operation incremental repainting means
+/// knowing the touched positions' on-screen geometry directly, which each conforming type is
+/// taught individually (matching its corresponding `Visualizer`'s own layout math exactly, so
+/// switching to an incremental renderer looks the same on screen as the pull-based style it
+/// replaced).
 ///
 /// Deliberately does NOT unify "how to get pixels on screen" — `MetalBarRenderer` draws directly
 /// to a drawable from `MTKView`'s own render callback, with nothing to hand back to a caller at

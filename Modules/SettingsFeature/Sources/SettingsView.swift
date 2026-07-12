@@ -74,23 +74,6 @@ public struct SettingsView: View {
                 .pickerStyle(.menu)
                 .accessibilityIdentifier("codeThemePicker")
             }
-            Section {
-                Picker("Renderer", selection: $settings.rendererBackend) {
-                    ForEach(RendererBackendKind.allCases) { kind in
-                        Text(kind.displayName).tag(kind)
-                    }
-                }
-                .pickerStyle(.menu)
-                .accessibilityIdentifier("rendererBackendPicker")
-            } header: {
-                Text("Renderer (Experimental)")
-            } footer: {
-                Text(
-                    "Metal repaints incrementally for most Visualizers; any without a GPU path "
-                        + "yet fall back to Immediate automatically. For comparing rendering cost "
-                        + "across array sizes, not for everyday use."
-                )
-            }
         }
         .navigationTitle("Settings")
     }
