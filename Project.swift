@@ -13,20 +13,6 @@ let modules: [Target] =
     Module.framework(name: "SortEngineKit") +
     Module.framework(name: "AlgorithmKit", dependencies: [.target(name: "SortEngineKit")]) +
     Module.framework(name: "VisualizationKit", dependencies: [.target(name: "SortEngineKit")]) +
-    Module.framework(
-        name: "ScriptingKit",
-        dependencies: [
-            .target(name: "AlgorithmKit"), .target(name: "VisualizationKit"),
-        ],
-        // Same real files the app bundles, referenced directly (no duplication) — lets
-        // ScriptingKitTests verify every bundled algorithm/shuffle actually sorts/shuffles
-        // correctly via ScriptAlgorithmLoader/ScriptShuffleLoader, the exact code path the real
-        // app uses, rather than a hand-picked sample.
-        testResources: [
-            .folderReference(path: "App/Resources/Algorithms"),
-            .folderReference(path: "App/Resources/Shuffles"),
-        ]
-    ) +
     Module.framework(name: "BuiltInAlgorithms", dependencies: [.target(name: "AlgorithmKit")]) +
     Module.framework(name: "BuiltInVisualizers", dependencies: [.target(name: "VisualizationKit")]) +
     Module.framework(name: "SettingsKit", dependencies: [.target(name: "VisualizationKit"), .target(name: "AlgorithmKit")]) +
@@ -91,7 +77,7 @@ let app = Target.target(
     sources: ["App/Sources/**"],
     resources: [
         .glob(pattern: "App/Resources/**", excluding: [
-            "App/Resources/Algorithms/**", "App/Resources/Shuffles/**", "App/Resources/AlgorithmDetails/**",
+            "App/Resources/AlgorithmDetails/**",
             // Already referenced directly via `entitlements:`/`CODE_SIGN_ENTITLEMENTS` below — left
             // in this glob too, Tuist warns it's being copied into the product as a plain resource.
             "App/Resources/SortSymphony.entitlements",
@@ -103,12 +89,7 @@ let app = Target.target(
             // referenced as its own `.folderReference` below instead.
             "App/Resources/AppIcon.icon/**",
         ]),
-        // Real folder references, not globs — the script loaders (§2.4/§2A.4) look up
-        // `Bundle.main.url(forResource:withExtension: nil)` expecting an actual subdirectory,
-        // which a glob of loose files wouldn't preserve. `AppIcon.icon` joins them for the
-        // unrelated reason explained in the exclusion comment above.
-        .folderReference(path: "App/Resources/Algorithms"),
-        .folderReference(path: "App/Resources/Shuffles"),
+        // Real folder reference, not a glob — see the exclusion comment above for why.
         .folderReference(path: "App/Resources/AppIcon.icon"),
     ],
     // AlgorithmDetails/ also holds the authoring pipeline (highlight.py, test.py, template/, ...)
@@ -128,12 +109,11 @@ let app = Target.target(
         // (AlgorithmRegistry/VisualizerRegistry), which has no visibility into either module
         // itself — both need to be referenced directly by the App target for that.
         .target(name: "BuiltInAlgorithms"), .target(name: "BuiltInVisualizers"),
-        // Composition-root registry wiring (AlgorithmKit's Algorithm/ShuffleRegistry,
-        // ScriptingKit's Script*Loader) needs both directly — neither is re-exported by any of the
-        // above. DesignSystemKit is needed directly too, for ContentView's CustomIconLabel sidebar
-        // rows (Phase 9) — SortFeature/SettingsFeature/HomeFeature all depend on it already, but
-        // don't re-export it.
-        .target(name: "AlgorithmKit"), .target(name: "ScriptingKit"), .target(name: "DesignSystemKit"),
+        // Composition-root registry wiring (AlgorithmKit's AlgorithmRegistry/ShuffleRegistry) needs
+        // it directly — it's not re-exported by any of the above. DesignSystemKit is needed
+        // directly too, for ContentView's CustomIconLabel sidebar rows (Phase 9) —
+        // SortFeature/SettingsFeature/HomeFeature all depend on it already, but don't re-export it.
+        .target(name: "AlgorithmKit"), .target(name: "DesignSystemKit"),
         .target(name: "SettingsKit"),
     ],
     settings: .settings(base: [

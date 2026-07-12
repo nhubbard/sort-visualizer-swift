@@ -13,21 +13,11 @@ private struct FakeShuffle: ShuffleAlgorithm {
 @Suite
 struct ShuffleRegistryTests {
     @Test
-    func discoverCombinesBuiltInsAndScriptLoader() {
+    func discoverPopulatesShufflesFromBuiltIns() {
         let registry = ShuffleRegistry()
         registry.builtIns = [FakeShuffle(id: ShuffleID(rawValue: "native"))]
-        registry.scriptLoader = { [FakeShuffle(id: ShuffleID(rawValue: "scripted"))] }
 
         #expect(registry.shuffles.isEmpty)
-        registry.discover()
-        #expect(registry.shuffles.map(\.id.rawValue) == ["native", "scripted"])
-    }
-
-    @Test
-    func discoverWithNoScriptLoaderYieldsBuiltInsAlone() {
-        let registry = ShuffleRegistry()
-        registry.builtIns = [FakeShuffle(id: ShuffleID(rawValue: "native"))]
-
         registry.discover()
         #expect(registry.shuffles.map(\.id.rawValue) == ["native"])
     }

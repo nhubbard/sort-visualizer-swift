@@ -21,21 +21,11 @@ private struct FakeAlgorithm: SortAlgorithm {
 @Suite
 struct AlgorithmRegistryTests {
     @Test
-    func discoverCombinesBuiltInsAndScriptLoader() {
+    func discoverPopulatesAlgorithmsFromBuiltIns() {
         let registry = AlgorithmRegistry()
         registry.builtIns = [FakeAlgorithm(id: AlgorithmID(rawValue: "native"))]
-        registry.scriptLoader = { [FakeAlgorithm(id: AlgorithmID(rawValue: "scripted"))] }
 
         #expect(registry.algorithms.isEmpty)
-        registry.discover()
-        #expect(registry.algorithms.map(\.id.rawValue) == ["native", "scripted"])
-    }
-
-    @Test
-    func discoverWithNoScriptLoaderYieldsBuiltInsAlone() {
-        let registry = AlgorithmRegistry()
-        registry.builtIns = [FakeAlgorithm(id: AlgorithmID(rawValue: "native"))]
-
         registry.discover()
         #expect(registry.algorithms.map(\.id.rawValue) == ["native"])
     }

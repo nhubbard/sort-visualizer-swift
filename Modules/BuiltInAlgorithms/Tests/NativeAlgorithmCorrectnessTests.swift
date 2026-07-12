@@ -3,8 +3,8 @@ import SortEngineKit
 import Testing
 @testable import BuiltInAlgorithms
 
-/// The native-Swift counterpart to `ScriptingKitTests`' `BundledContentCorrectnessTests` — same
-/// "record against real input, assert the result is sorted" shape, now covering every algorithm
+/// Same "record against real input, assert the result is sorted" shape the (now-removed)
+/// `ScriptingKit` JS backend's `BundledContentCorrectnessTests` used, now covering every algorithm
 /// that used to be a `.js`/`.manifest.json` pair before all 20 were ported to native Swift.
 @Suite
 struct NativeAlgorithmCorrectnessTests {

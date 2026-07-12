@@ -30,8 +30,7 @@ private final class ManualTickDriver: DisplayLinkDriving {
 }
 
 /// Bubble sort — mirrors `Legacy/.../BubbleSortImpl.swift`'s logic, duplicated here (rather than
-/// depending on `BuiltInAlgorithms`/`ScriptingKit`) so this test target only needs
-/// `AlgorithmKit`/`SortEngineKit`.
+/// depending on `BuiltInAlgorithms`) so this test target only needs `AlgorithmKit`/`SortEngineKit`.
 private struct FakeAlgorithm: SortAlgorithm {
     let id = AlgorithmID(rawValue: "fake")
     var sizeRange: ClosedRange<Int> = 1...512

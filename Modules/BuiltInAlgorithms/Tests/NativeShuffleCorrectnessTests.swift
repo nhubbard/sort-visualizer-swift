@@ -3,9 +3,9 @@ import SortEngineKit
 import Testing
 @testable import BuiltInAlgorithms
 
-/// The native counterpart to `ScriptingKitTests`' `BundledContentCorrectnessTests`'
-/// `everyBundledShuffleRunsWithoutCrashingAndPreservesArrayLength`, now covering every shuffle
-/// that used to be a `.js`/`.manifest.json` pair before all 5 were ported to native Swift.
+/// Covers every shuffle that used to be a `.js`/`.manifest.json` pair, back when the
+/// (now-removed) `ScriptingKit` JS backend's `BundledContentCorrectnessTests` verified them, before
+/// all 5 were ported to native Swift.
 @Suite
 struct NativeShuffleCorrectnessTests {
     private static let shuffles: [any ShuffleAlgorithm] = [

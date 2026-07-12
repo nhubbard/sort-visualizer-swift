@@ -2,7 +2,6 @@ import AlgorithmKit
 import BuiltInAlgorithms
 import BuiltInVisualizers
 import Foundation
-import ScriptingKit
 import SettingsKit
 import SortFeature
 import SwiftUI
@@ -24,13 +23,9 @@ struct Sort2App: App {
         ]
         VisualizerRegistry.shared.discover()
 
-        // Native Swift is the target for every algorithm now — JavaScriptCore only gets an
-        // interpreter (no JIT) in an ordinary app, which is slow enough in practice that JS is
-        // reserved for prototyping a brand-new algorithm before it's ported here and its script
-        // retired. `App/Resources/Algorithms/` is empty until the next one is being proven out;
-        // `scriptLoader` stays wired so dropping a `.js` + manifest there still works without a
-        // recompile, exactly as before. Shuffles followed the same path as of the native shuffle
-        // port batch — `App/Resources/Shuffles/` is empty for the same reason.
+        // Native Swift is the target for every algorithm and shuffle now — the JavaScriptCore
+        // scripting backend (ScriptingKit) was removed entirely after it turned out to reference a
+        // private API (`JSContextGroupSetExecutionTimeLimit`), which blocked App Store submission.
         AlgorithmRegistry.shared.builtIns = [
             BadSort(), BaseNMaxHeapSort(), BinaryDoubleInsertionSort(), BinaryGnomeSort(),
             BinaryInsertionSort(), BinaryMergeSort(), BingoSort(), BitonicSortIterative(),
@@ -54,9 +49,6 @@ struct Sort2App: App {
             ThreeSmoothCombSortRecursive(), TriangularHeapSort(), UnoptimizedBubbleSort(),
             UnoptimizedCocktailShakerSort(), WeavedMergeSort(), WeaveMergeSort()
         ]
-        AlgorithmRegistry.shared.scriptLoader = {
-            ScriptAlgorithmLoader.loadScripts(from: Bundle.main.url(forResource: "Algorithms", withExtension: nil)!)
-        }
         AlgorithmRegistry.shared.discover()
 
         ShuffleRegistry.shared.builtIns = [
@@ -70,9 +62,6 @@ struct Sort2App: App {
             ShuffledCubicShuffle(), ShuffledHalfShuffle(), ShuffledHeadShuffle(), ShuffledOddsShuffle(),
             ShuffledQuinticShuffle(), ShuffledTailShuffle(), SierpinskiShuffle(), TriangularShuffle()
         ]
-        ShuffleRegistry.shared.scriptLoader = {
-            ScriptShuffleLoader.loadScripts(from: Bundle.main.url(forResource: "Shuffles", withExtension: nil)!)
-        }
         ShuffleRegistry.shared.discover()
 
         // The two automations formerly hardcoded as `SortSession.toggleAutomation()`/

@@ -422,6 +422,11 @@ git commit -m "Phase 2: AlgorithmKit + native Quick Sort proof of concept"
 
 ## Phase 3 — `ScriptingKit`: prove the JS path before porting anything else
 
+> **`ScriptingKit` has since been removed.** It bound a private JavaScriptCore symbol
+> (`JSContextGroupSetExecutionTimeLimit`) that App Store validation flagged and blocked TestFlight
+> submission over; by then everything it loaded had already been ported to native Swift, so the
+> whole module was deleted rather than reworked. This phase is kept as historical record.
+
 **Goal:** `JSRecordingEngineBridge`/`JSAlgorithmAdapter`/manifest decoding/execution-time watchdog
 (§2.2, §2.3) exist; **Bubble Sort**, authored as `.js` + manifest, produces a tape and is verified
 against a hand-written native reference. This is the phase that proves "everything is scripted"

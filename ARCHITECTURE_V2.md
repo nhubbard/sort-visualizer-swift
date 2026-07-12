@@ -322,6 +322,14 @@ features:
 
 ## 2. Modular, scriptable algorithms (JavaScriptCore plugin system)
 
+> **Removed.** `ScriptingKit` (and the `App/Resources/Algorithms`/`Shuffles` script drop-in
+> mechanism it enabled) was deleted after App Store validation rejected a TestFlight build for
+> referencing a private API, `_JSContextGroupSetExecutionTimeLimit` (bound in
+> `ExecutionTimeLimit.swift` via `@_silgen_name`, §2.2). By that point every algorithm and shuffle
+> had already been ported to native Swift (§2.6, revised) and the JS path was unused in the
+> shipping app, so it was deleted outright rather than patched. The rest of this section is kept as
+> historical design record, not a description of current code.
+
 This directly replaces the abandoned NSObject/`NSClassFromString`/`INFOPLIST_KEY_NSPrincipalClass`
 bundle-plugin approach hinted at in `xcconfigs/QuickSortPlugin.xcconfig` (never implemented) and
 the one-Tuist-framework-per-algorithm idea in `Project.swift` (also never populated). Both were

@@ -18,9 +18,11 @@ logic ported to `BuiltInAlgorithms`) once it's confirmed correct. Shuffles follo
 as of the native shuffle port batch — see §2's preamble. Visualizations remain native-only
 (`Modules/BuiltInVisualizers/Sources/<Name>.swift`), unchanged.
 
-The eventual goal is to retire the JS bridge (`ScriptingKit`'s `JSAlgorithmAdapter`/`ScriptRunner`/
-`JSRecordingEngineBridge`) entirely, once new-algorithm prototyping in JS is no longer a live
-workflow — not yet, while there's still a large unported backlog below.
+**Update:** the JS bridge (`ScriptingKit`'s `JSAlgorithmAdapter`/`ScriptRunner`/
+`JSRecordingEngineBridge`) has been removed entirely — it bound a private JavaScriptCore symbol
+that blocked App Store submission. Every algorithm/shuffle it ever loaded had already been ported
+to native Swift by that point, so there's no more JS-prototyping stage for new content; new
+algorithms/shuffles go straight to native `BuiltInAlgorithms` conformances.
 
 ## 1. Sorting algorithms
 
