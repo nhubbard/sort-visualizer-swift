@@ -39,12 +39,19 @@ struct MetalRendererView: UIViewRepresentable {
         // Wire the Coordinator (which sets `renderer.onDrawableSizeChange`) BEFORE handing the
         // renderer to the view as its delegate — eliminates any chance of the view's very first
         // layout firing `drawableSizeWillChange` before anything is listening for it.
-        context.coordinator.setUp(replay: replay, renderer: renderer, view: view)
+        context.coordinator.setUp(replay: replay, renderer: renderer, view: view, visualizerID: visualizerID)
         view.delegate = renderer
         return view
     }
 
     func updateUIView(_ view: MTKView, context: Context) {
+        // `.id(ObjectIdentifier(replay))` at the call site only forces a fresh view (and thus a
+        // fresh `makeUIView`) for a genuinely NEW run — switching visualizers mid-sort (⌘⇧V, or
+        // the Settings picker) keeps the SAME `replay`, so this is the only place that ever learns
+        // about it. Must run before `reconcileStepIndexIfNeeded()`: that call is a no-op unless
+        // `stepIndex` itself moved, which switching visualizers alone doesn't change, but the new
+        // renderer's buffer still needs its own first full seed.
+        context.coordinator.switchVisualizerIfNeeded(to: visualizerID, view: view)
         // Catches a scrub/seek (`stepIndex` changing without `onOperationApplied` ever firing,
         // by `ReplayEngine`'s own design) — normal incremental playback is a no-op here, since
         // `trackedStepIndex` already matches by the time this runs. Resize is handled separately,
@@ -70,11 +77,13 @@ struct MetalRendererView: UIViewRepresentable {
         private var renderer: (any MetalIncrementalRenderer)?
         private var view: MTKView?
         private var trackedStepIndex = -1
+        private var visualizerID: VisualizerID?
 
-        func setUp(replay: ReplayEngine, renderer: any MetalIncrementalRenderer, view: MTKView) {
+        func setUp(replay: ReplayEngine, renderer: any MetalIncrementalRenderer, view: MTKView, visualizerID: VisualizerID) {
             self.replay = replay
             self.renderer = renderer
             self.view = view
+            self.visualizerID = visualizerID
             trackedStepIndex = -1
 
             replay.onOperationApplied = { [weak self, weak replay, weak renderer] operation in
@@ -117,9 +126,37 @@ struct MetalRendererView: UIViewRepresentable {
             }
         }
 
+        /// Rebuilds the renderer when `visualizerID` changed since `setUp`/the last switch — the
+        /// only place this can happen, since `.id(ObjectIdentifier(replay))` at the call site keeps
+        /// this same `Coordinator`/`MTKView` alive across a mid-sort visualizer change (only a
+        /// genuinely new `replay` tears them down). Reuses `view.device`/`view.sampleCount` (both
+        /// already set once in `makeUIView`) so the new pipeline's `rasterSampleCount` still
+        /// matches what this view actually renders into.
+        func switchVisualizerIfNeeded(to newVisualizerID: VisualizerID, view: MTKView) {
+            guard
+                newVisualizerID != visualizerID, let replay, let device = view.device,
+                let newRenderer = MetalRendererFactory.makeRenderer(
+                    for: newVisualizerID, device: device, sampleCount: view.sampleCount)
+            else { return }
+
+            setUp(replay: replay, renderer: newRenderer, view: view, visualizerID: newVisualizerID)
+            view.delegate = newRenderer
+            // `onDrawableSizeChange` won't fire again on its own here — that callback only fires
+            // on a REAL drawable-size change, and swapping the delegate isn't one. The new
+            // renderer's buffer starts out empty otherwise, so this is the only seed it gets.
+            reconcile(pixelSize: view.drawableSize)
+        }
+
         func reconcileStepIndexIfNeeded() {
             guard let replay, replay.stepIndex != trackedStepIndex, let view else { return }
             reconcile(pixelSize: view.drawableSize)
+        }
+
+        /// Test seam: lets a test verify a mid-sort visualizer switch actually rebuilt the
+        /// renderer (a genuinely different instance, freshly seeded) rather than just updating
+        /// bookkeeping with nothing behind it.
+        func debugState() -> (visualizerID: VisualizerID?, renderer: (any MetalIncrementalRenderer)?) {
+            (visualizerID, renderer)
         }
 
         private func reconcile(pixelSize: CGSize) {
