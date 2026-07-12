@@ -82,6 +82,17 @@ struct Sort2App: App {
            let overrideSize = Int(overrideValue) {
             AppSettings.shared.defaultArraySize = overrideSize
         }
+
+        // Same rationale, for `playbackSpeed`: a UI test asserting an exact seeded speed value
+        // needs to SET that value exactly, not approximate it via `XCUIElement.adjust(
+        // toNormalizedSliderPosition:)`'s coordinate-based drag gesture, which lands at a
+        // different actual value nearly every run (a real, observed source of test flakiness —
+        // not a hypothetical one). This mutates the same `UserDefaults.standard`-backed setting a
+        // real Settings-screen drag would, just precisely and deterministically.
+        if let overrideValue = ProcessInfo.processInfo.environment["UI_TEST_PLAYBACK_SPEED"],
+           let overrideSpeed = Double(overrideValue) {
+            AppSettings.shared.playbackSpeed = overrideSpeed
+        }
     }
 
     var body: some Scene {
