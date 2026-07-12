@@ -1,6 +1,12 @@
 #!/bin/bash
 set -e
-curl https://mise.run | sh
+
+mise_installer="$(mktemp)"
+curl --fail --silent --show-error --location \
+  --retry 5 --retry-all-errors --retry-delay 5 --retry-connrefused \
+  https://mise.run -o "$mise_installer"
+sh "$mise_installer"
+rm -f "$mise_installer"
 export PATH="$HOME/.local/bin:$PATH"
 
 mise install # Installs the tools in mise.toml
