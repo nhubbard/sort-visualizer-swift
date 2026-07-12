@@ -3,7 +3,6 @@ import DesignSystemKit
 import HomeFeature
 import SettingsFeature
 import SettingsKit
-import ShowcaseFeature
 import SortFeature
 import SwiftUI
 
@@ -14,11 +13,18 @@ import SwiftUI
 struct ContentView: View {
     @State private var selection: AlgorithmID?
     @State private var isShowingSettings = false
-    @State private var isShowingShowcase = false
     // Session-only (not AppSettings-backed): every category starts expanded on each launch, so
     // the existing `algorithmLink.<id>` UI tests (which tap straight into the sidebar with no
     // "expand first" step) keep working unmodified.
     @State private var collapsedCategories: Set<AlgorithmCategory> = []
+
+    // Showcase mode: `nil` means idle. Running drives `selection` through every registered
+    // algorithm in turn via the exact same sidebar-navigation path a manual tap would — see
+    // `ScrollingSortView`'s `showcaseCompletion` — rather than a separate `SortSession` bypassing
+    // what's actually on screen (the bug this replaced).
+    @State private var showcaseIndex: Int?
+    @State private var showcaseAlgorithmIDs: [AlgorithmID] = []
+    @State private var isShowingShowcaseConfirmation = false
 
     var body: some View {
         NavigationSplitView {
@@ -48,6 +54,9 @@ struct ContentView: View {
                     }
                 }
             }
+            // Blocks manual navigation while Showcase drives `selection` itself — otherwise a
+            // stray tap here would race the automated advance below.
+            .disabled(showcaseIndex != nil)
             .navigationTitle("Sort Symphony v2")
             // Attached to the sidebar column specifically — a `.toolbar` on the NavigationSplitView
             // itself never actually renders a button in this SwiftUI version, so Settings needs a
@@ -55,12 +64,7 @@ struct ContentView: View {
             // (not per-detail-view) so it's reachable from Home as well as from a running sort.
             .toolbar {
                 ToolbarItem(placement: .primaryAction) {
-                    Button {
-                        isShowingShowcase = true
-                    } label: {
-                        Image(systemName: "sparkles.tv.fill")
-                    }
-                    .accessibilityIdentifier("showcaseButton")
+                    showcaseToolbarButton
                 }
                 ToolbarItem(placement: .primaryAction) {
                     Button {
@@ -70,6 +74,17 @@ struct ContentView: View {
                     }
                     .accessibilityIdentifier("settingsButton")
                 }
+            }
+            .confirmationDialog(
+                "Start Showcase?", isPresented: $isShowingShowcaseConfirmation, titleVisibility: .visible
+            ) {
+                Button("Start Showcase") { startShowcase() }
+                    .accessibilityIdentifier("showcaseConfirmButton")
+            } message: {
+                Text("""
+                Runs every algorithm once, in order, with the current visualizer. The visualizer \
+                can still be changed with ⌘⇧V, but other controls are locked until it finishes.
+                """)
             }
             .background {
                 // Zero-size, fully transparent — same invisible-button-in-`.background` pattern
@@ -82,12 +97,7 @@ struct ContentView: View {
                     .accessibilityHidden(true)
             }
         } detail: {
-            if let selection, let algorithm = AlgorithmRegistry.shared.algorithm(id: selection) {
-                ScrollingSortView(algorithm: algorithm, shuffle: defaultShuffle, arraySize: arraySize)
-                    .id(selection)
-            } else {
-                HomeView()
-            }
+            detailContent
         }
         .sheet(isPresented: $isShowingSettings) {
             NavigationStack {
@@ -104,22 +114,106 @@ struct ContentView: View {
                     }
             }
         }
-        .sheet(isPresented: $isShowingShowcase) {
-            NavigationStack {
-                ShowcaseView()
-                    .toolbar {
-                        ToolbarItem(placement: .cancellationAction) {
-                            Button {
-                                isShowingShowcase = false
-                            } label: {
-                                Text("Done").fixedSize(horizontal: true, vertical: false)
-                            }
-                            .frame(width: 48)
-                            .buttonSizing(.flexible)
-                        }
-                    }
+    }
+
+    // Split out of `body` (along with `detailContent` below) — inlined, these pushed the
+    // surrounding `ViewBuilder` expression complex enough that the type checker started timing
+    // out and misattributing the resulting error to an unrelated, unchanged line.
+    private var showcaseToolbarButton: some View {
+        Button {
+            if showcaseIndex == nil {
+                isShowingShowcaseConfirmation = true
+            } else {
+                stopShowcase()
+            }
+        } label: {
+            Image(systemName: showcaseIndex == nil ? "sparkles.tv.fill" : "stop.fill")
+        }
+        .accessibilityIdentifier("showcaseButton")
+    }
+
+    private var showcaseCompletionHandler: (() -> Void)? {
+        guard showcaseIndex != nil else { return nil }
+        return advanceShowcase
+    }
+
+    private var detailContent: some View {
+        Group {
+            if let selection, let algorithm = AlgorithmRegistry.shared.algorithm(id: selection) {
+                ScrollingSortView(
+                    algorithm: algorithm, shuffle: defaultShuffle, arraySize: arraySize,
+                    showcaseCompletion: showcaseCompletionHandler
+                )
+                .id(selection)
+            } else {
+                HomeView()
             }
         }
+        .safeAreaInset(edge: .top) {
+            if showcaseIndex != nil {
+                showcaseBanner
+            }
+        }
+    }
+
+    private var showcaseBanner: some View {
+        HStack(spacing: 8) {
+            ProgressView()
+                .controlSize(.small)
+            Text(showcaseProgressText)
+                .font(.caption)
+                .accessibilityIdentifier("showcaseProgressLabel")
+            Spacer()
+        }
+        .padding(.horizontal)
+        .padding(.vertical, 6)
+        .background(.bar)
+    }
+
+    private var showcaseProgressText: String {
+        guard let showcaseIndex,
+            let algorithm = AlgorithmRegistry.shared.algorithm(id: showcaseAlgorithmIDs[showcaseIndex])
+        else {
+            return "Showcase"
+        }
+        return "Showcase: \(algorithm.metadata.displayName) (\(showcaseIndex + 1)/\(showcaseAlgorithmIDs.count))"
+    }
+
+    /// Same order the sidebar itself uses (`AlgorithmRegistry.shared.algorithms(in:)` sorts by
+    /// `displayName` too) — alphabetical, not registration order.
+    private func startShowcase() {
+        showcaseAlgorithmIDs = AlgorithmRegistry.shared.algorithms
+            .sorted { $0.metadata.displayName < $1.metadata.displayName }
+            .map(\.id)
+        guard !showcaseAlgorithmIDs.isEmpty else { return }
+        showcaseIndex = 0
+        selection = showcaseAlgorithmIDs[0]
+    }
+
+    /// `ScrollingSortView`'s `showcaseCompletion` callback — called once its current algorithm's
+    /// `runShowcasePass()` genuinely finishes. Moves `selection` to the next algorithm, which (via
+    /// `.id(selection)` above) tears down the finished view and starts the next one fresh; past the
+    /// last algorithm, ends the same way `stopShowcase()` does.
+    private func advanceShowcase() {
+        guard let showcaseIndex else { return }
+        let nextIndex = showcaseIndex + 1
+        guard nextIndex < showcaseAlgorithmIDs.count else {
+            stopShowcase()
+            return
+        }
+        self.showcaseIndex = nextIndex
+        selection = showcaseAlgorithmIDs[nextIndex]
+    }
+
+    /// Also the target of a mid-run Stop tap. Clearing `selection` (not leaving it on the
+    /// last-shown algorithm) is deliberate: it's what actually changes `ScrollingSortView`'s
+    /// `.id(selection)`, which is what tears the view down and cancels its in-flight
+    /// `runShowcasePass()` — SwiftUI's `.task` only restarts on identity change, not on a plain
+    /// property change, so anything short of this risks a pass that keeps running invisibly after
+    /// Stop is tapped.
+    private func stopShowcase() {
+        showcaseIndex = nil
+        selection = nil
     }
 
     /// UI tests override this via the `UI_TEST_ARRAY_SIZE` launch environment variable (read in

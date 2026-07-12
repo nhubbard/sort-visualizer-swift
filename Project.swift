@@ -57,9 +57,6 @@ let modules: [Target] =
     ]) +
     Module.framework(name: "HomeFeature", dependencies: [
         .target(name: "DesignSystemKit"), .external(name: "MarkdownUI"),
-    ]) +
-    Module.framework(name: "ShowcaseFeature", dependencies: [
-        .target(name: "SortFeature"), .target(name: "AlgorithmKit"),
     ])
 
 let app = Target.target(
@@ -114,7 +111,7 @@ let app = Target.target(
     entitlements: .file(path: "App/Resources/SortSymphony.entitlements"),
     dependencies: [
         .target(name: "SortFeature"), .target(name: "SettingsFeature"),
-        .target(name: "HomeFeature"), .target(name: "ShowcaseFeature"),
+        .target(name: "HomeFeature"),
         .target(name: "MathRenderingKit"),
         // Sort2App wires each module's concrete conformances into its registry
         // (AlgorithmRegistry/VisualizerRegistry), which has no visibility into either module
@@ -140,8 +137,9 @@ let app = Target.target(
         // target, which silently overrides DEVELOPMENT_TEAM for Mac Catalyst specifically (it
         // builds against the macosx SDK) and breaks entitlements requiring a real certificate
         // (CloudKit, aps-environment). Override back to a real identity, matching the shipping
-        // v1 project's explicit setting.
-        "CODE_SIGN_IDENTITY": "Apple Development",
+        // v1 project's explicit setting. Scoped to macosx only — an unscoped override here would
+        // also pin iphoneos builds to "Apple Development", blocking Automatic signing from
+        // switching to an Apple Distribution identity for App Store archives.
         "CODE_SIGN_IDENTITY[sdk=macosx*]": "Apple Development",
         "ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS": "YES",
         "ENABLE_USER_SCRIPT_SANDBOXING": "YES",

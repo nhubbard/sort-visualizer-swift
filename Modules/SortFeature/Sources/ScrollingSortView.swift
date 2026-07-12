@@ -6,13 +6,26 @@ import SwiftUI
 public struct ScrollingSortView: View {
     let algorithm: any SortAlgorithm
     let arraySize: Int
+    /// Non-`nil` when this instance is one step of Showcase mode (`ContentView`) rather than a
+    /// normal manually-selected algorithm screen — swaps `.task` from a plain `start(size:)` to
+    /// `session.runShowcasePass()` (locking `RunControlBar` via `isAutomating`, same as any other
+    /// automation) and reports back when that pass finishes so `ContentView` can advance to the
+    /// next algorithm. Guarded by `!Task.isCancelled` at the call site below: `ContentView` stops
+    /// Showcase by changing `selection`, which (via this view's `.id(selection)` at its call site)
+    /// tears this view down and cancels its `.task` — without that guard, a run already finishing
+    /// at the exact moment Stop is tapped could still fire "advance to the next algorithm" once.
+    let showcaseCompletion: (() -> Void)?
     @State private var session: SortSession
     @Environment(AppSettings.self) private var settings
 
     @MainActor
-    public init(algorithm: any SortAlgorithm, shuffle: any ShuffleAlgorithm, arraySize: Int = 48) {
+    public init(
+        algorithm: any SortAlgorithm, shuffle: any ShuffleAlgorithm, arraySize: Int = 48,
+        showcaseCompletion: (() -> Void)? = nil
+    ) {
         self.algorithm = algorithm
         self.arraySize = arraySize
+        self.showcaseCompletion = showcaseCompletion
         // AudioService.shared, for real: this used to default to NoOpAudioService() because
         // constructing a live AudioKit graph crashed in this project's toolchain/simulator
         // combination at native AudioComponent registration, a crash Swift couldn't catch (a C++
@@ -41,9 +54,14 @@ public struct ScrollingSortView: View {
         }
         .navigationTitle(algorithm.metadata.displayName)
         .task {
-            // SortSession.start(size:) clamps into algorithm.metadata.sizeRange itself, so
-            // every caller gets that enforcement, not just this one.
-            await session.start(size: arraySize)
+            if let showcaseCompletion {
+                await session.runShowcasePass()
+                if !Task.isCancelled { showcaseCompletion() }
+            } else {
+                // SortSession.start(size:) clamps into algorithm.metadata.sizeRange itself, so
+                // every caller gets that enforcement, not just this one.
+                await session.start(size: arraySize)
+            }
         }
         .background {
             // Zero-size, fully transparent — these buttons exist only to give ⌘⇧A/⌘⌥⇧A/⌘⇧V
