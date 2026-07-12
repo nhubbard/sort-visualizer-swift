@@ -14,7 +14,7 @@ final class VisualizerSwitchingUITests: XCTestCase {
         app.launchEnvironment = ["UI_TEST_ARRAY_SIZE": "24"]
         app.launch()
 
-        app.buttons["algorithmLink.quicksort"].tap()
+        app.tapSidebarLink("algorithmLink.quicksort")
 
         let canvas = app.descendants(matching: .any).matching(identifier: "sortVisualizationCanvas").firstMatch
         XCTAssertTrue(canvas.waitForExistence(timeout: 5), "canvas never appeared")
@@ -25,6 +25,11 @@ final class VisualizerSwitchingUITests: XCTestCase {
         let settingsButton = app.buttons["settingsButton"]
         XCTAssertTrue(settingsButton.waitForExistence(timeout: 5), "settings button never appeared")
         settingsButton.tap()
+
+        // `.pickerStyle(.menu)` only exposes its options as accessibility elements once its menu
+        // is actually open — tapping the picker itself first (by its own identifier) is required
+        // before "Rainbow" (or any other option) exists anywhere in the tree to find.
+        app.buttons["visualizerPicker"].tap()
 
         let rainbowOption = app.descendants(matching: .any)
             .matching(NSPredicate(format: "label == %@", "Rainbow"))

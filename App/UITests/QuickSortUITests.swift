@@ -19,7 +19,7 @@ final class QuickSortUITests: XCTestCase {
         app.launchEnvironment = ["UI_TEST_ARRAY_SIZE": "24"]
         app.launch()
 
-        let sidebarLink = app.buttons["algorithmLink.quicksort"]
+        let sidebarLink = app.revealSidebarLink("algorithmLink.quicksort")
         XCTAssertTrue(sidebarLink.waitForExistence(timeout: 5), "Quick Sort sidebar link never appeared")
         sidebarLink.tap()
 
@@ -67,9 +67,12 @@ final class QuickSortUITests: XCTestCase {
 
         XCTAssertTrue(app.navigationBars["Sort Symphony v2"].waitForExistence(timeout: 5))
         // Proves Phase 9's actual claim: the sidebar is generated from AlgorithmRegistry, not a
-        // hand-maintained list — Quick Sort (Logarithmic) and Bubble Sort (Quadratic) both being
-        // present confirms category sectioning works, not just a single flat list.
-        XCTAssertTrue(app.buttons["algorithmLink.quicksort"].exists)
-        XCTAssertTrue(app.buttons["algorithmLink.bubblesort"].exists)
+        // hand-maintained list — Quick Sort (.quick) and Bubble Sort (.exchange) both being
+        // present confirms category sectioning works, not just a single flat list. Checked nearer
+        // (`.exchange`, 3rd category) before farther (`.quick`, 9th) — scrolling for the farther
+        // one afterward can recycle the nearer one's now-scrolled-past cell right back out of the
+        // accessibility tree, so this order avoids re-finding it a second time.
+        XCTAssertTrue(app.revealSidebarLink("algorithmLink.bubblesort").exists)
+        XCTAssertTrue(app.revealSidebarLink("algorithmLink.quicksort").exists)
     }
 }

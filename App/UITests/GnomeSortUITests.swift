@@ -16,7 +16,7 @@ final class GnomeSortUITests: XCTestCase {
         app.launchEnvironment = ["UI_TEST_ARRAY_SIZE": "24"]
         app.launch()
 
-        let sidebarLink = app.buttons["algorithmLink.gnomesort"]
+        let sidebarLink = app.revealSidebarLink("algorithmLink.gnomesort")
         XCTAssertTrue(sidebarLink.waitForExistence(timeout: 5), "Gnome Sort sidebar link never appeared")
         sidebarLink.tap()
 

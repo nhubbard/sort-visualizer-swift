@@ -14,7 +14,7 @@ final class RunControlBarUITests: XCTestCase {
         app.launchEnvironment = ["UI_TEST_ARRAY_SIZE": "24"]
         app.launch()
 
-        app.buttons["algorithmLink.quicksort"].tap()
+        app.tapSidebarLink("algorithmLink.quicksort")
 
         let canvas = app.descendants(matching: .any).matching(identifier: "sortVisualizationCanvas").firstMatch
         XCTAssertTrue(canvas.waitForExistence(timeout: 5), "visualization canvas never appeared")
@@ -80,7 +80,7 @@ final class RunControlBarUITests: XCTestCase {
         app.launchEnvironment = ["UI_TEST_ARRAY_SIZE": "24"]
         app.launch()
 
-        app.buttons["algorithmLink.quicksort"].tap()
+        app.tapSidebarLink("algorithmLink.quicksort")
 
         let playPauseButton = app.buttons["runControlPlayPauseButton"]
         XCTAssertTrue(playPauseButton.waitForExistence(timeout: 5), "run control bar never appeared")
@@ -135,7 +135,7 @@ final class RunControlBarUITests: XCTestCase {
         app.launchEnvironment = ["UI_TEST_ARRAY_SIZE": "24"]
         app.launch()
 
-        app.buttons["algorithmLink.quicksort"].tap()
+        app.tapSidebarLink("algorithmLink.quicksort")
 
         let speedButton = app.buttons["runControlSpeedButton"]
         XCTAssertTrue(speedButton.waitForExistence(timeout: 5))

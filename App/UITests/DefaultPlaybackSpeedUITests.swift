@@ -33,7 +33,7 @@ final class DefaultPlaybackSpeedUITests: XCTestCase {
             "dragging to the slider's maximum should land near 200, not close to the old default")
         app.buttons["Done"].tap()
 
-        app.buttons["algorithmLink.quicksort"].tap()
+        app.tapSidebarLink("algorithmLink.quicksort")
         let speedButton = app.buttons["runControlSpeedButton"]
         XCTAssertTrue(speedButton.waitForExistence(timeout: 5))
         speedButton.tap() // expands the inline speed row
