@@ -76,6 +76,8 @@ let app = Target.target(
         "UIApplicationSceneManifest": [
             "UIApplicationSupportsMultipleScenes": false,
         ],
+        "CFBundleShortVersionString": "$(MARKETING_VERSION)",
+        "CFBundleVersion": "$(CURRENT_PROJECT_VERSION)"
     ]),
     sources: ["App/Sources/**"],
     resources: [
