@@ -1,6 +1,7 @@
 import Foundation
 import Metal
 import MetalKit
+import QuartzCore
 import SortEngineKit
 
 /// GPU-buffer layout, matched exactly to `PolygonRenderer.metal`'s `LineInstance` struct.
@@ -28,6 +29,22 @@ final class MetalDisparityChordsRenderer: NSObject, MetalIncrementalRenderer {
     private var lastCanvasSize: CGSize = .zero
     private var lastScale: CGFloat = 1
     private var pixelSize: CGSize = .zero
+
+    private let colorTransitions = MetalColorTransitionTracker()
+    private let startTransitions = MetalTransitionTracker<SIMD2<Float>>()
+    private let endTransitions = MetalTransitionTracker<SIMD2<Float>>()
+    /// See `MetalIncrementalRenderer.reduceFlashingEnabled`'s doc comment. `thickness` is never
+    /// eased — it's `Self.lineWidth * lastScale`, a per-renderer constant that never varies per
+    /// index, so there's nothing for a tracker to smooth.
+    var reduceFlashingEnabled = false {
+        didSet {
+            colorTransitions.isEnabled = reduceFlashingEnabled
+            startTransitions.isEnabled = reduceFlashingEnabled
+            endTransitions.isEnabled = reduceFlashingEnabled
+        }
+    }
+    /// See `MetalBarRenderer.lastFrameTimestamp`'s doc comment.
+    private var lastFrameTimestamp: CFTimeInterval?
 
     private static let lineWidth: Double = 1
 
@@ -69,6 +86,9 @@ final class MetalDisparityChordsRenderer: NSObject, MetalIncrementalRenderer {
         lastScale = scale
         pixelSize = CGSize(width: canvasSize.width * scale, height: canvasSize.height * scale)
         count = values.count
+        colorTransitions.reset()
+        startTransitions.reset()
+        endTransitions.reset()
 
         guard count > 0, pixelSize.width > 0, pixelSize.height > 0 else {
             instanceBuffer = nil
@@ -117,11 +137,14 @@ final class MetalDisparityChordsRenderer: NSObject, MetalIncrementalRenderer {
         let fromAngle = Self.angle(Double(index), count: count)
         let toAngle = Self.angle(Double(value), count: count)
 
+        let rawStart = SIMD2(Float(center.x + radius * cos(fromAngle)), Float(center.y + radius * sin(fromAngle)))
+        let rawEnd = SIMD2(Float(center.x + radius * cos(toAngle)), Float(center.y + radius * sin(toAngle)))
         let chord = MetalLineInstance(
-            start: SIMD2(Float(center.x + radius * cos(fromAngle)), Float(center.y + radius * sin(fromAngle))),
-            end: SIMD2(Float(center.x + radius * cos(toAngle)), Float(center.y + radius * sin(toAngle))),
+            start: startTransitions.valueToWrite(forSlot: index, target: rawStart),
+            end: endTransitions.valueToWrite(forSlot: index, target: rawEnd),
             thickness: Float(Self.lineWidth * lastScale),
-            color: color(forIndex: index, value: value, valueRange: valueRange, markers: markers)
+            color: colorTransitions.valueToWrite(
+                forSlot: index, target: color(forIndex: index, value: value, valueRange: valueRange, markers: markers))
         )
         instanceBuffer.contents()
             .advanced(by: index * MemoryLayout<MetalLineInstance>.stride)
@@ -153,9 +176,38 @@ final class MetalDisparityChordsRenderer: NSObject, MetalIncrementalRenderer {
                 let commandBuffer = commandQueue.makeCommandBuffer()
             else { return }
 
+            let now = CACurrentMediaTime()
+            let elapsed = lastFrameTimestamp.map { now - $0 } ?? 0
+            lastFrameTimestamp = now
+            advanceTransitions(elapsed: elapsed)
+
             encodeDraw(into: passDescriptor, commandBuffer: commandBuffer)
             commandBuffer.present(drawable)
             commandBuffer.commit()
+
+            // See `MetalBarRenderer.draw(in:)`'s own comment on why this uses MetalKit's own
+            // capped internal display link instead of manually re-arming `setNeedsDisplay()`.
+            if colorTransitions.isActive || startTransitions.isActive || endTransitions.isActive {
+                if view.isPaused { view.isPaused = false }
+            } else if !view.isPaused {
+                view.isPaused = true
+            }
+        }
+    }
+
+    /// See `MetalBarRenderer.advanceTransitions`'s doc comment.
+    func advanceTransitions(elapsed: TimeInterval) {
+        guard let instanceBuffer, count > 0 else { return }
+        let colorChanges = colorTransitions.advance(elapsed: elapsed)
+        let startChanges = startTransitions.advance(elapsed: elapsed)
+        let endChanges = endTransitions.advance(elapsed: elapsed)
+        let changedSlots = Set(colorChanges.keys).union(startChanges.keys).union(endChanges.keys)
+        guard !changedSlots.isEmpty else { return }
+        let pointer = instanceBuffer.contents().assumingMemoryBound(to: MetalLineInstance.self)
+        for slot in changedSlots {
+            if let color = colorTransitions.displayed(forSlot: slot) { pointer[slot].color = color }
+            if let start = startTransitions.displayed(forSlot: slot) { pointer[slot].start = start }
+            if let end = endTransitions.displayed(forSlot: slot) { pointer[slot].end = end }
         }
     }
 

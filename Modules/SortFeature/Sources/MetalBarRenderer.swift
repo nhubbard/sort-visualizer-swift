@@ -1,6 +1,7 @@
 import Foundation
 import Metal
 import MetalKit
+import QuartzCore
 import SortEngineKit
 
 /// The GPU half of the incremental-update hypothesis: a persistent `MTLBuffer` of per-bar
@@ -34,6 +35,22 @@ final class MetalBarRenderer: NSObject, MetalIncrementalRenderer {
     /// Pixel-space canvas size — `lastCanvasSize (points) * lastScale`, recomputed on every
     /// `reset`. All bar geometry and the shader's viewport uniform work in this space directly.
     private var pixelSize: CGSize = .zero
+
+    private let colorTransitions = MetalColorTransitionTracker()
+    private let originTransitions = MetalTransitionTracker<SIMD2<Float>>()
+    private let sizeTransitions = MetalTransitionTracker<SIMD2<Float>>()
+    /// See `MetalIncrementalRenderer.reduceFlashingEnabled`'s doc comment.
+    var reduceFlashingEnabled = false {
+        didSet {
+            colorTransitions.isEnabled = reduceFlashingEnabled
+            originTransitions.isEnabled = reduceFlashingEnabled
+            sizeTransitions.isEnabled = reduceFlashingEnabled
+        }
+    }
+    /// Wall-clock timestamp of the last `draw(in:)` call, for computing `advanceTransitions`'s
+    /// `elapsed` — `nil` before the first draw (treated as 0 elapsed, matching
+    /// `CADisplayLinkDriver`'s own first-tick convention).
+    private var lastFrameTimestamp: CFTimeInterval?
 
     private static let defaultColor = SIMD4<Float>(0.82, 0.82, 0.86, 1)
     private static let primaryColor = SIMD4<Float>(0.95, 0.38, 0.38, 1)
@@ -89,6 +106,11 @@ final class MetalBarRenderer: NSObject, MetalIncrementalRenderer {
         lastScale = scale
         pixelSize = CGSize(width: canvasSize.width * scale, height: canvasSize.height * scale)
         count = values.count
+        // A fresh full repaint (new run, resize, scrub) is a one-time state reset, not the
+        // rapid-flashing case these trackers exist to smooth — start them clean too.
+        colorTransitions.reset()
+        originTransitions.reset()
+        sizeTransitions.reset()
 
         guard count > 0, pixelSize.width > 0, pixelSize.height > 0 else {
             instanceBuffer = nil
@@ -140,9 +162,9 @@ final class MetalBarRenderer: NSObject, MetalIncrementalRenderer {
         let originY = Float(pixelSize.height) - height
 
         let bar = BarInstance(
-            origin: SIMD2(Float(index) * barWidth, originY),
-            size: SIMD2(barWidth, height),
-            color: color(forIndex: index, in: markers)
+            origin: originTransitions.valueToWrite(forSlot: index, target: SIMD2(Float(index) * barWidth, originY)),
+            size: sizeTransitions.valueToWrite(forSlot: index, target: SIMD2(barWidth, height)),
+            color: colorTransitions.valueToWrite(forSlot: index, target: color(forIndex: index, in: markers))
         )
         instanceBuffer.contents()
             .advanced(by: index * MemoryLayout<BarInstance>.stride)
@@ -180,9 +202,52 @@ final class MetalBarRenderer: NSObject, MetalIncrementalRenderer {
                 let commandBuffer = commandQueue.makeCommandBuffer()
             else { return }
 
+            let now = CACurrentMediaTime()
+            let elapsed = lastFrameTimestamp.map { now - $0 } ?? 0
+            lastFrameTimestamp = now
+            advanceTransitions(elapsed: elapsed)
+
             encodeDraw(into: passDescriptor, commandBuffer: commandBuffer)
             commandBuffer.present(drawable)
             commandBuffer.commit()
+
+            // `MTKView` is normally `isPaused = true` / `enableSetNeedsDisplay = true` (see
+            // `MetalRendererView`'s own doc comment) — it only redraws when told to. While any
+            // transition is in flight, flip to MetalKit's own capped internal display link
+            // (`preferredFramesPerSecond`, set once in `MetalRendererView.makeUIView`) instead of
+            // manually re-arming `setNeedsDisplay()` every single frame — re-arming unconditionally
+            // kept this view redrawing at full, uncapped display refresh rate for as long as
+            // operations kept landing (i.e. for most of a real sort's duration), and that sustained
+            // render-pass overhead competed with SwiftUI's own Core-Animation-driven frame commits
+            // on the same main thread, visibly slowing down unrelated UI animations. Flip back to
+            // paused the instant everything settles, returning to today's zero-background-cost
+            // on-demand model.
+            if colorTransitions.isActive || originTransitions.isActive || sizeTransitions.isActive {
+                if view.isPaused { view.isPaused = false }
+            } else if !view.isPaused {
+                view.isPaused = true
+            }
+        }
+    }
+
+    /// Advances every transition tracker and patches whichever fields moved this tick directly
+    /// into the live GPU buffer — pulled out of `draw(in:)` so a test can drive it directly against
+    /// `debugInstances()`/`encodeDraw`'s own offscreen-texture seam, without a live `MTKView` draw
+    /// loop. Reads `displayed(forSlot:)` from EVERY tracker (not just whichever ones changed this
+    /// tick) for any slot the union touched, since a complete `BarInstance` write needs all three
+    /// fields together.
+    func advanceTransitions(elapsed: TimeInterval) {
+        guard let instanceBuffer, count > 0 else { return }
+        let colorChanges = colorTransitions.advance(elapsed: elapsed)
+        let originChanges = originTransitions.advance(elapsed: elapsed)
+        let sizeChanges = sizeTransitions.advance(elapsed: elapsed)
+        let changedSlots = Set(colorChanges.keys).union(originChanges.keys).union(sizeChanges.keys)
+        guard !changedSlots.isEmpty else { return }
+        let pointer = instanceBuffer.contents().assumingMemoryBound(to: BarInstance.self)
+        for slot in changedSlots {
+            if let color = colorTransitions.displayed(forSlot: slot) { pointer[slot].color = color }
+            if let origin = originTransitions.displayed(forSlot: slot) { pointer[slot].origin = origin }
+            if let size = sizeTransitions.displayed(forSlot: slot) { pointer[slot].size = size }
         }
     }
 

@@ -1,6 +1,7 @@
 import Foundation
 import Metal
 import MetalKit
+import QuartzCore
 import SortEngineKit
 
 enum MetalShapeKind {
@@ -79,6 +80,20 @@ final class MetalShapeRenderer<Layout: MetalShapeLayout>: NSObject, MetalIncreme
     private var lastScale: CGFloat = 1
     private var pixelSize: CGSize = .zero
 
+    private let colorTransitions = MetalColorTransitionTracker()
+    private let originTransitions = MetalTransitionTracker<SIMD2<Float>>()
+    private let sizeTransitions = MetalTransitionTracker<SIMD2<Float>>()
+    /// See `MetalIncrementalRenderer.reduceFlashingEnabled`'s doc comment.
+    var reduceFlashingEnabled = false {
+        didSet {
+            colorTransitions.isEnabled = reduceFlashingEnabled
+            originTransitions.isEnabled = reduceFlashingEnabled
+            sizeTransitions.isEnabled = reduceFlashingEnabled
+        }
+    }
+    /// See `MetalBarRenderer.lastFrameTimestamp`'s doc comment.
+    private var lastFrameTimestamp: CFTimeInterval?
+
     /// `nil` under the same conditions `MetalBarRenderer.init?` can be — see that initializer's
     /// own doc comment for why `makeDefaultLibrary(bundle:)` (this type's own framework bundle),
     /// not the bundle-less overload, is required here too. `sampleCount` — see
@@ -119,6 +134,9 @@ final class MetalShapeRenderer<Layout: MetalShapeLayout>: NSObject, MetalIncreme
         pixelSize = CGSize(width: canvasSize.width * scale, height: canvasSize.height * scale)
         arrayCount = values.count
         slotCount = Layout.instanceCount(for: arrayCount)
+        colorTransitions.reset()
+        originTransitions.reset()
+        sizeTransitions.reset()
 
         guard slotCount > 0, pixelSize.width > 0, pixelSize.height > 0 else {
             instanceBuffer = nil
@@ -165,8 +183,9 @@ final class MetalShapeRenderer<Layout: MetalShapeLayout>: NSObject, MetalIncreme
         )
         // Layouts compute in points, matching every `Visualizer.draw`'s own convention — scale to
         // pixels here, once, generically, same as `MetalBarRenderer.writeBar` does inline.
-        instance.origin *= Float(lastScale)
-        instance.size *= Float(lastScale)
+        instance.origin = originTransitions.valueToWrite(forSlot: slot, target: instance.origin * Float(lastScale))
+        instance.size = sizeTransitions.valueToWrite(forSlot: slot, target: instance.size * Float(lastScale))
+        instance.color = colorTransitions.valueToWrite(forSlot: slot, target: instance.color)
 
         instanceBuffer.contents()
             .advanced(by: slot * MemoryLayout<MetalShapeInstance>.stride)
@@ -191,9 +210,38 @@ final class MetalShapeRenderer<Layout: MetalShapeLayout>: NSObject, MetalIncreme
                 let commandBuffer = commandQueue.makeCommandBuffer()
             else { return }
 
+            let now = CACurrentMediaTime()
+            let elapsed = lastFrameTimestamp.map { now - $0 } ?? 0
+            lastFrameTimestamp = now
+            advanceTransitions(elapsed: elapsed)
+
             encodeDraw(into: passDescriptor, commandBuffer: commandBuffer)
             commandBuffer.present(drawable)
             commandBuffer.commit()
+
+            // See `MetalBarRenderer.draw(in:)`'s own comment on why this uses MetalKit's own
+            // capped internal display link instead of manually re-arming `setNeedsDisplay()`.
+            if colorTransitions.isActive || originTransitions.isActive || sizeTransitions.isActive {
+                if view.isPaused { view.isPaused = false }
+            } else if !view.isPaused {
+                view.isPaused = true
+            }
+        }
+    }
+
+    /// See `MetalBarRenderer.advanceTransitions`'s doc comment.
+    func advanceTransitions(elapsed: TimeInterval) {
+        guard let instanceBuffer, slotCount > 0 else { return }
+        let colorChanges = colorTransitions.advance(elapsed: elapsed)
+        let originChanges = originTransitions.advance(elapsed: elapsed)
+        let sizeChanges = sizeTransitions.advance(elapsed: elapsed)
+        let changedSlots = Set(colorChanges.keys).union(originChanges.keys).union(sizeChanges.keys)
+        guard !changedSlots.isEmpty else { return }
+        let pointer = instanceBuffer.contents().assumingMemoryBound(to: MetalShapeInstance.self)
+        for slot in changedSlots {
+            if let color = colorTransitions.displayed(forSlot: slot) { pointer[slot].color = color }
+            if let origin = originTransitions.displayed(forSlot: slot) { pointer[slot].origin = origin }
+            if let size = sizeTransitions.displayed(forSlot: slot) { pointer[slot].size = size }
         }
     }
 

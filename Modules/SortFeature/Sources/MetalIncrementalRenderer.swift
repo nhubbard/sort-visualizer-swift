@@ -11,4 +11,10 @@ import MetalKit
 @MainActor
 protocol MetalIncrementalRenderer: IncrementalBarRenderer, MTKViewDelegate {
     var onDrawableSizeChange: ((CGSize) -> Void)? { get set }
+
+    /// `false` (today's exact instant-snap-to-target behavior) unless `MetalRendererView` turns it
+    /// on — set from `AppSettings.reduceFlashingEffective` (the user's manual toggle, OR'd with the
+    /// system's Reduce Motion accessibility setting). When `true`, `apply`'s per-touched-index color
+    /// writes fade over a short transition instead of snapping — see `MetalColorTransitionTracker`.
+    var reduceFlashingEnabled: Bool { get set }
 }

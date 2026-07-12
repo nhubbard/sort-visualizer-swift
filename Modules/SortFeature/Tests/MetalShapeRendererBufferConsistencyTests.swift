@@ -230,6 +230,67 @@ struct MetalShapeRendererBufferConsistencyTests {
         }
         #expect(mismatches.isEmpty, "\(mismatches.count) slot(s) never got the correct final height written")
     }
+
+    /// Coverage for `reduceFlashingEnabled` (`MetalColorTransitionTracker`): a touched slot's
+    /// buffer color must NOT jump straight to the marker color the instant `apply` runs, and must
+    /// reach it only after `advanceTransitions` has had enough elapsed time to finish the
+    /// fade — the whole point of easing instead of snapping to avoid a rapid, high-contrast flash
+    /// on small-array algorithms (Bogo/Bozo Sort) where the affected shape is large on screen.
+    @MainActor
+    @Test
+    func reduceFlashingEnabledEasesTouchedSlotColorInsteadOfSnapping() throws {
+        let device = try #require(MTLCreateSystemDefaultDevice())
+        // `RainbowMetalLayout` ignores markers entirely (always hue-ramp) — `DisparityBarGraphMetalLayout`
+        // is one of the layouts that actually paints `MetalShapeColor.marker(forIndex:in:)`, so a
+        // `.mark` operation's touched slot really does have a different target color to fade toward.
+        let renderer = try #require(MetalShapeRenderer<DisparityBarGraphMetalLayout>(device: device))
+        let values = [10, 20]
+        let canvasSize = CGSize(width: 200, height: 200)
+
+        // Matches `MetalRendererView.Coordinator`'s real ordering (`setReduceFlashingEnabled` runs
+        // before `setUp`, which runs before any `reset`/`apply`): the tracker must already be
+        // enabled when a slot gets its first color, or it has no prior color to fade FROM the next
+        // time that slot changes.
+        renderer.reduceFlashingEnabled = true
+        renderer.reset(values: values, valueRange: 10...20, markers: [:], canvasSize: canvasSize, scale: 1)
+
+        renderer.apply(
+            .mark(marker: Marker.primary, index: 0), values: values, valueRange: 10...20,
+            markers: [0: [Marker.primary]]
+        )
+        let afterApply = renderer.debugInstances()[0].color
+        #expect(afterApply != MetalShapeColor.primary, "must not snap to the marker color the instant it's touched")
+
+        renderer.advanceTransitions(elapsed: 1) // overshoots the 0.12s fade duration -> settles exactly
+        let afterAdvance = renderer.debugInstances()[0].color
+        #expect(afterAdvance == MetalShapeColor.primary)
+    }
+
+    /// Same shape as the color-easing test above, but for GEOMETRY: a touched slot's `origin` must
+    /// NOT jump straight to its new on-screen position the instant `apply` runs — the follow-up fix
+    /// after color-only easing turned out to look broken on position-driven visualizers (a dot
+    /// still teleporting to its new spot while only its color faded).
+    @MainActor
+    @Test
+    func reduceFlashingEnabledEasesTouchedSlotOriginInsteadOfSnapping() throws {
+        let device = try #require(MTLCreateSystemDefaultDevice())
+        // `ScatterPlotMetalLayout`'s dot Y-position is a direct function of value — a clean case
+        // where changing a value moves the dot, independent of any marker.
+        let renderer = try #require(MetalShapeRenderer<ScatterPlotMetalLayout>(device: device))
+        let canvasSize = CGSize(width: 200, height: 200)
+
+        renderer.reduceFlashingEnabled = true
+        renderer.reset(values: [10, 20], valueRange: 10...20, markers: [:], canvasSize: canvasSize, scale: 1)
+        let originalOrigin = renderer.debugInstances()[0].origin
+
+        renderer.apply(.setValue(0, 20), values: [20, 20], valueRange: 10...20, markers: [:])
+        let afterApply = renderer.debugInstances()[0].origin
+        #expect(afterApply == originalOrigin, "must not snap to the new position the instant it's touched")
+
+        renderer.advanceTransitions(elapsed: 1) // overshoots the 0.12s fade duration -> settles exactly
+        let afterAdvance = renderer.debugInstances()[0].origin
+        #expect(afterAdvance != originalOrigin, "should have reached the new position after settling")
+    }
 }
 
 /// Duplicated from `SortSessionTests.ManualTickDriver` — test targets can't import each other's
