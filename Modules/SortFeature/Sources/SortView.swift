@@ -15,6 +15,7 @@ public struct SortView: View {
     // the whole churn.
     @State private var isSpeedExpanded = false
     @State private var isSizeExpanded = false
+    @State private var isVisualizerExpanded = false
 
     public init(session: SortSession) {
         self.session = session
@@ -31,9 +32,9 @@ public struct SortView: View {
         }
     }
 
-    /// Shown instead of the normal status label while the `⌘⇧A` loop is driving this session —
-    /// same "machine-readable via accessibilityIdentifier" shape as `statusLabel`, plus a way to
-    /// stop the loop without needing to remember the keyboard shortcut that started it.
+    /// Shown instead of the normal status label while a registered `Automation` is driving this
+    /// session — same "machine-readable via accessibilityIdentifier" shape as `statusLabel`, plus
+    /// a way to stop the loop without needing to remember the keyboard shortcut that started it.
     private var automationBanner: some View {
         HStack(spacing: 8) {
             ProgressView()
@@ -41,7 +42,7 @@ public struct SortView: View {
             Text(automationProgressText)
                 .font(.caption)
                 .accessibilityIdentifier("automationProgressLabel")
-            Button("Stop") { session.toggleAutomation() }
+            Button("Stop") { session.stopAutomation() }
                 .font(.caption)
                 .accessibilityIdentifier("automationStopButton")
         }
@@ -66,7 +67,8 @@ public struct SortView: View {
                         replay: replay,
                         algorithm: session.algorithm,
                         isSpeedExpanded: $isSpeedExpanded,
-                        isSizeExpanded: $isSizeExpanded
+                        isSizeExpanded: $isSizeExpanded,
+                        isVisualizerExpanded: $isVisualizerExpanded
                     )
                 }
         case .failed:

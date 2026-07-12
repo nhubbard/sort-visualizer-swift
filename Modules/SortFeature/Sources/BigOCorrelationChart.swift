@@ -3,11 +3,9 @@ import Charts
 import PersistenceKit
 import SwiftUI
 
-/// Same `AnalyticsService`-backed data `BenchmarkFeature`'s `BigOCorrelationChart` charts — the
-/// real, observed operation-count growth against that same algorithm's own best/average/worst-case
-/// curves (`BigOCorrelation.bigOChartPoints`). Lives in `SortFeature` too rather than reusing
-/// `BenchmarkFeature`'s view directly: `SortFeature` doesn't depend on `BenchmarkFeature`, so
-/// duplicating this ~60-line view is cheaper than adding a cross-module dependency for it.
+/// `AnalyticsService`-backed data charted against that same algorithm's own best/average/worst-case
+/// curves (`BigOCorrelation.bigOChartPoints`) — the real, observed operation-count growth over
+/// recorded runs.
 struct BigOCorrelationChart: View {
     let algorithm: any SortAlgorithm
 

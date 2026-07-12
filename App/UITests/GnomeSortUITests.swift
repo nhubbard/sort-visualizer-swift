@@ -3,6 +3,7 @@ import XCTest
 /// Phase 7 batch checkpoint: proves that at least one of the newly-ported algorithms actually
 /// renders and sorts correctly end-to-end in the running app, not just in the unit-level
 /// `BundledContentCorrectnessTests`. Mirrors `QuickSortUITests`'s approach.
+@MainActor
 final class GnomeSortUITests: XCTestCase {
     override func setUpWithError() throws {
         continueAfterFailure = false

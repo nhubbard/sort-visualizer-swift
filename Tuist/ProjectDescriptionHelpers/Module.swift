@@ -7,25 +7,42 @@ public enum Module {
 
     /// A framework + its test target, sharing one bundle-ID/settings convention. This is the
     /// entire replacement for the current per-target `xcconfigs/*.xcconfig` files (§5.3).
+    ///
+    /// The test target is only included when `Modules/<name>/Tests` actually has at least one
+    /// `.swift` file in it — a test target with zero source files still builds, but produces no
+    /// executable, so `xctest` fails to load its bundle at *run* time ("couldn't be loaded because
+    /// its executable couldn't be located"). That failure only ever surfaces when someone runs
+    /// `tuist test`/`xcodebuild test` against that specific target, long after generation
+    /// succeeded, so it's easy to leave behind by deleting a module's last (or only ever
+    /// placeholder) test file without noticing. Skipping the target entirely when there's nothing
+    /// to test avoids that trap instead of requiring every module to keep a dummy test around.
+    /// `callerFilePath` defaults to the call site's own path (via `#filePath`), so the
+    /// manifest-relative root is computed from wherever this is actually called rather than
+    /// assumed from this file's own location.
     public static func framework(
         name: String,
         dependencies: [TargetDependency] = [],
         resources: ResourceFileElements? = nil,
-        testResources: ResourceFileElements? = nil
+        testResources: ResourceFileElements? = nil,
+        callerFilePath: StaticString = #filePath
     ) -> [Target] {
         let frameworkSettings = name.hasSuffix("Kit") ? baseSettings.merging(moduleVerifierSettings) { _, new in new } : baseSettings
+        let framework = Target.target(
+            name: name,
+            destinations: destinations,
+            product: .framework,
+            bundleId: "com.nhubbard.Sort2.mobile.modules.\(name.lowercased())",
+            deploymentTargets: deploymentTargets,
+            sources: ["Modules/\(name)/Sources/**"],
+            resources: resources,
+            dependencies: dependencies,
+            settings: .settings(base: frameworkSettings)
+        )
+        guard hasSwiftTestSources(forModule: name, callerFilePath: callerFilePath) else {
+            return [framework]
+        }
         return [
-            .target(
-                name: name,
-                destinations: destinations,
-                product: .framework,
-                bundleId: "com.nhubbard.Sort2.mobile.modules.\(name.lowercased())",
-                deploymentTargets: deploymentTargets,
-                sources: ["Modules/\(name)/Sources/**"],
-                resources: resources,
-                dependencies: dependencies,
-                settings: .settings(base: frameworkSettings)
-            ),
+            framework,
             .target(
                 name: "\(name)Tests",
                 destinations: destinations,
@@ -38,6 +55,16 @@ public enum Module {
                 settings: .settings(base: baseSettings)
             ),
         ]
+    }
+
+    private static func hasSwiftTestSources(forModule name: String, callerFilePath: StaticString) -> Bool {
+        let testsDirectory = URL(fileURLWithPath: "\(callerFilePath)")
+            .deletingLastPathComponent()
+            .appendingPathComponent("Modules/\(name)/Tests")
+        guard let enumerator = FileManager.default.enumerator(
+            at: testsDirectory, includingPropertiesForKeys: nil, options: [.skipsHiddenFiles]
+        ) else { return false }
+        return enumerator.contains { ($0 as? URL)?.pathExtension == "swift" }
     }
 
     public static let baseSettings: SettingsDictionary = [

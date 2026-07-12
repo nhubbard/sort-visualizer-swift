@@ -4,6 +4,7 @@ import BuiltInVisualizers
 import Foundation
 import ScriptingKit
 import SettingsKit
+import SortFeature
 import SwiftUI
 import VisualizationKit
 
@@ -73,6 +74,23 @@ struct Sort2App: App {
             ScriptShuffleLoader.loadScripts(from: Bundle.main.url(forResource: "Shuffles", withExtension: nil)!)
         }
         ShuffleRegistry.shared.discover()
+
+        // The two automations formerly hardcoded as `SortSession.toggleAutomation()`/
+        // `toggleMaxSizeAutomation()` — the shortcut each one triggers is declared right here,
+        // next to what it runs, instead of separately in `ScrollingSortView`'s shortcut buttons.
+        AutomationRegistry.shared.builtIns = [
+            Automation(
+                id: .sizeSweep, displayName: "Size Sweep", iconName: "arrow.up.right",
+                key: "a", modifiers: [.command, .shift], runsPerSize: 3,
+                sizes: { $0.sizeRange.steppedValues(by: $0.sizeStep) }
+            ),
+            Automation(
+                id: .maxSizeOnly, displayName: "Max Size Only", iconName: "arrow.up.to.line",
+                key: "a", modifiers: [.command, .option, .shift], runsPerSize: 3,
+                sizes: { [$0.sizeRange.upperBound] }
+            ),
+        ]
+        AutomationRegistry.shared.discover()
 
         // UI-test-only override (never set by a real launch): AppSettings.defaultArraySize's real
         // default (256) is deliberately large, and a quadratic/factorial algorithm at that size can

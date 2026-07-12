@@ -15,6 +15,7 @@ import XCTest
 /// `UserDefaults` value a real drag would, just exactly and deterministically — this test's job is
 /// proving the settings-to-new-session data flow, not re-proving the slider's own gesture
 /// handling (which no other test exercises, but isn't this test's concern either).
+@MainActor
 final class DefaultPlaybackSpeedUITests: XCTestCase {
     override func setUpWithError() throws {
         continueAfterFailure = false

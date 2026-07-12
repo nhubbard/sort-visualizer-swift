@@ -1,9 +1,9 @@
 import AlgorithmKit
-import BenchmarkFeature
 import DesignSystemKit
 import HomeFeature
 import SettingsFeature
 import SettingsKit
+import ShowcaseFeature
 import SortFeature
 import SwiftUI
 
@@ -14,7 +14,7 @@ import SwiftUI
 struct ContentView: View {
     @State private var selection: AlgorithmID?
     @State private var isShowingSettings = false
-    @State private var isShowingBenchmark = false
+    @State private var isShowingShowcase = false
     // Session-only (not AppSettings-backed): every category starts expanded on each launch, so
     // the existing `algorithmLink.<id>` UI tests (which tap straight into the sidebar with no
     // "expand first" step) keep working unmodified.
@@ -56,11 +56,11 @@ struct ContentView: View {
             .toolbar {
                 ToolbarItem(placement: .primaryAction) {
                     Button {
-                        isShowingBenchmark = true
+                        isShowingShowcase = true
                     } label: {
-                        Image(systemName: "chart.xyaxis.line")
+                        Image(systemName: "sparkles.tv.fill")
                     }
-                    .accessibilityIdentifier("benchmarkButton")
+                    .accessibilityIdentifier("showcaseButton")
                 }
                 ToolbarItem(placement: .primaryAction) {
                     Button {
@@ -70,6 +70,16 @@ struct ContentView: View {
                     }
                     .accessibilityIdentifier("settingsButton")
                 }
+            }
+            .background {
+                // Zero-size, fully transparent — same invisible-button-in-`.background` pattern
+                // `SortFeature`'s own shortcuts use. Lives here (not scoped to a running sort)
+                // since Settings should be reachable from anywhere in the app.
+                Button("") { isShowingSettings = true }
+                    .keyboardShortcut(",", modifiers: [.command])
+                    .opacity(0)
+                    .frame(width: 0, height: 0)
+                    .accessibilityHidden(true)
             }
         } detail: {
             if let selection, let algorithm = AlgorithmRegistry.shared.algorithm(id: selection) {
@@ -94,13 +104,13 @@ struct ContentView: View {
                     }
             }
         }
-        .sheet(isPresented: $isShowingBenchmark) {
+        .sheet(isPresented: $isShowingShowcase) {
             NavigationStack {
-                BenchmarkView()
+                ShowcaseView()
                     .toolbar {
                         ToolbarItem(placement: .cancellationAction) {
                             Button {
-                                isShowingBenchmark = false
+                                isShowingShowcase = false
                             } label: {
                                 Text("Done").fixedSize(horizontal: true, vertical: false)
                             }

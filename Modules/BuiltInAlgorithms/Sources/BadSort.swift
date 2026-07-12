@@ -122,7 +122,7 @@ public struct BadSort: SortAlgorithm {
         sizeRange: 16...128,
         stable: false,
         timeComplexity: ComplexityBounds(
-            best: "O(n^2)", average: "O(n^2 \\log n)", worst: "O(n^3)"),
+            best: "O(n^2)", average: "O(n^2 log n)", worst: "O(n^3)"),
         spaceComplexity: "O(1)",
         iconName: "hand.thumbsdown.fill"
     )

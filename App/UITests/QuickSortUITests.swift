@@ -7,6 +7,7 @@ import XCTest
 /// completion event fired." A `Canvas` has no discrete accessible bars to individually inspect, so
 /// `SortView` exposes `sortStatusLabel`'s accessibility value as the correctness signal — the app
 /// itself checks `frame.values == frame.values.sorted()` and reports the answer.
+@MainActor
 final class QuickSortUITests: XCTestCase {
     override func setUpWithError() throws {
         continueAfterFailure = false

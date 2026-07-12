@@ -4,7 +4,7 @@
 public extension ClosedRange where Bound == Int {
     func evenlySpacedSamples(count: Int) -> [Int] {
         guard upperBound > lowerBound else { return [lowerBound] }
-        let step = max(1, (upperBound - lowerBound) / (count - 1))
+        let step = Swift.max(1, (upperBound - lowerBound) / (count - 1))
         var sizes = Array(Swift.stride(from: lowerBound, through: upperBound, by: step))
         if sizes.last != upperBound { sizes.append(upperBound) }
         return sizes
@@ -23,10 +23,8 @@ public extension ClosedRange where Bound == Int {
     /// The increment a size stepper covering this range would move by: 16 at a time for wide
     /// ranges (matching the global Settings default step), or the full range's width for narrow
     /// ones — e.g. Bogo Sort's `4...7` steps by 1, so every valid size stays reachable instead of
-    /// only the two endpoints. Backs both `AlgorithmMetadata.sizeStep` and `ComplexityChart`'s own
-    /// benchmark sampling, so a stepper and any chart derived from the same range always agree on
-    /// which sizes are "every valid size."
+    /// only the two endpoints. Backs `AlgorithmMetadata.sizeStep`.
     var steppedSizeStep: Int {
-        upperBound - lowerBound >= 16 ? 16 : max(1, upperBound - lowerBound)
+        upperBound - lowerBound >= 16 ? 16 : Swift.max(1, upperBound - lowerBound)
     }
 }

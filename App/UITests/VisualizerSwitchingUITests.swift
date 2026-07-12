@@ -4,6 +4,7 @@ import XCTest
 /// zero disruption to the running `SortSession`/`ReplayEngine` — proof the algorithm and
 /// visualization plugin axes are genuinely orthogonal. Settings is presented as a sheet rather than
 /// a navigation push specifically so the underlying sort screen's state survives the round trip.
+@MainActor
 final class VisualizerSwitchingUITests: XCTestCase {
     override func setUpWithError() throws {
         continueAfterFailure = false

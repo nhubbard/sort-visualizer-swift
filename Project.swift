@@ -58,8 +58,8 @@ let modules: [Target] =
     Module.framework(name: "HomeFeature", dependencies: [
         .target(name: "DesignSystemKit"), .external(name: "MarkdownUI"),
     ]) +
-    Module.framework(name: "BenchmarkFeature", dependencies: [
-        .target(name: "SortEngineKit"), .target(name: "AlgorithmKit"), .target(name: "PersistenceKit"),
+    Module.framework(name: "ShowcaseFeature", dependencies: [
+        .target(name: "SortFeature"), .target(name: "AlgorithmKit"),
     ])
 
 let app = Target.target(
@@ -114,7 +114,7 @@ let app = Target.target(
     entitlements: .file(path: "App/Resources/SortSymphony.entitlements"),
     dependencies: [
         .target(name: "SortFeature"), .target(name: "SettingsFeature"),
-        .target(name: "HomeFeature"), .target(name: "BenchmarkFeature"),
+        .target(name: "HomeFeature"), .target(name: "ShowcaseFeature"),
         .target(name: "MathRenderingKit"),
         // Sort2App wires each module's concrete conformances into its registry
         // (AlgorithmRegistry/VisualizerRegistry), which has no visibility into either module

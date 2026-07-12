@@ -40,12 +40,16 @@ public final class SortSession {
     /// can appear.
     public private(set) var arraySize: Int
 
-    /// Whether the `⌘⇧A` automation loop (see `toggleAutomation`) is currently driving this
-    /// session — the run control bar disables its own manual controls while this is true, so a
-    /// stray scrub/resize/pause can't collide with the loop's own repeated `start(size:)` calls.
+    /// Whether an automation loop (see `runAutomation(_:)`) is currently driving this session —
+    /// the run control bar disables its own manual controls while this is true, so a stray
+    /// scrub/resize/pause can't collide with the loop's own repeated `start(size:)` calls.
     public private(set) var isAutomating = false
     /// `nil` outside automation; otherwise the loop's current position, for a progress banner.
     public private(set) var automationProgress: (sizeIndex: Int, sizeCount: Int, runIndex: Int, runCount: Int)?
+    /// Which registered `Automation` is currently running, if any — lets the Automator menu show a
+    /// checkmark next to the right entry, and lets `runAutomation(_:)` tell "toggle this one off"
+    /// apart from "switch to a different one" without a second tap.
+    public private(set) var runningAutomationID: AutomationID?
 
     public let algorithm: any SortAlgorithm
     public let shuffle: any ShuffleAlgorithm
@@ -201,43 +205,58 @@ public final class SortSession {
         await withCheckedContinuation { completionContinuations.append($0) }
     }
 
-    /// Starts or stops the `⌘⇧A` bulk-data-generation loop: starting from the algorithm's minimum
-    /// size, run 3 fresh, fully-animated sorts before stepping up by `sizeStep` (the same increment
-    /// the manual size stepper uses — every value for a narrow range, 16 at a time for a wide one)
-    /// to the next size, in ascending order, through the maximum. Toggling again mid-run cancels it
-    /// once the in-flight sort finishes playing, rather than yanking the tape out from under
-    /// `ReplayEngine` mid-playback.
-    public func toggleAutomation() {
-        if isAutomating {
-            automationTask?.cancel()
-        } else {
-            automationTask = Task { await runAutomation(sizes: algorithm.metadata.sizeRange.steppedValues(
-                by: algorithm.metadata.sizeStep)) }
+    /// Starts a registered `Automation`, or stops it if it's the one already running — tapping a
+    /// *different* automation while one is running cancels the old one and starts the new one in
+    /// the same call, no second tap needed. Each entry supplies its own sizes (a size sweep or a
+    /// single max-size run) and `runsPerSize`; see `AutomationRegistry`. Cancelling mid-run takes
+    /// effect once the in-flight sort finishes playing, rather than yanking the tape out from
+    /// under `ReplayEngine` mid-playback.
+    public func runAutomation(_ automation: Automation) {
+        if runningAutomationID == automation.id {
+            stopAutomation()
+            return
+        }
+        automationTask?.cancel()
+        runningAutomationID = automation.id
+        automationTask = Task {
+            await runAutomation(sizes: automation.sizes(algorithm.metadata), runsPerSize: automation.runsPerSize)
         }
     }
 
-    /// Same loop as `toggleAutomation()`, constrained to a single size — the algorithm's own
-    /// `sizeRange.upperBound` — for generating repeatable samples at the size most likely to show
-    /// visualization-time anomalies (large arrays, more ticks, more chances for per-tick/per-op
-    /// overhead to compound) without waiting through every smaller size first. Shares every bit of
-    /// `toggleAutomation()`'s machinery (`isAutomating`, `automationProgress`,
-    /// `completionContinuations` via `waitUntilComplete()`) — `SortView`'s automation banner and
-    /// its "Stop" button work unchanged for this mode too, since neither reads which method
-    /// started the loop.
-    public func toggleMaxSizeAutomation() {
-        if isAutomating {
-            automationTask?.cancel()
-        } else {
-            automationTask = Task { await runAutomation(sizes: [algorithm.metadata.sizeRange.upperBound]) }
-        }
+    /// Cancels whichever automation is currently running, if any — the automation banner's "Stop"
+    /// button calls this directly rather than looking up which `Automation` is running just to
+    /// hand it back to `runAutomation(_:)`.
+    public func stopAutomation() {
+        automationTask?.cancel()
+        runningAutomationID = nil
     }
 
-    private func runAutomation(sizes: [Int], runsPerSize: Int = 3) async {
+    /// Runs this algorithm once, at its own `sizeRange.upperBound` — the per-algorithm unit of work
+    /// Showcase mode's cross-algorithm loop drives, one fresh `SortSession` at a time. Shares the
+    /// exact same completion-detection machinery as `runAutomation(_:)` rather than reimplementing
+    /// it, so a caller can simply `await` this returning once the run has genuinely finished.
+    public func runShowcasePass() async {
+        await runAutomation(sizes: [algorithm.metadata.sizeRange.upperBound], runsPerSize: 1)
+    }
+
+    /// Advances `arraySize` to the next value in `algorithm.metadata.sizeRange` (stepped by
+    /// `sizeStep`), wrapping back to the smallest past the largest — the same ring-buffer shape as
+    /// `AppSettings.cycleVisualizer()`, just over sizes instead of visualizers. Backs `⌘S`.
+    public func cycleArraySize() async {
+        let sizes = algorithm.metadata.sizeRange.steppedValues(by: algorithm.metadata.sizeStep)
+        guard !sizes.isEmpty else { return }
+        let currentIndex = sizes.firstIndex(of: arraySize) ?? -1
+        let nextIndex = (currentIndex + 1) % sizes.count
+        await start(size: sizes[nextIndex])
+    }
+
+    private func runAutomation(sizes: [Int], runsPerSize: Int) async {
         isAutomating = true
         defer {
             isAutomating = false
             automationProgress = nil
             automationTask = nil
+            runningAutomationID = nil
         }
         for (sizeIndex, size) in sizes.enumerated() {
             for runIndex in 0..<runsPerSize {

@@ -128,9 +128,8 @@ struct AnalyticsServiceTests {
         #expect(rows.count == 3)
     }
 
-    /// `BenchmarkFeature`'s `BigOCorrelationChart` relies on this filtering to one algorithm and
-    /// sorting newest-first — both are asserted directly here rather than only indirectly through
-    /// a UI test.
+    /// `BigOCorrelationChart` relies on this filtering to one algorithm and sorting newest-first —
+    /// both are asserted directly here rather than only indirectly through a UI test.
     @Test
     func fetchSummariesFiltersByAlgorithmAndSortsNewestFirst() async throws {
         let service = try makeInMemoryService()

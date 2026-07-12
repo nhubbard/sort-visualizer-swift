@@ -1,6 +1,8 @@
 import AlgorithmKit
+import SettingsKit
 import SortEngineKit
 import SwiftUI
+import VisualizationKit
 
 /// Docked below the sort visualization via `.safeAreaInset(edge: .bottom)` — reserves real layout
 /// space rather than floating on top of the visualization (v1's `TouchBarSlider`/`GroupBox`
@@ -17,12 +19,14 @@ struct RunControlBar: View {
     @Bindable var session: SortSession
     @Bindable var replay: ReplayEngine
     let algorithm: any SortAlgorithm
+    @Environment(AppSettings.self) private var settings
 
     // Bindings, not local `@State` — owned by `SortView`, which survives the phase churn
     // `session.start(size:)` (the size stepper's own action) drives this view through. See
     // `SortView`'s doc comment on its own copies of these for why.
     @Binding var isSpeedExpanded: Bool
     @Binding var isSizeExpanded: Bool
+    @Binding var isVisualizerExpanded: Bool
 
     var body: some View {
         VStack(spacing: 8) {
@@ -35,15 +39,22 @@ struct RunControlBar: View {
             if isSizeExpanded {
                 sizeRow
             }
+            if isVisualizerExpanded {
+                visualizerRow
+            }
         }
         .padding(12)
         .glassEffect(.regular.interactive(), in: .rect(cornerRadius: 20))
         .padding([.horizontal, .bottom])
         .animation(.easeInOut(duration: 0.2), value: isSpeedExpanded)
         .animation(.easeInOut(duration: 0.2), value: isSizeExpanded)
+        .animation(.easeInOut(duration: 0.2), value: isVisualizerExpanded)
         // Manual scrubbing/resizing would otherwise collide with the automation loop's own
         // repeated `start(size:)` calls — this bar goes fully inert while it's running.
         .disabled(session.isAutomating)
+        .background {
+            transportShortcuts
+        }
     }
 
     private var scrubSlider: some View {
@@ -131,7 +142,7 @@ struct RunControlBar: View {
             }
             .accessibilityIdentifier("runControlJumpToStartButton")
             .accessibilityLabel("Jump to Start")
-            .help("Jump to the very beginning of the recording, before shuffling")
+            .help("Jump to the very beginning of the recording, before shuffling (⌘⌥←)")
             .disabled(replay.stepIndex <= 0)
 
             Button {
@@ -142,7 +153,7 @@ struct RunControlBar: View {
             }
             .accessibilityIdentifier("runControlStepBackButton")
             .accessibilityLabel("Step Back")
-            .help("Step back one operation")
+            .help("Step back one operation (⌥←)")
             .disabled(replay.stepIndex <= 0)
 
             Button {
@@ -153,7 +164,7 @@ struct RunControlBar: View {
             }
             .accessibilityIdentifier("runControlPlayPauseButton")
             .accessibilityLabel(replay.isPlaying ? "Pause" : "Play")
-            .help(replay.isPlaying ? "Pause playback" : "Resume playback")
+            .help(replay.isPlaying ? "Pause playback (Space)" : "Resume playback (Space)")
             .disabled(isFinished)
 
             Button {
@@ -164,7 +175,7 @@ struct RunControlBar: View {
             }
             .accessibilityIdentifier("runControlStepForwardButton")
             .accessibilityLabel("Step Forward")
-            .help("Step forward one operation")
+            .help("Step forward one operation (⌥→)")
             .disabled(isFinished)
 
             Button {
@@ -174,7 +185,7 @@ struct RunControlBar: View {
             }
             .accessibilityIdentifier("runControlJumpToEndButton")
             .accessibilityLabel("Jump to End")
-            .help("Jump to the fully sorted end of the recording")
+            .help("Jump to the fully sorted end of the recording (⌘⌥→)")
             .disabled(isFinished)
 
             Spacer()
@@ -186,7 +197,7 @@ struct RunControlBar: View {
             }
             .accessibilityIdentifier("runControlResetButton")
             .accessibilityLabel("Reset and Reshuffle")
-            .help("Stop the current sort, shuffle a fresh array at this size, and sort it again")
+            .help("Stop the current sort, shuffle a fresh array at this size, and sort it again (⌘R)")
 
             Button {
                 session.soundEnabled.toggle()
@@ -195,7 +206,9 @@ struct RunControlBar: View {
             }
             .accessibilityIdentifier("runControlSoundToggle")
             .accessibilityLabel(session.soundEnabled ? "Mute" : "Unmute")
-            .help(session.soundEnabled ? "Turn off sort sound effects" : "Turn on sort sound effects")
+            .help(session.soundEnabled ? "Turn off sort sound effects (⌘A)" : "Turn on sort sound effects (⌘A)")
+
+            automatorMenu
 
             Button {
                 isSpeedExpanded.toggle()
@@ -205,7 +218,7 @@ struct RunControlBar: View {
             }
             .accessibilityIdentifier("runControlSpeedButton")
             .accessibilityLabel("Playback Speed")
-            .help("Show or hide the playback speed slider")
+            .help("Show or hide the playback speed slider (⌘⇧+/− by 1, ⌘⌥+/− by 10)")
 
             Button {
                 isSizeExpanded.toggle()
@@ -215,10 +228,44 @@ struct RunControlBar: View {
             }
             .accessibilityIdentifier("runControlSizeButton")
             .accessibilityLabel("Array Size")
-            .help("Show or hide the array size stepper")
+            .help("Show or hide the array size stepper (⌘S cycles to the next size)")
+
+            Button {
+                isVisualizerExpanded.toggle()
+            } label: {
+                Image(systemName: "eye.fill")
+            }
+            .accessibilityIdentifier("runControlVisualizerButton")
+            .accessibilityLabel("Visualizer")
+            .help("Show or hide the visualizer picker (⌘⇧V cycles to the next visualizer)")
         }
         .buttonStyle(.borderless)
         .controlSize(.large)
+    }
+
+    /// Robot icon — lists every registered `Automation` (see `AutomationRegistry`), the same two
+    /// entries `⌘⇧A`/`⌘⌥⇧A` already trigger, so the shortcut and the tappable UI are two views onto
+    /// one source of truth rather than two independently-maintained ones.
+    private var automatorMenu: some View {
+        Menu {
+            ForEach(AutomationRegistry.shared.automations) { automation in
+                Button {
+                    session.runAutomation(automation)
+                } label: {
+                    if session.runningAutomationID == automation.id {
+                        Label("\(automation.displayName) (\(automation.shortcutDisplayString)) — Running", systemImage: "checkmark")
+                    } else {
+                        Label("\(automation.displayName) (\(automation.shortcutDisplayString))", systemImage: automation.iconName)
+                    }
+                }
+                .accessibilityIdentifier("automatorMenuItem.\(automation.id.rawValue)")
+            }
+        } label: {
+            Image(systemName: "gearshape.2.fill")
+        }
+        .accessibilityIdentifier("runControlAutomatorButton")
+        .accessibilityLabel("Automations")
+        .help("Run a size-sweep or max-size automation")
     }
 
     private var isFinished: Bool {
@@ -265,5 +312,69 @@ struct RunControlBar: View {
             }
             .accessibilityIdentifier("runControlSizeStepper")
         }
+    }
+
+    /// Same disclosure-row shape as `sizeRow` above, but for picking a visualizer instead of a
+    /// size — `settings.selectedVisualizerID` is the exact binding `SettingsFeature`'s own
+    /// visualizer picker uses, so this is just an iPadOS-reachable surface for the same live field
+    /// `⌘⇧V`/`AppSettings.cycleVisualizer()` already changes, not a second mechanism.
+    private var visualizerRow: some View {
+        @Bindable var settings = settings
+        return HStack(spacing: 8) {
+            Text("Visualizer")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+            Picker("Visualizer", selection: $settings.selectedVisualizerID) {
+                ForEach(VisualizerRegistry.shared.visualizers, id: \.id) { visualizer in
+                    Text(visualizer.metadata.displayName).tag(visualizer.id)
+                }
+            }
+            .pickerStyle(.menu)
+            .labelsHidden()
+            .accessibilityIdentifier("runControlVisualizerPicker")
+        }
+    }
+
+    /// Zero-size, fully transparent invisible buttons — same pattern as `ScrollingSortView`'s own
+    /// ⌘⇧A/⌘⌥⇧A/⌘⇧V shortcuts, just scoped here instead, since `replay` (`ReplayEngine`) only
+    /// exists at this level, not up at `ScrollingSortView`. Reset/toggle-audio/cycle-size only
+    /// need `session`, but live here too rather than splitting shortcuts across two views.
+    private var transportShortcuts: some View {
+        Group {
+            hiddenButton { replay.seek(to: 0) }
+                .keyboardShortcut(.leftArrow, modifiers: [.command, .option])
+            hiddenButton { replay.pause(); replay.stepBackward() }
+                .keyboardShortcut(.leftArrow, modifiers: [.option])
+            hiddenButton { session.togglePlayback() }
+                .keyboardShortcut(.space, modifiers: [])
+            hiddenButton { replay.pause(); replay.stepForward() }
+                .keyboardShortcut(.rightArrow, modifiers: [.option])
+            hiddenButton { replay.seek(to: replay.totalOperationCount) }
+                .keyboardShortcut(.rightArrow, modifiers: [.command, .option])
+            hiddenButton { Task { await session.start(size: session.arraySize) } }
+                .keyboardShortcut("r", modifiers: [.command])
+            hiddenButton { session.soundEnabled.toggle() }
+                .keyboardShortcut("a", modifiers: [.command])
+            hiddenButton { replay.speed = min(200, replay.speed + 1) }
+                .keyboardShortcut("+", modifiers: [.command, .shift])
+            hiddenButton { replay.speed = max(1, replay.speed - 1) }
+                .keyboardShortcut("-", modifiers: [.command, .shift])
+            hiddenButton { replay.speed = min(200, replay.speed + 10) }
+                .keyboardShortcut("+", modifiers: [.command, .option])
+            hiddenButton { replay.speed = max(1, replay.speed - 10) }
+                .keyboardShortcut("-", modifiers: [.command, .option])
+            hiddenButton { Task { await session.cycleArraySize() } }
+                .keyboardShortcut("s", modifiers: [.command])
+        }
+    }
+
+    /// Zero-size, fully transparent — the modifiers are applied per-button (not once to a
+    /// containing `Group`, whose modifier-distribution semantics across multiple children aren't
+    /// guaranteed), matching `ScrollingSortView`'s own shortcut buttons exactly.
+    private func hiddenButton(action: @escaping () -> Void) -> some View {
+        Button("", action: action)
+            .opacity(0)
+            .frame(width: 0, height: 0)
+            .accessibilityHidden(true)
     }
 }

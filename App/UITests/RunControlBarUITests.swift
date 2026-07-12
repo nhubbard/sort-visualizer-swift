@@ -4,6 +4,7 @@ import XCTest
 /// dead global "Playback Speed" Settings slider) is actually reachable and functional: pausing
 /// really stops progress, stepping forward while paused doesn't crash, and resuming reaches a
 /// correctly-sorted terminal state — the same correctness signal `QuickSortUITests` uses.
+@MainActor
 final class RunControlBarUITests: XCTestCase {
     override func setUpWithError() throws {
         continueAfterFailure = false
