@@ -70,9 +70,18 @@ let app = Target.target(
         "UIUserInterfaceStyle": "Dark",
         "UISupportedInterfaceOrientations": ["UIInterfaceOrientationLandscapeLeft", "UIInterfaceOrientationLandscapeRight"],
         "UISupportedInterfaceOrientations~ipad": ["UIInterfaceOrientationLandscapeLeft", "UIInterfaceOrientationLandscapeRight"],
+        // Landscape-only means we can't declare all 4 orientations, which iPad multitasking
+        // (Split View/Slide Over) requires. Opting out of multitasking via UIRequiresFullScreen
+        // is the standard escape hatch — App Store validation only enforces the all-4-orientations
+        // rule for apps that support multitasking.
+        "UIRequiresFullScreen": true,
         "LSApplicationCategoryType": "public.app-category.education",
         "UIApplicationSupportsIndirectInputEvents": true,
         "ITSAppUsesNonExemptEncryption": false,
+        // Empty dict opts into the system-generated default launch screen (app icon centered on
+        // background color) — no storyboard needed. Newly enforced by App Store validation as of
+        // the iOS 26/27 SDK; wasn't required in earlier submissions.
+        "UILaunchScreen": [:],
         "UIApplicationSceneManifest": [
             "UIApplicationSupportsMultipleScenes": false,
         ],
@@ -130,7 +139,7 @@ let app = Target.target(
     settings: .settings(base: [
         "CODE_SIGN_ENTITLEMENTS": "App/Resources/SortSymphony.entitlements",
         "MARKETING_VERSION": "2.0.0",
-        "CURRENT_PROJECT_VERSION": "20",
+        "CURRENT_PROJECT_VERSION": "35",
         "SWIFT_VERSION": "6.0",
         "SWIFT_STRICT_CONCURRENCY": "complete",
         "CODE_SIGN_STYLE": "Automatic",
