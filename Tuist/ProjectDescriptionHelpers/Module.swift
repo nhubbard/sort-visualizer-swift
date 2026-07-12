@@ -57,26 +57,37 @@ public enum Module {
         "MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS": "gnu11 gnu++14",
     ]
 
-    /// Discovers shipped `App/Resources/AlgorithmDetails/<id>/` output folders, skipping the
-    /// sibling `<name>.bundle/` authoring bundles (raw source + the Pygments highlighting
-    /// pipeline, see that directory's own README) — a plain top-level `.folderReference` would
-    /// ship those too, so each shipped folder is named individually here instead. Matches this
-    /// project's existing "no hardcoded lists" approach to registering content (see
-    /// `ContentView.swift`'s algorithm-sidebar comment). `callerFilePath` defaults to the call
-    /// site's own path (via `#filePath`), so the manifest-relative root is computed from wherever
-    /// this is actually called rather than assumed from this file's own location.
-    public static func algorithmDetailCopyFiles(callerFilePath: StaticString = #filePath) -> [CopyFileElement] {
+    /// Discovers `App/Resources/AlgorithmDetails/<id>/` algorithm folders (each holding raw
+    /// source alongside the finished `description.md`/`<lang>.md` content, see that directory's
+    /// own README) and returns one Copy Files build phase per algorithm, shipping only that
+    /// folder's `*.md` files under `AlgorithmDetails/<id>/` — raw source and pipeline files never
+    /// reach the app bundle. One phase per algorithm is required, not one shared phase: a Copy
+    /// Files phase applies a single destination subpath to every file it copies, so preserving
+    /// the per-algorithm nesting `AlgorithmDetailContent` expects means each algorithm needs its
+    /// own subpath. Matches this project's existing "no hardcoded lists" approach to registering
+    /// content (see `ContentView.swift`'s algorithm-sidebar comment). `callerFilePath` defaults to
+    /// the call site's own path (via `#filePath`), so the manifest-relative root is computed from
+    /// wherever this is actually called rather than assumed from this file's own location.
+    public static func algorithmDetailCopyFiles(callerFilePath: StaticString = #filePath) -> [CopyFilesAction] {
         let root = URL(fileURLWithPath: "\(callerFilePath)")
             .deletingLastPathComponent()
             .appendingPathComponent("App/Resources/AlgorithmDetails")
         let entries = (try? FileManager.default.contentsOfDirectory(
             at: root, includingPropertiesForKeys: [.isDirectoryKey], options: [.skipsHiddenFiles]
         )) ?? []
-        let shippedNames = entries
+        // `template/` is the master template `scaffold.sh` copies from, not a real algorithm.
+        let excluded: Set<String> = ["template"]
+        let algorithmIDs = entries
             .filter { (try? $0.resourceValues(forKeys: [.isDirectoryKey]))?.isDirectory == true }
             .map(\.lastPathComponent)
-            .filter { !$0.hasSuffix(".bundle") }
+            .filter { !excluded.contains($0) }
             .sorted()
-        return shippedNames.map { .folderReference(path: .path("App/Resources/AlgorithmDetails/\($0)")) }
+        return algorithmIDs.map { id in
+            .resources(
+                name: "AlgorithmDetails-\(id)",
+                subpath: "AlgorithmDetails/\(id)",
+                files: [.glob(pattern: .path("App/Resources/AlgorithmDetails/\(id)/*.md"))]
+            )
+        }
     }
 }

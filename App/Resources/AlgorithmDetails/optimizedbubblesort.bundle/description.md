@@ -1,9 +1,0 @@
-*From Wikipedia, the free encyclopedia*
-
-Optimized Bubble Sort is a small but effective refinement of plain [Bubble Sort](https://en.wikipedia.org/wiki/Bubble_sort). Ordinary Bubble Sort always shrinks its comparison range by exactly one element per pass, even when a much larger trailing portion of the array is already in its final sorted position. This variant instead tracks, during each pass, how many consecutive comparisons at the tail end did *not* require a swap. That count is used to shrink the outer bound by more than one element whenever possible, letting later passes skip over stretches of the array that are already known to be sorted.
-
-The inner loop is unchanged from plain Bubble Sort: adjacent elements are compared, and out-of-order pairs are swapped. What changes is bookkeeping around that loop. A counter starts at one and increments every time a comparison does *not* trigger a swap; it resets back to one the moment a swap does happen. Once the inner loop finishes, the outer bound decreases by the counter's final value rather than by a fixed one, so any consecutive run of already-sorted elements at the end of the array is skipped entirely on the next pass.
-
-Because a full inner pass without a single swap simply means the counter reaches the length of that pass, this optimization also has the effect of terminating in one pass on an already-sorted array, giving it the same O(n) best case as other early-exit Bubble Sort variants. On randomly ordered or reverse-ordered input, the counter rarely grows past one or two, so the algorithm's average and worst-case behavior remains O(n^2), identical to plain Bubble Sort.
-
-Like standard Bubble Sort, this optimization only ever swaps strictly out-of-order adjacent pairs, so equal elements are never exchanged and the algorithm remains a stable sort.

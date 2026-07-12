@@ -1,9 +1,0 @@
-*From Wikipedia, the free encyclopedia*
-
-Unoptimized Bubble Sort is the plain, textbook formulation of [Bubble Sort](https://en.wikipedia.org/wiki/Bubble_sort), stripped of the small refinements that most practical implementations add on top of it. It repeatedly steps through the array, comparing each pair of adjacent elements and swapping them if they are out of order, so that on each pass the largest remaining value "bubbles up" toward the end of the array. It keeps making passes until an entire pass completes without a single swap, at which point the array is known to be sorted.
-
-What sets this version apart is what it does *not* do. Ordinary Bubble Sort narrows its comparison range by one element after every pass, since the largest unsorted value is always guaranteed to have reached its final position. A further-optimized variant narrows the range by however many elements at the tail were already found to be in order. This version does neither: every single pass scans the full array from the first index to the last, regardless of how many elements near the end are already settled. The only thing that ever stops it early is a full pass making zero swaps.
-
-This makes it the simplest possible version of Bubble Sort to reason about, at the cost of doing needless comparison work on the already-sorted tail of the array during every later pass. On an already-sorted input, it still finishes after just one pass, since that pass makes no swaps and the loop exits immediately — giving it the same O(n) best case as its more refined siblings. On average and worst-case input, however, the wasted comparisons add no new order of growth; it remains O(n^2) just like the optimized variants, only with a somewhat larger constant factor.
-
-Because it only ever swaps strictly out-of-order adjacent pairs, equal elements are never exchanged, so the algorithm remains a stable sort.

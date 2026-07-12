@@ -9,16 +9,14 @@ algorithms = sorted(
     [
         "quicksort",
         "mergesort",
-        "heapsort",
+        "maxheapsort",
         "bubblesort",
         "selectionsort",
         "insertionsort",
         "gnomesort",
-        "shakersort",
         "oddevensort",
         "pancakesort",
-        "bitonicsort",
-        "radixsort",
+        "bitonicsortiterative",
         "shellsort",
         "combsort",
         "bogosort",
@@ -508,11 +506,11 @@ if __name__ == "__main__":
     if len(sys.argv) > 1:
         algorithm = sys.argv[1]
         for extension in extensions:
-            files.append(f"{algorithm}.bundle/{algorithm}.{extension}")
+            files.append(f"{algorithm}/{algorithm}.{extension}")
     else:
         for algorithm in algorithms:
             for extension in extensions:
-                files.append(f"{algorithm}.bundle/{algorithm}.{extension}")
+                files.append(f"{algorithm}/{algorithm}.{extension}")
     # Loop over each file
     for file in files:
         ext = file.split(".")[-1]

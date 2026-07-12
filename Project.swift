@@ -103,15 +103,14 @@ let app = Target.target(
         .folderReference(path: "App/Resources/Shuffles"),
         .folderReference(path: "App/Resources/AppIcon.icon"),
     ],
-    // AlgorithmDetails/ also holds the authoring pipeline (`<id>.bundle/`, highlight.py, test.py,
-    // template.bundle/, ...) as siblings of the shipped `<algorithmID>/` output folders — a plain
-    // top-level `.folderReference` would ship all of that too. This Copy Files phase re-nests just
-    // the shipped output folders under a literal `AlgorithmDetails/` in the bundle, so
+    // AlgorithmDetails/ also holds the authoring pipeline (highlight.py, test.py, template/, ...)
+    // and each algorithm folder's raw source, as siblings of the `*.md` content actually read at
+    // runtime — a plain top-level `.folderReference` would ship all of that too. These Copy Files
+    // phases (one per algorithm, see `Module.algorithmDetailCopyFiles`'s doc comment) ship only
+    // the `.md` files, re-nested under a literal `AlgorithmDetails/<id>/` in the bundle, so
     // `AlgorithmDetailContent.load` keeps reading `Bundle.main.url(forResource: "AlgorithmDetails",
     // withExtension: nil)` unmodified.
-    copyFiles: [
-        .resources(name: "AlgorithmDetails", subpath: "AlgorithmDetails", files: algorithmDetailCopyFiles),
-    ],
+    copyFiles: algorithmDetailCopyFiles,
     entitlements: .file(path: "App/Resources/SortSymphony.entitlements"),
     dependencies: [
         .target(name: "SortFeature"), .target(name: "SettingsFeature"),

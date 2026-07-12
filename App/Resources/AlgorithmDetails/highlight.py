@@ -7,16 +7,14 @@ algorithms = sorted(
     [
         "quicksort",
         "mergesort",
-        "heapsort",
+        "maxheapsort",
         "bubblesort",
         "selectionsort",
         "insertionsort",
         "gnomesort",
-        "shakersort",
         "oddevensort",
         "pancakesort",
-        "bitonicsort",
-        "radixsort",
+        "bitonicsortiterative",
         "shellsort",
         "combsort",
         "bogosort",
@@ -120,8 +118,8 @@ class AttributedTextFormatter(Formatter):
 if __name__ == "__main__":
     for algo in algorithms:
         for ext in extensions:
-            filename = f"./{algo}.bundle/{algo}.{ext}"
-            output_filename = f"{filename}.md"
+            filename = f"./{algo}/{algo}.{ext}"
+            output_filename = f"./{algo}/{ext}.md"
             try:
                 with open(filename) as fp:
                     code = fp.read().rstrip("\n")
