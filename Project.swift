@@ -127,8 +127,8 @@ let app = Target.target(
     ],
     settings: .settings(base: [
         "CODE_SIGN_ENTITLEMENTS": "App/Resources/SortSymphony.entitlements",
-        "MARKETING_VERSION": "1.4.2",
-        "CURRENT_PROJECT_VERSION": "1",
+        "MARKETING_VERSION": "2.0.0",
+        "CURRENT_PROJECT_VERSION": "20",
         "SWIFT_VERSION": "6.0",
         "SWIFT_STRICT_CONCURRENCY": "complete",
         "CODE_SIGN_STYLE": "Automatic",
