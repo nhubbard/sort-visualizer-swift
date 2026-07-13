@@ -60,7 +60,6 @@ public struct RecordingEngine: Sendable {
     }
 
     public mutating func setValue(_ i: Int, _ value: Int) {
-        tape.append(.mark(marker: Marker.write, index: i))
         tape.append(.setValue(i, value))
         values[i] = value
         mainWriteCount += 1

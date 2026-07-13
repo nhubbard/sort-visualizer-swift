@@ -29,7 +29,7 @@ public struct SettingsView: View {
                 .accessibilityIdentifier("shufflePicker")
             }
             Section {
-                Slider(value: $settings.playbackSpeed, in: 1...200, step: 1) {
+                Slider(value: $settings.playbackSpeed, in: 1...1000, step: 1) {
                     Text("Speed")
                 } minimumValueLabel: {
                     Text("Slow")

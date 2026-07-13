@@ -4,6 +4,10 @@ import SwiftUI
 
 public struct SortView: View {
     @Bindable var session: SortSession
+    /// Non-`nil` only when this session is one step of Showcase mode — see
+    /// `ScrollingSortView.showcaseStop`'s doc comment for why `automationBanner`'s Stop button
+    /// needs a different action in that case instead of `session.stopAutomation()`.
+    let showcaseStop: (() -> Void)?
     @Environment(AppSettings.self) private var settings
 
     // Owned here, not by `RunControlBar` itself: `start(size:)` (the size stepper's own action)
@@ -17,8 +21,9 @@ public struct SortView: View {
     @State private var isSizeExpanded = false
     @State private var isVisualizerExpanded = false
 
-    public init(session: SortSession) {
+    public init(session: SortSession, showcaseStop: (() -> Void)? = nil) {
         self.session = session
+        self.showcaseStop = showcaseStop
     }
 
     public var body: some View {
@@ -35,6 +40,9 @@ public struct SortView: View {
     /// Shown instead of the normal status label while a registered `Automation` is driving this
     /// session — same "machine-readable via accessibilityIdentifier" shape as `statusLabel`, plus
     /// a way to stop the loop without needing to remember the keyboard shortcut that started it.
+    /// `session.isAutomating` is also `true` during a Showcase pass (both go through
+    /// `SortSession.runAutomation(sizes:runsPerSize:)`), so this same banner appears either way —
+    /// but stopping them means two different things, hence `showcaseStop` taking priority when set.
     private var automationBanner: some View {
         HStack(spacing: 8) {
             ProgressView()
@@ -42,7 +50,13 @@ public struct SortView: View {
             Text(automationProgressText)
                 .font(.caption)
                 .accessibilityIdentifier("automationProgressLabel")
-            Button("Stop") { session.stopAutomation() }
+            Button("Stop") {
+                if let showcaseStop {
+                    showcaseStop()
+                } else {
+                    session.stopAutomation()
+                }
+            }
                 .font(.caption)
                 .accessibilityIdentifier("automationStopButton")
         }
@@ -54,11 +68,26 @@ public struct SortView: View {
         return "Automating: size \(session.arraySize) (\(progress.sizeIndex + 1)/\(progress.sizeCount)) · run \(progress.runIndex + 1)/\(progress.runCount)"
     }
 
+    /// `.idle`/`.recording`/`.ready` used to unconditionally show a bare `ProgressView()` here —
+    /// correct for the very first run (there's nothing else to show yet), but for every run after
+    /// that, `start(size:)` passes through this same gap on every single call, unmounting the
+    /// canvas for a spinner and remounting a freshly-built one moments later. Reported as a visible
+    /// flash between runs during Size Sweep automation, most noticeable at small array sizes
+    /// (where a run finishes fast enough that this fixed-cost gap is a large fraction of what's on
+    /// screen). Falling back to `session.lastReplay` — the previous run's now-frozen final frame —
+    /// instead keeps the canvas mounted and showing *something real* through the gap; `ProgressView`
+    /// only ever appears once, before the first run has produced a replay at all. Deliberately no
+    /// `RunControlBar` in this branch: `lastReplay` is a dead run about to be replaced, not
+    /// something worth offering scrub/play controls on.
     @ViewBuilder
     private var content: some View {
         switch session.phase {
         case .idle, .recording, .ready:
-            ProgressView()
+            if let lastReplay = session.lastReplay {
+                canvas(for: lastReplay)
+            } else {
+                ProgressView()
+            }
         case let .replaying(replay), let .complete(replay):
             canvas(for: replay)
                 .safeAreaInset(edge: .bottom) {

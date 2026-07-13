@@ -15,17 +15,24 @@ public struct ScrollingSortView: View {
     /// tears this view down and cancels its `.task` — without that guard, a run already finishing
     /// at the exact moment Stop is tapped could still fire "advance to the next algorithm" once.
     let showcaseCompletion: (() -> Void)?
+    /// Non-`nil` under the same condition as `showcaseCompletion` (both come from `ContentView`'s
+    /// `showcaseIndex != nil`) — wired to `ContentView.stopShowcase()`, for `SortView`'s embedded
+    /// automation-banner Stop button to call instead of `SortSession.stopAutomation()` (a no-op
+    /// during Showcase, since it never goes through `SortSession.automationTask`; see
+    /// `SortSession.runShowcasePass()`'s doc comment).
+    let showcaseStop: (() -> Void)?
     @State private var session: SortSession
     @Environment(AppSettings.self) private var settings
 
     @MainActor
     public init(
         algorithm: any SortAlgorithm, shuffle: any ShuffleAlgorithm, arraySize: Int = 48,
-        showcaseCompletion: (() -> Void)? = nil
+        showcaseCompletion: (() -> Void)? = nil, showcaseStop: (() -> Void)? = nil
     ) {
         self.algorithm = algorithm
         self.arraySize = arraySize
         self.showcaseCompletion = showcaseCompletion
+        self.showcaseStop = showcaseStop
         // AudioService.shared, for real: this used to default to NoOpAudioService() because
         // constructing a live AudioKit graph crashed in this project's toolchain/simulator
         // combination at native AudioComponent registration, a crash Swift couldn't catch (a C++
@@ -46,7 +53,7 @@ public struct ScrollingSortView: View {
         GeometryReader { geometry in
             ScrollView {
                 VStack(alignment: .leading, spacing: 0) {
-                    SortView(session: session)
+                    SortView(session: session, showcaseStop: showcaseStop)
                         .frame(width: geometry.size.width, height: geometry.size.height)
                     AlgorithmDetailSection(algorithm: algorithm)
                 }

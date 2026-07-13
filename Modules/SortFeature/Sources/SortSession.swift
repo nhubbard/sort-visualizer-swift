@@ -27,6 +27,16 @@ public final class SortSession {
 
     public private(set) var phase: Phase = .idle
 
+    /// The most recent `.replaying`/`.complete` replay this session has shown — unlike `phase`'s
+    /// own associated value, this deliberately *survives* the `.recording`/`.ready` gap `start
+    /// (size:)` passes through before the next run's replay exists, so `SortView` can keep
+    /// rendering the previous run's final frame instead of unmounting the canvas for a
+    /// `ProgressView()` on every single automation iteration (a real, reported flash — see
+    /// `SortView.content`'s own doc comment). Never explicitly cleared: the next `startReplay(_:)`
+    /// simply overwrites it, and the old `ReplayEngine` deallocates once nothing else (this
+    /// property included) still holds it.
+    public private(set) var lastReplay: ReplayEngine?
+
     /// Local to this session, seeded from `AppSettings.soundEnabled` at construction but never
     /// written back — the global setting is the *default* for new sessions, this is the
     /// currently-running sort's own on/off switch (a run-control-bar toggle, not a Settings toggle).
@@ -128,6 +138,14 @@ public final class SortSession {
         var shuffleEngine = RecordingEngine(values: identity)
         shuffle.record(into: &shuffleEngine)
         let uniqueValueCount = Set(shuffleEngine.values).count
+        // `compare`/`swap`'s auto-retraction (`markPrimarySecondary`) only clears the *previous*
+        // pair right before marking a new one — there's nothing to retract whatever pair the
+        // shuffle's own last `compare`/`swap` marked, since no further call ever comes along to
+        // trigger it. Without this, that leftover primary/secondary would sit on the frame for
+        // however long it takes the sort's own first `compare`/`swap` to happen to overwrite it
+        // (each `RecordingEngine` instance only tracks the marks *it* applied, so the sort's fresh
+        // instance doesn't know to retract them either) — same bug as below, one phase earlier.
+        shuffleEngine.unmarkAll()
         let shuffleSummary = shuffleEngine.finish()
 
         // recordingDuration measures only the sort, not the shuffle — it's the real algorithmic
@@ -136,6 +154,13 @@ public final class SortSession {
         var sortEngine = RecordingEngine(values: shuffleEngine.values)
         algorithm.record(into: &sortEngine)
         let recordingDuration = Date().timeIntervalSince(recordingStart)
+        // Same reasoning as `shuffleEngine.unmarkAll()` above, but for the far more visible case:
+        // whichever pair the algorithm's very last `compare`/`swap` touched would otherwise stay
+        // marked (one red, one blue) forever on the completed, fully-sorted final frame, since
+        // nothing ever calls another `compare`/`swap` afterward to retract it. Placed after
+        // `recordingDuration` is captured, not before, so this bookkeeping never counts against the
+        // algorithm's own measured recording time.
+        sortEngine.unmarkAll()
         let sortSummary = sortEngine.finish()
 
         return Tape(
@@ -162,6 +187,7 @@ public final class SortSession {
         let replay = replayEngineFactory(tape)
         replay.speed = settings.playbackSpeed
         phase = .replaying(replay)
+        lastReplay = replay
         beginPlayback(replay)
     }
 

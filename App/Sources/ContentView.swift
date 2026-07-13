@@ -137,12 +137,24 @@ struct ContentView: View {
         return advanceShowcase
     }
 
+    /// Distinct from `showcaseCompletionHandler` above: that one fires when the current
+    /// algorithm's pass finishes *on its own* (advance to the next one); this fires when the user
+    /// asks to stop early, from the "Stop" button embedded in `SortView`'s automation banner —
+    /// which `session.isAutomating` also shows during a Showcase pass (it's driven by the same
+    /// `SortSession.runAutomation(sizes:runsPerSize:)` machinery under the hood), but whose button
+    /// used to call `session.stopAutomation()`, a complete no-op here since Showcase never goes
+    /// through `SortSession.automationTask` (see `runShowcasePass()`'s own doc comment).
+    private var showcaseStopHandler: (() -> Void)? {
+        guard showcaseIndex != nil else { return nil }
+        return stopShowcase
+    }
+
     private var detailContent: some View {
         Group {
             if let selection, let algorithm = AlgorithmRegistry.shared.algorithm(id: selection) {
                 ScrollingSortView(
                     algorithm: algorithm, shuffle: defaultShuffle, arraySize: arraySize,
-                    showcaseCompletion: showcaseCompletionHandler
+                    showcaseCompletion: showcaseCompletionHandler, showcaseStop: showcaseStopHandler
                 )
                 .id(selection)
             } else {

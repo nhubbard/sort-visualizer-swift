@@ -95,6 +95,12 @@ public final class ReplayEngine {
         /// not the element moves it's built from (those already land in `swapCount`).
         public internal(set) var reversalCount: Int
         public internal(set) var stepIndex: Int
+        /// Count of applied operations where `SortOperation.isSignificantForPacing` is `true` —
+        /// the real-work numerator behind `RunControlBar`'s displayed "ops/sec" stat, matching
+        /// exactly what `play()`'s pacing loop actually paces against. `stepIndex` alone would
+        /// overstate throughput by however many bookkeeping mark/unmark entries rode along for
+        /// free alongside each real step (see `play()`'s own doc comment).
+        public internal(set) var significantOperationCount: Int
 
         /// Hand-written, not synthesized: `@Observable`'s macro-generated `state` setter calls
         /// this on every plain assignment (`stepForward`/`seek`) to decide whether to notify
@@ -127,6 +133,7 @@ public final class ReplayEngine {
     public var mainWriteCount: Int { state.mainWriteCount }
     public var auxWriteCount: Int { state.auxWriteCount }
     public var reversalCount: Int { state.reversalCount }
+    public var significantOperationCount: Int { state.significantOperationCount }
 
     /// Live element count across all currently-allocated auxiliary/scratch buffers (ArrayV's
     /// "Items in External Arrays" — `Writes.allocAmount`). Derived on demand from `auxArrays`
@@ -211,7 +218,8 @@ public final class ReplayEngine {
         let initialFrame = tape.header.initialValues.map { BarState(id: UUID(), value: $0) }
         let initialState = PlaybackState(
             frame: initialFrame, auxArrays: [:], compareCount: 0, swapCount: 0,
-            mainWriteCount: 0, auxWriteCount: 0, reversalCount: 0, stepIndex: 0
+            mainWriteCount: 0, auxWriteCount: 0, reversalCount: 0, stepIndex: 0,
+            significantOperationCount: 0
         )
         self.state = initialState
 
@@ -271,10 +279,12 @@ public final class ReplayEngine {
     private static let maxCatchUpInterval: TimeInterval = 0.25
 
     /// The pure pacing math, factored out of `play()` so it's directly unit-testable without a
-    /// driver: how many operations are due given `elapsed` real seconds at `speed` operations per
-    /// second, carrying any fractional remainder forward in `accumulator` so slow speeds don't
-    /// lose operations to rounding, and never returning more than `remaining` (the tape doesn't
-    /// have more to give).
+    /// driver: how many *significant* operations (see `SortOperation.isSignificantForPacing`) are
+    /// due given `elapsed` real seconds at `speed` operations per second, carrying any fractional
+    /// remainder forward in `accumulator` so slow speeds don't lose operations to rounding, and
+    /// never returning more than `remaining` (raw tape entries left — a safe, if loose, upper
+    /// bound, since the tape can never contain fewer significant entries than raw ones; `play()`'s
+    /// own tick loop is what actually stops at the true end of tape).
     static func opsToApply(elapsed: TimeInterval, speed: Double, accumulator: inout Double, remaining: Int) -> Int {
         accumulator += min(elapsed, maxCatchUpInterval) * speed
         let ops = min(Int(accumulator), remaining)
@@ -304,6 +314,17 @@ public final class ReplayEngine {
     /// entirely — no `mutatingState` write, no redraw. Whatever batch *is* due within one tick
     /// still applies through one `mutatingState` call, preserving the single-`@Observable`-write-
     /// per-tick property the type's other doc comments (see `state`) depend on.
+    ///
+    /// `opsToApply` is a budget of *significant* operations (`SortOperation.isSignificantForPacing`
+    /// — `.compare`/`.swap`/`.setValue`/`.auxWrite`/`.reversal`/`.markSorted`), not raw tape
+    /// entries: `RecordingEngine.markPrimarySecondary` emits up to 4 bookkeeping `.mark`/
+    /// `.unmarkIndex` entries around every `.compare`/`.swap` to retract the previous highlighted
+    /// pair and apply the new one, so a flat "N tape entries per tick" budget was spending ~4/5 of
+    /// every tick's budget on marker bookkeeping instead of real algorithmic progress — at a UI-
+    /// configured "200 ops/sec," only ~40 real compares/swaps actually happened per second. The
+    /// inner loop below still applies (and still reports to `onStep`/`onOperationApplied`) every
+    /// tape entry it passes over, bookkeeping included — it just doesn't count against the budget,
+    /// so bookkeeping rides along for free within whichever tick it falls in.
     @discardableResult
     public func play(onStep: ((SortOperation) -> Void)? = nil) -> Task<Void, Never> {
         isPlaying = true
@@ -331,11 +352,14 @@ public final class ReplayEngine {
                 let tickInterval = replaySignposter.beginInterval(
                     "TickApply", id: replaySignposter.makeSignpostID(), "\(opsToApply) ops")
                 self.mutatingState { working in
-                    for _ in 0..<opsToApply {
-                        guard working.stepIndex < self.tape.operations.count else { break }
+                    var significantApplied = 0
+                    while significantApplied < opsToApply, working.stepIndex < self.tape.operations.count {
                         let operation = self.tape.operations[working.stepIndex]
                         Self.apply(operation, to: &working)
                         appliedOperations.append(operation)
+                        if operation.isSignificantForPacing {
+                            significantApplied += 1
+                        }
                     }
                 }
                 replaySignposter.endInterval("TickApply", tickInterval)
@@ -417,6 +441,9 @@ public final class ReplayEngine {
             state.auxArrays.removeValue(forKey: handle)
         case .reversal:
             state.reversalCount += 1
+        }
+        if operation.isSignificantForPacing {
+            state.significantOperationCount += 1
         }
         state.stepIndex += 1
     }

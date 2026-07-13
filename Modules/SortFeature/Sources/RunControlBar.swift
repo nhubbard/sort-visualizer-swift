@@ -68,38 +68,34 @@ struct RunControlBar: View {
         .accessibilityIdentifier("runControlScrubSlider")
     }
 
-    /// Fixed-minimum-width digit slots, not one formatted `Text` — a single `Text` reflows (and
-    /// nudges every sibling in `transportRow` below it) every time a value's digit count changes,
-    /// which at real playback speeds is constantly. Reserving width up front means the row's total
-    /// width stays put; a value only grows into its own slot's padding.
+    /// Each stat is its own tight `[number][label]` cell (`statCell`), and the cells sit in a
+    /// plain `HStack` with generous inter-cell spacing standing in for the `·` separator this used
+    /// to have — a fixed-width slot only stabilizes the *digits* within one cell; the separator
+    /// glyph never did anything for stability, it was just visual noise between cells that
+    /// whitespace alone reads just as clearly. Not `LazyHStack`: laziness only pays off for
+    /// children a scrolling ancestor can defer rendering along this same (horizontal) axis — this
+    /// row never scrolls and always renders all 8 cells, so there's nothing to defer.
     private var statsCaption: some View {
-        HStack(spacing: 4) {
-            statSlot(replay.compareCount, digits: 6)
-            Text("compares")
-            dot
-            statSlot(replay.swapCount, digits: 6)
-            Text("swaps")
-            dot
+        HStack(spacing: 12) {
+            statCell(replay.compareCount, digits: 6, label: "compares")
+            statCell(replay.swapCount, digits: 6, label: "swaps")
             // Matches ArrayV's own on-screen order (Comparisons, Swaps, Reversals, Writes to Main
             // Array, Writes to Auxiliary Array(s), Items in External Arrays) — always shown, even
             // at zero, same as ArrayV itself never conditionally hides a stat an algorithm doesn't
             // happen to use. Conditionally showing/hiding would also reflow the row exactly when
             // the fixed-width slots above exist to prevent.
-            statSlot(replay.reversalCount, digits: 4)
-            Text("reversals")
-            dot
-            statSlot(replay.mainWriteCount, digits: 6)
-            Text("writes")
-            dot
-            statSlot(replay.auxWriteCount, digits: 6)
-            Text("aux writes")
-            dot
-            statSlot(replay.externalArrayItemCount, digits: 5)
-            Text("in external arrays")
-            dot
+            statCell(replay.reversalCount, digits: 4, label: "reversals")
+            statCell(replay.mainWriteCount, digits: 6, label: "writes")
+            statCell(replay.auxWriteCount, digits: 6, label: "aux writes")
+            statCell(replay.externalArrayItemCount, digits: 5, label: "in external arrays")
             statSlot(String(format: "%.1fs", replay.elapsedPlaybackDuration), digits: 6)
-            dot
-            statSlot(String(format: "%.0f ops/sec", opsPerSecond), digits: 4)
+            // Number and unit are two separate `Text`s within the cell, not one formatted string —
+            // `statSlot`'s fixed-width reservation only holds the digits steady; folding " ops/sec"
+            // into the same string as the number let the *whole* string's natural width (and thus
+            // this row's total width) shift every time the number crossed a digit boundary (3
+            // digits -> 4 once throughput approached 1000), which SwiftUI visibly resized/glitched
+            // several times a second during fast playback.
+            statCell(Int(opsPerSecond), digits: 4, label: "ops/sec")
         }
         .font(.caption)
         .foregroundStyle(.secondary)
@@ -107,14 +103,27 @@ struct RunControlBar: View {
         .accessibilityIdentifier("runControlStatsCaption")
     }
 
-    // `stepIndex`, not `compareCount + swapCount` — merge-family algorithms record most of their
-    // tape as `.setValue`/`.auxWrite` (writing merged runs back), not `.compare`/`.swap`, so a
-    // compare+swap-only numerator badly undercounts real throughput for them while still looking
-    // correct for compare/swap-heavy algorithms like quicksort. `stepIndex` is the actual count of
-    // tape operations `ReplayEngine` has applied, regardless of type.
+    /// One stat's fixed-width number plus its label, kept tight (`spacing: 4`) so the pair reads as
+    /// a single unit — the looser `spacing: 12` between cells in `statsCaption` above is what
+    /// visually separates one stat from the next now that there's no `·` glyph doing that job.
+    private func statCell(_ value: Int, digits: Int, label: String) -> some View {
+        HStack(spacing: 4) {
+            statSlot(value, digits: digits)
+            Text(label)
+        }
+    }
+
+    // `significantOperationCount`, not `stepIndex` and not `compareCount + swapCount`.
+    // `compareCount + swapCount` alone badly undercounts merge-family algorithms, which record
+    // most of their tape as `.setValue`/`.auxWrite` (writing merged runs back) — but plain
+    // `stepIndex` overcounts *everything*, since it also counts the mark/unmark bookkeeping
+    // `RecordingEngine.markPrimarySecondary` emits around every `.compare`/`.swap`, which
+    // `ReplayEngine.play()`'s pacing no longer charges against `speed` at all (see
+    // `SortOperation.isSignificantForPacing`). `significantOperationCount` is exactly what the
+    // pacing loop paces against, so this stat can never appear to exceed the configured `speed`.
     private var opsPerSecond: Double {
         let elapsed = replay.elapsedPlaybackDuration
-        return elapsed > 0 ? Double(replay.stepIndex) / elapsed : 0
+        return elapsed > 0 ? Double(replay.significantOperationCount) / elapsed : 0
     }
 
     private func statSlot(_ value: Int, digits: Int) -> some View {
@@ -127,10 +136,6 @@ struct RunControlBar: View {
         Text(text)
             .monospacedDigit()
             .frame(minWidth: CGFloat(digits) * 7.5, alignment: .trailing)
-    }
-
-    private var dot: some View {
-        Text("·")
     }
 
     private var transportRow: some View {
@@ -208,7 +213,7 @@ struct RunControlBar: View {
             .accessibilityLabel(session.soundEnabled ? "Mute" : "Unmute")
             .help(session.soundEnabled ? "Turn off sort sound effects (⌘A)" : "Turn on sort sound effects (⌘A)")
 
-            automatorMenu
+            AutomatorMenuButton(session: session)
 
             Button {
                 isSpeedExpanded.toggle()
@@ -243,32 +248,6 @@ struct RunControlBar: View {
         .controlSize(.large)
     }
 
-    /// Robot icon — lists every registered `Automation` (see `AutomationRegistry`), the same two
-    /// entries `⌘⇧A`/`⌘⌥⇧A` already trigger, so the shortcut and the tappable UI are two views onto
-    /// one source of truth rather than two independently-maintained ones.
-    private var automatorMenu: some View {
-        Menu {
-            ForEach(AutomationRegistry.shared.automations) { automation in
-                Button {
-                    session.runAutomation(automation)
-                } label: {
-                    if session.runningAutomationID == automation.id {
-                        Label("\(automation.displayName) (\(automation.shortcutDisplayString)) — Running", systemImage: "checkmark")
-                    } else {
-                        Label("\(automation.displayName) (\(automation.shortcutDisplayString))", systemImage: automation.iconName)
-                    }
-                }
-                .accessibilityIdentifier("automatorMenuItem.\(automation.id.rawValue)")
-            }
-        } label: {
-            Image(systemName: "gearshape.2.fill")
-              .foregroundStyle(Color.accentColor)
-        }
-        .buttonStyle(.plain)
-        .accessibilityIdentifier("runControlAutomatorButton")
-        .accessibilityLabel("Automations")
-        .help("Run a size-sweep or max-size automation")
-    }
 
     private var isFinished: Bool {
         replay.stepIndex >= replay.totalOperationCount
@@ -279,7 +258,7 @@ struct RunControlBar: View {
             Text("Slow")
                 .font(.caption)
                 .foregroundStyle(.secondary)
-            Slider(value: $replay.speed, in: 1...200, step: 1)
+            Slider(value: $replay.speed, in: 1...1000, step: 1)
                 .accessibilityIdentifier("runControlSpeedSlider")
             Text("Fast")
                 .font(.caption)
@@ -357,11 +336,11 @@ struct RunControlBar: View {
                 .keyboardShortcut("r", modifiers: [.command])
             hiddenButton { session.soundEnabled.toggle() }
                 .keyboardShortcut("a", modifiers: [.command])
-            hiddenButton { replay.speed = min(200, replay.speed + 1) }
+            hiddenButton { replay.speed = min(1000, replay.speed + 1) }
                 .keyboardShortcut("+", modifiers: [.command, .shift])
             hiddenButton { replay.speed = max(1, replay.speed - 1) }
                 .keyboardShortcut("-", modifiers: [.command, .shift])
-            hiddenButton { replay.speed = min(200, replay.speed + 10) }
+            hiddenButton { replay.speed = min(1000, replay.speed + 10) }
                 .keyboardShortcut("+", modifiers: [.command, .option])
             hiddenButton { replay.speed = max(1, replay.speed - 10) }
                 .keyboardShortcut("-", modifiers: [.command, .option])
@@ -378,5 +357,59 @@ struct RunControlBar: View {
             .opacity(0)
             .frame(width: 0, height: 0)
             .accessibilityHidden(true)
+    }
+}
+
+/// Robot icon — lists every registered `Automation` (see `AutomationRegistry`), the same two
+/// entries `⌘⇧A`/`⌘⌥⇧A` already trigger, so the shortcut and the tappable UI are two views onto
+/// one source of truth rather than two independently-maintained ones.
+///
+/// A genuine `View` type, not a computed property on `RunControlBar` (which is what this used to
+/// be) — `@Environment(\.isEnabled)` only reflects ancestors of wherever it's actually read, and
+/// `RunControlBar.body` applies `.disabled(session.isAutomating)` to the `VStack` it returns,
+/// which is a *descendant* of `RunControlBar` itself from the environment's point of view, not an
+/// ancestor of anything `RunControlBar`'s own properties can see. A `@Environment` property
+/// declared directly on `RunControlBar` would read whatever *its* parent set, never this bar's own
+/// `.disabled()` call. Pulling the button out into its own `View`, placed as an actual child inside
+/// that disabled `VStack`, gives it a real position in the tree to read that state from.
+///
+/// Every other button in `transportRow` dims automatically when `session.isAutomating` disables
+/// the bar, for free, because they have no explicit color of their own — `.buttonStyle(.borderless)`
+/// (set once on the whole row) applies the system's standard enabled/disabled look to plain
+/// `Image(systemName:)` content. This button opts out of both halves of that: `.buttonStyle(.plain)`
+/// (asked for explicitly, overriding the row's `.borderless`) and a hardcoded accent tint (so it
+/// visually reads as "the automation control," not just another transport button) — so it needs to
+/// re-derive the dimmed look itself instead of inheriting it.
+private struct AutomatorMenuButton: View {
+    let session: SortSession
+    @Environment(\.isEnabled) private var isEnabled
+
+    var body: some View {
+        Menu {
+            ForEach(AutomationRegistry.shared.automations) { automation in
+                Button {
+                    session.runAutomation(automation)
+                } label: {
+                    if session.runningAutomationID == automation.id {
+                        Label("\(automation.displayName) (\(automation.shortcutDisplayString)) — Running", systemImage: "checkmark")
+                    } else {
+                        Label("\(automation.displayName) (\(automation.shortcutDisplayString))", systemImage: automation.iconName)
+                    }
+                }
+                .accessibilityIdentifier("automatorMenuItem.\(automation.id.rawValue)")
+            }
+        } label: {
+            Image(systemName: "gearshape.2.fill")
+                // `isEnabled`, not `session.isAutomating` directly — tracks *whatever* disabled
+                // this control (today that's only ever automation, but this stays correct even if
+                // a future reason joins it) while still pinning an explicit color in both states,
+                // which a bare `Image(systemName:)` needs to avoid getting stuck at whatever color
+                // it last rendered through a tap/menu-open interaction.
+                .foregroundStyle(isEnabled ? Color.accentColor : Color.secondary)
+        }
+        .buttonStyle(.plain)
+        .accessibilityIdentifier("runControlAutomatorButton")
+        .accessibilityLabel("Automations")
+        .help("Run a size-sweep or max-size automation")
     }
 }

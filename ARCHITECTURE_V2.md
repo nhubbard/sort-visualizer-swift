@@ -746,6 +746,28 @@ but is explicitly **deferred, not designed yet**. The natural seam for it later:
 by `Visualizer`s that opt in (e.g. as `DrawCommand.text` captions) — noted here so the `DrawCommand`/
 `SortOperation` shapes above aren't accidentally designed in a way that forecloses adding it.
 
+**Stretch goal — scriptable external automation**: driving the app from outside itself with custom
+automations (an idea from your previous sorting visualizer that turned out to be too hard there,
+too). **Deferred, not designed.** Opinion for whenever this comes back up: skip literal AppleScript
+— it needs real Cocoa Scripting infrastructure (`.sdef`, `NSScriptCommand`, object specifiers) with
+no SwiftUI-native equivalent, and it's Mac-only, while this app targets iOS/iPadOS first with
+Catalyst secondary. **App Intents** gets the same "script it externally" outcome (plus Shortcuts/
+Siri) on every platform this app ships on, as an ordinary `AppIntent` conformance rather than
+Obj-C scripting glue — but it's still real work, not a small one: there's no concept today of "the
+currently active `SortSession`" that an intent running out-of-process could address, so that seam
+would need to exist first.
+
+**Stretch goal — binary tape export/import for debugging a failed sort**: dump a run's `Tape` to a
+compact file when a sort fails verification, and load it back later without re-running the
+algorithm. **Deferred, not designed** — but noted as the more tractable of this pair, since the
+architecture already leans the right way: `Tape`/`TapeHeader`/`SortOperation` are already `Codable`
+(unused today, but present), and `ReplayEngine`'s only public initializer already just takes a
+plain `Tape` value with no opinion about where it came from — so import is nearly free once export
+exists. The only real work is a small versioned, tag-byte-per-case binary encoder/decoder for
+`SortOperation` (skip `JSONEncoder`/`PropertyListEncoder`, both carry real per-field overhead for
+what's a 12-case enum of small `Int` payloads), plus a hook off `SortSession.phase == .failed` to
+write the file. Should be a small, low-risk feature whenever it's worth doing.
+
 ---
 
 ## 3. Decomposing `SortViewModel`

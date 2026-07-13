@@ -26,4 +26,18 @@ extension SortOperation {
         case .auxCreate, .auxWrite, .auxDelete, .reversal: return []
         }
     }
+
+    /// Whether this operation represents real algorithmic work for `ReplayEngine.play()`'s
+    /// `speed` (ops/sec) pacing budget, as opposed to bookkeeping the recorder emits alongside it
+    /// (`RecordingEngine.markPrimarySecondary`'s auto mark/unmark pair around every `.compare`/
+    /// `.swap`, `.unmarkAll`, and aux-buffer lifecycle events). `false` here does NOT mean "not
+    /// applied" or "not rendered" — every operation in the tape still gets applied to `state` and
+    /// still reaches `onStep`/`onOperationApplied` exactly as before; it only means this operation
+    /// doesn't consume a unit of the pacing budget on its own; see `play()`'s tick loop.
+    var isSignificantForPacing: Bool {
+        switch self {
+        case .swap, .setValue, .auxWrite, .reversal, .compare, .markSorted: return true
+        case .mark, .unmark, .unmarkAll, .unmarkIndex, .auxCreate, .auxDelete: return false
+        }
+    }
 }

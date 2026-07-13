@@ -140,6 +140,29 @@ struct SortSessionTests {
         #expect(replay.frame.map(\.value) == Array(1...size))
     }
 
+    /// Regression test for the reported bug: `FakeAlgorithm` (a bubble-sort shape) always ends on
+    /// a bare `.compare` that returns `false` — no trailing `.swap` ever comes along to retract the
+    /// primary/secondary pair that final `.compare` marked, since `RecordingEngine`'s auto-
+    /// retraction (`markPrimarySecondary`) only clears the *previous* pair right before marking a
+    /// new one. Without `SortSession.makeTape`'s trailing `unmarkAll()`, the completed, fully-
+    /// sorted frame would show one index still highlighted red and another still blue, forever.
+    @Test
+    func completedFrameHasNoLingeringPrimaryOrSecondaryMarkers() async throws {
+        let session = SortSession(
+            algorithm: FakeAlgorithm(),
+            shuffle: FakeReverseShuffle(),
+            settings: makeFastSettings())
+
+        await session.start(size: 9)
+        try await waitUntilTerminal(session)
+
+        guard case let .complete(replay) = session.phase else {
+            Issue.record("expected .complete, got \(session.phase)")
+            return
+        }
+        #expect(replay.frame.allSatisfy { $0.markers.isEmpty })
+    }
+
     /// No confirmation dialog to opt out of anymore (§9 of ARCHITECTURE_V2.md — removed in favor
     /// of ArrayV's own `unreasonableLimit` precedent) — `start(size:)` itself is responsible for
     /// keeping a caller from ever requesting a size the algorithm can't reasonably handle.
@@ -365,10 +388,12 @@ struct SortSessionTests {
 
         var shuffleEngine = RecordingEngine(values: Array(1...size))
         shuffle.record(into: &shuffleEngine)
+        shuffleEngine.unmarkAll() // mirrors makeTape's own trailing cleanup call
         let shuffleOperationCount = shuffleEngine.finish().tape.count
 
         var sortEngine = RecordingEngine(values: shuffleEngine.values)
         algorithm.record(into: &sortEngine)
+        sortEngine.unmarkAll() // mirrors makeTape's own trailing cleanup call
         let sortOperationCount = sortEngine.finish().tape.count
 
         let tape = SortSession.makeTape(algorithm: algorithm, shuffle: shuffle, size: size)

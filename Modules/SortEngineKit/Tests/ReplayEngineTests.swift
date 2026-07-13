@@ -181,6 +181,42 @@ struct ReplayEngineTests {
         engine.pause()
     }
 
+    /// Direct regression test for the marker-bookkeeping throughput bug: `RecordingEngine`'s
+    /// auto mark/unmark bookkeeping around every `.compare`/`.swap` must not eat into the pacing
+    /// budget — a tape mixing bookkeeping with significant operations must play through its
+    /// significant operations at (approximately) the configured `speed`, exactly as fast as an
+    /// equivalent tape with no bookkeeping at all, since the bookkeeping now rides along for free.
+    @Test
+    func bookkeepingOperationsDoNotCountAgainstThePacingBudget() async {
+        // 100 logical compares, each preceded by the same up-to-4-entry mark/unmark bookkeeping
+        // `RecordingEngine.markPrimarySecondary` emits — 5 raw tape entries per logical compare
+        // after the first. Old pacing (raw tape-entry count) would need 5x the ticks to apply all
+        // 100 compares; new pacing (significant-op count) must apply all 100 in ~1 second.
+        var recording = RecordingEngine(values: [1, 2])
+        for _ in 0..<100 { _ = recording.compare(0, 1) }
+        let operations = recording.finish().tape
+        #expect(operations.count > 100 * 4, "sanity check: bookkeeping really does inflate this tape")
+
+        let tape = makeTape(initialValues: [1, 2], operations: operations)
+        let driver = ManualTickDriver()
+        let engine = ReplayEngine(tape: tape, displayLinkFactory: { driver })
+        engine.speed = 100.0 // 100 significant ops/sec
+
+        _ = engine.play()
+        driver.fireTick(elapsed: 0) // the very first tick always carries zero elapsed time
+        // Simulate slightly over one second of real 60Hz vsync ticks — a few extra ticks of
+        // headroom past the exact 100-op budget absorbs floating-point summation error, without
+        // which the old (pre-fix) behavior would still be nowhere close to finishing.
+        for _ in 0..<65 {
+            driver.fireTick(elapsed: 1.0 / 60.0)
+        }
+        try? await Task.sleep(for: .milliseconds(50))
+
+        #expect(engine.compareCount == 100, "all 100 significant compares must finish within ~1s")
+        #expect(engine.stepIndex == tape.operations.count, "and every bookkeeping entry along the way")
+        engine.pause()
+    }
+
     /// The pure accumulator underlying `play()`'s pacing, tested directly without any driver: no
     /// operation is ever lost to rounding — a fractional remainder from one call carries forward
     /// into the next.
