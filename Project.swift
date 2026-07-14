@@ -61,13 +61,20 @@ let app = Target.target(
     deploymentTargets: Module.deploymentTargets,
     infoPlist: .extendingDefault(with: [
         "UIUserInterfaceStyle": "Dark",
-        "UISupportedInterfaceOrientations": ["UIInterfaceOrientationLandscapeLeft", "UIInterfaceOrientationLandscapeRight"],
-        "UISupportedInterfaceOrientations~ipad": ["UIInterfaceOrientationLandscapeLeft", "UIInterfaceOrientationLandscapeRight"],
-        // Landscape-only means we can't declare all 4 orientations, which iPad multitasking
-        // (Split View/Slide Over) requires. Opting out of multitasking via UIRequiresFullScreen
-        // is the standard escape hatch — App Store validation only enforces the all-4-orientations
-        // rule for apps that support multitasking.
-        "UIRequiresFullScreen": true,
+        // All 4 orientations, no UIRequiresFullScreen: Apple has announced that flag will stop
+        // being honored in a future iPadOS release, so "declare landscape-only + opt out of
+        // multitasking" is no longer a viable way to stay full-screen-and-wide — the OS will let
+        // the app rotate/resize into Split View and Slide Over regardless of what's declared here.
+        // RunControlBar/AlgorithmDetailSection respond to the narrower widths this permits
+        // (portrait and multitasking both just mean "less width," handled the same way).
+        "UISupportedInterfaceOrientations": [
+            "UIInterfaceOrientationLandscapeLeft", "UIInterfaceOrientationLandscapeRight",
+            "UIInterfaceOrientationPortrait", "UIInterfaceOrientationPortraitUpsideDown",
+        ],
+        "UISupportedInterfaceOrientations~ipad": [
+            "UIInterfaceOrientationLandscapeLeft", "UIInterfaceOrientationLandscapeRight",
+            "UIInterfaceOrientationPortrait", "UIInterfaceOrientationPortraitUpsideDown",
+        ],
         "LSApplicationCategoryType": "public.app-category.education",
         "UIApplicationSupportsIndirectInputEvents": true,
         "ITSAppUsesNonExemptEncryption": false,

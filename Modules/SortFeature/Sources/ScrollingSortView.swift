@@ -55,7 +55,7 @@ public struct ScrollingSortView: View {
                 VStack(alignment: .leading, spacing: 0) {
                     SortView(session: session, showcaseStop: showcaseStop)
                         .frame(width: geometry.size.width, height: geometry.size.height)
-                    AlgorithmDetailSection(algorithm: algorithm)
+                    AlgorithmDetailSection(algorithm: algorithm, availableWidth: geometry.size.width)
                 }
             }
         }

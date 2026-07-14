@@ -12,37 +12,36 @@ import SwiftUI
 public struct AlgorithmDetailSection: View {
     private let algorithm: any SortAlgorithm
     private let content: AlgorithmDetailContent?
+    /// `ScrollingSortView.body`'s own top-level `GeometryReader` (otherwise only used to size
+    /// `SortView`'s frame) passed straight through — not `ViewThatFits`: `descriptionColumn`/
+    /// `complexityColumn` below both use `.frame(maxWidth: .infinity)`, which happily shrinks to
+    /// any width, so `ViewThatFits` would never actually detect an overflow to fall back from.
+    private let availableWidth: CGFloat
     @Environment(AppSettings.self) private var settings
     @State private var selectedLanguage: CodeLanguage = CodeLanguage.all[0]
 
-    public init(algorithm: any SortAlgorithm) {
+    /// Below this, `descriptionColumn`/`complexityColumn` stack instead of sitting side by side —
+    /// comfortably under a landscape detail pane's width, comfortably over a narrow portrait one's.
+    private static let stackedLayoutThreshold: CGFloat = 700
+
+    public init(algorithm: any SortAlgorithm, availableWidth: CGFloat) {
         self.algorithm = algorithm
+        self.availableWidth = availableWidth
         content = AlgorithmDetailContent.load(for: algorithm.id.rawValue)
     }
 
     public var body: some View {
         VStack(alignment: .leading, spacing: 24) {
-            HStack(alignment: .top, spacing: 16) {
-                VStack(alignment: .leading, spacing: 16) {
-                    Text("Description").font(.title2.bold())
-                    if let description = content?.description {
-                        Markdown(description).lineSpacing(1.75)
-                    } else {
-                        Text("No description available yet.").foregroundStyle(.secondary)
-                    }
+            if availableWidth < Self.stackedLayoutThreshold {
+                VStack(alignment: .leading, spacing: 24) {
+                    descriptionColumn
+                    complexityColumn
                 }
-                .frame(maxWidth: .infinity, alignment: .leading)
-
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Complexity").font(.title2.bold())
-                    ForEach(algorithm.metadata.complexityRows) { row in
-                        MathView(text: row.label, equation: row.latex)
-                    }
-
-                    Text("Big-O Correlation").font(.title2.bold()).padding(.top, 8)
-                    BigOCorrelationChart(algorithm: algorithm)
+            } else {
+                HStack(alignment: .top, spacing: 16) {
+                    descriptionColumn
+                    complexityColumn
                 }
-                .frame(maxWidth: .infinity, alignment: .leading)
             }
 
             VStack(alignment: .leading, spacing: 8) {
@@ -70,5 +69,30 @@ public struct AlgorithmDetailSection: View {
                 selectedLanguage = firstLanguage
             }
         }
+    }
+
+    private var descriptionColumn: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Description").font(.title2.bold())
+            if let description = content?.description {
+                Markdown(description).lineSpacing(1.75)
+            } else {
+                Text("No description available yet.").foregroundStyle(.secondary)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private var complexityColumn: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Complexity").font(.title2.bold())
+            ForEach(algorithm.metadata.complexityRows) { row in
+                MathView(text: row.label, equation: row.latex)
+            }
+
+            Text("Big-O Correlation").font(.title2.bold()).padding(.top, 8)
+            BigOCorrelationChart(algorithm: algorithm)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 }

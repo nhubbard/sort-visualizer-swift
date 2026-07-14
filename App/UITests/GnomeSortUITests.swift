@@ -7,6 +7,10 @@ import XCTest
 final class GnomeSortUITests: XCTestCase {
     override func setUpWithError() throws {
         continueAfterFailure = false
+        // Now that portrait is a genuinely supported orientation (not just coerced to landscape by
+        // iOS), the simulator's own default boot orientation (portrait) would otherwise leak into
+        // this test unpinned — see `ScreenshotUITests`' identical rationale.
+        XCUIDevice.shared.orientation = .landscapeLeft
     }
 
     func testGnomeSortEndToEndProducesACorrectlySortedResult() throws {

@@ -9,12 +9,15 @@ import VisualizationKit
 /// overlay obscured bars it sat over and didn't reserve any space at all). Modeled on a standard
 /// media-player transport: a thin scrub bar, a live stats caption, then a row of transport
 /// buttons. Speed expands inline below the transport row on tap, rather than living behind a
-/// `.popover` — a `.popover`'s `UIPopoverPresentationController` unconditionally wants to support
-/// every interface orientation, which has no overlap with this app's deliberately
-/// landscape-only `UISupportedInterfaceOrientations` (bar visualizations read better wide),
-/// producing "Supported orientations has no common orientation with the application" and
-/// unreliable popover behavior. An inline expand/collapse never touches that presentation-
-/// controller machinery at all.
+/// `.popover` — kept that way even now that portrait/multitasking are supported (nothing forces a
+/// change here), not because it's the only option any more: inline expand/collapse just never
+/// touches `UIPopoverPresentationController` at all, which is one less orientation-related surface
+/// to think about as the app's supported width keeps changing.
+///
+/// `transportRow`/`statsCaption` each offer a second, stacked-into-two-rows `ViewThatFits`
+/// candidate — both rows are built entirely from fixed-intrinsic-width buttons/stat cells (no
+/// flexible `.frame(maxWidth: .infinity)` content), so `ViewThatFits` can genuinely detect an
+/// overflow and fall back, unlike `AlgorithmDetailSection`'s two-column layout.
 struct RunControlBar: View {
     @Bindable var session: SortSession
     @Bindable var replay: ReplayEngine
@@ -68,39 +71,63 @@ struct RunControlBar: View {
         .accessibilityIdentifier("runControlScrubSlider")
     }
 
-    /// Each stat is its own tight `[number][label]` cell (`statCell`), and the cells sit in a
-    /// plain `HStack` with generous inter-cell spacing standing in for the `·` separator this used
-    /// to have — a fixed-width slot only stabilizes the *digits* within one cell; the separator
-    /// glyph never did anything for stability, it was just visual noise between cells that
-    /// whitespace alone reads just as clearly. Not `LazyHStack`: laziness only pays off for
-    /// children a scrolling ancestor can defer rendering along this same (horizontal) axis — this
-    /// row never scrolls and always renders all 8 cells, so there's nothing to defer.
+    /// Each stat is its own tight `[number][label]` cell (`statCell`), sitting in an `HStack` with
+    /// generous inter-cell spacing standing in for the `·` separator this used to have — a
+    /// fixed-width slot only stabilizes the *digits* within one cell; the separator glyph never did
+    /// anything for stability, it was just visual noise between cells that whitespace alone reads
+    /// just as clearly. Not `LazyHStack`: laziness only pays off for children a scrolling ancestor
+    /// can defer rendering along this same (horizontal) axis — this row never scrolls.
+    ///
+    /// `ViewThatFits` between that one full-width row and two half-width rows — both built from
+    /// the same `statCell`s below, so whichever arrangement fits, every cell (and its
+    /// accessibility subtree) is still there for `runControlStatsCaption` to combine.
     private var statsCaption: some View {
-        HStack(spacing: 12) {
-            statCell(replay.compareCount, digits: 6, label: "compares")
-            statCell(replay.swapCount, digits: 6, label: "swaps")
-            // Matches ArrayV's own on-screen order (Comparisons, Swaps, Reversals, Writes to Main
-            // Array, Writes to Auxiliary Array(s), Items in External Arrays) — always shown, even
-            // at zero, same as ArrayV itself never conditionally hides a stat an algorithm doesn't
-            // happen to use. Conditionally showing/hiding would also reflow the row exactly when
-            // the fixed-width slots above exist to prevent.
-            statCell(replay.reversalCount, digits: 4, label: "reversals")
-            statCell(replay.mainWriteCount, digits: 6, label: "writes")
-            statCell(replay.auxWriteCount, digits: 6, label: "aux writes")
-            statCell(replay.externalArrayItemCount, digits: 5, label: "in external arrays")
-            statSlot(String(format: "%.1fs", replay.elapsedPlaybackDuration), digits: 6)
-            // Number and unit are two separate `Text`s within the cell, not one formatted string —
-            // `statSlot`'s fixed-width reservation only holds the digits steady; folding " ops/sec"
-            // into the same string as the number let the *whole* string's natural width (and thus
-            // this row's total width) shift every time the number crossed a digit boundary (3
-            // digits -> 4 once throughput approached 1000), which SwiftUI visibly resized/glitched
-            // several times a second during fast playback.
-            statCell(Int(opsPerSecond), digits: 4, label: "ops/sec")
+        ViewThatFits(in: .horizontal) {
+            HStack(spacing: 12) { statCells }
+            VStack(spacing: 4) {
+                HStack(spacing: 12) { firstHalfStatCells }
+                HStack(spacing: 12) { secondHalfStatCells }
+            }
         }
         .font(.caption)
         .foregroundStyle(.secondary)
         .accessibilityElement(children: .combine)
         .accessibilityIdentifier("runControlStatsCaption")
+    }
+
+    // Matches ArrayV's own on-screen order (Comparisons, Swaps, Reversals, Writes to Main Array,
+    // Writes to Auxiliary Array(s), Items in External Arrays) — always shown, even at zero, same
+    // as ArrayV itself never conditionally hides a stat an algorithm doesn't happen to use.
+    // Conditionally showing/hiding would also reflow the row exactly when the fixed-width slots
+    // in `statSlot` exist to prevent. Split into two `@ViewBuilder` halves (rather than one flat
+    // group) purely so the stacked `ViewThatFits` candidate above can lay them out as two rows of
+    // four instead of eight in a row.
+    @ViewBuilder
+    private var firstHalfStatCells: some View {
+        statCell(replay.compareCount, digits: 6, label: "compares")
+        statCell(replay.swapCount, digits: 6, label: "swaps")
+        statCell(replay.reversalCount, digits: 4, label: "reversals")
+        statCell(replay.mainWriteCount, digits: 6, label: "writes")
+    }
+
+    @ViewBuilder
+    private var secondHalfStatCells: some View {
+        statCell(replay.auxWriteCount, digits: 6, label: "aux writes")
+        statCell(replay.externalArrayItemCount, digits: 5, label: "in external arrays")
+        statSlot(String(format: "%.1fs", replay.elapsedPlaybackDuration), digits: 6)
+        // Number and unit are two separate `Text`s within the cell, not one formatted string —
+        // `statSlot`'s fixed-width reservation only holds the digits steady; folding " ops/sec"
+        // into the same string as the number let the *whole* string's natural width (and thus
+        // this row's total width) shift every time the number crossed a digit boundary (3
+        // digits -> 4 once throughput approached 1000), which SwiftUI visibly resized/glitched
+        // several times a second during fast playback.
+        statCell(Int(opsPerSecond), digits: 4, label: "ops/sec")
+    }
+
+    @ViewBuilder
+    private var statCells: some View {
+        firstHalfStatCells
+        secondHalfStatCells
     }
 
     /// One stat's fixed-width number plus its label, kept tight (`spacing: 4`) so the pair reads as
@@ -138,114 +165,131 @@ struct RunControlBar: View {
             .frame(minWidth: CGFloat(digits) * 7.5, alignment: .trailing)
     }
 
+    /// `ViewThatFits` between one full-width row and two rows (playback transport, then
+    /// utilities) — both built from the same buttons below, so whichever arrangement fits, every
+    /// button (and its accessibility identifier) is still there for UI tests to find.
     private var transportRow: some View {
-        HStack(spacing: 20) {
-            Button {
-                replay.seek(to: 0)
-            } label: {
-                Image(systemName: "backward.end.fill")
+        ViewThatFits(in: .horizontal) {
+            HStack(spacing: 20) {
+                playbackTransportButtons
+                Spacer()
+                utilityButtons
             }
-            .accessibilityIdentifier("runControlJumpToStartButton")
-            .accessibilityLabel("Jump to Start")
-            .help("Jump to the very beginning of the recording, before shuffling (⌘⌥←)")
-            .disabled(replay.stepIndex <= 0)
-
-            Button {
-                replay.pause()
-                replay.stepBackward()
-            } label: {
-                Image(systemName: "backward.frame.fill")
+            VStack(spacing: 8) {
+                HStack(spacing: 20) { playbackTransportButtons }
+                HStack(spacing: 20) { utilityButtons }
             }
-            .accessibilityIdentifier("runControlStepBackButton")
-            .accessibilityLabel("Step Back")
-            .help("Step back one operation (⌥←)")
-            .disabled(replay.stepIndex <= 0)
-
-            Button {
-                session.togglePlayback()
-            } label: {
-                Image(systemName: replay.isPlaying ? "pause.fill" : "play.fill")
-                    .font(.title2)
-            }
-            .accessibilityIdentifier("runControlPlayPauseButton")
-            .accessibilityLabel(replay.isPlaying ? "Pause" : "Play")
-            .help(replay.isPlaying ? "Pause playback (Space)" : "Resume playback (Space)")
-            .disabled(isFinished)
-
-            Button {
-                replay.pause()
-                replay.stepForward()
-            } label: {
-                Image(systemName: "forward.frame.fill")
-            }
-            .accessibilityIdentifier("runControlStepForwardButton")
-            .accessibilityLabel("Step Forward")
-            .help("Step forward one operation (⌥→)")
-            .disabled(isFinished)
-
-            Button {
-                replay.seek(to: replay.totalOperationCount)
-            } label: {
-                Image(systemName: "forward.end.fill")
-            }
-            .accessibilityIdentifier("runControlJumpToEndButton")
-            .accessibilityLabel("Jump to End")
-            .help("Jump to the fully sorted end of the recording (⌘⌥→)")
-            .disabled(isFinished)
-
-            Spacer()
-
-            Button {
-                Task { await session.start(size: session.arraySize) }
-            } label: {
-                Image(systemName: "arrow.counterclockwise")
-            }
-            .accessibilityIdentifier("runControlResetButton")
-            .accessibilityLabel("Reset and Reshuffle")
-            .help("Stop the current sort, shuffle a fresh array at this size, and sort it again (⌘R)")
-
-            Button {
-                session.soundEnabled.toggle()
-            } label: {
-                Image(systemName: session.soundEnabled ? "speaker.wave.2.fill" : "speaker.slash.fill")
-            }
-            .accessibilityIdentifier("runControlSoundToggle")
-            .accessibilityLabel(session.soundEnabled ? "Mute" : "Unmute")
-            .help(session.soundEnabled ? "Turn off sort sound effects (⌘A)" : "Turn on sort sound effects (⌘A)")
-
-            AutomatorMenuButton(session: session)
-
-            Button {
-                isSpeedExpanded.toggle()
-            } label: {
-                Text("\(Int(replay.speed))/s")
-                    .font(.footnote.monospacedDigit())
-            }
-            .accessibilityIdentifier("runControlSpeedButton")
-            .accessibilityLabel("Playback Speed")
-            .help("Show or hide the playback speed slider (⌘⇧+/− by 1, ⌘⌥+/− by 10)")
-
-            Button {
-                isSizeExpanded.toggle()
-            } label: {
-                Text("n=\(session.arraySize)")
-                    .font(.footnote.monospacedDigit())
-            }
-            .accessibilityIdentifier("runControlSizeButton")
-            .accessibilityLabel("Array Size")
-            .help("Show or hide the array size stepper (⌘S cycles to the next size)")
-
-            Button {
-                isVisualizerExpanded.toggle()
-            } label: {
-                Image(systemName: "eye.fill")
-            }
-            .accessibilityIdentifier("runControlVisualizerButton")
-            .accessibilityLabel("Visualizer")
-            .help("Show or hide the visualizer picker (⌘⇧V cycles to the next visualizer)")
         }
         .buttonStyle(.borderless)
         .controlSize(.large)
+    }
+
+    @ViewBuilder
+    private var playbackTransportButtons: some View {
+        Button {
+            replay.seek(to: 0)
+        } label: {
+            Image(systemName: "backward.end.fill")
+        }
+        .accessibilityIdentifier("runControlJumpToStartButton")
+        .accessibilityLabel("Jump to Start")
+        .help("Jump to the very beginning of the recording, before shuffling (⌘⌥←)")
+        .disabled(replay.stepIndex <= 0)
+
+        Button {
+            replay.pause()
+            replay.stepBackward()
+        } label: {
+            Image(systemName: "backward.frame.fill")
+        }
+        .accessibilityIdentifier("runControlStepBackButton")
+        .accessibilityLabel("Step Back")
+        .help("Step back one operation (⌥←)")
+        .disabled(replay.stepIndex <= 0)
+
+        Button {
+            session.togglePlayback()
+        } label: {
+            Image(systemName: replay.isPlaying ? "pause.fill" : "play.fill")
+                .font(.title2)
+        }
+        .accessibilityIdentifier("runControlPlayPauseButton")
+        .accessibilityLabel(replay.isPlaying ? "Pause" : "Play")
+        .help(replay.isPlaying ? "Pause playback (Space)" : "Resume playback (Space)")
+        .disabled(isFinished)
+
+        Button {
+            replay.pause()
+            replay.stepForward()
+        } label: {
+            Image(systemName: "forward.frame.fill")
+        }
+        .accessibilityIdentifier("runControlStepForwardButton")
+        .accessibilityLabel("Step Forward")
+        .help("Step forward one operation (⌥→)")
+        .disabled(isFinished)
+
+        Button {
+            replay.seek(to: replay.totalOperationCount)
+        } label: {
+            Image(systemName: "forward.end.fill")
+        }
+        .accessibilityIdentifier("runControlJumpToEndButton")
+        .accessibilityLabel("Jump to End")
+        .help("Jump to the fully sorted end of the recording (⌘⌥→)")
+        .disabled(isFinished)
+    }
+
+    @ViewBuilder
+    private var utilityButtons: some View {
+        Button {
+            Task { await session.start(size: session.arraySize) }
+        } label: {
+            Image(systemName: "arrow.counterclockwise")
+        }
+        .accessibilityIdentifier("runControlResetButton")
+        .accessibilityLabel("Reset and Reshuffle")
+        .help("Stop the current sort, shuffle a fresh array at this size, and sort it again (⌘R)")
+
+        Button {
+            session.soundEnabled.toggle()
+        } label: {
+            Image(systemName: session.soundEnabled ? "speaker.wave.2.fill" : "speaker.slash.fill")
+        }
+        .accessibilityIdentifier("runControlSoundToggle")
+        .accessibilityLabel(session.soundEnabled ? "Mute" : "Unmute")
+        .help(session.soundEnabled ? "Turn off sort sound effects (⌘A)" : "Turn on sort sound effects (⌘A)")
+
+        AutomatorMenuButton(session: session)
+
+        Button {
+            isSpeedExpanded.toggle()
+        } label: {
+            Text("\(Int(replay.speed))/s")
+                .font(.footnote.monospacedDigit())
+        }
+        .accessibilityIdentifier("runControlSpeedButton")
+        .accessibilityLabel("Playback Speed")
+        .help("Show or hide the playback speed slider (⌘⇧+/− by 1, ⌘⌥+/− by 10)")
+
+        Button {
+            isSizeExpanded.toggle()
+        } label: {
+            Text("n=\(session.arraySize)")
+                .font(.footnote.monospacedDigit())
+        }
+        .accessibilityIdentifier("runControlSizeButton")
+        .accessibilityLabel("Array Size")
+        .help("Show or hide the array size stepper (⌘S cycles to the next size)")
+
+        Button {
+            isVisualizerExpanded.toggle()
+        } label: {
+            Image(systemName: "eye.fill")
+        }
+        .accessibilityIdentifier("runControlVisualizerButton")
+        .accessibilityLabel("Visualizer")
+        .help("Show or hide the visualizer picker (⌘⇧V cycles to the next visualizer)")
     }
 
 

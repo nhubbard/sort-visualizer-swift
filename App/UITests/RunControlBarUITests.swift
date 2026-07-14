@@ -8,6 +8,10 @@ import XCTest
 final class RunControlBarUITests: XCTestCase {
     override func setUpWithError() throws {
         continueAfterFailure = false
+        // Now that portrait is a genuinely supported orientation (not just coerced to landscape by
+        // iOS), the simulator's own default boot orientation (portrait) would otherwise leak into
+        // this test unpinned — see `ScreenshotUITests`' identical rationale.
+        XCUIDevice.shared.orientation = .landscapeLeft
     }
 
     func testPauseStepAndResumeReachesSortedState() throws {
@@ -158,11 +162,9 @@ final class RunControlBarUITests: XCTestCase {
         XCTAssertEqual(statusLabel.value as? String, "sorted", "the freshly-reset sort produced an incorrect result")
     }
 
-    /// Speed deliberately expands inline (not via `.popover`) — a `.popover`'s
-    /// `UIPopoverPresentationController` demands to support every interface orientation, which
-    /// has no overlap with this app's deliberately landscape-only orientation support, producing
-    /// "Supported orientations has no common orientation with the application" and unreliable
-    /// popover behavior.
+    /// Speed deliberately expands inline (not via `.popover`) — see `RunControlBar`'s own doc
+    /// comment; kept this way even now that portrait/multitasking are supported, since inline
+    /// expand/collapse never touches `UIPopoverPresentationController` at all.
     func testSpeedButtonExpandsInlineLiveSpeedSlider() throws {
         let app = XCUIApplication()
         app.launchEnvironment = ["UI_TEST_ARRAY_SIZE": "24"]
