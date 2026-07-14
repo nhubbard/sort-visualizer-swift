@@ -38,7 +38,7 @@ struct FindAlgorithmsIntentTests {
         registry.discover()
 
         let filtered = try await FindAlgorithmsIntent(category: .quick).perform()
-        let all = try await FindAlgorithmsIntent(category: nil).perform()
+        let all = try await FindAlgorithmsIntent(category: .all).perform()
 
         #expect(filtered.value?.map(\.id).sorted() == ["a-quick", "b-quick"])
         #expect(all.value?.count == 3)

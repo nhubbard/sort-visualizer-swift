@@ -77,10 +77,6 @@ public final class SortSession {
     /// `runAutomation` `await` one real, fully-animated run finishing before starting the next,
     /// without polling `phase` itself.
     private var completionContinuations: [CheckedContinuation<Void, Never>] = []
-    /// Resolved (and cleared) whenever `runAutomation(sizes:runsPerSize:)`'s `defer` fires — lets
-    /// `runAutomationAndWait(_:)` `await` an entire sweep ending, whether it ran to completion or
-    /// was stopped early via `stopAutomation()`, without polling `isAutomating`.
-    private var automationCompletionContinuations: [CheckedContinuation<Void, Never>] = []
 
     public init(
         algorithm: any SortAlgorithm,
@@ -275,15 +271,29 @@ public final class SortSession {
         await runSinglePass(size: algorithm.metadata.sizeRange.upperBound)
     }
 
-    /// Awaits genuine completion (or an early stop via `stopAutomation()`) of `runAutomation(_:)`
-    /// — the primitive App Intents needs to report "the sweep is over" back to Shortcuts, rather
-    /// than firing the loop and returning immediately the way the keyboard-shortcut/Automator-menu
-    /// callers do. Safe on a freshly-constructed session only: `runAutomation(_:)`'s own "tap again
-    /// to stop" toggle can't trigger here, since `runningAutomationID` always starts `nil`.
+    /// Awaits genuine completion (or an early stop via `stopAutomation()`) of a sweep — the
+    /// primitive App Intents needs to report "the sweep is over" back to Shortcuts, rather than
+    /// firing the loop and returning immediately the way the keyboard-shortcut/Automator-menu
+    /// callers of `runAutomation(_:)` do. Safe on a freshly-constructed session only:
+    /// `runAutomation(_:)`'s own "tap again to stop" toggle can't trigger here, since
+    /// `runningAutomationID` always starts `nil`.
+    ///
+    /// Deliberately does NOT call the fire-and-forget `runAutomation(_:)` above and then poll
+    /// `isAutomating` to decide whether to wait — that shape had a real, deterministic (not just
+    /// racy) bug: a freshly spawned `Task`'s body cannot run any sooner than the *next* suspension
+    /// point in the caller, so a `guard isAutomating else { return }` checked on the very next line
+    /// with no intervening `await` always observed the pre-Task default (`false`) and returned
+    /// immediately, before the sweep had done any real work — this is what silently skipped
+    /// almost every algorithm in `RunFullSizeSweepIntent`, each just flashing `.idle` before the
+    /// next one replaced it. Awaiting the spawned `Task`'s own `.value` instead has no such gap.
     public func runAutomationAndWait(_ automation: Automation) async {
-        runAutomation(automation)
-        guard isAutomating else { return }
-        await withCheckedContinuation { automationCompletionContinuations.append($0) }
+        automationTask?.cancel()
+        runningAutomationID = automation.id
+        let task = Task {
+            await runAutomation(sizes: automation.sizes(algorithm.metadata), runsPerSize: automation.runsPerSize)
+        }
+        automationTask = task
+        await task.value
     }
 
     /// Advances `arraySize` to the next value in `algorithm.metadata.sizeRange` (stepped by
@@ -304,9 +314,6 @@ public final class SortSession {
             automationProgress = nil
             automationTask = nil
             runningAutomationID = nil
-            let continuations = automationCompletionContinuations
-            automationCompletionContinuations = []
-            for continuation in continuations { continuation.resume() }
         }
         for (sizeIndex, size) in sizes.enumerated() {
             for runIndex in 0..<runsPerSize {

@@ -13,20 +13,24 @@ public struct FindAlgorithmsIntent: AppIntent {
             categoryName: "Sort Symphony")
     }
 
-    @Parameter(title: "Category")
-    public var category: AlgorithmCategoryOption?
+    // Non-optional with `.all` as the default — see `AlgorithmCategoryOption`'s own doc comment
+    // for why an `Optional<AlgorithmCategoryOption>` defaulting to `nil` is the wrong shape here.
+    @Parameter(title: "Category", default: .all)
+    public var category: AlgorithmCategoryOption
 
-    public init() {}
+    public init() {
+        category = .all
+    }
 
-    public init(category: AlgorithmCategoryOption?) {
+    public init(category: AlgorithmCategoryOption) {
         self.category = category
     }
 
     @MainActor
     public func perform() async throws -> some IntentResult & ReturnsValue<[AlgorithmEntity]> {
         let algorithms: [any SortAlgorithm]
-        if let category {
-            algorithms = AlgorithmRegistry.shared.algorithms(in: category.algorithmCategory)
+        if let realCategory = category.algorithmCategory {
+            algorithms = AlgorithmRegistry.shared.algorithms(in: realCategory)
         } else {
             algorithms = AlgorithmRegistry.shared.algorithms
                 .sorted { $0.metadata.displayName < $1.metadata.displayName }
