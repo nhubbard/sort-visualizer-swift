@@ -198,7 +198,14 @@ struct MetalRendererView: UIViewRepresentable {
                 canvasSize: canvasSize, scale: scale
             )
             trackedStepIndex = replay.stepIndex
-            view.setNeedsDisplay()
+            // A resize (e.g. `RunControlBar`'s `safeAreaInset` coming or going) changes the
+            // `CAMetalLayer`'s on-screen size the moment SwiftUI/UIKit commits the new layout —
+            // ahead of `setNeedsDisplay()`'s deferred, next-vsync `draw(in:)` on this `isPaused`/
+            // on-demand view. That gap could show one frame where the layer is already the new
+            // size but `renderer`'s instance buffer still holds geometry sized for the old one —
+            // a mis-scaled/letterboxed flash. Same forced-synchronous-draw fix as the completion
+            // path above, applied here instead of relying on `setNeedsDisplay()` alone.
+            view.draw()
         }
 
         private static func valueRange(for values: [Int]) -> ClosedRange<Int> {

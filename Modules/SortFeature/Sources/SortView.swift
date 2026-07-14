@@ -76,33 +76,41 @@ public struct SortView: View {
     /// (where a run finishes fast enough that this fixed-cost gap is a large fraction of what's on
     /// screen). Falling back to `session.lastReplay` — the previous run's now-frozen final frame —
     /// instead keeps the canvas mounted and showing *something real* through the gap; `ProgressView`
-    /// only ever appears once, before the first run has produced a replay at all. Deliberately no
-    /// `RunControlBar` in this branch: `lastReplay` is a dead run about to be replaced, not
-    /// something worth offering scrub/play controls on.
+    /// only ever appears once, before the first run has produced a replay at all. `RunControlBar` is
+    /// kept mounted here too (it already goes `.disabled(session.isAutomating)` on its own) — an
+    /// earlier version dropped it in this branch, which meant `.safeAreaInset(edge: .bottom)`
+    /// itself came and went every automation iteration; the `MTKView` growing into that space for
+    /// the gap's duration, faster than its renderer's on-demand redraw could catch up, produced a
+    /// one-frame mis-scaled/letterboxed flash on top of the bar-shaped one this comment used to
+    /// describe.
     @ViewBuilder
     private var content: some View {
         switch session.phase {
         case .idle, .recording, .ready:
             if let lastReplay = session.lastReplay {
-                canvas(for: lastReplay)
+                canvasWithControls(for: lastReplay)
             } else {
                 ProgressView()
             }
         case let .replaying(replay), let .complete(replay):
-            canvas(for: replay)
-                .safeAreaInset(edge: .bottom) {
-                    RunControlBar(
-                        session: session,
-                        replay: replay,
-                        algorithm: session.algorithm,
-                        isSpeedExpanded: $isSpeedExpanded,
-                        isSizeExpanded: $isSizeExpanded,
-                        isVisualizerExpanded: $isVisualizerExpanded
-                    )
-                }
+            canvasWithControls(for: replay)
         case .failed:
             ContentUnavailableView("Sort Failed", systemImage: "exclamationmark.triangle")
         }
+    }
+
+    private func canvasWithControls(for replay: ReplayEngine) -> some View {
+        canvas(for: replay)
+            .safeAreaInset(edge: .bottom) {
+                RunControlBar(
+                    session: session,
+                    replay: replay,
+                    algorithm: session.algorithm,
+                    isSpeedExpanded: $isSpeedExpanded,
+                    isSizeExpanded: $isSizeExpanded,
+                    isVisualizerExpanded: $isVisualizerExpanded
+                )
+            }
     }
 
     /// `.id(ObjectIdentifier(replay))` forces SwiftUI to treat each new run as a genuinely new
