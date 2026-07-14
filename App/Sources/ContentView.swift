@@ -11,7 +11,10 @@ import SwiftUI
 /// Adding a new algorithm from here on is "drop a `.js` + manifest pair in `Algorithms/`," with
 /// zero changes to this file — `Page.swift`'s five parallel hand-maintained switches are gone.
 struct ContentView: View {
-    @State private var selection: AlgorithmID?
+    // `SortCoordinator.shared`, not local `@State` — App Intents (`RunSortIntent`/
+    // `RunAutomationIntent`) need to drive this same selection from outside the view tree, exactly
+    // the way Showcase mode (below) already drives it through a manual-tap-equivalent path.
+    @Bindable private var coordinator = SortCoordinator.shared
     @State private var isShowingSettings = false
     // Session-only (not AppSettings-backed): every category starts expanded on each launch, so
     // the existing `algorithmLink.<id>` UI tests (which tap straight into the sidebar with no
@@ -28,7 +31,7 @@ struct ContentView: View {
 
     var body: some View {
         NavigationSplitView {
-            List(selection: $selection) {
+            List(selection: $coordinator.selectedAlgorithmID) {
                 ForEach(AlgorithmCategory.allCases) { category in
                     let algorithms = AlgorithmRegistry.shared.algorithms(in: category)
                     if !algorithms.isEmpty {
@@ -151,12 +154,17 @@ struct ContentView: View {
 
     private var detailContent: some View {
         Group {
-            if let selection, let algorithm = AlgorithmRegistry.shared.algorithm(id: selection) {
+            if let selection = coordinator.selectedAlgorithmID,
+               let algorithm = AlgorithmRegistry.shared.algorithm(id: selection) {
                 ScrollingSortView(
-                    algorithm: algorithm, shuffle: defaultShuffle, arraySize: arraySize,
+                    algorithm: algorithm, shuffle: effectiveShuffle(for: selection), arraySize: arraySize,
                     showcaseCompletion: showcaseCompletionHandler, showcaseStop: showcaseStopHandler
                 )
-                .id(selection)
+                // Folds in `coordinator.runToken` (bumped on every intent-triggered run) alongside
+                // `selection` — a `RunSortIntent`/`RunAutomationIntent` re-running the *same*
+                // algorithm still needs a genuinely fresh `ScrollingSortView`/`SortSession`, not a
+                // silent no-op against one that already reached `.complete`.
+                .id("\(selection.rawValue)-\(coordinator.runToken)")
             } else {
                 HomeView()
             }
@@ -199,13 +207,13 @@ struct ContentView: View {
             .map(\.id)
         guard !showcaseAlgorithmIDs.isEmpty else { return }
         showcaseIndex = 0
-        selection = showcaseAlgorithmIDs[0]
+        coordinator.selectedAlgorithmID = showcaseAlgorithmIDs[0]
     }
 
     /// `ScrollingSortView`'s `showcaseCompletion` callback — called once its current algorithm's
-    /// `runShowcasePass()` genuinely finishes. Moves `selection` to the next algorithm, which (via
-    /// `.id(selection)` above) tears down the finished view and starts the next one fresh; past the
-    /// last algorithm, ends the same way `stopShowcase()` does.
+    /// `runShowcasePass()` genuinely finishes. Moves `coordinator.selectedAlgorithmID` to the next
+    /// algorithm, which (via `detailContent`'s `.id(...)` above) tears down the finished view and
+    /// starts the next one fresh; past the last algorithm, ends the same way `stopShowcase()` does.
     private func advanceShowcase() {
         guard let showcaseIndex else { return }
         let nextIndex = showcaseIndex + 1
@@ -214,18 +222,17 @@ struct ContentView: View {
             return
         }
         self.showcaseIndex = nextIndex
-        selection = showcaseAlgorithmIDs[nextIndex]
+        coordinator.selectedAlgorithmID = showcaseAlgorithmIDs[nextIndex]
     }
 
-    /// Also the target of a mid-run Stop tap. Clearing `selection` (not leaving it on the
-    /// last-shown algorithm) is deliberate: it's what actually changes `ScrollingSortView`'s
-    /// `.id(selection)`, which is what tears the view down and cancels its in-flight
-    /// `runShowcasePass()` — SwiftUI's `.task` only restarts on identity change, not on a plain
-    /// property change, so anything short of this risks a pass that keeps running invisibly after
-    /// Stop is tapped.
+    /// Also the target of a mid-run Stop tap. Clearing the selection (not leaving it on the
+    /// last-shown algorithm) is deliberate: it's what actually changes `detailContent`'s `.id(...)`,
+    /// which is what tears the view down and cancels its in-flight `runShowcasePass()` — SwiftUI's
+    /// `.task` only restarts on identity change, not on a plain property change, so anything short
+    /// of this risks a pass that keeps running invisibly after Stop is tapped.
     private func stopShowcase() {
         showcaseIndex = nil
-        selection = nil
+        coordinator.selectedAlgorithmID = nil
     }
 
     /// UI tests override this via the `UI_TEST_ARRAY_SIZE` launch environment variable (read in
@@ -241,11 +248,16 @@ struct ContentView: View {
     /// `AlgorithmRegistry`/`ShuffleRegistry` are populated synchronously in `Sort2App.init()`,
     /// before this view can ever appear — a missing lookup here means the bundled resources are
     /// broken, which should fail loudly in development rather than silently falling back.
-    private var defaultShuffle: any ShuffleAlgorithm {
-        guard let shuffle = ShuffleRegistry.shared.shuffle(id: AppSettings.shared.defaultShuffleID) else {
-            fatalError(
-                "Shuffles/\(AppSettings.shared.defaultShuffleID.rawValue).js failed to load"
-            )
+    ///
+    /// Checks `coordinator.pendingShuffleOverride(for:)` first — a `RunSortIntent` requesting a
+    /// specific shuffle for this one run. `shuffle` is a one-shot `SortSession`/`ScrollingSortView`
+    /// constructor argument, fixed for that session's whole lifetime, so this has to be resolved
+    /// here, before construction, rather than inside `ScrollingSortView.task` like the rest of a
+    /// pending intent action.
+    private func effectiveShuffle(for algorithmID: AlgorithmID) -> any ShuffleAlgorithm {
+        let shuffleID = coordinator.pendingShuffleOverride(for: algorithmID) ?? AppSettings.shared.defaultShuffleID
+        guard let shuffle = ShuffleRegistry.shared.shuffle(id: shuffleID) else {
+            fatalError("Shuffles/\(shuffleID.rawValue).js failed to load")
         }
         return shuffle
     }

@@ -1,0 +1,134 @@
+import AlgorithmKit
+import Foundation
+import SettingsKit
+import VisualizationKit
+
+/// The bridge App Intents needs and `ContentView`/`ScrollingSortView` never did before: neither
+/// `SortSession` (one per algorithm screen, owned locally) nor `ContentView`'s sidebar `selection`/
+/// `showcaseIndex` (private `@State`) were reachable from outside SwiftUI's own view tree. An
+/// `AppIntent.perform()` runs detached from any specific view, so it needs one shared, `@MainActor`
+/// singleton — this type — to say "select this algorithm and run it" and later find out the run
+/// actually finished, mirroring the exact "select via the same path a manual tap would use, await
+/// genuine completion" shape `ContentView`'s existing Showcase mode already established.
+@Observable
+@MainActor
+public final class SortCoordinator {
+    public static let shared = SortCoordinator()
+
+    /// One entry per algorithm with an intent-triggered run still waiting to be picked up —
+    /// consumed exactly once, by whichever `ScrollingSortView.task` mounts for that algorithm next.
+    public enum PendingAction: Sendable {
+        case run(visualizerID: VisualizerID?, size: Int?)
+        case automation(AutomationID)
+    }
+
+    /// `ContentView`'s sidebar `List(selection:)` binds directly to this (via `@Bindable`) instead
+    /// of owning its own `selection` `@State` — so a `RunSortIntent`/`RunAutomationIntent`
+    /// navigating the app looks, to the sidebar, exactly like a manual tap, and so a manual tap
+    /// while the app is already open is just as visible to anything reading this from outside the
+    /// view tree. Same precedent as `ContentView`'s own Showcase mode driving `selection` itself.
+    public var selectedAlgorithmID: AlgorithmID?
+    /// Bumped on every intent-triggered run — folded into `ScrollingSortView`'s `.id(...)` so
+    /// re-running the *same* algorithm from a Shortcut always mounts a genuinely fresh
+    /// `SortSession` instead of silently no-op'ing against one that already reached `.complete`.
+    public private(set) var runToken = 0
+
+    private var pendingActions: [AlgorithmID: PendingAction] = [:]
+    private var pendingShuffleOverrides: [AlgorithmID: ShuffleID] = [:]
+    private var completions: [Int: CheckedContinuation<Void, Never>] = [:]
+
+    /// The one `SortSession` currently on screen, if any — `weak` because `ScrollingSortView`'s own
+    /// `@State` is the sole rightful owner; registering here must never be what keeps a finished or
+    /// navigated-away-from session alive (see the replay-leak fix this project already shipped).
+    /// Only ever one at a time: `ContentView`'s `NavigationSplitView` shows exactly one detail pane.
+    private weak var activeSession: SortSession?
+    private var activeSessionAlgorithmID: AlgorithmID?
+
+    public init() {}
+
+    // MARK: - ContentView / ScrollingSortView integration
+
+    /// Read (without consuming) by `ContentView.detailContent` before constructing a
+    /// `ScrollingSortView` — `shuffle` is a one-shot `SortSession` constructor argument, fixed for
+    /// that session's whole lifetime, so an override has to be known *before* construction, unlike
+    /// the rest of `PendingAction`, which `ScrollingSortView.task` only needs once mounted.
+    public func pendingShuffleOverride(for algorithmID: AlgorithmID) -> ShuffleID? {
+        pendingShuffleOverrides[algorithmID]
+    }
+
+    /// Consumed exactly once by `ScrollingSortView.task` on mount — clears both the action and any
+    /// paired shuffle override together, since `runSort`/`runAutomation` below always set them in
+    /// the same call.
+    public func consumePendingAction(for algorithmID: AlgorithmID) -> PendingAction? {
+        pendingShuffleOverrides.removeValue(forKey: algorithmID)
+        return pendingActions.removeValue(forKey: algorithmID)
+    }
+
+    /// `ScrollingSortView` calls this on mount and clears it again on teardown — the only way any
+    /// intent gets a handle to a *live*, already-open session (for `StopIntent`, or a setting
+    /// intent that also wants to nudge the sort currently on screen).
+    public func registerActiveSession(_ session: SortSession, for algorithmID: AlgorithmID) {
+        activeSession = session
+        activeSessionAlgorithmID = algorithmID
+    }
+
+    public func unregisterActiveSession(for algorithmID: AlgorithmID) {
+        guard activeSessionAlgorithmID == algorithmID else { return }
+        activeSession = nil
+        activeSessionAlgorithmID = nil
+    }
+
+    /// Resolved by `ScrollingSortView.task` once the pending action it consumed has genuinely
+    /// finished — lets `runSort`/`runAutomation` below `await` the real result instead of returning
+    /// the moment the app merely opens to the right screen.
+    public func resolveCompletion(token: Int) {
+        completions.removeValue(forKey: token)?.resume()
+    }
+
+    // MARK: - Live-session hooks (for intents that only make sense against an open sort)
+
+    /// `nil` when nothing is currently on screen — every intent that reads this treats that as "no
+    /// effect," not an error, since a purely-settings-scoped intent (e.g. `SetPlaybackSpeedIntent`)
+    /// is still meaningful with the app closed; it just has nothing live left to also nudge.
+    public var activeSortSession: SortSession? { activeSession }
+
+    // MARK: - Intent entry points
+
+    /// Selects `algorithm` and awaits one fully-animated pass at `size` (falling back to whatever
+    /// size `ContentView` would otherwise use) — the primitive behind `RunSortIntent`, and, chained
+    /// with `FindAlgorithmsIntent` + Shortcuts' own "Repeat with Each," a full replacement for
+    /// Showcase mode's cross-algorithm loop, implemented entirely in the Shortcuts app instead of
+    /// this one.
+    public func runSort(
+        algorithm: any SortAlgorithm, visualizerID: VisualizerID?, shuffleID: ShuffleID?, size: Int?
+    ) async {
+        let token = beginRun(
+            algorithm: algorithm.id, shuffleID: shuffleID,
+            action: .run(visualizerID: visualizerID, size: size))
+        await withCheckedContinuation { completions[token] = $0 }
+    }
+
+    /// Selects `algorithm` and awaits an entire registered `Automation` sweep — the primitive
+    /// behind `RunAutomationIntent`, replacing the ⌘⇧A/⌘⌥⇧A keyboard shortcuts and Automator menu's
+    /// *reachability* without touching the `SortSession.runAutomation(_:)` engine underneath either
+    /// of them.
+    public func runAutomation(algorithm: any SortAlgorithm, automationID: AutomationID) async {
+        let token = beginRun(algorithm: algorithm.id, shuffleID: nil, action: .automation(automationID))
+        await withCheckedContinuation { completions[token] = $0 }
+    }
+
+    /// Stops whatever the currently-open session is running — `StopIntent`'s entire body. A no-op
+    /// if nothing is open or nothing is running, same as tapping the automation banner's Stop
+    /// button when it isn't shown.
+    public func stop() {
+        activeSession?.stopAutomation()
+    }
+
+    private func beginRun(algorithm algorithmID: AlgorithmID, shuffleID: ShuffleID?, action: PendingAction) -> Int {
+        runToken += 1
+        pendingActions[algorithmID] = action
+        pendingShuffleOverrides[algorithmID] = shuffleID
+        selectedAlgorithmID = algorithmID
+        return runToken
+    }
+}

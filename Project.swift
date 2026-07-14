@@ -43,6 +43,13 @@ let modules: [Target] =
     ]) +
     Module.framework(name: "HomeFeature", dependencies: [
         .target(name: "DesignSystemKit"), .external(name: "MarkdownUI"),
+    ]) +
+    // App Intents surface: entities/queries wrapping AlgorithmRegistry/VisualizerRegistry/
+    // ShuffleRegistry/AutomationRegistry, a SortCoordinator bridging intents into the live
+    // SwiftUI selection/session state, and the intents/AppShortcutsProvider themselves.
+    Module.framework(name: "IntentsKit", dependencies: [
+        .target(name: "AlgorithmKit"), .target(name: "VisualizationKit"),
+        .target(name: "SortFeature"), .target(name: "SettingsKit"),
     ])
 
 let app = Target.target(
@@ -103,8 +110,15 @@ let app = Target.target(
     entitlements: .file(path: "App/Resources/SortSymphony.entitlements"),
     dependencies: [
         .target(name: "SortFeature"), .target(name: "SettingsFeature"),
-        .target(name: "HomeFeature"),
+        .target(name: "HomeFeature"), .target(name: "IntentsKit"),
         .target(name: "MathRenderingKit"),
+        // Every AppIntent/AppEntity/AppShortcutsProvider conformance actually lives in IntentsKit,
+        // not here — but Xcode's App Intents metadata processor only exports a target's Shortcuts
+        // into the *app bundle* when the app target itself directly links AppIntents.framework,
+        // not merely transitively through a framework dependency that imports it. Without this,
+        // the build logs "Metadata extraction skipped. No AppIntents.framework dependency found"
+        // and `SortSymphonyShortcuts` never reaches the Shortcuts app.
+        .sdk(name: "AppIntents", type: .framework),
         // Sort2App wires each module's concrete conformances into its registry
         // (AlgorithmRegistry/VisualizerRegistry), which has no visibility into either module
         // itself — both need to be referenced directly by the App target for that.

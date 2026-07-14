@@ -61,9 +61,31 @@ public struct ScrollingSortView: View {
         }
         .navigationTitle(algorithm.metadata.displayName)
         .task {
+            // Registered/unregistered around the whole branch below (not just the intent one) —
+            // `SortCoordinator`'s live-session hooks (`StopIntent`, `SetPlaybackSpeedIntent`, ...)
+            // are meant to reach whichever sort is genuinely on screen, manually-started or not.
+            SortCoordinator.shared.registerActiveSession(session, for: algorithm.id)
+            defer { SortCoordinator.shared.unregisterActiveSession(for: algorithm.id) }
+
             if let showcaseCompletion {
                 await session.runShowcasePass()
                 if !Task.isCancelled { showcaseCompletion() }
+            } else if let action = SortCoordinator.shared.consumePendingAction(for: algorithm.id) {
+                // An App-Intents-triggered run (`RunSortIntent`/`RunAutomationIntent`) rather than
+                // a normal manually-selected screen — same "await genuine completion" contract as
+                // the Showcase branch above, just reported back through `SortCoordinator` instead
+                // of a `ContentView`-owned closure.
+                let token = SortCoordinator.shared.runToken
+                switch action {
+                case let .run(visualizerID, size):
+                    if let visualizerID { settings.selectedVisualizerID = visualizerID }
+                    await session.runSinglePass(size: size ?? arraySize)
+                case let .automation(automationID):
+                    if let automation = AutomationRegistry.shared.automation(id: automationID) {
+                        await session.runAutomationAndWait(automation)
+                    }
+                }
+                if !Task.isCancelled { SortCoordinator.shared.resolveCompletion(token: token) }
             } else {
                 // SortSession.start(size:) clamps into algorithm.metadata.sizeRange itself, so
                 // every caller gets that enforcement, not just this one.

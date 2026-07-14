@@ -77,6 +77,10 @@ public final class SortSession {
     /// `runAutomation` `await` one real, fully-animated run finishing before starting the next,
     /// without polling `phase` itself.
     private var completionContinuations: [CheckedContinuation<Void, Never>] = []
+    /// Resolved (and cleared) whenever `runAutomation(sizes:runsPerSize:)`'s `defer` fires — lets
+    /// `runAutomationAndWait(_:)` `await` an entire sweep ending, whether it ran to completion or
+    /// was stopped early via `stopAutomation()`, without polling `isAutomating`.
+    private var automationCompletionContinuations: [CheckedContinuation<Void, Never>] = []
 
     public init(
         algorithm: any SortAlgorithm,
@@ -257,12 +261,29 @@ public final class SortSession {
         runningAutomationID = nil
     }
 
+    /// Runs exactly one full pass at `size`, awaiting genuine completion — the primitive behind
+    /// both Showcase's per-algorithm step (`runShowcasePass()` below) and an App-Intents-triggered
+    /// "run this once and report back" request, neither of which can just fire-and-forget the way
+    /// the keyboard-shortcut/Automator-menu callers of `runAutomation(_:)` do.
+    public func runSinglePass(size: Int) async {
+        await runAutomation(sizes: [size], runsPerSize: 1)
+    }
+
     /// Runs this algorithm once, at its own `sizeRange.upperBound` — the per-algorithm unit of work
-    /// Showcase mode's cross-algorithm loop drives, one fresh `SortSession` at a time. Shares the
-    /// exact same completion-detection machinery as `runAutomation(_:)` rather than reimplementing
-    /// it, so a caller can simply `await` this returning once the run has genuinely finished.
+    /// Showcase mode's cross-algorithm loop drives, one fresh `SortSession` at a time.
     public func runShowcasePass() async {
-        await runAutomation(sizes: [algorithm.metadata.sizeRange.upperBound], runsPerSize: 1)
+        await runSinglePass(size: algorithm.metadata.sizeRange.upperBound)
+    }
+
+    /// Awaits genuine completion (or an early stop via `stopAutomation()`) of `runAutomation(_:)`
+    /// — the primitive App Intents needs to report "the sweep is over" back to Shortcuts, rather
+    /// than firing the loop and returning immediately the way the keyboard-shortcut/Automator-menu
+    /// callers do. Safe on a freshly-constructed session only: `runAutomation(_:)`'s own "tap again
+    /// to stop" toggle can't trigger here, since `runningAutomationID` always starts `nil`.
+    public func runAutomationAndWait(_ automation: Automation) async {
+        runAutomation(automation)
+        guard isAutomating else { return }
+        await withCheckedContinuation { automationCompletionContinuations.append($0) }
     }
 
     /// Advances `arraySize` to the next value in `algorithm.metadata.sizeRange` (stepped by
@@ -283,6 +304,9 @@ public final class SortSession {
             automationProgress = nil
             automationTask = nil
             runningAutomationID = nil
+            let continuations = automationCompletionContinuations
+            automationCompletionContinuations = []
+            for continuation in continuations { continuation.resume() }
         }
         for (sizeIndex, size) in sizes.enumerated() {
             for runIndex in 0..<runsPerSize {
