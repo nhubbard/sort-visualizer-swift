@@ -6,7 +6,7 @@ public struct StablePermutationSort: SortAlgorithm {
     public let metadata = AlgorithmMetadata(
         displayName: "Stable Permutation Sort",
         category: .exchange,
-        sizeRange: 4...11,
+        sizeRange: 4...8,
         stable: false,
         timeComplexity: ComplexityBounds(best: "O(n)", average: "O(n \\times n!)", worst: "O(n \\times n!)"),
         spaceComplexity: "O(n)",
