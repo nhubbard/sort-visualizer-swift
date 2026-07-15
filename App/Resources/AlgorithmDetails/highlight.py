@@ -9,7 +9,7 @@ root = os.path.dirname(os.path.abspath(__file__))
 algorithms = sorted(
     entry.name
     for entry in os.scandir(root)
-    if entry.is_dir() and entry.name != "template" and not entry.name.startswith(".")
+    if entry.is_dir() and entry.name != "template" and entry.name != "__pycache__" and not entry.name.startswith(".")
 )
 extensions = ["c", "cpp", "cs", "go", "java", "js", "kt", "py", "rb", "swift"]
 

@@ -1,6 +1,6 @@
 import java.util.Arrays;
 
-public class heapsort {
+public class maxheapsort {
   public static void heapify(int arr[], int n, int i) {
     int largest = i;
     int l = 2 * i + 1;

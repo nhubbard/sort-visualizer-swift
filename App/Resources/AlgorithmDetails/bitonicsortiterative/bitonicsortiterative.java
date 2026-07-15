@@ -1,6 +1,6 @@
 import java.util.Arrays;
 
-public class bitonicsort {
+public class bitonicsortiterative {
   public static void sort(int[] arr) {
     int n = arr.length;
     for (int k = 2; k <= n; k *= 2) {

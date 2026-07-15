@@ -1,6 +1,6 @@
 import java.util.Arrays;
 
-public class radixsort {
+public class lsdradixsort {
   public static void sort(int[] arr) {
     int n = arr.length;
     int[][] bucket = new int[10][10];
