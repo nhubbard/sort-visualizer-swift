@@ -59,15 +59,6 @@ final class MetalTriangleRenderer<Layout: MetalTriangleLayout>: NSObject, MetalI
     private let p0Transitions = MetalTransitionTracker<SIMD2<Float>>()
     private let p1Transitions = MetalTransitionTracker<SIMD2<Float>>()
     private let p2Transitions = MetalTransitionTracker<SIMD2<Float>>()
-    /// See `MetalIncrementalRenderer.reduceFlashingEnabled`'s doc comment.
-    var reduceFlashingEnabled = false {
-        didSet {
-            colorTransitions.isEnabled = reduceFlashingEnabled
-            p0Transitions.isEnabled = reduceFlashingEnabled
-            p1Transitions.isEnabled = reduceFlashingEnabled
-            p2Transitions.isEnabled = reduceFlashingEnabled
-        }
-    }
     /// See `MetalBarRenderer.lastFrameTimestamp`'s doc comment.
     private var lastFrameTimestamp: CFTimeInterval?
 

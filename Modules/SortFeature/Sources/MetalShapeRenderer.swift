@@ -83,14 +83,6 @@ final class MetalShapeRenderer<Layout: MetalShapeLayout>: NSObject, MetalIncreme
     private let colorTransitions = MetalColorTransitionTracker()
     private let originTransitions = MetalTransitionTracker<SIMD2<Float>>()
     private let sizeTransitions = MetalTransitionTracker<SIMD2<Float>>()
-    /// See `MetalIncrementalRenderer.reduceFlashingEnabled`'s doc comment.
-    var reduceFlashingEnabled = false {
-        didSet {
-            colorTransitions.isEnabled = reduceFlashingEnabled
-            originTransitions.isEnabled = reduceFlashingEnabled
-            sizeTransitions.isEnabled = reduceFlashingEnabled
-        }
-    }
     /// See `MetalBarRenderer.lastFrameTimestamp`'s doc comment.
     private var lastFrameTimestamp: CFTimeInterval?
 

@@ -153,12 +153,16 @@ struct RunControlBar: View {
     private func statSlot(_ value: Int, digits: Int) -> some View {
         Text("\(value)")
             .monospacedDigit()
+            .contentTransition(.numericText(value: Double(value)))
+            .animation(.snappy(duration: 0.15), value: value)
             .frame(minWidth: CGFloat(digits) * 7.5, alignment: .trailing)
     }
 
     private func statSlot(_ text: String, digits: Int) -> some View {
         Text(text)
             .monospacedDigit()
+            .contentTransition(.numericText())
+            .animation(.snappy(duration: 0.15), value: text)
             .frame(minWidth: CGFloat(digits) * 7.5, alignment: .trailing)
     }
 

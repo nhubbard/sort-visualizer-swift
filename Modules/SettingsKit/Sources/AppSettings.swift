@@ -1,7 +1,6 @@
 import AlgorithmKit
 import Foundation
 import Observation
-import UIKit
 import VisualizationKit
 
 /// §3.3, in full as of Phase 9. No `warnBeforeBogoSort`/`warnBeforeBitonicSort` (the
@@ -45,35 +44,11 @@ public final class AppSettings {
         didSet { store.set(defaultShuffleID.rawValue, forKey: Keys.defaultShuffleID) }
     }
 
-    /// Manual override — off by default, since `reduceFlashingEffective` already turns this on
-    /// automatically for anyone with Reduce Motion enabled system-wide (see that property's own
-    /// doc comment). This exists for someone who wants smoothed highlight colors without also
-    /// turning on every other Reduce Motion effect across their whole device.
-    public var reduceFlashingEnabled: Bool {
-        didSet { store.set(reduceFlashingEnabled, forKey: Keys.reduceFlashingEnabled) }
-    }
-
     /// The sidebar's collapsed `AlgorithmCategory` sections — moved here from `ContentView`'s own
     /// `@State` so collapse/expand choices survive across launches like every other setting.
     public var collapsedCategoryIDs: Set<AlgorithmCategory> {
         didSet { store.set(collapsedCategoryIDs.map(\.rawValue), forKey: Keys.collapsedCategoryIDs) }
     }
-
-    /// What Metal renderers actually check before easing highlight-color changes instead of
-    /// snapping them (see `MetalIncrementalRenderer.reduceFlashingEnabled`) — the manual toggle
-    /// above, OR'd with the system's Reduce Motion accessibility setting, Apple's own
-    /// HIG-documented signal for reducing rapid flashing/strobing effects. `UIAccessibility`
-    /// bridges this from the Mac's native Accessibility preferences under Mac Catalyst too.
-    public var reduceFlashingEffective: Bool {
-        reduceFlashingEnabled || cachedSystemReduceMotionEnabled
-    }
-
-    /// Cached instead of querying `UIAccessibility.isReduceMotionEnabled` fresh on every
-    /// `reduceFlashingEffective` read — `MetalRendererView.updateUIView` reads that during every
-    /// SwiftUI body evaluation, which happens very often during active playback. Updated only when
-    /// the system setting actually changes, via the `NotificationCenter` observer registered in
-    /// `init`, so a read here is always just a plain stored-property access.
-    private var cachedSystemReduceMotionEnabled: Bool
 
     private enum Keys {
         static let selectedVisualizerID = "selectedVisualizerID"
@@ -84,7 +59,6 @@ public final class AppSettings {
         static let defaultArraySize = "defaultArraySize"
         static let codeTheme = "codeTheme"
         static let defaultShuffleID = "defaultShuffleID"
-        static let reduceFlashingEnabled = "reduceFlashingEnabled"
         static let collapsedCategoryIDs = "collapsedCategoryIDs"
     }
 
@@ -103,8 +77,7 @@ public final class AppSettings {
             Keys.synthHighNote: 72,
             Keys.defaultArraySize: 256,
             Keys.codeTheme: "monokai",
-            Keys.defaultShuffleID: "random",
-            Keys.reduceFlashingEnabled: false
+            Keys.defaultShuffleID: "random"
         ])
         selectedVisualizerID = VisualizerID(rawValue: store.string(forKey: Keys.selectedVisualizerID) ?? "bargraph")
         playbackSpeed = store.double(forKey: Keys.playbackSpeed)
@@ -113,22 +86,8 @@ public final class AppSettings {
         defaultArraySize = store.integer(forKey: Keys.defaultArraySize)
         codeTheme = CodeThemeID(rawValue: store.string(forKey: Keys.codeTheme) ?? "monokai")
         defaultShuffleID = ShuffleID(rawValue: store.string(forKey: Keys.defaultShuffleID) ?? "random")
-        reduceFlashingEnabled = store.bool(forKey: Keys.reduceFlashingEnabled)
         collapsedCategoryIDs = Set(
             (store.stringArray(forKey: Keys.collapsedCategoryIDs) ?? []).compactMap(AlgorithmCategory.init(rawValue:)))
-        cachedSystemReduceMotionEnabled = UIAccessibility.isReduceMotionEnabled
-
-        // `queue: .main` guarantees this closure only ever runs on the main thread, same as every
-        // other `UIAccessibility` display-option notification — `MainActor.assumeIsolated` below
-        // is a safe, correct assertion given that guarantee, matching the same cross-isolation
-        // callback shape `MetalBarRenderer.mtkView(_:drawableSizeWillChange:)` already uses.
-        NotificationCenter.default.addObserver(
-            forName: UIAccessibility.reduceMotionStatusDidChangeNotification, object: nil, queue: .main
-        ) { [weak self] _ in
-            MainActor.assumeIsolated {
-                self?.cachedSystemReduceMotionEnabled = UIAccessibility.isReduceMotionEnabled
-            }
-        }
     }
 
     private func persistNoteRange() {

@@ -14,17 +14,8 @@ struct MetalColorTransitionTrackerTests {
 
     @MainActor
     @Test
-    func disabledPassesThroughTargetImmediately() {
-        let tracker = MetalColorTransitionTracker()
-        #expect(tracker.valueToWrite(forSlot: 0, target: Self.red) == Self.red)
-        #expect(!tracker.isActive)
-    }
-
-    @MainActor
-    @Test
     func firstColorForASlotShowsImmediatelyWithNoFade() {
         let tracker = MetalColorTransitionTracker()
-        tracker.isEnabled = true
         // Nothing to fade FROM yet — a slot's very first color must appear immediately, not
         // fade in from black/zero, or every new run would visibly fade in on first paint.
         #expect(tracker.valueToWrite(forSlot: 0, target: Self.red) == Self.red)
@@ -35,7 +26,6 @@ struct MetalColorTransitionTrackerTests {
     @Test
     func laterColorChangeFadesInsteadOfSnapping() throws {
         let tracker = MetalColorTransitionTracker()
-        tracker.isEnabled = true
         _ = tracker.valueToWrite(forSlot: 0, target: Self.gray)
 
         let firstWrite = tracker.valueToWrite(forSlot: 0, target: Self.red)
@@ -56,7 +46,6 @@ struct MetalColorTransitionTrackerTests {
     @Test
     func targetChangingMidFadeRestartsFromCurrentDisplayedColorNotAPop() throws {
         let tracker = MetalColorTransitionTracker()
-        tracker.isEnabled = true
         _ = tracker.valueToWrite(forSlot: 0, target: Self.gray)
         _ = tracker.valueToWrite(forSlot: 0, target: Self.red)
         let partial = try #require(tracker.advance(elapsed: 0.06)[0]) // halfway from gray to red
@@ -73,23 +62,8 @@ struct MetalColorTransitionTrackerTests {
 
     @MainActor
     @Test
-    func disablingMidFadeDropsInFlightTransitionsAndResumesInstantSnapping() {
-        let tracker = MetalColorTransitionTracker()
-        tracker.isEnabled = true
-        _ = tracker.valueToWrite(forSlot: 0, target: Self.gray)
-        _ = tracker.valueToWrite(forSlot: 0, target: Self.red)
-        #expect(tracker.isActive)
-
-        tracker.isEnabled = false
-        #expect(!tracker.isActive)
-        #expect(tracker.valueToWrite(forSlot: 0, target: Self.red) == Self.red)
-    }
-
-    @MainActor
-    @Test
     func resetClearsAllTrackedSlots() {
         let tracker = MetalColorTransitionTracker()
-        tracker.isEnabled = true
         _ = tracker.valueToWrite(forSlot: 0, target: Self.gray)
         _ = tracker.valueToWrite(forSlot: 0, target: Self.red)
         #expect(tracker.isActive)

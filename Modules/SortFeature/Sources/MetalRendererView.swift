@@ -1,5 +1,4 @@
 import MetalKit
-import SettingsKit
 import SortEngineKit
 import SwiftUI
 import VisualizationKit
@@ -12,7 +11,6 @@ struct MetalRendererView: UIViewRepresentable {
     let replay: ReplayEngine
     let visualizerID: VisualizerID
 
-    @Environment(AppSettings.self) private var settings
     @Environment(\.colorScheme) private var colorScheme
 
     func makeUIView(context: Context) -> MTKView {
@@ -53,18 +51,15 @@ struct MetalRendererView: UIViewRepresentable {
         // Wire the Coordinator (which sets `renderer.onDrawableSizeChange`) BEFORE handing the
         // renderer to the view as its delegate — eliminates any chance of the view's very first
         // layout firing `drawableSizeWillChange` before anything is listening for it.
-        context.coordinator.setReduceFlashingEnabled(settings.reduceFlashingEffective)
         context.coordinator.setUp(replay: replay, renderer: renderer, view: view, visualizerID: visualizerID)
         view.delegate = renderer
         return view
     }
 
     func updateUIView(_ view: MTKView, context: Context) {
-        // Read fresh on every body evaluation — the only way a live change to either the manual
-        // toggle or the system's Reduce Motion setting reaches an already-built renderer.
-        context.coordinator.setReduceFlashingEnabled(settings.reduceFlashingEffective)
-        // Same rationale — the only way a live Light/Dark Mode change reaches an already-built
-        // view/renderer. `setColorScheme` itself no-ops unless the value actually changed.
+        // Read fresh on every body evaluation — the only way a live Light/Dark Mode change reaches
+        // an already-built view/renderer. `setColorScheme` itself no-ops unless the value actually
+        // changed.
         context.coordinator.setColorScheme(colorScheme, view: view)
         // `.id(ObjectIdentifier(replay))` at the call site only forces a fresh view (and thus a
         // fresh `makeUIView`) for a genuinely NEW run — switching visualizers mid-sort (⌘⇧V, or
@@ -99,24 +94,11 @@ struct MetalRendererView: UIViewRepresentable {
         private var view: MTKView?
         private var trackedStepIndex = -1
         private var visualizerID: VisualizerID?
-        /// Last value pushed via `setReduceFlashingEnabled` — re-applied to whichever renderer
-        /// `setUp` wires next (first creation, or a later `switchVisualizerIfNeeded` rebuild), so a
-        /// mid-sort visualizer switch never silently drops back to instant-snap colors.
-        private var reduceFlashingEnabled = false
         /// Last `\.colorScheme` actually applied — this view is on-demand (`isPaused`/
         /// `enableSetNeedsDisplay`), so without this cache every single body evaluation would force
         /// a redundant `setNeedsDisplay()`, not just an actual Light/Dark Mode change. `nil` before
         /// the first call, so the very first `makeUIView` always applies regardless of value.
         private var appliedColorScheme: ColorScheme?
-
-        /// Called from `MetalRendererView.makeUIView`/`updateUIView` with the current
-        /// `AppSettings.reduceFlashingEffective` — kept as its own entry point (not folded into
-        /// `setUp`'s parameter list) so it can be pushed on every body evaluation without disturbing
-        /// `setUp`/`switchVisualizerIfNeeded`'s existing signatures.
-        func setReduceFlashingEnabled(_ enabled: Bool) {
-            reduceFlashingEnabled = enabled
-            renderer?.reduceFlashingEnabled = enabled
-        }
 
         /// The canvas backdrop (`view.clearColor`) and the shared "no marker at all" default color
         /// (`MetalBarRenderer.defaultColor`/`MetalShapeColor.neutral`) both have to flip together —
@@ -148,7 +130,6 @@ struct MetalRendererView: UIViewRepresentable {
             self.view = view
             self.visualizerID = visualizerID
             trackedStepIndex = -1
-            renderer.reduceFlashingEnabled = reduceFlashingEnabled
 
             replay.onOperationApplied = { [weak self, weak replay, weak renderer] operation in
                 guard let self, let replay, let renderer else { return }

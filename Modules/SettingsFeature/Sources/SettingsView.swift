@@ -74,18 +74,6 @@ public struct SettingsView: View {
                 .pickerStyle(.menu)
                 .accessibilityIdentifier("codeThemePicker")
             }
-            Section {
-                Toggle("Reduce Flashing", isOn: $settings.reduceFlashingEnabled)
-                    .accessibilityIdentifier("reduceFlashingToggle")
-            } header: {
-                Text("Accessibility")
-            } footer: {
-                Text(
-                    "Smooths rapid highlight-color changes on sorts with few, large elements "
-                        + "(e.g. Bogo Sort), instead of snapping instantly. Also turns on "
-                        + "automatically when Reduce Motion is enabled in Accessibility settings."
-                )
-            }
         }
         .navigationTitle("Settings")
     }

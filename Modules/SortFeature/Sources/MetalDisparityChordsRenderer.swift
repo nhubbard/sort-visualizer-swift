@@ -33,16 +33,6 @@ final class MetalDisparityChordsRenderer: NSObject, MetalIncrementalRenderer {
     private let colorTransitions = MetalColorTransitionTracker()
     private let startTransitions = MetalTransitionTracker<SIMD2<Float>>()
     private let endTransitions = MetalTransitionTracker<SIMD2<Float>>()
-    /// See `MetalIncrementalRenderer.reduceFlashingEnabled`'s doc comment. `thickness` is never
-    /// eased — it's `Self.lineWidth * lastScale`, a per-renderer constant that never varies per
-    /// index, so there's nothing for a tracker to smooth.
-    var reduceFlashingEnabled = false {
-        didSet {
-            colorTransitions.isEnabled = reduceFlashingEnabled
-            startTransitions.isEnabled = reduceFlashingEnabled
-            endTransitions.isEnabled = reduceFlashingEnabled
-        }
-    }
     /// See `MetalBarRenderer.lastFrameTimestamp`'s doc comment.
     private var lastFrameTimestamp: CFTimeInterval?
 

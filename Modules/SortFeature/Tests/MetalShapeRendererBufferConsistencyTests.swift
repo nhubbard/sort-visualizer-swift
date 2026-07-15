@@ -231,14 +231,14 @@ struct MetalShapeRendererBufferConsistencyTests {
         #expect(mismatches.isEmpty, "\(mismatches.count) slot(s) never got the correct final height written")
     }
 
-    /// Coverage for `reduceFlashingEnabled` (`MetalColorTransitionTracker`): a touched slot's
-    /// buffer color must NOT jump straight to the marker color the instant `apply` runs, and must
-    /// reach it only after `advanceTransitions` has had enough elapsed time to finish the
-    /// fade — the whole point of easing instead of snapping to avoid a rapid, high-contrast flash
-    /// on small-array algorithms (Bogo/Bozo Sort) where the affected shape is large on screen.
+    /// Coverage for `MetalColorTransitionTracker`: a touched slot's buffer color must NOT jump
+    /// straight to the marker color the instant `apply` runs, and must reach it only after
+    /// `advanceTransitions` has had enough elapsed time to finish the fade — the whole point of
+    /// easing instead of snapping to avoid a rapid, high-contrast flash on small-array algorithms
+    /// (Bogo/Bozo Sort) where the affected shape is large on screen.
     @MainActor
     @Test
-    func reduceFlashingEnabledEasesTouchedSlotColorInsteadOfSnapping() throws {
+    func touchedSlotColorEasesInsteadOfSnapping() throws {
         let device = try #require(MTLCreateSystemDefaultDevice())
         // `RainbowMetalLayout` ignores markers entirely (always hue-ramp) — `DisparityBarGraphMetalLayout`
         // is one of the layouts that actually paints `MetalShapeColor.marker(forIndex:in:)`, so a
@@ -247,11 +247,6 @@ struct MetalShapeRendererBufferConsistencyTests {
         let values = [10, 20]
         let canvasSize = CGSize(width: 200, height: 200)
 
-        // Matches `MetalRendererView.Coordinator`'s real ordering (`setReduceFlashingEnabled` runs
-        // before `setUp`, which runs before any `reset`/`apply`): the tracker must already be
-        // enabled when a slot gets its first color, or it has no prior color to fade FROM the next
-        // time that slot changes.
-        renderer.reduceFlashingEnabled = true
         renderer.reset(values: values, valueRange: 10...20, markers: [:], canvasSize: canvasSize, scale: 1)
 
         renderer.apply(
@@ -272,14 +267,13 @@ struct MetalShapeRendererBufferConsistencyTests {
     /// still teleporting to its new spot while only its color faded).
     @MainActor
     @Test
-    func reduceFlashingEnabledEasesTouchedSlotOriginInsteadOfSnapping() throws {
+    func touchedSlotOriginEasesInsteadOfSnapping() throws {
         let device = try #require(MTLCreateSystemDefaultDevice())
         // `ScatterPlotMetalLayout`'s dot Y-position is a direct function of value — a clean case
         // where changing a value moves the dot, independent of any marker.
         let renderer = try #require(MetalShapeRenderer<ScatterPlotMetalLayout>(device: device))
         let canvasSize = CGSize(width: 200, height: 200)
 
-        renderer.reduceFlashingEnabled = true
         renderer.reset(values: [10, 20], valueRange: 10...20, markers: [:], canvasSize: canvasSize, scale: 1)
         let originalOrigin = renderer.debugInstances()[0].origin
 

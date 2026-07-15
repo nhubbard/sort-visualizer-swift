@@ -26,16 +26,6 @@ final class MetalTransitionTracker<Value: SIMD> where Value.Scalar == Float {
         var progress: Double
     }
 
-    /// `false` (today's exact instant-snap behavior) unless the caller turned this on — see
-    /// `MetalIncrementalRenderer.reduceFlashingEnabled`'s doc comment for who sets this and why.
-    /// Disabling mid-fade drops every in-flight entry rather than leaving them frozen at whatever
-    /// partial value they'd reached with nothing left to advance them.
-    var isEnabled = false {
-        didSet {
-            if !isEnabled { entries.removeAll() }
-        }
-    }
-
     private var entries: [Int: Entry] = [:]
 
     /// Whether any slot is still mid-fade — the caller's cue to keep re-arming redraws.
@@ -51,7 +41,6 @@ final class MetalTransitionTracker<Value: SIMD> where Value.Scalar == Float {
     /// Called every time a renderer would otherwise write `target` directly into its GPU buffer.
     /// Returns the value that should actually be written THIS call.
     func valueToWrite(forSlot slot: Int, target: Value) -> Value {
-        guard isEnabled else { return target }
         guard var entry = entries[slot] else {
             // First-ever value for this slot — nothing to fade from, so show it immediately.
             entries[slot] = Entry(from: target, to: target, displayed: target, progress: 1)

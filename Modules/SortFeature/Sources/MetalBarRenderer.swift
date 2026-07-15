@@ -39,14 +39,6 @@ final class MetalBarRenderer: NSObject, MetalIncrementalRenderer {
     private let colorTransitions = MetalColorTransitionTracker()
     private let originTransitions = MetalTransitionTracker<SIMD2<Float>>()
     private let sizeTransitions = MetalTransitionTracker<SIMD2<Float>>()
-    /// See `MetalIncrementalRenderer.reduceFlashingEnabled`'s doc comment.
-    var reduceFlashingEnabled = false {
-        didSet {
-            colorTransitions.isEnabled = reduceFlashingEnabled
-            originTransitions.isEnabled = reduceFlashingEnabled
-            sizeTransitions.isEnabled = reduceFlashingEnabled
-        }
-    }
     /// Wall-clock timestamp of the last `draw(in:)` call, for computing `advanceTransitions`'s
     /// `elapsed` — `nil` before the first draw (treated as 0 elapsed, matching
     /// `CADisplayLinkDriver`'s own first-tick convention).
