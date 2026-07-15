@@ -9,8 +9,15 @@ enum MetalShapeColor {
     static let secondary = SIMD4<Float>(0.38, 0.58, 0.95, 1)
     /// `ScatterPlotVisualizer`/`WaveDotsVisualizer`'s own flat, non-hue-ramped default — distinct
     /// from `MetalBarRenderer`'s identically-valued `defaultColor` only because the two files don't
-    /// share a common color module to pull it from.
-    static let neutral = SIMD4<Float>(0.82, 0.82, 0.86, 1)
+    /// share a common color module to pull it from. `var`, not `let`, for the same light/dark-mode
+    /// reason as `MetalBarRenderer.defaultColor`. `nonisolated(unsafe)`: every actual reader/writer
+    /// (draw calls, `MetalRendererView.Coordinator`) runs on the main thread by construction — this
+    /// whole rendering pipeline is driven by an `isPaused`/`enableSetNeedsDisplay` `MTKView` from
+    /// main-thread SwiftUI/UIKit callbacks, never a background queue — but the rest of this enum's
+    /// static methods are called from some genuinely `nonisolated` layout contexts
+    /// (`MetalPolygonVisualizerLayouts.swift`), so isolating the whole enum `@MainActor` isn't an
+    /// option without breaking those.
+    nonisolated(unsafe) static var neutral = SIMD4<Float>(0.82, 0.82, 0.86, 1)
 
     /// `nil` when `index` carries no marker at all — callers fall back to whatever
     /// non-marker color their own `Visualizer` used (`hueRamp` for most, `neutral` for the two

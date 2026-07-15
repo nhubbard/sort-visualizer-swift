@@ -60,7 +60,6 @@ let app = Target.target(
     bundleId: "com.nhubbard.Sort2.mobile",
     deploymentTargets: Module.deploymentTargets,
     infoPlist: .extendingDefault(with: [
-        "UIUserInterfaceStyle": "Dark",
         // All 4 orientations, no UIRequiresFullScreen: Apple has announced that flag will stop
         // being honored in a future iPadOS release, so "declare landscape-only + opt out of
         // multitasking" is no longer a viable way to stay full-screen-and-wide — the OS will let

@@ -28,6 +28,10 @@ public final class SortCoordinator {
     /// while the app is already open is just as visible to anything reading this from outside the
     /// view tree. Same precedent as `ContentView`'s own Showcase mode driving `selection` itself.
     public var selectedAlgorithmID: AlgorithmID?
+    /// `ContentView`'s Settings sheet binds directly to this instead of owning its own
+    /// `@State` — the scene-level `SortCommands` menu (⌘,) needs somewhere reachable to request the
+    /// sheet from outside the view tree, same rationale as `selectedAlgorithmID` above.
+    public var isSettingsRequested = false
     /// Bumped on every intent-triggered run — folded into `ScrollingSortView`'s `.id(...)` so
     /// re-running the *same* algorithm from a Shortcut always mounts a genuinely fresh
     /// `SortSession` instead of silently no-op'ing against one that already reached `.complete`.

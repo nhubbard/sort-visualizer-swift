@@ -52,7 +52,12 @@ final class MetalBarRenderer: NSObject, MetalIncrementalRenderer {
     /// `CADisplayLinkDriver`'s own first-tick convention).
     private var lastFrameTimestamp: CFTimeInterval?
 
-    private static let defaultColor = SIMD4<Float>(0.82, 0.82, 0.86, 1)
+    /// `var`, not `let`: `MetalRendererView.Coordinator.setColorScheme` flips this between a
+    /// light-mode and dark-mode value, since a near-white "no marker" default vanishes into a
+    /// light-mode canvas the same way it would have vanished into the transparent-canvas bug Light
+    /// Mode support fixed. `primaryColor`/`secondaryColor` stay fixed — both are saturated enough
+    /// to read against either backdrop.
+    static var defaultColor = SIMD4<Float>(0.82, 0.82, 0.86, 1)
     private static let primaryColor = SIMD4<Float>(0.95, 0.38, 0.38, 1)
     private static let secondaryColor = SIMD4<Float>(0.38, 0.58, 0.95, 1)
 

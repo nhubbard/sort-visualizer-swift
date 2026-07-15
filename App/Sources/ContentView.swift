@@ -15,11 +15,10 @@ struct ContentView: View {
     // `RunAutomationIntent`) need to drive this same selection from outside the view tree, exactly
     // the way Showcase mode (below) already drives it through a manual-tap-equivalent path.
     @Bindable private var coordinator = SortCoordinator.shared
-    @State private var isShowingSettings = false
-    // Session-only (not AppSettings-backed): every category starts expanded on each launch, so
-    // the existing `algorithmLink.<id>` UI tests (which tap straight into the sidebar with no
-    // "expand first" step) keep working unmodified.
-    @State private var collapsedCategories: Set<AlgorithmCategory> = []
+    @Environment(AppSettings.self) private var settings
+    // Search text is deliberately not persisted — it's a one-off filter for the current session,
+    // not a setting.
+    @State private var searchText = ""
 
     // Showcase mode: `nil` means idle. Running drives `selection` through every registered
     // algorithm in turn via the exact same sidebar-navigation path a manual tap would — see
@@ -33,10 +32,13 @@ struct ContentView: View {
         NavigationSplitView {
             List(selection: $coordinator.selectedAlgorithmID) {
                 ForEach(AlgorithmCategory.allCases) { category in
-                    let algorithms = AlgorithmRegistry.shared.algorithms(in: category)
+                    let algorithms = filteredAlgorithms(in: category)
                     if !algorithms.isEmpty {
+                        // A search match must stay visible even inside a category the user
+                        // collapsed earlier — collapse only applies while not searching.
+                        let isCollapsed = searchText.isEmpty && settings.collapsedCategoryIDs.contains(category)
                         Section {
-                            if !collapsedCategories.contains(category) {
+                            if !isCollapsed {
                                 ForEach(algorithms, id: \.id) { algorithm in
                                     NavigationLink(value: algorithm.id) {
                                         CustomIconLabel(
@@ -44,19 +46,25 @@ struct ContentView: View {
                                             iconName: algorithm.metadata.iconName)
                                     }
                                     .accessibilityIdentifier("algorithmLink.\(algorithm.id.rawValue)")
+                                    .contextMenu {
+                                        Button("Run Size Sweep") {
+                                            Task { await SortCoordinator.shared.runAutomation(algorithm: algorithm, automationID: .sizeSweep) }
+                                        }
+                                        Button("Run Max Size Only") {
+                                            Task { await SortCoordinator.shared.runAutomation(algorithm: algorithm, automationID: .maxSizeOnly) }
+                                        }
+                                    }
                                 }
                             }
                         } header: {
-                            CategorySectionHeader(
-                                category: category,
-                                isCollapsed: collapsedCategories.contains(category)
-                            ) {
+                            CategorySectionHeader(category: category, isCollapsed: isCollapsed) {
                                 toggleCollapsed(category)
                             }
                         }
                     }
                 }
             }
+            .searchable(text: $searchText, prompt: "Search Algorithms")
             // Blocks manual navigation while Showcase drives `selection` itself — otherwise a
             // stray tap here would race the automated advance below.
             .disabled(showcaseIndex != nil)
@@ -71,7 +79,7 @@ struct ContentView: View {
                 }
                 ToolbarItem(placement: .primaryAction) {
                     Button {
-                        isShowingSettings = true
+                        coordinator.isSettingsRequested = true
                     } label: {
                         Image(systemName: "gearshape")
                     }
@@ -89,25 +97,15 @@ struct ContentView: View {
                 can still be changed with ⌘⇧V, but other controls are locked until it finishes.
                 """)
             }
-            .background {
-                // Zero-size, fully transparent — same invisible-button-in-`.background` pattern
-                // `SortFeature`'s own shortcuts use. Lives here (not scoped to a running sort)
-                // since Settings should be reachable from anywhere in the app.
-                Button("") { isShowingSettings = true }
-                    .keyboardShortcut(",", modifiers: [.command])
-                    .opacity(0)
-                    .frame(width: 0, height: 0)
-                    .accessibilityHidden(true)
-            }
         } detail: {
             detailContent
         }
-        .sheet(isPresented: $isShowingSettings) {
+        .sheet(isPresented: $coordinator.isSettingsRequested) {
             NavigationStack {
                 SettingsView()
                     .toolbar {
                         ToolbarItem(placement: .cancellationAction) {
-                            Button { isShowingSettings = false }
+                            Button { coordinator.isSettingsRequested = false }
                           label: {
                             Text("Done").fixedSize(horizontal: true, vertical: false)
                           }
@@ -264,12 +262,18 @@ struct ContentView: View {
 
     private func toggleCollapsed(_ category: AlgorithmCategory) {
         withAnimation(.snappy) {
-            if collapsedCategories.contains(category) {
-                collapsedCategories.remove(category)
+            if settings.collapsedCategoryIDs.contains(category) {
+                settings.collapsedCategoryIDs.remove(category)
             } else {
-                collapsedCategories.insert(category)
+                settings.collapsedCategoryIDs.insert(category)
             }
         }
+    }
+
+    private func filteredAlgorithms(in category: AlgorithmCategory) -> [any SortAlgorithm] {
+        let algorithms = AlgorithmRegistry.shared.algorithms(in: category)
+        guard !searchText.isEmpty else { return algorithms }
+        return algorithms.filter { $0.metadata.displayName.localizedCaseInsensitiveContains(searchText) }
     }
 }
 

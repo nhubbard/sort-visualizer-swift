@@ -13,12 +13,17 @@ struct MetalRendererView: UIViewRepresentable {
     let visualizerID: VisualizerID
 
     @Environment(AppSettings.self) private var settings
+    @Environment(\.colorScheme) private var colorScheme
 
     func makeUIView(context: Context) -> MTKView {
         let view = MTKView()
-        view.clearColor = MTLClearColor(red: 0, green: 0, blue: 0, alpha: 0)
-        view.isOpaque = false
-        view.layer.isOpaque = false
+        // Always opaque, never transparent — the visualization plane paints its own backdrop
+        // rather than showing whatever's behind it through. Which color that backdrop actually is
+        // (and the "no marker" default item color that has to stay visible against it) flips with
+        // the system appearance — see `Coordinator.setColorScheme`.
+        view.isOpaque = true
+        view.layer.isOpaque = true
+        context.coordinator.setColorScheme(colorScheme, view: view)
         // `isPaused = true` + `enableSetNeedsDisplay = true` puts this view on the SAME clock as
         // `ReplayEngine.onOperationApplied` (which explicitly calls `setNeedsDisplay()` below)
         // instead of MTKView's own independent internal display-link loop, which redrew
@@ -58,6 +63,9 @@ struct MetalRendererView: UIViewRepresentable {
         // Read fresh on every body evaluation — the only way a live change to either the manual
         // toggle or the system's Reduce Motion setting reaches an already-built renderer.
         context.coordinator.setReduceFlashingEnabled(settings.reduceFlashingEffective)
+        // Same rationale — the only way a live Light/Dark Mode change reaches an already-built
+        // view/renderer. `setColorScheme` itself no-ops unless the value actually changed.
+        context.coordinator.setColorScheme(colorScheme, view: view)
         // `.id(ObjectIdentifier(replay))` at the call site only forces a fresh view (and thus a
         // fresh `makeUIView`) for a genuinely NEW run — switching visualizers mid-sort (⌘⇧V, or
         // the Settings picker) keeps the SAME `replay`, so this is the only place that ever learns
@@ -95,6 +103,11 @@ struct MetalRendererView: UIViewRepresentable {
         /// `setUp` wires next (first creation, or a later `switchVisualizerIfNeeded` rebuild), so a
         /// mid-sort visualizer switch never silently drops back to instant-snap colors.
         private var reduceFlashingEnabled = false
+        /// Last `\.colorScheme` actually applied — this view is on-demand (`isPaused`/
+        /// `enableSetNeedsDisplay`), so without this cache every single body evaluation would force
+        /// a redundant `setNeedsDisplay()`, not just an actual Light/Dark Mode change. `nil` before
+        /// the first call, so the very first `makeUIView` always applies regardless of value.
+        private var appliedColorScheme: ColorScheme?
 
         /// Called from `MetalRendererView.makeUIView`/`updateUIView` with the current
         /// `AppSettings.reduceFlashingEffective` — kept as its own entry point (not folded into
@@ -103,6 +116,30 @@ struct MetalRendererView: UIViewRepresentable {
         func setReduceFlashingEnabled(_ enabled: Bool) {
             reduceFlashingEnabled = enabled
             renderer?.reduceFlashingEnabled = enabled
+        }
+
+        /// The canvas backdrop (`view.clearColor`) and the shared "no marker at all" default color
+        /// (`MetalBarRenderer.defaultColor`/`MetalShapeColor.neutral`) both have to flip together —
+        /// a near-white default bar is only readable against a dark backdrop, and vice versa. The
+        /// latter two are process-wide statics rather than per-renderer state because they're a
+        /// shared visual constant, not something that varies per algorithm/visualizer instance.
+        func setColorScheme(_ colorScheme: ColorScheme, view: MTKView) {
+            guard colorScheme != appliedColorScheme else { return }
+            appliedColorScheme = colorScheme
+            view.clearColor = Self.clearColor(for: colorScheme)
+            MetalBarRenderer.defaultColor = Self.neutralColor(for: colorScheme)
+            MetalShapeColor.neutral = Self.neutralColor(for: colorScheme)
+            view.setNeedsDisplay()
+        }
+
+        private static func clearColor(for colorScheme: ColorScheme) -> MTLClearColor {
+            colorScheme == .light
+                ? MTLClearColor(red: 0.90, green: 0.90, blue: 0.93, alpha: 1)
+                : MTLClearColor(red: 0, green: 0, blue: 0, alpha: 1)
+        }
+
+        private static func neutralColor(for colorScheme: ColorScheme) -> SIMD4<Float> {
+            colorScheme == .light ? SIMD4<Float>(0.30, 0.30, 0.34, 1) : SIMD4<Float>(0.82, 0.82, 0.86, 1)
         }
 
         func setUp(replay: ReplayEngine, renderer: any MetalIncrementalRenderer, view: MTKView, visualizerID: VisualizerID) {

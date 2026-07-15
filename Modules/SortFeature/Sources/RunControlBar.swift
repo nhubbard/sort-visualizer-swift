@@ -55,9 +55,6 @@ struct RunControlBar: View {
         // Manual scrubbing/resizing would otherwise collide with the automation loop's own
         // repeated `start(size:)` calls — this bar goes fully inert while it's running.
         .disabled(session.isAutomating)
-        .background {
-            transportShortcuts
-        }
     }
 
     private var scrubSlider: some View {
@@ -209,6 +206,7 @@ struct RunControlBar: View {
 
         Button {
             session.togglePlayback()
+            SortHaptics.playPauseToggled()
         } label: {
             Image(systemName: replay.isPlaying ? "pause.fill" : "play.fill")
                 .font(.title2)
@@ -244,6 +242,7 @@ struct RunControlBar: View {
     private var utilityButtons: some View {
         Button {
             Task { await session.start(size: session.arraySize) }
+            SortHaptics.reset()
         } label: {
             Image(systemName: "arrow.counterclockwise")
         }
@@ -360,48 +359,6 @@ struct RunControlBar: View {
         }
     }
 
-    /// Zero-size, fully transparent invisible buttons — same pattern as `ScrollingSortView`'s own
-    /// ⌘⇧A/⌘⌥⇧A/⌘⇧V shortcuts, just scoped here instead, since `replay` (`ReplayEngine`) only
-    /// exists at this level, not up at `ScrollingSortView`. Reset/toggle-audio/cycle-size only
-    /// need `session`, but live here too rather than splitting shortcuts across two views.
-    private var transportShortcuts: some View {
-        Group {
-            hiddenButton { replay.seek(to: 0) }
-                .keyboardShortcut(.leftArrow, modifiers: [.command, .option])
-            hiddenButton { replay.pause(); replay.stepBackward() }
-                .keyboardShortcut(.leftArrow, modifiers: [.option])
-            hiddenButton { session.togglePlayback() }
-                .keyboardShortcut(.space, modifiers: [])
-            hiddenButton { replay.pause(); replay.stepForward() }
-                .keyboardShortcut(.rightArrow, modifiers: [.option])
-            hiddenButton { replay.seek(to: replay.totalOperationCount) }
-                .keyboardShortcut(.rightArrow, modifiers: [.command, .option])
-            hiddenButton { Task { await session.start(size: session.arraySize) } }
-                .keyboardShortcut("r", modifiers: [.command])
-            hiddenButton { session.soundEnabled.toggle() }
-                .keyboardShortcut("a", modifiers: [.command])
-            hiddenButton { replay.speed = min(1000, replay.speed + 1) }
-                .keyboardShortcut("+", modifiers: [.command, .shift])
-            hiddenButton { replay.speed = max(1, replay.speed - 1) }
-                .keyboardShortcut("-", modifiers: [.command, .shift])
-            hiddenButton { replay.speed = min(1000, replay.speed + 10) }
-                .keyboardShortcut("+", modifiers: [.command, .option])
-            hiddenButton { replay.speed = max(1, replay.speed - 10) }
-                .keyboardShortcut("-", modifiers: [.command, .option])
-            hiddenButton { Task { await session.cycleArraySize() } }
-                .keyboardShortcut("s", modifiers: [.command])
-        }
-    }
-
-    /// Zero-size, fully transparent — the modifiers are applied per-button (not once to a
-    /// containing `Group`, whose modifier-distribution semantics across multiple children aren't
-    /// guaranteed), matching `ScrollingSortView`'s own shortcut buttons exactly.
-    private func hiddenButton(action: @escaping () -> Void) -> some View {
-        Button("", action: action)
-            .opacity(0)
-            .frame(width: 0, height: 0)
-            .accessibilityHidden(true)
-    }
 }
 
 /// Robot icon — lists every registered `Automation` (see `AutomationRegistry`), the same two

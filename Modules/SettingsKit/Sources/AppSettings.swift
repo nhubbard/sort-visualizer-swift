@@ -53,6 +53,12 @@ public final class AppSettings {
         didSet { store.set(reduceFlashingEnabled, forKey: Keys.reduceFlashingEnabled) }
     }
 
+    /// The sidebar's collapsed `AlgorithmCategory` sections — moved here from `ContentView`'s own
+    /// `@State` so collapse/expand choices survive across launches like every other setting.
+    public var collapsedCategoryIDs: Set<AlgorithmCategory> {
+        didSet { store.set(collapsedCategoryIDs.map(\.rawValue), forKey: Keys.collapsedCategoryIDs) }
+    }
+
     /// What Metal renderers actually check before easing highlight-color changes instead of
     /// snapping them (see `MetalIncrementalRenderer.reduceFlashingEnabled`) — the manual toggle
     /// above, OR'd with the system's Reduce Motion accessibility setting, Apple's own
@@ -79,6 +85,7 @@ public final class AppSettings {
         static let codeTheme = "codeTheme"
         static let defaultShuffleID = "defaultShuffleID"
         static let reduceFlashingEnabled = "reduceFlashingEnabled"
+        static let collapsedCategoryIDs = "collapsedCategoryIDs"
     }
 
     private let store: UserDefaults
@@ -107,6 +114,8 @@ public final class AppSettings {
         codeTheme = CodeThemeID(rawValue: store.string(forKey: Keys.codeTheme) ?? "monokai")
         defaultShuffleID = ShuffleID(rawValue: store.string(forKey: Keys.defaultShuffleID) ?? "random")
         reduceFlashingEnabled = store.bool(forKey: Keys.reduceFlashingEnabled)
+        collapsedCategoryIDs = Set(
+            (store.stringArray(forKey: Keys.collapsedCategoryIDs) ?? []).compactMap(AlgorithmCategory.init(rawValue:)))
         cachedSystemReduceMotionEnabled = UIAccessibility.isReduceMotionEnabled
 
         // `queue: .main` guarantees this closure only ever runs on the main thread, same as every

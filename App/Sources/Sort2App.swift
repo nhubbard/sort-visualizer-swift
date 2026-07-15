@@ -107,5 +107,8 @@ struct Sort2App: App {
             ContentView()
                 .environment(AppSettings.shared)
         }
+        .commands {
+            SortCommands()
+        }
     }
 }
