@@ -5,14 +5,17 @@ import UIKit
 /// target) so the feedback feels identical whether a control is tapped or its keyboard shortcut is
 /// used, since both paths end up calling the exact same `SortSession`/`ReplayEngine` methods.
 public enum SortHaptics {
+    @MainActor
     public static func playPauseToggled() {
         UIImpactFeedbackGenerator(style: .light).impactOccurred()
     }
 
+    @MainActor
     public static func reset() {
         UIImpactFeedbackGenerator(style: .medium).impactOccurred()
     }
 
+    @MainActor
     public static func speedClamped() {
         UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
     }

@@ -1,6 +1,7 @@
 import MetalKit
 import SortEngineKit
 import SwiftUI
+import UIKit
 import VisualizationKit
 
 /// Bridges whichever `MetalIncrementalRenderer` `MetalRendererFactory` builds for `visualizerID`
@@ -115,10 +116,28 @@ struct MetalRendererView: UIViewRepresentable {
         }
 
         private static func clearColor(for colorScheme: ColorScheme) -> MTLClearColor {
-            colorScheme == .light
+            #if targetEnvironment(macCatalyst)
+            // On Mac Catalyst, the canvas sits inside a windowed app next to sidebar/toolbar
+            // chrome that already uses the system background — a fixed black (or the iPad's
+            // fixed near-white) reads as visibly out of place there, so follow the same
+            // adaptive color the surrounding chrome uses instead of a hardcoded constant.
+            return systemBackgroundClearColor(for: colorScheme)
+            #else
+            return colorScheme == .light
                 ? MTLClearColor(red: 0.90, green: 0.90, blue: 0.93, alpha: 1)
                 : MTLClearColor(red: 0, green: 0, blue: 0, alpha: 1)
+            #endif
         }
+
+        #if targetEnvironment(macCatalyst)
+        private static func systemBackgroundClearColor(for colorScheme: ColorScheme) -> MTLClearColor {
+            let trait = UITraitCollection(userInterfaceStyle: colorScheme == .light ? .light : .dark)
+            let resolved = UIColor.systemBackground.resolvedColor(with: trait)
+            var red: CGFloat = 0, green: CGFloat = 0, blue: CGFloat = 0, alpha: CGFloat = 0
+            resolved.getRed(&red, green: &green, blue: &blue, alpha: &alpha)
+            return MTLClearColor(red: Double(red), green: Double(green), blue: Double(blue), alpha: 1)
+        }
+        #endif
 
         private static func neutralColor(for colorScheme: ColorScheme) -> SIMD4<Float> {
             colorScheme == .light ? SIMD4<Float>(0.30, 0.30, 0.34, 1) : SIMD4<Float>(0.82, 0.82, 0.86, 1)
