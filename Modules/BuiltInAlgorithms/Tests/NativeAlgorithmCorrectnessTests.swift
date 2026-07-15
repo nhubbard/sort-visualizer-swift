@@ -12,21 +12,21 @@ struct NativeAlgorithmCorrectnessTests {
         BadSort(), BaseNMaxHeapSort(), BinaryDoubleInsertionSort(), BinaryGnomeSort(),
         BinaryInsertionSort(), BinaryMergeSort(), BingoSort(), BitonicSortIterative(),
         BitonicSortRecursive(), BlockSwapMergeSort(), BogoSort(), BoseNelsonSortIterative(),
-        BottomUpMergeSort(), BozoSort(), BubbleSort(), BurntPancakeSort(),
+        BottomUpMergeSort(), BozoSort(), BubbleBogoSort(), BubbleSort(), BurntPancakeSort(),
         CircleSortIterative(), CircleSortRecursive(), CircloidSort(),
         ClassicThreeSmoothCombSort(), ClassicTreeSort(), CocktailBogoSort(),
         CocktailMergeSort(), CocktailShakerSort(), CombSort(), CountingSort(), CycleSort(),
-        DiamondSortRecursive(), DoubleInsertionSort(), DoubleSelectionSort(),
+        DeterministicBogoSort(), DiamondSortRecursive(), DoubleInsertionSort(), DoubleSelectionSort(),
         DualPivotQuickSort(), ExchangeBogoSort(), FlashSort(), GnomeSort(), GravitySort(),
-        HybridCombSort(), InPlaceMergeSort(), InsertionSort(), IntroCircleSortIterative(),
+        GuessSort(), HybridCombSort(), InPlaceMergeSort(), InsertionSort(), IntroCircleSortIterative(),
         IntroSort(), LessBogoSort(), LLQuickSort(), LRQuickSort(), LSDRadixSort(), MaxHeapSort(),
-        MergeExchangeSortIterative(), MergeSort(), MinHeapSort(), MSDRadixSort(),
+        MedianQuickBogoSort(), MergeBogoSort(), MergeExchangeSortIterative(), MergeSort(), MinHeapSort(), MSDRadixSort(),
         OddEvenMergeSortIterative(), OddEvenMergeSortRecursive(), OddEvenSort(),
-        OptimizedBubbleSort(), OptimizedCocktailShakerSort(), OptimizedGnomeSort(),
-        PairwiseSortIterative(), PancakeSort(), PigeonholeSort(), QuickSort(),
-        RecursiveShellSort(), RotateMergeSort(), SelectionSort(), ShellSort(),
-        SimplifiedLibrarySort(), SlopeSort(), SlowSort(), SnuffleSort(), StableCycleSort(),
-        StableSelectionSort(), StaticSort(), StoogeSort(), StrandSort(), SwaplessBubbleSort(),
+        OptimizedBubbleSort(), OptimizedCocktailShakerSort(), OptimizedGnomeSort(), OptimizedGuessSort(),
+        PairwiseSortIterative(), PancakeSort(), PigeonholeSort(), QuickBogoSort(), QuickSort(),
+        RandomGuessSort(), RecursiveShellSort(), RotateMergeSort(), SelectionBogoSort(), SelectionSort(), ShellSort(),
+        SimplifiedLibrarySort(), SlopeSort(), SlowSort(), SmartBogoBogoSort(), SmartGuessSort(), SnuffleSort(), StableCycleSort(),
+        StablePermutationSort(), StableSelectionSort(), StaticSort(), StoogeSort(), StrandSort(), SwaplessBubbleSort(),
         TernaryLLQuickSort(), TernaryLRQuickSort(), ThreeSmoothCombSortIterative(),
         ThreeSmoothCombSortRecursive(), TriangularHeapSort(), UnoptimizedBubbleSort(),
         UnoptimizedCocktailShakerSort(), WeavedMergeSort(), WeaveMergeSort()
@@ -455,6 +455,81 @@ struct NativeAlgorithmCorrectnessTests {
             expected PairwiseSortIterative's fixed comparator network to reorder at least one run \
             of equal-valued elements relative to their original input order across randomized \
             duplicate-heavy trials, confirming it is not a stable sort
+            """
+        )
+    }
+
+    /// `GuessSort`/`OptimizedGuessSort`/`SmartGuessSort`/`RandomGuessSort` all validate their
+    /// `loops[]` index-guess only via *adjacent* comparisons with an index tie-break — never an
+    /// explicit "is this actually a permutation" check — so, mirroring the scrutiny `FunSort` got
+    /// (an ArrayV algorithm that looked like a faithful port but was quietly wrong on duplicates
+    /// 84% of the time), this runs many more duplicate-heavy trials than the generic suite above
+    /// before trusting the faithful-port reasoning in each file's own doc comment.
+    @Test
+    func guessFamilyDuplicateHeavyFuzz() {
+        let algorithms: [any SortAlgorithm] = [GuessSort(), OptimizedGuessSort(), SmartGuessSort(), RandomGuessSort()]
+        for algorithm in algorithms {
+            let size = algorithm.metadata.sizeRange.lowerBound
+            for attempt in 0..<300 {
+                let input = (0..<size).map { _ in Int.random(in: 0...2) }
+                var engine = RecordingEngine(values: input)
+                algorithm.record(into: &engine)
+
+                #expect(
+                    engine.values == input.sorted(),
+                    """
+                    \(algorithm.id.rawValue) failed duplicate-heavy fuzz attempt \(attempt) of size \(size): \
+                    \(input) -> \(engine.values)
+                    """
+                )
+            }
+        }
+    }
+
+    /// Despite the name, `StablePermutationSort` does NOT actually preserve tied elements'
+    /// original relative order — confirmed empirically here (mirroring
+    /// `weaveMergeSortTiedElementsCanLoseTheirOriginalRelativeOrder`'s tape-replay-to-shadow-array
+    /// technique) after a faithful, careful line-for-line port still failed this exact check ~40%
+    /// of the time. See `StablePermutationSort.swift`'s own doc comment — this is a real property
+    /// of the algorithm ArrayV shipped, not a porting bug, the same class of "the name promises
+    /// more than the algorithm delivers" surprise `FunSort` already has documented.
+    @Test
+    func stablePermutationSortTiedElementsCanLoseTheirOriginalRelativeOrder() {
+        let algorithm = StablePermutationSort()
+        let size = algorithm.metadata.sizeRange.lowerBound
+        var sawReordering = false
+
+        for _ in 0..<50 {
+            let input = (0..<size).map { _ in Int.random(in: 0...2) }
+            var engine = RecordingEngine(values: input)
+            algorithm.record(into: &engine)
+
+            var shadow = Array(0..<size)
+            for operation in engine.finish().tape {
+                if case let .swap(i, j) = operation {
+                    shadow.swapAt(i, j)
+                }
+            }
+
+            var originalIndicesByValueInFinalOrder: [Int: [Int]] = [:]
+            for finalPosition in 0..<size {
+                let originalIndex = shadow[finalPosition]
+                let value = input[originalIndex]
+                originalIndicesByValueInFinalOrder[value, default: []].append(originalIndex)
+            }
+
+            if originalIndicesByValueInFinalOrder.values.contains(where: { $0 != $0.sorted() }) {
+                sawReordering = true
+                break
+            }
+        }
+
+        #expect(
+            sawReordering,
+            """
+            expected StablePermutationSort's rotation-based enumeration to reorder at least one run \
+            of equal-valued elements relative to their original input order across randomized \
+            duplicate-heavy trials, confirming it is not actually a stable sort despite the name
             """
         )
     }

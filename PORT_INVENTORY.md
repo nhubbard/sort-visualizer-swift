@@ -39,14 +39,16 @@ Several clusters share one large template or one unported prerequisite — porti
 once makes every sibling in that cluster much cheaper than its tier alone suggests, so tackle a
 cluster together rather than picking its members apart on separate days:
 
-- **The Bogo/Guess family (16 algorithms, spread across exchange + distribute below)** all extend
-  `BogoSorting` (261 lines), but the *real* blocker isn't that template — it's the same
-  "`RecordingEngine` can't pre-record an open-ended random search" problem `BogoSort`/`BozoSort`
-  already solved by rewriting as a deterministic permutation walk (see
-  `Modules/BuiltInAlgorithms/Sources/BogoSort.swift`'s doc comment). Every one of these 16 needs
-  that same rewrite treatment, not a literal port of `BogoSorting` — apply the established pattern
-  per variant rather than re-deriving it, and expect each variant to be cheap once the first one in
-  a session re-establishes the pattern.
+- **The Bogo/Guess family, spread across exchange + distribute below** all extend `BogoSorting`
+  (261 lines), but the *real* blocker isn't that template — it's the same "`RecordingEngine` can't
+  pre-record an open-ended random search" problem `BogoSort`/`BozoSort` already solved by
+  rewriting as a deterministic permutation walk (see
+  `Modules/BuiltInAlgorithms/Sources/BogoSort.swift`'s doc comment) — apply the established pattern
+  per variant rather than re-deriving it. **Status as of the 2026-07-15 batch: done except
+  `BogoBogoSort`** (deferred — see its own note under §1d, "Not Started"). Several members turned
+  out to already be deterministic in ArrayV itself (no rewrite needed, just a faithful port); one
+  (`SelectionBogoSort`) turned out to only need a single deterministic sweep, cheap enough to ship
+  with a much larger `sizeRange` than a typical bogo variant.
 - **The Grail cluster**: `BlockInsertionSort` (insert), `GrailSort`, `OptimizedLazyStableSort`
   (hybrid), and `LazyStableSort` (merge) all extend `GrailSorting` (780 lines) — port the template
   once, then all four wrapper algorithms are comparatively small.
@@ -68,7 +70,18 @@ cluster together rather than picking its members apart on separate days:
 
 #### Completed
 
-Move algorithms here when you finish them.
+- [x] BubbleBogoSort (Bogo family) — deterministic substitute, not a literal port: repeatedly
+      sweeps every adjacent pair left-to-right and swaps whenever inverted (exactly bubble sort's
+      own mechanic) instead of ArrayV's random-adjacent-pair-pick, since every accepted swap
+      strictly fixes one inversion regardless of which pair gets picked when. Genuinely O(n^2) now
+      (not factorial), so shipped with a much larger `sizeRange` (16...256) than a typical bogo
+      variant, matching `ExchangeBogoSort`'s own precedent.
+- [x] StablePermutationSort (Bogo family) — already fully deterministic in ArrayV (no `randInt` in
+      the Java source) — a faithful port, not a redesign. Heap's-algorithm walk over an index array
+      with a *rotation* (not a swap) as the step-to-next-arrangement move. **Despite the name, it's
+      not actually stable** — fuzzed empirically after a careful, faithful translation still
+      reordered ties in ~40% of duplicate-heavy trials; shipped as `stable: false`, the same "name
+      promises more than the algorithm delivers" surprise `FunSort` already has documented above.
 
 #### Not Started
 
@@ -76,13 +89,11 @@ Move algorithms here when you finish them.
 
 - [ ] ShoveSort — 52 lines
 - [ ] SillySort — 57 lines
-- [ ] BubbleBogoSort — 59 lines (Bogo family — see cluster note above)
 - [ ] QuadStoogeSort — 61 lines (ArrayV's own `setCategory` call for this one is actually
       `"Impractical Sorts"`, not `"Exchange Sorts"`, despite living in `sorts/exchange/` — port as
       `.impractical`, not `.exchange`, per `AlgorithmCategory`'s "match ArrayV's `setCategory` call,
       not its package directory" rule. Also `setUnreasonablySlow(true)`/limit 2048.)
 - [ ] OptimizedStoogeSortStudio — 75 lines
-- [ ] StablePermutationSort — 86 lines (Bogo family — see cluster note above)
 - [ ] OptimizedStoogeSort — 91 lines
 
 ##### Decision required
@@ -176,30 +187,62 @@ see Completed above.)
 
 #### Completed
 
-Move algorithms here when you finish them.
+- [x] RandomGuessSort (Bogo family) — deterministic substitute: borrows `OptimizedGuessSort`'s own
+      odometer technique (ArrayV's own later, already-deterministic descendant of this algorithm)
+      instead of re-deriving a different one, since it's the same `n^n` guess space either way.
+- [x] OptimizedGuessSort (Bogo family) — already fully deterministic in ArrayV, faithful port. A
+      base-`n` odometer over `n^n` index guesses (a bigger space than the `n!` permutation-walk
+      family), validated at its own upper-bound size (8) to confirm practical runtime.
+- [x] SmartGuessSort (Bogo family) — already fully deterministic in ArrayV, faithful port. Same
+      odometer as `OptimizedGuessSort`, but skip-ahead-optimized (only resets the prefix before the
+      first failing pair instead of restarting from position 0) — confirmed empirically dramatically
+      cheaper in practice, hence the much larger `sizeRange` (19) than the plain odometer siblings.
+- [x] GuessSort (Bogo family) — already fully deterministic in ArrayV, faithful port. Same odometer,
+      but validates via an O(n^2) brute-force pair count instead of an adjacent-pair scan — the
+      slowest member of the family per state checked, which set its own smaller `sizeRange` (7).
+- [x] DeterministicBogoSort (Bogo family) — already fully deterministic in ArrayV (true to its
+      name), faithful port. Heap's algorithm via forward recursion, the same technique `BozoSort`
+      already ported just structured depth-up instead of k-down.
+- [x] MedianQuickBogoSort (Bogo family) — deterministic substitute: sub-range lexicographic
+      permutation walk (same technique `LessBogoSort`/`CocktailBogoSort` already use) checking a
+      median-count split instead of full sortedness, in place of ArrayV's random reshuffle-until-split.
+- [x] SelectionBogoSort (Bogo family) — deterministic substitute, and the cheapest rewrite in the
+      whole cluster: the range's true minimum is always reachable in exactly one deterministic sweep
+      (literally selection sort's own inner loop), so no repeated-retry technique is needed at all.
+      Shipped with a much larger `sizeRange` (16...256) than a typical bogo variant, matching
+      `ExchangeBogoSort`'s own precedent for "the deterministic substitute made this genuinely cheap."
+- [x] SmartBogoBogoSort (Bogo family) — deterministic substitute: sub-range permutation walk of the
+      whole range, retried after each recursive re-sort of the prefix, in place of ArrayV's random
+      whole-range reshuffle.
+- [x] QuickBogoSort (Bogo family) — deterministic substitute: sub-range permutation walk checking a
+      partition around a tracked pivot *position* (updated through both the swap AND the reversal
+      each permutation step performs, mirroring ArrayV's own per-swap pivot bookkeeping) in place of
+      the random Fisher–Yates-with-pivot-tracking reshuffle.
+- [x] MergeBogoSort (Bogo family) — deterministic substitute, and the one member needing a genuinely
+      new primitive: after the two recursive halves are already sorted, walks every bitmask with the
+      correct popcount (in place of ArrayV's random weave-until-sorted) to find the correct
+      interleaving. Uses a real aux array for the pre-weave snapshot (matching `MergeSort.swift`'s
+      own convention) instead of ArrayV's trick of reusing the main array itself as mask scratch space.
 
 #### Not Started
 
 ##### Easy
 
-- [ ] RandomGuessSort — 55 lines (Bogo family — see cluster note above)
-- [ ] OptimizedGuessSort — 59 lines (Bogo family — see cluster note above)
-- [ ] SmartGuessSort — 60 lines (Bogo family — see cluster note above)
 - [ ] IndexSort — 64 lines
 - [ ] SimplisticGravitySort — 64 lines
-- [ ] GuessSort — 65 lines (Bogo family — see cluster note above)
-- [ ] DeterministicBogoSort — 67 lines (Bogo family — see cluster note above)
-- [ ] MedianQuickBogoSort — 67 lines (Bogo family — see cluster note above)
-- [ ] SelectionBogoSort — 68 lines (Bogo family — see cluster note above)
-- [ ] SmartBogoBogoSort — 72 lines (Bogo family — see cluster note above)
 - [ ] ClassicGravitySort — 77 lines
-- [ ] QuickBogoSort — 83 lines (Bogo family — see cluster note above)
-- [ ] MergeBogoSort — 86 lines (Bogo family — see cluster note above)
 - [ ] InPlaceLSDRadixSort — 87 lines
 
 ##### Medium
 
-- [ ] BogoBogoSort — 102 lines (Bogo family — see cluster note above)
+- [~] BogoBogoSort — 102 lines (Bogo family). **Deferred, not skipped** — unlike the other 12
+      members of this cluster (all shipped this batch), its own "is it sorted" check is itself
+      defined recursively via nested bogo-sorted copies at every recursion depth (the classic
+      super-exponential joke algorithm — ArrayV itself caps it at size 5). A faithful deterministic
+      port needs permutation walks nested at every recursion level, each with its own aux-array
+      bookkeeping — real, disproportionate design work for one algorithm, the same kind of
+      effort-tier surprise `FunSort`/`PancakeInsertionSort` already got flagged for. Worth a real
+      pass later; not worth blocking or rushing the rest of the cluster for.
 - [ ] StacklessBinaryQuickSort — 105 lines
 - [ ] RotateLSDRadixSort — 118 lines
 - [ ] TimeSort — 120 lines
