@@ -27,17 +27,18 @@ struct Sort2App: App {
         // scripting backend (ScriptingKit) was removed entirely after it turned out to reference a
         // private API (`JSContextGroupSetExecutionTimeLimit`), which blocked App Store submission.
         AlgorithmRegistry.shared.builtIns = [
-            BadSort(), BaseNMaxHeapSort(), BinaryDoubleInsertionSort(), BinaryGnomeSort(),
-            BinaryInsertionSort(), BinaryMergeSort(), BingoSort(), BitonicSortIterative(),
+            AsynchronousSort(), BadSort(), BaseNMaxHeapSort(), BinaryDoubleInsertionSort(), BinaryGnomeSort(),
+            BinaryInsertionSort(), BinaryMergeSort(), BingoSort(), BinomialHeapSort(), BinomialSmoothSort(),
+            BitonicSortIterative(),
             BitonicSortRecursive(), BlockSwapMergeSort(), BogoSort(), BoseNelsonSortIterative(),
-            BottomUpMergeSort(), BozoSort(), BubbleBogoSort(), BubbleSort(), BurntPancakeSort(),
+            BottomUpHeapSort(), BottomUpMergeSort(), BozoSort(), BubbleBogoSort(), BubbleSort(), BurntPancakeSort(),
             CircleSortIterative(), CircleSortRecursive(), CircloidSort(),
             ClassicThreeSmoothCombSort(), ClassicTreeSort(), CocktailBogoSort(),
             CocktailMergeSort(), CocktailShakerSort(), CombSort(), CountingSort(), CycleSort(),
             DeterministicBogoSort(), DiamondSortRecursive(), DoubleInsertionSort(), DoubleSelectionSort(),
-            DualPivotQuickSort(), ExchangeBogoSort(), FlashSort(), GnomeSort(), GravitySort(),
+            DualPivotQuickSort(), ExchangeBogoSort(), FlashSort(), FlippedMinHeapSort(), GnomeSort(), GravitySort(),
             GuessSort(), HybridCombSort(), InPlaceMergeSort(), InsertionSort(), IntroCircleSortIterative(),
-            IntroSort(), LessBogoSort(), LLQuickSort(), LRQuickSort(), LSDRadixSort(), MaxHeapSort(),
+            IntroSort(), LazyHeapSort(), LessBogoSort(), LLQuickSort(), LRQuickSort(), LSDRadixSort(), MaxHeapSort(),
             MedianQuickBogoSort(), MergeBogoSort(), MergeExchangeSortIterative(), MergeSort(), MinHeapSort(), MSDRadixSort(),
             OddEvenMergeSortIterative(), OddEvenMergeSortRecursive(), OddEvenSort(),
             OptimizedBubbleSort(), OptimizedCocktailShakerSort(), OptimizedGnomeSort(), OptimizedGuessSort(),
@@ -45,9 +46,9 @@ struct Sort2App: App {
             RandomGuessSort(), RecursiveShellSort(), RotateMergeSort(), SelectionBogoSort(), SelectionSort(), ShellSort(),
             SimplifiedLibrarySort(), SlopeSort(), SlowSort(), SmartBogoBogoSort(), SmartGuessSort(), SnuffleSort(), StableCycleSort(),
             StablePermutationSort(), StableSelectionSort(), StaticSort(), StoogeSort(), StrandSort(), SwaplessBubbleSort(),
-            TernaryLLQuickSort(), TernaryLRQuickSort(), ThreeSmoothCombSortIterative(),
+            TernaryHeapSort(), TernaryLLQuickSort(), TernaryLRQuickSort(), ThreeSmoothCombSortIterative(),
             ThreeSmoothCombSortRecursive(), TriangularHeapSort(), UnoptimizedBubbleSort(),
-            UnoptimizedCocktailShakerSort(), WeavedMergeSort(), WeaveMergeSort()
+            UnoptimizedCocktailShakerSort(), WeakHeapSort(), WeavedMergeSort(), WeaveMergeSort()
         ]
         AlgorithmRegistry.shared.discover()
 

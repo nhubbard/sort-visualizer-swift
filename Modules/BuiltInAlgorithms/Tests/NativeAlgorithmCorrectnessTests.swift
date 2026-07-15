@@ -9,17 +9,18 @@ import Testing
 @Suite
 struct NativeAlgorithmCorrectnessTests {
     private static let algorithms: [any SortAlgorithm] = [
-        BadSort(), BaseNMaxHeapSort(), BinaryDoubleInsertionSort(), BinaryGnomeSort(),
-        BinaryInsertionSort(), BinaryMergeSort(), BingoSort(), BitonicSortIterative(),
+        AsynchronousSort(), BadSort(), BaseNMaxHeapSort(), BinaryDoubleInsertionSort(), BinaryGnomeSort(),
+        BinaryInsertionSort(), BinaryMergeSort(), BingoSort(), BinomialHeapSort(), BinomialSmoothSort(),
+        BitonicSortIterative(),
         BitonicSortRecursive(), BlockSwapMergeSort(), BogoSort(), BoseNelsonSortIterative(),
-        BottomUpMergeSort(), BozoSort(), BubbleBogoSort(), BubbleSort(), BurntPancakeSort(),
+        BottomUpHeapSort(), BottomUpMergeSort(), BozoSort(), BubbleBogoSort(), BubbleSort(), BurntPancakeSort(),
         CircleSortIterative(), CircleSortRecursive(), CircloidSort(),
         ClassicThreeSmoothCombSort(), ClassicTreeSort(), CocktailBogoSort(),
         CocktailMergeSort(), CocktailShakerSort(), CombSort(), CountingSort(), CycleSort(),
         DeterministicBogoSort(), DiamondSortRecursive(), DoubleInsertionSort(), DoubleSelectionSort(),
-        DualPivotQuickSort(), ExchangeBogoSort(), FlashSort(), GnomeSort(), GravitySort(),
+        DualPivotQuickSort(), ExchangeBogoSort(), FlashSort(), FlippedMinHeapSort(), GnomeSort(), GravitySort(),
         GuessSort(), HybridCombSort(), InPlaceMergeSort(), InsertionSort(), IntroCircleSortIterative(),
-        IntroSort(), LessBogoSort(), LLQuickSort(), LRQuickSort(), LSDRadixSort(), MaxHeapSort(),
+        IntroSort(), LazyHeapSort(), LessBogoSort(), LLQuickSort(), LRQuickSort(), LSDRadixSort(), MaxHeapSort(),
         MedianQuickBogoSort(), MergeBogoSort(), MergeExchangeSortIterative(), MergeSort(), MinHeapSort(), MSDRadixSort(),
         OddEvenMergeSortIterative(), OddEvenMergeSortRecursive(), OddEvenSort(),
         OptimizedBubbleSort(), OptimizedCocktailShakerSort(), OptimizedGnomeSort(), OptimizedGuessSort(),
@@ -27,9 +28,9 @@ struct NativeAlgorithmCorrectnessTests {
         RandomGuessSort(), RecursiveShellSort(), RotateMergeSort(), SelectionBogoSort(), SelectionSort(), ShellSort(),
         SimplifiedLibrarySort(), SlopeSort(), SlowSort(), SmartBogoBogoSort(), SmartGuessSort(), SnuffleSort(), StableCycleSort(),
         StablePermutationSort(), StableSelectionSort(), StaticSort(), StoogeSort(), StrandSort(), SwaplessBubbleSort(),
-        TernaryLLQuickSort(), TernaryLRQuickSort(), ThreeSmoothCombSortIterative(),
+        TernaryHeapSort(), TernaryLLQuickSort(), TernaryLRQuickSort(), ThreeSmoothCombSortIterative(),
         ThreeSmoothCombSortRecursive(), TriangularHeapSort(), UnoptimizedBubbleSort(),
-        UnoptimizedCocktailShakerSort(), WeavedMergeSort(), WeaveMergeSort()
+        UnoptimizedCocktailShakerSort(), WeakHeapSort(), WeavedMergeSort(), WeaveMergeSort()
     ]
 
     @Test
@@ -532,5 +533,36 @@ struct NativeAlgorithmCorrectnessTests {
             duplicate-heavy trials, confirming it is not actually a stable sort despite the name
             """
         )
+    }
+
+    /// The generic suite above only exercises each algorithm once per input shape at its own
+    /// `sizeRange.lowerBound` — real bugs found in this exact batch (`LazyHeapSort`'s `maxToFront`
+    /// constructed a Swift `Range` with `lowerBound > upperBound` and trapped, a case Java's
+    /// lazily-checked `for` loop never hit) only ever showed up under specific random data, not
+    /// every run. Runs many more randomized duplicate-heavy trials than the generic suite before
+    /// trusting a translation that's this index-arithmetic-heavy — the bit-twiddling ones
+    /// (`WeakHeapSort`, `BinomialHeapSort`, `BinomialSmoothSort`) and `LazyHeapSort` especially.
+    @Test
+    func heapVariantBatchDuplicateHeavyFuzz() {
+        let algorithms: [any SortAlgorithm] = [
+            FlippedMinHeapSort(), TernaryHeapSort(), BottomUpHeapSort(), LazyHeapSort(),
+            AsynchronousSort(), WeakHeapSort(), BinomialHeapSort(), BinomialSmoothSort()
+        ]
+        // A few sizes around the lower bound, not just the bound itself — `LazyHeapSort`'s real
+        // bug depended on the exact relationship between `n` and its own `sqrt(n)` block size, not
+        // just on duplicates, so varying `n` a little catches that class of boundary bug too.
+        for algorithm in algorithms {
+            for size in [algorithm.metadata.sizeRange.lowerBound, 17, 20, 25] {
+                for attempt in 0..<100 {
+                    let input = (0..<size).map { _ in Int.random(in: 0...3) }
+                    var engine = RecordingEngine(values: input)
+                    algorithm.record(into: &engine)
+                    #expect(
+                        engine.values == input.sorted(),
+                        "\(algorithm.id.rawValue) failed duplicate-heavy fuzz attempt \(attempt) of size \(size): \(input) -> \(engine.values)"
+                    )
+                }
+            }
+        }
     }
 }

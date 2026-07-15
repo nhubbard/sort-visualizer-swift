@@ -151,7 +151,37 @@ Move algorithms here when you finish them.
 
 #### Completed
 
-Move algorithms here when you finish them.
+- [x] BinomialSmoothSort — recursive `thrift(node, parent, root)` over an implicit binomial-heap
+      structure, translated line-for-line (down to the exact boolean-flag threading between
+      recursive calls) rather than re-derived, since subtly wrong `parent`/`root` interplay would
+      silently change which nodes get compared.
+- [x] BinomialHeapSort — 1-indexed bit-arithmetic binomial-heap sort; same "translate the index
+      bookkeeping exactly, only convert to 0-indexed at the point of an actual engine call" approach.
+- [x] FlippedMinHeapSort — an ordinary min-heap sort with every array access mirrored through
+      `array[length - p]`; a single `idx(_:)` helper applies that mirroring consistently.
+- [x] BottomUpHeapSort — the Wikipedia "bottom-up heapsort" optimization: descend straight to a
+      leaf via always the larger child (no comparisons against the sift value), then climb back up
+      to find where it belongs, then shift the path — fewer comparisons than plain sift-down.
+- [x] LazyHeapSort — not actually heap-based despite the name: a sqrt-decomposition block-selection
+      sort. **Real bug found and fixed**: `maxToFront`'s inner scan, translated as a Swift
+      `(a+1)..<b` Range, traps when `b <= a` (a real, reachable case once a block empties down to
+      nothing) — Java's `for (i=a+1; i<b; i++)` just silently doesn't execute in that case, but
+      Swift's `Range` validates `lowerBound <= upperBound` eagerly at construction. Fixed by using
+      a `while` loop instead, matching Java's lazy condition check. Confirmed via macOS crash
+      report analysis (`~/Library/Logs/DiagnosticReports/xctest-*.ips`) pointing straight at the
+      exact line, then a targeted duplicate-heavy + varied-size fuzz test
+      (`heapVariantBatchDuplicateHeavyFuzz`) added as a permanent regression guard.
+- [x] TernaryHeapSort — extract-max heapsort with 3 children per node instead of 2 (fixed at 3,
+      unlike `BaseNMaxHeapSort`'s runtime `base`). ArrayV's own heapify loop start (`length - 1/3`)
+      is a Java operator-precedence artifact evaluating to a provable no-op call — skipped rather
+      than replicated.
+- [x] WeakHeapSort — relaxed heap invariant tracked via one reverse-bit per index instead of full
+      per-level ordering. ArrayV bit-packs the flags into a byte array; ported as a plain `Bool`
+      array instead (a memory micro-optimization irrelevant to this port, not a behavior change).
+- [x] AsynchronousSort — not heap-based at all despite living among the heap variants: a
+      counting/threshold-scan sort (same family as `CountingSort`), reading `engine.values` directly
+      for its value-dependent decisions. ArrayV's own trailing `InsertionSort` cleanup pass
+      ("necessary for floats") is provably a no-op for this `Int`-only engine and is omitted.
 
 #### Not Started
 
@@ -159,17 +189,6 @@ Move algorithms here when you finish them.
 `SMOOTH`/`POPLAR`, which literally call these sorts' own heapify step) — not just their own tier,
 they unblock a shuffle too. (`TriangularHeapSort`, the third sort in this cluster, is now shipped —
 see Completed above.)
-
-##### Easy
-
-- [ ] BinomialSmoothSort — 54 lines
-- [ ] BinomialHeapSort — 60 lines
-- [ ] FlippedMinHeapSort — 64 lines
-- [ ] BottomUpHeapSort — 66 lines
-- [ ] LazyHeapSort — 75 lines
-- [ ] TernaryHeapSort — 79 lines
-- [ ] WeakHeapSort — 84 lines
-- [ ] AsynchronousSort — 85 lines
 
 ##### Medium
 
