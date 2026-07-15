@@ -107,14 +107,6 @@ open:**
   in (e.g. as `DrawCommand.text` captions). Actually designing the vocabulary of step intents across
   ~82 different algorithms is real, undone design work — expect a design pass at least as involved
   as this section, not a quick addition.
-- **Scriptable external automation.** Driving the app from outside itself with custom automations.
-  **Deferred, not designed.** Skip literal AppleScript — it needs Cocoa Scripting infrastructure
-  (`.sdef`, `NSScriptCommand`, object specifiers) with no SwiftUI-native equivalent, and it's
-  Mac-only while this app targets iOS/iPadOS first with Catalyst secondary. **App Intents** gets the
-  same "script it externally" outcome (plus Shortcuts/Siri) on every platform this app ships on, as
-  an ordinary `AppIntent` conformance — but it's still real work: there's no concept today of "the
-  currently active `SortSession`" that an out-of-process intent could address, so that seam would
-  need to exist first.
 - **Binary tape export/import for debugging a failed sort.** Dump a run's `Tape` to a compact file
   when a sort fails verification; load it back later without re-running the algorithm. **Deferred,
   not designed** — but the more tractable of this pair, since `Tape`/`TapeHeader`/`SortOperation`

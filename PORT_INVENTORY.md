@@ -8,22 +8,6 @@ counts below come from reading that repo, not from `ARCHITECTURE_V2.md`'s illust
 **Status key:** `[x]` done and shipped · `[ ]` not started · `[~]` needs a decision before porting
 (noted inline)
 
-As of the native-porting batch (`ARCHITECTURE_V2.md` §2.6, revised), a "done" **sorting algorithm**
-row means a native `Modules/BuiltInAlgorithms/Sources/<Name>.swift` `SortAlgorithm` conformance
-registered in `AlgorithmRegistry.shared.builtIns` — not a `.js`/`.manifest.json` pair. JavaScript
-(`App/Resources/Algorithms/<id>.js` + `.manifest.json`) is now only ever a *temporary* stage for a
-brand-new algorithm you're still proving out — expect to see at most a handful of `.js` files
-there at any time, never all of them, and expect any given one to be retired (deleted, with its
-logic ported to `BuiltInAlgorithms`) once it's confirmed correct. Shuffles followed the same path
-as of the native shuffle port batch — see §2's preamble. Visualizations remain native-only
-(`Modules/BuiltInVisualizers/Sources/<Name>.swift`), unchanged.
-
-**Update:** the JS bridge (`ScriptingKit`'s `JSAlgorithmAdapter`/`ScriptRunner`/
-`JSRecordingEngineBridge`) has been removed entirely — it bound a private JavaScriptCore symbol
-that blocked App Store submission. Every algorithm/shuffle it ever loaded had already been ported
-to native Swift by that point, so there's no more JS-prototyping stage for new content; new
-algorithms/shuffles go straight to native `BuiltInAlgorithms` conformances.
-
 ## 1. Sorting algorithms
 
 208 ArrayV classes across 9 categories, + 21 shared `templates/` base classes that are never
@@ -84,12 +68,7 @@ cluster together rather than picking its members apart on separate days:
 
 #### Completed
 
-- [x] CircloidSort
-- [x] UnoptimizedCocktailShakerSort
-- [x] LRQuickSort
-- [x] ClassicThreeSmoothCombSort
-- [x] ThreeSmoothCombSortIterative
-- [x] ThreeSmoothCombSortRecursive
+Move algorithms here when you finish them.
 
 #### Not Started
 
@@ -134,7 +113,7 @@ cluster together rather than picking its members apart on separate days:
 
 #### Completed
 
-- [x] ClassicTreeSort
+Move algorithms here when you finish them.
 
 #### Not Started
 
@@ -161,9 +140,7 @@ cluster together rather than picking its members apart on separate days:
 
 #### Completed
 
-- [x] BadSort
-- [x] TriangularHeapSort — also unblocks the `TRI_HEAP` shuffle (§2) now that its own
-      `triangularHeapify` step exists natively
+Move algorithms here when you finish them.
 
 #### Not Started
 
@@ -238,7 +215,7 @@ Move algorithms here when you finish them.
 
 #### Completed
 
-- [x] BlockSwapMergeSort
+Move algorithms here when you finish them.
 
 #### Not Started
 
@@ -288,7 +265,7 @@ Move algorithms here when you finish them.
 
 #### Completed
 
-- [x] PairwiseSortIterative
+Move algorithms here when you finish them.
 
 #### Not Started
 
@@ -312,8 +289,7 @@ Move algorithms here when you finish them.
 
 #### Completed
 
-- [x] IntroCircleSortIterative
-- [x] WeaveMergeSort
+Move algorithms here when you finish them.
 
 #### Not Started
 
@@ -373,12 +349,6 @@ Move algorithms here when you finish them.
 
 Forty-five in ArrayV's `Shuffles.java` enum — no subdirectories, listed flat. v1's original 5 (Phase 6)
 doesn't map 1:1 onto ArrayV's list — noted inline where there's a rough equivalent.
-
-As of the native shuffle port batch, a "done" row means a native
-`Modules/BuiltInAlgorithms/Sources/<Name>.swift` `ShuffleAlgorithm` conformance registered in
-`ShuffleRegistry.shared.builtIns` — not a `.js`/`.manifest.json` pair, the same convention §1's
-preamble describes for sorting algorithms. `App/Resources/Shuffles/` is empty until the next
-shuffle is being proven out in JS first, same as `Algorithms/`.
 
 ### a. Completed
 

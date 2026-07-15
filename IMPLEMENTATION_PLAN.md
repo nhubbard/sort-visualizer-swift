@@ -33,9 +33,6 @@ reasoning:
 
 - **Teaching-mode step annotations** — visually indicating what a step *means*, not just that it
   happened. Deferred, not designed; real design work, not a quick addition.
-- **Scriptable external automation** — driving the app from outside itself. Deferred, not designed;
-  lean toward App Intents over AppleScript if this gets picked up (see `ARCHITECTURE_V2.md` §2A for
-  why), but note it needs an "addressable current session" concept that doesn't exist yet.
 - **Binary tape export/import for debugging a failed sort** — the more tractable of the deferred
   items, since `Tape` is already `Codable` and `ReplayEngine` already just consumes a plain `Tape`
   value.
