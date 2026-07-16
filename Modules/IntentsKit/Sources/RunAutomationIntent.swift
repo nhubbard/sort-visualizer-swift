@@ -11,15 +11,20 @@ public struct RunAutomationIntent: AppIntent {
     public static var description: IntentDescription {
         IntentDescription(
             "Runs a Sort Symphony automation sweep (like Size Sweep or Max Size Only) for one algorithm and waits for it to finish.",
-            categoryName: "Sort Symphony")
+            categoryName: "Sort Symphony",
+            searchKeywords: ["Size Sweep", "Max Size Only", "Automation"])
     }
 
     public static var openAppWhenRun: Bool { true }
 
-    @Parameter(title: "Algorithm")
+    @Parameter(title: "Algorithm", description: "The algorithm to run the automation on.")
     public var algorithm: AlgorithmEntity
-    @Parameter(title: "Automation")
+    @Parameter(title: "Automation", description: "Which registered automation sweep to run.")
     public var automation: AutomationEntity
+
+    public static var parameterSummary: some ParameterSummary {
+        Summary("Run \(\.$automation) for \(\.$algorithm)")
+    }
 
     public init() {}
 

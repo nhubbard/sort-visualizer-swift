@@ -24,6 +24,7 @@ struct AppSettingsTests {
         #expect(settings.defaultArraySize == 256)
         #expect(settings.codeTheme == CodeThemeID(rawValue: "monokai"))
         #expect(settings.defaultShuffleID == ShuffleID(rawValue: "random"))
+        #expect(settings.recordingOperationCap == 300_000)
     }
 
     @Test
@@ -37,6 +38,7 @@ struct AppSettingsTests {
         first.defaultArraySize = 128
         first.codeTheme = CodeThemeID(rawValue: "dracula")
         first.defaultShuffleID = ShuffleID(rawValue: "shuffledcubic")
+        first.recordingOperationCap = 1_000_000
 
         let second = AppSettings(store: store)
         #expect(second.selectedVisualizerID == VisualizerID(rawValue: "rainbow"))
@@ -46,6 +48,7 @@ struct AppSettingsTests {
         #expect(second.defaultArraySize == 128)
         #expect(second.codeTheme == CodeThemeID(rawValue: "dracula"))
         #expect(second.defaultShuffleID == ShuffleID(rawValue: "shuffledcubic"))
+        #expect(second.recordingOperationCap == 1_000_000)
     }
 
     /// Fully synchronous (no `await` between setup and assertions) so this critical section over

@@ -65,6 +65,28 @@ public struct SettingsView: View {
                 )
                 .accessibilityIdentifier("defaultArraySizeStepper")
             }
+            Section {
+                Stepper(
+                    "Max Operations: \(settings.recordingOperationCap)",
+                    value: $settings.recordingOperationCap,
+                    in: 50_000...5_000_000,
+                    step: 50_000
+                )
+                .accessibilityIdentifier("recordingOperationCapStepper")
+                Text("≈ \(recordingCapMinutesText) at the current playback speed")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            } header: {
+                Text("Recording Limit")
+            } footer: {
+                // Mirrors AlgorithmMetadata.sizeRange's own "clamp, don't confirm" precedent
+                // (§9 of ARCHITECTURE_V2.md) — a sort whose recording crosses this many operations
+                // is skipped automatically instead of asking the user each time.
+                Text(
+                    "A sort that would need more operations than this to finish is skipped "
+                        + "automatically instead of running for an unreasonably long time."
+                )
+            }
             Section("Code") {
                 Picker("Code Sample Theme", selection: $settings.codeTheme) {
                     ForEach(CodeThemeID.knownIDs, id: \.self) { theme in
@@ -76,5 +98,10 @@ public struct SettingsView: View {
             }
         }
         .navigationTitle("Settings")
+    }
+
+    private var recordingCapMinutesText: String {
+        let minutes = Double(settings.recordingOperationCap) / settings.playbackSpeed / 60
+        return minutes.formatted(.number.precision(.fractionLength(1))) + " min"
     }
 }

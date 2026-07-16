@@ -6,7 +6,11 @@ import AppIntents
 public struct FindShufflesIntent: AppIntent {
     public static var title: LocalizedStringResource { "Find Shuffles" }
     public static var description: IntentDescription {
-        IntentDescription("Lists every shuffle Sort Symphony ships.", categoryName: "Sort Symphony")
+        IntentDescription(
+            "Lists every shuffle Sort Symphony ships.",
+            categoryName: "Sort Symphony",
+            searchKeywords: ["Shuffles", "Scramble"],
+            resultValueName: "Shuffles")
     }
 
     public init() {}

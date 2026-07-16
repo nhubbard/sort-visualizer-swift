@@ -6,7 +6,10 @@ import SortFeature
 public struct StopIntent: AppIntent {
     public static var title: LocalizedStringResource { "Stop" }
     public static var description: IntentDescription {
-        IntentDescription("Stops whichever run or automation sweep is currently in progress in Sort Symphony.", categoryName: "Sort Symphony")
+        IntentDescription(
+            "Stops whichever run or automation sweep is currently in progress in Sort Symphony.",
+            categoryName: "Sort Symphony",
+            searchKeywords: ["Stop Sort", "Cancel", "Halt"])
     }
 
     public static var openAppWhenRun: Bool { true }

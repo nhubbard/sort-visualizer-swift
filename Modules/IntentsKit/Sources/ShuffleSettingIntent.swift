@@ -12,11 +12,16 @@ public struct SetShuffleIntent: AppIntent {
     public static var description: IntentDescription {
         IntentDescription(
             "Changes the default shuffle Sort Symphony scrambles the array with — takes effect on the next run, not one already on screen.",
-            categoryName: "Sort Symphony")
+            categoryName: "Sort Symphony",
+            searchKeywords: ["Shuffle", "Default Shuffle", "Scramble"])
     }
 
-    @Parameter(title: "Shuffle")
+    @Parameter(title: "Shuffle", description: "The default shuffle for future runs.")
     public var shuffle: ShuffleEntity
+
+    public static var parameterSummary: some ParameterSummary {
+        Summary("Set default shuffle to \(\.$shuffle)")
+    }
 
     public init() {}
 

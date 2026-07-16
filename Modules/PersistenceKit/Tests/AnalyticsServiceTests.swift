@@ -10,7 +10,7 @@ struct AnalyticsServiceTests {
     /// Isolated, in-memory, non-CloudKit container per test — never touches the real disk or
     /// account-bound CloudKit database that `AnalyticsService.shared`'s default container would.
     private func makeInMemoryService() throws -> AnalyticsService {
-        let schema = Schema([BigORecord.self])
+        let schema = Schema([BigORecord.self, RecordingCapExceededRecord.self])
         let configuration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
         let container = try ModelContainer(for: schema, configurations: [configuration])
         return AnalyticsService(modelContainer: container)
@@ -153,5 +153,44 @@ struct AnalyticsServiceTests {
         #expect(quickSortRows.count == 2)
         #expect(quickSortRows.map(\.recordedAt) == [newer, older])
         #expect(quickSortRows.allSatisfy { $0.algorithmID == "quicksort" })
+    }
+
+    /// `recordCapExceeded` is deliberately write-only in the app (no public fetch), but a plain
+    /// round-trip against the internal, test-only `fetchCapExceededForTesting()` is still the
+    /// right way to prove the insert actually carries every field through correctly.
+    @Test
+    func recordCapExceededInsertsAFetchableRecordWithTheExpectedFields() async throws {
+        let service = try makeInMemoryService()
+
+        try await service.recordCapExceeded(
+            algorithmID: AlgorithmID(rawValue: "snufflesort"), arraySize: 64, cap: 300_000,
+            compareCount: 3_400_000, swapCount: 1_200_000, mainWriteCount: 2_400_000, auxWriteCount: 0
+        )
+
+        let rows = try await service.fetchCapExceededForTesting()
+        #expect(rows.count == 1)
+        let row = rows[0]
+        #expect(row.algorithmID == "snufflesort")
+        #expect(row.arraySize == 64)
+        #expect(row.operationCap == 300_000)
+        #expect(row.compareCount == 3_400_000)
+        #expect(row.swapCount == 1_200_000)
+        #expect(row.mainWriteCount == 2_400_000)
+        #expect(row.auxWriteCount == 0)
+    }
+
+    @Test
+    func recordCapExceededAccumulatesRatherThanOverwriting() async throws {
+        let service = try makeInMemoryService()
+
+        for size in [16, 32, 64] {
+            try await service.recordCapExceeded(
+                algorithmID: AlgorithmID(rawValue: "snufflesort"), arraySize: size, cap: 300_000,
+                compareCount: 0, swapCount: 0, mainWriteCount: 0, auxWriteCount: 0
+            )
+        }
+
+        let rows = try await service.fetchCapExceededForTesting()
+        #expect(rows.count == 3)
     }
 }

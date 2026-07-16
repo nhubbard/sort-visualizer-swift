@@ -1,9 +1,10 @@
 import AlgorithmKit
 import Foundation
-import PersistenceKit
 import SettingsKit
 import SwiftData
+import SwiftUI
 import Testing
+@testable import PersistenceKit
 @testable import SortEngineKit
 @testable import SortFeature
 
@@ -113,7 +114,7 @@ private func makeFastSettings() -> AppSettings {
 /// `makeInMemoryService()` (duplicated rather than shared, same "test targets can't import each
 /// other's test code" reason `ManualTickDriver` above is duplicated).
 private func makeInMemoryAnalytics() throws -> AnalyticsService {
-    let schema = Schema([BigORecord.self])
+    let schema = Schema([BigORecord.self, RecordingCapExceededRecord.self])
     let configuration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
     let container = try ModelContainer(for: schema, configurations: [configuration])
     return AnalyticsService(modelContainer: container)
@@ -381,7 +382,7 @@ struct SortSessionTests {
     // MARK: - Phase 6: shuffle+sort concatenation
 
     @Test
-    func concatenatedTapeOperationCountEqualsShuffleLengthPlusSortLength() {
+    func concatenatedTapeOperationCountEqualsShuffleLengthPlusSortLength() throws {
         let size = 20
         let algorithm = FakeAlgorithm()
         let shuffle = FakeReverseShuffle()
@@ -396,7 +397,9 @@ struct SortSessionTests {
         sortEngine.unmarkAll() // mirrors makeTape's own trailing cleanup call
         let sortOperationCount = sortEngine.finish().tape.count
 
-        let tape = SortSession.makeTape(algorithm: algorithm, shuffle: shuffle, size: size)
+        let tape = try SortSession.makeTape(
+            algorithm: algorithm, shuffle: shuffle, size: size,
+            operationCap: RecordingEngine.defaultOperationCap)
 
         #expect(tape.operations.count == shuffleOperationCount + sortOperationCount)
         #expect(tape.header.sortStartIndex == shuffleOperationCount)
@@ -409,13 +412,84 @@ struct SortSessionTests {
         FakeReverseShuffle() as any ShuffleAlgorithm,
         FakeRotateShuffle() as any ShuffleAlgorithm
     ])
-    func replayingConcatenatedTapeProducesSortedFrameRegardlessOfShuffle(shuffle: any ShuffleAlgorithm) {
+    func replayingConcatenatedTapeProducesSortedFrameRegardlessOfShuffle(shuffle: any ShuffleAlgorithm) throws {
         let size = 15
-        let tape = SortSession.makeTape(algorithm: FakeAlgorithm(), shuffle: shuffle, size: size)
+        let tape = try SortSession.makeTape(
+            algorithm: FakeAlgorithm(), shuffle: shuffle, size: size,
+            operationCap: RecordingEngine.defaultOperationCap)
 
         let replay = ReplayEngine(tape: tape)
         for _ in 0..<tape.operations.count { replay.stepForward() }
 
         #expect(replay.frame.map(\.value) == Array(1...size))
+    }
+
+    // MARK: - Recording size cap
+
+    @Test
+    func manualStartWithATinyOperationCapEndsInFailedInsteadOfReplaying() async throws {
+        let settings = makeFastSettings()
+        settings.recordingOperationCap = 5
+        let session = SortSession(algorithm: FakeAlgorithm(), shuffle: FakeReverseShuffle(), settings: settings)
+
+        await session.start(size: 12)
+
+        guard case let .failed(error) = session.phase else {
+            Issue.record("expected .failed, got \(session.phase)")
+            return
+        }
+        guard case .recordingTooLarge = error else {
+            Issue.record("expected .recordingTooLarge, got \(error)")
+            return
+        }
+    }
+
+    /// End-to-end proof of the manual/automation split: a size sweep with one oversized size in
+    /// the middle must not hang on it (`waitUntilComplete()` would wait forever for a replay that
+    /// never starts without the `lastRunWasSkipped` check in `runAutomation(sizes:runsPerSize:)`),
+    /// must not leave `phase` on `.failed` (automation "pretends" a skipped run never happened —
+    /// see `start(size:)`'s `previousPhase` revert), and must log exactly one write-only
+    /// `RecordingCapExceededRecord` for the size that was actually skipped.
+    @Test
+    func automationSweepSkipsAnOversizedMiddleSizeWithoutHangingOrFailing() async throws {
+        let settings = makeFastSettings()
+        let analytics = try makeInMemoryAnalytics()
+
+        // Real op counts for `FakeAlgorithm` (a bubble sort) against an already-identity array —
+        // matches exactly what the sort phase inside `makeTape` records when paired with
+        // `FakeIdentityShuffle` below, so the cap chosen from these is guaranteed to sit strictly
+        // between the small and large sizes' real totals.
+        func realSortTapeCount(size: Int) -> Int {
+            var engine = RecordingEngine(values: Array(1...size))
+            FakeAlgorithm().record(into: &engine)
+            return engine.finish().tape.count
+        }
+        let smallCount = realSortTapeCount(size: 4)
+        let largeCount = realSortTapeCount(size: 60)
+        #expect(largeCount > smallCount, "sanity: the larger size must genuinely need more ops")
+        settings.recordingOperationCap = smallCount + 10
+
+        let session = SortSession(
+            algorithm: FakeAlgorithm(), shuffle: FakeIdentityShuffle(),
+            analytics: analytics, settings: settings)
+        let automation = Automation(
+            id: AutomationID(rawValue: "test-sweep"), displayName: "Test Sweep", iconName: "gearshape",
+            key: "t", modifiers: [], runsPerSize: 1,
+            sizes: { _ in [4, 60, 4] }
+        )
+
+        await session.runAutomationAndWait(automation)
+
+        guard case let .complete(replay) = session.phase else {
+            Issue.record("expected the sweep to end on the final size's genuine .complete, got \(session.phase)")
+            return
+        }
+        #expect(replay.frame.map(\.value) == Array(1...4), "the final (fitting) run should have completed normally")
+
+        let capExceededRows = try await analytics.fetchCapExceededForTesting()
+        #expect(capExceededRows.count == 1)
+        #expect(capExceededRows.first?.algorithmID == "fake")
+        #expect(capExceededRows.first?.arraySize == 60)
+        #expect(capExceededRows.first?.operationCap == settings.recordingOperationCap)
     }
 }

@@ -14,11 +14,16 @@ public struct SetArraySizeIntent: AppIntent {
     public static var description: IntentDescription {
         IntentDescription(
             "Changes the default array size Sort Symphony sorts — takes effect on the next run, not one already on screen.",
-            categoryName: "Sort Symphony")
+            categoryName: "Sort Symphony",
+            searchKeywords: ["Array Size", "Default Size"])
     }
 
-    @Parameter(title: "Size")
+    @Parameter(title: "Size", description: "The default array size for future runs, clamped to whichever algorithm's own range when a run starts.")
     public var size: Int
+
+    public static var parameterSummary: some ParameterSummary {
+        Summary("Set default array size to \(\.$size)")
+    }
 
     public init() {}
 
@@ -41,7 +46,10 @@ public struct SetArraySizeIntent: AppIntent {
 public struct CycleArraySizeIntent: AppIntent {
     public static var title: LocalizedStringResource { "Cycle Array Size" }
     public static var description: IntentDescription {
-        IntentDescription("Advances the array size of whichever sort is currently open in Sort Symphony.", categoryName: "Sort Symphony")
+        IntentDescription(
+            "Advances the array size of whichever sort is currently open in Sort Symphony.",
+            categoryName: "Sort Symphony",
+            searchKeywords: ["Next Size", "Increase Size", "Bigger Array"])
     }
 
     public static var openAppWhenRun: Bool { true }

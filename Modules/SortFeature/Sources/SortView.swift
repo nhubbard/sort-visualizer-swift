@@ -94,8 +94,11 @@ public struct SortView: View {
             }
         case let .replaying(replay), let .complete(replay):
             canvasWithControls(for: replay)
-        case .failed:
-            ContentUnavailableView("Sort Failed", systemImage: "exclamationmark.triangle")
+        case let .failed(error):
+            ContentUnavailableView(
+                "Sort Skipped", systemImage: "clock.badge.exclamationmark",
+                description: Text(error.localizedDescription)
+            )
         }
     }
 

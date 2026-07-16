@@ -10,11 +10,18 @@ import SortFeature
 public struct SetPlaybackSpeedIntent: AppIntent {
     public static var title: LocalizedStringResource { "Set Playback Speed" }
     public static var description: IntentDescription {
-        IntentDescription("Changes how fast Sort Symphony plays back a sort, in operations per second.", categoryName: "Sort Symphony")
+        IntentDescription(
+            "Changes how fast Sort Symphony plays back a sort, in operations per second.",
+            categoryName: "Sort Symphony",
+            searchKeywords: ["Speed", "Playback Speed", "Faster", "Slower"])
     }
 
-    @Parameter(title: "Speed (ops/sec)")
+    @Parameter(title: "Speed (ops/sec)", description: "How many sort operations to play back per second — higher is faster.")
     public var speed: Double
+
+    public static var parameterSummary: some ParameterSummary {
+        Summary("Set playback speed to \(\.$speed) operations per second")
+    }
 
     public init() {}
 
@@ -37,11 +44,18 @@ public struct SetPlaybackSpeedIntent: AppIntent {
 public struct SetSoundEnabledIntent: AppIntent {
     public static var title: LocalizedStringResource { "Set Sound" }
     public static var description: IntentDescription {
-        IntentDescription("Turns Sort Symphony's sort playback sound on or off.", categoryName: "Sort Symphony")
+        IntentDescription(
+            "Turns Sort Symphony's sort playback sound on or off.",
+            categoryName: "Sort Symphony",
+            searchKeywords: ["Sound", "Mute", "Unmute", "Audio"])
     }
 
-    @Parameter(title: "Enabled")
+    @Parameter(title: "Enabled", description: "Whether sort playback sound should be on.")
     public var enabled: Bool
+
+    public static var parameterSummary: some ParameterSummary {
+        Summary("Set sound \(\.$enabled)")
+    }
 
     public init() {}
 

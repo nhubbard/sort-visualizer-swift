@@ -9,7 +9,11 @@ import AppIntents
 public struct FindCategoriesIntent: AppIntent {
     public static var title: LocalizedStringResource { "Find Categories" }
     public static var description: IntentDescription {
-        IntentDescription("Lists Sort Symphony's algorithm categories.", categoryName: "Sort Symphony")
+        IntentDescription(
+            "Lists Sort Symphony's algorithm categories.",
+            categoryName: "Sort Symphony",
+            searchKeywords: ["Algorithm Categories", "Sort Categories"],
+            resultValueName: "Categories")
     }
 
     public init() {}

@@ -10,13 +10,19 @@ public struct FindAlgorithmsIntent: AppIntent {
     public static var description: IntentDescription {
         IntentDescription(
             "Lists Sort Symphony's sorting algorithms, optionally filtered to one category.",
-            categoryName: "Sort Symphony")
+            categoryName: "Sort Symphony",
+            searchKeywords: ["Sorting Algorithms", "List Algorithms", "All Algorithms"],
+            resultValueName: "Algorithms")
     }
 
     // Non-optional with `.all` as the default — see `AlgorithmCategoryOption`'s own doc comment
     // for why an `Optional<AlgorithmCategoryOption>` defaulting to `nil` is the wrong shape here.
-    @Parameter(title: "Category", default: .all)
+    @Parameter(title: "Category", description: "Filters to one category, or leave as All Categories to list every algorithm.", default: .all)
     public var category: AlgorithmCategoryOption
+
+    public static var parameterSummary: some ParameterSummary {
+        Summary("Find algorithms in \(\.$category)")
+    }
 
     public init() {
         category = .all

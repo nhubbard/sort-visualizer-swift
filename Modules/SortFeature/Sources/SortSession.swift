@@ -7,6 +7,27 @@ import SortEngineKit
 
 public enum SortSessionError: Error, Equatable, Sendable {
     case recordingFailed(String)
+    /// A recording (shuffle or sort) hit `RecordingEngine`'s operation cap before finishing —
+    /// `compareCount`/`swapCount`/`mainWriteCount`/`auxWriteCount` are the algorithm's true totals
+    /// (kept incrementing past the cap, see `RecordingEngine.appendOp`), not just the truncated
+    /// tape length, so a caller has real numbers to log or display.
+    case recordingTooLarge(
+        operationCount: Int, cap: Int,
+        compareCount: Int, swapCount: Int, mainWriteCount: Int, auxWriteCount: Int
+    )
+}
+
+extension SortSessionError: LocalizedError {
+    public var errorDescription: String? {
+        switch self {
+        case let .recordingFailed(message):
+            message
+        case let .recordingTooLarge(operationCount, cap, _, _, _, _):
+            "This sort would take an unusually long time to finish (over \(operationCount.formatted()) "
+                + "operations, past the \(cap.formatted())-operation limit) at the current settings, "
+                + "so it was skipped."
+        }
+    }
 }
 
 /// The orchestrator — the *only* type that owns instances of `RecordingEngine`/`ReplayEngine`,
@@ -73,6 +94,11 @@ public final class SortSession {
     private let replayEngineFactory: (Tape) -> ReplayEngine
     private var monitorTask: Task<Void, Never>?
     private var automationTask: Task<Void, Never>?
+    /// Set by `start(size:)` whenever the most recent call skipped a capped recording instead of
+    /// starting a replay — `runAutomation(sizes:runsPerSize:)` checks this right after `start
+    /// (size:)` returns to decide whether to `waitUntilComplete()` (a skipped run never starts a
+    /// replay, so waiting would hang forever) or move straight to the next size/run.
+    private var lastRunWasSkipped = false
     /// Resolved (and cleared) the moment `phase` genuinely reaches `.complete` — lets
     /// `runAutomation` `await` one real, fully-animated run finishing before starting the next,
     /// without polling `phase` itself.
@@ -115,16 +141,38 @@ public final class SortSession {
             max(size, algorithm.metadata.sizeRange.lowerBound),
             algorithm.metadata.sizeRange.upperBound)
         arraySize = clampedSize
+        // Only meaningful if this call turns out to hit the operation cap under automation (see
+        // below) — reverting to whatever was on screen before this call is how automation
+        // "pretends" a capped run never happened, instead of showing a warning nobody's watching
+        // for mid-sweep.
+        let previousPhase = phase
         phase = .recording
 
         let algorithm = self.algorithm
         let shuffle = self.shuffle
-        let tape = await Task.detached(priority: .userInitiated) {
-            SortSession.makeTape(algorithm: algorithm, shuffle: shuffle, size: clampedSize)
-        }.value
-
-        phase = .ready(tape)
-        startReplay(tape)
+        let operationCap = settings.recordingOperationCap
+        do {
+            let tape = try await Task.detached(priority: .userInitiated) {
+                try SortSession.makeTape(algorithm: algorithm, shuffle: shuffle, size: clampedSize, operationCap: operationCap)
+            }.value
+            lastRunWasSkipped = false
+            phase = .ready(tape)
+            startReplay(tape)
+        } catch {
+            let sessionError = (error as? SortSessionError) ?? .recordingFailed("\(error)")
+            lastRunWasSkipped = true
+            if isAutomating {
+                if case let .recordingTooLarge(_, cap, compareCount, swapCount, mainWriteCount, auxWriteCount) = sessionError {
+                    try? await analytics.recordCapExceeded(
+                        algorithmID: algorithm.id, arraySize: clampedSize, cap: cap,
+                        compareCount: compareCount, swapCount: swapCount,
+                        mainWriteCount: mainWriteCount, auxWriteCount: auxWriteCount)
+                }
+                phase = previousPhase
+            } else {
+                phase = .failed(sessionError)
+            }
+        }
     }
 
     /// Records the shuffle against an identity array, then the sort against the shuffle's output,
@@ -132,10 +180,12 @@ public final class SortSession {
     /// shuffle-then-sort is just one longer tape (§2A.4). A free function (well, static method) on
     /// purpose: no `self`, no actor isolation, callable directly from a test or from inside
     /// `Task.detached` without capturing the session itself.
-    nonisolated static func makeTape(algorithm: any SortAlgorithm, shuffle: any ShuffleAlgorithm, size: Int) -> Tape {
+    nonisolated static func makeTape(
+        algorithm: any SortAlgorithm, shuffle: any ShuffleAlgorithm, size: Int, operationCap: Int
+    ) throws -> Tape {
         let identity = Array(1...size)
 
-        var shuffleEngine = RecordingEngine(values: identity)
+        var shuffleEngine = RecordingEngine(values: identity, operationCap: operationCap)
         shuffle.record(into: &shuffleEngine)
         let uniqueValueCount = Set(shuffleEngine.values).count
         // `compare`/`swap`'s auto-retraction (`markPrimarySecondary`) only clears the *previous*
@@ -147,11 +197,17 @@ public final class SortSession {
         // instance doesn't know to retract them either) — same bug as below, one phase earlier.
         shuffleEngine.unmarkAll()
         let shuffleSummary = shuffleEngine.finish()
+        if shuffleSummary.didExceedCap {
+            throw SortSessionError.recordingTooLarge(
+                operationCount: shuffleSummary.tape.count, cap: operationCap,
+                compareCount: shuffleSummary.compareCount, swapCount: shuffleSummary.swapCount,
+                mainWriteCount: shuffleSummary.mainWriteCount, auxWriteCount: shuffleSummary.auxWriteCount)
+        }
 
         // recordingDuration measures only the sort, not the shuffle — it's the real algorithmic
         // performance number (§1.1), and a shuffle's cost isn't the algorithm's to answer for.
         let recordingStart = Date()
-        var sortEngine = RecordingEngine(values: shuffleEngine.values)
+        var sortEngine = RecordingEngine(values: shuffleEngine.values, operationCap: operationCap)
         algorithm.record(into: &sortEngine)
         let recordingDuration = Date().timeIntervalSince(recordingStart)
         // Same reasoning as `shuffleEngine.unmarkAll()` above, but for the far more visible case:
@@ -162,6 +218,12 @@ public final class SortSession {
         // algorithm's own measured recording time.
         sortEngine.unmarkAll()
         let sortSummary = sortEngine.finish()
+        if sortSummary.didExceedCap {
+            throw SortSessionError.recordingTooLarge(
+                operationCount: sortSummary.tape.count, cap: operationCap,
+                compareCount: sortSummary.compareCount, swapCount: sortSummary.swapCount,
+                mainWriteCount: sortSummary.mainWriteCount, auxWriteCount: sortSummary.auxWriteCount)
+        }
 
         return Tape(
             header: TapeHeader(
@@ -320,6 +382,7 @@ public final class SortSession {
                 guard !Task.isCancelled else { return }
                 automationProgress = (sizeIndex, sizes.count, runIndex, runsPerSize)
                 await start(size: size)
+                if lastRunWasSkipped { continue }
                 await waitUntilComplete()
             }
         }

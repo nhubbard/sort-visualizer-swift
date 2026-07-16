@@ -6,7 +6,11 @@ import VisualizationKit
 public struct FindVisualizersIntent: AppIntent {
     public static var title: LocalizedStringResource { "Find Visualizers" }
     public static var description: IntentDescription {
-        IntentDescription("Lists every visualizer Sort Symphony ships.", categoryName: "Sort Symphony")
+        IntentDescription(
+            "Lists every visualizer Sort Symphony ships.",
+            categoryName: "Sort Symphony",
+            searchKeywords: ["Visualizers", "Visualizations"],
+            resultValueName: "Visualizers")
     }
 
     public init() {}

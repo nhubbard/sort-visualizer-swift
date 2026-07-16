@@ -8,7 +8,11 @@ import SortFeature
 public struct FindAutomationsIntent: AppIntent {
     public static var title: LocalizedStringResource { "Find Automations" }
     public static var description: IntentDescription {
-        IntentDescription("Lists Sort Symphony's registered size-sweep automations.", categoryName: "Sort Symphony")
+        IntentDescription(
+            "Lists Sort Symphony's registered size-sweep automations.",
+            categoryName: "Sort Symphony",
+            searchKeywords: ["Size Sweep", "Max Size Only", "Automations"],
+            resultValueName: "Automations")
     }
 
     public init() {}

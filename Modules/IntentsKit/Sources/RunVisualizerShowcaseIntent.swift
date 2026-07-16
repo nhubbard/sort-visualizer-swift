@@ -14,13 +14,18 @@ public struct RunVisualizerShowcaseIntent: AppIntent {
     public static var description: IntentDescription {
         IntentDescription(
             "Runs one algorithm at its maximum size once per visualizer, switching visualizers only between runs.",
-            categoryName: "Sort Symphony")
+            categoryName: "Sort Symphony",
+            searchKeywords: ["Visualizer Showcase", "Every Visualizer"])
     }
 
     public static var openAppWhenRun: Bool { true }
 
-    @Parameter(title: "Algorithm")
+    @Parameter(title: "Algorithm", description: "The algorithm to showcase, run once per visualizer at its own maximum size.")
     public var algorithm: AlgorithmEntity
+
+    public static var parameterSummary: some ParameterSummary {
+        Summary("Run visualizer showcase for \(\.$algorithm)")
+    }
 
     public init() {}
 

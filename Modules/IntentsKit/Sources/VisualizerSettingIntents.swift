@@ -8,11 +8,18 @@ import SettingsKit
 public struct SetVisualizerIntent: AppIntent {
     public static var title: LocalizedStringResource { "Set Visualizer" }
     public static var description: IntentDescription {
-        IntentDescription("Changes which visualizer Sort Symphony draws sorts with.", categoryName: "Sort Symphony")
+        IntentDescription(
+            "Changes which visualizer Sort Symphony draws sorts with.",
+            categoryName: "Sort Symphony",
+            searchKeywords: ["Visualizer", "Visualization"])
     }
 
-    @Parameter(title: "Visualizer")
+    @Parameter(title: "Visualizer", description: "Which visualizer to draw sorts with.")
     public var visualizer: VisualizerEntity
+
+    public static var parameterSummary: some ParameterSummary {
+        Summary("Set visualizer to \(\.$visualizer)")
+    }
 
     public init() {}
 
@@ -32,7 +39,10 @@ public struct SetVisualizerIntent: AppIntent {
 public struct CycleVisualizerIntent: AppIntent {
     public static var title: LocalizedStringResource { "Cycle Visualizer" }
     public static var description: IntentDescription {
-        IntentDescription("Advances Sort Symphony to the next visualizer.", categoryName: "Sort Symphony")
+        IntentDescription(
+            "Advances Sort Symphony to the next visualizer.",
+            categoryName: "Sort Symphony",
+            searchKeywords: ["Next Visualizer", "Change Visualizer"])
     }
 
     public init() {}

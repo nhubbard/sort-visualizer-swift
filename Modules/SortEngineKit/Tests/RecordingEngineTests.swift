@@ -162,4 +162,44 @@ struct RecordingEngineTests {
             .unmarkAll
         ])
     }
+
+    @Test
+    func operationCapFreezesTapeGrowthButRealWorkKeepsHappening() {
+        // Each compare() emits 3 ops on the very first call (2 marks + the compare itself), so a
+        // cap of 3 is hit exactly at the end of the first compare — the second compare's marks/
+        // compare should all be swallowed, but `values`/`compareCount` must still reflect it.
+        var engine = RecordingEngine(values: [5, 3, 8], operationCap: 3)
+        _ = engine.compare(0, 1)
+        #expect(!engine.didExceedCap)
+        _ = engine.compare(1, 2)
+        #expect(engine.didExceedCap)
+
+        let summary = engine.finish()
+        #expect(summary.didExceedCap)
+        #expect(summary.tape.count == 3)
+        #expect(summary.tape == [
+            .mark(marker: Marker.primary, index: 0),
+            .mark(marker: Marker.secondary, index: 1),
+            .compare(0, 1)
+        ])
+        // Real work past the cap still happened — only the tape stopped growing.
+        #expect(summary.compareCount == 2)
+    }
+
+    @Test
+    func operationCapStillLetsTheAlgorithmFinishCorrectly() {
+        var engine = RecordingEngine(values: [3, 1, 2], operationCap: 2)
+        _ = engine.compare(0, 1)
+        engine.swap(0, 1)
+        _ = engine.compare(1, 2)
+        engine.swap(1, 2)
+        _ = engine.compare(0, 1)
+
+        #expect(engine.didExceedCap)
+        #expect(engine.values == [1, 2, 3])
+        let summary = engine.finish()
+        #expect(summary.compareCount == 3)
+        #expect(summary.swapCount == 2)
+        #expect(summary.tape.count == 2)
+    }
 }

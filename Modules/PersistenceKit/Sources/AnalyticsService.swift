@@ -50,11 +50,43 @@ public actor AnalyticsService {
         try modelContext.save()
     }
 
+    /// Fired only from an automation/sweep run (`SortSession.start(size:)`, `isAutomating ==
+    /// true`) whose recording hit `RecordingEngine`'s operation cap — a manual run shows the skip
+    /// reason directly in the UI instead, so it doesn't also need a record here. Deliberately
+    /// write-only: unlike `record(...)` above, no public fetch accessor exists for
+    /// `RecordingCapExceededRecord` — nothing in the app ever reads one back. These exist purely
+    /// for reviewing later, across every device signed into the same iCloud account, which
+    /// algorithm/size combinations are tripping the cap so `sizeRange` (or the algorithm itself)
+    /// can be adjusted by hand, the same way some Bogo-family algorithms already were.
+    public func recordCapExceeded(
+        algorithmID: AlgorithmID, arraySize: Int, cap: Int,
+        compareCount: Int, swapCount: Int, mainWriteCount: Int, auxWriteCount: Int
+    ) async throws {
+        let record = RecordingCapExceededRecord(
+            algorithmID: algorithmID.rawValue,
+            arraySize: arraySize,
+            operationCap: cap,
+            compareCount: compareCount,
+            swapCount: swapCount,
+            mainWriteCount: mainWriteCount,
+            auxWriteCount: auxWriteCount,
+            recordedAt: Date()
+        )
+        modelContext.insert(record)
+        try modelContext.save()
+    }
+
     /// Test-only: `ModelContext`/`BigORecord` aren't `Sendable`, so tests can't reach into
     /// `modelContext` directly from outside the actor without a concurrency error — this stays
     /// isolated and hands back plain `Sendable` values instead.
     func fetchAllForTesting() throws -> [BigORecordSnapshot] {
         try modelContext.fetch(FetchDescriptor<BigORecord>()).map(BigORecordSnapshot.init)
+    }
+
+    /// Test-only, same reasoning as `fetchAllForTesting()` above — `recordCapExceeded(...)` is
+    /// otherwise write-only by design; nothing app-facing ever calls this.
+    func fetchCapExceededForTesting() throws -> [RecordingCapExceededSnapshot] {
+        try modelContext.fetch(FetchDescriptor<RecordingCapExceededRecord>()).map(RecordingCapExceededSnapshot.init)
     }
 
     /// Every recorded run for one algorithm, across every device that's ever completed a sort
@@ -72,7 +104,7 @@ public actor AnalyticsService {
     /// "fail loudly on a mis-configured app" precedent already used elsewhere (e.g. `ContentView`'s
     /// `fatalError` for missing bundled algorithm resources).
     private static func makeDefaultContainer() -> ModelContainer {
-        let schema = Schema([BigORecord.self])
+        let schema = Schema([BigORecord.self, RecordingCapExceededRecord.self])
         let configuration = ModelConfiguration(schema: schema, cloudKitDatabase: .automatic)
         do {
             return try ModelContainer(for: schema, configurations: [configuration])
@@ -111,5 +143,30 @@ public struct BigORecordSnapshot: Sendable, Equatable, Identifiable {
         recordingDuration = summary.recordingDuration
         playbackDuration = summary.playbackDuration
         playbackSpeed = summary.playbackSpeed
+    }
+}
+
+/// Test-only counterpart to `BigORecordSnapshot` — `RecordingCapExceededRecord` itself isn't
+/// `Sendable` (no SwiftData `@Model` class is), so `fetchCapExceededForTesting()` hands back this
+/// instead of raw model instances.
+struct RecordingCapExceededSnapshot: Sendable, Equatable {
+    let algorithmID: String
+    let arraySize: Int
+    let operationCap: Int
+    let compareCount: Int
+    let swapCount: Int
+    let mainWriteCount: Int
+    let auxWriteCount: Int
+    let recordedAt: Date
+
+    init(_ record: RecordingCapExceededRecord) {
+        algorithmID = record.algorithmID
+        arraySize = record.arraySize
+        operationCap = record.operationCap
+        compareCount = record.compareCount
+        swapCount = record.swapCount
+        mainWriteCount = record.mainWriteCount
+        auxWriteCount = record.auxWriteCount
+        recordedAt = record.recordedAt
     }
 }

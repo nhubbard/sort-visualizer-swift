@@ -12,7 +12,8 @@ public struct RunFullSizeSweepIntent: AppIntent {
     public static var description: IntentDescription {
         IntentDescription(
             "Runs a size sweep (every supported size, three times each) for every algorithm, in alphabetical order.",
-            categoryName: "Sort Symphony")
+            categoryName: "Sort Symphony",
+            searchKeywords: ["Full Sweep", "All Algorithms", "Size Sweep"])
     }
 
     public static var openAppWhenRun: Bool { true }

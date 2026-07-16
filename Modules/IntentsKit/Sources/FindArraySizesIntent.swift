@@ -11,11 +11,17 @@ public struct FindArraySizesIntent: AppIntent {
     public static var description: IntentDescription {
         IntentDescription(
             "Lists every array size one algorithm supports, the same sizes a Size Sweep automation runs through.",
-            categoryName: "Sort Symphony")
+            categoryName: "Sort Symphony",
+            searchKeywords: ["Sizes", "Supported Sizes", "Size Sweep"],
+            resultValueName: "Array Sizes")
     }
 
-    @Parameter(title: "Algorithm")
+    @Parameter(title: "Algorithm", description: "The algorithm whose supported array sizes to list.")
     public var algorithm: AlgorithmEntity
+
+    public static var parameterSummary: some ParameterSummary {
+        Summary("Find array sizes for \(\.$algorithm)")
+    }
 
     public init() {}
 

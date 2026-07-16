@@ -13,12 +13,13 @@ public struct RunSortIntent: AppIntent {
     public static var description: IntentDescription {
         IntentDescription(
             "Runs one sorting algorithm in Sort Symphony and waits for the full animated pass to finish.",
-            categoryName: "Sort Symphony")
+            categoryName: "Sort Symphony",
+            searchKeywords: ["Sort", "Run Algorithm", "Play Sort"])
     }
 
     public static var openAppWhenRun: Bool { true }
 
-    @Parameter(title: "Algorithm")
+    @Parameter(title: "Algorithm", description: "The algorithm to run, selected exactly as if tapped in the sidebar.")
     public var algorithm: AlgorithmEntity
     @Parameter(title: "Visualizer", description: "Defaults to whichever visualizer is already selected.")
     public var visualizer: VisualizerEntity?
@@ -26,6 +27,14 @@ public struct RunSortIntent: AppIntent {
     public var shuffle: ShuffleEntity?
     @Parameter(title: "Array Size", description: "Defaults to the app's configured default size, clamped to the algorithm's own range.")
     public var size: Int?
+
+    public static var parameterSummary: some ParameterSummary {
+        Summary("Run \(\.$algorithm)") {
+            \.$visualizer
+            \.$shuffle
+            \.$size
+        }
+    }
 
     public init() {}
 

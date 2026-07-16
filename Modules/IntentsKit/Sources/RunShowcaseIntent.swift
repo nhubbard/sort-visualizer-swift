@@ -13,7 +13,8 @@ public struct RunShowcaseIntent: AppIntent {
     public static var description: IntentDescription {
         IntentDescription(
             "Runs every algorithm once, in alphabetical order, at its own maximum size, with the current visualizer.",
-            categoryName: "Sort Symphony")
+            categoryName: "Sort Symphony",
+            searchKeywords: ["Showcase", "Demo", "Every Algorithm"])
     }
 
     public static var openAppWhenRun: Bool { true }
