@@ -52,12 +52,6 @@ public final class AppSettings {
         didSet { store.set(defaultShuffleID.rawValue, forKey: Keys.defaultShuffleID) }
     }
 
-    /// The sidebar's collapsed `AlgorithmCategory` sections — moved here from `ContentView`'s own
-    /// `@State` so collapse/expand choices survive across launches like every other setting.
-    public var collapsedCategoryIDs: Set<AlgorithmCategory> {
-        didSet { store.set(collapsedCategoryIDs.map(\.rawValue), forKey: Keys.collapsedCategoryIDs) }
-    }
-
     private enum Keys {
         static let selectedVisualizerID = "selectedVisualizerID"
         static let playbackSpeed = "playbackSpeed"
@@ -68,7 +62,6 @@ public final class AppSettings {
         static let recordingOperationCap = "recordingOperationCap"
         static let codeTheme = "codeTheme"
         static let defaultShuffleID = "defaultShuffleID"
-        static let collapsedCategoryIDs = "collapsedCategoryIDs"
     }
 
     private let store: UserDefaults
@@ -100,13 +93,25 @@ public final class AppSettings {
         recordingOperationCap = store.integer(forKey: Keys.recordingOperationCap)
         codeTheme = CodeThemeID(rawValue: store.string(forKey: Keys.codeTheme) ?? "monokai")
         defaultShuffleID = ShuffleID(rawValue: store.string(forKey: Keys.defaultShuffleID) ?? "random")
-        collapsedCategoryIDs = Set(
-            (store.stringArray(forKey: Keys.collapsedCategoryIDs) ?? []).compactMap(AlgorithmCategory.init(rawValue:)))
     }
 
     private func persistNoteRange() {
         store.set(synthNoteRange.lowerBound, forKey: Keys.synthLowNote)
         store.set(synthNoteRange.upperBound, forKey: Keys.synthHighNote)
+    }
+
+    /// Mirrors `init`'s `store.register(defaults:)` literals exactly — keep the two in sync if a
+    /// default value ever changes. Each property's own `didSet` already persists it, so nothing
+    /// else is needed here.
+    public func resetToDefaults() {
+        selectedVisualizerID = VisualizerID(rawValue: "bargraph")
+        playbackSpeed = 30.0
+        soundEnabled = false
+        synthNoteRange = 36...72
+        defaultArraySize = 256
+        recordingOperationCap = 300_000
+        codeTheme = CodeThemeID(rawValue: "monokai")
+        defaultShuffleID = ShuffleID(rawValue: "random")
     }
 
     /// Advances `selectedVisualizerID` to the next entry in `VisualizerRegistry.shared.visualizers`

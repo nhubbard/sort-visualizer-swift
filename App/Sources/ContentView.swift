@@ -6,10 +6,18 @@ import SettingsKit
 import SortFeature
 import SwiftUI
 
-/// Phase 9's data-driven navigation (§4.4 of ARCHITECTURE_V2.md) — the sidebar is generated
-/// directly from `AlgorithmRegistry.shared.algorithms(in:)`, sectioned by `AlgorithmCategory`.
-/// Adding a new algorithm from here on is "drop a `.js` + manifest pair in `Algorithms/`," with
-/// zero changes to this file — `Page.swift`'s five parallel hand-maintained switches are gone.
+/// Phase 9's data-driven navigation (§4.4 of ARCHITECTURE_V2.md) — the sidebar/content columns are
+/// generated directly from `AlgorithmRegistry.shared.algorithms(in:)`, sectioned by
+/// `AlgorithmCategory`. Adding a new algorithm from here on is "drop a `.js` + manifest pair in
+/// `Algorithms/`," with zero changes to this file — `Page.swift`'s five parallel hand-maintained
+/// switches are gone.
+///
+/// Two-tier `NavigationSplitView` (category sidebar → algorithm content → detail), not the single
+/// collapsible-`Section`-per-category `List` this had before: that toggle-driven collapse was too
+/// small a target on touch, mildly annoying on Mac, and interacted badly with `.searchable` (a
+/// match inside a collapsed category had to force it open, which looked like it was fighting the
+/// user's own tap). A real content column gets that behavior for free from stock split-view
+/// navigation.
 struct ContentView: View {
     // `SortCoordinator.shared`, not local `@State` — App Intents (`RunSortIntent`/
     // `RunAutomationIntent`) need to drive this same selection from outside the view tree, exactly
@@ -28,77 +36,38 @@ struct ContentView: View {
     @State private var showcaseAlgorithmIDs: [AlgorithmID] = []
     @State private var isShowingShowcaseConfirmation = false
 
+    /// The sidebar's own selection. `.all` is synthetic — `AlgorithmCategory` alone has no way to
+    /// say "show every algorithm regardless of category," which the content column needs as its
+    /// default so cross-category search (today's behavior, and still expected) isn't lost just
+    /// because algorithms are now grouped behind a category pick.
+    private enum SidebarCategory: Hashable, Identifiable {
+        case all
+        case category(AlgorithmCategory)
+        var id: Self { self }
+    }
+
+    @State private var selectedSidebarCategory: SidebarCategory? = .all
+
     var body: some View {
         NavigationSplitView {
-            List(selection: $coordinator.selectedAlgorithmID) {
-                ForEach(AlgorithmCategory.allCases) { category in
-                    let algorithms = filteredAlgorithms(in: category)
-                    if !algorithms.isEmpty {
-                        // A search match must stay visible even inside a category the user
-                        // collapsed earlier — collapse only applies while not searching.
-                        let isCollapsed = searchText.isEmpty && settings.collapsedCategoryIDs.contains(category)
-                        Section {
-                            if !isCollapsed {
-                                ForEach(algorithms, id: \.id) { algorithm in
-                                    NavigationLink(value: algorithm.id) {
-                                        CustomIconLabel(
-                                            text: algorithm.metadata.displayName,
-                                            iconName: algorithm.metadata.iconName)
-                                    }
-                                    .accessibilityIdentifier("algorithmLink.\(algorithm.id.rawValue)")
-                                    .contextMenu {
-                                        Button("Run Size Sweep") {
-                                            Task { await SortCoordinator.shared.runAutomation(algorithm: algorithm, automationID: .sizeSweep) }
-                                        }
-                                        Button("Run Max Size Only") {
-                                            Task { await SortCoordinator.shared.runAutomation(algorithm: algorithm, automationID: .maxSizeOnly) }
-                                        }
-                                    }
-                                }
-                            }
-                        } header: {
-                            CategorySectionHeader(category: category, isCollapsed: isCollapsed) {
-                                toggleCollapsed(category)
-                            }
-                        }
-                    }
-                }
-            }
-            .searchable(text: $searchText, prompt: "Search Algorithms")
-            // Blocks manual navigation while Showcase drives `selection` itself — otherwise a
-            // stray tap here would race the automated advance below.
-            .disabled(showcaseIndex != nil)
-            .navigationTitle("Sort Symphony v2")
-            // Attached to the sidebar column specifically — a `.toolbar` on the NavigationSplitView
-            // itself never actually renders a button in this SwiftUI version, so Settings needs a
-            // home on whichever column has a real navigation bar. The sheet lives at this level too
-            // (not per-detail-view) so it's reachable from Home as well as from a running sort.
-            .toolbar {
-                ToolbarItem(placement: .primaryAction) {
-                    showcaseToolbarButton
-                }
-                ToolbarItem(placement: .primaryAction) {
-                    Button {
-                        coordinator.isSettingsRequested = true
-                    } label: {
-                        Image(systemName: "gearshape")
-                    }
-                    .accessibilityIdentifier("settingsButton")
-                }
-            }
-            .confirmationDialog(
-                "Start Showcase?", isPresented: $isShowingShowcaseConfirmation, titleVisibility: .visible
-            ) {
-                Button("Start Showcase") { startShowcase() }
-                    .accessibilityIdentifier("showcaseConfirmButton")
-            } message: {
-                Text("""
-                Runs every algorithm once, in order, with the current visualizer. The visualizer \
-                can still be changed with ⌘⇧V, but other controls are locked until it finishes.
-                """)
-            }
+            categorySidebar
+        } content: {
+            algorithmContent
         } detail: {
             detailContent
+        }
+        // Lives on the whole split view, not a specific column — it's just `@State` plus a
+        // modifier, so it doesn't need to share a column with whatever button triggers it.
+        .confirmationDialog(
+            "Start Showcase?", isPresented: $isShowingShowcaseConfirmation, titleVisibility: .visible
+        ) {
+            Button("Start Showcase") { startShowcase() }
+                .accessibilityIdentifier("showcaseConfirmButton")
+        } message: {
+            Text("""
+            Runs every algorithm once, in order, with the current visualizer. The visualizer \
+            can still be changed with ⌘⇧V, but other controls are locked until it finishes.
+            """)
         }
         .sheet(isPresented: $coordinator.isSettingsRequested) {
             NavigationStack {
@@ -110,10 +79,101 @@ struct ContentView: View {
                             Text("Done").fixedSize(horizontal: true, vertical: false)
                           }
                             .frame(width: 48)
-                            .buttonSizing(.flexible)
+                            .flexibleButtonSizingIfAvailable()
                         }
                     }
             }
+        }
+        // Keeps the content column showing the right category when `selectedAlgorithmID` changes
+        // from outside a manual category-then-algorithm tap (Showcase mode, `RunSortIntent`) — the
+        // same class of case a manual tap already handles for free just by being inside whichever
+        // category is currently selected.
+        .onChange(of: coordinator.selectedAlgorithmID) { _, newValue in
+            syncSidebarCategory(for: newValue)
+        }
+    }
+
+    private var categorySidebar: some View {
+        List(selection: $selectedSidebarCategory) {
+            NavigationLink(value: SidebarCategory.all) {
+                Label("All Algorithms", systemImage: "square.grid.2x2")
+            }
+            .accessibilityIdentifier("sidebarCategory.all")
+
+            Section("Categories") {
+                ForEach(AlgorithmCategory.allCases) { category in
+                    NavigationLink(value: SidebarCategory.category(category)) {
+                        Label(category.displayName, systemImage: "folder")
+                    }
+                    .accessibilityIdentifier("sidebarCategory.\(category.rawValue)")
+                }
+            }
+        }
+        .navigationTitle("Sort Symphony v2")
+        // Blocks manual category switching while Showcase drives `selection` itself — otherwise a
+        // stray tap here would race the automated advance below.
+        .disabled(showcaseIndex != nil)
+    }
+
+    private var algorithmContent: some View {
+        List(selection: $coordinator.selectedAlgorithmID) {
+            ForEach(contentAlgorithms, id: \.id) { algorithm in
+                NavigationLink(value: algorithm.id) {
+                    CustomIconLabel(
+                        text: algorithm.metadata.displayName,
+                        iconName: algorithm.metadata.iconName)
+                }
+                .accessibilityIdentifier("algorithmLink.\(algorithm.id.rawValue)")
+                .contextMenu {
+                    Button("Run Size Sweep") {
+                        Task { await SortCoordinator.shared.runAutomation(algorithm: algorithm, automationID: .sizeSweep) }
+                    }
+                    Button("Run Max Size Only") {
+                        Task { await SortCoordinator.shared.runAutomation(algorithm: algorithm, automationID: .maxSizeOnly) }
+                    }
+                }
+            }
+        }
+        // Lets UI tests target this specific list once there are two on screen (the category
+        // sidebar is the other) — see `App/UITests/SidebarNavigation.swift`.
+        .accessibilityIdentifier("algorithmContentList")
+        .searchable(text: $searchText, prompt: "Search Algorithms")
+        .disabled(showcaseIndex != nil)
+        .navigationTitle(contentTitle)
+    }
+
+    private var contentTitle: String {
+        switch selectedSidebarCategory {
+        case .none, .some(.all): "All Algorithms"
+        case .some(.category(let category)): category.displayName
+        }
+    }
+
+    private var contentAlgorithms: [any SortAlgorithm] {
+        let base: [any SortAlgorithm]
+        switch selectedSidebarCategory {
+        case .none, .some(.all):
+            // Same order Showcase mode itself uses — alphabetical, not registration order.
+            base = AlgorithmRegistry.shared.algorithms.sorted { $0.metadata.displayName < $1.metadata.displayName }
+        case .some(.category(let category)):
+            base = AlgorithmRegistry.shared.algorithms(in: category)
+        }
+        guard !searchText.isEmpty else { return base }
+        return base.filter { $0.metadata.displayName.localizedCaseInsensitiveContains(searchText) }
+    }
+
+    /// Moves the sidebar to whichever category actually contains `algorithmID`, but only when it
+    /// isn't already showing it — `.all` always contains it, and re-assigning the same
+    /// `.category(_)` back to itself would be a harmless but pointless extra write.
+    private func syncSidebarCategory(for algorithmID: AlgorithmID?) {
+        guard let algorithmID, let algorithm = AlgorithmRegistry.shared.algorithm(id: algorithmID) else { return }
+        switch selectedSidebarCategory {
+        case .none, .some(.all):
+            return
+        case .some(.category(let current)) where current == algorithm.metadata.category:
+            return
+        default:
+            selectedSidebarCategory = .category(algorithm.metadata.category)
         }
     }
 
@@ -130,7 +190,20 @@ struct ContentView: View {
         } label: {
             Image(systemName: showcaseIndex == nil ? "sparkles.tv.fill" : "stop.fill")
         }
+        .buttonBorderShape(.circle)
+        .frame(width: 36, height: 24)
         .accessibilityIdentifier("showcaseButton")
+    }
+
+    private var settingsToolbarButton: some View {
+        Button {
+            coordinator.isSettingsRequested = true
+        } label: {
+            Image(systemName: "gearshape")
+        }
+        .buttonBorderShape(.circle)
+        .frame(width: 36, height: 24)
+        .accessibilityIdentifier("settingsButton")
     }
 
     private var showcaseCompletionHandler: (() -> Void)? {
@@ -172,6 +245,19 @@ struct ContentView: View {
                 showcaseBanner
             }
         }
+        // On the detail column, not the sidebar: the sidebar is narrow enough that two icon
+        // buttons plus its title collapse into an automatic overflow ("…") menu instead of
+        // showing directly — confirmed visually. Detail is the widest column and always has room
+        // at its trailing edge, which is also where these visually landed before this app had a
+        // NavigationSplitView at all.
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                showcaseToolbarButton
+            }
+            ToolbarItem(placement: .topBarTrailing) {
+                settingsToolbarButton
+            }
+        }
     }
 
     private var showcaseBanner: some View {
@@ -197,7 +283,7 @@ struct ContentView: View {
         return "Showcase: \(algorithm.metadata.displayName) (\(showcaseIndex + 1)/\(showcaseAlgorithmIDs.count))"
     }
 
-    /// Same order the sidebar itself uses (`AlgorithmRegistry.shared.algorithms(in:)` sorts by
+    /// Same order the content column itself uses (`AlgorithmRegistry.shared.algorithms` sorted by
     /// `displayName` too) — alphabetical, not registration order.
     private func startShowcase() {
         showcaseAlgorithmIDs = AlgorithmRegistry.shared.algorithms
@@ -259,47 +345,18 @@ struct ContentView: View {
         }
         return shuffle
     }
-
-    private func toggleCollapsed(_ category: AlgorithmCategory) {
-        withAnimation(.snappy) {
-            if settings.collapsedCategoryIDs.contains(category) {
-                settings.collapsedCategoryIDs.remove(category)
-            } else {
-                settings.collapsedCategoryIDs.insert(category)
-            }
-        }
-    }
-
-    private func filteredAlgorithms(in category: AlgorithmCategory) -> [any SortAlgorithm] {
-        let algorithms = AlgorithmRegistry.shared.algorithms(in: category)
-        guard !searchText.isEmpty else { return algorithms }
-        return algorithms.filter { $0.metadata.displayName.localizedCaseInsensitiveContains(searchText) }
-    }
 }
 
-/// A `Section` header for `ContentView`'s sidebar with an explicit collapse/expand button next to
-/// the category name — rather than relying on `Section(isExpanded:)`'s built-in disclosure
-/// triangle, which only actually renders as a collapsible control under `.listStyle(.sidebar)` and
-/// ties the tap target to the whole header row. A dedicated `Button` works the same regardless of
-/// list style and keeps the tap target scoped to the chevron itself.
-private struct CategorySectionHeader: View {
-    let category: AlgorithmCategory
-    let isCollapsed: Bool
-    let onToggle: () -> Void
-
-    var body: some View {
-        HStack {
-            Text(category.displayName)
-            Spacer()
-            Button(action: onToggle) {
-                Image(systemName: "chevron.right")
-                    .rotationEffect(.degrees(isCollapsed ? 0 : 90))
-                    .imageScale(.small)
-            }
-            .buttonStyle(.plain)
-            .accessibilityIdentifier("categoryToggle.\(category.rawValue)")
-            .accessibilityLabel(
-                isCollapsed ? "Expand \(category.displayName)" : "Collapse \(category.displayName)")
+private extension View {
+    /// `.buttonSizing(.flexible)` is iOS 26+ only — the deployment target is iOS 18 (building
+    /// against the iOS 26 SDK, see `Module.deploymentTargets`), so anything older than 26 just
+    /// keeps the `.frame(width: 48)` this is paired with and skips this modifier entirely.
+    @ViewBuilder
+    func flexibleButtonSizingIfAvailable() -> some View {
+        if #available(iOS 26.0, *) {
+            buttonSizing(.flexible)
+        } else {
+            self
         }
     }
 }

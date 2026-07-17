@@ -56,7 +56,14 @@ public struct AlgorithmDetailSection: View {
                     .accessibilityIdentifier("codeLanguagePicker")
 
                     if let selected = content.codeSamples.first(where: { $0.language == selectedLanguage }) {
-                        AttributedCodeView(selected.source, theme: settings.codeTheme.makeTheme())
+                        // AttributedCodeView sizes to its own intrinsic width (`.fixedSize`), so
+                        // left inside this leading-aligned VStack it hugs the left edge instead of
+                        // sitting under the wider Description/Complexity content above it.
+                        HStack {
+                            Spacer(minLength: 0)
+                            AttributedCodeView(selected.source, theme: settings.codeTheme.makeTheme())
+                            Spacer(minLength: 0)
+                        }
                     }
                 } else {
                     Text("No code samples available yet.").foregroundStyle(.secondary)

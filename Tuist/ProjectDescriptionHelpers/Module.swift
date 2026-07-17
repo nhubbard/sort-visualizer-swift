@@ -2,7 +2,10 @@ import Foundation
 import ProjectDescription
 
 public enum Module {
-    public static let deploymentTargets: DeploymentTargets = .iOS("26.0")
+    // Building against the iOS 26 SDK (for RunControlBar's Liquid Glass `glassEffect`, gated
+    // behind `#available` there) doesn't require the deployment target to match it — this stays
+    // as low as the rest of the app's API usage allows.
+    public static let deploymentTargets: DeploymentTargets = .iOS("18.0")
     public static let destinations: Destinations = [.iPad, .macCatalyst]
 
     /// A framework + its test target, sharing one bundle-ID/settings convention. This is the

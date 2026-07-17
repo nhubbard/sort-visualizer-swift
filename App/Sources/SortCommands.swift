@@ -74,7 +74,10 @@ struct SortCommands: Commands {
             Button("Toggle Sound") {
                 SortCoordinator.shared.activeSortSession?.soundEnabled.toggle()
             }
-            .keyboardShortcut("a", modifiers: [.command])
+            // Not plain ⌘A: that collides with the system's own "Select All" (⌘A is a standard
+            // menu item UIKit registers automatically), which made UIMenuBuilder log a keyboard-
+            // shortcut conflict and silently drop this command on Mac Catalyst.
+            .keyboardShortcut("a", modifiers: [.command, .option])
             .disabled(SortCoordinator.shared.activeSortSession == nil)
 
             Button("Cycle Array Size") {

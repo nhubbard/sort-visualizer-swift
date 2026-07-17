@@ -5,6 +5,7 @@ import VisualizationKit
 
 public struct SettingsView: View {
     @Environment(AppSettings.self) private var settings
+    @State private var isShowingResetConfirmation = false
 
     public init() {}
 
@@ -96,8 +97,22 @@ public struct SettingsView: View {
                 .pickerStyle(.menu)
                 .accessibilityIdentifier("codeThemePicker")
             }
+            Section {
+                Button("Reset to Defaults", role: .destructive) {
+                    isShowingResetConfirmation = true
+                }
+                .accessibilityIdentifier("resetSettingsButton")
+            }
         }
         .navigationTitle("Settings")
+        .confirmationDialog(
+            "Reset all settings to their defaults?", isPresented: $isShowingResetConfirmation, titleVisibility: .visible
+        ) {
+            Button("Reset to Defaults", role: .destructive) {
+                settings.resetToDefaults()
+            }
+            .accessibilityIdentifier("resetSettingsConfirmButton")
+        }
     }
 
     private var recordingCapMinutesText: String {

@@ -47,7 +47,7 @@ struct RunControlBar: View {
             }
         }
         .padding(12)
-        .glassEffect(.regular.interactive(), in: .rect(cornerRadius: 20))
+        .glassOrMaterialBackground()
         .padding([.horizontal, .bottom])
         .animation(.easeInOut(duration: 0.2), value: isSpeedExpanded)
         .animation(.easeInOut(duration: 0.2), value: isSizeExpanded)
@@ -261,7 +261,7 @@ struct RunControlBar: View {
         }
         .accessibilityIdentifier("runControlSoundToggle")
         .accessibilityLabel(session.soundEnabled ? "Mute" : "Unmute")
-        .help(session.soundEnabled ? "Turn off sort sound effects (⌘A)" : "Turn on sort sound effects (⌘A)")
+        .help(session.soundEnabled ? "Turn off sort sound effects (⌥⌘A)" : "Turn on sort sound effects (⌥⌘A)")
 
         AutomatorMenuButton(session: session)
 
@@ -416,5 +416,19 @@ private struct AutomatorMenuButton: View {
         .accessibilityIdentifier("runControlAutomatorButton")
         .accessibilityLabel("Automations")
         .help("Run a size-sweep or max-size automation")
+    }
+}
+
+private extension View {
+    /// The deployment target is iOS 18 (`Module.deploymentTargets`), below Liquid Glass's iOS 26
+    /// minimum, even though the app builds against the iOS 26 SDK — `.regularMaterial` is the
+    /// pre-Liquid-Glass frosted-background equivalent for everything older than that.
+    @ViewBuilder
+    func glassOrMaterialBackground() -> some View {
+        if #available(iOS 26.0, *) {
+            glassEffect(.regular.interactive(), in: .rect(cornerRadius: 20))
+        } else {
+            background(.regularMaterial, in: .rect(cornerRadius: 20))
+        }
     }
 }
