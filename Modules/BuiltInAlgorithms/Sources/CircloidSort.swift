@@ -79,55 +79,55 @@ import SortEngineKit
 /// their original relative order, so this is not a rare edge case — it is the common outcome for
 /// duplicate-heavy input, not a one-off adversarial construction.
 public struct CircloidSort: SortAlgorithm {
-    public let id = AlgorithmID(rawValue: "circloidsort")
-    public let metadata = AlgorithmMetadata(
-        displayName: "Circloid Sort",
-        category: .exchange,
-        sizeRange: 16...256,
-        stable: false,
-        timeComplexity: ComplexityBounds(
-            best: "O(n log n)", average: "O(n log^2 n)", worst: "O(n log^2 n)"),
-        spaceComplexity: "O(log n)",
-        iconName: "smallcircle.circle.fill"
-    )
+  public let id = AlgorithmID(rawValue: "circloidsort")
+  public let metadata = AlgorithmMetadata(
+    displayName: "Circloid Sort",
+    category: .exchange,
+    sizeRange: 16...256,
+    stable: false,
+    timeComplexity: ComplexityBounds(
+      best: "O(n log n)", average: "O(n log^2 n)", worst: "O(n log^2 n)"),
+    spaceComplexity: "O(log n)",
+    iconName: "smallcircle.circle.fill"
+  )
 
-    public init() {}
+  public init() {}
 
-    public func record(into engine: inout RecordingEngine) {
-        guard engine.count > 1 else { return }
+  public func record(into engine: inout RecordingEngine) {
+    guard engine.count > 1 else { return }
 
-        // Ports `circle(array, left, right)`: converges `a` up from `left` and `b` down from
-        // `right`, swapping any out-of-order pair, and nudges `b` past the shared middle index
-        // once `a == b` so an odd-length range's middle element is never compared against itself.
-        func circle(_ left: Int, _ right: Int) -> Bool {
-            var a = left
-            var b = right
-            var swapped = false
-            while a < b {
-                if engine.compare(a, b, by: (>)) {
-                    engine.swap(a, b)
-                    swapped = true
-                }
-                a += 1
-                b -= 1
-                if a == b {
-                    b += 1
-                }
-            }
-            return swapped
+    // Ports `circle(array, left, right)`: converges `a` up from `left` and `b` down from
+    // `right`, swapping any out-of-order pair, and nudges `b` past the shared middle index
+    // once `a == b` so an odd-length range's middle element is never compared against itself.
+    func circle(_ left: Int, _ right: Int) -> Bool {
+      var a = left
+      var b = right
+      var swapped = false
+      while a < b {
+        if engine.compare(a, b, by: (>)) {
+          engine.swap(a, b)
+          swapped = true
         }
-
-        // Ports `circlePass(array, left, right)`: recurse into both halves first, then run this
-        // level's own `circle` pass, reporting whether anything swapped anywhere in the recursion.
-        func circlePass(_ left: Int, _ right: Int) -> Bool {
-            guard left < right else { return false }
-            let mid = (left + right) / 2
-            let l = circlePass(left, mid)
-            let r = circlePass(mid + 1, right)
-            return circle(left, right) || l || r
+        a += 1
+        b -= 1
+        if a == b {
+          b += 1
         }
-
-        let lastIndex = engine.count - 1
-        while circlePass(0, lastIndex) {}
+      }
+      return swapped
     }
+
+    // Ports `circlePass(array, left, right)`: recurse into both halves first, then run this
+    // level's own `circle` pass, reporting whether anything swapped anywhere in the recursion.
+    func circlePass(_ left: Int, _ right: Int) -> Bool {
+      guard left < right else { return false }
+      let mid = (left + right) / 2
+      let l = circlePass(left, mid)
+      let r = circlePass(mid + 1, right)
+      return circle(left, right) || l || r
+    }
+
+    let lastIndex = engine.count - 1
+    while circlePass(0, lastIndex) {}
+  }
 }

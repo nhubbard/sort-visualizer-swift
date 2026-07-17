@@ -46,54 +46,54 @@ import SortEngineKit
 /// end up on opposite sides of a partition swap and cross each other's original relative order,
 /// with nothing in the partition logic to prevent it (unlike an adjacent-only compare-swap pass).
 public struct LRQuickSort: SortAlgorithm {
-    public let id = AlgorithmID(rawValue: "lrquicksort")
-    public let metadata = AlgorithmMetadata(
-        displayName: "LR Quick Sort",
-        category: .exchange,
-        sizeRange: 16...256,
-        stable: false,
-        timeComplexity: ComplexityBounds(best: "O(n log n)", average: "O(n log n)", worst: "O(n^2)"),
-        spaceComplexity: "O(log n)",
-        iconName: "arrow.left.and.right.righttriangle.left.righttriangle.right.fill"
-    )
+  public let id = AlgorithmID(rawValue: "lrquicksort")
+  public let metadata = AlgorithmMetadata(
+    displayName: "LR Quick Sort",
+    category: .exchange,
+    sizeRange: 16...256,
+    stable: false,
+    timeComplexity: ComplexityBounds(best: "O(n log n)", average: "O(n log n)", worst: "O(n^2)"),
+    spaceComplexity: "O(log n)",
+    iconName: "arrow.left.and.right.righttriangle.left.righttriangle.right.fill"
+  )
 
-    public init() {}
+  public init() {}
 
-    public func record(into engine: inout RecordingEngine) {
-        guard engine.count > 1 else { return }
-        quickSort(&engine, 0, engine.count - 1)
+  public func record(into engine: inout RecordingEngine) {
+    guard engine.count > 1 else { return }
+    quickSort(&engine, 0, engine.count - 1)
+  }
+
+  private func quickSort(_ engine: inout RecordingEngine, _ p: Int, _ r: Int) {
+    guard p < r else { return }
+
+    let pivotIndex = p + (r - p + 1) / 2
+    // Held-value pattern (see the doc comment above): the pivot's own slot is never written to
+    // during this partition, so one read up front stands in for every live comparison against
+    // it below.
+    let pivotValue = engine.values[pivotIndex]
+
+    var i = p
+    var j = r
+    while i <= j {
+      while engine.values[i] < pivotValue {
+        i += 1
+      }
+      while engine.values[j] > pivotValue {
+        j -= 1
+      }
+      if i <= j {
+        engine.swap(i, j)
+        i += 1
+        j -= 1
+      }
     }
 
-    private func quickSort(_ engine: inout RecordingEngine, _ p: Int, _ r: Int) {
-        guard p < r else { return }
-
-        let pivotIndex = p + (r - p + 1) / 2
-        // Held-value pattern (see the doc comment above): the pivot's own slot is never written to
-        // during this partition, so one read up front stands in for every live comparison against
-        // it below.
-        let pivotValue = engine.values[pivotIndex]
-
-        var i = p
-        var j = r
-        while i <= j {
-            while engine.values[i] < pivotValue {
-                i += 1
-            }
-            while engine.values[j] > pivotValue {
-                j -= 1
-            }
-            if i <= j {
-                engine.swap(i, j)
-                i += 1
-                j -= 1
-            }
-        }
-
-        if p < j {
-            quickSort(&engine, p, j)
-        }
-        if i < r {
-            quickSort(&engine, i, r)
-        }
+    if p < j {
+      quickSort(&engine, p, j)
     }
+    if i < r {
+      quickSort(&engine, i, r)
+    }
+  }
 }

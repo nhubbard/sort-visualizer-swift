@@ -8,25 +8,25 @@ import SortFeature
 /// own progress UI and Stop control are the only way to check on or cancel it mid-run, same as
 /// `RunAutomationIntent` for a single algorithm.
 public struct RunFullSizeSweepIntent: AppIntent {
-    public static var title: LocalizedStringResource { "Run Full Size Sweep" }
-    public static var description: IntentDescription {
-        IntentDescription(
-            "Runs a size sweep (every supported size, three times each) for every algorithm, in alphabetical order.",
-            categoryName: "Sort Symphony",
-            searchKeywords: ["Full Sweep", "All Algorithms", "Size Sweep"])
+  public static var title: LocalizedStringResource { "Run Full Size Sweep" }
+  public static var description: IntentDescription {
+    IntentDescription(
+      "Runs a size sweep (every supported size, three times each) for every algorithm, in alphabetical order.",
+      categoryName: "Sort Symphony",
+      searchKeywords: ["Full Sweep", "All Algorithms", "Size Sweep"])
+  }
+
+  public static var openAppWhenRun: Bool { true }
+
+  public init() {}
+
+  @MainActor
+  public func perform() async throws -> some IntentResult {
+    let algorithms = AlgorithmRegistry.shared.algorithms
+      .sorted { $0.metadata.displayName < $1.metadata.displayName }
+    for algorithm in algorithms {
+      await SortCoordinator.shared.runAutomation(algorithm: algorithm, automationID: .sizeSweep)
     }
-
-    public static var openAppWhenRun: Bool { true }
-
-    public init() {}
-
-    @MainActor
-    public func perform() async throws -> some IntentResult {
-        let algorithms = AlgorithmRegistry.shared.algorithms
-            .sorted { $0.metadata.displayName < $1.metadata.displayName }
-        for algorithm in algorithms {
-            await SortCoordinator.shared.runAutomation(algorithm: algorithm, automationID: .sizeSweep)
-        }
-        return .result()
-    }
+    return .result()
+  }
 }

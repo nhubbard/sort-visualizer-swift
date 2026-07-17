@@ -8,33 +8,35 @@ import SortFeature
 /// running session never writes back to `AppSettings`, so without this an already-playing sort
 /// would ignore the change until its next run.
 public struct SetPlaybackSpeedIntent: AppIntent {
-    public static var title: LocalizedStringResource { "Set Playback Speed" }
-    public static var description: IntentDescription {
-        IntentDescription(
-            "Changes how fast Sort Symphony plays back a sort, in operations per second.",
-            categoryName: "Sort Symphony",
-            searchKeywords: ["Speed", "Playback Speed", "Faster", "Slower"])
-    }
+  public static var title: LocalizedStringResource { "Set Playback Speed" }
+  public static var description: IntentDescription {
+    IntentDescription(
+      "Changes how fast Sort Symphony plays back a sort, in operations per second.",
+      categoryName: "Sort Symphony",
+      searchKeywords: ["Speed", "Playback Speed", "Faster", "Slower"])
+  }
 
-    @Parameter(title: "Speed (ops/sec)", description: "How many sort operations to play back per second — higher is faster.")
-    public var speed: Double
+  @Parameter(
+    title: "Speed (ops/sec)",
+    description: "How many sort operations to play back per second — higher is faster.")
+  public var speed: Double
 
-    public static var parameterSummary: some ParameterSummary {
-        Summary("Set playback speed to \(\.$speed) operations per second")
-    }
+  public static var parameterSummary: some ParameterSummary {
+    Summary("Set playback speed to \(\.$speed) operations per second")
+  }
 
-    public init() {}
+  public init() {}
 
-    public init(speed: Double) {
-        self.speed = speed
-    }
+  public init(speed: Double) {
+    self.speed = speed
+  }
 
-    @MainActor
-    public func perform() async throws -> some IntentResult {
-        AppSettings.shared.playbackSpeed = speed
-        SortCoordinator.shared.activeSortSession?.lastReplay?.speed = speed
-        return .result()
-    }
+  @MainActor
+  public func perform() async throws -> some IntentResult {
+    AppSettings.shared.playbackSpeed = speed
+    SortCoordinator.shared.activeSortSession?.lastReplay?.speed = speed
+    return .result()
+  }
 }
 
 /// Sets `AppSettings.soundEnabled` (the default every *new* `SortSession` seeds its own,
@@ -42,31 +44,31 @@ public struct SetPlaybackSpeedIntent: AppIntent {
 /// already open, also nudges that session's live flag directly, same reasoning as
 /// `SetPlaybackSpeedIntent` above.
 public struct SetSoundEnabledIntent: AppIntent {
-    public static var title: LocalizedStringResource { "Set Sound" }
-    public static var description: IntentDescription {
-        IntentDescription(
-            "Turns Sort Symphony's sort playback sound on or off.",
-            categoryName: "Sort Symphony",
-            searchKeywords: ["Sound", "Mute", "Unmute", "Audio"])
-    }
+  public static var title: LocalizedStringResource { "Set Sound" }
+  public static var description: IntentDescription {
+    IntentDescription(
+      "Turns Sort Symphony's sort playback sound on or off.",
+      categoryName: "Sort Symphony",
+      searchKeywords: ["Sound", "Mute", "Unmute", "Audio"])
+  }
 
-    @Parameter(title: "Enabled", description: "Whether sort playback sound should be on.")
-    public var enabled: Bool
+  @Parameter(title: "Enabled", description: "Whether sort playback sound should be on.")
+  public var enabled: Bool
 
-    public static var parameterSummary: some ParameterSummary {
-        Summary("Set sound \(\.$enabled)")
-    }
+  public static var parameterSummary: some ParameterSummary {
+    Summary("Set sound \(\.$enabled)")
+  }
 
-    public init() {}
+  public init() {}
 
-    public init(enabled: Bool) {
-        self.enabled = enabled
-    }
+  public init(enabled: Bool) {
+    self.enabled = enabled
+  }
 
-    @MainActor
-    public func perform() async throws -> some IntentResult {
-        AppSettings.shared.soundEnabled = enabled
-        SortCoordinator.shared.activeSortSession?.soundEnabled = enabled
-        return .result()
-    }
+  @MainActor
+  public func perform() async throws -> some IntentResult {
+    AppSettings.shared.soundEnabled = enabled
+    SortCoordinator.shared.activeSortSession?.soundEnabled = enabled
+    return .result()
+  }
 }

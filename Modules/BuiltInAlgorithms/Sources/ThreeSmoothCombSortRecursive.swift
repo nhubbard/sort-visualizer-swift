@@ -68,54 +68,54 @@ import SortEngineKit
 /// `pos + gap` bound is exceeded — so the deepest live call chain, and therefore the auxiliary space
 /// this port actually uses, is `O(log n)`, not `O(1)`.
 public struct ThreeSmoothCombSortRecursive: SortAlgorithm {
-    public let id = AlgorithmID(rawValue: "threesmoothcombsortrecursive")
-    public let metadata = AlgorithmMetadata(
-        displayName: "3-Smooth Comb Sort (Recursive)",
-        category: .exchange,
-        sizeRange: 16...256,
-        stable: false,
-        timeComplexity: ComplexityBounds(
-            best: "O(n log^2 n)", average: "O(n log^2 n)", worst: "O(n log^2 n)"),
-        spaceComplexity: "O(log n)",
-        iconName: "arrow.up.arrow.down"
-    )
+  public let id = AlgorithmID(rawValue: "threesmoothcombsortrecursive")
+  public let metadata = AlgorithmMetadata(
+    displayName: "3-Smooth Comb Sort (Recursive)",
+    category: .exchange,
+    sizeRange: 16...256,
+    stable: false,
+    timeComplexity: ComplexityBounds(
+      best: "O(n log^2 n)", average: "O(n log^2 n)", worst: "O(n log^2 n)"),
+    spaceComplexity: "O(log n)",
+    iconName: "arrow.up.arrow.down"
+  )
 
-    public init() {}
+  public init() {}
 
-    public func record(into engine: inout RecordingEngine) {
-        guard engine.count > 1 else { return }
+  public func record(into engine: inout RecordingEngine) {
+    guard engine.count > 1 else { return }
 
-        // Ports `powerOfThree(array, pos, gap, end)`: recurse three ways with `gap` tripled (at
-        // `pos`, `pos + gap`, `pos + 2*gap`), covering every power-of-3 multiple of `gap` first, then
-        // — only once all three return — perform the single compare-and-swap pass at `gap` itself.
-        func powerOfThree(pos: Int, gap: Int, end: Int) {
-            guard pos + gap <= end else { return }
+    // Ports `powerOfThree(array, pos, gap, end)`: recurse three ways with `gap` tripled (at
+    // `pos`, `pos + gap`, `pos + 2*gap`), covering every power-of-3 multiple of `gap` first, then
+    // — only once all three return — perform the single compare-and-swap pass at `gap` itself.
+    func powerOfThree(pos: Int, gap: Int, end: Int) {
+      guard pos + gap <= end else { return }
 
-            powerOfThree(pos: pos, gap: gap * 3, end: end)
-            powerOfThree(pos: pos + gap, gap: gap * 3, end: end)
-            powerOfThree(pos: pos + 2 * gap, gap: gap * 3, end: end)
+      powerOfThree(pos: pos, gap: gap * 3, end: end)
+      powerOfThree(pos: pos + gap, gap: gap * 3, end: end)
+      powerOfThree(pos: pos + 2 * gap, gap: gap * 3, end: end)
 
-            var i = pos
-            while i + gap < end {
-                if engine.compare(i, i + gap, by: (>)) {
-                    engine.swap(i, i + gap)
-                }
-                i += gap
-            }
+      var i = pos
+      while i + gap < end {
+        if engine.compare(i, i + gap, by: (>)) {
+          engine.swap(i, i + gap)
         }
-
-        // Ports `recursiveComb(array, pos, gap, end)`: recurse twice with `gap` doubled (at `pos`,
-        // `pos + gap`), covering every power-of-2 multiple of `gap` first, then — only once both
-        // return — fire `powerOfThree` at `gap` itself.
-        func recursiveComb(pos: Int, gap: Int, end: Int) {
-            guard pos + gap <= end else { return }
-
-            recursiveComb(pos: pos, gap: gap * 2, end: end)
-            recursiveComb(pos: pos + gap, gap: gap * 2, end: end)
-
-            powerOfThree(pos: pos, gap: gap, end: end)
-        }
-
-        recursiveComb(pos: 0, gap: 1, end: engine.count)
+        i += gap
+      }
     }
+
+    // Ports `recursiveComb(array, pos, gap, end)`: recurse twice with `gap` doubled (at `pos`,
+    // `pos + gap`), covering every power-of-2 multiple of `gap` first, then — only once both
+    // return — fire `powerOfThree` at `gap` itself.
+    func recursiveComb(pos: Int, gap: Int, end: Int) {
+      guard pos + gap <= end else { return }
+
+      recursiveComb(pos: pos, gap: gap * 2, end: end)
+      recursiveComb(pos: pos + gap, gap: gap * 2, end: end)
+
+      powerOfThree(pos: pos, gap: gap, end: end)
+    }
+
+    recursiveComb(pos: 0, gap: 1, end: engine.count)
+  }
 }

@@ -55,46 +55,46 @@ import SortEngineKit
 /// trials, the large majority reordered at least one pair of equal-valued elements relative to
 /// their original input order.
 public struct ClassicThreeSmoothCombSort: SortAlgorithm {
-    public let id = AlgorithmID(rawValue: "classicthreesmoothcombsort")
-    public let metadata = AlgorithmMetadata(
-        displayName: "Classic 3-Smooth Comb Sort",
-        category: .exchange,
-        sizeRange: 16...256,
-        stable: false,
-        timeComplexity: ComplexityBounds(
-            best: "O(n log^2 n)", average: "O(n log^2 n)", worst: "O(n log^2 n)"),
-        spaceComplexity: "O(1)",
-        iconName: "point.3.filled.connected.trianglepath.dotted"
-    )
+  public let id = AlgorithmID(rawValue: "classicthreesmoothcombsort")
+  public let metadata = AlgorithmMetadata(
+    displayName: "Classic 3-Smooth Comb Sort",
+    category: .exchange,
+    sizeRange: 16...256,
+    stable: false,
+    timeComplexity: ComplexityBounds(
+      best: "O(n log^2 n)", average: "O(n log^2 n)", worst: "O(n log^2 n)"),
+    spaceComplexity: "O(1)",
+    iconName: "point.3.filled.connected.trianglepath.dotted"
+  )
 
-    public init() {}
+  public init() {}
 
-    public func record(into engine: inout RecordingEngine) {
-        guard engine.count > 1 else { return }
-        let length = engine.count
+  public func record(into engine: inout RecordingEngine) {
+    guard engine.count > 1 else { return }
+    let length = engine.count
 
-        // `n = 2^a * 3^b` for some `a, b >= 0`, mirroring ArrayV's repeated-division structure
-        // exactly: strip factors of 6, then 3, then 2, and check whether `1` is all that remains.
-        func is3Smooth(_ n: Int) -> Bool {
-            var n = n
-            while n % 6 == 0 { n /= 6 }
-            while n % 3 == 0 { n /= 3 }
-            while n % 2 == 0 { n /= 2 }
-            return n == 1
-        }
-
-        var g = length - 1
-        while g > 0 {
-            if is3Smooth(g) {
-                var i = g
-                while i < length {
-                    if engine.compare(i - g, i, by: (>)) {
-                        engine.swap(i - g, i)
-                    }
-                    i += 1
-                }
-            }
-            g -= 1
-        }
+    // `n = 2^a * 3^b` for some `a, b >= 0`, mirroring ArrayV's repeated-division structure
+    // exactly: strip factors of 6, then 3, then 2, and check whether `1` is all that remains.
+    func is3Smooth(_ n: Int) -> Bool {
+      var n = n
+      while n % 6 == 0 { n /= 6 }
+      while n % 3 == 0 { n /= 3 }
+      while n % 2 == 0 { n /= 2 }
+      return n == 1
     }
+
+    var g = length - 1
+    while g > 0 {
+      if is3Smooth(g) {
+        var i = g
+        while i < length {
+          if engine.compare(i - g, i, by: (>)) {
+            engine.swap(i - g, i)
+          }
+          i += 1
+        }
+      }
+      g -= 1
+    }
+  }
 }

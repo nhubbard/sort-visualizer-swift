@@ -115,47 +115,47 @@ import SortEngineKit
 /// `256` would roughly 8x that (the cubic growth measured above), so `128` errs toward the smaller,
 /// already-accepted magnitude for a "deliberately slow" entry, per the batch's own guidance.
 public struct BadSort: SortAlgorithm {
-    public let id = AlgorithmID(rawValue: "badsort")
-    public let metadata = AlgorithmMetadata(
-        displayName: "Bad Sort",
-        category: .selection,
-        sizeRange: 16...128,
-        stable: false,
-        timeComplexity: ComplexityBounds(
-            best: "O(n^2)", average: "O(n^2 log n)", worst: "O(n^3)"),
-        spaceComplexity: "O(1)",
-        iconName: "hand.thumbsdown.fill"
-    )
+  public let id = AlgorithmID(rawValue: "badsort")
+  public let metadata = AlgorithmMetadata(
+    displayName: "Bad Sort",
+    category: .selection,
+    sizeRange: 16...128,
+    stable: false,
+    timeComplexity: ComplexityBounds(
+      best: "O(n^2)", average: "O(n^2 log n)", worst: "O(n^3)"),
+    spaceComplexity: "O(1)",
+    iconName: "hand.thumbsdown.fill"
+  )
 
-    public init() {}
+  public init() {}
 
-    public func record(into engine: inout RecordingEngine) {
-        let n = engine.count
-        guard n > 1 else { return }
+  public func record(into engine: inout RecordingEngine) {
+    let n = engine.count
+    guard n > 1 else { return }
 
-        for i in 0..<n {
-            var shortest = i
-            var j = i
-            while j < n {
-                var isShortest = true
-                var k = j + 1
-                while k < n {
-                    // Reads.compareValues(array[j], array[k]) == 1 — strict greater-than, both
-                    // live indices (see the doc comment above for why this still goes through
-                    // `engine.compare` despite ArrayV routing it through `compareValues`).
-                    if engine.compare(j, k, by: (>)) {
-                        isShortest = false
-                        break
-                    }
-                    k += 1
-                }
-                if isShortest {
-                    shortest = j
-                    break
-                }
-                j += 1
-            }
-            engine.swap(i, shortest)
+    for i in 0..<n {
+      var shortest = i
+      var j = i
+      while j < n {
+        var isShortest = true
+        var k = j + 1
+        while k < n {
+          // Reads.compareValues(array[j], array[k]) == 1 — strict greater-than, both
+          // live indices (see the doc comment above for why this still goes through
+          // `engine.compare` despite ArrayV routing it through `compareValues`).
+          if engine.compare(j, k, by: (>)) {
+            isShortest = false
+            break
+          }
+          k += 1
         }
+        if isShortest {
+          shortest = j
+          break
+        }
+        j += 1
+      }
+      engine.swap(i, shortest)
     }
+  }
 }

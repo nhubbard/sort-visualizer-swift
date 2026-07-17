@@ -7,5 +7,5 @@ import AppIntents
 /// both sides are required for the Shortcuts app to actually discover intents declared in a
 /// framework rather than the main app module.
 public struct IntentsKitPackage: AppIntentsPackage {
-    public init() {}
+  public init() {}
 }

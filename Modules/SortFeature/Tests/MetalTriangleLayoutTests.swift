@@ -1,4 +1,5 @@
 import Testing
+
 @testable import SortFeature
 
 /// `DisparityCircleMetalLayout`/`SpiralMetalLayout` are the two wedge layouts with a non-identity
@@ -10,28 +11,28 @@ import Testing
 /// `MetalShapeLayoutTests` applies to `PixelMeshMetalLayout`/`HoopStackMetalLayout`.
 @Suite
 struct MetalTriangleLayoutTests {
-    @Test(arguments: [2, 3, 4, 5, 10, 100])
-    func disparityCircleSlotMappingCoversExactlyItsTwoDependencies(count: Int) {
-        assertWedgeSlotMapping(DisparityCircleMetalLayout.slots, count: count)
-    }
+  @Test(arguments: [2, 3, 4, 5, 10, 100])
+  func disparityCircleSlotMappingCoversExactlyItsTwoDependencies(count: Int) {
+    assertWedgeSlotMapping(DisparityCircleMetalLayout.slots, count: count)
+  }
 
-    @Test(arguments: [2, 3, 4, 5, 10, 100])
-    func spiralSlotMappingCoversExactlyItsTwoDependencies(count: Int) {
-        assertWedgeSlotMapping(SpiralMetalLayout.slots, count: count)
-    }
+  @Test(arguments: [2, 3, 4, 5, 10, 100])
+  func spiralSlotMappingCoversExactlyItsTwoDependencies(count: Int) {
+    assertWedgeSlotMapping(SpiralMetalLayout.slots, count: count)
+  }
 
-    @Test(arguments: [2, 3, 4, 5, 10, 100])
-    func colorCircleSlotMappingStaysIdentity(count: Int) {
-        // Confirms the doc-comment claim directly: ColorCircle's geometry never depends on a
-        // neighbor's value, so it must NOT override the default identity mapping.
-        for index in 0..<count {
-            #expect(ColorCircleMetalLayout.slots(forIndex: index, count: count) == [index])
-        }
+  @Test(arguments: [2, 3, 4, 5, 10, 100])
+  func colorCircleSlotMappingStaysIdentity(count: Int) {
+    // Confirms the doc-comment claim directly: ColorCircle's geometry never depends on a
+    // neighbor's value, so it must NOT override the default identity mapping.
+    for index in 0..<count {
+      #expect(ColorCircleMetalLayout.slots(forIndex: index, count: count) == [index])
     }
+  }
 
-    private func assertWedgeSlotMapping(_ slots: (Int, Int) -> [Int], count: Int) {
-        for index in 0..<count {
-            #expect(slots(index, count) == [index, (index + 1) % count])
-        }
+  private func assertWedgeSlotMapping(_ slots: (Int, Int) -> [Int], count: Int) {
+    for index in 0..<count {
+      #expect(slots(index, count) == [index, (index + 1) % count])
     }
+  }
 }

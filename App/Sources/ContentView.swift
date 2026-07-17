@@ -19,344 +19,358 @@ import SwiftUI
 /// user's own tap). A real content column gets that behavior for free from stock split-view
 /// navigation.
 struct ContentView: View {
-    // `SortCoordinator.shared`, not local `@State` — App Intents (`RunSortIntent`/
-    // `RunAutomationIntent`) need to drive this same selection from outside the view tree, exactly
-    // the way Showcase mode (below) already drives it through a manual-tap-equivalent path.
-    @Bindable private var coordinator = SortCoordinator.shared
-    @Environment(AppSettings.self) private var settings
-    // Search text is deliberately not persisted — it's a one-off filter for the current session,
-    // not a setting.
-    @State private var searchText = ""
+  // `SortCoordinator.shared`, not local `@State` — App Intents (`RunSortIntent`/
+  // `RunAutomationIntent`) need to drive this same selection from outside the view tree, exactly
+  // the way Showcase mode (below) already drives it through a manual-tap-equivalent path.
+  @Bindable private var coordinator = SortCoordinator.shared
+  @Environment(AppSettings.self) private var settings
+  // Search text is deliberately not persisted — it's a one-off filter for the current session,
+  // not a setting.
+  @State private var searchText = ""
 
-    // Showcase mode: `nil` means idle. Running drives `selection` through every registered
-    // algorithm in turn via the exact same sidebar-navigation path a manual tap would — see
-    // `ScrollingSortView`'s `showcaseCompletion` — rather than a separate `SortSession` bypassing
-    // what's actually on screen (the bug this replaced).
-    @State private var showcaseIndex: Int?
-    @State private var showcaseAlgorithmIDs: [AlgorithmID] = []
-    @State private var isShowingShowcaseConfirmation = false
+  // Showcase mode: `nil` means idle. Running drives `selection` through every registered
+  // algorithm in turn via the exact same sidebar-navigation path a manual tap would — see
+  // `ScrollingSortView`'s `showcaseCompletion` — rather than a separate `SortSession` bypassing
+  // what's actually on screen (the bug this replaced).
+  @State private var showcaseIndex: Int?
+  @State private var showcaseAlgorithmIDs: [AlgorithmID] = []
+  @State private var isShowingShowcaseConfirmation = false
 
-    /// The sidebar's own selection. `.all` is synthetic — `AlgorithmCategory` alone has no way to
-    /// say "show every algorithm regardless of category," which the content column needs as its
-    /// default so cross-category search (today's behavior, and still expected) isn't lost just
-    /// because algorithms are now grouped behind a category pick.
-    private enum SidebarCategory: Hashable, Identifiable {
-        case all
-        case category(AlgorithmCategory)
-        var id: Self { self }
+  /// The sidebar's own selection. `.all` is synthetic — `AlgorithmCategory` alone has no way to
+  /// say "show every algorithm regardless of category," which the content column needs as its
+  /// default so cross-category search (today's behavior, and still expected) isn't lost just
+  /// because algorithms are now grouped behind a category pick.
+  private enum SidebarCategory: Hashable, Identifiable {
+    case all
+    case category(AlgorithmCategory)
+    var id: Self { self }
+  }
+
+  @State private var selectedSidebarCategory: SidebarCategory? = .all
+
+  var body: some View {
+    NavigationSplitView {
+      categorySidebar
+    } content: {
+      algorithmContent
+    } detail: {
+      detailContent
     }
-
-    @State private var selectedSidebarCategory: SidebarCategory? = .all
-
-    var body: some View {
-        NavigationSplitView {
-            categorySidebar
-        } content: {
-            algorithmContent
-        } detail: {
-            detailContent
-        }
-        // Lives on the whole split view, not a specific column — it's just `@State` plus a
-        // modifier, so it doesn't need to share a column with whatever button triggers it.
-        .confirmationDialog(
-            "Start Showcase?", isPresented: $isShowingShowcaseConfirmation, titleVisibility: .visible
-        ) {
-            Button("Start Showcase") { startShowcase() }
-                .accessibilityIdentifier("showcaseConfirmButton")
-        } message: {
-            Text("""
-            Runs every algorithm once, in order, with the current visualizer. The visualizer \
-            can still be changed with ⌘⇧V, but other controls are locked until it finishes.
-            """)
-        }
-        .sheet(isPresented: $coordinator.isSettingsRequested) {
-            NavigationStack {
-                SettingsView()
-                    .toolbar {
-                        ToolbarItem(placement: .cancellationAction) {
-                            Button { coordinator.isSettingsRequested = false }
-                          label: {
-                            Text("Done").fixedSize(horizontal: true, vertical: false)
-                          }
-                            .frame(width: 48)
-                            .flexibleButtonSizingIfAvailable()
-                        }
-                    }
+    // Lives on the whole split view, not a specific column — it's just `@State` plus a
+    // modifier, so it doesn't need to share a column with whatever button triggers it.
+    .confirmationDialog(
+      "Start Showcase?", isPresented: $isShowingShowcaseConfirmation, titleVisibility: .visible
+    ) {
+      Button("Start Showcase") { startShowcase() }
+        .accessibilityIdentifier("showcaseConfirmButton")
+    } message: {
+      Text(
+        """
+        Runs every algorithm once, in order, with the current visualizer. The visualizer \
+        can still be changed with ⌘⇧V, but other controls are locked until it finishes.
+        """)
+    }
+    .sheet(isPresented: $coordinator.isSettingsRequested) {
+      NavigationStack {
+        SettingsView()
+          .toolbar {
+            ToolbarItem(placement: .cancellationAction) {
+              Button {
+                coordinator.isSettingsRequested = false
+              } label: {
+                Text("Done").fixedSize(horizontal: true, vertical: false)
+              }
+              .frame(width: 48)
+              .flexibleButtonSizingIfAvailable()
             }
-        }
-        // Keeps the content column showing the right category when `selectedAlgorithmID` changes
-        // from outside a manual category-then-algorithm tap (Showcase mode, `RunSortIntent`) — the
-        // same class of case a manual tap already handles for free just by being inside whichever
-        // category is currently selected.
-        .onChange(of: coordinator.selectedAlgorithmID) { _, newValue in
-            syncSidebarCategory(for: newValue)
-        }
+          }
+      }
     }
+    // Keeps the content column showing the right category when `selectedAlgorithmID` changes
+    // from outside a manual category-then-algorithm tap (Showcase mode, `RunSortIntent`) — the
+    // same class of case a manual tap already handles for free just by being inside whichever
+    // category is currently selected.
+    .onChange(of: coordinator.selectedAlgorithmID) { _, newValue in
+      syncSidebarCategory(for: newValue)
+    }
+  }
 
-    private var categorySidebar: some View {
-        List(selection: $selectedSidebarCategory) {
-            NavigationLink(value: SidebarCategory.all) {
-                Label("All Algorithms", systemImage: "square.grid.2x2")
+  private var categorySidebar: some View {
+    List(selection: $selectedSidebarCategory) {
+      NavigationLink(value: SidebarCategory.all) {
+        Label("All Algorithms", systemImage: "square.grid.2x2")
+      }
+      .accessibilityIdentifier("sidebarCategory.all")
+
+      Section("Categories") {
+        ForEach(AlgorithmCategory.allCases) { category in
+          NavigationLink(value: SidebarCategory.category(category)) {
+            Label(category.displayName, systemImage: "folder")
+          }
+          .accessibilityIdentifier("sidebarCategory.\(category.rawValue)")
+        }
+      }
+    }
+    .navigationTitle("Sort Symphony v2")
+    // Blocks manual category switching while Showcase drives `selection` itself — otherwise a
+    // stray tap here would race the automated advance below.
+    .disabled(showcaseIndex != nil)
+  }
+
+  private var algorithmContent: some View {
+    List(selection: $coordinator.selectedAlgorithmID) {
+      ForEach(contentAlgorithms, id: \.id) { algorithm in
+        NavigationLink(value: algorithm.id) {
+          CustomIconLabel(
+            text: algorithm.metadata.displayName,
+            iconName: algorithm.metadata.iconName)
+        }
+        .accessibilityIdentifier("algorithmLink.\(algorithm.id.rawValue)")
+        .contextMenu {
+          Button("Run Size Sweep") {
+            Task {
+              await SortCoordinator.shared.runAutomation(
+                algorithm: algorithm, automationID: .sizeSweep)
             }
-            .accessibilityIdentifier("sidebarCategory.all")
-
-            Section("Categories") {
-                ForEach(AlgorithmCategory.allCases) { category in
-                    NavigationLink(value: SidebarCategory.category(category)) {
-                        Label(category.displayName, systemImage: "folder")
-                    }
-                    .accessibilityIdentifier("sidebarCategory.\(category.rawValue)")
-                }
+          }
+          Button("Run Max Size Only") {
+            Task {
+              await SortCoordinator.shared.runAutomation(
+                algorithm: algorithm, automationID: .maxSizeOnly)
             }
+          }
         }
-        .navigationTitle("Sort Symphony v2")
-        // Blocks manual category switching while Showcase drives `selection` itself — otherwise a
-        // stray tap here would race the automated advance below.
-        .disabled(showcaseIndex != nil)
+      }
     }
+    // Lets UI tests target this specific list once there are two on screen (the category
+    // sidebar is the other) — see `App/UITests/SidebarNavigation.swift`.
+    .accessibilityIdentifier("algorithmContentList")
+    .searchable(text: $searchText, prompt: "Search Algorithms")
+    .disabled(showcaseIndex != nil)
+    .navigationTitle(contentTitle)
+  }
 
-    private var algorithmContent: some View {
-        List(selection: $coordinator.selectedAlgorithmID) {
-            ForEach(contentAlgorithms, id: \.id) { algorithm in
-                NavigationLink(value: algorithm.id) {
-                    CustomIconLabel(
-                        text: algorithm.metadata.displayName,
-                        iconName: algorithm.metadata.iconName)
-                }
-                .accessibilityIdentifier("algorithmLink.\(algorithm.id.rawValue)")
-                .contextMenu {
-                    Button("Run Size Sweep") {
-                        Task { await SortCoordinator.shared.runAutomation(algorithm: algorithm, automationID: .sizeSweep) }
-                    }
-                    Button("Run Max Size Only") {
-                        Task { await SortCoordinator.shared.runAutomation(algorithm: algorithm, automationID: .maxSizeOnly) }
-                    }
-                }
-            }
-        }
-        // Lets UI tests target this specific list once there are two on screen (the category
-        // sidebar is the other) — see `App/UITests/SidebarNavigation.swift`.
-        .accessibilityIdentifier("algorithmContentList")
-        .searchable(text: $searchText, prompt: "Search Algorithms")
-        .disabled(showcaseIndex != nil)
-        .navigationTitle(contentTitle)
+  private var contentTitle: String {
+    switch selectedSidebarCategory {
+    case .none, .some(.all): "All Algorithms"
+    case .some(.category(let category)): category.displayName
     }
+  }
 
-    private var contentTitle: String {
-        switch selectedSidebarCategory {
-        case .none, .some(.all): "All Algorithms"
-        case .some(.category(let category)): category.displayName
-        }
+  private var contentAlgorithms: [any SortAlgorithm] {
+    let base: [any SortAlgorithm]
+    switch selectedSidebarCategory {
+    case .none, .some(.all):
+      // Same order Showcase mode itself uses — alphabetical, not registration order.
+      base = AlgorithmRegistry.shared.algorithms.sorted {
+        $0.metadata.displayName < $1.metadata.displayName
+      }
+    case .some(.category(let category)):
+      base = AlgorithmRegistry.shared.algorithms(in: category)
     }
+    guard !searchText.isEmpty else { return base }
+    return base.filter { $0.metadata.displayName.localizedCaseInsensitiveContains(searchText) }
+  }
 
-    private var contentAlgorithms: [any SortAlgorithm] {
-        let base: [any SortAlgorithm]
-        switch selectedSidebarCategory {
-        case .none, .some(.all):
-            // Same order Showcase mode itself uses — alphabetical, not registration order.
-            base = AlgorithmRegistry.shared.algorithms.sorted { $0.metadata.displayName < $1.metadata.displayName }
-        case .some(.category(let category)):
-            base = AlgorithmRegistry.shared.algorithms(in: category)
-        }
-        guard !searchText.isEmpty else { return base }
-        return base.filter { $0.metadata.displayName.localizedCaseInsensitiveContains(searchText) }
+  /// Moves the sidebar to whichever category actually contains `algorithmID`, but only when it
+  /// isn't already showing it — `.all` always contains it, and re-assigning the same
+  /// `.category(_)` back to itself would be a harmless but pointless extra write.
+  private func syncSidebarCategory(for algorithmID: AlgorithmID?) {
+    guard let algorithmID, let algorithm = AlgorithmRegistry.shared.algorithm(id: algorithmID)
+    else { return }
+    switch selectedSidebarCategory {
+    case .none, .some(.all):
+      return
+    case .some(.category(let current)) where current == algorithm.metadata.category:
+      return
+    default:
+      selectedSidebarCategory = .category(algorithm.metadata.category)
     }
+  }
 
-    /// Moves the sidebar to whichever category actually contains `algorithmID`, but only when it
-    /// isn't already showing it — `.all` always contains it, and re-assigning the same
-    /// `.category(_)` back to itself would be a harmless but pointless extra write.
-    private func syncSidebarCategory(for algorithmID: AlgorithmID?) {
-        guard let algorithmID, let algorithm = AlgorithmRegistry.shared.algorithm(id: algorithmID) else { return }
-        switch selectedSidebarCategory {
-        case .none, .some(.all):
-            return
-        case .some(.category(let current)) where current == algorithm.metadata.category:
-            return
-        default:
-            selectedSidebarCategory = .category(algorithm.metadata.category)
-        }
+  // Split out of `body` (along with `detailContent` below) — inlined, these pushed the
+  // surrounding `ViewBuilder` expression complex enough that the type checker started timing
+  // out and misattributing the resulting error to an unrelated, unchanged line.
+  private var showcaseToolbarButton: some View {
+    Button {
+      if showcaseIndex == nil {
+        isShowingShowcaseConfirmation = true
+      } else {
+        stopShowcase()
+      }
+    } label: {
+      Image(systemName: showcaseIndex == nil ? "sparkles.tv.fill" : "stop.fill")
     }
+    .buttonBorderShape(.circle)
+    .frame(width: 36, height: 24)
+    .accessibilityIdentifier("showcaseButton")
+  }
 
-    // Split out of `body` (along with `detailContent` below) — inlined, these pushed the
-    // surrounding `ViewBuilder` expression complex enough that the type checker started timing
-    // out and misattributing the resulting error to an unrelated, unchanged line.
-    private var showcaseToolbarButton: some View {
-        Button {
-            if showcaseIndex == nil {
-                isShowingShowcaseConfirmation = true
-            } else {
-                stopShowcase()
-            }
-        } label: {
-            Image(systemName: showcaseIndex == nil ? "sparkles.tv.fill" : "stop.fill")
-        }
-        .buttonBorderShape(.circle)
-        .frame(width: 36, height: 24)
-        .accessibilityIdentifier("showcaseButton")
+  private var settingsToolbarButton: some View {
+    Button {
+      coordinator.isSettingsRequested = true
+    } label: {
+      Image(systemName: "gearshape")
     }
+    .buttonBorderShape(.circle)
+    .frame(width: 36, height: 24)
+    .accessibilityIdentifier("settingsButton")
+  }
 
-    private var settingsToolbarButton: some View {
-        Button {
-            coordinator.isSettingsRequested = true
-        } label: {
-            Image(systemName: "gearshape")
-        }
-        .buttonBorderShape(.circle)
-        .frame(width: 36, height: 24)
-        .accessibilityIdentifier("settingsButton")
-    }
+  private var showcaseCompletionHandler: (() -> Void)? {
+    guard showcaseIndex != nil else { return nil }
+    return advanceShowcase
+  }
 
-    private var showcaseCompletionHandler: (() -> Void)? {
-        guard showcaseIndex != nil else { return nil }
-        return advanceShowcase
-    }
+  /// Distinct from `showcaseCompletionHandler` above: that one fires when the current
+  /// algorithm's pass finishes *on its own* (advance to the next one); this fires when the user
+  /// asks to stop early, from the "Stop" button embedded in `SortView`'s automation banner —
+  /// which `session.isAutomating` also shows during a Showcase pass (it's driven by the same
+  /// `SortSession.runAutomation(sizes:runsPerSize:)` machinery under the hood), but whose button
+  /// used to call `session.stopAutomation()`, a complete no-op here since Showcase never goes
+  /// through `SortSession.automationTask` (see `runShowcasePass()`'s own doc comment).
+  private var showcaseStopHandler: (() -> Void)? {
+    guard showcaseIndex != nil else { return nil }
+    return stopShowcase
+  }
 
-    /// Distinct from `showcaseCompletionHandler` above: that one fires when the current
-    /// algorithm's pass finishes *on its own* (advance to the next one); this fires when the user
-    /// asks to stop early, from the "Stop" button embedded in `SortView`'s automation banner —
-    /// which `session.isAutomating` also shows during a Showcase pass (it's driven by the same
-    /// `SortSession.runAutomation(sizes:runsPerSize:)` machinery under the hood), but whose button
-    /// used to call `session.stopAutomation()`, a complete no-op here since Showcase never goes
-    /// through `SortSession.automationTask` (see `runShowcasePass()`'s own doc comment).
-    private var showcaseStopHandler: (() -> Void)? {
-        guard showcaseIndex != nil else { return nil }
-        return stopShowcase
+  private var detailContent: some View {
+    Group {
+      if let selection = coordinator.selectedAlgorithmID,
+        let algorithm = AlgorithmRegistry.shared.algorithm(id: selection)
+      {
+        ScrollingSortView(
+          algorithm: algorithm, shuffle: effectiveShuffle(for: selection), arraySize: arraySize,
+          showcaseCompletion: showcaseCompletionHandler, showcaseStop: showcaseStopHandler
+        )
+        // Folds in `coordinator.runToken` (bumped on every intent-triggered run) alongside
+        // `selection` — a `RunSortIntent`/`RunAutomationIntent` re-running the *same*
+        // algorithm still needs a genuinely fresh `ScrollingSortView`/`SortSession`, not a
+        // silent no-op against one that already reached `.complete`.
+        .id("\(selection.rawValue)-\(coordinator.runToken)")
+      } else {
+        HomeView()
+      }
     }
+    .safeAreaInset(edge: .top) {
+      if showcaseIndex != nil {
+        showcaseBanner
+      }
+    }
+    // On the detail column, not the sidebar: the sidebar is narrow enough that two icon
+    // buttons plus its title collapse into an automatic overflow ("…") menu instead of
+    // showing directly — confirmed visually. Detail is the widest column and always has room
+    // at its trailing edge, which is also where these visually landed before this app had a
+    // NavigationSplitView at all.
+    .toolbar {
+      ToolbarItem(placement: .topBarTrailing) {
+        showcaseToolbarButton
+      }
+      ToolbarItem(placement: .topBarTrailing) {
+        settingsToolbarButton
+      }
+    }
+  }
 
-    private var detailContent: some View {
-        Group {
-            if let selection = coordinator.selectedAlgorithmID,
-               let algorithm = AlgorithmRegistry.shared.algorithm(id: selection) {
-                ScrollingSortView(
-                    algorithm: algorithm, shuffle: effectiveShuffle(for: selection), arraySize: arraySize,
-                    showcaseCompletion: showcaseCompletionHandler, showcaseStop: showcaseStopHandler
-                )
-                // Folds in `coordinator.runToken` (bumped on every intent-triggered run) alongside
-                // `selection` — a `RunSortIntent`/`RunAutomationIntent` re-running the *same*
-                // algorithm still needs a genuinely fresh `ScrollingSortView`/`SortSession`, not a
-                // silent no-op against one that already reached `.complete`.
-                .id("\(selection.rawValue)-\(coordinator.runToken)")
-            } else {
-                HomeView()
-            }
-        }
-        .safeAreaInset(edge: .top) {
-            if showcaseIndex != nil {
-                showcaseBanner
-            }
-        }
-        // On the detail column, not the sidebar: the sidebar is narrow enough that two icon
-        // buttons plus its title collapse into an automatic overflow ("…") menu instead of
-        // showing directly — confirmed visually. Detail is the widest column and always has room
-        // at its trailing edge, which is also where these visually landed before this app had a
-        // NavigationSplitView at all.
-        .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
-                showcaseToolbarButton
-            }
-            ToolbarItem(placement: .topBarTrailing) {
-                settingsToolbarButton
-            }
-        }
+  private var showcaseBanner: some View {
+    HStack(spacing: 8) {
+      ProgressView()
+        .controlSize(.small)
+      Text(showcaseProgressText)
+        .font(.caption)
+        .accessibilityIdentifier("showcaseProgressLabel")
+      Spacer()
     }
+    .padding(.horizontal)
+    .padding(.vertical, 6)
+    .background(.bar)
+  }
 
-    private var showcaseBanner: some View {
-        HStack(spacing: 8) {
-            ProgressView()
-                .controlSize(.small)
-            Text(showcaseProgressText)
-                .font(.caption)
-                .accessibilityIdentifier("showcaseProgressLabel")
-            Spacer()
-        }
-        .padding(.horizontal)
-        .padding(.vertical, 6)
-        .background(.bar)
+  private var showcaseProgressText: String {
+    guard let showcaseIndex,
+      let algorithm = AlgorithmRegistry.shared.algorithm(id: showcaseAlgorithmIDs[showcaseIndex])
+    else {
+      return "Showcase"
     }
+    return
+      "Showcase: \(algorithm.metadata.displayName) (\(showcaseIndex + 1)/\(showcaseAlgorithmIDs.count))"
+  }
 
-    private var showcaseProgressText: String {
-        guard let showcaseIndex,
-            let algorithm = AlgorithmRegistry.shared.algorithm(id: showcaseAlgorithmIDs[showcaseIndex])
-        else {
-            return "Showcase"
-        }
-        return "Showcase: \(algorithm.metadata.displayName) (\(showcaseIndex + 1)/\(showcaseAlgorithmIDs.count))"
-    }
+  /// Same order the content column itself uses (`AlgorithmRegistry.shared.algorithms` sorted by
+  /// `displayName` too) — alphabetical, not registration order.
+  private func startShowcase() {
+    showcaseAlgorithmIDs = AlgorithmRegistry.shared.algorithms
+      .sorted { $0.metadata.displayName < $1.metadata.displayName }
+      .map(\.id)
+    guard !showcaseAlgorithmIDs.isEmpty else { return }
+    showcaseIndex = 0
+    coordinator.selectedAlgorithmID = showcaseAlgorithmIDs[0]
+  }
 
-    /// Same order the content column itself uses (`AlgorithmRegistry.shared.algorithms` sorted by
-    /// `displayName` too) — alphabetical, not registration order.
-    private func startShowcase() {
-        showcaseAlgorithmIDs = AlgorithmRegistry.shared.algorithms
-            .sorted { $0.metadata.displayName < $1.metadata.displayName }
-            .map(\.id)
-        guard !showcaseAlgorithmIDs.isEmpty else { return }
-        showcaseIndex = 0
-        coordinator.selectedAlgorithmID = showcaseAlgorithmIDs[0]
+  /// `ScrollingSortView`'s `showcaseCompletion` callback — called once its current algorithm's
+  /// `runShowcasePass()` genuinely finishes. Moves `coordinator.selectedAlgorithmID` to the next
+  /// algorithm, which (via `detailContent`'s `.id(...)` above) tears down the finished view and
+  /// starts the next one fresh; past the last algorithm, ends the same way `stopShowcase()` does.
+  private func advanceShowcase() {
+    guard let showcaseIndex else { return }
+    let nextIndex = showcaseIndex + 1
+    guard nextIndex < showcaseAlgorithmIDs.count else {
+      stopShowcase()
+      return
     }
+    self.showcaseIndex = nextIndex
+    coordinator.selectedAlgorithmID = showcaseAlgorithmIDs[nextIndex]
+  }
 
-    /// `ScrollingSortView`'s `showcaseCompletion` callback — called once its current algorithm's
-    /// `runShowcasePass()` genuinely finishes. Moves `coordinator.selectedAlgorithmID` to the next
-    /// algorithm, which (via `detailContent`'s `.id(...)` above) tears down the finished view and
-    /// starts the next one fresh; past the last algorithm, ends the same way `stopShowcase()` does.
-    private func advanceShowcase() {
-        guard let showcaseIndex else { return }
-        let nextIndex = showcaseIndex + 1
-        guard nextIndex < showcaseAlgorithmIDs.count else {
-            stopShowcase()
-            return
-        }
-        self.showcaseIndex = nextIndex
-        coordinator.selectedAlgorithmID = showcaseAlgorithmIDs[nextIndex]
-    }
+  /// Also the target of a mid-run Stop tap. Clearing the selection (not leaving it on the
+  /// last-shown algorithm) is deliberate: it's what actually changes `detailContent`'s `.id(...)`,
+  /// which is what tears the view down and cancels its in-flight `runShowcasePass()` — SwiftUI's
+  /// `.task` only restarts on identity change, not on a plain property change, so anything short
+  /// of this risks a pass that keeps running invisibly after Stop is tapped.
+  private func stopShowcase() {
+    showcaseIndex = nil
+    coordinator.selectedAlgorithmID = nil
+  }
 
-    /// Also the target of a mid-run Stop tap. Clearing the selection (not leaving it on the
-    /// last-shown algorithm) is deliberate: it's what actually changes `detailContent`'s `.id(...)`,
-    /// which is what tears the view down and cancels its in-flight `runShowcasePass()` — SwiftUI's
-    /// `.task` only restarts on identity change, not on a plain property change, so anything short
-    /// of this risks a pass that keeps running invisibly after Stop is tapped.
-    private func stopShowcase() {
-        showcaseIndex = nil
-        coordinator.selectedAlgorithmID = nil
-    }
+  /// UI tests override this via the `UI_TEST_ARRAY_SIZE` launch environment variable (read in
+  /// `Sort2App.init()`) — `AppSettings.defaultArraySize`'s real default (256) is deliberately
+  /// large, and a quadratic/factorial algorithm at that size can take minutes to visually
+  /// finish, which is correct, pedagogically-honest behavior in the running app but impractical
+  /// for a UI test's timeout. Production launches never set that variable, so this is a no-op
+  /// outside of tests.
+  private var arraySize: Int {
+    AppSettings.shared.defaultArraySize
+  }
 
-    /// UI tests override this via the `UI_TEST_ARRAY_SIZE` launch environment variable (read in
-    /// `Sort2App.init()`) — `AppSettings.defaultArraySize`'s real default (256) is deliberately
-    /// large, and a quadratic/factorial algorithm at that size can take minutes to visually
-    /// finish, which is correct, pedagogically-honest behavior in the running app but impractical
-    /// for a UI test's timeout. Production launches never set that variable, so this is a no-op
-    /// outside of tests.
-    private var arraySize: Int {
-        AppSettings.shared.defaultArraySize
+  /// `AlgorithmRegistry`/`ShuffleRegistry` are populated synchronously in `Sort2App.init()`,
+  /// before this view can ever appear — a missing lookup here means the bundled resources are
+  /// broken, which should fail loudly in development rather than silently falling back.
+  ///
+  /// Checks `coordinator.pendingShuffleOverride(for:)` first — a `RunSortIntent` requesting a
+  /// specific shuffle for this one run. `shuffle` is a one-shot `SortSession`/`ScrollingSortView`
+  /// constructor argument, fixed for that session's whole lifetime, so this has to be resolved
+  /// here, before construction, rather than inside `ScrollingSortView.task` like the rest of a
+  /// pending intent action.
+  private func effectiveShuffle(for algorithmID: AlgorithmID) -> any ShuffleAlgorithm {
+    let shuffleID =
+      coordinator.pendingShuffleOverride(for: algorithmID) ?? AppSettings.shared.defaultShuffleID
+    guard let shuffle = ShuffleRegistry.shared.shuffle(id: shuffleID) else {
+      fatalError("Shuffles/\(shuffleID.rawValue).js failed to load")
     }
-
-    /// `AlgorithmRegistry`/`ShuffleRegistry` are populated synchronously in `Sort2App.init()`,
-    /// before this view can ever appear — a missing lookup here means the bundled resources are
-    /// broken, which should fail loudly in development rather than silently falling back.
-    ///
-    /// Checks `coordinator.pendingShuffleOverride(for:)` first — a `RunSortIntent` requesting a
-    /// specific shuffle for this one run. `shuffle` is a one-shot `SortSession`/`ScrollingSortView`
-    /// constructor argument, fixed for that session's whole lifetime, so this has to be resolved
-    /// here, before construction, rather than inside `ScrollingSortView.task` like the rest of a
-    /// pending intent action.
-    private func effectiveShuffle(for algorithmID: AlgorithmID) -> any ShuffleAlgorithm {
-        let shuffleID = coordinator.pendingShuffleOverride(for: algorithmID) ?? AppSettings.shared.defaultShuffleID
-        guard let shuffle = ShuffleRegistry.shared.shuffle(id: shuffleID) else {
-            fatalError("Shuffles/\(shuffleID.rawValue).js failed to load")
-        }
-        return shuffle
-    }
+    return shuffle
+  }
 }
 
-private extension View {
-    /// `.buttonSizing(.flexible)` is iOS 26+ only — the deployment target is iOS 18 (building
-    /// against the iOS 26 SDK, see `Module.deploymentTargets`), so anything older than 26 just
-    /// keeps the `.frame(width: 48)` this is paired with and skips this modifier entirely.
-    @ViewBuilder
-    func flexibleButtonSizingIfAvailable() -> some View {
-        if #available(iOS 26.0, *) {
-            buttonSizing(.flexible)
-        } else {
-            self
-        }
+extension View {
+  /// `.buttonSizing(.flexible)` is iOS 26+ only — the deployment target is iOS 18 (building
+  /// against the iOS 26 SDK, see `Module.deploymentTargets`), so anything older than 26 just
+  /// keeps the `.frame(width: 48)` this is paired with and skips this modifier entirely.
+  @ViewBuilder
+  fileprivate func flexibleButtonSizingIfAvailable() -> some View {
+    if #available(iOS 26.0, *) {
+      buttonSizing(.flexible)
+    } else {
+      self
     }
+  }
 }

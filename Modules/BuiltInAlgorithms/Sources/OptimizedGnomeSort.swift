@@ -9,30 +9,30 @@ import SortEngineKit
 /// expressed as repeated adjacent swaps rather than a shift-then-place, not Gnome Sort's usual
 /// single forward/backward pointer over the whole array.
 public struct OptimizedGnomeSort: SortAlgorithm {
-    public let id = AlgorithmID(rawValue: "optimizedgnomesort")
-    public let metadata = AlgorithmMetadata(
-        displayName: "Optimized Gnome Sort",
-        category: .exchange,
-        sizeRange: 16...256,
-        stable: true,
-        timeComplexity: ComplexityBounds(best: "O(n)", average: "O(n^2)", worst: "O(n^2)"),
-        spaceComplexity: "O(1)",
-        iconName: "figure.walk.motion"
-    )
-    public init() {}
+  public let id = AlgorithmID(rawValue: "optimizedgnomesort")
+  public let metadata = AlgorithmMetadata(
+    displayName: "Optimized Gnome Sort",
+    category: .exchange,
+    sizeRange: 16...256,
+    stable: true,
+    timeComplexity: ComplexityBounds(best: "O(n)", average: "O(n^2)", worst: "O(n^2)"),
+    spaceComplexity: "O(1)",
+    iconName: "figure.walk.motion"
+  )
+  public init() {}
 
-    public func record(into engine: inout RecordingEngine) {
-        let n = engine.count
-        guard n > 1 else { return }
+  public func record(into engine: inout RecordingEngine) {
+    let n = engine.count
+    guard n > 1 else { return }
 
-        for i in 1..<n {
-            var pos = i
-            // Strict `>` (not the default `>=`): ties never trigger a swap, matching ArrayV's
-            // `Reads.compareValues(...) == 1` and keeping the sort stable.
-            while pos > 0 && engine.compare(pos - 1, pos, by: (>)) {
-                engine.swap(pos - 1, pos)
-                pos -= 1
-            }
-        }
+    for i in 1..<n {
+      var pos = i
+      // Strict `>` (not the default `>=`): ties never trigger a swap, matching ArrayV's
+      // `Reads.compareValues(...) == 1` and keeping the sort stable.
+      while pos > 0 && engine.compare(pos - 1, pos, by: (>)) {
+        engine.swap(pos - 1, pos)
+        pos -= 1
+      }
     }
+  }
 }

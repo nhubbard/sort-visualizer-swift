@@ -28,59 +28,59 @@ import SwiftData
 /// optional); a model without one fails to sync at runtime, not at compile time.
 @Model
 public final class BigORecord {
-    public var algorithmID: String = ""
-    public var arraySize: Int = 0
-    public var compareCount: Int = 0
-    public var swapCount: Int = 0
-    public var mainWriteCount: Int = 0
-    public var auxWriteCount: Int = 0
-    public var reversalCount: Int = 0
-    public var recordedAt: Date = Date.distantPast
-    /// Distinct value count right after the shuffle, before the sort ran (`TapeHeader.uniqueValueCount`)
-    /// — nullable because records written before this field existed predate it, not because a real
-    /// run can't measure it. `BigOCorrelation` uses this to estimate Bingo sort's `m`, the one
-    /// declared-complexity variable that isn't a fixed function of `n` in this app.
-    public var uniqueValueCount: Int?
-    /// Wall-clock time to record the sort itself (`TapeHeader.recordingDuration`) — always present
-    /// going forward, `0` only for rows synced from before this field existed (an honest "not
-    /// measured" sentinel, matching `arraySize`'s own placeholder-default convention in this file,
-    /// not a real zero-duration run).
-    public var recordingDuration: TimeInterval = 0
-    /// Active wall-clock time spent actually playing this run back (`ReplayEngine
-    /// .elapsedPlaybackDuration` at genuine completion — excludes any time spent paused). `nil`
-    /// for rows from before this field existed, or for a run that never reached genuine completion
-    /// (crash, force-quit mid-replay) — not recorded in either case, not a real zero.
-    public var playbackDuration: TimeInterval?
-    /// The `ReplayEngine.speed` (operations/second) actually in effect while `playbackDuration` was
-    /// measured — `nil` in exactly the same cases `playbackDuration` is, since a duration alone
-    /// doesn't say how much work that pacing target was asked to get through.
-    public var playbackSpeed: Double?
+  public var algorithmID: String = ""
+  public var arraySize: Int = 0
+  public var compareCount: Int = 0
+  public var swapCount: Int = 0
+  public var mainWriteCount: Int = 0
+  public var auxWriteCount: Int = 0
+  public var reversalCount: Int = 0
+  public var recordedAt: Date = Date.distantPast
+  /// Distinct value count right after the shuffle, before the sort ran (`TapeHeader.uniqueValueCount`)
+  /// — nullable because records written before this field existed predate it, not because a real
+  /// run can't measure it. `BigOCorrelation` uses this to estimate Bingo sort's `m`, the one
+  /// declared-complexity variable that isn't a fixed function of `n` in this app.
+  public var uniqueValueCount: Int?
+  /// Wall-clock time to record the sort itself (`TapeHeader.recordingDuration`) — always present
+  /// going forward, `0` only for rows synced from before this field existed (an honest "not
+  /// measured" sentinel, matching `arraySize`'s own placeholder-default convention in this file,
+  /// not a real zero-duration run).
+  public var recordingDuration: TimeInterval = 0
+  /// Active wall-clock time spent actually playing this run back (`ReplayEngine
+  /// .elapsedPlaybackDuration` at genuine completion — excludes any time spent paused). `nil`
+  /// for rows from before this field existed, or for a run that never reached genuine completion
+  /// (crash, force-quit mid-replay) — not recorded in either case, not a real zero.
+  public var playbackDuration: TimeInterval?
+  /// The `ReplayEngine.speed` (operations/second) actually in effect while `playbackDuration` was
+  /// measured — `nil` in exactly the same cases `playbackDuration` is, since a duration alone
+  /// doesn't say how much work that pacing target was asked to get through.
+  public var playbackSpeed: Double?
 
-    public init(
-        algorithmID: String,
-        arraySize: Int,
-        compareCount: Int,
-        swapCount: Int,
-        mainWriteCount: Int,
-        auxWriteCount: Int,
-        reversalCount: Int,
-        recordedAt: Date,
-        uniqueValueCount: Int? = nil,
-        recordingDuration: TimeInterval = 0,
-        playbackDuration: TimeInterval? = nil,
-        playbackSpeed: Double? = nil
-    ) {
-        self.algorithmID = algorithmID
-        self.arraySize = arraySize
-        self.compareCount = compareCount
-        self.swapCount = swapCount
-        self.mainWriteCount = mainWriteCount
-        self.auxWriteCount = auxWriteCount
-        self.reversalCount = reversalCount
-        self.recordedAt = recordedAt
-        self.uniqueValueCount = uniqueValueCount
-        self.recordingDuration = recordingDuration
-        self.playbackDuration = playbackDuration
-        self.playbackSpeed = playbackSpeed
-    }
+  public init(
+    algorithmID: String,
+    arraySize: Int,
+    compareCount: Int,
+    swapCount: Int,
+    mainWriteCount: Int,
+    auxWriteCount: Int,
+    reversalCount: Int,
+    recordedAt: Date,
+    uniqueValueCount: Int? = nil,
+    recordingDuration: TimeInterval = 0,
+    playbackDuration: TimeInterval? = nil,
+    playbackSpeed: Double? = nil
+  ) {
+    self.algorithmID = algorithmID
+    self.arraySize = arraySize
+    self.compareCount = compareCount
+    self.swapCount = swapCount
+    self.mainWriteCount = mainWriteCount
+    self.auxWriteCount = auxWriteCount
+    self.reversalCount = reversalCount
+    self.recordedAt = recordedAt
+    self.uniqueValueCount = uniqueValueCount
+    self.recordingDuration = recordingDuration
+    self.playbackDuration = playbackDuration
+    self.playbackSpeed = playbackSpeed
+  }
 }

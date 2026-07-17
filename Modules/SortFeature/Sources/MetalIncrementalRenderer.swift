@@ -10,5 +10,5 @@ import MetalKit
 /// concrete renderer type is currently active.
 @MainActor
 protocol MetalIncrementalRenderer: IncrementalBarRenderer, MTKViewDelegate {
-    var onDrawableSizeChange: ((CGSize) -> Void)? { get set }
+  var onDrawableSizeChange: ((CGSize) -> Void)? { get set }
 }

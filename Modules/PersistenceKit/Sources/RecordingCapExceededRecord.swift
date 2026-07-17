@@ -16,32 +16,32 @@ import SwiftData
 /// default (or be optional); a model without one fails to sync at runtime, not at compile time.
 @Model
 public final class RecordingCapExceededRecord {
-    public var algorithmID: String = ""
-    public var arraySize: Int = 0
-    public var operationCap: Int = 0
-    public var compareCount: Int = 0
-    public var swapCount: Int = 0
-    public var mainWriteCount: Int = 0
-    public var auxWriteCount: Int = 0
-    public var recordedAt: Date = Date.distantPast
+  public var algorithmID: String = ""
+  public var arraySize: Int = 0
+  public var operationCap: Int = 0
+  public var compareCount: Int = 0
+  public var swapCount: Int = 0
+  public var mainWriteCount: Int = 0
+  public var auxWriteCount: Int = 0
+  public var recordedAt: Date = Date.distantPast
 
-    public init(
-        algorithmID: String,
-        arraySize: Int,
-        operationCap: Int,
-        compareCount: Int,
-        swapCount: Int,
-        mainWriteCount: Int,
-        auxWriteCount: Int,
-        recordedAt: Date
-    ) {
-        self.algorithmID = algorithmID
-        self.arraySize = arraySize
-        self.operationCap = operationCap
-        self.compareCount = compareCount
-        self.swapCount = swapCount
-        self.mainWriteCount = mainWriteCount
-        self.auxWriteCount = auxWriteCount
-        self.recordedAt = recordedAt
-    }
+  public init(
+    algorithmID: String,
+    arraySize: Int,
+    operationCap: Int,
+    compareCount: Int,
+    swapCount: Int,
+    mainWriteCount: Int,
+    auxWriteCount: Int,
+    recordedAt: Date
+  ) {
+    self.algorithmID = algorithmID
+    self.arraySize = arraySize
+    self.operationCap = operationCap
+    self.compareCount = compareCount
+    self.swapCount = swapCount
+    self.mainWriteCount = mainWriteCount
+    self.auxWriteCount = auxWriteCount
+    self.recordedAt = recordedAt
+  }
 }

@@ -8,30 +8,30 @@ import SettingsKit
 /// "Default" (see `SetArraySizeIntent`'s identical reasoning) so it doesn't read as "changes
 /// whatever's currently running."
 public struct SetShuffleIntent: AppIntent {
-    public static var title: LocalizedStringResource { "Set Default Shuffle" }
-    public static var description: IntentDescription {
-        IntentDescription(
-            "Changes the default shuffle Sort Symphony scrambles the array with — takes effect on the next run, not one already on screen.",
-            categoryName: "Sort Symphony",
-            searchKeywords: ["Shuffle", "Default Shuffle", "Scramble"])
-    }
+  public static var title: LocalizedStringResource { "Set Default Shuffle" }
+  public static var description: IntentDescription {
+    IntentDescription(
+      "Changes the default shuffle Sort Symphony scrambles the array with — takes effect on the next run, not one already on screen.",
+      categoryName: "Sort Symphony",
+      searchKeywords: ["Shuffle", "Default Shuffle", "Scramble"])
+  }
 
-    @Parameter(title: "Shuffle", description: "The default shuffle for future runs.")
-    public var shuffle: ShuffleEntity
+  @Parameter(title: "Shuffle", description: "The default shuffle for future runs.")
+  public var shuffle: ShuffleEntity
 
-    public static var parameterSummary: some ParameterSummary {
-        Summary("Set default shuffle to \(\.$shuffle)")
-    }
+  public static var parameterSummary: some ParameterSummary {
+    Summary("Set default shuffle to \(\.$shuffle)")
+  }
 
-    public init() {}
+  public init() {}
 
-    public init(shuffle: ShuffleEntity) {
-        self.shuffle = shuffle
-    }
+  public init(shuffle: ShuffleEntity) {
+    self.shuffle = shuffle
+  }
 
-    @MainActor
-    public func perform() async throws -> some IntentResult {
-        AppSettings.shared.defaultShuffleID = shuffle.shuffleID
-        return .result()
-    }
+  @MainActor
+  public func perform() async throws -> some IntentResult {
+    AppSettings.shared.defaultShuffleID = shuffle.shuffleID
+    return .result()
+  }
 }

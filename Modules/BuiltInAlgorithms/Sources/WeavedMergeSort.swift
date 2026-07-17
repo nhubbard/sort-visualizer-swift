@@ -34,91 +34,92 @@ import SortEngineKit
 /// randomized trials — see the correctness testing performed while porting this file — so even a
 /// hypothetical second call would be a redundant no-op, not a load-bearing fixup.)
 public struct WeavedMergeSort: SortAlgorithm {
-    public let id = AlgorithmID(rawValue: "weavedmergesort")
-    public let metadata = AlgorithmMetadata(
-        displayName: "Weaved Merge Sort",
-        category: .merge,
-        sizeRange: 16...256,
-        // The tie-break rule `cmp == 0 && low > high` decides which of two EQUAL values to place
-        // next based on the numeric value of their current strided *positions* in `array`, not on
-        // which one originally appeared first in the input. Because the interleaved residue/modulus
-        // splitting scatters an original run of equal values across many different strided
-        // sub-sequences (unlike a normal merge sort, where "left" and "right" runs are contiguous
-        // slices that already agree with original array order), this position-based tie-break does
-        // NOT reduce to "preserve original relative order" the way a normal stable merge's
-        // low-index-wins tie-break does. Verified empirically with tagged-duplicate input
-        // (index-tagged values sorted purely on an untagged key): equal-valued tags come out
-        // reordered relative to their original input order, so this is NOT a stable sort.
-        stable: false,
-        timeComplexity: ComplexityBounds(
-            best: "O(n log n)", average: "O(n log n)", worst: "O(n log n)"),
-        spaceComplexity: "O(n)",
-        iconName: "shuffle"
-    )
+  public let id = AlgorithmID(rawValue: "weavedmergesort")
+  public let metadata = AlgorithmMetadata(
+    displayName: "Weaved Merge Sort",
+    category: .merge,
+    sizeRange: 16...256,
+    // The tie-break rule `cmp == 0 && low > high` decides which of two EQUAL values to place
+    // next based on the numeric value of their current strided *positions* in `array`, not on
+    // which one originally appeared first in the input. Because the interleaved residue/modulus
+    // splitting scatters an original run of equal values across many different strided
+    // sub-sequences (unlike a normal merge sort, where "left" and "right" runs are contiguous
+    // slices that already agree with original array order), this position-based tie-break does
+    // NOT reduce to "preserve original relative order" the way a normal stable merge's
+    // low-index-wins tie-break does. Verified empirically with tagged-duplicate input
+    // (index-tagged values sorted purely on an untagged key): equal-valued tags come out
+    // reordered relative to their original input order, so this is NOT a stable sort.
+    stable: false,
+    timeComplexity: ComplexityBounds(
+      best: "O(n log n)", average: "O(n log n)", worst: "O(n log n)"),
+    spaceComplexity: "O(n)",
+    iconName: "shuffle"
+  )
 
-    public init() {}
+  public init() {}
 
-    public func record(into engine: inout RecordingEngine) {
-        let n = engine.count
-        guard n >= 2 else { return }
+  public func record(into engine: inout RecordingEngine) {
+    let n = engine.count
+    guard n >= 2 else { return }
 
-        let tempHandle = engine.createAuxArray(length: n)
-        // The real backing store for the scratch buffer — `writeAux` only feeds the tape/visualizer,
-        // it can't be read back, so the merge's actual working data lives here (mirroring how
-        // `BottomUpMergeSort`/`MergeSort` keep their own shadow arrays alongside the aux writes).
-        var tmp = engine.values
+    let tempHandle = engine.createAuxArray(length: n)
+    // The real backing store for the scratch buffer — `writeAux` only feeds the tape/visualizer,
+    // it can't be read back, so the merge's actual working data lives here (mirroring how
+    // `BottomUpMergeSort`/`MergeSort` keep their own shadow arrays alongside the aux writes).
+    var tmp = engine.values
 
-        func merge(_ residue: Int, _ modulus: Int) {
-            guard residue + modulus < n else { return }
+    func merge(_ residue: Int, _ modulus: Int) {
+      guard residue + modulus < n else { return }
 
-            var low = residue
-            var high = residue + modulus
-            let dmodulus = modulus << 1
+      var low = residue
+      var high = residue + modulus
+      let dmodulus = modulus << 1
 
-            merge(low, dmodulus)
-            merge(high, dmodulus)
+      merge(low, dmodulus)
+      merge(high, dmodulus)
 
-            var nxt = residue
-            while low < n && high < n {
-                let takeHigh = engine.values[low] > engine.values[high]
-                    || (engine.values[low] == engine.values[high] && low > high)
-                if takeHigh {
-                    tmp[nxt] = engine.values[high]
-                    engine.writeAux(tempHandle, at: nxt, value: engine.values[high])
-                    high += dmodulus
-                } else {
-                    tmp[nxt] = engine.values[low]
-                    engine.writeAux(tempHandle, at: nxt, value: engine.values[low])
-                    low += dmodulus
-                }
-                nxt += modulus
-            }
-
-            if low >= n {
-                while high < n {
-                    tmp[nxt] = engine.values[high]
-                    engine.writeAux(tempHandle, at: nxt, value: engine.values[high])
-                    nxt += modulus
-                    high += dmodulus
-                }
-            } else {
-                while low < n {
-                    tmp[nxt] = engine.values[low]
-                    engine.writeAux(tempHandle, at: nxt, value: engine.values[low])
-                    nxt += modulus
-                    low += dmodulus
-                }
-            }
-
-            var i = residue
-            while i < n {
-                engine.setValue(i, tmp[i])
-                i += modulus
-            }
+      var nxt = residue
+      while low < n && high < n {
+        let takeHigh =
+          engine.values[low] > engine.values[high]
+          || (engine.values[low] == engine.values[high] && low > high)
+        if takeHigh {
+          tmp[nxt] = engine.values[high]
+          engine.writeAux(tempHandle, at: nxt, value: engine.values[high])
+          high += dmodulus
+        } else {
+          tmp[nxt] = engine.values[low]
+          engine.writeAux(tempHandle, at: nxt, value: engine.values[low])
+          low += dmodulus
         }
+        nxt += modulus
+      }
 
-        merge(0, 1)
+      if low >= n {
+        while high < n {
+          tmp[nxt] = engine.values[high]
+          engine.writeAux(tempHandle, at: nxt, value: engine.values[high])
+          nxt += modulus
+          high += dmodulus
+        }
+      } else {
+        while low < n {
+          tmp[nxt] = engine.values[low]
+          engine.writeAux(tempHandle, at: nxt, value: engine.values[low])
+          nxt += modulus
+          low += dmodulus
+        }
+      }
 
-        engine.deleteAuxArray(tempHandle)
+      var i = residue
+      while i < n {
+        engine.setValue(i, tmp[i])
+        i += modulus
+      }
     }
+
+    merge(0, 1)
+
+    engine.deleteAuxArray(tempHandle)
+  }
 }

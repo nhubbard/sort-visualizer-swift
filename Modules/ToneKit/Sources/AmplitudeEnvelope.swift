@@ -41,12 +41,12 @@ import Synchronization
 
 /// To allow a node to be gated open/closed — matches AudioKitEX's own protocol shape exactly.
 public protocol Gated: AnyObject {
-    func openGate()
-    func closeGate()
+  func openGate()
+  func closeGate()
 }
 
 enum EnvelopePhase: Sendable, Equatable {
-    case idle, attack, decay, release
+  case idle, attack, decay, release
 }
 
 /// Triggerable attack/decay/sustain/release envelope, applied to a wrapped `Oscillator`. Owns the
@@ -56,139 +56,140 @@ enum EnvelopePhase: Sendable, Equatable {
 /// to give the oscillator its own node and have this one process that node's output, short of a
 /// custom Audio Unit. One real voice, one real node — matching what `AudioService` actually needs.
 public final class AmplitudeEnvelope: Node, Gated {
-    struct State: Sendable {
-        var phase: EnvelopePhase = .idle
-        var gateOpen = false
-        var gain: Float = 0
-        var attackDuration: Float
-        var decayDuration: Float
-        var sustainLevel: Float
-        var releaseDuration: Float
-    }
+  struct State: Sendable {
+    var phase: EnvelopePhase = .idle
+    var gateOpen = false
+    var gain: Float = 0
+    var attackDuration: Float
+    var decayDuration: Float
+    var sustainLevel: Float
+    var releaseDuration: Float
+  }
 
-    /// `Mutex` is itself a noncopyable type (SE-0433) — it can't be captured directly by an
-    /// escaping closure, only a class *holding* one can (a class instance is an ordinary ARC
-    /// reference, copyable regardless of what noncopyable value lives inside it). This box is that
-    /// class: it's what the render closure below actually captures, not the bare `Mutex`.
-    private final class StateBox: Sendable {
-        let mutex: Mutex<State>
-        init(_ state: State) { mutex = Mutex(state) }
-    }
+  /// `Mutex` is itself a noncopyable type (SE-0433) — it can't be captured directly by an
+  /// escaping closure, only a class *holding* one can (a class instance is an ordinary ARC
+  /// reference, copyable regardless of what noncopyable value lives inside it). This box is that
+  /// class: it's what the render closure below actually captures, not the bare `Mutex`.
+  private final class StateBox: Sendable {
+    let mutex: Mutex<State>
+    init(_ state: State) { mutex = Mutex(state) }
+  }
 
-    private let stateBox: StateBox
-    public let avAudioNode: AVAudioNode
-    public let outputFormat: AVAudioFormat
+  private let stateBox: StateBox
+  public let avAudioNode: AVAudioNode
+  public let outputFormat: AVAudioFormat
 
-    public init(
-        _ input: Oscillator,
-        attackDuration: Float = 0.1,
-        decayDuration: Float = 0.1,
-        sustainLevel: Float = 1.0,
-        releaseDuration: Float = 0.1,
-        format: AVAudioFormat = AVAudioFormat(standardFormatWithSampleRate: 44100, channels: 1)!
-    ) {
-        let stateBox = StateBox(State(
-            attackDuration: attackDuration,
-            decayDuration: decayDuration,
-            sustainLevel: sustainLevel,
-            releaseDuration: releaseDuration
-        ))
-        self.stateBox = stateBox
-        self.outputFormat = format
+  public init(
+    _ input: Oscillator,
+    attackDuration: Float = 0.1,
+    decayDuration: Float = 0.1,
+    sustainLevel: Float = 1.0,
+    releaseDuration: Float = 0.1,
+    format: AVAudioFormat = AVAudioFormat(standardFormatWithSampleRate: 44100, channels: 1)!
+  ) {
+    let stateBox = StateBox(
+      State(
+        attackDuration: attackDuration,
+        decayDuration: decayDuration,
+        sustainLevel: sustainLevel,
+        releaseDuration: releaseDuration
+      ))
+    self.stateBox = stateBox
+    self.outputFormat = format
 
-        // Captures `input`/`stateBox`/`sampleRate` directly, not `self` — all three captured
-        // values are `Sendable` (`Oscillator` and `StateBox` are both `Mutex`-backed classes),
-        // which is what this `@Sendable` render closure actually needs; `AmplitudeEnvelope`
-        // holding a non-Sendable `AVAudioNode` never has to become `Sendable` itself as a result.
-        let oscillator = input
-        let sampleRate = format.sampleRate
-        self.avAudioNode = AVAudioSourceNode(format: format) { _, _, frameCount, audioBufferList in
-            let buffers = UnsafeMutableAudioBufferListPointer(audioBufferList)
-            guard let raw = buffers[0].mData else { return noErr }
-            let outBuffer = UnsafeMutableBufferPointer<Float>(
-                start: raw.assumingMemoryBound(to: Float.self),
-                count: Int(frameCount)
-            )
-            oscillator.fill(outBuffer, sampleRate: sampleRate)
-            stateBox.mutex.withLock { s in
-                for i in outBuffer.indices {
-                    s.gain = Self.nextGain(
-                        currentGain: s.gain,
-                        phase: &s.phase,
-                        attackDuration: s.attackDuration,
-                        decayDuration: s.decayDuration,
-                        sustainLevel: s.sustainLevel,
-                        releaseDuration: s.releaseDuration,
-                        sampleRate: sampleRate
-                    )
-                    outBuffer[i] *= s.gain
-                }
-            }
-            return noErr
+    // Captures `input`/`stateBox`/`sampleRate` directly, not `self` — all three captured
+    // values are `Sendable` (`Oscillator` and `StateBox` are both `Mutex`-backed classes),
+    // which is what this `@Sendable` render closure actually needs; `AmplitudeEnvelope`
+    // holding a non-Sendable `AVAudioNode` never has to become `Sendable` itself as a result.
+    let oscillator = input
+    let sampleRate = format.sampleRate
+    self.avAudioNode = AVAudioSourceNode(format: format) { _, _, frameCount, audioBufferList in
+      let buffers = UnsafeMutableAudioBufferListPointer(audioBufferList)
+      guard let raw = buffers[0].mData else { return noErr }
+      let outBuffer = UnsafeMutableBufferPointer<Float>(
+        start: raw.assumingMemoryBound(to: Float.self),
+        count: Int(frameCount)
+      )
+      oscillator.fill(outBuffer, sampleRate: sampleRate)
+      stateBox.mutex.withLock { s in
+        for i in outBuffer.indices {
+          s.gain = Self.nextGain(
+            currentGain: s.gain,
+            phase: &s.phase,
+            attackDuration: s.attackDuration,
+            decayDuration: s.decayDuration,
+            sustainLevel: s.sustainLevel,
+            releaseDuration: s.releaseDuration,
+            sampleRate: sampleRate
+          )
+          outBuffer[i] *= s.gain
         }
+      }
+      return noErr
+    }
+  }
+
+  /// A redundant `openGate()` while already open (the common case: the same pitch replaying
+  /// back-to-back) is a no-op, same as feeding Soundpipe's ADSR filter an unchanged `1` input
+  /// twice in a row never counts as a fresh rising edge — only a genuine closed-to-open
+  /// transition starts a new attack.
+  public func openGate() {
+    stateBox.mutex.withLock { s in
+      guard !s.gateOpen else { return }
+      s.gateOpen = true
+      s.phase = .attack
+    }
+  }
+
+  public func closeGate() {
+    stateBox.mutex.withLock { s in
+      guard s.gateOpen else { return }
+      s.gateOpen = false
+      s.phase = .release
+    }
+  }
+
+  /// One-pole exponential filter chasing whichever level the current phase targets — the same
+  /// shape Soundpipe's `sp_adsr_compute` uses (`pole = exp(-1/(tau·sr))`), reimplemented as a
+  /// plain phase-targets-a-level state machine instead of Soundpipe's specific per-sample
+  /// bookkeeping. `phase` advances attack -> decay once `gain` settles near 1, and release -> idle
+  /// once `gain` settles near 0 (an addition beyond Soundpipe's own behavior, which never
+  /// explicitly parks in an idle state — silencing the output once fully released avoids running
+  /// this filter forever on an asymptotically-tiny signal that never reaches exactly zero).
+  static func nextGain(
+    currentGain: Float,
+    phase: inout EnvelopePhase,
+    attackDuration: Float,
+    decayDuration: Float,
+    sustainLevel: Float,
+    releaseDuration: Float,
+    sampleRate: Double
+  ) -> Float {
+    let target: Float
+    let tau: Float
+    switch phase {
+    case .idle:
+      return 0
+    case .attack:
+      target = 1.0
+      tau = attackDuration
+    case .decay:
+      target = sustainLevel
+      tau = decayDuration
+    case .release:
+      target = 0.0
+      tau = releaseDuration
     }
 
-    /// A redundant `openGate()` while already open (the common case: the same pitch replaying
-    /// back-to-back) is a no-op, same as feeding Soundpipe's ADSR filter an unchanged `1` input
-    /// twice in a row never counts as a fresh rising edge — only a genuine closed-to-open
-    /// transition starts a new attack.
-    public func openGate() {
-        stateBox.mutex.withLock { s in
-            guard !s.gateOpen else { return }
-            s.gateOpen = true
-            s.phase = .attack
-        }
+    let pole = Float(exp(-1.0 / (Double(max(tau, 0.0001)) * sampleRate)))
+    let newGain = pole * currentGain + (1 - pole) * target
+
+    if phase == .attack && newGain > 0.999 {
+      phase = .decay
+    } else if phase == .release && newGain < 0.0001 {
+      phase = .idle
+      return 0
     }
-
-    public func closeGate() {
-        stateBox.mutex.withLock { s in
-            guard s.gateOpen else { return }
-            s.gateOpen = false
-            s.phase = .release
-        }
-    }
-
-    /// One-pole exponential filter chasing whichever level the current phase targets — the same
-    /// shape Soundpipe's `sp_adsr_compute` uses (`pole = exp(-1/(tau·sr))`), reimplemented as a
-    /// plain phase-targets-a-level state machine instead of Soundpipe's specific per-sample
-    /// bookkeeping. `phase` advances attack -> decay once `gain` settles near 1, and release -> idle
-    /// once `gain` settles near 0 (an addition beyond Soundpipe's own behavior, which never
-    /// explicitly parks in an idle state — silencing the output once fully released avoids running
-    /// this filter forever on an asymptotically-tiny signal that never reaches exactly zero).
-    static func nextGain(
-        currentGain: Float,
-        phase: inout EnvelopePhase,
-        attackDuration: Float,
-        decayDuration: Float,
-        sustainLevel: Float,
-        releaseDuration: Float,
-        sampleRate: Double
-    ) -> Float {
-        let target: Float
-        let tau: Float
-        switch phase {
-        case .idle:
-            return 0
-        case .attack:
-            target = 1.0
-            tau = attackDuration
-        case .decay:
-            target = sustainLevel
-            tau = decayDuration
-        case .release:
-            target = 0.0
-            tau = releaseDuration
-        }
-
-        let pole = Float(exp(-1.0 / (Double(max(tau, 0.0001)) * sampleRate)))
-        let newGain = pole * currentGain + (1 - pole) * target
-
-        if phase == .attack && newGain > 0.999 {
-            phase = .decay
-        } else if phase == .release && newGain < 0.0001 {
-            phase = .idle
-            return 0
-        }
-        return newGain
-    }
+    return newGain
+  }
 }

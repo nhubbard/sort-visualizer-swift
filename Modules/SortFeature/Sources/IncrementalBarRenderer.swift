@@ -15,17 +15,21 @@ import SortEngineKit
 /// O(1)-per-operation property actually needs — is common enough to share.
 @MainActor
 protocol IncrementalBarRenderer: AnyObject {
-    /// Full repaint from the current live state — the only path for the very first frame, a
-    /// canvas resize, a new run starting at a different array size, and recovering from any state
-    /// change that didn't arrive through `apply`. Scrubbing/seeking is the main example of the
-    /// last case: `ReplayEngine.onStep`/`onOperationApplied` are both deliberately scoped to the
-    /// `play()` loop only (see either one's doc comment), so a scrub never calls `apply` at all —
-    /// callers must detect that `ReplayEngine.stepIndex` moved some other way and call `reset`.
-    func reset(values: [Int], valueRange: ClosedRange<Int>, markers: [Int: Set<Int>], canvasSize: CGSize, scale: CGFloat)
+  /// Full repaint from the current live state — the only path for the very first frame, a
+  /// canvas resize, a new run starting at a different array size, and recovering from any state
+  /// change that didn't arrive through `apply`. Scrubbing/seeking is the main example of the
+  /// last case: `ReplayEngine.onStep`/`onOperationApplied` are both deliberately scoped to the
+  /// `play()` loop only (see either one's doc comment), so a scrub never calls `apply` at all —
+  /// callers must detect that `ReplayEngine.stepIndex` moved some other way and call `reset`.
+  func reset(
+    values: [Int], valueRange: ClosedRange<Int>, markers: [Int: Set<Int>], canvasSize: CGSize,
+    scale: CGFloat)
 
-    /// Incremental repaint for just the operation's touched positions — the fast path during
-    /// normal playback, called once per operation via `ReplayEngine.onOperationApplied`. Values/
-    /// markers reflect the CURRENT (post-batch) state, the same convention `AudioService.play`
-    /// already relies on for the identical reason (see `onOperationApplied`'s doc comment).
-    func apply(_ operation: SortOperation, values: [Int], valueRange: ClosedRange<Int>, markers: [Int: Set<Int>])
+  /// Incremental repaint for just the operation's touched positions — the fast path during
+  /// normal playback, called once per operation via `ReplayEngine.onOperationApplied`. Values/
+  /// markers reflect the CURRENT (post-batch) state, the same convention `AudioService.play`
+  /// already relies on for the identical reason (see `onOperationApplied`'s doc comment).
+  func apply(
+    _ operation: SortOperation, values: [Int], valueRange: ClosedRange<Int>,
+    markers: [Int: Set<Int>])
 }

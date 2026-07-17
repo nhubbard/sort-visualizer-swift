@@ -5,40 +5,46 @@ import XCTest
 /// screenshot pass doesn't also run every correctness test.
 @MainActor
 final class ScreenshotUITests: XCTestCase {
-    override func setUpWithError() throws {
-        continueAfterFailure = false
-    }
+  override func setUpWithError() throws {
+    continueAfterFailure = false
+  }
 
-    func testCaptureAppStoreScreenshots() throws {
-        // The simulator itself boots portrait regardless of the app's own Info.plist orientation
-        // restriction — has to be rotated explicitly, or `snapshot()` captures a portrait frame.
-        XCUIDevice.shared.orientation = .landscapeLeft
+  func testCaptureAppStoreScreenshots() throws {
+    // The simulator itself boots portrait regardless of the app's own Info.plist orientation
+    // restriction — has to be rotated explicitly, or `snapshot()` captures a portrait frame.
+    XCUIDevice.shared.orientation = .landscapeLeft
 
-        let app = XCUIApplication()
-        setupSnapshot(app)
-        app.launchEnvironment["UI_TEST_ARRAY_SIZE"] = "24"
-        app.launch()
+    let app = XCUIApplication()
+    setupSnapshot(app)
+    app.launchEnvironment["UI_TEST_ARRAY_SIZE"] = "24"
+    app.launch()
 
-        XCTAssertTrue(app.navigationBars["Sort Symphony v2"].waitForExistence(timeout: 5))
-        snapshot("01Home")
+    XCTAssertTrue(app.navigationBars["Sort Symphony v2"].waitForExistence(timeout: 5))
+    snapshot("01Home")
 
-        app.tapSidebarLink("algorithmLink.quicksort")
-        let canvas = app.descendants(matching: .any).matching(identifier: "sortVisualizationCanvas").firstMatch
-        XCTAssertTrue(canvas.waitForExistence(timeout: 5), "visualization canvas never appeared")
-        XCTAssertTrue(app.staticTexts["sortStatusLabel"].waitForExistence(timeout: 5), "status label never appeared")
-        // Let a few operations play out so the shot shows a mid-flight sort, not the very first frame.
-        Thread.sleep(forTimeInterval: 1.5)
-        snapshot("02SortInProgress")
+    app.tapSidebarLink("algorithmLink.quicksort")
+    let canvas = app.descendants(matching: .any).matching(identifier: "sortVisualizationCanvas")
+      .firstMatch
+    XCTAssertTrue(canvas.waitForExistence(timeout: 5), "visualization canvas never appeared")
+    XCTAssertTrue(
+      app.staticTexts["sortStatusLabel"].waitForExistence(timeout: 5), "status label never appeared"
+    )
+    // Let a few operations play out so the shot shows a mid-flight sort, not the very first frame.
+    Thread.sleep(forTimeInterval: 1.5)
+    snapshot("02SortInProgress")
 
-        app.buttons["showcaseButton"].tap()
-        app.buttons["showcaseConfirmButton"].tap()
-        XCTAssertTrue(app.staticTexts["showcaseProgressLabel"].waitForExistence(timeout: 5), "showcase never appeared")
-        Thread.sleep(forTimeInterval: 1.5)
-        snapshot("03Showcase")
-        app.buttons["showcaseButton"].tap() // stops it — the same button toggles start/stop now
+    app.buttons["showcaseButton"].tap()
+    app.buttons["showcaseConfirmButton"].tap()
+    XCTAssertTrue(
+      app.staticTexts["showcaseProgressLabel"].waitForExistence(timeout: 5),
+      "showcase never appeared")
+    Thread.sleep(forTimeInterval: 1.5)
+    snapshot("03Showcase")
+    app.buttons["showcaseButton"].tap()  // stops it — the same button toggles start/stop now
 
-        app.buttons["settingsButton"].tap()
-        XCTAssertTrue(app.buttons["visualizerPicker"].waitForExistence(timeout: 5), "settings never appeared")
-        snapshot("04Settings")
-    }
+    app.buttons["settingsButton"].tap()
+    XCTAssertTrue(
+      app.buttons["visualizerPicker"].waitForExistence(timeout: 5), "settings never appeared")
+    snapshot("04Settings")
+  }
 }

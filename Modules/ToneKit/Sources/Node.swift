@@ -35,34 +35,34 @@ import AVFoundation
 /// `connections` (for an arbitrary dynamic graph) and MIDI scheduling — dropped here since this
 /// module never builds anything but one fixed chain.
 public protocol Node: AnyObject {
-    var avAudioNode: AVAudioNode { get }
-    var outputFormat: AVAudioFormat { get }
+  var avAudioNode: AVAudioNode { get }
+  var outputFormat: AVAudioFormat { get }
 }
 
 /// Thin wrapper around `AVAudioEngine`, matching AudioKit's own `AudioEngine` shape closely enough
 /// that `AudioService` only had to change its imports, not its call sites.
 @MainActor
 public final class AudioEngine {
-    public let avEngine = AVAudioEngine()
+  public let avEngine = AVAudioEngine()
 
-    /// Setting this attaches and connects the node's `avAudioNode` to `avEngine`'s main mixer,
-    /// disconnecting whatever was previously attached first.
-    public var output: (any Node)? {
-        didSet {
-            if let oldValue { avEngine.disconnectNodeOutput(oldValue.avAudioNode) }
-            guard let output else { return }
-            avEngine.attach(output.avAudioNode)
-            avEngine.connect(output.avAudioNode, to: avEngine.mainMixerNode, format: output.outputFormat)
-        }
+  /// Setting this attaches and connects the node's `avAudioNode` to `avEngine`'s main mixer,
+  /// disconnecting whatever was previously attached first.
+  public var output: (any Node)? {
+    didSet {
+      if let oldValue { avEngine.disconnectNodeOutput(oldValue.avAudioNode) }
+      guard let output else { return }
+      avEngine.attach(output.avAudioNode)
+      avEngine.connect(output.avAudioNode, to: avEngine.mainMixerNode, format: output.outputFormat)
     }
+  }
 
-    public init() {}
+  public init() {}
 
-    public func start() throws {
-        try avEngine.start()
-    }
+  public func start() throws {
+    try avEngine.start()
+  }
 
-    public func stop() {
-        avEngine.stop()
-    }
+  public func stop() {
+    avEngine.stop()
+  }
 }

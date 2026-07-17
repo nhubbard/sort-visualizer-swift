@@ -7,24 +7,24 @@ import SortEngineKit
 /// instead — alternating which side gets reversed as the recursion descends, the same alternation
 /// pattern that produces a Gray code sequence.
 public struct GrayCodeShuffle: ShuffleAlgorithm {
-    public let id = ShuffleID(rawValue: "graycode")
-    public let metadata = ShuffleMetadata(displayName: "Gray Code Fractal")
-    public init() {}
-    public func record(into engine: inout RecordingEngine) {
-        reversalRec(&engine, a: 0, b: engine.count, reverseLeft: false)
+  public let id = ShuffleID(rawValue: "graycode")
+  public let metadata = ShuffleMetadata(displayName: "Gray Code Fractal")
+  public init() {}
+  public func record(into engine: inout RecordingEngine) {
+    reversalRec(&engine, a: 0, b: engine.count, reverseLeft: false)
+  }
+
+  private func reversalRec(_ engine: inout RecordingEngine, a: Int, b: Int, reverseLeft: Bool) {
+    guard b - a >= 3 else { return }
+    let m = (a + b) / 2
+
+    if reverseLeft {
+      engine.reversal(a, m - 1)
+    } else {
+      engine.reversal(m, b - 1)
     }
 
-    private func reversalRec(_ engine: inout RecordingEngine, a: Int, b: Int, reverseLeft: Bool) {
-        guard b - a >= 3 else { return }
-        let m = (a + b) / 2
-
-        if reverseLeft {
-            engine.reversal(a, m - 1)
-        } else {
-            engine.reversal(m, b - 1)
-        }
-
-        reversalRec(&engine, a: a, b: m, reverseLeft: false)
-        reversalRec(&engine, a: m, b: b, reverseLeft: true)
-    }
+    reversalRec(&engine, a: a, b: m, reverseLeft: false)
+    reversalRec(&engine, a: m, b: b, reverseLeft: true)
+  }
 }

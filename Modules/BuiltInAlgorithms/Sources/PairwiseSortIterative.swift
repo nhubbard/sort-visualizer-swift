@@ -86,66 +86,66 @@ import SortEngineKit
 /// comparator network, the compare-and-swap count for a given `length` is identical regardless of
 /// the input's actual values, so best, average, and worst case are all the same `O(n log^2 n)`.
 public struct PairwiseSortIterative: SortAlgorithm {
-    public let id = AlgorithmID(rawValue: "pairwisesortiterative")
-    public let metadata = AlgorithmMetadata(
-        displayName: "Iterative Pairwise Sort",
-        category: .concurrent,
-        sizeRange: 16...256,
-        stable: false,
-        timeComplexity: ComplexityBounds(
-            best: "O(n log^2 n)", average: "O(n log^2 n)", worst: "O(n log^2 n)"),
-        spaceComplexity: "O(1)",
-        iconName: "square.grid.3x3.fill"
-    )
+  public let id = AlgorithmID(rawValue: "pairwisesortiterative")
+  public let metadata = AlgorithmMetadata(
+    displayName: "Iterative Pairwise Sort",
+    category: .concurrent,
+    sizeRange: 16...256,
+    stable: false,
+    timeComplexity: ComplexityBounds(
+      best: "O(n log^2 n)", average: "O(n log^2 n)", worst: "O(n log^2 n)"),
+    spaceComplexity: "O(1)",
+    iconName: "square.grid.3x3.fill"
+  )
 
-    public init() {}
+  public init() {}
 
-    public func record(into engine: inout RecordingEngine) {
-        let length = engine.count
-        guard length > 1 else { return }
+  public func record(into engine: inout RecordingEngine) {
+    let length = engine.count
+    guard length > 1 else { return }
 
-        // Phase 1: `a` (the "gap"/block size) doubles from 1 while it stays below `length`.
-        var a = 1
-        while a < length {
-            var b = a
-            var c = 0
-            while b < length {
-                if engine.compare(b - a, b, by: (>)) {
-                    engine.swap(b - a, b)
-                }
-                c = (c + 1) % a
-                b += 1
-                if c == 0 {
-                    b += a
-                }
-            }
-            a *= 2
+    // Phase 1: `a` (the "gap"/block size) doubles from 1 while it stays below `length`.
+    var a = 1
+    while a < length {
+      var b = a
+      var c = 0
+      while b < length {
+        if engine.compare(b - a, b, by: (>)) {
+          engine.swap(b - a, b)
         }
-
-        // Phase 2: cleanup passes with `a` halving down from the phase-1 exit value divided by 4,
-        // and a nested `d` (starting at `e`, halving down to 0 each round) selecting the stride
-        // `d * a` compared against. `e` grows as `e = e*2 + 1` every outer round.
-        a /= 4
-        var e = 1
-        while a > 0 {
-            var d = e
-            while d > 0 {
-                var b = (d + 1) * a
-                var c = 0
-                while b < length {
-                    if engine.compare(b - (d * a), b, by: (>)) {
-                        engine.swap(b - (d * a), b)
-                    }
-                    c = (c + 1) % a
-                    b += 1
-                    if c == 0 {
-                        b += a
-                    }
-                }
-                d /= 2
-            }
-            a /= 2
-            e = (e * 2) + 1
+        c = (c + 1) % a
+        b += 1
+        if c == 0 {
+          b += a
         }
+      }
+      a *= 2
     }
+
+    // Phase 2: cleanup passes with `a` halving down from the phase-1 exit value divided by 4,
+    // and a nested `d` (starting at `e`, halving down to 0 each round) selecting the stride
+    // `d * a` compared against. `e` grows as `e = e*2 + 1` every outer round.
+    a /= 4
+    var e = 1
+    while a > 0 {
+      var d = e
+      while d > 0 {
+        var b = (d + 1) * a
+        var c = 0
+        while b < length {
+          if engine.compare(b - (d * a), b, by: (>)) {
+            engine.swap(b - (d * a), b)
+          }
+          c = (c + 1) % a
+          b += 1
+          if c == 0 {
+            b += a
+          }
+        }
+        d /= 2
+      }
+      a /= 2
+      e = (e * 2) + 1
+    }
+  }
 }

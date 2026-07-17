@@ -6,28 +6,28 @@ import SwiftUI
 /// (`Localizable.strings`' `home_copy`), inlined here rather than round-tripped through a
 /// `String(localized:)` lookup key, since this module owns no localization catalog of its own yet.
 public struct HomeView: View {
-    public init() {}
+  public init() {}
 
-    public var body: some View {
-        ScrollView {
-            VStack(spacing: 2) {
-                Text("Welcome to").bold()
-                RandomizingHeader(text: "SORT SYMPHONY")
-                Markdown(Self.welcomeCopy)
-                    .markdownTextStyle {
-                        FontFamilyVariant(.normal)
-                        FontFamily(.system())
-                        FontSize(.em(1))
-                    }
-                    .lineSpacing(1.75)
-                    .padding()
-            }
-        }
-        .padding()
-        .navigationTitle("Home")
+  public var body: some View {
+    ScrollView {
+      VStack(spacing: 2) {
+        Text("Welcome to").bold()
+        RandomizingHeader(text: "SORT SYMPHONY")
+        Markdown(Self.welcomeCopy)
+          .markdownTextStyle {
+            FontFamilyVariant(.normal)
+            FontFamily(.system())
+            FontSize(.em(1))
+          }
+          .lineSpacing(1.75)
+          .padding()
+      }
     }
+    .padding()
+    .navigationTitle("Home")
+  }
 
-    private static let welcomeCopy = """
+  private static let welcomeCopy = """
     Sorting algorithms are used to sort a data structure according to a specific order relationship, \
     such as numerical order or lexicographical order.
 

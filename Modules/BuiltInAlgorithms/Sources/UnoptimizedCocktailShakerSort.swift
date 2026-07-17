@@ -46,50 +46,50 @@ import SortEngineKit
 /// nothing about which swaps happen, only how many *comparisons* are spent confirming that the
 /// remaining ones don't need to.
 public struct UnoptimizedCocktailShakerSort: SortAlgorithm {
-    public let id = AlgorithmID(rawValue: "unoptimizedcocktailshakersort")
-    public let metadata = AlgorithmMetadata(
-        displayName: "Unoptimized Cocktail Shaker Sort",
-        category: .exchange,
-        sizeRange: 16...256,
-        stable: true,
-        timeComplexity: ComplexityBounds(best: "O(n^2)", average: "O(n^2)", worst: "O(n^2)"),
-        spaceComplexity: "O(1)",
-        iconName: "arrow.left.arrow.right.square"
-    )
-    public init() {}
+  public let id = AlgorithmID(rawValue: "unoptimizedcocktailshakersort")
+  public let metadata = AlgorithmMetadata(
+    displayName: "Unoptimized Cocktail Shaker Sort",
+    category: .exchange,
+    sizeRange: 16...256,
+    stable: true,
+    timeComplexity: ComplexityBounds(best: "O(n^2)", average: "O(n^2)", worst: "O(n^2)"),
+    spaceComplexity: "O(1)",
+    iconName: "arrow.left.arrow.right.square"
+  )
+  public init() {}
 
-    public func record(into engine: inout RecordingEngine) {
-        let n = engine.count
-        guard n > 1 else { return }
+  public func record(into engine: inout RecordingEngine) {
+    let n = engine.count
+    guard n > 1 else { return }
 
-        // Fixed `n / 2` outer passes — no swap-tracking flag, so nothing can ever break out early,
-        // unlike `CocktailShakerSort`'s single `sorted` flag or `OptimizedCocktailShakerSort`'s
-        // per-direction consecutive-no-swap counters. See the doc comment above for why that is the
-        // whole point of this variant.
-        var i = 0
-        while i < n / 2 {
-            // Forward sweep over the fixed range [i, n - i - 1), carrying larger values rightward.
-            // Strict `>` (not the default `>=`) is what keeps this stable: a tie never swaps, so
-            // equal-valued elements never cross past each other.
-            var j = i
-            while j < n - i - 1 {
-                if engine.compare(j, j + 1, by: (>)) {
-                    engine.swap(j, j + 1)
-                }
-                j += 1
-            }
-
-            // Backward sweep over the fixed range (i, n - i - 1], carrying smaller values leftward.
-            // Strict `<` mirrors the forward sweep's strict `>` for the same stability reason.
-            j = n - i - 1
-            while j > i {
-                if engine.compare(j, j - 1, by: (<)) {
-                    engine.swap(j, j - 1)
-                }
-                j -= 1
-            }
-
-            i += 1
+    // Fixed `n / 2` outer passes — no swap-tracking flag, so nothing can ever break out early,
+    // unlike `CocktailShakerSort`'s single `sorted` flag or `OptimizedCocktailShakerSort`'s
+    // per-direction consecutive-no-swap counters. See the doc comment above for why that is the
+    // whole point of this variant.
+    var i = 0
+    while i < n / 2 {
+      // Forward sweep over the fixed range [i, n - i - 1), carrying larger values rightward.
+      // Strict `>` (not the default `>=`) is what keeps this stable: a tie never swaps, so
+      // equal-valued elements never cross past each other.
+      var j = i
+      while j < n - i - 1 {
+        if engine.compare(j, j + 1, by: (>)) {
+          engine.swap(j, j + 1)
         }
+        j += 1
+      }
+
+      // Backward sweep over the fixed range (i, n - i - 1], carrying smaller values leftward.
+      // Strict `<` mirrors the forward sweep's strict `>` for the same stability reason.
+      j = n - i - 1
+      while j > i {
+        if engine.compare(j, j - 1, by: (<)) {
+          engine.swap(j, j - 1)
+        }
+        j -= 1
+      }
+
+      i += 1
     }
+  }
 }

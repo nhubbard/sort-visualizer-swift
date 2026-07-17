@@ -16,36 +16,36 @@ import AppIntents
 /// resolves it correctly. Giving the parameter a genuine, always-concrete value removes the
 /// unset-vs-nil ambiguity that glitch depends on.
 public enum AlgorithmCategoryOption: String, AppEnum {
-    case all
-    case concurrent, distribution, exchange, hybrid, impractical, insertion
-    case merge, miscellaneous, quick, selection
+  case all
+  case concurrent, distribution, exchange, hybrid, impractical, insertion
+  case merge, miscellaneous, quick, selection
 
-    public static var typeDisplayRepresentation: TypeDisplayRepresentation { "Algorithm Category" }
-    public static var caseDisplayRepresentations: [AlgorithmCategoryOption: DisplayRepresentation] {
-        [
-            .all: "All Categories",
-            .concurrent: "Concurrent Sorts",
-            .distribution: "Distribution Sorts",
-            .exchange: "Exchange Sorts",
-            .hybrid: "Hybrid Sorts",
-            .impractical: "Impractical Sorts",
-            .insertion: "Insertion Sorts",
-            .merge: "Merge Sorts",
-            .miscellaneous: "Miscellaneous Sorts",
-            .quick: "Quick Sorts",
-            .selection: "Selection Sorts",
-        ]
-    }
+  public static var typeDisplayRepresentation: TypeDisplayRepresentation { "Algorithm Category" }
+  public static var caseDisplayRepresentations: [AlgorithmCategoryOption: DisplayRepresentation] {
+    [
+      .all: "All Categories",
+      .concurrent: "Concurrent Sorts",
+      .distribution: "Distribution Sorts",
+      .exchange: "Exchange Sorts",
+      .hybrid: "Hybrid Sorts",
+      .impractical: "Impractical Sorts",
+      .insertion: "Insertion Sorts",
+      .merge: "Merge Sorts",
+      .miscellaneous: "Miscellaneous Sorts",
+      .quick: "Quick Sorts",
+      .selection: "Selection Sorts",
+    ]
+  }
 
-    /// `nil` only for `.all` (the filter sentinel) — every other case's name and raw value matches
-    /// `AlgorithmCategory` exactly.
-    public var algorithmCategory: AlgorithmCategory? {
-        AlgorithmCategory(rawValue: rawValue)
-    }
+  /// `nil` only for `.all` (the filter sentinel) — every other case's name and raw value matches
+  /// `AlgorithmCategory` exactly.
+  public var algorithmCategory: AlgorithmCategory? {
+    AlgorithmCategory(rawValue: rawValue)
+  }
 
-    /// The 10 real categories, excluding the `.all` filter sentinel — what `FindCategoriesIntent`
-    /// returns, and the building block for "for each category, find its algorithms" pipelines.
-    public static var realCategories: [AlgorithmCategoryOption] {
-        allCases.filter { $0 != .all }
-    }
+  /// The 10 real categories, excluding the `.all` filter sentinel — what `FindCategoriesIntent`
+  /// returns, and the building block for "for each category, find its algorithms" pipelines.
+  public static var realCategories: [AlgorithmCategoryOption] {
+    allCases.filter { $0 != .all }
+  }
 }

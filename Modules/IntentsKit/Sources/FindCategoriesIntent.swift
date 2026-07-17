@@ -7,18 +7,19 @@ import AppIntents
 /// Without this, a category could only ever be picked by hand from `FindAlgorithmsIntent`'s own
 /// fixed picker — there was no way to *discover* the category list itself as loopable values.
 public struct FindCategoriesIntent: AppIntent {
-    public static var title: LocalizedStringResource { "Find Categories" }
-    public static var description: IntentDescription {
-        IntentDescription(
-            "Lists Sort Symphony's algorithm categories.",
-            categoryName: "Sort Symphony",
-            searchKeywords: ["Algorithm Categories", "Sort Categories"],
-            resultValueName: "Categories")
-    }
+  public static var title: LocalizedStringResource { "Find Categories" }
+  public static var description: IntentDescription {
+    IntentDescription(
+      "Lists Sort Symphony's algorithm categories.",
+      categoryName: "Sort Symphony",
+      searchKeywords: ["Algorithm Categories", "Sort Categories"],
+      resultValueName: "Categories")
+  }
 
-    public init() {}
+  public init() {}
 
-    public func perform() async throws -> some IntentResult & ReturnsValue<[AlgorithmCategoryOption]> {
-        .result(value: AlgorithmCategoryOption.realCategories)
-    }
+  public func perform() async throws -> some IntentResult & ReturnsValue<[AlgorithmCategoryOption]>
+  {
+    .result(value: AlgorithmCategoryOption.realCategories)
+  }
 }

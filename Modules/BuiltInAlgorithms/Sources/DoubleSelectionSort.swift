@@ -24,52 +24,52 @@ import SortEngineKit
 /// And if `biggest == right` already, the second swap degenerates to swapping an index with
 /// itself. Ported exactly as ArrayV has it, in the same order, with no additional guards added.
 public struct DoubleSelectionSort: SortAlgorithm {
-    public let id = AlgorithmID(rawValue: "doubleselectionsort")
-    public let metadata = AlgorithmMetadata(
-        displayName: "Double Selection Sort",
-        category: .selection,
-        sizeRange: 16...256,
-        stable: false,
-        timeComplexity: ComplexityBounds(best: "O(n^2)", average: "O(n^2)", worst: "O(n^2)"),
-        spaceComplexity: "O(1)",
-        iconName: "arrow.left.and.right.circle.fill"
-    )
-    public init() {}
+  public let id = AlgorithmID(rawValue: "doubleselectionsort")
+  public let metadata = AlgorithmMetadata(
+    displayName: "Double Selection Sort",
+    category: .selection,
+    sizeRange: 16...256,
+    stable: false,
+    timeComplexity: ComplexityBounds(best: "O(n^2)", average: "O(n^2)", worst: "O(n^2)"),
+    spaceComplexity: "O(1)",
+    iconName: "arrow.left.and.right.circle.fill"
+  )
+  public init() {}
 
-    public func record(into engine: inout RecordingEngine) {
-        let n = engine.count
-        guard n > 1 else { return }
+  public func record(into engine: inout RecordingEngine) {
+    let n = engine.count
+    guard n > 1 else { return }
 
-        var left = 0
-        var right = n - 1
-        var smallest = 0
-        var biggest = 0
+    var left = 0
+    var right = n - 1
+    var smallest = 0
+    var biggest = 0
 
-        while left <= right {
-            for i in left...right {
-                // Reads.compareValues(array[i], array[biggest]) == 1 — strict greater-than,
-                // both live indices.
-                if engine.compare(i, biggest, by: (>)) {
-                    biggest = i
-                }
-                // Reads.compareValues(array[i], array[smallest]) == -1 — strict less-than,
-                // both live indices.
-                if engine.compare(i, smallest, by: (<)) {
-                    smallest = i
-                }
-            }
-            if biggest == left {
-                biggest = smallest
-            }
-
-            engine.swap(left, smallest)
-            engine.swap(right, biggest)
-
-            left += 1
-            right -= 1
-
-            smallest = left
-            biggest = right
+    while left <= right {
+      for i in left...right {
+        // Reads.compareValues(array[i], array[biggest]) == 1 — strict greater-than,
+        // both live indices.
+        if engine.compare(i, biggest, by: (>)) {
+          biggest = i
         }
+        // Reads.compareValues(array[i], array[smallest]) == -1 — strict less-than,
+        // both live indices.
+        if engine.compare(i, smallest, by: (<)) {
+          smallest = i
+        }
+      }
+      if biggest == left {
+        biggest = smallest
+      }
+
+      engine.swap(left, smallest)
+      engine.swap(right, biggest)
+
+      left += 1
+      right -= 1
+
+      smallest = left
+      biggest = right
     }
+  }
 }

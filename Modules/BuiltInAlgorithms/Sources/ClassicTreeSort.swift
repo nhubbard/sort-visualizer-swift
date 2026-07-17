@@ -73,96 +73,102 @@ import SortEngineKit
 /// `n`-sized auxiliary arrays (`lower`, `upper`, `temp`) that all persist for the algorithm's entire
 /// runtime, mirroring ArrayV's `Writes.createExternalArray` calls for the same three buffers.
 public struct ClassicTreeSort: SortAlgorithm {
-    public let id = AlgorithmID(rawValue: "classictreesort")
-    public let metadata = AlgorithmMetadata(
-        displayName: "Classic Tree Sort",
-        category: .insertion,
-        sizeRange: 16...256,
-        stable: true,
-        timeComplexity: ComplexityBounds(best: "O(n log n)", average: "O(n log n)", worst: "O(n^2)"),
-        spaceComplexity: "O(n)",
-        iconName: "list.bullet.indent"
-    )
+  public let id = AlgorithmID(rawValue: "classictreesort")
+  public let metadata = AlgorithmMetadata(
+    displayName: "Classic Tree Sort",
+    category: .insertion,
+    sizeRange: 16...256,
+    stable: true,
+    timeComplexity: ComplexityBounds(best: "O(n log n)", average: "O(n log n)", worst: "O(n^2)"),
+    spaceComplexity: "O(n)",
+    iconName: "list.bullet.indent"
+  )
 
-    public init() {}
+  public init() {}
 
-    public func record(into engine: inout RecordingEngine) {
-        let n = engine.count
-        guard n > 1 else { return }
+  public func record(into engine: inout RecordingEngine) {
+    let n = engine.count
+    guard n > 1 else { return }
 
-        // `lower`/`upper` back the tree's child pointers. There is no `RecordingEngine` equivalent
-        // of ArrayV's `Writes.createExternalArray` that can be read back — `writeAux` only feeds
-        // the tape/visualizer — so, mirroring `WeaveMergeSort`/`BottomUpMergeSort`'s established
-        // pattern for scratch buffers, real Swift `[Int]` arrays drive this port's own logic while
-        // parallel `engine.createAuxArray`/`writeAux` calls keep the visualizer in sync.
-        var lower = [Int](repeating: 0, count: n)
-        var upper = [Int](repeating: 0, count: n)
-        let lowerHandle = engine.createAuxArray(length: n)
-        let upperHandle = engine.createAuxArray(length: n)
+    // `lower`/`upper` back the tree's child pointers. There is no `RecordingEngine` equivalent
+    // of ArrayV's `Writes.createExternalArray` that can be read back — `writeAux` only feeds
+    // the tape/visualizer — so, mirroring `WeaveMergeSort`/`BottomUpMergeSort`'s established
+    // pattern for scratch buffers, real Swift `[Int]` arrays drive this port's own logic while
+    // parallel `engine.createAuxArray`/`writeAux` calls keep the visualizer in sync.
+    var lower = [Int](repeating: 0, count: n)
+    var upper = [Int](repeating: 0, count: n)
+    let lowerHandle = engine.createAuxArray(length: n)
+    let upperHandle = engine.createAuxArray(length: n)
 
-        for i in 1..<n {
-            var c = 0
-            while true {
-                // ArrayV's `Reads.compareValues(array[i], array[c]) < 0` is the non-marking
-                // comparison variant (reads values directly, not via the marking
-                // `Reads.compareIndices`), so this reads `engine.values` directly rather than
-                // calling `engine.compare` — matching `WeaveMergeSort`'s identical convention for
-                // comparisons ArrayV itself performs via `compareValues`.
-                let goLower = engine.values[i] < engine.values[c]
-                if goLower {
-                    if lower[c] == 0 {
-                        lower[c] = i
-                        engine.writeAux(lowerHandle, at: c, value: i)
-                        break
-                    } else {
-                        c = lower[c]
-                    }
-                } else {
-                    if upper[c] == 0 {
-                        upper[c] = i
-                        engine.writeAux(upperHandle, at: c, value: i)
-                        break
-                    } else {
-                        c = upper[c]
-                    }
-                }
-            }
+    for i in 1..<n {
+      var c = 0
+      while true {
+        // ArrayV's `Reads.compareValues(array[i], array[c]) < 0` is the non-marking
+        // comparison variant (reads values directly, not via the marking
+        // `Reads.compareIndices`), so this reads `engine.values` directly rather than
+        // calling `engine.compare` — matching `WeaveMergeSort`'s identical convention for
+        // comparisons ArrayV itself performs via `compareValues`.
+        let goLower = engine.values[i] < engine.values[c]
+        if goLower {
+          if lower[c] == 0 {
+            lower[c] = i
+            engine.writeAux(lowerHandle, at: c, value: i)
+            break
+          } else {
+            c = lower[c]
+          }
+        } else {
+          if upper[c] == 0 {
+            upper[c] = i
+            engine.writeAux(upperHandle, at: c, value: i)
+            break
+          } else {
+            c = upper[c]
+          }
         }
-
-        var temp = [Int](repeating: 0, count: n)
-        let tempHandle = engine.createAuxArray(length: n)
-        var idx = 0
-        traverse(engine.values, lower, upper, root: 0, into: &temp, at: &idx, engine: &engine, tempHandle: tempHandle)
-
-        for i in 0..<n {
-            engine.setValue(i, temp[i])
-        }
-
-        engine.deleteAuxArray(lowerHandle)
-        engine.deleteAuxArray(upperHandle)
-        engine.deleteAuxArray(tempHandle)
+      }
     }
 
-    /// Ports the recursive `traverse(array, temp, lower, upper, r)`: an in-order walk (left, self,
-    /// right) that emits the tree's values into `temp` in sorted order.
-    private func traverse(
-        _ values: [Int],
-        _ lower: [Int],
-        _ upper: [Int],
-        root r: Int,
-        into temp: inout [Int],
-        at idx: inout Int,
-        engine: inout RecordingEngine,
-        tempHandle: AuxHandle
-    ) {
-        if lower[r] != 0 {
-            traverse(values, lower, upper, root: lower[r], into: &temp, at: &idx, engine: &engine, tempHandle: tempHandle)
-        }
-        temp[idx] = values[r]
-        engine.writeAux(tempHandle, at: idx, value: values[r])
-        idx += 1
-        if upper[r] != 0 {
-            traverse(values, lower, upper, root: upper[r], into: &temp, at: &idx, engine: &engine, tempHandle: tempHandle)
-        }
+    var temp = [Int](repeating: 0, count: n)
+    let tempHandle = engine.createAuxArray(length: n)
+    var idx = 0
+    traverse(
+      engine.values, lower, upper, root: 0, into: &temp, at: &idx, engine: &engine,
+      tempHandle: tempHandle)
+
+    for i in 0..<n {
+      engine.setValue(i, temp[i])
     }
+
+    engine.deleteAuxArray(lowerHandle)
+    engine.deleteAuxArray(upperHandle)
+    engine.deleteAuxArray(tempHandle)
+  }
+
+  /// Ports the recursive `traverse(array, temp, lower, upper, r)`: an in-order walk (left, self,
+  /// right) that emits the tree's values into `temp` in sorted order.
+  private func traverse(
+    _ values: [Int],
+    _ lower: [Int],
+    _ upper: [Int],
+    root r: Int,
+    into temp: inout [Int],
+    at idx: inout Int,
+    engine: inout RecordingEngine,
+    tempHandle: AuxHandle
+  ) {
+    if lower[r] != 0 {
+      traverse(
+        values, lower, upper, root: lower[r], into: &temp, at: &idx, engine: &engine,
+        tempHandle: tempHandle)
+    }
+    temp[idx] = values[r]
+    engine.writeAux(tempHandle, at: idx, value: values[r])
+    idx += 1
+    if upper[r] != 0 {
+      traverse(
+        values, lower, upper, root: upper[r], into: &temp, at: &idx, engine: &engine,
+        tempHandle: tempHandle)
+    }
+  }
 }

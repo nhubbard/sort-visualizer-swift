@@ -6,19 +6,19 @@ import SortFeature
 /// always returns exactly the two entries ⌘⇧A/⌘⌥⇧A already trigger (Size Sweep, Max Size Only);
 /// it stays correct unchanged if more are ever registered in `AutomationRegistry`.
 public struct FindAutomationsIntent: AppIntent {
-    public static var title: LocalizedStringResource { "Find Automations" }
-    public static var description: IntentDescription {
-        IntentDescription(
-            "Lists Sort Symphony's registered size-sweep automations.",
-            categoryName: "Sort Symphony",
-            searchKeywords: ["Size Sweep", "Max Size Only", "Automations"],
-            resultValueName: "Automations")
-    }
+  public static var title: LocalizedStringResource { "Find Automations" }
+  public static var description: IntentDescription {
+    IntentDescription(
+      "Lists Sort Symphony's registered size-sweep automations.",
+      categoryName: "Sort Symphony",
+      searchKeywords: ["Size Sweep", "Max Size Only", "Automations"],
+      resultValueName: "Automations")
+  }
 
-    public init() {}
+  public init() {}
 
-    @MainActor
-    public func perform() async throws -> some IntentResult & ReturnsValue<[AutomationEntity]> {
-        .result(value: AutomationRegistry.shared.automations.map(AutomationEntity.init))
-    }
+  @MainActor
+  public func perform() async throws -> some IntentResult & ReturnsValue<[AutomationEntity]> {
+    .result(value: AutomationRegistry.shared.automations.map(AutomationEntity.init))
+  }
 }

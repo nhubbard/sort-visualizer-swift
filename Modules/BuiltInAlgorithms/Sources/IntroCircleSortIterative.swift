@@ -59,110 +59,110 @@ import SortEngineKit
 ///     parallel identity array): equal-valued tags come out reordered relative to their original
 ///     input order, so this is NOT a stable sort.
 public struct IntroCircleSortIterative: SortAlgorithm {
-    public let id = AlgorithmID(rawValue: "introcirclesortiterative")
-    public let metadata = AlgorithmMetadata(
-        displayName: "Intro Circle (Iterative)",
-        category: .hybrid,
-        sizeRange: 16...256,
-        stable: false,
-        // Best/average mirror `CircleSortIterative`: a single full pass is always `O(n log n)`
-        // work regardless of whether it ends up finding any swaps, and typical inputs still tend to
-        // converge (or hit the fallback) within a small number of such passes, so the average case
-        // stays in the same `O(n log^2 n)` family plain circle sort documents. The worst case is
-        // where this variant actually differs from `CircleSortIterative`: rather than an unbounded
-        // (if conjectured-log-n) number of `O(n log n)` passes, it is hard-capped at `threshold`
-        // passes and then falls back to a full binary insertion sort — whose own `O(n^2)` shift
-        // step dominates the bounded `O(n log^2 n)` circle-sort budget for large `n`. That `O(n^2)`
-        // is a strictly *guaranteed* ceiling this variant introduces on top of (not instead of)
-        // circle sort's own typical behavior — see the doc comment above.
-        timeComplexity: ComplexityBounds(
-            best: "O(n log n)", average: "O(n log^2 n)", worst: "O(n^2)"),
-        spaceComplexity: "O(1)",
-        iconName: "arrow.down.right.and.arrow.up.left"
-    )
+  public let id = AlgorithmID(rawValue: "introcirclesortiterative")
+  public let metadata = AlgorithmMetadata(
+    displayName: "Intro Circle (Iterative)",
+    category: .hybrid,
+    sizeRange: 16...256,
+    stable: false,
+    // Best/average mirror `CircleSortIterative`: a single full pass is always `O(n log n)`
+    // work regardless of whether it ends up finding any swaps, and typical inputs still tend to
+    // converge (or hit the fallback) within a small number of such passes, so the average case
+    // stays in the same `O(n log^2 n)` family plain circle sort documents. The worst case is
+    // where this variant actually differs from `CircleSortIterative`: rather than an unbounded
+    // (if conjectured-log-n) number of `O(n log n)` passes, it is hard-capped at `threshold`
+    // passes and then falls back to a full binary insertion sort — whose own `O(n^2)` shift
+    // step dominates the bounded `O(n log^2 n)` circle-sort budget for large `n`. That `O(n^2)`
+    // is a strictly *guaranteed* ceiling this variant introduces on top of (not instead of)
+    // circle sort's own typical behavior — see the doc comment above.
+    timeComplexity: ComplexityBounds(
+      best: "O(n log n)", average: "O(n log^2 n)", worst: "O(n^2)"),
+    spaceComplexity: "O(1)",
+    iconName: "arrow.down.right.and.arrow.up.left"
+  )
 
-    public init() {}
+  public init() {}
 
-    public func record(into engine: inout RecordingEngine) {
-        let end = engine.count
-        guard end > 1 else { return }
+  public func record(into engine: inout RecordingEngine) {
+    let end = engine.count
+    guard end > 1 else { return }
 
-        // Same padded-power-of-two `n` as `CircleSortIterative` — every real array access below
-        // stays separately guarded against `end`, so `n` only ever controls how many gap/start
-        // window combinations get iterated over, never an actual out-of-range read or write.
-        var n = 1
-        var threshold = 0
-        while n < end {
-            n <<= 1
-            threshold += 1
-        }
-        threshold /= 2
-
-        // Verbatim `IterativeCircleSorting.circleSortRoutine` translation (see
-        // `CircleSortIterative.swift`): for each shrinking `gap`, slide a window of size `2 * gap`
-        // across the padded conceptual array, and within each window walk `low`/`high` inward from
-        // its ends toward its center.
-        func circleSortRoutine(_ length: Int) -> Int {
-            var swapCount = 0
-            var gap = length / 2
-            while gap > 0 {
-                var start = 0
-                while start + gap < end {
-                    var low = start
-                    var high = start + 2 * gap - 1
-                    while low < high {
-                        if high < end {
-                            if engine.compare(low, high, by: (>)) {
-                                engine.swap(low, high)
-                                swapCount += 1
-                            }
-                        }
-                        low += 1
-                        high -= 1
-                    }
-                    start += 2 * gap
-                }
-                gap /= 2
-            }
-            return swapCount
-        }
-
-        // The "introspective" driver: ArrayV's `do { iterations++; if (iterations >= threshold) {
-        // ...; break; } } while (circleSortRoutine(...) != 0)`, translated 1:1 via Swift's
-        // `repeat`/`while` (the same do-while shape) rather than reordered into some equivalent
-        // `while`/`for` loop — keeping the exact iteration-count-checked-before-next-pass ordering
-        // matters for getting the off-by-one behavior right (see the doc comment above for the
-        // hand-traced threshold values this produces).
-        var iterations = 0
-        repeat {
-            iterations += 1
-            if iterations >= threshold {
-                // Fallback: one full binary insertion sort pass over the whole array, exactly
-                // `BinaryInsertionSort.swift`'s own `record(into:)` with `start` fixed at `0`
-                // (ArrayV calls `customBinaryInsert(array, 0, length, sleep)` here) — inlined rather
-                // than calling into another algorithm's `SortAlgorithm` conformance, matching how
-                // e.g. `WeavedMergeSort.swift` inlines its own merge/shift logic instead of
-                // cross-importing a sibling algorithm struct (no precedent in this codebase for one
-                // algorithm invoking another).
-                for i in 1..<end {
-                    var lo = 0
-                    var hi = i
-                    while lo < hi {
-                        let mid = lo + (hi - lo) / 2
-                        if engine.compare(i, mid, by: <) {
-                            hi = mid
-                        } else {
-                            lo = mid + 1
-                        }
-                    }
-                    var j = i
-                    while j > lo {
-                        engine.swap(j, j - 1)
-                        j -= 1
-                    }
-                }
-                break
-            }
-        } while circleSortRoutine(n) != 0
+    // Same padded-power-of-two `n` as `CircleSortIterative` — every real array access below
+    // stays separately guarded against `end`, so `n` only ever controls how many gap/start
+    // window combinations get iterated over, never an actual out-of-range read or write.
+    var n = 1
+    var threshold = 0
+    while n < end {
+      n <<= 1
+      threshold += 1
     }
+    threshold /= 2
+
+    // Verbatim `IterativeCircleSorting.circleSortRoutine` translation (see
+    // `CircleSortIterative.swift`): for each shrinking `gap`, slide a window of size `2 * gap`
+    // across the padded conceptual array, and within each window walk `low`/`high` inward from
+    // its ends toward its center.
+    func circleSortRoutine(_ length: Int) -> Int {
+      var swapCount = 0
+      var gap = length / 2
+      while gap > 0 {
+        var start = 0
+        while start + gap < end {
+          var low = start
+          var high = start + 2 * gap - 1
+          while low < high {
+            if high < end {
+              if engine.compare(low, high, by: (>)) {
+                engine.swap(low, high)
+                swapCount += 1
+              }
+            }
+            low += 1
+            high -= 1
+          }
+          start += 2 * gap
+        }
+        gap /= 2
+      }
+      return swapCount
+    }
+
+    // The "introspective" driver: ArrayV's `do { iterations++; if (iterations >= threshold) {
+    // ...; break; } } while (circleSortRoutine(...) != 0)`, translated 1:1 via Swift's
+    // `repeat`/`while` (the same do-while shape) rather than reordered into some equivalent
+    // `while`/`for` loop — keeping the exact iteration-count-checked-before-next-pass ordering
+    // matters for getting the off-by-one behavior right (see the doc comment above for the
+    // hand-traced threshold values this produces).
+    var iterations = 0
+    repeat {
+      iterations += 1
+      if iterations >= threshold {
+        // Fallback: one full binary insertion sort pass over the whole array, exactly
+        // `BinaryInsertionSort.swift`'s own `record(into:)` with `start` fixed at `0`
+        // (ArrayV calls `customBinaryInsert(array, 0, length, sleep)` here) — inlined rather
+        // than calling into another algorithm's `SortAlgorithm` conformance, matching how
+        // e.g. `WeavedMergeSort.swift` inlines its own merge/shift logic instead of
+        // cross-importing a sibling algorithm struct (no precedent in this codebase for one
+        // algorithm invoking another).
+        for i in 1..<end {
+          var lo = 0
+          var hi = i
+          while lo < hi {
+            let mid = lo + (hi - lo) / 2
+            if engine.compare(i, mid, by: <) {
+              hi = mid
+            } else {
+              lo = mid + 1
+            }
+          }
+          var j = i
+          while j > lo {
+            engine.swap(j, j - 1)
+            j -= 1
+          }
+        }
+        break
+      }
+    } while circleSortRoutine(n) != 0
+  }
 }

@@ -1,5 +1,5 @@
-import Foundation
 import AlgorithmKit
+import Foundation
 import SortEngineKit
 
 /// ArrayV's `io.github.arrayv.sorts.exchange.ThreeSmoothCombSortIterative` — a Shellsort using
@@ -58,42 +58,43 @@ import SortEngineKit
 /// shrinking. Space is `O(1)`: only scalar loop variables (`pow2`, `k`, `pow3`, `j`, `gap`, `i`),
 /// no recursion and no auxiliary arrays.
 public struct ThreeSmoothCombSortIterative: SortAlgorithm {
-    public let id = AlgorithmID(rawValue: "threesmoothcombsortiterative")
-    public let metadata = AlgorithmMetadata(
-        displayName: "3-Smooth Comb Sort (Iterative)",
-        category: .exchange,
-        sizeRange: 16...256,
-        stable: false,
-        timeComplexity: ComplexityBounds(best: "O(n log^2 n)", average: "O(n log^2 n)", worst: "O(n log^2 n)"),
-        spaceComplexity: "O(1)",
-        iconName: "3.circle.fill"
-    )
+  public let id = AlgorithmID(rawValue: "threesmoothcombsortiterative")
+  public let metadata = AlgorithmMetadata(
+    displayName: "3-Smooth Comb Sort (Iterative)",
+    category: .exchange,
+    sizeRange: 16...256,
+    stable: false,
+    timeComplexity: ComplexityBounds(
+      best: "O(n log^2 n)", average: "O(n log^2 n)", worst: "O(n log^2 n)"),
+    spaceComplexity: "O(1)",
+    iconName: "3.circle.fill"
+  )
 
-    public init() {}
+  public init() {}
 
-    public func record(into engine: inout RecordingEngine) {
-        let n = engine.count
-        guard n > 1 else { return }
+  public func record(into engine: inout RecordingEngine) {
+    let n = engine.count
+    guard n > 1 else { return }
 
-        // Java's `(int)` cast on a non-negative `Double` truncates toward zero, the same as
-        // Swift's `Int(_:)` on a `Double` — so this mirrors `Math.log`/`Math.pow` arithmetic from
-        // ArrayV's source line-by-line rather than reaching for an integer-only reformulation.
-        let pow2 = Int(log(Double(n - 1)) / log(2.0))
+    // Java's `(int)` cast on a non-negative `Double` truncates toward zero, the same as
+    // Swift's `Int(_:)` on a `Double` — so this mirrors `Math.log`/`Math.pow` arithmetic from
+    // ArrayV's source line-by-line rather than reaching for an integer-only reformulation.
+    let pow2 = Int(log(Double(n - 1)) / log(2.0))
 
-        for k in stride(from: pow2, through: 0, by: -1) {
-            let pow3 = Int((log(Double(n)) - Double(k) * log(2.0)) / log(3.0))
+    for k in stride(from: pow2, through: 0, by: -1) {
+      let pow3 = Int((log(Double(n)) - Double(k) * log(2.0)) / log(3.0))
 
-            for j in stride(from: pow3, through: 0, by: -1) {
-                let gap = Int(pow(2.0, Double(k)) * pow(3.0, Double(j)))
+      for j in stride(from: pow3, through: 0, by: -1) {
+        let gap = Int(pow(2.0, Double(k)) * pow(3.0, Double(j)))
 
-                var i = 0
-                while i + gap < n {
-                    if engine.compare(i, i + gap, by: (>)) {
-                        engine.swap(i, i + gap)
-                    }
-                    i += 1
-                }
-            }
+        var i = 0
+        while i + gap < n {
+          if engine.compare(i, i + gap, by: (>)) {
+            engine.swap(i, i + gap)
+          }
+          i += 1
         }
+      }
     }
+  }
 }

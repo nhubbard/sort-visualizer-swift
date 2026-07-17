@@ -10,106 +10,121 @@ import VisualizationKit
 @main
 @MainActor
 struct Sort2App: App {
-    init() {
-        // Composition root (§4.1): AppSettings.shared and registries are wired once, here, rather
-        // than re-declared per view. Full data-driven navigation off AlgorithmRegistry is Phase 9
-        // — this phase's debug entry point just looks algorithms/shuffles up by id.
-        VisualizerRegistry.shared.builtIns = [
-            BarGraphVisualizer(), RainbowVisualizer(), ScatterPlotVisualizer(),
-            SineWaveVisualizer(), ColorCircleVisualizer(), SpiralVisualizer(), SpiralDotsVisualizer(),
-            WaveDotsVisualizer(), PixelMeshVisualizer(), HoopStackVisualizer(),
-            DisparityBarGraphVisualizer(), DisparityCircleVisualizer(), DisparityChordsVisualizer(),
-            DisparityDotsVisualizer()
-        ]
-        VisualizerRegistry.shared.discover()
+  init() {
+    // Composition root (§4.1): AppSettings.shared and registries are wired once, here, rather
+    // than re-declared per view. Full data-driven navigation off AlgorithmRegistry is Phase 9
+    // — this phase's debug entry point just looks algorithms/shuffles up by id.
+    VisualizerRegistry.shared.builtIns = [
+      BarGraphVisualizer(), RainbowVisualizer(), ScatterPlotVisualizer(),
+      SineWaveVisualizer(), ColorCircleVisualizer(), SpiralVisualizer(), SpiralDotsVisualizer(),
+      WaveDotsVisualizer(), PixelMeshVisualizer(), HoopStackVisualizer(),
+      DisparityBarGraphVisualizer(), DisparityCircleVisualizer(), DisparityChordsVisualizer(),
+      DisparityDotsVisualizer(),
+    ]
+    VisualizerRegistry.shared.discover()
 
-        // Native Swift is the target for every algorithm and shuffle now — the JavaScriptCore
-        // scripting backend (ScriptingKit) was removed entirely after it turned out to reference a
-        // private API (`JSContextGroupSetExecutionTimeLimit`), which blocked App Store submission.
-        AlgorithmRegistry.shared.builtIns = [
-            AsynchronousSort(), BadSort(), BaseNMaxHeapSort(), BinaryDoubleInsertionSort(), BinaryGnomeSort(),
-            BinaryInsertionSort(), BinaryMergeSort(), BingoSort(), BinomialHeapSort(), BinomialSmoothSort(),
-            BitonicSortIterative(),
-            BitonicSortRecursive(), BlockSwapMergeSort(), BogoSort(), BoseNelsonSortIterative(),
-            BottomUpHeapSort(), BottomUpMergeSort(), BozoSort(), BubbleBogoSort(), BubbleSort(), BurntPancakeSort(),
-            CircleSortIterative(), CircleSortRecursive(), CircloidSort(),
-            ClassicThreeSmoothCombSort(), ClassicTreeSort(), CocktailBogoSort(),
-            CocktailMergeSort(), CocktailShakerSort(), CombSort(), CountingSort(), CycleSort(),
-            DeterministicBogoSort(), DiamondSortRecursive(), DoubleInsertionSort(), DoubleSelectionSort(),
-            DualPivotQuickSort(), ExchangeBogoSort(), FlashSort(), FlippedMinHeapSort(), GnomeSort(), GravitySort(),
-            GuessSort(), HybridCombSort(), InPlaceMergeSort(), InsertionSort(), IntroCircleSortIterative(),
-            IntroSort(), LazyHeapSort(), LessBogoSort(), LLQuickSort(), LRQuickSort(), LSDRadixSort(), MaxHeapSort(),
-            MedianQuickBogoSort(), MergeBogoSort(), MergeExchangeSortIterative(), MergeSort(), MinHeapSort(), MSDRadixSort(),
-            OddEvenMergeSortIterative(), OddEvenMergeSortRecursive(), OddEvenSort(),
-            OptimizedBubbleSort(), OptimizedCocktailShakerSort(), OptimizedGnomeSort(), OptimizedGuessSort(),
-            PairwiseSortIterative(), PancakeSort(), PigeonholeSort(), QuickBogoSort(), QuickSort(),
-            RandomGuessSort(), RecursiveShellSort(), RotateMergeSort(), SelectionBogoSort(), SelectionSort(), ShellSort(),
-            SimplifiedLibrarySort(), SlopeSort(), SlowSort(), SmartBogoBogoSort(), SmartGuessSort(), SnuffleSort(), StableCycleSort(),
-            StablePermutationSort(), StableSelectionSort(), StaticSort(), StoogeSort(), StrandSort(), SwaplessBubbleSort(),
-            TernaryHeapSort(), TernaryLLQuickSort(), TernaryLRQuickSort(), ThreeSmoothCombSortIterative(),
-            ThreeSmoothCombSortRecursive(), TriangularHeapSort(), UnoptimizedBubbleSort(),
-            UnoptimizedCocktailShakerSort(), WeakHeapSort(), WeavedMergeSort(), WeaveMergeSort()
-        ]
-        AlgorithmRegistry.shared.discover()
+    // Native Swift is the target for every algorithm and shuffle now — the JavaScriptCore
+    // scripting backend (ScriptingKit) was removed entirely after it turned out to reference a
+    // private API (`JSContextGroupSetExecutionTimeLimit`), which blocked App Store submission.
+    AlgorithmRegistry.shared.builtIns = [
+      AsynchronousSort(), BadSort(), BaseNMaxHeapSort(), BinaryDoubleInsertionSort(),
+      BinaryGnomeSort(),
+      BinaryInsertionSort(), BinaryMergeSort(), BingoSort(), BinomialHeapSort(),
+      BinomialSmoothSort(),
+      BitonicSortIterative(),
+      BitonicSortRecursive(), BlockSwapMergeSort(), BogoSort(), BoseNelsonSortIterative(),
+      BottomUpHeapSort(), BottomUpMergeSort(), BozoSort(), BubbleBogoSort(), BubbleSort(),
+      BurntPancakeSort(),
+      CircleSortIterative(), CircleSortRecursive(), CircloidSort(),
+      ClassicThreeSmoothCombSort(), ClassicTreeSort(), CocktailBogoSort(),
+      CocktailMergeSort(), CocktailShakerSort(), CombSort(), CountingSort(), CycleSort(),
+      DeterministicBogoSort(), DiamondSortRecursive(), DoubleInsertionSort(), DoubleSelectionSort(),
+      DualPivotQuickSort(), ExchangeBogoSort(), FlashSort(), FlippedMinHeapSort(), GnomeSort(),
+      GravitySort(),
+      GuessSort(), HybridCombSort(), InPlaceMergeSort(), InsertionSort(),
+      IntroCircleSortIterative(),
+      IntroSort(), LazyHeapSort(), LessBogoSort(), LLQuickSort(), LRQuickSort(), LSDRadixSort(),
+      MaxHeapSort(),
+      MedianQuickBogoSort(), MergeBogoSort(), MergeExchangeSortIterative(), MergeSort(),
+      MinHeapSort(), MSDRadixSort(),
+      OddEvenMergeSortIterative(), OddEvenMergeSortRecursive(), OddEvenSort(),
+      OptimizedBubbleSort(), OptimizedCocktailShakerSort(), OptimizedGnomeSort(),
+      OptimizedGuessSort(),
+      PairwiseSortIterative(), PancakeSort(), PigeonholeSort(), QuickBogoSort(), QuickSort(),
+      RandomGuessSort(), RecursiveShellSort(), RotateMergeSort(), SelectionBogoSort(),
+      SelectionSort(), ShellSort(),
+      SimplifiedLibrarySort(), SlopeSort(), SlowSort(), SmartBogoBogoSort(), SmartGuessSort(),
+      SnuffleSort(), StableCycleSort(),
+      StablePermutationSort(), StableSelectionSort(), StaticSort(), StoogeSort(), StrandSort(),
+      SwaplessBubbleSort(),
+      TernaryHeapSort(), TernaryLLQuickSort(), TernaryLRQuickSort(), ThreeSmoothCombSortIterative(),
+      ThreeSmoothCombSortRecursive(), TriangularHeapSort(), UnoptimizedBubbleSort(),
+      UnoptimizedCocktailShakerSort(), WeakHeapSort(), WeavedMergeSort(), WeaveMergeSort(),
+    ]
+    AlgorithmRegistry.shared.discover()
 
-        ShuffleRegistry.shared.builtIns = [
-            AlmostShuffle(), AscendingShuffle(), BlockRandomShuffle(), BSTTraversalShuffle(), CircleShuffle(),
-            DescendingShuffle(), DoubleLayeredShuffle(), FinalBitonicShuffle(), FinalMergeShuffle(),
-            FinalRadixShuffle(), GrayCodeShuffle(), HalfRotationShuffle(), HeapifiedShuffle(),
-            InterlacedShuffle(), InvertedBSTShuffle(), LogarithmicSlopesShuffle(), MovedElementShuffle(),
-            NaiveShuffle(), NoisyShuffle(), OrganShuffle(), PairwiseShuffle(), PartialReverseShuffle(),
-            PartitionedShuffle(), QuicksortAdversaryShuffle(), RandomShuffle(), RealFinalMergeShuffle(),
-            RealFinalRadixShuffle(), RecursiveRadixShuffle(), RecursiveReversalShuffle(), SawtoothShuffle(),
-            ShuffledCubicShuffle(), ShuffledHalfShuffle(), ShuffledHeadShuffle(), ShuffledOddsShuffle(),
-            ShuffledQuinticShuffle(), ShuffledTailShuffle(), SierpinskiShuffle(), TriangularShuffle()
-        ]
-        ShuffleRegistry.shared.discover()
+    ShuffleRegistry.shared.builtIns = [
+      AlmostShuffle(), AscendingShuffle(), BlockRandomShuffle(), BSTTraversalShuffle(),
+      CircleShuffle(),
+      DescendingShuffle(), DoubleLayeredShuffle(), FinalBitonicShuffle(), FinalMergeShuffle(),
+      FinalRadixShuffle(), GrayCodeShuffle(), HalfRotationShuffle(), HeapifiedShuffle(),
+      InterlacedShuffle(), InvertedBSTShuffle(), LogarithmicSlopesShuffle(), MovedElementShuffle(),
+      NaiveShuffle(), NoisyShuffle(), OrganShuffle(), PairwiseShuffle(), PartialReverseShuffle(),
+      PartitionedShuffle(), QuicksortAdversaryShuffle(), RandomShuffle(), RealFinalMergeShuffle(),
+      RealFinalRadixShuffle(), RecursiveRadixShuffle(), RecursiveReversalShuffle(),
+      SawtoothShuffle(),
+      ShuffledCubicShuffle(), ShuffledHalfShuffle(), ShuffledHeadShuffle(), ShuffledOddsShuffle(),
+      ShuffledQuinticShuffle(), ShuffledTailShuffle(), SierpinskiShuffle(), TriangularShuffle(),
+    ]
+    ShuffleRegistry.shared.discover()
 
-        // The two automations formerly hardcoded as `SortSession.toggleAutomation()`/
-        // `toggleMaxSizeAutomation()` — the shortcut each one triggers is declared right here,
-        // next to what it runs, instead of separately in `ScrollingSortView`'s shortcut buttons.
-        AutomationRegistry.shared.builtIns = [
-            Automation(
-                id: .sizeSweep, displayName: "Size Sweep", iconName: "arrow.up.right",
-                key: "a", modifiers: [.command, .shift], runsPerSize: 3,
-                sizes: { $0.sizeRange.steppedValues(by: $0.sizeStep) }
-            ),
-            Automation(
-                id: .maxSizeOnly, displayName: "Max Size Only", iconName: "arrow.up.to.line",
-                key: "a", modifiers: [.command, .option, .shift], runsPerSize: 3,
-                sizes: { [$0.sizeRange.upperBound] }
-            ),
-        ]
-        AutomationRegistry.shared.discover()
+    // The two automations formerly hardcoded as `SortSession.toggleAutomation()`/
+    // `toggleMaxSizeAutomation()` — the shortcut each one triggers is declared right here,
+    // next to what it runs, instead of separately in `ScrollingSortView`'s shortcut buttons.
+    AutomationRegistry.shared.builtIns = [
+      Automation(
+        id: .sizeSweep, displayName: "Size Sweep", iconName: "arrow.up.right",
+        key: "a", modifiers: [.command, .shift], runsPerSize: 3,
+        sizes: { $0.sizeRange.steppedValues(by: $0.sizeStep) }
+      ),
+      Automation(
+        id: .maxSizeOnly, displayName: "Max Size Only", iconName: "arrow.up.to.line",
+        key: "a", modifiers: [.command, .option, .shift], runsPerSize: 3,
+        sizes: { [$0.sizeRange.upperBound] }
+      ),
+    ]
+    AutomationRegistry.shared.discover()
 
-        // UI-test-only override (never set by a real launch): AppSettings.defaultArraySize's real
-        // default (256) is deliberately large, and a quadratic/factorial algorithm at that size can
-        // take minutes to visually finish — correct, pedagogically-honest behavior in the running
-        // app, but impractical for a UI test's timeout. Tests set this via `launchEnvironment`.
-        if let overrideValue = ProcessInfo.processInfo.environment["UI_TEST_ARRAY_SIZE"],
-           let overrideSize = Int(overrideValue) {
-            AppSettings.shared.defaultArraySize = overrideSize
-        }
-
-        // Same rationale, for `playbackSpeed`: a UI test asserting an exact seeded speed value
-        // needs to SET that value exactly, not approximate it via `XCUIElement.adjust(
-        // toNormalizedSliderPosition:)`'s coordinate-based drag gesture, which lands at a
-        // different actual value nearly every run (a real, observed source of test flakiness —
-        // not a hypothetical one). This mutates the same `UserDefaults.standard`-backed setting a
-        // real Settings-screen drag would, just precisely and deterministically.
-        if let overrideValue = ProcessInfo.processInfo.environment["UI_TEST_PLAYBACK_SPEED"],
-           let overrideSpeed = Double(overrideValue) {
-            AppSettings.shared.playbackSpeed = overrideSpeed
-        }
+    // UI-test-only override (never set by a real launch): AppSettings.defaultArraySize's real
+    // default (256) is deliberately large, and a quadratic/factorial algorithm at that size can
+    // take minutes to visually finish — correct, pedagogically-honest behavior in the running
+    // app, but impractical for a UI test's timeout. Tests set this via `launchEnvironment`.
+    if let overrideValue = ProcessInfo.processInfo.environment["UI_TEST_ARRAY_SIZE"],
+      let overrideSize = Int(overrideValue)
+    {
+      AppSettings.shared.defaultArraySize = overrideSize
     }
 
-    var body: some Scene {
-        WindowGroup {
-            ContentView()
-                .environment(AppSettings.shared)
-        }
-        .commands {
-            SortCommands()
-        }
+    // Same rationale, for `playbackSpeed`: a UI test asserting an exact seeded speed value
+    // needs to SET that value exactly, not approximate it via `XCUIElement.adjust(
+    // toNormalizedSliderPosition:)`'s coordinate-based drag gesture, which lands at a
+    // different actual value nearly every run (a real, observed source of test flakiness —
+    // not a hypothetical one). This mutates the same `UserDefaults.standard`-backed setting a
+    // real Settings-screen drag would, just precisely and deterministically.
+    if let overrideValue = ProcessInfo.processInfo.environment["UI_TEST_PLAYBACK_SPEED"],
+      let overrideSpeed = Double(overrideValue)
+    {
+      AppSettings.shared.playbackSpeed = overrideSpeed
     }
+  }
+
+  var body: some Scene {
+    WindowGroup {
+      ContentView()
+        .environment(AppSettings.shared)
+    }
+    .commands {
+      SortCommands()
+    }
+  }
 }

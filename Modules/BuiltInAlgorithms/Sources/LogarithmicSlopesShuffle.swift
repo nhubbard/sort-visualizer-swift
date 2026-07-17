@@ -1,6 +1,6 @@
 import AlgorithmKit
-import SortEngineKit
 import Foundation
+import SortEngineKit
 
 /// Ported from ArrayV's `Shuffles.LOG_SLOPES`. Every position `i` pulls its value from a computed
 /// index (`2 * (i - power) + 1`, where `power` is the largest power of two at or below `i`) into a
@@ -18,20 +18,20 @@ import Foundation
 /// `NativeShuffleCorrectnessTests` alongside the curve shuffles (`ShuffledCubicShuffle`/
 /// `ShuffledQuinticShuffle`) rather than the shuffles checked for permutation.
 public struct LogarithmicSlopesShuffle: ShuffleAlgorithm {
-    public let id = ShuffleID(rawValue: "logslopes")
-    public let metadata = ShuffleMetadata(displayName: "Logarithmic Slopes")
-    public init() {}
-    public func record(into engine: inout RecordingEngine) {
-        let n = engine.count
-        guard n > 0 else { return }
-        let original = engine.values
+  public let id = ShuffleID(rawValue: "logslopes")
+  public let metadata = ShuffleMetadata(displayName: "Logarithmic Slopes")
+  public init() {}
+  public func record(into engine: inout RecordingEngine) {
+    let n = engine.count
+    guard n > 0 else { return }
+    let original = engine.values
 
-        engine.setValue(0, original.min()!)
-        for i in 1..<n {
-            let log = Int(Foundation.log2(Double(i)))
-            let power = Int(pow(2.0, Double(log)))
-            let value = original[2 * (i - power) + 1]
-            engine.setValue(i, value)
-        }
+    engine.setValue(0, original.min()!)
+    for i in 1..<n {
+      let log = Int(Foundation.log2(Double(i)))
+      let power = Int(pow(2.0, Double(log)))
+      let value = original[2 * (i - power) + 1]
+      engine.setValue(i, value)
     }
+  }
 }
