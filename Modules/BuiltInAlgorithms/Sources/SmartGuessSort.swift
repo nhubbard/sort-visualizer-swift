@@ -6,7 +6,7 @@ public struct SmartGuessSort: SortAlgorithm {
     public let metadata = AlgorithmMetadata(
         displayName: "Smart Guess Sort",
         category: .impractical,
-        sizeRange: 4...19,
+        sizeRange: 4...8,
         stable: false,
         timeComplexity: ComplexityBounds(best: "O(n)", average: "O(n^n)", worst: "O(n^n)"),
         spaceComplexity: "O(n)",

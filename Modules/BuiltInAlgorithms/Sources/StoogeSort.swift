@@ -6,7 +6,7 @@ public struct StoogeSort: SortAlgorithm {
     public let metadata = AlgorithmMetadata(
         displayName: "Stooge Sort",
         category: .impractical,
-        sizeRange: 16...128,
+        sizeRange: 16...32,
         stable: false,
         timeComplexity: ComplexityBounds(best: "O(n^{2.71})", average: "O(n^{2.71})", worst: "O(n^{2.71})"),
         spaceComplexity: "O(log n)",

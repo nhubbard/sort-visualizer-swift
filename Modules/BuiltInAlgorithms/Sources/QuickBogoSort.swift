@@ -6,7 +6,7 @@ public struct QuickBogoSort: SortAlgorithm {
     public let metadata = AlgorithmMetadata(
         displayName: "Quick Bogo Sort",
         category: .impractical,
-        sizeRange: 4...8,
+        sizeRange: 4...6,
         stable: false,
         timeComplexity: ComplexityBounds(best: "O(n)", average: "O(n \\times n!)", worst: "O(n \\times n!)"),
         spaceComplexity: "O(log n)",

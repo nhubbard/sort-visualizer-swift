@@ -6,7 +6,7 @@ public struct MergeBogoSort: SortAlgorithm {
     public let metadata = AlgorithmMetadata(
         displayName: "Merge Bogo Sort",
         category: .impractical,
-        sizeRange: 4...22,
+        sizeRange: 4...10,
         stable: false,
         timeComplexity: ComplexityBounds(best: "O(n)", average: "O(n \\times 2^n)", worst: "O(n \\times 2^n)"),
         spaceComplexity: "O(n)",
