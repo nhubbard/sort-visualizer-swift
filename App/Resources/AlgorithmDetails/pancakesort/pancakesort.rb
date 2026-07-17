@@ -9,7 +9,7 @@ end
 
 def max_index(arr, n)
   index = 0
-  for i in 0..(n - 1)
+  (0..(n - 1)).each do |i|
     if arr[i] > arr[index]
       index = i
     end

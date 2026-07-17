@@ -10,9 +10,9 @@ end
 
 def sort(arr)
   n = arr.length
-  for i in (n - 1).downto(1)
+  (n - 1).downto(1).each do |i|
     max = 0
-    for j in (max + 1)..i
+    ((max + 1)..i).each do |j|
       if arr[j] > arr[max]
         max = j
       end

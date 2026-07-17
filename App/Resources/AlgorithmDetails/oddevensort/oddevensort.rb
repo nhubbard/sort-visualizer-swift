@@ -1,7 +1,7 @@
 def sort(arr)
   n = arr.length
   sorted = false
-  while !sorted
+  until sorted
     sorted = true
     i = 1
     while i < n - 1

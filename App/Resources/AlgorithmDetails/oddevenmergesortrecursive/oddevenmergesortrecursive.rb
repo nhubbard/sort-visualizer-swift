@@ -17,18 +17,14 @@ def odd_even_merge(array, lo, m2, n, r)
       odd_even_merge(array, lo + r, m2 / 2, n, m)           # odd subsequence
     end
 
-    if m2 % 2 != 0
-      i = lo
-      while i + r < lo + n
-        odd_even_merge_compare(array, i, i + r)
-        i += m
-      end
+    i = if m2 % 2 != 0
+      lo
     else
-      i = lo + r
-      while i + r < lo + n
-        odd_even_merge_compare(array, i, i + r)
-        i += m
-      end
+      lo + r
+    end
+    while i + r < lo + n
+      odd_even_merge_compare(array, i, i + r)
+      i += m
     end
   elsif n > r
     odd_even_merge_compare(array, lo, lo + r)

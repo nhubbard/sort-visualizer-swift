@@ -5,15 +5,15 @@ def sort(arr)
 
   is_valid = lambda do
     total = 0
-    for i in 0...n
-      for j in 0...n
+    (0...n).each do |i|
+      (0...n).each do |j|
         if loops[i] == loops[j]
           total += 1
         end
       end
     end
-    for i in 0...n
-      for j in 0...n
+    (0...n).each do |i|
+      (0...n).each do |j|
         if i < j && arr[loops[i]] > arr[loops[j]]
           total += 1
         elsif i > j && arr[loops[i]] < arr[loops[j]]
@@ -42,7 +42,7 @@ def sort(arr)
   end
 
   original = arr.dup
-  for i in 0...n
+  (0...n).each do |i|
     arr[i] = original[indexes[i]]
   end
 end

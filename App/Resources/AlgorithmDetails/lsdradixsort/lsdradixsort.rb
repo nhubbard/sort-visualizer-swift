@@ -2,11 +2,11 @@ def counting(arr, e)
   n = arr.length
   output = Array.new(n) { |z| 0 }
   count = Array.new(10) { |z| 0 }
-  for i in (0...n)
+  (0...n).each do |i|
     idx = arr[i] / e
     count[idx % 10] += 1
   end
-  for i in (1...10)
+  (1...10).each do |i|
     count[i] += count[i - 1]
   end
   i = n - 1
@@ -16,7 +16,7 @@ def counting(arr, e)
     count[idx % 10] -= 1
     i -= 1
   end
-  for i in (0...n)
+  (0...n).each do |i|
     arr[i] = output[i]
   end
 end

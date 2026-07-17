@@ -32,9 +32,10 @@ def sort(array)
   return array if ending == 0
   padded_length = next_power_of_two(ending)
   swaps = nil
-  begin
+  loop do
     swaps = circle_sort_routine(array, 0, padded_length - 1, ending)
-  end while swaps != 0
+    break unless swaps != 0
+  end
   array
 end
 

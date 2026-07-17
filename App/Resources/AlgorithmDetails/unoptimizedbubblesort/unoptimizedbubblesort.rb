@@ -11,7 +11,7 @@ def sort(array)
       i += 1
     end
   end
-  return array
+  array
 end
 
 array = [0, 39, 21, 62, 91, 77, 14, 23,

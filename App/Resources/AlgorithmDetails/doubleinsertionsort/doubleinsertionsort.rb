@@ -24,7 +24,6 @@ def double_insertion_sort(array, start, last)
         array[pos + 1] = array[pos]
         pos -= 1
       end
-      array[pos + 1] = right_item
     else
       left_item = array[left]
       right_item = array[right]
@@ -41,8 +40,8 @@ def double_insertion_sort(array, start, last)
         array[pos + 1] = array[pos]
         pos -= 1
       end
-      array[pos + 1] = right_item
     end
+    array[pos + 1] = right_item
 
     left -= 1
     right += 1

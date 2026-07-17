@@ -7,10 +7,8 @@ def sort(arr)
     b = arr[loops[i + 1]]
     if a < b
       true
-    elsif a == b && loops[i] < loops[i + 1]
-      true
     else
-      false
+      a == b && loops[i] < loops[i + 1]
     end
   end
 

@@ -1,7 +1,7 @@
 def heapify(a, parent, limit)
   root = a[parent]
   while (child_node = 2 * parent) <= limit
-    if child_node < limit and a[child_node] < a[child_node + 1]
+    if (child_node < limit) && (a[child_node] < a[child_node + 1])
       child_node += 1
     end
     break if root >= a[child_node]
