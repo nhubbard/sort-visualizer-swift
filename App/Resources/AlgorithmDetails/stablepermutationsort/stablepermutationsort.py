@@ -24,6 +24,7 @@ def sort(arr):
 
     permute(n)
 
+
 array = [0, 39, 21, 62, 91, 14, 23]
 sort(array)
 print(array)

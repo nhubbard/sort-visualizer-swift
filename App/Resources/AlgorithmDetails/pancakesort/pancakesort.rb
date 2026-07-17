@@ -14,11 +14,11 @@ def max_index(arr, n)
       index = i
     end
   end
-  return index
+  index
 end
 
 def sort(arr)
-  n = arr.length()
+  n = arr.length
   while n > 1
     max = max_index(arr, n)
     if max != n

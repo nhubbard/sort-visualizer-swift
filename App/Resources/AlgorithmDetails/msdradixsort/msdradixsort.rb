@@ -1,11 +1,11 @@
 def int_pow(base, exponent)
   result = 1
   exponent.times { result *= base }
-  return result
+  result
 end
 
 def get_digit(value, power, radix)
-  return (value / int_pow(radix, power)) % radix
+  (value / int_pow(radix, power)) % radix
 end
 
 def radix_msd(array, low, high, radix, power)
@@ -42,7 +42,7 @@ def sort(arr)
     probe *= radix
   end
   radix_msd(arr, 0, arr.length, radix, highest_power)
-  return arr
+  arr
 end
 
 array = [0, 39, 21, 62, 91, 77, 14, 23,

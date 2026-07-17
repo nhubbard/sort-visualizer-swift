@@ -1,5 +1,5 @@
 def insertion_sort(arr)
-  n = arr.length()
+  n = arr.length
   i = 1
   while i < n
     key = arr[i]
@@ -14,12 +14,12 @@ def insertion_sort(arr)
 end
 
 def sort(arr)
-  n = arr.length()
+  n = arr.length
   shrink = 1.3
   gap = n
   sorted = false
   threshold = [8, n / 32].min
-  while !sorted
+  until sorted
     gap = (gap / shrink).to_i
     if gap <= 1
       sorted = true

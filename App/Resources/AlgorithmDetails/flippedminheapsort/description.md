@@ -1,3 +1,9 @@
-Flipped Min Heap Sort is an ordinary min-heap sort with a mirror held up to it: every array position the algorithm touches is addressed as `length - p` instead of `p`, so the heap is built and repeatedly emptied from the *back* of the array toward the front rather than from the front toward the back. The heap logic itself — sift a value down past its children until it settles, extract the root, shrink the heap, repeat — is unchanged.
+Flipped Min Heap Sort is an ordinary min-heap sort with a mirror held up to it: every array position the algorithm
+touches is addressed as `length - p` instead of `p`, so the heap is built and repeatedly emptied from the *back* of the
+array toward the front rather than from the front toward the back. The heap logic itself — sift a value down past its
+children until it settles, extract the root, shrink the heap, repeat — is unchanged.
 
-The mirroring is purely cosmetic to the algorithm's correctness; a min-heap built and drained through flipped indices ends up placing the smallest elements at the *end* of the addressed range just as reliably as an unflipped one places them at the front of its own. It exists mainly to show that the specific direction a heapsort happens to sweep through memory is an implementation choice, not something the underlying heap invariant cares about.
+The mirroring is purely cosmetic to the algorithm's correctness; a min-heap built and drained through flipped indices
+ends up placing the smallest elements at the *end* of the addressed range just as reliably as an unflipped one places
+them at the front of its own. It exists mainly to show that the specific direction a heapsort happens to sweep through
+memory is an implementation choice, not something the underlying heap invariant cares about.

@@ -17,7 +17,8 @@ void printList(int items[], int size) {
 
 void snuffleSort(int arr[], int start, int stop) {
   if (stop - start + 1 >= 2) {
-    if (arr[start] > arr[stop]) std::swap(arr[start], arr[stop]);
+    if (arr[start] > arr[stop])
+      std::swap(arr[start], arr[stop]);
     if (stop - start + 1 >= 3) {
       int mid = (stop - start) / 2 + start;
       int iterations = (stop - start + 1) / 2;
@@ -29,9 +30,7 @@ void snuffleSort(int arr[], int start, int stop) {
   }
 }
 
-void sort(int arr[], int n) {
-  snuffleSort(arr, 0, n - 1);
-}
+void sort(int arr[], int n) { snuffleSort(arr, 0, n - 1); }
 
 int main(int argc, char *argv[]) {
   int size = sizeof(array) / sizeof(array[0]);

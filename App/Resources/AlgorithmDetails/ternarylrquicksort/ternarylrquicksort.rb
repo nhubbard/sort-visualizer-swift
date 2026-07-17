@@ -1,6 +1,6 @@
 def compare3(arr, a, b)
   return 0 if arr[a] == arr[b]
-  arr[a] > arr[b] ? 1 : -1
+  (arr[a] > arr[b]) ? 1 : -1
 end
 
 def select_pivot(arr, lo, hi)
@@ -12,9 +12,15 @@ def select_pivot(arr, lo, hi)
   return hi - 1 if c_lo_hi == 0 || c_mid_hi == 0
 
   if c_lo_mid < 0
-    c_mid_hi < 0 ? mid : (c_lo_hi < 0 ? hi - 1 : lo)
+    if c_mid_hi < 0
+      mid
+    else
+      ((c_lo_hi < 0) ? hi - 1 : lo)
+    end
+  elsif c_mid_hi > 0
+    mid
   else
-    c_mid_hi > 0 ? mid : (c_lo_hi < 0 ? lo : hi - 1)
+    ((c_lo_hi < 0) ? lo : hi - 1)
   end
 end
 
@@ -58,7 +64,7 @@ def quicksort_ternary_lr(arr, lo, hi)
   num_greater = q - j
 
   j = i - 1
-  i = i + 1
+  i += 1
 
   pe = lo + [p - lo, num_less].min
   k = lo
@@ -81,7 +87,7 @@ def quicksort_ternary_lr(arr, lo, hi)
 end
 
 def sort(arr)
-  quicksort_ternary_lr(arr, 0, arr.length() - 1)
+  quicksort_ternary_lr(arr, 0, arr.length - 1)
 end
 
 array = [0, 39, 21, 62, 91, 77, 14, 23,

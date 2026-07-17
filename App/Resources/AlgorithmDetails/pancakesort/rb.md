@@ -14,11 +14,11 @@
       ](code: 'Token.Text.Whitespace')^[index](code: 'Token.Name')^[ ](code: 'Token.Text.Whitespace')^[=](code: 'Token.Operator')^[ ](code: 'Token.Text.Whitespace')^[i](code: 'Token.Name')^[
     ](code: 'Token.Text.Whitespace')^[end](code: 'Token.Keyword')^[
   ](code: 'Token.Text.Whitespace')^[end](code: 'Token.Keyword')^[
-  ](code: 'Token.Text.Whitespace')^[return](code: 'Token.Keyword')^[ ](code: 'Token.Text.Whitespace')^[index](code: 'Token.Name')
+  ](code: 'Token.Text.Whitespace')^[index](code: 'Token.Name')
 ^[end](code: 'Token.Keyword')^[
 
 ](code: 'Token.Text.Whitespace')^[def](code: 'Token.Keyword')^[ ](code: 'Token.Text.Whitespace')^[sort](code: 'Token.Name.Function')^[(](code: 'Token.Punctuation')^[arr](code: 'Token.Name')^[)](code: 'Token.Punctuation')^[
-  ](code: 'Token.Text.Whitespace')^[n](code: 'Token.Name')^[ ](code: 'Token.Text.Whitespace')^[=](code: 'Token.Operator')^[ ](code: 'Token.Text.Whitespace')^[arr](code: 'Token.Name')^[.](code: 'Token.Operator')^[length](code: 'Token.Name')^[(](code: 'Token.Punctuation')^[)](code: 'Token.Punctuation')^[
+  ](code: 'Token.Text.Whitespace')^[n](code: 'Token.Name')^[ ](code: 'Token.Text.Whitespace')^[=](code: 'Token.Operator')^[ ](code: 'Token.Text.Whitespace')^[arr](code: 'Token.Name')^[.](code: 'Token.Operator')^[length](code: 'Token.Name')^[
   ](code: 'Token.Text.Whitespace')^[while](code: 'Token.Keyword')^[ ](code: 'Token.Text.Whitespace')^[n](code: 'Token.Name')^[ ](code: 'Token.Text.Whitespace')^[>](code: 'Token.Operator')^[ ](code: 'Token.Text.Whitespace')^[1](code: 'Token.Literal.Number.Integer')^[
     ](code: 'Token.Text.Whitespace')^[max](code: 'Token.Name')^[ ](code: 'Token.Text.Whitespace')^[=](code: 'Token.Operator')^[ ](code: 'Token.Text.Whitespace')^[max\_index](code: 'Token.Name')^[(](code: 'Token.Punctuation')^[arr](code: 'Token.Name')^[,](code: 'Token.Punctuation')^[ ](code: 'Token.Text.Whitespace')^[n](code: 'Token.Name')^[)](code: 'Token.Punctuation')^[
     ](code: 'Token.Text.Whitespace')^[if](code: 'Token.Keyword')^[ ](code: 'Token.Text.Whitespace')^[max](code: 'Token.Name')^[ ](code: 'Token.Text.Whitespace')^[!=](code: 'Token.Operator')^[ ](code: 'Token.Text.Whitespace')^[n](code: 'Token.Name')^[

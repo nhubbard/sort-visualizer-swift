@@ -1,7 +1,8 @@
 #include <cstdio>
 #include <vector>
 
-void merge(std::vector<int> &arr, std::vector<int> &tmp, int length, int residue, int modulus) {
+void merge(std::vector<int> &arr, std::vector<int> &tmp, int length,
+           int residue, int modulus) {
   if (residue + modulus >= length) {
     return;
   }
@@ -55,8 +56,8 @@ void printList(const std::vector<int> &arr) {
 }
 
 int main() {
-  std::vector<int> array = {0, 39, 21, 62, 91, 77, 14, 23,
-                             90, 69, 51, 81, 68, 83, 32, 56};
+  std::vector<int> array = {0,  39, 21, 62, 91, 77, 14, 23,
+                            90, 69, 51, 81, 68, 83, 32, 56};
   sort(array);
   printList(array);
   return 0;

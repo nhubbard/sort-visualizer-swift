@@ -36,9 +36,7 @@ void bitonicSort(int arr[], int lo, int n, bool dir) {
   }
 }
 
-void sort(int arr[], int n) {
-  bitonicSort(arr, 0, n, true);
-}
+void sort(int arr[], int n) { bitonicSort(arr, 0, n, true); }
 
 void printList(int arr[], int n) {
   for (int i = 0; i < n; i++) {
@@ -52,8 +50,7 @@ void printList(int arr[], int n) {
   }
 }
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
-                 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
 
 int main(int argc, char *argv[]) {
   int size = sizeof(array) / sizeof(array[0]);

@@ -28,7 +28,7 @@ def sort(array)
     end
     start_idx += consec_sorted
   end
-  return array
+  array
 end
 
 array = [0, 39, 21, 62, 91, 77, 14, 23,

@@ -35,6 +35,7 @@
 ^[    ](code: 'Token.Text')^[for](code: 'Token.Keyword')^[ ](code: 'Token.Text')^[i](code: 'Token.Name')^[ ](code: 'Token.Text')^[in](code: 'Token.Operator.Word')^[ ](code: 'Token.Text')^[range](code: 'Token.Name.Builtin')^[(](code: 'Token.Punctuation')^[n](code: 'Token.Name')^[)](code: 'Token.Punctuation')^[:](code: 'Token.Punctuation')
 ^[        ](code: 'Token.Text')^[arr](code: 'Token.Name')^[\[](code: 'Token.Punctuation')^[i](code: 'Token.Name')^[\]](code: 'Token.Punctuation')^[ ](code: 'Token.Text')^[=](code: 'Token.Operator')^[ ](code: 'Token.Text')^[original](code: 'Token.Name')^[\[](code: 'Token.Punctuation')^[indexes](code: 'Token.Name')^[\[](code: 'Token.Punctuation')^[i](code: 'Token.Name')^[\]](code: 'Token.Punctuation')^[\]](code: 'Token.Punctuation')
 
+
 ^[array](code: 'Token.Name')^[ ](code: 'Token.Text')^[=](code: 'Token.Operator')^[ ](code: 'Token.Text')^[\[](code: 'Token.Punctuation')^[0](code: 'Token.Literal.Number.Integer')^[,](code: 'Token.Punctuation')^[ ](code: 'Token.Text')^[39](code: 'Token.Literal.Number.Integer')^[,](code: 'Token.Punctuation')^[ ](code: 'Token.Text')^[21](code: 'Token.Literal.Number.Integer')^[,](code: 'Token.Punctuation')^[ ](code: 'Token.Text')^[14](code: 'Token.Literal.Number.Integer')^[\]](code: 'Token.Punctuation')
 ^[sort](code: 'Token.Name')^[(](code: 'Token.Punctuation')^[array](code: 'Token.Name')^[)](code: 'Token.Punctuation')
 ^[print](code: 'Token.Name.Builtin')^[(](code: 'Token.Punctuation')^[array](code: 'Token.Name')^[)](code: 'Token.Punctuation')

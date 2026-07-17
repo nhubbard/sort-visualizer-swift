@@ -1,12 +1,12 @@
 def sort(arr)
-  n = arr.length()
+  n = arr.length
   i = n / 2
   while i > 0
     j = i
     while j < n
       k = j - i
       while k >= 0
-        if arr[k + i] >= arr[k] then
+        if arr[k + i] >= arr[k]
           break
         else
           arr[k], arr[k + i] = arr[k + i], arr[k]

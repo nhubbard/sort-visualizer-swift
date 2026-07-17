@@ -1,8 +1,7 @@
 #include <cstdio>
 #include <vector>
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
-                 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
 
 void printList(int arr[], int n) {
   for (int i = 0; i < n; i++) {
@@ -47,8 +46,8 @@ void radixMSD(int arr[], int low, int high, int radix, int power) {
 
   int start = low;
   for (auto &bucket : buckets) {
-    radixMSD(arr, start, start + (int) bucket.size(), radix, power - 1);
-    start += (int) bucket.size();
+    radixMSD(arr, start, start + (int)bucket.size(), radix, power - 1);
+    start += (int)bucket.size();
   }
 }
 

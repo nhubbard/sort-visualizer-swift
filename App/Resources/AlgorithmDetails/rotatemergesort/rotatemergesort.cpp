@@ -1,8 +1,7 @@
 #include <cstdio>
 #include <utility>
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
-                 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
 
 void printList(int arr[], int n) {
   for (int i = 0; i < n; i++) {
@@ -90,9 +89,7 @@ void rotateMergeSort(int arr[], int a, int b) {
   }
 }
 
-void sort(int arr[], int n) {
-  rotateMergeSort(arr, 0, n);
-}
+void sort(int arr[], int n) { rotateMergeSort(arr, 0, n); }
 
 int main(int argc, char *argv[]) {
   int size = sizeof(array) / sizeof(array[0]);

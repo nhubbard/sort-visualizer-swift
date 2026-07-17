@@ -90,7 +90,7 @@ def static_sort(array, a, b)
   end
 
   (0...aux_len).each do |i|
-    s = i > 1 ? offset[i - 1] : a
+    s = (i > 1) ? offset[i - 1] : a
     e = offset[i]
     next if e - s <= 1
     if e - s > 16

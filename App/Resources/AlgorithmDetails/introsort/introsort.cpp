@@ -1,9 +1,8 @@
-#include <cstdio>
 #include <cmath>
+#include <cstdio>
 #include <utility>
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
-                 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
 
 void printList(int items[], int size) {
   for (int i = 0; i < size; i++) {
@@ -33,10 +32,13 @@ int medianOf3(int arr[], int left, int mid, int right) {
 int partition(int arr[], int lo, int hi, int pivotValue) {
   int i = lo, j = hi;
   while (true) {
-    while (arr[i] < pivotValue) i++;
+    while (arr[i] < pivotValue)
+      i++;
     j--;
-    while (pivotValue < arr[j]) j--;
-    if (!(i < j)) return i;
+    while (pivotValue < arr[j])
+      j--;
+    if (!(i < j))
+      return i;
     std::swap(arr[i], arr[j]);
     i++;
   }
@@ -47,9 +49,12 @@ void siftDown(int arr[], int lo, int root, int rangeSize) {
     int largest = root;
     int left = 2 * root + 1;
     int right = 2 * root + 2;
-    if (left < rangeSize && arr[lo + largest] < arr[lo + left]) largest = left;
-    if (right < rangeSize && arr[lo + largest] < arr[lo + right]) largest = right;
-    if (largest == root) break;
+    if (left < rangeSize && arr[lo + largest] < arr[lo + left])
+      largest = left;
+    if (right < rangeSize && arr[lo + largest] < arr[lo + right])
+      largest = right;
+    if (largest == root)
+      break;
     std::swap(arr[lo + root], arr[lo + largest]);
     root = largest;
   }
@@ -57,7 +62,8 @@ void siftDown(int arr[], int lo, int root, int rangeSize) {
 
 void heapSortRange(int arr[], int lo, int hi) {
   int size = hi - lo;
-  for (int i = size / 2 - 1; i >= 0; i--) siftDown(arr, lo, i, size);
+  for (int i = size / 2 - 1; i >= 0; i--)
+    siftDown(arr, lo, i, size);
   for (int end = size - 1; end > 0; end--) {
     std::swap(arr[lo], arr[lo + end]);
     siftDown(arr, lo, 0, end);
@@ -75,7 +81,8 @@ void insertionSort(int arr[], int start, int end) {
 }
 
 int floorLog2(int a) {
-  return static_cast<int>(std::floor(std::log(static_cast<double>(a)) / std::log(2.0)));
+  return static_cast<int>(
+      std::floor(std::log(static_cast<double>(a)) / std::log(2.0)));
 }
 
 void introsortLoop(int arr[], int lo, int hi, int depthLimit) {

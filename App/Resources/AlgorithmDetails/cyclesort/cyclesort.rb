@@ -18,11 +18,11 @@ def cycle_sort(array)
       array[pos], item = item, array[pos]
     end
   end
-  return array
+  array
 end
 
 def sort(array)
-  return cycle_sort(array)
+  cycle_sort(array)
 end
 
 array = [0, 39, 21, 62, 91, 77, 14, 23,

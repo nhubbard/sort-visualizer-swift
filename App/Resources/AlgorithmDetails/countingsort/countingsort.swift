@@ -2,7 +2,9 @@ import Foundation
 
 func sort(_ array: inout [Int]) {
   let n = array.count
-  guard n > 0 else { return }
+  guard n > 0 else {
+    return
+  }
   let maxValue = array.max()!
 
   var counts = [Int](repeating: 0, count: maxValue + 1)
@@ -24,7 +26,9 @@ func sort(_ array: inout [Int]) {
   }
 }
 
-var array: [Int] = [0, 39, 21, 62, 91, 77, 14, 23,
-  90, 69, 51, 81, 68, 83, 32, 56]
+var array: [Int] = [
+  0, 39, 21, 62, 91, 77, 14, 23,
+  90, 69, 51, 81, 68, 83, 32, 56,
+]
 sort(&array)
 print(array)

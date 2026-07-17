@@ -3,8 +3,8 @@
 
 static int idx;
 
-void traverse(const std::vector<int> &arr, std::vector<int> &temp, std::vector<int> &lower,
-              std::vector<int> &upper, int r) {
+void traverse(const std::vector<int> &arr, std::vector<int> &temp,
+              std::vector<int> &lower, std::vector<int> &upper, int r) {
   if (lower[r] != 0) {
     traverse(arr, temp, lower, upper, lower[r]);
   }
@@ -50,8 +50,8 @@ void printList(const std::vector<int> &arr) {
 }
 
 int main() {
-  std::vector<int> array = {0, 39, 21, 62, 91, 77, 14, 23,
-                             90, 69, 51, 81, 68, 83, 32, 56};
+  std::vector<int> array = {0,  39, 21, 62, 91, 77, 14, 23,
+                            90, 69, 51, 81, 68, 83, 32, 56};
   sort(array);
   printList(array);
   return 0;

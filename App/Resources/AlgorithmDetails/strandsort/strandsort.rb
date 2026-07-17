@@ -20,7 +20,7 @@ def merge_to(arr, sub_list, a, m, b)
 end
 
 def sort(arr)
-  n = arr.length()
+  n = arr.length
   return if n < 2
   sub_list = Array.new(n, 0)
   j = n

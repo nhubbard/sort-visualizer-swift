@@ -59,15 +59,14 @@ def double_insertion(array, a, b)
       m = right_binary_search(array, i + 1, j, l)
       insert_to_right(array, i, m - 1, l)
       dest = left_binary_search(array, m, j, r)
-      insert_to_left(array, j, dest, r)
     else
       l = array[i]
       r = array[j]
       m = left_binary_search(array, i + 1, j, l)
       insert_to_right(array, i, m - 1, l)
       dest = right_binary_search(array, m, j, r)
-      insert_to_left(array, j, dest, r)
     end
+    insert_to_left(array, j, dest, r)
     i -= 1
     j += 1
   end

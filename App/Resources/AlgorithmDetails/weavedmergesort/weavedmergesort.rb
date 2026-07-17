@@ -44,7 +44,7 @@ end
 def sort(arr)
   tmp = Array.new(arr.length, 0)
   merge(arr, tmp, arr.length, 0, 1)
-  return arr
+  arr
 end
 
 array = [0, 39, 21, 62, 91, 77, 14, 23,

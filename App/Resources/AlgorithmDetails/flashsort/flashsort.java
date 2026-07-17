@@ -19,12 +19,19 @@ public class flashsort {
     while (i < n - 1) {
       int small, big, bigIndex;
       if (array[i] < array[i + 1]) {
-        small = array[i]; big = array[i + 1]; bigIndex = i + 1;
+        small = array[i];
+        big = array[i + 1];
+        bigIndex = i + 1;
       } else {
-        big = array[i]; bigIndex = i; small = array[i + 1];
+        big = array[i];
+        bigIndex = i;
+        small = array[i + 1];
       }
-      if (big > maxValue) { maxValue = big; maxIndex = bigIndex; }
-      if (small < minValue) { minValue = small; }
+      if (big > maxValue) {
+        maxValue = big;
+        maxIndex = bigIndex;
+      }
+      if (small < minValue) {minValue = small;}
       i += 2;
     }
 
@@ -91,8 +98,7 @@ public class flashsort {
   }
 
   public static void main(String[] args) {
-    int[] array = new int[]{0, 39, 21, 62, 91, 77, 14, 23,
-      90, 69, 51, 81, 68, 83, 32, 56};
+    int[] array = new int[]{0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
     sort(array);
     System.out.println(Arrays.toString(array));
   }

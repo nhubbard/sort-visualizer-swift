@@ -1,5 +1,5 @@
 def sort(arr)
-  n = arr.length()
+  n = arr.length
   loops = Array.new(n, 0)
 
   is_valid = lambda do

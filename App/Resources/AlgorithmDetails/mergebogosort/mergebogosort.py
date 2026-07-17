@@ -1,5 +1,6 @@
 import random
 
+
 def sort(arr, start=0, end=None):
     if end is None:
         end = len(arr)
@@ -27,6 +28,7 @@ def sort(arr, start=0, end=None):
             else:
                 arr[start + offset] = saved[low]
                 low += 1
+
 
 array = [0, 39, 21, 62, 91, 14, 23]
 sort(array)

@@ -2,8 +2,7 @@
 #include <utility>
 #include <vector>
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
-                 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
 
 void printList(int arr[], int n) {
   for (int i = 0; i < n; i++) {
@@ -29,17 +28,20 @@ int destination(int arr[], std::vector<bool> &flagged, int a, int b1, int b) {
     }
   }
   while (flagged[d] || e > 0) {
-    if (!flagged[d]) e--;
+    if (!flagged[d])
+      e--;
     d++;
   }
   return d;
 }
 
 void stableCycleSort(int arr[], int n) {
-  if (n <= 1) return;
+  if (n <= 1)
+    return;
   std::vector<bool> flagged(n, false);
   for (int i = 0; i < n - 1; i++) {
-    if (flagged[i]) continue;
+    if (flagged[i])
+      continue;
     int j = i;
     do {
       int k = destination(arr, flagged, i, j, n);
@@ -50,9 +52,7 @@ void stableCycleSort(int arr[], int n) {
   }
 }
 
-void sort(int arr[], int n) {
-  stableCycleSort(arr, n);
-}
+void sort(int arr[], int n) { stableCycleSort(arr, n); }
 
 int main(int argc, char *argv[]) {
   int size = sizeof(array) / sizeof(array[0]);

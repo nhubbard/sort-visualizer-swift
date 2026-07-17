@@ -27,7 +27,7 @@ end
 
 def sort(array)
   double_selection_sort(array)
-  return array
+  array
 end
 
 array = [0, 39, 21, 62, 91, 77, 14, 23,

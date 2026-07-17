@@ -3,7 +3,7 @@
   ](code: 'Token.Text.Whitespace')^[while](code: 'Token.Keyword')^[ ](code: 'Token.Text.Whitespace')^[k](code: 'Token.Name')^[ ](code: 'Token.Text.Whitespace')^[<](code: 'Token.Operator')^[ ](code: 'Token.Text.Whitespace')^[n](code: 'Token.Name')^[
     ](code: 'Token.Text.Whitespace')^[k](code: 'Token.Name')^[ ](code: 'Token.Text.Whitespace')^[<<](code: 'Token.Operator')^[=](code: 'Token.Operator')^[ ](code: 'Token.Text.Whitespace')^[1](code: 'Token.Literal.Number.Integer')^[
   ](code: 'Token.Text.Whitespace')^[end](code: 'Token.Keyword')^[
-  ](code: 'Token.Text.Whitespace')^[return](code: 'Token.Keyword')^[ ](code: 'Token.Text.Whitespace')^[k](code: 'Token.Name')^[ ](code: 'Token.Text.Whitespace')^[>>](code: 'Token.Operator')^[ ](code: 'Token.Text.Whitespace')^[1](code: 'Token.Literal.Number.Integer')
+  ](code: 'Token.Text.Whitespace')^[k](code: 'Token.Name')^[ ](code: 'Token.Text.Whitespace')^[>>](code: 'Token.Operator')^[ ](code: 'Token.Text.Whitespace')^[1](code: 'Token.Literal.Number.Integer')
 ^[end](code: 'Token.Keyword')^[
 
 ](code: 'Token.Text.Whitespace')^[def](code: 'Token.Keyword')^[ ](code: 'Token.Text.Whitespace')^[compare](code: 'Token.Name.Function')^[(](code: 'Token.Punctuation')^[array](code: 'Token.Name')^[,](code: 'Token.Punctuation')^[ ](code: 'Token.Text.Whitespace')^[i](code: 'Token.Name')^[,](code: 'Token.Punctuation')^[ ](code: 'Token.Text.Whitespace')^[j](code: 'Token.Name')^[,](code: 'Token.Punctuation')^[ ](code: 'Token.Text.Whitespace')^[dir](code: 'Token.Name')^[)](code: 'Token.Punctuation')^[

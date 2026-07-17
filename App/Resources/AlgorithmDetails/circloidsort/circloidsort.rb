@@ -25,7 +25,7 @@ def circle_pass(array, left, right)
 end
 
 def sort(arr)
-  n = arr.length()
+  n = arr.length
   return if n <= 1
   while circle_pass(arr, 0, n - 1)
   end

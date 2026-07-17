@@ -13,7 +13,7 @@ def sort(array)
   end
 
   (0...n).each { |i| array[i] = output[i] }
-  return array
+  array
 end
 
 array = [0, 39, 21, 62, 91, 77, 14, 23,

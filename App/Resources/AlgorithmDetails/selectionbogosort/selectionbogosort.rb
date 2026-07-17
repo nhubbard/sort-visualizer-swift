@@ -1,5 +1,5 @@
 def sort(arr)
-  n = arr.length()
+  n = arr.length
   (0...n).each do |i|
     while arr[i] != arr[i..-1].min
       j = rand(i..(n - 1))

@@ -1,5 +1,5 @@
 def sort(arr)
-  n = arr.length()
+  n = arr.length
   return if n <= 1
   pow2 = (Math.log(n - 1) / Math.log(2)).to_i
   pow2.downto(0) do |k|

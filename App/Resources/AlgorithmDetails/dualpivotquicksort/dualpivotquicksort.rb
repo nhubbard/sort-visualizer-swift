@@ -28,7 +28,7 @@ def partition(array, low, high)
   g += 1
   array[low], array[j] = array[j], array[low]
   array[high], array[g] = array[g], array[high]
-  return j, g
+  [j, g]
 end
 
 def dual_pivot_quick_sort(array, low, high)
@@ -38,11 +38,11 @@ def dual_pivot_quick_sort(array, low, high)
     dual_pivot_quick_sort(array, j + 1, g - 1)
     dual_pivot_quick_sort(array, g + 1, high)
   end
-  return array
+  array
 end
 
 def sort(array)
-  return dual_pivot_quick_sort(array, 0, array.length() - 1)
+  dual_pivot_quick_sort(array, 0, array.length - 1)
 end
 
 array = [0, 39, 21, 62, 91, 77, 14, 23,

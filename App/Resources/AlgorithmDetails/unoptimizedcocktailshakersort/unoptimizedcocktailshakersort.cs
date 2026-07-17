@@ -1,17 +1,24 @@
 using System;
 
-public class UnoptimizedCocktailShakerSort {
-  public static int[] Sort(int[] array) {
+public class UnoptimizedCocktailShakerSort
+{
+  public static int[] Sort(int[] array)
+  {
     var n = array.Length;
     var i = 0;
-    while (i < n / 2) {
-      for (var j = i; j < n - i - 1; j++) {
-        if (array[j] > array[j + 1]) {
+    while (i < n / 2)
+    {
+      for (var j = i; j < n - i - 1; j++)
+      {
+        if (array[j] > array[j + 1])
+        {
           (array[j], array[j + 1]) = (array[j + 1], array[j]);
         }
       }
-      for (var j = n - i - 1; j > i; j--) {
-        if (array[j] < array[j - 1]) {
+      for (var j = n - i - 1; j > i; j--)
+      {
+        if (array[j] < array[j - 1])
+        {
           (array[j], array[j - 1]) = (array[j - 1], array[j]);
         }
       }
@@ -20,9 +27,9 @@ public class UnoptimizedCocktailShakerSort {
     return array;
   }
 
-  public static void Main(String[] args) {
-    int[] array = {0, 39, 21, 62, 91, 77, 14, 23,
-      90, 69, 51, 81, 68, 83, 32, 56};
+  public static void Main(String[] args)
+  {
+    int[] array = { 0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56 };
     Sort(array);
     string result = "[" + String.Join(", ", array) + "]";
     Console.WriteLine(result);

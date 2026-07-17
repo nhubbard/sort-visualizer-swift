@@ -30,7 +30,7 @@ end
 
 def weave_merge_sort(arr, min, max)
   if max - min == 0
-    return
+    nil
   elsif max - min == 1
     arr[min], arr[max] = arr[max], arr[min] if arr[min] > arr[max]
   else
@@ -43,7 +43,7 @@ end
 
 def sort(arr)
   weave_merge_sort(arr, 0, arr.length - 1) if arr.length > 1
-  return arr
+  arr
 end
 
 array = [0, 39, 21, 62, 91, 77, 14, 23,

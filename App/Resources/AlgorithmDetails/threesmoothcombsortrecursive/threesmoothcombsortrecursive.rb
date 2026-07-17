@@ -24,7 +24,7 @@ def recursive_comb(arr, pos, gap, en)
 end
 
 def sort(arr)
-  n = arr.length()
+  n = arr.length
   recursive_comb(arr, 0, 1, n) if n > 1
 end
 

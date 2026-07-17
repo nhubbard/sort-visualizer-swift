@@ -1,5 +1,5 @@
-#include <cstdio>
 #include <algorithm>
+#include <cstdio>
 #include <random>
 
 int array[7] = {0, 39, 21, 62, 91, 14, 23};
@@ -69,9 +69,7 @@ void sortRange(int arr[], int start, int end) {
   }
 }
 
-void sort(int arr[], int n) {
-  sortRange(arr, 0, n);
-}
+void sort(int arr[], int n) { sortRange(arr, 0, n); }
 
 int main(int argc, char *argv[]) {
   int size = sizeof(array) / sizeof(array[0]);

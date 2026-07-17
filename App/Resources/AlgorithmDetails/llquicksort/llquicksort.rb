@@ -10,7 +10,7 @@ def partition(array, lo, hi)
     j += 1
   end
   array[i], array[hi] = array[hi], array[i]
-  return i
+  i
 end
 
 def quick_sort(array, lo, hi)
@@ -19,11 +19,11 @@ def quick_sort(array, lo, hi)
     quick_sort(array, lo, p - 1)
     quick_sort(array, p + 1, hi)
   end
-  return array
+  array
 end
 
 def sort(array)
-  return quick_sort(array, 0, array.length() - 1)
+  quick_sort(array, 0, array.length - 1)
 end
 
 array = [0, 39, 21, 62, 91, 77, 14, 23,

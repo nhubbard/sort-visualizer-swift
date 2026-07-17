@@ -19,7 +19,7 @@ public class randomguesssort {
         break;
       }
       for (int pos = 0; pos < n; pos++) {
-        loops[pos] = (int)(Math.random() * n);
+        loops[pos] = (int) (Math.random() * n);
       }
     }
 

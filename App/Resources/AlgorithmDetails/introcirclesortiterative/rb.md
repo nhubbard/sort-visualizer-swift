@@ -18,7 +18,7 @@
     ](code: 'Token.Text.Whitespace')^[end](code: 'Token.Keyword')^[
     ](code: 'Token.Text.Whitespace')^[gap](code: 'Token.Name')^[ ](code: 'Token.Text.Whitespace')^[/=](code: 'Token.Operator')^[ ](code: 'Token.Text.Whitespace')^[2](code: 'Token.Literal.Number.Integer')^[
   ](code: 'Token.Text.Whitespace')^[end](code: 'Token.Keyword')^[
-  ](code: 'Token.Text.Whitespace')^[return](code: 'Token.Keyword')^[ ](code: 'Token.Text.Whitespace')^[swap\_count](code: 'Token.Name')
+  ](code: 'Token.Text.Whitespace')^[swap\_count](code: 'Token.Name')
 ^[end](code: 'Token.Keyword')^[
 
 ](code: 'Token.Text.Whitespace')^[def](code: 'Token.Keyword')^[ ](code: 'Token.Text.Whitespace')^[binary\_insertion\_sort](code: 'Token.Name.Function')^[(](code: 'Token.Punctuation')^[array](code: 'Token.Name')^[,](code: 'Token.Punctuation')^[ ](code: 'Token.Text.Whitespace')^[last](code: 'Token.Name')^[)](code: 'Token.Punctuation')^[

@@ -13,7 +13,7 @@ def shuffle_range(arr, start, stop)
 end
 
 def sort(arr)
-  n = arr.length()
+  n = arr.length
   (0...n).each do |i|
     shuffle_range(arr, i, n) until is_minimum(arr, i, n)
   end

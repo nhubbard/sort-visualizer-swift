@@ -4,7 +4,7 @@ def sort(numbers)
     return numbers
   end
   half_of_elements = (num_elements / 2).round
-  left  = numbers.take(half_of_elements)
+  left = numbers.take(half_of_elements)
   right = numbers.drop(half_of_elements)
   sorted_left = sort(left)
   sorted_right = sort(right)

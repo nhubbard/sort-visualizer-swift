@@ -20,7 +20,7 @@ def gravity_sort(arr)
 
   (y_size - 1).downto(0) do |j|
     (0...n).each do |i|
-      inc = (i >= n - y[j] ? 1 : 0) - (x[i] >= j ? 1 : 0)
+      inc = ((i >= n - y[j]) ? 1 : 0) - ((x[i] >= j) ? 1 : 0)
       arr[i] += inc
     end
   end

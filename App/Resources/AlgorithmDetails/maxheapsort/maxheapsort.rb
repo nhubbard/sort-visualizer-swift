@@ -1,6 +1,6 @@
 def heapify(a, parent, limit)
   root = a[parent]
-  while (child_node = 2 * parent) <= limit do
+  while (child_node = 2 * parent) <= limit
     if child_node < limit and a[child_node] < a[child_node + 1]
       child_node += 1
     end
@@ -15,18 +15,17 @@ def sort(array)
   size = array.length
   root_array = [nil] + array
   i = size / 2
-  while i > 0 do
+  while i > 0
     heapify(root_array, i, size)
     i -= 1
   end
-  while size > 1 do
+  while size > 1
     root_array[1], root_array[size] = root_array[size], root_array[1]
     size -= 1
     heapify(root_array, 1, size)
   end
   root_array.shift
   root_array
-  return root_array
 end
 
 array = [0, 39, 21, 62, 91, 77, 14, 23,

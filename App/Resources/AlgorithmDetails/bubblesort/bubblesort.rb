@@ -1,5 +1,5 @@
 def sort(array)
-  n = array.length()
+  n = array.length
   c = 0
   while c < n - 1
     d = 0

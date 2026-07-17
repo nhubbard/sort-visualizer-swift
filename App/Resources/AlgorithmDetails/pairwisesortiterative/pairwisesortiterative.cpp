@@ -1,8 +1,7 @@
 #include <cstdio>
 #include <utility>
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
-                 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
 
 void printList(int arr[], int n) {
   for (int i = 0; i < n; i++) {
@@ -28,7 +27,8 @@ void sort(int arr[], int length) {
       }
       c = (c + 1) % a;
       b++;
-      if (c == 0) b += a;
+      if (c == 0)
+        b += a;
     }
     a *= 2;
   }
@@ -46,7 +46,8 @@ void sort(int arr[], int length) {
         }
         c = (c + 1) % a;
         b++;
-        if (c == 0) b += a;
+        if (c == 0)
+          b += a;
       }
       d /= 2;
     }

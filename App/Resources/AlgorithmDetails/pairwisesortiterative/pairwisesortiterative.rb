@@ -35,7 +35,7 @@ def sort(array)
     a /= 2
     e = (e * 2) + 1
   end
-  return array
+  array
 end
 
 array = [0, 39, 21, 62, 91, 77, 14, 23,

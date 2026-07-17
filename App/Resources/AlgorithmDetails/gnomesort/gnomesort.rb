@@ -1,5 +1,5 @@
 def sort(arr)
-  n = arr.length()
+  n = arr.length
   idx = 0
   while idx < n
     if idx == 0

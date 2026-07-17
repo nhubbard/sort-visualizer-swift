@@ -7,15 +7,18 @@ public class strandsort {
     while (i < s && m < b) {
       if (subList[i] < arr[m]) {
         arr[a] = subList[i];
-        a++; i++;
+        a++;
+        i++;
       } else {
         arr[a] = arr[m];
-        a++; m++;
+        a++;
+        m++;
       }
     }
     while (i < s) {
       arr[a] = subList[i];
-      a++; i++;
+      a++;
+      i++;
     }
   }
 
@@ -50,8 +53,7 @@ public class strandsort {
   }
 
   public static void main(String[] args) {
-    int[] array = new int[]{0, 39, 21, 62, 91, 77, 14, 23,
-      90, 69, 51, 81, 68, 83, 32, 56};
+    int[] array = new int[]{0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
     sort(array);
     System.out.println(Arrays.toString(array));
   }

@@ -1,5 +1,5 @@
 def sort(array)
-  n = array.length
+  array.length
   min = array.min
   max = array.max
   size = max - min + 1
@@ -15,7 +15,7 @@ def sort(array)
       j += 1
     end
   end
-  return array
+  array
 end
 
 array = [0, 39, 21, 62, 91, 77, 14, 23,

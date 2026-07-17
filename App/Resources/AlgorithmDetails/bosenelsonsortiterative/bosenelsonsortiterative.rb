@@ -39,7 +39,7 @@ def sort(array)
     end
     k *= 2
   end
-  return array
+  array
 end
 
 array = [0, 39, 21, 62, 91, 77, 14, 23,

@@ -22,8 +22,8 @@ def recursive_shell_sort(array, start, last, g)
 end
 
 def sort(array)
-  recursive_shell_sort(array, 0, array.length(), 1)
-  return array
+  recursive_shell_sort(array, 0, array.length, 1)
+  array
 end
 
 array = [0, 39, 21, 62, 91, 77, 14, 23,

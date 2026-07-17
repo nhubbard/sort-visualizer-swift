@@ -1,8 +1,7 @@
 #include <cstdio>
 #include <utility>
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
-                 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
 
 void printList(int items[], int size) {
   for (int i = 0; i < size; i++) {
@@ -17,7 +16,8 @@ void printList(int items[], int size) {
 }
 
 void sort(int arr[], int i, int j) {
-  if (arr[j] < arr[i]) std::swap(arr[i], arr[j]);
+  if (arr[j] < arr[i])
+    std::swap(arr[i], arr[j]);
   if (j - i > 1) {
     int t = (j - i + 1) / 3;
     sort(arr, i, j - t);

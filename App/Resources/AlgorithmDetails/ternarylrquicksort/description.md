@@ -1,7 +1,27 @@
 *From Wikipedia, the free encyclopedia*
 
-Ternary Quick Sort, also called **3-way** or **multi-pivot-free three-way [Quick Sort](https://en.wikipedia.org/wiki/Quicksort)**, is a variant of the classic [divide-and-conquer](https://en.wikipedia.org/wiki/Divide-and-conquer_algorithm) sorting algorithm devised by [Tony Hoare](https://en.wikipedia.org/wiki/Tony_Hoare). Where ordinary Quick Sort partitions an array into two regions on each pass — elements less than the pivot and elements greater than or equal to it — three-way Quick Sort splits the array into three regions instead: elements **less than** the pivot, elements **equal to** the pivot, and elements **greater than** the pivot. Only the less-than and greater-than regions are recursed into; the equal region, once formed, is already in its final sorted position and is never touched again.
+Ternary Quick Sort, also called **3-way** or **multi-pivot-free
+three-way [Quick Sort](https://en.wikipedia.org/wiki/Quicksort)**, is a variant of the
+classic [divide-and-conquer](https://en.wikipedia.org/wiki/Divide-and-conquer_algorithm) sorting algorithm devised
+by [Tony Hoare](https://en.wikipedia.org/wiki/Tony_Hoare). Where ordinary Quick Sort partitions an array into two
+regions on each pass — elements less than the pivot and elements greater than or equal to it — three-way Quick Sort
+splits the array into three regions instead: elements **less than** the pivot, elements **equal to** the pivot, and
+elements **greater than** the pivot. Only the less-than and greater-than regions are recursed into; the equal region,
+once formed, is already in its final sorted position and is never touched again.
 
-This distinction matters enormously for inputs containing many duplicate keys. A standard two-way partition treats every element equal to the pivot as belonging to one side or the other, so runs of equal values are repeatedly re-compared and re-swapped across recursive calls, degrading performance toward the quadratic worst case. By grouping equal elements once per partition, three-way Quick Sort avoids that redundant work entirely, and its running time on data with few distinct keys can approach [linear time](https://en.wikipedia.org/wiki/Time_complexity#Linear_time) rather than the usual [linearithmic](https://en.wikipedia.org/wiki/Time_complexity#Linearithmic_time) average case. On data with mostly unique keys, it performs comparably to ordinary Quick Sort, so the technique is essentially a "free" improvement.
+This distinction matters enormously for inputs containing many duplicate keys. A standard two-way partition treats every
+element equal to the pivot as belonging to one side or the other, so runs of equal values are repeatedly re-compared and
+re-swapped across recursive calls, degrading performance toward the quadratic worst case. By grouping equal elements
+once per partition, three-way Quick Sort avoids that redundant work entirely, and its running time on data with few
+distinct keys can approach [linear time](https://en.wikipedia.org/wiki/Time_complexity#Linear_time) rather than the
+usual [linearithmic](https://en.wikipedia.org/wiki/Time_complexity#Linearithmic_time) average case. On data with mostly
+unique keys, it performs comparably to ordinary Quick Sort, so the technique is essentially a "free" improvement.
 
-The specific partitioning method implemented here is the **"LR" two-pointer scheme** popularized by [Jon Bentley](https://en.wikipedia.org/wiki/Jon_Bentley_(computer_scientist)) and [M. Douglas McIlroy](https://en.wikipedia.org/wiki/Douglas_McIlroy) in their widely cited 1993 paper *Engineering a Sort Function*, which scans inward from both ends of the array with a pair of indices, swapping pivot-equal elements out to the flanks as it goes before folding them back alongside the pivot once the scan completes. This app also includes a sibling **"LL"** variant, which achieves the same three-way partitioning outcome using a different single-pass, two-pointer bookkeeping scheme. Both variants are unstable, in-place, comparison-based sorts with the same theoretical complexity as ordinary Quick Sort, differing only in how the middle "equal" region is carved out during partitioning.
+The specific partitioning method implemented here is the **"LR" two-pointer scheme** popularized
+by [Jon Bentley](https://en.wikipedia.org/wiki/Jon_Bentley_(computer_scientist))
+and [M. Douglas McIlroy](https://en.wikipedia.org/wiki/Douglas_McIlroy) in their widely cited 1993 paper *Engineering a
+Sort Function*, which scans inward from both ends of the array with a pair of indices, swapping pivot-equal elements out
+to the flanks as it goes before folding them back alongside the pivot once the scan completes. This app also includes a
+sibling **"LL"** variant, which achieves the same three-way partitioning outcome using a different single-pass,
+two-pointer bookkeeping scheme. Both variants are unstable, in-place, comparison-based sorts with the same theoretical
+complexity as ordinary Quick Sort, differing only in how the middle "equal" region is carved out during partitioning.

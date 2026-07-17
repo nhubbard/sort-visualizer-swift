@@ -7,7 +7,9 @@ func multiSwap(_ array: inout [Int], _ a: Int, _ b: Int, _ len: Int) {
 }
 
 func rotate(_ array: inout [Int], _ a: Int, _ m: Int, _ b: Int) {
-  var a = a, m = m, b = b
+  var a = a
+  var m = m
+  var b = b
   var l = m - a
   var r = b - m
   while l > 0 && r > 0 {
@@ -26,7 +28,8 @@ func rotate(_ array: inout [Int], _ a: Int, _ m: Int, _ b: Int) {
 }
 
 func binarySearch(_ array: [Int], _ a: Int, _ b: Int, _ value: Int, _ left: Bool) -> Int {
-  var a = a, b = b
+  var a = a
+  var b = b
   while a < b {
     let mid = a + (b - a) / 2
     let comp = left ? value <= array[mid] : value < array[mid]
@@ -40,7 +43,8 @@ func binarySearch(_ array: [Int], _ a: Int, _ b: Int, _ value: Int, _ left: Bool
 }
 
 func rotateMerge(_ array: inout [Int], _ a: Int, _ m: Int, _ b: Int) {
-  let m1: Int, m3: Int
+  let m1: Int
+  let m3: Int
   var m2: Int
   if m - a >= b - m {
     m1 = a + (m - a) / 2
@@ -83,7 +87,9 @@ func sort(_ array: inout [Int]) {
   rotateMergeSort(&array, 0, array.count)
 }
 
-var array: [Int] = [0, 39, 21, 62, 91, 77, 14, 23,
-  90, 69, 51, 81, 68, 83, 32, 56]
+var array: [Int] = [
+  0, 39, 21, 62, 91, 77, 14, 23,
+  90, 69, 51, 81, 68, 83, 32, 56,
+]
 sort(&array)
 print(array)

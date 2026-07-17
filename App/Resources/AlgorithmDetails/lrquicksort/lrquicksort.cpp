@@ -1,8 +1,7 @@
 #include <cstdio>
 #include <utility>
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
-                 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
 
 void printList(int items[], int size) {
   for (int i = 0; i < size; i++) {
@@ -47,9 +46,7 @@ void quickSort(int arr[], int p, int r) {
   }
 }
 
-void sort(int arr[], int n) {
-  quickSort(arr, 0, n - 1);
-}
+void sort(int arr[], int n) { quickSort(arr, 0, n - 1); }
 
 int main(int argc, char *argv[]) {
   int size = sizeof(array) / sizeof(array[0]);

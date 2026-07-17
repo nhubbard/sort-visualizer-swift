@@ -24,6 +24,7 @@
 
 ^[    ](code: 'Token.Text')^[permute](code: 'Token.Name')^[(](code: 'Token.Punctuation')^[n](code: 'Token.Name')^[)](code: 'Token.Punctuation')
 
+
 ^[array](code: 'Token.Name')^[ ](code: 'Token.Text')^[=](code: 'Token.Operator')^[ ](code: 'Token.Text')^[\[](code: 'Token.Punctuation')^[0](code: 'Token.Literal.Number.Integer')^[,](code: 'Token.Punctuation')^[ ](code: 'Token.Text')^[39](code: 'Token.Literal.Number.Integer')^[,](code: 'Token.Punctuation')^[ ](code: 'Token.Text')^[21](code: 'Token.Literal.Number.Integer')^[,](code: 'Token.Punctuation')^[ ](code: 'Token.Text')^[62](code: 'Token.Literal.Number.Integer')^[,](code: 'Token.Punctuation')^[ ](code: 'Token.Text')^[91](code: 'Token.Literal.Number.Integer')^[,](code: 'Token.Punctuation')^[ ](code: 'Token.Text')^[14](code: 'Token.Literal.Number.Integer')^[,](code: 'Token.Punctuation')^[ ](code: 'Token.Text')^[23](code: 'Token.Literal.Number.Integer')^[\]](code: 'Token.Punctuation')
 ^[sort](code: 'Token.Name')^[(](code: 'Token.Punctuation')^[array](code: 'Token.Name')^[)](code: 'Token.Punctuation')
 ^[print](code: 'Token.Name.Builtin')^[(](code: 'Token.Punctuation')^[array](code: 'Token.Name')^[)](code: 'Token.Punctuation')

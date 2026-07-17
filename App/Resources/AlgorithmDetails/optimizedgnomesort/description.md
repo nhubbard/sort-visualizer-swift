@@ -1,7 +1,22 @@
 *From Wikipedia, the free encyclopedia*
 
-Optimized Gnome Sort is the optimization described on the [Gnome Sort](https://en.wikipedia.org/wiki/Gnome_sort) Wikipedia page itself: "the gnome sort may be optimized by introducing a variable to store the position before traversing back toward the beginning of the list." Plain Gnome Sort walks a single position forward and backward across the *entire* array, re-checking pairs it has already placed correctly every time it steps forward again after a swap. This variant instead processes the array as a series of growing prefixes, one element longer each time, and only ever walks backward through the prefix it is currently placing — never back out into the part of the array it hasn't reached yet.
+Optimized Gnome Sort is the optimization described on the [Gnome Sort](https://en.wikipedia.org/wiki/Gnome_sort)
+Wikipedia page itself: "the gnome sort may be optimized by introducing a variable to store the position before
+traversing back toward the beginning of the list." Plain Gnome Sort walks a single position forward and backward across
+the *entire* array, re-checking pairs it has already placed correctly every time it steps forward again after a swap.
+This variant instead processes the array as a series of growing prefixes, one element longer each time, and only ever
+walks backward through the prefix it is currently placing — never back out into the part of the array it hasn't reached
+yet.
 
-Concretely, for each prefix length from 2 up to the full array, the newest element (at the end of that prefix) is walked backward one adjacent swap at a time, past every element it is smaller than, until it either reaches the front of the prefix or lands next to an element it is not smaller than. The next prefix then starts from where the previous one left off, one element longer. As Wikipedia's own article notes, "with this optimization, the gnome sort would become a variant of the insertion sort" — each pass is exactly [Insertion Sort](https://en.wikipedia.org/wiki/Insertion_sort)'s "shift the new element left until it's in place" step, just expressed as a chain of adjacent swaps instead of a single shift.
+Concretely, for each prefix length from 2 up to the full array, the newest element (at the end of that prefix) is walked
+backward one adjacent swap at a time, past every element it is smaller than, until it either reaches the front of the
+prefix or lands next to an element it is not smaller than. The next prefix then starts from where the previous one left
+off, one element longer. As Wikipedia's own article notes, "with this optimization, the gnome sort would become a
+variant of the insertion sort" — each pass is exactly [Insertion Sort](https://en.wikipedia.org/wiki/Insertion_sort)'s "
+shift the new element left until it's in place" step, just expressed as a chain of adjacent swaps instead of a single
+shift.
 
-Because the algorithm still only ever swaps two elements when the earlier one compares strictly greater than the later one, equal elements are never exchanged and the sort remains stable. Its best, average, and worst-case running times match Insertion Sort's for the same reason: O(n) when the array is already sorted (each new element requires zero backward swaps), degrading to O(n^2) comparisons and swaps on random or reverse-sorted input.
+Because the algorithm still only ever swaps two elements when the earlier one compares strictly greater than the later
+one, equal elements are never exchanged and the sort remains stable. Its best, average, and worst-case running times
+match Insertion Sort's for the same reason: O(n) when the array is already sorted (each new element requires zero
+backward swaps), degrading to O(n^2) comparisons and swaps on random or reverse-sorted input.

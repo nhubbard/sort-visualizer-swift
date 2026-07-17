@@ -1,5 +1,5 @@
 def counting(arr, e)
-  n = arr.length()
+  n = arr.length
   output = Array.new(n) { |z| 0 }
   count = Array.new(10) { |z| 0 }
   for i in (0...n)
@@ -16,14 +16,13 @@ def counting(arr, e)
     count[idx % 10] -= 1
     i -= 1
   end
-  i = 0
   for i in (0...n)
     arr[i] = output[i]
   end
 end
 
 def sort(arr)
-  x = arr.max()
+  x = arr.max
   e = 1
   while x / e > 0
     counting(arr, e)

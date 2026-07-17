@@ -1,5 +1,5 @@
 def sort(arr)
-  arr = arr.shuffle() until arr == arr.sort
+  arr = arr.shuffle until arr == arr.sort
   arr.sort
 end
 

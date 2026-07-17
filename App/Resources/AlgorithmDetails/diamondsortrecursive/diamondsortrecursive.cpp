@@ -1,8 +1,7 @@
 #include <cstdio>
 #include <utility>
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
-                 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
 
 void printList(int items[], int size) {
   for (int i = 0; i < size; i++) {
@@ -27,8 +26,8 @@ void sort(int arr[], int start, int stop, bool merge) {
   } else if (stop - start >= 3) {
     double div = (stop - start) / 4.0;
     int mid = (stop - start) / 2 + start;
-    int quarter = (int) div + start;
-    int threeQuarters = (int) (div * 3) + start;
+    int quarter = (int)div + start;
+    int threeQuarters = (int)(div * 3) + start;
 
     if (merge) {
       sort(arr, start, mid, true);

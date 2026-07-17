@@ -1,7 +1,23 @@
 *From Wikipedia, the free encyclopedia*
 
-Heap Sort is a comparison-based sorting algorithm that uses a [binary heap](https://en.wikipedia.org/wiki/Binary_heap) data structure rather than a linear scan to find each next element to place. It was invented by J. W. J. Williams in 1964, alongside the introduction of the binary heap itself, and refined shortly after by R. W. Floyd. Heap Sort can be thought of as an improved Selection Sort: like that algorithm, it divides its input into a sorted and an unsorted region, but instead of scanning the unsorted region for the next extreme value, it maintains the unsorted region as a heap so that the next value is always available at the root.
+Heap Sort is a comparison-based sorting algorithm that uses a [binary heap](https://en.wikipedia.org/wiki/Binary_heap)
+data structure rather than a linear scan to find each next element to place. It was invented by J. W. J. Williams in
+1964, alongside the introduction of the binary heap itself, and refined shortly after by R. W. Floyd. Heap Sort can be
+thought of as an improved Selection Sort: like that algorithm, it divides its input into a sorted and an unsorted
+region, but instead of scanning the unsorted region for the next extreme value, it maintains the unsorted region as a
+heap so that the next value is always available at the root.
 
-A binary heap can be organized as a **max-heap**, where every parent is greater than or equal to its children, or a **min-heap**, where every parent is less than or equal to its children. Min Heap Sort builds a min-heap over the entire array, then repeatedly swaps the root (the smallest remaining value) with the last unsorted element and sifts the reduced heap back into shape. Doing this from first element to last, rather than reading the minimum off directly, leaves the array in descending order, so a min-heap-based Heap Sort finishes with a single reversal pass over the whole array to restore ascending order.
+A binary heap can be organized as a **max-heap**, where every parent is greater than or equal to its children, or a *
+*min-heap**, where every parent is less than or equal to its children. Min Heap Sort builds a min-heap over the entire
+array, then repeatedly swaps the root (the smallest remaining value) with the last unsorted element and sifts the
+reduced heap back into shape. Doing this from first element to last, rather than reading the minimum off directly,
+leaves the array in descending order, so a min-heap-based Heap Sort finishes with a single reversal pass over the whole
+array to restore ascending order.
 
-Because it only needs a small constant number of extra variables regardless of input size, Heap Sort runs in O(1) auxiliary space, unlike Merge Sort's O(n) buffer. Building the initial heap takes O(n) time, and each of the n extraction steps costs O(log n) to restore the heap property, giving O(n log n) performance in the best, average, and worst cases alike — a guarantee neither Quick Sort nor plain Selection Sort can make. The trade-off is that Heap Sort is not a [stable sort](https://en.wikipedia.org/wiki/Sorting_algorithm#Stability): swaps made while sifting the heap can reorder equal elements relative to one another, and its memory access pattern is less cache-friendly than Merge Sort's or Quick Sort's sequential scans.
+Because it only needs a small constant number of extra variables regardless of input size, Heap Sort runs in O(1)
+auxiliary space, unlike Merge Sort's O(n) buffer. Building the initial heap takes O(n) time, and each of the n
+extraction steps costs O(log n) to restore the heap property, giving O(n log n) performance in the best, average, and
+worst cases alike — a guarantee neither Quick Sort nor plain Selection Sort can make. The trade-off is that Heap Sort is
+not a [stable sort](https://en.wikipedia.org/wiki/Sorting_algorithm#Stability): swaps made while sifting the heap can
+reorder equal elements relative to one another, and its memory access pattern is less cache-friendly than Merge Sort's
+or Quick Sort's sequential scans.

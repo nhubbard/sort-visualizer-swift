@@ -9,7 +9,7 @@ def binary_search(array, item, start, stop)
       lo = mid + 1
     end
   end
-  return lo
+  lo
 end
 
 def binary_insertion_sort(array, start, stop)
@@ -92,11 +92,11 @@ def library_sort(array)
     i += 1
   end
   rebalance(array, temp, counts, locations, spine_size, n)
-  return array
+  array
 end
 
 def sort(array)
-  return library_sort(array)
+  library_sort(array)
 end
 
 array = [0, 39, 21, 62, 91, 77, 14, 23,

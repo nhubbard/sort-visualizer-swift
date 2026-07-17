@@ -21,7 +21,7 @@ end
 
 def merge_sort(array, low, high)
   if high - low == 0
-    return
+    nil
   elsif high - low == 1
     if array[low] > array[high]
       array[low], array[high] = array[high], array[low]
@@ -35,8 +35,8 @@ def merge_sort(array, low, high)
 end
 
 def sort(array)
-  merge_sort(array, 0, array.length() - 1) if array.length() >= 2
-  return array
+  merge_sort(array, 0, array.length - 1) if array.length >= 2
+  array
 end
 
 array = [0, 39, 21, 62, 91, 77, 14, 23,

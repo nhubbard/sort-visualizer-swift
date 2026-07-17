@@ -18,7 +18,7 @@ def circle_sort_routine(array, length, last)
     end
     gap /= 2
   end
-  return swap_count
+  swap_count
 end
 
 def binary_insertion_sort(array, last)

@@ -31,6 +31,7 @@ def sort(arr):
     for i in range(n):
         arr[i] = mapped[i]
 
+
 array = [0, 39, 21, 62, 91, 14, 23]
 sort(array)
 print(array)

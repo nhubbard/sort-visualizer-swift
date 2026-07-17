@@ -16,7 +16,7 @@ def binary_search_mid(array, start, mid, en)
     end
     m = a + (b - a) / 2
   end
-  return m
+  m
 end
 
 def multi_swap_merge(array, start, mid, en)
@@ -48,7 +48,7 @@ end
 
 def sort(array)
   multi_swap_merge_sort(array, 0, array.length)
-  return array
+  array
 end
 
 array = [0, 39, 21, 62, 91, 77, 14, 23,

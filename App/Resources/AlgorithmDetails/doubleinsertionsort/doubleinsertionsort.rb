@@ -61,7 +61,7 @@ end
 
 def sort(array)
   double_insertion_sort(array, 0, array.length) if array.length > 1
-  return array
+  array
 end
 
 array = [0, 39, 21, 62, 91, 77, 14, 23,

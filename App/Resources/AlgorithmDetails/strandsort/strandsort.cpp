@@ -1,7 +1,6 @@
 #include <cstdio>
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
-                 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
 
 void printList(int items[], int size) {
   for (int i = 0; i < size; i++) {
@@ -21,20 +20,24 @@ void mergeTo(int arr[], int subList[], int a, int m, int b) {
   while (i < s && m < b) {
     if (subList[i] < arr[m]) {
       arr[a] = subList[i];
-      a++; i++;
+      a++;
+      i++;
     } else {
       arr[a] = arr[m];
-      a++; m++;
+      a++;
+      m++;
     }
   }
   while (i < s) {
     arr[a] = subList[i];
-    a++; i++;
+    a++;
+    i++;
   }
 }
 
 void sort(int arr[], int n) {
-  if (n < 2) return;
+  if (n < 2)
+    return;
 
   int *subList = new int[n];
 

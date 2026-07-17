@@ -1,5 +1,5 @@
 def sort(arr)
-  n = arr.length()
+  n = arr.length
 
   index = 2
   while index <= n
@@ -40,7 +40,7 @@ def sort(arr)
 
     if max_node != index
       focus = index
-      while true
+      loop do
         arr[focus - 1], arr[max_node - 1] = arr[max_node - 1], arr[focus - 1]
         focus = max_node
         inner_depth = 1

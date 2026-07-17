@@ -48,7 +48,7 @@ def merge_sort(arr, start, stop)
 end
 
 def sort(arr)
-  n = arr.length()
+  n = arr.length
   return if n < 2
   merge_sort(arr, 0, n)
 end

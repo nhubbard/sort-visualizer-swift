@@ -19,11 +19,11 @@ def swapless_bubble_sort(array)
     array[i - 1] = comp
     i = last
   end
-  return array
+  array
 end
 
 def sort(array)
-  return swapless_bubble_sort(array)
+  swapless_bubble_sort(array)
 end
 
 array = [0, 39, 21, 62, 91, 77, 14, 23,

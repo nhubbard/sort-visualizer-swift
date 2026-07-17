@@ -22,8 +22,12 @@ fun flashSort(array: IntArray) {
     } else {
       big = array[i]; bigIndex = i; small = array[i + 1]
     }
-    if (big > maxValue) { maxValue = big; maxIndex = bigIndex }
-    if (small < minValue) { minValue = small }
+    if (big > maxValue) {
+      maxValue = big; maxIndex = bigIndex
+    }
+    if (small < minValue) {
+      minValue = small
+    }
     i += 2
   }
 
@@ -90,8 +94,10 @@ fun sort(arr: IntArray) {
 }
 
 fun main() {
-  val array = intArrayOf(0, 39, 21, 62, 91, 77, 14, 23,
-    90, 69, 51, 81, 68, 83, 32, 56)
+  val array = intArrayOf(
+    0, 39, 21, 62, 91, 77, 14, 23,
+    90, 69, 51, 81, 68, 83, 32, 56
+  )
   sort(array)
   println("[%s]".format(array.joinToString(", ")))
 }

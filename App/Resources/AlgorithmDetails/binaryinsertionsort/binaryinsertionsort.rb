@@ -9,7 +9,7 @@ def binary_search(array, item, first, last)
       low = mid + 1
     end
   end
-  return low
+  low
 end
 
 def binary_insertion_sort(array)
@@ -23,11 +23,11 @@ def binary_insertion_sort(array)
     end
     array[pos] = item
   end
-  return array
+  array
 end
 
 def sort(array)
-  return binary_insertion_sort(array)
+  binary_insertion_sort(array)
 end
 
 array = [0, 39, 21, 62, 91, 77, 14, 23,

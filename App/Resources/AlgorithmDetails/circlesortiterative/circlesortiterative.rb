@@ -18,7 +18,7 @@ def circle_sort_routine(array, length, last)
     end
     gap /= 2
   end
-  return swap_count
+  swap_count
 end
 
 def sort(array)
@@ -31,7 +31,7 @@ def sort(array)
   while number_of_swaps != 0
     number_of_swaps = circle_sort_routine(array, n, last)
   end
-  return array
+  array
 end
 
 array = [0, 39, 21, 62, 91, 77, 14, 23,

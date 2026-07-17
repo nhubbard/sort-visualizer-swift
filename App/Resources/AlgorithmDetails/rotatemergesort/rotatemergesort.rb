@@ -32,7 +32,7 @@ def binary_search(array, a, b, value, left)
       a = mid + 1
     end
   end
-  return a
+  a
 end
 
 def rotate_merge(array, a, m, b)
@@ -75,7 +75,7 @@ end
 
 def sort(array)
   rotate_merge_sort(array, 0, array.length)
-  return array
+  array
 end
 
 array = [0, 39, 21, 62, 91, 77, 14, 23,

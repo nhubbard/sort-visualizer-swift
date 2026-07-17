@@ -30,10 +30,8 @@
         ](code: 'Token.Text.Whitespace')^[i](code: 'Token.Name')^[ ](code: 'Token.Text.Whitespace')^[+=](code: 'Token.Operator')^[ ](code: 'Token.Text.Whitespace')^[m](code: 'Token.Name')^[
       ](code: 'Token.Text.Whitespace')^[end](code: 'Token.Keyword')^[
     ](code: 'Token.Text.Whitespace')^[end](code: 'Token.Keyword')^[
-  ](code: 'Token.Text.Whitespace')^[else](code: 'Token.Keyword')^[
-    ](code: 'Token.Text.Whitespace')^[if](code: 'Token.Keyword')^[ ](code: 'Token.Text.Whitespace')^[n](code: 'Token.Name')^[ ](code: 'Token.Text.Whitespace')^[>](code: 'Token.Operator')^[ ](code: 'Token.Text.Whitespace')^[r](code: 'Token.Name')^[
-      ](code: 'Token.Text.Whitespace')^[odd\_even\_merge\_compare](code: 'Token.Name')^[(](code: 'Token.Punctuation')^[array](code: 'Token.Name')^[,](code: 'Token.Punctuation')^[ ](code: 'Token.Text.Whitespace')^[lo](code: 'Token.Name')^[,](code: 'Token.Punctuation')^[ ](code: 'Token.Text.Whitespace')^[lo](code: 'Token.Name')^[ ](code: 'Token.Text.Whitespace')^[+](code: 'Token.Operator')^[ ](code: 'Token.Text.Whitespace')^[r](code: 'Token.Name')^[)](code: 'Token.Punctuation')^[
-    ](code: 'Token.Text.Whitespace')^[end](code: 'Token.Keyword')^[
+  ](code: 'Token.Text.Whitespace')^[elsif](code: 'Token.Keyword')^[ ](code: 'Token.Text.Whitespace')^[n](code: 'Token.Name')^[ ](code: 'Token.Text.Whitespace')^[>](code: 'Token.Operator')^[ ](code: 'Token.Text.Whitespace')^[r](code: 'Token.Name')^[
+    ](code: 'Token.Text.Whitespace')^[odd\_even\_merge\_compare](code: 'Token.Name')^[(](code: 'Token.Punctuation')^[array](code: 'Token.Name')^[,](code: 'Token.Punctuation')^[ ](code: 'Token.Text.Whitespace')^[lo](code: 'Token.Name')^[,](code: 'Token.Punctuation')^[ ](code: 'Token.Text.Whitespace')^[lo](code: 'Token.Name')^[ ](code: 'Token.Text.Whitespace')^[+](code: 'Token.Operator')^[ ](code: 'Token.Text.Whitespace')^[r](code: 'Token.Name')^[)](code: 'Token.Punctuation')^[
   ](code: 'Token.Text.Whitespace')^[end](code: 'Token.Keyword')
 ^[end](code: 'Token.Keyword')^[
 
@@ -47,8 +45,8 @@
 ^[end](code: 'Token.Keyword')^[
 
 ](code: 'Token.Text.Whitespace')^[def](code: 'Token.Keyword')^[ ](code: 'Token.Text.Whitespace')^[sort](code: 'Token.Name.Function')^[(](code: 'Token.Punctuation')^[array](code: 'Token.Name')^[)](code: 'Token.Punctuation')^[
-  ](code: 'Token.Text.Whitespace')^[odd\_even\_merge\_sort](code: 'Token.Name')^[(](code: 'Token.Punctuation')^[array](code: 'Token.Name')^[,](code: 'Token.Punctuation')^[ ](code: 'Token.Text.Whitespace')^[0](code: 'Token.Literal.Number.Integer')^[,](code: 'Token.Punctuation')^[ ](code: 'Token.Text.Whitespace')^[array](code: 'Token.Name')^[.](code: 'Token.Operator')^[length](code: 'Token.Name')^[(](code: 'Token.Punctuation')^[)](code: 'Token.Punctuation')^[)](code: 'Token.Punctuation')^[
-  ](code: 'Token.Text.Whitespace')^[return](code: 'Token.Keyword')^[ ](code: 'Token.Text.Whitespace')^[array](code: 'Token.Name')
+  ](code: 'Token.Text.Whitespace')^[odd\_even\_merge\_sort](code: 'Token.Name')^[(](code: 'Token.Punctuation')^[array](code: 'Token.Name')^[,](code: 'Token.Punctuation')^[ ](code: 'Token.Text.Whitespace')^[0](code: 'Token.Literal.Number.Integer')^[,](code: 'Token.Punctuation')^[ ](code: 'Token.Text.Whitespace')^[array](code: 'Token.Name')^[.](code: 'Token.Operator')^[length](code: 'Token.Name')^[)](code: 'Token.Punctuation')^[
+  ](code: 'Token.Text.Whitespace')^[array](code: 'Token.Name')
 ^[end](code: 'Token.Keyword')^[
 
 ](code: 'Token.Text.Whitespace')^[array](code: 'Token.Name')^[ ](code: 'Token.Text.Whitespace')^[=](code: 'Token.Operator')^[ ](code: 'Token.Text.Whitespace')^[\[](code: 'Token.Operator')^[0](code: 'Token.Literal.Number.Integer')^[,](code: 'Token.Punctuation')^[ ](code: 'Token.Text.Whitespace')^[39](code: 'Token.Literal.Number.Integer')^[,](code: 'Token.Punctuation')^[ ](code: 'Token.Text.Whitespace')^[21](code: 'Token.Literal.Number.Integer')^[,](code: 'Token.Punctuation')^[ ](code: 'Token.Text.Whitespace')^[62](code: 'Token.Literal.Number.Integer')^[,](code: 'Token.Punctuation')^[ ](code: 'Token.Text.Whitespace')^[91](code: 'Token.Literal.Number.Integer')^[,](code: 'Token.Punctuation')^[ ](code: 'Token.Text.Whitespace')^[77](code: 'Token.Literal.Number.Integer')^[,](code: 'Token.Punctuation')^[ ](code: 'Token.Text.Whitespace')^[14](code: 'Token.Literal.Number.Integer')^[,](code: 'Token.Punctuation')^[ ](code: 'Token.Text.Whitespace')^[23](code: 'Token.Literal.Number.Integer')^[,](code: 'Token.Punctuation')^[

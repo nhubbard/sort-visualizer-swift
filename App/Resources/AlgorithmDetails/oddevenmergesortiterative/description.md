@@ -1,9 +1,33 @@
 *From Wikipedia, the free encyclopedia*
 
-The odd–even mergesort is a [sorting network](https://en.wikipedia.org/wiki/Sorting_network) devised by [Ken Batcher](https://en.wikipedia.org/wiki/Ken_Batcher). It is a comparison-based algorithm, but unlike a general-purpose [comparison sort](https://en.wikipedia.org/wiki/Comparison_sort) such as [Quick Sort](https://en.wikipedia.org/wiki/Quicksort), the sequence of comparisons it performs is fixed in advance and does not depend on the data being sorted — only on the number of elements, `n`. Every input of a given size is run through exactly the same wiring of compare-and-swap operations, called comparators, each of which examines a pair of positions and swaps them if they are out of order. Because the schedule of comparisons is data-independent, many comparators can be evaluated at the same time, which makes Batcher's network a natural fit for hardware sorting circuits, [SIMD](https://en.wikipedia.org/wiki/Single_instruction,_multiple_data) instructions, and other parallel architectures where a fixed, predictable pattern of operations is far more valuable than raw sequential speed.
+The odd–even mergesort is a [sorting network](https://en.wikipedia.org/wiki/Sorting_network) devised
+by [Ken Batcher](https://en.wikipedia.org/wiki/Ken_Batcher). It is a comparison-based algorithm, but unlike a
+general-purpose [comparison sort](https://en.wikipedia.org/wiki/Comparison_sort) such
+as [Quick Sort](https://en.wikipedia.org/wiki/Quicksort), the sequence of comparisons it performs is fixed in advance
+and does not depend on the data being sorted — only on the number of elements, `n`. Every input of a given size is run
+through exactly the same wiring of compare-and-swap operations, called comparators, each of which examines a pair of
+positions and swaps them if they are out of order. Because the schedule of comparisons is data-independent, many
+comparators can be evaluated at the same time, which makes Batcher's network a natural fit for hardware sorting
+circuits, [SIMD](https://en.wikipedia.org/wiki/Single_instruction,_multiple_data) instructions, and other parallel
+architectures where a fixed, predictable pattern of operations is far more valuable than raw sequential speed.
 
-The network is built around a recursive **odd–even merge**: given two sequences that are already sorted, it splits each into its odd-indexed and even-indexed elements, recursively merges the two odd subsequences and the two even subsequences, and then performs one final pass of comparators between adjacent elements of the interleaved result to fix up the few remaining out-of-order pairs. A full odd–even mergesort is obtained by recursively sorting the two halves of the input and merging them together with this network, in the same divide-and-conquer spirit as [Merge Sort](https://en.wikipedia.org/wiki/Merge_sort).
+The network is built around a recursive **odd–even merge**: given two sequences that are already sorted, it splits each
+into its odd-indexed and even-indexed elements, recursively merges the two odd subsequences and the two even
+subsequences, and then performs one final pass of comparators between adjacent elements of the interleaved result to fix
+up the few remaining out-of-order pairs. A full odd–even mergesort is obtained by recursively sorting the two halves of
+the input and merging them together with this network, in the same divide-and-conquer spirit
+as [Merge Sort](https://en.wikipedia.org/wiki/Merge_sort).
 
-This **iterative** variant expresses that same fixed network without explicit recursion. The recursive merge-and-split structure is unrolled into a small number of nested loops driven by three quantities: `p`, a power of two that tracks the size of the sorted blocks currently being merged; `k`, which walks down through the successive merge stages within a given `p`; and `j`, which steps across the array selecting which groups of elements a given stage compares. For each combination of `p`, `k`, and `j`, an inner loop applies the same boundary test used throughout Batcher's construction — comparing `(i + j) / (2p)` against `(i + j + k) / (2p)` — to decide, index by index, exactly which pairs of positions belong to this stage's comparator set, and swaps each out-of-order pair it finds.
+This **iterative** variant expresses that same fixed network without explicit recursion. The recursive merge-and-split
+structure is unrolled into a small number of nested loops driven by three quantities: `p`, a power of two that tracks
+the size of the sorted blocks currently being merged; `k`, which walks down through the successive merge stages within a
+given `p`; and `j`, which steps across the array selecting which groups of elements a given stage compares. For each
+combination of `p`, `k`, and `j`, an inner loop applies the same boundary test used throughout Batcher's construction —
+comparing `(i + j) / (2p)` against `(i + j + k) / (2p)` — to decide, index by index, exactly which pairs of positions
+belong to this stage's comparator set, and swaps each out-of-order pair it finds.
 
-Because it is built from a fixed collection of pairwise comparators rather than adapting to the data, the odd–even mergesort performs O(n log²n) comparisons in all cases, which is asymptotically worse than the O(n log n) achieved by efficient comparison sorts like Merge Sort or Heap Sort. Its appeal is not raw efficiency on a single processor but the predictability of its comparison schedule: the same network of operations can be laid out once, in silicon or across parallel lanes, and reused for any input of the given size.
+Because it is built from a fixed collection of pairwise comparators rather than adapting to the data, the odd–even
+mergesort performs O(n log²n) comparisons in all cases, which is asymptotically worse than the O(n log n) achieved by
+efficient comparison sorts like Merge Sort or Heap Sort. Its appeal is not raw efficiency on a single processor but the
+predictability of its comparison schedule: the same network of operations can be laid out once, in silicon or across
+parallel lanes, and reused for any input of the given size.

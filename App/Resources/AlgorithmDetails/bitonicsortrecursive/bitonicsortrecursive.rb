@@ -3,7 +3,7 @@ def greatest_power_of_two_less_than(n)
   while k < n
     k <<= 1
   end
-  return k >> 1
+  k >> 1
 end
 
 def compare(array, i, j, dir)

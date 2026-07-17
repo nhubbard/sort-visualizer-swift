@@ -14,11 +14,11 @@ def unoptimized_cocktail_shaker_sort(array)
     end
     i += 1
   end
-  return array
+  array
 end
 
 def sort(array)
-  return unoptimized_cocktail_shaker_sort(array)
+  unoptimized_cocktail_shaker_sort(array)
 end
 
 array = [0, 39, 21, 62, 91, 77, 14, 23,

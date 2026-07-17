@@ -1,5 +1,6 @@
 import random
 
+
 def sort(arr):
     n = len(arr)
     loops = [0] * n
@@ -19,6 +20,7 @@ def sort(arr):
     mapped = [arr[i] for i in loops]
     for i in range(n):
         arr[i] = mapped[i]
+
 
 array = [0, 39, 21, 62, 14]
 sort(array)

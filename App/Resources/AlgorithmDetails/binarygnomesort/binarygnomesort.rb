@@ -9,7 +9,7 @@ def binary_search(array, item, first, last)
       low = mid + 1
     end
   end
-  return low
+  low
 end
 
 def binary_gnome_sort(array)
@@ -22,11 +22,11 @@ def binary_gnome_sort(array)
       j -= 1
     end
   end
-  return array
+  array
 end
 
 def sort(array)
-  return binary_gnome_sort(array)
+  binary_gnome_sort(array)
 end
 
 array = [0, 39, 21, 62, 91, 77, 14, 23,

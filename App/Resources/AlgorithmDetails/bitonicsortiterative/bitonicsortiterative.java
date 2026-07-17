@@ -8,8 +8,7 @@ public class bitonicsortiterative {
         for (int i = 0; i < n; i++) {
           int l = i ^ j;
           if (l > i) {
-            if (((i & k) == 0) && (arr[i] > arr[l]) ||
-                (((i & k) != 0) && (arr[i] < arr[l]))) {
+            if (((i & k) == 0) && (arr[i] > arr[l]) || (((i & k) != 0) && (arr[i] < arr[l]))) {
               int temp = arr[i];
               arr[i] = arr[l];
               arr[l] = temp;
@@ -21,8 +20,7 @@ public class bitonicsortiterative {
   }
 
   public static void main(String[] args) {
-    int[] array = new int[]{0, 39, 21, 62, 91, 77, 14, 23,
-      90, 69, 51, 81, 68, 83, 32, 56};
+    int[] array = new int[]{0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
     sort(array);
     System.out.println(Arrays.toString(array));
   }

@@ -46,8 +46,7 @@ public final class triangularheapsort {
   }
 
   public static void main(String[] args) {
-    int[] array = {0, 39, 21, 62, 91, 77, 14, 23,
-      90, 69, 51, 81, 68, 83, 32, 56};
+    int[] array = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
     sort(array);
     System.out.println(Arrays.toString(array));
   }

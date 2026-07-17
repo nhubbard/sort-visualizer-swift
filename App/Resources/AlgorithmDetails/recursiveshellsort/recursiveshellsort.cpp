@@ -1,7 +1,6 @@
 #include <cstdio>
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
-                 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
 
 void printList(int arr[], int n) {
   for (int i = 0; i < n; i++) {
@@ -36,9 +35,7 @@ void recursiveShellSort(int arr[], int start, int end, int g) {
   }
 }
 
-void sort(int arr[], int length) {
-  recursiveShellSort(arr, 0, length, 1);
-}
+void sort(int arr[], int length) { recursiveShellSort(arr, 0, length, 1); }
 
 int main(int argc, char *argv[]) {
   int size = sizeof(array) / sizeof(array[0]);

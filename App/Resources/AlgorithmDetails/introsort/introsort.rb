@@ -1,5 +1,5 @@
 def sort(arr)
-  n = arr.length()
+  n = arr.length
   size_threshold = 16
 
   median_of_3 = lambda do |left, mid, right|

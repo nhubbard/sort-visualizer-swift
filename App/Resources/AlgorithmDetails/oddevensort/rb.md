@@ -1,5 +1,5 @@
 ^[def](code: 'Token.Keyword')^[ ](code: 'Token.Text.Whitespace')^[sort](code: 'Token.Name.Function')^[(](code: 'Token.Punctuation')^[arr](code: 'Token.Name')^[)](code: 'Token.Punctuation')^[
-  ](code: 'Token.Text.Whitespace')^[n](code: 'Token.Name')^[ ](code: 'Token.Text.Whitespace')^[=](code: 'Token.Operator')^[ ](code: 'Token.Text.Whitespace')^[arr](code: 'Token.Name')^[.](code: 'Token.Operator')^[length](code: 'Token.Name')^[(](code: 'Token.Punctuation')^[)](code: 'Token.Punctuation')^[
+  ](code: 'Token.Text.Whitespace')^[n](code: 'Token.Name')^[ ](code: 'Token.Text.Whitespace')^[=](code: 'Token.Operator')^[ ](code: 'Token.Text.Whitespace')^[arr](code: 'Token.Name')^[.](code: 'Token.Operator')^[length](code: 'Token.Name')^[
   ](code: 'Token.Text.Whitespace')^[sorted](code: 'Token.Name')^[ ](code: 'Token.Text.Whitespace')^[=](code: 'Token.Operator')^[ ](code: 'Token.Text.Whitespace')^[false](code: 'Token.Keyword.Pseudo')^[
   ](code: 'Token.Text.Whitespace')^[while](code: 'Token.Keyword')^[ ](code: 'Token.Text.Whitespace')^[!](code: 'Token.Operator')^[sorted](code: 'Token.Name')^[
     ](code: 'Token.Text.Whitespace')^[sorted](code: 'Token.Name')^[ ](code: 'Token.Text.Whitespace')^[=](code: 'Token.Operator')^[ ](code: 'Token.Text.Whitespace')^[true](code: 'Token.Keyword.Pseudo')^[

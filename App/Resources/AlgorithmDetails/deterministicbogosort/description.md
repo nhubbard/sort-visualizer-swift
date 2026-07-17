@@ -1,3 +1,11 @@
-Deterministic Bogosort keeps Bogosort's defining "try an arrangement, check if it's sorted, try another" shape but drops the coin flip: it walks every permutation of the array using Heap's algorithm, a classic method for generating all `n!` permutations one swap at a time with no repeats, checking after each swap whether the array happens to be sorted yet. Where classic Bogosort's random reshuffle might land on the same wrong arrangement twice and has no memory of what it's already tried, this version is guaranteed to reach every possible arrangement exactly once before it could ever cycle back to where it started.
+Deterministic Bogosort keeps Bogosort's defining "try an arrangement, check if it's sorted, try another" shape but drops
+the coin flip: it walks every permutation of the array using Heap's algorithm, a classic method for generating all `n!`
+permutations one swap at a time with no repeats, checking after each swap whether the array happens to be sorted yet.
+Where classic Bogosort's random reshuffle might land on the same wrong arrangement twice and has no memory of what it's
+already tried, this version is guaranteed to reach every possible arrangement exactly once before it could ever cycle
+back to where it started.
 
-That guarantee comes at the cost of the randomness that gives Bogosort its dark comic appeal — there's no chance of getting *lucky* here, only the certainty of eventually getting *there*, in at most `n!` steps. It's the same family resemblance Bozosort's single-swap-and-check variant shares: take the "generate and test" idea seriously enough to make it terminate reliably, without pretending the result is a practical way to sort anything.
+That guarantee comes at the cost of the randomness that gives Bogosort its dark comic appeal — there's no chance of
+getting *lucky* here, only the certainty of eventually getting *there*, in at most `n!` steps. It's the same family
+resemblance Bozosort's single-swap-and-check variant shares: take the "generate and test" idea seriously enough to make
+it terminate reliably, without pretending the result is a practical way to sort anything.

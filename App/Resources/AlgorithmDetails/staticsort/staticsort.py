@@ -8,12 +8,14 @@ def find_min_max(array, a, b):
             max_value = array[i]
     return min_value, max_value
 
+
 def insertion_sort_range(array, s, e):
     for i in range(s + 1, e):
         j = i
         while j > s and array[j - 1] > array[j]:
             array[j - 1], array[j] = array[j], array[j - 1]
             j -= 1
+
 
 def sift_down(array, s, root, size):
     while True:
@@ -29,6 +31,7 @@ def sift_down(array, s, root, size):
         array[s + root], array[s + largest] = array[s + largest], array[s + root]
         root = largest
 
+
 def heap_sort_range(array, s, e):
     size = e - s
     if size <= 1:
@@ -42,6 +45,7 @@ def heap_sort_range(array, s, e):
         array[s], array[s + end] = array[s + end], array[s]
         sift_down(array, s, 0, end)
         end -= 1
+
 
 def static_sort(array, a, b):
     min_value, max_value = find_min_max(array, a, b)
@@ -89,12 +93,13 @@ def static_sort(array, a, b):
         else:
             insertion_sort_range(array, s, e)
 
+
 def sort(arr):
     if len(arr) > 1:
         static_sort(arr, 0, len(arr))
 
+
 if __name__ == "__main__":
-    array = [0, 39, 21, 62, 91, 77, 14, 23,
-        90, 69, 51, 81, 68, 83, 32, 56]
+    array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56]
     sort(array)
     print(array)

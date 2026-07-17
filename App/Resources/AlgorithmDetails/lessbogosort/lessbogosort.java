@@ -12,7 +12,7 @@ public class lessbogosort {
 
   public static void shuffleRange(int[] arr, int start, int end) {
     for (int i = start; i < end - 1; i++) {
-      int j = i + (int)(Math.random() * (end - i));
+      int j = i + (int) (Math.random() * (end - i));
       int t = arr[i];
       arr[i] = arr[j];
       arr[j] = t;

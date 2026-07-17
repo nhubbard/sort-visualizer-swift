@@ -36,7 +36,7 @@ public class mergesort {
 
   public static void mergeSort(int arr[], int l, int r) {
     if (l < r) {
-      int m =l + (r - l) / 2;
+      int m = l + (r - l) / 2;
       mergeSort(arr, l, m);
       mergeSort(arr, m + 1, r);
       merge(arr, l, m, r);
@@ -48,8 +48,7 @@ public class mergesort {
   }
 
   public static void main(String[] args) {
-    int[] array = new int[]{0, 39, 21, 62, 91, 77, 14, 23,
-      90, 69, 51, 81, 68, 83, 32, 56};
+    int[] array = new int[]{0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
     sort(array);
     System.out.println(Arrays.toString(array));
   }

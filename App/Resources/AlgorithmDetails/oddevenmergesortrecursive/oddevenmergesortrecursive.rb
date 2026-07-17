@@ -30,10 +30,8 @@ def odd_even_merge(array, lo, m2, n, r)
         i += m
       end
     end
-  else
-    if n > r
-      odd_even_merge_compare(array, lo, lo + r)
-    end
+  elsif n > r
+    odd_even_merge_compare(array, lo, lo + r)
   end
 end
 
@@ -47,8 +45,8 @@ def odd_even_merge_sort(array, lo, n)
 end
 
 def sort(array)
-  odd_even_merge_sort(array, 0, array.length())
-  return array
+  odd_even_merge_sort(array, 0, array.length)
+  array
 end
 
 array = [0, 39, 21, 62, 91, 77, 14, 23,

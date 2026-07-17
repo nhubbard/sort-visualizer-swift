@@ -1,5 +1,5 @@
 def sort(arr)
-  n = arr.length()
+  n = arr.length
   idx = (0...n).to_a
 
   is_sorted = lambda do |a|

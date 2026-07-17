@@ -41,9 +41,7 @@ bool permutationSort(int arr[], int n, int depth) {
   return permutationSort(arr, n, depth + 1);
 }
 
-void sort(int arr[], int n) {
-  permutationSort(arr, n, 0);
-}
+void sort(int arr[], int n) { permutationSort(arr, n, 0); }
 
 int main(int argc, char *argv[]) {
   int size = sizeof(array) / sizeof(array[0]);

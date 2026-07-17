@@ -1,8 +1,7 @@
 #include <cstdio>
 #include <vector>
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
-                 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
 
 void printList(int arr[], int n) {
   for (int i = 0; i < n; i++) {
@@ -20,8 +19,12 @@ void sort(int arr[], int n) {
   int min = arr[0];
   int max = arr[0];
   for (int i = 1; i < n; i++) {
-    if (arr[i] < min) { min = arr[i]; }
-    if (arr[i] > max) { max = arr[i]; }
+    if (arr[i] < min) {
+      min = arr[i];
+    }
+    if (arr[i] > max) {
+      max = arr[i];
+    }
   }
 
   int size = max - min + 1;

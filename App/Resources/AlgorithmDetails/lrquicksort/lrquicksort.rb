@@ -24,8 +24,8 @@ def quick_sort(array, p, r)
 end
 
 def sort(arr)
-  quick_sort(arr, 0, arr.length() - 1)
-  return arr
+  quick_sort(arr, 0, arr.length - 1)
+  arr
 end
 
 array = [0, 39, 21, 62, 91, 77, 14, 23,

@@ -1,5 +1,3 @@
-require 'set'
-
 def sort(arr, start = 0, e = arr.length)
   return if start >= e - 1
 

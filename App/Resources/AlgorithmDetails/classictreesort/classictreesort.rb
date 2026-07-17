@@ -15,7 +15,7 @@ def sort(arr)
   (1...n).each do |i|
     c = 0
     loop do
-      next_arr = arr[i] < arr[c] ? lower : upper
+      next_arr = (arr[i] < arr[c]) ? lower : upper
       if next_arr[c] == 0
         next_arr[c] = i
         break

@@ -24,7 +24,7 @@ public class quickbogosort {
 
     while (!isPartitioned(arr, start, pivot, end)) {
       for (int i = start; i < end; i++) {
-        int j = i + (int)(Math.random() * (end - i));
+        int j = i + (int) (Math.random() * (end - i));
         if (pivot == i) {
           pivot = j;
         } else if (pivot == j) {

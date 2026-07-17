@@ -1,5 +1,5 @@
 def sort(arr)
-  n = arr.length()
+  n = arr.length
   i = 1
   while i < n
     key = arr[i]

@@ -1,3 +1,11 @@
-Weak Heap Sort relaxes the ordinary heap invariant just enough to save comparisons. In an ordinary heap, every node has to be checked against *both* of its children. A weak heap instead gives every node a single "reverse" flag recording which of its two subtrees currently holds the larger value, so only one direct comparison is ever needed per node — the other child's relative order is already known from the flag, deferred rather than re-checked. Building the structure and repeatedly extracting the largest value both lean on this same flag to decide, at each step, which subtree to descend into next without a second comparison to confirm it.
+Weak Heap Sort relaxes the ordinary heap invariant just enough to save comparisons. In an ordinary heap, every node has
+to be checked against *both* of its children. A weak heap instead gives every node a single "reverse" flag recording
+which of its two subtrees currently holds the larger value, so only one direct comparison is ever needed per node — the
+other child's relative order is already known from the flag, deferred rather than re-checked. Building the structure and
+repeatedly extracting the largest value both lean on this same flag to decide, at each step, which subtree to descend
+into next without a second comparison to confirm it.
 
-The trade is a small amount of extra bookkeeping — one bit per array position — in exchange for doing meaningfully less comparison work overall than a standard binary heap needs for the same sort, while still guaranteeing the same O(n log n) bound. It's a middle ground between an ordinary heap's simplicity and more elaborate heap variants that chase an even smaller comparison count at the cost of more bookkeeping still.
+The trade is a small amount of extra bookkeeping — one bit per array position — in exchange for doing meaningfully less
+comparison work overall than a standard binary heap needs for the same sort, while still guaranteeing the same O(n log
+n) bound. It's a middle ground between an ordinary heap's simplicity and more elaborate heap variants that chase an even
+smaller comparison count at the cost of more bookkeeping still.

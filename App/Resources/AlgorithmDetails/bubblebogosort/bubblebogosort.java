@@ -13,7 +13,7 @@ public class bubblebogosort {
   public static void sort(int[] arr) {
     int n = arr.length;
     while (!isSorted(arr)) {
-      int index = (int)(Math.random() * (n - 1));
+      int index = (int) (Math.random() * (n - 1));
       if (arr[index] > arr[index + 1]) {
         int t = arr[index];
         arr[index] = arr[index + 1];

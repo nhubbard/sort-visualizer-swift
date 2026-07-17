@@ -1,5 +1,5 @@
 def sort(arr)
-  n = arr.length()
+  n = arr.length
   heap_size = n - 1
 
   max_heapify = lambda do |i|

@@ -1,5 +1,5 @@
 def sort(arr)
-  n = arr.length()
+  n = arr.length
   return if n < 2
 
   # Find the true maximum value in the array.

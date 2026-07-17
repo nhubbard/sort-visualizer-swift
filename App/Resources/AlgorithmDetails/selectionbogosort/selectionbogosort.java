@@ -15,7 +15,7 @@ public class selectionbogosort {
     int n = arr.length;
     for (int i = 0; i < n; i++) {
       while (arr[i] != minFrom(arr, i)) {
-        int j = i + (int)(Math.random() * (n - i));
+        int j = i + (int) (Math.random() * (n - i));
         int temp = arr[i];
         arr[i] = arr[j];
         arr[j] = temp;

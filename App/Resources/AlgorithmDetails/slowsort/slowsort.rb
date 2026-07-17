@@ -10,8 +10,8 @@ def slow_sort(array, i, j)
 end
 
 def sort(array)
-  slow_sort(array, 0, array.length() - 1)
-  return array
+  slow_sort(array, 0, array.length - 1)
+  array
 end
 
 array = [0, 39, 21, 62, 91, 77, 14, 23,

@@ -24,7 +24,7 @@ def sort(arr)
     sift_down(arr, 0, last)
   end
   arr.reverse!
-  return arr
+  arr
 end
 
 array = [0, 39, 21, 62, 91, 77, 14, 23,

@@ -1,9 +1,12 @@
 using System;
 
-public class DoubleSelectionSort {
-  public static void SortInPlace(int[] array) {
+public class DoubleSelectionSort
+{
+  public static void SortInPlace(int[] array)
+  {
     int n = array.Length;
-    if (n <= 1) {
+    if (n <= 1)
+    {
       return;
     }
 
@@ -12,17 +15,22 @@ public class DoubleSelectionSort {
     var smallest = 0;
     var biggest = 0;
 
-    while (left <= right) {
-      for (var i = left; i <= right; i++) {
-        if (array[i] > array[biggest]) {
+    while (left <= right)
+    {
+      for (var i = left; i <= right; i++)
+      {
+        if (array[i] > array[biggest])
+        {
           biggest = i;
         }
-        if (array[i] < array[smallest]) {
+        if (array[i] < array[smallest])
+        {
           smallest = i;
         }
       }
 
-      if (biggest == left) {
+      if (biggest == left)
+      {
         biggest = smallest;
       }
 
@@ -36,14 +44,15 @@ public class DoubleSelectionSort {
     }
   }
 
-  public static int[] Sort(int[] array) {
+  public static int[] Sort(int[] array)
+  {
     SortInPlace(array);
     return array;
   }
 
-  public static void Main(String[] args) {
-    int[] array = {0, 39, 21, 62, 91, 77, 14, 23,
-      90, 69, 51, 81, 68, 83, 32, 56};
+  public static void Main(String[] args)
+  {
+    int[] array = { 0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56 };
     Sort(array);
     string result = "[" + String.Join(", ", array) + "]";
     Console.WriteLine(result);

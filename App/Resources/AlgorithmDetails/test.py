@@ -14,7 +14,10 @@ root = os.path.dirname(os.path.abspath(__file__))
 algorithms = sorted(
     entry.name
     for entry in os.scandir(root)
-    if entry.is_dir() and entry.name != "template" and entry.name != "__pycache__" and not entry.name.startswith(".")
+    if entry.is_dir()
+    and entry.name != "template"
+    and entry.name != "__pycache__"
+    and not entry.name.startswith(".")
 )
 extensions = ["c", "cpp", "cs", "go", "java", "js", "kt", "py", "rb", "swift"]
 logger = logging.getLogger()
@@ -53,7 +56,10 @@ def test_c(filename: str) -> bool:
     logger.debug(f"Compiling {filename} into {outfile}")
     try:
         compiler = subprocess.run(
-            ["clang", "-o", outfile, basename], cwd=algo_dir, check=True, capture_output=True
+            ["clang", "-o", outfile, basename],
+            cwd=algo_dir,
+            check=True,
+            capture_output=True,
         )
         compile_stdout = compiler.stdout.decode("utf-8")
         if compile_stdout != "":
@@ -68,7 +74,9 @@ def test_c(filename: str) -> bool:
     logger.debug(f"Running ./{outfile}")
     try:
         output = (
-            subprocess.run([f"./{outfile}"], cwd=algo_dir, check=True, capture_output=True)
+            subprocess.run(
+                [f"./{outfile}"], cwd=algo_dir, check=True, capture_output=True
+            )
             .stdout.decode("utf-8")
             .strip()
         )
@@ -101,7 +109,10 @@ def test_cpp(filename: str) -> bool:
     logger.debug(f"Compiling {filename} into {outfile}")
     try:
         compiler = subprocess.run(
-            ["clang++", "-o", outfile, basename], cwd=algo_dir, check=True, capture_output=True
+            ["clang++", "-o", outfile, basename],
+            cwd=algo_dir,
+            check=True,
+            capture_output=True,
         )
         compile_stdout = compiler.stdout.decode("utf-8")
         if compile_stdout != "":
@@ -116,7 +127,9 @@ def test_cpp(filename: str) -> bool:
     logger.debug(f"Running ./{outfile}")
     try:
         output = (
-            subprocess.run([f"./{outfile}"], cwd=algo_dir, check=True, capture_output=True)
+            subprocess.run(
+                [f"./{outfile}"], cwd=algo_dir, check=True, capture_output=True
+            )
             .stdout.decode("utf-8")
             .strip()
         )
@@ -147,7 +160,10 @@ def test_cs(filename: str) -> bool:
     try:
         output = (
             subprocess.run(
-                ["dotnet", "run", "--file", basename], cwd=algo_dir, check=True, capture_output=True
+                ["dotnet", "run", "--file", basename],
+                cwd=algo_dir,
+                check=True,
+                capture_output=True,
             )
             .stdout.decode("utf-8")
             .strip()
@@ -217,7 +233,10 @@ def test_java(filename: str) -> bool:
     try:
         output = (
             subprocess.run(
-                ["java", "-cp", ".", classname], cwd=algo_dir, check=True, capture_output=True
+                ["java", "-cp", ".", classname],
+                cwd=algo_dir,
+                check=True,
+                capture_output=True,
             )
             .stdout.decode("utf-8")
             .strip()
@@ -398,7 +417,10 @@ def test_swift(filename: str) -> bool:
     logger.debug(f"Compiling {filename} into {outfile}")
     try:
         compiler = subprocess.run(
-            ["swiftc", "-o", outfile, basename], cwd=algo_dir, check=True, capture_output=True
+            ["swiftc", "-o", outfile, basename],
+            cwd=algo_dir,
+            check=True,
+            capture_output=True,
         )
         compile_stdout = compiler.stdout.decode("utf-8")
         if compile_stdout != "":
@@ -413,7 +435,9 @@ def test_swift(filename: str) -> bool:
     logger.debug(f"Running ./{outfile}")
     try:
         output = (
-            subprocess.run([f"./{outfile}"], cwd=algo_dir, check=True, capture_output=True)
+            subprocess.run(
+                [f"./{outfile}"], cwd=algo_dir, check=True, capture_output=True
+            )
             .stdout.decode("utf-8")
             .strip()
         )
@@ -460,7 +484,10 @@ def run_algorithm_tests(algorithm: str) -> list[bool]:
     binary mid-run. Parallelism is applied across algorithms instead, since each
     algorithm's directory is otherwise self-contained.
     """
-    return [TESTERS[extension](f"{algorithm}/{algorithm}.{extension}") for extension in extensions]
+    return [
+        TESTERS[extension](f"{algorithm}/{algorithm}.{extension}")
+        for extension in extensions
+    ]
 
 
 if __name__ == "__main__":

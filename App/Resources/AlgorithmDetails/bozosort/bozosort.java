@@ -13,8 +13,8 @@ public class bozosort {
   public static void sort(int[] arr) {
     int n = arr.length;
     while (!isSorted(arr)) {
-      int i = (int)(Math.random() * n);
-      int j = (int)(Math.random() * n);
+      int i = (int) (Math.random() * n);
+      int j = (int) (Math.random() * n);
       int t = arr[i];
       arr[i] = arr[j];
       arr[j] = t;

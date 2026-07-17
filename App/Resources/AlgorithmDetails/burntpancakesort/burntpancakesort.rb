@@ -9,7 +9,7 @@ def flip(arr, end_index)
 end
 
 def sort(arr)
-  n = arr.length()
+  n = arr.length
   for i in (n - 1).downto(1)
     max = 0
     for j in (max + 1)..i

@@ -1,5 +1,6 @@
 import random
 
+
 def sort(arr, length=None):
     if length is None:
         length = len(arr)
@@ -11,6 +12,7 @@ def sort(arr, length=None):
         random.shuffle(sub)
         arr[:length] = sub
         sort(arr, length - 1)
+
 
 array = [0, 39, 21, 62, 91, 14, 23]
 sort(array)

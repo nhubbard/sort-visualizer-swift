@@ -1,9 +1,26 @@
 *From Wikipedia, the free encyclopedia*
 
-Slowsort is a sorting algorithm based on the principle of multiply and surrender, a comedic counterpart to the divide-and-conquer paradigm used by algorithms such as Merge Sort and Quick Sort. Rather than breaking a problem into independent subproblems and combining their solutions efficiently, Slowsort breaks the array into two halves, recursively "sorts" each half, does the absolute minimum amount of work needed to make progress, and then redoes most of that work all over again on a slightly smaller range. It was first described (tongue in cheek) as a cautionary example of how *not* to design an algorithm.
+Slowsort is a sorting algorithm based on the principle of multiply and surrender, a comedic counterpart to the
+divide-and-conquer paradigm used by algorithms such as Merge Sort and Quick Sort. Rather than breaking a problem into
+independent subproblems and combining their solutions efficiently, Slowsort breaks the array into two halves,
+recursively "sorts" each half, does the absolute minimum amount of work needed to make progress, and then redoes most of
+that work all over again on a slightly smaller range. It was first described (tongue in cheek) as a cautionary example
+of how *not* to design an algorithm.
 
-The recursive step, `slowSort(A, i, j)`, splits the range `[i, j]` at its midpoint `m`, recursively sorts `[i, m]` and `[m+1, j]`, and then compares only the two "boundary" elements `A[m]` and `A[j]`, swapping them if `A[m]` is strictly larger. This settles the maximum of the two halves into the last position, `j` — but instead of stopping there, the algorithm then recurses on `[i, j-1]`, redoing nearly the entire sort to place the next-largest element, and so on. The result is a recursive restatement of selection sort, where finding "the maximum of the remaining range" is itself accomplished by a wasteful divide-and-conquer tournament rather than a simple linear scan.
+The recursive step, `slowSort(A, i, j)`, splits the range `[i, j]` at its midpoint `m`, recursively sorts `[i, m]` and
+`[m+1, j]`, and then compares only the two "boundary" elements `A[m]` and `A[j]`, swapping them if `A[m]` is strictly
+larger. This settles the maximum of the two halves into the last position, `j` — but instead of stopping there, the
+algorithm then recurses on `[i, j-1]`, redoing nearly the entire sort to place the next-largest element, and so on. The
+result is a recursive restatement of selection sort, where finding "the maximum of the remaining range" is itself
+accomplished by a wasteful divide-and-conquer tournament rather than a simple linear scan.
 
-Slowsort's running time is famously terrible: its recurrence, `T(n) = 2T(n/2) + T(n-1) + O(1)`, resolves to `O(n^(log n))` — an exponent that grows with the input size itself, so the algorithm is asymptotically worse than any fixed polynomial (quadratic, cubic, or otherwise), yet still faster than a factorial-time brute force. This makes it substantially slower in practice than [Stooge Sort](https://en.wikipedia.org/wiki/Stooge_sort), another deliberately inefficient recursive sort with which it is often compared — Stooge Sort's exponent, `log(3)/log(1.5) ≈ 2.71`, is fixed and merely polynomial, while Slowsort's keeps climbing as the input grows.
+Slowsort's running time is famously terrible: its recurrence, `T(n) = 2T(n/2) + T(n-1) + O(1)`, resolves to
+`O(n^(log n))` — an exponent that grows with the input size itself, so the algorithm is asymptotically worse than any
+fixed polynomial (quadratic, cubic, or otherwise), yet still faster than a factorial-time brute force. This makes it
+substantially slower in practice than [Stooge Sort](https://en.wikipedia.org/wiki/Stooge_sort), another deliberately
+inefficient recursive sort with which it is often compared — Stooge Sort's exponent, `log(3)/log(1.5) ≈ 2.71`, is fixed
+and merely polynomial, while Slowsort's keeps climbing as the input grows.
 
-As with other members of this "intentionally bad" genre of algorithm — a class of sorts designed to illustrate poor algorithmic choices rather than to be used in practice — Slowsort is a teaching curiosity: a working, fully deterministic sort that nonetheless embodies almost everything a real divide-and-conquer algorithm should avoid.
+As with other members of this "intentionally bad" genre of algorithm — a class of sorts designed to illustrate poor
+algorithmic choices rather than to be used in practice — Slowsort is a teaching curiosity: a working, fully
+deterministic sort that nonetheless embodies almost everything a real divide-and-conquer algorithm should avoid.

@@ -1,8 +1,7 @@
 #include <cstdio>
 #include <utility>
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
-                 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
 
 void printList(int arr[], int n) {
   for (int i = 0; i < n; i++) {
@@ -28,11 +27,11 @@ void oddEvenMerge(int arr[], int lo, int m2, int n, int r) {
   int m = r * 2;
   if (m < n) {
     if ((n / r) % 2 != 0) {
-      oddEvenMerge(arr, lo, (m2 + 1) / 2, n + r, m);     // even subsequence
-      oddEvenMerge(arr, lo + r, m2 / 2, n - r, m);        // odd subsequence
+      oddEvenMerge(arr, lo, (m2 + 1) / 2, n + r, m); // even subsequence
+      oddEvenMerge(arr, lo + r, m2 / 2, n - r, m);   // odd subsequence
     } else {
-      oddEvenMerge(arr, lo, (m2 + 1) / 2, n, m);          // even subsequence
-      oddEvenMerge(arr, lo + r, m2 / 2, n, m);            // odd subsequence
+      oddEvenMerge(arr, lo, (m2 + 1) / 2, n, m); // even subsequence
+      oddEvenMerge(arr, lo + r, m2 / 2, n, m);   // odd subsequence
     }
 
     if (m2 % 2 != 0) {
@@ -60,9 +59,7 @@ void oddEvenMergeSort(int arr[], int lo, int n) {
   }
 }
 
-void sort(int arr[], int n) {
-  oddEvenMergeSort(arr, 0, n);
-}
+void sort(int arr[], int n) { oddEvenMergeSort(arr, 0, n); }
 
 int main(int argc, char *argv[]) {
   int size = sizeof(array) / sizeof(array[0]);

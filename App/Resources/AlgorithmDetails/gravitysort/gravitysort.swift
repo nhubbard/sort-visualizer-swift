@@ -2,7 +2,9 @@ import Foundation
 
 func gravitySort(_ arr: inout [Int]) {
   let n = arr.count
-  guard n > 0 else { return }
+  guard n > 0 else {
+    return
+  }
 
   let minValue = arr.min()!
   let maxValue = arr.max()!
@@ -32,7 +34,9 @@ func sort(_ arr: inout [Int]) {
   gravitySort(&arr)
 }
 
-var array: [Int] = [0, 39, 21, 62, 91, 77, 14, 23,
-  90, 69, 51, 81, 68, 83, 32, 56]
+var array: [Int] = [
+  0, 39, 21, 62, 91, 77, 14, 23,
+  90, 69, 51, 81, 68, 83, 32, 56,
+]
 sort(&array)
 print(array)

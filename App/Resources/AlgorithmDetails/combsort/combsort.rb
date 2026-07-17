@@ -1,9 +1,9 @@
 def sort(arr)
-  n = arr.length()
+  n = arr.length
   shrink = 1.3
   gap = n
   sorted = false
-  while !sorted
+  until sorted
     gap = (gap / shrink).to_i
     if gap <= 1
       sorted = true

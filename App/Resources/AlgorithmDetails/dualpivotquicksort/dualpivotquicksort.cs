@@ -1,8 +1,11 @@
 using System;
 
-public class DualPivotQuickSort {
-  public static (int, int) Partition(int[] array, int low, int high) {
-    if (array[low] > array[high]) {
+public class DualPivotQuickSort
+{
+  public static (int, int) Partition(int[] array, int low, int high)
+  {
+    if (array[low] > array[high])
+    {
       (array[low], array[high]) = (array[high], array[low]);
     }
     var j = low + 1;
@@ -10,17 +13,23 @@ public class DualPivotQuickSort {
     var k = low + 1;
     var p = array[low];
     var q = array[high];
-    while (k <= g) {
-      if (array[k] < p) {
+    while (k <= g)
+    {
+      if (array[k] < p)
+      {
         (array[k], array[j]) = (array[j], array[k]);
         j++;
-      } else if (array[k] >= q) {
-        while (array[g] > q && k < g) {
+      }
+      else if (array[k] >= q)
+      {
+        while (array[g] > q && k < g)
+        {
           g--;
         }
         (array[k], array[g]) = (array[g], array[k]);
         g--;
-        if (array[k] < p) {
+        if (array[k] < p)
+        {
           (array[k], array[j]) = (array[j], array[k]);
           j++;
         }
@@ -34,8 +43,10 @@ public class DualPivotQuickSort {
     return (j, g);
   }
 
-  public static int[] Sort(int[] array, int low, int high) {
-    if (low < high) {
+  public static int[] Sort(int[] array, int low, int high)
+  {
+    if (low < high)
+    {
       var (j, g) = Partition(array, low, high);
       Sort(array, low, j - 1);
       Sort(array, j + 1, g - 1);
@@ -44,9 +55,9 @@ public class DualPivotQuickSort {
     return array;
   }
 
-  public static void Main(String[] args) {
-    int[] array = {0, 39, 21, 62, 91, 77, 14, 23,
-      90, 69, 51, 81, 68, 83, 32, 56};
+  public static void Main(String[] args)
+  {
+    int[] array = { 0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56 };
     Sort(array, 0, array.Length - 1);
     string result = "[" + String.Join(", ", array) + "]";
     Console.WriteLine(result);

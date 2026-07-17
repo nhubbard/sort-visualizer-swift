@@ -35,6 +35,7 @@ def sort(arr):
     for i in range(n):
         arr[i] = original[indexes[i]]
 
+
 array = [0, 39, 21, 14]
 sort(array)
 print(array)
