@@ -1,0 +1,3 @@
+# Point-in-time debug snapshots from past calibration runs -- large, not load-bearing.
+# The current output/*.json is the only thing apply_growth_models.py or a human should read.
+output/archive-*/
