@@ -16,6 +16,11 @@ public enum BigOShape: Sendable, Equatable {
   case superLinearithmic
   case exponential
   case factorial
+  /// `n^n` — distinct from `.factorial` (`n!`): both grow super-exponentially and are easy to
+  /// mistake for one another from a declared complexity string alone, but `n^n` is the real
+  /// measured growth of algorithms like `OptimizedGuessSort` (its odometer enumerates all `n^n`
+  /// index sequences), not `n!`.
+  case nToTheN
 
   public func value(n: Double) -> Double {
     switch self {
@@ -32,6 +37,9 @@ public enum BigOShape: Sendable, Equatable {
       // `lgamma(n + 1)` is `log(n!)` — avoids overflowing `Double` for the size ranges these
       // charts actually cover, then converts back via `exp` since callers want the raw value.
       return exp(lgamma(n + 1))
+    case .nToTheN:
+      // Same overflow-avoidance trick as `.factorial`: `log(n^n) = n*log(n)`.
+      return exp(n * log(n))
     }
   }
 
@@ -80,6 +88,7 @@ public enum BigOShape: Sendable, Equatable {
     case "n^logn": return .superLinearithmic
     case "2^n": return .exponential
     case "n!", "n*n!": return .factorial
+    case "n^n": return .nToTheN
     default: break
     }
 
