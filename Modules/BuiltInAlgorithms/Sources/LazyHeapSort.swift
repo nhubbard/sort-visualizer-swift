@@ -7,6 +7,9 @@ public struct LazyHeapSort: SortAlgorithm {
     displayName: "Lazy Heap Sort",
     category: .selection,
     sizeRange: 16...256,
+    growthModel: OperationGrowthModel(
+      anchorSize: 870, coefficients: [239859, 494.552, 0.250817],
+      measuredSafeCeiling: nil),
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n \\times \\sqrt{n})", average: "O(n \\times \\sqrt{n})",

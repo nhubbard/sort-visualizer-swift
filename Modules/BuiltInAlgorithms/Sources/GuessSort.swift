@@ -7,6 +7,9 @@ public struct GuessSort: SortAlgorithm {
     displayName: "Guess Sort",
     category: .impractical,
     sizeRange: 3...4,
+    growthModel: OperationGrowthModel(
+      anchorSize: 4, coefficients: [15975.7, 48236.9, 72823.2, 73294, 55326, 33410.2],
+      measuredSafeCeiling: nil),
     stable: false,
     timeComplexity: ComplexityBounds(best: "O(n)", average: "O(n^n)", worst: "O(n^n)"),
     spaceComplexity: "O(n)",

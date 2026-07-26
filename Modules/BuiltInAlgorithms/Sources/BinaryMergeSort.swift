@@ -7,6 +7,9 @@ public struct BinaryMergeSort: SortAlgorithm {
     displayName: "Binary Merge Sort",
     category: .hybrid,
     sizeRange: 16...256,
+    growthModel: OperationGrowthModel(
+      anchorSize: 1064, coefficients: [239809, 428.155, 0.191251],
+      measuredSafeCeiling: nil),
     stable: true,
     timeComplexity: ComplexityBounds(
       best: "O(n log n)", average: "O(n log n)", worst: "O(n log n)"),

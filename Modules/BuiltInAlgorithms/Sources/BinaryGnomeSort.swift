@@ -12,6 +12,9 @@ public struct BinaryGnomeSort: SortAlgorithm {
     displayName: "Binary Gnome Sort",
     category: .exchange,
     sizeRange: 16...256,
+    growthModel: OperationGrowthModel(
+      anchorSize: 303, coefficients: [239852, 1559, 2.5301],
+      measuredSafeCeiling: nil),
     stable: true,
     timeComplexity: ComplexityBounds(best: "O(n)", average: "O(n^2)", worst: "O(n^2)"),
     spaceComplexity: "O(1)",

@@ -11,6 +11,9 @@ public struct SnuffleSort: SortAlgorithm {
     displayName: "Snuffle Sort",
     category: .exchange,
     sizeRange: 16...32,
+    growthModel: OperationGrowthModel(
+      anchorSize: 24, coefficients: [167644, 69658.2, 14819.3, 2143.93, 236.657, 21.2186],
+      measuredSafeCeiling: nil),
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n^{log n})", average: "O(n^{log n})", worst: "O(n^{log n})"),

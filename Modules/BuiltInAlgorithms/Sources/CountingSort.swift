@@ -8,6 +8,9 @@ public struct CountingSort: SortAlgorithm {
     displayName: "Counting Sort",
     category: .distribution,
     sizeRange: 16...256,
+    growthModel: OperationGrowthModel(
+      anchorSize: 120000, coefficients: [240000, 2],
+      measuredSafeCeiling: nil),
     stable: true,
     timeComplexity: ComplexityBounds(best: "O(n+k)", average: "O(n+k)", worst: "O(n+k)"),
     spaceComplexity: "O(n+k)",

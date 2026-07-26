@@ -7,6 +7,9 @@ public struct BurntPancakeSort: SortAlgorithm {
     displayName: "Burnt Pancake Sort",
     category: .miscellaneous,
     sizeRange: 16...256,
+    growthModel: OperationGrowthModel(
+      anchorSize: 184, coefficients: [239094, 2629.98, 7.23954],
+      measuredSafeCeiling: nil),
     stable: false,
     timeComplexity: ComplexityBounds(best: "O(n^2)", average: "O(n^2)", worst: "O(n^2)"),
     spaceComplexity: "O(1)",

@@ -7,6 +7,9 @@ public struct BubbleBogoSort: SortAlgorithm {
     displayName: "Bubble Bogo Sort",
     category: .impractical,
     sizeRange: 16...256,
+    growthModel: OperationGrowthModel(
+      anchorSize: 179, coefficients: [238965, 2677.5, 7.5],
+      measuredSafeCeiling: nil),
     stable: false,
     timeComplexity: ComplexityBounds(best: "O(n)", average: "O(n^2)", worst: "O(n^2)"),
     spaceComplexity: "O(1)",

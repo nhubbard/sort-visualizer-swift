@@ -7,6 +7,9 @@ public struct SmartGuessSort: SortAlgorithm {
     displayName: "Smart Guess Sort",
     category: .impractical,
     sizeRange: 4...8,
+    growthModel: OperationGrowthModel(
+      anchorSize: 8, coefficients: [69216.4, 90169.4, 60562.7, 27811.9, 9788.65, 2809.08],
+      measuredSafeCeiling: nil),
     stable: false,
     timeComplexity: ComplexityBounds(best: "O(n)", average: "O(n^n)", worst: "O(n^n)"),
     spaceComplexity: "O(n)",

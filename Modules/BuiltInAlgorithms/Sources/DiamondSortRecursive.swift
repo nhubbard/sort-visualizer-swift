@@ -7,6 +7,9 @@ public struct DiamondSortRecursive: SortAlgorithm {
     displayName: "Diamond Sort (Recursive)",
     category: .concurrent,
     sizeRange: 16...256,
+    growthModel: OperationGrowthModel(
+      anchorSize: 187, coefficients: [240674, 2561.81, 6.65882],
+      measuredSafeCeiling: nil),
     stable: true,
     timeComplexity: ComplexityBounds(
       best: "O(n log^2 n)", average: "O(n log^2 n)", worst: "O(n log^2 n)"),

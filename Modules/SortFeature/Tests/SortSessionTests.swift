@@ -41,6 +41,14 @@ private struct FakeAlgorithm: SortAlgorithm {
       displayName: "Fake",
       category: .exchange,
       sizeRange: sizeRange,
+      // A curve that only reaches any realistic operation cap at an enormous size, with
+      // `measuredSafeCeiling` pinned to this fixture's own (test-varied) `sizeRange.upperBound` --
+      // so `effectiveSizeRange` always reproduces plain `sizeRange` regardless of
+      // `recordingOperationCap`, and tests that deliberately set a tiny cap (see the "Recording
+      // size cap" tests below) exercise `RecordingEngine`'s own mid-recording cap check instead of
+      // getting silently pre-clamped before recording ever starts.
+      growthModel: OperationGrowthModel(
+        anchorSize: 0, coefficients: [0, 1e-9], measuredSafeCeiling: sizeRange.upperBound),
       stable: true,
       timeComplexity: ComplexityBounds(best: "O(n)", average: "O(n^2)", worst: "O(n^2)"),
       spaceComplexity: "O(1)",

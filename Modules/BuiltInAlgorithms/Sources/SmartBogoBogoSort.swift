@@ -7,6 +7,9 @@ public struct SmartBogoBogoSort: SortAlgorithm {
     displayName: "Smart Bogo Bogo Sort",
     category: .impractical,
     sizeRange: 4...8,
+    growthModel: OperationGrowthModel(
+      anchorSize: 27, coefficients: [222431, 27365.5, 1176.61, 19.2002],
+      measuredSafeCeiling: nil),
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n)", average: "O(n \\times n!)", worst: "O(n \\times n!)"),

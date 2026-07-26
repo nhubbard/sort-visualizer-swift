@@ -7,6 +7,9 @@ public struct OddEvenMergeSortIterative: SortAlgorithm {
     displayName: "Odd-Even Merge Sort (Iterative)",
     category: .concurrent,
     sizeRange: 16...256,
+    growthModel: OperationGrowthModel(
+      anchorSize: 897, coefficients: [239988, 392.652, 0.102345],
+      measuredSafeCeiling: nil),
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(log^2 n)", average: "O(log^2 n)", worst: "O(log^2 n)"),

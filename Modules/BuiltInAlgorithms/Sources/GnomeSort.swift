@@ -7,6 +7,9 @@ public struct GnomeSort: SortAlgorithm {
     displayName: "Gnome Sort",
     category: .exchange,
     sizeRange: 16...256,
+    growthModel: OperationGrowthModel(
+      anchorSize: 179, coefficients: [238965, 2677.5, 7.5],
+      measuredSafeCeiling: nil),
     stable: true,
     timeComplexity: ComplexityBounds(best: "O(n)", average: "O(n^2)", worst: "O(n^2)"),
     spaceComplexity: "O(1)",

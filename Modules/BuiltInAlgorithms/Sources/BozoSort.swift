@@ -7,6 +7,9 @@ public struct BozoSort: SortAlgorithm {
     displayName: "Bozo Sort",
     category: .impractical,
     sizeRange: 4...7,
+    growthModel: OperationGrowthModel(
+      anchorSize: 7, coefficients: [42633.5, 80687, 76353.1, 48168, 22790.4, 8626.49],
+      measuredSafeCeiling: nil),
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n)", average: "O(n \\times n!)", worst: "O(n \\times n!)"),

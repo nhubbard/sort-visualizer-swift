@@ -18,6 +18,9 @@ public struct CircleSortRecursive: SortAlgorithm {
     displayName: "Circle Sort (Recursive)",
     category: .exchange,
     sizeRange: 16...256,
+    growthModel: OperationGrowthModel(
+      anchorSize: 739, coefficients: [231890, 439.615, 0.114404],
+      measuredSafeCeiling: nil),
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n log n)", average: "O(n log^2 n)", worst: "O(n log^2 n)"),

@@ -7,6 +7,9 @@ public struct StrandSort: SortAlgorithm {
     displayName: "Strand Sort",
     category: .merge,
     sizeRange: 16...256,
+    growthModel: OperationGrowthModel(
+      anchorSize: 691, coefficients: [239777, 692.5, 0.5],
+      measuredSafeCeiling: nil),
     stable: true,
     timeComplexity: ComplexityBounds(best: "O(n)", average: "O(n log n)", worst: "O(n^2)"),
     spaceComplexity: "O(n)",

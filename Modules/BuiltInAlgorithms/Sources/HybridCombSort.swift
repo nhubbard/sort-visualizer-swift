@@ -14,6 +14,9 @@ public struct HybridCombSort: SortAlgorithm {
     displayName: "Hybrid Comb Sort",
     category: .hybrid,
     sizeRange: 16...256,
+    growthModel: OperationGrowthModel(
+      anchorSize: 1095, coefficients: [239934, 387.443, 0.153455],
+      measuredSafeCeiling: nil),
     stable: false,
     timeComplexity: ComplexityBounds(best: "O(n log n)", average: "O(n^2)", worst: "O(n^2)"),
     spaceComplexity: "O(1)",

@@ -8,6 +8,9 @@ public struct IntroSort: SortAlgorithm {
     displayName: "Intro Sort",
     category: .hybrid,
     sizeRange: 16...256,
+    growthModel: OperationGrowthModel(
+      anchorSize: 1247, coefficients: [213291, 237.961, 0.0359793],
+      measuredSafeCeiling: nil),
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n log n)", average: "O(n log n)", worst: "O(n log n)"),

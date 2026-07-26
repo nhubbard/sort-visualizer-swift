@@ -7,6 +7,9 @@ public struct TernaryLRQuickSort: SortAlgorithm {
     displayName: "Ternary Quick Sort (LR)",
     category: .quick,
     sizeRange: 16...256,
+    growthModel: OperationGrowthModel(
+      anchorSize: 340, coefficients: [239073, 1364.42, 1.94344],
+      measuredSafeCeiling: nil),
     stable: false,
     timeComplexity: ComplexityBounds(best: "O(n log n)", average: "O(n log n)", worst: "O(n^2)"),
     spaceComplexity: "O(log n)",

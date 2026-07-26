@@ -23,6 +23,9 @@ public struct WeaveMergeSort: SortAlgorithm {
     displayName: "Weave Merge Sort",
     category: .hybrid,
     sizeRange: 16...256,
+    growthModel: OperationGrowthModel(
+      anchorSize: 310, coefficients: [239475, 1547.5, 2.5],
+      measuredSafeCeiling: nil),
     stable: false,
     timeComplexity: ComplexityBounds(best: "O(n^2)", average: "O(n^2)", worst: "O(n^2)"),
     spaceComplexity: "O(log n)",

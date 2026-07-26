@@ -17,6 +17,9 @@ public struct RotateMergeSort: SortAlgorithm {
     displayName: "Rotate Merge Sort",
     category: .merge,
     sizeRange: 16...256,
+    growthModel: OperationGrowthModel(
+      anchorSize: 1458, coefficients: [205533, 206.468, 0.0319876],
+      measuredSafeCeiling: nil),
     stable: true,
     timeComplexity: ComplexityBounds(
       best: "O(n log n)", average: "O(n log n)", worst: "O(n log n)"),

@@ -7,6 +7,9 @@ public struct CycleSort: SortAlgorithm {
     displayName: "Cycle Sort",
     category: .selection,
     sizeRange: 16...256,
+    growthModel: OperationGrowthModel(
+      anchorSize: 31223, coefficients: [239990, 14.5146, 0.000218692],
+      measuredSafeCeiling: nil),
     stable: false,
     timeComplexity: ComplexityBounds(best: "O(n^2)", average: "O(n^2)", worst: "O(n^2)"),
     spaceComplexity: "O(1)",

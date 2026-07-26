@@ -7,6 +7,9 @@ public struct BoseNelsonSortIterative: SortAlgorithm {
     displayName: "Iterative Bose-Nelson Sort",
     category: .concurrent,
     sizeRange: 16...256,
+    growthModel: OperationGrowthModel(
+      anchorSize: 712, coefficients: [232412, 484.259, 0.159123],
+      measuredSafeCeiling: nil),
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n log^2 n)", average: "O(n log^2 n)", worst: "O(n log^2 n)"),

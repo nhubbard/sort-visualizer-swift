@@ -7,6 +7,9 @@ public struct WeakHeapSort: SortAlgorithm {
     displayName: "Weak Heap Sort",
     category: .selection,
     sizeRange: 16...256,
+    growthModel: OperationGrowthModel(
+      anchorSize: 2213, coefficients: [198458, 101.593],
+      measuredSafeCeiling: nil),
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n log n)", average: "O(n log n)", worst: "O(n log n)"),

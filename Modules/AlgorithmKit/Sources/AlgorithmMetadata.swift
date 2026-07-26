@@ -71,6 +71,10 @@ public struct AlgorithmMetadata: Sendable, Codable, Equatable {
   public var sizeStep: Int {
     sizeRange.steppedSizeStep
   }
+  /// The real, measured operation-count growth curve for this algorithm (see
+  /// `OperationGrowthModel`), used by `effectiveSizeRange(operationCap:)` to compute a live upper
+  /// bound instead of trusting `sizeRange.upperBound`'s hand-picked guess.
+  public var growthModel: OperationGrowthModel
   public var stable: Bool
   public var timeComplexity: ComplexityBounds
   public var spaceComplexity: String
@@ -80,6 +84,7 @@ public struct AlgorithmMetadata: Sendable, Codable, Equatable {
     displayName: String,
     category: AlgorithmCategory,
     sizeRange: ClosedRange<Int>,
+    growthModel: OperationGrowthModel,
     stable: Bool,
     timeComplexity: ComplexityBounds,
     spaceComplexity: String,
@@ -88,9 +93,20 @@ public struct AlgorithmMetadata: Sendable, Codable, Equatable {
     self.displayName = displayName
     self.category = category
     self.sizeRange = sizeRange
+    self.growthModel = growthModel
     self.stable = stable
     self.timeComplexity = timeComplexity
     self.spaceComplexity = spaceComplexity
     self.iconName = iconName
+  }
+
+  /// `sizeRange.upperBound` replaced with a value computed live from `growthModel` and the
+  /// current recording operation cap -- so raising or lowering that setting immediately
+  /// recalculates every algorithm's real safe max, instead of using a number baked in by hand.
+  /// `sizeRange.lowerBound` is untouched (a small-`n` visualization floor, unrelated to the
+  /// operation cap).
+  public func effectiveSizeRange(operationCap: Int) -> ClosedRange<Int> {
+    let maxSize = Swift.max(sizeRange.lowerBound, growthModel.maxSafeSize(forOperationCap: operationCap))
+    return sizeRange.lowerBound...maxSize
   }
 }

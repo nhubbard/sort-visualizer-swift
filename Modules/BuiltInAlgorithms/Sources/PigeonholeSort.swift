@@ -12,6 +12,9 @@ public struct PigeonholeSort: SortAlgorithm {
     displayName: "Pigeonhole Sort",
     category: .distribution,
     sizeRange: 16...256,
+    growthModel: OperationGrowthModel(
+      anchorSize: 79999, coefficients: [239997, 3],
+      measuredSafeCeiling: nil),
     stable: false,
     timeComplexity: ComplexityBounds(best: "O(n+k)", average: "O(n+k)", worst: "O(n+k)"),
     spaceComplexity: "O(n+k)",

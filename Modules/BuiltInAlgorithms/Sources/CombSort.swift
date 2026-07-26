@@ -7,6 +7,9 @@ public struct CombSort: SortAlgorithm {
     displayName: "Comb Sort",
     category: .exchange,
     sizeRange: 16...256,
+    growthModel: OperationGrowthModel(
+      anchorSize: 1111, coefficients: [239895, 377.299, 0.144918],
+      measuredSafeCeiling: nil),
     stable: false,
     timeComplexity: ComplexityBounds(best: "O(n log n)", average: "O(n^2)", worst: "O(n^2)"),
     spaceComplexity: "O(1)",

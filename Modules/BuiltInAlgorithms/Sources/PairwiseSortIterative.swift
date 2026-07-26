@@ -20,6 +20,9 @@ public struct PairwiseSortIterative: SortAlgorithm {
     displayName: "Iterative Pairwise Sort",
     category: .concurrent,
     sizeRange: 16...256,
+    growthModel: OperationGrowthModel(
+      anchorSize: 1018, coefficients: [222310, 294.667, 0.0483229],
+      measuredSafeCeiling: nil),
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n log^2 n)", average: "O(n log^2 n)", worst: "O(n log^2 n)"),

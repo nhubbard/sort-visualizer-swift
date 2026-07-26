@@ -7,6 +7,9 @@ public struct MedianQuickBogoSort: SortAlgorithm {
     displayName: "Median Quick Bogo Sort",
     category: .impractical,
     sizeRange: 4...6,
+    growthModel: OperationGrowthModel(
+      anchorSize: 7, coefficients: [108732, 237680, 268499, 207938, 123755, 60211.4],
+      measuredSafeCeiling: nil),
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n)", average: "O(n \\times n!)", worst: "O(n \\times n!)"),

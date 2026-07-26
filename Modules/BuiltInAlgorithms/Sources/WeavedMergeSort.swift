@@ -19,6 +19,9 @@ public struct WeavedMergeSort: SortAlgorithm {
     displayName: "Weaved Merge Sort",
     category: .merge,
     sizeRange: 16...256,
+    growthModel: OperationGrowthModel(
+      anchorSize: 5553, coefficients: [139568, 28.052],
+      measuredSafeCeiling: nil),
     // The tie-break (`cmp == 0 && low > high` picks `array[high]`) decides between equal values
     // by their current strided *position*, not original input order — and since interleaving
     // scatters an original run of equal values across many strided sub-sequences, this does NOT

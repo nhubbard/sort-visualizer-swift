@@ -20,6 +20,9 @@ public struct BinaryDoubleInsertionSort: SortAlgorithm {
     displayName: "Binary Double Insertion Sort",
     category: .insertion,
     sizeRange: 16...256,
+    growthModel: OperationGrowthModel(
+      anchorSize: 973, coefficients: [239538, 489.325, 0.249887],
+      measuredSafeCeiling: nil),
     stable: true,
     timeComplexity: ComplexityBounds(best: "O(n)", average: "O(n^2)", worst: "O(n^2)"),
     spaceComplexity: "O(1)",

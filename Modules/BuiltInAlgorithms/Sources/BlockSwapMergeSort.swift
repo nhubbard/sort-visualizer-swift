@@ -24,6 +24,9 @@ public struct BlockSwapMergeSort: SortAlgorithm {
     displayName: "Block-Swap Merge Sort",
     category: .merge,
     sizeRange: 16...256,
+    growthModel: OperationGrowthModel(
+      anchorSize: 1797, coefficients: [195567, 143.231, 0.0120582],
+      measuredSafeCeiling: nil),
     stable: true,
     timeComplexity: ComplexityBounds(
       best: "O(n log n)", average: "O(n log n)", worst: "O(n log n)"),

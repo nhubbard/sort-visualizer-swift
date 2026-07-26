@@ -7,6 +7,9 @@ public struct DeterministicBogoSort: SortAlgorithm {
     displayName: "Deterministic Bogo Sort",
     category: .impractical,
     sizeRange: 4...8,
+    growthModel: OperationGrowthModel(
+      anchorSize: 7, coefficients: [62148.5, 131302, 143522, 107633, 62067.4, 29273.3],
+      measuredSafeCeiling: nil),
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n)", average: "O(n \\times n!)", worst: "O(n \\times n!)"),

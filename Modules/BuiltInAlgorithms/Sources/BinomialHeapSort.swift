@@ -7,6 +7,9 @@ public struct BinomialHeapSort: SortAlgorithm {
     displayName: "Binomial Heap Sort",
     category: .selection,
     sizeRange: 16...256,
+    growthModel: OperationGrowthModel(
+      anchorSize: 900, coefficients: [225607, 373.111, 0.0982337],
+      measuredSafeCeiling: nil),
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n log n)", average: "O(n log n)", worst: "O(n log n)"),

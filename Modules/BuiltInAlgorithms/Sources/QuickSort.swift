@@ -7,6 +7,9 @@ public struct QuickSort: SortAlgorithm {
     displayName: "Quick Sort",
     category: .exchange,
     sizeRange: 16...256,
+    growthModel: OperationGrowthModel(
+      anchorSize: 306, coefficients: [239425, 1547.5, 2.5],
+      measuredSafeCeiling: nil),
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n log n)", average: "O(n log n)", worst: "O(n^2)"),

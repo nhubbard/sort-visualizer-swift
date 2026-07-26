@@ -7,6 +7,9 @@ public struct MinHeapSort: SortAlgorithm {
     displayName: "Min Heap Sort",
     category: .selection,
     sizeRange: 16...256,
+    growthModel: OperationGrowthModel(
+      anchorSize: 1373, coefficients: [214009, 191.071, 0.0146267],
+      measuredSafeCeiling: nil),
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n log n)", average: "O(n log n)", worst: "O(n log n)"),

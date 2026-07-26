@@ -7,6 +7,9 @@ public struct MaxHeapSort: SortAlgorithm {
     displayName: "Max Heap Sort",
     category: .selection,
     sizeRange: 16...256,
+    growthModel: OperationGrowthModel(
+      anchorSize: 1361, coefficients: [213492, 194.876, 0.0162418],
+      measuredSafeCeiling: nil),
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n log n)", average: "O(n log n)", worst: "O(n log n)"),

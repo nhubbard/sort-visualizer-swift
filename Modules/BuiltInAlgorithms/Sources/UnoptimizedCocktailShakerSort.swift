@@ -19,6 +19,9 @@ public struct UnoptimizedCocktailShakerSort: SortAlgorithm {
     displayName: "Unoptimized Cocktail Shaker Sort",
     category: .exchange,
     sizeRange: 16...256,
+    growthModel: OperationGrowthModel(
+      anchorSize: 219, coefficients: [239258, 2187.5, 4.99995],
+      measuredSafeCeiling: nil),
     stable: true,
     timeComplexity: ComplexityBounds(best: "O(n^2)", average: "O(n^2)", worst: "O(n^2)"),
     spaceComplexity: "O(1)",

@@ -22,6 +22,9 @@ public struct LRQuickSort: SortAlgorithm {
     displayName: "LR Quick Sort",
     category: .exchange,
     sizeRange: 16...256,
+    growthModel: OperationGrowthModel(
+      anchorSize: 4130, coefficients: [239896, 107.738, 0.0120197],
+      measuredSafeCeiling: nil),
     stable: false,
     timeComplexity: ComplexityBounds(best: "O(n log n)", average: "O(n log n)", worst: "O(n^2)"),
     spaceComplexity: "O(log n)",

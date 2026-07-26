@@ -7,6 +7,9 @@ public struct StoogeSort: SortAlgorithm {
     displayName: "Stooge Sort",
     category: .impractical,
     sizeRange: 16...32,
+    growthModel: OperationGrowthModel(
+      anchorSize: 60, coefficients: [231548, 11309.6, 140.924],
+      measuredSafeCeiling: nil),
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n^{2.71})", average: "O(n^{2.71})", worst: "O(n^{2.71})"),

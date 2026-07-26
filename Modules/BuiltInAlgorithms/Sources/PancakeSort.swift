@@ -7,6 +7,9 @@ public struct PancakeSort: SortAlgorithm {
     displayName: "Pancake Sort",
     category: .miscellaneous,
     sizeRange: 16...256,
+    growthModel: OperationGrowthModel(
+      anchorSize: 228, coefficients: [238503, 2093.78, 4.5946],
+      measuredSafeCeiling: nil),
     stable: false,
     timeComplexity: ComplexityBounds(best: "O(n^2)", average: "O(n^2)", worst: "O(n^2)"),
     spaceComplexity: "O(1)",

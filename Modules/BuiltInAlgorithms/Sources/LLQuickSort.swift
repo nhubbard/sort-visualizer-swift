@@ -13,6 +13,9 @@ public struct LLQuickSort: SortAlgorithm {
     displayName: "LL Quick Sort",
     category: .exchange,
     sizeRange: 16...256,
+    growthModel: OperationGrowthModel(
+      anchorSize: 309, coefficients: [239470, 1547.5, 2.5],
+      measuredSafeCeiling: nil),
     stable: false,
     timeComplexity: ComplexityBounds(best: "O(n log n)", average: "O(n log n)", worst: "O(n^2)"),
     spaceComplexity: "O(log n)",

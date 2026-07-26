@@ -23,6 +23,9 @@ public struct StaticSort: SortAlgorithm {
     displayName: "Static Sort",
     category: .distribution,
     sizeRange: 16...256,
+    growthModel: OperationGrowthModel(
+      anchorSize: 6815, coefficients: [135181, 21.4058],
+      measuredSafeCeiling: nil),
     stable: false,
     timeComplexity: ComplexityBounds(best: "O(n)", average: "O(n)", worst: "O(n^2)"),
     spaceComplexity: "O(n)",

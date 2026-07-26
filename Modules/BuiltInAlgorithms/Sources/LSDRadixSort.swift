@@ -8,6 +8,9 @@ public struct LSDRadixSort: SortAlgorithm {
     displayName: "LSD Radix Sort",
     category: .distribution,
     sizeRange: 16...256,
+    growthModel: OperationGrowthModel(
+      anchorSize: 4292, coefficients: [239924, 105.28, 0.0115046],
+      measuredSafeCeiling: nil),
     stable: true,
     timeComplexity: ComplexityBounds(
       best: "O(d \\times (n+b))", average: "O(d \\times (n+b))", worst: "O(d \\times (n+b))"

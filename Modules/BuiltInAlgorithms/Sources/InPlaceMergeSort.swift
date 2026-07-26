@@ -13,6 +13,9 @@ public struct InPlaceMergeSort: SortAlgorithm {
     displayName: "In-Place Merge Sort",
     category: .merge,
     sizeRange: 16...256,
+    growthModel: OperationGrowthModel(
+      anchorSize: 219, coefficients: [238710, 2185, 5],
+      measuredSafeCeiling: nil),
     // Not stable, despite resembling a textbook (stable) merge: `merge`'s swaps are positional
     // (driven by the fixed index `mid + 1`), so `push` can walk a duplicate past another
     // occurrence of the same value at a different recursion level without the two ever being

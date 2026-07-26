@@ -7,6 +7,9 @@ public struct ShellSort: SortAlgorithm {
     displayName: "Shell Sort",
     category: .insertion,
     sizeRange: 16...256,
+    growthModel: OperationGrowthModel(
+      anchorSize: 1379, coefficients: [239961, 296.697, 0.0887158],
+      measuredSafeCeiling: nil),
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n log n)", average: "O(n^{1.25})", worst: "O(n^2)"),

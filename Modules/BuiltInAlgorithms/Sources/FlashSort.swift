@@ -21,6 +21,9 @@ public struct FlashSort: SortAlgorithm {
     displayName: "Flash Sort",
     category: .distribution,
     sizeRange: 16...256,
+    growthModel: OperationGrowthModel(
+      anchorSize: 5935, coefficients: [239951, 71.1776, 0.00518025],
+      measuredSafeCeiling: nil),
     stable: true,
     timeComplexity: ComplexityBounds(best: "O(n)", average: "O(n)", worst: "O(n^2)"),
     spaceComplexity: "O(n)",

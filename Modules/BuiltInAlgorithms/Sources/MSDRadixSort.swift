@@ -15,6 +15,9 @@ public struct MSDRadixSort: SortAlgorithm {
     displayName: "MSD Radix Sort",
     category: .distribution,
     sizeRange: 16...256,
+    growthModel: OperationGrowthModel(
+      anchorSize: 4292, coefficients: [239924, 105.28, 0.0115046],
+      measuredSafeCeiling: nil),
     stable: true,
     timeComplexity: ComplexityBounds(
       best: "O(d \\times n)", average: "O(d \\times n)", worst: "O(d \\times n)"),

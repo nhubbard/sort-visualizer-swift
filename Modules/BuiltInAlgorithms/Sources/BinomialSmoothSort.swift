@@ -7,6 +7,9 @@ public struct BinomialSmoothSort: SortAlgorithm {
     displayName: "Binomial Smooth Sort",
     category: .selection,
     sizeRange: 16...256,
+    growthModel: OperationGrowthModel(
+      anchorSize: 753, coefficients: [231631, 498.093, 0.200148],
+      measuredSafeCeiling: nil),
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n)", average: "O(n log n)", worst: "O(n log n)"),

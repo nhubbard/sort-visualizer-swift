@@ -12,6 +12,9 @@ public struct BingoSort: SortAlgorithm {
     displayName: "Bingo Sort",
     category: .selection,
     sizeRange: 16...256,
+    growthModel: OperationGrowthModel(
+      anchorSize: 7700, coefficients: [239958, 58.86, 0.00359711],
+      measuredSafeCeiling: nil),
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n+m^2)", average: "O(n \\times m)", worst: "O(n \\times m)"),

@@ -18,6 +18,9 @@ public struct SlowSort: SortAlgorithm {
     displayName: "Slow Sort",
     category: .exchange,
     sizeRange: 16...64,
+    growthModel: OperationGrowthModel(
+      anchorSize: 45, coefficients: [229877, 40045.9, 3580.68, 217.991, 10.1328, 0.382704],
+      measuredSafeCeiling: nil),
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n^{log n})", average: "O(n^{log n})", worst: "O(n^{log n})"),

@@ -22,6 +22,9 @@ public struct ClassicThreeSmoothCombSort: SortAlgorithm {
     displayName: "Classic 3-Smooth Comb Sort",
     category: .exchange,
     sizeRange: 16...256,
+    growthModel: OperationGrowthModel(
+      anchorSize: 1057, coefficients: [220385, 289.129, 0.0508555],
+      measuredSafeCeiling: nil),
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n log^2 n)", average: "O(n log^2 n)", worst: "O(n log^2 n)"),

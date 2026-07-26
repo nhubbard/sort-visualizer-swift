@@ -23,6 +23,9 @@ public struct ThreeSmoothCombSortRecursive: SortAlgorithm {
     displayName: "3-Smooth Comb Sort (Recursive)",
     category: .exchange,
     sizeRange: 16...256,
+    growthModel: OperationGrowthModel(
+      anchorSize: 959, coefficients: [224607, 317.145, 0.0559625],
+      measuredSafeCeiling: nil),
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n log^2 n)", average: "O(n log^2 n)", worst: "O(n log^2 n)"),

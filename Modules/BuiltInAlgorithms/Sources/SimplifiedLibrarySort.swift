@@ -20,6 +20,9 @@ public struct SimplifiedLibrarySort: SortAlgorithm {
     displayName: "Simplified Library Sort",
     category: .insertion,
     sizeRange: 32...256,
+    growthModel: OperationGrowthModel(
+      anchorSize: 390, coefficients: [239459, 1197.06, 1.49226],
+      measuredSafeCeiling: nil),
     stable: true,
     timeComplexity: ComplexityBounds(best: "O(n)", average: "O(n log n)", worst: "O(n^2)"),
     spaceComplexity: "O(n)",

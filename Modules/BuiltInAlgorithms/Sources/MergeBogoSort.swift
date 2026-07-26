@@ -7,6 +7,9 @@ public struct MergeBogoSort: SortAlgorithm {
     displayName: "Merge Bogo Sort",
     category: .impractical,
     sizeRange: 4...10,
+    growthModel: OperationGrowthModel(
+      anchorSize: 15, coefficients: [188543, 126003, 42104, 9379.37, 1567.06, 209.453],
+      measuredSafeCeiling: nil),
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n)", average: "O(n \\times 2^n)", worst: "O(n \\times 2^n)"),

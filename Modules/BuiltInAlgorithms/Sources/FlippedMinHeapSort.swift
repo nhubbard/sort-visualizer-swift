@@ -7,6 +7,9 @@ public struct FlippedMinHeapSort: SortAlgorithm {
     displayName: "Flipped Min Heap Sort",
     category: .selection,
     sizeRange: 16...256,
+    growthModel: OperationGrowthModel(
+      anchorSize: 1359, coefficients: [213649, 195.55, 0.0164349],
+      measuredSafeCeiling: nil),
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n log n)", average: "O(n log n)", worst: "O(n log n)"),

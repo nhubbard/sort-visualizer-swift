@@ -7,6 +7,9 @@ public struct StableSelectionSort: SortAlgorithm {
     displayName: "Stable Selection Sort",
     category: .selection,
     sizeRange: 16...256,
+    growthModel: OperationGrowthModel(
+      anchorSize: 283, coefficients: [239700, 1696, 3],
+      measuredSafeCeiling: nil),
     stable: true,
     timeComplexity: ComplexityBounds(best: "O(n^2)", average: "O(n^2)", worst: "O(n^2)"),
     spaceComplexity: "O(1)",

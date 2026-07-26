@@ -8,6 +8,9 @@ public struct MergeExchangeSortIterative: SortAlgorithm {
     displayName: "Iterative Merge-Exchange Sort",
     category: .concurrent,
     sizeRange: 16...256,
+    growthModel: OperationGrowthModel(
+      anchorSize: 1014, coefficients: [222565, 296.317, 0.0488819],
+      measuredSafeCeiling: nil),
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n log^2 n)", average: "O(n log^2 n)", worst: "O(n log^2 n)"),

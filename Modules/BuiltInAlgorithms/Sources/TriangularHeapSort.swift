@@ -23,6 +23,9 @@ public struct TriangularHeapSort: SortAlgorithm {
     displayName: "Triangular Heap Sort",
     category: .selection,
     sizeRange: 16...256,
+    growthModel: OperationGrowthModel(
+      anchorSize: 499, coefficients: [239702, 829.397, 0.692574],
+      measuredSafeCeiling: nil),
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n^1.5)", average: "O(n^1.5)", worst: "O(n^1.5)"),

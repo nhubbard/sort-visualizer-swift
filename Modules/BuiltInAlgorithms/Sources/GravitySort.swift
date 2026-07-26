@@ -17,6 +17,9 @@ public struct GravitySort: SortAlgorithm {
     displayName: "Gravity (Bead) Sort",
     category: .distribution,
     sizeRange: 16...256,
+    growthModel: OperationGrowthModel(
+      anchorSize: 488, coefficients: [239607, 979, 1],
+      measuredSafeCeiling: nil),
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n \\times k)", average: "O(n \\times k)", worst: "O(n \\times k)"),

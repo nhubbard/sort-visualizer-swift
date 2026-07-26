@@ -15,6 +15,9 @@ public struct BitonicSortRecursive: SortAlgorithm {
     displayName: "Bitonic Sort (Recursive)",
     category: .concurrent,
     sizeRange: 16...256,
+    growthModel: OperationGrowthModel(
+      anchorSize: 940, coefficients: [239944, 372.102, 0.0905988],
+      measuredSafeCeiling: nil),
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(log^2 n)", average: "O(log^2 n)", worst: "O(log^2 n)"),

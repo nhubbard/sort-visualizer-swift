@@ -12,6 +12,9 @@ public struct OptimizedCocktailShakerSort: SortAlgorithm {
     displayName: "Optimized Cocktail Shaker Sort",
     category: .exchange,
     sizeRange: 16...256,
+    growthModel: OperationGrowthModel(
+      anchorSize: 219, coefficients: [238710, 2185, 5],
+      measuredSafeCeiling: nil),
     stable: true,
     timeComplexity: ComplexityBounds(best: "O(n)", average: "O(n^2)", worst: "O(n^2)"),
     spaceComplexity: "O(1)",

@@ -17,6 +17,9 @@ public struct DoubleSelectionSort: SortAlgorithm {
     displayName: "Double Selection Sort",
     category: .selection,
     sizeRange: 16...256,
+    growthModel: OperationGrowthModel(
+      anchorSize: 307, coefficients: [238693, 1545.03, 2.50014],
+      measuredSafeCeiling: nil),
     stable: false,
     timeComplexity: ComplexityBounds(best: "O(n^2)", average: "O(n^2)", worst: "O(n^2)"),
     spaceComplexity: "O(1)",

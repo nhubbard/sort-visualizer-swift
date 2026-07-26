@@ -22,6 +22,9 @@ public struct ClassicTreeSort: SortAlgorithm {
     displayName: "Classic Tree Sort",
     category: .insertion,
     sizeRange: 16...256,
+    growthModel: OperationGrowthModel(
+      anchorSize: 80000, coefficients: [239999, 3],
+      measuredSafeCeiling: nil),
     stable: true,
     timeComplexity: ComplexityBounds(best: "O(n log n)", average: "O(n log n)", worst: "O(n^2)"),
     spaceComplexity: "O(n)",

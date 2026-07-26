@@ -9,6 +9,7 @@ struct AlgorithmMetadataTests {
       displayName: "Fake",
       category: .exchange,
       sizeRange: sizeRange,
+      growthModel: .unconstrained,
       stable: true,
       timeComplexity: ComplexityBounds(best: "O(1)", average: "O(1)", worst: "O(1)"),
       spaceComplexity: "O(1)",

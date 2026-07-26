@@ -7,6 +7,9 @@ public struct RecursiveShellSort: SortAlgorithm {
     displayName: "Recursive Shell Sort",
     category: .insertion,
     sizeRange: 16...256,
+    growthModel: OperationGrowthModel(
+      anchorSize: 905, coefficients: [239558, 478.568, 0.235672],
+      measuredSafeCeiling: nil),
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n log n)", average: "O(n^{1.25})", worst: "O(n^2)"),

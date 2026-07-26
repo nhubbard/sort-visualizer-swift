@@ -7,6 +7,9 @@ public struct BaseNMaxHeapSort: SortAlgorithm {
     displayName: "Base-N Max Heap Sort",
     category: .selection,
     sizeRange: 16...256,
+    growthModel: OperationGrowthModel(
+      anchorSize: 1466, coefficients: [212542, 174.346, 0.0111134],
+      measuredSafeCeiling: nil),
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n log n)", average: "O(n log n)", worst: "O(n log n)"),

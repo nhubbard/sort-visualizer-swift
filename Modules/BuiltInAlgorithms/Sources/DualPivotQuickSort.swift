@@ -13,6 +13,9 @@ public struct DualPivotQuickSort: SortAlgorithm {
     displayName: "Dual-Pivot Quick Sort",
     category: .exchange,
     sizeRange: 16...256,
+    growthModel: OperationGrowthModel(
+      anchorSize: 2686, coefficients: [239877, 165.612, 0.028404],
+      measuredSafeCeiling: nil),
     stable: false,
     timeComplexity: ComplexityBounds(best: "O(n log n)", average: "O(n log n)", worst: "O(n^2)"),
     spaceComplexity: "O(log n)",

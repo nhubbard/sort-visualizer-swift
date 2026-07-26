@@ -7,6 +7,9 @@ public struct OddEvenSort: SortAlgorithm {
     displayName: "Odd-Even Sort",
     category: .exchange,
     sizeRange: 16...256,
+    growthModel: OperationGrowthModel(
+      anchorSize: 219, coefficients: [239793, 2190.03, 5.00077],
+      measuredSafeCeiling: nil),
     stable: true,
     timeComplexity: ComplexityBounds(best: "O(n)", average: "O(n^2)", worst: "O(n^2)"),
     spaceComplexity: "O(1)",

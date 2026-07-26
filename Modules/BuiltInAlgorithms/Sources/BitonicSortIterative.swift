@@ -7,6 +7,9 @@ public struct BitonicSortIterative: SortAlgorithm {
     displayName: "Bitonic Sort (Iterative)",
     category: .concurrent,
     sizeRange: 16...256,
+    growthModel: OperationGrowthModel(
+      anchorSize: 819, coefficients: [239681, 424.783, 0.117088],
+      measuredSafeCeiling: nil),
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(log^2 n)", average: "O(log^2 n)", worst: "O(log^2 n)"),

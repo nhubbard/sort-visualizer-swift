@@ -7,6 +7,9 @@ public struct AsynchronousSort: SortAlgorithm {
     displayName: "Asynchronous Sort",
     category: .selection,
     sizeRange: 16...256,
+    growthModel: OperationGrowthModel(
+      anchorSize: 79999, coefficients: [239997, 3],
+      measuredSafeCeiling: nil),
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n + k)", average: "O(n + k)", worst: "O(n + k)"),

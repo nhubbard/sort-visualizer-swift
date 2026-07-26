@@ -7,6 +7,9 @@ public struct QuickBogoSort: SortAlgorithm {
     displayName: "Quick Bogo Sort",
     category: .impractical,
     sizeRange: 4...6,
+    growthModel: OperationGrowthModel(
+      anchorSize: 7, coefficients: [80426.6, 170544, 187079, 140785, 81461.4, 38549.3],
+      measuredSafeCeiling: nil),
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n)", average: "O(n \\times n!)", worst: "O(n \\times n!)"),

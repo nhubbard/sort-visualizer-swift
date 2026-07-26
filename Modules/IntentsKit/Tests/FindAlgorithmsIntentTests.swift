@@ -9,7 +9,8 @@ private struct FakeAlgorithm: SortAlgorithm {
   let category: AlgorithmCategory
   var metadata: AlgorithmMetadata {
     AlgorithmMetadata(
-      displayName: id.rawValue, category: category, sizeRange: 1...64, stable: true,
+      displayName: id.rawValue, category: category, sizeRange: 1...64,
+      growthModel: .unconstrained, stable: true,
       timeComplexity: ComplexityBounds(best: "O(n)", average: "O(n)", worst: "O(n)"),
       spaceComplexity: "O(1)", iconName: "fake")
   }
