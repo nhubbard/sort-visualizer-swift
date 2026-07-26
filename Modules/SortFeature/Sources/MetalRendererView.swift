@@ -94,6 +94,20 @@ struct MetalRendererView: UIViewRepresentable {
     private var view: MTKView?
     private var trackedStepIndex = -1
     private var visualizerID: VisualizerID?
+
+    /// Incremental mirror of `replay.frame`, maintained by `onOperationApplied` instead of being
+    /// rebuilt from scratch on every operation -- `values`/`markers` used to be a fresh O(N)
+    /// `.map`/`Dictionary(uniqueKeysWithValues:)` pass over the *entire* array on every single
+    /// applied operation (not every displayed frame; several can land here between vsyncs during
+    /// fast/catch-up playback), which was invisible at the old 256-element cap but real cost once
+    /// `effectiveSizeRange` lets well-behaved algorithms run into the thousands. `reconcile(_:)`
+    /// (a genuine full rebuild -- new run, resize, scrub) is the only place these get rebuilt from
+    /// scratch; `onOperationApplied` only ever touches `operation.touchedIndices`.
+    private var cachedValues: [Int] = []
+    private var cachedMarkers: [Int: Set<Int>] = [:]
+    /// Only ever needs revisiting on `.setValue` -- swaps/marks/compares/aux-writes reorder or
+    /// annotate the existing value set, they never introduce a number outside its current bounds.
+    private var cachedValueRange: ClosedRange<Int> = 0...1
     /// Last `\.colorScheme` actually applied — this view is on-demand (`isPaused`/
     /// `enableSetNeedsDisplay`), so without this cache every single body evaluation would force
     /// a redundant `setNeedsDisplay()`, not just an actual Light/Dark Mode change. `nil` before
@@ -157,11 +171,9 @@ struct MetalRendererView: UIViewRepresentable {
 
       replay.onOperationApplied = { [weak self, weak replay, weak renderer] operation in
         guard let self, let replay, let renderer else { return }
-        let values = replay.frame.map(\.value)
-        renderer.apply(
-          operation, values: values, valueRange: Self.valueRange(for: values),
-          markers: Self.markers(for: replay.frame)
-        )
+        self.applyIncrementally(operation, frame: replay.frame)
+        renderer.apply(operation, values: self.cachedValues, valueRange: self.cachedValueRange,
+          markers: self.cachedMarkers)
         self.trackedStepIndex += 1
         // Multiple operations can land here within the same `CADisplayLink` tick (catch-up
         // batching during fast playback) — `setNeedsDisplay()` just marks the view dirty,
@@ -228,10 +240,11 @@ struct MetalRendererView: UIViewRepresentable {
       guard scale > 0, pixelSize.width > 0, pixelSize.height > 0 else { return }
       let canvasSize = CGSize(width: pixelSize.width / scale, height: pixelSize.height / scale)
 
-      let values = replay.frame.map(\.value)
+      cachedValues = replay.frame.map(\.value)
+      cachedMarkers = Self.markers(for: replay.frame)
+      cachedValueRange = Self.valueRange(for: cachedValues)
       renderer.reset(
-        values: values, valueRange: Self.valueRange(for: values),
-        markers: Self.markers(for: replay.frame),
+        values: cachedValues, valueRange: cachedValueRange, markers: cachedMarkers,
         canvasSize: canvasSize, scale: scale
       )
       trackedStepIndex = replay.stepIndex
@@ -243,6 +256,32 @@ struct MetalRendererView: UIViewRepresentable {
       // a mis-scaled/letterboxed flash. Same forced-synchronous-draw fix as the completion
       // path above, applied here instead of relying on `setNeedsDisplay()` alone.
       view.draw()
+    }
+
+    /// Updates `cachedValues`/`cachedMarkers`/`cachedValueRange` to reflect `operation` without
+    /// re-scanning the whole `frame` -- the incremental counterpart to `reconcile`'s full rebuild.
+    /// `.unmark`/`.unmarkAll` (`touchedIndices == nil`) are the one case that can invalidate any
+    /// index at once, so they fall back to a full re-derive from `frame`; every other operation
+    /// only ever touches the handful of indices `touchedIndices` names.
+    private func applyIncrementally(_ operation: SortOperation, frame: [ReplayEngine.BarState]) {
+      // `cachedValues.count != frame.count` covers both `.unmark`/`.unmarkAll` (which can
+      // invalidate any index) and the cache simply not having been seeded yet for this frame size
+      // (`reconcile` hasn't run) -- either way, only a full re-derive from `frame` is correct.
+      guard let touched = operation.touchedIndices, cachedValues.count == frame.count else {
+        cachedValues = frame.map(\.value)
+        cachedMarkers = Self.markers(for: frame)
+        cachedValueRange = Self.valueRange(for: cachedValues)
+        return
+      }
+      for index in touched where frame.indices.contains(index) {
+        cachedValues[index] = frame[index].value
+        cachedMarkers[index] = frame[index].markers
+      }
+      if case .setValue(let index, _) = operation, frame.indices.contains(index) {
+        let value = frame[index].value
+        cachedValueRange =
+          Swift.min(cachedValueRange.lowerBound, value)...Swift.max(cachedValueRange.upperBound, value)
+      }
     }
 
     private static func valueRange(for values: [Int]) -> ClosedRange<Int> {
