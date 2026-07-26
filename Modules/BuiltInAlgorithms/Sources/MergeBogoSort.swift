@@ -17,11 +17,18 @@ public struct MergeBogoSort: SortAlgorithm {
 
   /// ArrayV's `MergeBogoSort` recursively sorts each half, then randomly "weaves" the two
   /// already-sorted runs back together by picking a random subset of positions to pull from the
-  /// right run until the result is sorted. Ported as a deterministic walk instead: every bitmask
-  /// of length `end - start` with exactly `end - mid` bits set is one candidate interleaving (bit
-  /// set = pull from the right run); walking masks in increasing order and skipping any whose bit
-  /// count doesn't match visits every interleaving exactly once, and the correct one is always
-  /// among them, so termination is guaranteed.
+  /// right run until the result is sorted. Ported as a deterministic walk instead: every subset
+  /// of `end - mid` positions (out of `end - start`) to pull from the right run is one candidate
+  /// interleaving; walking subsets in lexicographic order visits every interleaving exactly once,
+  /// and the correct one is always among them, so termination is guaranteed.
+  ///
+  /// Candidate interleavings are enumerated as an explicit sorted array of "pull from the right
+  /// run" offsets (standard lexicographic next-combination), not as bits of a fixed-width `Int`
+  /// — a 64-bit mask can't represent a merge range wider than 64 elements at all (`mask >>
+  /// offset` for `offset >= 64` saturates to `0` rather than trapping, per Swift's smart-shift
+  /// semantics), so the original bitmask version silently became unable to express the correct
+  /// interleaving, and looped forever re-trying only representable-but-wrong ones, for any
+  /// top-level array size past 64.
   ///
   /// Uses a real aux array for the pre-weave snapshot (matching `MergeSort.swift`) rather than
   /// ArrayV's reuse of the main array as scratch space.
@@ -37,19 +44,40 @@ public struct MergeBogoSort: SortAlgorithm {
       return true
     }
 
-    func applyWeave(_ start: Int, _ mid: Int, _ end: Int, mask: Int) {
+    func applyWeave(_ start: Int, _ mid: Int, _ end: Int, highOffsets: [Int]) {
       var low = start
       var high = mid
+      var nextHighIndex = 0
       for offset in 0..<(end - start) {
-        let pullFromHigh = (mask >> offset) & 1 == 1
+        let pullFromHigh = nextHighIndex < highOffsets.count && highOffsets[nextHighIndex] == offset
         if pullFromHigh {
           engine.setValue(start + offset, tmp[high])
           high += 1
+          nextHighIndex += 1
         } else {
           engine.setValue(start + offset, tmp[low])
           low += 1
         }
       }
+    }
+
+    /// Advances `combination` (a sorted array of `k` distinct offsets in `0..<width`) to the next
+    /// one in lexicographic order, or returns `false` if it's already the last (`[width-k, ...,
+    /// width-1]`) — the standard "next combination" algorithm: find the rightmost offset that
+    /// isn't already at its maximum, bump it, then pack every offset after it back-to-back.
+    func nextCombination(_ combination: inout [Int], width: Int) -> Bool {
+      let k = combination.count
+      guard k > 0 else { return false }
+      var i = k - 1
+      while i >= 0 && combination[i] == width - k + i {
+        i -= 1
+      }
+      guard i >= 0 else { return false }
+      combination[i] += 1
+      for j in (i + 1)..<k {
+        combination[j] = combination[i] + (j - i)
+      }
+      return true
     }
 
     func mergeBogo(_ start: Int, _ end: Int) {
@@ -63,11 +91,17 @@ public struct MergeBogoSort: SortAlgorithm {
         engine.writeAux(tmpHandle, at: i, value: tmp[i])
       }
 
+      let width = end - start
       let popcountTarget = end - mid
-      var mask = -1
+      var highOffsets = Array(0..<popcountTarget)
+      var isFirstAttempt = true
       while !isRangeSorted(start, end) {
-        repeat { mask += 1 } while mask.nonzeroBitCount != popcountTarget
-        applyWeave(start, mid, end, mask: mask)
+        if !isFirstAttempt {
+          let advanced = nextCombination(&highOffsets, width: width)
+          precondition(advanced, "every interleaving was tried without finding a sorted one")
+        }
+        isFirstAttempt = false
+        applyWeave(start, mid, end, highOffsets: highOffsets)
       }
     }
 
