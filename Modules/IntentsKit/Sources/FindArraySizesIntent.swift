@@ -1,5 +1,6 @@
 import AlgorithmKit
 import AppIntents
+import SettingsKit
 
 /// The "iterate over the sizes one algorithm supports" building block — the other missing rung
 /// for a fully custom sweep pipeline (see `FindCategoriesIntent`'s doc comment for the whole
@@ -34,7 +35,9 @@ public struct FindArraySizesIntent: AppIntent {
     guard let realAlgorithm = AlgorithmRegistry.shared.algorithm(id: algorithm.algorithmID) else {
       throw SortSymphonyIntentError.algorithmUnavailable
     }
-    let sizes = realAlgorithm.metadata.sizeRange.steppedValues(by: realAlgorithm.metadata.sizeStep)
+    let effectiveSizeRange = realAlgorithm.metadata.effectiveSizeRange(
+      operationCap: AppSettings.shared.recordingOperationCap)
+    let sizes = effectiveSizeRange.steppedValues(by: effectiveSizeRange.steppedSizeStep)
     return .result(value: sizes)
   }
 }

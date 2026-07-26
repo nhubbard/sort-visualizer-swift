@@ -82,8 +82,8 @@ public struct ScrollingSortView: View {
         }
         if !Task.isCancelled { SortCoordinator.shared.resolveCompletion(token: token) }
       } else {
-        // SortSession.start(size:) clamps into algorithm.metadata.sizeRange itself, so
-        // every caller gets that enforcement, not just this one.
+        // SortSession.start(size:) clamps into algorithm.metadata.effectiveSizeRange(...) itself,
+        // so every caller gets that enforcement, not just this one.
         await session.start(size: arraySize)
       }
     }

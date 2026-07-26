@@ -1,5 +1,6 @@
 import AlgorithmKit
 import AppIntents
+import SettingsKit
 
 /// The "just the ceiling" sibling of `FindArraySizesIntent` — most Shortcuts that want the biggest
 /// size an algorithm supports (e.g. to feed `RunSortIntent(size:)` for a max-size-only run) don't
@@ -32,6 +33,8 @@ public struct FindMaximumArraySizeIntent: AppIntent {
     guard let realAlgorithm = AlgorithmRegistry.shared.algorithm(id: algorithm.algorithmID) else {
       throw SortSymphonyIntentError.algorithmUnavailable
     }
-    return .result(value: realAlgorithm.metadata.sizeRange.upperBound)
+    let effectiveSizeRange = realAlgorithm.metadata.effectiveSizeRange(
+      operationCap: AppSettings.shared.recordingOperationCap)
+    return .result(value: effectiveSizeRange.upperBound)
   }
 }

@@ -85,12 +85,23 @@ struct Sort2App: App {
       Automation(
         id: .sizeSweep, displayName: "Size Sweep", iconName: "arrow.up.right",
         key: "a", modifiers: [.command, .shift], runsPerSize: 3,
-        sizes: { $0.sizeRange.steppedValues(by: $0.sizeStep) }
+        sizes: { metadata in
+          // `Automation.sizes` is `@Sendable` (no static isolation), but every current caller
+          // (`SortSession`, `@MainActor`) only ever invokes it from the main actor.
+          let range = MainActor.assumeIsolated {
+            metadata.effectiveSizeRange(operationCap: AppSettings.shared.recordingOperationCap)
+          }
+          return range.steppedValues(by: range.steppedSizeStep)
+        }
       ),
       Automation(
         id: .maxSizeOnly, displayName: "Max Size Only", iconName: "arrow.up.to.line",
         key: "a", modifiers: [.command, .option, .shift], runsPerSize: 3,
-        sizes: { [$0.sizeRange.upperBound] }
+        sizes: { metadata in
+          MainActor.assumeIsolated {
+            [metadata.effectiveSizeRange(operationCap: AppSettings.shared.recordingOperationCap).upperBound]
+          }
+        }
       ),
     ]
     AutomationRegistry.shared.discover()

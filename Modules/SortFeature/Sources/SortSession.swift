@@ -126,18 +126,20 @@ public final class SortSession {
     self.arraySize = algorithm.metadata.sizeRange.lowerBound
   }
 
-  /// Unconditionally clamps into `algorithm.metadata.sizeRange` rather than warning past it —
-  /// this is ArrayV's own `unreasonableLimit` precedent (a per-sort size threshold, not a
-  /// user-toggleable confirmation dialog), enforced here so every caller gets it, not just
-  /// whichever view happens to clamp its own slider (§9 of ARCHITECTURE_V2.md).
+  /// Unconditionally clamps into `algorithm.metadata.effectiveSizeRange(operationCap:)` rather
+  /// than warning past it — this is ArrayV's own `unreasonableLimit` precedent (a per-sort size
+  /// threshold, not a user-toggleable confirmation dialog), enforced here so every caller gets
+  /// it, not just whichever view happens to clamp its own slider (§9 of ARCHITECTURE_V2.md).
   public func start(size: Int) async {
     // Stops the current sort's sound/visuals immediately instead of leaving them running
     // until the orphaned `ReplayEngine` self-terminates on its own — see the size stepper and
     // automation loop, both of which call this repeatedly on an already-running session.
     if case .replaying(let replay) = phase { replay.pause() }
+    let effectiveSizeRange = algorithm.metadata.effectiveSizeRange(
+      operationCap: settings.recordingOperationCap)
     let clampedSize = min(
-      max(size, algorithm.metadata.sizeRange.lowerBound),
-      algorithm.metadata.sizeRange.upperBound)
+      max(size, effectiveSizeRange.lowerBound),
+      effectiveSizeRange.upperBound)
     arraySize = clampedSize
     // Only meaningful if this call turns out to hit the operation cap under automation (see
     // below) — reverting to whatever was on screen before this call is how automation
@@ -332,7 +334,9 @@ public final class SortSession {
   /// Runs this algorithm once, at its own `sizeRange.upperBound` — the per-algorithm unit of work
   /// Showcase mode's cross-algorithm loop drives, one fresh `SortSession` at a time.
   public func runShowcasePass() async {
-    await runSinglePass(size: algorithm.metadata.sizeRange.upperBound)
+    let effectiveSizeRange = algorithm.metadata.effectiveSizeRange(
+      operationCap: settings.recordingOperationCap)
+    await runSinglePass(size: effectiveSizeRange.upperBound)
   }
 
   /// Awaits genuine completion (or an early stop via `stopAutomation()`) of a sweep — the
@@ -361,7 +365,9 @@ public final class SortSession {
   /// `sizeStep`), wrapping back to the smallest past the largest — the same ring-buffer shape as
   /// `AppSettings.cycleVisualizer()`, just over sizes instead of visualizers. Backs `⌘S`.
   public func cycleArraySize() async {
-    let sizes = algorithm.metadata.sizeRange.steppedValues(by: algorithm.metadata.sizeStep)
+    let effectiveSizeRange = algorithm.metadata.effectiveSizeRange(
+      operationCap: settings.recordingOperationCap)
+    let sizes = effectiveSizeRange.steppedValues(by: effectiveSizeRange.steppedSizeStep)
     guard !sizes.isEmpty else { return }
     let currentIndex = sizes.firstIndex(of: arraySize) ?? -1
     let nextIndex = (currentIndex + 1) % sizes.count

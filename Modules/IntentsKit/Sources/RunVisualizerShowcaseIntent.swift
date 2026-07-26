@@ -1,5 +1,6 @@
 import AlgorithmKit
 import AppIntents
+import SettingsKit
 import SortFeature
 import VisualizationKit
 
@@ -40,7 +41,9 @@ public struct RunVisualizerShowcaseIntent: AppIntent {
     guard let realAlgorithm = AlgorithmRegistry.shared.algorithm(id: algorithm.algorithmID) else {
       throw SortSymphonyIntentError.algorithmUnavailable
     }
-    let size = realAlgorithm.metadata.sizeRange.upperBound
+    let size = realAlgorithm.metadata.effectiveSizeRange(
+      operationCap: AppSettings.shared.recordingOperationCap
+    ).upperBound
     for visualizer in VisualizerRegistry.shared.visualizers {
       await SortCoordinator.shared.runSort(
         algorithm: realAlgorithm, visualizerID: visualizer.id, shuffleID: nil, size: size)

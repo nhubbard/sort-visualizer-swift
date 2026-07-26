@@ -304,7 +304,9 @@ struct RunControlBar: View {
   /// just change a number, it immediately stops the current sort and re-records+replays a fresh
   /// one at the new size (`SortSession.start(size:)` already pauses any in-flight playback).
   private var sizeRow: some View {
-    HStack(spacing: 8) {
+    let effectiveSizeRange = algorithm.metadata.effectiveSizeRange(
+      operationCap: settings.recordingOperationCap)
+    return HStack(spacing: 8) {
       Text("Size")
         .font(.caption)
         .foregroundStyle(.secondary)
@@ -313,8 +315,8 @@ struct RunControlBar: View {
           get: { session.arraySize },
           set: { newValue in Task { await session.start(size: newValue) } }
         ),
-        in: algorithm.metadata.sizeRange,
-        step: algorithm.metadata.sizeStep
+        in: effectiveSizeRange,
+        step: effectiveSizeRange.steppedSizeStep
       ) {
         Text("\(session.arraySize) elements")
           .font(.caption.monospacedDigit())

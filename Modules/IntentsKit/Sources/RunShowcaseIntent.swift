@@ -1,5 +1,6 @@
 import AlgorithmKit
 import AppIntents
+import SettingsKit
 import SortFeature
 
 /// A from-scratch, Shortcuts-only reimplementation of `ContentView`'s in-app Showcase mode — every
@@ -25,10 +26,11 @@ public struct RunShowcaseIntent: AppIntent {
   public func perform() async throws -> some IntentResult {
     let algorithms = AlgorithmRegistry.shared.algorithms
       .sorted { $0.metadata.displayName < $1.metadata.displayName }
+    let operationCap = AppSettings.shared.recordingOperationCap
     for algorithm in algorithms {
       await SortCoordinator.shared.runSort(
         algorithm: algorithm, visualizerID: nil, shuffleID: nil,
-        size: algorithm.metadata.sizeRange.upperBound)
+        size: algorithm.metadata.effectiveSizeRange(operationCap: operationCap).upperBound)
     }
     return .result()
   }
