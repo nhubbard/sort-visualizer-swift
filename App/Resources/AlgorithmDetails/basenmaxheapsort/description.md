@@ -1,8 +1,8 @@
 *From Wikipedia, the free encyclopedia*
 
 Base-N Max Heap Sort is an ordinary [Heapsort](https://en.wikipedia.org/wiki/Heapsort) generalized so that every node in
-the heap has `N` children instead of two. ArrayV lets the user pick `N` at runtime, but its own default — and the value
-used here — is 4, so each node sifts down against up to four children rather than the usual pair. The two-phase
+the heap has `N` children instead of two. This implementation fixes `N` at 4, so each node sifts down against up to four
+children rather than the usual pair. The two-phase
 structure of binary heap sort carries over unchanged: first build a max-heap over the whole array from the bottom up by
 sifting every node down into place, then repeatedly swap the root — always the current maximum, by the max-heap
 property — out to the end of the still-unsorted region and re-heapify what remains.
@@ -20,6 +20,6 @@ the same factor, the two effects offset each other in the asymptotic bound: Base
 the best, average, and worst cases, the same guarantee ordinary Heapsort provides regardless of the branching factor
 chosen. It needs no auxiliary storage beyond a few loop variables, giving it the same `O(1)` space complexity as binary
 heap sort, and it inherits the same lack of stability: swaps performed while sifting a node down past its largest child
-can reorder equal elements relative to one another. In ArrayV, Base-N Max Heap Sort is filed under the "Selection Sorts"
-category, the same family every heap sort variant belongs to there, since each pass still selects the current maximum
-from an unsorted region and moves it into place.
+can reorder equal elements relative to one another. Base-N Max Heap Sort is filed under the "Selection Sorts" category,
+the same family every heap sort variant belongs to, since each pass still selects the current maximum from an unsorted
+region and moves it into place.

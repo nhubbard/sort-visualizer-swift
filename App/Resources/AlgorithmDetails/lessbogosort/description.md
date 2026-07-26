@@ -21,7 +21,7 @@ alternating between confirming a minimum at the front of the remaining range and
 middle region shrinks by one from each side per pass rather than by one from the front alone. Both belong to the same
 lineage of algorithms that trade Bogosort's single giant gamble for a sequence of smaller ones.
 
-Despite the resemblance to distribution-style sorts in name and package placement, Less Bogosort is not a distribution
-sort in any meaningful algorithmic sense — it performs no bucketing or classification of values. In ArrayV, it is
-classified among the "Impractical Sorts," the family reserved for algorithms whose only real purpose is to illustrate,
-by absurd example, what *not* to do when sorting.
+Despite the resemblance to distribution-style sorts in name, Less Bogosort is not a distribution sort in any meaningful
+algorithmic sense — it performs no bucketing or classification of values. It's classified here among the "Impractical
+Sorts," the family reserved for algorithms whose only real purpose is to illustrate, by absurd example, what *not* to do
+when sorting.

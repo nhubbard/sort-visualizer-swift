@@ -3,9 +3,8 @@
 Circloid Sort is a variant of Circle Sort, a comparison-based sorting algorithm built around a simple symmetric idea:
 compare the first element of a range against the last, the second against the second-to-last, and so on, swapping any
 out-of-order pair as the two pointers converge toward the middle. Circloid Sort itself has no dedicated Wikipedia
-article — it originates as a community-contributed variant in the ArrayV sorting-algorithm visualizer rather than a
-textbook algorithm, but it follows the same converging compare-and-swap idea, recursively applied, as its better-known
-relative.
+article — it originates as a community-contributed sorting-visualizer variant rather than a textbook algorithm, but it
+follows the same converging compare-and-swap idea, recursively applied, as its better-known relative.
 
 Where this variant departs from the ordinary recursive Circle Sort is in how it handles ranges that are not themselves a
 power of two in length. Rather than padding the working range up to the next power of two and guarding every access

@@ -4,8 +4,8 @@ Diamond Sort is a recursive [comparator network](https://en.wikipedia.org/wiki/S
 as [Batcher's Bitonic Sort](https://en.wikipedia.org/wiki/Bitonic_sorter) and the Bose-Nelson sort: algorithms whose
 sequence of compare-and-swap operations is fixed in advance rather than adapted to the data being sorted, and which were
 originally designed with the expectation that their comparisons could run independently of one another, and therefore in
-parallel. That shared lineage is why ArrayV groups Diamond Sort, Bitonic Sort, and Bose-Nelson sort together under its "
-Concurrent Sorts" category, even though the visualizer runs each of them sequentially.
+parallel. That shared lineage is why Diamond Sort, Bitonic Sort, and Bose-Nelson sort are grouped together under the
+"Concurrent Sorts" category here, even though this visualizer runs each of them sequentially.
 
 The recursive form works over a range described by a starting index and an exclusive stopping index, together with a
 boolean `merge` flag. A range of exactly two elements is resolved with a single comparison. Anything larger is split at

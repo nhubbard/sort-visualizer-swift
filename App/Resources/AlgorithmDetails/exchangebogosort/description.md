@@ -16,12 +16,9 @@ retains from its relatives is the complete absence of any strategy for *which* p
 choice of indices is always uniform and memoryless, so a run can spend an arbitrarily long stretch drawing pairs that
 are already in order, or that are equal, before it happens to land on a real inversion.
 
-Despite living in ArrayV's `sorts/exchange` package alongside genuinely practical exchange-based sorts, Exchange Bogo
-Sort is categorized among ArrayV's "Impractical Sorts," grouped with Bogosort, Bozosort, Less Bogosort, and Cocktail
-Bogosort. The package placement reflects only the mechanical fact that its accepted moves are pairwise element swaps
-rather than whole-array permutations or gap-based comparisons; the category placement reflects that, like its bogosort
-relatives, it has no practical use beyond illustrating what an algorithm without any real search strategy looks like in
-practice.
+Exchange Bogo Sort is categorized among the "Impractical Sorts," grouped with Bogosort, Bozosort, Less Bogosort, and
+Cocktail Bogosort — sorts that, whatever their mechanics, share no practical use beyond illustrating what an algorithm
+without any real search strategy looks like in practice.
 
 Because no accepted swap is guaranteed to bring the array meaningfully closer to sorted — a swap fixing one inversion
 can easily be followed by many rounds of draws that touch already-ordered or coincident positions before another genuine

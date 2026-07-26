@@ -15,7 +15,6 @@ fundamentally random, guess-and-check nature — the window still only shrinks w
 boundary element correctly, and the number of reshuffles needed to sort even a small array remains governed by the same
 factorial-growth randomness that makes every member of the Bogosort family impractical.
 
-Despite living in ArrayV's `sorts/distribute/` package for implementation convenience, Cocktail Bogo Sort belongs
-squarely to ArrayV's "Impractical Sorts" family alongside Bogosort, Bozosort, and Less Bogo Sort itself — it shares
-their defining trait of relying on random chance rather than any deterministic comparison strategy to make progress, and
-offers no meaningful improvement to the underlying algorithm's astronomical expected running time.
+Cocktail Bogo Sort belongs squarely to the "Impractical Sorts" family alongside Bogosort, Bozosort, and Less Bogo Sort
+itself — it shares their defining trait of relying on random chance rather than any deterministic comparison strategy to
+make progress, and offers no meaningful improvement to the underlying algorithm's astronomical expected running time.

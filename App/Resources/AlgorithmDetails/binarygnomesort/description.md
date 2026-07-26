@@ -17,7 +17,7 @@ elements.
 Despite its name, this particular "gnome sort" variant has nothing to do
 with [gnome sort](https://en.wikipedia.org/wiki/Gnome_sort)'s classic technique of repeatedly comparing an element with
 its predecessor and stepping backward through a swap when the pair is out of order (the "garden gnome sorting flower
-pots" mental model). The name comes from ArrayV, the reference project this port is taken from, which historically
-grouped this binary-search-driven shifting insertion under its "Optimized Gnome Sort" family and files it among its
-Exchange Sorts, even though the algorithm it actually implements is structurally indistinguishable from Binary Insertion
-Sort. This description reflects the algorithm ArrayV actually wrote, not an invented gnome-sort mechanism.
+pots" mental model). The "gnome sort" name is a historical naming quirk of the algorithm this one is based on, which
+groups this binary-search-driven shifting insertion under an "Optimized Gnome Sort" label among its Exchange Sorts, even
+though the algorithm it actually implements is structurally indistinguishable from Binary Insertion Sort. This
+description reflects the algorithm as actually implemented, not an invented gnome-sort mechanism.

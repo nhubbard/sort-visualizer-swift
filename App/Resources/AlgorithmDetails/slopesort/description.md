@@ -20,7 +20,7 @@ comparison. Slope Sort's inner loop always runs the full distance back to the fr
 elements are arranged, so a fully sorted input costs exactly as many comparisons and potential swaps as a reverse-sorted
 one. Both its best and worst cases are therefore `O(n^2)`, with no data-dependent shortcut available.
 
-Slope Sort belongs to ArrayV's "Exchange Sorts" family, the group of sorts that make progress purely by swapping pairs
+Slope Sort belongs to the "Exchange Sorts" family, the group of sorts that make progress purely by swapping pairs
 of adjacent or nearby elements rather than by selecting, merging, or partitioning. Because it only ever swaps two
 elements when the left one is strictly less than the right one — never when they are equal — two equal elements are
 never reordered relative to each other, which makes Slope Sort a stable sort.

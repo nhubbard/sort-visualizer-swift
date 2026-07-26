@@ -4,6 +4,6 @@ in a uniformly random element from the unplaced remainder and checks whether the
 the smallest one left, giving up and drawing again if it isn't.
 
 It's gentler than most of its bogosort relatives: rather than gambling on a full reshuffle or a single unrelated swap,
-every draw is at least aimed at the position currently being decided, which is also why ArrayV describes it as an
-optimized variant of Less Bogosort — the same "shuffle a range until its front element is the minimum" idea, just
-narrowed to a single random swap per attempt instead of reshuffling the whole remaining range each time.
+every draw is at least aimed at the position currently being decided — it's effectively an optimized variant of Less
+Bogosort, the same "shuffle a range until its front element is the minimum" idea, just narrowed to a single random swap
+per attempt instead of reshuffling the whole remaining range each time.
