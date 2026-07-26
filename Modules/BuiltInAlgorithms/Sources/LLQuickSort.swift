@@ -1,15 +1,12 @@
 import AlgorithmKit
 import SortEngineKit
 
-/// ArrayV's `LLQuickSort` ("Quick Sort, Left/Left Pointers") — the classic Lomuto partition
-/// scheme: the pivot is always the last element (`array[hi]`), and a single forward-scanning
-/// pointer `i` marks the boundary of "confirmed less-than-pivot" elements as `j` sweeps the rest
-/// of the range, swapping any strictly-lesser element into that boundary and advancing it. The
-/// pivot itself is swapped into its resting place at `i` once the sweep finishes. This is a
-/// distinct algorithm from this app's own `QuickSort` (a two-pointer/Hoare-style partition ported
-/// from the v1/JS prototype) and from `TernaryLLQuickSort`/`TernaryLRQuickSort` (three-way
-/// partition variants) — no pivot randomization or median-of-three selection here, which is why
-/// already-sorted/reverse-sorted input triggers this scheme's classic O(n^2) worst case.
+/// ArrayV's `LLQuickSort` ("Quick Sort, Left/Left Pointers") — classic Lomuto partition: pivot is
+/// always the last element (`array[hi]`), and forward-scanning pointer `i` marks the boundary of
+/// "confirmed less-than-pivot" elements as `j` sweeps the rest of the range. No pivot randomization
+/// or median-of-three selection, which is why already-sorted/reverse-sorted input triggers the
+/// classic `O(n^2)` worst case. Distinct from this app's Hoare-style `QuickSort` and the
+/// `TernaryLLQuickSort`/`TernaryLRQuickSort` three-way partition variants.
 public struct LLQuickSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "llquicksort")
   public let metadata = AlgorithmMetadata(

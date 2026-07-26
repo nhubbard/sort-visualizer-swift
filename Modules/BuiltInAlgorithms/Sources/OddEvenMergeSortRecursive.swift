@@ -32,15 +32,12 @@ public struct OddEvenMergeSortRecursive: SortAlgorithm {
       }
     }
 
-    // ArrayV's `oddEvenMerge`, credited to a rewrite by Piotr Grochowski (building on H.W.
-    // Lang's original power-of-two-only network) that generalizes Batcher's odd-even merge to
-    // work directly on array lengths that aren't a power of two. `lo` is the start of the piece
-    // being merged, `m2` is the halfway point (threaded through independently of `lo`/`n`, not
-    // recomputed from them), `n` is the length of the piece (which can grow by `r` in the
-    // odd-`(n/r)` branch below), and `r` is the comparison distance, doubling each level via
-    // `m = r * 2`. Every parity-dependent branch below is preserved exactly as ArrayV has it —
-    // simplifying any of them would silently break correctness for most non-power-of-two
-    // lengths while still passing on power-of-two test arrays.
+    // ArrayV's `oddEvenMerge` (Piotr Grochowski's rewrite of Batcher's odd-even merge network,
+    // generalized to non-power-of-two lengths). `lo` is the piece start, `m2` the halfway point
+    // (threaded independently of `lo`/`n`), `n` the piece length (can grow by `r` in the
+    // odd-`(n/r)` branch), `r` the comparison distance, doubling each level via `m = r * 2`. Every
+    // parity-dependent branch must stay exactly as-is: simplifying any of them breaks correctness
+    // for non-power-of-two lengths while still passing on power-of-two test arrays.
     func oddEvenMerge(_ lo: Int, _ m2: Int, _ n: Int, _ r: Int) {
       let m = r * 2
       if m < n {

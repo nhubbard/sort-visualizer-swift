@@ -1,43 +1,22 @@
 import AlgorithmKit
 import SortEngineKit
 
-/// Static Sort — ported from ArrayV's `io.github.arrayv.sorts.distribute.StaticSort` (ArrayV's
-/// own sub-name for it is "Simple Static Sort"). A distribution sort that classifies every element
-/// into one of `n` buckets via a linear formula based on where its value falls between the array's
-/// min and max, cycle-permutes elements into their bucket's contiguous region in a single in-place
-/// pass — the same "evict, place, adopt" technique `CycleSort`/`FlashSort` use, except here
-/// `offset`/`count` supply the shrinking per-bucket write cursors instead of `FlashSort`'s single
-/// `L` array or `CycleSort`'s `countLesser` scan — then finishes each bucket's now-contiguous-but-
-/// internally-unsorted range with a small range-scoped sort: Insertion Sort for buckets of 16 or
-/// fewer elements, Heap Sort for anything larger.
+/// Static Sort — ArrayV's `StaticSort` ("Simple Static Sort"). A distribution sort: classifies
+/// each element into one of `n` buckets via a linear formula on its value's position between
+/// min/max, cycle-permutes elements into contiguous per-bucket regions in place (same
+/// evict/place/adopt technique as `CycleSort`/`FlashSort`), then finishes each bucket with
+/// Insertion Sort (<=16 elements) or Heap Sort (larger).
 ///
-/// **The `CONST` divide-by-zero non-issue.** Unlike `FlashSort`'s `c = (m-1)/(max-min)` — which
-/// really does divide by zero when every element is identical, and is guarded accordingly —
-/// ArrayV's `CONST = auxLen / (max - min + 1)` here has a `+ 1` in the denominator. When
-/// `max == min` (every element identical), that's `auxLen / 1`, a perfectly finite value, and every
-/// element classifies to bucket 0 (`(value - min) * CONST == 0` for all of them). No guard is
-/// needed, and none is ArrayV's own code either — confirmed empirically below with an
-/// all-identical-elements sweep across many sizes.
+/// `CONST = auxLen / (max - min + 1)` — the `+ 1` keeps this finite even when every element is
+/// identical (unlike `FlashSort`'s unguarded `c = (m-1)/(max-min)`), so no zero-division guard is
+/// needed here.
 ///
-/// **The `i > 1` vs `i > 0` question in the finishing-sort loop.** ArrayV computes each bucket's
-/// start as `(i > 1) ? offset[i - 1] : a` — note `i == 1` *also* falls through to `a`, not
-/// `offset[0]`. This is not a correctness bug: `classify(_:)` is a non-decreasing step function of
-/// value (as value increases, the bucket index it maps to never decreases), so every element in a
-/// lower-numbered bucket is guaranteed `<=` every element in a higher-numbered bucket. Widening
-/// bucket 1's finishing range to `[a, offset[1])` — which also re-covers bucket 0's already-placed
-/// elements — can only ever re-confirm an ordering that's already consistent with the rest of the
-/// array; it cannot introduce a value from bucket 1 that's secretly smaller than something bucket 0
-/// contributed, because no such value can exist. The visible effect is purely a small amount of
-/// redundant work the one time `i == 1` (bucket 0's own finishing pass at `i == 0` gets redone as
-/// part of bucket 1's), never incorrect output. Verified empirically: thousands of random/adversarial
-/// trials (including ones engineered so bucket 0 alone exceeds the 16-element heap-sort threshold,
-/// maximizing the redundant work) all produce correctly sorted output. Ported exactly as ArrayV
-/// wrote it rather than "fixed" to `i > 0`, since there is nothing to fix.
+/// The finishing loop computes each bucket's start as `(i > 1) ? offset[i - 1] : a`, so bucket 1's
+/// range also re-covers bucket 0's. Not a bug: `classify` is non-decreasing in value, so bucket
+/// 0's elements are always `<=` bucket 1's — the only effect is redundant re-scanning when
+/// `i == 1`. Ported exactly as ArrayV wrote it.
 ///
-/// **Stability: `false`.** The cycle-permutation phase moves elements by value alone (`classify`
-/// has no notion of original index), and the Heap Sort used to finish any bucket over 16 elements
-/// is not stable either. Confirmed empirically with tagged-duplicate trials: relative order among
-/// equal elements is not preserved in general.
+/// Stability: `false` — the cycle-permutation is value-only, and Heap Sort isn't stable either.
 public struct StaticSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "staticsort")
   public let metadata = AlgorithmMetadata(
@@ -120,12 +99,9 @@ public struct StaticSort: SortAlgorithm {
         var from = origin
         var num = engine.values[from]
 
-        // A literal port of ArrayV's transient sentinel write (`Writes.write(array, from,
-        // -1, ...)`). `-1` is never a genuinely valid value in this app (shuffles are
-        // always `Array(1...size)`, all positive) — it's bookkeeping only, immediately
-        // overwritten below before the cycle closes, never read back as data. Ported
-        // faithfully to match ArrayV's own technique; confirmed empirically that it never
-        // persists in the final sorted output (see test notes).
+        // Transient sentinel write matching ArrayV's `Writes.write(array, from, -1, ...)`.
+        // `-1` is never a valid value here (shuffles are always `Array(1...size)`), so this
+        // is bookkeeping only — immediately overwritten before the cycle closes.
         engine.setValue(from, -1)
 
         repeat {

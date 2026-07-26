@@ -1,48 +1,26 @@
 import AlgorithmKit
 import SortEngineKit
 
-/// ArrayV's `sorts/merge/RotateMergeSort.java` — a genuine in-place merge, unlike
-/// `InPlaceMergeSort`'s one-element-at-a-time insertion-shifting. It is bottom-up like
-/// `BottomUpMergeSort` (`rotateMergeSort` doubles a merge-width `j`, merging adjacent runs of that
-/// width across the array on each pass), but each individual merge (`rotateMerge`) never allocates
-/// an O(n) temp buffer. Instead:
+/// ArrayV's `RotateMergeSort` — a genuine in-place merge (unlike `InPlaceMergeSort`'s
+/// insertion-shifting), bottom-up like `BottomUpMergeSort` but with no O(n) temp buffer per merge.
+/// Each merge finds the larger of the two runs, binary-searches its midpoint value into the other
+/// run, then `rotate` (built from block-swaps) swaps the block between the two found midpoints
+/// into correct order, recursing into the two sub-merges that rotation produces.
 ///
-/// 1. Whichever of the two runs being merged is the larger half decides direction (`m-a >= b-m`).
-/// 2. That larger half's own midpoint value is captured once, then `binarySearch` finds where that
-///    value would land within the *other* run.
-/// 3. `rotate` (built from `multiSwap`, a block-swap of two equal-length adjacent ranges) swaps the
-///    block between the two found midpoints into correct relative order — a full merge step with no
-///    aux storage, just index arithmetic and swaps.
-/// 4. `rotateMerge` recurses into the two sub-merges the rotation produced.
-///
-/// `binarySearch`'s `left`/`right`-biased comparison (`<=` vs `<`) is what keeps this stable:
-/// depending on which run the search value came from, the search finds either the leftmost or the
-/// leftmost-strictly-after-equal insertion point, so equal elements never cross each other's
-/// relative order. Because rotation-based merging with a binary-searched split point still performs
-/// a full, linear-in-the-merged-range amount of rotation work per merge (rotation is a
-/// constant-multiple of a linear scan, not the quadratic shifting `InPlaceMergeSort`'s `push` does),
-/// the overall bound stays the ordinary merge sort O(n log n) — the sophistication here buys
-/// in-place-ness without `InPlaceMergeSort`'s quadratic degradation.
+/// Stable because `binarySearch`'s left/right-biased comparison picks the leftmost or
+/// leftmost-after-equal insertion point depending on which run the search value came from, so
+/// equal elements never cross. Rotation is linear in the merged range, so the overall bound stays
+/// `O(n log n)` despite being in-place — no quadratic degradation like `InPlaceMergeSort`.
 public struct RotateMergeSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "rotatemergesort")
   public let metadata = AlgorithmMetadata(
     displayName: "Rotate Merge Sort",
     category: .merge,
     sizeRange: 16...256,
-    // The `left`/`right`-biased binary search exists specifically to preserve relative order
-    // among equal elements across the rotation — verified empirically with tagged-duplicate
-    // input (index-tagged values sorted purely on the untagged key retain their original
-    // relative order among ties).
     stable: true,
-    // Every merge is a real linear-time (in the size of the two runs) merge — the binary search
-    // is O(log n) and the rotation it drives moves each element a bounded number of times, so
-    // summed across the doubling bottom-up passes this is the ordinary merge sort O(n log n),
-    // not `InPlaceMergeSort`'s degraded O(n^2) (that algorithm's `push` step can rescan an
-    // entire run per out-of-order element, which this rotation-based merge never does).
     timeComplexity: ComplexityBounds(
       best: "O(n log n)", average: "O(n log n)", worst: "O(n log n)"),
-    // No aux array is ever created — `rotate`/`multiSwap` shuffle elements within the array
-    // itself. The only extra memory is the recursion stack `rotateMerge` uses.
+    // No aux array is ever created; the only extra memory is the recursion stack.
     spaceComplexity: "O(1)",
     iconName: "arrow.clockwise"
   )
@@ -86,16 +64,10 @@ public struct RotateMergeSort: SortAlgorithm {
       }
     }
 
-    // Finds the insertion point for the held `value` within `[a, b)`. `left` selects the
-    // comparison bias: `true` finds the leftmost position where `value` could be inserted
-    // (`value <= array[mid]`), `false` finds the leftmost position strictly after any equal
-    // elements (`value < array[mid]`) — the bias `rotateMerge` picks depends on which run
-    // `value` came from, which is what keeps the merge stable. `value` is a held value (read
-    // once by the caller, from an index outside the `[a, b)` range being searched here, and
-    // never written to during the search), so per this codebase's convention (see `CycleSort`'s
-    // `countLesser`), it's compared with plain Swift `<=`/`<` against freshly-read
-    // `engine.values[mid]` rather than through `engine.compare`. Mirrors ArrayV's
-    // `binarySearch(array, a, b, value, left)`.
+    // Finds where the held `value` (read once, from outside `[a, b)`) inserts into sorted
+    // `[a, b)`. `left` picks the bias: leftmost position (`<=`) vs leftmost-after-equal (`<`) —
+    // which one `rotateMerge` uses depends on which run `value` came from, and is what keeps
+    // the merge stable.
     func binarySearch(_ a: Int, _ b: Int, _ value: Int, _ left: Bool) -> Int {
       var a = a
       var b = b

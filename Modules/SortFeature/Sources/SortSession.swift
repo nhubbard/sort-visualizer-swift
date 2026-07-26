@@ -49,13 +49,10 @@ public final class SortSession {
   public private(set) var phase: Phase = .idle
 
   /// The most recent `.replaying`/`.complete` replay this session has shown — unlike `phase`'s
-  /// own associated value, this deliberately *survives* the `.recording`/`.ready` gap `start
-  /// (size:)` passes through before the next run's replay exists, so `SortView` can keep
-  /// rendering the previous run's final frame instead of unmounting the canvas for a
-  /// `ProgressView()` on every single automation iteration (a real, reported flash — see
-  /// `SortView.content`'s own doc comment). Never explicitly cleared: the next `startReplay(_:)`
-  /// simply overwrites it, and the old `ReplayEngine` deallocates once nothing else (this
-  /// property included) still holds it.
+  /// own associated value, this survives the `.recording`/`.ready` gap `start(size:)` passes
+  /// through before the next run's replay exists, so `SortView` can keep rendering the previous
+  /// run's final frame instead of unmounting the canvas for a `ProgressView()` on every
+  /// automation iteration. Never explicitly cleared: the next `startReplay(_:)` overwrites it.
   public private(set) var lastReplay: ReplayEngine?
 
   /// Local to this session, seeded from `AppSettings.soundEnabled` at construction but never
@@ -166,8 +163,7 @@ public final class SortSession {
       if isAutomating {
         if case .recordingTooLarge(
           _, let cap, let compareCount, let swapCount, let mainWriteCount, let auxWriteCount) =
-          sessionError
-        {
+          sessionError {
           try? await analytics.recordCapExceeded(
             algorithmID: algorithm.id, arraySize: clampedSize, cap: cap,
             compareCount: compareCount, swapCount: swapCount,
@@ -342,18 +338,14 @@ public final class SortSession {
   /// Awaits genuine completion (or an early stop via `stopAutomation()`) of a sweep — the
   /// primitive App Intents needs to report "the sweep is over" back to Shortcuts, rather than
   /// firing the loop and returning immediately the way the keyboard-shortcut/Automator-menu
-  /// callers of `runAutomation(_:)` do. Safe on a freshly-constructed session only:
-  /// `runAutomation(_:)`'s own "tap again to stop" toggle can't trigger here, since
-  /// `runningAutomationID` always starts `nil`.
+  /// callers of `runAutomation(_:)` do. Safe on a freshly-constructed session only, since
+  /// `runningAutomationID` always starts `nil` here.
   ///
   /// Deliberately does NOT call the fire-and-forget `runAutomation(_:)` above and then poll
-  /// `isAutomating` to decide whether to wait — that shape had a real, deterministic (not just
-  /// racy) bug: a freshly spawned `Task`'s body cannot run any sooner than the *next* suspension
-  /// point in the caller, so a `guard isAutomating else { return }` checked on the very next line
-  /// with no intervening `await` always observed the pre-Task default (`false`) and returned
-  /// immediately, before the sweep had done any real work — this is what silently skipped
-  /// almost every algorithm in `RunFullSizeSweepIntent`, each just flashing `.idle` before the
-  /// next one replaced it. Awaiting the spawned `Task`'s own `.value` instead has no such gap.
+  /// `isAutomating`: a freshly spawned `Task`'s body can't run before the *next* suspension point
+  /// in the caller, so a `guard isAutomating else { return }` with no intervening `await` always
+  /// observes the pre-Task default (`false`) and returns immediately. Awaiting the spawned
+  /// `Task`'s own `.value` instead has no such gap.
   public func runAutomationAndWait(_ automation: Automation) async {
     automationTask?.cancel()
     runningAutomationID = automation.id
@@ -397,13 +389,12 @@ public final class SortSession {
 
   /// Toggles between playing and paused. In `.replaying`, this is a normal pause/resume.
   ///
-  /// In `.complete`, it resumes only if `stepIndex` is no longer at the very end — the scrub
-  /// slider, step-back, and Reset all call `seek(to:)`/`stepBackward()` directly on `replay`,
-  /// bypassing `SortSession` entirely, so none of them ever transition `phase` back to
-  /// `.replaying` on their own; without this case, scrubbing backward after a sort finishes
-  /// would leave the play button looking enabled but silently doing nothing. A `.complete` sort
-  /// still sitting at the very end remains a no-op — a stray tap on a play button the UI failed
-  /// to disable can't re-trigger analytics recording.
+  /// In `.complete`, resumes only if `stepIndex` is no longer at the very end. The scrub slider,
+  /// step-back, and Reset call `seek(to:)`/`stepBackward()` directly on `replay`, bypassing
+  /// `SortSession`, so none of them transition `phase` back to `.replaying` on their own —
+  /// without this case, scrubbing backward after completion would leave play looking enabled but
+  /// inert. A `.complete` sort still at the very end stays a no-op so a stray tap can't
+  /// re-trigger analytics recording.
   public func togglePlayback() {
     switch phase {
     case .replaying(let replay):

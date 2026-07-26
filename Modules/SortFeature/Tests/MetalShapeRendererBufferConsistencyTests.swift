@@ -6,16 +6,12 @@ import Testing
 @testable import SortEngineKit
 @testable import SortFeature
 
-/// Permanent regression coverage, not a throwaway diagnostic (despite the filename, kept for now)
-/// — written while investigating a user report of a stale-looking block of bars on the right edge
-/// of a Counting Sort + Rainbow (Metal) run at n=256. These tests proved the GPU INSTANCE BUFFER
-/// itself ends up fully correct after a complete playback, even across a mid-playback resize —
-/// ruling out "some write got lost" and "a resize corrupts prior writes" as the cause. The actual
-/// bug turned out to be in `MetalRendererView`'s on-screen PRESENTATION timing (a stale displayed
-/// frame, not stale buffer contents — see the forced completion redraw in
-/// `MetalRendererView.Coordinator.setUp`), which these buffer-level tests can't exercise (no live
-/// `MTKView`/display refresh cadence in a headless test target) — but they're worth keeping as a
-/// standing guarantee that the buffer-write half of the pipeline stays correct.
+/// Permanent regression coverage: proves the GPU instance buffer itself ends up fully correct
+/// after a complete playback, even across a mid-playback resize. The actual stale-frame bug this
+/// was written to rule out lived in `MetalRendererView`'s on-screen presentation timing instead
+/// (see the forced completion redraw in `MetalRendererView.Coordinator.setUp`), which these
+/// buffer-level tests can't exercise (no live `MTKView`/display refresh cadence in a headless
+/// test target) — kept anyway as a standing guarantee that the buffer-write half stays correct.
 ///
 /// `FakeCountingSort` duplicates `BuiltInAlgorithms.CountingSort.record(into:)` verbatim rather
 /// than depending on that module — `SortFeature`'s test target doesn't currently depend on

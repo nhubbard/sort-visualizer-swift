@@ -15,17 +15,11 @@ public struct WeakHeapSort: SortAlgorithm {
   )
   public init() {}
 
-  /// A weak heap relaxes the ordinary heap invariant: instead of every node being `>=` both
-  /// children, each node keeps one "reverse" bit per index recording which of its two subtrees
-  /// currently holds the larger root, so a node only needs to dominate ONE of its children
-  /// directly (the other comparison is deferred, tracked by the bit) — fewer comparisons overall
-  /// than an ordinary heap for the same `n`. ArrayV bit-packs these flags into a byte array
-  /// (`getBitwiseFlag`/`toggleBitwiseFlag`); that packing is a memory micro-optimization
-  /// irrelevant to this port, so `flags` here is a plain `Bool` array indexed directly by
-  /// position instead — identical logical behavior, no bit unpacking. ArrayV's own explicit
-  /// zero-fill loop is also skipped: it only zeroes `n/8` of the `bits` array's `(n+7)/8` bytes
-  /// anyway, redundant regardless since Java (and Swift's `repeating: false`) already
-  /// zero-initializes a freshly created array.
+  /// A weak heap relaxes the ordinary heap invariant: each node only needs to dominate one child
+  /// directly; a "reverse" bit per index tracks which subtree holds the larger root, deferring
+  /// the other comparison — fewer comparisons overall than an ordinary heap. ArrayV bit-packs
+  /// these flags into a byte array; this port uses a plain `Bool` array instead (same behavior,
+  /// no zero-fill loop needed since Swift already zero-initializes `repeating: false`).
   public func record(into engine: inout RecordingEngine) {
     let n = engine.count
     guard n > 1 else { return }

@@ -15,15 +15,13 @@ public struct CocktailBogoSort: SortAlgorithm {
   )
   public init() {}
 
-  /// ArrayV's `CocktailBogoSort` is `LessBogoSort` made bidirectional: it tracks a shrinking
-  /// `[min, max)` window, advances `min` whenever the window's front element is already its
-  /// minimum, retreats `max` whenever the back element is already its maximum, and otherwise
-  /// reshuffles the whole window and tries again. Same open-ended-random-walk problem as
-  /// `LessBogoSort`, so it gets the same fix: reshuffling the window becomes deterministically
-  /// stepping to the window's next lexicographic permutation instead. Every permutation of the
-  /// window is reachable with no repeats, and the window's fully ascending arrangement always
-  /// satisfies *both* "front is minimum" and "back is maximum" simultaneously, so this can never
-  /// run out of permutations to try before one of the two conditions is finally met.
+  /// ArrayV's `CocktailBogoSort` is `LessBogoSort` made bidirectional: tracks a shrinking
+  /// `[min, max)` window, advancing `min` when the front is already the window's minimum,
+  /// retreating `max` when the back is already its maximum, otherwise reshuffling and retrying.
+  ///
+  /// Ported here as a deterministic substitute: reshuffling becomes stepping to the window's next
+  /// lexicographic permutation. The window's fully ascending arrangement always satisfies both
+  /// stopping conditions, so this can never run out of permutations before one is met.
   public func record(into engine: inout RecordingEngine) {
     let n = engine.count
     guard n > 1 else { return }

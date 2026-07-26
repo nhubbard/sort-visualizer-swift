@@ -15,14 +15,10 @@ public struct QuickBogoSort: SortAlgorithm {
   )
   public init() {}
 
-  /// ArrayV's `QuickBogoSort` picks the first element of a range as pivot, then Fisher–Yates
-  /// reshuffles the whole range (tracking where the pivot value ends up through each swap) until
-  /// the range happens to be partitioned around it, then recurses on both sides — the same
-  /// open-ended random walk `BogoSort` already fixed. Substitutes a lexicographic
-  /// `nextPermutation` walk of the range (same technique `LessBogoSort`/`CocktailBogoSort` already
-  /// use) for the reshuffle, tracking the pivot's position through each `nextPermutation` step's
-  /// swap AND reversal — mirroring the original's own per-swap pivot bookkeeping, just extended
-  /// to cover the reversal `nextPermutation` also performs that a plain Fisher–Yates never would.
+  /// ArrayV's `QuickBogoSort` picks the first element as pivot and reshuffles the range until it
+  /// happens to be partitioned around it — the same open-ended random walk `BogoSort` fixed.
+  /// Substitutes a lexicographic `nextPermutation` walk (as `LessBogoSort`/`CocktailBogoSort` use),
+  /// tracking the pivot's position through each step's swap and reversal.
   public func record(into engine: inout RecordingEngine) {
     let n = engine.count
     guard n > 1 else { return }

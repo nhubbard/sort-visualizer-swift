@@ -16,13 +16,10 @@ public struct TernaryHeapSort: SortAlgorithm {
   public init() {}
 
   /// Same extract-max heapsort shape as `MaxHeapSort`/`BaseNMaxHeapSort`, fixed at 3 children per
-  /// node (`leftBranch/middleBranch/rightBranch = 3i+1/3i+2/3i+3`) rather than 2 or a runtime
-  /// `base`. ArrayV's own `buildMaxTernaryHeap` starts its heapify loop at `length - 1 / 3`,
-  /// which — due to Java's operator precedence (division binds before subtraction) — evaluates
-  /// to `length - 0 = length`, one past the last valid index. That extra call is a provable
-  /// no-op (every child-bound check inside `maxHeapify` short-circuits false before ever reading
-  /// `array[length]`), so this starts the loop at the last real index instead of replicating the
-  /// pointless call.
+  /// node (`3i+1/3i+2/3i+3`) instead of 2 or a runtime `base`. ArrayV's heapify loop start
+  /// (`length - 1 / 3`) evaluates to `length` due to Java's operator precedence — one past the
+  /// last valid index, and a provable no-op (every bound check short-circuits before reading
+  /// `array[length]`) — so this starts at the last real index instead of replicating it.
   public func record(into engine: inout RecordingEngine) {
     let n = engine.count
     guard n > 1 else { return }

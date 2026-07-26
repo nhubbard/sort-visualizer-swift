@@ -4,19 +4,15 @@ import MetalKit
 import QuartzCore
 import SortEngineKit
 
-/// The GPU half of the incremental-update hypothesis: a persistent `MTLBuffer` of per-bar
-/// instance data (`BarInstance`, layout-matched to `BarRenderer.metal`'s struct of the same
-/// name), written incrementally — only the touched indices' slots, via direct pointer writes —
-/// then drawn with exactly one instanced draw call per frame regardless of array size. The GPU
-/// redraws every bar every frame no matter what (there's no partial-redraw concept for a GPU draw
-/// call) — the win here is entirely that the CPU-side *write* is incremental, and that
-/// GPU-instanced rectangle rendering is cheap enough per-instance that redrawing all of them every
-/// frame stops being the bottleneck at all.
+/// Persistent `MTLBuffer` of per-bar instance data (`BarInstance`, layout-matched to
+/// `BarRenderer.metal`'s struct of the same name) written incrementally — only touched indices'
+/// slots — then drawn with one instanced draw call per frame. The GPU still redraws every bar
+/// every frame regardless (no partial-redraw concept for a draw call); the incrementality is
+/// purely in the CPU-side write.
 ///
-/// Works in pixel space throughout (not points): `MTKView`'s drawable is always sized in real
-/// backing-store pixels, and the render encoder's implicit viewport matches that, so the vertex
-/// shader's NDC conversion has to agree — `reset`/`apply` take points + a scale factor (matching
-/// `IncrementalBarRenderer`'s shared contract) and convert internally.
+/// Works in PIXEL space throughout, not points (unlike `MetalShapeRenderer`'s layouts): `MTKView`'s
+/// drawable is sized in backing-store pixels, so `reset`/`apply` take points + scale and convert
+/// internally to match.
 @MainActor
 final class MetalBarRenderer: NSObject, MetalIncrementalRenderer {
   struct BarInstance {
@@ -53,25 +49,19 @@ final class MetalBarRenderer: NSObject, MetalIncrementalRenderer {
   private static let primaryColor = SIMD4<Float>(0.95, 0.38, 0.38, 1)
   private static let secondaryColor = SIMD4<Float>(0.38, 0.58, 0.95, 1)
 
-  /// `nil` if this device can't build the pipeline at all (no Metal support, or — it shouldn't
-  /// happen given `BarRenderer.metal` ships in this same target, but defensively — the default
-  /// library is missing the expected functions). Callers should fall back to a different
-  /// backend rather than force-unwrap.
+  /// `nil` if this device can't build the pipeline (no Metal support, or a missing shader
+  /// function). Callers should fall back to a different backend rather than force-unwrap.
   ///
-  /// `sampleCount` defaults to `1` (no MSAA) so existing tests driving `encodeDraw` against a
-  /// plain, non-multisampled offscreen texture keep working unchanged — a render pipeline's
-  /// `rasterSampleCount` must exactly match whatever render pass it's encoded into, or Metal
-  /// fails validation. `MetalRendererView` is the only caller that passes a real value, matching
-  /// whatever it set `MTKView.sampleCount` to.
+  /// `sampleCount` defaults to `1` (no MSAA) so tests driving `encodeDraw` against a plain,
+  /// non-multisampled offscreen texture keep working — a pipeline's `rasterSampleCount` must
+  /// exactly match whatever render pass it's encoded into, or Metal fails validation.
+  /// `MetalRendererView` is the only caller that passes a real value.
   init?(device: MTLDevice, sampleCount: Int = 1) {
     guard let queue = device.makeCommandQueue() else { return nil }
-    // `device.makeDefaultLibrary()` (no bundle argument) looks for `default.metallib` in
-    // `Bundle.main` — the HOST APP's bundle, not the caller's own. `BarRenderer.metal`
-    // compiles into `SortFeature.framework`'s own bundle, not the app's, so that overload
-    // always returned `nil` here — silently, with no crash, which is exactly why nothing ever
-    // drew: this whole initializer returned `nil`, and `MetalRendererView.makeUIView` fell
-    // back to a bare, undelegated `MTKView()`. `makeDefaultLibrary(bundle:)` with THIS type's
-    // own bundle is the fix — it looks in `SortFeature.framework` instead.
+    // `device.makeDefaultLibrary()` (no bundle argument) looks in `Bundle.main` — the host app's
+    // bundle, not the framework's. `BarRenderer.metal` compiles into `SortFeature.framework`'s own
+    // bundle, so that overload always returns `nil` here; `makeDefaultLibrary(bundle:)` with this
+    // type's own bundle is required instead.
     guard
       let library = try? device.makeDefaultLibrary(bundle: Bundle(for: MetalBarRenderer.self)),
       let vertexFunction = library.makeFunction(name: "bar_vertex"),
@@ -220,17 +210,13 @@ final class MetalBarRenderer: NSObject, MetalIncrementalRenderer {
       commandBuffer.present(drawable)
       commandBuffer.commit()
 
-      // `MTKView` is normally `isPaused = true` / `enableSetNeedsDisplay = true` (see
-      // `MetalRendererView`'s own doc comment) — it only redraws when told to. While any
-      // transition is in flight, flip to MetalKit's own capped internal display link
-      // (`preferredFramesPerSecond`, set once in `MetalRendererView.makeUIView`) instead of
-      // manually re-arming `setNeedsDisplay()` every single frame — re-arming unconditionally
-      // kept this view redrawing at full, uncapped display refresh rate for as long as
-      // operations kept landing (i.e. for most of a real sort's duration), and that sustained
-      // render-pass overhead competed with SwiftUI's own Core-Animation-driven frame commits
-      // on the same main thread, visibly slowing down unrelated UI animations. Flip back to
-      // paused the instant everything settles, returning to today's zero-background-cost
-      // on-demand model.
+      // `MTKView` is normally `isPaused = true`/`enableSetNeedsDisplay = true` (see
+      // `MetalRendererView`), redrawing only when told to. While a transition is in flight,
+      // flip to MetalKit's own capped display link (`preferredFramesPerSecond`) instead of
+      // manually re-arming `setNeedsDisplay()` every frame — unconditional re-arming redraws at
+      // full uncapped refresh rate for the sort's whole duration, competing with SwiftUI's own
+      // frame commits on the main thread and visibly slowing unrelated UI animations. Return to
+      // paused once everything settles.
       if colorTransitions.isActive || originTransitions.isActive || sizeTransitions.isActive {
         if view.isPaused { view.isPaused = false }
       } else if !view.isPaused {

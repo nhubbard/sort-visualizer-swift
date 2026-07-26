@@ -1,25 +1,14 @@
 import AlgorithmKit
 import SortEngineKit
 
-/// ArrayV's `BitonicSortRecursive` — H.W. Lang's generalized recursive formulation of Bitonic
-/// Sort (http://www.inf.fh-flensburg.de/lang/algorithmen/sortieren/bitonic/oddn.htm), which is
-/// structurally different from the already-shipped ``BitonicSortIterative``: that one pads the
-/// input up to the next power of two and walks it iteratively; this one works directly on any
-/// `n`, no padding required. The trick lives entirely in ``bitonicMerge``: it splits its range at
-/// `m = greatestPowerOfTwoLessThan(n)` — not `n / 2` — and only compares `i` against `i + m` for
-/// the first `n - m` positions (not the whole range), which is exactly the generalization that
-/// makes arbitrary-length merging correct.
+/// ArrayV's `BitonicSortRecursive` — H.W. Lang's generalized recursive Bitonic Sort. Unlike
+/// ``BitonicSortIterative``, which pads to the next power of two, ``bitonicMerge`` here splits its
+/// range at `m = greatestPowerOfTwoLessThan(n)` (not `n / 2`) and only compares `i` against `i + m`
+/// for the first `n - m` positions, which generalizes correctly to any `n`.
 ///
-/// `dir` alternates `true`/`false` through the ``bitonicSort`` recursion (one half ascending, the
-/// other descending) to build the bitonic sequence that ``bitonicMerge`` then merges; the
-/// top-level call always sorts ascending (`dir = true`), matching ArrayV's own `direction` field,
-/// which defaults to `true` and this app never flips.
-///
-/// ``compare`` ports ArrayV's `if (dir == (cmp == 1)) swap(...)` exactly, including its asymmetry:
-/// the ascending case (`dir == true`) only swaps on a *strict* `A[i] > A[j]`, while the descending
-/// case (`dir == false`) swaps whenever `A[i]` is *not* strictly greater than `A[j]` — i.e. on
-/// `<=`, including ties. That asymmetry is real ArrayV behavior, not a bug, so it's preserved via
-/// the same boolean-equality structure rather than two separate strict `by:` comparators.
+/// ``compare`` implements `if (dir == (cmp == 1)) swap(...)`: ascending (`dir == true`) swaps only
+/// on strict `>`, descending swaps on `<=` including ties. This asymmetry is real ArrayV behavior,
+/// not a bug.
 public struct BitonicSortRecursive: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "bitonicsortrecursive")
   public let metadata = AlgorithmMetadata(

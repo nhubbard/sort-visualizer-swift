@@ -59,15 +59,12 @@ public final class AudioService: AudioPlaying {
   private var nextGateCloseDeadline: ContinuousClock.Instant?
   private var gateCloserTask: Task<Void, Never>?
 
-  /// Self-starts on first call so composition-root code doesn't need to remember to call
-  /// `start()` — a caller that never plays a note never pays for a running engine.
-  ///
-  /// Retriggers the envelope on a pitch change (matching `Synthesizer.swift`'s behavior), then
-  /// pushes the gate's close deadline out via `scheduleGateClose`, not a blocking `Task.sleep` in
-  /// this call — v1's blocking version is exactly the bug §3.1 calls out ("a fast algorithm...
-  /// can outrun AudioKit's note-scheduling and glitch, because note-firing is woven into the
-  /// algorithm's own timing"). This method returns immediately regardless of hold duration, so
-  /// `ReplayEngine`'s playback loop is never slowed down by audio.
+  /// Self-starts on first call so callers don't need to call `start()` explicitly. Retriggers the
+  /// envelope on a pitch change, then pushes the gate's close deadline via `scheduleGateClose`
+  /// rather than a blocking `Task.sleep` — a blocking version can let a fast algorithm outrun
+  /// note-scheduling and glitch, since note-firing is woven into the algorithm's own timing.
+  /// Returns immediately regardless of hold duration, so `ReplayEngine`'s playback loop is never
+  /// slowed down by audio.
   public func play(value: Int, in range: ClosedRange<Int>, holdSeconds: Double) {
     let interval = audioSignposter.beginInterval("PlayNote", id: audioSignposter.makeSignpostID())
     defer { audioSignposter.endInterval("PlayNote", interval) }

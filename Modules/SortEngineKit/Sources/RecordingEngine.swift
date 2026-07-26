@@ -1,16 +1,14 @@
-/// A plain, synchronous, `mutating`-method struct — no actor, no `async`, no `@MainActor`. This is
-/// the *only* interface an algorithm ever touches. `compare`/`swap` auto-apply
+/// A plain, synchronous, `mutating`-method struct — no actor, no `async`, no `@MainActor`. The
+/// *only* interface an algorithm ever touches. `compare`/`swap` auto-apply
 /// `Marker.primary`/`.secondary` (matching ArrayV's `Reads.compareIndices`/`Writes.swap`
-/// convention of always marking what they touch), and auto-*retract* the previous call's marks
-/// first — so at most one index carries `.primary` and one carries `.secondary` at a time, a
-/// "what's happening right now" highlight rather than a permanent stain (§ colors: a `Visualizer`
-/// falls back to its own base/value color for every unmarked index, so without retraction, every
-/// index a sort has ever touched stays highlighted forever instead of reverting once the operation
-/// moves on). Everything past primary/secondary — `pivot`, `bucket(n)`, custom markers — is the
+/// convention) and auto-*retract* the previous call's marks first, so at most one index carries
+/// `.primary` and one `.secondary` at a time — a "what's happening right now" highlight rather
+/// than a permanent stain, since a `Visualizer` falls back to its base color for every unmarked
+/// index. Everything past primary/secondary (`pivot`, `bucket(n)`, custom markers) is the
 /// algorithm's own choice, held across as many operations as it likes.
 ///
-/// A synchronous function cannot be cancelled mid-loop-body anyway, so there is no
-/// `enforceRunning()`-style guard anywhere here — cancellation is a `ReplayEngine` concern.
+/// A synchronous function cannot be cancelled mid-loop-body, so there is no
+/// `enforceRunning()`-style guard here — cancellation is a `ReplayEngine` concern.
 public struct RecordingEngine: Sendable {
   /// 5 minutes at the app's own 1000 ops/sec max playback speed (`SettingsView`'s speed slider
   /// tops out there) — the fallback used when a caller doesn't pass its own `operationCap`.

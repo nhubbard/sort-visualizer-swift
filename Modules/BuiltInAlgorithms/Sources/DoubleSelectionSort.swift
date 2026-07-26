@@ -1,28 +1,16 @@
 import AlgorithmKit
 import SortEngineKit
 
-/// ArrayV's `DoubleSelectionSort`: like plain Selection Sort, but each pass scans the current
-/// unsorted range `[left, right]` once and finds BOTH the minimum and the maximum, then places
-/// the minimum at `left` and the maximum at `right` in the same pass — shrinking the range from
-/// both ends and roughly halving the number of passes versus a single-ended selection sort (the
-/// total comparison count stays about the same, since each pass still inspects every remaining
-/// element, twice).
+/// ArrayV's `DoubleSelectionSort` — like plain Selection Sort, but each pass scans the unsorted
+/// range `[left, right]` once for BOTH the minimum and maximum, placing the minimum at `left` and
+/// the maximum at `right` in the same pass, roughly halving the number of passes.
 ///
-/// `smallest`/`biggest` are plain, live indices into the array as it stands *right now* — not
-/// held values — so the two swaps below have to be sequenced with care. ArrayV's source only
-/// guards one collision explicitly: `if(biggest == left) biggest = smallest;`. That guard exists
-/// because if the single largest element in the range happens to sit at `left` itself, the first
-/// swap (`swap(left, smallest)`) would relocate it to wherever `smallest` used to be — so `biggest`
-/// must be redirected there *before* that swap runs, or the second swap would read the wrong slot
-/// (`left`, which by then holds the *smallest* value, not the largest).
-///
-/// No analogous guard exists for `smallest == right`, and by inspection (confirmed by exhaustive
-/// and randomized testing below) none is needed: the first swap only ever touches indices `left`
-/// and `smallest`. If `biggest` is neither of those, its slot is untouched and the second swap
-/// reads the correct value. If `biggest == smallest` (only possible when the whole remaining
-/// range is one repeated value), both swaps move equal values around, which is a no-op in effect.
-/// And if `biggest == right` already, the second swap degenerates to swapping an index with
-/// itself. Ported exactly as ArrayV has it, in the same order, with no additional guards added.
+/// `smallest`/`biggest` are live indices, so the two swaps must be sequenced with care: if the
+/// largest element sits at `left` itself, the first swap (`left`/`smallest`) would relocate it, so
+/// `biggest` is redirected to `smallest` before that swap runs. No analogous guard is needed for
+/// `smallest == right` — the first swap only ever touches `left`/`smallest`, so `biggest`'s slot is
+/// unaffected unless `biggest` already equals one of those two indices, in which case the second
+/// swap is a harmless no-op.
 public struct DoubleSelectionSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "doubleselectionsort")
   public let metadata = AlgorithmMetadata(

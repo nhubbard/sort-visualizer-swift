@@ -5,18 +5,16 @@ import Foundation
 /// inside the class itself.
 private let transitionDuration: TimeInterval = 0.12
 
-/// Eases each GPU instance slot's rendered value (a color, an origin/size, a triangle point, a
-/// line endpoint — anything expressible as a fixed-width float `SIMD` vector) toward its latest
-/// target over `transitionDuration`, instead of snapping instantly the moment `apply` touches it —
-/// small arrays make for large on-screen bars/shapes, and *anything* snapping on/off every
-/// operation at those sizes reads as a high-contrast, high-frequency flash (a real photosensitivity
-/// concern, most visible on tiny-array algorithms like Bogo/Bozo Sort) or, for position-driven
-/// visualizers, as a point/dot instantly teleporting instead of moving. Pure CPU-side math, no
-/// Metal/GPU types, so every renderer (`MetalBarRenderer`, `MetalShapeRenderer`,
-/// `MetalTriangleRenderer`, `MetalDisparityChordsRenderer`) shares exactly this one implementation
-/// for BOTH color and geometry despite each owning its own differently-shaped GPU instance struct —
-/// each field that needs easing just gets its own tracker instance, keyed by `Value`'s shape
-/// (`SIMD4<Float>` for color, `SIMD2<Float>` for a point/origin/size).
+/// Eases each GPU instance slot's rendered value (color, origin/size, a triangle/line point —
+/// anything expressible as a fixed-width float `SIMD` vector) toward its latest target over
+/// `transitionDuration` instead of snapping instantly — on small arrays, bars/shapes are large
+/// enough that instant snapping reads as a high-contrast flash (a real photosensitivity concern,
+/// worst on tiny-array algorithms like Bogo/Bozo Sort) or a teleporting point/dot.
+///
+/// Pure CPU-side math, no Metal/GPU types — every renderer (`MetalBarRenderer`,
+/// `MetalShapeRenderer`, `MetalTriangleRenderer`, `MetalDisparityChordsRenderer`) shares this one
+/// implementation for both color and geometry, one tracker instance per eased field, keyed by
+/// `Value`'s shape (`SIMD4<Float>` for color, `SIMD2<Float>` for a point).
 @MainActor
 final class MetalTransitionTracker<Value: SIMD> where Value.Scalar == Float {
   private struct Entry {

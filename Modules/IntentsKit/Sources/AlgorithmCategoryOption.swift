@@ -1,20 +1,17 @@
 import AlgorithmKit
 import AppIntents
 
-/// `AlgorithmCategory` itself can't conform to `AppEnum` from here: App Intents' compile-time
-/// metadata extraction requires an `AppEnum`'s cases to be declared in the same module as the
-/// conformance ("enums implemented in an imported framework or library are not supported"), and
-/// `AlgorithmCategory` lives in `AlgorithmKit`. This is a same-cases mirror instead (plus `.all`,
-/// a filter-parameter sentinel with no `AlgorithmCategory` counterpart), converted back to the
-/// real type via `algorithmCategory` below.
+/// `AlgorithmCategory` can't conform to `AppEnum` directly: App Intents requires an `AppEnum`'s
+/// cases to be declared in the same module as the conformance, and `AlgorithmCategory` lives in
+/// `AlgorithmKit`. This is a same-cases mirror instead (plus `.all`, a filter sentinel with no
+/// `AlgorithmCategory` counterpart), converted back via `algorithmCategory` below.
 ///
-/// `FindAlgorithmsIntent.category` is intentionally non-optional with `.all` as its default,
-/// rather than an `Optional<AlgorithmCategoryOption>` defaulting to `nil` for "no filter" — an
-/// Optional `AppEnum` parameter left at its unset default is exactly the shape most prone to a
-/// real, observed App Intents/Shortcuts glitch where the *first* run after configuring the
-/// parameter resolves it as unset (acting as if filtered by nothing) while every subsequent run
-/// resolves it correctly. Giving the parameter a genuine, always-concrete value removes the
-/// unset-vs-nil ambiguity that glitch depends on.
+/// `FindAlgorithmsIntent.category` is non-optional with `.all` as its default rather than an
+/// `Optional<AlgorithmCategoryOption>` defaulting to `nil`: an unset-default Optional `AppEnum`
+/// parameter is exactly the shape that triggers a real, observed App Intents/Shortcuts glitch
+/// where the first run after configuring the parameter resolves as unset while every subsequent
+/// run resolves correctly. A concrete default removes the unset-vs-nil ambiguity that glitch
+/// depends on.
 public enum AlgorithmCategoryOption: String, AppEnum {
   case all
   case concurrent, distribution, exchange, hybrid, impractical, insertion
@@ -33,7 +30,7 @@ public enum AlgorithmCategoryOption: String, AppEnum {
       .merge: "Merge Sorts",
       .miscellaneous: "Miscellaneous Sorts",
       .quick: "Quick Sorts",
-      .selection: "Selection Sorts",
+      .selection: "Selection Sorts"
     ]
   }
 

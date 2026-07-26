@@ -1,18 +1,14 @@
 import AlgorithmKit
 import SortEngineKit
 
-/// Most-Significant-Digit Radix Sort — ported from ArrayV's
-/// `io.github.arrayv.sorts.distribute.MSDRadixSort` (`radixMSD`). Unlike `LSDRadixSort` (a single
-/// iterative counting-sort pass per digit place, least-significant first), MSD recurses: at each
-/// call it buckets the current `[min, max)` slice by one digit (starting from the *most*
-/// significant), writes the buckets back in order, then recurses into each bucket's sub-range with
-/// the next-less-significant digit. A bucket of size 0 or 1, or a range that has run out of digits
-/// (`power < 0`), is already in its final position and the recursion bottoms out.
+/// Most-Significant-Digit Radix Sort — ported from ArrayV's `radixMSD`. Unlike `LSDRadixSort`
+/// (single iterative counting-sort pass per digit, least-significant first), MSD recurses: each
+/// call buckets the current `[min, max)` slice by one digit (most significant first), writes the
+/// buckets back in order, then recurses into each bucket's sub-range with the next digit. A bucket
+/// of size 0 or 1, or a range out of digits (`power < 0`), bottoms out the recursion.
 ///
-/// ArrayV builds one `ArrayList<Integer>[]` ("registers") per recursion frame, appends into it in
-/// original left-to-right order (a stable distribution), transcribes it back into `array` starting
-/// at `min`, recurses per bucket, then deletes the whole registers array. This mirrors that exactly
-/// with one `createAuxArray`/`deleteAuxArray` pair per recursion frame standing in for `registers`.
+/// One `createAuxArray`/`deleteAuxArray` pair per recursion frame stands in for ArrayV's per-frame
+/// "registers" array.
 public struct MSDRadixSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "msdradixsort")
   public let metadata = AlgorithmMetadata(

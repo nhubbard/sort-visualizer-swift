@@ -179,15 +179,13 @@ struct SortCoordinatorTests {
     #expect(!session.isAutomating)
   }
 
-  /// Regression test for a real, deterministic (not just racy) bug: `runAutomationAndWait`
-  /// used to call the fire-and-forget `runAutomation(_:)` (which only *spawns* a `Task` doing
-  /// the real work) and then immediately `guard isAutomating else { return }` with no
-  /// intervening `await` — a freshly spawned `Task`'s body cannot possibly have run yet at that
-  /// point, so `isAutomating` was always still `false` and this returned instantly, before the
-  /// sweep had done any real work at all. This is exactly what silently skipped almost every
-  /// algorithm in a `RunFullSizeSweepIntent` run, each just flashing `.idle` before the next one
-  /// replaced it. If this regresses, `session.phase` below would still read `.idle` (or
-  /// `.recording`) the instant `runAutomationAndWait` returns, not `.complete`.
+  /// Regression test: `runAutomationAndWait` used to call the fire-and-forget
+  /// `runAutomation(_:)` (which only *spawns* a `Task` doing the real work) and then immediately
+  /// `guard isAutomating else { return }` with no intervening `await` — a freshly spawned
+  /// `Task`'s body cannot possibly have run yet at that point, so `isAutomating` was always still
+  /// `false` and this returned instantly, before the sweep did any real work. If this regresses,
+  /// `session.phase` below would still read `.idle` (or `.recording`) the instant
+  /// `runAutomationAndWait` returns, not `.complete`.
   @Test
   func runAutomationAndWaitDoesNotReturnBeforeTheSweepGenuinelyFinishes() async throws {
     let session = SortSession(

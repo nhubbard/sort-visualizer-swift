@@ -2,14 +2,12 @@ import Foundation
 import SortEngineKit
 import VisualizationKit
 
-/// Direct port of ArrayV's `DisparityChords` — no wave/disp math at all, unlike its three
-/// siblings: one line per index, from that index's own point on the circle (fixed radius, angle
-/// from its *position*) to a second point at the angle corresponding to its *value* (same fixed
-/// radius, angle from the value treated as if it were a position). A sorted array draws every
-/// chord to its near neighbor's angle; a scrambled one draws long chords crossing the circle.
-/// ArrayV already files this one under its "ports cleanly, no extra state" dozen in
-/// `ARCHITECTURE_V2.md` §2A.6 — confirming (per `DisparityBarGraphVisualizer`'s doc comment) that
-/// its siblings do too, despite the doc's own "Disparity family needs `originalIndices`" claim.
+/// Direct port of ArrayV's `DisparityChords` — unlike its siblings, no wave/disp math: one line
+/// per index, from that index's own point on the circle (angle from its *position*) to a second
+/// point at the angle corresponding to its *value*. A sorted array draws short chords to near
+/// neighbors; a scrambled one draws long chords crossing the circle. Confirms (see
+/// `DisparityBarGraphVisualizer`) that the whole Disparity family ports cleanly with no extra
+/// state, despite `ARCHITECTURE_V2.md`'s original claim otherwise.
 public struct DisparityChordsVisualizer: Visualizer {
   public let id = VisualizerID(rawValue: "disparitychords")
   public let metadata = VisualizerMetadata(
@@ -56,8 +54,7 @@ public struct DisparityChordsVisualizer: Visualizer {
     }
   }
 
-  private func color(forIndex index: Int, value: Int, in context: VisualizationContext) -> RGBAColor
-  {
+  private func color(forIndex index: Int, value: Int, in context: VisualizationContext) -> RGBAColor {
     let markers = context.markers[index] ?? []
     if markers.contains(Marker.primary) {
       return Self.primaryColor

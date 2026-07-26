@@ -1,27 +1,18 @@
 import Foundation
 import SwiftData
 
-/// Replaces `Legacy/`'s `RunRecord` + `CloudKitRecordEncoder`/`Decoder` (§3.2 of
-/// ARCHITECTURE_V2.md) — plain SwiftData, synced via `ModelConfiguration(cloudKitDatabase:
-/// .automatic)` rather than a hand-rolled CloudKit encoder or `NSPersistentCloudKitContainer`.
+/// Replaces `Legacy/`'s `RunRecord` + `CloudKitRecordEncoder`/`Decoder` — plain SwiftData, synced
+/// via `ModelConfiguration(cloudKitDatabase: .automatic)` rather than a hand-rolled CloudKit
+/// encoder or `NSPersistentCloudKitContainer`.
 ///
-/// Records the same ArrayV-style operation counters `TapeHeader` already tracks per run — the
-/// point of collecting these across every device signed into the same iCloud account is charting
-/// how they actually grow with array size against the classic Big-O reference curves
-/// (`BigOCorrelation.bigOChartPoints`), not comparing device speed (a prior revision recorded
-/// `deviceModel`/`speed`/`recordingDuration` for that; playback speed no longer reflects device
-/// performance since the replay engine was reworked).
+/// Records the same ArrayV-style operation counters `TapeHeader` already tracks per run, so
+/// growth against the classic Big-O reference curves (`BigOCorrelation.bigOChartPoints`) can be
+/// charted across every device signed into the same iCloud account — not for comparing device
+/// speed, since `speed` is now a fixed pacing target the user dials in, not a device measurement.
 ///
-/// `recordingDuration`/`playbackDuration`/`playbackSpeed` below are a DIFFERENT thing from that
-/// removed `speed`/`deviceModel` pair, not a reversal of the same decision: those were removed
-/// because comparing wall-clock speed *across devices* stopped being meaningful once `speed`
-/// became a fixed operations-per-second target the user dials in, rather than a measurement of
-/// how fast a given device could go. Recording-vs-playback duration on the SAME run, on the SAME
-/// device, is meaningful regardless of that — it's exactly the "the algorithm itself is fast, but
-/// watching it is slow" gap this app wants to be able to show off, and `playbackSpeed` is stored
-/// alongside `playbackDuration` only so a later reader knows how much *pacing target* that
-/// duration was measured against (a duration alone doesn't say how much work `speed` was told to
-/// get through).
+/// `recordingDuration`/`playbackDuration`/`playbackSpeed` capture the "algorithm is fast but
+/// watching it is slow" gap on a single run/device; `playbackSpeed` is stored alongside
+/// `playbackDuration` so a reader knows what pacing target that duration was measured against.
 ///
 /// Every property has a default value even though `AnalyticsService.record(...)` always supplies
 /// real ones — CloudKit-backed SwiftData models require every attribute to have a default (or be

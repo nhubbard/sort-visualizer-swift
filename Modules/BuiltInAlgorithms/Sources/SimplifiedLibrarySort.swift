@@ -1,28 +1,19 @@
 import AlgorithmKit
 import SortEngineKit
 
-/// Ported from ArrayV's `io.github.arrayv.sorts.insert.SimplifiedLibrarySort` — "Library Sort"
-/// (aka gapped insertion sort), named for how librarians shelve books with empty gaps between them
-/// so that inserting a new book rarely requires reshuffling the whole shelf.
+/// Ported from ArrayV's `SimplifiedLibrarySort` — gapped insertion sort ("Library Sort"): a sorted
+/// "spine" of `j` elements with empty gaps between them, so new elements rarely require reshuffling
+/// the whole array.
 ///
-/// The algorithm keeps a sorted "spine" of `j` elements and repeatedly absorbs a batch of up to
-/// `R * j - j` further elements: each new element is binary-searched against the spine to find
-/// which of the `j + 1` gaps (before the first spine element, between two spine elements, or after
-/// the last one) it belongs in, and that classification (`loc`) is tallied per-gap in `cnts` and
-/// remembered per-element in `locs`. Once the batch fills up (`R * j == i`), `rebalance` runs: a
-/// partial sum over `cnts` turns per-gap counts into per-gap starting offsets, every spine element
-/// and every classified batch element is written into a `temp` buffer at its gap's offset (so each
-/// gap ends up containing exactly one spine element preceded by however many batch elements landed
-/// in it), `temp` is copied back over the live array, and each gap's run of batch elements — not
-/// yet in relative order against each other, only correctly bucketed — is locally sorted with a
-/// range-scoped binary insertion sort. The spine then grows to `j = i` and the process repeats until
-/// the whole array has been absorbed, with one final `rebalance` call after the loop to flush the
-/// last partial batch.
+/// Each new element is binary-searched against the spine to find its gap, tallied per-gap in
+/// `cnts`. Once a batch of `R * j - j` elements fills up, `rebalance` runs: gap counts become gap
+/// offsets via partial sum, spine + batch elements are written into a `temp` buffer at their gap's
+/// offset, `temp` is copied back over the live array, and each gap's batch run is locally sorted.
+/// The spine then grows to `j = i` and the process repeats.
 ///
-/// Arrays shorter than 32 elements skip the gap machinery entirely and fall back to a single
-/// whole-range binary insertion sort, exactly as ArrayV's own `length < 32` special case does — so
-/// `metadata.sizeRange`'s lower bound is kept at (or above) 32 to guarantee the gap-based logic this
-/// port exists to demonstrate is actually exercised.
+/// Arrays under 32 elements skip the gap machinery and fall back to a single binary insertion sort,
+/// matching ArrayV's own `length < 32` special case — `sizeRange`'s lower bound stays at 32 so the
+/// gap logic is actually exercised.
 public struct SimplifiedLibrarySort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "simplifiedlibrarysort")
   public let metadata = AlgorithmMetadata(

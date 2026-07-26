@@ -1,17 +1,13 @@
 import SortEngineKit
 import VisualizationKit
 
-/// Ported from ArrayV's `HoopStack` (misc family): every position is drawn as a wide, flat
-/// ellipse ("hoop") stacked vertically down the canvas by INDEX, all horizontally centered, with
-/// the hoop's SIZE — not its position — encoding that position's VALUE. Bigger value, bigger
-/// hoop; a hoop never shrinks to nothing even at the lowest value, so the stack always reads as a
-/// full column of rings.
+/// Port of ArrayV's `HoopStack` (misc family): each position is a wide flat ellipse stacked
+/// vertically by index, with the ellipse's SIZE (not position) encoding that position's VALUE. A
+/// hoop never shrinks to nothing even at the lowest value.
 ///
-/// `DrawCommand.ellipse` is always filled in this codebase (rendered via `GraphicsContext.fill`,
-/// same as every other visualizer) — there's no stroked/outline-only primitive like ArrayV's
-/// `drawOval`, so unlike the original, overlapping hoops here occlude each other. Drawn back to
-/// front from index `n-1` down to `0` (matching ArrayV's own draw order) so earlier indices paint
-/// on top of later ones.
+/// `DrawCommand.ellipse` is always filled here (no stroked/outline-only primitive like ArrayV's
+/// `drawOval`), so overlapping hoops occlude each other. Drawn back to front from index `n-1` down
+/// to `0`, matching ArrayV's own draw order, so earlier indices paint on top.
 public struct HoopStackVisualizer: Visualizer {
   public let id = VisualizerID(rawValue: "hoopstack")
   public let metadata = VisualizerMetadata(
@@ -68,8 +64,7 @@ public struct HoopStackVisualizer: Visualizer {
   }
 
   private func color(forIndex index: Int, in context: VisualizationContext, normalized: Double)
-    -> RGBAColor
-  {
+    -> RGBAColor {
     let markers = context.markers[index] ?? []
     if markers.contains(Marker.primary) {
       return Self.primaryColor

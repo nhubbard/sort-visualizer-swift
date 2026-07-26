@@ -71,14 +71,11 @@ struct MetalRendererView: UIViewRepresentable {
     // `stepIndex` itself moved, which switching visualizers alone doesn't change, but the new
     // renderer's buffer still needs its own first full seed.
     context.coordinator.switchVisualizerIfNeeded(to: visualizerID, view: view)
-    // Catches a scrub/seek (`stepIndex` changing without `onOperationApplied` ever firing,
-    // by `ReplayEngine`'s own design) — normal incremental playback is a no-op here, since
-    // `trackedStepIndex` already matches by the time this runs. Resize is handled separately,
-    // by `MetalBarRenderer.onDrawableSizeChange` below — `view.drawableSize` can still be
-    // `.zero` the first several times this is called, before real layout ever happens, with
-    // no guarantee SwiftUI calls `updateUIView` again once it becomes valid; the dedicated
-    // resize callback is the only signal that's actually guaranteed to fire when a real size
-    // shows up.
+    // Catches a scrub/seek (`stepIndex` changing without `onOperationApplied` firing, by
+    // `ReplayEngine`'s design) — a no-op during normal playback since `trackedStepIndex` already
+    // matches. Resize is handled separately by `onDrawableSizeChange`: `view.drawableSize` can
+    // still be `.zero` here before real layout happens, with no guarantee `updateUIView` runs
+    // again once it becomes valid.
     context.coordinator.reconcileStepIndexIfNeeded()
   }
 
@@ -132,8 +129,7 @@ struct MetalRendererView: UIViewRepresentable {
     }
 
     #if targetEnvironment(macCatalyst)
-      private static func systemBackgroundClearColor(for colorScheme: ColorScheme) -> MTLClearColor
-      {
+      private static func systemBackgroundClearColor(for colorScheme: ColorScheme) -> MTLClearColor {
         let trait = UITraitCollection(userInterfaceStyle: colorScheme == .light ? .light : .dark)
         let resolved = UIColor.systemBackground.resolvedColor(with: trait)
         var red: CGFloat = 0
@@ -174,17 +170,11 @@ struct MetalRendererView: UIViewRepresentable {
         // step.
         self.view?.setNeedsDisplay()
 
-        // The operation that reaches natural completion gets a forced, SYNCHRONOUS extra
-        // draw right here, on top of the routine `setNeedsDisplay()` above — a real,
-        // reported bug: a long monotonic run of single-index writes at the very end of
-        // playback (Counting Sort's final pass writes index 0, 1, 2, ... in order) could
-        // still be showing a stale tail of pre-final-write values on screen even though
-        // the instance buffer itself is already fully correct, until something unrelated
-        // (e.g. a sidebar toggle resizing the view) forced a fresh full redraw. Exactly one
-        // extra `view.draw()` per run, right at completion, costs nothing during normal
-        // fast playback and removes any dependency on `setNeedsDisplay()`'s coalesced,
-        // deferred scheduling actually landing one more time before nothing else ever
-        // prompts this view to redraw again.
+        // Forces a synchronous extra draw when playback reaches natural completion, on top of
+        // the routine `setNeedsDisplay()` above: a long monotonic run of single-index writes at
+        // the very end (e.g. Counting Sort's final pass) could leave a stale tail on screen even
+        // though the instance buffer is already fully correct, since nothing else was guaranteed
+        // to trigger another redraw. Costs nothing during normal playback.
         if replay.stepIndex >= replay.totalOperationCount {
           self.view?.draw()
         }

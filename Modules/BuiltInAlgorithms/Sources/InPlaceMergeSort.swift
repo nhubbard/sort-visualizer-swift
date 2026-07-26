@@ -1,39 +1,28 @@
 import AlgorithmKit
 import SortEngineKit
 
-/// ArrayV's `sorts/merge/InPlaceMergeSort.java` (not `ImprovedInPlaceMergeSort.java`, a different
-/// algorithm) — plain Merge Sort's divide-and-conquer shape, but the merge step never allocates an
-/// O(n) auxiliary buffer. Instead, whenever a left-run element is found to be greater than the
-/// right run's leading element, the two are swapped and the (now out-of-place, formerly-left)
-/// element is bubbled rightward through the remainder of the right run via `push` — a single
-/// left-to-right adjacent-swap pass — until it lands in its correct sorted position. This trades
-/// `MergeSort`'s O(n) space for an asymptotically worse merge step: `push` can rescan up to the
-/// entire right run on every out-of-order left element, making the merge itself O(run sizes
-/// multiplied together) in the worst case rather than the usual linear merge.
+/// ArrayV's `InPlaceMergeSort` (not `ImprovedInPlaceMergeSort`, a different algorithm) — Merge
+/// Sort's divide-and-conquer shape, but the merge never allocates an O(n) buffer: whenever a
+/// left-run element exceeds the right run's leading element, the two are swapped and the displaced
+/// element is bubbled rightward through the remainder of the right run via `push` until it lands
+/// correctly. This trades `MergeSort`'s O(n) space for an asymptotically worse merge: `push` can
+/// rescan up to the entire right run per out-of-order element.
 public struct InPlaceMergeSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "inplacemergesort")
   public let metadata = AlgorithmMetadata(
     displayName: "In-Place Merge Sort",
     category: .merge,
     sizeRange: 16...256,
-    // Not stable, despite superficially resembling a textbook (stable) merge. `merge`'s swaps
-    // are positional — driven by the fixed index `mid + 1`, not by tracking "the right run's
-    // current front element" — so `push` can walk a duplicate value past another occurrence of
-    // the same value at a different recursion level without the two ever being compared
-    // directly against each other. Verified empirically: tagging each element with its
-    // original index and sorting duplicates shows equal elements landing out of their original
-    // relative order after a few levels of recursive merging.
+    // Not stable, despite resembling a textbook (stable) merge: `merge`'s swaps are positional
+    // (driven by the fixed index `mid + 1`), so `push` can walk a duplicate past another
+    // occurrence of the same value at a different recursion level without the two ever being
+    // compared directly.
     stable: false,
-    // Best case (already-sorted input): every left element is already <= the right run's
-    // leading element, so `merge` never swaps and `push` never runs — just the usual
-    // O(n log n) compare-only pass down the recursion. Average/worst case: `push` turns each
-    // merge into effectively an insertion-sort-style shift across the two runs being combined,
-    // so summed across the recursion this is O(n^2), not O(n log n) — verified empirically:
-    // at n = 512 this algorithm performs roughly as many compares/swaps as Bubble Sort's
-    // worst case, not plain Merge Sort's ~n log n.
+    // Best case (already-sorted): merge never swaps, push never runs, O(n log n). Average/worst:
+    // push turns each merge into an insertion-sort-style shift across the two runs, so summed
+    // across the recursion this is O(n^2), not O(n log n).
     timeComplexity: ComplexityBounds(best: "O(n log n)", average: "O(n^2)", worst: "O(n^2)"),
-    // No aux array is ever created — the merge works by swapping and bubbling elements
-    // within the array itself. The only extra memory is the recursion stack.
+    // No aux array — the merge swaps and bubbles within the array itself.
     spaceComplexity: "O(log n)",
     iconName: "rectangle.compress.vertical"
   )

@@ -6,17 +6,14 @@ import SettingsKit
 import SortFeature
 import SwiftUI
 
-/// Phase 9's data-driven navigation (§4.4 of ARCHITECTURE_V2.md) — the sidebar/content columns are
-/// generated directly from `AlgorithmRegistry.shared.algorithms(in:)`, sectioned by
-/// `AlgorithmCategory`. Adding a new algorithm from here on is "drop a `.js` + manifest pair in
-/// `Algorithms/`," with zero changes to this file — `Page.swift`'s five parallel hand-maintained
-/// switches are gone.
+/// Sidebar/content columns are generated directly from `AlgorithmRegistry.shared.algorithms(in:)`,
+/// sectioned by `AlgorithmCategory` — registering a new algorithm requires no changes to this
+/// file.
 ///
-/// Two-tier `NavigationSplitView` (category sidebar → algorithm content → detail), not the single
-/// collapsible-`Section`-per-category `List` this had before: that toggle-driven collapse was too
-/// small a target on touch, mildly annoying on Mac, and interacted badly with `.searchable` (a
-/// match inside a collapsed category had to force it open, which looked like it was fighting the
-/// user's own tap). A real content column gets that behavior for free from stock split-view
+/// Two-tier `NavigationSplitView` (category sidebar → algorithm content → detail), not a single
+/// collapsible-`Section`-per-category `List`: that toggle-driven collapse was a small touch
+/// target, was annoying on Mac, and fought `.searchable` (a match inside a collapsed category had
+/// to force it open). A content column gets that behavior for free from stock split-view
 /// navigation.
 struct ContentView: View {
   // `SortCoordinator.shared`, not local `@State` — App Intents (`RunSortIntent`/
@@ -222,13 +219,11 @@ struct ContentView: View {
     return advanceShowcase
   }
 
-  /// Distinct from `showcaseCompletionHandler` above: that one fires when the current
-  /// algorithm's pass finishes *on its own* (advance to the next one); this fires when the user
-  /// asks to stop early, from the "Stop" button embedded in `SortView`'s automation banner —
-  /// which `session.isAutomating` also shows during a Showcase pass (it's driven by the same
-  /// `SortSession.runAutomation(sizes:runsPerSize:)` machinery under the hood), but whose button
-  /// used to call `session.stopAutomation()`, a complete no-op here since Showcase never goes
-  /// through `SortSession.automationTask` (see `runShowcasePass()`'s own doc comment).
+  /// Distinct from `showcaseCompletionHandler`: that fires when the current algorithm's pass
+  /// finishes on its own; this fires when the user stops early via `SortView`'s automation banner
+  /// Stop button. That button calls this rather than `session.stopAutomation()`, which would be a
+  /// no-op here since Showcase never goes through `SortSession.automationTask` (see
+  /// `runShowcasePass()`).
   private var showcaseStopHandler: (() -> Void)? {
     guard showcaseIndex != nil else { return nil }
     return stopShowcase
@@ -237,8 +232,7 @@ struct ContentView: View {
   private var detailContent: some View {
     Group {
       if let selection = coordinator.selectedAlgorithmID,
-        let algorithm = AlgorithmRegistry.shared.algorithm(id: selection)
-      {
+        let algorithm = AlgorithmRegistry.shared.algorithm(id: selection) {
         ScrollingSortView(
           algorithm: algorithm, shuffle: effectiveShuffle(for: selection), arraySize: arraySize,
           showcaseCompletion: showcaseCompletionHandler, showcaseStop: showcaseStopHandler
@@ -343,14 +337,13 @@ struct ContentView: View {
   }
 
   /// `AlgorithmRegistry`/`ShuffleRegistry` are populated synchronously in `Sort2App.init()`,
-  /// before this view can ever appear — a missing lookup here means the bundled resources are
-  /// broken, which should fail loudly in development rather than silently falling back.
+  /// before this view can appear — a missing lookup means bundled resources are broken, so this
+  /// fails loudly rather than falling back silently.
   ///
-  /// Checks `coordinator.pendingShuffleOverride(for:)` first — a `RunSortIntent` requesting a
-  /// specific shuffle for this one run. `shuffle` is a one-shot `SortSession`/`ScrollingSortView`
-  /// constructor argument, fixed for that session's whole lifetime, so this has to be resolved
-  /// here, before construction, rather than inside `ScrollingSortView.task` like the rest of a
-  /// pending intent action.
+  /// Checks `coordinator.pendingShuffleOverride(for:)` first, for a `RunSortIntent` requesting a
+  /// specific shuffle for this run. `shuffle` is a one-shot constructor argument fixed for the
+  /// session's lifetime, so it must be resolved here before construction, not inside
+  /// `ScrollingSortView.task` like the rest of a pending intent action.
   private func effectiveShuffle(for algorithmID: AlgorithmID) -> any ShuffleAlgorithm {
     let shuffleID =
       coordinator.pendingShuffleOverride(for: algorithmID) ?? AppSettings.shared.defaultShuffleID

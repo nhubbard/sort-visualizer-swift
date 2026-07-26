@@ -17,23 +17,16 @@ struct MetalShapeInstance {
 }
 
 /// Per-visualizer geometry contract for `MetalShapeRenderer<Self>` — mirrors that `Visualizer`'s
-/// own `draw(_:) -> [DrawCommand]` math almost line for line, just computing one GPU instance at a
-/// time instead of appending to an array, and in POINTS (matching every `Visualizer`'s own
-/// `context.canvasSize` convention) rather than pixels — `MetalShapeRenderer` converts to pixel
-/// space generically, the same way `MetalBarRenderer` does, so ported math doesn't have to.
+/// own `draw(_:) -> [DrawCommand]` math, computing one GPU instance at a time in POINTS (matching
+/// `Visualizer.context.canvasSize`); `MetalShapeRenderer` converts to pixel space generically.
 ///
-/// Separates "which array index feeds this instance" (`arrayIndex(forSlot:)`) from "which
-/// instance(s) does this array index touch" (`slots(forIndex:)`) because most visualizers have a
-/// 1:1 index-to-instance mapping (the defaults below), but two don't: `PixelMeshMetalLayout`
-/// resamples `values.count` indices across a differently-sized grid of cells, and
-/// `HoopStackMetalLayout` reverses draw order so index 0 paints last (on top) — both still need
-/// true O(touched) incremental `apply`, not a full `reset`, which requires knowing the exact
-/// instance slot(s) a changed index maps to instead of assuming slot == index.
+/// `arrayIndex(forSlot:)`/`slots(forIndex:)` are separate because most visualizers are 1:1 (the
+/// defaults below), but `PixelMeshMetalLayout` resamples indices across a differently-sized grid
+/// and `HoopStackMetalLayout` reverses draw order — both need the exact slot(s) a changed index
+/// maps to for incremental `apply`.
 ///
-/// Deliberately NOT `@MainActor` — every requirement is a pure value computation with no Metal/UI
-/// state, called from `MetalShapeRenderer`'s already-`@MainActor` methods either way, and leaving
-/// it unisolated lets `MetalShapeLayoutTests` call these directly, synchronously, with no actor
-/// hop needed to test math that never touches actor-isolated state in the first place.
+/// Deliberately NOT `@MainActor`: pure value computation, so `MetalShapeLayoutTests` can call it
+/// directly without an actor hop.
 protocol MetalShapeLayout {
   static var shapeKind: MetalShapeKind { get }
 

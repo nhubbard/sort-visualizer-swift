@@ -88,8 +88,7 @@ private struct FakeRotateShuffle: ShuffleAlgorithm {
 }
 
 @MainActor
-private func waitUntilTerminal(_ session: SortSession, timeout: Duration = .seconds(5)) async throws
-{
+private func waitUntilTerminal(_ session: SortSession, timeout: Duration = .seconds(5)) async throws {
   let deadline = ContinuousClock.now + timeout
   while ContinuousClock.now < deadline {
     switch session.phase {
@@ -235,17 +234,14 @@ struct SortSessionTests {
       "ReplayEngine should deallocate once nothing outside it holds a reference, even mid-playback")
   }
 
-  /// Regression test for the pause/resume redesign: pausing mid-replay must not prematurely
-  /// flip `phase` to `.complete` (the old one-shot "await the first playbackTask" design would
-  /// have, since a cancelled task's `.value` still resolves), and resuming must continue from
-  /// where it left off rather than restarting or getting stuck.
+  /// Regression test for the pause/resume redesign: pausing mid-replay must not prematurely flip
+  /// `phase` to `.complete` (the old one-shot "await the first playbackTask" design would have,
+  /// since a cancelled task's `.value` still resolves), and resuming must continue from where it
+  /// left off rather than restarting or getting stuck.
   ///
-  /// Drives a `ManualTickDriver` directly instead of sleeping and hoping enough real
-  /// `CADisplayLink` ticks land in the window — this test used to sleep 50ms at `speed: 20`
-  /// (1 op/50ms) and assert `stepIndexAtPause > 0`, which depended on a real display link
-  /// ticking at least once in that window. In this module's host-less `.unitTests` bundle a real
-  /// `CADisplayLink` has no guaranteed tick latency, so that assertion failed outright rather
-  /// than flaking occasionally — the fix is determinism, not a longer sleep.
+  /// Drives a `ManualTickDriver` directly instead of sleeping and hoping real `CADisplayLink`
+  /// ticks land in the window — this module's host-less `.unitTests` bundle gives no guaranteed
+  /// tick latency, so timing-dependent assertions need a deterministic driver instead.
   @Test
   func pausingThenResumingReachesCompletionWithoutLosingProgress() async throws {
     let settings = makeFastSettings()
@@ -415,7 +411,7 @@ struct SortSessionTests {
   @Test(arguments: [
     FakeIdentityShuffle() as any ShuffleAlgorithm,
     FakeReverseShuffle() as any ShuffleAlgorithm,
-    FakeRotateShuffle() as any ShuffleAlgorithm,
+    FakeRotateShuffle() as any ShuffleAlgorithm
   ])
   func replayingConcatenatedTapeProducesSortedFrameRegardlessOfShuffle(
     shuffle: any ShuffleAlgorithm

@@ -1,32 +1,17 @@
 import AlgorithmKit
 import SortEngineKit
 
-/// ArrayV's `CircleSortRecursive` (`sorts/exchange/CircleSortRecursive.java`), built on the shared
-/// `sorts/templates/CircleSorting.java` base that ``CircleSortIterative`` (if/when ported) also
-/// extends. Both siblings share the same fundamental idea — a symmetric compare-and-swap pass that
-/// converges a range's two ends toward its middle — but this one reaches the next level down via
-/// genuine recursion into the two resulting half-ranges, rather than the iterative version's
-/// explicit nested `gap`/`start` loop structure.
+/// ArrayV's `CircleSortRecursive` — like ``CircleSortIterative``, a symmetric compare-and-swap pass
+/// converging a range's two ends toward its middle, but reached via genuine recursion into the two
+/// half-ranges instead of an iterative `gap`/`start` loop.
 ///
-/// Like the iterative sibling, the recursion's working size (`n`, the initial `hi` bound passed to
-/// ``circleSortRoutine``) is padded up to the next power of two at or above the real array length
-/// (`end`), while every actual array access — both the compare/swap itself and the decision to
-/// recurse into the second half — stays guarded against `end`. Two guards matter here, both ported
-/// exactly from ArrayV's `CircleSorting.circleSortRoutine`:
-/// - `hi < end` gates only the compare-and-swap, not the convergence loop itself, so `lo`/`hi` keep
-///   marching toward the middle (and `mid` keeps being computed from their original span) even
-///   while `hi` still points past the real array.
-/// - `low + mid + 1 < end` gates whether the *second* half is even worth recursing into — mirroring
-///   ArrayV's own asymmetry: the first half `[low, low + mid]` is always recursed into, but the
-///   second half `[low + mid + 1, high]` is skipped entirely once it would start beyond `end`.
+/// The recursion's working size is padded up to the next power of two above the real array length
+/// (`end`), while every actual access stays guarded against `end`. Two asymmetric guards matter:
+/// `hi < end` gates only the compare-and-swap, not the convergence loop itself, so `lo`/`hi` keep
+/// marching even while `hi` points past the real array; `low + mid + 1 < end` gates whether the
+/// *second* half is even recursed into — the first half is always recursed into regardless.
 ///
-/// One pass is a full top-to-bottom recursive sweep; ArrayV's `runSort` repeats that sweep
-/// (`do { ... } while (numberOfSwaps != 0)`) until a sweep performs zero swaps, at which point the
-/// array is sorted. `circleSortRoutine`'s own swap-count return value is a plain running total —
-/// unlike ArrayV's Java, which threads an accumulator parameter through both recursive calls, this
-/// port sums the while-loop's own count with both recursive calls' returned counts directly, which
-/// is arithmetically identical (addition doesn't care which side already had which partial sum) and
-/// avoids an extra parameter with no behavioral difference.
+/// One pass is a full recursive sweep; `runSort` repeats sweeps until one performs zero swaps.
 public struct CircleSortRecursive: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "circlesortrecursive")
   public let metadata = AlgorithmMetadata(

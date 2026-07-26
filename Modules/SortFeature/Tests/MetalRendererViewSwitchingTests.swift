@@ -7,14 +7,12 @@ import VisualizationKit
 @testable import SortEngineKit
 @testable import SortFeature
 
-/// Regression coverage for a real, reported bug: `.id(ObjectIdentifier(replay))` at
-/// `SortView.canvas(for:)`'s call site keeps `MetalRendererView`'s `Coordinator`/`MTKView` alive
-/// across a mid-sort visualizer switch (⌘⇧V, or the Settings picker) — only a genuinely NEW
-/// `replay` tears them down. That means `updateUIView` is the only place that can ever learn the
-/// visualizer changed, and it used to not check at all: the renderer built for whichever
-/// visualizer was active when `makeUIView` first ran just stayed wired forever, silently ignoring
-/// every later switch. Fixed by `Coordinator.switchVisualizerIfNeeded`; verified here directly
-/// against the `Coordinator`, without needing a live window/screen.
+/// Regression coverage: `.id(ObjectIdentifier(replay))` at `SortView.canvas(for:)`'s call site
+/// keeps `MetalRendererView`'s `Coordinator`/`MTKView` alive across a mid-sort visualizer switch
+/// (⌘⇧V, or the Settings picker) — only a genuinely new `replay` tears them down, so
+/// `updateUIView` is the only place that can learn the visualizer changed. Fixed by
+/// `Coordinator.switchVisualizerIfNeeded`; verified here directly against the `Coordinator`,
+/// without needing a live window/screen.
 @Suite
 struct MetalRendererViewSwitchingTests {
   @MainActor

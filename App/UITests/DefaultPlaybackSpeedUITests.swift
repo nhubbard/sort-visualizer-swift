@@ -1,20 +1,12 @@
 import XCTest
 
 /// The global default speed feeds every *new* session's starting `ReplayEngine.speed`
-/// (`SortSession.startReplay`) — proven end-to-end here by setting it directly via
-/// `UI_TEST_PLAYBACK_SPEED` (see `Sort2App.init()`), then opening a fresh sort and reading the
-/// run-control bar's own speed readout, rather than only checking `AppSettings` in isolation
-/// (`AppSettingsTests` already covers that).
-///
-/// Deliberately does NOT drive this through the Settings screen's slider via
-/// `XCUIElement.adjust(toNormalizedSliderPosition:)` — that's a coordinate-based drag gesture, and
-/// it lands at a genuinely different actual value practically every run (observed landing
-/// anywhere from ~48 to ~61 when asked to land near 30 across otherwise-identical runs), which is
-/// exactly the kind of flakiness a test asserting an EXACT seeded value can't tolerate. The
-/// launch-environment override mutates the same underlying `AppSettings.playbackSpeed`/
-/// `UserDefaults` value a real drag would, just exactly and deterministically — this test's job is
-/// proving the settings-to-new-session data flow, not re-proving the slider's own gesture
-/// handling (which no other test exercises, but isn't this test's concern either).
+/// (`SortSession.startReplay`) — set here via `UI_TEST_PLAYBACK_SPEED` (see `Sort2App.init()`)
+/// rather than through the Settings slider: `XCUIElement.adjust(toNormalizedSliderPosition:)` is a
+/// coordinate-based drag that lands at a different actual value nearly every run (observed ~48-61
+/// when targeting 30), which an exact-value assertion can't tolerate. The launch-environment
+/// override mutates the same `AppSettings.playbackSpeed`/`UserDefaults` value a real drag would,
+/// just deterministically.
 @MainActor
 final class DefaultPlaybackSpeedUITests: XCTestCase {
   override func setUpWithError() throws {

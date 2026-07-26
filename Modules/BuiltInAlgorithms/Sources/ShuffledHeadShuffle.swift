@@ -1,18 +1,14 @@
 import AlgorithmKit
 import SortEngineKit
 
-/// Ported from ArrayV's `Shuffles.SHUFFLED_HEAD` — the mirror image of `ShuffledTailShuffle`,
-/// scanning from the back instead of the front. About 6/7 of the elements stay compacted at the
-/// back in their original relative order; the rest are set aside and copied to the front, then
-/// shuffled among themselves.
+/// Ported from ArrayV's `Shuffles.SHUFFLED_HEAD` — mirror of `ShuffledTailShuffle`, scanning from
+/// the back. About 6/7 of elements stay compacted at the back in original relative order; the rest
+/// are set aside, copied to the front, and shuffled among themselves.
 ///
-/// Faithfully ported including a real off-by-one quirk in ArrayV's own source: the final shuffle
-/// call covers one fewer position than the number of elements actually copied to the front
-/// (`shuffle(array, 0, j)` where `j` ends up one less than the aux count, rather than `j + 1`), so
-/// the very last of the set-aside elements never actually participates in the shuffle. This doesn't
-/// break the array-length or permutation invariants (unlike a real crash bug, which this codebase
-/// does fix when found — see e.g. `DoubleInsertionSort`'s doc comment), so it's preserved as-is
-/// rather than silently corrected.
+/// Preserves a real off-by-one in ArrayV's source: the final shuffle call covers one fewer position
+/// than the number of elements copied to the front, so the last set-aside element never
+/// participates in the shuffle. Harmless (doesn't break length/permutation invariants), so left
+/// as-is.
 public struct ShuffledHeadShuffle: ShuffleAlgorithm {
   public let id = ShuffleID(rawValue: "shuffledhead")
   public let metadata = ShuffleMetadata(displayName: "Scrambled Head")

@@ -20,14 +20,11 @@ public actor AnalyticsService {
     self.modelContext = ModelContext(modelContainer ?? Self.makeDefaultContainer())
   }
 
-  /// `playbackDuration`/`playbackSpeed` aren't on `TapeHeader` itself (unlike `recordingDuration`,
-  /// which is baked in at recording time) — `TapeHeader`/`Tape` are fully immutable (every field
-  /// a `let`), and a playback duration isn't knowable until playback actually finishes, well
-  /// after the header already exists. `SortSession`'s `monitorTask` is the only caller, and it
-  /// already has `replay.elapsedPlaybackDuration`/`replay.speed` in hand at the exact moment it
-  /// observes genuine completion, so those are passed straight through here instead — both
-  /// default to `nil`, so recording without a playback in progress (e.g. a caller that only
-  /// ever runs `RecordingEngine`, never `ReplayEngine`) needs no dummy values.
+  /// `playbackDuration`/`playbackSpeed` aren't on `TapeHeader` itself: `TapeHeader`/`Tape` are
+  /// fully immutable, and playback duration isn't knowable until playback finishes, well after
+  /// the header already exists. `SortSession.monitorTask` passes `replay.elapsedPlaybackDuration`/
+  /// `replay.speed` straight through instead; both default to `nil` so a caller that only runs
+  /// `RecordingEngine` (never `ReplayEngine`) needs no dummy values.
   public func record(
     _ header: TapeHeader, algorithmID: AlgorithmID,
     playbackDuration: TimeInterval? = nil, playbackSpeed: Double? = nil
@@ -50,14 +47,11 @@ public actor AnalyticsService {
     try modelContext.save()
   }
 
-  /// Fired only from an automation/sweep run (`SortSession.start(size:)`, `isAutomating ==
-  /// true`) whose recording hit `RecordingEngine`'s operation cap — a manual run shows the skip
-  /// reason directly in the UI instead, so it doesn't also need a record here. Deliberately
-  /// write-only: unlike `record(...)` above, no public fetch accessor exists for
-  /// `RecordingCapExceededRecord` — nothing in the app ever reads one back. These exist purely
-  /// for reviewing later, across every device signed into the same iCloud account, which
-  /// algorithm/size combinations are tripping the cap so `sizeRange` (or the algorithm itself)
-  /// can be adjusted by hand, the same way some Bogo-family algorithms already were.
+  /// Fired only from an automation/sweep run whose recording hit `RecordingEngine`'s operation
+  /// cap — a manual run shows the skip reason directly in the UI instead. Deliberately
+  /// write-only: no public fetch accessor exists for `RecordingCapExceededRecord`. These records
+  /// exist purely so cap-tripping algorithm/size combinations can be reviewed later (across every
+  /// device on the same iCloud account) and have their `sizeRange` adjusted by hand.
   public func recordCapExceeded(
     algorithmID: AlgorithmID, arraySize: Int, cap: Int,
     compareCount: Int, swapCount: Int, mainWriteCount: Int, auxWriteCount: Int

@@ -1,8 +1,7 @@
-// This file's `Node`/`AudioEngine` shape is modeled on AudioKit (github.com/AudioKit/AudioKit),
-// trimmed to the one thing this module needs — attaching a single terminal node's underlying
-// `AVAudioNode` to an `AVAudioEngine`'s mixer — rather than AudioKit's general dynamic node graph
-// (`connections`, `bypass`, MIDI scheduling), which this module never needs since it only ever has
-// one linear chain (`Oscillator` feeding `AmplitudeEnvelope`). See this module's NOTICE.md.
+// This file's `Node`/`AudioEngine` shape is modeled on AudioKit, trimmed to the one thing this
+// module needs — attaching a single terminal node's `AVAudioNode` to an `AVAudioEngine`'s mixer —
+// rather than AudioKit's general dynamic node graph (`connections`, `bypass`, MIDI scheduling),
+// since this module only ever has one linear chain. See NOTICE.md.
 //
 // Used under the MIT License:
 //

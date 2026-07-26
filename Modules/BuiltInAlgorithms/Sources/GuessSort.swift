@@ -14,18 +14,13 @@ public struct GuessSort: SortAlgorithm {
   )
   public init() {}
 
-  /// Already fully deterministic in ArrayV — the "plain" ancestor `OptimizedGuessSort`/
-  /// `SmartGuessSort` both grew out of. Same base-`n` odometer, but validity is checked
-  /// differently: rather than an adjacent-pair-with-tie-break scan, this brute-force-counts, for
-  /// every ordered pair `(i, j)`, both whether `loops[i] == loops[j]` (catching a non-permutation
-  /// mapping — an index used twice always contributes at least the `n` expected self-pairs, plus
-  /// more if genuinely duplicated) and whether reading through `loops` produces an inversion in
-  /// EITHER direction. The mapping is accepted only when both counts land at exactly `n` — unlike
-  /// the other three, no tie-break on equal values is enforced (accepting any relative order among
-  /// ties, matching the original's lack of one). Unlike the others, this never stops early: it
-  /// walks the *entire* `n^n` space and keeps whichever valid mapping it saw last, so the final
-  /// answer can depend on which tie-order the odometer happened to reach last — still correct,
-  /// since any valid mapping sorts the array.
+  /// The "plain" ancestor `OptimizedGuessSort`/`SmartGuessSort` both grew out of — already fully
+  /// deterministic in ArrayV. Same base-`n` odometer, but validity is checked by brute-force
+  /// counting, over every ordered pair `(i, j)`, both `loops[i] == loops[j]` (catches a
+  /// non-permutation mapping) and inversions in either direction; a mapping is accepted only when
+  /// both counts equal `n`. Unlike the other Guess Sort variants, no tie-break on equal values is
+  /// enforced, and it never stops early — it walks the entire `n^n` space and keeps the last valid
+  /// mapping seen, which is still correct since any valid mapping sorts the array.
   public func record(into engine: inout RecordingEngine) {
     let n = engine.count
     guard n > 1 else { return }

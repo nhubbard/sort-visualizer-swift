@@ -69,21 +69,13 @@ public struct SortView: View {
       "Automating: size \(session.arraySize) (\(progress.sizeIndex + 1)/\(progress.sizeCount)) · run \(progress.runIndex + 1)/\(progress.runCount)"
   }
 
-  /// `.idle`/`.recording`/`.ready` used to unconditionally show a bare `ProgressView()` here —
-  /// correct for the very first run (there's nothing else to show yet), but for every run after
-  /// that, `start(size:)` passes through this same gap on every single call, unmounting the
-  /// canvas for a spinner and remounting a freshly-built one moments later. Reported as a visible
-  /// flash between runs during Size Sweep automation, most noticeable at small array sizes
-  /// (where a run finishes fast enough that this fixed-cost gap is a large fraction of what's on
-  /// screen). Falling back to `session.lastReplay` — the previous run's now-frozen final frame —
-  /// instead keeps the canvas mounted and showing *something real* through the gap; `ProgressView`
-  /// only ever appears once, before the first run has produced a replay at all. `RunControlBar` is
-  /// kept mounted here too (it already goes `.disabled(session.isAutomating)` on its own) — an
-  /// earlier version dropped it in this branch, which meant `.safeAreaInset(edge: .bottom)`
-  /// itself came and went every automation iteration; the `MTKView` growing into that space for
-  /// the gap's duration, faster than its renderer's on-demand redraw could catch up, produced a
-  /// one-frame mis-scaled/letterboxed flash on top of the bar-shaped one this comment used to
-  /// describe.
+  /// `.idle`/`.recording`/`.ready` fall back to `session.lastReplay` (the previous run's frozen
+  /// final frame) instead of unconditionally showing `ProgressView()`, so the canvas stays
+  /// mounted through the gap `start(size:)` passes through on every run after the first —
+  /// `ProgressView()` only ever appears before the first replay exists. `RunControlBar` must stay
+  /// mounted here too: if it dropped out of this branch, `.safeAreaInset(edge: .bottom)` itself
+  /// would toggle on/off every run, and the `MTKView` growing into that space faster than its
+  /// on-demand redraw could catch up produced a mis-scaled/letterboxed flash.
   @ViewBuilder
   private var content: some View {
     switch session.phase {

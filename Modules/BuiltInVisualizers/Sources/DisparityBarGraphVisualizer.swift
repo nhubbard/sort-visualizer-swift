@@ -2,14 +2,11 @@ import Foundation
 import SortEngineKit
 import VisualizationKit
 
-/// Direct port of ArrayV's `DisparityBarGraph` — despite `ARCHITECTURE_V2.md` §2A.6's claim that
-/// the whole Disparity family needs a new `originalIndices` engine feature, the real ArrayV source
-/// (`visuals/bars/DisparityBarGraph.java`) computes displacement from nothing but the *current*
-/// value at the *current* index (`array[i] - i`) — exactly the data `VisualizationContext.values`
-/// already provides, same as every other `Visualizer`. Bar height comes from `disp`, a 0...1
-/// "how far is this value from home" measure via a sine wave, rather than the value's own height —
-/// a sorted array's bars all end up the same height (each position's `value - index` is constant),
-/// while a scrambled one produces a jagged skyline.
+/// Direct port of ArrayV's `DisparityBarGraph` — despite `ARCHITECTURE_V2.md` §2A.6 claiming the
+/// Disparity family needs an `originalIndices` engine feature, ArrayV's own source computes
+/// displacement from just the current value and index (`array[i] - i`), data
+/// `VisualizationContext.values` already provides. Bar height is `disp`, a 0...1 "distance from
+/// home" measure via a sine wave — sorted arrays render a flat skyline, scrambled ones jagged.
 public struct DisparityBarGraphVisualizer: Visualizer {
   public let id = VisualizerID(rawValue: "disparitybargraph")
   public let metadata = VisualizerMetadata(
@@ -52,8 +49,7 @@ public struct DisparityBarGraphVisualizer: Visualizer {
     }
   }
 
-  private func color(forIndex index: Int, value: Int, in context: VisualizationContext) -> RGBAColor
-  {
+  private func color(forIndex index: Int, value: Int, in context: VisualizationContext) -> RGBAColor {
     let markers = context.markers[index] ?? []
     if markers.contains(Marker.primary) {
       return Self.primaryColor

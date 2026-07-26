@@ -2,17 +2,13 @@ import CoreGraphics
 import SortEngineKit
 
 /// A per-visualizer incremental renderer contract: `Visualizer.draw(_:) -> [DrawCommand]` is a
-/// pure pull — "give me everything, every time" — with no way to say "only positions 3 and 7
-/// changed since you last asked." Getting genuine per-operation incremental repainting means
-/// knowing the touched positions' on-screen geometry directly, which each conforming type is
-/// taught individually (matching its corresponding `Visualizer`'s own layout math exactly, so
-/// switching to an incremental renderer looks the same on screen as the pull-based style it
-/// replaced).
+/// pure pull with no way to say "only positions 3 and 7 changed." Genuine per-operation
+/// incremental repainting needs each conforming type to know its own touched positions'
+/// on-screen geometry directly, matching its `Visualizer`'s layout math exactly.
 ///
-/// Deliberately does NOT unify "how to get pixels on screen" — `MetalBarRenderer` draws directly
-/// to a drawable from `MTKView`'s own render callback, with nothing to hand back to a caller at
-/// all. Only `apply`/`reset` — the incremental-update contract every backend that wants the
-/// O(1)-per-operation property actually needs — is common enough to share.
+/// Deliberately does NOT unify "how to get pixels on screen" — e.g. `MetalBarRenderer` draws
+/// directly to a drawable from `MTKView`'s render callback, nothing to hand back to a caller.
+/// Only `apply`/`reset` (the O(1)-per-operation contract) is common enough to share.
 @MainActor
 protocol IncrementalBarRenderer: AnyObject {
   /// Full repaint from the current live state — the only path for the very first frame, a

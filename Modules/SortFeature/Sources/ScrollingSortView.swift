@@ -8,12 +8,11 @@ public struct ScrollingSortView: View {
   let arraySize: Int
   /// Non-`nil` when this instance is one step of Showcase mode (`ContentView`) rather than a
   /// normal manually-selected algorithm screen — swaps `.task` from a plain `start(size:)` to
-  /// `session.runShowcasePass()` (locking `RunControlBar` via `isAutomating`, same as any other
-  /// automation) and reports back when that pass finishes so `ContentView` can advance to the
-  /// next algorithm. Guarded by `!Task.isCancelled` at the call site below: `ContentView` stops
-  /// Showcase by changing `selection`, which (via this view's `.id(selection)` at its call site)
-  /// tears this view down and cancels its `.task` — without that guard, a run already finishing
-  /// at the exact moment Stop is tapped could still fire "advance to the next algorithm" once.
+  /// `session.runShowcasePass()` (locking `RunControlBar` via `isAutomating`) and reports back
+  /// when that pass finishes so `ContentView` can advance to the next algorithm. Guarded by
+  /// `!Task.isCancelled` at the call site: `ContentView` stops Showcase by changing `selection`,
+  /// which tears this view down and cancels its `.task` — without the guard, a run already
+  /// finishing at that exact moment could still fire "advance" once more.
   let showcaseCompletion: (() -> Void)?
   /// Non-`nil` under the same condition as `showcaseCompletion` (both come from `ContentView`'s
   /// `showcaseIndex != nil`) — wired to `ContentView.stopShowcase()`, for `SortView`'s embedded
@@ -33,15 +32,10 @@ public struct ScrollingSortView: View {
     self.arraySize = arraySize
     self.showcaseCompletion = showcaseCompletion
     self.showcaseStop = showcaseStop
-    // AudioService.shared, for real: this used to default to NoOpAudioService() because
-    // constructing a live AudioKit graph crashed in this project's toolchain/simulator
-    // combination at native AudioComponent registration, a crash Swift couldn't catch (a C++
-    // assert -> SIGABRT). That risk doesn't exist for ToneKit (plain AVAudioEngine/
-    // AVAudioSourceNode — see Modules/ToneKit/NOTICE.md), and `AudioService.play()`'s `try?
-    // start()` already fails silently rather than crashing if a given host has no usable
-    // audio route (e.g. a sandboxed CI runner), so there's no reason left to keep this screen
-    // silent. `AppSettings.soundEnabled` (Settings) still gates whether a sort plays anything
-    // at all; this is just which backend answers when it does.
+    // AudioService.shared, not the NoOpAudioService default: `AudioService.play()`'s `try?
+    // start()` already fails silently if a host has no usable audio route (e.g. a sandboxed CI
+    // runner), so this is safe even off-device. `AppSettings.soundEnabled` still gates whether a
+    // sort plays anything at all; this is just which backend answers when it does.
     _session = State(
       wrappedValue: SortSession(algorithm: algorithm, shuffle: shuffle, audio: AudioService.shared))
   }

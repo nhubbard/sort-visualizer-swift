@@ -1,14 +1,12 @@
 import AlgorithmKit
 import SortEngineKit
 
-/// Yaroslavskiy's dual-pivot quicksort — partitions around *two* pivots per pass instead of one,
-/// splitting the working range into three regions (`< pivot1`, `[pivot1, pivot2]`, `> pivot2`)
-/// each recursion instead of two. This is the same algorithm family real-world Java's
-/// `Arrays.sort` has used for primitive-type arrays since Java 7.
+/// Yaroslavskiy's dual-pivot quicksort — partitions around *two* pivots per pass, splitting the
+/// working range into three regions (`< pivot1`, `[pivot1, pivot2]`, `> pivot2`). The same
+/// algorithm family real-world Java's `Arrays.sort` uses for primitive-type arrays since Java 7.
 ///
-/// Ported from ArrayV's `DualPivotQuickSort.dualPivot`, preserving its inclusive `[left, right]`
-/// ranges, three-way recursion, and self-adjusting `divisor` (which widens the "thirds" used to
-/// pick pivot candidates once a partition's middle region turns out small) exactly.
+/// `divisor` self-adjusts, widening the "thirds" used to pick pivot candidates once a partition's
+/// middle region turns out small.
 public struct DualPivotQuickSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "dualpivotquicksort")
   public let metadata = AlgorithmMetadata(
@@ -44,8 +42,7 @@ public struct DualPivotQuickSort: SortAlgorithm {
     }
   }
 
-  private func dualPivot(_ engine: inout RecordingEngine, _ left: Int, _ right: Int, _ divisor: Int)
-  {
+  private func dualPivot(_ engine: inout RecordingEngine, _ left: Int, _ right: Int, _ divisor: Int) {
     let length = right - left
     // Insertion sort for tiny ranges (also covers empty/inverted ranges produced by the
     // recursive boundary arithmetic below, since `length` is then negative and always < 4).

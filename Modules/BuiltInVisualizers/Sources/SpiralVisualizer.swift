@@ -2,17 +2,14 @@ import Foundation
 import SortEngineKit
 import VisualizationKit
 
-/// Port of ArrayV's `Spiral` (circles family): `ColorCircleVisualizer`'s sibling, but each wedge's
-/// outer radius is modulated by that position's value instead of being fixed — low values pull
-/// their point in toward the center, high values reach the full radius, so the wheel blooms into a
-/// spiral/flower shape instead of a plain pie.
+/// Port of ArrayV's `Spiral` (circles family): like `ColorCircleVisualizer`, but each wedge's
+/// outer radius is modulated by that position's value — low values pull toward the center, high
+/// values reach full radius, blooming into a spiral instead of a plain pie.
 ///
-/// `mult(normalized) = 1 - (1 - normalized)^2` is an adapted approximation of ArrayV's
-/// `frac = value/arrayLength - 1; mult = 1 - frac^2`, rewritten against our `valueRange`-relative
-/// `normalized` (0...1) convention rather than a raw `value/arrayLength` ratio. Both curves satisfy
-/// mult(0) = 0 (innermost), mult(1) = 1 (full radius), and rise smoothly in between — the exact
-/// polynomial shape differs slightly from the Java original, but the visual spirit (a concave ease-out
-/// from center to rim) is preserved.
+/// `mult(normalized) = 1 - (1 - normalized)^2` adapts ArrayV's `mult = 1 - (value/arrayLength -
+/// 1)^2` to this codebase's `valueRange`-relative `normalized` (0...1) convention. Both satisfy
+/// mult(0)=0, mult(1)=1; the polynomial shape differs slightly from the Java original but
+/// preserves the same concave ease-out curve.
 public struct SpiralVisualizer: Visualizer {
   public let id = VisualizerID(rawValue: "spiral")
   public let metadata = VisualizerMetadata(
@@ -68,8 +65,7 @@ public struct SpiralVisualizer: Visualizer {
   }
 
   private func color(forIndex index: Int, normalized: Double, in context: VisualizationContext)
-    -> RGBAColor
-  {
+    -> RGBAColor {
     let markers = context.markers[index] ?? []
     if markers.contains(Marker.primary) {
       return Self.primaryColor

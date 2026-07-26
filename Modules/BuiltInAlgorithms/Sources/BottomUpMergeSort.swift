@@ -1,21 +1,15 @@
 import AlgorithmKit
 import SortEngineKit
 
-/// The non-recursive twin of `MergeSort`: instead of recursing top-down, it iterates over
-/// doubling merge-run widths (`mergeSize` = 2, 4, 8, ...) and merges every adjacent pair of runs
-/// of that width across the whole array in one pass, writing the pass's results into a
-/// full-length scratch buffer before copying them back and doubling the width again.
+/// The non-recursive twin of `MergeSort`: iterates over doubling merge-run widths (`mergeSize` =
+/// 2, 4, 8, ...), merging every adjacent pair of runs of that width in one pass into a scratch
+/// buffer before copying back and doubling again.
 ///
-/// Ported faithfully from ArrayV's `io.github.arrayv.sorts.merge.BottomUpMergeSort`, including its
-/// `copyLength` trick for the final partial run: `merge(index, mergeSize)` reads `left`/`mid`/
-/// `right`/`end` exactly as ArrayV does, and when the "right" half is empty (the tail chunk is
-/// shorter than half a run — only possible on the last chunk of a pass, since every earlier chunk
-/// is a full `mergeSize`), it performs no writes and reports `index` as the point past which the
-/// pass's scratch contents shouldn't be copied back (the untouched tail is already correctly
-/// ordered from the previous pass, so leaving it alone is safe). ArrayV also runs one extra fixup
-/// merge after the main loop whenever `currentLength` isn't a power of two, folding the final
-/// undersized run into the rest of the array; that fixup is reproduced here via the same `merge`
-/// helper called once more at `index = 0`.
+/// `merge`'s `copyLength` return value handles the final partial run: when the "right" half is
+/// empty (only possible on a pass's last chunk), no writes happen and `index` is returned as the
+/// point past which the scratch buffer shouldn't be copied back — the untouched tail is already
+/// correctly ordered from the previous pass. One extra fixup merge runs after the main loop
+/// whenever `n` isn't a power of two, folding the final undersized run into the rest of the array.
 public struct BottomUpMergeSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "bottomupmergesort")
   public let metadata = AlgorithmMetadata(
@@ -39,11 +33,9 @@ public struct BottomUpMergeSort: SortAlgorithm {
     // MergeSort.swift keeps its own `merged` array alongside the aux writes).
     var scratch = engine.values
 
-    // Merges the two runs of length `mergeSize / 2` starting at `index` (clamped to the array's
-    // end for the last, possibly-partial, pair of runs) into `scratch`. Returns a non-nil
-    // "copy up to here" override only when the right run turned out to be empty — ArrayV's
-    // `copyLength = left` branch — otherwise returns nil, meaning the caller should copy the
-    // whole scratch buffer back once the pass finishes.
+    // Merges the two runs of length `mergeSize / 2` starting at `index` into `scratch`. Returns
+    // a "copy up to here" override only when the right run is empty; nil means copy the whole
+    // scratch buffer back once the pass finishes.
     @discardableResult
     func merge(_ index: Int, _ mergeSize: Int) -> Int? {
       let mid = index + mergeSize / 2

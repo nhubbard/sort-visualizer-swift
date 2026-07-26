@@ -1,8 +1,7 @@
 // This file's public API (`frequency`/`amplitude`/`detuningOffset`/`detuningMultiplier`) is
-// modeled on SoundpipeAudioKit's `Oscillator` (github.com/AudioKit/SoundpipeAudioKit,
-// Generators/Oscillator.swift) — reduced to a plain sine wave (no waveform table selection) and
-// reimplemented as a direct phase accumulator instead of a wrapped native Soundpipe "oscl" Audio
-// Unit. See this module's NOTICE.md.
+// modeled on SoundpipeAudioKit's `Oscillator`, reduced to a plain sine wave (no waveform table
+// selection) and reimplemented as a direct phase accumulator instead of a wrapped Soundpipe
+// "oscl" Audio Unit. See NOTICE.md.
 //
 // Used under the MIT License:
 //
@@ -33,14 +32,13 @@ import Accelerate
 import Foundation
 import Synchronization
 
-/// A single sine voice. Not itself an `AVAudioNode`/`Node` — unlike AudioKit's real `Oscillator`,
-/// which gets its own Audio Unit so it can be wired into an arbitrary graph, this one is always
-/// the innermost link in exactly one chain (`AmplitudeEnvelope` owns the actual `AVAudioSourceNode`
-/// and pulls samples from this directly), so it doesn't need graph machinery of its own.
+/// A single sine voice. Not itself an `AVAudioNode`/`Node` — it's always the innermost link in
+/// exactly one chain (`AmplitudeEnvelope` owns the actual `AVAudioSourceNode` and pulls samples
+/// from this directly), so it doesn't need graph machinery of its own.
 ///
 /// `frequency`/`amplitude`/`detuningOffset`/`detuningMultiplier` are set from `@MainActor` code
-/// (`AudioService`) but read every render buffer from the realtime audio thread — `Mutex`-guarded
-/// so both sides are safe without exposing any lock to callers.
+/// but read every render buffer from the realtime audio thread — `Mutex`-guarded so both sides
+/// are safe without exposing any lock to callers.
 public final class Oscillator: Sendable {
   struct State: Sendable {
     var frequency: Float
@@ -94,15 +92,13 @@ public final class Oscillator: Sendable {
     set { state.withLock { $0.detuningMultiplier = newValue } }
   }
 
-  /// One lock acquisition per call, not per sample — this runs on the realtime audio thread once
-  /// per render buffer (typically a few hundred frames), so a single short critical section here
-  /// keeps contention negligible regardless of buffer size.
+  /// One lock acquisition per call, not per sample — runs once per render buffer (typically a few
+  /// hundred frames) on the realtime audio thread, keeping contention negligible regardless of
+  /// buffer size.
   ///
-  /// Vectorized via Accelerate rather than a per-sample `nextSample` loop: `sin` is exactly
-  /// periodic and numerically accurate for any real input (no precision loss from letting phase
-  /// run unwrapped across one buffer's worth of samples), so the whole buffer's phase ramp can be
-  /// built and sined in bulk, with phase only wrapped back into `0..<2π` once at the end — one
-  /// `vDSP`/`vForce` call each instead of a branch-per-sample scalar loop.
+  /// Vectorized via Accelerate rather than a per-sample loop: phase can run unwrapped across the
+  /// whole buffer and get wrapped back into `0..<2π` once at the end, since `sin` is exactly
+  /// periodic — one `vDSP`/`vForce` call each instead of a branch-per-sample scalar loop.
   func fill(_ buffer: UnsafeMutableBufferPointer<Float>, sampleRate: Double) {
     let count = buffer.count
     guard count > 0, let output = buffer.baseAddress else { return }

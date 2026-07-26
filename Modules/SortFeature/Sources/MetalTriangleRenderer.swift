@@ -13,13 +13,10 @@ struct MetalTriangleInstance {
 }
 
 /// Per-visualizer geometry contract for `MetalTriangleRenderer<Self>` — the triangle-wedge sibling
-/// of `MetalShapeLayout` (`MetalShapeRenderer.swift`), same design for the same reason: mirrors
-/// that `Visualizer`'s own `draw(_:) -> [DrawCommand]` math almost line for line, in points (this
-/// renderer converts to pixels generically), with the same `arrayIndex(forSlot:)`/
-/// `slots(forIndex:)` split for visualizers whose geometry depends on a NEIGHBOR's value, not just
-/// their own — `DisparityCircleMetalLayout`/`SpiralMetalLayout`'s wedge `i` uses both point `i-1`
-/// and point `i`, so touching index `i` must repaint wedges `i` AND `i+1`
-/// (`Modules/SortFeature/Sources/MetalPolygonVisualizerLayouts.swift`).
+/// of `MetalShapeLayout`, same design, in points (this renderer converts to pixels generically).
+/// `DisparityCircleMetalLayout`/`SpiralMetalLayout`'s wedge `i` uses both point `i-1` and point
+/// `i`, so touching index `i` must repaint wedges `i` AND `i+1` — hence the same
+/// `arrayIndex(forSlot:)`/`slots(forIndex:)` split as `MetalShapeLayout`.
 ///
 /// Deliberately NOT `@MainActor`, same reasoning as `MetalShapeLayout`.
 protocol MetalTriangleLayout {

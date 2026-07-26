@@ -1,17 +1,16 @@
 import SortEngineKit
 
-/// ArrayV's own taxonomy (`Sort.setCategory(...)`/`@SortMeta`/`@SortPackageMeta` across
-/// `~/ArrayV/src/main/java/io/github/arrayv/sorts/`), not this app's own invention — matching it
-/// means every ported algorithm files under the same category ArrayV itself assigns, including
-/// cases where that disagrees with ArrayV's own physical package layout (e.g. `BogoSort.java`
-/// lives in `sorts/distribute/` but is actually categorized `.impractical`). ArrayV's own
-/// `"Distributive Sorts"` (a one-off misspelling of `"Distribution Sorts"` affecting exactly one
-/// algorithm, `SimplisticGravitySort`) and `"Tests"` (an internal correctness check, not a real
-/// sort) aren't represented here — the former files under `.distribution` when ported, correcting
-/// the typo rather than perpetuating it; the latter isn't a sort at all.
+/// Mirrors ArrayV's own taxonomy (`Sort.setCategory(...)`/`@SortMeta`/`@SortPackageMeta` in
+/// `~/ArrayV/src/main/java/io/github/arrayv/sorts/`), not an invention of this app — a ported
+/// algorithm files under the same category ArrayV assigns, even where that disagrees with
+/// ArrayV's own package layout (e.g. `BogoSort.java` lives in `sorts/distribute/` but is
+/// categorized `.impractical`). Two ArrayV category strings aren't represented here:
+/// `"Distributive Sorts"` (a one-off misspelling of `"Distribution Sorts"`, affecting only
+/// `SimplisticGravitySort`) is corrected to `.distribution` on port rather than perpetuated, and
+/// `"Tests"` (an internal correctness check, not a real sort) has no case at all.
 ///
-/// `iconName` (on `AlgorithmMetadata` below) is a real SF Symbol name, resolved via
-/// `CustomIconLabel` — v2 never ported Legacy's per-algorithm custom icon-image assets.
+/// `iconName` below is a real SF Symbol name resolved via `CustomIconLabel` — v2 never ported
+/// Legacy's per-algorithm custom icon-image assets.
 public enum AlgorithmCategory: String, Sendable, Codable, CaseIterable, Identifiable {
   case concurrent
   case distribution

@@ -1,15 +1,11 @@
 import AlgorithmKit
 import SortEngineKit
 
-/// ArrayV's own display name is "Optimized Gnome Sort + Binary Search" and it files this under
-/// `sorts/exchange/` (`setCategory("Exchange Sorts")`), but the algorithm ArrayV actually wrote is
-/// not gnome sort's classic adjacent-compare-and-backstep walk at all — `runSort` binary-searches
-/// the sorted prefix `[0, i)` for element `i`'s insertion point, then shifts it into place via
-/// adjacent swaps. That is Binary Insertion Sort's own structure, verbatim (compare
-/// `BinaryInsertionSort.swift`). This port is faithful to ArrayV's source and its `.exchange`
-/// categorization even though the logic itself would otherwise be filed as `.insertion` — the name
-/// and category are ArrayV's historical/nominal choice, not a claim that a distinct gnome-sort
-/// mechanism is present here.
+/// Despite the name and ArrayV's `.exchange` categorization, this isn't gnome sort's classic
+/// adjacent-compare-and-backstep walk — it binary-searches the sorted prefix `[0, i)` for each
+/// element's insertion point, then shifts it into place via adjacent swaps, i.e. Binary Insertion
+/// Sort's structure verbatim (compare `BinaryInsertionSort.swift`). Kept as `.exchange` to match
+/// ArrayV's own categorization.
 public struct BinaryGnomeSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "binarygnomesort")
   public let metadata = AlgorithmMetadata(

@@ -14,14 +14,10 @@ public struct RandomGuessSort: SortAlgorithm {
   )
   public init() {}
 
-  /// ArrayV's `RandomGuessSort` repeatedly draws `loops[pos]` uniformly at random from `0..<n`
-  /// per position and checks whether reading the array through that guess comes out stably
-  /// sorted — the same open-ended-random-walk problem `BogoSort` already solved, just over a
-  /// bigger `n^n` guess space (each position guessed independently, not constrained to be a
-  /// permutation) rather than `n!`. ArrayV's own later variant, `OptimizedGuessSort`, already
-  /// solves exactly this by walking that same guess space as a deterministic base-`n` odometer
-  /// instead of drawing randomly — reused here rather than re-deriving a different technique,
-  /// since it's the same search space this algorithm itself explores, just walked in fixed order.
+  /// ArrayV's `RandomGuessSort` draws each position's guess uniformly at random and checks whether
+  /// the resulting mapping is sorted — same open-ended-random-walk problem `BogoSort` solved, over
+  /// an `n^n` guess space. Walked here as a deterministic base-`n` odometer instead (the same fix
+  /// `OptimizedGuessSort` uses) rather than drawing randomly.
   public func record(into engine: inout RecordingEngine) {
     let n = engine.count
     guard n > 1 else { return }

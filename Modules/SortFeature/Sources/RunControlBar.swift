@@ -4,20 +4,14 @@ import SortEngineKit
 import SwiftUI
 import VisualizationKit
 
-/// Docked below the sort visualization via `.safeAreaInset(edge: .bottom)` — reserves real layout
-/// space rather than floating on top of the visualization (v1's `TouchBarSlider`/`GroupBox`
-/// overlay obscured bars it sat over and didn't reserve any space at all). Modeled on a standard
-/// media-player transport: a thin scrub bar, a live stats caption, then a row of transport
-/// buttons. Speed expands inline below the transport row on tap, rather than living behind a
-/// `.popover` — kept that way even now that portrait/multitasking are supported (nothing forces a
-/// change here), not because it's the only option any more: inline expand/collapse just never
-/// touches `UIPopoverPresentationController` at all, which is one less orientation-related surface
-/// to think about as the app's supported width keeps changing.
+/// Docked below the sort visualization via `.safeAreaInset(edge: .bottom)`, reserving real layout
+/// space rather than floating over it. Modeled on a media-player transport: scrub bar, stats
+/// caption, then transport buttons. Speed/size/visualizer rows expand inline below the transport
+/// row on tap instead of using a `.popover`, so no `UIPopoverPresentationController` is involved.
 ///
-/// `transportRow`/`statsCaption` each offer a second, stacked-into-two-rows `ViewThatFits`
-/// candidate — both rows are built entirely from fixed-intrinsic-width buttons/stat cells (no
-/// flexible `.frame(maxWidth: .infinity)` content), so `ViewThatFits` can genuinely detect an
-/// overflow and fall back, unlike `AlgorithmDetailSection`'s two-column layout.
+/// `transportRow`/`statsCaption` each offer a stacked-two-row `ViewThatFits` fallback — both rows
+/// are built from fixed-intrinsic-width buttons/stat cells (no flexible `.frame(maxWidth:
+/// .infinity)` content), so `ViewThatFits` can actually detect overflow and fall back.
 struct RunControlBar: View {
   @Bindable var session: SortSession
   @Bindable var replay: ReplayEngine
@@ -68,16 +62,12 @@ struct RunControlBar: View {
     .accessibilityIdentifier("runControlScrubSlider")
   }
 
-  /// Each stat is its own tight `[number][label]` cell (`statCell`), sitting in an `HStack` with
-  /// generous inter-cell spacing standing in for the `·` separator this used to have — a
-  /// fixed-width slot only stabilizes the *digits* within one cell; the separator glyph never did
-  /// anything for stability, it was just visual noise between cells that whitespace alone reads
-  /// just as clearly. Not `LazyHStack`: laziness only pays off for children a scrolling ancestor
-  /// can defer rendering along this same (horizontal) axis — this row never scrolls.
+  /// Each stat is a `[number][label]` cell (`statCell`) in an `HStack`; spacing alone separates
+  /// cells now that there's no `·` separator. Not `LazyHStack` — laziness only helps children a
+  /// scrolling ancestor can defer, and this row never scrolls.
   ///
-  /// `ViewThatFits` between that one full-width row and two half-width rows — both built from
-  /// the same `statCell`s below, so whichever arrangement fits, every cell (and its
-  /// accessibility subtree) is still there for `runControlStatsCaption` to combine.
+  /// `ViewThatFits` falls back between one full-width row and two half-width rows, both built
+  /// from the same `statCell`s, so every cell's accessibility subtree survives either arrangement.
   private var statsCaption: some View {
     ViewThatFits(in: .horizontal) {
       HStack(spacing: 12) { statCells }
@@ -92,13 +82,10 @@ struct RunControlBar: View {
     .accessibilityIdentifier("runControlStatsCaption")
   }
 
-  // Matches ArrayV's own on-screen order (Comparisons, Swaps, Reversals, Writes to Main Array,
-  // Writes to Auxiliary Array(s), Items in External Arrays) — always shown, even at zero, same
-  // as ArrayV itself never conditionally hides a stat an algorithm doesn't happen to use.
-  // Conditionally showing/hiding would also reflow the row exactly when the fixed-width slots
-  // in `statSlot` exist to prevent. Split into two `@ViewBuilder` halves (rather than one flat
-  // group) purely so the stacked `ViewThatFits` candidate above can lay them out as two rows of
-  // four instead of eight in a row.
+  // Matches ArrayV's on-screen order (Comparisons, Swaps, Reversals, Writes to Main Array, Writes
+  // to Auxiliary Array(s), Items in External Arrays); always shown, even at zero, to avoid
+  // reflowing the fixed-width slots in `statSlot`. Split into two halves so the stacked
+  // `ViewThatFits` candidate above can lay them out as two rows of four.
   @ViewBuilder
   private var firstHalfStatCells: some View {
     statCell(replay.compareCount, digits: 6, label: "compares")
@@ -112,12 +99,9 @@ struct RunControlBar: View {
     statCell(replay.auxWriteCount, digits: 6, label: "aux writes")
     statCell(replay.externalArrayItemCount, digits: 5, label: "in external arrays")
     statSlot(String(format: "%.1fs", replay.elapsedPlaybackDuration), digits: 6)
-    // Number and unit are two separate `Text`s within the cell, not one formatted string —
-    // `statSlot`'s fixed-width reservation only holds the digits steady; folding " ops/sec"
-    // into the same string as the number let the *whole* string's natural width (and thus
-    // this row's total width) shift every time the number crossed a digit boundary (3
-    // digits -> 4 once throughput approached 1000), which SwiftUI visibly resized/glitched
-    // several times a second during fast playback.
+    // Number and unit are separate `Text`s, not one formatted string — folding " ops/sec" into
+    // the same string let the whole string's width shift whenever the number crossed a digit
+    // boundary (e.g. 3->4 digits near 1000 ops/sec), causing visible reflow during fast playback.
     statCell(Int(opsPerSecond), digits: 4, label: "ops/sec")
   }
 
@@ -137,14 +121,11 @@ struct RunControlBar: View {
     }
   }
 
-  // `significantOperationCount`, not `stepIndex` and not `compareCount + swapCount`.
-  // `compareCount + swapCount` alone badly undercounts merge-family algorithms, which record
-  // most of their tape as `.setValue`/`.auxWrite` (writing merged runs back) — but plain
-  // `stepIndex` overcounts *everything*, since it also counts the mark/unmark bookkeeping
-  // `RecordingEngine.markPrimarySecondary` emits around every `.compare`/`.swap`, which
-  // `ReplayEngine.play()`'s pacing no longer charges against `speed` at all (see
-  // `SortOperation.isSignificantForPacing`). `significantOperationCount` is exactly what the
-  // pacing loop paces against, so this stat can never appear to exceed the configured `speed`.
+  // `significantOperationCount`, not `stepIndex` (over-counts mark/unmark bookkeeping around
+  // every compare/swap, see `SortOperation.isSignificantForPacing`) and not
+  // `compareCount + swapCount` (under-counts merge-family algorithms, which write most of their
+  // tape via `.setValue`/`.auxWrite`). This is exactly what `ReplayEngine.play()`'s pacing loop
+  // paces against, so the stat can never exceed the configured `speed`.
   private var opsPerSecond: Double {
     let elapsed = replay.elapsedPlaybackDuration
     return elapsed > 0 ? Double(replay.significantOperationCount) / elapsed : 0
@@ -366,26 +347,17 @@ struct RunControlBar: View {
 
 }
 
-/// Robot icon — lists every registered `Automation` (see `AutomationRegistry`), the same two
-/// entries `⌘⇧A`/`⌘⌥⇧A` already trigger, so the shortcut and the tappable UI are two views onto
-/// one source of truth rather than two independently-maintained ones.
+/// Lists every registered `Automation` (see `AutomationRegistry`) — the same entries `⌘⇧A`/`⌘⌥⇧A`
+/// trigger, so the shortcut and this menu share one source of truth.
 ///
-/// A genuine `View` type, not a computed property on `RunControlBar` (which is what this used to
-/// be) — `@Environment(\.isEnabled)` only reflects ancestors of wherever it's actually read, and
-/// `RunControlBar.body` applies `.disabled(session.isAutomating)` to the `VStack` it returns,
-/// which is a *descendant* of `RunControlBar` itself from the environment's point of view, not an
-/// ancestor of anything `RunControlBar`'s own properties can see. A `@Environment` property
-/// declared directly on `RunControlBar` would read whatever *its* parent set, never this bar's own
-/// `.disabled()` call. Pulling the button out into its own `View`, placed as an actual child inside
-/// that disabled `VStack`, gives it a real position in the tree to read that state from.
+/// A genuine `View`, not a computed property on `RunControlBar`: `@Environment(\.isEnabled)` only
+/// sees ancestors of where it's read, and `RunControlBar.body`'s `.disabled(session.isAutomating)`
+/// applies to the `VStack` it returns — a descendant from `RunControlBar`'s own point of view, not
+/// an ancestor. Only a child placed inside that disabled `VStack` can read the state.
 ///
-/// Every other button in `transportRow` dims automatically when `session.isAutomating` disables
-/// the bar, for free, because they have no explicit color of their own — `.buttonStyle(.borderless)`
-/// (set once on the whole row) applies the system's standard enabled/disabled look to plain
-/// `Image(systemName:)` content. This button opts out of both halves of that: `.buttonStyle(.plain)`
-/// (asked for explicitly, overriding the row's `.borderless`) and a hardcoded accent tint (so it
-/// visually reads as "the automation control," not just another transport button) — so it needs to
-/// re-derive the dimmed look itself instead of inheriting it.
+/// Unlike the row's other buttons, this one opts out of the inherited disabled look via
+/// `.buttonStyle(.plain)` (overriding the row's `.borderless`) plus a hardcoded accent tint, so it
+/// must re-derive the dimmed appearance itself via `isEnabled` below.
 private struct AutomatorMenuButton: View {
   let session: SortSession
   @Environment(\.isEnabled) private var isEnabled
@@ -410,11 +382,10 @@ private struct AutomatorMenuButton: View {
       }
     } label: {
       Image(systemName: "gearshape.2.fill")
-        // `isEnabled`, not `session.isAutomating` directly — tracks *whatever* disabled
-        // this control (today that's only ever automation, but this stays correct even if
-        // a future reason joins it) while still pinning an explicit color in both states,
-        // which a bare `Image(systemName:)` needs to avoid getting stuck at whatever color
-        // it last rendered through a tap/menu-open interaction.
+        // `isEnabled`, not `session.isAutomating` directly, so this tracks whatever actually
+        // disabled the control. Explicit color pinned in both states because a bare
+        // `Image(systemName:)` otherwise gets stuck at whatever color it last rendered during
+        // a tap/menu interaction.
         .foregroundStyle(isEnabled ? Color.accentColor : Color.secondary)
     }
     .buttonStyle(.plain)

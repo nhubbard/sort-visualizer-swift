@@ -1,45 +1,20 @@
 import AlgorithmKit
 import SortEngineKit
 
-/// Flash Sort — ported from ArrayV's `io.github.arrayv.sorts.distribute.FlashSort`, an algorithm
-/// attributed to Karl-Dietrich Neubert. Classifies each element into one of roughly `0.2n`
-/// "classes" based on where its value falls between the array's min and max, cycle-permutes
-/// elements into their class's contiguous region in a single in-place pass, then finishes with a
-/// straight (shift-based) insertion sort.
+/// ArrayV's `FlashSort` (Neubert's algorithm) — classifies each element into one of roughly `0.2n`
+/// classes based on where its value falls between the array's min and max, cycle-permutes elements
+/// into their class's contiguous region in one in-place pass, then finishes with a straight
+/// (shift-based) insertion sort.
 ///
-/// **Deliberately skipped: ArrayV's post-permutation recursion.** ArrayV's own `runSort`, right
-/// after the permutation phase, walks every class and — for any class whose size exceeds a
-/// threshold — copies that class's sub-range out via `Arrays.copyOfRange`, then recurses
-/// `runSort` on the *copy*. That copy's sorted result is never written back into `array`; the
-/// very next (unconditional) line is a full-array `insertSorter.customInsertSort(array, 0,
-/// sortLength, ...)`, which alone finishes the sort regardless of what the recursion did or
-/// didn't do. The recursion is real, reachable work with zero effect on the final result — a
-/// verified dead-code path in ArrayV itself, not a load-bearing part of the algorithm. Porting it
-/// faithfully would mean recording genuine cycle/permutation work for the visualizer to render in
-/// a sub-range, only for that same sub-range to be immediately overwritten and re-rendered a
-/// moment later by the final insertion-sort pass — confusing motion with no payoff, in an app
-/// whose whole point is watching the motion. It is skipped here; every other step (paired min/max
-/// scan, class-count histogram, cumulative sum, cycle-based permutation, final insertion sort) is
-/// ported faithfully. This is not a behavioral regression versus ArrayV — the recursion never
-/// affected ArrayV's own output either — but it does mean this port leans on the final straight
-/// insertion sort just as much as ArrayV's own code secretly always did, including in skewed
-/// worst-case distributions where the (skipped) recursion would have been ArrayV's attempt —
-/// itself already ineffective — at rescuing an oversized class before that final pass.
+/// ArrayV's post-permutation recursion into oversized classes is skipped: it's verified dead code
+/// in ArrayV itself — the recursion's result is never written back before the final full-array
+/// insertion sort overwrites it. This port relies on that final pass exactly as much as ArrayV's
+/// own code secretly always did.
 ///
-/// **Stability: `true`, confirmed empirically (this contradicts Flash Sort's usual reputation as
-/// unstable, which is the reputation an in-place cycle permutation would normally deserve).**
-/// Two structural facts save it here: (1) within a class, `L[K]` is decremented by exactly one on
-/// every write to that class, so a class's slots fill in strictly *decreasing* index order over
-/// time, never revisited — and every eviction chain observed empirically resolves those slots in
-/// decreasing *original*-index order too, i.e. exactly a stable counting-sort placement; (2) the
-/// one swap that seeds the permutation (`maxIndex` into position 0) only ever moves the *first*
-/// occurrence of the maximum value — every update to `maxIndex` during the min/max scan requires a
-/// *strictly* greater value, so ties never move `maxIndex` away from an earlier index — meaning
-/// that swap can't reorder two array-max duplicates relative to each other. The final straight
-/// insertion sort only shifts elements past *strictly* greater neighbors, so it never reorders
-/// equal elements either. Verified with an exhaustive sweep (every value assignment over small
-/// alphabets, sizes 4-10; 87,000+ combinations) plus tens of thousands of random/adversarial
-/// tagged-duplicate trials up to size 512 — zero instability observed in any of them.
+/// Stability: `true` — contrary to Flash Sort's usual reputation as unstable. Ties never move
+/// `maxIndex` during the min/max scan (strict `>`), class slots fill in strictly decreasing index
+/// order, and the final insertion sort only shifts elements past strictly-greater neighbors, so
+/// equal elements are never reordered.
 public struct FlashSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "flashsort")
   public let metadata = AlgorithmMetadata(

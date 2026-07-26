@@ -16,13 +16,10 @@ public struct BinomialSmoothSort: SortAlgorithm {
   public init() {}
 
   /// A Smoothsort-family algorithm built on the same implicit-binomial-heap-in-an-array idea as
-  /// `BinomialHeapSort`, but 0-indexed and expressed recursively (`thrift`) instead of with
-  /// explicit loops. `height(node)` counts `node`'s trailing set bits — the position tells
-  /// `thrift` which of `node`'s "sibling" subtrees to look at. `thrift(node, parent, root)`
-  /// decides, for a given node, whether some earlier subtree root beats it and — if so — swaps
-  /// it up and recurses into the vacated spot. Translated line-for-line (down to the exact
-  /// boolean-flag threading between recursive calls) rather than re-derived, since getting the
-  /// `parent`/`root` flag interplay subtly wrong would silently change which nodes get compared.
+  /// `BinomialHeapSort`, but 0-indexed and recursive (`thrift`). `height(node)` counts `node`'s
+  /// trailing set bits, telling `thrift` which sibling subtree to look at. `thrift(node, parent,
+  /// root)` decides whether an earlier subtree root beats `node` and, if so, swaps it up and
+  /// recurses into the vacated spot.
   public func record(into engine: inout RecordingEngine) {
     let n = engine.count
     guard n > 1 else { return }

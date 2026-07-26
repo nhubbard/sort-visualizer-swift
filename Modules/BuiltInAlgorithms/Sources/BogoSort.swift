@@ -15,20 +15,12 @@ public struct BogoSort: SortAlgorithm {
   )
   public init() {}
 
-  /// Classic Bogo Sort shuffles randomly and hopes, but `RecordingEngine` has to pre-record the
-  /// *entire* run before a single frame plays back — a real random walk has no memory of which
-  /// arrangements it's already tried, so the tape can balloon for a very long time (n! shuffles
-  /// in expectation, with no guaranteed ceiling) before it happens to land on sorted. Swapping
-  /// the coin flip for deterministic lexicographic permutation generation (the standard
-  /// `next_permutation` technique) keeps the same "try every arrangement" spirit but puts a hard
-  /// n!-step ceiling on the tape instead of an open-ended random one, with no repeats along the
-  /// way — this is the same fix used in this app's original SwiftUI version, which enumerated
-  /// `values.permutations(ofCount:)` instead of reshuffling blindly.
-  ///
-  /// The fully-sorted ascending array is lexicographically *first*, so walking forward via
-  /// `next_permutation` never lands on it directly except by wrapping all the way around — the
-  /// wrap point is exactly the fully *descending* array (lexicographically last), which
-  /// `engine.reversal` flips straight to sorted in one step.
+  /// Classic Bogo Sort shuffles randomly and checks; since `RecordingEngine` must pre-record the
+  /// entire run before playback, an open-ended random walk risks an unbounded tape. This instead
+  /// walks permutations deterministically via lexicographic `next_permutation`, giving a hard
+  /// n!-step ceiling with no repeats. `next_permutation` never lands on the sorted (lexicographically
+  /// first) permutation except by wrapping around from the fully descending (lexicographically
+  /// last) one, so the final `engine.reversal` handles that wrap-to-sorted step directly.
   public func record(into engine: inout RecordingEngine) {
     let n = engine.count
     guard n > 1 else { return }

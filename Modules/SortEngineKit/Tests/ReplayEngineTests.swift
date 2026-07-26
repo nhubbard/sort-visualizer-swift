@@ -26,7 +26,9 @@ final class ManualTickDriver: DisplayLinkDriving {
 @MainActor
 @Suite
 struct ReplayEngineTests {
-  private func makeTape(initialValues: [Int], operations: [SortOperation]) -> Tape {
+  private func makeTape(
+    initialValues: [Int], operations: [SortOperation], sortStartIndex: Int = 0
+  ) -> Tape {
     Tape(
       header: TapeHeader(
         algorithmID: "test",
@@ -35,7 +37,8 @@ struct ReplayEngineTests {
         compareCount: 0,
         swapCount: 0,
         recordingDuration: 0,
-        recordedAt: Date(timeIntervalSince1970: 0)
+        recordedAt: Date(timeIntervalSince1970: 0),
+        sortStartIndex: sortStartIndex
       ),
       operations: operations
     )
@@ -50,7 +53,7 @@ struct ReplayEngineTests {
         .mark(marker: Marker.secondary, index: 1),
         .compare(0, 1),
         .swap(0, 1),
-        .markSorted(0),
+        .markSorted(0)
       ])
     let engine = ReplayEngine(tape: tape)
     for _ in 0..<tape.operations.count { engine.stepForward() }
@@ -266,7 +269,7 @@ struct ReplayEngineTests {
       operations: [
         .auxCreate(handle: 0, length: 2),
         .auxWrite(handle: 0, index: 0, value: 9),
-        .auxWrite(handle: 0, index: 1, value: 4),
+        .auxWrite(handle: 0, index: 1, value: 4)
       ])
     let engine = ReplayEngine(tape: tape)
     for _ in 0..<tape.operations.count { engine.stepForward() }
@@ -331,7 +334,7 @@ struct ReplayEngineTests {
     let operations: [SortOperation] = [
       .compare(0, 1), .swap(0, 1),
       .compare(1, 2), .swap(1, 2),
-      .markSorted(2),
+      .markSorted(2)
     ]
     let tape = makeTape(initialValues: [3, 1, 2], operations: operations)
 
@@ -354,7 +357,7 @@ struct ReplayEngineTests {
       operations: [
         .mark(marker: Marker.pivot, index: 0),
         .mark(marker: Marker.pivot, index: 2),
-        .unmark(marker: Marker.pivot),
+        .unmark(marker: Marker.pivot)
       ])
     let engine = ReplayEngine(tape: tape)
     for _ in 0..<tape.operations.count { engine.stepForward() }
@@ -369,7 +372,7 @@ struct ReplayEngineTests {
       operations: [
         .mark(marker: Marker.primary, index: 0),
         .mark(marker: Marker.primary, index: 2),
-        .unmarkIndex(marker: Marker.primary, index: 0),
+        .unmarkIndex(marker: Marker.primary, index: 0)
       ])
     let engine = ReplayEngine(tape: tape)
     for _ in 0..<tape.operations.count { engine.stepForward() }
@@ -454,5 +457,93 @@ struct ReplayEngineTests {
     let secondRead = engine.elapsedPlaybackDuration
 
     #expect(firstRead == secondRead)
+  }
+
+  /// Direct test of the shuffle/sort stat-separation fix: operations before `sortStartIndex`
+  /// (a recorded shuffle) must animate the frame but never move the live ArrayV-parity
+  /// counters `RunControlBar` displays.
+  @Test
+  func shuffleOperationsDoNotIncrementLiveCountersUntilSortStartIndex() {
+    let operations: [SortOperation] = [
+      .compare(0, 1), .swap(0, 1), .compare(1, 2),  // "shuffle" — indices 0-2
+      .compare(0, 1), .swap(0, 1)  // "sort" — indices 3-4
+    ]
+    let tape = makeTape(initialValues: [3, 1, 2], operations: operations, sortStartIndex: 3)
+    let engine = ReplayEngine(tape: tape)
+
+    for _ in 0..<3 { engine.stepForward() }
+    #expect(engine.compareCount == 0)
+    #expect(engine.swapCount == 0)
+    #expect(engine.mainWriteCount == 0)
+  }
+
+  /// Counting must begin exactly at `sortStartIndex`, with no off-by-one in either direction.
+  @Test
+  func countingBeginsExactlyAtSortStartIndexWithNoOffByOne() {
+    let operations: [SortOperation] = [
+      .compare(0, 1), .swap(0, 1),  // shuffle — indices 0-1
+      .swap(0, 1)  // sort — index 2, the first counted operation
+    ]
+    let tape = makeTape(initialValues: [3, 1, 2], operations: operations, sortStartIndex: 2)
+    let engine = ReplayEngine(tape: tape)
+
+    engine.stepForward()  // index 0: shuffle compare
+    engine.stepForward()  // index 1: shuffle swap
+    #expect(engine.compareCount == 0)
+    #expect(engine.swapCount == 0)
+
+    engine.stepForward()  // index 2: the first sort operation
+    #expect(engine.swapCount == 1)
+    #expect(engine.mainWriteCount == 2)
+  }
+
+  /// Scrubbing backward into the shuffle region must zero the gated counters again, and
+  /// scrubbing forward past `sortStartIndex` must match a fresh, independently-stepped
+  /// reference engine — the strongest guarantee against double-counting or missed counts
+  /// across `seek(to:)`'s checkpoint-replay path.
+  @Test
+  func seekingBackwardIntoShuffleThenForwardPastSortStartProducesCorrectCounts() {
+    let operations: [SortOperation] = (0..<1200).map { i in
+      i.isMultiple(of: 2) ? .compare(0, 1) : .swap(0, 1)
+    }
+    let tape = makeTape(initialValues: [1, 2], operations: operations, sortStartIndex: 600)
+
+    let engine = ReplayEngine(tape: tape)
+    for _ in 0..<1000 { engine.stepForward() }
+    #expect(engine.compareCount > 0)
+    #expect(engine.swapCount > 0)
+
+    engine.seek(to: 400)  // inside the shuffle region
+    #expect(engine.compareCount == 0)
+    #expect(engine.swapCount == 0)
+
+    engine.seek(to: 900)  // past sortStartIndex
+    let reference = ReplayEngine(tape: tape)
+    for _ in 0..<900 { reference.stepForward() }
+    #expect(engine.compareCount == reference.compareCount)
+    #expect(engine.swapCount == reference.swapCount)
+    #expect(engine.stepIndex == reference.stepIndex)
+  }
+
+  /// `sortStartIndex` deliberately falls strictly between two ~500-op checkpoint boundaries
+  /// (`ReplayEngine.checkpointInterval`) — confirms checkpoints built in `init` already carry
+  /// correctly-gated counts, with no extra boundary-awareness needed in `seek(to:)` itself.
+  @Test
+  func checkpointsStraddlingSortStartIndexProduceCorrectGatedCounts() {
+    let operations: [SortOperation] = (0..<1200).map { i in
+      i.isMultiple(of: 2) ? .compare(0, 1) : .swap(0, 1)
+    }
+    let tape = makeTape(initialValues: [1, 2], operations: operations, sortStartIndex: 550)
+
+    let engine = ReplayEngine(tape: tape)
+    engine.seek(to: 520)  // shuffle region, past the 500 checkpoint
+    #expect(engine.compareCount == 0)
+    #expect(engine.swapCount == 0)
+
+    engine.seek(to: 700)  // past sortStartIndex; nearest checkpoint (500) is pre-boundary
+    let reference = ReplayEngine(tape: tape)
+    for _ in 0..<700 { reference.stepForward() }
+    #expect(engine.compareCount == reference.compareCount)
+    #expect(engine.swapCount == reference.swapCount)
   }
 }

@@ -15,21 +15,12 @@ public struct DiamondSortRecursive: SortAlgorithm {
   )
   public init() {}
 
-  /// Ported from ArrayV's `DiamondSortRecursive.sort(arr, start, stop, merge)` — with one real
-  /// fix. A direct, unpadded port of the Java (verified by simulating it outside
-  /// `RecordingEngine`) only sorts correctly when the range length is a power of two — e.g. every
-  /// one of 4/8/16/32/64/128/256 sorts correctly across thousands of random trials, but plenty of
-  /// in-between sizes (5, 6, 9, 10, 12, 20, ...) come out with elements still out of order. This
-  /// is the same "network only proven correct at specific sizes" situation `BitonicSortIterative`
-  /// already solves by padding: `record(into:)` runs the real `sort` network over the next power
-  /// of two at or above `engine.count`, and `compareAndSwap` silently skips any comparison that
-  /// would touch an index at or past the real length — those indices are conceptually filler
-  /// elements larger than everything real, so a comparison against one never needs a swap, and
-  /// skipping it (rather than performing a swap that would smuggle a nonexistent filler value into
-  /// a real array slot) leaves the real elements to sort correctly among themselves. Verified
-  /// against the same random-trial harness across every size from 1 to 256: zero failures, and —
-  /// unlike the unpadded version, whose behavior on ties was never checked — stable under repeated
-  /// duplicate-heavy trials too.
+  /// ArrayV's `DiamondSortRecursive.sort` is a sorting network only proven correct when the range
+  /// length is a power of two — an unpadded port fails on in-between sizes (5, 6, 9, 10, ...).
+  /// `record(into:)` runs the network over the next power of two at or above `engine.count`, and
+  /// `compareAndSwap` silently skips any comparison touching an out-of-range index — those indices
+  /// are conceptually filler elements larger than everything real, so skipping them never needs a
+  /// swap and leaves the real elements to sort correctly among themselves.
   public func record(into engine: inout RecordingEngine) {
     let n = engine.count
     guard n > 1 else { return }

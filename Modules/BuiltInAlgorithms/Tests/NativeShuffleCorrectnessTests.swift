@@ -19,20 +19,17 @@ struct NativeShuffleCorrectnessTests {
     PartitionedShuffle(), QuicksortAdversaryShuffle(), RandomShuffle(), RealFinalMergeShuffle(),
     RealFinalRadixShuffle(), RecursiveRadixShuffle(), RecursiveReversalShuffle(), SawtoothShuffle(),
     ShuffledCubicShuffle(), ShuffledHalfShuffle(), ShuffledHeadShuffle(), ShuffledOddsShuffle(),
-    ShuffledQuinticShuffle(), ShuffledTailShuffle(), SierpinskiShuffle(), TriangularShuffle(),
+    ShuffledQuinticShuffle(), ShuffledTailShuffle(), SierpinskiShuffle(), TriangularShuffle()
   ]
 
-  /// Every one of these 33 new shuffles rearranges the array's *existing* values — unlike the
-  /// curve shuffles (`ShuffledCubicShuffle`/`ShuffledQuinticShuffle`), none of them compute a
-  /// brand-new value out of thin air — so, unlike the generic length-only check above, they all
-  /// owe a stronger guarantee: the output must be a genuine permutation of the input.
+  /// Unlike the curve shuffles (`ShuffledCubicShuffle`/`ShuffledQuinticShuffle`), these shuffles
+  /// only rearrange existing values, so they owe a stronger guarantee than the length-only check
+  /// above: the output must be a genuine permutation of the input.
   ///
-  /// `LogarithmicSlopesShuffle` is deliberately excluded: hand-tracing ArrayV's own
-  /// `2 * (i - power) + 1` index formula against a plain identity array shows it reads the same
-  /// handful of low indices repeatedly (e.g. at size 4, both `i = 1` and `i = 2` read index 1),
-  /// producing genuine duplicate values and dropping others entirely — true under ArrayV's own
-  /// 0-indexed convention too, not an artifact of this app's 1-indexed values, so it belongs in
-  /// the same "doesn't guarantee a permutation" bucket the curve shuffles occupy below.
+  /// `LogarithmicSlopesShuffle` is excluded: ArrayV's own `2 * (i - power) + 1` index formula
+  /// reads the same low indices repeatedly (e.g. at size 4, both `i = 1` and `i = 2` read index
+  /// 1), producing duplicate values and dropping others — a real property of the formula itself,
+  /// not an artifact of this app's 1-indexed values.
   private static let permutingShuffles: [any ShuffleAlgorithm] = [
     AlmostShuffle(), BlockRandomShuffle(), BSTTraversalShuffle(), CircleShuffle(),
     DoubleLayeredShuffle(),
@@ -43,7 +40,7 @@ struct NativeShuffleCorrectnessTests {
     RealFinalMergeShuffle(), RealFinalRadixShuffle(), RecursiveRadixShuffle(),
     RecursiveReversalShuffle(),
     SawtoothShuffle(), ShuffledHalfShuffle(), ShuffledHeadShuffle(), ShuffledOddsShuffle(),
-    ShuffledTailShuffle(), SierpinskiShuffle(), TriangularShuffle(),
+    ShuffledTailShuffle(), SierpinskiShuffle(), TriangularShuffle()
   ]
 
   @Test

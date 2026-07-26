@@ -14,17 +14,13 @@ public struct BubbleBogoSort: SortAlgorithm {
   )
   public init() {}
 
-  /// ArrayV's `BubbleBogoSort` repeatedly picks a RANDOM adjacent pair and swaps it if inverted,
-  /// repeating until the whole array happens to be sorted — an open-ended random walk with no
-  /// hard ceiling, the same `RecordingEngine`-can't-pre-record-an-unbounded-tape problem
-  /// documented on `BogoSort`. Every accepted swap strictly fixes one inversion, so — mirroring
-  /// `ExchangeBogoSort`'s own choice to substitute a fixed deterministic sweep rather than a
-  /// permutation walk, since that's the character actually being preserved here — repeatedly
-  /// sweeping every adjacent pair left-to-right and swapping whenever inverted, until a full
-  /// sweep finds nothing left to fix, is exactly bubble sort's own mechanic: it preserves "pick
-  /// an adjacent pair, fix it if needed" faithfully while guaranteeing termination in O(n^2), a
-  /// genuinely cheap substitute unlike the rest of this family — hence the much larger
-  /// `sizeRange` than a typical bogo variant, matching `ExchangeBogoSort`'s own precedent.
+  /// ArrayV's `BubbleBogoSort` repeatedly picks a random adjacent pair and swaps it if inverted,
+  /// repeating until sorted — an open-ended random walk, same as `BogoSort`.
+  ///
+  /// Ported here as a deterministic substitute: repeatedly sweep every adjacent pair
+  /// left-to-right, swapping when inverted, until a full sweep finds nothing to fix — this is
+  /// bubble sort's own mechanic, guaranteeing termination in `O(n^2)` (hence the larger
+  /// `sizeRange` than a typical bogo variant).
   public func record(into engine: inout RecordingEngine) {
     let n = engine.count
     guard n > 1 else { return }

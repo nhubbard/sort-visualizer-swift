@@ -15,20 +15,12 @@ public struct LessBogoSort: SortAlgorithm {
   )
   public init() {}
 
-  /// ArrayV's `LessBogoSort` repeatedly Fisher–Yates shuffles the remaining range `[i, n)` until
-  /// its front element happens to be the minimum of that range, then "drops" it by advancing
-  /// `i`. Like `BogoSort`, a real shuffle-until-lucky loop has no memory of which arrangements of
-  /// `[i, n)` it's already tried, so `RecordingEngine`'s pre-recorded tape has no hard ceiling —
-  /// the same problem, just re-run once per outer step instead of once overall.
-  ///
-  /// This applies `BogoSort`'s own fix at the scope of each remaining subrange: instead of a
-  /// random shuffle, deterministically step through lexicographic permutations of `[i, n)`
-  /// (the same `next_permutation` technique, just bounded to the subrange) until the front
-  /// element lands on the minimum. Every one of `(n - i)!` permutations of that subrange is
-  /// reachable this way with no repeats, so each outer step is guaranteed to terminate within a
-  /// hard `(n - i)!`-step ceiling — landing on the range's fully *ascending* order in particular
-  /// always satisfies "front is minimum," so the walk can never run out of options before
-  /// succeeding.
+  /// ArrayV's `LessBogoSort` repeatedly shuffles the remaining range `[i, n)` until its front
+  /// element is the minimum, then advances `i`. Ported using `BogoSort`'s fix applied per
+  /// subrange: instead of a random shuffle, deterministically step through lexicographic
+  /// permutations of `[i, n)` until the front lands on the minimum. Every one of `(n - i)!`
+  /// permutations is reachable with no repeats, and the fully ascending arrangement always
+  /// satisfies "front is minimum," so each outer step is guaranteed to terminate.
   public func record(into engine: inout RecordingEngine) {
     let n = engine.count
     guard n > 1 else { return }

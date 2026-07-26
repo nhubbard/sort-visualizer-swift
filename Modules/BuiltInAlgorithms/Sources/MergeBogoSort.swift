@@ -16,22 +16,15 @@ public struct MergeBogoSort: SortAlgorithm {
   public init() {}
 
   /// ArrayV's `MergeBogoSort` recursively sorts each half, then randomly "weaves" the two
-  /// already-sorted runs back together — repeatedly picking a random subset of positions to pull
-  /// from the right run (and the rest from the left) until the merged result happens to be
-  /// sorted — the same open-ended random walk `BogoSort` already fixed, just over the space of
-  /// interleavings of two fixed runs rather than permutations of the whole range.
+  /// already-sorted runs back together by picking a random subset of positions to pull from the
+  /// right run until the result is sorted. Ported as a deterministic walk instead: every bitmask
+  /// of length `end - start` with exactly `end - mid` bits set is one candidate interleaving (bit
+  /// set = pull from the right run); walking masks in increasing order and skipping any whose bit
+  /// count doesn't match visits every interleaving exactly once, and the correct one is always
+  /// among them, so termination is guaranteed.
   ///
-  /// Substitutes a deterministic walk over that same interleaving space: every bitmask of length
-  /// `end - start` with exactly `end - mid` bits set corresponds to one candidate interleaving
-  /// (bit set = pull from the right run next); walking masks in increasing integer order and
-  /// skipping any whose bit count doesn't match is a simple, correctly-bounded way to visit every
-  /// one exactly once with no combinatorics helper beyond `Int.nonzeroBitCount`. The correct
-  /// merge interleaving is always among them, so this is guaranteed to terminate.
-  ///
-  /// ArrayV reuses the main array itself as scratch space for the random mask; this uses a real
-  /// aux array for the pre-weave snapshot instead (matching `MergeSort.swift`'s own convention),
-  /// which avoids a confusing "values flash to 0/1 mid-sort" visual and gives proper
-  /// `auxWriteCount` credit for the snapshot.
+  /// Uses a real aux array for the pre-weave snapshot (matching `MergeSort.swift`) rather than
+  /// ArrayV's reuse of the main array as scratch space.
   public func record(into engine: inout RecordingEngine) {
     let n = engine.count
     guard n > 1 else { return }

@@ -1,32 +1,19 @@
 import AlgorithmKit
 import SortEngineKit
 
-/// ArrayV's `BinaryDoubleInsertionSort`: a binary-search-accelerated sibling of
-/// `DoubleInsertionSort` (see that file's header for the shared middle-outward-growth shape).
-/// `i`/`j` still start as the pair of indices straddling the midpoint (swapped into order first,
-/// via the one and only `swap` this algorithm ever does) and still step outward one slot per
-/// iteration, absorbing one new element from each side per pass. The difference is entirely in
-/// *how* each of those two new elements gets inserted: instead of a linear scan-while-shifting
-/// loop that compares against one array slot at a time, this binary-searches the sorted middle
-/// region for the element's exact destination first (`leftBinarySearch`/`rightBinarySearch`),
-/// then performs a single shift-and-drop pass to get it there (`insertToLeft`/`insertToRight`).
-/// Binary search cuts the number of *comparisons* per insertion from O(n) to O(log n), but the
-/// shift itself is still a linear walk over the elements between the old and new position, so the
-/// total element-move count — and thus the overall time bound — is unchanged from the sibling.
+/// ArrayV's `BinaryDoubleInsertionSort` — a binary-search-accelerated sibling of
+/// `DoubleInsertionSort` (see that file for the shared middle-outward-growth shape: `i`/`j` start
+/// straddling the midpoint and step outward, absorbing one new element from each side per pass).
+/// The difference: instead of a linear scan-while-shifting insertion, each new element's exact
+/// destination is found first via binary search (`leftBinarySearch`/`rightBinarySearch`), then
+/// placed with a single shift-and-drop pass (`insertToLeft`/`insertToRight`). This cuts comparisons
+/// per insertion from O(n) to O(log n), but the shift is still a linear walk, so the overall time
+/// bound is unchanged from the sibling.
 ///
-/// Stability: empirically and by construction this *is* stable, for exactly the sibling's
-/// reason, just phrased in terms of binary-search insertion points instead of scan-stop
-/// conditions:
-///   - An element captured from `j` (a larger original index) is searched for with
-///     `rightBinarySearch`'s *strict* `<` (an upper-bound search: the first position whose
-///     resident value is strictly greater), so it lands *after* every element already resident
-///     that compares equal to it. Correct: larger index stays later.
-///   - An element captured from `i` (a smaller original index) is searched for with
-///     `leftBinarySearch`'s *non-strict* `<=` (a lower-bound search: the first position whose
-///     resident value is greater-or-equal), so it lands *before* every element already resident
-///     that compares equal to it. Correct: smaller index stays earlier.
-/// Every move inside `insertToLeft`/`insertToRight` is a single-element write walking one slot at
-/// a time — never a swap of non-adjacent elements — so equal elements never leapfrog each other.
+/// Stable: the element from `j` (larger original index) uses `rightBinarySearch`'s strict `<`
+/// (upper-bound, lands after resident equals); the element from `i` (smaller original index) uses
+/// `leftBinarySearch`'s non-strict `<=` (lower-bound, lands before resident equals). That asymmetry
+/// keeps equal elements in original order.
 public struct BinaryDoubleInsertionSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "binarydoubleinsertionsort")
   public let metadata = AlgorithmMetadata(
@@ -43,12 +30,8 @@ public struct BinaryDoubleInsertionSort: SortAlgorithm {
   public func record(into engine: inout RecordingEngine) {
     let n = engine.count
 
-    // ArrayV's `leftBinarySearch(array, a, b, val, sleep)`: `val` is a value already read out
-    // into a local (see the `l`/`r` captures in `doubleInsertion` below) rather than a value
-    // still live at some index, so this is the held-value-vs-array-value pattern (matching
-    // `CycleSort.countLesser`/`SimplifiedLibrarySort.gapSearch`), not `engine.compare`.
-    // Reads.compareValues(val, array[m]) <= 0 — NON-STRICT: this is a lower-bound search, so
-    // ties resolve toward the left (`val` ends up *before* any resident equal elements).
+    // ArrayV's `leftBinarySearch`: held-value lower-bound search (non-strict `<=`), so ties
+    // resolve left — `val` lands before any resident equal elements.
     func leftBinarySearch(_ a: Int, _ b: Int, _ val: Int) -> Int {
       var lo = a
       var hi = b
@@ -63,9 +46,8 @@ public struct BinaryDoubleInsertionSort: SortAlgorithm {
       return lo
     }
 
-    // ArrayV's `rightBinarySearch(array, a, b, val, sleep)`: same held-value shape as above,
-    // but Reads.compareValues(val, array[m]) < 0 — STRICT: an upper-bound search, so ties
-    // resolve toward the right (`val` ends up *after* any resident equal elements).
+    // ArrayV's `rightBinarySearch`: strict upper-bound search, so ties resolve right — `val`
+    // lands after any resident equal elements.
     func rightBinarySearch(_ a: Int, _ b: Int, _ val: Int) -> Int {
       var lo = a
       var hi = b
@@ -107,11 +89,9 @@ public struct BinaryDoubleInsertionSort: SortAlgorithm {
     func doubleInsertion(_ a: Int, _ b: Int) {
       guard b - a >= 2 else { return }
 
-      // Same seed-index arithmetic as the sibling `DoubleInsertionSort.insertionSort`'s
-      // `left`/`right`, just renamed `i`/`j` to match ArrayV's own names in this file. For
-      // odd-length ranges the two seed indices coincide on a single middle element (`j` ==
-      // `i`); the `j > i` guard below skips the swap check in that case, since a lone
-      // element trivially needs no ordering fix.
+      // Same seed-index arithmetic as `DoubleInsertionSort.insertionSort`'s `left`/`right`. For
+      // odd-length ranges `i` and `j` coincide on the middle element; the `j > i` guard below
+      // skips the swap check then.
       let j0 = a + (b - a - 2) / 2 + 1
       let i0 = a + (b - a - 1) / 2
       var i = i0
@@ -134,24 +114,18 @@ public struct BinaryDoubleInsertionSort: SortAlgorithm {
           let l = engine.values[j]
           let r = engine.values[i]
 
-          // `l` came from `j` (the larger original index): find its destination with
-          // `rightBinarySearch` (strict, upper-bound — lands after resident equals),
-          // then shift it into place with a single `insertToRight` pass.
+          // `l` (from `j`) uses `rightBinarySearch`; `r` (from `i`) uses `leftBinarySearch` —
+          // see the type-level stability note for why.
           let m = rightBinarySearch(i + 1, j, l)
           insertToRight(i, m - 1, l)
-          // `r` came from `i` (the smaller original index): find its destination with
-          // `leftBinarySearch` (non-strict, lower-bound — lands before resident
-          // equals), then shift it into place with a single `insertToLeft` pass.
           let dest = leftBinarySearch(m, j, r)
           insertToLeft(j, dest, r)
         } else {
           let l = engine.values[i]
           let r = engine.values[j]
 
-          // Branches swapped relative to the `if` above: `l` (from `i`, the smaller
-          // original index) now uses `leftBinarySearch` (non-strict, lower-bound), and
-          // `r` (from `j`, the larger original index) uses `rightBinarySearch` (strict,
-          // upper-bound) — exactly ArrayV's asymmetry, preserved.
+          // Branches swapped relative to the `if` above: `l` (from `i`) now uses
+          // `leftBinarySearch`, `r` (from `j`) uses `rightBinarySearch`.
           let m = leftBinarySearch(i + 1, j, l)
           insertToRight(i, m - 1, l)
           let dest = rightBinarySearch(m, j, r)

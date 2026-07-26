@@ -15,23 +15,17 @@ public struct BinomialHeapSort: SortAlgorithm {
   )
   public init() {}
 
-  /// ArrayV's own arithmetic is entirely 1-indexed (`array[x - 1]` everywhere) and leans on bit
-  /// tricks over that 1-indexed position rather than an explicit tree structure — a binomial
-  /// heap's node `x`'s "parent-ward" neighbors are found by clearing successively higher set
-  /// bits of `x`. This translates the index bookkeeping line-for-line (still 1-indexed
-  /// internally, only ever converted to a 0-indexed `engine` call at the point of an actual
-  /// compare/swap) rather than re-deriving the bit arithmetic from a cleaner 0-indexed model,
-  /// since faithfulness to the exact traversal order matters more here than tidiness.
+  /// ArrayV's arithmetic is 1-indexed (`array[x - 1]` everywhere): a binomial heap node `x`'s
+  /// parent-ward neighbors are found by clearing successively higher set bits of `x`. Index
+  /// bookkeeping stays 1-indexed internally and is only converted to 0-indexed at the point of an
+  /// `engine` call, to keep the traversal order identical to ArrayV's.
   ///
-  /// **Phase 1** (`index` stepping by 2): builds the binomial-heap structure — for each even
-  /// `index`, repeatedly finds the largest value among `index` and its "binomial siblings"
-  /// (found by clearing the lowest set bit not yet cleared) and bubbles it up via swap, stopping
-  /// once a full pass finds nothing bigger.
+  /// Phase 1 (`index` stepping by 2) builds the binomial-heap structure: for each even `index`,
+  /// bubbles the largest of `index` and its binomial siblings up via swap until a pass finds
+  /// nothing bigger.
   ///
-  /// **Phase 2** (`index` counting down from `n`): extracts the max at the current root by
-  /// walking the set bits of `index` from lowest to highest (each one names a subtree root to
-  /// compare), then — if a bigger node was found — repeats the same bubble-up as phase 1,
-  /// starting from that node, to restore the structure before moving to the next `index`.
+  /// Phase 2 (`index` counting down from `n`) extracts the max at the current root by walking
+  /// `index`'s set bits, then re-runs phase 1's bubble-up from any bigger node found before moving on.
   public func record(into engine: inout RecordingEngine) {
     let n = engine.count
     guard n > 1 else { return }

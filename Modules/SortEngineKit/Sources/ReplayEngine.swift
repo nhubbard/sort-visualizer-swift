@@ -115,15 +115,12 @@ public final class ReplayEngine {
   }
 
   /// The one `@Observable`-tracked stored property behind `frame`/`auxArrays`/`compareCount`/
-  /// `swapCount`/`mainWriteCount`/`auxWriteCount`/`reversalCount`/`stepIndex` below. Profiling a
-  /// live replay showed the main thread pegged inside SwiftUI's AttributeGraph dirty-propagation
-  /// machinery, not inside any view body — caused by this type previously exposing five of these
-  /// as *separate* stored properties, each mutated independently every tick, each firing its own
-  /// Observable dirty-propagation. Bundling them into one value and writing it exactly once per
-  /// mutation (`stepForward`/`seek`/each `play()` tick) cut that fan-out 5x at the time. Every
-  /// ArrayV-parity statistic added since (`mainWriteCount`/`auxWriteCount`/`reversalCount`, and
-  /// whatever comes next) is a new `PlaybackState` field for exactly that reason — adding it as
-  /// its own stored property on `ReplayEngine` would reopen the fan-out this consolidation closed.
+  /// `swapCount`/`mainWriteCount`/`auxWriteCount`/`reversalCount`/`stepIndex` below. These used to
+  /// be five separate stored properties, each firing its own Observable dirty-propagation on every
+  /// tick, which pegged the main thread in SwiftUI's AttributeGraph machinery rather than any view
+  /// body. Bundling them into one value written exactly once per mutation
+  /// (`stepForward`/`seek`/each `play()` tick) fixed it — any new ArrayV-parity statistic must be
+  /// added as a `PlaybackState` field, not a separate stored property, or the fan-out returns.
   public private(set) var state: PlaybackState
 
   public var frame: [BarState] { state.frame }
@@ -144,15 +141,10 @@ public final class ReplayEngine {
     state.auxArrays.values.reduce(0) { $0 + $1.count }
   }
 
-  /// A second, independent per-operation observer, orthogonal to `play(onStep:)`'s own
-  /// parameter — set directly on whichever `ReplayEngine` instance a view currently holds
-  /// (views already get one, e.g. `MetalRendererView`), rather than threaded through
-  /// `SortSession`'s audio-specific wiring. Exists so an incremental renderer can repaint just
-  /// the touched positions without `SortEngineKit`/`SortSession` needing to know renderers
-  /// exist at all — the same "engine stays unaware of who's listening" shape `onStep` itself
-  /// already has for audio. Fires immediately after `onStep`, with the same post-batch `frame`
-  /// state (see `play()`'s doc comment on `onStep` for why a batch's intermediate per-operation
-  /// values are never individually observable — both hooks share that same limitation).
+  /// A second, independent per-operation observer, orthogonal to `play(onStep:)`. Lets an
+  /// incremental renderer repaint just the touched positions without `SortEngineKit`/
+  /// `SortSession` needing to know renderers exist — set directly on the `ReplayEngine` instance a
+  /// view holds. Fires immediately after `onStep`, with the same post-batch `frame` state.
   public var onOperationApplied: ((SortOperation) -> Void)?
 
   public private(set) var isPlaying = false
@@ -178,14 +170,11 @@ public final class ReplayEngine {
   private var currentSegmentStart: Date?
 
   /// Folds the currently-open segment (if any) into `activePlaybackDuration` and clears
-  /// `currentSegmentStart` — shared by `pause()` and `play()`'s own natural-completion path.
-  /// Idempotent: `currentSegmentStart` is `nil` after the first call, so whichever of "the tape
-  /// ran out" or "the user paused" happens first wins outright; the other is a no-op. Without
-  /// this shared close on the natural-completion path too, `elapsedPlaybackDuration`'s getter
-  /// (which adds live `Date()` time for any still-open segment) would keep growing, unbounded,
-  /// on every read after a sort finishes on its own — until the next `pause()`/`seek(to:)`
-  /// happened to close it. `RunControlBar` reads `elapsedPlaybackDuration` on every body
-  /// evaluation, so this was a real, user-visible drift, not just a theoretical one.
+  /// `currentSegmentStart` — shared by `pause()` and `play()`'s natural-completion path.
+  /// Idempotent, so whichever of "tape ran out" or "user paused" happens first wins. Without
+  /// closing on natural completion too, `elapsedPlaybackDuration`'s getter would keep growing on
+  /// every read after a sort finishes on its own, since `RunControlBar` reads it every body
+  /// evaluation.
   private func closeActiveSegmentIfNeeded() {
     if let currentSegmentStart {
       activePlaybackDuration += Date().timeIntervalSince(currentSegmentStart)
@@ -226,8 +215,9 @@ public final class ReplayEngine {
 
     var checkpoints = [initialState]
     var working = initialState
+    let sortStartIndex = tape.header.sortStartIndex
     for operation in tape.operations {
-      Self.apply(operation, to: &working)
+      Self.apply(operation, to: &working, sortStartIndex: sortStartIndex)
       if working.stepIndex.isMultiple(of: Self.checkpointInterval) {
         checkpoints.append(working)
       }
@@ -238,7 +228,9 @@ public final class ReplayEngine {
   public func stepForward() {
     guard state.stepIndex < tape.operations.count else { return }
     mutatingState { working in
-      Self.apply(tape.operations[working.stepIndex], to: &working)
+      Self.apply(
+        tape.operations[working.stepIndex], to: &working,
+        sortStartIndex: tape.header.sortStartIndex)
     }
   }
 
@@ -251,25 +243,21 @@ public final class ReplayEngine {
     pause()
     let target = max(0, min(index, tape.operations.count))
     let checkpoint = nearestCheckpoint(atOrBefore: target)
+    let sortStartIndex = tape.header.sortStartIndex
     mutatingState { working in
       working = checkpoint
       while working.stepIndex < target {
-        Self.apply(tape.operations[working.stepIndex], to: &working)
+        Self.apply(tape.operations[working.stepIndex], to: &working, sortStartIndex: sortStartIndex)
       }
     }
   }
 
-  /// Routes a mutation through `@Observable`'s synthesized `_modify` accessor for `state`
-  /// (via `&state`) instead of `var working = state; ...; state = working`. The latter leaves
-  /// `state` and `working` referencing the same `frame` buffer until the write-back — `Array`
-  /// is copy-on-write, so the very first element mutation inside `body` forces a full O(n) copy
-  /// of `frame` before it can write to it. Yielding `state` directly keeps only one reference to
-  /// that buffer alive for the whole batch, so no copy happens regardless of how many operations
-  /// `body` applies. `_modify` also unconditionally calls `willSet`/`didSet` exactly once for the
-  /// whole access rather than routing through the `Equatable`-based `shouldNotifyObservers` the
-  /// plain setter uses — batched callers (`play()`) always mutate `state`, so that's moot; this
-  /// helper exists for the copy-avoidance, not to dodge the (already-cheap, see `PlaybackState.
-  /// ==`) equality check.
+  /// Routes the mutation through `@Observable`'s synthesized `_modify` accessor for `state` (via
+  /// `&state`) rather than `var working = state; ...; state = working`, which would keep two
+  /// references to `frame` alive until the write-back and force a copy-on-write copy on the first
+  /// element mutation. `_modify` also calls `willSet`/`didSet` exactly once for the whole access
+  /// instead of per assignment — incidental here since batched callers always mutate `state`
+  /// directly; this helper exists for the copy-avoidance, not to dodge the equality check.
   private func mutatingState(_ body: (inout PlaybackState) -> Void) {
     body(&state)
   }
@@ -298,36 +286,22 @@ public final class ReplayEngine {
   /// Returns the playback `Task` so callers (e.g. `SortSession`) can `await` its completion
   /// instead of polling `isPlaying`.
   ///
-  /// `onStep`, when provided, is called with each operation immediately after it's applied —
-  /// this is the seam `SortSession` uses to fire audio per touched index (§3.1 of
-  /// ARCHITECTURE_V2.md) without `SortEngineKit` itself knowing `AudioPlaying`/`AppSettings`
-  /// exist. Deliberately scoped to this loop only, not `stepForward()` itself, so scrubbing via
-  /// `stepForward()`/`stepBackward()`/`seek(to:)` directly never triggers audio.
+  /// `onStep` fires per operation immediately after it's applied — the seam `SortSession` uses to
+  /// fire audio per touched index without `SortEngineKit` knowing `AudioPlaying`/`AppSettings`
+  /// exist. Scoped to this loop, not `stepForward()`, so scrubbing never triggers audio. `speed` is
+  /// read fresh every tick so a live change takes effect immediately.
   ///
-  /// Reads `speed` fresh on every tick (rather than capturing it once) so a caller can change it
-  /// live, mid-replay, and see the new cadence take effect immediately.
+  /// Ticks come from `displayLinkFactory()` (real vsync via `CADisplayLinkDriver` in production, a
+  /// deterministic fake in tests) rather than a sleep interval derived from `speed`, decoupling
+  /// simulation (`opsToApply`'s uncapped `elapsed × speed` accumulator) from render — a faster
+  /// machine just applies more operations per vsync interval. A tick with nothing due is skipped
+  /// entirely, with no `mutatingState` write or redraw.
   ///
-  /// Ticks come from `displayLinkFactory()` — real hardware vsync (`CADisplayLinkDriver`) in
-  /// production, a deterministic fake in tests — rather than a fixed sleep interval derived from
-  /// `speed`. This decouples *simulation* (how many tape operations are due, governed purely by
-  /// `opsToApply`'s `elapsed × speed` accumulator, uncapped) from *render* (when the display
-  /// actually gets a new frame): a fast machine at a high `speed` just accumulates and applies
-  /// more operations per real vsync interval, instead of being capped by an assumed render rate.
-  /// A tick that has no operation due yet (`opsToApply == 0`, common at low `speed`) is skipped
-  /// entirely — no `mutatingState` write, no redraw. Whatever batch *is* due within one tick
-  /// still applies through one `mutatingState` call, preserving the single-`@Observable`-write-
-  /// per-tick property the type's other doc comments (see `state`) depend on.
-  ///
-  /// `opsToApply` is a budget of *significant* operations (`SortOperation.isSignificantForPacing`
-  /// — `.compare`/`.swap`/`.setValue`/`.auxWrite`/`.reversal`/`.markSorted`), not raw tape
-  /// entries: `RecordingEngine.markPrimarySecondary` emits up to 4 bookkeeping `.mark`/
-  /// `.unmarkIndex` entries around every `.compare`/`.swap` to retract the previous highlighted
-  /// pair and apply the new one, so a flat "N tape entries per tick" budget was spending ~4/5 of
-  /// every tick's budget on marker bookkeeping instead of real algorithmic progress — at a UI-
-  /// configured "200 ops/sec," only ~40 real compares/swaps actually happened per second. The
-  /// inner loop below still applies (and still reports to `onStep`/`onOperationApplied`) every
-  /// tape entry it passes over, bookkeeping included — it just doesn't count against the budget,
-  /// so bookkeeping rides along for free within whichever tick it falls in.
+  /// `opsToApply` budgets only *significant* operations (`SortOperation.isSignificantForPacing`):
+  /// bookkeeping `.mark`/`.unmarkIndex` entries around each `.compare`/`.swap` still apply, and
+  /// still reach `onStep`/`onOperationApplied`, but don't count against the budget — otherwise a
+  /// flat per-tick entry cap would spend most of it on marker bookkeeping instead of real
+  /// algorithmic progress.
   @discardableResult
   public func play(onStep: ((SortOperation) -> Void)? = nil) -> Task<Void, Never> {
     isPlaying = true
@@ -344,6 +318,7 @@ public final class ReplayEngine {
         guard let self, !Task.isCancelled else { break }
         let remaining = self.tape.operations.count - self.state.stepIndex
         guard remaining > 0 else { break }
+        let sortStartIndex = self.tape.header.sortStartIndex
 
         let opsToApply = Self.opsToApply(
           elapsed: elapsed, speed: self.speed, accumulator: &accumulator, remaining: remaining
@@ -358,7 +333,7 @@ public final class ReplayEngine {
           var significantApplied = 0
           while significantApplied < opsToApply, working.stepIndex < self.tape.operations.count {
             let operation = self.tape.operations[working.stepIndex]
-            Self.apply(operation, to: &working)
+            Self.apply(operation, to: &working, sortStartIndex: sortStartIndex)
             appliedOperations.append(operation)
             if operation.isSignificantForPacing {
               significantApplied += 1
@@ -412,17 +387,30 @@ public final class ReplayEngine {
     return result
   }
 
-  private static func apply(_ operation: SortOperation, to state: inout PlaybackState) {
+  /// `sortStartIndex` gates the five ArrayV-parity counters (`compareCount`/`swapCount`/
+  /// `mainWriteCount`/`auxWriteCount`/`reversalCount`) so a recorded shuffle's own operations
+  /// (§2A.4, `TapeHeader.sortStartIndex`) animate the frame but never inflate the stats
+  /// `RunControlBar` displays, matching `TapeHeader`'s already-sort-only totals. `state.stepIndex`
+  /// here is still *pre-increment* (bumped at the end of this function) — the raw tape index of
+  /// the operation being applied right now, exactly what needs comparing against `sortStartIndex`.
+  private static func apply(
+    _ operation: SortOperation, to state: inout PlaybackState, sortStartIndex: Int
+  ) {
+    let countsTowardStats = state.stepIndex >= sortStartIndex
     switch operation {
     case .swap(let i, let j):
       let temp = state.frame[i].value
       state.frame[i].value = state.frame[j].value
       state.frame[j].value = temp
-      state.swapCount += 1
-      state.mainWriteCount += 2
+      if countsTowardStats {
+        state.swapCount += 1
+        state.mainWriteCount += 2
+      }
     case .setValue(let i, let value):
       state.frame[i].value = value
-      state.mainWriteCount += 1
+      if countsTowardStats {
+        state.mainWriteCount += 1
+      }
     case .mark(let marker, let index):
       state.frame[index].markers.insert(marker)
     case .unmark(let marker):
@@ -432,18 +420,24 @@ public final class ReplayEngine {
     case .unmarkAll:
       for i in state.frame.indices { state.frame[i].markers.removeAll() }
     case .compare:
-      state.compareCount += 1
+      if countsTowardStats {
+        state.compareCount += 1
+      }
     case .markSorted(let i):
       state.frame[i].isSorted = true
     case .auxCreate(let handle, let length):
       state.auxArrays[handle] = Array(repeating: 0, count: length)
     case .auxWrite(let handle, let index, let value):
       state.auxArrays[handle]![index] = value
-      state.auxWriteCount += 1
+      if countsTowardStats {
+        state.auxWriteCount += 1
+      }
     case .auxDelete(let handle):
       state.auxArrays.removeValue(forKey: handle)
     case .reversal:
-      state.reversalCount += 1
+      if countsTowardStats {
+        state.reversalCount += 1
+      }
     }
     if operation.isSignificantForPacing {
       state.significantOperationCount += 1

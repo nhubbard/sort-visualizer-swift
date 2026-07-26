@@ -28,22 +28,19 @@ public struct BigOChartPoint: Identifiable, Sendable {
 }
 
 /// Resolves a declared complexity string to a value at `n`, going beyond `BigOShape.parse`'s
-/// pure-`n` shapes for the handful of `AlgorithmMetadata` entries that reference another variable
-/// — `BigOShape` deliberately stays app-agnostic (its own doc comment), but `SortSession.makeTape`
-/// always shuffles a permutation of `1...n`, which pins most of those "extra" variables to a
-/// concrete function of `n` in this specific app:
+/// pure-`n` shapes for `AlgorithmMetadata` entries that reference another variable.
+/// `SortSession.makeTape` always shuffles a permutation of `1...n`, which pins those "extra"
+/// variables to a concrete function of `n` in this specific app:
 ///   - Radix sort's digit count `d` and LSD's bucket count `b`: `radix` is a hardcoded `4` in both
-///     `MSDRadixSort`/`LSDRadixSort`, never a runtime variable, so `d = log₄ n` and `b = 4`.
+///     `MSDRadixSort`/`LSDRadixSort`, so `d = log₄ n` and `b = 4`.
 ///   - Counting/Pigeonhole/Gravity sort's value range `k`: every shuffle keeps values within
-///     `~[1, n]`, so `k ≈ n` regardless of which of the five built-in shuffles produced the array.
-///   - Bingo sort's unique-value count `m` is the one exception — two of the five built-in shuffles
-///     (`shuffledcubic`/`shuffledquintic`) resample through a skewed curve and can produce
-///     duplicate values, so `m` isn't a fixed function of `n`. `uniqueValueRatio` is this same
-///     algorithm's own observed `uniqueValueCount / arraySize` average, and the caller falls back
-///     to `1.0` (i.e. `m = n`) when no recorded run has that field populated yet.
+///     `~[1, n]`, so `k ≈ n` regardless of which built-in shuffle produced the array.
+///   - Bingo sort's unique-value count `m` is the exception — `shuffledcubic`/`shuffledquintic`
+///     resample through a skewed curve and can produce duplicates, so `m` isn't a fixed function
+///     of `n`. `uniqueValueRatio` is the observed `uniqueValueCount / arraySize` average, falling
+///     back to `1.0` (`m = n`) when no recorded run has that field populated yet.
 private func resolvedComplexityValue(_ complexity: String, n: Double, uniqueValueRatio: Double)
-  -> Double?
-{
+  -> Double? {
   if let shape = BigOShape.parse(complexity) {
     return shape.value(n: n)
   }
@@ -76,7 +73,7 @@ private func mergedComplexityCases(_ timeComplexity: ComplexityBounds) -> [(
   let rawCases: [(label: String, complexity: String)] = [
     ("Best", timeComplexity.best),
     ("Average", timeComplexity.average),
-    ("Worst", timeComplexity.worst),
+    ("Worst", timeComplexity.worst)
   ]
   let keys = rawCases.map { BigOShape.normalize($0.complexity) ?? $0.complexity }
 
@@ -95,27 +92,19 @@ private func mergedComplexityCases(_ timeComplexity: ComplexityBounds) -> [(
   return cases
 }
 
-/// Turns raw per-run operation counts into chart-ready points: every individual run's "total work"
-/// plotted as a scatter, the per-array-size average plotted as a trendline through that scatter,
-/// and the algorithm's own best/average/worst-case curves as a dashed backdrop for comparison.
+/// Turns raw per-run operation counts into chart-ready points: individual runs as a scatter, the
+/// per-array-size average as a trendline, and the algorithm's declared best/average/worst-case
+/// curves as a dashed backdrop.
 ///
-/// The scatter and its trendline are normalized by the single largest *individual run's* total ever
-/// recorded — not the largest per-size average. That distinction matters: normalizing by "largest
-/// average bucket" instead would always anchor `1.0` to whichever size happens to be the largest one
-/// recorded so far (since total work is monotonic in array size for essentially every algorithm),
-/// making the newest/largest size look like "the worst case yet" by construction, regardless of
-/// whether anything unusual actually happened. Anchoring on the largest individual run instead means
-/// a genuine outlier — e.g. a pathological worst-case shuffle at a *smaller* size — can correctly
-/// outrank a later, larger, but unremarkable run.
+/// The scatter and trendline are normalized by the largest *individual run's* total, not the
+/// largest per-size average — normalizing by average would always anchor `1.0` to the largest
+/// size recorded so far (since total work is monotonic in size), making the newest size look like
+/// "the worst case yet" by construction. Anchoring on the largest individual run instead lets a
+/// genuine outlier at a smaller size correctly outrank a later, larger, unremarkable run.
 ///
-/// Reference curves are unaffected by that distinction: a pure theoretical Big-O curve is genuinely
-/// largest at the largest sampled size, so anchoring each one to `1.0` there (as before) stays
-/// correct. There's no shared unit between raw op counts and `n^2`/`n log n` etc. to begin with, so
-/// every series here is normalized independently — comparing growth *shape*, not raw magnitude, is
-/// the whole point. Every declared complexity renders a curve now, including the ones with a second
-/// free variable in the general case (`resolvedComplexityValue` resolves those using this app's own
-/// `1...n`-permutation convention) — only a string `resolvedComplexityValue` doesn't recognize at
-/// all would contribute no curve.
+/// Reference curves stay anchored to `1.0` at the largest sampled size, since a theoretical Big-O
+/// curve genuinely peaks there. Every series is normalized independently — there's no shared unit
+/// between raw op counts and `n^2`/`n log n`, so only growth *shape* is comparable across them.
 public func bigOChartPoints(
   for summaries: [BigORecordSnapshot],
   timeComplexity: ComplexityBounds

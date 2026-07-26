@@ -15,22 +15,13 @@ public struct StablePermutationSort: SortAlgorithm {
   )
   public init() {}
 
-  /// Unlike every other member of the Bogo/Guess family, ArrayV's `StablePermutationSort` is
-  /// already fully deterministic — no `randInt` anywhere in the Java source — so this is a
-  /// faithful, line-for-line port, not a redesign: a Heap's-algorithm walk over an INDEX array
-  /// `idx` (tracking which original position each slot currently holds) rather than the values
-  /// directly, with a *rotation* — not a swap — as the "step to the next arrangement" move at the
-  /// base of each recursion level.
+  /// ArrayV's `StablePermutationSort` is already deterministic (no `randInt`): a Heap's-algorithm
+  /// walk over an index array `idx`, using a *rotation* rather than a swap as the step to the next
+  /// arrangement.
   ///
-  /// Despite the name, this does **not** actually guarantee stability — confirmed empirically
-  /// (fuzzed against ~40% of duplicate-heavy trials reordering ties, not a rare edge case), the
-  /// same kind of "the name promises more than the algorithm delivers" defect `FunSort` already
-  /// has documented in `PORT_INVENTORY.md`. The rotation-over-swap enumeration order is real and
-  /// translated faithfully; it just doesn't imply what the class name claims it does.
-  ///
-  /// `idx` itself is pure bookkeeping — never visualized in the original either (ArrayV tracks it
-  /// as a plain aux array with no delay), so it stays a local Swift array; only the calls that
-  /// touch the real, visualized array go through `engine`.
+  /// Despite the name, this is NOT stable — fuzzing shows ~40% of duplicate-heavy trials reorder
+  /// ties. `idx` is pure bookkeeping (never visualized in ArrayV either), so it stays a local Swift
+  /// array; only calls touching the real array go through `engine`.
   public func record(into engine: inout RecordingEngine) {
     let n = engine.count
     guard n > 1 else { return }

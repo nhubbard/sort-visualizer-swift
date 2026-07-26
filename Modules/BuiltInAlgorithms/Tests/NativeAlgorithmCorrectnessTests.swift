@@ -40,7 +40,7 @@ struct NativeAlgorithmCorrectnessTests {
     SwaplessBubbleSort(),
     TernaryHeapSort(), TernaryLLQuickSort(), TernaryLRQuickSort(), ThreeSmoothCombSortIterative(),
     ThreeSmoothCombSortRecursive(), TriangularHeapSort(), UnoptimizedBubbleSort(),
-    UnoptimizedCocktailShakerSort(), WeakHeapSort(), WeavedMergeSort(), WeaveMergeSort(),
+    UnoptimizedCocktailShakerSort(), WeakHeapSort(), WeavedMergeSort(), WeaveMergeSort()
   ]
 
   @Test
@@ -120,16 +120,11 @@ struct NativeAlgorithmCorrectnessTests {
     }
   }
 
-  /// No existing test in this suite exercises stability, so this one verifies
-  /// `IntroCircleSortIterative`'s `stable: false` conclusion (see its doc comment) empirically,
-  /// with tagged-duplicate input: each element's *original* index is tracked independently of
-  /// its (heavily duplicated) compared value by replaying the recorded tape's `.swap` operations
-  /// onto a parallel identity array — `originalIndex[k]` ends up holding whichever starting index
-  /// the element now sitting at final position `k` came from. A stable sort would leave every
-  /// group of equal final values with strictly increasing original indices (since equal values
-  /// are scanned left-to-right into the input in increasing-index order); finding any group where
-  /// a later position's original index is smaller than an earlier one directly witnesses two
-  /// equal elements crossing each other's original relative order.
+  /// Verifies `IntroCircleSortIterative`'s `stable: false` claim empirically: replays the
+  /// recorded tape's `.swap` operations onto a parallel identity array to track each element's
+  /// original index, then checks whether any group of equal final values has a later position
+  /// with a smaller original index than an earlier one — which would witness two equal elements
+  /// crossing their original relative order.
   @Test
   func introCircleSortIterativeIsNotStable() {
     let algorithm = IntroCircleSortIterative()
@@ -169,14 +164,10 @@ struct NativeAlgorithmCorrectnessTests {
     )
   }
 
-  /// `WeaveMergeSort`'s own doc comment reasons that `weaveInsert`'s non-strict (`<=`)
-  /// tie-swapping shift condition should reorder equal elements, but calls that conclusion
-  /// untractable to hand-prove given how it interacts with the position-blind weave step and the
-  /// recursive calls beneath it — so, mirroring how `WeavedMergeSort`/`StaticSort`/`FlashSort`
-  /// were each verified, this replays the recorded tape's `.swap` operations against a shadow
-  /// array of original indices (rather than encoding tags into the values themselves, which
-  /// would eliminate the very ties being tested) to see where every element with a given input
-  /// value actually ends up, independent of what value it carries.
+  /// Confirms `WeaveMergeSort`'s `stable: false` claim empirically. Replays the recorded tape's
+  /// `.swap` operations against a shadow array of original indices (rather than tagging values
+  /// directly, which would eliminate the ties being tested) to see where every element sharing
+  /// an input value actually ends up.
   @Test
   func weaveMergeSortTiedElementsCanLoseTheirOriginalRelativeOrder() {
     let algorithm = WeaveMergeSort()
@@ -226,14 +217,10 @@ struct NativeAlgorithmCorrectnessTests {
     )
   }
 
-  /// `BadSort`'s doc comment reasons that swap-based selection (unconditionally exchanging
-  /// whatever sits at `i` with the leftmost suffix minimum at `shortest`) inherits ordinary
-  /// selection sort's classic instability, and works out a concrete counterexample by hand
-  /// (`[3a, 4, 3b, 2]` comes out with its two `3`s reversed). This confirms that conclusion
-  /// empirically as well, mirroring `weaveMergeSortTiedElementsCanLoseTheirOriginalRelativeOrder`:
-  /// replay the recorded tape's `.swap` operations against a shadow array of original indices
-  /// (`BadSort` never calls `setValue`/aux writes, only `compare`/`swap`, so replaying `.swap`
-  /// alone fully reconstructs the final permutation) across randomized heavily-duplicated trials.
+  /// Confirms `BadSort`'s instability empirically: its swap-based leftmost-suffix-minimum
+  /// selection inherits ordinary selection sort's classic instability. `BadSort` never calls
+  /// `setValue`/aux writes, only `compare`/`swap`, so replaying the tape's `.swap` operations
+  /// onto a shadow index array fully reconstructs the final permutation.
   @Test
   func badSortTiedElementsCanLoseTheirOriginalRelativeOrder() {
     let algorithm = BadSort()
@@ -275,15 +262,12 @@ struct NativeAlgorithmCorrectnessTests {
     )
   }
 
-  /// `ClassicTreeSort`'s doc comment analytically argues stability (ties always route to `upper`,
-  /// traversal is left-self-right, so a later duplicate always ties into an earlier one's `upper`
-  /// subtree, visited after it). Unlike `WeaveMergeSort`/`IntroCircleSortIterative`, this algorithm
-  /// never calls `engine.swap` on the main array at all — its only main-array writes are the final
-  /// value-copying `setValue` loop, which erases which original index produced which output value
-  /// once duplicates are involved, so replaying the recorded tape can't reconstruct provenance here.
-  /// Instead, this reimplements the identical routing/traversal rule directly over `(value,
-  /// originalIndex)` pairs, comparing only on `value` (exactly mirroring `array[i] < array[c]`), and
-  /// checks that every group of equal final values keeps strictly ascending original indices.
+  /// Confirms `ClassicTreeSort` is stable. Unlike `WeaveMergeSort`/`IntroCircleSortIterative`,
+  /// this algorithm never calls `engine.swap` — its only main-array writes are a final
+  /// `setValue` copy loop that erases provenance once duplicates are involved, so tape-replay
+  /// can't reconstruct original indices here. Instead this reimplements the same
+  /// routing/traversal rule over `(value, originalIndex)` pairs and checks that equal-value
+  /// groups keep ascending original indices.
   @Test
   func classicTreeSortTiedElementsKeepTheirOriginalRelativeOrder() {
     struct Tagged {
@@ -352,10 +336,8 @@ struct NativeAlgorithmCorrectnessTests {
     }
   }
 
-  /// `TriangularHeapSort`'s doc comment reasons that, like `MaxHeapSort`, swap-based heap
-  /// construction/extraction can relocate one of two equal elements past the other with no
-  /// recovery mechanism, and verifies this empirically — mirroring
-  /// `weaveMergeSortTiedElementsCanLoseTheirOriginalRelativeOrder`'s tape-replay approach.
+  /// Confirms `TriangularHeapSort`'s instability empirically: like `MaxHeapSort`, swap-based
+  /// heap construction/extraction can relocate one equal element past another with no recovery.
   @Test
   func triangularHeapSortTiedElementsCanLoseTheirOriginalRelativeOrder() {
     let algorithm = TriangularHeapSort()
@@ -397,13 +379,10 @@ struct NativeAlgorithmCorrectnessTests {
     )
   }
 
-  /// `BlockSwapMergeSort`'s own doc comment reasons that `binarySearchMid`'s strict-greater-than
-  /// tie-break should preserve equal elements' original relative order (unlike `WeaveMergeSort`'s
-  /// tie-swapping instability) — verified here empirically, mirroring `RotateMergeSort`'s tagged-
-  /// duplicate approach: tagging each element with its original index and sorting purely on the
-  /// (heavily duplicated) untagged value, then replaying the recorded tape's swaps to find each
-  /// tag's final resting position. A stable sort leaves every group of equal final values with
-  /// strictly ascending original-index tags.
+  /// Confirms `BlockSwapMergeSort` is stable: `binarySearchMid`'s strict-greater-than tie-break
+  /// should preserve equal elements' original order, unlike `WeaveMergeSort`'s tie-swapping
+  /// instability. Verified by tagging each element with its original index and checking that
+  /// every group of equal final values keeps strictly ascending original-index tags.
   @Test
   func blockSwapMergeSortIsStable() {
     let algorithm = BlockSwapMergeSort()
@@ -435,13 +414,9 @@ struct NativeAlgorithmCorrectnessTests {
     }
   }
 
-  /// `PairwiseSortIterative`'s own doc comment reasons that indirect transpositions through the
-  /// fixed comparator network (each element separately swapping against some third, unequal
-  /// element) could reorder equal elements even though every direct comparison only swaps on a
-  /// strict `>` — but calls that untractable to conclude by inspection alone, so, mirroring how
-  /// `WeaveMergeSort`/`IntroCircleSortIterative` were each verified, this replays the recorded
-  /// tape's `.swap` operations against a shadow array of original indices to see where every
-  /// element with a given input value actually ends up, independent of what value it carries.
+  /// Confirms `PairwiseSortIterative`'s instability empirically: indirect transpositions through
+  /// the fixed comparator network (each element swapping against some third, unequal element)
+  /// can reorder equal elements even though every direct comparison only swaps on a strict `>`.
   @Test
   func pairwiseSortIterativeTiedElementsCanLoseTheirOriginalRelativeOrder() {
     let algorithm = PairwiseSortIterative()
@@ -483,16 +458,14 @@ struct NativeAlgorithmCorrectnessTests {
     )
   }
 
-  /// `GuessSort`/`OptimizedGuessSort`/`SmartGuessSort`/`RandomGuessSort` all validate their
-  /// `loops[]` index-guess only via *adjacent* comparisons with an index tie-break — never an
-  /// explicit "is this actually a permutation" check — so, mirroring the scrutiny `FunSort` got
-  /// (an ArrayV algorithm that looked like a faithful port but was quietly wrong on duplicates
-  /// 84% of the time), this runs many more duplicate-heavy trials than the generic suite above
-  /// before trusting the faithful-port reasoning in each file's own doc comment.
+  /// The GuessSort family validates its `loops[]` index-guess only via adjacent comparisons with
+  /// an index tie-break — never an explicit "is this actually a permutation" check — so this
+  /// runs far more duplicate-heavy trials than the generic suite above, given `FunSort`'s
+  /// precedent of a faithful-looking port that was quietly wrong on duplicates 84% of the time.
   @Test
   func guessFamilyDuplicateHeavyFuzz() {
     let algorithms: [any SortAlgorithm] = [
-      GuessSort(), OptimizedGuessSort(), SmartGuessSort(), RandomGuessSort(),
+      GuessSort(), OptimizedGuessSort(), SmartGuessSort(), RandomGuessSort()
     ]
     for algorithm in algorithms {
       let size = algorithm.metadata.sizeRange.lowerBound
@@ -512,13 +485,9 @@ struct NativeAlgorithmCorrectnessTests {
     }
   }
 
-  /// Despite the name, `StablePermutationSort` does NOT actually preserve tied elements'
-  /// original relative order — confirmed empirically here (mirroring
-  /// `weaveMergeSortTiedElementsCanLoseTheirOriginalRelativeOrder`'s tape-replay-to-shadow-array
-  /// technique) after a faithful, careful line-for-line port still failed this exact check ~40%
-  /// of the time. See `StablePermutationSort.swift`'s own doc comment — this is a real property
-  /// of the algorithm ArrayV shipped, not a porting bug, the same class of "the name promises
-  /// more than the algorithm delivers" surprise `FunSort` already has documented.
+  /// Despite the name, `StablePermutationSort` does NOT preserve tied elements' original
+  /// relative order — a real property of the algorithm ArrayV shipped, not a porting bug (~40%
+  /// failure rate even with a faithful, careful port).
   @Test
   func stablePermutationSortTiedElementsCanLoseTheirOriginalRelativeOrder() {
     let algorithm = StablePermutationSort()
@@ -560,18 +529,15 @@ struct NativeAlgorithmCorrectnessTests {
     )
   }
 
-  /// The generic suite above only exercises each algorithm once per input shape at its own
-  /// `sizeRange.lowerBound` — real bugs found in this exact batch (`LazyHeapSort`'s `maxToFront`
-  /// constructed a Swift `Range` with `lowerBound > upperBound` and trapped, a case Java's
-  /// lazily-checked `for` loop never hit) only ever showed up under specific random data, not
-  /// every run. Runs many more randomized duplicate-heavy trials than the generic suite before
-  /// trusting a translation that's this index-arithmetic-heavy — the bit-twiddling ones
-  /// (`WeakHeapSort`, `BinomialHeapSort`, `BinomialSmoothSort`) and `LazyHeapSort` especially.
+  /// Runs far more randomized duplicate-heavy trials than the generic suite above for this
+  /// index-arithmetic-heavy batch. Found a real bug here: `LazyHeapSort`'s `maxToFront`
+  /// constructed a Swift `Range` with `lowerBound > upperBound` and trapped — a case Java's
+  /// lazily-checked `for` loop never hits — which only showed up under specific random data.
   @Test
   func heapVariantBatchDuplicateHeavyFuzz() {
     let algorithms: [any SortAlgorithm] = [
       FlippedMinHeapSort(), TernaryHeapSort(), BottomUpHeapSort(), LazyHeapSort(),
-      AsynchronousSort(), WeakHeapSort(), BinomialHeapSort(), BinomialSmoothSort(),
+      AsynchronousSort(), WeakHeapSort(), BinomialHeapSort(), BinomialSmoothSort()
     ]
     // A few sizes around the lower bound, not just the bound itself — `LazyHeapSort`'s real
     // bug depended on the exact relationship between `n` and its own `sqrt(n)` block size, not

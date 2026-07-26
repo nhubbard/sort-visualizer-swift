@@ -15,14 +15,11 @@ public struct MedianQuickBogoSort: SortAlgorithm {
   )
   public init() {}
 
-  /// ArrayV's `MedianQuickBogoSort` reshuffles a range at random until its front half's every
-  /// element is no greater than its back half's every element (a *median-count split*, not a
-  /// full sort), then recurses on each half — the same open-ended random walk `BogoSort` already
-  /// fixed. Substitutes a lexicographic `nextPermutation` walk of the range (same technique
-  /// `LessBogoSort`/`CocktailBogoSort` already use) for the reshuffle, checking `isRangeSplit`
-  /// instead of full sortedness. The range's fully ascending arrangement always satisfies a
-  /// split around any midpoint, so the same wrap-to-ascending fallback used elsewhere guarantees
-  /// termination.
+  /// ArrayV's `MedianQuickBogoSort` reshuffles a range at random until its front half is no
+  /// greater than its back half (a median-count split, not a full sort), then recurses on each
+  /// half. Ported using the same lexicographic `nextPermutation` walk as `LessBogoSort`, checking
+  /// `isRangeSplit` instead of full sortedness; the fully ascending arrangement always satisfies a
+  /// split, so termination is guaranteed.
   public func record(into engine: inout RecordingEngine) {
     let n = engine.count
     guard n > 1 else { return }

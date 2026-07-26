@@ -1,24 +1,16 @@
 import AlgorithmKit
 import SortEngineKit
 
-/// ArrayV's `GravitySort` ("Beadsort"): models Bead Sort — beads dropped onto vertical rods, one
-/// rod per array position, with as many beads on a rod as the value it represents; once released,
-/// the beads fall and settle into a sorted "staircase" — but instead of literally simulating rows
-/// of falling beads, it reaches the same final array through an equivalent tally-and-partial-sum
-/// computation. `x` is a shifted copy of the input (`array[i] - min`, so every shifted value is
-/// non-negative and indexable). `y[v]` starts as a per-value occurrence tally, then a *backward*
-/// partial sum turns it into "how many elements have shifted-value >= v" — in the physical bead
-/// model, this is exactly how many beads would be resting at or above height `v` once gravity has
-/// settled them, without ever tracking rod-by-rod bead positions directly. The final double loop
-/// then reconstructs each `array[i]` incrementally: walking value levels `j` from highest to
-/// lowest, position `i` gains `+1` once `i` falls among the rightmost `y[j]` slots (the slots
-/// known, from the tally, to end up `>= j`), and loses that same `+1` back out via `-1` if `i`'s
-/// *original* shifted value was itself already `>= j` (so the "this element already started at or
-/// above this level" contribution isn't double-counted as gravity settles it further down).
+/// ArrayV's `GravitySort` ("Beadsort") — models Bead Sort (beads on vertical rods settling under
+/// gravity into a sorted staircase) via an equivalent tally-and-partial-sum computation instead of
+/// simulating falling beads. `x` is the input shifted non-negative (`array[i] - min`). `y[v]` starts
+/// as a per-value occurrence count, then a backward partial sum turns it into "count of elements
+/// with shifted-value >= v" (how many beads rest at or above height `v`). The final double loop
+/// reconstructs each `array[i]`: walking levels `j` from highest to lowest, position `i` gains `+1`
+/// if it's among the rightmost `y[j]` slots, and loses it back via `-1` if `i`'s original shifted
+/// value was already `>= j` (avoiding double-counting).
 ///
-/// This reconstruction has no notion of which original element ends up at which final position
-/// beyond value — nothing here threads an original index or insertion order through to the write
-/// loop — so, like `PigeonholeSort`, this is NOT a stable sort.
+/// Not stable — like `PigeonholeSort`, reconstruction tracks only value counts, not original index.
 public struct GravitySort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "gravitysort")
   public let metadata = AlgorithmMetadata(

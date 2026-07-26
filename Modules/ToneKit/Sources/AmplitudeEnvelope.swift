@@ -1,14 +1,8 @@
-// This file's public API (`Gated`'s `openGate`/`closeGate`, `AmplitudeEnvelope`'s
-// attack/decay/sustain/release parameters) is modeled on AudioKitEX (github.com/AudioKit/AudioKitEX,
-// Node+Triggerable.swift's `Gated`) and SoundpipeAudioKit (github.com/AudioKit/SoundpipeAudioKit,
-// Effects/AmplitudeEnvelope.swift). The envelope *shape* — a one-pole exponential filter chasing a
-// target level, rather than a linear ramp — is modeled on (not copied from) Soundpipe's own C
-// kernel behind SoundpipeAudioKit's `AmplitudeEnvelope` (Sources/Soundpipe/modules/adsr.c,
-// `sp_adsr_compute`): same `pole = exp(-1 / (tau * sampleRate))` one-pole-filter idea, without
-// copying Soundpipe's specific per-sample state machine (its attack-time fudge factor, manual
-// timer counting, and lack of an explicit sustain/idle exit are all Soundpipe implementation
-// details, not part of the audible behavior `AudioService` actually depends on). See this module's
-// NOTICE.md.
+// This file's public API (`Gated`, `AmplitudeEnvelope`'s ADSR parameters) is modeled on
+// AudioKitEX's `Gated` protocol and SoundpipeAudioKit's `AmplitudeEnvelope`. The envelope *shape* —
+// a one-pole exponential filter chasing a target level, rather than a linear ramp — mirrors
+// Soundpipe's `adsr.c` (`pole = exp(-1 / (tau * sampleRate))`) without copying its per-sample state
+// machine (attack-time fudge factor, manual timer counting, no explicit idle exit). See NOTICE.md.
 //
 // Used under the MIT License:
 //
@@ -111,18 +105,18 @@ public final class AmplitudeEnvelope: Node, Gated {
         count: Int(frameCount)
       )
       oscillator.fill(outBuffer, sampleRate: sampleRate)
-      stateBox.mutex.withLock { s in
-        for i in outBuffer.indices {
-          s.gain = Self.nextGain(
-            currentGain: s.gain,
-            phase: &s.phase,
-            attackDuration: s.attackDuration,
-            decayDuration: s.decayDuration,
-            sustainLevel: s.sustainLevel,
-            releaseDuration: s.releaseDuration,
+      stateBox.mutex.withLock { state in
+        for index in outBuffer.indices {
+          state.gain = Self.nextGain(
+            currentGain: state.gain,
+            phase: &state.phase,
+            attackDuration: state.attackDuration,
+            decayDuration: state.decayDuration,
+            sustainLevel: state.sustainLevel,
+            releaseDuration: state.releaseDuration,
             sampleRate: sampleRate
           )
-          outBuffer[i] *= s.gain
+          outBuffer[index] *= state.gain
         }
       }
       return noErr
@@ -134,18 +128,18 @@ public final class AmplitudeEnvelope: Node, Gated {
   /// twice in a row never counts as a fresh rising edge — only a genuine closed-to-open
   /// transition starts a new attack.
   public func openGate() {
-    stateBox.mutex.withLock { s in
-      guard !s.gateOpen else { return }
-      s.gateOpen = true
-      s.phase = .attack
+    stateBox.mutex.withLock { state in
+      guard !state.gateOpen else { return }
+      state.gateOpen = true
+      state.phase = .attack
     }
   }
 
   public func closeGate() {
-    stateBox.mutex.withLock { s in
-      guard s.gateOpen else { return }
-      s.gateOpen = false
-      s.phase = .release
+    stateBox.mutex.withLock { state in
+      guard state.gateOpen else { return }
+      state.gateOpen = false
+      state.phase = .release
     }
   }
 

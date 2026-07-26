@@ -1,18 +1,11 @@
 import AlgorithmKit
 import SortEngineKit
 
-/// ArrayV's own doc comment: "Bingo Sort is a variant of Selection Sort which looks through all
-/// elements, using the element with the maximum VALUE instead of the item to be swapped instead
-/// of the item. This is best suited to use when there are duplicate values in the array because
-/// the sort will run quicker (similar to Counting Sort) - running on O(n+m^2) best case scenario,
-/// otherwise it will run at O(n*m) time complexity, where 'm' is the amount of unique values in
-/// the array."
-///
-/// Working backward from the end, each round targets the current maximum *value* (`val`) rather
-/// than a single index: every element equal to `val` gets swapped into the shrinking tail in one
-/// pass, while the pass simultaneously tracks the second-highest value seen (`next`) to become the
-/// following round's target. Plain Selection Sort would need one full pass per single element even
-/// among ties — Bingo Sort clears every tied duplicate in the same pass its target was found in.
+/// A Selection Sort variant that targets the current maximum *value* rather than a single index:
+/// each round swaps every element equal to that value into the shrinking tail in one pass, while
+/// tracking the next-highest value seen for the following round. This clears all tied duplicates
+/// per pass instead of one per pass, which is why it beats plain Selection Sort when values repeat
+/// (`O(n+m^2)` best case, `O(n*m)` otherwise, where `m` is the count of distinct values).
 public struct BingoSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "bingosort")
   public let metadata = AlgorithmMetadata(

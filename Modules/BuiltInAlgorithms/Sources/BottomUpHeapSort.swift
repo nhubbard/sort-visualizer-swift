@@ -15,15 +15,11 @@ public struct BottomUpHeapSort: SortAlgorithm {
   )
   public init() {}
 
-  /// The "bottom-up heapsort" optimization (see
-  /// https://en.wikipedia.org/wiki/Heapsort#Bottom-up_heapsort): ordinary `siftDown`
-  /// (`MaxHeapSort.swift`) compares the sift value against each level on the way down. This
-  /// variant instead descends straight to a leaf via always the larger child — no comparison
-  /// against the sift value at all — then climbs back UP from that leaf while the sift value is
-  /// still greater than the current ancestor, to find exactly where it belongs. The third loop
-  /// then shifts every node between that resting level and `i` one step toward the root (each
-  /// position takes its child's value) and drops the original sift value in at the leaf end —
-  /// fewer comparisons on average than plain sift-down, same end result.
+  /// The "bottom-up heapsort" optimization: unlike `MaxHeapSort`'s `siftDown`, which compares the
+  /// sift value at each level on the way down, this descends straight to a leaf via the larger
+  /// child, climbs back up while the sift value is still greater than the current ancestor, then
+  /// shifts every node between that resting point and `i` one step toward the root. Fewer
+  /// comparisons on average than plain sift-down, same end result.
   public func record(into engine: inout RecordingEngine) {
     let n = engine.count
     guard n > 1 else { return }
