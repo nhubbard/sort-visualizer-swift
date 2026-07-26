@@ -183,7 +183,8 @@ public final class ReplayEngine {
   }
 
   private let tape: Tape
-  /// Every ~500 operations, so `seek(to:)` never replays more than ~500 ops from the nearest one.
+  /// Every `checkpointInterval` operations, so `seek(to:)` never replays more than that many ops
+  /// from the nearest one.
   private let checkpoints: [PlaybackState]
   private var playbackTask: Task<Void, Never>?
   /// The driver behind whatever `play()` call is currently in flight, kept here (not just
@@ -192,7 +193,20 @@ public final class ReplayEngine {
   private var activeDriver: DisplayLinkDriving?
   private let displayLinkFactory: () -> DisplayLinkDriving
 
-  private static let checkpointInterval = 500
+  /// A checkpoint stores a full `PlaybackState` -- including `frame`/`auxArrays`, each O(N) --
+  /// and each one crossed forces a copy-on-write duplication of those arrays on the next mutation.
+  /// A fixed 500 was fine while every array topped out at 256 elements (`checkpointCount * N` was
+  /// trivially small either way), but `effectiveSizeRange` now lets well-behaved algorithms run
+  /// into the thousands while tape length stays capped near the same `operationCap` ceiling
+  /// regardless of N -- so a fixed interval means `checkpointCount * N` (total checkpoint memory
+  /// and the one-time `init` cost of building them) grows linearly with N alone. Scaling the
+  /// interval with N keeps that product roughly constant instead: `checkpointCount` shrinks as N
+  /// grows, trading a proportionally longer (but still fast to replay forward) worst-case `seek`
+  /// distance on huge arrays for bounded memory and startup cost. `500` remains the floor, so
+  /// nothing changes for every existing algorithm/test at N <= 500.
+  static func checkpointInterval(forArrayCount n: Int) -> Int {
+    Swift.max(500, n)
+  }
 
   public convenience init(tape: Tape) {
     self.init(tape: tape, displayLinkFactory: { CADisplayLinkDriver() })
@@ -213,12 +227,13 @@ public final class ReplayEngine {
     )
     self.state = initialState
 
+    let checkpointInterval = Self.checkpointInterval(forArrayCount: initialFrame.count)
     var checkpoints = [initialState]
     var working = initialState
     let sortStartIndex = tape.header.sortStartIndex
     for operation in tape.operations {
       Self.apply(operation, to: &working, sortStartIndex: sortStartIndex)
-      if working.stepIndex.isMultiple(of: Self.checkpointInterval) {
+      if working.stepIndex.isMultiple(of: checkpointInterval) {
         checkpoints.append(working)
       }
     }

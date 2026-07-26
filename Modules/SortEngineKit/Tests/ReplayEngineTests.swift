@@ -546,4 +546,40 @@ struct ReplayEngineTests {
     #expect(engine.compareCount == reference.compareCount)
     #expect(engine.swapCount == reference.swapCount)
   }
+
+  // MARK: - Checkpoint interval scaling (see `checkpointInterval(forArrayCount:)`'s doc comment)
+
+  /// A checkpoint stores a full O(N) `PlaybackState`; a fixed interval means total checkpoint
+  /// memory/init cost grows linearly with N alone once `effectiveSizeRange` lets algorithms run at
+  /// N well past the old 256-element cap. The interval scales with N above the 500 floor so
+  /// `checkpointCount * N` stays roughly constant instead -- every existing algorithm/test stays
+  /// at N <= 500 and sees the unchanged interval.
+  @Test
+  func checkpointIntervalScalesWithArrayCountButNeverBelowFiveHundred() {
+    #expect(ReplayEngine.checkpointInterval(forArrayCount: 10) == 500)
+    #expect(ReplayEngine.checkpointInterval(forArrayCount: 256) == 500)
+    #expect(ReplayEngine.checkpointInterval(forArrayCount: 500) == 500)
+    #expect(ReplayEngine.checkpointInterval(forArrayCount: 5000) == 5000)
+  }
+
+  /// Correctness regression at the array sizes the growth-model feature newly makes reachable --
+  /// mirrors `seekToNonCheckpointIndexThenContinueMatchesUninterruptedStepping` above, but at
+  /// N = 2000 (past the 500 floor, so the checkpoint interval is scaled rather than fixed) and
+  /// seeking across multiple checkpoint boundaries at once.
+  @Test
+  func seekRemainsCorrectAtALargeArrayCountWithAScaledCheckpointInterval() {
+    let n = 2000
+    let initialValues = Array(0..<n)
+    let operations: [SortOperation] = (0..<5000).map { .swap($0 % n, ($0 + 1) % n) }
+    let tape = makeTape(initialValues: initialValues, operations: operations)
+
+    let seeking = ReplayEngine(tape: tape)
+    seeking.seek(to: 2500)  // deliberately not a multiple of the scaled interval (2000)
+
+    let reference = ReplayEngine(tape: tape)
+    for _ in 0..<2500 { reference.stepForward() }
+
+    #expect(seeking.frame.map(\.value) == reference.frame.map(\.value))
+    #expect(seeking.stepIndex == reference.stepIndex)
+  }
 }
