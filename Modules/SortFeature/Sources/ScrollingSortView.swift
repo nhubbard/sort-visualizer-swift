@@ -64,6 +64,13 @@ public struct ScrollingSortView: View {
 
       if let showcaseCompletion {
         await session.runShowcasePass()
+        // Lets `RunControlBar`'s final stat values (compares/swaps/elapsed time) finish their
+        // `.snappy(duration: 0.15)` settle animation before the view tears down for the next
+        // algorithm — comfortably past 0.15s since a spring-based transition asymptotes rather
+        // than stopping sharply. `try?` + the `Task.isCancelled` guard below: if Showcase is
+        // stopped mid-delay, this just skips the (now-moot) advance instead of surfacing the
+        // resulting `CancellationError`.
+        try? await Task.sleep(for: .seconds(0.5))
         if !Task.isCancelled { showcaseCompletion() }
       } else if let action = SortCoordinator.shared.consumePendingAction(for: algorithm.id) {
         // An App-Intents-triggered run (`RunSortIntent`/`RunAutomationIntent`) rather than

@@ -100,11 +100,25 @@ public struct AlgorithmMetadata: Sendable, Codable, Equatable {
     self.iconName = iconName
   }
 
+  /// A hard ceiling on `effectiveSizeRange`'s upper bound, independent of `operationCap` --
+  /// `growthModel`'s fitted curve is only ever calibrated against a sampled range of real sizes
+  /// (see `Tools/GrowthModelCalibration`), and an algorithm whose true cost grows in a way its
+  /// recorded operation count doesn't fully capture (e.g. `CycleSort`'s O(n^2) comparisons happen
+  /// via direct `engine.values` reads rather than `engine.compare`, invisible to the op-count the
+  /// curve was fit against) can have that curve legitimately, non-degenerately solve to tens of
+  /// thousands of elements once a user raises `recordingOperationCap` -- a real, reachable size
+  /// no visualizer style renders as distinct elements anyway. Deliberately a fixed constant, not
+  /// an `AppSettings` value: decoupling it from any user-adjustable dial is the whole point, since
+  /// it was raising the *operation* cap that made an ordinary setting change balloon the *visual*
+  /// size unexpectedly. ArrayV itself doesn't push its own showcase past comparable sizes.
+  public static let maxReasonableArraySize = 8192
+
   /// `sizeRange.upperBound` replaced with a value computed live from `growthModel` and the
   /// current recording operation cap -- so raising or lowering that setting immediately
   /// recalculates every algorithm's real safe max, instead of using a number baked in by hand.
   /// `sizeRange.lowerBound` is untouched (a small-`n` visualization floor, unrelated to the
-  /// operation cap).
+  /// operation cap). Also clamped to `maxReasonableArraySize` regardless of what the operation
+  /// cap alone would allow -- see that constant's own doc comment for why.
   ///
   /// `growthModel.maxSafeSize` returns the raw floor of a fitted curve's root -- an arbitrary
   /// integer with no relationship to the size stepper's step (e.g. `2873`), even though every
@@ -114,7 +128,9 @@ public struct AlgorithmMetadata: Sendable, Codable, Equatable {
   /// tap at a time, at the cost of a few percent of the `maxSafeSize` safety margin already built
   /// into `growthModel` -- negligible next to that margin's own slack.
   public func effectiveSizeRange(operationCap: Int) -> ClosedRange<Int> {
-    let rawMaxSize = Swift.max(sizeRange.lowerBound, growthModel.maxSafeSize(forOperationCap: operationCap))
+    let rawMaxSize = Swift.max(
+      sizeRange.lowerBound,
+      Swift.min(growthModel.maxSafeSize(forOperationCap: operationCap), Self.maxReasonableArraySize))
     let step = (sizeRange.lowerBound...rawMaxSize).steppedSizeStep
     let steppedMaxSize = sizeRange.lowerBound + step * ((rawMaxSize - sizeRange.lowerBound) / step)
     return sizeRange.lowerBound...steppedMaxSize

@@ -40,6 +40,17 @@ reasoning:
   `AVAssetWriter`. Not started.
 - **CustomImage visualizer** — needs an image-picker UI and a per-pixel remap step. Deferred until
   the other 14 styles feel done and this specific novelty is worth the cost.
+- **Target-duration-based playback pacing** — replace the flat ops/sec `playbackSpeed` with a
+  per-run computed rate (`significantOperationCount / targetDuration`), so every sort takes
+  roughly the same wall-clock time regardless of how many operations it needs — the effect
+  ArrayV's own showcase mode achieves. Architecturally cheap: the full tape (and its exact
+  operation count) is already known before `SortSession.startReplay` seeds `ReplayEngine.speed`
+  once per run, so this is a one-line change at that seed point, not a rewrite; sustained
+  operation-apply throughput is already proven fine at the rates this would need. Open questions
+  before building it: pace against `significantOperationCount` (what the existing ops/sec budget
+  already filters to), not raw tape length; and whether this replaces the manual speed slider
+  globally or is scoped to Showcase mode only, where "every algorithm takes about the same time"
+  is actually the point.
 
 None of these block each other. Same commit discipline as the rest of this project's history: one
 commit per item as it lands, not a grab-bag commit.
