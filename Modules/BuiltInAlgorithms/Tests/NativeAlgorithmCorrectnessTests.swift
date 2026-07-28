@@ -558,6 +558,41 @@ struct NativeAlgorithmCorrectnessTests {
     }
   }
 
+  /// Regression guard for a real, deterministically-reproducible infinite loop found in
+  /// `SmartBogoBogoSort`'s first port attempt: a `nextPermutation`-based reshuffle whose
+  /// termination guarantee was silently broken by an interleaved recursive prefix re-sort,
+  /// stranding the walk in a 2-cycle on certain duplicate-heavy inputs (see the doc comment on
+  /// `SmartBogoBogoSort.record(into:)` for the full mechanism). `[2, 1, 1, 2]` is the exact input
+  /// that hung indefinitely before the fix; kept here verbatim rather than only relying on random
+  /// fuzzing, since a random duplicate-heavy draw might not reliably rediscover this specific
+  /// pattern every run.
+  @Test
+  func smartBogoBogoSortDoesNotHangOnItsKnownAdversarialInput() {
+    var engine = RecordingEngine(values: [2, 1, 1, 2])
+    SmartBogoBogoSort().record(into: &engine)
+    #expect(engine.values == [1, 1, 2, 2])
+  }
+
+  /// Broader duplicate-heavy fuzz across every size in `SmartBogoBogoSort`'s own `sizeRange`,
+  /// not just the lower bound — the hang this guards against depended on a specific duplicate
+  /// arrangement, not merely "any duplicates," so exercising every reachable size gives the fuzz
+  /// more chances to hit an equivalent pattern at other sizes too.
+  @Test
+  func smartBogoBogoSortDuplicateHeavyFuzz() {
+    let algorithm = SmartBogoBogoSort()
+    for size in algorithm.metadata.sizeRange {
+      for attempt in 0..<200 {
+        let input = (0..<size).map { _ in Int.random(in: 0...3) }
+        var engine = RecordingEngine(values: input)
+        algorithm.record(into: &engine)
+        #expect(
+          engine.values == input.sorted(),
+          "smartbogobogosort failed duplicate-heavy fuzz attempt \(attempt) of size \(size): \(input) -> \(engine.values)"
+        )
+      }
+    }
+  }
+
   /// Confirms `ShoveSort`'s instability empirically: the chain-swap "shove" rotates the
   /// out-of-order element past every other element in `[i, end-1]` regardless of ties,
   /// including any equal-valued elements sitting in between.

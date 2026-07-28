@@ -3060,5 +3060,31 @@
     "subjectID" : "optimizedstoogesortstudio+descending",
     "winningFamily" : "polynomialIntercept",
     "winningRSquared" : 1
+  },
+  {
+    "coefficients" : [
+      97.59843820736573,
+      0.25208883592079057
+    ],
+    "runnerUpFamily" : "exponential",
+    "runnerUpRSquared" : 0.9987009185002109,
+    "safeMaxSizeByCap" : [
+      1000000,
+      18,
+      300000,
+      16,
+      100000,
+      15
+    ],
+    "sampleSizes" : [
+      4,
+      5,
+      6,
+      7,
+      14
+    ],
+    "subjectID" : "smartbogobogosort+bsttraversal",
+    "winningFamily" : "factorial",
+    "winningRSquared" : 0.9921397043966658
   }
 ]
