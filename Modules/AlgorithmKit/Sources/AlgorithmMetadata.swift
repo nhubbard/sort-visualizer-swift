@@ -105,8 +105,18 @@ public struct AlgorithmMetadata: Sendable, Codable, Equatable {
   /// recalculates every algorithm's real safe max, instead of using a number baked in by hand.
   /// `sizeRange.lowerBound` is untouched (a small-`n` visualization floor, unrelated to the
   /// operation cap).
+  ///
+  /// `growthModel.maxSafeSize` returns the raw floor of a fitted curve's root -- an arbitrary
+  /// integer with no relationship to the size stepper's step (e.g. `2873`), even though every
+  /// stepper/automation in the app moves in `sizeStep`-sized increments from `sizeRange.lowerBound`
+  /// and would never land on that value by tapping. Rounding down to the nearest reachable step
+  /// here means the displayed/selectable max is always a value a user could actually dial to one
+  /// tap at a time, at the cost of a few percent of the `maxSafeSize` safety margin already built
+  /// into `growthModel` -- negligible next to that margin's own slack.
   public func effectiveSizeRange(operationCap: Int) -> ClosedRange<Int> {
-    let maxSize = Swift.max(sizeRange.lowerBound, growthModel.maxSafeSize(forOperationCap: operationCap))
-    return sizeRange.lowerBound...maxSize
+    let rawMaxSize = Swift.max(sizeRange.lowerBound, growthModel.maxSafeSize(forOperationCap: operationCap))
+    let step = (sizeRange.lowerBound...rawMaxSize).steppedSizeStep
+    let steppedMaxSize = sizeRange.lowerBound + step * ((rawMaxSize - sizeRange.lowerBound) / step)
+    return sizeRange.lowerBound...steppedMaxSize
   }
 }

@@ -35,7 +35,12 @@ private final class ManualTickDriver: DisplayLinkDriving {
 /// depending on `BuiltInAlgorithms`) so this test target only needs `AlgorithmKit`/`SortEngineKit`.
 private struct FakeAlgorithm: SortAlgorithm {
   let id = AlgorithmID(rawValue: "fake")
-  var sizeRange: ClosedRange<Int> = 1...512
+  // 513, not 512: `effectiveSizeRange` now rounds its computed max down to the nearest size-step
+  // multiple from `sizeRange.lowerBound`, so the range's width (`upperBound - lowerBound`) needs
+  // to itself be an exact multiple of the step (16) for the "reproduces plain sizeRange exactly"
+  // comment below to actually hold -- 1...513 has width 512 (16 * 32); 1...512 (width 511) would
+  // silently get rounded down to 1...497.
+  var sizeRange: ClosedRange<Int> = 1...513
   var metadata: AlgorithmMetadata {
     AlgorithmMetadata(
       displayName: "Fake",
