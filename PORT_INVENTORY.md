@@ -82,19 +82,28 @@ cluster together rather than picking its members apart on separate days:
       not actually stable** — fuzzed empirically after a careful, faithful translation still
       reordered ties in ~40% of duplicate-heavy trials; shipped as `stable: false`, the same "name
       promises more than the algorithm delivers" surprise `FunSort` already has documented above.
-
-#### Not Started
-
-##### Easy
-
-- [ ] ShoveSort — 52 lines
-- [ ] SillySort — 57 lines
-- [ ] QuadStoogeSort — 61 lines (ArrayV's own `setCategory` call for this one is actually
-      `"Impractical Sorts"`, not `"Exchange Sorts"`, despite living in `sorts/exchange/` — port as
-      `.impractical`, not `.exchange`, per `AlgorithmCategory`'s "match ArrayV's `setCategory` call,
-      not its package directory" rule. Also `setUnreasonablySlow(true)`/limit 2048.)
-- [ ] OptimizedStoogeSortStudio — 75 lines
-- [ ] OptimizedStoogeSort — 91 lines
+- [x] ShoveSort — faithful port. Scans left to right; an out-of-order adjacent pair triggers a
+      chain of adjacent swaps ("shove") that rotates the offending element to the very end of the
+      range, then backs up one index to recheck. ArrayV's own `setCategory` call for this one is
+      also `"Impractical Sorts"` despite living in `sorts/exchange/` (the same override
+      `QuadStoogeSort`/`BogoSort` need) — ported as `.impractical`. Fuzzed `stable: false`.
+- [x] SillySort — faithful port of Tom Duff's classic joke sort. Its recurrence
+      (`T(n) = 2T(n/2) + T(n-1)`) is identical in shape to `SlowSort`'s, so it shares that port's
+      `O(n^log n)` explosive growth and reuses its exact `sizeRange` (`16...64`) rather than
+      ArrayV's own more permissive `unreasonableLimit(150)`. Fuzzed `stable: false`.
+- [x] QuadStoogeSort — faithful port, `.impractical` category per the note already here. Six
+      recursive calls of ~half the range each give `O(n^(log2 6)) ≈ O(n^2.585)` — a lower exponent
+      than plain `StoogeSort`'s `O(n^2.71))` despite twice as many recursive calls per level.
+      Fuzzed `stable: false`.
+- [x] OptimizedStoogeSortStudio — faithful port. ArrayV's own doc comment claims both a real
+      complexity improvement (`O(n^2)` worst / `O(n)` best, vs. plain Stooge's `O(n^2.71)`) *and*
+      stability — unlike `StablePermutationSort`'s similar claim, this one fuzzed `stable: true`
+      as documented, confirmed via a dedicated empirical test rather than trusted on the comment
+      alone.
+- [x] OptimizedStoogeSort — faithful port of the Kishor/Singh technique (distinct from
+      `OptimizedStoogeSortStudio` despite the near-identical name): one bidirectional
+      converging-pointer pass followed by two shrinking-triangle iterative passes. Fuzzed
+      `stable: false`.
 
 ##### Decision required
 

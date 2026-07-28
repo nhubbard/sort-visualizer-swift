@@ -30,10 +30,11 @@ struct NativeAlgorithmCorrectnessTests {
     MinHeapSort(), MSDRadixSort(),
     OddEvenMergeSortIterative(), OddEvenMergeSortRecursive(), OddEvenSort(),
     OptimizedBubbleSort(), OptimizedCocktailShakerSort(), OptimizedGnomeSort(),
-    OptimizedGuessSort(),
-    PairwiseSortIterative(), PancakeSort(), PigeonholeSort(), QuickBogoSort(), QuickSort(),
+    OptimizedGuessSort(), OptimizedStoogeSort(), OptimizedStoogeSortStudio(),
+    PairwiseSortIterative(), PancakeSort(), PigeonholeSort(), QuadStoogeSort(),
+    QuickBogoSort(), QuickSort(),
     RandomGuessSort(), RecursiveShellSort(), RotateMergeSort(), SelectionBogoSort(),
-    SelectionSort(), ShellSort(),
+    SelectionSort(), ShellSort(), ShoveSort(), SillySort(),
     SimplifiedLibrarySort(), SlopeSort(), SlowSort(), SmartBogoBogoSort(), SmartGuessSort(),
     SnuffleSort(), StableCycleSort(),
     StablePermutationSort(), StableSelectionSort(), StaticSort(), StoogeSort(), StrandSort(),
@@ -555,5 +556,215 @@ struct NativeAlgorithmCorrectnessTests {
         }
       }
     }
+  }
+
+  /// Confirms `ShoveSort`'s instability empirically: the chain-swap "shove" rotates the
+  /// out-of-order element past every other element in `[i, end-1]` regardless of ties,
+  /// including any equal-valued elements sitting in between.
+  @Test
+  func shoveSortTiedElementsCanLoseTheirOriginalRelativeOrder() {
+    let algorithm = ShoveSort()
+    let size = algorithm.metadata.sizeRange.lowerBound
+    var sawReordering = false
+
+    for _ in 0..<50 {
+      let input = (0..<size).map { _ in Int.random(in: 0...3) }
+      var engine = RecordingEngine(values: input)
+      algorithm.record(into: &engine)
+
+      var shadow = Array(0..<size)
+      for operation in engine.finish().tape {
+        if case .swap(let i, let j) = operation {
+          shadow.swapAt(i, j)
+        }
+      }
+
+      var originalIndicesByValueInFinalOrder: [Int: [Int]] = [:]
+      for finalPosition in 0..<size {
+        let originalIndex = shadow[finalPosition]
+        let value = input[originalIndex]
+        originalIndicesByValueInFinalOrder[value, default: []].append(originalIndex)
+      }
+
+      if originalIndicesByValueInFinalOrder.values.contains(where: { $0 != $0.sorted() }) {
+        sawReordering = true
+        break
+      }
+    }
+
+    #expect(
+      sawReordering,
+      """
+      expected ShoveSort's chain-swap rotation to reorder at least one run of equal-valued \
+      elements relative to their original input order across randomized duplicate-heavy \
+      trials, confirming it is not a stable sort
+      """
+    )
+  }
+
+  /// Confirms `SillySort`'s instability empirically: the recursive compare-and-swap between
+  /// `values[i]` and `values[m+1]` operates on two elements that are generally not adjacent,
+  /// the same instability shape `SlowSort`'s own recursive tournament has.
+  @Test
+  func sillySortTiedElementsCanLoseTheirOriginalRelativeOrder() {
+    let algorithm = SillySort()
+    let size = algorithm.metadata.sizeRange.lowerBound
+    var sawReordering = false
+
+    for _ in 0..<50 {
+      let input = (0..<size).map { _ in Int.random(in: 0...3) }
+      var engine = RecordingEngine(values: input)
+      algorithm.record(into: &engine)
+
+      var shadow = Array(0..<size)
+      for operation in engine.finish().tape {
+        if case .swap(let i, let j) = operation {
+          shadow.swapAt(i, j)
+        }
+      }
+
+      var originalIndicesByValueInFinalOrder: [Int: [Int]] = [:]
+      for finalPosition in 0..<size {
+        let originalIndex = shadow[finalPosition]
+        let value = input[originalIndex]
+        originalIndicesByValueInFinalOrder[value, default: []].append(originalIndex)
+      }
+
+      if originalIndicesByValueInFinalOrder.values.contains(where: { $0 != $0.sorted() }) {
+        sawReordering = true
+        break
+      }
+    }
+
+    #expect(
+      sawReordering,
+      """
+      expected SillySort's recursive non-adjacent compare-and-swap to reorder at least one run \
+      of equal-valued elements relative to their original input order across randomized \
+      duplicate-heavy trials, confirming it is not a stable sort
+      """
+    )
+  }
+
+  /// Confirms `QuadStoogeSort`'s instability empirically, the same family resemblance
+  /// `StoogeSort` itself has: swapping distant range endpoints past each other can reorder
+  /// equal-valued elements sitting between them.
+  @Test
+  func quadStoogeSortTiedElementsCanLoseTheirOriginalRelativeOrder() {
+    let algorithm = QuadStoogeSort()
+    let size = algorithm.metadata.sizeRange.lowerBound
+    var sawReordering = false
+
+    for _ in 0..<50 {
+      let input = (0..<size).map { _ in Int.random(in: 0...3) }
+      var engine = RecordingEngine(values: input)
+      algorithm.record(into: &engine)
+
+      var shadow = Array(0..<size)
+      for operation in engine.finish().tape {
+        if case .swap(let i, let j) = operation {
+          shadow.swapAt(i, j)
+        }
+      }
+
+      var originalIndicesByValueInFinalOrder: [Int: [Int]] = [:]
+      for finalPosition in 0..<size {
+        let originalIndex = shadow[finalPosition]
+        let value = input[originalIndex]
+        originalIndicesByValueInFinalOrder[value, default: []].append(originalIndex)
+      }
+
+      if originalIndicesByValueInFinalOrder.values.contains(where: { $0 != $0.sorted() }) {
+        sawReordering = true
+        break
+      }
+    }
+
+    #expect(
+      sawReordering,
+      """
+      expected QuadStoogeSort's distant-endpoint compare-and-swap to reorder at least one run \
+      of equal-valued elements relative to their original input order across randomized \
+      duplicate-heavy trials, confirming it is not a stable sort
+      """
+    )
+  }
+
+  /// Verifies `OptimizedStoogeSortStudio`'s explicit ArrayV doc-comment claim of stability —
+  /// per this codebase's `StablePermutationSort` precedent, a name/comment's stability claim is
+  /// verified empirically rather than trusted outright.
+  @Test
+  func optimizedStoogeSortStudioIsStable() {
+    let algorithm = OptimizedStoogeSortStudio()
+    let size = algorithm.metadata.sizeRange.lowerBound
+
+    for _ in 0..<50 {
+      let input = (0..<size).map { _ in Int.random(in: 0...3) }
+      var engine = RecordingEngine(values: input)
+      algorithm.record(into: &engine)
+
+      var shadow = Array(0..<size)
+      for operation in engine.finish().tape {
+        if case .swap(let i, let j) = operation {
+          shadow.swapAt(i, j)
+        }
+      }
+
+      var originalIndicesByValueInFinalOrder: [Int: [Int]] = [:]
+      for finalPosition in 0..<size {
+        let originalIndex = shadow[finalPosition]
+        let value = input[originalIndex]
+        originalIndicesByValueInFinalOrder[value, default: []].append(originalIndex)
+      }
+
+      #expect(
+        originalIndicesByValueInFinalOrder.values.allSatisfy { $0 == $0.sorted() },
+        "expected optimizedstoogesortstudio to preserve original relative order among tied elements"
+      )
+    }
+  }
+
+  /// Confirms `OptimizedStoogeSort`'s instability empirically: `forward`/`backward`'s
+  /// distant-index compare-and-swap passes are the same cocktail/selection-style shape that
+  /// makes those families unstable.
+  @Test
+  func optimizedStoogeSortTiedElementsCanLoseTheirOriginalRelativeOrder() {
+    let algorithm = OptimizedStoogeSort()
+    let size = algorithm.metadata.sizeRange.lowerBound
+    var sawReordering = false
+
+    for _ in 0..<50 {
+      let input = (0..<size).map { _ in Int.random(in: 0...3) }
+      var engine = RecordingEngine(values: input)
+      algorithm.record(into: &engine)
+
+      var shadow = Array(0..<size)
+      for operation in engine.finish().tape {
+        if case .swap(let i, let j) = operation {
+          shadow.swapAt(i, j)
+        }
+      }
+
+      var originalIndicesByValueInFinalOrder: [Int: [Int]] = [:]
+      for finalPosition in 0..<size {
+        let originalIndex = shadow[finalPosition]
+        let value = input[originalIndex]
+        originalIndicesByValueInFinalOrder[value, default: []].append(originalIndex)
+      }
+
+      if originalIndicesByValueInFinalOrder.values.contains(where: { $0 != $0.sorted() }) {
+        sawReordering = true
+        break
+      }
+    }
+
+    #expect(
+      sawReordering,
+      """
+      expected OptimizedStoogeSort's distant-index compare-and-swap passes to reorder at least \
+      one run of equal-valued elements relative to their original input order across \
+      randomized duplicate-heavy trials, confirming it is not a stable sort
+      """
+    )
   }
 }
