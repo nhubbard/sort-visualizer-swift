@@ -53,7 +53,15 @@ let modules: [Target] =
     ])
 
 let app = Target.target(
-    name: "Sort Symphony",
+    // Not "Sort Symphony" (with the space `productName` below deliberately avoids): Xcode's
+    // build system names each target's own "-deps.modulemap" file after the *target* name, not
+    // `productName`/the module name, so a space here leaks into a real file path
+    // (`Derived/ModuleMaps/Sort Symphony-deps.modulemap`) that `swiftc` tolerates but `actool`'s
+    // asset-symbol-generation dependency scanner does not -- it truncates at the space and fails
+    // with "module map file '.../ModuleMaps/Sort' not found" (hit this for real once Xcode Cloud
+    // picked up an `actool` version where that scanning path started running). The app's visible
+    // name stays "Sort Symphony" via the explicit `CFBundleDisplayName` override below.
+    name: "SortSymphony",
     destinations: Module.destinations,
     product: .app,
     productName: "SortSymphony",
@@ -85,7 +93,12 @@ let app = Target.target(
             "UIApplicationSupportsMultipleScenes": false,
         ],
         "CFBundleShortVersionString": "$(MARKETING_VERSION)",
-        "CFBundleVersion": "$(CURRENT_PROJECT_VERSION)"
+        "CFBundleVersion": "$(CURRENT_PROJECT_VERSION)",
+        // Explicit, rather than relying on whatever Tuist/Xcode falls back to by default --
+        // `name`/`productName` above are both space-free ("SortSymphony") for the module-map
+        // reason explained on `app`'s own `name:`, so nothing else here guarantees the user-facing
+        // app name still reads as "Sort Symphony".
+        "CFBundleDisplayName": "Sort Symphony",
     ]),
     sources: ["App/Sources/**"],
     resources: [
@@ -166,7 +179,7 @@ let appUITests = Target.target(
     bundleId: "com.nhubbard.Sort2.mobile.uitests",
     deploymentTargets: Module.deploymentTargets,
     sources: ["App/UITests/**"],
-    dependencies: [.target(name: "Sort Symphony")],
+    dependencies: [.target(name: "SortSymphony")],
     settings: .settings(base: Module.baseSettings)
 )
 
