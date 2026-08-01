@@ -3,7 +3,7 @@ import Foundation
 /// Orchestrates a full frame decode: header, then the block loop, then the trailing content
 /// checksum if present. Every standard block/literals/sequences shape decodes now — see
 /// `COMPRESSION_AND_STRETCH_GOALS_PLAN.md`'s staged decoder milestones for what's still deferred
-/// (XXH64 checksum verification, dictionary support, the optimized/wildcopy path).
+/// (dictionary support, the optimized/wildcopy path).
 enum ZstdDecompressor {
   static func decompress(_ data: Data, limits: ZstdDecodingLimits) throws -> Data {
     guard data.count <= limits.maximumFrameSize else {
@@ -103,9 +103,10 @@ enum ZstdDecompressor {
     }
 
     if header.contentChecksumFlag {
-      // XXH64 verification is a separate milestone; consuming these 4 bytes here keeps frame-length
-      // accounting (and the trailing-data check below) correct in the meantime.
-      _ = try reader.readBytes(4)
+      let trailer = try reader.readLittleEndianUInt(byteCount: 4)
+      let expected = UInt32(truncatingIfNeeded: trailer)
+      let actual = XXH64.checksum32(output)
+      guard actual == expected else { throw ZstdError.checksumMismatch }
     }
 
     guard reader.remaining == 0 else {

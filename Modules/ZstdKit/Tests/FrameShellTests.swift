@@ -4,7 +4,7 @@ import Testing
 @testable import ZstdKit
 
 /// Milestone A: magic/frame-header parsing, the block loop, `Raw_Block`/`RLE_Block`, and the
-/// checksum-trailer skip — every fixture here is decodable without `.compressed` block support.
+/// XXH64 checksum trailer — every fixture here is decodable without `.compressed` block support.
 @Suite
 struct FrameShellTests {
   private func assertRoundTrip(_ name: String) throws {
@@ -22,10 +22,16 @@ struct FrameShellTests {
     try assertRoundTrip("raw_single_segment")
   }
 
-  @Test func checksumTrailerIsSkippedNotVerified() throws {
-    // XXH64 verification is a later milestone; for now this just proves the trailing 4 bytes are
-    // consumed correctly rather than misread as trailing data or a second frame.
+  @Test func checksumTrailerIsVerified() throws {
     try assertRoundTrip("checksum_trailer")
+  }
+
+  @Test func corruptedChecksumTrailerThrowsChecksumMismatch() throws {
+    var compressed = try Fixture.compressed("checksum_trailer")
+    compressed[compressed.count - 1] ^= 0xFF
+    #expect(throws: ZstdError.checksumMismatch) {
+      try Zstd.decompress(compressed)
+    }
   }
 
   @Test func rleSingleSegment() throws {
