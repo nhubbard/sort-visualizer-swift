@@ -78,6 +78,14 @@ enum HuffmanTableBuilder {
       state = Int(table.baseline[state]) + low
     }
 
+    // Mirrors the reference decoder's tail loop (`FSE_decompress_usingDTable_generic`) exactly:
+    // each state's symbol is read from its *current* position, then (unless this is the final
+    // symbol of the whole stream) the state transitions before the next read. The bug this
+    // replaced: giving `state1` a second, spurious transition right before reading the very last
+    // symbol of an odd-length stream — invisible on every fixture whose weight stream happened to
+    // end at that boundary evenly, until a real multi-KB corpus (restricted-alphabet content, so
+    // the implicit last symbol landed exactly on this parity) exposed it. Confirmed bit-exact
+    // against a faithful port of `BIT_reloadDStream`'s container semantics, not guessed.
     while true {
       weights.append(Int(table.symbolOf[state1]))
       if !reader.hasBitsRemaining {
@@ -85,10 +93,8 @@ enum HuffmanTableBuilder {
         break
       }
       advance(&state1)
-
       weights.append(Int(table.symbolOf[state2]))
       if !reader.hasBitsRemaining {
-        advance(&state1)
         weights.append(Int(table.symbolOf[state1]))
         break
       }
@@ -109,7 +115,10 @@ enum HuffmanTableBuilder {
     var nextPowerOfTwo = 1
     while nextPowerOfTwo < total { nextPowerOfTwo <<= 1 }
     let lastValue = nextPowerOfTwo - total
-    guard lastValue > 0, lastValue & (lastValue - 1) == 0 else { throw ZstdError.invalidHuffmanTable }
+    // lastValue == 0 is legitimate: the explicit weights already sum exactly to a power of two,
+    // so the implicit last symbol simply has weight 0 (unused) — confirmed against a real
+    // fixture where this occurs (see SequenceTests's large multi-block corpus).
+    guard lastValue >= 0, lastValue & (lastValue - 1) == 0 else { throw ZstdError.invalidHuffmanTable }
     let lastWeight = Int.bitWidth - lastValue.leadingZeroBitCount
     var all = weights
     all.append(lastWeight)

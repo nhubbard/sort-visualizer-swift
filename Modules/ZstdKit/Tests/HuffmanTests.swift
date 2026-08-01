@@ -27,20 +27,13 @@ struct HuffmanTests {
     try assertRoundTrip("huffman_treeless_zero_sequences")
   }
 
-  /// A block with a nonzero sequence count is still explicitly unsupported (Milestone C) — this
-  /// fixture's content is repetitive enough to force genuine LZ77 matches, so it also proves the
-  /// "peek one byte to check for zero" logic in `ZstdDecompressor` doesn't misfire on ordinary
-  /// compressed content that isn't the literals-only special case the rest of this suite covers.
-  @Test func nonzeroSequenceCountThrowsUnsupportedFrameFeature() throws {
+  /// This fixture has a genuinely nonzero sequence count (real LZ77 matches, not the
+  /// literals-only special case the rest of this suite covers) — see `SequenceTests` for
+  /// Milestone C/D coverage of the FSE-coded sequences and LZ77 execution this now exercises.
+  @Test func blockWithRealSequencesRoundTrips() throws {
     let compressed = try Fixture.compressed("compressed_block_with_sequences")
-    do {
-      _ = try Zstd.decompress(compressed)
-      Issue.record("expected .unsupportedFrameFeature for a block with real sequences")
-    } catch ZstdError.unsupportedFrameFeature {
-      // Expected.
-    } catch {
-      Issue.record("expected .unsupportedFrameFeature, got \(error)")
-    }
+    let expected = try Fixture.expected("compressed_block_with_sequences")
+    #expect(try Zstd.decompress(compressed) == expected)
   }
 
   // --- Huffman weight direct-encoding: no real zstd fixture was found to trigger this path

@@ -399,6 +399,132 @@ def generate_compressed_block_with_sequences() -> None:
     write_fixture("compressed_block_with_sequences", plaintext, frame)
 
 
+# --------------------------------------------------------------------------------------------
+# Milestone C/D: FSE-coded sequences + LZ77 execution. Each fixture's sequence-symbol-table modes
+# (Predefined/RLE/FSE_Compressed/Repeat) were found by scanning input shapes and confirmed via
+# `_sequence_table_modes` below, the same reference-parsing approach used throughout this file —
+# not assumed from how the input was constructed.
+# --------------------------------------------------------------------------------------------
+
+
+def _literals_section_extent(block: bytes) -> tuple[int, int, int]:
+    """Returns (literals_block_type, header_size, compressed_size) for the block's literals
+    section — `compressed_size` doubles as the on-disk byte count for Raw (verbatim) and RLE
+    (always 1) literals, matching `generate_compressed_block_with_sequences`'s helper.
+    """
+    b0 = block[0]
+    lit_type = b0 & 3
+    lhl = (b0 >> 2) & 3
+    if lit_type in (0, 1):
+        if lhl in (0, 2):
+            header_size = 1
+            regenerated_size = 1 if lit_type == 1 else (b0 >> 3)
+        elif lhl == 1:
+            header_size = 2
+            regenerated_size = 1 if lit_type == 1 else (int.from_bytes(block[0:2], "little") >> 4)
+        else:
+            header_size = 3
+            regenerated_size = 1 if lit_type == 1 else (int.from_bytes(block[0:3], "little") >> 4)
+        return lit_type, header_size, regenerated_size
+
+    lhc = int.from_bytes(block[0:4], "little")
+    if lhl in (0, 1):
+        return lit_type, 3, (lhc >> 14) & 0x3FF
+    if lhl == 2:
+        return lit_type, 4, (lhc >> 18) & 0x3FFF
+    lhc2 = int.from_bytes(block[1:5], "little")
+    return lit_type, 5, lhc2 >> 2
+
+
+def _sequence_table_modes(frame: bytes, block_index: int = 0) -> str:
+    """Reference-parses the requested block's Symbol_Compression_Modes -- independent
+    confirmation of which mode each fixture actually exercises, same spirit as `classify_blocks`.
+    """
+    descriptor = frame[4]
+    pos = 5
+    single_segment = bool((descriptor >> 5) & 1)
+    if not single_segment:
+        pos += 1
+    pos += [0, 1, 2, 4][descriptor & 3]
+    fcs_flag = (descriptor >> 6) & 3
+    pos += {0: 1 if single_segment else 0, 1: 2, 2: 4, 3: 8}[fcs_flag]
+
+    for current_index in range(block_index + 1):
+        raw = int.from_bytes(frame[pos : pos + 3], "little")
+        block_size = (raw >> 3) & 0x1FFFFF
+        pos += 3
+        block = frame[pos : pos + block_size]
+        pos += block_size
+
+    _lit_type, header_size, csize = _literals_section_extent(block)
+    seq_pos = header_size + csize
+    nb = block[seq_pos]
+    if nb == 0:
+        return "nbSeq=0"
+    seq_pos += 1
+    if nb == 255:
+        seq_pos += 2
+    elif nb >= 128:
+        seq_pos += 1
+    modes_byte = block[seq_pos]
+    names = ["predefined", "rle", "fse", "repeat"]
+    ll, of, ml = names[(modes_byte >> 6) & 3], names[(modes_byte >> 4) & 3], names[(modes_byte >> 2) & 3]
+    return f"LL={ll} OF={of} ML={ml}"
+
+
+def generate_sequences_predefined_tables() -> None:
+    """A single huge match collapses to exactly one sequence, cheap enough that Predefined beats
+    building a custom table for all three symbol types.
+    """
+    plaintext = b"ab" * 5000
+    compressor = zstandard.ZstdCompressor(level=19, write_content_size=True, write_checksum=False)
+    frame = compressor.compress(plaintext)
+    modes = _sequence_table_modes(frame)
+    assert modes == "LL=predefined OF=predefined ML=predefined", modes
+    write_fixture("sequences_predefined_tables", plaintext, frame)
+
+
+def generate_sequences_rle_tables() -> None:
+    """Many short matches all sharing the same offset and match length make Offset_Code and
+    Match_Length_Code each RLE-encodable; Literal_Length_Code still varies (FSE_Compressed).
+    """
+    plaintext = b"".join((bytes([65 + (i % 20)]) * 4 + bytes([i % 251])) for i in range(50))
+    compressor = zstandard.ZstdCompressor(level=19, write_content_size=True, write_checksum=False)
+    frame = compressor.compress(plaintext)
+    modes = _sequence_table_modes(frame)
+    assert modes == "LL=fse OF=rle ML=rle", modes
+    write_fixture("sequences_rle_tables", plaintext, frame)
+
+
+def generate_sequences_repeat_and_multiblock() -> None:
+    """Real production-shaped content (concatenated `AlgorithmDetails/*/*.md`, matching what
+    `AlgorithmDetails.algz` actually contains): large enough to span 4 blocks, naturally mixing
+    `Compressed`/`Treeless`/`Raw` literals with `FSE_Compressed` and (in the last block) `Repeat`
+    sequence-symbol tables. Depends on this repo's checked-in AlgorithmDetails content rather than
+    a hardcoded byte literal or RNG, since reproducing the exact block/mode split some other way
+    isn't practical -- if AlgorithmDetails' content changes enough to alter this fixture's block
+    layout, `generate.py`'s assertions below will fail loudly and it can be regenerated.
+    """
+    root = Path(__file__).resolve().parent.parent.parent.parent / "App" / "Resources" / "AlgorithmDetails"
+    algorithms = ["quicksort", "mergesort", "bubblesort", "insertionsort", "maxheapsort", "selectionsort"]
+    languages = ["py", "js", "go", "java", "c", "cpp"]
+    plaintext = b"".join(
+        (root / algorithm / f"{language}.md").read_bytes()
+        for algorithm in algorithms
+        for language in languages
+        if (root / algorithm / f"{language}.md").exists()
+    )
+    assert len(plaintext) > 300_000, f"expected a large corpus, got {len(plaintext)} B"
+
+    compressor = zstandard.ZstdCompressor(level=19, write_content_size=True, write_checksum=False)
+    frame = compressor.compress(plaintext)
+    blocks = classify_blocks(frame)
+    assert len(blocks) >= 4, f"expected >= 4 blocks, got {len(blocks)}"
+    last_block_modes = _sequence_table_modes(frame, block_index=len(blocks) - 1)
+    assert "repeat" in last_block_modes, f"expected a repeat-mode table, got {last_block_modes}"
+    write_fixture("sequences_repeat_and_multiblock", plaintext, frame)
+
+
 if __name__ == "__main__":
     generate_empty()
     generate_raw_single_segment()
@@ -412,3 +538,6 @@ if __name__ == "__main__":
     generate_huffman_four_stream_zero_sequences()
     generate_huffman_treeless_zero_sequences()
     generate_compressed_block_with_sequences()
+    generate_sequences_predefined_tables()
+    generate_sequences_rle_tables()
+    generate_sequences_repeat_and_multiblock()

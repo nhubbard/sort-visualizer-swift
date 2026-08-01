@@ -1,10 +1,9 @@
 import Foundation
 
 /// Orchestrates a full frame decode: header, then the block loop, then the trailing content
-/// checksum if present. `.compressed` blocks with a nonzero sequence count still throw —
-/// FSE-coded sequence decoding and LZ77 execution are later milestones (see
-/// `COMPRESSION_AND_STRETCH_GOALS_PLAN.md`'s staged decoder milestones). A block with zero
-/// sequences is fully decodable now: its literals section *is* the block's entire output.
+/// checksum if present. Every standard block/literals/sequences shape decodes now — see
+/// `COMPRESSION_AND_STRETCH_GOALS_PLAN.md`'s staged decoder milestones for what's still deferred
+/// (XXH64 checksum verification, dictionary support, the optimized/wildcopy path).
 enum ZstdDecompressor {
   static func decompress(_ data: Data, limits: ZstdDecodingLimits) throws -> Data {
     guard data.count <= limits.maximumFrameSize else {
@@ -22,6 +21,11 @@ enum ZstdDecompressor {
     // Persists across blocks within this frame (never across separate `decompress` calls) so a
     // `.treeless` block can reuse the table the most recent `.compressed` block built.
     var lastHuffmanTable: HuffmanDecodeTable?
+    // Same lifetime as `lastHuffmanTable`, for `.repeat_` sequence-symbol tables.
+    var lastSequenceTables = SequenceTableSet()
+    // Reset once per frame (RFC 8878 §3.1.1.3.2.1.2), threaded through every sequence in every
+    // block of this frame — never reset per block.
+    var repeatOffsets = RepeatOffsets()
 
     var blockCount = 0
     var isLastBlock = false
@@ -55,14 +59,38 @@ enum ZstdDecompressor {
           ? literalsHeader.regeneratedSize : literalsHeader.compressedSize
         try blockReader.skip(literalsSectionByteCount)
 
-        // Only Number_of_Sequences == 0 is decodable so far: the whole block is then just its
-        // literals, with no LZ77 matches. A single peeked byte is enough to tell zero from
-        // nonzero without needing the full variable-length count encoding (Milestone C's job).
-        let firstSequenceByte = try blockReader.readByte()
-        guard firstSequenceByte == 0 else {
-          throw ZstdError.unsupportedFrameFeature("FSE-coded sequences are not implemented yet")
+        let sequencesHeader = try SequencesHeaderParser.parse(&blockReader)
+        if sequencesHeader.numberOfSequences == 0 {
+          output.append(contentsOf: decoded.literals)
+        } else {
+          let literalLengthTable = try SequenceTableBuilder.buildTable(
+            mode: sequencesHeader.literalLengthsMode, kind: .literalLength,
+            reader: &blockReader, previousTables: lastSequenceTables
+          )
+          let offsetTable = try SequenceTableBuilder.buildTable(
+            mode: sequencesHeader.offsetsMode, kind: .offset,
+            reader: &blockReader, previousTables: lastSequenceTables
+          )
+          let matchLengthTable = try SequenceTableBuilder.buildTable(
+            mode: sequencesHeader.matchLengthsMode, kind: .matchLength,
+            reader: &blockReader, previousTables: lastSequenceTables
+          )
+          lastSequenceTables.literalLengths = literalLengthTable
+          lastSequenceTables.offsets = offsetTable
+          lastSequenceTables.matchLengths = matchLengthTable
+
+          let sequences = try SequenceStreamDecoder.decode(
+            blockReader.remainingBytes(),
+            count: sequencesHeader.numberOfSequences,
+            literalLengthTable: literalLengthTable,
+            offsetTable: offsetTable,
+            matchLengthTable: matchLengthTable,
+            repeatOffsets: &repeatOffsets
+          )
+          try SequenceExecutor.execute(
+            literals: decoded.literals, sequences: sequences, into: &output, limits: limits
+          )
         }
-        output.append(contentsOf: decoded.literals)
       }
 
       guard output.count <= limits.maximumOutputSize else {
