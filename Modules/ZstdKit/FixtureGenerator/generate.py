@@ -19,10 +19,10 @@ Two sources of fixtures:
 
 from __future__ import annotations
 
+import random
 from dataclasses import dataclass
 from pathlib import Path
 
-import os
 import zstandard
 
 OUTPUT_DIR = Path(__file__).resolve().parent.parent / "Tests" / "Fixtures"
@@ -70,16 +70,22 @@ def classify_blocks(frame: bytes) -> list[BlockSummary]:
     return summaries
 
 
-def write_fixture(name: str, plaintext: bytes, frame: bytes, *, verify: bool = True) -> None:
+def write_fixture(
+    name: str, plaintext: bytes, frame: bytes, *, verify: bool = True
+) -> None:
     if verify:
-        decompressed = zstandard.decompress(frame, max_output_size=max(len(plaintext), 1))
+        decompressed = zstandard.decompress(
+            frame, max_output_size=max(len(plaintext), 1)
+        )
         assert decompressed == plaintext, f"{name}: round-trip mismatch"
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     (OUTPUT_DIR / f"{name}.zst").write_bytes(frame)
     (OUTPUT_DIR / f"{name}.expected").write_bytes(plaintext)
     blocks = classify_blocks(frame)
     kinds = ", ".join(f"{b.block_type}({b.block_size}B)" for b in blocks)
-    print(f"{name}: {len(frame)} B compressed, {len(plaintext)} B plaintext, blocks=[{kinds}]")
+    print(
+        f"{name}: {len(frame)} B compressed, {len(plaintext)} B plaintext, blocks=[{kinds}]"
+    )
 
 
 # --------------------------------------------------------------------------------------------
@@ -88,28 +94,40 @@ def write_fixture(name: str, plaintext: bytes, frame: bytes, *, verify: bool = T
 
 
 def generate_empty() -> None:
-    compressor = zstandard.ZstdCompressor(level=1, write_content_size=True, write_checksum=False)
+    compressor = zstandard.ZstdCompressor(
+        level=1, write_content_size=True, write_checksum=False
+    )
     write_fixture("empty", b"", compressor.compress(b""))
 
 
 def generate_raw_single_segment() -> None:
-    plaintext = os.urandom(2000)
-    compressor = zstandard.ZstdCompressor(level=1, write_content_size=True, write_checksum=False)
+    plaintext = random.Random(1).randbytes(2000)
+    compressor = zstandard.ZstdCompressor(
+        level=1, write_content_size=True, write_checksum=False
+    )
     write_fixture("raw_single_segment", plaintext, compressor.compress(plaintext))
 
 
 def generate_checksum_trailer() -> None:
-    plaintext = os.urandom(4000)
-    compressor = zstandard.ZstdCompressor(level=1, write_content_size=True, write_checksum=True)
+    plaintext = random.Random(2).randbytes(4000)
+    compressor = zstandard.ZstdCompressor(
+        level=1, write_content_size=True, write_checksum=True
+    )
     write_fixture("checksum_trailer", plaintext, compressor.compress(plaintext))
 
 
 def generate_dictionary_id_present() -> None:
-    samples = [os.urandom(50) + b"COMMON_PATTERN_HERE_" + os.urandom(50) for _ in range(50)]
+    rng = random.Random(4)
+    samples = [
+        rng.randbytes(50) + b"COMMON_PATTERN_HERE_" + rng.randbytes(50)
+        for _ in range(50)
+    ]
     dictionary = zstandard.train_dictionary(4096, samples)
     assert dictionary.dict_id() != 0, "expected a nonzero trained dictionary ID"
-    compressor = zstandard.ZstdCompressor(level=1, dict_data=dictionary, write_content_size=True)
-    plaintext = os.urandom(50) + b"COMMON_PATTERN_HERE_" + os.urandom(50)
+    compressor = zstandard.ZstdCompressor(
+        level=1, dict_data=dictionary, write_content_size=True
+    )
+    plaintext = rng.randbytes(50) + b"COMMON_PATTERN_HERE_" + rng.randbytes(50)
     frame = compressor.compress(plaintext)
     params = zstandard.get_frame_parameters(frame)
     assert params.dict_id == dictionary.dict_id()
@@ -123,7 +141,11 @@ def generate_dictionary_id_present() -> None:
 
 
 def build_frame_header(
-    *, content_size: int | None, single_segment: bool, checksum: bool, window_covers: int = 0
+    *,
+    content_size: int | None,
+    single_segment: bool,
+    checksum: bool,
+    window_covers: int = 0,
 ) -> bytes:
     """`window_covers` sizes the window descriptor when `content_size` is `None` — the window
     must still be large enough to hold whatever content the caller actually plans to emit, even
@@ -147,7 +169,11 @@ def build_frame_header(
     else:
         fcs_flag, fcs_field_size = 3, 8
 
-    descriptor = (fcs_flag << 6) | ((1 if single_segment else 0) << 5) | ((1 if checksum else 0) << 2)
+    descriptor = (
+        (fcs_flag << 6)
+        | ((1 if single_segment else 0) << 5)
+        | ((1 if checksum else 0) << 2)
+    )
     header = bytearray(MAGIC)
     header.append(descriptor)
     if not single_segment:
@@ -172,8 +198,12 @@ BLOCK_TYPE_RAW, BLOCK_TYPE_RLE = 0, 1
 
 def generate_rle_single_segment() -> None:
     plaintext = b"A" * 10_000
-    header = build_frame_header(content_size=len(plaintext), single_segment=True, checksum=False)
-    block = build_block_header(is_last=True, block_type=BLOCK_TYPE_RLE, block_size=len(plaintext))
+    header = build_frame_header(
+        content_size=len(plaintext), single_segment=True, checksum=False
+    )
+    block = build_block_header(
+        is_last=True, block_type=BLOCK_TYPE_RLE, block_size=len(plaintext)
+    )
     block += bytes([plaintext[0]])
     write_fixture("rle_single_segment", plaintext, header + block)
 
@@ -188,40 +218,185 @@ def generate_rle_windowed_known_size() -> None:
     reproduce).
     """
     plaintext = b"Q" * 500_000
-    header = build_frame_header(content_size=len(plaintext), single_segment=False, checksum=False)
-    block = build_block_header(is_last=True, block_type=BLOCK_TYPE_RLE, block_size=len(plaintext))
+    header = build_frame_header(
+        content_size=len(plaintext), single_segment=False, checksum=False
+    )
+    block = build_block_header(
+        is_last=True, block_type=BLOCK_TYPE_RLE, block_size=len(plaintext)
+    )
     block += bytes([plaintext[0]])
     write_fixture("rle_windowed_known_size", plaintext, header + block)
 
 
 def generate_raw_windowed_unknown_size() -> None:
-    plaintext = os.urandom(10_000)
+    plaintext = random.Random(5).randbytes(10_000)
     header = build_frame_header(
-        content_size=None, single_segment=False, checksum=False, window_covers=len(plaintext)
+        content_size=None,
+        single_segment=False,
+        checksum=False,
+        window_covers=len(plaintext),
     )
-    block = build_block_header(is_last=True, block_type=BLOCK_TYPE_RAW, block_size=len(plaintext))
+    block = build_block_header(
+        is_last=True, block_type=BLOCK_TYPE_RAW, block_size=len(plaintext)
+    )
     block += plaintext
     write_fixture("raw_windowed_unknown_size", plaintext, header + block)
 
 
 def generate_mixed_raw_and_rle_blocks() -> None:
     """Three blocks — raw, rle, raw — proving the block loop advances correctly across types."""
-    raw1 = os.urandom(1000)
+    rng = random.Random(6)
+    raw1 = rng.randbytes(1000)
     rle_byte = 0x42
     rle_length = 2000
-    raw2 = os.urandom(500)
+    raw2 = rng.randbytes(500)
     plaintext = raw1 + bytes([rle_byte]) * rle_length + raw2
 
-    header = build_frame_header(content_size=len(plaintext), single_segment=True, checksum=False)
+    header = build_frame_header(
+        content_size=len(plaintext), single_segment=True, checksum=False
+    )
     blocks = b"".join(
         [
-            build_block_header(is_last=False, block_type=BLOCK_TYPE_RAW, block_size=len(raw1)) + raw1,
-            build_block_header(is_last=False, block_type=BLOCK_TYPE_RLE, block_size=rle_length)
+            build_block_header(
+                is_last=False, block_type=BLOCK_TYPE_RAW, block_size=len(raw1)
+            )
+            + raw1,
+            build_block_header(
+                is_last=False, block_type=BLOCK_TYPE_RLE, block_size=rle_length
+            )
             + bytes([rle_byte]),
-            build_block_header(is_last=True, block_type=BLOCK_TYPE_RAW, block_size=len(raw2)) + raw2,
+            build_block_header(
+                is_last=True, block_type=BLOCK_TYPE_RAW, block_size=len(raw2)
+            )
+            + raw2,
         ]
     )
     write_fixture("mixed_raw_and_rle_blocks", plaintext, header + blocks)
+
+
+# --------------------------------------------------------------------------------------------
+# Milestone B: Huffman-coded literals, with zero sequences so the block's entire decompressed
+# output is exactly the literals section (sequence decoding is Milestone C). Plaintexts below are
+# hardcoded rather than regenerated from a `random` seed each run: they were originally found by
+# scanning skewed-alphabet inputs at level 19 for ones the reference encoder happened to encode as
+# `Compressed_Literals_Block` + zero sequences, and hardcoding avoids the fixture silently
+# changing if Python's `random` algorithm ever shifts between versions.
+# --------------------------------------------------------------------------------------------
+
+
+def generate_huffman_one_stream_zero_sequences() -> None:
+    plaintext = b"BDABCBCBBAAAAAAABAAAADBBABAADBBB"  # 32 B, alphabet {A,B,C,D} -- single Huffman stream
+    compressor = zstandard.ZstdCompressor(
+        level=19, write_content_size=True, write_checksum=False
+    )
+    write_fixture(
+        "huffman_one_stream_zero_sequences", plaintext, compressor.compress(plaintext)
+    )
+
+
+def generate_huffman_four_stream_zero_sequences() -> None:
+    plaintext = (
+        b"BAABAABDACCACACBAADADCBDDCABABABBBCDAAACBCAACCAAADAAACAABBDABAAAAADAAADCABBDAAAA"
+        b"CABBBABAABABAACAACACAAAABAABAAAABABABAAADABCAADAAABACAABAABBADAABABCBBBAAAAAAAAB"
+        b"AACACAABCBBBAAABBCBDBABABAACABBCCDCBBACCAABAAACBAABABAAAABBBAAABBABAAABAAABABAAB"
+        b"AAAAAAABAABACCAC"
+    )  # 256 B, alphabet {A,B,C,D} -- large enough to trigger 4-stream Huffman literals
+    assert len(plaintext) == 256
+    compressor = zstandard.ZstdCompressor(
+        level=19, write_content_size=True, write_checksum=False
+    )
+    write_fixture(
+        "huffman_four_stream_zero_sequences", plaintext, compressor.compress(plaintext)
+    )
+
+
+def generate_huffman_treeless_zero_sequences() -> None:
+    """Forces an explicit block boundary via the streaming API (`COMPRESSOBJ_FLUSH_BLOCK`) so the
+    first block builds a real Huffman table (`Compressed_Literals_Block`) and the second reuses it
+    (`Treeless_Literals_Block`) -- both empirically confirmed to still have zero sequences at this
+    size, so Milestone B can exercise table persistence across blocks without Milestone C.
+    """
+    rng = random.Random(3)
+    symbols = list(range(65, 65 + 4))  # A-D
+    chunk1 = bytes(rng.choice(symbols) for _ in range(2000))
+    chunk2 = bytes(rng.choice(symbols) for _ in range(2000))
+    plaintext = chunk1 + chunk2
+
+    compressor = zstandard.ZstdCompressor(
+        level=19, write_content_size=True, write_checksum=False
+    )
+    streaming = compressor.compressobj()
+    frame = streaming.compress(chunk1)
+    frame += streaming.flush(zstandard.COMPRESSOBJ_FLUSH_BLOCK)
+    frame += streaming.compress(chunk2)
+    frame += streaming.flush(zstandard.COMPRESSOBJ_FLUSH_FINISH)
+
+    blocks = classify_blocks(frame)
+    assert len(blocks) == 2, f"expected 2 blocks, got {len(blocks)}"
+    write_fixture("huffman_treeless_zero_sequences", plaintext, frame)
+
+
+def _first_block_sequence_count_byte(frame: bytes) -> int:
+    """Reference-parses just far enough into the first block to read Number_of_Sequences,
+    independent of anything ZstdKit itself does -- used only to confirm a fixture's shape.
+    """
+    descriptor = frame[4]
+    pos = 5
+    single_segment = bool((descriptor >> 5) & 1)
+    if not single_segment:
+        pos += 1
+    pos += [0, 1, 2, 4][descriptor & 3]
+    fcs_flag = (descriptor >> 6) & 3
+    pos += {0: 1 if single_segment else 0, 1: 2, 2: 4, 3: 8}[fcs_flag]
+    pos += 3  # block header
+    block = frame[pos:]
+    b0 = block[0]
+    lit_type = b0 & 3
+    lhl = (b0 >> 2) & 3
+
+    if lit_type in (
+        0,
+        1,
+    ):  # raw/rle literals -- header_size is the section's own length,
+        # and for RLE the "compressed" payload is always exactly 1 byte regardless of size.
+        if lhl in (0, 2):
+            header_size, payload_size = 1, (1 if lit_type == 1 else b0 >> 3)
+        elif lhl == 1:
+            header_size, payload_size = (
+                2,
+                (1 if lit_type == 1 else int.from_bytes(block[0:2], "little") >> 4),
+            )
+        else:
+            header_size, payload_size = (
+                3,
+                (1 if lit_type == 1 else int.from_bytes(block[0:3], "little") >> 4),
+            )
+        return block[header_size + payload_size]
+
+    lhc = int.from_bytes(block[0:4], "little")
+    if lhl in (0, 1):
+        csize, header_size = (lhc >> 14) & 0x3FF, 3
+    elif lhl == 2:
+        csize, header_size = (lhc >> 18) & 0x3FFF, 4
+    else:
+        lhc2 = int.from_bytes(block[1:5], "little")
+        csize, header_size = lhc2 >> 2, 5
+    return block[header_size + csize]
+
+
+def generate_compressed_block_with_sequences() -> None:
+    """Genuinely repetitive content, so the encoder finds real LZ77 matches -- unlike every other
+    Milestone-B fixture, this one must NOT decode yet (`ZstdDecompressor` still throws for any
+    nonzero sequence count; FSE-coded sequence decoding is Milestone C).
+    """
+    plaintext = b"the quick brown fox jumps over the lazy dog. " * 40
+    compressor = zstandard.ZstdCompressor(
+        level=19, write_content_size=True, write_checksum=False
+    )
+    frame = compressor.compress(plaintext)
+    nb_seq_byte = _first_block_sequence_count_byte(frame)
+    assert nb_seq_byte != 0, "expected a nonzero sequence count in this fixture"
+    write_fixture("compressed_block_with_sequences", plaintext, frame)
 
 
 if __name__ == "__main__":
@@ -233,3 +408,7 @@ if __name__ == "__main__":
     generate_rle_windowed_known_size()
     generate_raw_windowed_unknown_size()
     generate_mixed_raw_and_rle_blocks()
+    generate_huffman_one_stream_zero_sequences()
+    generate_huffman_four_stream_zero_sequences()
+    generate_huffman_treeless_zero_sequences()
+    generate_compressed_block_with_sequences()

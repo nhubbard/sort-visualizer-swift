@@ -14,6 +14,7 @@ public enum ZstdError: Error, Sendable, Equatable {
   case invalidLiteralsSection
   case invalidHuffmanTable
   case invalidFSETable
+  case invalidBitstream
   case invalidSequenceStream
   case invalidMatchOffset
   case dictionaryRequired(id: UInt32)

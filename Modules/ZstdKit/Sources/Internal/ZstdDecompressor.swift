@@ -1,8 +1,10 @@
 import Foundation
 
 /// Orchestrates a full frame decode: header, then the block loop, then the trailing content
-/// checksum if present. `.compressed` blocks are wired in as literals/sequences support lands
-/// (see `COMPRESSION_AND_STRETCH_GOALS_PLAN.md`'s staged decoder milestones).
+/// checksum if present. `.compressed` blocks with a nonzero sequence count still throw —
+/// FSE-coded sequence decoding and LZ77 execution are later milestones (see
+/// `COMPRESSION_AND_STRETCH_GOALS_PLAN.md`'s staged decoder milestones). A block with zero
+/// sequences is fully decodable now: its literals section *is* the block's entire output.
 enum ZstdDecompressor {
   static func decompress(_ data: Data, limits: ZstdDecodingLimits) throws -> Data {
     guard data.count <= limits.maximumFrameSize else {
@@ -16,6 +18,10 @@ enum ZstdDecompressor {
     if let frameContentSize = header.frameContentSize {
       output.reserveCapacity(frameContentSize)
     }
+
+    // Persists across blocks within this frame (never across separate `decompress` calls) so a
+    // `.treeless` block can reuse the table the most recent `.compressed` block built.
+    var lastHuffmanTable: HuffmanDecodeTable?
 
     var blockCount = 0
     var isLastBlock = false
@@ -35,7 +41,28 @@ enum ZstdDecompressor {
         let byte = try reader.readByte()
         output.append(contentsOf: repeatElement(byte, count: blockHeader.blockSize))
       case .compressed:
-        throw ZstdError.unsupportedFrameFeature("compressed blocks are not implemented yet")
+        var blockReader = ByteReader(Array(try reader.readBytes(blockHeader.blockSize)))
+        let literalsHeader = try LiteralsSectionParser.parse(&blockReader)
+        let decoded = try LiteralsSectionDecoder.decode(
+          header: literalsHeader,
+          sectionBytes: blockReader.remainingBytes(),
+          previousHuffmanTable: lastHuffmanTable
+        )
+        lastHuffmanTable = decoded.huffmanTable
+
+        let literalsSectionByteCount =
+          literalsHeader.blockType == .raw || literalsHeader.blockType == .rle
+          ? literalsHeader.regeneratedSize : literalsHeader.compressedSize
+        try blockReader.skip(literalsSectionByteCount)
+
+        // Only Number_of_Sequences == 0 is decodable so far: the whole block is then just its
+        // literals, with no LZ77 matches. A single peeked byte is enough to tell zero from
+        // nonzero without needing the full variable-length count encoding (Milestone C's job).
+        let firstSequenceByte = try blockReader.readByte()
+        guard firstSequenceByte == 0 else {
+          throw ZstdError.unsupportedFrameFeature("FSE-coded sequences are not implemented yet")
+        }
+        output.append(contentsOf: decoded.literals)
       }
 
       guard output.count <= limits.maximumOutputSize else {

@@ -12,6 +12,16 @@ struct ByteReader {
 
   var remaining: Int { bytes.count - offset }
 
+  func peekByte() throws -> UInt8 {
+    guard offset < bytes.count else { throw ZstdError.truncatedInput }
+    return bytes[offset]
+  }
+
+  /// Every byte not yet consumed, as a slice sharing storage with the underlying buffer.
+  func remainingBytes() -> ArraySlice<UInt8> {
+    bytes[offset...]
+  }
+
   mutating func readByte() throws -> UInt8 {
     guard offset < bytes.count else { throw ZstdError.truncatedInput }
     defer { offset += 1 }
