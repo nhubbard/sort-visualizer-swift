@@ -1,3 +1,19 @@
+# Generated per-language highlighted Markdown (`uv run manage.py highlight`) — reproducible from
+# each algorithm's canonical source file, never hand-edited, and packed into AlgorithmDetails.algz
+# by `uv run manage.py pack`. Only these 10 generated filenames are ignored; description.md and
+# every canonical source file (quicksort.py, quicksort.js, ...) stay tracked as the actual source
+# of truth these are regenerated from.
+py.md
+js.md
+go.md
+java.md
+c.md
+cpp.md
+cs.md
+rb.md
+kt.md
+swift.md
+
 # Created by https://www.toptal.com/developers/gitignore/api/windows,macos,linux,sublimetext,xcode,python,node,go,c++,c,csharp,kotlin,ruby,swift,java
 # Edit at https://www.toptal.com/developers/gitignore?templates=windows,macos,linux,sublimetext,xcode,python,node,go,c++,c,csharp,kotlin,ruby,swift,java
 
