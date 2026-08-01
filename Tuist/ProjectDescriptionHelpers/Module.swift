@@ -99,7 +99,8 @@ public enum Module {
             at: root, includingPropertiesForKeys: [.isDirectoryKey], options: [.skipsHiddenFiles]
         )) ?? []
         // `template/` is the master template `scaffold.sh` copies from, not a real algorithm.
-        let excluded: Set<String> = ["template"]
+        // `__pycache__` is the Python cache folder and does not contain any algorithm.
+        let excluded: Set<String> = ["template", "__pycache__"]
         let algorithmIDs = entries
             .filter { (try? $0.resourceValues(forKeys: [.isDirectoryKey]))?.isDirectory == true }
             .map(\.lastPathComponent)
