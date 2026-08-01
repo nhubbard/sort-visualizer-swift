@@ -93,7 +93,16 @@ enum LiteralsSectionDecoder {
   /// Jump_Table (RFC 8878 §3.1.1.3.1.6): 3 little-endian `UInt16` compressed sizes for streams
   /// 1-3; stream 4's compressed size is whatever bytes remain. Streams 1-3 each decode
   /// `ceil(regeneratedSize / 4)` symbols; stream 4 decodes the remainder.
-  private static func decodeFourStreams(
+  ///
+  /// The four streams are decoded as four independent scalar states advanced one symbol at a
+  /// time in a single round-robin loop, rather than one stream fully decoded after another —
+  /// this is where reference zstd's "four-stream" format actually earns its keep: the streams
+  /// share no bitstream state, so interleaving their independent peek/consume chains is exactly
+  /// as correct as decoding them one after another (same bytes go to the same output positions
+  /// either way — `LiteralsSectionDecoderTests` checks the two orderings against each other
+  /// directly), while letting the CPU pipeline four independent dependency chains per round
+  /// instead of one long one four times over.
+  static func decodeFourStreams(
     _ body: ArraySlice<UInt8>, regeneratedSize: Int, table: HuffmanDecodeTable
   ) throws -> [UInt8] {
     guard body.count >= 6 else { throw ZstdError.invalidLiteralsSection }
@@ -112,12 +121,31 @@ enum LiteralsSectionDecoder {
     let lastSegmentSize = regeneratedSize - 3 * segmentSize
     guard lastSegmentSize >= 0 else { throw ZstdError.invalidLiteralsSection }
 
-    var literals: [UInt8] = []
-    literals.reserveCapacity(regeneratedSize)
-    literals += try HuffmanStreamDecoder.decode(body[streamsStart..<stream1End], count: segmentSize, table: table)
-    literals += try HuffmanStreamDecoder.decode(body[stream1End..<stream2End], count: segmentSize, table: table)
-    literals += try HuffmanStreamDecoder.decode(body[stream2End..<stream3End], count: segmentSize, table: table)
-    literals += try HuffmanStreamDecoder.decode(body[stream3End...], count: lastSegmentSize, table: table)
+    let segments: [(range: Range<Int>, count: Int)] = [
+      (streamsStart..<stream1End, segmentSize),
+      (stream1End..<stream2End, segmentSize),
+      (stream2End..<stream3End, segmentSize),
+      (stream3End..<body.endIndex, lastSegmentSize),
+    ]
+
+    var literals = [UInt8](repeating: 0, count: regeneratedSize)
+    var streams: [(reader: BackwardBitReader, outputOffset: Int, count: Int)] = []
+    var outputOffset = 0
+    for segment in segments where segment.count > 0 {
+      let reader = try BackwardBitReader(Array(body[segment.range]))
+      streams.append((reader, outputOffset, segment.count))
+      outputOffset += segment.count
+    }
+
+    let maxCount = streams.map(\.count).max() ?? 0
+    for step in 0..<maxCount {
+      for index in streams.indices where step < streams[index].count {
+        let lutIndex = Int(streams[index].reader.peekBits(table.maxBits))
+        guard lutIndex < table.symbolOf.count else { throw ZstdError.invalidHuffmanTable }
+        literals[streams[index].outputOffset + step] = table.symbolOf[lutIndex]
+        _ = streams[index].reader.readBits(Int(table.numberOfBits[lutIndex]))
+      }
+    }
     return literals
   }
 }
