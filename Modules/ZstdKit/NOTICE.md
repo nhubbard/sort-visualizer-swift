@@ -3,7 +3,7 @@
 `ZstdKit` is a from-scratch Swift port of a subset of [Zstandard](https://github.com/facebook/zstd)'s
 decoding algorithm (frame/block parsing, FSE table construction, Huffman literals, FSE-coded
 sequences, LZ77 execution) and of [xxHash](https://github.com/Cyan4973/xxHash)'s XXH64 checksum,
-which ships as part of the Zstandard source tree. See `COMPRESSION_AND_STRETCH_GOALS_PLAN.md` for
+which ships as part of the Zstandard source tree. See `COMPRESSION_DESIGN.md` for
 the full design rationale.
 
 No C/C++ source is linked, vendored, or transpiled — every file is original Swift. But the *logic*

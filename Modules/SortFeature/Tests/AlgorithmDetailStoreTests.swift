@@ -59,9 +59,9 @@ private enum LegacyLoader {
   }
 }
 
-/// The equivalence test `COMPRESSION_AND_STRETCH_GOALS_PLAN.md`'s Test strategy section calls
-/// for: every algorithm's content, loaded through the new archive-backed `AlgorithmDetailStore`,
-/// must be byte-for-byte identical to what the old loose-file loader reads directly off disk.
+/// The equivalence proof `COMPRESSION_DESIGN.md` calls for: every algorithm's content, loaded
+/// through the archive-backed `AlgorithmDetailStore`, must be byte-for-byte identical to what the
+/// old loose-file loader reads directly off disk.
 @Suite
 struct AlgorithmDetailStoreTests {
   private static var testBundle: Bundle { Bundle(for: StoreTestBundleMarker.self) }

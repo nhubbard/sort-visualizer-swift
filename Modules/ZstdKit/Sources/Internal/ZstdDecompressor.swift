@@ -37,9 +37,10 @@
 import Foundation
 
 /// Orchestrates a full frame decode: header, then the block loop, then the trailing content
-/// checksum if present. Every standard block/literals/sequences shape decodes now — see
-/// `COMPRESSION_AND_STRETCH_GOALS_PLAN.md`'s staged decoder milestones for what's still deferred
-/// (dictionary support, the optimized/wildcopy path).
+/// checksum if present. Every standard block/literals/sequences shape decodes, with the optimized
+/// wildcopy/bit-reader path wired in — see `COMPRESSION_DESIGN.md` for the full decoder-
+/// completeness/performance rundown. Dictionary support is the one generic `ZstdKit` capability
+/// not required (or exercised) by `AlgorithmDetails.algz`.
 enum ZstdDecompressor {
   static func decompress(_ data: Data, limits: ZstdDecodingLimits) throws -> Data {
     guard data.count <= limits.maximumFrameSize else {

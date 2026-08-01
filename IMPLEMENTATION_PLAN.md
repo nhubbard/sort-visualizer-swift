@@ -29,28 +29,53 @@ a plan; only **Phase 12 (stretch goals)** still has real, unbuilt content.
 
 Kept in sync with `ARCHITECTURE_V2.md` §2A, which has the full detail/opinion for each — this list
 exists so Phase 12 is the one place tracking every open item, not a second, divergent copy of the
-reasoning:
+reasoning. Ordered least to most effort, using the concrete seams named below and confirmed against
+current code (`SortSession.swift`, `ReplayEngine.swift`, `RunControlBar.swift`). None of these block
+each other, and each lands as its own commit as it's built, not a grab-bag.
 
-- **Teaching-mode step annotations** — visually indicating what a step *means*, not just that it
-  happened. Deferred, not designed; real design work, not a quick addition.
-- **Binary tape export/import for debugging a failed sort** — the more tractable of the deferred
-  items, since `Tape` is already `Codable` and `ReplayEngine` already just consumes a plain `Tape`
-  value.
-- **Video/GIF export** — iterate a tape's operations off-screen through a `Visualizer` into
-  `AVAssetWriter`. Not started.
-- **CustomImage visualizer** — needs an image-picker UI and a per-pixel remap step. Deferred until
-  the other 14 styles feel done and this specific novelty is worth the cost.
-- **Target-duration-based playback pacing** — replace the flat ops/sec `playbackSpeed` with a
-  per-run computed rate (`significantOperationCount / targetDuration`), so every sort takes
-  roughly the same wall-clock time regardless of how many operations it needs — the effect
-  ArrayV's own showcase mode achieves. Architecturally cheap: the full tape (and its exact
-  operation count) is already known before `SortSession.startReplay` seeds `ReplayEngine.speed`
-  once per run, so this is a one-line change at that seed point, not a rewrite; sustained
-  operation-apply throughput is already proven fine at the rates this would need. Open questions
-  before building it: pace against `significantOperationCount` (what the existing ops/sec budget
-  already filters to), not raw tape length; and whether this replaces the manual speed slider
-  globally or is scoped to Showcase mode only, where "every algorithm takes about the same time"
-  is actually the point.
-
-None of these block each other. Same commit discipline as the rest of this project's history: one
-commit per item as it lands, not a grab-bag commit.
+1. **Target-duration-based playback pacing** — Small. Replace the flat ops/sec `playbackSpeed`
+   with a per-run computed rate (`significantOperationCount / targetDuration`), so every sort takes
+   roughly the same wall-clock time regardless of how many operations it needs — the effect
+   ArrayV's own showcase mode achieves. Architecturally cheap: `SortSession.swift:253` sets
+   `replay.speed = settings.playbackSpeed` once per run inside `startReplay(_:)`, and
+   `ReplayEngine.significantOperationCount` is already tracked live (surfaced today only as a
+   displayed ops/sec stat in `RunControlBar.swift:131`) — the full tape (and its exact operation
+   count) is already known before that seed point, so this is close to a one-line change there, not
+   a rewrite; sustained operation-apply throughput is already proven fine at the rates this would
+   need. Open questions before building it: pace against `significantOperationCount` (what the
+   existing ops/sec budget already filters to), not raw tape length; and whether this replaces the
+   manual speed slider globally or is scoped to Showcase mode only, where "every algorithm takes
+   about the same time" is actually the point.
+2. **Binary tape export/import for a failed sort** — Small-Medium. The more tractable of the
+   deferred items: `Tape`/`TapeHeader`/`SortOperation` are already `Codable` (unused today), and
+   `ReplayEngine`'s only public initializer already takes a plain `Tape` with no opinion about
+   provenance — import is nearly free once export exists. The real work is a small versioned,
+   tag-byte-per-case binary encoder/decoder for `SortOperation` (a 12-case enum of small `Int`
+   payloads) rather than reusing `JSONEncoder`/`PropertyListEncoder`'s per-field overhead, plus a
+   hook off `SortSession.phase == .failed` to trigger the write, and a share-sheet/file-importer UI
+   pair. Self-contained — doesn't touch the renderer or replay logic.
+3. **CustomImage visualizer** — Medium. Needs an image-picker UI (`PhotosPicker`, standard
+   SwiftUI, low effort) and a per-pixel remap design (array value/index → pixel position — ArrayV's
+   own "Custom Image" concept). `MetalShapeRenderer<Layout>` was already generalized across the
+   other visualizer styles, so this becomes a 15th conformance following an established pattern
+   rather than new rendering infrastructure. Deferred until the other 14 styles feel done and this
+   specific novelty is worth the cost — a want-to-build-it-eventually item, not a blocked one.
+4. **Video/GIF export** — Medium-Large. Iterate `tape.operations` off-screen at a fixed frame rate
+   through whichever `Visualizer` is selected, into `ImageRenderer` → `AVAssetWriter` — reusing the
+   same `VisualizationContext`/`draw(_:)` call the live UI already uses, driven by a loop instead of
+   a display link, rather than a bespoke offscreen Metal texture pipeline. That reuse lowers risk,
+   but this is genuinely unstarted (no `AVAssetWriter` usage anywhere in the repo today). Work: the
+   off-screen drive loop, frame-rate/frame-count math for large tapes, `AVAssetWriter` plumbing
+   (pixel buffer pool, video settings, session start/finish), and — only if true animated GIF is
+   wanted — `ImageIO`'s `CGImageDestination` animated-GIF path as a second encoder. Recommend
+   scoping the first pass to video-only to keep this Medium rather than Large.
+5. **Teaching-mode step annotations** — Large. The engineering seam is small and already sketched:
+   an optional `annotation: String?` (or a small "step intent" enum) riding alongside
+   `SortOperation`, surfaced by opt-in `Visualizer`s as `DrawCommand.text` captions. The actual cost
+   is content/design, not code — this needs a design pass at least as involved as `ARCHITECTURE_V2.md`
+   itself, to design a vocabulary of step intents meaningful across ~82 different algorithms (a
+   compare in quicksort means something different from a compare in radix sort). This is the only
+   item where the blocker is design work, not implementation — recommend doing it last, and
+   treating it as its own separate planning pass (prove the vocabulary on a handful of
+   representative algorithms before rolling out to all 82) rather than folding it into a general
+   "implement stretch goals" pass.

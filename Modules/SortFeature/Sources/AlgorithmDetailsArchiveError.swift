@@ -1,6 +1,6 @@
 /// Errors `AlgorithmDetailStore` and its parsers throw. Every structural/memory-safety condition
 /// the `ALGZ`/`ADTL` container format has to check throws one of these in release builds — see
-/// `COMPRESSION_AND_STRETCH_GOALS_PLAN.md`'s "Container format"/"Safety model"/"Error model"
+/// `COMPRESSION_DESIGN.md`'s "Container format"/"Safety model"/"Error model"
 /// sections, which this enum is transcribed from directly.
 enum AlgorithmDetailsArchiveError: Error, Sendable, Equatable {
   case invalidMagic

@@ -1,7 +1,7 @@
 import DesignSystemKit
 
 /// One content entry inside a directory record: `kind` 0 = description, 1...10 = a `CodeLanguage`
-/// (index `kind - 1` into `CodeLanguage.all`) — see `COMPRESSION_AND_STRETCH_GOALS_PLAN.md`'s
+/// (index `kind - 1` into `CodeLanguage.all`) — see `COMPRESSION_DESIGN.md`'s
 /// content-kind table. `range` is content-section-relative, matching how the format stores it.
 struct AlgorithmDetailsContentEntryRecord {
   let kind: UInt16
@@ -14,7 +14,7 @@ struct AlgorithmDetailsDirectoryRecord {
   let entries: [AlgorithmDetailsContentEntryRecord]
 }
 
-/// The inner `ADTL` manifest (`COMPRESSION_AND_STRETCH_GOALS_PLAN.md`'s "Container format" §
+/// The inner `ADTL` manifest (`COMPRESSION_DESIGN.md`'s "Container format" §
 /// "Inner payload header"/"Algorithm directory records"/"Content entries"), parsed from the
 /// decompressed payload `ZstdKit` produces.
 struct AlgorithmDetailsManifest {

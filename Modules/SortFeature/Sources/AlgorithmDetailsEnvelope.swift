@@ -1,7 +1,7 @@
 /// A bounds-checked forward cursor over the archive's raw bytes — this file's own minimal
 /// implementation, not `ZstdKit`'s internal `ByteReader` (not exported cross-module, and this
 /// layer is meant to stay independent of `ZstdKit`'s internals per
-/// `COMPRESSION_AND_STRETCH_GOALS_PLAN.md`'s safety model). Shared with
+/// `COMPRESSION_DESIGN.md`'s safety model). Shared with
 /// `AlgorithmDetailsManifest.swift` for the same reason.
 struct ArchiveByteReader {
   let bytes: [UInt8]
@@ -34,7 +34,7 @@ struct ArchiveByteReader {
   }
 }
 
-/// The outer `ALGZ` envelope (`COMPRESSION_AND_STRETCH_GOALS_PLAN.md`'s "Container format" §
+/// The outer `ALGZ` envelope (`COMPRESSION_DESIGN.md`'s "Container format" §
 /// "Outer envelope"), parsed from the raw archive bytes — everything needed to locate and verify
 /// the single zstd frame inside, before `ZstdKit` ever sees it.
 struct AlgorithmDetailsEnvelope {

@@ -348,7 +348,7 @@ def test_algorithms(targets: Sequence[str], languages: Sequence[str]) -> bool:
 
 # --------------------------------------------------------------------------------------------
 # pack / decode — the ALGZ v1 container format
-# (COMPRESSION_AND_STRETCH_GOALS_PLAN.md, "Container format")
+# (COMPRESSION_DESIGN.md, "Container format")
 # --------------------------------------------------------------------------------------------
 
 MAGIC_ALGZ = bytes([0x41, 0x4C, 0x47, 0x5A, 0x0D, 0x0A, 0x1A, 0x0A])
@@ -855,7 +855,7 @@ def pack_command(
 
     Implements the ALGZ v1 container format (one whole-corpus zstd frame, no dictionary,
     versioned manifest, outer SHA-256 + zstd content checksum) — see
-    COMPRESSION_AND_STRETCH_GOALS_PLAN.md. Self-verifies by default after writing.
+    COMPRESSION_DESIGN.md. Self-verifies by default after writing.
     """
     algorithms = resolve_targets(names)
     result = pack_archive(algorithms, level)
