@@ -39,10 +39,9 @@
 /// can legitimately reference bytes an earlier block in this same frame wrote (the LZ77 window is
 /// frame-scoped, not block-scoped; confirmed the hard way, via a real multi-block fixture whose
 /// later blocks reference far enough back to only be satisfiable from a prior block's output).
-/// Byte-at-a-time copying so overlapping matches (`offset < matchLength`, a run repeating itself)
-/// come out correct by construction: appending from `output[matchStart + i]` one byte at a time
-/// naturally picks up bytes this same copy already wrote. (The optimized wildcopy/memmove version
-/// of this is a later milestone.)
+/// Match bytes are appended via `MatchCopier`'s bulk-copy path (offset-tiled chunks rather than
+/// one `append` call per byte), which handles the `offset < matchLength` overlapping case
+/// correctly by construction — see that type's doc comment.
 enum SequenceExecutor {
   static func execute(
     literals: [UInt8], sequences: [DecodedSequence], into output: inout [UInt8], limits: ZstdDecodingLimits
@@ -61,10 +60,9 @@ enum SequenceExecutor {
           throw ZstdError.invalidMatchOffset
         }
         let matchStart = output.count - sequence.offset
-        output.reserveCapacity(output.count + sequence.matchLength)
-        for i in 0..<sequence.matchLength {
-          output.append(output[matchStart + i])
-        }
+        MatchCopier.copy(
+          into: &output, matchStart: matchStart, matchLength: sequence.matchLength, offset: sequence.offset
+        )
       }
 
       guard output.count <= limits.maximumOutputSize else {
