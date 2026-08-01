@@ -128,6 +128,10 @@ struct Sort2App: App {
     {
       AppSettings.shared.playbackSpeed = overrideSpeed
     }
+
+    // Kicks off AlgorithmDetails.algz's decode as early as possible so it's likely already warm
+    // by the time the user reaches an AlgorithmDetailSection.
+    prewarmAlgorithmDetails()
   }
 
   var body: some Scene {

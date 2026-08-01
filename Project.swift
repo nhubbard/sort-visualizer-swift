@@ -1,14 +1,6 @@
 import ProjectDescription
 import ProjectDescriptionHelpers
 
-// Discovered once, at manifest-generation time, rather than hardcoded — see
-// `Module.algorithmDetailCopyFiles`'s doc comment for why.
-let algorithmDetailCopyFiles = Module.algorithmDetailCopyFiles()
-precondition(
-    !algorithmDetailCopyFiles.isEmpty,
-    "No AlgorithmDetails output folders discovered — check App/Resources/AlgorithmDetails/"
-)
-
 let modules: [Target] =
     Module.framework(name: "SortEngineKit") +
     // Decode-only, pure-Swift Zstandard implementation — no dependencies beyond Foundation, no
@@ -40,11 +32,21 @@ let modules: [Target] =
     Module.framework(name: "MathRenderingKit", dependencies: [
         .external(name: "SwiftMath"), .target(name: "AlgorithmKit"),
     ]) +
-    Module.framework(name: "SortFeature", dependencies: [
-        .target(name: "SortEngineKit"), .target(name: "AlgorithmKit"), .target(name: "VisualizationKit"),
-        .target(name: "AudioEngineKit"), .target(name: "SettingsKit"), .target(name: "DesignSystemKit"),
-        .target(name: "PersistenceKit"), .target(name: "MathRenderingKit"), .external(name: "MarkdownUI"),
-    ]) +
+    // `AlgorithmDetailStore` decodes `AlgorithmDetails.algz` via ZstdKit; its equivalence tests
+    // need the real archive bundled into SortFeatureTests too (mirroring ZstdKit's own
+    // `testResources` glob for its binary fixtures), and need `import ZstdKit` directly (module
+    // visibility isn't transitive), hence `testDependencies`.
+    Module.framework(
+        name: "SortFeature",
+        dependencies: [
+            .target(name: "SortEngineKit"), .target(name: "AlgorithmKit"), .target(name: "VisualizationKit"),
+            .target(name: "AudioEngineKit"), .target(name: "SettingsKit"), .target(name: "DesignSystemKit"),
+            .target(name: "PersistenceKit"), .target(name: "MathRenderingKit"), .target(name: "ZstdKit"),
+            .external(name: "MarkdownUI"),
+        ],
+        testResources: [.glob(pattern: "App/Resources/AlgorithmDetails/AlgorithmDetails.algz")],
+        testDependencies: [.target(name: "ZstdKit")]
+    ) +
     Module.framework(name: "SettingsFeature", dependencies: [
         .target(name: "SettingsKit"), .target(name: "VisualizationKit"), .target(name: "AlgorithmKit"),
         .target(name: "AudioEngineKit"), .target(name: "DesignSystemKit"),
@@ -125,15 +127,15 @@ let app = Target.target(
         ]),
         // Real folder reference, not a glob — see the exclusion comment above for why.
         .folderReference(path: "App/Resources/AppIcon.icon"),
+        // AlgorithmDetails/ also holds the authoring pipeline (highlight.py, test.py, template/,
+        // manage.py, ...) and each algorithm folder's raw/highlighted source, as siblings of the
+        // one file actually read at runtime — the exclusion glob above keeps all of that out, so
+        // this one explicit carve-out is needed to ship the archive itself.
+        // `AlgorithmDetailStore` reads it via `Bundle.main.url(forResource: "AlgorithmDetails",
+        // withExtension: "algz")`. `ResourceFileElement` has no `.file(path:)` case — an exact,
+        // non-wildcard path is a valid glob pattern instead.
+        .glob(pattern: "App/Resources/AlgorithmDetails/AlgorithmDetails.algz"),
     ],
-    // AlgorithmDetails/ also holds the authoring pipeline (highlight.py, test.py, template/, ...)
-    // and each algorithm folder's raw source, as siblings of the `*.md` content actually read at
-    // runtime — a plain top-level `.folderReference` would ship all of that too. These Copy Files
-    // phases (one per algorithm, see `Module.algorithmDetailCopyFiles`'s doc comment) ship only
-    // the `.md` files, re-nested under a literal `AlgorithmDetails/<id>/` in the bundle, so
-    // `AlgorithmDetailContent.load` keeps reading `Bundle.main.url(forResource: "AlgorithmDetails",
-    // withExtension: nil)` unmodified.
-    copyFiles: algorithmDetailCopyFiles,
     entitlements: .file(path: "App/Resources/SortSymphony.entitlements"),
     dependencies: [
         .target(name: "SortFeature"), .target(name: "SettingsFeature"),

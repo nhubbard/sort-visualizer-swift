@@ -11,7 +11,7 @@ import SwiftUI
 /// content) + a language-picker code sample, when `AlgorithmDetailContent` has any.
 public struct AlgorithmDetailSection: View {
   private let algorithm: any SortAlgorithm
-  private let content: AlgorithmDetailContent?
+  @State private var content: AlgorithmDetailContent?
   /// `ScrollingSortView.body`'s own top-level `GeometryReader` (otherwise only used to size
   /// `SortView`'s frame) passed straight through — not `ViewThatFits`: `descriptionColumn`/
   /// `complexityColumn` below both use `.frame(maxWidth: .infinity)`, which happily shrinks to
@@ -27,7 +27,6 @@ public struct AlgorithmDetailSection: View {
   public init(algorithm: any SortAlgorithm, availableWidth: CGFloat) {
     self.algorithm = algorithm
     self.availableWidth = availableWidth
-    content = AlgorithmDetailContent.load(for: algorithm.id.rawValue)
   }
 
   public var body: some View {
@@ -72,6 +71,7 @@ public struct AlgorithmDetailSection: View {
     }
     .padding(.all, 32)
     .task {
+      content = await AlgorithmDetailContent.load(for: algorithm.id.rawValue)
       if let firstLanguage = content?.codeSamples.first?.language {
         selectedLanguage = firstLanguage
       }

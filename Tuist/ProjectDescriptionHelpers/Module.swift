@@ -23,6 +23,11 @@ public enum Module {
         dependencies: [TargetDependency] = [],
         resources: ResourceFileElements? = nil,
         testResources: ResourceFileElements? = nil,
+        // Extra dependencies for the "<name>Tests" target only, beyond the framework itself —
+        // Swift module visibility isn't transitive across target boundaries, so a test that needs
+        // to `import` one of the framework's own dependencies directly (not just through the
+        // framework's public API) needs it listed here too.
+        testDependencies: [TargetDependency] = [],
         callerFilePath: StaticString = #filePath
     ) -> [Target] {
         let frameworkSettings = name.hasSuffix("Kit") ? baseSettings.merging(moduleVerifierSettings) { _, new in new } : baseSettings
@@ -50,7 +55,7 @@ public enum Module {
                 deploymentTargets: deploymentTargets,
                 sources: ["Modules/\(name)/Tests/**"],
                 resources: testResources,
-                dependencies: [.target(name: name)],
+                dependencies: [.target(name: name)] + testDependencies,
                 settings: .settings(base: baseSettings)
             )
         ]
@@ -82,36 +87,4 @@ public enum Module {
         "MODULE_VERIFIER_SUPPORTED_LANGUAGES": "objective-c objective-c++",
         "MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS": "gnu11 gnu++14"
     ]
-
-    /// Discovers `App/Resources/AlgorithmDetails/<id>/` algorithm folders and returns one Copy
-    /// Files build phase per algorithm, shipping only that folder's `*.md` files under
-    /// `AlgorithmDetails/<id>/` — raw source and pipeline files never reach the app bundle. One
-    /// phase per algorithm is required, not one shared phase: a Copy Files phase applies a single
-    /// destination subpath to every file it copies, so preserving the per-algorithm nesting
-    /// `AlgorithmDetailContent` expects means each algorithm needs its own subpath.
-    /// `callerFilePath` defaults to the call site's own path (via `#filePath`) so the
-    /// manifest-relative root is computed correctly regardless of where this is called from.
-    public static func algorithmDetailCopyFiles(callerFilePath: StaticString = #filePath) -> [CopyFilesAction] {
-        let root = URL(fileURLWithPath: "\(callerFilePath)")
-            .deletingLastPathComponent()
-            .appendingPathComponent("App/Resources/AlgorithmDetails")
-        let entries = (try? FileManager.default.contentsOfDirectory(
-            at: root, includingPropertiesForKeys: [.isDirectoryKey], options: [.skipsHiddenFiles]
-        )) ?? []
-        // `template/` is the master template `scaffold.sh` copies from, not a real algorithm.
-        // `__pycache__` is the Python cache folder and does not contain any algorithm.
-        let excluded: Set<String> = ["template", "__pycache__"]
-        let algorithmIDs = entries
-            .filter { (try? $0.resourceValues(forKeys: [.isDirectoryKey]))?.isDirectory == true }
-            .map(\.lastPathComponent)
-            .filter { !excluded.contains($0) }
-            .sorted()
-        return algorithmIDs.map { id in
-            .resources(
-                name: "AlgorithmDetails-\(id)",
-                subpath: "AlgorithmDetails/\(id)",
-                files: [.glob(pattern: .path("App/Resources/AlgorithmDetails/\(id)/*.md"))]
-            )
-        }
-    }
 }
