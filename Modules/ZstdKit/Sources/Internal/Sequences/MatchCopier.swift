@@ -48,6 +48,16 @@
 /// offset)]`, exactly the byte-at-a-time loop's own behavior, just computed in `offset`-sized
 /// chunks instead of one byte at a time. `scalarCopy` stays byte-at-a-time and is kept as the
 /// correctness oracle `MatchCopierTests` checks this against.
+///
+/// Every chunk appended below is first copied into its own small, independent `[UInt8]` — never
+/// `output.append(contentsOf: output[someRange])` directly. Passing a slice of `output` itself to
+/// `append(contentsOf:)` makes that slice hold a second reference to `output`'s storage for the
+/// duration of the call, which defeats `append`'s copy-on-write uniqueness check and forces it to
+/// copy the *entire* existing buffer before applying the append — turning every single match copy
+/// into an O(current output size) operation. Invisible on every fixture up to a few hundred KB;
+/// on the real ~17 MB multi-block archive this content module ships, it turned a ~30 ms decode
+/// into a 37-second one. Copying the small chunk first breaks that aliasing and restores the
+/// intended amortized-O(matchLength) behavior.
 enum MatchCopier {
   static func copy(into output: inout [UInt8], matchStart: Int, matchLength: Int, offset: Int) {
     guard matchLength > 0 else { return }
@@ -55,7 +65,8 @@ enum MatchCopier {
 
     if offset >= matchLength {
       // Fully nonoverlapping: the whole match is already sitting in `output`, verbatim.
-      output.append(contentsOf: output[matchStart..<(matchStart + matchLength)])
+      let chunk = Array(output[matchStart..<(matchStart + matchLength)])
+      output.append(contentsOf: chunk)
       return
     }
 
@@ -65,16 +76,16 @@ enum MatchCopier {
       return
     }
 
+    // `pattern` is the periodic unit the whole match tiles — captured once into its own storage,
+    // then reused for every tile (never re-sliced from `output`).
+    let pattern = Array(output[matchStart..<(matchStart + offset)])
     var written = 0
-    var readIndex = matchStart
     while written + offset <= matchLength {
-      output.append(contentsOf: output[readIndex..<(readIndex + offset)])
-      readIndex += offset
+      output.append(contentsOf: pattern)
       written += offset
     }
     if written < matchLength {
-      let remainder = matchLength - written
-      output.append(contentsOf: output[readIndex..<(readIndex + remainder)])
+      output.append(contentsOf: pattern[0..<(matchLength - written)])
     }
   }
 

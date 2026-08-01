@@ -104,39 +104,39 @@ enum HuffmanTableBuilder {
 
     let bitstreamStart = forwardReader.consumedBytes
     guard bitstreamStart <= weightSection.count else { throw ZstdError.invalidHuffmanTable }
-    var reader = try BackwardBitReader(Array(weightSection[bitstreamStart...]))
+    var reader = try FSEContainerBitReader(Array(weightSection[bitstreamStart...]))
 
     var state1 = Int(reader.readBits(accuracyLog))
     var state2 = Int(reader.readBits(accuracyLog))
     var weights: [Int] = []
 
-    func advance(_ state: inout Int) {
+    // Reads the symbol at the state's *current* position, then transitions it — one atomic step,
+    // matching `FSE_decodeSymbol` exactly (the lookup uses `numberOfBits`/`baseline` from the
+    // state *before* this call updates it).
+    func decodeAndAdvance(_ state: inout Int) -> Int {
+      let symbol = Int(table.symbolOf[state])
       let bits = Int(table.numberOfBits[state])
-      let low = bits > 0 ? Int(reader.readBits(bits)) : 0
+      let low = Int(reader.readBits(bits))
       state = Int(table.baseline[state]) + low
+      return symbol
     }
 
-    // Mirrors the reference decoder's tail loop (`FSE_decompress_usingDTable_generic`) exactly:
-    // each state's symbol is read from its *current* position, then (unless this is the final
-    // symbol of the whole stream) the state transitions before the next read. The bug this
-    // replaced: giving `state1` a second, spurious transition right before reading the very last
-    // symbol of an odd-length stream — invisible on every fixture whose weight stream happened to
-    // end at that boundary evenly, until a real multi-KB corpus (restricted-alphabet content, so
-    // the implicit last symbol landed exactly on this parity) exposed it. Confirmed bit-exact
-    // against a faithful port of `BIT_reloadDStream`'s container semantics, not guessed.
+    // Mirrors `FSE_decompress_usingDTable_generic`'s tail loop exactly, including its container-
+    // based overflow detection (`FSEContainerBitReader.reload`) — a simplified bit-position
+    // heuristic was tried here first and produced the wrong symbol count on real multi-KB content
+    // (matched one fixture's tail parity by chance, was short by 2 symbols on another); this port
+    // replicates the reference decoder's actual termination condition instead of approximating it.
     while true {
-      weights.append(Int(table.symbolOf[state1]))
-      if !reader.hasBitsRemaining {
-        weights.append(Int(table.symbolOf[state2]))
+      weights.append(decodeAndAdvance(&state1))
+      if reader.reload() == .overflow {
+        weights.append(decodeAndAdvance(&state2))
         break
       }
-      advance(&state1)
-      weights.append(Int(table.symbolOf[state2]))
-      if !reader.hasBitsRemaining {
-        weights.append(Int(table.symbolOf[state1]))
+      weights.append(decodeAndAdvance(&state2))
+      if reader.reload() == .overflow {
+        weights.append(decodeAndAdvance(&state1))
         break
       }
-      advance(&state2)
     }
     return weights
   }
