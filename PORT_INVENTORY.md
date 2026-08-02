@@ -154,11 +154,6 @@ Move algorithms here when you finish them.
 
 #### Not Started
 
-##### Easy
-
-- [ ] ImprovedInPlaceMergeSort — 92 lines (**not** ported — distinct from plain `InPlaceMergeSort` above)
-- [ ] BufferedStoogeSort — 96 lines
-
 ##### Medium
 
 - [ ] StacklessRotateMergeSort — 125 lines
