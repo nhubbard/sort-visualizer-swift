@@ -85,14 +85,13 @@ def part_right(arr, begin_, end_)
   first += 1
   first += 1 while arr[first] < pivot
 
+  last -= 1
   if first - 1 == begin_
-    last -= 1
     while first < last && !(arr[last] < pivot)
       last -= 1
     end
   else
-    last -= 1
-    last -= 1 while !(arr[last] < pivot)
+    last -= 1 until arr[last] < pivot
   end
 
   already_parted = first >= last
@@ -101,7 +100,7 @@ def part_right(arr, begin_, end_)
     first += 1
     first += 1 while arr[first] < pivot
     last -= 1
-    last -= 1 while !(arr[last] < pivot)
+    last -= 1 until arr[last] < pivot
   end
 
   pivot_pos = first - 1
@@ -119,14 +118,13 @@ def part_left(arr, begin_, end_)
   last -= 1
   last -= 1 while pivot < arr[last]
 
+  first += 1
   if last + 1 == end_
-    first += 1
     while first < last && !(pivot < arr[first])
       first += 1
     end
   else
-    first += 1
-    first += 1 while !(pivot < arr[first])
+    first += 1 until pivot < arr[first]
   end
 
   while first < last
@@ -134,7 +132,7 @@ def part_left(arr, begin_, end_)
     last -= 1
     last -= 1 while pivot < arr[last]
     first += 1
-    first += 1 while !(pivot < arr[first])
+    first += 1 until pivot < arr[first]
   end
 
   pivot_pos = last
@@ -230,10 +228,8 @@ def pdq_loop(arr, begin_, end_, bad_allowed)
           arr[end_ - 3], arr[end_ - (2 + right_size / 4)] = arr[end_ - (2 + right_size / 4)], arr[end_ - 3]
         end
       end
-    else
-      if already_parted && partial_insert_sort(arr, begin_, pivot_pos) && partial_insert_sort(arr, pivot_pos + 1, end_)
-        return
-      end
+    elsif already_parted && partial_insert_sort(arr, begin_, pivot_pos) && partial_insert_sort(arr, pivot_pos + 1, end_)
+      return
     end
 
     pdq_loop(arr, begin_, pivot_pos, bad_allowed)

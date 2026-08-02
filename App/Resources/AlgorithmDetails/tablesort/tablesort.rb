@@ -20,12 +20,14 @@ def partition(arr, table, a, b, p)
   i = a - 1
   j = b
   loop do
-    begin
+    loop do
       i += 1
-    end while i < j && !stable_comp(arr, table, i, p)
-    begin
+      break unless i < j && !stable_comp(arr, table, i, p)
+    end
+    loop do
       j -= 1
-    end while j >= i && stable_comp(arr, table, j, p)
+      break unless j >= i && stable_comp(arr, table, j, p)
+    end
     if i < j
       table[i], table[j] = table[j], table[i]
     else
@@ -58,12 +60,13 @@ def sort(arr)
     t = arr[i]
     j = i
     nxt = table[i]
-    begin
+    loop do
       arr[j] = arr[nxt]
       table[j] = j
       j = nxt
       nxt = table[nxt]
-    end while nxt != i
+      break unless nxt != i
+    end
     arr[j] = t
     table[j] = j
   end

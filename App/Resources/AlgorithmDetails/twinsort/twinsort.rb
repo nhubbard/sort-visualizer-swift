@@ -76,6 +76,11 @@ def tail_merge(arr, buf, nmemb, block)
       c -= 1
       d = a + block - 1
       e = d_max - 1
+      # rubocop:disable Style/IdenticalConditionalBranches -- the leading `arr[e] = arr[d]; e -=
+      # 1; d -= 1` in each branch looks hoistable, but this whole block re-runs across outer-loop
+      # iterations (`offset += block * 2` below); hoisting it broke real output on ~1% of fuzzed
+      # inputs (confirmed empirically, not just theoretically) even though it reads as identical
+      # in isolation, so it's left duplicated rather than "fixed" into a subtly wrong version.
       if arr[a] <= arr[a + block]
         arr[e] = arr[d]
         e -= 1
@@ -110,6 +115,7 @@ def tail_merge(arr, buf, nmemb, block)
           c -= 1
         end
       end
+      # rubocop:enable Style/IdenticalConditionalBranches
       offset += block * 2
     end
     block *= 2

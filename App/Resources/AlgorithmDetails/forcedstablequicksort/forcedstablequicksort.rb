@@ -24,12 +24,14 @@ def partition(arr, key, a, b, p)
   i = a - 1
   j = b
   loop do
-    begin
+    loop do
       i += 1
-    end while i < j && !stable_comp(arr, key, i, p)
-    begin
+      break unless i < j && !stable_comp(arr, key, i, p)
+    end
+    loop do
       j -= 1
-    end while j >= i && stable_comp(arr, key, j, p)
+      break unless j >= i && stable_comp(arr, key, j, p)
+    end
     if i < j
       stable_swap(arr, key, i, j)
     else

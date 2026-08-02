@@ -157,7 +157,7 @@ end
 def build_blocks(arr, pos, length, build_len)
   dist = 1
   while dist < length
-    extra_dist = arr[pos + dist - 1] > arr[pos + dist] ? 1 : 0
+    extra_dist = (arr[pos + dist - 1] > arr[pos + dist]) ? 1 : 0
     swap(arr, pos + dist - 3, pos + dist - 1 + extra_dist)
     swap(arr, pos + dist - 2, pos + dist - extra_dist)
     dist += 2
@@ -206,7 +206,7 @@ def combine_blocks(arr, pos, length, build_len, reg_block_len)
     break if i == combine_len && left_over == 0
 
     block_pos = pos + i * 2 * build_len
-    block_count = (i == combine_len ? left_over : 2 * build_len) / reg_block_len
+    block_count = ((i == combine_len) ? left_over : 2 * build_len) / reg_block_len
     (1...block_count).each do |index|
       left_index = index - 1
       (index...block_count).each do |right_index|
@@ -223,7 +223,7 @@ def combine_blocks(arr, pos, length, build_len, reg_block_len)
       end
     end
     a_block_count = 0
-    last_len = i == combine_len ? (left_over % reg_block_len) : 0
+    last_len = (i == combine_len) ? (left_over % reg_block_len) : 0
     if last_len != 0
       while a_block_count < block_count && arr[block_pos + block_count * reg_block_len] < arr[
         block_pos + (block_count - a_block_count - 1) * reg_block_len

@@ -56,8 +56,9 @@ def find_run(arr, a, b)
   i = a + 1
   return i if i == b
 
-  if arr[i - 1] > arr[i]
-    i += 1
+  descending = arr[i - 1] > arr[i]
+  i += 1
+  if descending
     i += 1 while i < b && arr[i - 1] > arr[i]
     lo = a
     hi = i - 1
@@ -67,7 +68,6 @@ def find_run(arr, a, b)
       hi -= 1
     end
   else
-    i += 1
     i += 1 while i < b && arr[i - 1] <= arr[i]
   end
   i

@@ -1,7 +1,10 @@
 def sort(array)
   sorted = false
   until sorted
+    # rubocop:disable Lint/UselessAssignment -- read by `until sorted` on the next iteration;
+    # rubocop's liveness analysis doesn't track loop-condition variables reassigned in the body.
     sorted = true
+    # rubocop:enable Lint/UselessAssignment
     i = 0
     while i < array.length - 1
       if array[i] > array[i + 1]

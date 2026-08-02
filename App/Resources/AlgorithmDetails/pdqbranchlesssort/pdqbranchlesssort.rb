@@ -19,7 +19,7 @@ def trunc_div(a, b)
   # negative operands (like Python), but the pivot-position arithmetic below can go
   # negative, so plain `/` would silently disagree with C/Java/Swift/etc. semantics there.
   q = a.abs / b.abs
-  (a < 0) != (b < 0) ? -q : q
+  ((a < 0) != (b < 0)) ? -q : q
 end
 
 def insert_sort(arr, begin_, end_)
@@ -117,14 +117,13 @@ def part_right_branchless(arr, begin_, end_, left_offsets, right_offsets)
   first += 1
   first += 1 while arr[first] < pivot
 
+  last -= 1
   if first - 1 == begin_
-    last -= 1
     while first < last && !(arr[last] < pivot)
       last -= 1
     end
   else
-    last -= 1
-    last -= 1 while !(arr[last] < pivot)
+    last -= 1 until arr[last] < pivot
   end
 
   already_parted = first >= last
@@ -141,20 +140,20 @@ def part_right_branchless(arr, begin_, end_, left_offsets, right_offsets)
   while last - first > 2 * BLOCK_SIZE
     if left_num == 0
       left_start = 0
-      it = first
+      cursor = first
       (0...BLOCK_SIZE).each do |i|
         left_offsets[left_num] = i
-        left_num += 1 unless arr[it] < pivot
-        it += 1
+        left_num += 1 unless arr[cursor] < pivot
+        cursor += 1
       end
     end
     if right_num == 0
       right_start = 0
-      it = last
+      cursor = last
       (0...BLOCK_SIZE).each do |i|
-        it -= 1
+        cursor -= 1
         right_offsets[right_num] = i + 1
-        right_num += 1 if arr[it] < pivot
+        right_num += 1 if arr[cursor] < pivot
       end
     end
 
@@ -184,21 +183,21 @@ def part_right_branchless(arr, begin_, end_, left_offsets, right_offsets)
 
   if unknown_left != 0 && left_num == 0
     left_start = 0
-    it = first
+    cursor = first
     (0...left_size).each do |i|
       left_offsets[left_num] = i
-      left_num += 1 unless arr[it] < pivot
-      it += 1
+      left_num += 1 unless arr[cursor] < pivot
+      cursor += 1
     end
   end
 
   if unknown_left != 0 && right_num == 0
     right_start = 0
-    it = last
+    cursor = last
     (0...right_size).each do |i|
-      it -= 1
+      cursor -= 1
       right_offsets[right_num] = i + 1
-      right_num += 1 if arr[it] < pivot
+      right_num += 1 if arr[cursor] < pivot
     end
   end
 
@@ -233,7 +232,6 @@ def part_right_branchless(arr, begin_, end_, left_offsets, right_offsets)
       arr[src], arr[first] = arr[first], arr[src]
       first += 1
     end
-    last = first
   end
 
   pivot_pos = first - 1
@@ -251,14 +249,13 @@ def part_left(arr, begin_, end_)
   last -= 1
   last -= 1 while pivot < arr[last]
 
+  first += 1
   if last + 1 == end_
-    first += 1
     while first < last && !(pivot < arr[first])
       first += 1
     end
   else
-    first += 1
-    first += 1 while !(pivot < arr[first])
+    first += 1 until pivot < arr[first]
   end
 
   while first < last
@@ -266,7 +263,7 @@ def part_left(arr, begin_, end_)
     last -= 1
     last -= 1 while pivot < arr[last]
     first += 1
-    first += 1 while !(pivot < arr[first])
+    first += 1 until pivot < arr[first]
   end
 
   pivot_pos = last
@@ -362,10 +359,8 @@ def pdq_loop(arr, begin_, end_, bad_allowed, left_offsets, right_offsets)
           arr[end_ - 3], arr[end_ - (2 + right_size / 4)] = arr[end_ - (2 + right_size / 4)], arr[end_ - 3]
         end
       end
-    else
-      if already_parted && partial_insert_sort(arr, begin_, pivot_pos) && partial_insert_sort(arr, pivot_pos + 1, end_)
-        return
-      end
+    elsif already_parted && partial_insert_sort(arr, begin_, pivot_pos) && partial_insert_sort(arr, pivot_pos + 1, end_)
+      return
     end
 
     pdq_loop(arr, begin_, pivot_pos, bad_allowed, left_offsets, right_offsets)

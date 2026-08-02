@@ -79,10 +79,11 @@ def merge_without_buffer(arr, pos, len1, len2)
       end
       break if len2 == 0
 
-      begin
+      loop do
         pos += 1
         len1 -= 1
-      end while len1 != 0 && arr[pos] <= arr[pos + len1]
+        break unless len1 != 0 && arr[pos] <= arr[pos + len1]
+      end
     end
   else
     while len2 != 0
@@ -93,9 +94,10 @@ def merge_without_buffer(arr, pos, len1, len2)
       end
       break if len1 == 0
 
-      begin
+      loop do
         len2 -= 1
-      end while len2 != 0 && arr[pos + len1 - 1] <= arr[pos + len1 + len2 - 1]
+        break unless len2 != 0 && arr[pos + len1 - 1] <= arr[pos + len1 + len2 - 1]
+      end
     end
   end
 end
@@ -156,10 +158,11 @@ def smart_merge_without_buffer(arr, pos, left_over_len, left_over_frag, reg_bloc
       end
       return [len1, left_over_frag] if len2 == 0
 
-      begin
+      loop do
         pos += 1
         len1 -= 1
-      end while len1 != 0 && (compare_values(arr[pos], arr[pos + len1]) - type_frag) < 0
+        break unless len1 != 0 && (compare_values(arr[pos], arr[pos + len1]) - type_frag) < 0
+      end
     end
   end
   [len2, type_frag]
@@ -209,14 +212,13 @@ def merge_buffers_left(arr, keys_pos, midkey, pos, block_count, block_len, haveb
     return
   end
   left_over_len = block_len
-  left_over_frag = arr[keys_pos] < arr[midkey] ? 0 : 1
+  left_over_frag = (arr[keys_pos] < arr[midkey]) ? 0 : 1
   process_index = block_len
   (1...block_count).each do |key_index|
     rest_to_process = process_index - left_over_len
-    next_frag = arr[keys_pos + key_index] < arr[midkey] ? 0 : 1
+    next_frag = (arr[keys_pos + key_index] < arr[midkey]) ? 0 : 1
     if next_frag == left_over_frag
       multi_swap(arr, pos + rest_to_process - block_len, pos + rest_to_process, left_over_len) if havebuf
-      rest_to_process = process_index
       left_over_len = block_len
     else
       left_over_len, left_over_frag = if havebuf
@@ -242,15 +244,15 @@ def merge_buffers_left(arr, keys_pos, midkey, pos, block_count, block_len, haveb
     else
       merge_without_buffer(arr, pos + rest_to_process, left_over_len, last_len)
     end
-  else
-    multi_swap(arr, pos + rest_to_process, pos + rest_to_process - block_len, left_over_len) if havebuf
+  elsif havebuf
+    multi_swap(arr, pos + rest_to_process, pos + rest_to_process - block_len, left_over_len)
   end
 end
 
 def build_blocks(arr, pos, length, build_len)
   dist = 1
   while dist < length
-    extra_dist = arr[pos + dist - 1] > arr[pos + dist] ? 1 : 0
+    extra_dist = (arr[pos + dist - 1] > arr[pos + dist]) ? 1 : 0
     swap(arr, pos + dist - 3, pos + dist - 1 + extra_dist)
     swap(arr, pos + dist - 2, pos + dist - extra_dist)
     dist += 2
@@ -299,8 +301,8 @@ def combine_blocks(arr, key_pos, pos, length, build_len, reg_block_len, havebuf)
     break if i == combine_len && left_over == 0
 
     block_pos = pos + i * 2 * build_len
-    block_count = (i == combine_len ? left_over : 2 * build_len) / reg_block_len
-    insert_sort(arr, key_pos, block_count + (i == combine_len ? 1 : 0))
+    block_count = ((i == combine_len) ? left_over : 2 * build_len) / reg_block_len
+    insert_sort(arr, key_pos, block_count + ((i == combine_len) ? 1 : 0))
     midkey = build_len / reg_block_len
     (1...block_count).each do |index|
       left_index = index - 1
@@ -318,7 +320,7 @@ def combine_blocks(arr, key_pos, pos, length, build_len, reg_block_len, havebuf)
       end
     end
     a_block_count = 0
-    last_len = i == combine_len ? (left_over % reg_block_len) : 0
+    last_len = (i == combine_len) ? (left_over % reg_block_len) : 0
     if last_len != 0
       while a_block_count < block_count && arr[block_pos + block_count * reg_block_len] < arr[
         block_pos + (block_count - a_block_count - 1) * reg_block_len
@@ -327,7 +329,7 @@ def combine_blocks(arr, key_pos, pos, length, build_len, reg_block_len, havebuf)
       end
     end
     merge_buffers_left(arr, key_pos, key_pos + midkey, block_pos, block_count - a_block_count,
-                        reg_block_len, havebuf, a_block_count, last_len)
+      reg_block_len, havebuf, a_block_count, last_len)
     i += 1
   end
   if havebuf

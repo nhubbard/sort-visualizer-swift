@@ -2,15 +2,15 @@ def sort(arr)
   n = arr.length
   i = 0
   while i < n - 1
-    minIdx = i
+    min_idx = i
     j = i + 1
     while j < n
-      if arr[j] < arr[minIdx]
-        minIdx = j
+      if arr[j] < arr[min_idx]
+        min_idx = j
       end
       j += 1
     end
-    arr[minIdx], arr[i] = arr[i], arr[minIdx]
+    arr[min_idx], arr[i] = arr[i], arr[min_idx]
     i += 1
   end
 end
