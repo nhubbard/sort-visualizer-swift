@@ -72,9 +72,7 @@ cluster together rather than picking its members apart on separate days:
 
 ### a. Exchange sorts (`sorts/exchange/`, 41)
 
-#### Completed
-
-Move algorithms here when you finish them.
+All exchange sorts have been ported.
 
 ### b. Insertion sorts (`sorts/insert/`, 18)
 
@@ -130,13 +128,6 @@ see Completed above.)
 Move algorithms here when you finish them.
 
 #### Not Started
-
-##### Easy
-
-- [ ] IndexSort — 64 lines
-- [ ] SimplisticGravitySort — 64 lines
-- [ ] ClassicGravitySort — 77 lines
-- [ ] InPlaceLSDRadixSort — 87 lines
 
 ##### Medium
 

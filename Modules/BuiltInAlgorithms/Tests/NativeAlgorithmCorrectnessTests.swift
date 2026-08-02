@@ -20,14 +20,15 @@ struct NativeAlgorithmCorrectnessTests {
     BottomUpHeapSort(), BottomUpMergeSort(), BozoSort(), BubbleBogoSort(), BubbleSort(),
     BurntPancakeSort(),
     CircleSortIterative(), CircleSortRecursive(), CircloidSort(),
-    ClassicThreeSmoothCombSort(), ClassicTreeSort(), CocktailBogoSort(),
+    ClassicGravitySort(), ClassicThreeSmoothCombSort(), ClassicTreeSort(), CocktailBogoSort(),
     CocktailMergeSort(), CocktailShakerSort(), CombSort(), CompleteGraphSort(), CountingSort(),
     CycleSort(),
     DeterministicBogoSort(), DiamondSortRecursive(), DoubleInsertionSort(), DoubleSelectionSort(),
     DualPivotQuickSort(), ExchangeBogoSort(), FlashSort(), FlippedMinHeapSort(),
     ForcedStableQuickSort(), FunSort(), GnomeSort(), GrailSort(),
     GravitySort(),
-    GuessSort(), HybridCombSort(), InPlaceMergeSort(), InsertionSort(), IntroCircleSortIterative(),
+    GuessSort(), HybridCombSort(), InPlaceLSDRadixSort(), InPlaceMergeSort(), InsertionSort(),
+    IntroCircleSortIterative(),
     IntroSort(), LazyHeapSort(), LazyStableSort(), LessBogoSort(), LLQuickSort(), LRQuickSort(),
     LSDRadixSort(),
     MaxHeapSort(),
@@ -42,7 +43,8 @@ struct NativeAlgorithmCorrectnessTests {
     QuickBogoSort(), QuickSort(),
     RandomGuessSort(), RecursiveShellSort(), RotateMergeSort(), SelectionBogoSort(),
     SelectionSort(), ShatterSort(), ShellSort(), ShoveSort(), SillySort(), SimpleShatterSort(),
-    SimplifiedLibrarySort(), SlopeSort(), SlowSort(), SmartBogoBogoSort(), SmartGuessSort(),
+    SimplifiedLibrarySort(), SimplisticGravitySort(), SlopeSort(), SlowSort(), SmartBogoBogoSort(),
+    SmartGuessSort(),
     SnuffleSort(), StableCycleSort(),
     StablePermutationSort(), StableQuickSort(), StableSelectionSort(), StaticSort(), StoogeSort(),
     StrandSort(),
@@ -1403,4 +1405,29 @@ struct NativeAlgorithmCorrectnessTests {
   // duplicate-heavy trials each, zero wrong results, zero instability), matching the
   // `StableQuickSort`/`ShatterSortingTemplate` precedent for algorithms this engine's tape can't
   // fully observe. `PORT_INVENTORY.md`'s entries for both algorithms record this verification.
+
+  /// `IndexSort` is deliberately NOT in `Self.algorithms` above: it only works when the input is
+  /// already a permutation of `min...(min + n - 1)` (it swaps a value directly into the array
+  /// index that value names), which is always true of this app's real `SortSession` input (an
+  /// identity array of `1...size`) but is not true of the generic suite's arbitrary
+  /// `0...1000`/duplicate-heavy inputs above — pointing those at `IndexSort` would either trap on
+  /// an out-of-bounds swap target or silently leave a duplicate-heavy array unsorted, neither of
+  /// which is a real bug in the algorithm itself. This test instead fuzzes it against exactly the
+  /// shape of input it's built for.
+  @Test
+  func indexSortSortsPermutationsCorrectly() {
+    let algorithm = IndexSort()
+    for size in [algorithm.metadata.sizeRange.lowerBound, 17, 20, 32, 64, 128, 256] {
+      for _ in 0..<100 {
+        let base = Int.random(in: -5...5)
+        let input = (base..<(base + size)).shuffled()
+        var engine = RecordingEngine(values: input)
+        algorithm.record(into: &engine)
+        #expect(
+          engine.values == input.sorted(),
+          "indexsort failed on permutation input of size \(size): \(input) -> \(engine.values)"
+        )
+      }
+    }
+  }
 }

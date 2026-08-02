@@ -1,5 +1,5 @@
 {
-  "originHash" : "166daf25d8fe29524d59afeeb0fa1322c5c67475a9cdff9327b6e3938b208be2",
+  "originHash" : "8e6ea83be3d11ad771989589da4271df9803c980020a0d1973da7b897fd5bfbb",
   "pins" : [
     {
       "identity" : "collectionconcurrencykit",
@@ -31,7 +31,7 @@
     {
       "identity" : "swift-algorithms",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/apple/swift-algorithms.git",
+      "location" : "https://github.com/apple/swift-algorithms",
       "state" : {
         "revision" : "87e50f483c54e6efd60e885f7f5aa946cee68023",
         "version" : "1.2.1"
@@ -49,7 +49,7 @@
     {
       "identity" : "swift-numerics",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/apple/swift-numerics.git",
+      "location" : "https://github.com/apple/swift-numerics",
       "state" : {
         "revision" : "0c0290ff6b24942dadb83a929ffaaa1481df04a2",
         "version" : "1.1.1"
@@ -58,7 +58,7 @@
     {
       "identity" : "swiftmath",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/mgriebling/SwiftMath.git",
+      "location" : "https://github.com/mgriebling/SwiftMath",
       "state" : {
         "revision" : "fa8244ed032f4a1ade4cb0571bf87d2f1a9fd2d7",
         "version" : "1.7.3"
