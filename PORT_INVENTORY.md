@@ -49,9 +49,13 @@ cluster together rather than picking its members apart on separate days:
   out to already be deterministic in ArrayV itself (no rewrite needed, just a faithful port); one
   (`SelectionBogoSort`) turned out to only need a single deterministic sweep, cheap enough to ship
   with a much larger `sizeRange` than a typical bogo variant.
-- **The Grail cluster**: `BlockInsertionSort` (insert), `GrailSort`, `OptimizedLazyStableSort`
-  (hybrid), and `LazyStableSort` (merge) all extend `GrailSorting` (780 lines) — port the template
-  once, then all four wrapper algorithms are comparatively small.
+- **The Grail cluster**: `BlockInsertionSort` (insert), `GrailSort` (hybrid), `OptimizedLazyStableSort`
+  (files under `sorts/hybrid/` but tracked under merge — its own `setCategory("Merge Sorts")` call
+  says so, see that entry's own note), and `LazyStableSort` (merge) all extend `GrailSorting`
+  (780 lines). **Status: done, all 4 shipped** — the "port the template once, then all four
+  wrapper algorithms are comparatively small" prediction held up, confirmed genuine (non-decorative)
+  reuse for all four by reading every Java source before porting, unlike the `MultiWayMergeSorting`
+  cluster's cautionary tale below.
 - **The Quad cluster**: `QuadSort` (merge) and `FluxSort` (hybrid) both extend `QuadSorting`
   (875 lines).
 - **The PDQ cluster**: `PDQBranchedSort` and `PDQBranchlessSort` (both hybrid) both extend
@@ -127,7 +131,18 @@ cluster together rather than picking its members apart on separate days:
 
 #### Completed
 
-Move algorithms here when you finish them.
+- [x] BlockInsertionSort — faithful port, first member of the Grail cluster shipped (see
+      `GrailSortingTemplate`, `TEMPLATE_PORT_REFERENCE.md` §6). Doesn't call `commonSort`'s block-
+      merge machinery at all — a natural-run-detecting insertion sort built from just
+      `mergeWithoutBuffer` plus its own `insert1`/`insert2` shift-based placement for short runs.
+      ArrayV's own override of `grailRotate` (`Rotations.holyGriesMills`) turned out functionally
+      identical to the shared `rotate` (same block-swap-of-the-smaller-side technique, just with an
+      added length-1 fast path) — reused the shared one directly rather than duplicating an
+      equivalent override. Real mutations mix `engine.swap` and `engine.setValue`, so the standard
+      swap-tape-shadow stability test can't fully observe this one (confirmed: 31/50 spurious
+      failures) — verified genuinely stable instead via a from-scratch Python simulation
+      threading a parallel original-index array through every swap and write (2,000 trials, zero
+      wrong results, zero instability).
 
 #### Not Started
 
@@ -144,11 +159,6 @@ Move algorithms here when you finish them.
 - [ ] HanoiSort — 326 lines
 - [ ] RedBlackTreeSort — 336 lines
 - [ ] AVLTreeSort — 373 lines
-
-##### Very Hard
-
-- [ ] BlockInsertionSort — 86 own lines, but extends `GrailSorting` (780 lines, Grail cluster —
-      see note above); ~866 effective lines
 
 ### c. Selection sorts (`sorts/select/`, 25)
 
@@ -179,7 +189,32 @@ see Completed above.)
 
 #### Completed
 
-Move algorithms here when you finish them.
+- [x] BinaryQuickSortIterative — faithful port. Shares `BinaryQuickSortingTemplate` (ported as a
+      Swift namespace-of-static-functions, the first "shared template" in this codebase — see
+      `TEMPLATE_PORT_REFERENCE.md` §1) with `BinaryQuickSortRecursive`: a bit-based Hoare partition
+      driven by an explicit FIFO task queue instead of the call stack. Fuzzed unstable (no
+      tie-break in a pure bit partition).
+- [x] BinaryQuickSortRecursive — faithful port, same `BinaryQuickSortingTemplate` partition as
+      `BinaryQuickSortIterative` above, driven by real recursion instead of a task queue. Fuzzed
+      unstable, independently confirmed rather than assumed from its sibling's result.
+- [x] ShatterSort — **not a faithful port.** ArrayV's own `ShatterSorting` template buckets by
+      `value / num` and finishes each bucket via a `value % num` residue-placement trick — both
+      assume the array holds a permutation of `0..<length` (true for every ArrayV array, false
+      here: `NativeAlgorithmCorrectnessTests` fuzzes `Int.random(in: 0...1000)` regardless of array
+      size). A literal port would compute out-of-range bucket indices and silently drop duplicate
+      values via residue collisions. Fixed by bucketing on a range-normalized index
+      (`(value-minValue)*shatters/(maxValue-minValue+1)`) and replacing the residue trick with a
+      plain insertion-sort finish over each bucket's real size — genuinely just the textbook bucket
+      sort definition, not a special ArrayV trick, so this is a return to the standard algorithm
+      rather than a loss of fidelity. Validated in Python first (~6,600 trials) before porting, then
+      re-confirmed with a dedicated 1,400-trial wide-range + duplicate-heavy fuzz test in the real
+      engine. See `TEMPLATE_PORT_REFERENCE.md` §2 for the full writeup. Verified stable by
+      construction (bucket index is a deterministic, order-preserving function of value alone) —
+      no dedicated swap-tape stability test, since every real mutation is `engine.setValue`
+      (bucket flatten), the same structural situation `StableQuickSort` hit.
+- [x] SimpleShatterSort — same `ShatterSortingTemplate` fix as `ShatterSort` above, just reached via
+      repeated shrinking-granularity bucket passes instead of one pass. Same validation, same
+      stable-by-construction reasoning.
 
 #### Not Started
 
@@ -203,11 +238,7 @@ Move algorithms here when you finish them.
 - [ ] StacklessBinaryQuickSort — 105 lines
 - [ ] RotateLSDRadixSort — 118 lines
 - [ ] TimeSort — 120 lines
-- [ ] BinaryQuickSortIterative — 43 own + 101 `BinaryQuickSorting` template = 144 lines
-- [ ] BinaryQuickSortRecursive — 43 own + 101 `BinaryQuickSorting` template = 144 lines
 - [ ] StacklessAmericanFlagSort — 144 lines
-- [ ] ShatterSort — 51 own + 102 `ShatterSorting` template = 153 lines
-- [ ] SimpleShatterSort — 51 own + 102 `ShatterSorting` template = 153 lines
 - [ ] AmericanFlagSort — 155 lines
 - [ ] RotateMSDRadixSort — 164 lines
 
@@ -215,7 +246,39 @@ Move algorithms here when you finish them.
 
 #### Completed
 
-Move algorithms here when you finish them.
+- [x] TwinSort — faithful port of Igor van den Hoven's adaptive bottom-up merge sort. Really does
+      live in ArrayV's `sorts/merge/` package (this doc's own prior "tracked elsewhere, files under
+      hybrid/" note was mistaken — confirmed directly from `TwinSort.java`'s own `package
+      io.github.arrayv.sorts.merge;` declaration this batch). Shares `TwinSortingTemplate` (see
+      `TEMPLATE_PORT_REFERENCE.md` §3) — a run-detection pre-pass (`twinSwap`, reversing strictly
+      descending runs) followed by a tail-inward bottom-up merge (`tailMerge`). The densest index
+      arithmetic in this template-porting batch; the standard swap-tape-shadow stability test can't
+      observe most of `tailMerge`'s moves (pure `engine.setValue`, same limitation
+      `StableQuickSort`/`ShatterSortingTemplate` hit), so stability was verified by simulating the
+      exact algorithm in Python with a parallel original-index array instead (6,000 randomized
+      duplicate-heavy trials, zero instability) — genuinely stable, confirmed rather than assumed.
+- [x] LazyStableSort — faithful port, second member of the Grail cluster shipped. One-line wrapper
+      calling `GrailSortingTemplate.lazyStableSort` directly — the simple O(n log n) alternate
+      path independent of the block-merge machinery (pairwise compare-swap, then doubling
+      `mergeWithoutBuffer`). Every real mutation is `engine.swap`, so the standard swap-tape-shadow
+      stability test applies directly here (unlike `BlockInsertionSort`/`OptimizedLazyStableSort`
+      below) — fuzzed genuinely stable.
+- [x] OptimizedLazyStableSort — third member of the Grail cluster shipped. Files under ArrayV's
+      `sorts/hybrid/` package but calls `this.setCategory("Merge Sorts")` in its own constructor —
+      tracked here under Merge sorts to match that real category string, the same
+      package-vs-`setCategory` correction `TwinSort` needed above (this doc's own prior tracking
+      had it filed under Hybrid instead). **Genuinely overrides** `grailLazyStableSort` (not just a
+      thin wrapper) with a different construction: natural-run-detecting insertion sort over fixed
+      16-element chunks, then doubling `mergeWithoutBuffer` (reused from the template unmodified).
+      **Real bug found and fixed**: ArrayV's own `insertionSort` reads two elements unconditionally
+      before any bounds check; for array lengths not a multiple of 16 the final chunk can be
+      exactly 1 element wide (confirmed crash at `n = 17`, a `[16, 17)` tail chunk reading one past
+      the valid range) — fixed with a guard, since a single-element range is already trivially
+      sorted and needs no comparison at all. Found via a dedicated extra-scrutiny duplicate-heavy
+      fuzz test across sizes 16-256 (not just the generic suite's single per-algorithm trial),
+      matching the scrutiny this whole batch of dense template ports got throughout. `insertionSort`'s
+      shifts use `engine.setValue`, so stability was verified via Python simulation (2,000 trials,
+      zero instability) rather than the swap-tape-shadow technique, same as `BlockInsertionSort`.
 
 #### Not Started
 
@@ -238,14 +301,7 @@ Move algorithms here when you finish them.
 
 ##### Very Hard
 
-- [ ] LazyStableSort — 60 own + 780 `GrailSorting` template = 840 lines (Grail cluster — see note above)
 - [ ] QuadSort — 51 own + 875 `QuadSorting` template = 926 lines (Quad cluster — see note above)
-
-##### Tracked elsewhere
-
-- [ ] TwinSort (ArrayV files it under `merge/`'s sibling `hybrid/` package per its template
-      location; tracked once, under the hybrid section below — originally picked as this batch's hybrid/medium
-      but swapped for IntroSort, see hybrid/ section)
 
 ### f. Miscellaneous sorts (`sorts/misc/`, 4)
 
@@ -289,7 +345,47 @@ Move algorithms here when you finish them.
 
 #### Completed
 
-Move algorithms here when you finish them.
+- [x] UnstableGrailSort — faithful port of Astrelin's classic in-place block-merge sort (the
+      unstable variant — no per-block original-stream tracking, see the `GrailSort` entry once
+      that lands for the stable version that adds exactly that tracking). `UnstableGrailSortingTemplate`
+      (see `TEMPLATE_PORT_REFERENCE.md` §4) is genuinely a pure pass-through for this one
+      concrete algorithm — the entire algorithm lives in the template, the wrapper is a one-line
+      `commonSort` call. Passed the generic correctness suite (including duplicate-heavy) on the
+      first try despite being the densest index arithmetic ported so far in this batch; a dedicated
+      stability test at `sizeRange.lowerBound` (16) would have been a false negative (`commonSort`'s
+      own `len <= 16` base case is a trivially-stable plain insertion sort that never touches the
+      block-merge machinery at all) — tested at size 64 instead, confirming genuinely unstable as
+      the name claims (never assumed from the name outright).
+- [x] PDQBranchedSort — faithful port of Orson Peters' pattern-defeating quicksort, branch-based
+      partition variant. `PDQSortingTemplate` (see `TEMPLATE_PORT_REFERENCE.md` §5) is the
+      cleanest reuse case in this whole batch — confirmed by research that neither
+      `PDQBranchedSort` nor `PDQBranchlessSort` shadows or reimplements anything, both are pure
+      configuration wrappers (a `branchless` flag) around one shared `pdqLoop`. Passed the generic
+      correctness suite on the first try. Same `sizeRange.lowerBound`-is-a-trivial-base-case
+      pitfall as `UnstableGrailSort` above applies here too (`insertSortThreshold` is 24, above
+      this batch's usual 16-element lower bound) — dedicated stability test run at size 64 instead,
+      confirming genuinely unstable (no tie-break anywhere in the Hoare-style partition).
+- [x] PDQBranchlessSort — same `PDQSortingTemplate` as `PDQBranchedSort` above, using the
+      block-quicksort-style branchless partition (Edelkamp & Weiss) instead of the plain
+      Hoare-style one — the densest, most index-arithmetic-heavy code in this whole batch of
+      template ports (block-scan offset bookkeeping, cyclic vs. swap-based offset application).
+      Passed the generic correctness suite on the first try despite that density. Confirmed
+      unstable independently of its sibling's result, same size-64 rationale.
+- [x] GrailSort — faithful port (in-place mode only — ArrayV exposes a 32-item static buffer and a
+      dynamic `sqrt(n)` buffer as user-selectable runtime alternatives; no algorithm in this
+      codebase takes a runtime configuration parameter, so in-place is the one shipped, matching
+      every other port). Last and largest member of the Grail cluster — the full `commonSort`
+      block build/combine machinery (`GrailSortingTemplate`, `TEMPLATE_PORT_REFERENCE.md` §6),
+      genuinely reused verbatim (a one-line wrapper). Two simplifications versus ArrayV's own
+      template, both because in-place mode makes them provably dead code: ArrayV's own "XBuf"
+      method family (only reachable with a real external buffer, which in-place mode never
+      supplies) wasn't ported at all, and `buildBlocks` without XBuf turned out textually identical
+      to `UnstableGrailSortingTemplate.buildBlocks` — reused rather than re-transcribed. Passed the
+      generic correctness suite (including duplicate-heavy) on the first try despite being the
+      densest translation in this whole batch. Dedicated stability test run at size 64 (not
+      `sizeRange.lowerBound`, same trivial-base-case pitfall as `UnstableGrailSort`) — confirmed
+      genuinely stable, the key-array/stream-fragment tracking `combineBlocks` adds over the
+      unstable sibling's plain first/last-element comparison earns the name honestly.
 
 #### Not Started
 
@@ -314,8 +410,6 @@ Move algorithms here when you finish them.
 - [ ] CircularGrailSort — 209 lines (self-contained despite the name — doesn't actually extend
       `GrailSorting`)
 - [ ] FifthMergeSort — 221 lines
-- [ ] TwinSort — 57 own + 217 `TwinSorting` template = 274 lines; deferred (see substitution note
-      above, and §1e's redirect note) — still worth a real port later
 - [ ] BufferPartitionMergeSort — 290 lines
 - [ ] OptimizedRotateMergeSort — 305 lines
 - [ ] RemiSort — 270 own + 82 `MultiWayMergeSorting` template = 352 lines (MultiWayMerge cluster —
@@ -325,16 +419,10 @@ Move algorithms here when you finish them.
 ##### Very Hard
 
 - [ ] SqrtSort — 425 lines
-- [ ] UnstableGrailSort — 71 own + 355 `UnstableGrailSorting` template = 426 lines
 - [ ] FlanSort — 367 own + 82 `MultiWayMergeSorting` template = 449 lines (MultiWayMerge cluster —
       see note above)
 - [ ] SynchronousSqrtSort — 190 own + 352 `BlockMergeSorting` template = 542 lines (BlockMerge
       cluster — see note above)
-- [ ] PDQBranchlessSort — 46 own + 570 `PDQSorting` template = 616 lines (PDQ cluster — see note above)
-- [ ] PDQBranchedSort — 49 own + 570-line `PDQSorting` template = 619 lines (PDQ cluster — see note above)
-- [ ] GrailSort — 91 own + 780 `GrailSorting` template = 871 lines (Grail cluster — see note above)
-- [ ] OptimizedLazyStableSort — 106 own + 780 `GrailSorting` template = 886 lines (Grail cluster —
-      see note above)
 - [ ] AdaptiveGrailSort — 915 lines — very complex, but self-contained (extends the bare `Sort`
       base directly, despite the name)
 - [ ] TimSort — 45-line composition wrapper + 950 `TimSorting` template = 995 effective lines

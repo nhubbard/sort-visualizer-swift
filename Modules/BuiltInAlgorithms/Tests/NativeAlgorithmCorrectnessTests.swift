@@ -12,9 +12,11 @@ struct NativeAlgorithmCorrectnessTests {
   private static let algorithms: [any SortAlgorithm] = [
     AsynchronousSort(), BadSort(), BaseNMaxHeapSort(), BinaryDoubleInsertionSort(),
     BinaryGnomeSort(),
-    BinaryInsertionSort(), BinaryMergeSort(), BingoSort(), BinomialHeapSort(), BinomialSmoothSort(),
+    BinaryInsertionSort(), BinaryMergeSort(), BinaryQuickSortIterative(),
+    BinaryQuickSortRecursive(), BingoSort(), BinomialHeapSort(), BinomialSmoothSort(),
     BitonicSortIterative(),
-    BitonicSortRecursive(), BlockSwapMergeSort(), BogoSort(), BoseNelsonSortIterative(),
+    BitonicSortRecursive(), BlockInsertionSort(), BlockSwapMergeSort(), BogoSort(),
+    BoseNelsonSortIterative(),
     BottomUpHeapSort(), BottomUpMergeSort(), BozoSort(), BubbleBogoSort(), BubbleSort(),
     BurntPancakeSort(),
     CircleSortIterative(), CircleSortRecursive(), CircloidSort(),
@@ -23,20 +25,23 @@ struct NativeAlgorithmCorrectnessTests {
     CycleSort(),
     DeterministicBogoSort(), DiamondSortRecursive(), DoubleInsertionSort(), DoubleSelectionSort(),
     DualPivotQuickSort(), ExchangeBogoSort(), FlashSort(), FlippedMinHeapSort(),
-    ForcedStableQuickSort(), FunSort(), GnomeSort(),
+    ForcedStableQuickSort(), FunSort(), GnomeSort(), GrailSort(),
     GravitySort(),
     GuessSort(), HybridCombSort(), InPlaceMergeSort(), InsertionSort(), IntroCircleSortIterative(),
-    IntroSort(), LazyHeapSort(), LessBogoSort(), LLQuickSort(), LRQuickSort(), LSDRadixSort(),
+    IntroSort(), LazyHeapSort(), LazyStableSort(), LessBogoSort(), LLQuickSort(), LRQuickSort(),
+    LSDRadixSort(),
     MaxHeapSort(),
     MedianQuickBogoSort(), MergeBogoSort(), MergeExchangeSortIterative(), MergeSort(),
     MinHeapSort(), MSDRadixSort(),
     OddEvenMergeSortIterative(), OddEvenMergeSortRecursive(), OddEvenSort(),
     OptimizedBubbleSort(), OptimizedCocktailShakerSort(), OptimizedGnomeSort(),
-    OptimizedGuessSort(), OptimizedStoogeSort(), OptimizedStoogeSortStudio(),
-    PairwiseSortIterative(), PancakeSort(), PigeonholeSort(), QuadStoogeSort(),
+    OptimizedGuessSort(), OptimizedLazyStableSort(), OptimizedStoogeSort(),
+    OptimizedStoogeSortStudio(),
+    PairwiseSortIterative(), PancakeSort(), PDQBranchedSort(), PDQBranchlessSort(),
+    PigeonholeSort(), QuadStoogeSort(),
     QuickBogoSort(), QuickSort(),
     RandomGuessSort(), RecursiveShellSort(), RotateMergeSort(), SelectionBogoSort(),
-    SelectionSort(), ShellSort(), ShoveSort(), SillySort(),
+    SelectionSort(), ShatterSort(), ShellSort(), ShoveSort(), SillySort(), SimpleShatterSort(),
     SimplifiedLibrarySort(), SlopeSort(), SlowSort(), SmartBogoBogoSort(), SmartGuessSort(),
     SnuffleSort(), StableCycleSort(),
     StablePermutationSort(), StableQuickSort(), StableSelectionSort(), StaticSort(), StoogeSort(),
@@ -44,8 +49,9 @@ struct NativeAlgorithmCorrectnessTests {
     SwaplessBubbleSort(),
     TableSort(), TernaryHeapSort(), TernaryLLQuickSort(), TernaryLRQuickSort(),
     ThreeSmoothCombSortIterative(),
-    ThreeSmoothCombSortRecursive(), TriangularHeapSort(), UnoptimizedBubbleSort(),
-    UnoptimizedCocktailShakerSort(), WeakHeapSort(), WeavedMergeSort(), WeaveMergeSort()
+    ThreeSmoothCombSortRecursive(), TriangularHeapSort(), TwinSort(), UnoptimizedBubbleSort(),
+    UnoptimizedCocktailShakerSort(), UnstableGrailSort(), WeakHeapSort(), WeavedMergeSort(),
+    WeaveMergeSort()
   ]
 
   @Test
@@ -979,4 +985,422 @@ struct NativeAlgorithmCorrectnessTests {
       }
     }
   }
+
+  /// `BinaryQuickSortIterative`/`BinaryQuickSortRecursive` share
+  /// `BinaryQuickSortingTemplate`'s bit-based Hoare partition, which has no tie-break at all —
+  /// two elements identical in every bit (i.e. equal) can still land on opposite sides of an
+  /// `i < j` swap. Verified empirically rather than assumed, per this suite's standing policy.
+  @Test
+  func binaryQuickSortIterativeTiedElementsCanLoseTheirOriginalRelativeOrder() {
+    let algorithm = BinaryQuickSortIterative()
+    let size = algorithm.metadata.sizeRange.lowerBound
+    var sawReordering = false
+
+    for _ in 0..<50 {
+      let input = (0..<size).map { _ in Int.random(in: 0...3) }
+      var engine = RecordingEngine(values: input)
+      algorithm.record(into: &engine)
+
+      var shadow = Array(0..<size)
+      for operation in engine.finish().tape {
+        if case .swap(let i, let j) = operation {
+          shadow.swapAt(i, j)
+        }
+      }
+
+      var originalIndicesByValueInFinalOrder: [Int: [Int]] = [:]
+      for finalPosition in 0..<size {
+        let originalIndex = shadow[finalPosition]
+        let value = input[originalIndex]
+        originalIndicesByValueInFinalOrder[value, default: []].append(originalIndex)
+      }
+
+      if originalIndicesByValueInFinalOrder.values.contains(where: { $0 != $0.sorted() }) {
+        sawReordering = true
+        break
+      }
+    }
+
+    #expect(
+      sawReordering,
+      """
+      expected BinaryQuickSortIterative's tie-free bit partition to reorder at least one run of \
+      equal-valued elements relative to their original input order across randomized \
+      duplicate-heavy trials, confirming it is not a stable sort
+      """
+    )
+  }
+
+  /// Same underlying `BinaryQuickSortingTemplate.partition` as
+  /// `binaryQuickSortIterativeTiedElementsCanLoseTheirOriginalRelativeOrder` above, just reached
+  /// via the recursive driver instead of the task-queue one — expected to be equally unstable,
+  /// confirmed independently rather than assumed from the sibling's result.
+  @Test
+  func binaryQuickSortRecursiveTiedElementsCanLoseTheirOriginalRelativeOrder() {
+    let algorithm = BinaryQuickSortRecursive()
+    let size = algorithm.metadata.sizeRange.lowerBound
+    var sawReordering = false
+
+    for _ in 0..<50 {
+      let input = (0..<size).map { _ in Int.random(in: 0...3) }
+      var engine = RecordingEngine(values: input)
+      algorithm.record(into: &engine)
+
+      var shadow = Array(0..<size)
+      for operation in engine.finish().tape {
+        if case .swap(let i, let j) = operation {
+          shadow.swapAt(i, j)
+        }
+      }
+
+      var originalIndicesByValueInFinalOrder: [Int: [Int]] = [:]
+      for finalPosition in 0..<size {
+        let originalIndex = shadow[finalPosition]
+        let value = input[originalIndex]
+        originalIndicesByValueInFinalOrder[value, default: []].append(originalIndex)
+      }
+
+      if originalIndicesByValueInFinalOrder.values.contains(where: { $0 != $0.sorted() }) {
+        sawReordering = true
+        break
+      }
+    }
+
+    #expect(
+      sawReordering,
+      """
+      expected BinaryQuickSortRecursive's tie-free bit partition to reorder at least one run of \
+      equal-valued elements relative to their original input order across randomized \
+      duplicate-heavy trials, confirming it is not a stable sort
+      """
+    )
+  }
+
+  /// `ShatterSortingTemplate`'s bucketing was fixed from ArrayV's own `value / num` (assumes a
+  /// permutation of `0..<length`) to a range-normalized formula specifically because the literal
+  /// version would compute out-of-range bucket indices or silently drop duplicate values under
+  /// this suite's own wide-range/duplicate-heavy fuzzing (see `ShatterSortingTemplate.swift`'s doc
+  /// comment) — a defect severe enough to warrant the same extra scrutiny
+  /// `funSortDuplicateHeavyFuzz`/`heapVariantBatchDuplicateHeavyFuzz` already apply to their own
+  /// previously-buggy algorithms, across both wide-range distinct values and heavy duplicates.
+  @Test
+  func shatterSortingTemplateWideRangeAndDuplicateHeavyFuzz() {
+    let algorithms: [any SortAlgorithm] = [ShatterSort(), SimpleShatterSort()]
+    for algorithm in algorithms {
+      for size in [algorithm.metadata.sizeRange.lowerBound, 17, 20, 32, 64, 128, 256] {
+        for attempt in 0..<100 {
+          let wideRangeInput = (0..<size).map { _ in Int.random(in: 0...1000) }
+          var wideRangeEngine = RecordingEngine(values: wideRangeInput)
+          algorithm.record(into: &wideRangeEngine)
+          #expect(
+            wideRangeEngine.values == wideRangeInput.sorted(),
+            "\(algorithm.id.rawValue) failed wide-range fuzz attempt \(attempt) of size \(size): \(wideRangeInput) -> \(wideRangeEngine.values)"
+          )
+
+          let duplicateHeavyInput = (0..<size).map { _ in Int.random(in: 0...3) }
+          var duplicateHeavyEngine = RecordingEngine(values: duplicateHeavyInput)
+          algorithm.record(into: &duplicateHeavyEngine)
+          #expect(
+            duplicateHeavyEngine.values == duplicateHeavyInput.sorted(),
+            "\(algorithm.id.rawValue) failed duplicate-heavy fuzz attempt \(attempt) of size \(size): \(duplicateHeavyInput) -> \(duplicateHeavyEngine.values)"
+          )
+        }
+      }
+    }
+  }
+
+  /// `TwinSortingTemplate`'s `tailMerge` is the densest index arithmetic in this batch of
+  /// template ports (tail-inward merge with two symmetric branches, an early-exit sortedness
+  /// check, and a buffer shrink loop) — matching the extra scrutiny
+  /// `heapVariantBatchDuplicateHeavyFuzz` already applies to its own index-arithmetic-heavy batch,
+  /// rather than trusting the generic suite's single duplicate-heavy trial per algorithm.
+  @Test
+  func twinSortDuplicateHeavyFuzz() {
+    let algorithm = TwinSort()
+    for size in [algorithm.metadata.sizeRange.lowerBound, 17, 20, 32, 64, 128, 256] {
+      for attempt in 0..<200 {
+        let input = (0..<size).map { _ in Int.random(in: 0...3) }
+        var engine = RecordingEngine(values: input)
+        algorithm.record(into: &engine)
+        #expect(
+          engine.values == input.sorted(),
+          "twinsort failed duplicate-heavy fuzz attempt \(attempt) of size \(size): \(input) -> \(engine.values)"
+        )
+      }
+    }
+  }
+
+  /// `UnstableGrailSortingTemplate`'s block-build/combine machinery is the densest index
+  /// arithmetic ported so far — matching the extra scrutiny already given to the other
+  /// index-arithmetic-heavy templates in this batch rather than trusting the generic suite's
+  /// single duplicate-heavy trial.
+  @Test
+  func unstableGrailSortDuplicateHeavyFuzz() {
+    let algorithm = UnstableGrailSort()
+    for size in [algorithm.metadata.sizeRange.lowerBound, 17, 20, 32, 64, 128, 256] {
+      for attempt in 0..<200 {
+        let input = (0..<size).map { _ in Int.random(in: 0...3) }
+        var engine = RecordingEngine(values: input)
+        algorithm.record(into: &engine)
+        #expect(
+          engine.values == input.sorted(),
+          "unstablegrailsort failed duplicate-heavy fuzz attempt \(attempt) of size \(size): \(input) -> \(engine.values)"
+        )
+      }
+    }
+  }
+
+  /// `UnstableGrailSort` is named for its lack of stability — `combineBlocks`'s selection sort
+  /// tie-breaks on each block's last element rather than any original-index tracking. Verified
+  /// empirically rather than trusted from the name, per this suite's standing policy (even a name
+  /// that already claims instability gets the same fuzz check as a name claiming stability).
+  ///
+  /// Deliberately does NOT use `sizeRange.lowerBound` (16): `commonSort`'s own `len <= 16` base
+  /// case is a plain (stable) insertion sort that returns before ever touching
+  /// `buildBlocks`/`combineBlocks` — testing at exactly the lower bound would only ever exercise
+  /// the trivially-stable path and could never observe the real block-combine behavior this test
+  /// is trying to check.
+  @Test
+  func unstableGrailSortTiedElementsCanLoseTheirOriginalRelativeOrder() {
+    let algorithm = UnstableGrailSort()
+    let size = 64
+    var sawReordering = false
+
+    for _ in 0..<50 {
+      let input = (0..<size).map { _ in Int.random(in: 0...3) }
+      var engine = RecordingEngine(values: input)
+      algorithm.record(into: &engine)
+
+      var shadow = Array(0..<size)
+      for operation in engine.finish().tape {
+        if case .swap(let i, let j) = operation {
+          shadow.swapAt(i, j)
+        }
+      }
+
+      var originalIndicesByValueInFinalOrder: [Int: [Int]] = [:]
+      for finalPosition in 0..<size {
+        let originalIndex = shadow[finalPosition]
+        let value = input[originalIndex]
+        originalIndicesByValueInFinalOrder[value, default: []].append(originalIndex)
+      }
+
+      if originalIndicesByValueInFinalOrder.values.contains(where: { $0 != $0.sorted() }) {
+        sawReordering = true
+        break
+      }
+    }
+
+    #expect(
+      sawReordering,
+      """
+      expected UnstableGrailSort's selection-sort-by-last-element block combine to reorder at \
+      least one run of equal-valued elements relative to their original input order across \
+      randomized duplicate-heavy trials, confirming it is not a stable sort
+      """
+    )
+  }
+
+  /// `PDQSortingTemplate`'s partition steps (`partRight`/`partLeft`/`partRightBranchless`) have no
+  /// tie-break anywhere — standard Hoare-style quicksort partitioning, expected unstable. Also
+  /// deliberately does NOT use `sizeRange.lowerBound` (16): `pdqLoop`'s own `insertSortThreshold`
+  /// is 24, so a 16-element input would only ever exercise the (individually stable) plain
+  /// insertion-sort base case and never actually reach a real partition — the same
+  /// trivial-base-case pitfall `unstableGrailSortTiedElementsCanLoseTheirOriginalRelativeOrder`
+  /// above already had to route around. Both `PDQBranchedSort` and `PDQBranchlessSort` are
+  /// checked independently rather than assuming one from the other's result, since they use
+  /// different partition implementations under the shared `pdqLoop` driver.
+  @Test
+  func pdqBranchedSortTiedElementsCanLoseTheirOriginalRelativeOrder() {
+    let algorithm = PDQBranchedSort()
+    let size = 64
+    var sawReordering = false
+
+    for _ in 0..<50 {
+      let input = (0..<size).map { _ in Int.random(in: 0...3) }
+      var engine = RecordingEngine(values: input)
+      algorithm.record(into: &engine)
+
+      var shadow = Array(0..<size)
+      for operation in engine.finish().tape {
+        if case .swap(let i, let j) = operation {
+          shadow.swapAt(i, j)
+        }
+      }
+
+      var originalIndicesByValueInFinalOrder: [Int: [Int]] = [:]
+      for finalPosition in 0..<size {
+        let originalIndex = shadow[finalPosition]
+        let value = input[originalIndex]
+        originalIndicesByValueInFinalOrder[value, default: []].append(originalIndex)
+      }
+
+      if originalIndicesByValueInFinalOrder.values.contains(where: { $0 != $0.sorted() }) {
+        sawReordering = true
+        break
+      }
+    }
+
+    #expect(
+      sawReordering,
+      """
+      expected PDQBranchedSort's Hoare-style partition to reorder at least one run of \
+      equal-valued elements relative to their original input order across randomized \
+      duplicate-heavy trials, confirming it is not a stable sort
+      """
+    )
+  }
+
+  @Test
+  func pdqBranchlessSortTiedElementsCanLoseTheirOriginalRelativeOrder() {
+    let algorithm = PDQBranchlessSort()
+    let size = 64
+    var sawReordering = false
+
+    for _ in 0..<50 {
+      let input = (0..<size).map { _ in Int.random(in: 0...3) }
+      var engine = RecordingEngine(values: input)
+      algorithm.record(into: &engine)
+
+      var shadow = Array(0..<size)
+      for operation in engine.finish().tape {
+        if case .swap(let i, let j) = operation {
+          shadow.swapAt(i, j)
+        }
+      }
+
+      var originalIndicesByValueInFinalOrder: [Int: [Int]] = [:]
+      for finalPosition in 0..<size {
+        let originalIndex = shadow[finalPosition]
+        let value = input[originalIndex]
+        originalIndicesByValueInFinalOrder[value, default: []].append(originalIndex)
+      }
+
+      if originalIndicesByValueInFinalOrder.values.contains(where: { $0 != $0.sorted() }) {
+        sawReordering = true
+        break
+      }
+    }
+
+    #expect(
+      sawReordering,
+      """
+      expected PDQBranchlessSort's block-quicksort partition to reorder at least one run of \
+      equal-valued elements relative to their original input order across randomized \
+      duplicate-heavy trials, confirming it is not a stable sort
+      """
+    )
+  }
+
+  /// `PDQSortingTemplate`'s branchless block-quicksort partition is the densest code in this
+  /// batch of template ports — matching the extra scrutiny already given to the other
+  /// index-arithmetic-heavy templates rather than trusting the generic suite's single
+  /// duplicate-heavy trial per algorithm.
+  @Test
+  func pdqSortingTemplateDuplicateHeavyFuzz() {
+    let algorithms: [any SortAlgorithm] = [PDQBranchedSort(), PDQBranchlessSort()]
+    for algorithm in algorithms {
+      for size in [algorithm.metadata.sizeRange.lowerBound, 17, 20, 32, 64, 128, 256] {
+        for attempt in 0..<200 {
+          let input = (0..<size).map { _ in Int.random(in: 0...3) }
+          var engine = RecordingEngine(values: input)
+          algorithm.record(into: &engine)
+          #expect(
+            engine.values == input.sorted(),
+            "\(algorithm.id.rawValue) failed duplicate-heavy fuzz attempt \(attempt) of size \(size): \(input) -> \(engine.values)"
+          )
+        }
+      }
+    }
+  }
+
+  /// Shared helper for the `GrailSortingTemplate`-cluster stability checks below: replays the
+  /// tape's `.swap` ops onto an identity shadow and asserts every equal-valued run kept its
+  /// original relative order. Only valid when every real mutation is a swap — `GrailSort` and
+  /// `LazyStableSort` qualify (`mergeWithoutBuffer`/`mergeLeft`/`mergeRight`/
+  /// `smartMergeWithBuffer`'s buffer-preserving technique is swap-only); `BlockInsertionSort` and
+  /// `OptimizedLazyStableSort` do NOT (`insert1`/`insert2`'s shifts use `engine.setValue`) and are
+  /// verified separately below instead of with this helper — using it on them produced 31/50 and
+  /// 50/50 "failures" that a from-scratch Python simulation (tracking a parallel original-index
+  /// array through every `swap` AND `setValue`, 2,000 trials each, zero real instability) confirmed
+  /// were false negatives from this technique's incomplete coverage, not real bugs. Keeping this
+  /// helper swap-only-safe rather than trying to generalize it prevents that mistake from
+  /// resurfacing for a future algorithm in this cluster.
+  private func expectStable(_ algorithm: any SortAlgorithm, size: Int, trials: Int = 50) {
+    for _ in 0..<trials {
+      let input = (0..<size).map { _ in Int.random(in: 0...3) }
+      var engine = RecordingEngine(values: input)
+      algorithm.record(into: &engine)
+
+      var shadow = Array(0..<size)
+      for operation in engine.finish().tape {
+        if case .swap(let i, let j) = operation {
+          shadow.swapAt(i, j)
+        }
+      }
+
+      var originalIndicesByValueInFinalOrder: [Int: [Int]] = [:]
+      for finalPosition in 0..<size {
+        let originalIndex = shadow[finalPosition]
+        let value = input[originalIndex]
+        originalIndicesByValueInFinalOrder[value, default: []].append(originalIndex)
+      }
+
+      #expect(
+        originalIndicesByValueInFinalOrder.values.allSatisfy { $0 == $0.sorted() },
+        "expected \(algorithm.id.rawValue) to preserve original relative order among tied elements"
+      )
+    }
+  }
+
+  /// Deliberately does NOT use `sizeRange.lowerBound` (16): `commonSort`'s own `len <= 16` base
+  /// case is a trivially-stable plain insertion sort that never touches `buildBlocks`/
+  /// `combineBlocks` at all — the same pitfall `unstableGrailSortTiedElementsCanLoseTheirOriginalRelativeOrder`
+  /// already had to route around for the unstable sibling template.
+  @Test
+  func grailSortIsStable() {
+    expectStable(GrailSort(), size: 64)
+  }
+
+  /// `lazyStableSort` has no small-size special case (just pairwise compare-swap + doubling
+  /// merge), so `sizeRange.lowerBound` already exercises the real logic.
+  @Test
+  func lazyStableSortIsStable() {
+    expectStable(LazyStableSort(), size: 16)
+  }
+
+  /// `GrailSortingTemplate`'s block build/combine machinery is the largest and most intricate
+  /// translation in this whole batch of template ports — matching the extra scrutiny already
+  /// given to the other index-arithmetic-heavy templates rather than trusting the generic suite's
+  /// single duplicate-heavy trial per algorithm.
+  @Test
+  func grailSortingTemplateDuplicateHeavyFuzz() {
+    let algorithms: [any SortAlgorithm] = [
+      BlockInsertionSort(), GrailSort(), LazyStableSort(), OptimizedLazyStableSort(),
+    ]
+    for algorithm in algorithms {
+      for size in [algorithm.metadata.sizeRange.lowerBound, 17, 20, 32, 64, 128, 256] {
+        for attempt in 0..<200 {
+          let input = (0..<size).map { _ in Int.random(in: 0...3) }
+          var engine = RecordingEngine(values: input)
+          algorithm.record(into: &engine)
+          #expect(
+            engine.values == input.sorted(),
+            "\(algorithm.id.rawValue) failed duplicate-heavy fuzz attempt \(attempt) of size \(size): \(input) -> \(engine.values)"
+          )
+        }
+      }
+    }
+  }
+
+  // `BlockInsertionSort` and `OptimizedLazyStableSort` are NOT covered by a dedicated Swift
+  // stability test — both mix `engine.swap` (their respective merge steps) with `engine.setValue`
+  // (`insert1`/`insert2`'s shifts here, and the chunked insertion sort's shifts there), so
+  // `expectStable`'s swap-tape-shadow technique can't observe every real move and produces false
+  // failures if pointed at them (see that helper's own doc comment — verified directly, not just
+  // asserted). Both are verified stable instead by simulating each algorithm exactly in Python
+  // with a parallel original-index array threaded through every swap AND write (2,000 randomized
+  // duplicate-heavy trials each, zero wrong results, zero instability), matching the
+  // `StableQuickSort`/`ShatterSortingTemplate` precedent for algorithms this engine's tape can't
+  // fully observe. `PORT_INVENTORY.md`'s entries for both algorithms record this verification.
 }
