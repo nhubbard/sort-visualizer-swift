@@ -1,8 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
-                 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
 
 void swap(int *a, int *b) {
   int t = *a;
@@ -24,11 +23,11 @@ void printList(int items[], int size) {
 
 void sort(int arr[], int n) {
   int sm;
-  float shrink = 1.3;
+  float shrink = 1.3f;
   int gap = n;
   int sorted = 0;
   while (!sorted) {
-    gap /= shrink;
+    gap = (int)((float)gap / shrink);
     if (gap <= 1) {
       sorted = 1;
       gap = 1;

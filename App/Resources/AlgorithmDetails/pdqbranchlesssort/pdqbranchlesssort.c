@@ -1,8 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
-                 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
 
 #define INSERT_SORT_THRESHOLD 24
 #define NINTHER_THRESHOLD 128
@@ -35,16 +34,16 @@ typedef struct {
 
 int pdqLog(int n) {
   int log = 0;
-  while ((n >>= 1) != 0) log++;
+  while ((n >>= 1) != 0)
+    log++;
   return log;
 }
 
-/* Integer division truncated toward zero. C's `/` already truncates toward zero for
-   negative operands, which is what the pivot-position arithmetic below needs at the one
-   call site where the dividend can go negative -- this helper just names that intent. */
-int truncDiv(int a, int b) {
-  return a / b;
-}
+/* Integer division truncated toward zero. C's `/` already truncates toward zero
+   for negative operands, which is what the pivot-position arithmetic below
+   needs at the one call site where the dividend can go negative -- this helper
+   just names that intent. */
+int truncDiv(int a, int b) { return a / b; }
 
 void insertSort(int arr[], int begin, int end) {
   for (int cur = begin + 1; cur < end; cur++) {
@@ -77,7 +76,8 @@ void unguardInsertSort(int arr[], int begin, int end) {
 int partialInsertSort(int arr[], int begin, int end) {
   int limit = 0;
   for (int cur = begin + 1; cur < end; cur++) {
-    if (limit > PARTIAL_INSERT_SORT_LIMIT) return 0;
+    if (limit > PARTIAL_INSERT_SORT_LIMIT)
+      return 0;
     if (arr[cur] < arr[cur - 1]) {
       int tmp = arr[cur];
       int sift = cur;
@@ -93,7 +93,8 @@ int partialInsertSort(int arr[], int begin, int end) {
 }
 
 void sortTwo(int arr[], int a, int b) {
-  if (arr[b] < arr[a]) swap(&arr[a], &arr[b]);
+  if (arr[b] < arr[a])
+    swap(&arr[a], &arr[b]);
 }
 
 void sortThree(int arr[], int a, int b, int c) {
@@ -103,10 +104,11 @@ void sortThree(int arr[], int a, int b, int c) {
 }
 
 void swapOffsets(int arr[], int first, int last, int leftOffsets[], int leftPos,
-                  int rightOffsets[], int rightPos, int num, int useSwaps) {
+                 int rightOffsets[], int rightPos, int num, int useSwaps) {
   if (useSwaps) {
     for (int i = 0; i < num; i++) {
-      swap(&arr[first + leftOffsets[leftPos + i]], &arr[last - rightOffsets[rightPos + i]]);
+      swap(&arr[first + leftOffsets[leftPos + i]],
+           &arr[last - rightOffsets[rightPos + i]]);
     }
   } else if (num > 0) {
     int left = first + leftOffsets[leftPos];
@@ -123,20 +125,24 @@ void swapOffsets(int arr[], int first, int last, int leftOffsets[], int leftPos,
   }
 }
 
-PDQPair partRightBranchless(int arr[], int begin, int end, int leftOffsets[], int rightOffsets[]) {
+PDQPair partRightBranchless(int arr[], int begin, int end, int leftOffsets[],
+                            int rightOffsets[]) {
   int pivot = arr[begin];
   int first = begin;
   int last = end;
 
   first++;
-  while (arr[first] < pivot) first++;
+  while (arr[first] < pivot)
+    first++;
 
   if (first - 1 == begin) {
     last--;
-    while (first < last && !(arr[last] < pivot)) last--;
+    while (first < last && !(arr[last] < pivot))
+      last--;
   } else {
     last--;
-    while (!(arr[last] < pivot)) last--;
+    while (!(arr[last] < pivot))
+      last--;
   }
 
   int alreadyParted = first >= last;
@@ -153,7 +159,8 @@ PDQPair partRightBranchless(int arr[], int begin, int end, int leftOffsets[], in
       int it = first;
       for (int i = 0; i < BLOCK_SIZE; i++) {
         leftOffsets[leftNum] = i;
-        if (!(arr[it] < pivot)) leftNum++;
+        if (!(arr[it] < pivot))
+          leftNum++;
         it++;
       }
     }
@@ -163,20 +170,27 @@ PDQPair partRightBranchless(int arr[], int begin, int end, int leftOffsets[], in
       for (int i = 0; i < BLOCK_SIZE; i++) {
         it--;
         rightOffsets[rightNum] = i + 1;
-        if (arr[it] < pivot) rightNum++;
+        if (arr[it] < pivot)
+          rightNum++;
       }
     }
 
     int num = leftNum < rightNum ? leftNum : rightNum;
-    swapOffsets(arr, first, last, leftOffsets, leftStart, rightOffsets, rightStart, num, leftNum == rightNum);
-    leftNum -= num; rightNum -= num;
-    leftStart += num; rightStart += num;
-    if (leftNum == 0) first += BLOCK_SIZE;
-    if (rightNum == 0) last -= BLOCK_SIZE;
+    swapOffsets(arr, first, last, leftOffsets, leftStart, rightOffsets,
+                rightStart, num, leftNum == rightNum);
+    leftNum -= num;
+    rightNum -= num;
+    leftStart += num;
+    rightStart += num;
+    if (leftNum == 0)
+      first += BLOCK_SIZE;
+    if (rightNum == 0)
+      last -= BLOCK_SIZE;
   }
 
   int leftSize = 0, rightSize = 0;
-  int unknownLeft = (last - first) - ((rightNum != 0 || leftNum != 0) ? BLOCK_SIZE : 0);
+  int unknownLeft =
+      (last - first) - ((rightNum != 0 || leftNum != 0) ? BLOCK_SIZE : 0);
   if (rightNum != 0) {
     leftSize = unknownLeft;
     rightSize = BLOCK_SIZE;
@@ -193,7 +207,8 @@ PDQPair partRightBranchless(int arr[], int begin, int end, int leftOffsets[], in
     int it = first;
     for (int i = 0; i < leftSize; i++) {
       leftOffsets[leftNum] = i;
-      if (!(arr[it] < pivot)) leftNum++;
+      if (!(arr[it] < pivot))
+        leftNum++;
       it++;
     }
   }
@@ -204,16 +219,22 @@ PDQPair partRightBranchless(int arr[], int begin, int end, int leftOffsets[], in
     for (int i = 0; i < rightSize; i++) {
       it--;
       rightOffsets[rightNum] = i + 1;
-      if (arr[it] < pivot) rightNum++;
+      if (arr[it] < pivot)
+        rightNum++;
     }
   }
 
   int num = leftNum < rightNum ? leftNum : rightNum;
-  swapOffsets(arr, first, last, leftOffsets, leftStart, rightOffsets, rightStart, num, leftNum == rightNum);
-  leftNum -= num; rightNum -= num;
-  leftStart += num; rightStart += num;
-  if (leftNum == 0) first += leftSize;
-  if (rightNum == 0) last -= rightSize;
+  swapOffsets(arr, first, last, leftOffsets, leftStart, rightOffsets,
+              rightStart, num, leftNum == rightNum);
+  leftNum -= num;
+  rightNum -= num;
+  leftStart += num;
+  rightStart += num;
+  if (leftNum == 0)
+    first += leftSize;
+  if (rightNum == 0)
+    last -= rightSize;
 
   int leftOffsetsPos = 0;
   int rightOffsetsPos = 0;
@@ -229,9 +250,9 @@ PDQPair partRightBranchless(int arr[], int begin, int end, int leftOffsets[], in
   if (rightNum != 0) {
     rightOffsetsPos += rightStart;
     while (rightNum-- != 0) {
-      swap(&arr[last - rightOffsets[rightOffsetsPos + rightNum]], &arr[first++]);
+      swap(&arr[last - rightOffsets[rightOffsetsPos + rightNum]],
+           &arr[first++]);
     }
-    last = first;
   }
 
   int pivotPos = first - 1;
@@ -248,22 +269,27 @@ int partLeft(int arr[], int begin, int end) {
   int last = end;
 
   last--;
-  while (pivot < arr[last]) last--;
+  while (pivot < arr[last])
+    last--;
 
   if (last + 1 == end) {
     first++;
-    while (first < last && !(pivot < arr[first])) first++;
+    while (first < last && !(pivot < arr[first]))
+      first++;
   } else {
     first++;
-    while (!(pivot < arr[first])) first++;
+    while (!(pivot < arr[first]))
+      first++;
   }
 
   while (first < last) {
     swap(&arr[first], &arr[last]);
     last--;
-    while (pivot < arr[last]) last--;
+    while (pivot < arr[last])
+      last--;
     first++;
-    while (!(pivot < arr[first])) first++;
+    while (!(pivot < arr[first]))
+      first++;
   }
 
   int pivotPos = last;
@@ -275,8 +301,10 @@ int partLeft(int arr[], int begin, int end) {
 void siftDown(int arr[], int begin, int root, int size) {
   while (1) {
     int child = 2 * root + 1;
-    if (child >= size) break;
-    if (child + 1 < size && arr[begin + child] < arr[begin + child + 1]) child++;
+    if (child >= size)
+      break;
+    if (child + 1 < size && arr[begin + child] < arr[begin + child + 1])
+      child++;
     if (arr[begin + root] < arr[begin + child]) {
       swap(&arr[begin + root], &arr[begin + child]);
       root = child;
@@ -288,21 +316,25 @@ void siftDown(int arr[], int begin, int root, int size) {
 
 void heapSort(int arr[], int begin, int end) {
   int n = end - begin;
-  for (int i = n / 2 - 1; i >= 0; i--) siftDown(arr, begin, i, n);
+  for (int i = n / 2 - 1; i >= 0; i--)
+    siftDown(arr, begin, i, n);
   for (int i = n - 1; i > 0; i--) {
     swap(&arr[begin], &arr[begin + i]);
     siftDown(arr, begin, 0, i);
   }
 }
 
-void pdqLoop(int arr[], int begin, int end, int badAllowed, int leftOffsets[], int rightOffsets[]) {
+void pdqLoop(int arr[], int begin, int end, int badAllowed, int leftOffsets[],
+             int rightOffsets[]) {
   int leftmost = 1;
   while (1) {
     int size = end - begin;
 
     if (size < INSERT_SORT_THRESHOLD) {
-      if (leftmost) insertSort(arr, begin, end);
-      else unguardInsertSort(arr, begin, end);
+      if (leftmost)
+        insertSort(arr, begin, end);
+      else
+        unguardInsertSort(arr, begin, end);
       return;
     }
 
@@ -311,7 +343,8 @@ void pdqLoop(int arr[], int begin, int end, int badAllowed, int leftOffsets[], i
       sortThree(arr, begin, begin + halfSize, end - 1);
       sortThree(arr, begin + 1, begin + halfSize - 1, end - 2);
       sortThree(arr, begin + 2, begin + halfSize + 1, end - 3);
-      sortThree(arr, begin + halfSize - 1, begin + halfSize, begin + halfSize + 1);
+      sortThree(arr, begin + halfSize - 1, begin + halfSize,
+                begin + halfSize + 1);
       swap(&arr[begin], &arr[begin + halfSize]);
     } else {
       sortThree(arr, begin + halfSize, begin, end - 1);
@@ -322,7 +355,8 @@ void pdqLoop(int arr[], int begin, int end, int badAllowed, int leftOffsets[], i
       continue;
     }
 
-    PDQPair partResult = partRightBranchless(arr, begin, end, leftOffsets, rightOffsets);
+    PDQPair partResult =
+        partRightBranchless(arr, begin, end, leftOffsets, rightOffsets);
     int pivotPos = partResult.pivotPos;
     int alreadyParted = partResult.alreadyParted;
 
@@ -358,7 +392,8 @@ void pdqLoop(int arr[], int begin, int end, int badAllowed, int leftOffsets[], i
         }
       }
     } else {
-      if (alreadyParted && partialInsertSort(arr, begin, pivotPos) && partialInsertSort(arr, pivotPos + 1, end)) {
+      if (alreadyParted && partialInsertSort(arr, begin, pivotPos) &&
+          partialInsertSort(arr, pivotPos + 1, end)) {
         return;
       }
     }
@@ -370,7 +405,8 @@ void pdqLoop(int arr[], int begin, int end, int badAllowed, int leftOffsets[], i
 }
 
 void sort(int arr[], int n) {
-  if (n < 2) return;
+  if (n < 2)
+    return;
   int leftOffsets[BLOCK_SIZE + CACHELINE_SIZE];
   int rightOffsets[BLOCK_SIZE + CACHELINE_SIZE];
   pdqLoop(arr, 0, n, pdqLog(n), leftOffsets, rightOffsets);

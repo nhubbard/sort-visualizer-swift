@@ -1,9 +1,8 @@
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <math.h>
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
-                 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
 
 void swap(int *a, int *b) {
   int t = *a;
@@ -39,10 +38,13 @@ int medianOf3(int arr[], int left, int mid, int right) {
 int partition(int arr[], int lo, int hi, int pivotValue) {
   int i = lo, j = hi;
   while (1) {
-    while (arr[i] < pivotValue) i++;
+    while (arr[i] < pivotValue)
+      i++;
     j--;
-    while (pivotValue < arr[j]) j--;
-    if (!(i < j)) return i;
+    while (pivotValue < arr[j])
+      j--;
+    if (!(i < j))
+      return i;
     swap(&arr[i], &arr[j]);
     i++;
   }
@@ -53,9 +55,12 @@ void siftDown(int arr[], int lo, int root, int rangeSize) {
     int largest = root;
     int left = 2 * root + 1;
     int right = 2 * root + 2;
-    if (left < rangeSize && arr[lo + largest] < arr[lo + left]) largest = left;
-    if (right < rangeSize && arr[lo + largest] < arr[lo + right]) largest = right;
-    if (largest == root) break;
+    if (left < rangeSize && arr[lo + largest] < arr[lo + left])
+      largest = left;
+    if (right < rangeSize && arr[lo + largest] < arr[lo + right])
+      largest = right;
+    if (largest == root)
+      break;
     swap(&arr[lo + root], &arr[lo + largest]);
     root = largest;
   }
@@ -63,7 +68,8 @@ void siftDown(int arr[], int lo, int root, int rangeSize) {
 
 void heapSortRange(int arr[], int lo, int hi) {
   int size = hi - lo;
-  for (int i = size / 2 - 1; i >= 0; i--) siftDown(arr, lo, i, size);
+  for (int i = size / 2 - 1; i >= 0; i--)
+    siftDown(arr, lo, i, size);
   for (int end = size - 1; end > 0; end--) {
     swap(&arr[lo], &arr[lo + end]);
     siftDown(arr, lo, 0, end);
@@ -80,9 +86,7 @@ void insertionSort(int arr[], int start, int end) {
   }
 }
 
-int floorLog2(int a) {
-  return (int)floor(log((double)a) / log(2.0));
-}
+int floorLog2(int a) { return (int)floor(log((double)a) / log(2.0)); }
 
 void introsortLoop(int arr[], int lo, int hi, int depthLimit) {
   while (hi - lo > 16) {

@@ -1,7 +1,6 @@
 #include <stdio.h>
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
-                 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
 
 void printList(int arr[], int n) {
   for (int i = 0; i < n; i++) {
@@ -20,11 +19,14 @@ void cycleSort(int arr[], int n) {
     int item = arr[cycleStart];
     int pos = cycleStart;
     for (int i = cycleStart + 1; i < n; i++) {
-      if (arr[i] < item) pos++;
+      if (arr[i] < item)
+        pos++;
     }
-    if (pos == cycleStart) continue;
+    if (pos == cycleStart)
+      continue;
 
-    while (item == arr[pos]) pos++;
+    while (item == arr[pos])
+      pos++;
     int temp = arr[pos];
     arr[pos] = item;
     item = temp;
@@ -32,9 +34,11 @@ void cycleSort(int arr[], int n) {
     while (pos != cycleStart) {
       pos = cycleStart;
       for (int i = cycleStart + 1; i < n; i++) {
-        if (arr[i] < item) pos++;
+        if (arr[i] < item)
+          pos++;
       }
-      while (item == arr[pos]) pos++;
+      while (item == arr[pos])
+        pos++;
       temp = arr[pos];
       arr[pos] = item;
       item = temp;
@@ -42,9 +46,7 @@ void cycleSort(int arr[], int n) {
   }
 }
 
-void sort(int arr[], int n) {
-  cycleSort(arr, n);
-}
+void sort(int arr[], int n) { cycleSort(arr, n); }
 
 int main(int argc, char *argv[]) {
   int size = sizeof(array) / sizeof(array[0]);

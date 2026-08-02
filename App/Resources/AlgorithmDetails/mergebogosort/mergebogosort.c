@@ -73,9 +73,7 @@ void sortRange(int arr[], int start, int end) {
   }
 }
 
-void sort(int arr[], int n) {
-  sortRange(arr, 0, n);
-}
+void sort(int arr[], int n) { sortRange(arr, 0, n); }
 
 int main(int argc, char *argv[]) {
   int size = sizeof(array) / sizeof(array[0]);

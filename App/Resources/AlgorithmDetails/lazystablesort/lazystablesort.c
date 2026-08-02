@@ -1,8 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
-                 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
 
 void swap(int arr[], int a, int b) {
   int t = arr[a];
@@ -23,7 +22,8 @@ void printList(int items[], int size) {
 }
 
 void multiSwap(int arr[], int a, int b, int count) {
-  for (int i = 0; i < count; i++) swap(arr, a + i, b + i);
+  for (int i = 0; i < count; i++)
+    swap(arr, a + i, b + i);
 }
 
 void rotate(int arr[], int pos, int lenA, int lenB) {
@@ -43,15 +43,19 @@ int binSearch(int arr[], int pos, int len, int keyPos, int isLeft) {
   int left = 0, right = len;
   while (left < right) {
     int mid = left + (right - left) / 2;
-    int cond = isLeft ? (arr[pos + mid] < arr[keyPos]) : (arr[pos + mid] <= arr[keyPos]);
-    if (cond) left = mid + 1;
-    else right = mid;
+    int cond = isLeft ? (arr[pos + mid] < arr[keyPos])
+                      : (arr[pos + mid] <= arr[keyPos]);
+    if (cond)
+      left = mid + 1;
+    else
+      right = mid;
   }
   return left;
 }
 
 void mergeWithoutBuffer(int arr[], int pos, int len1, int len2) {
-  if (len1 == 0 || len2 == 0) return;
+  if (len1 == 0 || len2 == 0)
+    return;
   if (len1 == 1) {
     int loc = binSearch(arr, pos + 1, len2, pos, 1);
     rotate(arr, pos, 1, loc);
@@ -72,7 +76,8 @@ void mergeWithoutBuffer(int arr[], int pos, int len1, int len2) {
 void sort(int arr[], int n) {
   int dist = 1;
   while (dist < n) {
-    if (arr[dist - 1] > arr[dist]) swap(arr, dist - 1, dist);
+    if (arr[dist - 1] > arr[dist])
+      swap(arr, dist - 1, dist);
     dist += 2;
   }
   int part = 2;
@@ -84,7 +89,8 @@ void sort(int arr[], int n) {
       left += 2 * part;
     }
     int rest = n - left;
-    if (rest > part) mergeWithoutBuffer(arr, left, part, rest - part);
+    if (rest > part)
+      mergeWithoutBuffer(arr, left, part, rest - part);
     part *= 2;
   }
 }

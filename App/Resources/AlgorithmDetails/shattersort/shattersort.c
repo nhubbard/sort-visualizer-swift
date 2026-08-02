@@ -1,8 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
-                 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
 
 void swap(int *a, int *b) {
   int t = *a;
@@ -34,17 +33,20 @@ void insertionSort(int arr[], int start, int end) {
   }
 }
 
-int *shatterPartition(int arr[], int start, int length, int num, int *outShatters) {
+int *shatterPartition(int arr[], int start, int length, int num,
+                      int *outShatters) {
   int minV = arr[start];
   int maxV = arr[start];
   for (int i = 1; i < length; i++) {
-    if (arr[start + i] < minV) minV = arr[start + i];
-    if (arr[start + i] > maxV) maxV = arr[start + i];
+    if (arr[start + i] < minV)
+      minV = arr[start + i];
+    if (arr[start + i] > maxV)
+      maxV = arr[start + i];
   }
   int valueRange = maxV - minV + 1;
   int shatters = (length + num - 1) / num;
 
-  int **buckets = malloc(shatters * sizeof(int *));
+  int **buckets = (int **)malloc(shatters * sizeof(int *));
   int *counts = calloc(shatters, sizeof(int));
   for (int i = 0; i < shatters; i++) {
     buckets[i] = malloc(length * sizeof(int));
@@ -53,7 +55,8 @@ int *shatterPartition(int arr[], int start, int length, int num, int *outShatter
   for (int i = 0; i < length; i++) {
     int v = arr[start + i];
     int idx = (v - minV) * shatters / valueRange;
-    if (idx > shatters - 1) idx = shatters - 1;
+    if (idx > shatters - 1)
+      idx = shatters - 1;
     buckets[idx][counts[idx]++] = v;
   }
 
@@ -70,7 +73,7 @@ int *shatterPartition(int arr[], int start, int length, int num, int *outShatter
     }
     free(buckets[i]);
   }
-  free(buckets);
+  free((void *)buckets);
   free(counts);
 
   *outShatters = shatters;
@@ -88,9 +91,7 @@ void shatterSort(int arr[], int length, int num) {
   free(offsets);
 }
 
-void sort(int arr[], int n) {
-  shatterSort(arr, n, 4);
-}
+void sort(int arr[], int n) { shatterSort(arr, n, 4); }
 
 int main(int argc, char *argv[]) {
   int size = sizeof(array) / sizeof(array[0]);

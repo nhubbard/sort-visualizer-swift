@@ -26,9 +26,8 @@ int isValid(int arr[], int loops[], int n) {
   }
   for (int i = 0; i < n; i++) {
     for (int j = 0; j < n; j++) {
-      if (i < j && arr[loops[i]] > arr[loops[j]]) {
-        total += 1;
-      } else if (i > j && arr[loops[i]] < arr[loops[j]]) {
+      if ((i < j && arr[loops[i]] > arr[loops[j]]) ||
+          (i > j && arr[loops[i]] < arr[loops[j]])) {
         total += 1;
       }
     }

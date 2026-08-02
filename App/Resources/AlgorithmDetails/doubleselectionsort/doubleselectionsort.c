@@ -1,8 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
-                 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
 
 void printList(int arr[], int n) {
   for (int i = 0; i < n; i++) {
@@ -55,9 +54,7 @@ void doubleSelectionSort(int arr[], int n) {
   }
 }
 
-void sort(int arr[], int n) {
-  doubleSelectionSort(arr, n);
-}
+void sort(int arr[], int n) { doubleSelectionSort(arr, n); }
 
 int main(int argc, char *argv[]) {
   int size = sizeof(array) / sizeof(array[0]);

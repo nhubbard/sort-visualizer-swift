@@ -1,8 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
-                 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
 
 void swap(int *a, int *b) {
   int t = *a;
@@ -23,8 +22,10 @@ void printList(int items[], int size) {
 }
 
 int stableComp(int arr[], int key[], int a, int b) {
-  if (arr[a] > arr[b]) return 1;
-  if (arr[a] == arr[b]) return key[a] > key[b];
+  if (arr[a] > arr[b])
+    return 1;
+  if (arr[a] == arr[b])
+    return key[a] > key[b];
   return 0;
 }
 
@@ -35,10 +36,12 @@ void stableSwap(int arr[], int key[], int a, int b) {
 
 void medianOfThree(int arr[], int key[], int a, int b) {
   int m = a + (b - 1 - a) / 2;
-  if (stableComp(arr, key, a, m)) stableSwap(arr, key, a, m);
+  if (stableComp(arr, key, a, m))
+    stableSwap(arr, key, a, m);
   if (stableComp(arr, key, m, b - 1)) {
     stableSwap(arr, key, m, b - 1);
-    if (stableComp(arr, key, a, m)) return;
+    if (stableComp(arr, key, a, m))
+      return;
   }
   stableSwap(arr, key, a, m);
 }
@@ -77,7 +80,8 @@ void quickSort(int arr[], int key[], int a, int b) {
 
 void sort(int arr[], int n) {
   int *key = malloc(sizeof(int) * n);
-  for (int i = 0; i < n; i++) key[i] = i;
+  for (int i = 0; i < n; i++)
+    key[i] = i;
   quickSort(arr, key, 0, n);
   free(key);
 }

@@ -1,8 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
-                 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
 
 int end;
 
@@ -19,7 +18,8 @@ void printList(int arr[], int n) {
 }
 
 void compSwap(int arr[], int a, int b) {
-  if (b >= end) return;
+  if (b >= end)
+    return;
   if (arr[a] > arr[b]) {
     int temp = arr[a];
     arr[a] = arr[b];
@@ -40,9 +40,11 @@ void rangeComp(int arr[], int a, int b, int offset) {
 
 void sort(int arr[], int n) {
   end = n;
-  if (n <= 1) return;
+  if (n <= 1)
+    return;
   int paddedLength = 1;
-  while (paddedLength < n) paddedLength <<= 1;
+  while (paddedLength < n)
+    paddedLength <<= 1;
 
   for (int k = 2; k <= paddedLength; k *= 2) {
     for (int j = 0; j < k / 2; j++) {

@@ -1,8 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
-                 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
 
 void swap(int *a, int *b) {
   int t = *a;
@@ -25,17 +24,21 @@ void printList(int items[], int size) {
 int stableComp(int arr[], int table[], int a, int b) {
   int ta = table[a];
   int tb = table[b];
-  if (arr[ta] > arr[tb]) return 1;
-  if (arr[ta] == arr[tb]) return table[a] > table[b];
+  if (arr[ta] > arr[tb])
+    return 1;
+  if (arr[ta] == arr[tb])
+    return table[a] > table[b];
   return 0;
 }
 
 void medianOfThree(int arr[], int table[], int a, int b) {
   int m = a + (b - 1 - a) / 2;
-  if (stableComp(arr, table, a, m)) swap(&table[a], &table[m]);
+  if (stableComp(arr, table, a, m))
+    swap(&table[a], &table[m]);
   if (stableComp(arr, table, m, b - 1)) {
     swap(&table[m], &table[b - 1]);
-    if (stableComp(arr, table, a, m)) return;
+    if (stableComp(arr, table, a, m))
+      return;
   }
   swap(&table[a], &table[m]);
 }
@@ -74,7 +77,8 @@ void quickSort(int arr[], int table[], int a, int b) {
 
 void sort(int arr[], int n) {
   int *table = malloc(n * sizeof(int));
-  for (int i = 0; i < n; i++) table[i] = i;
+  for (int i = 0; i < n; i++)
+    table[i] = i;
   quickSort(arr, table, 0, n);
   for (int i = 0; i < n; i++) {
     if (table[i] != i) {

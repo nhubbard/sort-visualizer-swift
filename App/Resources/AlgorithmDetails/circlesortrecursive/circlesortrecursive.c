@@ -17,7 +17,12 @@ int circleSortRoutine(int arr[], int lo, int hi, int end) {
   int mid = (hi - lo) / 2;
   int swaps = 0;
   while (lo < hi) {
-    if (hi < end && arr[lo] > arr[hi]) {
+    // clang-tidy can't prove lo/hi stay within [0, end) across the recursive
+    // calls below; by induction from the initial (0, paddedLength - 1) call, lo
+    // only increases from >= 0 and hi only decreases while staying >= lo, so
+    // this never actually goes out of bounds.
+    if (hi < end &&
+        arr[lo] > arr[hi]) { // NOLINT(clang-analyzer-security.ArrayBound)
       int t = arr[lo];
       arr[lo] = arr[hi];
       arr[hi] = t;
@@ -57,7 +62,7 @@ void printList(int arr[], int n) {
 }
 
 int main(int argc, char *argv[]) {
-  int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
+  int array[16] = {0,  39, 21, 62, 91, 77, 14, 23,
                    90, 69, 51, 81, 68, 83, 32, 56};
   int size = sizeof(array) / sizeof(array[0]);
   sort(array, size);

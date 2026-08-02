@@ -1,8 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
-                 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
 
 void printList(int arr[], int n) {
   for (int i = 0; i < n; i++) {
@@ -16,17 +15,17 @@ void printList(int arr[], int n) {
   }
 }
 
-int min(int a, int b) {
-  return a < b ? a : b;
-}
+int min(int a, int b) { return a < b ? a : b; }
 
 void merge(int arr[], int low, int mid, int high) {
   int leftSize = mid - low;
   int rightSize = high - mid;
   int *left = malloc(leftSize * sizeof(int));
   int *right = malloc(rightSize * sizeof(int));
-  for (int x = 0; x < leftSize; x++) left[x] = arr[low + x];
-  for (int x = 0; x < rightSize; x++) right[x] = arr[mid + x];
+  for (int x = 0; x < leftSize; x++)
+    left[x] = arr[low + x];
+  for (int x = 0; x < rightSize; x++)
+    right[x] = arr[mid + x];
 
   int i = 0, j = 0, k = low;
   while (i < leftSize && j < rightSize) {

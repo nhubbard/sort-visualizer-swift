@@ -1,8 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
-                 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
 
 #define INSERT_SORT_THRESHOLD 24
 #define NINTHER_THRESHOLD 128
@@ -33,7 +32,8 @@ typedef struct {
 
 int pdqLog(int n) {
   int log = 0;
-  while ((n >>= 1) != 0) log++;
+  while ((n >>= 1) != 0)
+    log++;
   return log;
 }
 
@@ -68,7 +68,8 @@ void unguardInsertSort(int arr[], int begin, int end) {
 int partialInsertSort(int arr[], int begin, int end) {
   int limit = 0;
   for (int cur = begin + 1; cur < end; cur++) {
-    if (limit > PARTIAL_INSERT_SORT_LIMIT) return 0;
+    if (limit > PARTIAL_INSERT_SORT_LIMIT)
+      return 0;
     if (arr[cur] < arr[cur - 1]) {
       int tmp = arr[cur];
       int sift = cur;
@@ -84,7 +85,8 @@ int partialInsertSort(int arr[], int begin, int end) {
 }
 
 void sortTwo(int arr[], int a, int b) {
-  if (arr[b] < arr[a]) swap(&arr[a], &arr[b]);
+  if (arr[b] < arr[a])
+    swap(&arr[a], &arr[b]);
 }
 
 void sortThree(int arr[], int a, int b, int c) {
@@ -99,23 +101,28 @@ PDQPair partRight(int arr[], int begin, int end) {
   int last = end;
 
   first++;
-  while (arr[first] < pivot) first++;
+  while (arr[first] < pivot)
+    first++;
 
   if (first - 1 == begin) {
     last--;
-    while (first < last && !(arr[last] < pivot)) last--;
+    while (first < last && !(arr[last] < pivot))
+      last--;
   } else {
     last--;
-    while (!(arr[last] < pivot)) last--;
+    while (!(arr[last] < pivot))
+      last--;
   }
 
   int alreadyParted = first >= last;
   while (first < last) {
     swap(&arr[first], &arr[last]);
     first++;
-    while (arr[first] < pivot) first++;
+    while (arr[first] < pivot)
+      first++;
     last--;
-    while (!(arr[last] < pivot)) last--;
+    while (!(arr[last] < pivot))
+      last--;
   }
 
   int pivotPos = first - 1;
@@ -132,22 +139,27 @@ int partLeft(int arr[], int begin, int end) {
   int last = end;
 
   last--;
-  while (pivot < arr[last]) last--;
+  while (pivot < arr[last])
+    last--;
 
   if (last + 1 == end) {
     first++;
-    while (first < last && !(pivot < arr[first])) first++;
+    while (first < last && !(pivot < arr[first]))
+      first++;
   } else {
     first++;
-    while (!(pivot < arr[first])) first++;
+    while (!(pivot < arr[first]))
+      first++;
   }
 
   while (first < last) {
     swap(&arr[first], &arr[last]);
     last--;
-    while (pivot < arr[last]) last--;
+    while (pivot < arr[last])
+      last--;
     first++;
-    while (!(pivot < arr[first])) first++;
+    while (!(pivot < arr[first]))
+      first++;
   }
 
   int pivotPos = last;
@@ -159,8 +171,10 @@ int partLeft(int arr[], int begin, int end) {
 void siftDown(int arr[], int begin, int root, int size) {
   while (1) {
     int child = 2 * root + 1;
-    if (child >= size) break;
-    if (child + 1 < size && arr[begin + child] < arr[begin + child + 1]) child++;
+    if (child >= size)
+      break;
+    if (child + 1 < size && arr[begin + child] < arr[begin + child + 1])
+      child++;
     if (arr[begin + root] < arr[begin + child]) {
       swap(&arr[begin + root], &arr[begin + child]);
       root = child;
@@ -172,7 +186,8 @@ void siftDown(int arr[], int begin, int root, int size) {
 
 void heapSort(int arr[], int begin, int end) {
   int n = end - begin;
-  for (int i = n / 2 - 1; i >= 0; i--) siftDown(arr, begin, i, n);
+  for (int i = n / 2 - 1; i >= 0; i--)
+    siftDown(arr, begin, i, n);
   for (int i = n - 1; i > 0; i--) {
     swap(&arr[begin], &arr[begin + i]);
     siftDown(arr, begin, 0, i);
@@ -185,8 +200,10 @@ void pdqLoop(int arr[], int begin, int end, int badAllowed) {
     int size = end - begin;
 
     if (size < INSERT_SORT_THRESHOLD) {
-      if (leftmost) insertSort(arr, begin, end);
-      else unguardInsertSort(arr, begin, end);
+      if (leftmost)
+        insertSort(arr, begin, end);
+      else
+        unguardInsertSort(arr, begin, end);
       return;
     }
 
@@ -195,7 +212,8 @@ void pdqLoop(int arr[], int begin, int end, int badAllowed) {
       sortThree(arr, begin, begin + halfSize, end - 1);
       sortThree(arr, begin + 1, begin + halfSize - 1, end - 2);
       sortThree(arr, begin + 2, begin + halfSize + 1, end - 3);
-      sortThree(arr, begin + halfSize - 1, begin + halfSize, begin + halfSize + 1);
+      sortThree(arr, begin + halfSize - 1, begin + halfSize,
+                begin + halfSize + 1);
       swap(&arr[begin], &arr[begin + halfSize]);
     } else {
       sortThree(arr, begin + halfSize, begin, end - 1);
@@ -242,7 +260,8 @@ void pdqLoop(int arr[], int begin, int end, int badAllowed) {
         }
       }
     } else {
-      if (alreadyParted && partialInsertSort(arr, begin, pivotPos) && partialInsertSort(arr, pivotPos + 1, end)) {
+      if (alreadyParted && partialInsertSort(arr, begin, pivotPos) &&
+          partialInsertSort(arr, pivotPos + 1, end)) {
         return;
       }
     }
@@ -254,7 +273,8 @@ void pdqLoop(int arr[], int begin, int end, int badAllowed) {
 }
 
 void sort(int arr[], int n) {
-  if (n < 2) return;
+  if (n < 2)
+    return;
   pdqLoop(arr, 0, n, pdqLog(n));
 }
 

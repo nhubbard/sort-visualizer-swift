@@ -1,8 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
-                 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
 
 void swap(int *a, int *b) {
   int t = *a;
@@ -23,8 +22,10 @@ void printList(int items[], int size) {
 }
 
 int compositeLess(int arr[], int key[], int mid, int i) {
-  if (arr[mid] < arr[i]) return 1;
-  if (arr[mid] == arr[i]) return key[mid] < key[i];
+  if (arr[mid] < arr[i])
+    return 1;
+  if (arr[mid] == arr[i])
+    return key[mid] < key[i];
   return 0;
 }
 
@@ -44,7 +45,8 @@ int binarySearch(int arr[], int key[], int n, int i) {
 
 void sort(int arr[], int n) {
   int *key = malloc(n * sizeof(int));
-  for (int i = 0; i < n; i++) key[i] = i;
+  for (int i = 0; i < n; i++)
+    key[i] = i;
 
   for (int i = 1; i < n; i++) {
     int done = 0;

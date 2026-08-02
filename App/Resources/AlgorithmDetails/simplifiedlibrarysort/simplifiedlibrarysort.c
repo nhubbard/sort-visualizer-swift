@@ -1,8 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
-                 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
 
 void printList(int arr[], int n) {
   for (int i = 0; i < n; i++) {
@@ -43,7 +42,8 @@ void binaryInsertionSort(int arr[], int start, int end) {
   }
 }
 
-void rebalance(int arr[], int temp[], int counts[], int locations[], int spineSize, int batchEnd) {
+void rebalance(int arr[], int temp[], int counts[], int locations[],
+               int spineSize, int batchEnd) {
   for (int i = 0; i < spineSize; i++) {
     counts[i + 1] = counts[i + 1] + counts[i] + 1;
   }
@@ -117,9 +117,7 @@ void librarySort(int arr[], int n) {
   free(locations);
 }
 
-void sort(int arr[], int n) {
-  librarySort(arr, n);
-}
+void sort(int arr[], int n) { librarySort(arr, n); }
 
 int main(int argc, char *argv[]) {
   int size = sizeof(array) / sizeof(array[0]);

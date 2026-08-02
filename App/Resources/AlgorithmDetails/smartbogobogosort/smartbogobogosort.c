@@ -35,9 +35,7 @@ void sortLen(int arr[], int length) {
   }
 }
 
-void sort(int arr[], int n) {
-  sortLen(arr, n);
-}
+void sort(int arr[], int n) { sortLen(arr, n); }
 
 int main(int argc, char *argv[]) {
   int size = sizeof(array) / sizeof(array[0]);

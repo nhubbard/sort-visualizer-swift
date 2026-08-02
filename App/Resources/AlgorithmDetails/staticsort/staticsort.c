@@ -1,8 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
-                 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
 
 void printList(int arr[], int n) {
   for (int i = 0; i < n; i++) {
@@ -51,7 +50,8 @@ void siftDown(int arr[], int s, int root, int size) {
     if (right < size && arr[s + largest] < arr[s + right]) {
       largest = right;
     }
-    if (largest == root) break;
+    if (largest == root)
+      break;
     int tmp = arr[s + root];
     arr[s + root] = arr[s + largest];
     arr[s + largest] = tmp;
@@ -61,7 +61,8 @@ void siftDown(int arr[], int s, int root, int size) {
 
 void heapSortRange(int arr[], int s, int e) {
   int size = e - s;
-  if (size <= 1) return;
+  if (size <= 1)
+    return;
   int i = size / 2 - 1;
   while (i >= 0) {
     siftDown(arr, s, i, size);
@@ -121,7 +122,8 @@ void staticSort(int arr[], int a, int b) {
   for (int i = 0; i < auxLen; i++) {
     int s = (i > 1) ? offset[i - 1] : a;
     int e = offset[i];
-    if (e - s <= 1) continue;
+    if (e - s <= 1)
+      continue;
     if (e - s > 16) {
       heapSortRange(arr, s, e);
     } else {

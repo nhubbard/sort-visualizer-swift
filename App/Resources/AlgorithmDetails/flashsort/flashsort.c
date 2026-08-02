@@ -1,8 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
-                 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
 
 void printList(int arr[], int n) {
   for (int i = 0; i < n; i++) {
@@ -21,7 +20,8 @@ int classify(int value, int minValue, double c) {
 }
 
 void flashSort(int arr[], int n) {
-  if (n == 0) return;
+  if (n == 0)
+    return;
 
   int m = (int)(0.2 * n) + 2;
 
@@ -33,12 +33,21 @@ void flashSort(int arr[], int n) {
   while (i < n - 1) {
     int small, big, bigIndex;
     if (arr[i] < arr[i + 1]) {
-      small = arr[i]; big = arr[i + 1]; bigIndex = i + 1;
+      small = arr[i];
+      big = arr[i + 1];
+      bigIndex = i + 1;
     } else {
-      big = arr[i]; bigIndex = i; small = arr[i + 1];
+      big = arr[i];
+      bigIndex = i;
+      small = arr[i + 1];
     }
-    if (big > maxValue) { maxValue = big; maxIndex = bigIndex; }
-    if (small < minValue) { minValue = small; }
+    if (big > maxValue) {
+      maxValue = big;
+      maxIndex = bigIndex;
+    }
+    if (small < minValue) {
+      minValue = small;
+    }
     i += 2;
   }
 
@@ -50,7 +59,8 @@ void flashSort(int arr[], int n) {
     maxIndex = n - 1;
   }
 
-  if (maxValue == minValue) return;
+  if (maxValue == minValue)
+    return;
 
   int *L = calloc(m + 1, sizeof(int));
   double c = (m - 1.0) / (maxValue - minValue);
@@ -102,9 +112,7 @@ void flashSort(int arr[], int n) {
   free(L);
 }
 
-void sort(int arr[], int n) {
-  flashSort(arr, n);
-}
+void sort(int arr[], int n) { flashSort(arr, n); }
 
 int main(int argc, char *argv[]) {
   int size = sizeof(array) / sizeof(array[0]);

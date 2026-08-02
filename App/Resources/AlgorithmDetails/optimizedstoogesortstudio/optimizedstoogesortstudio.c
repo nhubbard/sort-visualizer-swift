@@ -1,8 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
-                 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
 
 void swap(int *a, int *b) {
   int t = *a;
@@ -30,13 +29,13 @@ int compSwap(int arr[], int a, int b) {
   return 0;
 }
 
-int max(int a, int b) {
-  return a > b ? a : b;
-}
+int max(int a, int b) { return a > b ? a : b; }
 
 int stoogeSort(int arr[], int a, int m, int b, int merge) {
-  if (a >= m) return 0;
-  if (b - a == 2) return compSwap(arr, a, m);
+  if (a >= m)
+    return 0;
+  if (b - a == 2)
+    return compSwap(arr, a, m);
 
   int lChange = 0;
   int rChange = 0;
@@ -67,9 +66,7 @@ int stoogeSort(int arr[], int a, int m, int b, int merge) {
   return lChange || rChange;
 }
 
-void sort(int arr[], int n) {
-  stoogeSort(arr, 0, 1, n, 0);
-}
+void sort(int arr[], int n) { stoogeSort(arr, 0, 1, n, 0); }
 
 int main(int argc, char *argv[]) {
   int size = sizeof(array) / sizeof(array[0]);
