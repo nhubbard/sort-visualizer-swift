@@ -82,12 +82,6 @@ Move algorithms here when you finish them.
 
 #### Not Started
 
-##### Medium
-
-- [ ] PatienceSort — 127 lines
-- [ ] SplaySort — 157 lines
-- [ ] TreeSort — 168 lines
-
 ##### Hard
 
 - [ ] LibrarySort — 233 lines
