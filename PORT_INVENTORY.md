@@ -192,18 +192,6 @@ Move algorithms here when you finish them.
 
 #### Not Started
 
-##### Easy
-
-- [ ] BoseNelsonSortRecursive — 55 lines
-- [ ] WeaveSortIterative — 63 lines
-- [ ] CreaseSort — 65 lines
-- [ ] DiamondSortIterative — 67 lines
-- [ ] PairwiseMergeSortIterative — 67 lines
-- [ ] FoldSort — 77 lines
-- [ ] WeaveSortRecursive — 77 lines
-- [ ] PairwiseMergeSortRecursive — 80 lines
-- [ ] PairwiseSortRecursive — 81 lines
-
 ##### Medium
 
 - [ ] MatrixSort — 120 lines
