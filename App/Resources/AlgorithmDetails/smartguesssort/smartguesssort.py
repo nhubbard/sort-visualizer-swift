@@ -4,11 +4,7 @@ def sort(arr):
 
     def pair_ok(i):
         a, b = arr[loops[i]], arr[loops[i + 1]]
-        if a < b:
-            return True
-        if a == b and loops[i] < loops[i + 1]:
-            return True
-        return False
+        return bool(a < b or (a == b and loops[i] < loops[i + 1]))
 
     def first_failure():
         i = n - 2

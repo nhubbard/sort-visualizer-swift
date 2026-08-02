@@ -18,7 +18,9 @@ def bin_search(arr, pos, length, key_pos, is_left):
     left, right = 0, length
     while left < right:
         mid = left + (right - left) // 2
-        cond = arr[pos + mid] < arr[key_pos] if is_left else arr[pos + mid] <= arr[key_pos]
+        cond = (
+            arr[pos + mid] < arr[key_pos] if is_left else arr[pos + mid] <= arr[key_pos]
+        )
         if cond:
             left = mid + 1
         else:

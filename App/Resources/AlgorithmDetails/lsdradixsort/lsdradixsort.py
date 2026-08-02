@@ -2,7 +2,7 @@ def counting(arr, e):
     n = len(arr)
     output = [0] * n
     count = [0] * (10)
-    for i in range(0, n):
+    for i in range(n):
         index = arr[i] / e
         count[int(index % 10)] += 1
     for i in range(1, 10):
@@ -14,7 +14,7 @@ def counting(arr, e):
         count[int(index % 10)] -= 1
         i -= 1
     i = 0
-    for i in range(0, len(arr)):
+    for i in range(len(arr)):
         arr[i] = output[i]
 
 

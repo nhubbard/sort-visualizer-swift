@@ -7,13 +7,12 @@ def sort(arr):
             i = 0
             while i < n:
                 l = i ^ j
-                if l > i:
-                    if (
-                        ((i & k) == 0)
-                        and (arr[i] > arr[l])
-                        or (((i & k) != 0) and (arr[i] < arr[l]))
-                    ):
-                        arr[i], arr[l] = arr[l], arr[i]
+                if l > i and (
+                    ((i & k) == 0)
+                    and (arr[i] > arr[l])
+                    or (((i & k) != 0) and (arr[i] < arr[l]))
+                ):
+                    arr[i], arr[l] = arr[l], arr[i]
                 i += 1
             j //= 2
         k *= 2

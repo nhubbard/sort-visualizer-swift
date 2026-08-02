@@ -11,8 +11,7 @@ def sort(arr, start=0, end=None):
     def is_split():
         low_max = arr[start]
         for i in range(start + 1, mid):
-            if arr[i] > low_max:
-                low_max = arr[i]
+            low_max = max(low_max, arr[i])
         for i in range(mid, end):
             if low_max > arr[i]:
                 return False

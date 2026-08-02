@@ -7,8 +7,7 @@ def sort(arr):
     maximum = n - 1
     next_value = arr[maximum]
     for i in range(maximum - 1, -1, -1):
-        if arr[i] > next_value:
-            next_value = arr[i]
+        next_value = max(next_value, arr[i])
     # Skip past any elements already sitting at the tail with that value.
     while maximum > 0 and arr[maximum] == next_value:
         maximum -= 1

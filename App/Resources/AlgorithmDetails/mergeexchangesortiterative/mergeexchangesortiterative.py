@@ -5,7 +5,7 @@ def merge_exchange_sort(array):
     n = len(array)
     if n <= 1:
         return
-    t = int(math.log(n - 1, 2)) + 1
+    t = int(math.log2(n - 1)) + 1
     p0 = 1 << (t - 1)
     p = p0
     while p > 0:

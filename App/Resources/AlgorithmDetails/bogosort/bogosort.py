@@ -4,7 +4,7 @@ import random
 def sort(arr):
     expected = arr[:]
     expected.sort()
-    while not (arr == expected):
+    while arr != expected:
         random.shuffle(arr)
 
 

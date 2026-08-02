@@ -21,8 +21,7 @@ def flash_sort(array):
         if big > max_value:
             max_value = big
             max_index = big_index
-        if small < min_value:
-            min_value = small
+        min_value = min(min_value, small)
         i += 2
 
     last = array[n - 1]

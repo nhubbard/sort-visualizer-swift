@@ -7,10 +7,9 @@ def sort(arr):
             j = k % p
             while j + k < n:
                 for i in range(k):
-                    if (i + j) // (p + p) == (i + j + k) // (p + p):
-                        if i + j + k < n:
-                            if arr[i + j] > arr[i + j + k]:
-                                arr[i + j], arr[i + j + k] = arr[i + j + k], arr[i + j]
+                    same_block = (i + j) // (p + p) == (i + j + k) // (p + p)
+                    if same_block and i + j + k < n and arr[i + j] > arr[i + j + k]:
+                        arr[i + j], arr[i + j + k] = arr[i + j + k], arr[i + j]
                 j += k + k
             k //= 2
         p += p

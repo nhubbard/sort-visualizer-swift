@@ -25,13 +25,11 @@ def rebalance(array, temp, counts, locations, spine_size, batch_end):
     for i in range(spine_size):
         counts[i + 1] = counts[i + 1] + counts[i] + 1
 
-    k = 0
-    for i in range(spine_size, batch_end):
+    for k, i in enumerate(range(spine_size, batch_end)):
         gap = locations[k]
         position = counts[gap]
         temp[position] = array[i]
         counts[gap] = position + 1
-        k += 1
 
     for i in range(spine_size):
         position = counts[i]

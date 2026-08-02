@@ -87,7 +87,9 @@ def merge_without_buffer(arr, pos, len1, len2):
                 break
             while True:
                 len2 -= 1
-                if not (len2 != 0 and arr[pos + len1 - 1] <= arr[pos + len1 + len2 - 1]):
+                if not (
+                    len2 != 0 and arr[pos + len1 - 1] <= arr[pos + len1 + len2 - 1]
+                ):
                     break
 
 
@@ -145,7 +147,9 @@ def smart_merge_without_buffer(arr, pos, left_over_len, left_over_frag, reg_bloc
             while True:
                 pos += 1
                 len1 -= 1
-                if not (len1 != 0 and (compare(arr[pos], arr[pos + len1]) - type_frag) < 0):
+                if not (
+                    len1 != 0 and (compare(arr[pos], arr[pos + len1]) - type_frag) < 0
+                ):
                     break
     return len2, type_frag
 
@@ -179,7 +183,9 @@ def smart_merge_with_buffer(arr, pos, left_over_len, left_over_frag, block_len):
     return length, fragment
 
 
-def merge_buffers_left(arr, keys_pos, midkey, pos, block_count, block_len, havebuf, a_block_count, last_len):
+def merge_buffers_left(
+    arr, keys_pos, midkey, pos, block_count, block_len, havebuf, a_block_count, last_len
+):
     if block_count == 0:
         a_blocks_len = a_block_count * block_len
         if havebuf:
@@ -195,22 +201,34 @@ def merge_buffers_left(arr, keys_pos, midkey, pos, block_count, block_len, haveb
         next_frag = 0 if arr[keys_pos + key_index] < arr[midkey] else 1
         if next_frag == left_over_frag:
             if havebuf:
-                multi_swap(arr, pos + rest_to_process - block_len, pos + rest_to_process, left_over_len)
+                multi_swap(
+                    arr,
+                    pos + rest_to_process - block_len,
+                    pos + rest_to_process,
+                    left_over_len,
+                )
             rest_to_process = process_index
             left_over_len = block_len
         else:
             if havebuf:
                 left_over_len, left_over_frag = smart_merge_with_buffer(
-                    arr, pos + rest_to_process, left_over_len, left_over_frag, block_len)
+                    arr, pos + rest_to_process, left_over_len, left_over_frag, block_len
+                )
             else:
                 left_over_len, left_over_frag = smart_merge_without_buffer(
-                    arr, pos + rest_to_process, left_over_len, left_over_frag, block_len)
+                    arr, pos + rest_to_process, left_over_len, left_over_frag, block_len
+                )
         process_index += block_len
     rest_to_process = process_index - left_over_len
     if last_len != 0:
         if left_over_frag != 0:
             if havebuf:
-                multi_swap(arr, pos + rest_to_process - block_len, pos + rest_to_process, left_over_len)
+                multi_swap(
+                    arr,
+                    pos + rest_to_process - block_len,
+                    pos + rest_to_process,
+                    left_over_len,
+                )
             rest_to_process = process_index
             left_over_len = block_len * a_block_count
             left_over_frag = 0
@@ -222,7 +240,12 @@ def merge_buffers_left(arr, keys_pos, midkey, pos, block_count, block_len, haveb
             merge_without_buffer(arr, pos + rest_to_process, left_over_len, last_len)
     else:
         if havebuf:
-            multi_swap(arr, pos + rest_to_process, pos + rest_to_process - block_len, left_over_len)
+            multi_swap(
+                arr,
+                pos + rest_to_process,
+                pos + rest_to_process - block_len,
+                left_over_len,
+            )
 
 
 def build_blocks(arr, pos, length, build_len):
@@ -254,7 +277,9 @@ def build_blocks(arr, pos, length, build_len):
     if rest_to_build <= build_len:
         rotate(arr, pos + left_over_pos, rest_to_build, build_len)
     else:
-        merge_right(arr, pos + left_over_pos, build_len, rest_to_build - build_len, build_len)
+        merge_right(
+            arr, pos + left_over_pos, build_len, rest_to_build - build_len, build_len
+        )
     while left_over_pos > 0:
         left_over_pos -= 2 * build_len
         merge_right(arr, pos + left_over_pos, build_len, build_len, build_len)
@@ -270,7 +295,9 @@ def combine_blocks(arr, key_pos, pos, length, build_len, reg_block_len, havebuf)
         if i == combine_len and left_over == 0:
             break
         block_pos = pos + i * 2 * build_len
-        block_count = (left_over if i == combine_len else 2 * build_len) // reg_block_len
+        block_count = (
+            left_over if i == combine_len else 2 * build_len
+        ) // reg_block_len
         insert_sort(arr, key_pos, block_count + (1 if i == combine_len else 0))
         midkey = build_len // reg_block_len
         for index in range(1, block_count):
@@ -278,21 +305,40 @@ def combine_blocks(arr, key_pos, pos, length, build_len, reg_block_len, havebuf)
             for right_index in range(index, block_count):
                 a = arr[block_pos + left_index * reg_block_len]
                 b = arr[block_pos + right_index * reg_block_len]
-                if a > b or (a == b and arr[key_pos + left_index] > arr[key_pos + right_index]):
+                if a > b or (
+                    a == b and arr[key_pos + left_index] > arr[key_pos + right_index]
+                ):
                     left_index = right_index
             if left_index != index - 1:
-                multi_swap(arr, block_pos + (index - 1) * reg_block_len, block_pos + left_index * reg_block_len, reg_block_len)
+                multi_swap(
+                    arr,
+                    block_pos + (index - 1) * reg_block_len,
+                    block_pos + left_index * reg_block_len,
+                    reg_block_len,
+                )
                 swap(arr, key_pos + (index - 1), key_pos + left_index)
                 if midkey == index - 1 or midkey == left_index:
                     midkey ^= (index - 1) ^ left_index
         a_block_count = 0
         last_len = (left_over % reg_block_len) if i == combine_len else 0
         if last_len != 0:
-            while a_block_count < block_count and arr[block_pos + block_count * reg_block_len] < arr[
-                    block_pos + (block_count - a_block_count - 1) * reg_block_len]:
+            while (
+                a_block_count < block_count
+                and arr[block_pos + block_count * reg_block_len]
+                < arr[block_pos + (block_count - a_block_count - 1) * reg_block_len]
+            ):
                 a_block_count += 1
-        merge_buffers_left(arr, key_pos, key_pos + midkey, block_pos, block_count - a_block_count,
-                            reg_block_len, havebuf, a_block_count, last_len)
+        merge_buffers_left(
+            arr,
+            key_pos,
+            key_pos + midkey,
+            block_pos,
+            block_count - a_block_count,
+            reg_block_len,
+            havebuf,
+            a_block_count,
+            last_len,
+        )
     if havebuf:
         while length > 0:
             length -= 1
@@ -355,7 +401,15 @@ def common_sort(arr, pos, length):
                     calc_keys *= 2
                     i //= 8
                 reg_block_len = (2 * build_len) // calc_keys
-        combine_blocks(arr, pos, pos + dist, length - dist, build_len, reg_block_len, build_buf_enabled)
+        combine_blocks(
+            arr,
+            pos,
+            pos + dist,
+            length - dist,
+            build_len,
+            reg_block_len,
+            build_buf_enabled,
+        )
     insert_sort(arr, pos, dist)
     merge_without_buffer(arr, pos, dist, length - dist)
 

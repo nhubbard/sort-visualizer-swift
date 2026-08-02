@@ -59,7 +59,9 @@ def merge_without_buffer(arr, pos, len1, len2):
                 break
             while True:
                 len2 -= 1
-                if not (len2 != 0 and arr[pos + len1 - 1] <= arr[pos + len1 + len2 - 1]):
+                if not (
+                    len2 != 0 and arr[pos + len1 - 1] <= arr[pos + len1 + len2 - 1]
+                ):
                     break
 
 

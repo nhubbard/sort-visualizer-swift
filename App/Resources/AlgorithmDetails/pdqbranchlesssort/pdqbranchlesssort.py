@@ -84,7 +84,9 @@ def sort_three(arr, a, b, c):
     sort_two(arr, a, b)
 
 
-def swap_offsets(arr, first, last, left_offsets, left_pos, right_offsets, right_pos, num, use_swaps):
+def swap_offsets(
+    arr, first, last, left_offsets, left_pos, right_offsets, right_pos, num, use_swaps
+):
     if use_swaps:
         for i in range(num):
             li = first + left_offsets[left_pos + i]
@@ -150,7 +152,17 @@ def part_right_branchless(arr, begin, end, left_offsets, right_offsets):
                     right_num += 1
 
         num = min(left_num, right_num)
-        swap_offsets(arr, first, last, left_offsets, left_start, right_offsets, right_start, num, left_num == right_num)
+        swap_offsets(
+            arr,
+            first,
+            last,
+            left_offsets,
+            left_start,
+            right_offsets,
+            right_start,
+            num,
+            left_num == right_num,
+        )
         left_num -= num
         right_num -= num
         left_start += num
@@ -162,7 +174,9 @@ def part_right_branchless(arr, begin, end, left_offsets, right_offsets):
 
     left_size = 0
     right_size = 0
-    unknown_left = (last - first) - (BLOCK_SIZE if (right_num != 0 or left_num != 0) else 0)
+    unknown_left = (last - first) - (
+        BLOCK_SIZE if (right_num != 0 or left_num != 0) else 0
+    )
     if right_num != 0:
         left_size = unknown_left
         right_size = BLOCK_SIZE
@@ -192,7 +206,17 @@ def part_right_branchless(arr, begin, end, left_offsets, right_offsets):
                 right_num += 1
 
     num = min(left_num, right_num)
-    swap_offsets(arr, first, last, left_offsets, left_start, right_offsets, right_start, num, left_num == right_num)
+    swap_offsets(
+        arr,
+        first,
+        last,
+        left_offsets,
+        left_start,
+        right_offsets,
+        right_start,
+        num,
+        left_num == right_num,
+    )
     left_num -= num
     right_num -= num
     left_start += num
@@ -274,7 +298,10 @@ def heap_sort(arr, begin, end):
             if child + 1 < size and arr[begin + child] < arr[begin + child + 1]:
                 child += 1
             if arr[begin + root] < arr[begin + child]:
-                arr[begin + root], arr[begin + child] = arr[begin + child], arr[begin + root]
+                arr[begin + root], arr[begin + child] = (
+                    arr[begin + child],
+                    arr[begin + root],
+                )
                 root = child
             else:
                 break
@@ -303,7 +330,9 @@ def pdq_loop(arr, begin, end, bad_allowed, left_offsets, right_offsets):
             sort_three(arr, begin, begin + half_size, end - 1)
             sort_three(arr, begin + 1, begin + half_size - 1, end - 2)
             sort_three(arr, begin + 2, begin + half_size + 1, end - 3)
-            sort_three(arr, begin + half_size - 1, begin + half_size, begin + half_size + 1)
+            sort_three(
+                arr, begin + half_size - 1, begin + half_size, begin + half_size + 1
+            )
             arr[begin], arr[begin + half_size] = arr[begin + half_size], arr[begin]
         else:
             sort_three(arr, begin + half_size, begin, end - 1)
@@ -312,7 +341,9 @@ def pdq_loop(arr, begin, end, bad_allowed, left_offsets, right_offsets):
             begin = part_left(arr, begin, end) + 1
             continue
 
-        pivot_pos, already_parted = part_right_branchless(arr, begin, end, left_offsets, right_offsets)
+        pivot_pos, already_parted = part_right_branchless(
+            arr, begin, end, left_offsets, right_offsets
+        )
 
         left_size = pivot_pos - begin
         right_size = end - (pivot_pos + 1)
@@ -325,24 +356,64 @@ def pdq_loop(arr, begin, end, bad_allowed, left_offsets, right_offsets):
                 return
 
             if left_size >= INSERT_SORT_THRESHOLD:
-                arr[begin], arr[begin + left_size // 4] = arr[begin + left_size // 4], arr[begin]
-                arr[pivot_pos - 1], arr[pivot_pos - left_size // 4] = arr[pivot_pos - left_size // 4], arr[pivot_pos - 1]
+                arr[begin], arr[begin + left_size // 4] = (
+                    arr[begin + left_size // 4],
+                    arr[begin],
+                )
+                arr[pivot_pos - 1], arr[pivot_pos - left_size // 4] = (
+                    arr[pivot_pos - left_size // 4],
+                    arr[pivot_pos - 1],
+                )
                 if left_size > NINTHER_THRESHOLD:
-                    arr[begin + 1], arr[begin + (left_size // 4 + 1)] = arr[begin + (left_size // 4 + 1)], arr[begin + 1]
-                    arr[begin + 2], arr[begin + (left_size // 4 + 2)] = arr[begin + (left_size // 4 + 2)], arr[begin + 2]
-                    arr[pivot_pos - 2], arr[pivot_pos - (left_size // 4 + 1)] = arr[pivot_pos - (left_size // 4 + 1)], arr[pivot_pos - 2]
-                    arr[pivot_pos - 3], arr[pivot_pos - (left_size // 4 + 2)] = arr[pivot_pos - (left_size // 4 + 2)], arr[pivot_pos - 3]
+                    arr[begin + 1], arr[begin + (left_size // 4 + 1)] = (
+                        arr[begin + (left_size // 4 + 1)],
+                        arr[begin + 1],
+                    )
+                    arr[begin + 2], arr[begin + (left_size // 4 + 2)] = (
+                        arr[begin + (left_size // 4 + 2)],
+                        arr[begin + 2],
+                    )
+                    arr[pivot_pos - 2], arr[pivot_pos - (left_size // 4 + 1)] = (
+                        arr[pivot_pos - (left_size // 4 + 1)],
+                        arr[pivot_pos - 2],
+                    )
+                    arr[pivot_pos - 3], arr[pivot_pos - (left_size // 4 + 2)] = (
+                        arr[pivot_pos - (left_size // 4 + 2)],
+                        arr[pivot_pos - 3],
+                    )
 
             if right_size >= INSERT_SORT_THRESHOLD:
-                arr[pivot_pos + 1], arr[pivot_pos + (1 + right_size // 4)] = arr[pivot_pos + (1 + right_size // 4)], arr[pivot_pos + 1]
-                arr[end - 1], arr[end - right_size // 4] = arr[end - right_size // 4], arr[end - 1]
+                arr[pivot_pos + 1], arr[pivot_pos + (1 + right_size // 4)] = (
+                    arr[pivot_pos + (1 + right_size // 4)],
+                    arr[pivot_pos + 1],
+                )
+                arr[end - 1], arr[end - right_size // 4] = (
+                    arr[end - right_size // 4],
+                    arr[end - 1],
+                )
                 if right_size > NINTHER_THRESHOLD:
-                    arr[pivot_pos + 2], arr[pivot_pos + (2 + right_size // 4)] = arr[pivot_pos + (2 + right_size // 4)], arr[pivot_pos + 2]
-                    arr[pivot_pos + 3], arr[pivot_pos + (3 + right_size // 4)] = arr[pivot_pos + (3 + right_size // 4)], arr[pivot_pos + 3]
-                    arr[end - 2], arr[end - (1 + right_size // 4)] = arr[end - (1 + right_size // 4)], arr[end - 2]
-                    arr[end - 3], arr[end - (2 + right_size // 4)] = arr[end - (2 + right_size // 4)], arr[end - 3]
+                    arr[pivot_pos + 2], arr[pivot_pos + (2 + right_size // 4)] = (
+                        arr[pivot_pos + (2 + right_size // 4)],
+                        arr[pivot_pos + 2],
+                    )
+                    arr[pivot_pos + 3], arr[pivot_pos + (3 + right_size // 4)] = (
+                        arr[pivot_pos + (3 + right_size // 4)],
+                        arr[pivot_pos + 3],
+                    )
+                    arr[end - 2], arr[end - (1 + right_size // 4)] = (
+                        arr[end - (1 + right_size // 4)],
+                        arr[end - 2],
+                    )
+                    arr[end - 3], arr[end - (2 + right_size // 4)] = (
+                        arr[end - (2 + right_size // 4)],
+                        arr[end - 3],
+                    )
         else:
-            if already_parted and partial_insert_sort(arr, begin, pivot_pos) and partial_insert_sort(arr, pivot_pos + 1, end):
+            if (
+                already_parted
+                and partial_insert_sort(arr, begin, pivot_pos)
+                and partial_insert_sort(arr, pivot_pos + 1, end)
+            ):
                 return
 
         pdq_loop(arr, begin, pivot_pos, bad_allowed, left_offsets, right_offsets)

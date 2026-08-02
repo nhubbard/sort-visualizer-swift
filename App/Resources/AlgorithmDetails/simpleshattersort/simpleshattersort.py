@@ -9,7 +9,7 @@ def insertion_sort(arr, start, end):
 
 
 def shatter_partition(arr, start, length, num):
-    window = arr[start:start + length]
+    window = arr[start : start + length]
     min_v = min(window)
     max_v = max(window)
     value_range = max_v - min_v + 1

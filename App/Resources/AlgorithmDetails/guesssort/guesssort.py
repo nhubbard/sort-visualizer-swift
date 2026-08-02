@@ -11,9 +11,12 @@ def sort(arr):
                     total += 1
         for i in range(n):
             for j in range(n):
-                if i < j and arr[loops[i]] > arr[loops[j]]:
-                    total += 1
-                elif i > j and arr[loops[i]] < arr[loops[j]]:
+                if (
+                    i < j
+                    and arr[loops[i]] > arr[loops[j]]
+                    or i > j
+                    and arr[loops[i]] < arr[loops[j]]
+                ):
                     total += 1
         return total == n
 

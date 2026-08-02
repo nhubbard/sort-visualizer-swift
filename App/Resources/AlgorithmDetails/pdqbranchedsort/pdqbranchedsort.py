@@ -152,7 +152,10 @@ def heap_sort(arr, begin, end):
             if child + 1 < size and arr[begin + child] < arr[begin + child + 1]:
                 child += 1
             if arr[begin + root] < arr[begin + child]:
-                arr[begin + root], arr[begin + child] = arr[begin + child], arr[begin + root]
+                arr[begin + root], arr[begin + child] = (
+                    arr[begin + child],
+                    arr[begin + root],
+                )
                 root = child
             else:
                 break
@@ -181,7 +184,9 @@ def pdq_loop(arr, begin, end, bad_allowed):
             sort_three(arr, begin, begin + half_size, end - 1)
             sort_three(arr, begin + 1, begin + half_size - 1, end - 2)
             sort_three(arr, begin + 2, begin + half_size + 1, end - 3)
-            sort_three(arr, begin + half_size - 1, begin + half_size, begin + half_size + 1)
+            sort_three(
+                arr, begin + half_size - 1, begin + half_size, begin + half_size + 1
+            )
             arr[begin], arr[begin + half_size] = arr[begin + half_size], arr[begin]
         else:
             sort_three(arr, begin + half_size, begin, end - 1)
@@ -203,24 +208,64 @@ def pdq_loop(arr, begin, end, bad_allowed):
                 return
 
             if left_size >= INSERT_SORT_THRESHOLD:
-                arr[begin], arr[begin + left_size // 4] = arr[begin + left_size // 4], arr[begin]
-                arr[pivot_pos - 1], arr[pivot_pos - left_size // 4] = arr[pivot_pos - left_size // 4], arr[pivot_pos - 1]
+                arr[begin], arr[begin + left_size // 4] = (
+                    arr[begin + left_size // 4],
+                    arr[begin],
+                )
+                arr[pivot_pos - 1], arr[pivot_pos - left_size // 4] = (
+                    arr[pivot_pos - left_size // 4],
+                    arr[pivot_pos - 1],
+                )
                 if left_size > NINTHER_THRESHOLD:
-                    arr[begin + 1], arr[begin + (left_size // 4 + 1)] = arr[begin + (left_size // 4 + 1)], arr[begin + 1]
-                    arr[begin + 2], arr[begin + (left_size // 4 + 2)] = arr[begin + (left_size // 4 + 2)], arr[begin + 2]
-                    arr[pivot_pos - 2], arr[pivot_pos - (left_size // 4 + 1)] = arr[pivot_pos - (left_size // 4 + 1)], arr[pivot_pos - 2]
-                    arr[pivot_pos - 3], arr[pivot_pos - (left_size // 4 + 2)] = arr[pivot_pos - (left_size // 4 + 2)], arr[pivot_pos - 3]
+                    arr[begin + 1], arr[begin + (left_size // 4 + 1)] = (
+                        arr[begin + (left_size // 4 + 1)],
+                        arr[begin + 1],
+                    )
+                    arr[begin + 2], arr[begin + (left_size // 4 + 2)] = (
+                        arr[begin + (left_size // 4 + 2)],
+                        arr[begin + 2],
+                    )
+                    arr[pivot_pos - 2], arr[pivot_pos - (left_size // 4 + 1)] = (
+                        arr[pivot_pos - (left_size // 4 + 1)],
+                        arr[pivot_pos - 2],
+                    )
+                    arr[pivot_pos - 3], arr[pivot_pos - (left_size // 4 + 2)] = (
+                        arr[pivot_pos - (left_size // 4 + 2)],
+                        arr[pivot_pos - 3],
+                    )
 
             if right_size >= INSERT_SORT_THRESHOLD:
-                arr[pivot_pos + 1], arr[pivot_pos + (1 + right_size // 4)] = arr[pivot_pos + (1 + right_size // 4)], arr[pivot_pos + 1]
-                arr[end - 1], arr[end - right_size // 4] = arr[end - right_size // 4], arr[end - 1]
+                arr[pivot_pos + 1], arr[pivot_pos + (1 + right_size // 4)] = (
+                    arr[pivot_pos + (1 + right_size // 4)],
+                    arr[pivot_pos + 1],
+                )
+                arr[end - 1], arr[end - right_size // 4] = (
+                    arr[end - right_size // 4],
+                    arr[end - 1],
+                )
                 if right_size > NINTHER_THRESHOLD:
-                    arr[pivot_pos + 2], arr[pivot_pos + (2 + right_size // 4)] = arr[pivot_pos + (2 + right_size // 4)], arr[pivot_pos + 2]
-                    arr[pivot_pos + 3], arr[pivot_pos + (3 + right_size // 4)] = arr[pivot_pos + (3 + right_size // 4)], arr[pivot_pos + 3]
-                    arr[end - 2], arr[end - (1 + right_size // 4)] = arr[end - (1 + right_size // 4)], arr[end - 2]
-                    arr[end - 3], arr[end - (2 + right_size // 4)] = arr[end - (2 + right_size // 4)], arr[end - 3]
+                    arr[pivot_pos + 2], arr[pivot_pos + (2 + right_size // 4)] = (
+                        arr[pivot_pos + (2 + right_size // 4)],
+                        arr[pivot_pos + 2],
+                    )
+                    arr[pivot_pos + 3], arr[pivot_pos + (3 + right_size // 4)] = (
+                        arr[pivot_pos + (3 + right_size // 4)],
+                        arr[pivot_pos + 3],
+                    )
+                    arr[end - 2], arr[end - (1 + right_size // 4)] = (
+                        arr[end - (1 + right_size // 4)],
+                        arr[end - 2],
+                    )
+                    arr[end - 3], arr[end - (2 + right_size // 4)] = (
+                        arr[end - (2 + right_size // 4)],
+                        arr[end - 3],
+                    )
         else:
-            if already_parted and partial_insert_sort(arr, begin, pivot_pos) and partial_insert_sort(arr, pivot_pos + 1, end):
+            if (
+                already_parted
+                and partial_insert_sort(arr, begin, pivot_pos)
+                and partial_insert_sort(arr, pivot_pos + 1, end)
+            ):
                 return
 
         pdq_loop(arr, begin, pivot_pos, bad_allowed)
