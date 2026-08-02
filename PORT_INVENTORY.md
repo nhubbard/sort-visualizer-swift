@@ -70,64 +70,58 @@ cluster together rather than picking its members apart on separate days:
 
 #### Completed
 
-- [x] BubbleBogoSort (Bogo family) — deterministic substitute, not a literal port: repeatedly
-      sweeps every adjacent pair left-to-right and swaps whenever inverted (exactly bubble sort's
-      own mechanic) instead of ArrayV's random-adjacent-pair-pick, since every accepted swap
-      strictly fixes one inversion regardless of which pair gets picked when. Genuinely O(n^2) now
-      (not factorial), so shipped with a much larger `sizeRange` (16...256) than a typical bogo
-      variant, matching `ExchangeBogoSort`'s own precedent.
-- [x] StablePermutationSort (Bogo family) — already fully deterministic in ArrayV (no `randInt` in
-      the Java source) — a faithful port, not a redesign. Heap's-algorithm walk over an index array
-      with a *rotation* (not a swap) as the step-to-next-arrangement move. **Despite the name, it's
-      not actually stable** — fuzzed empirically after a careful, faithful translation still
-      reordered ties in ~40% of duplicate-heavy trials; shipped as `stable: false`, the same "name
-      promises more than the algorithm delivers" surprise `FunSort` already has documented above.
-- [x] ShoveSort — faithful port. Scans left to right; an out-of-order adjacent pair triggers a
-      chain of adjacent swaps ("shove") that rotates the offending element to the very end of the
-      range, then backs up one index to recheck. ArrayV's own `setCategory` call for this one is
-      also `"Impractical Sorts"` despite living in `sorts/exchange/` (the same override
-      `QuadStoogeSort`/`BogoSort` need) — ported as `.impractical`. Fuzzed `stable: false`.
-- [x] SillySort — faithful port of Tom Duff's classic joke sort. Its recurrence
-      (`T(n) = 2T(n/2) + T(n-1)`) is identical in shape to `SlowSort`'s, so it shares that port's
-      `O(n^log n)` explosive growth and reuses its exact `sizeRange` (`16...64`) rather than
-      ArrayV's own more permissive `unreasonableLimit(150)`. Fuzzed `stable: false`.
-- [x] QuadStoogeSort — faithful port, `.impractical` category per the note already here. Six
-      recursive calls of ~half the range each give `O(n^(log2 6)) ≈ O(n^2.585)` — a lower exponent
-      than plain `StoogeSort`'s `O(n^2.71))` despite twice as many recursive calls per level.
-      Fuzzed `stable: false`.
-- [x] OptimizedStoogeSortStudio — faithful port. ArrayV's own doc comment claims both a real
-      complexity improvement (`O(n^2)` worst / `O(n)` best, vs. plain Stooge's `O(n^2.71)`) *and*
-      stability — unlike `StablePermutationSort`'s similar claim, this one fuzzed `stable: true`
-      as documented, confirmed via a dedicated empirical test rather than trusted on the comment
-      alone.
-- [x] OptimizedStoogeSort — faithful port of the Kishor/Singh technique (distinct from
-      `OptimizedStoogeSortStudio` despite the near-identical name): one bidirectional
-      converging-pointer pass followed by two shrinking-triangle iterative passes. Fuzzed
-      `stable: false`.
-
-##### Decision required
-
-- [~] FunSort — 88 lines. **Do not port as a literal translation.** ArrayV's own algorithm
-      (`Reads.compareIndices(array, pos, i, 0, false) != 0`, which resolves to a plain value
-      comparison per `Reads.compareIndices`'s implementation) treats "the binary search landed on
-      *some* index holding an equal value" as sufficient to mark index `i` permanently settled, even
-      when that index isn't `i`'s own eventual home. On duplicate-heavy input this repeatedly leaves
-      the array genuinely **unsorted** (not merely unstable) once the loop moves past `i` and never
-      revisits it — confirmed against a faithful line-for-line Python re-implementation of the Java
-      source itself (i.e. not a porting bug): 1,680/2,000 randomized duplicate-heavy trials (values
-      drawn from a small range, sizes 2–24) ended with an unsorted final array, e.g. `[3, 0, 5, 3, 1,
-      0] -> [0, 1, 3, 3, 5, 0]`. 2,000/2,000 trials with all-distinct values passed, so the defect is
-      specific to duplicates. This codebase's own `NativeAlgorithmCorrectnessTests` mandates that
-      *every* registered algorithm sorts duplicate-heavy input correctly with no exceptions, so a
-      literal port cannot be registered as-is — either find/design a corrected convergence check
-      before porting (which would no longer be a faithful translation) or skip this one.
-
-##### Medium
-
-- [ ] CompleteGraphSort — 109 lines
-- [ ] StableQuickSort — 112 lines
-- [ ] ForcedStableQuickSort — 115 lines
-- [ ] TableSort — 132 lines
+- [x] CompleteGraphSort — faithful port of the sorting network (recursive `split` compare-swapping
+      across a doubling stride). `compSwap` only swaps on a strict `>`, never a tie, but fuzzing
+      shows that alone doesn't preserve relative order — 50/50 randomized duplicate-heavy trials
+      found reordering, confirming this is not a stable sort (ArrayV itself makes no stability
+      claim for it).
+- [x] StableQuickSort — faithful port of Rodney Shaghoulian's O(n)-extra-space partition: a single
+      left-to-right scan appends each element to a "less than pivot" or "not less than pivot" list
+      in encounter order, then writes `leftList + pivot + rightList` back. No in-place swaps at all
+      (every array mutation is a plain write), so the standard swap-tape-shadow stability fuzz test
+      other algorithms in this batch use doesn't apply — genuinely stable by construction instead
+      (a single order-preserving scan into order-preserving lists cannot reorder ties), verified by
+      reading the mechanism rather than by fuzzing swaps that never happen. No dedicated stability
+      test, matching the existing `CountingSort`/`SimplifiedLibrarySort`/`CycleSort` precedent for
+      write-only algorithms.
+- [x] ForcedStableQuickSort — faithful port of the median-of-three Hoare quicksort forced stable via
+      an external `key` array (`Writes.createExternalArray` mirrored as an aux handle + shadow
+      `[Int]`, the same pattern `MergeSort`/`SimplifiedLibrarySort` already use) swapped in lockstep
+      with every real swap, tie-breaking on `key`'s original order. Fuzzed genuinely stable — the
+      whole point of the "forced" in its name holds up.
+- [x] TableSort — same median-of-three Hoare quicksort shape as `ForcedStableQuickSort`, but
+      quicksorts an index permutation `table` instead of the real array, applying the finished
+      permutation at the end. **Port decision**: ArrayV's own final-apply step is write-only (a
+      held temp value walked around each cycle via `Writes.write`), which would emit zero `.swap`
+      operations on the real array in a literal port — making the swap-tape-shadow stability fuzz
+      test blind to this algorithm (the shadow would never move, trivially "passing" regardless of
+      ground truth). Ported the apply step as a swap-based cycle-follow instead (`swap(a1,a2),
+      swap(a2,a3), ..., swap(a(k-1),ak)` for a cycle `(a1->a2->...->ak)`), which produces an
+      identical final array to the write+temp version — verified by hand before porting — in
+      exchange for a working stability test. Fuzzed genuinely stable.
+- [x] FunSort — 88 lines. Previously "Decision required" (skipped in an earlier batch as
+      not-portable-as-a-faithful-translation) — revisited on request to fix rather than skip, and
+      to make it stable while at it. ArrayV's
+      own convergence check (`Reads.compareIndices(array, pos, i, ...) != 0`, a plain *value*
+      comparison) treats "the binary search landed on *some* index holding an equal value" as
+      sufficient to mark index `i` permanently settled, even when that index isn't `i`'s own
+      eventual home — on duplicate-heavy input this left the array genuinely **unsorted** (not
+      merely unstable) ~87% of the time (confirmed via a faithful Python re-implementation: 1,749/
+      2,000 randomized trials, sizes 2–24, values drawn from a small range). A **second, previously
+      latent** defect surfaced while designing the fix: ArrayV's own swap rule has a silent no-op
+      case (`pos == i + 1` triggers neither of its two swap conditions) that never surfaced because
+      the value-equality bug always terminated first — fixing defect #1 alone would have exposed
+      defect #2 as a genuine infinite loop. **The fix**: compare elements by a tie-free composite
+      key of `(value, originalIndex)` instead of value alone (a `key` array in the same style as
+      `ForcedStableQuickSort`/`TableSort`'s external index arrays above), so "the search finds `i`
+      itself" becomes a well-defined fixed point instead of a value-equality shortcut, and the
+      `pos == i + 1` gap gets an explicit forced swap instead of a no-op. Tie-breaking by original
+      index also makes the sort genuinely stable as a side effect, for free. Validated by fuzzing
+      the exact design in Python first (~7,700 randomized trials — duplicate-heavy and all-distinct,
+      sizes 2–256, plus adversarial already-sorted/reverse-sorted/all-equal inputs — zero wrong
+      results, zero non-termination, zero instability) before porting to Swift, then re-confirmed
+      with a dedicated 1,400-trial duplicate-heavy fuzz test and a stability fuzz test in the real
+      engine.
 
 ### b. Insertion sorts (`sorts/insert/`, 18)
 
@@ -160,37 +154,7 @@ Move algorithms here when you finish them.
 
 #### Completed
 
-- [x] BinomialSmoothSort — recursive `thrift(node, parent, root)` over an implicit binomial-heap
-      structure, translated line-for-line (down to the exact boolean-flag threading between
-      recursive calls) rather than re-derived, since subtly wrong `parent`/`root` interplay would
-      silently change which nodes get compared.
-- [x] BinomialHeapSort — 1-indexed bit-arithmetic binomial-heap sort; same "translate the index
-      bookkeeping exactly, only convert to 0-indexed at the point of an actual engine call" approach.
-- [x] FlippedMinHeapSort — an ordinary min-heap sort with every array access mirrored through
-      `array[length - p]`; a single `idx(_:)` helper applies that mirroring consistently.
-- [x] BottomUpHeapSort — the Wikipedia "bottom-up heapsort" optimization: descend straight to a
-      leaf via always the larger child (no comparisons against the sift value), then climb back up
-      to find where it belongs, then shift the path — fewer comparisons than plain sift-down.
-- [x] LazyHeapSort — not actually heap-based despite the name: a sqrt-decomposition block-selection
-      sort. **Real bug found and fixed**: `maxToFront`'s inner scan, translated as a Swift
-      `(a+1)..<b` Range, traps when `b <= a` (a real, reachable case once a block empties down to
-      nothing) — Java's `for (i=a+1; i<b; i++)` just silently doesn't execute in that case, but
-      Swift's `Range` validates `lowerBound <= upperBound` eagerly at construction. Fixed by using
-      a `while` loop instead, matching Java's lazy condition check. Confirmed via macOS crash
-      report analysis (`~/Library/Logs/DiagnosticReports/xctest-*.ips`) pointing straight at the
-      exact line, then a targeted duplicate-heavy + varied-size fuzz test
-      (`heapVariantBatchDuplicateHeavyFuzz`) added as a permanent regression guard.
-- [x] TernaryHeapSort — extract-max heapsort with 3 children per node instead of 2 (fixed at 3,
-      unlike `BaseNMaxHeapSort`'s runtime `base`). ArrayV's own heapify loop start (`length - 1/3`)
-      is a Java operator-precedence artifact evaluating to a provable no-op call — skipped rather
-      than replicated.
-- [x] WeakHeapSort — relaxed heap invariant tracked via one reverse-bit per index instead of full
-      per-level ordering. ArrayV bit-packs the flags into a byte array; ported as a plain `Bool`
-      array instead (a memory micro-optimization irrelevant to this port, not a behavior change).
-- [x] AsynchronousSort — not heap-based at all despite living among the heap variants: a
-      counting/threshold-scan sort (same family as `CountingSort`), reading `engine.values` directly
-      for its value-dependent decisions. ArrayV's own trailing `InsertionSort` cleanup pass
-      ("necessary for floats") is provably a no-op for this `Int`-only engine and is omitted.
+Move algorithms here when you finish them.
 
 #### Not Started
 
@@ -215,42 +179,7 @@ see Completed above.)
 
 #### Completed
 
-- [x] RandomGuessSort (Bogo family) — deterministic substitute: borrows `OptimizedGuessSort`'s own
-      odometer technique (ArrayV's own later, already-deterministic descendant of this algorithm)
-      instead of re-deriving a different one, since it's the same `n^n` guess space either way.
-- [x] OptimizedGuessSort (Bogo family) — already fully deterministic in ArrayV, faithful port. A
-      base-`n` odometer over `n^n` index guesses (a bigger space than the `n!` permutation-walk
-      family), validated at its own upper-bound size (8) to confirm practical runtime.
-- [x] SmartGuessSort (Bogo family) — already fully deterministic in ArrayV, faithful port. Same
-      odometer as `OptimizedGuessSort`, but skip-ahead-optimized (only resets the prefix before the
-      first failing pair instead of restarting from position 0) — confirmed empirically dramatically
-      cheaper in practice, hence the much larger `sizeRange` (19) than the plain odometer siblings.
-- [x] GuessSort (Bogo family) — already fully deterministic in ArrayV, faithful port. Same odometer,
-      but validates via an O(n^2) brute-force pair count instead of an adjacent-pair scan — the
-      slowest member of the family per state checked, which set its own smaller `sizeRange` (7).
-- [x] DeterministicBogoSort (Bogo family) — already fully deterministic in ArrayV (true to its
-      name), faithful port. Heap's algorithm via forward recursion, the same technique `BozoSort`
-      already ported just structured depth-up instead of k-down.
-- [x] MedianQuickBogoSort (Bogo family) — deterministic substitute: sub-range lexicographic
-      permutation walk (same technique `LessBogoSort`/`CocktailBogoSort` already use) checking a
-      median-count split instead of full sortedness, in place of ArrayV's random reshuffle-until-split.
-- [x] SelectionBogoSort (Bogo family) — deterministic substitute, and the cheapest rewrite in the
-      whole cluster: the range's true minimum is always reachable in exactly one deterministic sweep
-      (literally selection sort's own inner loop), so no repeated-retry technique is needed at all.
-      Shipped with a much larger `sizeRange` (16...256) than a typical bogo variant, matching
-      `ExchangeBogoSort`'s own precedent for "the deterministic substitute made this genuinely cheap."
-- [x] SmartBogoBogoSort (Bogo family) — deterministic substitute: sub-range permutation walk of the
-      whole range, retried after each recursive re-sort of the prefix, in place of ArrayV's random
-      whole-range reshuffle.
-- [x] QuickBogoSort (Bogo family) — deterministic substitute: sub-range permutation walk checking a
-      partition around a tracked pivot *position* (updated through both the swap AND the reversal
-      each permutation step performs, mirroring ArrayV's own per-swap pivot bookkeeping) in place of
-      the random Fisher–Yates-with-pivot-tracking reshuffle.
-- [x] MergeBogoSort (Bogo family) — deterministic substitute, and the one member needing a genuinely
-      new primitive: after the two recursive halves are already sorted, walks every bitmask with the
-      correct popcount (in place of ArrayV's random weave-until-sorted) to find the correct
-      interleaving. Uses a real aux array for the pre-weave snapshot (matching `MergeSort.swift`'s
-      own convention) instead of ArrayV's trick of reusing the main array itself as mask scratch space.
+Move algorithms here when you finish them.
 
 #### Not Started
 
@@ -422,8 +351,6 @@ Forty-five in ArrayV's `Shuffles.java` enum — no subdirectories, listed flat. 
 doesn't map 1:1 onto ArrayV's list — noted inline where there's a rough equivalent.
 
 ### a. Completed
-
-#### Completed
 
 Move shuffles here when you finish them.
 

@@ -179,8 +179,16 @@ def _log_subprocess_failure(
     logger.error(error.stderr.decode("utf-8", "replace").strip())
 
 
-def _check_output(filename: str, algorithm: str, output: str) -> bool:
+def _check_output(
+    filename: str,
+    algorithm: str,
+    output: str,
+    normalize: Callable[[str], str] | None = None,
+) -> bool:
     expected = get_expected(algorithm)
+    if normalize is not None:
+        expected = normalize(expected)
+        output = normalize(output)
     if expected != output:
         logger.error(f"{filename}: Failed! Expected {expected}, found {output}")
         return False
@@ -221,9 +229,6 @@ class LanguageTest:
     run: Callable[[Path, str], list[str]]
     artifacts: Callable[[Path, str], list[Path]]
     normalize: Callable[[str], str] | None = None
-
-    def normalize_output(self, output: str) -> str:
-        return output if self.normalize is None else self.normalize(output)
 
 
 LANGUAGE_TESTS: dict[str, LanguageTest] = {
@@ -301,7 +306,7 @@ def run_language_test(spec: LanguageTest, filename: str) -> bool:
         _log_subprocess_failure("Execution", filename, e)
         _cleanup(artifacts)
         return False
-    passed = _check_output(filename, algorithm, spec.normalize_output(output))
+    passed = _check_output(filename, algorithm, output, spec.normalize)
     _cleanup(artifacts)
     return passed
 

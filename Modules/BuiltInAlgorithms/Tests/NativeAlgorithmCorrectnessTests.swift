@@ -19,9 +19,11 @@ struct NativeAlgorithmCorrectnessTests {
     BurntPancakeSort(),
     CircleSortIterative(), CircleSortRecursive(), CircloidSort(),
     ClassicThreeSmoothCombSort(), ClassicTreeSort(), CocktailBogoSort(),
-    CocktailMergeSort(), CocktailShakerSort(), CombSort(), CountingSort(), CycleSort(),
+    CocktailMergeSort(), CocktailShakerSort(), CombSort(), CompleteGraphSort(), CountingSort(),
+    CycleSort(),
     DeterministicBogoSort(), DiamondSortRecursive(), DoubleInsertionSort(), DoubleSelectionSort(),
-    DualPivotQuickSort(), ExchangeBogoSort(), FlashSort(), FlippedMinHeapSort(), GnomeSort(),
+    DualPivotQuickSort(), ExchangeBogoSort(), FlashSort(), FlippedMinHeapSort(),
+    ForcedStableQuickSort(), FunSort(), GnomeSort(),
     GravitySort(),
     GuessSort(), HybridCombSort(), InPlaceMergeSort(), InsertionSort(), IntroCircleSortIterative(),
     IntroSort(), LazyHeapSort(), LessBogoSort(), LLQuickSort(), LRQuickSort(), LSDRadixSort(),
@@ -37,9 +39,11 @@ struct NativeAlgorithmCorrectnessTests {
     SelectionSort(), ShellSort(), ShoveSort(), SillySort(),
     SimplifiedLibrarySort(), SlopeSort(), SlowSort(), SmartBogoBogoSort(), SmartGuessSort(),
     SnuffleSort(), StableCycleSort(),
-    StablePermutationSort(), StableSelectionSort(), StaticSort(), StoogeSort(), StrandSort(),
+    StablePermutationSort(), StableQuickSort(), StableSelectionSort(), StaticSort(), StoogeSort(),
+    StrandSort(),
     SwaplessBubbleSort(),
-    TernaryHeapSort(), TernaryLLQuickSort(), TernaryLRQuickSort(), ThreeSmoothCombSortIterative(),
+    TableSort(), TernaryHeapSort(), TernaryLLQuickSort(), TernaryLRQuickSort(),
+    ThreeSmoothCombSortIterative(),
     ThreeSmoothCombSortRecursive(), TriangularHeapSort(), UnoptimizedBubbleSort(),
     UnoptimizedCocktailShakerSort(), WeakHeapSort(), WeavedMergeSort(), WeaveMergeSort()
   ]
@@ -801,5 +805,178 @@ struct NativeAlgorithmCorrectnessTests {
       randomized duplicate-heavy trials, confirming it is not a stable sort
       """
     )
+  }
+
+  /// `CompleteGraphSort`'s `compSwap` only ever swaps on a strict `>`, never on equal values, but
+  /// fuzzing shows that alone doesn't guarantee the network preserves relative order overall: the
+  /// non-adjacent, independently-chosen pairs compared at each stride can still carry two
+  /// equal-valued elements past each other via separate swaps against a shared third element,
+  /// failing all 50/50 randomized duplicate-heavy trials.
+  @Test
+  func completeGraphSortTiedElementsCanLoseTheirOriginalRelativeOrder() {
+    let algorithm = CompleteGraphSort()
+    let size = algorithm.metadata.sizeRange.lowerBound
+    var sawReordering = false
+
+    for _ in 0..<50 {
+      let input = (0..<size).map { _ in Int.random(in: 0...3) }
+      var engine = RecordingEngine(values: input)
+      algorithm.record(into: &engine)
+
+      var shadow = Array(0..<size)
+      for operation in engine.finish().tape {
+        if case .swap(let i, let j) = operation {
+          shadow.swapAt(i, j)
+        }
+      }
+
+      var originalIndicesByValueInFinalOrder: [Int: [Int]] = [:]
+      for finalPosition in 0..<size {
+        let originalIndex = shadow[finalPosition]
+        let value = input[originalIndex]
+        originalIndicesByValueInFinalOrder[value, default: []].append(originalIndex)
+      }
+
+      if originalIndicesByValueInFinalOrder.values.contains(where: { $0 != $0.sorted() }) {
+        sawReordering = true
+        break
+      }
+    }
+
+    #expect(
+      sawReordering,
+      """
+      expected CompleteGraphSort's non-adjacent compare-swap network to reorder at least one run \
+      of equal-valued elements relative to their original input order across randomized \
+      duplicate-heavy trials, confirming it is not a stable sort
+      """
+    )
+  }
+
+  /// Verifies `ForcedStableQuickSort`'s whole reason for existing: `stableComp`'s tie-break on
+  /// `key`'s original index order should make it genuinely stable, not merely named that way —
+  /// checked the same way every other stability claim in this suite is, by fuzzing rather than
+  /// trusting the name.
+  @Test
+  func forcedStableQuickSortIsStable() {
+    let algorithm = ForcedStableQuickSort()
+    let size = algorithm.metadata.sizeRange.lowerBound
+
+    for _ in 0..<50 {
+      let input = (0..<size).map { _ in Int.random(in: 0...3) }
+      var engine = RecordingEngine(values: input)
+      algorithm.record(into: &engine)
+
+      var shadow = Array(0..<size)
+      for operation in engine.finish().tape {
+        if case .swap(let i, let j) = operation {
+          shadow.swapAt(i, j)
+        }
+      }
+
+      var originalIndicesByValueInFinalOrder: [Int: [Int]] = [:]
+      for finalPosition in 0..<size {
+        let originalIndex = shadow[finalPosition]
+        let value = input[originalIndex]
+        originalIndicesByValueInFinalOrder[value, default: []].append(originalIndex)
+      }
+
+      #expect(
+        originalIndicesByValueInFinalOrder.values.allSatisfy { $0 == $0.sorted() },
+        "expected forcedstablequicksort to preserve original relative order among tied elements"
+      )
+    }
+  }
+
+  /// Verifies `TableSort`'s tie-break on `table`'s own original index order makes it genuinely
+  /// stable — including through this port's swap-based final permutation apply (see
+  /// `TableSort.swift`'s doc comment), which this test's swap-tape-shadow technique depends on
+  /// being able to observe in the first place.
+  @Test
+  func tableSortIsStable() {
+    let algorithm = TableSort()
+    let size = algorithm.metadata.sizeRange.lowerBound
+
+    for _ in 0..<50 {
+      let input = (0..<size).map { _ in Int.random(in: 0...3) }
+      var engine = RecordingEngine(values: input)
+      algorithm.record(into: &engine)
+
+      var shadow = Array(0..<size)
+      for operation in engine.finish().tape {
+        if case .swap(let i, let j) = operation {
+          shadow.swapAt(i, j)
+        }
+      }
+
+      var originalIndicesByValueInFinalOrder: [Int: [Int]] = [:]
+      for finalPosition in 0..<size {
+        let originalIndex = shadow[finalPosition]
+        let value = input[originalIndex]
+        originalIndicesByValueInFinalOrder[value, default: []].append(originalIndex)
+      }
+
+      #expect(
+        originalIndicesByValueInFinalOrder.values.allSatisfy { $0 == $0.sorted() },
+        "expected tablesort to preserve original relative order among tied elements"
+      )
+    }
+  }
+
+  /// Verifies `FunSort`'s tie-free `(value, key)` composite order makes it genuinely stable — the
+  /// same fix that resolves its known duplicate-heavy correctness defect (see `FunSort.swift`'s
+  /// doc comment) also eliminates ties entirely, so equal-valued elements can never cross past
+  /// each other.
+  @Test
+  func funSortIsStable() {
+    let algorithm = FunSort()
+    let size = algorithm.metadata.sizeRange.lowerBound
+
+    for _ in 0..<50 {
+      let input = (0..<size).map { _ in Int.random(in: 0...3) }
+      var engine = RecordingEngine(values: input)
+      algorithm.record(into: &engine)
+
+      var shadow = Array(0..<size)
+      for operation in engine.finish().tape {
+        if case .swap(let i, let j) = operation {
+          shadow.swapAt(i, j)
+        }
+      }
+
+      var originalIndicesByValueInFinalOrder: [Int: [Int]] = [:]
+      for finalPosition in 0..<size {
+        let originalIndex = shadow[finalPosition]
+        let value = input[originalIndex]
+        originalIndicesByValueInFinalOrder[value, default: []].append(originalIndex)
+      }
+
+      #expect(
+        originalIndicesByValueInFinalOrder.values.allSatisfy { $0 == $0.sorted() },
+        "expected funsort to preserve original relative order among tied elements"
+      )
+    }
+  }
+
+  /// `FunSort`'s literal ArrayV port left ~87% of randomized duplicate-heavy trials genuinely
+  /// unsorted (see `FunSort.swift`'s doc comment and `PORT_INVENTORY.md`'s decision-required
+  /// note) — a defect severe enough, and specific enough to this exact failure mode, to warrant
+  /// running far more randomized duplicate-heavy trials than the generic suite above, across every
+  /// size in its own `sizeRange` rather than just the lower bound, matching the scrutiny
+  /// `heapVariantBatchDuplicateHeavyFuzz` already applies to its own previously-buggy algorithm.
+  @Test
+  func funSortDuplicateHeavyFuzz() {
+    let algorithm = FunSort()
+    for size in [algorithm.metadata.sizeRange.lowerBound, 17, 20, 32, 64, 128, 256] {
+      for attempt in 0..<200 {
+        let input = (0..<size).map { _ in Int.random(in: 0...3) }
+        var engine = RecordingEngine(values: input)
+        algorithm.record(into: &engine)
+        #expect(
+          engine.values == input.sorted(),
+          "funsort failed duplicate-heavy fuzz attempt \(attempt) of size \(size): \(input) -> \(engine.values)"
+        )
+      }
+    }
   }
 }
