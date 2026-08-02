@@ -35,7 +35,7 @@ struct NativeAlgorithmCorrectnessTests {
     IntroCircleSortIterative(),
     IntroSort(), LazyHeapSort(), LazyStableSort(), LessBogoSort(), LLQuickSort(), LRQuickSort(),
     LSDRadixSort(),
-    MaxHeapSort(),
+    MatrixSort(), MaxHeapSort(),
     MedianQuickBogoSort(), MergeBogoSort(), MergeExchangeSortIterative(), MergeSort(),
     MinHeapSort(), MSDRadixSort(),
     OddEvenMergeSortIterative(), OddEvenMergeSortRecursive(), OddEvenSort(),

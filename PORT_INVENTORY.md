@@ -186,15 +186,7 @@ Move algorithms here when you finish them.
 
 ### g. Concurrent sorts (`sorts/concurrent/`, 22)
 
-#### Completed
-
-Move algorithms here when you finish them.
-
-#### Not Started
-
-##### Medium
-
-- [ ] MatrixSort — 120 lines
+All concurrent sorts have been ported.
 
 ### h. Hybrid sorts (`sorts/hybrid/`, 41)
 

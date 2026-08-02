@@ -4026,5 +4026,35 @@
     "subjectID" : "weavesortrecursive+recradix",
     "winningFamily" : "powerLog",
     "winningRSquared" : 0.9998150748681958
+  },
+  {
+    "coefficients" : [
+      0.0942692741964534,
+      45.53866011408033,
+      -670.6630493932237
+    ],
+    "runnerUpFamily" : "powerLog",
+    "runnerUpRSquared" : 0.8644290219451696,
+    "safeMaxSizeByCap" : [
+      1000000,
+      2682,
+      100000,
+      714,
+      300000,
+      1374
+    ],
+    "sampleSizes" : [
+      16,
+      17,
+      18,
+      19,
+      38,
+      76,
+      152,
+      304
+    ],
+    "subjectID" : "matrixsort+recradix",
+    "winningFamily" : "polynomialIntercept",
+    "winningRSquared" : 0.9999692869750808
   }
 ]
