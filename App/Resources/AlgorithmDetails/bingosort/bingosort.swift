@@ -15,7 +15,7 @@ func sort(_ arr: inout [Int]) {
         i -= 1
     }
     // Skip past any elements already sitting at the tail with that value.
-    while maximum > 0 && arr[maximum] == next {
+    while maximum > 0, arr[maximum] == next {
         maximum -= 1
     }
 
@@ -37,7 +37,7 @@ func sort(_ arr: inout [Int]) {
             j -= 1
         }
 
-        while maximum > 0 && arr[maximum] == next {
+        while maximum > 0, arr[maximum] == next {
             maximum -= 1
         }
     }

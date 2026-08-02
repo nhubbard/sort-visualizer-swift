@@ -7,7 +7,7 @@ func siftDown(_ arr: inout [Int], _ node: Int, _ stop: Int) {
     }
     var maxIndex = left
     var i = left + 1
-    while i < left + base && i < stop {
+    while i < left + base, i < stop {
         if arr[maxIndex] < arr[i] {
             maxIndex = i
         }

@@ -4,7 +4,7 @@ func insertionSort(_ arr: inout [Int], _ start: Int, _ end: Int) {
     var i = start + 1
     while i < end {
         var j = i
-        while j > start && arr[j] < arr[j - 1] {
+        while j > start, arr[j] < arr[j - 1] {
             arr.swapAt(j - 1, j)
             j -= 1
         }
@@ -16,7 +16,7 @@ func merge(_ arr: inout [Int], _ start: Int, _ mid: Int, _ end: Int) {
     var low = start
     var high = mid
     var merged: [Int] = []
-    while low < mid && high < end {
+    while low < mid, high < end {
         if arr[high] < arr[low] {
             merged.append(arr[high])
             high += 1

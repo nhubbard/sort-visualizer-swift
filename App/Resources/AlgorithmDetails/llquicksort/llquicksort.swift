@@ -1,8 +1,9 @@
 import Foundation
 
 func partition(_ array: inout [Int],
-_ lo: Int,
-_ hi: Int) -> Int {
+               _ lo: Int,
+               _ hi: Int) -> Int
+{
     let pivot = array[hi]
     var i = lo
     for j in lo ..< hi where array[j] < pivot {

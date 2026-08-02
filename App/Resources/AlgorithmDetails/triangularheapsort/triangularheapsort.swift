@@ -18,7 +18,7 @@ func siftDown(_ array: inout [Int], _ rootIn: Int, _ size: Int) {
         if array[largest] < array[left] {
             largest = left
         }
-        if right < size && array[largest] < array[right] {
+        if right < size, array[largest] < array[right] {
             largest = right
         }
         if largest == root {

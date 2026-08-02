@@ -1,5 +1,5 @@
 func multiSwap(_ arr: inout [Int], _ a: Int, _ b: Int, _ count: Int) {
-    for i in 0..<count {
+    for i in 0 ..< count {
         arr.swapAt(a + i, b + i)
     }
 }
@@ -8,7 +8,7 @@ func rotate(_ arr: inout [Int], _ pos: Int, _ lenA: Int, _ lenB: Int) {
     var p = pos
     var la = lenA
     var lb = lenB
-    while la != 0 && lb != 0 {
+    while la != 0, lb != 0 {
         if la <= lb {
             multiSwap(&arr, p, p + la, la)
             p += la
@@ -26,13 +26,19 @@ func binSearch(_ arr: [Int], _ pos: Int, _ len: Int, _ keyPos: Int, _ isLeft: Bo
     while left < right {
         let mid = left + (right - left) / 2
         let cond = isLeft ? arr[pos + mid] < arr[keyPos] : arr[pos + mid] <= arr[keyPos]
-        if cond { left = mid + 1 } else { right = mid }
+        if cond {
+            left = mid + 1
+        } else {
+            right = mid
+        }
     }
     return left
 }
 
 func mergeWithoutBuffer(_ arr: inout [Int], _ pos: Int, _ len1: Int, _ len2: Int) {
-    if len1 == 0 || len2 == 0 { return }
+    if len1 == 0 || len2 == 0 {
+        return
+    }
     if len1 == 1 {
         let loc = binSearch(arr, pos + 1, len2, pos, true)
         rotate(&arr, pos, 1, loc)
@@ -54,7 +60,9 @@ func sort(_ arr: inout [Int]) {
     let n = arr.count
     var dist = 1
     while dist < n {
-        if arr[dist - 1] > arr[dist] { arr.swapAt(dist - 1, dist) }
+        if arr[dist - 1] > arr[dist] {
+            arr.swapAt(dist - 1, dist)
+        }
         dist += 2
     }
     var part = 2
@@ -66,7 +74,9 @@ func sort(_ arr: inout [Int]) {
             left += 2 * part
         }
         let rest = n - left
-        if rest > part { mergeWithoutBuffer(&arr, left, part, rest - part) }
+        if rest > part {
+            mergeWithoutBuffer(&arr, left, part, rest - part)
+        }
         part *= 2
     }
 }

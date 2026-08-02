@@ -11,11 +11,11 @@ func sort(_ arr: inout [Int]) {
 
     func thrift(_ node: Int, _ parentFlag: Bool, _ rootFlag: Bool) {
         let isRoot = rootFlag && (node >= (1 << height(node)))
-        if !isRoot && !parentFlag {
+        if !isRoot, !parentFlag {
             return
         }
 
-        var choice = height(node) - (isRoot ? 0: 1)
+        var choice = height(node) - (isRoot ? 0 : 1)
         if parentFlag {
             var child = choice - 1
             while child >= 0 {

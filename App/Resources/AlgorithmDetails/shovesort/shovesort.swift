@@ -3,7 +3,7 @@ func sort(_ arr: inout [Int]) {
     var i = 0
     while i < end - 1 {
         if arr[i] > arr[i + 1] {
-            for f in i..<(end - 1) {
+            for f in i ..< (end - 1) {
                 arr.swapAt(f, f + 1)
             }
             if i > 0 {

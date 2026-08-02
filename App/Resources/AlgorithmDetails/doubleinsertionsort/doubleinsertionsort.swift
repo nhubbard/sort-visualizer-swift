@@ -9,20 +9,20 @@ func doubleInsertionSort(_ array: inout [Int], _ start: Int, _ end: Int) {
     left -= 1
     right += 1
 
-    while left >= start && right < end {
+    while left >= start, right < end {
         if array[left] > array[right] {
             let leftItem = array[right]
             let rightItem = array[left]
 
             var pos = left + 1
-            while pos <= right && array[pos] <= leftItem {
+            while pos <= right, array[pos] <= leftItem {
                 array[pos - 1] = array[pos]
                 pos += 1
             }
             array[pos - 1] = leftItem
 
             pos = right - 1
-            while pos >= left && array[pos] >= rightItem {
+            while pos >= left, array[pos] >= rightItem {
                 array[pos + 1] = array[pos]
                 pos -= 1
             }
@@ -53,7 +53,7 @@ func doubleInsertionSort(_ array: inout [Int], _ start: Int, _ end: Int) {
     if right < end {
         var pos = right - 1
         let current = array[right]
-        while pos >= start && array[pos] > current {
+        while pos >= start, array[pos] > current {
             array[pos + 1] = array[pos]
             pos -= 1
         }

@@ -9,21 +9,23 @@ func pdqLog(_ n0: Int) -> Int {
     var log = 0
     while true {
         n >>= 1
-        if n == 0 { break }
+        if n == 0 {
+            break
+        }
         log += 1
     }
     return log
 }
 
-// Integer division truncated toward zero. Swift's `/` already truncates toward zero for
-// negative operands, which is what the pivot-position arithmetic below needs at the one
-// call site where the dividend can go negative -- this helper just names that intent.
+/// Integer division truncated toward zero. Swift's `/` already truncates toward zero for
+/// negative operands, which is what the pivot-position arithmetic below needs at the one
+/// call site where the dividend can go negative -- this helper just names that intent.
 func truncDiv(_ a: Int, _ b: Int) -> Int {
     return a / b
 }
 
 func insertSort(_ arr: inout [Int], _ begin: Int, _ end: Int) {
-    for cur in (begin + 1)..<end {
+    for cur in (begin + 1) ..< end {
         if arr[cur] < arr[cur - 1] {
             let tmp = arr[cur]
             var sift = cur
@@ -39,7 +41,7 @@ func insertSort(_ arr: inout [Int], _ begin: Int, _ end: Int) {
 }
 
 func unguardInsertSort(_ arr: inout [Int], _ begin: Int, _ end: Int) {
-    for cur in (begin + 1)..<end {
+    for cur in (begin + 1) ..< end {
         if arr[cur] < arr[cur - 1] {
             let tmp = arr[cur]
             var sift = cur
@@ -56,8 +58,10 @@ func unguardInsertSort(_ arr: inout [Int], _ begin: Int, _ end: Int) {
 
 func partialInsertSort(_ arr: inout [Int], _ begin: Int, _ end: Int) -> Bool {
     var limit = 0
-    for cur in (begin + 1)..<end {
-        if limit > partialInsertSortLimit { return false }
+    for cur in (begin + 1) ..< end {
+        if limit > partialInsertSortLimit {
+            return false
+        }
         if arr[cur] < arr[cur - 1] {
             let tmp = arr[cur]
             var sift = cur
@@ -75,7 +79,9 @@ func partialInsertSort(_ arr: inout [Int], _ begin: Int, _ end: Int) -> Bool {
 }
 
 func sortTwo(_ arr: inout [Int], _ a: Int, _ b: Int) {
-    if arr[b] < arr[a] { arr.swapAt(a, b) }
+    if arr[b] < arr[a] {
+        arr.swapAt(a, b)
+    }
 }
 
 func sortThree(_ arr: inout [Int], _ a: Int, _ b: Int, _ c: Int) {
@@ -89,7 +95,7 @@ func swapOffsets(
     _ rightOffsets: inout [Int], _ rightPos: Int, _ num: Int, _ useSwaps: Bool
 ) {
     if useSwaps {
-        for i in 0..<num {
+        for i in 0 ..< num {
             arr.swapAt(first + leftOffsets[leftPos + i], last - rightOffsets[rightPos + i])
         }
     } else if num > 0 {
@@ -97,7 +103,7 @@ func swapOffsets(
         var right = last - rightOffsets[rightPos]
         let tmp = arr[left]
         arr[left] = arr[right]
-        for i in 1..<num {
+        for i in 1 ..< num {
             left = first + leftOffsets[leftPos + i]
             arr[right] = arr[left]
             right = last - rightOffsets[rightPos + i]
@@ -115,14 +121,20 @@ func partRightBranchless(
     var last = end
 
     first += 1
-    while arr[first] < pivot { first += 1 }
+    while arr[first] < pivot {
+        first += 1
+    }
 
     if first - 1 == begin {
         last -= 1
-        while first < last && !(arr[last] < pivot) { last -= 1 }
+        while first < last, !(arr[last] < pivot) {
+            last -= 1
+        }
     } else {
         last -= 1
-        while !(arr[last] < pivot) { last -= 1 }
+        while !(arr[last] < pivot) {
+            last -= 1
+        }
     }
 
     let alreadyParted = first >= last
@@ -140,19 +152,23 @@ func partRightBranchless(
         if leftNum == 0 {
             leftStart = 0
             var it = first
-            for i in 0..<blockSize {
+            for i in 0 ..< blockSize {
                 leftOffsets[leftNum] = i
-                if !(arr[it] < pivot) { leftNum += 1 }
+                if !(arr[it] < pivot) {
+                    leftNum += 1
+                }
                 it += 1
             }
         }
         if rightNum == 0 {
             rightStart = 0
             var it = last
-            for i in 0..<blockSize {
+            for i in 0 ..< blockSize {
                 it -= 1
                 rightOffsets[rightNum] = i + 1
-                if arr[it] < pivot { rightNum += 1 }
+                if arr[it] < pivot {
+                    rightNum += 1
+                }
             }
         }
 
@@ -160,8 +176,12 @@ func partRightBranchless(
         swapOffsets(&arr, first, last, &leftOffsets, leftStart, &rightOffsets, rightStart, num, leftNum == rightNum)
         leftNum -= num; rightNum -= num
         leftStart += num; rightStart += num
-        if leftNum == 0 { first += blockSize }
-        if rightNum == 0 { last -= blockSize }
+        if leftNum == 0 {
+            first += blockSize
+        }
+        if rightNum == 0 {
+            last -= blockSize
+        }
     }
 
     var leftSize = 0
@@ -178,23 +198,27 @@ func partRightBranchless(
         rightSize = unknownLeft - leftSize
     }
 
-    if unknownLeft != 0 && leftNum == 0 {
+    if unknownLeft != 0, leftNum == 0 {
         leftStart = 0
         var it = first
-        for i in 0..<leftSize {
+        for i in 0 ..< leftSize {
             leftOffsets[leftNum] = i
-            if !(arr[it] < pivot) { leftNum += 1 }
+            if !(arr[it] < pivot) {
+                leftNum += 1
+            }
             it += 1
         }
     }
 
-    if unknownLeft != 0 && rightNum == 0 {
+    if unknownLeft != 0, rightNum == 0 {
         rightStart = 0
         var it = last
-        for i in 0..<rightSize {
+        for i in 0 ..< rightSize {
             it -= 1
             rightOffsets[rightNum] = i + 1
-            if arr[it] < pivot { rightNum += 1 }
+            if arr[it] < pivot {
+                rightNum += 1
+            }
         }
     }
 
@@ -202,8 +226,12 @@ func partRightBranchless(
     swapOffsets(&arr, first, last, &leftOffsets, leftStart, &rightOffsets, rightStart, num, leftNum == rightNum)
     leftNum -= num; rightNum -= num
     leftStart += num; rightStart += num
-    if leftNum == 0 { first += leftSize }
-    if rightNum == 0 { last -= rightSize }
+    if leftNum == 0 {
+        first += leftSize
+    }
+    if rightNum == 0 {
+        last -= rightSize
+    }
 
     var leftOffsetsPos = 0
     var rightOffsetsPos = 0
@@ -241,22 +269,32 @@ func partLeft(_ arr: inout [Int], _ begin: Int, _ end: Int) -> Int {
     var last = end
 
     last -= 1
-    while pivot < arr[last] { last -= 1 }
+    while pivot < arr[last] {
+        last -= 1
+    }
 
     if last + 1 == end {
         first += 1
-        while first < last && !(pivot < arr[first]) { first += 1 }
+        while first < last && !(pivot < arr[first]) {
+            first += 1
+        }
     } else {
         first += 1
-        while !(pivot < arr[first]) { first += 1 }
+        while !(pivot < arr[first]) {
+            first += 1
+        }
     }
 
     while first < last {
         arr.swapAt(first, last)
         last -= 1
-        while pivot < arr[last] { last -= 1 }
+        while pivot < arr[last] {
+            last -= 1
+        }
         first += 1
-        while !(pivot < arr[first]) { first += 1 }
+        while !(pivot < arr[first]) {
+            first += 1
+        }
     }
 
     let pivotPos = last
@@ -269,8 +307,12 @@ func siftDown(_ arr: inout [Int], _ begin: Int, _ root0: Int, _ size: Int) {
     var root = root0
     while true {
         var child = 2 * root + 1
-        if child >= size { break }
-        if child + 1 < size && arr[begin + child] < arr[begin + child + 1] { child += 1 }
+        if child >= size {
+            break
+        }
+        if child + 1 < size, arr[begin + child] < arr[begin + child + 1] {
+            child += 1
+        }
         if arr[begin + root] < arr[begin + child] {
             arr.swapAt(begin + root, begin + child)
             root = child
@@ -365,7 +407,7 @@ func pdqLoop(
                 }
             }
         } else {
-            if alreadyParted && partialInsertSort(&arr, begin, pivotPos) && partialInsertSort(&arr, pivotPos + 1, end) {
+            if alreadyParted, partialInsertSort(&arr, begin, pivotPos), partialInsertSort(&arr, pivotPos + 1, end) {
                 return
             }
         }
@@ -378,7 +420,9 @@ func pdqLoop(
 
 func sort(_ arr: inout [Int]) {
     let n = arr.count
-    if n < 2 { return }
+    if n < 2 {
+        return
+    }
     var leftOffsets = [Int](repeating: 0, count: blockSize + cachelineSize)
     var rightOffsets = [Int](repeating: 0, count: blockSize + cachelineSize)
     pdqLoop(&arr, 0, n, pdqLog(n), &leftOffsets, &rightOffsets)

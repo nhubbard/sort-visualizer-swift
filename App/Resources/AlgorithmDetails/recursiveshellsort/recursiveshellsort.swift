@@ -5,7 +5,7 @@ func gappedInsertionSort(_ array: inout [Int], _ a: Int, _ b: Int, _ gap: Int) {
     while i < b {
         let key = array[i]
         var j = i - gap
-        while j >= a && key < array[j] {
+        while j >= a, key < array[j] {
             array[j + gap] = array[j]
             j -= gap
         }

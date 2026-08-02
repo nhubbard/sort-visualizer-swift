@@ -1,17 +1,25 @@
 func stableComp(_ arr: [Int], _ table: [Int], _ a: Int, _ b: Int) -> Bool {
     let ta = table[a]
     let tb = table[b]
-    if arr[ta] > arr[tb] { return true }
-    if arr[ta] == arr[tb] { return table[a] > table[b] }
+    if arr[ta] > arr[tb] {
+        return true
+    }
+    if arr[ta] == arr[tb] {
+        return table[a] > table[b]
+    }
     return false
 }
 
 func medianOfThree(_ arr: [Int], _ table: inout [Int], _ a: Int, _ b: Int) {
     let m = a + (b - 1 - a) / 2
-    if stableComp(arr, table, a, m) { table.swapAt(a, m) }
+    if stableComp(arr, table, a, m) {
+        table.swapAt(a, m)
+    }
     if stableComp(arr, table, m, b - 1) {
         table.swapAt(m, b - 1)
-        if stableComp(arr, table, a, m) { return }
+        if stableComp(arr, table, a, m) {
+            return
+        }
     }
     table.swapAt(a, m)
 }
@@ -36,7 +44,7 @@ func partition(_ arr: [Int], _ table: inout [Int], _ a: Int, _ b: Int, _ p: Int)
 
 func quickSort(_ arr: [Int], _ table: inout [Int], _ a: Int, _ b: Int) {
     if b - a < 3 {
-        if b - a == 2 && stableComp(arr, table, a, a + 1) {
+        if b - a == 2, stableComp(arr, table, a, a + 1) {
             table.swapAt(a, a + 1)
         }
         return
@@ -50,9 +58,9 @@ func quickSort(_ arr: [Int], _ table: inout [Int], _ a: Int, _ b: Int) {
 
 func sort(_ arr: inout [Int]) {
     let n = arr.count
-    var table = Array(0..<n)
+    var table = Array(0 ..< n)
     quickSort(arr, &table, 0, n)
-    for i in 0..<n {
+    for i in 0 ..< n {
         if table[i] != i {
             let t = arr[i]
             var j = i

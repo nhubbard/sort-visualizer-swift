@@ -1,6 +1,7 @@
 func stoogeSort(_ arr: inout [Int],
-_ i: Int,
-_ j: Int) {
+                _ i: Int,
+                _ j: Int)
+{
     if arr[i] > arr[j] {
         arr.swapAt(i, j)
     }

@@ -4,7 +4,7 @@ func sort(_ array: inout [Int]) {
     let n = array.count
     for i in 1 ..< n {
         var pos = i
-        while pos > 0 && array[pos - 1] > array[pos] {
+        while pos > 0, array[pos - 1] > array[pos] {
             array.swapAt(pos - 1, pos)
             pos -= 1
         }

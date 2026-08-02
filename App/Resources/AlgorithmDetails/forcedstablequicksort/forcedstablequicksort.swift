@@ -1,6 +1,10 @@
 func stableComp(_ arr: [Int], _ key: [Int], _ a: Int, _ b: Int) -> Bool {
-    if arr[a] > arr[b] { return true }
-    if arr[a] == arr[b] { return key[a] > key[b] }
+    if arr[a] > arr[b] {
+        return true
+    }
+    if arr[a] == arr[b] {
+        return key[a] > key[b]
+    }
     return false
 }
 
@@ -11,10 +15,14 @@ func stableSwap(_ arr: inout [Int], _ key: inout [Int], _ a: Int, _ b: Int) {
 
 func medianOfThree(_ arr: inout [Int], _ key: inout [Int], _ a: Int, _ b: Int) {
     let m = a + (b - 1 - a) / 2
-    if stableComp(arr, key, a, m) { stableSwap(&arr, &key, a, m) }
+    if stableComp(arr, key, a, m) {
+        stableSwap(&arr, &key, a, m)
+    }
     if stableComp(arr, key, m, b - 1) {
         stableSwap(&arr, &key, m, b - 1)
-        if stableComp(arr, key, a, m) { return }
+        if stableComp(arr, key, a, m) {
+            return
+        }
     }
     stableSwap(&arr, &key, a, m)
 }
@@ -39,7 +47,7 @@ func partition(_ arr: inout [Int], _ key: inout [Int], _ a: Int, _ b: Int, _ p: 
 
 func quickSort(_ arr: inout [Int], _ key: inout [Int], _ a: Int, _ b: Int) {
     if b - a < 3 {
-        if b - a == 2 && stableComp(arr, key, a, a + 1) {
+        if b - a == 2, stableComp(arr, key, a, a + 1) {
             stableSwap(&arr, &key, a, a + 1)
         }
         return
@@ -53,7 +61,7 @@ func quickSort(_ arr: inout [Int], _ key: inout [Int], _ a: Int, _ b: Int) {
 
 func sort(_ arr: inout [Int]) {
     let n = arr.count
-    var key = Array(0..<n)
+    var key = Array(0 ..< n)
     quickSort(&arr, &key, 0, n)
 }
 

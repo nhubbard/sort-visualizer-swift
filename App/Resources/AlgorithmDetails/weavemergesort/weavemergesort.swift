@@ -19,7 +19,7 @@ func multiSwap(_ arr: inout [Int], _ pos: Int, _ to: Int) {
 func weaveInsert(_ arr: inout [Int], _ start: Int, _ end: Int) {
     for j in start ..< end {
         var pos = j
-        while pos > start && arr[pos] <= arr[pos - 1] {
+        while pos > start, arr[pos] <= arr[pos - 1] {
             arr.swapAt(pos, pos - 1)
             pos -= 1
         }

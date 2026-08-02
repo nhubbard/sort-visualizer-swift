@@ -3,14 +3,16 @@ func swap(_ arr: inout [Int], _ a: Int, _ b: Int) {
 }
 
 func multiSwap(_ arr: inout [Int], _ a: Int, _ b: Int, _ count: Int) {
-    for i in 0..<count { swap(&arr, a + i, b + i) }
+    for i in 0 ..< count {
+        swap(&arr, a + i, b + i)
+    }
 }
 
 func rotate(_ arr: inout [Int], _ posArg: Int, _ lenAArg: Int, _ lenBArg: Int) {
     var pos = posArg
     var lenA = lenAArg
     var lenB = lenBArg
-    while lenA != 0 && lenB != 0 {
+    while lenA != 0, lenB != 0 {
         if lenA <= lenB {
             multiSwap(&arr, pos, pos + lenA, lenA)
             pos += lenA
@@ -23,10 +25,12 @@ func rotate(_ arr: inout [Int], _ posArg: Int, _ lenAArg: Int, _ lenBArg: Int) {
 }
 
 func insertSort(_ arr: inout [Int], _ pos: Int, _ len: Int) {
-    if len < 2 { return }
-    for i in 1..<len {
+    if len < 2 {
+        return
+    }
+    for i in 1 ..< len {
         var j = pos + i
-        while j > pos && arr[j] < arr[j - 1] {
+        while j > pos, arr[j] < arr[j - 1] {
             swap(&arr, j, j - 1)
             j -= 1
         }
@@ -40,15 +44,23 @@ func binSearch(_ arr: [Int], _ pos: Int, _ len: Int, _ keyPos: Int, _ isLeft: Bo
     while left < right - 1 {
         let mid = left + (right - left) / 2
         let cond = isLeft ? (arr[pos + mid] >= key) : (arr[pos + mid] > key)
-        if cond { right = mid } else { left = mid }
+        if cond {
+            right = mid
+        } else {
+            left = mid
+        }
     }
     return right
 }
 
 func mergeWithoutBuffer(_ arr: inout [Int], _ pos: Int, _ len1: Int, _ len2: Int) {
-    if len1 == 0 || len2 == 0 { return }
+    if len1 == 0 || len2 == 0 {
+        return
+    }
     if len1 + len2 == 2 {
-        if arr[pos] > arr[pos + 1] { swap(&arr, pos, pos + 1) }
+        if arr[pos] > arr[pos + 1] {
+            swap(&arr, pos, pos + 1)
+        }
         return
     }
     let mid1: Int
@@ -77,7 +89,9 @@ func mergeLeft(_ arr: inout [Int], _ pos: Int, _ leftLen: Int, _ rightLenArg: In
             swap(&arr, pos + dist, pos + left); dist += 1; left += 1
         }
     }
-    if dist != left { multiSwap(&arr, pos + dist, pos + left, leftLen - left) }
+    if dist != left {
+        multiSwap(&arr, pos + dist, pos + left, leftLen - left)
+    }
 }
 
 func mergeRight(_ arr: inout [Int], _ pos: Int, _ leftLen: Int, _ rightLen: Int, _ dist: Int) {
@@ -91,7 +105,7 @@ func mergeRight(_ arr: inout [Int], _ pos: Int, _ leftLen: Int, _ rightLen: Int,
             swap(&arr, pos + mergedPos, pos + right); mergedPos -= 1; right -= 1
         }
     }
-    while right != mergedPos && right >= leftLen {
+    while right != mergedPos, right >= leftLen {
         swap(&arr, pos + mergedPos, pos + right); mergedPos -= 1; right -= 1
     }
 }
@@ -129,7 +143,7 @@ func mergeBuffersLeft(_ arr: inout [Int], _ pos: Int, _ blockCount: Int, _ block
     }
     var leftOverLen = blockLen
     var processIndex = blockLen
-    for _ in 1..<blockCount {
+    for _ in 1 ..< blockCount {
         let restToProcess = processIndex - leftOverLen
         leftOverLen = smartMergeWithBuffer(&arr, pos + restToProcess, leftOverLen, blockLen)
         processIndex += blockLen
@@ -152,7 +166,9 @@ func buildBlocks(_ arr: inout [Int], _ posArg: Int, _ len: Int, _ buildLen: Int)
         swap(&arr, pos + dist - 2, pos + dist - extraDist)
         dist += 2
     }
-    if len % 2 == 1 { swap(&arr, pos + len - 1, pos + len - 3) }
+    if len % 2 == 1 {
+        swap(&arr, pos + len - 1, pos + len - 3)
+    }
     pos -= 2
     var part = 2
     while part < buildLen {
@@ -192,18 +208,21 @@ func combineBlocks(_ arr: inout [Int], _ pos: Int, _ lenArg: Int, _ buildLen: In
         len -= leftOver
         leftOver = 0
     }
-    for i in 0...combineLen {
-        if i == combineLen && leftOver == 0 { break }
+    for i in 0 ... combineLen {
+        if i == combineLen && leftOver == 0 {
+            break
+        }
         let blockPos = pos + i * 2 * buildLen
         let blockCount = (i == combineLen ? leftOver : 2 * buildLen) / regBlockLen
-        for index in 1..<blockCount {
+        for index in 1 ..< blockCount {
             var leftIndex = index - 1
-            for rightIndex in index..<blockCount {
+            for rightIndex in index ..< blockCount {
                 let a = arr[blockPos + leftIndex * regBlockLen]
                 let b = arr[blockPos + rightIndex * regBlockLen]
                 let cmp = a > b ? 1 : (a < b ? -1 : 0)
                 if cmp > 0 || (cmp == 0 && arr[blockPos + (leftIndex + 1) * regBlockLen - 1] >
-                                arr[blockPos + (rightIndex + 1) * regBlockLen - 1]) {
+                    arr[blockPos + (rightIndex + 1) * regBlockLen - 1])
+                {
                     leftIndex = rightIndex
                 }
             }
@@ -214,8 +233,9 @@ func combineBlocks(_ arr: inout [Int], _ pos: Int, _ lenArg: Int, _ buildLen: In
         var aBlockCount = 0
         let lastLen = (i == combineLen) ? (leftOver % regBlockLen) : 0
         if lastLen != 0 {
-            while aBlockCount < blockCount &&
-                    arr[blockPos + blockCount * regBlockLen] < arr[blockPos + (blockCount - aBlockCount - 1) * regBlockLen] {
+            while aBlockCount < blockCount,
+                  arr[blockPos + blockCount * regBlockLen] < arr[blockPos + (blockCount - aBlockCount - 1) * regBlockLen]
+            {
                 aBlockCount += 1
             }
         }
@@ -233,12 +253,16 @@ func commonSort(_ arr: inout [Int], _ pos: Int, _ len: Int) {
         return
     }
     var blockLen = 1
-    while blockLen * blockLen < len { blockLen *= 2 }
+    while blockLen * blockLen < len {
+        blockLen *= 2
+    }
     var buildLen = blockLen
     buildBlocks(&arr, pos + blockLen, len - blockLen, buildLen)
     while true {
         buildLen *= 2
-        if len - blockLen <= buildLen { break }
+        if len - blockLen <= buildLen {
+            break
+        }
         combineBlocks(&arr, pos + blockLen, len - blockLen, buildLen, blockLen)
     }
     insertSort(&arr, pos, blockLen)

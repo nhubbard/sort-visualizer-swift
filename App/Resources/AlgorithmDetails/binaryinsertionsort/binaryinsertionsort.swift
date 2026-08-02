@@ -1,9 +1,10 @@
 import Foundation
 
 func binarySearch(_ array: [Int],
-_ item: Int,
-_ start: Int,
-_ end: Int) -> Int {
+                  _ item: Int,
+                  _ start: Int,
+                  _ end: Int) -> Int
+{
     var low = start
     var high = end
     while low < high {

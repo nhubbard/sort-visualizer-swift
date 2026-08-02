@@ -8,8 +8,8 @@ func sort(_ arr: inout [Int]) {
             var j = k % p
             while j + k < n {
                 for i in 0 ..< k
-                where (i + j) / (p + p) == (i + j + k) / (p + p) && i + j + k < n && arr[i + j] > arr[i + j + k]
-                    {
+                    where (i + j) / (p + p) == (i + j + k) / (p + p) && i + j + k < n && arr[i + j] > arr[i + j + k]
+                {
                     arr.swapAt(i + j, i + j + k)
                 }
                 j += k + k

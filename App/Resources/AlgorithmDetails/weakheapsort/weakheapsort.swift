@@ -12,7 +12,7 @@ func sort(_ arr: inout [Int]) {
     var i = n - 1
     while i > 0 {
         var j = i
-        while (j & 1) == (flags[j >> 1] ? 1: 0) {
+        while (j & 1) == (flags[j >> 1] ? 1 : 0) {
             j >>= 1
         }
         let gparent = j >> 1
@@ -25,7 +25,7 @@ func sort(_ arr: inout [Int]) {
         arr.swapAt(0, i)
         var x = 1
         while true {
-            let y = 2 * x + (flags[x] ? 1: 0)
+            let y = 2 * x + (flags[x] ? 1 : 0)
             if y >= i {
                 break
             }

@@ -9,7 +9,9 @@ func compSwap(_ arr: inout [Int], _ a: Int, _ b: Int) {
 func split(_ arr: inout [Int], _ aIn: Int, _ m: Int, _ bIn: Int) {
     var a = aIn
     var b = bIn
-    if b - a < 2 { return }
+    if b - a < 2 {
+        return
+    }
     var c = 0
     let len1 = (b - a) / 2
     let odd = (b - a) % 2 == 1
@@ -22,22 +24,26 @@ func split(_ arr: inout [Int], _ aIn: Int, _ m: Int, _ bIn: Int) {
             c = b
         }
     }
-    for s in 0..<len1 {
+    for s in 0 ..< len1 {
         var i = a
-        for j in s..<len1 {
+        for j in s ..< len1 {
             compSwap(&arr, i, m + j)
             i += 1
         }
-        for j in 0..<s {
+        for j in 0 ..< s {
             compSwap(&arr, i, m + j)
             i += 1
         }
     }
     if odd {
         if c < m {
-            for j in 0..<len1 { compSwap(&arr, c, m + j) }
+            for j in 0 ..< len1 {
+                compSwap(&arr, c, m + j)
+            }
         } else {
-            for j in 0..<len1 { compSwap(&arr, a + j, c) }
+            for j in 0 ..< len1 {
+                compSwap(&arr, a + j, c)
+            }
         }
     }
 }

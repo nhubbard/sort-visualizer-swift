@@ -3,7 +3,7 @@ func stablePartition(_ arr: inout [Int], _ start: Int, _ end: Int) -> Int {
     var leftList: [Int] = []
     var rightList: [Int] = []
 
-    for i in (start + 1)...end {
+    for i in (start + 1) ... end {
         if arr[i] < pivotValue {
             leftList.append(arr[i])
         } else {

@@ -56,7 +56,7 @@ func doubleInsertion(_ array: inout [Int], _ a: Int, _ b: Int) {
     var i = i0
     var j = j0
 
-    if j > i && array[i] > array[j] {
+    if j > i, array[i] > array[j] {
         array.swapAt(i, j)
     }
     i -= 1

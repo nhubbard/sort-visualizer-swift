@@ -12,7 +12,7 @@ func merge(_ arr: inout [Int], _ tmp: inout [Int], _ length: Int, _ residue: Int
     merge(&arr, &tmp, length, high, dmodulus)
 
     var nxt = residue
-    while low < length && high < length {
+    while low < length, high < length {
         if arr[low] > arr[high] || (arr[low] == arr[high] && low > high) {
             tmp[nxt] = arr[high]
             high += dmodulus

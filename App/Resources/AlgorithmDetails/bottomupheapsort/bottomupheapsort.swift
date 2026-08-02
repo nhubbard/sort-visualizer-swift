@@ -5,7 +5,7 @@ func sort(_ arr: inout [Int]) {
         var j = i
         while 2 * j + 1 < b {
             if 2 * j + 2 < b {
-                j = arr[2 * j + 2] > arr[2 * j + 1] ? 2 * j + 2: 2 * j + 1
+                j = arr[2 * j + 2] > arr[2 * j + 1] ? 2 * j + 2 : 2 * j + 1
             } else {
                 j = 2 * j + 1
             }

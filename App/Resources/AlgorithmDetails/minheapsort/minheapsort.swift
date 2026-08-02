@@ -6,10 +6,10 @@ func siftDown(_ arr: inout [Int], _ root: Int, _ size: Int) {
         var smallest = root
         let left = 2 * root + 1
         let right = 2 * root + 2
-        if left < size && arr[left] < arr[smallest] {
+        if left < size, arr[left] < arr[smallest] {
             smallest = left
         }
-        if right < size && arr[right] < arr[smallest] {
+        if right < size, arr[right] < arr[smallest] {
             smallest = right
         }
         if smallest == root {

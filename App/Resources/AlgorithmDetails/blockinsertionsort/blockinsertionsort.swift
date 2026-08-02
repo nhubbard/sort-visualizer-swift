@@ -1,5 +1,5 @@
 func multiSwap(_ arr: inout [Int], _ a: Int, _ b: Int, _ count: Int) {
-    for i in 0..<count {
+    for i in 0 ..< count {
         arr.swapAt(a + i, b + i)
     }
 }
@@ -8,7 +8,7 @@ func rotate(_ arr: inout [Int], _ pos: Int, _ lenA: Int, _ lenB: Int) {
     var p = pos
     var la = lenA
     var lb = lenB
-    while la != 0 && lb != 0 {
+    while la != 0, lb != 0 {
         if la <= lb {
             multiSwap(&arr, p, p + la, la)
             p += la
@@ -26,13 +26,19 @@ func binSearch(_ arr: [Int], _ pos: Int, _ len: Int, _ keyPos: Int, _ isLeft: Bo
     while left < right {
         let mid = left + (right - left) / 2
         let cond = isLeft ? arr[pos + mid] < arr[keyPos] : arr[pos + mid] <= arr[keyPos]
-        if cond { left = mid + 1 } else { right = mid }
+        if cond {
+            left = mid + 1
+        } else {
+            right = mid
+        }
     }
     return left
 }
 
 func mergeWithoutBuffer(_ arr: inout [Int], _ pos: Int, _ len1: Int, _ len2: Int) {
-    if len1 == 0 || len2 == 0 { return }
+    if len1 == 0 || len2 == 0 {
+        return
+    }
     if len1 == 1 {
         let loc = binSearch(arr, pos + 1, len2, pos, true)
         rotate(&arr, pos, 1, loc)
@@ -52,10 +58,14 @@ func mergeWithoutBuffer(_ arr: inout [Int], _ pos: Int, _ len1: Int, _ len2: Int
 
 func findRun(_ arr: inout [Int], _ a: Int, _ b: Int) -> Int {
     var i = a + 1
-    if i == b { return i }
+    if i == b {
+        return i
+    }
     if arr[i - 1] > arr[i] {
         i += 1
-        while i < b && arr[i - 1] > arr[i] { i += 1 }
+        while i < b && arr[i - 1] > arr[i] {
+            i += 1
+        }
         var lo = a
         var hi = i - 1
         while lo < hi {
@@ -65,7 +75,9 @@ func findRun(_ arr: inout [Int], _ a: Int, _ b: Int) -> Int {
         }
     } else {
         i += 1
-        while i < b && arr[i - 1] <= arr[i] { i += 1 }
+        while i < b && arr[i - 1] <= arr[i] {
+            i += 1
+        }
     }
     return i
 }
@@ -73,7 +85,7 @@ func findRun(_ arr: inout [Int], _ a: Int, _ b: Int) -> Int {
 func insert1(_ arr: inout [Int], _ a: Int, _ l: Int) {
     let tmp = arr[l]
     var i = l - 1
-    while i >= a && arr[i] > tmp {
+    while i >= a, arr[i] > tmp {
         arr[i + 1] = arr[i]
         i -= 1
     }
@@ -84,12 +96,12 @@ func insert2(_ arr: inout [Int], _ a: Int, _ l: Int, _ r: Int) {
     let tmpL = arr[l]
     let tmpR = arr[r]
     var i = l - 1
-    while i >= a && arr[i] > tmpR {
+    while i >= a, arr[i] > tmpR {
         arr[i + 2] = arr[i]
         i -= 1
     }
     arr[i + 2] = tmpR
-    while i >= a && arr[i] > tmpL {
+    while i >= a, arr[i] > tmpL {
         arr[i + 1] = arr[i]
         i -= 1
     }
@@ -102,9 +114,13 @@ func sort(_ arr: inout [Int]) {
     while i < n {
         let j = findRun(&arr, i, n)
         let len = j - i
-        if len == 1 { insert1(&arr, 0, i) }
-        else if len == 2 { insert2(&arr, 0, i, i + 1) }
-        else { mergeWithoutBuffer(&arr, 0, i, len) }
+        if len == 1 {
+            insert1(&arr, 0, i)
+        } else if len == 2 {
+            insert2(&arr, 0, i, i + 1)
+        } else {
+            mergeWithoutBuffer(&arr, 0, i, len)
+        }
         i = j
     }
 }

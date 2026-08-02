@@ -1,5 +1,5 @@
 func sort(_ arr: inout [Int], _ length: Int = -1) {
-    let length = length < 0 ? arr.count: length
+    let length = length < 0 ? arr.count : length
     if length == 1 {
         return
     }

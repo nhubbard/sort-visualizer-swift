@@ -1,7 +1,11 @@
 func mostSignificantBit(_ value: Int) -> Int {
-    if value == 0 { return -1 }
+    if value == 0 {
+        return -1
+    }
     var bit = 0
-    while (value >> (bit + 1)) != 0 { bit += 1 }
+    while (value >> (bit + 1)) != 0 {
+        bit += 1
+    }
     return bit
 }
 
@@ -10,9 +14,13 @@ func partition(_ arr: inout [Int], _ p: Int, _ r: Int, _ bit: Int) -> Int {
     var j = r + 1
     while true {
         i += 1
-        while i <= r && ((arr[i] >> bit) & 1) == 0 { i += 1 }
+        while i <= r && ((arr[i] >> bit) & 1) == 0 {
+            i += 1
+        }
         j -= 1
-        while j >= p && ((arr[j] >> bit) & 1) == 1 { j -= 1 }
+        while j >= p && ((arr[j] >> bit) & 1) == 1 {
+            j -= 1
+        }
         if i < j {
             arr.swapAt(i, j)
         } else {
@@ -31,7 +39,7 @@ func sort(_ arr: inout [Int]) {
     while head < tasks.count {
         let t = tasks[head]
         head += 1
-        if t.p < t.r && t.bit >= 0 {
+        if t.p < t.r, t.bit >= 0 {
             let q = partition(&arr, t.p, t.r, t.bit)
             tasks.append((t.p, q, t.bit - 1))
             tasks.append((q + 1, t.r, t.bit - 1))

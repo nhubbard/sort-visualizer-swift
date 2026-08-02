@@ -9,7 +9,7 @@ func sort(_ arr: inout [Int]) {
         var root = root
         while root <= dist / 2 {
             var leaf = 2 * root
-            if leaf < dist && arr[idx(leaf)] > arr[idx(leaf + 1)] {
+            if leaf < dist, arr[idx(leaf)] > arr[idx(leaf + 1)] {
                 leaf += 1
             }
             if arr[idx(root)] > arr[idx(leaf)] {

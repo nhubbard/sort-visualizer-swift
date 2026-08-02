@@ -4,12 +4,14 @@ func sort(_ arr: inout [Int]) {
     while !sorted {
         sorted = true
         for i in stride(from: 1, to: n - 1, by: 2)
-        where arr[i] > arr[i + 1] {
+            where arr[i] > arr[i + 1]
+        {
             arr.swapAt(i, i + 1)
             sorted = false
         }
         for i in stride(from: 0, to: n - 1, by: 2)
-        where arr[i] > arr[i + 1] {
+            where arr[i] > arr[i + 1]
+        {
             arr.swapAt(i, i + 1)
             sorted = false
         }

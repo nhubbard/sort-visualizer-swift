@@ -47,7 +47,7 @@ func merge(_ array: inout [Int], _ start: Int, _ mid: Int, _ end: Int) {
     var i = 0
     var j = 0
     var k = start
-    while i < left.count && j < right.count {
+    while i < left.count, j < right.count {
         if left[i] <= right[j] {
             array[k] = left[i]
             i += 1

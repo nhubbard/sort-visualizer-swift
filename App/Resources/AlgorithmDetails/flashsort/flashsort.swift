@@ -90,7 +90,7 @@ func flashSort(_ array: inout [Int]) {
     for idx in 1 ..< n {
         let current = array[idx]
         var pos = idx - 1
-        while pos >= 0 && array[pos] > current {
+        while pos >= 0, array[pos] > current {
             array[pos + 1] = array[pos]
             pos -= 1
         }

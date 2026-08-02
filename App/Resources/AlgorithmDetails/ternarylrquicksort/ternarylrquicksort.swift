@@ -4,7 +4,7 @@ func compare3(_ arr: [Int], _ a: Int, _ b: Int) -> Int {
     if arr[a] == arr[b] {
         return 0
     }
-    return arr[a] > arr[b] ? 1: -1
+    return arr[a] > arr[b] ? 1 : -1
 }
 
 func selectPivot(_ arr: [Int], _ lo: Int, _ hi: Int) -> Int {
@@ -20,9 +20,9 @@ func selectPivot(_ arr: [Int], _ lo: Int, _ hi: Int) -> Int {
     }
 
     if cLoMid < 0 {
-        return cMidHi < 0 ? mid: (cLoHi < 0 ? hi - 1: lo)
+        return cMidHi < 0 ? mid : (cLoHi < 0 ? hi - 1 : lo)
     } else {
-        return cMidHi > 0 ? mid: (cLoHi < 0 ? lo: hi - 1)
+        return cMidHi > 0 ? mid : (cLoHi < 0 ? lo : hi - 1)
     }
 }
 

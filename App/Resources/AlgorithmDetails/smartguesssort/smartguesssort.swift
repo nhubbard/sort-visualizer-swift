@@ -29,7 +29,7 @@ func sort(_ arr: inout [Int]) {
         }
         var pos = 0
         while pos < n {
-            if pos >= i && loops[pos] < n - 1 {
+            if pos >= i, loops[pos] < n - 1 {
                 loops[pos] += 1
                 break
             } else {

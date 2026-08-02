@@ -7,13 +7,13 @@ func sort(_ arr: inout [Int]) {
         let mid = 3 * i + 2
         let right = 3 * i + 3
         var largest = i
-        if left <= heapSize && arr[left] > arr[largest] {
+        if left <= heapSize, arr[left] > arr[largest] {
             largest = left
         }
-        if right <= heapSize && arr[right] > arr[largest] {
+        if right <= heapSize, arr[right] > arr[largest] {
             largest = right
         }
-        if mid <= heapSize && arr[mid] > arr[largest] {
+        if mid <= heapSize, arr[mid] > arr[largest] {
             largest = mid
         }
         if largest != i {

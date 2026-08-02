@@ -1,6 +1,10 @@
 func compositeLess(_ arr: [Int], _ key: [Int], _ mid: Int, _ i: Int) -> Bool {
-    if arr[mid] < arr[i] { return true }
-    if arr[mid] == arr[i] { return key[mid] < key[i] }
+    if arr[mid] < arr[i] {
+        return true
+    }
+    if arr[mid] == arr[i] {
+        return key[mid] < key[i]
+    }
     return false
 }
 
@@ -20,9 +24,9 @@ func binarySearch(_ arr: [Int], _ key: [Int], _ n: Int, _ i: Int) -> Int {
 
 func sort(_ arr: inout [Int]) {
     let n = arr.count
-    var key = Array(0..<n)
+    var key = Array(0 ..< n)
 
-    for i in 1..<n {
+    for i in 1 ..< n {
         var done = false
         while !done {
             let pos = binarySearch(arr, key, n, i)

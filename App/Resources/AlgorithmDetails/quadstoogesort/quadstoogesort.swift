@@ -1,5 +1,5 @@
 func quadStooge(_ arr: inout [Int], _ pos: Int, _ length: Int) {
-    if length >= 2 && arr[pos] > arr[pos + length - 1] {
+    if length >= 2, arr[pos] > arr[pos + length - 1] {
         arr.swapAt(pos, pos + length - 1)
     }
     if length <= 2 {

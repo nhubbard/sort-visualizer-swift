@@ -1,6 +1,7 @@
 func snuffleSort(_ arr: inout [Int],
-_ start: Int,
-_ stop: Int) {
+                 _ start: Int,
+                 _ stop: Int)
+{
     if stop - start + 1 >= 2 {
         if arr[start] > arr[stop] {
             arr.swapAt(start, stop)

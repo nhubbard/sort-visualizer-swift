@@ -10,18 +10,19 @@ func oddEvenMergeCompare(_ array: inout [Int], _ i: Int, _ j: Int) {
 // the piece being merged, and r is the distance of the elements compared.
 
 func oddEvenMerge(_ array: inout [Int],
-_ lo: Int,
-_ m2: Int,
-_ n: Int,
-_ r: Int) {
+                  _ lo: Int,
+                  _ m2: Int,
+                  _ n: Int,
+                  _ r: Int)
+{
     let m = r * 2
     if m < n {
         if (n / r) % 2 != 0 {
-            oddEvenMerge(&array, lo, (m2 + 1) / 2, n + r, m)  // even subsequence
-            oddEvenMerge(&array, lo + r, m2 / 2, n - r, m)  // odd subsequence
+            oddEvenMerge(&array, lo, (m2 + 1) / 2, n + r, m) // even subsequence
+            oddEvenMerge(&array, lo + r, m2 / 2, n - r, m) // odd subsequence
         } else {
-            oddEvenMerge(&array, lo, (m2 + 1) / 2, n, m)  // even subsequence
-            oddEvenMerge(&array, lo + r, m2 / 2, n, m)  // odd subsequence
+            oddEvenMerge(&array, lo, (m2 + 1) / 2, n, m) // even subsequence
+            oddEvenMerge(&array, lo + r, m2 / 2, n, m) // odd subsequence
         }
 
         if m2 % 2 != 0 {

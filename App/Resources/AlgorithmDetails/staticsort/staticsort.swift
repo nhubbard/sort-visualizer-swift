@@ -21,7 +21,7 @@ func insertionSortRange(_ array: inout [Int], _ s: Int, _ e: Int) {
     }
     for i in (s + 1) ..< e {
         var j = i
-        while j > s && array[j - 1] > array[j] {
+        while j > s, array[j - 1] > array[j] {
             array.swapAt(j - 1, j)
             j -= 1
         }
@@ -34,10 +34,10 @@ func siftDown(_ array: inout [Int], _ s: Int, _ root: Int, _ size: Int) {
         var largest = root
         let left = 2 * root + 1
         let right = 2 * root + 2
-        if left < size && array[s + largest] < array[s + left] {
+        if left < size, array[s + largest] < array[s + left] {
             largest = left
         }
-        if right < size && array[s + largest] < array[s + right] {
+        if right < size, array[s + largest] < array[s + right] {
             largest = right
         }
         if largest == root {
@@ -107,7 +107,7 @@ func staticSort(_ array: inout [Int], _ a: Int, _ b: Int) {
     }
 
     for i in 0 ..< auxLen {
-        let s = (i > 1) ? offset[i - 1]: a
+        let s = (i > 1) ? offset[i - 1] : a
         let e = offset[i]
         if e - s <= 1 {
             continue

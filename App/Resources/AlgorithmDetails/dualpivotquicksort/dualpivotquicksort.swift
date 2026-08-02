@@ -1,8 +1,9 @@
 import Foundation
 
 func partition(_ array: inout [Int],
-_ low: Int,
-_ high: Int) -> (Int, Int) {
+               _ low: Int,
+               _ high: Int) -> (Int, Int)
+{
     if array[low] > array[high] {
         array.swapAt(low, high)
     }
@@ -16,7 +17,7 @@ _ high: Int) -> (Int, Int) {
             array.swapAt(k, j)
             j += 1
         } else if array[k] >= q {
-            while array[g] > q && k < g {
+            while array[g] > q, k < g {
                 g -= 1
             }
             array.swapAt(k, g)

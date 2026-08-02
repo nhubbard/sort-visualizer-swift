@@ -1,7 +1,11 @@
 func mostSignificantBit(_ value: Int) -> Int {
-    if value == 0 { return -1 }
+    if value == 0 {
+        return -1
+    }
     var bit = 0
-    while (value >> (bit + 1)) != 0 { bit += 1 }
+    while (value >> (bit + 1)) != 0 {
+        bit += 1
+    }
     return bit
 }
 
@@ -10,9 +14,13 @@ func partition(_ arr: inout [Int], _ p: Int, _ r: Int, _ bit: Int) -> Int {
     var j = r + 1
     while true {
         i += 1
-        while i <= r && ((arr[i] >> bit) & 1) == 0 { i += 1 }
+        while i <= r && ((arr[i] >> bit) & 1) == 0 {
+            i += 1
+        }
         j -= 1
-        while j >= p && ((arr[j] >> bit) & 1) == 1 { j -= 1 }
+        while j >= p && ((arr[j] >> bit) & 1) == 1 {
+            j -= 1
+        }
         if i < j {
             arr.swapAt(i, j)
         } else {
@@ -22,7 +30,7 @@ func partition(_ arr: inout [Int], _ p: Int, _ r: Int, _ bit: Int) -> Int {
 }
 
 func binaryQuickSortRecursive(_ arr: inout [Int], _ p: Int, _ r: Int, _ bit: Int) {
-    if p < r && bit >= 0 {
+    if p < r, bit >= 0 {
         let q = partition(&arr, p, r, bit)
         binaryQuickSortRecursive(&arr, p, q, bit - 1)
         binaryQuickSortRecursive(&arr, q + 1, r, bit - 1)

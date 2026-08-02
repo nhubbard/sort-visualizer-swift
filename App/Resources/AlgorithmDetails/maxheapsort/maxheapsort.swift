@@ -2,10 +2,10 @@ func heapify(_ array: inout [Int], _ length: Int, _ i: Int) {
     var largest = i
     let left = i * 2 + 1
     let right = left + 1
-    if left < length && array[left] >= array[largest] {
+    if left < length, array[left] >= array[largest] {
         largest = left
     }
-    if right < length && array[right] >= array[largest] {
+    if right < length, array[right] >= array[largest] {
         largest = right
     }
     if largest != i {

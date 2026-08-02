@@ -3,7 +3,7 @@ func mergeTo(_ arr: inout [Int], _ subList: [Int], _ a: Int, _ m: Int, _ b: Int)
     var m = m
     var i = 0
     let s = m - a
-    while i < s && m < b {
+    while i < s, m < b {
         if subList[i] < arr[m] {
             arr[a] = subList[i]
             a += 1

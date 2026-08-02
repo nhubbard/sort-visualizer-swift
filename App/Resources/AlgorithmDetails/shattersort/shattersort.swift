@@ -3,7 +3,7 @@ func insertionSort(_ arr: inout [Int], _ start: Int, _ end: Int) {
     while i < end {
         let key = arr[i]
         var j = i - 1
-        while j >= start && arr[j] > key {
+        while j >= start, arr[j] > key {
             arr[j + 1] = arr[j]
             j -= 1
         }
@@ -15,7 +15,7 @@ func insertionSort(_ arr: inout [Int], _ start: Int, _ end: Int) {
 func shatterPartition(_ arr: inout [Int], _ start: Int, _ length: Int, _ num: Int) -> [Int] {
     var minV = arr[start]
     var maxV = arr[start]
-    for i in 1..<length {
+    for i in 1 ..< length {
         minV = min(minV, arr[start + i])
         maxV = max(maxV, arr[start + i])
     }
@@ -23,15 +23,17 @@ func shatterPartition(_ arr: inout [Int], _ start: Int, _ length: Int, _ num: In
     let shatters = (length + num - 1) / num
 
     var buckets = [[Int]](repeating: [], count: shatters)
-    for i in 0..<length {
+    for i in 0 ..< length {
         let v = arr[start + i]
         var idx = (v - minV) * shatters / valueRange
-        if idx > shatters - 1 { idx = shatters - 1 }
+        if idx > shatters - 1 {
+            idx = shatters - 1
+        }
         buckets[idx].append(v)
     }
 
     var offsets = [Int](repeating: 0, count: shatters + 1)
-    for i in 0..<shatters {
+    for i in 0 ..< shatters {
         offsets[i + 1] = offsets[i] + buckets[i].count
     }
 
@@ -47,7 +49,7 @@ func shatterPartition(_ arr: inout [Int], _ start: Int, _ length: Int, _ num: In
 
 func shatterSort(_ arr: inout [Int], _ length: Int, _ num: Int) {
     let offsets = shatterPartition(&arr, 0, length, num)
-    for i in 0..<(offsets.count - 1) {
+    for i in 0 ..< (offsets.count - 1) {
         if offsets[i + 1] - offsets[i] > 1 {
             insertionSort(&arr, offsets[i], offsets[i + 1])
         }
