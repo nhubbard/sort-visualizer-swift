@@ -21,7 +21,7 @@ public class smartguesssort {
     return i;
   }
 
-  public static void sort(int arr[]) {
+  public static void sort(int[] arr) {
     int n = arr.length;
     int[] loops = new int[n];
 
@@ -50,7 +50,7 @@ public class smartguesssort {
   }
 
   public static void main(String[] args) {
-    int[] array = new int[]{0, 39, 21, 62, 91, 14, 23};
+    int[] array = new int[] {0, 39, 21, 62, 91, 14, 23};
     sort(array);
     System.out.println(Arrays.toString(array));
   }

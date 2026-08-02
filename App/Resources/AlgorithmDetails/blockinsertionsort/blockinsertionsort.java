@@ -23,18 +23,24 @@ public class blockinsertionsort {
   }
 
   public static int binSearch(int[] arr, int pos, int len, int keyPos, boolean isLeft) {
-    int left = 0, right = len;
+    int left = 0;
+    int right = len;
     while (left < right) {
       int mid = left + (right - left) / 2;
       boolean cond = isLeft ? arr[pos + mid] < arr[keyPos] : arr[pos + mid] <= arr[keyPos];
-      if (cond) left = mid + 1;
-      else right = mid;
+      if (cond) {
+        left = mid + 1;
+      } else {
+        right = mid;
+      }
     }
     return left;
   }
 
   public static void mergeWithoutBuffer(int[] arr, int pos, int len1, int len2) {
-    if (len1 == 0 || len2 == 0) return;
+    if (len1 == 0 || len2 == 0) {
+      return;
+    }
     if (len1 == 1) {
       int loc = binSearch(arr, pos + 1, len2, pos, true);
       rotate(arr, pos, 1, loc);
@@ -54,11 +60,16 @@ public class blockinsertionsort {
 
   public static int findRun(int[] arr, int a, int b) {
     int i = a + 1;
-    if (i == b) return i;
+    if (i == b) {
+      return i;
+    }
     if (arr[i - 1] > arr[i]) {
       i++;
-      while (i < b && arr[i - 1] > arr[i]) i++;
-      int lo = a, hi = i - 1;
+      while (i < b && arr[i - 1] > arr[i]) {
+        i++;
+      }
+      int lo = a;
+      int hi = i - 1;
       while (lo < hi) {
         int t = arr[lo];
         arr[lo] = arr[hi];
@@ -68,7 +79,9 @@ public class blockinsertionsort {
       }
     } else {
       i++;
-      while (i < b && arr[i - 1] <= arr[i]) i++;
+      while (i < b && arr[i - 1] <= arr[i]) {
+        i++;
+      }
     }
     return i;
   }
@@ -105,15 +118,19 @@ public class blockinsertionsort {
     while (i < n) {
       int j = findRun(arr, i, n);
       int len = j - i;
-      if (len == 1) insert1(arr, 0, i);
-      else if (len == 2) insert2(arr, 0, i, i + 1);
-      else mergeWithoutBuffer(arr, 0, i, len);
+      if (len == 1) {
+        insert1(arr, 0, i);
+      } else if (len == 2) {
+        insert2(arr, 0, i, i + 1);
+      } else {
+        mergeWithoutBuffer(arr, 0, i, len);
+      }
       i = j;
     }
   }
 
   public static void main(String[] args) {
-    int[] array = new int[]{0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+    int[] array = new int[] {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
     sort(array);
     System.out.println(Arrays.toString(array));
   }

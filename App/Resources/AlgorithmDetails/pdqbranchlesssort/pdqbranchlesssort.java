@@ -15,7 +15,9 @@ public class pdqbranchlesssort {
 
   private static int pdqLog(int n) {
     int log = 0;
-    while ((n >>= 1) != 0) log++;
+    while ((n >>= 1) != 0) {
+      log++;
+    }
     return log;
   }
 
@@ -57,7 +59,9 @@ public class pdqbranchlesssort {
   private static boolean partialInsertSort(int[] arr, int begin, int end) {
     int limit = 0;
     for (int cur = begin + 1; cur < end; cur++) {
-      if (limit > PARTIAL_INSERT_SORT_LIMIT) return false;
+      if (limit > PARTIAL_INSERT_SORT_LIMIT) {
+        return false;
+      }
       if (arr[cur] < arr[cur - 1]) {
         int tmp = arr[cur];
         int sift = cur;
@@ -73,7 +77,9 @@ public class pdqbranchlesssort {
   }
 
   private static void sortTwo(int[] arr, int a, int b) {
-    if (arr[b] < arr[a]) swap(arr, a, b);
+    if (arr[b] < arr[a]) {
+      swap(arr, a, b);
+    }
   }
 
   private static void sortThree(int[] arr, int a, int b, int c) {
@@ -92,8 +98,16 @@ public class pdqbranchlesssort {
     }
   }
 
-  private static void swapOffsets(int[] arr, int first, int last, int[] leftOffsets, int leftPos,
-                                   int[] rightOffsets, int rightPos, int num, boolean useSwaps) {
+  private static void swapOffsets(
+      int[] arr,
+      int first,
+      int last,
+      int[] leftOffsets,
+      int leftPos,
+      int[] rightOffsets,
+      int rightPos,
+      int num,
+      boolean useSwaps) {
     if (useSwaps) {
       for (int i = 0; i < num; i++) {
         swap(arr, first + leftOffsets[leftPos + i], last - rightOffsets[rightPos + i]);
@@ -113,20 +127,27 @@ public class pdqbranchlesssort {
     }
   }
 
-  private static PDQPair partRightBranchless(int[] arr, int begin, int end, int[] leftOffsets, int[] rightOffsets) {
+  private static PDQPair partRightBranchless(
+      int[] arr, int begin, int end, int[] leftOffsets, int[] rightOffsets) {
     int pivot = arr[begin];
     int first = begin;
     int last = end;
 
     first++;
-    while (arr[first] < pivot) first++;
+    while (arr[first] < pivot) {
+      first++;
+    }
 
     if (first - 1 == begin) {
       last--;
-      while (first < last && !(arr[last] < pivot)) last--;
+      while (first < last && !(arr[last] < pivot)) {
+        last--;
+      }
     } else {
       last--;
-      while (!(arr[last] < pivot)) last--;
+      while (!(arr[last] < pivot)) {
+        last--;
+      }
     }
 
     boolean alreadyParted = first >= last;
@@ -135,7 +156,10 @@ public class pdqbranchlesssort {
       first++;
     }
 
-    int leftNum = 0, rightNum = 0, leftStart = 0, rightStart = 0;
+    int leftNum = 0;
+    int rightNum = 0;
+    int leftStart = 0;
+    int rightStart = 0;
 
     while (last - first > 2 * BLOCK_SIZE) {
       if (leftNum == 0) {
@@ -143,7 +167,9 @@ public class pdqbranchlesssort {
         int it = first;
         for (int i = 0; i < BLOCK_SIZE; i++) {
           leftOffsets[leftNum] = i;
-          if (!(arr[it] < pivot)) leftNum++;
+          if (!(arr[it] < pivot)) {
+            leftNum++;
+          }
           it++;
         }
       }
@@ -153,19 +179,37 @@ public class pdqbranchlesssort {
         for (int i = 0; i < BLOCK_SIZE; i++) {
           it--;
           rightOffsets[rightNum] = i + 1;
-          if (arr[it] < pivot) rightNum++;
+          if (arr[it] < pivot) {
+            rightNum++;
+          }
         }
       }
 
       int num = Math.min(leftNum, rightNum);
-      swapOffsets(arr, first, last, leftOffsets, leftStart, rightOffsets, rightStart, num, leftNum == rightNum);
-      leftNum -= num; rightNum -= num;
-      leftStart += num; rightStart += num;
-      if (leftNum == 0) first += BLOCK_SIZE;
-      if (rightNum == 0) last -= BLOCK_SIZE;
+      swapOffsets(
+          arr,
+          first,
+          last,
+          leftOffsets,
+          leftStart,
+          rightOffsets,
+          rightStart,
+          num,
+          leftNum == rightNum);
+      leftNum -= num;
+      rightNum -= num;
+      leftStart += num;
+      rightStart += num;
+      if (leftNum == 0) {
+        first += BLOCK_SIZE;
+      }
+      if (rightNum == 0) {
+        last -= BLOCK_SIZE;
+      }
     }
 
-    int leftSize = 0, rightSize = 0;
+    int leftSize = 0;
+    int rightSize = 0;
     int unknownLeft = (last - first) - ((rightNum != 0 || leftNum != 0) ? BLOCK_SIZE : 0);
     if (rightNum != 0) {
       leftSize = unknownLeft;
@@ -183,7 +227,9 @@ public class pdqbranchlesssort {
       int it = first;
       for (int i = 0; i < leftSize; i++) {
         leftOffsets[leftNum] = i;
-        if (!(arr[it] < pivot)) leftNum++;
+        if (!(arr[it] < pivot)) {
+          leftNum++;
+        }
         it++;
       }
     }
@@ -194,29 +240,50 @@ public class pdqbranchlesssort {
       for (int i = 0; i < rightSize; i++) {
         it--;
         rightOffsets[rightNum] = i + 1;
-        if (arr[it] < pivot) rightNum++;
+        if (arr[it] < pivot) {
+          rightNum++;
+        }
       }
     }
 
     int num = Math.min(leftNum, rightNum);
-    swapOffsets(arr, first, last, leftOffsets, leftStart, rightOffsets, rightStart, num, leftNum == rightNum);
-    leftNum -= num; rightNum -= num;
-    leftStart += num; rightStart += num;
-    if (leftNum == 0) first += leftSize;
-    if (rightNum == 0) last -= rightSize;
+    swapOffsets(
+        arr,
+        first,
+        last,
+        leftOffsets,
+        leftStart,
+        rightOffsets,
+        rightStart,
+        num,
+        leftNum == rightNum);
+    leftNum -= num;
+    rightNum -= num;
+    leftStart += num;
+    rightStart += num;
+    if (leftNum == 0) {
+      first += leftSize;
+    }
+    if (rightNum == 0) {
+      last -= rightSize;
+    }
 
     int leftOffsetsPos = 0;
     int rightOffsetsPos = 0;
 
     if (leftNum != 0) {
       leftOffsetsPos += leftStart;
-      while (leftNum-- != 0) swap(arr, first + leftOffsets[leftOffsetsPos + leftNum], --last);
+      while (leftNum-- != 0) {
+        swap(arr, first + leftOffsets[leftOffsetsPos + leftNum], --last);
+      }
       first = last;
     }
 
     if (rightNum != 0) {
       rightOffsetsPos += rightStart;
-      while (rightNum-- != 0) swap(arr, last - rightOffsets[rightOffsetsPos + rightNum], first++);
+      while (rightNum-- != 0) {
+        swap(arr, last - rightOffsets[rightOffsetsPos + rightNum], first++);
+      }
       last = first;
     }
 
@@ -233,22 +300,32 @@ public class pdqbranchlesssort {
     int last = end;
 
     last--;
-    while (pivot < arr[last]) last--;
+    while (pivot < arr[last]) {
+      last--;
+    }
 
     if (last + 1 == end) {
       first++;
-      while (first < last && !(pivot < arr[first])) first++;
+      while (first < last && !(pivot < arr[first])) {
+        first++;
+      }
     } else {
       first++;
-      while (!(pivot < arr[first])) first++;
+      while (!(pivot < arr[first])) {
+        first++;
+      }
     }
 
     while (first < last) {
       swap(arr, first, last);
       last--;
-      while (pivot < arr[last]) last--;
+      while (pivot < arr[last]) {
+        last--;
+      }
       first++;
-      while (!(pivot < arr[first])) first++;
+      while (!(pivot < arr[first])) {
+        first++;
+      }
     }
 
     int pivotPos = last;
@@ -260,8 +337,12 @@ public class pdqbranchlesssort {
   private static void siftDown(int[] arr, int begin, int root, int size) {
     while (true) {
       int child = 2 * root + 1;
-      if (child >= size) break;
-      if (child + 1 < size && arr[begin + child] < arr[begin + child + 1]) child++;
+      if (child >= size) {
+        break;
+      }
+      if (child + 1 < size && arr[begin + child] < arr[begin + child + 1]) {
+        child++;
+      }
       if (arr[begin + root] < arr[begin + child]) {
         swap(arr, begin + root, begin + child);
         root = child;
@@ -273,21 +354,27 @@ public class pdqbranchlesssort {
 
   private static void heapSort(int[] arr, int begin, int end) {
     int n = end - begin;
-    for (int i = n / 2 - 1; i >= 0; i--) siftDown(arr, begin, i, n);
+    for (int i = n / 2 - 1; i >= 0; i--) {
+      siftDown(arr, begin, i, n);
+    }
     for (int i = n - 1; i > 0; i--) {
       swap(arr, begin, begin + i);
       siftDown(arr, begin, 0, i);
     }
   }
 
-  private static void pdqLoop(int[] arr, int begin, int end, int badAllowed, int[] leftOffsets, int[] rightOffsets) {
+  private static void pdqLoop(
+      int[] arr, int begin, int end, int badAllowed, int[] leftOffsets, int[] rightOffsets) {
     boolean leftmost = true;
     while (true) {
       int size = end - begin;
 
       if (size < INSERT_SORT_THRESHOLD) {
-        if (leftmost) insertSort(arr, begin, end);
-        else unguardInsertSort(arr, begin, end);
+        if (leftmost) {
+          insertSort(arr, begin, end);
+        } else {
+          unguardInsertSort(arr, begin, end);
+        }
         return;
       }
 
@@ -343,7 +430,9 @@ public class pdqbranchlesssort {
           }
         }
       } else {
-        if (alreadyParted && partialInsertSort(arr, begin, pivotPos) && partialInsertSort(arr, pivotPos + 1, end)) {
+        if (alreadyParted
+            && partialInsertSort(arr, begin, pivotPos)
+            && partialInsertSort(arr, pivotPos + 1, end)) {
           return;
         }
       }
@@ -356,14 +445,16 @@ public class pdqbranchlesssort {
 
   public static void sort(int[] arr) {
     int n = arr.length;
-    if (n < 2) return;
+    if (n < 2) {
+      return;
+    }
     int[] leftOffsets = new int[BLOCK_SIZE + CACHELINE_SIZE];
     int[] rightOffsets = new int[BLOCK_SIZE + CACHELINE_SIZE];
     pdqLoop(arr, 0, n, pdqLog(n), leftOffsets, rightOffsets);
   }
 
   public static void main(String[] args) {
-    int[] array = new int[]{0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+    int[] array = new int[] {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
     sort(array);
     System.out.println(Arrays.toString(array));
   }

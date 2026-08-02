@@ -2,7 +2,8 @@ import java.util.Arrays;
 
 public final class binarydoubleinsertionsort {
   private static int leftBinarySearch(int[] array, int a, int b, int val) {
-    int lo = a, hi = b;
+    int lo = a;
+    int hi = b;
     while (lo < hi) {
       int mid = lo + (hi - lo) / 2;
       if (val <= array[mid]) {
@@ -15,7 +16,8 @@ public final class binarydoubleinsertionsort {
   }
 
   private static int rightBinarySearch(int[] array, int a, int b, int val) {
-    int lo = a, hi = b;
+    int lo = a;
+    int hi = b;
     while (lo < hi) {
       int mid = lo + (hi - lo) / 2;
       if (val < array[mid]) {

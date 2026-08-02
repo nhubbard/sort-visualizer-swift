@@ -1,7 +1,7 @@
 import java.util.Arrays;
 
 public class dualpivotquicksort {
-  private static int[] partition(int arr[], int low, int high) {
+  private static int[] partition(int[] arr, int low, int high) {
     if (arr[low] > arr[high]) {
       int t = arr[low];
       arr[low] = arr[high];
@@ -43,10 +43,10 @@ public class dualpivotquicksort {
     int t2 = arr[high];
     arr[high] = arr[g];
     arr[g] = t2;
-    return new int[]{j, g};
+    return new int[] {j, g};
   }
 
-  public static void dualPivotQuickSort(int arr[], int low, int high) {
+  public static void dualPivotQuickSort(int[] arr, int low, int high) {
     if (low < high) {
       int[] pivots = partition(arr, low, high);
       dualPivotQuickSort(arr, low, pivots[0] - 1);
@@ -55,12 +55,12 @@ public class dualpivotquicksort {
     }
   }
 
-  public static void sort(int arr[]) {
+  public static void sort(int[] arr) {
     dualPivotQuickSort(arr, 0, arr.length - 1);
   }
 
   public static void main(String[] args) {
-    int[] array = new int[]{0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+    int[] array = new int[] {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
     sort(array);
     System.out.println(Arrays.toString(array));
   }

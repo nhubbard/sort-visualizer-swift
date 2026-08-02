@@ -1,15 +1,21 @@
 import java.util.Arrays;
 
 public class gravitysort {
-  private static void gravitySort(int arr[]) {
+  private static void gravitySort(int[] arr) {
     int n = arr.length;
-    if (n == 0) return;
+    if (n == 0) {
+      return;
+    }
 
     int minValue = arr[0];
     int maxValue = arr[0];
     for (int i = 1; i < n; i++) {
-      if (arr[i] < minValue) minValue = arr[i];
-      if (arr[i] > maxValue) maxValue = arr[i];
+      if (arr[i] < minValue) {
+        minValue = arr[i];
+      }
+      if (arr[i] > maxValue) {
+        maxValue = arr[i];
+      }
     }
     int ySize = maxValue - minValue + 1;
 
@@ -33,12 +39,12 @@ public class gravitysort {
     }
   }
 
-  public static void sort(int arr[]) {
+  public static void sort(int[] arr) {
     gravitySort(arr);
   }
 
   public static void main(String[] args) {
-    int[] array = new int[]{0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+    int[] array = new int[] {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
     sort(array);
     System.out.println(Arrays.toString(array));
   }

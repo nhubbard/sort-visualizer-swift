@@ -1,7 +1,7 @@
 import java.util.Arrays;
 
 public class doubleinsertionsort {
-  private static void doubleInsertionSort(int arr[], int start, int end) {
+  private static void doubleInsertionSort(int[] arr, int start, int end) {
     int left = start + (end - start) / 2 - 1;
     int right = left + 1;
     if (arr[left] > arr[right]) {
@@ -64,14 +64,14 @@ public class doubleinsertionsort {
     }
   }
 
-  public static void sort(int arr[]) {
+  public static void sort(int[] arr) {
     if (arr.length > 1) {
       doubleInsertionSort(arr, 0, arr.length);
     }
   }
 
   public static void main(String[] args) {
-    int[] array = new int[]{0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+    int[] array = new int[] {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
     sort(array);
     System.out.println(Arrays.toString(array));
   }

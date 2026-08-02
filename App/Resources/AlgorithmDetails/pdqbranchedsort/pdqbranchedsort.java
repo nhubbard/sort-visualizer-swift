@@ -13,7 +13,9 @@ public class pdqbranchedsort {
 
   private static int pdqLog(int n) {
     int log = 0;
-    while ((n >>= 1) != 0) log++;
+    while ((n >>= 1) != 0) {
+      log++;
+    }
     return log;
   }
 
@@ -48,7 +50,9 @@ public class pdqbranchedsort {
   private static boolean partialInsertSort(int[] arr, int begin, int end) {
     int limit = 0;
     for (int cur = begin + 1; cur < end; cur++) {
-      if (limit > PARTIAL_INSERT_SORT_LIMIT) return false;
+      if (limit > PARTIAL_INSERT_SORT_LIMIT) {
+        return false;
+      }
       if (arr[cur] < arr[cur - 1]) {
         int tmp = arr[cur];
         int sift = cur;
@@ -64,7 +68,9 @@ public class pdqbranchedsort {
   }
 
   private static void sortTwo(int[] arr, int a, int b) {
-    if (arr[b] < arr[a]) swap(arr, a, b);
+    if (arr[b] < arr[a]) {
+      swap(arr, a, b);
+    }
   }
 
   private static void sortThree(int[] arr, int a, int b, int c) {
@@ -89,23 +95,33 @@ public class pdqbranchedsort {
     int last = end;
 
     first++;
-    while (arr[first] < pivot) first++;
+    while (arr[first] < pivot) {
+      first++;
+    }
 
     if (first - 1 == begin) {
       last--;
-      while (first < last && !(arr[last] < pivot)) last--;
+      while (first < last && !(arr[last] < pivot)) {
+        last--;
+      }
     } else {
       last--;
-      while (!(arr[last] < pivot)) last--;
+      while (!(arr[last] < pivot)) {
+        last--;
+      }
     }
 
     boolean alreadyParted = first >= last;
     while (first < last) {
       swap(arr, first, last);
       first++;
-      while (arr[first] < pivot) first++;
+      while (arr[first] < pivot) {
+        first++;
+      }
       last--;
-      while (!(arr[last] < pivot)) last--;
+      while (!(arr[last] < pivot)) {
+        last--;
+      }
     }
 
     int pivotPos = first - 1;
@@ -121,22 +137,32 @@ public class pdqbranchedsort {
     int last = end;
 
     last--;
-    while (pivot < arr[last]) last--;
+    while (pivot < arr[last]) {
+      last--;
+    }
 
     if (last + 1 == end) {
       first++;
-      while (first < last && !(pivot < arr[first])) first++;
+      while (first < last && !(pivot < arr[first])) {
+        first++;
+      }
     } else {
       first++;
-      while (!(pivot < arr[first])) first++;
+      while (!(pivot < arr[first])) {
+        first++;
+      }
     }
 
     while (first < last) {
       swap(arr, first, last);
       last--;
-      while (pivot < arr[last]) last--;
+      while (pivot < arr[last]) {
+        last--;
+      }
       first++;
-      while (!(pivot < arr[first])) first++;
+      while (!(pivot < arr[first])) {
+        first++;
+      }
     }
 
     int pivotPos = last;
@@ -148,8 +174,12 @@ public class pdqbranchedsort {
   private static void siftDown(int[] arr, int begin, int root, int size) {
     while (true) {
       int child = 2 * root + 1;
-      if (child >= size) break;
-      if (child + 1 < size && arr[begin + child] < arr[begin + child + 1]) child++;
+      if (child >= size) {
+        break;
+      }
+      if (child + 1 < size && arr[begin + child] < arr[begin + child + 1]) {
+        child++;
+      }
       if (arr[begin + root] < arr[begin + child]) {
         swap(arr, begin + root, begin + child);
         root = child;
@@ -161,7 +191,9 @@ public class pdqbranchedsort {
 
   private static void heapSort(int[] arr, int begin, int end) {
     int n = end - begin;
-    for (int i = n / 2 - 1; i >= 0; i--) siftDown(arr, begin, i, n);
+    for (int i = n / 2 - 1; i >= 0; i--) {
+      siftDown(arr, begin, i, n);
+    }
     for (int i = n - 1; i > 0; i--) {
       swap(arr, begin, begin + i);
       siftDown(arr, begin, 0, i);
@@ -174,8 +206,11 @@ public class pdqbranchedsort {
       int size = end - begin;
 
       if (size < INSERT_SORT_THRESHOLD) {
-        if (leftmost) insertSort(arr, begin, end);
-        else unguardInsertSort(arr, begin, end);
+        if (leftmost) {
+          insertSort(arr, begin, end);
+        } else {
+          unguardInsertSort(arr, begin, end);
+        }
         return;
       }
 
@@ -231,7 +266,9 @@ public class pdqbranchedsort {
           }
         }
       } else {
-        if (alreadyParted && partialInsertSort(arr, begin, pivotPos) && partialInsertSort(arr, pivotPos + 1, end)) {
+        if (alreadyParted
+            && partialInsertSort(arr, begin, pivotPos)
+            && partialInsertSort(arr, pivotPos + 1, end)) {
           return;
         }
       }
@@ -244,12 +281,14 @@ public class pdqbranchedsort {
 
   public static void sort(int[] arr) {
     int n = arr.length;
-    if (n < 2) return;
+    if (n < 2) {
+      return;
+    }
     pdqLoop(arr, 0, n, pdqLog(n));
   }
 
   public static void main(String[] args) {
-    int[] array = new int[]{0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+    int[] array = new int[] {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
     sort(array);
     System.out.println(Arrays.toString(array));
   }

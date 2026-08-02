@@ -11,7 +11,7 @@ public class staticsort {
         maxValue = array[i];
       }
     }
-    return new int[]{minValue, maxValue};
+    return new int[] {minValue, maxValue};
   }
 
   private static void insertionSortRange(int[] array, int s, int e) {
@@ -37,7 +37,9 @@ public class staticsort {
       if (right < size && array[s + largest] < array[s + right]) {
         largest = right;
       }
-      if (largest == root) break;
+      if (largest == root) {
+        break;
+      }
       int tmp = array[s + root];
       array[s + root] = array[s + largest];
       array[s + largest] = tmp;
@@ -47,7 +49,9 @@ public class staticsort {
 
   private static void heapSortRange(int[] array, int s, int e) {
     int size = e - s;
-    if (size <= 1) return;
+    if (size <= 1) {
+      return;
+    }
     int i = size / 2 - 1;
     while (i >= 0) {
       siftDown(array, s, i, size);
@@ -108,7 +112,9 @@ public class staticsort {
     for (int i = 0; i < auxLen; i++) {
       int s = (i > 1) ? offset[i - 1] : a;
       int e = offset[i];
-      if (e - s <= 1) continue;
+      if (e - s <= 1) {
+        continue;
+      }
       if (e - s > 16) {
         heapSortRange(array, s, e);
       } else {
@@ -124,7 +130,7 @@ public class staticsort {
   }
 
   public static void main(String[] args) {
-    int[] array = new int[]{0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+    int[] array = new int[] {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
     sort(array);
     System.out.println(Arrays.toString(array));
   }

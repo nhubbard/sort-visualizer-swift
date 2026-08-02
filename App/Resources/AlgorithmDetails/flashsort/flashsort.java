@@ -7,7 +7,9 @@ public class flashsort {
 
   private static void flashSort(int[] array) {
     int n = array.length;
-    if (n == 0) return;
+    if (n == 0) {
+      return;
+    }
 
     int m = (int) (0.2 * n) + 2;
 
@@ -17,7 +19,9 @@ public class flashsort {
 
     int i = 1;
     while (i < n - 1) {
-      int small, big, bigIndex;
+      int small;
+      int big;
+      int bigIndex;
       if (array[i] < array[i + 1]) {
         small = array[i];
         big = array[i + 1];
@@ -31,7 +35,9 @@ public class flashsort {
         maxValue = big;
         maxIndex = bigIndex;
       }
-      if (small < minValue) {minValue = small;}
+      if (small < minValue) {
+        minValue = small;
+      }
       i += 2;
     }
 
@@ -43,8 +49,11 @@ public class flashsort {
       maxIndex = n - 1;
     }
 
-    if (maxValue == minValue) return;
+    if (maxValue == minValue) {
+      return;
+    }
 
+    @SuppressWarnings("checkstyle:localvariablename") // matches every other language's port
     int[] L = new int[m + 1];
     double c = (m - 1.0) / (maxValue - minValue);
 
@@ -98,7 +107,7 @@ public class flashsort {
   }
 
   public static void main(String[] args) {
-    int[] array = new int[]{0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+    int[] array = new int[] {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
     sort(array);
     System.out.println(Arrays.toString(array));
   }

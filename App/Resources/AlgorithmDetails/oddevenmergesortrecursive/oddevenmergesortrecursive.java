@@ -15,11 +15,11 @@ public class oddevenmergesortrecursive {
     int m = r * 2;
     if (m < n) {
       if ((n / r) % 2 != 0) {
-        oddEvenMerge(arr, lo, (m2 + 1) / 2, n + r, m);     // even subsequence
-        oddEvenMerge(arr, lo + r, m2 / 2, n - r, m);       // odd subsequence
+        oddEvenMerge(arr, lo, (m2 + 1) / 2, n + r, m); // even subsequence
+        oddEvenMerge(arr, lo + r, m2 / 2, n - r, m); // odd subsequence
       } else {
-        oddEvenMerge(arr, lo, (m2 + 1) / 2, n, m);         // even subsequence
-        oddEvenMerge(arr, lo + r, m2 / 2, n, m);           // odd subsequence
+        oddEvenMerge(arr, lo, (m2 + 1) / 2, n, m); // even subsequence
+        oddEvenMerge(arr, lo + r, m2 / 2, n, m); // odd subsequence
       }
 
       if (m2 % 2 != 0) {
@@ -52,7 +52,7 @@ public class oddevenmergesortrecursive {
   }
 
   public static void main(String[] args) {
-    int[] array = new int[]{0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+    int[] array = new int[] {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
     sort(array);
     System.out.println(Arrays.toString(array));
   }

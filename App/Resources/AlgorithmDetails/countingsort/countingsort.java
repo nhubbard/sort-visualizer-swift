@@ -1,7 +1,7 @@
 import java.util.Arrays;
 
 public class countingsort {
-  public static int[] sort(int arr[]) {
+  public static int[] sort(int[] arr) {
     int max = arr[0];
     for (int i = 1; i < arr.length; i++) {
       if (arr[i] > max) {
@@ -26,7 +26,7 @@ public class countingsort {
   }
 
   public static void main(String[] args) {
-    int[] array = new int[]{0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+    int[] array = new int[] {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
     array = sort(array);
     System.out.println(Arrays.toString(array));
   }

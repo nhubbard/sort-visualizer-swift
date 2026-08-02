@@ -23,12 +23,19 @@ public class introsort {
   }
 
   private static int partition(int[] arr, int lo, int hi, int pivotValue) {
-    int i = lo, j = hi;
+    int i = lo;
+    int j = hi;
     while (true) {
-      while (arr[i] < pivotValue) i++;
+      while (arr[i] < pivotValue) {
+        i++;
+      }
       j--;
-      while (pivotValue < arr[j]) j--;
-      if (!(i < j)) return i;
+      while (pivotValue < arr[j]) {
+        j--;
+      }
+      if (!(i < j)) {
+        return i;
+      }
       swap(arr, i, j);
       i++;
     }
@@ -39,9 +46,15 @@ public class introsort {
       int largest = root;
       int left = 2 * root + 1;
       int right = 2 * root + 2;
-      if (left < rangeSize && arr[lo + largest] < arr[lo + left]) largest = left;
-      if (right < rangeSize && arr[lo + largest] < arr[lo + right]) largest = right;
-      if (largest == root) break;
+      if (left < rangeSize && arr[lo + largest] < arr[lo + left]) {
+        largest = left;
+      }
+      if (right < rangeSize && arr[lo + largest] < arr[lo + right]) {
+        largest = right;
+      }
+      if (largest == root) {
+        break;
+      }
       swap(arr, lo + root, lo + largest);
       root = largest;
     }
@@ -49,7 +62,9 @@ public class introsort {
 
   private static void heapSortRange(int[] arr, int lo, int hi) {
     int size = hi - lo;
-    for (int i = size / 2 - 1; i >= 0; i--) siftDown(arr, lo, i, size);
+    for (int i = size / 2 - 1; i >= 0; i--) {
+      siftDown(arr, lo, i, size);
+    }
     for (int end = size - 1; end > 0; end--) {
       swap(arr, lo, lo + end);
       siftDown(arr, lo, 0, end);
@@ -93,7 +108,7 @@ public class introsort {
   }
 
   public static void main(String[] args) {
-    int[] array = new int[]{0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+    int[] array = new int[] {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
     sort(array);
     System.out.println(Arrays.toString(array));
   }

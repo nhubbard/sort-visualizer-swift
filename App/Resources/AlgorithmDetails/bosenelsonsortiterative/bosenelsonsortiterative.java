@@ -4,7 +4,9 @@ public class bosenelsonsortiterative {
   private static int end;
 
   private static void compSwap(int[] arr, int a, int b) {
-    if (b >= end) return;
+    if (b >= end) {
+      return;
+    }
     if (arr[a] > arr[b]) {
       int temp = arr[a];
       arr[a] = arr[b];
@@ -25,9 +27,13 @@ public class bosenelsonsortiterative {
 
   public static void sort(int[] arr) {
     end = arr.length;
-    if (end <= 1) return;
+    if (end <= 1) {
+      return;
+    }
     int paddedLength = 1;
-    while (paddedLength < end) paddedLength <<= 1;
+    while (paddedLength < end) {
+      paddedLength <<= 1;
+    }
 
     for (int k = 2; k <= paddedLength; k *= 2) {
       for (int j = 0; j < k / 2; j++) {
@@ -39,7 +45,7 @@ public class bosenelsonsortiterative {
   }
 
   public static void main(String[] args) {
-    int[] array = new int[]{0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+    int[] array = new int[] {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
     sort(array);
     System.out.println(Arrays.toString(array));
   }

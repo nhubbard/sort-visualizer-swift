@@ -1,7 +1,7 @@
 import java.util.Arrays;
 
 public class simplifiedlibrarysort {
-  private static int binarySearch(int arr[], int item, int start, int end) {
+  private static int binarySearch(int[] arr, int item, int start, int end) {
     int lo = start;
     int hi = end;
     while (lo < hi) {
@@ -15,7 +15,7 @@ public class simplifiedlibrarysort {
     return lo;
   }
 
-  private static void binaryInsertionSort(int arr[], int start, int end) {
+  private static void binaryInsertionSort(int[] arr, int start, int end) {
     for (int i = start + 1; i < end; i++) {
       int item = arr[i];
       int pos = binarySearch(arr, item, start, i);
@@ -28,7 +28,8 @@ public class simplifiedlibrarysort {
     }
   }
 
-  private static void rebalance(int arr[], int temp[], int counts[], int locations[], int spineSize, int batchEnd) {
+  private static void rebalance(
+      int[] arr, int[] temp, int[] counts, int[] locations, int spineSize, int batchEnd) {
     for (int i = 0; i < spineSize; i++) {
       counts[i + 1] = counts[i + 1] + counts[i] + 1;
     }
@@ -63,7 +64,7 @@ public class simplifiedlibrarysort {
     }
   }
 
-  private static void librarySort(int arr[]) {
+  private static void librarySort(int[] arr) {
     int n = arr.length;
     if (n < 2) {
       return;
@@ -99,12 +100,12 @@ public class simplifiedlibrarysort {
     rebalance(arr, temp, counts, locations, spineSize, n);
   }
 
-  public static void sort(int arr[]) {
+  public static void sort(int[] arr) {
     librarySort(arr);
   }
 
   public static void main(String[] args) {
-    int[] array = new int[]{0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+    int[] array = new int[] {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
     sort(array);
     System.out.println(Arrays.toString(array));
   }

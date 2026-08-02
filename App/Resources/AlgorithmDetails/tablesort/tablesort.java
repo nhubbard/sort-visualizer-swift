@@ -4,8 +4,12 @@ public class tablesort {
   public static boolean stableComp(int[] arr, int[] table, int a, int b) {
     int ta = table[a];
     int tb = table[b];
-    if (arr[ta] > arr[tb]) return true;
-    if (arr[ta] == arr[tb]) return table[a] > table[b];
+    if (arr[ta] > arr[tb]) {
+      return true;
+    }
+    if (arr[ta] == arr[tb]) {
+      return table[a] > table[b];
+    }
     return false;
   }
 
@@ -20,7 +24,9 @@ public class tablesort {
       int tmp = table[m];
       table[m] = table[b - 1];
       table[b - 1] = tmp;
-      if (stableComp(arr, table, a, m)) return;
+      if (stableComp(arr, table, a, m)) {
+        return;
+      }
     }
     int tmp = table[a];
     table[a] = table[m];
@@ -68,7 +74,9 @@ public class tablesort {
   public static void sort(int[] arr) {
     int n = arr.length;
     int[] table = new int[n];
-    for (int i = 0; i < n; i++) table[i] = i;
+    for (int i = 0; i < n; i++) {
+      table[i] = i;
+    }
     quickSort(arr, table, 0, n);
     for (int i = 0; i < n; i++) {
       if (table[i] != i) {
@@ -88,7 +96,7 @@ public class tablesort {
   }
 
   public static void main(String[] args) {
-    int[] array = new int[]{0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+    int[] array = new int[] {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
     sort(array);
     System.out.println(Arrays.toString(array));
   }

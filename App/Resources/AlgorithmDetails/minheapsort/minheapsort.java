@@ -1,7 +1,7 @@
 import java.util.Arrays;
 
 public class minheapsort {
-  private static void siftDown(int arr[], int root, int size) {
+  private static void siftDown(int[] arr, int root, int size) {
     while (true) {
       int smallest = root;
       int left = 2 * root + 1;
@@ -22,14 +22,15 @@ public class minheapsort {
     }
   }
 
-  private static void heapify(int arr[]) {
+  private static void heapify(int[] arr) {
     for (int i = arr.length / 2 - 1; i >= 0; i--) {
       siftDown(arr, i, arr.length);
     }
   }
 
-  private static void reverse(int arr[]) {
-    int low = 0, high = arr.length - 1;
+  private static void reverse(int[] arr) {
+    int low = 0;
+    int high = arr.length - 1;
     while (low < high) {
       int temp = arr[low];
       arr[low] = arr[high];
@@ -39,7 +40,7 @@ public class minheapsort {
     }
   }
 
-  public static void sort(int arr[]) {
+  public static void sort(int[] arr) {
     heapify(arr);
     for (int end = arr.length - 1; end > 0; end--) {
       int temp = arr[0];
@@ -51,7 +52,7 @@ public class minheapsort {
   }
 
   public static void main(String[] args) {
-    int[] array = new int[]{0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+    int[] array = new int[] {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
     sort(array);
     System.out.println(Arrays.toString(array));
   }

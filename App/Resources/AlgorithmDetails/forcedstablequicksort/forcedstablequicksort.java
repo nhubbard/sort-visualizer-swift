@@ -2,8 +2,12 @@ import java.util.Arrays;
 
 public class forcedstablequicksort {
   private static boolean stableComp(int[] arr, int[] key, int a, int b) {
-    if (arr[a] > arr[b]) return true;
-    if (arr[a] == arr[b]) return key[a] > key[b];
+    if (arr[a] > arr[b]) {
+      return true;
+    }
+    if (arr[a] == arr[b]) {
+      return key[a] > key[b];
+    }
     return false;
   }
 
@@ -18,10 +22,14 @@ public class forcedstablequicksort {
 
   private static void medianOfThree(int[] arr, int[] key, int a, int b) {
     int m = a + (b - 1 - a) / 2;
-    if (stableComp(arr, key, a, m)) stableSwap(arr, key, a, m);
+    if (stableComp(arr, key, a, m)) {
+      stableSwap(arr, key, a, m);
+    }
     if (stableComp(arr, key, m, b - 1)) {
       stableSwap(arr, key, m, b - 1);
-      if (stableComp(arr, key, a, m)) return;
+      if (stableComp(arr, key, a, m)) {
+        return;
+      }
     }
     stableSwap(arr, key, a, m);
   }
@@ -46,7 +54,9 @@ public class forcedstablequicksort {
 
   private static void quickSort(int[] arr, int[] key, int a, int b) {
     if (b - a < 3) {
-      if (b - a == 2 && stableComp(arr, key, a, a + 1)) stableSwap(arr, key, a, a + 1);
+      if (b - a == 2 && stableComp(arr, key, a, a + 1)) {
+        stableSwap(arr, key, a, a + 1);
+      }
       return;
     }
     medianOfThree(arr, key, a, b);
@@ -59,12 +69,14 @@ public class forcedstablequicksort {
   public static void sort(int[] arr) {
     int n = arr.length;
     int[] key = new int[n];
-    for (int i = 0; i < n; i++) key[i] = i;
+    for (int i = 0; i < n; i++) {
+      key[i] = i;
+    }
     quickSort(arr, key, 0, n);
   }
 
   public static void main(String[] args) {
-    int[] array = new int[]{0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+    int[] array = new int[] {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
     sort(array);
     System.out.println(Arrays.toString(array));
   }

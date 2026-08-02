@@ -2,8 +2,12 @@ import java.util.Arrays;
 
 public class funsort {
   public static boolean compositeLess(int[] arr, int[] key, int mid, int i) {
-    if (arr[mid] < arr[i]) return true;
-    if (arr[mid] == arr[i]) return key[mid] < key[i];
+    if (arr[mid] < arr[i]) {
+      return true;
+    }
+    if (arr[mid] == arr[i]) {
+      return key[mid] < key[i];
+    }
     return false;
   }
 
@@ -24,7 +28,9 @@ public class funsort {
   public static void sort(int[] arr) {
     int n = arr.length;
     int[] key = new int[n];
-    for (int i = 0; i < n; i++) key[i] = i;
+    for (int i = 0; i < n; i++) {
+      key[i] = i;
+    }
 
     for (int i = 1; i < n; i++) {
       boolean done = false;
@@ -52,7 +58,7 @@ public class funsort {
   }
 
   public static void main(String[] args) {
-    int[] array = new int[]{0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+    int[] array = new int[] {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
     sort(array);
     System.out.println(Arrays.toString(array));
   }

@@ -1,7 +1,7 @@
 import java.util.Arrays;
 
 public class bottomupheapsort {
-  public static void siftDown(int arr[], int i, int b) {
+  public static void siftDown(int[] arr, int i, int b) {
     int j = i;
     while (2 * j + 1 < b) {
       if (2 * j + 2 < b) {
@@ -21,7 +21,7 @@ public class bottomupheapsort {
     }
   }
 
-  public static void sort(int arr[]) {
+  public static void sort(int[] arr) {
     int n = arr.length;
     for (int i = (n - 1) / 2; i >= 0; i--) {
       siftDown(arr, i, n);
@@ -35,7 +35,7 @@ public class bottomupheapsort {
   }
 
   public static void main(String[] args) {
-    int[] array = new int[]{0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+    int[] array = new int[] {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
     sort(array);
     System.out.println(Arrays.toString(array));
   }

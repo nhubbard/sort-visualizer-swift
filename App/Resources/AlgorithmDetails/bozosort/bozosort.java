@@ -22,7 +22,7 @@ public class bozosort {
   }
 
   public static void main(String[] args) {
-    int[] array = new int[]{0, 39, 21, 62, 91, 77};
+    int[] array = new int[] {0, 39, 21, 62, 91, 77};
     sort(array);
     System.out.println(Arrays.toString(array));
   }

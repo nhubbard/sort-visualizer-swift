@@ -19,28 +19,40 @@ public class simpleshattersort {
     int minV = arr[start];
     int maxV = arr[start];
     for (int i = 1; i < length; i++) {
-      if (arr[start + i] < minV) minV = arr[start + i];
-      if (arr[start + i] > maxV) maxV = arr[start + i];
+      if (arr[start + i] < minV) {
+        minV = arr[start + i];
+      }
+      if (arr[start + i] > maxV) {
+        maxV = arr[start + i];
+      }
     }
     int valueRange = maxV - minV + 1;
     int shatters = (length + num - 1) / num;
 
     List<List<Integer>> buckets = new ArrayList<>();
-    for (int i = 0; i < shatters; i++) buckets.add(new ArrayList<>());
+    for (int i = 0; i < shatters; i++) {
+      buckets.add(new ArrayList<>());
+    }
 
     for (int i = 0; i < length; i++) {
       int v = arr[start + i];
       int idx = (v - minV) * shatters / valueRange;
-      if (idx > shatters - 1) idx = shatters - 1;
+      if (idx > shatters - 1) {
+        idx = shatters - 1;
+      }
       buckets.get(idx).add(v);
     }
 
     int[] offsets = new int[shatters + 1];
-    for (int i = 0; i < shatters; i++) offsets[i + 1] = offsets[i] + buckets.get(i).size();
+    for (int i = 0; i < shatters; i++) {
+      offsets[i + 1] = offsets[i] + buckets.get(i).size();
+    }
 
     int pos = start;
     for (List<Integer> bucket : buckets) {
-      for (int v : bucket) arr[pos++] = v;
+      for (int v : bucket) {
+        arr[pos++] = v;
+      }
     }
     return offsets;
   }
@@ -63,7 +75,9 @@ public class simpleshattersort {
     }
     int[] offsets = shatterPartition(arr, 0, length, 1);
     for (int k = 0; k < offsets.length - 1; k++) {
-      if (offsets[k + 1] - offsets[k] > 1) insertionSort(arr, offsets[k], offsets[k + 1]);
+      if (offsets[k + 1] - offsets[k] > 1) {
+        insertionSort(arr, offsets[k], offsets[k + 1]);
+      }
     }
   }
 
@@ -74,7 +88,7 @@ public class simpleshattersort {
   }
 
   public static void main(String[] args) {
-    int[] array = new int[]{0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+    int[] array = new int[] {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
     sort(array);
     System.out.println(Arrays.toString(array));
   }

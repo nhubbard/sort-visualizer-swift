@@ -9,12 +9,20 @@ public final class triangularheapsort {
     while (true) {
       int row = triangularRoot(root);
       int left = root + row + 1;
-      if (left >= size) break;
+      if (left >= size) {
+        break;
+      }
       int right = left + 1;
       int largest = root;
-      if (array[largest] < array[left]) largest = left;
-      if (right < size && array[largest] < array[right]) largest = right;
-      if (largest == root) break;
+      if (array[largest] < array[left]) {
+        largest = left;
+      }
+      if (right < size && array[largest] < array[right]) {
+        largest = right;
+      }
+      if (largest == root) {
+        break;
+      }
       int temp = array[root];
       array[root] = array[largest];
       array[largest] = temp;
@@ -30,7 +38,9 @@ public final class triangularheapsort {
 
   static void sort(int[] array) {
     int n = array.length;
-    if (n <= 1) return;
+    if (n <= 1) {
+      return;
+    }
     heapify(array, n);
     for (int i = 1; i < n - 1; i++) {
       int temp = array[0];

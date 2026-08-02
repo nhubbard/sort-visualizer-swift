@@ -29,7 +29,7 @@ public class lessbogosort {
   }
 
   public static void main(String[] args) {
-    int[] array = new int[]{0, 39, 21, 62, 91, 77, 14, 23};
+    int[] array = new int[] {0, 39, 21, 62, 91, 77, 14, 23};
     sort(array);
     System.out.println(Arrays.toString(array));
   }

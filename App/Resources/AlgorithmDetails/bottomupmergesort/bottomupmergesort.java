@@ -4,7 +4,9 @@ public class bottomupmergesort {
   private static void merge(int[] arr, int low, int mid, int high) {
     int[] left = Arrays.copyOfRange(arr, low, mid);
     int[] right = Arrays.copyOfRange(arr, mid, high);
-    int i = 0, j = 0, k = low;
+    int i = 0;
+    int j = 0;
+    int k = low;
     while (i < left.length && j < right.length) {
       if (left[i] <= right[j]) {
         arr[k] = left[i];
@@ -27,7 +29,7 @@ public class bottomupmergesort {
     }
   }
 
-  public static void sort(int arr[]) {
+  public static void sort(int[] arr) {
     int n = arr.length;
     for (int width = 1; width < n; width *= 2) {
       for (int low = 0; low < n; low += 2 * width) {
@@ -41,7 +43,7 @@ public class bottomupmergesort {
   }
 
   public static void main(String[] args) {
-    int[] array = new int[]{0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+    int[] array = new int[] {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
     sort(array);
     System.out.println(Arrays.toString(array));
   }

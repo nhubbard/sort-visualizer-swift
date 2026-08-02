@@ -46,7 +46,9 @@ public class introcirclesortiterative {
 
   public static void sort(int[] arr) {
     int end = arr.length;
-    if (end <= 1) return;
+    if (end <= 1) {
+      return;
+    }
     int n = 1;
     int threshold = 0;
     while (n < end) {
@@ -69,7 +71,7 @@ public class introcirclesortiterative {
   }
 
   public static void main(String[] args) {
-    int[] array = new int[]{0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+    int[] array = new int[] {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
     sort(array);
     System.out.println(Arrays.toString(array));
   }

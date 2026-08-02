@@ -10,7 +10,8 @@ public class rotatemergesort {
   }
 
   private static void rotate(int[] arr, int a, int m, int b) {
-    int l = m - a, r = b - m;
+    int l = m - a;
+    int r = b - m;
     while (l > 0 && r > 0) {
       if (r < l) {
         multiSwap(arr, m - r, m, r);
@@ -40,7 +41,9 @@ public class rotatemergesort {
   }
 
   private static void rotateMerge(int[] arr, int a, int m, int b) {
-    int m1, m2, m3;
+    int m1;
+    int m2;
+    int m3;
     if (m - a >= b - m) {
       m1 = a + (m - a) / 2;
       int value = arr[m1];
@@ -80,7 +83,7 @@ public class rotatemergesort {
   }
 
   public static void main(String[] args) {
-    int[] array = new int[]{0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+    int[] array = new int[] {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
     sort(array);
     System.out.println(Arrays.toString(array));
   }

@@ -50,7 +50,9 @@ public class cocktailmergesort {
     int rightLength = end - mid;
     int[] left = Arrays.copyOfRange(arr, start, mid);
     int[] right = Arrays.copyOfRange(arr, mid, end);
-    int i = 0, j = 0, k = start;
+    int i = 0;
+    int j = 0;
+    int k = start;
     while (i < leftLength && j < rightLength) {
       if (left[i] <= right[j]) {
         arr[k] = left[i];
@@ -111,7 +113,7 @@ public class cocktailmergesort {
   }
 
   public static void main(String[] args) {
-    int[] array = new int[]{0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+    int[] array = new int[] {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
     sort(array);
     System.out.println(Arrays.toString(array));
   }

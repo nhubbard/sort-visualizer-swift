@@ -60,7 +60,8 @@ public class twinsort {
           offset += block * 2;
           continue;
         }
-        int cMax, dMax;
+        int cMax;
+        int dMax;
         if (offset + block * 2 <= nmemb) {
           cMax = s + block;
           dMax = a + block * 2;
@@ -85,23 +86,37 @@ public class twinsort {
         d = a + block - 1;
         e = dMax - 1;
         if (arr[a] <= arr[a + block]) {
-          arr[e] = arr[d]; e--; d--;
+          arr[e] = arr[d];
+          e--;
+          d--;
           while (c >= s) {
             while (arr[d] > buf[c]) {
-              arr[e] = arr[d]; e--; d--;
+              arr[e] = arr[d];
+              e--;
+              d--;
             }
-            arr[e] = buf[c]; e--; c--;
+            arr[e] = buf[c];
+            e--;
+            c--;
           }
         } else {
-          arr[e] = arr[d]; e--; d--;
+          arr[e] = arr[d];
+          e--;
+          d--;
           while (d >= a) {
             while (arr[d] <= buf[c]) {
-              arr[e] = buf[c]; e--; c--;
+              arr[e] = buf[c];
+              e--;
+              c--;
             }
-            arr[e] = arr[d]; e--; d--;
+            arr[e] = arr[d];
+            e--;
+            d--;
           }
           while (c >= s) {
-            arr[e] = buf[c]; e--; c--;
+            arr[e] = buf[c];
+            e--;
+            c--;
           }
         }
         offset += block * 2;
@@ -110,7 +125,7 @@ public class twinsort {
     }
   }
 
-  static void twinsort(int[] arr, int nmemb) {
+  static void twinSort(int[] arr, int nmemb) {
     if (twinSwap(arr, nmemb) == 0) {
       int[] buf = new int[nmemb / 2];
       tailMerge(arr, buf, nmemb, 2);
@@ -119,11 +134,11 @@ public class twinsort {
 
   public static void sort(int[] arr) {
     int n = arr.length;
-    twinsort(arr, n);
+    twinSort(arr, n);
   }
 
   public static void main(String[] args) {
-    int[] array = new int[]{0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+    int[] array = new int[] {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
     sort(array);
     System.out.println(Arrays.toString(array));
   }

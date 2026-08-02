@@ -41,7 +41,7 @@ public class stablepermutationsort {
     return false;
   }
 
-  public static void sort(int arr[]) {
+  public static void sort(int[] arr) {
     int n = arr.length;
     int[] idx = new int[n];
     for (int i = 0; i < n; i++) {
@@ -51,7 +51,7 @@ public class stablepermutationsort {
   }
 
   public static void main(String[] args) {
-    int[] array = new int[]{0, 39, 21, 62, 91, 14, 23};
+    int[] array = new int[] {0, 39, 21, 62, 91, 14, 23};
     sort(array);
     System.out.println(Arrays.toString(array));
   }

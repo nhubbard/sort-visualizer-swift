@@ -22,7 +22,7 @@ public class guesssort {
     return total == n;
   }
 
-  public static void sort(int arr[]) {
+  public static void sort(int[] arr) {
     int n = arr.length;
     int[] loops = new int[n];
     int[] indexes = new int[n];
@@ -53,7 +53,7 @@ public class guesssort {
   }
 
   public static void main(String[] args) {
-    int[] array = new int[]{0, 39, 21, 14};
+    int[] array = new int[] {0, 39, 21, 14};
     sort(array);
     System.out.println(Arrays.toString(array));
   }

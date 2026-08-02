@@ -23,18 +23,24 @@ public class lazystablesort {
   }
 
   public static int binSearch(int[] arr, int pos, int len, int keyPos, boolean isLeft) {
-    int left = 0, right = len;
+    int left = 0;
+    int right = len;
     while (left < right) {
       int mid = left + (right - left) / 2;
       boolean cond = isLeft ? arr[pos + mid] < arr[keyPos] : arr[pos + mid] <= arr[keyPos];
-      if (cond) left = mid + 1;
-      else right = mid;
+      if (cond) {
+        left = mid + 1;
+      } else {
+        right = mid;
+      }
     }
     return left;
   }
 
   public static void mergeWithoutBuffer(int[] arr, int pos, int len1, int len2) {
-    if (len1 == 0 || len2 == 0) return;
+    if (len1 == 0 || len2 == 0) {
+      return;
+    }
     if (len1 == 1) {
       int loc = binSearch(arr, pos + 1, len2, pos, true);
       rotate(arr, pos, 1, loc);
@@ -72,13 +78,15 @@ public class lazystablesort {
         left += 2 * part;
       }
       int rest = n - left;
-      if (rest > part) mergeWithoutBuffer(arr, left, part, rest - part);
+      if (rest > part) {
+        mergeWithoutBuffer(arr, left, part, rest - part);
+      }
       part *= 2;
     }
   }
 
   public static void main(String[] args) {
-    int[] array = new int[]{0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+    int[] array = new int[] {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
     sort(array);
     System.out.println(Arrays.toString(array));
   }

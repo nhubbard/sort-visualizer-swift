@@ -5,7 +5,14 @@ public class lsdradixsort {
     int n = arr.length;
     int[][] bucket = new int[10][10];
     int[] bucketCount = new int[10];
-    int i, j, k, r, nop = 0, divisor = 1, lar, pass;
+    int i;
+    int j;
+    int k;
+    int r;
+    int nop = 0;
+    int divisor = 1;
+    int lar;
+    int pass;
     lar = Arrays.stream(arr).summaryStatistics().getMax();
     while (lar > 0) {
       nop++;
@@ -32,7 +39,7 @@ public class lsdradixsort {
   }
 
   public static void main(String[] args) {
-    int[] array = new int[]{0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+    int[] array = new int[] {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
     sort(array);
     System.out.println(Arrays.toString(array));
   }

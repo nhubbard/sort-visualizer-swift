@@ -1,15 +1,19 @@
 import java.util.Arrays;
 
 public class asynchronoussort {
-  public static void sort(int arr[]) {
+  public static void sort(int[] arr) {
     int n = arr.length;
     int[] ext = new int[n];
     System.arraycopy(arr, 0, ext, 0, n);
     int minValue = ext[0];
     int maxValue = ext[0];
     for (int k = 0; k < n; k++) {
-      if (ext[k] < minValue) minValue = ext[k];
-      if (ext[k] > maxValue) maxValue = ext[k];
+      if (ext[k] < minValue) {
+        minValue = ext[k];
+      }
+      if (ext[k] > maxValue) {
+        maxValue = ext[k];
+      }
     }
     maxValue += 1;
 
@@ -28,7 +32,7 @@ public class asynchronoussort {
   }
 
   public static void main(String[] args) {
-    int[] array = new int[]{0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+    int[] array = new int[] {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
     sort(array);
     System.out.println(Arrays.toString(array));
   }

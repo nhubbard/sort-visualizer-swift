@@ -1,7 +1,7 @@
 import java.util.Arrays;
 
 public class inplacemergesort {
-  private static void push(int arr[], int low, int high) {
+  private static void push(int[] arr, int low, int high) {
     for (int i = low; i < high; i++) {
       if (arr[i] > arr[i + 1]) {
         int temp = arr[i];
@@ -11,7 +11,7 @@ public class inplacemergesort {
     }
   }
 
-  private static void merge(int arr[], int low, int high, int mid) {
+  private static void merge(int[] arr, int low, int high, int mid) {
     int i = low;
     while (i <= mid) {
       if (arr[i] > arr[mid + 1]) {
@@ -24,7 +24,7 @@ public class inplacemergesort {
     }
   }
 
-  private static void mergeSort(int arr[], int low, int high) {
+  private static void mergeSort(int[] arr, int low, int high) {
     if (high - low == 0) {
       return;
     } else if (high - low == 1) {
@@ -41,14 +41,14 @@ public class inplacemergesort {
     }
   }
 
-  public static void sort(int arr[]) {
+  public static void sort(int[] arr) {
     if (arr.length >= 2) {
       mergeSort(arr, 0, arr.length - 1);
     }
   }
 
   public static void main(String[] args) {
-    int[] array = new int[]{0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+    int[] array = new int[] {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
     sort(array);
     System.out.println(Arrays.toString(array));
   }

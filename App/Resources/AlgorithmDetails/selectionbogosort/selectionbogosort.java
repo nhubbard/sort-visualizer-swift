@@ -11,7 +11,7 @@ public class selectionbogosort {
     return m;
   }
 
-  public static void sort(int arr[]) {
+  public static void sort(int[] arr) {
     int n = arr.length;
     for (int i = 0; i < n; i++) {
       while (arr[i] != minFrom(arr, i)) {
@@ -24,7 +24,7 @@ public class selectionbogosort {
   }
 
   public static void main(String[] args) {
-    int[] array = new int[]{0, 39, 21, 62, 91, 14, 23};
+    int[] array = new int[] {0, 39, 21, 62, 91, 14, 23};
     sort(array);
     System.out.println(Arrays.toString(array));
   }

@@ -2,17 +2,23 @@ import java.util.Arrays;
 
 public class ternaryllquicksort {
   public static int compare3(int[] arr, int a, int b) {
-    if (arr[a] == arr[b]) return 0;
+    if (arr[a] == arr[b]) {
+      return 0;
+    }
     return arr[a] > arr[b] ? 1 : -1;
   }
 
   public static int selectPivot(int[] arr, int lo, int hi) {
     int mid = (lo + hi) / 2;
     int cLoMid = compare3(arr, lo, mid);
-    if (cLoMid == 0) return lo;
+    if (cLoMid == 0) {
+      return lo;
+    }
     int cLoHi = compare3(arr, lo, hi - 1);
     int cMidHi = compare3(arr, mid, hi - 1);
-    if (cLoHi == 0 || cMidHi == 0) return hi - 1;
+    if (cLoHi == 0 || cMidHi == 0) {
+      return hi - 1;
+    }
 
     if (cLoMid < 0) {
       return cMidHi < 0 ? mid : (cLoHi < 0 ? hi - 1 : lo);
@@ -53,7 +59,7 @@ public class ternaryllquicksort {
       arr[hi - 1 - s] = t;
     }
 
-    return new int[]{i, i + (hi - k)};
+    return new int[] {i, i + (hi - k)};
   }
 
   public static void quicksortTernaryLL(int[] arr, int lo, int hi) {
@@ -69,7 +75,7 @@ public class ternaryllquicksort {
   }
 
   public static void main(String[] args) {
-    int[] array = new int[]{0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+    int[] array = new int[] {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
     sort(array);
     System.out.println(Arrays.toString(array));
   }

@@ -2,9 +2,13 @@ import java.util.Arrays;
 
 public class binaryquicksortrecursive {
   private static int mostSignificantBit(int value) {
-    if (value == 0) return -1;
+    if (value == 0) {
+      return -1;
+    }
     int bit = 0;
-    while ((value >> (bit + 1)) != 0) bit++;
+    while ((value >> (bit + 1)) != 0) {
+      bit++;
+    }
     return bit;
   }
 
@@ -40,14 +44,16 @@ public class binaryquicksortrecursive {
     int n = arr.length;
     int maxValue = arr[0];
     for (int i = 1; i < n; i++) {
-      if (arr[i] > maxValue) maxValue = arr[i];
+      if (arr[i] > maxValue) {
+        maxValue = arr[i];
+      }
     }
     int bit = mostSignificantBit(maxValue);
     binaryQuickSortRecursive(arr, 0, n - 1, bit);
   }
 
   public static void main(String[] args) {
-    int[] array = new int[]{0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+    int[] array = new int[] {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
     sort(array);
     System.out.println(Arrays.toString(array));
   }

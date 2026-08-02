@@ -1,4 +1,9 @@
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class mergebogosort {
   public static boolean isSorted(int[] arr, int start, int end) {
@@ -28,7 +33,8 @@ public class mergebogosort {
       Collections.shuffle(indices);
       Set<Integer> highPositions = new HashSet<>(indices.subList(0, end - mid));
 
-      int low = 0, high = mid - start;
+      int low = 0;
+      int high = mid - start;
       for (int offset = 0; offset < end - start; offset++) {
         if (highPositions.contains(offset)) {
           arr[start + offset] = saved[high];
@@ -46,7 +52,7 @@ public class mergebogosort {
   }
 
   public static void main(String[] args) {
-    int[] array = new int[]{0, 39, 21, 62, 91, 14, 23};
+    int[] array = new int[] {0, 39, 21, 62, 91, 14, 23};
     sort(array);
     System.out.println(Arrays.toString(array));
   }
