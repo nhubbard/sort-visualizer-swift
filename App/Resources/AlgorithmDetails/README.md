@@ -40,6 +40,30 @@ Other root-level content, none of it shipped:
     highlighting. Needs the actual toolchains installed (clang, javac/java, kotlinc, python3,
     ruby, swiftc, node, go, dotnet — whichever languages you're checking). Defaults to every
     algorithm and every language; `-l py -l js` etc. restricts it.
+  - `lint [name ...] [--languages/-l ...] [--fix]` — runs each language's linter (clang-tidy,
+    checkstyle, eslint, ktlint, ruff, standardrb, go vet, swiftlint, dotnet format) and reports
+    findings; nonzero exit if any file has one. `--fix` applies each language's autofix where one
+    exists (go vet and swiftlint have none in v1 — they just run the check, with a warning).
+    Every applied fix is re-verified against `test` before being kept, restoring the original
+    file if the fix broke it (see `manage.py`'s own `lint`/`format` section for why — a real
+    regression like that has happened here before). Needs `setup` run first.
+  - `format [name ...] [--languages/-l ...] [--check]` — runs each language's formatter
+    (clang-format, google-java-format, prettier, ktlint, ruff, standardrb, gofmt, swiftformat,
+    dotnet format) and applies it in place by default; `--check` verifies without changing
+    anything. Same re-verify-or-restore safety net as `lint --fix`. Swift files additionally get
+    a persistent `<file>.swift.bak` backup before every format (gitignored) — a prior real run of
+    the Swift formatter across many files in parallel produced non-deterministic corruption in
+    this repo, so all swiftformat invocations are also serialized to one at a time regardless of
+    how many algorithms are otherwise being processed concurrently. Needs `setup` run first.
+  - `setup` — installs every Homebrew-installable dependency `test`/`lint`/`format` need: the
+    lint/format add-on tools (`clang-tidy` via the `llvm` keg, `ktlint`, `checkstyle`,
+    `google-java-format`, `ruff`, `eslint`, `prettier`, `swiftformat`, `swiftlint`) and each
+    language's base compiler/runtime that Homebrew can reasonably provide (`go`, `java` via
+    `openjdk`, `node`, `kotlin`, `ruby`, `dotnet` via its cask), plus the `standard` Ruby gem.
+    Deliberately excludes Swift's and C/C++'s own compilers (`swiftc`/`clang`/`clang++`) — those
+    come from Xcode's Command Line Tools, already a precondition for building this repository's
+    app at all. Safe to re-run; already-installed tools (from Homebrew or anywhere else on PATH)
+    are skipped.
   - `pack [name ...] [--output PATH] [--level N] [--no-verify]` — compresses every algorithm's
     `description.md` and highlighted `<lang>.md` files into the single `AlgorithmDetails.algz`
     archive described in `../../../COMPRESSION_DESIGN.md` (one whole-corpus zstd

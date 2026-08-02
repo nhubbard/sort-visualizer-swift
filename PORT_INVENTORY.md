@@ -74,75 +74,13 @@ cluster together rather than picking its members apart on separate days:
 
 #### Completed
 
-- [x] CompleteGraphSort — faithful port of the sorting network (recursive `split` compare-swapping
-      across a doubling stride). `compSwap` only swaps on a strict `>`, never a tie, but fuzzing
-      shows that alone doesn't preserve relative order — 50/50 randomized duplicate-heavy trials
-      found reordering, confirming this is not a stable sort (ArrayV itself makes no stability
-      claim for it).
-- [x] StableQuickSort — faithful port of Rodney Shaghoulian's O(n)-extra-space partition: a single
-      left-to-right scan appends each element to a "less than pivot" or "not less than pivot" list
-      in encounter order, then writes `leftList + pivot + rightList` back. No in-place swaps at all
-      (every array mutation is a plain write), so the standard swap-tape-shadow stability fuzz test
-      other algorithms in this batch use doesn't apply — genuinely stable by construction instead
-      (a single order-preserving scan into order-preserving lists cannot reorder ties), verified by
-      reading the mechanism rather than by fuzzing swaps that never happen. No dedicated stability
-      test, matching the existing `CountingSort`/`SimplifiedLibrarySort`/`CycleSort` precedent for
-      write-only algorithms.
-- [x] ForcedStableQuickSort — faithful port of the median-of-three Hoare quicksort forced stable via
-      an external `key` array (`Writes.createExternalArray` mirrored as an aux handle + shadow
-      `[Int]`, the same pattern `MergeSort`/`SimplifiedLibrarySort` already use) swapped in lockstep
-      with every real swap, tie-breaking on `key`'s original order. Fuzzed genuinely stable — the
-      whole point of the "forced" in its name holds up.
-- [x] TableSort — same median-of-three Hoare quicksort shape as `ForcedStableQuickSort`, but
-      quicksorts an index permutation `table` instead of the real array, applying the finished
-      permutation at the end. **Port decision**: ArrayV's own final-apply step is write-only (a
-      held temp value walked around each cycle via `Writes.write`), which would emit zero `.swap`
-      operations on the real array in a literal port — making the swap-tape-shadow stability fuzz
-      test blind to this algorithm (the shadow would never move, trivially "passing" regardless of
-      ground truth). Ported the apply step as a swap-based cycle-follow instead (`swap(a1,a2),
-      swap(a2,a3), ..., swap(a(k-1),ak)` for a cycle `(a1->a2->...->ak)`), which produces an
-      identical final array to the write+temp version — verified by hand before porting — in
-      exchange for a working stability test. Fuzzed genuinely stable.
-- [x] FunSort — 88 lines. Previously "Decision required" (skipped in an earlier batch as
-      not-portable-as-a-faithful-translation) — revisited on request to fix rather than skip, and
-      to make it stable while at it. ArrayV's
-      own convergence check (`Reads.compareIndices(array, pos, i, ...) != 0`, a plain *value*
-      comparison) treats "the binary search landed on *some* index holding an equal value" as
-      sufficient to mark index `i` permanently settled, even when that index isn't `i`'s own
-      eventual home — on duplicate-heavy input this left the array genuinely **unsorted** (not
-      merely unstable) ~87% of the time (confirmed via a faithful Python re-implementation: 1,749/
-      2,000 randomized trials, sizes 2–24, values drawn from a small range). A **second, previously
-      latent** defect surfaced while designing the fix: ArrayV's own swap rule has a silent no-op
-      case (`pos == i + 1` triggers neither of its two swap conditions) that never surfaced because
-      the value-equality bug always terminated first — fixing defect #1 alone would have exposed
-      defect #2 as a genuine infinite loop. **The fix**: compare elements by a tie-free composite
-      key of `(value, originalIndex)` instead of value alone (a `key` array in the same style as
-      `ForcedStableQuickSort`/`TableSort`'s external index arrays above), so "the search finds `i`
-      itself" becomes a well-defined fixed point instead of a value-equality shortcut, and the
-      `pos == i + 1` gap gets an explicit forced swap instead of a no-op. Tie-breaking by original
-      index also makes the sort genuinely stable as a side effect, for free. Validated by fuzzing
-      the exact design in Python first (~7,700 randomized trials — duplicate-heavy and all-distinct,
-      sizes 2–256, plus adversarial already-sorted/reverse-sorted/all-equal inputs — zero wrong
-      results, zero non-termination, zero instability) before porting to Swift, then re-confirmed
-      with a dedicated 1,400-trial duplicate-heavy fuzz test and a stability fuzz test in the real
-      engine.
+Move algorithms here when you finish them.
 
 ### b. Insertion sorts (`sorts/insert/`, 18)
 
 #### Completed
 
-- [x] BlockInsertionSort — faithful port, first member of the Grail cluster shipped (see
-      `GrailSortingTemplate`, `TEMPLATE_PORT_REFERENCE.md` §6). Doesn't call `commonSort`'s block-
-      merge machinery at all — a natural-run-detecting insertion sort built from just
-      `mergeWithoutBuffer` plus its own `insert1`/`insert2` shift-based placement for short runs.
-      ArrayV's own override of `grailRotate` (`Rotations.holyGriesMills`) turned out functionally
-      identical to the shared `rotate` (same block-swap-of-the-smaller-side technique, just with an
-      added length-1 fast path) — reused the shared one directly rather than duplicating an
-      equivalent override. Real mutations mix `engine.swap` and `engine.setValue`, so the standard
-      swap-tape-shadow stability test can't fully observe this one (confirmed: 31/50 spurious
-      failures) — verified genuinely stable instead via a from-scratch Python simulation
-      threading a parallel original-index array through every swap and write (2,000 trials, zero
-      wrong results, zero instability).
+Move algorithms here when you finish them.
 
 #### Not Started
 
@@ -189,32 +127,7 @@ see Completed above.)
 
 #### Completed
 
-- [x] BinaryQuickSortIterative — faithful port. Shares `BinaryQuickSortingTemplate` (ported as a
-      Swift namespace-of-static-functions, the first "shared template" in this codebase — see
-      `TEMPLATE_PORT_REFERENCE.md` §1) with `BinaryQuickSortRecursive`: a bit-based Hoare partition
-      driven by an explicit FIFO task queue instead of the call stack. Fuzzed unstable (no
-      tie-break in a pure bit partition).
-- [x] BinaryQuickSortRecursive — faithful port, same `BinaryQuickSortingTemplate` partition as
-      `BinaryQuickSortIterative` above, driven by real recursion instead of a task queue. Fuzzed
-      unstable, independently confirmed rather than assumed from its sibling's result.
-- [x] ShatterSort — **not a faithful port.** ArrayV's own `ShatterSorting` template buckets by
-      `value / num` and finishes each bucket via a `value % num` residue-placement trick — both
-      assume the array holds a permutation of `0..<length` (true for every ArrayV array, false
-      here: `NativeAlgorithmCorrectnessTests` fuzzes `Int.random(in: 0...1000)` regardless of array
-      size). A literal port would compute out-of-range bucket indices and silently drop duplicate
-      values via residue collisions. Fixed by bucketing on a range-normalized index
-      (`(value-minValue)*shatters/(maxValue-minValue+1)`) and replacing the residue trick with a
-      plain insertion-sort finish over each bucket's real size — genuinely just the textbook bucket
-      sort definition, not a special ArrayV trick, so this is a return to the standard algorithm
-      rather than a loss of fidelity. Validated in Python first (~6,600 trials) before porting, then
-      re-confirmed with a dedicated 1,400-trial wide-range + duplicate-heavy fuzz test in the real
-      engine. See `TEMPLATE_PORT_REFERENCE.md` §2 for the full writeup. Verified stable by
-      construction (bucket index is a deterministic, order-preserving function of value alone) —
-      no dedicated swap-tape stability test, since every real mutation is `engine.setValue`
-      (bucket flatten), the same structural situation `StableQuickSort` hit.
-- [x] SimpleShatterSort — same `ShatterSortingTemplate` fix as `ShatterSort` above, just reached via
-      repeated shrinking-granularity bucket passes instead of one pass. Same validation, same
-      stable-by-construction reasoning.
+Move algorithms here when you finish them.
 
 #### Not Started
 
@@ -246,39 +159,7 @@ see Completed above.)
 
 #### Completed
 
-- [x] TwinSort — faithful port of Igor van den Hoven's adaptive bottom-up merge sort. Really does
-      live in ArrayV's `sorts/merge/` package (this doc's own prior "tracked elsewhere, files under
-      hybrid/" note was mistaken — confirmed directly from `TwinSort.java`'s own `package
-      io.github.arrayv.sorts.merge;` declaration this batch). Shares `TwinSortingTemplate` (see
-      `TEMPLATE_PORT_REFERENCE.md` §3) — a run-detection pre-pass (`twinSwap`, reversing strictly
-      descending runs) followed by a tail-inward bottom-up merge (`tailMerge`). The densest index
-      arithmetic in this template-porting batch; the standard swap-tape-shadow stability test can't
-      observe most of `tailMerge`'s moves (pure `engine.setValue`, same limitation
-      `StableQuickSort`/`ShatterSortingTemplate` hit), so stability was verified by simulating the
-      exact algorithm in Python with a parallel original-index array instead (6,000 randomized
-      duplicate-heavy trials, zero instability) — genuinely stable, confirmed rather than assumed.
-- [x] LazyStableSort — faithful port, second member of the Grail cluster shipped. One-line wrapper
-      calling `GrailSortingTemplate.lazyStableSort` directly — the simple O(n log n) alternate
-      path independent of the block-merge machinery (pairwise compare-swap, then doubling
-      `mergeWithoutBuffer`). Every real mutation is `engine.swap`, so the standard swap-tape-shadow
-      stability test applies directly here (unlike `BlockInsertionSort`/`OptimizedLazyStableSort`
-      below) — fuzzed genuinely stable.
-- [x] OptimizedLazyStableSort — third member of the Grail cluster shipped. Files under ArrayV's
-      `sorts/hybrid/` package but calls `this.setCategory("Merge Sorts")` in its own constructor —
-      tracked here under Merge sorts to match that real category string, the same
-      package-vs-`setCategory` correction `TwinSort` needed above (this doc's own prior tracking
-      had it filed under Hybrid instead). **Genuinely overrides** `grailLazyStableSort` (not just a
-      thin wrapper) with a different construction: natural-run-detecting insertion sort over fixed
-      16-element chunks, then doubling `mergeWithoutBuffer` (reused from the template unmodified).
-      **Real bug found and fixed**: ArrayV's own `insertionSort` reads two elements unconditionally
-      before any bounds check; for array lengths not a multiple of 16 the final chunk can be
-      exactly 1 element wide (confirmed crash at `n = 17`, a `[16, 17)` tail chunk reading one past
-      the valid range) — fixed with a guard, since a single-element range is already trivially
-      sorted and needs no comparison at all. Found via a dedicated extra-scrutiny duplicate-heavy
-      fuzz test across sizes 16-256 (not just the generic suite's single per-algorithm trial),
-      matching the scrutiny this whole batch of dense template ports got throughout. `insertionSort`'s
-      shifts use `engine.setValue`, so stability was verified via Python simulation (2,000 trials,
-      zero instability) rather than the swap-tape-shadow technique, same as `BlockInsertionSort`.
+Move algorithms here when you finish them.
 
 #### Not Started
 
@@ -345,47 +226,7 @@ Move algorithms here when you finish them.
 
 #### Completed
 
-- [x] UnstableGrailSort — faithful port of Astrelin's classic in-place block-merge sort (the
-      unstable variant — no per-block original-stream tracking, see the `GrailSort` entry once
-      that lands for the stable version that adds exactly that tracking). `UnstableGrailSortingTemplate`
-      (see `TEMPLATE_PORT_REFERENCE.md` §4) is genuinely a pure pass-through for this one
-      concrete algorithm — the entire algorithm lives in the template, the wrapper is a one-line
-      `commonSort` call. Passed the generic correctness suite (including duplicate-heavy) on the
-      first try despite being the densest index arithmetic ported so far in this batch; a dedicated
-      stability test at `sizeRange.lowerBound` (16) would have been a false negative (`commonSort`'s
-      own `len <= 16` base case is a trivially-stable plain insertion sort that never touches the
-      block-merge machinery at all) — tested at size 64 instead, confirming genuinely unstable as
-      the name claims (never assumed from the name outright).
-- [x] PDQBranchedSort — faithful port of Orson Peters' pattern-defeating quicksort, branch-based
-      partition variant. `PDQSortingTemplate` (see `TEMPLATE_PORT_REFERENCE.md` §5) is the
-      cleanest reuse case in this whole batch — confirmed by research that neither
-      `PDQBranchedSort` nor `PDQBranchlessSort` shadows or reimplements anything, both are pure
-      configuration wrappers (a `branchless` flag) around one shared `pdqLoop`. Passed the generic
-      correctness suite on the first try. Same `sizeRange.lowerBound`-is-a-trivial-base-case
-      pitfall as `UnstableGrailSort` above applies here too (`insertSortThreshold` is 24, above
-      this batch's usual 16-element lower bound) — dedicated stability test run at size 64 instead,
-      confirming genuinely unstable (no tie-break anywhere in the Hoare-style partition).
-- [x] PDQBranchlessSort — same `PDQSortingTemplate` as `PDQBranchedSort` above, using the
-      block-quicksort-style branchless partition (Edelkamp & Weiss) instead of the plain
-      Hoare-style one — the densest, most index-arithmetic-heavy code in this whole batch of
-      template ports (block-scan offset bookkeeping, cyclic vs. swap-based offset application).
-      Passed the generic correctness suite on the first try despite that density. Confirmed
-      unstable independently of its sibling's result, same size-64 rationale.
-- [x] GrailSort — faithful port (in-place mode only — ArrayV exposes a 32-item static buffer and a
-      dynamic `sqrt(n)` buffer as user-selectable runtime alternatives; no algorithm in this
-      codebase takes a runtime configuration parameter, so in-place is the one shipped, matching
-      every other port). Last and largest member of the Grail cluster — the full `commonSort`
-      block build/combine machinery (`GrailSortingTemplate`, `TEMPLATE_PORT_REFERENCE.md` §6),
-      genuinely reused verbatim (a one-line wrapper). Two simplifications versus ArrayV's own
-      template, both because in-place mode makes them provably dead code: ArrayV's own "XBuf"
-      method family (only reachable with a real external buffer, which in-place mode never
-      supplies) wasn't ported at all, and `buildBlocks` without XBuf turned out textually identical
-      to `UnstableGrailSortingTemplate.buildBlocks` — reused rather than re-transcribed. Passed the
-      generic correctness suite (including duplicate-heavy) on the first try despite being the
-      densest translation in this whole batch. Dedicated stability test run at size 64 (not
-      `sizeRange.lowerBound`, same trivial-base-case pitfall as `UnstableGrailSort`) — confirmed
-      genuinely stable, the key-array/stream-fragment tracking `combineBlocks` adds over the
-      unstable sibling's plain first/last-element comparison earns the name honestly.
+Move algorithms here when you finish them.
 
 #### Not Started
 

@@ -14,6 +14,12 @@ rb.md
 kt.md
 swift.md
 
+# Persistent pre-format backup `uv run manage.py format` keeps for every Swift file it touches —
+# swiftformat run across many Swift files in parallel has previously produced non-deterministic
+# file corruption in this repo, so this is a manual recovery path beyond the automatic
+# restore-on-test-failure safety net every language's `lint --fix`/`format` already gets.
+*.swift.bak
+
 # Created by https://www.toptal.com/developers/gitignore/api/windows,macos,linux,sublimetext,xcode,python,node,go,c++,c,csharp,kotlin,ruby,swift,java
 # Edit at https://www.toptal.com/developers/gitignore?templates=windows,macos,linux,sublimetext,xcode,python,node,go,c++,c,csharp,kotlin,ruby,swift,java
 
