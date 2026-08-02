@@ -15,12 +15,11 @@ void printList(int items[], int size) {
   }
 }
 
-void swapAt(int arr[], int a, int b) {
-  std::swap(arr[a], arr[b]);
-}
+void swapAt(int arr[], int a, int b) { std::swap(arr[a], arr[b]); }
 
 void multiSwap(int arr[], int a, int b, int count) {
-  for (int i = 0; i < count; i++) swapAt(arr, a + i, b + i);
+  for (int i = 0; i < count; i++)
+    swapAt(arr, a + i, b + i);
 }
 
 void rotate(int arr[], int pos, int lenA, int lenB) {
@@ -43,13 +42,17 @@ int binSearch(int arr[], int pos, int len, int keyPos, int isLeft) {
   while (left < right - 1) {
     int mid = left + (right - left) / 2;
     int cond = isLeft ? (arr[pos + mid] >= key) : (arr[pos + mid] > key);
-    if (cond) right = mid; else left = mid;
+    if (cond)
+      right = mid;
+    else
+      left = mid;
   }
   return right;
 }
 
 void mergeWithoutBuffer(int arr[], int pos, int len1, int len2) {
-  if (len1 == 0 || len2 == 0) return;
+  if (len1 == 0 || len2 == 0)
+    return;
   if (len1 < len2) {
     while (len1 != 0) {
       int loc = binSearch(arr, pos + len1, len2, pos, 1);
@@ -58,7 +61,8 @@ void mergeWithoutBuffer(int arr[], int pos, int len1, int len2) {
         pos += loc;
         len2 -= loc;
       }
-      if (len2 == 0) break;
+      if (len2 == 0)
+        break;
       do {
         pos++;
         len1--;
@@ -71,7 +75,8 @@ void mergeWithoutBuffer(int arr[], int pos, int len1, int len2) {
         rotate(arr, pos + loc, len1 - loc, len2);
         len1 = loc;
       }
-      if (len1 == 0) break;
+      if (len1 == 0)
+        break;
       do {
         len2--;
       } while (len2 != 0 && arr[pos + len1 - 1] <= arr[pos + len1 + len2 - 1]);
@@ -79,16 +84,19 @@ void mergeWithoutBuffer(int arr[], int pos, int len1, int len2) {
   }
 }
 
-/* Guard: a chunk of length <= 1 has nothing to compare. ArrayV's own source skips this
-   check and unconditionally reads arr[a] / arr[a + 1], which crashes whenever chunking
-   leaves a trailing 1-element chunk (e.g. n = 17 leaves a final [16, 17) chunk). */
+/* Guard: a chunk of length <= 1 has nothing to compare. ArrayV's own source
+   skips this check and unconditionally reads arr[a] / arr[a + 1], which crashes
+   whenever chunking leaves a trailing 1-element chunk (e.g. n = 17 leaves a
+   final [16, 17) chunk). */
 void insertionSortChunk(int arr[], int a, int b) {
-  if (b - a <= 1) return;
+  if (b - a <= 1)
+    return;
   int i = a + 1;
   bool descending = arr[i - 1] > arr[i];
   i++;
   if (descending) {
-    while (i < b && arr[i - 1] > arr[i]) i++;
+    while (i < b && arr[i - 1] > arr[i])
+      i++;
     int lo = a, hi = i - 1;
     while (lo < hi) {
       swapAt(arr, lo, hi);
@@ -96,7 +104,8 @@ void insertionSortChunk(int arr[], int a, int b) {
       hi--;
     }
   } else {
-    while (i < b && arr[i - 1] <= arr[i]) i++;
+    while (i < b && arr[i - 1] <= arr[i])
+      i++;
   }
   while (i < b) {
     int current = arr[i];
@@ -116,7 +125,8 @@ void lazyStableSort(int arr[], int pos, int len) {
     insertionSortChunk(arr, pos + dist, pos + dist + 16);
     dist += 16;
   }
-  if (dist < len) insertionSortChunk(arr, pos + dist, pos + len);
+  if (dist < len)
+    insertionSortChunk(arr, pos + dist, pos + len);
 
   int part = 16;
   while (part < len) {
@@ -127,14 +137,13 @@ void lazyStableSort(int arr[], int pos, int len) {
       left += 2 * part;
     }
     int rest = len - left;
-    if (rest > part) mergeWithoutBuffer(arr, pos + left, part, rest - part);
+    if (rest > part)
+      mergeWithoutBuffer(arr, pos + left, part, rest - part);
     part *= 2;
   }
 }
 
-void sort(int arr[], int n) {
-  lazyStableSort(arr, 0, n);
-}
+void sort(int arr[], int n) { lazyStableSort(arr, 0, n); }
 
 int main(int argc, char *argv[]) {
   int size = sizeof(array) / sizeof(array[0]);

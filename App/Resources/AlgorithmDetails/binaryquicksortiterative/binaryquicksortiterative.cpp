@@ -1,6 +1,6 @@
 #include <cstdio>
-#include <utility>
 #include <queue>
+#include <utility>
 
 struct Task {
   int p;
@@ -23,9 +23,11 @@ void printList(int items[], int size) {
 }
 
 int mostSignificantBit(int value) {
-  if (value == 0) return -1;
+  if (value == 0)
+    return -1;
   int bit = 0;
-  while ((value >> (bit + 1)) != 0) bit++;
+  while ((value >> (bit + 1)) != 0)
+    bit++;
   return bit;
 }
 
@@ -50,7 +52,8 @@ int partition(int arr[], int p, int r, int bit) {
 void sort(int arr[], int n) {
   int maxValue = arr[0];
   for (int i = 1; i < n; i++) {
-    if (arr[i] > maxValue) maxValue = arr[i];
+    if (arr[i] > maxValue)
+      maxValue = arr[i];
   }
   int bit = mostSignificantBit(maxValue);
 

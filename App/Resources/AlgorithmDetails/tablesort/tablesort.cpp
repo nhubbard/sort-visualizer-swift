@@ -18,17 +18,21 @@ void printList(int items[], int size) {
 bool stableComp(int arr[], int table[], int a, int b) {
   int ta = table[a];
   int tb = table[b];
-  if (arr[ta] > arr[tb]) return true;
-  if (arr[ta] == arr[tb]) return table[a] > table[b];
+  if (arr[ta] > arr[tb])
+    return true;
+  if (arr[ta] == arr[tb])
+    return table[a] > table[b];
   return false;
 }
 
 void medianOfThree(int arr[], int table[], int a, int b) {
   int m = a + (b - 1 - a) / 2;
-  if (stableComp(arr, table, a, m)) std::swap(table[a], table[m]);
+  if (stableComp(arr, table, a, m))
+    std::swap(table[a], table[m]);
   if (stableComp(arr, table, m, b - 1)) {
     std::swap(table[m], table[b - 1]);
-    if (stableComp(arr, table, a, m)) return;
+    if (stableComp(arr, table, a, m))
+      return;
   }
   std::swap(table[a], table[m]);
 }
@@ -67,7 +71,8 @@ void quickSort(int arr[], int table[], int a, int b) {
 
 void sort(int arr[], int n) {
   int *table = new int[n];
-  for (int i = 0; i < n; i++) table[i] = i;
+  for (int i = 0; i < n; i++)
+    table[i] = i;
   quickSort(arr, table, 0, n);
   for (int i = 0; i < n; i++) {
     if (table[i] != i) {

@@ -16,7 +16,8 @@ void printList(int items[], int size) {
 }
 
 void multiSwap(int arr[], int a, int b, int count) {
-  for (int i = 0; i < count; i++) std::swap(arr[a + i], arr[b + i]);
+  for (int i = 0; i < count; i++)
+    std::swap(arr[a + i], arr[b + i]);
 }
 
 void rotate(int arr[], int pos, int lenA, int lenB) {
@@ -36,15 +37,19 @@ int binSearch(int arr[], int pos, int len, int keyPos, bool isLeft) {
   int left = 0, right = len;
   while (left < right) {
     int mid = left + (right - left) / 2;
-    bool cond = isLeft ? (arr[pos + mid] < arr[keyPos]) : (arr[pos + mid] <= arr[keyPos]);
-    if (cond) left = mid + 1;
-    else right = mid;
+    bool cond = isLeft ? (arr[pos + mid] < arr[keyPos])
+                       : (arr[pos + mid] <= arr[keyPos]);
+    if (cond)
+      left = mid + 1;
+    else
+      right = mid;
   }
   return left;
 }
 
 void mergeWithoutBuffer(int arr[], int pos, int len1, int len2) {
-  if (len1 == 0 || len2 == 0) return;
+  if (len1 == 0 || len2 == 0)
+    return;
   if (len1 == 1) {
     int loc = binSearch(arr, pos + 1, len2, pos, true);
     rotate(arr, pos, 1, loc);
@@ -65,7 +70,8 @@ void mergeWithoutBuffer(int arr[], int pos, int len1, int len2) {
 void sort(int arr[], int n) {
   int dist = 1;
   while (dist < n) {
-    if (arr[dist - 1] > arr[dist]) std::swap(arr[dist - 1], arr[dist]);
+    if (arr[dist - 1] > arr[dist])
+      std::swap(arr[dist - 1], arr[dist]);
     dist += 2;
   }
   int part = 2;
@@ -77,7 +83,8 @@ void sort(int arr[], int n) {
       left += 2 * part;
     }
     int rest = n - left;
-    if (rest > part) mergeWithoutBuffer(arr, left, part, rest - part);
+    if (rest > part)
+      mergeWithoutBuffer(arr, left, part, rest - part);
     part *= 2;
   }
 }

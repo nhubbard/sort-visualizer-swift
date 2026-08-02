@@ -56,6 +56,6 @@ int main() {
     if (i != array.size() - 1)
       std::cout << ", ";
   }
-  std::cout << "]" << std::endl;
+  std::cout << "]" << '\n';
   return 0;
 }

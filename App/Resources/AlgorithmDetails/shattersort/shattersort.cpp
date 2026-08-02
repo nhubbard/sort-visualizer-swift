@@ -43,7 +43,8 @@ std::vector<int> shatterPartition(int arr[], int start, int length, int num) {
   for (int i = 0; i < length; i++) {
     int v = arr[start + i];
     int idx = (v - minV) * shatters / valueRange;
-    if (idx > shatters - 1) idx = shatters - 1;
+    if (idx > shatters - 1)
+      idx = shatters - 1;
     buckets[idx].push_back(v);
   }
 
@@ -70,9 +71,7 @@ void shatterSort(int arr[], int length, int num) {
   }
 }
 
-void sort(int arr[], int n) {
-  shatterSort(arr, n, 4);
-}
+void sort(int arr[], int n) { shatterSort(arr, n, 4); }
 
 int main(int argc, char *argv[]) {
   int size = sizeof(array) / sizeof(array[0]);

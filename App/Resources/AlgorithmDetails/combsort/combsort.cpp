@@ -17,11 +17,11 @@ void printList(int items[], int size) {
 
 void sort(int arr[], int n) {
   int sm;
-  float shrink = 1.3;
+  float shrink = 1.3f;
   int gap = n;
   bool sorted = false;
   while (!sorted) {
-    gap /= shrink;
+    gap = static_cast<int>(static_cast<float>(gap) / shrink);
     if (gap <= 1) {
       sorted = true;
       gap = 1;

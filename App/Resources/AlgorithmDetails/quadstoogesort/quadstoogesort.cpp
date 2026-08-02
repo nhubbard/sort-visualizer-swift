@@ -37,9 +37,7 @@ void quadStooge(int arr[], int pos, int length) {
   }
 }
 
-void sort(int arr[], int n) {
-  quadStooge(arr, 0, n);
-}
+void sort(int arr[], int n) { quadStooge(arr, 0, n); }
 
 int main(int argc, char *argv[]) {
   int size = sizeof(array) / sizeof(array[0]);

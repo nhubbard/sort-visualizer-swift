@@ -22,7 +22,8 @@ void sort(int arr[], int end) {
       for (int f = i; f < end - 1; f++) {
         std::swap(arr[f], arr[f + 1]);
       }
-      if (i > 0) i--;
+      if (i > 0)
+        i--;
       continue;
     }
     i++;

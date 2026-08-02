@@ -24,16 +24,16 @@ void printList(int items[], int size) {
 
 int pdqLog(int n) {
   int log = 0;
-  while ((n >>= 1) != 0) log++;
+  while ((n >>= 1) != 0)
+    log++;
   return log;
 }
 
-// Integer division truncated toward zero. C++'s `/` already truncates toward zero for
-// negative operands, which is what the pivot-position arithmetic below needs at the one
-// call site where the dividend can go negative -- this helper just names that intent.
-int truncDiv(int a, int b) {
-  return a / b;
-}
+// Integer division truncated toward zero. C++'s `/` already truncates toward
+// zero for negative operands, which is what the pivot-position arithmetic below
+// needs at the one call site where the dividend can go negative -- this helper
+// just names that intent.
+int truncDiv(int a, int b) { return a / b; }
 
 void insertSort(int arr[], int begin, int end) {
   for (int cur = begin + 1; cur < end; cur++) {
@@ -66,7 +66,8 @@ void unguardInsertSort(int arr[], int begin, int end) {
 bool partialInsertSort(int arr[], int begin, int end) {
   int limit = 0;
   for (int cur = begin + 1; cur < end; cur++) {
-    if (limit > partialInsertSortLimit) return false;
+    if (limit > partialInsertSortLimit)
+      return false;
     if (arr[cur] < arr[cur - 1]) {
       int tmp = arr[cur];
       int sift = cur;
@@ -82,7 +83,8 @@ bool partialInsertSort(int arr[], int begin, int end) {
 }
 
 void sortTwo(int arr[], int a, int b) {
-  if (arr[b] < arr[a]) std::swap(arr[a], arr[b]);
+  if (arr[b] < arr[a])
+    std::swap(arr[a], arr[b]);
 }
 
 void sortThree(int arr[], int a, int b, int c) {
@@ -91,11 +93,13 @@ void sortThree(int arr[], int a, int b, int c) {
   sortTwo(arr, a, b);
 }
 
-void swapOffsets(int arr[], int first, int last, std::vector<int> &leftOffsets, int leftPos,
-                  std::vector<int> &rightOffsets, int rightPos, int num, bool useSwaps) {
+void swapOffsets(int arr[], int first, int last, std::vector<int> &leftOffsets,
+                 int leftPos, std::vector<int> &rightOffsets, int rightPos,
+                 int num, bool useSwaps) {
   if (useSwaps) {
     for (int i = 0; i < num; i++) {
-      std::swap(arr[first + leftOffsets[leftPos + i]], arr[last - rightOffsets[rightPos + i]]);
+      std::swap(arr[first + leftOffsets[leftPos + i]],
+                arr[last - rightOffsets[rightPos + i]]);
     }
   } else if (num > 0) {
     int left = first + leftOffsets[leftPos];
@@ -112,21 +116,25 @@ void swapOffsets(int arr[], int first, int last, std::vector<int> &leftOffsets, 
   }
 }
 
-std::pair<int, bool> partRightBranchless(int arr[], int begin, int end, std::vector<int> &leftOffsets,
-                                          std::vector<int> &rightOffsets) {
+std::pair<int, bool> partRightBranchless(int arr[], int begin, int end,
+                                         std::vector<int> &leftOffsets,
+                                         std::vector<int> &rightOffsets) {
   int pivot = arr[begin];
   int first = begin;
   int last = end;
 
   first++;
-  while (arr[first] < pivot) first++;
+  while (arr[first] < pivot)
+    first++;
 
   if (first - 1 == begin) {
     last--;
-    while (first < last && !(arr[last] < pivot)) last--;
+    while (first < last && !(arr[last] < pivot))
+      last--;
   } else {
     last--;
-    while (!(arr[last] < pivot)) last--;
+    while (!(arr[last] < pivot))
+      last--;
   }
 
   bool alreadyParted = first >= last;
@@ -143,7 +151,8 @@ std::pair<int, bool> partRightBranchless(int arr[], int begin, int end, std::vec
       int it = first;
       for (int i = 0; i < blockSize; i++) {
         leftOffsets[leftNum] = i;
-        if (!(arr[it] < pivot)) leftNum++;
+        if (!(arr[it] < pivot))
+          leftNum++;
         it++;
       }
     }
@@ -153,20 +162,27 @@ std::pair<int, bool> partRightBranchless(int arr[], int begin, int end, std::vec
       for (int i = 0; i < blockSize; i++) {
         it--;
         rightOffsets[rightNum] = i + 1;
-        if (arr[it] < pivot) rightNum++;
+        if (arr[it] < pivot)
+          rightNum++;
       }
     }
 
     int num = std::min(leftNum, rightNum);
-    swapOffsets(arr, first, last, leftOffsets, leftStart, rightOffsets, rightStart, num, leftNum == rightNum);
-    leftNum -= num; rightNum -= num;
-    leftStart += num; rightStart += num;
-    if (leftNum == 0) first += blockSize;
-    if (rightNum == 0) last -= blockSize;
+    swapOffsets(arr, first, last, leftOffsets, leftStart, rightOffsets,
+                rightStart, num, leftNum == rightNum);
+    leftNum -= num;
+    rightNum -= num;
+    leftStart += num;
+    rightStart += num;
+    if (leftNum == 0)
+      first += blockSize;
+    if (rightNum == 0)
+      last -= blockSize;
   }
 
   int leftSize = 0, rightSize = 0;
-  int unknownLeft = (last - first) - ((rightNum != 0 || leftNum != 0) ? blockSize : 0);
+  int unknownLeft =
+      (last - first) - ((rightNum != 0 || leftNum != 0) ? blockSize : 0);
   if (rightNum != 0) {
     leftSize = unknownLeft;
     rightSize = blockSize;
@@ -183,7 +199,8 @@ std::pair<int, bool> partRightBranchless(int arr[], int begin, int end, std::vec
     int it = first;
     for (int i = 0; i < leftSize; i++) {
       leftOffsets[leftNum] = i;
-      if (!(arr[it] < pivot)) leftNum++;
+      if (!(arr[it] < pivot))
+        leftNum++;
       it++;
     }
   }
@@ -194,16 +211,22 @@ std::pair<int, bool> partRightBranchless(int arr[], int begin, int end, std::vec
     for (int i = 0; i < rightSize; i++) {
       it--;
       rightOffsets[rightNum] = i + 1;
-      if (arr[it] < pivot) rightNum++;
+      if (arr[it] < pivot)
+        rightNum++;
     }
   }
 
   int num = std::min(leftNum, rightNum);
-  swapOffsets(arr, first, last, leftOffsets, leftStart, rightOffsets, rightStart, num, leftNum == rightNum);
-  leftNum -= num; rightNum -= num;
-  leftStart += num; rightStart += num;
-  if (leftNum == 0) first += leftSize;
-  if (rightNum == 0) last -= rightSize;
+  swapOffsets(arr, first, last, leftOffsets, leftStart, rightOffsets,
+              rightStart, num, leftNum == rightNum);
+  leftNum -= num;
+  rightNum -= num;
+  leftStart += num;
+  rightStart += num;
+  if (leftNum == 0)
+    first += leftSize;
+  if (rightNum == 0)
+    last -= rightSize;
 
   int leftOffsetsPos = 0;
   int rightOffsetsPos = 0;
@@ -211,7 +234,8 @@ std::pair<int, bool> partRightBranchless(int arr[], int begin, int end, std::vec
   if (leftNum != 0) {
     leftOffsetsPos += leftStart;
     while (leftNum-- != 0) {
-      std::swap(arr[first + leftOffsets[leftOffsetsPos + leftNum]], arr[--last]);
+      std::swap(arr[first + leftOffsets[leftOffsetsPos + leftNum]],
+                arr[--last]);
     }
     first = last;
   }
@@ -219,9 +243,9 @@ std::pair<int, bool> partRightBranchless(int arr[], int begin, int end, std::vec
   if (rightNum != 0) {
     rightOffsetsPos += rightStart;
     while (rightNum-- != 0) {
-      std::swap(arr[last - rightOffsets[rightOffsetsPos + rightNum]], arr[first++]);
+      std::swap(arr[last - rightOffsets[rightOffsetsPos + rightNum]],
+                arr[first++]);
     }
-    last = first;
   }
 
   int pivotPos = first - 1;
@@ -237,22 +261,27 @@ int partLeft(int arr[], int begin, int end) {
   int last = end;
 
   last--;
-  while (pivot < arr[last]) last--;
+  while (pivot < arr[last])
+    last--;
 
   if (last + 1 == end) {
     first++;
-    while (first < last && !(pivot < arr[first])) first++;
+    while (first < last && !(pivot < arr[first]))
+      first++;
   } else {
     first++;
-    while (!(pivot < arr[first])) first++;
+    while (!(pivot < arr[first]))
+      first++;
   }
 
   while (first < last) {
     std::swap(arr[first], arr[last]);
     last--;
-    while (pivot < arr[last]) last--;
+    while (pivot < arr[last])
+      last--;
     first++;
-    while (!(pivot < arr[first])) first++;
+    while (!(pivot < arr[first]))
+      first++;
   }
 
   int pivotPos = last;
@@ -264,8 +293,10 @@ int partLeft(int arr[], int begin, int end) {
 void siftDown(int arr[], int begin, int root, int size) {
   while (true) {
     int child = 2 * root + 1;
-    if (child >= size) break;
-    if (child + 1 < size && arr[begin + child] < arr[begin + child + 1]) child++;
+    if (child >= size)
+      break;
+    if (child + 1 < size && arr[begin + child] < arr[begin + child + 1])
+      child++;
     if (arr[begin + root] < arr[begin + child]) {
       std::swap(arr[begin + root], arr[begin + child]);
       root = child;
@@ -277,22 +308,25 @@ void siftDown(int arr[], int begin, int root, int size) {
 
 void heapSort(int arr[], int begin, int end) {
   int n = end - begin;
-  for (int i = n / 2 - 1; i >= 0; i--) siftDown(arr, begin, i, n);
+  for (int i = n / 2 - 1; i >= 0; i--)
+    siftDown(arr, begin, i, n);
   for (int i = n - 1; i > 0; i--) {
     std::swap(arr[begin], arr[begin + i]);
     siftDown(arr, begin, 0, i);
   }
 }
 
-void pdqLoop(int arr[], int begin, int end, int badAllowed, std::vector<int> &leftOffsets,
-             std::vector<int> &rightOffsets) {
+void pdqLoop(int arr[], int begin, int end, int badAllowed,
+             std::vector<int> &leftOffsets, std::vector<int> &rightOffsets) {
   bool leftmost = true;
   while (true) {
     int size = end - begin;
 
     if (size < insertSortThreshold) {
-      if (leftmost) insertSort(arr, begin, end);
-      else unguardInsertSort(arr, begin, end);
+      if (leftmost)
+        insertSort(arr, begin, end);
+      else
+        unguardInsertSort(arr, begin, end);
       return;
     }
 
@@ -301,7 +335,8 @@ void pdqLoop(int arr[], int begin, int end, int badAllowed, std::vector<int> &le
       sortThree(arr, begin, begin + halfSize, end - 1);
       sortThree(arr, begin + 1, begin + halfSize - 1, end - 2);
       sortThree(arr, begin + 2, begin + halfSize + 1, end - 3);
-      sortThree(arr, begin + halfSize - 1, begin + halfSize, begin + halfSize + 1);
+      sortThree(arr, begin + halfSize - 1, begin + halfSize,
+                begin + halfSize + 1);
       std::swap(arr[begin], arr[begin + halfSize]);
     } else {
       sortThree(arr, begin + halfSize, begin, end - 1);
@@ -312,7 +347,8 @@ void pdqLoop(int arr[], int begin, int end, int badAllowed, std::vector<int> &le
       continue;
     }
 
-    auto [pivotPos, alreadyParted] = partRightBranchless(arr, begin, end, leftOffsets, rightOffsets);
+    auto [pivotPos, alreadyParted] =
+        partRightBranchless(arr, begin, end, leftOffsets, rightOffsets);
 
     int leftSize = pivotPos - begin;
     int rightSize = end - (pivotPos + 1);
@@ -346,7 +382,8 @@ void pdqLoop(int arr[], int begin, int end, int badAllowed, std::vector<int> &le
         }
       }
     } else {
-      if (alreadyParted && partialInsertSort(arr, begin, pivotPos) && partialInsertSort(arr, pivotPos + 1, end)) {
+      if (alreadyParted && partialInsertSort(arr, begin, pivotPos) &&
+          partialInsertSort(arr, pivotPos + 1, end)) {
         return;
       }
     }
@@ -358,7 +395,8 @@ void pdqLoop(int arr[], int begin, int end, int badAllowed, std::vector<int> &le
 }
 
 void sort(int arr[], int n) {
-  if (n < 2) return;
+  if (n < 2)
+    return;
   std::vector<int> leftOffsets(blockSize + cachelineSize, 0);
   std::vector<int> rightOffsets(blockSize + cachelineSize, 0);
   pdqLoop(arr, 0, n, pdqLog(n), leftOffsets, rightOffsets);

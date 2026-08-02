@@ -43,7 +43,8 @@ std::vector<int> shatterPartition(int arr[], int start, int length, int num) {
   for (int i = 0; i < length; i++) {
     int v = arr[start + i];
     int idx = (v - minV) * shatters / valueRange;
-    if (idx > shatters - 1) idx = shatters - 1;
+    if (idx > shatters - 1)
+      idx = shatters - 1;
     buckets[idx].push_back(v);
   }
 

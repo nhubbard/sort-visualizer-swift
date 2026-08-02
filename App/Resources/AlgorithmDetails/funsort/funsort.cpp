@@ -17,8 +17,10 @@ void printList(int items[], int size) {
 }
 
 bool compositeLess(int arr[], std::vector<int> &key, int mid, int i) {
-  if (arr[mid] < arr[i]) return true;
-  if (arr[mid] == arr[i]) return key[mid] < key[i];
+  if (arr[mid] < arr[i])
+    return true;
+  if (arr[mid] == arr[i])
+    return key[mid] < key[i];
   return false;
 }
 
@@ -38,7 +40,8 @@ int binarySearch(int arr[], std::vector<int> &key, int n, int i) {
 
 void sort(int arr[], int n) {
   std::vector<int> key(n);
-  for (int i = 0; i < n; i++) key[i] = i;
+  for (int i = 0; i < n; i++)
+    key[i] = i;
 
   for (int i = 1; i < n; i++) {
     bool done = false;

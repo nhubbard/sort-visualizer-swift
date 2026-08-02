@@ -61,9 +61,7 @@ void exchange(int arr[], int length) {
   backward(arr, 1, length - 1);
 }
 
-void sort(int arr[], int n) {
-  exchange(arr, n);
-}
+void sort(int arr[], int n) { exchange(arr, n); }
 
 int main(int argc, char *argv[]) {
   int size = sizeof(array) / sizeof(array[0]);

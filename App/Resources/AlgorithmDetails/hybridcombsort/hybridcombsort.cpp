@@ -28,7 +28,7 @@ void insertionSort(int arr[], int n) {
 }
 
 void sort(int arr[], int n) {
-  float shrink = 1.3;
+  float shrink = 1.3f;
   int gap = n;
   bool sorted = false;
   int threshold = n / 32;
@@ -36,7 +36,7 @@ void sort(int arr[], int n) {
     threshold = 8;
   }
   while (!sorted) {
-    gap /= shrink;
+    gap = static_cast<int>(static_cast<float>(gap) / shrink);
     if (gap <= 1) {
       sorted = true;
       gap = 1;

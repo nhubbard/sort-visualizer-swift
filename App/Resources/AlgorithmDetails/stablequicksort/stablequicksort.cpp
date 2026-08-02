@@ -48,9 +48,7 @@ void stableQuickSort(int arr[], int start, int end) {
   }
 }
 
-void sort(int arr[], int n) {
-  stableQuickSort(arr, 0, n - 1);
-}
+void sort(int arr[], int n) { stableQuickSort(arr, 0, n - 1); }
 
 int main(int argc, char *argv[]) {
   int size = sizeof(array) / sizeof(array[0]);
