@@ -6,9 +6,7 @@ fun intPow(base: Int, exponent: Int): Int {
   return result
 }
 
-fun getDigit(value: Int, power: Int, radix: Int): Int {
-  return (value / intPow(radix, power)) % radix
-}
+fun getDigit(value: Int, power: Int, radix: Int): Int = (value / intPow(radix, power)) % radix
 
 fun radixMSD(array: IntArray, low: Int, high: Int, radix: Int, power: Int) {
   if (low >= high || power < 0) {
@@ -57,7 +55,7 @@ fun sort(arr: IntArray) {
 fun main() {
   val array = intArrayOf(
     0, 39, 21, 62, 91, 77, 14, 23,
-    90, 69, 51, 81, 68, 83, 32, 56
+    90, 69, 51, 81, 68, 83, 32, 56,
   )
   sort(array)
   println("[" + array.joinToString(", ") + "]")

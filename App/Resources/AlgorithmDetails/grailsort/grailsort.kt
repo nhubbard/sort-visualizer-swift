@@ -107,9 +107,13 @@ fun mergeLeft(arr: Array<Int>, pos: Int, leftLen: Int, rightLenArg: Int, distArg
   var dist = distArg
   while (right < rightLen) {
     if (left == leftLen || arr[pos + left] > arr[pos + right]) {
-      swap(arr, pos + dist, pos + right); dist++; right++
+      swap(arr, pos + dist, pos + right)
+      dist++
+      right++
     } else {
-      swap(arr, pos + dist, pos + left); dist++; left++
+      swap(arr, pos + dist, pos + left)
+      dist++
+      left++
     }
   }
   if (dist != left) multiSwap(arr, pos + dist, pos + left, leftLen - left)
@@ -121,13 +125,19 @@ fun mergeRight(arr: Array<Int>, pos: Int, leftLen: Int, rightLen: Int, dist: Int
   var left = leftLen - 1
   while (left >= 0) {
     if (right < leftLen || arr[pos + left] > arr[pos + right]) {
-      swap(arr, pos + mergedPos, pos + left); mergedPos--; left--
+      swap(arr, pos + mergedPos, pos + left)
+      mergedPos--
+      left--
     } else {
-      swap(arr, pos + mergedPos, pos + right); mergedPos--; right--
+      swap(arr, pos + mergedPos, pos + right)
+      mergedPos--
+      right--
     }
   }
   while (right != mergedPos && right >= leftLen) {
-    swap(arr, pos + mergedPos, pos + right); mergedPos--; right--
+    swap(arr, pos + mergedPos, pos + right)
+    mergedPos--
+    right--
   }
 }
 
@@ -164,9 +174,13 @@ fun smartMergeWithBuffer(arr: Array<Int>, pos: Int, leftOverLen: Int, leftOverFr
   val typeFrag = 1 - leftOverFrag
   while (left < leftEnd && right < rightEnd) {
     if ((compareValues(arr[pos + left], arr[pos + right]) - typeFrag) < 0) {
-      swap(arr, pos + dist, pos + left); dist++; left++
+      swap(arr, pos + dist, pos + left)
+      dist++
+      left++
     } else {
-      swap(arr, pos + dist, pos + right); dist++; right++
+      swap(arr, pos + dist, pos + right)
+      dist++
+      right++
     }
   }
   val length: Int
@@ -174,7 +188,8 @@ fun smartMergeWithBuffer(arr: Array<Int>, pos: Int, leftOverLen: Int, leftOverFr
   if (left < leftEnd) {
     length = leftEnd - left
     while (left < leftEnd) {
-      leftEnd--; rightEnd--
+      leftEnd--
+      rightEnd--
       swap(arr, pos + leftEnd, pos + rightEnd)
     }
   } else {
@@ -186,7 +201,7 @@ fun smartMergeWithBuffer(arr: Array<Int>, pos: Int, leftOverLen: Int, leftOverFr
 
 fun mergeBuffersLeft(
   arr: Array<Int>, keysPos: Int, midkey: Int, pos: Int, blockCount: Int, blockLen: Int,
-  havebuf: Boolean, aBlockCount: Int, lastLen: Int
+  havebuf: Boolean, aBlockCount: Int, lastLen: Int,
 ) {
   if (blockCount == 0) {
     val aBlocksLen = aBlockCount * blockLen
@@ -387,7 +402,7 @@ fun sort(arr: Array<Int>) {
 fun main() {
   var array = arrayOf<Int>(
     0, 39, 21, 62, 91, 77, 14, 23,
-    90, 69, 51, 81, 68, 83, 32, 56
+    90, 69, 51, 81, 68, 83, 32, 56,
   )
   sort(array)
   println("[%s]".format(array.joinToString(", ")))

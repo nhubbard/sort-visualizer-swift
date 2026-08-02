@@ -84,7 +84,7 @@ fun sortThree(arr: Array<Int>, a: Int, b: Int, c: Int) {
 
 fun swapOffsets(
   arr: Array<Int>, first: Int, last: Int, leftOffsets: IntArray, leftPos: Int,
-  rightOffsets: IntArray, rightPos: Int, num: Int, useSwaps: Boolean
+  rightOffsets: IntArray, rightPos: Int, num: Int, useSwaps: Boolean,
 ) {
   if (useSwaps) {
     for (i in 0 until num) {
@@ -106,7 +106,7 @@ fun swapOffsets(
 }
 
 fun partRightBranchless(
-  arr: Array<Int>, begin: Int, end: Int, leftOffsets: IntArray, rightOffsets: IntArray
+  arr: Array<Int>, begin: Int, end: Int, leftOffsets: IntArray, rightOffsets: IntArray,
 ): Pair<Int, Boolean> {
   val pivot = arr[begin]
   var first = begin
@@ -156,8 +156,10 @@ fun partRightBranchless(
 
     val num = minOf(leftNum, rightNum)
     swapOffsets(arr, first, last, leftOffsets, leftStart, rightOffsets, rightStart, num, leftNum == rightNum)
-    leftNum -= num; rightNum -= num
-    leftStart += num; rightStart += num
+    leftNum -= num
+    rightNum -= num
+    leftStart += num
+    rightStart += num
     if (leftNum == 0) first += BLOCK_SIZE
     if (rightNum == 0) last -= BLOCK_SIZE
   }
@@ -198,8 +200,10 @@ fun partRightBranchless(
 
   val num = minOf(leftNum, rightNum)
   swapOffsets(arr, first, last, leftOffsets, leftStart, rightOffsets, rightStart, num, leftNum == rightNum)
-  leftNum -= num; rightNum -= num
-  leftStart += num; rightStart += num
+  leftNum -= num
+  rightNum -= num
+  leftStart += num
+  rightStart += num
   if (leftNum == 0) first += leftSize
   if (rightNum == 0) last -= rightSize
 
@@ -373,7 +377,7 @@ fun sort(arr: Array<Int>) {
 fun main() {
   var array = arrayOf<Int>(
     0, 39, 21, 62, 91, 77, 14, 23,
-    90, 69, 51, 81, 68, 83, 32, 56
+    90, 69, 51, 81, 68, 83, 32, 56,
   )
   sort(array)
   println("[%s]".format(array.joinToString(", ")))

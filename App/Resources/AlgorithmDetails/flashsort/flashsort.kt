@@ -1,6 +1,4 @@
-fun classify(value: Int, minValue: Int, c: Double): Int {
-  return ((value - minValue) * c).toInt() + 1
-}
+fun classify(value: Int, minValue: Int, c: Double): Int = ((value - minValue) * c).toInt() + 1
 
 fun flashSort(array: IntArray) {
   val n = array.size
@@ -18,12 +16,17 @@ fun flashSort(array: IntArray) {
     val big: Int
     val bigIndex: Int
     if (array[i] < array[i + 1]) {
-      small = array[i]; big = array[i + 1]; bigIndex = i + 1
+      small = array[i]
+      big = array[i + 1]
+      bigIndex = i + 1
     } else {
-      big = array[i]; bigIndex = i; small = array[i + 1]
+      big = array[i]
+      bigIndex = i
+      small = array[i + 1]
     }
     if (big > maxValue) {
-      maxValue = big; maxIndex = bigIndex
+      maxValue = big
+      maxIndex = bigIndex
     }
     if (small < minValue) {
       minValue = small
@@ -41,6 +44,7 @@ fun flashSort(array: IntArray) {
 
   if (maxValue == minValue) return
 
+  @Suppress("ktlint:standard:property-naming") // matches every other language's port of this algorithm
   val L = IntArray(m + 1)
   val c = (m - 1.0) / (maxValue - minValue)
 
@@ -96,7 +100,7 @@ fun sort(arr: IntArray) {
 fun main() {
   val array = intArrayOf(
     0, 39, 21, 62, 91, 77, 14, 23,
-    90, 69, 51, 81, 68, 83, 32, 56
+    90, 69, 51, 81, 68, 83, 32, 56,
   )
   sort(array)
   println("[%s]".format(array.joinToString(", ")))

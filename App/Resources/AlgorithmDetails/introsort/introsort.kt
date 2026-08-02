@@ -65,9 +65,7 @@ fun insertionSort(arr: Array<Int>, start: Int, end: Int) {
   }
 }
 
-fun floorLog2(a: Int): Int {
-  return Math.floor(Math.log(a.toDouble()) / Math.log(2.0)).toInt()
-}
+fun floorLog2(a: Int): Int = Math.floor(Math.log(a.toDouble()) / Math.log(2.0)).toInt()
 
 fun introsortLoop(arr: Array<Int>, lo: Int, hiStart: Int, depthLimitStart: Int) {
   var hi = hiStart
@@ -96,7 +94,7 @@ fun sort(arr: Array<Int>) {
 fun main() {
   var array = arrayOf<Int>(
     0, 39, 21, 62, 91, 77, 14, 23,
-    90, 69, 51, 81, 68, 83, 32, 56
+    90, 69, 51, 81, 68, 83, 32, 56,
   )
   sort(array)
   println("[%s]".format(array.joinToString(", ")))

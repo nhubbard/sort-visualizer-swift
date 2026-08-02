@@ -1,9 +1,7 @@
 fun sort(arr: Array<Int>) {
   val n = arr.size
 
-  fun idx(p: Int): Int {
-    return n - p
-  }
+  fun idx(p: Int): Int = n - p
 
   fun siftDown(root: Int, dist: Int) {
     var root = root
@@ -42,7 +40,7 @@ fun sort(arr: Array<Int>) {
 fun main() {
   var array = arrayOf<Int>(
     0, 39, 21, 62, 91, 77, 14, 23,
-    90, 69, 51, 81, 68, 83, 32, 56
+    90, 69, 51, 81, 68, 83, 32, 56,
   )
   sort(array)
   println("[%s]".format(array.joinToString(", ")))

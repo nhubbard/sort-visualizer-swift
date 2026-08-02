@@ -6,15 +6,18 @@ fun mergeTo(arr: Array<Int>, subList: Array<Int>, a0: Int, m0: Int, b: Int) {
   while (i < s && m < b) {
     if (subList[i] < arr[m]) {
       arr[a] = subList[i]
-      a++; i++
+      a++
+      i++
     } else {
       arr[a] = arr[m]
-      a++; m++
+      a++
+      m++
     }
   }
   while (i < s) {
     arr[a] = subList[i]
-    a++; i++
+    a++
+    i++
   }
 }
 
@@ -53,7 +56,7 @@ fun sort(arr: Array<Int>) {
 fun main() {
   var array = arrayOf<Int>(
     0, 39, 21, 62, 91, 77, 14, 23,
-    90, 69, 51, 81, 68, 83, 32, 56
+    90, 69, 51, 81, 68, 83, 32, 56,
   )
   sort(array)
   println("[%s]".format(array.joinToString(", ")))

@@ -19,7 +19,7 @@ fun merge(left: List<Int>, right: List<Int>): List<Int> {
     newList.add(right[indexRight])
     indexRight++
   }
-  return newList;
+  return newList
 }
 
 fun sort(list: List<Int>): List<Int> {
@@ -35,7 +35,7 @@ fun sort(list: List<Int>): List<Int> {
 fun main() {
   var array = mutableListOf<Int>(
     0, 39, 21, 62, 91, 77, 14, 23,
-    90, 69, 51, 81, 68, 83, 32, 56
+    90, 69, 51, 81, 68, 83, 32, 56,
   )
   sort(array)
   println("[%s]".format(sort(array).joinToString(", ")))

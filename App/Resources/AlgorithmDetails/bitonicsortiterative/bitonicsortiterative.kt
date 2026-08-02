@@ -8,7 +8,7 @@ fun sort(arr: Array<Int>) {
       while (i < n) {
         val l = i xor j
         if (l > i) {
-          if (((i and k) == 0) && (arr[i] > arr[l]) ||
+          if ((((i and k) == 0) && (arr[i] > arr[l])) ||
             (((i and k) != 0) && (arr[i] < arr[l]))
           ) {
             arr[i] = arr[l].also { arr[l] = arr[i] }
@@ -25,7 +25,7 @@ fun sort(arr: Array<Int>) {
 fun main() {
   var array = arrayOf<Int>(
     0, 39, 21, 62, 91, 77, 14, 23,
-    90, 69, 51, 81, 68, 83, 32, 56
+    90, 69, 51, 81, 68, 83, 32, 56,
   )
   sort(array)
   println("[%s]".format(array.joinToString(", ")))

@@ -1,8 +1,6 @@
 import kotlin.math.sqrt
 
-fun triangularRoot(val_: Int): Int {
-  return ((sqrt((8 * val_ + 1).toDouble())).toInt() - 1) / 2
-}
+fun triangularRoot(val_: Int): Int = ((sqrt((8 * val_ + 1).toDouble())).toInt() - 1) / 2
 
 fun siftDown(array: IntArray, rootIn: Int, size: Int) {
   var root = rootIn
@@ -48,7 +46,7 @@ fun sort(array: IntArray) {
 fun main() {
   val array = intArrayOf(
     0, 39, 21, 62, 91, 77, 14, 23,
-    90, 69, 51, 81, 68, 83, 32, 56
+    90, 69, 51, 81, 68, 83, 32, 56,
   )
   sort(array)
   println(array.joinToString(", ", "[", "]"))

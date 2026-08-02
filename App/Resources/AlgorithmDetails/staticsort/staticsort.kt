@@ -61,9 +61,7 @@ fun heapSortRange(array: IntArray, s: Int, e: Int) {
   }
 }
 
-fun classify(value: Int, minValue: Int, c: Double): Int {
-  return ((value - minValue) * c).toInt()
-}
+fun classify(value: Int, minValue: Int, c: Double): Int = ((value - minValue) * c).toInt()
 
 fun staticSort(array: IntArray, a: Int, b: Int) {
   val (minValue, maxValue) = findMinMax(array, a, b)
@@ -122,7 +120,7 @@ fun sort(arr: IntArray) {
 fun main() {
   val array = intArrayOf(
     0, 39, 21, 62, 91, 77, 14, 23,
-    90, 69, 51, 81, 68, 83, 32, 56
+    90, 69, 51, 81, 68, 83, 32, 56,
   )
   sort(array)
   println("[%s]".format(array.joinToString(", ")))

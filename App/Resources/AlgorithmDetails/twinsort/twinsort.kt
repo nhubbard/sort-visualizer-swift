@@ -86,23 +86,37 @@ fun tailMerge(arr: Array<Int>, buf: IntArray, nmemb: Int, block0: Int) {
       d = a + block - 1
       e = dMax - 1
       if (arr[a] <= arr[a + block]) {
-        arr[e] = arr[d]; e--; d--
+        arr[e] = arr[d]
+        e--
+        d--
         while (c >= s) {
           while (arr[d] > buf[c]) {
-            arr[e] = arr[d]; e--; d--
+            arr[e] = arr[d]
+            e--
+            d--
           }
-          arr[e] = buf[c]; e--; c--
+          arr[e] = buf[c]
+          e--
+          c--
         }
       } else {
-        arr[e] = arr[d]; e--; d--
+        arr[e] = arr[d]
+        e--
+        d--
         while (d >= a) {
           while (arr[d] <= buf[c]) {
-            arr[e] = buf[c]; e--; c--
+            arr[e] = buf[c]
+            e--
+            c--
           }
-          arr[e] = arr[d]; e--; d--
+          arr[e] = arr[d]
+          e--
+          d--
         }
         while (c >= s) {
-          arr[e] = buf[c]; e--; c--
+          arr[e] = buf[c]
+          e--
+          c--
         }
       }
       offset += block * 2
@@ -126,7 +140,7 @@ fun sort(arr: Array<Int>) {
 fun main() {
   var array = arrayOf<Int>(
     0, 39, 21, 62, 91, 77, 14, 23,
-    90, 69, 51, 81, 68, 83, 32, 56
+    90, 69, 51, 81, 68, 83, 32, 56,
   )
   sort(array)
   println("[%s]".format(array.joinToString(", ")))
