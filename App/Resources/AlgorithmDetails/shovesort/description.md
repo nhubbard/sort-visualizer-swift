@@ -11,10 +11,10 @@ This gives the algorithm a chance to shove the same trouble spot again if the el
 place is also out of order, at the cost of potentially revisiting the same stretch of the array
 many times.
 
-Despite living among ArrayV's other exchange sorts and performing the same order of work as a
+Despite living among other exchange sorts and performing the same order of work as a
 shift-based insertion sort — every shove costs a pass across the remaining range, and the same
-position can be reshoved on a later loop — this algorithm is filed under "Impractical Sorts" in
-ArrayV itself, alongside other purpose-built curiosities rather than textbook comparison sorts.
+position can be reshoved on a later loop — this algorithm is filed under "Impractical Sorts",
+alongside other purpose-built curiosities rather than textbook comparison sorts.
 Because a shove can carry an out-of-order element past several other elements at once, including
 any that happen to be equal to it, Shove Sort does not preserve the original relative order of
 equal elements and is not a stable sort.

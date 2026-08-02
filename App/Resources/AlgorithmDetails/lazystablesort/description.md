@@ -14,7 +14,7 @@ side of the rotation. Because every step is just comparisons, swaps, and rotatio
 itself, the whole sort runs in O(1) auxiliary space, at the cost of the extra log-factor work the
 binary searches and rotations add on top of a standard merge.
 
-Lazy Stable Sort is filed among ArrayV's merge sorts, and it earns the "stable" half of its name
+Lazy Stable Sort is filed among merge sorts, and it earns the "stable" half of its name
 honestly: because every binary search in the merge step breaks ties in favor of whichever run is
 being treated as the "left" side, equal elements originating from the first of two runs always
 stay ahead of equal elements from the second, so the original relative order of equal elements is

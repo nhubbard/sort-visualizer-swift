@@ -66,7 +66,7 @@ def merge_without_buffer(arr, pos, len1, len2):
 
 
 def insertion_sort_chunk(arr, a, b):
-    # Guard: a chunk of length <= 1 has nothing to compare. ArrayV's own source skips this
+    # Guard: a chunk of length <= 1 has nothing to compare. The original source skips this
     # check and unconditionally reads arr[a] / arr[a + 1], which crashes whenever chunking
     # leaves a trailing 1-element chunk (e.g. n = 17 leaves a final [16, 17) chunk).
     if b - a <= 1:

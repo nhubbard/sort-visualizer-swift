@@ -19,7 +19,7 @@ tail is trimmed before the copy so the buffer only ever needs to hold half of th
 merged rather than a full copy of the array. That scratch buffer, sized to half the input, is
 allocated once up front and reused across every pass of the merge.
 
-Twin Sort belongs with ArrayV's merge sorts: every comparison-driven step is a movement of whole
+Twin Sort belongs with merge sorts: every comparison-driven step is a movement of whole
 runs or blocks that were already known to be internally sorted, never a value swapped past an
 unrelated value the way a partitioning or exchange sort would. It is a genuinely stable sort. The
 run-detection phase only ever reverses strictly-decreasing runs — a run that included a tie would

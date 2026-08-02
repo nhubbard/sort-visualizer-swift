@@ -14,7 +14,7 @@ Sort makes twice as many recursive calls per level — halving a range shrinks t
 than splitting it into thirds does, and that effect outweighs the extra calls as the array grows.
 
 Like Stooge Sort, this is still a purpose-built impractical sort rather than a competitive
-comparison sort, and ArrayV categorizes it accordingly (`"Impractical Sorts"`) despite its source
+comparison sort, and we categorize it accordingly (`"Impractical Sorts"`) despite its source
 file living alongside the ordinary exchange sorts. The repeated swapping of distant range endpoints
 across overlapping windows means equal-valued elements are not guaranteed to keep their original
 relative order, so Quad Stooge Sort is not a stable sort.

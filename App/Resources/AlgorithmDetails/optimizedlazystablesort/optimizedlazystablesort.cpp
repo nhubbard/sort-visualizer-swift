@@ -84,7 +84,7 @@ void mergeWithoutBuffer(int arr[], int pos, int len1, int len2) {
   }
 }
 
-/* Guard: a chunk of length <= 1 has nothing to compare. ArrayV's own source
+/* Guard: a chunk of length <= 1 has nothing to compare. The original source
    skips this check and unconditionally reads arr[a] / arr[a + 1], which crashes
    whenever chunking leaves a trailing 1-element chunk (e.g. n = 17 leaves a
    final [16, 17) chunk). */
