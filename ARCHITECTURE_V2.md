@@ -121,7 +121,7 @@ open:**
   `VisualizationContext`/`draw(_:)` call the live UI uses, just driven by a loop instead of a
   display link. Not started.
 
-**Three further ideas investigated on request (2026-08-03):**
+**Three further items investigated on request (2026-08-03) — two shipped, one a closed audit:**
 
 - **Algorithm registration completeness — audited, no gap.** Every one of the 148 sorts and 38
   shuffles in `Modules/BuiltInAlgorithms/Sources/` is correctly wired into all three real
@@ -133,17 +133,21 @@ open:**
   permutations of `min...(min+n-1)`, not arbitrary/duplicate-heavy fuzz input, and has its own
   dedicated permutation-based correctness test in the same file. Not an open item — closed.
 
-- **Tower of Hanoi tower visualizer — investigated, declined as a general `Visualizer`.** The
-  animated-three-towers idea doesn't fit the plugin boundary §2A established: a `Visualizer` only
-  ever sees `VisualizationContext` (values, markers, a generic `auxArrays: [Int: [Int]]`, canvas
-  size, color seed) with no idea which algorithm produced them, and `SortOperation` is equally
-  generic (`swap`/`setValue`/`auxWrite`/`compare`/...) — nothing on the tape says "this write moved
-  one disk from peg 2 to peg 3," only "some aux array changed at some index." A real three-peg
-  rendering only makes sense as a `HanoiSort`-specific special case, not a style selectable for any
-  of the other ~81 sorts the way the other 14 visualizers are — and even scoped to just `HanoiSort`,
-  it needs the same undesigned "step intent" vocabulary as the teaching-mode annotation item above,
-  since "an aux array changed" isn't distinguishable from "a peg move" without it. Worth revisiting
-  only alongside that item, not on its own.
+- **Hanoi Towers visualizer — reframed by the user, then shipped.** The initial "declined" verdict
+  was for a literal replay of `HanoiSort`'s own peg moves, which really doesn't fit the plugin
+  boundary (no algorithm's `SortOperation`s carry peg semantics). The shipped version is a
+  different, better idea: a dramatized layout usable with ANY algorithm, splitting the array into a
+  number of visual towers by CURRENT INDEX (not value) — `HanoiTowersVisualizer.tower(forIndex:)`/
+  `.depth(forIndex:)` (`Modules/BuiltInVisualizers/Sources/HanoiTowersVisualizer.swift`) are pure,
+  index-derived functions, so this is a completely ordinary `Visualizer` conformance with no
+  algorithm awareness at all. The choreography — lift the blocks stacked above a moved index out to
+  a spare tower, carry the swapped values across, restore the obstacles — lives entirely in
+  `MetalHanoiTowersRenderer` (`Modules/SortFeature/Sources/`), driven by the raw `SortOperation`s
+  `MetalIncrementalRenderer.apply(_:values:valueRange:markers:)` already receives for every
+  visualizer; `HanoiMoveScheduler` is the small per-slot waypoint queue behind it, wrapping the
+  existing `MetalTransitionTracker` rather than inventing new interpolation math. Same-tower swaps
+  skip the obstacle dance (extracting from the middle of one stack was left out of this first
+  version, deliberately). No engine, tape, or algorithm changes of any kind were needed.
 
 - **The 6 code-highlighting themes now regenerate from real Pygments data.** The old themes were
   hand-copied from Pygments' CSS years ago and had drifted (e.g. Monokai's real operator color is

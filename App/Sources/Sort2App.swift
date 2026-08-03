@@ -19,7 +19,7 @@ struct Sort2App: App {
       SineWaveVisualizer(), ColorCircleVisualizer(), SpiralVisualizer(), SpiralDotsVisualizer(),
       WaveDotsVisualizer(), PixelMeshVisualizer(), HoopStackVisualizer(),
       DisparityBarGraphVisualizer(), DisparityCircleVisualizer(), DisparityChordsVisualizer(),
-      DisparityDotsVisualizer(),
+      DisparityDotsVisualizer(), HanoiTowersVisualizer(),
     ]
     VisualizerRegistry.shared.discover()
 

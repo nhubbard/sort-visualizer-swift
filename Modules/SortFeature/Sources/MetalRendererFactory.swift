@@ -39,6 +39,7 @@ enum MetalRendererFactory {
     case "spiral":
       MetalTriangleRenderer<SpiralMetalLayout>(device: device, sampleCount: sampleCount)
     case "disparitychords": MetalDisparityChordsRenderer(device: device, sampleCount: sampleCount)
+    case "hanoitowers": MetalHanoiTowersRenderer(device: device, sampleCount: sampleCount)
     default: nil
     }
   }
