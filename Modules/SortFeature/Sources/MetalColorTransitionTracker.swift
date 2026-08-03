@@ -69,12 +69,26 @@ final class MetalTransitionTracker<Value: SIMD> where Value.Scalar == Float {
     for (slot, entry) in entries where entry.progress < 1 {
       var updated = entry
       updated.progress = min(1, updated.progress + elapsed / transitionDuration)
+      // Ease-in-out (cubic) rather than linear: with fast-firing highlights retargeting the
+      // fade every tick, a linear ramp spends most of its time in a half-blended state and
+      // never reads as the FULL target color before the next change arrives — looking like a
+      // faint wash instead of a flash. Easing out the back half front-loads the approach so the
+      // displayed value reaches near-target quickly and holds there, while still avoiding the
+      // instant-snap flash this tracker exists to prevent. Easing in the front half (rather than
+      // a pure ease-out) keeps the very start of each fade gentle instead of an abrupt jolt.
       let t = Float(updated.progress)
-      updated.displayed = updated.from + (updated.to - updated.from) * Value(repeating: t)
+      let eased = Self.easeInOutCubic(t)
+      updated.displayed = updated.from + (updated.to - updated.from) * Value(repeating: eased)
       entries[slot] = updated
       changed[slot] = updated.displayed
     }
     return changed
+  }
+
+  private static func easeInOutCubic(_ t: Float) -> Float {
+    guard t >= 0.5 else { return 4 * t * t * t }
+    let f = -2 * t + 2
+    return 1 - f * f * f / 2
   }
 
   /// The slot's current eased value, even on a tick where it didn't move — needed when a
