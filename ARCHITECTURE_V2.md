@@ -121,6 +121,55 @@ open:**
   `VisualizationContext`/`draw(_:)` call the live UI uses, just driven by a loop instead of a
   display link. Not started.
 
+**Three further ideas investigated on request (2026-08-03):**
+
+- **Algorithm registration completeness — audited, no gap.** Every one of the 148 sorts and 38
+  shuffles in `Modules/BuiltInAlgorithms/Sources/` is correctly wired into all three real
+  registration surfaces: `AllBuiltInAlgorithms.swift` (test fixture list), `Sort2App.swift`
+  (`AlgorithmRegistry`/`ShuffleRegistry`), and `GrowthModelCalibrationTests.swift` (which reads
+  `AllBuiltInAlgorithms.sorts`/`.shuffles` directly rather than keeping its own list, so it can't
+  drift independently). `IndexSort`'s absence from `NativeAlgorithmCorrectnessTests.swift`'s generic
+  fuzz list is the one asymmetry, and it's deliberate, not forgotten: `IndexSort` only sorts
+  permutations of `min...(min+n-1)`, not arbitrary/duplicate-heavy fuzz input, and has its own
+  dedicated permutation-based correctness test in the same file. Not an open item — closed.
+
+- **Tower of Hanoi tower visualizer — investigated, declined as a general `Visualizer`.** The
+  animated-three-towers idea doesn't fit the plugin boundary §2A established: a `Visualizer` only
+  ever sees `VisualizationContext` (values, markers, a generic `auxArrays: [Int: [Int]]`, canvas
+  size, color seed) with no idea which algorithm produced them, and `SortOperation` is equally
+  generic (`swap`/`setValue`/`auxWrite`/`compare`/...) — nothing on the tape says "this write moved
+  one disk from peg 2 to peg 3," only "some aux array changed at some index." A real three-peg
+  rendering only makes sense as a `HanoiSort`-specific special case, not a style selectable for any
+  of the other ~81 sorts the way the other 14 visualizers are — and even scoped to just `HanoiSort`,
+  it needs the same undesigned "step intent" vocabulary as the teaching-mode annotation item above,
+  since "an aux array changed" isn't distinguishable from "a peg move" without it. Worth revisiting
+  only alongside that item, not on its own.
+
+- **Algorithm-detail resource cleanup — mixed verdict, one real fix identified.** Four ideas,
+  investigated together since they all touch `AlgorithmDetailSection`/`AttributedCodeView`
+  (`Modules/DesignSystemKit/Sources/`) and the `AlgorithmDetails.algz` pipeline
+  (`App/Resources/AlgorithmDetails/manage.py`, see `ALGORITHM_PORTING_PROCESS.md`):
+  - *Move the Pygments lexer into the app* — would fix nothing. Pygments already only runs at
+    author time (`manage.py highlight`), producing token-marked-up text baked into
+    `AlgorithmDetails.algz` at build time; no Python process runs on-device today, so this idea's
+    premise doesn't hold.
+  - *Drop `Then`* — real but low-value cleanup. Only 6 call sites total, all in
+    `Modules/DesignSystemKit/Sources/Themes/*.swift`, all the identical
+    `TextFormat.getBuilder(...).then { ... }.build()` shape — mechanical to replace with a plain
+    `build(configure:)`-style closure parameter, whenever it's worth doing.
+  - *Cache the highlighted result, or make it async* — **this is the actual fix for the freeze**,
+    not (a). `AttributedCodeView.init` re-parses the full marked-up string and re-runs
+    `theme.getFormat(token:)` per attribute run from scratch, synchronously on the main thread,
+    every time the language picker changes — there is no caching at any layer today. Straightforward
+    to fix either way: memoize `[CodeLanguage: AttributedString]` per algorithm+theme in
+    `AlgorithmDetailSection`'s `@State`, or move the parse/style work to `Task.detached` behind a
+    spinner. Nothing structural blocks either approach.
+  - *Copy plain code to the clipboard* — a small addition, not a rework. The stored source
+    (`AlgorithmDetailContent.codeSamples[].source`) is Pygments-marked-up text, not raw code, but
+    parsing it into an `AttributedString` losslessly recovers the original
+    (`String(attributedString.characters)`) since the markdown parse un-escapes the token markup.
+    Exposing that plain string alongside the attributed one is all a clipboard action would need.
+
 ---
 
 ## 3. Services — shipped
