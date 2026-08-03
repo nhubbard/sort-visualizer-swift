@@ -1,0 +1,9 @@
+[project]
+name = "generate-themes"
+version = "0.1.0"
+description = "Regenerates Modules/DesignSystemKit/Sources/Themes/*.swift from real Pygments style data."
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "pygments>=2.20.0",
+]

@@ -145,30 +145,33 @@ open:**
   since "an aux array changed" isn't distinguishable from "a peg move" without it. Worth revisiting
   only alongside that item, not on its own.
 
-- **Algorithm-detail resource cleanup — mixed verdict, one real fix identified.** Four ideas,
-  investigated together since they all touch `AlgorithmDetailSection`/`AttributedCodeView`
-  (`Modules/DesignSystemKit/Sources/`) and the `AlgorithmDetails.algz` pipeline
-  (`App/Resources/AlgorithmDetails/manage.py`, see `ALGORITHM_PORTING_PROCESS.md`):
-  - *Move the Pygments lexer into the app* — would fix nothing. Pygments already only runs at
-    author time (`manage.py highlight`), producing token-marked-up text baked into
-    `AlgorithmDetails.algz` at build time; no Python process runs on-device today, so this idea's
-    premise doesn't hold.
-  - *Drop `Then`* — real but low-value cleanup. Only 6 call sites total, all in
-    `Modules/DesignSystemKit/Sources/Themes/*.swift`, all the identical
-    `TextFormat.getBuilder(...).then { ... }.build()` shape — mechanical to replace with a plain
-    `build(configure:)`-style closure parameter, whenever it's worth doing.
-  - *Cache the highlighted result, or make it async* — **this is the actual fix for the freeze**,
-    not (a). `AttributedCodeView.init` re-parses the full marked-up string and re-runs
-    `theme.getFormat(token:)` per attribute run from scratch, synchronously on the main thread,
-    every time the language picker changes — there is no caching at any layer today. Straightforward
-    to fix either way: memoize `[CodeLanguage: AttributedString]` per algorithm+theme in
-    `AlgorithmDetailSection`'s `@State`, or move the parse/style work to `Task.detached` behind a
-    spinner. Nothing structural blocks either approach.
-  - *Copy plain code to the clipboard* — a small addition, not a rework. The stored source
-    (`AlgorithmDetailContent.codeSamples[].source`) is Pygments-marked-up text, not raw code, but
-    parsing it into an `AttributedString` losslessly recovers the original
-    (`String(attributedString.characters)`) since the markdown parse un-escapes the token markup.
-    Exposing that plain string alongside the attributed one is all a clipboard action would need.
+- **The 6 code-highlighting themes now regenerate from real Pygments data.** The old themes were
+  hand-copied from Pygments' CSS years ago and had drifted (e.g. Monokai's real operator color is
+  `#FF4689`, not the `#F92672` all 6 themes had hard-coded). `Tools/GenerateThemes/
+  generate_themes.py` — deliberately separate from `App/Resources/AlgorithmDetails/manage.py`,
+  which is scoped to per-algorithm content, not styling — reads each style's real,
+  fully-cascaded token colors straight from `HtmlFormatter(style:).get_style_defs()` (Pygments'
+  own public CSS-export mechanism; each rule's trailing comment already names the token in the same
+  dotted form `CodeAttributes.Value`'s raw values use, so no separate short-class-name table is
+  needed), then prunes anything identical to its parent's resolved style before emitting each
+  theme's now-sparse `static var styles: [CodeAttributes.Value: TextFormat]`. `CodeAttributes.Value`
+  gained a `parent` computed property so `CodeTheme.getFormat(token:)` can walk that cascade at
+  runtime (`Modules/DesignSystemKit/Sources/CodeAttributes.swift`/`CodeTheme.swift`) — a theme now
+  only declares the tokens it actually diverges on (Monokai: 25 entries, down from a 78-case
+  `switch`) instead of hand-listing every leaf that shares a parent's color. This also obsoleted the
+  `Then`-based builder outright: `TextFormat` is a plain, defaulted struct, so generated code just
+  writes `TextFormat(fg:bg:bold:...)` literals directly — `TextFormat.Builder` and the `Then`
+  package dependency are both gone.
+
+- **`AttributedCodeView` caching fixed the language-switch freeze.** Confirmed root cause:
+  `AttributedCodeView.init` re-parsed the full marked-up source and re-ran `theme.getFormat(token:)`
+  per attribute run from scratch, synchronously, on **every** SwiftUI body evaluation of
+  `AlgorithmDetailSection` — not just on an actual language switch. The highlighting logic moved
+  into a standalone `CodeHighlighter.highlight(_:theme:)` (`Modules/DesignSystemKit/Sources/
+  CodeHighlighter.swift`); `AlgorithmDetailSection` now precomputes every code sample's highlighted
+  `AttributedString` (and, as a bonus, its plain-text form for a "Copy Code" action) once per
+  `content`/theme change via `Task.detached`, off the main actor, caching the results in `@State`
+  and showing a `ProgressView` until ready.
 
 ---
 

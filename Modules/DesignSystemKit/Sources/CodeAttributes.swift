@@ -66,6 +66,7 @@ public enum CodeAttributes: CodableAttributedStringKey, MarkdownDecodableAttribu
     case `operator` = "Token.Operator"
     case operatorWord = "Token.Operator.Word"
     case punctuation = "Token.Punctuation"
+    case punctuationMarker = "Token.Punctuation.Marker"
     case comment = "Token.Comment"
     case commentHashbang = "Token.Comment.Hashbang"
     case commentMultiline = "Token.Comment.Multiline"
@@ -84,6 +85,18 @@ public enum CodeAttributes: CodableAttributedStringKey, MarkdownDecodableAttribu
     case genericStrong = "Token.Generic.Strong"
     case genericSubheading = "Token.Generic.Subheading"
     case genericTraceback = "Token.Generic.Traceback"
+    case genericEmphStrong = "Token.Generic.EmphStrong"
+
+    /// The next-broader token this one falls back to when a theme doesn't declare its own style
+    /// for it — `"Token.Keyword.Constant"` -> `"Token.Keyword"` -> `"Token"` -> `nil`. Mirrors
+    /// Pygments' own token-style cascade, so a theme only needs to declare the tokens it actually
+    /// wants to diverge on; anything else inherits its nearest ancestor's style automatically,
+    /// including tokens added to this enum after a given theme was last touched.
+    public var parent: Value? {
+      let components = rawValue.split(separator: ".")
+      guard components.count > 1 else { return nil }
+      return Value(rawValue: components.dropLast().joined(separator: "."))
+    }
   }
   public static let name = "code"
 }

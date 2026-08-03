@@ -27,7 +27,7 @@ let modules: [Target] =
         .target(name: "SortEngineKit"), .target(name: "AlgorithmKit"),
     ]) +
     Module.framework(name: "DesignSystemKit", dependencies: [
-        .external(name: "Then"), .target(name: "SettingsKit"),
+        .target(name: "SettingsKit"),
     ]) +
     Module.framework(name: "MathRenderingKit", dependencies: [
         .external(name: "SwiftMath"), .target(name: "AlgorithmKit"),

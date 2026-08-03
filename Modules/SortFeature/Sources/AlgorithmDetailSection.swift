@@ -4,6 +4,7 @@ import MarkdownUI
 import MathRenderingKit
 import SettingsKit
 import SwiftUI
+import UIKit
 
 /// The `AlgorithmDetailSection(entry:)` §4.2 of ARCHITECTURE_V2.md describes as sitting below the
 /// live sort — description + complexity (rendered via `MathView`, derived from
@@ -19,6 +20,13 @@ public struct AlgorithmDetailSection: View {
   private let availableWidth: CGFloat
   @Environment(AppSettings.self) private var settings
   @State private var selectedLanguage: CodeLanguage = CodeLanguage.all[0]
+  /// Highlighting a sample re-parses its full source and re-styles every attribute run — cheap
+  /// once, but `AttributedCodeView(selected.source, theme:)` used to pay that cost again on every
+  /// SwiftUI body evaluation of this view, not just on an actual language switch, causing a
+  /// visible hitch on the newly-ported, hundreds-of-lines algorithms. Computed once per
+  /// `content`/theme change in `highlightAllSamples`, off the main actor, instead.
+  @State private var highlighted: [CodeLanguage: AttributedString] = [:]
+  @State private var plainSamples: [CodeLanguage: String] = [:]
 
   /// Below this, `descriptionColumn`/`complexityColumn` stack instead of sitting side by side —
   /// comfortably under a landscape detail pane's width, comfortably over a narrow portrait one's.
@@ -54,13 +62,34 @@ public struct AlgorithmDetailSection: View {
           .pickerStyle(.segmented)
           .accessibilityIdentifier("codeLanguagePicker")
 
-          if let selected = content.codeSamples.first(where: { $0.language == selectedLanguage }) {
+          if content.codeSamples.contains(where: { $0.language == selectedLanguage }) {
             // AttributedCodeView sizes to its own intrinsic width (`.fixedSize`), so
             // left inside this leading-aligned VStack it hugs the left edge instead of
             // sitting under the wider Description/Complexity content above it.
             HStack {
               Spacer(minLength: 0)
-              AttributedCodeView(selected.source, theme: settings.codeTheme.makeTheme())
+              if let styled = highlighted[selectedLanguage] {
+                AttributedCodeView(
+                  attributed: styled, backgroundColor: settings.codeTheme.makeTheme().getBgColor()
+                )
+                .overlay(alignment: .topTrailing) {
+                  if let plain = plainSamples[selectedLanguage] {
+                    Button {
+                      UIPasteboard.general.string = plain
+                    } label: {
+                      Image(systemName: "doc.on.doc")
+                        .padding(8)
+                        .glassOrMaterialBackground()
+                    }
+                    .buttonStyle(.plain)
+                    .offset(x: 8, y: -8)
+                    .accessibilityLabel("Copy Code")
+                  }
+                }
+              } else {
+                ProgressView()
+                  .frame(minWidth: 200, minHeight: 100)
+              }
               Spacer(minLength: 0)
             }
           }
@@ -75,7 +104,28 @@ public struct AlgorithmDetailSection: View {
       if let firstLanguage = content?.codeSamples.first?.language {
         selectedLanguage = firstLanguage
       }
+      if let content { await highlightAllSamples(content) }
     }
+    .onChange(of: settings.codeTheme) {
+      if let content { Task { await highlightAllSamples(content) } }
+    }
+  }
+
+  private func highlightAllSamples(_ content: AlgorithmDetailContent) async {
+    let theme = settings.codeTheme.makeTheme()
+    let samples = content.codeSamples
+    let (styled, plain) = await Task.detached(priority: .userInitiated) {
+      var styled: [CodeLanguage: AttributedString] = [:]
+      var plain: [CodeLanguage: String] = [:]
+      for sample in samples {
+        let attributed = CodeHighlighter.highlight(sample.source, theme: theme)
+        styled[sample.language] = attributed
+        plain[sample.language] = String(attributed.characters)
+      }
+      return (styled, plain)
+    }.value
+    highlighted = styled
+    plainSamples = plain
   }
 
   private var descriptionColumn: some View {
@@ -101,5 +151,19 @@ public struct AlgorithmDetailSection: View {
       BigOCorrelationChart(algorithm: algorithm)
     }
     .frame(maxWidth: .infinity, alignment: .leading)
+  }
+}
+
+extension View {
+  /// Same Liquid Glass convention as `RunControlBar.glassOrMaterialBackground()` — the app
+  /// builds against the iOS 26 SDK but ships back to iOS 18.0 (`Module.deploymentTargets`), so
+  /// every Liquid Glass site needs this `#available` fallback, not just this one.
+  @ViewBuilder
+  fileprivate func glassOrMaterialBackground() -> some View {
+    if #available(iOS 26.0, *) {
+      glassEffect(.regular.interactive(), in: .circle)
+    } else {
+      background(.thinMaterial, in: Circle())
+    }
   }
 }

@@ -26,7 +26,6 @@ let packageSettings = PackageSettings(
 let package = Package(
     name: "SortSymphonyDependencies",
     dependencies: [
-        .package(url: "https://github.com/devxoul/Then", from: "3.0.0"),
         .package(url: "https://github.com/nhubbard/CollectionConcurrencyKit", from: "2.1.0"),
         .package(url: "https://github.com/apple/swift-algorithms.git", from: "1.2.1"),
         .package(url: "https://github.com/mgriebling/SwiftMath.git", from: "1.7.1"),

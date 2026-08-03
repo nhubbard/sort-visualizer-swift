@@ -8,15 +8,17 @@ public struct AttributedCodeView: View {
   private let attributedString: AttributedString
   private let backgroundColor: Color
 
+  /// Highlights `source` inline — fine for a one-off render, but callers juggling several samples
+  /// per render pass (a language picker) should precompute via `CodeHighlighter.highlight(_:theme:)`
+  /// and use `init(attributed:backgroundColor:)` instead, so the work happens once per sample
+  /// rather than on every SwiftUI body evaluation.
   public init(_ source: String, theme: any CodeTheme) {
-    backgroundColor = theme.getBgColor()
-    var attrString = AttributedString(
-      localized: String.LocalizationValue(source), including: \.sortSymphonyApp)
-    for run in attrString.runs {
-      guard let codeMode = run.code else { continue }
-      attrString[run.range].mergeAttributes(applyTextFormat(theme.getFormat(token: codeMode)))
-    }
-    attributedString = attrString
+    self.init(attributed: CodeHighlighter.highlight(source, theme: theme), backgroundColor: theme.getBgColor())
+  }
+
+  public init(attributed: AttributedString, backgroundColor: Color) {
+    self.attributedString = attributed
+    self.backgroundColor = backgroundColor
   }
 
   public var body: some View {
