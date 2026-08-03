@@ -76,19 +76,7 @@ All exchange sorts have been ported.
 
 ### b. Insertion sorts (`sorts/insert/`, 18)
 
-#### Completed
-
-Move algorithms here when you finish them.
-
-#### Not Started
-
-##### Hard
-
-- [ ] LibrarySort — 233 lines
-- [ ] AATreeSort — 248 lines
-- [ ] HanoiSort — 326 lines
-- [ ] RedBlackTreeSort — 336 lines
-- [ ] AVLTreeSort — 373 lines
+All insertion sorts have been ported.
 
 ### c. Selection sorts (`sorts/select/`, 25)
 

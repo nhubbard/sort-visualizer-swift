@@ -10,6 +10,7 @@ import Testing
 @Suite
 struct NativeAlgorithmCorrectnessTests {
   private static let algorithms: [any SortAlgorithm] = [
+    AATreeSort(), AVLTreeSort(),
     AsynchronousSort(), BadSort(), BaseNMaxHeapSort(), BinaryDoubleInsertionSort(),
     BinaryGnomeSort(),
     BinaryInsertionSort(), BinaryMergeSort(), BinaryQuickSortIterative(),
@@ -30,10 +31,11 @@ struct NativeAlgorithmCorrectnessTests {
     DualPivotQuickSort(), ExchangeBogoSort(), FlashSort(), FlippedMinHeapSort(), FoldSort(),
     ForcedStableQuickSort(), FunSort(), GnomeSort(), GrailSort(),
     GravitySort(),
-    GuessSort(), HybridCombSort(), ImprovedInPlaceMergeSort(), InPlaceLSDRadixSort(),
+    GuessSort(), HanoiSort(), HybridCombSort(), ImprovedInPlaceMergeSort(), InPlaceLSDRadixSort(),
     InPlaceMergeSort(), InsertionSort(),
     IntroCircleSortIterative(),
-    IntroSort(), LazyHeapSort(), LazyStableSort(), LessBogoSort(), LLQuickSort(), LRQuickSort(),
+    IntroSort(), LazyHeapSort(), LazyStableSort(), LessBogoSort(), LibrarySort(), LLQuickSort(),
+    LRQuickSort(),
     LSDRadixSort(),
     MatrixSort(), MaxHeapSort(),
     MedianQuickBogoSort(), MergeBogoSort(), MergeExchangeSortIterative(), MergeSort(),
@@ -48,7 +50,8 @@ struct NativeAlgorithmCorrectnessTests {
     PDQBranchlessSort(),
     PigeonholeSort(), QuadStoogeSort(),
     QuickBogoSort(), QuickSort(),
-    RandomGuessSort(), RecursiveShellSort(), RotateMergeSort(), SelectionBogoSort(),
+    RandomGuessSort(), RecursiveShellSort(), RedBlackTreeSort(), RotateMergeSort(),
+    SelectionBogoSort(),
     SelectionSort(), ShatterSort(), ShellSort(), ShoveSort(), SillySort(), SimpleShatterSort(),
     SimplifiedLibrarySort(), SimplisticGravitySort(), SlopeSort(), SlowSort(), SmartBogoBogoSort(),
     SmartGuessSort(),
@@ -1437,5 +1440,620 @@ struct NativeAlgorithmCorrectnessTests {
         )
       }
     }
+  }
+
+  /// Extra scrutiny for the 5 newly-ported `sorts/insert/` Hard-tier algorithms, matching the
+  /// precedent set for every other batch in this file: more randomized duplicate-heavy trials
+  /// than the generic suite's single pass per algorithm, across several sizes including ones
+  /// that exercise `LibrarySort`'s rebalance boundary and `HanoiSort`'s duplicate-run grouping.
+  @Test
+  func hardInsertionBatchDuplicateHeavyFuzz() {
+    let algorithms: [any SortAlgorithm] = [
+      AATreeSort(), AVLTreeSort(), RedBlackTreeSort(), HanoiSort(), LibrarySort(),
+    ]
+    for algorithm in algorithms {
+      for size in [algorithm.metadata.sizeRange.lowerBound, 5, 8, 16, 20, 32] {
+        for attempt in 0..<100 {
+          let input = (0..<size).map { _ in Int.random(in: 0...3) }
+          var engine = RecordingEngine(values: input)
+          algorithm.record(into: &engine)
+          #expect(
+            engine.values == input.sorted(),
+            "\(algorithm.id.rawValue) failed duplicate-heavy fuzz attempt \(attempt) of size \(size): \(input) -> \(engine.values)"
+          )
+        }
+      }
+    }
+  }
+
+  /// Shared tagged-pair shape for the stability checks below: every one of the 5 new
+  /// `sorts/insert/` Hard-tier algorithms writes its main-array output via `setValue`, never
+  /// `swap` (same limitation `classicTreeSortTiedElementsKeepTheirOriginalRelativeOrder`
+  /// documents above `expectStable`) — tape replay can't reconstruct original indices once
+  /// duplicates are involved, so each algorithm's real routing/insertion logic is reimplemented
+  /// here over `(value, originalIndex)` pairs instead.
+  private struct Tagged {
+    let value: Int
+    let originalIndex: Int
+  }
+
+  private func assertTaggedGroupsStayOrdered(
+    _ sorted: [Tagged], inputCount: Int, algorithmName: String
+  ) {
+    var byValue: [Int: [Int]] = [:]
+    for t in sorted {
+      byValue[t.value, default: []].append(t.originalIndex)
+    }
+    for (value, indices) in byValue {
+      #expect(
+        indices == indices.sorted(),
+        "\(algorithmName) reordered equal-valued elements (value \(value)): \(indices)"
+      )
+    }
+  }
+
+  @Test
+  func aaTreeSortTiedElementsKeepTheirOriginalRelativeOrder() {
+    final class Node {
+      let tag: Tagged
+      var left: Node?
+      var right: Node?
+      var level = 0
+      init(_ tag: Tagged) { self.tag = tag }
+    }
+    func level(_ node: Node?) -> Int { node?.level ?? -1 }
+    func skew(_ node: Node) -> Node {
+      guard let l = node.left else { return node }
+      node.left = l.right
+      l.right = node
+      return l
+    }
+    func split(_ node: Node) -> Node {
+      guard let r = node.right else { return node }
+      node.right = r.left
+      r.left = node
+      r.level += 1
+      return r
+    }
+    func add(_ node: Node?, _ tag: Tagged) -> Node {
+      guard let node else { return Node(tag) }
+      if tag.value < node.tag.value {
+        node.left = add(node.left, tag)
+        if level(node.left) == node.level {
+          if node.level != level(node.right) { return skew(node) }
+          node.level += 1
+          return node
+        }
+        return node
+      } else {
+        node.right = add(node.right, tag)
+        if level(node.right?.right) == node.level { return split(node) }
+        return node
+      }
+    }
+    func traverse(_ node: Node?, into result: inout [Tagged]) {
+      guard let node else { return }
+      traverse(node.left, into: &result)
+      result.append(node.tag)
+      traverse(node.right, into: &result)
+    }
+
+    let size = 64
+    for _ in 0..<200 {
+      let values = (0..<size).map { _ in Int.random(in: 0...3) }
+      var root: Node?
+      for (index, value) in values.enumerated() {
+        root = add(root, Tagged(value: value, originalIndex: index))
+      }
+      var sorted: [Tagged] = []
+      traverse(root, into: &sorted)
+      #expect(sorted.map(\.value) == values.sorted())
+      assertTaggedGroupsStayOrdered(sorted, inputCount: size, algorithmName: "aatreesort")
+    }
+  }
+
+  @Test
+  func redBlackTreeSortTiedElementsKeepTheirOriginalRelativeOrder() {
+    final class Node {
+      let tag: Tagged
+      var left: Node?
+      var right: Node?
+      var isRed = true
+      init(_ tag: Tagged) { self.tag = tag }
+    }
+    func isRed(_ node: Node?) -> Bool { node?.isRed ?? false }
+    func singleRotateRight(_ node: Node) -> Node {
+      let b = node.left!
+      node.left = b.right
+      b.right = node
+      b.isRed = false
+      node.isRed = true
+      return b
+    }
+    func singleRotateLeft(_ node: Node) -> Node {
+      let b = node.right!
+      node.right = b.left
+      b.left = node
+      b.isRed = false
+      node.isRed = true
+      return b
+    }
+    func doubleRotateRight(_ node: Node) -> Node {
+      node.left = singleRotateLeft(node.left!)
+      return singleRotateRight(node)
+    }
+    func doubleRotateLeft(_ node: Node) -> Node {
+      node.right = singleRotateRight(node.right!)
+      return singleRotateLeft(node)
+    }
+    struct AddResult { var node: Node; var needsFix: Bool }
+    func add(_ node: Node?, _ tag: Tagged) -> AddResult {
+      guard let node else { return AddResult(node: Node(tag), needsFix: false) }
+      if !node.isRed, isRed(node.left), isRed(node.right) {
+        node.isRed = true
+        node.left!.isRed = false
+        node.right!.isRed = false
+      }
+      if tag.value < node.tag.value {
+        let result = add(node.left, tag)
+        node.left = result.node
+        if result.needsFix {
+          if isRed(node.left!.left) { return AddResult(node: singleRotateRight(node), needsFix: false) }
+          return AddResult(node: doubleRotateRight(node), needsFix: false)
+        }
+        return AddResult(node: node, needsFix: node.isRed && isRed(node.left))
+      } else {
+        let result = add(node.right, tag)
+        node.right = result.node
+        if result.needsFix {
+          if isRed(node.right!.right) { return AddResult(node: singleRotateLeft(node), needsFix: false) }
+          return AddResult(node: doubleRotateLeft(node), needsFix: false)
+        }
+        return AddResult(node: node, needsFix: node.isRed && isRed(node.right))
+      }
+    }
+    func traverse(_ node: Node?, into result: inout [Tagged]) {
+      guard let node else { return }
+      traverse(node.left, into: &result)
+      result.append(node.tag)
+      traverse(node.right, into: &result)
+    }
+
+    let size = 64
+    for _ in 0..<200 {
+      let values = (0..<size).map { _ in Int.random(in: 0...3) }
+      var root: Node?
+      for (index, value) in values.enumerated() {
+        let result = add(root, Tagged(value: value, originalIndex: index))
+        root = result.node
+        root?.isRed = false
+      }
+      var sorted: [Tagged] = []
+      traverse(root, into: &sorted)
+      #expect(sorted.map(\.value) == values.sorted())
+      assertTaggedGroupsStayOrdered(sorted, inputCount: size, algorithmName: "redblacktreesort")
+    }
+  }
+
+  @Test
+  func avlTreeSortTiedElementsKeepTheirOriginalRelativeOrder() {
+    final class Node {
+      let tag: Tagged
+      var left: Node?
+      var right: Node?
+      var balance = 0
+      init(_ tag: Tagged) { self.tag = tag }
+    }
+    func singleRotateRight(_ node: Node) -> Node {
+      let b = node.left!
+      node.left = b.right
+      b.right = node
+      node.balance = 0
+      b.balance = 0
+      return b
+    }
+    func singleRotateLeft(_ node: Node) -> Node {
+      let b = node.right!
+      node.right = b.left
+      b.left = node
+      node.balance = 0
+      b.balance = 0
+      return b
+    }
+    func doubleRotateRight(_ node: Node) -> Node {
+      let oldBBalance = node.left!.right!.balance
+      node.left = singleRotateLeft(node.left!)
+      let b = singleRotateRight(node)
+      if oldBBalance == -1 { b.right!.balance = 1 }
+      if oldBBalance == 1 { b.left!.balance = -1 }
+      return b
+    }
+    func doubleRotateLeft(_ node: Node) -> Node {
+      let oldBBalance = node.right!.left!.balance
+      node.right = singleRotateRight(node.right!)
+      let b = singleRotateLeft(node)
+      if oldBBalance == -1 { b.right!.balance = 1 }
+      if oldBBalance == 1 { b.left!.balance = -1 }
+      return b
+    }
+    struct AddResult { var node: Node; var heightChanged: Bool }
+    func heightChangeLeft(_ node: Node) -> AddResult {
+      if node.balance != -1 {
+        node.balance -= 1
+        return AddResult(node: node, heightChanged: node.balance == -1)
+      }
+      if node.left!.balance == -1 { return AddResult(node: singleRotateRight(node), heightChanged: false) }
+      return AddResult(node: doubleRotateRight(node), heightChanged: false)
+    }
+    func heightChangeRight(_ node: Node) -> AddResult {
+      if node.balance != 1 {
+        node.balance += 1
+        return AddResult(node: node, heightChanged: node.balance == 1)
+      }
+      if node.right!.balance == 1 { return AddResult(node: singleRotateLeft(node), heightChanged: false) }
+      return AddResult(node: doubleRotateLeft(node), heightChanged: false)
+    }
+    func add(_ node: Node?, _ tag: Tagged) -> AddResult {
+      guard let node else { return AddResult(node: Node(tag), heightChanged: true) }
+      if tag.value < node.tag.value {
+        let result = add(node.left, tag)
+        node.left = result.node
+        if result.heightChanged { return heightChangeLeft(node) }
+        return AddResult(node: node, heightChanged: false)
+      } else {
+        let result = add(node.right, tag)
+        node.right = result.node
+        if result.heightChanged { return heightChangeRight(node) }
+        return AddResult(node: node, heightChanged: false)
+      }
+    }
+    func traverse(_ node: Node?, into result: inout [Tagged]) {
+      guard let node else { return }
+      traverse(node.left, into: &result)
+      result.append(node.tag)
+      traverse(node.right, into: &result)
+    }
+
+    let size = 64
+    for _ in 0..<200 {
+      let values = (0..<size).map { _ in Int.random(in: 0...3) }
+      var root: Node?
+      for (index, value) in values.enumerated() {
+        root = add(root, Tagged(value: value, originalIndex: index)).node
+      }
+      var sorted: [Tagged] = []
+      traverse(root, into: &sorted)
+      #expect(sorted.map(\.value) == values.sorted())
+      assertTaggedGroupsStayOrdered(sorted, inputCount: size, algorithmName: "avltreesort")
+    }
+  }
+
+  /// Reimplements `LibrarySort`'s gap-array insertion over tagged pairs. `empty` becomes a
+  /// sentinel `Tagged` (value `Int.min`, an impossible `originalIndex`) instead of `Int.min`
+  /// directly, and every comparison switches from `slots[...] > value` to `slots[...].value >
+  /// tag.value` — otherwise this is the exact same algorithm as the shipped port.
+  @Test
+  func librarySortTiedElementsKeepTheirOriginalRelativeOrder() {
+    let empty = Tagged(value: .min, originalIndex: -1)
+
+    func runLibrarySort(_ values: [Int]) -> [Tagged] {
+      var capacity = 0
+      var slots: [Tagged] = []
+      var positions: [Int] = []
+
+      func rebalance() {
+        let count = positions.count
+        let newCapacity = max(2, count * 2)
+        var newSlots = [Tagged](repeating: empty, count: newCapacity)
+        var newPositions = [Int]()
+        for (i, pos) in positions.enumerated() {
+          newSlots[i * 2] = slots[pos]
+          newPositions.append(i * 2)
+        }
+        slots = newSlots
+        positions = newPositions
+        capacity = newCapacity
+      }
+
+      func insert(_ tag: Tagged) {
+        if positions.count == capacity { rebalance() }
+
+        var lo = 0
+        var hi = positions.count
+        while lo < hi {
+          let mid = (lo + hi) / 2
+          if slots[positions[mid]].value > tag.value { hi = mid } else { lo = mid + 1 }
+        }
+        let k = lo
+        let targetPos = k == 0 ? 0 : positions[k - 1] + 1
+
+        guard targetPos == capacity || slots[targetPos].value != empty.value else {
+          slots[targetPos] = tag
+          positions.insert(targetPos, at: k)
+          return
+        }
+
+        var leftGap = targetPos - 1
+        while leftGap >= 0, slots[leftGap].value != empty.value { leftGap -= 1 }
+        var rightGap = targetPos
+        while rightGap < capacity, slots[rightGap].value != empty.value { rightGap += 1 }
+        let leftDistance = leftGap >= 0 ? targetPos - leftGap : Int.max
+        let rightDistance = rightGap < capacity ? rightGap - targetPos : Int.max
+
+        if rightDistance <= leftDistance {
+          var i = rightGap
+          while i > targetPos {
+            slots[i] = slots[i - 1]
+            i -= 1
+          }
+          for idx in k..<(k + (rightGap - targetPos)) { positions[idx] += 1 }
+          slots[targetPos] = tag
+          positions.insert(targetPos, at: k)
+        } else {
+          let shiftCount = (targetPos - 1) - leftGap
+          var i = leftGap
+          while i < targetPos - 1 {
+            slots[i] = slots[i + 1]
+            i += 1
+          }
+          for idx in (k - shiftCount)..<k { positions[idx] -= 1 }
+          slots[targetPos - 1] = tag
+          positions.insert(targetPos - 1, at: k)
+        }
+      }
+
+      guard values.count > 1 else {
+        return values.enumerated().map { Tagged(value: $0.element, originalIndex: $0.offset) }
+      }
+      for (index, value) in values.enumerated() {
+        insert(Tagged(value: value, originalIndex: index))
+      }
+      return positions.map { slots[$0] }
+    }
+
+    for size in [16, 17, 32, 64] {
+      for _ in 0..<100 {
+        let values = (0..<size).map { _ in Int.random(in: 0...3) }
+        let sorted = runLibrarySort(values)
+        #expect(sorted.map(\.value) == values.sorted())
+        assertTaggedGroupsStayOrdered(sorted, inputCount: size, algorithmName: "librarysort")
+      }
+    }
+  }
+
+  /// Reimplements `HanoiSort`'s stack machinery over tagged pairs (its main-array writes are
+  /// `setValue`, same tape-replay limitation as the tests above) and confirms `metadata.stable
+  /// == false` empirically: despite `moveFromMain`/`moveToMain`/`moveBetweenStacks` moving
+  /// whole runs of equal elements together as a unit, the stack-shuffling `hanoi` move sequence
+  /// still lets two equal elements end up in the opposite of their original relative order.
+  @Test
+  func hanoiSortTiedElementsCanLoseTheirOriginalRelativeOrder() {
+    enum StackID { case two, three }
+
+    func runHanoiSort(_ values: [Int]) -> [Tagged] {
+      let n = values.count
+      guard n > 1 else {
+        return values.enumerated().map { Tagged(value: $0.element, originalIndex: $0.offset) }
+      }
+
+      var main = values.enumerated().map { Tagged(value: $0.element, originalIndex: $0.offset) }
+      var stack2: [Tagged] = []
+      var stack3: [Tagged] = []
+
+      func push(_ id: StackID, _ tag: Tagged) {
+        switch id {
+        case .two: stack2.append(tag)
+        case .three: stack3.append(tag)
+        }
+      }
+      func pop(_ id: StackID) -> Tagged {
+        switch id {
+        case .two: return stack2.removeLast()
+        case .three: return stack3.removeLast()
+        }
+      }
+      func peek(_ id: StackID) -> Tagged? {
+        switch id {
+        case .two: return stack2.last
+        case .three: return stack3.last
+        }
+      }
+      func isEmptyStack(_ id: StackID) -> Bool {
+        switch id {
+        case .two: return stack2.isEmpty
+        case .three: return stack3.isEmpty
+        }
+      }
+
+      var sp = 0
+      var unsorted = 0
+      var target = 0
+      var targetMoves = 0
+
+      @discardableResult
+      func moveFromMain(_ id: StackID, checkUnsorted: Bool) -> Int {
+        var duplicates = 1
+        push(id, main[sp])
+        sp += 1
+        var endOnLength = sp >= n || (checkUnsorted && sp >= unsorted)
+        while !endOnLength, main[sp].value == peek(id)?.value {
+          duplicates += 1
+          push(id, main[sp])
+          sp += 1
+          endOnLength = sp >= n || (checkUnsorted && sp >= unsorted)
+        }
+        return duplicates
+      }
+
+      func moveToMain(_ id: StackID) {
+        sp -= 1
+        main[sp] = pop(id)
+        while !isEmptyStack(id), peek(id)?.value == main[sp].value {
+          sp -= 1
+          main[sp] = pop(id)
+        }
+      }
+
+      func moveBetweenStacks(_ from: StackID, _ to: StackID) {
+        push(to, pop(from))
+        while !isEmptyStack(from), peek(from)?.value == peek(to)?.value {
+          push(to, pop(from))
+        }
+      }
+
+      func validNumberMoves(_ moves: Int) -> Bool {
+        if moves == 0 { return true }
+        if moves % 2 == 0 { return false }
+        return validNumberMoves(moves / 2)
+      }
+      func getHeight(_ movesPlus1: Int) -> Int {
+        if movesPlus1 == 1 { return 0 }
+        return getHeight(movesPlus1 / 2) + 1
+      }
+      func endConMet(_ endCon: Int, _ moves: Int) -> Bool {
+        guard validNumberMoves(moves) else { return false }
+        switch endCon {
+        case 1: return stack2.isEmpty || target <= stack2.last!.value
+        case 2: return moves == targetMoves
+        case 3: return stack2.isEmpty
+        default: preconditionFailure("unknown end condition")
+        }
+      }
+
+      @discardableResult
+      func hanoi(_ startStack: Int, _ goRight: Bool, _ endCon: Int) -> Int {
+        var moves = 0
+        var minPoleLoc = startStack
+
+        if !endConMet(endCon, moves) {
+          moves += 1
+          switch minPoleLoc {
+          case 1:
+            if goRight {
+              moveFromMain(.two, checkUnsorted: true)
+              minPoleLoc = 2
+            } else {
+              moveFromMain(.three, checkUnsorted: true)
+              minPoleLoc = 3
+            }
+          case 2:
+            if goRight {
+              moveBetweenStacks(.two, .three)
+              minPoleLoc = 3
+            } else {
+              moveToMain(.two)
+              minPoleLoc = 1
+            }
+          default:
+            if goRight {
+              moveToMain(.three)
+              minPoleLoc = 1
+            } else {
+              moveBetweenStacks(.three, .two)
+              minPoleLoc = 2
+            }
+          }
+        }
+
+        while !endConMet(endCon, moves) {
+          moves += 2
+          switch minPoleLoc {
+          case 1:
+            if !stack2.isEmpty, stack3.isEmpty || stack2.last!.value < stack3.last!.value {
+              moveBetweenStacks(.two, .three)
+            } else {
+              moveBetweenStacks(.three, .two)
+            }
+            if goRight {
+              moveFromMain(.two, checkUnsorted: true)
+              minPoleLoc = 2
+            } else {
+              moveFromMain(.three, checkUnsorted: true)
+              minPoleLoc = 3
+            }
+          case 2:
+            if stack3.isEmpty || (sp < unsorted && main[sp].value < stack3.last!.value) {
+              moveFromMain(.three, checkUnsorted: true)
+            } else {
+              moveToMain(.three)
+            }
+            if goRight {
+              moveBetweenStacks(.two, .three)
+              minPoleLoc = 3
+            } else {
+              moveToMain(.two)
+              minPoleLoc = 1
+            }
+          default:
+            if stack2.isEmpty || (sp < unsorted && main[sp].value < stack2.last!.value) {
+              moveFromMain(.two, checkUnsorted: true)
+            } else {
+              moveToMain(.two)
+            }
+            if goRight {
+              moveToMain(.three)
+              minPoleLoc = 1
+            } else {
+              moveBetweenStacks(.three, .two)
+              minPoleLoc = 2
+            }
+          }
+        }
+        return moves
+      }
+
+      func removeFromMainStack() {
+        target = main[sp].value
+        let moves = hanoi(2, true, 1)
+        let height = getHeight(moves + 1)
+        targetMoves = moves
+        let evenHeight = height % 2 == 0
+        if evenHeight { hanoi(1, true, 2) }
+        unsorted += moveFromMain(.two, checkUnsorted: false)
+        hanoi(3, evenHeight, 2)
+      }
+
+      func returnToMainStack() {
+        let moves = hanoi(2, true, 3)
+        let height = getHeight(moves + 1)
+        if height % 2 == 1 {
+          targetMoves = moves
+          hanoi(3, true, 2)
+        }
+      }
+
+      while unsorted < n {
+        removeFromMainStack()
+      }
+      returnToMainStack()
+
+      return main
+    }
+
+    var sawReordering = false
+    for size in [4, 5, 8, 16, 20] {
+      for _ in 0..<100 {
+        let values = (0..<size).map { _ in Int.random(in: 0...3) }
+        let sorted = runHanoiSort(values)
+        #expect(sorted.map(\.value) == values.sorted())
+
+        var byValue: [Int: [Int]] = [:]
+        for t in sorted {
+          byValue[t.value, default: []].append(t.originalIndex)
+        }
+        if byValue.values.contains(where: { $0 != $0.sorted() }) {
+          sawReordering = true
+        }
+      }
+    }
+
+    #expect(
+      sawReordering,
+      """
+      expected HanoiSort's stack-shuffling move sequence to reorder at least one run of \
+      equal-valued elements relative to their original input order across randomized \
+      duplicate-heavy trials, confirming it is not a stable sort
+      """
+    )
   }
 }

@@ -12,6 +12,7 @@ import AlgorithmKit
 /// could derive from without either target depending on the other.
 enum AllBuiltInAlgorithms {
   static let sorts: [any SortAlgorithm] = [
+    AATreeSort(), AVLTreeSort(),
     AsynchronousSort(), BadSort(), BaseNMaxHeapSort(), BinaryDoubleInsertionSort(),
     BinaryGnomeSort(),
     BinaryInsertionSort(), BinaryMergeSort(), BinaryQuickSortIterative(),
@@ -33,11 +34,12 @@ enum AllBuiltInAlgorithms {
     DualPivotQuickSort(), ExchangeBogoSort(), FlashSort(), FlippedMinHeapSort(), FoldSort(),
     ForcedStableQuickSort(), FunSort(), GnomeSort(), GrailSort(),
     GravitySort(),
-    GuessSort(), HybridCombSort(), ImprovedInPlaceMergeSort(), IndexSort(),
+    GuessSort(), HanoiSort(), HybridCombSort(), ImprovedInPlaceMergeSort(), IndexSort(),
     InPlaceLSDRadixSort(), InPlaceMergeSort(),
     InsertionSort(),
     IntroCircleSortIterative(),
-    IntroSort(), LazyHeapSort(), LazyStableSort(), LessBogoSort(), LLQuickSort(), LRQuickSort(),
+    IntroSort(), LazyHeapSort(), LazyStableSort(), LessBogoSort(), LibrarySort(), LLQuickSort(),
+    LRQuickSort(),
     LSDRadixSort(),
     MatrixSort(), MaxHeapSort(),
     MedianQuickBogoSort(), MergeBogoSort(), MergeExchangeSortIterative(), MergeSort(),
@@ -52,7 +54,8 @@ enum AllBuiltInAlgorithms {
     PDQBranchlessSort(),
     PigeonholeSort(), QuadStoogeSort(),
     QuickBogoSort(), QuickSort(),
-    RandomGuessSort(), RecursiveShellSort(), RotateMergeSort(), SelectionBogoSort(),
+    RandomGuessSort(), RecursiveShellSort(), RedBlackTreeSort(), RotateMergeSort(),
+    SelectionBogoSort(),
     SelectionSort(), ShatterSort(), ShellSort(), ShoveSort(), SillySort(),
     SimpleShatterSort(), SimplifiedLibrarySort(), SimplisticGravitySort(), SlopeSort(),
     SlowSort(), SmartBogoBogoSort(),

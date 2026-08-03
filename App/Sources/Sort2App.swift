@@ -27,6 +27,7 @@ struct Sort2App: App {
     // scripting backend (ScriptingKit) was removed entirely after it turned out to reference a
     // private API (`JSContextGroupSetExecutionTimeLimit`), which blocked App Store submission.
     AlgorithmRegistry.shared.builtIns = [
+      AATreeSort(), AVLTreeSort(),
       AsynchronousSort(), BadSort(), BaseNMaxHeapSort(), BinaryDoubleInsertionSort(),
       BinaryGnomeSort(),
       BinaryInsertionSort(), BinaryMergeSort(), BinaryQuickSortIterative(),
@@ -48,11 +49,12 @@ struct Sort2App: App {
       DualPivotQuickSort(), ExchangeBogoSort(), FlashSort(), FlippedMinHeapSort(), FoldSort(),
       ForcedStableQuickSort(), FunSort(), GnomeSort(),
       GrailSort(), GravitySort(),
-      GuessSort(), HybridCombSort(), ImprovedInPlaceMergeSort(), IndexSort(),
+      GuessSort(), HanoiSort(), HybridCombSort(), ImprovedInPlaceMergeSort(), IndexSort(),
       InPlaceLSDRadixSort(), InPlaceMergeSort(),
       InsertionSort(),
       IntroCircleSortIterative(),
-      IntroSort(), LazyHeapSort(), LazyStableSort(), LessBogoSort(), LLQuickSort(), LRQuickSort(),
+      IntroSort(), LazyHeapSort(), LazyStableSort(), LessBogoSort(), LibrarySort(), LLQuickSort(),
+      LRQuickSort(),
       LSDRadixSort(),
       MatrixSort(), MaxHeapSort(),
       MedianQuickBogoSort(), MergeBogoSort(), MergeExchangeSortIterative(), MergeSort(),
@@ -67,7 +69,8 @@ struct Sort2App: App {
       PDQBranchlessSort(),
       PigeonholeSort(), QuadStoogeSort(),
       QuickBogoSort(), QuickSort(),
-      RandomGuessSort(), RecursiveShellSort(), RotateMergeSort(), SelectionBogoSort(),
+      RandomGuessSort(), RecursiveShellSort(), RedBlackTreeSort(), RotateMergeSort(),
+      SelectionBogoSort(),
       SelectionSort(), ShatterSort(), ShellSort(), ShoveSort(), SillySort(),
       SimpleShatterSort(), SimplifiedLibrarySort(), SimplisticGravitySort(), SlopeSort(),
       SlowSort(), SmartBogoBogoSort(),
