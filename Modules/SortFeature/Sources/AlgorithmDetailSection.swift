@@ -113,19 +113,16 @@ public struct AlgorithmDetailSection: View {
 
   private func highlightAllSamples(_ content: AlgorithmDetailContent) async {
     let theme = settings.codeTheme.makeTheme()
-    let samples = content.codeSamples
-    let (styled, plain) = await Task.detached(priority: .userInitiated) {
-      var styled: [CodeLanguage: AttributedString] = [:]
-      var plain: [CodeLanguage: String] = [:]
-      for sample in samples {
-        let attributed = CodeHighlighter.highlight(sample.source, theme: theme)
-        styled[sample.language] = attributed
-        plain[sample.language] = String(attributed.characters)
+    let styled = await withTaskGroup(of: (CodeLanguage, AttributedString).self) { group in
+      for sample in content.codeSamples {
+        group.addTask { (sample.language, await CodeHighlighter.highlight(sample.source, theme: theme)) }
       }
-      return (styled, plain)
-    }.value
+      var styled: [CodeLanguage: AttributedString] = [:]
+      for await (language, attributed) in group { styled[language] = attributed }
+      return styled
+    }
     highlighted = styled
-    plainSamples = plain
+    plainSamples = styled.mapValues { String($0.characters) }
   }
 
   private var descriptionColumn: some View {

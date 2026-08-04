@@ -8,14 +8,9 @@ public struct AttributedCodeView: View {
   private let attributedString: AttributedString
   private let backgroundColor: Color
 
-  /// Highlights `source` inline — fine for a one-off render, but callers juggling several samples
-  /// per render pass (a language picker) should precompute via `CodeHighlighter.highlight(_:theme:)`
-  /// and use `init(attributed:backgroundColor:)` instead, so the work happens once per sample
-  /// rather than on every SwiftUI body evaluation.
-  public init(_ source: String, theme: any CodeTheme) {
-    self.init(attributed: CodeHighlighter.highlight(source, theme: theme), backgroundColor: theme.getBgColor())
-  }
-
+  /// Callers should precompute via `CodeHighlighter.highlight(_:theme:)` (now `async`, since large
+  /// sources divide-and-conquer across `Task`s) and pass the result here, so the work happens once
+  /// per sample rather than on every SwiftUI body evaluation.
   public init(attributed: AttributedString, backgroundColor: Color) {
     self.attributedString = attributed
     self.backgroundColor = backgroundColor
@@ -27,6 +22,7 @@ public struct AttributedCodeView: View {
       .fixedSize(horizontal: true, vertical: true)
       .background(backgroundColor)
       .cornerRadius(15)
+      .drawingGroup()
       .textSelection(.enabled)
   }
 }
