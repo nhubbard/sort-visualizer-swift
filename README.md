@@ -37,7 +37,7 @@ Apple devices in Swift and SwiftUI.
 ## Requirements
 
 - Xcode with an iOS 26 SDK or newer.
-- Runs on iOS, iPadOS, and Mac Catalyst (no native macOS/AppKit target — see `ARCHITECTURE_V2.md`
+- Runs on iOS, iPadOS, and Mac Catalyst (no native macOS/AppKit target — see `Documentation/ARCHITECTURE_V2.md`
   §9 for why).
 - [Tuist](https://tuist.dev) for project generation (see below).
 
@@ -79,4 +79,4 @@ The app is split into ~15 Tuist modules under `Modules/`, roughly in four layers
 
 For the full rationale behind this shape (and the handful of places the app has since diverged from
 its original design — most notably Metal rendering replacing `Canvas`, and `ToneKit` replacing
-AudioKit), see `ARCHITECTURE_V2.md`.
+AudioKit), see `Documentation/ARCHITECTURE_V2.md`.
