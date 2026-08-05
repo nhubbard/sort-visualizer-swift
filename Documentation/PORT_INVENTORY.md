@@ -105,17 +105,7 @@ All merge sorts have been ported except `QuadSort`.
 
 ### f. Miscellaneous sorts (`sorts/misc/`, 4)
 
-#### Completed
-
-Move algorithms here when you finish them.
-
-#### Not Started
-
-##### Medium (by line count — see caveat)
-
-- [ ] PancakeInsertionSort — 128 lines, deferred (see substitution note above); still worth a real
-      port later. Line count alone undersells this one — the held-value binary-search "monobound"
-      helpers plus the direction-flip state machine make it feel more like a Hard port in practice.
+All miscellaneous sorts have been ported.
 
 ### g. Concurrent sorts (`sorts/concurrent/`, 22)
 
