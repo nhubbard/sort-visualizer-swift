@@ -44,11 +44,14 @@ cluster together rather than picking its members apart on separate days:
   pre-record an open-ended random search" problem `BogoSort`/`BozoSort` already solved by
   rewriting as a deterministic permutation walk (see
   `Modules/BuiltInAlgorithms/Sources/BogoSort.swift`'s doc comment) — apply the established pattern
-  per variant rather than re-deriving it. **Status as of the 2026-07-15 batch: done except
-  `BogoBogoSort`** (deferred — see its own note under §1d, "Not Started"). Several members turned
-  out to already be deterministic in ArrayV itself (no rewrite needed, just a faithful port); one
-  (`SelectionBogoSort`) turned out to only need a single deterministic sweep, cheap enough to ship
-  with a much larger `sizeRange` than a typical bogo variant.
+  per variant rather than re-deriving it. **Status: done, all members shipped** — `BogoBogoSort`
+  (the last holdout, previously deferred over its nested-recursion-depth shuffle problem) turned out
+  tractable by composing two already-proven techniques (`BogoSort`'s `next_permutation` walk for
+  its outer reshuffle loop, `SmartBogoBogoSort`'s candidate-swap technique for its inner tail-fixup
+  loop) independently at each recursion depth — see `BogoBogoSort.swift`'s own doc comment. Several
+  members turned out to already be deterministic in ArrayV itself (no rewrite needed, just a
+  faithful port); one (`SelectionBogoSort`) turned out to only need a single deterministic sweep,
+  cheap enough to ship with a much larger `sizeRange` than a typical bogo variant.
 - **The Grail cluster**: `BlockInsertionSort` (insert), `GrailSort` (hybrid), `OptimizedLazyStableSort`
   (files under `sorts/hybrid/` but tracked under merge — its own `setCategory("Merge Sorts")` call
   says so, see that entry's own note), and `LazyStableSort` (merge) all extend `GrailSorting`
@@ -65,8 +68,6 @@ cluster together rather than picking its members apart on separate days:
   its members' own size alone suggests.
 - **The BlockMerge cluster**: `ChaliceSort` and `SynchronousSqrtSort` (both hybrid) both extend
   `BlockMergeSorting` (352 lines).
-- `NewShuffleMergeSort` (merge) directly extends the not-yet-ported `IterativeTopDownMergeSort`
-  (merge) — port that prerequisite first, not just its shared template.
 - `IntroCircleSortIterative`/`IntroCircleSortRecursive` (hybrid) extend the already-small
   `IterativeCircleSorting`/`CircleSorting` templates (44/48 lines) — trivial once `CircleSort*` (already shipped) established the pattern.
 
@@ -84,52 +85,23 @@ All selection sorts have been ported.
 
 ### d. Distribution sorts (`sorts/distribute/`, 36)
 
-#### Completed
-
-Move algorithms here when you finish them.
-
-#### Not Started
-
-##### Medium
-
-- [~] BogoBogoSort — 102 lines (Bogo family). **Deferred, not skipped** — unlike the other 12
-      members of this cluster (all shipped this batch), its own "is it sorted" check is itself
-      defined recursively via nested bogo-sorted copies at every recursion depth (the classic
-      super-exponential joke algorithm — ArrayV itself caps it at size 5). A faithful deterministic
-      port needs permutation walks nested at every recursion level, each with its own aux-array
-      bookkeeping — real, disproportionate design work for one algorithm, the same kind of
-      effort-tier surprise `FunSort`/`PancakeInsertionSort` already got flagged for. Worth a real
-      pass later; not worth blocking or rushing the rest of the cluster for.
-- [ ] StacklessBinaryQuickSort — 105 lines
-- [ ] RotateLSDRadixSort — 118 lines
-- [ ] TimeSort — 120 lines
-- [ ] StacklessAmericanFlagSort — 144 lines
-- [ ] AmericanFlagSort — 155 lines
-- [ ] RotateMSDRadixSort — 164 lines
+All distribution sorts have been ported.
 
 ### e. Merge sorts (`sorts/merge/`, 19)
 
-#### Completed
-
-Move algorithms here when you finish them.
+All merge sorts have been ported except `QuadSort`.
 
 #### Not Started
 
-##### Medium
-
-- [ ] StacklessRotateMergeSort — 125 lines
-- [ ] IterativeTopDownMergeSort — 137 lines (also a same-category prerequisite — see note above)
-- [ ] AndreySort — 158 lines
-- [ ] PDMergeSort — 183 lines
-
-##### Hard
-
-- [ ] NewShuffleMergeSort — 203 lines, and directly extends the not-yet-ported
-      `IterativeTopDownMergeSort` above rather than just a shared template — port that one first
-
 ##### Very Hard
 
-- [ ] QuadSort — 51 own + 875 `QuadSorting` template = 926 lines (Quad cluster — see note above)
+- [ ] QuadSort — 51 own + 875 `QuadSorting` template = 926 lines (Quad cluster — see note above).
+      Deliberately deferred (2026-08-05): the `QuadSorting` template is 875 lines of real, dense
+      production code (Igor van den Hoven's actual quadsort — hand-unrolled 2-8 element sorting
+      networks, parity-merge routines, a dedicated quad-merge/tail-merge pipeline), a genuinely
+      multi-day undertaking rather than a "looks scary but resolves cleanly" case. Earmarked for a
+      future batch covering all the largest remaining sorts across categories, alongside `FluxSort`
+      (hybrid, the Quad cluster's other member).
 
 ### f. Miscellaneous sorts (`sorts/misc/`, 4)
 
