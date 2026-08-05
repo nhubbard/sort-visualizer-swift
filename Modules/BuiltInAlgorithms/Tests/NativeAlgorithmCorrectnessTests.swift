@@ -22,7 +22,8 @@ struct NativeAlgorithmCorrectnessTests {
     BufferedStoogeSort(),
     BurntPancakeSort(),
     CircleSortIterative(), CircleSortRecursive(), CircloidSort(),
-    ClassicGravitySort(), ClassicThreeSmoothCombSort(), ClassicTreeSort(), CocktailBogoSort(),
+    ClassicGravitySort(), ClassicThreeSmoothCombSort(), ClassicTournamentSort(), ClassicTreeSort(),
+    CocktailBogoSort(),
     CocktailMergeSort(), CocktailShakerSort(), CombSort(), CompleteGraphSort(), CountingSort(),
     CreaseSort(),
     CycleSort(),
@@ -39,29 +40,30 @@ struct NativeAlgorithmCorrectnessTests {
     LSDRadixSort(),
     MatrixSort(), MaxHeapSort(),
     MedianQuickBogoSort(), MergeBogoSort(), MergeExchangeSortIterative(), MergeSort(),
-    MinHeapSort(), MSDRadixSort(),
+    MinHeapSort(), MinMaxHeapSort(), MSDRadixSort(),
     OddEvenMergeSortIterative(), OddEvenMergeSortRecursive(), OddEvenSort(),
     OptimizedBubbleSort(), OptimizedCocktailShakerSort(), OptimizedGnomeSort(),
     OptimizedGuessSort(), OptimizedLazyStableSort(), OptimizedStoogeSort(),
-    OptimizedStoogeSortStudio(),
+    OptimizedStoogeSortStudio(), OutOfPlaceHeapSort(),
     PairwiseMergeSortIterative(), PairwiseMergeSortRecursive(),
     PairwiseSortIterative(), PairwiseSortRecursive(), PancakeSort(), PatienceSort(),
     PDQBranchedSort(),
     PDQBranchlessSort(),
-    PigeonholeSort(), QuadStoogeSort(),
+    PigeonholeSort(), PoplarHeapSort(), QuadStoogeSort(),
     QuickBogoSort(), QuickSort(),
     RandomGuessSort(), RecursiveShellSort(), RedBlackTreeSort(), RotateMergeSort(),
     SelectionBogoSort(),
     SelectionSort(), ShatterSort(), ShellSort(), ShoveSort(), SillySort(), SimpleShatterSort(),
     SimplifiedLibrarySort(), SimplisticGravitySort(), SlopeSort(), SlowSort(), SmartBogoBogoSort(),
-    SmartGuessSort(),
+    SmartGuessSort(), SmoothSort(),
     SnuffleSort(), SplaySort(), StableCycleSort(),
     StablePermutationSort(), StableQuickSort(), StableSelectionSort(), StaticSort(), StoogeSort(),
     StrandSort(),
     SwaplessBubbleSort(),
     TableSort(), TernaryHeapSort(), TernaryLLQuickSort(), TernaryLRQuickSort(),
     ThreeSmoothCombSortIterative(),
-    ThreeSmoothCombSortRecursive(), TreeSort(), TriangularHeapSort(), TwinSort(),
+    ThreeSmoothCombSortRecursive(), TournamentSort(), TreeSort(), TriangularHeapSort(),
+    TwinSort(),
     UnoptimizedBubbleSort(),
     UnoptimizedCocktailShakerSort(), UnstableGrailSort(), WeakHeapSort(), WeavedMergeSort(),
     WeaveMergeSort(), WeaveSortIterative(), WeaveSortRecursive(),
@@ -403,6 +405,50 @@ struct NativeAlgorithmCorrectnessTests {
     )
   }
 
+  /// Confirms `MinMaxHeapSort`'s instability empirically: `downheap`/`storeMax` only ever call
+  /// `engine.swap`, so replaying the tape's `.swap` operations onto a shadow index array fully
+  /// reconstructs the final permutation, same technique as `BadSort`/`TriangularHeapSort` above.
+  @Test
+  func minMaxHeapSortTiedElementsCanLoseTheirOriginalRelativeOrder() {
+    let algorithm = MinMaxHeapSort()
+    let size = 64
+    var sawReordering = false
+
+    for _ in 0..<50 {
+      let input = (0..<size).map { _ in Int.random(in: 0...3) }
+      var engine = RecordingEngine(values: input)
+      algorithm.record(into: &engine)
+
+      var shadow = Array(0..<size)
+      for operation in engine.finish().tape {
+        if case .swap(let i, let j) = operation {
+          shadow.swapAt(i, j)
+        }
+      }
+
+      var originalIndicesByValueInFinalOrder: [Int: [Int]] = [:]
+      for finalPosition in 0..<size {
+        let originalIndex = shadow[finalPosition]
+        let value = input[originalIndex]
+        originalIndicesByValueInFinalOrder[value, default: []].append(originalIndex)
+      }
+
+      if originalIndicesByValueInFinalOrder.values.contains(where: { $0 != $0.sorted() }) {
+        sawReordering = true
+        break
+      }
+    }
+
+    #expect(
+      sawReordering,
+      """
+      expected MinMaxHeapSort's swap-based heap construction/extraction to reorder at least \
+      one run of equal-valued elements relative to their original input order across \
+      randomized duplicate-heavy trials, confirming it is not a stable sort
+      """
+    )
+  }
+
   /// Confirms `BlockSwapMergeSort` is stable: `binarySearchMid`'s strict-greater-than tie-break
   /// should preserve equal elements' original order, unlike `WeaveMergeSort`'s tie-swapping
   /// instability. Verified by tagging each element with its original index and checking that
@@ -577,6 +623,90 @@ struct NativeAlgorithmCorrectnessTests {
             "\(algorithm.id.rawValue) failed duplicate-heavy fuzz attempt \(attempt) of size \(size): \(input) -> \(engine.values)"
           )
         }
+      }
+    }
+  }
+
+  /// Wide-size-range fuzz for the rest of the 2026-08 selection-sort batch
+  /// (`OutOfPlaceHeapSort`/`ClassicTournamentSort`/`TournamentSort`/`SmoothSort`) — the same
+  /// generic-suite gap that hid `PoplarHeapSort`'s real crash (only ever testing
+  /// `sizeRange.lowerBound`) could equally hide a similar size-dependent bug in any of these,
+  /// since all four have their own size-dependent index arithmetic (tree/bracket layouts,
+  /// Leonardo-number table indexing). No bug found here as of this writing, but this is real
+  /// coverage the generic suite doesn't provide, not a no-op.
+  @Test
+  func selectionSortBatchWideSizeRangeFuzz() {
+    let algorithms: [any SortAlgorithm] = [
+      OutOfPlaceHeapSort(), ClassicTournamentSort(), TournamentSort(), SmoothSort(),
+    ]
+    for algorithm in algorithms {
+      for size in stride(
+        from: algorithm.metadata.sizeRange.lowerBound, through: algorithm.metadata.sizeRange.upperBound,
+        by: 7
+      ) {
+        for attempt in 0..<10 {
+          let input = (0..<size).map { _ in Int.random(in: 0...(size / 4)) }
+          var engine = RecordingEngine(values: input)
+          algorithm.record(into: &engine)
+          #expect(
+            engine.values == input.sorted(),
+            """
+            \(algorithm.id.rawValue) failed duplicate-heavy fuzz attempt \(attempt) of size \
+            \(size): \(input) -> \(engine.values)
+            """
+          )
+        }
+      }
+    }
+  }
+
+  /// Regression guard for a real, deterministically-reproducible out-of-bounds crash found in
+  /// `PoplarHeapSort`'s `makeHeap` — and confirmed to be a genuine bug in ArrayV's own
+  /// `PoplarHeapSort.java`, not a translation slip, by transcribing `make_heap`/`sort_heap` to a
+  /// standalone Java program and running it directly: reverse-sorted input of length 62 throws
+  /// `ArrayIndexOutOfBoundsException` there too. The generic suite above only ever exercises each
+  /// algorithm's `sizeRange.lowerBound` (16 here), which never reaches this bug — sizes 62, 125,
+  /// 126, 189, 252, 253, and 254 are exactly where the binary-carry poplar-merge sequence tries
+  /// to combine two same-size poplars using a "spare" element past the array's actual end. Kept
+  /// as reverse-sorted input (the exact pattern that reproduced the crash) rather than only
+  /// relying on random fuzzing, since a random duplicate-light draw at these sizes might not
+  /// reliably land on the specific structure that triggers it.
+  @Test
+  func poplarHeapSortDoesNotCrashAtItsKnownBoundarySizes() {
+    let algorithm = PoplarHeapSort()
+    for size in [62, 125, 126, 189, 252, 253, 254] {
+      let input = Array((1...size).reversed())
+      var engine = RecordingEngine(values: input)
+      algorithm.record(into: &engine)
+      #expect(
+        engine.values == input.sorted(),
+        "PoplarHeapSort failed to sort reverse-sorted input of size \(size)"
+      )
+    }
+  }
+
+  /// Broader fuzz across `PoplarHeapSort`'s full `sizeRange`, not just the lower bound — the
+  /// crash above depended on the exact size, not on duplicates or a specific value distribution,
+  /// so exercising many sizes with both random and duplicate-heavy inputs gives real coverage of
+  /// the size-dependent binary-carry merge structure the generic suite's single fixed size can't.
+  @Test
+  func poplarHeapSortWideSizeRangeFuzz() {
+    let algorithm = PoplarHeapSort()
+    for size in stride(
+      from: algorithm.metadata.sizeRange.lowerBound, through: algorithm.metadata.sizeRange.upperBound,
+      by: 7
+    ) {
+      for attempt in 0..<10 {
+        let input = (0..<size).map { _ in Int.random(in: 0...(size / 4)) }
+        var engine = RecordingEngine(values: input)
+        algorithm.record(into: &engine)
+        #expect(
+          engine.values == input.sorted(),
+          """
+          PoplarHeapSort failed duplicate-heavy fuzz attempt \(attempt) of size \(size): \
+          \(input) -> \(engine.values)
+          """
+        )
       }
     }
   }

@@ -80,28 +80,7 @@ All insertion sorts have been ported.
 
 ### c. Selection sorts (`sorts/select/`, 25)
 
-#### Completed
-
-Move algorithms here when you finish them.
-
-#### Not Started
-
-`SmoothSort`/`PoplarHeapSort` below are also each a hard prerequisite for a shuffle (§2's
-`SMOOTH`/`POPLAR`, which literally call these sorts' own heapify step) — not just their own tier,
-they unblock a shuffle too. (`TriangularHeapSort`, the third sort in this cluster, is now shipped —
-see Completed above.)
-
-##### Medium
-
-- [ ] OutOfPlaceHeapSort — 102 lines
-- [ ] MinMaxHeapSort — 123 lines
-- [ ] ClassicTournamentSort — 140 lines
-- [ ] TournamentSort — 156 lines
-
-##### Hard
-
-- [ ] SmoothSort — 205 lines (also a shuffle prerequisite — see note above)
-- [ ] PoplarHeapSort — 209 lines (also a shuffle prerequisite — see note above)
+All selection sorts have been ported.
 
 ### d. Distribution sorts (`sorts/distribute/`, 36)
 
@@ -243,11 +222,11 @@ than subdivided further.
 `HEAPIFIED`/`SMOOTH`/`POPLAR`/`TRI_HEAP` each call directly into a sort's own heapify step
 (`MaxHeapSort.makeHeap`/`SmoothSort.smoothHeapify`/`PoplarHeapSort.poplarHeapify`/
 `TriangularHeapSort.triangularHeapify`) rather than reimplementing it — `HEAPIFIED` shipped by reusing
-`MaxHeapSort`'s own heapify step directly; `SMOOTH`/`POPLAR` remain blocked on their same-named sort
-being ported first (see §1c), regardless of how trivial their own body looks. `TRI_HEAP` is now
-unblocked — `TriangularHeapSort` shipped this batch — but still needs its own port, duplicating
-`TriangularHeapSort.swift`'s `triangularRoot`/`siftDown`/heapify logic inline the way
-`HeapifiedShuffle.swift` duplicates `MaxHeapSort`'s (see that sort's own doc comment).
+`MaxHeapSort`'s own heapify step directly. `SMOOTH`/`POPLAR`/`TRI_HEAP` are all now unblocked —
+`SmoothSort`/`PoplarHeapSort`/`TriangularHeapSort` have all shipped (§1c is fully ported) — but each
+still needs its own shuffle port, duplicating the same sort's own heapify logic inline the way
+`HeapifiedShuffle.swift` duplicates `MaxHeapSort`'s (see that sort's own doc comment). Porting the
+shuffles themselves is separate, not-yet-scoped work — being unblocked isn't the same as being done.
 
 `QSORT_BAD`/`PDQ_BAD`/`GRAIL_BAD`/`SHUF_MERGE_BAD` sound like they'd need their namesake sort
 already ported (to reverse-engineer its worst case), but don't — each embeds its own self-contained
@@ -257,10 +236,9 @@ adversarial-input construction, independent of whether `LLQuickSort`(shipped)/`P
 
 #### Trivial
 
-- [ ] SMOOTH ("Smoothified") — 12 lines, but blocked on `SmoothSort` (§1c) — see note above
-- [ ] POPLAR ("Poplarified") — 12 lines, but blocked on `PoplarHeapSort` (§1c) — see note above
-- [ ] TRI_HEAP ("Triangular Heapified") — 19 lines, no longer blocked — `TriangularHeapSort` (§1c)
-      shipped this batch — see note above
+- [ ] SMOOTH ("Smoothified") — 12 lines, no longer blocked — see note above
+- [ ] POPLAR ("Poplarified") — 12 lines, no longer blocked — see note above
+- [ ] TRI_HEAP ("Triangular Heapified") — 19 lines, no longer blocked — see note above
 
 #### Easy
 

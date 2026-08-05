@@ -95,6 +95,14 @@ class AttributedTextFormatter(Formatter):
         self.output = ""
 
     def format(self, tokensource, _outfile) -> None:
+        pending_type, pending_value = None, ""
+
+        def flush() -> None:
+            nonlocal pending_type, pending_value
+            if pending_value:
+                self.output += f"^[{pending_value}](code: '{pending_type!s}')"
+            pending_type, pending_value = None, ""
+
         for token_type, value in tokensource:
             value = (
                 value.replace("[", "\\[")
@@ -105,9 +113,14 @@ class AttributedTextFormatter(Formatter):
                 .replace("*", "\\*")
             )
             if value == "\n":
+                flush()
                 self.output += "\n"
+            elif token_type == pending_type:
+                pending_value += value
             else:
-                self.output += f"^[{value}](code: '{token_type!s}')"
+                flush()
+                pending_type, pending_value = token_type, value
+        flush()
 
     def result(self) -> str:
         return self.output
