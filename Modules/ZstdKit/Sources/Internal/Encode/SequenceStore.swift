@@ -15,41 +15,55 @@ struct SequenceStore {
 }
 
 enum BlockParser {
-  /// `initialRepeatOffset` is the frame's current `offset1` (`EncodeRepeatOffsets.offset1`) at the
-  /// point this chunk starts — read-only here, purely to let `options.searchDepth >= 1`'s lazy
-  /// driver cheaply check rep-code matches during lookahead; no offset-state mutation happens
-  /// during parsing (that's still `SequenceStreamEncoder.encode`'s job, unchanged).
+  /// `prefix` (default empty) is raw, already-encoded content immediately preceding `chunk` —
+  /// searchable by the match finder so a sequence near the start of `chunk` can still reference
+  /// back into it, but never itself re-emitted as literals/sequences. Used by `FrameEncoder`'s
+  /// parallel-chunk path (`maximumConcurrency > 1`) to let a chunk's own first block still find
+  /// matches into the previous parallel chunk's tail, mirroring real zstd's multithreaded mode's
+  /// "prefix reload." `initialRepeatOffset` is the frame's (or, under parallel encoding, the
+  /// current chunk's) current `offset1` (`EncodeRepeatOffsets.offset1`) at the point this chunk
+  /// starts — read-only here, purely to let `options.searchDepth >= 1`'s lazy driver cheaply check
+  /// rep-code matches during lookahead; no offset-state mutation happens during parsing (that's
+  /// still `SequenceStreamEncoder.encode`'s job, unchanged).
   static func parse(
-    _ chunk: [UInt8], initialRepeatOffset: Int = 1, options: ZstdEncodingOptions
+    _ chunk: [UInt8], prefix: [UInt8] = [], initialRepeatOffset: Int = 1, options: ZstdEncodingOptions
   ) -> SequenceStore {
     guard chunk.count >= 8 else {
       return SequenceStore(literals: chunk, sequences: [])
     }
     if options.searchDepth == 0 {
-      return parseGreedy(chunk, options: options)
+      return parseGreedy(chunk, prefix: prefix, options: options)
     }
-    return parseLazy(chunk, initialRepeatOffset: initialRepeatOffset, options: options)
+    return parseLazy(chunk, prefix: prefix, initialRepeatOffset: initialRepeatOffset, options: options)
   }
 
   /// Runs the greedy match finder across the whole chunk, threading a single "pending literal
   /// run" cursor forward — matches are accepted eagerly (no lookahead), and every position gets
   /// inserted into the match finder's hash table regardless of whether it ends up inside a literal
   /// run or a match, so a later position can still reference it. Exactly this module's Phase 1
-  /// behavior, kept byte-for-byte unchanged as `options.searchDepth == 0`'s code path.
-  private static func parseGreedy(_ chunk: [UInt8], options: ZstdEncodingOptions) -> SequenceStore {
+  /// behavior, kept byte-for-byte unchanged as `options.searchDepth == 0`'s code path whenever
+  /// `prefix` is empty (the default, used by every caller before `maximumConcurrency > 1`
+  /// existed) — `MatchFinder.findBestMatch`'s own `insertUpTo` already inserts every position
+  /// below wherever it's first called, so bulk-inserting `prefix` needs no special call: starting
+  /// `ip`/`literalStart` at `prefix.count` and letting the very first `findBestMatch` call happen
+  /// there is enough for the whole prefix region to end up in the hash table for free.
+  private static func parseGreedy(
+    _ chunk: [UInt8], prefix: [UInt8], options: ZstdEncodingOptions
+  ) -> SequenceStore {
+    let combined = prefix + chunk
     let hashLog = min(options.hashLog, 17)
-    let finder = MatchFinder(input: chunk, hashLog: hashLog)
+    let finder = MatchFinder(input: combined, hashLog: hashLog)
     var literals: [UInt8] = []
     var sequences: [RawSequence] = []
-    var literalStart = 0
-    var ip = 0
-    let limit = chunk.count
+    var literalStart = prefix.count
+    var ip = prefix.count
+    let limit = combined.count
 
     while ip + 4 <= limit {
       if let match = finder.findBestMatch(
         at: ip, minMatch: options.minimumMatchLength, maxAttempts: options.maximumSearchAttempts)
       {
-        literals.append(contentsOf: chunk[literalStart..<ip])
+        literals.append(contentsOf: combined[literalStart..<ip])
         sequences.append(
           RawSequence(literalLength: ip - literalStart, offset: ip - match.position, matchLength: match.length))
         ip += match.length
@@ -59,7 +73,7 @@ enum BlockParser {
       }
     }
 
-    literals.append(contentsOf: chunk[literalStart...])
+    literals.append(contentsOf: combined[literalStart...])
     return SequenceStore(literals: literals, sequences: sequences)
   }
 
@@ -76,20 +90,21 @@ enum BlockParser {
   /// `findBestMatch` call, so every one of them lands in the hash table for later searches, exactly
   /// matching the reference's own insert-on-visit guarantee.
   private static func parseLazy(
-    _ chunk: [UInt8], initialRepeatOffset: Int, options: ZstdEncodingOptions
+    _ chunk: [UInt8], prefix: [UInt8], initialRepeatOffset: Int, options: ZstdEncodingOptions
   ) -> SequenceStore {
+    let combined = prefix + chunk
     let hashLog = min(options.hashLog, 17)
-    let finder = MatchFinder(input: chunk, hashLog: hashLog)
+    let finder = MatchFinder(input: combined, hashLog: hashLog)
     var literals: [UInt8] = []
     var sequences: [RawSequence] = []
-    var literalStart = 0
-    var ip = 0
-    let limit = chunk.count
+    var literalStart = prefix.count
+    var ip = prefix.count
+    let limit = combined.count
     let offset1 = initialRepeatOffset
 
     func repMatchLength(at position: Int) -> Int {
       guard offset1 > 0, position - offset1 >= 0 else { return 0 }
-      return wideWordMatchLength(in: chunk, position, position - offset1)
+      return wideWordMatchLength(in: combined, position, position - offset1)
     }
     func gain(_ matchLength: Int, _ offBase: Int, k: Int, bias: Int) -> Int {
       let highbit = 31 - UInt32(offBase).leadingZeroBitCount
@@ -187,14 +202,14 @@ enum BlockParser {
       // Backward extension: recover literal bytes lookahead left stranded in the pending run,
       // by extending the match earlier for as long as the bytes right before it still agree.
       while matchStart > literalStart, matchPosition > 0,
-        chunk[matchStart - 1] == chunk[matchPosition - 1]
+        combined[matchStart - 1] == combined[matchPosition - 1]
       {
         matchStart -= 1
         matchPosition -= 1
         matchLength += 1
       }
 
-      literals.append(contentsOf: chunk[literalStart..<matchStart])
+      literals.append(contentsOf: combined[literalStart..<matchStart])
       sequences.append(
         RawSequence(
           literalLength: matchStart - literalStart, offset: matchStart - matchPosition,
@@ -203,7 +218,7 @@ enum BlockParser {
       literalStart = ip
     }
 
-    literals.append(contentsOf: chunk[literalStart...])
+    literals.append(contentsOf: combined[literalStart...])
     return SequenceStore(literals: literals, sequences: sequences)
   }
 }

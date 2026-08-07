@@ -66,20 +66,99 @@ enum FrameEncoder {
       writer.writeLittleEndianUInt(wireValue, byteCount: fieldByteCount)
     }
 
-    // Frame-scoped, reset once here (never per block) — matches decode's own `RepeatOffsets`
-    // lifetime exactly (RFC 8878 §3.1.1.3.2.1.2).
-    var repeatOffsets = EncodeRepeatOffsets()
-    let chunks = chunked(input, into: maximumBlockSize)
-    for (index, chunk) in chunks.enumerated() {
-      let isLast = index == chunks.count - 1
-      writer.writeBytes(
-        BlockEncoder.encode(chunk, isLastBlock: isLast, options: options, repeatOffsets: &repeatOffsets))
-    }
+    writer.writeBytes(encodeBlocks(input, options: options))
 
     if options.checksum {
+      // Runs over the complete buffer in one shot, entirely unaffected by whether blocks were
+      // encoded sequentially or across several parallel chunks below — real zstd's multithreaded
+      // mode needs an incrementally-fed, job-ordered checksum specifically because it streams
+      // (never holds the whole input in memory); this encoder always does, so that whole piece of
+      // complexity doesn't apply here.
       writer.writeLittleEndianUInt(UInt64(XXH64.checksum32(input)), byteCount: 4)
     }
 
+    return writer.bytes
+  }
+
+  /// Sequential when `options.maximumConcurrency <= 1` or `input` isn't large enough to fill more
+  /// than one parallel chunk — today's exact behavior, byte-for-byte, is this function's single-
+  /// chunk case, not a separately-maintained code path. Above that, splits `input` into
+  /// `options.maximumConcurrency` roughly-equal chunks (each still `>= maximumBlockSize`, so a
+  /// chunk is never smaller than one real block) and encodes them concurrently via
+  /// `DispatchQueue.concurrentPerform` — `TaskGroup` would need `Zstd.compress` to become `async`,
+  /// which would force a real redesign of `Tape.archived()`/`RunControlBar`'s already-shipped
+  /// Export Tape button (a SwiftUI `View` body-time computed property, which cannot `await`); this
+  /// delivers the identical genuine-multi-core value without that ripple (see
+  /// `COMPRESSION_DESIGN.md`). Each chunk gets its own fresh `EncodeRepeatOffsets` (mirroring real
+  /// zstd's multithreaded mode's per-job reset) and, past the first chunk, a raw-content "prefix"
+  /// (the previous chunk's own tail, capped at `maximumBlockSize`) so a match can still reference
+  /// across the boundary even though the cheap repeat-offset optimization can't. Results are
+  /// collected into an index-ordered array (never append-as-completed), so the output is
+  /// deterministic regardless of which chunk's thread finishes first.
+  private static func encodeBlocks(_ input: [UInt8], options: ZstdEncodingOptions) -> [UInt8] {
+    let parallelChunkSize = max(maximumBlockSize, input.count / max(1, options.maximumConcurrency))
+    guard options.maximumConcurrency > 1, input.count > parallelChunkSize else {
+      var writer = ByteWriter()
+      // Frame-scoped, reset once here (never per block) — matches decode's own `RepeatOffsets`
+      // lifetime exactly (RFC 8878 §3.1.1.3.2.1.2).
+      var repeatOffsets = EncodeRepeatOffsets()
+      let blocks = chunked(input, into: maximumBlockSize)
+      for (index, block) in blocks.enumerated() {
+        let isLast = index == blocks.count - 1
+        writer.writeBytes(
+          BlockEncoder.encode(block, isLastBlock: isLast, options: options, repeatOffsets: &repeatOffsets))
+      }
+      return writer.bytes
+    }
+
+    let parallelChunks = chunked(input, into: parallelChunkSize)
+    var chunkStartOffsets: [Int] = []
+    var runningOffset = 0
+    for chunk in parallelChunks {
+      chunkStartOffsets.append(runningOffset)
+      runningOffset += chunk.count
+    }
+
+    var results = [[UInt8]?](repeating: nil, count: parallelChunks.count)
+    let lock = NSLock()
+    DispatchQueue.concurrentPerform(iterations: parallelChunks.count) { index in
+      let chunkStart = chunkStartOffsets[index]
+      let prefixLength = min(chunkStart, maximumBlockSize)
+      let prefix = prefixLength > 0 ? Array(input[(chunkStart - prefixLength)..<chunkStart]) : []
+      let isLastChunk = index == parallelChunks.count - 1
+      let encoded = encodeParallelChunk(
+        parallelChunks[index], prefix: prefix, isLastChunk: isLastChunk, options: options)
+      lock.lock()
+      results[index] = encoded
+      lock.unlock()
+    }
+
+    var writer = ByteWriter()
+    for result in results {
+      writer.writeBytes(result ?? [])
+    }
+    return writer.bytes
+  }
+
+  /// One parallel chunk's own internal block loop — a fresh `EncodeRepeatOffsets` scoped to just
+  /// this chunk (not the whole frame), `prefix` only ever handed to the chunk's own first block
+  /// (later blocks within the same chunk already have zero access to *any* of this chunk's own
+  /// earlier blocks, a pre-existing limitation this phase doesn't change — see
+  /// `COMPRESSION_DESIGN.md`).
+  private static func encodeParallelChunk(
+    _ chunk: [UInt8], prefix: [UInt8], isLastChunk: Bool, options: ZstdEncodingOptions
+  ) -> [UInt8] {
+    var repeatOffsets = EncodeRepeatOffsets()
+    var writer = ByteWriter()
+    let blocks = chunked(chunk, into: maximumBlockSize)
+    for (index, block) in blocks.enumerated() {
+      let isLastBlock = isLastChunk && index == blocks.count - 1
+      let blockPrefix = index == 0 ? prefix : []
+      writer.writeBytes(
+        BlockEncoder.encode(
+          block, prefix: blockPrefix, isLastBlock: isLastBlock, options: options,
+          repeatOffsets: &repeatOffsets))
+    }
     return writer.bytes
   }
 

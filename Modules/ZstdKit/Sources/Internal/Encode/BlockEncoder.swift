@@ -49,14 +49,17 @@ let maximumBlockSize = 16_000
 /// than deciding up front — a block is never allowed to expand incompressible input by more than
 /// its own 3-byte header.
 enum BlockEncoder {
-  /// `repeatOffsets` is frame-scoped (owned by `FrameEncoder`, threaded across every block's
-  /// `encode` call) and only ever mutated here if the LZ77-with-sequences candidate is the one
+  /// `repeatOffsets` is frame-scoped under sequential encoding, or chunk-scoped under
+  /// `FrameEncoder`'s parallel-chunk path (owned by whichever caller threads it across a run of
+  /// `encode` calls) and only ever mutated here if the LZ77-with-sequences candidate is the one
   /// actually chosen — matching decode, where a raw/RLE/zero-sequences block never touches the
-  /// repeat-offset state at all (see `SequenceStreamEncoder.encode`'s doc comment).
+  /// repeat-offset state at all (see `SequenceStreamEncoder.encode`'s doc comment). `prefix`
+  /// (default empty) is forwarded to `BlockParser.parse` unchanged — see that type's doc comment.
   static func encode(
-    _ chunk: [UInt8], isLastBlock: Bool, options: ZstdEncodingOptions, repeatOffsets: inout EncodeRepeatOffsets
+    _ chunk: [UInt8], prefix: [UInt8] = [], isLastBlock: Bool, options: ZstdEncodingOptions,
+    repeatOffsets: inout EncodeRepeatOffsets
   ) -> [UInt8] {
-    let candidate = bestCandidate(for: chunk, options: options, repeatOffsets: &repeatOffsets)
+    let candidate = bestCandidate(for: chunk, prefix: prefix, options: options, repeatOffsets: &repeatOffsets)
     var writer = ByteWriter()
     let blockSize: Int
     switch candidate.type {
@@ -78,7 +81,8 @@ enum BlockEncoder {
   }
 
   private static func bestCandidate(
-    for chunk: [UInt8], options: ZstdEncodingOptions, repeatOffsets: inout EncodeRepeatOffsets
+    for chunk: [UInt8], prefix: [UInt8], options: ZstdEncodingOptions,
+    repeatOffsets: inout EncodeRepeatOffsets
   ) -> Candidate {
     if let first = chunk.first, isRLE(chunk) {
       return Candidate(type: .rle, payload: [first])
@@ -100,7 +104,7 @@ enum BlockEncoder {
     // `SequenceStreamEncoder.encode`'s doc comment for why committing it back is conditional on
     // this candidate actually winning).
     let sequenceStore = BlockParser.parse(
-      chunk, initialRepeatOffset: repeatOffsets.offset1, options: options)
+      chunk, prefix: prefix, initialRepeatOffset: repeatOffsets.offset1, options: options)
     if !sequenceStore.sequences.isEmpty,
       let sequencesResult = SequenceStreamEncoder.encode(
         sequenceStore: sequenceStore, initialRepeatOffsets: repeatOffsets)

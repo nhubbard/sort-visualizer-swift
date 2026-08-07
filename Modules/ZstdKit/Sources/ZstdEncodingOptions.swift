@@ -23,6 +23,14 @@ public struct ZstdEncodingOptions: Sendable, Equatable {
   /// Sanity ceiling — this encoder holds the whole input in memory (no streaming), so there's no
   /// architectural reason to refuse a larger input beyond "did the caller mean to do this."
   public var maximumInputSize: Int
+  /// How many chunks `FrameEncoder.encode` may compress concurrently via
+  /// `DispatchQueue.concurrentPerform`, mirroring (in spirit, not mechanism — see
+  /// `COMPRESSION_DESIGN.md`) real zstd's multithreaded mode's per-job structure: each chunk gets
+  /// its own fresh `EncodeRepeatOffsets` (matching real zstdmt's per-job reset) and, past the
+  /// first chunk, a raw-content "prefix" loaded from the previous chunk's tail so matches can
+  /// still reference across the boundary. Defaults to `1` — today's exact sequential behavior,
+  /// byte-for-byte, so every existing caller is unaffected unless they opt in explicitly.
+  public var maximumConcurrency: Int
 
   public init(
     hashLog: Int = 17,
@@ -30,7 +38,8 @@ public struct ZstdEncodingOptions: Sendable, Equatable {
     minimumMatchLength: Int = 4,
     searchDepth: Int = 2,
     checksum: Bool = true,
-    maximumInputSize: Int = 1 << 30
+    maximumInputSize: Int = 1 << 30,
+    maximumConcurrency: Int = 1
   ) {
     self.hashLog = hashLog
     self.maximumSearchAttempts = maximumSearchAttempts
@@ -38,6 +47,7 @@ public struct ZstdEncodingOptions: Sendable, Equatable {
     self.searchDepth = searchDepth
     self.checksum = checksum
     self.maximumInputSize = maximumInputSize
+    self.maximumConcurrency = maximumConcurrency
   }
 
   public static let `default` = ZstdEncodingOptions()

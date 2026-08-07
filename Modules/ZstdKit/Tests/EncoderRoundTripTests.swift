@@ -194,4 +194,42 @@ struct EncoderRoundTripTests {
     #expect(try Zstd.decompress(greedyCompressed) == Data(input))
     #expect(try Zstd.decompress(lazyCompressed) == Data(input))
   }
+
+  /// Deliberately adversarial for `maximumConcurrency > 1`: one repeating 16-byte pattern across
+  /// 320,000 bytes, so a long match straddles wherever a parallel-chunk boundary happens to fall,
+  /// and `EncodeRepeatOffsets`'s fresh-per-chunk reset (see `FrameEncoder.encodeBlocks`'s doc
+  /// comment) has every opportunity to matter.
+  @Test
+  func parallelEncodingRoundTrips() throws {
+    let pattern = Array("0123456789abcdef".utf8)
+    var input: [UInt8] = []
+    for _ in 0..<20_000 { input.append(contentsOf: pattern) }
+    let data = Data(input)
+
+    let sequential = try Zstd.compress(data, options: ZstdEncodingOptions(maximumConcurrency: 1))
+    let parallel = try Zstd.compress(data, options: ZstdEncodingOptions(maximumConcurrency: 4))
+
+    #expect(try Zstd.decompress(sequential) == data)
+    #expect(try Zstd.decompress(parallel) == data)
+
+    // Determinism must survive parallel encoding, same as the sequential path.
+    let parallelAgain = try Zstd.compress(data, options: ZstdEncodingOptions(maximumConcurrency: 4))
+    #expect(parallel == parallelAgain)
+  }
+
+  /// Mixed content (a constant run, a near-incompressible pseudo-random section, then a
+  /// repetitive text pattern) spanning several parallel chunks, so a chunk boundary can land
+  /// inside any of the three very different content shapes this encoder handles.
+  @Test
+  func parallelEncodingWithMixedContentRoundTrips() throws {
+    var input: [UInt8] = []
+    input.append(contentsOf: Array(repeating: UInt8(ascii: "A"), count: 100_000))
+    input.append(contentsOf: (0..<100_000).map { UInt8(truncatingIfNeeded: $0 &* 2_654_435_761) })
+    let pattern = Array("The quick brown fox jumps over the lazy dog. ".utf8)
+    while input.count < 300_000 { input.append(contentsOf: pattern) }
+    let data = Data(input)
+
+    let parallel = try Zstd.compress(data, options: ZstdEncodingOptions(maximumConcurrency: 3))
+    #expect(try Zstd.decompress(parallel) == data)
+  }
 }
