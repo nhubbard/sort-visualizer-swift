@@ -192,6 +192,8 @@ today:
 | Settings | `AppSettings`, `Modules/SettingsKit/` |
 | Orchestration | `SortSession`, `Modules/SortFeature/Sources/SortSession.swift` — the only type that composes the above; each algorithm screen owns its own instance, matching the pre-v2 "each screen gets its own view model" behavior |
 
+**Future consideration (not scheduled):** a CoreMIDI virtual-source output alongside `ToneKit`, so the existing comparison/swap trigger points could optionally drive an external DAW (Logic, MainStage, Reaper) instead of only the built-in synth. First-party framework, no third-party dependency risk like the AudioKit-era Tuist build pain.
+
 One deviation from the original design worth keeping as a decision record: **the confirmation-
 dialog/warning-toggle system** (a generalized `SortGate`/`AlgorithmWarning` pair meant to replace
 Bogo/Bitonic-specific warning booleans) was built partway, then removed in favor of ArrayV's own,
