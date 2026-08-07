@@ -31,6 +31,14 @@ public struct ZstdEncodingOptions: Sendable, Equatable {
   /// still reference across the boundary. Defaults to `1` — today's exact sequential behavior,
   /// byte-for-byte, so every existing caller is unaffected unless they opt in explicitly.
   public var maximumConcurrency: Int
+  /// Use `RowHashMatchFinder` (a `SIMD16<UInt8>`-based row-hash search) instead of `MatchFinder`
+  /// (plain hash-chain search) — see `COMPRESSION_DESIGN.md` for why this is an original design
+  /// inspired by, not transcribed from, real zstd's own row-hash matcher. Defaults to `true`:
+  /// `RowHashMatchFinderTests` (self round-trip + a real `zstandard`-oracle cross-check on the
+  /// exact corpus `EncoderRoundTripTests` exercises for the plain hash-chain finder) is green, so
+  /// both finders produce spec-valid, interchangeable output — this is purely a speed/dispatch
+  /// choice, not a compatibility one. Set `false` to force the plain hash-chain finder instead.
+  public var useRowHashMatchFinder: Bool
 
   public init(
     hashLog: Int = 17,
@@ -39,7 +47,8 @@ public struct ZstdEncodingOptions: Sendable, Equatable {
     searchDepth: Int = 2,
     checksum: Bool = true,
     maximumInputSize: Int = 1 << 30,
-    maximumConcurrency: Int = 1
+    maximumConcurrency: Int = 1,
+    useRowHashMatchFinder: Bool = true
   ) {
     self.hashLog = hashLog
     self.maximumSearchAttempts = maximumSearchAttempts
@@ -48,6 +57,7 @@ public struct ZstdEncodingOptions: Sendable, Equatable {
     self.checksum = checksum
     self.maximumInputSize = maximumInputSize
     self.maximumConcurrency = maximumConcurrency
+    self.useRowHashMatchFinder = useRowHashMatchFinder
   }
 
   public static let `default` = ZstdEncodingOptions()

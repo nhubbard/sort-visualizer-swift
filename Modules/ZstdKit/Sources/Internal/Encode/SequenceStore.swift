@@ -15,6 +15,14 @@ struct SequenceStore {
 }
 
 enum BlockParser {
+  private static func makeMatchFinder(
+    input: [UInt8], hashLog: Int, options: ZstdEncodingOptions
+  ) -> any MatchFinding {
+    options.useRowHashMatchFinder
+      ? RowHashMatchFinder(input: input, hashLog: hashLog) : MatchFinder(input: input, hashLog: hashLog)
+  }
+
+
   /// `prefix` (default empty) is raw, already-encoded content immediately preceding `chunk` —
   /// searchable by the match finder so a sequence near the start of `chunk` can still reference
   /// back into it, but never itself re-emitted as literals/sequences. Used by `FrameEncoder`'s
@@ -52,7 +60,7 @@ enum BlockParser {
   ) -> SequenceStore {
     let combined = prefix + chunk
     let hashLog = min(options.hashLog, 17)
-    let finder = MatchFinder(input: combined, hashLog: hashLog)
+    var finder = makeMatchFinder(input: combined, hashLog: hashLog, options: options)
     var literals: [UInt8] = []
     var sequences: [RawSequence] = []
     var literalStart = prefix.count
@@ -94,7 +102,7 @@ enum BlockParser {
   ) -> SequenceStore {
     let combined = prefix + chunk
     let hashLog = min(options.hashLog, 17)
-    let finder = MatchFinder(input: combined, hashLog: hashLog)
+    var finder = makeMatchFinder(input: combined, hashLog: hashLog, options: options)
     var literals: [UInt8] = []
     var sequences: [RawSequence] = []
     var literalStart = prefix.count
