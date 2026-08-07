@@ -50,4 +50,21 @@ struct ComplexityRowTests {
     let best = metadata.complexityRows.first { $0.id == "best" }!
     #expect(best.latex == "O(n \\log n)")
   }
+
+  @Test
+  func complexityRowsHasExactlyFourRowsInBestAverageWorstSpaceOrder() {
+    let metadata = makeMetadata(best: "O(1)", average: "O(n)", worst: "O(n^2)", space: "O(1)")
+    let rows = metadata.complexityRows
+    #expect(rows.map(\.id) == ["best", "average", "worst", "space"])
+    #expect(
+      rows.map(\.label) == [
+        "Best Case", "Average Complexity", "Worst Case", "Space Complexity",
+      ])
+  }
+
+  @Test
+  func complexityWithNeitherLogNorStarPassesThroughUnchanged() {
+    let metadata = makeMetadata(best: "O(1)", average: "O(1)", worst: "O(1)", space: "O(1)")
+    #expect(metadata.complexityRows.allSatisfy { $0.latex == "O(1)" })
+  }
 }

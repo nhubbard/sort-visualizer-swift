@@ -111,7 +111,7 @@ struct GrowthModelCalibrationTests {
       "sorts: \(sorts.count) algorithms remaining x \(shuffles.count) shuffles = \(totalCombinations) combinations across \(workerCount) worker(s)"
     )
 
-    var progress: [String: AlgorithmProgress] = Dictionary(
+    let progress: [String: AlgorithmProgress] = Dictionary(
       uniqueKeysWithValues: sorts.map { ($0.id.rawValue, AlgorithmProgress()) })
     var combinationsDone = 0
 

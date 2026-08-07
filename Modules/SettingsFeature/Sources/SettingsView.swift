@@ -104,7 +104,13 @@ public struct SettingsView: View {
           step: 50_000
         )
         .accessibilityIdentifier("recordingOperationCapStepper")
-        Text(recordingCapEstimateText)
+        Text(
+          recordingCapEstimateText(
+            useFixedDurationPacing: settings.useFixedDurationPacing,
+            targetPlaybackDuration: settings.targetPlaybackDuration,
+            recordingOperationCap: settings.recordingOperationCap,
+            playbackSpeed: settings.playbackSpeed)
+        )
           .font(.caption)
           .foregroundStyle(.secondary)
       } header: {
@@ -145,16 +151,19 @@ public struct SettingsView: View {
       .accessibilityIdentifier("resetSettingsConfirmButton")
     }
   }
+}
 
-  // The ops/sec-based minutes estimate doesn't apply in fixed-duration mode, where every run is
-  // already paced to land at `targetPlaybackDuration` regardless of tape size — show that target
-  // directly instead of a stale rate-based projection.
-  private var recordingCapEstimateText: String {
-    if settings.useFixedDurationPacing {
-      return "≈ \(Int(settings.targetPlaybackDuration))s per run at the fixed-duration target"
-    }
-    let minutes = Double(settings.recordingOperationCap) / settings.playbackSpeed / 60
-    return "≈ " + minutes.formatted(.number.precision(.fractionLength(1)))
-      + " min at the current playback speed"
+// The ops/sec-based minutes estimate doesn't apply in fixed-duration mode, where every run is
+// already paced to land at `targetPlaybackDuration` regardless of tape size — show that target
+// directly instead of a stale rate-based projection.
+func recordingCapEstimateText(
+  useFixedDurationPacing: Bool, targetPlaybackDuration: Double, recordingOperationCap: Int,
+  playbackSpeed: Double
+) -> String {
+  if useFixedDurationPacing {
+    return "≈ \(Int(targetPlaybackDuration))s per run at the fixed-duration target"
   }
+  let minutes = Double(recordingOperationCap) / playbackSpeed / 60
+  return "≈ " + minutes.formatted(.number.precision(.fractionLength(1)))
+    + " min at the current playback speed"
 }

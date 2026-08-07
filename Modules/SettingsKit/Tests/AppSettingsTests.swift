@@ -90,6 +90,36 @@ struct AppSettingsTests {
   }
 
   @Test
+  func resetToDefaultsRestoresEveryFieldAfterMutation() {
+    let settings = AppSettings(store: makeIsolatedStore())
+    settings.selectedVisualizerID = VisualizerID(rawValue: "rainbow")
+    settings.playbackSpeed = 75.0
+    settings.useFixedDurationPacing = true
+    settings.targetPlaybackDuration = 15.0
+    settings.compactPlaybackForFixedDuration = true
+    settings.soundEnabled = true
+    settings.synthNoteRange = 24...96
+    settings.defaultArraySize = 128
+    settings.codeTheme = CodeThemeID(rawValue: "dracula")
+    settings.defaultShuffleID = ShuffleID(rawValue: "shuffledcubic")
+    settings.recordingOperationCap = 1_000_000
+
+    settings.resetToDefaults()
+
+    #expect(settings.selectedVisualizerID == VisualizerID(rawValue: "bargraph"))
+    #expect(settings.playbackSpeed == 30.0)
+    #expect(settings.useFixedDurationPacing == false)
+    #expect(settings.targetPlaybackDuration == 10.0)
+    #expect(settings.compactPlaybackForFixedDuration == false)
+    #expect(settings.soundEnabled == false)
+    #expect(settings.synthNoteRange == 36...72)
+    #expect(settings.defaultArraySize == 256)
+    #expect(settings.codeTheme == CodeThemeID(rawValue: "monokai"))
+    #expect(settings.defaultShuffleID == ShuffleID(rawValue: "random"))
+    #expect(settings.recordingOperationCap == 300_000)
+  }
+
+  @Test
   func cycleVisualizerFallsBackToFirstEntryWhenCurrentIDIsUnknown() {
     let registry = VisualizerRegistry.shared
     let restoreBuiltIns = registry.builtIns

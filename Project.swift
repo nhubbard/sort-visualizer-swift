@@ -208,5 +208,8 @@ let appUITests = Target.target(
 
 let project = Project(
     name: "Sort Symphony",
+    // Xcode doesn't gather coverage by default (it's a real build-time cost) -- opt in explicitly
+    // so `tuist test` produces a .xcresult with coverage data we can inspect via `xcrun xccov`.
+    options: .options(automaticSchemesOptions: .enabled(codeCoverageEnabled: true)),
     targets: modules + [app, appUITests]
 )

@@ -102,7 +102,12 @@ struct RunControlBar: View {
     // Number and unit are separate `Text`s, not one formatted string — folding " ops/sec" into
     // the same string let the whole string's width shift whenever the number crossed a digit
     // boundary (e.g. 3->4 digits near 1000 ops/sec), causing visible reflow during fast playback.
-    statCell(Int(opsPerSecond), digits: 4, label: "ops/sec")
+    statCell(
+      Int(
+        opsPerSecond(
+          significantOperationCount: replay.significantOperationCount,
+          elapsedPlaybackDuration: replay.elapsedPlaybackDuration)),
+      digits: 4, label: "ops/sec")
   }
 
   @ViewBuilder
@@ -119,16 +124,6 @@ struct RunControlBar: View {
       statSlot(value, digits: digits)
       Text(label)
     }
-  }
-
-  // `significantOperationCount`, not `stepIndex` (over-counts mark/unmark bookkeeping around
-  // every compare/swap, see `SortOperation.isSignificantForPacing`) and not
-  // `compareCount + swapCount` (under-counts merge-family algorithms, which write most of their
-  // tape via `.setValue`/`.auxWrite`). This is exactly what `ReplayEngine.play()`'s pacing loop
-  // paces against, so the stat can never exceed the configured `speed`.
-  private var opsPerSecond: Double {
-    let elapsed = replay.elapsedPlaybackDuration
-    return elapsed > 0 ? Double(replay.significantOperationCount) / elapsed : 0
   }
 
   private func statSlot(_ value: Int, digits: Int) -> some View {
@@ -449,6 +444,16 @@ private struct AutomatorMenuButton: View {
     .accessibilityLabel("Automations")
     .help("Run a size-sweep or max-size automation")
   }
+}
+
+// `significantOperationCount`, not `stepIndex` (over-counts mark/unmark bookkeeping around every
+// compare/swap, see `SortOperation.isSignificantForPacing`) and not `compareCount + swapCount`
+// (under-counts merge-family algorithms, which write most of their tape via
+// `.setValue`/`.auxWrite`). This is exactly what `ReplayEngine.play()`'s pacing loop paces
+// against, so the stat can never exceed the configured `speed`.
+func opsPerSecond(significantOperationCount: Int, elapsedPlaybackDuration: Double) -> Double {
+  elapsedPlaybackDuration > 0
+    ? Double(significantOperationCount) / elapsedPlaybackDuration : 0
 }
 
 extension View {
