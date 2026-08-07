@@ -1,6 +1,5 @@
-// This module's public API is original, but the decoder it fronts ports a subset of
-// Zstandard's decoding algorithm (RFC 8878) from the real `zstd`/`xxHash` C source. See
-// NOTICE.md.
+// This file's per-symbol code+length lookup mirrors `HuffmanStreamDecoder`'s decode loop in
+// reverse. See NOTICE.md.
 //
 // Used under the BSD License:
 //
@@ -35,32 +34,18 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import Foundation
-
-/// A from-scratch Zstandard implementation — no C/C++ interop. `AlgorithmDetails.algz` still uses
-/// the Python `zstandard`-backed pipeline (`App/Resources/AlgorithmDetails/manage.py`) as its
-/// encoder — this module's own encoder exists for tape export, not to replace that shipped
-/// pipeline. See `COMPRESSION_DESIGN.md` for the full design rationale and scope.
-public enum Zstd {
-  /// Decompresses one standard Zstd frame. Concatenated frames, skippable frames, legacy formats,
-  /// and magicless framing are rejected with a specific `ZstdError`, not misclassified as corrupt
-  /// data. Dictionary support is not yet part of this API — frames requiring one throw
-  /// `.dictionaryRequired`.
-  public static func decompress(
-    _ frame: Data,
-    limits: ZstdDecodingLimits = .default
-  ) throws -> Data {
-    try ZstdDecompressor.decompress(frame, limits: limits)
-  }
-
-  /// Compresses `input` into one standard Zstd frame, decodable by both `Zstd.decompress` and a
-  /// real zstd decoder. Single strategy (`greedy`), single frame, whole input in memory — see
-  /// `COMPRESSION_DESIGN.md` for the full scope and the deliberate simplifications relative to the
-  /// reference encoder.
-  public static func compress(
-    _ input: Data,
-    options: ZstdEncodingOptions = .default
-  ) throws -> Data {
-    Data(try FrameEncoder.encode([UInt8](input), options: options))
+/// Encodes `bytes` into one Huffman-coded stream (single-stream form only — 4-stream is a later
+/// optimization, not a correctness requirement). Unlike FSE, Huffman needs no reverse-order
+/// processing: `HuffmanStreamDecoder.decode` decodes symbol 0, 1, 2... in a plain forward loop, so
+/// pushing symbols in their normal order here — the same order `BackwardBitWriter`'s own contract
+/// already guarantees ("push order = decode order") — is exactly correct.
+enum HuffmanStreamEncoder {
+  static func encode(_ bytes: [UInt8], table: HuffmanEncodeTable) -> [UInt8]? {
+    var writer = BackwardBitWriter()
+    for byte in bytes {
+      guard let huffmanCode = table.codes[Int(byte)] else { return nil }
+      writer.writeBits(UInt32(huffmanCode.code), count: huffmanCode.nbBits)
+    }
+    return writer.finish()
   }
 }

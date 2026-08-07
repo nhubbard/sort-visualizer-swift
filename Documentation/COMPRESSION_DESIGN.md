@@ -193,10 +193,10 @@ public enum Zstd {
 }
 ```
 
-No `compress` API, no encoder stub, no match finder/optimal parser/Huffman encoder/FSE encoder, no
-Swift-side dictionary trainer, and none planned — a real zstd encoder's match-finding and
-from-scratch entropy-table construction is more work than decoding, and is permanently unnecessary
-here since the Python pipeline (`zstandard` PyPI package) already does it well.
+`ZstdKit` also ships a real Swift encoder (`Zstd.compress(_:options:)`) — see "Encoder: Swift, for
+tape export" below. `AlgorithmDetails.algz` itself keeps using the Python pipeline (`zstandard` PyPI
+package, described in "Encoder: Python, not Swift"); the Swift encoder's first consumer is tape
+export, not a replacement for `manage.py pack`.
 
 **Decoder completeness** — supports every normal encoding a standard compressor may produce, not
 just what the project's own level-19 encoder happens to emit:
@@ -268,6 +268,63 @@ enum AlgorithmDetailsArchiveError: Error, Sendable, Equatable {
     case overlappingContent, invalidUTF8, missingRequiredContent, archiveResourceNotFound
 }
 ```
+
+## Encoder: Swift, for tape export
+
+`Zstd.compress(_:options:)` (`Sources/Zstd.swift`, backed by `Sources/Internal/Encode/`) is a
+from-scratch Swift Zstandard encoder — greedy hash-chain match finder, real FSE and Huffman
+entropy coding, no streaming (whole input in memory, one frame). It exists for tape export/import
+(binary `SortOperation` archives, not `AlgorithmDetails.algz`), which needs to run entirely on-device
+without a Python toolchain. Scope is deliberately narrower than the reference encoder: `greedy`
+strategy only (no `lazy`/`lazy2` lookahead, no binary-tree optimal parsers), no dictionary support,
+no multithreading — all explicitly deferred, not oversights (tape exports are KB-to-low-tens-of-MB,
+never large enough to need them).
+
+**Verification.** Self-round-trip (`Zstd.decompress(try Zstd.compress(x)) == x`) is necessary but
+provably *not* sufficient: a writer and reader can agree on a bit convention that's internally
+consistent yet wrong relative to what real zstd actually produces or accepts, and self-round-trip
+cannot distinguish that case from a correct one. The only test that catches it is cross-checking
+against a real, independent zstd implementation — this project uses the `zstandard` PyPI package
+(`Modules/ZstdKit/FixtureGenerator/`, `uv run python3 -c "import zstandard; ..."`) and, for exact
+diagnostics beyond zstandard's generic "Data corruption detected", a `DEBUGLEVEL=6` debug build of
+the real C library at `~/zstd` (`make -C lib libzstd.a DEBUGLEVEL=6`) linked into a throwaway C
+program calling `ZSTD_decompress`/`ZSTD_compressSequences` directly — the verbose `DEBUGLOG` trace
+pinpoints which internal check failed (e.g. `!BIT_endOfDStream(...)`), which a generic error code
+never does.
+
+Two real bugs were found and fixed this way, both invisible to self-round-trip:
+
+- **`FSEEncodeTable.writeNCount` padding byte.** An earlier version appended one extra zero byte
+  after the tight NCount bit-count, meant as a safety margin for the read side's "guess wide, rewind
+  1 bit if narrow" over-read trick. Both real call sites (`SequenceTableBuilder.buildTable`'s
+  `.fseCompressed` case, `HuffmanTableBuilder.decodeFSECompressedWeights`) determine how many bytes
+  to skip from `ForwardBitReader.consumedBytes` — bits *actually read*, not a declared length this
+  function controls — so the extra byte silently desynchronized whichever table description came
+  next in the same buffer (LL, then OF, then ML — the first single-table tests never exercised this,
+  since they never had a "next table" to misalign). Fixed by returning exactly the tight byte count;
+  no padding is needed because both call sites hand `readNormalizedCounts` a buffer that extends well
+  past this description's own bytes, so the narrow-branch peek is always safe unpadded.
+- **`BackwardBitWriter` sentinel placement.** The original writer always packed the sentinel `1` bit
+  at bit 7 (the top) of the byte that ends up last after reversal, with any partial-byte padding
+  pushed into a *separate* byte at the *opposite* end of the buffer. Real zstd's `BIT_addBits`/
+  `BIT_closeCStream` (`~/zstd/lib/common/bitstream.h`) instead grow a bit-position counter from 0 and
+  add the sentinel wherever the last real bit happens to land — the padding needed to round up to a
+  whole byte sits *directly above the sentinel, in the same byte*, not off in a separate one. Both
+  layouts are internally self-consistent (this project's writer and reader always agreed with each
+  other, so every round-trip test passed and even every *value* decoded correctly), but real zstd's
+  `BIT_endOfDStream` requires the total consumed-bit count to land exactly on a container-width
+  boundary, which only holds when the padding is adjacent to the sentinel. Fixed by buffering all
+  `writeBits` calls and packing padding + sentinel + real bits in one pass at `finish()`, once the
+  total real bit count (and therefore the padding count) is known. This one only reproduced with a
+  *complete* block (real literals + real match, not a hand-built isolated sequence), because the
+  bug's symptom — the stream ending a few bits short of where the decoder expects — needs an actual
+  variable-width extra-bits payload to manifest; a `RawSequence`-level unit test with hand-picked
+  round numbers happened not to expose it.
+
+Because both bugs were invisible to self-round-trip, `SequenceStreamDecoder.decode` now enforces
+`!reader.hasBitsRemaining` after the last sequence — the same unconditional check real zstd performs
+via `BIT_endOfDStream` — so this entire bug class is caught by the existing Swift test suite going
+forward, without needing the C oracle rebuilt every time.
 
 ## Encoder: Python, not Swift
 

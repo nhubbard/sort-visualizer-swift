@@ -114,6 +114,14 @@ enum SequenceStreamDecoder {
       }
     }
 
+    // Mirrors the reference decoder's unconditional `!BIT_endOfDStream(&seqState.DStream)` check
+    // after the last sequence: a correctly-formed stream's last sequence (no state advance) always
+    // consumes every real bit exactly down to the sentinel, with zero left over. Catches encoder
+    // bugs that produce the right *byte count* but misplace bits within it — the kind of bug a
+    // self-round-trip test can't see, since a matching writer/reader pair agree on a wrong
+    // convention just as readily as a right one (see `BackwardBitWriter`'s doc comment).
+    guard !reader.hasBitsRemaining else { throw ZstdError.invalidSequenceStream }
+
     return sequences
   }
 

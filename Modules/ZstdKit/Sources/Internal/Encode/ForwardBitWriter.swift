@@ -1,6 +1,5 @@
-// This module's public API is original, but the decoder it fronts ports a subset of
-// Zstandard's decoding algorithm (RFC 8878) from the real `zstd`/`xxHash` C source. See
-// NOTICE.md.
+// This file's forward, LSB-first bit writer is the write-side mirror of `ForwardBitReader`,
+// supporting FSE normalized-count table serialization (RFC 8878 §4.1.1). See NOTICE.md.
 //
 // Used under the BSD License:
 //
@@ -35,32 +34,31 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import Foundation
+/// Writes an FSE normalized-count table description — LSB-first within each byte, exactly
+/// mirroring `ForwardBitReader`'s read convention (`bit(at position) = (byte >> (position % 8)) &
+/// 1`, position increasing = lower bits of a byte first, then the next byte).
+struct ForwardBitWriter {
+  private(set) var bytes: [UInt8] = []
+  private var bitOffset: Int = 0
 
-/// A from-scratch Zstandard implementation — no C/C++ interop. `AlgorithmDetails.algz` still uses
-/// the Python `zstandard`-backed pipeline (`App/Resources/AlgorithmDetails/manage.py`) as its
-/// encoder — this module's own encoder exists for tape export, not to replace that shipped
-/// pipeline. See `COMPRESSION_DESIGN.md` for the full design rationale and scope.
-public enum Zstd {
-  /// Decompresses one standard Zstd frame. Concatenated frames, skippable frames, legacy formats,
-  /// and magicless framing are rejected with a specific `ZstdError`, not misclassified as corrupt
-  /// data. Dictionary support is not yet part of this API — frames requiring one throw
-  /// `.dictionaryRequired`.
-  public static func decompress(
-    _ frame: Data,
-    limits: ZstdDecodingLimits = .default
-  ) throws -> Data {
-    try ZstdDecompressor.decompress(frame, limits: limits)
+  /// Writes `count` bits (0...32) of `value`, least-significant bit first — the mirror of
+  /// `ForwardBitReader.readBits`, which assembles `result |= UInt32(bit) << index` for increasing
+  /// `index`, i.e. the first bit read becomes the result's LSB.
+  mutating func writeBits(_ value: UInt32, count: Int) {
+    precondition(count >= 0 && count <= 32)
+    for index in 0..<count {
+      let bit = UInt8((value >> index) & 1)
+      let byteIndex = bitOffset / 8
+      let bitIndex = bitOffset % 8
+      if byteIndex == bytes.count {
+        bytes.append(0)
+      }
+      bytes[byteIndex] |= bit << bitIndex
+      bitOffset += 1
+    }
   }
 
-  /// Compresses `input` into one standard Zstd frame, decodable by both `Zstd.decompress` and a
-  /// real zstd decoder. Single strategy (`greedy`), single frame, whole input in memory — see
-  /// `COMPRESSION_DESIGN.md` for the full scope and the deliberate simplifications relative to the
-  /// reference encoder.
-  public static func compress(
-    _ input: Data,
-    options: ZstdEncodingOptions = .default
-  ) throws -> Data {
-    Data(try FrameEncoder.encode([UInt8](input), options: options))
-  }
+  /// Byte length just past the last bit written, rounded up — matches
+  /// `ForwardBitReader.consumedBytes`, the offset where a following entropy-coded bitstream begins.
+  var consumedBytes: Int { (bitOffset + 7) / 8 }
 }
