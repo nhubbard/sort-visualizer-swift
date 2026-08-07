@@ -112,14 +112,22 @@ enum FrameEncoder {
     }
 
     let parallelChunks = chunked(input, into: parallelChunkSize)
-    var chunkStartOffsets: [Int] = []
+    var offsets: [Int] = []
     var runningOffset = 0
     for chunk in parallelChunks {
-      chunkStartOffsets.append(runningOffset)
+      offsets.append(runningOffset)
       runningOffset += chunk.count
     }
+    // Frozen into a `let` before the concurrent section starts — every write already happened
+    // above, so this capture is genuinely immutable by the time `concurrentPerform`'s closure
+    // reads it, silencing the compiler's (otherwise-legitimate) concern about a captured `var` in
+    // concurrently-executing code without needing an unsafe escape hatch.
+    let chunkStartOffsets = offsets
 
-    var results = [[UInt8]?](repeating: nil, count: parallelChunks.count)
+    // `results`, unlike `chunkStartOffsets`, genuinely is mutated from multiple threads — safe
+    // because every access (the write below, and the read once `concurrentPerform` returns) is
+    // strictly serialized by `lock`, which the compiler can't see from the closure's shape alone.
+    nonisolated(unsafe) var results = [[UInt8]?](repeating: nil, count: parallelChunks.count)
     let lock = NSLock()
     DispatchQueue.concurrentPerform(iterations: parallelChunks.count) { index in
       let chunkStart = chunkStartOffsets[index]
