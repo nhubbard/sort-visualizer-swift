@@ -272,13 +272,16 @@ enum AlgorithmDetailsArchiveError: Error, Sendable, Equatable {
 ## Encoder: Swift, for tape export
 
 `Zstd.compress(_:options:)` (`Sources/Zstd.swift`, backed by `Sources/Internal/Encode/`) is a
-from-scratch Swift Zstandard encoder — greedy hash-chain match finder, real FSE and Huffman
-entropy coding, no streaming (whole input in memory, one frame). It exists for tape export/import
-(binary `SortOperation` archives, not `AlgorithmDetails.algz`), which needs to run entirely on-device
-without a Python toolchain. Scope is deliberately narrower than the reference encoder: `greedy`
-strategy only (no `lazy`/`lazy2` lookahead, no binary-tree optimal parsers), no dictionary support,
-no multithreading — all explicitly deferred, not oversights (tape exports are KB-to-low-tens-of-MB,
-never large enough to need them).
+from-scratch Swift Zstandard encoder — a hash-chain or SIMD row-hash match finder (either
+conforming to `MatchFinding`, selectable via `ZstdEncodingOptions.useRowHashMatchFinder`), lazy/
+lazy2 lookahead (`searchDepth`), optional chunked parallel encoding (`maximumConcurrency`), and real
+FSE and Huffman entropy coding — no streaming (whole input in memory, one frame). It exists for
+tape export/import (binary `SortOperation` archives, not `AlgorithmDetails.algz`), which needs to
+run entirely on-device without a Python toolchain, though nothing about the encoder itself is tape-
+specific; see "Feature-complete encoder: lazy matching, row-hash SIMD, parallel encoding" below for
+what shipped past the original Phase 1 tape-export scope. `btlazy2`/`btopt`/`btultra`/`btultra2`
+(binary-tree optimal parsers) and dictionary support remain out of scope — a genuinely different,
+much larger match-finder family and a feature nothing in this app has ever needed, respectively.
 
 **Verification.** Self-round-trip (`Zstd.decompress(try Zstd.compress(x)) == x`) is necessary but
 provably *not* sufficient: a writer and reader can agree on a bit convention that's internally
@@ -325,6 +328,91 @@ Because both bugs were invisible to self-round-trip, `SequenceStreamDecoder.deco
 `!reader.hasBitsRemaining` after the last sequence — the same unconditional check real zstd performs
 via `BIT_endOfDStream` — so this entire bug class is caught by the existing Swift test suite going
 forward, without needing the C oracle rebuilt every time.
+
+## Feature-complete encoder: lazy matching, row-hash SIMD, parallel encoding
+
+Built on direct request, once tape export/import (Phases 1-3) shipped: the goal shifted from
+"good enough for tape export" to a genuinely feature-complete Zstandard implementation, with an
+eye toward `ZstdKit` eventually being useful as a standalone dependency outside this app (see
+"Standalone package" below). Three additions, each independently valuable and verified the same
+way as Phase 1 (self-round-trip, then a real `zstandard`-package oracle cross-check — see above):
+
+- **Lazy/lazy2 match-finder depth** (`ZstdEncodingOptions.searchDepth`, default `2`). Ported
+  directly from `ZSTD_compressBlock_lazy_generic` (`zstd_lazy.c`): after finding a baseline
+  candidate at `ip`, keep re-searching one position ahead (`searchDepth: 1`) and, nested one level
+  deeper (`searchDepth: 2`), one position further still, for as long as the new candidate's *gain*
+  — `matchLength * K - highbit32(offBase) + bias`, log-scaling the encoded offset as a proxy for
+  its coding cost — beats the one currently held. `K`/`bias` are the exact constants the reference
+  source uses (`K=3` for a cheap repeat-offset check, `K=4` for a fresh hash-table search; `bias`
+  grows `0` → `1`/`4` → `1`/`7` across rounds, the hysteresis that keeps lookahead from becoming
+  unbounded), not approximated. `searchDepth: 0` is the original Phase 1 greedy path, kept byte-
+  for-byte unchanged. `Modules/ZstdKit/Tests/EncoderRoundTripTests.swift`'s
+  `lazyMatchingChoosesALongerMatchOverAnImmediateShortOne` is an engineered proof this does real
+  work — a hand-built input where greedy takes an immediate length-4 match and lazy correctly waits
+  one byte for a length-39 one instead, both oracle-cross-checked.
+- **A SIMD row-hash match finder** (`RowHashMatchFinder`, a second `MatchFinding` conformer next to
+  the original hash-chain `MatchFinder`, selected via `ZstdEncodingOptions.useRowHashMatchFinder`,
+  default `true`). **Not a line-for-line port** of real zstd's `ZSTD_row_getMatchMask` — its actual
+  vector-hardware usage exists only via SSE2/NEON *compiler intrinsics*, which this project's no-
+  C-interop constraint rules out by design, and its own portable fallback (used when neither
+  intrinsic is available) is itself a wide-scalar SWAR bit-gather trick on a `size_t`, not a vector
+  type at all. This is an original design *inspired by* the row-hash concept instead: a circular
+  16-entry tag row per hash bucket, searched by broadcasting a hash tag into a `SIMD16<UInt8>` and
+  comparing against the row in one vectorized op (`.==` then `.replacing(with:where:)` — genuine
+  compiler-lowered vector instructions on both arm64/NEON and x86_64/SSE, no intrinsics or `import
+  simd` needed; `SIMDn` has shipped in the standard library since Swift 5.0). Only the final
+  "which of these 16 lanes matched" reduction falls back to a small fixed-16-iteration scalar loop
+  — deliberately not replicating the SWAR magic-multiply trick, exactly the category of subtle bit
+  arithmetic that cost real debugging time on `BackwardBitWriter` (see above); one vector compare
+  instead of 16 sequential branchy ones is the real win either way. Verified with its own isolated
+  suite (`RowHashMatchFinderTests.swift`) mirroring the same corpus `EncoderRoundTripTests.swift`
+  already exercises for the hash-chain finder, oracle-cross-checked, before its default flipped on.
+- **Chunked parallel encoding** (`ZstdEncodingOptions.maximumConcurrency`, default `1`). The one
+  genuine cross-block dependency in the whole encoder is `EncodeRepeatOffsets`, threaded by `inout`
+  across every block in a frame — everything else (`MatchFinder`/`RowHashMatchFinder`,
+  `LiteralsEncoder`'s per-block-fresh Huffman tables, RLE/raw candidate selection) is already
+  embarrassingly block-independent. Real zstd's own multithreaded mode (`zstdmt_compress.c`)
+  resolves the same tension by giving each parallel *job* its own fresh compression state (repeat
+  offsets reset per job) plus a "prefix reload" — the tail of the previous job's input, fed into
+  the new job's match finder as raw searchable content (not re-emitted) so matches can still
+  reference across the boundary. `FrameEncoder.encodeBlocks` mirrors this in spirit: each parallel
+  chunk gets a fresh `EncodeRepeatOffsets` and, past the first chunk, a raw-content prefix (the
+  previous chunk's own tail, capped at `maximumBlockSize`) threaded into `BlockParser.parse`'s new
+  `prefix:` parameter. One piece of the real design collapses for free here: this encoder always
+  holds the whole input in memory (no streaming), so the checksum needs no incremental, job-
+  ordered updates at all — `XXH64.checksum32(input)` just runs over the complete buffer in one shot
+  regardless of how blocks were chunked for parallel encoding. **Mechanism deviates from an earlier
+  sketch of this work, discovered during implementation, not silently**: `TaskGroup` requires an
+  `async` context, but `Zstd.compress` is a synchronous, `throws`-only API that `Tape.archived()`
+  and `RunControlBar`'s already-shipped Export Tape button (a SwiftUI `View` body-time computed
+  property, which cannot `await`) both depend on directly — making `compress` `async` would force a
+  real redesign of already-shipped UI, not a mechanical ripple. `DispatchQueue.concurrentPerform`
+  (GCD's synchronous, blocks-until-done parallel-for) delivers the identical genuine-multi-core
+  value without that cost; each chunk's result is written into a shared, index-ordered array
+  guarded by a plain `NSLock` (serializing only the tiny array-write, not the actual encode work),
+  so output stays deterministic regardless of which chunk's thread finishes first. Defaults to `1`
+  — today's exact sequential behavior, byte-for-byte — so no existing caller is affected unless it
+  opts in explicitly.
+
+## Standalone package
+
+`Modules/ZstdKit/Package.swift` makes the same `Sources/`/`Tests/` tree also a self-contained,
+independently buildable/testable Swift package (`cd Modules/ZstdKit && swift build && swift
+test`), coexisting with — not replacing — Tuist's own glob-based `Module.framework(name: "ZstdKit",
+...)` consumption in the app's `Project.swift` (left completely untouched; that mechanism doesn't
+read this file at all). The one source change genuinely required by having both build systems
+compile the same files: `Tests/Fixture.swift`'s resource-bundle lookup is `#if SWIFT_PACKAGE`-
+gated, since SPM's `.testTarget(resources: [.copy("Fixtures")])` preserves that subdirectory inside
+a *separate* module-resource bundle only `Bundle.module` (synthesized only under `SWIFT_PACKAGE`)
+knows how to find, while Tuist's `testResources` glob flattens the same files straight into the
+generated test bundle's root, found via class-based `Bundle(for:)` lookup — different bundles,
+different internal layouts, so the lookup has to switch, not just the resource declaration.
+Platform minimums in `Package.swift` are deliberately broad (iOS 13/macOS 10.15/watchOS 6/tvOS 13),
+well below what anything in this module actually needs, since a package meant for *other* projects
+shouldn't inherit this app's own iOS-18-specific floor. Publishing this as a real, externally-
+consumable dependency (a dedicated git remote, version tags, a standalone README) is intentionally
+not part of this — this only makes that step possible later, if `ZstdKit` turns out to be useful
+enough elsewhere to be worth doing.
 
 ## Tape export/import: `Tape.archived()`/`Tape(archivedData:)`
 

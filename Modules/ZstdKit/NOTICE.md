@@ -19,6 +19,17 @@ reference `zstd`/`xxHash` C source and cross-checked against real `zstd`-produce
 derived solely from the RFC 8878 prose. Each source file under `Sources/` carries a short note on
 what it specifically reuses.
 
+One deliberate exception, called out explicitly rather than left to blend in with everything
+above: `Sources/Internal/Encode/RowHashMatchFinder.swift`'s actual SIMD mechanism is an *original*
+design *inspired by* real zstd's row-hash matcher (`ZSTD_row_getMatchMask`), not transcribed from
+it — that reference function's genuine vector-hardware usage exists only via SSE2/NEON compiler
+intrinsics this project's no-C-interop constraint rules out, and its own portable (non-intrinsic)
+fallback is itself a wide-scalar SWAR bit-gather trick, not a vector type at all, so there is no
+"portable SIMD row-hash matcher" in the reference source to port line for line. The lazy/lazy2
+lookahead driver it's used from (`Sources/Internal/Encode/SequenceStore.swift`'s `parseLazy`) *is*
+transcribed faithfully, including its exact gain-comparison constants, from
+`ZSTD_compressBlock_lazy_generic` (`zstd_lazy.c`) — see `COMPRESSION_DESIGN.md`.
+
 Reused under the BSD License, from Zstandard (`github.com/facebook/zstd`, `LICENSE`) and xxHash
 (bundled in the same repository under `lib/common/xxhash.h`/`xxhash.c`):
 
