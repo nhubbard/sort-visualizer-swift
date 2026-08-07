@@ -200,6 +200,68 @@ struct SortCoordinatorTests {
       return
     }
   }
+
+  /// `AlgorithmRegistry.shared` is a real, otherwise-unpopulated-in-this-target singleton (see
+  /// `sampleAutomation()`'s own doc comment for the same fact about `AutomationRegistry`) — this
+  /// is the one test in this file that has to temporarily populate it to exercise the "found a
+  /// match" path, then restore whatever was there before, `defer`red so a failed `#expect` above
+  /// it still cleans up.
+  @Test
+  func importTapeRoutesToTheMatchingAlgorithm() throws {
+    let coordinator = SortCoordinator()
+    let algorithm = FakeAlgorithm()
+    let originalBuiltIns = AlgorithmRegistry.shared.builtIns
+    defer {
+      AlgorithmRegistry.shared.builtIns = originalBuiltIns
+      AlgorithmRegistry.shared.discover()
+    }
+    AlgorithmRegistry.shared.builtIns = [algorithm]
+    AlgorithmRegistry.shared.discover()
+
+    let tape = Tape(
+      header: TapeHeader(
+        algorithmID: algorithm.id.rawValue, initialValues: [2, 1],
+        visualSeed: 0, compareCount: 1, swapCount: 1,
+        recordingDuration: 0, recordedAt: Date(timeIntervalSince1970: 0)),
+      operations: [.compare(0, 1), .swap(0, 1)]
+    )
+    let archived = try tape.archived()
+
+    #expect(coordinator.importTape(from: archived) == .success)
+    #expect(coordinator.selectedAlgorithmID == algorithm.id)
+    guard case .loadTape(let loadedTape) = coordinator.consumePendingAction(for: algorithm.id)
+    else {
+      Issue.record("expected a .loadTape pending action")
+      return
+    }
+    #expect(loadedTape == tape)
+  }
+
+  @Test
+  func importTapeReportsAnAlgorithmIDThisBuildDoesNotRecognize() throws {
+    let coordinator = SortCoordinator()
+    let tape = Tape(
+      header: TapeHeader(
+        algorithmID: "definitely-not-registered-anywhere", initialValues: [1],
+        visualSeed: 0, compareCount: 0, swapCount: 0,
+        recordingDuration: 0, recordedAt: Date(timeIntervalSince1970: 0)),
+      operations: []
+    )
+    let archived = try tape.archived()
+
+    #expect(
+      coordinator.importTape(from: archived)
+        == .unrecognizedAlgorithm(algorithmID: "definitely-not-registered-anywhere"))
+  }
+
+  @Test
+  func importTapeReportsDecodeFailureOnGarbageData() {
+    let coordinator = SortCoordinator()
+    guard case .decodeFailed = coordinator.importTape(from: Data([0x00, 0x01, 0x02])) else {
+      Issue.record("expected .decodeFailed for unparseable data")
+      return
+    }
+  }
 }
 
 /// `AutomationRegistry.shared` is only populated by the real app's composition root — this test

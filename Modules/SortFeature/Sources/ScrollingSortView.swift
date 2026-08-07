@@ -86,6 +86,8 @@ public struct ScrollingSortView: View {
           if let automation = AutomationRegistry.shared.automation(id: automationID) {
             await session.runAutomationAndWait(automation)
           }
+        case .loadTape(let tape):
+          session.loadImportedTape(tape)
         }
         if !Task.isCancelled { SortCoordinator.shared.resolveCompletion(token: token) }
       } else {

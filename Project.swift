@@ -110,6 +110,18 @@ let app = Target.target(
         // reason explained on `app`'s own `name:`, so nothing else here guarantees the user-facing
         // app name still reads as "Sort Symphony".
         "CFBundleDisplayName": "Sort Symphony",
+        // Backs `UTType.tapeArchive` (`TapeArchiveDocument.swift`) — a `.tape`-extension file
+        // ShareLink can export a recorded/imported tape to, and `.fileImporter` can filter to.
+        "UTExportedTypeDeclarations": [
+            [
+                "UTTypeIdentifier": "com.nhubbard.Sort2.mobile.tapearchive",
+                "UTTypeDescription": "Sort Symphony Tape",
+                "UTTypeConformsTo": ["public.data"],
+                "UTTypeTagSpecification": [
+                    "public.filename-extension": ["tape"]
+                ],
+            ]
+        ],
     ]),
     sources: ["App/Sources/**"],
     resources: [

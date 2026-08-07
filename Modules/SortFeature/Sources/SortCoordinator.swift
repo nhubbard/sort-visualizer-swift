@@ -1,6 +1,7 @@
 import AlgorithmKit
 import Foundation
 import SettingsKit
+import SortEngineKit
 import VisualizationKit
 
 /// The bridge App Intents needs and `ContentView`/`ScrollingSortView` never did before: neither
@@ -20,6 +21,9 @@ public final class SortCoordinator {
   public enum PendingAction: Sendable {
     case run(visualizerID: VisualizerID?, size: Int?)
     case automation(AutomationID)
+    /// An imported tape (`Tape(archivedData:)`), routed the same way as an intent-triggered run —
+    /// see `loadTape(_:algorithm:)` below.
+    case loadTape(Tape)
   }
 
   /// `ContentView`'s sidebar `List(selection:)` binds directly to this (via `@Bindable`) instead
@@ -126,6 +130,45 @@ public final class SortCoordinator {
   /// button when it isn't shown.
   public func stop() {
     activeSession?.stopAutomation()
+  }
+
+  /// Selects `algorithm` and routes `tape` to whichever `ScrollingSortView.task` mounts for it
+  /// next — the "Import Tape" entry point's primitive. Deliberately synchronous, unlike
+  /// `runSort`/`runAutomation` above: those `await` a genuine completion because an App Intent
+  /// needs to report back to Shortcuts, but nothing here needs to wait on anything, so this
+  /// skips the `completions`/`beginRun`-continuation machinery entirely.
+  public func loadTape(_ tape: Tape, algorithm: any SortAlgorithm) {
+    _ = beginRun(algorithm: algorithm.id, shuffleID: nil, action: .loadTape(tape))
+  }
+
+  /// The result of `importTape(from:)` — a plain value instead of `throws`, since one of its
+  /// failure modes (`unrecognizedAlgorithm`) isn't an `Error` at all, just a `String` this build's
+  /// `AlgorithmRegistry` doesn't have an entry for.
+  public enum TapeImportResult: Sendable, Equatable {
+    case success
+    case unrecognizedAlgorithm(algorithmID: String)
+    case decodeFailed(String)
+  }
+
+  /// Decodes `data` (an exported `.tape` file's contents) and, if it names an algorithm this
+  /// build actually has registered, routes it through `loadTape(_:algorithm:)` above — keeps
+  /// `Tape`/`TapeArchiveError` entirely inside `SortEngineKit`/`SortFeature` rather than leaking
+  /// into `ContentView`, which only needs to turn a `.fileImporter` result into user-facing text.
+  public func importTape(from data: Data) -> TapeImportResult {
+    let tape: Tape
+    do {
+      tape = try Tape(archivedData: data)
+    } catch {
+      return .decodeFailed("\(error)")
+    }
+    guard
+      let algorithm = AlgorithmRegistry.shared.algorithm(
+        id: AlgorithmID(rawValue: tape.header.algorithmID))
+    else {
+      return .unrecognizedAlgorithm(algorithmID: tape.header.algorithmID)
+    }
+    loadTape(tape, algorithm: algorithm)
+    return .success
   }
 
   private func beginRun(

@@ -5,6 +5,7 @@ import SettingsFeature
 import SettingsKit
 import SortFeature
 import SwiftUI
+import UniformTypeIdentifiers
 
 /// Sidebar/content columns are generated directly from `AlgorithmRegistry.shared.algorithms(in:)`,
 /// sectioned by `AlgorithmCategory` — registering a new algorithm requires no changes to this
@@ -32,6 +33,13 @@ struct ContentView: View {
   @State private var showcaseIndex: Int?
   @State private var showcaseAlgorithmIDs: [AlgorithmID] = []
   @State private var isShowingShowcaseConfirmation = false
+
+  // Import Tape: `isImportingTape` drives the picker sheet itself; `importErrorMessage` is
+  // shown live (not logged silently) since this is a manual, interactive action, not automation
+  // — matching this app's existing "automation fails silently + self-logs, interactive flows
+  // show the error live" split.
+  @State private var isImportingTape = false
+  @State private var importErrorMessage: String?
 
   /// The sidebar's own selection. `.all` is synthetic — `AlgorithmCategory` alone has no way to
   /// say "show every algorithm regardless of category," which the content column needs as its
@@ -214,6 +222,43 @@ struct ContentView: View {
     .accessibilityIdentifier("settingsButton")
   }
 
+  private var importTapeToolbarButton: some View {
+    Button {
+      isImportingTape = true
+    } label: {
+      Image(systemName: "square.and.arrow.down")
+    }
+    .buttonBorderShape(.circle)
+    .frame(width: 36, height: 24)
+    .accessibilityIdentifier("importTapeButton")
+    .help("Import a previously exported .tape file")
+  }
+
+  /// Reads `url` (a security-scoped URL from `.fileImporter`) and hands its bytes to
+  /// `SortCoordinator.importTape(from:)`, which owns everything `Tape`-shaped (decoding,
+  /// resolving `algorithmID` against `AlgorithmRegistry`, routing through the same
+  /// "select via the same path a manual tap would use" mechanism `RunSortIntent`/Showcase mode
+  /// already establish). Every failure surfaces via `importErrorMessage` — this is a manual,
+  /// interactive action, so it gets a live error, not a silent skip.
+  private func importTape(from url: URL) {
+    let didAccess = url.startAccessingSecurityScopedResource()
+    defer { if didAccess { url.stopAccessingSecurityScopedResource() } }
+    do {
+      let data = try Data(contentsOf: url)
+      switch coordinator.importTape(from: data) {
+      case .success:
+        break
+      case .unrecognizedAlgorithm(let algorithmID):
+        importErrorMessage =
+          "This tape was recorded with an algorithm (\"\(algorithmID)\") this build doesn't recognize."
+      case .decodeFailed(let reason):
+        importErrorMessage = "Couldn't import this tape: \(reason)"
+      }
+    } catch {
+      importErrorMessage = "Couldn't read this file: \(error.localizedDescription)"
+    }
+  }
+
   private var showcaseCompletionHandler: (() -> Void)? {
     guard showcaseIndex != nil else { return nil }
     return advanceShowcase
@@ -258,11 +303,28 @@ struct ContentView: View {
     // NavigationSplitView at all.
     .toolbar {
       ToolbarItem(placement: .topBarTrailing) {
+        importTapeToolbarButton
+      }
+      ToolbarItem(placement: .topBarTrailing) {
         showcaseToolbarButton
       }
       ToolbarItem(placement: .topBarTrailing) {
         settingsToolbarButton
       }
+    }
+    .fileImporter(isPresented: $isImportingTape, allowedContentTypes: [.tapeArchive]) { result in
+      switch result {
+      case .success(let url): importTape(from: url)
+      case .failure(let error): importErrorMessage = error.localizedDescription
+      }
+    }
+    .alert(
+      "Import Failed", isPresented: Binding(
+        get: { importErrorMessage != nil }, set: { if !$0 { importErrorMessage = nil } })
+    ) {
+      Button("OK") {}
+    } message: {
+      Text(importErrorMessage ?? "")
     }
   }
 

@@ -43,21 +43,28 @@ only cosmetic mark/unmark bookkeeping — recorded stats are untouched either wa
 to manual, automated, and Showcase runs via `SortSession.startReplay`. See git history for the
 commit.
 
-1. **Binary tape export/import for a failed sort** — Small-Medium. The more tractable of the
-   deferred items: `Tape`/`TapeHeader`/`SortOperation` are already `Codable` (unused today), and
-   `ReplayEngine`'s only public initializer already takes a plain `Tape` with no opinion about
-   provenance — import is nearly free once export exists. The real work is a small versioned,
-   tag-byte-per-case binary encoder/decoder for `SortOperation` (a 12-case enum of small `Int`
-   payloads) rather than reusing `JSONEncoder`/`PropertyListEncoder`'s per-field overhead, plus a
-   hook off `SortSession.phase == .failed` to trigger the write, and a share-sheet/file-importer UI
-   pair. Self-contained — doesn't touch the renderer or replay logic.
-2. **CustomImage visualizer** — Medium. Needs an image-picker UI (`PhotosPicker`, standard
+**Also shipped: binary tape export/import.** Grew well beyond this item's original "for a failed
+sort" scope on direct request — `SortSession.Phase.failed` never actually carries a `Tape` (checked
+during design, not assumed), so export is a general, user-triggered action available whenever a
+tape exists (`.ready`/`.replaying`/`.complete`), not failure-gated. Delivered in three commits:
+(1) a real, from-scratch Swift Zstandard **encoder** for `ZstdKit` (previously decode-only) — a
+greedy LZ77 match finder, FSE-coded sequences, Huffman-compressed literals — verified against a
+real independent zstd implementation, which caught two bit-convention bugs self-round-trip alone
+couldn't see (see `COMPRESSION_DESIGN.md`); (2) `Tape.archived()`/`Tape(archivedData:)`, a binary
+archive format in `SortEngineKit` modeled on `AlgorithmDetails.algz`'s envelope but leaner (no
+dictionary section), wrapping the new encoder around a payload that's a direct structural mirror of
+`TapeHeader`'s 13 fields and `SortOperation`'s 12 cases; (3) UI wiring — an Export Tape `ShareLink`
+button in `RunControlBar`, an Import Tape toolbar button routed through `SortCoordinator` (a new
+`.loadTape` pending action, mirroring the existing App-Intents routing pattern) into
+`SortSession.loadImportedTape(_:)`. See git history for the three commits.
+
+1. **CustomImage visualizer** — Medium. Needs an image-picker UI (`PhotosPicker`, standard
    SwiftUI, low effort) and a per-pixel remap design (array value/index → pixel position — ArrayV's
    own "Custom Image" concept). `MetalShapeRenderer<Layout>` was already generalized across the
    other visualizer styles, so this becomes a 15th conformance following an established pattern
    rather than new rendering infrastructure. Deferred until the other 14 styles feel done and this
    specific novelty is worth the cost — a want-to-build-it-eventually item, not a blocked one.
-3. **Video/GIF export** — Medium-Large. Iterate `tape.operations` off-screen at a fixed frame rate
+2. **Video/GIF export** — Medium-Large. Iterate `tape.operations` off-screen at a fixed frame rate
    through whichever `Visualizer` is selected, into `ImageRenderer` → `AVAssetWriter` — reusing the
    same `VisualizationContext`/`draw(_:)` call the live UI already uses, driven by a loop instead of
    a display link, rather than a bespoke offscreen Metal texture pipeline. That reuse lowers risk,
@@ -66,7 +73,7 @@ commit.
    (pixel buffer pool, video settings, session start/finish), and — only if true animated GIF is
    wanted — `ImageIO`'s `CGImageDestination` animated-GIF path as a second encoder. Recommend
    scoping the first pass to video-only to keep this Medium rather than Large.
-4. **Teaching-mode step annotations** — Large. The engineering seam is small and already sketched:
+3. **Teaching-mode step annotations** — Large. The engineering seam is small and already sketched:
    an optional `annotation: String?` (or a small "step intent" enum) riding alongside
    `SortOperation`, surfaced by opt-in `Visualizer`s as `DrawCommand.text` captions. The actual cost
    is content/design, not code — this needs a design pass at least as involved as `ARCHITECTURE_V2.md`

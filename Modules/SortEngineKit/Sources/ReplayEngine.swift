@@ -202,7 +202,7 @@ public final class ReplayEngine {
     }
   }
 
-  private let tape: Tape
+  public let tape: Tape
   /// Every `checkpointInterval` operations, so `seek(to:)` never replays more than that many ops
   /// from the nearest one.
   private let checkpoints: [PlaybackState]

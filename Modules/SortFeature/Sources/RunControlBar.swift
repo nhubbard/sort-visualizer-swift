@@ -235,6 +235,24 @@ struct RunControlBar: View {
     .accessibilityLabel("Reset and Reshuffle")
     .help("Stop the current sort, shuffle a fresh array at this size, and sort it again (⌘R)")
 
+    if let exportDocument {
+      ShareLink(item: exportDocument, preview: SharePreview(exportDocument.suggestedFileName)) {
+        Image(systemName: "square.and.arrow.up")
+      }
+      .accessibilityIdentifier("runControlExportTapeButton")
+      .accessibilityLabel("Export Tape")
+      .help("Export this run's recorded tape as a .tape file")
+    } else {
+      Button {
+      } label: {
+        Image(systemName: "square.and.arrow.up")
+      }
+      .accessibilityIdentifier("runControlExportTapeButton")
+      .accessibilityLabel("Export Tape")
+      .help("This run's tape couldn't be archived")
+      .disabled(true)
+    }
+
     Button {
       session.soundEnabled.toggle()
     } label: {
@@ -286,6 +304,17 @@ struct RunControlBar: View {
 
   private var isFinished: Bool {
     replay.stepIndex >= replay.totalOperationCount
+  }
+
+  /// `nil` only if `Tape.archived()` itself throws — realistically only an encoder bug, since
+  /// `replay.tape` is always a real, already-recorded-or-imported value by the time this bar is
+  /// on screen. Computed fresh each body evaluation rather than cached: archiving a recording
+  /// tape (capped at `RecordingEngine`'s operation limit) is cheap enough not to need memoizing,
+  /// and re-deriving it avoids a stale copy if `replay.tape` itself ever changed underneath.
+  private var exportDocument: TapeArchiveDocument? {
+    guard let data = try? replay.tape.archived() else { return nil }
+    return TapeArchiveDocument(
+      data: data, suggestedFileName: "\(algorithm.id.rawValue)-\(session.arraySize).tape")
   }
 
   @ViewBuilder

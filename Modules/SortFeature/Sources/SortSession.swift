@@ -248,6 +248,18 @@ public final class SortSession {
     )
   }
 
+  /// Loads an externally-supplied `Tape` (from `Tape(archivedData:)`, i.e. an imported `.tape`
+  /// file) directly into `.ready`/`.replaying`, skipping `makeTape`'s live recording entirely —
+  /// `startReplay(_:)` itself has no opinion on where a `Tape` came from, so the only real
+  /// difference from `start(size:)` finishing successfully is that step.
+  public func loadImportedTape(_ tape: Tape) {
+    if case .replaying(let replay) = phase { replay.pause() }
+    arraySize = tape.header.initialValues.count
+    lastRunWasSkipped = false
+    phase = .ready(tape)
+    startReplay(tape)
+  }
+
   private func startReplay(_ tape: Tape) {
     // Automation, Showcase, and manual runs all funnel through this one method, so reading the
     // pacing mode from `settings` unconditionally (no `isAutomating` branch) applies it uniformly
