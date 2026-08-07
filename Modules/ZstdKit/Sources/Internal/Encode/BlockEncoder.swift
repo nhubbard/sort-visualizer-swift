@@ -99,7 +99,8 @@ enum BlockEncoder {
     // Full LZ77 + FSE-coded sequences — tried against a *trial* copy of `repeatOffsets` (see
     // `SequenceStreamEncoder.encode`'s doc comment for why committing it back is conditional on
     // this candidate actually winning).
-    let sequenceStore = BlockParser.parse(chunk, options: options)
+    let sequenceStore = BlockParser.parse(
+      chunk, initialRepeatOffset: repeatOffsets.offset1, options: options)
     if !sequenceStore.sequences.isEmpty,
       let sequencesResult = SequenceStreamEncoder.encode(
         sequenceStore: sequenceStore, initialRepeatOffsets: repeatOffsets)

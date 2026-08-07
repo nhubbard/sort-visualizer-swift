@@ -40,7 +40,7 @@
 /// Matches are restricted to *within* the buffer it's constructed over (one block at a time,
 /// never referencing a previous block) — a deliberate simplification: correct, if conservative,
 /// since `SequenceExecutor` never requires cross-block matches, it just allows them.
-final class MatchFinder {
+final class MatchFinder: MatchFinding {
   private let input: [UInt8]
   private let hashLog: Int
   private let hashMask: Int
@@ -79,41 +79,6 @@ final class MatchFinder {
     }
   }
 
-  /// The `ZSTD_count` mirror: how many consecutive bytes starting at `a` and `b` agree, via
-  /// `UInt64` XOR + `trailingZeroBitCount` (a wide-scalar trick, not SIMD — see
-  /// `COMPRESSION_DESIGN.md`'s honest accounting of where this encoder does and doesn't use real
-  /// vector hardware). `b < a` always (candidates only ever come from already-inserted, strictly
-  /// earlier positions), but the byte-level comparison itself is safe (and correct — including the
-  /// `offset < matchLength` overlapping/self-referential case, e.g. runs of one repeated byte)
-  /// however far it extends, since `input` is a complete, static, already-fully-known buffer, not
-  /// a growing output needing copy-on-write aliasing care the way `MatchCopier`'s decode-side
-  /// output buffer does.
-  private func matchLength(_ a: Int, _ b: Int) -> Int {
-    let limit = input.count
-    var length = 0
-    while a + length + 8 <= limit {
-      let wordA = readUInt64LE(a + length)
-      let wordB = readUInt64LE(b + length)
-      let diff = wordA ^ wordB
-      if diff != 0 {
-        return length + diff.trailingZeroBitCount / 8
-      }
-      length += 8
-    }
-    while a + length < limit, input[a + length] == input[b + length] {
-      length += 1
-    }
-    return length
-  }
-
-  private func readUInt64LE(_ position: Int) -> UInt64 {
-    var value: UInt64 = 0
-    for index in 0..<8 {
-      value |= UInt64(input[position + index]) << (8 * index)
-    }
-    return value
-  }
-
   /// Searches for the best (longest) match at `ip` among up to `maxAttempts` chained candidates
   /// sharing its hash, then inserts `ip` itself for future searches. Returns `nil` if nothing
   /// found meeting `minMatch`.
@@ -130,7 +95,7 @@ final class MatchFinder {
     var bestLength = 0
     var bestPosition = -1
     while candidate >= 0, attempts < maxAttempts {
-      let length = matchLength(ip, candidate)
+      let length = wideWordMatchLength(in: input, ip, candidate)
       if length > bestLength {
         bestLength = length
         bestPosition = candidate

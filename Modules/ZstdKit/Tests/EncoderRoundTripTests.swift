@@ -144,4 +144,54 @@ struct EncoderRoundTripTests {
     let second = try Zstd.compress(input)
     #expect(first == second)
   }
+
+  @Test(arguments: [0, 1, 2])
+  func everySearchDepthRoundTripsARepeatedPattern(searchDepth: Int) throws {
+    let pattern = "The quick brown fox jumps over the lazy dog. "
+    let input = Data(String(repeating: pattern, count: 500).utf8)
+    let options = ZstdEncodingOptions(searchDepth: searchDepth)
+    let compressed = try Zstd.compress(input, options: options)
+    let decompressed = try Zstd.decompress(compressed)
+    #expect(decompressed == input)
+  }
+
+  /// The direct, engineered proof that `searchDepth >= 1` does real work, not just plumbing: a
+  /// greedy (`searchDepth: 0`) pass takes an immediate length-4 match at `ip`, capped by
+  /// construction so it can't extend further, while a length-39 match to a much earlier position
+  /// is available starting exactly one byte later — `depth >= 1` must wait for it. `decoySource`
+  /// (`[x] + long[1...3]`, positions 40-43) is a real, independent earlier occurrence of the same
+  /// 4-gram the immediate match at the test region's `x` byte finds; `afterDecoyByte` deliberately
+  /// differs from `long[4]` so referencing `decoySource` can never extend past 4 bytes by
+  /// accident, keeping the "immediate" candidate's length pinned at exactly 4 regardless of
+  /// anything else in this construction.
+  @Test
+  func lazyMatchingChoosesALongerMatchOverAnImmediateShortOne() throws {
+    let long: [UInt8] = (0..<40).map { UInt8(20 + ($0 * 37) % 200) }
+    let x: UInt8 = 250
+    var input: [UInt8] = long  // positions 0-39
+    input.append(x)  // position 40
+    input.append(contentsOf: long[1...3])  // positions 41-43
+    let afterDecoyByte: UInt8 = long[4] == 255 ? long[4] - 1 : long[4] + 1
+    input.append(afterDecoyByte)  // position 44
+    input.append(contentsOf: [1, 2, 3, 4, 5])  // filler, positions 45-49
+    input.append(x)  // position 50 (== test region start)
+    input.append(contentsOf: long[1...])  // positions 51-89
+
+    let greedyStore = BlockParser.parse(input, options: ZstdEncodingOptions(searchDepth: 0))
+    #expect(greedyStore.sequences.first?.matchLength == 4, "greedy should take the immediate short match")
+
+    let lazyStore = BlockParser.parse(input, options: ZstdEncodingOptions(searchDepth: 1))
+    #expect(
+      lazyStore.sequences.first?.matchLength == 39,
+      "depth >= 1 should find the longer match one byte later instead")
+
+    let greedyCompressed = try Zstd.compress(Data(input), options: ZstdEncodingOptions(searchDepth: 0))
+    let lazyCompressed = try Zstd.compress(Data(input), options: ZstdEncodingOptions(searchDepth: 2))
+    #expect(
+      lazyCompressed.count < greedyCompressed.count,
+      "lazy2 should compress this input strictly better than greedy")
+
+    #expect(try Zstd.decompress(greedyCompressed) == Data(input))
+    #expect(try Zstd.decompress(lazyCompressed) == Data(input))
+  }
 }
