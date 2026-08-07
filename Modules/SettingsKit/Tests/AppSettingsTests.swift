@@ -20,6 +20,9 @@ struct AppSettingsTests {
     let settings = AppSettings(store: makeIsolatedStore())
     #expect(settings.selectedVisualizerID == VisualizerID(rawValue: "bargraph"))
     #expect(settings.playbackSpeed == 30.0)
+    #expect(settings.useFixedDurationPacing == false)
+    #expect(settings.targetPlaybackDuration == 10.0)
+    #expect(settings.compactPlaybackForFixedDuration == false)
     #expect(settings.soundEnabled == false)
     #expect(settings.synthNoteRange == 36...72)
     #expect(settings.defaultArraySize == 256)
@@ -34,6 +37,9 @@ struct AppSettingsTests {
     let first = AppSettings(store: store)
     first.selectedVisualizerID = VisualizerID(rawValue: "rainbow")
     first.playbackSpeed = 75.0
+    first.useFixedDurationPacing = true
+    first.targetPlaybackDuration = 15.0
+    first.compactPlaybackForFixedDuration = true
     first.soundEnabled = false
     first.synthNoteRange = 24...96
     first.defaultArraySize = 128
@@ -44,6 +50,9 @@ struct AppSettingsTests {
     let second = AppSettings(store: store)
     #expect(second.selectedVisualizerID == VisualizerID(rawValue: "rainbow"))
     #expect(second.playbackSpeed == 75.0)
+    #expect(second.useFixedDurationPacing == true)
+    #expect(second.targetPlaybackDuration == 15.0)
+    #expect(second.compactPlaybackForFixedDuration == true)
     #expect(second.soundEnabled == false)
     #expect(second.synthNoteRange == 24...96)
     #expect(second.defaultArraySize == 128)

@@ -151,8 +151,28 @@ public final class ReplayEngine {
 
   /// Operations per second — a live knob, not a one-shot parameter: `play()`'s loop re-reads
   /// this on every iteration, so a caller (e.g. a run-control slider) can change it while
-  /// replay is in progress and see the cadence change on the very next step.
+  /// replay is in progress and see the cadence change on the very next step. Only consulted when
+  /// `useFixedDurationPacing` is `false`.
   public var speed: Double = 30.0
+
+  /// Mode switch, live like `speed` — when `true`, `play()` paces against `targetDuration`
+  /// instead of a flat `speed`, recomputing the required rate every tick from how much
+  /// significant work and wall-clock time actually remain (see `play()`'s tick loop), so a run's
+  /// length converges on `targetDuration` regardless of tape size or per-tick overhead, rather
+  /// than approximating it from one upfront number.
+  public var useFixedDurationPacing: Bool = false
+
+  /// Target wall-clock length for the whole replay. Only consulted when `useFixedDurationPacing`
+  /// is `true`.
+  public var targetDuration: Double = 10.0
+
+  /// The rate actually being applied as of the most recent tick — equal to `speed` in the flat
+  /// mode, but the freshly recomputed deadline rate in fixed-duration mode (where `speed` itself
+  /// stays an unrelated stored value). Updated once per tick (not per operation), so callers that
+  /// need "the current cadence" for something other than the tick loop itself — e.g. sizing an
+  /// audio note's hold duration in `SortSession.makeOnStepClosure` — read the real rate regardless
+  /// of pacing mode, instead of `speed`, which is meaningless while fixed-duration pacing is on.
+  public private(set) var currentPacingRate: Double = 30.0
 
   /// So consumers (e.g. Metal layouts, for `colorSeed`) can read tape metadata without
   /// `ReplayEngine` handing out the operations array itself.
@@ -298,6 +318,25 @@ public final class ReplayEngine {
     return ops
   }
 
+  /// The pacing rate to feed `opsToApply` this tick. `false` (`useFixedDurationPacing`) just
+  /// passes `speed` through unchanged — today's flat-rate behavior. `true` recomputes a deadline
+  /// rate every tick from how much significant work and wall-clock time actually remain, rather
+  /// than a single rate computed once up front: if a tick runs slow for any reason,
+  /// `elapsedPlaybackDuration` (real time) advances by that same amount regardless of how much
+  /// work got done, so `remainingTime` shrinks and the next tick's rate rises to compensate —
+  /// self-correcting toward `targetDuration` instead of drifting from a stale estimate. Flooring
+  /// `remainingTime` (rather than special-casing "deadline passed") means at or past the deadline
+  /// this naturally returns a huge rate that `opsToApply`'s own `min(Int(accumulator), remaining)`
+  /// clamp saturates to "apply everything left this tick" — no separate catch-up path needed.
+  static func effectiveSpeed(
+    speed: Double, useFixedDurationPacing: Bool, targetDuration: Double,
+    remainingSignificantOperationCount: Int, elapsedPlaybackDuration: TimeInterval
+  ) -> Double {
+    guard useFixedDurationPacing else { return speed }
+    let remainingTime = max(targetDuration - elapsedPlaybackDuration, 0.001)
+    return Double(remainingSignificantOperationCount) / remainingTime
+  }
+
   /// Returns the playback `Task` so callers (e.g. `SortSession`) can `await` its completion
   /// instead of polling `isPlaying`.
   ///
@@ -322,6 +361,11 @@ public final class ReplayEngine {
     isPlaying = true
     currentSegmentStart = Date()
 
+    // Computed once per `play()` call (not per tick — this scans the whole tape) so the
+    // fixed-duration branch below only ever needs an O(1) subtraction against the live
+    // `state.significantOperationCount` counter to know how much work remains.
+    let totalSignificantOperationCount = tape.significantOperationCount
+
     let driver = displayLinkFactory()
     activeDriver = driver
     let (stream, continuation) = AsyncStream<TimeInterval>.makeStream()
@@ -335,8 +379,17 @@ public final class ReplayEngine {
         guard remaining > 0 else { break }
         let sortStartIndex = self.tape.header.sortStartIndex
 
+        let effectiveSpeed = Self.effectiveSpeed(
+          speed: self.speed,
+          useFixedDurationPacing: self.useFixedDurationPacing,
+          targetDuration: self.targetDuration,
+          remainingSignificantOperationCount:
+            max(0, totalSignificantOperationCount - self.state.significantOperationCount),
+          elapsedPlaybackDuration: self.elapsedPlaybackDuration
+        )
+        self.currentPacingRate = effectiveSpeed
         let opsToApply = Self.opsToApply(
-          elapsed: elapsed, speed: self.speed, accumulator: &accumulator, remaining: remaining
+          elapsed: elapsed, speed: effectiveSpeed, accumulator: &accumulator, remaining: remaining
         )
         guard opsToApply > 0 else { continue }
 

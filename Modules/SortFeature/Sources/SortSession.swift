@@ -249,8 +249,16 @@ public final class SortSession {
   }
 
   private func startReplay(_ tape: Tape) {
-    let replay = replayEngineFactory(tape)
+    // Automation, Showcase, and manual runs all funnel through this one method, so reading the
+    // pacing mode from `settings` unconditionally (no `isAutomating` branch) applies it uniformly
+    // to all three, as intended — see IMPLEMENTATION_PLAN.md Phase 12 item 1.
+    let playbackTape =
+      settings.useFixedDurationPacing && settings.compactPlaybackForFixedDuration
+      ? tape.compactedForFastPlayback() : tape
+    let replay = replayEngineFactory(playbackTape)
     replay.speed = settings.playbackSpeed
+    replay.useFixedDurationPacing = settings.useFixedDurationPacing
+    replay.targetDuration = settings.targetPlaybackDuration
     phase = .replaying(replay)
     lastReplay = replay
     beginPlayback(replay)
@@ -279,9 +287,24 @@ public final class SortSession {
       // cached from an earlier tick — so this reflects the real elapsed wall-clock up to
       // this instant regardless of anything else that might read `elapsedPlaybackDuration`
       // afterward (e.g. `RunControlBar`, still displaying `.complete` state).
+      // `replay.speed` is the exact value the user configured and is what fixed-rate mode
+      // actually paces against, so it stays the recorded number there — same as before this
+      // feature. In fixed-duration mode `speed` is inert (see `ReplayEngine.currentPacingRate`'s
+      // doc comment), so record the true achieved average instead
+      // (`significantOperationCount / elapsedPlaybackDuration`, matching what `RunControlBar`'s
+      // own "ops/sec" stat already computes) rather than a meaningless stored number.
+      let recordedSpeed: Double
+      if replay.useFixedDurationPacing {
+        recordedSpeed =
+          replay.elapsedPlaybackDuration > 0
+          ? Double(replay.significantOperationCount) / replay.elapsedPlaybackDuration
+          : replay.speed
+      } else {
+        recordedSpeed = replay.speed
+      }
       try? await self.analytics.record(
         replay.header, algorithmID: self.algorithm.id,
-        playbackDuration: replay.elapsedPlaybackDuration, playbackSpeed: replay.speed
+        playbackDuration: replay.elapsedPlaybackDuration, playbackSpeed: recordedSpeed
       )
       let continuations = self.completionContinuations
       self.completionContinuations = []
@@ -420,13 +443,16 @@ public final class SortSession {
   /// One note per touched index, keyed on that index's **current** value (post-operation) —
   /// matches v1's "play a note per touched index" behavior (`compare`/`swap` both play both
   /// indices; `setValue` plays the one it touched), but pitch tracks value, not index (§3.1).
-  /// Reads `soundEnabled`/`replay.speed` live on every call (both are `weak`/reference-captured),
-  /// so toggling sound or adjusting speed mid-replay takes effect on the very next operation.
+  /// Reads `soundEnabled`/`replay.currentPacingRate` live on every call (both are
+  /// `weak`/reference-captured), so toggling sound or adjusting speed mid-replay takes effect on
+  /// the very next operation. `currentPacingRate`, not `speed` — `speed` is meaningless while
+  /// `useFixedDurationPacing` is on (see `ReplayEngine.currentPacingRate`'s doc comment), and notes
+  /// need to track the actual cadence either way.
   private func makeOnStepClosure(for replay: ReplayEngine) -> (SortOperation) -> Void {
     let audio = self.audio
     return { [weak self, weak replay] operation in
       guard let self, self.soundEnabled, let replay else { return }
-      let holdSeconds = max(1.0 / replay.speed, 0.03)
+      let holdSeconds = max(1.0 / replay.currentPacingRate, 0.03)
       let range = 1...replay.frame.count
       switch operation {
       case .compare(let i, let j), .swap(let i, let j):

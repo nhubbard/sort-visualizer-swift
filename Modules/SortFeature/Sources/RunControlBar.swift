@@ -251,12 +251,18 @@ struct RunControlBar: View {
     Button {
       isSpeedExpanded.toggle()
     } label: {
-      Text("\(Int(replay.speed))/s")
-        .font(.footnote.monospacedDigit())
+      Text(
+        replay.useFixedDurationPacing
+          ? "\(Int(replay.targetDuration))s" : "\(Int(replay.speed))/s"
+      )
+      .font(.footnote.monospacedDigit())
     }
     .accessibilityIdentifier("runControlSpeedButton")
-    .accessibilityLabel("Playback Speed")
-    .help("Show or hide the playback speed slider (⌘⇧+/− by 1, ⌘⌥+/− by 10)")
+    .accessibilityLabel(replay.useFixedDurationPacing ? "Target Duration" : "Playback Speed")
+    .help(
+      replay.useFixedDurationPacing
+        ? "Show or hide the target duration slider"
+        : "Show or hide the playback speed slider (⌘⇧+/− by 1, ⌘⌥+/− by 10)")
 
     Button {
       isSizeExpanded.toggle()
@@ -282,21 +288,40 @@ struct RunControlBar: View {
     replay.stepIndex >= replay.totalOperationCount
   }
 
+  @ViewBuilder
   private var speedRow: some View {
-    HStack(spacing: 8) {
-      Text("Slow")
-        .font(.caption)
-        .foregroundStyle(.secondary)
-      Slider(value: $replay.speed, in: 1...1000, step: 1)
-        .accessibilityIdentifier("runControlSpeedSlider")
-      Text("Fast")
-        .font(.caption)
-        .foregroundStyle(.secondary)
-      Text("target: \(Int(replay.speed)) ops/sec")
-        .font(.caption.monospacedDigit())
-        .foregroundStyle(.secondary)
-        .frame(minWidth: 120, alignment: .trailing)
-        .accessibilityIdentifier("runControlSpeedValueLabel")
+    if replay.useFixedDurationPacing {
+      HStack(spacing: 8) {
+        Text("1s")
+          .font(.caption)
+          .foregroundStyle(.secondary)
+        Slider(value: $replay.targetDuration, in: 1...120, step: 1)
+          .accessibilityIdentifier("runControlDurationSlider")
+        Text("120s")
+          .font(.caption)
+          .foregroundStyle(.secondary)
+        Text("target: \(Int(replay.targetDuration))s")
+          .font(.caption.monospacedDigit())
+          .foregroundStyle(.secondary)
+          .frame(minWidth: 120, alignment: .trailing)
+          .accessibilityIdentifier("runControlSpeedValueLabel")
+      }
+    } else {
+      HStack(spacing: 8) {
+        Text("Slow")
+          .font(.caption)
+          .foregroundStyle(.secondary)
+        Slider(value: $replay.speed, in: 1...1000, step: 1)
+          .accessibilityIdentifier("runControlSpeedSlider")
+        Text("Fast")
+          .font(.caption)
+          .foregroundStyle(.secondary)
+        Text("target: \(Int(replay.speed)) ops/sec")
+          .font(.caption.monospacedDigit())
+          .foregroundStyle(.secondary)
+          .frame(minWidth: 120, alignment: .trailing)
+          .accessibilityIdentifier("runControlSpeedValueLabel")
+      }
     }
   }
 

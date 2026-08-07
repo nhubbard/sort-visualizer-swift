@@ -263,6 +263,60 @@ struct ReplayEngineTests {
   }
 
   @Test
+  func effectiveSpeedPassesSpeedThroughUnchangedWhenFixedDurationPacingIsOff() {
+    let rate = ReplayEngine.effectiveSpeed(
+      speed: 42, useFixedDurationPacing: false, targetDuration: 10,
+      remainingSignificantOperationCount: 1000, elapsedPlaybackDuration: 3)
+    #expect(rate == 42)
+  }
+
+  @Test
+  func effectiveSpeedDividesRemainingWorkByRemainingTimeWhenOn() {
+    // 5s target, 2s elapsed -> 3s remaining; 300 significant ops remaining -> 100 ops/sec due.
+    let rate = ReplayEngine.effectiveSpeed(
+      speed: 1000, useFixedDurationPacing: true, targetDuration: 5,
+      remainingSignificantOperationCount: 300, elapsedPlaybackDuration: 2)
+    #expect(rate == 100)
+  }
+
+  /// The self-correcting property the deadline controller depends on: if two runs have the
+  /// *same* remaining work but one has already burned more of its time budget (a slow tick, or
+  /// simply more wall-clock having passed), the one with less time left must compute a higher
+  /// rate — this is what makes the run converge on `targetDuration` rather than drift from a
+  /// stale one-shot estimate.
+  @Test
+  func effectiveSpeedRisesAsElapsedTimeEatsIntoTheBudget() {
+    let earlyRate = ReplayEngine.effectiveSpeed(
+      speed: 1000, useFixedDurationPacing: true, targetDuration: 10,
+      remainingSignificantOperationCount: 500, elapsedPlaybackDuration: 1)
+    let lateRate = ReplayEngine.effectiveSpeed(
+      speed: 1000, useFixedDurationPacing: true, targetDuration: 10,
+      remainingSignificantOperationCount: 500, elapsedPlaybackDuration: 8)
+    #expect(lateRate > earlyRate)
+  }
+
+  /// At or past the deadline, the controller must not divide by zero or go negative — it should
+  /// instead saturate to an enormous rate, which `opsToApply`'s own `remaining` clamp then turns
+  /// into "apply everything left this tick," guaranteeing the run can't hang past its deadline
+  /// waiting on a rate that never arrives.
+  @Test
+  func effectiveSpeedSaturatesAtOrPastTheDeadlineInsteadOfDividingByZero() {
+    let atDeadline = ReplayEngine.effectiveSpeed(
+      speed: 1000, useFixedDurationPacing: true, targetDuration: 10,
+      remainingSignificantOperationCount: 5000, elapsedPlaybackDuration: 10)
+    let pastDeadline = ReplayEngine.effectiveSpeed(
+      speed: 1000, useFixedDurationPacing: true, targetDuration: 10,
+      remainingSignificantOperationCount: 5000, elapsedPlaybackDuration: 15)
+    #expect(atDeadline > 100_000)
+    #expect(pastDeadline > 100_000)
+
+    var accumulator = 0.0
+    let ops = ReplayEngine.opsToApply(
+      elapsed: 1.0 / 60, speed: atDeadline, accumulator: &accumulator, remaining: 5000)
+    #expect(ops == 5000)
+  }
+
+  @Test
   func auxArraysCreateWriteAndDeleteAcrossReplay() {
     let tape = makeTape(
       initialValues: [1, 2],

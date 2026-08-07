@@ -21,6 +21,27 @@ public final class AppSettings {
     didSet { store.set(playbackSpeed, forKey: Keys.playbackSpeed) }
   }
 
+  /// Mode switch: `false` (default) keeps `playbackSpeed`'s flat ops/sec behavior exactly as
+  /// today. `true` switches every new replay (manual, automation, or Showcase — `SortSession
+  /// .startReplay` reads this unconditionally) to pace against `targetPlaybackDuration` instead,
+  /// so a run's animated length stays roughly constant regardless of how large its tape is.
+  public var useFixedDurationPacing: Bool {
+    didSet { store.set(useFixedDurationPacing, forKey: Keys.useFixedDurationPacing) }
+  }
+
+  /// Only consulted when `useFixedDurationPacing` is `true`.
+  public var targetPlaybackDuration: Double {
+    didSet { store.set(targetPlaybackDuration, forKey: Keys.targetPlaybackDuration) }
+  }
+
+  /// Optional refinement on top of `useFixedDurationPacing`: drops purely-cosmetic
+  /// mark/unmark bookkeeping from the replay-only tape copy so the target duration is easier to
+  /// hit cleanly. Never affects `TapeHeader`'s recorded operation-count stats — see
+  /// `Tape.compactedForFastPlayback()`.
+  public var compactPlaybackForFixedDuration: Bool {
+    didSet { store.set(compactPlaybackForFixedDuration, forKey: Keys.compactPlaybackForFixedDuration) }
+  }
+
   public var soundEnabled: Bool {
     didSet { store.set(soundEnabled, forKey: Keys.soundEnabled) }
   }
@@ -55,6 +76,9 @@ public final class AppSettings {
   private enum Keys {
     static let selectedVisualizerID = "selectedVisualizerID"
     static let playbackSpeed = "playbackSpeed"
+    static let useFixedDurationPacing = "useFixedDurationPacing"
+    static let targetPlaybackDuration = "targetPlaybackDuration"
+    static let compactPlaybackForFixedDuration = "compactPlaybackForFixedDuration"
     static let soundEnabled = "soundEnabled"
     static let synthLowNote = "synthLowNote"
     static let synthHighNote = "synthHighNote"
@@ -71,6 +95,9 @@ public final class AppSettings {
     store.register(defaults: [
       Keys.selectedVisualizerID: "bargraph",
       Keys.playbackSpeed: 30.0,
+      Keys.useFixedDurationPacing: false,
+      Keys.targetPlaybackDuration: 10.0,
+      Keys.compactPlaybackForFixedDuration: false,
       // Off by default — real audio now plays through ScrollingSortView (ToneKit-backed
       // AudioService.shared, see Modules/ToneKit/NOTICE.md), and a brand-new user shouldn't
       // have sound start playing on their very first sort without having chosen it.
@@ -88,6 +115,9 @@ public final class AppSettings {
     selectedVisualizerID = VisualizerID(
       rawValue: store.string(forKey: Keys.selectedVisualizerID) ?? "bargraph")
     playbackSpeed = store.double(forKey: Keys.playbackSpeed)
+    useFixedDurationPacing = store.bool(forKey: Keys.useFixedDurationPacing)
+    targetPlaybackDuration = store.double(forKey: Keys.targetPlaybackDuration)
+    compactPlaybackForFixedDuration = store.bool(forKey: Keys.compactPlaybackForFixedDuration)
     soundEnabled = store.bool(forKey: Keys.soundEnabled)
     synthNoteRange =
       store.integer(forKey: Keys.synthLowNote)...store.integer(forKey: Keys.synthHighNote)
@@ -108,6 +138,9 @@ public final class AppSettings {
   public func resetToDefaults() {
     selectedVisualizerID = VisualizerID(rawValue: "bargraph")
     playbackSpeed = 30.0
+    useFixedDurationPacing = false
+    targetPlaybackDuration = 10.0
+    compactPlaybackForFixedDuration = false
     soundEnabled = false
     synthNoteRange = 36...72
     defaultArraySize = 256

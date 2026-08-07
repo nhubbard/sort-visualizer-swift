@@ -33,20 +33,17 @@ reasoning. Ordered least to most effort, using the concrete seams named below an
 current code (`SortSession.swift`, `ReplayEngine.swift`, `RunControlBar.swift`). None of these block
 each other, and each lands as its own commit as it's built, not a grab-bag.
 
-1. **Target-duration-based playback pacing** — Small. Replace the flat ops/sec `playbackSpeed`
-   with a per-run computed rate (`significantOperationCount / targetDuration`), so every sort takes
-   roughly the same wall-clock time regardless of how many operations it needs — the effect
-   ArrayV's own showcase mode achieves. Architecturally cheap: `SortSession.swift:253` sets
-   `replay.speed = settings.playbackSpeed` once per run inside `startReplay(_:)`, and
-   `ReplayEngine.significantOperationCount` is already tracked live (surfaced today only as a
-   displayed ops/sec stat in `RunControlBar.swift:131`) — the full tape (and its exact operation
-   count) is already known before that seed point, so this is close to a one-line change there, not
-   a rewrite; sustained operation-apply throughput is already proven fine at the rates this would
-   need. Open questions before building it: pace against `significantOperationCount` (what the
-   existing ops/sec budget already filters to), not raw tape length; and whether this replaces the
-   manual speed slider globally or is scoped to Showcase mode only, where "every algorithm takes
-   about the same time" is actually the point.
-2. **Binary tape export/import for a failed sort** — Small-Medium. The more tractable of the
+**Shipped since this list was last updated: fixed-duration playback pacing.** Landed as a
+user-facing pacing *mode* (`AppSettings.useFixedDurationPacing`/`targetPlaybackDuration`, an
+alternative to the default ops/sec mode rather than a replacement for it — resolving this item's own
+open question) with an adaptive per-tick deadline controller in `ReplayEngine` (recomputes the
+required rate every tick from real remaining time and remaining significant work, rather than a
+one-shot estimate) and an optional tape-compaction knob (`compactPlaybackForFixedDuration`, drops
+only cosmetic mark/unmark bookkeeping — recorded stats are untouched either way). Applies uniformly
+to manual, automated, and Showcase runs via `SortSession.startReplay`. See git history for the
+commit.
+
+1. **Binary tape export/import for a failed sort** — Small-Medium. The more tractable of the
    deferred items: `Tape`/`TapeHeader`/`SortOperation` are already `Codable` (unused today), and
    `ReplayEngine`'s only public initializer already takes a plain `Tape` with no opinion about
    provenance — import is nearly free once export exists. The real work is a small versioned,
@@ -54,13 +51,13 @@ each other, and each lands as its own commit as it's built, not a grab-bag.
    payloads) rather than reusing `JSONEncoder`/`PropertyListEncoder`'s per-field overhead, plus a
    hook off `SortSession.phase == .failed` to trigger the write, and a share-sheet/file-importer UI
    pair. Self-contained — doesn't touch the renderer or replay logic.
-3. **CustomImage visualizer** — Medium. Needs an image-picker UI (`PhotosPicker`, standard
+2. **CustomImage visualizer** — Medium. Needs an image-picker UI (`PhotosPicker`, standard
    SwiftUI, low effort) and a per-pixel remap design (array value/index → pixel position — ArrayV's
    own "Custom Image" concept). `MetalShapeRenderer<Layout>` was already generalized across the
    other visualizer styles, so this becomes a 15th conformance following an established pattern
    rather than new rendering infrastructure. Deferred until the other 14 styles feel done and this
    specific novelty is worth the cost — a want-to-build-it-eventually item, not a blocked one.
-4. **Video/GIF export** — Medium-Large. Iterate `tape.operations` off-screen at a fixed frame rate
+3. **Video/GIF export** — Medium-Large. Iterate `tape.operations` off-screen at a fixed frame rate
    through whichever `Visualizer` is selected, into `ImageRenderer` → `AVAssetWriter` — reusing the
    same `VisualizationContext`/`draw(_:)` call the live UI already uses, driven by a loop instead of
    a display link, rather than a bespoke offscreen Metal texture pipeline. That reuse lowers risk,
@@ -69,7 +66,7 @@ each other, and each lands as its own commit as it's built, not a grab-bag.
    (pixel buffer pool, video settings, session start/finish), and — only if true animated GIF is
    wanted — `ImageIO`'s `CGImageDestination` animated-GIF path as a second encoder. Recommend
    scoping the first pass to video-only to keep this Medium rather than Large.
-5. **Teaching-mode step annotations** — Large. The engineering seam is small and already sketched:
+4. **Teaching-mode step annotations** — Large. The engineering seam is small and already sketched:
    an optional `annotation: String?` (or a small "step intent" enum) riding alongside
    `SortOperation`, surfaced by opt-in `Visualizer`s as `DrawCommand.text` captions. The actual cost
    is content/design, not code — this needs a design pass at least as involved as `ARCHITECTURE_V2.md`

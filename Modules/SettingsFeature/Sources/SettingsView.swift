@@ -30,27 +30,57 @@ public struct SettingsView: View {
         .accessibilityIdentifier("shufflePicker")
       }
       Section {
-        Slider(value: $settings.playbackSpeed, in: 1...1000, step: 1) {
-          Text("Speed")
-        } minimumValueLabel: {
-          Text("Slow")
-        } maximumValueLabel: {
-          Text("Fast")
+        Picker("Pacing Mode", selection: $settings.useFixedDurationPacing) {
+          Text("Fixed Rate").tag(false)
+          Text("Fixed Duration").tag(true)
         }
-        .accessibilityIdentifier("playbackSpeedSlider")
-        Text("\(Int(settings.playbackSpeed)) operations/second")
-          .font(.caption)
-          .foregroundStyle(.secondary)
+        .pickerStyle(.segmented)
+        .accessibilityIdentifier("pacingModePicker")
+
+        if settings.useFixedDurationPacing {
+          Slider(value: $settings.targetPlaybackDuration, in: 1...120, step: 1) {
+            Text("Duration")
+          } minimumValueLabel: {
+            Text("1s")
+          } maximumValueLabel: {
+            Text("120s")
+          }
+          .accessibilityIdentifier("targetPlaybackDurationSlider")
+          Text("\(Int(settings.targetPlaybackDuration))s per run")
+            .font(.caption)
+            .foregroundStyle(.secondary)
+
+          Toggle("Compact for Fast Playback", isOn: $settings.compactPlaybackForFixedDuration)
+            .accessibilityIdentifier("compactPlaybackToggle")
+        } else {
+          Slider(value: $settings.playbackSpeed, in: 1...1000, step: 1) {
+            Text("Speed")
+          } minimumValueLabel: {
+            Text("Slow")
+          } maximumValueLabel: {
+            Text("Fast")
+          }
+          .accessibilityIdentifier("playbackSpeedSlider")
+          Text("\(Int(settings.playbackSpeed)) operations/second")
+            .font(.caption)
+            .foregroundStyle(.secondary)
+        }
       } header: {
         Text("Default Playback Speed")
       } footer: {
-        // Seeds every new sort screen's starting speed (SortSession.startReplay) — the
-        // run-control bar's own speed slider still governs an already-running sort live,
-        // matching every other per-run-vs-global split on this screen (visualizer/shuffle
+        // Seeds every new sort screen's starting pacing (SortSession.startReplay) — the
+        // run-control bar's own speed/duration control still governs an already-running sort
+        // live, matching every other per-run-vs-global split on this screen (visualizer/shuffle
         // choice are global too, but sound and start/stop are per-run).
         Text(
-          "Applies to sorts you open after changing this. "
-            + "Adjust an already-running sort from its own speed control."
+          settings.useFixedDurationPacing
+            ? "Every run is paced to finish in about this many seconds, regardless of tape "
+              + "size — this replaces the manual ops/sec speed while active. Compaction "
+              + "optionally drops cosmetic highlight flicker to help hit the target more "
+              + "cleanly; operation-count stats are always exact either way. Applies to sorts "
+              + "you open after changing this."
+            : "Applies to sorts you open after changing this. "
+              + "Adjust an already-running sort from its own speed control."
         )
       }
       Section("Sound") {
@@ -74,7 +104,7 @@ public struct SettingsView: View {
           step: 50_000
         )
         .accessibilityIdentifier("recordingOperationCapStepper")
-        Text("≈ \(recordingCapMinutesText) at the current playback speed")
+        Text(recordingCapEstimateText)
           .font(.caption)
           .foregroundStyle(.secondary)
       } header: {
@@ -116,8 +146,15 @@ public struct SettingsView: View {
     }
   }
 
-  private var recordingCapMinutesText: String {
+  // The ops/sec-based minutes estimate doesn't apply in fixed-duration mode, where every run is
+  // already paced to land at `targetPlaybackDuration` regardless of tape size — show that target
+  // directly instead of a stale rate-based projection.
+  private var recordingCapEstimateText: String {
+    if settings.useFixedDurationPacing {
+      return "≈ \(Int(settings.targetPlaybackDuration))s per run at the fixed-duration target"
+    }
     let minutes = Double(settings.recordingOperationCap) / settings.playbackSpeed / 60
-    return minutes.formatted(.number.precision(.fractionLength(1))) + " min"
+    return "≈ " + minutes.formatted(.number.precision(.fractionLength(1)))
+      + " min at the current playback speed"
   }
 }

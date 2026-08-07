@@ -89,14 +89,18 @@ struct SortCommands: Commands {
 
       Divider()
 
-      Button("Increase Speed") { bumpSpeed(by: 1) }
+      Button(isFixedDurationPacing ? "Increase Duration" : "Increase Speed") { bumpPacing(by: 1) }
         .keyboardShortcut("+", modifiers: [.command, .shift])
-      Button("Decrease Speed") { bumpSpeed(by: -1) }
+      Button(isFixedDurationPacing ? "Decrease Duration" : "Decrease Speed") { bumpPacing(by: -1) }
         .keyboardShortcut("-", modifiers: [.command, .shift])
-      Button("Increase Speed ×10") { bumpSpeed(by: 10) }
-        .keyboardShortcut("+", modifiers: [.command, .option])
-      Button("Decrease Speed ×10") { bumpSpeed(by: -10) }
-        .keyboardShortcut("-", modifiers: [.command, .option])
+      Button(isFixedDurationPacing ? "Increase Duration ×10" : "Increase Speed ×10") {
+        bumpPacing(by: 10)
+      }
+      .keyboardShortcut("+", modifiers: [.command, .option])
+      Button(isFixedDurationPacing ? "Decrease Duration ×10" : "Decrease Speed ×10") {
+        bumpPacing(by: -10)
+      }
+      .keyboardShortcut("-", modifiers: [.command, .option])
 
       Divider()
 
@@ -107,16 +111,32 @@ struct SortCommands: Commands {
     }
   }
 
-  /// Same clamp range `RunControlBar`'s speed slider enforces (1...1000) — fires a rigid haptic
-  /// instead of moving `replay.speed` when the bump would have no effect, so hitting the ceiling/
-  /// floor repeatedly is felt rather than silently swallowed.
-  private func bumpSpeed(by delta: Double) {
+  private var isFixedDurationPacing: Bool {
+    SortCoordinator.shared.activeSortSession?.lastReplay?.useFixedDurationPacing ?? false
+  }
+
+  /// Bumps whichever knob is actually live for the current pacing mode — `replay.speed` (same
+  /// clamp `RunControlBar`'s ops/sec slider enforces, 1...1000) in the default mode, or
+  /// `replay.targetDuration` (matching its own slider's 1...120 range) in fixed-duration mode,
+  /// where `speed` itself is inert. Fires a rigid haptic instead of moving the value when the
+  /// bump would have no effect, so hitting the ceiling/floor repeatedly is felt rather than
+  /// silently swallowed.
+  private func bumpPacing(by delta: Double) {
     guard let replay = SortCoordinator.shared.activeSortSession?.lastReplay else { return }
-    let newSpeed = min(1000, max(1, replay.speed + delta))
-    if newSpeed == replay.speed {
-      SortHaptics.speedClamped()
+    if replay.useFixedDurationPacing {
+      let newDuration = min(120, max(1, replay.targetDuration + delta))
+      if newDuration == replay.targetDuration {
+        SortHaptics.speedClamped()
+      } else {
+        replay.targetDuration = newDuration
+      }
     } else {
-      replay.speed = newSpeed
+      let newSpeed = min(1000, max(1, replay.speed + delta))
+      if newSpeed == replay.speed {
+        SortHaptics.speedClamped()
+      } else {
+        replay.speed = newSpeed
+      }
     }
   }
 

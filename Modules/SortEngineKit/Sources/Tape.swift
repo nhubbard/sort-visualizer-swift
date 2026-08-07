@@ -86,4 +86,56 @@ public struct Tape: Sendable, Codable, Equatable {
     self.header = header
     self.operations = operations
   }
+
+  /// How many operations in `operations` are real algorithmic work rather than highlight
+  /// bookkeeping — see `SortOperation.isSignificantForPacing`. Precomputed once per tape (rather
+  /// than accumulated live during replay) so a pacing mode that needs the *total* up front, before
+  /// any operation has been applied, can compute a target rate immediately.
+  public var significantOperationCount: Int {
+    operations.count { $0.isSignificantForPacing }
+  }
+
+  /// A replay-only copy with purely-cosmetic marker bookkeeping (`.mark`/`.unmark`/`.unmarkAll`/
+  /// `.unmarkIndex`) dropped — every operation that actually mutates `values`/`auxArrays`
+  /// (`.swap`/`.setValue`/`.compare`/`.auxWrite`/`.reversal`/`.markSorted`), plus aux-buffer
+  /// lifecycle (`.auxCreate`/`.auxDelete`, which a later `.auxWrite` depends on for renderer
+  /// state), is preserved in order untouched. `header`'s recorded stats
+  /// (`compareCount`/`swapCount`/etc.) are copied verbatim — they were captured directly from the
+  /// algorithm's own counters at record time, never recomputed from `operations` — so this can
+  /// never change what gets reported as the true operation counts, only how much cosmetic
+  /// highlight flicker plays back. `sortStartIndex` is remapped (not copied verbatim), since it's
+  /// an absolute index into `operations` and dropping entries before it would otherwise desync it
+  /// from the real shuffle/sort boundary.
+  public func compactedForFastPlayback() -> Tape {
+    var keptBeforeSortStart = 0
+    var kept: [SortOperation] = []
+    kept.reserveCapacity(operations.count)
+    for (index, operation) in operations.enumerated() {
+      switch operation {
+      case .mark, .unmark, .unmarkAll, .unmarkIndex:
+        continue
+      default:
+        if index < header.sortStartIndex {
+          keptBeforeSortStart += 1
+        }
+        kept.append(operation)
+      }
+    }
+    let newHeader = TapeHeader(
+      algorithmID: header.algorithmID,
+      initialValues: header.initialValues,
+      visualSeed: header.visualSeed,
+      compareCount: header.compareCount,
+      swapCount: header.swapCount,
+      mainWriteCount: header.mainWriteCount,
+      auxWriteCount: header.auxWriteCount,
+      reversalCount: header.reversalCount,
+      recordingDuration: header.recordingDuration,
+      recordedAt: header.recordedAt,
+      shuffleID: header.shuffleID,
+      sortStartIndex: keptBeforeSortStart,
+      uniqueValueCount: header.uniqueValueCount
+    )
+    return Tape(header: newHeader, operations: kept)
+  }
 }
