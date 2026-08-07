@@ -1,10 +1,15 @@
 # Notice
 
 `ZstdKit` is a from-scratch Swift port of a subset of [Zstandard](https://github.com/facebook/zstd)'s
-decoding algorithm (frame/block parsing, FSE table construction, Huffman literals, FSE-coded
-sequences, LZ77 execution) and of [xxHash](https://github.com/Cyan4973/xxHash)'s XXH64 checksum,
-which ships as part of the Zstandard source tree. See `COMPRESSION_DESIGN.md` for
-the full design rationale.
+decoding *and* encoding algorithms (frame/block parsing and construction, FSE table decode/encode,
+Huffman literals decode/encode, FSE-coded sequences decode/encode, LZ77 execution and a greedy
+hash-chain match finder) and of [xxHash](https://github.com/Cyan4973/xxHash)'s XXH64 checksum, which
+ships as part of the Zstandard source tree. See `COMPRESSION_DESIGN.md` for the full design
+rationale — the encoder (`Sources/Internal/Encode/`, `Sources/Internal/FSE/FSEEncodeTable.swift`,
+`Sources/Internal/Huffman/HuffmanEncodeTable.swift`/`HuffmanStreamEncoder.swift`,
+`Sources/Internal/Sequences/SequenceCodeSelection.swift`/`SequenceStreamEncoder.swift`) is the same
+BSD-licensed reference source transcribed in the write direction, with the same "logic transcribed,
+no C linked" model as the decoder.
 
 No C/C++ source is linked, vendored, or transpiled — every file is original Swift. But the *logic*
 throughout this module (bitstream conventions, table-construction algorithms, decode-loop
