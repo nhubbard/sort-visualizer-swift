@@ -326,6 +326,36 @@ Because both bugs were invisible to self-round-trip, `SequenceStreamDecoder.deco
 via `BIT_endOfDStream` — so this entire bug class is caught by the existing Swift test suite going
 forward, without needing the C oracle rebuilt every time.
 
+## Tape export/import: `Tape.archived()`/`Tape(archivedData:)`
+
+`Modules/SortEngineKit/Sources/{TapeArchiveEnvelope,TapeArchivePayload,TapeArchiveError,Tape+Archive}
+.swift` build a self-contained binary format for exporting/importing a recorded `Tape`, using the
+Swift encoder above. Modeled on `AlgorithmDetails.algz`'s envelope shape, but leaner where that
+format's own fields turned out vestigial: `AlgorithmDetailsEnvelope`'s dictionary offset/length
+fields are always zero in practice (dictionary support was never actually built), so this format
+carries no dictionary section, no flag bit for one, nothing to validate as always-zero.
+
+**Outer envelope** (80 bytes, all little-endian, assembled with a plain shift loop like
+`AlgorithmDetailsEnvelope`'s own reader — never a typed/aligned load): magic `"STAP\r\n\x1a\n"` (8
+bytes, matching `AlgorithmDetailsEnvelope`'s "ALGZ\r\n\x1a\n" text-mode-safety trick) · major
+version (2) · minor version (2, ignored) · header length (4) · flags (4, must be 0) · codec (2, must
+be 1 = zstd) · reserved (2, ignored) · frame offset (8, always exactly 80 since there's no
+dictionary section) · frame length (8) · decompressed length (8) · SHA-256 of the decompressed
+payload (32).
+
+**Inner payload** (decompressed via `Zstd.decompress`, hash-verified before parsing): `"TAPE"` magic
+(4 bytes), then `TapeHeader`'s 13 fields at fixed widths — `algorithmID`/`shuffleID` as UInt16-
+length-prefixed UTF-8 (`shuffleID` preceded by a presence-flag byte, since it's optional),
+`initialValues` as a UInt32 count + `Int32` elements, `visualSeed` as a raw `UInt64`, the five
+ArrayV-parity counters and `sortStartIndex` as `Int32`, `recordingDuration`/`recordedAt` as raw
+`Double` bit patterns, `uniqueValueCount` as a presence-flag byte + `Int32` — then `operations` as a
+UInt32 count followed by one tag byte (0–11, `SortOperation`'s case order) + 0–3 `Int32` fields per
+operation, a direct structural mirror of the enum itself rather than a fixed-max-width record.
+
+`ReplayEngine(tape:)` takes a plain `Tape` with zero provenance opinion, so nothing downstream needs
+to know a tape came from a file rather than a live recording — `Tape(archivedData:)`'s result is a
+regular `Tape`, usable anywhere one already is.
+
 ## Encoder: Python, not Swift
 
 `App/Resources/AlgorithmDetails/manage.py` (a Click CLI, `scaffold`/`highlight`/`test`/`pack`/
