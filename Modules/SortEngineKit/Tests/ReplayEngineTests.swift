@@ -262,6 +262,40 @@ struct ReplayEngineTests {
     #expect(ops < 100)
   }
 
+  /// Direct regression test for the fixed-duration hang: `SortSession.makeTape` always appends a
+  /// trailing, non-significant `.unmarkAll` after the last real operation (retracting whatever
+  /// the algorithm's final `compare`/`swap` highlighted) — so every real tape ends exactly like
+  /// this one. Once that last `.compare` is applied, `remainingSignificantOperationCount` hits
+  /// `0` and `effectiveSpeed` returns exactly `0`; without `play()`'s flush special-case, a `0`
+  /// rate can never clear the trailing `.unmarkAll` through the accumulator, and the task would
+  /// spin forever, one tick at a time, without ever reaching the end of the tape.
+  @Test
+  func fixedDurationPacingFlushesTrailingCosmeticOperationsInsteadOfHangingForever() async {
+    let operations: [SortOperation] = [.compare(0, 1), .unmarkAll]
+    let tape = makeTape(initialValues: [1, 2], operations: operations)
+    let driver = ManualTickDriver()
+    let engine = ReplayEngine(tape: tape, displayLinkFactory: { driver })
+    engine.useFixedDurationPacing = true
+    // `effectiveSpeed` starts at ~1/0.25 = 4 ops/sec; a tick's elapsed time is itself clamped to
+    // `maxCatchUpInterval` (0.25s), so the very next tick's accumulator lands at exactly
+    // `0.25 * 4 == 1.0` — precisely enough to apply the lone significant `.compare` and nothing
+    // more, leaving the trailing `.unmarkAll` for a later tick to (previously: never) clear.
+    engine.targetDuration = 0.25
+
+    // Deliberately doesn't `await` the `Task` `play()` returns: pre-fix, the bug this guards
+    // against left that `Task` running forever, which would hang the test itself rather than
+    // failing it cleanly. Sleeping past the ticks and asserting `stepIndex` directly (then
+    // `pause()`ing) verifies the same outcome without that risk.
+    _ = engine.play()
+    driver.fireTick(elapsed: 0)  // the very first tick always carries zero elapsed time
+    driver.fireTick(elapsed: 1.0)  // clamped to 0.25s — applies exactly the one significant op
+    driver.fireTick(elapsed: 0.05)  // previously: stuck here forever, rate pinned at 0
+
+    try? await Task.sleep(for: .milliseconds(50))
+    #expect(engine.stepIndex == tape.operations.count)
+    engine.pause()
+  }
+
   @Test
   func effectiveSpeedPassesSpeedThroughUnchangedWhenFixedDurationPacingIsOff() {
     let rate = ReplayEngine.effectiveSpeed(

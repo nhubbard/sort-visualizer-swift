@@ -328,6 +328,11 @@ public final class ReplayEngine {
   /// `remainingTime` (rather than special-casing "deadline passed") means at or past the deadline
   /// this naturally returns a huge rate that `opsToApply`'s own `min(Int(accumulator), remaining)`
   /// clamp saturates to "apply everything left this tick" — no separate catch-up path needed.
+  ///
+  /// Returns exactly `0` once `remainingSignificantOperationCount` reaches `0` — there's no rate
+  /// left to divide toward. `play()`'s tick loop must never feed that straight into `opsToApply`
+  /// (a `0` rate can never make progress, however much time passes) — it special-cases this by
+  /// flushing whatever's left in the tape immediately instead. See `play()`'s own doc comment.
   static func effectiveSpeed(
     speed: Double, useFixedDurationPacing: Bool, targetDuration: Double,
     remainingSignificantOperationCount: Int, elapsedPlaybackDuration: TimeInterval
@@ -356,6 +361,15 @@ public final class ReplayEngine {
   /// still reach `onStep`/`onOperationApplied`, but don't count against the budget — otherwise a
   /// flat per-tick entry cap would spend most of it on marker bookkeeping instead of real
   /// algorithmic progress.
+  ///
+  /// In fixed-duration mode, once every significant operation has been applied there's nothing
+  /// left for `effectiveSpeed` to pace against — it returns exactly `0`, and a `0` rate can never
+  /// make progress through `opsToApply`'s `elapsed × speed` accumulator no matter how many more
+  /// ticks arrive. But `SortSession.makeTape` always appends a trailing, non-significant
+  /// `unmarkAll()` after the shuffle and after the sort (to retract whatever bar the algorithm's
+  /// very last `compare`/`swap` highlighted), so every tape ends on exactly this kind of entry —
+  /// without the flush below, fixed-duration replay would hang forever one cosmetic operation
+  /// short of genuine completion, on every single run.
   @discardableResult
   public func play(onStep: ((SortOperation) -> Void)? = nil) -> Task<Void, Never> {
     isPlaying = true
@@ -379,18 +393,26 @@ public final class ReplayEngine {
         guard remaining > 0 else { break }
         let sortStartIndex = self.tape.header.sortStartIndex
 
+        let remainingSignificantOperationCount =
+          max(0, totalSignificantOperationCount - self.state.significantOperationCount)
         let effectiveSpeed = Self.effectiveSpeed(
           speed: self.speed,
           useFixedDurationPacing: self.useFixedDurationPacing,
           targetDuration: self.targetDuration,
-          remainingSignificantOperationCount:
-            max(0, totalSignificantOperationCount - self.state.significantOperationCount),
+          remainingSignificantOperationCount: remainingSignificantOperationCount,
           elapsedPlaybackDuration: self.elapsedPlaybackDuration
         )
         self.currentPacingRate = effectiveSpeed
-        let opsToApply = Self.opsToApply(
-          elapsed: elapsed, speed: effectiveSpeed, accumulator: &accumulator, remaining: remaining
-        )
+        // See `effectiveSpeed`'s and this method's own doc comments: a `0` rate (only possible
+        // in fixed-duration mode, once no significant work remains) can never clear the
+        // cosmetic-only remainder through the normal accumulator math, so flush it directly.
+        let opsToApply =
+          self.useFixedDurationPacing && remainingSignificantOperationCount == 0
+          ? remaining
+          : Self.opsToApply(
+            elapsed: elapsed, speed: effectiveSpeed, accumulator: &accumulator,
+            remaining: remaining
+          )
         guard opsToApply > 0 else { continue }
 
         var appliedOperations: [SortOperation] = []
