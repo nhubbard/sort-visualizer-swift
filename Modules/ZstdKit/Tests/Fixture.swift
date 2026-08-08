@@ -30,7 +30,10 @@ enum Fixture {
     try load(name, extension: "expected")
   }
 
-  private static func load(_ name: String, extension fileExtension: String) throws -> Data {
+  /// Shared by `load` below and `FixtureArchive` (which locates its own `.zbin` archives the
+  /// same way) — the SPM-vs-Tuist subdirectory split is a property of how this module's two build
+  /// systems bundle *any* resource, not just the plain `.zst`/`.expected` pairs `load` handles.
+  static func url(forResourceNamed name: String, extension fileExtension: String) throws -> URL {
     // SPM's `.copy("Fixtures")` preserves that folder name inside the resource bundle (files land
     // at `<bundle>/Fixtures/name.ext`), unlike Tuist's glob-based `testResources`, which flattens
     // them to the bundle's root — same two-build-systems split as `bundle`'s own definition above.
@@ -45,6 +48,22 @@ enum Fixture {
     else {
       throw FixtureError.missing(name: name, extension: fileExtension)
     }
+    return url
+  }
+
+  /// Fixtures named `golden_*`/`decodecorpus_*` (the real-Zstandard-project-derived corpus, see
+  /// `GoldenCorpusTests.swift`) live inside `FixtureArchive`'s compressed `.zbin` bundles rather
+  /// than as loose per-fixture resources — ~1,619 individual files was too many to keep in the
+  /// repo. Routed here so `compressed`/`expected` (and every existing call site) don't need to
+  /// know or care which storage a given fixture actually uses.
+  private static func load(_ name: String, extension fileExtension: String) throws -> Data {
+    if name.hasPrefix("golden_") {
+      return try FixtureArchive.golden.data(named: "\(name).\(fileExtension)")
+    }
+    if name.hasPrefix("decodecorpus_") {
+      return try FixtureArchive.decodecorpus.data(named: "\(name).\(fileExtension)")
+    }
+    let url = try url(forResourceNamed: name, extension: fileExtension)
     return try Data(contentsOf: url)
   }
 }
