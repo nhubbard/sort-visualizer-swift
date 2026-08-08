@@ -108,7 +108,7 @@ struct MetalShapeRendererBufferConsistencyTests {
       values: replay.frame.map(\.value), valueRange: valueRange(for: replay.frame.map(\.value)),
       markers: markers(for: replay.frame), canvasSize: canvasSize, scale: 1
     )
-    replay.onOperationApplied = { operation in
+    replay.onOperationApplied = { operation, _ in
       let values = replay.frame.map(\.value)
       renderer.apply(
         operation, values: values, valueRange: valueRange(for: values),
@@ -187,7 +187,7 @@ struct MetalShapeRendererBufferConsistencyTests {
     }
 
     fullReset()
-    replay.onOperationApplied = { operation in
+    replay.onOperationApplied = { operation, _ in
       let values = replay.frame.map(\.value)
       renderer.apply(
         operation, values: values, valueRange: valueRange(for: values),

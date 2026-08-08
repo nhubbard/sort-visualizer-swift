@@ -169,7 +169,7 @@ struct MetalRendererView: UIViewRepresentable {
       self.visualizerID = visualizerID
       trackedStepIndex = -1
 
-      replay.onOperationApplied = { [weak self, weak replay, weak renderer] operation in
+      replay.onOperationApplied = { [weak self, weak replay, weak renderer] operation, isFinalOperation in
         guard let self, let replay, let renderer else { return }
         self.applyIncrementally(operation, frame: replay.frame)
         renderer.apply(operation, values: self.cachedValues, valueRange: self.cachedValueRange,
@@ -186,8 +186,12 @@ struct MetalRendererView: UIViewRepresentable {
         // the routine `setNeedsDisplay()` above: a long monotonic run of single-index writes at
         // the very end (e.g. Counting Sort's final pass) could leave a stale tail on screen even
         // though the instance buffer is already fully correct, since nothing else was guaranteed
-        // to trigger another redraw. Costs nothing during normal playback.
-        if replay.stepIndex >= replay.totalOperationCount {
+        // to trigger another redraw. Costs nothing during normal playback. Gated on
+        // `isFinalOperation` (true for exactly one call per run — see `onOperationApplied`'s doc
+        // comment) rather than re-deriving completion from `replay.stepIndex`, which is already
+        // bumped to its post-chunk value for every operation in the tape's last chunk and would
+        // otherwise fire this blocking draw once per operation in that chunk.
+        if isFinalOperation {
           self.view?.draw()
         }
       }

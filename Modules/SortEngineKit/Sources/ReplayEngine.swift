@@ -145,7 +145,17 @@ public final class ReplayEngine {
   /// incremental renderer repaint just the touched positions without `SortEngineKit`/
   /// `SortSession` needing to know renderers exist — set directly on the `ReplayEngine` instance a
   /// view holds. Fires immediately after `onStep`, with the same post-batch `frame` state.
-  public var onOperationApplied: ((SortOperation) -> Void)?
+  ///
+  /// The `Bool` is `true` for exactly one call across the entire `play()` run: the true last
+  /// operation of the tape. `play()` applies operations in `maxOperationsPerChunk`-sized chunks,
+  /// mutating `state.stepIndex` to its post-chunk value *before* dispatching any of that chunk's
+  /// operations through this callback — so a naive per-call `stepIndex >= totalOperationCount`
+  /// check in the observer is true for every operation in the tape's final chunk, not just the
+  /// last one. A consumer that forces a synchronous draw on that signal (as `MetalRendererView`
+  /// does, to guarantee one final repaint) would otherwise fire it once per operation in that
+  /// chunk — up to `maxOperationsPerChunk` blocking draws back to back with no yield, a real
+  /// main-thread stall observed at the end of large runs.
+  public var onOperationApplied: ((SortOperation, Bool) -> Void)?
 
   public private(set) var isPlaying = false
 
@@ -454,9 +464,10 @@ public final class ReplayEngine {
           }
           replaySignposter.endInterval("TickApply", tickInterval)
 
-          for operation in appliedOperations {
+          let isFinalChunkOfRun = self.state.stepIndex >= self.tape.operations.count
+          for (index, operation) in appliedOperations.enumerated() {
             onStep?(operation)
-            onOperationApplied?(operation)
+            onOperationApplied?(operation, isFinalChunkOfRun && index == appliedOperations.count - 1)
           }
 
           if self.state.stepIndex >= self.tape.operations.count { break tickLoop }
