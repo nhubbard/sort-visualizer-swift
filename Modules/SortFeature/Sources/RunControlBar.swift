@@ -245,35 +245,20 @@ struct RunControlBar: View {
       }
       .accessibilityIdentifier("runControlExportTapeButton")
       .accessibilityLabel("Export Tape")
-      .help(
-        exportDocument == nil
-          ? "This run's tape couldn't be archived" : "Export this run's recorded tape as a .tape file"
-      )
-      .disabled(exportDocument == nil)
+      .help("Export this run's recorded tape as a .tape file")
       .fileExporter(
         isPresented: $isExportingTape,
-        document: exportDocument.map { TapeExportFileDocument(data: $0.data) },
+        document: TapeExportFileDocument(tape: replay.tape),
         contentType: .tapeArchive,
-        defaultFilename: exportDocument?.suggestedFileName
+        defaultFilename: exportDocument.suggestedFileName
       ) { _ in }
     #else
-      if let exportDocument {
-        ShareLink(item: exportDocument, preview: SharePreview(exportDocument.suggestedFileName)) {
-          Image(systemName: "square.and.arrow.up")
-        }
-        .accessibilityIdentifier("runControlExportTapeButton")
-        .accessibilityLabel("Export Tape")
-        .help("Export this run's recorded tape as a .tape file")
-      } else {
-        Button {
-        } label: {
-          Image(systemName: "square.and.arrow.up")
-        }
-        .accessibilityIdentifier("runControlExportTapeButton")
-        .accessibilityLabel("Export Tape")
-        .help("This run's tape couldn't be archived")
-        .disabled(true)
+      ShareLink(item: exportDocument, preview: SharePreview(exportDocument.suggestedFileName)) {
+        Image(systemName: "square.and.arrow.up")
       }
+      .accessibilityIdentifier("runControlExportTapeButton")
+      .accessibilityLabel("Export Tape")
+      .help("Export this run's recorded tape as a .tape file")
     #endif
 
     Button {
@@ -329,16 +314,13 @@ struct RunControlBar: View {
     replay.stepIndex >= replay.totalOperationCount
   }
 
-  /// `nil` only if `Tape.archived()` itself throws — realistically only an encoder bug, since
-  /// `replay.tape` is always a real, already-recorded-or-imported value by the time this bar is
-  /// on screen. Reads `replay.archivedTapeData`, which `ReplayEngine` computes and caches once
-  /// (`tape` is immutable for the instance's lifetime) instead of re-encoding/re-hashing/
-  /// re-compressing the whole tape on every `body` evaluation — this property itself still runs
-  /// once per playback tick, but the expensive work behind it no longer does.
-  private var exportDocument: TapeArchiveDocument? {
-    guard let data = replay.archivedTapeData else { return nil }
-    return TapeArchiveDocument(
-      data: data, suggestedFileName: "\(algorithm.id.rawValue)-\(session.arraySize).tape")
+  /// Cheap: wraps `replay.tape` without encoding anything. The real `tape.archived()` encode only
+  /// happens inside `TapeArchiveDocument`/`TapeExportFileDocument`'s own transfer/save closures,
+  /// which SwiftUI only calls once the user actually completes a real share/save action — so
+  /// referencing this property on every `body` evaluation (e.g. via `ShareLink(item:)`) is safe.
+  private var exportDocument: TapeArchiveDocument {
+    TapeArchiveDocument(
+      tape: replay.tape, suggestedFileName: "\(algorithm.id.rawValue)-\(session.arraySize).tape")
   }
 
   @ViewBuilder
