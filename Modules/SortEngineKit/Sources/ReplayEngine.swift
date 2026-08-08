@@ -8,6 +8,14 @@ import os
 /// Profiler trace until it was traced back to this call by hand; a signpost interval here means a
 /// future trace shows "TickApply" spans directly, with the batch size as its message, instead of
 /// requiring that same manual detective work again.
+///
+/// Also emits a "Tick" point event once per tick (see `play()`), before "TickApply"'s interval
+/// even exists for a given chunk — "TickApply" only fires when a tick actually has ops to apply,
+/// so a tick skipped by `opsToApply <= 0` (nothing due yet) is otherwise invisible in a trace.
+/// "Tick" carries the raw and smoothed pacing rate plus `opsToApply`, so a fixed-duration
+/// smoothness complaint can be diagnosed directly from a Points of Interest capture — rate spikes,
+/// oscillation, or a skipped run of ticks all show up as the event's message — without needing to
+/// reproduce a specific "it looks laggy" report by eye first.
 private let replaySignposter = OSSignposter(
   subsystem: "com.nhubbard.Sort2.SortEngineKit", category: "ReplayEngine")
 
@@ -366,6 +374,35 @@ public final class ReplayEngine {
     return Double(remainingSignificantOperationCount) / remainingTime
   }
 
+  /// How much weight a tick's freshly recomputed `effectiveSpeed` gets against the smoothed rate
+  /// already in hand — see `smoothedPacingRate`. Picked to settle within roughly 8-12 ticks
+  /// (~150-200ms at 60fps) after a step change: fast enough that the deadline self-correction in
+  /// `effectiveSpeed` still converges well inside `targetDuration`, slow enough to visibly damp
+  /// the tick-to-tick swings a non-uniform algorithm's work density otherwise produces.
+  private static let pacingRateSmoothingFactor = 0.25
+
+  /// Exponential moving average over `effectiveSpeed`'s raw per-tick output — only ever applied in
+  /// fixed-duration mode (see `play()`), since flat-rate `speed` is documented to take effect
+  /// immediately on a live change, and smoothing it would delay that.
+  ///
+  /// `effectiveSpeed` recomputes its rate from scratch every tick, with no memory of the previous
+  /// tick — exactly right for its own deadline self-correction, but it means any tick-to-tick
+  /// noise (a non-uniform algorithm's work density, real tick-timing jitter, the self-correcting
+  /// rate bump after a slow tick) feeds straight through to `opsToApply` unfiltered, which reads
+  /// as choppy/laggy playback even with no bug involved. Blending toward the raw rate by
+  /// `pacingRateSmoothingFactor` each tick turns a sudden jump into a gradual ramp instead.
+  ///
+  /// `previous == nil` (the first tick of a `play()` call) returns `raw` unchanged, so smoothing
+  /// never introduces a startup lag before the very first operation. Smoothing a spike near the
+  /// end of a run (see `effectiveSpeed`'s own doc comment on saturating at the deadline) just
+  /// spreads that tail's catch-up burst over a few more frames instead of jamming it into one —
+  /// `opsToApply`'s own `remaining` clamp still guarantees the tape drains in bounded extra ticks,
+  /// not a regression of the "never hangs past the deadline" guarantee, just a gentler landing.
+  static func smoothedPacingRate(raw: Double, previous: Double?) -> Double {
+    guard let previous else { return raw }
+    return previous + pacingRateSmoothingFactor * (raw - previous)
+  }
+
   /// Returns the playback `Task` so callers (e.g. `SortSession`) can `await` its completion
   /// instead of polling `isPlaying`.
   ///
@@ -411,6 +448,10 @@ public final class ReplayEngine {
 
     let task = Task { [weak self] in
       var accumulator = 0.0
+      // Local to this `play()` call, like `accumulator` above — a fresh pause/resume segment
+      // starts smoothing over with no memory of a rate from before the gap, same rationale as
+      // `accumulator` not carrying stale fractional ops across segments.
+      var previousSmoothedRate: Double?
       tickLoop: for await elapsed in stream {
         guard let self, !Task.isCancelled else { break }
         let remaining = self.tape.operations.count - self.state.stepIndex
@@ -419,13 +460,25 @@ public final class ReplayEngine {
 
         let remainingSignificantOperationCount =
           max(0, totalSignificantOperationCount - self.state.significantOperationCount)
-        let effectiveSpeed = Self.effectiveSpeed(
+        let rawPacingRate = Self.effectiveSpeed(
           speed: self.speed,
           useFixedDurationPacing: self.useFixedDurationPacing,
           targetDuration: self.targetDuration,
           remainingSignificantOperationCount: remainingSignificantOperationCount,
           elapsedPlaybackDuration: self.elapsedPlaybackDuration
         )
+        // Flat-rate `speed` is documented to take effect immediately on a live change (see its
+        // own doc comment) — only fixed-duration mode's rate gets smoothed, and its own
+        // `previousSmoothedRate` history is dropped the instant that mode isn't active, so
+        // switching back into it later starts fresh rather than blending against a stale value.
+        let effectiveSpeed: Double
+        if self.useFixedDurationPacing {
+          effectiveSpeed = Self.smoothedPacingRate(raw: rawPacingRate, previous: previousSmoothedRate)
+          previousSmoothedRate = effectiveSpeed
+        } else {
+          effectiveSpeed = rawPacingRate
+          previousSmoothedRate = nil
+        }
         self.currentPacingRate = effectiveSpeed
         // See `effectiveSpeed`'s and this method's own doc comments: a `0` rate (only possible
         // in fixed-duration mode, once no significant work remains) can never clear the
@@ -437,6 +490,13 @@ public final class ReplayEngine {
             elapsed: elapsed, speed: effectiveSpeed, accumulator: &accumulator,
             remaining: remaining
           )
+        // See `replaySignposter`'s own doc comment: unlike "TickApply" below, this fires on
+        // every tick, including ones `opsToApply <= 0` skips entirely — otherwise a run of
+        // skipped ticks (nothing due yet) would be invisible in a trace.
+        replaySignposter.emitEvent(
+          "Tick",
+          "elapsed=\(elapsed, format: .fixed(precision: 4))s raw=\(rawPacingRate, format: .fixed(precision: 1)) smoothed=\(effectiveSpeed, format: .fixed(precision: 1)) opsToApply=\(opsToApply)"
+        )
         guard opsToApply > 0 else { continue }
 
         // Applied in bounded chunks, yielding between them — see `maxOperationsPerChunk`'s doc

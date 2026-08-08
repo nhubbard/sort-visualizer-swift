@@ -351,6 +351,45 @@ struct ReplayEngineTests {
   }
 
   @Test
+  func smoothedPacingRateReturnsRawUnchangedOnTheFirstTick() {
+    // No `previous` yet (the first tick of a `play()` call) must not introduce a startup lag —
+    // the very first operation should move at the real computed rate, not a value blended
+    // against nothing.
+    let rate = ReplayEngine.smoothedPacingRate(raw: 500, previous: nil)
+    #expect(rate == 500)
+  }
+
+  @Test
+  func smoothedPacingRateBlendsPartwayTowardARisingRawRate() {
+    let rate = ReplayEngine.smoothedPacingRate(raw: 100, previous: 20)
+    // 20 + 0.25 * (100 - 20) == 40 — strictly between the previous and raw values, not jumping
+    // straight to the new raw rate.
+    #expect(rate == 40)
+    #expect(rate > 20)
+    #expect(rate < 100)
+  }
+
+  @Test
+  func smoothedPacingRateBlendsPartwayTowardAFallingRawRate() {
+    let rate = ReplayEngine.smoothedPacingRate(raw: 20, previous: 100)
+    #expect(rate == 80)
+    #expect(rate < 100)
+    #expect(rate > 20)
+  }
+
+  @Test
+  func smoothedPacingRateConvergesToASustainedRawRateWithinAFewTicks() {
+    var previous: Double?
+    for _ in 0..<20 {
+      previous = ReplayEngine.smoothedPacingRate(raw: 1000, previous: previous)
+    }
+    // Repeatedly feeding the same raw rate must settle arbitrarily close to it, not oscillate or
+    // asymptote short — otherwise a long steady stretch of an algorithm would never actually
+    // reach the rate `effectiveSpeed` computed for it.
+    #expect(abs(previous! - 1000) < 0.01)
+  }
+
+  @Test
   func auxArraysCreateWriteAndDeleteAcrossReplay() {
     let tape = makeTape(
       initialValues: [1, 2],
