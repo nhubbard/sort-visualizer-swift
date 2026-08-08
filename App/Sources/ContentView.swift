@@ -6,6 +6,13 @@ import SettingsKit
 import SortFeature
 import SwiftUI
 import UniformTypeIdentifiers
+import os
+
+/// Brackets an entire Showcase pass (every registered algorithm, in order) for a manual
+/// Instruments capture — a full pass can run for many minutes, so a "ShowcaseRun" interval here
+/// means a trace can be scrubbed straight to the window that actually matters instead of guessing
+/// from wall-clock timestamps against whenever the recording happened to be started/stopped.
+private let showcaseSignposter = OSSignposter(subsystem: "com.nhubbard.Sort2.mobile", category: "Showcase")
 
 /// Sidebar/content columns are generated directly from `AlgorithmRegistry.shared.algorithms(in:)`,
 /// sectioned by `AlgorithmCategory` — registering a new algorithm requires no changes to this
@@ -33,6 +40,10 @@ struct ContentView: View {
   @State private var showcaseIndex: Int?
   @State private var showcaseAlgorithmIDs: [AlgorithmID] = []
   @State private var isShowingShowcaseConfirmation = false
+  // Carries `showcaseSignposter`'s begin-interval token from `startShowcase()` across to whichever
+  // of `advanceShowcase()`/`stopShowcase()` ends up closing it — `OSSignposter.endInterval`
+  // requires the exact token `beginInterval` returned, not just a matching name/id.
+  @State private var showcaseSignpostState: OSSignpostIntervalState?
 
   // Import Tape: `isImportingTape` drives the picker sheet itself; `importErrorMessage` is
   // shown live (not logged silently) since this is a manual, interactive action, not automation
@@ -361,6 +372,8 @@ struct ContentView: View {
       .map(\.id)
     guard !showcaseAlgorithmIDs.isEmpty else { return }
     showcaseIndex = 0
+    showcaseSignpostState = showcaseSignposter.beginInterval(
+      "ShowcaseRun", "\(showcaseAlgorithmIDs.count) algorithms")
     coordinator.selectAlgorithmForFreshView(showcaseAlgorithmIDs[0])
   }
 
@@ -385,6 +398,16 @@ struct ContentView: View {
   /// `.task` only restarts on identity change, not on a plain property change, so anything short
   /// of this risks a pass that keeps running invisibly after Stop is tapped.
   private func stopShowcase() {
+    if let showcaseSignpostState {
+      // `showcaseIndex` is still whatever was on screen when this was called — the last valid
+      // index (a natural, ran-every-algorithm finish via `advanceShowcase()`) or wherever a
+      // mid-run Stop tap landed — so `+ 1` reads as "how far in" either way, not a claim that
+      // that specific algorithm's pass itself finished.
+      let reached = (showcaseIndex ?? -1) + 1
+      showcaseSignposter.endInterval(
+        "ShowcaseRun", showcaseSignpostState, "reached \(reached)/\(showcaseAlgorithmIDs.count)")
+      self.showcaseSignpostState = nil
+    }
     showcaseIndex = nil
     coordinator.selectedAlgorithmID = nil
   }
