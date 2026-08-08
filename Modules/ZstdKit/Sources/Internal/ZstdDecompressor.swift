@@ -91,13 +91,31 @@ enum ZstdDecompressor {
         )
         lastHuffmanTable = decoded.huffmanTable
 
-        let literalsSectionByteCount =
-          literalsHeader.blockType == .raw || literalsHeader.blockType == .rle
-          ? literalsHeader.regeneratedSize : literalsHeader.compressedSize
+        // How many *source* bytes the literals section occupied, to advance past it to the
+        // sequences header -- not to be confused with `regeneratedSize` (the decoded literal
+        // count). `.raw` stores its literals verbatim (source bytes == regeneratedSize), but
+        // `.rle` always stores exactly one repeated byte regardless of how many times it's
+        // replayed -- conflating the two here (a real bug: this used to skip `regeneratedSize`
+        // bytes for `.rle` too) skips far past the single RLE payload byte, either overrunning
+        // the block entirely (`truncatedInput`) or, for a large enough block, silently
+        // desyncing every subsequent parse position (sequences header, next block) in that frame.
+        let literalsSectionByteCount: Int
+        switch literalsHeader.blockType {
+        case .raw: literalsSectionByteCount = literalsHeader.regeneratedSize
+        case .rle: literalsSectionByteCount = 1
+        case .compressed, .treeless: literalsSectionByteCount = literalsHeader.compressedSize
+        }
         try blockReader.skip(literalsSectionByteCount)
 
         let sequencesHeader = try SequencesHeaderParser.parse(&blockReader)
         if sequencesHeader.numberOfSequences == 0 {
+          // Mirrors real zstd's `ip != iend` check in `ZSTD_decodeSeqHeaders`: a zero sequence
+          // count means the block's content is exactly the literals section, so nothing may
+          // follow the Number_of_Sequences field. Trailing bytes here are corruption, not
+          // something to silently ignore (a real fixture upstream, `zeroSeq_extraneous`, is
+          // exactly this: deliberately appended bytes after an otherwise-valid zero-sequence
+          // block, which must be rejected).
+          guard blockReader.remaining == 0 else { throw ZstdError.invalidSequenceStream }
           output.append(contentsOf: decoded.literals)
         } else {
           let literalLengthTable = try SequenceTableBuilder.buildTable(

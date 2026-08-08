@@ -57,15 +57,6 @@ enum SequencesHeaderParser {
   static func parse(_ reader: inout ByteReader) throws -> SequencesHeader {
     let first = try reader.readByte()
 
-    if first == 0 {
-      // Section ends immediately — no Symbol_Compression_Modes byte follows. The modes below are
-      // placeholders the caller must never act on (there's nothing to build a table for).
-      return SequencesHeader(
-        numberOfSequences: 0, literalLengthsMode: .predefined, offsetsMode: .predefined,
-        matchLengthsMode: .predefined
-      )
-    }
-
     let numberOfSequences: Int
     if first < 128 {
       numberOfSequences = Int(first)
@@ -74,6 +65,22 @@ enum SequencesHeaderParser {
     } else {
       let extra = try reader.readByte()
       numberOfSequences = ((Int(first) - 0x80) << 8) + Int(extra)
+    }
+
+    // Section ends immediately once the count is 0, however it was spelled — the single-byte
+    // direct form (`first == 0`) isn't the only encoding that can produce it: the 2-byte extended
+    // form's `((first - 0x80) << 8) + extra` is also 0 whenever `first == 0x80, extra == 0` (a
+    // real fixture upstream exercises exactly this — `zeroSeq_2B`). No Symbol_Compression_Modes
+    // byte follows in either case; a previous version only special-cased the single-byte form,
+    // so the 2-byte-form zero either read past the end of a minimal block (`truncatedInput`) or,
+    // given trailing bytes to misread as a modes byte, silently accepted them instead of
+    // rejecting the block as the real decoder does (`zeroSeq_extraneous`). The modes below are
+    // placeholders the caller must never act on (there's nothing to build a table for).
+    guard numberOfSequences > 0 else {
+      return SequencesHeader(
+        numberOfSequences: 0, literalLengthsMode: .predefined, offsetsMode: .predefined,
+        matchLengthsMode: .predefined
+      )
     }
 
     let modesByte = try reader.readByte()

@@ -54,9 +54,15 @@ struct ParsedHuffmanTable {
 
 /// The maximum weight value (RFC 8878 §4.2.1) — Huffman code lengths top out at 11 bits.
 private let maximumHuffmanWeight = 11
-/// Weight-distribution FSE tables use a generously-capped accuracy log; the reference encoder
-/// stays well under this in every fixture this decoder has been tested against.
-private let maximumWeightAccuracyLog = 12
+/// The weight-distribution FSE table's own accuracy-log ceiling — real zstd hardcodes this as a
+/// literal `6` at its one call site (`entropy_common.c`'s `FSE_decompress_wksp_bmi2(...,  6, ...)`
+/// inside `HUF_readStats_body`), distinct from `HUF_TABLELOG_MAX` (12), which bounds the actual
+/// Huffman table built *from* those weights, not the FSE table describing the weights themselves.
+/// A previous version of this port conflated the two, using 12 here — validation-only (a real
+/// encoder never emits a weight-FSE tableLog anywhere near either bound), so it never produced
+/// wrong output, but it would wrongly accept a malformed tableLog in the 7...12 range that real
+/// zstd rejects outright.
+private let maximumWeightAccuracyLog = 6
 
 enum HuffmanTableBuilder {
   static func parse(_ bytes: ArraySlice<UInt8>) throws -> ParsedHuffmanTable {
@@ -108,6 +114,13 @@ enum HuffmanTableBuilder {
 
     var state1 = Int(reader.readBits(accuracyLog))
     var state2 = Int(reader.readBits(accuracyLog))
+    // Matches `FSE_decompress_usingDTable_generic`'s own
+    // `RETURN_ERROR_IF(BIT_reloadDStream(&bitD)==BIT_DStream_overflow, corruption_detected, "")`,
+    // performed once right after initializing both states and before decoding a single symbol —
+    // a previous version of this port omitted it and went straight to the tail loop below, so a
+    // bitstream too short to even hold two initial states (real fixture: `truncated_huff_state`)
+    // decoded zero symbols instead of being rejected as corrupt.
+    guard reader.reload() != .overflow else { throw ZstdError.invalidHuffmanTable }
     var weights: [Int] = []
 
     // Reads the symbol at the state's *current* position, then transitions it — one atomic step,
@@ -142,7 +155,19 @@ enum HuffmanTableBuilder {
   }
 
   /// The final symbol's weight is never transmitted; it's whatever value makes
-  /// `sum(2^(weight-1))` complete to the next power of two (RFC 8878 §4.2.1.2).
+  /// `sum(2^(weight-1))` complete to the next power of two (RFC 8878 §4.2.1.2) -- mirroring real
+  /// zstd's `HUF_readStats` exactly: `tableLog = highbit32(total) + 1`, i.e. `fullTotal` is always
+  /// the power of two *strictly greater* than the explicit weights' own total, even when that
+  /// total already happens to be a power of two itself. A previous version found the smallest
+  /// power of two `>=` total instead of `>`, so whenever the explicit weights summed to exactly a
+  /// power of two, it wrongly concluded the implicit last symbol had weight 0 (unused) rather than
+  /// the real, nonzero weight that actually completes the *next* power of two -- silently mis-
+  /// assigning that symbol's Huffman code (and, since decode-table slot layout depends on every
+  /// weight, corrupting the whole table) instead of throwing or decoding correctly. Real zstd's
+  /// construction guarantees this remainder is never zero, so `lastValue > 0` always holds for a
+  /// valid table; kept as a guard (rather than a precondition) since a malformed input could still
+  /// reach here with `total` already representing bogus data — e.g., duplicate normalized counts
+  /// with the wrong distinct-symbol vs. accuracy-log balance a fuzzer might construct.
   private static func appendingImplicitLastWeight(_ weights: [Int]) throws -> [Int] {
     var total = 0
     for weight in weights {
@@ -150,13 +175,10 @@ enum HuffmanTableBuilder {
       if weight > 0 { total += 1 << (weight - 1) }
     }
     guard total > 0 else { throw ZstdError.invalidHuffmanTable }
-    var nextPowerOfTwo = 1
-    while nextPowerOfTwo < total { nextPowerOfTwo <<= 1 }
-    let lastValue = nextPowerOfTwo - total
-    // lastValue == 0 is legitimate: the explicit weights already sum exactly to a power of two,
-    // so the implicit last symbol simply has weight 0 (unused) — confirmed against a real
-    // fixture where this occurs (see SequenceTests's large multi-block corpus).
-    guard lastValue >= 0, lastValue & (lastValue - 1) == 0 else { throw ZstdError.invalidHuffmanTable }
+    let tableLog = Int.bitWidth - total.leadingZeroBitCount
+    let fullTotal = 1 << tableLog
+    let lastValue = fullTotal - total
+    guard lastValue > 0, lastValue & (lastValue - 1) == 0 else { throw ZstdError.invalidHuffmanTable }
     let lastWeight = Int.bitWidth - lastValue.leadingZeroBitCount
     var all = weights
     all.append(lastWeight)

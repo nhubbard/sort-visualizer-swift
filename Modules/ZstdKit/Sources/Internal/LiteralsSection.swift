@@ -104,6 +104,11 @@ enum LiteralsSectionParser {
           streamCount: 4
         )
       default:
+        // 40 bits total across these 5 bytes: 2 (block type) + 2 (size format) + 18
+        // (Regenerated_Size, bits 4-21) + 18 (Compressed_Size, bits 22-39). `secondWord`'s bit 0
+        // is original bit 8 (it's built from bytes[1...4]), so Compressed_Size's bit 22 lands at
+        // `secondWord` bit `22 - 8 = 14` -- shifting by 2 (a real, previously-shipped bug) read
+        // 12 bits too low, picking up part of Regenerated_Size's own bits instead.
         let bytes = try reader.readBytes(5)
         let base = bytes.startIndex
         let firstWord =
@@ -115,7 +120,7 @@ enum LiteralsSectionParser {
         return LiteralsSectionHeader(
           blockType: blockType,
           regeneratedSize: Int((firstWord >> 4) & 0x3_FFFF),
-          compressedSize: Int(secondWord >> 2),
+          compressedSize: Int((secondWord >> 14) & 0x3_FFFF),
           streamCount: 4
         )
       }
