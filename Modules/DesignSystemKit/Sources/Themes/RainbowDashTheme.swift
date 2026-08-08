@@ -46,7 +46,7 @@ public struct RainbowDashTheme: CodeTheme {
       .stringEscape: TextFormat(fg: Color(fromHex: "#c5060b")!, bg: Color(fromHex: "#ffffff")!, bold: true),
       .stringOther: TextFormat(fg: Color(fromHex: "#318495")!, bg: Color(fromHex: "#ffffff")!),
       .stringSymbol: TextFormat(fg: Color(fromHex: "#c5060b")!, bg: Color(fromHex: "#ffffff")!, bold: true),
-      .whitespace: TextFormat(fg: Color(fromHex: "#cbcbcb")!, bg: Color(fromHex: "#ffffff")!),
+      .whitespace: TextFormat(fg: Color(fromHex: "#cbcbcb")!, bg: Color(fromHex: "#ffffff")!)
     ]
   }
 }

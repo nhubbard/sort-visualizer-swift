@@ -52,8 +52,7 @@ public struct SpiralDotsVisualizer: Visualizer {
   }
 
   private func color(forIndex index: Int, in context: VisualizationContext, normalized: Double)
-    -> RGBAColor
-  {
+    -> RGBAColor {
     let markers = context.markers[index] ?? []
     if markers.contains(Marker.primary) {
       return Self.primaryColor

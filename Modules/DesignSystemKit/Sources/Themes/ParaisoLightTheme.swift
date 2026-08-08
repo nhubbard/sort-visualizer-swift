@@ -44,7 +44,7 @@ public struct ParaisoLightTheme: CodeTheme {
       .stringDoc: TextFormat(fg: Color(fromHex: "#8d8687")!, bg: Color(fromHex: "#e7e9db")!),
       .stringEscape: TextFormat(fg: Color(fromHex: "#f99b15")!, bg: Color(fromHex: "#e7e9db")!),
       .stringInterpol: TextFormat(fg: Color(fromHex: "#f99b15")!, bg: Color(fromHex: "#e7e9db")!),
-      .whitespace: TextFormat(fg: Color(fromHex: "#2f1e2e")!, bg: Color(fromHex: "#e7e9db")!),
+      .whitespace: TextFormat(fg: Color(fromHex: "#2f1e2e")!, bg: Color(fromHex: "#e7e9db")!)
     ]
   }
 }

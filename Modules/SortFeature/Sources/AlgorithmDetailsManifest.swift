@@ -146,8 +146,7 @@ struct AlgorithmDetailsManifest {
     // No two content entries may overlap (a gap is wasteful but not unsafe, so gaps are allowed).
     let sortedRanges = allEntryRanges.sorted { $0.lowerBound < $1.lowerBound }
     if sortedRanges.count > 1 {
-      for index in 1..<sortedRanges.count where sortedRanges[index].lowerBound < sortedRanges[index - 1].upperBound
-      {
+      for index in 1..<sortedRanges.count where sortedRanges[index].lowerBound < sortedRanges[index - 1].upperBound {
         throw AlgorithmDetailsArchiveError.overlappingContent
       }
     }

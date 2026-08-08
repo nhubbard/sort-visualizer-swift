@@ -23,7 +23,7 @@ public struct VsTheme: CodeTheme {
       .keywordType: TextFormat(fg: Color(fromHex: "#2b91af")!, bg: Color(fromHex: "#ffffff")!),
       .nameClass: TextFormat(fg: Color(fromHex: "#2b91af")!, bg: Color(fromHex: "#ffffff")!),
       .operatorWord: TextFormat(fg: Color(fromHex: "#00f")!, bg: Color(fromHex: "#ffffff")!),
-      .string: TextFormat(fg: Color(fromHex: "#a31515")!, bg: Color(fromHex: "#ffffff")!),
+      .string: TextFormat(fg: Color(fromHex: "#a31515")!, bg: Color(fromHex: "#ffffff")!)
     ]
   }
 }

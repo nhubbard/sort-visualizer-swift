@@ -8,7 +8,7 @@ struct AudioServiceTests {
   @Test(arguments: [
     (value: 1, range: 1...100, noteRange: 36...72, expectedNote: 36),
     (value: 100, range: 1...100, noteRange: 36...72, expectedNote: 72),
-    (value: 50, range: 0...100, noteRange: 36...96, expectedNote: 66),
+    (value: 50, range: 0...100, noteRange: 36...96, expectedNote: 66)
   ])
   func frequencyMapsValueLinearlyOntoNoteRangeThenConvertsToHz(
     value: Int,

@@ -17,7 +17,7 @@ struct VisualizerRegistryTests {
     let registry = VisualizerRegistry()
     registry.builtIns = [
       FakeVisualizer(id: VisualizerID(rawValue: "a")),
-      FakeVisualizer(id: VisualizerID(rawValue: "b")),
+      FakeVisualizer(id: VisualizerID(rawValue: "b"))
     ]
 
     #expect(registry.visualizers.isEmpty)

@@ -325,8 +325,7 @@ enum UnstableGrailSortingTemplate {
         while aBlockCount < blockCount
           && engine.compare(
             blockPos + blockCount * regBlockLen,
-            blockPos + (blockCount - aBlockCount - 1) * regBlockLen, by: <)
-        {
+            blockPos + (blockCount - aBlockCount - 1) * regBlockLen, by: <) {
           aBlockCount += 1
         }
       }

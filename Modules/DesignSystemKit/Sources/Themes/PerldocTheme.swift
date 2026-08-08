@@ -44,7 +44,7 @@ public struct PerldocTheme: CodeTheme {
       .stringHeredoc: TextFormat(fg: Color(fromHex: "#1c7e71")!, bg: Color(fromHex: "#eeeedd")!, italic: true),
       .stringOther: TextFormat(fg: Color(fromHex: "#cb6c20")!, bg: Color(fromHex: "#eeeedd")!),
       .stringRegex: TextFormat(fg: Color(fromHex: "#1c7e71")!, bg: Color(fromHex: "#eeeedd")!),
-      .whitespace: TextFormat(fg: Color(fromHex: "#bbb")!, bg: Color(fromHex: "#eeeedd")!),
+      .whitespace: TextFormat(fg: Color(fromHex: "#bbb")!, bg: Color(fromHex: "#eeeedd")!)
     ]
   }
 }

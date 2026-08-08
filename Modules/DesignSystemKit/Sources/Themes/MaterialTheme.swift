@@ -57,7 +57,7 @@ public struct MaterialTheme: CodeTheme {
       .stringInterpol: TextFormat(fg: Color(fromHex: "#89ddff")!, bg: Color(fromHex: "#263238")!),
       .stringRegex: TextFormat(fg: Color(fromHex: "#89ddff")!, bg: Color(fromHex: "#263238")!),
       .stringSymbol: TextFormat(fg: Color(fromHex: "#89ddff")!, bg: Color(fromHex: "#263238")!),
-      .whitespace: TextFormat(fg: Color(fromHex: "#eff")!, bg: Color(fromHex: "#263238")!),
+      .whitespace: TextFormat(fg: Color(fromHex: "#eff")!, bg: Color(fromHex: "#263238")!)
     ]
   }
 }

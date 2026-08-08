@@ -46,7 +46,7 @@ public struct SolarizedLightTheme: CodeTheme {
       .operatorWord: TextFormat(fg: Color(fromHex: "#859900")!, bg: Color(fromHex: "#fdf6e3")!),
       .string: TextFormat(fg: Color(fromHex: "#2aa198")!, bg: Color(fromHex: "#fdf6e3")!),
       .stringDoc: TextFormat(fg: Color(fromHex: "#93a1a1")!, bg: Color(fromHex: "#fdf6e3")!),
-      .stringRegex: TextFormat(fg: Color(fromHex: "#cb4b16")!, bg: Color(fromHex: "#fdf6e3")!),
+      .stringRegex: TextFormat(fg: Color(fromHex: "#cb4b16")!, bg: Color(fromHex: "#fdf6e3")!)
     ]
   }
 }

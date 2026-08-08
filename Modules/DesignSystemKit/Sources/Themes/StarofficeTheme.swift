@@ -14,7 +14,7 @@ public struct StarofficeTheme: CodeTheme {
       .comment: TextFormat(fg: Color(fromHex: "#696969")!, bg: Color(fromHex: "#ffffff")!),
       .error: TextFormat(fg: Color(fromHex: "#800000")!, bg: Color(fromHex: "#ffffff")!),
       .literal: TextFormat(fg: Color(fromHex: "#e00")!, bg: Color(fromHex: "#ffffff")!),
-      .name: TextFormat(fg: Color(fromHex: "#008000")!, bg: Color(fromHex: "#ffffff")!),
+      .name: TextFormat(fg: Color(fromHex: "#008000")!, bg: Color(fromHex: "#ffffff")!)
     ]
   }
 }

@@ -29,8 +29,7 @@ enum TwinSortingTemplate {
       outer: while true {
         if index > end {
           if start == 0
-            && (nmemb % 2 == 0 || engine.values[index - 1 + left] > engine.values[index + left])
-          {
+            && (nmemb % 2 == 0 || engine.values[index - 1 + left] > engine.values[index + left]) {
             // The whole range is one descending run -- reverse it all and stop.
             end = nmemb - 1
             engine.reversal(start + left, end + left)

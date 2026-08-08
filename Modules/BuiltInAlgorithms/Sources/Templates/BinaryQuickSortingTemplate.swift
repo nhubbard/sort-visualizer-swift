@@ -22,8 +22,7 @@ enum BinaryQuickSortingTemplate {
   /// Hoare-style single-bit partition: routes every element with `bitIndex` clear to the left of
   /// the returned split point, and every element with `bitIndex` set to the right.
   static func partition(_ engine: inout RecordingEngine, _ p: Int, _ r: Int, _ bitIndex: Int)
-    -> Int
-  {
+    -> Int {
     var i = p - 1
     var j = r + 1
     while true {
@@ -50,8 +49,7 @@ enum BinaryQuickSortingTemplate {
   /// instead of the call stack (matching ArrayV's own `Queue<Task>`-based variant) — a growable
   /// array with a `head` index gives the same amortized FIFO behavior as ArrayV's `LinkedList`
   /// without needing a dedicated deque type.
-  static func binaryQuickSort(_ engine: inout RecordingEngine, _ p: Int, _ r: Int, _ bitIndex: Int)
-  {
+  static func binaryQuickSort(_ engine: inout RecordingEngine, _ p: Int, _ r: Int, _ bitIndex: Int) {
     var tasks: [(p: Int, r: Int, bitIndex: Int)] = [(p, r, bitIndex)]
     var head = 0
     while head < tasks.count {

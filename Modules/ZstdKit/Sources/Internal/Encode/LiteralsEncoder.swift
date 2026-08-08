@@ -82,7 +82,7 @@ enum LiteralsEncoder {
       0..<segmentSize,
       segmentSize..<(2 * segmentSize),
       (2 * segmentSize)..<(3 * segmentSize),
-      (3 * segmentSize)..<bytes.count,
+      (3 * segmentSize)..<bytes.count
     ]
 
     var streamBytes: [[UInt8]] = []

@@ -48,8 +48,7 @@ public struct DisparityDotsVisualizer: Visualizer {
     }
   }
 
-  private func color(forIndex index: Int, value: Int, in context: VisualizationContext) -> RGBAColor
-  {
+  private func color(forIndex index: Int, value: Int, in context: VisualizationContext) -> RGBAColor {
     let markers = context.markers[index] ?? []
     if markers.contains(Marker.primary) {
       return Self.primaryColor

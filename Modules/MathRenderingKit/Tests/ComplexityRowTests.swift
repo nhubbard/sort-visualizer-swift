@@ -4,8 +4,7 @@ import Testing
 @testable import MathRenderingKit
 
 private func makeMetadata(best: String, average: String, worst: String, space: String)
-  -> AlgorithmMetadata
-{
+  -> AlgorithmMetadata {
   AlgorithmMetadata(
     displayName: "Fake",
     category: .exchange,
@@ -58,7 +57,7 @@ struct ComplexityRowTests {
     #expect(rows.map(\.id) == ["best", "average", "worst", "space"])
     #expect(
       rows.map(\.label) == [
-        "Best Case", "Average Complexity", "Worst Case", "Space Complexity",
+        "Best Case", "Average Complexity", "Worst Case", "Space Complexity"
       ])
   }
 

@@ -138,7 +138,7 @@ struct AnalyticsServiceTests {
     let newer = Date(timeIntervalSince1970: 2000)
 
     for (algorithmID, recordedAt) in [
-      ("quicksort", older), ("quicksort", newer), ("gnomesort", newer),
+      ("quicksort", older), ("quicksort", newer), ("gnomesort", newer)
     ] {
       let header = TapeHeader(
         algorithmID: algorithmID,

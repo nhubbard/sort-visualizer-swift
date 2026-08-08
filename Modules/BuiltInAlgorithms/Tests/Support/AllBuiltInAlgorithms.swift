@@ -77,7 +77,7 @@ enum AllBuiltInAlgorithms {
     TwinSort(),
     UnoptimizedBubbleSort(),
     UnoptimizedCocktailShakerSort(), UnstableGrailSort(), WeakHeapSort(), WeavedMergeSort(),
-    WeaveMergeSort(), WeaveSortIterative(), WeaveSortRecursive(),
+    WeaveMergeSort(), WeaveSortIterative(), WeaveSortRecursive()
   ]
 
   static let shuffles: [any ShuffleAlgorithm] = [
@@ -91,6 +91,6 @@ enum AllBuiltInAlgorithms {
     RealFinalRadixShuffle(), RecursiveRadixShuffle(), RecursiveReversalShuffle(),
     SawtoothShuffle(),
     ShuffledCubicShuffle(), ShuffledHalfShuffle(), ShuffledHeadShuffle(), ShuffledOddsShuffle(),
-    ShuffledQuinticShuffle(), ShuffledTailShuffle(), SierpinskiShuffle(), TriangularShuffle(),
+    ShuffledQuinticShuffle(), ShuffledTailShuffle(), SierpinskiShuffle(), TriangularShuffle()
   ]
 }

@@ -78,8 +78,7 @@ public struct CompleteGraphSort: SortAlgorithm {
     }
   }
 
-  private func split(_ engine: inout RecordingEngine, _ rangeStart: Int, _ m: Int, _ rangeEnd: Int)
-  {
+  private func split(_ engine: inout RecordingEngine, _ rangeStart: Int, _ m: Int, _ rangeEnd: Int) {
     guard rangeEnd - rangeStart >= 2 else { return }
 
     var a = rangeStart

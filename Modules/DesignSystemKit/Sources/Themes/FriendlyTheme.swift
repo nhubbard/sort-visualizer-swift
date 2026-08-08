@@ -50,7 +50,7 @@ public struct FriendlyTheme: CodeTheme {
       .stringOther: TextFormat(fg: Color(fromHex: "#c65d09")!, bg: Color(fromHex: "#f0f0f0")!),
       .stringRegex: TextFormat(fg: Color(fromHex: "#235388")!, bg: Color(fromHex: "#f0f0f0")!),
       .stringSymbol: TextFormat(fg: Color(fromHex: "#517918")!, bg: Color(fromHex: "#f0f0f0")!),
-      .whitespace: TextFormat(fg: Color(fromHex: "#bbb")!, bg: Color(fromHex: "#f0f0f0")!),
+      .whitespace: TextFormat(fg: Color(fromHex: "#bbb")!, bg: Color(fromHex: "#f0f0f0")!)
     ]
   }
 }

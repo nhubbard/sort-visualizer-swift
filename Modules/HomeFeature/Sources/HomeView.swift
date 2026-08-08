@@ -2,8 +2,10 @@ import DesignSystemKit
 import MarkdownUI
 import SwiftUI
 
-/// Ported from `Legacy/Shared/Views/Main/HomeView.swift` — the welcome copy is the same text
-/// (`Localizable.strings`' `home_copy`), inlined here rather than round-tripped through a
+/// Originally ported verbatim from `Legacy/Shared/Views/Main/HomeView.swift`'s `home_copy` string;
+/// its categorization paragraph has since been rewritten to describe this app's actual ten
+/// `AlgorithmCategory` families instead of the legacy Logarithmic/Quadratic/Weird complexity split,
+/// which never matched this codebase's sidebar. Inlined here rather than round-tripped through a
 /// `String(localized:)` lookup key, since this module owns no localization catalog of its own yet.
 public struct HomeView: View {
   public init() {}
@@ -42,16 +44,17 @@ public struct HomeView: View {
     algorithm's complexity. The numeric value of these bounds is specified in parentheses in terms of \
     the number *n*, which is the number of elements in the data structure.
 
-    Most sorting algorithms fall into two specific categories:
+    This app organizes its algorithms into ten families, grouped by how they work rather than how \
+    fast they run: **Concurrent**, **Distribution**, **Exchange**, **Hybrid**, **Impractical**, \
+    **Insertion**, **Merge**, **Miscellaneous**, **Quick**, and **Selection** sorts. A family shares \
+    a common strategy: selection sorts repeatedly find the smallest remaining element, for \
+    instance, while merge sorts split the data apart and merge it back together in order.
 
-    * **Logarithmic**: The complexity is proportional to the binary logarithm of *n* (i.e. log₂(*n*)). \
-    An example of a logarithmic sorting algorithm is **Quick Sort**, which has space and time \
-    complexity of O(*n* log *n*).
-    * **Quadratic**: The complexity is proportional to the square of *n*. An example of a quadratic \
-    sorting algorithm is **Bubble Sort**, with a time complexity of O(*n*²).
-
-    There is also a third category: **Weird** algorithms. These don't follow a Logarithmic or \
-    Quadratic complexity, and are a bit more difficult to compare.
+    Complexity still varies within every family. **Quick Sort**, for example, is typically \
+    efficient, with a time complexity of O(*n* log *n*). **Bubble Sort**, on the other hand, is \
+    quadratic, with a time complexity of O(*n*²). The **Impractical** family is reserved for \
+    algorithms that are correct but absurd -- sorts that work by brute force, accident, or joke, \
+    and are difficult to compare to anything else.
 
     Space and time complexity can also be further subdivided into 3 different cases: best case, \
     average case, and worst case.

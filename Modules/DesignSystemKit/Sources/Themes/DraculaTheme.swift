@@ -40,7 +40,7 @@ public struct DraculaTheme: CodeTheme {
       .other: TextFormat(fg: Color(fromHex: "#f8f8f2")!, bg: Color(fromHex: "#282a36")!),
       .punctuation: TextFormat(fg: Color(fromHex: "#f8f8f2")!, bg: Color(fromHex: "#282a36")!),
       .string: TextFormat(fg: Color(fromHex: "#bd93f9")!, bg: Color(fromHex: "#282a36")!),
-      .whitespace: TextFormat(fg: Color(fromHex: "#f8f8f2")!, bg: Color(fromHex: "#282a36")!),
+      .whitespace: TextFormat(fg: Color(fromHex: "#f8f8f2")!, bg: Color(fromHex: "#282a36")!)
     ]
   }
 }

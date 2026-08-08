@@ -42,7 +42,7 @@ public struct NativeTheme: CodeTheme {
       .operatorWord: TextFormat(fg: Color(fromHex: "#6ebf26")!, bg: Color(fromHex: "#202020")!, bold: true),
       .string: TextFormat(fg: Color(fromHex: "#ed9d13")!, bg: Color(fromHex: "#202020")!),
       .stringOther: TextFormat(fg: Color(fromHex: "#ffa500")!, bg: Color(fromHex: "#202020")!),
-      .whitespace: TextFormat(fg: Color(fromHex: "#666")!, bg: Color(fromHex: "#202020")!),
+      .whitespace: TextFormat(fg: Color(fromHex: "#666")!, bg: Color(fromHex: "#202020")!)
     ]
   }
 }

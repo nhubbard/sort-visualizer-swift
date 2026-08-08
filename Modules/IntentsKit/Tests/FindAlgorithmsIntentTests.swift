@@ -35,7 +35,7 @@ struct FindAlgorithmsIntentTests {
     registry.builtIns = [
       FakeAlgorithm(id: AlgorithmID(rawValue: "b-quick"), category: .quick),
       FakeAlgorithm(id: AlgorithmID(rawValue: "a-quick"), category: .quick),
-      FakeAlgorithm(id: AlgorithmID(rawValue: "some-merge"), category: .merge),
+      FakeAlgorithm(id: AlgorithmID(rawValue: "some-merge"), category: .merge)
     ]
     registry.discover()
 

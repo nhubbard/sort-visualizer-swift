@@ -18,8 +18,7 @@ public struct FindCategoriesIntent: AppIntent {
 
   public init() {}
 
-  public func perform() async throws -> some IntentResult & ReturnsValue<[AlgorithmCategoryOption]>
-  {
+  public func perform() async throws -> some IntentResult & ReturnsValue<[AlgorithmCategoryOption]> {
     .result(value: AlgorithmCategoryOption.realCategories)
   }
 }

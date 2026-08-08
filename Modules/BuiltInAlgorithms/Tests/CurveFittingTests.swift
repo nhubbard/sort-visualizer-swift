@@ -62,7 +62,7 @@ struct CurveFittingTests {
     // rather than let it win on a technicality of raw R².
     let samples: [GrowthSample] = [
       GrowthSample(n: 4, value: 61), GrowthSample(n: 5, value: 89),
-      GrowthSample(n: 6, value: 122), GrowthSample(n: 12, value: 353),
+      GrowthSample(n: 6, value: 122), GrowthSample(n: 12, value: 353)
     ]
     let models = CurveFitting.fitAllFamilies(samples)
     #expect(!models.contains { $0.family == .polynomialIntercept })
@@ -83,7 +83,7 @@ struct CurveFittingTests {
     let samples: [GrowthSample] = [
       GrowthSample(n: 4, value: 20), GrowthSample(n: 5, value: 15),
       GrowthSample(n: 6, value: 55), GrowthSample(n: 7, value: 480),
-      GrowthSample(n: 14, value: 33_000),
+      GrowthSample(n: 14, value: 33_000)
     ]
     let models = CurveFitting.fitAllFamilies(samples)
     #expect(!models.contains { $0.family == .polynomialIntercept })

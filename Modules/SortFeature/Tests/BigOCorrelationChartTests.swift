@@ -7,8 +7,7 @@ import Testing
 @Suite
 struct BigOCorrelationChartTests {
   private func point(size: Int, kind: BigOChartPoint.Kind, series: String = "Observed")
-    -> BigOChartPoint
-  {
+    -> BigOChartPoint {
     BigOChartPoint(id: UUID().uuidString, series: series, size: size, normalizedValue: 0.5, kind: kind)
   }
 

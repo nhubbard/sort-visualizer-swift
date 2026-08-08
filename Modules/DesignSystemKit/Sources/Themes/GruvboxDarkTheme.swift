@@ -47,7 +47,7 @@ public struct GruvboxDarkTheme: CodeTheme {
       .punctuation: TextFormat(fg: Color(fromHex: "#ddd")!, bg: Color(fromHex: "#282828")!),
       .string: TextFormat(fg: Color(fromHex: "#b8bb26")!, bg: Color(fromHex: "#282828")!),
       .stringEscape: TextFormat(fg: Color(fromHex: "#fe8019")!, bg: Color(fromHex: "#282828")!),
-      .whitespace: TextFormat(fg: Color(fromHex: "#ddd")!, bg: Color(fromHex: "#282828")!),
+      .whitespace: TextFormat(fg: Color(fromHex: "#ddd")!, bg: Color(fromHex: "#282828")!)
     ]
   }
 }

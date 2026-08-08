@@ -72,7 +72,7 @@ struct NativeAlgorithmCorrectnessTests {
     TwinSort(),
     UnoptimizedBubbleSort(),
     UnoptimizedCocktailShakerSort(), UnstableGrailSort(), WeakHeapSort(), WeavedMergeSort(),
-    WeaveMergeSort(), WeaveSortIterative(), WeaveSortRecursive(),
+    WeaveMergeSort(), WeaveSortIterative(), WeaveSortRecursive()
   ]
 
   @Test
@@ -643,7 +643,7 @@ struct NativeAlgorithmCorrectnessTests {
   @Test
   func selectionSortBatchWideSizeRangeFuzz() {
     let algorithms: [any SortAlgorithm] = [
-      OutOfPlaceHeapSort(), ClassicTournamentSort(), TournamentSort(), SmoothSort(),
+      OutOfPlaceHeapSort(), ClassicTournamentSort(), TournamentSort(), SmoothSort()
     ]
     for algorithm in algorithms {
       for size in stride(
@@ -1525,7 +1525,7 @@ struct NativeAlgorithmCorrectnessTests {
   @Test
   func grailSortingTemplateDuplicateHeavyFuzz() {
     let algorithms: [any SortAlgorithm] = [
-      BlockInsertionSort(), GrailSort(), LazyStableSort(), OptimizedLazyStableSort(),
+      BlockInsertionSort(), GrailSort(), LazyStableSort(), OptimizedLazyStableSort()
     ]
     for algorithm in algorithms {
       for size in [algorithm.metadata.sizeRange.lowerBound, 17, 20, 32, 64, 128, 256] {
@@ -1602,7 +1602,7 @@ struct NativeAlgorithmCorrectnessTests {
   func andreySortSortsReliablyExceptOnHeavyDuplicates() {
     let algorithm = AndreySort()
     for size in [
-      algorithm.metadata.sizeRange.lowerBound, 12, 13, 17, 20, 24, 32, 63, 64, 100, 200, 256,
+      algorithm.metadata.sizeRange.lowerBound, 12, 13, 17, 20, 24, 32, 63, 64, 100, 200, 256
     ] {
       for trial in 0..<20 {
         let input: [Int]
@@ -1642,7 +1642,7 @@ struct NativeAlgorithmCorrectnessTests {
   @Test
   func hardInsertionBatchDuplicateHeavyFuzz() {
     let algorithms: [any SortAlgorithm] = [
-      AATreeSort(), AVLTreeSort(), RedBlackTreeSort(), HanoiSort(), LibrarySort(),
+      AATreeSort(), AVLTreeSort(), RedBlackTreeSort(), HanoiSort(), LibrarySort()
     ]
     for algorithm in algorithms {
       for size in [algorithm.metadata.sizeRange.lowerBound, 5, 8, 16, 20, 32] {

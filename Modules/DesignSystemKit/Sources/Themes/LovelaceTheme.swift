@@ -59,7 +59,7 @@ public struct LovelaceTheme: CodeTheme {
       .stringInterpol: TextFormat(fg: Color(fromHex: "#b83838")!, bg: Color(fromHex: "#ffffff")!, underline: true),
       .stringOther: TextFormat(fg: Color(fromHex: "#a848a8")!, bg: Color(fromHex: "#ffffff")!),
       .stringRegex: TextFormat(fg: Color(fromHex: "#a848a8")!, bg: Color(fromHex: "#ffffff")!),
-      .whitespace: TextFormat(fg: Color(fromHex: "#a89028")!, bg: Color(fromHex: "#ffffff")!),
+      .whitespace: TextFormat(fg: Color(fromHex: "#a89028")!, bg: Color(fromHex: "#ffffff")!)
     ]
   }
 }

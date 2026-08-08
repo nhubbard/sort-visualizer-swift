@@ -125,7 +125,7 @@ enum LiteralsSectionDecoder {
       (streamsStart..<stream1End, segmentSize),
       (stream1End..<stream2End, segmentSize),
       (stream2End..<stream3End, segmentSize),
-      (stream3End..<body.endIndex, lastSegmentSize),
+      (stream3End..<body.endIndex, lastSegmentSize)
     ]
 
     var literals = [UInt8](repeating: 0, count: regeneratedSize)

@@ -35,7 +35,7 @@ public struct MonokaiTheme: CodeTheme {
       .nameTag: TextFormat(fg: Color(fromHex: "#ff4689")!, bg: Color(fromHex: "#272822")!),
       .operator: TextFormat(fg: Color(fromHex: "#ff4689")!, bg: Color(fromHex: "#272822")!),
       .string: TextFormat(fg: Color(fromHex: "#e6db74")!, bg: Color(fromHex: "#272822")!),
-      .stringEscape: TextFormat(fg: Color(fromHex: "#ae81ff")!, bg: Color(fromHex: "#272822")!),
+      .stringEscape: TextFormat(fg: Color(fromHex: "#ae81ff")!, bg: Color(fromHex: "#272822")!)
     ]
   }
 }

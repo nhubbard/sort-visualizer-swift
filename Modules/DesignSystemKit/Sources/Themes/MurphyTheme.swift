@@ -58,7 +58,7 @@ public struct MurphyTheme: CodeTheme {
       .stringOther: TextFormat(fg: Color(fromHex: "#f88")!, bg: Color(fromHex: "#e0e0ff")!),
       .stringRegex: TextFormat(fg: Color(fromHex: "#000")!, bg: Color(fromHex: "#e0e0ff")!),
       .stringSymbol: TextFormat(fg: Color(fromHex: "#fc8")!, bg: Color(fromHex: "#ffffff")!),
-      .whitespace: TextFormat(fg: Color(fromHex: "#bbb")!, bg: Color(fromHex: "#ffffff")!),
+      .whitespace: TextFormat(fg: Color(fromHex: "#bbb")!, bg: Color(fromHex: "#ffffff")!)
     ]
   }
 }

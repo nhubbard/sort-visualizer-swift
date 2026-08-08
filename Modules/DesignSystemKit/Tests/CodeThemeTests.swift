@@ -27,7 +27,7 @@ struct CodeThemeTests {
   func exactMatchReturnsItsOwnStyleWithoutWalkingTheParentChain() {
     let theme = StubTheme(styles: [
       .keyword: .red,
-      .token: .white,
+      .token: .white
     ])
     #expect(theme.getFormat(token: .keyword).fg == .red)
   }

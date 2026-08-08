@@ -85,7 +85,7 @@ enum CurveFitting {
   static func fitAllFamilies(_ samples: [GrowthSample]) -> [FittedGrowthModel] {
     [
       fitPowerLaw(samples), fitPowerLog(samples), fitPolynomialIntercept(samples),
-      fitExponential(samples), fitNToTheNLike(samples), fitFactorial(samples),
+      fitExponential(samples), fitNToTheNLike(samples), fitFactorial(samples)
     ].compactMap { $0 }
   }
 
@@ -265,8 +265,7 @@ enum CurveFitting {
     let intercept: Double
   }
 
-  private static func simpleLinearRegression(xs: [Double], ys: [Double]) -> LinearRegressionResult
-  {
+  private static func simpleLinearRegression(xs: [Double], ys: [Double]) -> LinearRegressionResult {
     let count = Double(xs.count)
     let xMean = xs.reduce(0, +) / count
     let yMean = ys.reduce(0, +) / count
@@ -316,8 +315,7 @@ enum CurveFitting {
   /// function's `usable.count >= parameterCount + 2` guard above, so this is never dividing by
   /// zero — that guard is precisely what makes adjusted R² well-defined here at all.
   private static func adjustedRSquared(_ rSquared: Double, sampleCount: Int, parameterCount: Int)
-    -> Double
-  {
+    -> Double {
     let degreesOfFreedom = Double(sampleCount - parameterCount - 1)
     return 1 - (1 - rSquared) * Double(sampleCount - 1) / degreesOfFreedom
   }

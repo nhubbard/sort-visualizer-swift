@@ -86,8 +86,7 @@ enum PDQSortingTemplate {
   /// the total shift count exceeds `partialInsertSortLimit` — a cheap "is this nearly sorted
   /// already" finishing move after a partition reported already-partitioned.
   private static func partialInsertSort(_ engine: inout RecordingEngine, _ begin: Int, _ end: Int)
-    -> Bool
-  {
+    -> Bool {
     guard begin != end else { return true }
     var limit = 0
     for cur in (begin + 1)..<end {
@@ -475,8 +474,7 @@ enum PDQSortingTemplate {
           }
         }
       } else if alreadyParted && partialInsertSort(&engine, begin, pivotPos)
-        && partialInsertSort(&engine, pivotPos + 1, end)
-      {
+        && partialInsertSort(&engine, pivotPos + 1, end) {
         // Balanced, and the input was already partitioned -- a cheap insertion-sort finish
         // handled both sides.
         return

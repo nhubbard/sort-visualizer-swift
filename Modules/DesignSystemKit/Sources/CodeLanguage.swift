@@ -22,6 +22,6 @@ extension CodeLanguage {
     CodeLanguage(id: "cs", title: "C#"),
     CodeLanguage(id: "rb", title: "Ruby"),
     CodeLanguage(id: "kt", title: "Kotlin"),
-    CodeLanguage(id: "swift", title: "Swift"),
+    CodeLanguage(id: "swift", title: "Swift")
   ]
 }

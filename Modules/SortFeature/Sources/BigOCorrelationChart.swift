@@ -118,8 +118,7 @@ func bigOChartMarks(for points: [BigOChartPoint]) -> some ChartContent {
 /// cost for `BigOCorrelationDetailView`'s `.chartScrollableAxes` drag gesture — this caps scatter
 /// density per distinct size before rendering. `.observedTrend`/`.reference` are untouched: there's
 /// already at most one trend point per size and a fixed 40-sample reference curve.
-func cappedForRendering(_ points: [BigOChartPoint], maxScatterPerSize: Int = 15) -> [BigOChartPoint]
-{
+func cappedForRendering(_ points: [BigOChartPoint], maxScatterPerSize: Int = 15) -> [BigOChartPoint] {
   var seenPerSize: [Int: Int] = [:]
   return points.filter { point in
     guard point.kind == .observedRun else { return true }

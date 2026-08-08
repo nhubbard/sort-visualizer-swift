@@ -43,7 +43,7 @@ public struct VimTheme: CodeTheme {
       .other: TextFormat(fg: Color(fromHex: "#ccc")!, bg: Color(fromHex: "#000000")!),
       .punctuation: TextFormat(fg: Color(fromHex: "#ccc")!, bg: Color(fromHex: "#000000")!),
       .string: TextFormat(fg: Color(fromHex: "#cd0000")!, bg: Color(fromHex: "#000000")!),
-      .whitespace: TextFormat(fg: Color(fromHex: "#ccc")!, bg: Color(fromHex: "#000000")!),
+      .whitespace: TextFormat(fg: Color(fromHex: "#ccc")!, bg: Color(fromHex: "#000000")!)
     ]
   }
 }

@@ -17,7 +17,7 @@ public struct SortSymphonyShortcuts: AppShortcutsProvider {
           id: "sizeSweep", displayName: "Size Sweep", iconName: "arrow.up.right")),
       phrases: [
         "Run a \(.applicationName) size sweep for \(\.$algorithm)",
-        "Run \(.applicationName) size sweep",
+        "Run \(.applicationName) size sweep"
       ],
       shortTitle: "Size Sweep",
       systemImageName: "arrow.up.right"
@@ -28,7 +28,7 @@ public struct SortSymphonyShortcuts: AppShortcutsProvider {
           id: "maxSizeOnly", displayName: "Max Size Only", iconName: "arrow.up.to.line")),
       phrases: [
         "Run a \(.applicationName) max size demo for \(\.$algorithm)",
-        "Run \(.applicationName) max size demo",
+        "Run \(.applicationName) max size demo"
       ],
       shortTitle: "Max Size Only",
       systemImageName: "arrow.up.to.line"
@@ -37,7 +37,7 @@ public struct SortSymphonyShortcuts: AppShortcutsProvider {
       intent: RunSortIntent(),
       phrases: [
         "Run \(\.$algorithm) in \(.applicationName)",
-        "Run a sort in \(.applicationName)",
+        "Run a sort in \(.applicationName)"
       ],
       shortTitle: "Run Sort",
       systemImageName: "play.fill"
@@ -46,7 +46,7 @@ public struct SortSymphonyShortcuts: AppShortcutsProvider {
       intent: RunShowcaseIntent(),
       phrases: [
         "Run a \(.applicationName) showcase",
-        "Show me a \(.applicationName) showcase",
+        "Show me a \(.applicationName) showcase"
       ],
       shortTitle: "Showcase",
       systemImageName: "sparkles.tv.fill"
@@ -55,7 +55,7 @@ public struct SortSymphonyShortcuts: AppShortcutsProvider {
       intent: RunFullSizeSweepIntent(),
       phrases: [
         "Run a full \(.applicationName) size sweep",
-        "Run a \(.applicationName) showcase sweep",
+        "Run a \(.applicationName) showcase sweep"
       ],
       shortTitle: "Full Size Sweep",
       systemImageName: "square.grid.3x3.fill"
@@ -64,7 +64,7 @@ public struct SortSymphonyShortcuts: AppShortcutsProvider {
       intent: RunVisualizerShowcaseIntent(),
       phrases: [
         "Run a \(.applicationName) visualizer showcase for \(\.$algorithm)",
-        "Run a \(.applicationName) visualizer showcase",
+        "Run a \(.applicationName) visualizer showcase"
       ],
       shortTitle: "Visualizer Showcase",
       systemImageName: "paintpalette.fill"

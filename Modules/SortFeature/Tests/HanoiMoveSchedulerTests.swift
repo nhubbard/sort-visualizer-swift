@@ -20,7 +20,7 @@ struct HanoiMoveSchedulerTests {
       slot: 0,
       waypoints: [
         .init(target: SIMD2(5, 5), holdDuration: 0.1),
-        .init(target: SIMD2(0, 0), holdDuration: 0),
+        .init(target: SIMD2(0, 0), holdDuration: 0)
       ])
     #expect(scheduler.displayed(forSlot: 0) == SIMD2(5, 5))
   }
@@ -33,7 +33,7 @@ struct HanoiMoveSchedulerTests {
       slot: 0,
       waypoints: [
         .init(target: SIMD2(5, 5), holdDuration: 0.1),
-        .init(target: SIMD2(9, 9), holdDuration: 0),
+        .init(target: SIMD2(9, 9), holdDuration: 0)
       ])
     _ = scheduler.advance(elapsed: 0.05)
     #expect(scheduler.displayed(forSlot: 0) == SIMD2(5, 5), "hold hasn't elapsed yet")
@@ -52,7 +52,7 @@ struct HanoiMoveSchedulerTests {
       slot: 0,
       waypoints: [
         .init(target: SIMD2(5, 5), holdDuration: 10),
-        .init(target: SIMD2(9, 9), holdDuration: 0),
+        .init(target: SIMD2(9, 9), holdDuration: 0)
       ])
     // Interrupt before the first leg's hold would ever elapse.
     scheduler.schedule(slot: 0, waypoints: [.init(target: SIMD2(1, 1), holdDuration: 0)])
@@ -69,7 +69,7 @@ struct HanoiMoveSchedulerTests {
       slot: 1,
       waypoints: [
         .init(target: SIMD2(2, 2), holdDuration: 0.05),
-        .init(target: SIMD2(3, 3), holdDuration: 0),
+        .init(target: SIMD2(3, 3), holdDuration: 0)
       ])
     _ = scheduler.advance(elapsed: 1)
     #expect(scheduler.displayed(forSlot: 0) == SIMD2(1, 1))

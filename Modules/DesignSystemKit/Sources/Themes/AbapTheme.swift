@@ -17,7 +17,7 @@ public struct AbapTheme: CodeTheme {
       .name: TextFormat(fg: Color(fromHex: "#000")!, bg: Color(fromHex: "#ffffff")!),
       .number: TextFormat(fg: Color(fromHex: "#3af")!, bg: Color(fromHex: "#ffffff")!),
       .operatorWord: TextFormat(fg: Color(fromHex: "#00f")!, bg: Color(fromHex: "#ffffff")!),
-      .string: TextFormat(fg: Color(fromHex: "#5a2")!, bg: Color(fromHex: "#ffffff")!),
+      .string: TextFormat(fg: Color(fromHex: "#5a2")!, bg: Color(fromHex: "#ffffff")!)
     ]
   }
 }

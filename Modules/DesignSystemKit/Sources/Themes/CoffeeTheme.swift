@@ -47,7 +47,7 @@ public struct CoffeeTheme: CodeTheme {
       .stringInterpol: TextFormat(fg: Color(fromHex: "#af5f5f")!, bg: Color(fromHex: "#262220")!),
       .stringOther: TextFormat(fg: Color(fromHex: "#fdd0c0")!, bg: Color(fromHex: "#262220")!),
       .stringRegex: TextFormat(fg: Color(fromHex: "#af5f5f")!, bg: Color(fromHex: "#262220")!),
-      .stringSymbol: TextFormat(fg: Color(fromHex: "#af5f5f")!, bg: Color(fromHex: "#262220")!),
+      .stringSymbol: TextFormat(fg: Color(fromHex: "#af5f5f")!, bg: Color(fromHex: "#262220")!)
     ]
   }
 }

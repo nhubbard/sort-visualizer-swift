@@ -45,7 +45,7 @@ public struct LightbulbTheme: CodeTheme {
       .stringInterpol: TextFormat(fg: Color(fromHex: "#95e6cb")!, bg: Color(fromHex: "#1d2331")!),
       .stringOther: TextFormat(fg: Color(fromHex: "#95e6cb")!, bg: Color(fromHex: "#1d2331")!),
       .stringRegex: TextFormat(fg: Color(fromHex: "#95e6cb")!, bg: Color(fromHex: "#1d2331")!),
-      .stringSymbol: TextFormat(fg: Color(fromHex: "#dfbfff")!, bg: Color(fromHex: "#1d2331")!),
+      .stringSymbol: TextFormat(fg: Color(fromHex: "#dfbfff")!, bg: Color(fromHex: "#1d2331")!)
     ]
   }
 }

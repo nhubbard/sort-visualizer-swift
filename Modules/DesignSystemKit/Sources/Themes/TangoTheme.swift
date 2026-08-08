@@ -43,7 +43,7 @@ public struct TangoTheme: CodeTheme {
       .punctuation: TextFormat(fg: Color(fromHex: "#000")!, bg: Color(fromHex: "#f8f8f8")!, bold: true),
       .string: TextFormat(fg: Color(fromHex: "#4e9a06")!, bg: Color(fromHex: "#f8f8f8")!),
       .stringDoc: TextFormat(fg: Color(fromHex: "#8f5902")!, bg: Color(fromHex: "#f8f8f8")!, italic: true),
-      .whitespace: TextFormat(fg: Color(fromHex: "#f8f8f8")!, bg: Color(fromHex: "#f8f8f8")!),
+      .whitespace: TextFormat(fg: Color(fromHex: "#f8f8f8")!, bg: Color(fromHex: "#f8f8f8")!)
     ]
   }
 }

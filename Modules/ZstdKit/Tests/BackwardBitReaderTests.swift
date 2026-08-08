@@ -96,7 +96,7 @@ struct BackwardBitReaderTests {
     [32],
     [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 32],
     [31, 3, 1, 17, 9],
-    [5, 5, 5, 5, 5],
+    [5, 5, 5, 5, 5]
   ]
 
   @Test func differentialAcrossBufferSizesAndReadPatterns() throws {

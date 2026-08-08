@@ -110,7 +110,7 @@ public final class AppSettings {
       // doesn't depend on SortEngineKit).
       Keys.recordingOperationCap: 300_000,
       Keys.codeTheme: "monokai",
-      Keys.defaultShuffleID: "random",
+      Keys.defaultShuffleID: "random"
     ])
     selectedVisualizerID = VisualizerID(
       rawValue: store.string(forKey: Keys.selectedVisualizerID) ?? "bargraph")

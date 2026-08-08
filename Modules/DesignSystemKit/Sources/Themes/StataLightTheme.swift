@@ -20,7 +20,7 @@ public struct StataLightTheme: CodeTheme {
       .nameVariableGlobal: TextFormat(fg: Color(fromHex: "#b5565e")!, bg: Color(fromHex: "#ffffff")!, bold: true),
       .number: TextFormat(fg: Color(fromHex: "#2c2cff")!, bg: Color(fromHex: "#ffffff")!),
       .string: TextFormat(fg: Color(fromHex: "#7a2424")!, bg: Color(fromHex: "#ffffff")!),
-      .whitespace: TextFormat(fg: Color(fromHex: "#bbb")!, bg: Color(fromHex: "#ffffff")!),
+      .whitespace: TextFormat(fg: Color(fromHex: "#bbb")!, bg: Color(fromHex: "#ffffff")!)
     ]
   }
 }

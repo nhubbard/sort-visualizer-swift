@@ -22,7 +22,6 @@ enum BlockParser {
       ? RowHashMatchFinder(input: input, hashLog: hashLog) : MatchFinder(input: input, hashLog: hashLog)
   }
 
-
   /// `prefix` (default empty) is raw, already-encoded content immediately preceding `chunk` —
   /// searchable by the match finder so a sequence near the start of `chunk` can still reference
   /// back into it, but never itself re-emitted as literals/sequences. Used by `FrameEncoder`'s
@@ -69,8 +68,7 @@ enum BlockParser {
 
     while ip + 4 <= limit {
       if let match = finder.findBestMatch(
-        at: ip, minMatch: options.minimumMatchLength, maxAttempts: options.maximumSearchAttempts)
-      {
+        at: ip, minMatch: options.minimumMatchLength, maxAttempts: options.maximumSearchAttempts) {
         literals.append(contentsOf: combined[literalStart..<ip])
         sequences.append(
           RawSequence(literalLength: ip - literalStart, offset: ip - match.position, matchLength: match.length))
@@ -131,8 +129,7 @@ enum BlockParser {
 
       if baselineRep >= options.minimumMatchLength, let baselineSearch,
         gain(baselineRep, 1, k: 3, bias: 0)
-          > gain(baselineSearch.length, ip - baselineSearch.position + 3, k: 3, bias: 0)
-      {
+          > gain(baselineSearch.length, ip - baselineSearch.position + 3, k: 3, bias: 0) {
         matchPosition = ip - offset1
         matchLength = baselineRep
         offBase = 1
@@ -159,8 +156,7 @@ enum BlockParser {
           maxAttempts: options.maximumSearchAttempts)
 
         if round1Rep >= options.minimumMatchLength,
-          gain(round1Rep, 1, k: 3, bias: 1) > gain(matchLength, offBase, k: 3, bias: 0)
-        {
+          gain(round1Rep, 1, k: 3, bias: 1) > gain(matchLength, offBase, k: 3, bias: 0) {
           matchStart = round1Position
           matchPosition = round1Position - offset1
           matchLength = round1Rep
@@ -168,8 +164,7 @@ enum BlockParser {
           continue outer
         } else if let round1Search,
           gain(round1Search.length, round1Position - round1Search.position + 3, k: 4, bias: 4)
-            > gain(matchLength, offBase, k: 4, bias: 0)
-        {
+            > gain(matchLength, offBase, k: 4, bias: 0) {
           matchStart = round1Position
           matchPosition = round1Search.position
           matchLength = round1Search.length
@@ -185,8 +180,7 @@ enum BlockParser {
             maxAttempts: options.maximumSearchAttempts)
 
           if round2Rep >= options.minimumMatchLength,
-            gain(round2Rep, 1, k: 4, bias: 1) > gain(matchLength, offBase, k: 4, bias: 0)
-          {
+            gain(round2Rep, 1, k: 4, bias: 1) > gain(matchLength, offBase, k: 4, bias: 0) {
             matchStart = round2Position
             matchPosition = round2Position - offset1
             matchLength = round2Rep
@@ -194,8 +188,7 @@ enum BlockParser {
             continue outer
           } else if let round2Search,
             gain(round2Search.length, round2Position - round2Search.position + 3, k: 4, bias: 7)
-              > gain(matchLength, offBase, k: 4, bias: 0)
-          {
+              > gain(matchLength, offBase, k: 4, bias: 0) {
             matchStart = round2Position
             matchPosition = round2Search.position
             matchLength = round2Search.length
@@ -210,8 +203,7 @@ enum BlockParser {
       // Backward extension: recover literal bytes lookahead left stranded in the pending run,
       // by extending the match earlier for as long as the bytes right before it still agree.
       while matchStart > literalStart, matchPosition > 0,
-        combined[matchStart - 1] == combined[matchPosition - 1]
-      {
+        combined[matchStart - 1] == combined[matchPosition - 1] {
         matchStart -= 1
         matchPosition -= 1
         matchLength += 1

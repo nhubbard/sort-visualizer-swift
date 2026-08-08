@@ -43,7 +43,7 @@ public struct NordTheme: CodeTheme {
       .string: TextFormat(fg: Color(fromHex: "#a3be8c")!, bg: Color(fromHex: "#2E3440")!),
       .stringDoc: TextFormat(fg: Color(fromHex: "#616e87")!, bg: Color(fromHex: "#2E3440")!),
       .stringEscape: TextFormat(fg: Color(fromHex: "#ebcb8b")!, bg: Color(fromHex: "#2E3440")!),
-      .stringRegex: TextFormat(fg: Color(fromHex: "#ebcb8b")!, bg: Color(fromHex: "#2E3440")!),
+      .stringRegex: TextFormat(fg: Color(fromHex: "#ebcb8b")!, bg: Color(fromHex: "#2E3440")!)
     ]
   }
 }

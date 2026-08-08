@@ -25,7 +25,7 @@ public struct SasTheme: CodeTheme {
       .number: TextFormat(fg: Color(fromHex: "#2c8553")!, bg: Color(fromHex: "#ffffff")!, bold: true),
       .other: TextFormat(fg: Color(fromHex: "#000000")!, bg: Color(fromHex: "#ffffe0")!),
       .string: TextFormat(fg: Color(fromHex: "#800080")!, bg: Color(fromHex: "#ffffff")!),
-      .whitespace: TextFormat(fg: Color(fromHex: "#bbb")!, bg: Color(fromHex: "#ffffff")!),
+      .whitespace: TextFormat(fg: Color(fromHex: "#bbb")!, bg: Color(fromHex: "#ffffff")!)
     ]
   }
 }

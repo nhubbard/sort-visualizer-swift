@@ -52,7 +52,7 @@ public struct SmoothSort: SortAlgorithm {
 
   private static let leonardo: [Int] = [
     1, 1, 3, 5, 9, 15, 25, 41, 67, 109,
-    177, 287, 465, 753, 1219, 1973, 3193, 5167, 8361, 13529, 21891,
+    177, 287, 465, 753, 1219, 1973, 3193, 5167, 8361, 13529, 21891
   ]
 
   public func record(into engine: inout RecordingEngine) {

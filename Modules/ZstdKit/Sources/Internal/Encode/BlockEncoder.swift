@@ -107,8 +107,7 @@ enum BlockEncoder {
       chunk, prefix: prefix, initialRepeatOffset: repeatOffsets.offset1, options: options)
     if !sequenceStore.sequences.isEmpty,
       let sequencesResult = SequenceStreamEncoder.encode(
-        sequenceStore: sequenceStore, initialRepeatOffsets: repeatOffsets)
-    {
+        sequenceStore: sequenceStore, initialRepeatOffsets: repeatOffsets) {
       let literalsSection = LiteralsEncoder.encodeLiterals(sequenceStore.literals)
       let payload = literalsSection + sequencesResult.bytes
       if payload.count < best.payload.count {

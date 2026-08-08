@@ -58,7 +58,7 @@ public struct ColorfulTheme: CodeTheme {
       .stringOther: TextFormat(fg: Color(fromHex: "#d20")!, bg: Color(fromHex: "#fff0f0")!),
       .stringRegex: TextFormat(fg: Color(fromHex: "#000")!, bg: Color(fromHex: "#fff0ff")!),
       .stringSymbol: TextFormat(fg: Color(fromHex: "#a60")!, bg: Color(fromHex: "#ffffff")!),
-      .whitespace: TextFormat(fg: Color(fromHex: "#bbb")!, bg: Color(fromHex: "#ffffff")!),
+      .whitespace: TextFormat(fg: Color(fromHex: "#bbb")!, bg: Color(fromHex: "#ffffff")!)
     ]
   }
 }

@@ -49,7 +49,7 @@ public struct PygmentsTheme: CodeTheme {
       .stringOther: TextFormat(fg: Color(fromHex: "#008000")!, bg: Color(fromHex: "#f8f8f8")!),
       .stringRegex: TextFormat(fg: Color(fromHex: "#a45a77")!, bg: Color(fromHex: "#f8f8f8")!),
       .stringSymbol: TextFormat(fg: Color(fromHex: "#19177c")!, bg: Color(fromHex: "#f8f8f8")!),
-      .whitespace: TextFormat(fg: Color(fromHex: "#bbb")!, bg: Color(fromHex: "#f8f8f8")!),
+      .whitespace: TextFormat(fg: Color(fromHex: "#bbb")!, bg: Color(fromHex: "#f8f8f8")!)
     ]
   }
 }

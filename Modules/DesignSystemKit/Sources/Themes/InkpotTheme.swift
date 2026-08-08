@@ -45,7 +45,7 @@ public struct InkpotTheme: CodeTheme {
       .punctuation: TextFormat(fg: Color(fromHex: "#cfbfad")!, bg: Color(fromHex: "#1e1e27")!),
       .string: TextFormat(fg: Color(fromHex: "#ffcd8b")!, bg: Color(fromHex: "#404040")!),
       .stringDoc: TextFormat(fg: Color(fromHex: "#808bed")!, bg: Color(fromHex: "#404040")!),
-      .whitespace: TextFormat(fg: Color(fromHex: "#434357")!, bg: Color(fromHex: "#1e1e27")!),
+      .whitespace: TextFormat(fg: Color(fromHex: "#434357")!, bg: Color(fromHex: "#1e1e27")!)
     ]
   }
 }

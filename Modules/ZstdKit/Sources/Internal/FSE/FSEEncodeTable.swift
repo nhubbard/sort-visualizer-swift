@@ -115,7 +115,6 @@ enum FSEEncodeTable {
     return writer.finish()
   }
 
-
   /// Turns a raw frequency histogram into normalized counts summing to `1 << accuracyLog`
   /// (`FSE_normalizeCount`'s job, simplified: proportional allocation, floored, each present
   /// symbol guaranteed at least 1 slot, any rounding leftover dumped onto the most frequent
@@ -155,8 +154,7 @@ enum FSEEncodeTable {
   /// Smallest accuracy log that can give every distinct symbol at least one table slot, never
   /// exceeding `maximumAccuracyLog`.
   static func chooseAccuracyLog(distinctSymbolCount: Int, minimumAccuracyLog: Int, maximumAccuracyLog: Int)
-    -> Int
-  {
+    -> Int {
     var log = minimumAccuracyLog
     while (1 << log) < distinctSymbolCount, log < maximumAccuracyLog {
       log += 1

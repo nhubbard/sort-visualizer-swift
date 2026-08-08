@@ -28,7 +28,7 @@ public struct StataDarkTheme: CodeTheme {
       .other: TextFormat(fg: Color(fromHex: "#ccc")!, bg: Color(fromHex: "#232629")!),
       .punctuation: TextFormat(fg: Color(fromHex: "#ccc")!, bg: Color(fromHex: "#232629")!),
       .string: TextFormat(fg: Color(fromHex: "#51cc99")!, bg: Color(fromHex: "#232629")!),
-      .whitespace: TextFormat(fg: Color(fromHex: "#bbb")!, bg: Color(fromHex: "#232629")!),
+      .whitespace: TextFormat(fg: Color(fromHex: "#bbb")!, bg: Color(fromHex: "#232629")!)
     ]
   }
 }

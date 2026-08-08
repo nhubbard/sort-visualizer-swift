@@ -48,7 +48,7 @@ public struct GithubDarkTheme: CodeTheme {
       .stringEscape: TextFormat(fg: Color(fromHex: "#79c0ff")!, bg: Color(fromHex: "#0d1117")!),
       .stringHeredoc: TextFormat(fg: Color(fromHex: "#79c0ff")!, bg: Color(fromHex: "#0d1117")!),
       .stringRegex: TextFormat(fg: Color(fromHex: "#79c0ff")!, bg: Color(fromHex: "#0d1117")!),
-      .whitespace: TextFormat(fg: Color(fromHex: "#6e7681")!, bg: Color(fromHex: "#0d1117")!),
+      .whitespace: TextFormat(fg: Color(fromHex: "#6e7681")!, bg: Color(fromHex: "#0d1117")!)
     ]
   }
 }

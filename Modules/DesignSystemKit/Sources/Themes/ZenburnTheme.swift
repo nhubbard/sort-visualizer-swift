@@ -44,7 +44,7 @@ public struct ZenburnTheme: CodeTheme {
       .punctuation: TextFormat(fg: Color(fromHex: "#f0efd0")!, bg: Color(fromHex: "#3f3f3f")!),
       .string: TextFormat(fg: Color(fromHex: "#cc9393")!, bg: Color(fromHex: "#3f3f3f")!),
       .stringDoc: TextFormat(fg: Color(fromHex: "#7f9f7f")!, bg: Color(fromHex: "#3f3f3f")!),
-      .stringInterpol: TextFormat(fg: Color(fromHex: "#dca3a3")!, bg: Color(fromHex: "#3f3f3f")!, bold: true),
+      .stringInterpol: TextFormat(fg: Color(fromHex: "#dca3a3")!, bg: Color(fromHex: "#3f3f3f")!, bold: true)
     ]
   }
 }

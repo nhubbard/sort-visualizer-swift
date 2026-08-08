@@ -38,7 +38,7 @@ public struct GruvboxLightTheme: CodeTheme {
       .number: TextFormat(fg: Color(fromHex: "#8f3f71")!, bg: Color(fromHex: "#fbf1c7")!),
       .operatorWord: TextFormat(fg: Color(fromHex: "#9d0006")!, bg: Color(fromHex: "#fbf1c7")!),
       .string: TextFormat(fg: Color(fromHex: "#79740e")!, bg: Color(fromHex: "#fbf1c7")!),
-      .stringEscape: TextFormat(fg: Color(fromHex: "#af3a03")!, bg: Color(fromHex: "#fbf1c7")!),
+      .stringEscape: TextFormat(fg: Color(fromHex: "#af3a03")!, bg: Color(fromHex: "#fbf1c7")!)
     ]
   }
 }

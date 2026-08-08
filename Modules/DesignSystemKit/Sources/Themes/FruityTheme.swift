@@ -34,7 +34,7 @@ public struct FruityTheme: CodeTheme {
       .other: TextFormat(fg: Color(fromHex: "#fff")!, bg: Color(fromHex: "#111111")!),
       .punctuation: TextFormat(fg: Color(fromHex: "#fff")!, bg: Color(fromHex: "#111111")!),
       .string: TextFormat(fg: Color(fromHex: "#0086d2")!, bg: Color(fromHex: "#111111")!),
-      .whitespace: TextFormat(fg: Color(fromHex: "#888")!, bg: Color(fromHex: "#111111")!),
+      .whitespace: TextFormat(fg: Color(fromHex: "#888")!, bg: Color(fromHex: "#111111")!)
     ]
   }
 }

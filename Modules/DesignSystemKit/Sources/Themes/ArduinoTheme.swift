@@ -25,7 +25,7 @@ public struct ArduinoTheme: CodeTheme {
       .nameOther: TextFormat(fg: Color(fromHex: "#728e00")!, bg: Color(fromHex: "#ffffff")!),
       .number: TextFormat(fg: Color(fromHex: "#8a7b52")!, bg: Color(fromHex: "#ffffff")!),
       .operator: TextFormat(fg: Color(fromHex: "#728e00")!, bg: Color(fromHex: "#ffffff")!),
-      .string: TextFormat(fg: Color(fromHex: "#7f8c8d")!, bg: Color(fromHex: "#ffffff")!),
+      .string: TextFormat(fg: Color(fromHex: "#7f8c8d")!, bg: Color(fromHex: "#ffffff")!)
     ]
   }
 }

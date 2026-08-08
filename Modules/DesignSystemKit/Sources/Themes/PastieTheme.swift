@@ -51,7 +51,7 @@ public struct PastieTheme: CodeTheme {
       .stringOther: TextFormat(fg: Color(fromHex: "#2b2")!, bg: Color(fromHex: "#f0fff0")!),
       .stringRegex: TextFormat(fg: Color(fromHex: "#080")!, bg: Color(fromHex: "#fff0ff")!),
       .stringSymbol: TextFormat(fg: Color(fromHex: "#a60")!, bg: Color(fromHex: "#fff0f0")!),
-      .whitespace: TextFormat(fg: Color(fromHex: "#bbb")!, bg: Color(fromHex: "#ffffff")!),
+      .whitespace: TextFormat(fg: Color(fromHex: "#bbb")!, bg: Color(fromHex: "#ffffff")!)
     ]
   }
 }

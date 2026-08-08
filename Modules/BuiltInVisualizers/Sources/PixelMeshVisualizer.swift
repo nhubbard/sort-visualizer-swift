@@ -56,8 +56,7 @@ public struct PixelMeshVisualizer: Visualizer {
   }
 
   private func color(forIndex idx: Int, normalized: Double, in context: VisualizationContext)
-    -> RGBAColor
-  {
+    -> RGBAColor {
     let markers = context.markers[idx] ?? []
     if markers.contains(Marker.primary) {
       return Self.primaryColor

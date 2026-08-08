@@ -230,13 +230,13 @@ final class MetalHanoiTowersRenderer: NSObject, MetalIncrementalRenderer {
       slot: i,
       waypoints: [
         .init(target: homePosition(forIndex: j), holdDuration: Self.legDuration),
-        .init(target: homePosition(forIndex: i), holdDuration: 0),
+        .init(target: homePosition(forIndex: i), holdDuration: 0)
       ])
     positions.schedule(
       slot: j,
       waypoints: [
         .init(target: homePosition(forIndex: i), holdDuration: Self.legDuration),
-        .init(target: homePosition(forIndex: j), holdDuration: 0),
+        .init(target: homePosition(forIndex: j), holdDuration: 0)
       ])
     writeInstance(slot: i, values: values, valueRange: valueRange, markers: markers)
     writeInstance(slot: j, values: values, valueRange: valueRange, markers: markers)
@@ -250,7 +250,7 @@ final class MetalHanoiTowersRenderer: NSObject, MetalIncrementalRenderer {
       slot: index,
       waypoints: [
         .init(target: parkedPosition(inTower: spare, rank: rank), holdDuration: Self.legDuration * 2),
-        .init(target: homePosition(forIndex: index), holdDuration: 0),
+        .init(target: homePosition(forIndex: index), holdDuration: 0)
       ])
     writeInstance(slot: index, values: values, valueRange: valueRange, markers: markers)
   }

@@ -49,8 +49,7 @@ enum ShatterSortingTemplate {
   /// distribution rather than always being exactly `num`.
   @discardableResult
   static func shatterPartition(_ engine: inout RecordingEngine, _ start: Int, _ length: Int, _ num: Int)
-    -> [Int]
-  {
+    -> [Int] {
     let window = start..<(start + length)
     let minValue = window.map { engine.values[$0] }.min()!
     let maxValue = window.map { engine.values[$0] }.max()!

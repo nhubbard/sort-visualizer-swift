@@ -50,7 +50,7 @@ public struct ManniTheme: CodeTheme {
       .stringInterpol: TextFormat(fg: Color(fromHex: "#a00")!, bg: Color(fromHex: "#f0f3f3")!),
       .stringRegex: TextFormat(fg: Color(fromHex: "#3aa")!, bg: Color(fromHex: "#f0f3f3")!),
       .stringSymbol: TextFormat(fg: Color(fromHex: "#fc3")!, bg: Color(fromHex: "#f0f3f3")!),
-      .whitespace: TextFormat(fg: Color(fromHex: "#bbb")!, bg: Color(fromHex: "#f0f3f3")!),
+      .whitespace: TextFormat(fg: Color(fromHex: "#bbb")!, bg: Color(fromHex: "#f0f3f3")!)
     ]
   }
 }

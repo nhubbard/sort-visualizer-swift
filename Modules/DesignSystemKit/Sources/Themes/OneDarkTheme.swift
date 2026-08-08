@@ -32,7 +32,7 @@ public struct OneDarkTheme: CodeTheme {
       .nameFunctionMagic: TextFormat(fg: Color(fromHex: "#56b6c2")!, bg: Color(fromHex: "#282C34")!, bold: true),
       .number: TextFormat(fg: Color(fromHex: "#d19a66")!, bg: Color(fromHex: "#282C34")!),
       .operator: TextFormat(fg: Color(fromHex: "#56b6c2")!, bg: Color(fromHex: "#282C34")!),
-      .string: TextFormat(fg: Color(fromHex: "#98c379")!, bg: Color(fromHex: "#282C34")!),
+      .string: TextFormat(fg: Color(fromHex: "#98c379")!, bg: Color(fromHex: "#282C34")!)
     ]
   }
 }

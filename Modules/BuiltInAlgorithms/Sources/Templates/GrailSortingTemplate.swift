@@ -89,8 +89,7 @@ enum GrailSortingTemplate {
   /// many distinct keys were actually found (may be `< numKeys` if there aren't enough distinct
   /// values in the range). Cost: `2*len + numKeys^2/2`.
   private static func findKeys(_ engine: inout RecordingEngine, _ pos: Int, _ len: Int, _ numKeys: Int)
-    -> Int
-  {
+    -> Int {
     var dist = 1
     var foundKeys = 1
     var firstKey = 0
@@ -354,8 +353,7 @@ enum GrailSortingTemplate {
   /// Bottom-up run construction. Textually identical to
   /// `UnstableGrailSortingTemplate.buildBlocks` — see this file's own doc comment for why (no
   /// external buffer means ArrayV's own "XBuf" branch is provably unreachable here too).
-  private static func buildBlocks(_ engine: inout RecordingEngine, _ pos: Int, _ len: Int, _ buildLen: Int)
-  {
+  private static func buildBlocks(_ engine: inout RecordingEngine, _ pos: Int, _ len: Int, _ buildLen: Int) {
     var pos = pos
     var dist = 1
     while dist < len {
@@ -457,8 +455,7 @@ enum GrailSortingTemplate {
         while aBlockCount < blockCount
           && engine.compare(
             blockPos + blockCount * regBlockLen,
-            blockPos + (blockCount - aBlockCount - 1) * regBlockLen, by: <)
-        {
+            blockPos + (blockCount - aBlockCount - 1) * regBlockLen, by: <) {
           aBlockCount += 1
         }
       }

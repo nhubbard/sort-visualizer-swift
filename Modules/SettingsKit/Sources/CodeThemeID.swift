@@ -62,7 +62,7 @@ extension CodeThemeID {
     CodeThemeID(rawValue: "vim"),
     CodeThemeID(rawValue: "vs"),
     CodeThemeID(rawValue: "xcode"),
-    CodeThemeID(rawValue: "zenburn"),
+    CodeThemeID(rawValue: "zenburn")
   ]
 
   public var displayName: String {

@@ -19,7 +19,7 @@ struct Sort2App: App {
       SineWaveVisualizer(), ColorCircleVisualizer(), SpiralVisualizer(), SpiralDotsVisualizer(),
       WaveDotsVisualizer(), PixelMeshVisualizer(), HoopStackVisualizer(),
       DisparityBarGraphVisualizer(), DisparityCircleVisualizer(), DisparityChordsVisualizer(),
-      DisparityDotsVisualizer(), HanoiTowersVisualizer(),
+      DisparityDotsVisualizer(), HanoiTowersVisualizer()
     ]
     VisualizerRegistry.shared.discover()
 
@@ -92,7 +92,7 @@ struct Sort2App: App {
       TwinSort(),
       UnoptimizedBubbleSort(),
       UnoptimizedCocktailShakerSort(), UnstableGrailSort(), WeakHeapSort(), WeavedMergeSort(),
-      WeaveMergeSort(), WeaveSortIterative(), WeaveSortRecursive(),
+      WeaveMergeSort(), WeaveSortIterative(), WeaveSortRecursive()
     ]
     AlgorithmRegistry.shared.discover()
 
@@ -107,7 +107,7 @@ struct Sort2App: App {
       RealFinalRadixShuffle(), RecursiveRadixShuffle(), RecursiveReversalShuffle(),
       SawtoothShuffle(),
       ShuffledCubicShuffle(), ShuffledHalfShuffle(), ShuffledHeadShuffle(), ShuffledOddsShuffle(),
-      ShuffledQuinticShuffle(), ShuffledTailShuffle(), SierpinskiShuffle(), TriangularShuffle(),
+      ShuffledQuinticShuffle(), ShuffledTailShuffle(), SierpinskiShuffle(), TriangularShuffle()
     ]
     ShuffleRegistry.shared.discover()
 
@@ -135,7 +135,7 @@ struct Sort2App: App {
             [metadata.effectiveSizeRange(operationCap: AppSettings.shared.recordingOperationCap).upperBound]
           }
         }
-      ),
+      )
     ]
     AutomationRegistry.shared.discover()
 
@@ -144,8 +144,7 @@ struct Sort2App: App {
     // take minutes to visually finish — correct, pedagogically-honest behavior in the running
     // app, but impractical for a UI test's timeout. Tests set this via `launchEnvironment`.
     if let overrideValue = ProcessInfo.processInfo.environment["UI_TEST_ARRAY_SIZE"],
-      let overrideSize = Int(overrideValue)
-    {
+      let overrideSize = Int(overrideValue) {
       AppSettings.shared.defaultArraySize = overrideSize
     }
 
@@ -156,8 +155,7 @@ struct Sort2App: App {
     // not a hypothetical one). This mutates the same `UserDefaults.standard`-backed setting a
     // real Settings-screen drag would, just precisely and deterministically.
     if let overrideValue = ProcessInfo.processInfo.environment["UI_TEST_PLAYBACK_SPEED"],
-      let overrideSpeed = Double(overrideValue)
-    {
+      let overrideSpeed = Double(overrideValue) {
       AppSettings.shared.playbackSpeed = overrideSpeed
     }
 

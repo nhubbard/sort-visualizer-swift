@@ -42,7 +42,7 @@ public struct TracTheme: CodeTheme {
       .operator: TextFormat(fg: Color(fromHex: "#000000")!, bg: Color(fromHex: "#ffffff")!, bold: true),
       .string: TextFormat(fg: Color(fromHex: "#b84")!, bg: Color(fromHex: "#ffffff")!),
       .stringRegex: TextFormat(fg: Color(fromHex: "#808000")!, bg: Color(fromHex: "#ffffff")!),
-      .whitespace: TextFormat(fg: Color(fromHex: "#bbb")!, bg: Color(fromHex: "#ffffff")!),
+      .whitespace: TextFormat(fg: Color(fromHex: "#bbb")!, bg: Color(fromHex: "#ffffff")!)
     ]
   }
 }

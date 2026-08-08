@@ -15,7 +15,7 @@ public struct LilypondTheme: CodeTheme {
       .keyword: TextFormat(fg: Color(fromHex: "#000000")!, bg: Color(fromHex: "#ffffff")!, bold: true),
       .number: TextFormat(fg: Color(fromHex: "#976806")!, bg: Color(fromHex: "#ffffff")!),
       .string: TextFormat(fg: Color(fromHex: "#ab0909")!, bg: Color(fromHex: "#ffffff")!),
-      .stringEscape: TextFormat(fg: Color(fromHex: "#c46c6c")!, bg: Color(fromHex: "#ffffff")!),
+      .stringEscape: TextFormat(fg: Color(fromHex: "#c46c6c")!, bg: Color(fromHex: "#ffffff")!)
     ]
   }
 }

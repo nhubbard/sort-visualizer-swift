@@ -131,8 +131,7 @@ struct GrowthModelCalibrationTests {
       let declaredShape = BigOShape.parse(combo.algorithm.metadata.timeComplexity.worst)
       if let report = await Self.makeReport(
         subjectID: "\(algorithmID)+\(combo.shuffle.id.rawValue)", measurement: measurement,
-        declaredShape: declaredShape)
-      {
+        declaredShape: declaredShape) {
         let unsafeNote = report.unsafeAtSize.map {
           " [\((report.unsafeReason ?? "unsafe").uppercased()) at size \($0) -- capped]"
         } ?? ""
@@ -145,8 +144,7 @@ struct GrowthModelCalibrationTests {
         // before taking the minimum.
         if entry.bindingReport == nil
           || (report.safeMaxSizeByCap[Self.referenceCaps[1]] ?? .infinity)
-            < (entry.bindingReport!.safeMaxSizeByCap[Self.referenceCaps[1]] ?? .infinity)
-        {
+            < (entry.bindingReport!.safeMaxSizeByCap[Self.referenceCaps[1]] ?? .infinity) {
           entry.bindingReport = report
         }
       } else {
@@ -371,8 +369,7 @@ struct GrowthModelCalibrationTests {
       // outlier from `samples` entirely (not just cap around it) rather than let it distort the
       // fit for every other size.
       if let predictedForThisSize, predictedForThisSize > 0,
-        stats.mean / predictedForThisSize > 100
-      {
+        stats.mean / predictedForThisSize > 100 {
         logProgress(
           "  \(label) size \(n): measured \(Int(stats.mean)) ops, ~\(Int(stats.mean / predictedForThisSize))x more than the established trend predicted (~\(Int(predictedForThisSize))) -- erratic/discontinuous growth, excluding this size and stopping here"
         )
@@ -574,8 +571,7 @@ struct GrowthModelCalibrationTests {
   }
 
   private static func solveForN(model: FittedGrowthModel, cap: Double, seed: Double) async
-    -> Double?
-  {
+    -> Double? {
     switch model.family {
     case .powerLaw:
       let (a, k) = (model.coefficients[0], model.coefficients[1])
@@ -638,8 +634,7 @@ struct GrowthModelCalibrationTests {
   }
 
   private static func fetchTaylorPolynomial(expr: String, n0: Double, order: Int = 2) async throws
-    -> TaylorPolynomial
-  {
+    -> TaylorPolynomial {
     var request = URLRequest(url: bridgeURL.appending(path: "taylor-invert"))
     request.httpMethod = "POST"
     request.setValue("application/json", forHTTPHeaderField: "Content-Type")

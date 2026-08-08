@@ -16,7 +16,7 @@ public struct IgorTheme: CodeTheme {
       .nameClass: TextFormat(fg: Color(fromHex: "#007575")!, bg: Color(fromHex: "#ffffff")!),
       .nameDecorator: TextFormat(fg: Color(fromHex: "#cc00a3")!, bg: Color(fromHex: "#ffffff")!),
       .nameFunction: TextFormat(fg: Color(fromHex: "#c34e00")!, bg: Color(fromHex: "#ffffff")!),
-      .string: TextFormat(fg: Color(fromHex: "#009c00")!, bg: Color(fromHex: "#ffffff")!),
+      .string: TextFormat(fg: Color(fromHex: "#009c00")!, bg: Color(fromHex: "#ffffff")!)
     ]
   }
 }

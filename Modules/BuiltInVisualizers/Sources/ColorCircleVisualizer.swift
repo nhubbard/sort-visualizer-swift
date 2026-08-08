@@ -53,8 +53,7 @@ public struct ColorCircleVisualizer: Visualizer {
   }
 
   private func color(forIndex index: Int, normalized: Double, in context: VisualizationContext)
-    -> RGBAColor
-  {
+    -> RGBAColor {
     let markers = context.markers[index] ?? []
     if markers.contains(Marker.primary) {
       return Self.primaryColor

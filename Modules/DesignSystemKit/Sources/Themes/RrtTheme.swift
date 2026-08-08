@@ -35,7 +35,7 @@ public struct RrtTheme: CodeTheme {
       .other: TextFormat(fg: Color(fromHex: "#ddd")!, bg: Color(fromHex: "#000000")!),
       .punctuation: TextFormat(fg: Color(fromHex: "#ddd")!, bg: Color(fromHex: "#000000")!),
       .string: TextFormat(fg: Color(fromHex: "#87ceeb")!, bg: Color(fromHex: "#000000")!),
-      .whitespace: TextFormat(fg: Color(fromHex: "#ddd")!, bg: Color(fromHex: "#000000")!),
+      .whitespace: TextFormat(fg: Color(fromHex: "#ddd")!, bg: Color(fromHex: "#000000")!)
     ]
   }
 }

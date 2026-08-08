@@ -50,7 +50,7 @@ public struct EmacsTheme: CodeTheme {
       .stringOther: TextFormat(fg: Color(fromHex: "#008000")!, bg: Color(fromHex: "#f8f8f8")!),
       .stringRegex: TextFormat(fg: Color(fromHex: "#b68")!, bg: Color(fromHex: "#f8f8f8")!),
       .stringSymbol: TextFormat(fg: Color(fromHex: "#b8860b")!, bg: Color(fromHex: "#f8f8f8")!),
-      .whitespace: TextFormat(fg: Color(fromHex: "#bbb")!, bg: Color(fromHex: "#f8f8f8")!),
+      .whitespace: TextFormat(fg: Color(fromHex: "#bbb")!, bg: Color(fromHex: "#f8f8f8")!)
     ]
   }
 }

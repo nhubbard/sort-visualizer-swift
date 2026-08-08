@@ -23,7 +23,7 @@ public struct XcodeTheme: CodeTheme {
       .nameClass: TextFormat(fg: Color(fromHex: "#3f6e75")!, bg: Color(fromHex: "#ffffff")!),
       .operator: TextFormat(fg: Color(fromHex: "#000")!, bg: Color(fromHex: "#ffffff")!),
       .string: TextFormat(fg: Color(fromHex: "#c41a16")!, bg: Color(fromHex: "#ffffff")!),
-      .stringChar: TextFormat(fg: Color(fromHex: "#2300ce")!, bg: Color(fromHex: "#ffffff")!),
+      .stringChar: TextFormat(fg: Color(fromHex: "#2300ce")!, bg: Color(fromHex: "#ffffff")!)
     ]
   }
 }

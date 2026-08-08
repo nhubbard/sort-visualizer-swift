@@ -43,7 +43,7 @@ public struct AutumnTheme: CodeTheme {
       .string: TextFormat(fg: Color(fromHex: "#a50")!, bg: Color(fromHex: "#ffffff")!),
       .stringRegex: TextFormat(fg: Color(fromHex: "#099")!, bg: Color(fromHex: "#ffffff")!),
       .stringSymbol: TextFormat(fg: Color(fromHex: "#00a")!, bg: Color(fromHex: "#ffffff")!),
-      .whitespace: TextFormat(fg: Color(fromHex: "#bbb")!, bg: Color(fromHex: "#ffffff")!),
+      .whitespace: TextFormat(fg: Color(fromHex: "#bbb")!, bg: Color(fromHex: "#ffffff")!)
     ]
   }
 }

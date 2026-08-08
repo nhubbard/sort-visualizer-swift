@@ -29,7 +29,7 @@ struct RainbowVisualizerTests {
 
     #expect(commands.count == 3)
     guard case .rect(_, let y0, let w0, let h0, _) = commands[0],
-      case .rect(_, _, _, _, _) = commands[1],
+      case .rect = commands[1],
       case .rect(_, let y2, _, let h2, _) = commands[2]
     else {
       Issue.record("expected all commands to be .rect")

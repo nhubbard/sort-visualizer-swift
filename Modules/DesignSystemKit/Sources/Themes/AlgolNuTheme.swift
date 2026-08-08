@@ -23,7 +23,7 @@ public struct AlgolNuTheme: CodeTheme {
       .nameNamespace: TextFormat(fg: Color(fromHex: "#666")!, bg: Color(fromHex: "#ffffff")!, bold: true, italic: true),
       .nameVariable: TextFormat(fg: Color(fromHex: "#666")!, bg: Color(fromHex: "#ffffff")!, bold: true, italic: true),
       .operatorWord: TextFormat(fg: Color(fromHex: "#000000")!, bg: Color(fromHex: "#ffffff")!, bold: true),
-      .string: TextFormat(fg: Color(fromHex: "#666")!, bg: Color(fromHex: "#ffffff")!, italic: true),
+      .string: TextFormat(fg: Color(fromHex: "#666")!, bg: Color(fromHex: "#ffffff")!, italic: true)
     ]
   }
 }
