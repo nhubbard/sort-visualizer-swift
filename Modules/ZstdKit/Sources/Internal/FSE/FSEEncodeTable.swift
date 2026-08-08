@@ -115,38 +115,57 @@ enum FSEEncodeTable {
     return writer.finish()
   }
 
-  /// Turns a raw frequency histogram into normalized counts summing to `1 << accuracyLog`
+  /// Turns a raw frequency histogram into normalized counts summing to exactly `1 << accuracyLog`
   /// (`FSE_normalizeCount`'s job, simplified: proportional allocation, floored, each present
-  /// symbol guaranteed at least 1 slot, any rounding leftover dumped onto the most frequent
-  /// symbol). Deliberately never emits the `-1` "low probability" sentinel — a plain count of `1`
-  /// produces an identical, valid decode table (per `FSETableBuilder.buildDecodeTable`, `-1` and
-  /// `1` are handled identically except for *where* in the table they're placed), so this skips a
-  /// whole class of bookkeeping the reference's real encoder carries for a compression-ratio
-  /// nicety this doesn't need. Safe by construction whenever `distinctSymbolCount <= 1 <<
-  /// accuracyLog` (guaranteed by `chooseAccuracyLog`'s caller): see the derivation in this
-  /// session's notes — the "leftover dumped on the largest symbol" adjustment can be shown to
-  /// always leave that symbol with a count `>= 1` under that precondition.
+  /// symbol guaranteed at least 1 slot). Deliberately never emits the `-1` "low probability"
+  /// sentinel — a plain count of `1` produces an identical, valid decode table (per
+  /// `FSETableBuilder.buildDecodeTable`, `-1` and `1` are handled identically except for *where* in
+  /// the table they're placed), so this skips a whole class of bookkeeping the reference's real
+  /// encoder carries for a compression-ratio nicety this doesn't need.
+  ///
+  /// The proportional pass alone doesn't guarantee the sum comes out to `tableSize`: forcing every
+  /// present symbol up to at least 1 slot can push the total *past* `tableSize` even when
+  /// `distinctSymbolCount <= tableSize` holds (e.g. many low-frequency symbols each claiming their
+  /// forced minimum, leaving less than proportional share for the rest). When that happens
+  /// (`remaining < 0`), the shortfall is taken back from the most-allocated symbols first, down to
+  /// a floor of `1` each — never just clamping a single symbol, which would silently break the
+  /// exact-`tableSize` invariant `build()` relies on (a real, previously-shipped bug: it let
+  /// `build()` write more slots than `stateTable` has room for). This always fully resolves:
+  /// reducible capacity is `sum(normalized) - distinctSymbolCount`, and the deficit is
+  /// `sum(normalized) - tableSize`, which is `<=` that capacity exactly when
+  /// `distinctSymbolCount <= tableSize` — the precondition `chooseAccuracyLog`'s callers guarantee.
   static func normalize(counts: [Int], accuracyLog: Int) -> [Int] {
     let tableSize = 1 << accuracyLog
     let total = counts.reduce(0, +)
     var normalized = [Int](repeating: 0, count: counts.count)
     guard total > 0 else { return normalized }
 
-    var remaining = tableSize
+    var presentIndices: [Int] = []
     var largestIndex = -1
     var largestCount = -1
     for (index, count) in counts.enumerated() where count > 0 {
       let proba = max(1, Int((Double(count) * Double(tableSize)) / Double(total)))
       normalized[index] = proba
-      remaining -= proba
+      presentIndices.append(index)
       if count > largestCount {
         largestCount = count
         largestIndex = index
       }
     }
-    if largestIndex >= 0 {
-      normalized[largestIndex] += remaining
-      if normalized[largestIndex] < 1 { normalized[largestIndex] = 1 }
+
+    let remaining = tableSize - presentIndices.reduce(0) { $0 + normalized[$1] }
+    if remaining >= 0 {
+      if largestIndex >= 0 {
+        normalized[largestIndex] += remaining
+      }
+    } else {
+      var deficit = -remaining
+      for index in presentIndices.sorted(by: { normalized[$0] > normalized[$1] }) {
+        guard deficit > 0 else { break }
+        let take = min(deficit, normalized[index] - 1)
+        normalized[index] -= take
+        deficit -= take
+      }
     }
     return normalized
   }

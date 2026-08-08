@@ -122,4 +122,96 @@ struct FSEEncodeTableTests {
     let decoded = try decode(bytes, accuracyLog: accuracyLog, count: symbols.count, decodeTable: decodeTable)
     #expect(decoded == symbols)
   }
+
+  /// Reproduces the real crash this project hit: many low-frequency-but-present symbols (offset
+  /// codes commonly have up to 32 distinct values, matching `tableSize` at the minimum accuracy
+  /// log) each forced up to `normalize`'s `max(1, ...)` floor, plus a *spread* of moderately-sized
+  /// symbols (not one overwhelming dominant symbol — see below), can push the proportional-
+  /// allocation sum well past `tableSize` even though `distinctSymbolCount <= tableSize` holds.
+  /// 21 symbols at count 1 plus 10 symbols at count 70 (31 distinct symbols, `tableSize` 32):
+  /// proportional allocation gives the 10 "medium" symbols proba 3 each (30) plus the 21 forced
+  /// 1s (21), summing to 51 against a `tableSize` of 32 — a deficit of 19 that no *single* symbol
+  /// can absorb (the largest individual proba is only 3), which is exactly why a fix must reduce
+  /// from *multiple* symbols, not just clamp the one largest. The old single-symbol-clamp code
+  /// left the sum at 49 instead of 32, and `FSEEncodeTable.build` wrote past `stateTable`'s bounds
+  /// as a result.
+  @Test
+  func normalizeResolvesOverAllocationWithManyLowFrequencySymbols() throws {
+    let counts = [Int](repeating: 1, count: 21) + [Int](repeating: 70, count: 10)
+    let accuracyLog = 5
+    let tableSize = 1 << accuracyLog
+
+    let normalized = FSEEncodeTable.normalize(counts: counts, accuracyLog: accuracyLog)
+    #expect(normalized.reduce(0, +) == tableSize)
+    for (index, count) in counts.enumerated() where count > 0 {
+      #expect(normalized[index] >= 1, "present symbol \(index) dropped below 1")
+    }
+
+    // Must not trap building the encode table, and the result must round-trip.
+    let encodeTable = FSEEncodeTable.build(counts: normalized, accuracyLog: accuracyLog)
+    let decodeTable = try FSETableBuilder.buildDecodeTable(counts: normalized, accuracyLog: accuracyLog)
+    let symbols = normalized.enumerated().flatMap { index, count in Array(repeating: index, count: count) }
+    let bytes = FSEEncodeTable.encodeSymbols(symbols, table: encodeTable)
+    let decoded = try decode(bytes, accuracyLog: accuracyLog, count: symbols.count, decodeTable: decodeTable)
+    #expect(decoded == symbols)
+  }
+
+  /// A minimal, self-contained deterministic PRNG (xorshift32) — this file has no existing seeded
+  /// RNG helper, and a fixed seed keeps this fuzz test's failures reproducible across runs rather
+  /// than depending on `SystemRandomNumberGenerator`'s nondeterministic state.
+  private struct Xorshift32: RandomNumberGenerator {
+    var state: UInt32
+    mutating func next() -> UInt64 {
+      state ^= state << 13
+      state ^= state >> 17
+      state ^= state << 5
+      return UInt64(state)
+    }
+  }
+
+  /// Property fuzz: across every real caller's actual symbol-count ceiling (`SequenceSymbolKind`'s
+  /// literal-length/offset/match-length maxes, plus Huffman's weight max) and a spread of accuracy
+  /// logs, `normalize` must always sum to exactly `tableSize` with every present symbol `>= 1`, and
+  /// `build` must never crash. This is the class of input `FSEEncodeTableTests`'s existing hand-picked
+  /// fixtures never exercised — real distinct-symbol counts approaching `tableSize` with a skewed
+  /// frequency distribution, exactly the shape that reproduced the original crash.
+  @Test
+  func normalizeAndBuildNeverCrashAcrossRandomDistributions() throws {
+    var rng = Xorshift32(state: 0xC0FF_EE01)
+    let symbolCeilings = [36, 53, 32, 12]  // literalLength, matchLength, offset, Huffman weights
+    let accuracyLogs = [5, 6, 7, 8, 9]
+
+    for _ in 0..<500 {
+      let maxSymbol = symbolCeilings.randomElement(using: &rng)!
+      let accuracyLog = accuracyLogs.randomElement(using: &rng)!
+      let tableSize = 1 << accuracyLog
+      guard maxSymbol + 1 <= tableSize * 4 else { continue }  // keep distinctSymbolCount reachable
+
+      var counts = [Int](repeating: 0, count: maxSymbol + 1)
+      let distinctSymbolCount = Int.random(in: 1...min(maxSymbol + 1, tableSize), using: &rng)
+      let chosenIndices = (0...maxSymbol).shuffled(using: &rng).prefix(distinctSymbolCount)
+      for index in chosenIndices {
+        // Heavily skewed range so a handful of symbols can dominate while the rest sit near the
+        // forced minimum -- the shape that actually stresses the over-allocation path.
+        counts[index] = Int.random(in: 1...2000, using: &rng)
+      }
+      guard counts.contains(where: { $0 > 0 }) else { continue }
+
+      let normalized = FSEEncodeTable.normalize(counts: counts, accuracyLog: accuracyLog)
+      #expect(normalized.reduce(0, +) == tableSize)
+      for (index, count) in counts.enumerated() where count > 0 {
+        #expect(normalized[index] >= 1)
+      }
+
+      let encodeTable = FSEEncodeTable.build(counts: normalized, accuracyLog: accuracyLog)
+      let decodeTable = try FSETableBuilder.buildDecodeTable(counts: normalized, accuracyLog: accuracyLog)
+      let symbols = normalized.enumerated().flatMap { index, count in
+        Array(repeating: index, count: max(count, 0))
+      }
+      guard !symbols.isEmpty else { continue }
+      let bytes = FSEEncodeTable.encodeSymbols(symbols, table: encodeTable)
+      let decoded = try decode(bytes, accuracyLog: accuracyLog, count: symbols.count, decodeTable: decodeTable)
+      #expect(decoded == symbols)
+    }
+  }
 }
