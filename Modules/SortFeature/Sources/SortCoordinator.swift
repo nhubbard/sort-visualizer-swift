@@ -180,4 +180,18 @@ public final class SortCoordinator {
     selectedAlgorithmID = algorithmID
     return runToken
   }
+
+  /// Selects `algorithmID` and always bumps `runToken`, even when `algorithmID` already equals
+  /// `selectedAlgorithmID` — a plain assignment in that case is a silent no-op (`@Observable`
+  /// elides the change notification for an equal value), so `ContentView.detailContent`'s
+  /// `.id(...)` never changes and `ScrollingSortView` never remounts. Showcase mode hit exactly
+  /// this: starting it while already viewing the alphabetically-first algorithm (the one Showcase
+  /// itself starts with) left the old, non-showcase-aware view/task running untouched underneath
+  /// the showcase banner. Mirrors `beginRun`'s `runToken` bump without its `pendingActions`/
+  /// `pendingShuffleOverrides` bookkeeping — Showcase drives completion via `ScrollingSortView`'s
+  /// `showcaseCompletion`/`showcaseStop` parameters directly, not the `PendingAction` mechanism.
+  public func selectAlgorithmForFreshView(_ algorithmID: AlgorithmID) {
+    runToken += 1
+    selectedAlgorithmID = algorithmID
+  }
 }

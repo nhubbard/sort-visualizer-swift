@@ -282,10 +282,11 @@ struct ContentView: View {
           algorithm: algorithm, shuffle: effectiveShuffle(for: selection), arraySize: arraySize,
           showcaseCompletion: showcaseCompletionHandler, showcaseStop: showcaseStopHandler
         )
-        // Folds in `coordinator.runToken` (bumped on every intent-triggered run) alongside
-        // `selection` — a `RunSortIntent`/`RunAutomationIntent` re-running the *same*
-        // algorithm still needs a genuinely fresh `ScrollingSortView`/`SortSession`, not a
-        // silent no-op against one that already reached `.complete`.
+        // Folds in `coordinator.runToken` (bumped on every intent-triggered run, and by
+        // `selectAlgorithmForFreshView` — see `startShowcase`/`advanceShowcase`) alongside
+        // `selection` — a `RunSortIntent`/`RunAutomationIntent`/Showcase step re-running or
+        // landing on the *same* algorithm still needs a genuinely fresh `ScrollingSortView`/
+        // `SortSession`, not a silent no-op against one that already reached `.complete`.
         .id("\(selection.rawValue)-\(coordinator.runToken)")
       } else {
         HomeView()
@@ -360,7 +361,7 @@ struct ContentView: View {
       .map(\.id)
     guard !showcaseAlgorithmIDs.isEmpty else { return }
     showcaseIndex = 0
-    coordinator.selectedAlgorithmID = showcaseAlgorithmIDs[0]
+    coordinator.selectAlgorithmForFreshView(showcaseAlgorithmIDs[0])
   }
 
   /// `ScrollingSortView`'s `showcaseCompletion` callback — called once its current algorithm's
@@ -375,7 +376,7 @@ struct ContentView: View {
       return
     }
     self.showcaseIndex = nextIndex
-    coordinator.selectedAlgorithmID = showcaseAlgorithmIDs[nextIndex]
+    coordinator.selectAlgorithmForFreshView(showcaseAlgorithmIDs[nextIndex])
   }
 
   /// Also the target of a mid-run Stop tap. Clearing the selection (not leaving it on the

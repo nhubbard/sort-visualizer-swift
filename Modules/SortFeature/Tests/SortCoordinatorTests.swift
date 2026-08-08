@@ -156,6 +156,24 @@ struct SortCoordinatorTests {
   }
 
   @Test
+  func selectAlgorithmForFreshViewBumpsRunTokenEvenWhenSelectionIsUnchanged() {
+    let coordinator = SortCoordinator()
+    let algorithmID = AlgorithmID(rawValue: "coordinator-fake")
+    coordinator.selectAlgorithmForFreshView(algorithmID)
+    let tokenAfterFirstSelect = coordinator.runToken
+
+    // Selecting the *same* algorithm again must still bump the token — otherwise plain
+    // assignment would be a no-op against `@Observable`'s equality-elision, `ContentView`'s
+    // `.id(...)` would never change, and `ScrollingSortView` would never remount. This is
+    // exactly the Showcase-mode bug: starting Showcase while already viewing the
+    // alphabetically-first algorithm (the one Showcase itself starts with) left the prior,
+    // non-showcase-aware view running untouched.
+    coordinator.selectAlgorithmForFreshView(algorithmID)
+    #expect(coordinator.runToken != tokenAfterFirstSelect)
+    #expect(coordinator.selectedAlgorithmID == algorithmID)
+  }
+
+  @Test
   func stopDelegatesToTheActiveSessionsStopAutomation() async throws {
     let coordinator = SortCoordinator()
     let session = SortSession(
