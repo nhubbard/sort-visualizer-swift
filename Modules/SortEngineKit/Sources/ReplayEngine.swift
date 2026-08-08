@@ -203,15 +203,6 @@ public final class ReplayEngine {
   }
 
   public let tape: Tape
-  /// `tape` never changes after `init`, so this only ever does the real encode+hash+compress
-  /// work once, on whichever thread first reads `archivedTapeData` — not once per `body`
-  /// evaluation. Before this cache existed, `RunControlBar.exportDocument` called `tape.archived()`
-  /// directly, and because `body` re-evaluates on every `@Observable` `state` write (i.e. every
-  /// playback tick), that re-ran the full archive encode dozens of times a second during
-  /// playback instead of once at export time. `@ObservationIgnored` so writing this cache isn't
-  /// itself treated as observable state.
-  @ObservationIgnored private lazy var cachedArchivedTapeData: Data? = try? tape.archived()
-  public var archivedTapeData: Data? { cachedArchivedTapeData }
   /// Every `checkpointInterval` operations, so `seek(to:)` never replays more than that many ops
   /// from the nearest one.
   private let checkpoints: [PlaybackState]
@@ -311,6 +302,20 @@ public final class ReplayEngine {
   /// of operations applied in a single tick.
   private static let maxCatchUpInterval: TimeInterval = 0.25
 
+  /// Caps how many operations `play()`'s tick loop applies in one `mutatingState` call before
+  /// yielding back to the run loop — a real, reported freeze on a throttled host (the iPadOS
+  /// Simulator has no true vsync and can stall `CADisplayLink` under load): in fixed-duration
+  /// mode, `effectiveSpeed` recomputes its rate from wall-clock `elapsedPlaybackDuration`, which
+  /// keeps advancing even while no ticks arrive to make progress, so a stalled-then-recovered tick
+  /// can compute a rate high enough that `opsToApply` wants the *entire remaining tape* applied in
+  /// one shot. `maxCatchUpInterval` above bounds a tick's own elapsed time, but not `speed`/
+  /// `effectiveSpeed` itself, so it doesn't help here. Applying in bounded chunks with a
+  /// `Task.yield()` between them (see `play()`) spreads a huge burst across multiple run-loop
+  /// turns instead of monopolizing the main actor for the whole thing — which both lets SwiftUI
+  /// actually redraw along the way and stops the burst itself from further starving tick delivery
+  /// (the freeze was compounding: no ticks -> huge rate -> long synchronous burst -> no ticks).
+  private static let maxOperationsPerChunk = 2000
+
   /// The pure pacing math, factored out of `play()` so it's directly unit-testable without a
   /// driver: how many *significant* operations (see `SortOperation.isSignificantForPacing`) are
   /// due given `elapsed` real seconds at `speed` operations per second, carrying any fractional
@@ -396,7 +401,7 @@ public final class ReplayEngine {
 
     let task = Task { [weak self] in
       var accumulator = 0.0
-      for await elapsed in stream {
+      tickLoop: for await elapsed in stream {
         guard let self, !Task.isCancelled else { break }
         let remaining = self.tape.operations.count - self.state.stepIndex
         guard remaining > 0 else { break }
@@ -424,29 +429,40 @@ public final class ReplayEngine {
           )
         guard opsToApply > 0 else { continue }
 
-        var appliedOperations: [SortOperation] = []
-        appliedOperations.reserveCapacity(opsToApply)
-        let tickInterval = replaySignposter.beginInterval(
-          "TickApply", id: replaySignposter.makeSignpostID(), "\(opsToApply) ops")
-        self.mutatingState { working in
-          var significantApplied = 0
-          while significantApplied < opsToApply, working.stepIndex < self.tape.operations.count {
-            let operation = self.tape.operations[working.stepIndex]
-            Self.apply(operation, to: &working, sortStartIndex: sortStartIndex)
-            appliedOperations.append(operation)
-            if operation.isSignificantForPacing {
-              significantApplied += 1
+        // Applied in bounded chunks, yielding between them — see `maxOperationsPerChunk`'s doc
+        // comment for the freeze this avoids. Identical to the old single-shot behavior whenever
+        // `opsToApply <= maxOperationsPerChunk` (the overwhelming majority of ticks).
+        var stillToApply = opsToApply
+        while stillToApply > 0 {
+          guard !Task.isCancelled else { break tickLoop }
+          let chunkTarget = min(stillToApply, Self.maxOperationsPerChunk)
+
+          var appliedOperations: [SortOperation] = []
+          appliedOperations.reserveCapacity(chunkTarget)
+          let tickInterval = replaySignposter.beginInterval(
+            "TickApply", id: replaySignposter.makeSignpostID(), "\(chunkTarget) ops")
+          self.mutatingState { working in
+            var significantApplied = 0
+            while significantApplied < chunkTarget, working.stepIndex < self.tape.operations.count {
+              let operation = self.tape.operations[working.stepIndex]
+              Self.apply(operation, to: &working, sortStartIndex: sortStartIndex)
+              appliedOperations.append(operation)
+              if operation.isSignificantForPacing {
+                significantApplied += 1
+              }
             }
           }
-        }
-        replaySignposter.endInterval("TickApply", tickInterval)
+          replaySignposter.endInterval("TickApply", tickInterval)
 
-        for operation in appliedOperations {
-          onStep?(operation)
-          onOperationApplied?(operation)
-        }
+          for operation in appliedOperations {
+            onStep?(operation)
+            onOperationApplied?(operation)
+          }
 
-        if self.state.stepIndex >= self.tape.operations.count { break }
+          if self.state.stepIndex >= self.tape.operations.count { break tickLoop }
+          stillToApply -= chunkTarget
+          if stillToApply > 0 { await Task.yield() }
+        }
       }
       driver.stop()
       self?.activeDriver = nil

@@ -670,4 +670,55 @@ struct ReplayEngineTests {
     #expect(seeking.frame.map(\.value) == reference.frame.map(\.value))
     #expect(seeking.stepIndex == reference.stepIndex)
   }
+
+  /// Regression test for a real freeze on a throttled host (reported on the iPadOS Simulator,
+  /// which has no true vsync): a single tick whose `opsToApply` vastly exceeds
+  /// `maxOperationsPerChunk` — exactly what fixed-duration pacing's `effectiveSpeed` can produce
+  /// if ticks stall while wall-clock keeps advancing, see `effectiveSpeed`'s doc comment — used to
+  /// apply everything in one uninterrupted `mutatingState` call, monopolizing the main actor for
+  /// the whole burst. Proves two things: chunking doesn't drop or duplicate operations at chunk
+  /// boundaries (6000 ops is exactly 3x a 2000-op chunk cap, so this exercises two boundaries), and
+  /// the run loop genuinely gets scheduling turns *during* the burst — a concurrent counting task
+  /// only accumulates observations if `play()` actually suspends (via `Task.yield()`) partway
+  /// through, not just once the whole burst finishes.
+  @Test
+  func hugeSingleTickBurstIsChunkedAndYieldsBetweenChunks() async {
+    let operations: [SortOperation] = (0..<60000).map { _ in .compare(0, 1) }
+    let tape = makeTape(initialValues: [1, 2], operations: operations)
+    let driver = ManualTickDriver()
+    let engine = ReplayEngine(tape: tape, displayLinkFactory: { driver })
+    engine.speed = 10_000_000.0  // one tick's accumulator vastly exceeds the whole tape
+
+    var appliedCount = 0
+    let task = engine.play(onStep: { _ in appliedCount += 1 })
+
+    let yieldObservations = ReplayEngineTestCounter()
+    let counterTask = Task { @MainActor in
+      while !Task.isCancelled {
+        yieldObservations.increment()
+        await Task.yield()
+      }
+    }
+
+    driver.fireTick(elapsed: 1.0)
+    await task.value
+    counterTask.cancel()
+
+    #expect(appliedCount == operations.count, "chunking must not drop or duplicate operations")
+    #expect(engine.stepIndex == operations.count)
+    // Empirically: an unchunked single-shot burst gives the concurrent counter ~3 incidental
+    // turns (before/after the burst, never during it, since it never suspends); this fix's 30
+    // chunks (60000 ops / 2000-op cap) give it ~33. 15 sits well clear of either side of that
+    // gap, so this only passes when genuine mid-burst yielding is happening.
+    #expect(
+      yieldObservations.value >= 15,
+      "a burst above the chunk cap must yield back to the run loop between chunks, not apply everything in one uninterrupted call"
+    )
+  }
+}
+
+@MainActor
+private final class ReplayEngineTestCounter {
+  private(set) var value = 0
+  func increment() { value += 1 }
 }
