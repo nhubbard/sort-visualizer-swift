@@ -36,8 +36,8 @@ public struct ClassicGravitySort: SortAlgorithm {
     guard n > 1 else { return }
 
     var maxValue = engine.values[0]
-    for i in 1..<n {
-      if engine.values[i] > maxValue { maxValue = engine.values[i] }
+    for i in 1..<n where engine.values[i] > maxValue {
+      maxValue = engine.values[i]
     }
 
     let transposeHandle = engine.createAuxArray(length: maxValue)
@@ -53,8 +53,8 @@ public struct ClassicGravitySort: SortAlgorithm {
 
     for i in 0..<n {
       var sum = 0
-      for j in 0..<maxValue {
-        if transpose[j] > 0 { sum += 1 }
+      for j in 0..<maxValue where transpose[j] > 0 {
+        sum += 1
       }
       engine.setValue(n - i - 1, sum)
       for j in 0..<maxValue {

@@ -32,8 +32,8 @@ public struct IndexSort: SortAlgorithm {
     guard n > 1 else { return }
 
     var minValue = engine.values[0]
-    for i in 1..<n {
-      if engine.values[i] < minValue { minValue = engine.values[i] }
+    for i in 1..<n where engine.values[i] < minValue {
+      minValue = engine.values[i]
     }
 
     for i in 0..<n {

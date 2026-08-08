@@ -1,12 +1,12 @@
 import CoreGraphics
 import Foundation
 
-/// One `MetalShapeLayout` per Metal-ported `Visualizer` beyond `BarGraphVisualizer` (which keeps
-/// its own bespoke `MetalBarRenderer` — see that type's doc comment). Each `instance(atSlot:...)`
-/// is a direct, line-for-line port of the matching `Visualizer.draw(_:)`'s per-index math, just
-/// returning one `MetalShapeInstance` instead of appending a `DrawCommand` — see
-/// `MetalShapeLayout`'s own doc comment for why geometry here is in points, and why `arrayIndex`/
-/// `slots` default to identity except where noted.
+// One `MetalShapeLayout` per Metal-ported `Visualizer` beyond `BarGraphVisualizer` (which keeps
+// its own bespoke `MetalBarRenderer` — see that type's doc comment). Each `instance(atSlot:...)`
+// is a direct, line-for-line port of the matching `Visualizer.draw(_:)`'s per-index math, just
+// returning one `MetalShapeInstance` instead of appending a `DrawCommand` — see
+// `MetalShapeLayout`'s own doc comment for why geometry here is in points, and why `arrayIndex`/
+// `slots` default to identity except where noted.
 
 // MARK: - Rect layouts
 

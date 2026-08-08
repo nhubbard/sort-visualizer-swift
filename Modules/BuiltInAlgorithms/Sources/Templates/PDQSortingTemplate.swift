@@ -47,18 +47,16 @@ enum PDQSortingTemplate {
 
   private static func insertSort(_ engine: inout RecordingEngine, _ begin: Int, _ end: Int) {
     guard begin != end else { return }
-    for cur in (begin + 1)..<end {
-      if engine.compare(cur, cur - 1, by: <) {
-        let tmp = engine.values[cur]
-        var sift = cur
-        var siftMinusOne = cur - 1
-        repeat {
-          engine.setValue(sift, engine.values[siftMinusOne])
-          sift -= 1
-          siftMinusOne -= 1
-        } while sift != begin && tmp < engine.values[siftMinusOne]
-        engine.setValue(sift, tmp)
-      }
+    for cur in (begin + 1)..<end where engine.compare(cur, cur - 1, by: <) {
+      let tmp = engine.values[cur]
+      var sift = cur
+      var siftMinusOne = cur - 1
+      repeat {
+        engine.setValue(sift, engine.values[siftMinusOne])
+        sift -= 1
+        siftMinusOne -= 1
+      } while sift != begin && tmp < engine.values[siftMinusOne]
+      engine.setValue(sift, tmp)
     }
   }
 
@@ -67,18 +65,16 @@ enum PDQSortingTemplate {
   /// left-edge check.
   private static func unguardInsertSort(_ engine: inout RecordingEngine, _ begin: Int, _ end: Int) {
     guard begin != end else { return }
-    for cur in (begin + 1)..<end {
-      if engine.compare(cur, cur - 1, by: <) {
-        let tmp = engine.values[cur]
-        var sift = cur
-        var siftMinusOne = cur - 1
-        repeat {
-          engine.setValue(sift, engine.values[siftMinusOne])
-          sift -= 1
-          siftMinusOne -= 1
-        } while tmp < engine.values[siftMinusOne]
-        engine.setValue(sift, tmp)
-      }
+    for cur in (begin + 1)..<end where engine.compare(cur, cur - 1, by: <) {
+      let tmp = engine.values[cur]
+      var sift = cur
+      var siftMinusOne = cur - 1
+      repeat {
+        engine.setValue(sift, engine.values[siftMinusOne])
+        sift -= 1
+        siftMinusOne -= 1
+      } while tmp < engine.values[siftMinusOne]
+      engine.setValue(sift, tmp)
     }
   }
 

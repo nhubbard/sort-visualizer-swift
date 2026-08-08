@@ -58,8 +58,8 @@ public struct AndreySort: SortAlgorithm {
       var b = bIn
       while b > 1 {
         var k = 0
-        for i in 1..<b {
-          if engine.compare(a + k, a + i, by: (>)) { k = i }
+        for i in 1..<b where engine.compare(a + k, a + i, by: (>)) {
+          k = i
         }
         engine.swap(a, a + k)
         a += 1
