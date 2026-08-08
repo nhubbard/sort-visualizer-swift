@@ -203,6 +203,15 @@ public final class ReplayEngine {
   }
 
   public let tape: Tape
+  /// `tape` never changes after `init`, so this only ever does the real encode+hash+compress
+  /// work once, on whichever thread first reads `archivedTapeData` — not once per `body`
+  /// evaluation. Before this cache existed, `RunControlBar.exportDocument` called `tape.archived()`
+  /// directly, and because `body` re-evaluates on every `@Observable` `state` write (i.e. every
+  /// playback tick), that re-ran the full archive encode dozens of times a second during
+  /// playback instead of once at export time. `@ObservationIgnored` so writing this cache isn't
+  /// itself treated as observable state.
+  @ObservationIgnored private lazy var cachedArchivedTapeData: Data? = try? tape.archived()
+  public var archivedTapeData: Data? { cachedArchivedTapeData }
   /// Every `checkpointInterval` operations, so `seek(to:)` never replays more than that many ops
   /// from the nearest one.
   private let checkpoints: [PlaybackState]

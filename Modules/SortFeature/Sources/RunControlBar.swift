@@ -25,6 +25,13 @@ struct RunControlBar: View {
   @Binding var isSizeExpanded: Bool
   @Binding var isVisualizerExpanded: Bool
 
+  #if targetEnvironment(macCatalyst)
+    // Catalyst's `ShareLink` bridges to `NSSharingServicePicker`, which has nothing to show for
+    // a pure in-memory `Transferable` (see `exportDocument`'s doc comment) — `.fileExporter`
+    // drives a native `NSSavePanel` instead, gated by this state.
+    @State private var isExportingTape = false
+  #endif
+
   var body: some View {
     VStack(spacing: 8) {
       scrubSlider
@@ -230,23 +237,44 @@ struct RunControlBar: View {
     .accessibilityLabel("Reset and Reshuffle")
     .help("Stop the current sort, shuffle a fresh array at this size, and sort it again (⌘R)")
 
-    if let exportDocument {
-      ShareLink(item: exportDocument, preview: SharePreview(exportDocument.suggestedFileName)) {
-        Image(systemName: "square.and.arrow.up")
-      }
-      .accessibilityIdentifier("runControlExportTapeButton")
-      .accessibilityLabel("Export Tape")
-      .help("Export this run's recorded tape as a .tape file")
-    } else {
+    #if targetEnvironment(macCatalyst)
       Button {
+        isExportingTape = true
       } label: {
         Image(systemName: "square.and.arrow.up")
       }
       .accessibilityIdentifier("runControlExportTapeButton")
       .accessibilityLabel("Export Tape")
-      .help("This run's tape couldn't be archived")
-      .disabled(true)
-    }
+      .help(
+        exportDocument == nil
+          ? "This run's tape couldn't be archived" : "Export this run's recorded tape as a .tape file"
+      )
+      .disabled(exportDocument == nil)
+      .fileExporter(
+        isPresented: $isExportingTape,
+        document: exportDocument.map { TapeExportFileDocument(data: $0.data) },
+        contentType: .tapeArchive,
+        defaultFilename: exportDocument?.suggestedFileName
+      ) { _ in }
+    #else
+      if let exportDocument {
+        ShareLink(item: exportDocument, preview: SharePreview(exportDocument.suggestedFileName)) {
+          Image(systemName: "square.and.arrow.up")
+        }
+        .accessibilityIdentifier("runControlExportTapeButton")
+        .accessibilityLabel("Export Tape")
+        .help("Export this run's recorded tape as a .tape file")
+      } else {
+        Button {
+        } label: {
+          Image(systemName: "square.and.arrow.up")
+        }
+        .accessibilityIdentifier("runControlExportTapeButton")
+        .accessibilityLabel("Export Tape")
+        .help("This run's tape couldn't be archived")
+        .disabled(true)
+      }
+    #endif
 
     Button {
       session.soundEnabled.toggle()
@@ -303,11 +331,12 @@ struct RunControlBar: View {
 
   /// `nil` only if `Tape.archived()` itself throws — realistically only an encoder bug, since
   /// `replay.tape` is always a real, already-recorded-or-imported value by the time this bar is
-  /// on screen. Computed fresh each body evaluation rather than cached: archiving a recording
-  /// tape (capped at `RecordingEngine`'s operation limit) is cheap enough not to need memoizing,
-  /// and re-deriving it avoids a stale copy if `replay.tape` itself ever changed underneath.
+  /// on screen. Reads `replay.archivedTapeData`, which `ReplayEngine` computes and caches once
+  /// (`tape` is immutable for the instance's lifetime) instead of re-encoding/re-hashing/
+  /// re-compressing the whole tape on every `body` evaluation — this property itself still runs
+  /// once per playback tick, but the expensive work behind it no longer does.
   private var exportDocument: TapeArchiveDocument? {
-    guard let data = try? replay.tape.archived() else { return nil }
+    guard let data = replay.archivedTapeData else { return nil }
     return TapeArchiveDocument(
       data: data, suggestedFileName: "\(algorithm.id.rawValue)-\(session.arraySize).tape")
   }
