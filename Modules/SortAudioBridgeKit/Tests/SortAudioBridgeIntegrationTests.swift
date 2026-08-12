@@ -54,7 +54,8 @@ struct SortAudioBridgeIntegrationTests {
     let server = SortAudioBridgeServer()
     try server.start(socketPath: socketPath)
 
-    let event = SortToneEvent(value: 12, range: 0...255, holdSeconds: 0.2)
+    let event = SortToneEvent(
+      value: 12, range: 0...255, holdSeconds: 0.2, index: 3, arraySize: 255, operationKind: .swap)
     let noteRange = 36...96
 
     try await confirmation { received in

@@ -87,7 +87,9 @@ struct SortAudioUnitTests {
     #expect(server.hasConnectedClients)
 
     server.broadcast(
-      SortToneEvent(value: 50, range: 1...100, holdSeconds: 10), noteRange: 36...72)
+      SortToneEvent(
+        value: 50, range: 1...100, holdSeconds: 10, index: 0, arraySize: 100,
+        operationKind: .compare), noteRange: 36...72)
     try await Task.sleep(for: .milliseconds(300))
 
     let format = AVAudioFormat(standardFormatWithSampleRate: 44100, channels: 1)!
@@ -148,7 +150,10 @@ struct SortAudioUnitTests {
     }
     #expect(server.hasConnectedClients)
 
-    server.broadcast(SortToneEvent(value: 50, range: 1...100, holdSeconds: 10), noteRange: 36...72)
+    server.broadcast(
+      SortToneEvent(
+        value: 50, range: 1...100, holdSeconds: 10, index: 0, arraySize: 100,
+        operationKind: .compare), noteRange: 36...72)
     try await Task.sleep(for: .milliseconds(300))
 
     let format = AVAudioFormat(standardFormatWithSampleRate: 44100, channels: 1)!

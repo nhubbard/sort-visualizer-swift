@@ -57,22 +57,27 @@ struct ToneMapperTests {
   @Test
   func repeatingTheSamePitchNeverRetriggersTheGate() {
     var mapper = ToneMapper()
-    let event = SortToneEvent(value: 50, range: 1...100, holdSeconds: 0.1)
+    let event = SortToneEvent(
+      value: 50, range: 1...100, holdSeconds: 0.1, index: 0, arraySize: 100, operationKind: .compare)
 
     let first = mapper.commands(for: event, noteRange: 36...72)
     let second = mapper.commands(for: event, noteRange: 36...72)
 
     // The very first mapping always closes (there's no prior pitch to match), but a repeat of
     // the same value/range/noteRange must not close the gate again before reopening it.
-    #expect(first == [.closeGate, .setFrequency(first.frequencyPayload!), .openGate])
-    #expect(second == [.setFrequency(first.frequencyPayload!), .openGate])
+    #expect(
+      first == [.closeGate, .setAccent(0.65), .setFrequency(first.frequencyPayload!), .openGate])
+    #expect(second == [.setAccent(0.65), .setFrequency(first.frequencyPayload!), .openGate])
   }
 
   @Test
   func aDifferentPitchClosesTheGateBeforeReopening() {
     var mapper = ToneMapper()
-    let low = SortToneEvent(value: 1, range: 1...100, holdSeconds: 0.1)
-    let high = SortToneEvent(value: 100, range: 1...100, holdSeconds: 0.1)
+    let low = SortToneEvent(
+      value: 1, range: 1...100, holdSeconds: 0.1, index: 0, arraySize: 100, operationKind: .compare)
+    let high = SortToneEvent(
+      value: 100, range: 1...100, holdSeconds: 0.1, index: 0, arraySize: 100,
+      operationKind: .compare)
 
     _ = mapper.commands(for: low, noteRange: 36...72)
     let commands = mapper.commands(for: high, noteRange: 36...72)

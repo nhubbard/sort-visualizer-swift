@@ -3,6 +3,7 @@ import AudioEngineKit
 import Foundation
 import PersistenceKit
 import SettingsKit
+import SortAudioCore
 import SortEngineKit
 
 public enum SortSessionError: Error, Equatable, Sendable {
@@ -405,12 +406,26 @@ public final class SortSession {
       guard let self, self.soundEnabled, let replay else { return }
       let holdSeconds = max(1.0 / replay.currentPacingRate, 0.03)
       let range = 1...replay.frame.count
+      let arraySize = replay.frame.count
       switch operation {
-      case .compare(let i, let j), .swap(let i, let j):
-        audio.play(value: replay.frame[i].value, in: range, holdSeconds: holdSeconds)
-        audio.play(value: replay.frame[j].value, in: range, holdSeconds: holdSeconds)
+      case .compare(let i, let j):
+        audio.play(
+          value: replay.frame[i].value, in: range, holdSeconds: holdSeconds, index: i,
+          arraySize: arraySize, operationKind: .compare)
+        audio.play(
+          value: replay.frame[j].value, in: range, holdSeconds: holdSeconds, index: j,
+          arraySize: arraySize, operationKind: .compare)
+      case .swap(let i, let j):
+        audio.play(
+          value: replay.frame[i].value, in: range, holdSeconds: holdSeconds, index: i,
+          arraySize: arraySize, operationKind: .swap)
+        audio.play(
+          value: replay.frame[j].value, in: range, holdSeconds: holdSeconds, index: j,
+          arraySize: arraySize, operationKind: .swap)
       case .setValue(let i, _):
-        audio.play(value: replay.frame[i].value, in: range, holdSeconds: holdSeconds)
+        audio.play(
+          value: replay.frame[i].value, in: range, holdSeconds: holdSeconds, index: i,
+          arraySize: arraySize, operationKind: .setValue)
       default:
         break
       }

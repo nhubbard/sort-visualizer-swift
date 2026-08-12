@@ -20,4 +20,8 @@ public enum ToneCommand: Sendable, Equatable {
   case setReleaseDuration(Float)
   case setDetuningOffset(Float)
   case setAmplitude(Float)
+  /// `SortAudioCore.ToneMapper` enqueues this per operation (louder for swaps, softer for
+  /// compares/value-writes) — a multiplicative layer kept separate from `setAmplitude` specifically
+  /// so it never fights the AU remote's user-facing Gain slider.
+  case setAccent(Float)
 }

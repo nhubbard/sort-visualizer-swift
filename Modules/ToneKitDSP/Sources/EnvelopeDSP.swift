@@ -48,17 +48,24 @@ public struct EnvelopeDSP: Sendable {
   public var decayDuration: Float
   public var sustainLevel: Float
   public var releaseDuration: Float
+  /// A multiplicative gain layer, deliberately separate from the AU-hosted remote's user-facing
+  /// Gain slider (`AUDIO_UNIT_PLAN.md` §7) — `SortAudioCore.ToneMapper` drives this per-operation
+  /// (louder for swaps, softer for compares/value-writes) without ever fighting a performer's own
+  /// manual dial-in, since the two multiply together instead of one clobbering the other.
+  public var accent: Float = 1.0
 
   public init(
     attackDuration: Float = 0.1,
     decayDuration: Float = 0.1,
     sustainLevel: Float = 1.0,
-    releaseDuration: Float = 0.1
+    releaseDuration: Float = 0.1,
+    accent: Float = 1.0
   ) {
     self.attackDuration = attackDuration
     self.decayDuration = decayDuration
     self.sustainLevel = sustainLevel
     self.releaseDuration = releaseDuration
+    self.accent = accent
   }
 
   /// A redundant `openGate()` while already open (the common case: the same pitch replaying
@@ -91,7 +98,7 @@ public struct EnvelopeDSP: Sendable {
         releaseDuration: releaseDuration,
         sampleRate: sampleRate
       )
-      buffer[index] *= gain
+      buffer[index] *= gain * accent
     }
   }
 

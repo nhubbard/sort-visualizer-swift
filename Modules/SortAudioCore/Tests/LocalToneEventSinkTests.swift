@@ -17,7 +17,11 @@ struct LocalToneEventSinkTests {
     renderer.prepare(maxFrameCount: 512)
     let sink = LocalToneEventSink(renderer: renderer)
 
-    sink.send(SortToneEvent(value: 50, range: 1...100, holdSeconds: 10), noteRange: 36...72)
+    sink.send(
+      SortToneEvent(
+        value: 50, range: 1...100, holdSeconds: 10, index: 0, arraySize: 100,
+        operationKind: .compare),
+      noteRange: 36...72)
 
     var buffer = [Float](repeating: -1, count: 512)
     buffer.withUnsafeMutableBufferPointer { renderer.render(into: $0, sampleRate: 44100) }
@@ -32,7 +36,11 @@ struct LocalToneEventSinkTests {
     renderer.prepare(maxFrameCount: 4096)
     let sink = LocalToneEventSink(renderer: renderer)
 
-    sink.send(SortToneEvent(value: 50, range: 1...100, holdSeconds: 0.05), noteRange: 36...72)
+    sink.send(
+      SortToneEvent(
+        value: 50, range: 1...100, holdSeconds: 0.05, index: 0, arraySize: 100,
+        operationKind: .compare),
+      noteRange: 36...72)
 
     var opened = [Float](repeating: -1, count: 4096)
     opened.withUnsafeMutableBufferPointer { renderer.render(into: $0, sampleRate: 44100) }

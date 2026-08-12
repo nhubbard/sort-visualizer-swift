@@ -23,9 +23,18 @@ public struct ToneMapper: Sendable {
       commands.append(.closeGate)
     }
     currentFrequency = frequency
+    commands.append(.setAccent(Self.accent(for: event.operationKind)))
     commands.append(.setFrequency(Double(frequency)))
     commands.append(.openGate)
     return commands
+  }
+
+  /// Swaps (the actual element movement) read as louder/more present than compares or value-writes
+  /// (bookkeeping) — the compare/swap sonic distinction this type exists to provide, kept as a
+  /// separate multiplicative layer from the AU remote's own Gain slider (`ToneCommand.setAccent`'s
+  /// own doc comment explains why).
+  private static func accent(for operationKind: SortOperationKind) -> Float {
+    operationKind == .swap ? 1.0 : 0.65
   }
 
   /// Pure value→pitch mapping — originally moved verbatim from `AudioService.frequency(forValue:

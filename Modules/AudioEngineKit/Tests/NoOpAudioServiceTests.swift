@@ -1,3 +1,4 @@
+import SortAudioCore
 import Testing
 
 @testable import AudioEngineKit
@@ -9,7 +10,8 @@ struct NoOpAudioServiceTests {
   func conformsAndNeverThrowsOrCrashes() throws {
     let service: any AudioPlaying = NoOpAudioService()
     try service.start()
-    service.play(value: 5, in: 0...10, holdSeconds: 0.05)
+    service.play(
+      value: 5, in: 0...10, holdSeconds: 0.05, index: 0, arraySize: 10, operationKind: .compare)
     service.stop()
   }
 }

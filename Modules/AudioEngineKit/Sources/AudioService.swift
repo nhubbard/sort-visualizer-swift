@@ -149,11 +149,16 @@ public final class AudioService: AudioPlaying {
   /// Self-starts on first call so callers don't need to call `start()` explicitly. Returns
   /// immediately regardless of hold duration — enqueuing (whether locally or onto the bridge) never
   /// blocks — so `ReplayEngine`'s playback loop is never slowed down by audio.
-  public func play(value: Int, in range: ClosedRange<Int>, holdSeconds: Double) {
+  public func play(
+    value: Int, in range: ClosedRange<Int>, holdSeconds: Double, index: Int, arraySize: Int,
+    operationKind: SortOperationKind
+  ) {
     if !isStarted { try? start() }
     guard isStarted else { return }
 
-    let event = SortToneEvent(value: value, range: range, holdSeconds: holdSeconds)
+    let event = SortToneEvent(
+      value: value, range: range, holdSeconds: holdSeconds, index: index, arraySize: arraySize,
+      operationKind: operationKind)
     let noteRange = settings.synthNoteRange
 
     #if targetEnvironment(macCatalyst)

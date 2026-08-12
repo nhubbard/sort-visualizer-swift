@@ -1,4 +1,6 @@
-/// `SortSession.startReplay` decides whether to call `play(value:in:)` based on
+import SortAudioCore
+
+/// `SortSession.startReplay` decides whether to call `play(...)` based on
 /// `AppSettings.soundEnabled`, and derives pitch from the current frame's value, not from
 /// anything baked into the tape — notes fire at the replay engine's frame rate, so audio and
 /// animation can never drift apart.
@@ -13,5 +15,9 @@ public protocol AudioPlaying: Sendable {
   /// `holdSeconds` comes from the caller (derived from the *current* replay speed, which may
   /// have changed live since playback started) rather than this type reading a global default
   /// itself — otherwise a per-session speed override would leave notes held for a stale duration.
-  func play(value: Int, in range: ClosedRange<Int>, holdSeconds: Double)
+  /// `index`/`arraySize` drive stereo panning (§3 of the richer-sonification work); `operationKind`
+  /// lets compares/swaps/value-writes get genuinely different sonic treatment.
+  func play(
+    value: Int, in range: ClosedRange<Int>, holdSeconds: Double, index: Int, arraySize: Int,
+    operationKind: SortOperationKind)
 }

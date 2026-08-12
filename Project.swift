@@ -97,6 +97,10 @@ let modules: [Target] =
             .target(name: "SortEngineKit"), .target(name: "AlgorithmKit"), .target(name: "VisualizationKit"),
             .target(name: "AudioEngineKit"), .target(name: "SettingsKit"), .target(name: "DesignSystemKit"),
             .target(name: "PersistenceKit"), .target(name: "MathRenderingKit"), .target(name: "ZstdKit"),
+            // Needed directly, not just transitively through AudioEngineKit — Swift module
+            // visibility isn't transitive across target boundaries. SortSession.makeOnStepClosure
+            // constructs a SortAudioCore.SortOperationKind to pass to AudioPlaying.play(...).
+            .target(name: "SortAudioCore"),
             .external(name: "MarkdownUI"),
         ],
         testResources: [.glob(pattern: "App/Resources/AlgorithmDetails/AlgorithmDetails.algz")],

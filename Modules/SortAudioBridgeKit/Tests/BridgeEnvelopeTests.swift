@@ -7,7 +7,8 @@ import Testing
 struct BridgeEnvelopeTests {
   @Test
   func toneEventRoundTrips() {
-    let event = SortToneEvent(value: 12, range: 0...255, holdSeconds: 0.2)
+    let event = SortToneEvent(
+      value: 12, range: 0...255, holdSeconds: 0.2, index: 3, arraySize: 255, operationKind: .swap)
     let noteRange = 36...96
 
     let bytes = BridgeEnvelope.encodeToneEvent(event, noteRange: noteRange)

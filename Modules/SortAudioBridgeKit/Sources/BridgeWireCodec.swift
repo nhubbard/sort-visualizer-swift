@@ -7,9 +7,10 @@ import SortAudioCore
 /// the same architecture, but this is cheap to get right now and easy to regret skipping later).
 enum BridgeWireCodec {
   static let version: UInt8 = 1
-  /// version(1) + value/range.lowerBound/range.upperBound/noteRange.lowerBound/noteRange.upperBound
-  /// (5 × Int64) + holdSeconds (Double's bit pattern, as UInt64).
-  static let encodedByteCount = 1 + 5 * 8 + 8
+  /// version(1) + value/range.lowerBound/range.upperBound/noteRange.lowerBound/noteRange.upperBound/
+  /// index/arraySize (7 × Int64) + holdSeconds (Double's bit pattern, as UInt64) +
+  /// operationKind (1 byte).
+  static let encodedByteCount = 1 + 7 * 8 + 8 + 1
 
   static func encode(_ event: SortToneEvent, noteRange: ClosedRange<Int>) -> [UInt8] {
     var bytes: [UInt8] = [version]
@@ -19,7 +20,10 @@ enum BridgeWireCodec {
     appendInt64(Int64(event.range.upperBound), to: &bytes)
     appendInt64(Int64(noteRange.lowerBound), to: &bytes)
     appendInt64(Int64(noteRange.upperBound), to: &bytes)
+    appendInt64(Int64(event.index), to: &bytes)
+    appendInt64(Int64(event.arraySize), to: &bytes)
     appendUInt64(event.holdSeconds.bitPattern, to: &bytes)
+    bytes.append(event.operationKind.rawValue)
     return bytes
   }
 
@@ -32,9 +36,14 @@ enum BridgeWireCodec {
     let rangeUpper = Int(readInt64(bytes, at: &offset))
     let noteRangeLower = Int(readInt64(bytes, at: &offset))
     let noteRangeUpper = Int(readInt64(bytes, at: &offset))
+    let index = Int(readInt64(bytes, at: &offset))
+    let arraySize = Int(readInt64(bytes, at: &offset))
     let holdSeconds = Double(bitPattern: readUInt64(bytes, at: &offset))
+    guard let operationKind = SortOperationKind(rawValue: bytes[offset]) else { return nil }
     guard rangeLower <= rangeUpper, noteRangeLower <= noteRangeUpper else { return nil }
-    let event = SortToneEvent(value: value, range: rangeLower...rangeUpper, holdSeconds: holdSeconds)
+    let event = SortToneEvent(
+      value: value, range: rangeLower...rangeUpper, holdSeconds: holdSeconds, index: index,
+      arraySize: arraySize, operationKind: operationKind)
     return (event, noteRangeLower...noteRangeUpper)
   }
 

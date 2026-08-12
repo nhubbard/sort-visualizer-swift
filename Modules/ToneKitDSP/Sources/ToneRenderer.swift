@@ -72,6 +72,8 @@ public final class ToneRenderer: @unchecked Sendable {
         oscillator.detuningOffset = hz
       case .setAmplitude(let amplitude):
         oscillator.amplitude = amplitude
+      case .setAccent(let accent):
+        envelope.accent = accent
       }
     }
   }
