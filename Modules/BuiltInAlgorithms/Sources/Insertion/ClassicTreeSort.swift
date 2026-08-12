@@ -86,30 +86,45 @@ public struct ClassicTreeSort: SortAlgorithm {
     engine.deleteAuxArray(tempHandle)
   }
 
-  /// Ports the recursive `traverse(array, temp, lower, upper, r)`: an in-order walk (left, self,
-  /// right) that emits the tree's values into `temp` in sorted order.
+  /// Ports ArrayV's recursive `traverse(array, temp, lower, upper, r)` — an in-order walk (left,
+  /// self, right) that emits the tree's values into `temp` in sorted order — as an iterative walk
+  /// over an explicit, heap-allocated `[Int]` stack instead, mirroring
+  /// `BinaryQuickSortingTemplate`'s explicit-work-list idiom.
+  ///
+  /// This tree is never balanced (see the type's own doc comment), so a call-stack-recursive
+  /// traversal's depth is `O(n)` in the worst case (sorted/reverse-sorted or otherwise adversarial
+  /// input degenerates it into a linear chain) — a size-8192 run with such an input produced a real,
+  /// reproduced-in-Xcode `EXC_BAD_ACCESS` from overflowing the smaller stack `RecordingEngine`'s
+  /// detached recording `Task` runs on (nothing like the 8 MB main-thread stack). An explicit
+  /// `[Int]` stack has the identical `O(depth)` space cost, but as an ordinary heap-allocated Swift
+  /// `Array` rather than fixed-size thread-stack frames, so it grows instead of overflowing.
+  ///
+  /// `current`/node indices are `Int?`, not the tree's own `0`-means-"no child" sentinel — `0` is
+  /// also the real root index here, so a raw `Int` can't distinguish "descend into node 0" from
+  /// "no child," unlike inside `lower`/`upper` themselves (where `0` is unambiguous only because
+  /// index `0` can never be assigned as anyone's child during insertion).
   private func traverse(
     _ values: [Int],
     _ lower: [Int],
     _ upper: [Int],
-    root r: Int,
+    root: Int,
     into temp: inout [Int],
     at idx: inout Int,
     engine: inout RecordingEngine,
     tempHandle: AuxHandle
   ) {
-    if lower[r] != 0 {
-      traverse(
-        values, lower, upper, root: lower[r], into: &temp, at: &idx, engine: &engine,
-        tempHandle: tempHandle)
-    }
-    temp[idx] = values[r]
-    engine.writeAux(tempHandle, at: idx, value: values[r])
-    idx += 1
-    if upper[r] != 0 {
-      traverse(
-        values, lower, upper, root: upper[r], into: &temp, at: &idx, engine: &engine,
-        tempHandle: tempHandle)
+    var stack: [Int] = []
+    var current: Int? = root
+    while current != nil || !stack.isEmpty {
+      while let node = current {
+        stack.append(node)
+        current = lower[node] != 0 ? lower[node] : nil
+      }
+      let node = stack.removeLast()
+      temp[idx] = values[node]
+      engine.writeAux(tempHandle, at: idx, value: values[node])
+      idx += 1
+      current = upper[node] != 0 ? upper[node] : nil
     }
   }
 }

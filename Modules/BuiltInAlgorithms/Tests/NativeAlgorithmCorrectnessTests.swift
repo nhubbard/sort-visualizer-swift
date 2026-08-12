@@ -368,6 +368,27 @@ struct NativeAlgorithmCorrectnessTests {
     }
   }
 
+  /// Regression guard for a real, user-reported `EXC_BAD_ACCESS` crash at array size 8192:
+  /// `ClassicTreeSort`'s tree is never balanced (see its own doc comment), so `traverse`'s
+  /// call-stack recursion depth is `O(n)` in the worst case — sorted/reverse-sorted input
+  /// degenerates the tree into a full-depth linear chain, deep enough to overflow the smaller
+  /// stack `RecordingEngine`'s detached recording `Task` runs on (nowhere near the 8 MB
+  /// main-thread stack). The crash surfaced inside `RecordingEngine.appendOp`'s own guard clause,
+  /// but that was just where the exhausted stack happened to fault — the real bug was 1700+ nested
+  /// `traverse` frames underneath it. Fixed by converting `traverse` to an iterative walk over an
+  /// explicit, heap-allocated `[Int]` stack; this guards against the recursive version regressing.
+  @Test
+  func classicTreeSortDoesNotStackOverflowOnAdversarialLargeInput() {
+    let algorithm = ClassicTreeSort()
+    for input in [Array(0..<8192), Array((0..<8192).reversed())] {
+      var engine = RecordingEngine(values: input)
+      algorithm.record(into: &engine)
+      #expect(
+        engine.values == input.sorted(),
+        "ClassicTreeSort failed to sort adversarial input of size \(input.count)")
+    }
+  }
+
   /// Confirms `TriangularHeapSort`'s instability empirically: like `MaxHeapSort`, swap-based
   /// heap construction/extraction can relocate one equal element past another with no recovery.
   @Test
