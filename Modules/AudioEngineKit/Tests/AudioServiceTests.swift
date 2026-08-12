@@ -28,8 +28,8 @@ struct AudioServiceTests {
   }
 
   // No test constructs a live `AudioService()` here: doing so builds a real `AVAudioEngine`
-  // graph (Oscillator -> AmplitudeEnvelope -> AudioEngine, via ToneKit) and calling `start()`
-  // needs a real audio session route this test host doesn't reliably have. `frequency(forValue:
-  // in:noteRange:)` above covers the actual logic; `AudioService`'s wiring is verified by
-  // actually running the app rather than by a unit test exercising live audio.
+  // graph (ToneVoice, wrapping ToneKitDSP's ToneRenderer, via ToneKitAVFoundation's AudioEngine)
+  // and calling `start()` needs a real audio session route this test host doesn't reliably have.
+  // `frequency(forValue:in:noteRange:)` above covers the actual logic; `AudioService`'s wiring is
+  // verified by actually running the app rather than by a unit test exercising live audio.
 }

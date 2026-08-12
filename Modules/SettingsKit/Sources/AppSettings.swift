@@ -98,9 +98,10 @@ public final class AppSettings {
       Keys.useFixedDurationPacing: false,
       Keys.targetPlaybackDuration: 10.0,
       Keys.compactPlaybackForFixedDuration: false,
-      // Off by default — real audio now plays through ScrollingSortView (ToneKit-backed
-      // AudioService.shared, see Modules/ToneKit/NOTICE.md), and a brand-new user shouldn't
-      // have sound start playing on their very first sort without having chosen it.
+      // Off by default — real audio now plays through ScrollingSortView (ToneKitAVFoundation-backed
+      // AudioService.shared, see Modules/ToneKitDSP/NOTICE.md and Modules/ToneKitAVFoundation/
+      // NOTICE.md), and a brand-new user shouldn't have sound start playing on their very first
+      // sort without having chosen it.
       Keys.soundEnabled: false,
       Keys.synthLowNote: 36,
       Keys.synthHighNote: 72,

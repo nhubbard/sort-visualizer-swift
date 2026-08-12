@@ -3,9 +3,9 @@
 /// anything baked into the tape — notes fire at the replay engine's frame rate, so audio and
 /// animation can never drift apart.
 ///
-/// `@MainActor`, not just `Sendable`: every real caller and `AudioService`'s `ToneKit` graph are
-/// already MainActor-isolated, so isolating the protocol itself is what lets `AudioService`
-/// conform at all.
+/// `@MainActor`, not just `Sendable`: every real caller and `AudioService`'s control-side calls
+/// into its `ToneVoice` (`ToneKitAVFoundation`) already only ever happen from the main actor, so
+/// isolating the protocol itself is what lets `AudioService` conform at all.
 @MainActor
 public protocol AudioPlaying: Sendable {
   func start() throws

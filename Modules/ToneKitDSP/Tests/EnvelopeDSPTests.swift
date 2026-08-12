@@ -1,13 +1,13 @@
 import Testing
 
-@testable import ToneKit
+@testable import ToneKitDSP
 
 @Suite
-struct AmplitudeEnvelopeTests {
+struct EnvelopeDSPTests {
   private let sampleRate = 44100.0
 
   /// Runs `nextGain` `count` times in a row, threading `phase` through each call — simulates
-  /// what the render closure does one sample at a time, without needing a live `AVAudioEngine`.
+  /// what `applyGain` does one sample at a time, without needing a live render buffer.
   private func run(
     steps count: Int,
     startingGain: Float = 0,
@@ -20,7 +20,7 @@ struct AmplitudeEnvelopeTests {
     var gain = startingGain
     var phase = startingPhase
     for _ in 0..<count {
-      gain = AmplitudeEnvelope.nextGain(
+      gain = EnvelopeDSP.nextGain(
         currentGain: gain,
         phase: &phase,
         attackDuration: attackDuration,
@@ -79,7 +79,7 @@ struct AmplitudeEnvelopeTests {
   @Test
   func singleStepMovesTowardTargetNotAwayFromIt() {
     var phase = EnvelopePhase.attack
-    let gain = AmplitudeEnvelope.nextGain(
+    let gain = EnvelopeDSP.nextGain(
       currentGain: 0, phase: &phase,
       attackDuration: 0.1, decayDuration: 0.1, sustainLevel: 1.0, releaseDuration: 0.1,
       sampleRate: sampleRate
@@ -97,5 +97,28 @@ struct AmplitudeEnvelopeTests {
     #expect(
       fast.gain > slow.gain,
       "a shorter attack time constant should reach a higher gain in the same steps")
+  }
+
+  @Test
+  func openGateStartsAttackOnlyOnAClosedToOpenTransition() {
+    var envelope = EnvelopeDSP()
+    envelope.openGate()
+    #expect(envelope.phase == .attack)
+
+    // Redundant open while already open must not restart the attack from a different phase.
+    envelope.openGate()
+    #expect(envelope.phase == .attack)
+  }
+
+  @Test
+  func closeGateStartsReleaseOnlyWhileOpen() {
+    var envelope = EnvelopeDSP()
+    // Closing while never opened is a no-op — no gate to close.
+    envelope.closeGate()
+    #expect(envelope.phase == .idle)
+
+    envelope.openGate()
+    envelope.closeGate()
+    #expect(envelope.phase == .release)
   }
 }

@@ -33,7 +33,7 @@ let package = Package(
         // swift-atomics intentionally omitted — operation counting in RecordingEngine is a plain
         // Int now that there's no concurrent writer to protect against.
         // AudioKit/AudioKitUI/AudioKitEX/SoundpipeAudioKit intentionally omitted — the whole audio
-        // stack is now Modules/ToneKit, a local target with no external package dependency at all
-        // (see its NOTICE.md).
+        // stack is now Modules/ToneKitDSP + Modules/ToneKitAVFoundation, local targets with no
+        // external package dependency at all (see each module's own NOTICE.md).
     ]
 )

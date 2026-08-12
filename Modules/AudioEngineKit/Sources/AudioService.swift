@@ -1,6 +1,7 @@
 import Foundation
 import SettingsKit
-import ToneKit
+import ToneKitAVFoundation
+import ToneKitDSP
 import os
 
 /// Labels the two spots that were, historically, the actual bottleneck behind "recording is fast
@@ -11,33 +12,36 @@ import os
 private let audioSignposter = OSSignposter(
   subsystem: "com.nhubbard.Sort2.AudioEngineKit", category: "AudioService")
 
-/// `ToneKit`-backed `AudioPlaying`, replacing `Legacy/Shared/Data/Primary/Synthesizer.swift`'s
-/// graph (`Oscillator` → `AmplitudeEnvelope` → `Fader` → `AudioEngine`, originally AudioKit-backed)
-/// with the same shape minus `Fader` — it was never touched past its default gain of 1, a pure
-/// passthrough, so `env` connects directly to `engine.output` — and minus the parts that no
-/// longer apply in v2's tape-based model (§3.1 of ARCHITECTURE_V2.md).
+/// `ToneKitAVFoundation`-backed `AudioPlaying`, replacing `Legacy/Shared/Data/Primary/
+/// Synthesizer.swift`'s graph (`Oscillator` → `AmplitudeEnvelope` → `Fader` → `AudioEngine`,
+/// originally AudioKit-backed) with the same shape minus `Fader` — it was never touched past its
+/// default gain of 1, a pure passthrough, so `voice` connects directly to `engine.output` — and
+/// minus the parts that no longer apply in v2's tape-based model (§3.1 of ARCHITECTURE_V2.md).
+/// `voice`'s actual DSP (oscillator + envelope) lives in `ToneKitDSP`'s `ToneRenderer`, reached
+/// through `ToneKitAVFoundation.ToneVoice` — see `AUDIO_UNIT_PLAN.md` §3 for why it's split this
+/// way (a host-independent core the AU/VST3 targets can reuse, plus this AVFoundation adapter).
 @MainActor
 public final class AudioService: AudioPlaying {
   public static let shared = AudioService()
 
   private let engine = AudioEngine()
-  private let osc: Oscillator
-  private let env: AmplitudeEnvelope
+  private let voice: ToneVoice
   private let settings: AppSettings
   private var isStarted = false
   private var currentFrequency: Float = 0
 
   public init(settings: AppSettings = .shared) {
     self.settings = settings
-    let osc = Oscillator(
-      frequency: 440.0, amplitude: 1.0, detuningOffset: 0.0, detuningMultiplier: 1.0
+    let voice = ToneVoice(
+      oscillator: OscillatorDSP(
+        frequency: 440.0, amplitude: 1.0, detuningOffset: 0.0, detuningMultiplier: 1.0
+      ),
+      envelope: EnvelopeDSP(
+        attackDuration: 0.1, decayDuration: 0.1, sustainLevel: 1.0, releaseDuration: 0.1
+      )
     )
-    let env = AmplitudeEnvelope(
-      osc, attackDuration: 0.1, decayDuration: 0.1, sustainLevel: 1.0, releaseDuration: 0.1
-    )
-    self.osc = osc
-    self.env = env
-    engine.output = env
+    self.voice = voice
+    engine.output = voice
   }
 
   public func start() throws {
@@ -74,11 +78,11 @@ public final class AudioService: AudioPlaying {
 
     let frequency = Self.frequency(forValue: value, in: range, noteRange: settings.synthNoteRange)
     if frequency != currentFrequency {
-      env.closeGate()
+      voice.closeGate()
     }
     currentFrequency = frequency
-    osc.frequency = frequency
-    env.openGate()
+    voice.frequency = frequency
+    voice.openGate()
 
     scheduleGateClose(after: holdSeconds)
   }
@@ -104,7 +108,7 @@ public final class AudioService: AudioPlaying {
         // A newer note pushed the deadline out while we were asleep — sleep again instead
         // of closing the gate early.
         if let latest = self.nextGateCloseDeadline, latest > deadline { continue }
-        self.env.closeGate()
+        self.voice.closeGate()
         self.nextGateCloseDeadline = nil
         break
       }

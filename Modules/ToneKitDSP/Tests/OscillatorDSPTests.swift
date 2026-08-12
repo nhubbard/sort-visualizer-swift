@@ -1,35 +1,35 @@
 import Testing
 
-@testable import ToneKit
+@testable import ToneKitDSP
 
 /// Same "test the pure math, not a live audio graph" split `AudioServiceTests.swift` already
-/// uses for `AudioService.frequency(forValue:in:noteRange:)` — `Oscillator.fill` needs a real
-/// realtime render context to exercise directly, but its underlying per-sample math
+/// uses for `AudioService.frequency(forValue:in:noteRange:)` — `OscillatorDSP.fill` needs a
+/// realtime render context to exercise fully, but its underlying per-sample math
 /// (`nextSample`/`phaseIncrement`) doesn't, so that's what's checked here.
 @Suite
-struct OscillatorTests {
+struct OscillatorDSPTests {
   @Test
   func phaseIncrementScalesLinearlyWithFrequency() {
-    let increment = Oscillator.phaseIncrement(frequency: 440, sampleRate: 44100)
+    let increment = OscillatorDSP.phaseIncrement(frequency: 440, sampleRate: 44100)
     #expect(abs(increment - (2 * Double.pi * 440 / 44100)) < 0.00001)
   }
 
   @Test
   func nextSampleAtZeroPhaseIsZero() {
-    let (sample, _) = Oscillator.nextSample(phase: 0, phaseIncrement: 0.1)
+    let (sample, _) = OscillatorDSP.nextSample(phase: 0, phaseIncrement: 0.1)
     #expect(abs(sample) < 0.0001)
   }
 
   @Test
   func nextSampleAtQuarterPeriodIsPeakAmplitude() {
-    let (sample, _) = Oscillator.nextSample(phase: .pi / 2, phaseIncrement: 0.1)
+    let (sample, _) = OscillatorDSP.nextSample(phase: .pi / 2, phaseIncrement: 0.1)
     #expect(abs(sample - 1.0) < 0.0001)
   }
 
   @Test
   func nextSampleWrapsPhasePastTwoPi() {
     let increment = 0.1
-    let (_, nextPhase) = Oscillator.nextSample(
+    let (_, nextPhase) = OscillatorDSP.nextSample(
       phase: 2 * Double.pi - 0.05, phaseIncrement: increment)
     #expect(nextPhase >= 0)
     #expect(nextPhase < 2 * Double.pi)
@@ -38,7 +38,8 @@ struct OscillatorTests {
 
   @Test
   func fillProducesOneSamplePerFrameScaledByAmplitude() {
-    let osc = Oscillator(frequency: 440, amplitude: 0.5)
+    var osc = OscillatorDSP(frequency: 440, amplitude: 0.5)
+    osc.prepare(maxFrameCount: 8)
     var buffer = [Float](repeating: -1, count: 8)
     buffer.withUnsafeMutableBufferPointer { osc.fill($0, sampleRate: 44100) }
 
@@ -49,7 +50,8 @@ struct OscillatorTests {
 
   @Test
   func fillAdvancesPhaseAcrossCallsInsteadOfRestartingEachTime() {
-    let osc = Oscillator(frequency: 440, amplitude: 1)
+    var osc = OscillatorDSP(frequency: 440, amplitude: 1)
+    osc.prepare(maxFrameCount: 4)
     var first = [Float](repeating: 0, count: 4)
     var second = [Float](repeating: 0, count: 4)
     first.withUnsafeMutableBufferPointer { osc.fill($0, sampleRate: 44100) }
@@ -63,8 +65,10 @@ struct OscillatorTests {
 
   @Test
   func detuningOffsetAndMultiplierAffectEffectiveFrequency() {
-    let plain = Oscillator(frequency: 440)
-    let detuned = Oscillator(frequency: 440, detuningOffset: 100, detuningMultiplier: 1)
+    var plain = OscillatorDSP(frequency: 440)
+    var detuned = OscillatorDSP(frequency: 440, detuningOffset: 100, detuningMultiplier: 1)
+    plain.prepare(maxFrameCount: 4)
+    detuned.prepare(maxFrameCount: 4)
     var plainBuffer = [Float](repeating: 0, count: 4)
     var detunedBuffer = [Float](repeating: 0, count: 4)
     plainBuffer.withUnsafeMutableBufferPointer { plain.fill($0, sampleRate: 44100) }
@@ -74,5 +78,18 @@ struct OscillatorTests {
     // must diverge from the plain oscillator by the second sample.
     #expect(abs(plainBuffer[0] - detunedBuffer[0]) < 0.0001)
     #expect(abs(plainBuffer[1] - detunedBuffer[1]) > 0.0001)
+  }
+
+  @Test
+  func fillClampsToPreparedCapacityInsteadOfAllocating() {
+    // Preparing for fewer frames than a later `fill` call requests must not resize scratch
+    // storage on the fly — the excess renders as silence instead (AUDIO_UNIT_PLAN.md §5's "no
+    // allocation on the render thread" rule, applied even to a misconfigured `prepare` call).
+    var osc = OscillatorDSP(frequency: 440, amplitude: 1)
+    osc.prepare(maxFrameCount: 2)
+    var buffer = [Float](repeating: -1, count: 4)
+    buffer.withUnsafeMutableBufferPointer { osc.fill($0, sampleRate: 44100) }
+    #expect(buffer[2] == 0)
+    #expect(buffer[3] == 0)
   }
 }

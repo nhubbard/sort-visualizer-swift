@@ -1,5 +1,5 @@
-/// Does nothing — stands in for the real `ToneKit`-backed `AudioService` until Phase 8, and
-/// remains useful afterward for previews/tests that don't want a live audio engine running.
+/// Does nothing — stands in for the real `ToneKitAVFoundation`-backed `AudioService` until Phase 8,
+/// and remains useful afterward for previews/tests that don't want a live audio engine running.
 public struct NoOpAudioService: AudioPlaying {
   public init() {}
   public func start() throws {}

@@ -1,7 +1,7 @@
 import AVFoundation
 import Testing
 
-@testable import ToneKit
+@testable import ToneKitAVFoundation
 
 private final class FakeNode: Node {
   let avAudioNode: AVAudioNode = AVAudioMixerNode()

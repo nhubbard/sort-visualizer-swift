@@ -17,12 +17,25 @@ let modules: [Target] =
     Module.framework(name: "BuiltInAlgorithms", dependencies: [.target(name: "AlgorithmKit")]) +
     Module.framework(name: "BuiltInVisualizers", dependencies: [.target(name: "VisualizationKit")]) +
     Module.framework(name: "SettingsKit", dependencies: [.target(name: "VisualizationKit"), .target(name: "AlgorithmKit")]) +
-    // ToneKit reimplements just the AudioKit/AudioKitEX/SoundpipeAudioKit subset AudioService
-    // actually needs directly on AVAudioEngine — see Modules/ToneKit/NOTICE.md — so AudioEngineKit
-    // no longer needs any external audio package at all.
-    Module.framework(name: "ToneKit") +
+    // ToneKit (see NOTICE.md in each) reimplements just the AudioKit/AudioKitEX/SoundpipeAudioKit
+    // subset AudioEngineKit actually needs directly on AVAudioEngine, so AudioEngineKit needs no
+    // external audio package at all. Split per AUDIO_UNIT_PLAN.md §3 into a host-independent DSP
+    // core (no AVFoundation, no locks on the render path — reusable by a future AU/VST3 target)
+    // and an AVFoundation adapter, so the render path isn't coupled to AVAudioEngine specifically.
+    Module.framework(name: "ToneKitDSP") +
+    // testDependencies needed too: ToneVoiceTests imports ToneKitDSP directly (to construct
+    // OscillatorDSP/EnvelopeDSP), and module visibility isn't transitive across target boundaries.
+    Module.framework(
+        name: "ToneKitAVFoundation",
+        dependencies: [.target(name: "ToneKitDSP")],
+        testDependencies: [.target(name: "ToneKitDSP")]
+    ) +
+    // Needs ToneKitDSP directly, not just transitively through ToneKitAVFoundation — Swift module
+    // visibility isn't transitive across target boundaries (same reason SortFeature's
+    // testDependencies lists ZstdKit directly elsewhere in this file), and AudioService constructs
+    // ToneKitDSP.OscillatorDSP/EnvelopeDSP values to hand to ToneKitAVFoundation.ToneVoice.
     Module.framework(name: "AudioEngineKit", dependencies: [
-        .target(name: "ToneKit"), .target(name: "SettingsKit"),
+        .target(name: "ToneKitAVFoundation"), .target(name: "ToneKitDSP"), .target(name: "SettingsKit"),
     ]) +
     Module.framework(name: "PersistenceKit", dependencies: [
         .target(name: "SortEngineKit"), .target(name: "AlgorithmKit"),

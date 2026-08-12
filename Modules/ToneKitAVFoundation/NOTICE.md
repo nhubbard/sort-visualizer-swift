@@ -1,23 +1,21 @@
 # Notice
 
-`ToneKit`'s API — `Node`, `AudioEngine`, `Oscillator`, `Gated`, `AmplitudeEnvelope` — is modeled on
-a small subset of three [AudioKit](https://github.com/AudioKit/AudioKit) organization projects:
+`ToneKitAVFoundation`'s API — `Node`, `AudioEngine`, `Gated` — is modeled on a subset of two
+[AudioKit](https://github.com/AudioKit/AudioKit) organization projects:
 
 - [AudioKit](https://github.com/AudioKit/AudioKit) (`Node`, `AudioEngine`)
 - [AudioKitEX](https://github.com/AudioKit/AudioKitEX) (`Gated`)
-- [SoundpipeAudioKit](https://github.com/AudioKit/SoundpipeAudioKit) (`Oscillator`,
-  `AmplitudeEnvelope`, and the one-pole exponential envelope shape in `Soundpipe/modules/adsr.c`'s
-  `sp_adsr_compute`)
 
-None of the code here is copied from those projects — AudioKit's real `Oscillator`/
-`AmplitudeEnvelope`/`Fader` are thin Swift parameter bindings around native Soundpipe C DSP kernels
-reached through a custom Audio Unit host (`instantiate(instrument:/effect:)`), which pulls in the
+This module is a Phase 1 split of what was previously `ToneKit` (see that module's own history) into
+an `AVFoundation`-coupled adapter (this module) and a host-independent DSP core (`ToneKitDSP`) — see
+`AUDIO_UNIT_PLAN.md` §3 for why. `ToneVoice`, which wires `ToneKitDSP`'s `ToneRenderer` into an
+`AVAudioSourceNode`, is new to this split and not modeled on any AudioKit type. None of the code here
+is copied from AudioKit/AudioKitEX — their real equivalents pull in the full
 `AudioKit`/`AudioKitEX`/`SoundpipeAudioKit`/`CSoundpipeAudioKit` package graph this module exists to
-avoid. `ToneKit` reimplements just the shapes this project's `AudioEngineKit` module actually calls,
-directly on `AVAudioEngine`/`AVAudioSourceNode`, with no `Fader`, waveform table, MIDI, automation,
-or stereo support (all unused here) and no external package dependency at all.
+avoid, reimplementing just the one fixed `AVAudioEngine` chain this project's `AudioEngineKit` module
+actually needs.
 
-Reused under the MIT License from both projects:
+Reused under the MIT License:
 
 ```
 MIT License
