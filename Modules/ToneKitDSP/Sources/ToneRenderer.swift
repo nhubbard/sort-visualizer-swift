@@ -60,6 +60,18 @@ public final class ToneRenderer: @unchecked Sendable {
         envelope.openGate()
       case .closeGate:
         envelope.closeGate()
+      case .setAttackDuration(let seconds):
+        envelope.attackDuration = seconds
+      case .setDecayDuration(let seconds):
+        envelope.decayDuration = seconds
+      case .setSustainLevel(let level):
+        envelope.sustainLevel = level
+      case .setReleaseDuration(let seconds):
+        envelope.releaseDuration = seconds
+      case .setDetuningOffset(let hz):
+        oscillator.detuningOffset = hz
+      case .setAmplitude(let amplitude):
+        oscillator.amplitude = amplitude
       }
     }
   }

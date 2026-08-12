@@ -26,6 +26,16 @@ private final class RecordingSink: SortAudioEventSink, @unchecked Sendable {
   }
 }
 
+/// Same "class + NSLock" safe-capture idiom as `RecordingSink` above — a plain `var` captured by
+/// `onRemoteControlCommandReceived` (a `@Sendable` closure) fails Swift 6 strict concurrency, even
+/// though the lock genuinely makes it safe.
+private final class LastCommandBox: @unchecked Sendable {
+  private let lock = NSLock()
+  private var value: RemoteControlCommand?
+  func set(_ newValue: RemoteControlCommand) { lock.withLock { value = newValue } }
+  func get() -> RemoteControlCommand? { lock.withLock { value } }
+}
+
 @Suite
 struct SortAudioBridgeIntegrationTests {
   /// Deliberately under `/tmp` rather than `FileManager.default.temporaryDirectory` — macOS
@@ -77,5 +87,42 @@ struct SortAudioBridgeIntegrationTests {
   func hasConnectedClientsReflectsNoConnections() {
     let server = SortAudioBridgeServer()
     #expect(!server.hasConnectedClients)
+  }
+
+  /// The reverse direction the AU-hosted remote (`AUDIO_UNIT_PLAN.md` §7) depends on — same
+  /// connection, opposite flow, previously untested since the server was write-only before the
+  /// remote existed.
+  @Test
+  func serverReceivesRemoteControlCommandsFromClient() async throws {
+    let socketPath = makeTempSocketPath()
+    defer { try? FileManager.default.removeItem(atPath: socketPath) }
+
+    let server = SortAudioBridgeServer()
+    try server.start(socketPath: socketPath)
+    defer { server.stop() }
+
+    let sink = RecordingSink(onReceive: {})
+    let client = SortAudioBridgeClient(socketPath: socketPath, sink: sink)
+    client.start()
+    defer { client.stop() }
+
+    let deadline = ContinuousClock.now.advanced(by: .seconds(5))
+    while !server.hasConnectedClients, ContinuousClock.now < deadline {
+      try await Task.sleep(for: .milliseconds(10))
+    }
+    #expect(server.hasConnectedClients)
+
+    let lastCommandBox = LastCommandBox()
+    try await confirmation { received in
+      server.onRemoteControlCommandReceived = { command in
+        lastCommandBox.set(command)
+        received()
+      }
+
+      client.sendRemoteControlCommand(.regenerate)
+      try await Task.sleep(for: .milliseconds(500))
+
+      #expect(lastCommandBox.get() == .regenerate)
+    }
   }
 }

@@ -11,4 +11,13 @@ public enum ToneCommand: Sendable, Equatable {
   case setFrequency(Double)
   case openGate
   case closeGate
+  // Below: the AU-hosted remote's audio-production parameters (`AUDIO_UNIT_PLAN.md` §7's "Plug-in
+  // UI") — a host's `AUParameter` observer enqueues these exactly like `SortAudioCore` enqueues
+  // `setFrequency`/gate commands, so they drain on the render thread through the same mechanism.
+  case setAttackDuration(Float)
+  case setDecayDuration(Float)
+  case setSustainLevel(Float)
+  case setReleaseDuration(Float)
+  case setDetuningOffset(Float)
+  case setAmplitude(Float)
 }

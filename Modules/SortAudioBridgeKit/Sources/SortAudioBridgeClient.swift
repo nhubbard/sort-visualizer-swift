@@ -46,6 +46,16 @@ public final class SortAudioBridgeClient: @unchecked Sendable {
     }
   }
 
+  /// The AU-hosted remote (`AUDIO_UNIT_PLAN.md` §7) calls this from its own UI actions — fire and
+  /// forget, a no-op if not currently connected (`connection` is `nil` on `queue` whenever
+  /// disconnected), matching this whole architecture's "no connection = silently does nothing" rule.
+  public func sendRemoteControlCommand(_ command: RemoteControlCommand) {
+    let data = Data(BridgeEnvelope.encodeRemoteControlCommand(command))
+    queue.async { [weak self] in
+      self?.connection?.send(content: data, completion: .idempotent)
+    }
+  }
+
   /// Runs on `queue` — called only from `start()`'s dispatch or `scheduleReconnect`'s
   /// `asyncAfter`, both already on `queue`.
   private func connect() {
@@ -81,18 +91,19 @@ public final class SortAudioBridgeClient: @unchecked Sendable {
     }
   }
 
-  /// `minimumIncompleteLength == maximumLength == encodedByteCount` reliably yields exactly one
-  /// fixed-size message per call regardless of how the underlying stream happened to chunk the
+  /// `minimumIncompleteLength == maximumLength == totalByteCount` reliably yields exactly one
+  /// fixed-size envelope per call regardless of how the underlying stream happened to chunk the
   /// bytes — `receive` never delivers more than `maximumLength`, and won't complete with fewer
-  /// until either that many are available or the connection ends.
+  /// until either that many are available or the connection ends. The client only expects
+  /// `toneEvent` envelopes on this direction; a stray `remoteControlCommand` would just be ignored.
   private func receiveNext(on connection: NWConnection) {
     connection.receive(
-      minimumIncompleteLength: BridgeWireCodec.encodedByteCount,
-      maximumLength: BridgeWireCodec.encodedByteCount
+      minimumIncompleteLength: BridgeEnvelope.totalByteCount,
+      maximumLength: BridgeEnvelope.totalByteCount
     ) { [weak self] content, _, isComplete, error in
       guard let self else { return }
-      if let content, let decoded = BridgeWireCodec.decode(content) {
-        sink.send(decoded.event, noteRange: decoded.noteRange)
+      if let content, case .toneEvent(let event, let noteRange) = BridgeEnvelope.decode(content) {
+        sink.send(event, noteRange: noteRange)
       }
       guard error == nil, !isComplete else {
         connection.cancel()

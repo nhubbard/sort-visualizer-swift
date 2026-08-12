@@ -355,16 +355,85 @@ in either order, and either side may restart independently — the bridge client
 the "no clients connected → play locally" fallback in `AudioService` both exist specifically so
 neither side has to assume anything about the other's lifecycle.
 
-### Plug-in UI (near-term follow-on, not yet built)
+### Plug-in UI: the remote (shipped)
 
-A minimal custom parameter UI, via `AUParameterTree` and an `AUViewController`-hosted view —
-audio-production-relevant controls only (envelope ADSR, detune, gain — whatever `ToneKitDSP` already
-exposes as DSP parameters). Explicitly **not** a reimplementation of any sort visualization,
-algorithm detail, or code display inside the plug-in host; the motivation is letting Logic Pro's own
-effects chains and recording do the "fun things with the audio" work, not building a second UI
-surface for the app itself. Currently `SortAudioUnitFactory.beginRequest(with:)` is a no-op stub —
-this follow-on is the first time the `com.apple.AudioUnit-UI` extension point's actual UI capability
-gets exercised.
+A custom `AUViewController`-hosted SwiftUI view (`SortAudioUnitViewController`/
+`SortAudioUnitParameterView.swift`, hosted via `UIHostingController`), with two sections — nothing
+else, no sort visualization, algorithm detail, or code display anywhere in it:
+
+- **Transport**: the same sort-transport actions already available from the app's own run-control
+  bar and menu commands (`RunControlBar.swift`, `App/Sources/SortCommands.swift`) — play/pause,
+  restart (seek to start), regenerate (fresh shuffle, restart from scratch), step forward/back, sound
+  toggle. Fire-and-forget buttons, no state readback from the app (the buttons work like a keyboard
+  shortcut with no visual confirmation beyond what you hear) — deliberately excludes algorithm/
+  visualizer/size pickers, Export Tape, and the Automations menu, since those either expose
+  "algorithm details" or aren't audio-relevant.
+- **Tone**: `AUParameterTree`-backed sliders for the audio-production-relevant DSP controls
+  `ToneKitDSP` already models — Attack/Decay/Sustain/Release, Detune (±50 Hz), Gain.
+
+**New reverse-direction channel**: the transport buttons need to reach the *running* app, the
+opposite direction from `SortToneEvent`. `SortAudioBridgeKit`'s wire format grew a 1-byte channel
+tag (`BridgeEnvelope`) so both directions fit the same fixed-size framing — channel 1 is the existing
+`SortToneEvent` payload, channel 2 is a `RemoteControlCommand` (a `UInt8` enum:
+`togglePlayback`/`restart`/`regenerate`/`stepForward`/`stepBackward`/`toggleSound`, defined in
+`SortAudioCore` alongside `SortToneEvent`). The server (app side) gained its first receive loop —
+previously write-only — and the client (extension side) gained `sendRemoteControlCommand(_:)`.
+Dispatch from a received command to an actual `SortSession` call happens in `App/Sources/
+Sort2App.swift`, set once at launch: `AudioEngineKit` can't import `SortFeature` (the dependency runs
+the other way), so the mapping from `RemoteControlCommand` to `SortCoordinator.shared
+.activeSortSession?...` calls lives at the app-composition-root level, mirroring
+`SortCommands.swift`'s existing menu-command dispatch exactly.
+
+Tone parameter changes reuse the exact realtime-safety mechanism §5 already established: an
+`AUParameter`'s `implementorValueObserver` enqueues a `ToneCommand` (six new cases —
+`setAttackDuration`/`setDecayDuration`/`setSustainLevel`/`setReleaseDuration`/`setDetuningOffset`/
+`setAmplitude`) into the same lock-free `ToneCommandQueue` `setFrequency`/gate commands already use;
+`implementorValueProvider` reads a `Mutex`-protected snapshot on `SortAudioUnit`, since
+`OscillatorDSP`/`EnvelopeDSP` are owned exclusively by the render thread and can't be read directly.
+
+### Known gotchas (found via real Logic Pro testing)
+
+- **The principal class must be a real `AUViewController`, not a bare `NSObject`, even before any
+  UI is built.** The original `SortAudioUnitFactory` was a plain `NSObject` conforming only to
+  `AUAudioUnitFactory` — the extension registered fine (`auval -a`, `pluginkit` both recognized it)
+  and the process launched cleanly, but Logic would load it, sit idle for several minutes, then
+  silently tear the connection down — `allocateRenderResources()` was *never called*, so
+  `SortAudioBridgeClient` never even attempted to connect. The system log showed why, right at
+  launch: `[PlugInKit:subsystems] Bootstrapping; misconfigured plugin; external subsystem
+  [NSViewService_PKSubsystem] not present; possible missing linkage`. Every real Apple AUv3 template
+  pairs `com.apple.AudioUnit-UI` with an `AUViewController`-conforming principal class, even for a
+  plug-in with no custom UI at all — a bare `NSObject` doesn't provide the view-vending/ViewBridge
+  linkage that extension point's host-side machinery expects. Fixed by replacing
+  `SortAudioUnitFactory` with `SortAudioUnitViewController: AUViewController, AUAudioUnitFactory`
+  (no storyboard needed — `NSExtensionPrincipalClass` pointing directly at an `AUViewController`
+  subclass is Apple's own documented, supported pattern). If a future AU-hosted extension registers
+  successfully but the host never proceeds past load, check for this exact signature via `log show
+  --predicate 'process == "<ExtensionName>"'` across the extension's full launch-to-teardown window
+  (several minutes) before assuming it's an `auval`-only tooling quirk.
+- **Sound must be on in the app for the bridge to carry anything.** `AppSettings.soundEnabled` is
+  checked in `SortSession.makeOnStepClosure` *before* `audio.play(...)` is ever called —
+  `AudioService.play()` itself has no sound-enabled check. The gate is upstream of both local
+  playback and the bridge broadcast, in the exact same code path — turning sound off in the app
+  silences Logic too, not just the speakers. There's no way to route silently-generated events to
+  the bridge only; if you want to hear nothing locally but still feed Logic, that's a real gap this
+  architecture doesn't yet address (companion mode as designed = "sound is either fully off, or
+  going to exactly one destination").
+- **Logic's Record button captures MIDI, not audio, for Software Instrument tracks.** Since this AU
+  never receives or reacts to MIDI at all, hitting Record produces an empty region — there's no
+  performance to capture. Worse, "Bounce in Place" (the usual offline workaround) doesn't work
+  either, because it renders offline, decoupled from real time, but this AU's audio only exists
+  because the standalone app is enqueuing it in actual wall-clock time as a sort runs — there's
+  nothing to bounce ahead of time. The correct capture method: route the instrument track's **output
+  to a bus**, create a **new audio track** with that bus as input, **mute the instrument track**
+  (avoids doubled signal), record-enable the audio track, and hit Record while a sort is actually
+  running in the standalone app. This is the documented Logic Pro workflow for any generative/
+  continuous-output instrument, not specific to Sort Symphony.
+- **A stuck local note during the local-to-bridge handoff was a real bug, now fixed.** Before the
+  fix, a note already ringing locally (enqueued before an AU instance connected) kept playing until
+  whatever `holdSeconds` was already in flight expired on its own, since `play()`'s routing only
+  affects *new* notes. `AudioService` now enqueues an immediate `.closeGate` on its local `renderer`
+  the moment `onConnectedClientsChanged` reports a new connection, guaranteeing local speakers go
+  silent right away rather than after a variable tail.
 
 ---
 
@@ -655,32 +724,42 @@ Modules/
   AlgorithmKit/             (existing, unchanged)
   BuiltInAlgorithms/        (existing, unchanged — no longer linked by anything AU-related)
 
-  SortAudioCore/            (SortToneEvent, ToneMapper, SortAudioEventSink/LocalToneEventSink)
-      SortToneEvent
+  SortAudioCore/            (SortToneEvent, RemoteControlCommand, ToneMapper, event sink)
+      SortToneEvent                  — app → extension direction
+      RemoteControlCommand           — extension → app direction (the remote's Transport section)
       SortAudioEventSink (protocol) / LocalToneEventSink (§4)
       ToneMapper                    — extracted from AudioService's pitch/gate-retrigger logic
       no headless driver — deleted; the AU has no sort logic of its own (§2, §7)
       no MainActor, no UI, depends only on SortEngineKit/ToneKitDSP
 
   ToneKitDSP/               (host-independent DSP core)
-      OscillatorDSP, EnvelopeDSP, ToneRenderer, ToneCommand/ToneEvent, bounded command queue
+      OscillatorDSP, EnvelopeDSP, ToneRenderer, ToneCommand/ToneEvent, bounded command queue —
+      ToneCommand also carries the remote's Tone-section parameters (setAttackDuration/
+      setDecayDuration/setSustainLevel/setReleaseDuration/setDetuningOffset/setAmplitude)
       no AVAudioEngine, no AVAudioNode, no locks, no IPC of any kind on the render path
 
   ToneKitAVFoundation/      (AVFoundation adapter)
       Node, AudioEngine, AVAudioSourceNode adapter — standalone-app integration point
 
-  SortAudioBridgeKit/       (NEW — Mac Catalyst only, `destinations: [.macCatalyst]`)
-      BridgeWireCodec               — fixed-size versioned binary encode/decode (§8)
+  SortAudioBridgeKit/       (Mac Catalyst only, `destinations: [.macCatalyst]`)
+      BridgeWireCodec               — fixed-size versioned binary encode/decode for SortToneEvent (§8)
+      BridgeEnvelope                — 1-byte channel tag + fixed payload, both directions share one
+                                       framing shape (channel 1 = SortToneEvent, 2 = RemoteControlCommand)
       SortAudioBridgePath           — the shared App-Group-derived socket path, with a byte-length
                                        safety check
-      SortAudioBridgeServer         — app side: NWListener, broadcasts to every connected client
-      SortAudioBridgeClient         — extension side: NWConnection, reconnect-on-failure loop
-      depends only on SortAudioCore (for SortToneEvent/SortAudioEventSink)
+      SortAudioBridgeServer         — app side: NWListener, broadcasts to every connected client,
+                                       and (now) receives RemoteControlCommands back from any of them
+      SortAudioBridgeClient         — extension side: NWConnection, reconnect-on-failure loop, and
+                                       (now) sendRemoteControlCommand(_:) for the remote's buttons
+      depends only on SortAudioCore (for SortToneEvent/RemoteControlCommand/SortAudioEventSink)
 
   AudioEngineKit/           (existing, refactored again — now a bridge router)
-      AudioService     — @MainActor; routes play() to the bridge (SortAudioBridgeKit, Mac Catalyst
-                          only, `#if targetEnvironment(macCatalyst)`) when a client is connected,
-                          else plays locally via ToneKitAVFoundation as before
+      AudioService     — @Observable @MainActor; routes play() to the bridge (SortAudioBridgeKit,
+                          Mac Catalyst only, `#if targetEnvironment(macCatalyst)`) when a client is
+                          connected, else plays locally via ToneKitAVFoundation as before; enqueues
+                          an immediate local .closeGate the moment a client connects (the stuck-note
+                          handoff fix, §7's "Known gotchas"); exposes remoteControlHandler for the
+                          app composition root to wire into SortCoordinator
       AudioPlaying, NoOpAudioService — unchanged; SortSession's call sites are unaffected
 
   SortAudioUnitKit/         (AUAudioUnit subclass — now a relay, not a generator)
@@ -688,7 +767,7 @@ Modules/
       starts a SortAudioBridgeClient feeding a LocalToneEventSink — no sort logic of its own
       depends on SortAudioCore/ToneKitDSP/SortAudioBridgeKit — no longer on
       AlgorithmKit/BuiltInAlgorithms/SortEngineKit (nothing in this module runs a sort)
-      AUParameterTree — planned follow-on (§7's "Plug-in UI"), not yet built
+      AUParameterTree (6 params) + sendRemoteControlCommand(_:) — shipped (§7's "Plug-in UI")
 
   ... (SortFeature, SettingsFeature, HomeFeature, IntentsKit, DesignSystemKit, PersistenceKit,
        MathRenderingKit, ZstdKit, VisualizationKit, BuiltInVisualizers, SettingsKit — all existing,
@@ -786,16 +865,18 @@ Phase 5 is the correction this document now describes as current truth.
 | 3 | **iPadOS AUv3 (superseded by Phase 5).** Built `SortAudioUnitKit` + an iPadOS extension target wired to a self-contained headless algorithm/replay driver. Registered and rendered real audio, confirmed via `pluginkit`/OS-level checks — but this entire product shape (self-contained, iPadOS-included) was the wrong one; both the headless driver and the iPadOS target were removed in Phase 5. | Phase 2 |
 | 4 | **macOS AUv3 packaging spike (superseded by Phase 5).** Confirmed a Catalyst-built AUv3 extension embeds and registers cleanly on Mac (`auval -a` lists the component; `log show` confirms the extension process launches and reports ready) — this packaging finding *carried forward* into Phase 5 unchanged; only the extension's own behavior (self-contained vs. relay) and its destinations changed. | Phase 0 (Mac packaging spike), Phase 3's `SortAudioUnitKit` |
 | 5 | **Companion-mode bridge correction (current architecture).** Real Logic Pro testing on Mac revealed Phases 3-4's self-contained model was wrong. Deleted `HeadlessSortAudioDriver`; built `SortAudioBridgeKit` (Unix domain socket over a shared App Group container, §8); made `AudioService` a local/bridge router; rewired `SortAudioUnit` to relay bridge events instead of running its own sort; reverted the extension to Mac Catalyst only, permanently (§7); added the App Group entitlement to both targets (§12, now shipped rather than reserved). Verified: `SortAudioBridgeKit`/`SortAudioUnitKit`/`AudioEngineKit` test suites pass on Mac Catalyst; full app+extension build succeeds with real code signing; iPad Simulator regression build confirms the extension no longer embeds there. | Phases 3-4 |
-| 6 | **Minimal plug-in UI (follow-on, not yet built).** A custom `AUParameterTree` + `AUViewController`-hosted view exposing audio-production-only controls (§7's "Plug-in UI" subsection) — envelope ADSR, detune, gain, whatever `ToneKitDSP` already models. Explicitly no visualization/algorithm/code UI. | Phase 5 |
+| 6 | **The remote (shipped).** A custom `AUViewController`-hosted SwiftUI view (§7's "Plug-in UI: the remote" subsection) — a Transport section (play/pause, restart, regenerate, step forward/back, sound toggle, relayed to the running app via a new reverse-direction bridge channel) and a Tone section (`AUParameterTree`-backed envelope ADSR/detune/gain sliders). Explicitly no visualization/algorithm/code UI. Found and fixed a real bug along the way: local speaker playback could keep ringing briefly after the bridge connected — `AudioService` now force-closes the local gate the moment a client connects. | Phase 5 |
 
 **Logic Pro licensing note, still relevant:** there is a perpetual Logic Pro for Mac license
 available for testing (unlike the iPad subscription this project never had access to) — this is
 part of why Phase 5's Mac-only scope decision was made with real testing feedback behind it, rather
 than being another unverified assumption like Phase 3's iPadOS claim was.
 
-**The project is complete at the end of Phase 5**, pending the one verification step only a human
-can perform: loading the AU on a real Logic Pro track and confirming the app's local speakers go
-quiet once connected (§8's "Verified end to end"). Phase 6 is a planned follow-on, not a blocker.
+**The project is complete at the end of Phase 6.** Real Logic Pro testing on Mac, across both
+Phase 5 and Phase 6, surfaced three real issues documented in §7's "Known gotchas" — the
+`AUViewController` principal-class bug (found and fixed between Phase 5 and Phase 6, since it
+blocked the bridge from ever being reached at all), the sound-must-be-on constraint, and the
+stuck-local-note handoff bug. All three are fixed, not left as follow-on work.
 
 ### Deferred compatibility work (not phases — conditional, undated)
 
@@ -835,6 +916,9 @@ Resolved by this revision:
   required (§11). Renamed/clarified as a *separate* bridge from the AU's own (§9's naming note).
 - **Swift/C++ interop for VST3**: still deliberately left undecided; evaluated empirically at the
   start of that deferred work (§9), not chosen now.
+- **Plug-in UI scope and parameter set**: resolved and shipped (Phase 6, §7/§14) — Transport
+  (play/pause, restart, regenerate, step forward/back, sound toggle) plus Tone (attack, decay,
+  sustain, release, detune, gain). No MIDI input, no algorithm/visualizer/size selection.
 
 New, from this revision:
 
@@ -849,15 +933,15 @@ New, from this revision:
 
 Carried over, still genuinely open:
 
-1. **Plug-in UI scope and parameter set** — Phase 6 (§14) plans a minimal, audio-production-only
-   `AUParameterTree` view (envelope ADSR, detune, gain candidates); exact parameter set not yet
-   chosen.
-2. **Whether MIDI input becomes an optional future mode** — e.g. selecting which of the running app's
+1. **Whether MIDI input becomes an optional future mode** — e.g. selecting which of the running app's
    sorts to relay, or nudging playback speed remotely, layered on top of the relay rather than
    replacing it.
-3. **App Store AU packaging/listing decision** — ship the AU as an update to the existing Sort
+2. **App Store AU packaging/listing decision** — ship the AU as an update to the existing Sort
    Symphony listing (assumed throughout this document) or reconsider if real App Review feedback
    suggests otherwise.
+3. **No way to feed the bridge silently** — `soundEnabled` gates both local playback and the bridge
+   identically (§7's "Known gotchas"); there's no current way to hear nothing locally while still
+   feeding Logic. Not clearly worth solving unless someone actually asks for it.
 
 ---
 

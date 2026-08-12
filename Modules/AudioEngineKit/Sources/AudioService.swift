@@ -67,9 +67,18 @@ public final class AudioService: AudioPlaying {
   public static let shared = AudioService()
 
   private let engine = AudioEngine()
+  /// Kept as a property (not just handed off to `sink`/`engine.output` and discarded) so the bridge
+  /// handoff below can reach in and silence it directly — see `startBridgeServerIfNeeded()`'s
+  /// `onConnectedClientsChanged` handler.
+  private let renderer: ToneRenderer
   private let sink: LocalToneEventSink
   private let settings: AppSettings
   private var isStarted = false
+  /// Fires when the AU-hosted remote (`AUDIO_UNIT_PLAN.md` §7) sends a sort-transport command —
+  /// wired to `bridgeServer.onRemoteControlCommandReceived` on Mac Catalyst. Declared unconditionally
+  /// (not `#if targetEnvironment(macCatalyst)`) so app-level wiring code compiles identically on
+  /// both platforms; on iPad it's simply never invoked, since no bridge exists there to receive from.
+  public var remoteControlHandler: (@Sendable (RemoteControlCommand) -> Void)?
   #if targetEnvironment(macCatalyst)
   private let bridgeServer = SortAudioBridgeServer()
   private var bridgeStarted = false
@@ -88,6 +97,7 @@ public final class AudioService: AudioPlaying {
         attackDuration: 0.1, decayDuration: 0.1, sustainLevel: 1.0, releaseDuration: 0.1
       )
     )
+    self.renderer = renderer
     self.sink = LocalToneEventSink(renderer: renderer)
     engine.output = ToneVoice(renderer: renderer)
   }
@@ -156,7 +166,20 @@ public final class AudioService: AudioPlaying {
     }
     bridgeServer.onConnectedClientsChanged = { [weak self] connected in
       Task { @MainActor in
-        self?.bridgeStatus = connected ? .connected : .listening
+        guard let self else { return }
+        self.bridgeStatus = connected ? .connected : .listening
+        // A note already ringing locally (enqueued before this connection existed) would otherwise
+        // keep playing until whatever holdSeconds was already in flight expires on its own — this
+        // guarantees an immediate, clean handoff the moment a client connects, instead of a brief
+        // (or, if the connection kept flapping, indefinite) overlap between the bridge and the
+        // local speakers. Never the reverse: disconnecting doesn't reopen anything locally, `play()`
+        // just resumes routing new notes to `sink` on its own.
+        if connected { self.renderer.enqueue(.closeGate) }
+      }
+    }
+    bridgeServer.onRemoteControlCommandReceived = { [weak self] command in
+      Task { @MainActor in
+        self?.remoteControlHandler?(command)
       }
     }
 

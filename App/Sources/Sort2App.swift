@@ -1,4 +1,5 @@
 import AlgorithmKit
+import AudioEngineKit
 import BuiltInAlgorithms
 import BuiltInVisualizers
 import Foundation
@@ -166,6 +167,35 @@ struct Sort2App: App {
     // Kicks off AlgorithmDetails.algz's decode as early as possible so it's likely already warm
     // by the time the user reaches an AlgorithmDetailSection.
     prewarmAlgorithmDetails()
+
+    // The AU-hosted remote's transport buttons (AUDIO_UNIT_PLAN.md §7) arrive here as
+    // RemoteControlCommands over the companion-mode bridge — set once, at launch, so
+    // AudioEngineKit (which can't import SortFeature; that dependency runs the other way) never
+    // needs to know SortSession/SortCoordinator exist. Mirrors SortCommands.swift's menu-command
+    // dispatch exactly, just triggered from the bridge instead of a keyboard shortcut. A no-op
+    // (via `?.`) whenever nothing's actively sorting, same as every other reach-in through
+    // `SortCoordinator.shared.activeSortSession`.
+    AudioService.shared.remoteControlHandler = { command in
+      Task { @MainActor in
+        guard let session = SortCoordinator.shared.activeSortSession else { return }
+        switch command {
+        case .togglePlayback:
+          session.togglePlayback()
+        case .restart:
+          session.lastReplay?.seek(to: 0)
+        case .regenerate:
+          Task { await session.start(size: session.arraySize) }
+        case .stepForward:
+          session.lastReplay?.pause()
+          session.lastReplay?.stepForward()
+        case .stepBackward:
+          session.lastReplay?.pause()
+          session.lastReplay?.stepBackward()
+        case .toggleSound:
+          session.soundEnabled.toggle()
+        }
+      }
+    }
   }
 
   var body: some Scene {

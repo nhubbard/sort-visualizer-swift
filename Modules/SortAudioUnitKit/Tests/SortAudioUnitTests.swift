@@ -93,4 +93,75 @@ struct SortAudioUnitTests {
     let format = AVAudioFormat(standardFormatWithSampleRate: 44100, channels: 1)!
     #expect(!renderIsSilent(unit, format: format))
   }
+
+  /// The remote's "Tone" section (`AUDIO_UNIT_PLAN.md` §7) needs exactly these 6
+  /// audio-production-only controls, with correct ranges and defaults matching the DSP's own
+  /// hardcoded init values.
+  @Test
+  func parameterTreeExposesExpectedParametersWithDefaults() throws {
+    let unit = try SortAudioUnit(componentDescription: Self.componentDescription)
+    guard let tree = unit.parameterTree else {
+      Issue.record("expected a parameter tree")
+      return
+    }
+    let expected: [(identifier: String, min: AUValue, max: AUValue, defaultValue: AUValue)] = [
+      ("attack", 0.001, 2.0, 0.1),
+      ("decay", 0.001, 2.0, 0.1),
+      ("sustain", 0.0, 1.0, 1.0),
+      ("release", 0.001, 2.0, 0.1),
+      ("detune", -50.0, 50.0, 0.0),
+      ("gain", 0.0, 1.0, 1.0),
+    ]
+    #expect(tree.allParameters.count == expected.count)
+    for expectation in expected {
+      guard let parameter = tree.allParameters.first(where: { $0.identifier == expectation.identifier })
+      else {
+        Issue.record("missing parameter \(expectation.identifier)")
+        continue
+      }
+      #expect(parameter.minValue == expectation.min)
+      #expect(parameter.maxValue == expectation.max)
+      #expect(parameter.value == expectation.defaultValue)
+    }
+  }
+
+  /// Exercises the full observer → `ToneCommand` → `ToneRenderer` pipeline end to end: a real
+  /// `AUParameter` value change should actually affect subsequently rendered audio, not just update
+  /// some UI-facing cache.
+  @Test
+  func settingGainParameterToZeroSilencesAnActiveNote() async throws {
+    let socketPath = "/tmp/sabk-unit-\(UUID().uuidString.prefix(8)).sock"
+    defer { try? FileManager.default.removeItem(atPath: socketPath) }
+    let server = SortAudioBridgeServer()
+    try server.start(socketPath: socketPath)
+    defer { server.stop() }
+
+    let unit = try SortAudioUnit(componentDescription: Self.componentDescription)
+    unit.maximumFramesToRender = 512
+    unit.socketPathOverride = socketPath
+    try unit.allocateRenderResources()
+    defer { unit.deallocateRenderResources() }
+
+    let deadline = ContinuousClock.now.advanced(by: .seconds(5))
+    while !server.hasConnectedClients, ContinuousClock.now < deadline {
+      try await Task.sleep(for: .milliseconds(10))
+    }
+    #expect(server.hasConnectedClients)
+
+    server.broadcast(SortToneEvent(value: 50, range: 1...100, holdSeconds: 10), noteRange: 36...72)
+    try await Task.sleep(for: .milliseconds(300))
+
+    let format = AVAudioFormat(standardFormatWithSampleRate: 44100, channels: 1)!
+    #expect(!renderIsSilent(unit, format: format))
+
+    guard let gainParameter = unit.parameterTree?.allParameters.first(where: { $0.identifier == "gain" })
+    else {
+      Issue.record("expected a gain parameter")
+      return
+    }
+    gainParameter.setValue(0, originator: nil)
+    try await Task.sleep(for: .milliseconds(50))
+
+    #expect(renderIsSilent(unit, format: format))
+  }
 }

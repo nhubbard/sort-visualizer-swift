@@ -30,6 +30,11 @@ public final class SortAudioBridgeServer: @unchecked Sendable {
   /// status indicator should be able to tell apart.
   public var onListenerStateChanged: (@Sendable (ListenerState) -> Void)?
 
+  /// Fires on an arbitrary background queue whenever a connected AU instance sends a remote-control
+  /// command (the AU-hosted transport remote, `AUDIO_UNIT_PLAN.md` §7) — `AudioService` forwards
+  /// this to whatever's driving the currently-active `SortSession`.
+  public var onRemoteControlCommandReceived: (@Sendable (RemoteControlCommand) -> Void)?
+
   public enum ListenerState: Sendable, Equatable {
     case listening
     case failed
@@ -96,7 +101,7 @@ public final class SortAudioBridgeServer: @unchecked Sendable {
   }
 
   public func broadcast(_ event: SortToneEvent, noteRange: ClosedRange<Int>) {
-    let data = Data(BridgeWireCodec.encode(event, noteRange: noteRange))
+    let data = Data(BridgeEnvelope.encodeToneEvent(event, noteRange: noteRange))
     queue.async { [weak self] in
       guard let self else { return }
       for connection in self.connections.values {
@@ -125,6 +130,24 @@ public final class SortAudioBridgeServer: @unchecked Sendable {
     connections[id] = connection
     connection.start(queue: queue)
     notifyConnectedClientsChanged()
+    receiveNext(on: connection)
+  }
+
+  /// The server was write-only before the AU remote existed — this is its first receive path.
+  /// Reads whatever a connected AU instance sends back (only remote-control commands today; a
+  /// stray `toneEvent` channel byte from a client would just be ignored, not crash anything).
+  private func receiveNext(on connection: NWConnection) {
+    connection.receive(
+      minimumIncompleteLength: BridgeEnvelope.totalByteCount,
+      maximumLength: BridgeEnvelope.totalByteCount
+    ) { [weak self] content, _, isComplete, error in
+      guard let self else { return }
+      if let content, case .remoteControlCommand(let command) = BridgeEnvelope.decode(content) {
+        self.onRemoteControlCommandReceived?(command)
+      }
+      guard error == nil, !isComplete else { return }
+      self.receiveNext(on: connection)
+    }
   }
 
   /// Runs on `queue` already, same reasoning as `accept(_:)` — both call sites are connection
