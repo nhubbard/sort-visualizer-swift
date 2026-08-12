@@ -2,6 +2,7 @@ import AlgorithmKit
 import AudioToolbox
 import AVFoundation
 import BuiltInAlgorithms
+import CoreAudio
 import SortAudioCore
 import SortEngineKit
 import ToneKitDSP

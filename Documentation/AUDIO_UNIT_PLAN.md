@@ -323,6 +323,38 @@ it isn't evidence any particular approach is required.
 Do not permanently complicate the product based only on historical/toolchain-specific Catalyst-AU
 reports before the current configuration has actually been tested.
 
+**Option 1 spike result (Phase 4, current Xcode 26 toolchain): promising, not yet conclusive.**
+Expanding `AUv3Extension`'s destinations from `.iPad` to `Module.destinations` (adding
+`.macCatalyst`) built and embedded cleanly (`Contents/PlugIns/AUv3Extension.appex`) after two small,
+expected fixes — `SortAudioUnit.swift` needed an explicit `import CoreAudio` for
+`UnsafeMutableAudioBufferListPointer` on Catalyst specifically (the same gotcha `ToneVoice.swift`
+already hit in Phase 1), and the app's dependency on the extension needed its `.when([.ios])`
+platform condition (added when the extension was iPad-only) widened back to unconditional now that
+both targets share destinations.
+
+Real, OS-level registration is confirmed: `auval -a` lists the component (`aumu SrtS NkHb - Nick
+Hubbard: Sort Symphony`), and `log show` during a validation attempt shows the extension process
+actually launching through the real PlugInKit/RunningBoard/XPC machinery and logging "plugin loaded
+and ready for host" — genuine proof the extension mechanics work at the OS level, not just a clean
+compile. However, `auval -v aumu SrtS NkHb` (with or without `-oop`) doesn't complete a full pass —
+it hits `FATAL ERROR: OpenAComponent: result: -10863` (`kAudioUnitErr_CannotDoInCurrentContext`)
+roughly 30 seconds after the extension process itself successfully reports ready, consistent with
+`auvaltool`'s own instantiation path still routing through the legacy synchronous
+`AudioComponentInstanceNew`/`OpenAComponent` API before/instead of the modern async
+`AVAudioUnit.instantiate(with:options:completionHandler:)` path a real host uses for a v3-only
+component with no in-process AUv2 fallback registered alongside it — a known category of `auval`
+limitation with pure-v3, extension-hosted components, not necessarily evidence the AU itself is
+broken for a real host.
+
+**This is exactly the ambiguity real Logic Pro testing resolves and `auval` alone cannot** — see the
+Logic Pro licensing callout after the phase table (§14): there's no Logic Pro for iPad subscription
+to test Phase 3's iPadOS claim, but there **is** a perpetual Logic Pro for Mac license, making this
+option-1 Mac spike the first point in the whole plan where "does Logic Pro actually load this" can
+be checked directly. Recommendation: keep option 1 (no reason yet to fall back to option 2/3 — the
+failure signature is `auval`-specific tooling behavior, not a build, packaging, or registration
+defect), and treat a real Logic Pro for Mac load-and-play test as the deciding confirmation before
+calling Phase 4 done.
+
 **The AU itself remains completely self-contained and in-process regardless of which packaging
 option above is chosen** — none of the three options change the render-time architecture from §5-6.
 
@@ -739,9 +771,18 @@ The shipping roadmap ends at AUv3. VST3/AAX live in §9-10, not as numbered phas
 | 0 | **Architecture/platform feasibility.** AU component-type test (§1). iPad AU loading validation. Catalyst/macOS AU packaging spike (§7's tested order). `ToneRenderer` API/SPSC design (§5). Define the versioned, transport-neutral event/wire model (§8) as a design artifact. **Also**: the App Group/XPC Catalyst-sandboxed ↔ Developer-ID-helper feasibility spike (§8), throwaway code only. | none |
 | 1 | **Shared DSP refactor.** Split `ToneKit` into `ToneKitDSP`/`ToneKitAVFoundation` (§3). Extract `EnvelopeDSP`'s per-sample math out of the `AVAudioSourceNode` closure. Introduce `ToneRenderer` as sole state owner. Replace the render-thread `Mutex` with the bounded queue + single-ownership model (§5). Preallocate render scratch storage. Verify the standalone app sounds/behaves identically (regression-test against `Modules/ToneKit/Tests/{OscillatorTests,AmplitudeEnvelopeTests,NodeTests}.swift` and `Modules/AudioEngineKit/Tests/{AudioServiceTests,NoOpAudioServiceTests}.swift`, re-homed across the new modules). | Phase 0's `ToneRenderer` API shape |
 | 2 | **`SortAudioCore`.** `SortToneEvent`/`ToneMapper` extracted from `AudioService` (§2). Headless algorithm/replay driver (§7). **Also establish the `SortAudioEventSink`/`LocalToneEventSink` abstraction (§4)** used by both v1 consumers now, with the `ExternalEventSink` shape documented but not implemented. `AudioService` refactored onto `SortAudioCore` + `ToneKitAVFoundation`. Sorting algorithms stay untouched. | Phase 1 |
-| 3 | **iPadOS AUv3.** `SortAudioUnitKit` + the iPadOS extension target, wiring the headless driver directly into `internalRenderBlock` via `LocalToneEventSink`/`ToneRenderer`. Test in Logic Pro for iPad; verify the plug-in survives without the standalone app running. | Phase 2, informed by Phase 0's component-type finding |
-| 4 | **macOS AUv3.** Whichever packaging option §7's tested order lands on. Validate with `auval` and real Logic Pro on Mac. | Phase 0 (Mac packaging spike), Phase 3's `SortAudioUnitKit` |
+| 3 | **iPadOS AUv3.** `SortAudioUnitKit` + the iPadOS extension target, wiring the headless driver directly into `internalRenderBlock` via `LocalToneEventSink`/`ToneRenderer`. **Shipped, verified as far as this environment and the available Logic Pro licensing allow** — no Logic Pro for iPad subscription exists to test real hosting, so that specific claim is *assumed*, not confirmed (see the callout below the table). Verified instead: `SortAudioUnitKitTests` exercises the real `AUAudioUnit` end-to-end and asserts non-silent rendered output; the built app was installed and launched on the iPad Simulator and `pluginkit -m -p com.apple.AudioUnit-UI` confirmed the OS's own plugin registry recognizes the extension as a legitimate AudioUnit-UI extension. | Phase 2, informed by Phase 0's component-type finding |
+| 4 | **macOS AUv3.** Whichever packaging option §7's tested order lands on. Validate with `auval` and real Logic Pro on Mac — **this phase's Logic Pro claim is fully verifiable**, via a perpetual Mac license (see the callout below the table), unlike Phase 3's. | Phase 0 (Mac packaging spike), Phase 3's `SortAudioUnitKit` |
 | 5 | **Parameters/presets/UI and shipping hardening.** Decide which sort/synth controls belong in the plug-in (§12) and expose them via `AUParameterTree`. App Review documentation/testing for the AU submission. No App Group entitlement added at this phase (§12). | Phases 3-4 |
+
+**Logic Pro licensing constraint, confirmed during Phase 3**: there is no Logic Pro for iPad
+subscription available to test with, so Phase 3's "Logic Pro for iPad actually hosts this" claim is
+assumed, not verified end-to-end — everything short of that (build, real render output, OS-level
+extension registration) is genuinely confirmed, per Phase 3's row above. There **is** a perpetual
+Logic Pro for Mac license, though, which means Phase 4's macOS AUv3 packaging work is the first point
+in this plan where "does Logic Pro actually load and host this" can be checked directly rather than
+inferred — worth weighting Phase 4 as the higher-confidence verification milestone precisely because
+of this asymmetry, not just because it's next in sequence.
 
 **The initial project is complete at the end of Phase 5.**
 

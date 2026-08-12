@@ -204,12 +204,10 @@ let app = Target.target(
         .target(name: "SettingsKit"),
         // Tuist infers the "Embed Foundation Extensions" build phase and PlugIns/ placement
         // purely from this dependency's product type (.appExtension) — no other manifest
-        // mechanism needed. `condition: .when([.ios])` excludes it from the Mac Catalyst build
-        // entirely — without this, Xcode still tries to build/embed the iPad-only extension
-        // target for the Catalyst destination too (a dependency has no destinations of its own to
-        // consult), which fails signing since AUv3Extension's own settings never needed a
-        // DEVELOPMENT_TEAM for a target that was only ever meant to build for iOS/iPadOS.
-        .target(name: "AUv3Extension", condition: .when([.ios])),
+        // mechanism needed. No platform condition needed (unlike when this was `.iPad`-only,
+        // Phase 3): AUv3Extension now shares the app's own `Module.destinations`, so there's no
+        // destination mismatch for Xcode to fail on for either platform.
+        .target(name: "AUv3Extension"),
     ],
     settings: .settings(base: [
         "CODE_SIGN_ENTITLEMENTS": "App/Resources/SortSymphony.entitlements",
@@ -233,14 +231,17 @@ let app = Target.target(
     ])
 )
 
-// The first App Extension target in this project (AUDIO_UNIT_PLAN.md Phase 3) — iPadOS-only
-// (`.iPad`, not `Module.destinations`, which also includes `.macCatalyst`): macOS AUv3 packaging
-// is separate, undetermined Phase 4 work (see the plan's §7 "test in this order" list). Its own
-// Sources are just the thin AUAudioUnitFactory-conforming principal class; the real AUAudioUnit
-// implementation lives in SortAudioUnitKit, which this target links like any other dependency.
+// The first App Extension target in this project. Shipped for `.iPad` in Phase 3
+// (AUDIO_UNIT_PLAN.md); `.macCatalyst` added here for Phase 4's §7 option 1 spike — the cheapest
+// of the three packaging strategies to test (a Catalyst-built extension embedded directly in the
+// existing Catalyst app), tried first per the plan's own "test in this order" guidance before
+// assuming a native-macOS-embedded or separate-container-app fallback is needed. Its own Sources
+// are just the thin AUAudioUnitFactory-conforming principal class; the real AUAudioUnit
+// implementation lives in SortAudioUnitKit (already built against `Module.destinations`, i.e.
+// already Catalyst-capable, since `Module.framework` doesn't take a narrower `destinations`).
 let auv3Extension = Module.appExtension(
     name: "AUv3Extension",
-    destinations: [.iPad],
+    destinations: Module.destinations,
     dependencies: [.target(name: "SortAudioUnitKit")],
     infoPlist: .extendingDefault(with: [
         // Must match the containing app's CFBundleVersion/CFBundleShortVersionString exactly, or
@@ -276,6 +277,15 @@ let auv3Extension = Module.appExtension(
     extraSettings: [
         "MARKETING_VERSION": "2.0.0",
         "CURRENT_PROJECT_VERSION": "35",
+        // Needed now that this target also builds for .macCatalyst (Phase 4 spike) — without an
+        // explicit DEVELOPMENT_TEAM, Xcode fails Catalyst builds specifically with "Signing ...
+        // requires a development team" (the .iPad-only Simulator build never hit this; Mac
+        // Catalyst enforces real code signing even in Debug). Mirrors the app target's own
+        // settings exactly, including the macCatalyst-scoped identity override for the same
+        // "Tuist's ad-hoc default silently overrides DEVELOPMENT_TEAM for macosx" reason.
+        "CODE_SIGN_STYLE": "Automatic",
+        "DEVELOPMENT_TEAM": "676UP3S3AH",
+        "CODE_SIGN_IDENTITY[sdk=macosx*]": "Apple Development",
     ]
 )
 
