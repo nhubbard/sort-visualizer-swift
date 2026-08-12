@@ -280,7 +280,7 @@ let auv3Extension = Module.appExtension(
         "CFBundleDisplayName": "Sort Symphony AUv3",
         "NSExtension": [
             "NSExtensionPointIdentifier": "com.apple.AudioUnit-UI",
-            "NSExtensionPrincipalClass": "$(PRODUCT_MODULE_NAME).SortAudioUnitFactory",
+            "NSExtensionPrincipalClass": "$(PRODUCT_MODULE_NAME).SortAudioUnitViewController",
             "NSExtensionAttributes": [
                 "AudioComponents": [
                     [
