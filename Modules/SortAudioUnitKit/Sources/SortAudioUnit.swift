@@ -4,6 +4,9 @@ import CoreAudio
 import SortAudioBridgeKit
 import SortAudioCore
 import ToneKitDSP
+import os
+
+private let logger = Logger(subsystem: "com.nhubbard.Sort2.SortAudioUnitKit", category: "SortAudioUnit")
 
 /// The AUv3 instrument itself — a **companion-mode relay**, not an independent generator
 /// (AUDIO_UNIT_PLAN.md's corrected architecture): it never runs a sort of its own. Instead it
@@ -79,7 +82,10 @@ public final class SortAudioUnit: AUAudioUnit {
   /// returns `nil`) — this instance just stays silent rather than crashing, matching companion
   /// mode's "no self-contained fallback" design.
   private func startBridgeClient() {
-    guard let socketPath = socketPathOverride ?? SortAudioBridgePath.socketPath() else { return }
+    guard let socketPath = socketPathOverride ?? SortAudioBridgePath.socketPath() else {
+      logger.error("App Group container unavailable — bridge client not started, this instance will stay silent")
+      return
+    }
     let client = SortAudioBridgeClient(socketPath: socketPath, sink: sink)
     client.start()
     bridgeClient = client

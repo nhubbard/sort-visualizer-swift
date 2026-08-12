@@ -1,6 +1,7 @@
 import Foundation
 import Network
 import SortAudioCore
+import os
 
 /// The standalone app's side of the companion-mode bridge: binds a Unix domain socket inside the
 /// shared App Group container and broadcasts every `SortToneEvent` to whichever AU extension
@@ -14,8 +15,26 @@ import SortAudioCore
 /// thread (this type is `@unchecked Sendable`) can't race a connection being added/removed.
 public final class SortAudioBridgeServer: @unchecked Sendable {
   private let queue = DispatchQueue(label: "com.nhubbard.Sort2.SortAudioBridgeServer")
+  private let logger = Logger(subsystem: "com.nhubbard.Sort2.SortAudioBridgeKit", category: "SortAudioBridgeServer")
   private var listener: NWListener?
   private var connections: [ObjectIdentifier: NWConnection] = [:]
+
+  /// Fires on an arbitrary background queue whenever the connected-client count transitions to/from
+  /// zero — `AudioService` uses this to drive a UI-visible connection indicator. Callers needing
+  /// this on the main actor must hop themselves.
+  public var onConnectedClientsChanged: (@Sendable (Bool) -> Void)?
+
+  /// Fires on an arbitrary background queue whenever the listener itself changes state — distinct
+  /// from `onConnectedClientsChanged`, since "bound and listening, nothing connected yet" and
+  /// "failed to bind at all" (e.g. a sandbox/entitlement problem) are different situations a UI
+  /// status indicator should be able to tell apart.
+  public var onListenerStateChanged: (@Sendable (ListenerState) -> Void)?
+
+  public enum ListenerState: Sendable, Equatable {
+    case listening
+    case failed
+    case cancelled
+  }
 
   public init() {}
 
@@ -26,7 +45,11 @@ public final class SortAudioBridgeServer: @unchecked Sendable {
   }
 
   /// `socketPath` should come from `SortAudioBridgePath.socketPath()` — a plain path outside the
-  /// App Group container won't be reachable from the sandboxed AU extension process.
+  /// App Group container won't be reachable from the sandboxed AU extension process. The `throw`
+  /// here only covers gross parameter errors (e.g. a malformed endpoint) — an actual bind failure
+  /// (permission denied, sandbox violation) surfaces asynchronously via `listener.stateUpdateHandler`
+  /// below instead, which is why that handler logs rather than assuming a thrown error would catch
+  /// every failure mode.
   public func start(socketPath: String) throws {
     let params = NWParameters()
     params.defaultProtocolStack.transportProtocol = NWProtocolTCP.Options()
@@ -38,11 +61,29 @@ public final class SortAudioBridgeServer: @unchecked Sendable {
     try? FileManager.default.removeItem(atPath: socketPath)
 
     let listener = try NWListener(using: params)
+    listener.stateUpdateHandler = { [weak self] state in
+      switch state {
+      case .ready:
+        self?.logger.info("listening at \(socketPath, privacy: .public)")
+        self?.onListenerStateChanged?(.listening)
+      case .failed(let error):
+        self?.logger.error("failed to bind at \(socketPath, privacy: .public): \(String(describing: error), privacy: .public)")
+        self?.onListenerStateChanged?(.failed)
+      case .waiting(let error):
+        self?.logger.notice("waiting to bind at \(socketPath, privacy: .public): \(String(describing: error), privacy: .public)")
+      case .cancelled:
+        self?.logger.debug("listener cancelled")
+        self?.onListenerStateChanged?(.cancelled)
+      default:
+        break
+      }
+    }
     listener.newConnectionHandler = { [weak self] connection in
       self?.accept(connection)
     }
     listener.start(queue: queue)
     self.listener = listener
+    logger.info("starting bridge server, socket path: \(socketPath, privacy: .public)")
   }
 
   public func stop() {
@@ -70,13 +111,30 @@ public final class SortAudioBridgeServer: @unchecked Sendable {
     let id = ObjectIdentifier(connection)
     connection.stateUpdateHandler = { [weak self] state in
       switch state {
-      case .failed, .cancelled:
-        self?.connections.removeValue(forKey: id)
+      case .ready:
+        self?.logger.info("AU client connected")
+      case .failed(let error):
+        self?.logger.error("AU client connection failed: \(String(describing: error), privacy: .public)")
+        self?.removeConnection(id)
+      case .cancelled:
+        self?.removeConnection(id)
       default:
         break
       }
     }
     connections[id] = connection
     connection.start(queue: queue)
+    notifyConnectedClientsChanged()
+  }
+
+  /// Runs on `queue` already, same reasoning as `accept(_:)` — both call sites are connection
+  /// state-update handlers, which fire on the queue the connection was started with.
+  private func removeConnection(_ id: ObjectIdentifier) {
+    connections.removeValue(forKey: id)
+    notifyConnectedClientsChanged()
+  }
+
+  private func notifyConnectedClientsChanged() {
+    onConnectedClientsChanged?(!connections.isEmpty)
   }
 }

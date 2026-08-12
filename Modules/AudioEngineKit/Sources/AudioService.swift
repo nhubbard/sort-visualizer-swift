@@ -1,4 +1,5 @@
 import Foundation
+import Observation
 import SettingsKit
 import SortAudioCore
 import ToneKitAVFoundation
@@ -6,6 +7,37 @@ import ToneKitDSP
 #if targetEnvironment(macCatalyst)
 import SortAudioBridgeKit
 #endif
+
+/// A UI-facing summary of the companion-mode bridge's state — deliberately more granular than a
+/// single bool, since "never started" (no sort has played yet), "bound but nothing's connected
+/// yet," and "failed to bind at all" (e.g. an App Group/entitlement problem) are different
+/// situations someone debugging "why isn't Logic Pro receiving audio" needs to tell apart.
+public enum BridgeConnectionStatus: Sendable, Equatable {
+  /// `AudioService.start()` hasn't run yet — nothing has played a tone since the app launched.
+  case notStarted
+  /// Mac Catalyst only, and only reachable if `start()` has run there — this platform never has a
+  /// bridge (`AUv3Extension` and `SortAudioBridgeKit` are Mac Catalyst only, permanently).
+  case unsupportedPlatform
+  /// The App Group entitlement isn't resolvable (`SortAudioBridgePath.socketPath()` returned
+  /// `nil`) or the socket failed to bind — check `Console.app`/`log show` for
+  /// `SortAudioBridgeServer`'s own logged reason.
+  case unavailable
+  /// Bound and listening; no AU instance has connected (yet, or ever, if none is loaded in a DAW).
+  case listening
+  /// At least one AU instance is connected — `play()` is broadcasting to it instead of playing
+  /// locally.
+  case connected
+
+  public var displayText: String {
+    switch self {
+    case .notStarted: "Not Started Yet"
+    case .unsupportedPlatform: "Not Available on This Platform"
+    case .unavailable: "Unavailable"
+    case .listening: "Waiting for Connection"
+    case .connected: "Connected"
+    }
+  }
+}
 
 /// `ToneKitAVFoundation`-backed `AudioPlaying`, replacing `Legacy/Shared/Data/Primary/
 /// Synthesizer.swift`'s graph (`Oscillator` → `AmplitudeEnvelope` → `Fader` → `AudioEngine`,
@@ -29,6 +61,7 @@ import SortAudioBridgeKit
 /// unchanged from before the bridge existed. iPad builds never link `SortAudioBridgeKit` at all
 /// (`.when([.catalyst])` in Project.swift) — the bridge simply doesn't exist there, by permanent
 /// design (see AUDIO_UNIT_PLAN.md's platform-scope rationale).
+@Observable
 @MainActor
 public final class AudioService: AudioPlaying {
   public static let shared = AudioService()
@@ -40,6 +73,9 @@ public final class AudioService: AudioPlaying {
   #if targetEnvironment(macCatalyst)
   private let bridgeServer = SortAudioBridgeServer()
   private var bridgeStarted = false
+  public private(set) var bridgeStatus: BridgeConnectionStatus = .notStarted
+  #else
+  public let bridgeStatus: BridgeConnectionStatus = .unsupportedPlatform
   #endif
 
   public init(settings: AppSettings = .shared) {
@@ -92,13 +128,43 @@ public final class AudioService: AudioPlaying {
   }
 
   #if targetEnvironment(macCatalyst)
-  /// No-op if the App Group entitlement isn't resolvable — matches the AU extension's own
-  /// `SortAudioUnit.startBridgeClient()` fallback, so a signing/provisioning gap on either side
-  /// degrades to "bridge inactive," never a crash.
+  /// Degrades to `.unavailable` (never a crash) if the App Group entitlement isn't resolvable —
+  /// matches the AU extension's own `SortAudioUnit.startBridgeClient()` fallback, so a
+  /// signing/provisioning gap on either side just means "bridge inactive." `bridgeStatus`'s
+  /// transitions are the thing to check first when the bridge doesn't seem to be working: an app
+  /// launch alone never starts it — only the first `play()` call does (see `start()` below) — so
+  /// "no sort has played sound yet" is the single most common reason nothing is happening.
   private func startBridgeServerIfNeeded() {
-    guard !bridgeStarted, let socketPath = SortAudioBridgePath.socketPath() else { return }
-    try? bridgeServer.start(socketPath: socketPath)
+    guard !bridgeStarted else { return }
     bridgeStarted = true
+
+    guard let socketPath = SortAudioBridgePath.socketPath() else {
+      bridgeStatus = .unavailable
+      return
+    }
+
+    bridgeServer.onListenerStateChanged = { [weak self] state in
+      Task { @MainActor in
+        guard let self else { return }
+        switch state {
+        case .listening:
+          if self.bridgeStatus != .connected { self.bridgeStatus = .listening }
+        case .failed, .cancelled:
+          self.bridgeStatus = .unavailable
+        }
+      }
+    }
+    bridgeServer.onConnectedClientsChanged = { [weak self] connected in
+      Task { @MainActor in
+        self?.bridgeStatus = connected ? .connected : .listening
+      }
+    }
+
+    do {
+      try bridgeServer.start(socketPath: socketPath)
+    } catch {
+      bridgeStatus = .unavailable
+    }
   }
   #endif
 }

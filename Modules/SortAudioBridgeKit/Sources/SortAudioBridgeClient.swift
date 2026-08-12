@@ -1,6 +1,7 @@
 import Foundation
 import Network
 import SortAudioCore
+import os
 
 /// The AU extension's side of the companion-mode bridge: connects to the app's Unix domain socket
 /// (inside the shared App Group container) and forwards every received `SortToneEvent` to a
@@ -10,8 +11,14 @@ import SortAudioCore
 /// Retries on a short interval while disconnected, since Logic may instantiate the AU before or
 /// after the standalone app is running, in either order, and the app may quit/relaunch at any time
 /// while the AU stays loaded on a track.
+///
+/// Every connection attempt's outcome is logged (`log show --predicate 'process ==
+/// "AUv3Extension"'`) — since retries happen silently and often (every `reconnectInterval`), this
+/// is the only way to tell "still waiting for the app to be running" apart from "the app is running
+/// but something about the connection itself is failing" from outside the process.
 public final class SortAudioBridgeClient: @unchecked Sendable {
   private let queue = DispatchQueue(label: "com.nhubbard.Sort2.SortAudioBridgeClient")
+  private let logger = Logger(subsystem: "com.nhubbard.Sort2.SortAudioBridgeKit", category: "SortAudioBridgeClient")
   private let socketPath: String
   private let sink: any SortAudioEventSink
   private var connection: NWConnection?
@@ -24,6 +31,7 @@ public final class SortAudioBridgeClient: @unchecked Sendable {
   }
 
   public func start() {
+    logger.info("starting, will connect to \(self.socketPath, privacy: .public)")
     queue.async { [weak self] in
       self?.connect()
     }
@@ -52,8 +60,12 @@ public final class SortAudioBridgeClient: @unchecked Sendable {
       guard let self else { return }
       switch state {
       case .ready:
+        logger.info("connected to bridge server")
         receiveNext(on: connection)
-      case .failed, .cancelled:
+      case .failed(let error):
+        logger.notice("connection attempt failed: \(String(describing: error), privacy: .public) — retrying in \(Self.reconnectInterval, privacy: .public)s")
+        scheduleReconnect()
+      case .cancelled:
         scheduleReconnect()
       default:
         break

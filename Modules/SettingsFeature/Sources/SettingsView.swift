@@ -1,4 +1,5 @@
 import AlgorithmKit
+import AudioEngineKit
 import SettingsKit
 import SwiftUI
 import VisualizationKit
@@ -6,6 +7,7 @@ import VisualizationKit
 public struct SettingsView: View {
   @Environment(AppSettings.self) private var settings
   @State private var isShowingResetConfirmation = false
+  private var audioService: AudioService { .shared }
 
   public init() {}
 
@@ -86,6 +88,11 @@ public struct SettingsView: View {
       Section("Sound") {
         Toggle("Sound Effects", isOn: $settings.soundEnabled)
           .accessibilityIdentifier("soundEnabledToggle")
+
+        if audioService.bridgeStatus != .unsupportedPlatform {
+          LabeledContent("Audio Unit Bridge", value: audioService.bridgeStatus.displayText)
+            .accessibilityIdentifier("audioUnitBridgeStatusRow")
+        }
       }
       Section("Array Size") {
         Stepper(
