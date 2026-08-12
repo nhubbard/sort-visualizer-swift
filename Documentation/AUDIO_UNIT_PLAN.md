@@ -424,16 +424,31 @@ Tone parameter changes reuse the exact realtime-safety mechanism §5 already est
   either, because it renders offline, decoupled from real time, but this AU's audio only exists
   because the standalone app is enqueuing it in actual wall-clock time as a sort runs — there's
   nothing to bounce ahead of time. The correct capture method: route the instrument track's **output
-  to a bus**, create a **new audio track** with that bus as input, **mute the instrument track**
-  (avoids doubled signal), record-enable the audio track, and hit Record while a sort is actually
-  running in the standalone app. This is the documented Logic Pro workflow for any generative/
-  continuous-output instrument, not specific to Sort Symphony.
+  to a bus**, create a **new audio track** with that bus as input, record-enable the audio track, and
+  hit Record while a sort is actually running in the standalone app. **Confirmed live: do not mute
+  the instrument track.** The obvious-seeming "mute it to avoid a doubled signal" step is actually
+  wrong for this exact routing — muting the track that the bus routing depends on silences the signal
+  reaching the bus too, not just the track's own direct output, so the recording goes silent as well.
+  Leaving the instrument track unmuted works correctly and doesn't double anything, since its output
+  is already redirected entirely to the bus rather than also feeding the main mix.
 - **A stuck local note during the local-to-bridge handoff was a real bug, now fixed.** Before the
   fix, a note already ringing locally (enqueued before an AU instance connected) kept playing until
   whatever `holdSeconds` was already in flight expired on its own, since `play()`'s routing only
   affects *new* notes. `AudioService` now enqueues an immediate `.closeGate` on its local `renderer`
   the moment `onConnectedClientsChanged` reports a new connection, guaranteeing local speakers go
-  silent right away rather than after a variable tail.
+  silent right away rather than after a variable tail. Confirmed live: Logic correctly receives audio
+  and mutes itself appropriately when the standalone app isn't actively playing back.
+- **The bridge is off by default, with its own priming UI, because the system's own prompt can't be
+  customized.** The first time the bridge actually connects, macOS shows a "would like to access data
+  from other apps" prompt — this is a fixed TCC dialog with no Info.plist usage-description key
+  (unlike Camera/Microphone), so its wording can't be changed. Rather than a user hitting that vague
+  prompt unprompted the first time they happen to play a sort with sound on,
+  `AppSettings.audioUnitBridgeEnabled` defaults to `false`, and Settings shows explanatory text
+  (visible only while the toggle is on) describing what the upcoming system prompt means and why it's
+  safe to allow. Turning the toggle on immediately calls `AudioService.setAudioUnitBridgeEnabled(true)`,
+  which binds the bridge's socket right away — independent of whether a sort has ever played sound —
+  so the system prompt (and our own explanation) both appear at the moment of clearest intent, not
+  buried inside an unrelated action.
 
 ---
 

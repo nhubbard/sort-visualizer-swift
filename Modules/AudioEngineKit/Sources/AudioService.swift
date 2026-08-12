@@ -13,7 +13,12 @@ import SortAudioBridgeKit
 /// yet," and "failed to bind at all" (e.g. an App Group/entitlement problem) are different
 /// situations someone debugging "why isn't Logic Pro receiving audio" needs to tell apart.
 public enum BridgeConnectionStatus: Sendable, Equatable {
-  /// `AudioService.start()` hasn't run yet — nothing has played a tone since the app launched.
+  /// `AppSettings.audioUnitBridgeEnabled` is off — the default. The bridge never attempts to bind
+  /// its socket in this state, so the system's "access data from other apps" prompt never appears
+  /// until the user opts in from Settings (see that setting's own doc comment for why).
+  case disabledByUser
+  /// Enabled, but `AudioService.start()` hasn't run yet — nothing has played a tone since the app
+  /// launched (or since the setting was turned on, whichever is later).
   case notStarted
   /// Mac Catalyst only, and only reachable if `start()` has run there — this platform never has a
   /// bridge (`AUv3Extension` and `SortAudioBridgeKit` are Mac Catalyst only, permanently).
@@ -30,6 +35,7 @@ public enum BridgeConnectionStatus: Sendable, Equatable {
 
   public var displayText: String {
     switch self {
+    case .disabledByUser: "Disabled"
     case .notStarted: "Not Started Yet"
     case .unsupportedPlatform: "Not Available on This Platform"
     case .unavailable: "Unavailable"
@@ -82,7 +88,7 @@ public final class AudioService: AudioPlaying {
   #if targetEnvironment(macCatalyst)
   private let bridgeServer = SortAudioBridgeServer()
   private var bridgeStarted = false
-  public private(set) var bridgeStatus: BridgeConnectionStatus = .notStarted
+  public private(set) var bridgeStatus: BridgeConnectionStatus = .disabledByUser
   #else
   public let bridgeStatus: BridgeConnectionStatus = .unsupportedPlatform
   #endif
@@ -100,6 +106,9 @@ public final class AudioService: AudioPlaying {
     self.renderer = renderer
     self.sink = LocalToneEventSink(renderer: renderer)
     engine.output = ToneVoice(renderer: renderer)
+    #if targetEnvironment(macCatalyst)
+    bridgeStatus = settings.audioUnitBridgeEnabled ? .notStarted : .disabledByUser
+    #endif
   }
 
   public func start() throws {
@@ -110,6 +119,26 @@ public final class AudioService: AudioPlaying {
     startBridgeServerIfNeeded()
     #endif
   }
+
+  #if targetEnvironment(macCatalyst)
+  /// Called immediately when the Settings toggle changes — deliberately independent of `start()`/
+  /// `isStarted` (binding a Unix socket has nothing to do with whether the local `AVAudioEngine` is
+  /// running), so enabling this from Settings "front-runs" the system's access prompt right there,
+  /// showing our own explanatory text first, instead of a user hitting it unprompted the next time
+  /// they happen to play a sort with sound on.
+  public func setAudioUnitBridgeEnabled(_ enabled: Bool) {
+    guard enabled else {
+      bridgeServer.stop()
+      bridgeStarted = false
+      bridgeStatus = .disabledByUser
+      return
+    }
+    bridgeStatus = .notStarted
+    startBridgeServerIfNeeded()
+  }
+  #else
+  public func setAudioUnitBridgeEnabled(_ enabled: Bool) {}
+  #endif
 
   public func stop() {
     guard isStarted else { return }
@@ -145,7 +174,7 @@ public final class AudioService: AudioPlaying {
   /// launch alone never starts it — only the first `play()` call does (see `start()` below) — so
   /// "no sort has played sound yet" is the single most common reason nothing is happening.
   private func startBridgeServerIfNeeded() {
-    guard !bridgeStarted else { return }
+    guard !bridgeStarted, settings.audioUnitBridgeEnabled else { return }
     bridgeStarted = true
 
     guard let socketPath = SortAudioBridgePath.socketPath() else {

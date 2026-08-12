@@ -46,6 +46,16 @@ public final class AppSettings {
     didSet { store.set(soundEnabled, forKey: Keys.soundEnabled) }
   }
 
+  /// Off by default, deliberately — the first connection macOS makes to the shared App Group
+  /// container triggers a system "would like to access data from other apps" prompt, and that
+  /// prompt's wording is fixed by the OS (no Info.plist usage-description key exists for it, unlike
+  /// Camera/Microphone). Gating the bridge behind an explicit opt-in lets Settings show its own
+  /// explanatory text *before* that unavoidably vague system dialog appears, rather than a user
+  /// hitting it unprompted the first time they happen to play a sort with sound on.
+  public var audioUnitBridgeEnabled: Bool {
+    didSet { store.set(audioUnitBridgeEnabled, forKey: Keys.audioUnitBridgeEnabled) }
+  }
+
   /// MIDI note numbers (matching `Legacy/Shared/Data/Primary/SortViewModel.swift`'s
   /// `synthLowNote`/`synthHighNote`), not Hz — `AudioEngineKit`'s `AudioService` converts to
   /// frequency at play time, so this stays a plain, portable `ClosedRange<Int>` here.
@@ -80,6 +90,7 @@ public final class AppSettings {
     static let targetPlaybackDuration = "targetPlaybackDuration"
     static let compactPlaybackForFixedDuration = "compactPlaybackForFixedDuration"
     static let soundEnabled = "soundEnabled"
+    static let audioUnitBridgeEnabled = "audioUnitBridgeEnabled"
     static let synthLowNote = "synthLowNote"
     static let synthHighNote = "synthHighNote"
     static let defaultArraySize = "defaultArraySize"
@@ -103,6 +114,9 @@ public final class AppSettings {
       // NOTICE.md), and a brand-new user shouldn't have sound start playing on their very first
       // sort without having chosen it.
       Keys.soundEnabled: false,
+      // Off by default — see the property's own doc comment for why (front-running the system's
+      // unavoidably vague "access data from other apps" prompt with our own explanatory text).
+      Keys.audioUnitBridgeEnabled: false,
       Keys.synthLowNote: 36,
       Keys.synthHighNote: 72,
       Keys.defaultArraySize: 256,
@@ -120,6 +134,7 @@ public final class AppSettings {
     targetPlaybackDuration = store.double(forKey: Keys.targetPlaybackDuration)
     compactPlaybackForFixedDuration = store.bool(forKey: Keys.compactPlaybackForFixedDuration)
     soundEnabled = store.bool(forKey: Keys.soundEnabled)
+    audioUnitBridgeEnabled = store.bool(forKey: Keys.audioUnitBridgeEnabled)
     synthNoteRange =
       store.integer(forKey: Keys.synthLowNote)...store.integer(forKey: Keys.synthHighNote)
     defaultArraySize = store.integer(forKey: Keys.defaultArraySize)
@@ -143,6 +158,7 @@ public final class AppSettings {
     targetPlaybackDuration = 10.0
     compactPlaybackForFixedDuration = false
     soundEnabled = false
+    audioUnitBridgeEnabled = false
     synthNoteRange = 36...72
     defaultArraySize = 256
     recordingOperationCap = 300_000

@@ -85,13 +85,33 @@ public struct SettingsView: View {
               + "Adjust an already-running sort from its own speed control."
         )
       }
-      Section("Sound") {
+      Section {
         Toggle("Sound Effects", isOn: $settings.soundEnabled)
           .accessibilityIdentifier("soundEnabledToggle")
 
         if audioService.bridgeStatus != .unsupportedPlatform {
-          LabeledContent("Audio Unit Bridge", value: audioService.bridgeStatus.displayText)
+          Toggle("Audio Unit Bridge", isOn: $settings.audioUnitBridgeEnabled)
+            .accessibilityIdentifier("audioUnitBridgeEnabledToggle")
+            .onChange(of: settings.audioUnitBridgeEnabled) { _, newValue in
+              audioService.setAudioUnitBridgeEnabled(newValue)
+            }
+
+          LabeledContent("Status", value: audioService.bridgeStatus.displayText)
             .accessibilityIdentifier("audioUnitBridgeStatusRow")
+        }
+      } header: {
+        Text("Sound")
+      } footer: {
+        // Front-runs the system's own unavoidably vague "access data from other apps" prompt
+        // (AUDIO_UNIT_PLAN.md §7's "Known gotchas") — shown only while the toggle is on, so someone
+        // who's never touched this setting doesn't see irrelevant DAW-routing explanation.
+        if settings.audioUnitBridgeEnabled {
+          Text(
+            "Lets a DAW's Audio Unit (e.g. Logic Pro) connect to Sort Symphony and receive its live "
+              + "audio instead of playing through your speakers. The first time this connects, macOS "
+              + "will show a prompt asking to let \"Sort Symphony\" access data from other apps — "
+              + "that's expected and required for the connection to work."
+          )
         }
       }
       Section("Array Size") {

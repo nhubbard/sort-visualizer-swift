@@ -25,6 +25,7 @@ struct AppSettingsTests {
     #expect(settings.targetPlaybackDuration == 10.0)
     #expect(settings.compactPlaybackForFixedDuration == false)
     #expect(settings.soundEnabled == false)
+    #expect(settings.audioUnitBridgeEnabled == false)
     #expect(settings.synthNoteRange == 36...72)
     #expect(settings.defaultArraySize == 256)
     #expect(settings.codeTheme == CodeThemeID(rawValue: "monokai"))
@@ -99,6 +100,7 @@ struct AppSettingsTests {
     settings.targetPlaybackDuration = 15.0
     settings.compactPlaybackForFixedDuration = true
     settings.soundEnabled = true
+    settings.audioUnitBridgeEnabled = true
     settings.synthNoteRange = 24...96
     settings.defaultArraySize = 128
     settings.codeTheme = CodeThemeID(rawValue: "dracula")
@@ -113,6 +115,7 @@ struct AppSettingsTests {
     #expect(settings.targetPlaybackDuration == 10.0)
     #expect(settings.compactPlaybackForFixedDuration == false)
     #expect(settings.soundEnabled == false)
+    #expect(settings.audioUnitBridgeEnabled == false)
     #expect(settings.synthNoteRange == 36...72)
     #expect(settings.defaultArraySize == 256)
     #expect(settings.codeTheme == CodeThemeID(rawValue: "monokai"))
