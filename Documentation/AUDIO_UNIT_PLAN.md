@@ -1,84 +1,110 @@
 # Sort Symphony as an Audio Unit — Implementation Plan
 
-Status: **planning only, nothing built. Third and final pre-implementation draft.** This revision
-commits scope and reserves an expansion path; it does not change the core architecture the second
-draft established (the sort-driven generator model, `SortAudioCore`, the `ToneKitDSP`/
-`ToneKitAVFoundation` split, realtime-safe rendering). See `ARCHITECTURE_V2.md`/
-`IMPLEMENTATION_PLAN.md` for the existing app's shipped design this plan builds alongside.
+Status: **companion-mode bridge shipped.** This is the corrected, current architecture — a
+substantial revision of the original plan, made after real Logic Pro testing on Mac revealed the
+first four implementation phases had built the wrong product model (see the "Revision history"
+callout below). See `ARCHITECTURE_V2.md`/`IMPLEMENTATION_PLAN.md` for the existing app's shipped
+design this plan builds alongside.
 
-**What this draft commits to, up front:**
+**Revision history, briefly:** Phases 1-4 (still described in git history and in this document's
+older diffs) built a self-contained AU that ran its own independent copy of a sort/shuffle inside
+the extension process, with no connection to the standalone app — reasoning that Logic must own the
+plug-in's entire lifetime and can't assume the app is running. Loading that build in real Logic Pro
+surfaced the actual intent: the AU should be a **live send from the running standalone app**,
+replacing local speaker output with Logic Pro routing while connected — not an independent
+generator. That correction, plus a related realization that iPadOS's aggressive background-app
+termination makes a persistent live pipe structurally unsound there, produced this revision. The
+headless, self-contained driver was deleted; the platform scope narrowed to Mac Catalyst only,
+permanently.
 
-1. **AUv3 is the committed v1 feature** — the only plug-in format actually being built.
-2. **The AU is fully self-contained and requires no custom IPC** to operate — it never talks to
-   anything outside its own process to render audio.
-3. **The core event/DSP architecture (`SortAudioCore`, `ToneKitDSP`, `ToneRenderer`) is
-   transport- and plug-in-format-neutral by design**, so a future external transport or plug-in
-   format is an additional adapter, not a rewrite.
-4. **The Mac architecture reserves and validates an App Group/XPC path** for a possible future
-   external DAW bridge — validated in a Phase 0 spike, but not shipped in the initial build.
-5. **XPC is never part of the realtime audio-render path**, full stop — not now, not in any future
-   bridge design.
-6. **VST3 is optional future compatibility, delivered outside the Mac App Store** via a separately
-   distributed, Developer ID-signed bridge — not a Phase in the initial roadmap.
-7. **AAX is a still-more-conditional future target**, gated on real licensing/tooling cost, using
+**What this document now commits to:**
+
+1. **AUv3 is the only plug-in format shipped or planned** — VST3/AAX remain described-but-deferred
+   compatibility ideas (§9-10), unchanged in that regard from the original plan.
+2. **The AU is a companion-mode relay, not a self-contained generator.** It has no sort/shuffle
+   logic of its own; it exists only to receive and re-render events the *running* standalone app
+   produces. With the app not running or not reachable, the AU is simply silent — there is no
+   fallback mode.
+3. **A Unix domain socket bound inside a shared App Group container is the shipped IPC
+   mechanism** — confirmed via Apple DTS forum guidance as the supported, sandbox-compatible way
+   for the standalone app and an AU extension instance hosted by an unrelated third-party host
+   (Logic Pro) to talk directly. Raw XPC (a custom Mach service) is **not** used for this — setting
+   up a custom XPC listener reachable from inside a third-party host's sandboxed extension process
+   is not the pattern Apple designed AUv3 around.
+4. **This IPC is never part of the realtime audio-render path.** `internalRenderBlock` only ever
+   calls `ToneRenderer.render(...)`; the bridge client runs entirely off the render thread and only
+   ever enqueues into the same lock-free command queue the standalone app's own render path uses.
+5. **Platform scope is Mac Catalyst only, permanently** — not deferred pending iPadOS Logic Pro
+   access. iPadOS's aggressive background-app termination under memory pressure could silently sever
+   a persistent pipe at arbitrary times with no recourse; macOS does not jetsam-kill background apps
+   the same way, so this architecture is structurally sound on Mac and structurally unsound on
+   iPadOS regardless of testing access. If this is ever revisited, the underlying App Group +
+   same-device IPC mechanism would transfer, but there is no iPadOS variant planned.
+6. **The App Group entitlement ships now**, on both the app and the extension — it is load-bearing
+   for v1, not a reserved-but-unused capability.
+7. **VST3 is optional future compatibility, delivered outside the Mac App Store** via a separately
+   distributed, Developer ID-signed bridge — not a phase in the committed roadmap. Unchanged from
+   the original plan, except that the underlying event-transport mechanism such a bridge would reuse
+   now already exists and ships (§8), rather than being a reserved-but-unbuilt spike.
+8. **AAX is a still-more-conditional future target**, gated on real licensing/tooling cost, using
    the same bridge/core if it's ever pursued.
-8. **Nothing in the initial AU implementation requires Swift/C++ interoperability** — that question
-   is deferred entirely to whenever VST3 work actually starts.
-9. **The initial project is considered complete once AUv3 works robustly on iPadOS and macOS** —
-   there is no Phase 6 in the committed roadmap; VST3/AAX live in a separate, non-numbered
-   "deferred compatibility" section.
+9. **A minimal, audio-production-only parameter UI** for the AU is planned as a near-term follow-on
+   (§7's "Plug-in UI" subsection) — explicitly not a reimplementation of the app's own sort
+   visualization, algorithm details, or code display inside the plug-in host.
 
 ---
 
-## 1. The product model: a live, self-contained sort-audio generator (AUv3, committed)
+## 1. The product model: a live companion-mode relay (AUv3, shipped)
 
-The goal is to expose the sonification a running sort/replay already produces as a live, continuous
-audio source inside a DAW — something you drop on a track, hit play, and hear the sort's own tones
-come out, ready for Logic's (or another AU host's) effects chain on top.
+The goal is to route the *running* standalone Sort Symphony app's own live audio into a DAW —
+something you drop on a Logic Pro track, then run a sort with sound on in the standalone app, and
+hear that same audio arrive on the track, ready for Logic's effects chain on top **instead of** the
+app's own local speaker output. This intentionally avoids building any effects/node-editor system
+inside Sort Symphony itself — Logic Pro already is one.
 
 ```text
-Sort Symphony
+Sort Symphony (running, standalone app)
+    ↓ SortAudioCore / ToneKitDSP (local DSP, unchanged)
     ↓
-SortAudioCore
+AudioService                         (routes: bridge if connected, else local speakers)
+    ↓ SortAudioBridgeServer          (Unix domain socket, shared App Group container)
     ↓
-ToneKitDSP
+SortAudioBridgeClient                (inside the AU extension process)
+    ↓ SortAudioCore.LocalToneEventSink → ToneKitDSP.ToneRenderer
     ↓
-AUv3
+AUv3 (internalRenderBlock)
     ↓
-Logic Pro / other AUv3 hosts
+Logic Pro (Mac) — the extension's audio output on its track
 ```
 
-for **iPadOS** and **macOS through the existing Mac Catalyst product**, using whichever AU packaging
-strategy the Phase 0 spike (§6) proves reliable. This is the entire committed v1 scope. VST3 and AAX
-are addressed in §9-10 as deferred, conditional compatibility work — the architecture below is
-written so that work is possible later without a rewrite, not so that it's promised.
+for **macOS, through the existing Mac Catalyst product, only.** This is the entire committed scope.
+VST3 and AAX are addressed in §9-10 as deferred, conditional compatibility work.
 
-Explicitly **not** in scope for v1:
+Explicitly **not** in scope:
 
+- No self-contained/headless mode — the AU never runs a sort or shuffle of its own, on any platform.
+  There is deliberately no fallback path for "the app isn't running": the AU is simply silent then,
+  matching "there's no control, and it doesn't load as-is, so it's easier to just make companion mode
+  the default."
+- No iPadOS AU target, now or planned — permanent, not deferred (see the revision-history callout
+  above for the reasoning).
 - No bounced/pre-rendered audio file.
 - No requirement that the DAW supply MIDI notes as the source of truth for pitch/timing.
-- No incoming audio signal that Sort Symphony transforms (`ToneKit` has no audio-input processing
-  path today — see `NOTICE.md`'s "no Fader... no MIDI, automation" scope note — and this plan
-  doesn't add one).
+- No incoming audio signal that Sort Symphony transforms (`ToneKitDSP` has no audio-input processing
+  path today, and this plan doesn't add one).
 - No rewriting of individual sorting algorithms around AU/VST/MIDI/DAW-transport concepts. Every
   algorithm in `BuiltInAlgorithms` stays exactly what it is today: a pure, synchronous producer of
-  `SortOperation`s against `RecordingEngine`, with zero awareness that a plug-in host, or any future
-  external transport, might ever consume its output.
+  `SortOperation`s against `RecordingEngine`, with zero awareness that a plug-in host might ever
+  consume its output, directly or indirectly.
+- No DAW-hosted UI beyond the minimal, audio-production-only parameter view planned in §7 — no
+  visualization, algorithm detail, or code display ever renders inside the AU host.
 
-**Component type: what Logic actually needs to see.** AUv3 has a real `kAudioUnitType_Generator`
-category (audio out, no MIDI in, no audio in) that matches this product's actual behavior more
-precisely than an instrument does. Research turned up no confirmed, current evidence of Logic Pro
-exposing a user-installed `kAudioUnitType_Generator` plug-in the way it exposes Instruments —
-Generator subtypes appear mostly as Apple-internal utility units. By contrast, there's a real,
-working precedent for this exact product shape registered as an **instrument** (`aumu`): Wotja
-(Intermorphic) ships as an AUv3 hosted successfully in Logic Pro that generates music from its own
-internal engine autonomously, with MIDI as optional/secondary control rather than the source of
-truth. The pragmatic, proven-in-the-wild answer is: **register as `aumu` for host compatibility and
-DAW-track presentation, but architect the plug-in so incoming MIDI is never load-bearing** — the
-sort/replay engine drives its own tone generation regardless of whether any MIDI ever arrives.
-Confirming this against real Logic behavior (iPad and Mac) is Phase 0 work (§11), not assumed
-further. Optional MIDI *input* (e.g. to select an algorithm, or nudge speed) remains a plausible
-future feature, not a v1 requirement (§12).
+**Component type: what Logic actually needs to see.** Registered as an instrument (`aumu`), matching
+a real, working precedent for this exact product shape: Wotja (Intermorphic) ships as an AUv3 hosted
+successfully in Logic Pro that generates its own audio from an internal engine, with MIDI as
+optional/secondary control rather than the source of truth. Sort Symphony's AU follows the same
+shape, except its "internal engine" is a relayed feed from the running standalone app rather than a
+self-driving generator. Incoming MIDI is never load-bearing.
 
 ---
 
@@ -114,13 +140,12 @@ Both the standalone app (`AudioService`, refactored to sit on top of `SortAudioC
 `ToneKitAVFoundation`) and the AU consume the same `ToneMapper`, so a pitch or gate-retrigger tweak
 made once is heard identically everywhere.
 
-`SortAudioCore` also owns something the standalone app has never needed: **a headless driver that
-picks and runs an algorithm/shuffle/size on its own**, since a plug-in instance has no
-`SortSession`/UI feeding it choices — it must be self-sufficient the moment Logic instantiates it
-(§6). This driver depends only on `SortEngineKit`/`AlgorithmKit`/`BuiltInAlgorithms` — never on
-`SortFeature` (which pulls in `VisualizationKit`, `DesignSystemKit`, `PersistenceKit`,
-`MathRenderingKit`, `ZstdKit`, none of which a plug-in should link). What exactly it picks (fixed
-algorithm, cycling, parameter-selected) is open (§12).
+`SortAudioCore` does **not** own an independent driver that picks and runs an algorithm/shuffle on
+its own — an earlier revision of this plan built exactly that (reasoning that a plug-in instance has
+no `SortSession`/UI feeding it choices, so it must be self-sufficient the moment Logic instantiates
+it), and real testing showed that isn't the wanted product: the AU has no sort logic of its own on
+any platform. It only ever relays `SortToneEvent`s that arrive over the companion-mode bridge (§8)
+into its own `ToneRenderer`, via the same `LocalToneEventSink` the standalone app itself uses.
 
 `SortAudioCore` is also where the transport-neutral event boundary lives — see §4.
 
@@ -164,48 +189,46 @@ VST3/AAX adapter (§9-10) additive rather than a fork.
 
 ---
 
-## 4. A transport-neutral event boundary, designed in now
+## 4. A transport-neutral event boundary — now genuinely exercised by two transports
 
-`SortAudioCore` must produce a canonical logical event representation that doesn't care whether the
-consumer is the standalone renderer, the AUv3 extension, or — someday — an external transport. This
-is the one piece of new abstraction this draft asks for beyond the second draft, because retrofitting
-it later would mean touching `SortAudioCore` a second time after the AU already ships.
+`SortAudioCore` produces a canonical logical event representation (`SortToneEvent`) that doesn't
+care whether the consumer is in-process or across the companion-mode bridge. Designing this
+boundary in early (rather than retrofitting it after the AU shipped) turned out to matter for
+exactly the reason originally anticipated, just via a different transport than first assumed:
 
 ```text
 SortToneEvent
     │
-    ├── LocalEventSink → realtime SPSC queue → ToneRenderer      (ships in v1)
+    ├── LocalToneEventSink → realtime SPSC queue → ToneRenderer      (standalone app, no bridge
+    │                                                                  connected; AU extension,
+    │                                                                  fed by the bridge client)
     │
-    └── ExternalEventSink                                        (future, macOS-only, §8)
+    └── SortAudioBridgeServer.broadcast(_:noteRange:)                 (standalone app, when a
+            ↓                                                         bridge client is connected)
+        Unix domain socket, shared App Group container
             ↓
-        XPC serialization
+        SortAudioBridgeClient (inside the AU extension process)
             ↓
-        DAW Bridge
-            ↓
-        plug-in event ingress
-            ↓
-        realtime SPSC queue → ToneRenderer
+        LocalToneEventSink → realtime SPSC queue → ToneRenderer
 ```
 
-Proposed shape (exact names aren't load-bearing):
+Shape actually shipped:
 
 ```text
-protocol SortAudioEventSink { func send(_ event: SortToneEvent) }
+protocol SortAudioEventSink: Sendable { func send(_ event: SortToneEvent, noteRange: ClosedRange<Int>) }
 
-struct LocalToneEventSink: SortAudioEventSink {
-    // wraps the bounded SPSC queue feeding ToneRenderer directly, in-process
+final class LocalToneEventSink: SortAudioEventSink {
+    // wraps the bounded command queue feeding a ToneRenderer directly, in-process — used by both
+    // the standalone app (when nothing's connected) and the AU extension (fed by the bridge client)
 }
-
-// Future, not implemented now:
-// struct ExternalToneEventSink: SortAudioEventSink { ... publishes over the wire protocol in §5 ... }
 ```
 
 **The rule this exists to enforce: sort code and tone-mapping code must never know or care where
-events ultimately go.** `SortAudioCore`'s headless driver and `ToneMapper` emit `SortToneEvent`s to
-whatever `SortAudioEventSink` they were configured with; only the sink implementation differs between
-"this process's own render thread" (v1, everywhere) and "somewhere else, over a wire" (deferred,
-§8-9). `LocalToneEventSink` is the only sink implemented in v1 — it's what both the standalone app
-and the AU extension use.
+events ultimately go.** `ToneMapper`/`LocalToneEventSink` don't know whether their caller is
+`AudioService` playing locally or a `SortAudioBridgeClient` relaying a received message — the
+`SortAudioBridgeKit` module (§8) sits entirely to the side of this boundary, moving *events* over
+its own wire format, never touching `ToneKitDSP` or `SortAudioCore`'s types beyond consuming
+`SortToneEvent` and calling a `SortAudioEventSink`.
 
 ---
 
@@ -273,153 +296,147 @@ AUv3:            SortAudioUnitKit's AUAudioUnit.internalRenderBlock     → Tone
 
 ---
 
-## 7. iPadOS and macOS/Catalyst: the AUv3 target itself
+## 7. Mac Catalyst only, permanently: the AUv3 target itself
 
-### iPadOS — required, self-contained
+### Why not iPadOS
 
-Logic Pro for iPad hosts ordinary iPadOS AUv3 App Extensions installed from the App Store; there's
-no separate Logic-specific SDK and no Catalyst involvement, since the app already ships a real
-iPadOS build (`.iPad` is one of `Module.destinations`' two entries,
-`Tuist/ProjectDescriptionHelpers/Module.swift:9`).
+An earlier revision of this plan targeted both iPadOS and macOS, on the reasoning that the AU was
+self-contained and platform-agnostic. Once the product model became companion mode — a persistent
+live connection to a *running* standalone app instance — iPadOS stopped being a good fit
+structurally, independent of testing access: iPadOS aggressively terminates backgrounded apps under
+memory pressure, with no recourse, which would silently sever a persistent pipe at arbitrary times.
+macOS does not jetsam-kill background apps the same way, so a persistent live connection is
+architecturally sound there and not on iPadOS. This is a **permanent** scope decision, not a
+temporary deferral pending a Logic Pro for iPad subscription (which doesn't exist anyway) — see the
+top-of-document revision-history callout.
 
-The extension must be **self-contained enough that Logic owns its entire lifetime**:
+### macOS / Mac Catalyst — packaging, confirmed working
 
-```text
-Logic launches AU
-    ↓
-AU owns SortAudioCore headless driver
-    ↓
-sort runs
-    ↓
-LocalToneEventSink → ToneRenderer
-    ↓
-audio
-```
-
-It cannot assume the standalone Sort Symphony app is foregrounded, running, or even installed — this
-is particularly important on iPadOS, where there is no external-bridge concept at all (§8 is
-macOS-only). Ideally the *exact same* `SortAudioCore` headless driver runs inside both the standalone
-app target and the AU extension target.
-
-### macOS / Mac Catalyst — test reality before choosing, in this order
-
-This project is Mac Catalyst end to end today — no native macOS (AppKit or macOS-native SwiftUI)
-target exists anywhere in the repository. That's the fact driving the packaging uncertainty below;
-it isn't evidence any particular approach is required.
-
-**Test in this order, cheapest/most-likely-to-just-work first:**
-
-1. **Test a normal Catalyst-built AUv3 extension, embedded in the existing Catalyst app, on the
-   current Xcode 26 toolchain first.** Older developer-forum friction reports
-   (`supportedViewConfigurations` sizing, `auval` validation issues) predate this toolchain — don't
-   rule this out on old evidence when it's cheap to simply try it.
-2. **If (1) has real, current registration/validation problems**, test whether a plain native-macOS
-   (non-Catalyst) AU extension target can be embedded inside the existing Catalyst app's Mac build —
-   one App Store listing, one container product, a fully native-macOS `.appex`. Viable because
-   `ToneKitDSP`/`SortAudioCore` have zero UIKit/AppKit dependency by construction.
-3. **Only if both (1) and (2) prove unsupported or unreliable**, fall back to a small, genuinely
-   separate native-macOS container app target existing purely to hold the AU extension on Mac.
-
-Do not permanently complicate the product based only on historical/toolchain-specific Catalyst-AU
-reports before the current configuration has actually been tested.
-
-**Option 1 spike result (Phase 4, current Xcode 26 toolchain): promising, not yet conclusive.**
-Expanding `AUv3Extension`'s destinations from `.iPad` to `Module.destinations` (adding
-`.macCatalyst`) built and embedded cleanly (`Contents/PlugIns/AUv3Extension.appex`) after two small,
-expected fixes — `SortAudioUnit.swift` needed an explicit `import CoreAudio` for
+This project is Mac Catalyst end to end — no native macOS (AppKit or macOS-native SwiftUI) target
+exists anywhere in the repository, and none is needed: a normal Catalyst-built AUv3 extension,
+embedded in the existing Catalyst app, builds, embeds (`Contents/PlugIns/AUv3Extension.appex`),
+signs, and registers cleanly on the current Xcode 26 toolchain. Two small, expected fixes were
+needed getting there — `SortAudioUnit.swift` needed an explicit `import CoreAudio` for
 `UnsafeMutableAudioBufferListPointer` on Catalyst specifically (the same gotcha `ToneVoice.swift`
-already hit in Phase 1), and the app's dependency on the extension needed its `.when([.ios])`
-platform condition (added when the extension was iPad-only) widened back to unconditional now that
-both targets share destinations.
+already hit earlier in this project), and the app's dependency on the extension needs a
+`condition: .when([.catalyst])` platform filter (Tuist doesn't infer this from the extension
+target's own `destinations`).
 
 Real, OS-level registration is confirmed: `auval -a` lists the component (`aumu SrtS NkHb - Nick
 Hubbard: Sort Symphony`), and `log show` during a validation attempt shows the extension process
 actually launching through the real PlugInKit/RunningBoard/XPC machinery and logging "plugin loaded
-and ready for host" — genuine proof the extension mechanics work at the OS level, not just a clean
-compile. However, `auval -v aumu SrtS NkHb` (with or without `-oop`) doesn't complete a full pass —
-it hits `FATAL ERROR: OpenAComponent: result: -10863` (`kAudioUnitErr_CannotDoInCurrentContext`)
+and ready for host." `auval -v aumu SrtS NkHb` (with or without `-oop`) doesn't complete a full pass
+— it hits `FATAL ERROR: OpenAComponent: result: -10863` (`kAudioUnitErr_CannotDoInCurrentContext`)
 roughly 30 seconds after the extension process itself successfully reports ready, consistent with
 `auvaltool`'s own instantiation path still routing through the legacy synchronous
-`AudioComponentInstanceNew`/`OpenAComponent` API before/instead of the modern async
-`AVAudioUnit.instantiate(with:options:completionHandler:)` path a real host uses for a v3-only
-component with no in-process AUv2 fallback registered alongside it — a known category of `auval`
-limitation with pure-v3, extension-hosted components, not necessarily evidence the AU itself is
-broken for a real host.
+`AudioComponentInstanceNew`/`OpenAComponent` API rather than the modern async
+`AVAudioUnit.instantiate(with:options:completionHandler:)` path a real host uses — a known category
+of `auval` limitation with pure-v3, extension-hosted components, not evidence the AU itself is
+broken for a real host. Real Logic Pro on Mac (a perpetual license, unlike the iPad subscription
+this project never had) is what actually resolves this ambiguity — see §14's phase table.
 
-**This is exactly the ambiguity real Logic Pro testing resolves and `auval` alone cannot** — see the
-Logic Pro licensing callout after the phase table (§14): there's no Logic Pro for iPad subscription
-to test Phase 3's iPadOS claim, but there **is** a perpetual Logic Pro for Mac license, making this
-option-1 Mac spike the first point in the whole plan where "does Logic Pro actually load this" can
-be checked directly. Recommendation: keep option 1 (no reason yet to fall back to option 2/3 — the
-failure signature is `auval`-specific tooling behavior, not a build, packaging, or registration
-defect), and treat a real Logic Pro for Mac load-and-play test as the deciding confirmation before
-calling Phase 4 done.
+### Companion-mode connection lifecycle
 
-**The AU itself remains completely self-contained and in-process regardless of which packaging
-option above is chosen** — none of the three options change the render-time architecture from §5-6.
+```text
+Standalone app launches → AudioService.start() binds SortAudioBridgeServer's Unix socket
+                           (inside the shared App Group container; no-op if unreachable)
+Logic loads the AU on a track → SortAudioUnit.allocateRenderResources() starts a
+                                 SortAudioBridgeClient, which connects out and retries on a short
+                                 interval until the server is reachable
+Sort runs with sound on in the app → AudioService.play(...) broadcasts to the bridge instead of
+                                      playing locally (replaces, never adds to, local output)
+App quits / AU is removed from the track → the corresponding connection fails/cancels; the other
+                                            side simply goes back to "nothing connected" — the
+                                            standalone app resumes local playback, the AU goes silent
+```
+
+Order independence is deliberate: Logic may instantiate the AU before or after the app is running,
+in either order, and either side may restart independently — the bridge client's reconnect loop and
+the "no clients connected → play locally" fallback in `AudioService` both exist specifically so
+neither side has to assume anything about the other's lifecycle.
+
+### Plug-in UI (near-term follow-on, not yet built)
+
+A minimal custom parameter UI, via `AUParameterTree` and an `AUViewController`-hosted view —
+audio-production-relevant controls only (envelope ADSR, detune, gain — whatever `ToneKitDSP` already
+exposes as DSP parameters). Explicitly **not** a reimplementation of any sort visualization,
+algorithm detail, or code display inside the plug-in host; the motivation is letting Logic Pro's own
+effects chains and recording do the "fun things with the audio" work, not building a second UI
+surface for the app itself. Currently `SortAudioUnitFactory.beginRequest(with:)` is a no-op stub —
+this follow-on is the first time the `com.apple.AudioUnit-UI` extension point's actual UI capability
+gets exercised.
 
 ---
 
-## 8. Reserved (not shipped) macOS expansion path: App Group/XPC bridge
+## 8. The companion-mode bridge (shipped): App Group + Unix domain socket, not XPC
 
-This section changes the previous draft's conclusion. XPC is still never part of the realtime
-render path (§5's hard rule stands unmodified) — but on macOS specifically, the architecture should
-**leave a validated, working path** for a future external bridge, rather than merely noting XPC as
-"available if someone wants it later."
+This is now the core mechanism the whole product depends on, not a reserved future option. Research
+against Apple's own guidance (Apple DTS forum posts, not just community folklore) for the specific
+scenario here — a standalone app reaching into an extension instance a **third-party host** (Logic
+Pro) instantiated, not a container app talking to its own embedded extension in the usual sense —
+found:
 
-**Why this is worth reserving now, concretely:** the App Store build must not install `.vst3`,
-`.aaxplugin`, or helper applications into shared system locations (§9's citations). If VST3/AAX
-support is ever built, the only App Store-compliant way to get that logical sort-audio event stream
-to externally distributed plug-in code is a separate, directly-distributed companion app — and that
-companion app needs *some* way to receive live events from the running, sandboxed, App Store copy of
-Sort Symphony. App Groups are Apple's documented mechanism for exactly this: Apple's current App
-Groups documentation states the entitlement's purpose is to "enable communication and data sharing
-between multiple installed apps created by the same developer," and the (now-retired, but
-technically still-accurate and consistently corroborated) App Sandbox Design Guide described the
-underlying mechanism more specifically — member apps "share Mach and POSIX semaphores and... certain
-other IPC mechanisms," with one member of a group able to be sandboxed while another is not. That
-sandboxed/nonsandboxed pairing is precisely the shape needed here: the App Store `Sort Symphony.app`
-(sandboxed) and a separately distributed `Sort Symphony DAW Bridge` (Developer ID-signed, notarized,
-not sandboxed) sharing one App Group.
+- **Raw XPC (`xpc_connection_create_mach_service`, a custom Mach service name) is not the supported
+  pattern here.** Setting up a custom XPC listener reachable from inside a third-party host's
+  sandboxed extension process is non-trivial and not the standard pattern Apple designed AUv3
+  around.
+- **A Unix domain socket bound inside a shared App Group container is the documented, supported,
+  sandbox-compatible mechanism** for exactly this: two sandboxed processes communicating, as long as
+  both declare the same App Group entitlement and the listening socket's path lives inside
+  `containerURL(forSecurityApplicationGroupIdentifier:)`.
+- Darwin notifications (`CFNotificationCenterGetDarwinNotifyCenter`) are a standard complement for
+  lightweight signaling, but aren't needed here — a live socket connection's own existence already
+  tells both sides "is anything currently listening/connected," so there's no separate wake-up signal
+  to build.
+
+**Design, as shipped in `Modules/SortAudioBridgeKit/`:** the standalone app is the **server**
+(`SortAudioBridgeServer`, one socket path inside the shared App Group container); the AU extension is
+the **client** (`SortAudioBridgeClient`, connects out, retries on a short interval while
+disconnected). This naturally supports multiple simultaneous AU instances (e.g. one per Logic track)
+as multiple fanned-out client connections from one server, with no extra design work.
 
 ```text
-Mac App Store Sort Symphony
+Sort Symphony.app (server)
         │
-        │ App Group / XPC
+        │ Unix domain socket, path inside the shared App Group container
+        │ (NWListener/NWConnection, Network.framework)
         ▼
-Sort Symphony DAW Bridge
-Developer-ID signed + notarized
-        │
-        ├──── future VST3 integration
-        │
-        └──── possible future AAX integration
+AUv3Extension process (client) — one connection per loaded instance
 ```
 
-The purpose of the bridge is to let the App Store version of Sort Symphony emit the same logical
-`SortToneEvent` stream to externally distributed plug-in infrastructure, without the App Store app
-itself ever installing executable plug-in code (which guideline 2.5.2/2.4.5 forbid — §9).
+Transport: `Network.framework`'s `NWListener`/`NWConnection` with `NWEndpoint.unix(path:)` — a
+modern, async-friendly, standard-framework API for Unix-domain-socket IPC, avoiding hand-rolled BSD
+socket code. `sockaddr_un.sun_path`'s 104-byte limit on Darwin is a real, hit-in-practice constraint
+for App-Group-container-derived paths (`SortAudioBridgePath` keeps the filename to a few characters
+and refuses to hand back a path over a conservative safety threshold, rather than letting `bind()`
+fail with an opaque error).
 
-**Hard rule, restated from §5 in this specific context:** neither a future VST3 nor AAX
-`process()`/render callback may synchronously call XPC, wait for the bridge, perform filesystem IPC,
-allocate IPC messages, acquire cross-process locks, or block waiting for the Sort Symphony app or the
-bridge. The bridge is a **control/event transport**, never an audio-rendering dependency:
+**Wire format:** a small, fixed-size, versioned binary struct (`BridgeWireCodec`) — a version byte
+plus `SortToneEvent`'s three fields and the `noteRange` bounds, all fixed-width integers/bit
+patterns, no JSON/Codable. Because every field is fixed-width, the encoded size never varies, so no
+length-prefix framing is needed: a reader just always reads exactly `encodedByteCount` bytes per
+message. Big-endian throughout, independent of either end's native endianness.
+
+**Hard rule, restated from §5 in this specific context:** the render thread never talks to the
+bridge. `internalRenderBlock` only ever calls `ToneRenderer.render(...)`; `SortAudioBridgeClient`
+runs its own dispatch queue entirely off the render thread and only ever calls
+`LocalToneEventSink.send(_:noteRange:)`, which itself only enqueues into the existing lock-free
+command queue — the same path the standalone app's own render code drains. If the bridge connection
+drops mid-render, rendering continues with whatever state/events are already enqueued; nothing in
+the render path blocks on or waits for the bridge.
 
 ```text
 Sort Symphony.app
     │
-    │ versioned SortToneEvent stream (§ future wire protocol below)
+    │ SortToneEvent + noteRange, BridgeWireCodec-encoded
     ▼
-XPC / App Group transport
+Unix domain socket (App Group container)
     │
     ▼
-DAW Bridge
-    │
-    │ non-realtime transport
-    ▼
-plug-in-side event ingress
+SortAudioBridgeClient (AU extension process)
     │
     ▼
-bounded realtime-safe queue
+LocalToneEventSink → bounded command queue
 ════════════════════════════ realtime boundary
     ▼
 ToneRenderer
@@ -427,59 +444,33 @@ ToneRenderer
 DAW audio buffer
 ```
 
-### Future external transport: wire-protocol design requirements (design only, not implemented)
+### Wire-protocol properties, as shipped
 
-To avoid discovering later that `SortToneEvent`/`ToneCommand` can't be transported cleanly, the
-*requirements* for a future external event protocol are worth fixing now, without building it:
+- Explicitly versioned (a leading version byte; unknown versions are rejected, not misparsed).
+- Based on semantic `SortToneEvent` concepts, not PCM — the bridge moves *events*, not audio.
+- Independent of Swift object identity or pointers, and independent of AU/VST/AAX SDK types — a
+  plain fixed-width byte encoding, not `NSSecureCoding` classes tied to one transport.
+- Reconnects cleanly after either side restarts (`SortAudioBridgeClient`'s retry loop;
+  `SortAudioBridgeServer.hasConnectedClients` reflects live connection state, not a cached
+  assumption).
+- Multiple concurrent client connections (one per AU instance) are handled for free by the
+  server's own connection map — no explicit session/stream identifier was needed for this.
+- Not yet built: explicit backpressure/drop-behavior handling if a client falls behind (currently:
+  `NWConnection.send` with `.idempotent` completion, no explicit queue-depth cap on the bridge side
+  itself — the realtime-safe bounded queue on the *receiving* end, inside `ToneKitDSP`, is what
+  actually bounds unbounded growth).
 
-- Explicitly versioned, with a defined incompatibility-reporting path.
-- Format-neutral — not named or shaped around VST specifically, since AAX may reuse the same
-  transport.
-- Based on semantic `SortToneEvent`/`ToneCommand` concepts, not PCM — the bridge moves *events*, not
-  audio.
-- Capable of carrying timestamps/sample timing where useful.
-- Capable of identifying a stream/session (so a bridge serving multiple concurrent plug-in instances,
-  or reconnecting mid-session, isn't ambiguous).
-- Capable of reconnecting cleanly after either side restarts.
-- Explicit about bounded queues, backpressure, and drop behavior when the consumer falls behind.
-- Independent of Swift object identity or pointers.
-- Independent of AU/VST/AAX SDK types.
+### Verified end to end
 
-**Do not prematurely pick NSXPC-specific classes as the canonical model.** The logical protocol
-should survive if the eventual transport turns out to be XPC, shared memory, Unix sockets, or some
-combination — a simple, fixed, value-semantic wire representation (plain structs/enums with explicit
-versioned encoding, not `NSSecureCoding` classes tied to one transport) is preferable. This design
-work belongs in the initial architecture; building the actual bridge does not.
-
-### Phase 0 feasibility spike (throwaway, not production)
-
-Even though the bridge doesn't ship in v1, Phase 0 should prove the assumption the entire deferred
-VST3/AAX path depends on:
-
-```text
-sandboxed Mac Catalyst test app
-        ↕
-App Group / XPC
-        ↕
-Developer-ID-signed nonsandboxed helper
-```
-
-Goal: establish only that —
-
-- the App Store-compatible sandboxed side can establish the intended IPC relationship;
-- a separately distributed, Developer ID-signed helper can participate using this project's real
-  Team ID/App Group configuration;
-- reconnect/relaunch behavior (either side restarting independently) is understood;
-- no temporary sandbox exceptions or private APIs are required.
-
-**Do not turn this into production bridge code.** It's a disposable spike whose only output is
-confidence (or a documented blocker) plus notes feeding §9's "at the start of that work" list.
-
-Also, explicitly: this spike tests only the **App Store app ↔ Developer-ID helper** boundary. It says
-nothing about the separate, still-unresolved **bridge → DAW plug-in** boundary — a VST3/AAX binary
-runs inside a host-controlled process Apple doesn't govern the same way, so don't assume that leg
-will necessarily be XPC or App-Group access too. That second boundary gets tested against real DAW
-hosts only when VST3/AAX work actually starts (§9-10).
+`SortAudioBridgeKit`'s own tests run a real server and client over a Unix socket in `/tmp` (standing
+in for the App Group container — no real entitlement needed at this level) and confirm a broadcast
+event round-trips correctly. `SortAudioUnitKitTests` goes one level up: constructs a real
+`SortAudioBridgeServer`, points a `SortAudioUnit` at it via a test-only socket-path override, and
+confirms the unit renders silent with nothing connected and non-silent once an event is broadcast.
+Full Mac Catalyst app + extension builds succeed with the real App Group entitlement and code
+signing. The remaining verification step is the one only a human can do: load the AU on a real Logic
+Pro track and confirm the app's local speakers go quiet once connected, matching the "instead of"
+routing this entire design exists to deliver.
 
 ---
 
@@ -494,17 +485,27 @@ The core stays exactly what §1-6 already builds:
 ```text
 ToneKitDSP
 SortAudioCore
-canonical event protocol (§4, §8)
+canonical event protocol (§4)
 ```
+
+**Note on naming:** a hypothetical VST3 effort's "DAW Bridge" would be a *different* component from
+`SortAudioBridgeKit` (§8) — §8's bridge connects the standalone app to its own AUv3 extension inside
+the same App Group; a VST3 bridge would instead be a separately distributed, Developer-ID-signed
+helper process feeding externally distributed plug-in code, since the Mac App Store build can never
+install that code itself (§11's guideline citations). They could plausibly reuse the *same* Unix
+domain socket + App Group mechanism and even the same wire codec §8 already built and shipped —
+that's a real head start this revision creates that didn't exist when VST3 was purely speculative —
+but the second boundary (bridge → externally-hosted VST3 binary, running inside a host process Apple
+doesn't govern the same way) is untested and shouldn't be assumed to work identically.
 
 A future VST3 effort would *add*, without touching the core:
 
 ```text
-Developer-ID DAW Bridge (§8)
+Developer-ID DAW Bridge (new component, VST3-specific)
         +
 native macOS VST3 adapter
         +
-bridge-to-plugin event transport (§8's still-unresolved second boundary)
+bridge-to-plugin event transport (untested — see the naming note above)
 ```
 
 and reuse `ToneRenderer` exactly as the AUv3 adapter does.
@@ -537,9 +538,9 @@ VST3 for free — the adapter above is still new, real engineering when it happe
 
 ## 10. Deferred Compatibility: AAX
 
-**Architectural goal only:** nothing in `SortAudioCore`, `ToneKitDSP`, the event wire protocol (§8),
-or the bridge should assume VST3-specific semantics in a way that would preclude a future AAX
-adapter reusing the same core and bridge. **AAX is not in the implementation schedule.** It is
+**Architectural goal only:** nothing in `SortAudioCore`, `ToneKitDSP`, or the event wire protocol
+should assume VST3-specific semantics in a way that would preclude a future AAX adapter reusing the
+same core and (if built) the same VST3-era bridge. **AAX is not in the implementation schedule.** It is
 categorized as:
 
 ```text
@@ -584,21 +585,20 @@ one-size-fits-all host-adapter framework.
 ## 11. Distribution architecture
 
 ```text
-Initial product (committed):
+Shipped product:
 
 Apple App Store
     ↓
 Sort Symphony
-    ├── iPadOS app
-    ├── Mac Catalyst app
-    └── embedded AUv3 extension(s)
+    ├── Mac Catalyst app (with the AUv3 companion-mode bridge, §8)
+    └── embedded AUv3 extension (Mac Catalyst only — no iPadOS variant)
 
 Possible future external compatibility package (deferred, conditional):
 
 Sort Symphony website / direct distribution
     ↓
 Developer-ID signed + notarized Mac package
-    ├── Sort Symphony DAW Bridge
+    ├── Sort Symphony DAW Bridge (VST3/AAX-specific — a different component from §8's AU bridge)
     ├── VST3 plug-in, if implemented
     └── AAX plug-in, if implemented
 ```
@@ -617,31 +617,33 @@ requirement, not a cautious inference — quoting Apple's published guidelines d
   code, or resources to add functionality or significantly change the app from what we see during
   the review process."
 
-Together these mean the App Store `Sort Symphony.app` can never be the thing that installs the
-`DAW Bridge`, a `.vst3`, or an `.aaxplugin` — the user installs the bridge/plug-in package
-independently (from the Sort Symphony website), and the App Store app only ever *talks to* it if
-already present, via the App Group path in §8. **This means no second Mac App Store listing is ever
-needed merely to provide VST3/AAX** — the directly-distributed companion package is the entire
-mechanism for crossing that distribution boundary, if that work ever ships.
+This doesn't affect the shipped AUv3 companion bridge at all — `AUv3Extension.appex` is embedded
+directly in the App Store `Sort Symphony.app` bundle via the normal Xcode app-extension mechanism,
+not separately installed or distributed. It's specifically what constrains any *future* VST3/AAX
+work: the App Store app can never be the thing that installs a `.vst3`/`.aaxplugin` or a
+Developer-ID-signed helper — the user would install that package independently (from the Sort
+Symphony website), and the App Store app would only ever *talk to* it if already present. **This
+means no second Mac App Store listing would ever be needed merely to provide VST3/AAX** — a
+directly-distributed companion package would be the entire mechanism for crossing that distribution
+boundary, if that work ever ships.
 
 ---
 
 ## 12. App Group entitlement policy
 
-There is now a concrete anticipated future use for an App Group (§8) — the plan should no longer
-say "no need identified." However:
+Shipped, not reserved: `App/Resources/SortSymphony.entitlements` and
+`App/AUv3Extension/Resources/AUv3Extension.entitlements` both declare
+`com.apple.security.application-groups` with `group.com.nhubbard.Sort2.mobile` — this is load-bearing
+for v1, since the companion-mode bridge (§8) can't establish its Unix domain socket without it.
+`SortAudioBridgePath.socketPath()` returns `nil` if the entitlement isn't resolvable at runtime (e.g.
+a build/provisioning gap), and both the server (`AudioService`) and client (`SortAudioUnit`) treat
+that as "bridge unavailable" — falling back to local playback, or staying silent, respectively —
+rather than crashing.
 
-> The architecture reserves an App Group/XPC bridge path and Phase 0 validates it, but the
-> production App Group entitlement is added to shipping targets only when the external bridge
-> feature is actually implemented.
-
-Concretely: `App/Resources/SortSymphony.entitlements` gets no new entitlement for the v1 AU ship.
-The intended App Group identifier may be *reserved/registered* on the Apple Developer portal during
-development (registration is required regardless of when the entitlement is actually turned on, per
-current Apple guidance that app group IDs must be registered to the team before use), but no shipping
-target declares `com.apple.security.application-groups` until the bridge feature is real. This keeps
-the initial App Store submission as simple as possible while confirming — via the Phase 0 spike — that
-the expansion path actually works before committing to it in a shipping entitlement.
+If a future VST3/AAX Developer-ID bridge (§9-11) is ever built, it would likely register its own,
+separate App Group identifier rather than reusing this one, since it crosses a fundamentally
+different trust boundary (sandboxed App Store app ↔ non-sandboxed, independently-distributed helper)
+than this one (two sandboxed processes, one hosted by a trusted first-party extension point).
 
 ---
 
@@ -651,150 +653,160 @@ the expansion path actually works before committing to it in a shipping entitlem
 Modules/
   SortEngineKit/            (existing, unchanged)
   AlgorithmKit/             (existing, unchanged)
-  BuiltInAlgorithms/        (existing, unchanged)
+  BuiltInAlgorithms/        (existing, unchanged — no longer linked by anything AU-related)
 
-  SortAudioCore/            (NEW)
+  SortAudioCore/            (SortToneEvent, ToneMapper, SortAudioEventSink/LocalToneEventSink)
       SortToneEvent
       SortAudioEventSink (protocol) / LocalToneEventSink (§4)
       ToneMapper                    — extracted from AudioService's pitch/gate-retrigger logic
-      headless algorithm/replay driver — for self-contained plug-in operation (§7)
-      no MainActor, no UI, depends only on SortEngineKit/AlgorithmKit/BuiltInAlgorithms
+      no headless driver — deleted; the AU has no sort logic of its own (§2, §7)
+      no MainActor, no UI, depends only on SortEngineKit/ToneKitDSP
 
-  ToneKitDSP/               (NEW — replaces most of today's ToneKit)
-      OscillatorDSP, EnvelopeDSP, ToneRenderer, ToneCommand/ToneEvent, bounded SPSC queue
+  ToneKitDSP/               (host-independent DSP core)
+      OscillatorDSP, EnvelopeDSP, ToneRenderer, ToneCommand/ToneEvent, bounded command queue
       no AVAudioEngine, no AVAudioNode, no locks, no IPC of any kind on the render path
 
-  ToneKitAVFoundation/      (NEW — replaces the AVFoundation half of today's ToneKit)
+  ToneKitAVFoundation/      (AVFoundation adapter)
       Node, AudioEngine, AVAudioSourceNode adapter — standalone-app integration point
 
-  AudioEngineKit/           (existing, refactored)
-      AudioService                  — thin @MainActor wrapper over SortAudioCore + ToneKitAVFoundation
+  SortAudioBridgeKit/       (NEW — Mac Catalyst only, `destinations: [.macCatalyst]`)
+      BridgeWireCodec               — fixed-size versioned binary encode/decode (§8)
+      SortAudioBridgePath           — the shared App-Group-derived socket path, with a byte-length
+                                       safety check
+      SortAudioBridgeServer         — app side: NWListener, broadcasts to every connected client
+      SortAudioBridgeClient         — extension side: NWConnection, reconnect-on-failure loop
+      depends only on SortAudioCore (for SortToneEvent/SortAudioEventSink)
+
+  AudioEngineKit/           (existing, refactored again — now a bridge router)
+      AudioService     — @MainActor; routes play() to the bridge (SortAudioBridgeKit, Mac Catalyst
+                          only, `#if targetEnvironment(macCatalyst)`) when a client is connected,
+                          else plays locally via ToneKitAVFoundation as before
       AudioPlaying, NoOpAudioService — unchanged; SortSession's call sites are unaffected
 
-  SortAudioUnitKit/         (NEW, Phase 3-4)
+  SortAudioUnitKit/         (AUAudioUnit subclass — now a relay, not a generator)
       AUAudioUnit subclass, internalRenderBlock calling ToneRenderer.render() directly
-      owns/hosts a SortAudioCore headless driver + LocalToneEventSink per plug-in instance
-      AUParameterTree (scope per §12's open questions)
+      starts a SortAudioBridgeClient feeding a LocalToneEventSink — no sort logic of its own
+      depends on SortAudioCore/ToneKitDSP/SortAudioBridgeKit — no longer on
+      AlgorithmKit/BuiltInAlgorithms/SortEngineKit (nothing in this module runs a sort)
+      AUParameterTree — planned follow-on (§7's "Plug-in UI"), not yet built
 
   ... (SortFeature, SettingsFeature, HomeFeature, IntentsKit, DesignSystemKit, PersistenceKit,
        MathRenderingKit, ZstdKit, VisualizationKit, BuiltInVisualizers, SettingsKit — all existing,
        unaffected; none of them are linked by SortAudioUnitKit)
 
-Deferred, not built in v1:
-  Sort Symphony DAW Bridge target      (§8 — separate product, Developer-ID signed)
+Deferred, not built:
+  Sort Symphony DAW Bridge target      (§9-11 — separate product, Developer-ID signed, VST3/AAX-only)
   Native macOS VST3 adapter target     (§9)
   AAX adapter target                   (§10, conditional on §10's feasibility findings)
 
-Targets/ (v1, committed)
-  SortSymphony (App)              existing, unchanged product
-  AUv3 iPadOS extension           NEW, Phase 3 — .appExtension, .iPad only
-  AUv3 macOS/Catalyst extension   NEW, Phase 4 — packaging per §7's tested order
+Targets/ (shipped)
+  SortSymphony (App)              existing product, now owns a SortAudioBridgeServer on Mac Catalyst
+  AUv3 macOS/Catalyst extension   .appExtension, destinations: [.macCatalyst] only, permanently —
+                                   no iPadOS variant, condition: .when([.catalyst]) on the app's
+                                   dependency on it
 ```
 
 Exact names aren't load-bearing; the dependency boundaries are — in particular, nothing under
-`SortAudioCore`/`ToneKitDSP`/`SortAudioUnitKit` may depend on `SortFeature`, `VisualizationKit`,
-`DesignSystemKit`, `PersistenceKit`, `SettingsKit`, or any UI framework, ever, and nothing under
-`ToneKitDSP` may depend on any IPC/XPC framework, ever.
+`SortAudioCore`/`ToneKitDSP`/`SortAudioUnitKit`/`SortAudioBridgeKit` may depend on `SortFeature`,
+`VisualizationKit`, `DesignSystemKit`, `PersistenceKit`, `SettingsKit`, or any UI framework, ever,
+and nothing under `ToneKitDSP` may depend on any IPC framework, ever — `SortAudioBridgeKit` is the
+one module in this list that *does* use IPC (`Network.framework`'s Unix-domain-socket API), and it
+sits entirely off the render path, feeding `LocalToneEventSink` the same way any other caller would.
 
-### Revised dependency/event-flow diagram
+### Dependency/event-flow diagram
 
 ```text
-                    Algorithm / Sort Engine
+                    Algorithm / Sort Engine (standalone app only — the AU has none)
                            │
                            ▼
                       SortAudioCore
                            │
                      SortToneEvent
+                           │
+                      AudioService
                     ┌──────┴───────┐
                     │              │
-             LocalEventSink   ExternalEventSink
-             (v1, shipped)    (deferred, §8, macOS-only)
+             LocalToneEventSink   SortAudioBridgeServer.broadcast(...)
+             (nothing connected)  (a bridge client is connected — replaces local playback)
                     │              │
+                    ▼              │  Unix domain socket, shared App Group container
+              command queue        │
                     ▼              ▼
-                SPSC queue      DAW Bridge
-                    │              │
-                    ▼              │
-                ToneRenderer       │
+              ToneRenderer   SortAudioBridgeClient (AU extension process)
               (ToneKitDSP)         │
-                    │              │
-              ┌─────┴─────┐        │
-              │           │        │
-       AVFoundation      AUv3      │  future plug-in ingress
-       (standalone)    (v1, shipped)   ┌────┴────┐
-                                        ▼         ▼
-                                      VST3       AAX
-                                    (§9)        (§10)
-                                        │         │
-                                        └────┬────┘
-                                             ▼
-                                      ToneRenderer
-                                      (same ToneKitDSP)
+                    │              ▼
+                    │        LocalToneEventSink → command queue → ToneRenderer (ToneKitDSP)
+                    │                                                    │
+                    ▼                                                    ▼
+             AVFoundation                                              AUv3
+             (standalone speakers)                              (Logic Pro track)
 ```
 
-The canonical sort/audio semantics and renderer remain format-neutral throughout; external transport
-is a separate, clearly-bounded concern that only exists on the right-hand side of the diagram, which
-is entirely unbuilt in v1.
+The canonical sort/audio semantics and renderer remain format-neutral throughout — the same
+`ToneRenderer`/`ToneKitDSP` code runs in both the standalone app's process and the AU extension's
+process; only how each side's `LocalToneEventSink` gets fed differs.
 
-### Realtime dataflow, end to end (v1 scope)
+### Realtime dataflow, end to end
 
 ```text
-AU extension process (Logic-owned lifetime)
-┌─────────────────────────────────────────────────────────────────────┐
-│ SortAudioCore headless driver                                       │
-│   picks algorithm/shuffle/size → RecordingEngine → Tape              │
-│   drives ReplayEngine at its own pacing                              │
-│     → SortToneEvent(value, range, holdSeconds) per operation         │
-│     → ToneMapper → ToneCommand(frequency, gate, [sample offset])     │
-│     → LocalToneEventSink → bounded SPSC queue                        │
-│ ════════════════════════════════ realtime boundary ═══════════════   │
-│ AUAudioUnit.internalRenderBlock                                     │
-│   → ToneRenderer.render(frameCount, buffer)   — no locks, no IPC,    │
-│       no allocation; drains due ToneCommands, updates DSP state,     │
-│       fills caller-owned buffer                                      │
-└─────────────────────────────────────────────────────────────────────┘
-                                    ↓
-                          Logic Pro track / mixer
-                                    ↓
-                       user's arbitrary effect chain
-                                    ↓
-                              DAW output
+Standalone app process                              AU extension process (Logic-owned)
+┌───────────────────────────────────┐     Unix      ┌─────────────────────────────────────┐
+│ Sort/replay → SortToneEvent        │    domain     │ SortAudioBridgeClient                │
+│   → AudioService.play(...)         │───socket─────▶│   (reconnect-on-failure loop,        │
+│   → bridge connected? broadcast :  │   (App Group  │    off the render thread)            │
+│     LocalToneEventSink + local     │   container)  │   → LocalToneEventSink               │
+│     ToneRenderer (speakers)        │               │   → bounded command queue            │
+└───────────────────────────────────┘               │ ══════ realtime boundary ══════       │
+                                                      │ AUAudioUnit.internalRenderBlock       │
+                                                      │   → ToneRenderer.render(frameCount,   │
+                                                      │       buffer) — no locks, no IPC,     │
+                                                      │       no allocation                   │
+                                                      └─────────────────────────────────────┘
+                                                                          ↓
+                                                                Logic Pro track / mixer
+                                                                          ↓
+                                                             user's arbitrary effect chain
+                                                                          ↓
+                                                                     DAW output
 ```
 
 ---
 
 ## 14. Phased plan
 
-The shipping roadmap ends at AUv3. VST3/AAX live in §9-10, not as numbered phases.
+The shipping roadmap ends at AUv3. VST3/AAX live in §9-10, not as numbered phases. Phases 0-4 built
+the wrong product model (a self-contained, iPadOS+macOS generator) and are kept here for history;
+Phase 5 is the correction this document now describes as current truth.
 
 | Phase | Goal | Depends on |
 |---|---|---|
-| 0 | **Architecture/platform feasibility.** AU component-type test (§1). iPad AU loading validation. Catalyst/macOS AU packaging spike (§7's tested order). `ToneRenderer` API/SPSC design (§5). Define the versioned, transport-neutral event/wire model (§8) as a design artifact. **Also**: the App Group/XPC Catalyst-sandboxed ↔ Developer-ID-helper feasibility spike (§8), throwaway code only. | none |
-| 1 | **Shared DSP refactor.** Split `ToneKit` into `ToneKitDSP`/`ToneKitAVFoundation` (§3). Extract `EnvelopeDSP`'s per-sample math out of the `AVAudioSourceNode` closure. Introduce `ToneRenderer` as sole state owner. Replace the render-thread `Mutex` with the bounded queue + single-ownership model (§5). Preallocate render scratch storage. Verify the standalone app sounds/behaves identically (regression-test against `Modules/ToneKit/Tests/{OscillatorTests,AmplitudeEnvelopeTests,NodeTests}.swift` and `Modules/AudioEngineKit/Tests/{AudioServiceTests,NoOpAudioServiceTests}.swift`, re-homed across the new modules). | Phase 0's `ToneRenderer` API shape |
-| 2 | **`SortAudioCore`.** `SortToneEvent`/`ToneMapper` extracted from `AudioService` (§2). Headless algorithm/replay driver (§7). **Also establish the `SortAudioEventSink`/`LocalToneEventSink` abstraction (§4)** used by both v1 consumers now, with the `ExternalEventSink` shape documented but not implemented. `AudioService` refactored onto `SortAudioCore` + `ToneKitAVFoundation`. Sorting algorithms stay untouched. | Phase 1 |
-| 3 | **iPadOS AUv3.** `SortAudioUnitKit` + the iPadOS extension target, wiring the headless driver directly into `internalRenderBlock` via `LocalToneEventSink`/`ToneRenderer`. **Shipped, verified as far as this environment and the available Logic Pro licensing allow** — no Logic Pro for iPad subscription exists to test real hosting, so that specific claim is *assumed*, not confirmed (see the callout below the table). Verified instead: `SortAudioUnitKitTests` exercises the real `AUAudioUnit` end-to-end and asserts non-silent rendered output; the built app was installed and launched on the iPad Simulator and `pluginkit -m -p com.apple.AudioUnit-UI` confirmed the OS's own plugin registry recognizes the extension as a legitimate AudioUnit-UI extension. | Phase 2, informed by Phase 0's component-type finding |
-| 4 | **macOS AUv3.** Whichever packaging option §7's tested order lands on. Validate with `auval` and real Logic Pro on Mac — **this phase's Logic Pro claim is fully verifiable**, via a perpetual Mac license (see the callout below the table), unlike Phase 3's. | Phase 0 (Mac packaging spike), Phase 3's `SortAudioUnitKit` |
-| 5 | **Parameters/presets/UI and shipping hardening.** Decide which sort/synth controls belong in the plug-in (§12) and expose them via `AUParameterTree`. App Review documentation/testing for the AU submission. No App Group entitlement added at this phase (§12). | Phases 3-4 |
+| 0 | **Architecture/platform feasibility.** AU component-type test (§1). `ToneRenderer` API/command-queue design (§5). | none |
+| 1 | **Shared DSP refactor.** Split `ToneKit` into `ToneKitDSP`/`ToneKitAVFoundation` (§3). Extract `EnvelopeDSP`'s per-sample math out of the `AVAudioSourceNode` closure. Introduce `ToneRenderer` as sole state owner. Replace the render-thread `Mutex` with the bounded queue + single-ownership model (§5). Preallocate render scratch storage. | Phase 0's `ToneRenderer` API shape |
+| 2 | **`SortAudioCore`.** `SortToneEvent`/`ToneMapper` extracted from `AudioService` (§2). The `SortAudioEventSink`/`LocalToneEventSink` abstraction (§4). `AudioService` refactored onto `SortAudioCore` + `ToneKitAVFoundation`. Sorting algorithms stay untouched. | Phase 1 |
+| 3 | **iPadOS AUv3 (superseded by Phase 5).** Built `SortAudioUnitKit` + an iPadOS extension target wired to a self-contained headless algorithm/replay driver. Registered and rendered real audio, confirmed via `pluginkit`/OS-level checks — but this entire product shape (self-contained, iPadOS-included) was the wrong one; both the headless driver and the iPadOS target were removed in Phase 5. | Phase 2 |
+| 4 | **macOS AUv3 packaging spike (superseded by Phase 5).** Confirmed a Catalyst-built AUv3 extension embeds and registers cleanly on Mac (`auval -a` lists the component; `log show` confirms the extension process launches and reports ready) — this packaging finding *carried forward* into Phase 5 unchanged; only the extension's own behavior (self-contained vs. relay) and its destinations changed. | Phase 0 (Mac packaging spike), Phase 3's `SortAudioUnitKit` |
+| 5 | **Companion-mode bridge correction (current architecture).** Real Logic Pro testing on Mac revealed Phases 3-4's self-contained model was wrong. Deleted `HeadlessSortAudioDriver`; built `SortAudioBridgeKit` (Unix domain socket over a shared App Group container, §8); made `AudioService` a local/bridge router; rewired `SortAudioUnit` to relay bridge events instead of running its own sort; reverted the extension to Mac Catalyst only, permanently (§7); added the App Group entitlement to both targets (§12, now shipped rather than reserved). Verified: `SortAudioBridgeKit`/`SortAudioUnitKit`/`AudioEngineKit` test suites pass on Mac Catalyst; full app+extension build succeeds with real code signing; iPad Simulator regression build confirms the extension no longer embeds there. | Phases 3-4 |
+| 6 | **Minimal plug-in UI (follow-on, not yet built).** A custom `AUParameterTree` + `AUViewController`-hosted view exposing audio-production-only controls (§7's "Plug-in UI" subsection) — envelope ADSR, detune, gain, whatever `ToneKitDSP` already models. Explicitly no visualization/algorithm/code UI. | Phase 5 |
 
-**Logic Pro licensing constraint, confirmed during Phase 3**: there is no Logic Pro for iPad
-subscription available to test with, so Phase 3's "Logic Pro for iPad actually hosts this" claim is
-assumed, not verified end-to-end — everything short of that (build, real render output, OS-level
-extension registration) is genuinely confirmed, per Phase 3's row above. There **is** a perpetual
-Logic Pro for Mac license, though, which means Phase 4's macOS AUv3 packaging work is the first point
-in this plan where "does Logic Pro actually load and host this" can be checked directly rather than
-inferred — worth weighting Phase 4 as the higher-confidence verification milestone precisely because
-of this asymmetry, not just because it's next in sequence.
+**Logic Pro licensing note, still relevant:** there is a perpetual Logic Pro for Mac license
+available for testing (unlike the iPad subscription this project never had access to) — this is
+part of why Phase 5's Mac-only scope decision was made with real testing feedback behind it, rather
+than being another unverified assumption like Phase 3's iPadOS claim was.
 
-**The initial project is complete at the end of Phase 5.**
+**The project is complete at the end of Phase 5**, pending the one verification step only a human
+can perform: loading the AU on a real Logic Pro track and confirming the app's local speakers go
+quiet once connected (§8's "Verified end to end"). Phase 6 is a planned follow-on, not a blocker.
 
 ### Deferred compatibility work (not phases — conditional, undated)
 
-**VST3** (§9): Developer-ID DAW Bridge, XPC publisher, plug-in-side transport, native VST3 adapter,
-C++/Swift boundary decision, direct distribution/notarization. Picked up only if the
-engineering/distribution cost is judged worthwhile after v1 ships.
+**VST3** (§9): a new, separate Developer-ID DAW Bridge (distinct from the shipped `SortAudioBridgeKit`
+— §9's naming note), plug-in-side transport, native VST3 adapter, C++/Swift boundary decision,
+direct distribution/notarization. Picked up only if the engineering/distribution cost is judged
+worthwhile.
 
 **AAX** (§10): feasibility/licensing/tooling evaluation first (iLok cost, Avid commercial-license
-terms, whether the generator model maps to AAX at all); an adapter is built only if that evaluation
-justifies it.
+terms, whether the model maps to AAX at all); an adapter is built only if that evaluation justifies
+it.
 
 ---
 
@@ -802,81 +814,84 @@ justifies it.
 
 Resolved by this revision:
 
-- The product is a **sort-driven live audio generator**, not a MIDI instrument or an audio effect.
-- AUv3 is the committed v1 target; VST3 is designed-for-but-deferred; AAX is more conditional still.
-- The AU is fully self-contained on both iPadOS and macOS and requires no custom IPC to render audio.
-- XPC is never part of the realtime render path, in v1 or in any future bridge design.
-- **App Group need**: no longer "none identified" — it's *anticipated* for a future external bridge
-  (§8) and validated by a Phase 0 spike, but the production entitlement is **not** enabled in the
-  initial shipping build (§12).
-- **VST3 distribution**: direct, Developer ID-signed external distribution — never something the Mac
-  App Store build installs; no second App Store listing required (§11).
-- **Swift/C++ interop for VST3**: deliberately left undecided; evaluated empirically at the start of
-  that deferred work (§9), not chosen now.
-- **Self-contained AU vs. companion-driven mode**: self-contained (`LocalEventSink`) is required and
-  is the only thing v1 ships; companion mode (`ExternalEventSink`) is future, macOS-only, and
-  contingent on the bridge ever being built.
+- The product is a **live companion-mode relay** from the running standalone app, not a self-driving
+  generator, not a MIDI instrument, not an audio effect.
+- AUv3 is the only shipped/committed plug-in format; VST3 is designed-for-but-deferred; AAX is more
+  conditional still.
+- The companion-mode bridge (App Group + Unix domain socket) is shipped, load-bearing, and never part
+  of the realtime render path — confirmed via real builds/tests, not just designed (§8).
+- XPC is not used anywhere in this architecture, including the AU companion bridge — a correction
+  from earlier drafts, which assumed XPC was the mechanism a future external bridge would use.
+- **App Group**: shipped in v1 on both the app and extension (§12) — a reversal from the earlier
+  "reserved, not enabled" stance, once the bridge became the core mechanism rather than a future
+  option.
+- **Platform scope**: Mac Catalyst only, permanently — not "iPadOS and macOS" as originally planned.
+  This is the single biggest scope change in this revision (§7).
+- **Self-contained vs. companion mode**: companion mode is the *only* mode. The self-contained
+  headless driver was built, shipped internally, tested, and then deleted once real usage showed it
+  wasn't the wanted product.
+- **VST3 distribution**: unchanged from the original plan — direct, Developer ID-signed external
+  distribution, never something the Mac App Store build installs; no second App Store listing
+  required (§11). Renamed/clarified as a *separate* bridge from the AU's own (§9's naming note).
+- **Swift/C++ interop for VST3**: still deliberately left undecided; evaluated empirically at the
+  start of that deferred work (§9), not chosen now.
 
 New, from this revision:
 
-- **AAX feasibility** — is the real all-in cost (iLok hardware, Avid's undisclosed commercial
-  licensing terms, any PACE signing fees) and market case (Pro Tools specifically) worth it, once
-  VST3 (if ever) has shipped? Unresearched beyond §10's SDK-page findings.
-- **Bridge → VST3/AAX transport** — genuinely separate from the App Store-app-to-bridge XPC path
-  validated in Phase 0; must be tested against real DAW hosts only when that work starts, not assumed
-  to be the same mechanism (§8).
+- **AAX feasibility** — unchanged open question, unresearched beyond §10's SDK-page findings.
+- **Bridge → VST3/AAX transport** — a hypothetical future VST3/AAX bridge could plausibly reuse
+  `SortAudioBridgeKit`'s exact mechanism and wire codec, but the *second* boundary (bridge → an
+  externally-hosted VST3/AAX binary, running inside a host process Apple doesn't govern the same way)
+  remains untested and shouldn't be assumed to work identically (§9's naming note).
+- **Backpressure/drop behavior on the bridge itself** — not yet built; currently only the
+  *receiving*-end bounded command queue (inside `ToneKitDSP`) bounds unbounded growth, not the bridge
+  transport layer itself (§8).
 
 Carried over, still genuinely open:
 
-1. **Exact Mac AU packaging strategy** — resolved empirically by §7's tested order (Phase 0/4).
-2. **Exact Logic-visible component type/presentation** — `aumu` with autonomous internal generation
-   (Wotja precedent) vs. `kAudioUnitType_Generator` if Phase 0 testing finds current Logic actually
-   surfaces third-party Generator-type units well.
-3. **Plug-in UI scope** — a custom view (possibly reusing `VisualizationKit`/`BuiltInVisualizers`
-   somehow) versus a host-generic parameter view only.
-4. **Automatable parameter set** — candidates include algorithm choice, shuffle choice, array size,
-   playback speed, note range, and envelope ADSR; none committed yet (Phase 5).
-5. **Whether MIDI input becomes an optional future mode** — e.g. selecting an algorithm or modulating
-   speed, layered on top of the self-driving generator rather than replacing it.
-6. **App Store AU packaging/listing decision** — ship the AU as an update to the existing Sort
-   Symphony listing (assumed throughout this document) or reconsider if Phase 0 findings suggest
-   otherwise.
+1. **Plug-in UI scope and parameter set** — Phase 6 (§14) plans a minimal, audio-production-only
+   `AUParameterTree` view (envelope ADSR, detune, gain candidates); exact parameter set not yet
+   chosen.
+2. **Whether MIDI input becomes an optional future mode** — e.g. selecting which of the running app's
+   sorts to relay, or nudging playback speed remotely, layered on top of the relay rather than
+   replacing it.
+3. **App Store AU packaging/listing decision** — ship the AU as an update to the existing Sort
+   Symphony listing (assumed throughout this document) or reconsider if real App Review feedback
+   suggests otherwise.
 
 ---
 
-## 16. Files/modules expected to change (v1 scope only)
+## 16. Files/modules changed in this revision (companion-mode correction)
 
-- **`Modules/ToneKit/`** — retired as a single module. `Oscillator.swift`'s `fill()` becomes
-  `OscillatorDSP` in `ToneKitDSP` largely as-is. `AmplitudeEnvelope.swift` splits: `nextGain()`'s math
-  becomes `EnvelopeDSP` in `ToneKitDSP`; the `AVAudioSourceNode` ownership/render-closure wiring
-  becomes the adapter in `ToneKitAVFoundation`, now calling `ToneRenderer.render(...)` instead of
-  doing envelope math and `Mutex` locking inline. `Node.swift` moves to `ToneKitAVFoundation`
-  unchanged.
-- **`Modules/AudioEngineKit/Sources/AudioService.swift`** — refactored to depend on `SortAudioCore`
-  (for `ToneMapper`) and `ToneKitAVFoundation` (for the engine) instead of instantiating
-  `Oscillator`/`AmplitudeEnvelope` and doing pitch mapping itself. `AudioPlaying`/`NoOpAudioService`
-  unaffected; `SortSession`'s call sites (`Modules/SortFeature/Sources/SortSession.swift:471-474`)
-  don't change.
-- **New: `Modules/SortAudioCore/`** — `SortToneEvent`, `ToneMapper`, `SortAudioEventSink`/
-  `LocalToneEventSink`, and the headless algorithm/replay driver. Depends only on
-  `SortEngineKit`/`AlgorithmKit`/`BuiltInAlgorithms`.
-- **New: `Modules/ToneKitDSP/`** — `OscillatorDSP`, `EnvelopeDSP`, `ToneRenderer`,
-  `ToneCommand`/`ToneEvent`, the bounded SPSC queue. No AVFoundation import; no IPC import.
-- **New: `Modules/ToneKitAVFoundation/`** — `Node`, `AudioEngine`, the `AVAudioSourceNode` adapter.
-- **New: `Modules/SortAudioUnitKit/`** — the `AUAudioUnit` subclass, `internalRenderBlock`, parameter
-  tree, and the glue instantiating a `SortAudioCore` headless driver + `LocalToneEventSink` per
-  plug-in instance.
-- **`Project.swift` / `Tuist/ProjectDescriptionHelpers/Module.swift`** — needs new support for
-  `.appExtension` product targets (no precedent exists in the current helper, which only has
-  `Module.framework` for framework+test-target pairs) and whatever new destination (native `.mac`,
-  alongside the existing `.iPad`/`.macCatalyst`) the Phase 0/4 Mac-packaging spike lands on.
-- **`App/Resources/SortSymphony.entitlements`** — **no change** in v1 (§12); an App Group entry is
-  added only when/if the deferred bridge (§8) is actually implemented.
-- **Test coverage**: `Modules/ToneKit/Tests/{OscillatorTests,AmplitudeEnvelopeTests,NodeTests}.swift`
-  and `Modules/AudioEngineKit/Tests/{AudioServiceTests,NoOpAudioServiceTests}.swift` re-homed across
-  the new module split, plus new coverage for `ToneRenderer`'s realtime-safety invariants (no
-  allocation, bounded-queue behavior under overflow) — properties the old design was never tested
-  against.
-- **Nothing else changes in v1** — no bridge target, no VST3/AAX adapter target, and no entitlement
-  changes beyond what's listed above. §8's Phase 0 spike is explicitly throwaway and doesn't land in
-  any shipping target.
+- **Deleted**: `Modules/SortAudioCore/Sources/HeadlessSortAudioDriver.swift` and its tests — no
+  self-contained fallback mode exists anywhere in this architecture now.
+- **New: `Modules/SortAudioBridgeKit/`** (Mac Catalyst only) — `BridgeWireCodec`,
+  `SortAudioBridgePath`, `SortAudioBridgeServer`, `SortAudioBridgeClient`, plus tests exercising a
+  real Unix socket end to end. Depends only on `SortAudioCore`.
+- **`Modules/SortAudioUnitKit/Sources/SortAudioUnit.swift`** — dropped `AlgorithmKit`/
+  `BuiltInAlgorithms`/`SortEngineKit` imports and the headless-driver-based render loop; now starts a
+  `SortAudioBridgeClient` feeding the existing `LocalToneEventSink`. A `socketPathOverride` seam
+  (internal, `@testable`-only) lets tests point it at a local bridge server without the real App
+  Group entitlement.
+- **`Modules/AudioEngineKit/Sources/AudioService.swift`** — gained a Mac-Catalyst-only
+  `SortAudioBridgeServer`, started alongside the `AVAudioEngine` in `start()`. `play()` broadcasts to
+  the bridge instead of playing locally whenever a client is connected — replacing, never adding to,
+  local output. iPad builds never link `SortAudioBridgeKit` at all.
+- **`Tuist/ProjectDescriptionHelpers/Module.swift`** — `Module.framework` gained an optional
+  `destinations` parameter (default unchanged) so `SortAudioBridgeKit` could be declared Mac Catalyst
+  only without a new helper function.
+- **`Project.swift`** — new `SortAudioBridgeKit` module entry (Mac-only destinations);
+  `SortAudioUnitKit`'s dependencies trimmed to `SortAudioCore`/`ToneKitDSP`/`SortAudioBridgeKit`;
+  `AUv3Extension` reverted to `destinations: [.macCatalyst]`; the app's dependency on it re-scoped
+  with `condition: .when([.catalyst])` (the opposite of the earlier `.when([.ios])`/unconditional
+  scoping across Phases 3-4).
+- **`App/Resources/SortSymphony.entitlements`**, **`App/AUv3Extension/Resources/AUv3Extension.entitlements`**
+  — both gained `com.apple.security.application-groups` with `group.com.nhubbard.Sort2.mobile` —
+  shipped now, not reserved (§12).
+- **`Modules/SortAudioUnitKit/Tests/SortAudioUnitTests.swift`** — rewritten: the old test polled for
+  the headless driver's first tick; the new tests confirm silence with no bridge connection, and
+  non-silent rendering once a real `SortAudioBridgeServer` (pointed at via `socketPathOverride`)
+  broadcasts an event.
+- **This document** — substantially rewritten (§1, §2, §4, §7, §8, §11-16) to describe the corrected
+  architecture as current truth rather than accreting another patch on top of the self-contained
+  model.

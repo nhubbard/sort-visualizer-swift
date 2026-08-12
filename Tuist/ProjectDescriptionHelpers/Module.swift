@@ -28,6 +28,11 @@ public enum Module {
         // to `import` one of the framework's own dependencies directly (not just through the
         // framework's public API) needs it listed here too.
         testDependencies: [TargetDependency] = [],
+        // Defaults to the shared `Module.destinations` (every existing call site is unaffected) —
+        // overridable for a module that's genuinely platform-restricted, e.g. `SortAudioBridgeKit`
+        // (Mac Catalyst only: it's a Unix-domain-socket IPC bridge to a Mac-only AU extension, per
+        // AUDIO_UNIT_PLAN.md's permanent Mac-only scope decision).
+        destinations: Destinations = Module.destinations,
         callerFilePath: StaticString = #filePath
     ) -> [Target] {
         let frameworkSettings = name.hasSuffix("Kit") ? baseSettings.merging(moduleVerifierSettings) { _, new in new } : baseSettings

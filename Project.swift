@@ -42,19 +42,42 @@ let modules: [Target] =
     // Swift module visibility isn't transitive across target boundaries (same reason SortFeature's
     // testDependencies lists ZstdKit directly elsewhere in this file), and AudioService constructs
     // ToneKitDSP.OscillatorDSP/EnvelopeDSP values and a SortAudioCore.LocalToneEventSink directly.
+    // SortAudioBridgeKit is Mac Catalyst only (`.when([.catalyst])`) — AudioService's own
+    // `#if targetEnvironment(macCatalyst)` guards match this exactly, so the iPad build never
+    // references the type this dependency wouldn't provide there.
     Module.framework(name: "AudioEngineKit", dependencies: [
         .target(name: "ToneKitAVFoundation"), .target(name: "ToneKitDSP"),
         .target(name: "SortAudioCore"), .target(name: "SettingsKit"),
+        .target(name: "SortAudioBridgeKit", condition: .when([.catalyst])),
     ]) +
-    // The AUv3 instrument (AUDIO_UNIT_PLAN.md Phase 3): the AUAudioUnit subclass + internalRenderBlock
-    // wiring SortAudioCore's headless driver directly into ToneKitDSP's ToneRenderer. Never
-    // ToneKitAVFoundation — the extension builds no AVAudioEngine graph at all (§3 of the plan).
-    // BuiltInAlgorithms is needed directly for the concrete QuickSort/RandomShuffle the headless
-    // driver currently runs (a placeholder pending Phase 5's real parameter tree).
-    Module.framework(name: "SortAudioUnitKit", dependencies: [
-        .target(name: "SortAudioCore"), .target(name: "ToneKitDSP"), .target(name: "SortEngineKit"),
-        .target(name: "AlgorithmKit"), .target(name: "BuiltInAlgorithms"),
-    ]) +
+    // Companion-mode bridge (AUDIO_UNIT_PLAN.md's corrected architecture): a Unix-domain-socket IPC
+    // channel over a shared App Group container between the running standalone app (server) and an
+    // AU extension instance a third-party host loaded (client). Mac Catalyst only, permanently —
+    // iPadOS's aggressive background-app termination would silently sever a persistent pipe at
+    // arbitrary times, which macOS doesn't do. Depends only on SortAudioCore, for the
+    // SortToneEvent/SortAudioEventSink types the wire format and client forward to — never
+    // ToneKitDSP directly, the client only needs the sink protocol, not how it's implemented.
+    Module.framework(
+        name: "SortAudioBridgeKit",
+        dependencies: [.target(name: "SortAudioCore")],
+        destinations: [.macCatalyst]
+    ) +
+    // The AUv3 instrument (AUDIO_UNIT_PLAN.md Phase 3, corrected): the AUAudioUnit subclass +
+    // internalRenderBlock wiring a SortAudioBridgeKit client's incoming events into ToneKitDSP's
+    // ToneRenderer via a SortAudioCore.LocalToneEventSink. Never ToneKitAVFoundation — the
+    // extension builds no AVAudioEngine graph at all (§3 of the plan). No longer needs
+    // AlgorithmKit/BuiltInAlgorithms/SortEngineKit — the extension doesn't run sorts itself
+    // anymore, it only relays events the running app already produced.
+    Module.framework(
+        name: "SortAudioUnitKit",
+        dependencies: [
+            .target(name: "SortAudioCore"), .target(name: "ToneKitDSP"), .target(name: "SortAudioBridgeKit"),
+        ],
+        // SortAudioUnitTests constructs a SortAudioBridgeServer directly (to feed a real bridge
+        // connection into the unit under test) and a SortToneEvent — module visibility isn't
+        // transitive across target boundaries, so both need to be imported directly there too.
+        testDependencies: [.target(name: "SortAudioBridgeKit"), .target(name: "SortAudioCore")]
+    ) +
     Module.framework(name: "PersistenceKit", dependencies: [
         .target(name: "SortEngineKit"), .target(name: "AlgorithmKit"),
     ]) +
@@ -204,10 +227,11 @@ let app = Target.target(
         .target(name: "SettingsKit"),
         // Tuist infers the "Embed Foundation Extensions" build phase and PlugIns/ placement
         // purely from this dependency's product type (.appExtension) — no other manifest
-        // mechanism needed. No platform condition needed (unlike when this was `.iPad`-only,
-        // Phase 3): AUv3Extension now shares the app's own `Module.destinations`, so there's no
-        // destination mismatch for Xcode to fail on for either platform.
-        .target(name: "AUv3Extension"),
+        // mechanism needed. Mac Catalyst only, permanently (AUDIO_UNIT_PLAN.md's corrected,
+        // companion-mode architecture) — a `.catalyst` condition keeps Xcode from trying to embed
+        // a Mac-only extension into the iPad Simulator build, the same reason Phase 3 originally
+        // needed a `.when([.ios])` condition (before this target briefly gained `.iPad` too).
+        .target(name: "AUv3Extension", condition: .when([.catalyst])),
     ],
     settings: .settings(base: [
         "CODE_SIGN_ENTITLEMENTS": "App/Resources/SortSymphony.entitlements",
@@ -231,17 +255,17 @@ let app = Target.target(
     ])
 )
 
-// The first App Extension target in this project. Shipped for `.iPad` in Phase 3
-// (AUDIO_UNIT_PLAN.md); `.macCatalyst` added here for Phase 4's §7 option 1 spike — the cheapest
-// of the three packaging strategies to test (a Catalyst-built extension embedded directly in the
-// existing Catalyst app), tried first per the plan's own "test in this order" guidance before
-// assuming a native-macOS-embedded or separate-container-app fallback is needed. Its own Sources
-// are just the thin AUAudioUnitFactory-conforming principal class; the real AUAudioUnit
-// implementation lives in SortAudioUnitKit (already built against `Module.destinations`, i.e.
-// already Catalyst-capable, since `Module.framework` doesn't take a narrower `destinations`).
+// The first App Extension target in this project. Originally shipped for `.iPad` (Phase 3), then
+// briefly widened to include `.macCatalyst` (Phase 4's §7 option 1 spike). Real-world testing
+// revealed the actual product goal — a live companion-mode pipe from the *running* standalone app,
+// never a self-contained generator — is structurally unsound on iPadOS (aggressive background-app
+// termination would silently sever a persistent connection) and sound on macOS, so the platform
+// scope is now permanently Mac Catalyst only, not a temporary deferral. Its own Sources are just
+// the thin AUAudioUnitFactory-conforming principal class; the real AUAudioUnit implementation
+// lives in SortAudioUnitKit.
 let auv3Extension = Module.appExtension(
     name: "AUv3Extension",
-    destinations: Module.destinations,
+    destinations: [.macCatalyst],
     dependencies: [.target(name: "SortAudioUnitKit")],
     infoPlist: .extendingDefault(with: [
         // Must match the containing app's CFBundleVersion/CFBundleShortVersionString exactly, or
@@ -264,7 +288,7 @@ let auv3Extension = Module.appExtension(
                         "subtype": "SrtS",
                         "manufacturer": "NkHb",
                         "name": "Nick Hubbard: Sort Symphony",
-                        "description": "Generates tones from a running sort algorithm.",
+                        "description": "Relays live tones from a running Sort Symphony sort.",
                         "version": 1,
                         "sandboxSafe": true,
                         "tags": ["Generator"],

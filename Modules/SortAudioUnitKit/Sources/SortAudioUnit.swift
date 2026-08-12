@@ -1,28 +1,30 @@
-import AlgorithmKit
 import AudioToolbox
 import AVFoundation
-import BuiltInAlgorithms
 import CoreAudio
+import SortAudioBridgeKit
 import SortAudioCore
-import SortEngineKit
 import ToneKitDSP
 
-/// The AUv3 instrument itself — a self-contained, ambient generator per `AUDIO_UNIT_PLAN.md` §1/§7:
-/// Logic owns this instance's entire lifetime, with no app UI or `SortSession` in the loop. Reuses
-/// exactly the same pieces the standalone app's `AudioEngineKit.AudioService` does
-/// (`ToneRenderer`/`LocalToneEventSink`), plus `SortAudioCore.HeadlessSortAudioDriver` to keep
-/// producing sort-tone events on its own for as long as the host keeps this instance alive.
+/// The AUv3 instrument itself — a **companion-mode relay**, not an independent generator
+/// (AUDIO_UNIT_PLAN.md's corrected architecture): it never runs a sort of its own. Instead it
+/// connects a `SortAudioBridgeClient` to the standalone Sort Symphony app's bridge server (a Unix
+/// domain socket inside the shared App Group container) and forwards every event it receives into
+/// its own `ToneRenderer` via a `LocalToneEventSink` — the same DSP path
+/// `ToneKitAVFoundation.ToneVoice` uses for local playback, reached through a different host
+/// callback shape. If the app isn't running or the bridge isn't reachable, this instance is simply
+/// silent — there is no self-contained fallback.
 ///
-/// `internalRenderBlock` calls straight into `ToneRenderer.render(...)` — the exact same call
-/// `ToneKitAVFoundation.ToneVoice`'s `AVAudioSourceNode` closure already makes for the standalone
-/// app, just reached through a different host callback shape. No Objective-C/Objective-C++ shim:
-/// modern Swift-only `AUAudioUnit` subclasses calling into allocation-free, lock-free Swift code
-/// from the render block are a proven, working pattern, not merely a theoretical one.
+/// `internalRenderBlock` calls straight into `ToneRenderer.render(...)`. No Objective-C/Objective-
+/// C++ shim: modern Swift-only `AUAudioUnit` subclasses calling into allocation-free, lock-free
+/// Swift code from the render block are a proven, working pattern.
 public final class SortAudioUnit: AUAudioUnit {
   private let renderer: ToneRenderer
   private let sink: LocalToneEventSink
-  private let driver: HeadlessSortAudioDriver
-  private var driverTask: Task<Void, Never>?
+  private var bridgeClient: SortAudioBridgeClient?
+  /// Test-only seam: overrides the real App-Group-derived socket path so tests can point this
+  /// instance at a local bridge server without needing the real entitlement. Internal, reachable
+  /// only via `@testable import` — never set outside tests.
+  var socketPathOverride: String?
   private let outputBus: AUAudioUnitBus
   private lazy var _outputBusses = AUAudioUnitBusArray(
     audioUnit: self, busType: .output, busses: [outputBus])
@@ -39,7 +41,6 @@ public final class SortAudioUnit: AUAudioUnit {
     )
     self.renderer = renderer
     self.sink = LocalToneEventSink(renderer: renderer)
-    self.driver = HeadlessSortAudioDriver(sink: sink, noteRange: 36...72)
     let format = AVAudioFormat(standardFormatWithSampleRate: 44100, channels: 1)!
     self.outputBus = try AUAudioUnitBus(format: format)
     try super.init(componentDescription: componentDescription, options: options)
@@ -50,12 +51,12 @@ public final class SortAudioUnit: AUAudioUnit {
   public override func allocateRenderResources() throws {
     try super.allocateRenderResources()
     renderer.prepare(maxFrameCount: Int(maximumFramesToRender))
-    startDriverLoop()
+    startBridgeClient()
   }
 
   public override func deallocateRenderResources() {
-    driverTask?.cancel()
-    driverTask = nil
+    bridgeClient?.stop()
+    bridgeClient = nil
     super.deallocateRenderResources()
   }
 
@@ -74,18 +75,13 @@ public final class SortAudioUnit: AUAudioUnit {
     }
   }
 
-  /// Runs one shuffle+sort to completion, then immediately starts another — the "self-contained,
-  /// ambient generator" behavior `AUDIO_UNIT_PLAN.md` §1/§7 settled on, for as long as the host
-  /// keeps this instance's render resources allocated. `QuickSort`/`RandomShuffle`/size `256`
-  /// (`QuickSort.metadata.sizeRange`'s actual maximum) is a simple, representative default, not a
-  /// final answer — Phase 5 replaces this with real AU parameters (algorithm/size selection).
-  private func startDriverLoop() {
-    driverTask = Task { [driver] in
-      while !Task.isCancelled {
-        try? await driver.run(
-          algorithm: QuickSort(), shuffle: RandomShuffle(), size: 256,
-          operationCap: RecordingEngine.defaultOperationCap)
-      }
-    }
+  /// No-op if the App Group entitlement isn't resolvable (`SortAudioBridgePath.socketPath()`
+  /// returns `nil`) — this instance just stays silent rather than crashing, matching companion
+  /// mode's "no self-contained fallback" design.
+  private func startBridgeClient() {
+    guard let socketPath = socketPathOverride ?? SortAudioBridgePath.socketPath() else { return }
+    let client = SortAudioBridgeClient(socketPath: socketPath, sink: sink)
+    client.start()
+    bridgeClient = client
   }
 }
