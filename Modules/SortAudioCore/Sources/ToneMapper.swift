@@ -24,9 +24,18 @@ public struct ToneMapper: Sendable {
     }
     currentFrequency = frequency
     commands.append(.setAccent(Self.accent(for: event.operationKind)))
+    commands.append(.setPan(Self.pan(forIndex: event.index, arraySize: event.arraySize)))
     commands.append(.setFrequency(Double(frequency)))
     commands.append(.openGate)
     return commands
+  }
+
+  /// Maps an event's position in the array onto `[-1, 1]` so you hear a sort's spatial progress —
+  /// left-to-right across the array reads as left-to-right in the stereo field. A single-element
+  /// array (or any degenerate `arraySize <= 1`) centers rather than dividing by zero.
+  private static func pan(forIndex index: Int, arraySize: Int) -> Float {
+    guard arraySize > 1 else { return 0 }
+    return 2 * Float(index) / Float(arraySize - 1) - 1
   }
 
   /// Swaps (the actual element movement) read as louder/more present than compares or value-writes

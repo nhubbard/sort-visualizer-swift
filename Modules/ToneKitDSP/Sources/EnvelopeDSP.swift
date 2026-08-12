@@ -86,9 +86,16 @@ public struct EnvelopeDSP: Sendable {
 
   /// Per-sample gain application over a whole render buffer — the same loop today's
   /// `AmplitudeEnvelope`'s `AVAudioSourceNode` render closure runs, just no longer inside a
-  /// `Mutex.withLock`. Called after the oscillator has already filled `buffer` with raw samples.
-  public mutating func applyGain(to buffer: UnsafeMutableBufferPointer<Float>, sampleRate: Double) {
-    for index in buffer.indices {
+  /// `Mutex.withLock`. Called after the oscillator has already filled `left`/`right` with raw
+  /// samples. The envelope's temporal shape doesn't depend on pan — both channels are the same
+  /// underlying tone, just at different equal-power gains — so one shared per-sample gain value
+  /// applies identically to both.
+  public mutating func applyGain(
+    left: UnsafeMutableBufferPointer<Float>, right: UnsafeMutableBufferPointer<Float>,
+    sampleRate: Double
+  ) {
+    let count = min(left.count, right.count)
+    for index in 0..<count {
       gain = Self.nextGain(
         currentGain: gain,
         phase: &phase,
@@ -98,7 +105,9 @@ public struct EnvelopeDSP: Sendable {
         releaseDuration: releaseDuration,
         sampleRate: sampleRate
       )
-      buffer[index] *= gain * accent
+      let scaled = gain * accent
+      left[index] *= scaled
+      right[index] *= scaled
     }
   }
 

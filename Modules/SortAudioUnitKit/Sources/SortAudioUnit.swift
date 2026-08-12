@@ -69,7 +69,7 @@ public final class SortAudioUnit: AUAudioUnit {
     )
     self.renderer = renderer
     self.sink = LocalToneEventSink(renderer: renderer)
-    let format = AVAudioFormat(standardFormatWithSampleRate: 44100, channels: 1)!
+    let format = AVAudioFormat(standardFormatWithSampleRate: 44100, channels: 2)!
     self.outputBus = try AUAudioUnitBus(format: format)
     try super.init(componentDescription: componentDescription, options: options)
     parameterTree = makeParameterTree()
@@ -94,12 +94,16 @@ public final class SortAudioUnit: AUAudioUnit {
     let sampleRate = outputBus.format.sampleRate
     return { _, _, frameCount, _, outputData, _, _ in
       let buffers = UnsafeMutableAudioBufferListPointer(outputData)
-      guard let raw = buffers[0].mData else { return noErr }
-      let outBuffer = UnsafeMutableBufferPointer<Float>(
-        start: raw.assumingMemoryBound(to: Float.self),
+      guard let leftRaw = buffers[0].mData, let rightRaw = buffers[1].mData else { return noErr }
+      let left = UnsafeMutableBufferPointer<Float>(
+        start: leftRaw.assumingMemoryBound(to: Float.self),
         count: Int(frameCount)
       )
-      renderer.render(into: outBuffer, sampleRate: sampleRate)
+      let right = UnsafeMutableBufferPointer<Float>(
+        start: rightRaw.assumingMemoryBound(to: Float.self),
+        count: Int(frameCount)
+      )
+      renderer.render(left: left, right: right, sampleRate: sampleRate)
       return noErr
     }
   }

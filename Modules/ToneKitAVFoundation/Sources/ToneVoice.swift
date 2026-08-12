@@ -23,7 +23,7 @@ public final class ToneVoice: Node {
   public init(
     renderer: ToneRenderer,
     maxFrameCount: Int = 4096,
-    format: AVAudioFormat = AVAudioFormat(standardFormatWithSampleRate: 44100, channels: 1)!
+    format: AVAudioFormat = AVAudioFormat(standardFormatWithSampleRate: 44100, channels: 2)!
   ) {
     renderer.prepare(maxFrameCount: maxFrameCount)
     self.outputFormat = format
@@ -33,12 +33,16 @@ public final class ToneVoice: Node {
     // `AVAudioNode`) never needs to become `Sendable` itself as a result.
     self.avAudioNode = AVAudioSourceNode(format: format) { _, _, frameCount, audioBufferList in
       let buffers = UnsafeMutableAudioBufferListPointer(audioBufferList)
-      guard let raw = buffers[0].mData else { return noErr }
-      let outBuffer = UnsafeMutableBufferPointer<Float>(
-        start: raw.assumingMemoryBound(to: Float.self),
+      guard let leftRaw = buffers[0].mData, let rightRaw = buffers[1].mData else { return noErr }
+      let left = UnsafeMutableBufferPointer<Float>(
+        start: leftRaw.assumingMemoryBound(to: Float.self),
         count: Int(frameCount)
       )
-      renderer.render(into: outBuffer, sampleRate: format.sampleRate)
+      let right = UnsafeMutableBufferPointer<Float>(
+        start: rightRaw.assumingMemoryBound(to: Float.self),
+        count: Int(frameCount)
+      )
+      renderer.render(left: left, right: right, sampleRate: format.sampleRate)
       return noErr
     }
   }

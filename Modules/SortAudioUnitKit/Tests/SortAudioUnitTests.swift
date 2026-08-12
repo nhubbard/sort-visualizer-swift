@@ -32,10 +32,10 @@ struct SortAudioUnitTests {
   )
 
   @Test
-  func exposesExactlyOneMonoOutputBus() throws {
+  func exposesExactlyOneStereoOutputBus() throws {
     let unit = try SortAudioUnit(componentDescription: Self.componentDescription)
     #expect(unit.outputBusses.count == 1)
-    #expect(unit.outputBusses[0].format.channelCount == 1)
+    #expect(unit.outputBusses[0].format.channelCount == 2)
   }
 
   /// Renders one 512-frame block and reports whether any sample was non-zero.
@@ -62,7 +62,7 @@ struct SortAudioUnitTests {
     try unit.allocateRenderResources()
     defer { unit.deallocateRenderResources() }
 
-    let format = AVAudioFormat(standardFormatWithSampleRate: 44100, channels: 1)!
+    let format = AVAudioFormat(standardFormatWithSampleRate: 44100, channels: 2)!
     #expect(renderIsSilent(unit, format: format))
   }
 
@@ -92,7 +92,7 @@ struct SortAudioUnitTests {
         operationKind: .compare), noteRange: 36...72)
     try await Task.sleep(for: .milliseconds(300))
 
-    let format = AVAudioFormat(standardFormatWithSampleRate: 44100, channels: 1)!
+    let format = AVAudioFormat(standardFormatWithSampleRate: 44100, channels: 2)!
     #expect(!renderIsSilent(unit, format: format))
   }
 
@@ -156,7 +156,7 @@ struct SortAudioUnitTests {
         operationKind: .compare), noteRange: 36...72)
     try await Task.sleep(for: .milliseconds(300))
 
-    let format = AVAudioFormat(standardFormatWithSampleRate: 44100, channels: 1)!
+    let format = AVAudioFormat(standardFormatWithSampleRate: 44100, channels: 2)!
     #expect(!renderIsSilent(unit, format: format))
 
     guard let gainParameter = unit.parameterTree?.allParameters.first(where: { $0.identifier == "gain" })

@@ -3,8 +3,8 @@
 /// `AVAudioSourceNode` closure today; an `AUAudioUnit.internalRenderBlock` and, later, a VST3
 /// `process()` callback) calls to actually produce audio. See `AUDIO_UNIT_PLAN.md` §3/§5.
 ///
-/// `render(into:sampleRate:)` must only ever be called from one thread at a time — the realtime
-/// render thread — and must never be called concurrently with itself. `enqueue(_:)` is the only
+/// `render(left:right:sampleRate:)` must only ever be called from one thread at a time — the
+/// realtime render thread — and must never be called concurrently with itself. `enqueue(_:)` is the only
 /// method safe to call from any other thread. `prepare(maxFrameCount:)` must complete before the
 /// first `render` call and must not be called concurrently with `render`.
 ///
@@ -45,10 +45,13 @@ public final class ToneRenderer: @unchecked Sendable {
   /// buffer's worth of audio — the same two-step combination (`fill` a raw tone, then multiply in
   /// the envelope's gain) today's `AmplitudeEnvelope`'s `AVAudioSourceNode` closure performs, just
   /// no longer behind two separately-locked mutexes.
-  public func render(into buffer: UnsafeMutableBufferPointer<Float>, sampleRate: Double) {
+  public func render(
+    left: UnsafeMutableBufferPointer<Float>, right: UnsafeMutableBufferPointer<Float>,
+    sampleRate: Double
+  ) {
     drainDueCommands()
-    oscillator.fill(buffer, sampleRate: sampleRate)
-    envelope.applyGain(to: buffer, sampleRate: sampleRate)
+    oscillator.fill(left: left, right: right, sampleRate: sampleRate)
+    envelope.applyGain(left: left, right: right, sampleRate: sampleRate)
   }
 
   private func drainDueCommands() {
@@ -74,6 +77,8 @@ public final class ToneRenderer: @unchecked Sendable {
         oscillator.amplitude = amplitude
       case .setAccent(let accent):
         envelope.accent = accent
+      case .setPan(let pan):
+        oscillator.pan = pan
       }
     }
   }

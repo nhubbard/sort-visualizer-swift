@@ -24,4 +24,8 @@ public enum ToneCommand: Sendable, Equatable {
   /// compares/value-writes) — a multiplicative layer kept separate from `setAmplitude` specifically
   /// so it never fights the AU remote's user-facing Gain slider.
   case setAccent(Float)
+  /// Equal-power stereo position (`-1` full left ... `1` full right) — `SortAudioCore.ToneMapper`
+  /// derives this from an event's array index/size so a sort's spatial progress is audible, not
+  /// just its pitch progress.
+  case setPan(Float)
 }

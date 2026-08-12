@@ -42,6 +42,12 @@ public struct OscillatorDSP: Sendable {
   public var amplitude: Float
   public var detuningOffset: Float
   public var detuningMultiplier: Float
+  /// Equal-power stereo position: `-1` full left, `1` full right, `0` center. A first-class field
+  /// alongside `frequency`/`amplitude`/detuning because it shapes this voice's output the same way
+  /// they do — stereo lives at the oscillator's core, not as a post-hoc split bolted onto a mono
+  /// signal, so a future genuine per-channel divergence (chorus/width, independent per-side
+  /// detuning) extends `fill` rather than requiring a redesign.
+  public var pan: Float = 0
   private var phase: Double = 0
 
   // Preallocated once by `prepare(maxFrameCount:)` rather than lazily resized inside `fill` —
@@ -50,6 +56,10 @@ public struct OscillatorDSP: Sendable {
   // render path. `fill` renders into a prefix of these sized to the actual call's frame count.
   private var scratchPhases: [Double] = []
   private var scratchSines: [Double] = []
+  /// The raw (unscaled, un-panned) waveform narrowed to `Float` exactly once per `fill` call, then
+  /// independently gain-scaled into `left`/`right` by two separate `vDSP_vsmul` calls — one shared
+  /// waveform, two independent scalings, no shared mutable buffer between channels.
+  private var scratchRawSamples: [Float] = []
 
   public init(
     frequency: Float = 440.0,
@@ -70,6 +80,7 @@ public struct OscillatorDSP: Sendable {
   public mutating func prepare(maxFrameCount: Int) {
     scratchPhases = [Double](repeating: 0, count: maxFrameCount)
     scratchSines = [Double](repeating: 0, count: maxFrameCount)
+    scratchRawSamples = [Float](repeating: 0, count: maxFrameCount)
   }
 
   /// One computation pass per render buffer (typically a few hundred frames), not per sample —
@@ -79,17 +90,25 @@ public struct OscillatorDSP: Sendable {
   /// whole buffer and get wrapped back into `0..<2π` once at the end, since `sin` is exactly
   /// periodic — one `vDSP`/`vForce` call each instead of a branch-per-sample scalar loop.
   ///
-  /// `buffer.count` must not exceed the `maxFrameCount` passed to `prepare` — rather than resize
+  /// `left`/`right` must not exceed the `maxFrameCount` passed to `prepare` — rather than resize
   /// (an allocation on what may be the realtime render thread), a call past that capacity renders
   /// silence into the excess and clamps to the prepared capacity, since that's a `prepare`-time
   /// misconfiguration bug to fix, not a condition to allocate through on the render thread.
-  public mutating func fill(_ buffer: UnsafeMutableBufferPointer<Float>, sampleRate: Double) {
-    let count = min(buffer.count, scratchPhases.count)
-    guard let output = buffer.baseAddress, buffer.count > 0 else { return }
-    if count < buffer.count {
+  public mutating func fill(
+    left: UnsafeMutableBufferPointer<Float>, right: UnsafeMutableBufferPointer<Float>,
+    sampleRate: Double
+  ) {
+    let count = min(min(left.count, right.count), scratchPhases.count)
+    guard let leftOutput = left.baseAddress, let rightOutput = right.baseAddress,
+      left.count > 0, right.count > 0
+    else { return }
+    if count < left.count {
       // Not prepared for a buffer this large (or not prepared at all) — silence rather than
       // whatever was previously in the caller's buffer, and never allocate here to catch up.
-      output.advanced(by: count).update(repeating: 0, count: buffer.count - count)
+      leftOutput.advanced(by: count).update(repeating: 0, count: left.count - count)
+    }
+    if count < right.count {
+      rightOutput.advanced(by: count).update(repeating: 0, count: right.count - count)
     }
     guard count > 0 else { return }
 
@@ -112,14 +131,28 @@ public struct OscillatorDSP: Sendable {
       }
     }
 
-    // sines[i] *= amplitude, then narrowed straight into the Float output buffer.
-    var amplitudeValue = Double(amplitude)
-    scratchSines.withUnsafeMutableBufferPointer { sines in
-      vDSP_vsmulD(sines.baseAddress!, 1, &amplitudeValue, sines.baseAddress!, 1, vDSP_Length(count))
-      vDSP_vdpsp(sines.baseAddress!, 1, output, 1, vDSP_Length(count))
+    // One shared, unscaled waveform narrowed to Float once, then two independent equal-power
+    // gain scalings write directly into the caller's left/right buffers.
+    scratchRawSamples.withUnsafeMutableBufferPointer { raw in
+      scratchSines.withUnsafeMutableBufferPointer { sines in
+        vDSP_vdpsp(sines.baseAddress!, 1, raw.baseAddress!, 1, vDSP_Length(count))
+      }
+      let (leftGain, rightGain) = Self.equalPowerPanGains(pan: pan)
+      var leftScale = amplitude * leftGain
+      var rightScale = amplitude * rightGain
+      vDSP_vsmul(raw.baseAddress!, 1, &leftScale, leftOutput, 1, vDSP_Length(count))
+      vDSP_vsmul(raw.baseAddress!, 1, &rightScale, rightOutput, 1, vDSP_Length(count))
     }
 
     phase = Self.wrappedPhase(start: phase, increment: increment, count: count)
+  }
+
+  /// Equal-power panning law: gains trace a quarter-circle rather than a straight line, so the
+  /// perceived loudness at center pan matches the perceived loudness at either extreme instead of
+  /// dipping (the well-known flaw of naive linear left/right gain crossfades).
+  public static func equalPowerPanGains(pan: Float) -> (left: Float, right: Float) {
+    let theta = Double(pan + 1) * .pi / 4
+    return (Float(cos(theta)), Float(sin(theta)))
   }
 
   /// Pure sine-generation step — the scalar reference this file's `OscillatorDSPTests` pin the

@@ -66,8 +66,14 @@ struct ToneMapperTests {
     // The very first mapping always closes (there's no prior pitch to match), but a repeat of
     // the same value/range/noteRange must not close the gate again before reopening it.
     #expect(
-      first == [.closeGate, .setAccent(0.65), .setFrequency(first.frequencyPayload!), .openGate])
-    #expect(second == [.setAccent(0.65), .setFrequency(first.frequencyPayload!), .openGate])
+      first
+        == [
+          .closeGate, .setAccent(0.65), .setPan(-1.0), .setFrequency(first.frequencyPayload!),
+          .openGate,
+        ])
+    #expect(
+      second
+        == [.setAccent(0.65), .setPan(-1.0), .setFrequency(first.frequencyPayload!), .openGate])
   }
 
   @Test
