@@ -1,5 +1,6 @@
 import AlgorithmKit
 import Foundation
+import SortEngineKit
 import Testing
 import VisualizationKit
 
@@ -136,6 +137,52 @@ struct AppSettingsTests {
     settings.cycleVisualizer()
     #expect(settings.selectedVisualizerID == VisualizerID(rawValue: "a"))
   }
+
+  /// Same isolation rationale as `cycleVisualizerWrapsAroundLikeARingBuffer` above, over
+  /// `ShuffleRegistry.shared` instead. Deliberately registers the mocks out of alphabetical order
+  /// (`c`, `a`, `b`) to actually exercise `cycleShuffle()`'s alphabetical sort, not just registry
+  /// order (which would pass even with a bug that dropped the `.sorted` entirely).
+  @Test
+  func cycleShuffleWrapsAroundLikeARingBufferInAlphabeticalOrder() {
+    let registry = ShuffleRegistry.shared
+    let restoreBuiltIns = registry.builtIns
+    defer {
+      registry.builtIns = restoreBuiltIns
+      registry.discover()
+    }
+    registry.builtIns = ["c", "a", "b"].map(MockShuffle.init)
+    registry.discover()
+
+    let settings = AppSettings(store: makeIsolatedStore())
+    settings.defaultShuffleID = ShuffleID(rawValue: "a")
+
+    settings.cycleShuffle()
+    #expect(settings.defaultShuffleID == ShuffleID(rawValue: "b"))
+    settings.cycleShuffle()
+    #expect(settings.defaultShuffleID == ShuffleID(rawValue: "c"))
+    settings.cycleShuffle()
+    #expect(
+      settings.defaultShuffleID == ShuffleID(rawValue: "a"),
+      "should wrap back to the first entry")
+  }
+
+  @Test
+  func cycleShuffleFallsBackToFirstEntryWhenCurrentIDIsUnknown() {
+    let registry = ShuffleRegistry.shared
+    let restoreBuiltIns = registry.builtIns
+    defer {
+      registry.builtIns = restoreBuiltIns
+      registry.discover()
+    }
+    registry.builtIns = ["b", "a"].map(MockShuffle.init)
+    registry.discover()
+
+    let settings = AppSettings(store: makeIsolatedStore())
+    settings.defaultShuffleID = ShuffleID(rawValue: "not-in-the-registry")
+
+    settings.cycleShuffle()
+    #expect(settings.defaultShuffleID == ShuffleID(rawValue: "a"))
+  }
 }
 
 private struct MockVisualizer: Visualizer {
@@ -148,4 +195,16 @@ private struct MockVisualizer: Visualizer {
   }
 
   func draw(_ context: VisualizationContext) -> [DrawCommand] { [] }
+}
+
+private struct MockShuffle: ShuffleAlgorithm {
+  let id: ShuffleID
+  let metadata: ShuffleMetadata
+
+  init(_ rawID: String) {
+    id = ShuffleID(rawValue: rawID)
+    metadata = ShuffleMetadata(displayName: rawID)
+  }
+
+  func record(into engine: inout RecordingEngine) {}
 }

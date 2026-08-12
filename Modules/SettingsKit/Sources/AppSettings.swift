@@ -162,4 +162,19 @@ public final class AppSettings {
     let nextIndex = (currentIndex + 1) % visualizers.count
     selectedVisualizerID = visualizers[nextIndex].id
   }
+
+  /// Same ring-buffer shape as `cycleVisualizer()`, over `defaultShuffleID` instead — but sorted
+  /// alphabetically by `displayName`, matching `ShuffleEntityQuery.allEntities()`/
+  /// `FindShufflesIntent`'s own canonical order for shuffles (unlike visualizers, whose canonical
+  /// order is the registry's own registration order, not alphabetical — each type keeps its own
+  /// existing convention here rather than a shared one).
+  public func cycleShuffle() {
+    let shuffles = ShuffleRegistry.shared.shuffles.sorted {
+      $0.metadata.displayName < $1.metadata.displayName
+    }
+    guard !shuffles.isEmpty else { return }
+    let currentIndex = shuffles.firstIndex { $0.id == defaultShuffleID } ?? -1
+    let nextIndex = (currentIndex + 1) % shuffles.count
+    defaultShuffleID = shuffles[nextIndex].id
+  }
 }

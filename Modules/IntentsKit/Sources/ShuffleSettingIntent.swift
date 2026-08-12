@@ -1,3 +1,4 @@
+import AlgorithmKit
 import AppIntents
 import SettingsKit
 
@@ -33,5 +34,36 @@ public struct SetShuffleIntent: AppIntent {
   public func perform() async throws -> some IntentResult {
     AppSettings.shared.defaultShuffleID = shuffle.shuffleID
     return .result()
+  }
+}
+
+/// The value-returning counterpart to `AppSettings.cycleShuffle()` (`CycleVisualizerIntent`'s own
+/// shape, one level up) — advances `defaultShuffleID` one step around the ring buffer and hands
+/// back the shuffle it landed on, so a Shortcut can feed that straight into `RunSortIntent`'s
+/// `shuffle` parameter as a variable instead of a fixed literal. Built for exactly this: chaining
+/// "Get Next Shuffle" → "Run Sort" inside a loop cycles through every shuffle over a long run,
+/// without Shortcuts ever needing to iterate `FindShufflesIntent`'s own list itself.
+public struct GetNextShuffleIntent: AppIntent {
+  public static var title: LocalizedStringResource { "Get Next Shuffle" }
+  public static var description: IntentDescription {
+    IntentDescription(
+      "Advances Sort Symphony's default shuffle by one step and returns it — chain with Run Sort to cycle through every shuffle over a long run.",
+      categoryName: "Sort Symphony",
+      searchKeywords: ["Next Shuffle", "Cycle Shuffle", "Shuffle"],
+      resultValueName: "Shuffle")
+  }
+
+  public init() {}
+
+  @MainActor
+  public func perform() async throws -> some IntentResult & ReturnsValue<ShuffleEntity> {
+    AppSettings.shared.cycleShuffle()
+    let shuffles = ShuffleRegistry.shared.shuffles.sorted {
+      $0.metadata.displayName < $1.metadata.displayName
+    }
+    let shuffle =
+      ShuffleRegistry.shared.shuffle(id: AppSettings.shared.defaultShuffleID) ?? shuffles.first
+    guard let shuffle else { throw SortSymphonyIntentError.shuffleUnavailable }
+    return .result(value: ShuffleEntity(shuffle: shuffle))
   }
 }

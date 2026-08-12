@@ -374,6 +374,14 @@ struct ContentView: View {
     showcaseIndex = 0
     showcaseSignpostState = showcaseSignposter.beginInterval(
       "ShowcaseRun", "\(showcaseAlgorithmIDs.count) algorithms")
+    // One step per algorithm, not fixed for the whole run — `advanceShowcase()` below repeats
+    // this same pair of calls for every algorithm after the first, so a full Showcase pass
+    // exercises every shuffle and every visualizer at least once (far more algorithms than either
+    // list is long). `effectiveShuffle(for:)`/the renderer's own reactive read of
+    // `selectedVisualizerID` pick this up automatically once `selectAlgorithmForFreshView` below
+    // tears down and rebuilds the session.
+    AppSettings.shared.cycleShuffle()
+    AppSettings.shared.cycleVisualizer()
     coordinator.selectAlgorithmForFreshView(showcaseAlgorithmIDs[0])
   }
 
@@ -389,6 +397,8 @@ struct ContentView: View {
       return
     }
     self.showcaseIndex = nextIndex
+    AppSettings.shared.cycleShuffle()
+    AppSettings.shared.cycleVisualizer()
     coordinator.selectAlgorithmForFreshView(showcaseAlgorithmIDs[nextIndex])
   }
 
