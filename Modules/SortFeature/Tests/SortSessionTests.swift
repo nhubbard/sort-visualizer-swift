@@ -159,7 +159,7 @@ struct SortSessionTests {
   /// a bare `.compare` that returns `false` — no trailing `.swap` ever comes along to retract the
   /// primary/secondary pair that final `.compare` marked, since `RecordingEngine`'s auto-
   /// retraction (`markPrimarySecondary`) only clears the *previous* pair right before marking a
-  /// new one. Without `SortSession.makeTape`'s trailing `unmarkAll()`, the completed, fully-
+  /// new one. Without `TapeFactory.makeTape`'s trailing `unmarkAll()`, the completed, fully-
   /// sorted frame would show one index still highlighted red and another still blue, forever.
   @Test
   func completedFrameHasNoLingeringPrimaryOrSecondaryMarkers() async throws {
@@ -391,53 +391,6 @@ struct SortSessionTests {
     session.soundEnabled = false
 
     #expect(settings.soundEnabled)  // toggling the session-local flag never touches the global default
-  }
-
-  // MARK: - Phase 6: shuffle+sort concatenation
-
-  @Test
-  func concatenatedTapeOperationCountEqualsShuffleLengthPlusSortLength() throws {
-    let size = 20
-    let algorithm = FakeAlgorithm()
-    let shuffle = FakeReverseShuffle()
-
-    var shuffleEngine = RecordingEngine(values: Array(1...size))
-    shuffle.record(into: &shuffleEngine)
-    shuffleEngine.unmarkAll()  // mirrors makeTape's own trailing cleanup call
-    let shuffleOperationCount = shuffleEngine.finish().tape.count
-
-    var sortEngine = RecordingEngine(values: shuffleEngine.values)
-    algorithm.record(into: &sortEngine)
-    sortEngine.unmarkAll()  // mirrors makeTape's own trailing cleanup call
-    let sortOperationCount = sortEngine.finish().tape.count
-
-    let tape = try SortSession.makeTape(
-      algorithm: algorithm, shuffle: shuffle, size: size,
-      operationCap: RecordingEngine.defaultOperationCap)
-
-    #expect(tape.operations.count == shuffleOperationCount + sortOperationCount)
-    #expect(tape.header.sortStartIndex == shuffleOperationCount)
-    #expect(tape.header.shuffleID == shuffle.id.rawValue)
-    #expect(tape.header.initialValues == Array(1...size))
-  }
-
-  @Test(arguments: [
-    FakeIdentityShuffle() as any ShuffleAlgorithm,
-    FakeReverseShuffle() as any ShuffleAlgorithm,
-    FakeRotateShuffle() as any ShuffleAlgorithm
-  ])
-  func replayingConcatenatedTapeProducesSortedFrameRegardlessOfShuffle(
-    shuffle: any ShuffleAlgorithm
-  ) throws {
-    let size = 15
-    let tape = try SortSession.makeTape(
-      algorithm: FakeAlgorithm(), shuffle: shuffle, size: size,
-      operationCap: RecordingEngine.defaultOperationCap)
-
-    let replay = ReplayEngine(tape: tape)
-    for _ in 0..<tape.operations.count { replay.stepForward() }
-
-    #expect(replay.frame.map(\.value) == Array(1...size))
   }
 
   // MARK: - Recording size cap

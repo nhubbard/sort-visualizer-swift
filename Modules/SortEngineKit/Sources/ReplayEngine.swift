@@ -318,7 +318,7 @@ public final class ReplayEngine {
   /// Elapsed time between ticks is clamped to this before feeding the accumulator, so a real
   /// gap (backgrounding, a debugger pause, a genuine hitch) can't turn into one enormous burst
   /// of operations applied in a single tick.
-  private static let maxCatchUpInterval: TimeInterval = 0.25
+  private nonisolated static let maxCatchUpInterval: TimeInterval = 0.25
 
   /// Caps how many operations `play()`'s tick loop applies in one `mutatingState` call before
   /// yielding back to the run loop — a real, reported freeze on a throttled host (the iPadOS
@@ -341,7 +341,15 @@ public final class ReplayEngine {
   /// never returning more than `remaining` (raw tape entries left — a safe, if loose, upper
   /// bound, since the tape can never contain fewer significant entries than raw ones; `play()`'s
   /// own tick loop is what actually stops at the true end of tape).
-  static func opsToApply(
+  ///
+  /// `public` and `nonisolated` so `SortAudioCore`'s headless driver can reuse this exact pacing
+  /// math (flat-rate only — it has no fixed-duration-pacing concept, so `effectiveSpeed`/
+  /// `smoothedPacingRate` below stay internal) for its own non-`@MainActor`, non-display-link tick
+  /// loop instead of duplicating it — `ReplayEngine` itself is `@MainActor`/`@Observable` and
+  /// display-link-driven, unsuitable for that context, but this one function touches no actor
+  /// state at all (a plain static method on an `@MainActor` type still inherits that isolation
+  /// unless explicitly opted out).
+  public nonisolated static func opsToApply(
     elapsed: TimeInterval, speed: Double, accumulator: inout Double, remaining: Int
   ) -> Int {
     accumulator += min(elapsed, maxCatchUpInterval) * speed

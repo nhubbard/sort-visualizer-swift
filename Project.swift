@@ -30,12 +30,21 @@ let modules: [Target] =
         dependencies: [.target(name: "ToneKitDSP")],
         testDependencies: [.target(name: "ToneKitDSP")]
     ) +
-    // Needs ToneKitDSP directly, not just transitively through ToneKitAVFoundation — Swift module
-    // visibility isn't transitive across target boundaries (same reason SortFeature's
+    // The sort-to-tone semantics (pitch mapping, gate retrigger, deferred gate-close) and the
+    // headless algorithm/replay driver a future AU extension needs — no MainActor, no UI. Depends
+    // only on SortEngineKit/AlgorithmKit (for TapeFactory/SortAlgorithm/ShuffleAlgorithm) and
+    // ToneKitDSP (for ToneCommand/ToneRenderer, which LocalToneEventSink enqueues into) — never
+    // SortFeature. See AUDIO_UNIT_PLAN.md §2/§4/§7.
+    Module.framework(name: "SortAudioCore", dependencies: [
+        .target(name: "SortEngineKit"), .target(name: "AlgorithmKit"), .target(name: "ToneKitDSP"),
+    ]) +
+    // Needs ToneKitDSP/SortAudioCore directly, not just transitively through ToneKitAVFoundation —
+    // Swift module visibility isn't transitive across target boundaries (same reason SortFeature's
     // testDependencies lists ZstdKit directly elsewhere in this file), and AudioService constructs
-    // ToneKitDSP.OscillatorDSP/EnvelopeDSP values to hand to ToneKitAVFoundation.ToneVoice.
+    // ToneKitDSP.OscillatorDSP/EnvelopeDSP values and a SortAudioCore.LocalToneEventSink directly.
     Module.framework(name: "AudioEngineKit", dependencies: [
-        .target(name: "ToneKitAVFoundation"), .target(name: "ToneKitDSP"), .target(name: "SettingsKit"),
+        .target(name: "ToneKitAVFoundation"), .target(name: "ToneKitDSP"),
+        .target(name: "SortAudioCore"), .target(name: "SettingsKit"),
     ]) +
     Module.framework(name: "PersistenceKit", dependencies: [
         .target(name: "SortEngineKit"), .target(name: "AlgorithmKit"),

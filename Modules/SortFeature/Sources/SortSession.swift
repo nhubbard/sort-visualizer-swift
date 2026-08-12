@@ -153,14 +153,23 @@ public final class SortSession {
     let operationCap = settings.recordingOperationCap
     do {
       let tape = try await Task.detached(priority: .userInitiated) {
-        try SortSession.makeTape(
+        try TapeFactory.makeTape(
           algorithm: algorithm, shuffle: shuffle, size: clampedSize, operationCap: operationCap)
       }.value
       lastRunWasSkipped = false
       phase = .ready(tape)
       startReplay(tape)
     } catch {
-      let sessionError = (error as? SortSessionError) ?? .recordingFailed("\(error)")
+      let sessionError: SortSessionError
+      if case .tooLarge(
+        let operationCount, let cap, let compareCount, let swapCount, let mainWriteCount,
+        let auxWriteCount) = error as? TapeRecordingError {
+        sessionError = .recordingTooLarge(
+          operationCount: operationCount, cap: cap, compareCount: compareCount,
+          swapCount: swapCount, mainWriteCount: mainWriteCount, auxWriteCount: auxWriteCount)
+      } else {
+        sessionError = (error as? SortSessionError) ?? .recordingFailed("\(error)")
+      }
       lastRunWasSkipped = true
       if isAutomating {
         if case .recordingTooLarge(
@@ -176,76 +185,6 @@ public final class SortSession {
         phase = .failed(sessionError)
       }
     }
-  }
-
-  /// Records the shuffle against an identity array, then the sort against the shuffle's output,
-  /// concatenating both into one continuous `Tape` — from `ReplayEngine`'s point of view a
-  /// shuffle-then-sort is just one longer tape (§2A.4). A free function (well, static method) on
-  /// purpose: no `self`, no actor isolation, callable directly from a test or from inside
-  /// `Task.detached` without capturing the session itself.
-  nonisolated static func makeTape(
-    algorithm: any SortAlgorithm, shuffle: any ShuffleAlgorithm, size: Int, operationCap: Int
-  ) throws -> Tape {
-    let identity = Array(1...size)
-
-    var shuffleEngine = RecordingEngine(values: identity, operationCap: operationCap)
-    shuffle.record(into: &shuffleEngine)
-    let uniqueValueCount = Set(shuffleEngine.values).count
-    // `compare`/`swap`'s auto-retraction (`markPrimarySecondary`) only clears the *previous*
-    // pair right before marking a new one — there's nothing to retract whatever pair the
-    // shuffle's own last `compare`/`swap` marked, since no further call ever comes along to
-    // trigger it. Without this, that leftover primary/secondary would sit on the frame for
-    // however long it takes the sort's own first `compare`/`swap` to happen to overwrite it
-    // (each `RecordingEngine` instance only tracks the marks *it* applied, so the sort's fresh
-    // instance doesn't know to retract them either) — same bug as below, one phase earlier.
-    shuffleEngine.unmarkAll()
-    let shuffleSummary = shuffleEngine.finish()
-    if shuffleSummary.didExceedCap {
-      throw SortSessionError.recordingTooLarge(
-        operationCount: shuffleSummary.tape.count, cap: operationCap,
-        compareCount: shuffleSummary.compareCount, swapCount: shuffleSummary.swapCount,
-        mainWriteCount: shuffleSummary.mainWriteCount, auxWriteCount: shuffleSummary.auxWriteCount)
-    }
-
-    // recordingDuration measures only the sort, not the shuffle — it's the real algorithmic
-    // performance number (§1.1), and a shuffle's cost isn't the algorithm's to answer for.
-    let recordingStart = Date()
-    var sortEngine = RecordingEngine(values: shuffleEngine.values, operationCap: operationCap)
-    algorithm.record(into: &sortEngine)
-    let recordingDuration = Date().timeIntervalSince(recordingStart)
-    // Same reasoning as `shuffleEngine.unmarkAll()` above, but for the far more visible case:
-    // whichever pair the algorithm's very last `compare`/`swap` touched would otherwise stay
-    // marked (one red, one blue) forever on the completed, fully-sorted final frame, since
-    // nothing ever calls another `compare`/`swap` afterward to retract it. Placed after
-    // `recordingDuration` is captured, not before, so this bookkeeping never counts against the
-    // algorithm's own measured recording time.
-    sortEngine.unmarkAll()
-    let sortSummary = sortEngine.finish()
-    if sortSummary.didExceedCap {
-      throw SortSessionError.recordingTooLarge(
-        operationCount: sortSummary.tape.count, cap: operationCap,
-        compareCount: sortSummary.compareCount, swapCount: sortSummary.swapCount,
-        mainWriteCount: sortSummary.mainWriteCount, auxWriteCount: sortSummary.auxWriteCount)
-    }
-
-    return Tape(
-      header: TapeHeader(
-        algorithmID: algorithm.id.rawValue,
-        initialValues: identity,
-        visualSeed: UInt64.random(in: .min ... .max),
-        compareCount: sortSummary.compareCount,
-        swapCount: sortSummary.swapCount,
-        mainWriteCount: sortSummary.mainWriteCount,
-        auxWriteCount: sortSummary.auxWriteCount,
-        reversalCount: sortSummary.reversalCount,
-        recordingDuration: recordingDuration,
-        recordedAt: Date(),
-        shuffleID: shuffle.id.rawValue,
-        sortStartIndex: shuffleSummary.tape.count,
-        uniqueValueCount: uniqueValueCount
-      ),
-      operations: shuffleSummary.tape + sortSummary.tape
-    )
   }
 
   /// Loads an externally-supplied `Tape` (from `Tape(archivedData:)`, i.e. an imported `.tape`

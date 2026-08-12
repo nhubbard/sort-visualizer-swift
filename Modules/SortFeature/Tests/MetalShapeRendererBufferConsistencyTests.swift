@@ -82,7 +82,7 @@ struct MetalShapeRendererBufferConsistencyTests {
   @Test
   func rainbowMetalBufferMatchesFinalSortedValuesAtN256() async throws {
     let size = 256
-    let tape = try SortSession.makeTape(
+    let tape = try TapeFactory.makeTape(
       algorithm: FakeCountingSort(), shuffle: FakeReverseShuffle(), size: size,
       operationCap: RecordingEngine.defaultOperationCap)
     let replay = ReplayEngine(tape: tape)
@@ -160,7 +160,7 @@ struct MetalShapeRendererBufferConsistencyTests {
   @Test
   func rainbowMetalBufferStaysCorrectAfterMidPlaybackResize() async throws {
     let size = 256
-    let tape = try SortSession.makeTape(
+    let tape = try TapeFactory.makeTape(
       algorithm: FakeCountingSort(), shuffle: FakeReverseShuffle(), size: size,
       operationCap: RecordingEngine.defaultOperationCap)
     let driver = ManualTickDriver()
