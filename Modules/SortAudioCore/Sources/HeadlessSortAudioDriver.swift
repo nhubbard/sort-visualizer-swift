@@ -19,7 +19,13 @@ private struct HeadlessPlaybackState {
 ///
 /// Which algorithm/shuffle/size to run, and whether to loop afterward, is entirely the caller's
 /// decision (mirroring `SortSession` itself never picking its own algorithm) — out of scope here.
-public final class HeadlessSortAudioDriver {
+///
+/// `@unchecked Sendable` so a caller can capture one instance into a `Task` (e.g. an AU's own
+/// driver loop) — safe under the same single-owner-drives-it-sequentially invariant as
+/// `ToneKitDSP`'s `ToneRenderer`/`ToneCommandQueue` and this module's own `LocalToneEventSink`:
+/// nothing in this codebase calls `run(...)` on, or mutates `speed` on, the same instance from two
+/// concurrent contexts.
+public final class HeadlessSortAudioDriver: @unchecked Sendable {
   private let sink: any SortAudioEventSink
   private let noteRange: ClosedRange<Int>
 

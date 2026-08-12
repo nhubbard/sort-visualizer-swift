@@ -61,6 +61,35 @@ public enum Module {
         ]
     }
 
+    /// For non-`Modules/`-resident product targets whose `product` `Module.framework` can't
+    /// express (it hardcodes `.framework`) — first user: the AUv3 extension target
+    /// (`AUDIO_UNIT_PLAN.md` Phase 3), with a second (macOS AUv3 packaging, Phase 4) already a
+    /// known near-term need, which is why this is a small reusable helper rather than one
+    /// hand-rolled `Target.target(...)` call. Sources live under `App/<name>/Sources/**`,
+    /// mirroring `App/UITests/` as the existing precedent for a non-`Module.framework` product
+    /// target living alongside the app rather than under `Modules/`.
+    public static func appExtension(
+        name: String,
+        destinations: Destinations,
+        dependencies: [TargetDependency] = [],
+        infoPlist: InfoPlist,
+        entitlements: Entitlements? = nil,
+        extraSettings: SettingsDictionary = [:]
+    ) -> Target {
+        .target(
+            name: name,
+            destinations: destinations,
+            product: .appExtension,
+            bundleId: "com.nhubbard.Sort2.mobile.\(name.lowercased())",
+            deploymentTargets: deploymentTargets,
+            infoPlist: infoPlist,
+            sources: ["App/\(name)/Sources/**"],
+            entitlements: entitlements,
+            dependencies: dependencies,
+            settings: .settings(base: baseSettings.merging(extraSettings) { _, new in new })
+        )
+    }
+
     private static func hasSwiftTestSources(forModule name: String, callerFilePath: StaticString) -> Bool {
         let testsDirectory = URL(fileURLWithPath: "\(callerFilePath)")
             .deletingLastPathComponent()

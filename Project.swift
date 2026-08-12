@@ -46,6 +46,15 @@ let modules: [Target] =
         .target(name: "ToneKitAVFoundation"), .target(name: "ToneKitDSP"),
         .target(name: "SortAudioCore"), .target(name: "SettingsKit"),
     ]) +
+    // The AUv3 instrument (AUDIO_UNIT_PLAN.md Phase 3): the AUAudioUnit subclass + internalRenderBlock
+    // wiring SortAudioCore's headless driver directly into ToneKitDSP's ToneRenderer. Never
+    // ToneKitAVFoundation — the extension builds no AVAudioEngine graph at all (§3 of the plan).
+    // BuiltInAlgorithms is needed directly for the concrete QuickSort/RandomShuffle the headless
+    // driver currently runs (a placeholder pending Phase 5's real parameter tree).
+    Module.framework(name: "SortAudioUnitKit", dependencies: [
+        .target(name: "SortAudioCore"), .target(name: "ToneKitDSP"), .target(name: "SortEngineKit"),
+        .target(name: "AlgorithmKit"), .target(name: "BuiltInAlgorithms"),
+    ]) +
     Module.framework(name: "PersistenceKit", dependencies: [
         .target(name: "SortEngineKit"), .target(name: "AlgorithmKit"),
     ]) +
@@ -193,6 +202,14 @@ let app = Target.target(
         // SortFeature/SettingsFeature/HomeFeature all depend on it already, but don't re-export it.
         .target(name: "AlgorithmKit"), .target(name: "DesignSystemKit"),
         .target(name: "SettingsKit"),
+        // Tuist infers the "Embed Foundation Extensions" build phase and PlugIns/ placement
+        // purely from this dependency's product type (.appExtension) — no other manifest
+        // mechanism needed. `condition: .when([.ios])` excludes it from the Mac Catalyst build
+        // entirely — without this, Xcode still tries to build/embed the iPad-only extension
+        // target for the Catalyst destination too (a dependency has no destinations of its own to
+        // consult), which fails signing since AUv3Extension's own settings never needed a
+        // DEVELOPMENT_TEAM for a target that was only ever meant to build for iOS/iPadOS.
+        .target(name: "AUv3Extension", condition: .when([.ios])),
     ],
     settings: .settings(base: [
         "CODE_SIGN_ENTITLEMENTS": "App/Resources/SortSymphony.entitlements",
@@ -216,6 +233,52 @@ let app = Target.target(
     ])
 )
 
+// The first App Extension target in this project (AUDIO_UNIT_PLAN.md Phase 3) — iPadOS-only
+// (`.iPad`, not `Module.destinations`, which also includes `.macCatalyst`): macOS AUv3 packaging
+// is separate, undetermined Phase 4 work (see the plan's §7 "test in this order" list). Its own
+// Sources are just the thin AUAudioUnitFactory-conforming principal class; the real AUAudioUnit
+// implementation lives in SortAudioUnitKit, which this target links like any other dependency.
+let auv3Extension = Module.appExtension(
+    name: "AUv3Extension",
+    destinations: [.iPad],
+    dependencies: [.target(name: "SortAudioUnitKit")],
+    infoPlist: .extendingDefault(with: [
+        // Must match the containing app's CFBundleVersion/CFBundleShortVersionString exactly, or
+        // the app fails ValidateEmbeddedBinary ("CFBundleVersion of an app extension must match
+        // that of its containing parent app") — sourced from the same MARKETING_VERSION/
+        // CURRENT_PROJECT_VERSION build settings the app target uses, via `extraSettings` below.
+        "CFBundleShortVersionString": "$(MARKETING_VERSION)",
+        "CFBundleVersion": "$(CURRENT_PROJECT_VERSION)",
+        // Required non-empty (caught by a real `simctl install` failure, not just a clean
+        // compile) — an app extension's own Info.plist needs this even though it has no UI of
+        // its own to display a name for.
+        "CFBundleDisplayName": "Sort Symphony AUv3",
+        "NSExtension": [
+            "NSExtensionPointIdentifier": "com.apple.AudioUnit-UI",
+            "NSExtensionPrincipalClass": "$(PRODUCT_MODULE_NAME).SortAudioUnitFactory",
+            "NSExtensionAttributes": [
+                "AudioComponents": [
+                    [
+                        "type": "aumu",
+                        "subtype": "SrtS",
+                        "manufacturer": "NkHb",
+                        "name": "Nick Hubbard: Sort Symphony",
+                        "description": "Generates tones from a running sort algorithm.",
+                        "version": 1,
+                        "sandboxSafe": true,
+                        "tags": ["Generator"],
+                    ]
+                ]
+            ],
+        ]
+    ]),
+    entitlements: .file(path: "App/AUv3Extension/Resources/AUv3Extension.entitlements"),
+    extraSettings: [
+        "MARKETING_VERSION": "2.0.0",
+        "CURRENT_PROJECT_VERSION": "35",
+    ]
+)
+
 let appUITests = Target.target(
     name: "Sort SymphonyUITests",
     destinations: Module.destinations,
@@ -233,5 +296,5 @@ let project = Project(
     // Xcode doesn't gather coverage by default (it's a real build-time cost) -- opt in explicitly
     // so `tuist test` produces a .xcresult with coverage data we can inspect via `xcrun xccov`.
     options: .options(automaticSchemesOptions: .enabled(codeCoverageEnabled: true)),
-    targets: modules + [app, appUITests]
+    targets: modules + [app, appUITests, auv3Extension]
 )
