@@ -83,3 +83,21 @@ button in `RunControlBar`, an Import Tape toolbar button routed through `SortCoo
    treating it as its own separate planning pass (prove the vocabulary on a handful of
    representative algorithms before rolling out to all 82) rather than folding it into a general
    "implement stretch goals" pass.
+4. **MIDI-output Audio Unit** — Large. A second AUv3 extension target
+   (`kAudioUnitType_MIDIProcessor`/`aumi`) alongside the existing audio-generating one
+   (`App/AUv3Extension/`, `Modules/SortAudioUnitKit/` — see `AUDIO_UNIT_PLAN.md`) — genuinely
+   parallel work, not an extension of it: its own principal class/registration, and a render path
+   emitting `MIDIEventList`s instead of audio samples. The payoff is real — it routes the same
+   sort-to-tone semantics (`SortAudioCore`) into *any* synth plugin a host has loaded, not just this
+   app's own built-in oscillator+envelope, which is a genuinely different value proposition than the
+   audio-bridge AU (more sonic variety via other people's instruments, vs. hearing this app's own
+   voice inside a DAW's effects chain). Would need its own note-mapping layer, comparable to but
+   distinct from `SortAudioBridgeKit`'s existing audio-event wire format — ideally sharing whichever
+   value-to-pitch logic (e.g. scale quantization) the richer-local-synthesis work below lands on,
+   rather than being designed in isolation. Supersedes an earlier, smaller-scoped idea noted in
+   `ARCHITECTURE_V2.md` (a plain CoreMIDI virtual-source output, itself a rescoped-down version of a
+   full customizable-synth-playground pitch) — now that real AU-hosting infrastructure exists, an
+   AU-hosted MIDI generator is arguably the more natural fit than a bare system-wide virtual MIDI
+   port would have been. Not scheduled; best picked up after the local-synthesis richness work
+   (scale quantization, stereo panning, compare/swap timbral differentiation) has shipped, since that
+   work will settle the pitch-mapping vocabulary this would want to reuse.

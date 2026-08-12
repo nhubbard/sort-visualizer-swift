@@ -28,9 +28,13 @@ public struct ToneMapper: Sendable {
     return commands
   }
 
-  /// Pure value→pitch mapping — moved verbatim from `AudioService.frequency(forValue:in:
-  /// noteRange:)`. Linearly maps `value`'s position in `range` onto `noteRange` (MIDI note
-  /// numbers), then converts to Hz via the standard equal-tempered formula.
+  /// Pure value→pitch mapping — originally moved verbatim from `AudioService.frequency(forValue:
+  /// in:noteRange:)`, since extended with scale quantization. Linearly maps `value`'s position in
+  /// `range` onto `noteRange` (MIDI note numbers), snaps that to the nearest pentatonic-minor scale
+  /// degree (relative to `noteRange.lowerBound` as the root), then converts to Hz via the standard
+  /// equal-tempered formula. Quantizing is what turns "any value in range maps to some frequency"
+  /// into "sounds like music" — a raw continuous sweep across essentially-arbitrary sort values
+  /// produces essentially-arbitrary intervals.
   public static func frequency(
     forValue value: Int, in range: ClosedRange<Int>, noteRange: ClosedRange<Int>
   ) -> Float {
@@ -38,6 +42,30 @@ public struct ToneMapper: Sendable {
     let ratio: Float = span > 0 ? Float(value - range.lowerBound) / Float(span) : 0.5
     let note =
       Float(noteRange.lowerBound) + ratio * Float(noteRange.upperBound - noteRange.lowerBound)
-    return 440.0 * pow(2.0, (note - 69.0) / 12.0)
+    let quantizedNote = quantized(note, root: noteRange.lowerBound)
+    return 440.0 * pow(2.0, (quantizedNote - 69.0) / 12.0)
+  }
+
+  /// Pentatonic minor, as semitone offsets from whatever root a caller supplies — the classic
+  /// choice for algorithmically-generated pitch sequences: every degree sounds consonant against
+  /// every other, so there's no "wrong note" an arbitrary sequence of sort values could land on.
+  /// Deliberately hardcoded rather than a user-facing setting for now — `SettingsKit` can't depend
+  /// on this module today (no `SortAudioCore`/`ToneKitDSP` edge in `Project.swift`), and a single
+  /// well-chosen default already fixes the "sounds random" problem this exists to solve.
+  private static let scaleSemitones = [0, 3, 5, 7, 10]
+
+  /// Snaps a continuous MIDI note number to the nearest `scaleSemitones` degree in whichever
+  /// octave it already falls in, relative to `root`. Known simplification: the nearest-degree
+  /// search doesn't look across the octave boundary, so a note very close to the top of its octave
+  /// might not be the *globally* nearest scale degree (the equivalent degree one octave up could be
+  /// closer) — cosmetic, not a correctness issue, and not worth the extra complexity here.
+  private static func quantized(_ note: Float, root: Int) -> Float {
+    let offset = note - Float(root)
+    let octave = (offset / 12).rounded(.down)
+    let semitoneInOctave = offset - octave * 12
+    let nearestDegree = scaleSemitones.min {
+      abs(Float($0) - semitoneInOctave) < abs(Float($1) - semitoneInOctave)
+    }!
+    return Float(root) + octave * 12 + Float(nearestDegree)
   }
 }

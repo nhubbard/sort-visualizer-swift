@@ -6,12 +6,17 @@ import ToneKitDSP
 
 @Suite
 struct ToneMapperTests {
+  /// Expected notes are the *quantized* result, not the raw linear interpolation — value 50 in
+  /// `0...100` onto `36...96` linearly lands on MIDI note 66, but 66 sits exactly between the
+  /// pentatonic-minor scale's 5th and 7th degrees above root 36 (65 and 67), a tie `quantized(_:
+  /// root:)` breaks toward whichever degree appears first in its table (5, giving note 65) — see
+  /// that function's own doc comment on this known, accepted simplification.
   @Test(arguments: [
     (value: 1, range: 1...100, noteRange: 36...72, expectedNote: 36),
     (value: 100, range: 1...100, noteRange: 36...72, expectedNote: 72),
-    (value: 50, range: 0...100, noteRange: 36...96, expectedNote: 66)
+    (value: 50, range: 0...100, noteRange: 36...96, expectedNote: 65)
   ])
-  func frequencyMapsValueLinearlyOntoNoteRangeThenConvertsToHz(
+  func frequencyMapsValueOntoNoteRangeThenQuantizesToScaleThenConvertsToHz(
     value: Int,
     range: ClosedRange<Int>,
     noteRange: ClosedRange<Int>,
@@ -26,6 +31,27 @@ struct ToneMapperTests {
   func frequencyDoesNotCrashOnADegenerateSingleValueRange() {
     let frequency = ToneMapper.frequency(forValue: 5, in: 5...5, noteRange: 36...72)
     #expect(frequency > 0)
+  }
+
+  /// Confirms the actual point of quantization: across a wide sweep of arbitrary values, every
+  /// resulting pitch lands on a pentatonic-minor degree relative to the note range's root — never
+  /// an "in-between" note the old continuous mapping could produce.
+  @Test
+  func frequencyOnlyEverProducesPentatonicMinorScaleDegrees() {
+    let noteRange = 36...96
+    let root = Float(noteRange.lowerBound)
+    let scaleSemitones: Set<Int> = [0, 3, 5, 7, 10]
+
+    for value in 0...200 {
+      let frequency = ToneMapper.frequency(forValue: value, in: 0...200, noteRange: noteRange)
+      let note = 69.0 + 12.0 * log2(Double(frequency) / 440.0)
+      let semitoneFromRoot = Int((Float(note) - root).rounded())
+      let semitoneInOctave = ((semitoneFromRoot % 12) + 12) % 12
+      #expect(
+        scaleSemitones.contains(semitoneInOctave),
+        "value \(value) produced a note \(semitoneInOctave) semitones into its octave, not on the pentatonic minor scale \(scaleSemitones)"
+      )
+    }
   }
 
   @Test
