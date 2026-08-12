@@ -389,6 +389,40 @@ struct NativeAlgorithmCorrectnessTests {
     }
   }
 
+  /// Same class of bug as `classicTreeSortDoesNotStackOverflowOnAdversarialLargeInput`, found in
+  /// `TreeSort`'s identically-named `traverse` function (plus a second, independent instance in
+  /// its `add` insertion function — sorted/reverse-sorted input walks the entire existing chain on
+  /// every insertion, so the last insertion recursed to depth `n - 1` before the fix). Both were
+  /// converted to iterative walks over an explicit stack.
+  @Test
+  func treeSortDoesNotStackOverflowOnAdversarialLargeInput() {
+    let algorithm = TreeSort()
+    for input in [Array(0..<8192), Array((0..<8192).reversed())] {
+      var engine = RecordingEngine(values: input)
+      algorithm.record(into: &engine)
+      #expect(
+        engine.values == input.sorted(),
+        "TreeSort failed to sort adversarial input of size \(input.count)")
+    }
+  }
+
+  /// Same class of bug, found in `SplaySort`'s identically-named `traverse` function. Splaying
+  /// doesn't protect against this for monotonic insertion order: `splay` hits its early-return on
+  /// every insertion (the relevant child is always `nil`), so the tree never actually gets
+  /// rotated and grows as a plain linear chain exactly like an unbalanced BST would — sorted input
+  /// is a worst case for this insertion algorithm, not a best case.
+  @Test
+  func splaySortDoesNotStackOverflowOnAdversarialLargeInput() {
+    let algorithm = SplaySort()
+    for input in [Array(0..<8192), Array((0..<8192).reversed())] {
+      var engine = RecordingEngine(values: input)
+      algorithm.record(into: &engine)
+      #expect(
+        engine.values == input.sorted(),
+        "SplaySort failed to sort adversarial input of size \(input.count)")
+    }
+  }
+
   /// Confirms `TriangularHeapSort`'s instability empirically: like `MaxHeapSort`, swap-based
   /// heap construction/extraction can relocate one equal element past another with no recovery.
   @Test

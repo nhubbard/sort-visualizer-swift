@@ -112,13 +112,47 @@ public struct SplaySort: SortAlgorithm {
     }
 
     var index = 0
-    func traverse(_ node: Node?) {
-      guard let node else { return }
-      traverse(node.left)
-      engine.setValue(index, node.key)
-      index += 1
-      traverse(node.right)
+    // Iterative in-order walk over an explicit `[Node]` stack rather than call-stack recursion.
+    // Splaying only pays off across a *mixed* access pattern — for monotonically increasing or
+    // decreasing input, `splay` hits its early-return on every insertion (the tree's far child on
+    // the relevant side is always `nil`) and the tree never actually gets rotated, so it grows as
+    // a plain linear chain exactly like an unbalanced BST would. That makes sorted input a worst
+    // case here, not a best case, and a recursive traversal over it the same `O(n)`-depth
+    // `EXC_BAD_ACCESS` risk `ClassicTreeSort`'s identically-shaped traversal actually hit at size
+    // 8192. An explicit stack has the same `O(depth)` space cost, but as an ordinary
+    // heap-allocated Swift `Array` that grows instead of overflowing.
+    func traverse(_ root: Node?) {
+      var stack: [Node] = []
+      var current = root
+      while current != nil || !stack.isEmpty {
+        while let node = current {
+          stack.append(node)
+          current = node.left
+        }
+        let node = stack.removeLast()
+        engine.setValue(index, node.key)
+        index += 1
+        current = node.right
+      }
     }
     traverse(root)
+
+    // Manually detach every node from its children before `root` goes out of scope. Swift's
+    // compiler-synthesized `Node.deinit` recursively releases `left`/`right`, so deallocating a
+    // long linear chain (the same degenerate shape `traverse`'s own doc comment above describes)
+    // would cascade through `n` nested `deinit` calls and overflow the stack — a second,
+    // independent recursion-depth bug from `traverse`'s, since it happens during deallocation
+    // rather than while the tree is actually being used.
+    func detachAll(_ root: Node?) {
+      var stack: [Node] = []
+      if let root { stack.append(root) }
+      while let node = stack.popLast() {
+        if let left = node.left { stack.append(left) }
+        if let right = node.right { stack.append(right) }
+        node.left = nil
+        node.right = nil
+      }
+    }
+    detachAll(root)
   }
 }
