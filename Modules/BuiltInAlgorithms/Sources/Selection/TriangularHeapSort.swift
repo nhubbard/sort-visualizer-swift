@@ -38,60 +38,11 @@ public struct TriangularHeapSort: SortAlgorithm {
     let n = engine.count
     guard n > 1 else { return }
 
-    // The largest row index `r` such that the triangular number `T(r) = r*(r+1)/2` is `<=
-    // val` — the inverse of `T`, telling us which row of the implicit triangular tree a flat
-    // array index falls in. Ports ArrayV's `triangularRoot(val)`:
-    // `((int) Math.sqrt(8 * val + 1) - 1) / 2`. `val` stays well within `Double`'s exact-
-    // integer range for every size this codebase allows (max array size 256, so `8 * val + 1`
-    // never exceeds a few thousand), so the `Double` round-trip through `squareRoot()` never
-    // loses precision the way it might for astronomically large inputs.
-    func triangularRoot(_ val: Int) -> Int {
-      let integerSqrt = Int(Double(8 * val + 1).squareRoot())
-      return (integerSqrt - 1) / 2
-    }
-
-    // Same nested-loop shape as `MaxHeapSort.swift`'s `siftDown`, with the two DISJOINT
-    // binary-heap children (`2*root+1`/`2*root+2`) replaced by this variant's triangular
-    // children (`root + row + 1`/`root + row + 2`, where `row = triangularRoot(root)`).
-    func siftDown(_ root: Int, _ size: Int) {
-      var root = root
-      while true {
-        let row = triangularRoot(root)
-        let left = root + row + 1
-        if left >= size { break }
-        let right = left + 1
-        var largest = root
-        if !engine.compare(largest, left) {
-          largest = left
-        }
-        if right < size && !engine.compare(largest, right) {
-          largest = right
-        }
-        if largest == root { break }
-        engine.swap(root, largest)
-        root = largest
-      }
-    }
-
-    // Ports `triangularHeapify` — every index from `length - 1` down to `0`, unlike
-    // `MaxHeapSort`'s leaf-skipping `n / 2 - 1` starting point: the triangular leaf boundary
-    // isn't a single fixed fraction of `n` the way a binary heap's is, and ArrayV's own source
-    // doesn't bother computing it either, so a `siftDown` call on an already-leaf index is a
-    // harmless one-comparison-free no-op (`left >= size` breaks immediately) rather than an
-    // optimization worth reproducing here.
-    func triangularHeapify(_ length: Int) {
-      var i = length - 1
-      while i >= 0 {
-        siftDown(i, length)
-        i -= 1
-      }
-    }
-
-    triangularHeapify(n)
+    triangularHeapify(&engine, n)
     var i = 1
     while i < n - 1 {
       engine.swap(0, n - i)
-      siftDown(0, n - i)
+      siftDown(&engine, 0, n - i)
       i += 1
     }
     // The explicit tidy-up `MaxHeapSort` doesn't need — see the doc comment above. ArrayV
@@ -99,6 +50,64 @@ public struct TriangularHeapSort: SortAlgorithm {
     // directly rather than calling `engine.compare`.
     if engine.values[0] > engine.values[1] {
       engine.swap(0, 1)
+    }
+  }
+
+  /// Just the build-heap sweep, stopping short of `record`'s extraction phase — the entry point
+  /// `Shuffles.TRI_HEAP` calls directly (`triangularHeapify`), matching `SmoothSort.smoothHeapify`/
+  /// `PoplarHeapSort.poplarHeapify`'s own dedicated-entry-point shape.
+  public func triangularHeapify(into engine: inout RecordingEngine) {
+    let n = engine.count
+    guard n > 1 else { return }
+    triangularHeapify(&engine, n)
+  }
+
+  // The largest row index `r` such that the triangular number `T(r) = r*(r+1)/2` is `<=
+  // val` — the inverse of `T`, telling us which row of the implicit triangular tree a flat
+  // array index falls in. Ports ArrayV's `triangularRoot(val)`:
+  // `((int) Math.sqrt(8 * val + 1) - 1) / 2`. `val` stays well within `Double`'s exact-
+  // integer range for every size this codebase allows (max array size 256, so `8 * val + 1`
+  // never exceeds a few thousand), so the `Double` round-trip through `squareRoot()` never
+  // loses precision the way it might for astronomically large inputs.
+  private func triangularRoot(_ val: Int) -> Int {
+    let integerSqrt = Int(Double(8 * val + 1).squareRoot())
+    return (integerSqrt - 1) / 2
+  }
+
+  // Same nested-loop shape as `MaxHeapSort.swift`'s `siftDown`, with the two DISJOINT
+  // binary-heap children (`2*root+1`/`2*root+2`) replaced by this variant's triangular
+  // children (`root + row + 1`/`root + row + 2`, where `row = triangularRoot(root)`).
+  private func siftDown(_ engine: inout RecordingEngine, _ rootIn: Int, _ size: Int) {
+    var root = rootIn
+    while true {
+      let row = triangularRoot(root)
+      let left = root + row + 1
+      if left >= size { break }
+      let right = left + 1
+      var largest = root
+      if !engine.compare(largest, left) {
+        largest = left
+      }
+      if right < size && !engine.compare(largest, right) {
+        largest = right
+      }
+      if largest == root { break }
+      engine.swap(root, largest)
+      root = largest
+    }
+  }
+
+  // Ports `triangularHeapify` — every index from `length - 1` down to `0`, unlike
+  // `MaxHeapSort`'s leaf-skipping `n / 2 - 1` starting point: the triangular leaf boundary
+  // isn't a single fixed fraction of `n` the way a binary heap's is, and ArrayV's own source
+  // doesn't bother computing it either, so a `siftDown` call on an already-leaf index is a
+  // harmless one-comparison-free no-op (`left >= size` breaks immediately) rather than an
+  // optimization worth reproducing here.
+  private func triangularHeapify(_ engine: inout RecordingEngine, _ length: Int) {
+    var i = length - 1
+    while i >= 0 {
+      siftDown(&engine, i, length)
+      i -= 1
     }
   }
 }

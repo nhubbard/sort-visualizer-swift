@@ -81,16 +81,20 @@ enum AllBuiltInAlgorithms {
   ]
 
   static let shuffles: [any ShuffleAlgorithm] = [
-    AlmostShuffle(), AscendingShuffle(), BlockRandomShuffle(), BSTTraversalShuffle(),
+    AlmostShuffle(), AscendingShuffle(), BitReversalShuffle(), BlockRandomShuffle(),
+    BlockReverseShuffle(), BSTTraversalShuffle(),
     CircleShuffle(),
     DescendingShuffle(), DoubleLayeredShuffle(), FinalBitonicShuffle(), FinalMergeShuffle(),
-    FinalRadixShuffle(), GrayCodeShuffle(), HalfRotationShuffle(), HeapifiedShuffle(),
+    FinalRadixShuffle(), GrailsortAdversaryShuffle(), GrayCodeShuffle(), HalfRotationShuffle(),
+    HeapifiedShuffle(),
     InterlacedShuffle(), InvertedBSTShuffle(), LogarithmicSlopesShuffle(), MovedElementShuffle(),
     NaiveShuffle(), NoisyShuffle(), OrganShuffle(), PairwiseShuffle(), PartialReverseShuffle(),
-    PartitionedShuffle(), QuicksortAdversaryShuffle(), RandomShuffle(), RealFinalMergeShuffle(),
+    PartitionedShuffle(), PDQAdversaryShuffle(), PoplarifiedShuffle(),
+    QuicksortAdversaryShuffle(), RandomShuffle(), RealFinalMergeShuffle(),
     RealFinalRadixShuffle(), RecursiveRadixShuffle(), RecursiveReversalShuffle(),
-    SawtoothShuffle(),
+    SawtoothShuffle(), ShuffleMergeAdversaryShuffle(),
     ShuffledCubicShuffle(), ShuffledHalfShuffle(), ShuffledHeadShuffle(), ShuffledOddsShuffle(),
-    ShuffledQuinticShuffle(), ShuffledTailShuffle(), SierpinskiShuffle(), TriangularShuffle()
+    ShuffledQuinticShuffle(), ShuffledTailShuffle(), SierpinskiShuffle(), SmoothifiedShuffle(),
+    TriangularHeapifiedShuffle(), TriangularShuffle()
   ]
 }

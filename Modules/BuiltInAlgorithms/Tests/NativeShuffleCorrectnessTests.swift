@@ -10,16 +10,21 @@ import Testing
 @Suite
 struct NativeShuffleCorrectnessTests {
   private static let shuffles: [any ShuffleAlgorithm] = [
-    AlmostShuffle(), AscendingShuffle(), BlockRandomShuffle(), BSTTraversalShuffle(),
+    AlmostShuffle(), AscendingShuffle(), BitReversalShuffle(), BlockRandomShuffle(),
+    BlockReverseShuffle(), BSTTraversalShuffle(),
     CircleShuffle(),
     DescendingShuffle(), DoubleLayeredShuffle(), FinalBitonicShuffle(), FinalMergeShuffle(),
-    FinalRadixShuffle(), GrayCodeShuffle(), HalfRotationShuffle(), HeapifiedShuffle(),
+    FinalRadixShuffle(), GrailsortAdversaryShuffle(), GrayCodeShuffle(), HalfRotationShuffle(),
+    HeapifiedShuffle(),
     InterlacedShuffle(), InvertedBSTShuffle(), LogarithmicSlopesShuffle(), MovedElementShuffle(),
     NaiveShuffle(), NoisyShuffle(), OrganShuffle(), PairwiseShuffle(), PartialReverseShuffle(),
-    PartitionedShuffle(), QuicksortAdversaryShuffle(), RandomShuffle(), RealFinalMergeShuffle(),
+    PartitionedShuffle(), PDQAdversaryShuffle(), PoplarifiedShuffle(),
+    QuicksortAdversaryShuffle(), RandomShuffle(), RealFinalMergeShuffle(),
     RealFinalRadixShuffle(), RecursiveRadixShuffle(), RecursiveReversalShuffle(), SawtoothShuffle(),
+    ShuffleMergeAdversaryShuffle(),
     ShuffledCubicShuffle(), ShuffledHalfShuffle(), ShuffledHeadShuffle(), ShuffledOddsShuffle(),
-    ShuffledQuinticShuffle(), ShuffledTailShuffle(), SierpinskiShuffle(), TriangularShuffle()
+    ShuffledQuinticShuffle(), ShuffledTailShuffle(), SierpinskiShuffle(), SmoothifiedShuffle(),
+    TriangularHeapifiedShuffle(), TriangularShuffle()
   ]
 
   /// Unlike the curve shuffles (`ShuffledCubicShuffle`/`ShuffledQuinticShuffle`), these shuffles
@@ -31,16 +36,21 @@ struct NativeShuffleCorrectnessTests {
   /// 1), producing duplicate values and dropping others — a real property of the formula itself,
   /// not an artifact of this app's 1-indexed values.
   private static let permutingShuffles: [any ShuffleAlgorithm] = [
-    AlmostShuffle(), BlockRandomShuffle(), BSTTraversalShuffle(), CircleShuffle(),
+    AlmostShuffle(), BitReversalShuffle(), BlockRandomShuffle(), BlockReverseShuffle(),
+    BSTTraversalShuffle(), CircleShuffle(),
     DoubleLayeredShuffle(),
-    FinalBitonicShuffle(), FinalMergeShuffle(), FinalRadixShuffle(), GrayCodeShuffle(),
+    FinalBitonicShuffle(), FinalMergeShuffle(), FinalRadixShuffle(), GrailsortAdversaryShuffle(),
+    GrayCodeShuffle(),
     HalfRotationShuffle(), HeapifiedShuffle(), InterlacedShuffle(), InvertedBSTShuffle(),
     MovedElementShuffle(), NaiveShuffle(), NoisyShuffle(), OrganShuffle(),
-    PairwiseShuffle(), PartialReverseShuffle(), PartitionedShuffle(), QuicksortAdversaryShuffle(),
+    PairwiseShuffle(), PartialReverseShuffle(), PartitionedShuffle(), PDQAdversaryShuffle(),
+    PoplarifiedShuffle(), QuicksortAdversaryShuffle(),
     RealFinalMergeShuffle(), RealFinalRadixShuffle(), RecursiveRadixShuffle(),
     RecursiveReversalShuffle(),
-    SawtoothShuffle(), ShuffledHalfShuffle(), ShuffledHeadShuffle(), ShuffledOddsShuffle(),
-    ShuffledTailShuffle(), SierpinskiShuffle(), TriangularShuffle()
+    SawtoothShuffle(), ShuffleMergeAdversaryShuffle(), ShuffledHalfShuffle(), ShuffledHeadShuffle(),
+    ShuffledOddsShuffle(),
+    ShuffledTailShuffle(), SierpinskiShuffle(), SmoothifiedShuffle(),
+    TriangularHeapifiedShuffle(), TriangularShuffle()
   ]
 
   @Test

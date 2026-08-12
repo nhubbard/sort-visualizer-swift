@@ -170,46 +170,15 @@ doesn't map 1:1 onto ArrayV's list — noted inline where there's a rough equiva
 
 ### a. Completed
 
-Move shuffles here when you finish them.
-
-### b. Not Started
-
-Every shuffle lives as one enum constant's method body inside ArrayV's single 1,484-line
-`Shuffles.java`, not a separate file — "effective lines" below is that one method's own body
-(`~/ArrayV`'s `utils/Shuffles.java`), since there's no shared shuffle template to inherit
-complexity from. Shuffles compress into a much narrower range than sorts do: nearly all of them are
-Trivial by the same thresholds §1 uses, so within that tier they're listed in ascending order rather
-than subdivided further.
+All 45 shuffles have been ported.
 
 `HEAPIFIED`/`SMOOTH`/`POPLAR`/`TRI_HEAP` each call directly into a sort's own heapify step
 (`MaxHeapSort.makeHeap`/`SmoothSort.smoothHeapify`/`PoplarHeapSort.poplarHeapify`/
-`TriangularHeapSort.triangularHeapify`) rather than reimplementing it — `HEAPIFIED` shipped by reusing
-`MaxHeapSort`'s own heapify step directly. `SMOOTH`/`POPLAR`/`TRI_HEAP` are all now unblocked —
-`SmoothSort`/`PoplarHeapSort`/`TriangularHeapSort` have all shipped (§1c is fully ported) — but each
-still needs its own shuffle port, duplicating the same sort's own heapify logic inline the way
-`HeapifiedShuffle.swift` duplicates `MaxHeapSort`'s (see that sort's own doc comment). Porting the
-shuffles themselves is separate, not-yet-scoped work — being unblocked isn't the same as being done.
+`TriangularHeapSort.triangularHeapify`) rather than reimplementing it — the latter three needed a
+small refactor of their host sort (extracting a dedicated public heapify-only entry point) before
+their shuffle could call it directly, the same shape `SmoothSort`/`PoplarHeapSort` already had.
 
 `QSORT_BAD`/`PDQ_BAD`/`GRAIL_BAD`/`SHUF_MERGE_BAD` sound like they'd need their namesake sort
 already ported (to reverse-engineer its worst case), but don't — each embeds its own self-contained
-adversarial-input construction, independent of whether `LLQuickSort`(shipped)/`PDQBranchedSort`/
-`GrailSort`/`NewShuffleMergeSort` exist as Swift code. `QSORT_BAD` shipped this batch; `PDQ_BAD`/
-`GRAIL_BAD`/`SHUF_MERGE_BAD` remain (Easy/Hard tier, out of this batch's Trivial-only scope).
-
-#### Trivial
-
-- [ ] SMOOTH ("Smoothified") — 12 lines, no longer blocked — see note above
-- [ ] POPLAR ("Poplarified") — 12 lines, no longer blocked — see note above
-- [ ] TRI_HEAP ("Triangular Heapified") — 19 lines, no longer blocked — see note above
-
-#### Easy
-
-- [ ] BIT_REVERSE ("Bit Reversal") — 53 lines
-- [ ] GRAIL_BAD ("Grailsort Adversary") — 55 lines — see adversary note above
-- [ ] SHUF_MERGE_BAD ("Shuffle Merge Adversary") — 63 lines — see adversary note above
-- [ ] BLOCK_REVERSE ("Block Reverse") — 68 lines
-
-#### Hard
-
-- [ ] PDQ_BAD ("PDQ Adversary") — 345 lines, embeds most of pdqsort's own logic — see adversary
-      note above
+adversarial-input construction, independent of whether `LLQuickSort`/`PDQBranchedSort`/`GrailSort`/
+`NewShuffleMergeSort` exist as Swift code.
