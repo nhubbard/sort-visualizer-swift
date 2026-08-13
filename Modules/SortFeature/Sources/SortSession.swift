@@ -235,6 +235,7 @@ public final class SortSession {
       await playbackTask.value
       guard let self, let replay, replay.stepIndex >= replay.totalOperationCount else { return }
       self.phase = .complete(replay)
+      Self.exportTapeForAuditIfRequested(replay.tape)
       // Read here, at the exact moment genuine completion is observed — not later, and not
       // cached from an earlier tick — so this reflects the real elapsed wall-clock up to
       // this instant regardless of anything else that might read `elapsedPlaybackDuration`
@@ -261,6 +262,22 @@ public final class SortSession {
       let continuations = self.completionContinuations
       self.completionContinuations = []
       for continuation in continuations { continuation.resume() }
+    }
+  }
+
+  /// Debug-only, zero-cost-by-default: if `SORT_TAPE_EXPORT_DIR` is set, writes this run's tape
+  /// archive there for offline analysis (`Tools/SoundCoverageAudit`) — never enabled in normal
+  /// use, so the one environment lookup is the only cost paid when it's unset. Every run (manual,
+  /// keyboard Automation, or Showcase) passes through here, so a Showcase pass with this set
+  /// dumps one `.tape` file per algorithm.
+  private static func exportTapeForAuditIfRequested(_ tape: Tape) {
+    guard let dir = ProcessInfo.processInfo.environment["SORT_TAPE_EXPORT_DIR"] else { return }
+    do {
+      let data = try tape.archived()
+      let url = URL(fileURLWithPath: dir).appendingPathComponent("\(tape.header.algorithmID).tape")
+      try data.write(to: url)
+    } catch {
+      // Best-effort diagnostic only — must never affect real playback.
     }
   }
 

@@ -27,4 +27,17 @@ public enum SortOperation: Sendable, Codable, Equatable {
   /// `Writes.reversals` — a reversal is one *operation* built from many swaps, not its own kind
   /// of element move.
   case reversal
+
+  /// Whether `SortFeature.SortSession.makeOnStepClosure` would play a note for this operation —
+  /// `.compare`/`.swap`/`.setValue` only, matching that closure's switch exactly. The single
+  /// source of truth both the real playback path and any sound-coverage auditing tooling derive
+  /// "is this operation audible" from, so the two can never drift apart.
+  public var isAudible: Bool {
+    switch self {
+    case .compare, .swap, .setValue: true
+    case .mark, .unmark, .unmarkAll, .unmarkIndex, .markSorted, .auxCreate, .auxWrite, .auxDelete,
+      .reversal:
+      false
+    }
+  }
 }
