@@ -51,8 +51,16 @@ public struct EnvelopeDSP: Sendable {
   /// A multiplicative gain layer, deliberately separate from the AU-hosted remote's user-facing
   /// Gain slider (`AUDIO_UNIT_PLAN.md` §7) — `SortAudioCore.ToneMapper` drives this per-operation
   /// (louder for swaps, softer for compares/value-writes) without ever fighting a performer's own
-  /// manual dial-in, since the two multiply together instead of one clobbering the other.
+  /// manual dial-in, since the two multiply together instead of one clobbering the other. This is
+  /// the *target* `applyGain` ramps `appliedAccent` toward, not applied directly — see that
+  /// property's doc comment.
   public var accent: Float = 1.0
+  /// The accent value actually multiplied into samples, linearly ramped toward `accent` across
+  /// each `applyGain` call rather than snapping to it instantly. `accent` changes on nearly every
+  /// note (`SortAudioCore.ToneMapper` sets it per operation), so applying it as a flat per-buffer
+  /// scalar was a real, reported source of audible clicking — the same class of bug
+  /// `OscillatorDSP`'s ramped pan/amplitude scale fixes, for the same reason.
+  private var appliedAccent: Float = 1.0
 
   public init(
     attackDuration: Float = 0.1,
@@ -66,6 +74,7 @@ public struct EnvelopeDSP: Sendable {
     self.sustainLevel = sustainLevel
     self.releaseDuration = releaseDuration
     self.accent = accent
+    self.appliedAccent = accent
   }
 
   /// A redundant `openGate()` while already open (the common case: the same pitch replaying
@@ -95,6 +104,10 @@ public struct EnvelopeDSP: Sendable {
     sampleRate: Double
   ) {
     let count = min(left.count, right.count)
+    // Ramps `appliedAccent` toward `accent` linearly across this buffer — when they're already
+    // equal (the common case: `accent` didn't change since the last buffer), `step` is 0 and this
+    // degenerates to the flat multiply it always was.
+    let step = count > 1 ? (accent - appliedAccent) / Float(count - 1) : 0
     for index in 0..<count {
       gain = Self.nextGain(
         currentGain: gain,
@@ -105,10 +118,12 @@ public struct EnvelopeDSP: Sendable {
         releaseDuration: releaseDuration,
         sampleRate: sampleRate
       )
-      let scaled = gain * accent
+      let scaled = gain * appliedAccent
       left[index] *= scaled
       right[index] *= scaled
+      appliedAccent += step
     }
+    appliedAccent = accent
   }
 
   /// One-pole exponential filter chasing whichever level the current phase targets — the same

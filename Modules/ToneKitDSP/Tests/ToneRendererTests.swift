@@ -115,6 +115,22 @@ struct ToneRendererTests {
     halved.enqueue(.openGate)
     halved.enqueue(.setAmplitude(0.5))
 
+    // Warm-up call lets halved's amplitude-change ramp (declicking — see `applyRampedScale`)
+    // finish settling to its new target before the buffer under test, so the peak comparison
+    // below sees the steady state rather than a transition still descending from full amplitude.
+    var warmupFull = [Float](repeating: 0, count: 512)
+    var warmupFullRight = [Float](repeating: 0, count: 512)
+    var warmupHalved = [Float](repeating: 0, count: 512)
+    var warmupHalvedRight = [Float](repeating: 0, count: 512)
+    warmupFull.withUnsafeMutableBufferPointer { l in
+      warmupFullRight.withUnsafeMutableBufferPointer { r in full.render(left: l, right: r, sampleRate: 44100) }
+    }
+    warmupHalved.withUnsafeMutableBufferPointer { l in
+      warmupHalvedRight.withUnsafeMutableBufferPointer { r in
+        halved.render(left: l, right: r, sampleRate: 44100)
+      }
+    }
+
     var fullBuffer = [Float](repeating: 0, count: 512)
     var fullRight = [Float](repeating: 0, count: 512)
     var halvedBuffer = [Float](repeating: 0, count: 512)
@@ -307,6 +323,14 @@ struct ToneRendererTests {
     renderer.enqueue(.openGate)
     renderer.enqueue(.setPan(-1))
 
+    // Warm-up call lets the pan ramp (declicking) finish settling into hard-left before the
+    // buffer under test, so `allSatisfy` sees the steady state rather than the transition into it.
+    var warmup = [Float](repeating: -1, count: 256)
+    var warmupRight = [Float](repeating: -1, count: 256)
+    warmup.withUnsafeMutableBufferPointer { l in
+      warmupRight.withUnsafeMutableBufferPointer { r in renderer.render(left: l, right: r, sampleRate: 44100) }
+    }
+
     var left = [Float](repeating: -1, count: 256)
     var right = [Float](repeating: -1, count: 256)
     left.withUnsafeMutableBufferPointer { l in
@@ -325,6 +349,13 @@ struct ToneRendererTests {
     renderer.prepare(maxFrameCount: 256)
     renderer.enqueue(.openGate)
     renderer.enqueue(.setPan(1))
+
+    // See the hard-left test's comment above for why this warm-up call is here.
+    var warmup = [Float](repeating: -1, count: 256)
+    var warmupRight = [Float](repeating: -1, count: 256)
+    warmup.withUnsafeMutableBufferPointer { l in
+      warmupRight.withUnsafeMutableBufferPointer { r in renderer.render(left: l, right: r, sampleRate: 44100) }
+    }
 
     var left = [Float](repeating: -1, count: 256)
     var right = [Float](repeating: -1, count: 256)

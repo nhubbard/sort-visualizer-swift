@@ -49,6 +49,15 @@ public struct OscillatorDSP: Sendable {
   /// detuning) extends `fill` rather than requiring a redesign.
   public var pan: Float = 0
   private var phase: Double = 0
+  /// The per-channel `amplitude * equalPowerPanGains` scale actually applied at the *end* of the
+  /// most recent `fill` call — the ramp start point for the next one. Without this, a `pan`/
+  /// `amplitude` change lands as a flat scalar jump at whatever the buffer boundary happens to be,
+  /// which is an audible click if the waveform isn't near zero right there (confirmed: this was a
+  /// real, reported source of "low-frequency crackling" once `pan` started changing on nearly
+  /// every note). Ramping the scale itself, not `pan`, sidesteps `equalPowerPanGains`'s nonlinear
+  /// cos/sin entirely — a linear interpolation between two gain values is all that's needed.
+  private var previousLeftScale: Float
+  private var previousRightScale: Float
 
   // Preallocated once by `prepare(maxFrameCount:)` rather than lazily resized inside `fill` —
   // today's `ToneKit.Oscillator` resizes these on first use/whenever the buffer size changes,
@@ -57,9 +66,12 @@ public struct OscillatorDSP: Sendable {
   private var scratchPhases: [Double] = []
   private var scratchSines: [Double] = []
   /// The raw (unscaled, un-panned) waveform narrowed to `Float` exactly once per `fill` call, then
-  /// independently gain-scaled into `left`/`right` by two separate `vDSP_vsmul` calls — one shared
+  /// independently gain-scaled into `left`/`right` by two separate ramped multiplies — one shared
   /// waveform, two independent scalings, no shared mutable buffer between channels.
   private var scratchRawSamples: [Float] = []
+  /// Reused for both channels' gain ramps in turn within a single `fill` call — each use fully
+  /// completes (read by `vDSP_vmul`) before the next begins, so there's no aliasing between them.
+  private var scratchGainRamp: [Float] = []
 
   public init(
     frequency: Float = 440.0,
@@ -71,6 +83,9 @@ public struct OscillatorDSP: Sendable {
     self.amplitude = amplitude
     self.detuningOffset = detuningOffset
     self.detuningMultiplier = detuningMultiplier
+    let (leftGain, rightGain) = Self.equalPowerPanGains(pan: 0)
+    self.previousLeftScale = amplitude * leftGain
+    self.previousRightScale = amplitude * rightGain
   }
 
   /// Allocates render scratch storage up front, sized to the largest frame count `fill` will ever
@@ -81,6 +96,7 @@ public struct OscillatorDSP: Sendable {
     scratchPhases = [Double](repeating: 0, count: maxFrameCount)
     scratchSines = [Double](repeating: 0, count: maxFrameCount)
     scratchRawSamples = [Float](repeating: 0, count: maxFrameCount)
+    scratchGainRamp = [Float](repeating: 0, count: maxFrameCount)
   }
 
   /// One computation pass per render buffer (typically a few hundred frames), not per sample —
@@ -132,19 +148,47 @@ public struct OscillatorDSP: Sendable {
     }
 
     // One shared, unscaled waveform narrowed to Float once, then two independent equal-power
-    // gain scalings write directly into the caller's left/right buffers.
+    // gain scalings write directly into the caller's left/right buffers — each ramped from the
+    // previous buffer's ending scale to this buffer's target rather than applied as a flat
+    // scalar, so a pan/amplitude change never introduces a discontinuity mid-signal.
     scratchRawSamples.withUnsafeMutableBufferPointer { raw in
       scratchSines.withUnsafeMutableBufferPointer { sines in
         vDSP_vdpsp(sines.baseAddress!, 1, raw.baseAddress!, 1, vDSP_Length(count))
       }
       let (leftGain, rightGain) = Self.equalPowerPanGains(pan: pan)
-      var leftScale = amplitude * leftGain
-      var rightScale = amplitude * rightGain
-      vDSP_vsmul(raw.baseAddress!, 1, &leftScale, leftOutput, 1, vDSP_Length(count))
-      vDSP_vsmul(raw.baseAddress!, 1, &rightScale, rightOutput, 1, vDSP_Length(count))
+      Self.applyRampedScale(
+        raw: raw.baseAddress!, output: leftOutput, ramp: &scratchGainRamp,
+        from: &previousLeftScale, to: amplitude * leftGain, count: count)
+      Self.applyRampedScale(
+        raw: raw.baseAddress!, output: rightOutput, ramp: &scratchGainRamp,
+        from: &previousRightScale, to: amplitude * rightGain, count: count)
     }
 
     phase = Self.wrappedPhase(start: phase, increment: increment, count: count)
+  }
+
+  /// Linearly ramps the per-channel scale from `previous` to `target` across `count` samples and
+  /// multiplies it into `raw`, writing the result to `output` — the declicking mechanism `fill`
+  /// relies on. When `previous == target` (the common case: nothing changed since the last
+  /// buffer), this degenerates to the same flat-scalar multiply it always was.
+  ///
+  /// `static` with `ramp`/`previous` passed explicitly, rather than an instance method reaching
+  /// into `self.scratchGainRamp`/`self.previousLeftScale` — calling a `mutating` instance method
+  /// from inside `fill`'s `scratchRawSamples.withUnsafeMutableBufferPointer` closure would need
+  /// exclusive access to all of `self` while that closure already holds exclusive access to
+  /// `self.scratchRawSamples`, which Swift's exclusivity checker correctly rejects. Explicit
+  /// `inout` parameters to disjoint stored properties have no such conflict.
+  private static func applyRampedScale(
+    raw: UnsafePointer<Float>, output: UnsafeMutablePointer<Float>, ramp: inout [Float],
+    from previous: inout Float, to target: Float, count: Int
+  ) {
+    ramp.withUnsafeMutableBufferPointer { rampBuffer in
+      var start = previous
+      var step = count > 1 ? (target - previous) / Float(count - 1) : 0
+      vDSP_vramp(&start, &step, rampBuffer.baseAddress!, 1, vDSP_Length(count))
+      vDSP_vmul(raw, 1, rampBuffer.baseAddress!, 1, output, 1, vDSP_Length(count))
+    }
+    previous = target
   }
 
   /// Equal-power panning law: gains trace a quarter-circle rather than a straight line, so the

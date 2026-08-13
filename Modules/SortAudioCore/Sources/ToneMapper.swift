@@ -56,13 +56,23 @@ public struct ToneMapper: Sendable {
   public static func frequency(
     forValue value: Int, in range: ClosedRange<Int>, noteRange: ClosedRange<Int>
   ) -> Float {
+    let lowerBound = max(noteRange.lowerBound, minimumNote)
+    let upperBound = max(noteRange.upperBound, lowerBound)
     let span = range.upperBound - range.lowerBound
     let ratio: Float = span > 0 ? Float(value - range.lowerBound) / Float(span) : 0.5
-    let note =
-      Float(noteRange.lowerBound) + ratio * Float(noteRange.upperBound - noteRange.lowerBound)
-    let quantizedNote = quantized(note, root: noteRange.lowerBound)
+    let note = Float(lowerBound) + ratio * Float(upperBound - lowerBound)
+    let quantizedNote = quantized(note, root: lowerBound)
     return 440.0 * pow(2.0, (quantizedNote - 69.0) / 12.0)
   }
+
+  /// MIDI note 24 (~32.7 Hz, C1) — below this, a note gated for a typical `holdSeconds` doesn't
+  /// even complete a full waveform cycle, so it reads as a click/thump rather than a genuinely low
+  /// pitch. Clamped on the *note-range floor*, before quantization, rather than clamping the
+  /// output Hz directly — that keeps every frequency this function can ever produce a real
+  /// pentatonic-minor scale degree, the same guarantee `frequencyOnlyEverProducesPentatonicMinorScaleDegrees`
+  /// checks. A no-op for the default `36...72` range; only matters for a custom range configured
+  /// low enough to reach it.
+  private static let minimumNote = 24
 
   /// Pentatonic minor, as semitone offsets from whatever root a caller supplies — the classic
   /// choice for algorithmically-generated pitch sequences: every degree sounds consonant against

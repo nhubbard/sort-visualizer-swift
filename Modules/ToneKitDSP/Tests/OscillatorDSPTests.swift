@@ -39,20 +39,62 @@ struct OscillatorDSPTests {
   @Test
   func fillProducesOneSamplePerFrameScaledByAmplitude() {
     // Hard-left pan makes the left channel's gain exactly 1 (equal-power gain at the pan extreme),
-    // so it reproduces the un-panned single-buffer math these amplitude assertions check.
+    // so it reproduces the un-panned single-buffer math these amplitude assertions check. A
+    // throwaway warm-up call lets the pan ramp (declicking — see `applyRampedScale`) finish
+    // settling into hard-left before the buffer under test, so these assertions see the steady
+    // state rather than the transition into it.
     var osc = OscillatorDSP(frequency: 440, amplitude: 0.5)
     osc.pan = -1
     osc.prepare(maxFrameCount: 8)
+    var warmup = [Float](repeating: -1, count: 8)
+    var warmupRight = [Float](repeating: -1, count: 8)
+    warmup.withUnsafeMutableBufferPointer { l in
+      warmupRight.withUnsafeMutableBufferPointer { r in osc.fill(left: l, right: r, sampleRate: 44100) }
+    }
+
     var left = [Float](repeating: -1, count: 8)
     var right = [Float](repeating: -1, count: 8)
     left.withUnsafeMutableBufferPointer { l in
       right.withUnsafeMutableBufferPointer { r in osc.fill(left: l, right: r, sampleRate: 44100) }
     }
 
-    // First sample is always phase 0 -> sin(0) = 0, regardless of amplitude.
-    #expect(abs(left[0]) < 0.0001)
+    // The warm-up call already advanced phase past 0, so (unlike the un-warmed-up tests below)
+    // this only checks the amplitude bound, not any specific sample value.
     #expect(left.allSatisfy { abs($0) <= 0.5 + 0.0001 })
     #expect(right.allSatisfy { abs($0) < 0.0001 })
+  }
+
+  @Test
+  func fillRampsTheScaleAcrossABufferInsteadOfJumpingInstantly() {
+    // A pan flip mid-stream (hard-left -> hard-right) should NOT make the very next buffer's
+    // right channel jump straight to full amplitude — it should start near where the ramp began
+    // (near-silent, since the previous buffer was hard-left) and grow across the buffer. This is
+    // the actual declicking behavior: a real per-buffer amplitude jump is what produced the
+    // reported "low-frequency crackling."
+    //
+    // `frequency` is set to 0 for the buffer under test so every raw sample holds the same
+    // (whatever nonzero phase the warm-up call left behind) value — isolating the ramp's own
+    // effect from the sine wave's own natural variation across the buffer.
+    var osc = OscillatorDSP(frequency: 440, amplitude: 1)
+    osc.pan = -1
+    osc.prepare(maxFrameCount: 256)
+    var warmup = [Float](repeating: -1, count: 256)
+    var warmupRight = [Float](repeating: -1, count: 256)
+    warmup.withUnsafeMutableBufferPointer { l in
+      warmupRight.withUnsafeMutableBufferPointer { r in osc.fill(left: l, right: r, sampleRate: 44100) }
+    }
+
+    osc.pan = 1
+    osc.frequency = 0
+    var right = [Float](repeating: -1, count: 256)
+    var left = [Float](repeating: -1, count: 256)
+    left.withUnsafeMutableBufferPointer { l in
+      right.withUnsafeMutableBufferPointer { r in osc.fill(left: l, right: r, sampleRate: 44100) }
+    }
+
+    #expect(
+      abs(right[0]) < abs(right[right.count - 1]),
+      "right channel should ramp up toward full amplitude across the buffer, not start there")
   }
 
   @Test

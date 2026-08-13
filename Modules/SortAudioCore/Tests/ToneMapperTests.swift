@@ -54,6 +54,22 @@ struct ToneMapperTests {
     }
   }
 
+  /// A custom note range configured low enough to reach the floor (MIDI note 24, ~32.7 Hz) must
+  /// never produce a note below it — below that, a note gated for a typical `holdSeconds` doesn't
+  /// even complete a full waveform cycle, reading as a click rather than a tone. Clamped on the
+  /// note-range floor before quantization, so results still land on a real pentatonic-minor
+  /// degree instead of an arbitrary post-hoc-clamped Hz value.
+  @Test
+  func frequencyNeverGoesBelowTheMinimumNoteFloor() {
+    let floorHz: Float = 440.0 * pow(2.0, (24.0 - 69.0) / 12.0)
+    for value in 0...10 {
+      let frequency = ToneMapper.frequency(forValue: value, in: 0...10, noteRange: 0...12)
+      #expect(
+        frequency >= floorHz - 0.01,
+        "value \(value) produced \(frequency) Hz, below the floor of \(floorHz) Hz")
+    }
+  }
+
   @Test
   func repeatingTheSamePitchNeverRetriggersTheGate() {
     var mapper = ToneMapper()

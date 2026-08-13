@@ -167,6 +167,10 @@ struct SortAudioUnitTests {
     gainParameter.setValue(0, originator: nil)
     try await Task.sleep(for: .milliseconds(50))
 
+    // The gain change ramps down across the *next* rendered buffer (declicking — see
+    // `OscillatorDSP.applyRampedScale`) rather than snapping to silence instantly, so a throwaway
+    // render lets that ramp finish before the buffer actually checked for silence.
+    _ = renderIsSilent(unit, format: format)
     #expect(renderIsSilent(unit, format: format))
   }
 }
