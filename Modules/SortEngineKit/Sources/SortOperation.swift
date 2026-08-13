@@ -28,15 +28,21 @@ public enum SortOperation: Sendable, Codable, Equatable {
   /// of element move.
   case reversal
 
-  /// Whether `SortFeature.SortSession.makeOnStepClosure` would play a note for this operation —
-  /// `.compare`/`.swap`/`.setValue` only, matching that closure's switch exactly. The single
-  /// source of truth both the real playback path and any sound-coverage auditing tooling derive
-  /// "is this operation audible" from, so the two can never drift apart.
+  /// Whether `SortFeature.SortSession.makeOnStepClosure` can ever play a note for this operation
+  /// kind, matching that closure's switch exactly — `.compare`/`.swap`/`.setValue`, plus
+  /// `.auxWrite` (writes to a shadow/auxiliary array, e.g. `LibrarySort`'s gapped `slots`
+  /// structure or `MergeSort`'s staging buffer — real algorithmic work that used to be completely
+  /// silent). `.auxWrite` is additionally *throttled* there (only every Nth occurrence actually
+  /// plays, to avoid overwhelming algorithms that do tens of thousands of them), so this reflects
+  /// "can this kind ever be audible," not "does this exact occurrence play."
+  ///
+  /// `Tools/SoundCoverageAudit/audit_sound_coverage.py`'s `AUDIBLE_TAGS` hand-maintains an
+  /// identical mirror of this classification (Python can't import this enum) — keep the two in
+  /// sync by hand if this ever changes.
   public var isAudible: Bool {
     switch self {
-    case .compare, .swap, .setValue: true
-    case .mark, .unmark, .unmarkAll, .unmarkIndex, .markSorted, .auxCreate, .auxWrite, .auxDelete,
-      .reversal:
+    case .compare, .swap, .setValue, .auxWrite: true
+    case .mark, .unmark, .unmarkAll, .unmarkIndex, .markSorted, .auxCreate, .auxDelete, .reversal:
       false
     }
   }

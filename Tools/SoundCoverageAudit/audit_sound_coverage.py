@@ -4,7 +4,10 @@ Dev-tool only — never built into or shipped with the app. Parses the same `.ta
 `Modules/SortEngineKit/Sources/{Tape+Archive,TapeArchiveEnvelope,TapeArchivePayload}.swift` produce
 (a "STAP"-magic envelope wrapping a zstd-compressed, SHA-256-checked "TAPE"-magic payload) and
 reports, per algorithm, how much of its recorded tape is silence (no `.compare`/`.swap`/
-`.setValue`) versus audible.
+`.setValue`/`.auxWrite`) versus audible. Note: in the real app, `.auxWrite` is additionally
+throttled (only every Nth occurrence actually plays — see `SortSession.makeOnStepClosure`), so
+this tool's "audible %" is an upper bound on real playback for aux-write-heavy algorithms, not an
+exact match.
 
 Tapes are produced by `SortSession.exportTapeForAuditIfRequested` (`Modules/SortFeature/Sources/
 SortSession.swift`), which only ever runs when the app process has `SORT_TAPE_EXPORT_DIR` set —
@@ -49,10 +52,10 @@ OPERATION_FIELD_COUNTS = {
     10: 1,  # auxDelete(handle:)
     11: 0,  # reversal
 }
-# .compare / .swap / .setValue only — mirrors `SortOperation.isAudible`
+# .compare / .swap / .setValue / .auxWrite — mirrors `SortOperation.isAudible`
 # (Modules/SortEngineKit/Sources/SortOperation.swift). Keep in sync by hand: Python can't import
 # that Swift enum, so this is a hand-maintained mirror, not a derived value.
-AUDIBLE_TAGS = {0, 1, 6}
+AUDIBLE_TAGS = {0, 1, 6, 9}
 
 
 class TapeFormatError(Exception):

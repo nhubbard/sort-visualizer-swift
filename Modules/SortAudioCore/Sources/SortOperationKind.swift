@@ -10,4 +10,9 @@ public enum SortOperationKind: UInt8, Sendable, Equatable, CaseIterable {
   case compare
   case swap
   case setValue
+  /// A write to a shadow/auxiliary array (`SortOperation.auxWrite`) rather than the main array —
+  /// e.g. `LibrarySort`'s gapped `slots` structure or `MergeSort`'s staging buffer. Real
+  /// algorithmic work that used to be completely silent; `ToneMapper.accent(for:)` gives it a
+  /// distinctly quieter accent than main-array activity so it reads as background texture.
+  case auxWrite
 }

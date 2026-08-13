@@ -41,9 +41,16 @@ public struct ToneMapper: Sendable {
   /// Swaps (the actual element movement) read as louder/more present than compares or value-writes
   /// (bookkeeping) — the compare/swap sonic distinction this type exists to provide, kept as a
   /// separate multiplicative layer from the AU remote's own Gain slider (`ToneCommand.setAccent`'s
-  /// own doc comment explains why).
+  /// own doc comment explains why). `.auxWrite` (shadow/auxiliary array activity — see
+  /// `SortOperationKind.auxWrite`'s own doc comment) sits quieter still, below both: it's real
+  /// algorithmic work that used to be completely silent, but it should read as background texture
+  /// rather than compete with genuine main-array movement.
   private static func accent(for operationKind: SortOperationKind) -> Float {
-    operationKind == .swap ? 1.0 : 0.65
+    switch operationKind {
+    case .swap: 1.0
+    case .compare, .setValue: 0.65
+    case .auxWrite: 0.35
+    }
   }
 
   /// Pure value→pitch mapping — originally moved verbatim from `AudioService.frequency(forValue:

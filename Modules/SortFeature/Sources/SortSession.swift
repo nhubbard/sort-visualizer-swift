@@ -452,6 +452,7 @@ public final class SortSession {
   /// need to track the actual cadence either way.
   private func makeOnStepClosure(for replay: ReplayEngine) -> (SortOperation) -> Void {
     let audio = self.audio
+    var auxWriteCounter = 0
     return { [weak self, weak replay] operation in
       guard let self, self.soundEnabled, let replay else { return }
       let holdSeconds = max(1.0 / replay.currentPacingRate, 0.03)
@@ -476,9 +477,27 @@ public final class SortSession {
         audio.play(
           value: replay.frame[i].value, in: range, holdSeconds: holdSeconds, index: i,
           arraySize: arraySize, operationKind: .setValue)
+      case .auxWrite(_, let index, let value):
+        // Some algorithms (e.g. ClassicGravitySort's bead-column transpose) do tens of thousands
+        // of these per run — sonifying every single one would replace "too quiet" with "a wall of
+        // noise" and overload ToneCommandQueue's fixed capacity. Only every Nth one actually
+        // plays; `index`/the main array's `range`/`arraySize` are an approximation (aux arrays can
+        // have a different length than the main array, e.g. that same transpose buffer), not worth
+        // new plumbing for yet.
+        auxWriteCounter += 1
+        guard auxWriteCounter.isMultiple(of: Self.auxWriteThrottleInterval) else { return }
+        audio.play(
+          value: value, in: range, holdSeconds: holdSeconds, index: index, arraySize: arraySize,
+          operationKind: .auxWrite)
       default:
         break
       }
     }
   }
+
+  /// First-guess starting point (roughly one in every eight aux writes actually plays) — meant to
+  /// be tuned by ear alongside `ToneMapper.accent(for:)`'s `.auxWrite` value, not a carefully
+  /// measured constant. Internal rather than `private` so `SortSessionTests` can assert the exact
+  /// throttled count instead of hardcoding a second copy of this number.
+  static let auxWriteThrottleInterval = 8
 }

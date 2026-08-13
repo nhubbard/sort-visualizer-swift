@@ -1,6 +1,8 @@
 import AlgorithmKit
+import AudioEngineKit
 import Foundation
 import SettingsKit
+import SortAudioCore
 import SwiftData
 import SwiftUI
 import Testing
@@ -68,6 +70,60 @@ private struct FakeAlgorithm: SortAlgorithm {
         engine.swap(j, j + 1)
       }
     }
+  }
+}
+
+/// Emits exactly `auxWriteCount` `.auxWrite` operations and nothing else audible-adjacent — a
+/// minimal fixture for testing `SortSession.makeOnStepClosure`'s `.auxWrite` throttling in
+/// isolation, without any real algorithm's `.compare`/`.swap` traffic muddying the count.
+private struct FakeAuxWritingAlgorithm: SortAlgorithm {
+  let id = AlgorithmID(rawValue: "fake-auxwrite")
+  let auxWriteCount: Int
+  var metadata: AlgorithmMetadata {
+    AlgorithmMetadata(
+      displayName: "Fake Aux Writing",
+      category: .exchange,
+      sizeRange: 2...16,
+      growthModel: OperationGrowthModel(
+        anchorSize: 0, coefficients: [0, 1e-9], measuredSafeCeiling: 16),
+      stable: true,
+      timeComplexity: ComplexityBounds(best: "O(n)", average: "O(n)", worst: "O(n)"),
+      spaceComplexity: "O(1)",
+      iconName: "fake"
+    )
+  }
+
+  func record(into engine: inout RecordingEngine) {
+    let handle = engine.createAuxArray(length: max(auxWriteCount, 1))
+    for i in 0..<auxWriteCount {
+      engine.writeAux(handle, at: i % max(auxWriteCount, 1), value: i)
+    }
+    engine.deleteAuxArray(handle)
+  }
+}
+
+/// Records every `play(...)` call's arguments — this test target has no `AudioPlaying`
+/// conformance besides the real `AudioService`/`NoOpAudioService`, so a minimal spy is needed to
+/// assert on `SortSession.makeOnStepClosure`'s actual sound dispatch (which operations trigger a
+/// call, with what `operationKind`) rather than just the visual/tape-level behavior every other
+/// test in this file checks.
+@MainActor
+private final class RecordingAudioService: AudioPlaying {
+  struct Call: Equatable {
+    let value: Int
+    let index: Int
+    let arraySize: Int
+    let operationKind: SortOperationKind
+  }
+  private(set) var calls: [Call] = []
+
+  func start() throws {}
+  func stop() {}
+  func play(
+    value: Int, in range: ClosedRange<Int>, holdSeconds: Double, index: Int, arraySize: Int,
+    operationKind: SortOperationKind
+  ) {
+    calls.append(Call(value: value, index: index, arraySize: arraySize, operationKind: operationKind))
   }
 }
 
@@ -391,6 +447,28 @@ struct SortSessionTests {
     session.soundEnabled = false
 
     #expect(settings.soundEnabled)  // toggling the session-local flag never touches the global default
+  }
+
+  /// `.auxWrite` operations do trigger sound (they used to be completely silent — see
+  /// `SortOperationKind.auxWrite`'s own doc comment), but only every
+  /// `SortSession.auxWriteThrottleInterval`th one, not every single occurrence — sonifying every
+  /// aux write on an algorithm that does tens of thousands of them would overwhelm both the
+  /// listener and `ToneCommandQueue`'s fixed capacity.
+  @Test
+  func auxWriteOperationsPlayThrottledNotEvery() async throws {
+    let settings = makeFastSettings()
+    settings.soundEnabled = true
+    let audio = RecordingAudioService()
+    let auxWriteCount = 40
+    let session = SortSession(
+      algorithm: FakeAuxWritingAlgorithm(auxWriteCount: auxWriteCount),
+      shuffle: FakeIdentityShuffle(), audio: audio, settings: settings)
+
+    await session.start(size: 2)
+    try await waitUntilTerminal(session)
+
+    #expect(audio.calls.allSatisfy { $0.operationKind == .auxWrite })
+    #expect(audio.calls.count == auxWriteCount / SortSession.auxWriteThrottleInterval)
   }
 
   // MARK: - Recording size cap

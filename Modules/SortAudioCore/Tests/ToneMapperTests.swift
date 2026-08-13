@@ -92,6 +92,20 @@ struct ToneMapperTests {
         == [.setAccent(0.65), .setPan(-1.0), .setFrequency(first.frequencyPayload!), .openGate])
   }
 
+  /// `.auxWrite` (shadow/auxiliary array activity) gets a distinctly quieter accent than any
+  /// main-array operation kind — background texture, not competing with real element movement.
+  @Test
+  func auxWriteGetsAQuieterAccentThanMainArrayOperations() {
+    var mapper = ToneMapper()
+    let event = SortToneEvent(
+      value: 50, range: 1...100, holdSeconds: 0.1, index: 0, arraySize: 100,
+      operationKind: .auxWrite)
+
+    let commands = mapper.commands(for: event, noteRange: 36...72)
+
+    #expect(commands.contains(.setAccent(0.35)))
+  }
+
   @Test
   func aDifferentPitchClosesTheGateBeforeReopening() {
     var mapper = ToneMapper()
