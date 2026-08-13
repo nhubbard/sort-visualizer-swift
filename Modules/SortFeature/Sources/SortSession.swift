@@ -270,14 +270,23 @@ public final class SortSession {
   /// use, so the one environment lookup is the only cost paid when it's unset. Every run (manual,
   /// keyboard Automation, or Showcase) passes through here, so a Showcase pass with this set
   /// dumps one `.tape` file per algorithm.
+  ///
+  /// Encoding (`.archived()` compresses and SHA-256-hashes the whole operation list) and the disk
+  /// write both cost real time for a large tape — enough to visibly hang playback completion on
+  /// every run during a Showcase pass. `Tape` is `Sendable`, so handing the whole job to a
+  /// detached background task is just a cheap copy-on-write capture, not a real copy, and keeps
+  /// this debug-only path from ever blocking the caller.
   private static func exportTapeForAuditIfRequested(_ tape: Tape) {
     guard let dir = ProcessInfo.processInfo.environment["SORT_TAPE_EXPORT_DIR"] else { return }
-    do {
-      let data = try tape.archived()
-      let url = URL(fileURLWithPath: dir).appendingPathComponent("\(tape.header.algorithmID).tape")
-      try data.write(to: url)
-    } catch {
-      // Best-effort diagnostic only — must never affect real playback.
+    Task.detached(priority: .background) {
+      do {
+        try FileManager.default.createDirectory(atPath: dir, withIntermediateDirectories: true)
+        let data = try tape.archived()
+        let url = URL(fileURLWithPath: dir).appendingPathComponent("\(tape.header.algorithmID).tape")
+        try data.write(to: url)
+      } catch {
+        // Best-effort diagnostic only — must never affect real playback.
+      }
     }
   }
 
