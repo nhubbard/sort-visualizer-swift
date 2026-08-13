@@ -423,6 +423,27 @@ struct NativeAlgorithmCorrectnessTests {
     }
   }
 
+  /// A real, reproduced `EXC_BAD_ACCESS` (445 frames) inside `SplaySort`'s own `splay` function —
+  /// a second, independent recursion source from `traverse`'s, and not something monotonic
+  /// insertion order alone triggers (that only stresses `traverse`, per the test above). Ascending
+  /// insertion order builds a one-sided chain via `splay`'s own early-return (no rotation needed,
+  /// so no stack depth either) exactly like `traverse`'s test — but inserting the global minimum
+  /// *last* forces that one `splay` call to walk the entire existing chain, since every node on
+  /// the path has a left child and a key greater than the new minimum. This is the mechanism: even
+  /// splaying's amortized O(log n) guarantee doesn't bound any single call's depth, so an ordinary
+  /// (non-adversarial) insertion sequence can transiently build a deep chain and pay for it in one
+  /// very deep `splay` call. Fixed by converting `splay` itself to an iterative descend/unwind pair.
+  @Test
+  func splaySortDoesNotStackOverflowOnADeepSplayDuringInsertion() {
+    let algorithm = SplaySort()
+    let input = Array(1..<8192) + [0]
+    var engine = RecordingEngine(values: input)
+    algorithm.record(into: &engine)
+    #expect(
+      engine.values == input.sorted(),
+      "SplaySort failed to sort adversarial input of size \(input.count)")
+  }
+
   /// Confirms `TriangularHeapSort`'s instability empirically: like `MaxHeapSort`, swap-based
   /// heap construction/extraction can relocate one equal element past another with no recovery.
   @Test

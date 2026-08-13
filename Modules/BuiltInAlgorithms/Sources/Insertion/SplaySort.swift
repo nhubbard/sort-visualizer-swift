@@ -59,34 +59,97 @@ public struct SplaySort: SortAlgorithm {
       return y
     }
 
-    func splay(_ rootArg: Node?, _ key: Int) -> Node? {
-      guard var root = rootArg else { return nil }
+    // Which of the 4 zig-zig/zig-zag cases a descend step took, and the two nodes its unwind
+    // step needs — everything the original recursive call's stack frame held onto across its own
+    // single recursive call.
+    enum SplayFrame {
+      case zigZigLeft(root: Node, left: Node)
+      case zigZagLeft(root: Node, left: Node)
+      case zigZagRight(root: Node, right: Node)
+      case zigZigRight(root: Node, right: Node)
+    }
 
-      if root.key > key {
-        guard let left = root.left else { return root }
-        if left.key > key {
-          left.left = splay(left.left, key)
-          root = rightRotate(root)
+    // Iterative splay — a real, reproducible `EXC_BAD_ACCESS` (445 recursion frames, well within
+    // a plausible tree depth here) showed splaying's *amortized* O(log n) guarantee doesn't bound
+    // any single call's depth: even an ordinary (non-adversarial) insertion sequence can
+    // transiently build a deep chain, and a single splay toward a key at its far end still
+    // recurses the full depth of that chain. `traverse`'s own doc comment already covers the
+    // "monotonic insertion order never rotates, degenerates into a chain" mechanism; this is the
+    // second, independent place that same transient chain shape can blow the stack.
+    //
+    // Every recursive call above makes *at most one* further recursive call, so this converts
+    // directly: a descend loop mirrors the original's branch decisions exactly, pushing one
+    // `SplayFrame` per level instead of recursing, until it hits a base case (`nil` root, or a
+    // missing child — the same two `guard` cases the recursive version returns from directly);
+    // an unwind loop then replays each frame's post-recursion work bottom-up, in the same order
+    // the call stack would have unwound it. Each case below is a line-for-line transcription of
+    // one branch's "assign into the child slot, rotate, decide the frame's own return value" — the
+    // `newRoot` locals exist only because the original's `root = rightRotate(root)`/`root =
+    // leftRotate(root)` reassignments need a distinct name once they're no longer a single
+    // function's local variable.
+    func splay(_ rootArg: Node?, _ key: Int) -> Node? {
+      var frames: [SplayFrame] = []
+      var current = rootArg
+      var baseResult: Node?
+
+      descend: while true {
+        guard let root = current else {
+          baseResult = nil
+          break descend
+        }
+        if root.key > key {
+          guard let left = root.left else {
+            baseResult = root
+            break descend
+          }
+          if left.key > key {
+            frames.append(.zigZigLeft(root: root, left: left))
+            current = left.left
+          } else {
+            frames.append(.zigZagLeft(root: root, left: left))
+            current = left.right
+          }
         } else {
-          left.right = splay(left.right, key)
+          guard let right = root.right else {
+            baseResult = root
+            break descend
+          }
+          if right.key > key {
+            frames.append(.zigZagRight(root: root, right: right))
+            current = right.left
+          } else {
+            frames.append(.zigZigRight(root: root, right: right))
+            current = right.right
+          }
+        }
+      }
+
+      var result = baseResult
+      while let frame = frames.popLast() {
+        switch frame {
+        case .zigZigLeft(let root, let left):
+          left.left = result
+          let newRoot = rightRotate(root)
+          result = newRoot.left == nil ? newRoot : rightRotate(newRoot)
+        case .zigZagLeft(let root, let left):
+          left.right = result
           if left.right != nil {
             root.left = leftRotate(left)
           }
-        }
-        return root.left == nil ? root : rightRotate(root)
-      } else {
-        guard let right = root.right else { return root }
-        if right.key > key {
-          right.left = splay(right.left, key)
+          result = root.left == nil ? root : rightRotate(root)
+        case .zigZagRight(let root, let right):
+          right.left = result
           if right.left != nil {
             root.right = rightRotate(right)
           }
-        } else {
-          right.right = splay(right.right, key)
-          root = leftRotate(root)
+          result = root.right == nil ? root : leftRotate(root)
+        case .zigZigRight(let root, let right):
+          right.right = result
+          let newRoot = leftRotate(root)
+          result = newRoot.right == nil ? newRoot : leftRotate(newRoot)
         }
-        return root.right == nil ? root : leftRotate(root)
       }
+      return result
     }
 
     func insertRec(_ rootArg: Node?, _ key: Int) -> Node {
