@@ -5,6 +5,7 @@ import PersistenceKit
 import SettingsKit
 import SortAudioCore
 import SortEngineKit
+import os
 
 public enum SortSessionError: Error, Equatable, Sendable {
   case recordingFailed(String)
@@ -265,11 +266,22 @@ public final class SortSession {
     }
   }
 
+  private nonisolated static let exportLogger = Logger(
+    subsystem: "com.nhubbard.Sort2.mobile", category: "TapeExport")
+
   /// Debug-only, zero-cost-by-default: if `SORT_TAPE_EXPORT_DIR` is set, writes this run's tape
   /// archive there for offline analysis (`Tools/SoundCoverageAudit`) — never enabled in normal
   /// use, so the one environment lookup is the only cost paid when it's unset. Every run (manual,
   /// keyboard Automation, or Showcase) passes through here, so a Showcase pass with this set
   /// dumps one `.tape` file per algorithm.
+  ///
+  /// This app is sandboxed (`com.apple.security.app-sandbox`, see `SortSymphony.entitlements`)
+  /// with no broad file-system entitlement — only `files.user-selected.read-write`, which only
+  /// covers paths the user picked through an open/save panel. Writing to an arbitrary absolute
+  /// path the sandbox never granted access to (confirmed the hard way: both `/tmp/...` and a
+  /// path under the user's home directory silently failed) is denied regardless of whether it
+  /// exists, so only the requested directory's *name* is honored, as a subfolder of the app's own
+  /// Documents container — the one location always writable with zero extra entitlements.
   ///
   /// Encoding (`.archived()` compresses and SHA-256-hashes the whole operation list) and the disk
   /// write both cost real time for a large tape — enough to visibly hang playback completion on
@@ -277,15 +289,27 @@ public final class SortSession {
   /// detached background task is just a cheap copy-on-write capture, not a real copy, and keeps
   /// this debug-only path from ever blocking the caller.
   private static func exportTapeForAuditIfRequested(_ tape: Tape) {
-    guard let dir = ProcessInfo.processInfo.environment["SORT_TAPE_EXPORT_DIR"] else { return }
+    guard let requestedName = ProcessInfo.processInfo.environment["SORT_TAPE_EXPORT_DIR"] else { return }
+    let subdirectoryName = URL(fileURLWithPath: requestedName).lastPathComponent
     Task.detached(priority: .background) {
       do {
-        try FileManager.default.createDirectory(atPath: dir, withIntermediateDirectories: true)
+        guard
+          let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
+            .first
+        else {
+          exportLogger.error("no Documents directory available for tape export")
+          return
+        }
+        let dir = documentsURL.appendingPathComponent(subdirectoryName)
+        try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
         let data = try tape.archived()
-        let url = URL(fileURLWithPath: dir).appendingPathComponent("\(tape.header.algorithmID).tape")
+        let url = dir.appendingPathComponent("\(tape.header.algorithmID).tape")
         try data.write(to: url)
+        exportLogger.notice("exported tape to \(url.path, privacy: .public)")
       } catch {
-        // Best-effort diagnostic only — must never affect real playback.
+        exportLogger.error(
+          "tape export failed for \(tape.header.algorithmID, privacy: .public): \(error, privacy: .public)"
+        )
       }
     }
   }

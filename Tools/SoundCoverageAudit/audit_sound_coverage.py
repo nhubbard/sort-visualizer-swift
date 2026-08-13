@@ -27,6 +27,11 @@ STAP_MAGIC = b"STAP\r\n\x1a\n"
 TAPE_MAGIC = b"TAPE"
 FIXED_HEADER_SIZE = 80
 DEFAULT_SPEED = 30.0  # ops/sec, matching AppSettings.playbackSpeed's/ReplayEngine.speed's default.
+# The app is sandboxed with no broad file-system entitlement, so `SortSession
+# .exportTapeForAuditIfRequested` can only ever write inside its own container — see that
+# function's doc comment (Modules/SortFeature/Sources/SortSession.swift) and this directory's
+# README for why. `SORT_TAPE_EXPORT_DIR=sort-tape-audit` (just a bare name, no slashes) lands here.
+DEFAULT_DIRECTORY = "~/Library/Containers/com.nhubbard.Sort2.mobile/Data/Documents/sort-tape-audit"
 
 # Tag byte -> number of trailing Int32 fields, matching `TapeArchivePayload.swift`'s `encode`/
 # `decode` exactly (`SortOperation`'s own declaration order, tags 0 through 11).
@@ -219,8 +224,8 @@ def audit_file(path: Path, *, include_shuffle: bool) -> TapeReport:
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
-        "directory", nargs="?", default="/tmp/sort-tape-audit",
-        help="directory of .tape files to audit (default: /tmp/sort-tape-audit)")
+        "directory", nargs="?", default=DEFAULT_DIRECTORY,
+        help=f"directory of .tape files to audit (default: {DEFAULT_DIRECTORY})")
     parser.add_argument(
         "--speed", type=float, default=DEFAULT_SPEED,
         help=f"ops/sec used to convert gaps to seconds (default: {DEFAULT_SPEED})")
@@ -229,7 +234,7 @@ def main() -> int:
         help="audit the full shuffle+sort tape instead of just the sort portion (default: sort only)")
     args = parser.parse_args()
 
-    directory = Path(args.directory)
+    directory = Path(args.directory).expanduser()
     tape_paths = sorted(directory.glob("*.tape"))
     if not tape_paths:
         print(f"no .tape files found in {directory}", file=sys.stderr)
