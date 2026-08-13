@@ -33,6 +33,17 @@ struct ToneMapperTests {
     #expect(frequency > 0)
   }
 
+  /// Regression test for a real crash: `.auxWrite` values aren't always a genuine in-range
+  /// element anymore now that aux writes are audible — `LibrarySort`'s gap-tracking `slots` array
+  /// writes `Int.min` as an "empty slot" sentinel, and the old `value - range.lowerBound`
+  /// subtraction trapped on overflow for any value far outside `range`. Clamping before
+  /// subtracting fixes it; this pins both extremes plus a value just past each edge.
+  @Test(arguments: [Int.min, Int.max, 0, 101, -1])
+  func frequencyClampsWildlyOutOfRangeValuesInsteadOfCrashing(value: Int) {
+    let frequency = ToneMapper.frequency(forValue: value, in: 1...100, noteRange: 36...72)
+    #expect(frequency > 0)
+  }
+
   /// Confirms the actual point of quantization: across a wide sweep of arbitrary values, every
   /// resulting pitch lands on a pentatonic-minor degree relative to the note range's root — never
   /// an "in-between" note the old continuous mapping could produce.

@@ -66,7 +66,13 @@ public struct ToneMapper: Sendable {
     let lowerBound = max(noteRange.lowerBound, minimumNote)
     let upperBound = max(noteRange.upperBound, lowerBound)
     let span = range.upperBound - range.lowerBound
-    let ratio: Float = span > 0 ? Float(value - range.lowerBound) / Float(span) : 0.5
+    // Clamped, not just subtracted directly: `value` isn't always a genuine in-range element
+    // anymore now that `.auxWrite` is audible — e.g. `LibrarySort`'s gap-tracking `slots` array
+    // holds `Int.min` as an "empty" sentinel, and `Int.min - range.lowerBound` traps (Int
+    // subtraction overflow). Clamping via comparison is safe regardless of how extreme `value`
+    // is; only the subtraction afterward needed guarding.
+    let clampedValue = min(max(value, range.lowerBound), range.upperBound)
+    let ratio: Float = span > 0 ? Float(clampedValue - range.lowerBound) / Float(span) : 0.5
     let note = Float(lowerBound) + ratio * Float(upperBound - lowerBound)
     let quantizedNote = quantized(note, root: lowerBound)
     return 440.0 * pow(2.0, (quantizedNote - 69.0) / 12.0)
