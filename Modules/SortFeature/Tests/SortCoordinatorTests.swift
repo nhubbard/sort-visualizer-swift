@@ -149,6 +149,43 @@ struct SortCoordinatorTests {
       "a .loadTape pending action does not lead to an automating pass")
   }
 
+  /// Regression guard for the Full Sweep hang: `ContentView.detailContent` branches between
+  /// `NonScrollingSortView`/`ScrollingSortView` on `currentSelectionWillAutomate`, not on the live
+  /// `pendingActionWillAutomate(for:)` — that method's answer flips to `false` the instant
+  /// `consumePendingAction` runs (which happens almost immediately after mount, well before the
+  /// automated run it kicked off actually finishes). If `ContentView` branched on the live value,
+  /// any unrelated re-render mid-run would flip the view type, tearing down the automating view
+  /// and cancelling its `.task` before `resolveCompletion` ever fired — hanging `runSort`'s
+  /// continuation, and with it `CoverageSweepDriver.runLoop`, forever. This snapshot must stay
+  /// `true` across `consumePendingAction`, unlike the live peek `pendingActionWillAutomateReflects
+  /// WhetherTheActionLeadsToAnAutomatingPass` above already confirms does *not* survive it.
+  @Test
+  func currentSelectionWillAutomateSurvivesConsumingThePendingAction() async {
+    let coordinator = SortCoordinator()
+    let algorithm = FakeAlgorithm()
+
+    #expect(!coordinator.currentSelectionWillAutomate)
+
+    let runTask = Task {
+      await coordinator.runSort(algorithm: algorithm, visualizerID: nil, shuffleID: nil, size: nil)
+    }
+    await Task.yield()
+    #expect(coordinator.currentSelectionWillAutomate)
+
+    _ = coordinator.consumePendingAction(for: algorithm.id)
+    #expect(
+      coordinator.currentSelectionWillAutomate,
+      "must not flip back to false once the pending action is consumed mid-run")
+
+    coordinator.resolveCompletion(token: coordinator.runToken)
+    await runTask.value
+
+    // A plain manual selection (no pending action at all) must read false, same as the live peek.
+    let manualAlgorithm = AlgorithmID(rawValue: "coordinator-fake-manual")
+    coordinator.selectedAlgorithmID = manualAlgorithm
+    #expect(!coordinator.currentSelectionWillAutomate)
+  }
+
   @Test
   func runAutomationSelectsTheAlgorithmAndAwaitsResolveCompletion() async {
     let coordinator = SortCoordinator()

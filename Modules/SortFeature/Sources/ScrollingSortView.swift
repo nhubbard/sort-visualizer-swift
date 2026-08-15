@@ -86,45 +86,9 @@ public struct ScrollingSortView: View {
     }
     .navigationTitle(algorithm.metadata.displayName)
     .task {
-      // Registered/unregistered around the whole branch below (not just the intent one) —
-      // `SortCoordinator`'s live-session hooks (`StopIntent`, `SetPlaybackSpeedIntent`, ...)
-      // are meant to reach whichever sort is genuinely on screen, manually-started or not.
-      SortCoordinator.shared.registerActiveSession(session, for: algorithm.id)
-      defer { SortCoordinator.shared.unregisterActiveSession(for: algorithm.id) }
-
-      if let showcaseCompletion {
-        await session.runShowcasePass()
-        // Lets `RunControlBar`'s final stat values (compares/swaps/elapsed time) finish their
-        // `.snappy(duration: 0.15)` settle animation before the view tears down for the next
-        // algorithm — comfortably past 0.15s since a spring-based transition asymptotes rather
-        // than stopping sharply. `try?` + the `Task.isCancelled` guard below: if Showcase is
-        // stopped mid-delay, this just skips the (now-moot) advance instead of surfacing the
-        // resulting `CancellationError`.
-        try? await Task.sleep(for: .seconds(0.5))
-        if !Task.isCancelled { showcaseCompletion() }
-      } else if let action = SortCoordinator.shared.consumePendingAction(for: algorithm.id) {
-        // An App-Intents-triggered run (`RunSortIntent`/`RunAutomationIntent`) rather than
-        // a normal manually-selected screen — same "await genuine completion" contract as
-        // the Showcase branch above, just reported back through `SortCoordinator` instead
-        // of a `ContentView`-owned closure.
-        let token = SortCoordinator.shared.runToken
-        switch action {
-        case .run(let visualizerID, let size):
-          if let visualizerID { settings.selectedVisualizerID = visualizerID }
-          await session.runSinglePass(size: size ?? arraySize)
-        case .automation(let automationID):
-          if let automation = AutomationRegistry.shared.automation(id: automationID) {
-            await session.runAutomationAndWait(automation)
-          }
-        case .loadTape(let tape):
-          session.loadImportedTape(tape)
-        }
-        if !Task.isCancelled { SortCoordinator.shared.resolveCompletion(token: token) }
-      } else {
-        // SortSession.start(size:) clamps into algorithm.metadata.effectiveSizeRange(...) itself,
-        // so every caller gets that enforcement, not just this one.
-        await session.start(size: arraySize)
-      }
+      await runSortViewLifecycle(
+        session: session, algorithm: algorithm, arraySize: arraySize,
+        showcaseCompletion: showcaseCompletion, settings: settings)
     }
   }
 }

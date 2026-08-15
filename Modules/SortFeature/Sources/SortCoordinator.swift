@@ -31,7 +31,28 @@ public final class SortCoordinator {
   /// navigating the app looks, to the sidebar, exactly like a manual tap, and so a manual tap
   /// while the app is already open is just as visible to anything reading this from outside the
   /// view tree. Same precedent as `ContentView`'s own Showcase mode driving `selection` itself.
-  public var selectedAlgorithmID: AlgorithmID?
+  public var selectedAlgorithmID: AlgorithmID? {
+    didSet {
+      // Snapshotted here, at the exact moment `beginRun` sets both `pendingActions[algorithmID]`
+      // and `selectedAlgorithmID` together, rather than read live from `pendingActionWillAutomate`
+      // wherever it's needed — that method's answer flips to `false` the instant `.task` calls
+      // `consumePendingAction`, which happens almost immediately, well before the run it kicked
+      // off actually finishes. `ContentView.detailContent` used to branch on the live method
+      // directly, so any unrelated re-render during that run's ~1s of real animation (a Full
+      // Sweep progress update, anything) flipped the branch back to `ScrollingSortView` mid-flight
+      // — tearing down `NonScrollingSortView` and cancelling its `.task` before it ever reached
+      // `resolveCompletion`, hanging `runSort`'s continuation forever. `CoverageSweepDriver
+      // .runLoop`'s `await SortCoordinator.shared.runSort(...)` then just sat there: no TSV
+      // append, no advance to the next combo, indistinguishable from "stuck after one sort." This
+      // snapshot instead stays fixed for a selection's whole lifetime, only changing in lockstep
+      // with `selectedAlgorithmID`/`runToken` themselves (both flip together on the next real
+      // selection change) — so `detailContent`'s branch and its `.id(...)` never disagree.
+      currentSelectionWillAutomate = selectedAlgorithmID.map(pendingActionWillAutomate(for:)) ?? false
+    }
+  }
+  /// Stable per-selection snapshot of `pendingActionWillAutomate(for:)` — see `selectedAlgorithmID`
+  /// `didSet` above for why this exists instead of calling that method live from `ContentView`.
+  public private(set) var currentSelectionWillAutomate = false
   /// `ContentView`'s Settings sheet binds directly to this instead of owning its own
   /// `@State` — the scene-level `SortCommands` menu (⌘,) needs somewhere reachable to request the
   /// sheet from outside the view tree, same rationale as `selectedAlgorithmID` above.

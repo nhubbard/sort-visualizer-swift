@@ -342,16 +342,33 @@ struct ContentView: View {
     Group {
       if let selection = coordinator.selectedAlgorithmID,
         let algorithm = AlgorithmRegistry.shared.algorithm(id: selection) {
-        ScrollingSortView(
-          algorithm: algorithm, shuffle: effectiveShuffle(for: selection), arraySize: arraySize,
-          showcaseCompletion: showcaseCompletionHandler, showcaseStop: showcaseStopHandler
-        )
-        // Folds in `coordinator.runToken` (bumped on every intent-triggered run, and by
-        // `selectAlgorithmForFreshView` — see `startShowcase`/`advanceShowcase`) alongside
-        // `selection` — a `RunSortIntent`/`RunAutomationIntent`/Showcase step re-running or
-        // landing on the *same* algorithm still needs a genuinely fresh `ScrollingSortView`/
-        // `SortSession`, not a silent no-op against one that already reached `.complete`.
-        .id("\(selection.rawValue)-\(coordinator.runToken)")
+        // `coordinator.currentSelectionWillAutomate` — a stable snapshot taken once, when
+        // `selectedAlgorithmID` itself changed — not the live `pendingActionWillAutomate(for:)`,
+        // which flips back to `false` the moment the mounted view's `.task` consumes the pending
+        // action, almost immediately after mounting. Branching on the live value here let any
+        // unrelated re-render mid-run (a Full Sweep progress tick, anything) flip this back to
+        // `ScrollingSortView`, tearing down `NonScrollingSortView` and cancelling its `.task`
+        // before it ever reached `resolveCompletion` — see `SortCoordinator.selectedAlgorithmID`'s
+        // `didSet` for the full story. This snapshot only changes in lockstep with `selection`/
+        // `runToken` themselves, so the branch below and the `.id(...)` always agree.
+        if showcaseCompletionHandler != nil || coordinator.currentSelectionWillAutomate {
+          NonScrollingSortView(
+            algorithm: algorithm, shuffle: effectiveShuffle(for: selection), arraySize: arraySize,
+            showcaseCompletion: showcaseCompletionHandler, showcaseStop: showcaseStopHandler
+          )
+          // Folds in `coordinator.runToken` (bumped on every intent-triggered run, and by
+          // `selectAlgorithmForFreshView` — see `startShowcase`/`advanceShowcase`) alongside
+          // `selection` — a `RunSortIntent`/`RunAutomationIntent`/Showcase step re-running or
+          // landing on the *same* algorithm still needs a genuinely fresh view/`SortSession`, not
+          // a silent no-op against one that already reached `.complete`.
+          .id("\(selection.rawValue)-\(coordinator.runToken)")
+        } else {
+          ScrollingSortView(
+            algorithm: algorithm, shuffle: effectiveShuffle(for: selection), arraySize: arraySize,
+            showcaseCompletion: showcaseCompletionHandler, showcaseStop: showcaseStopHandler
+          )
+          .id("\(selection.rawValue)-\(coordinator.runToken)")
+        }
       } else {
         HomeView()
       }
