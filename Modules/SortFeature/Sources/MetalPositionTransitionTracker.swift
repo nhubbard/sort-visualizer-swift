@@ -1,14 +1,14 @@
 import Foundation
 
-/// The position/size/point counterpart to `MetalColorTransitionTracker` — see that class's doc
-/// comment (`MetalColorTransitionTracker.swift`, same file as the shared `transitionDuration`/
-/// `easeInOutCubic` this class reuses) for the full rationale behind resolving `(from, to,
-/// startTime)` triples on the GPU every frame instead of sweeping every active entry on the CPU.
-/// Every renderer easing a position/size/point (`MetalBarRenderer`, `MetalShapeRenderer`,
-/// `MetalTriangleRenderer`, `MetalDisparityChordsRenderer`) uses this type; every renderer easing
-/// a color uses `MetalColorTransitionTracker` instead — same shape, kept as two small
-/// hand-duplicated classes rather than one shared abstraction (see that class's doc comment for
-/// why sharing one generic implementation is exactly the cost this design avoids).
+/// The position/size/point counterpart to `MetalColorSourceTracker`/`MetalMarkerColorTracker` —
+/// see `MetalEasingCore.swift` (the shared `transitionDuration`/`easeInOutCubic` this class reuses)
+/// for the full rationale behind resolving `(from, to, startTime)` triples on the GPU every frame
+/// instead of sweeping every active entry on the CPU. Every renderer easing a position/size/point
+/// (`MetalBarRenderer`, `MetalShapeRenderer`, `MetalTriangleRenderer`,
+/// `MetalDisparityChordsRenderer`) uses this type; color uses `MetalColorSourceTracker`/
+/// `MetalMarkerColorTracker` instead — kept as separate hand-duplicated classes rather than one
+/// shared abstraction (a shared generic base would reintroduce the exact Swift generic-dispatch
+/// cost the original `MetalTransitionTracker<Value: SIMD>` → concrete-classes split eliminated).
 @MainActor
 final class MetalPositionTransitionTracker {
   private struct Entry {
@@ -18,7 +18,10 @@ final class MetalPositionTransitionTracker {
   }
 
   private var entries: [Int: Entry] = [:]
-  /// See `MetalColorTransitionTracker.settleDeadline`'s doc comment — identical role here.
+  /// The latest instant at which any tracked entry could still be mid-fade — an O(1) substitute
+  /// for scanning every entry every frame. Only ever grows (extended at retarget time to
+  /// `now + transitionDuration`), so once `now` passes it, NOTHING can still be fading — `isActive`
+  /// reporting `false` is exact, not approximate.
   private var settleDeadline: Float?
 
   func reset() {
@@ -62,14 +65,17 @@ final class MetalPositionTransitionTracker {
     return entry.from + (entry.to - entry.from) * SIMD2<Float>(repeating: eased)
   }
 
-  /// O(1) — whether ANY slot could still be mid-fade at `now`. See `MetalColorTransitionTracker
-  /// .isActive`'s doc comment.
+  /// O(1) — whether ANY slot could still be mid-fade at `now`, the caller's cue to keep re-arming
+  /// redraws.
   func isActive(now: Float) -> Bool {
     guard let deadline = settleDeadline else { return false }
     return now < deadline
   }
 
-  /// Test-only — see `MetalColorTransitionTracker.resolvedValueForTesting`'s doc comment.
+  /// Test-only: the CPU reference computation at an arbitrary probe time, for asserting the same
+  /// bookkeeping behavior these tests always have, and for parity-checking against the shader's
+  /// own `resolveAnimated2` in a renderer's shader-parity tests. Not used by any renderer at
+  /// runtime — `valueToWrite`'s return value is what actually reaches the GPU.
   func resolvedValueForTesting(forSlot slot: Int, now: Float) -> SIMD2<Float>? {
     entries[slot].map { resolvedValue($0, now: now) }
   }

@@ -15,14 +15,17 @@ enum MetalShapeColor {
   /// `nonisolated` layout contexts, so `@MainActor` isolation isn't an option here.
   nonisolated(unsafe) static var neutral = SIMD4<Float>(0.82, 0.82, 0.86, 1)
 
-  /// `nil` when `index` carries no marker at all — callers fall back to whatever
-  /// non-marker color their own `Visualizer` used (`hueRamp` for most, `neutral` for the two
-  /// that don't hue-ramp).
-  static func marker(forIndex index: Int, in markers: [Int: Set<Int>]) -> SIMD4<Float>? {
+  /// A compact `0`/`1`/`2` kind instead of a resolved color, matching `Marker.primary`/`Marker
+  /// .secondary`'s own raw values exactly so no separate mapping table is needed —
+  /// `AnimatedField.h`'s `resolveColorSource` checks this directly against the same two raw
+  /// integers. `0` means "no marker" — every renderer now passes this (plus a raw value, for
+  /// hue-ramp-capable renderers) instead of a resolved `SIMD4<Float>` color, since color
+  /// resolution moved into the vertex shader.
+  static func markerKind(forIndex index: Int, in markers: [Int: Set<Int>]) -> Int32 {
     let indexMarkers = markers[index] ?? []
-    if indexMarkers.contains(Marker.primary) { return primary }
-    if indexMarkers.contains(Marker.secondary) { return secondary }
-    return nil
+    if indexMarkers.contains(Marker.primary) { return Int32(Marker.primary) }
+    if indexMarkers.contains(Marker.secondary) { return Int32(Marker.secondary) }
+    return 0
   }
 
   static func hueRamp(_ normalized: Double) -> SIMD4<Float> {

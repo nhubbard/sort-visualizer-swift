@@ -7,10 +7,11 @@ private func isClose(_ lhs: SIMD2<Float>, _ rhs: SIMD2<Float>, tolerance: Float 
   return abs(delta.x) < tolerance && abs(delta.y) < tolerance
 }
 
-/// Mirrors `MetalColorTransitionTrackerTests.swift` test-for-test — same bookkeeping contract,
-/// only the `Value` shape (a 2D point instead of an RGBA color) differs. See that file's own doc
-/// comment for why these tests only cover the CPU-side bookkeeping half, not the GPU-side
-/// resolution.
+/// Covers exactly the bookkeeping half of `MetalPositionTransitionTracker` — deciding when a new
+/// target starts a fresh fade, and what `from`/`to`/`startTime` triple gets written. This is still
+/// 100% CPU-side logic after the GPU-driven easing redesign; only the per-frame resolution
+/// (`resolveAnimated2` in `AnimatedField.h`) moved to the shader, which these tests can't reach
+/// directly — see the per-renderer shader-parity tests for coverage of that half.
 @Suite
 struct MetalPositionTransitionTrackerTests {
   private static let origin = SIMD2<Float>(10, 20)

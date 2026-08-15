@@ -9,7 +9,7 @@ using namespace metal;
 struct ShapeInstance {
     AnimatedFloat2 origin;
     AnimatedFloat2 size;
-    AnimatedFloat4 color;
+    AnimatedColorSource color;
 };
 
 struct RasterizedShape {
@@ -23,9 +23,9 @@ struct RasterizedShape {
 /// Same one-instanced-draw-call-per-frame structure as `bar_vertex` (see its own doc comment) —
 /// this is a separate function rather than a shared one only because it additionally computes
 /// `localUV`, which `bar_vertex`'s `RasterizedBar` output has no field for. Resolving each
-/// animated field here (`resolveAnimated2`/`resolveAnimated4`, `AnimatedField.h`) rather than on
+/// animated field here (`resolveAnimated2`/`resolveAnimatedColorSource`, `AnimatedField.h`) rather than on
 /// the CPU is what keeps steady-state per-frame CPU cost O(1) regardless of how many shapes are
-/// mid-transition — see `MetalColorTransitionTracker`'s doc comment for the full rationale.
+/// mid-transition — see `MetalColorSourceTracker`'s doc comment for the full rationale.
 vertex RasterizedShape shape_vertex(
     uint vertexID [[vertex_id]],
     uint instanceID [[instance_id]],
@@ -37,7 +37,9 @@ vertex RasterizedShape shape_vertex(
 
     float2 origin = resolveAnimated2(shape.origin, uniforms.currentTime, uniforms.transitionDuration);
     float2 size = resolveAnimated2(shape.size, uniforms.currentTime, uniforms.transitionDuration);
-    float4 color = resolveAnimated4(shape.color, uniforms.currentTime, uniforms.transitionDuration);
+    float4 color = resolveAnimatedColorSource(
+        shape.color, uniforms.currentTime, uniforms.transitionDuration, uniforms.useHueRamp,
+        uniforms.primaryColor, uniforms.secondaryColor, uniforms.neutralColor);
 
     float2 pixelPosition = origin + unitCorner * size;
 
@@ -82,18 +84,18 @@ struct HanoiOrigin {
 
 /// Layout must match Swift's `HanoiInstance` (`MetalHanoiTowersRenderer.swift`) exactly — `size`
 /// is a plain unanimated `float2` (Hanoi never eases block size), `color` is the usual
-/// `AnimatedFloat4`.
+/// `AnimatedColorSource` (Hanoi hue-ramps like every renderer except `MetalBarRenderer`).
 struct HanoiInstance {
     HanoiOrigin origin;
     float2 size;
-    AnimatedFloat4 color;
+    AnimatedColorSource color;
 };
 
 /// Resolves a `HanoiOrigin` to its current displayed position — the shader-side counterpart to
 /// `HanoiMoveScheduler.resolvedOrigin(forSlot:now:)`, which MUST stay in sync with this exactly
 /// (that Swift copy runs only at retarget time, to compute a smooth continuation point; this one
 /// runs every frame, for every Hanoi instance, which is the entire point of the GPU-driven
-/// redesign — see `MetalColorTransitionTracker`'s doc comment). Reproduces the exact two-phase
+/// redesign — see `MetalColorSourceTracker`'s doc comment). Reproduces the exact two-phase
 /// timing `HanoiMoveScheduler`'s doc comment describes: ease `transitionDuration` toward `leg0To`,
 /// sit static until `leg0Hold` elapses, then ease a fresh `transitionDuration` toward `leg1To` —
 /// NOT a single fade lasting `leg0Hold`, which is why `t` is compared against `leg0Hold` directly
@@ -123,7 +125,9 @@ vertex RasterizedShape hanoi_vertex(
     HanoiInstance block = instances[instanceID];
 
     float2 origin = resolveHanoiOrigin(block.origin, uniforms.currentTime, uniforms.transitionDuration);
-    float4 color = resolveAnimated4(block.color, uniforms.currentTime, uniforms.transitionDuration);
+    float4 color = resolveAnimatedColorSource(
+        block.color, uniforms.currentTime, uniforms.transitionDuration, uniforms.useHueRamp,
+        uniforms.primaryColor, uniforms.secondaryColor, uniforms.neutralColor);
 
     float2 pixelPosition = origin + unitCorner * block.size;
 

@@ -23,12 +23,11 @@ struct DisparityBarGraphMetalLayout: MetalShapeLayout {
     let disp = (1 + sin(.pi * Double(value - index) / Double(count))) * 0.5
     let height = canvasSize.height * disp
     let normalized = MetalShapeColor.normalized(value: value, in: valueRange)
-    let color =
-      MetalShapeColor.marker(forIndex: index, in: markers) ?? MetalShapeColor.hueRamp(normalized)
     return MetalShapeInstance(
       origin: SIMD2(Float(Double(index) * barWidth), Float(canvasSize.height - height)),
       size: SIMD2(Float(barWidth), Float(height)),
-      color: color
+      colorValue: Float(normalized),
+      colorMarker: MetalShapeColor.markerKind(forIndex: index, in: markers)
     )
   }
 }
@@ -48,7 +47,7 @@ struct RainbowMetalLayout: MetalShapeLayout {
     return MetalShapeInstance(
       origin: SIMD2(Float(Double(index) * barWidth), Float(canvasSize.height - height)),
       size: SIMD2(Float(barWidth), Float(height)),
-      color: MetalShapeColor.hueRamp(normalized)
+      colorValue: Float(normalized), colorMarker: 0
     )
   }
 }
@@ -68,12 +67,11 @@ struct SineWaveMetalLayout: MetalShapeLayout {
     let centerY = canvasSize.height / 2
     let amplitude = canvasSize.height * Self.amplitudeFraction
     let y = centerY - amplitude * sin(2 * Double.pi * normalized)
-    let color =
-      MetalShapeColor.marker(forIndex: index, in: markers) ?? MetalShapeColor.hueRamp(normalized)
     return MetalShapeInstance(
       origin: SIMD2(Float(Double(index) * columnWidth), Float(y - Self.barThickness / 2)),
       size: SIMD2(Float(columnWidth), Float(Self.barThickness)),
-      color: color
+      colorValue: Float(normalized),
+      colorMarker: MetalShapeColor.markerKind(forIndex: index, in: markers)
     )
   }
 }
@@ -122,18 +120,19 @@ struct PixelMeshMetalLayout: MetalShapeLayout {
     markers: [Int: Set<Int>], canvasSize: CGSize, count: Int
   ) -> MetalShapeInstance {
     let side = gridSide(for: count)
-    guard side > 0 else { return MetalShapeInstance(origin: .zero, size: .zero, color: .zero) }
+    guard side > 0 else {
+      return MetalShapeInstance(origin: .zero, size: .zero, colorValue: 0, colorMarker: 0)
+    }
     let cellWidth = canvasSize.width / Double(side)
     let cellHeight = canvasSize.height / Double(side)
     let gridX = slot % side
     let gridY = slot / side
     let normalized = MetalShapeColor.normalized(value: values[index], in: valueRange)
-    let color =
-      MetalShapeColor.marker(forIndex: index, in: markers) ?? MetalShapeColor.hueRamp(normalized)
     return MetalShapeInstance(
       origin: SIMD2(Float(Double(gridX) * cellWidth), Float(Double(gridY) * cellHeight)),
       size: SIMD2(Float(cellWidth), Float(cellHeight)),
-      color: color
+      colorValue: Float(normalized),
+      colorMarker: MetalShapeColor.markerKind(forIndex: index, in: markers)
     )
   }
 }
@@ -143,6 +142,8 @@ struct PixelMeshMetalLayout: MetalShapeLayout {
 /// Ports `ScatterPlotVisualizer`.
 struct ScatterPlotMetalLayout: MetalShapeLayout {
   static let shapeKind: MetalShapeKind = .ellipse
+  // Flat, non-hue-ramped default — see `MetalShapeLayout.usesHueRamp`'s own doc comment.
+  static let usesHueRamp = false
   private static let dotDiameter: Double = 6
 
   static func instance(
@@ -154,11 +155,10 @@ struct ScatterPlotMetalLayout: MetalShapeLayout {
     let radius = Self.dotDiameter / 2
     let centerX = Double(index) * columnWidth + columnWidth / 2
     let centerY = radius + (canvasSize.height - 2 * radius) * (1 - normalized)
-    let color = MetalShapeColor.marker(forIndex: index, in: markers) ?? MetalShapeColor.neutral
     return MetalShapeInstance(
       origin: SIMD2(Float(centerX - radius), Float(centerY - radius)),
       size: SIMD2(Float(Self.dotDiameter), Float(Self.dotDiameter)),
-      color: color
+      colorValue: 0, colorMarker: MetalShapeColor.markerKind(forIndex: index, in: markers)
     )
   }
 }
@@ -166,6 +166,8 @@ struct ScatterPlotMetalLayout: MetalShapeLayout {
 /// Ports `WaveDotsVisualizer`.
 struct WaveDotsMetalLayout: MetalShapeLayout {
   static let shapeKind: MetalShapeKind = .ellipse
+  // Flat, non-hue-ramped default — see `MetalShapeLayout.usesHueRamp`'s own doc comment.
+  static let usesHueRamp = false
   private static let dotDiameter: Double = 6
 
   static func instance(
@@ -179,11 +181,10 @@ struct WaveDotsMetalLayout: MetalShapeLayout {
     let amplitude = canvasSize.height / 2 - radius
     let centerX = Double(index) * columnWidth + columnWidth / 2
     let centerY = verticalCenter + amplitude * sin(2 * Double.pi * normalized)
-    let color = MetalShapeColor.marker(forIndex: index, in: markers) ?? MetalShapeColor.neutral
     return MetalShapeInstance(
       origin: SIMD2(Float(centerX - radius), Float(centerY - radius)),
       size: SIMD2(Float(Self.dotDiameter), Float(Self.dotDiameter)),
-      color: color
+      colorValue: 0, colorMarker: MetalShapeColor.markerKind(forIndex: index, in: markers)
     )
   }
 }
@@ -204,12 +205,11 @@ struct SpiralDotsMetalLayout: MetalShapeLayout {
     let distance = normalized * radius
     let centerX = center.x + distance * cos(angle)
     let centerY = center.y + distance * sin(angle)
-    let color =
-      MetalShapeColor.marker(forIndex: index, in: markers) ?? MetalShapeColor.hueRamp(normalized)
     return MetalShapeInstance(
       origin: SIMD2(Float(centerX - Self.dotDiameter / 2), Float(centerY - Self.dotDiameter / 2)),
       size: SIMD2(Float(Self.dotDiameter), Float(Self.dotDiameter)),
-      color: color
+      colorValue: Float(normalized),
+      colorMarker: MetalShapeColor.markerKind(forIndex: index, in: markers)
     )
   }
 }
@@ -234,12 +234,11 @@ struct DisparityDotsMetalLayout: MetalShapeLayout {
     let centerX = center.x + disp * radius * cos(theta)
     let centerY = center.y + disp * radius * sin(theta)
     let normalized = MetalShapeColor.normalized(value: value, in: valueRange)
-    let color =
-      MetalShapeColor.marker(forIndex: index, in: markers) ?? MetalShapeColor.hueRamp(normalized)
     return MetalShapeInstance(
       origin: SIMD2(Float(centerX - dotRadius), Float(centerY - dotRadius)),
       size: SIMD2(Float(Self.dotDiameter), Float(Self.dotDiameter)),
-      color: color
+      colorValue: Float(normalized),
+      colorMarker: MetalShapeColor.markerKind(forIndex: index, in: markers)
     )
   }
 }
@@ -276,12 +275,11 @@ struct HoopStackMetalLayout: MetalShapeLayout {
     let scale = 0.2 + 0.8 * normalized
     let radiusX = scale * baseRadiusX
     let radiusY = scale * baseRadiusY
-    let color =
-      MetalShapeColor.marker(forIndex: index, in: markers) ?? MetalShapeColor.hueRamp(normalized)
     return MetalShapeInstance(
       origin: SIMD2(Float(centerX - radiusX), Float(y - radiusY)),
       size: SIMD2(Float(2 * radiusX), Float(2 * radiusY)),
-      color: color
+      colorValue: Float(normalized),
+      colorMarker: MetalShapeColor.markerKind(forIndex: index, in: markers)
     )
   }
 }

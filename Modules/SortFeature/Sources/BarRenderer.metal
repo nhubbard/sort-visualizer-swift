@@ -2,16 +2,18 @@
 #include "AnimatedField.h"
 using namespace metal;
 
-/// One bar's on-screen rect + color, each field an unresolved `(from, to, startTime)` triple
-/// instead of an already-interpolated value — `MetalBarRenderer` writes one of these directly
-/// into a persistent buffer per touched index per operation, and this vertex shader resolves the
-/// actual displayed geometry/color itself, every frame, via `resolveAnimated2`/`resolveAnimated4`
-/// (`AnimatedField.h`). Layout must match `MetalBarRenderer.BarInstance` exactly (both are plain,
+/// One bar's on-screen rect + color, each field an unresolved `(from, to, startTime)`-shaped
+/// triple instead of an already-interpolated value — `MetalBarRenderer` writes one of these
+/// directly into a persistent buffer per touched index per operation, and this vertex shader
+/// resolves the actual displayed geometry/color itself, every frame, via `resolveAnimated2`/
+/// `resolveAnimatedMarkerColor` (`AnimatedField.h`). `color` is `AnimatedMarkerColor`, not
+/// `AnimatedColorSource` — Bar never hue-ramps, only ever picks between primary/secondary/a flat
+/// default. Layout must match `MetalBarRenderer.BarInstance` exactly (both are plain,
 /// tightly-packed structs with no Swift-side padding surprises).
 struct BarInstance {
     AnimatedFloat2 origin;
     AnimatedFloat2 size;
-    AnimatedFloat4 color;
+    AnimatedMarkerColor color;
 };
 
 struct RasterizedBar {
@@ -37,7 +39,9 @@ vertex RasterizedBar bar_vertex(
 
     float2 origin = resolveAnimated2(bar.origin, uniforms.currentTime, uniforms.transitionDuration);
     float2 size = resolveAnimated2(bar.size, uniforms.currentTime, uniforms.transitionDuration);
-    float4 color = resolveAnimated4(bar.color, uniforms.currentTime, uniforms.transitionDuration);
+    float4 color = resolveAnimatedMarkerColor(
+        bar.color, uniforms.currentTime, uniforms.transitionDuration, uniforms.primaryColor,
+        uniforms.secondaryColor, uniforms.neutralColor);
 
     float2 pixelPosition = origin + unitCorner * size;
 

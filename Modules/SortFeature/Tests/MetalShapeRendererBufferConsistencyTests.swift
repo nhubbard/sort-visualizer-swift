@@ -249,17 +249,17 @@ struct MetalShapeRendererBufferConsistencyTests {
       mismatches.isEmpty, "\(mismatches.count) slot(s) never got the correct final height written")
   }
 
-  /// Coverage for `MetalColorTransitionTracker`: a touched slot's buffer color must NOT jump
-  /// straight to the marker color the instant `apply` runs, and must reach it only after
-  /// `advanceTransitions` has had enough elapsed time to finish the fade — the whole point of
-  /// easing instead of snapping to avoid a rapid, high-contrast flash on small-array algorithms
+  /// Coverage for `MetalColorSourceTracker`/`resolveAnimatedColorSource`: a touched slot's
+  /// resolved color must NOT jump straight to the marker color the instant `apply` runs, and must
+  /// reach it only once enough time has elapsed to finish the fade — the whole point of easing
+  /// instead of snapping to avoid a rapid, high-contrast flash on small-array algorithms
   /// (Bogo/Bozo Sort) where the affected shape is large on screen.
   @MainActor
   @Test
   func touchedSlotColorEasesInsteadOfSnapping() throws {
     let device = try #require(MTLCreateSystemDefaultDevice())
     // `RainbowMetalLayout` ignores markers entirely (always hue-ramp) — `DisparityBarGraphMetalLayout`
-    // is one of the layouts that actually paints `MetalShapeColor.marker(forIndex:in:)`, so a
+    // is one of the layouts that actually paints `MetalShapeColor.markerKind(forIndex:in:)`, so a
     // `.mark` operation's touched slot really does have a different target color to fade toward.
     let renderer = try #require(MetalShapeRenderer<DisparityBarGraphMetalLayout>(device: device))
     let values = [10, 20]

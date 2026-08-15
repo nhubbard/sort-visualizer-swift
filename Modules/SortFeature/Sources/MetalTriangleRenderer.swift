@@ -13,7 +13,8 @@ struct MetalTriangleInstance {
   var p0: SIMD2<Float>
   var p1: SIMD2<Float>
   var p2: SIMD2<Float>
-  var color: SIMD4<Float>
+  var colorValue: Float
+  var colorMarker: Int32
 }
 
 /// GPU-buffer layout, matched exactly to `PolygonRenderer.metal`'s `TriangleInstance` struct —
@@ -25,7 +26,7 @@ struct MetalTriangleGPUInstance {
   var p0: AnimatedFloat2
   var p1: AnimatedFloat2
   var p2: AnimatedFloat2
-  var color: AnimatedFloat4
+  var color: AnimatedColorSource
 }
 
 /// Per-visualizer geometry contract for `MetalTriangleRenderer<Self>` — the triangle-wedge sibling
@@ -68,7 +69,7 @@ final class MetalTriangleRenderer<Layout: MetalTriangleLayout>: NSObject, MetalI
   private var lastScale: CGFloat = 1
   private var pixelSize: CGSize = .zero
 
-  private let colorTransitions = MetalColorTransitionTracker()
+  private let colorTransitions = MetalColorSourceTracker()
   private let p0Transitions = MetalPositionTransitionTracker()
   private let p1Transitions = MetalPositionTransitionTracker()
   private let p2Transitions = MetalPositionTransitionTracker()
@@ -182,7 +183,8 @@ final class MetalTriangleRenderer<Layout: MetalTriangleLayout>: NSObject, MetalI
       p0: p0Transitions.valueToWrite(forSlot: slot, target: target.p0 * Float(lastScale), now: n),
       p1: p1Transitions.valueToWrite(forSlot: slot, target: target.p1 * Float(lastScale), now: n),
       p2: p2Transitions.valueToWrite(forSlot: slot, target: target.p2 * Float(lastScale), now: n),
-      color: colorTransitions.valueToWrite(forSlot: slot, target: target.color, now: n)
+      color: colorTransitions.valueToWrite(
+        forSlot: slot, value: target.colorValue, marker: target.colorMarker, now: n)
     )
 
     instanceBuffer.contents()
@@ -235,14 +237,24 @@ final class MetalTriangleRenderer<Layout: MetalTriangleLayout>: NSObject, MetalI
   }
 
   /// Test seam: resolved displayed values at a pinned `currentTime` — see `MetalShapeRenderer
-  /// .resolvedInstances(at:)`'s doc comment.
-  func resolvedInstances(at currentTime: Float) -> [MetalTriangleInstance] {
+  /// .resolvedInstances(at:)`'s doc comment. Every `MetalTriangleLayout` hue-ramps (none use flat
+  /// neutral, unlike two `MetalShapeLayout`s), so `useHueRamp` is unconditionally `true` here.
+  struct ResolvedTriangleInstance {
+    var p0: SIMD2<Float>
+    var p1: SIMD2<Float>
+    var p2: SIMD2<Float>
+    var color: SIMD4<Float>
+  }
+
+  func resolvedInstances(at currentTime: Float) -> [ResolvedTriangleInstance] {
     debugInstances().map {
-      MetalTriangleInstance(
+      ResolvedTriangleInstance(
         p0: resolveAnimated2($0.p0, at: currentTime),
         p1: resolveAnimated2($0.p1, at: currentTime),
         p2: resolveAnimated2($0.p2, at: currentTime),
-        color: resolveAnimated4($0.color, at: currentTime))
+        color: resolveAnimatedColorSource(
+          $0.color, at: currentTime, useHueRamp: true, primaryColor: MetalShapeColor.primary,
+          secondaryColor: MetalShapeColor.secondary, neutralColor: MetalShapeColor.neutral))
     }
   }
 
@@ -264,9 +276,12 @@ final class MetalTriangleRenderer<Layout: MetalTriangleLayout>: NSObject, MetalI
 
     encoder.setRenderPipelineState(pipelineState)
     encoder.setVertexBuffer(buffer, offset: 0, index: 0)
+    // `useHueRamp: 1` unconditionally — every `MetalTriangleLayout` hue-ramps.
     var uniforms = MetalAnimationUniforms(
       viewportSize: SIMD2(Float(pixelSize.width), Float(pixelSize.height)),
-      currentTime: currentTime, transitionDuration: Float(transitionDuration))
+      currentTime: currentTime, transitionDuration: Float(transitionDuration), useHueRamp: 1,
+      primaryColor: MetalShapeColor.primary, secondaryColor: MetalShapeColor.secondary,
+      neutralColor: MetalShapeColor.neutral)
     encoder.setVertexBytes(&uniforms, length: MemoryLayout<MetalAnimationUniforms>.size, index: 1)
     encoder.drawPrimitives(
       type: .triangle, vertexStart: 0, vertexCount: 3, instanceCount: slotCount)

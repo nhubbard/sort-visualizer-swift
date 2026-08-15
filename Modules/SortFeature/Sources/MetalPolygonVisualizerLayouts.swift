@@ -33,13 +33,12 @@ struct ColorCircleMetalLayout: MetalTriangleLayout {
       atAngle: Self.angle(index - 1, count: count), center: center, radius: radius)
     let end = Self.point(atAngle: Self.angle(index, count: count), center: center, radius: radius)
     let normalized = MetalShapeColor.normalized(value: values[index], in: valueRange)
-    let color =
-      MetalShapeColor.marker(forIndex: index, in: markers) ?? MetalShapeColor.hueRamp(normalized)
     return MetalTriangleInstance(
       p0: SIMD2(Float(center.x), Float(center.y)),
       p1: SIMD2(Float(start.x), Float(start.y)),
       p2: SIMD2(Float(end.x), Float(end.y)),
-      color: color
+      colorValue: Float(normalized),
+      colorMarker: MetalShapeColor.markerKind(forIndex: index, in: markers)
     )
   }
 }
@@ -82,13 +81,12 @@ struct DisparityCircleMetalLayout: MetalTriangleLayout {
     let end = Self.point(
       forIndex: index, values: values, center: center, radius: radius, count: count)
     let normalized = MetalShapeColor.normalized(value: values[index], in: valueRange)
-    let color =
-      MetalShapeColor.marker(forIndex: index, in: markers) ?? MetalShapeColor.hueRamp(normalized)
     return MetalTriangleInstance(
       p0: SIMD2(Float(center.x), Float(center.y)),
       p1: SIMD2(Float(start.x), Float(start.y)),
       p2: SIMD2(Float(end.x), Float(end.y)),
-      color: color
+      colorValue: Float(normalized),
+      colorMarker: MetalShapeColor.markerKind(forIndex: index, in: markers)
     )
   }
 }
@@ -128,13 +126,12 @@ struct SpiralMetalLayout: MetalTriangleLayout {
       forIndex: index, values: values, valueRange: valueRange, center: center, radius: radius,
       count: count)
     let normalized = MetalShapeColor.normalized(value: values[index], in: valueRange)
-    let color =
-      MetalShapeColor.marker(forIndex: index, in: markers) ?? MetalShapeColor.hueRamp(normalized)
     return MetalTriangleInstance(
       p0: SIMD2(Float(center.x), Float(center.y)),
       p1: SIMD2(Float(start.x), Float(start.y)),
       p2: SIMD2(Float(end.x), Float(end.y)),
-      color: color
+      colorValue: Float(normalized),
+      colorMarker: MetalShapeColor.markerKind(forIndex: index, in: markers)
     )
   }
 }

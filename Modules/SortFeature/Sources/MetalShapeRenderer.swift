@@ -9,25 +9,35 @@ enum MetalShapeKind {
   case ellipse
 }
 
-/// The TARGET geometry/color a `MetalShapeLayout` computes for one slot, in points, before scaling
-/// to pixels or being fed through a transition tracker — plain resolved values, NOT the GPU
-/// buffer's own layout (see `MetalShapeGPUInstance` for that). Every `MetalShapeLayout` conformance
-/// in `MetalVisualizerLayouts.swift` returns one of these; `MetalShapeRenderer.writeInstance` is
-/// the only place that turns it into the animated triples the GPU buffer actually holds.
+/// The TARGET geometry/color-ingredients a `MetalShapeLayout` computes for one slot, in points,
+/// before scaling to pixels or being fed through a transition tracker — plain resolved values, NOT
+/// the GPU buffer's own layout (see `MetalShapeGPUInstance` for that). Every `MetalShapeLayout`
+/// conformance in `MetalVisualizerLayouts.swift` returns one of these; `MetalShapeRenderer
+/// .writeInstance` is the only place that turns it into the animated triples the GPU buffer
+/// actually holds.
+///
+/// `colorValue`/`colorMarker` — NOT a resolved `SIMD4<Float>` color — since `shape_vertex` now
+/// computes the actual hue-ramp/marker-override color itself (`AnimatedField.h`'s
+/// `resolveColorSource`); a layout only ever needs to supply the raw ingredients
+/// (`MetalShapeColor.normalized(value:in:)`/`.markerKind(forIndex:in:)`), never call `.hueRamp`/
+/// `.marker` directly anymore.
 struct MetalShapeInstance {
   var origin: SIMD2<Float>
   var size: SIMD2<Float>
-  var color: SIMD4<Float>
+  var colorValue: Float
+  var colorMarker: Int32
 }
 
 /// GPU-buffer layout, matched exactly to `ShapeRenderer.metal`'s `ShapeInstance` struct — each
-/// field an unresolved `(from, to, startTime)` triple, resolved every frame by `shape_vertex`
-/// itself via `resolveAnimated2`/`resolveAnimated4` (`AnimatedField.h`) rather than by a CPU-side
-/// per-frame sweep. See `MetalColorTransitionTracker`'s doc comment for the full rationale.
+/// field an unresolved `(from, to, startTime)`-shaped triple, resolved every frame by
+/// `shape_vertex` itself via `resolveAnimated2`/`resolveAnimatedColorSource` (`AnimatedField.h`)
+/// rather than by a CPU-side per-frame sweep. See `MetalColorSourceTracker`'s doc comment for the
+/// full rationale behind resolving color on the GPU, and `MetalPositionTransitionTracker`'s for
+/// position.
 struct MetalShapeGPUInstance {
   var origin: AnimatedFloat2
   var size: AnimatedFloat2
-  var color: AnimatedFloat4
+  var color: AnimatedColorSource
 }
 
 /// Per-visualizer geometry contract for `MetalShapeRenderer<Self>` — mirrors that `Visualizer`'s
@@ -43,6 +53,13 @@ struct MetalShapeGPUInstance {
 /// directly without an actor hop.
 protocol MetalShapeLayout {
   static var shapeKind: MetalShapeKind { get }
+
+  /// Whether this layout's non-marker default color is a hue-ramp of `colorValue` (`true`, most
+  /// layouts) or a flat neutral color (`false` — `ScatterPlotMetalLayout`/`WaveDotsMetalLayout`
+  /// only). A marker (primary/secondary) always overrides either way. Read once per `reset()` and
+  /// passed to the shader via `AnimationUniforms.useHueRamp` — fixed for a given `Layout`, not
+  /// something that varies per instance/frame.
+  static var usesHueRamp: Bool { get }
 
   /// Total GPU instance count for a given array length. Default: one instance per index.
   static func instanceCount(for count: Int) -> Int
@@ -64,6 +81,7 @@ protocol MetalShapeLayout {
 }
 
 extension MetalShapeLayout {
+  static var usesHueRamp: Bool { true }
   static func instanceCount(for count: Int) -> Int { count }
   static func arrayIndex(forSlot slot: Int, count: Int) -> Int { slot }
   static func slots(forIndex index: Int, count: Int) -> [Int] { [index] }
@@ -87,7 +105,7 @@ final class MetalShapeRenderer<Layout: MetalShapeLayout>: NSObject, MetalIncreme
   private var lastScale: CGFloat = 1
   private var pixelSize: CGSize = .zero
 
-  private let colorTransitions = MetalColorTransitionTracker()
+  private let colorTransitions = MetalColorSourceTracker()
   private let originTransitions = MetalPositionTransitionTracker()
   private let sizeTransitions = MetalPositionTransitionTracker()
   /// See `MetalBarRenderer.timeEpoch`/`now()`'s doc comments.
@@ -202,7 +220,8 @@ final class MetalShapeRenderer<Layout: MetalShapeLayout>: NSObject, MetalIncreme
         forSlot: slot, target: target.origin * Float(lastScale), now: n),
       size: sizeTransitions.valueToWrite(
         forSlot: slot, target: target.size * Float(lastScale), now: n),
-      color: colorTransitions.valueToWrite(forSlot: slot, target: target.color, now: n)
+      color: colorTransitions.valueToWrite(
+        forSlot: slot, value: target.colorValue, marker: target.colorMarker, now: n)
     )
 
     instanceBuffer.contents()
@@ -256,14 +275,23 @@ final class MetalShapeRenderer<Layout: MetalShapeLayout>: NSObject, MetalIncreme
   /// Test seam: `debugInstances()`'s raw triples resolved to plain displayed values at an
   /// explicit, pinned `currentTime` — the direct replacement for the old `advanceTransitions
   /// (elapsed:); debugInstances()` pattern now that resolution happens in the shader, not on the
-  /// CPU. Uses the same CPU reference math (`resolveAnimated2`/`resolveAnimated4`) the shader-
-  /// parity tests independently verify against the real MSL implementation.
-  func resolvedInstances(at currentTime: Float) -> [MetalShapeInstance] {
+  /// CPU. Uses the same CPU reference math (`resolveAnimated2`/`resolveAnimatedColorSource`) the
+  /// shader-parity tests independently verify against the real MSL implementation.
+  struct ResolvedShapeInstance {
+    var origin: SIMD2<Float>
+    var size: SIMD2<Float>
+    var color: SIMD4<Float>
+  }
+
+  func resolvedInstances(at currentTime: Float) -> [ResolvedShapeInstance] {
     debugInstances().map {
-      MetalShapeInstance(
+      ResolvedShapeInstance(
         origin: resolveAnimated2($0.origin, at: currentTime),
         size: resolveAnimated2($0.size, at: currentTime),
-        color: resolveAnimated4($0.color, at: currentTime))
+        color: resolveAnimatedColorSource(
+          $0.color, at: currentTime, useHueRamp: Layout.usesHueRamp,
+          primaryColor: MetalShapeColor.primary, secondaryColor: MetalShapeColor.secondary,
+          neutralColor: MetalShapeColor.neutral))
     }
   }
 
@@ -287,7 +315,9 @@ final class MetalShapeRenderer<Layout: MetalShapeLayout>: NSObject, MetalIncreme
     encoder.setVertexBuffer(buffer, offset: 0, index: 0)
     var uniforms = MetalAnimationUniforms(
       viewportSize: SIMD2(Float(pixelSize.width), Float(pixelSize.height)),
-      currentTime: currentTime, transitionDuration: Float(transitionDuration))
+      currentTime: currentTime, transitionDuration: Float(transitionDuration),
+      useHueRamp: Layout.usesHueRamp ? 1 : 0, primaryColor: MetalShapeColor.primary,
+      secondaryColor: MetalShapeColor.secondary, neutralColor: MetalShapeColor.neutral)
     encoder.setVertexBytes(&uniforms, length: MemoryLayout<MetalAnimationUniforms>.size, index: 1)
     encoder.drawPrimitives(
       type: .triangleStrip, vertexStart: 0, vertexCount: 4, instanceCount: slotCount)

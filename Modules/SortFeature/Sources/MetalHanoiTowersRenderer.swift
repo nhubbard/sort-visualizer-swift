@@ -8,11 +8,11 @@ import VisualizationKit
 /// GPU-buffer layout, matched exactly to `ShapeRenderer.metal`'s `HanoiInstance` struct — `origin`
 /// is the fixed 2-leg `HanoiOrigin` (`HanoiMoveScheduler.swift`), `size` stays a plain unanimated
 /// value (Hanoi never eases block size, only position and color), `color` is the usual
-/// `AnimatedFloat4`.
+/// `AnimatedColorSource` (Hanoi hue-ramps like every renderer except `MetalBarRenderer`).
 struct HanoiInstance {
   var origin: HanoiOrigin
   var size: SIMD2<Float>
-  var color: AnimatedFloat4
+  var color: AnimatedColorSource
 }
 
 /// The Metal counterpart to `HanoiTowersVisualizer` (`Modules/BuiltInVisualizers/Sources/`) — that
@@ -46,14 +46,14 @@ final class MetalHanoiTowersRenderer: NSObject, MetalIncrementalRenderer {
   private var lastScale: CGFloat = 1
   private var pixelSize: CGSize = .zero
 
-  private let colorTransitions = MetalColorTransitionTracker()
+  private let colorTransitions = MetalColorSourceTracker()
   private let positions = HanoiMoveScheduler()
   /// See `MetalBarRenderer.timeEpoch`/`now()`'s doc comments.
   private var timeEpoch: CFTimeInterval = CACurrentMediaTime()
   private func now() -> Float { Float(CACurrentMediaTime() - timeEpoch) }
 
   /// How long a leg of the choreography (lift, carry, restore) takes before advancing to the
-  /// next waypoint — independent of `MetalColorTransitionTracker`'s own fixed 0.12s
+  /// next waypoint — independent of `MetalColorSourceTracker`'s own fixed 0.12s
   /// `transitionDuration`, just long enough for that fade to visually complete before the next
   /// leg starts. MUST stay `>= transitionDuration` — see `HanoiOrigin`'s own doc comment for why
   /// a smaller value would make leg 1 visibly pop instead of continuing from leg 0's target.
@@ -274,7 +274,6 @@ final class MetalHanoiTowersRenderer: NSObject, MetalIncrementalRenderer {
   ) {
     guard let instanceBuffer, values.indices.contains(slot) else { return }
     let normalized = MetalShapeColor.normalized(value: values[slot], in: valueRange)
-    let color = MetalShapeColor.marker(forIndex: slot, in: markers) ?? MetalShapeColor.hueRamp(normalized)
     let n = now()
     let home = homePosition(forIndex: slot)
 
@@ -282,7 +281,9 @@ final class MetalHanoiTowersRenderer: NSObject, MetalIncrementalRenderer {
       origin: positions.origin(forSlot: slot)
         ?? HanoiOrigin(leg0From: home, leg0To: home, leg1To: home, leg0Hold: 0, startTime: n),
       size: blockSize(),
-      color: colorTransitions.valueToWrite(forSlot: slot, target: color, now: n)
+      color: colorTransitions.valueToWrite(
+        forSlot: slot, value: Float(normalized),
+        marker: MetalShapeColor.markerKind(forIndex: slot, in: markers), now: n)
     )
     instanceBuffer.contents()
       .advanced(by: slot * MemoryLayout<HanoiInstance>.stride)
@@ -355,7 +356,9 @@ final class MetalHanoiTowersRenderer: NSObject, MetalIncrementalRenderer {
       }
       return ResolvedHanoiInstance(
         origin: resolvedOrigin, size: instance.size,
-        color: resolveAnimated4(instance.color, at: currentTime))
+        color: resolveAnimatedColorSource(
+          instance.color, at: currentTime, useHueRamp: true, primaryColor: MetalShapeColor.primary,
+          secondaryColor: MetalShapeColor.secondary, neutralColor: MetalShapeColor.neutral))
     }
   }
 
@@ -375,9 +378,12 @@ final class MetalHanoiTowersRenderer: NSObject, MetalIncrementalRenderer {
 
     encoder.setRenderPipelineState(pipelineState)
     encoder.setVertexBuffer(buffer, offset: 0, index: 0)
+    // `useHueRamp: 1` unconditionally — Hanoi always hue-ramps.
     var uniforms = MetalAnimationUniforms(
       viewportSize: SIMD2(Float(pixelSize.width), Float(pixelSize.height)),
-      currentTime: currentTime, transitionDuration: Float(transitionDuration))
+      currentTime: currentTime, transitionDuration: Float(transitionDuration), useHueRamp: 1,
+      primaryColor: MetalShapeColor.primary, secondaryColor: MetalShapeColor.secondary,
+      neutralColor: MetalShapeColor.neutral)
     encoder.setVertexBytes(&uniforms, length: MemoryLayout<MetalAnimationUniforms>.size, index: 1)
     encoder.drawPrimitives(
       type: .triangleStrip, vertexStart: 0, vertexCount: 4, instanceCount: count)

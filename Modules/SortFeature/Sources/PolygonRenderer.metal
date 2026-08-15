@@ -12,7 +12,7 @@ struct TriangleInstance {
     AnimatedFloat2 p0;
     AnimatedFloat2 p1;
     AnimatedFloat2 p2;
-    AnimatedFloat4 color;
+    AnimatedColorSource color;
 };
 
 struct RasterizedTriangle {
@@ -36,7 +36,9 @@ vertex RasterizedTriangle triangle_vertex(
     float2 p0 = resolveAnimated2(triangle.p0, uniforms.currentTime, uniforms.transitionDuration);
     float2 p1 = resolveAnimated2(triangle.p1, uniforms.currentTime, uniforms.transitionDuration);
     float2 p2 = resolveAnimated2(triangle.p2, uniforms.currentTime, uniforms.transitionDuration);
-    float4 color = resolveAnimated4(triangle.color, uniforms.currentTime, uniforms.transitionDuration);
+    float4 color = resolveAnimatedColorSource(
+        triangle.color, uniforms.currentTime, uniforms.transitionDuration, uniforms.useHueRamp,
+        uniforms.primaryColor, uniforms.secondaryColor, uniforms.neutralColor);
 
     float2 pixelPosition = vertexID == 0 ? p0 : (vertexID == 1 ? p1 : p2);
 
@@ -66,7 +68,7 @@ struct LineInstance {
     AnimatedFloat2 start;
     AnimatedFloat2 end;
     float thickness;
-    AnimatedFloat4 color;
+    AnimatedColorSource color;
 };
 
 struct RasterizedLine {
@@ -83,7 +85,9 @@ vertex RasterizedLine line_vertex(
     LineInstance line = instances[instanceID];
     float2 start = resolveAnimated2(line.start, uniforms.currentTime, uniforms.transitionDuration);
     float2 end = resolveAnimated2(line.end, uniforms.currentTime, uniforms.transitionDuration);
-    float4 color = resolveAnimated4(line.color, uniforms.currentTime, uniforms.transitionDuration);
+    float4 color = resolveAnimatedColorSource(
+        line.color, uniforms.currentTime, uniforms.transitionDuration, uniforms.useHueRamp,
+        uniforms.primaryColor, uniforms.secondaryColor, uniforms.neutralColor);
 
     float2 direction = end - start;
     float length = max(metal::length(direction), 0.0001);

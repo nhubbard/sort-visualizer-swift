@@ -2,17 +2,19 @@ import Testing
 
 @testable import SortFeature
 
-/// Regression coverage for a real bug this project hit: `AnimatedFloat2`/`AnimatedFloat4`'s raw
-/// (unpadded) size used to be smaller than their own alignment-padded stride, and Swift's
-/// nested-struct field-offset computation uses raw `size` while MSL/C always uses the
-/// alignment-padded `sizeof` — so a field following an `AnimatedFloat2`/`AnimatedFloat4` (like
-/// `MetalLineInstance.thickness`) could land at a different byte offset in Swift than the shader
-/// expected, silently corrupting whichever fields came after it. Fixed via explicit padding
-/// fields making `size == stride` for both types — these tests assert that invariant directly,
-/// plus the resulting stride of every GPU-buffer struct that embeds them, so a future field
-/// reordering/addition that reintroduces the gap fails loudly here instead of as a rendering bug
-/// only visible via pixel readback (see `MetalPolygonRendererTests
-/// .linePipelineRendersAlongItsOwnMidpoint`, which is what actually caught this the first time).
+/// Regression coverage for a real bug this project hit: `AnimatedFloat2`'s raw (unpadded) size
+/// used to be smaller than its own alignment-padded stride, and Swift's nested-struct field-offset
+/// computation uses raw `size` while MSL/C always uses the alignment-padded `sizeof` — so a field
+/// following an `AnimatedFloat2` (like `MetalLineInstance.thickness`) could land at a different
+/// byte offset in Swift than the shader expected, silently corrupting whichever fields came after
+/// it. Fixed via an explicit padding field making `size == stride`. `AnimatedColorSource`/
+/// `AnimatedMarkerColor` (the color-resolution-on-GPU structs) were designed from the start to be
+/// all 4-byte-aligned scalars specifically to avoid this class of bug entirely — these tests assert
+/// that invariant directly for every animated-field type, plus the resulting stride of every
+/// GPU-buffer struct that embeds them, so a future field reordering/addition that reintroduces a
+/// similar gap fails loudly here instead of as a rendering bug only visible via pixel readback (see
+/// `MetalPolygonRendererTests.linePipelineRendersAlongItsOwnMidpoint`, which is what actually
+/// caught the original bug).
 @Suite
 struct MetalAnimatedFieldLayoutTests {
   @Test
@@ -22,37 +24,46 @@ struct MetalAnimatedFieldLayoutTests {
   }
 
   @Test
-  func animatedFloat4HasNoInternalPadding() {
-    #expect(MemoryLayout<AnimatedFloat4>.size == MemoryLayout<AnimatedFloat4>.stride)
-    #expect(MemoryLayout<AnimatedFloat4>.stride == 48)
+  func animatedColorSourceHasNoInternalPadding() {
+    #expect(MemoryLayout<AnimatedColorSource>.size == MemoryLayout<AnimatedColorSource>.stride)
+    #expect(MemoryLayout<AnimatedColorSource>.stride == 20)
+  }
+
+  @Test
+  func animatedMarkerColorHasNoInternalPadding() {
+    #expect(MemoryLayout<AnimatedMarkerColor>.size == MemoryLayout<AnimatedMarkerColor>.stride)
+    #expect(MemoryLayout<AnimatedMarkerColor>.stride == 12)
   }
 
   @Test
   func metalAnimationUniformsStride() {
-    #expect(MemoryLayout<MetalAnimationUniforms>.stride == 16)
+    #expect(MemoryLayout<MetalAnimationUniforms>.stride == 80)
   }
 
   @Test
   func barInstanceStride() {
-    #expect(MemoryLayout<MetalBarRenderer.BarInstance>.stride == 96)
+    #expect(MemoryLayout<MetalBarRenderer.BarInstance>.stride == 64)
   }
 
   @Test
   func shapeGPUInstanceStride() {
-    #expect(MemoryLayout<MetalShapeGPUInstance>.stride == 96)
+    #expect(MemoryLayout<MetalShapeGPUInstance>.stride == 72)
   }
 
   @Test
   func triangleGPUInstanceStride() {
-    #expect(MemoryLayout<MetalTriangleGPUInstance>.stride == 128)
+    #expect(MemoryLayout<MetalTriangleGPUInstance>.stride == 96)
   }
 
-  /// The struct that actually exposed the bug: `thickness` (a plain, small-alignment scalar)
-  /// sits between two `AnimatedFloat2` fields and one `AnimatedFloat4` field — exactly the
-  /// arrangement where the Swift/MSL packing divergence manifested.
+  /// The struct that actually exposed the original bug: `thickness` (a plain, small-alignment
+  /// scalar) sits between two `AnimatedFloat2` fields and the color field — exactly the
+  /// arrangement where the Swift/MSL packing divergence manifested when color was still
+  /// `AnimatedFloat4`. Now that color is `AnimatedColorSource` (no internal padding of its own),
+  /// this struct's layout is unambiguous by construction, but the assertion stays as a permanent
+  /// tripwire.
   @Test
   func lineInstanceStride() {
-    #expect(MemoryLayout<MetalLineInstance>.stride == 112)
+    #expect(MemoryLayout<MetalLineInstance>.stride == 72)
   }
 
   @Test
@@ -63,6 +74,6 @@ struct MetalAnimatedFieldLayoutTests {
 
   @Test
   func hanoiInstanceStride() {
-    #expect(MemoryLayout<HanoiInstance>.stride == 96)
+    #expect(MemoryLayout<HanoiInstance>.stride == 64)
   }
 }

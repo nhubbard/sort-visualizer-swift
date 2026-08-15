@@ -21,20 +21,20 @@ struct MetalShapeColorTests {
   }
 
   @Test
-  func markerReturnsPrimaryColorWhenIndexCarriesThePrimaryMarker() {
+  func markerKindReturnsPrimaryRawValueWhenIndexCarriesThePrimaryMarker() {
     let markers: [Int: Set<Int>] = [0: [Marker.primary]]
-    #expect(MetalShapeColor.marker(forIndex: 0, in: markers) == MetalShapeColor.primary)
+    #expect(MetalShapeColor.markerKind(forIndex: 0, in: markers) == Int32(Marker.primary))
   }
 
   @Test
-  func markerReturnsSecondaryColorWhenIndexCarriesTheSecondaryMarker() {
+  func markerKindReturnsSecondaryRawValueWhenIndexCarriesTheSecondaryMarker() {
     let markers: [Int: Set<Int>] = [0: [Marker.secondary]]
-    #expect(MetalShapeColor.marker(forIndex: 0, in: markers) == MetalShapeColor.secondary)
+    #expect(MetalShapeColor.markerKind(forIndex: 0, in: markers) == Int32(Marker.secondary))
   }
 
   @Test
-  func markerReturnsNilWhenIndexHasNoEntryAtAll() {
+  func markerKindReturnsZeroWhenIndexHasNoEntryAtAll() {
     let markers: [Int: Set<Int>] = [1: [Marker.primary]]
-    #expect(MetalShapeColor.marker(forIndex: 0, in: markers) == nil)
+    #expect(MetalShapeColor.markerKind(forIndex: 0, in: markers) == 0)
   }
 }

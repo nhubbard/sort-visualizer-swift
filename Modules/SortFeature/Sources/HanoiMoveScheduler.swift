@@ -2,8 +2,8 @@ import Foundation
 
 /// A fixed 2-leg animated origin for `MetalHanoiTowersRenderer`'s lift-obstacles/carry/place/
 /// restore choreography, resolved every frame by `hanoi_vertex` (`resolveHanoiOrigin`,
-/// `AnimatedField.h`) instead of a CPU-side per-frame sweep — see `MetalColorTransitionTracker`'s
-/// doc comment for the full rationale behind resolving animation on the GPU.
+/// `AnimatedField.h`) instead of a CPU-side per-frame sweep — see `MetalColorSourceTracker`'s doc
+/// comment for the full rationale behind resolving animation on the GPU.
 ///
 /// Every real caller (`MetalHanoiTowersRenderer.choreographSwap`'s cross-tower swap,
 /// `scheduleObstacle`) schedules exactly 2 legs: ease `transitionDuration` seconds toward
@@ -34,7 +34,9 @@ struct HanoiOrigin {
 @MainActor
 final class HanoiMoveScheduler {
   private var origins: [Int: HanoiOrigin] = [:]
-  /// See `MetalColorTransitionTracker.settleDeadline`'s doc comment — identical O(1) role here.
+  /// The latest instant at which any tracked entry could still be mid-fade — an O(1) substitute
+  /// for scanning every entry every frame. Only ever grows, so once `now` passes it, NOTHING can
+  /// still be animating — `isActive` reporting `false` is exact, not approximate.
   private var settleDeadline: Float?
 
   func reset() {

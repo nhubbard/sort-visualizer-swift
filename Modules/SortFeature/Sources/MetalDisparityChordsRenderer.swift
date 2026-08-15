@@ -13,7 +13,7 @@ struct MetalLineInstance {
   var start: AnimatedFloat2
   var end: AnimatedFloat2
   var thickness: Float
-  var color: AnimatedFloat4
+  var color: AnimatedColorSource
 }
 
 /// Bespoke, non-generic — like `MetalBarRenderer`, not `MetalShapeRenderer<Layout>`/
@@ -34,7 +34,7 @@ final class MetalDisparityChordsRenderer: NSObject, MetalIncrementalRenderer {
   private var lastScale: CGFloat = 1
   private var pixelSize: CGSize = .zero
 
-  private let colorTransitions = MetalColorTransitionTracker()
+  private let colorTransitions = MetalColorSourceTracker()
   private let startTransitions = MetalPositionTransitionTracker()
   private let endTransitions = MetalPositionTransitionTracker()
   /// See `MetalBarRenderer.timeEpoch`/`now()`'s doc comments.
@@ -150,25 +150,18 @@ final class MetalDisparityChordsRenderer: NSObject, MetalIncrementalRenderer {
     let rawEnd = SIMD2(
       Float(center.x + radius * cos(toAngle)), Float(center.y + radius * sin(toAngle)))
     let n = now()
+    let normalized = MetalShapeColor.normalized(value: value, in: valueRange)
     let chord = MetalLineInstance(
       start: startTransitions.valueToWrite(forSlot: index, target: rawStart, now: n),
       end: endTransitions.valueToWrite(forSlot: index, target: rawEnd, now: n),
       thickness: Float(Self.lineWidth * lastScale),
       color: colorTransitions.valueToWrite(
-        forSlot: index,
-        target: color(forIndex: index, value: value, valueRange: valueRange, markers: markers),
-        now: n)
+        forSlot: index, value: Float(normalized),
+        marker: MetalShapeColor.markerKind(forIndex: index, in: markers), now: n)
     )
     instanceBuffer.contents()
       .advanced(by: index * MemoryLayout<MetalLineInstance>.stride)
       .storeBytes(of: chord, as: MetalLineInstance.self)
-  }
-
-  private func color(
-    forIndex index: Int, value: Int, valueRange: ClosedRange<Int>, markers: [Int: Set<Int>]
-  ) -> SIMD4<Float> {
-    MetalShapeColor.marker(forIndex: index, in: markers)
-      ?? MetalShapeColor.hueRamp(MetalShapeColor.normalized(value: value, in: valueRange))
   }
 
   var onDrawableSizeChange: ((CGSize) -> Void)?
@@ -222,9 +215,12 @@ final class MetalDisparityChordsRenderer: NSObject, MetalIncrementalRenderer {
 
     encoder.setRenderPipelineState(pipelineState)
     encoder.setVertexBuffer(buffer, offset: 0, index: 0)
+    // `useHueRamp: 1` unconditionally — `DisparityChordsVisualizer` always hue-ramps.
     var uniforms = MetalAnimationUniforms(
       viewportSize: SIMD2(Float(pixelSize.width), Float(pixelSize.height)),
-      currentTime: currentTime, transitionDuration: Float(transitionDuration))
+      currentTime: currentTime, transitionDuration: Float(transitionDuration), useHueRamp: 1,
+      primaryColor: MetalShapeColor.primary, secondaryColor: MetalShapeColor.secondary,
+      neutralColor: MetalShapeColor.neutral)
     encoder.setVertexBytes(&uniforms, length: MemoryLayout<MetalAnimationUniforms>.size, index: 1)
     encoder.drawPrimitives(
       type: .triangleStrip, vertexStart: 0, vertexCount: 4, instanceCount: count)
@@ -255,7 +251,9 @@ final class MetalDisparityChordsRenderer: NSObject, MetalIncrementalRenderer {
         start: resolveAnimated2($0.start, at: currentTime),
         end: resolveAnimated2($0.end, at: currentTime),
         thickness: $0.thickness,
-        color: resolveAnimated4($0.color, at: currentTime))
+        color: resolveAnimatedColorSource(
+          $0.color, at: currentTime, useHueRamp: true, primaryColor: MetalShapeColor.primary,
+          secondaryColor: MetalShapeColor.secondary, neutralColor: MetalShapeColor.neutral))
     }
   }
 }

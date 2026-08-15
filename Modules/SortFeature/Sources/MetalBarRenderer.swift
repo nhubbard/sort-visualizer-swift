@@ -18,7 +18,7 @@ final class MetalBarRenderer: NSObject, MetalIncrementalRenderer {
   struct BarInstance {
     var origin: AnimatedFloat2
     var size: AnimatedFloat2
-    var color: AnimatedFloat4
+    var color: AnimatedMarkerColor
   }
 
   private let device: MTLDevice
@@ -32,7 +32,7 @@ final class MetalBarRenderer: NSObject, MetalIncrementalRenderer {
   /// `reset`. All bar geometry and the shader's viewport uniform work in this space directly.
   private var pixelSize: CGSize = .zero
 
-  private let colorTransitions = MetalColorTransitionTracker()
+  private let colorTransitions = MetalMarkerColorTracker()
   private let originTransitions = MetalPositionTransitionTracker()
   private let sizeTransitions = MetalPositionTransitionTracker()
   /// Session-relative clock, reset alongside every tracker in `reset()` — see `now()`'s own doc
@@ -40,7 +40,7 @@ final class MetalBarRenderer: NSObject, MetalIncrementalRenderer {
   private var timeEpoch: CFTimeInterval = CACurrentMediaTime()
 
   /// Seconds since this renderer's last `reset()`, fed to both `MetalPositionTransitionTracker`/
-  /// `MetalColorTransitionTracker` (to stamp `startTime`) and the vertex shader's `currentTime`
+  /// `MetalMarkerColorTracker` (to stamp `startTime`) and the vertex shader's `currentTime`
   /// uniform. NOT raw `CACurrentMediaTime()`: that's seconds-since-boot, which on a
   /// long-uptime device can be a six-digit number — `Float`'s ~7 significant digits would then
   /// leave a `currentTime - startTime` subtraction with precision comparable to the 0.12s
@@ -173,18 +173,11 @@ final class MetalBarRenderer: NSObject, MetalIncrementalRenderer {
         forSlot: index, target: SIMD2(Float(index) * barWidth, originY), now: n),
       size: sizeTransitions.valueToWrite(forSlot: index, target: SIMD2(barWidth, height), now: n),
       color: colorTransitions.valueToWrite(
-        forSlot: index, target: color(forIndex: index, in: markers), now: n)
+        forSlot: index, marker: MetalShapeColor.markerKind(forIndex: index, in: markers), now: n)
     )
     instanceBuffer.contents()
       .advanced(by: index * MemoryLayout<BarInstance>.stride)
       .storeBytes(of: bar, as: BarInstance.self)
-  }
-
-  private func color(forIndex index: Int, in markers: [Int: Set<Int>]) -> SIMD4<Float> {
-    let indexMarkers = markers[index] ?? []
-    if indexMarkers.contains(Marker.primary) { return Self.primaryColor }
-    if indexMarkers.contains(Marker.secondary) { return Self.secondaryColor }
-    return Self.defaultColor
   }
 
   /// Fired from `mtkView(_:drawableSizeWillChange:)` below with the drawable's real pixel size
@@ -255,9 +248,15 @@ final class MetalBarRenderer: NSObject, MetalIncrementalRenderer {
 
     encoder.setRenderPipelineState(pipelineState)
     encoder.setVertexBuffer(buffer, offset: 0, index: 0)
+    // `useHueRamp: 0` — Bar never hue-ramps, always one of primary/secondary/`defaultColor`
+    // (`resolveAnimatedMarkerColor` in `AnimatedField.h`, not `resolveAnimatedColorSource`, is
+    // what `bar_vertex` actually calls, so this uniform's `useHueRamp` field isn't even read on
+    // this path — set for consistency with the shared struct, not because it's consulted).
     var uniforms = MetalAnimationUniforms(
       viewportSize: SIMD2(Float(pixelSize.width), Float(pixelSize.height)),
-      currentTime: currentTime, transitionDuration: Float(transitionDuration))
+      currentTime: currentTime, transitionDuration: Float(transitionDuration), useHueRamp: 0,
+      primaryColor: Self.primaryColor, secondaryColor: Self.secondaryColor,
+      neutralColor: Self.defaultColor)
     encoder.setVertexBytes(&uniforms, length: MemoryLayout<MetalAnimationUniforms>.size, index: 1)
     encoder.drawPrimitives(
       type: .triangleStrip, vertexStart: 0, vertexCount: 4, instanceCount: count)
