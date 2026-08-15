@@ -6,6 +6,7 @@ import SettingsKit
 import SortFeature
 import SwiftUI
 import UniformTypeIdentifiers
+import VisualizationKit
 import os
 
 /// Brackets an entire Showcase pass (every registered algorithm, in order) for a manual
@@ -28,6 +29,7 @@ struct ContentView: View {
   // `RunAutomationIntent`) need to drive this same selection from outside the view tree, exactly
   // the way Showcase mode (below) already drives it through a manual-tap-equivalent path.
   @Bindable private var coordinator = SortCoordinator.shared
+  @Bindable private var sweepDriver = CoverageSweepDriver.shared
   @Environment(AppSettings.self) private var settings
   // Search text is deliberately not persisted — it's a one-off filter for the current session,
   // not a setting.
@@ -44,6 +46,11 @@ struct ContentView: View {
   // of `advanceShowcase()`/`stopShowcase()` ends up closing it — `OSSignposter.endInterval`
   // requires the exact token `beginInterval` returned, not just a matching name/id.
   @State private var showcaseSignpostState: OSSignpostIntervalState?
+
+  // Full Sweep: exhaustive algorithm × shuffle × visualizer coverage — see `CoverageSweepDriver`.
+  // Unlike Showcase, progress persists to disk across launches, so the confirmation dialog itself
+  // needs to reflect real prior progress rather than always reading as "start from zero."
+  @State private var isShowingFullSweepConfirmation = false
 
   // Import Tape: `isImportingTape` drives the picker sheet itself; `importErrorMessage` is
   // shown live (not logged silently) since this is a manual, interactive action, not automation
@@ -84,6 +91,22 @@ struct ContentView: View {
         """
         Runs every algorithm once, in order, with the current visualizer. The visualizer \
         can still be changed with ⌘⇧V, but other controls are locked until it finishes.
+        """)
+    }
+    .confirmationDialog(
+      fullSweepConfirmationTitle, isPresented: $isShowingFullSweepConfirmation, titleVisibility: .visible
+    ) {
+      Button(sweepDriver.completedCount > 0 ? "Resume Full Sweep" : "Start Full Sweep") {
+        sweepDriver.start()
+      }
+      .accessibilityIdentifier("fullSweepConfirmButton")
+    } message: {
+      Text(
+        """
+        Runs every algorithm against every shuffle and every visualizer — \
+        \(sweepDriver.totalCount.formatted()) combinations, likely several days. Progress is \
+        saved and resumes automatically across launches. Other controls are locked until it \
+        finishes or is stopped.
         """)
     }
     .sheet(isPresented: $coordinator.isSettingsRequested) {
@@ -128,9 +151,9 @@ struct ContentView: View {
       }
     }
     .navigationTitle("Sort Symphony v2")
-    // Blocks manual category switching while Showcase drives `selection` itself — otherwise a
-    // stray tap here would race the automated advance below.
-    .disabled(showcaseIndex != nil)
+    // Blocks manual category switching while Showcase or Full Sweep drives `selection` itself —
+    // otherwise a stray tap here would race the automated advance below.
+    .disabled(showcaseIndex != nil || sweepDriver.isRunning)
   }
 
   private var algorithmContent: some View {
@@ -162,7 +185,7 @@ struct ContentView: View {
     // sidebar is the other) — see `App/UITests/SidebarNavigation.swift`.
     .accessibilityIdentifier("algorithmContentList")
     .searchable(text: $searchText, prompt: "Search Algorithms")
-    .disabled(showcaseIndex != nil)
+    .disabled(showcaseIndex != nil || sweepDriver.isRunning)
     .navigationTitle(contentTitle)
   }
 
@@ -220,6 +243,36 @@ struct ContentView: View {
     .buttonBorderShape(.circle)
     .frame(width: 36, height: 24)
     .accessibilityIdentifier("showcaseButton")
+    // Starting Showcase while a Full Sweep is running would race it for `selectedAlgorithmID` —
+    // stopping is always allowed regardless (mirrors `fullSweepToolbarButton`'s own guard below).
+    .disabled(showcaseIndex == nil && sweepDriver.isRunning)
+  }
+
+  /// Same start/stop-icon-swap shape as `showcaseToolbarButton` — see `CoverageSweepDriver` for
+  /// what this actually drives. `sweepDriver.loadProgress()` runs before showing the confirmation
+  /// dialog (not just once at app launch) so its message always reflects real, current progress —
+  /// this can be tapped again after a previous sweep partially completed in an earlier session.
+  private var fullSweepToolbarButton: some View {
+    Button {
+      if sweepDriver.isRunning {
+        sweepDriver.stop()
+      } else {
+        sweepDriver.loadProgress()
+        isShowingFullSweepConfirmation = true
+      }
+    } label: {
+      Image(systemName: sweepDriver.isRunning ? "stop.fill" : "checklist")
+    }
+    .buttonBorderShape(.circle)
+    .frame(width: 36, height: 24)
+    .accessibilityIdentifier("fullSweepButton")
+    .disabled(!sweepDriver.isRunning && showcaseIndex != nil)
+  }
+
+  private var fullSweepConfirmationTitle: String {
+    sweepDriver.completedCount > 0
+      ? "Resume Full Sweep? (\(sweepDriver.completedCount.formatted())/\(sweepDriver.totalCount.formatted()) done)"
+      : "Start Full Sweep?"
   }
 
   private var settingsToolbarButton: some View {
@@ -306,6 +359,8 @@ struct ContentView: View {
     .safeAreaInset(edge: .top) {
       if showcaseIndex != nil {
         showcaseBanner
+      } else if sweepDriver.isRunning {
+        fullSweepBanner
       }
     }
     // On the detail column, not the sidebar: the sidebar is narrow enough that two icon
@@ -319,6 +374,9 @@ struct ContentView: View {
       }
       ToolbarItem(placement: .topBarTrailing) {
         showcaseToolbarButton
+      }
+      ToolbarItem(placement: .topBarTrailing) {
+        fullSweepToolbarButton
       }
       ToolbarItem(placement: .topBarTrailing) {
         settingsToolbarButton
@@ -363,6 +421,51 @@ struct ContentView: View {
     return
       "Showcase: \(algorithm.metadata.displayName) (\(showcaseIndex + 1)/\(showcaseAlgorithmIDs.count))"
   }
+
+  /// The first determinate `ProgressView` in this app (Showcase/Automation are both open-ended
+  /// enough that only an indeterminate spinner made sense) — a real fraction is meaningful here
+  /// since `sweepDriver.totalCount` is a fixed, known denominator.
+  private var fullSweepBanner: some View {
+    HStack(spacing: 8) {
+      ProgressView(value: Double(sweepDriver.completedCount), total: Double(sweepDriver.totalCount))
+        .frame(maxWidth: 120)
+      Text(fullSweepProgressText)
+        .font(.caption)
+        .accessibilityIdentifier("fullSweepProgressLabel")
+      Spacer()
+      Button("Stop") { sweepDriver.stop() }
+        .accessibilityIdentifier("fullSweepStopButton")
+    }
+    .padding(.horizontal)
+    .padding(.vertical, 6)
+    .background(.bar)
+  }
+
+  private var fullSweepProgressText: String {
+    let progress = "\(sweepDriver.completedCount.formatted())/\(sweepDriver.totalCount.formatted())"
+    guard let combo = sweepDriver.currentCombo,
+      let algorithm = AlgorithmRegistry.shared.algorithm(id: combo.algorithmID),
+      let shuffle = ShuffleRegistry.shared.shuffle(id: combo.shuffleID),
+      let visualizer = VisualizerRegistry.shared.visualizer(id: combo.visualizerID)
+    else {
+      return "Full Sweep: \(progress)"
+    }
+    var text =
+      "Full Sweep: \(progress) · \(algorithm.metadata.displayName) + \(shuffle.metadata.displayName) + \(visualizer.metadata.displayName)"
+    if let remaining = sweepDriver.estimatedTimeRemaining(),
+      let formatted = Self.fullSweepETAFormatter.string(from: remaining) {
+      text += " · ~\(formatted) remaining"
+    }
+    return text
+  }
+
+  private static let fullSweepETAFormatter: DateComponentsFormatter = {
+    let formatter = DateComponentsFormatter()
+    formatter.allowedUnits = [.day, .hour, .minute]
+    formatter.unitsStyle = .abbreviated
+    formatter.maximumUnitCount = 2
+    return formatter
+  }()
 
   /// Same order the content column itself uses (`AlgorithmRegistry.shared.algorithms` sorted by
   /// `displayName` too) — alphabetical, not registration order.
