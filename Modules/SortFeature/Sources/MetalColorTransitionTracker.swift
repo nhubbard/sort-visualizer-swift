@@ -24,34 +24,34 @@ final class MetalTransitionTracker<Value: SIMD> where Value.Scalar == Float {
     var progress: Double
   }
 
-  // Slots are dense, contiguous indices (`0..<slotCount` — see this class's own callers, all of
-  // which repopulate every slot in order immediately after `reset()`), not sparse/arbitrary keys
-  // — a plain array indexed directly by slot is an O(1) memory access with no hashing at all,
-  // versus a `Dictionary<Int, Entry>`'s hash + bucket search for the exact same lookup. `valueToWrite`/
-  // `advance` are hot: called once per slot, per field (color/origin/size), per frame, for every
-  // renderer — found via a Full Sweep profiling round that also fixed `AnalyticsService
-  // .fetchSummaries` and `CodeTheme`'s hex parsing. `nil` means "never touched", matching the
-  // Dictionary's own "key absent" semantics exactly; `ensureCapacity` grows lazily since `reset()`
-  // itself doesn't know the upcoming slot count, but every real caller populates every slot via
-  // `valueToWrite` immediately afterward anyway, so this never leaves a real gap in practice.
-  private var entries: [Entry?] = []
+  // REVERTED from `[Entry?]` back to `Dictionary<Int, Entry>` — see git history for the array
+  // attempt. Slots ARE dense/contiguous, so an array indexed directly by slot looked like a clean
+  // win over hashing, but `Entry` is generic over `Value: SIMD`, and this project builds in Debug
+  // (`-Onone`), where Swift does not specialize generics. Under `-Onone`, `Optional<Entry<Value>>`
+  // loses the cheap nil-check representation a concrete/specialized Optional gets and falls back
+  // to runtime value-witness-table machinery (`getEnumTagSinglePayload`, outlined init/destroy)
+  // on every single array access. A follow-up Full Sweep profiling round measured this directly:
+  // total tracker-related sample share nearly quadrupled (942/12628 → 3681/14298, using the same
+  // "shallowest in-app frame" methodology both times) after switching to the array — a real,
+  // measured regression, not combo-to-combo variance. Left as a cautionary note: don't re-attempt
+  // "obviously cheaper" data-structure swaps on a *generic* type without validating under a
+  // Release (optimized, specialized) build first — Debug-build profiling can be actively
+  // misleading for generic-heavy code, in either direction.
+  private var entries: [Int: Entry] = [:]
 
   /// Whether any slot is still mid-fade — the caller's cue to keep re-arming redraws.
-  var isActive: Bool { entries.contains { ($0?.progress ?? 1) < 1 } }
+  var isActive: Bool { entries.values.contains { $0.progress < 1 } }
 
   /// Called from `reset` (a fresh full repaint — new run, resize, scrub) — those are one-time
   /// state resets, not the rapid-flashing case this exists to smooth, so they start clean rather
-  /// than fading from whatever the previous run last displayed. Keeps the array's already-grown
-  /// capacity (`removeAll(keepingCapacity: true)`) since the next repopulate loop almost always
-  /// touches a similar slot count again.
+  /// than fading from whatever the previous run last displayed.
   func reset() {
-    entries.removeAll(keepingCapacity: true)
+    entries.removeAll()
   }
 
   /// Called every time a renderer would otherwise write `target` directly into its GPU buffer.
   /// Returns the value that should actually be written THIS call.
   func valueToWrite(forSlot slot: Int, target: Value) -> Value {
-    ensureCapacity(through: slot)
     guard var entry = entries[slot] else {
       // First-ever value for this slot — nothing to fade from, so show it immediately.
       entries[slot] = Entry(from: target, to: target, displayed: target, progress: 1)
@@ -74,14 +74,14 @@ final class MetalTransitionTracker<Value: SIMD> where Value.Scalar == Float {
   /// buffer entries, not every slot. Settled entries (`progress == 1`) are left in `entries`
   /// rather than removed — a slot's history has to survive so a LATER `valueToWrite` call for
   /// that same slot can still fade from its real last-displayed value instead of treating it as a
-  /// fresh first-ever paint. Bounded by slot count either way, so there's no unbounded-growth
-  /// concern to trade against that.
+  /// fresh first-ever paint. Bounded by slot count either way (keys are just slot indices), so
+  /// there's no unbounded-growth concern to trade against that.
   func advance(elapsed: TimeInterval) -> [Int: Value] {
     guard !entries.isEmpty else { return [:] }
     var changed: [Int: Value] = [:]
-    for slot in entries.indices {
-      guard var entry = entries[slot], entry.progress < 1 else { continue }
-      entry.progress = min(1, entry.progress + elapsed / transitionDuration)
+    for (slot, entry) in entries where entry.progress < 1 {
+      var updated = entry
+      updated.progress = min(1, updated.progress + elapsed / transitionDuration)
       // Ease-in-out (cubic) rather than linear: with fast-firing highlights retargeting the
       // fade every tick, a linear ramp spends most of its time in a half-blended state and
       // never reads as the FULL target color before the next change arrives — looking like a
@@ -89,11 +89,11 @@ final class MetalTransitionTracker<Value: SIMD> where Value.Scalar == Float {
       // displayed value reaches near-target quickly and holds there, while still avoiding the
       // instant-snap flash this tracker exists to prevent. Easing in the front half (rather than
       // a pure ease-out) keeps the very start of each fade gentle instead of an abrupt jolt.
-      let t = Float(entry.progress)
+      let t = Float(updated.progress)
       let eased = Self.easeInOutCubic(t)
-      entry.displayed = entry.from + (entry.to - entry.from) * Value(repeating: eased)
-      entries[slot] = entry
-      changed[slot] = entry.displayed
+      updated.displayed = updated.from + (updated.to - updated.from) * Value(repeating: eased)
+      entries[slot] = updated
+      changed[slot] = updated.displayed
     }
     return changed
   }
@@ -108,13 +108,7 @@ final class MetalTransitionTracker<Value: SIMD> where Value.Scalar == Float {
   /// renderer assembles a complete instance from several independently-tracked fields (e.g.
   /// origin AND size AND color) and only some of them changed this particular tick.
   func displayed(forSlot slot: Int) -> Value? {
-    guard slot < entries.count else { return nil }
-    return entries[slot]?.displayed
-  }
-
-  private func ensureCapacity(through slot: Int) {
-    guard slot >= entries.count else { return }
-    entries.append(contentsOf: repeatElement(nil, count: slot - entries.count + 1))
+    entries[slot]?.displayed
   }
 }
 
