@@ -187,8 +187,10 @@ final class MetalHanoiTowersRenderer: NSObject, MetalIncrementalRenderer {
 
     let n = now()
     for index in values.indices {
-      positions.setDirect(slot: index, target: homePosition(forIndex: index), now: n)
-      writeInstance(slot: index, values: values, valueRange: valueRange, markers: markers)
+      let origin = positions.setDirect(slot: index, target: homePosition(forIndex: index), now: n)
+      writeInstance(
+        slot: index, origin: origin, now: n, values: values, valueRange: valueRange,
+        markers: markers)
     }
   }
 
@@ -210,8 +212,10 @@ final class MetalHanoiTowersRenderer: NSObject, MetalIncrementalRenderer {
       }
       let n = now()
       for index in touched where values.indices.contains(index) {
-        positions.setDirect(slot: index, target: homePosition(forIndex: index), now: n)
-        writeInstance(slot: index, values: values, valueRange: valueRange, markers: markers)
+        let origin = positions.setDirect(slot: index, target: homePosition(forIndex: index), now: n)
+        writeInstance(
+          slot: index, origin: origin, now: n, values: values, valueRange: valueRange,
+          markers: markers)
       }
     }
   }
@@ -230,8 +234,10 @@ final class MetalHanoiTowersRenderer: NSObject, MetalIncrementalRenderer {
     let n = now()
     guard towerI != towerJ else {
       for index in [i, j] {
-        positions.setDirect(slot: index, target: homePosition(forIndex: index), now: n)
-        writeInstance(slot: index, values: values, valueRange: valueRange, markers: markers)
+        let origin = positions.setDirect(slot: index, target: homePosition(forIndex: index), now: n)
+        writeInstance(
+          slot: index, origin: origin, now: n, values: values, valueRange: valueRange,
+          markers: markers)
       }
       return
     }
@@ -241,49 +247,59 @@ final class MetalHanoiTowersRenderer: NSObject, MetalIncrementalRenderer {
     let obstaclesJ = Self.obstacles(above: j, count: count, towerCount: towerCount)
 
     for (rank, obstacle) in obstaclesI.enumerated() {
-      scheduleObstacle(obstacle, spare: spare, rank: rank, values: values, valueRange: valueRange, markers: markers)
+      scheduleObstacle(
+        obstacle, spare: spare, rank: rank, now: n, values: values, valueRange: valueRange,
+        markers: markers)
     }
     for (rank, obstacle) in obstaclesJ.enumerated() {
       scheduleObstacle(
-        obstacle, spare: spare, rank: obstaclesI.count + rank, values: values,
+        obstacle, spare: spare, rank: obstaclesI.count + rank, now: n, values: values,
         valueRange: valueRange, markers: markers)
     }
 
-    positions.schedule(
+    let originI = positions.schedule(
       slot: i, leg0Target: homePosition(forIndex: j), leg0Hold: Self.legDuration,
       leg1Target: homePosition(forIndex: i), now: n)
-    positions.schedule(
+    let originJ = positions.schedule(
       slot: j, leg0Target: homePosition(forIndex: i), leg0Hold: Self.legDuration,
       leg1Target: homePosition(forIndex: j), now: n)
-    writeInstance(slot: i, values: values, valueRange: valueRange, markers: markers)
-    writeInstance(slot: j, values: values, valueRange: valueRange, markers: markers)
+    writeInstance(
+      slot: i, origin: originI, now: n, values: values, valueRange: valueRange, markers: markers)
+    writeInstance(
+      slot: j, origin: originJ, now: n, values: values, valueRange: valueRange, markers: markers)
   }
 
   private func scheduleObstacle(
-    _ index: Int, spare: Int, rank: Int, values: [Int], valueRange: ClosedRange<Int>,
+    _ index: Int, spare: Int, rank: Int, now: Float, values: [Int], valueRange: ClosedRange<Int>,
     markers: [Int: Set<Int>]
   ) {
-    positions.schedule(
+    let origin = positions.schedule(
       slot: index, leg0Target: parkedPosition(inTower: spare, rank: rank),
-      leg0Hold: Self.legDuration * 2, leg1Target: homePosition(forIndex: index), now: now())
-    writeInstance(slot: index, values: values, valueRange: valueRange, markers: markers)
+      leg0Hold: Self.legDuration * 2, leg1Target: homePosition(forIndex: index), now: now)
+    writeInstance(
+      slot: index, origin: origin, now: now, values: values, valueRange: valueRange,
+      markers: markers)
   }
 
+  /// Takes `origin`/`now` from the caller instead of recomputing — every real call site just
+  /// wrote (or read) this exact origin from `positions` a moment ago, and `now()` (a
+  /// `CACurrentMediaTime()` call) is the same instant for every slot touched within one
+  /// `apply`/`reset` call, so there is nothing left to recompute per-slot here. Avoids both a
+  /// second `positions`-array lookup and an unused `homePosition(forIndex:)` fallback recompute
+  /// (dead in practice — `origin` is always available from the caller).
   private func writeInstance(
-    slot: Int, values: [Int], valueRange: ClosedRange<Int>, markers: [Int: Set<Int>]
+    slot: Int, origin: HanoiOrigin, now: Float, values: [Int], valueRange: ClosedRange<Int>,
+    markers: [Int: Set<Int>]
   ) {
     guard let instanceBuffer, values.indices.contains(slot) else { return }
     let normalized = MetalShapeColor.normalized(value: values[slot], in: valueRange)
-    let n = now()
-    let home = homePosition(forIndex: slot)
 
     let instance = HanoiInstance(
-      origin: positions.origin(forSlot: slot)
-        ?? HanoiOrigin(leg0From: home, leg0To: home, leg1To: home, leg0Hold: 0, startTime: n),
+      origin: origin,
       size: blockSize(),
       color: colorTransitions.valueToWrite(
         forSlot: slot, value: Float(normalized),
-        marker: MetalShapeColor.markerKind(forIndex: slot, in: markers), now: n)
+        marker: MetalShapeColor.markerKind(forIndex: slot, in: markers), now: now)
     )
     instanceBuffer.contents()
       .advanced(by: slot * MemoryLayout<HanoiInstance>.stride)

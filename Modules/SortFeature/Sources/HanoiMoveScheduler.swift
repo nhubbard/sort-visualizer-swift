@@ -27,50 +27,80 @@ struct HanoiOrigin {
   var startTime: Float
 }
 
-/// Thin wrapper around a per-slot `[Int: HanoiOrigin]` map — replaces the old generic `[Waypoint]`
+/// Thin wrapper around a per-slot array of `HanoiOrigin`s — replaces the old generic `[Waypoint]`
 /// queue plus its `advance(elapsed:)` leg-advancement sweep, both retired now that every real
 /// usage was already always exactly 2 legs (see `HanoiOrigin`'s own doc comment) and the shader
 /// does all per-frame resolution itself.
+///
+/// Backed by `[HanoiOrigin?]` rather than `[Int: HanoiOrigin]` — slots are dense, contiguous
+/// `0..<count` indices, so direct indexing beats a Dictionary's hash + bucket search. A prior
+/// attempt at this exact swap (`8ecdf2e`, reverted by `d8a6d80`) measured ~4x WORSE under this
+/// project's Debug/`-Onone` build, but that was on the old *generic*
+/// `MetalTransitionTracker<Value: SIMD>` — under `-Onone` Swift doesn't specialize generics, so
+/// `Optional<Entry<Value>>` fell back to runtime value-witness-table dispatch on every array
+/// access. `HanoiOrigin` is a concrete, non-generic struct (post `f61bc5d`'s de-genericization),
+/// so `Optional<HanoiOrigin>` gets its compact fixed layout at compile time regardless of
+/// optimization level — confirmed via `HanoiStressHarnessTests` before/after, not assumed.
 @MainActor
 final class HanoiMoveScheduler {
-  private var origins: [Int: HanoiOrigin] = [:]
+  private var origins: [HanoiOrigin?] = []
   /// The latest instant at which any tracked entry could still be mid-fade — an O(1) substitute
   /// for scanning every entry every frame. Only ever grows, so once `now` passes it, NOTHING can
   /// still be animating — `isActive` reporting `false` is exact, not approximate.
   private var settleDeadline: Float?
 
   func reset() {
-    origins.removeAll()
+    origins.removeAll(keepingCapacity: true)
     settleDeadline = nil
+  }
+
+  /// Grows `origins` up to and including `slot`, leaving new entries `nil` — matches a
+  /// Dictionary's own "key absent" semantics for a slot that's never been touched. Every real
+  /// caller repopulates every slot via `setDirect`/`schedule` immediately after `reset()`, so this
+  /// never leaves a real gap in practice.
+  private func ensureCapacity(_ slot: Int) {
+    if slot >= origins.count {
+      origins.append(contentsOf: repeatElement(nil, count: slot - origins.count + 1))
+    }
   }
 
   /// Replaces any in-flight choreography for `slot` and starts a fresh 2-leg animation, continuing
   /// from wherever `slot` is currently, visually sitting (via `resolvedOrigin`) rather than
   /// popping — the same interrupt-and-retarget contract every other tracker in this file's family
-  /// has.
+  /// has. Returns the origin just written so callers don't need a second lookup to hand it to
+  /// `MetalHanoiTowersRenderer.writeInstance`.
+  @discardableResult
   func schedule(
     slot: Int, leg0Target: SIMD2<Float>, leg0Hold: TimeInterval, leg1Target: SIMD2<Float>,
     now: Float
-  ) {
+  ) -> HanoiOrigin {
     let from = resolvedOrigin(forSlot: slot, now: now) ?? leg0Target
-    origins[slot] = HanoiOrigin(
+    let origin = HanoiOrigin(
       leg0From: from, leg0To: leg0Target, leg1To: leg1Target, leg0Hold: Float(leg0Hold),
       startTime: now)
+    ensureCapacity(slot)
+    origins[slot] = origin
     settleDeadline = max(
       settleDeadline ?? -.infinity, now + Float(leg0Hold) + Float(transitionDuration))
+    return origin
   }
 
   /// For slots with no in-flight choreography — the resting-state repaint every OTHER slot needs
   /// on every `apply`/`reset`, same as `MetalShapeRenderer.writeInstance` does unconditionally.
   /// Guarded the same way the pre-redesign `setDirect` was: don't clobber an in-flight 2-leg
-  /// choreography that hasn't reached (or settled at) leg 1 yet.
-  func setDirect(slot: Int, target: SIMD2<Float>, now: Float) {
+  /// choreography that hasn't reached (or settled at) leg 1 yet. Returns the origin now in effect
+  /// for `slot` (either the untouched existing one, or the fresh resting-state one just written).
+  @discardableResult
+  func setDirect(slot: Int, target: SIMD2<Float>, now: Float) -> HanoiOrigin {
+    ensureCapacity(slot)
     if let existing = origins[slot],
       now < existing.startTime + existing.leg0Hold + Float(transitionDuration) {
-      return
+      return existing
     }
-    origins[slot] = HanoiOrigin(
+    let origin = HanoiOrigin(
       leg0From: target, leg0To: target, leg1To: target, leg0Hold: 0, startTime: now)
+    origins[slot] = origin
+    return origin
   }
 
   func isActive(now: Float) -> Bool {
@@ -82,14 +112,15 @@ final class HanoiMoveScheduler {
   /// into the GPU buffer — `nil` only if `slot` has never been touched at all (in practice, every
   /// slot gets at least one `setDirect` call during `reset()`, so this is mostly a defensive nil).
   func origin(forSlot slot: Int) -> HanoiOrigin? {
-    origins[slot]
+    guard slot < origins.count else { return nil }
+    return origins[slot]
   }
 
   /// The CPU reference computation — identical math to `AnimatedField.h`'s `resolveHanoiOrigin` —
   /// used only at retarget time (`schedule` above, to continue smoothly instead of popping) and
   /// by tests, never on a per-frame production path.
   func resolvedOrigin(forSlot slot: Int, now: Float) -> SIMD2<Float>? {
-    guard let origin = origins[slot] else { return nil }
+    guard slot < origins.count, let origin = origins[slot] else { return nil }
     let t = now - origin.startTime
     if t < origin.leg0Hold {
       let localT = min(max(t / Float(transitionDuration), 0), 1)

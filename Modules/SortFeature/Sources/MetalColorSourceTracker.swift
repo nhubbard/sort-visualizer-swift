@@ -66,6 +66,9 @@ func resolveAnimatedMarkerColor(
 /// playback) for eliminating essentially all CPU-side color computation — the whole point of this
 /// migration. Position/geometry easing is UNCHANGED by this — only color's continuation contract
 /// is different.
+/// Backed by `[Entry?]` rather than `[Int: Entry]` — see `HanoiMoveScheduler`'s own doc comment
+/// for the full rationale (dense contiguous slot indices, and why the prior generic-type version
+/// of this same swap was a real regression while this concrete-struct version isn't).
 @MainActor
 final class MetalColorSourceTracker {
   private struct Entry {
@@ -76,7 +79,7 @@ final class MetalColorSourceTracker {
     var startTime: Float
   }
 
-  private var entries: [Int: Entry] = [:]
+  private var entries: [Entry?] = []
   /// The latest instant at which any tracked entry could still be mid-fade — an O(1) substitute
   /// for scanning every entry every frame. Only ever grows (extended at retarget time to
   /// `now + transitionDuration`), so once `now` passes it, NOTHING can still be fading — `isActive`
@@ -84,8 +87,14 @@ final class MetalColorSourceTracker {
   private var settleDeadline: Float?
 
   func reset() {
-    entries.removeAll()
+    entries.removeAll(keepingCapacity: true)
     settleDeadline = nil
+  }
+
+  private func ensureCapacity(_ slot: Int) {
+    if slot >= entries.count {
+      entries.append(contentsOf: repeatElement(nil, count: slot - entries.count + 1))
+    }
   }
 
   /// Called every time a renderer would otherwise compute+write a resolved color directly into
@@ -93,6 +102,7 @@ final class MetalColorSourceTracker {
   /// write THIS call — the shader resolves it into an actual displayed color every subsequent
   /// frame on its own.
   func valueToWrite(forSlot slot: Int, value: Float, marker: Int32, now: Float) -> AnimatedColorSource {
+    ensureCapacity(slot)
     guard var entry = entries[slot] else {
       // First-ever value for this slot — nothing to fade from, so show it immediately: `from ==
       // to` resolves to that same color at any `t`, no special-casing needed on the GPU side.
