@@ -50,7 +50,24 @@ public struct ScrollingSortView: View {
         VStack(alignment: .leading, spacing: 0) {
           SortView(session: session, showcaseStop: showcaseStop)
             .frame(width: geometry.size.width, height: geometry.size.height)
-          AlgorithmDetailSection(algorithm: algorithm, availableWidth: geometry.size.width)
+          // `session.isAutomating` covers Showcase, Full Sweep, App-Intent single runs, and
+          // classic Automations alike (all four route through the same private
+          // `SortSession.runAutomation(sizes:runsPerSize:)`) — every case where a fresh combo
+          // arrives roughly once a second and nobody has time to scroll down and actually read
+          // the description/complexity/code/correlation chart before it changes again. Skipping
+          // `AlgorithmDetailSection` entirely here avoids its full cost (SwiftData fetch, code
+          // highlighting, math rendering) rather than just hiding an already-built view — found
+          // via the same Full Sweep profiling round that fixed `CodeTheme`'s hex parsing and
+          // `AnalyticsService.fetchSummaries`'s cache-defeating write/read cycle.
+          if session.isAutomating {
+            Text("Details hidden during automation")
+              .font(.callout)
+              .foregroundStyle(.secondary)
+              .padding()
+              .accessibilityIdentifier("algorithmDetailAutomationPlaceholder")
+          } else {
+            AlgorithmDetailSection(algorithm: algorithm, availableWidth: geometry.size.width)
+          }
         }
       }
     }
