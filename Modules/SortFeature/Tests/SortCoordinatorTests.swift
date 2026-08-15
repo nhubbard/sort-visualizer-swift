@@ -96,6 +96,59 @@ struct SortCoordinatorTests {
     await runTask.value  // proves runSort() was still suspended until resolveCompletion above
   }
 
+  /// Regression guard for the mount-race fix: `ScrollingSortView.init` peeks this *before*
+  /// consuming the pending action, to seed `SortSession.startsAutomating` correctly from the very
+  /// first render. `.run`/`.automation` both lead to an automating pass unconditionally (see
+  /// `ScrollingSortView.body`'s `.task`); `.loadTape` and "nothing pending" do not.
+  @Test
+  func pendingActionWillAutomateReflectsWhetherTheActionLeadsToAnAutomatingPass() async {
+    let coordinator = SortCoordinator()
+    let algorithm = FakeAlgorithm()
+
+    #expect(!coordinator.pendingActionWillAutomate(for: algorithm.id))
+
+    let runTask = Task {
+      await coordinator.runSort(algorithm: algorithm, visualizerID: nil, shuffleID: nil, size: nil)
+    }
+    await Task.yield()
+    #expect(coordinator.pendingActionWillAutomate(for: algorithm.id))
+    // Peeking must not consume it — a second peek still sees it.
+    #expect(coordinator.pendingActionWillAutomate(for: algorithm.id))
+    _ = coordinator.consumePendingAction(for: algorithm.id)
+    #expect(!coordinator.pendingActionWillAutomate(for: algorithm.id), "consuming clears the peek too")
+    coordinator.resolveCompletion(token: coordinator.runToken)
+    await runTask.value
+
+    let automationID = AutomationID(rawValue: "coordinator-fake-automation")
+    let automationTask = Task {
+      await coordinator.runAutomation(algorithm: algorithm, automationID: automationID)
+    }
+    await Task.yield()
+    #expect(coordinator.pendingActionWillAutomate(for: algorithm.id))
+    _ = coordinator.consumePendingAction(for: algorithm.id)
+    coordinator.resolveCompletion(token: coordinator.runToken)
+    await automationTask.value
+
+    let tape = Tape(
+      header: TapeHeader(
+        algorithmID: algorithm.id.rawValue, initialValues: [2, 1],
+        visualSeed: 0, compareCount: 1, swapCount: 1,
+        recordingDuration: 0, recordedAt: Date(timeIntervalSince1970: 0)),
+      operations: [.compare(0, 1), .swap(0, 1)]
+    )
+    let originalBuiltIns = AlgorithmRegistry.shared.builtIns
+    defer {
+      AlgorithmRegistry.shared.builtIns = originalBuiltIns
+      AlgorithmRegistry.shared.discover()
+    }
+    AlgorithmRegistry.shared.builtIns = [algorithm]
+    AlgorithmRegistry.shared.discover()
+    _ = try? coordinator.importTape(from: tape.archived())
+    #expect(
+      !coordinator.pendingActionWillAutomate(for: algorithm.id),
+      "a .loadTape pending action does not lead to an automating pass")
+  }
+
   @Test
   func runAutomationSelectsTheAlgorithmAndAwaitsResolveCompletion() async {
     let coordinator = SortCoordinator()

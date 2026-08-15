@@ -193,6 +193,24 @@ private func makeInMemoryAnalytics() throws -> AnalyticsService {
 @MainActor
 @Suite
 struct SortSessionTests {
+  /// Regression guard for a real, measured mount-race: without `startsAutomating`, a freshly
+  /// constructed session always began `isAutomating == false` until its own `.task` actually
+  /// reached `runSinglePass`/`runAutomationAndWait` — a window `ScrollingSortView` could render
+  /// `AlgorithmDetailSection` (and start highlighting) in, on every Full Sweep combo, before that
+  /// automating pass ever got a chance to flip the flag itself. `startsAutomating: true` must make
+  /// `isAutomating` observably `true` immediately, with no `await`/suspension needed first.
+  @Test
+  func startsAutomatingSeedsIsAutomatingBeforeAnyAsyncWorkRuns() {
+    let automating = SortSession(
+      algorithm: FakeAlgorithm(), shuffle: FakeReverseShuffle(), settings: makeFastSettings(),
+      startsAutomating: true)
+    #expect(automating.isAutomating)
+
+    let manual = SortSession(
+      algorithm: FakeAlgorithm(), shuffle: FakeReverseShuffle(), settings: makeFastSettings())
+    #expect(!manual.isAutomating, "the default must stay false for every existing caller")
+  }
+
   @Test
   func sortEndToEndProducesCorrectlySortedFrame() async throws {
     let session = SortSession(

@@ -36,8 +36,21 @@ public struct ScrollingSortView: View {
     // start()` already fails silently if a host has no usable audio route (e.g. a sandboxed CI
     // runner), so this is safe even off-device. `AppSettings.soundEnabled` still gates whether a
     // sort plays anything at all; this is just which backend answers when it does.
+    //
+    // `startsAutomating` is predicted here, before `.task` below has even run, from the exact
+    // same two triggers `body`'s `.task` branches on: Showcase (`showcaseCompletion != nil`,
+    // already known) and an App-Intent/Full-Sweep `.run`/`.automation` pending action (peeked,
+    // not consumed, via `pendingActionWillAutomate`). Without this, a freshly-constructed
+    // `SortSession` started `isAutomating == false` until its own `.task` actually reached
+    // `runSinglePass`/`runAutomationAndWait`, a real window `AlgorithmDetailSection` could mount
+    // (and start highlighting) in — measured directly in a Full Sweep profiling round.
+    let startsAutomating =
+      showcaseCompletion != nil
+      || SortCoordinator.shared.pendingActionWillAutomate(for: algorithm.id)
     _session = State(
-      wrappedValue: SortSession(algorithm: algorithm, shuffle: shuffle, audio: AudioService.shared))
+      wrappedValue: SortSession(
+        algorithm: algorithm, shuffle: shuffle, audio: AudioService.shared,
+        startsAutomating: startsAutomating))
   }
 
   public var body: some View {

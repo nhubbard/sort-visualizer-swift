@@ -72,8 +72,11 @@ public final class SortSession {
 
   /// Whether an automation loop (see `runAutomation(_:)`) is currently driving this session —
   /// the run control bar disables its own manual controls while this is true, so a stray
-  /// scrub/resize/pause can't collide with the loop's own repeated `start(size:)` calls.
-  public private(set) var isAutomating = false
+  /// scrub/resize/pause can't collide with the loop's own repeated `start(size:)` calls. Also
+  /// gates `ScrollingSortView`'s `AlgorithmDetailSection` visibility — seedable via `init(
+  /// startsAutomating:)` so a session that's *about to* automate starts this `true` immediately,
+  /// not just once its `.task` actually reaches `runSinglePass`/`runAutomationAndWait`.
+  public private(set) var isAutomating: Bool
   /// `nil` outside automation; otherwise the loop's current position, for a progress banner.
   public private(set) var automationProgress:
     (sizeIndex: Int, sizeCount: Int, runIndex: Int, runCount: Int)?
@@ -116,7 +119,14 @@ public final class SortSession {
     audio: any AudioPlaying = NoOpAudioService(),
     analytics: AnalyticsService = .shared,
     settings: AppSettings = .shared,
-    replayEngineFactory: @escaping (Tape) -> ReplayEngine = { ReplayEngine(tape: $0) }
+    replayEngineFactory: @escaping (Tape) -> ReplayEngine = { ReplayEngine(tape: $0) },
+    // `ScrollingSortView.init` passes `true` here when it already knows (via `SortCoordinator
+    // .pendingActionWillAutomate(for:)`/`showcaseCompletion != nil`) that this session's own
+    // `.task` is about to call `runSinglePass`/`runAutomationAndWait` — every other caller
+    // (a plain manually-selected algorithm, every test/preview) leaves this `false`, matching
+    // `runAutomation(sizes:runsPerSize:)`'s own eventual `defer { isAutomating = false }` once a
+    // real automating pass genuinely ends.
+    startsAutomating: Bool = false
   ) {
     self.algorithm = algorithm
     self.shuffle = shuffle
@@ -126,6 +136,7 @@ public final class SortSession {
     self.replayEngineFactory = replayEngineFactory
     self.soundEnabled = settings.soundEnabled
     self.arraySize = algorithm.metadata.sizeRange.lowerBound
+    self.isAutomating = startsAutomating
   }
 
   /// Unconditionally clamps into `algorithm.metadata.effectiveSizeRange(operationCap:)` rather

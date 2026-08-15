@@ -64,6 +64,23 @@ public final class SortCoordinator {
     pendingShuffleOverrides[algorithmID]
   }
 
+  /// Read (without consuming) by `ScrollingSortView.init`, same rationale as
+  /// `pendingShuffleOverride(for:)` above: whether the pending action this view is about to
+  /// consume will run the session through `SortSession.runAutomation(sizes:runsPerSize:)` (and
+  /// therefore set `isAutomating`) has to be known *before* construction, so `SortSession` can be
+  /// seeded with the right initial `isAutomating` value instead of starting `false` and only
+  /// catching up once its `.task` actually calls `runSinglePass`/`runAutomationAndWait` — a real,
+  /// measured gap that let `AlgorithmDetailSection` mount transiently on every Full Sweep combo
+  /// before this fix. `.run`/`.automation` both lead there unconditionally (see
+  /// `ScrollingSortView.body`'s `.task`); `.loadTape` does not (it only replaces the session's
+  /// tape, no automation pass).
+  public func pendingActionWillAutomate(for algorithmID: AlgorithmID) -> Bool {
+    switch pendingActions[algorithmID] {
+    case .run, .automation: true
+    case .loadTape, nil: false
+    }
+  }
+
   /// Consumed exactly once by `ScrollingSortView.task` on mount — clears both the action and any
   /// paired shuffle override together, since `runSort`/`runAutomation` below always set them in
   /// the same call.
