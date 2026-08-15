@@ -2,15 +2,15 @@ import Foundation
 
 /// A short, per-slot queue of position waypoints for `MetalHanoiTowersRenderer` — the mechanism
 /// behind its lift-obstacles/carry/place/restore choreography. Wraps a plain
-/// `MetalTransitionTracker<SIMD2<Float>>` (`MetalColorTransitionTracker.swift`) for the actual
+/// `MetalPositionTransitionTracker` (`MetalPositionTransitionTracker.swift`) for the actual
 /// easing of whichever leg is current; this type only adds "and once you've been heading toward
 /// this leg's target for `holdDuration` seconds, retarget to the next one."
 ///
 /// Deliberately has no separate "reduce motion at high playback speed" mode: if a later operation
 /// touches a slot before its current choreography finishes, `schedule` simply overwrites the
 /// queue and retargets immediately — the same interrupt-and-retarget behavior
-/// `MetalTransitionTracker.valueToWrite` already has. At fast playback, legs compress into a blur
-/// instead of ever fully completing, which degrades gracefully rather than needing to be
+/// `MetalPositionTransitionTracker.valueToWrite` already has. At fast playback, legs compress into
+/// a blur instead of ever fully completing, which degrades gracefully rather than needing to be
 /// special-cased — no other renderer in this file's family has a "reduced motion" branch either.
 @MainActor
 final class HanoiMoveScheduler {
@@ -18,13 +18,13 @@ final class HanoiMoveScheduler {
     var target: SIMD2<Float>
     /// How long to sit "in transit toward" this waypoint before advancing to the next one in the
     /// queue — independent of how long the underlying tracker's own fade actually takes, since
-    /// `MetalTransitionTracker` exposes no per-slot "has this settled yet" query.
+    /// `MetalPositionTransitionTracker` exposes no per-slot "has this settled yet" query.
     var holdDuration: TimeInterval
   }
 
   private var queues: [Int: [Waypoint]] = [:]
   private var elapsedInLeg: [Int: TimeInterval] = [:]
-  private let positions = MetalTransitionTracker<SIMD2<Float>>()
+  private let positions = MetalPositionTransitionTracker()
 
   func reset() {
     queues.removeAll()
@@ -56,7 +56,8 @@ final class HanoiMoveScheduler {
 
   /// Advances every in-flight leg timer, retargeting any slot whose current leg's `holdDuration`
   /// has elapsed, then advances the underlying position tracker — same shape as
-  /// `MetalTransitionTracker.advance(elapsed:)`, returning only the slots that actually moved.
+  /// `MetalPositionTransitionTracker.advance(elapsed:)`, returning only the slots that actually
+  /// moved.
   func advance(elapsed: TimeInterval) -> [Int: SIMD2<Float>] {
     for slot in queues.keys {
       guard var queue = queues[slot], queue.count > 1 else { continue }

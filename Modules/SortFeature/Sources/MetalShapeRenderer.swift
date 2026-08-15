@@ -74,8 +74,8 @@ final class MetalShapeRenderer<Layout: MetalShapeLayout>: NSObject, MetalIncreme
   private var pixelSize: CGSize = .zero
 
   private let colorTransitions = MetalColorTransitionTracker()
-  private let originTransitions = MetalTransitionTracker<SIMD2<Float>>()
-  private let sizeTransitions = MetalTransitionTracker<SIMD2<Float>>()
+  private let originTransitions = MetalPositionTransitionTracker()
+  private let sizeTransitions = MetalPositionTransitionTracker()
   /// See `MetalBarRenderer.lastFrameTimestamp`'s doc comment.
   private var lastFrameTimestamp: CFTimeInterval?
 

@@ -31,8 +31,8 @@ final class MetalDisparityChordsRenderer: NSObject, MetalIncrementalRenderer {
   private var pixelSize: CGSize = .zero
 
   private let colorTransitions = MetalColorTransitionTracker()
-  private let startTransitions = MetalTransitionTracker<SIMD2<Float>>()
-  private let endTransitions = MetalTransitionTracker<SIMD2<Float>>()
+  private let startTransitions = MetalPositionTransitionTracker()
+  private let endTransitions = MetalPositionTransitionTracker()
   /// See `MetalBarRenderer.lastFrameTimestamp`'s doc comment.
   private var lastFrameTimestamp: CFTimeInterval?
 

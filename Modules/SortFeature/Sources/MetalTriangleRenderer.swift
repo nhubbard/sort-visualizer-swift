@@ -53,9 +53,9 @@ final class MetalTriangleRenderer<Layout: MetalTriangleLayout>: NSObject, MetalI
   private var pixelSize: CGSize = .zero
 
   private let colorTransitions = MetalColorTransitionTracker()
-  private let p0Transitions = MetalTransitionTracker<SIMD2<Float>>()
-  private let p1Transitions = MetalTransitionTracker<SIMD2<Float>>()
-  private let p2Transitions = MetalTransitionTracker<SIMD2<Float>>()
+  private let p0Transitions = MetalPositionTransitionTracker()
+  private let p1Transitions = MetalPositionTransitionTracker()
+  private let p2Transitions = MetalPositionTransitionTracker()
   /// See `MetalBarRenderer.lastFrameTimestamp`'s doc comment.
   private var lastFrameTimestamp: CFTimeInterval?
 

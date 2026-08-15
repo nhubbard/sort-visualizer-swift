@@ -1,42 +1,51 @@
 import Foundation
 
-/// Shared by every `MetalTransitionTracker<Value>` instantiation — Swift doesn't support static
-/// stored properties on generic types, so this lives at file scope instead of as a `static let`
-/// inside the class itself.
-private let transitionDuration: TimeInterval = 0.12
+/// Shared by `MetalColorTransitionTracker` and `MetalPositionTransitionTracker`
+/// (`MetalPositionTransitionTracker.swift`) — the one piece of logic identical between them, pure
+/// `Float`/`TimeInterval` math with no generic involvement either way, so lifting it to file scope
+/// (rather than duplicating it into both files) costs nothing and avoids two copies drifting apart.
+let transitionDuration: TimeInterval = 0.12
 
-/// Eases each GPU instance slot's rendered value (color, origin/size, a triangle/line point —
-/// anything expressible as a fixed-width float `SIMD` vector) toward its latest target over
+/// Ease-in-out (cubic) rather than linear: with fast-firing highlights retargeting the fade every
+/// tick, a linear ramp spends most of its time in a half-blended state and never reads as the FULL
+/// target value before the next change arrives — looking like a faint wash instead of a flash.
+/// Easing out the back half front-loads the approach so the displayed value reaches near-target
+/// quickly and holds there, while still avoiding the instant-snap flash these trackers exist to
+/// prevent. Easing in the front half (rather than a pure ease-out) keeps the very start of each
+/// fade gentle instead of an abrupt jolt.
+func easeInOutCubic(_ t: Float) -> Float {
+  guard t >= 0.5 else { return 4 * t * t * t }
+  let f = -2 * t + 2
+  return 1 - f * f * f / 2
+}
+
+/// Eases each GPU instance slot's rendered COLOR toward its latest target over
 /// `transitionDuration` instead of snapping instantly — on small arrays, bars/shapes are large
 /// enough that instant snapping reads as a high-contrast flash (a real photosensitivity concern,
-/// worst on tiny-array algorithms like Bogo/Bozo Sort) or a teleporting point/dot.
+/// worst on tiny-array algorithms like Bogo/Bozo Sort).
 ///
-/// Pure CPU-side math, no Metal/GPU types — every renderer (`MetalBarRenderer`,
-/// `MetalShapeRenderer`, `MetalTriangleRenderer`, `MetalDisparityChordsRenderer`) shares this one
-/// implementation for both color and geometry, one tracker instance per eased field, keyed by
-/// `Value`'s shape (`SIMD4<Float>` for color, `SIMD2<Float>` for a point).
+/// A concrete (non-generic) class hardcoded to `SIMD4<Float>`, deliberately NOT sharing an
+/// implementation with `MetalPositionTransitionTracker` (`SIMD2<Float>`, same shape otherwise) via
+/// a shared generic base or protocol — that used to be one `MetalTransitionTracker<Value: SIMD>`
+/// generic class, but under this project's Debug (`-Onone`) build Swift never specializes
+/// generics, so every call paid real `swift::MetadataCacheKey`/`ConcurrentReadableHashMap`/
+/// `_swift_getGenericMetadata` runtime lookup overhead regardless of which concrete `Value` was
+/// actually in play — confirmed directly via a Hanoi Towers stress-profiling round (~30% of that
+/// visualizer's per-chunk cost, its many small per-obstacle transitions making it the worst-hit
+/// caller by far, though every renderer using either tracker paid some of this tax). Two small,
+/// fully concrete classes guarantee zero generic-metadata dispatch under any build configuration —
+/// the same "duplicate a small amount of pure logic across a boundary rather than share it through
+/// an abstraction that costs something real" precedent `MetalHanoiTowersRenderer`'s own tower/
+/// depth math already sets (duplicated from `HanoiTowersVisualizer` rather than shared cross-module).
 @MainActor
-final class MetalTransitionTracker<Value: SIMD> where Value.Scalar == Float {
+final class MetalColorTransitionTracker {
   private struct Entry {
-    var from: Value
-    var to: Value
-    var displayed: Value
+    var from: SIMD4<Float>
+    var to: SIMD4<Float>
+    var displayed: SIMD4<Float>
     var progress: Double
   }
 
-  // REVERTED from `[Entry?]` back to `Dictionary<Int, Entry>` — see git history for the array
-  // attempt. Slots ARE dense/contiguous, so an array indexed directly by slot looked like a clean
-  // win over hashing, but `Entry` is generic over `Value: SIMD`, and this project builds in Debug
-  // (`-Onone`), where Swift does not specialize generics. Under `-Onone`, `Optional<Entry<Value>>`
-  // loses the cheap nil-check representation a concrete/specialized Optional gets and falls back
-  // to runtime value-witness-table machinery (`getEnumTagSinglePayload`, outlined init/destroy)
-  // on every single array access. A follow-up Full Sweep profiling round measured this directly:
-  // total tracker-related sample share nearly quadrupled (942/12628 → 3681/14298, using the same
-  // "shallowest in-app frame" methodology both times) after switching to the array — a real,
-  // measured regression, not combo-to-combo variance. Left as a cautionary note: don't re-attempt
-  // "obviously cheaper" data-structure swaps on a *generic* type without validating under a
-  // Release (optimized, specialized) build first — Debug-build profiling can be actively
-  // misleading for generic-heavy code, in either direction.
   private var entries: [Int: Entry] = [:]
 
   /// Whether any slot is still mid-fade — the caller's cue to keep re-arming redraws.
@@ -51,7 +60,7 @@ final class MetalTransitionTracker<Value: SIMD> where Value.Scalar == Float {
 
   /// Called every time a renderer would otherwise write `target` directly into its GPU buffer.
   /// Returns the value that should actually be written THIS call.
-  func valueToWrite(forSlot slot: Int, target: Value) -> Value {
+  func valueToWrite(forSlot slot: Int, target: SIMD4<Float>) -> SIMD4<Float> {
     guard var entry = entries[slot] else {
       // First-ever value for this slot — nothing to fade from, so show it immediately.
       entries[slot] = Entry(from: target, to: target, displayed: target, progress: 1)
@@ -76,42 +85,25 @@ final class MetalTransitionTracker<Value: SIMD> where Value.Scalar == Float {
   /// that same slot can still fade from its real last-displayed value instead of treating it as a
   /// fresh first-ever paint. Bounded by slot count either way (keys are just slot indices), so
   /// there's no unbounded-growth concern to trade against that.
-  func advance(elapsed: TimeInterval) -> [Int: Value] {
+  func advance(elapsed: TimeInterval) -> [Int: SIMD4<Float>] {
     guard !entries.isEmpty else { return [:] }
-    var changed: [Int: Value] = [:]
+    var changed: [Int: SIMD4<Float>] = [:]
     for (slot, entry) in entries where entry.progress < 1 {
       var updated = entry
       updated.progress = min(1, updated.progress + elapsed / transitionDuration)
-      // Ease-in-out (cubic) rather than linear: with fast-firing highlights retargeting the
-      // fade every tick, a linear ramp spends most of its time in a half-blended state and
-      // never reads as the FULL target color before the next change arrives — looking like a
-      // faint wash instead of a flash. Easing out the back half front-loads the approach so the
-      // displayed value reaches near-target quickly and holds there, while still avoiding the
-      // instant-snap flash this tracker exists to prevent. Easing in the front half (rather than
-      // a pure ease-out) keeps the very start of each fade gentle instead of an abrupt jolt.
       let t = Float(updated.progress)
-      let eased = Self.easeInOutCubic(t)
-      updated.displayed = updated.from + (updated.to - updated.from) * Value(repeating: eased)
+      let eased = easeInOutCubic(t)
+      updated.displayed = updated.from + (updated.to - updated.from) * SIMD4<Float>(repeating: eased)
       entries[slot] = updated
       changed[slot] = updated.displayed
     }
     return changed
   }
 
-  private static func easeInOutCubic(_ t: Float) -> Float {
-    guard t >= 0.5 else { return 4 * t * t * t }
-    let f = -2 * t + 2
-    return 1 - f * f * f / 2
-  }
-
   /// The slot's current eased value, even on a tick where it didn't move — needed when a
   /// renderer assembles a complete instance from several independently-tracked fields (e.g.
   /// origin AND size AND color) and only some of them changed this particular tick.
-  func displayed(forSlot slot: Int) -> Value? {
+  func displayed(forSlot slot: Int) -> SIMD4<Float>? {
     entries[slot]?.displayed
   }
 }
-
-/// Color is the one field every renderer eases — kept as its own name for readability at call
-/// sites (`colorTransitions`), even though it's just `MetalTransitionTracker<SIMD4<Float>>`.
-typealias MetalColorTransitionTracker = MetalTransitionTracker<SIMD4<Float>>

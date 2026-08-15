@@ -40,8 +40,8 @@ final class MetalHanoiTowersRenderer: NSObject, MetalIncrementalRenderer {
   private var lastFrameTimestamp: CFTimeInterval?
 
   /// How long a leg of the choreography (lift, carry, restore) takes before advancing to the
-  /// next waypoint — independent of `MetalTransitionTracker`'s own fixed 0.12s fade duration,
-  /// just long enough for that fade to visually complete before the next leg starts.
+  /// next waypoint — independent of `MetalPositionTransitionTracker`'s own fixed 0.12s fade
+  /// duration, just long enough for that fade to visually complete before the next leg starts.
   private static let legDuration: TimeInterval = 0.15
 
   init?(device: MTLDevice, sampleCount: Int = 1) {
