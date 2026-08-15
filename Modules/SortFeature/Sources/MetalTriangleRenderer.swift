@@ -4,12 +4,28 @@ import MetalKit
 import QuartzCore
 import SortEngineKit
 
-/// GPU-buffer layout, matched exactly to `PolygonRenderer.metal`'s `TriangleInstance` struct.
+/// The TARGET geometry/color a `MetalTriangleLayout` computes for one slot, in points — plain
+/// resolved values, NOT the GPU buffer's own layout (see `MetalTriangleGPUInstance` for that).
+/// Every `MetalTriangleLayout` conformance in `MetalPolygonVisualizerLayouts.swift` returns one of
+/// these; `MetalTriangleRenderer.writeInstance` is the only place that turns it into the animated
+/// triples the GPU buffer actually holds.
 struct MetalTriangleInstance {
   var p0: SIMD2<Float>
   var p1: SIMD2<Float>
   var p2: SIMD2<Float>
   var color: SIMD4<Float>
+}
+
+/// GPU-buffer layout, matched exactly to `PolygonRenderer.metal`'s `TriangleInstance` struct —
+/// each field an unresolved `(from, to, startTime)` triple. `p0`/`p1`/`p2` each get an
+/// INDEPENDENT `AnimatedFloat2` (not one shared triple) because `MetalTriangleLayout.slots
+/// (forIndex:)` can touch a wedge where only one of its 3 points actually moved — see that
+/// protocol's own doc comment.
+struct MetalTriangleGPUInstance {
+  var p0: AnimatedFloat2
+  var p1: AnimatedFloat2
+  var p2: AnimatedFloat2
+  var color: AnimatedFloat4
 }
 
 /// Per-visualizer geometry contract for `MetalTriangleRenderer<Self>` — the triangle-wedge sibling
@@ -56,8 +72,9 @@ final class MetalTriangleRenderer<Layout: MetalTriangleLayout>: NSObject, MetalI
   private let p0Transitions = MetalPositionTransitionTracker()
   private let p1Transitions = MetalPositionTransitionTracker()
   private let p2Transitions = MetalPositionTransitionTracker()
-  /// See `MetalBarRenderer.lastFrameTimestamp`'s doc comment.
-  private var lastFrameTimestamp: CFTimeInterval?
+  /// See `MetalBarRenderer.timeEpoch`/`now()`'s doc comments.
+  private var timeEpoch: CFTimeInterval = CACurrentMediaTime()
+  private func now() -> Float { Float(CACurrentMediaTime() - timeEpoch) }
 
   /// `nil` under the same conditions `MetalBarRenderer.init?` can be — see that initializer's
   /// own doc comment for why `makeDefaultLibrary(bundle:)` is required. `sampleCount` defaults to
@@ -104,6 +121,7 @@ final class MetalTriangleRenderer<Layout: MetalTriangleLayout>: NSObject, MetalI
     p0Transitions.reset()
     p1Transitions.reset()
     p2Transitions.reset()
+    timeEpoch = CACurrentMediaTime()
 
     guard slotCount > 0, pixelSize.width > 0, pixelSize.height > 0 else {
       instanceBuffer = nil
@@ -111,7 +129,8 @@ final class MetalTriangleRenderer<Layout: MetalTriangleLayout>: NSObject, MetalI
     }
     guard
       let buffer = device.makeBuffer(
-        length: MemoryLayout<MetalTriangleInstance>.stride * slotCount, options: .storageModeShared)
+        length: MemoryLayout<MetalTriangleGPUInstance>.stride * slotCount,
+        options: .storageModeShared)
     else {
       instanceBuffer = nil
       return
@@ -152,20 +171,23 @@ final class MetalTriangleRenderer<Layout: MetalTriangleLayout>: NSObject, MetalI
     let index = Layout.arrayIndex(forSlot: slot, count: arrayCount)
     guard values.indices.contains(index) else { return }
 
-    var instance = Layout.instance(
+    let target = Layout.instance(
       atSlot: slot, arrayIndex: index, values: values, valueRange: valueRange,
       markers: markers, canvasSize: lastCanvasSize, count: arrayCount
     )
     // Layouts compute in points, matching every `Visualizer.draw`'s own convention — scale to
     // pixels here, once, generically, same as `MetalShapeRenderer.writeInstance` does.
-    instance.p0 = p0Transitions.valueToWrite(forSlot: slot, target: instance.p0 * Float(lastScale))
-    instance.p1 = p1Transitions.valueToWrite(forSlot: slot, target: instance.p1 * Float(lastScale))
-    instance.p2 = p2Transitions.valueToWrite(forSlot: slot, target: instance.p2 * Float(lastScale))
-    instance.color = colorTransitions.valueToWrite(forSlot: slot, target: instance.color)
+    let n = now()
+    let instance = MetalTriangleGPUInstance(
+      p0: p0Transitions.valueToWrite(forSlot: slot, target: target.p0 * Float(lastScale), now: n),
+      p1: p1Transitions.valueToWrite(forSlot: slot, target: target.p1 * Float(lastScale), now: n),
+      p2: p2Transitions.valueToWrite(forSlot: slot, target: target.p2 * Float(lastScale), now: n),
+      color: colorTransitions.valueToWrite(forSlot: slot, target: target.color, now: n)
+    )
 
     instanceBuffer.contents()
-      .advanced(by: slot * MemoryLayout<MetalTriangleInstance>.stride)
-      .storeBytes(of: instance, as: MetalTriangleInstance.self)
+      .advanced(by: slot * MemoryLayout<MetalTriangleGPUInstance>.stride)
+      .storeBytes(of: instance, as: MetalTriangleGPUInstance.self)
   }
 
   var onDrawableSizeChange: ((CGSize) -> Void)?
@@ -186,20 +208,16 @@ final class MetalTriangleRenderer<Layout: MetalTriangleLayout>: NSObject, MetalI
         let commandBuffer = commandQueue.makeCommandBuffer()
       else { return }
 
-      let now = CACurrentMediaTime()
-      let elapsed = lastFrameTimestamp.map { now - $0 } ?? 0
-      lastFrameTimestamp = now
-      advanceTransitions(elapsed: elapsed)
-
       encodeDraw(into: passDescriptor, commandBuffer: commandBuffer)
       commandBuffer.present(drawable)
       commandBuffer.commit()
 
       // See `MetalBarRenderer.draw(in:)`'s own comment on why this uses MetalKit's own
       // capped internal display link instead of manually re-arming `setNeedsDisplay()`.
+      let n = now()
       let stillActive =
-        colorTransitions.isActive || p0Transitions.isActive
-        || p1Transitions.isActive || p2Transitions.isActive
+        colorTransitions.isActive(now: n) || p0Transitions.isActive(now: n)
+        || p1Transitions.isActive(now: n) || p2Transitions.isActive(now: n)
       if stillActive {
         if view.isPaused { view.isPaused = false }
       } else if !view.isPaused {
@@ -208,35 +226,37 @@ final class MetalTriangleRenderer<Layout: MetalTriangleLayout>: NSObject, MetalI
     }
   }
 
-  /// See `MetalBarRenderer.advanceTransitions`'s doc comment.
-  func advanceTransitions(elapsed: TimeInterval) {
-    guard let instanceBuffer, slotCount > 0 else { return }
-    let colorChanges = colorTransitions.advance(elapsed: elapsed)
-    let p0Changes = p0Transitions.advance(elapsed: elapsed)
-    let p1Changes = p1Transitions.advance(elapsed: elapsed)
-    let p2Changes = p2Transitions.advance(elapsed: elapsed)
-    let changedSlots = Set(colorChanges.keys).union(p0Changes.keys).union(p1Changes.keys).union(
-      p2Changes.keys)
-    guard !changedSlots.isEmpty else { return }
-    let pointer = instanceBuffer.contents().assumingMemoryBound(to: MetalTriangleInstance.self)
-    for slot in changedSlots {
-      if let color = colorTransitions.displayed(forSlot: slot) { pointer[slot].color = color }
-      if let p0 = p0Transitions.displayed(forSlot: slot) { pointer[slot].p0 = p0 }
-      if let p1 = p1Transitions.displayed(forSlot: slot) { pointer[slot].p1 = p1 }
-      if let p2 = p2Transitions.displayed(forSlot: slot) { pointer[slot].p2 = p2 }
-    }
+  /// Test seam: the RAW current instance buffer contents — see `MetalShapeRenderer
+  /// .debugInstances`'s doc comment.
+  func debugInstances() -> [MetalTriangleGPUInstance] {
+    guard let instanceBuffer else { return [] }
+    let pointer = instanceBuffer.contents().assumingMemoryBound(to: MetalTriangleGPUInstance.self)
+    return (0..<slotCount).map { pointer[$0] }
   }
 
-  /// Test seam, same shape as `MetalShapeRenderer.debugInstances`.
-  func debugInstances() -> [MetalTriangleInstance] {
-    guard let instanceBuffer else { return [] }
-    let pointer = instanceBuffer.contents().assumingMemoryBound(to: MetalTriangleInstance.self)
-    return (0..<slotCount).map { pointer[$0] }
+  /// Test seam: resolved displayed values at a pinned `currentTime` — see `MetalShapeRenderer
+  /// .resolvedInstances(at:)`'s doc comment.
+  func resolvedInstances(at currentTime: Float) -> [MetalTriangleInstance] {
+    debugInstances().map {
+      MetalTriangleInstance(
+        p0: resolveAnimated2($0.p0, at: currentTime),
+        p1: resolveAnimated2($0.p1, at: currentTime),
+        p2: resolveAnimated2($0.p2, at: currentTime),
+        color: resolveAnimated4($0.color, at: currentTime))
+    }
   }
 
   /// Test seam, same shape as `MetalShapeRenderer.encodeDraw` — drives this against an offscreen
   /// texture instead of a live `MTKView`.
   func encodeDraw(into passDescriptor: MTLRenderPassDescriptor, commandBuffer: MTLCommandBuffer) {
+    encodeDraw(into: passDescriptor, commandBuffer: commandBuffer, currentTime: now())
+  }
+
+  /// Test-only overload — see `MetalBarRenderer`'s own overload of the same name for why.
+  func encodeDraw(
+    into passDescriptor: MTLRenderPassDescriptor, commandBuffer: MTLCommandBuffer,
+    currentTime: Float
+  ) {
     guard
       let buffer = instanceBuffer, slotCount > 0,
       let encoder = commandBuffer.makeRenderCommandEncoder(descriptor: passDescriptor)
@@ -244,8 +264,10 @@ final class MetalTriangleRenderer<Layout: MetalTriangleLayout>: NSObject, MetalI
 
     encoder.setRenderPipelineState(pipelineState)
     encoder.setVertexBuffer(buffer, offset: 0, index: 0)
-    var viewport = SIMD2<Float>(Float(pixelSize.width), Float(pixelSize.height))
-    encoder.setVertexBytes(&viewport, length: MemoryLayout<SIMD2<Float>>.size, index: 1)
+    var uniforms = MetalAnimationUniforms(
+      viewportSize: SIMD2(Float(pixelSize.width), Float(pixelSize.height)),
+      currentTime: currentTime, transitionDuration: Float(transitionDuration))
+    encoder.setVertexBytes(&uniforms, length: MemoryLayout<MetalAnimationUniforms>.size, index: 1)
     encoder.drawPrimitives(
       type: .triangle, vertexStart: 0, vertexCount: 3, instanceCount: slotCount)
     encoder.endEncoding()

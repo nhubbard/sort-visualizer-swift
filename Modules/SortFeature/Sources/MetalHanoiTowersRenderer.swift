@@ -5,6 +5,16 @@ import QuartzCore
 import SortEngineKit
 import VisualizationKit
 
+/// GPU-buffer layout, matched exactly to `ShapeRenderer.metal`'s `HanoiInstance` struct — `origin`
+/// is the fixed 2-leg `HanoiOrigin` (`HanoiMoveScheduler.swift`), `size` stays a plain unanimated
+/// value (Hanoi never eases block size, only position and color), `color` is the usual
+/// `AnimatedFloat4`.
+struct HanoiInstance {
+  var origin: HanoiOrigin
+  var size: SIMD2<Float>
+  var color: AnimatedFloat4
+}
+
 /// The Metal counterpart to `HanoiTowersVisualizer` (`Modules/BuiltInVisualizers/Sources/`) — that
 /// type only describes the static resting layout; this renderer adds the actual lift-obstacles/
 /// carry/place/restore choreography on top of it, driven by the raw `SortOperation`s
@@ -13,9 +23,10 @@ import VisualizationKit
 /// Not a `MetalShapeRenderer<Layout>` parametrization — its needs (per-slot multi-waypoint
 /// choreography, obstacle discovery) diverge enough from that shared, single-target-per-field
 /// abstraction to warrant a fully bespoke type, the same precedent `MetalBarRenderer`/
-/// `MetalDisparityChordsRenderer` already set. Reuses `MetalShapeInstance`
-/// (`MetalShapeRenderer.swift`) and the existing `shape_vertex`/`rect_fragment` shader pair
-/// unchanged — a Hanoi Towers block is just a rect, no new `.metal` shader needed.
+/// `MetalDisparityChordsRenderer` already set. Its own `hanoi_vertex` function (`ShapeRenderer
+/// .metal`, alongside `shape_vertex`/`rect_fragment` which it still reuses for fragment output) —
+/// the fixed 2-leg origin math genuinely differs from every other renderer's single-target fade,
+/// even though the rest (unit-corner quad, NDC flip, fill) is identical.
 ///
 /// Tower/depth assignment is a PURE function of index (`tower(forIndex:count:towerCount:)`/
 /// `depth(forIndex:count:towerCount:)`, duplicated from `HanoiTowersVisualizer` rather than shared
@@ -37,11 +48,15 @@ final class MetalHanoiTowersRenderer: NSObject, MetalIncrementalRenderer {
 
   private let colorTransitions = MetalColorTransitionTracker()
   private let positions = HanoiMoveScheduler()
-  private var lastFrameTimestamp: CFTimeInterval?
+  /// See `MetalBarRenderer.timeEpoch`/`now()`'s doc comments.
+  private var timeEpoch: CFTimeInterval = CACurrentMediaTime()
+  private func now() -> Float { Float(CACurrentMediaTime() - timeEpoch) }
 
   /// How long a leg of the choreography (lift, carry, restore) takes before advancing to the
-  /// next waypoint — independent of `MetalPositionTransitionTracker`'s own fixed 0.12s fade
-  /// duration, just long enough for that fade to visually complete before the next leg starts.
+  /// next waypoint — independent of `MetalColorTransitionTracker`'s own fixed 0.12s
+  /// `transitionDuration`, just long enough for that fade to visually complete before the next
+  /// leg starts. MUST stay `>= transitionDuration` — see `HanoiOrigin`'s own doc comment for why
+  /// a smaller value would make leg 1 visibly pop instead of continuing from leg 0's target.
   private static let legDuration: TimeInterval = 0.15
 
   init?(device: MTLDevice, sampleCount: Int = 1) {
@@ -50,7 +65,7 @@ final class MetalHanoiTowersRenderer: NSObject, MetalIncrementalRenderer {
       return nil
     }
     guard
-      let vertexFunction = library.makeFunction(name: "shape_vertex"),
+      let vertexFunction = library.makeFunction(name: "hanoi_vertex"),
       let fragmentFunction = library.makeFunction(name: "rect_fragment")
     else { return nil }
 
@@ -71,6 +86,10 @@ final class MetalHanoiTowersRenderer: NSObject, MetalIncrementalRenderer {
     self.commandQueue = queue
     self.pipelineState = pipelineState
     super.init()
+    assert(
+      Self.legDuration >= transitionDuration,
+      "leg0Hold must be >= transitionDuration or leg 1 will visibly pop instead of continuing "
+        + "from leg 0's settled target — see HanoiOrigin's doc comment")
   }
 
   // MARK: - Tower/depth math (pure, index-derived — see the type doc comment)
@@ -151,6 +170,7 @@ final class MetalHanoiTowersRenderer: NSObject, MetalIncrementalRenderer {
     towerCount = Self.towerCount(for: count)
     colorTransitions.reset()
     positions.reset()
+    timeEpoch = CACurrentMediaTime()
 
     guard count > 0, pixelSize.width > 0, pixelSize.height > 0 else {
       instanceBuffer = nil
@@ -158,15 +178,16 @@ final class MetalHanoiTowersRenderer: NSObject, MetalIncrementalRenderer {
     }
     guard
       let buffer = device.makeBuffer(
-        length: MemoryLayout<MetalShapeInstance>.stride * count, options: .storageModeShared)
+        length: MemoryLayout<HanoiInstance>.stride * count, options: .storageModeShared)
     else {
       instanceBuffer = nil
       return
     }
     instanceBuffer = buffer
 
+    let n = now()
     for index in values.indices {
-      positions.setDirect(slot: index, target: homePosition(forIndex: index))
+      positions.setDirect(slot: index, target: homePosition(forIndex: index), now: n)
       writeInstance(slot: index, values: values, valueRange: valueRange, markers: markers)
     }
   }
@@ -187,8 +208,9 @@ final class MetalHanoiTowersRenderer: NSObject, MetalIncrementalRenderer {
           scale: lastScale)
         return
       }
+      let n = now()
       for index in touched where values.indices.contains(index) {
-        positions.setDirect(slot: index, target: homePosition(forIndex: index))
+        positions.setDirect(slot: index, target: homePosition(forIndex: index), now: n)
         writeInstance(slot: index, values: values, valueRange: valueRange, markers: markers)
       }
     }
@@ -205,9 +227,10 @@ final class MetalHanoiTowersRenderer: NSObject, MetalIncrementalRenderer {
     let towerI = Self.tower(forIndex: i, count: count, towerCount: towerCount)
     let towerJ = Self.tower(forIndex: j, count: count, towerCount: towerCount)
 
+    let n = now()
     guard towerI != towerJ else {
       for index in [i, j] {
-        positions.setDirect(slot: index, target: homePosition(forIndex: index))
+        positions.setDirect(slot: index, target: homePosition(forIndex: index), now: n)
         writeInstance(slot: index, values: values, valueRange: valueRange, markers: markers)
       }
       return
@@ -227,17 +250,11 @@ final class MetalHanoiTowersRenderer: NSObject, MetalIncrementalRenderer {
     }
 
     positions.schedule(
-      slot: i,
-      waypoints: [
-        .init(target: homePosition(forIndex: j), holdDuration: Self.legDuration),
-        .init(target: homePosition(forIndex: i), holdDuration: 0)
-      ])
+      slot: i, leg0Target: homePosition(forIndex: j), leg0Hold: Self.legDuration,
+      leg1Target: homePosition(forIndex: i), now: n)
     positions.schedule(
-      slot: j,
-      waypoints: [
-        .init(target: homePosition(forIndex: i), holdDuration: Self.legDuration),
-        .init(target: homePosition(forIndex: j), holdDuration: 0)
-      ])
+      slot: j, leg0Target: homePosition(forIndex: i), leg0Hold: Self.legDuration,
+      leg1Target: homePosition(forIndex: j), now: n)
     writeInstance(slot: i, values: values, valueRange: valueRange, markers: markers)
     writeInstance(slot: j, values: values, valueRange: valueRange, markers: markers)
   }
@@ -247,11 +264,8 @@ final class MetalHanoiTowersRenderer: NSObject, MetalIncrementalRenderer {
     markers: [Int: Set<Int>]
   ) {
     positions.schedule(
-      slot: index,
-      waypoints: [
-        .init(target: parkedPosition(inTower: spare, rank: rank), holdDuration: Self.legDuration * 2),
-        .init(target: homePosition(forIndex: index), holdDuration: 0)
-      ])
+      slot: index, leg0Target: parkedPosition(inTower: spare, rank: rank),
+      leg0Hold: Self.legDuration * 2, leg1Target: homePosition(forIndex: index), now: now())
     writeInstance(slot: index, values: values, valueRange: valueRange, markers: markers)
   }
 
@@ -261,15 +275,18 @@ final class MetalHanoiTowersRenderer: NSObject, MetalIncrementalRenderer {
     guard let instanceBuffer, values.indices.contains(slot) else { return }
     let normalized = MetalShapeColor.normalized(value: values[slot], in: valueRange)
     let color = MetalShapeColor.marker(forIndex: slot, in: markers) ?? MetalShapeColor.hueRamp(normalized)
+    let n = now()
+    let home = homePosition(forIndex: slot)
 
-    let instance = MetalShapeInstance(
-      origin: positions.displayed(forSlot: slot) ?? homePosition(forIndex: slot),
+    let instance = HanoiInstance(
+      origin: positions.origin(forSlot: slot)
+        ?? HanoiOrigin(leg0From: home, leg0To: home, leg1To: home, leg0Hold: 0, startTime: n),
       size: blockSize(),
-      color: colorTransitions.valueToWrite(forSlot: slot, target: color)
+      color: colorTransitions.valueToWrite(forSlot: slot, target: color, now: n)
     )
     instanceBuffer.contents()
-      .advanced(by: slot * MemoryLayout<MetalShapeInstance>.stride)
-      .storeBytes(of: instance, as: MetalShapeInstance.self)
+      .advanced(by: slot * MemoryLayout<HanoiInstance>.stride)
+      .storeBytes(of: instance, as: HanoiInstance.self)
   }
 
   var onDrawableSizeChange: ((CGSize) -> Void)?
@@ -288,16 +305,12 @@ final class MetalHanoiTowersRenderer: NSObject, MetalIncrementalRenderer {
         let commandBuffer = commandQueue.makeCommandBuffer()
       else { return }
 
-      let now = CACurrentMediaTime()
-      let elapsed = lastFrameTimestamp.map { now - $0 } ?? 0
-      lastFrameTimestamp = now
-      advanceTransitions(elapsed: elapsed)
-
       encodeDraw(into: passDescriptor, commandBuffer: commandBuffer)
       commandBuffer.present(drawable)
       commandBuffer.commit()
 
-      if colorTransitions.isActive || positions.isActive {
+      let n = now()
+      if colorTransitions.isActive(now: n) || positions.isActive(now: n) {
         if view.isPaused { view.isPaused = false }
       } else if !view.isPaused {
         view.isPaused = true
@@ -305,26 +318,56 @@ final class MetalHanoiTowersRenderer: NSObject, MetalIncrementalRenderer {
     }
   }
 
-  func advanceTransitions(elapsed: TimeInterval) {
-    guard let instanceBuffer, count > 0 else { return }
-    let colorChanges = colorTransitions.advance(elapsed: elapsed)
-    let positionChanges = positions.advance(elapsed: elapsed)
-    let changedSlots = Set(colorChanges.keys).union(positionChanges.keys)
-    guard !changedSlots.isEmpty else { return }
-    let pointer = instanceBuffer.contents().assumingMemoryBound(to: MetalShapeInstance.self)
-    for slot in changedSlots {
-      if let color = colorTransitions.displayed(forSlot: slot) { pointer[slot].color = color }
-      if let origin = positions.displayed(forSlot: slot) { pointer[slot].origin = origin }
-    }
-  }
-
-  func debugInstances() -> [MetalShapeInstance] {
+  /// Test seam: the RAW current instance buffer contents — see `MetalShapeRenderer
+  /// .debugInstances`'s doc comment.
+  func debugInstances() -> [HanoiInstance] {
     guard let instanceBuffer else { return [] }
-    let pointer = instanceBuffer.contents().assumingMemoryBound(to: MetalShapeInstance.self)
+    let pointer = instanceBuffer.contents().assumingMemoryBound(to: HanoiInstance.self)
     return (0..<count).map { pointer[$0] }
   }
 
+  /// Test seam: `debugInstances()`'s raw origin/color resolved to plain displayed values at a
+  /// pinned `currentTime` (`size` passes through unchanged, never animated) — see
+  /// `MetalShapeRenderer.resolvedInstances(at:)`'s doc comment. Origin resolution uses
+  /// `HanoiMoveScheduler`'s own `resolvedOrigin`-equivalent math directly on the raw triple
+  /// (not through the scheduler instance, which only knows about slots it currently tracks) so
+  /// this works uniformly even for a slot whose `HanoiOrigin` came from the `?? homePosition`
+  /// fallback in `writeInstance`.
+  struct ResolvedHanoiInstance {
+    var origin: SIMD2<Float>
+    var size: SIMD2<Float>
+    var color: SIMD4<Float>
+  }
+
+  func resolvedInstances(at currentTime: Float) -> [ResolvedHanoiInstance] {
+    debugInstances().map { instance in
+      let origin = instance.origin
+      let t = currentTime - origin.startTime
+      let resolvedOrigin: SIMD2<Float>
+      if t < origin.leg0Hold {
+        let localT = min(max(t / Float(transitionDuration), 0), 1)
+        let eased = easeInOutCubic(localT)
+        resolvedOrigin = origin.leg0From + (origin.leg0To - origin.leg0From) * SIMD2<Float>(repeating: eased)
+      } else {
+        let localT = min(max((t - origin.leg0Hold) / Float(transitionDuration), 0), 1)
+        let eased = easeInOutCubic(localT)
+        resolvedOrigin = origin.leg0To + (origin.leg1To - origin.leg0To) * SIMD2<Float>(repeating: eased)
+      }
+      return ResolvedHanoiInstance(
+        origin: resolvedOrigin, size: instance.size,
+        color: resolveAnimated4(instance.color, at: currentTime))
+    }
+  }
+
   func encodeDraw(into passDescriptor: MTLRenderPassDescriptor, commandBuffer: MTLCommandBuffer) {
+    encodeDraw(into: passDescriptor, commandBuffer: commandBuffer, currentTime: now())
+  }
+
+  /// Test-only overload — see `MetalBarRenderer`'s own overload of the same name for why.
+  func encodeDraw(
+    into passDescriptor: MTLRenderPassDescriptor, commandBuffer: MTLCommandBuffer,
+    currentTime: Float
+  ) {
     guard
       let buffer = instanceBuffer, count > 0,
       let encoder = commandBuffer.makeRenderCommandEncoder(descriptor: passDescriptor)
@@ -332,8 +375,10 @@ final class MetalHanoiTowersRenderer: NSObject, MetalIncrementalRenderer {
 
     encoder.setRenderPipelineState(pipelineState)
     encoder.setVertexBuffer(buffer, offset: 0, index: 0)
-    var viewport = SIMD2<Float>(Float(pixelSize.width), Float(pixelSize.height))
-    encoder.setVertexBytes(&viewport, length: MemoryLayout<SIMD2<Float>>.size, index: 1)
+    var uniforms = MetalAnimationUniforms(
+      viewportSize: SIMD2(Float(pixelSize.width), Float(pixelSize.height)),
+      currentTime: currentTime, transitionDuration: Float(transitionDuration))
+    encoder.setVertexBytes(&uniforms, length: MemoryLayout<MetalAnimationUniforms>.size, index: 1)
     encoder.drawPrimitives(
       type: .triangleStrip, vertexStart: 0, vertexCount: 4, instanceCount: count)
     encoder.endEncoding()

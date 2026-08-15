@@ -73,6 +73,9 @@ struct MetalHanoiTowersRendererTests {
       values: values, valueRange: 1...12, markers: [:], canvasSize: CGSize(width: 400, height: 400),
       scale: 1)
 
+    // Fresh off `reset()` — `origin.leg0From == leg0To == leg1To` for every slot (a first-ever
+    // paint shows immediately, no fade in flight yet), so reading `leg0To` directly gives the
+    // actual home position without needing to resolve anything.
     let instances = renderer.debugInstances()
     #expect(instances.count == 12)
     // Every tower's bottom-most (depth 0) block should sit at the same Y — the canvas floor
@@ -80,7 +83,7 @@ struct MetalHanoiTowersRendererTests {
     let towers = MetalHanoiTowersRenderer.towerCount(for: 12)
     var bottomYs: Set<Float> = []
     for index in 0..<12 where MetalHanoiTowersRenderer.depth(forIndex: index, count: 12, towerCount: towers) == 0 {
-      bottomYs.insert(instances[index].origin.y)
+      bottomYs.insert(instances[index].origin.leg0To.y)
     }
     #expect(bottomYs.count == 1, "every tower's floor block should be at the same height")
   }
@@ -95,7 +98,9 @@ struct MetalHanoiTowersRendererTests {
     renderer.reset(
       values: values, valueRange: 1...9, markers: [:], canvasSize: CGSize(width: 300, height: 300),
       scale: 1)
-    let homeOrigins = renderer.debugInstances().map(\.origin)
+    // Fresh off `reset()` — see the sibling test's own comment on why `leg0To` is safe to read
+    // directly here.
+    let homeOrigins = renderer.debugInstances().map(\.origin.leg0To)
 
     let towers = MetalHanoiTowersRenderer.towerCount(for: 9)
     // Find two indices in different towers to swap.
@@ -113,14 +118,10 @@ struct MetalHanoiTowersRendererTests {
     values.swapAt(i, j)
     renderer.apply(.swap(i, j), values: values, valueRange: 1...9, markers: [:])
 
-    // Overshoot every leg's hold duration plus the underlying fade, in several ticks so the
-    // scheduler's own per-leg advancement actually runs (a single giant elapsed tick would only
-    // ever process the FIRST leg boundary once).
-    for _ in 0..<10 {
-      renderer.advanceTransitions(elapsed: 0.2)
-    }
-
-    let finalInstances = renderer.debugInstances()
+    // A large sentinel probe time, comfortably past both legs' hold durations plus their own
+    // fades regardless of how much real wall-clock time this test took to reach this line — see
+    // `MetalShapeRendererBufferConsistencyTests`'s own comment on this same sentinel pattern.
+    let finalInstances = renderer.resolvedInstances(at: 1000)
     #expect(
       finalInstances[i].origin == homeOrigins[i],
       "slot \(i) must settle back at its own home position, not \(j)'s")
@@ -138,7 +139,9 @@ struct MetalHanoiTowersRendererTests {
     renderer.reset(
       values: values, valueRange: 1...9, markers: [:], canvasSize: CGSize(width: 300, height: 300),
       scale: 1)
-    let homeOrigins = renderer.debugInstances().map(\.origin)
+    // Fresh off `reset()` — see `resetPlacesEveryIndexAtItsOwnHomePosition`'s own comment on why
+    // `leg0To` is safe to read directly here.
+    let homeOrigins = renderer.debugInstances().map(\.origin.leg0To)
 
     let towers = MetalHanoiTowersRenderer.towerCount(for: 9)
     // Pick the FIRST index of some tower with at least one obstacle above it, so a swap on it
@@ -160,10 +163,8 @@ struct MetalHanoiTowersRendererTests {
     values.swapAt(i, j)
     renderer.apply(.swap(i, j), values: values, valueRange: 1...9, markers: [:])
 
-    for _ in 0..<10 {
-      renderer.advanceTransitions(elapsed: 0.2)
-    }
-
-    #expect(renderer.debugInstances()[obstacle].origin == homeOrigins[obstacle])
+    // See `crossTowerSwapSettlesBothSlotsBackAtTheirOwnHomeWithSwappedColors`'s own comment on
+    // this sentinel probe time — comfortably past an obstacle's (longer, `legDuration * 2`) hold.
+    #expect(renderer.resolvedInstances(at: 1000)[obstacle].origin == homeOrigins[obstacle])
   }
 }

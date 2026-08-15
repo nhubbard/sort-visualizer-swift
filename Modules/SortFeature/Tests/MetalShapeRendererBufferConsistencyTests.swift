@@ -125,7 +125,11 @@ struct MetalShapeRendererBufferConsistencyTests {
     let finalValues = replay.frame.map(\.value)
     #expect(finalValues == Array(1...size), "sanity: the DATA must be correctly sorted")
 
-    let instances = renderer.debugInstances()
+    // A large sentinel probe time, comfortably past any real fade's `startTime + transitionDuration`
+    // — every test in this suite resets its renderer's animation epoch to 0 at `reset()` and runs
+    // for at most ~10 real seconds, so 1000 is guaranteed to resolve every field at its settled
+    // `to` value, exactly like real playback having finished long enough ago.
+    let instances = renderer.resolvedInstances(at: 1000)
     #expect(instances.count == size)
 
     var mismatches: [(index: Int, expectedHeight: Float, actualHeight: Float)] = []
@@ -218,7 +222,8 @@ struct MetalShapeRendererBufferConsistencyTests {
     let finalValues = replay.frame.map(\.value)
     #expect(finalValues == Array(1...size), "sanity: the DATA must be correctly sorted")
 
-    let instances = renderer.debugInstances()
+    // See the sibling test's own comment on this sentinel probe time.
+    let instances = renderer.resolvedInstances(at: 1000)
     #expect(instances.count == size)
 
     var mismatches: [(index: Int, expectedHeight: Float, actualHeight: Float)] = []
@@ -267,13 +272,17 @@ struct MetalShapeRendererBufferConsistencyTests {
       .mark(marker: Marker.primary, index: 0), values: values, valueRange: 10...20,
       markers: [0: [Marker.primary]]
     )
-    let afterApply = renderer.debugInstances()[0].color
+    // Probed at t=0: always at-or-before the real `startTime` this `apply` just stamped (the
+    // renderer's own animation epoch only ever advances forward from 0), so this resolves to
+    // exactly the fade's `from` value regardless of how much real wall-clock time this line of
+    // test code actually took to run.
+    let afterApply = renderer.resolvedInstances(at: 0)[0].color
     #expect(
       afterApply != MetalShapeColor.primary,
       "must not snap to the marker color the instant it's touched")
 
-    renderer.advanceTransitions(elapsed: 1)  // overshoots the 0.12s fade duration -> settles exactly
-    let afterAdvance = renderer.debugInstances()[0].color
+    // Overshoots the 0.12s fade duration -> settles exactly at the target.
+    let afterAdvance = renderer.resolvedInstances(at: 1)[0].color
     #expect(afterAdvance == MetalShapeColor.primary)
   }
 
@@ -292,15 +301,16 @@ struct MetalShapeRendererBufferConsistencyTests {
 
     renderer.reset(
       values: [10, 20], valueRange: 10...20, markers: [:], canvasSize: canvasSize, scale: 1)
-    let originalOrigin = renderer.debugInstances()[0].origin
+    let originalOrigin = renderer.resolvedInstances(at: 0)[0].origin
 
     renderer.apply(.setValue(0, 20), values: [20, 20], valueRange: 10...20, markers: [:])
-    let afterApply = renderer.debugInstances()[0].origin
+    // See the color-easing test's own comment on why probing at t=0 is deterministic here.
+    let afterApply = renderer.resolvedInstances(at: 0)[0].origin
     #expect(
       afterApply == originalOrigin, "must not snap to the new position the instant it's touched")
 
-    renderer.advanceTransitions(elapsed: 1)  // overshoots the 0.12s fade duration -> settles exactly
-    let afterAdvance = renderer.debugInstances()[0].origin
+    // Overshoots the 0.12s fade duration -> settles exactly at the target.
+    let afterAdvance = renderer.resolvedInstances(at: 1)[0].origin
     #expect(afterAdvance != originalOrigin, "should have reached the new position after settling")
   }
 }

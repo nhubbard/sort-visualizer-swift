@@ -16,9 +16,9 @@ import SortEngineKit
 @MainActor
 final class MetalBarRenderer: NSObject, MetalIncrementalRenderer {
   struct BarInstance {
-    var origin: SIMD2<Float>
-    var size: SIMD2<Float>
-    var color: SIMD4<Float>
+    var origin: AnimatedFloat2
+    var size: AnimatedFloat2
+    var color: AnimatedFloat4
   }
 
   private let device: MTLDevice
@@ -35,10 +35,18 @@ final class MetalBarRenderer: NSObject, MetalIncrementalRenderer {
   private let colorTransitions = MetalColorTransitionTracker()
   private let originTransitions = MetalPositionTransitionTracker()
   private let sizeTransitions = MetalPositionTransitionTracker()
-  /// Wall-clock timestamp of the last `draw(in:)` call, for computing `advanceTransitions`'s
-  /// `elapsed` — `nil` before the first draw (treated as 0 elapsed, matching
-  /// `CADisplayLinkDriver`'s own first-tick convention).
-  private var lastFrameTimestamp: CFTimeInterval?
+  /// Session-relative clock, reset alongside every tracker in `reset()` — see `now()`'s own doc
+  /// comment for why this isn't raw `CACurrentMediaTime()`.
+  private var timeEpoch: CFTimeInterval = CACurrentMediaTime()
+
+  /// Seconds since this renderer's last `reset()`, fed to both `MetalPositionTransitionTracker`/
+  /// `MetalColorTransitionTracker` (to stamp `startTime`) and the vertex shader's `currentTime`
+  /// uniform. NOT raw `CACurrentMediaTime()`: that's seconds-since-boot, which on a
+  /// long-uptime device can be a six-digit number — `Float`'s ~7 significant digits would then
+  /// leave a `currentTime - startTime` subtraction with precision comparable to the 0.12s
+  /// transition duration itself, causing visible jitter. Resetting the epoch on every `reset()`
+  /// keeps the magnitude small for the common case (a run lasting seconds to a couple minutes).
+  private func now() -> Float { Float(CACurrentMediaTime() - timeEpoch) }
 
   /// `var`, not `let`: `MetalRendererView.Coordinator.setColorScheme` flips this between a
   /// light-mode and dark-mode value, since a near-white "no marker" default vanishes into a
@@ -100,6 +108,7 @@ final class MetalBarRenderer: NSObject, MetalIncrementalRenderer {
     colorTransitions.reset()
     originTransitions.reset()
     sizeTransitions.reset()
+    timeEpoch = CACurrentMediaTime()
 
     guard count > 0, pixelSize.width > 0, pixelSize.height > 0 else {
       instanceBuffer = nil
@@ -157,13 +166,14 @@ final class MetalBarRenderer: NSObject, MetalIncrementalRenderer {
     // (see `BarRenderer.metal`'s vertex shader for how this point space maps to Metal's own
     // +Y-up NDC).
     let originY = Float(pixelSize.height) - height
+    let n = now()
 
     let bar = BarInstance(
       origin: originTransitions.valueToWrite(
-        forSlot: index, target: SIMD2(Float(index) * barWidth, originY)),
-      size: sizeTransitions.valueToWrite(forSlot: index, target: SIMD2(barWidth, height)),
+        forSlot: index, target: SIMD2(Float(index) * barWidth, originY), now: n),
+      size: sizeTransitions.valueToWrite(forSlot: index, target: SIMD2(barWidth, height), now: n),
       color: colorTransitions.valueToWrite(
-        forSlot: index, target: color(forIndex: index, in: markers))
+        forSlot: index, target: color(forIndex: index, in: markers), now: n)
     )
     instanceBuffer.contents()
       .advanced(by: index * MemoryLayout<BarInstance>.stride)
@@ -201,11 +211,6 @@ final class MetalBarRenderer: NSObject, MetalIncrementalRenderer {
         let commandBuffer = commandQueue.makeCommandBuffer()
       else { return }
 
-      let now = CACurrentMediaTime()
-      let elapsed = lastFrameTimestamp.map { now - $0 } ?? 0
-      lastFrameTimestamp = now
-      advanceTransitions(elapsed: elapsed)
-
       encodeDraw(into: passDescriptor, commandBuffer: commandBuffer)
       commandBuffer.present(drawable)
       commandBuffer.commit()
@@ -217,32 +222,13 @@ final class MetalBarRenderer: NSObject, MetalIncrementalRenderer {
       // full uncapped refresh rate for the sort's whole duration, competing with SwiftUI's own
       // frame commits on the main thread and visibly slowing unrelated UI animations. Return to
       // paused once everything settles.
-      if colorTransitions.isActive || originTransitions.isActive || sizeTransitions.isActive {
+      let n = now()
+      if colorTransitions.isActive(now: n) || originTransitions.isActive(now: n)
+        || sizeTransitions.isActive(now: n) {
         if view.isPaused { view.isPaused = false }
       } else if !view.isPaused {
         view.isPaused = true
       }
-    }
-  }
-
-  /// Advances every transition tracker and patches whichever fields moved this tick directly
-  /// into the live GPU buffer — pulled out of `draw(in:)` so a test can drive it directly against
-  /// `debugInstances()`/`encodeDraw`'s own offscreen-texture seam, without a live `MTKView` draw
-  /// loop. Reads `displayed(forSlot:)` from EVERY tracker (not just whichever ones changed this
-  /// tick) for any slot the union touched, since a complete `BarInstance` write needs all three
-  /// fields together.
-  func advanceTransitions(elapsed: TimeInterval) {
-    guard let instanceBuffer, count > 0 else { return }
-    let colorChanges = colorTransitions.advance(elapsed: elapsed)
-    let originChanges = originTransitions.advance(elapsed: elapsed)
-    let sizeChanges = sizeTransitions.advance(elapsed: elapsed)
-    let changedSlots = Set(colorChanges.keys).union(originChanges.keys).union(sizeChanges.keys)
-    guard !changedSlots.isEmpty else { return }
-    let pointer = instanceBuffer.contents().assumingMemoryBound(to: BarInstance.self)
-    for slot in changedSlots {
-      if let color = colorTransitions.displayed(forSlot: slot) { pointer[slot].color = color }
-      if let origin = originTransitions.displayed(forSlot: slot) { pointer[slot].origin = origin }
-      if let size = sizeTransitions.displayed(forSlot: slot) { pointer[slot].size = size }
     }
   }
 
@@ -251,6 +237,17 @@ final class MetalBarRenderer: NSObject, MetalIncrementalRenderer {
   /// pixel-readback diagnosis instead of guessing from GPU pipeline setup alone. Not `private`
   /// for exactly that reason: `@testable import` can see `internal`, never `private`.
   func encodeDraw(into passDescriptor: MTLRenderPassDescriptor, commandBuffer: MTLCommandBuffer) {
+    encodeDraw(into: passDescriptor, commandBuffer: commandBuffer, currentTime: now())
+  }
+
+  /// Test-only overload: lets a shader-parity test pin `currentTime` to an exact probe value
+  /// instead of racing a live wall clock, so it can assert the vertex shader's `resolveAnimated2`/
+  /// `resolveAnimated4` resolve to the expected value at `t=startTime`, `t=startTime+duration/2`,
+  /// and `t=startTime+duration` precisely.
+  func encodeDraw(
+    into passDescriptor: MTLRenderPassDescriptor, commandBuffer: MTLCommandBuffer,
+    currentTime: Float
+  ) {
     guard
       let buffer = instanceBuffer, count > 0,
       let encoder = commandBuffer.makeRenderCommandEncoder(descriptor: passDescriptor)
@@ -258,8 +255,10 @@ final class MetalBarRenderer: NSObject, MetalIncrementalRenderer {
 
     encoder.setRenderPipelineState(pipelineState)
     encoder.setVertexBuffer(buffer, offset: 0, index: 0)
-    var viewport = SIMD2<Float>(Float(pixelSize.width), Float(pixelSize.height))
-    encoder.setVertexBytes(&viewport, length: MemoryLayout<SIMD2<Float>>.size, index: 1)
+    var uniforms = MetalAnimationUniforms(
+      viewportSize: SIMD2(Float(pixelSize.width), Float(pixelSize.height)),
+      currentTime: currentTime, transitionDuration: Float(transitionDuration))
+    encoder.setVertexBytes(&uniforms, length: MemoryLayout<MetalAnimationUniforms>.size, index: 1)
     encoder.drawPrimitives(
       type: .triangleStrip, vertexStart: 0, vertexCount: 4, instanceCount: count)
     encoder.endEncoding()

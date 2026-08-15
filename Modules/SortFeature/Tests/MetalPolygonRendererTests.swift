@@ -24,9 +24,11 @@ struct MetalPolygonRendererTests {
       canvasSize: CGSize(width: width, height: height), scale: 1
     )
 
+    // Fresh off `reset()` — every field's `from == to` (a first-ever paint shows immediately, no
+    // fade in flight yet), so reading either side of the raw triple gives the actual painted point.
     let wedge0 = try #require(renderer.debugInstances().first)
-    let centroidX = Int((wedge0.p0.x + wedge0.p1.x + wedge0.p2.x) / 3)
-    let centroidY = Int((wedge0.p0.y + wedge0.p1.y + wedge0.p2.y) / 3)
+    let centroidX = Int((wedge0.p0.to.x + wedge0.p1.to.x + wedge0.p2.to.x) / 3)
+    let centroidY = Int((wedge0.p0.to.y + wedge0.p1.to.y + wedge0.p2.to.y) / 3)
 
     let pixels = try render(renderer, device: device, width: width, height: height)
     let bytesPerRow = width * 4
@@ -60,9 +62,10 @@ struct MetalPolygonRendererTests {
       canvasSize: CGSize(width: 200, height: 200), scale: 4
     )
 
+    // See the triangle test's own comment on why `.to` is safe to read straight off a fresh reset.
     let chord0 = try #require(renderer.debugInstances().first)
-    let midX = Int(((chord0.start.x + chord0.end.x) / 2).rounded())
-    let midY = Int(((chord0.start.y + chord0.end.y) / 2).rounded())
+    let midX = Int(((chord0.start.to.x + chord0.end.to.x) / 2).rounded())
+    let midY = Int(((chord0.start.to.y + chord0.end.to.y) / 2).rounded())
 
     let pixels = try render(renderer, device: device, width: width, height: height)
     let bytesPerRow = width * 4

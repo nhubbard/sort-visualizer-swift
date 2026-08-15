@@ -8,6 +8,11 @@ private func isClose(_ lhs: SIMD4<Float>, _ rhs: SIMD4<Float>, tolerance: Float 
     && abs(delta.w) < tolerance
 }
 
+/// Covers exactly the bookkeeping half of `MetalColorTransitionTracker` — deciding when a new
+/// target starts a fresh fade, and what `from`/`to`/`startTime` triple gets written. This is still
+/// 100% CPU-side logic after the GPU-driven easing redesign; only the per-frame resolution
+/// (`resolveAnimated4` in `AnimatedField.h`) moved to the shader, which these tests can't reach
+/// directly — see the per-renderer shader-parity tests for coverage of that half.
 @Suite
 struct MetalColorTransitionTrackerTests {
   private static let gray = SIMD4<Float>(0.82, 0.82, 0.86, 1)
@@ -18,47 +23,51 @@ struct MetalColorTransitionTrackerTests {
   @Test
   func firstColorForASlotShowsImmediatelyWithNoFade() {
     let tracker = MetalColorTransitionTracker()
-    // Nothing to fade FROM yet — a slot's very first color must appear immediately, not
-    // fade in from black/zero, or every new run would visibly fade in on first paint.
-    #expect(tracker.valueToWrite(forSlot: 0, target: Self.red) == Self.red)
-    #expect(!tracker.isActive)
+    // Nothing to fade FROM yet — a slot's very first color must appear immediately, not fade in
+    // from black/zero: `from == to` resolves to that value at any `t`.
+    let written = tracker.valueToWrite(forSlot: 0, target: Self.red, now: 0)
+    #expect(written.from == Self.red)
+    #expect(written.to == Self.red)
+    #expect(!tracker.isActive(now: 0))
   }
 
   @MainActor
   @Test
   func laterColorChangeFadesInsteadOfSnapping() throws {
     let tracker = MetalColorTransitionTracker()
-    _ = tracker.valueToWrite(forSlot: 0, target: Self.gray)
+    _ = tracker.valueToWrite(forSlot: 0, target: Self.gray, now: 0)
 
-    let firstWrite = tracker.valueToWrite(forSlot: 0, target: Self.red)
-    #expect(firstWrite == Self.gray, "must still show the OLD color the instant the target changes")
-    #expect(tracker.isActive)
+    let restarted = tracker.valueToWrite(forSlot: 0, target: Self.red, now: 0)
+    #expect(restarted.from == Self.gray, "the fade must start from the OLD color")
+    #expect(restarted.to == Self.red)
+    #expect(tracker.isActive(now: 0))
 
-    let midChange = try #require(tracker.advance(elapsed: 0.06)[0])  // half of the 0.12s duration
+    let midChange = try #require(tracker.resolvedValueForTesting(forSlot: 0, now: 0.06))  // half of 0.12s
     #expect(!isClose(midChange, Self.gray), "should have moved away from the starting color")
     #expect(!isClose(midChange, Self.red), "should not have reached the target color yet")
-    #expect(tracker.isActive)
+    #expect(tracker.isActive(now: 0.06))
 
-    let settled = try #require(tracker.advance(elapsed: 1)[0])  // overshoots -> clamps to target
+    let settled = try #require(tracker.resolvedValueForTesting(forSlot: 0, now: 1))  // overshoots -> clamps to target
     #expect(isClose(settled, Self.red))
-    #expect(!tracker.isActive)
+    #expect(!tracker.isActive(now: 1))
   }
 
   @MainActor
   @Test
   func targetChangingMidFadeRestartsFromCurrentDisplayedColorNotAPop() throws {
     let tracker = MetalColorTransitionTracker()
-    _ = tracker.valueToWrite(forSlot: 0, target: Self.gray)
-    _ = tracker.valueToWrite(forSlot: 0, target: Self.red)
-    let partial = try #require(tracker.advance(elapsed: 0.06)[0])  // halfway from gray to red
+    _ = tracker.valueToWrite(forSlot: 0, target: Self.gray, now: 0)
+    _ = tracker.valueToWrite(forSlot: 0, target: Self.red, now: 0)
+    let partial = try #require(tracker.resolvedValueForTesting(forSlot: 0, now: 0.06))  // halfway from gray to red
 
-    let writtenAtRetarget = tracker.valueToWrite(forSlot: 0, target: Self.blue)
+    let writtenAtRetarget = tracker.valueToWrite(forSlot: 0, target: Self.blue, now: 0.06)
     #expect(
-      writtenAtRetarget == partial,
+      isClose(writtenAtRetarget.from, partial),
       "retargeting mid-fade must continue from the current displayed color, not pop back to gray or jump to blue"
     )
+    #expect(writtenAtRetarget.to == Self.blue)
 
-    let settled = try #require(tracker.advance(elapsed: 1)[0])
+    let settled = try #require(tracker.resolvedValueForTesting(forSlot: 0, now: 0.06 + 1))
     #expect(isClose(settled, Self.blue))
   }
 
@@ -66,40 +75,43 @@ struct MetalColorTransitionTrackerTests {
   @Test
   func resetClearsAllTrackedSlots() {
     let tracker = MetalColorTransitionTracker()
-    _ = tracker.valueToWrite(forSlot: 0, target: Self.gray)
-    _ = tracker.valueToWrite(forSlot: 0, target: Self.red)
-    #expect(tracker.isActive)
+    _ = tracker.valueToWrite(forSlot: 0, target: Self.gray, now: 0)
+    _ = tracker.valueToWrite(forSlot: 0, target: Self.red, now: 0)
+    #expect(tracker.isActive(now: 0))
 
     tracker.reset()
-    #expect(!tracker.isActive)
+    #expect(!tracker.isActive(now: 0))
     // Slot 0 is treated as a fresh first-ever paint again — shows immediately, no fade.
-    #expect(tracker.valueToWrite(forSlot: 0, target: Self.blue) == Self.blue)
+    let written = tracker.valueToWrite(forSlot: 0, target: Self.blue, now: 0)
+    #expect(written.from == Self.blue)
+    #expect(written.to == Self.blue)
   }
 
-  /// Regression guard for the backing-storage change (`Dictionary<Int, Entry>` → `[Entry?]`,
-  /// grown lazily by `ensureCapacity`): a slot touched out of order and far from zero must still
-  /// track independently of every other slot, and `displayed(forSlot:)` for a slot that's never
-  /// been touched at all (including one beyond the array's current length) must return `nil`
-  /// rather than crashing on an out-of-bounds access.
+  /// Regression guard for independent per-slot bookkeeping: a slot touched out of order and far
+  /// from zero must still track independently of every other slot, and a never-touched slot
+  /// (including one far beyond any real slot count) must report no resolved value rather than
+  /// crashing or inheriting another slot's state.
   @MainActor
   @Test
   func nonZeroAndUntouchedSlotsTrackIndependently() throws {
     let tracker = MetalColorTransitionTracker()
 
-    // Touching slot 5 first must grow the backing storage correctly, not assume slot 0 exists.
-    #expect(tracker.valueToWrite(forSlot: 5, target: Self.red) == Self.red)
-    #expect(tracker.displayed(forSlot: 0) == nil, "slot 0 was never touched")
-    #expect(tracker.displayed(forSlot: 100) == nil, "far-beyond-capacity slot must not crash")
+    let written5 = tracker.valueToWrite(forSlot: 5, target: Self.red, now: 0)
+    #expect(written5.from == Self.red && written5.to == Self.red)
+    #expect(tracker.resolvedValueForTesting(forSlot: 0, now: 0) == nil, "slot 0 was never touched")
+    #expect(
+      tracker.resolvedValueForTesting(forSlot: 100, now: 0) == nil,
+      "far-beyond-capacity slot must not crash")
 
     // Slot 2, touched afterward, must be its own independent fresh-paint, not somehow inherit
     // slot 5's already-settled state.
-    #expect(tracker.valueToWrite(forSlot: 2, target: Self.blue) == Self.blue)
+    let written2 = tracker.valueToWrite(forSlot: 2, target: Self.blue, now: 0)
+    #expect(written2.from == Self.blue && written2.to == Self.blue)
 
     // Retargeting slot 5 mid-stream must not disturb slot 2's already-settled entry.
-    _ = tracker.valueToWrite(forSlot: 5, target: Self.gray)
-    let changes = tracker.advance(elapsed: 1)
-    #expect(isClose(try #require(changes[5]), Self.gray))
-    #expect(changes[2] == nil, "slot 2 was never mid-fade, so advance() must not report it as changed")
-    #expect(tracker.displayed(forSlot: 2) == Self.blue)
+    _ = tracker.valueToWrite(forSlot: 5, target: Self.gray, now: 0)
+    let slot5Settled = try #require(tracker.resolvedValueForTesting(forSlot: 5, now: 1))
+    #expect(isClose(slot5Settled, Self.gray))
+    #expect(tracker.resolvedValueForTesting(forSlot: 2, now: 1) == Self.blue)
   }
 }
