@@ -5,19 +5,29 @@ import SwiftUI
 
 public struct AbapTheme: CodeTheme {
   public init() {}
-  public func getBgColor() -> Color { Color(fromHex: "#ffffff")! }
 
-  public var defaultFormat: TextFormat { TextFormat(fg: Color(fromHex: "#000000")!, bg: Color(fromHex: "#ffffff")!) }
+  private static let hex000: UInt32 = 0x000ff
+  private static let hex000000: UInt32 = 0x000000ff
+  private static let hex00f: UInt32 = 0x00fff
+  private static let hex3af: UInt32 = 0x3afff
+  private static let hex5a2: UInt32 = 0x5a2ff
+  private static let hex888: UInt32 = 0x888ff
+  private static let hexf00: UInt32 = 0xf00ff
+  private static let hexffffff: UInt32 = 0xffffffff
+
+  public func getBgColor() -> Color { Color(rgba: Self.hexffffff) }
+
+  public var defaultFormat: TextFormat { TextFormat(fg: Color(rgba: Self.hex000000), bg: Color(rgba: Self.hexffffff)) }
 
   public var styles: [CodeAttributes.Value: TextFormat] {
     [
-      .comment: TextFormat(fg: Color(fromHex: "#888")!, bg: Color(fromHex: "#ffffff")!, italic: true),
-      .error: TextFormat(fg: Color(fromHex: "#f00")!, bg: Color(fromHex: "#ffffff")!),
-      .keyword: TextFormat(fg: Color(fromHex: "#00f")!, bg: Color(fromHex: "#ffffff")!),
-      .name: TextFormat(fg: Color(fromHex: "#000")!, bg: Color(fromHex: "#ffffff")!),
-      .number: TextFormat(fg: Color(fromHex: "#3af")!, bg: Color(fromHex: "#ffffff")!),
-      .operatorWord: TextFormat(fg: Color(fromHex: "#00f")!, bg: Color(fromHex: "#ffffff")!),
-      .string: TextFormat(fg: Color(fromHex: "#5a2")!, bg: Color(fromHex: "#ffffff")!)
+      .comment: TextFormat(fg: Color(rgba: Self.hex888), bg: Color(rgba: Self.hexffffff), italic: true),
+      .error: TextFormat(fg: Color(rgba: Self.hexf00), bg: Color(rgba: Self.hexffffff)),
+      .keyword: TextFormat(fg: Color(rgba: Self.hex00f), bg: Color(rgba: Self.hexffffff)),
+      .name: TextFormat(fg: Color(rgba: Self.hex000), bg: Color(rgba: Self.hexffffff)),
+      .number: TextFormat(fg: Color(rgba: Self.hex3af), bg: Color(rgba: Self.hexffffff)),
+      .operatorWord: TextFormat(fg: Color(rgba: Self.hex00f), bg: Color(rgba: Self.hexffffff)),
+      .string: TextFormat(fg: Color(rgba: Self.hex5a2), bg: Color(rgba: Self.hexffffff)),
     ]
   }
 }

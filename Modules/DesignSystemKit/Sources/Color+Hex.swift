@@ -1,50 +1,17 @@
 import SwiftUI
 
-/// Ported from `Legacy/Shared/Data/Extensions/Color+Extensions.swift` ("shamelessly stolen from
-/// SwifterSwift") — the one piece of hex-color parsing every `CodeTheme` needs.
 extension Color {
-  private static func getGroupValue(string: String, range: Range<Int>) -> CGFloat {
-    let lowerIndex = string.index(string.startIndex, offsetBy: range.lowerBound)
-    let upperIndex = string.index(string.startIndex, offsetBy: range.upperBound)
-    let group = string[lowerIndex..<upperIndex]
-    guard group.count == 2, let intVal = Int(group, radix: 16) else {
-      return 1.0
-    }
-    return CGFloat(Double(intVal) / 255.0)
-  }
-
-  public init?(fromHex string: String) {
-    let result: String
-    if string.first == "#" {
-      result = String(string.dropFirst())
-    } else {
-      result = string
-    }
-    var stringValue: String = result
-    switch stringValue.count {
-    case 3:  // RGB
-      let r = String(stringValue[stringValue.index(stringValue.startIndex, offsetBy: 0)])
-      let g = String(stringValue[stringValue.index(stringValue.startIndex, offsetBy: 1)])
-      let b = String(stringValue[stringValue.index(stringValue.startIndex, offsetBy: 2)])
-      stringValue = "\(r)\(r)\(g)\(g)\(b)\(b)FF"
-    case 4:  // RGBA
-      let r = String(stringValue[stringValue.index(stringValue.startIndex, offsetBy: 0)])
-      let g = String(stringValue[stringValue.index(stringValue.startIndex, offsetBy: 1)])
-      let b = String(stringValue[stringValue.index(stringValue.startIndex, offsetBy: 2)])
-      let a = String(stringValue[stringValue.index(stringValue.startIndex, offsetBy: 3)])
-      stringValue = "\(r)\(r)\(g)\(g)\(b)\(b)\(a)\(a)"
-    case 6:  // RRGGBB
-      stringValue += "FF"
-    case 8:  // RRGGBBAA
-      break
-    default:
-      return nil
-    }
-    stringValue = stringValue.lowercased()
-    let red = Color.getGroupValue(string: stringValue, range: 0..<2)
-    let green = Color.getGroupValue(string: stringValue, range: 2..<4)
-    let blue = Color.getGroupValue(string: stringValue, range: 4..<6)
-    let alpha = Color.getGroupValue(string: stringValue, range: 6..<8)
+  /// `rgba`'s byte layout is `0xRRGGBBAA`. `Tools/GenerateThemes/generate_themes.py` parses each
+  /// theme's hex strings to this packed form once, in Python, at codegen time, so this never does
+  /// any string parsing at runtime — a real profiling run found the string-parsing path this
+  /// replaced (`Int(_:radix:)`, `String.index(offsetBy:)`) dominating CPU during Full Sweep,
+  /// entirely from `CodeTheme.styles`/`getBgColor()` re-parsing the same handful of hex literals
+  /// on every single per-token style lookup.
+  public init(rgba: UInt32) {
+    let red = CGFloat((rgba >> 24) & 0xFF) / 255.0
+    let green = CGFloat((rgba >> 16) & 0xFF) / 255.0
+    let blue = CGFloat((rgba >> 8) & 0xFF) / 255.0
+    let alpha = CGFloat(rgba & 0xFF) / 255.0
     self.init(CGColor(srgbRed: red, green: green, blue: blue, alpha: alpha))
   }
 }

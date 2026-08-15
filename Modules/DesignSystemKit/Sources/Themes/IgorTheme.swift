@@ -5,18 +5,28 @@ import SwiftUI
 
 public struct IgorTheme: CodeTheme {
   public init() {}
-  public func getBgColor() -> Color { Color(fromHex: "#ffffff")! }
 
-  public var defaultFormat: TextFormat { TextFormat(fg: Color(fromHex: "#000000")!, bg: Color(fromHex: "#ffffff")!) }
+  private static let hex000000: UInt32 = 0x000000ff
+  private static let hex007575: UInt32 = 0x007575ff
+  private static let hex009c00: UInt32 = 0x009c00ff
+  private static let hex00f: UInt32 = 0x00fff
+  private static let hexc34e00: UInt32 = 0xc34e00ff
+  private static let hexcc00a3: UInt32 = 0xcc00a3ff
+  private static let hexf00: UInt32 = 0xf00ff
+  private static let hexffffff: UInt32 = 0xffffffff
+
+  public func getBgColor() -> Color { Color(rgba: Self.hexffffff) }
+
+  public var defaultFormat: TextFormat { TextFormat(fg: Color(rgba: Self.hex000000), bg: Color(rgba: Self.hexffffff)) }
 
   public var styles: [CodeAttributes.Value: TextFormat] {
     [
-      .comment: TextFormat(fg: Color(fromHex: "#f00")!, bg: Color(fromHex: "#ffffff")!, italic: true),
-      .keyword: TextFormat(fg: Color(fromHex: "#00f")!, bg: Color(fromHex: "#ffffff")!),
-      .nameClass: TextFormat(fg: Color(fromHex: "#007575")!, bg: Color(fromHex: "#ffffff")!),
-      .nameDecorator: TextFormat(fg: Color(fromHex: "#cc00a3")!, bg: Color(fromHex: "#ffffff")!),
-      .nameFunction: TextFormat(fg: Color(fromHex: "#c34e00")!, bg: Color(fromHex: "#ffffff")!),
-      .string: TextFormat(fg: Color(fromHex: "#009c00")!, bg: Color(fromHex: "#ffffff")!)
+      .comment: TextFormat(fg: Color(rgba: Self.hexf00), bg: Color(rgba: Self.hexffffff), italic: true),
+      .keyword: TextFormat(fg: Color(rgba: Self.hex00f), bg: Color(rgba: Self.hexffffff)),
+      .nameClass: TextFormat(fg: Color(rgba: Self.hex007575), bg: Color(rgba: Self.hexffffff)),
+      .nameDecorator: TextFormat(fg: Color(rgba: Self.hexcc00a3), bg: Color(rgba: Self.hexffffff)),
+      .nameFunction: TextFormat(fg: Color(rgba: Self.hexc34e00), bg: Color(rgba: Self.hexffffff)),
+      .string: TextFormat(fg: Color(rgba: Self.hex009c00), bg: Color(rgba: Self.hexffffff)),
     ]
   }
 }

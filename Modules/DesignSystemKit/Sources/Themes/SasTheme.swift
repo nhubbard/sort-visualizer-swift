@@ -5,27 +5,41 @@ import SwiftUI
 
 public struct SasTheme: CodeTheme {
   public init() {}
-  public func getBgColor() -> Color { Color(fromHex: "#ffffff")! }
 
-  public var defaultFormat: TextFormat { TextFormat(fg: Color(fromHex: "#000000")!, bg: Color(fromHex: "#ffffff")!) }
+  private static let hex000000: UInt32 = 0x000000ff
+  private static let hex080: UInt32 = 0x080ff
+  private static let hex2c2cff: UInt32 = 0x2c2cffff
+  private static let hex2c8553: UInt32 = 0x2c8553ff
+  private static let hex353580: UInt32 = 0x353580ff
+  private static let hex800080: UInt32 = 0x800080ff
+  private static let hexa61717: UInt32 = 0xa61717ff
+  private static let hexbbb: UInt32 = 0xbbbff
+  private static let hexd30202: UInt32 = 0xd30202ff
+  private static let hexe3d2d2: UInt32 = 0xe3d2d2ff
+  private static let hexffffe0: UInt32 = 0xffffe0ff
+  private static let hexffffff: UInt32 = 0xffffffff
+
+  public func getBgColor() -> Color { Color(rgba: Self.hexffffff) }
+
+  public var defaultFormat: TextFormat { TextFormat(fg: Color(rgba: Self.hex000000), bg: Color(rgba: Self.hexffffff)) }
 
   public var styles: [CodeAttributes.Value: TextFormat] {
     [
-      .comment: TextFormat(fg: Color(fromHex: "#080")!, bg: Color(fromHex: "#ffffff")!, italic: true),
-      .error: TextFormat(fg: Color(fromHex: "#a61717")!, bg: Color(fromHex: "#e3d2d2")!),
-      .generic: TextFormat(fg: Color(fromHex: "#2c2cff")!, bg: Color(fromHex: "#ffffff")!),
-      .genericEmph: TextFormat(fg: Color(fromHex: "#080")!, bg: Color(fromHex: "#ffffff")!),
-      .genericError: TextFormat(fg: Color(fromHex: "#d30202")!, bg: Color(fromHex: "#ffffff")!),
-      .keyword: TextFormat(fg: Color(fromHex: "#2c2cff")!, bg: Color(fromHex: "#ffffff")!),
-      .keywordConstant: TextFormat(fg: Color(fromHex: "#2c2cff")!, bg: Color(fromHex: "#ffffff")!, bold: true),
-      .keywordReserved: TextFormat(fg: Color(fromHex: "#353580")!, bg: Color(fromHex: "#ffffff")!, bold: true),
-      .nameBuiltin: TextFormat(fg: Color(fromHex: "#2c2cff")!, bg: Color(fromHex: "#ffffff")!),
-      .nameFunction: TextFormat(fg: Color(fromHex: "#000000")!, bg: Color(fromHex: "#ffffff")!, bold: true, italic: true),
-      .nameVariable: TextFormat(fg: Color(fromHex: "#2c2cff")!, bg: Color(fromHex: "#ffffff")!, bold: true),
-      .number: TextFormat(fg: Color(fromHex: "#2c8553")!, bg: Color(fromHex: "#ffffff")!, bold: true),
-      .other: TextFormat(fg: Color(fromHex: "#000000")!, bg: Color(fromHex: "#ffffe0")!),
-      .string: TextFormat(fg: Color(fromHex: "#800080")!, bg: Color(fromHex: "#ffffff")!),
-      .whitespace: TextFormat(fg: Color(fromHex: "#bbb")!, bg: Color(fromHex: "#ffffff")!)
+      .comment: TextFormat(fg: Color(rgba: Self.hex080), bg: Color(rgba: Self.hexffffff), italic: true),
+      .error: TextFormat(fg: Color(rgba: Self.hexa61717), bg: Color(rgba: Self.hexe3d2d2)),
+      .generic: TextFormat(fg: Color(rgba: Self.hex2c2cff), bg: Color(rgba: Self.hexffffff)),
+      .genericEmph: TextFormat(fg: Color(rgba: Self.hex080), bg: Color(rgba: Self.hexffffff)),
+      .genericError: TextFormat(fg: Color(rgba: Self.hexd30202), bg: Color(rgba: Self.hexffffff)),
+      .keyword: TextFormat(fg: Color(rgba: Self.hex2c2cff), bg: Color(rgba: Self.hexffffff)),
+      .keywordConstant: TextFormat(fg: Color(rgba: Self.hex2c2cff), bg: Color(rgba: Self.hexffffff), bold: true),
+      .keywordReserved: TextFormat(fg: Color(rgba: Self.hex353580), bg: Color(rgba: Self.hexffffff), bold: true),
+      .nameBuiltin: TextFormat(fg: Color(rgba: Self.hex2c2cff), bg: Color(rgba: Self.hexffffff)),
+      .nameFunction: TextFormat(fg: Color(rgba: Self.hex000000), bg: Color(rgba: Self.hexffffff), bold: true, italic: true),
+      .nameVariable: TextFormat(fg: Color(rgba: Self.hex2c2cff), bg: Color(rgba: Self.hexffffff), bold: true),
+      .number: TextFormat(fg: Color(rgba: Self.hex2c8553), bg: Color(rgba: Self.hexffffff), bold: true),
+      .other: TextFormat(fg: Color(rgba: Self.hex000000), bg: Color(rgba: Self.hexffffe0)),
+      .string: TextFormat(fg: Color(rgba: Self.hex800080), bg: Color(rgba: Self.hexffffff)),
+      .whitespace: TextFormat(fg: Color(rgba: Self.hexbbb), bg: Color(rgba: Self.hexffffff)),
     ]
   }
 }

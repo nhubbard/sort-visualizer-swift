@@ -13,6 +13,15 @@ short-class-name table is needed. Because `get_style_defs()` emits every standar
 resolved (not just explicit overrides), this script does its own pruning pass afterward — dropping
 any token whose resolved style is identical to its parent's — to produce the same sparse,
 cascade-friendly table `CodeAttributes.Value.parent` expects at runtime.
+
+Colors are emitted as pre-parsed `Color(rgba: Self.hexXXXXXX)` references, not runtime
+`Color(fromHex: "...")!` string parses — a real Full Sweep profiling run found that string-parsing
+path (`Int(_:radix:)`, `String.index(offsetBy:)`, plus the Swift generic-metadata-cache machinery
+it drags in) dominating CPU, entirely from `CodeTheme.styles` re-parsing the same handful of hex
+literals on every single per-token style lookup. Each unique hex value used by a theme collapses
+onto one shared `private static let` constant (`register_hex`/`constant_name`), named after its own
+hex digits rather than any guess at what the color is "for" — a background color reused across most
+of a theme's entries needs no semantic label to be deduplicated correctly.
 """
 
 from __future__ import annotations
@@ -175,13 +184,35 @@ def load_token_case_names() -> dict[str, str]:
             re.findall(r'case\s+`?(\w+)`?\s*=\s*"(Token[\w.]*)"', source)}
 
 
-def swift_hex(value: str, bg_fallback: str) -> str:
-    hex_value = (value or bg_fallback).lstrip("#")
-    return f'Color(fromHex: "#{hex_value}")!'
+def constant_name(hex6: str) -> str:
+    """`hex272822` — a Swift identifier that mechanically encodes its own value, so dedup needs no
+    semantic understanding of what a color is *for* (no "commentColor"/"keywordColor" guessing)."""
+    return f"hex{hex6}"
 
 
-def swift_text_format(style: Style, page_bg: str) -> str:
-    args = [f"fg: {swift_hex(style.fg, '000000')}", f"bg: {swift_hex(style.bg, page_bg)}"]
+def register_hex(hex_map: dict[str, str], value: str | None, fallback: str) -> str:
+    """Records `value` (or `fallback` if unset) in `hex_map` keyed by its own 6-digit hex value —
+    the same color reused across many entries in one theme (a background color, especially)
+    collapses onto a single shared constant automatically, no naming/intent-parsing required.
+    Returns the constant name to reference at the call site."""
+    hex_value = (value or fallback).lstrip("#").lower()
+    name = constant_name(hex_value)
+    hex_map[hex_value] = name
+    return name
+
+
+def swift_color_ref(hex_map: dict[str, str], value: str | None, fallback: str) -> str:
+    """`Color(rgba:)` takes an already-parsed `0xRRGGBBAA` integer — no runtime string parsing at
+    all, not even once per theme construction. Alpha is always opaque (`ff`): Pygments styles are
+    plain `#RRGGBB`, never `RRGGBBAA`."""
+    return f"Color(rgba: Self.{register_hex(hex_map, value, fallback)})"
+
+
+def swift_text_format(style: Style, page_bg: str, hex_map: dict[str, str]) -> str:
+    args = [
+        f"fg: {swift_color_ref(hex_map, style.fg, '000000')}",
+        f"bg: {swift_color_ref(hex_map, style.bg, page_bg)}",
+    ]
     if style.bold:
         args.append("bold: true")
     if style.italic:
@@ -196,6 +227,7 @@ def generate_theme_source(type_name: str, style_name: str, case_names: dict[str,
     page_bg = style.background_color or "#ffffff"
     all_styles = resolved_styles(style_name)
     default = default_style(style_name)
+    hex_map: dict[str, str] = {}
 
     entries = []
     for token, case_name in sorted(case_names.items(), key=lambda kv: kv[1]):
@@ -206,9 +238,20 @@ def generate_theme_source(type_name: str, style_name: str, case_names: dict[str,
 
     sparse_tokens = sparse({token: resolved for token, _, resolved in entries})
     lines = [
-        f"      .{case_name}: {swift_text_format(resolved, page_bg)},"
+        f"      .{case_name}: {swift_text_format(resolved, page_bg, hex_map)},"
         for token, case_name, resolved in entries
         if token in sparse_tokens
+    ]
+    # Order matters here: `default_format`/`bg_color` are rendered *after* `lines` above so any
+    # hex value they introduce that `lines` didn't already register still ends up in `hex_map` —
+    # but all three must be computed before the constant-declarations block below, since that
+    # block is what actually reads the now-fully-populated `hex_map`.
+    default_format = swift_text_format(default, page_bg, hex_map)
+    bg_color = swift_color_ref(hex_map, page_bg, "ffffff")
+
+    constants = [
+        f"  private static let {name}: UInt32 = 0x{hex_value}ff"
+        for hex_value, name in sorted(hex_map.items())
     ]
 
     return f"""\
@@ -219,9 +262,12 @@ import SwiftUI
 
 public struct {type_name}: CodeTheme {{
   public init() {{}}
-  public func getBgColor() -> Color {{ {swift_hex(page_bg, "ffffff")} }}
 
-  public var defaultFormat: TextFormat {{ {swift_text_format(default, page_bg)} }}
+{chr(10).join(constants)}
+
+  public func getBgColor() -> Color {{ {bg_color} }}
+
+  public var defaultFormat: TextFormat {{ {default_format} }}
 
   public var styles: [CodeAttributes.Value: TextFormat] {{
     [

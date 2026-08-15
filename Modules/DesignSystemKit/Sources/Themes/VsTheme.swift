@@ -5,25 +5,33 @@ import SwiftUI
 
 public struct VsTheme: CodeTheme {
   public init() {}
-  public func getBgColor() -> Color { Color(fromHex: "#ffffff")! }
 
-  public var defaultFormat: TextFormat { TextFormat(fg: Color(fromHex: "#000000")!, bg: Color(fromHex: "#ffffff")!) }
+  private static let hex000000: UInt32 = 0x000000ff
+  private static let hex008000: UInt32 = 0x008000ff
+  private static let hex00f: UInt32 = 0x00fff
+  private static let hex2b91af: UInt32 = 0x2b91afff
+  private static let hexa31515: UInt32 = 0xa31515ff
+  private static let hexffffff: UInt32 = 0xffffffff
+
+  public func getBgColor() -> Color { Color(rgba: Self.hexffffff) }
+
+  public var defaultFormat: TextFormat { TextFormat(fg: Color(rgba: Self.hex000000), bg: Color(rgba: Self.hexffffff)) }
 
   public var styles: [CodeAttributes.Value: TextFormat] {
     [
-      .comment: TextFormat(fg: Color(fromHex: "#008000")!, bg: Color(fromHex: "#ffffff")!),
-      .commentPreproc: TextFormat(fg: Color(fromHex: "#00f")!, bg: Color(fromHex: "#ffffff")!),
-      .genericEmph: TextFormat(fg: Color(fromHex: "#000000")!, bg: Color(fromHex: "#ffffff")!, italic: true),
-      .genericEmphStrong: TextFormat(fg: Color(fromHex: "#000000")!, bg: Color(fromHex: "#ffffff")!, bold: true, italic: true),
-      .genericHeading: TextFormat(fg: Color(fromHex: "#000000")!, bg: Color(fromHex: "#ffffff")!, bold: true),
-      .genericPrompt: TextFormat(fg: Color(fromHex: "#000000")!, bg: Color(fromHex: "#ffffff")!, bold: true),
-      .genericStrong: TextFormat(fg: Color(fromHex: "#000000")!, bg: Color(fromHex: "#ffffff")!, bold: true),
-      .genericSubheading: TextFormat(fg: Color(fromHex: "#000000")!, bg: Color(fromHex: "#ffffff")!, bold: true),
-      .keyword: TextFormat(fg: Color(fromHex: "#00f")!, bg: Color(fromHex: "#ffffff")!),
-      .keywordType: TextFormat(fg: Color(fromHex: "#2b91af")!, bg: Color(fromHex: "#ffffff")!),
-      .nameClass: TextFormat(fg: Color(fromHex: "#2b91af")!, bg: Color(fromHex: "#ffffff")!),
-      .operatorWord: TextFormat(fg: Color(fromHex: "#00f")!, bg: Color(fromHex: "#ffffff")!),
-      .string: TextFormat(fg: Color(fromHex: "#a31515")!, bg: Color(fromHex: "#ffffff")!)
+      .comment: TextFormat(fg: Color(rgba: Self.hex008000), bg: Color(rgba: Self.hexffffff)),
+      .commentPreproc: TextFormat(fg: Color(rgba: Self.hex00f), bg: Color(rgba: Self.hexffffff)),
+      .genericEmph: TextFormat(fg: Color(rgba: Self.hex000000), bg: Color(rgba: Self.hexffffff), italic: true),
+      .genericEmphStrong: TextFormat(fg: Color(rgba: Self.hex000000), bg: Color(rgba: Self.hexffffff), bold: true, italic: true),
+      .genericHeading: TextFormat(fg: Color(rgba: Self.hex000000), bg: Color(rgba: Self.hexffffff), bold: true),
+      .genericPrompt: TextFormat(fg: Color(rgba: Self.hex000000), bg: Color(rgba: Self.hexffffff), bold: true),
+      .genericStrong: TextFormat(fg: Color(rgba: Self.hex000000), bg: Color(rgba: Self.hexffffff), bold: true),
+      .genericSubheading: TextFormat(fg: Color(rgba: Self.hex000000), bg: Color(rgba: Self.hexffffff), bold: true),
+      .keyword: TextFormat(fg: Color(rgba: Self.hex00f), bg: Color(rgba: Self.hexffffff)),
+      .keywordType: TextFormat(fg: Color(rgba: Self.hex2b91af), bg: Color(rgba: Self.hexffffff)),
+      .nameClass: TextFormat(fg: Color(rgba: Self.hex2b91af), bg: Color(rgba: Self.hexffffff)),
+      .operatorWord: TextFormat(fg: Color(rgba: Self.hex00f), bg: Color(rgba: Self.hexffffff)),
+      .string: TextFormat(fg: Color(rgba: Self.hexa31515), bg: Color(rgba: Self.hexffffff)),
     ]
   }
 }

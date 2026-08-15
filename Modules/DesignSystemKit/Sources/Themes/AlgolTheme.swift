@@ -5,25 +5,31 @@ import SwiftUI
 
 public struct AlgolTheme: CodeTheme {
   public init() {}
-  public func getBgColor() -> Color { Color(fromHex: "#ffffff")! }
 
-  public var defaultFormat: TextFormat { TextFormat(fg: Color(fromHex: "#000000")!, bg: Color(fromHex: "#ffffff")!) }
+  private static let hex000000: UInt32 = 0x000000ff
+  private static let hex666: UInt32 = 0x666ff
+  private static let hex888: UInt32 = 0x888ff
+  private static let hexffffff: UInt32 = 0xffffffff
+
+  public func getBgColor() -> Color { Color(rgba: Self.hexffffff) }
+
+  public var defaultFormat: TextFormat { TextFormat(fg: Color(rgba: Self.hex000000), bg: Color(rgba: Self.hexffffff)) }
 
   public var styles: [CodeAttributes.Value: TextFormat] {
     [
-      .comment: TextFormat(fg: Color(fromHex: "#888")!, bg: Color(fromHex: "#ffffff")!, italic: true),
-      .commentPreproc: TextFormat(fg: Color(fromHex: "#888")!, bg: Color(fromHex: "#ffffff")!, bold: true),
-      .commentSpecial: TextFormat(fg: Color(fromHex: "#888")!, bg: Color(fromHex: "#ffffff")!, bold: true),
-      .keyword: TextFormat(fg: Color(fromHex: "#000000")!, bg: Color(fromHex: "#ffffff")!, bold: true, underline: true),
-      .keywordDeclaration: TextFormat(fg: Color(fromHex: "#000000")!, bg: Color(fromHex: "#ffffff")!, bold: true, italic: true, underline: true),
-      .nameBuiltin: TextFormat(fg: Color(fromHex: "#000000")!, bg: Color(fromHex: "#ffffff")!, bold: true, italic: true),
-      .nameClass: TextFormat(fg: Color(fromHex: "#666")!, bg: Color(fromHex: "#ffffff")!, bold: true, italic: true),
-      .nameConstant: TextFormat(fg: Color(fromHex: "#666")!, bg: Color(fromHex: "#ffffff")!, bold: true, italic: true),
-      .nameFunction: TextFormat(fg: Color(fromHex: "#666")!, bg: Color(fromHex: "#ffffff")!, bold: true, italic: true),
-      .nameNamespace: TextFormat(fg: Color(fromHex: "#666")!, bg: Color(fromHex: "#ffffff")!, bold: true, italic: true),
-      .nameVariable: TextFormat(fg: Color(fromHex: "#666")!, bg: Color(fromHex: "#ffffff")!, bold: true, italic: true),
-      .operatorWord: TextFormat(fg: Color(fromHex: "#000000")!, bg: Color(fromHex: "#ffffff")!, bold: true),
-      .string: TextFormat(fg: Color(fromHex: "#666")!, bg: Color(fromHex: "#ffffff")!, italic: true)
+      .comment: TextFormat(fg: Color(rgba: Self.hex888), bg: Color(rgba: Self.hexffffff), italic: true),
+      .commentPreproc: TextFormat(fg: Color(rgba: Self.hex888), bg: Color(rgba: Self.hexffffff), bold: true),
+      .commentSpecial: TextFormat(fg: Color(rgba: Self.hex888), bg: Color(rgba: Self.hexffffff), bold: true),
+      .keyword: TextFormat(fg: Color(rgba: Self.hex000000), bg: Color(rgba: Self.hexffffff), bold: true, underline: true),
+      .keywordDeclaration: TextFormat(fg: Color(rgba: Self.hex000000), bg: Color(rgba: Self.hexffffff), bold: true, italic: true, underline: true),
+      .nameBuiltin: TextFormat(fg: Color(rgba: Self.hex000000), bg: Color(rgba: Self.hexffffff), bold: true, italic: true),
+      .nameClass: TextFormat(fg: Color(rgba: Self.hex666), bg: Color(rgba: Self.hexffffff), bold: true, italic: true),
+      .nameConstant: TextFormat(fg: Color(rgba: Self.hex666), bg: Color(rgba: Self.hexffffff), bold: true, italic: true),
+      .nameFunction: TextFormat(fg: Color(rgba: Self.hex666), bg: Color(rgba: Self.hexffffff), bold: true, italic: true),
+      .nameNamespace: TextFormat(fg: Color(rgba: Self.hex666), bg: Color(rgba: Self.hexffffff), bold: true, italic: true),
+      .nameVariable: TextFormat(fg: Color(rgba: Self.hex666), bg: Color(rgba: Self.hexffffff), bold: true, italic: true),
+      .operatorWord: TextFormat(fg: Color(rgba: Self.hex000000), bg: Color(rgba: Self.hexffffff), bold: true),
+      .string: TextFormat(fg: Color(rgba: Self.hex666), bg: Color(rgba: Self.hexffffff), italic: true),
     ]
   }
 }

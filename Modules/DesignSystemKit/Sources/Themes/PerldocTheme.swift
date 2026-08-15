@@ -5,46 +5,70 @@ import SwiftUI
 
 public struct PerldocTheme: CodeTheme {
   public init() {}
-  public func getBgColor() -> Color { Color(fromHex: "#eeeedd")! }
 
-  public var defaultFormat: TextFormat { TextFormat(fg: Color(fromHex: "#000000")!, bg: Color(fromHex: "#eeeedd")!) }
+  private static let hex000000: UInt32 = 0x000000ff
+  private static let hex000080: UInt32 = 0x000080ff
+  private static let hex00688b: UInt32 = 0x00688bff
+  private static let hex008b45: UInt32 = 0x008b45ff
+  private static let hex0a0: UInt32 = 0x0a0ff
+  private static let hex1c7e71: UInt32 = 0x1c7e71ff
+  private static let hex1e889b: UInt32 = 0x1e889bff
+  private static let hex228b22: UInt32 = 0x228b22ff
+  private static let hex555: UInt32 = 0x555ff
+  private static let hex658b00: UInt32 = 0x658b00ff
+  private static let hex707a7c: UInt32 = 0x707a7cff
+  private static let hex800080: UInt32 = 0x800080ff
+  private static let hex888: UInt32 = 0x888ff
+  private static let hex8b008b: UInt32 = 0x8b008bff
+  private static let hexa00: UInt32 = 0xa00ff
+  private static let hexa61717: UInt32 = 0xa61717ff
+  private static let hexb452cd: UInt32 = 0xb452cdff
+  private static let hexbbb: UInt32 = 0xbbbff
+  private static let hexcb6c20: UInt32 = 0xcb6c20ff
+  private static let hexcd5555: UInt32 = 0xcd5555ff
+  private static let hexe3d2d2: UInt32 = 0xe3d2d2ff
+  private static let hexeeeedd: UInt32 = 0xeeeeddff
+
+  public func getBgColor() -> Color { Color(rgba: Self.hexeeeedd) }
+
+  public var defaultFormat: TextFormat { TextFormat(fg: Color(rgba: Self.hex000000), bg: Color(rgba: Self.hexeeeedd)) }
 
   public var styles: [CodeAttributes.Value: TextFormat] {
     [
-      .comment: TextFormat(fg: Color(fromHex: "#228b22")!, bg: Color(fromHex: "#eeeedd")!),
-      .commentPreproc: TextFormat(fg: Color(fromHex: "#1e889b")!, bg: Color(fromHex: "#eeeedd")!),
-      .commentSpecial: TextFormat(fg: Color(fromHex: "#8b008b")!, bg: Color(fromHex: "#eeeedd")!, bold: true),
-      .error: TextFormat(fg: Color(fromHex: "#a61717")!, bg: Color(fromHex: "#e3d2d2")!),
-      .genericDeleted: TextFormat(fg: Color(fromHex: "#a00")!, bg: Color(fromHex: "#eeeedd")!),
-      .genericEmph: TextFormat(fg: Color(fromHex: "#000000")!, bg: Color(fromHex: "#eeeedd")!, italic: true),
-      .genericEmphStrong: TextFormat(fg: Color(fromHex: "#000000")!, bg: Color(fromHex: "#eeeedd")!, bold: true, italic: true),
-      .genericError: TextFormat(fg: Color(fromHex: "#a00")!, bg: Color(fromHex: "#eeeedd")!),
-      .genericHeading: TextFormat(fg: Color(fromHex: "#000080")!, bg: Color(fromHex: "#eeeedd")!, bold: true),
-      .genericInserted: TextFormat(fg: Color(fromHex: "#0a0")!, bg: Color(fromHex: "#eeeedd")!),
-      .genericOutput: TextFormat(fg: Color(fromHex: "#888")!, bg: Color(fromHex: "#eeeedd")!),
-      .genericPrompt: TextFormat(fg: Color(fromHex: "#555")!, bg: Color(fromHex: "#eeeedd")!),
-      .genericStrong: TextFormat(fg: Color(fromHex: "#000000")!, bg: Color(fromHex: "#eeeedd")!, bold: true),
-      .genericSubheading: TextFormat(fg: Color(fromHex: "#800080")!, bg: Color(fromHex: "#eeeedd")!, bold: true),
-      .genericTraceback: TextFormat(fg: Color(fromHex: "#a00")!, bg: Color(fromHex: "#eeeedd")!),
-      .keyword: TextFormat(fg: Color(fromHex: "#8b008b")!, bg: Color(fromHex: "#eeeedd")!, bold: true),
-      .keywordType: TextFormat(fg: Color(fromHex: "#00688b")!, bg: Color(fromHex: "#eeeedd")!, bold: true),
-      .nameAttribute: TextFormat(fg: Color(fromHex: "#658b00")!, bg: Color(fromHex: "#eeeedd")!),
-      .nameBuiltin: TextFormat(fg: Color(fromHex: "#658b00")!, bg: Color(fromHex: "#eeeedd")!),
-      .nameClass: TextFormat(fg: Color(fromHex: "#008b45")!, bg: Color(fromHex: "#eeeedd")!, bold: true),
-      .nameConstant: TextFormat(fg: Color(fromHex: "#00688b")!, bg: Color(fromHex: "#eeeedd")!),
-      .nameDecorator: TextFormat(fg: Color(fromHex: "#707a7c")!, bg: Color(fromHex: "#eeeedd")!),
-      .nameException: TextFormat(fg: Color(fromHex: "#008b45")!, bg: Color(fromHex: "#eeeedd")!, bold: true),
-      .nameFunction: TextFormat(fg: Color(fromHex: "#008b45")!, bg: Color(fromHex: "#eeeedd")!),
-      .nameNamespace: TextFormat(fg: Color(fromHex: "#008b45")!, bg: Color(fromHex: "#eeeedd")!, underline: true),
-      .nameTag: TextFormat(fg: Color(fromHex: "#8b008b")!, bg: Color(fromHex: "#eeeedd")!, bold: true),
-      .nameVariable: TextFormat(fg: Color(fromHex: "#00688b")!, bg: Color(fromHex: "#eeeedd")!),
-      .number: TextFormat(fg: Color(fromHex: "#b452cd")!, bg: Color(fromHex: "#eeeedd")!),
-      .operatorWord: TextFormat(fg: Color(fromHex: "#8b008b")!, bg: Color(fromHex: "#eeeedd")!),
-      .string: TextFormat(fg: Color(fromHex: "#cd5555")!, bg: Color(fromHex: "#eeeedd")!),
-      .stringHeredoc: TextFormat(fg: Color(fromHex: "#1c7e71")!, bg: Color(fromHex: "#eeeedd")!, italic: true),
-      .stringOther: TextFormat(fg: Color(fromHex: "#cb6c20")!, bg: Color(fromHex: "#eeeedd")!),
-      .stringRegex: TextFormat(fg: Color(fromHex: "#1c7e71")!, bg: Color(fromHex: "#eeeedd")!),
-      .whitespace: TextFormat(fg: Color(fromHex: "#bbb")!, bg: Color(fromHex: "#eeeedd")!)
+      .comment: TextFormat(fg: Color(rgba: Self.hex228b22), bg: Color(rgba: Self.hexeeeedd)),
+      .commentPreproc: TextFormat(fg: Color(rgba: Self.hex1e889b), bg: Color(rgba: Self.hexeeeedd)),
+      .commentSpecial: TextFormat(fg: Color(rgba: Self.hex8b008b), bg: Color(rgba: Self.hexeeeedd), bold: true),
+      .error: TextFormat(fg: Color(rgba: Self.hexa61717), bg: Color(rgba: Self.hexe3d2d2)),
+      .genericDeleted: TextFormat(fg: Color(rgba: Self.hexa00), bg: Color(rgba: Self.hexeeeedd)),
+      .genericEmph: TextFormat(fg: Color(rgba: Self.hex000000), bg: Color(rgba: Self.hexeeeedd), italic: true),
+      .genericEmphStrong: TextFormat(fg: Color(rgba: Self.hex000000), bg: Color(rgba: Self.hexeeeedd), bold: true, italic: true),
+      .genericError: TextFormat(fg: Color(rgba: Self.hexa00), bg: Color(rgba: Self.hexeeeedd)),
+      .genericHeading: TextFormat(fg: Color(rgba: Self.hex000080), bg: Color(rgba: Self.hexeeeedd), bold: true),
+      .genericInserted: TextFormat(fg: Color(rgba: Self.hex0a0), bg: Color(rgba: Self.hexeeeedd)),
+      .genericOutput: TextFormat(fg: Color(rgba: Self.hex888), bg: Color(rgba: Self.hexeeeedd)),
+      .genericPrompt: TextFormat(fg: Color(rgba: Self.hex555), bg: Color(rgba: Self.hexeeeedd)),
+      .genericStrong: TextFormat(fg: Color(rgba: Self.hex000000), bg: Color(rgba: Self.hexeeeedd), bold: true),
+      .genericSubheading: TextFormat(fg: Color(rgba: Self.hex800080), bg: Color(rgba: Self.hexeeeedd), bold: true),
+      .genericTraceback: TextFormat(fg: Color(rgba: Self.hexa00), bg: Color(rgba: Self.hexeeeedd)),
+      .keyword: TextFormat(fg: Color(rgba: Self.hex8b008b), bg: Color(rgba: Self.hexeeeedd), bold: true),
+      .keywordType: TextFormat(fg: Color(rgba: Self.hex00688b), bg: Color(rgba: Self.hexeeeedd), bold: true),
+      .nameAttribute: TextFormat(fg: Color(rgba: Self.hex658b00), bg: Color(rgba: Self.hexeeeedd)),
+      .nameBuiltin: TextFormat(fg: Color(rgba: Self.hex658b00), bg: Color(rgba: Self.hexeeeedd)),
+      .nameClass: TextFormat(fg: Color(rgba: Self.hex008b45), bg: Color(rgba: Self.hexeeeedd), bold: true),
+      .nameConstant: TextFormat(fg: Color(rgba: Self.hex00688b), bg: Color(rgba: Self.hexeeeedd)),
+      .nameDecorator: TextFormat(fg: Color(rgba: Self.hex707a7c), bg: Color(rgba: Self.hexeeeedd)),
+      .nameException: TextFormat(fg: Color(rgba: Self.hex008b45), bg: Color(rgba: Self.hexeeeedd), bold: true),
+      .nameFunction: TextFormat(fg: Color(rgba: Self.hex008b45), bg: Color(rgba: Self.hexeeeedd)),
+      .nameNamespace: TextFormat(fg: Color(rgba: Self.hex008b45), bg: Color(rgba: Self.hexeeeedd), underline: true),
+      .nameTag: TextFormat(fg: Color(rgba: Self.hex8b008b), bg: Color(rgba: Self.hexeeeedd), bold: true),
+      .nameVariable: TextFormat(fg: Color(rgba: Self.hex00688b), bg: Color(rgba: Self.hexeeeedd)),
+      .number: TextFormat(fg: Color(rgba: Self.hexb452cd), bg: Color(rgba: Self.hexeeeedd)),
+      .operatorWord: TextFormat(fg: Color(rgba: Self.hex8b008b), bg: Color(rgba: Self.hexeeeedd)),
+      .string: TextFormat(fg: Color(rgba: Self.hexcd5555), bg: Color(rgba: Self.hexeeeedd)),
+      .stringHeredoc: TextFormat(fg: Color(rgba: Self.hex1c7e71), bg: Color(rgba: Self.hexeeeedd), italic: true),
+      .stringOther: TextFormat(fg: Color(rgba: Self.hexcb6c20), bg: Color(rgba: Self.hexeeeedd)),
+      .stringRegex: TextFormat(fg: Color(rgba: Self.hex1c7e71), bg: Color(rgba: Self.hexeeeedd)),
+      .whitespace: TextFormat(fg: Color(rgba: Self.hexbbb), bg: Color(rgba: Self.hexeeeedd)),
     ]
   }
 }

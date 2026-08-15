@@ -5,16 +5,24 @@ import SwiftUI
 
 public struct StarofficeTheme: CodeTheme {
   public init() {}
-  public func getBgColor() -> Color { Color(fromHex: "#ffffff")! }
 
-  public var defaultFormat: TextFormat { TextFormat(fg: Color(fromHex: "#000080")!, bg: Color(fromHex: "#ffffff")!) }
+  private static let hex000080: UInt32 = 0x000080ff
+  private static let hex008000: UInt32 = 0x008000ff
+  private static let hex696969: UInt32 = 0x696969ff
+  private static let hex800000: UInt32 = 0x800000ff
+  private static let hexe00: UInt32 = 0xe00ff
+  private static let hexffffff: UInt32 = 0xffffffff
+
+  public func getBgColor() -> Color { Color(rgba: Self.hexffffff) }
+
+  public var defaultFormat: TextFormat { TextFormat(fg: Color(rgba: Self.hex000080), bg: Color(rgba: Self.hexffffff)) }
 
   public var styles: [CodeAttributes.Value: TextFormat] {
     [
-      .comment: TextFormat(fg: Color(fromHex: "#696969")!, bg: Color(fromHex: "#ffffff")!),
-      .error: TextFormat(fg: Color(fromHex: "#800000")!, bg: Color(fromHex: "#ffffff")!),
-      .literal: TextFormat(fg: Color(fromHex: "#e00")!, bg: Color(fromHex: "#ffffff")!),
-      .name: TextFormat(fg: Color(fromHex: "#008000")!, bg: Color(fromHex: "#ffffff")!)
+      .comment: TextFormat(fg: Color(rgba: Self.hex696969), bg: Color(rgba: Self.hexffffff)),
+      .error: TextFormat(fg: Color(rgba: Self.hex800000), bg: Color(rgba: Self.hexffffff)),
+      .literal: TextFormat(fg: Color(rgba: Self.hexe00), bg: Color(rgba: Self.hexffffff)),
+      .name: TextFormat(fg: Color(rgba: Self.hex008000), bg: Color(rgba: Self.hexffffff)),
     ]
   }
 }

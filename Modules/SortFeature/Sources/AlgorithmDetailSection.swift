@@ -112,10 +112,17 @@ public struct AlgorithmDetailSection: View {
   }
 
   private func highlightAllSamples(_ content: AlgorithmDetailContent) async {
-    let theme = settings.codeTheme.makeTheme()
+    // `themeID`, not a resolved `theme`, so `CodeHighlighter.highlight(_:themeID:)` can skip
+    // recomputation entirely for a source/theme pair it's already highlighted — full sweep
+    // remounts this view (and re-triggers this exact `.task`) on every combo, not just every
+    // algorithm change, so without this cache the same unchanged source got re-highlighted
+    // roughly once a second for the entire sweep.
+    let themeID = settings.codeTheme
     let styled = await withTaskGroup(of: (CodeLanguage, AttributedString).self) { group in
       for sample in content.codeSamples {
-        group.addTask { (sample.language, await CodeHighlighter.highlight(sample.source, theme: theme)) }
+        group.addTask {
+          (sample.language, await CodeHighlighter.highlight(sample.source, themeID: themeID))
+        }
       }
       var styled: [CodeLanguage: AttributedString] = [:]
       for await (language, attributed) in group { styled[language] = attributed }

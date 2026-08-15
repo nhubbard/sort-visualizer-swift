@@ -5,17 +5,25 @@ import SwiftUI
 
 public struct LilypondTheme: CodeTheme {
   public init() {}
-  public func getBgColor() -> Color { Color(fromHex: "#ffffff")! }
 
-  public var defaultFormat: TextFormat { TextFormat(fg: Color(fromHex: "#000000")!, bg: Color(fromHex: "#ffffff")!) }
+  private static let hex000000: UInt32 = 0x000000ff
+  private static let hex976806: UInt32 = 0x976806ff
+  private static let hexa3aab2: UInt32 = 0xa3aab2ff
+  private static let hexab0909: UInt32 = 0xab0909ff
+  private static let hexc46c6c: UInt32 = 0xc46c6cff
+  private static let hexffffff: UInt32 = 0xffffffff
+
+  public func getBgColor() -> Color { Color(rgba: Self.hexffffff) }
+
+  public var defaultFormat: TextFormat { TextFormat(fg: Color(rgba: Self.hex000000), bg: Color(rgba: Self.hexffffff)) }
 
   public var styles: [CodeAttributes.Value: TextFormat] {
     [
-      .comment: TextFormat(fg: Color(fromHex: "#a3aab2")!, bg: Color(fromHex: "#ffffff")!, italic: true),
-      .keyword: TextFormat(fg: Color(fromHex: "#000000")!, bg: Color(fromHex: "#ffffff")!, bold: true),
-      .number: TextFormat(fg: Color(fromHex: "#976806")!, bg: Color(fromHex: "#ffffff")!),
-      .string: TextFormat(fg: Color(fromHex: "#ab0909")!, bg: Color(fromHex: "#ffffff")!),
-      .stringEscape: TextFormat(fg: Color(fromHex: "#c46c6c")!, bg: Color(fromHex: "#ffffff")!)
+      .comment: TextFormat(fg: Color(rgba: Self.hexa3aab2), bg: Color(rgba: Self.hexffffff), italic: true),
+      .keyword: TextFormat(fg: Color(rgba: Self.hex000000), bg: Color(rgba: Self.hexffffff), bold: true),
+      .number: TextFormat(fg: Color(rgba: Self.hex976806), bg: Color(rgba: Self.hexffffff)),
+      .string: TextFormat(fg: Color(rgba: Self.hexab0909), bg: Color(rgba: Self.hexffffff)),
+      .stringEscape: TextFormat(fg: Color(rgba: Self.hexc46c6c), bg: Color(rgba: Self.hexffffff)),
     ]
   }
 }

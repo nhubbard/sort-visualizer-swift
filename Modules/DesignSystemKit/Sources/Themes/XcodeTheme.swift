@@ -5,25 +5,39 @@ import SwiftUI
 
 public struct XcodeTheme: CodeTheme {
   public init() {}
-  public func getBgColor() -> Color { Color(fromHex: "#ffffff")! }
 
-  public var defaultFormat: TextFormat { TextFormat(fg: Color(fromHex: "#000000")!, bg: Color(fromHex: "#ffffff")!) }
+  private static let hex000: UInt32 = 0x000ff
+  private static let hex000000: UInt32 = 0x000000ff
+  private static let hex177500: UInt32 = 0x177500ff
+  private static let hex1c01ce: UInt32 = 0x1c01ceff
+  private static let hex2300ce: UInt32 = 0x2300ceff
+  private static let hex3f6e75: UInt32 = 0x3f6e75ff
+  private static let hex5b269a: UInt32 = 0x5b269aff
+  private static let hex633820: UInt32 = 0x633820ff
+  private static let hex836c28: UInt32 = 0x836c28ff
+  private static let hexa90d91: UInt32 = 0xa90d91ff
+  private static let hexc41a16: UInt32 = 0xc41a16ff
+  private static let hexffffff: UInt32 = 0xffffffff
+
+  public func getBgColor() -> Color { Color(rgba: Self.hexffffff) }
+
+  public var defaultFormat: TextFormat { TextFormat(fg: Color(rgba: Self.hex000000), bg: Color(rgba: Self.hexffffff)) }
 
   public var styles: [CodeAttributes.Value: TextFormat] {
     [
-      .comment: TextFormat(fg: Color(fromHex: "#177500")!, bg: Color(fromHex: "#ffffff")!),
-      .commentPreproc: TextFormat(fg: Color(fromHex: "#633820")!, bg: Color(fromHex: "#ffffff")!),
-      .error: TextFormat(fg: Color(fromHex: "#000")!, bg: Color(fromHex: "#ffffff")!),
-      .keyword: TextFormat(fg: Color(fromHex: "#a90d91")!, bg: Color(fromHex: "#ffffff")!),
-      .literal: TextFormat(fg: Color(fromHex: "#1c01ce")!, bg: Color(fromHex: "#ffffff")!),
-      .name: TextFormat(fg: Color(fromHex: "#000")!, bg: Color(fromHex: "#ffffff")!),
-      .nameAttribute: TextFormat(fg: Color(fromHex: "#836c28")!, bg: Color(fromHex: "#ffffff")!),
-      .nameBuiltin: TextFormat(fg: Color(fromHex: "#a90d91")!, bg: Color(fromHex: "#ffffff")!),
-      .nameBuiltinPseudo: TextFormat(fg: Color(fromHex: "#5b269a")!, bg: Color(fromHex: "#ffffff")!),
-      .nameClass: TextFormat(fg: Color(fromHex: "#3f6e75")!, bg: Color(fromHex: "#ffffff")!),
-      .operator: TextFormat(fg: Color(fromHex: "#000")!, bg: Color(fromHex: "#ffffff")!),
-      .string: TextFormat(fg: Color(fromHex: "#c41a16")!, bg: Color(fromHex: "#ffffff")!),
-      .stringChar: TextFormat(fg: Color(fromHex: "#2300ce")!, bg: Color(fromHex: "#ffffff")!)
+      .comment: TextFormat(fg: Color(rgba: Self.hex177500), bg: Color(rgba: Self.hexffffff)),
+      .commentPreproc: TextFormat(fg: Color(rgba: Self.hex633820), bg: Color(rgba: Self.hexffffff)),
+      .error: TextFormat(fg: Color(rgba: Self.hex000), bg: Color(rgba: Self.hexffffff)),
+      .keyword: TextFormat(fg: Color(rgba: Self.hexa90d91), bg: Color(rgba: Self.hexffffff)),
+      .literal: TextFormat(fg: Color(rgba: Self.hex1c01ce), bg: Color(rgba: Self.hexffffff)),
+      .name: TextFormat(fg: Color(rgba: Self.hex000), bg: Color(rgba: Self.hexffffff)),
+      .nameAttribute: TextFormat(fg: Color(rgba: Self.hex836c28), bg: Color(rgba: Self.hexffffff)),
+      .nameBuiltin: TextFormat(fg: Color(rgba: Self.hexa90d91), bg: Color(rgba: Self.hexffffff)),
+      .nameBuiltinPseudo: TextFormat(fg: Color(rgba: Self.hex5b269a), bg: Color(rgba: Self.hexffffff)),
+      .nameClass: TextFormat(fg: Color(rgba: Self.hex3f6e75), bg: Color(rgba: Self.hexffffff)),
+      .operator: TextFormat(fg: Color(rgba: Self.hex000), bg: Color(rgba: Self.hexffffff)),
+      .string: TextFormat(fg: Color(rgba: Self.hexc41a16), bg: Color(rgba: Self.hexffffff)),
+      .stringChar: TextFormat(fg: Color(rgba: Self.hex2300ce), bg: Color(rgba: Self.hexffffff)),
     ]
   }
 }
