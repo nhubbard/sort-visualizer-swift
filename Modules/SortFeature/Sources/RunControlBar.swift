@@ -25,13 +25,6 @@ struct RunControlBar: View {
   @Binding var isSizeExpanded: Bool
   @Binding var isVisualizerExpanded: Bool
 
-  #if targetEnvironment(macCatalyst)
-    // Catalyst's `ShareLink` bridges to `NSSharingServicePicker`, which has nothing to show for
-    // a pure in-memory `Transferable` (see `exportDocument`'s doc comment) — `.fileExporter`
-    // drives a native `NSSavePanel` instead, gated by this state.
-    @State private var isExportingTape = false
-  #endif
-
   var body: some View {
     VStack(spacing: 8) {
       scrubSlider
@@ -150,177 +143,40 @@ struct RunControlBar: View {
   }
 
   /// `ViewThatFits` between one full-width row and two rows (playback transport, then
-  /// utilities) — both built from the same buttons below, so whichever arrangement fits, every
-  /// button (and its accessibility identifier) is still there for UI tests to find.
+  /// utilities) — both built from the same two extracted button-group views, so whichever
+  /// arrangement fits, every button (and its accessibility identifier) is still there for UI
+  /// tests to find. `PlaybackTransportButtons`/`UtilityButtons` are genuine child `View`s, not
+  /// computed properties on `RunControlBar` itself (like `AutomatorMenuButton` already is, for a
+  /// different reason) — `@Observable`'s dependency tracking is per-view-instance, so inlining
+  /// them as computed properties meant *every* button got reconstructed on every tick just
+  /// because `statsCaption` elsewhere in this same `body` reads `replay`'s per-tick-changing
+  /// counters. `UtilityButtons` in particular reads none of those counters, so as a real child
+  /// view it now only re-renders when something it actually displays changes (speed/size/sound
+  /// toggle state) — found via a Full Sweep profiling round that also fixed `CodeHighlighter` and
+  /// `AnalyticsService.fetchSummaries`. Each extracted view supplies its own `spacing: 20` rather
+  /// than relying on `HStack` flattening a nested view's multi-button body — this reproduces the
+  /// original uniform 20pt rhythm by direct structural correspondence instead of depending on
+  /// that flattening behavior working the same one level deeper.
   private var transportRow: some View {
     ViewThatFits(in: .horizontal) {
       HStack(spacing: 20) {
-        playbackTransportButtons
+        PlaybackTransportButtons(session: session, replay: replay)
         Spacer()
-        utilityButtons
+        UtilityButtons(
+          session: session, replay: replay, algorithm: algorithm,
+          isSpeedExpanded: $isSpeedExpanded, isSizeExpanded: $isSizeExpanded,
+          isVisualizerExpanded: $isVisualizerExpanded)
       }
       VStack(spacing: 8) {
-        HStack(spacing: 20) { playbackTransportButtons }
-        HStack(spacing: 20) { utilityButtons }
+        PlaybackTransportButtons(session: session, replay: replay)
+        UtilityButtons(
+          session: session, replay: replay, algorithm: algorithm,
+          isSpeedExpanded: $isSpeedExpanded, isSizeExpanded: $isSizeExpanded,
+          isVisualizerExpanded: $isVisualizerExpanded)
       }
     }
     .buttonStyle(.borderless)
     .controlSize(.large)
-  }
-
-  @ViewBuilder
-  private var playbackTransportButtons: some View {
-    Button {
-      replay.seek(to: 0)
-    } label: {
-      Image(systemName: "backward.end.fill")
-    }
-    .accessibilityIdentifier("runControlJumpToStartButton")
-    .accessibilityLabel("Jump to Start")
-    .help("Jump to the very beginning of the recording, before shuffling (⌘⌥←)")
-    .disabled(replay.stepIndex <= 0)
-
-    Button {
-      replay.pause()
-      replay.stepBackward()
-    } label: {
-      Image(systemName: "backward.frame.fill")
-    }
-    .accessibilityIdentifier("runControlStepBackButton")
-    .accessibilityLabel("Step Back")
-    .help("Step back one operation (⌥←)")
-    .disabled(replay.stepIndex <= 0)
-
-    Button {
-      session.togglePlayback()
-      SortHaptics.playPauseToggled()
-    } label: {
-      Image(systemName: replay.isPlaying ? "pause.fill" : "play.fill")
-        .font(.title2)
-    }
-    .accessibilityIdentifier("runControlPlayPauseButton")
-    .accessibilityLabel(replay.isPlaying ? "Pause" : "Play")
-    .help(replay.isPlaying ? "Pause playback (Space)" : "Resume playback (Space)")
-    .disabled(isFinished)
-
-    Button {
-      replay.pause()
-      replay.stepForward()
-    } label: {
-      Image(systemName: "forward.frame.fill")
-    }
-    .accessibilityIdentifier("runControlStepForwardButton")
-    .accessibilityLabel("Step Forward")
-    .help("Step forward one operation (⌥→)")
-    .disabled(isFinished)
-
-    Button {
-      replay.seek(to: replay.totalOperationCount)
-    } label: {
-      Image(systemName: "forward.end.fill")
-    }
-    .accessibilityIdentifier("runControlJumpToEndButton")
-    .accessibilityLabel("Jump to End")
-    .help("Jump to the fully sorted end of the recording (⌘⌥→)")
-    .disabled(isFinished)
-  }
-
-  @ViewBuilder
-  private var utilityButtons: some View {
-    Button {
-      Task { await session.start(size: session.arraySize) }
-      SortHaptics.reset()
-    } label: {
-      Image(systemName: "arrow.counterclockwise")
-    }
-    .accessibilityIdentifier("runControlResetButton")
-    .accessibilityLabel("Reset and Reshuffle")
-    .help("Stop the current sort, shuffle a fresh array at this size, and sort it again (⌘R)")
-
-    #if targetEnvironment(macCatalyst)
-      Button {
-        isExportingTape = true
-      } label: {
-        Image(systemName: "square.and.arrow.up")
-      }
-      .accessibilityIdentifier("runControlExportTapeButton")
-      .accessibilityLabel("Export Tape")
-      .help("Export this run's recorded tape as a .tape file")
-      .fileExporter(
-        isPresented: $isExportingTape,
-        document: TapeExportFileDocument(tape: replay.tape),
-        contentType: .tapeArchive,
-        defaultFilename: exportDocument.suggestedFileName
-      ) { _ in }
-    #else
-      ShareLink(item: exportDocument, preview: SharePreview(exportDocument.suggestedFileName)) {
-        Image(systemName: "square.and.arrow.up")
-      }
-      .accessibilityIdentifier("runControlExportTapeButton")
-      .accessibilityLabel("Export Tape")
-      .help("Export this run's recorded tape as a .tape file")
-    #endif
-
-    Button {
-      session.soundEnabled.toggle()
-    } label: {
-      Image(systemName: session.soundEnabled ? "speaker.wave.2.fill" : "speaker.slash.fill")
-    }
-    .accessibilityIdentifier("runControlSoundToggle")
-    .accessibilityLabel(session.soundEnabled ? "Mute" : "Unmute")
-    .help(
-      session.soundEnabled
-        ? "Turn off sort sound effects (⌥⌘A)" : "Turn on sort sound effects (⌥⌘A)")
-
-    AutomatorMenuButton(session: session)
-
-    Button {
-      isSpeedExpanded.toggle()
-    } label: {
-      Text(
-        replay.useFixedDurationPacing
-          ? "\(Int(replay.targetDuration))s" : "\(Int(replay.speed))/s"
-      )
-      .font(.footnote.monospacedDigit())
-    }
-    .accessibilityIdentifier("runControlSpeedButton")
-    .accessibilityLabel(replay.useFixedDurationPacing ? "Target Duration" : "Playback Speed")
-    .help(
-      replay.useFixedDurationPacing
-        ? "Show or hide the target duration slider"
-        : "Show or hide the playback speed slider (⌘⇧+/− by 1, ⌘⌥+/− by 10)")
-
-    Button {
-      isSizeExpanded.toggle()
-    } label: {
-      Text("n=\(session.arraySize)")
-        .font(.footnote.monospacedDigit())
-    }
-    .accessibilityIdentifier("runControlSizeButton")
-    .accessibilityLabel("Array Size")
-    .help("Show or hide the array size stepper (⌘S cycles to the next size)")
-
-    Button {
-      isVisualizerExpanded.toggle()
-    } label: {
-      Image(systemName: "eye.fill")
-    }
-    .accessibilityIdentifier("runControlVisualizerButton")
-    .accessibilityLabel("Visualizer")
-    .help("Show or hide the visualizer picker (⌘⇧V cycles to the next visualizer)")
-  }
-
-  private var isFinished: Bool {
-    replay.stepIndex >= replay.totalOperationCount
-  }
-
-  /// Cheap: wraps `replay.tape` without encoding anything. The real `tape.archived()` encode only
-  /// happens inside `TapeArchiveDocument`/`TapeExportFileDocument`'s own transfer/save closures,
-  /// which SwiftUI only calls once the user actually completes a real share/save action — so
-  /// referencing this property on every `body` evaluation (e.g. via `ShareLink(item:)`) is safe.
-  private var exportDocument: TapeArchiveDocument {
-    TapeArchiveDocument(
-      tape: replay.tape, suggestedFileName: "\(algorithm.id.rawValue)-\(session.arraySize).tape")
   }
 
   @ViewBuilder
@@ -407,6 +263,195 @@ struct RunControlBar: View {
     }
   }
 
+}
+
+/// Extracted from `RunControlBar` so `@Observable`'s per-view dependency tracking applies to it
+/// independently — see `transportRow`'s own doc comment for why. Reads `replay.stepIndex`/
+/// `.isPlaying`/`.totalOperationCount` directly, all of which genuinely do change every tick, so
+/// this view is expected to keep re-rendering during playback; extracting it mainly keeps that
+/// legitimate per-tick cost from also forcing `UtilityButtons` (which needs none of it) to
+/// re-render alongside it.
+private struct PlaybackTransportButtons: View {
+  let session: SortSession
+  let replay: ReplayEngine
+
+  var body: some View {
+    HStack(spacing: 20) {
+      Button {
+        replay.seek(to: 0)
+      } label: {
+        Image(systemName: "backward.end.fill")
+      }
+      .accessibilityIdentifier("runControlJumpToStartButton")
+      .accessibilityLabel("Jump to Start")
+      .help("Jump to the very beginning of the recording, before shuffling (⌘⌥←)")
+      .disabled(replay.stepIndex <= 0)
+
+      Button {
+        replay.pause()
+        replay.stepBackward()
+      } label: {
+        Image(systemName: "backward.frame.fill")
+      }
+      .accessibilityIdentifier("runControlStepBackButton")
+      .accessibilityLabel("Step Back")
+      .help("Step back one operation (⌥←)")
+      .disabled(replay.stepIndex <= 0)
+
+      Button {
+        session.togglePlayback()
+        SortHaptics.playPauseToggled()
+      } label: {
+        Image(systemName: replay.isPlaying ? "pause.fill" : "play.fill")
+          .font(.title2)
+      }
+      .accessibilityIdentifier("runControlPlayPauseButton")
+      .accessibilityLabel(replay.isPlaying ? "Pause" : "Play")
+      .help(replay.isPlaying ? "Pause playback (Space)" : "Resume playback (Space)")
+      .disabled(isFinished)
+
+      Button {
+        replay.pause()
+        replay.stepForward()
+      } label: {
+        Image(systemName: "forward.frame.fill")
+      }
+      .accessibilityIdentifier("runControlStepForwardButton")
+      .accessibilityLabel("Step Forward")
+      .help("Step forward one operation (⌥→)")
+      .disabled(isFinished)
+
+      Button {
+        replay.seek(to: replay.totalOperationCount)
+      } label: {
+        Image(systemName: "forward.end.fill")
+      }
+      .accessibilityIdentifier("runControlJumpToEndButton")
+      .accessibilityLabel("Jump to End")
+      .help("Jump to the fully sorted end of the recording (⌘⌥→)")
+      .disabled(isFinished)
+    }
+  }
+
+  private var isFinished: Bool {
+    replay.stepIndex >= replay.totalOperationCount
+  }
+}
+
+/// Extracted from `RunControlBar` so `@Observable`'s per-view dependency tracking applies to it
+/// independently — see `transportRow`'s own doc comment for why. Deliberately reads none of
+/// `replay`'s per-tick counters (`compareCount`/`swapCount`/etc.), only the rarely-changing
+/// `useFixedDurationPacing`/`speed`/`targetDuration`/`tape`, so as a genuine child view it now
+/// only re-renders when something it actually displays changes — not on every playback tick.
+private struct UtilityButtons: View {
+  let session: SortSession
+  let replay: ReplayEngine
+  let algorithm: any SortAlgorithm
+  @Binding var isSpeedExpanded: Bool
+  @Binding var isSizeExpanded: Bool
+  @Binding var isVisualizerExpanded: Bool
+
+  #if targetEnvironment(macCatalyst)
+    // Catalyst's `ShareLink` bridges to `NSSharingServicePicker`, which has nothing to show for
+    // a pure in-memory `Transferable` (see `exportDocument`'s doc comment) — `.fileExporter`
+    // drives a native `NSSavePanel` instead, gated by this state.
+    @State private var isExportingTape = false
+  #endif
+
+  var body: some View {
+    HStack(spacing: 20) {
+      Button {
+        Task { await session.start(size: session.arraySize) }
+        SortHaptics.reset()
+      } label: {
+        Image(systemName: "arrow.counterclockwise")
+      }
+      .accessibilityIdentifier("runControlResetButton")
+      .accessibilityLabel("Reset and Reshuffle")
+      .help("Stop the current sort, shuffle a fresh array at this size, and sort it again (⌘R)")
+
+      #if targetEnvironment(macCatalyst)
+        Button {
+          isExportingTape = true
+        } label: {
+          Image(systemName: "square.and.arrow.up")
+        }
+        .accessibilityIdentifier("runControlExportTapeButton")
+        .accessibilityLabel("Export Tape")
+        .help("Export this run's recorded tape as a .tape file")
+        .fileExporter(
+          isPresented: $isExportingTape,
+          document: TapeExportFileDocument(tape: replay.tape),
+          contentType: .tapeArchive,
+          defaultFilename: exportDocument.suggestedFileName
+        ) { _ in }
+      #else
+        ShareLink(item: exportDocument, preview: SharePreview(exportDocument.suggestedFileName)) {
+          Image(systemName: "square.and.arrow.up")
+        }
+        .accessibilityIdentifier("runControlExportTapeButton")
+        .accessibilityLabel("Export Tape")
+        .help("Export this run's recorded tape as a .tape file")
+      #endif
+
+      Button {
+        session.soundEnabled.toggle()
+      } label: {
+        Image(systemName: session.soundEnabled ? "speaker.wave.2.fill" : "speaker.slash.fill")
+      }
+      .accessibilityIdentifier("runControlSoundToggle")
+      .accessibilityLabel(session.soundEnabled ? "Mute" : "Unmute")
+      .help(
+        session.soundEnabled
+          ? "Turn off sort sound effects (⌥⌘A)" : "Turn on sort sound effects (⌥⌘A)")
+
+      AutomatorMenuButton(session: session)
+
+      Button {
+        isSpeedExpanded.toggle()
+      } label: {
+        Text(
+          replay.useFixedDurationPacing
+            ? "\(Int(replay.targetDuration))s" : "\(Int(replay.speed))/s"
+        )
+        .font(.footnote.monospacedDigit())
+      }
+      .accessibilityIdentifier("runControlSpeedButton")
+      .accessibilityLabel(replay.useFixedDurationPacing ? "Target Duration" : "Playback Speed")
+      .help(
+        replay.useFixedDurationPacing
+          ? "Show or hide the target duration slider"
+          : "Show or hide the playback speed slider (⌘⇧+/− by 1, ⌘⌥+/− by 10)")
+
+      Button {
+        isSizeExpanded.toggle()
+      } label: {
+        Text("n=\(session.arraySize)")
+          .font(.footnote.monospacedDigit())
+      }
+      .accessibilityIdentifier("runControlSizeButton")
+      .accessibilityLabel("Array Size")
+      .help("Show or hide the array size stepper (⌘S cycles to the next size)")
+
+      Button {
+        isVisualizerExpanded.toggle()
+      } label: {
+        Image(systemName: "eye.fill")
+      }
+      .accessibilityIdentifier("runControlVisualizerButton")
+      .accessibilityLabel("Visualizer")
+      .help("Show or hide the visualizer picker (⌘⇧V cycles to the next visualizer)")
+    }
+  }
+
+  /// Cheap: wraps `replay.tape` without encoding anything. The real `tape.archived()` encode only
+  /// happens inside `TapeArchiveDocument`/`TapeExportFileDocument`'s own transfer/save closures,
+  /// which SwiftUI only calls once the user actually completes a real share/save action — so
+  /// referencing this property on every `body` evaluation (e.g. via `ShareLink(item:)`) is safe.
+  private var exportDocument: TapeArchiveDocument {
+    TapeArchiveDocument(
+      tape: replay.tape, suggestedFileName: "\(algorithm.id.rawValue)-\(session.arraySize).tape")
+  }
 }
 
 /// Lists every registered `Automation` (see `AutomationRegistry`) — the same entries `⌘⇧A`/`⌘⌥⇧A`
