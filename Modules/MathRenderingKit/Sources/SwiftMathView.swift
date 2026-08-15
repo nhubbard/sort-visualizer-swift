@@ -1,5 +1,14 @@
-import SwiftMath
+@preconcurrency import SwiftMath
 import SwiftUI
+
+/// `MTFontManager` (a third-party type, not audited for Swift 6 strict concurrency) isn't
+/// `Sendable`, so accessing its `.manager` singleton needs `@preconcurrency import` above to avoid
+/// a "reference to class property is not concurrency-safe" error at every access site — a plain
+/// `nonisolated(unsafe)` on our own declaration doesn't cover accessing *their* static property.
+/// Safe here in practice: the only two access points are `updateUIView`/`updateNSView` below, both
+/// MainActor-isolated by `UIViewRepresentable`/`NSViewRepresentable`, and `MTFontManager`'s own
+/// `nameToFontMap` is already `@RWLocked` internally.
+private let sharedMathFontManager = MTFontManager.manager
 
 /// Ported near-verbatim from `Legacy/Shared/Views/Utilities/SwiftMathView.swift` — a thin
 /// `UIViewRepresentable`/`NSViewRepresentable` wrapper over `SwiftMath`'s `MTMathUILabel`.
@@ -34,7 +43,12 @@ import SwiftUI
 
     public func updateUIView(_ view: MTMathUILabel, context: Context) {
       view.latex = equation
-      view.font = MTFontManager().font(withName: font.rawValue, size: fontSize)
+      // `MTFontManager()` (the plain initializer) starts with an empty `nameToFontMap`, so it
+      // reloads the font from disk on every call — `.manager` is SwiftMath's own shared instance
+      // (`.fontManager` is the same value but `internal` to the package, inaccessible here),
+      // whose cache actually persists across `updateUIView`/`updateNSView` calls. Found via the
+      // Full Sweep profiling round that also fixed `AnalyticsService.fetchSummaries`.
+      view.font = sharedMathFontManager.font(withName: font.rawValue, size: fontSize)
       view.textAlignment = textAlignment
       view.labelMode = labelMode
       view.textColor = MTColor(Color.primary)
@@ -72,7 +86,12 @@ import SwiftUI
 
     public func updateNSView(_ view: MTMathUILabel, context: Context) {
       view.latex = equation
-      view.font = MTFontManager().font(withName: font.rawValue, size: fontSize)
+      // `MTFontManager()` (the plain initializer) starts with an empty `nameToFontMap`, so it
+      // reloads the font from disk on every call — `.manager` is SwiftMath's own shared instance
+      // (`.fontManager` is the same value but `internal` to the package, inaccessible here),
+      // whose cache actually persists across `updateUIView`/`updateNSView` calls. Found via the
+      // Full Sweep profiling round that also fixed `AnalyticsService.fetchSummaries`.
+      view.font = sharedMathFontManager.font(withName: font.rawValue, size: fontSize)
       view.textAlignment = textAlignment
       view.labelMode = labelMode
       view.textColor = MTColor(Color.primary)
