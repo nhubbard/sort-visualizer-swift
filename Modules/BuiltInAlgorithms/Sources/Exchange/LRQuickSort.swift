@@ -38,36 +38,61 @@ public struct LRQuickSort: SortAlgorithm {
     quickSort(&engine, 0, engine.count - 1)
   }
 
-  private func quickSort(_ engine: inout RecordingEngine, _ p: Int, _ r: Int) {
-    guard p < r else { return }
+  // A real, reproduced `EXC_BAD_ACCESS` (1192 frames) surfaced from the exhaustive Full Sweep:
+  // a fixed, data-independent pivot rule (the middle element) can still be defeated by
+  // adversarial input into a perfectly skewed 1-versus-(k-1) partition at *every* level (see
+  // `middlePivotKillerSequence` in the correctness test suite for the construction), and Swift
+  // gives no guaranteed tail-call optimization -- two unbounded recursive calls per level made
+  // real call-stack depth `O(n)` in that case, deep enough to overflow the stack well before
+  // `maxReasonableArraySize`. Fixed with the standard technique for bounding quicksort's
+  // recursion depth: always recurse (a real call) into whichever partition is *smaller*, and
+  // loop for the larger one instead of a second recursive call. Since the recursed-into side is
+  // never more than half of the remaining range, real recursion depth is bounded to `O(log n)`
+  // regardless of how skewed any single partition is.
+  //
+  // This can change which partition's swaps get recorded first when the right partition happens
+  // to be the smaller one (the original always fully finished the left partition before starting
+  // the right) -- the final sorted result and swap/compare counts are unaffected, only the
+  // interleaving order in that one case, an unavoidable trade-off for bounding the recursion (see
+  // the fix's own regression test for why strict left-first order and a stack-depth guarantee are
+  // mutually exclusive here).
+  private func quickSort(_ engine: inout RecordingEngine, _ pArg: Int, _ rArg: Int) {
+    var p = pArg
+    var r = rArg
+    while p < r {
+      let pivotIndex = p + (r - p + 1) / 2
+      // Held-value pattern (see the doc comment above): the pivot's own slot is never written to
+      // during this partition, so one read up front stands in for every live comparison against
+      // it below.
+      let pivotValue = engine.values[pivotIndex]
 
-    let pivotIndex = p + (r - p + 1) / 2
-    // Held-value pattern (see the doc comment above): the pivot's own slot is never written to
-    // during this partition, so one read up front stands in for every live comparison against
-    // it below.
-    let pivotValue = engine.values[pivotIndex]
+      var i = p
+      var j = r
+      while i <= j {
+        while engine.values[i] < pivotValue {
+          i += 1
+        }
+        while engine.values[j] > pivotValue {
+          j -= 1
+        }
+        if i <= j {
+          engine.swap(i, j)
+          i += 1
+          j -= 1
+        }
+      }
 
-    var i = p
-    var j = r
-    while i <= j {
-      while engine.values[i] < pivotValue {
-        i += 1
+      if (j - p) < (r - i) {
+        if p < j {
+          quickSort(&engine, p, j)
+        }
+        p = i
+      } else {
+        if i < r {
+          quickSort(&engine, i, r)
+        }
+        r = j
       }
-      while engine.values[j] > pivotValue {
-        j -= 1
-      }
-      if i <= j {
-        engine.swap(i, j)
-        i += 1
-        j -= 1
-      }
-    }
-
-    if p < j {
-      quickSort(&engine, p, j)
-    }
-    if i < r {
-      quickSort(&engine, i, r)
     }
   }
 }

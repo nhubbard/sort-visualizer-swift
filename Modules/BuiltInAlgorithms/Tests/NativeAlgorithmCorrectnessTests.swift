@@ -444,6 +444,44 @@ struct NativeAlgorithmCorrectnessTests {
       "SplaySort failed to sort adversarial input of size \(input.count)")
   }
 
+  /// Builds a permutation of `0..<n` that defeats `LRQuickSort`'s middle-element pivot choice:
+  /// recursively placing the largest remaining value at the middle position of the still-live
+  /// window forces a perfectly skewed 1-versus-(k-1) partition at *every* level, because the
+  /// pivot is always the maximum of whatever range is still being partitioned (the same mechanism
+  /// a fixed-first/fixed-last pivot rule is vulnerable to on sorted input, just index-shaped
+  /// instead of value-shaped). Verified by hand-tracing the actual two-pointer partition against
+  /// this construction's output for `n == 8`: both the first and second levels produce exactly
+  /// the `i == r, j == r - 1` state that recurses into only `(p, r - 1)`, shrinking the live range
+  /// by just one element per level — `O(n)` real recursion depth pre-fix, deep enough to overflow
+  /// the stack well before `n` reaches `AlgorithmMetadata.maxReasonableArraySize`.
+  private func middlePivotKillerSequence(_ n: Int) -> [Int] {
+    var result = [Int](repeating: 0, count: n)
+    var window = Array(0..<n)
+    var nextValue = n - 1
+    while !window.isEmpty {
+      let mid = window.count / 2
+      result[window[mid]] = nextValue
+      nextValue -= 1
+      window.remove(at: mid)
+    }
+    return result
+  }
+
+  /// Regression guard for a real, user-reported `EXC_BAD_ACCESS` (1192 frames) found by the Full
+  /// Sweep coverage driver — see `LRQuickSort.quickSort`'s own doc comment for the fix (recurse
+  /// into the smaller partition, loop for the larger one, bounding real recursion depth to
+  /// `O(log n)` regardless of how skewed any single partition is).
+  @Test
+  func lrQuickSortDoesNotStackOverflowOnAMiddlePivotKillerSequence() {
+    let algorithm = LRQuickSort()
+    let input = middlePivotKillerSequence(8192)
+    var engine = RecordingEngine(values: input)
+    algorithm.record(into: &engine)
+    #expect(
+      engine.values == input.sorted(),
+      "LRQuickSort failed to sort a middle-pivot-killer input of size \(input.count)")
+  }
+
   /// Confirms `TriangularHeapSort`'s instability empirically: like `MaxHeapSort`, swap-based
   /// heap construction/extraction can relocate one equal element past another with no recovery.
   @Test
