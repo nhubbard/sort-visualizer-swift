@@ -532,11 +532,22 @@ public final class ReplayEngine {
           }
           replaySignposter.endInterval("TickApply", tickInterval)
 
+          // Separate from "TickApply" above on purpose: that interval covers only the tape's own
+          // state mutation (`Self.apply`, cheap array/set writes), never `onStep`/
+          // `onOperationApplied` — the fan-out to whichever renderer/audio/stats consumers are
+          // subscribed this run, which is where a slow renderer's per-operation cost (e.g. a
+          // Metal renderer's `apply(_:values:...)`) actually shows up. Without its own interval,
+          // that cost was invisible as a distinct span in a trace — indistinguishable from
+          // "TickApply" itself unless traced back by hand, the exact problem "TickApply"'s own
+          // doc comment already solved for tape mutation.
+          let dispatchInterval = replaySignposter.beginInterval(
+            "TickDispatch", id: replaySignposter.makeSignpostID(), "\(appliedOperations.count) ops")
           let isFinalChunkOfRun = self.state.stepIndex >= self.tape.operations.count
           for (index, operation) in appliedOperations.enumerated() {
             onStep?(operation)
             onOperationApplied?(operation, isFinalChunkOfRun && index == appliedOperations.count - 1)
           }
+          replaySignposter.endInterval("TickDispatch", dispatchInterval)
 
           if self.state.stepIndex >= self.tape.operations.count { break tickLoop }
           stillToApply -= chunkTarget
