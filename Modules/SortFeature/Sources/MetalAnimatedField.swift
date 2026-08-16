@@ -24,6 +24,28 @@ struct MetalAnimationUniforms {
   var primaryColor: SIMD4<Float>
   var secondaryColor: SIMD4<Float>
   var neutralColor: SIMD4<Float>
+  /// The array size and value-range bounds a geometry formula needs but no single instance owns
+  /// (every slot in one draw call shares the same `count`/`valueRange`) — added for
+  /// `MetalBarRenderer`'s GPU-side geometry (`bar_vertex` now computes `barWidth`/`height` itself
+  /// from an eased raw `value` instead of the CPU precomputing an already-positioned rect), and
+  /// reusable by future `MetalShapeLayout`/`MetalTriangleLayout` ports needing the same two
+  /// per-frame constants. `arrayCount` is `Float` (not `Int`) purely so the shader can divide by
+  /// it directly with no int-to-float conversion at the call site; this app's own audited
+  /// `maxArraySize` (256) is nowhere near `Float`'s 2^24 exact-integer ceiling.
+  var arrayCount: Float
+  var valueRangeLowerBound: Float
+  var valueRangeSpan: Float
+  /// Points-to-pixels scale factor — needed so a geometry formula's FIXED point-based constants
+  /// (e.g. `ScatterPlotMetalLayout`'s 6pt dot diameter) render at the correct pixel size on any
+  /// display scale, now that those formulas run in the shader against pixel-space `viewportSize`
+  /// rather than being computed once in points on the CPU and scaled up afterward (what
+  /// `MetalShapeRenderer.writeInstance` used to do via `target.origin * Float(lastScale)`).
+  var scale: Float
+  /// Selects which `MetalShapeGeometryKind` case `shape_vertex` uses for this draw call — fixed
+  /// per `Layout` type, read once from `MetalShapeLayout.geometryKind` and passed through
+  /// unchanged every frame. `-1` for every renderer that isn't `MetalShapeRenderer` (Bar, Triangle,
+  /// DisparityChords, Hanoi don't read this field at all).
+  var geometryKind: Int32
 }
 
 /// An unresolved animated 2D field (a position, a size, a triangle/line point) — `from`/`to`/
@@ -78,5 +100,18 @@ struct AnimatedColorSource {
 struct AnimatedMarkerColor {
   var fromMarker: Int32
   var toMarker: Int32
+  var startTime: Float
+}
+
+/// The scalar counterpart to `AnimatedFloat2` — an unresolved `(from, to, startTime)` triple for a
+/// single `Float`, not a `SIMD2`. First user: `MetalBarRenderer`'s GPU-geometry port, which only
+/// ever needs to ease the bar's raw underlying VALUE (not a precomputed screen position) — `
+/// bar_vertex` derives `origin`/`size` itself from the eased value plus `MetalAnimationUniforms`'s
+/// `arrayCount`/`valueRangeLowerBound`/`valueRangeSpan`. All 3 fields are already 4-byte-aligned
+/// scalars, so — like `AnimatedColorSource`/`AnimatedMarkerColor` — this carries none of
+/// `AnimatedFloat2`'s SIMD-alignment padding risk; no explicit `_padding` field needed.
+struct AnimatedFloat {
+  var from: Float
+  var to: Float
   var startTime: Float
 }

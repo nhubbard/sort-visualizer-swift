@@ -6,12 +6,15 @@ import SortEngineKit
 import VisualizationKit
 
 /// GPU-buffer layout, matched exactly to `ShapeRenderer.metal`'s `HanoiInstance` struct — `origin`
-/// is the fixed 2-leg `HanoiOrigin` (`HanoiMoveScheduler.swift`), `size` stays a plain unanimated
-/// value (Hanoi never eases block size, only position and color), `color` is the usual
-/// `AnimatedColorSource` (Hanoi hue-ramps like every renderer except `MetalBarRenderer`).
+/// is the fixed 2-leg `HanoiOrigin` (`HanoiMoveScheduler.swift`), whose 3 waypoints are now
+/// abstract (tower, depth) COORDINATES rather than pixel positions (see `HanoiOrigin`'s own doc
+/// comment). No `size` field anymore: `hanoi_vertex` derives the on-screen rect itself
+/// (`resolveHanoiGeometry`, `MetalHanoiGeometry.swift`/`ShapeRenderer.metal`) from the resolved
+/// coordinate, the same "raw ingredients only" shape every other GPU-geometry port in this
+/// initiative already uses. `color` is the usual `AnimatedColorSource` (Hanoi hue-ramps like every
+/// renderer except `MetalBarRenderer`).
 struct HanoiInstance {
   var origin: HanoiOrigin
-  var size: SIMD2<Float>
   var color: AnimatedColorSource
 }
 
@@ -125,32 +128,25 @@ final class MetalHanoiTowersRenderer: NSObject, MetalIncrementalRenderer {
     return Array((index + 1)..<nextTowerStart)
   }
 
-  private func homePosition(forIndex index: Int) -> SIMD2<Float> {
+  /// This index's HOME (tower, depth) coordinate — an abstract descriptor now, not a pixel
+  /// position; `hanoi_vertex`/`resolveHanoiGeometry` turn it into one every frame. Choosing WHICH
+  /// tower/depth an index belongs to stays a pure, CPU-side function of index (`tower(forIndex:)`/
+  /// `depth(forIndex:)`) — only the tower/depth-to-PIXEL formula moved to the shader.
+  private func homeCoordinate(forIndex index: Int) -> SIMD2<Float> {
     let tower = Self.tower(forIndex: index, count: count, towerCount: towerCount)
     let depth = Self.depth(forIndex: index, count: count, towerCount: towerCount)
-    return blockPosition(tower: tower, depth: depth)
+    return SIMD2(Float(tower), Float(depth))
   }
 
   private var maxDepth: Int { max(1, (count + towerCount - 1) / towerCount) }
-  private var towerWidth: Double { Double(pixelSize.width) / Double(towerCount) }
-  private var blockHeight: Double { Double(pixelSize.height) / Double(maxDepth) }
-
-  private func blockPosition(tower: Int, depth: Int) -> SIMD2<Float> {
-    SIMD2(
-      Float(Double(tower) * towerWidth + towerWidth * 0.1),
-      Float(Double(pixelSize.height) - Double(depth + 1) * blockHeight))
-  }
-
-  private func blockSize() -> SIMD2<Float> {
-    SIMD2(Float(towerWidth * 0.8), Float(blockHeight * 0.9))
-  }
 
   /// A temporary "parked" spot for an obstacle block — stacked above the spare tower's own
   /// legitimate contents, rank `rank` deep, so several obstacles lifted at once don't overlap.
-  private func parkedPosition(inTower tower: Int, rank: Int) -> SIMD2<Float> {
-    SIMD2(
-      Float(Double(tower) * towerWidth + towerWidth * 0.1),
-      Float(Double(pixelSize.height) - Double(maxDepth + 1 + rank) * blockHeight))
+  /// Just a depth of `maxDepth + rank` in the same (tower, depth) coordinate space `homeCoordinate`
+  /// uses — `resolveHanoiGeometry`'s formula is affine linear in depth, so there's nothing special
+  /// about a "parked" coordinate beyond sitting past the tower's own legitimate depth range.
+  private func parkedCoordinate(inTower tower: Int, rank: Int) -> SIMD2<Float> {
+    SIMD2(Float(tower), Float(maxDepth + rank))
   }
 
   private func spareTower(avoiding towers: Set<Int>) -> Int {
@@ -187,7 +183,7 @@ final class MetalHanoiTowersRenderer: NSObject, MetalIncrementalRenderer {
 
     let n = now()
     for index in values.indices {
-      let origin = positions.setDirect(slot: index, target: homePosition(forIndex: index), now: n)
+      let origin = positions.setDirect(slot: index, target: homeCoordinate(forIndex: index), now: n)
       writeInstance(
         slot: index, origin: origin, now: n, values: values, valueRange: valueRange,
         markers: markers)
@@ -212,7 +208,7 @@ final class MetalHanoiTowersRenderer: NSObject, MetalIncrementalRenderer {
       }
       let n = now()
       for index in touched where values.indices.contains(index) {
-        let origin = positions.setDirect(slot: index, target: homePosition(forIndex: index), now: n)
+        let origin = positions.setDirect(slot: index, target: homeCoordinate(forIndex: index), now: n)
         writeInstance(
           slot: index, origin: origin, now: n, values: values, valueRange: valueRange,
           markers: markers)
@@ -234,7 +230,7 @@ final class MetalHanoiTowersRenderer: NSObject, MetalIncrementalRenderer {
     let n = now()
     guard towerI != towerJ else {
       for index in [i, j] {
-        let origin = positions.setDirect(slot: index, target: homePosition(forIndex: index), now: n)
+        let origin = positions.setDirect(slot: index, target: homeCoordinate(forIndex: index), now: n)
         writeInstance(
           slot: index, origin: origin, now: n, values: values, valueRange: valueRange,
           markers: markers)
@@ -258,11 +254,11 @@ final class MetalHanoiTowersRenderer: NSObject, MetalIncrementalRenderer {
     }
 
     let originI = positions.schedule(
-      slot: i, leg0Target: homePosition(forIndex: j), leg0Hold: Self.legDuration,
-      leg1Target: homePosition(forIndex: i), now: n)
+      slot: i, leg0Target: homeCoordinate(forIndex: j), leg0Hold: Self.legDuration,
+      leg1Target: homeCoordinate(forIndex: i), now: n)
     let originJ = positions.schedule(
-      slot: j, leg0Target: homePosition(forIndex: i), leg0Hold: Self.legDuration,
-      leg1Target: homePosition(forIndex: j), now: n)
+      slot: j, leg0Target: homeCoordinate(forIndex: i), leg0Hold: Self.legDuration,
+      leg1Target: homeCoordinate(forIndex: j), now: n)
     writeInstance(
       slot: i, origin: originI, now: n, values: values, valueRange: valueRange, markers: markers)
     writeInstance(
@@ -274,8 +270,8 @@ final class MetalHanoiTowersRenderer: NSObject, MetalIncrementalRenderer {
     markers: [Int: Set<Int>]
   ) {
     let origin = positions.schedule(
-      slot: index, leg0Target: parkedPosition(inTower: spare, rank: rank),
-      leg0Hold: Self.legDuration * 2, leg1Target: homePosition(forIndex: index), now: now)
+      slot: index, leg0Target: parkedCoordinate(inTower: spare, rank: rank),
+      leg0Hold: Self.legDuration * 2, leg1Target: homeCoordinate(forIndex: index), now: now)
     writeInstance(
       slot: index, origin: origin, now: now, values: values, valueRange: valueRange,
       markers: markers)
@@ -285,7 +281,7 @@ final class MetalHanoiTowersRenderer: NSObject, MetalIncrementalRenderer {
   /// wrote (or read) this exact origin from `positions` a moment ago, and `now()` (a
   /// `CACurrentMediaTime()` call) is the same instant for every slot touched within one
   /// `apply`/`reset` call, so there is nothing left to recompute per-slot here. Avoids both a
-  /// second `positions`-array lookup and an unused `homePosition(forIndex:)` fallback recompute
+  /// second `positions`-array lookup and an unused `homeCoordinate(forIndex:)` fallback recompute
   /// (dead in practice — `origin` is always available from the caller).
   private func writeInstance(
     slot: Int, origin: HanoiOrigin, now: Float, values: [Int], valueRange: ClosedRange<Int>,
@@ -296,7 +292,6 @@ final class MetalHanoiTowersRenderer: NSObject, MetalIncrementalRenderer {
 
     let instance = HanoiInstance(
       origin: origin,
-      size: blockSize(),
       color: colorTransitions.valueToWrite(
         forSlot: slot, value: Float(normalized),
         marker: MetalShapeColor.markerKind(forIndex: slot, in: markers), now: now)
@@ -343,13 +338,13 @@ final class MetalHanoiTowersRenderer: NSObject, MetalIncrementalRenderer {
     return (0..<count).map { pointer[$0] }
   }
 
-  /// Test seam: `debugInstances()`'s raw origin/color resolved to plain displayed values at a
-  /// pinned `currentTime` (`size` passes through unchanged, never animated) — see
-  /// `MetalShapeRenderer.resolvedInstances(at:)`'s doc comment. Origin resolution uses
-  /// `HanoiMoveScheduler`'s own `resolvedOrigin`-equivalent math directly on the raw triple
-  /// (not through the scheduler instance, which only knows about slots it currently tracks) so
-  /// this works uniformly even for a slot whose `HanoiOrigin` came from the `?? homePosition`
-  /// fallback in `writeInstance`.
+  /// Test seam: `debugInstances()`'s raw origin/color resolved to plain displayed PIXEL values
+  /// (`origin`/`size`) at a pinned `currentTime` — see `MetalShapeRenderer.resolvedInstances(at:)`'s
+  /// doc comment. Coordinate resolution uses `HanoiMoveScheduler`'s own `resolvedOrigin`-equivalent
+  /// math directly on the raw triple (not through the scheduler instance, which only knows about
+  /// slots it currently tracks), yielding a (tower, depth) coordinate that then goes through
+  /// `resolveHanoiGeometry` (`MetalHanoiGeometry.swift`) to derive the actual on-screen rect — the
+  /// same two-step resolve `hanoi_vertex` does every frame.
   struct ResolvedHanoiInstance {
     var origin: SIMD2<Float>
     var size: SIMD2<Float>
@@ -357,21 +352,24 @@ final class MetalHanoiTowersRenderer: NSObject, MetalIncrementalRenderer {
   }
 
   func resolvedInstances(at currentTime: Float) -> [ResolvedHanoiInstance] {
-    debugInstances().map { instance in
+    let viewportSize = SIMD2(Float(pixelSize.width), Float(pixelSize.height))
+    return debugInstances().map { instance in
       let origin = instance.origin
       let t = currentTime - origin.startTime
-      let resolvedOrigin: SIMD2<Float>
+      let towerDepth: SIMD2<Float>
       if t < origin.leg0Hold {
         let localT = min(max(t / Float(transitionDuration), 0), 1)
         let eased = easeInOutCubic(localT)
-        resolvedOrigin = origin.leg0From + (origin.leg0To - origin.leg0From) * SIMD2<Float>(repeating: eased)
+        towerDepth = origin.leg0From + (origin.leg0To - origin.leg0From) * SIMD2<Float>(repeating: eased)
       } else {
         let localT = min(max((t - origin.leg0Hold) / Float(transitionDuration), 0), 1)
         let eased = easeInOutCubic(localT)
-        resolvedOrigin = origin.leg0To + (origin.leg1To - origin.leg0To) * SIMD2<Float>(repeating: eased)
+        towerDepth = origin.leg0To + (origin.leg1To - origin.leg0To) * SIMD2<Float>(repeating: eased)
       }
+      let geometry = resolveHanoiGeometry(
+        towerDepth: towerDepth, arrayCount: Float(count), viewportSize: viewportSize)
       return ResolvedHanoiInstance(
-        origin: resolvedOrigin, size: instance.size,
+        origin: geometry.origin, size: geometry.size,
         color: resolveAnimatedColorSource(
           instance.color, at: currentTime, useHueRamp: true, primaryColor: MetalShapeColor.primary,
           secondaryColor: MetalShapeColor.secondary, neutralColor: MetalShapeColor.neutral))
@@ -395,12 +393,14 @@ final class MetalHanoiTowersRenderer: NSObject, MetalIncrementalRenderer {
     encoder.setRenderPipelineState(pipelineState)
     encoder.setVertexBuffer(buffer, offset: 0, index: 0)
     // `useHueRamp: 1` unconditionally — Hanoi always hue-ramps.
+    // `valueRangeLowerBound`/`.valueRangeSpan: 0` — see `MetalShapeRenderer`'s identical comment.
     var uniforms = MetalAnimationUniforms(
       viewportSize: SIMD2(Float(pixelSize.width), Float(pixelSize.height)),
       currentTime: currentTime, transitionDuration: Float(transitionDuration), useHueRamp: 1,
       primaryColor: MetalShapeColor.primary, secondaryColor: MetalShapeColor.secondary,
-      neutralColor: MetalShapeColor.neutral)
-    encoder.setVertexBytes(&uniforms, length: MemoryLayout<MetalAnimationUniforms>.size, index: 1)
+      neutralColor: MetalShapeColor.neutral, arrayCount: Float(count), valueRangeLowerBound: 0,
+      valueRangeSpan: 0, scale: Float(lastScale), geometryKind: -1)
+    encoder.setVertexBytes(&uniforms, length: MemoryLayout<MetalAnimationUniforms>.stride, index: 1)
     encoder.drawPrimitives(
       type: .triangleStrip, vertexStart: 0, vertexCount: 4, instanceCount: count)
     encoder.endEncoding()

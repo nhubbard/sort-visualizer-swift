@@ -2,13 +2,16 @@
 #include "AnimatedField.h"
 using namespace metal;
 
-/// One shape's on-screen rect + color, each field an unresolved `(from, to, startTime)` triple —
-/// layout must match `MetalShapeGPUInstance` exactly. Reused for both `.rect` and `.ellipse`
-/// `MetalShapeLayout`s: the bounding box is identical either way, only the fragment shader differs
-/// in whether it fills the whole box or masks it to the ellipse inscribed within it.
+/// One shape's raw underlying VALUE + color, each animated field an unresolved
+/// `(from, to, startTime)` triple — layout must match `MetalShapeGPUInstance` exactly. Reused for
+/// both `.rect` and `.ellipse` `MetalShapeLayout`s: `resolveShapeGeometry` computes the correct
+/// bounding box either way (which fragment shader gets used — `rect_fragment` vs
+/// `ellipse_fragment` — is what actually distinguishes them at draw time, via `MetalShapeRenderer
+/// .init?`'s pipeline setup, not anything here). `arrayIndex` is a plain, unanimated `int` — see
+/// `MetalShapeGPUInstance`'s own doc comment.
 struct ShapeInstance {
-    AnimatedFloat2 origin;
-    AnimatedFloat2 size;
+    int arrayIndex;
+    AnimatedFloat value;
     AnimatedColorSource color;
 };
 
@@ -23,9 +26,11 @@ struct RasterizedShape {
 /// Same one-instanced-draw-call-per-frame structure as `bar_vertex` (see its own doc comment) —
 /// this is a separate function rather than a shared one only because it additionally computes
 /// `localUV`, which `bar_vertex`'s `RasterizedBar` output has no field for. Resolving each
-/// animated field here (`resolveAnimated2`/`resolveAnimatedColorSource`, `AnimatedField.h`) rather than on
-/// the CPU is what keeps steady-state per-frame CPU cost O(1) regardless of how many shapes are
-/// mid-transition — see `MetalColorSourceTracker`'s doc comment for the full rationale.
+/// animated field here (`resolveAnimated`/`resolveAnimatedColorSource`, `AnimatedField.h`) AND
+/// deriving the actual on-screen rect from the resolved value (`resolveShapeGeometry`, selected
+/// per draw call by `uniforms.geometryKind`) rather than on the CPU is what keeps steady-state
+/// per-frame CPU cost O(1) regardless of how many shapes are mid-transition — see
+/// `MetalColorSourceTracker`'s doc comment for the full rationale.
 vertex RasterizedShape shape_vertex(
     uint vertexID [[vertex_id]],
     uint instanceID [[instance_id]],
@@ -35,13 +40,17 @@ vertex RasterizedShape shape_vertex(
     float2 unitCorner = float2(float(vertexID & 1), float(vertexID >> 1));
     ShapeInstance shape = instances[instanceID];
 
-    float2 origin = resolveAnimated2(shape.origin, uniforms.currentTime, uniforms.transitionDuration);
-    float2 size = resolveAnimated2(shape.size, uniforms.currentTime, uniforms.transitionDuration);
+    float value = resolveAnimated(shape.value, uniforms.currentTime, uniforms.transitionDuration);
     float4 color = resolveAnimatedColorSource(
         shape.color, uniforms.currentTime, uniforms.transitionDuration, uniforms.useHueRamp,
         uniforms.primaryColor, uniforms.secondaryColor, uniforms.neutralColor);
 
-    float2 pixelPosition = origin + unitCorner * size;
+    ShapeGeometry geometry = resolveShapeGeometry(
+        uniforms.geometryKind, int(instanceID), shape.arrayIndex, value, uniforms.arrayCount,
+        uniforms.valueRangeLowerBound, uniforms.valueRangeSpan, uniforms.viewportSize,
+        uniforms.scale);
+
+    float2 pixelPosition = geometry.origin + unitCorner * geometry.size;
 
     // Same top-left-origin, +Y-down point space -> Metal NDC flip `bar_vertex` uses.
     float2 ndc = float2(
@@ -82,24 +91,26 @@ struct HanoiOrigin {
     float startTime;
 };
 
-/// Layout must match Swift's `HanoiInstance` (`MetalHanoiTowersRenderer.swift`) exactly — `size`
-/// is a plain unanimated `float2` (Hanoi never eases block size), `color` is the usual
-/// `AnimatedColorSource` (Hanoi hue-ramps like every renderer except `MetalBarRenderer`).
+/// Layout must match Swift's `HanoiInstance` (`MetalHanoiTowersRenderer.swift`) exactly — no
+/// `size` field anymore: `hanoi_vertex` now derives the on-screen rect itself (`resolveHanoiGeometry`
+/// below) from `origin`'s resolved (tower, depth) coordinate, the same "raw ingredients only" shape
+/// every other GPU-geometry port already uses. `color` is the usual `AnimatedColorSource` (Hanoi
+/// hue-ramps like every renderer except `MetalBarRenderer`).
 struct HanoiInstance {
     HanoiOrigin origin;
-    float2 size;
     AnimatedColorSource color;
 };
 
-/// Resolves a `HanoiOrigin` to its current displayed position — the shader-side counterpart to
-/// `HanoiMoveScheduler.resolvedOrigin(forSlot:now:)`, which MUST stay in sync with this exactly
-/// (that Swift copy runs only at retarget time, to compute a smooth continuation point; this one
-/// runs every frame, for every Hanoi instance, which is the entire point of the GPU-driven
-/// redesign — see `MetalColorSourceTracker`'s doc comment). Reproduces the exact two-phase
-/// timing `HanoiMoveScheduler`'s doc comment describes: ease `transitionDuration` toward `leg0To`,
-/// sit static until `leg0Hold` elapses, then ease a fresh `transitionDuration` toward `leg1To` —
-/// NOT a single fade lasting `leg0Hold`, which is why `t` is compared against `leg0Hold` directly
-/// rather than folded into `transitionDuration`.
+/// Resolves a `HanoiOrigin` to its current (tower, depth) COORDINATE — NOT a pixel position
+/// anymore; see `resolveHanoiGeometry` below for the formula that turns this into one. The
+/// shader-side counterpart to `HanoiMoveScheduler.resolvedOrigin(forSlot:now:)`, which MUST stay in
+/// sync with this exactly (that Swift copy runs only at retarget time, to compute a smooth
+/// continuation point; this one runs every frame, for every Hanoi instance, which is the entire
+/// point of the GPU-driven redesign — see `MetalColorSourceTracker`'s doc comment). Reproduces the
+/// exact two-phase timing `HanoiMoveScheduler`'s doc comment describes: ease `transitionDuration`
+/// toward `leg0To`, sit static until `leg0Hold` elapses, then ease a fresh `transitionDuration`
+/// toward `leg1To` — NOT a single fade lasting `leg0Hold`, which is why `t` is compared against
+/// `leg0Hold` directly rather than folded into `transitionDuration`.
 inline float2 resolveHanoiOrigin(HanoiOrigin o, float currentTime, float transitionDuration) {
     float t = currentTime - o.startTime;
     if (t < o.leg0Hold) {
@@ -111,10 +122,39 @@ inline float2 resolveHanoiOrigin(HanoiOrigin o, float currentTime, float transit
     }
 }
 
+/// MSL port of `MetalHanoiGeometry.swift`'s `hanoiTowerCount`/`resolveHanoiGeometry` — MUST stay
+/// formula-for-formula in sync with that Swift pair. See that file's own doc comments for the full
+/// rationale (why a (tower, depth) coordinate rather than a pixel position can be blended by
+/// `resolveHanoiOrigin` above and still produce the exact same result as blending pixel positions
+/// directly, and why Metal's `round()` matching Swift's `.rounded()` matters here).
+inline float hanoiTowerCount(float arrayCount) {
+    float raw = round(sqrt(arrayCount));
+    return clamp(raw, 3.0, 8.0);
+}
+
+struct HanoiGeometry {
+    float2 origin;
+    float2 size;
+};
+
+inline HanoiGeometry resolveHanoiGeometry(float2 towerDepth, float arrayCount, float2 viewportSize) {
+    float towerCount = hanoiTowerCount(arrayCount);
+    float maxDepth = max(1.0, ceil(arrayCount / towerCount));
+    float towerWidth = viewportSize.x / towerCount;
+    float blockHeight = viewportSize.y / maxDepth;
+    HanoiGeometry result;
+    result.origin = float2(
+        towerDepth.x * towerWidth + towerWidth * 0.1,
+        viewportSize.y - (towerDepth.y + 1.0) * blockHeight);
+    result.size = float2(towerWidth * 0.8, blockHeight * 0.9);
+    return result;
+}
+
 /// Same one-instanced-draw-call structure as `shape_vertex` — the only genuine difference is
-/// `origin`'s resolution, via `resolveHanoiOrigin` above instead of the shared `resolveAnimated2`,
-/// to reproduce the fixed 2-leg choreography. Reuses `RasterizedShape`/`rect_fragment` unchanged:
-/// a Hanoi Towers block is just a rect once its origin is resolved, no new fragment stage needed.
+/// `origin`'s resolution, via `resolveHanoiOrigin`/`resolveHanoiGeometry` above instead of the
+/// shared `resolveAnimated2`/`resolveShapeGeometry`, to reproduce the fixed 2-leg choreography.
+/// Reuses `RasterizedShape`/`rect_fragment` unchanged: a Hanoi Towers block is just a rect once its
+/// origin is resolved, no new fragment stage needed.
 vertex RasterizedShape hanoi_vertex(
     uint vertexID [[vertex_id]],
     uint instanceID [[instance_id]],
@@ -124,12 +164,13 @@ vertex RasterizedShape hanoi_vertex(
     float2 unitCorner = float2(float(vertexID & 1), float(vertexID >> 1));
     HanoiInstance block = instances[instanceID];
 
-    float2 origin = resolveHanoiOrigin(block.origin, uniforms.currentTime, uniforms.transitionDuration);
+    float2 towerDepth = resolveHanoiOrigin(block.origin, uniforms.currentTime, uniforms.transitionDuration);
+    HanoiGeometry geometry = resolveHanoiGeometry(towerDepth, uniforms.arrayCount, uniforms.viewportSize);
     float4 color = resolveAnimatedColorSource(
         block.color, uniforms.currentTime, uniforms.transitionDuration, uniforms.useHueRamp,
         uniforms.primaryColor, uniforms.secondaryColor, uniforms.neutralColor);
 
-    float2 pixelPosition = origin + unitCorner * block.size;
+    float2 pixelPosition = geometry.origin + unitCorner * geometry.size;
 
     float2 ndc = float2(
         (pixelPosition.x / uniforms.viewportSize.x) * 2.0 - 1.0,

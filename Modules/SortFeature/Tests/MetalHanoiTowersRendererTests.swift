@@ -74,16 +74,17 @@ struct MetalHanoiTowersRendererTests {
       scale: 1)
 
     // Fresh off `reset()` — `origin.leg0From == leg0To == leg1To` for every slot (a first-ever
-    // paint shows immediately, no fade in flight yet), so reading `leg0To` directly gives the
-    // actual home position without needing to resolve anything.
-    let instances = renderer.debugInstances()
+    // paint shows immediately, no fade in flight yet), so `resolvedInstances(at:)` gives the
+    // actual pixel home position for every slot regardless of which `currentTime` is passed.
+    let instances = renderer.resolvedInstances(at: 0)
     #expect(instances.count == 12)
-    // Every tower's bottom-most (depth 0) block should sit at the same Y — the canvas floor
-    // minus one block height — regardless of which tower it's in.
+    // Every tower's bottom-most (depth 0) block should sit at the same PIXEL Y — the canvas floor
+    // minus one block height — regardless of which tower it's in, once `resolveHanoiGeometry`
+    // turns each one's (tower, depth) coordinate into an actual on-screen rect.
     let towers = MetalHanoiTowersRenderer.towerCount(for: 12)
     var bottomYs: Set<Float> = []
     for index in 0..<12 where MetalHanoiTowersRenderer.depth(forIndex: index, count: 12, towerCount: towers) == 0 {
-      bottomYs.insert(instances[index].origin.leg0To.y)
+      bottomYs.insert(instances[index].origin.y)
     }
     #expect(bottomYs.count == 1, "every tower's floor block should be at the same height")
   }
@@ -98,9 +99,10 @@ struct MetalHanoiTowersRendererTests {
     renderer.reset(
       values: values, valueRange: 1...9, markers: [:], canvasSize: CGSize(width: 300, height: 300),
       scale: 1)
-    // Fresh off `reset()` — see the sibling test's own comment on why `leg0To` is safe to read
-    // directly here.
-    let homeOrigins = renderer.debugInstances().map(\.origin.leg0To)
+    // Fresh off `reset()`, every slot's fully settled — `resolvedInstances(at:)` gives the actual
+    // PIXEL home position (`debugInstances()`'s raw `.origin.leg0To` is now an abstract (tower,
+    // depth) coordinate, not comparable to `resolvedInstances(at:)`'s pixel-space output below).
+    let homeOrigins = renderer.resolvedInstances(at: 0).map(\.origin)
 
     let towers = MetalHanoiTowersRenderer.towerCount(for: 9)
     // Find two indices in different towers to swap.
@@ -139,9 +141,10 @@ struct MetalHanoiTowersRendererTests {
     renderer.reset(
       values: values, valueRange: 1...9, markers: [:], canvasSize: CGSize(width: 300, height: 300),
       scale: 1)
-    // Fresh off `reset()` — see `resetPlacesEveryIndexAtItsOwnHomePosition`'s own comment on why
-    // `leg0To` is safe to read directly here.
-    let homeOrigins = renderer.debugInstances().map(\.origin.leg0To)
+    // Fresh off `reset()` — see `crossTowerSwapSettlesBothSlotsBackAtTheirOwnHomeWithSwappedColors`'s
+    // own comment on why `resolvedInstances(at:)`, not raw `debugInstances()`, gives the pixel
+    // home position now.
+    let homeOrigins = renderer.resolvedInstances(at: 0).map(\.origin)
 
     let towers = MetalHanoiTowersRenderer.towerCount(for: 9)
     // Pick the FIRST index of some tower with at least one obstacle above it, so a swap on it

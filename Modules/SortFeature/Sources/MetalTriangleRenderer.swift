@@ -4,46 +4,56 @@ import MetalKit
 import QuartzCore
 import SortEngineKit
 
-/// The TARGET geometry/color a `MetalTriangleLayout` computes for one slot, in points — plain
+/// The TARGET raw value + color-ingredients a `MetalTriangleLayout` computes for one slot — plain
 /// resolved values, NOT the GPU buffer's own layout (see `MetalTriangleGPUInstance` for that).
 /// Every `MetalTriangleLayout` conformance in `MetalPolygonVisualizerLayouts.swift` returns one of
 /// these; `MetalTriangleRenderer.writeInstance` is the only place that turns it into the animated
 /// triples the GPU buffer actually holds.
+///
+/// No `p0`/`p1`/`p2` fields anymore: `triangle_vertex` now derives the actual 3 points itself
+/// (`resolveTriangleGeometry`, selected per draw call by `MetalTriangleLayout.geometryKind`) —
+/// a layout's `instance(...)` only ever needs to supply its slot's raw underlying value, the same
+/// way `MetalShapeInstance` already does.
 struct MetalTriangleInstance {
-  var p0: SIMD2<Float>
-  var p1: SIMD2<Float>
-  var p2: SIMD2<Float>
+  var value: Float
   var colorValue: Float
   var colorMarker: Int32
 }
 
 /// GPU-buffer layout, matched exactly to `PolygonRenderer.metal`'s `TriangleInstance` struct —
-/// each field an unresolved `(from, to, startTime)` triple. `p0`/`p1`/`p2` each get an
-/// INDEPENDENT `AnimatedFloat2` (not one shared triple) because `MetalTriangleLayout.slots
-/// (forIndex:)` can touch a wedge where only one of its 3 points actually moved — see that
-/// protocol's own doc comment.
+/// `value`/`previousValue` each an unresolved `(from, to, startTime)` triple, resolved every frame
+/// by `triangle_vertex` itself via `resolveAnimated`/`resolveTriangleGeometry`/
+/// `resolveAnimatedColorSource` (`AnimatedField.h`). `previousValue` is supplied for EVERY layout,
+/// not just `DisparityCircle`/`Spiral` — `ColorCircle`'s branch of `resolveTriangleGeometry` simply
+/// never reads it. `arrayIndex` is a plain, unanimated `Int32`, same rationale as
+/// `MetalShapeGPUInstance.arrayIndex`.
 struct MetalTriangleGPUInstance {
-  var p0: AnimatedFloat2
-  var p1: AnimatedFloat2
-  var p2: AnimatedFloat2
+  var arrayIndex: Int32
+  var value: AnimatedFloat
+  var previousValue: AnimatedFloat
   var color: AnimatedColorSource
 }
 
 /// Per-visualizer geometry contract for `MetalTriangleRenderer<Self>` — the triangle-wedge sibling
-/// of `MetalShapeLayout`, same design, in points (this renderer converts to pixels generically).
-/// `DisparityCircleMetalLayout`/`SpiralMetalLayout`'s wedge `i` uses both point `i-1` and point
-/// `i`, so touching index `i` must repaint wedges `i` AND `i+1` — hence the same
-/// `arrayIndex(forSlot:)`/`slots(forIndex:)` split as `MetalShapeLayout`.
+/// of `MetalShapeLayout`, same design. `DisparityCircleMetalLayout`/`SpiralMetalLayout`'s wedge `i`
+/// uses both point `i-1` and point `i`, so touching index `i` must repaint wedges `i` AND `i+1` —
+/// hence the same `arrayIndex(forSlot:)`/`slots(forIndex:)` split as `MetalShapeLayout`.
 ///
 /// Deliberately NOT `@MainActor`, same reasoning as `MetalShapeLayout`.
 protocol MetalTriangleLayout {
+  /// Which `AnimatedField.h`/`MetalShapeGeometry.swift` position formula `triangle_vertex` applies
+  /// for this layout — see `MetalShapeLayout.geometryKind`'s identical doc comment.
+  static var geometryKind: MetalTriangleGeometryKind { get }
+
   static func instanceCount(for count: Int) -> Int
   static func arrayIndex(forSlot slot: Int, count: Int) -> Int
   static func slots(forIndex index: Int, count: Int) -> [Int]
 
+  /// No `canvasSize`/`count` parameters anymore — see `MetalShapeLayout.instance(...)`'s identical
+  /// doc comment on why.
   static func instance(
     atSlot slot: Int, arrayIndex: Int, values: [Int], valueRange: ClosedRange<Int>,
-    markers: [Int: Set<Int>], canvasSize: CGSize, count: Int
+    markers: [Int: Set<Int>]
   ) -> MetalTriangleInstance
 }
 
@@ -68,11 +78,12 @@ final class MetalTriangleRenderer<Layout: MetalTriangleLayout>: NSObject, MetalI
   private var lastCanvasSize: CGSize = .zero
   private var lastScale: CGFloat = 1
   private var pixelSize: CGSize = .zero
+  /// See `MetalShapeRenderer.lastValueRange`'s identical doc comment.
+  private var lastValueRange: ClosedRange<Int> = 0...0
 
   private let colorTransitions = MetalColorSourceTracker()
-  private let p0Transitions = MetalPositionTransitionTracker()
-  private let p1Transitions = MetalPositionTransitionTracker()
-  private let p2Transitions = MetalPositionTransitionTracker()
+  private let valueTransitions = MetalScalarTransitionTracker()
+  private let previousValueTransitions = MetalScalarTransitionTracker()
   /// See `MetalBarRenderer.timeEpoch`/`now()`'s doc comments.
   private var timeEpoch: CFTimeInterval = CACurrentMediaTime()
   private func now() -> Float { Float(CACurrentMediaTime() - timeEpoch) }
@@ -115,13 +126,13 @@ final class MetalTriangleRenderer<Layout: MetalTriangleLayout>: NSObject, MetalI
   ) {
     lastCanvasSize = canvasSize
     lastScale = scale
+    lastValueRange = valueRange
     pixelSize = CGSize(width: canvasSize.width * scale, height: canvasSize.height * scale)
     arrayCount = values.count
     slotCount = Layout.instanceCount(for: arrayCount)
     colorTransitions.reset()
-    p0Transitions.reset()
-    p1Transitions.reset()
-    p2Transitions.reset()
+    valueTransitions.reset()
+    previousValueTransitions.reset()
     timeEpoch = CACurrentMediaTime()
 
     guard slotCount > 0, pixelSize.width > 0, pixelSize.height > 0 else {
@@ -148,6 +159,7 @@ final class MetalTriangleRenderer<Layout: MetalTriangleLayout>: NSObject, MetalI
     markers: [Int: Set<Int>]
   ) {
     guard instanceBuffer != nil, values.count == arrayCount else { return }
+    lastValueRange = valueRange
 
     guard let touched = operation.touchedIndices else {
       reset(
@@ -173,16 +185,18 @@ final class MetalTriangleRenderer<Layout: MetalTriangleLayout>: NSObject, MetalI
     guard values.indices.contains(index) else { return }
 
     let target = Layout.instance(
-      atSlot: slot, arrayIndex: index, values: values, valueRange: valueRange,
-      markers: markers, canvasSize: lastCanvasSize, count: arrayCount
+      atSlot: slot, arrayIndex: index, values: values, valueRange: valueRange, markers: markers
     )
-    // Layouts compute in points, matching every `Visualizer.draw`'s own convention — scale to
-    // pixels here, once, generically, same as `MetalShapeRenderer.writeInstance` does.
+    // Supplied generically for every layout, not just `DisparityCircle`/`Spiral` — see
+    // `MetalTriangleGPUInstance.previousValue`'s doc comment.
+    let previousIndex = (index - 1 + arrayCount) % arrayCount
+    let previousValue = Float(values[previousIndex])
     let n = now()
     let instance = MetalTriangleGPUInstance(
-      p0: p0Transitions.valueToWrite(forSlot: slot, target: target.p0 * Float(lastScale), now: n),
-      p1: p1Transitions.valueToWrite(forSlot: slot, target: target.p1 * Float(lastScale), now: n),
-      p2: p2Transitions.valueToWrite(forSlot: slot, target: target.p2 * Float(lastScale), now: n),
+      arrayIndex: Int32(index),
+      value: valueTransitions.valueToWrite(forSlot: slot, target: target.value, now: n),
+      previousValue: previousValueTransitions.valueToWrite(
+        forSlot: slot, target: previousValue, now: n),
       color: colorTransitions.valueToWrite(
         forSlot: slot, value: target.colorValue, marker: target.colorMarker, now: n)
     )
@@ -218,8 +232,8 @@ final class MetalTriangleRenderer<Layout: MetalTriangleLayout>: NSObject, MetalI
       // capped internal display link instead of manually re-arming `setNeedsDisplay()`.
       let n = now()
       let stillActive =
-        colorTransitions.isActive(now: n) || p0Transitions.isActive(now: n)
-        || p1Transitions.isActive(now: n) || p2Transitions.isActive(now: n)
+        colorTransitions.isActive(now: n) || valueTransitions.isActive(now: n)
+        || previousValueTransitions.isActive(now: n)
       if stillActive {
         if view.isPaused { view.isPaused = false }
       } else if !view.isPaused {
@@ -247,13 +261,20 @@ final class MetalTriangleRenderer<Layout: MetalTriangleLayout>: NSObject, MetalI
   }
 
   func resolvedInstances(at currentTime: Float) -> [ResolvedTriangleInstance] {
-    debugInstances().map {
-      ResolvedTriangleInstance(
-        p0: resolveAnimated2($0.p0, at: currentTime),
-        p1: resolveAnimated2($0.p1, at: currentTime),
-        p2: resolveAnimated2($0.p2, at: currentTime),
+    let viewportSize = SIMD2(Float(pixelSize.width), Float(pixelSize.height))
+    return debugInstances().map { instance in
+      let value = resolveAnimated(instance.value, at: currentTime)
+      let previousValue = resolveAnimated(instance.previousValue, at: currentTime)
+      let geometry = resolveTriangleGeometry(
+        kind: Layout.geometryKind, arrayIndex: instance.arrayIndex, value: value,
+        previousValue: previousValue, arrayCount: Float(arrayCount),
+        valueRangeLowerBound: Float(lastValueRange.lowerBound),
+        valueRangeSpan: Float(lastValueRange.upperBound - lastValueRange.lowerBound),
+        viewportSize: viewportSize)
+      return ResolvedTriangleInstance(
+        p0: geometry.p0, p1: geometry.p1, p2: geometry.p2,
         color: resolveAnimatedColorSource(
-          $0.color, at: currentTime, useHueRamp: true, primaryColor: MetalShapeColor.primary,
+          instance.color, at: currentTime, useHueRamp: true, primaryColor: MetalShapeColor.primary,
           secondaryColor: MetalShapeColor.secondary, neutralColor: MetalShapeColor.neutral))
     }
   }
@@ -281,8 +302,11 @@ final class MetalTriangleRenderer<Layout: MetalTriangleLayout>: NSObject, MetalI
       viewportSize: SIMD2(Float(pixelSize.width), Float(pixelSize.height)),
       currentTime: currentTime, transitionDuration: Float(transitionDuration), useHueRamp: 1,
       primaryColor: MetalShapeColor.primary, secondaryColor: MetalShapeColor.secondary,
-      neutralColor: MetalShapeColor.neutral)
-    encoder.setVertexBytes(&uniforms, length: MemoryLayout<MetalAnimationUniforms>.size, index: 1)
+      neutralColor: MetalShapeColor.neutral, arrayCount: Float(arrayCount),
+      valueRangeLowerBound: Float(lastValueRange.lowerBound),
+      valueRangeSpan: Float(lastValueRange.upperBound - lastValueRange.lowerBound),
+      scale: Float(lastScale), geometryKind: Layout.geometryKind.rawValue)
+    encoder.setVertexBytes(&uniforms, length: MemoryLayout<MetalAnimationUniforms>.stride, index: 1)
     encoder.drawPrimitives(
       type: .triangle, vertexStart: 0, vertexCount: 3, instanceCount: slotCount)
     encoder.endEncoding()

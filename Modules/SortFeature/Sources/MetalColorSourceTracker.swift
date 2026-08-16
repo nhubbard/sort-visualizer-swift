@@ -133,7 +133,9 @@ final class MetalColorSourceTracker {
 
 /// `MetalBarRenderer`'s own simpler tracker — same shape as `MetalColorSourceTracker` but for
 /// `AnimatedMarkerColor` (no `value` ingredient, since Bar never hue-ramps). See
-/// `MetalColorSourceTracker`'s own doc comment for the identical retarget-continuity trade-off.
+/// `MetalColorSourceTracker`'s own doc comment for the identical retarget-continuity trade-off,
+/// and `HanoiMoveScheduler`'s doc comment for why `[Entry?]` is safe here (concrete struct, not
+/// the generic type the original array-conversion regression was about).
 @MainActor
 final class MetalMarkerColorTracker {
   private struct Entry {
@@ -142,15 +144,22 @@ final class MetalMarkerColorTracker {
     var startTime: Float
   }
 
-  private var entries: [Int: Entry] = [:]
+  private var entries: [Entry?] = []
   private var settleDeadline: Float?
 
   func reset() {
-    entries.removeAll()
+    entries.removeAll(keepingCapacity: true)
     settleDeadline = nil
   }
 
+  private func ensureCapacity(_ slot: Int) {
+    if slot >= entries.count {
+      entries.append(contentsOf: repeatElement(nil, count: slot - entries.count + 1))
+    }
+  }
+
   func valueToWrite(forSlot slot: Int, marker: Int32, now: Float) -> AnimatedMarkerColor {
+    ensureCapacity(slot)
     guard var entry = entries[slot] else {
       entries[slot] = Entry(fromMarker: marker, toMarker: marker, startTime: now)
       return AnimatedMarkerColor(fromMarker: marker, toMarker: marker, startTime: now)

@@ -30,3 +30,10 @@ func resolveAnimated2(_ field: AnimatedFloat2, at now: Float) -> SIMD2<Float> {
   let eased = easeInOutCubic(t)
   return field.from + (field.to - field.from) * SIMD2<Float>(repeating: eased)
 }
+
+/// The scalar counterpart to `resolveAnimated2` above, for `AnimatedFloat`.
+func resolveAnimated(_ field: AnimatedFloat, at now: Float) -> Float {
+  let t = min(max((now - field.startTime) / Float(transitionDuration), 0), 1)
+  let eased = easeInOutCubic(t)
+  return field.from + (field.to - field.from) * eased
+}

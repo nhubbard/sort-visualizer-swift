@@ -5,13 +5,14 @@ import QuartzCore
 import SortEngineKit
 
 /// GPU-buffer layout, matched exactly to `PolygonRenderer.metal`'s `LineInstance` struct —
-/// `start`/`end`/`color` are unresolved `(from, to, startTime)` triples, resolved every frame by
-/// `line_vertex` itself (`resolveAnimated2`/`resolveAnimated4`, `AnimatedField.h`); `thickness`
-/// stays a plain, unanimated scalar — it's a fixed derived value (`lineWidth * scale`), never fed
-/// through a transition tracker.
+/// `value`/`color` are unresolved `(from, to, startTime)` triples, resolved every frame by
+/// `line_vertex` itself (`resolveAnimated`/`resolveChordGeometry`/`resolveAnimatedColorSource`,
+/// `AnimatedField.h`) rather than a CPU-side per-frame sweep; `thickness` stays a plain, unanimated
+/// scalar — it's a fixed derived value (`lineWidth * scale`), never fed through a transition
+/// tracker. No `arrayIndex` field — unlike `MetalShapeGPUInstance`/`MetalTriangleGPUInstance`,
+/// `resolveChordGeometry` always uses the raw `instanceID` directly (see its own doc comment).
 struct MetalLineInstance {
-  var start: AnimatedFloat2
-  var end: AnimatedFloat2
+  var value: AnimatedFloat
   var thickness: Float
   var color: AnimatedColorSource
 }
@@ -35,8 +36,7 @@ final class MetalDisparityChordsRenderer: NSObject, MetalIncrementalRenderer {
   private var pixelSize: CGSize = .zero
 
   private let colorTransitions = MetalColorSourceTracker()
-  private let startTransitions = MetalPositionTransitionTracker()
-  private let endTransitions = MetalPositionTransitionTracker()
+  private let valueTransitions = MetalScalarTransitionTracker()
   /// See `MetalBarRenderer.timeEpoch`/`now()`'s doc comments.
   private var timeEpoch: CFTimeInterval = CACurrentMediaTime()
   private func now() -> Float { Float(CACurrentMediaTime() - timeEpoch) }
@@ -87,8 +87,7 @@ final class MetalDisparityChordsRenderer: NSObject, MetalIncrementalRenderer {
     pixelSize = CGSize(width: canvasSize.width * scale, height: canvasSize.height * scale)
     count = values.count
     colorTransitions.reset()
-    startTransitions.reset()
-    endTransitions.reset()
+    valueTransitions.reset()
     timeEpoch = CACurrentMediaTime()
 
     guard count > 0, pixelSize.width > 0, pixelSize.height > 0 else {
@@ -128,32 +127,15 @@ final class MetalDisparityChordsRenderer: NSObject, MetalIncrementalRenderer {
     }
   }
 
-  /// Same `angle(k) = π*(2k/n - 0.5)` `DisparityChordsVisualizer.angle(_:count:)` uses, generalized
-  /// to a `Double` input since the chord's far endpoint plugs a raw *value* into this formula,
-  /// not just an index.
-  private static func angle(_ position: Double, count: Int) -> Double {
-    .pi * (2.0 * position / Double(count) - 0.5)
-  }
-
   private func writeChord(
     index: Int, values: [Int], valueRange: ClosedRange<Int>, markers: [Int: Set<Int>]
   ) {
     guard let instanceBuffer, count > 0 else { return }
     let value = values[index]
-    let center = SIMD2<Double>(pixelSize.width / 2, pixelSize.height / 2)
-    let radius = min(pixelSize.width, pixelSize.height) / 2.5
-    let fromAngle = Self.angle(Double(index), count: count)
-    let toAngle = Self.angle(Double(value), count: count)
-
-    let rawStart = SIMD2(
-      Float(center.x + radius * cos(fromAngle)), Float(center.y + radius * sin(fromAngle)))
-    let rawEnd = SIMD2(
-      Float(center.x + radius * cos(toAngle)), Float(center.y + radius * sin(toAngle)))
     let n = now()
     let normalized = MetalShapeColor.normalized(value: value, in: valueRange)
     let chord = MetalLineInstance(
-      start: startTransitions.valueToWrite(forSlot: index, target: rawStart, now: n),
-      end: endTransitions.valueToWrite(forSlot: index, target: rawEnd, now: n),
+      value: valueTransitions.valueToWrite(forSlot: index, target: Float(value), now: n),
       thickness: Float(Self.lineWidth * lastScale),
       color: colorTransitions.valueToWrite(
         forSlot: index, value: Float(normalized),
@@ -189,8 +171,7 @@ final class MetalDisparityChordsRenderer: NSObject, MetalIncrementalRenderer {
       // See `MetalBarRenderer.draw(in:)`'s own comment on why this uses MetalKit's own
       // capped internal display link instead of manually re-arming `setNeedsDisplay()`.
       let n = now()
-      if colorTransitions.isActive(now: n) || startTransitions.isActive(now: n)
-        || endTransitions.isActive(now: n) {
+      if colorTransitions.isActive(now: n) || valueTransitions.isActive(now: n) {
         if view.isPaused { view.isPaused = false }
       } else if !view.isPaused {
         view.isPaused = true
@@ -216,12 +197,15 @@ final class MetalDisparityChordsRenderer: NSObject, MetalIncrementalRenderer {
     encoder.setRenderPipelineState(pipelineState)
     encoder.setVertexBuffer(buffer, offset: 0, index: 0)
     // `useHueRamp: 1` unconditionally — `DisparityChordsVisualizer` always hue-ramps.
+    // `valueRangeLowerBound`/`.valueRangeSpan`/`geometryKind` unused by `line_vertex` (there's only
+    // one chord formula, no per-layout selection) — left at `0`/`-1` same as before the port.
     var uniforms = MetalAnimationUniforms(
       viewportSize: SIMD2(Float(pixelSize.width), Float(pixelSize.height)),
       currentTime: currentTime, transitionDuration: Float(transitionDuration), useHueRamp: 1,
       primaryColor: MetalShapeColor.primary, secondaryColor: MetalShapeColor.secondary,
-      neutralColor: MetalShapeColor.neutral)
-    encoder.setVertexBytes(&uniforms, length: MemoryLayout<MetalAnimationUniforms>.size, index: 1)
+      neutralColor: MetalShapeColor.neutral, arrayCount: Float(count), valueRangeLowerBound: 0,
+      valueRangeSpan: 0, scale: Float(lastScale), geometryKind: -1)
+    encoder.setVertexBytes(&uniforms, length: MemoryLayout<MetalAnimationUniforms>.stride, index: 1)
     encoder.drawPrimitives(
       type: .triangleStrip, vertexStart: 0, vertexCount: 4, instanceCount: count)
     encoder.endEncoding()
@@ -246,13 +230,15 @@ final class MetalDisparityChordsRenderer: NSObject, MetalIncrementalRenderer {
   }
 
   func resolvedInstances(at currentTime: Float) -> [ResolvedLineInstance] {
-    debugInstances().map {
-      ResolvedLineInstance(
-        start: resolveAnimated2($0.start, at: currentTime),
-        end: resolveAnimated2($0.end, at: currentTime),
-        thickness: $0.thickness,
+    let viewportSize = SIMD2(Float(pixelSize.width), Float(pixelSize.height))
+    return debugInstances().enumerated().map { index, instance in
+      let value = resolveAnimated(instance.value, at: currentTime)
+      let geometry = resolveChordGeometry(
+        index: Int32(index), value: value, arrayCount: Float(count), viewportSize: viewportSize)
+      return ResolvedLineInstance(
+        start: geometry.start, end: geometry.end, thickness: instance.thickness,
         color: resolveAnimatedColorSource(
-          $0.color, at: currentTime, useHueRamp: true, primaryColor: MetalShapeColor.primary,
+          instance.color, at: currentTime, useHueRamp: true, primaryColor: MetalShapeColor.primary,
           secondaryColor: MetalShapeColor.secondary, neutralColor: MetalShapeColor.neutral))
     }
   }

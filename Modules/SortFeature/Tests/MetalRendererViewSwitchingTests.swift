@@ -51,11 +51,11 @@ struct MetalRendererViewSwitchingTests {
     let instances = rainbowRenderer.debugInstances()
     #expect(instances.count == 4, "the new renderer must have been reset/reseeded, not left empty")
 
-    // Sanity check the seeding reflects the CURRENT frame, not zeroed/garbage memory: value 40
-    // (max, at index 2) should be taller than value 10 (min, at index 1). Fresh off `reset()` —
-    // `size.from == size.to` (a first-ever paint shows immediately), so reading `.to` directly
-    // gives the actual seeded size.
-    #expect(instances[2].size.to.y > instances[1].size.to.y)
+    // Sanity check the seeding reflects the CURRENT frame, not zeroed/garbage memory: index 2's
+    // raw value (40) must be greater than index 1's (10). Fresh off `reset()` — `value.from ==
+    // value.to` (a first-ever paint shows immediately), so reading `.to` directly gives the
+    // actual seeded value.
+    #expect(instances[2].value.to > instances[1].value.to)
   }
 
   /// Switching to the visualizer already active must be a no-op, not a pointless rebuild —

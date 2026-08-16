@@ -126,10 +126,16 @@ final class HanoiMoveScheduler {
       let localT = min(max(t / Float(transitionDuration), 0), 1)
       let eased = easeInOutCubic(localT)
       return origin.leg0From + (origin.leg0To - origin.leg0From) * SIMD2<Float>(repeating: eased)
-    } else {
-      let localT = min(max((t - origin.leg0Hold) / Float(transitionDuration), 0), 1)
-      let eased = easeInOutCubic(localT)
-      return origin.leg0To + (origin.leg1To - origin.leg0To) * SIMD2<Float>(repeating: eased)
     }
+    let leg1T = t - origin.leg0Hold
+    // Fully settled: `easeInOutCubic(1) == 1` exactly (verified, not approximated — see its own
+    // doc comment), so a clamped `localT` of 1 always resolves to exactly `leg1To` anyway. Skip
+    // the divide/clamp/cubic-eval for this case rather than compute a result that's already known
+    // — cheap on its own, but `schedule` calls this once per obstacle per swap, so it's worth
+    // skipping at that call volume.
+    guard leg1T < Float(transitionDuration) else { return origin.leg1To }
+    let localT = leg1T / Float(transitionDuration)
+    let eased = easeInOutCubic(localT)
+    return origin.leg0To + (origin.leg1To - origin.leg0To) * SIMD2<Float>(repeating: eased)
   }
 }

@@ -2,17 +2,18 @@
 #include "AnimatedField.h"
 using namespace metal;
 
-/// One bar's on-screen rect + color, each field an unresolved `(from, to, startTime)`-shaped
+/// One bar's raw underlying VALUE + color, each field an unresolved `(from, to, startTime)`-shaped
 /// triple instead of an already-interpolated value — `MetalBarRenderer` writes one of these
 /// directly into a persistent buffer per touched index per operation, and this vertex shader
-/// resolves the actual displayed geometry/color itself, every frame, via `resolveAnimated2`/
-/// `resolveAnimatedMarkerColor` (`AnimatedField.h`). `color` is `AnimatedMarkerColor`, not
-/// `AnimatedColorSource` — Bar never hue-ramps, only ever picks between primary/secondary/a flat
-/// default. Layout must match `MetalBarRenderer.BarInstance` exactly (both are plain,
-/// tightly-packed structs with no Swift-side padding surprises).
+/// resolves the eased value/color AND derives the actual on-screen rect from them itself, every
+/// frame (`resolveAnimated`/`resolveAnimatedMarkerColor`, `AnimatedField.h`) — geometry
+/// (`barWidth`/`height`/`origin`/`size`) is no longer precomputed on the CPU at all, unlike every
+/// other renderer's instance struct (which still stores an already-positioned rect). `color` is
+/// `AnimatedMarkerColor`, not `AnimatedColorSource` — Bar never hue-ramps, only ever picks between
+/// primary/secondary/a flat default. Layout must match `MetalBarRenderer.BarInstance` exactly
+/// (both are plain, tightly-packed structs with no Swift-side padding surprises).
 struct BarInstance {
-    AnimatedFloat2 origin;
-    AnimatedFloat2 size;
+    AnimatedFloat value;
     AnimatedMarkerColor color;
 };
 
@@ -28,6 +29,14 @@ struct RasterizedBar {
 /// per-frame sweep over every mid-fade slot — is what keeps the steady-state per-frame CPU cost
 /// of an actively-animating scene at O(1) regardless of how many bars are mid-transition. Corner
 /// selection via `vertex_id` avoids needing a separate vertex buffer for the shared unit quad.
+///
+/// Geometry (`barWidth`/`normalizedHeight`/`height`/`origin`/`size`) is computed HERE now, from
+/// the eased raw `value` plus `uniforms.arrayCount`/`.valueRangeLowerBound`/`.valueRangeSpan` —
+/// byte-for-byte the same formula `MetalBarRenderer.writeBar` used to run on the CPU once per
+/// touched index per operation, just relocated to run once per vertex per frame instead. Easing
+/// the raw value (not a precomputed position) is exact here since a bar's position is already a
+/// LINEAR function of its value — no curve to diverge from, unlike the sin/cos-based visualizer
+/// layouts a future port would need to accept a transition-path change for.
 vertex RasterizedBar bar_vertex(
     uint vertexID [[vertex_id]],
     uint instanceID [[instance_id]],
@@ -37,11 +46,20 @@ vertex RasterizedBar bar_vertex(
     float2 unitCorner = float2(float(vertexID & 1), float(vertexID >> 1));
     BarInstance bar = instances[instanceID];
 
-    float2 origin = resolveAnimated2(bar.origin, uniforms.currentTime, uniforms.transitionDuration);
-    float2 size = resolveAnimated2(bar.size, uniforms.currentTime, uniforms.transitionDuration);
+    float value = resolveAnimated(bar.value, uniforms.currentTime, uniforms.transitionDuration);
     float4 color = resolveAnimatedMarkerColor(
         bar.color, uniforms.currentTime, uniforms.transitionDuration, uniforms.primaryColor,
         uniforms.secondaryColor, uniforms.neutralColor);
+
+    float barWidth = uniforms.viewportSize.x / uniforms.arrayCount;
+    float normalizedHeight = uniforms.valueRangeSpan > 0.0
+        ? (value - uniforms.valueRangeLowerBound) / uniforms.valueRangeSpan
+        : 1.0;
+    float height = uniforms.viewportSize.y * normalizedHeight;
+    // Top-left origin, bars anchored at the bottom — matches `BarGraphVisualizer` exactly (see
+    // this function's own NDC-conversion comment below for how this point space maps over).
+    float2 origin = float2(float(instanceID) * barWidth, uniforms.viewportSize.y - height);
+    float2 size = float2(barWidth, height);
 
     float2 pixelPosition = origin + unitCorner * size;
 

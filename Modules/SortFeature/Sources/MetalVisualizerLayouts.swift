@@ -3,30 +3,28 @@ import Foundation
 
 // One `MetalShapeLayout` per Metal-ported `Visualizer` beyond `BarGraphVisualizer` (which keeps
 // its own bespoke `MetalBarRenderer` — see that type's doc comment). Each `instance(atSlot:...)`
-// is a direct, line-for-line port of the matching `Visualizer.draw(_:)`'s per-index math, just
-// returning one `MetalShapeInstance` instead of appending a `DrawCommand` — see
-// `MetalShapeLayout`'s own doc comment for why geometry here is in points, and why `arrayIndex`/
-// `slots` default to identity except where noted.
+// only ever needs to supply a slot's raw underlying value plus color ingredients now — the actual
+// on-screen geometry formula (what used to be a direct, line-for-line port of the matching
+// `Visualizer.draw(_:)`'s per-index math, computed here in points) has moved to `shape_vertex`
+// (`ShapeRenderer.metal`'s `resolveShapeGeometry`, `MetalShapeGeometry.swift`'s Swift-side CPU
+// mirror for tests) — see `MetalShapeLayout`'s own doc comment for the full rationale, and each
+// layout's `geometryKind` for which shader branch carries its exact formula forward unchanged.
 
 // MARK: - Rect layouts
 
 /// Ports `DisparityBarGraphVisualizer`.
 struct DisparityBarGraphMetalLayout: MetalShapeLayout {
   static let shapeKind: MetalShapeKind = .rect
+  static let geometryKind: MetalShapeGeometryKind = .disparityBarGraph
 
   static func instance(
     atSlot slot: Int, arrayIndex index: Int, values: [Int], valueRange: ClosedRange<Int>,
-    markers: [Int: Set<Int>], canvasSize: CGSize, count: Int
+    markers: [Int: Set<Int>]
   ) -> MetalShapeInstance {
     let value = values[index]
-    let barWidth = canvasSize.width / Double(count)
-    let disp = (1 + sin(.pi * Double(value - index) / Double(count))) * 0.5
-    let height = canvasSize.height * disp
     let normalized = MetalShapeColor.normalized(value: value, in: valueRange)
     return MetalShapeInstance(
-      origin: SIMD2(Float(Double(index) * barWidth), Float(canvasSize.height - height)),
-      size: SIMD2(Float(barWidth), Float(height)),
-      colorValue: Float(normalized),
+      value: Float(value), colorValue: Float(normalized),
       colorMarker: MetalShapeColor.markerKind(forIndex: index, in: markers)
     )
   }
@@ -36,41 +34,33 @@ struct DisparityBarGraphMetalLayout: MetalShapeLayout {
 /// value (no marker override at all, matching the original, which ignores `context.markers`).
 struct RainbowMetalLayout: MetalShapeLayout {
   static let shapeKind: MetalShapeKind = .rect
+  static let geometryKind: MetalShapeGeometryKind = .rainbow
 
   static func instance(
     atSlot slot: Int, arrayIndex index: Int, values: [Int], valueRange: ClosedRange<Int>,
-    markers: [Int: Set<Int>], canvasSize: CGSize, count: Int
+    markers: [Int: Set<Int>]
   ) -> MetalShapeInstance {
-    let barWidth = canvasSize.width / Double(count)
-    let normalized = MetalShapeColor.normalized(value: values[index], in: valueRange)
-    let height = canvasSize.height * normalized
-    return MetalShapeInstance(
-      origin: SIMD2(Float(Double(index) * barWidth), Float(canvasSize.height - height)),
-      size: SIMD2(Float(barWidth), Float(height)),
-      colorValue: Float(normalized), colorMarker: 0
-    )
+    let value = values[index]
+    let normalized = MetalShapeColor.normalized(value: value, in: valueRange)
+    return MetalShapeInstance(value: Float(value), colorValue: Float(normalized), colorMarker: 0)
   }
 }
 
-/// Ports `SineWaveVisualizer`.
+/// Ports `SineWaveVisualizer`. `barThickness`/`amplitudeFraction` are fixed constants baked
+/// directly into `resolveShapeGeometry`'s `.sineWave` branch now (they never varied per-instance
+/// or per-frame), not read from here anymore.
 struct SineWaveMetalLayout: MetalShapeLayout {
   static let shapeKind: MetalShapeKind = .rect
-  private static let barThickness: Double = 5
-  private static let amplitudeFraction: Double = 0.4
+  static let geometryKind: MetalShapeGeometryKind = .sineWave
 
   static func instance(
     atSlot slot: Int, arrayIndex index: Int, values: [Int], valueRange: ClosedRange<Int>,
-    markers: [Int: Set<Int>], canvasSize: CGSize, count: Int
+    markers: [Int: Set<Int>]
   ) -> MetalShapeInstance {
-    let columnWidth = canvasSize.width / Double(count)
-    let normalized = MetalShapeColor.normalized(value: values[index], in: valueRange)
-    let centerY = canvasSize.height / 2
-    let amplitude = canvasSize.height * Self.amplitudeFraction
-    let y = centerY - amplitude * sin(2 * Double.pi * normalized)
+    let value = values[index]
+    let normalized = MetalShapeColor.normalized(value: value, in: valueRange)
     return MetalShapeInstance(
-      origin: SIMD2(Float(Double(index) * columnWidth), Float(y - Self.barThickness / 2)),
-      size: SIMD2(Float(columnWidth), Float(Self.barThickness)),
-      colorValue: Float(normalized),
+      value: Float(value), colorValue: Float(normalized),
       colorMarker: MetalShapeColor.markerKind(forIndex: index, in: markers)
     )
   }
@@ -82,8 +72,12 @@ struct SineWaveMetalLayout: MetalShapeLayout {
 /// `PixelMeshVisualizer.draw`'s own `idx = min(count-1, max(0, Int(cellIndex * scale)))` exactly;
 /// `slots(forIndex:)` is its analytic inverse (the range of cellIndex whose `floor(cellIndex*scale)`
 /// lands on a given index), not a linear scan, so `apply` stays O(touched) instead of O(cellCount).
+/// This VALUE-to-cell resampling stays entirely CPU-side, unchanged by the geometry-to-GPU port —
+/// only the grid CELL's on-screen placement (a pure function of `slot`/`count`, no value
+/// dependency at all) moved to the shader; see `MetalShapeGeometry.swift`'s own doc comment.
 struct PixelMeshMetalLayout: MetalShapeLayout {
   static let shapeKind: MetalShapeKind = .rect
+  static let geometryKind: MetalShapeGeometryKind = .pixelMesh
 
   private static func gridSide(for count: Int) -> Int {
     Int(Double(count).squareRoot().rounded(.up))
@@ -117,21 +111,12 @@ struct PixelMeshMetalLayout: MetalShapeLayout {
 
   static func instance(
     atSlot slot: Int, arrayIndex index: Int, values: [Int], valueRange: ClosedRange<Int>,
-    markers: [Int: Set<Int>], canvasSize: CGSize, count: Int
+    markers: [Int: Set<Int>]
   ) -> MetalShapeInstance {
-    let side = gridSide(for: count)
-    guard side > 0 else {
-      return MetalShapeInstance(origin: .zero, size: .zero, colorValue: 0, colorMarker: 0)
-    }
-    let cellWidth = canvasSize.width / Double(side)
-    let cellHeight = canvasSize.height / Double(side)
-    let gridX = slot % side
-    let gridY = slot / side
-    let normalized = MetalShapeColor.normalized(value: values[index], in: valueRange)
+    let value = values[index]
+    let normalized = MetalShapeColor.normalized(value: value, in: valueRange)
     return MetalShapeInstance(
-      origin: SIMD2(Float(Double(gridX) * cellWidth), Float(Double(gridY) * cellHeight)),
-      size: SIMD2(Float(cellWidth), Float(cellHeight)),
-      colorValue: Float(normalized),
+      value: Float(value), colorValue: Float(normalized),
       colorMarker: MetalShapeColor.markerKind(forIndex: index, in: markers)
     )
   }
@@ -139,105 +124,79 @@ struct PixelMeshMetalLayout: MetalShapeLayout {
 
 // MARK: - Ellipse layouts
 
-/// Ports `ScatterPlotVisualizer`.
+/// Ports `ScatterPlotVisualizer`. `dotDiameter` is a fixed constant baked directly into
+/// `resolveShapeGeometry`'s `.scatterPlot` branch now.
 struct ScatterPlotMetalLayout: MetalShapeLayout {
   static let shapeKind: MetalShapeKind = .ellipse
+  static let geometryKind: MetalShapeGeometryKind = .scatterPlot
   // Flat, non-hue-ramped default — see `MetalShapeLayout.usesHueRamp`'s own doc comment.
   static let usesHueRamp = false
-  private static let dotDiameter: Double = 6
 
   static func instance(
     atSlot slot: Int, arrayIndex index: Int, values: [Int], valueRange: ClosedRange<Int>,
-    markers: [Int: Set<Int>], canvasSize: CGSize, count: Int
+    markers: [Int: Set<Int>]
   ) -> MetalShapeInstance {
-    let columnWidth = canvasSize.width / Double(count)
-    let normalized = MetalShapeColor.normalized(value: values[index], in: valueRange)
-    let radius = Self.dotDiameter / 2
-    let centerX = Double(index) * columnWidth + columnWidth / 2
-    let centerY = radius + (canvasSize.height - 2 * radius) * (1 - normalized)
-    return MetalShapeInstance(
-      origin: SIMD2(Float(centerX - radius), Float(centerY - radius)),
-      size: SIMD2(Float(Self.dotDiameter), Float(Self.dotDiameter)),
-      colorValue: 0, colorMarker: MetalShapeColor.markerKind(forIndex: index, in: markers)
+    MetalShapeInstance(
+      value: Float(values[index]), colorValue: 0,
+      colorMarker: MetalShapeColor.markerKind(forIndex: index, in: markers)
     )
   }
 }
 
-/// Ports `WaveDotsVisualizer`.
+/// Ports `WaveDotsVisualizer`. `dotDiameter` is a fixed constant baked directly into
+/// `resolveShapeGeometry`'s `.waveDots` branch now.
 struct WaveDotsMetalLayout: MetalShapeLayout {
   static let shapeKind: MetalShapeKind = .ellipse
+  static let geometryKind: MetalShapeGeometryKind = .waveDots
   // Flat, non-hue-ramped default — see `MetalShapeLayout.usesHueRamp`'s own doc comment.
   static let usesHueRamp = false
-  private static let dotDiameter: Double = 6
 
   static func instance(
     atSlot slot: Int, arrayIndex index: Int, values: [Int], valueRange: ClosedRange<Int>,
-    markers: [Int: Set<Int>], canvasSize: CGSize, count: Int
+    markers: [Int: Set<Int>]
   ) -> MetalShapeInstance {
-    let columnWidth = canvasSize.width / Double(count)
-    let normalized = MetalShapeColor.normalized(value: values[index], in: valueRange)
-    let radius = Self.dotDiameter / 2
-    let verticalCenter = canvasSize.height / 2
-    let amplitude = canvasSize.height / 2 - radius
-    let centerX = Double(index) * columnWidth + columnWidth / 2
-    let centerY = verticalCenter + amplitude * sin(2 * Double.pi * normalized)
-    return MetalShapeInstance(
-      origin: SIMD2(Float(centerX - radius), Float(centerY - radius)),
-      size: SIMD2(Float(Self.dotDiameter), Float(Self.dotDiameter)),
-      colorValue: 0, colorMarker: MetalShapeColor.markerKind(forIndex: index, in: markers)
+    MetalShapeInstance(
+      value: Float(values[index]), colorValue: 0,
+      colorMarker: MetalShapeColor.markerKind(forIndex: index, in: markers)
     )
   }
 }
 
-/// Ports `SpiralDotsVisualizer`.
+/// Ports `SpiralDotsVisualizer`. `dotDiameter` is a fixed constant baked directly into
+/// `resolveShapeGeometry`'s `.spiralDots` branch now.
 struct SpiralDotsMetalLayout: MetalShapeLayout {
   static let shapeKind: MetalShapeKind = .ellipse
-  private static let dotDiameter: Double = 6
+  static let geometryKind: MetalShapeGeometryKind = .spiralDots
 
   static func instance(
     atSlot slot: Int, arrayIndex index: Int, values: [Int], valueRange: ClosedRange<Int>,
-    markers: [Int: Set<Int>], canvasSize: CGSize, count: Int
+    markers: [Int: Set<Int>]
   ) -> MetalShapeInstance {
-    let normalized = MetalShapeColor.normalized(value: values[index], in: valueRange)
-    let center = SIMD2<Double>(canvasSize.width / 2, canvasSize.height / 2)
-    let radius = min(canvasSize.width, canvasSize.height) / 2.5
-    let angle = Double.pi * (2.0 * Double(index) / Double(count) - 0.5)
-    let distance = normalized * radius
-    let centerX = center.x + distance * cos(angle)
-    let centerY = center.y + distance * sin(angle)
+    let value = values[index]
+    let normalized = MetalShapeColor.normalized(value: value, in: valueRange)
     return MetalShapeInstance(
-      origin: SIMD2(Float(centerX - Self.dotDiameter / 2), Float(centerY - Self.dotDiameter / 2)),
-      size: SIMD2(Float(Self.dotDiameter), Float(Self.dotDiameter)),
-      colorValue: Float(normalized),
+      value: Float(value), colorValue: Float(normalized),
       colorMarker: MetalShapeColor.markerKind(forIndex: index, in: markers)
     )
   }
 }
 
 /// Ports `DisparityDotsVisualizer` — its `disp` formula matches `DisparityCircleVisualizer.disparity`
-/// exactly (that type's own doc comment notes the two share it); duplicated here as a plain
-/// expression rather than importing `BuiltInVisualizers` for one static function.
+/// exactly (that type's own doc comment notes the two share it); duplicated in
+/// `resolveShapeGeometry`'s `.disparityDots` branch as a plain expression rather than importing
+/// `BuiltInVisualizers` for one static function, same as before the geometry-to-GPU port.
 struct DisparityDotsMetalLayout: MetalShapeLayout {
   static let shapeKind: MetalShapeKind = .ellipse
-  private static let dotDiameter: Double = 6
+  static let geometryKind: MetalShapeGeometryKind = .disparityDots
 
   static func instance(
     atSlot slot: Int, arrayIndex index: Int, values: [Int], valueRange: ClosedRange<Int>,
-    markers: [Int: Set<Int>], canvasSize: CGSize, count: Int
+    markers: [Int: Set<Int>]
   ) -> MetalShapeInstance {
     let value = values[index]
-    let center = SIMD2<Double>(canvasSize.width / 2, canvasSize.height / 2)
-    let radius = min(canvasSize.width, canvasSize.height) / 2.5
-    let dotRadius = Self.dotDiameter / 2
-    let disp = (1 + cos(.pi * Double(value - index) / (Double(count) * 0.5))) * 0.5
-    let theta = Double.pi * (2.0 * Double(index) / Double(count) - 0.5)
-    let centerX = center.x + disp * radius * cos(theta)
-    let centerY = center.y + disp * radius * sin(theta)
     let normalized = MetalShapeColor.normalized(value: value, in: valueRange)
     return MetalShapeInstance(
-      origin: SIMD2(Float(centerX - dotRadius), Float(centerY - dotRadius)),
-      size: SIMD2(Float(Self.dotDiameter), Float(Self.dotDiameter)),
-      colorValue: Float(normalized),
+      value: Float(value), colorValue: Float(normalized),
       colorMarker: MetalShapeColor.markerKind(forIndex: index, in: markers)
     )
   }
@@ -247,9 +206,12 @@ struct DisparityDotsMetalLayout: MetalShapeLayout {
 /// draws back-to-front (`stride(from: count-1, through: 0, by: -1)`) so index 0 paints last (on
 /// top). A single Metal draw call rasterizes/blends instances in ascending `instanceID` order (the
 /// same "later submission wins" rule immediate-mode `fill()` calls already rely on for these fully
-/// opaque colors), so reversing slot == count-1-index reproduces that ordering exactly.
+/// opaque colors), so reversing slot == count-1-index reproduces that ordering exactly. This
+/// mapping stays CPU-side, unchanged by the geometry-to-GPU port; `resolveShapeGeometry`'s
+/// `.hoopStack` branch reads the already-reversed `arrayIndex` straight from the GPU buffer.
 struct HoopStackMetalLayout: MetalShapeLayout {
   static let shapeKind: MetalShapeKind = .ellipse
+  static let geometryKind: MetalShapeGeometryKind = .hoopStack
 
   static func arrayIndex(forSlot slot: Int, count: Int) -> Int {
     count - 1 - slot
@@ -261,24 +223,12 @@ struct HoopStackMetalLayout: MetalShapeLayout {
 
   static func instance(
     atSlot slot: Int, arrayIndex index: Int, values: [Int], valueRange: ClosedRange<Int>,
-    markers: [Int: Set<Int>], canvasSize: CGSize, count: Int
+    markers: [Int: Set<Int>]
   ) -> MetalShapeInstance {
     let value = values[index]
-    let centerX = canvasSize.width / 2
     let normalized = MetalShapeColor.normalized(value: value, in: valueRange)
-    let baseRadiusX = min(canvasSize.height / 6, canvasSize.width / 2)
-    let baseRadiusY = canvasSize.height / 18
-    let y =
-      count > 1
-      ? baseRadiusY + (canvasSize.height - 2 * baseRadiusY) * Double(index) / Double(count - 1)
-      : canvasSize.height / 2
-    let scale = 0.2 + 0.8 * normalized
-    let radiusX = scale * baseRadiusX
-    let radiusY = scale * baseRadiusY
     return MetalShapeInstance(
-      origin: SIMD2(Float(centerX - radiusX), Float(y - radiusY)),
-      size: SIMD2(Float(2 * radiusX), Float(2 * radiusY)),
-      colorValue: Float(normalized),
+      value: Float(value), colorValue: Float(normalized),
       colorMarker: MetalShapeColor.markerKind(forIndex: index, in: markers)
     )
   }

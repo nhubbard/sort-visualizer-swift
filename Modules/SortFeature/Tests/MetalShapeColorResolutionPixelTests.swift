@@ -25,9 +25,13 @@ struct MetalShapeColorResolutionPixelTests {
       values: [10], valueRange: 0...10, markers: [:], canvasSize: CGSize(width: width, height: height),
       scale: 1)
 
-    let instance = try #require(renderer.debugInstances().first)
-    let centerX = Int((instance.origin.to.x + instance.size.to.x / 2).rounded())
-    let centerY = Int((instance.origin.to.y + instance.size.to.y / 2).rounded())
+    // `resolvedInstances(at:)`, not raw `debugInstances()` — geometry is derived from the raw
+    // value now (`resolveShapeGeometry`), not stored directly in the buffer; see
+    // `MetalShapeRenderer.ResolvedShapeInstance`'s own doc comment. `at: 0` is safe here for the
+    // same reason it always was: fresh off `reset()`, every field's `from == to`.
+    let instance = try #require(renderer.resolvedInstances(at: 0).first)
+    let centerX = Int((instance.origin.x + instance.size.x / 2).rounded())
+    let centerY = Int((instance.origin.y + instance.size.y / 2).rounded())
 
     let pixel = try render(renderer, device: device, width: width, height: height, x: centerX, y: centerY)
     let neutral = MetalShapeColor.neutral
@@ -52,10 +56,11 @@ struct MetalShapeColorResolutionPixelTests {
       values: [10], valueRange: 0...10, markers: [:], canvasSize: CGSize(width: width, height: height),
       scale: 1)
 
-    let instance = try #require(renderer.debugInstances().first)
+    // See the scatter-plot test's own comment on `resolvedInstances(at:)` vs. raw `debugInstances()`.
+    let instance = try #require(renderer.resolvedInstances(at: 0).first)
     // `RainbowMetalLayout` is a `.rect` (bar) shape spanning the full canvas width and (at the max
     // value) the full height — sample well inside it rather than at its exact origin corner.
-    let sampleX = Int((instance.origin.to.x + instance.size.to.x / 2).rounded())
+    let sampleX = Int((instance.origin.x + instance.size.x / 2).rounded())
     let sampleY = height / 2
 
     let pixel = try render(

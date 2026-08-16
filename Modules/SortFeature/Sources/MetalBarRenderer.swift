@@ -15,9 +15,16 @@ import SortEngineKit
 /// internally to match.
 @MainActor
 final class MetalBarRenderer: NSObject, MetalIncrementalRenderer {
+  /// `value` is the bar's raw underlying value (eased, not a precomputed screen position) —
+  /// `bar_vertex` derives `barWidth`/`height`/`origin`/`size` itself from this plus
+  /// `MetalAnimationUniforms`'s `arrayCount`/`valueRangeLowerBound`/`valueRangeSpan`, the same
+  /// formula `writeBar` used to compute on the CPU once per touched index per operation. First of
+  /// this app's per-operation geometry-layout formulas moved fully onto the GPU — see
+  /// `general_renderer_optimization_and_gpu_offload_scope`'s scoping notes for why Bar (no trig,
+  /// position depends only on its own index/value, no cross-slot dependency) was chosen as the
+  /// proof of concept ahead of the other 14 visualizer layouts.
   struct BarInstance {
-    var origin: AnimatedFloat2
-    var size: AnimatedFloat2
+    var value: AnimatedFloat
     var color: AnimatedMarkerColor
   }
 
@@ -28,13 +35,16 @@ final class MetalBarRenderer: NSObject, MetalIncrementalRenderer {
   private var count = 0
   private var lastCanvasSize: CGSize = .zero
   private var lastScale: CGFloat = 1
+  /// Persisted so `encodeDraw` can fill `MetalAnimationUniforms.valueRangeLowerBound`/`.valueRangeSpan`
+  /// at DRAW time — now that geometry is resolved in the shader (not precomputed per-write on the
+  /// CPU), `valueRange` has to survive from `reset`/`apply` until the next actual draw call.
+  private var lastValueRange: ClosedRange<Int> = 0...0
   /// Pixel-space canvas size — `lastCanvasSize (points) * lastScale`, recomputed on every
   /// `reset`. All bar geometry and the shader's viewport uniform work in this space directly.
   private var pixelSize: CGSize = .zero
 
   private let colorTransitions = MetalMarkerColorTracker()
-  private let originTransitions = MetalPositionTransitionTracker()
-  private let sizeTransitions = MetalPositionTransitionTracker()
+  private let valueTransitions = MetalScalarTransitionTracker()
   /// Session-relative clock, reset alongside every tracker in `reset()` — see `now()`'s own doc
   /// comment for why this isn't raw `CACurrentMediaTime()`.
   private var timeEpoch: CFTimeInterval = CACurrentMediaTime()
@@ -101,13 +111,13 @@ final class MetalBarRenderer: NSObject, MetalIncrementalRenderer {
   ) {
     lastCanvasSize = canvasSize
     lastScale = scale
+    lastValueRange = valueRange
     pixelSize = CGSize(width: canvasSize.width * scale, height: canvasSize.height * scale)
     count = values.count
     // A fresh full repaint (new run, resize, scrub) is a one-time state reset, not the
     // rapid-flashing case these trackers exist to smooth — start them clean too.
     colorTransitions.reset()
-    originTransitions.reset()
-    sizeTransitions.reset()
+    valueTransitions.reset()
     timeEpoch = CACurrentMediaTime()
 
     guard count > 0, pixelSize.width > 0, pixelSize.height > 0 else {
@@ -133,6 +143,7 @@ final class MetalBarRenderer: NSObject, MetalIncrementalRenderer {
     markers: [Int: Set<Int>]
   ) {
     guard instanceBuffer != nil, values.count == count else { return }
+    lastValueRange = valueRange
 
     guard let touched = operation.touchedIndices else {
       // `.unmark`/`.unmarkAll` — could affect any index; only a full repaint is correct.
@@ -151,27 +162,20 @@ final class MetalBarRenderer: NSObject, MetalIncrementalRenderer {
     }
   }
 
+  /// Only eases the bar's raw underlying VALUE now — `bar_vertex` (`BarRenderer.metal`) derives
+  /// `barWidth`/`normalizedHeight`/`height`/`origin`/`size` itself from that value plus
+  /// `MetalAnimationUniforms`'s `arrayCount`/`valueRangeLowerBound`/`valueRangeSpan`
+  /// (`encodeDraw` fills those from `count`/`lastValueRange`), the exact formula this method used
+  /// to compute on the CPU. Bars anchored at the bottom in a top-left-origin, +Y-down point space
+  /// — see `BarRenderer.metal`'s own comment for how that maps to Metal's +Y-up NDC.
   private func writeBar(
     index: Int, values: [Int], valueRange: ClosedRange<Int>, markers: [Int: Set<Int>]
   ) {
     guard let instanceBuffer, count > 0 else { return }
-    let barWidth = Float(pixelSize.width / Double(count))
-    let spanLength = Double(valueRange.upperBound - valueRange.lowerBound)
-    let normalizedHeight =
-      spanLength > 0
-      ? Double(values[index] - valueRange.lowerBound) / spanLength
-      : 1.0
-    let height = Float(pixelSize.height * normalizedHeight)
-    // Top-left origin, bars anchored at the bottom — matches `BarGraphVisualizer` exactly
-    // (see `BarRenderer.metal`'s vertex shader for how this point space maps to Metal's own
-    // +Y-up NDC).
-    let originY = Float(pixelSize.height) - height
     let n = now()
 
     let bar = BarInstance(
-      origin: originTransitions.valueToWrite(
-        forSlot: index, target: SIMD2(Float(index) * barWidth, originY), now: n),
-      size: sizeTransitions.valueToWrite(forSlot: index, target: SIMD2(barWidth, height), now: n),
+      value: valueTransitions.valueToWrite(forSlot: index, target: Float(values[index]), now: n),
       color: colorTransitions.valueToWrite(
         forSlot: index, marker: MetalShapeColor.markerKind(forIndex: index, in: markers), now: n)
     )
@@ -216,8 +220,7 @@ final class MetalBarRenderer: NSObject, MetalIncrementalRenderer {
       // frame commits on the main thread and visibly slowing unrelated UI animations. Return to
       // paused once everything settles.
       let n = now()
-      if colorTransitions.isActive(now: n) || originTransitions.isActive(now: n)
-        || sizeTransitions.isActive(now: n) {
+      if colorTransitions.isActive(now: n) || valueTransitions.isActive(now: n) {
         if view.isPaused { view.isPaused = false }
       } else if !view.isPaused {
         view.isPaused = true
@@ -256,8 +259,11 @@ final class MetalBarRenderer: NSObject, MetalIncrementalRenderer {
       viewportSize: SIMD2(Float(pixelSize.width), Float(pixelSize.height)),
       currentTime: currentTime, transitionDuration: Float(transitionDuration), useHueRamp: 0,
       primaryColor: Self.primaryColor, secondaryColor: Self.secondaryColor,
-      neutralColor: Self.defaultColor)
-    encoder.setVertexBytes(&uniforms, length: MemoryLayout<MetalAnimationUniforms>.size, index: 1)
+      neutralColor: Self.defaultColor, arrayCount: Float(count),
+      valueRangeLowerBound: Float(lastValueRange.lowerBound),
+      valueRangeSpan: Float(lastValueRange.upperBound - lastValueRange.lowerBound),
+      scale: Float(lastScale), geometryKind: -1)
+    encoder.setVertexBytes(&uniforms, length: MemoryLayout<MetalAnimationUniforms>.stride, index: 1)
     encoder.drawPrimitives(
       type: .triangleStrip, vertexStart: 0, vertexCount: 4, instanceCount: count)
     encoder.endEncoding()
