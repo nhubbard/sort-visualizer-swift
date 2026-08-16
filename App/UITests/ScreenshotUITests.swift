@@ -34,7 +34,11 @@ final class ScreenshotUITests: XCTestCase {
     snapshot("02SortInProgress")
 
     app.buttons["showcaseButton"].tap()
-    app.buttons["showcaseConfirmButton"].tap()
+    // `.matching(identifier:).firstMatch`, not a plain subscript lookup — see
+    // `SettingsUITests`' identical rationale: a `Button` with a custom `.accessibilityIdentifier`
+    // inside a `.confirmationDialog` action closure gets wrapped in an extra accessibility
+    // container, and the identifier lands on both the wrapper and the real inner button.
+    app.buttons.matching(identifier: "showcaseConfirmButton").firstMatch.tap()
     XCTAssertTrue(
       app.staticTexts["showcaseProgressLabel"].waitForExistence(timeout: 5),
       "showcase never appeared")

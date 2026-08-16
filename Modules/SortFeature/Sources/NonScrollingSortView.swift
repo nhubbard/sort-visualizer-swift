@@ -58,6 +58,14 @@ public struct NonScrollingSortView: View {
     SortView(session: session, showcaseStop: showcaseStop)
       .frame(maxWidth: .infinity, maxHeight: .infinity)
       .navigationTitle(algorithm.metadata.displayName)
+      // See `ScrollingSortView`'s identical modifiers / `runSortViewLifecycle`'s doc comment —
+      // tied to this view's own presence, not to the task's return.
+      .onAppear {
+        SortCoordinator.shared.registerActiveSession(session, for: algorithm.id)
+      }
+      .onDisappear {
+        SortCoordinator.shared.unregisterActiveSession(for: algorithm.id)
+      }
       .task {
         await runSortViewLifecycle(
           session: session, algorithm: algorithm, arraySize: arraySize,

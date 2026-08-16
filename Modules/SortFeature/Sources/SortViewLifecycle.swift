@@ -7,17 +7,21 @@ import SettingsKit
 /// once `NonScrollingSortView` needed the identical logic, rather than risking the two drifting
 /// apart from independent hand-copies.
 ///
-/// Registered/unregistered around the whole branch below (not just the intent one) —
-/// `SortCoordinator`'s live-session hooks (`StopIntent`, `SetPlaybackSpeedIntent`, ...) are meant
-/// to reach whichever sort is genuinely on screen, manually-started or not.
+/// Does NOT register with `SortCoordinator` itself — see both views' own `.onAppear`/
+/// `.onDisappear` for why that has to be tied to the view's actual presence on screen, not to
+/// this function's own return (a real, shipped bug: registering here and unregistering via
+/// `defer` meant a plain manual start's registration vanished the instant `session.start(size:)`
+/// returned — i.e., the moment the initial sort finished animating — even though the completed,
+/// fully-interactive session stayed on screen for as long as the user kept looking at it. Every
+/// scene-level `SortCommands` shortcut gated on `SortCoordinator.shared.activeSortSession` (all
+/// but "Settings…"/"Cycle Visualizer") went permanently `.disabled` the moment ANY sort finished,
+/// confirmed live: Settings/Cycle Visualizer kept working, every other shortcut and its equivalent
+/// menu-bar item went inert).
 @MainActor
 func runSortViewLifecycle(
   session: SortSession, algorithm: any SortAlgorithm, arraySize: Int,
   showcaseCompletion: (() -> Void)?, settings: AppSettings
 ) async {
-  SortCoordinator.shared.registerActiveSession(session, for: algorithm.id)
-  defer { SortCoordinator.shared.unregisterActiveSession(for: algorithm.id) }
-
   if let showcaseCompletion {
     await session.runShowcasePass()
     // Lets `RunControlBar`'s final stat values (compares/swaps/elapsed time) finish their

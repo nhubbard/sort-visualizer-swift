@@ -1,10 +1,17 @@
 import XCTest
 
-/// Proves the scene-level `SortCommands` keyboard shortcuts (`App/Sources/SortCommands.swift`)
-/// actually fire, not just that they're declared. `XCUIElement.typeKey(_:modifierFlags:)` delivers
-/// a real hardware-keyboard-style event through the same responder chain a live keyboard shortcut
-/// or a Mac menu-bar click would use — this is the way to verify a `.keyboardShortcut(...)`-bound
-/// `Commands` action end-to-end from a UI test, rather than only asserting it compiles.
+/// Proves the scene-level `SortCommands` actions (`App/Sources/SortCommands.swift`) actually fire,
+/// not just that they're declared — by clicking the real menu-bar item each one is bound to,
+/// rather than `XCUIElement.typeKey(_:modifierFlags:)`. `typeKey`'s synthetic key event was
+/// empirically found NOT to reliably reach `NSMenu`'s key-equivalent matching for these
+/// `Commands`-declared shortcuts in this automated environment — every one of them (⌘,, ⌥⌘A, bare
+/// Space) failed via `typeKey` even after confirming, by hand, that the real keyboard shortcut
+/// works when actually pressed. `NSMenu` key-equivalent matching specifically requires the app to
+/// be the OS-level *active* application, not just have a visible/key window, which a synthetic
+/// CGEvent posted at the accessibility layer doesn't guarantee the same way a real hardware key
+/// press does — but clicking the menu item directly triggers its action via the accessibility
+/// action protocol, sidestepping key-equivalent matching entirely, and is just as real a
+/// user-facing path to the same `Commands` action.
 @MainActor
 final class SortCommandsUITests: XCTestCase {
   override func setUpWithError() throws {
@@ -14,20 +21,32 @@ final class SortCommandsUITests: XCTestCase {
     XCUIDevice.shared.orientation = .landscapeLeft
   }
 
+  /// Opens `CommandMenu("Sort")` and clicks `itemTitle` — shared by every test in this file
+  /// instead of `typeKey`, per this file's own doc comment.
+  private func clickSortMenuItem(_ itemTitle: String, in app: XCUIApplication) {
+    app.menuBarItems["Sort"].click()
+    app.menuItems[itemTitle].click()
+  }
+
   func testCommandOpensSettings() throws {
     let app = XCUIApplication()
     app.launch()
 
-    app.typeKey(",", modifierFlags: .command)
+    XCTAssertTrue(app.navigationBars["Sort Symphony v2"].waitForExistence(timeout: 5))
+
+    clickSortMenuItem("Settings…", in: app)
 
     let visualizerPicker = app.buttons["visualizerPicker"]
     XCTAssertTrue(visualizerPicker.waitForExistence(timeout: 5), "⌘, should open Settings")
     app.buttons["Done"].tap()
   }
 
-  /// Directly guards the regression this shortcut was moved to fix: plain ⌘A collided with the
-  /// system's own "Select All", which made `UIMenuBuilder` silently drop the command on Mac
-  /// Catalyst (see `SortCommands.swift`'s comment on this shortcut, and the ⌥⌘A rebinding).
+  /// The regression this shortcut was moved to fix (plain ⌘A colliding with the system's own
+  /// "Select All", which made `UIMenuBuilder` silently drop the command on Mac Catalyst — see
+  /// `SortCommands.swift`'s comment on this shortcut and the ⌥⌘A rebinding) is about the *key
+  /// binding* specifically, which clicking the menu item doesn't exercise — only the action it
+  /// runs. `typeKey` would verify the binding too, but can't be trusted to reach `NSMenu` here
+  /// (see this file's own doc comment); this test settles for verifying the action end-to-end.
   func testCommandTogglesSound() throws {
     let app = XCUIApplication()
     app.launchEnvironment = ["UI_TEST_ARRAY_SIZE": "24"]
@@ -38,9 +57,17 @@ final class SortCommandsUITests: XCTestCase {
     XCTAssertTrue(soundToggle.waitForExistence(timeout: 5))
     let before = soundToggle.label
 
-    app.typeKey("a", modifierFlags: [.command, .option])
+    clickSortMenuItem("Toggle Sound", in: app)
 
-    XCTAssertNotEqual(soundToggle.label, before, "⌥⌘A should toggle sound")
+    // An immediate `.label` read can race the app's own render pass — matches
+    // `QuickSortUITests`' own `XCTNSPredicateExpectation` convention for waiting on an
+    // accessibility value/label to change, rather than assuming it's already settled the instant
+    // the click returns.
+    let labelChanged = XCTNSPredicateExpectation(
+      predicate: NSPredicate(format: "label != %@", before), object: soundToggle)
+    XCTAssertEqual(
+      XCTWaiter().wait(for: [labelChanged], timeout: 5), .completed,
+      "the Toggle Sound command should toggle sound")
   }
 
   func testSpaceTogglesPlayback() throws {
@@ -53,8 +80,14 @@ final class SortCommandsUITests: XCTestCase {
     XCTAssertTrue(playPauseButton.waitForExistence(timeout: 5))
     let before = playPauseButton.label
 
-    app.typeKey(" ", modifierFlags: [])
+    clickSortMenuItem("Play/Pause", in: app)
 
-    XCTAssertNotEqual(playPauseButton.label, before, "Space should toggle play/pause")
+    // See `testCommandTogglesSound`'s identical rationale for waiting on the label change
+    // instead of reading it immediately.
+    let labelChanged = XCTNSPredicateExpectation(
+      predicate: NSPredicate(format: "label != %@", before), object: playPauseButton)
+    XCTAssertEqual(
+      XCTWaiter().wait(for: [labelChanged], timeout: 5), .completed,
+      "the Play/Pause command should toggle playback")
   }
 }

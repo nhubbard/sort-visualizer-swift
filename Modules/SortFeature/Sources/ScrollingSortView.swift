@@ -85,6 +85,16 @@ public struct ScrollingSortView: View {
       }
     }
     .navigationTitle(algorithm.metadata.displayName)
+    // Tied to this view's own presence, not to `runSortViewLifecycle`'s return — that function
+    // returns once the initial run finishes (e.g. a plain manual sort completing its animation),
+    // well before the user is done looking at the still-fully-interactive completed session. See
+    // `runSortViewLifecycle`'s own doc comment for the real, shipped bug this fixes.
+    .onAppear {
+      SortCoordinator.shared.registerActiveSession(session, for: algorithm.id)
+    }
+    .onDisappear {
+      SortCoordinator.shared.unregisterActiveSession(for: algorithm.id)
+    }
     .task {
       await runSortViewLifecycle(
         session: session, algorithm: algorithm, arraySize: arraySize,

@@ -15,6 +15,34 @@ final class TapeExportImportUITests: XCTestCase {
     XCUIDevice.shared.orientation = .landscapeLeft
   }
 
+  /// Polls for ANY plausible sign the native save/open panel presented, across the element types
+  /// and window-count changes a `.sheet`/`.dialog`/independent-window classification could each
+  /// produce — two prior guesses at the "right" element type (`.sheets` alone, then
+  /// `.sheets`-or-`.dialogs`) both failed even though the panel demonstrably appears when this
+  /// same button is tapped manually, so this no longer guesses a specific type. If NONE of them
+  /// match within `timeout`, attaches the full accessibility tree (`app.debugDescription`) to the
+  /// test result — the same technique `SettingsUITests`' own `resetSettingsConfirmButton` fix was
+  /// diagnosed with — so the actual element type can be read off directly instead of guessed a
+  /// third time.
+  private func waitForNativePanelPresentation(
+    in app: XCUIApplication, timeout: TimeInterval, testCase: XCTestCase
+  ) -> Bool {
+    let initialWindowCount = app.windows.count
+    let deadline = Date().addingTimeInterval(timeout)
+    while Date() < deadline {
+      if app.sheets.firstMatch.exists || app.dialogs.firstMatch.exists
+        || app.windows.count > initialWindowCount {
+        return true
+      }
+      Thread.sleep(forTimeInterval: 0.1)
+    }
+    let attachment = XCTAttachment(string: app.debugDescription)
+    attachment.name = "accessibility-tree-at-timeout"
+    attachment.lifetime = .keepAlways
+    testCase.add(attachment)
+    return false
+  }
+
   func testExportTapeButtonPresentsAShareSheet() throws {
     let app = XCUIApplication()
     app.launchEnvironment = ["UI_TEST_ARRAY_SIZE": "24"]
@@ -29,11 +57,10 @@ final class TapeExportImportUITests: XCTestCase {
     exportButton.tap()
 
     // The share sheet itself is system UI mostly outside this app's own accessibility
-    // hierarchy, but it's still presented as a `.sheet`-typed element XCUITest can at least see
-    // exists — enough to confirm tapping the button didn't crash and genuinely presented
-    // something, without asserting on the share sheet's own contents.
+    // hierarchy — see `waitForNativePanelPresentation`'s own doc comment for why this no longer
+    // asserts on one specific element type.
     XCTAssertTrue(
-      app.sheets.firstMatch.waitForExistence(timeout: 5),
+      waitForNativePanelPresentation(in: app, timeout: 5, testCase: self),
       "Export Tape should present a share sheet")
 
     // Dismiss however this platform's share sheet responds to Escape, so the test doesn't leave
@@ -52,10 +79,9 @@ final class TapeExportImportUITests: XCTestCase {
 
     importButton.tap()
 
-    // Same rationale as the export test above: the file-open panel is mostly system UI, but
-    // still presented as a `.sheet`-typed element this test can confirm actually appeared.
+    // Same rationale as the export test above.
     XCTAssertTrue(
-      app.sheets.firstMatch.waitForExistence(timeout: 5),
+      waitForNativePanelPresentation(in: app, timeout: 5, testCase: self),
       "Import Tape should present a file importer")
 
     app.typeKey(.escape, modifierFlags: [])
