@@ -24,9 +24,16 @@ public struct HanoiTowersVisualizer: Visualizer {
 
   /// Towers scale gently with array size — few enough that each tower holds a visually
   /// legible stack, many enough that a large array doesn't pile hundreds of blocks into 3 towers.
+  /// Capped at 16, not 8 — kept in sync with `MetalHanoiTowersRenderer.towerCount(for:)`'s own
+  /// identical formula (this type's `draw(_:)` isn't on the live rendering path anymore — Metal
+  /// renderers handle that exclusively — but the two must still agree, same convention every
+  /// other `Visualizer`/`Metal*Layout` pair in this codebase follows). See that renderer's doc
+  /// comment for why 8 was too low: a real trace found the obstacle-lifting choreography's
+  /// worst-case per-swap cost scales as roughly O(count / towerCount), so a low, constant cap left
+  /// that unbounded well within this app's real supported array-size range.
   public static func towerCount(for count: Int) -> Int {
     guard count > 0 else { return 1 }
-    return max(3, min(8, Int(Double(count).squareRoot().rounded())))
+    return max(3, min(16, Int(Double(count).squareRoot().rounded())))
   }
 
   /// Index assignment is monotonic in `index` (tower boundaries only ever move forward as

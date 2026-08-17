@@ -22,6 +22,11 @@ enum MetalShapeColor {
   /// hue-ramp-capable renderers) instead of a resolved `SIMD4<Float>` color, since color
   /// resolution moved into the vertex shader.
   static func markerKind(forIndex index: Int, in markers: [Int: Set<Int>]) -> Int32 {
+    // `isEmpty` is a plain property read, no hashing — skips the Dictionary subscript's hash +
+    // bucket probe entirely for the common case (most operations mark nothing at all, or mark far
+    // fewer indices than a renderer repaints per operation — e.g. Hanoi's obstacle writes, which a
+    // real trace found spending real main-thread time in exactly this lookup).
+    guard !markers.isEmpty else { return 0 }
     let indexMarkers = markers[index] ?? []
     if indexMarkers.contains(Marker.primary) { return Int32(Marker.primary) }
     if indexMarkers.contains(Marker.secondary) { return Int32(Marker.secondary) }

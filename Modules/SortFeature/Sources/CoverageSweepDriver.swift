@@ -100,6 +100,15 @@ public final class CoverageSweepDriver {
   private let logURL: URL
 
   private static let logger = Logger(subsystem: "com.nhubbard.Sort2.mobile", category: "CoverageSweep")
+  /// `category: "PointsOfInterest"` specifically — Instruments' Time Profiler/Metal System Trace
+  /// templates only capture os-signposts from that exact category by default (confirmed the hard
+  /// way: `ReplayEngine`'s own `TickApply`/`TickDispatch` signposts, under category
+  /// `"ReplayEngine"`, never showed up in either template's exported `os-signpost` table at all).
+  /// Brackets each combo with its full identity, so a future trace's Points of Interest track can
+  /// attribute any CPU/GPU timeline anomaly to the exact algorithm/shuffle/visualizer/size running
+  /// at that instant — the missing piece investigating a real Hanoi Towers large-array freeze.
+  private static let signposter = OSSignposter(
+    subsystem: "com.nhubbard.Sort2.mobile", category: "PointsOfInterest")
 
   public init(logURL: URL? = nil) {
     self.logURL = logURL ?? Self.defaultLogURL()
@@ -174,9 +183,14 @@ public final class CoverageSweepDriver {
       let size = algorithm.metadata.effectiveSizeRange(
         operationCap: AppSettings.shared.recordingOperationCap
       ).upperBound
+      let comboInterval = Self.signposter.beginInterval(
+        "FullSweepCombo", id: Self.signposter.makeSignpostID(),
+        "\(combo.algorithmID.rawValue) \(combo.shuffleID.rawValue) \(combo.visualizerID.rawValue) n=\(size)"
+      )
       await SortCoordinator.shared.runSort(
         algorithm: algorithm, visualizerID: combo.visualizerID, shuffleID: combo.shuffleID,
         size: size)
+      Self.signposter.endInterval("FullSweepCombo", comboInterval)
 
       Self.appendToLog(combo, at: logURL)
       completedKeys.insert(CoverageSweepEnumerator.key(for: combo))

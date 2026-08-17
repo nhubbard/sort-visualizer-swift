@@ -45,7 +45,7 @@ struct MetalHanoiTowersRendererTests {
     guard firstOfTowerOne > 1 else { return }  // guard: only meaningful if tower 0 has >1 member
     let target = 0
     let obstacles = MetalHanoiTowersRenderer.obstacles(above: target, count: count, towerCount: towers)
-    #expect(obstacles == Array(1..<firstOfTowerOne))
+    #expect(obstacles == 1..<firstOfTowerOne)
     for obstacle in obstacles {
       #expect(
         MetalHanoiTowersRenderer.tower(forIndex: obstacle, count: count, towerCount: towers)
@@ -161,7 +161,10 @@ struct MetalHanoiTowersRendererTests {
       Issue.record("test setup: need an index with an obstacle and a different-tower partner")
       return
     }
-    let obstacle = MetalHanoiTowersRenderer.obstacles(above: i, count: 9, towerCount: towers)[0]
+    // `.lowerBound`, not `[0]` — `obstacles(above:)` returns a `Range<Int>` now, whose `Index` IS
+    // the element type itself, so `[0]` would mean "the element AT position 0" (a trap unless the
+    // range happens to start at 0), not "the first element."
+    let obstacle = MetalHanoiTowersRenderer.obstacles(above: i, count: 9, towerCount: towers).lowerBound
 
     values.swapAt(i, j)
     renderer.apply(.swap(i, j), values: values, valueRange: 1...9, markers: [:])
@@ -169,5 +172,55 @@ struct MetalHanoiTowersRendererTests {
     // See `crossTowerSwapSettlesBothSlotsBackAtTheirOwnHomeWithSwappedColors`'s own comment on
     // this sentinel probe time — comfortably past an obstacle's (longer, `legDuration * 2`) hold.
     #expect(renderer.resolvedInstances(at: 1000)[obstacle].origin == homeOrigins[obstacle])
+  }
+
+  /// Guards `maxAnimatedObstaclesPerSwap`'s own doc comment claim directly: above that many
+  /// combined obstacles, `choreographSwap` must skip `scheduleObstacle` entirely for BOTH sides
+  /// (not just cap how many animate) — verified by asserting an obstacle's raw `HanoiOrigin`
+  /// (`startTime` included) is byte-identical before and after the swap, which is only true if
+  /// `HanoiMoveScheduler.schedule` was never called for it at all. `i`/`j` themselves must still
+  /// get scheduled regardless — the swap's own animation isn't gated by this threshold, only the
+  /// obstacle-lifting dance around it.
+  @MainActor
+  @Test
+  func crossTowerSwapWithManyObstaclesSkipsTheLiftAnimationEntirely() throws {
+    let device = try #require(MTLCreateSystemDefaultDevice())
+    let renderer = try #require(MetalHanoiTowersRenderer(device: device))
+    // towerCount(for: 1200) == 16 (round(sqrt(1200)) == 35, clamped), so depth-0 members of
+    // adjacent towers each have ~74 other members as obstacles — comfortably past the 32 combined
+    // threshold, the same adversarial shape `HanoiStressHarnessTests.adversarialSwapSequence` uses.
+    let count = 1200
+    var values = Array(1...count)
+    renderer.reset(
+      values: values, valueRange: 1...count, markers: [:],
+      canvasSize: CGSize(width: 1600, height: 1200), scale: 1)
+
+    let towers = MetalHanoiTowersRenderer.towerCount(for: count)
+    let i = MetalHanoiTowersRenderer.firstIndex(ofTower: 0, count: count, towerCount: towers)
+    let j = MetalHanoiTowersRenderer.firstIndex(ofTower: 1, count: count, towerCount: towers)
+    let obstacleCount =
+      MetalHanoiTowersRenderer.obstacles(above: i, count: count, towerCount: towers).count
+      + MetalHanoiTowersRenderer.obstacles(above: j, count: count, towerCount: towers).count
+    #expect(obstacleCount > 32, "test setup: this scenario must actually exceed the threshold")
+    let obstacle = MetalHanoiTowersRenderer.obstacles(above: i, count: count, towerCount: towers)
+      .lowerBound
+
+    let beforeObstacleOrigin = renderer.debugInstances()[obstacle].origin
+    let beforeSwapOrigin = renderer.debugInstances()[i].origin
+
+    values.swapAt(i, j)
+    renderer.apply(.swap(i, j), values: values, valueRange: 1...count, markers: [:])
+
+    let afterObstacleOrigin = renderer.debugInstances()[obstacle].origin
+    let afterSwapOrigin = renderer.debugInstances()[i].origin
+    #expect(
+      afterObstacleOrigin.startTime == beforeObstacleOrigin.startTime,
+      "an obstacle past the threshold must never be scheduled at all, not just settle quickly")
+    #expect(
+      afterObstacleOrigin.leg0To == beforeObstacleOrigin.leg0To,
+      "an unscheduled obstacle's coordinate must stay exactly at its own home")
+    #expect(
+      afterSwapOrigin.startTime != beforeSwapOrigin.startTime,
+      "the swapped pair's own animation must still be scheduled regardless of obstacle count")
   }
 }

@@ -129,7 +129,7 @@ inline float2 resolveHanoiOrigin(HanoiOrigin o, float currentTime, float transit
 /// directly, and why Metal's `round()` matching Swift's `.rounded()` matters here).
 inline float hanoiTowerCount(float arrayCount) {
     float raw = round(sqrt(arrayCount));
-    return clamp(raw, 3.0, 8.0);
+    return clamp(raw, 3.0, 16.0);
 }
 
 struct HanoiGeometry {

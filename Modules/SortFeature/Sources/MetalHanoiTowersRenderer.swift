@@ -62,6 +62,20 @@ final class MetalHanoiTowersRenderer: NSObject, MetalIncrementalRenderer {
   /// a smaller value would make leg 1 visibly pop instead of continuing from leg 0's target.
   private static let legDuration: TimeInterval = 0.15
 
+  /// Above this many combined obstacles, `choreographSwap` skips the lift-to-spare-tower
+  /// animation for ALL of them, for both a performance AND a legibility reason: a real trace
+  /// found `scheduleObstacle`'s per-obstacle cost dominating large-array freezes (`obstacles(
+  /// above:)`'s count is `O(count / towerCount)` in the worst case, unbounded as `count` grows —
+  /// see `towerCount(for:)`'s own doc comment), and watching a hundred-plus tiny blocks flicker up
+  /// and back down all at once isn't a legible animation anyway, even if it were free. Safe to
+  /// skip entirely, not just cheapen: an obstacle's own resting position/color never actually
+  /// changes across the swap (only `i`/`j` do) — the lift is a purely decorative "clearing space"
+  /// flourish, so skipping it leaves every obstacle sitting exactly where it already correctly is,
+  /// not stale. 32 matches `HanoiStressHarnessTests`' own already-validated worst case (count=256,
+  /// towerCount=8 → up to 31 obstacles per swap) — the largest per-swap obstacle count this
+  /// renderer has real, measured evidence stays comfortably fast animated in full.
+  private static let maxAnimatedObstaclesPerSwap = 32
+
   init?(device: MTLDevice, sampleCount: Int = 1) {
     guard let queue = device.makeCommandQueue() else { return nil }
     guard let library = try? device.makeDefaultLibrary(bundle: Bundle(for: Self.self)) else {
@@ -99,7 +113,13 @@ final class MetalHanoiTowersRenderer: NSObject, MetalIncrementalRenderer {
 
   nonisolated static func towerCount(for count: Int) -> Int {
     guard count > 0 else { return 1 }
-    return max(3, min(8, Int(Double(count).squareRoot().rounded())))
+    // Capped at 16, not 8 — raised after a real trace found the obstacle-lifting choreography's
+    // worst-case cost scales as roughly O(count / towerCount) per cross-tower swap, so a cap this
+    // low left `maxDepth` (and thus obstacle count) growing UNBOUNDED past count≈64, causing the
+    // large-array freeze `HanoiStressHarnessTests`'s own synthetic scenario never triggered — see
+    // `MetalHanoiGeometry.swift`/`ShapeRenderer.metal`'s `hanoiTowerCount`, which MUST match this
+    // exactly (the GPU-side geometry mirror of this same formula).
+    return max(3, min(16, Int(Double(count).squareRoot().rounded())))
   }
 
   nonisolated static func tower(forIndex index: Int, count: Int, towerCount: Int) -> Int {
@@ -120,12 +140,16 @@ final class MetalHanoiTowersRenderer: NSObject, MetalIncrementalRenderer {
   }
 
   /// Every OTHER index sharing `index`'s tower and sitting above it (greater depth) — the blocks
-  /// that must be lifted out of the way before `index`'s own block can be pulled out.
-  nonisolated static func obstacles(above index: Int, count: Int, towerCount: Int) -> [Int] {
+  /// that must be lifted out of the way before `index`'s own block can be pulled out. Returns a
+  /// `Range<Int>`, not `[Int]` — a real Full Sweep trace (large arrays, worst-case cross-tower
+  /// swaps) found this Array materialization alone responsible for ~12% of all main-thread hang
+  /// time in `choreographSwap`; every real caller only ever iterates or takes `.count`, neither of
+  /// which needs a heap-allocated copy of a range that's already contiguous.
+  nonisolated static func obstacles(above index: Int, count: Int, towerCount: Int) -> Range<Int> {
     let tower = tower(forIndex: index, count: count, towerCount: towerCount)
     let nextTowerStart = tower + 1 < towerCount
       ? firstIndex(ofTower: tower + 1, count: count, towerCount: towerCount) : count
-    return Array((index + 1)..<nextTowerStart)
+    return (index + 1)..<nextTowerStart
   }
 
   /// This index's HOME (tower, depth) coordinate — an abstract descriptor now, not a pixel
@@ -220,7 +244,9 @@ final class MetalHanoiTowersRenderer: NSObject, MetalIncrementalRenderer {
   /// the two swapped blocks travel to visit each other's tower and back, settling at their own
   /// (unchanged) home position with their new color — same-tower swaps skip the obstacle dance
   /// (extracting from the middle of one stack is a fussier case, deliberately out of scope for a
-  /// first version) and just let color fade in place.
+  /// first version) and just let color fade in place. Above `maxAnimatedObstaclesPerSwap`
+  /// combined obstacles, skips the lift dance for BOTH sides entirely — see that constant's own
+  /// doc comment for why this is safe, not just cheaper.
   private func choreographSwap(
     i: Int, j: Int, values: [Int], valueRange: ClosedRange<Int>, markers: [Int: Set<Int>]
   ) {
@@ -238,19 +264,21 @@ final class MetalHanoiTowersRenderer: NSObject, MetalIncrementalRenderer {
       return
     }
 
-    let spare = spareTower(avoiding: [towerI, towerJ])
     let obstaclesI = Self.obstacles(above: i, count: count, towerCount: towerCount)
     let obstaclesJ = Self.obstacles(above: j, count: count, towerCount: towerCount)
 
-    for (rank, obstacle) in obstaclesI.enumerated() {
-      scheduleObstacle(
-        obstacle, spare: spare, rank: rank, now: n, values: values, valueRange: valueRange,
-        markers: markers)
-    }
-    for (rank, obstacle) in obstaclesJ.enumerated() {
-      scheduleObstacle(
-        obstacle, spare: spare, rank: obstaclesI.count + rank, now: n, values: values,
-        valueRange: valueRange, markers: markers)
+    if obstaclesI.count + obstaclesJ.count <= Self.maxAnimatedObstaclesPerSwap {
+      let spare = spareTower(avoiding: [towerI, towerJ])
+      for (rank, obstacle) in obstaclesI.enumerated() {
+        scheduleObstacle(
+          obstacle, spare: spare, rank: rank, now: n, values: values, valueRange: valueRange,
+          markers: markers)
+      }
+      for (rank, obstacle) in obstaclesJ.enumerated() {
+        scheduleObstacle(
+          obstacle, spare: spare, rank: obstaclesI.count + rank, now: n, values: values,
+          valueRange: valueRange, markers: markers)
+      }
     }
 
     let originI = positions.schedule(

@@ -5,16 +5,19 @@ import Foundation
 /// (test-seam only, never a per-frame production path).
 ///
 /// `MetalHanoiTowersRenderer.towerCount(for:)` is a pure function of `arrayCount` alone (`max(3,
-/// min(8, round(sqrt(count))))`), so unlike every other layout's `geometryKind`-selected formula,
+/// min(16, round(sqrt(count))))`), so unlike every other layout's `geometryKind`-selected formula,
 /// Hanoi's shader needs no per-`Layout` selector at all — it can just recompute `towerCount`/
 /// `maxDepth` itself from `uniforms.arrayCount`, the same value already threaded through for every
 /// other renderer. Metal's `round()` rounds halfway cases away from zero, matching Swift's default
 /// `.rounded()` — the two must stay in exact agreement for any array size this app actually
-/// supports (`maxArraySize` 256, verified via `MetalHanoiTowersRendererTests`'s existing
-/// tower/depth-assignment coverage, which now also exercises this indirectly).
+/// supports (up to `AlgorithmMetadata.maxReasonableArraySize`, 8192, verified via
+/// `MetalHanoiTowersRendererTests`'s existing tower/depth-assignment coverage, which now also
+/// exercises this indirectly). Capped at 16, not 8 — see `towerCount(for:)`'s own doc comment for
+/// why: below 16, `maxDepth` (and thus the obstacle-lifting choreography's worst-case per-swap
+/// cost) grows unbounded well within this app's real supported array-size range.
 func hanoiTowerCount(forArrayCount arrayCount: Float) -> Float {
   let raw = arrayCount.squareRoot().rounded()
-  return min(8, max(3, raw))
+  return min(16, max(3, raw))
 }
 
 /// Turns an abstract (tower, depth) coordinate — NOT a pixel position — into the actual on-screen
