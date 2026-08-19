@@ -27,7 +27,7 @@ import SortEngineKit
 /// return to the standard algorithm rather than a loss of fidelity. Validated in Python first
 /// (~6,600 randomized trials — duplicate-heavy, wide-range distinct, sizes 2-256 including the
 /// exact value range this engine's own test suite uses, plus adversarial inputs — zero failures)
-/// before porting to Swift; see `TEMPLATE_PORT_REFERENCE.md` §2 for the full writeup.
+/// before porting to Swift.
 ///
 /// **Stability**: every real array mutation in `shatterPartition` goes through `engine.setValue`
 /// (the bucket flatten), not `engine.swap` — so the standard swap-tape-shadow stability fuzz test

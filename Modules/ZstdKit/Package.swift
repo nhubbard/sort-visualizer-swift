@@ -8,7 +8,7 @@ import PackageDescription
 /// `Tuist/Package.swift` is Tuist's own dependency manifest). Platform minimums here are
 /// deliberately broad — well below what anything in this module actually needs (`SIMD16<UInt8>`
 /// has shipped since Swift 5.0) — since a package meant for *other* projects shouldn't inherit
-/// this app's own iOS-18-specific floor. See `COMPRESSION_DESIGN.md`.
+/// this app's own iOS-18-specific floor. See Documentation/docs/reference/compression.md.
 let package = Package(
   name: "ZstdKit",
   platforms: [

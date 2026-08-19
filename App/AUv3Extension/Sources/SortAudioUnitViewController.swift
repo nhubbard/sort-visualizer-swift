@@ -13,7 +13,7 @@ import UIKit
 /// would register the component but silently time out a few minutes later without ever calling
 /// `allocateRenderResources()` — this fixes that by providing a real, if minimal, view controller.
 ///
-/// Vends the remote (`AUDIO_UNIT_PLAN.md` §7's "Plug-in UI") — sort transport buttons plus
+/// Vends the remote (see Documentation/docs/architecture/audio.md's "The plug-in UI") — sort transport buttons plus
 /// audio-production-only DSP sliders — hosted via `UIHostingController` since the SwiftUI view
 /// itself lives in `SortAudioUnitParameterView.swift`. `beginRequest(with:)` needs no override —
 /// `AUViewController`'s own superclass chain already conforms to `NSExtensionRequestHandling`,

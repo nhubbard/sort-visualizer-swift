@@ -96,7 +96,7 @@ struct SortAudioUnitTests {
     #expect(!renderIsSilent(unit, format: format))
   }
 
-  /// The remote's "Tone" section (`AUDIO_UNIT_PLAN.md` §7) needs exactly these 6
+  /// The remote's "Tone" section (Documentation/docs/architecture/audio.md) needs exactly these 6
   /// audio-production-only controls, with correct ranges and defaults matching the DSP's own
   /// hardcoded init values.
   @Test

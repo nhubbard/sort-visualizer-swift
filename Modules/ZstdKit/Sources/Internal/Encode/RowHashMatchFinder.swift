@@ -7,7 +7,7 @@
 /// line; this design (Swift's `SIMD16<UInt8>` `.==` compare + `.replacing(where:)` select, which
 /// the compiler genuinely lowers to vector instructions on both arm64/NEON and x86_64/SSE) captures
 /// the same underlying idea — broadcast-compare a hash tag against many candidates in one op — with
-/// an original layout. See `COMPRESSION_DESIGN.md`.
+/// an original layout. See Documentation/docs/reference/compression.md.
 final class RowHashMatchFinder: MatchFinding {
   private static let rowWidth = 16
 

@@ -1228,8 +1228,8 @@ struct NativeAlgorithmCorrectnessTests {
   }
 
   /// `FunSort`'s literal ArrayV port left ~87% of randomized duplicate-heavy trials genuinely
-  /// unsorted (see `FunSort.swift`'s doc comment and `PORT_INVENTORY.md`'s decision-required
-  /// note) — a defect severe enough, and specific enough to this exact failure mode, to warrant
+  /// unsorted (see `FunSort.swift`'s doc comment and Documentation/docs/architecture/content.md's
+  /// note on it) — a defect severe enough, and specific enough to this exact failure mode, to warrant
   /// running far more randomized duplicate-heavy trials than the generic suite above, across every
   /// size in its own `sizeRange` rather than just the lower bound, matching the scrutiny
   /// `heapVariantBatchDuplicateHeavyFuzz` already applies to its own previously-buggy algorithm.
@@ -1665,7 +1665,7 @@ struct NativeAlgorithmCorrectnessTests {
   // with a parallel original-index array threaded through every swap AND write (2,000 randomized
   // duplicate-heavy trials each, zero wrong results, zero instability), matching the
   // `StableQuickSort`/`ShatterSortingTemplate` precedent for algorithms this engine's tape can't
-  // fully observe. `PORT_INVENTORY.md`'s entries for both algorithms record this verification.
+  // fully observe. Documentation/docs/reference/port-status.md records this verification for both algorithms.
 
   /// `IndexSort` is deliberately NOT in `Self.algorithms` above: it only works when the input is
   /// already a permutation of `min...(min + n - 1)` (it swaps a value directly into the array

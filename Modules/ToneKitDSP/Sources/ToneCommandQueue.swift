@@ -1,7 +1,7 @@
 import Synchronization
 
 /// Bounded single-producer/single-consumer lock-free command queue — the "realtime boundary" from
-/// `AUDIO_UNIT_PLAN.md` §5: `push` is called from the non-realtime control side, `pop` is called
+/// Documentation/docs/architecture/audio.md: `push` is called from the non-realtime control side, `pop` is called
 /// only from the realtime render thread. Neither ever blocks, takes a lock, or allocates after
 /// `init`; correctness depends entirely on there being exactly one producer and exactly one
 /// consumer, which callers must enforce — this type does nothing to detect or prevent a second

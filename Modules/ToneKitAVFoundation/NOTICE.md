@@ -5,7 +5,7 @@
 
 This module is a Phase 1 split of what was previously `ToneKit` (see that module's own history) into
 an `AVFoundation`-coupled adapter (this module) and a host-independent DSP core (`ToneKitDSP`) — see
-`AUDIO_UNIT_PLAN.md` §3 for why. `ToneVoice`, which wires `ToneKitDSP`'s `ToneRenderer` into an
+Documentation/docs/architecture/audio.md for why. `ToneVoice`, which wires `ToneKitDSP`'s `ToneRenderer` into an
 `AVAudioSourceNode`, is new to this split and not modeled on any AudioKit type. (An earlier version
 of this module also carried a `Gated` protocol modeled on AudioKitEX, for `ToneVoice`'s own
 `openGate()`/`closeGate()` API — removed in Phase 2 once `SortAudioCore.LocalToneEventSink` took over

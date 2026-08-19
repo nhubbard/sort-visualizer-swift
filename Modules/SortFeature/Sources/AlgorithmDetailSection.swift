@@ -6,7 +6,7 @@ import SettingsKit
 import SwiftUI
 import UIKit
 
-/// The `AlgorithmDetailSection(entry:)` §4.2 of ARCHITECTURE_V2.md describes as sitting below the
+/// The `AlgorithmDetailSection(entry:)` Documentation/docs/architecture/features.md describes as sitting below the
 /// live sort — description + complexity (rendered via `MathView`, derived from
 /// `AlgorithmMetadata` directly so all 20 algorithms have it, not just the ones with legacy
 /// content) + a language-picker code sample, when `AlgorithmDetailContent` has any.

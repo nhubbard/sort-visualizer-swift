@@ -59,7 +59,7 @@ private enum LegacyLoader {
   }
 }
 
-/// The equivalence proof `COMPRESSION_DESIGN.md` calls for: every algorithm's content, loaded
+/// The equivalence proof Documentation/docs/reference/compression.md calls for: every algorithm's content, loaded
 /// through the archive-backed `AlgorithmDetailStore`, must be byte-for-byte identical to what the
 /// old loose-file loader reads directly off disk.
 @Suite

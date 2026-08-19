@@ -168,7 +168,7 @@ struct Sort2App: App {
     // by the time the user reaches an AlgorithmDetailSection.
     prewarmAlgorithmDetails()
 
-    // The AU-hosted remote's transport buttons (AUDIO_UNIT_PLAN.md §7) arrive here as
+    // The AU-hosted remote's transport buttons (Documentation/docs/architecture/audio.md) arrive here as
     // RemoteControlCommands over the companion-mode bridge — set once, at launch, so
     // AudioEngineKit (which can't import SortFeature; that dependency runs the other way) never
     // needs to know SortSession/SortCoordinator exist. Mirrors SortCommands.swift's menu-command

@@ -266,7 +266,7 @@ enum FSEEncodeTable {
   /// description from `ForwardBitReader.consumedBytes` — i.e. from bits *actually read* — not from
   /// a declared length this function would control. An extra trailing byte here would be silently
   /// unaccounted for by that skip, misaligning whatever comes next in the buffer (confirmed the
-  /// hard way: this cost a real debugging session, described in `COMPRESSION_DESIGN.md`). The read
+  /// hard way: this cost a real debugging session, described in Documentation/docs/reference/compression.md). The read
   /// side's own "guess wide, rewind 1 bit if narrow" trick can speculatively peek 1 bit past this
   /// description's own last real bit, but that's always safe *without* padding: both call sites
   /// hand `readNormalizedCounts` a buffer that extends well past this description's own bytes

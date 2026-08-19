@@ -155,7 +155,7 @@ struct OscillatorDSPTests {
   @Test
   func fillClampsToPreparedCapacityInsteadOfAllocating() {
     // Preparing for fewer frames than a later `fill` call requests must not resize scratch
-    // storage on the fly — the excess renders as silence instead (AUDIO_UNIT_PLAN.md §5's "no
+    // storage on the fly — the excess renders as silence instead (Documentation/docs/architecture/audio.md's "no
     // allocation on the render thread" rule, applied even to a misconfigured `prepare` call).
     var osc = OscillatorDSP(frequency: 440, amplitude: 1)
     osc.prepare(maxFrameCount: 2)

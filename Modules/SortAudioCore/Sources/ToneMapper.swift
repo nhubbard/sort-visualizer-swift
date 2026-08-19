@@ -3,8 +3,8 @@ import ToneKitDSP
 
 /// Turns a `SortToneEvent` into the `ToneCommand`s that produce it — the pitch/timing semantics
 /// that used to live directly inside `AudioEngineKit.AudioService`, extracted so both the
-/// standalone app and a future headless AU driver hear the identical mapping (AUDIO_UNIT_PLAN.md
-/// §2). Stateful (tracks the last frequency it mapped) because the retrigger-on-pitch-change rule
+/// standalone app and the AU extension's relay hear the identical mapping (see
+/// Documentation/docs/architecture/audio.md). Stateful (tracks the last frequency it mapped) because the retrigger-on-pitch-change rule
 /// below needs to compare against it — a fresh `ToneMapper` per voice, not a shared/static one.
 public struct ToneMapper: Sendable {
   private var currentFrequency: Float = 0

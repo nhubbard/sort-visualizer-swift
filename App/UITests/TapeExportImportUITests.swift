@@ -1,7 +1,7 @@
 import XCTest
 
-/// Proves the Export/Import Tape buttons (Phase 3 of `IMPLEMENTATION_PLAN.md`'s tape
-/// export/import stretch goal) are actually wired into the running app and reachable — the same
+/// Proves the Export/Import Tape buttons (see Documentation/docs/architecture/history.md for the
+/// feature's origin) are actually wired into the running app and reachable — the same
 /// "reachable and functional" bar `RunControlBarUITests` sets for the rest of the run control
 /// bar. Doesn't attempt a full save-to-disk-then-reimport round trip: the system share sheet
 /// (`ShareLink`) and file-open panel (`.fileImporter`) both live outside this app's own

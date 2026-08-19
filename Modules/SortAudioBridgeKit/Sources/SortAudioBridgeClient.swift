@@ -46,7 +46,7 @@ public final class SortAudioBridgeClient: @unchecked Sendable {
     }
   }
 
-  /// The AU-hosted remote (`AUDIO_UNIT_PLAN.md` §7) calls this from its own UI actions — fire and
+  /// The AU-hosted remote (Documentation/docs/architecture/audio.md) calls this from its own UI actions — fire and
   /// forget, a no-op if not currently connected (`connection` is `nil` on `queue` whenever
   /// disconnected), matching this whole architecture's "no connection = silently does nothing" rule.
   public func sendRemoteControlCommand(_ command: RemoteControlCommand) {

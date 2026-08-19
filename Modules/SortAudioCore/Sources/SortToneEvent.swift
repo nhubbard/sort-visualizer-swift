@@ -1,4 +1,4 @@
-/// The transport-neutral sort-audio event `AUDIO_UNIT_PLAN.md` §2/§4 describes: the values
+/// The transport-neutral sort-audio event Documentation/docs/architecture/audio.md describes: the values
 /// `AudioPlaying.play(...)` receives, now a standalone type so both the standalone app (via
 /// `LocalToneEventSink`) and the AU extension's relay hear an identical mapping.
 ///

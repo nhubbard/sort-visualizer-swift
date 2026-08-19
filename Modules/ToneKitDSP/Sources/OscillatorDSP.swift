@@ -34,7 +34,7 @@ import Foundation
 /// A single sine voice's DSP state, owned exclusively by whichever `ToneRenderer` holds it — a
 /// plain value type rather than today's `ToneKit.Oscillator`'s `Mutex`-guarded class, because
 /// there's exactly one mutable reference to it once wired into a `ToneRenderer` (see
-/// `AUDIO_UNIT_PLAN.md` §5): frequency/amplitude changes cross from the control side to the render
+/// Documentation/docs/architecture/audio.md): frequency/amplitude changes cross from the control side to the render
 /// thread as `ToneCommand`s through `ToneRenderer`'s queue, not by another thread poking this
 /// struct's properties directly, so no internal synchronization is needed here at all.
 public struct OscillatorDSP: Sendable {
@@ -61,7 +61,7 @@ public struct OscillatorDSP: Sendable {
 
   // Preallocated once by `prepare(maxFrameCount:)` rather than lazily resized inside `fill` —
   // today's `ToneKit.Oscillator` resizes these on first use/whenever the buffer size changes,
-  // which is a render-thread allocation `AUDIO_UNIT_PLAN.md` §5 requires eliminating for the AU
+  // which is a render-thread allocation Documentation/docs/architecture/audio.md requires eliminating for the AU
   // render path. `fill` renders into a prefix of these sized to the actual call's frame count.
   private var scratchPhases: [Double] = []
   private var scratchSines: [Double] = []

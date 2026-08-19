@@ -7,7 +7,7 @@
 
 This module is a Phase 1 split of what was previously `ToneKit` (see that module's own history) into
 a host-independent DSP core (this module) and an `AVFoundation`-coupled adapter
-(`ToneKitAVFoundation`) — see `AUDIO_UNIT_PLAN.md` §3 for why. None of the code here is copied from
+(`ToneKitAVFoundation`) — see Documentation/docs/architecture/audio.md for why. None of the code here is copied from
 SoundpipeAudioKit — its real `Oscillator`/`AmplitudeEnvelope` are thin Swift parameter bindings
 around native Soundpipe C DSP kernels reached through a custom Audio Unit host, which pulls in the
 `AudioKit`/`AudioKitEX`/`SoundpipeAudioKit`/`CSoundpipeAudioKit` package graph this module exists to

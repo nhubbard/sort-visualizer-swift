@@ -8,7 +8,7 @@
 // `ZstdKit` itself: this bundles *ZstdKit's own test fixtures*, so depending on ZstdKit to unpack
 // them would be circular — a compressor bug could make the suite that's supposed to catch it lie
 // about passing instead. `.zlib` here is raw DEFLATE (RFC 1951), not RFC 1950 zlib-wrapped --
-// confirmed via Apple DTS, see `COMPRESSION_DESIGN.md`'s "Contingency" section. The runtime test
+// confirmed via Apple DTS, see Documentation/docs/reference/compression.md's contingency-plan section. The runtime test
 // helper (`Tests/FixtureArchive.swift`) uses the exact same API, so the two sides are guaranteed
 // bit-compatible.
 //

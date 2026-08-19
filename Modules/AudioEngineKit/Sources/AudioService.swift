@@ -49,9 +49,10 @@ public enum BridgeConnectionStatus: Sendable, Equatable {
 /// Synthesizer.swift`'s graph (`Oscillator` → `AmplitudeEnvelope` → `Fader` → `AudioEngine`,
 /// originally AudioKit-backed) with the same shape minus `Fader` — it was never touched past its
 /// default gain of 1, a pure passthrough, so `voice` connects directly to `engine.output` — and
-/// minus the parts that no longer apply in v2's tape-based model (§3.1 of ARCHITECTURE_V2.md).
+/// minus the parts that no longer apply in this app's tape-based model (see
+/// Documentation/docs/architecture/overview.md).
 ///
-/// As of Phase 2 (AUDIO_UNIT_PLAN.md §2), the pitch mapping, gate-retrigger, and deferred-gate-
+/// The pitch mapping, gate-retrigger, and deferred-gate-
 /// close logic that used to live directly in `play()` lives in `SortAudioCore.LocalToneEventSink`
 /// instead, shared with the AU extension's own relay so both hear identical sort-to-tone
 /// semantics. `AudioService` is left with the pieces genuinely specific to being the *standalone
@@ -59,14 +60,14 @@ public enum BridgeConnectionStatus: Sendable, Equatable {
 /// per call, and — Mac Catalyst only — routing between local playback and the companion-mode
 /// bridge.
 ///
-/// Companion mode (AUDIO_UNIT_PLAN.md's corrected architecture): on Mac Catalyst, this class also
+/// Companion mode (see Documentation/docs/architecture/audio.md): on Mac Catalyst, this class also
 /// owns the bridge's `SortAudioBridgeServer`. Whenever an AU extension instance is connected
 /// (loaded on a Logic Pro track, say), `play()` broadcasts to the bridge *instead of* playing
 /// locally — never both at once, matching "sends... to the Audio Unit instead of running it
 /// through our simple integrated ADSR envelope DSP" exactly. With nothing connected, playback is
 /// unchanged from before the bridge existed. iPad builds never link `SortAudioBridgeKit` at all
 /// (`.when([.catalyst])` in Project.swift) — the bridge simply doesn't exist there, by permanent
-/// design (see AUDIO_UNIT_PLAN.md's platform-scope rationale).
+/// design (see Documentation/docs/architecture/audio.md's platform-scope rationale).
 @Observable
 @MainActor
 public final class AudioService: AudioPlaying {
@@ -80,7 +81,7 @@ public final class AudioService: AudioPlaying {
   private let sink: LocalToneEventSink
   private let settings: AppSettings
   private var isStarted = false
-  /// Fires when the AU-hosted remote (`AUDIO_UNIT_PLAN.md` §7) sends a sort-transport command —
+  /// Fires when the AU-hosted remote (Documentation/docs/architecture/audio.md) sends a sort-transport command —
   /// wired to `bridgeServer.onRemoteControlCommandReceived` on Mac Catalyst. Declared unconditionally
   /// (not `#if targetEnvironment(macCatalyst)`) so app-level wiring code compiles identically on
   /// both platforms; on iPad it's simply never invoked, since no bridge exists there to receive from.

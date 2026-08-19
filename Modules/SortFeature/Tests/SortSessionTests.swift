@@ -252,7 +252,7 @@ struct SortSessionTests {
     #expect(replay.frame.allSatisfy { $0.markers.isEmpty })
   }
 
-  /// No confirmation dialog to opt out of anymore (§9 of ARCHITECTURE_V2.md — removed in favor
+  /// No confirmation dialog to opt out of anymore (see Documentation/docs/architecture/overview.md — removed in favor
   /// of ArrayV's own `unreasonableLimit` precedent) — `start(size:)` itself is responsible for
   /// keeping a caller from ever requesting a size the algorithm can't reasonably handle.
   @Test

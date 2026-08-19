@@ -8,7 +8,7 @@ import SortEngineKit
 /// search that nonetheless converges given enough repetition — then swap `i` toward the found
 /// position and search again, until `i` reaches a fixed point.
 ///
-/// **Not ported as a literal translation** — see `PORT_INVENTORY.md`'s own decision-required note
+/// **Not ported as a literal translation** — see Documentation/docs/architecture/content.md's note
 /// on this algorithm, and this doc comment's continuation below for the two real defects a literal
 /// port would carry over, fixed here instead:
 ///

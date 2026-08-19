@@ -6,8 +6,8 @@ import VisualizationKit
 /// `ColorCircleVisualizer` (`[center, previousPoint, currentPoint]` per index), but each point's
 /// distance from center is scaled by `disp`, a 0...1 "how far is this value from home" measure via
 /// a cosine wave, instead of always sitting at full radius. A sorted array's wedges all land at the
-/// same radius; a scrambled one produces a jagged, uneven ring. Despite `ARCHITECTURE_V2.md`
-/// §2A.6's claim, ArrayV's real source (`visuals/circles/DisparityCircle.java`) needs nothing but
+/// same radius; a scrambled one produces a jagged, uneven ring. Despite an earlier design draft's
+/// claim (see Documentation/docs/architecture/content.md), ArrayV's real source (`visuals/circles/DisparityCircle.java`) needs nothing but
 /// the current value and index — no `originalIndices` engine feature required.
 public struct DisparityCircleVisualizer: Visualizer {
   public let id = VisualizerID(rawValue: "disparitycircle")

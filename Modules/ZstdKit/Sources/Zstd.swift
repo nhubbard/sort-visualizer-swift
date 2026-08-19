@@ -40,7 +40,7 @@ import Foundation
 /// A from-scratch Zstandard implementation — no C/C++ interop. `AlgorithmDetails.algz` still uses
 /// the Python `zstandard`-backed pipeline (`App/Resources/AlgorithmDetails/manage.py`) as its
 /// encoder — this module's own encoder exists for tape export, not to replace that shipped
-/// pipeline. See `COMPRESSION_DESIGN.md` for the full design rationale and scope.
+/// pipeline. See Documentation/docs/reference/compression.md for the full design rationale and scope.
 public enum Zstd {
   /// Decompresses one standard Zstd frame. Concatenated frames, skippable frames, legacy formats,
   /// and magicless framing are rejected with a specific `ZstdError`, not misclassified as corrupt
@@ -55,7 +55,7 @@ public enum Zstd {
 
   /// Compresses `input` into one standard Zstd frame, decodable by both `Zstd.decompress` and a
   /// real zstd decoder. Single strategy (`greedy`), single frame, whole input in memory — see
-  /// `COMPRESSION_DESIGN.md` for the full scope and the deliberate simplifications relative to the
+  /// Documentation/docs/reference/compression.md for the full scope and the deliberate simplifications relative to the
   /// reference encoder.
   public static func compress(
     _ input: Data,

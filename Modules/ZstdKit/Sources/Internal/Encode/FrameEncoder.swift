@@ -43,7 +43,7 @@ private let zstdMagicNumber: UInt64 = 0xFD2F_B528
 ///
 /// Always writes `Single_Segment_flag = 1` (this encoder holds the whole input in memory, so the
 /// content size is always known up front) and never sets `Dictionary_ID_flag` (no dictionary
-/// support — see `COMPRESSION_DESIGN.md`), which together mean the window-descriptor byte and
+/// support — see Documentation/docs/reference/compression.md), which together mean the window-descriptor byte and
 /// dictionary-ID field are always absent, not just narrowed.
 enum FrameEncoder {
   static func encode(_ input: [UInt8], options: ZstdEncodingOptions) throws -> [UInt8] {
@@ -89,7 +89,7 @@ enum FrameEncoder {
   /// which would force a real redesign of `Tape.archived()`/`RunControlBar`'s already-shipped
   /// Export Tape button (a SwiftUI `View` body-time computed property, which cannot `await`); this
   /// delivers the identical genuine-multi-core value without that ripple (see
-  /// `COMPRESSION_DESIGN.md`). Each chunk gets its own fresh `EncodeRepeatOffsets` (mirroring real
+  /// Documentation/docs/reference/compression.md). Each chunk gets its own fresh `EncodeRepeatOffsets` (mirroring real
   /// zstd's multithreaded mode's per-job reset) and, past the first chunk, a raw-content "prefix"
   /// (the previous chunk's own tail, capped at `maximumBlockSize`) so a match can still reference
   /// across the boundary even though the cheap repeat-offset optimization can't. Results are
@@ -152,7 +152,7 @@ enum FrameEncoder {
   /// this chunk (not the whole frame), `prefix` only ever handed to the chunk's own first block
   /// (later blocks within the same chunk already have zero access to *any* of this chunk's own
   /// earlier blocks, a pre-existing limitation this phase doesn't change — see
-  /// `COMPRESSION_DESIGN.md`).
+  /// Documentation/docs/reference/compression.md).
   private static func encodeParallelChunk(
     _ chunk: [UInt8], prefix: [UInt8], isLastChunk: Bool, options: ZstdEncodingOptions
   ) -> [UInt8] {

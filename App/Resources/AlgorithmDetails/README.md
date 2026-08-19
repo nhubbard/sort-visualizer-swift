@@ -23,7 +23,7 @@ None of this folder's raw content reaches the app bundle directly. `manage.py pa
 every `description.md` and generated `<lang>.md` into one `AlgorithmDetails.algz` file, which
 `Project.swift` ships as a single ordinary resource; `AlgorithmDetailStore`
 (`Modules/SortFeature/Sources/`) decompresses and parses it at runtime — see
-`../../../COMPRESSION_DESIGN.md` for the full container format and runtime design. There's no
+`../../../Documentation/docs/reference/compression.md` for the full container format and runtime design. There's no
 per-algorithm Tuist build phase anymore: adding a new algorithm just means adding its folder here
 and re-running `highlight`/`pack`.
 
@@ -66,7 +66,7 @@ Other root-level content, none of it shipped:
     are skipped.
   - `pack [name ...] [--output PATH] [--level N] [--no-verify]` — compresses every algorithm's
     `description.md` and highlighted `<lang>.md` files into the single `AlgorithmDetails.algz`
-    archive described in `../../../COMPRESSION_DESIGN.md` (one whole-corpus zstd
+    archive described in `../../../Documentation/docs/reference/compression.md` (one whole-corpus zstd
     frame, no dictionary, versioned `ALGZ`/`ADTL` container, outer SHA-256 + zstd content
     checksum). Self-verifies by default after writing — decompresses the archive back and
     compares every extracted byte range against the source `.md` files on disk; `--no-verify`

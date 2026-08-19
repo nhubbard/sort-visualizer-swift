@@ -1,7 +1,7 @@
 /// The single owner of one voice's DSP state — one `OscillatorDSP`, one `EnvelopeDSP`, one
 /// `ToneCommandQueue` — and the one entry point every host adapter (`ToneKitAVFoundation`'s
 /// `AVAudioSourceNode` closure today; an `AUAudioUnit.internalRenderBlock` and, later, a VST3
-/// `process()` callback) calls to actually produce audio. See `AUDIO_UNIT_PLAN.md` §3/§5.
+/// `process()` callback) calls to actually produce audio. See Documentation/docs/architecture/audio.md.
 ///
 /// `render(left:right:sampleRate:)` must only ever be called from one thread at a time — the
 /// realtime render thread — and must never be called concurrently with itself. `enqueue(_:)` is the only

@@ -9,8 +9,8 @@ import SortEngineKit
 ///
 /// This is the first "template" ported in this codebase — every prior algorithm is a
 /// self-contained `SortAlgorithm` struct, but ArrayV's own class hierarchy has several concrete
-/// sorts sharing one base class's logic verbatim (see `PORT_INVENTORY.md`'s cluster notes and
-/// `TEMPLATE_PORT_REFERENCE.md` for the full survey). Since this codebase has no inheritance, a
+/// sorts sharing one base class's logic verbatim (see Documentation/docs/reference/port-status.md's
+/// cluster notes). Since this codebase has no inheritance, a
 /// template becomes a stateless namespace of `static func`s taking `inout RecordingEngine`
 /// explicitly, rather than the nested-closure-capturing-`engine` style every single-file algorithm
 /// uses — nested closures can't be shared across two different files' `record(into:)`.

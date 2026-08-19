@@ -8,7 +8,7 @@ import SortEngineKit
 /// functionally just `isSorted(range)` — it only *computes* that answer through an absurdly
 /// expensive recursive detour, which is the entire point of this being filed under "Impractical
 /// Sorts" (ArrayV's own `setCategory` call, despite living in `sorts/distribute/` — see
-/// `ALGORITHM_PORTING_PROCESS.md`'s note that category always comes from that call, not the
+/// Documentation/docs/guides/adding-an-algorithm.md's note that category always comes from that call, not the
 /// directory).
 ///
 /// One buffer per recursion depth (`tmp[idx]` backs depth `idx + 2`, sizes `2...n`, mirroring

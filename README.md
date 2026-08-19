@@ -7,11 +7,11 @@ Apple devices in Swift and SwiftUI.
 
 ## Features
 
-- **~82 sorting algorithms** and **~38 shuffles**, spanning ArrayV's category taxonomy (exchange,
+- **167 sorting algorithms** and **46 shuffles**, spanning ArrayV's category taxonomy (exchange,
   hybrid, insertion, selection, merge, distribution, concurrent-simulated, and the deliberately
   impractical Bogo/Stooge/Slow family) — every one a native Swift implementation, not an
   interpreted script.
-- **14 visualizer styles** (bar graph, rainbow, disparity family, circular/spiral/scatter/dot
+- **15 visualizer styles** (bar graph, rainbow, disparity family, circular/spiral/scatter/dot
   layouts, hoop stack, pixel mesh, and more), switchable live, mid-sort, with zero engine changes —
   the algorithm has no idea which style is currently drawing it.
 - **GPU-rendered visuals** via a Metal renderer, with optional reduced-flashing/reduced-motion
@@ -37,8 +37,9 @@ Apple devices in Swift and SwiftUI.
 ## Requirements
 
 - Xcode with an iOS 26 SDK or newer.
-- Runs on iOS, iPadOS, and Mac Catalyst (no native macOS/AppKit target — see `Documentation/ARCHITECTURE_V2.md`
-  §9 for why).
+- Runs on iOS, iPadOS, and Mac Catalyst (no native macOS/AppKit target — see the
+  [Architecture overview](Documentation/docs/architecture/overview.md#platform-and-scope-decisions)
+  for why).
 - [Tuist](https://tuist.dev) for project generation (see below).
 
 ## How to Build
@@ -63,20 +64,24 @@ xcodebuild test -workspace "Sort Symphony.xcworkspace" \
 
 ## Project Structure
 
-The app is split into ~15 Tuist modules under `Modules/`, roughly in four layers:
+The app is split into about 20 Tuist modules under `Modules/`, roughly in four layers:
 
 - **Engine** — `SortEngineKit` (the record/replay tape engine), `AlgorithmKit` (algorithm/shuffle
-  protocols + registries), `VisualizationKit` (the visualizer protocol + draw-command model). No
-  SwiftUI, no UIKit, minimal dependencies — the most-tested, least-churned layer.
+  protocols + registries), `VisualizationKit` (the visualizer protocol + draw-command model),
+  `ZstdKit` (a from-scratch Zstandard codec). No SwiftUI, no UIKit, minimal dependencies — the
+  most-tested, least-churned layer.
 - **Content** — `BuiltInAlgorithms` (every sorting algorithm and shuffle), `BuiltInVisualizers`
   (every visualization style). Adding one more of either is a new file in these modules, never a
   project-file edit.
-- **Services** — `AudioEngineKit` (backed by the local `ToneKit` synth module), `PersistenceKit`
+- **Services** — `AudioEngineKit` and its supporting audio modules (`ToneKitDSP`,
+  `ToneKitAVFoundation`, `SortAudioCore`, `SortAudioBridgeKit`, `SortAudioUnitKit`), `PersistenceKit`
   (analytics/CloudKit sync), `SettingsKit`, `DesignSystemKit` (shared UI components/themes),
   `MathRenderingKit` (complexity notation rendering).
 - **Features** — `SortFeature` (the sort screen, run controls, Metal rendering host),
-  `SettingsFeature`, `HomeFeature` — assembled together by the `Sort Symphony` app target.
+  `SettingsFeature`, `HomeFeature`, `IntentsKit` (Shortcuts/App Intents) — assembled together by the
+  `Sort Symphony` app target.
 
-For the full rationale behind this shape (and the handful of places the app has since diverged from
-its original design — most notably Metal rendering replacing `Canvas`, and `ToneKit` replacing
-AudioKit), see `Documentation/ARCHITECTURE_V2.md`.
+For the full rationale behind this shape, including the places the app has since diverged from its
+original design (most notably Metal rendering replacing `Canvas`, and a local synth replacing
+AudioKit), see the [documentation site](Documentation/docs/index.md), or browse the source directly
+under `Documentation/docs/`.

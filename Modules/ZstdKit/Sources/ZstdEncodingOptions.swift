@@ -1,5 +1,5 @@
 /// Direct knobs for the encoder, rather than reproducing real zstd's 22-level parameter table —
-/// this encoder implements one strategy (`greedy`, see `COMPRESSION_DESIGN.md`), so one well-tuned
+/// this encoder implements one strategy (`greedy`, see Documentation/docs/reference/compression.md), so one well-tuned
 /// default is enough; nobody asked for 22 levels.
 public struct ZstdEncodingOptions: Sendable, Equatable {
   /// `1 << hashLog` entries in the match finder's hash table.
@@ -25,14 +25,14 @@ public struct ZstdEncodingOptions: Sendable, Equatable {
   public var maximumInputSize: Int
   /// How many chunks `FrameEncoder.encode` may compress concurrently via
   /// `DispatchQueue.concurrentPerform`, mirroring (in spirit, not mechanism — see
-  /// `COMPRESSION_DESIGN.md`) real zstd's multithreaded mode's per-job structure: each chunk gets
+  /// Documentation/docs/reference/compression.md) real zstd's multithreaded mode's per-job structure: each chunk gets
   /// its own fresh `EncodeRepeatOffsets` (matching real zstdmt's per-job reset) and, past the
   /// first chunk, a raw-content "prefix" loaded from the previous chunk's tail so matches can
   /// still reference across the boundary. Defaults to `1` — today's exact sequential behavior,
   /// byte-for-byte, so every existing caller is unaffected unless they opt in explicitly.
   public var maximumConcurrency: Int
   /// Use `RowHashMatchFinder` (a `SIMD16<UInt8>`-based row-hash search) instead of `MatchFinder`
-  /// (plain hash-chain search) — see `COMPRESSION_DESIGN.md` for why this is an original design
+  /// (plain hash-chain search) — see Documentation/docs/reference/compression.md for why this is an original design
   /// inspired by, not transcribed from, real zstd's own row-hash matcher. Defaults to `true`:
   /// `RowHashMatchFinderTests` (self round-trip + a real `zstandard`-oracle cross-check on the
   /// exact corpus `EncoderRoundTripTests` exercises for the plain hash-chain finder) is green, so

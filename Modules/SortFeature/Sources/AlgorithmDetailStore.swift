@@ -5,7 +5,7 @@ import ZstdKit
 
 /// Lazily decodes `AlgorithmDetails.algz` once per process and shares the result — replaces
 /// `AlgorithmDetailContent.load(for:)`'s old per-algorithm loose-file bundle reads. See
-/// `COMPRESSION_DESIGN.md`'s "Runtime: a lazily-decoded singleton".
+/// Documentation/docs/reference/compression.md's "AlgorithmDetails.algz" runtime section.
 ///
 /// `bundle` defaults to `.main` but is injectable so tests can point this at their own test
 /// bundle instead — mirrors `ZstdKit`'s own `Fixture.bundle = Bundle(for: FixtureBundleMarker.self)`

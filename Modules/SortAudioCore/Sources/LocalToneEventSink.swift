@@ -11,15 +11,16 @@ private let sinkSignposter = OSSignposter(
   subsystem: "com.nhubbard.Sort2.SortAudioCore", category: "LocalToneEventSink")
 
 /// The in-process `SortAudioEventSink`: maps events via a `ToneMapper` and enqueues the resulting
-/// commands directly into a `ToneRenderer`'s command queue — no IPC, no serialization, matching
-/// `AUDIO_UNIT_PLAN.md` §4's `LocalEventSink`. This is what both `AudioEngineKit.AudioService`
-/// (standalone app) and `HeadlessSortAudioDriver` (below) use; only the caller and the wrapped
+/// commands directly into a `ToneRenderer`'s command queue — no IPC, no serialization (see
+/// Documentation/docs/architecture/audio.md). This is what `AudioEngineKit.AudioService` uses for
+/// local playback in the standalone app, and what `SortAudioUnitKit`'s AU extension uses to drain
+/// events its bridge client received from the running app; only the caller and the wrapped
 /// `ToneRenderer` differ between them.
 ///
 /// `@unchecked Sendable`: safe because exactly one caller drives a given instance's `send(_:
-/// noteRange:)` sequentially — `AudioService` calls it only from the main actor, and
-/// `HeadlessSortAudioDriver` calls it only from its own single sequential tick loop; nothing in
-/// this codebase shares one `LocalToneEventSink` instance across two concurrent callers. Not
+/// noteRange:)` sequentially — `AudioService` calls it only from the main actor, and the AU
+/// extension's bridge client calls it only from its own single background dispatch queue; nothing
+/// in this codebase shares one `LocalToneEventSink` instance across two concurrent callers. Not
 /// enforced by the type itself, same documented-invariant style as `ToneKitDSP`'s `ToneRenderer`/
 /// `ToneCommandQueue`.
 public final class LocalToneEventSink: SortAudioEventSink, @unchecked Sendable {

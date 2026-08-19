@@ -12,14 +12,14 @@ public enum TapeRecordingError: Error, Equatable, Sendable {
   )
 }
 
-/// Moved here from `SortFeature`'s `SortSession.makeTape` (AUDIO_UNIT_PLAN.md Phase 2) — recording
+/// Moved here from `SortFeature`'s `SortSession.makeTape` (see Documentation/docs/architecture/audio.md) — recording
 /// a shuffle-then-sort tape has zero UI dependency and needs to be callable by both the standalone
 /// app's `SortSession` and `SortAudioCore`'s headless driver, neither of which may depend on the
 /// other's module.
 public enum TapeFactory {
   /// Records the shuffle against an identity array, then the sort against the shuffle's output,
   /// concatenating both into one continuous `Tape` — from `ReplayEngine`'s point of view a
-  /// shuffle-then-sort is just one longer tape (§2A.4 of ARCHITECTURE_V2.md).
+  /// shuffle-then-sort is just one longer tape (see Documentation/docs/architecture/content.md's "Shuffles are tapes too").
   public static func makeTape(
     algorithm: any SortAlgorithm, shuffle: any ShuffleAlgorithm, size: Int, operationCap: Int
   ) throws -> Tape {
@@ -45,7 +45,7 @@ public enum TapeFactory {
     }
 
     // recordingDuration measures only the sort, not the shuffle — it's the real algorithmic
-    // performance number (§1.1 of ARCHITECTURE_V2.md), and a shuffle's cost isn't the
+    // performance number (see Documentation/docs/architecture/overview.md), and a shuffle's cost isn't the
     // algorithm's to answer for.
     let recordingStart = Date()
     var sortEngine = RecordingEngine(values: shuffleEngine.values, operationCap: operationCap)

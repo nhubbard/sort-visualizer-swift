@@ -142,7 +142,7 @@ public final class SortSession {
   /// Unconditionally clamps into `algorithm.metadata.effectiveSizeRange(operationCap:)` rather
   /// than warning past it — this is ArrayV's own `unreasonableLimit` precedent (a per-sort size
   /// threshold, not a user-toggleable confirmation dialog), enforced here so every caller gets
-  /// it, not just whichever view happens to clamp its own slider (§9 of ARCHITECTURE_V2.md).
+  /// it, not just whichever view happens to clamp its own slider (see Documentation/docs/architecture/overview.md).
   public func start(size: Int) async {
     // Stops the current sort's sound/visuals immediately instead of leaving them running
     // until the orphaned `ReplayEngine` self-terminates on its own — see the size stepper and
@@ -215,7 +215,7 @@ public final class SortSession {
   private func startReplay(_ tape: Tape) {
     // Automation, Showcase, and manual runs all funnel through this one method, so reading the
     // pacing mode from `settings` unconditionally (no `isAutomating` branch) applies it uniformly
-    // to all three, as intended — see IMPLEMENTATION_PLAN.md Phase 12 item 1.
+    // to all three, as intended — see Documentation/docs/architecture/history.md.
     let playbackTape =
       settings.useFixedDurationPacing && settings.compactPlaybackForFixedDuration
       ? tape.compactedForFastPlayback() : tape

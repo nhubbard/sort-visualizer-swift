@@ -55,7 +55,7 @@
 /// holds when the padding is adjacent to the sentinel. Confirmed by cross-referencing
 /// `~/zstd/lib/common/bitstream.h`'s `BIT_addBits`/`BIT_closeCStream`/`BIT_initDStream` and by
 /// building a debug (`DEBUGLEVEL=6`) libzstd to watch `BIT_endOfDStream` fail on the old encoding —
-/// see `COMPRESSION_DESIGN.md`.
+/// see Documentation/docs/reference/compression.md.
 struct BackwardBitWriter {
   private var pending: [(value: UInt32, count: Int)] = []
   private var totalRealBits = 0

@@ -1,6 +1,6 @@
 /// A single logical step an algorithm performs against a `RecordingEngine`. A `Tape` is nothing
 /// more than an ordered array of these — replaying them one at a time is the entire mechanism
-/// behind stepping, scrubbing, and speed control (§1 of ARCHITECTURE_V2.md).
+/// behind stepping, scrubbing, and speed control (see Documentation/docs/architecture/engine.md).
 public enum SortOperation: Sendable, Codable, Equatable {
   case swap(Int, Int)
   case setValue(Int, Int)

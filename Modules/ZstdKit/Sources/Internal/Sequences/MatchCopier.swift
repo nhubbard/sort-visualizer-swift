@@ -1,6 +1,6 @@
 // This file's match-copy specialization by offset (offset 1 as a fill, long nonoverlapping
 // matches as one bulk copy, other overlapping offsets via periodic pattern expansion) follows the
-// wildcopy strategy `COMPRESSION_DESIGN.md` describes from the real `zstd` C
+// wildcopy strategy Documentation/docs/reference/compression.md describes from the real `zstd` C
 // source's `ZSTD_wildcopy`, adapted to safe Swift array operations rather than raw pointer chunks.
 // See NOTICE.md.
 //

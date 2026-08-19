@@ -2,8 +2,9 @@ import Foundation
 import SortEngineKit
 import VisualizationKit
 
-/// Direct port of ArrayV's `DisparityBarGraph` — despite `ARCHITECTURE_V2.md` §2A.6 claiming the
-/// Disparity family needs an `originalIndices` engine feature, ArrayV's own source computes
+/// Direct port of ArrayV's `DisparityBarGraph` — despite an earlier design draft claiming the
+/// Disparity family needs an `originalIndices` engine feature (see
+/// Documentation/docs/architecture/content.md), ArrayV's own source computes
 /// displacement from just the current value and index (`array[i] - i`), data
 /// `VisualizationContext.values` already provides. Bar height is `disp`, a 0...1 "distance from
 /// home" measure via a sine wave — sorted arrays render a flat skyline, scrambled ones jagged.

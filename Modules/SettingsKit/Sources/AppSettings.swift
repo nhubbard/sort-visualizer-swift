@@ -3,11 +3,11 @@ import Foundation
 import Observation
 import VisualizationKit
 
-/// §3.3, in full as of Phase 9. No `warnBeforeBogoSort`/`warnBeforeBitonicSort` (the
-/// confirmation-dialog system they'd gate was removed in Phase 8, see §9 of ARCHITECTURE_V2.md —
-/// `AlgorithmMetadata.sizeRange` already does that job unconditionally). `defaultShuffleID`
-/// replaces what would have been a `shuffleMethod` enum — shuffles are data-driven via
-/// `ShuffleRegistry` (Phase 6), so this is an ID lookup, not a fixed case set.
+/// No `warnBeforeBogoSort`/`warnBeforeBitonicSort` (the confirmation-dialog system they'd gate was
+/// removed, see Documentation/docs/architecture/overview.md — `AlgorithmMetadata.sizeRange`
+/// already does that job unconditionally). `defaultShuffleID` replaces what would have been a
+/// `shuffleMethod` enum — shuffles are data-driven via `ShuffleRegistry`, so this is an ID lookup,
+/// not a fixed case set.
 @Observable
 @MainActor
 public final class AppSettings {

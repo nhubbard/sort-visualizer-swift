@@ -5,7 +5,8 @@ import SortEngineKit
 /// `lazyStableSort` entirely with a different construction (natural-run-detecting insertion sort
 /// over fixed 16-element chunks, then doubling `mergeWithoutBuffer`), while still reusing the
 /// template's `mergeWithoutBuffer` unmodified. ArrayV's own subclass genuinely does this (a real
-/// override, not decoration) — see `TEMPLATE_PORT_REFERENCE.md` §6.
+/// override, not decoration) — see Documentation/docs/reference/port-status.md's note on the
+/// Grail cluster this algorithm belongs to.
 ///
 /// **Stability**: `insertionSort`'s shifts use `engine.setValue`, so the standard swap-tape-shadow
 /// stability test can't observe them and produces false failures if pointed at this algorithm

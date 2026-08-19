@@ -5,7 +5,7 @@ import Testing
 
 /// Cross-checks `ZstdKit` against the real Zstandard project's own test corpus
 /// (`~/zstd/tests/golden-*`, `~/zstd/tests/decodecorpus`), not just this project's own
-/// hand-picked/self-generated fixtures — see `COMPRESSION_DESIGN.md`'s "Verification" section for
+/// hand-picked/self-generated fixtures — see Documentation/docs/reference/compression.md's "encoder's correctness bar" section for
 /// why self-round-trip alone is insufficient for this kind of port. Every fixture here was
 /// oracle-verified once, offline, against the real `zstd`/`unzstd` CLI before being committed
 /// (mirroring `FixtureGenerator/generate.py`'s own "self-verified against the reference before

@@ -14,7 +14,7 @@ uv run generate.py
 
 A second, separate set of fixtures cross-checks `ZstdKit` against the real Zstandard project's own
 test suite (`~/zstd/tests/`), not just this project's own hand-picked/self-generated ones — see
-`COMPRESSION_DESIGN.md`'s "Verification" section and `Tests/GoldenCorpusTests.swift`. Authored the
+Documentation/docs/reference/compression.md's "encoder's correctness bar" section and `Tests/GoldenCorpusTests.swift`. Authored the
 same way as `generate.py` above (offline, oracle-verified once, then committed) but using the real
 `zstd`/`unzstd` CLI and a real `~/zstd` checkout directly rather than the Python `zstandard`
 package — `swift test`/CI never shells out or needs zstd installed. To regenerate:

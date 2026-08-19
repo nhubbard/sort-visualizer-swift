@@ -41,7 +41,7 @@
 /// `Size_Format == 2` header form supports — deliberately avoiding the widest 5-byte literals-
 /// header form's non-obvious overlapping-bitfield layout for this milestone. No content-based
 /// pre-splitting beyond that (that's a ratio-tuning heuristic for large corpora, not a correctness
-/// requirement — see `COMPRESSION_DESIGN.md`).
+/// requirement — see Documentation/docs/reference/compression.md).
 let maximumBlockSize = 16_000
 
 /// Encodes one block's worth of input (`<= maximumBlockSize` bytes) into whichever of raw/RLE/
@@ -91,7 +91,7 @@ enum BlockEncoder {
     var best = Candidate(type: .raw, payload: chunk)
 
     // Huffman-only literals with a zero-sequences marker — a real, valid compressed-block shape
-    // that needs no match finder (see `COMPRESSION_DESIGN.md`'s milestone breakdown).
+    // that needs no match finder (see Documentation/docs/reference/compression.md).
     if let literalsSection = LiteralsEncoder.encodeFourStreamHuffman(chunk) {
       var payload = literalsSection
       payload.append(0)  // Number_of_Sequences == 0: section ends immediately.

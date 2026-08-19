@@ -14,8 +14,8 @@ import SortEngineKit
 /// <https://en.wikipedia.org/wiki/Smoothsort>) rather than an invented one — divergent naming
 /// would only make it harder to cross-reference against other implementations. `smoothHeapify`
 /// is kept as its own entry point (a partial run with `fullSort: false`) rather than folded into
-/// `record`, matching `PORT_INVENTORY.md`'s note that a future `SMOOTH` shuffle calls this exact
-/// step directly.
+/// `record`, since `HeapifiedShuffle`'s `SMOOTH` sibling (`SmoothifiedShuffle`) calls this exact
+/// step directly — see Documentation/docs/reference/port-status.md.
 ///
 /// `sift`/`trinkle` hold a candidate value in a plain local (`val`), only ever writing it to its
 /// final resting index once its correct position is found — the same "hole" shape already used

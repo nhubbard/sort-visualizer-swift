@@ -62,7 +62,7 @@ public struct AlgorithmMetadata: Sendable, Codable, Equatable {
   /// once the chosen array size exceeds a per-algorithm threshold, `SortSession.start(size:)`
   /// unconditionally clamps into this range, so e.g. Bogo Sort's `[4, 16]` never lets a caller
   /// pick a size that would run effectively forever. No separate confirmation-dialog mechanism
-  /// needed on top of it (§9 of ARCHITECTURE_V2.md).
+  /// needed on top of it (see Documentation/docs/architecture/overview.md's platform and scope decisions).
   public var sizeRange: ClosedRange<Int>
   /// The increment the manual size stepper (and the `⌘⇧A` automation loop) moves by: 16 at a
   /// time for wide ranges (matching the global Settings default step), or the full range's

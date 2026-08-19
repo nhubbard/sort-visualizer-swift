@@ -103,7 +103,7 @@ public struct SettingsView: View {
         Text("Sound")
       } footer: {
         // Front-runs the system's own unavoidably vague "access data from other apps" prompt
-        // (AUDIO_UNIT_PLAN.md §7's "Known gotchas") — shown only while the toggle is on, so someone
+        // (Documentation/docs/architecture/audio.md's "Known gotchas") — shown only while the toggle is on, so someone
         // who's never touched this setting doesn't see irrelevant DAW-routing explanation.
         if settings.audioUnitBridgeEnabled {
           Text(
@@ -144,7 +144,7 @@ public struct SettingsView: View {
         Text("Recording Limit")
       } footer: {
         // Mirrors AlgorithmMetadata.sizeRange's own "clamp, don't confirm" precedent
-        // (§9 of ARCHITECTURE_V2.md) — a sort whose recording crosses this many operations
+        // (Documentation/docs/architecture/overview.md) — a sort whose recording crosses this many operations
         // is skipped automatically instead of asking the user each time.
         Text(
           "A sort that would need more operations than this to finish is skipped "

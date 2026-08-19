@@ -31,7 +31,7 @@ public enum Module {
         // Defaults to the shared `Module.destinations` (every existing call site is unaffected) —
         // overridable for a module that's genuinely platform-restricted, e.g. `SortAudioBridgeKit`
         // (Mac Catalyst only: it's a Unix-domain-socket IPC bridge to a Mac-only AU extension, per
-        // AUDIO_UNIT_PLAN.md's permanent Mac-only scope decision).
+        // the Audio subsystem docs' permanent Mac-only scope decision: Documentation/docs/architecture/audio.md).
         destinations: Destinations = Module.destinations,
         callerFilePath: StaticString = #filePath
     ) -> [Target] {
@@ -67,8 +67,8 @@ public enum Module {
     }
 
     /// For non-`Modules/`-resident product targets whose `product` `Module.framework` can't
-    /// express (it hardcodes `.framework`) — first user: the AUv3 extension target
-    /// (`AUDIO_UNIT_PLAN.md` Phase 3), with a second (macOS AUv3 packaging, Phase 4) already a
+    /// express (it hardcodes `.framework`) — first user: the AUv3 extension target (see
+    /// Documentation/docs/architecture/audio.md), with a second app-extension target already a
     /// known near-term need, which is why this is a small reusable helper rather than one
     /// hand-rolled `Target.target(...)` call. Sources live under `App/<name>/Sources/**`,
     /// mirroring `App/UITests/` as the existing precedent for a non-`Module.framework` product

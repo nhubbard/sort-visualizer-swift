@@ -10,7 +10,7 @@ import os
 private let logger = Logger(subsystem: "com.nhubbard.Sort2.SortAudioUnitKit", category: "SortAudioUnit")
 
 /// The AUv3 instrument itself — a **companion-mode relay**, not an independent generator
-/// (AUDIO_UNIT_PLAN.md's corrected architecture): it never runs a sort of its own. Instead it
+/// (see Documentation/docs/architecture/audio.md): it never runs a sort of its own. Instead it
 /// connects a `SortAudioBridgeClient` to the standalone Sort Symphony app's bridge server (a Unix
 /// domain socket inside the shared App Group container) and forwards every event it receives into
 /// its own `ToneRenderer` via a `LocalToneEventSink` — the same DSP path
@@ -22,7 +22,7 @@ private let logger = Logger(subsystem: "com.nhubbard.Sort2.SortAudioUnitKit", ca
 /// C++ shim: modern Swift-only `AUAudioUnit` subclasses calling into allocation-free, lock-free
 /// Swift code from the render block are a proven, working pattern.
 ///
-/// Also exposes the AU-hosted remote (`AUDIO_UNIT_PLAN.md` §7's "Plug-in UI"): an `AUParameterTree`
+/// Also exposes the AU-hosted remote (Documentation/docs/architecture/audio.md's "The plug-in UI"): an `AUParameterTree`
 /// of audio-production-only DSP controls (envelope ADSR, detune, gain), and
 /// `sendRemoteControlCommand(_:)` for the sort-transport buttons (play/pause, restart, etc.),
 /// relayed back to the standalone app over the same bridge connection in the opposite direction.

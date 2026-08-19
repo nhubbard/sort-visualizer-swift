@@ -5,7 +5,7 @@ import Foundation
 /// `ZstdKitTests.xctest` target (`testResources` in `Project.swift`) copies them straight into the
 /// test bundle itself, findable via class-based `Bundle(for:)` lookup; plain SPM's `.testTarget
 /// (resources: [.copy("Fixtures")])` (`Package.swift`, for this module's standalone
-/// `swift build`/`swift test` use — see `COMPRESSION_DESIGN.md`) instead copies them into a
+/// `swift build`/`swift test` use — see Documentation/docs/reference/compression.md) instead copies them into a
 /// *separate* module-resource bundle only `Bundle.module` (synthesized by SPM, `#if SWIFT_PACKAGE`
 /// only) knows how to find — `Bundle(for:)` can't see into it. Both build systems compile this
 /// exact same file, so the lookup has to switch, not just the resource declaration.

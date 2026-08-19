@@ -90,7 +90,7 @@ struct SortAudioBridgeIntegrationTests {
     #expect(!server.hasConnectedClients)
   }
 
-  /// The reverse direction the AU-hosted remote (`AUDIO_UNIT_PLAN.md` §7) depends on — same
+  /// The reverse direction the AU-hosted remote (Documentation/docs/architecture/audio.md) depends on — same
   /// connection, opposite flow, previously untested since the server was write-only before the
   /// remote existed.
   @Test

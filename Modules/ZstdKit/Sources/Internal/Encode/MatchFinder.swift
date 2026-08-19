@@ -36,7 +36,7 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /// A greedy (no lookahead) LZ77 match finder over a single, fully in-memory buffer — no sliding-
-/// window eviction, since the whole block already fits in memory (see `COMPRESSION_DESIGN.md`).
+/// window eviction, since the whole block already fits in memory (see Documentation/docs/reference/compression.md).
 /// Matches are restricted to *within* the buffer it's constructed over (one block at a time,
 /// never referencing a previous block) — a deliberate simplification: correct, if conservative,
 /// since `SequenceExecutor` never requires cross-block matches, it just allows them.

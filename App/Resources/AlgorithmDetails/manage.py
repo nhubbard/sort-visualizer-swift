@@ -1003,7 +1003,7 @@ def format_algorithms(
 
 # --------------------------------------------------------------------------------------------
 # pack / decode — the ALGZ v1 container format
-# (COMPRESSION_DESIGN.md, "Container format")
+# (Documentation/docs/reference/compression.md, "AlgorithmDetails.algz: ALGZ / ADTL")
 # --------------------------------------------------------------------------------------------
 
 MAGIC_ALGZ = bytes([0x41, 0x4C, 0x47, 0x5A, 0x0D, 0x0A, 0x1A, 0x0A])
@@ -1601,7 +1601,7 @@ def pack_command(
 
     Implements the ALGZ v1 container format (one whole-corpus zstd frame, no dictionary,
     versioned manifest, outer SHA-256 + zstd content checksum) — see
-    COMPRESSION_DESIGN.md. Self-verifies by default after writing.
+    Documentation/docs/reference/compression.md. Self-verifies by default after writing.
     """
     algorithms = resolve_targets(names)
     result = pack_archive(algorithms, level)

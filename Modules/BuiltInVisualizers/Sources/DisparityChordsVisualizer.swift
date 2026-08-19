@@ -7,7 +7,8 @@ import VisualizationKit
 /// point at the angle corresponding to its *value*. A sorted array draws short chords to near
 /// neighbors; a scrambled one draws long chords crossing the circle. Confirms (see
 /// `DisparityBarGraphVisualizer`) that the whole Disparity family ports cleanly with no extra
-/// state, despite `ARCHITECTURE_V2.md`'s original claim otherwise.
+/// state, despite an earlier design draft's claim otherwise (see
+/// Documentation/docs/architecture/content.md).
 public struct DisparityChordsVisualizer: Visualizer {
   public let id = VisualizerID(rawValue: "disparitychords")
   public let metadata = VisualizerMetadata(

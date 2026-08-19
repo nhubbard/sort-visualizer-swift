@@ -39,7 +39,7 @@ public enum EnvelopePhase: Sendable, Equatable {
 /// `ToneRenderer` fills into a buffer. Unlike today's `ToneKit.AmplitudeEnvelope`, this owns no
 /// `AVAudioNode` and no `Mutex` — it's a plain value type mutated only by the render thread that
 /// owns it, with gate open/close arriving as `ToneCommand`s rather than direct property writes
-/// from another thread (`AUDIO_UNIT_PLAN.md` §5).
+/// from another thread (see Documentation/docs/architecture/audio.md).
 public struct EnvelopeDSP: Sendable {
   public private(set) var phase: EnvelopePhase = .idle
   private var gateOpen = false
@@ -49,7 +49,7 @@ public struct EnvelopeDSP: Sendable {
   public var sustainLevel: Float
   public var releaseDuration: Float
   /// A multiplicative gain layer, deliberately separate from the AU-hosted remote's user-facing
-  /// Gain slider (`AUDIO_UNIT_PLAN.md` §7) — `SortAudioCore.ToneMapper` drives this per-operation
+  /// Gain slider (Documentation/docs/architecture/audio.md) — `SortAudioCore.ToneMapper` drives this per-operation
   /// (louder for swaps, softer for compares/value-writes) without ever fighting a performer's own
   /// manual dial-in, since the two multiply together instead of one clobbering the other. This is
   /// the *target* `applyGain` ramps `appliedAccent` toward, not applied directly — see that

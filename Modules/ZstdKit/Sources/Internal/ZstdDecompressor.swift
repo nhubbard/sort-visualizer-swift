@@ -38,7 +38,7 @@ import Foundation
 
 /// Orchestrates a full frame decode: header, then the block loop, then the trailing content
 /// checksum if present. Every standard block/literals/sequences shape decodes, with the optimized
-/// wildcopy/bit-reader path wired in — see `COMPRESSION_DESIGN.md` for the full decoder-
+/// wildcopy/bit-reader path wired in — see Documentation/docs/reference/compression.md for the full decoder-
 /// completeness/performance rundown. Dictionary support is the one generic `ZstdKit` capability
 /// not required (or exercised) by `AlgorithmDetails.algz`.
 enum ZstdDecompressor {

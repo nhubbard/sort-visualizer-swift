@@ -5,7 +5,7 @@ import SortAudioUnitKit
 import SwiftUI
 
 /// Bridges `SortAudioUnit`'s `AUParameterTree` and `sendRemoteControlCommand(_:)` into SwiftUI —
-/// the remote's whole reason for existing (`AUDIO_UNIT_PLAN.md` §7): rapid, audio-production-only
+/// the remote's whole reason for existing (see Documentation/docs/architecture/audio.md): rapid, audio-production-only
 /// control from inside the DAW, nothing else. Registers an `AUParameterObserverToken` so the
 /// sliders stay correct if a host automates a parameter externally, not just when the user drags
 /// one — the observer callback fires off the main thread, so it hops back before touching UI state.

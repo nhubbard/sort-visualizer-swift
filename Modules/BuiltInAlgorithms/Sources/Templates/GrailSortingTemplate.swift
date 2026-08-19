@@ -6,7 +6,7 @@ import SortEngineKit
 /// this one stable). Confirmed genuine reuse across all 4 concrete subclasses in ArrayV
 /// (`BlockInsertionSort`, `LazyStableSort`, `GrailSort`, `OptimizedLazyStableSort`) — every one
 /// either calls inherited methods verbatim or overrides exactly one method while still leaning on
-/// the rest (see `TEMPLATE_PORT_REFERENCE.md` §6).
+/// the rest (see Documentation/docs/reference/port-status.md's note on the Grail cluster).
 ///
 /// **Two simplifications versus ArrayV's own template**, both because every concrete algorithm in
 /// this codebase runs `commonSort` in pure in-place mode (no external scratch array is plumbed

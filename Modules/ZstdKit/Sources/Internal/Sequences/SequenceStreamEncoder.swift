@@ -126,7 +126,7 @@ enum SequenceStreamEncoder {
 
   /// RLE whenever every sequence in this block shares the same code for this symbol type
   /// (matching `ZSTD_selectEncodingType`'s cheapest-available check); FSE_Compressed otherwise.
-  /// Deliberately never `.predefined`/`.repeat_` — see `COMPRESSION_DESIGN.md`'s scope notes: both
+  /// Deliberately never `.predefined`/`.repeat_` — see Documentation/docs/reference/compression.md's scope notes: both
   /// are real compression-ratio opportunities left for later, not correctness gaps (every stream
   /// this produces is validly decodable either way).
   private static func buildStream(codes: [Int], kind: SequenceSymbolKind) -> StreamPlan {

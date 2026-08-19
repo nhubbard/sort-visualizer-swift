@@ -1,6 +1,6 @@
 /// A transport-neutral remote-control command, the reverse-direction counterpart to
 /// `SortToneEvent`: instead of audio events flowing app → AU extension, these flow AU extension →
-/// app, letting a minimal AU-hosted remote (`AUDIO_UNIT_PLAN.md` §7's "Plug-in UI") drive the
+/// app, letting a minimal AU-hosted remote (see Documentation/docs/architecture/audio.md's "The plug-in UI") drive the
 /// standalone app's running sort without exposing any sort visualization, algorithm detail, or code
 /// — only the same transport actions already available from the app's own run-control bar and menu
 /// commands (`RunControlBar.swift`, `App/Sources/SortCommands.swift`).

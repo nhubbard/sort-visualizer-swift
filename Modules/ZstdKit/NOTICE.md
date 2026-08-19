@@ -4,7 +4,7 @@
 decoding *and* encoding algorithms (frame/block parsing and construction, FSE table decode/encode,
 Huffman literals decode/encode, FSE-coded sequences decode/encode, LZ77 execution and a greedy
 hash-chain match finder) and of [xxHash](https://github.com/Cyan4973/xxHash)'s XXH64 checksum, which
-ships as part of the Zstandard source tree. See `COMPRESSION_DESIGN.md` for the full design
+ships as part of the Zstandard source tree. See Documentation/docs/reference/compression.md for the full design
 rationale — the encoder (`Sources/Internal/Encode/`, `Sources/Internal/FSE/FSEEncodeTable.swift`,
 `Sources/Internal/Huffman/HuffmanEncodeTable.swift`/`HuffmanStreamEncoder.swift`,
 `Sources/Internal/Sequences/SequenceCodeSelection.swift`/`SequenceStreamEncoder.swift`) is the same
@@ -28,7 +28,7 @@ fallback is itself a wide-scalar SWAR bit-gather trick, not a vector type at all
 "portable SIMD row-hash matcher" in the reference source to port line for line. The lazy/lazy2
 lookahead driver it's used from (`Sources/Internal/Encode/SequenceStore.swift`'s `parseLazy`) *is*
 transcribed faithfully, including its exact gain-comparison constants, from
-`ZSTD_compressBlock_lazy_generic` (`zstd_lazy.c`) — see `COMPRESSION_DESIGN.md`.
+`ZSTD_compressBlock_lazy_generic` (`zstd_lazy.c`) — see Documentation/docs/reference/compression.md.
 
 Reused under the BSD License, from Zstandard (`github.com/facebook/zstd`, `LICENSE`) and xxHash
 (bundled in the same repository under `lib/common/xxhash.h`/`xxhash.c`):

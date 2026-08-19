@@ -31,7 +31,7 @@ public final class SortAudioBridgeServer: @unchecked Sendable {
   public var onListenerStateChanged: (@Sendable (ListenerState) -> Void)?
 
   /// Fires on an arbitrary background queue whenever a connected AU instance sends a remote-control
-  /// command (the AU-hosted transport remote, `AUDIO_UNIT_PLAN.md` §7) — `AudioService` forwards
+  /// command (the AU-hosted transport remote, Documentation/docs/architecture/audio.md) — `AudioService` forwards
   /// this to whatever's driving the currently-active `SortSession`.
   public var onRemoteControlCommandReceived: (@Sendable (RemoteControlCommand) -> Void)?
 
