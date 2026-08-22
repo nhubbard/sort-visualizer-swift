@@ -1,0 +1,20 @@
+*From Wikipedia, the free encyclopedia*
+
+Double Selection Sort is a variant of [Selection Sort](https://en.wikipedia.org/wiki/Selection_sort) that finds both the
+smallest and the largest remaining element during a single scan of the unsorted portion of the array, rather than
+locating just one extreme value per pass. The smallest element found is placed at the front of the unsorted range and
+the largest is placed at the back, so the sorted region grows inward from both ends simultaneously instead of advancing
+from a single boundary.
+
+Each pass therefore shrinks the unsorted window by two elements — one from the left and one from the right — instead of
+one, roughly halving the number of full passes needed to sort the array compared to ordinary Selection Sort. The total
+number of element comparisons is not reduced by this trick, however: each pass still has to inspect every remaining
+element to determine both its minimum and its maximum, so the comparison count stays on the same order as single-ended
+Selection Sort. The number of swaps performed is likewise about the same, since two elements are still moved into place
+per pass, just in a single scan rather than two separate ones.
+
+Like standard Selection Sort, Double Selection Sort is an
+in-place [comparison sort](https://en.wikipedia.org/wiki/Comparison_sort) with quadratic best-, average-, and worst-case
+running time, and it requires no auxiliary storage beyond a few index variables. Because it moves elements into place
+with long-distance swaps rather than adjacent shifts, it does not preserve the relative order of equal elements, and so,
+like Selection Sort, it is not a [stable sort](https://en.wikipedia.org/wiki/Sorting_algorithm#Stability).

@@ -1,0 +1,35 @@
+*From Wikipedia, the free encyclopedia*
+
+Diamond Sort is a recursive [comparator network](https://en.wikipedia.org/wiki/Sorting_network) in the same broad family
+as [Batcher's Bitonic Sort](https://en.wikipedia.org/wiki/Bitonic_sorter) and the Bose-Nelson sort: algorithms whose
+sequence of compare-and-swap operations is fixed in advance rather than adapted to the data being sorted, and which were
+originally designed with the expectation that their comparisons could run independently of one another, and therefore in
+parallel. That shared lineage is why Diamond Sort, Bitonic Sort, and Bose-Nelson sort are grouped together under the
+"Concurrent Sorts" category here, even though this visualizer runs each of them sequentially.
+
+The recursive form works over a range described by a starting index and an exclusive stopping index, together with a
+boolean `merge` flag. A range of exactly two elements is resolved with a single comparison. Anything larger is split at
+its midpoint, and also at its one-quarter and three-quarter points; when `merge` is set, the two halves are recursively
+pre-sorted in full before anything else happens — and that recursive pre-sort passes `merge` down as `true` again, so it
+keeps fully resolving smaller and smaller halves all the way down to the base case. Once a half has actually been
+pre-sorted this way, the rest of the algorithm never needs to sort it again, so every one of the remaining recursive
+calls it makes — the ones that carry out the "diamond" comparison pattern itself — passes `merge` down as `false`, and
+that `false` then propagates through all of *their* nested calls too. In effect, each half of the original range is
+fully pre-sorted exactly once per call chain, and the flag is what lets the algorithm tell, at any depth, whether it is
+still in that one-time pre-sort or already inside the merge step that follows it. That merge step runs the algorithm's
+namesake "diamond" pattern: the inner quarter-to-three-quarter span, then both halves again, then the
+quarter-to-three-quarter span once more, each pass wired to nudge the handful of elements left out of place by the
+initial split into their correct final positions.
+
+Like Bitonic Sort, Diamond Sort's fixed comparator schedule is only proven to produce a fully sorted array when the
+range's length is a power of two — 4, 8, 16, 32, and so on. Feeding it a range whose length isn't a power of two can
+leave some elements out of order, because the quarter and three-quarter split points are computed by truncating a
+division that does not land on a whole number, which skews the "diamond" comparisons just enough that they no longer
+cover every pair that needs fixing. This is a faithful port of the direct recursive construction, so it inherits that
+restriction as-is; it does not pad the input to the next power of two the way a production implementation might. For
+that reason, the sample below deliberately sorts a 16-element array rather than an arbitrary-length one.
+
+Because it is built from a fixed schedule of pairwise comparators rather than one that adapts to the data, Diamond
+Sort's best, average, and worst-case running times are identical, and it is not
+a [stable sort](https://en.wikipedia.org/wiki/Sorting_algorithm#Stability): elements can cross paths through comparators
+spanning a good portion of the array, so equal elements are not guaranteed to keep their original relative order.

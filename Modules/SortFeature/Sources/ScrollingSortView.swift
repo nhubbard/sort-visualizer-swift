@@ -1,0 +1,104 @@
+import AlgorithmKit
+import AudioEngineKit
+import SettingsKit
+import SwiftUI
+
+public struct ScrollingSortView: View {
+  let algorithm: any SortAlgorithm
+  let arraySize: Int
+  /// Non-`nil` when this instance is one step of Showcase mode (`ContentView`) rather than a
+  /// normal manually-selected algorithm screen — swaps `.task` from a plain `start(size:)` to
+  /// `session.runShowcasePass()` (locking `RunControlBar` via `isAutomating`) and reports back
+  /// when that pass finishes so `ContentView` can advance to the next algorithm. Guarded by
+  /// `!Task.isCancelled` at the call site: `ContentView` stops Showcase by changing `selection`,
+  /// which tears this view down and cancels its `.task` — without the guard, a run already
+  /// finishing at that exact moment could still fire "advance" once more.
+  let showcaseCompletion: (() -> Void)?
+  /// Non-`nil` under the same condition as `showcaseCompletion` (both come from `ContentView`'s
+  /// `showcaseIndex != nil`) — wired to `ContentView.stopShowcase()`, for `SortView`'s embedded
+  /// automation-banner Stop button to call instead of `SortSession.stopAutomation()` (a no-op
+  /// during Showcase, since it never goes through `SortSession.automationTask`; see
+  /// `SortSession.runShowcasePass()`'s doc comment).
+  let showcaseStop: (() -> Void)?
+  @State private var session: SortSession
+  @Environment(AppSettings.self) private var settings
+
+  @MainActor
+  public init(
+    algorithm: any SortAlgorithm, shuffle: any ShuffleAlgorithm, arraySize: Int = 48,
+    showcaseCompletion: (() -> Void)? = nil, showcaseStop: (() -> Void)? = nil
+  ) {
+    self.algorithm = algorithm
+    self.arraySize = arraySize
+    self.showcaseCompletion = showcaseCompletion
+    self.showcaseStop = showcaseStop
+    // AudioService.shared, not the NoOpAudioService default: `AudioService.play()`'s `try?
+    // start()` already fails silently if a host has no usable audio route (e.g. a sandboxed CI
+    // runner), so this is safe even off-device. `AppSettings.soundEnabled` still gates whether a
+    // sort plays anything at all; this is just which backend answers when it does.
+    //
+    // `startsAutomating` is predicted here, before `.task` below has even run, from the exact
+    // same two triggers `body`'s `.task` branches on: Showcase (`showcaseCompletion != nil`,
+    // already known) and an App-Intent/Full-Sweep `.run`/`.automation` pending action (peeked,
+    // not consumed, via `pendingActionWillAutomate`). Without this, a freshly-constructed
+    // `SortSession` started `isAutomating == false` until its own `.task` actually reached
+    // `runSinglePass`/`runAutomationAndWait`, a real window `AlgorithmDetailSection` could mount
+    // (and start highlighting) in — measured directly in a Full Sweep profiling round.
+    let startsAutomating =
+      showcaseCompletion != nil
+      || SortCoordinator.shared.pendingActionWillAutomate(for: algorithm.id)
+    _session = State(
+      wrappedValue: SortSession(
+        algorithm: algorithm, shuffle: shuffle, audio: AudioService.shared,
+        startsAutomating: startsAutomating))
+  }
+
+  public var body: some View {
+    // Matches Legacy/Shared/Views/Main/ScrollingSortView.swift's own GeometryReader approach:
+    // the sort visualization fills the whole visible viewport on first appearance (not a
+    // fixed/minimum height), with the detail section sitting below the fold — a deliberate
+    // "the animation is the main event" layout, not a byproduct of ScrollView's own sizing.
+    GeometryReader { geometry in
+      ScrollView {
+        VStack(alignment: .leading, spacing: 0) {
+          SortView(session: session, showcaseStop: showcaseStop)
+            .frame(width: geometry.size.width, height: geometry.size.height)
+          // `session.isAutomating` covers Showcase, Full Sweep, App-Intent single runs, and
+          // classic Automations alike (all four route through the same private
+          // `SortSession.runAutomation(sizes:runsPerSize:)`) — every case where a fresh combo
+          // arrives roughly once a second and nobody has time to scroll down and actually read
+          // the description/complexity/code/correlation chart before it changes again. Skipping
+          // `AlgorithmDetailSection` entirely here avoids its full cost (SwiftData fetch, code
+          // highlighting, math rendering) rather than just hiding an already-built view — found
+          // via the same Full Sweep profiling round that fixed `CodeTheme`'s hex parsing and
+          // `AnalyticsService.fetchSummaries`'s cache-defeating write/read cycle.
+          if session.isAutomating {
+            Text("Details hidden during automation")
+              .font(.callout)
+              .foregroundStyle(.secondary)
+              .padding()
+              .accessibilityIdentifier("algorithmDetailAutomationPlaceholder")
+          } else {
+            AlgorithmDetailSection(algorithm: algorithm, availableWidth: geometry.size.width)
+          }
+        }
+      }
+    }
+    .navigationTitle(algorithm.metadata.displayName)
+    // Tied to this view's own presence, not to `runSortViewLifecycle`'s return — that function
+    // returns once the initial run finishes (e.g. a plain manual sort completing its animation),
+    // well before the user is done looking at the still-fully-interactive completed session. See
+    // `runSortViewLifecycle`'s own doc comment for the real, shipped bug this fixes.
+    .onAppear {
+      SortCoordinator.shared.registerActiveSession(session, for: algorithm.id)
+    }
+    .onDisappear {
+      SortCoordinator.shared.unregisterActiveSession(for: algorithm.id)
+    }
+    .task {
+      await runSortViewLifecycle(
+        session: session, algorithm: algorithm, arraySize: arraySize,
+        showcaseCompletion: showcaseCompletion, settings: settings)
+    }
+  }
+}

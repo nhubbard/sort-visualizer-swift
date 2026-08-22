@@ -1,0 +1,22 @@
+workspace("Sort Symphony.xcworkspace")
+scheme("Sort Symphony")
+
+# Only the dedicated screenshot test — the UI test target also holds correctness tests
+# (RunControlBarUITests, QuickSortUITests, ...) that a screenshot pass shouldn't re-run.
+only_testing(["Sort SymphonyUITests/ScreenshotUITests"])
+
+# App Store's two current iPad size classes — there's no iPhone destination to capture (the app
+# is iPad + Mac Catalyst only), and the app's Info.plist enforces landscape-only orientation.
+devices([
+  "iPad Pro 13-inch (M5)",
+  "iPad Pro 11-inch (M5)",
+])
+
+languages(["en-US"])
+
+output_directory("./fastlane/screenshots")
+clear_previous_screenshots(true)
+
+# Launching both simulators' test runners at once raced for simulator resources and one device's
+# runner failed to launch ("Busy — Application failed preflight checks") — run them one at a time.
+concurrent_simulators(false)

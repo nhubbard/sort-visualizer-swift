@@ -1,0 +1,12 @@
+Median Quick Bogosort borrows Quicksort's divide-and-recurse shape but replaces the partitioning step with blind luck:
+instead of choosing a pivot and moving elements around it directly, it repeatedly shuffles an entire range at random and
+checks whether the shuffle happened to leave every element in the first half no greater than every element in the second
+half. Once a shuffle satisfies that split — a *median*-based split, always cutting the range exactly in two rather than
+around a chosen pivot value — it recurses into each half independently and repeats the same random-shuffle-until-split
+trick there.
+
+Because the check only asks "is this range split down the middle," not "is this range sorted," a single successful
+shuffle is a much easier target to hit than full sortedness would be, which is what keeps this from being quite as
+hopeless as reshuffling the whole array at once. Still, every one of those shuffles is a genuine gamble with no memory
+of previous attempts, so the number of reshuffles any given recursive call needs before it gets lucky is exactly as
+open-ended as ordinary Bogosort's.

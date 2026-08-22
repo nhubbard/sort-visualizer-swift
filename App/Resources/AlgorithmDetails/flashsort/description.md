@@ -1,0 +1,21 @@
+*From Wikipedia, the free encyclopedia*
+
+Flash Sort is a distribution sorting algorithm developed by Karl-Dietrich Neubert in 1997. It divides the input into a
+linear number of "classes" — roughly one-fifth of the number of elements — based on where each element's value falls
+between the smallest and largest values present. A simple formula estimates, for any given value, which class it belongs
+to without needing to inspect any other element.
+
+The algorithm proceeds in two stages. First, it scans the array once to count how many elements fall into each class,
+then turns those counts into cumulative boundaries — the same technique Counting Sort uses to know exactly which slice
+of the output each class occupies. Second, it permutes the elements into those class boundaries in a single in-place
+pass, following chains of displaced elements until every element sits somewhere inside its class's boundary. At that
+point the array is not fully sorted, only sorted *by class* — a cheap general-purpose sort, typically a form of
+Insertion Sort, finishes the job by tidying up the small amount of disorder left within each class.
+
+Because classification only requires a value and the array's minimum and maximum, no auxiliary storage proportional to
+the range of values is needed the way Counting Sort or Pigeonhole Sort require — Flash Sort's extra memory is
+proportional only to the number of classes, not the size of the value range. When the input's values are roughly
+uniformly distributed, each class ends up holding close to the same number of elements, the permutation and cleanup
+passes stay cheap, and the algorithm runs in linear time on average. Skewed or clustered distributions can leave some
+classes far larger than others, degrading performance toward the quadratic behavior of the plain cleanup sort it relies
+on.

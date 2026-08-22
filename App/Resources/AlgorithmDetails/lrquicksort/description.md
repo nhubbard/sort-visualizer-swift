@@ -1,0 +1,34 @@
+*From Wikipedia, the free encyclopedia*
+
+The **Hoare partition scheme** is the original partitioning method C. A. R. Hoare described
+for [Quick Sort](https://en.wikipedia.org/wiki/Quicksort), and the counterpart to the more commonly
+taught [Lomuto partition scheme](https://en.wikipedia.org/wiki/Quicksort#Lomuto_partition_scheme). Rather than a single
+pointer sweeping left to right, Hoare's scheme uses two pointers that start at opposite ends of the range and move
+toward each other: a left pointer skips forward past every element already known to belong on the left of the pivot, and
+a right pointer skips backward past every element already known to belong on the right. When both pointers stop — the
+left one having found an element that is not smaller than the pivot, the right one having found an element that is not
+larger — the two elements they are sitting on are swapped, and both pointers take one more step toward the middle.
+This "Left/Right Pointers" variant additionally picks the middle element of each range as its pivot, rather than always
+the first or last element the way a naive implementation might.
+
+Because the two pointers only ever swap when they have each independently found something genuinely out of place
+relative to the pivot, Hoare partitioning tends to do noticeably fewer swaps in practice than Lomuto partitioning, which
+swaps on every single element found to be less than the pivot as it scans. The tradeoff is that Hoare's scheme is a
+little more subtle to implement correctly: the two pointers can cross each other by exactly one position by the time the
+partitioning pass ends, and the recursive calls have to be made on `[left, right-pointer]` and `[left-pointer, right]`
+rather than around a single clean split index the way Lomuto's scheme naturally produces.
+
+Choosing the pivot from the middle of the range, rather than a fixed end, also changes how the algorithm behaves on
+already-sorted or reverse-sorted input. A Lomuto-style implementation that always pivots on the last element degrades to
+its worst-case running time on exactly that kind of input, because every partition ends up maximally unbalanced. Picking
+the middle element instead means a sorted or reverse-sorted array still splits into two roughly equal halves on each
+call, avoiding that particular pitfall — though, since the pivot choice is still fixed and not randomized or selected by
+a median-of-three sample, a specifically constructed adversarial input can still drive this variant to its own O(n^2)
+worst case, exactly as with any quicksort that doesn't guard against adversarial pivot selection.
+
+Like every variant of Quick Sort, this is an
+in-place [divide-and-conquer](https://en.wikipedia.org/wiki/Divide-and-conquer_algorithm) comparison sort, with an
+average running time of O(n log n) and a recursion depth — and therefore auxiliary space usage — of O(log n) for a
+well-balanced split. It is not a [stable sort](https://en.wikipedia.org/wiki/Sorting_algorithm#Stability): elements on
+opposite sides of a partition swap can be carried past other elements equal in value to either of them, with nothing in
+the partitioning logic to preserve their original relative order.

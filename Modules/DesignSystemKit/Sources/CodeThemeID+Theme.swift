@@ -1,0 +1,61 @@
+import SettingsKit
+
+/// `SettingsKit.CodeThemeID` is an ID only (so `SettingsKit` doesn't need to depend on the actual
+/// theme rendering) — this is the other half, mapping that ID to a concrete `CodeTheme` wherever
+/// the rendering actually happens.
+extension CodeThemeID {
+  public func makeTheme() -> any CodeTheme {
+    switch rawValue {
+    case "monokai": MonokaiTheme()
+    case "pygments": PygmentsTheme()
+    case "arduino": ArduinoTheme()
+    case "colorful": ColorfulTheme()
+    case "dracula": DraculaTheme()
+    case "emacs": EmacsTheme()
+    case "abap": AbapTheme()
+    case "algol": AlgolTheme()
+    case "algol_nu": AlgolNuTheme()
+    case "autumn": AutumnTheme()
+    case "borland": BorlandTheme()
+    case "bw": BwTheme()
+    case "coffee": CoffeeTheme()
+    case "friendly": FriendlyTheme()
+    case "friendly_grayscale": FriendlyGrayscaleTheme()
+    case "fruity": FruityTheme()
+    case "github-dark": GithubDarkTheme()
+    case "gruvbox-dark": GruvboxDarkTheme()
+    case "gruvbox-light": GruvboxLightTheme()
+    case "igor": IgorTheme()
+    case "inkpot": InkpotTheme()
+    case "lightbulb": LightbulbTheme()
+    case "lilypond": LilypondTheme()
+    case "lovelace": LovelaceTheme()
+    case "manni": ManniTheme()
+    case "material": MaterialTheme()
+    case "murphy": MurphyTheme()
+    case "native": NativeTheme()
+    case "nord": NordTheme()
+    case "nord-darker": NordDarkerTheme()
+    case "one-dark": OneDarkTheme()
+    case "paraiso-dark": ParaisoDarkTheme()
+    case "paraiso-light": ParaisoLightTheme()
+    case "pastie": PastieTheme()
+    case "perldoc": PerldocTheme()
+    case "rainbow_dash": RainbowDashTheme()
+    case "rrt": RrtTheme()
+    case "sas": SasTheme()
+    case "solarized-dark": SolarizedDarkTheme()
+    case "solarized-light": SolarizedLightTheme()
+    case "staroffice": StarofficeTheme()
+    case "stata-dark": StataDarkTheme()
+    case "stata-light": StataLightTheme()
+    case "tango": TangoTheme()
+    case "trac": TracTheme()
+    case "vim": VimTheme()
+    case "vs": VsTheme()
+    case "xcode": XcodeTheme()
+    case "zenburn": ZenburnTheme()
+    default: MonokaiTheme()
+    }
+  }
+}

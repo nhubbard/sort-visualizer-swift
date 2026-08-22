@@ -1,0 +1,30 @@
+import AlgorithmKit
+import SortEngineKit
+
+public struct InsertionSort: SortAlgorithm {
+  public let id = AlgorithmID(rawValue: "insertionsort")
+  public let metadata = AlgorithmMetadata(
+    displayName: "Insertion Sort",
+    category: .insertion,
+    sizeRange: 16...256,
+    growthModel: OperationGrowthModel(
+      anchorSize: 219, coefficients: [238710, 2185, 5],
+      measuredSafeCeiling: nil),
+    stable: true,
+    timeComplexity: ComplexityBounds(best: "O(n)", average: "O(n^2)", worst: "O(n^2)"),
+    spaceComplexity: "O(1)",
+    iconName: "text.insert"
+  )
+  public init() {}
+  public func record(into engine: inout RecordingEngine) {
+    let n = engine.count
+    guard n > 1 else { return }
+    for i in 1..<n {
+      var j = i
+      while j > 0 && !engine.compare(j, j - 1) {
+        engine.swap(j - 1, j)
+        j -= 1
+      }
+    }
+  }
+}

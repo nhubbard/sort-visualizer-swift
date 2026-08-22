@@ -1,0 +1,35 @@
+# ktlint config for the Kotlin source files under this directory. Each algorithm's .kt file is a
+# short, single-purpose demo script (one function plus a literal test array), and ktlint's
+# "standard" ruleset defaults to an opinionated style that fights that on several fronts —
+# specifically the family of rules that normalizes ANY already-multi-line construct (a call, a
+# function signature, an if/else chain, a method chain, a loop body) to one-item-per-line
+# regardless of whether it already fits comfortably. Left enabled, `manage.py lint --fix`/`format`
+# balloons a compact 16-element test array into one integer per line, and expands single-line
+# if/else-if/else bodies into fully-braced blocks — pure churn with no readability benefit for
+# code this size. Disabled below, alongside `filename` (our files are intentionally named
+# `<algorithm-id>.kt`, matching the same-name convention every other language here also uses, not
+# ktlint's expected PascalCase-matching-a-class convention) and `final-newline` (this repo's root
+# .editorconfig sets `insert_final_newline = false` project-wide, but 8 of the other 9 languages'
+# source files in this directory already have one in practice — overridden below so Kotlin doesn't
+# become the one outlier and lose its trailing newline on every format).
+#
+# Left enabled: rules that catch genuine non-idiomatic Kotlin (stray semicolons, cramming several
+# statements onto one line, an expression-bodied function still using `{ return ... }`, a
+# non-camelCase property name, a hard-to-read mixed-operator condition) — these are real,
+# low-volume findings worth fixing, not systemic style clashes. `standard:wrapping` also stays on
+# despite being part of the same "normalize to multi-line" family: `trailing-comma-on-call-site`/
+# `trailing-comma-on-declaration-site` (which we do want) hard-depend on it being loaded — ktlint
+# refuses to run at all otherwise ("Skipping rule(s) which are depending on a rule which is not
+# loaded"). It barely fired on its own in practice anyway.
+[*.{kt,kts}]
+insert_final_newline = true
+ktlint_standard_filename = disabled
+ktlint_standard_final-newline = disabled
+ktlint_standard_argument-list-wrapping = disabled
+ktlint_standard_parameter-list-wrapping = disabled
+ktlint_standard_function-signature = disabled
+ktlint_standard_multiline-expression-wrapping = disabled
+ktlint_standard_chain-method-continuation = disabled
+ktlint_standard_multiline-if-else = disabled
+ktlint_standard_if-else-wrapping = disabled
+ktlint_standard_multiline-loop = disabled

@@ -1,0 +1,44 @@
+# Audited every bugprone-* finding that actually fired across the corpus (124 short, single-file
+# C/C++ sorting-algorithm demos) before disabling anything:
+#
+# - bugprone-easily-swappable-parameters: 160 of ~197 total findings, essentially firing on every
+#   function here (sorting algorithms are inherently full of same-typed index/bound parameters
+#   like `(int arr[], int start, int end)`) — structurally endemic to this domain, not a real risk
+#   given clear parameter names and a test suite that verifies actual sortedness.
+# - bugprone-exception-escape: fires on `main` using standard containers/streams that could
+#   theoretically throw (e.g. `bad_alloc`) — technically correct, practically irrelevant for a
+#   demo script with no try/catch anywhere; an uncaught exception in `main` just terminates
+#   cleanly, which is fine here.
+# - bugprone-throwing-static-initialization: same class of "technically could throw" false
+#   positive, this time on a global `std::mt19937 rng(std::random_device{}())` — its constructor
+#   can theoretically throw on some restricted platforms, but not in the environment this runs in,
+#   and there's no sensible fallback to add for a demo script's RNG.
+#
+# Real findings from the other bugprone checks were fixed directly rather than suppressed: a
+# genuine realloc-without-null-check leak (bugprone-suspicious-realloc-usage), missing explicit
+# casts on void*<->int** conversions (bugprone-multi-level-implicit-pointer-conversion), narrowing
+# float/double literals and compound assignments (bugprone-narrowing-conversions), and a
+# duplicated if/else branch simplified to match the algorithm's own Python reference
+# (bugprone-branch-clone). Genuine clang-analyzer dead-stores (deadcode.DeadStores) were also
+# removed directly — the same provably-safe pattern already found and fuzz-verified in this
+# batch's Ruby port (see PORT_INVENTORY.md).
+#
+# Two clang-analyzer checks disabled outright, both for the same reason — recommending a
+# non-portable replacement that would make these files worse, not better:
+# - clang-analyzer-security.insecureAPI.rand: recommends `arc4random` over `rand()`, but
+#   `arc4random` is a BSD/Darwin-only extension, not standard C — that advice would make these
+#   files non-portable to Linux/Windows for no benefit, since `rand()` here is only used for
+#   ordinary (non-cryptographic) shuffling in the bogosort family.
+# - clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling: recommends `fprintf_s`
+#   (and similar) over `fprintf` — the C11 Annex K bounds-checking functions are optional and, in
+#   practice, only implemented by MSVC's CRT; glibc and macOS's libc don't provide them at all.
+#
+# A handful of remaining clang-analyzer-security.ArrayBound and one
+# clang-analyzer-core.uninitialized.Assign finding are real invariants the analyzer can't prove
+# across recursive calls / a two-pass counting-sort — each is suppressed individually inline with
+# `// NOLINT(...)` plus a comment explaining the proof/verification, not blanket-disabled here,
+# since both checks are otherwise valuable and should stay on for new files.
+#
+# Left every other bugprone/clang-diagnostic/clang-analyzer/performance check enabled as a safety
+# net for future files.
+Checks: 'clang-diagnostic-*,clang-analyzer-*,bugprone-*,performance-*,-bugprone-easily-swappable-parameters,-bugprone-exception-escape,-bugprone-throwing-static-initialization,-clang-analyzer-security.insecureAPI.rand,-clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling'
