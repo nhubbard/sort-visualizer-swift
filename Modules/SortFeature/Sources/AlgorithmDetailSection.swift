@@ -147,8 +147,14 @@ public struct AlgorithmDetailSection: View {
   private var complexityColumn: some View {
     VStack(alignment: .leading, spacing: 8) {
       Text("Complexity").font(.title2.bold())
-      ForEach(algorithm.metadata.complexityRows) { row in
-        MathView(text: row.label, equation: row.latex)
+      // A `Grid`, not a `VStack` of independent per-row `HStack`s -- each `MathGridRow` used to
+      // size itself without any regard for its siblings, so the equation column's width (and,
+      // once `SwiftMathView` picked up an inflated width from that, its height too) varied row to
+      // row instead of lining up. `Grid` sizes both columns once, from every row's real content.
+      Grid(alignment: .leading, horizontalSpacing: 12, verticalSpacing: 6) {
+        ForEach(algorithm.metadata.complexityRows) { row in
+          MathGridRow(text: row.label, equation: row.latex)
+        }
       }
 
       GrowthModelComparisonSection(algorithm: algorithm)

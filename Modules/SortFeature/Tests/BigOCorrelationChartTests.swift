@@ -48,4 +48,29 @@ struct BigOCorrelationChartTests {
     let filtered = powerOfTwoSizesOnly(points)
     #expect(filtered.map(\.size).sorted() == [1, 3, 16, 17, 100, 256])
   }
+
+  @Test
+  func powerOfTwoAxisValuesBracketsANonPowerOfTwoRange() {
+    #expect(powerOfTwoAxisValues(in: 16...300) == [16, 32, 64, 128, 256, 512])
+  }
+
+  @Test
+  func powerOfTwoAxisValuesMatchesARangeAlreadyAtExactPowers() {
+    #expect(powerOfTwoAxisValues(in: 8...64) == [8, 16, 32, 64])
+  }
+
+  @Test
+  func powerOfTwoAxisValuesBracketsASingleNonPowerOfTwoValue() {
+    #expect(powerOfTwoAxisValues(in: 5...5) == [4, 8])
+  }
+
+  @Test
+  func powerOfTwoAxisValuesNeverGoesBelowOneEvenForASubOneLowerBound() {
+    #expect(powerOfTwoAxisValues(in: 0.5...4) == [1, 2, 4])
+  }
+
+  @Test
+  func powerOfTwoAxisValuesIsEmptyWhenTheUpperBoundIsBelowOne() {
+    #expect(powerOfTwoAxisValues(in: 0.1...0.5).isEmpty)
+  }
 }

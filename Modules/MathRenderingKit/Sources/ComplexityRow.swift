@@ -1,6 +1,6 @@
 import AlgorithmKit
 
-/// One renderable row for `MathView` — `label`/`latex` pair, e.g. ("Worst Case", "O(n^2)").
+/// One renderable row for `MathGridRow` — `label`/`latex` pair, e.g. ("Worst Case", "O(n^2)").
 public struct ComplexityRow: Identifiable, Sendable {
   public let id: String
   public let label: String

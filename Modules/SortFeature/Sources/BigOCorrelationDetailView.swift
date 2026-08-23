@@ -78,6 +78,10 @@ struct BigOCorrelationDetailView: View {
     let sizeDomain = observedSizes[0]...observedSizes[observedSizes.count - 1]
     let fullRange = max(observedSizes[observedSizes.count - 1] - observedSizes[0], 1)
     let visibleLength = shouldScroll ? max(fullRange / 3, 1) : fullRange
+    // `chartXScale`/`chartXVisibleDomain`/`chartXSelection` all stay in plain domain (array-size)
+    // units regardless of scale type -- `.log` only changes how those values are *positioned* on
+    // screen, so none of the scrolling/selection math above needs to change for it.
+    let logDomain = Double(sizeDomain.lowerBound)...Double(sizeDomain.upperBound)
 
     return Chart {
       bigOChartMarks(for: visiblePoints)
@@ -85,22 +89,20 @@ struct BigOCorrelationDetailView: View {
       // there's no selection, so hovering never changes the Chart's mark structure. Toggling a
       // mark in and out was itself part of the resize/flicker loop below: a structural change on
       // every hover-driven `chartXSelection` update forced a full chart relayout each time.
-      RuleMark(x: .value("Selected", selectedSize ?? sizeDomain.lowerBound - 1))
+      // `max(..., 1)`, not just `sizeDomain.lowerBound - 1` -- a `.log`-scaled axis can't position
+      // a value <= 0 at all, and this needs to stay a valid (if invisible) point even in the
+      // pathological case of a size-1 lower bound.
+      RuleMark(x: .value("Selected", max(selectedSize ?? sizeDomain.lowerBound - 1, 1)))
         .foregroundStyle(.secondary.opacity(selectedSize == nil ? 0 : 0.5))
         .lineStyle(StrokeStyle(lineWidth: 1, dash: [2, 2]))
     }
-    .chartXScale(domain: sizeDomain)
+    .chartXScale(domain: sizeDomain, type: .log)
     .chartXAxis {
-      AxisMarks(values: observedSizes) { value in
-        AxisGridLine()
-        AxisTick()
-        AxisValueLabel {
-          if let size = value.as(Int.self) {
-            Text("\(size)")
-              .rotationEffect(.degrees(shouldScroll ? -45 : 0))
-          }
-        }
-      }
+      // Bounded by the number of powers of two in range (rarely more than a dozen even across
+      // this app's full size range), unlike the old one-tick-per-recorded-size approach this
+      // replaced -- dense enough recorded sizes used to need rotated labels just to avoid
+      // overlapping; log-spaced power-of-two ticks don't.
+      AxisMarks(values: powerOfTwoAxisValues(in: logDomain))
     }
     .chartXAxisLabel("Array Size")
     .chartYAxisLabel("Normalized Work")

@@ -41,6 +41,20 @@ private let sharedMathFontManager = MTFontManager.manager
       MTMathUILabel()
     }
 
+    /// Without this, SwiftUI's default `UIViewRepresentable` sizing negotiation was letting
+    /// `MTMathUILabel` claim however much width/height its container merely *proposed* — a plain
+    /// `HStack`/`VStack` row with no other constraint could propose a huge share of the detail
+    /// pane's width, and the label expanded to fill it (blowing up that row's, and therefore its
+    /// whole column's, ideal width), with knock-on vertical bloat once other layout code reacted
+    /// to that width. `MTMathUILabel.intrinsicContentSize` (`_sizeThatFits(CGSizeZero)` internally)
+    /// already computes the label's real, tight rendered-content size regardless of what's
+    /// proposed -- returning it directly here is what makes the label actually hug its equation.
+    public func sizeThatFits(
+      _ proposal: ProposedViewSize, uiView: MTMathUILabel, context: Context
+    ) -> CGSize? {
+      uiView.intrinsicContentSize
+    }
+
     public func updateUIView(_ view: MTMathUILabel, context: Context) {
       view.latex = equation
       // `MTFontManager()` (the plain initializer) starts with an empty `nameToFontMap`, so it
@@ -82,6 +96,13 @@ private let sharedMathFontManager = MTFontManager.manager
 
     public func makeNSView(context: Context) -> MTMathUILabel {
       MTMathUILabel()
+    }
+
+    /// See the iOS variant's identical override above for why this is necessary.
+    public func sizeThatFits(
+      _ proposal: ProposedViewSize, nsView: MTMathUILabel, context: Context
+    ) -> CGSize? {
+      nsView.intrinsicContentSize
     }
 
     public func updateNSView(_ view: MTMathUILabel, context: Context) {

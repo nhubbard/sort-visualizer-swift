@@ -47,13 +47,14 @@ struct BigOCorrelationChart: View {
         // as an algorithm accumulates recorded runs at more sizes.
         let renderedPoints = powerOfTwoSizesOnly(
           cappedForRendering(points).filter { $0.kind != .observedRun })
+        let sizeDomain = Double(observedSizes[0])...Double(observedSizes[observedSizes.count - 1])
         VStack(alignment: .leading, spacing: 4) {
           Chart {
             bigOChartMarks(for: renderedPoints)
           }
-          .chartXScale(domain: observedSizes[0]...observedSizes[observedSizes.count - 1])
+          .chartXScale(domain: sizeDomain, type: .log)
           .chartXAxis {
-            AxisMarks(values: .automatic(desiredCount: 5))
+            AxisMarks(values: powerOfTwoAxisValues(in: sizeDomain))
           }
           .chartXAxisLabel("Array Size")
           .chartYAxisLabel("Normalized Work")
@@ -151,6 +152,22 @@ func bigOChartMarks(for points: [BigOChartPoint]) -> some ChartContent {
       .foregroundStyle(.purple)
     }
   }
+}
+
+/// Powers of two spanning `range` (the nearest one at or below the lower bound through the
+/// nearest one at or above the upper bound) — every array-size chart in this module (this one,
+/// `BigOCorrelationDetailView`, and `GrowthModelComparisonSection`) uses these as its
+/// `AxisMarks(values:)`, on top of a `.log`-typed `chartXScale`, so ticks land at a genuine
+/// log-base-2 spacing instead of Swift Charts' automatic (linear, arbitrary-round-number) ticks —
+/// array sizes commonly span orders of magnitude in one chart, where linear ticks either clump
+/// everything near the small end or land on numbers with no relationship to how these algorithms'
+/// complexity actually scales.
+func powerOfTwoAxisValues(in range: ClosedRange<Double>) -> [Int] {
+  guard range.upperBound >= 1 else { return [] }
+  let lowerExponent = max(0, Int(log2(max(range.lowerBound, 1)).rounded(.down)))
+  let upperExponent = Int(log2(range.upperBound).rounded(.up))
+  guard lowerExponent <= upperExponent else { return [] }
+  return (lowerExponent...upperExponent).map { 1 << $0 }
 }
 
 /// Restricts the rainbow stat points (but not the trend line or reference curves) to sizes that

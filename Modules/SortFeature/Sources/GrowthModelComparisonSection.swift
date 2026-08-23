@@ -31,8 +31,10 @@ struct GrowthModelComparisonSection: View {
     if let detected = metadata.detectedGrowthModel {
       VStack(alignment: .leading, spacing: 8) {
         Text("Growth Model").font(.title2.bold())
-        MathView(text: "Detected", equation: detected.latex)
-        MathView(text: "Fitted (Used by App)", equation: metadata.fittedGrowthModelLatex)
+        Grid(alignment: .leading, horizontalSpacing: 12, verticalSpacing: 6) {
+          MathGridRow(text: "Detected", equation: detected.latex)
+          MathGridRow(text: "Fitted (Used by App)", equation: metadata.fittedGrowthModelLatex)
+        }
         chart(detected: detected)
         if let divergence = divergencePercent(detected: detected) {
           Text(
@@ -86,7 +88,10 @@ struct GrowthModelComparisonSection: View {
           Text("Cutoff").font(.caption2).foregroundStyle(.secondary)
         }
     }
-    .chartXScale(domain: domain)
+    .chartXScale(domain: domain, type: .log)
+    .chartXAxis {
+      AxisMarks(values: powerOfTwoAxisValues(in: domain))
+    }
     .chartXAxisLabel("Array Size")
     .chartYAxisLabel("Normalized Work")
     .chartLegend(position: .bottom, alignment: .center, spacing: 16)
