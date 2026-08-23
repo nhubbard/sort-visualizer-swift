@@ -25,6 +25,8 @@ public struct ClassicThreeSmoothCombSort: SortAlgorithm {
     growthModel: OperationGrowthModel(
       anchorSize: 1057, coefficients: [220385, 289.129, 0.0508555],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .powerLog, coefficients: [5.51005, 1.2431], rSquared: 0.998099),
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n log^2 n)", average: "O(n log^2 n)", worst: "O(n log^2 n)"),

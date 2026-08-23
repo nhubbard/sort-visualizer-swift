@@ -27,6 +27,8 @@ public struct IterativeTopDownMergeSort: SortAlgorithm {
     growthModel: OperationGrowthModel(
       anchorSize: 2390, coefficients: [188980, 92.2662, 0.00294775],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .powerLog, coefficients: [7.54425, 1.03832], rSquared: 0.999756),
     stable: true,
     timeComplexity: ComplexityBounds(
       best: "O(n log n)", average: "O(n log n)", worst: "O(n log n)"),

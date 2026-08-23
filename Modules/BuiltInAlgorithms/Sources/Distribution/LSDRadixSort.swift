@@ -11,6 +11,8 @@ public struct LSDRadixSort: SortAlgorithm {
     growthModel: OperationGrowthModel(
       anchorSize: 4292, coefficients: [239924, 105.28, 0.0115046],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .polynomialIntercept, coefficients: [0.0115046, 6.52513, -11.2883], rSquared: 0.999346),
     stable: true,
     timeComplexity: ComplexityBounds(
       best: "O(d \\times (n+b))", average: "O(d \\times (n+b))", worst: "O(d \\times (n+b))"

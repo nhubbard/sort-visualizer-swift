@@ -21,6 +21,8 @@ public struct ForcedStableQuickSort: SortAlgorithm {
     growthModel: OperationGrowthModel(
       anchorSize: 1060, coefficients: [239803, 409.245, 0.172442],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .polynomialIntercept, coefficients: [0.172442, 43.6682, -241.159], rSquared: 0.99998),
     stable: true,
     timeComplexity: ComplexityBounds(
       best: "O(n log n)", average: "O(n log n)", worst: "O(n^2)"),

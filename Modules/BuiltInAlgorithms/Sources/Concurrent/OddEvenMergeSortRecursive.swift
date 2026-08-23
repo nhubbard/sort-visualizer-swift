@@ -10,6 +10,8 @@ public struct OddEvenMergeSortRecursive: SortAlgorithm {
     growthModel: OperationGrowthModel(
       anchorSize: 930, coefficients: [239582, 422.642, 0.176149],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .polynomialIntercept, coefficients: [0.176149, 95.004, -1123.73], rSquared: 0.999859),
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(log^2 n)", average: "O(log^2 n)", worst: "O(log^2 n)"),

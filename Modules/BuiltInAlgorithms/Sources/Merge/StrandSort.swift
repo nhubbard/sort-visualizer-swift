@@ -10,6 +10,8 @@ public struct StrandSort: SortAlgorithm {
     growthModel: OperationGrowthModel(
       anchorSize: 691, coefficients: [239777, 692.5, 0.5],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .polynomialIntercept, coefficients: [0.5, 1.5, 0], rSquared: 1),
     stable: true,
     timeComplexity: ComplexityBounds(best: "O(n)", average: "O(n log n)", worst: "O(n^2)"),
     spaceComplexity: "O(n)",

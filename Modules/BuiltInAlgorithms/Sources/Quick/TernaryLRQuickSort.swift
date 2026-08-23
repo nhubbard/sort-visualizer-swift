@@ -10,6 +10,8 @@ public struct TernaryLRQuickSort: SortAlgorithm {
     growthModel: OperationGrowthModel(
       anchorSize: 340, coefficients: [239073, 1364.42, 1.94344],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .polynomialIntercept, coefficients: [1.94344, 42.8797, -167.683], rSquared: 1),
     stable: false,
     timeComplexity: ComplexityBounds(best: "O(n log n)", average: "O(n log n)", worst: "O(n^2)"),
     spaceComplexity: "O(log n)",

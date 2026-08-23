@@ -27,6 +27,8 @@ public struct ClassicTournamentSort: SortAlgorithm {
     growthModel: OperationGrowthModel(
       anchorSize: 2255, coefficients: [193624, 99.5009, 0.00318444],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .powerLog, coefficients: [8.86973, 1.0293], rSquared: 0.999267),
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n log n)", average: "O(n log n)", worst: "O(n log n)"),

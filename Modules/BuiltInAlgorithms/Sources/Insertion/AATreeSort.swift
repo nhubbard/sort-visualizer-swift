@@ -23,6 +23,8 @@ public struct AATreeSort: SortAlgorithm {
     growthModel: OperationGrowthModel(
       anchorSize: 2364, coefficients: [184459, 94.7247, 0.0040135],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .powerLog, coefficients: [5.18022, 1.08525], rSquared: 0.999728),
     stable: true,
     timeComplexity: ComplexityBounds(best: "O(n log n)", average: "O(n log n)", worst: "O(n log n)"),
     spaceComplexity: "O(n)",

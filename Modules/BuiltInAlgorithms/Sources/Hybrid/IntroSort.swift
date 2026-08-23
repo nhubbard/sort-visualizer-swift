@@ -11,6 +11,8 @@ public struct IntroSort: SortAlgorithm {
     growthModel: OperationGrowthModel(
       anchorSize: 1247, coefficients: [213291, 237.961, 0.0359793],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .powerLog, coefficients: [4.01049, 1.25095], rSquared: 0.999664),
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n log n)", average: "O(n log n)", worst: "O(n log n)"),

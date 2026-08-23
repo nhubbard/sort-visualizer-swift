@@ -10,6 +10,8 @@ public struct QuickSort: SortAlgorithm {
     growthModel: OperationGrowthModel(
       anchorSize: 306, coefficients: [239425, 1547.5, 2.5],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .polynomialIntercept, coefficients: [2.5, 17.5, -20], rSquared: 1),
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n log n)", average: "O(n log n)", worst: "O(n^2)"),

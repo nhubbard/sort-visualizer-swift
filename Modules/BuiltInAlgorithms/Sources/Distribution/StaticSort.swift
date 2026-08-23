@@ -26,6 +26,8 @@ public struct StaticSort: SortAlgorithm {
     growthModel: OperationGrowthModel(
       anchorSize: 6815, coefficients: [135181, 21.4058],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .powerLog, coefficients: [3.03765, 0.965855], rSquared: 0.983209),
     stable: false,
     timeComplexity: ComplexityBounds(best: "O(n)", average: "O(n)", worst: "O(n^2)"),
     spaceComplexity: "O(n)",

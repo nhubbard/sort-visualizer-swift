@@ -23,6 +23,8 @@ public struct TwinSort: SortAlgorithm {
     growthModel: OperationGrowthModel(
       anchorSize: 6478, coefficients: [114074, 24.224, 0.000684673],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .powerLog, coefficients: [0.201857, 1.26168], rSquared: 0.99033),
     stable: true,
     timeComplexity: ComplexityBounds(
       best: "O(n)", average: "O(n log n)", worst: "O(n log n)"),

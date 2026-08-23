@@ -26,6 +26,8 @@ public struct CircloidSort: SortAlgorithm {
     growthModel: OperationGrowthModel(
       anchorSize: 564, coefficients: [236497, 638.268, 0.28619],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .powerLog, coefficients: [6.58436, 1.3643], rSquared: 0.99642),
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n log n)", average: "O(n log^2 n)", worst: "O(n log^2 n)"),

@@ -13,6 +13,8 @@ public struct LazyStableSort: SortAlgorithm {
     growthModel: OperationGrowthModel(
       anchorSize: 491, coefficients: [238170, 793.515, 0.500959],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .powerLog, coefficients: [4.13781, 1.47449], rSquared: 0.992666),
     stable: true,
     timeComplexity: ComplexityBounds(
       best: "O(n log n)", average: "O(n log n)", worst: "O(n log n)"),

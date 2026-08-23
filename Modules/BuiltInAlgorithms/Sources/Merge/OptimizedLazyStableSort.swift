@@ -25,6 +25,8 @@ public struct OptimizedLazyStableSort: SortAlgorithm {
     growthModel: OperationGrowthModel(
       anchorSize: 462, coefficients: [239433, 1020.51, 1.08469],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .polynomialIntercept, coefficients: [1.08469, 18.2524, -521.373], rSquared: 0.999991),
     stable: true,
     timeComplexity: ComplexityBounds(
       best: "O(n)", average: "O(n log n)", worst: "O(n log n)"),

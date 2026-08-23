@@ -10,6 +10,8 @@ public struct StablePermutationSort: SortAlgorithm {
     growthModel: OperationGrowthModel(
       anchorSize: 7, coefficients: [78799.3, 163121, 174825, 128613, 72779.7, 33693.6],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .factorial, coefficients: [68.769, 1.06381], rSquared: 0.99929),
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n)", average: "O(n \\times n!)", worst: "O(n \\times n!)"),

@@ -32,6 +32,8 @@ public struct BlockInsertionSort: SortAlgorithm {
     growthModel: OperationGrowthModel(
       anchorSize: 573, coefficients: [239718, 808.206, 0.679677],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .polynomialIntercept, coefficients: [0.679677, 29.2959, -225.995], rSquared: 0.999997),
     stable: true,
     timeComplexity: ComplexityBounds(
       best: "O(n)", average: "O(n log n)", worst: "O(n^2)"),

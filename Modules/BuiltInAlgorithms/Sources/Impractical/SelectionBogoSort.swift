@@ -10,6 +10,8 @@ public struct SelectionBogoSort: SortAlgorithm {
     growthModel: OperationGrowthModel(
       anchorSize: 309, coefficients: [239234, 1547.02, 2.50054],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .polynomialIntercept, coefficients: [2.50054, 1.68879, -41.971], rSquared: 1),
     stable: false,
     timeComplexity: ComplexityBounds(best: "O(n^2)", average: "O(n^2)", worst: "O(n^2)"),
     spaceComplexity: "O(1)",

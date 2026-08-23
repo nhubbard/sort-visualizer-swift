@@ -15,6 +15,8 @@ public struct BinaryGnomeSort: SortAlgorithm {
     growthModel: OperationGrowthModel(
       anchorSize: 303, coefficients: [239852, 1559, 2.5301],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .polynomialIntercept, coefficients: [2.5301, 25.7589, -238.373], rSquared: 1),
     stable: true,
     timeComplexity: ComplexityBounds(best: "O(n)", average: "O(n^2)", worst: "O(n^2)"),
     spaceComplexity: "O(1)",

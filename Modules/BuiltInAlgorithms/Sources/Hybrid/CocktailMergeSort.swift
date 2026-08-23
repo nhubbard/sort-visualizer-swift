@@ -22,6 +22,8 @@ public struct CocktailMergeSort: SortAlgorithm {
     growthModel: OperationGrowthModel(
       anchorSize: 756, coefficients: [239683, 1763.36, 6.48657, 0.0159073, 2.92578e-05, 4.30503e-08],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .exponential, coefficients: [920.704, 1.00738], rSquared: 0.808132),
     stable: true,
     timeComplexity: ComplexityBounds(
       best: "O(n log n)", average: "O(n log n)", worst: "O(n^2)"),

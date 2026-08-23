@@ -21,6 +21,8 @@ public struct SlowSort: SortAlgorithm {
     growthModel: OperationGrowthModel(
       anchorSize: 45, coefficients: [229877, 40045.9, 3580.68, 217.991, 10.1328, 0.382704],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .nToTheNLike, coefficients: [462.64, 0.0362426], rSquared: 0.999605),
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n^{log n})", average: "O(n^{log n})", worst: "O(n^{log n})"),

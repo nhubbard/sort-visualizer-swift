@@ -19,6 +19,8 @@ public struct IntroCircleSortIterative: SortAlgorithm {
     growthModel: OperationGrowthModel(
       anchorSize: 829, coefficients: [239869, 499.36, 0.251911],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .polynomialIntercept, coefficients: [0.251911, 81.6922, -977.171], rSquared: 0.999813),
     stable: false,
     // Best/average mirror `CircleSortIterative`'s O(n log^2 n). Worst case differs: passes are
     // capped at `threshold`, then the insertion sort fallback's O(n^2) shift step dominates.

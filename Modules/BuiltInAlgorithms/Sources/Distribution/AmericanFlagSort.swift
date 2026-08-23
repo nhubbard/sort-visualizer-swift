@@ -34,6 +34,8 @@ public struct AmericanFlagSort: SortAlgorithm {
     growthModel: OperationGrowthModel(
       anchorSize: 2928, coefficients: [239957, 149.836, 0.0231814],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .polynomialIntercept, coefficients: [0.0231814, 14.0857, -25.0834], rSquared: 0.99942),
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(d \\times (n+b))", average: "O(d \\times (n+b))", worst: "O(d \\times (n+b))"),

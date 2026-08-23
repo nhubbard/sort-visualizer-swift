@@ -10,6 +10,8 @@ public struct BogoSort: SortAlgorithm {
     growthModel: OperationGrowthModel(
       anchorSize: 7, coefficients: [64841.3, 138712, 153462, 116450, 67932.8, 32406.7],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .factorial, coefficients: [44.7206, 1.09936], rSquared: 0.999853),
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n)", average: "O(n \\times n!)", worst: "O(n \\times n!)"),

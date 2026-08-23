@@ -11,6 +11,8 @@ public struct MergeExchangeSortIterative: SortAlgorithm {
     growthModel: OperationGrowthModel(
       anchorSize: 1014, coefficients: [222565, 296.317, 0.0488819],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .powerLog, coefficients: [7.64469, 1.20554], rSquared: 0.999419),
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n log^2 n)", average: "O(n log^2 n)", worst: "O(n log^2 n)"),

@@ -25,6 +25,8 @@ public struct ClassicTreeSort: SortAlgorithm {
     growthModel: OperationGrowthModel(
       anchorSize: 80000, coefficients: [239999, 3],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .polynomialIntercept, coefficients: [0, 3, -1], rSquared: 1),
     stable: true,
     timeComplexity: ComplexityBounds(best: "O(n log n)", average: "O(n log n)", worst: "O(n^2)"),
     spaceComplexity: "O(n)",

@@ -13,6 +13,8 @@ public struct PDQBranchlessSort: SortAlgorithm {
     growthModel: OperationGrowthModel(
       anchorSize: 3459, coefficients: [154956, 56.5413, 0.002045],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .powerLog, coefficients: [1.76501, 1.13943], rSquared: 0.989801),
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n)", average: "O(n log n)", worst: "O(n log n)"),

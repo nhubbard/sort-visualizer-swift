@@ -18,6 +18,8 @@ public struct BitonicSortRecursive: SortAlgorithm {
     growthModel: OperationGrowthModel(
       anchorSize: 940, coefficients: [239944, 372.102, 0.0905988],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .powerLaw, coefficients: [11.119, 1.45774], rSquared: 0.996688),
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(log^2 n)", average: "O(log^2 n)", worst: "O(log^2 n)"),

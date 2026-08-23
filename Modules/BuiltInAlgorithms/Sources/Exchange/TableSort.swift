@@ -30,6 +30,8 @@ public struct TableSort: SortAlgorithm {
     growthModel: OperationGrowthModel(
       anchorSize: 1082, coefficients: [239639, 408.256, 0.172477],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .polynomialIntercept, coefficients: [0.172477, 35.0156, -170.746], rSquared: 0.999979),
     stable: true,
     timeComplexity: ComplexityBounds(
       best: "O(n log n)", average: "O(n log n)", worst: "O(n^2)"),

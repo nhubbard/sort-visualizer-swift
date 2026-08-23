@@ -23,6 +23,8 @@ public struct PairwiseSortIterative: SortAlgorithm {
     growthModel: OperationGrowthModel(
       anchorSize: 1018, coefficients: [222310, 294.667, 0.0483229],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .powerLog, coefficients: [7.62654, 1.20495], rSquared: 0.999518),
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n log^2 n)", average: "O(n log^2 n)", worst: "O(n log^2 n)"),

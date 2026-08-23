@@ -21,6 +21,8 @@ public struct DoubleInsertionSort: SortAlgorithm {
     growthModel: OperationGrowthModel(
       anchorSize: 973, coefficients: [239822, 489.296, 0.249545],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .polynomialIntercept, coefficients: [0.249545, 3.6818, -11.8066], rSquared: 0.999998),
     stable: true,
     timeComplexity: ComplexityBounds(best: "O(n)", average: "O(n^2)", worst: "O(n^2)"),
     spaceComplexity: "O(1)",

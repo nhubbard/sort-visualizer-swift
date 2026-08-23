@@ -15,6 +15,8 @@ public struct BingoSort: SortAlgorithm {
     growthModel: OperationGrowthModel(
       anchorSize: 7700, coefficients: [239958, 58.86, 0.00359711],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .polynomialIntercept, coefficients: [0.00359711, 3.4646, 8.34021], rSquared: 0.996179),
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n+m^2)", average: "O(n \\times m)", worst: "O(n \\times m)"),

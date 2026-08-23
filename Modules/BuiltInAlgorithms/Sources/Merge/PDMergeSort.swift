@@ -26,6 +26,8 @@ public struct PDMergeSort: SortAlgorithm {
     growthModel: OperationGrowthModel(
       anchorSize: 6078, coefficients: [144878, 25.6429],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .powerLog, coefficients: [3.84271, 0.961008], rSquared: 0.997374),
     stable: true,
     timeComplexity: ComplexityBounds(
       best: "O(n)", average: "O(n log n)", worst: "O(n log n)"),

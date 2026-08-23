@@ -34,6 +34,8 @@ public struct ImprovedInPlaceMergeSort: SortAlgorithm {
     growthModel: OperationGrowthModel(
       anchorSize: 661, coefficients: [239574, 704.958, 0.51783],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .polynomialIntercept, coefficients: [0.51783, 20.3874, -152.537], rSquared: 0.999999),
     stable: true,
     timeComplexity: ComplexityBounds(best: "O(n log n)", average: "O(n^2)", worst: "O(n^2)"),
     spaceComplexity: "O(log n)",

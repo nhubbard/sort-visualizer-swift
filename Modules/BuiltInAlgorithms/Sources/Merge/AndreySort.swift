@@ -39,6 +39,8 @@ public struct AndreySort: SortAlgorithm {
     growthModel: OperationGrowthModel(
       anchorSize: 1378, coefficients: [213948, 189.879, 0.014284],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .powerLog, coefficients: [11.6503, 1.08463], rSquared: 0.996129),
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n log n)", average: "O(n log n)", worst: "O(n log n)"),

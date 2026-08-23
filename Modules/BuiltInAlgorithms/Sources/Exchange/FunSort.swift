@@ -45,6 +45,8 @@ public struct FunSort: SortAlgorithm {
     growthModel: OperationGrowthModel(
       anchorSize: 147, coefficients: [238858, 3492.7, 13.6561],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .powerLaw, coefficients: [5.24161, 2.14951], rSquared: 0.999985),
     stable: true,
     timeComplexity: ComplexityBounds(
       best: "O(n log n)", average: "O(n^2 log n)", worst: "O(n^2 log n)"),

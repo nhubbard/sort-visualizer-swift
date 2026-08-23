@@ -15,6 +15,8 @@ public struct PigeonholeSort: SortAlgorithm {
     growthModel: OperationGrowthModel(
       anchorSize: 79999, coefficients: [239997, 3],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .powerLaw, coefficients: [3, 1], rSquared: 1),
     stable: false,
     timeComplexity: ComplexityBounds(best: "O(n+k)", average: "O(n+k)", worst: "O(n+k)"),
     spaceComplexity: "O(n+k)",

@@ -21,6 +21,8 @@ public struct RedBlackTreeSort: SortAlgorithm {
     growthModel: OperationGrowthModel(
       anchorSize: 2141, coefficients: [187269, 110.438, 0.00642576],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .powerLog, coefficients: [4.13756, 1.13222], rSquared: 0.998576),
     stable: true,
     timeComplexity: ComplexityBounds(best: "O(n log n)", average: "O(n log n)", worst: "O(n log n)"),
     spaceComplexity: "O(n)",

@@ -10,6 +10,8 @@ public struct MaxHeapSort: SortAlgorithm {
     growthModel: OperationGrowthModel(
       anchorSize: 1361, coefficients: [213492, 194.876, 0.0162418],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .powerLog, coefficients: [10.283, 1.10374], rSquared: 0.998829),
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n log n)", average: "O(n log n)", worst: "O(n log n)"),

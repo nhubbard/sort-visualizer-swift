@@ -22,6 +22,8 @@ public struct ClassicGravitySort: SortAlgorithm {
     growthModel: OperationGrowthModel(
       anchorSize: 399, coefficients: [239400, 1198.5, 1.5],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .polynomialIntercept, coefficients: [1.5, 1.5, 0], rSquared: 1),
     stable: true,
     timeComplexity: ComplexityBounds(
       best: "O(n \\times k)", average: "O(n \\times k)", worst: "O(n \\times k)"),

@@ -26,6 +26,8 @@ public struct WeaveMergeSort: SortAlgorithm {
     growthModel: OperationGrowthModel(
       anchorSize: 310, coefficients: [239475, 1547.5, 2.5],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .polynomialIntercept, coefficients: [2.5, -2.5, -6.79585e-11], rSquared: 1),
     stable: false,
     timeComplexity: ComplexityBounds(best: "O(n^2)", average: "O(n^2)", worst: "O(n^2)"),
     spaceComplexity: "O(log n)",

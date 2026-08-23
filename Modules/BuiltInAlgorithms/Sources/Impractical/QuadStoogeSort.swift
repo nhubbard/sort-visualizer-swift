@@ -21,6 +21,8 @@ public struct QuadStoogeSort: SortAlgorithm {
     growthModel: OperationGrowthModel(
       anchorSize: 89, coefficients: [234447, 6880.98, 51.1949],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .polynomialIntercept, coefficients: [51.1949, -2231.72, 27554.5], rSquared: 0.999815),
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n^{2.585})", average: "O(n^{2.585})", worst: "O(n^{2.585})"),

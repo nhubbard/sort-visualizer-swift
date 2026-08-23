@@ -10,6 +10,8 @@ public struct WeakHeapSort: SortAlgorithm {
     growthModel: OperationGrowthModel(
       anchorSize: 2213, coefficients: [198458, 101.593],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .powerLog, coefficients: [11.3751, 1.00303], rSquared: 0.999961),
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n log n)", average: "O(n log n)", worst: "O(n log n)"),

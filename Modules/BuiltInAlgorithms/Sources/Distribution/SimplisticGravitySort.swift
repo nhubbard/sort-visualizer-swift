@@ -20,6 +20,8 @@ public struct SimplisticGravitySort: SortAlgorithm {
     growthModel: OperationGrowthModel(
       anchorSize: 346, coefficients: [238740, 1382, 2],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .polynomialIntercept, coefficients: [2, -2, 0], rSquared: 1),
     stable: true,
     timeComplexity: ComplexityBounds(
       best: "O(n \\times k)", average: "O(n \\times k)", worst: "O(n \\times k)"),

@@ -27,6 +27,8 @@ public struct BlockSwapMergeSort: SortAlgorithm {
     growthModel: OperationGrowthModel(
       anchorSize: 1797, coefficients: [195567, 143.231, 0.0120582],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .powerLog, coefficients: [3.69468, 1.18266], rSquared: 0.99952),
     stable: true,
     timeComplexity: ComplexityBounds(
       best: "O(n log n)", average: "O(n log n)", worst: "O(n log n)"),

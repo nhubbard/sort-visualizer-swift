@@ -47,6 +47,8 @@ public struct PoplarHeapSort: SortAlgorithm {
     growthModel: OperationGrowthModel(
       anchorSize: 1158, coefficients: [239862, 359.367, 0.130811],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .polynomialIntercept, coefficients: [0.130811, 56.4079, -871.979], rSquared: 0.999771),
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n log n)", average: "O(n log n)", worst: "O(n log n)"),

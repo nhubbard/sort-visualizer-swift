@@ -41,6 +41,8 @@ public struct MatrixSort: SortAlgorithm {
     growthModel: OperationGrowthModel(
       anchorSize: 1374, coefficients: [239868, 304.591, 0.0942693],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .polynomialIntercept, coefficients: [0.0942693, 45.5387, -670.663], rSquared: 0.999969),
     stable: true,
     timeComplexity: ComplexityBounds(
       best: "O(n log n)", average: "O(n^{1.5})", worst: "O(n^{1.5})"),

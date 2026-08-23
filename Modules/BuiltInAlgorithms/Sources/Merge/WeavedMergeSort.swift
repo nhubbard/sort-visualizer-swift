@@ -22,6 +22,8 @@ public struct WeavedMergeSort: SortAlgorithm {
     growthModel: OperationGrowthModel(
       anchorSize: 5553, coefficients: [139568, 28.052],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .powerLog, coefficients: [2.91183, 1.00013], rSquared: 0.999996),
     // The tie-break (`cmp == 0 && low > high` picks `array[high]`) decides between equal values
     // by their current strided *position*, not original input order — and since interleaving
     // scatters an original run of equal values across many strided sub-sequences, this does NOT

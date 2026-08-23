@@ -10,6 +10,8 @@ public struct CombSort: SortAlgorithm {
     growthModel: OperationGrowthModel(
       anchorSize: 1111, coefficients: [239895, 377.299, 0.144918],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .polynomialIntercept, coefficients: [0.144918, 55.2916, -409.637], rSquared: 0.999937),
     stable: false,
     timeComplexity: ComplexityBounds(best: "O(n log n)", average: "O(n^2)", worst: "O(n^2)"),
     spaceComplexity: "O(1)",

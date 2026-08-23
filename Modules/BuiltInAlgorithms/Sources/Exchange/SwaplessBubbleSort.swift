@@ -10,6 +10,8 @@ public struct SwaplessBubbleSort: SortAlgorithm {
     growthModel: OperationGrowthModel(
       anchorSize: 692, coefficients: [239778, 692.5, 0.5],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .polynomialIntercept, coefficients: [0.5, 0.5, 0], rSquared: 1),
     stable: true,
     timeComplexity: ComplexityBounds(best: "O(n)", average: "O(n^2)", worst: "O(n^2)"),
     spaceComplexity: "O(1)",

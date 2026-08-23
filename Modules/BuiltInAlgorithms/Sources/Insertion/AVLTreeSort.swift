@@ -23,6 +23,8 @@ public struct AVLTreeSort: SortAlgorithm {
     growthModel: OperationGrowthModel(
       anchorSize: 2633, coefficients: [177828, 81.6697, 0.00303825],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .powerLog, coefficients: [4.48604, 1.08227], rSquared: 0.999203),
     stable: true,
     timeComplexity: ComplexityBounds(best: "O(n log n)", average: "O(n log n)", worst: "O(n log n)"),
     spaceComplexity: "O(n)",

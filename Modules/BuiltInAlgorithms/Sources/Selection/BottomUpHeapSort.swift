@@ -10,6 +10,8 @@ public struct BottomUpHeapSort: SortAlgorithm {
     growthModel: OperationGrowthModel(
       anchorSize: 1824, coefficients: [206453, 130.237, 0.00482764],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .powerLog, coefficients: [13.2217, 1.01746], rSquared: 0.999978),
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n log n)", average: "O(n log n)", worst: "O(n log n)"),

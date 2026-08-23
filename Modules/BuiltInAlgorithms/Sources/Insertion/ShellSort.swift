@@ -10,6 +10,8 @@ public struct ShellSort: SortAlgorithm {
     growthModel: OperationGrowthModel(
       anchorSize: 1379, coefficients: [239961, 296.697, 0.0887158],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .polynomialIntercept, coefficients: [0.0887158, 52.0191, -478.52], rSquared: 0.999946),
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n log n)", average: "O(n^{1.25})", worst: "O(n^2)"),

@@ -10,6 +10,8 @@ public struct SmartGuessSort: SortAlgorithm {
     growthModel: OperationGrowthModel(
       anchorSize: 8, coefficients: [69216.4, 90169.4, 60562.7, 27811.9, 9788.65, 2809.08],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .nToTheNLike, coefficients: [60.7972, 0.423037], rSquared: 0.996733),
     stable: false,
     timeComplexity: ComplexityBounds(best: "O(n)", average: "O(n^n)", worst: "O(n^n)"),
     spaceComplexity: "O(n)",

@@ -22,6 +22,8 @@ public struct SillySort: SortAlgorithm {
     growthModel: OperationGrowthModel(
       anchorSize: 43, coefficients: [208617, 35618.8, 3127.73, 187.234, 8.56559, 0.318619],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .nToTheNLike, coefficients: [631.765, 0.0358603], rSquared: 0.999501),
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n^{log n})", average: "O(n^{log n})", worst: "O(n^{log n})"),

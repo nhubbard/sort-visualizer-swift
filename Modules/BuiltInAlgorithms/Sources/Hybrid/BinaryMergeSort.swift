@@ -10,6 +10,8 @@ public struct BinaryMergeSort: SortAlgorithm {
     growthModel: OperationGrowthModel(
       anchorSize: 1064, coefficients: [239809, 428.155, 0.191251],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .polynomialIntercept, coefficients: [0.191251, 21.1737, 766.059], rSquared: 0.986745),
     stable: true,
     timeComplexity: ComplexityBounds(
       best: "O(n log n)", average: "O(n log n)", worst: "O(n log n)"),

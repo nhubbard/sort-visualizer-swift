@@ -33,6 +33,8 @@ public struct BadSort: SortAlgorithm {
     growthModel: OperationGrowthModel(
       anchorSize: 80, coefficients: [235277, 9309.04, 125.981, 0.611696],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .powerLaw, coefficients: [0.222694, 3.16531], rSquared: 0.998283),
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n^2)", average: "O(n^2 log n)", worst: "O(n^3)"),

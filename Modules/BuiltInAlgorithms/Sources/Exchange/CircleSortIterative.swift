@@ -10,6 +10,8 @@ public struct CircleSortIterative: SortAlgorithm {
     growthModel: OperationGrowthModel(
       anchorSize: 739, coefficients: [231890, 439.615, 0.114404],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .powerLog, coefficients: [9.13569, 1.2496], rSquared: 0.99562),
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n log n)", average: "O(n log n)", worst: "O(n log^2 n)"),

@@ -28,6 +28,8 @@ public struct OutOfPlaceHeapSort: SortAlgorithm {
     growthModel: OperationGrowthModel(
       anchorSize: 1907, coefficients: [202743, 123.564, 0.00476778],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .powerLog, coefficients: [11.2339, 1.02985], rSquared: 0.999898),
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n log n)", average: "O(n log n)", worst: "O(n log n)"),

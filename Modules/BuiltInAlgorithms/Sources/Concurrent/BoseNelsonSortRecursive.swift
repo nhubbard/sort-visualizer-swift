@@ -29,6 +29,8 @@ public struct BoseNelsonSortRecursive: SortAlgorithm {
     growthModel: OperationGrowthModel(
       anchorSize: 654, coefficients: [239600, 647.462, 0.42732],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .polynomialIntercept, coefficients: [0.42732, 88.5281, -1069.1], rSquared: 0.999872),
     stable: true,
     timeComplexity: ComplexityBounds(
       best: "O(n^{1.585})", average: "O(n^{1.585})", worst: "O(n^{1.585})"),

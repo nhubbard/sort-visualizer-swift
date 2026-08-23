@@ -16,6 +16,8 @@ public struct GrailSort: SortAlgorithm {
     growthModel: OperationGrowthModel(
       anchorSize: 1118, coefficients: [239948, 354.287, 0.124527],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .polynomialIntercept, coefficients: [0.124527, 75.8443, -495.375], rSquared: 0.998894),
     stable: true,
     timeComplexity: ComplexityBounds(
       best: "O(n log n)", average: "O(n log n)", worst: "O(n log n)"),

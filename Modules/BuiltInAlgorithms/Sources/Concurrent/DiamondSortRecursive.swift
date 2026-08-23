@@ -10,6 +10,8 @@ public struct DiamondSortRecursive: SortAlgorithm {
     growthModel: OperationGrowthModel(
       anchorSize: 187, coefficients: [240674, 2561.81, 6.65882],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .powerLog, coefficients: [3.75894, 1.79932], rSquared: 0.999984),
     stable: true,
     timeComplexity: ComplexityBounds(
       best: "O(n log^2 n)", average: "O(n log^2 n)", worst: "O(n log^2 n)"),

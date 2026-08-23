@@ -24,6 +24,8 @@ public struct TimeSort: SortAlgorithm {
     growthModel: OperationGrowthModel(
       anchorSize: 304, coefficients: [2064.16, 6.3784],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .powerLog, coefficients: [4.56569, 0.764464], rSquared: 0.998931),
     stable: true,
     timeComplexity: ComplexityBounds(
       best: "O(n log n)", average: "O(n log n)", worst: "O(n log n)"),

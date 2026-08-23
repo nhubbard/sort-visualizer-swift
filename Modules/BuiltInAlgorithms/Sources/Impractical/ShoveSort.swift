@@ -24,6 +24,8 @@ public struct ShoveSort: SortAlgorithm {
     growthModel: OperationGrowthModel(
       anchorSize: 45, coefficients: [217155, 25867.3, 1540.64, 61.1728, 1.8217, 0.0433997],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .exponential, coefficients: [1020.48, 1.1265], rSquared: 0.999456),
     stable: false,
     timeComplexity: ComplexityBounds(best: "O(n)", average: "O(n^2)", worst: "O(n^2)"),
     spaceComplexity: "O(1)",

@@ -10,6 +10,8 @@ public struct TernaryHeapSort: SortAlgorithm {
     growthModel: OperationGrowthModel(
       anchorSize: 1528, coefficients: [212199, 164.079, 0.00889959],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .powerLog, coefficients: [13.6077, 1.04511], rSquared: 0.99964),
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n log n)", average: "O(n log n)", worst: "O(n log n)"),

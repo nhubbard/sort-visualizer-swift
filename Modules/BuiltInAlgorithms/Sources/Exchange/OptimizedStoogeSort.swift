@@ -22,6 +22,8 @@ public struct OptimizedStoogeSort: SortAlgorithm {
     growthModel: OperationGrowthModel(
       anchorSize: 253, coefficients: [239401, 1895, 3.74998],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .polynomialIntercept, coefficients: [3.74998, -2.49097, -0.68452], rSquared: 1),
     stable: false,
     timeComplexity: ComplexityBounds(best: "O(n^2)", average: "O(n^2)", worst: "O(n^2)"),
     spaceComplexity: "O(1)",

@@ -10,6 +10,8 @@ public struct MergeBogoSort: SortAlgorithm {
     growthModel: OperationGrowthModel(
       anchorSize: 15, coefficients: [188543, 126003, 42104, 9379.37, 1567.06, 209.453],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .exponential, coefficients: [8.35267, 1.95092], rSquared: 0.999984),
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n)", average: "O(n \\times 2^n)", worst: "O(n \\times 2^n)"),

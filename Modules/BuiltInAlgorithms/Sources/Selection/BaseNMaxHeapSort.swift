@@ -10,6 +10,8 @@ public struct BaseNMaxHeapSort: SortAlgorithm {
     growthModel: OperationGrowthModel(
       anchorSize: 1466, coefficients: [212542, 174.346, 0.0111134],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .powerLog, coefficients: [12.3477, 1.06537], rSquared: 0.998114),
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n log n)", average: "O(n log n)", worst: "O(n log n)"),

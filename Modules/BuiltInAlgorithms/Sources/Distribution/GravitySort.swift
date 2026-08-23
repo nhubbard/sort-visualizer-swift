@@ -20,6 +20,8 @@ public struct GravitySort: SortAlgorithm {
     growthModel: OperationGrowthModel(
       anchorSize: 488, coefficients: [239607, 979, 1],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .polynomialIntercept, coefficients: [1, 3, -1], rSquared: 1),
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n \\times k)", average: "O(n \\times k)", worst: "O(n \\times k)"),

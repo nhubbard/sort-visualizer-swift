@@ -10,6 +10,8 @@ public struct CycleSort: SortAlgorithm {
     growthModel: OperationGrowthModel(
       anchorSize: 31223, coefficients: [239990, 14.5146, 0.000218692],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .polynomialIntercept, coefficients: [0.000218692, 0.858133, -0.720986], rSquared: 0.999935),
     stable: false,
     timeComplexity: ComplexityBounds(best: "O(n^2)", average: "O(n^2)", worst: "O(n^2)"),
     spaceComplexity: "O(1)",

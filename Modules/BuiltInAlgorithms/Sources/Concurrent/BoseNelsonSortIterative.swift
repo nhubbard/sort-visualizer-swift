@@ -10,6 +10,8 @@ public struct BoseNelsonSortIterative: SortAlgorithm {
     growthModel: OperationGrowthModel(
       anchorSize: 712, coefficients: [232412, 484.259, 0.159123],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .powerLog, coefficients: [5.64094, 1.33129], rSquared: 0.999993),
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n log^2 n)", average: "O(n log^2 n)", worst: "O(n log^2 n)"),

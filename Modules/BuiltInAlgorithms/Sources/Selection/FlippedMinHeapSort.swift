@@ -10,6 +10,8 @@ public struct FlippedMinHeapSort: SortAlgorithm {
     growthModel: OperationGrowthModel(
       anchorSize: 1359, coefficients: [213649, 195.55, 0.0164349],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .powerLog, coefficients: [10.1963, 1.10527], rSquared: 0.999043),
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n log n)", average: "O(n log n)", worst: "O(n log n)"),

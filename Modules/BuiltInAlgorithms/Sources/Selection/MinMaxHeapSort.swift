@@ -28,6 +28,8 @@ public struct MinMaxHeapSort: SortAlgorithm {
     growthModel: OperationGrowthModel(
       anchorSize: 1114, coefficients: [219835, 258.857, 0.0344196],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .powerLog, coefficients: [8.58215, 1.1692], rSquared: 0.995883),
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n log n)", average: "O(n log n)", worst: "O(n log n)"),

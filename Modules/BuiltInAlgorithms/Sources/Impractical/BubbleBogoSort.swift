@@ -10,6 +10,8 @@ public struct BubbleBogoSort: SortAlgorithm {
     growthModel: OperationGrowthModel(
       anchorSize: 179, coefficients: [238965, 2677.5, 7.5],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .polynomialIntercept, coefficients: [7.5, -7.5, 0], rSquared: 1),
     stable: false,
     timeComplexity: ComplexityBounds(best: "O(n)", average: "O(n^2)", worst: "O(n^2)"),
     spaceComplexity: "O(1)",

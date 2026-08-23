@@ -10,6 +10,8 @@ public struct MergeSort: SortAlgorithm {
     growthModel: OperationGrowthModel(
       anchorSize: 2394, coefficients: [187775, 92.2319, 0.0031176],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .powerLog, coefficients: [6.97323, 1.04737], rSquared: 0.999799),
     stable: true,
     timeComplexity: ComplexityBounds(
       best: "O(n log n)", average: "O(n log n)", worst: "O(n log n)"),

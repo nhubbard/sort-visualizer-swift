@@ -10,6 +10,8 @@ public struct StableSelectionSort: SortAlgorithm {
     growthModel: OperationGrowthModel(
       anchorSize: 283, coefficients: [239700, 1696, 3],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .polynomialIntercept, coefficients: [3, -2, -1], rSquared: 1),
     stable: true,
     timeComplexity: ComplexityBounds(best: "O(n^2)", average: "O(n^2)", worst: "O(n^2)"),
     spaceComplexity: "O(1)",

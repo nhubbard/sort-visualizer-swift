@@ -21,6 +21,8 @@ public struct RotateLSDRadixSort: SortAlgorithm {
     growthModel: OperationGrowthModel(
       anchorSize: 986, coefficients: [239959, 423.11, 0.181461],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .polynomialIntercept, coefficients: [0.181461, 65.2687, -811.591], rSquared: 0.999786),
     stable: true,
     timeComplexity: ComplexityBounds(
       best: "O(d \\times n log n)", average: "O(d \\times n log n)", worst: "O(d \\times n log n)"),

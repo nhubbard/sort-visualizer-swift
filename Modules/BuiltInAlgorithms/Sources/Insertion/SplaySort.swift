@@ -26,6 +26,8 @@ public struct SplaySort: SortAlgorithm {
     growthModel: OperationGrowthModel(
       anchorSize: 304, coefficients: [293.481, 0.89195],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .powerLog, coefficients: [0.709131, 0.749004], rSquared: 0.998323),
     stable: true,
     timeComplexity: ComplexityBounds(best: "O(n)", average: "O(n log n)", worst: "O(n log n)"),
     spaceComplexity: "O(n)",

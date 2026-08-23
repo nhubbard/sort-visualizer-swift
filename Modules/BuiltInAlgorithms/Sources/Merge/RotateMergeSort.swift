@@ -20,6 +20,8 @@ public struct RotateMergeSort: SortAlgorithm {
     growthModel: OperationGrowthModel(
       anchorSize: 1458, coefficients: [205533, 206.468, 0.0319876],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .powerLog, coefficients: [1.78242, 1.32736], rSquared: 0.996364),
     stable: true,
     timeComplexity: ComplexityBounds(
       best: "O(n log n)", average: "O(n log n)", worst: "O(n log n)"),

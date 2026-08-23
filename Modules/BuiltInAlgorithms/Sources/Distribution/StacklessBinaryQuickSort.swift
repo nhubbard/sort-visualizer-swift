@@ -23,6 +23,8 @@ public struct StacklessBinaryQuickSort: SortAlgorithm {
     growthModel: OperationGrowthModel(
       anchorSize: 4823, coefficients: [130922, 35.5342, 0.00109931],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .powerLog, coefficients: [0.632795, 1.19113], rSquared: 0.987733),
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n log n)", average: "O(n log n)", worst: "O(n log n)"),

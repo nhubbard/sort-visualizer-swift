@@ -21,6 +21,8 @@ public struct TreeSort: SortAlgorithm {
     growthModel: OperationGrowthModel(
       anchorSize: 310, coefficients: [239785, 1548.5, 2.5],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .polynomialIntercept, coefficients: [2.5, -1.5, -6.79585e-11], rSquared: 1),
     stable: true,
     timeComplexity: ComplexityBounds(best: "O(n log n)", average: "O(n log n)", worst: "O(n^2)"),
     spaceComplexity: "O(n)",

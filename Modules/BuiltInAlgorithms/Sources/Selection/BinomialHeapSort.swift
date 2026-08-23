@@ -10,6 +10,8 @@ public struct BinomialHeapSort: SortAlgorithm {
     growthModel: OperationGrowthModel(
       anchorSize: 900, coefficients: [225607, 373.111, 0.0982337],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .powerLog, coefficients: [3.61249, 1.34142], rSquared: 0.993445),
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n log n)", average: "O(n log n)", worst: "O(n log n)"),

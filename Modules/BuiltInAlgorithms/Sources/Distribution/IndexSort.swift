@@ -19,6 +19,8 @@ public struct IndexSort: SortAlgorithm {
     growthModel: OperationGrowthModel(
       anchorSize: 225, coefficients: [239388, 3451.44, 17.2112, 0.0317196],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .powerLaw, coefficients: [0.00560557, 3.244], rSquared: 0.344362),
     stable: false,
     timeComplexity: ComplexityBounds(best: "O(n)", average: "O(n)", worst: "O(n)"),
     spaceComplexity: "O(1)",

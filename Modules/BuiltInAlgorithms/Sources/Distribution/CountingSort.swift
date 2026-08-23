@@ -11,6 +11,8 @@ public struct CountingSort: SortAlgorithm {
     growthModel: OperationGrowthModel(
       anchorSize: 120000, coefficients: [240000, 2],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .powerLaw, coefficients: [2, 1], rSquared: 1),
     stable: true,
     timeComplexity: ComplexityBounds(best: "O(n+k)", average: "O(n+k)", worst: "O(n+k)"),
     spaceComplexity: "O(n+k)",

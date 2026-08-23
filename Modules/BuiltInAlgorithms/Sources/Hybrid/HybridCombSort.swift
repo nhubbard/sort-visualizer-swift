@@ -17,6 +17,8 @@ public struct HybridCombSort: SortAlgorithm {
     growthModel: OperationGrowthModel(
       anchorSize: 1095, coefficients: [239934, 387.443, 0.153455],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .polynomialIntercept, coefficients: [0.153455, 51.3758, -318.896], rSquared: 0.999988),
     stable: false,
     timeComplexity: ComplexityBounds(best: "O(n log n)", average: "O(n^2)", worst: "O(n^2)"),
     spaceComplexity: "O(1)",
