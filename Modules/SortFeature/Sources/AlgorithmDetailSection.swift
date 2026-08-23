@@ -151,6 +151,9 @@ public struct AlgorithmDetailSection: View {
         MathView(text: row.label, equation: row.latex)
       }
 
+      GrowthModelComparisonSection(algorithm: algorithm)
+        .padding(.top, 8)
+
       Text("Big-O Correlation").font(.title2.bold()).padding(.top, 8)
       BigOCorrelationChart(algorithm: algorithm)
     }

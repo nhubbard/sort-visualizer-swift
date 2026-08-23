@@ -75,6 +75,11 @@ public struct AlgorithmMetadata: Sendable, Codable, Equatable {
   /// `OperationGrowthModel`), used by `effectiveSizeRange(operationCap:)` to compute a live upper
   /// bound instead of trusting `sizeRange.upperBound`'s hand-picked guess.
   public var growthModel: OperationGrowthModel
+  /// The growth family `Tools/GrowthModelCalibration` actually detected for this algorithm,
+  /// before it got Taylor-expanded into `growthModel` — display-only metadata, nil for any
+  /// algorithm `Tools/GrowthModelCalibration/apply_detected_models.py` hasn't processed yet
+  /// (e.g. one just added and not yet calibrated).
+  public var detectedGrowthModel: DetectedGrowthModel?
   public var stable: Bool
   public var timeComplexity: ComplexityBounds
   public var spaceComplexity: String
@@ -85,6 +90,7 @@ public struct AlgorithmMetadata: Sendable, Codable, Equatable {
     category: AlgorithmCategory,
     sizeRange: ClosedRange<Int>,
     growthModel: OperationGrowthModel,
+    detectedGrowthModel: DetectedGrowthModel? = nil,
     stable: Bool,
     timeComplexity: ComplexityBounds,
     spaceComplexity: String,
@@ -94,6 +100,7 @@ public struct AlgorithmMetadata: Sendable, Codable, Equatable {
     self.category = category
     self.sizeRange = sizeRange
     self.growthModel = growthModel
+    self.detectedGrowthModel = detectedGrowthModel
     self.stable = stable
     self.timeComplexity = timeComplexity
     self.spaceComplexity = spaceComplexity
