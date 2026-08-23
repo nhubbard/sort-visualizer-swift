@@ -52,7 +52,7 @@ struct NativeAlgorithmCorrectnessTests {
     PatienceSort(), PDMergeSort(),
     PDQBranchedSort(),
     PDQBranchlessSort(),
-    PigeonholeSort(), PoplarHeapSort(), QuadStoogeSort(),
+    PigeonholeSort(), PoplarHeapSort(), QuadSort(), QuadStoogeSort(),
     QuickBogoSort(), QuickSort(),
     RandomGuessSort(), RecursiveShellSort(), RedBlackTreeSort(), RotateLSDRadixSort(),
     RotateMergeSort(), RotateMSDRadixSort(),
@@ -2362,6 +2362,64 @@ struct NativeAlgorithmCorrectnessTests {
       duplicate-heavy trials, confirming it is not a stable sort
       """
     )
+  }
+
+  /// `QuadSortingTemplate`'s top-level dispatcher (`quadSort`) genuinely branches into three
+  /// structurally different code paths by size: under 16 is a plain `tailSwap`, 16 up to 256 pre-
+  /// sorts via `quadSwap` then finishes with `tailMerge`, and 256 and up finishes with the full
+  /// `quadMerge` pass instead. The generic suite's single trial at `sizeRange.lowerBound` (16)
+  /// only ever exercises the middle path's *entry* size — this fuzzes across (and past) every
+  /// boundary explicitly, including below `QuadSort`'s declared `sizeRange` (`record(into:)`'s
+  /// only guard is `n > 1`, so feeding it a smaller array is a real, reachable code path, not an
+  /// artificial one).
+  @Test
+  func quadSortWideSizeRangeAndBoundaryFuzz() {
+    let algorithm = QuadSort()
+
+    let boundarySizes = [0, 1, 2, 3, 15, 16, 17, 255, 256, 257, 300]
+    for size in boundarySizes {
+      for attempt in 0..<20 {
+        let input = (0..<size).map { _ in Int.random(in: 0...(max(size, 1) / 4)) }
+        var engine = RecordingEngine(values: input)
+        algorithm.record(into: &engine)
+        #expect(
+          engine.values == input.sorted(),
+          """
+          QuadSort failed duplicate-heavy fuzz attempt \(attempt) of boundary size \(size): \
+          \(input) -> \(engine.values)
+          """
+        )
+      }
+    }
+
+    for size in stride(from: 4, through: 320, by: 5) {
+      for attempt in 0..<10 {
+        let input = (0..<size).map { _ in Int.random(in: 0...1_000_000) }
+        var engine = RecordingEngine(values: input)
+        algorithm.record(into: &engine)
+        #expect(
+          engine.values == input.sorted(),
+          """
+          QuadSort failed wide-range fuzz attempt \(attempt) of size \(size): \(input) -> \
+          \(engine.values)
+          """
+        )
+      }
+    }
+
+    for size in [0, 1, 2, 4, 8, 15, 16, 32, 64, 128, 256, 300] {
+      let sorted = Array(0..<size)
+      var engineSorted = RecordingEngine(values: sorted)
+      algorithm.record(into: &engineSorted)
+      #expect(engineSorted.values == sorted, "QuadSort failed already-sorted input of size \(size)")
+
+      let reversed = Array((0..<size).reversed())
+      var engineReversed = RecordingEngine(values: reversed)
+      algorithm.record(into: &engineReversed)
+      #expect(
+        engineReversed.values == reversed.sorted(),
+        "QuadSort failed reverse-sorted input of size \(size)")
+    }
   }
 
 }

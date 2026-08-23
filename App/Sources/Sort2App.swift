@@ -72,7 +72,7 @@ struct Sort2App: App {
       PatienceSort(),
       PDMergeSort(), PDQBranchedSort(),
       PDQBranchlessSort(),
-      PigeonholeSort(), PoplarHeapSort(), QuadStoogeSort(),
+      PigeonholeSort(), PoplarHeapSort(), QuadSort(), QuadStoogeSort(),
       QuickBogoSort(), QuickSort(),
       RandomGuessSort(), RecursiveShellSort(), RedBlackTreeSort(), RotateLSDRadixSort(),
       RotateMergeSort(), RotateMSDRadixSort(),
