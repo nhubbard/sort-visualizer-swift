@@ -39,17 +39,28 @@ struct BigOCorrelationChart: View {
         // Derived from `.observedTrend` specifically — exactly one per distinct recorded
         // size, unlike the raw scatter which can have several points at the same size.
         let observedSizes = points.filter { $0.kind == .observedTrend }.map(\.size).sorted()
-        Chart {
-          bigOChartMarks(for: cappedForRendering(points))
+        // Raw per-run scatter (`.observedRun`) is dropped entirely here, not just capped — this
+        // compact chart has no toggle UI to bring it back (that's what the expand button's detail
+        // view is for), so always rendering it was the actual source of the clutter this chart's
+        // rainbow stat points now replace. Those stat points are further restricted to power-of-
+        // two sizes, unlike the detail view's every-recorded-size view, to stay cheap and legible
+        // as an algorithm accumulates recorded runs at more sizes.
+        let renderedPoints = powerOfTwoSizesOnly(
+          cappedForRendering(points).filter { $0.kind != .observedRun })
+        VStack(alignment: .leading, spacing: 4) {
+          Chart {
+            bigOChartMarks(for: renderedPoints)
+          }
+          .chartXScale(domain: observedSizes[0]...observedSizes[observedSizes.count - 1])
+          .chartXAxis {
+            AxisMarks(values: .automatic(desiredCount: 5))
+          }
+          .chartXAxisLabel("Array Size")
+          .chartYAxisLabel("Normalized Work")
+          .frame(maxWidth: .infinity, minHeight: 200)
+          .accessibilityIdentifier("bigOCorrelationChart")
+          RainbowStatLegend()
         }
-        .chartXScale(domain: observedSizes[0]...observedSizes[observedSizes.count - 1])
-        .chartXAxis {
-          AxisMarks(values: .automatic(desiredCount: 5))
-        }
-        .chartXAxisLabel("Array Size")
-        .chartYAxisLabel("Normalized Work")
-        .frame(maxWidth: .infinity, minHeight: 200)
-        .accessibilityIdentifier("bigOCorrelationChart")
         .overlay(alignment: .topTrailing) {
           Button {
             isShowingDetail = true
@@ -94,12 +105,18 @@ func bigOChartMarks(for points: [BigOChartPoint]) -> some ChartContent {
       )
       .foregroundStyle(by: .value("Series", point.series))
     case .observedTrend:
+      // Fixed blue, not `by: .value("Series", ...)` like `.reference` below -- this is the one
+      // color in `RainbowStatLegend`'s manual caption, not part of the reference curves' own
+      // auto-generated best/average/worst-case legend. `.symbol(.circle)` doubles this line's own
+      // vertices as the "mean" rainbow point, rather than emitting a separate, redundant mean
+      // point mark at the exact same coordinates.
       LineMark(
         x: .value("Array Size", point.size),
         y: .value("Normalized Work", point.normalizedValue)
       )
-      .foregroundStyle(by: .value("Series", point.series))
+      .foregroundStyle(.blue)
       .lineStyle(StrokeStyle())
+      .symbol(.circle)
     case .reference:
       LineMark(
         x: .value("Array Size", point.size),
@@ -107,6 +124,66 @@ func bigOChartMarks(for points: [BigOChartPoint]) -> some ChartContent {
       )
       .foregroundStyle(by: .value("Series", point.series))
       .lineStyle(StrokeStyle(dash: [4, 4]))
+    case .statMin:
+      PointMark(
+        x: .value("Array Size", point.size),
+        y: .value("Normalized Work", point.normalizedValue)
+      )
+      .foregroundStyle(.green)
+    case .statMax:
+      PointMark(
+        x: .value("Array Size", point.size),
+        y: .value("Normalized Work", point.normalizedValue)
+      )
+      .foregroundStyle(.red)
+    case .statMedian:
+      PointMark(
+        x: .value("Array Size", point.size),
+        y: .value("Normalized Work", point.normalizedValue)
+      )
+      .foregroundStyle(.orange)
+    case .statStdDevBand:
+      PointMark(
+        x: .value("Array Size", point.size),
+        y: .value("Normalized Work", point.normalizedValue)
+      )
+      .symbolSize(30)
+      .foregroundStyle(.purple)
+    }
+  }
+}
+
+/// Restricts the rainbow stat points (but not the trend line or reference curves) to sizes that
+/// are exact powers of two — the compact chart's own decluttering measure, on top of what
+/// `bigOChartPoints` already computes for every recorded size. `BigOCorrelationDetailView` shows
+/// every size instead, since it's the deliberate full-detail escape hatch.
+func powerOfTwoSizesOnly(_ points: [BigOChartPoint]) -> [BigOChartPoint] {
+  points.filter { point in
+    switch point.kind {
+    case .statMin, .statMax, .statMedian, .statStdDevBand:
+      return point.size > 0 && (point.size & (point.size - 1)) == 0
+    case .observedRun, .observedTrend, .reference:
+      return true
+    }
+  }
+}
+
+/// Manual color key for the rainbow stat points — `bigOChartMarks` gives these fixed colors
+/// rather than `foregroundStyle(by:)`, so they don't participate in `Chart`'s own automatic
+/// series-based legend the way the reference curves do, and need this instead.
+struct RainbowStatLegend: View {
+  private static let entries: [(label: String, color: Color)] = [
+    ("Max", .red), ("Median", .orange), ("Mean", .blue), ("Min", .green), ("±1σ", .purple)
+  ]
+
+  var body: some View {
+    HStack(spacing: 12) {
+      ForEach(Self.entries, id: \.label) { entry in
+        HStack(spacing: 4) {
+          Circle().fill(entry.color).frame(width: 8, height: 8)
+          Text(entry.label).font(.caption2).foregroundStyle(.secondary)
+        }
+      }
     }
   }
 }

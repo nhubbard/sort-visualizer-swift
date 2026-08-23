@@ -49,6 +49,7 @@ struct BigOCorrelationDetailView: View {
       VStack(alignment: .leading, spacing: 16) {
         seriesToggleRow
         chart
+        RainbowStatLegend()
         selectionSummary
       }
       .padding(24)

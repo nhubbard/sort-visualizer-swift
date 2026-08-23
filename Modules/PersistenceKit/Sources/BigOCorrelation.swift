@@ -18,6 +18,17 @@ public struct BigOChartPoint: Identifiable, Sendable {
     /// A sampled point on one of the algorithm's declared best/average/worst-case curves —
     /// plotted as a dashed line (`LineMark`).
     case reference
+    /// The smallest total at this size — the best case actually recorded.
+    case statMin
+    /// The largest total at this size — the worst case actually recorded.
+    case statMax
+    /// The median total at this size (average of the two middle values on an even run count).
+    case statMedian
+    /// One of two points per size — `mean − stddev` and `mean + stddev` (clamped at 0, since a
+    /// real operation count can't go negative) — bracketing the per-size average with one sample
+    /// standard deviation on either side. Distinguished from one another by `id`, not by any
+    /// field on the point itself; both render identically.
+    case statStdDevBand
   }
 
   public let id: String
@@ -146,6 +157,35 @@ public func bigOChartPoints(
     )
   }
 
+  // The five aggregate stats replace the raw per-run scatter as each chart's *default* view —
+  // see `BigOCorrelationChart`/`BigOCorrelationDetailView` — since an algorithm with many
+  // recorded runs at one size makes that scatter the dominant, cluttering mark count. `.observedRun`
+  // itself is untouched above; it's still emitted for the detail view's opt-in "Show Individual
+  // Runs" toggle.
+  let statPoints = distinctSizes.flatMap { size -> [BigOChartPoint] in
+    let totals = totalsBySize[size] ?? []
+    let stats = runStatistics(for: totals)
+    let lowerBand = Swift.max(stats.mean - stats.standardDeviation, 0) / maxObservedValue
+    let upperBand = (stats.mean + stats.standardDeviation) / maxObservedValue
+    return [
+      BigOChartPoint(
+        id: "stat-min-\(size)", series: "Observed", size: size,
+        normalizedValue: stats.min / maxObservedValue, kind: .statMin),
+      BigOChartPoint(
+        id: "stat-max-\(size)", series: "Observed", size: size,
+        normalizedValue: stats.max / maxObservedValue, kind: .statMax),
+      BigOChartPoint(
+        id: "stat-median-\(size)", series: "Observed", size: size,
+        normalizedValue: stats.median / maxObservedValue, kind: .statMedian),
+      BigOChartPoint(
+        id: "stat-stddev-lower-\(size)", series: "Observed", size: size,
+        normalizedValue: lowerBand, kind: .statStdDevBand),
+      BigOChartPoint(
+        id: "stat-stddev-upper-\(size)", series: "Observed", size: size,
+        normalizedValue: upperBand, kind: .statStdDevBand)
+    ]
+  }
+
   let uniqueValueRatioSamples = summaries.compactMap { summary -> Double? in
     guard let uniqueValueCount = summary.uniqueValueCount, summary.arraySize > 0 else { return nil }
     return Double(uniqueValueCount) / Double(summary.arraySize)
@@ -181,5 +221,30 @@ public func bigOChartPoints(
     }
   }.flatMap { $0 }
 
-  return runPoints + trendPoints + referencePoints
+  return runPoints + trendPoints + statPoints + referencePoints
+}
+
+/// Min/max/median/mean/sample-standard-deviation over one size's raw run totals, computed
+/// directly (sort + a single pass) rather than via `BuiltInAlgorithms`'s test-only streaming
+/// `Statistics.swift`/Welford helper -- that solves a different problem (an online running
+/// estimate during adaptive calibration sampling); here every total for a size is already fully
+/// materialized in memory, so a plain batch computation is simpler and just as correct.
+private func runStatistics(for totals: [Int]) -> (
+  min: Double, max: Double, median: Double, mean: Double, standardDeviation: Double
+) {
+  let sorted = totals.sorted()
+  let count = Double(sorted.count)
+  let mean = Double(sorted.reduce(0, +)) / count
+  let median: Double =
+    sorted.count % 2 == 0
+    ? Double(sorted[sorted.count / 2 - 1] + sorted[sorted.count / 2]) / 2
+    : Double(sorted[sorted.count / 2])
+  let standardDeviation: Double =
+    sorted.count > 1
+    ? (sorted.reduce(0.0) { $0 + pow(Double($1) - mean, 2) } / (count - 1)).squareRoot()
+    : 0
+  return (
+    min: Double(sorted[0]), max: Double(sorted[sorted.count - 1]), median: median, mean: mean,
+    standardDeviation: standardDeviation
+  )
 }
