@@ -7,7 +7,7 @@ import SwiftUI
 import UIKit
 
 /// The `AlgorithmDetailSection(entry:)` Documentation/docs/architecture/features.md describes as sitting below the
-/// live sort — description + complexity (rendered via `MathView`, derived from
+/// live sort — description + complexity (rendered via `MathGridRow`/`ComplexityCell`, derived from
 /// `AlgorithmMetadata` directly so all 20 algorithms have it, not just the ones with legacy
 /// content) + a language-picker code sample, when `AlgorithmDetailContent` has any.
 public struct AlgorithmDetailSection: View {
@@ -147,21 +147,51 @@ public struct AlgorithmDetailSection: View {
   private var complexityColumn: some View {
     VStack(alignment: .leading, spacing: 8) {
       Text("Complexity").font(.title2.bold())
-      // A `Grid`, not a `VStack` of independent per-row `HStack`s -- each `MathGridRow` used to
-      // size itself without any regard for its siblings, so the equation column's width (and,
-      // once `SwiftMathView` picked up an inflated width from that, its height too) varied row to
-      // row instead of lining up. `Grid` sizes both columns once, from every row's real content.
-      Grid(alignment: .leading, horizontalSpacing: 12, verticalSpacing: 6) {
-        ForEach(algorithm.metadata.complexityRows) { row in
-          MathGridRow(text: row.label, equation: row.latex)
-        }
-      }
+      complexityGrid
 
       GrowthModelComparisonSection(algorithm: algorithm)
         .padding(.top, 8)
 
       Text("Big-O Correlation").font(.title2.bold()).padding(.top, 8)
       BigOCorrelationChart(algorithm: algorithm)
+    }
+    .frame(maxWidth: .infinity, alignment: .leading)
+  }
+
+  /// 2x2 (best/average over worst/space), not a single column of four full-width `MathGridRow`s
+  /// -- each cell's own label is small and secondary-styled instead of a full label column, which
+  /// keeps this section compact instead of stacking four full-width rows underneath "Complexity".
+  private var complexityGrid: some View {
+    let rows = algorithm.metadata.complexityRows
+    func row(_ id: String) -> ComplexityRow { rows.first { $0.id == id } ?? rows[0] }
+    return Grid(alignment: .leading, horizontalSpacing: 16, verticalSpacing: 8) {
+      GridRow {
+        ComplexityCell(row: row("best"))
+        ComplexityCell(row: row("average"))
+      }
+      GridRow {
+        ComplexityCell(row: row("worst"))
+        ComplexityCell(row: row("space"))
+      }
+    }
+  }
+}
+
+/// One cell of `AlgorithmDetailSection.complexityGrid` — a small secondary-styled label above its
+/// equation, each cell taking half the grid's width regardless of column.
+private struct ComplexityCell: View {
+  let row: ComplexityRow
+
+  var body: some View {
+    VStack(alignment: .leading, spacing: 2) {
+      Text(row.label)
+        .font(.caption)
+        .foregroundStyle(.secondary)
+      // Same reasoning as `MathGridRow`'s equation cell -- decouples this cell's layout footprint
+      // from an unusually wide rendered equation's actual width.
+      ScrollView(.horizontal, showsIndicators: false) {
+        SwiftMathView(equation: row.latex, textAlignment: .left)
+      }
     }
     .frame(maxWidth: .infinity, alignment: .leading)
   }

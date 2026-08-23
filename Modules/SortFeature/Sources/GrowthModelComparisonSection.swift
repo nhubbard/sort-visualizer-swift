@@ -36,10 +36,10 @@ struct GrowthModelComparisonSection: View {
           MathGridRow(text: "Fitted (Used by App)", equation: metadata.fittedGrowthModelLatex)
         }
         chart(detected: detected)
-        if let divergence = divergencePercent(detected: detected) {
+        if let divergence = averageDivergencePercent(detected: detected) {
           Text(
-            "Diverges \(divergence.formatted(.number.precision(.fractionLength(1))))% "
-              + "from the detected curve at the current operation-cap cutoff."
+            "Averages \(divergence.formatted(.number.precision(.fractionLength(1))))% divergence "
+              + "from the detected curve across sizes this algorithm can actually run at."
           )
           .font(.caption)
           .foregroundStyle(.secondary)
@@ -99,13 +99,31 @@ struct GrowthModelComparisonSection: View {
     .accessibilityIdentifier("growthModelComparisonChart")
   }
 
-  /// `abs(detected(n) - fitted(n)) / detected(n)` at the current operation-cap cutoff — nil when
-  /// the detected curve predicts (effectively) zero work there, which would make a relative error
-  /// meaningless rather than just large.
-  private func divergencePercent(detected: DetectedGrowthModel) -> Double? {
-    let detectedValue = detected.predictedOperations(atSize: cutoffSize)
-    guard detectedValue > 0 else { return nil }
-    let fittedValue = metadata.growthModel.predictedOperations(atSize: cutoffSize)
-    return abs(detectedValue - fittedValue) / detectedValue * 100
+  /// The mean of `abs(detected(n) - fitted(n)) / detected(n)` sampled log-spaced across the range
+  /// a user can actually reach (`domain.lowerBound...cutoffSize`) — not a single point at the
+  /// cutoff, and not the full chart domain out to `AlgorithmMetadata.maxReasonableArraySize`
+  /// either. An algorithm like Bad Sort can diverge sharply well past `cutoffSize` (the chart
+  /// plots out to `maxReasonableArraySize` purely for visual context), at sizes no user could
+  /// ever actually reach under the current operation cap, so including them here would report a
+  /// scarier number than the one that's actually reachable. Log-spaced, not linear, so the
+  /// average isn't dominated by the handful of samples nearest `cutoffSize` — each order of
+  /// magnitude of array size contributes about equally.
+  private func averageDivergencePercent(detected: DetectedGrowthModel) -> Double? {
+    let lowerBound = domain.lowerBound
+    guard cutoffSize > lowerBound, lowerBound > 0 else { return nil }
+
+    let sampleCount = 20
+    let logLowerBound = log(lowerBound)
+    let logUpperBound = log(cutoffSize)
+    let divergences: [Double] = (0..<sampleCount).compactMap { index in
+      let fraction = Double(index) / Double(sampleCount - 1)
+      let size = exp(logLowerBound + fraction * (logUpperBound - logLowerBound))
+      let detectedValue = detected.predictedOperations(atSize: size)
+      guard detectedValue > 0 else { return nil }
+      let fittedValue = metadata.growthModel.predictedOperations(atSize: size)
+      return abs(detectedValue - fittedValue) / detectedValue * 100
+    }
+    guard !divergences.isEmpty else { return nil }
+    return divergences.reduce(0, +) / Double(divergences.count)
   }
 }

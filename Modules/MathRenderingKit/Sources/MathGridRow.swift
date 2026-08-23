@@ -27,7 +27,17 @@ public struct MathGridRow: View {
         // label column simply growing to fit it on one line -- `fixedSize` reports this Text's
         // true single-line width as non-negotiable, so Grid sizes the column to that instead.
         .fixedSize(horizontal: true, vertical: false)
-      SwiftMathView(equation: equation, textAlignment: .left)
+      // A multi-term fitted polynomial ("224607 + 317.145(n - 959) + 0.0559625(n - 959)^2") can
+      // render very wide at a fixed font size -- SwiftMath has no line-wrapping, so a bare
+      // `SwiftMathView` here would report that full width as its ideal size and Grid would widen
+      // the whole equation column (and therefore the whole detail pane column) to match, squeezing
+      // the sibling description column instead. `ScrollView(.horizontal)` decouples the column's
+      // layout footprint from the equation's actual rendered width along the scrolling axis --
+      // Grid sizes this column from whatever space is left after the label column, and a long
+      // equation scrolls within that instead of forcing it wider.
+      ScrollView(.horizontal, showsIndicators: false) {
+        SwiftMathView(equation: equation, textAlignment: .left)
+      }
     }
   }
 }
