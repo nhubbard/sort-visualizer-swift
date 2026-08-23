@@ -39,14 +39,19 @@ struct BigOCorrelationChart: View {
         // Derived from `.observedTrend` specifically — exactly one per distinct recorded
         // size, unlike the raw scatter which can have several points at the same size.
         let observedSizes = points.filter { $0.kind == .observedTrend }.map(\.size).sorted()
-        // Raw per-run scatter (`.observedRun`) is dropped entirely here, not just capped — this
-        // compact chart has no toggle UI to bring it back (that's what the expand button's detail
-        // view is for), so always rendering it was the actual source of the clutter this chart's
-        // rainbow stat points now replace. Those stat points are further restricted to power-of-
-        // two sizes, unlike the detail view's every-recorded-size view, to stay cheap and legible
-        // as an algorithm accumulates recorded runs at more sizes.
-        let renderedPoints = powerOfTwoSizesOnly(
-          cappedForRendering(points).filter { $0.kind != .observedRun })
+        // Shows only the rainbow stat point groups, restricted to power-of-two sizes -- no raw
+        // scatter, no trend line, no reference curves. This compact chart has no toggle UI to
+        // bring any of that back (that's what the expand button's detail view is for), so keeping
+        // it to one group of five colored points per major tick mark is what actually keeps it
+        // legible and cheap as an algorithm accumulates recorded runs at more sizes; the detail
+        // view is the full picture (every recorded size, trend line, reference curves, and an
+        // opt-in raw-scatter toggle).
+        let renderedPoints = powerOfTwoSizesOnly(points).filter {
+          switch $0.kind {
+          case .statMin, .statMax, .statMedian, .statStdDevBand: true
+          case .observedRun, .observedTrend, .reference: false
+          }
+        }
         let sizeDomain = Double(observedSizes[0])...Double(observedSizes[observedSizes.count - 1])
         VStack(alignment: .leading, spacing: 4) {
           Chart {

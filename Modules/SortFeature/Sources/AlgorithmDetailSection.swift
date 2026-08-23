@@ -7,7 +7,7 @@ import SwiftUI
 import UIKit
 
 /// The `AlgorithmDetailSection(entry:)` Documentation/docs/architecture/features.md describes as sitting below the
-/// live sort — description + complexity (rendered via `MathGridRow`/`ComplexityCell`, derived from
+/// live sort — description + complexity (rendered via `LabeledEquationCell`, derived from
 /// `AlgorithmMetadata` directly so all 20 algorithms have it, not just the ones with legacy
 /// content) + a language-picker code sample, when `AlgorithmDetailContent` has any.
 public struct AlgorithmDetailSection: View {
@@ -158,42 +158,30 @@ public struct AlgorithmDetailSection: View {
     .frame(maxWidth: .infinity, alignment: .leading)
   }
 
-  /// 2x2 (best/average over worst/space), not a single column of four full-width `MathGridRow`s
-  /// -- each cell's own label is small and secondary-styled instead of a full label column, which
-  /// keeps this section compact instead of stacking four full-width rows underneath "Complexity".
+  /// 2x2 (best/average over worst/space), not a single column of four full-width
+  /// `LabeledEquationCell`s -- each cell's own label is small and secondary-styled instead of a
+  /// full label column, which keeps this section compact instead of stacking four full-width rows
+  /// underneath "Complexity".
+  ///
+  /// Each `GridRow` uses `alignment: .bottom`, not the Grid default `.center` -- two equations of
+  /// different rendered heights in the same row (e.g. "O(n log² n)"'s superscript-tall box next to
+  /// "O(1)"'s short one) land on visibly different baselines under center alignment, since
+  /// centering a short box inside the row's full height sits its glyphs at a different vertical
+  /// offset than a tall box's glyphs at that same center. Bottom-aligning instead lines up each
+  /// equation's own (roughly consistent, since none of these have deep subscripts) descent.
   private var complexityGrid: some View {
     let rows = algorithm.metadata.complexityRows
     func row(_ id: String) -> ComplexityRow { rows.first { $0.id == id } ?? rows[0] }
     return Grid(alignment: .leading, horizontalSpacing: 16, verticalSpacing: 8) {
-      GridRow {
-        ComplexityCell(row: row("best"))
-        ComplexityCell(row: row("average"))
+      GridRow(alignment: .bottom) {
+        LabeledEquationCell(label: row("best").label, equation: row("best").latex)
+        LabeledEquationCell(label: row("average").label, equation: row("average").latex)
       }
-      GridRow {
-        ComplexityCell(row: row("worst"))
-        ComplexityCell(row: row("space"))
-      }
-    }
-  }
-}
-
-/// One cell of `AlgorithmDetailSection.complexityGrid` — a small secondary-styled label above its
-/// equation, each cell taking half the grid's width regardless of column.
-private struct ComplexityCell: View {
-  let row: ComplexityRow
-
-  var body: some View {
-    VStack(alignment: .leading, spacing: 2) {
-      Text(row.label)
-        .font(.caption)
-        .foregroundStyle(.secondary)
-      // Same reasoning as `MathGridRow`'s equation cell -- decouples this cell's layout footprint
-      // from an unusually wide rendered equation's actual width.
-      ScrollView(.horizontal, showsIndicators: false) {
-        SwiftMathView(equation: row.latex, textAlignment: .left)
+      GridRow(alignment: .bottom) {
+        LabeledEquationCell(label: row("worst").label, equation: row("worst").latex)
+        LabeledEquationCell(label: row("space").label, equation: row("space").latex)
       }
     }
-    .frame(maxWidth: .infinity, alignment: .leading)
   }
 }
 
