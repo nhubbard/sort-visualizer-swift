@@ -18,7 +18,7 @@ sequential version, under a different name. Real thread interleaving has no mean
 single-writer model. Porting these variants would add duplicate content, not new algorithmic
 behavior.
 
-This leaves 196 candidates. 168 are shipped. 28 remain, in one category.
+This leaves 196 candidates. 170 are shipped. 26 remain, in one category.
 
 ### By category
 
@@ -31,7 +31,7 @@ This leaves 196 candidates. 168 are shipped. 28 remain, in one category.
 | Merge (19) | All ported |
 | Miscellaneous (4) | All ported |
 | Concurrent (22) | All ported |
-| Hybrid (41) | 13 ported, 28 remaining |
+| Hybrid (41) | 15 ported, 26 remaining |
 
 ### Remaining work
 
@@ -42,7 +42,7 @@ line count. Inherited template logic is real complexity a port must understand a
 
 **Medium** (101–200 effective lines):
 
-- `IntroCircleSortRecursive`, `MergeInsertionSort`, `OptimizedDualPivotQuickSort`,
+- `MergeInsertionSort`, `OptimizedDualPivotQuickSort`,
   `OptimizedBottomUpMergeSort`, `LaziestSort`, `StacklessDualPivotQuickSort`,
   `StacklessHybridQuickSort`, `DropMergeSort`, `OptimizedWeaveMergeSort`,
   `ImprovedBlockSelectionSort`.
@@ -52,9 +52,7 @@ line count. Inherited template logic is real complexity a port must understand a
 - `YujisBufferedMergeSort2`, `MedianMergeSort`, `LazierestSort`, `CircularGrailSort`
   (self-contained despite the name; it does not extend `GrailSorting`), `FifthMergeSort`,
   `BufferPartitionMergeSort`, `OptimizedRotateMergeSort`, `RemiSort` (270 own plus 82 for the
-  shared `MultiWayMergeSorting` template), `EctaSort`, `FluxSort` (202 own lines; its shared
-  `QuadSorting` template already shipped via `QuadSort`, so porting it no longer means also
-  translating the template).
+  shared `MultiWayMergeSorting` template), `EctaSort`.
 
 **Very Hard** (400+ effective lines, or extending one of the largest remaining templates):
 
@@ -68,19 +66,14 @@ line count. Inherited template logic is real complexity a port must understand a
 Several of these algorithms share one large template or one unported prerequisite. Porting the
 shared piece once reduces the cost of every sibling in that cluster:
 
-- **Quad cluster**: `QuadSort` (Merge) shipped, along with the `QuadSorting` template (875 lines)
-  it extends — Igor van den Hoven's actual quadsort, dense and hand-unrolled, a multi-day
-  undertaking on its own. `FluxSort` (Hybrid) is the cluster's one remaining member; porting it no
-  longer means re-deriving `QuadSorting` too, only its own 202 lines built on top of the
-  already-shipped, already-tested template.
 - **MultiWayMerge cluster**: `FlanSort` and `RemiSort` (both Hybrid) both extend
   `MultiWayMergeSorting` (82 lines). This template is much smaller than `QuadSorting`, so this pair
   costs less than the members' own size alone suggests.
 - **BlockMerge cluster**: `ChaliceSort` and `SynchronousSqrtSort` (both Hybrid) both extend
   `BlockMergeSorting` (352 lines).
 
-`FluxSort` and the rest of the Hybrid backlog are deferred as a policy, not scheduled piecemeal,
-earmarked for a future batch covering the largest remaining sorts across every category.
+The rest of the Hybrid backlog is deferred as a policy, not scheduled piecemeal, earmarked for a
+future batch covering the largest remaining sorts across every category.
 
 ### Completed clusters
 
@@ -102,10 +95,16 @@ port-the-shared-template-once strategy:
   non-decorative reuse of the shared template across all four ports.
 - **PDQ cluster**: `PDQBranchedSort` and `PDQBranchlessSort` (both Hybrid) both extend
   `PDQSorting` (570 lines). Both shipped.
-- `IntroCircleSortIterative`/`IntroCircleSortRecursive` (Hybrid) extend the small
-  `IterativeCircleSorting`/`CircleSorting` templates (44/48 lines). The already-shipped
-  `CircleSort` family established the pattern; only the recursive variant remains (see the Medium
-  tier above).
+- **Circle cluster**: `IntroCircleSortIterative` and `IntroCircleSortRecursive` (both Hybrid)
+  extend the small `IterativeCircleSorting`/`CircleSorting` templates (44/48 lines). Both shipped,
+  each inlining its own routine rather than sharing a dedicated template file — small enough not to
+  be worth extracting, matching how the already-shipped `CircleSort` family itself is structured.
+- **Quad cluster**: `QuadSort` (Merge) shipped, along with the `QuadSorting` template (875 lines)
+  it extends — Igor van den Hoven's actual quadsort, dense and hand-unrolled, a multi-day
+  undertaking on its own. `FluxSort` (Hybrid), the cluster's other member, has since shipped too;
+  porting it only needed its own 202 lines built on top of the already-shipped, already-tested
+  template plus one new template entry point (`sort(_:using:start:length:)`, ArrayV's
+  `quadSortSwap`) for reusing a caller-supplied scratch buffer across recursive partition calls.
 
 A retired scratch document, previously kept at `Documentation/TEMPLATE_PORT_REFERENCE.md`, carried
 hand-transcribed Java-to-pseudocode notes for six templates: `BinaryQuickSortingTemplate`,

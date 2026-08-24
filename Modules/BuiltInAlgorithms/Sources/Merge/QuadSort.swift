@@ -25,7 +25,10 @@ public struct QuadSort: SortAlgorithm {
     category: .merge,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 1, coefficients: [1, 1, 1], measuredSafeCeiling: nil),
+      anchorSize: 3349, coefficients: [154913, 61.7612, 0.00298586],
+      measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .powerLog, coefficients: [1.02001, 1.21198], rSquared: 0.859447),
     stable: true,
     timeComplexity: ComplexityBounds(
       best: "O(n)", average: "O(n log n)", worst: "O(n log n)"),

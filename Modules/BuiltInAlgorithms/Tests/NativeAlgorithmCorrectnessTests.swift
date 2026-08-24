@@ -30,12 +30,14 @@ struct NativeAlgorithmCorrectnessTests {
     CycleSort(),
     DeterministicBogoSort(), DiamondSortIterative(), DiamondSortRecursive(),
     DoubleInsertionSort(), DoubleSelectionSort(),
-    DualPivotQuickSort(), ExchangeBogoSort(), FlashSort(), FlippedMinHeapSort(), FoldSort(),
+    DualPivotQuickSort(), ExchangeBogoSort(), FlashSort(), FlippedMinHeapSort(), FluxSort(),
+    FoldSort(),
     ForcedStableQuickSort(), FunSort(), GnomeSort(), GrailSort(),
     GravitySort(),
     GuessSort(), HanoiSort(), HybridCombSort(), ImprovedInPlaceMergeSort(), InPlaceLSDRadixSort(),
     InPlaceMergeSort(), InsertionSort(),
     IntroCircleSortIterative(),
+    IntroCircleSortRecursive(),
     IntroSort(), IterativeTopDownMergeSort(),
     LazyHeapSort(), LazyStableSort(), LessBogoSort(), LibrarySort(), LLQuickSort(),
     LRQuickSort(),
@@ -2419,6 +2421,86 @@ struct NativeAlgorithmCorrectnessTests {
       #expect(
         engineReversed.values == reversed.sorted(),
         "QuadSort failed reverse-sorted input of size \(size)")
+    }
+  }
+
+  /// `FluxSort` branches by size at several points: `record(into:)` special-cases `nmemb < 32`
+  /// directly into `QuadSortingTemplate.sort`; `fluxAnalyze` early-outs on already-sorted, fully
+  /// reversed, or balance within 1/6 of either end; `fluxPartition` recurses until a side is
+  /// `<= FLUX_OUT` (24) or skewed `<= other/16`, and switches pivot-selection strategy once
+  /// `nmemb > 1024`. The generic suite's single trial at `sizeRange.lowerBound` (16) only
+  /// exercises the smallest `record(into:)` branch — this fuzzes across those boundaries
+  /// explicitly, plus deliberately near-sorted input to exercise `fluxAnalyze`'s ratio early-out.
+  @Test
+  func fluxSortWideSizeRangeAndBoundaryFuzz() {
+    let algorithm = FluxSort()
+
+    let boundarySizes = [0, 1, 2, 3, 24, 25, 31, 32, 33, 48, 49, 1023, 1024, 1025]
+    for size in boundarySizes {
+      for attempt in 0..<20 {
+        let input = (0..<size).map { _ in Int.random(in: 0...(max(size, 1) / 4)) }
+        var engine = RecordingEngine(values: input)
+        algorithm.record(into: &engine)
+        #expect(
+          engine.values == input.sorted(),
+          """
+          FluxSort failed duplicate-heavy fuzz attempt \(attempt) of boundary size \(size): \
+          \(input) -> \(engine.values)
+          """
+        )
+      }
+    }
+
+    for size in stride(from: 4, through: 512, by: 7) {
+      for attempt in 0..<10 {
+        let input = (0..<size).map { _ in Int.random(in: 0...1_000_000) }
+        var engine = RecordingEngine(values: input)
+        algorithm.record(into: &engine)
+        #expect(
+          engine.values == input.sorted(),
+          """
+          FluxSort failed wide-range fuzz attempt \(attempt) of size \(size): \(input) -> \
+          \(engine.values)
+          """
+        )
+      }
+    }
+
+    for size in [0, 1, 2, 24, 32, 64, 128, 256, 512, 1030] {
+      let sorted = Array(0..<size)
+      var engineSorted = RecordingEngine(values: sorted)
+      algorithm.record(into: &engineSorted)
+      #expect(engineSorted.values == sorted, "FluxSort failed already-sorted input of size \(size)")
+
+      let reversed = Array((0..<size).reversed())
+      var engineReversed = RecordingEngine(values: reversed)
+      algorithm.record(into: &engineReversed)
+      #expect(
+        engineReversed.values == reversed.sorted(),
+        "FluxSort failed reverse-sorted input of size \(size)")
+    }
+
+    // fluxAnalyze's "mostly sorted/reversed" early-out triggers when balance stays within 1/6 of
+    // either end — a handful of random swaps on an otherwise-sorted array lands squarely there.
+    for size in [64, 128, 300, 1200] {
+      for attempt in 0..<10 {
+        var nearlySorted = Array(0..<size)
+        let swapCount = max(1, size / 20)
+        for _ in 0..<swapCount {
+          let i = Int.random(in: 0..<size)
+          let j = Int.random(in: 0..<size)
+          nearlySorted.swapAt(i, j)
+        }
+        var engine = RecordingEngine(values: nearlySorted)
+        algorithm.record(into: &engine)
+        #expect(
+          engine.values == nearlySorted.sorted(),
+          """
+          FluxSort failed nearly-sorted fuzz attempt \(attempt) of size \(size): \
+          \(nearlySorted) -> \(engine.values)
+          """
+        )
+      }
     }
   }
 

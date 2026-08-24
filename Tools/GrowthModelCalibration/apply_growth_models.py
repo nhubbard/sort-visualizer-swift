@@ -212,7 +212,9 @@ def measured_safe_ceiling(entry: dict) -> int | None:
 
 def find_source_file(algorithm_id: str) -> Path | None:
     needle = f'AlgorithmID(rawValue: "{algorithm_id}")'
-    for path in _SOURCES_DIR.glob("*.swift"):
+    # Recursive -- algorithm sources live under per-category subdirectories (`Merge/`, `Quick/`,
+    # ...), not flat directly in `Sources/` (mirrors `apply_detected_models.py`'s own fix).
+    for path in _SOURCES_DIR.rglob("*.swift"):
         if needle in path.read_text():
             return path
     return None

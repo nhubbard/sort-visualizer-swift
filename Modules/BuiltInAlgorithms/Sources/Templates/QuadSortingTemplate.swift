@@ -4,8 +4,9 @@ import SortEngineKit
 /// can't read back — see `BottomUpMergeSort.swift`'s doc comment for why every aux buffer needs
 /// this dual bookkeeping. `QuadSortingTemplate` allocates several of these at different sizes
 /// (16, 128, `length/2`), so this is a small reusable wrapper rather than repeating the pattern
-/// by hand at each call site.
-private struct AuxBuffer {
+/// by hand at each call site. Module-internal (not `private`) so `FluxSort` can construct and read
+/// back its own top-level scratch buffer to pass into `sort(_:using:start:length:)` below.
+struct AuxBuffer {
   let handle: AuxHandle
   var values: [Int]
 
@@ -21,9 +22,10 @@ private struct AuxBuffer {
 }
 
 /// Ported from ArrayV's `sorts/templates/QuadSorting` — Igor van den Hoven's real `quadsort.c`,
-/// via ArrayV's Java re-implementation. One concrete algorithm currently extends this template
-/// (`QuadSort`, filed under Merge despite the shared template's name); `FluxSort` (Hybrid) extends
-/// it too but stays deferred — see `Documentation/docs/reference/port-status.md`.
+/// via ArrayV's Java re-implementation. Two concrete algorithms extend this template: `QuadSort`
+/// (filed under Merge despite the shared template's name), via `sort(_:start:length:)`, and
+/// `FluxSort` (Hybrid), via `sort(_:using:start:length:)` — ArrayV's `quadSortSwap` variant, which
+/// reuses a caller-supplied scratch buffer instead of allocating its own.
 ///
 /// Two systematic translation decisions apply throughout, both because `RecordingEngine` has no
 /// concept matching ArrayV's `Reads.compareValues`/`Highlights.markArray`:
@@ -788,9 +790,9 @@ enum QuadSortingTemplate {
 
   /// Top-level dispatch by size: under 16 is a plain `tailSwap`; under 256 pre-sorts via
   /// `quadSwap` then finishes with `tailMerge`; 256 and up finishes with the full `quadMerge`
-  /// pass instead. Matches ArrayV's `QuadSort.runSort`, which always calls this (never
-  /// `quadSortSwap`, the variant taking a caller-supplied swap array — nothing in this app's
-  /// scope needs that entry point).
+  /// pass instead. Matches ArrayV's `QuadSort.runSort`. Allocates and frees its own scratch
+  /// buffer each call — see `sort(_:using:start:length:)` below for the variant that reuses a
+  /// caller-supplied one instead.
   static func sort(_ engine: inout RecordingEngine, start: Int, length: Int) {
     if length < 16 {
       tailSwap(&engine, start, length)
@@ -807,6 +809,29 @@ enum QuadSortingTemplate {
         var swap = AuxBuffer(handle: handle, length: length / 2)
         quadMerge(&engine, &swap, start, length, 16)
         engine.deleteAuxArray(handle)
+      }
+    }
+  }
+
+  /// Same dispatch as `sort(_:start:length:)`, but merges into `swap` — a caller-supplied scratch
+  /// buffer — instead of allocating/freeing a fresh one. ArrayV's `quadSortSwap`. `FluxSort` uses
+  /// this to reuse one top-level scratch buffer across every depth of its own recursive
+  /// partition, sized to the partition's own `length` rather than the top-level array size:
+  /// `tailMerge`/`quadMerge` only ever address `swap` with 0-based offsets no larger than
+  /// `length`/2-ish, so any buffer at least `length` long works regardless of how it was sized by
+  /// the caller.
+  static func sort(
+    _ engine: inout RecordingEngine, using swap: inout AuxBuffer, start: Int, length: Int
+  ) {
+    if length < 16 {
+      tailSwap(&engine, start, length)
+    } else if length < 256 {
+      if quadSwap(&engine, start, length) == 0 {
+        tailMerge(&engine, &swap, start, length, 16)
+      }
+    } else {
+      if quadSwap(&engine, start, length) == 0 {
+        quadMerge(&engine, &swap, start, length, 16)
       }
     }
   }
