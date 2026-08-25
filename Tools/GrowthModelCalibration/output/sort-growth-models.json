@@ -7,12 +7,12 @@
     "runnerUpFamily" : "polynomialIntercept",
     "runnerUpRSquared" : 0.9997045227047171,
     "safeMaxSizeByCap" : [
-      100000,
-      646,
       300000,
       1466,
       1000000,
-      3256
+      3256,
+      100000,
+      646
     ],
     "sampleSizes" : [
       16,
@@ -36,12 +36,12 @@
     "runnerUpFamily" : "polynomialIntercept",
     "runnerUpRSquared" : 1,
     "safeMaxSizeByCap" : [
+      300000,
+      79999,
       1000000,
       266666,
       100000,
-      26666,
-      300000,
-      79999
+      26666
     ],
     "sampleSizes" : [
       16,
@@ -66,10 +66,10 @@
     "runnerUpFamily" : "powerLaw",
     "runnerUpRSquared" : 0.9937446905325323,
     "safeMaxSizeByCap" : [
-      1000000,
-      1783,
       300000,
       973,
+      1000000,
+      1783,
       100000,
       559
     ],
@@ -95,12 +95,12 @@
     "runnerUpFamily" : "powerLog",
     "runnerUpRSquared" : 0.9973681308433912,
     "safeMaxSizeByCap" : [
-      300000,
-      80,
       100000,
       56,
       1000000,
-      117
+      117,
+      300000,
+      80
     ],
     "sampleSizes" : [
       16,
@@ -123,10 +123,10 @@
     "runnerUpFamily" : "powerLaw",
     "runnerUpRSquared" : 0.9994823976712225,
     "safeMaxSizeByCap" : [
-      300000,
-      303,
       100000,
       173,
+      300000,
+      303,
       1000000,
       557
     ],
@@ -242,10 +242,10 @@
     "runnerUpFamily" : "polynomialIntercept",
     "runnerUpRSquared" : 0.9998185618323463,
     "safeMaxSizeByCap" : [
-      100000,
-      449,
       300000,
       900,
+      100000,
+      449,
       1000000,
       1830
     ],
@@ -300,12 +300,12 @@
     "runnerUpFamily" : "polynomialIntercept",
     "runnerUpRSquared" : 0.9998224677618613,
     "safeMaxSizeByCap" : [
-      1000000,
-      1878,
       100000,
       384,
       300000,
-      819
+      819,
+      1000000,
+      1878
     ],
     "sampleSizes" : [
       16,
@@ -329,12 +329,12 @@
     "runnerUpFamily" : "polynomialIntercept",
     "runnerUpRSquared" : 0.999793402649919,
     "safeMaxSizeByCap" : [
-      1000000,
-      2147,
+      300000,
+      940,
       100000,
       442,
-      300000,
-      940
+      1000000,
+      2147
     ],
     "sampleSizes" : [
       16,
@@ -360,10 +360,10 @@
     "safeMaxSizeByCap" : [
       1000000,
       3666,
-      300000,
-      1797,
       100000,
-      879
+      879,
+      300000,
+      1797
     ],
     "sampleSizes" : [
       16,
@@ -387,10 +387,10 @@
     "runnerUpFamily" : "polynomialIntercept",
     "runnerUpRSquared" : 0.9998852964007595,
     "safeMaxSizeByCap" : [
-      300000,
-      712,
       100000,
       348,
+      300000,
+      712,
       1000000,
       1478
     ],
@@ -416,12 +416,12 @@
     "runnerUpFamily" : "nToTheNLike",
     "runnerUpRSquared" : 0.9980949862598061,
     "safeMaxSizeByCap" : [
+      300000,
+      7,
       100000,
       7,
       1000000,
-      8,
-      300000,
-      7
+      8
     ],
     "sampleSizes" : [
       4,
@@ -441,10 +441,10 @@
     "runnerUpFamily" : "polynomialIntercept",
     "runnerUpRSquared" : 0.999929254604413,
     "safeMaxSizeByCap" : [
-      100000,
-      788,
       1000000,
       4109,
+      100000,
+      788,
       300000,
       1824
     ],
@@ -470,12 +470,12 @@
     "runnerUpFamily" : "polynomialIntercept",
     "runnerUpRSquared" : 0.9998338938595202,
     "safeMaxSizeByCap" : [
+      1000000,
+      4723,
       300000,
       2239,
       100000,
-      1044,
-      1000000,
-      4723
+      1044
     ],
     "sampleSizes" : [
       16,
@@ -502,10 +502,10 @@
     "safeMaxSizeByCap" : [
       1000000,
       327,
-      300000,
-      179,
       100000,
-      103
+      103,
+      300000,
+      179
     ],
     "sampleSizes" : [
       16,
@@ -532,10 +532,10 @@
     "safeMaxSizeByCap" : [
       300000,
       219,
-      100000,
-      126,
       1000000,
-      400
+      400,
+      100000,
+      126
     ],
     "sampleSizes" : [
       16,
@@ -560,10 +560,10 @@
     "runnerUpFamily" : "powerLog",
     "runnerUpRSquared" : 0.9998897894249792,
     "safeMaxSizeByCap" : [
-      1000000,
-      334,
       300000,
       184,
+      1000000,
+      334,
       100000,
       107
     ],
@@ -580,6 +580,35 @@
     "subjectID" : "burntpancakesort+shuffledtail",
     "winningFamily" : "polynomialIntercept",
     "winningRSquared" : 0.9999947770767171
+  },
+  {
+    "coefficients" : [
+      9.13568631096998,
+      1.2495966627009572
+    ],
+    "runnerUpFamily" : "polynomialIntercept",
+    "runnerUpRSquared" : 0.9998439266015413,
+    "safeMaxSizeByCap" : [
+      300000,
+      739,
+      1000000,
+      1584,
+      100000,
+      347
+    ],
+    "sampleSizes" : [
+      16,
+      17,
+      18,
+      19,
+      38,
+      76,
+      152,
+      304
+    ],
+    "subjectID" : "circlesortiterative+bsttraversal",
+    "winningFamily" : "powerLog",
+    "winningRSquared" : 0.9956201291129332
   },
   {
     "coefficients" : [
@@ -606,35 +635,6 @@
       152,
       304
     ],
-    "subjectID" : "circlesortiterative+bsttraversal",
-    "winningFamily" : "powerLog",
-    "winningRSquared" : 0.9956201291129332
-  },
-  {
-    "coefficients" : [
-      9.13568631096998,
-      1.2495966627009572
-    ],
-    "runnerUpFamily" : "polynomialIntercept",
-    "runnerUpRSquared" : 0.9998439266015413,
-    "safeMaxSizeByCap" : [
-      100000,
-      347,
-      1000000,
-      1584,
-      300000,
-      739
-    ],
-    "sampleSizes" : [
-      16,
-      17,
-      18,
-      19,
-      38,
-      76,
-      152,
-      304
-    ],
     "subjectID" : "circlesortrecursive+bsttraversal",
     "winningFamily" : "powerLog",
     "winningRSquared" : 0.9956201291129332
@@ -647,12 +647,12 @@
     "runnerUpFamily" : "polynomialIntercept",
     "runnerUpRSquared" : 0.9997285243557421,
     "safeMaxSizeByCap" : [
-      300000,
-      564,
+      100000,
+      277,
       1000000,
       1176,
-      100000,
-      277
+      300000,
+      564
     ],
     "sampleSizes" : [
       16,
@@ -676,10 +676,10 @@
     "runnerUpFamily" : "polynomialIntercept",
     "runnerUpRSquared" : 0.9998281223456352,
     "safeMaxSizeByCap" : [
-      1000000,
-      2202,
       100000,
       508,
+      1000000,
+      2202,
       300000,
       1057
     ],
@@ -708,10 +708,10 @@
     "safeMaxSizeByCap" : [
       300000,
       80000,
-      1000000,
-      266667,
       100000,
-      26667
+      26667,
+      1000000,
+      266667
     ],
     "sampleSizes" : [
       16,
@@ -735,12 +735,12 @@
     "runnerUpFamily" : "nToTheNLike",
     "runnerUpRSquared" : 0.7942718847131646,
     "safeMaxSizeByCap" : [
+      100000,
+      606,
       1000000,
       919,
       300000,
-      756,
-      100000,
-      606
+      756
     ],
     "sampleSizes" : [
       16,
@@ -765,12 +765,12 @@
     "runnerUpFamily" : "powerLaw",
     "runnerUpRSquared" : 0.9997329632169906,
     "safeMaxSizeByCap" : [
-      300000,
-      1111,
+      100000,
+      578,
       1000000,
       2167,
-      100000,
-      578
+      300000,
+      1111
     ],
     "sampleSizes" : [
       16,
@@ -797,10 +797,10 @@
     "safeMaxSizeByCap" : [
       300000,
       219,
-      100000,
-      126,
       1000000,
-      400
+      400,
+      100000,
+      126
     ],
     "sampleSizes" : [
       16,
@@ -883,12 +883,12 @@
     "runnerUpFamily" : "polynomialIntercept",
     "runnerUpRSquared" : 0.9999994483551424,
     "safeMaxSizeByCap" : [
-      300000,
-      187,
+      1000000,
+      342,
       100000,
       110,
-      1000000,
-      342
+      300000,
+      187
     ],
     "sampleSizes" : [
       16,
@@ -913,12 +913,12 @@
     "runnerUpFamily" : "powerLaw",
     "runnerUpRSquared" : 0.9956896850503543,
     "safeMaxSizeByCap" : [
+      1000000,
+      1783,
       300000,
       973,
       100000,
-      558,
-      1000000,
-      1783
+      558
     ],
     "sampleSizes" : [
       16,
@@ -945,10 +945,10 @@
     "safeMaxSizeByCap" : [
       1000000,
       563,
-      300000,
-      307,
       100000,
-      176
+      176,
+      300000,
+      307
     ],
     "sampleSizes" : [
       16,
@@ -973,12 +973,12 @@
     "runnerUpFamily" : "powerLaw",
     "runnerUpRSquared" : 0.9976019832461516,
     "safeMaxSizeByCap" : [
-      100000,
-      1464,
+      300000,
+      2686,
       1000000,
       5082,
-      300000,
-      2686
+      100000,
+      1464
     ],
     "sampleSizes" : [
       16,
@@ -1003,12 +1003,12 @@
     "runnerUpFamily" : "powerLaw",
     "runnerUpRSquared" : 0.9998981992253527,
     "safeMaxSizeByCap" : [
+      300000,
+      219,
       100000,
       126,
       1000000,
-      400,
-      300000,
-      219
+      400
     ],
     "sampleSizes" : [
       16,
@@ -1033,10 +1033,10 @@
     "runnerUpFamily" : "powerLog",
     "runnerUpRSquared" : 0.9982590829679542,
     "safeMaxSizeByCap" : [
-      100000,
-      3104,
       1000000,
       11527,
+      100000,
+      3104,
       300000,
       5935
     ],
@@ -1092,10 +1092,10 @@
     "runnerUpFamily" : "powerLaw",
     "runnerUpRSquared" : 0.9998772347380144,
     "safeMaxSizeByCap" : [
-      100000,
-      103,
       300000,
       179,
+      100000,
+      103,
       1000000,
       327
     ],
@@ -1122,12 +1122,12 @@
     "runnerUpFamily" : "powerLaw",
     "runnerUpRSquared" : 0.9992772988797501,
     "safeMaxSizeByCap" : [
-      1000000,
-      892,
       300000,
       488,
       100000,
-      281
+      281,
+      1000000,
+      892
     ],
     "sampleSizes" : [
       16,
@@ -1201,11 +1201,11 @@
     "runnerUpFamily" : "powerLaw",
     "runnerUpRSquared" : 0.8959248565740832,
     "safeMaxSizeByCap" : [
-      300000,
+      100000,
       7,
       1000000,
       7,
-      100000,
+      300000,
       7
     ],
     "sampleSizes" : [
@@ -1259,12 +1259,12 @@
     "runnerUpFamily" : "powerLaw",
     "runnerUpRSquared" : 0.9998772347380144,
     "safeMaxSizeByCap" : [
-      1000000,
-      400,
       300000,
       219,
       100000,
-      126
+      126,
+      1000000,
+      400
     ],
     "sampleSizes" : [
       16,
@@ -1350,10 +1350,10 @@
     "safeMaxSizeByCap" : [
       100000,
       610,
-      300000,
-      1247,
       1000000,
-      2553
+      2553,
+      300000,
+      1247
     ],
     "sampleSizes" : [
       16,
@@ -1378,12 +1378,12 @@
     "runnerUpFamily" : "powerLaw",
     "runnerUpRSquared" : 0.9998648754680293,
     "safeMaxSizeByCap" : [
+      300000,
+      870,
       100000,
       462,
       1000000,
-      1674,
-      300000,
-      870
+      1674
     ],
     "sampleSizes" : [
       16,
@@ -1408,12 +1408,12 @@
     "runnerUpFamily" : "powerLaw",
     "runnerUpRSquared" : 0.9989382870496538,
     "safeMaxSizeByCap" : [
+      1000000,
+      7814,
       100000,
       2252,
       300000,
-      4130,
-      1000000,
-      7814
+      4130
     ],
     "sampleSizes" : [
       16,
@@ -1438,12 +1438,12 @@
     "runnerUpFamily" : "powerLaw",
     "runnerUpRSquared" : 0.9963283479581942,
     "safeMaxSizeByCap" : [
+      100000,
+      2368,
       300000,
       4292,
       1000000,
-      8060,
-      100000,
-      2368
+      8060
     ],
     "sampleSizes" : [
       16,
@@ -1467,12 +1467,12 @@
     "runnerUpFamily" : "polynomialIntercept",
     "runnerUpRSquared" : 0.9997589456082925,
     "safeMaxSizeByCap" : [
+      1000000,
+      2969,
       100000,
       614,
       300000,
-      1361,
-      1000000,
-      2969
+      1361
     ],
     "sampleSizes" : [
       16,
@@ -1497,10 +1497,10 @@
     "runnerUpFamily" : "powerLaw",
     "runnerUpRSquared" : 0.9999304469291975,
     "safeMaxSizeByCap" : [
-      100000,
-      178,
       1000000,
       565,
+      100000,
+      178,
       300000,
       309
     ],
@@ -1526,12 +1526,12 @@
     "runnerUpFamily" : "polynomialIntercept",
     "runnerUpRSquared" : 0.9998194431330928,
     "safeMaxSizeByCap" : [
-      300000,
-      1014,
+      1000000,
+      2156,
       100000,
       475,
-      1000000,
-      2156
+      300000,
+      1014
     ],
     "sampleSizes" : [
       16,
@@ -1584,12 +1584,12 @@
     "runnerUpFamily" : "polynomialIntercept",
     "runnerUpRSquared" : 0.999902355879827,
     "safeMaxSizeByCap" : [
-      1000000,
-      3025,
       300000,
       1373,
       100000,
-      612
+      612,
+      1000000,
+      3025
     ],
     "sampleSizes" : [
       16,
@@ -1614,12 +1614,12 @@
     "runnerUpFamily" : "powerLaw",
     "runnerUpRSquared" : 0.9963283479581942,
     "safeMaxSizeByCap" : [
+      100000,
+      2368,
       300000,
       4292,
       1000000,
-      8060,
-      100000,
-      2368
+      8060
     ],
     "sampleSizes" : [
       16,
@@ -1675,10 +1675,10 @@
     "safeMaxSizeByCap" : [
       300000,
       930,
-      1000000,
-      1879,
       100000,
-      460
+      460,
+      1000000,
+      1879
     ],
     "sampleSizes" : [
       16,
@@ -1703,10 +1703,10 @@
     "runnerUpFamily" : "powerLaw",
     "runnerUpRSquared" : 0.9999920931830334,
     "safeMaxSizeByCap" : [
-      1000000,
-      399,
       300000,
       219,
+      1000000,
+      399,
       100000,
       126
     ],
@@ -1763,12 +1763,12 @@
     "runnerUpFamily" : "powerLaw",
     "runnerUpRSquared" : 0.9998772347380144,
     "safeMaxSizeByCap" : [
-      100000,
-      126,
+      300000,
+      219,
       1000000,
       400,
-      300000,
-      219
+      100000,
+      126
     ],
     "sampleSizes" : [
       16,
@@ -1793,12 +1793,12 @@
     "runnerUpFamily" : "powerLaw",
     "runnerUpRSquared" : 0.9998772347380144,
     "safeMaxSizeByCap" : [
+      1000000,
+      400,
       100000,
       126,
       300000,
-      219,
-      1000000,
-      400
+      219
     ],
     "sampleSizes" : [
       16,
@@ -1852,10 +1852,10 @@
     "runnerUpFamily" : "powerLaw",
     "runnerUpRSquared" : 0.999905090058402,
     "safeMaxSizeByCap" : [
-      1000000,
-      417,
       100000,
       132,
+      1000000,
+      417,
       300000,
       228
     ],
@@ -1881,12 +1881,12 @@
     "runnerUpFamily" : "polynomialIntercept",
     "runnerUpRSquared" : 1,
     "safeMaxSizeByCap" : [
-      100000,
-      26666,
       300000,
       79999,
       1000000,
-      266666
+      266666,
+      100000,
+      26666
     ],
     "sampleSizes" : [
       16,
@@ -1911,10 +1911,10 @@
     "runnerUpFamily" : "powerLaw",
     "runnerUpRSquared" : 0.9974770031037304,
     "safeMaxSizeByCap" : [
-      300000,
-      306,
       1000000,
       562,
+      300000,
+      306,
       100000,
       175
     ],
@@ -1940,12 +1940,12 @@
     "runnerUpFamily" : "nToTheNLike",
     "runnerUpRSquared" : 0.9944602550756949,
     "safeMaxSizeByCap" : [
-      300000,
-      7,
+      1000000,
+      8,
       100000,
       7,
-      1000000,
-      8
+      300000,
+      7
     ],
     "sampleSizes" : [
       4,
@@ -1965,10 +1965,10 @@
     "runnerUpFamily" : "factorial",
     "runnerUpRSquared" : 0.9943266907766354,
     "safeMaxSizeByCap" : [
-      1000000,
-      6,
       100000,
       5,
+      1000000,
+      6,
       300000,
       5
     ],
@@ -2040,10 +2040,10 @@
     "runnerUpFamily" : "nToTheNLike",
     "runnerUpRSquared" : 0.9889735638836192,
     "safeMaxSizeByCap" : [
-      1000000,
-      5,
       100000,
       4,
+      1000000,
+      5,
       300000,
       4
     ],
@@ -2065,10 +2065,10 @@
     "runnerUpFamily" : "nToTheNLike",
     "runnerUpRSquared" : 0.996955601800247,
     "safeMaxSizeByCap" : [
-      1000000,
-      17,
       100000,
       13,
+      1000000,
+      17,
       300000,
       15
     ],
@@ -2092,12 +2092,12 @@
     "runnerUpFamily" : "powerLaw",
     "runnerUpRSquared" : 0.9999630214101954,
     "safeMaxSizeByCap" : [
-      100000,
-      484,
+      300000,
+      905,
       1000000,
       1736,
-      300000,
-      905
+      100000,
+      484
     ],
     "sampleSizes" : [
       16,
@@ -2123,10 +2123,10 @@
     "safeMaxSizeByCap" : [
       100000,
       748,
-      1000000,
-      2880,
       300000,
-      1458
+      1458,
+      1000000,
+      2880
     ],
     "sampleSizes" : [
       16,
@@ -2151,12 +2151,12 @@
     "runnerUpFamily" : "powerLaw",
     "runnerUpRSquared" : 0.9999419583441159,
     "safeMaxSizeByCap" : [
-      100000,
-      178,
       1000000,
       565,
       300000,
-      309
+      309,
+      100000,
+      178
     ],
     "sampleSizes" : [
       16,
@@ -2181,12 +2181,12 @@
     "runnerUpFamily" : "powerLaw",
     "runnerUpRSquared" : 0.9999304469291975,
     "safeMaxSizeByCap" : [
-      100000,
-      178,
       300000,
       309,
       1000000,
-      565
+      565,
+      100000,
+      178
     ],
     "sampleSizes" : [
       16,
@@ -2211,12 +2211,12 @@
     "runnerUpFamily" : "powerLog",
     "runnerUpRSquared" : 0.999751096415555,
     "safeMaxSizeByCap" : [
-      300000,
-      1379,
       100000,
       703,
       1000000,
-      2724
+      2724,
+      300000,
+      1379
     ],
     "sampleSizes" : [
       16,
@@ -2241,12 +2241,12 @@
     "runnerUpFamily" : "powerLaw",
     "runnerUpRSquared" : 0.9986256171786145,
     "safeMaxSizeByCap" : [
-      1000000,
-      721,
       300000,
       390,
       100000,
-      221
+      221,
+      1000000,
+      721
     ],
     "sampleSizes" : [
       32,
@@ -2326,12 +2326,12 @@
     "runnerUpFamily" : "factorial",
     "runnerUpRSquared" : 0.9659483057573703,
     "safeMaxSizeByCap" : [
+      1000000,
+      28,
       300000,
       24,
       100000,
-      22,
-      1000000,
-      28
+      22
     ],
     "sampleSizes" : [
       16,
@@ -2352,12 +2352,12 @@
     "runnerUpFamily" : "powerLaw",
     "runnerUpRSquared" : 0.9999813142934036,
     "safeMaxSizeByCap" : [
-      100000,
-      12410,
       300000,
       28576,
       1000000,
-      63444
+      63444,
+      100000,
+      12410
     ],
     "sampleSizes" : [
       16,
@@ -2382,12 +2382,12 @@
     "runnerUpFamily" : "powerLaw",
     "runnerUpRSquared" : 0.9999424367246493,
     "safeMaxSizeByCap" : [
-      1000000,
-      516,
+      300000,
+      283,
       100000,
       163,
-      300000,
-      283
+      1000000,
+      516
     ],
     "sampleSizes" : [
       16,
@@ -2411,12 +2411,12 @@
     "runnerUpFamily" : "powerLaw",
     "runnerUpRSquared" : 0.9708275537443997,
     "safeMaxSizeByCap" : [
-      1000000,
-      13994,
       100000,
       3282,
       300000,
-      6815
+      6815,
+      1000000,
+      13994
     ],
     "sampleSizes" : [
       16,
@@ -2441,12 +2441,12 @@
     "runnerUpFamily" : "powerLaw",
     "runnerUpRSquared" : 0.9933144542731964,
     "safeMaxSizeByCap" : [
+      1000000,
+      94,
       100000,
       42,
       300000,
-      60,
-      1000000,
-      94
+      60
     ],
     "sampleSizes" : [
       16,
@@ -2469,12 +2469,12 @@
     "runnerUpFamily" : "powerLaw",
     "runnerUpRSquared" : 0.9992362052136097,
     "safeMaxSizeByCap" : [
-      1000000,
-      1263,
+      100000,
+      398,
       300000,
       691,
-      100000,
-      398
+      1000000,
+      1263
     ],
     "sampleSizes" : [
       16,
@@ -2500,10 +2500,10 @@
     "safeMaxSizeByCap" : [
       100000,
       7,
-      1000000,
-      8,
       300000,
-      7
+      7,
+      1000000,
+      8
     ],
     "sampleSizes" : [
       4,
@@ -2523,12 +2523,12 @@
     "runnerUpFamily" : "polynomialIntercept",
     "runnerUpRSquared" : 0.9998280210159485,
     "safeMaxSizeByCap" : [
-      300000,
-      1528,
       100000,
       664,
       1000000,
-      3431
+      3431,
+      300000,
+      1528
     ],
     "sampleSizes" : [
       16,
@@ -2553,12 +2553,12 @@
     "runnerUpFamily" : "powerLaw",
     "runnerUpRSquared" : 0.9985419992419914,
     "safeMaxSizeByCap" : [
+      300000,
+      250,
       100000,
       143,
       1000000,
-      459,
-      300000,
-      250
+      459
     ],
     "sampleSizes" : [
       16,
@@ -2583,12 +2583,12 @@
     "runnerUpFamily" : "powerLaw",
     "runnerUpRSquared" : 0.9936426028432778,
     "safeMaxSizeByCap" : [
-      300000,
-      340,
       1000000,
       630,
       100000,
-      192
+      192,
+      300000,
+      340
     ],
     "sampleSizes" : [
       16,
@@ -2612,12 +2612,12 @@
     "runnerUpFamily" : "polynomialIntercept",
     "runnerUpRSquared" : 0.9998096441062542,
     "safeMaxSizeByCap" : [
+      100000,
+      448,
       1000000,
       2046,
       300000,
-      959,
-      100000,
-      448
+      959
     ],
     "sampleSizes" : [
       16,
@@ -2643,10 +2643,10 @@
     "safeMaxSizeByCap" : [
       100000,
       448,
-      300000,
-      959,
       1000000,
-      2046
+      2046,
+      300000,
+      959
     ],
     "sampleSizes" : [
       16,
@@ -2671,12 +2671,12 @@
     "runnerUpFamily" : "powerLog",
     "runnerUpRSquared" : 0.999997530416101,
     "safeMaxSizeByCap" : [
-      1000000,
-      980,
       300000,
       499,
       100000,
-      257
+      257,
+      1000000,
+      980
     ],
     "sampleSizes" : [
       16,
@@ -2701,10 +2701,10 @@
     "runnerUpFamily" : "powerLaw",
     "runnerUpRSquared" : 0.9998987590225054,
     "safeMaxSizeByCap" : [
-      1000000,
-      1264,
       100000,
       399,
+      1000000,
+      1264,
       300000,
       692
     ],
@@ -2731,12 +2731,12 @@
     "runnerUpFamily" : "powerLaw",
     "runnerUpRSquared" : 0.9998772347380144,
     "safeMaxSizeByCap" : [
-      1000000,
-      327,
       300000,
       179,
       100000,
-      103
+      103,
+      1000000,
+      327
     ],
     "sampleSizes" : [
       16,
@@ -2761,12 +2761,12 @@
     "runnerUpFamily" : "powerLaw",
     "runnerUpRSquared" : 0.9999682247726385,
     "safeMaxSizeByCap" : [
-      300000,
-      219,
       100000,
       126,
       1000000,
-      400
+      400,
+      300000,
+      219
     ],
     "sampleSizes" : [
       16,
@@ -2790,10 +2790,10 @@
     "runnerUpFamily" : "polynomialIntercept",
     "runnerUpRSquared" : 0.99993038816351,
     "safeMaxSizeByCap" : [
-      1000000,
-      4939,
       100000,
       963,
+      1000000,
+      4939,
       300000,
       2213
     ],
@@ -2819,12 +2819,12 @@
     "runnerUpFamily" : "polynomialIntercept",
     "runnerUpRSquared" : 0.9999208996688393,
     "safeMaxSizeByCap" : [
+      100000,
+      2711,
       1000000,
       11296,
       300000,
-      5553,
-      100000,
-      2711
+      5553
     ],
     "sampleSizes" : [
       16,
@@ -2849,12 +2849,12 @@
     "runnerUpFamily" : "powerLaw",
     "runnerUpRSquared" : 0.9998772347380144,
     "safeMaxSizeByCap" : [
-      1000000,
-      566,
       300000,
       310,
       100000,
-      179
+      179,
+      1000000,
+      566
     ],
     "sampleSizes" : [
       16,
@@ -2878,12 +2878,12 @@
     "runnerUpFamily" : "exponential",
     "runnerUpRSquared" : 0.9989109908477298,
     "safeMaxSizeByCap" : [
+      300000,
+      8,
       100000,
       8,
       1000000,
-      9,
-      300000,
-      8
+      9
     ],
     "sampleSizes" : [
       4,
@@ -2930,10 +2930,10 @@
     "safeMaxSizeByCap" : [
       300000,
       45,
-      1000000,
-      55,
       100000,
-      36
+      36,
+      1000000,
+      55
     ],
     "sampleSizes" : [
       16,
@@ -2981,10 +2981,10 @@
     "runnerUpFamily" : "powerLog",
     "runnerUpRSquared" : 0.9974353742837561,
     "safeMaxSizeByCap" : [
-      100000,
-      60,
       1000000,
       146,
+      100000,
+      60,
       300000,
       89
     ],
@@ -3012,10 +3012,10 @@
     "safeMaxSizeByCap" : [
       300000,
       253,
-      100000,
-      146,
       1000000,
-      462
+      462,
+      100000,
+      146
     ],
     "sampleSizes" : [
       16,
@@ -3040,12 +3040,12 @@
     "runnerUpFamily" : "powerLaw",
     "runnerUpRSquared" : 0.9998772347380144,
     "safeMaxSizeByCap" : [
+      300000,
+      219,
       100000,
       126,
       1000000,
-      400,
-      300000,
-      219
+      400
     ],
     "sampleSizes" : [
       16,
@@ -3069,12 +3069,12 @@
     "runnerUpFamily" : "exponential",
     "runnerUpRSquared" : 0.9987009185002109,
     "safeMaxSizeByCap" : [
+      1000000,
+      18,
       300000,
       16,
       100000,
-      15,
-      1000000,
-      18
+      15
     ],
     "sampleSizes" : [
       4,
@@ -3095,12 +3095,12 @@
     "runnerUpFamily" : "polynomialIntercept",
     "runnerUpRSquared" : 0.9999999550895727,
     "safeMaxSizeByCap" : [
+      100000,
+      172,
       300000,
       304,
       1000000,
-      571,
-      100000,
-      172
+      571
     ],
     "sampleSizes" : [
       16,
@@ -3125,12 +3125,12 @@
     "runnerUpFamily" : "powerLaw",
     "runnerUpRSquared" : 0.9960098309235693,
     "safeMaxSizeByCap" : [
-      1000000,
-      2031,
       100000,
       567,
       300000,
-      1060
+      1060,
+      1000000,
+      2031
     ],
     "sampleSizes" : [
       16,
@@ -3214,12 +3214,12 @@
     "runnerUpFamily" : "polynomialIntercept",
     "runnerUpRSquared" : 0.9999791624880261,
     "safeMaxSizeByCap" : [
-      100000,
-      88,
       300000,
       147,
       1000000,
-      257
+      257,
+      100000,
+      88
     ],
     "sampleSizes" : [
       16,
@@ -3243,10 +3243,10 @@
     "runnerUpFamily" : "polynomialIntercept",
     "runnerUpRSquared" : 0.9999941640728685,
     "safeMaxSizeByCap" : [
-      300000,
-      4823,
       1000000,
       9239,
+      300000,
+      4823,
       100000,
       2580
     ],
@@ -3272,12 +3272,12 @@
     "runnerUpFamily" : "polynomialIntercept",
     "runnerUpRSquared" : 0.9999941640728685,
     "safeMaxSizeByCap" : [
-      100000,
-      2580,
+      300000,
+      4823,
       1000000,
       9239,
-      300000,
-      4823
+      100000,
+      2580
     ],
     "sampleSizes" : [
       16,
@@ -3390,12 +3390,12 @@
     "runnerUpFamily" : "polynomialIntercept",
     "runnerUpRSquared" : 0.9988240098247146,
     "safeMaxSizeByCap" : [
-      1000000,
-      2270,
       100000,
       530,
       300000,
-      1097
+      1097,
+      1000000,
+      2270
     ],
     "sampleSizes" : [
       16,
@@ -3420,12 +3420,12 @@
     "runnerUpFamily" : "powerLog",
     "runnerUpRSquared" : 0.9084839085443541,
     "safeMaxSizeByCap" : [
-      300000,
-      1725,
+      1000000,
+      3368,
       100000,
       897,
-      1000000,
-      3368
+      300000,
+      1725
     ],
     "sampleSizes" : [
       16,
@@ -3481,10 +3481,10 @@
     "safeMaxSizeByCap" : [
       100000,
       322,
-      300000,
-      573,
       1000000,
-      1063
+      1063,
+      300000,
+      573
     ],
     "sampleSizes" : [
       16,
@@ -3509,12 +3509,12 @@
     "runnerUpFamily" : "powerLog",
     "runnerUpRSquared" : 0.975075442972679,
     "safeMaxSizeByCap" : [
+      100000,
+      555,
       300000,
       1118,
       1000000,
-      2249,
-      100000,
-      555
+      2249
     ],
     "sampleSizes" : [
       16,
@@ -3568,10 +3568,10 @@
     "runnerUpFamily" : "powerLog",
     "runnerUpRSquared" : 0.9322497345405348,
     "safeMaxSizeByCap" : [
-      1000000,
-      850,
       300000,
       462,
+      1000000,
+      850,
       100000,
       264
     ],
@@ -3597,10 +3597,10 @@
     "runnerUpFamily" : "factorial",
     "runnerUpRSquared" : 0.34836027303096095,
     "safeMaxSizeByCap" : [
-      300000,
-      225,
       1000000,
       326,
+      300000,
+      225,
       100000,
       160
     ],
@@ -3653,12 +3653,12 @@
     "runnerUpFamily" : "powerLaw",
     "runnerUpRSquared" : 0.9998772347380144,
     "safeMaxSizeByCap" : [
+      1000000,
+      632,
       300000,
       346,
       100000,
-      200,
-      1000000,
-      632
+      200
     ],
     "sampleSizes" : [
       16,
@@ -3685,10 +3685,10 @@
     "safeMaxSizeByCap" : [
       300000,
       141,
-      100000,
-      90,
       1000000,
-      241
+      241,
+      100000,
+      90
     ],
     "sampleSizes" : [
       16,
@@ -3713,12 +3713,12 @@
     "runnerUpFamily" : "powerLaw",
     "runnerUpRSquared" : 0.9958469905818642,
     "safeMaxSizeByCap" : [
+      100000,
+      374,
       1000000,
       1223,
       300000,
-      661,
-      100000,
-      374
+      661
     ],
     "sampleSizes" : [
       16,
@@ -3743,10 +3743,10 @@
     "runnerUpFamily" : "powerLaw",
     "runnerUpRSquared" : 0.9960642022183781,
     "safeMaxSizeByCap" : [
-      300000,
-      367,
       100000,
       208,
+      300000,
+      367,
       1000000,
       678
     ],
@@ -3773,10 +3773,10 @@
     "runnerUpFamily" : "powerLog",
     "runnerUpRSquared" : 0.9999947179850411,
     "safeMaxSizeByCap" : [
-      300000,
-      654,
       100000,
       344,
+      300000,
+      654,
       1000000,
       1269
     ],
@@ -3802,12 +3802,12 @@
     "runnerUpFamily" : "polynomialIntercept",
     "runnerUpRSquared" : 0.9998305227666915,
     "safeMaxSizeByCap" : [
-      300000,
-      938,
+      1000000,
+      1956,
       100000,
       451,
-      1000000,
-      1956
+      300000,
+      938
     ],
     "sampleSizes" : [
       16,
@@ -3832,12 +3832,12 @@
     "runnerUpFamily" : "powerLog",
     "runnerUpRSquared" : 0.9999838647177588,
     "safeMaxSizeByCap" : [
-      1000000,
-      341,
       100000,
       108,
       300000,
-      187
+      187,
+      1000000,
+      341
     ],
     "sampleSizes" : [
       16,
@@ -3861,12 +3861,12 @@
     "runnerUpFamily" : "polynomialIntercept",
     "runnerUpRSquared" : 0.9998172971406372,
     "safeMaxSizeByCap" : [
+      300000,
+      959,
       1000000,
       2062,
       100000,
-      444,
-      300000,
-      959
+      444
     ],
     "sampleSizes" : [
       16,
@@ -3890,12 +3890,12 @@
     "runnerUpFamily" : "polynomialIntercept",
     "runnerUpRSquared" : 0.9998220960565639,
     "safeMaxSizeByCap" : [
-      300000,
-      943,
       1000000,
       2007,
       100000,
-      442
+      442,
+      300000,
+      943
     ],
     "sampleSizes" : [
       16,
@@ -3919,12 +3919,12 @@
     "runnerUpFamily" : "polynomialIntercept",
     "runnerUpRSquared" : 0.9998220960565639,
     "safeMaxSizeByCap" : [
-      100000,
-      442,
+      1000000,
+      2007,
       300000,
       943,
-      1000000,
-      2007
+      100000,
+      442
     ],
     "sampleSizes" : [
       16,
@@ -3948,12 +3948,12 @@
     "runnerUpFamily" : "polynomialIntercept",
     "runnerUpRSquared" : 0.9998144034927793,
     "safeMaxSizeByCap" : [
+      300000,
+      1018,
       1000000,
       2165,
       100000,
-      477,
-      300000,
-      1018
+      477
     ],
     "sampleSizes" : [
       16,
@@ -4006,12 +4006,12 @@
     "runnerUpFamily" : "polynomialIntercept",
     "runnerUpRSquared" : 0.9998050721593684,
     "safeMaxSizeByCap" : [
-      100000,
-      481,
       1000000,
       2200,
       300000,
-      1031
+      1031,
+      100000,
+      481
     ],
     "sampleSizes" : [
       16,
@@ -4036,12 +4036,12 @@
     "runnerUpFamily" : "powerLog",
     "runnerUpRSquared" : 0.8644290219451696,
     "safeMaxSizeByCap" : [
-      1000000,
-      2682,
+      300000,
+      1374,
       100000,
       714,
-      300000,
-      1374
+      1000000,
+      2682
     ],
     "sampleSizes" : [
       16,
@@ -4202,12 +4202,12 @@
     "runnerUpFamily" : "powerLaw",
     "runnerUpRSquared" : 0.9873700134659859,
     "safeMaxSizeByCap" : [
+      1000000,
+      1738,
       300000,
       947,
       100000,
-      543,
-      1000000,
-      1738
+      543
     ],
     "sampleSizes" : [
       16,
@@ -4231,12 +4231,12 @@
     "runnerUpFamily" : "polynomialIntercept",
     "runnerUpRSquared" : 0.9998299633989308,
     "safeMaxSizeByCap" : [
+      100000,
+      1036,
       1000000,
       4398,
       300000,
-      2141,
-      100000,
-      1036
+      2141
     ],
     "sampleSizes" : [
       16,
@@ -4260,12 +4260,12 @@
     "runnerUpFamily" : "nToTheNLike",
     "runnerUpRSquared" : 0.9916150577874732,
     "safeMaxSizeByCap" : [
-      1000000,
-      18,
       300000,
       16,
       100000,
-      15
+      15,
+      1000000,
+      18
     ],
     "sampleSizes" : [
       4,
@@ -4286,12 +4286,12 @@
     "runnerUpFamily" : "polynomialIntercept",
     "runnerUpRSquared" : 0.9998763631818777,
     "safeMaxSizeByCap" : [
-      300000,
-      2255,
       100000,
       1012,
       1000000,
-      4905
+      4905,
+      300000,
+      2255
     ],
     "sampleSizes" : [
       16,
@@ -4315,12 +4315,12 @@
     "runnerUpFamily" : "polynomialIntercept",
     "runnerUpRSquared" : 0.9998930474945081,
     "safeMaxSizeByCap" : [
-      100000,
-      515,
       300000,
       1114,
       1000000,
-      2389
+      2389,
+      100000,
+      515
     ],
     "sampleSizes" : [
       16,
@@ -4344,12 +4344,12 @@
     "runnerUpFamily" : "polynomialIntercept",
     "runnerUpRSquared" : 0.9999174785990707,
     "safeMaxSizeByCap" : [
-      100000,
-      838,
+      1000000,
+      4227,
       300000,
       1907,
-      1000000,
-      4227
+      100000,
+      838
     ],
     "sampleSizes" : [
       16,
@@ -4403,10 +4403,10 @@
     "runnerUpFamily" : "powerLog",
     "runnerUpRSquared" : 0.9480223981061009,
     "safeMaxSizeByCap" : [
-      1000000,
-      2268,
       300000,
       1158,
+      1000000,
+      2268,
       100000,
       599
     ],
@@ -4433,12 +4433,12 @@
     "runnerUpFamily" : "powerLog",
     "runnerUpRSquared" : 0.9819718460436836,
     "safeMaxSizeByCap" : [
-      1000000,
-      3113,
       100000,
       899,
       300000,
-      1647
+      1647,
+      1000000,
+      3113
     ],
     "sampleSizes" : [
       16,
@@ -4463,12 +4463,12 @@
     "runnerUpFamily" : "powerLaw",
     "runnerUpRSquared" : 0.9966957345600865,
     "safeMaxSizeByCap" : [
+      100000,
+      1578,
       300000,
       2928,
       1000000,
-      5578,
-      100000,
-      1578
+      5578
     ],
     "sampleSizes" : [
       16,
@@ -4493,12 +4493,12 @@
     "runnerUpFamily" : "powerLog",
     "runnerUpRSquared" : 0.9976145138599731,
     "safeMaxSizeByCap" : [
-      100000,
-      511,
       300000,
       986,
       1000000,
-      1928
+      1928,
+      100000,
+      511
     ],
     "sampleSizes" : [
       16,
@@ -4523,12 +4523,12 @@
     "runnerUpFamily" : "powerLog",
     "runnerUpRSquared" : 0.992193988142563,
     "safeMaxSizeByCap" : [
-      300000,
-      1190,
       1000000,
       2278,
       100000,
-      638
+      638,
+      300000,
+      1190
     ],
     "sampleSizes" : [
       16,
@@ -4582,10 +4582,10 @@
     "runnerUpFamily" : "polynomialIntercept",
     "runnerUpRSquared" : 0.9999941640728685,
     "safeMaxSizeByCap" : [
-      300000,
-      4823,
       1000000,
       9239,
+      300000,
+      4823,
       100000,
       2580
     ],
@@ -4635,12 +4635,12 @@
     "runnerUpFamily" : "nToTheNLike",
     "runnerUpRSquared" : 0.38005302770198934,
     "safeMaxSizeByCap" : [
-      100000,
-      5,
+      1000000,
+      6,
       300000,
       5,
-      1000000,
-      6
+      100000,
+      5
     ],
     "sampleSizes" : [
       3,
@@ -4662,10 +4662,10 @@
     "safeMaxSizeByCap" : [
       300000,
       1378,
-      1000000,
-      3041,
       100000,
-      613
+      613,
+      1000000,
+      3041
     ],
     "sampleSizes" : [
       16,
@@ -4691,10 +4691,10 @@
     "safeMaxSizeByCap" : [
       300000,
       2390,
-      100000,
-      1090,
       1000000,
-      5130
+      5130,
+      100000,
+      1090
     ],
     "sampleSizes" : [
       16,
@@ -4747,12 +4747,12 @@
     "runnerUpFamily" : "polynomialIntercept",
     "runnerUpRSquared" : 0.9997366311574701,
     "safeMaxSizeByCap" : [
+      300000,
+      6078,
       100000,
       2866,
       1000000,
-      12673,
-      300000,
-      6078
+      12673
     ],
     "sampleSizes" : [
       16,
@@ -4778,10 +4778,10 @@
     "safeMaxSizeByCap" : [
       100000,
       364,
-      1000000,
-      1711,
       300000,
-      788
+      788,
+      1000000,
+      1711
     ],
     "sampleSizes" : [
       16,
@@ -4808,10 +4808,10 @@
     "safeMaxSizeByCap" : [
       1000000,
       497,
-      100000,
-      153,
       300000,
-      269
+      269,
+      100000,
+      153
     ],
     "sampleSizes" : [
       16,
@@ -4864,12 +4864,12 @@
     "runnerUpFamily" : "powerLaw",
     "runnerUpRSquared" : 0.6917499662606658,
     "safeMaxSizeByCap" : [
+      1000000,
+      3631,
       100000,
       1020,
       300000,
-      1898,
-      1000000,
-      3631
+      1898
     ],
     "sampleSizes" : [
       16,
@@ -4894,10 +4894,10 @@
     "runnerUpFamily" : "powerLog",
     "runnerUpRSquared" : 0.9991717148505878,
     "safeMaxSizeByCap" : [
-      300000,
-      829,
       100000,
       427,
+      300000,
+      829,
       1000000,
       1628
     ],
@@ -4925,10 +4925,10 @@
     "safeMaxSizeByCap" : [
       300000,
       396,
-      100000,
-      225,
       1000000,
-      735
+      735,
+      100000,
+      225
     ],
     "sampleSizes" : [
       16,
@@ -4952,10 +4952,10 @@
     "runnerUpFamily" : "powerLaw",
     "runnerUpRSquared" : -0.17642732577622322,
     "safeMaxSizeByCap" : [
-      100000,
-      554,
       300000,
       991,
+      100000,
+      554,
       1000000,
       1851
     ],
@@ -4972,5 +4972,35 @@
     "subjectID" : "optimizeddualpivotquicksort+pdqbad",
     "winningFamily" : "powerLog",
     "winningRSquared" : -0.023160072904980344
+  },
+  {
+    "coefficients" : [
+      0.03125501087080063,
+      9.798711866460652,
+      22.334255143164835
+    ],
+    "runnerUpFamily" : "powerLaw",
+    "runnerUpRSquared" : 0.9861299746789419,
+    "safeMaxSizeByCap" : [
+      1000000,
+      4904,
+      100000,
+      1450,
+      300000,
+      2618
+    ],
+    "sampleSizes" : [
+      16,
+      17,
+      18,
+      19,
+      38,
+      76,
+      152,
+      304
+    ],
+    "subjectID" : "optimizedbottomupmergesort+grailbad",
+    "winningFamily" : "polynomialIntercept",
+    "winningRSquared" : 0.9989987796766281
   }
 ]

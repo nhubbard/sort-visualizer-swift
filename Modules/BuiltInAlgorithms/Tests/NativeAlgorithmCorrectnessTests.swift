@@ -27,7 +27,8 @@ struct NativeAlgorithmCorrectnessTests {
     LRQuickSort(), LSDRadixSort(), MatrixSort(), MaxHeapSort(), MedianQuickBogoSort(), MergeBogoSort(),
     MergeExchangeSortIterative(), MergeInsertionSort(), MergeSort(), MinHeapSort(), MinMaxHeapSort(), MSDRadixSort(),
     NewShuffleMergeSort(), OddEvenMergeSortIterative(), OddEvenMergeSortRecursive(), OddEvenSort(),
-    OptimizedBubbleSort(), OptimizedCocktailShakerSort(), OptimizedDualPivotQuickSort(), OptimizedGnomeSort(),
+    OptimizedBottomUpMergeSort(), OptimizedBubbleSort(), OptimizedCocktailShakerSort(),
+    OptimizedDualPivotQuickSort(), OptimizedGnomeSort(),
     OptimizedGuessSort(), OptimizedLazyStableSort(), OptimizedStoogeSort(), OptimizedStoogeSortStudio(),
     OutOfPlaceHeapSort(), PairwiseMergeSortIterative(), PairwiseMergeSortRecursive(), PairwiseSortIterative(),
     PairwiseSortRecursive(), PancakeInsertionSort(), PancakeSort(), PatienceSort(), PDMergeSort(), PDQBranchedSort(),
@@ -2647,6 +2648,65 @@ struct NativeAlgorithmCorrectnessTests {
       #expect(
         engineReversed.values == reversed.sorted(),
         "OptimizedDualPivotQuickSort failed reverse-sorted input of size \(size)")
+    }
+  }
+
+  /// `OptimizedBottomUpMergeSort` branches on `length < 16` directly into a single binary-
+  /// insertion pass with no merge phase at all — the generic suite's single trial at
+  /// `sizeRange.lowerBound` (16) never reaches that path. This is also exactly the boundary
+  /// where ArrayV's own source has a real bug this port deliberately does not reproduce
+  /// (`customBinaryInsert(a, 0, 16, ...)` — a hardcoded `16` instead of `n`, which would read/
+  /// write out of bounds for any array shorter than 16 elements): fuzzing sizes 0-15 here is
+  /// exactly what would have caught that bug if the fix had been missed.
+  @Test
+  func optimizedBottomUpMergeSortWideSizeRangeAndBoundaryFuzz() {
+    let algorithm = OptimizedBottomUpMergeSort()
+
+    let boundarySizes = [0, 1, 2, 3, 15, 16, 17, 31, 32, 33]
+    for size in boundarySizes {
+      for attempt in 0..<20 {
+        let input = (0..<size).map { _ in Int.random(in: 0...(max(size, 1) / 4)) }
+        var engine = RecordingEngine(values: input)
+        algorithm.record(into: &engine)
+        #expect(
+          engine.values == input.sorted(),
+          """
+          OptimizedBottomUpMergeSort failed duplicate-heavy fuzz attempt \(attempt) of boundary \
+          size \(size): \(input) -> \(engine.values)
+          """
+        )
+      }
+    }
+
+    for size in stride(from: 4, through: 320, by: 5) {
+      for attempt in 0..<10 {
+        let input = (0..<size).map { _ in Int.random(in: 0...1_000_000) }
+        var engine = RecordingEngine(values: input)
+        algorithm.record(into: &engine)
+        #expect(
+          engine.values == input.sorted(),
+          """
+          OptimizedBottomUpMergeSort failed wide-range fuzz attempt \(attempt) of size \(size): \
+          \(input) -> \(engine.values)
+          """
+        )
+      }
+    }
+
+    for size in [0, 1, 2, 15, 16, 32, 64, 128, 256, 300] {
+      let sorted = Array(0..<size)
+      var engineSorted = RecordingEngine(values: sorted)
+      algorithm.record(into: &engineSorted)
+      #expect(
+        engineSorted.values == sorted,
+        "OptimizedBottomUpMergeSort failed already-sorted input of size \(size)")
+
+      let reversed = Array((0..<size).reversed())
+      var engineReversed = RecordingEngine(values: reversed)
+      algorithm.record(into: &engineReversed)
+      #expect(
+        engineReversed.values == reversed.sorted(),
+        "OptimizedBottomUpMergeSort failed reverse-sorted input of size \(size)")
     }
   }
 
