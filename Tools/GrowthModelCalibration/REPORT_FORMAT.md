@@ -32,6 +32,10 @@ that piggybacks on every one of those calls in the real recorded tape.
 - **`shuffle-growth-models.json`**: one entry per built-in *shuffle*. Shuffles are profiled
   standalone, starting from an identity (sorted) array — no sort involved.
 
+Both files are a flat JSON array of report objects, sorted alphabetically by `subjectID` — this
+sorting happens on every write (not just once), so re-running calibration for one algorithm only
+ever changes that algorithm's own entry in a diff, never the position of any other entry.
+
 ## Field reference
 
 | Field | Type | Meaning |
@@ -50,13 +54,16 @@ that piggybacks on every one of those calls in the real recorded tape.
 
 Swift's `Codable` only produces a normal `{"key": value}` JSON object for dictionaries keyed by
 `String` or `Int`. This dictionary is keyed by `Double` (100000.0 / 300000.0 / 1000000.0), so it
-serializes as a **flat array of alternating key, value, key, value, ...**, in no particular order:
+serializes as a **flat array of alternating key, value, key, value, ...**, always ascending by
+cap (`GrowthReport.encode(to:)` sorts explicitly before writing — `Dictionary`'s own iteration
+order for a `Double` key is randomized per process, which otherwise perturbed every algorithm's
+entry on every calibration run, not just the one actually re-measured):
 
 ```json
-"safeMaxSizeByCap": [300000, 7, 1000000, 7, 100000, 7]
+"safeMaxSizeByCap": [100000, 7, 300000, 7, 1000000, 7]
 ```
 
-Read it in pairs: `(300000 → 7)`, `(1000000 → 7)`, `(100000 → 7)`. In Python:
+Read it in pairs: `(100000 → 7)`, `(300000 → 7)`, `(1000000 → 7)`. In Python:
 
 ```python
 caps = data["safeMaxSizeByCap"]

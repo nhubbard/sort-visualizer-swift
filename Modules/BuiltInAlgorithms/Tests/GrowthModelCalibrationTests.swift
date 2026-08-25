@@ -28,6 +28,23 @@ struct GrowthModelCalibrationTests {
     #expect(healthy, "Start the calibration bridge first: cd Tools/GrowthModelCalibration && uv run bridge_server.py")
   }
 
+  /// One-off maintenance operation, not a real calibration pass: reloads both existing report
+  /// files and writes them straight back out through the exact same `writeReport` path a real
+  /// run uses, with zero new measurements. Needs neither the bridge (no new `powerLog` fits are
+  /// computed) nor any filter. Exists to retroactively canonicalize files written before
+  /// `GrowthReport.encode(to:)`/`writeReport`'s sorting existed -- every entry currently on disk
+  /// predates both fixes, so this is the only way to get them into the new canonical order
+  /// without waiting for each one to naturally get re-measured one at a time. Safe to run again
+  /// any time; a no-op once everything's already canonical.
+  @Test
+  func canonicalizeExistingReports() throws {
+    for filename in ["sort-growth-models.json", "shuffle-growth-models.json"] {
+      let reports = Self.loadExistingReport(from: filename)
+      try Self.writeReport(reports, to: filename)
+      Self.logProgress("canonicalized \(reports.count) entries in \(filename)")
+    }
+  }
+
   @Test
   func calibrateShuffles() async throws {
     try #require(await Self.checkBridgeHealth())
@@ -710,6 +727,46 @@ struct GrowthModelCalibrationTests {
     /// `"hang"` or `"erratic jump"` -- see `GrowthMeasurement`'s doc comment. `nil` exactly when
     /// `unsafeAtSize` is `nil`.
     let unsafeReason: String?
+
+    private enum CodingKeys: String, CodingKey {
+      case subjectID, winningFamily, winningRSquared, runnerUpFamily, runnerUpRSquared,
+        coefficients, sampleSizes, safeMaxSizeByCap, unsafeAtSize, unsafeReason
+    }
+
+    /// Hand-written only for `safeMaxSizeByCap`'s sake -- `Decodable`'s synthesis is left alone
+    /// below (order doesn't matter when reconstructing a `Dictionary` from flat pairs, so the
+    /// default decode already round-trips this correctly regardless of pair order).
+    ///
+    /// `Double`-keyed dictionaries aren't one of the two key types (`String`, `Int`) `JSONEncoder`
+    /// gives real, `.sortedKeys`-respecting object treatment to, so this one falls back to a flat
+    /// `[key, value, key, value, ...]` array serialized in `Dictionary`'s own iteration order --
+    /// which Swift randomizes per-process (a `Hashable` defense against hash-flooding), not
+    /// insertion order. Left alone, that meant re-running calibration for a single algorithm
+    /// perturbed this field's pair order in every *other* algorithm's entry too, on every run,
+    /// even though their actual values never changed -- a git diff touching the whole file for a
+    /// one-algorithm change. Sorting by cap before writing makes this field byte-identical across
+    /// runs unless the underlying numbers actually changed.
+    func encode(to encoder: Encoder) throws {
+      var container = encoder.container(keyedBy: CodingKeys.self)
+      try container.encode(subjectID, forKey: .subjectID)
+      try container.encode(winningFamily, forKey: .winningFamily)
+      try container.encode(winningRSquared, forKey: .winningRSquared)
+      // `encodeIfPresent`, not `encode`, for every Optional field -- matching the auto-synthesis
+      // this replaced, which omits the key entirely when nil rather than writing an explicit
+      // `null`. `encode(_:forKey:)` on an `Optional` value does NOT do this (it happily encodes
+      // `null`), so getting this wrong here would have added `"unsafeAtSize": null` etc. to every
+      // one of the hundreds of entries that never had those keys at all -- a real, if harmless,
+      // schema drift caught by diffing this canonicalization pass against the prior file instead
+      // of assuming a reorder-only change needed no verification.
+      try container.encodeIfPresent(runnerUpFamily, forKey: .runnerUpFamily)
+      try container.encodeIfPresent(runnerUpRSquared, forKey: .runnerUpRSquared)
+      try container.encode(coefficients, forKey: .coefficients)
+      try container.encode(sampleSizes, forKey: .sampleSizes)
+      let sortedPairs = safeMaxSizeByCap.sorted { $0.key < $1.key }.flatMap { [$0.key, $0.value] }
+      try container.encode(sortedPairs, forKey: .safeMaxSizeByCap)
+      try container.encodeIfPresent(unsafeAtSize, forKey: .unsafeAtSize)
+      try container.encodeIfPresent(unsafeReason, forKey: .unsafeReason)
+    }
   }
 
   private static func printReport(title: String, reports: [GrowthReport]) {
@@ -750,7 +807,14 @@ struct GrowthModelCalibrationTests {
       at: outputDirectory, withIntermediateDirectories: true)
     let encoder = JSONEncoder()
     encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
-    let data = try encoder.encode(reports)
+    // Canonical order (alphabetical by subjectID), not construction order -- `reports` is built
+    // by appending a resumed run's one new entry to whatever order the previous run happened to
+    // leave the array in, and `parallelMap` above hands results back in completion order (not
+    // input order) on top of that, so without this a full multi-algorithm sweep could reshuffle
+    // every entry's relative position even when no entry's own data changed. Sorting here means a
+    // single-algorithm resumed run only ever touches that algorithm's own entry in a diff.
+    let sorted = reports.sorted { $0.subjectID < $1.subjectID }
+    let data = try encoder.encode(sorted)
     try data.write(to: outputDirectory.appendingPathComponent(filename))
   }
 
@@ -765,5 +829,74 @@ struct GrowthModelCalibrationTests {
     let url = outputDirectory.appendingPathComponent(filename)
     guard let data = try? Data(contentsOf: url) else { return [] }
     return (try? JSONDecoder().decode([GrowthReport].self, from: data)) ?? []
+  }
+}
+
+/// Deliberately outside `GrowthModelCalibrationTests` (which is gated behind
+/// `RUN_GROWTH_CALIBRATION=1` and needs the SymPy bridge) -- this only exercises
+/// `GrowthReport`'s own `Codable` conformance, so it should run in every plain `xcodebuild test`
+/// like any other test in this target.
+@Suite
+struct GrowthReportEncodingTests {
+  typealias GrowthReport = GrowthModelCalibrationTests.GrowthReport
+
+  private func makeReport(safeMaxSizeByCap: [Double: Double]) -> GrowthReport {
+    GrowthReport(
+      subjectID: "test", winningFamily: "powerLaw", winningRSquared: 1, runnerUpFamily: nil,
+      runnerUpRSquared: nil, coefficients: [1, 1], sampleSizes: [16, 32],
+      safeMaxSizeByCap: safeMaxSizeByCap, unsafeAtSize: nil, unsafeReason: nil)
+  }
+
+  /// `Dictionary`'s iteration order is randomized per-process for a `Double` key (not tied to
+  /// insertion order), which is exactly what made re-running growth-model calibration for one
+  /// algorithm perturb `safeMaxSizeByCap`'s pair order in every *other* algorithm's already-
+  /// written entry too. `GrowthReport.encode(to:)` sorts by cap before writing specifically to
+  /// defeat that -- this constructs the same key/value pairs via two different insertion orders
+  /// (about as close as a test can get to forcing two different internal iteration orders) and
+  /// checks the encoded JSON is byte-identical either way.
+  @Test
+  func safeMaxSizeByCapEncodesInCanonicalOrderRegardlessOfInsertionOrder() throws {
+    let ascending = makeReport(safeMaxSizeByCap: [100_000: 500, 300_000: 900, 1_000_000: 1700])
+    let descending = makeReport(safeMaxSizeByCap: [1_000_000: 1700, 300_000: 900, 100_000: 500])
+
+    let encoder = JSONEncoder()
+    encoder.outputFormatting = [.sortedKeys]
+    let ascendingData = try encoder.encode(ascending)
+    let descendingData = try encoder.encode(descending)
+
+    // The real discriminating check: the flat pair array is ascending by cap in the actual
+    // encoded bytes, not merely "whatever two same-content dictionaries happened to agree on" --
+    // two `Dictionary` literals built from the same keys can coincidentally iterate identically
+    // within one process regardless of source order, so matching each other alone wouldn't prove
+    // this encodes canonically rather than just consistently-by-luck.
+    let json = try #require(String(data: ascendingData, encoding: .utf8))
+    let pairsRange = try #require(json.range(of: "\"safeMaxSizeByCap\":["))
+    let afterKey = json[pairsRange.upperBound...]
+    let pairsEnd = try #require(afterKey.firstIndex(of: "]"))
+    let pairsText = afterKey[afterKey.startIndex..<pairsEnd]
+    #expect(pairsText == "100000,500,300000,900,1000000,1700")
+
+    #expect(ascendingData == descendingData)
+
+    let decoded = try JSONDecoder().decode(GrowthReport.self, from: ascendingData)
+    #expect(decoded.safeMaxSizeByCap == [100_000: 500, 300_000: 900, 1_000_000: 1700])
+  }
+
+  /// Regression test for a real bug caught while first using `canonicalizeExistingReports`: a
+  /// hand-written `encode(to:)` is easy to get subtly wrong for `Optional` fields.
+  /// `container.encode(_:forKey:)` on an `Optional` value writes an explicit `null` when nil;
+  /// the auto-synthesized `encode(to:)` this replaced used `encodeIfPresent` semantics instead,
+  /// omitting the key entirely. Every one of the hundreds of already-shipped report entries with
+  /// a nil `runnerUpFamily`/`unsafeAtSize`/etc. was missing those keys on disk -- if this test had
+  /// existed first, the mistake would never have made it into a real run's output at all.
+  @Test
+  func nilOptionalFieldsAreOmittedNotEncodedAsNull() throws {
+    let report = makeReport(safeMaxSizeByCap: [100_000: 500])
+    let data = try JSONEncoder().encode(report)
+    let json = try #require(String(data: data, encoding: .utf8))
+
+    for omittedKey in ["runnerUpFamily", "runnerUpRSquared", "unsafeAtSize", "unsafeReason"] {
+      #expect(!json.contains("\"\(omittedKey)\""), "expected \(omittedKey) to be omitted, not encoded as null")
+    }
   }
 }
