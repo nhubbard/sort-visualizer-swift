@@ -23,7 +23,8 @@ struct NativeAlgorithmCorrectnessTests {
     FlippedMinHeapSort(), FluxSort(), FoldSort(), ForcedStableQuickSort(), FunSort(), GnomeSort(), GrailSort(),
     GravitySort(), GuessSort(), HanoiSort(), HybridCombSort(), ImprovedInPlaceMergeSort(), InPlaceLSDRadixSort(),
     InPlaceMergeSort(), InsertionSort(), IntroCircleSortIterative(), IntroCircleSortRecursive(), IntroSort(),
-    IterativeTopDownMergeSort(), LazyHeapSort(), LazyStableSort(), LessBogoSort(), LibrarySort(), LLQuickSort(),
+    IterativeTopDownMergeSort(), LaziestSort(), LazyHeapSort(), LazyStableSort(), LessBogoSort(),
+    LibrarySort(), LLQuickSort(),
     LRQuickSort(), LSDRadixSort(), MatrixSort(), MaxHeapSort(), MedianQuickBogoSort(), MergeBogoSort(),
     MergeExchangeSortIterative(), MergeInsertionSort(), MergeSort(), MinHeapSort(), MinMaxHeapSort(), MSDRadixSort(),
     NewShuffleMergeSort(), OddEvenMergeSortIterative(), OddEvenMergeSortRecursive(), OddEvenSort(),
@@ -2707,6 +2708,76 @@ struct NativeAlgorithmCorrectnessTests {
       #expect(
         engineReversed.values == reversed.sorted(),
         "OptimizedBottomUpMergeSort failed reverse-sorted input of size \(size)")
+    }
+  }
+
+  /// `LaziestSort` branches on `n <= 16` directly into a single binary-insertion pass with no
+  /// block/merge structure at all, and its block size (`max(16, sqrt(n))`) only grows past the
+  /// fixed value of 16 once `n > 256` — the generic suite's single trial at `sizeRange.lowerBound`
+  /// (16) reaches neither the block-merge path in general nor the `sqrt(n) > 16` block-size
+  /// transition specifically. This fuzzes both boundaries explicitly.
+  @Test
+  func laziestSortWideSizeRangeAndBoundaryFuzz() {
+    let algorithm = LaziestSort()
+
+    // Regression case: the sibling content-bundle reference implementation (hand-derived from a
+    // natural-language description of this algorithm, not a literal ArrayV translation like this
+    // Swift port) initially got its merge loop's boundary wrong — guarding on the *original*
+    // fixed midpoint instead of the live, shrinking right-run pointer — and this exact array
+    // caught it. This port's own `inPlaceMerge` was translated directly from ArrayV's real
+    // `i < j && j < b` condition, so it was never actually at risk, but the case is cheap
+    // insurance against ever regressing to that same mistake.
+    let knownRegressionInput = [1, 1, 1, 1, 2, 3, 4, 3, 0, 2, 4, 0, 2, 5, 3, 0, 4, 2]
+    var regressionEngine = RecordingEngine(values: knownRegressionInput)
+    algorithm.record(into: &regressionEngine)
+    #expect(
+      regressionEngine.values == knownRegressionInput.sorted(),
+      "LaziestSort failed the known merge-boundary regression case: \(knownRegressionInput) -> \(regressionEngine.values)"
+    )
+
+    let boundarySizes = [0, 1, 2, 15, 16, 17, 18, 32, 33, 48, 49, 255, 256, 257, 288, 289, 290, 320]
+    for size in boundarySizes {
+      for attempt in 0..<20 {
+        let input = (0..<size).map { _ in Int.random(in: 0...(max(size, 1) / 4)) }
+        var engine = RecordingEngine(values: input)
+        algorithm.record(into: &engine)
+        #expect(
+          engine.values == input.sorted(),
+          """
+          LaziestSort failed duplicate-heavy fuzz attempt \(attempt) of boundary size \(size): \
+          \(input) -> \(engine.values)
+          """
+        )
+      }
+    }
+
+    for size in stride(from: 4, through: 400, by: 7) {
+      for attempt in 0..<10 {
+        let input = (0..<size).map { _ in Int.random(in: 0...1_000_000) }
+        var engine = RecordingEngine(values: input)
+        algorithm.record(into: &engine)
+        #expect(
+          engine.values == input.sorted(),
+          """
+          LaziestSort failed wide-range fuzz attempt \(attempt) of size \(size): \(input) -> \
+          \(engine.values)
+          """
+        )
+      }
+    }
+
+    for size in [0, 1, 2, 16, 17, 32, 64, 128, 256, 289, 320] {
+      let sorted = Array(0..<size)
+      var engineSorted = RecordingEngine(values: sorted)
+      algorithm.record(into: &engineSorted)
+      #expect(engineSorted.values == sorted, "LaziestSort failed already-sorted input of size \(size)")
+
+      let reversed = Array((0..<size).reversed())
+      var engineReversed = RecordingEngine(values: reversed)
+      algorithm.record(into: &engineReversed)
+      #expect(
+        engineReversed.values == reversed.sorted(),
+        "LaziestSort failed reverse-sorted input of size \(size)")
     }
   }
 

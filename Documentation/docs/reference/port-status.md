@@ -18,7 +18,7 @@ sequential version, under a different name. Real thread interleaving has no mean
 single-writer model. Porting these variants would add duplicate content, not new algorithmic
 behavior.
 
-This leaves 196 candidates. 173 are shipped. 23 remain, in one category.
+This leaves 196 candidates. 174 are shipped. 22 remain, in one category.
 
 ### By category
 
@@ -31,7 +31,7 @@ This leaves 196 candidates. 173 are shipped. 23 remain, in one category.
 | Merge (19) | All ported |
 | Miscellaneous (4) | All ported |
 | Concurrent (22) | All ported |
-| Hybrid (41) | 18 ported, 23 remaining |
+| Hybrid (41) | 19 ported, 22 remaining |
 
 ### Remaining work
 
@@ -42,7 +42,7 @@ line count. Inherited template logic is real complexity a port must understand a
 
 **Medium** (101–200 effective lines):
 
-- `LaziestSort`, `StacklessDualPivotQuickSort`, `StacklessHybridQuickSort`, `DropMergeSort`,
+- `StacklessDualPivotQuickSort`, `StacklessHybridQuickSort`, `DropMergeSort`,
   `OptimizedWeaveMergeSort`, `ImprovedBlockSelectionSort`.
 
 **Hard** (201–400 effective lines, or a same-category prerequisite not yet ported):
