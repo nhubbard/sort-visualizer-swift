@@ -19,7 +19,8 @@ struct NativeAlgorithmCorrectnessTests {
     CircleSortRecursive(), CircloidSort(), ClassicGravitySort(), ClassicThreeSmoothCombSort(), ClassicTournamentSort(),
     ClassicTreeSort(), CocktailBogoSort(), CocktailMergeSort(), CocktailShakerSort(), CombSort(), CompleteGraphSort(),
     CountingSort(), CreaseSort(), CycleSort(), DeterministicBogoSort(), DiamondSortIterative(), DiamondSortRecursive(),
-    DoubleInsertionSort(), DoubleSelectionSort(), DualPivotQuickSort(), ExchangeBogoSort(), FlashSort(),
+    DoubleInsertionSort(), DoubleSelectionSort(), DropMergeSort(), DualPivotQuickSort(), ExchangeBogoSort(),
+    FlashSort(),
     FlippedMinHeapSort(), FluxSort(), FoldSort(), ForcedStableQuickSort(), FunSort(), GnomeSort(), GrailSort(),
     GravitySort(), GuessSort(), HanoiSort(), HybridCombSort(), ImprovedInPlaceMergeSort(), InPlaceLSDRadixSort(),
     InPlaceMergeSort(), InsertionSort(), IntroCircleSortIterative(), IntroCircleSortRecursive(), IntroSort(),
@@ -2942,6 +2943,102 @@ struct NativeAlgorithmCorrectnessTests {
       #expect(
         engineReversed.values == reversed.sorted(),
         "StacklessHybridQuickSort failed reverse-sorted input of size \(size)")
+    }
+  }
+
+  /// `DropMergeSort` is an adaptive sort whose whole design targets nearly-sorted input — the
+  /// generic suite's uniform-random/sorted/reverse-sorted/duplicate-heavy trials at
+  /// `sizeRange.lowerBound` don't reliably exercise its "quick undo," 8-drops-in-a-row backtrack,
+  /// or early-out-to-full-PDQ paths. This fuzzes across a spread of disorder fractions
+  /// specifically, plus a known regression input that hits the backtrack branch, plus
+  /// reverse-sorted input (which reliably triggers the early-out fallback at every size tried).
+  @Test
+  func dropMergeSortAdaptiveDisorderFuzz() {
+    let algorithm = DropMergeSort()
+
+    // Regression case: found by fuzzing the validated reference implementation for an input
+    // that specifically exercises the `numDroppedInARow == recency` backtrack branch (undoing
+    // a run of drops plus however many already-accepted elements exceed their maximum).
+    let knownBacktrackInput = [0, 1, 8, 3, 5, 7, 19, 4, 2, 9, 10, 11, 16, 13, 14, 15, 12, 17, 18, 6]
+    var backtrackEngine = RecordingEngine(values: knownBacktrackInput)
+    algorithm.record(into: &backtrackEngine)
+    #expect(
+      backtrackEngine.values == knownBacktrackInput.sorted(),
+      "DropMergeSort failed the known backtrack-triggering regression case: \(knownBacktrackInput)"
+    )
+
+    // A spread of disorder fractions (fraction of random pairwise swaps applied to an
+    // originally-sorted array) from "barely touched" to "fully shuffled," specifically
+    // targeting this algorithm's adaptive design rather than uniform-random input.
+    for size in [16, 20, 30, 40, 64, 100, 150, 256] {
+      for disorderTenths in 0...10 {
+        let disorder = Double(disorderTenths) / 10
+        for attempt in 0..<8 {
+          var input = Array(0..<size)
+          let swapCount = Int(Double(size) * disorder)
+          for _ in 0..<swapCount {
+            let i = Int.random(in: 0..<max(size, 1))
+            let j = Int.random(in: 0..<max(size, 1))
+            input.swapAt(i, j)
+          }
+          var engine = RecordingEngine(values: input)
+          algorithm.record(into: &engine)
+          #expect(
+            engine.values == input.sorted(),
+            """
+            DropMergeSort failed disorder-fuzz attempt \(attempt) at size \(size), disorder \
+            \(disorder): \(input) -> \(engine.values)
+            """
+          )
+        }
+      }
+    }
+
+    // Heavy-duplicate near-sorted input, exercising the `>=`-based "in order" acceptance test
+    // against ties.
+    for size in [30, 64, 128, 256] {
+      for attempt in 0..<20 {
+        var input = Array(0..<size).map { $0 % max(size / 8, 1) }
+        for _ in 0..<(size / 3) {
+          let i = Int.random(in: 0..<size)
+          let j = Int.random(in: 0..<size)
+          input.swapAt(i, j)
+        }
+        var engine = RecordingEngine(values: input)
+        algorithm.record(into: &engine)
+        #expect(
+          engine.values == input.sorted(),
+          """
+          DropMergeSort failed heavy-duplicate near-sorted fuzz attempt \(attempt) of size \
+          \(size): \(input) -> \(engine.values)
+          """
+        )
+      }
+
+      let allEqual = Array(repeating: 7, count: size)
+      var allEqualEngine = RecordingEngine(values: allEqual)
+      algorithm.record(into: &allEqualEngine)
+      #expect(
+        allEqualEngine.values == allEqual,
+        "DropMergeSort failed all-equal input of size \(size)")
+    }
+
+    for size in [0, 1, 2, 15, 16, 32, 64, 128, 256, 300] {
+      let sorted = Array(0..<size)
+      var engineSorted = RecordingEngine(values: sorted)
+      algorithm.record(into: &engineSorted)
+      #expect(
+        engineSorted.values == sorted,
+        "DropMergeSort failed already-sorted input of size \(size)")
+
+      // Reverse-sorted reliably triggers the early-out-to-full-PDQ fallback at every size
+      // tried during development — the maximally adversarial case for an adaptive sort.
+      let reversed = Array((0..<size).reversed())
+      var engineReversed = RecordingEngine(values: reversed)
+      algorithm.record(into: &engineReversed)
+      #expect(
+        engineReversed.values == reversed.sorted(),
+        "DropMergeSort failed reverse-sorted (early-out) input of size \(size)")
     }
   }
 
