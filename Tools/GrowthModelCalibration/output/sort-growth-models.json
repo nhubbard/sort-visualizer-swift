@@ -4334,6 +4334,65 @@
   },
   {
     "coefficients" : [
+      0.1746310654066014,
+      1.5858612315805405
+    ],
+    "runnerUpFamily" : "powerLaw",
+    "runnerUpRSquared" : 0.6041567241872681,
+    "safeMaxSizeByCap" : [
+      100000,
+      1049,
+      300000,
+      1881,
+      1000000,
+      3513
+    ],
+    "sampleSizes" : [
+      16,
+      17,
+      18,
+      19,
+      38,
+      76,
+      152,
+      304
+    ],
+    "subjectID" : "stacklessdualpivotquicksort+triangular",
+    "winningFamily" : "powerLog",
+    "winningRSquared" : 0.6739312658590213
+  },
+  {
+    "coefficients" : [
+      0.048732702844863106,
+      37.808277378563055,
+      -612.9613367447578
+    ],
+    "runnerUpFamily" : "powerLog",
+    "runnerUpRSquared" : 0.9672147169893841,
+    "safeMaxSizeByCap" : [
+      100000,
+      955,
+      300000,
+      1867,
+      1000000,
+      3683
+    ],
+    "sampleSizes" : [
+      16,
+      17,
+      18,
+      19,
+      38,
+      76,
+      152,
+      304
+    ],
+    "subjectID" : "stacklesshybridquicksort+descending",
+    "winningFamily" : "polynomialIntercept",
+    "winningRSquared" : 0.9985256621846718
+  },
+  {
+    "coefficients" : [
       10.61381199205657,
       1.2126491156352595
     ],

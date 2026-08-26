@@ -39,7 +39,9 @@ struct NativeAlgorithmCorrectnessTests {
     SimpleShatterSort(), SimplifiedLibrarySort(), SimplisticGravitySort(), SlopeSort(), SlowSort(), SmartBogoBogoSort(),
     SmartGuessSort(), SmoothSort(), SnuffleSort(), SplaySort(), StableCycleSort(), StablePermutationSort(),
     StableQuickSort(), StableSelectionSort(), StacklessAmericanFlagSort(), StacklessBinaryQuickSort(),
-    StacklessRotateMergeSort(), StaticSort(), StoogeSort(), StrandSort(), SwaplessBubbleSort(), TableSort(),
+    StacklessDualPivotQuickSort(), StacklessHybridQuickSort(), StacklessRotateMergeSort(), StaticSort(),
+    StoogeSort(), StrandSort(),
+    SwaplessBubbleSort(), TableSort(),
     TernaryHeapSort(), TernaryLLQuickSort(), TernaryLRQuickSort(), ThreeSmoothCombSortIterative(),
     ThreeSmoothCombSortRecursive(), TimeSort(), TournamentSort(), TreeSort(), TriangularHeapSort(), TwinSort(),
     UnoptimizedBubbleSort(), UnoptimizedCocktailShakerSort(), UnstableGrailSort(), WeakHeapSort(), WeavedMergeSort(),
@@ -2778,6 +2780,168 @@ struct NativeAlgorithmCorrectnessTests {
       #expect(
         engineReversed.values == reversed.sorted(),
         "LaziestSort failed reverse-sorted input of size \(size)")
+    }
+  }
+
+  /// `StacklessDualPivotQuickSort`'s `partition` only runs once a segment's length exceeds 24 —
+  /// the generic suite's single trial at `sizeRange.lowerBound` (16) never reaches it, exercising
+  /// only the max-extraction pass and the `binaryInsert` base case. This fuzzes across that
+  /// boundary directly, plus heavy-duplicate input to exercise the `med`-flag duplicate-skip loop
+  /// (`leftBinSearch` + the `array[a-1] == array[a]` absorption while) that only does anything
+  /// once a pivot value repeats.
+  @Test
+  func stacklessDualPivotQuickSortWideSizeRangeAndBoundaryFuzz() {
+    let algorithm = StacklessDualPivotQuickSort()
+
+    let boundarySizes = [0, 1, 2, 3, 22, 23, 24, 25, 26, 48, 49]
+    for size in boundarySizes {
+      for attempt in 0..<20 {
+        let input = (0..<size).map { _ in Int.random(in: 0...(max(size, 1) / 4)) }
+        var engine = RecordingEngine(values: input)
+        algorithm.record(into: &engine)
+        #expect(
+          engine.values == input.sorted(),
+          """
+          StacklessDualPivotQuickSort failed duplicate-heavy fuzz attempt \(attempt) of boundary \
+          size \(size): \(input) -> \(engine.values)
+          """
+        )
+      }
+    }
+
+    for size in stride(from: 4, through: 320, by: 5) {
+      for attempt in 0..<10 {
+        let input = (0..<size).map { _ in Int.random(in: 0...1_000_000) }
+        var engine = RecordingEngine(values: input)
+        algorithm.record(into: &engine)
+        #expect(
+          engine.values == input.sorted(),
+          """
+          StacklessDualPivotQuickSort failed wide-range fuzz attempt \(attempt) of size \(size): \
+          \(input) -> \(engine.values)
+          """
+        )
+      }
+    }
+
+    // Heavy-duplicate input, including an all-equal extreme, specifically targets the
+    // max-extraction pass and the `med`-flag duplicate-absorption loop.
+    for size in [50, 100, 200, 256] {
+      for attempt in 0..<20 {
+        let input = (0..<size).map { _ in Int.random(in: 0...4) }
+        var engine = RecordingEngine(values: input)
+        algorithm.record(into: &engine)
+        #expect(
+          engine.values == input.sorted(),
+          """
+          StacklessDualPivotQuickSort failed heavy-duplicate fuzz attempt \(attempt) of size \
+          \(size): \(input) -> \(engine.values)
+          """
+        )
+      }
+
+      let allEqual = Array(repeating: 7, count: size)
+      var allEqualEngine = RecordingEngine(values: allEqual)
+      algorithm.record(into: &allEqualEngine)
+      #expect(
+        allEqualEngine.values == allEqual,
+        "StacklessDualPivotQuickSort failed all-equal input of size \(size)")
+    }
+
+    for size in [0, 1, 2, 24, 25, 32, 64, 128, 256, 300] {
+      let sorted = Array(0..<size)
+      var engineSorted = RecordingEngine(values: sorted)
+      algorithm.record(into: &engineSorted)
+      #expect(
+        engineSorted.values == sorted,
+        "StacklessDualPivotQuickSort failed already-sorted input of size \(size)")
+
+      let reversed = Array((0..<size).reversed())
+      var engineReversed = RecordingEngine(values: reversed)
+      algorithm.record(into: &engineReversed)
+      #expect(
+        engineReversed.values == reversed.sorted(),
+        "StacklessDualPivotQuickSort failed reverse-sorted input of size \(size)")
+    }
+  }
+
+  /// `StacklessHybridQuickSort`'s `partition` only runs once a segment's length exceeds 16 —
+  /// the generic suite's single trial at `sizeRange.lowerBound` (16) never reaches it, exercising
+  /// only the max-extraction pass and the `binaryInsert` base case. This fuzzes across that
+  /// boundary directly, plus heavy-duplicate input to exercise the `med`-flag duplicate-skip loop.
+  @Test
+  func stacklessHybridQuickSortWideSizeRangeAndBoundaryFuzz() {
+    let algorithm = StacklessHybridQuickSort()
+
+    let boundarySizes = [0, 1, 2, 3, 14, 15, 16, 17, 18, 32, 33]
+    for size in boundarySizes {
+      for attempt in 0..<20 {
+        let input = (0..<size).map { _ in Int.random(in: 0...(max(size, 1) / 4)) }
+        var engine = RecordingEngine(values: input)
+        algorithm.record(into: &engine)
+        #expect(
+          engine.values == input.sorted(),
+          """
+          StacklessHybridQuickSort failed duplicate-heavy fuzz attempt \(attempt) of boundary \
+          size \(size): \(input) -> \(engine.values)
+          """
+        )
+      }
+    }
+
+    for size in stride(from: 4, through: 320, by: 5) {
+      for attempt in 0..<10 {
+        let input = (0..<size).map { _ in Int.random(in: 0...1_000_000) }
+        var engine = RecordingEngine(values: input)
+        algorithm.record(into: &engine)
+        #expect(
+          engine.values == input.sorted(),
+          """
+          StacklessHybridQuickSort failed wide-range fuzz attempt \(attempt) of size \(size): \
+          \(input) -> \(engine.values)
+          """
+        )
+      }
+    }
+
+    // Heavy-duplicate input, including an all-equal extreme, specifically targets the
+    // max-extraction pass and the `med`-flag duplicate-absorption loop.
+    for size in [50, 100, 200, 256] {
+      for attempt in 0..<20 {
+        let input = (0..<size).map { _ in Int.random(in: 0...4) }
+        var engine = RecordingEngine(values: input)
+        algorithm.record(into: &engine)
+        #expect(
+          engine.values == input.sorted(),
+          """
+          StacklessHybridQuickSort failed heavy-duplicate fuzz attempt \(attempt) of size \
+          \(size): \(input) -> \(engine.values)
+          """
+        )
+      }
+
+      let allEqual = Array(repeating: 7, count: size)
+      var allEqualEngine = RecordingEngine(values: allEqual)
+      algorithm.record(into: &allEqualEngine)
+      #expect(
+        allEqualEngine.values == allEqual,
+        "StacklessHybridQuickSort failed all-equal input of size \(size)")
+    }
+
+    for size in [0, 1, 2, 16, 17, 32, 64, 128, 256, 300] {
+      let sorted = Array(0..<size)
+      var engineSorted = RecordingEngine(values: sorted)
+      algorithm.record(into: &engineSorted)
+      #expect(
+        engineSorted.values == sorted,
+        "StacklessHybridQuickSort failed already-sorted input of size \(size)")
+
+      let reversed = Array((0..<size).reversed())
+      var engineReversed = RecordingEngine(values: reversed)
+      algorithm.record(into: &engineReversed)
+      #expect(
+        engineReversed.values == reversed.sorted(),
+        "StacklessHybridQuickSort failed reverse-sorted input of size \(size)")
     }
   }
 
