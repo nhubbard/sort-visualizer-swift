@@ -136,29 +136,25 @@ struct RunControlBar: View {
     }
   }
 
-  /// Bound through a custom `Binding`, same idiom as `scrubSlider` above — every tap doesn't
-  /// just change a number, it immediately stops the current sort and re-records+replays a fresh
-  /// one at the new size (`SortSession.start(size:)` already pauses any in-flight playback).
+  /// Every reachable size (`effectiveSizeRange.steppedValues(by:)`) as tap-to-select chips, not a
+  /// `Stepper` — same tap-driven idiom as `scrubSlider` above: picking a chip doesn't just change
+  /// a number, it immediately stops the current sort and re-records+replays a fresh one at the
+  /// new size (`SortSession.start(size:)` already pauses any in-flight playback). Built from
+  /// exactly the same `steppedValues(by:)` call `SortSession.cycleArraySize()` uses for `⌘S`, so
+  /// the chip set and the keyboard-cycle set never disagree about which sizes are reachable.
   private var sizeRow: some View {
     let effectiveSizeRange = algorithm.metadata.effectiveSizeRange(
       operationCap: settings.recordingOperationCap)
+    let sizes = effectiveSizeRange.steppedValues(by: effectiveSizeRange.steppedSizeStep)
     return HStack(spacing: 8) {
       Text("Size")
         .font(.caption)
         .foregroundStyle(.secondary)
-      Stepper(
-        value: Binding(
-          get: { session.arraySize },
-          set: { newValue in Task { await session.start(size: newValue) } }
-        ),
-        in: effectiveSizeRange,
-        step: effectiveSizeRange.steppedSizeStep
-      ) {
-        Text("\(session.arraySize) elements")
-          .font(.caption.monospacedDigit())
-          .frame(minWidth: 90, alignment: .trailing)
-      }
-      .accessibilityIdentifier("runControlSizeStepper")
+      SizeChipRow(
+        sizes: sizes,
+        selection: session.arraySize,
+        onSelect: { newValue in Task { await session.start(size: newValue) } }
+      )
     }
   }
 
@@ -478,7 +474,7 @@ private struct UtilityButtons: View {
       }
       .accessibilityIdentifier("runControlSizeButton")
       .accessibilityLabel("Array Size")
-      .help("Show or hide the array size stepper (⌘S cycles to the next size)")
+      .help("Show or hide the array size picker (⌘S cycles to the next size)")
 
       Button {
         isVisualizerExpanded.toggle()
@@ -498,6 +494,82 @@ private struct UtilityButtons: View {
   private var exportDocument: TapeArchiveDocument {
     TapeArchiveDocument(
       tape: replay.tape, suggestedFileName: "\(algorithm.id.rawValue)-\(session.arraySize).tape")
+  }
+}
+
+/// Adapted from an approved standalone prototype. `selection`/`onSelect` are a plain value plus
+/// callback, not a `Binding<Int>` — the real action is `Task { await session.start(size:) }`
+/// (same idiom as `scrubSlider`'s custom `Binding` above), so the callback keeps that Task-wrap at
+/// the one call site in `sizeRow` rather than hiding it behind a `Binding`'s `set:`.
+private struct SizeChipRow: View {
+  let sizes: [Int]
+  let selection: Int
+  let onSelect: (Int) -> Void
+
+  var body: some View {
+    GeometryReader { geo in
+      ScrollViewReader { proxy in
+        ScrollView(.horizontal, showsIndicators: false) {
+          LazyHStack(spacing: 8) {
+            ForEach(sizes, id: \.self) { size in
+              SizeChip(size: size, isSelected: size == selection) {
+                onSelect(size)
+              }
+              .id(size)
+              .accessibilityIdentifier("runControlSizeChip-\(size)")
+            }
+          }
+          // Half-viewport padding lets the first/last chip still reach true center. Because
+          // `SizeChipRow` sits next to a fixed-width `Text("Size")` inside sizeRow's HStack,
+          // `geo.size.width` here is already "row width minus the caption" — HStack hands a
+          // flexible child (GeometryReader always reports as flexible) whatever space is left
+          // after fixed-width siblings size themselves.
+          .padding(.horizontal, geo.size.width / 2)
+        }
+        // Reacting to `selection` itself (not just inside the chip's tap handler) means any
+        // change re-centers the same way — a chip tap, but also a programmatic one from
+        // automation, `⌘S`, or an App Intent.
+        .onChange(of: selection) { _, newValue in
+          withAnimation(.easeInOut(duration: 0.25)) {
+            proxy.scrollTo(newValue, anchor: .center)
+          }
+        }
+        .task {
+          // A same-frame scrollTo can fire before the ScrollView has measured content on first
+          // layout; the tiny delay makes initial centering reliable.
+          try? await Task.sleep(nanoseconds: 50_000_000)
+          proxy.scrollTo(selection, anchor: .center)
+        }
+      }
+    }
+    .frame(height: 44)
+    .accessibilityIdentifier("runControlSizeChipRow")
+  }
+}
+
+private struct SizeChip: View {
+  let size: Int
+  let isSelected: Bool
+  let action: () -> Void
+
+  var body: some View {
+    Button(action: action) {
+      Text("\(size)")
+        .font(.callout.monospacedDigit())
+        .fontWeight(isSelected ? .semibold : .regular)
+        .padding(.horizontal, 14)
+        .padding(.vertical, 8)
+        .background {
+          Capsule().fill(isSelected ? Color.accentColor : Color.secondary.opacity(0.15))
+        }
+        .foregroundStyle(isSelected ? Color.white : Color.primary)
+    }
+    .buttonStyle(.plain)
+    // Announces the current size to VoiceOver the same way a segmented control would, and gives
+    // UI tests a stable, semantic signal to assert on — `runControlSizeButton`'s own accessibility
+    // label is the fixed string "Array Size", not a live "n=size" value, so it can't be used for
+    // this instead.
+    .accessibilityAddTraits(isSelected ? .isSelected : [])
   }
 }
 

@@ -195,4 +195,46 @@ final class RunControlBarUITests: XCTestCase {
     XCTAssertFalse(
       speedSlider.waitForExistence(timeout: 2), "tapping again should collapse the speed row")
   }
+
+  /// Size deliberately expands inline as a chip row (not a `Stepper`, not a `.popover`) — see
+  /// `RunControlBar.sizeRow`'s own doc comment. `runControlSizeButton`'s own accessibility label
+  /// is the fixed string "Array Size" (not a live "n=size" value, and true of the old `Stepper`
+  /// version too), so this instead confirms the tap took effect via the tapped chip's own
+  /// `.isSelected` accessibility trait — driven directly by `session.arraySize`, so it can only
+  /// become true once `SortSession.start(size:)` has actually run and rebuilt this row. QuickSort's
+  /// `sizeRange` is `16...256` (step 16), so `runControlSizeChip-16` is guaranteed to exist
+  /// regardless of the seeded `UI_TEST_ARRAY_SIZE` (24, which isn't itself step-aligned and so may
+  /// start with no chip selected at all — expected, not asserted here).
+  func testSizeButtonExpandsChipRowAndSelectingAChipUpdatesSize() throws {
+    let app = XCUIApplication()
+    app.launchEnvironment = ["UI_TEST_ARRAY_SIZE": "24"]
+    app.launch()
+
+    app.tapSidebarLink("algorithmLink.quicksort")
+
+    let sizeButton = app.buttons["runControlSizeButton"]
+    XCTAssertTrue(sizeButton.waitForExistence(timeout: 5))
+    sizeButton.tap()
+
+    let chipRow = app.scrollViews["runControlSizeChipRow"]
+    XCTAssertTrue(chipRow.waitForExistence(timeout: 5), "size row never expanded to reveal its chips")
+
+    let chip = app.buttons["runControlSizeChip-16"]
+    XCTAssertTrue(chip.waitForExistence(timeout: 5), "expected a size-16 chip to exist for QuickSort")
+    chip.tap()
+
+    // `start(size:)` re-records and restarts playback, tearing down and rebuilding this whole
+    // row (see `SortView`'s phase-driven `ProgressView` fallback) — so this chip is a fresh
+    // element post-tap, re-queried here by its stable identifier rather than a cached reference.
+    let selected = XCTNSPredicateExpectation(
+      predicate: NSPredicate(format: "isSelected == true"), object: chip)
+    XCTAssertEqual(
+      XCTWaiter().wait(for: [selected], timeout: 10), .completed,
+      "tapping a size chip should mark it selected once session.arraySize actually changes"
+    )
+
+    sizeButton.tap()
+    XCTAssertFalse(
+      chipRow.waitForExistence(timeout: 2), "tapping again should collapse the size chip row")
+  }
 }
