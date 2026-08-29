@@ -18,7 +18,7 @@ sequential version, under a different name. Real thread interleaving has no mean
 single-writer model. Porting these variants would add duplicate content, not new algorithmic
 behavior.
 
-This leaves 196 candidates. 177 are shipped. 19 remain, in one category.
+This leaves 196 candidates. 179 are shipped. 17 remain, in one category.
 
 ### By category
 
@@ -31,7 +31,7 @@ This leaves 196 candidates. 177 are shipped. 19 remain, in one category.
 | Merge (19) | All ported |
 | Miscellaneous (4) | All ported |
 | Concurrent (22) | All ported |
-| Hybrid (41) | 22 ported, 19 remaining |
+| Hybrid (41) | 24 ported, 17 remaining |
 
 ### Remaining work
 
@@ -39,10 +39,6 @@ The list groups remaining work by how complex the ArrayV Java source is, not by 
 alphabetical order. The line count cited per algorithm is "effective lines": the algorithm's own
 class, plus, when it extends a shared template rather than the bare base class, that template's
 line count. Inherited template logic is real complexity a port must understand and translate.
-
-**Medium** (101–200 effective lines):
-
-- `OptimizedWeaveMergeSort`, `ImprovedBlockSelectionSort`.
 
 **Hard** (201–400 effective lines, or a same-category prerequisite not yet ported):
 

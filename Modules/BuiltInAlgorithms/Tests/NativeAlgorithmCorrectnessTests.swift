@@ -20,18 +20,16 @@ struct NativeAlgorithmCorrectnessTests {
     ClassicTreeSort(), CocktailBogoSort(), CocktailMergeSort(), CocktailShakerSort(), CombSort(), CompleteGraphSort(),
     CountingSort(), CreaseSort(), CycleSort(), DeterministicBogoSort(), DiamondSortIterative(), DiamondSortRecursive(),
     DoubleInsertionSort(), DoubleSelectionSort(), DropMergeSort(), DualPivotQuickSort(), ExchangeBogoSort(),
-    FlashSort(),
-    FlippedMinHeapSort(), FluxSort(), FoldSort(), ForcedStableQuickSort(), FunSort(), GnomeSort(), GrailSort(),
-    GravitySort(), GuessSort(), HanoiSort(), HybridCombSort(), ImprovedInPlaceMergeSort(), InPlaceLSDRadixSort(),
-    InPlaceMergeSort(), InsertionSort(), IntroCircleSortIterative(), IntroCircleSortRecursive(), IntroSort(),
-    IterativeTopDownMergeSort(), LaziestSort(), LazyHeapSort(), LazyStableSort(), LessBogoSort(),
-    LibrarySort(), LLQuickSort(),
-    LRQuickSort(), LSDRadixSort(), MatrixSort(), MaxHeapSort(), MedianQuickBogoSort(), MergeBogoSort(),
-    MergeExchangeSortIterative(), MergeInsertionSort(), MergeSort(), MinHeapSort(), MinMaxHeapSort(), MSDRadixSort(),
-    NewShuffleMergeSort(), OddEvenMergeSortIterative(), OddEvenMergeSortRecursive(), OddEvenSort(),
-    OptimizedBottomUpMergeSort(), OptimizedBubbleSort(), OptimizedCocktailShakerSort(),
-    OptimizedDualPivotQuickSort(), OptimizedGnomeSort(),
-    OptimizedGuessSort(), OptimizedLazyStableSort(), OptimizedStoogeSort(), OptimizedStoogeSortStudio(),
+    FlashSort(), FlippedMinHeapSort(), FluxSort(), FoldSort(), ForcedStableQuickSort(), FunSort(), GnomeSort(),
+    GrailSort(), GravitySort(), GuessSort(), HanoiSort(), HybridCombSort(), ImprovedBlockSelectionSort(),
+    ImprovedInPlaceMergeSort(), InPlaceLSDRadixSort(), InPlaceMergeSort(), InsertionSort(), IntroCircleSortIterative(),
+    IntroCircleSortRecursive(), IntroSort(), IterativeTopDownMergeSort(), LaziestSort(), LazyHeapSort(),
+    LazyStableSort(), LessBogoSort(), LibrarySort(), LLQuickSort(), LRQuickSort(), LSDRadixSort(), MatrixSort(),
+    MaxHeapSort(), MedianQuickBogoSort(), MergeBogoSort(), MergeExchangeSortIterative(), MergeInsertionSort(),
+    MergeSort(), MinHeapSort(), MinMaxHeapSort(), MSDRadixSort(), NewShuffleMergeSort(), OddEvenMergeSortIterative(),
+    OddEvenMergeSortRecursive(), OddEvenSort(), OptimizedBottomUpMergeSort(), OptimizedBubbleSort(),
+    OptimizedCocktailShakerSort(), OptimizedDualPivotQuickSort(), OptimizedGnomeSort(), OptimizedGuessSort(),
+    OptimizedLazyStableSort(), OptimizedStoogeSort(), OptimizedStoogeSortStudio(), OptimizedWeaveMergeSort(),
     OutOfPlaceHeapSort(), PairwiseMergeSortIterative(), PairwiseMergeSortRecursive(), PairwiseSortIterative(),
     PairwiseSortRecursive(), PancakeInsertionSort(), PancakeSort(), PatienceSort(), PDMergeSort(), PDQBranchedSort(),
     PDQBranchlessSort(), PigeonholeSort(), PoplarHeapSort(), QuadSort(), QuadStoogeSort(), QuickBogoSort(), QuickSort(),
@@ -40,13 +38,11 @@ struct NativeAlgorithmCorrectnessTests {
     SimpleShatterSort(), SimplifiedLibrarySort(), SimplisticGravitySort(), SlopeSort(), SlowSort(), SmartBogoBogoSort(),
     SmartGuessSort(), SmoothSort(), SnuffleSort(), SplaySort(), StableCycleSort(), StablePermutationSort(),
     StableQuickSort(), StableSelectionSort(), StacklessAmericanFlagSort(), StacklessBinaryQuickSort(),
-    StacklessDualPivotQuickSort(), StacklessHybridQuickSort(), StacklessRotateMergeSort(), StaticSort(),
-    StoogeSort(), StrandSort(),
-    SwaplessBubbleSort(), TableSort(),
-    TernaryHeapSort(), TernaryLLQuickSort(), TernaryLRQuickSort(), ThreeSmoothCombSortIterative(),
-    ThreeSmoothCombSortRecursive(), TimeSort(), TournamentSort(), TreeSort(), TriangularHeapSort(), TwinSort(),
-    UnoptimizedBubbleSort(), UnoptimizedCocktailShakerSort(), UnstableGrailSort(), WeakHeapSort(), WeavedMergeSort(),
-    WeaveMergeSort(), WeaveSortIterative(), WeaveSortRecursive()
+    StacklessDualPivotQuickSort(), StacklessHybridQuickSort(), StacklessRotateMergeSort(), StaticSort(), StoogeSort(),
+    StrandSort(), SwaplessBubbleSort(), TableSort(), TernaryHeapSort(), TernaryLLQuickSort(), TernaryLRQuickSort(),
+    ThreeSmoothCombSortIterative(), ThreeSmoothCombSortRecursive(), TimeSort(), TournamentSort(), TreeSort(),
+    TriangularHeapSort(), TwinSort(), UnoptimizedBubbleSort(), UnoptimizedCocktailShakerSort(), UnstableGrailSort(),
+    WeakHeapSort(), WeavedMergeSort(), WeaveMergeSort(), WeaveSortIterative(), WeaveSortRecursive()
   ]
 
   @Test
@@ -3039,6 +3035,271 @@ struct NativeAlgorithmCorrectnessTests {
       #expect(
         engineReversed.values == reversed.sorted(),
         "DropMergeSort failed reverse-sorted (early-out) input of size \(size)")
+    }
+  }
+
+  /// Confirms `ImprovedBlockSelectionSort`'s `stable: false` claim empirically. Its
+  /// `inPlaceMerge`/`inPlaceMergeBW` comparisons are all strict (`>`, never `>=`), which looks
+  /// stable in isolation, but `blockSelect` runs first and reorders whole `bLen`-sized blocks as
+  /// atomic units by comparing only representative elements — two blocks tying on their
+  /// representative can still swap wholesale, taking along elements that share a value with ones
+  /// in a different, not-yet-repositioned block, before the strict merge ever runs. All real
+  /// movement in this algorithm goes through `multiSwap`/`rotate`, both built from `engine.swap`
+  /// — no `setValue` anywhere — so swap-tape-shadow replay validly reconstructs each final
+  /// position's original index.
+  @Test
+  func improvedBlockSelectionSortTiedElementsCanLoseTheirOriginalRelativeOrder() {
+    let algorithm = ImprovedBlockSelectionSort()
+    let size = 64
+    var sawReordering = false
+
+    for _ in 0..<50 {
+      let input = (0..<size).map { _ in Int.random(in: 0...3) }
+      var engine = RecordingEngine(values: input)
+      algorithm.record(into: &engine)
+
+      var shadow = Array(0..<size)
+      for operation in engine.finish().tape {
+        if case .swap(let i, let j) = operation {
+          shadow.swapAt(i, j)
+        }
+      }
+
+      var originalIndicesByValueInFinalOrder: [Int: [Int]] = [:]
+      for finalPosition in 0..<size {
+        let originalIndex = shadow[finalPosition]
+        let value = input[originalIndex]
+        originalIndicesByValueInFinalOrder[value, default: []].append(originalIndex)
+      }
+
+      if originalIndicesByValueInFinalOrder.values.contains(where: { $0 != $0.sorted() }) {
+        sawReordering = true
+        break
+      }
+    }
+
+    #expect(
+      sawReordering,
+      """
+      expected ImprovedBlockSelectionSort's block-level reordering in blockSelect to reorder at \
+      least one run of equal-valued elements relative to their original input order across \
+      randomized duplicate-heavy trials, confirming it is not a stable sort
+      """
+    )
+  }
+
+  /// Confirms `OptimizedWeaveMergeSort`'s `stable: true` claim empirically. This algorithm moves
+  /// data through both `engine.swap` (the `rotate`/`bitReversal` shuffle) and `engine.setValue`
+  /// (`insertTo`'s shift-and-place cleanup), so swap-tape-shadow replay can't validly reconstruct
+  /// original indices here — a `setValue` op only records the destination index and the raw value
+  /// written, not which original index that value came from (see `ClassicTreeSort`'s equivalent
+  /// gap above). Instead, this reimplements the algorithm directly over `[Tagged]` (comparing
+  /// only `.value`, moving whole `Tagged` pairs on every swap/shift), sidestepping the engine's
+  /// tape entirely — the same technique `classicTreeSortTiedElementsKeepTheirOriginalRelativeOrder`
+  /// uses for the same reason.
+  @Test
+  func optimizedWeaveMergeSortIsStable() {
+    struct Tagged {
+      let value: Int
+      let originalIndex: Int
+    }
+
+    func insertTo(_ array: inout [Tagged], _ a: Int, _ b: Int) {
+      let temp = array[a]
+      var a = a
+      while a > b {
+        a -= 1
+        array[a + 1] = array[a]
+      }
+      array[b] = temp
+    }
+
+    func multiSwap(_ array: inout [Tagged], _ a: Int, _ b: Int, _ len: Int) {
+      for i in 0..<len {
+        array.swapAt(a + i, b + i)
+      }
+    }
+
+    func rotate(_ array: inout [Tagged], _ a: Int, _ m: Int, _ b: Int) {
+      var a = a
+      var m = m
+      var b = b
+      var l = m - a
+      var r = b - m
+      while l > 0 && r > 0 {
+        if r < l {
+          multiSwap(&array, m - r, m, r)
+          b -= r
+          m -= r
+          l -= r
+        } else {
+          multiSwap(&array, a, m, l)
+          a += l
+          m += l
+          r -= l
+        }
+      }
+    }
+
+    func bitReversal(_ array: inout [Tagged], _ a: Int, _ b: Int) {
+      let len = b - a
+      var m = 0
+      let d1 = len >> 1
+      let d2 = d1 + (d1 >> 1)
+      var i = 1
+      while i < len - 1 {
+        var j = d1
+        var k = i
+        var nn = d2
+        while k & 1 == 0 {
+          j -= nn
+          k >>= 1
+          nn >>= 1
+        }
+        m += j
+        if m > i {
+          array.swapAt(a + i, a + m)
+        }
+        i += 1
+      }
+    }
+
+    func weaveInsert(_ array: inout [Tagged], _ a: Int, _ b: Int, _ rightInit: Bool) {
+      var right = rightInit
+      var i = a
+      var j = a + 1
+      while j < b {
+        if right {
+          while i < j && array[i].value <= array[j].value { i += 1 }
+        } else {
+          while i < j && array[i].value < array[j].value { i += 1 }
+        }
+        if i == j {
+          right.toggle()
+          j += 1
+        } else {
+          insertTo(&array, j, i)
+          i += 1
+          j += 2
+        }
+      }
+    }
+
+    func weaveMerge(_ array: inout [Tagged], _ a: Int, _ mInit: Int, _ b: Int) {
+      guard b - a >= 2 else { return }
+      var a1 = a
+      var b1 = b
+      var right = true
+      if (b - a) % 2 == 1 {
+        if mInit - a < b - mInit {
+          a1 -= 1
+          right = false
+        } else {
+          b1 += 1
+        }
+      }
+      var e = b1
+      while e - a1 > 2 {
+        var m = (a1 + e) / 2
+        var p = 1
+        while p * 2 <= m - a1 { p *= 2 }
+        rotate(&array, m - p, m, e - p)
+        m = e - p
+        let f = m - p
+        bitReversal(&array, f, m)
+        bitReversal(&array, m, e)
+        bitReversal(&array, f, e)
+        e = f
+      }
+      weaveInsert(&array, a, b, right)
+    }
+
+    func optimizedWeaveMergeSortTagged(_ array: inout [Tagged]) {
+      let n = array.count
+      guard n > 1 else { return }
+      var d = 1
+      while d < n { d <<= 1 }
+      while d > 1 {
+        var i = 0
+        var dec = 0
+        while i < n {
+          var j = i
+          dec += n
+          while dec >= d {
+            dec -= d
+            j += 1
+          }
+          var k = j
+          dec += n
+          while dec >= d {
+            dec -= d
+            k += 1
+          }
+          weaveMerge(&array, i, j, k)
+          i = k
+        }
+        d /= 2
+      }
+    }
+
+    for size in [8, 15, 16, 17, 33, 63, 64, 65, 100, 127, 200] {
+      for _ in 0..<50 {
+        let values = (0..<size).map { _ in Int.random(in: 0...3) }
+        var tagged = values.enumerated().map { Tagged(value: $0.element, originalIndex: $0.offset) }
+        optimizedWeaveMergeSortTagged(&tagged)
+
+        #expect(tagged.map(\.value) == values.sorted())
+
+        var byValue: [Int: [Int]] = [:]
+        for t in tagged {
+          byValue[t.value, default: []].append(t.originalIndex)
+        }
+        #expect(
+          byValue.values.allSatisfy { $0 == $0.sorted() },
+          "expected optimizedweavemergesort to preserve original relative order among tied elements at size \(size)"
+        )
+      }
+    }
+  }
+
+  /// Boundary/wide-size-range fuzz for `OptimizedWeaveMergeSort`, targeting `weaveMerge`'s
+  /// odd-length sentinel-borrow branch (`a1 = a - 1` when the left run is shorter) — the one place
+  /// this port explicitly diverges from a literal translation of ArrayV's `Math.log`-based `d`
+  /// calculation. Every size from 0 through 40 hits both parities and a wide spread of run-length
+  /// ratios via `runSort`'s Bresenham-style pass splitting; sizes near several power-of-two
+  /// boundaries add larger-scale coverage.
+  @Test
+  func optimizedWeaveMergeSortWideSizeRangeAndBoundaryFuzz() {
+    let algorithm = OptimizedWeaveMergeSort()
+
+    for size in 0...40 {
+      for attempt in 0..<10 {
+        let input = (0..<size).map { _ in Int.random(in: 0...(max(size, 1) / 4)) }
+        var engine = RecordingEngine(values: input)
+        algorithm.record(into: &engine)
+        #expect(
+          engine.values == input.sorted(),
+          """
+          OptimizedWeaveMergeSort failed duplicate-heavy fuzz attempt \(attempt) at size \(size): \
+          \(input) -> \(engine.values)
+          """
+        )
+      }
+    }
+
+    for size in [63, 64, 65, 127, 128, 129, 255, 256, 257] {
+      for attempt in 0..<10 {
+        let input = (0..<size).map { _ in Int.random(in: 0...1_000_000) }
+        var engine = RecordingEngine(values: input)
+        algorithm.record(into: &engine)
+        #expect(
+          engine.values == input.sorted(),
+          """
+          OptimizedWeaveMergeSort failed wide-range fuzz attempt \(attempt) at boundary size \
+          \(size): \(input) -> \(engine.values)
+          """
+        )
+      }
     }
   }
 

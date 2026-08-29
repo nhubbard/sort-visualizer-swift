@@ -1910,6 +1910,35 @@
   },
   {
     "coefficients" : [
+      9.032904971654178,
+      1.2022821006641498
+    ],
+    "runnerUpFamily" : "polynomialIntercept",
+    "runnerUpRSquared" : 0.9999487988406159,
+    "safeMaxSizeByCap" : [
+      100000,
+      428,
+      300000,
+      921,
+      1000000,
+      1980
+    ],
+    "sampleSizes" : [
+      16,
+      17,
+      18,
+      19,
+      38,
+      76,
+      152,
+      304
+    ],
+    "subjectID" : "improvedblockselectionsort+recradix",
+    "winningFamily" : "powerLog",
+    "winningRSquared" : 0.9952597271938391
+  },
+  {
+    "coefficients" : [
       0.5178296862462118,
       20.38742234517196,
       -152.537063106578
@@ -3071,6 +3100,35 @@
     "subjectID" : "optimizedstoogesortstudio+descending",
     "winningFamily" : "polynomialIntercept",
     "winningRSquared" : 1
+  },
+  {
+    "coefficients" : [
+      3.8085005842259494,
+      1.3206066333910251
+    ],
+    "runnerUpFamily" : "polynomialIntercept",
+    "runnerUpRSquared" : 0.9999610527748775,
+    "safeMaxSizeByCap" : [
+      100000,
+      471,
+      300000,
+      951,
+      1000000,
+      1939
+    ],
+    "sampleSizes" : [
+      16,
+      17,
+      18,
+      19,
+      38,
+      76,
+      152,
+      304
+    ],
+    "subjectID" : "optimizedweavemergesort+blockreverse",
+    "winningFamily" : "powerLog",
+    "winningRSquared" : 0.9990460969639303
   },
   {
     "coefficients" : [
