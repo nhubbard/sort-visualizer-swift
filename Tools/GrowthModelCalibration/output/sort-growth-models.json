@@ -5190,5 +5190,35 @@
     "subjectID" : "weavesortrecursive+recradix",
     "winningFamily" : "powerLog",
     "winningRSquared" : 0.9998150748681958
+  },
+  {
+    "coefficients" : [
+      0.09638363660823339,
+      43.52681775938879,
+      -440.1053495414507
+    ],
+    "runnerUpFamily" : "powerLog",
+    "runnerUpRSquared" : 0.9745316815136034,
+    "safeMaxSizeByCap" : [
+      100000,
+      715,
+      300000,
+      1369,
+      1000000,
+      2664
+    ],
+    "sampleSizes" : [
+      16,
+      17,
+      18,
+      19,
+      38,
+      76,
+      152,
+      304
+    ],
+    "subjectID" : "yujisbufferedmergesort2+pdqbad",
+    "winningFamily" : "polynomialIntercept",
+    "winningRSquared" : 0.9989754244443416
   }
 ]

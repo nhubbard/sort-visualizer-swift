@@ -42,7 +42,8 @@ struct NativeAlgorithmCorrectnessTests {
     StrandSort(), SwaplessBubbleSort(), TableSort(), TernaryHeapSort(), TernaryLLQuickSort(), TernaryLRQuickSort(),
     ThreeSmoothCombSortIterative(), ThreeSmoothCombSortRecursive(), TimeSort(), TournamentSort(), TreeSort(),
     TriangularHeapSort(), TwinSort(), UnoptimizedBubbleSort(), UnoptimizedCocktailShakerSort(), UnstableGrailSort(),
-    WeakHeapSort(), WeavedMergeSort(), WeaveMergeSort(), WeaveSortIterative(), WeaveSortRecursive()
+    WeakHeapSort(), WeavedMergeSort(), WeaveMergeSort(), WeaveSortIterative(), WeaveSortRecursive(),
+    YujisBufferedMergeSort2()
   ]
 
   @Test
@@ -3300,6 +3301,295 @@ struct NativeAlgorithmCorrectnessTests {
           """
         )
       }
+    }
+  }
+
+  /// Determines `YujisBufferedMergeSort2`'s stability empirically. This algorithm moves data
+  /// through both `engine.swap` (everywhere except `insertTo`) and `engine.setValue` (`insertTo`'s
+  /// shift-and-place, used by `binaryInsertion`), so swap-tape-shadow replay can't validly
+  /// reconstruct original indices here -- same situation as `OptimizedWeaveMergeSort`. Reimplements
+  /// the algorithm directly over `[Tagged]` (comparing only `.value`, moving whole `Tagged` pairs),
+  /// sidestepping the engine's tape entirely.
+  @Test
+  func yujisBufferedMergeSort2TiedElementsCanLoseTheirOriginalRelativeOrder() {
+    struct Tagged {
+      let value: Int
+      let originalIndex: Int
+    }
+
+    func ceilLog(_ value: Int) -> Int {
+      var i = 0
+      while (1 << i) < value {
+        i += 1
+      }
+      return i
+    }
+
+    func multiSwap(_ array: inout [Tagged], _ a: Int, _ b: Int, _ len: Int) {
+      for i in 0..<len {
+        array.swapAt(a + i, b + i)
+      }
+    }
+
+    func insertTo(_ array: inout [Tagged], _ a: Int, _ b: Int) {
+      let temp = array[a]
+      var a = a
+      while a > b {
+        a -= 1
+        array[a + 1] = array[a]
+      }
+      array[b] = temp
+    }
+
+    func binarySearch(_ array: [Tagged], _ start: Int, _ end: Int, _ value: Int, left: Bool)
+      -> Int
+    {
+      var a = start
+      var b = end
+      while a < b {
+        let m = a + (b - a) / 2
+        let comp = left ? value <= array[m].value : value < array[m].value
+        if comp {
+          b = m
+        } else {
+          a = m + 1
+        }
+      }
+      return a
+    }
+
+    func binaryInsertion(_ array: inout [Tagged], _ a: Int, _ b: Int) {
+      var i = a + 1
+      while i < b {
+        let value = array[i].value
+        insertTo(&array, i, binarySearch(array, a, i, value, left: false))
+        i += 1
+      }
+    }
+
+    func merge(_ array: inout [Tagged], _ a: Int, _ m: Int, _ b: Int, _ pIn: Int) -> Int {
+      var i = a
+      var j = m
+      var p = pIn
+      while i < m && j < b {
+        if array[i].value <= array[j].value {
+          array.swapAt(p, i)
+          p += 1
+          i += 1
+        } else {
+          array.swapAt(p, j)
+          p += 1
+          j += 1
+        }
+      }
+      var leftover = 0
+      while i < m {
+        array.swapAt(p, i)
+        p += 1
+        i += 1
+      }
+      while j < b {
+        array.swapAt(p, j)
+        p += 1
+        j += 1
+        leftover += 1
+      }
+      return leftover
+    }
+
+    func mergeWithBufStatic(
+      _ array: inout [Tagged], _ a: Int, _ m: Int, _ b: Int, _ p: Int, _ useBinarySearch: Bool
+    ) {
+      var i = 0
+      var j = m
+      var k = a
+
+      if useBinarySearch {
+        while i < m - a && j < b {
+          if array[j].value < array[p + i].value {
+            let value = array[p + i].value
+            let q = binarySearch(array, j, b, value, left: true)
+            while j < q {
+              array.swapAt(k, j)
+              k += 1
+              j += 1
+            }
+          }
+          array.swapAt(k, p + i)
+          k += 1
+          i += 1
+        }
+        while i < m - a {
+          array.swapAt(k, p + i)
+          k += 1
+          i += 1
+        }
+      } else {
+        while i < m - a && j < b {
+          if array[p + i].value <= array[j].value {
+            array.swapAt(k, p + i)
+            k += 1
+            i += 1
+          } else {
+            array.swapAt(k, j)
+            k += 1
+            j += 1
+          }
+        }
+        while i < m - a {
+          array.swapAt(k, p + i)
+          k += 1
+          i += 1
+        }
+      }
+    }
+
+    func mergeSort(_ array: inout [Tagged], _ a: Int, _ p: Int, _ length: Int) {
+      var j = 16
+      let ceilLogValue = ceilLog(length)
+
+      var pos: Int
+      if length > 16 && (ceilLogValue & 1) == 1 {
+        pos = p
+      } else {
+        pos = a
+      }
+
+      var i = pos
+      while i + 16 <= pos + length {
+        binaryInsertion(&array, i, i + 16)
+        i += 16
+      }
+      binaryInsertion(&array, i, pos + length)
+
+      var next = pos
+      while j < length {
+        pos = next
+        next ^= a ^ p
+        var posNext = next
+
+        i = pos
+        while i + 2 * j <= pos + length {
+          _ = merge(&array, i, i + j, i + 2 * j, posNext)
+          i += 2 * j
+          posNext += 2 * j
+        }
+        if i + j < pos + length {
+          _ = merge(&array, i, i + j, pos + length, posNext)
+        } else {
+          while i < pos + length {
+            array.swapAt(i, posNext)
+            i += 1
+            posNext += 1
+          }
+        }
+        j *= 2
+      }
+    }
+
+    func bufferedMerge(_ array: inout [Tagged], _ a: Int, _ b: Int) {
+      if b - a <= 16 {
+        binaryInsertion(&array, a, b)
+        return
+      }
+
+      var m = (a + b + 1) / 2
+      mergeSort(&array, m, 2 * m - b, b - m)
+
+      var n = (a + m + 1) / 2
+      let limit = (b - a) / 16
+      while m - a > limit {
+        mergeSort(&array, 2 * n - m, n, m - n)
+        mergeWithBufStatic(&array, n, m, b, 2 * n - m, (b - m) / (m - n) >= ceilLog(n - a))
+        m = n
+        n = (a + m + 1) / 2
+      }
+
+      bufferedMerge(&array, a, m)
+      multiSwap(&array, a, b - (m - a), m - a)
+      let s = merge(&array, m, b - (m - a), b, a)
+      bufferedMerge(&array, b - (m - a) - s, b)
+    }
+
+    var sawReordering = false
+    for size in [8, 15, 16, 17, 33, 63, 64, 65, 100, 127, 200] {
+      for _ in 0..<50 {
+        let values = (0..<size).map { _ in Int.random(in: 0...3) }
+        var tagged = values.enumerated().map { Tagged(value: $0.element, originalIndex: $0.offset) }
+        bufferedMerge(&tagged, 0, size)
+
+        #expect(tagged.map(\.value) == values.sorted())
+
+        var byValue: [Int: [Int]] = [:]
+        for t in tagged {
+          byValue[t.value, default: []].append(t.originalIndex)
+        }
+        if byValue.values.contains(where: { $0 != $0.sorted() }) {
+          sawReordering = true
+        }
+      }
+    }
+
+    #expect(
+      sawReordering,
+      """
+      expected YujisBufferedMergeSort2's buffered merge to reorder at least one run of \
+      equal-valued elements relative to their original input order across randomized \
+      duplicate-heavy trials, confirming it is not a stable sort
+      """
+    )
+  }
+
+  /// Boundary and recursion-depth fuzz for `YujisBufferedMergeSort2`. `bufferedMerge` recurses on
+  /// both halves of its range every level it doesn't hit the `b - a <= 16` base case, so this
+  /// exercises a wide spread of sizes -- including several hundred elements, well past this
+  /// algorithm's own `sizeRange` -- to catch a stack-overflow or off-by-one that only a deeper
+  /// recursion would surface (the failure mode this codebase has hit before in similarly-shaped
+  /// merge/tree sorts).
+  @Test
+  func yujisBufferedMergeSort2WideSizeRangeAndBoundaryFuzz() {
+    let algorithm = YujisBufferedMergeSort2()
+
+    let boundarySizes = [0, 1, 2, 15, 16, 17, 32, 33, 255, 256, 257]
+    for size in boundarySizes {
+      for attempt in 0..<10 {
+        let input = (0..<size).map { _ in Int.random(in: 0...(max(size, 1) / 4)) }
+        var engine = RecordingEngine(values: input)
+        algorithm.record(into: &engine)
+        #expect(
+          engine.values == input.sorted(),
+          """
+          YujisBufferedMergeSort2 failed duplicate-heavy fuzz attempt \(attempt) at boundary size \
+          \(size): \(input) -> \(engine.values)
+          """
+        )
+      }
+    }
+
+    for size in stride(from: 4, through: 2000, by: 47) {
+      let input = (0..<size).map { _ in Int.random(in: 0...1_000_000) }
+      var engine = RecordingEngine(values: input)
+      algorithm.record(into: &engine)
+      #expect(
+        engine.values == input.sorted(),
+        "YujisBufferedMergeSort2 failed wide-range fuzz at size \(size): \(input) -> \(engine.values)"
+      )
+    }
+
+    for size in [0, 1, 2, 16, 17, 256, 257, 500, 1000] {
+      let sorted = Array(0..<size)
+      var engineSorted = RecordingEngine(values: sorted)
+      algorithm.record(into: &engineSorted)
+      #expect(
+        engineSorted.values == sorted,
+        "YujisBufferedMergeSort2 failed already-sorted input of size \(size)")
+
+      let reversed = Array((0..<size).reversed())
+      var engineReversed = RecordingEngine(values: reversed)
+      algorithm.record(into: &engineReversed)
+      #expect(
+        engineReversed.values == reversed.sorted(),
+        "YujisBufferedMergeSort2 failed reverse-sorted input of size \(size)")
     }
   }
 

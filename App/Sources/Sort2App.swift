@@ -65,7 +65,7 @@ struct Sort2App: App {
       TernaryLLQuickSort(), TernaryLRQuickSort(), ThreeSmoothCombSortIterative(), ThreeSmoothCombSortRecursive(),
       TimeSort(), TournamentSort(), TreeSort(), TriangularHeapSort(), TwinSort(), UnoptimizedBubbleSort(),
       UnoptimizedCocktailShakerSort(), UnstableGrailSort(), WeakHeapSort(), WeavedMergeSort(), WeaveMergeSort(),
-      WeaveSortIterative(), WeaveSortRecursive()
+      WeaveSortIterative(), WeaveSortRecursive(), YujisBufferedMergeSort2()
     ]
     AlgorithmRegistry.shared.discover()
 
