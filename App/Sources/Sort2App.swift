@@ -73,11 +73,11 @@ struct Sort2App: App {
       FinalMergeShuffle(), FinalRadixShuffle(), GrailsortAdversaryShuffle(), GrayCodeShuffle(), HalfRotationShuffle(),
       HeapifiedShuffle(), InterlacedShuffle(), InvertedBSTShuffle(), LogarithmicSlopesShuffle(), MovedElementShuffle(),
       NaiveShuffle(), NoisyShuffle(), OrganShuffle(), PairwiseShuffle(), PartialReverseShuffle(), PartitionedShuffle(),
-      PDQAdversaryShuffle(), PoplarifiedShuffle(), QuicksortAdversaryShuffle(), RandomShuffle(),
+      PDQAdversaryShuffle(), QuicksortAdversaryShuffle(), RandomShuffle(),
       RealFinalMergeShuffle(), RealFinalRadixShuffle(), RecursiveRadixShuffle(), RecursiveReversalShuffle(),
       SawtoothShuffle(), ShuffleMergeAdversaryShuffle(), ShuffledCubicShuffle(), ShuffledHalfShuffle(),
       ShuffledHeadShuffle(), ShuffledOddsShuffle(), ShuffledQuinticShuffle(), ShuffledTailShuffle(),
-      SierpinskiShuffle(), SmoothifiedShuffle(), TriangularHeapifiedShuffle(), TriangularShuffle()
+      SierpinskiShuffle(), TriangularHeapifiedShuffle(), TriangularShuffle()
     ]
     ShuffleRegistry.shared.discover()
 

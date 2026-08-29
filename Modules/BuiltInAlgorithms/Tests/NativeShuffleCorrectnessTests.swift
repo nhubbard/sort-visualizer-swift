@@ -18,12 +18,12 @@ struct NativeShuffleCorrectnessTests {
     HeapifiedShuffle(),
     InterlacedShuffle(), InvertedBSTShuffle(), LogarithmicSlopesShuffle(), MovedElementShuffle(),
     NaiveShuffle(), NoisyShuffle(), OrganShuffle(), PairwiseShuffle(), PartialReverseShuffle(),
-    PartitionedShuffle(), PDQAdversaryShuffle(), PoplarifiedShuffle(),
+    PartitionedShuffle(), PDQAdversaryShuffle(),
     QuicksortAdversaryShuffle(), RandomShuffle(), RealFinalMergeShuffle(),
     RealFinalRadixShuffle(), RecursiveRadixShuffle(), RecursiveReversalShuffle(), SawtoothShuffle(),
     ShuffleMergeAdversaryShuffle(),
     ShuffledCubicShuffle(), ShuffledHalfShuffle(), ShuffledHeadShuffle(), ShuffledOddsShuffle(),
-    ShuffledQuinticShuffle(), ShuffledTailShuffle(), SierpinskiShuffle(), SmoothifiedShuffle(),
+    ShuffledQuinticShuffle(), ShuffledTailShuffle(), SierpinskiShuffle(),
     TriangularHeapifiedShuffle(), TriangularShuffle()
   ]
 
@@ -44,12 +44,12 @@ struct NativeShuffleCorrectnessTests {
     HalfRotationShuffle(), HeapifiedShuffle(), InterlacedShuffle(), InvertedBSTShuffle(),
     MovedElementShuffle(), NaiveShuffle(), NoisyShuffle(), OrganShuffle(),
     PairwiseShuffle(), PartialReverseShuffle(), PartitionedShuffle(), PDQAdversaryShuffle(),
-    PoplarifiedShuffle(), QuicksortAdversaryShuffle(),
+    QuicksortAdversaryShuffle(),
     RealFinalMergeShuffle(), RealFinalRadixShuffle(), RecursiveRadixShuffle(),
     RecursiveReversalShuffle(),
     SawtoothShuffle(), ShuffleMergeAdversaryShuffle(), ShuffledHalfShuffle(), ShuffledHeadShuffle(),
     ShuffledOddsShuffle(),
-    ShuffledTailShuffle(), SierpinskiShuffle(), SmoothifiedShuffle(),
+    ShuffledTailShuffle(), SierpinskiShuffle(),
     TriangularHeapifiedShuffle(), TriangularShuffle()
   ]
 

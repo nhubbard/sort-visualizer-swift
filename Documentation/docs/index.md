@@ -13,7 +13,7 @@ This site documents the app's architecture and extension points. For the app its
 
 ## Capabilities
 
-- **167 sorting algorithms** and **46 shuffles**, covering
+- **167 sorting algorithms** and **44 shuffles**, covering
   [ArrayV](https://github.com/gouravkhunger/ArrayV)'s category taxonomy: exchange, hybrid,
   insertion, selection, merge, distribution, concurrent-simulated, and the intentionally
   impractical Bogo/Stooge/Slow family. Every algorithm is native Swift, not an interpreted script.

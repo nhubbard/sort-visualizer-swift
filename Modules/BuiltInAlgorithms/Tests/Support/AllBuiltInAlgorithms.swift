@@ -57,10 +57,10 @@ enum AllBuiltInAlgorithms {
     FinalMergeShuffle(), FinalRadixShuffle(), GrailsortAdversaryShuffle(), GrayCodeShuffle(), HalfRotationShuffle(),
     HeapifiedShuffle(), InterlacedShuffle(), InvertedBSTShuffle(), LogarithmicSlopesShuffle(), MovedElementShuffle(),
     NaiveShuffle(), NoisyShuffle(), OrganShuffle(), PairwiseShuffle(), PartialReverseShuffle(), PartitionedShuffle(),
-    PDQAdversaryShuffle(), PoplarifiedShuffle(), QuicksortAdversaryShuffle(), RandomShuffle(), RealFinalMergeShuffle(),
+    PDQAdversaryShuffle(), QuicksortAdversaryShuffle(), RandomShuffle(), RealFinalMergeShuffle(),
     RealFinalRadixShuffle(), RecursiveRadixShuffle(), RecursiveReversalShuffle(), SawtoothShuffle(),
     ShuffleMergeAdversaryShuffle(), ShuffledCubicShuffle(), ShuffledHalfShuffle(), ShuffledHeadShuffle(),
-    ShuffledOddsShuffle(), ShuffledQuinticShuffle(), ShuffledTailShuffle(), SierpinskiShuffle(), SmoothifiedShuffle(),
+    ShuffledOddsShuffle(), ShuffledQuinticShuffle(), ShuffledTailShuffle(), SierpinskiShuffle(),
     TriangularHeapifiedShuffle(), TriangularShuffle()
   ]
 }

@@ -73,7 +73,7 @@ not depend on the Swift app. If that format changes, update this parser by hand 
 
 This is not a separate Python tool. It runs inside the app itself, in Swift. Full Sweep drives
 every registered algorithm against every shuffle and every visualizer at least once: the full
-cross product, 115,230 combinations at current registry sizes (167 algorithms × 46 shuffles × 15
+cross product, 110,220 combinations at current registry sizes (167 algorithms × 44 shuffles × 15
 visualizers; see [Content layer](../architecture/content.md)), with real animated playback. Use it
 to generate a large, uniform batch of analytics data, or to soak-test a change that could affect
 many combinations at once, such as a shared Metal shader change or a `RecordingEngine` change.

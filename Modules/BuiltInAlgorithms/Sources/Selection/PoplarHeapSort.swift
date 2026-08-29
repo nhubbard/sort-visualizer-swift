@@ -64,12 +64,6 @@ public struct PoplarHeapSort: SortAlgorithm {
     sortHeap(&engine, 0, n)
   }
 
-  public func poplarHeapify(into engine: inout RecordingEngine) {
-    let n = engine.count
-    guard n > 1 else { return }
-    makeHeap(&engine, 0, n)
-  }
-
   private func hyperfloor(_ n: Int) -> Int {
     1 &<< (Int.bitWidth - n.leadingZeroBitCount - 1)
   }

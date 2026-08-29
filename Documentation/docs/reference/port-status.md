@@ -115,18 +115,27 @@ templates, given how dense and index-arithmetic-heavy this style of algorithm te
 
 ## Shuffles
 
-ArrayV's `Shuffles.java` enum lists 45 cases, flat with no subdirectories. This app ships 46
+ArrayV's `Shuffles.java` enum lists 45 cases, flat with no subdirectories. This app ships 44
 shuffles today, all complete. This project's original set of 5 shuffles did not map one-to-one
 onto ArrayV's list when shuffles were first ported, which accounts for the difference.
 
 Notes on specific shuffles:
 
-- `HeapifiedShuffle`, `SmoothifiedShuffle`, `PoplarifiedShuffle`, and `TriangularHeapifiedShuffle`
-  each call directly into a sort's own heapify step (`MaxHeapSort.makeHeap`,
-  `SmoothSort.smoothHeapify`, `PoplarHeapSort.poplarHeapify`, `TriangularHeapSort.
-  triangularHeapify`) rather than reimplementing it. Three of these four sorts needed a small
-  refactor first, extracting a dedicated public heapify-only entry point, before their shuffle
-  could call it directly.
+- `HeapifiedShuffle` and `TriangularHeapifiedShuffle` each call directly into a sort's own
+  heapify step (`MaxHeapSort.makeHeap`, `TriangularHeapSort.triangularHeapify`) rather than
+  reimplementing it. `TriangularHeapSort` needed a small refactor first, extracting a dedicated
+  public heapify-only entry point, before its shuffle could call it directly.
+- `PoplarifiedShuffle` and `SmoothifiedShuffle` were ported the same way (calling into
+  `PoplarHeapSort`'s/`SmoothSort`'s own heapify steps) but were later removed: both heap
+  conventions define a poplar/Leonardo-heap's "root" as the *last* index of its run, and on this
+  app's ascending identity starting array that index already holds the run's maximum by
+  construction, so their sift step never swaps anything. The "shuffle" was silently a no-op,
+  always producing plain ascending order — confirmed for every size from 8 to 256. `MaxHeapSort`/
+  `TriangularHeapSort`'s classic convention (root = first index, children at higher indices)
+  doesn't share this failure mode, since ascending input actually violates the max-heap property
+  at every internal node, so those two shuffles were kept. `PoplarHeapSort`/`SmoothSort` the
+  *sorts* are unaffected and still ship — only their now-unused dedicated heapify entry points
+  (`poplarHeapify`/`smoothHeapify`) were removed along with the shuffles.
 - `QuicksortAdversaryShuffle`, `PDQAdversaryShuffle`, `GrailsortAdversaryShuffle`, and
   `ShuffleMergeAdversaryShuffle` sound like they need their namesake sort already ported, to
   reverse-engineer its worst case. They do not. Each embeds its own self-contained adversarial-input

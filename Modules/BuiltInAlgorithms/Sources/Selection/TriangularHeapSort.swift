@@ -56,8 +56,14 @@ public struct TriangularHeapSort: SortAlgorithm {
   }
 
   /// Just the build-heap sweep, stopping short of `record`'s extraction phase — the entry point
-  /// `Shuffles.TRI_HEAP` calls directly (`triangularHeapify`), matching `SmoothSort.smoothHeapify`/
-  /// `PoplarHeapSort.poplarHeapify`'s own dedicated-entry-point shape.
+  /// `TriangularHeapifiedShuffle` calls directly. `PoplarHeapSort`/`SmoothSort` once exposed the
+  /// same kind of dedicated entry point for their own heapify-shuffle siblings
+  /// (`PoplarifiedShuffle`/`SmoothifiedShuffle`), but both were removed: on this app's identity
+  /// starting array, their "root = last index of the run" heap convention means the run's last
+  /// index already holds that run's max by construction, so their sift step never swaps — the
+  /// shuffle was silently a no-op, always identical to plain ascending order. This binary-heap
+  /// convention (root = first index, children at higher indices) doesn't share that failure
+  /// mode, since ascending input actually violates the max-heap property at every internal node.
   public func triangularHeapify(into engine: inout RecordingEngine) {
     let n = engine.count
     guard n > 1 else { return }
