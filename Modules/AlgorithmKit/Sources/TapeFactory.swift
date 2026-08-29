@@ -5,10 +5,16 @@ import SortEngineKit
 /// operation cap before finishing. `compareCount`/`swapCount`/`mainWriteCount`/`auxWriteCount` are
 /// the algorithm's true totals (kept incrementing past the cap, see `RecordingEngine.appendOp`),
 /// not just the truncated tape length, so a caller has real numbers to log or display.
+/// `recordingDuration` is the real wall-clock time the sort phase took to run to actual completion
+/// before this was thrown -- capping only stops the *tape* from growing further (see
+/// `RecordingEngine.appendOp`), the algorithm itself still runs the whole way through, so this
+/// number is a genuine measurement, not an estimate. `0` for a cap hit during the shuffle phase,
+/// which has no comparable timer running yet.
 public enum TapeRecordingError: Error, Equatable, Sendable {
   case tooLarge(
     operationCount: Int, cap: Int,
-    compareCount: Int, swapCount: Int, mainWriteCount: Int, auxWriteCount: Int
+    compareCount: Int, swapCount: Int, mainWriteCount: Int, auxWriteCount: Int,
+    recordingDuration: TimeInterval
   )
 }
 
@@ -41,7 +47,8 @@ public enum TapeFactory {
       throw TapeRecordingError.tooLarge(
         operationCount: shuffleSummary.tape.count, cap: operationCap,
         compareCount: shuffleSummary.compareCount, swapCount: shuffleSummary.swapCount,
-        mainWriteCount: shuffleSummary.mainWriteCount, auxWriteCount: shuffleSummary.auxWriteCount)
+        mainWriteCount: shuffleSummary.mainWriteCount, auxWriteCount: shuffleSummary.auxWriteCount,
+        recordingDuration: 0)
     }
 
     // recordingDuration measures only the sort, not the shuffle — it's the real algorithmic
@@ -63,7 +70,8 @@ public enum TapeFactory {
       throw TapeRecordingError.tooLarge(
         operationCount: sortSummary.tape.count, cap: operationCap,
         compareCount: sortSummary.compareCount, swapCount: sortSummary.swapCount,
-        mainWriteCount: sortSummary.mainWriteCount, auxWriteCount: sortSummary.auxWriteCount)
+        mainWriteCount: sortSummary.mainWriteCount, auxWriteCount: sortSummary.auxWriteCount,
+        recordingDuration: recordingDuration)
     }
 
     return Tape(
