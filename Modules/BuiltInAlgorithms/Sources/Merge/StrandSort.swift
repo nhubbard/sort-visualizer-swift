@@ -8,10 +8,10 @@ public struct StrandSort: SortAlgorithm {
     category: .merge,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 691, coefficients: [239777, 692.5, 0.5],
+      anchorSize: 309, coefficients: [239780, 1548.5, 2.5],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .polynomialIntercept, coefficients: [0.5, 1.5, 0], rSquared: 1),
+      family: .polynomialIntercept, coefficients: [2.5, 3.5, -4], rSquared: 1),
     stable: true,
     timeComplexity: ComplexityBounds(best: "O(n)", average: "O(n log n)", worst: "O(n^2)"),
     spaceComplexity: "O(n)",
@@ -42,7 +42,10 @@ public struct StrandSort: SortAlgorithm {
       var i = 0
       let s = m - a
       while i < s && m < b {
-        if subList[i] < engine.values[m] {
+        // `subList[i]` is a real re-read of the `subListHandle`-shadowed buffer, marked via
+        // `markAuxRead`, then compared against the live `m` index via `engine.compareValue`.
+        engine.markAuxRead(subListHandle, at: i)
+        if engine.compareValue(m, against: subList[i], by: (>)) {
           engine.setValue(a, subList[i])
           a += 1
           i += 1
@@ -68,7 +71,9 @@ public struct StrandSort: SortAlgorithm {
       var i = 0
       var p = 0
       for m in 1..<j {
-        if engine.values[m] >= subList[i] {
+        // Same `markAuxRead` + `engine.compareValue` pairing as `mergeTo` above.
+        engine.markAuxRead(subListHandle, at: i)
+        if engine.compareValue(m, against: subList[i], by: (>=)) {
           i += 1
           writeSubList(i, engine.values[m])
           k -= 1

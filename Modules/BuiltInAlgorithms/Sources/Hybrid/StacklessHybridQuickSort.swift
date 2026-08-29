@@ -26,14 +26,13 @@ import SortEngineKit
 /// `partition`'s inner scan comparisons (`Reads.compareIndices(array, i, a, 0, false)`) pass
 /// `mark=false` in the source — ArrayV suppresses the usual primary/secondary highlight there
 /// because it's using its own marker-1/marker-2 position highlighting instead (`Highlights
-/// .markArray(1, i)`/`.markArray(2, j)`, decoupled from any specific compared pair). Both the
-/// decoupled position marks and the pivot highlight (marker 3) are omitted here for the same
-/// reason as the dual-pivot sibling: no `Visualizer` in this app renders anything but
-/// `Marker.primary`/`.secondary`, so recording them would be tape bloat with zero visible effect.
-/// The comparisons themselves are translated as held-value reads against the pivot (safe: `a`
-/// never moves during the scan), matching this codebase's usual "value comparison, not index
-/// comparison" convention — not because of the `mark=false` flag specifically, but because the
-/// pivot's value, once captured, never changes until the closing swap.
+/// .markArray(1, i)`/`.markArray(2, j)`, decoupled from any specific compared pair). The decoupled
+/// position marks and the pivot highlight (marker 3) are omitted here for the same reason as the
+/// dual-pivot sibling: no `Visualizer` in this app renders anything but `Marker.primary`/
+/// `.secondary`, so recording them would be tape bloat with zero visible effect. The comparisons
+/// themselves go through `engine.compareValue` against the held pivot (safe: `a` never moves
+/// during the scan) — a real, tracked comparison per scan step, not `compare`'s usual two-index
+/// mark pair, but no longer a raw untracked read either.
 public struct StacklessHybridQuickSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "stacklesshybridquicksort")
   public let metadata = AlgorithmMetadata(
@@ -41,10 +40,10 @@ public struct StacklessHybridQuickSort: SortAlgorithm {
     category: .hybrid,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 1867, coefficients: [239842, 219.776, 0.0487327],
+      anchorSize: 703, coefficients: [239698, 643.587, 0.429216],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .polynomialIntercept, coefficients: [0.0487327, 37.8083, -612.961], rSquared: 0.998526),
+      family: .polynomialIntercept, coefficients: [0.429216, 40.1101, -621.54], rSquared: 0.999815),
     stable: false,
     timeComplexity: ComplexityBounds(best: "O(n log n)", average: "O(n log n)", worst: "O(n^2)"),
     // No recursion at all — the whole point of this port's shape — so no call-stack space to
@@ -156,10 +155,10 @@ public struct StacklessHybridQuickSort: SortAlgorithm {
     while true {
       repeat {
         i += 1
-      } while i < j && engine.values[i] < pivot
+      } while i < j && engine.compareValue(i, against: pivot, by: (<))
       repeat {
         j -= 1
-      } while j >= i && engine.values[j] >= pivot
+      } while j >= i && engine.compareValue(j, against: pivot, by: (>=))
 
       if i < j {
         engine.swap(i, j)
@@ -197,7 +196,7 @@ public struct StacklessHybridQuickSort: SortAlgorithm {
       var hi = i
       while lo < hi {
         let mid = lo + (hi - lo) / 2
-        if num < engine.values[mid] {
+        if engine.compareValue(mid, against: num, by: (>)) {
           hi = mid
         } else {
           lo = mid + 1

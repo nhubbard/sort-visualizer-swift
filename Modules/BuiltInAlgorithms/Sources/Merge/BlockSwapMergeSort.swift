@@ -25,10 +25,10 @@ public struct BlockSwapMergeSort: SortAlgorithm {
     category: .merge,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 1797, coefficients: [195567, 143.231, 0.0120582],
+      anchorSize: 1227, coefficients: [216635, 226.028, 0.024386],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .powerLog, coefficients: [3.69468, 1.18266], rSquared: 0.99952),
+      family: .powerLog, coefficients: [9.19747, 1.1396], rSquared: 0.999493),
     stable: true,
     timeComplexity: ComplexityBounds(
       best: "O(n log n)", average: "O(n log n)", worst: "O(n log n)"),
@@ -52,14 +52,16 @@ public struct BlockSwapMergeSort: SortAlgorithm {
 
     // Binary-searches for `m`, the number of elements at the tail of the left run `[start,
     // mid)` that are each strictly greater than their mirrored counterpart at the head of the
-    // right run `[mid, end)`. Non-marking (`Reads.compareValues` in ArrayV), so this reads
-    // `engine.values` directly rather than calling `engine.compare`.
+    // right run `[mid, end)`. Both sides are live array indices, so this goes through
+    // `engine.compare` — this scans `O(log(run length))` real comparisons per call, previously
+    // invisible to `compareCount` despite this sort's own doc comment already documenting it as
+    // the source of every real comparison in the whole algorithm.
     func binarySearchMid(_ start: Int, _ mid: Int, _ end: Int) -> Int {
       var a = 0
       var b = min(mid - start, end - mid)
       var m = a + (b - a) / 2
       while b > a {
-        if engine.values[mid - m - 1] > engine.values[mid + m] {
+        if engine.compare(mid - m - 1, mid + m, by: (>)) {
           a = m + 1
         } else {
           b = m

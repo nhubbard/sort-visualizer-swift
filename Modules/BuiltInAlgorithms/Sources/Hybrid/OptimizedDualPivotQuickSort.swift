@@ -28,10 +28,10 @@ public struct OptimizedDualPivotQuickSort: SortAlgorithm {
     category: .hybrid,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 991, coefficients: [229752, 422.283, 0.172561],
+      anchorSize: 1293, coefficients: [239931, 338.964, 0.119008],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .powerLog, coefficients: [0.315917, 1.6765], rSquared: -0.0231601),
+      family: .polynomialIntercept, coefficients: [0.119008, 31.2089, 614.358], rSquared: 0.998653),
     // Confirmed via a direct measurement (not just accepted blindly): the negative R² here isn't
     // a bug — the calibration's sample sizes straddle this algorithm's own insertion-sort cutoff
     // (27) badly, with 4 samples entirely below it (pure O(n) insertion sort) and 4 entirely above
@@ -101,16 +101,16 @@ public struct OptimizedDualPivotQuickSort: SortAlgorithm {
 
     var k = less
     while k <= great {
-      if engine.values[k] < pivot1 {
+      if engine.compareValue(k, against: pivot1, by: (<)) {
         engine.swap(k, less)
         less += 1
-      } else if engine.values[k] > pivot2 {
-        while k < great && engine.values[great] > pivot2 {
+      } else if engine.compareValue(k, against: pivot2, by: (>)) {
+        while k < great && engine.compareValue(great, against: pivot2, by: (>)) {
           great -= 1
         }
         engine.swap(k, great)
         great -= 1
-        if engine.values[k] < pivot1 {
+        if engine.compareValue(k, against: pivot1, by: (<)) {
           engine.swap(k, less)
           less += 1
         }
@@ -129,19 +129,19 @@ public struct OptimizedDualPivotQuickSort: SortAlgorithm {
     dualPivot(&engine, great + 2, right, divisor)
 
     // Equal-elements pass: shrink the still-unsorted middle by pulling out anything exactly
-    // equal to either pivot. Held-value comparisons throughout, same reasoning as `pivot1`/
-    // `pivot2` above — `less`/`great` are live loop bounds being mutated here, not stable
-    // positions to re-read from `engine.values` each time.
-    if dist > length - 13 && pivot1 != pivot2 {
+    // equal to either pivot. `less`/`great` are live loop bounds being mutated here, so `k`
+    // against `pivot1`/`pivot2` goes through `engine.compareValue`; `pivot1`/`pivot2` against
+    // each other (both held values, neither a live index) goes through `engine.compareValues`.
+    if dist > length - 13 && engine.compareValues(pivot1, pivot2, by: (!=)) {
       var k = less
       while k <= great {
-        if engine.values[k] == pivot1 {
+        if engine.compareValue(k, against: pivot1, by: (==)) {
           engine.swap(k, less)
           less += 1
-        } else if engine.values[k] == pivot2 {
+        } else if engine.compareValue(k, against: pivot2, by: (==)) {
           engine.swap(k, great)
           great -= 1
-          if engine.values[k] == pivot1 {
+          if engine.compareValue(k, against: pivot1, by: (==)) {
             engine.swap(k, less)
             less += 1
           }
@@ -150,7 +150,7 @@ public struct OptimizedDualPivotQuickSort: SortAlgorithm {
       }
     }
 
-    if pivot1 < pivot2 {
+    if engine.compareValues(pivot1, pivot2, by: (<)) {
       dualPivot(&engine, less, great, divisor)
     }
   }

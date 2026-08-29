@@ -20,14 +20,19 @@ enum BinaryQuickSortingTemplate {
   }
 
   /// Hoare-style single-bit partition: routes every element with `bitIndex` clear to the left of
-  /// the returned split point, and every element with `bitIndex` set to the right.
+  /// the returned split point, and every element with `bitIndex` set to the right. The bit test
+  /// goes through `engine.compareValue`, treating `bitIndex` as the held "value" side (it's not a
+  /// value comparison in the usual `<`/`>` sense, but the same shape: one live index, one held
+  /// constant that never changes mid-scan) — this scans the *entire* `[p, r]` range regardless of
+  /// how many elements actually need swapping, so leaving it a raw read would hide real
+  /// comparison work on already-partitioned-for-this-bit input.
   static func partition(_ engine: inout RecordingEngine, _ p: Int, _ r: Int, _ bitIndex: Int)
     -> Int {
     var i = p - 1
     var j = r + 1
     while true {
-      repeat { i += 1 } while i <= r && !isBitSet(engine.values[i], bitIndex)
-      repeat { j -= 1 } while j >= p && isBitSet(engine.values[j], bitIndex)
+      repeat { i += 1 } while i <= r && !engine.compareValue(i, against: bitIndex, by: isBitSet)
+      repeat { j -= 1 } while j >= p && engine.compareValue(j, against: bitIndex, by: isBitSet)
       if i < j {
         engine.swap(i, j)
       } else {

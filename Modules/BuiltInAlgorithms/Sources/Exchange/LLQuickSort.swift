@@ -14,10 +14,10 @@ public struct LLQuickSort: SortAlgorithm {
     category: .exchange,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 309, coefficients: [239470, 1547.5, 2.5],
+      anchorSize: 244, coefficients: [238383, 1953, 4],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .polynomialIntercept, coefficients: [2.5, 2.5, -5], rSquared: 1),
+      family: .polynomialIntercept, coefficients: [4, 1, -5], rSquared: 1),
     stable: false,
     timeComplexity: ComplexityBounds(best: "O(n log n)", average: "O(n log n)", worst: "O(n^2)"),
     spaceComplexity: "O(log n)",
@@ -35,12 +35,17 @@ public struct LLQuickSort: SortAlgorithm {
     // Held-value pattern (matching `CycleSort`'s precedent): `hi` is never written to until
     // the final pivot-placement swap below, so reading `engine.values[hi]` once up front is
     // equivalent to ArrayV's `Reads.compareValues(array[j], pivot) < 0` against a value that
-    // never changes mid-sweep.
+    // never changes mid-sweep. Every subsequent comparison against `pivot` goes through
+    // `engine.compareValue` — this scans the *entire* `[lo, hi)` range regardless of how many
+    // elements actually swap, so a conditional `engine.swap` alone would leave most of that real
+    // comparison work invisible to the tape/op count on skewed input.
     let pivot = engine.values[hi]
     var i = lo
-    for j in lo..<hi where engine.values[j] < pivot {
-      engine.swap(i, j)
-      i += 1
+    for j in lo..<hi {
+      if engine.compareValue(j, against: pivot, by: (<)) {
+        engine.swap(i, j)
+        i += 1
+      }
     }
     engine.swap(i, hi)
     return i

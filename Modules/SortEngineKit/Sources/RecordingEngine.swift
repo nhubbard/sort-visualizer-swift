@@ -33,9 +33,17 @@ public struct RecordingEngine: Sendable {
   /// `compare`/`swap`. `GrowthModelCalibrationTests.tapeEstimate` needs this split to keep
   /// approximating real tape size accurately now that `compareCount` mixes both call shapes.
   private var compareValueCount = 0
+  /// How many of `compareCount`'s increments came from `compareValues` -- see that method's own
+  /// doc comment. Tracked separately from `compareValueCount` since a `compareValues` call marks
+  /// nothing at all (neither side is a live index), so it costs even fewer raw tape entries per
+  /// call than `compareValue` does.
+  private var compareValuesCount = 0
   private var swapCount = 0
   private var mainWriteCount = 0
   private var auxWriteCount = 0
+  /// How many times an algorithm re-read a `writeAux`-shadowed local buffer for a real decision,
+  /// via `markAuxRead` -- see that method's own doc comment.
+  private var auxReadCount = 0
   private var reversalCount = 0
   private var nextAuxHandle = 0
   private var primaryIndex: Int?
@@ -117,6 +125,22 @@ public struct RecordingEngine: Sendable {
     return cmp(values[i], value)
   }
 
+  /// For comparisons where *neither* side is a live array index -- e.g. `SplaySort`'s two tree
+  /// node keys, `PatienceSort`'s pile-top/heap-entry values, `TimeSort`'s two scratch-array
+  /// entries. `compareValue(_:against:by:)` already covers "one live index, one held value"; this
+  /// covers the remaining case where both sides have already left the array. There's nothing to
+  /// mark -- no live index exists on either side at this moment -- but the call still records a
+  /// tape entry and counts toward `compareCount`, since it costs exactly as much real CPU time as
+  /// any other comparison and was previously invisible to the growth-model curve
+  /// `effectiveSizeRange` sizes algorithms against.
+  @discardableResult
+  public mutating func compareValues(_ a: Int, _ b: Int, by cmp: (Int, Int) -> Bool = (>=)) -> Bool {
+    appendOp(.compareValues(a, b))
+    compareCount += 1
+    compareValuesCount += 1
+    return cmp(a, b)
+  }
+
   public mutating func setValue(_ i: Int, _ value: Int) {
     appendOp(.setValue(i, value))
     values[i] = value
@@ -146,6 +170,18 @@ public struct RecordingEngine: Sendable {
   public mutating func writeAux(_ handle: AuxHandle, at index: Int, value: Int) {
     appendOp(.auxWrite(handle: handle.rawValue, index: index, value: value))
     auxWriteCount += 1
+  }
+
+  /// `RecordingEngine` doesn't retain aux-buffer contents (see `writeAux`'s own doc comment on
+  /// why callers keep a local shadow array), so this can't return a value the way `values[i]`
+  /// reads do -- it exists purely to make a real, repeated re-read of that shadow array visible
+  /// to the tape/op-count, the same way `writeAux` makes writes to it visible. Algorithms like
+  /// `GravitySort`/`ClassicGravitySort` that rescan a shadowed bucket/tally array many times per
+  /// element (not just write it once) should call this alongside each read that represents real
+  /// work, keeping their own local copy for the actual value.
+  public mutating func markAuxRead(_ handle: AuxHandle, at index: Int) {
+    appendOp(.auxRead(handle: handle.rawValue, index: index))
+    auxReadCount += 1
   }
 
   public mutating func deleteAuxArray(_ handle: AuxHandle) {
@@ -178,9 +214,11 @@ public struct RecordingEngine: Sendable {
       tape: tape,
       compareCount: compareCount,
       compareValueCount: compareValueCount,
+      compareValuesCount: compareValuesCount,
       swapCount: swapCount,
       mainWriteCount: mainWriteCount,
       auxWriteCount: auxWriteCount,
+      auxReadCount: auxReadCount,
       reversalCount: reversalCount,
       didExceedCap: didExceedCap
     )
@@ -196,9 +234,15 @@ public struct RecordingSummary: Sendable {
   /// The portion of `compareCount` that came from `compareValue` rather than `compare` -- see
   /// that field's own doc comment on `RecordingEngine`.
   public let compareValueCount: Int
+  /// The portion of `compareCount` that came from `compareValues` -- see that field's own doc
+  /// comment on `RecordingEngine`.
+  public let compareValuesCount: Int
   public let swapCount: Int
   public let mainWriteCount: Int
   public let auxWriteCount: Int
+  /// Real re-reads of a `writeAux`-shadowed buffer, recorded via `markAuxRead` -- see that
+  /// field's own doc comment on `RecordingEngine`.
+  public let auxReadCount: Int
   public let reversalCount: Int
   /// `true` if `tape` was cut short at `RecordingEngine`'s `operationCap` — `tape` still reflects
   /// a genuinely-completed run's real touches up to the cap, but stops short of the whole thing.

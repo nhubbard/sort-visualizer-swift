@@ -210,10 +210,15 @@ struct GrowthModelCalibrationTests {
 
   // MARK: - Filtering
 
+  /// Comma-separated list of substrings (not just one) so a re-calibration run can target an
+  /// exact set of algorithms after a source change, without paying for a full unfiltered sweep.
   private static func filteredSorts() -> [any SortAlgorithm] {
     guard let filter = ProcessInfo.processInfo.environment["GROWTH_CALIBRATION_ALGORITHM_FILTER"]
     else { return AllBuiltInAlgorithms.sorts }
-    return AllBuiltInAlgorithms.sorts.filter { $0.id.rawValue.contains(filter) }
+    let needles = filter.split(separator: ",").map(String.init)
+    return AllBuiltInAlgorithms.sorts.filter { sort in
+      needles.contains { sort.id.rawValue.contains($0) }
+    }
   }
 
   private static func filteredShuffles() -> [any ShuffleAlgorithm] {
@@ -246,13 +251,17 @@ struct GrowthModelCalibrationTests {
   /// `setValueCount = mainWriteCount - 2*swapCount` since `mainWriteCount` folds both together.
   private static func tapeEstimate(_ summary: RecordingSummary) -> Double {
     let setValueCount = summary.mainWriteCount - 2 * summary.swapCount
-    let compareCallCount = summary.compareCount - summary.compareValueCount
+    let compareCallCount =
+      summary.compareCount - summary.compareValueCount - summary.compareValuesCount
     // `compareValue` only ever marks one index (never a secondary), so each call costs fewer
     // raw tape entries than a real two-index `compare`/`swap` -- empirically closer to 3 than
-    // the full 5x multiplier those get.
+    // the full 5x multiplier those get. `compareValues` marks nothing at all (neither side is a
+    // live index), so it costs exactly one raw tape entry per call -- same weight as
+    // `auxReadCount` below, for the same reason (`markAuxRead` also marks nothing).
     return Double(
-      5 * (compareCallCount + summary.swapCount) + 3 * summary.compareValueCount + setValueCount
-        + summary.auxWriteCount + summary.reversalCount)
+      5 * (compareCallCount + summary.swapCount) + 3 * summary.compareValueCount
+        + summary.compareValuesCount + setValueCount + summary.auxWriteCount
+        + summary.auxReadCount + summary.reversalCount)
   }
 
   // MARK: - Size sweep with adaptive sampling and a per-size time budget

@@ -30,10 +30,10 @@ public struct BlockInsertionSort: SortAlgorithm {
     category: .insertion,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 573, coefficients: [239718, 808.206, 0.679677],
+      anchorSize: 547, coefficients: [239303, 855.358, 0.763473],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .polynomialIntercept, coefficients: [0.679677, 29.2959, -225.995], rSquared: 0.999997),
+      family: .polynomialIntercept, coefficients: [0.763473, 20.1188, -139.595], rSquared: 0.999999),
     stable: true,
     timeComplexity: ComplexityBounds(
       best: "O(n)", average: "O(n log n)", worst: "O(n^2)"),
@@ -67,7 +67,7 @@ public struct BlockInsertionSort: SortAlgorithm {
     func insert1(_ a: Int, _ l: Int) {
       let tmp = engine.values[l]
       var l = l - 1
-      while l >= a && engine.values[l] > tmp {
+      while l >= a && engine.compareValue(l, against: tmp, by: (>)) {
         engine.setValue(l + 1, engine.values[l])
         l -= 1
       }
@@ -80,12 +80,12 @@ public struct BlockInsertionSort: SortAlgorithm {
       let tmpL = engine.values[l]
       let tmpR = engine.values[r]
       var l = l - 1
-      while l >= a && engine.values[l] > tmpR {
+      while l >= a && engine.compareValue(l, against: tmpR, by: (>)) {
         engine.setValue(l + 2, engine.values[l])
         l -= 1
       }
       engine.setValue(l + 2, tmpR)
-      while l >= a && engine.values[l] > tmpL {
+      while l >= a && engine.compareValue(l, against: tmpL, by: (>)) {
         engine.setValue(l + 1, engine.values[l])
         l -= 1
       }

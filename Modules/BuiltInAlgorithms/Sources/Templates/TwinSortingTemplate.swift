@@ -18,7 +18,7 @@ enum TwinSortingTemplate {
     var end = nmemb - 2
 
     while index <= end {
-      if engine.values[index + left] <= engine.values[index + 1 + left] {
+      if engine.compare(index + left, index + 1 + left, by: (<=)) {
         index += 2
         continue
       }
@@ -29,7 +29,7 @@ enum TwinSortingTemplate {
       outer: while true {
         if index > end {
           if start == 0
-            && (nmemb % 2 == 0 || engine.values[index - 1 + left] > engine.values[index + left]) {
+            && (nmemb % 2 == 0 || engine.compare(index - 1 + left, index + left, by: (>))) {
             // The whole range is one descending run -- reverse it all and stop.
             end = nmemb - 1
             engine.reversal(start + left, end + left)
@@ -37,8 +37,8 @@ enum TwinSortingTemplate {
           }
           break outer
         }
-        if engine.values[index + left] > engine.values[index + 1 + left] {
-          if engine.values[index - 1 + left] > engine.values[index + left] {
+        if engine.compare(index + left, index + 1 + left, by: (>)) {
+          if engine.compare(index - 1 + left, index + left, by: (>)) {
             index += 2
             continue
           }
@@ -73,7 +73,7 @@ enum TwinSortingTemplate {
         let a = offset
         let e0 = a + block - 1
 
-        if engine.values[e0 + left] <= engine.values[e0 + 1 + left] {
+        if engine.compare(e0 + left, e0 + 1 + left, by: (<=)) {
           // This adjacent pair of blocks is already in order -- skip the merge.
           offset += block * 2
           continue
@@ -92,7 +92,7 @@ enum TwinSortingTemplate {
         // Shrink the merge if the tail of the right block is already >= the tail of the left
         // block (an early-exit for a partially-already-merged tail).
         var d = dMax - 1
-        while engine.values[e0 + left] <= engine.values[d + left] {
+        while engine.compare(e0 + left, d + left, by: (<=)) {
           dMax -= 1
           d -= 1
           cMax -= 1
@@ -111,14 +111,14 @@ enum TwinSortingTemplate {
         d = a + block - 1
         var e = dMax - 1
 
-        if engine.values[a + left] <= engine.values[a + block + left] {
+        if engine.compare(a + left, a + block + left, by: (<=)) {
           // Left block's head is already <= right block's head: merge from the tail of the
           // LEFT block against the buffered right block.
           engine.setValue(e + left, engine.values[d + left])
           e -= 1
           d -= 1
           while c >= s {
-            while engine.values[d + left] > swap[c] {
+            while engine.compareValue(d + left, against: swap[c], by: (>)) {
               engine.setValue(e + left, engine.values[d + left])
               e -= 1
               d -= 1
@@ -133,7 +133,7 @@ enum TwinSortingTemplate {
           e -= 1
           d -= 1
           while d >= a {
-            while engine.values[d + left] <= swap[c] {
+            while engine.compareValue(d + left, against: swap[c], by: (<=)) {
               engine.setValue(e + left, swap[c])
               e -= 1
               c -= 1

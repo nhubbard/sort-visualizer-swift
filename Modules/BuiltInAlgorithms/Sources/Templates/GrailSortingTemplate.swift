@@ -210,16 +210,15 @@ enum GrailSortingTemplate {
     var len2 = regBlockLen
     let typeFrag = 1 - leftOverFrag
 
-    // Matches ArrayV's own `Reads.compareValues(a, b) - typeFrag` exactly: a 3-way compare
-    // (-1/0/1) with `typeFrag` (0 or 1) subtracted, so the `>= 0` / `< 0` checks below flip
-    // which direction counts as "in order" depending on which stream fragment is inverted.
-    func compareValue(_ a: Int, _ b: Int) -> Int {
-      if engine.values[a] < engine.values[b] { return -1 }
-      if engine.values[a] > engine.values[b] { return 1 }
-      return 0
+    // Matches ArrayV's own `Reads.compareValues(a, b) - typeFrag` exactly, but as a single
+    // boolean decision instead of a 3-way (-1/0/1) compare minus `typeFrag` (0 or 1): both `a`
+    // and `b` are always live indices here, so this is `engine.compare` with the tie-break
+    // direction chosen by `typeFrag` up front, rather than two raw reads per call.
+    func inOrder(_ a: Int, _ b: Int) -> Bool {
+      typeFrag == 0 ? engine.compare(a, b, by: (>=)) : engine.compare(a, b, by: (>))
     }
 
-    if len1 != 0 && compareValue(pos + len1 - 1, pos + len1) - typeFrag >= 0 {
+    if len1 != 0 && inOrder(pos + len1 - 1, pos + len1) {
       while len1 != 0 {
         let foundLen = binSearch(&engine, pos + len1, len2, pos, typeFrag != 0)
         if foundLen != 0 {
@@ -231,7 +230,7 @@ enum GrailSortingTemplate {
         repeat {
           pos += 1
           len1 -= 1
-        } while len1 != 0 && compareValue(pos, pos + len1) - typeFrag < 0
+        } while len1 != 0 && !inOrder(pos, pos + len1)
       }
     }
     return (len2, typeFrag)
@@ -248,14 +247,12 @@ enum GrailSortingTemplate {
     var rightEnd = right + blockLen
     let typeFrag = 1 - leftOverFrag
 
-    func compareValue(_ a: Int, _ b: Int) -> Int {
-      if engine.values[a] < engine.values[b] { return -1 }
-      if engine.values[a] > engine.values[b] { return 1 }
-      return 0
+    func inOrder(_ a: Int, _ b: Int) -> Bool {
+      typeFrag == 0 ? engine.compare(a, b, by: (>=)) : engine.compare(a, b, by: (>))
     }
 
     while left < leftEnd && right < rightEnd {
-      if compareValue(pos + left, pos + right) - typeFrag < 0 {
+      if !inOrder(pos + left, pos + right) {
         engine.swap(pos + dist, pos + left)
         dist += 1
         left += 1
@@ -301,13 +298,13 @@ enum GrailSortingTemplate {
     }
 
     var leftOverLen = blockLen
-    var leftOverFrag = engine.values[keysPos] < engine.values[midkey] ? 0 : 1
+    var leftOverFrag = engine.compare(keysPos, midkey, by: (<)) ? 0 : 1
     var processIndex = blockLen
     var restToProcess = 0
 
     for keyIndex in 1..<blockCount {
       restToProcess = processIndex - leftOverLen
-      let nextFrag = engine.values[keysPos + keyIndex] < engine.values[midkey] ? 0 : 1
+      let nextFrag = engine.compare(keysPos + keyIndex, midkey, by: (<)) ? 0 : 1
 
       if nextFrag == leftOverFrag {
         if havebuf {

@@ -624,7 +624,7 @@ public final class ReplayEngine {
       state.frame[index].markers.remove(marker)
     case .unmarkAll:
       for i in state.frame.indices { state.frame[i].markers.removeAll() }
-    case .compare, .compareValue:
+    case .compare, .compareValue, .compareValues:
       if countsTowardStats {
         state.compareCount += 1
       }
@@ -637,6 +637,11 @@ public final class ReplayEngine {
       if countsTowardStats {
         state.auxWriteCount += 1
       }
+    case .auxRead:
+      // Real work (see `isSignificantForPacing`), but a read never changes `state` -- nothing to
+      // apply besides consuming its share of the pacing budget, already handled upstream of this
+      // switch by `isSignificantForPacing` itself.
+      break
     case .auxDelete(let handle):
       state.auxArrays.removeValue(forKey: handle)
     case .reversal:

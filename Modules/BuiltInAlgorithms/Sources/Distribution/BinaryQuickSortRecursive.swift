@@ -13,10 +13,10 @@ public struct BinaryQuickSortRecursive: SortAlgorithm {
     category: .distribution,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 4823, coefficients: [130922, 35.5342, 0.00109931],
+      anchorSize: 2823, coefficients: [181627, 73.6464, 0.00170668],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .powerLog, coefficients: [0.632795, 1.19113], rSquared: 0.987733),
+      family: .powerLog, coefficients: [6.97262, 1.01882], rSquared: 0.997448),
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n log n)", average: "O(n log n)", worst: "O(n log n)"),

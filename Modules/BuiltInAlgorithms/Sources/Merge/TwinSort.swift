@@ -21,10 +21,10 @@ public struct TwinSort: SortAlgorithm {
     category: .merge,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 6478, coefficients: [114074, 24.224, 0.000684673],
+      anchorSize: 1599, coefficients: [204968, 206.646, 0.038815],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .powerLog, coefficients: [0.201857, 1.26168], rSquared: 0.99033),
+      family: .powerLog, coefficients: [0.516654, 1.47654], rSquared: 0.633735),
     stable: true,
     timeComplexity: ComplexityBounds(
       best: "O(n)", average: "O(n log n)", worst: "O(n log n)"),

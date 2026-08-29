@@ -8,10 +8,10 @@ public struct SwaplessBubbleSort: SortAlgorithm {
     category: .exchange,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 692, coefficients: [239778, 692.5, 0.5],
+      anchorSize: 346, coefficients: [239086, 1383, 2],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .polynomialIntercept, coefficients: [0.5, 0.5, 0], rSquared: 1),
+      family: .polynomialIntercept, coefficients: [2, -1, 0], rSquared: 1),
     stable: true,
     timeComplexity: ComplexityBounds(best: "O(n)", average: "O(n^2)", worst: "O(n^2)"),
     spaceComplexity: "O(1)",
@@ -34,15 +34,15 @@ public struct SwaplessBubbleSort: SortAlgorithm {
       // `comp` is a carried value, not something that's necessarily live at any array
       // index once the sweep gets going (it starts as `array[0]`, but from then on it's
       // whichever value the sweep is currently "holding") — the same held-value-vs-
-      // array-value shape as CycleSort's `t`/IntroSort's `pivotValue`. So the comparisons
-      // below read `engine.values` directly and compare with plain `>`/`<=` rather than
-      // going through `engine.compare`, which only knows how to compare two live indices
-      // against each other.
+      // array-value shape as CycleSort's `t`/IntroSort's `pivotValue`, so `j` (a live
+      // index) against `comp` (held) goes through `engine.compareValue`. This comparison
+      // happens exactly once per `j`, every iteration, regardless of whether the write
+      // below ends up being skipped — proportional, not a hidden rescan.
       var comp = engine.values[0]
 
       for j in 1..<i {
         let arrJ = engine.values[j]
-        if comp > arrJ {
+        if engine.compareValue(j, against: comp, by: (<)) {
           // `comp` is the larger of the two: the lesser value (`array[j]`) shifts one
           // slot left, `comp` keeps being carried rightward, and `last` remembers this
           // as the rightmost point where a "swap-like" shift happened.

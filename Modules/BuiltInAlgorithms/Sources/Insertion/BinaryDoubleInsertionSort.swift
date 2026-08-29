@@ -21,10 +21,10 @@ public struct BinaryDoubleInsertionSort: SortAlgorithm {
     category: .insertion,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 973, coefficients: [239538, 489.325, 0.249887],
+      anchorSize: 910, coefficients: [239899, 507.559, 0.267874],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .polynomialIntercept, coefficients: [0.249887, 3.04516, -0.422601], rSquared: 1),
+      family: .polynomialIntercept, coefficients: [0.267874, 20.0294, -153.637], rSquared: 0.999996),
     stable: true,
     timeComplexity: ComplexityBounds(best: "O(n)", average: "O(n^2)", worst: "O(n^2)"),
     spaceComplexity: "O(1)",
@@ -42,7 +42,7 @@ public struct BinaryDoubleInsertionSort: SortAlgorithm {
       var hi = b
       while lo < hi {
         let mid = lo + (hi - lo) / 2
-        if val <= engine.values[mid] {
+        if engine.compareValue(mid, against: val, by: (>=)) {
           hi = mid
         } else {
           lo = mid + 1
@@ -58,7 +58,7 @@ public struct BinaryDoubleInsertionSort: SortAlgorithm {
       var hi = b
       while lo < hi {
         let mid = lo + (hi - lo) / 2
-        if val < engine.values[mid] {
+        if engine.compareValue(mid, against: val, by: (>)) {
           hi = mid
         } else {
           lo = mid + 1

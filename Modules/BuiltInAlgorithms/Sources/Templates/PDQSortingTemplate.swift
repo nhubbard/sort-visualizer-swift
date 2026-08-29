@@ -55,7 +55,7 @@ enum PDQSortingTemplate {
         engine.setValue(sift, engine.values[siftMinusOne])
         sift -= 1
         siftMinusOne -= 1
-      } while sift != begin && tmp < engine.values[siftMinusOne]
+      } while sift != begin && engine.compareValue(siftMinusOne, against: tmp, by: (>))
       engine.setValue(sift, tmp)
     }
   }
@@ -73,7 +73,7 @@ enum PDQSortingTemplate {
         engine.setValue(sift, engine.values[siftMinusOne])
         sift -= 1
         siftMinusOne -= 1
-      } while tmp < engine.values[siftMinusOne]
+      } while engine.compareValue(siftMinusOne, against: tmp, by: (>))
       engine.setValue(sift, tmp)
     }
   }
@@ -95,7 +95,7 @@ enum PDQSortingTemplate {
           engine.setValue(sift, engine.values[siftMinusOne])
           sift -= 1
           siftMinusOne -= 1
-        } while sift != begin && tmp < engine.values[siftMinusOne]
+        } while sift != begin && engine.compareValue(siftMinusOne, against: tmp, by: (>))
         engine.setValue(sift, tmp)
         limit += cur - sift
       }
@@ -247,10 +247,13 @@ enum PDQSortingTemplate {
   /// Same contract as `partRight`, but partitions via the block-quicksort technique from
   /// "BlockQuicksort: How Branch Mispredictions don't affect Quicksort" (Edelkamp & Weiss):
   /// scan `blockSize`-sized chunks from both ends recording which elements are on the wrong side
-  /// into `offsets`, then swap matched wrong-side pairs `blockSize` at a time. Every comparison in
-  /// here reads `engine.values` directly rather than going through `engine.compare` — matching
-  /// ArrayV's own deliberate choice (`pdqLessThan`'s doc comment) not to track these as ordinary
-  /// comparisons, since real branchless code has no per-comparison overhead to model.
+  /// into `offsets`, then swap matched wrong-side pairs `blockSize` at a time. Every comparison
+  /// against the held `pivot` goes through `engine.compareValue` — ArrayV's own `pdqLessThan`
+  /// deliberately reads raw values to model "real branchless code has no per-comparison
+  /// overhead," but that's a statement about branch *misprediction* cost, not about whether the
+  /// comparison itself is real, countable work; leaving it untracked hid this algorithm's real
+  /// cost from the op-count-driven growth model the same way every other bypass in this codebase
+  /// did, so it's tracked here at the cost of an accompanying visual mark per scan step.
   private static func partRightBranchless(
     _ engine: inout RecordingEngine, _ begin: Int, _ end: Int, _ offsets: inout PDQOffsetBuffers
   ) -> (pivotPos: Int, alreadyParted: Bool) {
@@ -258,12 +261,12 @@ enum PDQSortingTemplate {
     var first = begin
     var last = end
 
-    repeat { first += 1 } while engine.values[first] < pivot
+    repeat { first += 1 } while engine.compareValue(first, against: pivot, by: (<))
 
     if first - 1 == begin {
-      repeat { last -= 1 } while first < last && !(engine.values[last] < pivot)
+      repeat { last -= 1 } while first < last && !engine.compareValue(last, against: pivot, by: (<))
     } else {
-      repeat { last -= 1 } while !(engine.values[last] < pivot)
+      repeat { last -= 1 } while !engine.compareValue(last, against: pivot, by: (<))
     }
 
     let alreadyParted = first >= last
@@ -283,7 +286,7 @@ enum PDQSortingTemplate {
         var it = first
         for i in 0..<blockSize {
           offsets.left[leftNum] = i
-          if !(engine.values[it] < pivot) { leftNum += 1 }
+          if !engine.compareValue(it, against: pivot, by: (<)) { leftNum += 1 }
           it += 1
         }
       }
@@ -295,7 +298,7 @@ enum PDQSortingTemplate {
           i += 1
           offsets.right[rightNum] = i
           it -= 1
-          if engine.values[it] < pivot { rightNum += 1 }
+          if engine.compareValue(it, against: pivot, by: (<)) { rightNum += 1 }
         }
       }
 
@@ -330,7 +333,7 @@ enum PDQSortingTemplate {
       var it = first
       for i in 0..<leftSize {
         offsets.left[leftNum] = i
-        if !(engine.values[it] < pivot) { leftNum += 1 }
+        if !engine.compareValue(it, against: pivot, by: (<)) { leftNum += 1 }
         it += 1
       }
     }
@@ -342,7 +345,7 @@ enum PDQSortingTemplate {
         i += 1
         offsets.right[rightNum] = i
         it -= 1
-        if engine.values[it] < pivot { rightNum += 1 }
+        if engine.compareValue(it, against: pivot, by: (<)) { rightNum += 1 }
       }
     }
 

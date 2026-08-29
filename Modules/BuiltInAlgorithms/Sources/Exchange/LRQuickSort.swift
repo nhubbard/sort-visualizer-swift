@@ -23,10 +23,10 @@ public struct LRQuickSort: SortAlgorithm {
     category: .exchange,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 4130, coefficients: [239896, 107.738, 0.0120197],
+      anchorSize: 555, coefficients: [239548, 849.223, 0.752436],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .polynomialIntercept, coefficients: [0.0120197, 8.45488, -41.4009], rSquared: 0.999317),
+      family: .polynomialIntercept, coefficients: [0.752436, 14.0195, -2.24718], rSquared: 1),
     stable: false,
     timeComplexity: ComplexityBounds(best: "O(n log n)", average: "O(n log n)", worst: "O(n^2)"),
     spaceComplexity: "O(log n)",
@@ -71,10 +71,10 @@ public struct LRQuickSort: SortAlgorithm {
       var i = p
       var j = r
       while i <= j {
-        while engine.values[i] < pivotValue {
+        while engine.compareValue(i, against: pivotValue, by: (<)) {
           i += 1
         }
-        while engine.values[j] > pivotValue {
+        while engine.compareValue(j, against: pivotValue, by: (>)) {
           j -= 1
         }
         if i <= j {

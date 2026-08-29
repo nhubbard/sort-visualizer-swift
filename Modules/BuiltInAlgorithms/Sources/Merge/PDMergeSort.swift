@@ -24,10 +24,10 @@ public struct PDMergeSort: SortAlgorithm {
     category: .merge,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 6078, coefficients: [144878, 25.6429],
+      anchorSize: 2523, coefficients: [183052, 86.1501, 0.00296527],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .powerLog, coefficients: [3.84271, 0.961008], rSquared: 0.997374),
+      family: .powerLog, coefficients: [5.8005, 1.05975], rSquared: 0.998944),
     stable: true,
     timeComplexity: ComplexityBounds(
       best: "O(n)", average: "O(n log n)", worst: "O(n log n)"),
@@ -57,7 +57,11 @@ public struct PDMergeSort: SortAlgorithm {
       var left = start
       var right = mid
       while left < right && right < end {
-        if copied[bufferPointer] <= engine.values[right] {
+        // `copied[bufferPointer]` is a real re-read of the `copiedHandle`-shadowed buffer
+        // (marked via `markAuxRead`), then compared against the live `right` index via
+        // `engine.compareValue` — the aux-held value plays the "held value" role.
+        engine.markAuxRead(copiedHandle, at: bufferPointer)
+        if engine.compareValue(right, against: copied[bufferPointer], by: (>=)) {
           engine.setValue(left, copied[bufferPointer])
           bufferPointer += 1
         } else {
@@ -81,7 +85,9 @@ public struct PDMergeSort: SortAlgorithm {
       var left = mid - 1
       var right = end - 1
       while right > left && left >= start {
-        if copied[bufferPointer] >= engine.values[left] {
+        // Same `markAuxRead` + `engine.compareValue` pairing as `mergeUp` above.
+        engine.markAuxRead(copiedHandle, at: bufferPointer)
+        if engine.compareValue(left, against: copied[bufferPointer], by: (<=)) {
           engine.setValue(right, copied[bufferPointer])
           bufferPointer -= 1
         } else {

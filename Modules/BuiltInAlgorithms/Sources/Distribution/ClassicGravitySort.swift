@@ -20,10 +20,10 @@ public struct ClassicGravitySort: SortAlgorithm {
     category: .distribution,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 399, coefficients: [239400, 1198.5, 1.5],
+      anchorSize: 309, coefficients: [239166, 1546.5, 2.5],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .polynomialIntercept, coefficients: [1.5, 1.5, 0], rSquared: 1),
+      family: .polynomialIntercept, coefficients: [2.5, 1.5, 0], rSquared: 1),
     stable: true,
     timeComplexity: ComplexityBounds(
       best: "O(n \\times k)", average: "O(n \\times k)", worst: "O(n \\times k)"),
@@ -55,8 +55,15 @@ public struct ClassicGravitySort: SortAlgorithm {
 
     for i in 0..<n {
       var sum = 0
-      for j in 0..<maxValue where transpose[j] > 0 {
-        sum += 1
+      // Re-reads the `transpose` shadow array in full for every one of `n` output slots -- real,
+      // repeated work the tape didn't previously see at all (only the decrements below were
+      // visible via `writeAux`) -- so each read is marked via `markAuxRead` right where it
+      // happens.
+      for j in 0..<maxValue {
+        engine.markAuxRead(transposeHandle, at: j)
+        if transpose[j] > 0 {
+          sum += 1
+        }
       }
       engine.setValue(n - i - 1, sum)
       for j in 0..<maxValue {

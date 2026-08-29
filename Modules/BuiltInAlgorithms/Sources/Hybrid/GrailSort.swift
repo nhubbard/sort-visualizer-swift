@@ -14,10 +14,10 @@ public struct GrailSort: SortAlgorithm {
     category: .hybrid,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 1118, coefficients: [239948, 354.287, 0.124527],
+      anchorSize: 1046, coefficients: [221245, 288.107, 0.0477776],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .polynomialIntercept, coefficients: [0.124527, 75.8443, -495.375], rSquared: 0.998894),
+      family: .powerLog, coefficients: [6.66926, 1.21828], rSquared: 0.996923),
     stable: true,
     timeComplexity: ComplexityBounds(
       best: "O(n log n)", average: "O(n log n)", worst: "O(n log n)"),

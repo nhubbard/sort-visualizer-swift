@@ -17,6 +17,14 @@ import SortEngineKit
 /// while a genuinely random insertion order costs the same amortized `O(log n)` per insertion an
 /// ordinary balanced tree would. A final in-order traversal writes each key directly back into the
 /// real array as it's visited, without a separate temporary buffer.
+///
+/// `splay`'s three `Node.key` comparisons go through `engine.compareValues` — neither side is ever
+/// a live array index (both are held tree-node keys), so `engine.compare`/`compareValue` don't
+/// apply. Before this, the tree's entire real descent cost (amortized `O(log n)` per insertion,
+/// but a degenerate/sorted input's worst-case `O(n)` single-call depth) was invisible to
+/// `compareCount` — the tape only ever saw this sort's final `n` `setValue` calls, indistinguishable
+/// from `PatienceSort`'s equally under-counted profile despite the two being structurally
+/// unrelated sorts.
 public struct SplaySort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "splaysort")
   public let metadata = AlgorithmMetadata(
@@ -24,10 +32,10 @@ public struct SplaySort: SortAlgorithm {
     category: .insertion,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 304, coefficients: [293.481, 0.89195],
+      anchorSize: 4925, coefficients: [134363, 32.8644, 0.000644423],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .powerLog, coefficients: [0.709131, 0.749004], rSquared: 0.998323),
+      family: .powerLog, coefficients: [1.53133, 1.08701], rSquared: 0.999659),
     stable: true,
     timeComplexity: ComplexityBounds(best: "O(n)", average: "O(n log n)", worst: "O(n log n)"),
     spaceComplexity: "O(n)",
@@ -99,12 +107,12 @@ public struct SplaySort: SortAlgorithm {
           baseResult = nil
           break descend
         }
-        if root.key > key {
+        if engine.compareValues(root.key, key, by: (>)) {
           guard let left = root.left else {
             baseResult = root
             break descend
           }
-          if left.key > key {
+          if engine.compareValues(left.key, key, by: (>)) {
             frames.append(.zigZigLeft(root: root, left: left))
             current = left.left
           } else {
@@ -116,7 +124,7 @@ public struct SplaySort: SortAlgorithm {
             baseResult = root
             break descend
           }
-          if right.key > key {
+          if engine.compareValues(right.key, key, by: (>)) {
             frames.append(.zigZagRight(root: root, right: right))
             current = right.left
           } else {

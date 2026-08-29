@@ -22,7 +22,7 @@ extension SortOperation {
     case .compareValue(let i, _): return [i]
     case .markSorted(let i): return [i]
     case .unmark, .unmarkAll: return nil
-    case .auxCreate, .auxWrite, .auxDelete, .reversal: return []
+    case .auxCreate, .auxWrite, .auxDelete, .reversal, .compareValues, .auxRead: return []
     }
   }
 
@@ -35,7 +35,9 @@ extension SortOperation {
   /// doesn't consume a unit of the pacing budget on its own; see `play()`'s tick loop.
   var isSignificantForPacing: Bool {
     switch self {
-    case .swap, .setValue, .auxWrite, .reversal, .compare, .compareValue, .markSorted: return true
+    case .swap, .setValue, .auxWrite, .reversal, .compare, .compareValue, .markSorted,
+      .compareValues, .auxRead:
+      return true
     case .mark, .unmark, .unmarkAll, .unmarkIndex, .auxCreate, .auxDelete: return false
     }
   }

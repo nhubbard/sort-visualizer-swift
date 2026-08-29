@@ -9,10 +9,10 @@ public struct IntroSort: SortAlgorithm {
     category: .hybrid,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 1247, coefficients: [213291, 237.961, 0.0359793],
+      anchorSize: 935, coefficients: [239868, 423.3, 0.176868],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .powerLog, coefficients: [4.01049, 1.25095], rSquared: 0.999664),
+      family: .polynomialIntercept, coefficients: [0.176868, 92.5566, -1295.45], rSquared: 0.999783),
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n log n)", average: "O(n log n)", worst: "O(n log n)"),
@@ -43,9 +43,9 @@ public struct IntroSort: SortAlgorithm {
       var i = lo
       var j = hi
       while true {
-        while engine.values[i] < pivotValue { i += 1 }
+        while engine.compareValue(i, against: pivotValue, by: (<)) { i += 1 }
         j -= 1
-        while pivotValue < engine.values[j] { j -= 1 }
+        while engine.compareValue(j, against: pivotValue, by: (>)) { j -= 1 }
         if !(i < j) { return i }
         engine.swap(i, j)
         i += 1

@@ -21,10 +21,10 @@ public struct SimplifiedLibrarySort: SortAlgorithm {
     category: .insertion,
     sizeRange: 32...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 390, coefficients: [239459, 1197.06, 1.49226],
+      anchorSize: 384, coefficients: [239914, 1203.82, 1.5031],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .polynomialIntercept, coefficients: [1.49226, 33.0984, -421.306], rSquared: 1),
+      family: .polynomialIntercept, coefficients: [1.5031, 49.4357, -710.621], rSquared: 1),
     stable: true,
     timeComplexity: ComplexityBounds(best: "O(n)", average: "O(n log n)", worst: "O(n^2)"),
     spaceComplexity: "O(n)",
@@ -73,15 +73,14 @@ public struct SimplifiedLibrarySort: SortAlgorithm {
     // ArrayV's separate `binarySearch(array, a, b, val, sleep)`: finds where `val` would
     // insert among the sorted spine `[a, b)`. Unlike `binaryInsert` above, `val` here is
     // `engine.values[i]` for an `i` *outside* `[a, b)` (a not-yet-classified batch element), so
-    // it's a held value read once rather than a live index compared against another live
-    // index — the same pattern `CycleSort`'s `countLesser`/`IntroSort`'s cached pivot use — and
-    // is therefore not run through `engine.compare`.
+    // it's a held value compared against a live spine index — `engine.compareValue`, the same
+    // pattern `IntroSort`'s cached pivot uses, not `engine.compare`'s two-live-index shape.
     func gapSearch(_ a: Int, _ b: Int, _ val: Int) -> Int {
       var lo = a
       var hi = b
       while lo < hi {
         let mid = lo + (hi - lo) / 2
-        if val < engine.values[mid] {
+        if engine.compareValue(mid, against: val, by: (>)) {
           hi = mid
         } else {
           lo = mid + 1

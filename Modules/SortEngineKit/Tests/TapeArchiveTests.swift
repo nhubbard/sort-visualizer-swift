@@ -45,7 +45,10 @@ struct TapeArchiveTests {
     .auxCreate(handle: 13, length: 14),
     .auxWrite(handle: 15, index: 16, value: 17),
     .auxDelete(handle: 18),
-    .reversal
+    .reversal,
+    .compareValue(19, 20),
+    .compareValues(21, 22),
+    .auxRead(handle: 23, index: 24)
   ]
 
   @Test

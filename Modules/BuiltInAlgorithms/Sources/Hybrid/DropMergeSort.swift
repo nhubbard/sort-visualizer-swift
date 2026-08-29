@@ -39,10 +39,10 @@ public struct DropMergeSort: SortAlgorithm {
     category: .hybrid,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 1095, coefficients: [239973, 343.406, 0.112181],
+      anchorSize: 1044, coefficients: [239819, 444.106, 0.205487],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .polynomialIntercept, coefficients: [0.112181, 63.9691, -1206.71], rSquared: 0.999709),
+      family: .polynomialIntercept, coefficients: [0.205487, 15.0498, 139.87], rSquared: 0.998895),
     // Calibrated against `pdqbad` — the binding (worst-case) shuffle across the whole suite,
     // which reliably triggers the early-out fallback into a plain O(n log n) sort. This is the
     // right shuffle to bind against: growthModel exists to bound the *expensive* case, and an
@@ -118,7 +118,7 @@ public struct DropMergeSort: SortAlgorithm {
           maxOfDropped = engine.values[i]
         }
 
-        while write >= 1 && maxOfDropped < engine.values[write - 1] {
+        while write >= 1 && engine.compareValue(write - 1, against: maxOfDropped, by: (>)) {
           write -= 1
           numBacktracked += 1
         }
@@ -152,7 +152,10 @@ public struct DropMergeSort: SortAlgorithm {
     var k = length - 1
 
     while i >= 0 {
-      if j < 0 || buffer[i] > engine.values[j] {
+      // `buffer[i]` is a real re-read of the `bufferHandle`-shadowed buffer, marked via
+      // `markAuxRead`, before comparing it against the live `j` index.
+      engine.markAuxRead(bufferHandle, at: i)
+      if j < 0 || engine.compareValue(j, against: buffer[i], by: (<)) {
         engine.setValue(k, buffer[i])
         k -= 1
         i -= 1

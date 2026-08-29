@@ -44,10 +44,10 @@ public struct LibrarySort: SortAlgorithm {
     category: .insertion,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 947, coefficients: [239542, 500.602, 0.261518],
+      anchorSize: 661, coefficients: [239642, 712.391, 0.529187],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .polynomialIntercept, coefficients: [0.261518, 5.28623, 3.79926], rSquared: 0.999999),
+      family: .polynomialIntercept, coefficients: [0.529187, 12.8053, -35.5912], rSquared: 0.999999),
     stable: true,
     timeComplexity: ComplexityBounds(best: "O(n)", average: "O(n log n)", worst: "O(n^2)"),
     spaceComplexity: "O(n)",
@@ -86,20 +86,26 @@ public struct LibrarySort: SortAlgorithm {
       }
     }
 
+    // Every real read of `slots` below (not just the writes already going through `writeAux`)
+    // is a re-read of that same `writeAux`-shadowed buffer for a real decision, so it's marked
+    // via `markAuxRead` right where it happens — same reasoning as `GravitySort`'s bucket
+    // rescans, just against this sort's gapped-array shadow instead.
+    func auxRead(at index: Int) -> Int {
+      engine.markAuxRead(handle, at: index)
+      return slots[index]
+    }
+
     func insert(_ value: Int) {
       if positions.count == capacity {
         rebalance()
       }
 
       // Upper-bound binary search: first slot whose value is strictly greater than `value`.
-      // Values read here are already-placed, held values (not live main-array positions), so
-      // this is a plain comparison rather than `engine.compare` — matching
-      // `SimplifiedLibrarySort.gapSearch`'s own convention for the same kind of read.
       var lo = 0
       var hi = positions.count
       while lo < hi {
         let mid = (lo + hi) / 2
-        if slots[positions[mid]] > value {
+        if auxRead(at: positions[mid]) > value {
           hi = mid
         } else {
           lo = mid + 1
@@ -108,7 +114,7 @@ public struct LibrarySort: SortAlgorithm {
       let k = lo
       let targetPos = k == 0 ? 0 : positions[k - 1] + 1
 
-      guard targetPos == capacity || slots[targetPos] != empty else {
+      guard targetPos == capacity || auxRead(at: targetPos) != empty else {
         slots[targetPos] = value
         engine.writeAux(handle, at: targetPos, value: value)
         positions.insert(targetPos, at: k)
@@ -125,11 +131,11 @@ public struct LibrarySort: SortAlgorithm {
       // searched and the shorter shift wins, the same "nearer side" choice ArrayV's own
       // `shiftExt` makes.
       var leftGap = targetPos - 1
-      while leftGap >= 0, slots[leftGap] != empty {
+      while leftGap >= 0, auxRead(at: leftGap) != empty {
         leftGap -= 1
       }
       var rightGap = targetPos
-      while rightGap < capacity, slots[rightGap] != empty {
+      while rightGap < capacity, auxRead(at: rightGap) != empty {
         rightGap += 1
       }
       let leftDistance = leftGap >= 0 ? targetPos - leftGap : Int.max

@@ -18,10 +18,10 @@ public struct GravitySort: SortAlgorithm {
     category: .distribution,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 488, coefficients: [239607, 979, 1],
+      anchorSize: 309, coefficients: [239528, 1549.14, 2.50453],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .polynomialIntercept, coefficients: [1, 3, -1], rSquared: 1),
+      family: .polynomialIntercept, coefficients: [2.50453, 1.34498, -22.9079], rSquared: 0.999999),
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n \\times k)", average: "O(n \\times k)", worst: "O(n \\times k)"),
@@ -81,8 +81,15 @@ public struct GravitySort: SortAlgorithm {
     // `i` is one of the rightmost `y[j]` positions known to end up `>= j`) or debits it back
     // out (if position `i`'s original shifted value already started `>= j`, so it shouldn't be
     // credited again on the way down).
+    //
+    // `y[j]`/`x[i]` are re-read from `writeAux`'s own local shadow copies on every one of the
+    // `ySize * n` inner iterations -- real, repeated work the tape didn't previously see at all
+    // (only the occasional resulting `setValue` was visible), so each read is marked via
+    // `markAuxRead` right where it happens.
     for j in stride(from: ySize - 1, through: 0, by: -1) {
       for i in 0..<n {
+        engine.markAuxRead(yHandle, at: j)
+        engine.markAuxRead(xHandle, at: i)
         let inc = (i >= n - y[j] ? 1 : 0) - (x[i] >= j ? 1 : 0)
         // Most `(j, i)` pairs across a full `ySize * n` sweep leave position `i` unchanged at
         // this level (`inc == 0`) -- skipping the write is a genuine no-op (`values[i] + 0 ==

@@ -19,10 +19,10 @@ public struct DoubleInsertionSort: SortAlgorithm {
     category: .insertion,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 973, coefficients: [239822, 489.296, 0.249545],
+      anchorSize: 487, coefficients: [239509, 978.281, 0.998748],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .polynomialIntercept, coefficients: [0.249545, 3.6818, -11.8066], rSquared: 0.999998),
+      family: .polynomialIntercept, coefficients: [0.998748, 5.50024, -41.9973], rSquared: 0.999999),
     stable: true,
     timeComplexity: ComplexityBounds(best: "O(n)", average: "O(n^2)", worst: "O(n^2)"),
     spaceComplexity: "O(1)",
@@ -61,7 +61,7 @@ public struct DoubleInsertionSort: SortAlgorithm {
         // Reads.compareValues(array[pos], leftItem) <= 0 — non-strict: `leftItem` came
         // from `right` (a larger original index), so it must slide past any elements
         // already equal to it and land *after* them to stay stable.
-        while pos <= right && engine.values[pos] <= leftItem {
+        while pos <= right && engine.compareValue(pos, against: leftItem, by: (<=)) {
           engine.setValue(pos - 1, engine.values[pos])
           pos += 1
         }
@@ -71,7 +71,7 @@ public struct DoubleInsertionSort: SortAlgorithm {
         // Reads.compareValues(array[pos], rightItem) >= 0 — non-strict: `rightItem` came
         // from `left` (a smaller original index), so it must slide past any elements
         // already equal to it and land *before* them to stay stable.
-        while pos >= left && engine.values[pos] >= rightItem {
+        while pos >= left && engine.compareValue(pos, against: rightItem, by: (>=)) {
           engine.setValue(pos + 1, engine.values[pos])
           pos -= 1
         }
@@ -85,7 +85,7 @@ public struct DoubleInsertionSort: SortAlgorithm {
         // the two new elements here, so it must stop before any equal elements. No `pos <= right`
         // bound check is needed — `rightItem` (>= `leftItem` in this branch) guarantees the scan
         // stops at or before `pos == right`.
-        while engine.values[pos] < leftItem {
+        while engine.compareValue(pos, against: leftItem, by: (<)) {
           engine.setValue(pos - 1, engine.values[pos])
           pos += 1
         }
@@ -94,7 +94,7 @@ public struct DoubleInsertionSort: SortAlgorithm {
         pos = right - 1
         // Reads.compareValues(array[pos], rightItem) > 0 — strict, held value; same
         // "no explicit bound needed" reasoning as above, mirrored for the left edge.
-        while engine.values[pos] > rightItem {
+        while engine.compareValue(pos, against: rightItem, by: (>)) {
           engine.setValue(pos + 1, engine.values[pos])
           pos -= 1
         }
@@ -114,7 +114,7 @@ public struct DoubleInsertionSort: SortAlgorithm {
       // the trailing element can be smaller than every element sorted so far (e.g. reverse-sorted
       // input), which would otherwise walk `pos` past `start` and out of bounds — ArrayV's Java
       // would throw ArrayIndexOutOfBoundsException there; a literal port would trap in Swift.
-      while pos >= start && engine.values[pos] > current {
+      while pos >= start && engine.compareValue(pos, against: current, by: (>)) {
         engine.setValue(pos + 1, engine.values[pos])
         pos -= 1
       }

@@ -18,10 +18,10 @@ public struct RotateMergeSort: SortAlgorithm {
     category: .merge,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 1458, coefficients: [205533, 206.468, 0.0319876],
+      anchorSize: 1335, coefficients: [211292, 209.839, 0.0244619],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .powerLog, coefficients: [1.78242, 1.32736], rSquared: 0.996364),
+      family: .powerLog, coefficients: [5.73099, 1.18686], rSquared: 0.999043),
     stable: true,
     timeComplexity: ComplexityBounds(
       best: "O(n log n)", average: "O(n log n)", worst: "O(n log n)"),
@@ -78,7 +78,10 @@ public struct RotateMergeSort: SortAlgorithm {
       var b = b
       while a < b {
         let mid = a + (b - a) / 2
-        let comp = left ? value <= engine.values[mid] : value < engine.values[mid]
+        let comp =
+          left
+          ? engine.compareValue(mid, against: value, by: (>=))
+          : engine.compareValue(mid, against: value, by: (>))
         if comp {
           b = mid
         } else {

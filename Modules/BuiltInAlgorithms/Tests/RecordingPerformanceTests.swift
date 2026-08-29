@@ -21,13 +21,21 @@ import Testing
 /// `GrowthModelCalibrationTests.swift` rather than shared, to keep this a fully isolated, distinct
 /// test that can't regress the existing (already delicate) calibration harness.
 ///
-/// Run with: `RUN_RECORDING_PERFORMANCE=1 xcodebuild test -scheme BuiltInAlgorithms -destination
-/// 'platform=macOS,variant=Mac Catalyst' -only-testing:BuiltInAlgorithmsTests/
-/// RecordingPerformanceTests`. Narrow a run first with `RECORDING_PERFORMANCE_ALGORITHM_FILTER`/
-/// `RECORDING_PERFORMANCE_SHUFFLE_FILTER` (substring match against the algorithm/shuffle's
-/// `AlgorithmID`/`ShuffleID` raw value) to sanity-check timing/output shape before a full,
-/// long-running unfiltered sweep across all 177 sorts x 44 shuffles.
-@Suite(.enabled(if: true || ProcessInfo.processInfo.environment["RUN_RECORDING_PERFORMANCE"] == "1"))
+/// Run with: `TEST_RUNNER_RUN_RECORDING_PERFORMANCE=1 xcodebuild test -scheme BuiltInAlgorithms
+/// -destination 'platform=macOS,variant=Mac Catalyst' -only-testing:BuiltInAlgorithmsTests/
+/// RecordingPerformanceTests`. Narrow a run first with `TEST_RUNNER_RECORDING_PERFORMANCE_ALGORITHM_FILTER`/
+/// `TEST_RUNNER_RECORDING_PERFORMANCE_SHUFFLE_FILTER` (substring match against the algorithm/
+/// shuffle's `AlgorithmID`/`ShuffleID` raw value) to sanity-check timing/output shape before a
+/// full, long-running unfiltered sweep across all 177 sorts x 44 shuffles.
+///
+/// The `TEST_RUNNER_` prefix on every one of these env vars is not optional decoration --
+/// `xcodebuild test` only forwards a shell environment variable through to the actual test host
+/// process when it's prefixed that way (confirmed empirically: an unprefixed
+/// `RECORDING_PERFORMANCE_ALGORITHM_FILTER=...` is silently ignored under
+/// `-destination platform=macOS,variant=Mac Catalyst`, running the full unfiltered sweep instead
+/// with no error). `Tools/GrowthModelCalibration/run_calibration.py` already gets this right for
+/// its own env vars -- match that convention here too.
+@Suite(.enabled(if: ProcessInfo.processInfo.environment["RUN_RECORDING_PERFORMANCE"] == "1"))
 struct RecordingPerformanceTests {
   /// One (algorithm, shuffle) unit of work -- flattening the full cross product (rather than one
   /// worker per algorithm) gives much better load balancing, since per-combination recording cost
@@ -61,7 +69,12 @@ struct RecordingPerformanceTests {
     let tolerance = Self.envOverride("RECORDING_PERFORMANCE_TOLERANCE", default: 0.05)
     let minTrials = Int(Self.envOverride("RECORDING_PERFORMANCE_MIN_TRIALS", default: 5))
     let maxTrials = Int(Self.envOverride("RECORDING_PERFORMANCE_MAX_TRIALS", default: 30))
-    let trialTimeout = Self.envOverride("RECORDING_PERFORMANCE_TRIAL_TIMEOUT", default: 5.0)
+    // 60s, not the original 5s -- raised after the RecordingEngine-bypass fix batch (see
+    // Documentation/) made several algorithms' real recorded duration visible for the first
+    // time, and `asynchronoussort`'s alone came in at ~6.2s, already past the old default. This
+    // is a genuine hang backstop now, not a de facto per-trial data-censoring cap: bump it
+    // further if a future algorithm's real duration approaches it.
+    let trialTimeout = Self.envOverride("RECORDING_PERFORMANCE_TRIAL_TIMEOUT", default: 60.0)
     Self.logProgress(
       "\(sorts.count) algorithms x \(shuffles.count) shuffles = \(totalCombinations) combinations across \(workerCount) worker(s)"
     )
@@ -135,22 +148,70 @@ struct RecordingPerformanceTests {
   /// bound -- the largest size a real user could reach via the size chip picker today -- sampling
   /// adaptively via `AdaptiveSampling` (`Support/Statistics.swift`, already in this test target)
   /// until the mean is stable or `maxTrials` is hit. A hung trial (never returns within
-  /// `trialTimeout`) or one that throws `.tooLarge` both record `trialTimeout` itself as the
-  /// sample -- a well-behaved finite floor ("took at least this long") that keeps a pathological
-  /// algorithm visible in the ranking instead of silently vanishing from it.
+  /// `trialTimeout`) records `trialTimeout` itself as the sample -- a well-behaved finite floor
+  /// ("took at least this long") that keeps a pathological algorithm visible in the ranking
+  /// instead of silently vanishing from it. A `.tooLarge` throw, on the other hand, still carries
+  /// a *real* `recordingDuration` whenever the cap was hit during the sort phase (see
+  /// `TapeRecordingError`'s own doc comment: capping only stops the tape from growing, the
+  /// algorithm itself still runs to genuine completion) -- that real duration is used directly
+  /// instead of falling back to the sentinel, so a cap hit doesn't masquerade as "as slow as the
+  /// timeout" when the true number is known and might be far smaller.
   /// Deliberately two different cap values, not one: `sizingCap` decides *what size gets tested* and
   /// must stay at the real app's default so the tested size matches what a user could actually reach
   /// (the cap "enforced elsewhere" that shouldn't change) -- but the same low value passed straight
   /// through to `TapeFactory.makeTape` as the *recording* cap caused several algorithms to abort
   /// mid-recording the moment a particular shuffle's real operation count ran a little over the
-  /// growth model's imperfect prediction, discarding a real, fully-computed duration in favor of a
-  /// fake sentinel (see `TapeRecordingError` -- the duration existed, it just wasn't in the error).
-  /// `recordingCap` reuses the same `10_000_000` "clearly out of hand" magnitude
-  /// `GrowthModelCalibrationTests.absoluteSafetyCeiling` already established, so the recording is
-  /// free to actually finish at the size `sizingCap` already chose, instead of aborting early --
-  /// this changes nothing about `size` itself, only whether that size's recording is allowed to
-  /// complete.
+  /// growth model's imperfect prediction. `recordingCap` reuses the same `10_000_000` "clearly out
+  /// of hand" magnitude `GrowthModelCalibrationTests.absoluteSafetyCeiling` already established, so
+  /// the recording is free to actually finish at the size `sizingCap` already chose, instead of
+  /// aborting early -- this changes nothing about `size` itself, only whether that size's
+  /// recording is allowed to complete.
   private static let recordingCap = 10_000_000
+
+  private static func recordOneTrial(
+    sort: any SortAlgorithm, shuffle: any ShuffleAlgorithm, size: Int
+  ) -> Result<Tape, TapeRecordingError> {
+    do {
+      let tape = try TapeFactory.makeTape(algorithm: sort, shuffle: shuffle, size: size, operationCap: recordingCap)
+      return .success(tape)
+    } catch let error as TapeRecordingError {
+      return .failure(error)
+    } catch {
+      fatalError("TapeFactory.makeTape only ever throws TapeRecordingError")
+    }
+  }
+
+  /// Classification outcome of one trial -- `duration` is always a real number (either the
+  /// genuine `recordingDuration`, or `trialTimeout` as the well-behaved floor for a hang/unknown
+  /// cap-hit), `wasHung`/`wasCapExceeded` are which counter (if any) the caller should bump.
+  private struct TrialOutcome {
+    let duration: TimeInterval
+    let wasHung: Bool
+    let wasCapExceeded: Bool
+  }
+
+  private static func runOneTrial(
+    sort: any SortAlgorithm, shuffle: any ShuffleAlgorithm, size: Int, trialTimeout: TimeInterval
+  ) -> TrialOutcome {
+    let outcome = runWithTimeout(trialTimeout) {
+      Self.recordOneTrial(sort: sort, shuffle: shuffle, size: size)
+    }
+    guard let outcome else {
+      return TrialOutcome(duration: trialTimeout, wasHung: true, wasCapExceeded: false)
+    }
+    switch outcome {
+    case .success(let tape):
+      return TrialOutcome(duration: tape.header.recordingDuration, wasHung: false, wasCapExceeded: false)
+    case .failure(let error):
+      let recordingDuration: TimeInterval
+      switch error {
+      case .tooLarge(_, _, _, _, _, _, let duration):
+        recordingDuration = duration
+      }
+      let effectiveDuration = recordingDuration > 0 ? recordingDuration : trialTimeout
+      return TrialOutcome(duration: effectiveDuration, wasHung: false, wasCapExceeded: true)
+    }
+  }
 
   private static func measureCombo(
     sort: any SortAlgorithm, shuffle: any ShuffleAlgorithm, tolerance: Double, minTrials: Int,
@@ -162,19 +223,10 @@ struct RecordingPerformanceTests {
     var capExceededTrials = 0
 
     let sampled = AdaptiveSampling.sample(tolerance: tolerance, minTrials: minTrials, maxTrials: maxTrials) {
-      let outcome: Tape?? = runWithTimeout(trialTimeout) {
-        try? TapeFactory.makeTape(algorithm: sort, shuffle: shuffle, size: size, operationCap: recordingCap)
-      }
-      switch outcome {
-      case .none:
-        hungTrials += 1
-        return trialTimeout
-      case .some(.none):
-        capExceededTrials += 1
-        return trialTimeout
-      case .some(.some(let tape)):
-        return tape.header.recordingDuration
-      }
+      let trial = Self.runOneTrial(sort: sort, shuffle: shuffle, size: size, trialTimeout: trialTimeout)
+      if trial.wasHung { hungTrials += 1 }
+      if trial.wasCapExceeded { capExceededTrials += 1 }
+      return trial.duration
     }
 
     return ComboResult(

@@ -39,10 +39,10 @@ public struct StacklessDualPivotQuickSort: SortAlgorithm {
     category: .hybrid,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 1881, coefficients: [205208, 187.479, 0.035296],
+      anchorSize: 1348, coefficients: [239739, 337.138, 0.118075],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .powerLog, coefficients: [0.174631, 1.58586], rSquared: 0.673931),
+      family: .polynomialIntercept, coefficients: [0.118075, 18.8081, -168.367], rSquared: 0.999151),
     // Sample sizes straddle this algorithm's own insertion-sort cutoff (24) the same way
     // `OptimizedDualPivotQuickSort`'s calibration did: 4 samples (16-19) fall entirely below it,
     // where the whole range goes through one binary-insertion pass whose O(n) shift-per-insert
@@ -160,16 +160,16 @@ public struct StacklessDualPivotQuickSort: SortAlgorithm {
 
     var k = i + 1
     while k < j {
-      if engine.values[k] < pivotLow {
+      if engine.compareValue(k, against: pivotLow, by: (<)) {
         i += 1
         engine.swap(k, i)
-      } else if engine.values[k] >= pivotHigh {
+      } else if engine.compareValue(k, against: pivotHigh, by: (>=)) {
         repeat {
           j -= 1
-        } while j > k && engine.values[j] >= pivotHigh
+        } while j > k && engine.compareValue(j, against: pivotHigh, by: (>=))
         engine.swap(k, j)
 
-        if engine.values[k] < pivotLow {
+        if engine.compareValue(k, against: pivotLow, by: (<)) {
           i += 1
           engine.swap(k, i)
         }
@@ -219,7 +219,7 @@ public struct StacklessDualPivotQuickSort: SortAlgorithm {
       var hi = i
       while lo < hi {
         let mid = lo + (hi - lo) / 2
-        if num < engine.values[mid] {
+        if engine.compareValue(mid, against: num, by: (>)) {
           hi = mid
         } else {
           lo = mid + 1

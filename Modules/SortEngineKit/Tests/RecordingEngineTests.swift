@@ -195,6 +195,44 @@ struct RecordingEngineTests {
   }
 
   @Test
+  func compareValuesRecordsNoMarksButCountsAsACompare() {
+    var engine = RecordingEngine(values: [5, 3])
+    let result = engine.compareValues(10, 4, by: (<))
+
+    #expect(result == false)
+    // Neither operand is a live index -- no marks, unlike compare()/compareValue().
+    let summary = engine.finish()
+    #expect(summary.tape == [.compareValues(10, 4)])
+    #expect(summary.compareCount == 1)
+    #expect(summary.compareValuesCount == 1)
+    #expect(summary.compareValueCount == 0)
+    // values/mainWriteCount are untouched -- this never reads or writes the live array.
+    #expect(engine.values == [5, 3])
+    #expect(summary.mainWriteCount == 0)
+  }
+
+  @Test
+  func markAuxReadRecordsWithoutMutatingValuesOrAuxWriteCount() {
+    var engine = RecordingEngine(values: [1, 2, 3])
+    let handle = engine.createAuxArray(length: 2)
+    engine.writeAux(handle, at: 0, value: 42)
+    engine.markAuxRead(handle, at: 0)
+    engine.markAuxRead(handle, at: 0)
+
+    let summary = engine.finish()
+    #expect(
+      summary.tape == [
+        .auxCreate(handle: handle.rawValue, length: 2),
+        .auxWrite(handle: handle.rawValue, index: 0, value: 42),
+        .auxRead(handle: handle.rawValue, index: 0),
+        .auxRead(handle: handle.rawValue, index: 0)
+      ])
+    #expect(summary.auxWriteCount == 1)
+    #expect(summary.auxReadCount == 2)
+    #expect(engine.values == [1, 2, 3])
+  }
+
+  @Test
   func operationCapStillLetsTheAlgorithmFinishCorrectly() {
     var engine = RecordingEngine(values: [3, 1, 2], operationCap: 2)
     _ = engine.compare(0, 1)
