@@ -8,7 +8,7 @@ public struct StableCycleSort: SortAlgorithm {
     category: .selection,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 28576, coefficients: [239994, 11.8494, 0.000120764],
+      anchorSize: 207, coefficients: [237800, 2328.2, 5.70237],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
       family: .polynomialIntercept, coefficients: [0.000120764, 4.94749, -0.170237], rSquared: 0.999986),
@@ -45,15 +45,17 @@ public struct StableCycleSort: SortAlgorithm {
     // value, i.e. duplicates still waiting to be placed by this same cycle. The final loop walks
     // `d` past already-flagged slots and past those `e` reserved duplicate slots, landing on the
     // first genuinely free destination and preserving tie order.
+    // `a` is always the outer loop's fixed `i` (never the roaming `j`/`k`), and `engine.swap(i, k)`
+    // below refreshes position `a` with the next value to route on every pass — so unlike plain
+    // Cycle Sort's `t`, the value being routed here is always genuinely live at index `a`, and
+    // every comparison against it is a real `engine.compare(_, a)`, not a held-value comparison.
     func destination1(_ a: Int, _ b1: Int, _ b: Int) -> Int {
-      let heldValue = engine.values[a]
       var d = a
       var e = 0
       for i in (a + 1)..<b {
-        let v = engine.values[i]
-        if v < heldValue {
+        if engine.compare(i, a, by: <) {
           d += 1
-        } else if i < b1 && !getBit(i) && v == heldValue {
+        } else if i < b1 && !getBit(i) && engine.compare(i, a, by: ==) {
           e += 1
         }
       }

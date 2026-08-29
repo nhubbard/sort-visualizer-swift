@@ -15,6 +15,10 @@ public enum SortOperation: Sendable, Codable, Equatable {
   case unmarkIndex(marker: Int, index: Int)
   /// Counted, structurally inert — never changes `values`.
   case compare(Int, Int)
+  /// Like `.compare`, but against a value an algorithm is holding onto rather than a second live
+  /// array index (e.g. Cycle Sort's in-flight rotation value) — see
+  /// `RecordingEngine.compareValue(_:against:by:)`. `(index, value)`.
+  case compareValue(Int, Int)
   /// Permanent "done" marker at completion.
   case markSorted(Int)
   case auxCreate(handle: Int, length: Int)
@@ -41,7 +45,7 @@ public enum SortOperation: Sendable, Codable, Equatable {
   /// sync by hand if this ever changes.
   public var isAudible: Bool {
     switch self {
-    case .compare, .swap, .setValue, .auxWrite: true
+    case .compare, .compareValue, .swap, .setValue, .auxWrite: true
     case .mark, .unmark, .unmarkAll, .unmarkIndex, .markSorted, .auxCreate, .auxDelete, .reversal:
       false
     }

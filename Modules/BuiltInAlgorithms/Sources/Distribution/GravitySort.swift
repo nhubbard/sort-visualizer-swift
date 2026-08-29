@@ -84,6 +84,10 @@ public struct GravitySort: SortAlgorithm {
     for j in stride(from: ySize - 1, through: 0, by: -1) {
       for i in 0..<n {
         let inc = (i >= n - y[j] ? 1 : 0) - (x[i] >= j ? 1 : 0)
+        // Most `(j, i)` pairs across a full `ySize * n` sweep leave position `i` unchanged at
+        // this level (`inc == 0`) -- skipping the write is a genuine no-op (`values[i] + 0 ==
+        // values[i]`), not a behavior change, and cuts real, redundant tape volume.
+        guard inc != 0 else { continue }
         engine.setValue(i, engine.values[i] + inc)
       }
     }

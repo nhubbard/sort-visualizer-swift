@@ -27,6 +27,12 @@ public struct RecordingEngine: Sendable {
   /// to skip the run entirely rather than building a `Tape`/`ReplayEngine` from a truncated one.
   public private(set) var didExceedCap = false
   private var compareCount = 0
+  /// How many of `compareCount`'s increments came from `compareValue` rather than `compare` --
+  /// tracked separately because each `compareValue` call only ever marks one index (never a
+  /// second/`secondary`), so it costs fewer raw tape entries per call than a real two-index
+  /// `compare`/`swap`. `GrowthModelCalibrationTests.tapeEstimate` needs this split to keep
+  /// approximating real tape size accurately now that `compareCount` mixes both call shapes.
+  private var compareValueCount = 0
   private var swapCount = 0
   private var mainWriteCount = 0
   private var auxWriteCount = 0
@@ -79,6 +85,36 @@ public struct RecordingEngine: Sendable {
     appendOp(.mark(marker: Marker.secondary, index: j))
     primaryIndex = i
     secondaryIndex = j
+  }
+
+  /// Same retract-then-mark shape as `markPrimarySecondary`, but for a comparison with only one
+  /// real array side — `compareValue`'s `value` argument isn't stored at any index, so there's
+  /// nothing to mark as secondary.
+  private mutating func markPrimaryOnly(_ i: Int) {
+    if let primaryIndex {
+      appendOp(.unmarkIndex(marker: Marker.primary, index: primaryIndex))
+    }
+    if let secondaryIndex {
+      appendOp(.unmarkIndex(marker: Marker.secondary, index: secondaryIndex))
+    }
+    appendOp(.mark(marker: Marker.primary, index: i))
+    primaryIndex = i
+    secondaryIndex = nil
+  }
+
+  /// For comparisons where one side is a value an algorithm is holding onto rather than a live
+  /// array index — e.g. Cycle Sort's in-flight rotation value, which stops being stored anywhere
+  /// in `values` the moment its original slot gets overwritten. Routing these through
+  /// `engine.values[i] < heldValue` directly (bypassing this method) makes the comparison
+  /// invisible to `compareCount` — and therefore to the growth-model curve `effectiveSizeRange`
+  /// sizes algorithms against — even though it's exactly as expensive as a real `compare()` call.
+  @discardableResult
+  public mutating func compareValue(_ i: Int, against value: Int, by cmp: (Int, Int) -> Bool = (>=)) -> Bool {
+    markPrimaryOnly(i)
+    appendOp(.compareValue(i, value))
+    compareCount += 1
+    compareValueCount += 1
+    return cmp(values[i], value)
   }
 
   public mutating func setValue(_ i: Int, _ value: Int) {
@@ -141,6 +177,7 @@ public struct RecordingEngine: Sendable {
     RecordingSummary(
       tape: tape,
       compareCount: compareCount,
+      compareValueCount: compareValueCount,
       swapCount: swapCount,
       mainWriteCount: mainWriteCount,
       auxWriteCount: auxWriteCount,
@@ -156,6 +193,9 @@ public struct RecordingEngine: Sendable {
 public struct RecordingSummary: Sendable {
   public let tape: [SortOperation]
   public let compareCount: Int
+  /// The portion of `compareCount` that came from `compareValue` rather than `compare` -- see
+  /// that field's own doc comment on `RecordingEngine`.
+  public let compareValueCount: Int
   public let swapCount: Int
   public let mainWriteCount: Int
   public let auxWriteCount: Int

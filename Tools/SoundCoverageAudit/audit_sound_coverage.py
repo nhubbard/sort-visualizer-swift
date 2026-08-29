@@ -37,7 +37,8 @@ DEFAULT_SPEED = 30.0  # ops/sec, matching AppSettings.playbackSpeed's/ReplayEngi
 DEFAULT_DIRECTORY = "~/Library/Containers/com.nhubbard.Sort2.mobile/Data/Documents/sort-tape-audit"
 
 # Tag byte -> number of trailing Int32 fields, matching `TapeArchivePayload.swift`'s `encode`/
-# `decode` exactly (`SortOperation`'s own declaration order, tags 0 through 11).
+# `decode` exactly (`SortOperation`'s own declaration order, tags 0 through 11, plus 12
+# (`.compareValue`) appended later, after this format already shipped).
 OPERATION_FIELD_COUNTS = {
     0: 2,  # swap(Int, Int)
     1: 2,  # setValue(Int, Int)
@@ -51,11 +52,12 @@ OPERATION_FIELD_COUNTS = {
     9: 3,  # auxWrite(handle:, index:, value:)
     10: 1,  # auxDelete(handle:)
     11: 0,  # reversal
+    12: 2,  # compareValue(Int, Int)
 }
-# .compare / .swap / .setValue / .auxWrite — mirrors `SortOperation.isAudible`
+# .compare / .compareValue / .swap / .setValue / .auxWrite — mirrors `SortOperation.isAudible`
 # (Modules/SortEngineKit/Sources/SortOperation.swift). Keep in sync by hand: Python can't import
 # that Swift enum, so this is a hand-maintained mirror, not a derived value.
-AUDIBLE_TAGS = {0, 1, 6, 9}
+AUDIBLE_TAGS = {0, 1, 6, 9, 12}
 
 
 class TapeFormatError(Exception):

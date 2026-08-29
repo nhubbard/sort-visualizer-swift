@@ -41,12 +41,17 @@ public struct LSDRadixSort: SortAlgorithm {
     }
 
     let outputHandle = engine.createAuxArray(length: n)
+    // Reused across every pass instead of allocated fresh each time -- both are fully
+    // overwritten by the end of each pass (`values` by the snapshot loop below, `output` by the
+    // partitioning loop, since `counts`' prefix sum accounts for every index exactly once), so
+    // there's no stale-data risk in keeping the same backing storage across passes.
+    var values = [Int](repeating: 0, count: n)
+    var output = [Int](repeating: 0, count: n)
 
     for place in 0..<highestPlace {
       var counts = [Int](repeating: 0, count: radix)
-      var values = [Int]()
       for i in 0..<n {
-        values.append(engine.values[i])
+        values[i] = engine.values[i]
       }
       for i in 0..<n {
         counts[getDigit(values[i], place)] += 1
@@ -54,7 +59,6 @@ public struct LSDRadixSort: SortAlgorithm {
       for d in 1..<radix {
         counts[d] += counts[d - 1]
       }
-      var output = [Int](repeating: 0, count: n)
       for i in stride(from: n - 1, through: 0, by: -1) {
         let digit = getDigit(values[i], place)
         counts[digit] -= 1

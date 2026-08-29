@@ -13,7 +13,7 @@ public struct BingoSort: SortAlgorithm {
     category: .selection,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 7700, coefficients: [239958, 58.86, 0.00359711],
+      anchorSize: 218, coefficients: [238671, 2184.84, 4.99964],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
       family: .polynomialIntercept, coefficients: [0.00359711, 3.4646, 8.34021], rSquared: 0.996179),
@@ -30,20 +30,20 @@ public struct BingoSort: SortAlgorithm {
     guard n > 1 else { return }
 
     var maximum = n - 1
-    // `next` is a held value, not a live index — same held-value-vs-array-value pattern as
-    // CycleSort's cached `t`, so this reads `engine.values` directly instead of going through
-    // `engine.compare` (which only supports index-vs-index comparisons).
+    // `next`/`val` are held values, not live indices — same held-value-vs-array-value pattern
+    // as CycleSort's cached `t`, so comparisons against them go through `engine.compareValue`
+    // rather than `engine.compare` (which only supports index-vs-index).
     var next = engine.values[maximum]
     var i = maximum - 1
     while i >= 0 {
-      if engine.values[i] > next {
+      if engine.compareValue(i, against: next, by: >) {
         next = engine.values[i]
       }
       i -= 1
     }
     // Skip past any elements at the tail that already equal the true maximum — nothing to do
     // for them yet.
-    while maximum > 0 && engine.values[maximum] == next {
+    while maximum > 0 && engine.compareValue(maximum, against: next, by: ==) {
       maximum -= 1
     }
 
@@ -56,18 +56,15 @@ public struct BingoSort: SortAlgorithm {
       // initializer runs exactly once even though the loop body mutates `maximum`.
       var j = maximum - 1
       while j >= 0 {
-        // Held-value equality against the local `val` — ArrayV routes this one through
-        // `Reads.compareValues` for its own stat tracking, but `val` is still a local, not
-        // a live index, so the held-value pattern applies regardless: read directly.
-        if engine.values[j] == val {
+        if engine.compareValue(j, against: val, by: ==) {
           engine.swap(j, maximum)
           maximum -= 1
-        } else if engine.values[j] > next {
+        } else if engine.compareValue(j, against: next, by: >) {
           next = engine.values[j]
         }
         j -= 1
       }
-      while maximum > 0 && engine.values[maximum] == next {
+      while maximum > 0 && engine.compareValue(maximum, against: next, by: ==) {
         maximum -= 1
       }
     }

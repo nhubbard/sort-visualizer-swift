@@ -8,7 +8,7 @@ public struct CycleSort: SortAlgorithm {
     category: .selection,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 31223, coefficients: [239990, 14.5146, 0.000218692],
+      anchorSize: 35, coefficients: [131621, 35784, 5008.13, 478.549, 35.0019, 2.08498],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
       family: .polynomialIntercept, coefficients: [0.000218692, 0.858133, -0.720986], rSquared: 0.999935),
@@ -26,12 +26,12 @@ public struct CycleSort: SortAlgorithm {
     // ArrayV's `countLesser(array, a, b, t)`: starting at `a`, count how many of the
     // remaining elements in `[a+1, b)` are *strictly* less than the held value `t`. `t`
     // isn't necessarily live at any array index while a cycle is in flight (see below), so
-    // this reads `engine.values` directly rather than going through `engine.compare` —
-    // the same held-value-vs-array-value pattern IntroSort's `partition` uses for its
-    // cached `pivotValue`.
+    // this uses `engine.compareValue` (a held-value-vs-array-value comparison) rather than
+    // `engine.compare`, which only supports index-vs-index — the same pattern IntroSort's
+    // `partition` uses for its cached `pivotValue`.
     func countLesser(_ a: Int, _ b: Int, _ t: Int) -> Int {
       var r = a
-      for i in (a + 1)..<b where engine.values[i] < t {
+      for i in (a + 1)..<b where engine.compareValue(i, against: t, by: <) {
         r += 1
       }
       return r
@@ -53,7 +53,7 @@ public struct CycleSort: SortAlgorithm {
         // without this skip the cycle would try to write `t` on top of a slot that
         // already holds `t`, looping forever. This is exactly ArrayV's own duplicate
         // handling (`while (Reads.compareIndexValue(array, r, t, ...) == 0) r++;`).
-        while engine.values[r] == t {
+        while engine.compareValue(r, against: t, by: ==) {
           r += 1
         }
 

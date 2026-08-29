@@ -246,9 +246,13 @@ struct GrowthModelCalibrationTests {
   /// `setValueCount = mainWriteCount - 2*swapCount` since `mainWriteCount` folds both together.
   private static func tapeEstimate(_ summary: RecordingSummary) -> Double {
     let setValueCount = summary.mainWriteCount - 2 * summary.swapCount
+    let compareCallCount = summary.compareCount - summary.compareValueCount
+    // `compareValue` only ever marks one index (never a secondary), so each call costs fewer
+    // raw tape entries than a real two-index `compare`/`swap` -- empirically closer to 3 than
+    // the full 5x multiplier those get.
     return Double(
-      5 * (summary.compareCount + summary.swapCount) + setValueCount + summary.auxWriteCount
-        + summary.reversalCount)
+      5 * (compareCallCount + summary.swapCount) + 3 * summary.compareValueCount + setValueCount
+        + summary.auxWriteCount + summary.reversalCount)
   }
 
   // MARK: - Size sweep with adaptive sampling and a per-size time budget

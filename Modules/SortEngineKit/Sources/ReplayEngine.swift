@@ -624,7 +624,7 @@ public final class ReplayEngine {
       state.frame[index].markers.remove(marker)
     case .unmarkAll:
       for i in state.frame.indices { state.frame[i].markers.removeAll() }
-    case .compare:
+    case .compare, .compareValue:
       if countsTowardStats {
         state.compareCount += 1
       }

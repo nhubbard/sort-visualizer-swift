@@ -23,7 +23,7 @@ public struct ClassicTreeSort: SortAlgorithm {
     category: .insertion,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 80000, coefficients: [239999, 3],
+      anchorSize: 309, coefficients: [238856, 1545.5, 2.5],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
       family: .polynomialIntercept, coefficients: [0, 3, -1], rSquared: 1),
@@ -49,9 +49,11 @@ public struct ClassicTreeSort: SortAlgorithm {
     for i in 1..<n {
       var c = 0
       while true {
-        // Non-marking comparison (ArrayV's `Reads.compareValues`), so this reads `engine.values`
-        // directly rather than calling `engine.compare`.
-        let goLower = engine.values[i] < engine.values[c]
+        // Both `i` and `c` are live, untouched main-array indices for the whole insertion phase
+        // (nothing writes to `values` until the final reconstruction loop below), so this is a
+        // real `engine.compare` — routing it through raw `engine.values` reads made this
+        // algorithm's true O(n^2) worst-case cost invisible to the growth model that sizes it.
+        let goLower = engine.compare(i, c, by: <)
         if goLower {
           if lower[c] == 0 {
             lower[c] = i
