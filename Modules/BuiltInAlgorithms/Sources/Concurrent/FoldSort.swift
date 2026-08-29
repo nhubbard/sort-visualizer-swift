@@ -27,6 +27,7 @@ public struct FoldSort: SortAlgorithm {
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
       family: .powerLog, coefficients: [9.00412, 1.19409], rSquared: 0.999525),
+    implementationComplexity: 11,
     stable: true,
     timeComplexity: ComplexityBounds(
       best: "O(n log^2 n)", average: "O(n log^2 n)", worst: "O(n log^2 n)"),

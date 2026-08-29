@@ -13,6 +13,7 @@ public struct CountingSort: SortAlgorithm {
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
       family: .powerLaw, coefficients: [2, 1], rSquared: 1),
+    implementationComplexity: 9,
     stable: true,
     timeComplexity: ComplexityBounds(best: "O(n+k)", average: "O(n+k)", worst: "O(n+k)"),
     spaceComplexity: "O(n+k)",

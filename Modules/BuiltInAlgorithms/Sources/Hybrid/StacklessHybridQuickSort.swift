@@ -44,6 +44,7 @@ public struct StacklessHybridQuickSort: SortAlgorithm {
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
       family: .polynomialIntercept, coefficients: [0.429216, 40.1101, -621.54], rSquared: 0.999815),
+    implementationComplexity: 40,
     stable: false,
     timeComplexity: ComplexityBounds(best: "O(n log n)", average: "O(n log n)", worst: "O(n^2)"),
     // No recursion at all — the whole point of this port's shape — so no call-stack space to

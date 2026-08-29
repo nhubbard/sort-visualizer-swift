@@ -30,6 +30,7 @@ public struct MinMaxHeapSort: SortAlgorithm {
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
       family: .powerLog, coefficients: [8.58215, 1.1692], rSquared: 0.995883),
+    implementationComplexity: 31,
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n log n)", average: "O(n log n)", worst: "O(n log n)"),

@@ -10,6 +10,7 @@ struct AlgorithmMetadataTests {
       category: .exchange,
       sizeRange: sizeRange,
       growthModel: .unconstrained,
+      implementationComplexity: 0,
       stable: true,
       timeComplexity: ComplexityBounds(best: "O(1)", average: "O(1)", worst: "O(1)"),
       spaceComplexity: "O(1)",

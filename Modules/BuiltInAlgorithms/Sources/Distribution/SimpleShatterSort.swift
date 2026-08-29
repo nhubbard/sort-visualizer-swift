@@ -21,6 +21,7 @@ public struct SimpleShatterSort: SortAlgorithm {
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
       family: .polynomialIntercept, coefficients: [0.000611972, 4.40588, 26.5466], rSquared: 0.999512),
+    implementationComplexity: 14,
     stable: true,
     timeComplexity: ComplexityBounds(
       best: "O(n)", average: "O(n log n)", worst: "O(n^2)"),

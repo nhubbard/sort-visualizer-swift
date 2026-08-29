@@ -28,6 +28,7 @@ public struct ThreeSmoothCombSortRecursive: SortAlgorithm {
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
       family: .powerLog, coefficients: [8.15281, 1.20846], rSquared: 0.9996),
+    implementationComplexity: 8,
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n log^2 n)", average: "O(n log^2 n)", worst: "O(n log^2 n)"),

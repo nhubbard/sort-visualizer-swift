@@ -48,6 +48,7 @@ public struct MergeInsertionSort: SortAlgorithm {
     // comparison, carrying every other element of both blocks (including any tied values buried
     // inside them) along for the ride — this is also why the array isn't actually sorted at every
     // intermediate doubling level, only once both phases finish.
+    implementationComplexity: 28,
     stable: false,
     // No data-dependent short-circuit anywhere in the structure (every pass/index walk is fixed by
     // `length` alone, never skipped based on existing order), so best case doesn't drop below

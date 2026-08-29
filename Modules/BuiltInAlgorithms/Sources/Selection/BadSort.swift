@@ -35,6 +35,7 @@ public struct BadSort: SortAlgorithm {
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
       family: .powerLaw, coefficients: [0.222694, 3.16531], rSquared: 0.998283),
+    implementationComplexity: 7,
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n^2)", average: "O(n^2 log n)", worst: "O(n^3)"),

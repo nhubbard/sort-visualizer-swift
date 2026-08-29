@@ -61,6 +61,7 @@ struct OperationGrowthModelTests {
       category: .exchange,
       sizeRange: 4...256,
       growthModel: OperationGrowthModel(anchorSize: 0, coefficients: [100, 1]),
+      implementationComplexity: 0,
       stable: true,
       timeComplexity: ComplexityBounds(best: "O(1)", average: "O(1)", worst: "O(1)"),
       spaceComplexity: "O(1)",

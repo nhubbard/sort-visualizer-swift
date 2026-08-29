@@ -52,6 +52,7 @@ public struct StacklessDualPivotQuickSort: SortAlgorithm {
     // algorithm and confirmed ops/n peaks right at the cutoff (n=24-25) then falls as n grows
     // into the real partitioning regime — no single smooth 2-parameter curve fits both regimes
     // at once. Every sampled size still sorted correctly.
+    implementationComplexity: 33,
     stable: false,
     timeComplexity: ComplexityBounds(best: "O(n log n)", average: "O(n log n)", worst: "O(n^2)"),
     // No recursion at all — the whole point of this port's shape — so no call-stack space to

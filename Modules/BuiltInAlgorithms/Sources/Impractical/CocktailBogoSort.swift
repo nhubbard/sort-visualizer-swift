@@ -12,6 +12,7 @@ public struct CocktailBogoSort: SortAlgorithm {
       measuredSafeCeiling: 7),
     detectedGrowthModel: DetectedGrowthModel(
       family: .powerLog, coefficients: [5.26004, 1.80398], rSquared: 0.89857),
+    implementationComplexity: 16,
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n)", average: "O(n \\times n!)", worst: "O(n \\times n!)"),

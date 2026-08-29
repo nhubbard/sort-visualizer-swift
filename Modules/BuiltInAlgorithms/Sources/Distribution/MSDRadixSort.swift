@@ -20,6 +20,7 @@ public struct MSDRadixSort: SortAlgorithm {
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
       family: .polynomialIntercept, coefficients: [0.0115046, 6.52513, -11.2883], rSquared: 0.999346),
+    implementationComplexity: 13,
     stable: true,
     timeComplexity: ComplexityBounds(
       best: "O(d \\times n)", average: "O(d \\times n)", worst: "O(d \\times n)"),

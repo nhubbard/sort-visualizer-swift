@@ -18,6 +18,7 @@ public struct DualPivotQuickSort: SortAlgorithm {
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
       family: .polynomialIntercept, coefficients: [0.0913771, 24.866, -145.779], rSquared: 0.999642),
+    implementationComplexity: 20,
     stable: false,
     timeComplexity: ComplexityBounds(best: "O(n log n)", average: "O(n log n)", worst: "O(n^2)"),
     spaceComplexity: "O(log n)",

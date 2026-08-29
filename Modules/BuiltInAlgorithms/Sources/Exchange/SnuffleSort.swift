@@ -16,6 +16,7 @@ public struct SnuffleSort: SortAlgorithm {
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
       family: .nToTheNLike, coefficients: [85.1247, 0.0994513], rSquared: 0.965661),
+    implementationComplexity: 7,
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n^{log n})", average: "O(n^{log n})", worst: "O(n^{log n})"),

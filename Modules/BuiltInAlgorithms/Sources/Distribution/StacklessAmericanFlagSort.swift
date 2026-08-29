@@ -33,6 +33,7 @@ public struct StacklessAmericanFlagSort: SortAlgorithm {
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
       family: .polynomialIntercept, coefficients: [0.0181722, 13.9485, 16.2217], rSquared: 0.999545),
+    implementationComplexity: 26,
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(d \\times (n+b))", average: "O(d \\times (n+b))", worst: "O(d \\times (n+b))"),

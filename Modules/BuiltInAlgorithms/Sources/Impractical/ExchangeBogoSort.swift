@@ -12,6 +12,7 @@ public struct ExchangeBogoSort: SortAlgorithm {
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
       family: .polynomialIntercept, coefficients: [5, -5, 5], rSquared: 1),
+    implementationComplexity: 9,
     stable: false,
     timeComplexity: ComplexityBounds(best: "O(n)", average: "O(n^2)", worst: "O(n^2)"),
     spaceComplexity: "O(1)",

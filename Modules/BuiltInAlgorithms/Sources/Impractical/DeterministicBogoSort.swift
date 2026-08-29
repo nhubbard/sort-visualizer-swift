@@ -12,6 +12,7 @@ public struct DeterministicBogoSort: SortAlgorithm {
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
       family: .factorial, coefficients: [46.9138, 1.08572], rSquared: 0.992626),
+    implementationComplexity: 10,
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n)", average: "O(n \\times n!)", worst: "O(n \\times n!)"),

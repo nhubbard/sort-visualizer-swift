@@ -12,6 +12,7 @@ public struct QuickBogoSort: SortAlgorithm {
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
       family: .factorial, coefficients: [59.1261, 1.08972], rSquared: 0.999744),
+    implementationComplexity: 22,
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n)", average: "O(n \\times n!)", worst: "O(n \\times n!)"),

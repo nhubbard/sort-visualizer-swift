@@ -12,6 +12,7 @@ public struct ShellSort: SortAlgorithm {
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
       family: .polynomialIntercept, coefficients: [0.0887158, 52.0191, -478.52], rSquared: 0.999946),
+    implementationComplexity: 6,
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n log n)", average: "O(n^{1.25})", worst: "O(n^2)"),

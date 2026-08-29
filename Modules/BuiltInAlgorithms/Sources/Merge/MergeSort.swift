@@ -12,6 +12,7 @@ public struct MergeSort: SortAlgorithm {
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
       family: .powerLog, coefficients: [6.97323, 1.04737], rSquared: 0.999799),
+    implementationComplexity: 12,
     stable: true,
     timeComplexity: ComplexityBounds(
       best: "O(n log n)", average: "O(n log n)", worst: "O(n log n)"),

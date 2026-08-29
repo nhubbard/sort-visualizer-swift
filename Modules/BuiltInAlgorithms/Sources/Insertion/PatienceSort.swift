@@ -27,6 +27,7 @@ public struct PatienceSort: SortAlgorithm {
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
       family: .polynomialIntercept, coefficients: [0.0149033, 14.0609, -171.113], rSquared: 0.999899),
+    implementationComplexity: 9,
     stable: true,
     timeComplexity: ComplexityBounds(
       best: "O(n log n)", average: "O(n log n)", worst: "O(n log n)"),

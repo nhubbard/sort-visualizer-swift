@@ -31,6 +31,7 @@ public struct YujisBufferedMergeSort2: SortAlgorithm {
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
       family: .polynomialIntercept, coefficients: [0.0963836, 43.5268, -440.105], rSquared: 0.998975),
+    implementationComplexity: 62,
     stable: false,
     timeComplexity: ComplexityBounds(best: "O(n log n)", average: "O(n log n)", worst: "O(n log n)"),
     spaceComplexity: "O(1)",

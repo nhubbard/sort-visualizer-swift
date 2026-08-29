@@ -42,6 +42,7 @@ public struct LaziestSort: SortAlgorithm {
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
       family: .powerLog, coefficients: [0.552509, 1.58098], rSquared: 0.990328),
+    implementationComplexity: 29,
     stable: true,
     timeComplexity: ComplexityBounds(
       best: "O(n log n)", average: "O(n log n)", worst: "O(n log n)"),

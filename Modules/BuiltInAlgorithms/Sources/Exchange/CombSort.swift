@@ -12,6 +12,7 @@ public struct CombSort: SortAlgorithm {
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
       family: .polynomialIntercept, coefficients: [0.144918, 55.2916, -409.637], rSquared: 0.999937),
+    implementationComplexity: 6,
     stable: false,
     timeComplexity: ComplexityBounds(best: "O(n log n)", average: "O(n^2)", worst: "O(n^2)"),
     spaceComplexity: "O(1)",

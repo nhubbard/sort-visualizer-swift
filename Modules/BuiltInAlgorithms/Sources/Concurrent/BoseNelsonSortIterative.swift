@@ -12,6 +12,7 @@ public struct BoseNelsonSortIterative: SortAlgorithm {
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
       family: .powerLog, coefficients: [5.64094, 1.33129], rSquared: 0.999993),
+    implementationComplexity: 12,
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n log^2 n)", average: "O(n log^2 n)", worst: "O(n log^2 n)"),

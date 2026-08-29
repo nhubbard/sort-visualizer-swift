@@ -48,6 +48,7 @@ public struct LibrarySort: SortAlgorithm {
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
       family: .polynomialIntercept, coefficients: [0.529187, 12.8053, -35.5912], rSquared: 0.999999),
+    implementationComplexity: 21,
     stable: true,
     timeComplexity: ComplexityBounds(best: "O(n)", average: "O(n log n)", worst: "O(n^2)"),
     spaceComplexity: "O(n)",

@@ -28,6 +28,7 @@ public struct TriangularHeapSort: SortAlgorithm {
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
       family: .polynomialIntercept, coefficients: [0.692574, 138.207, -1715.4], rSquared: 0.999867),
+    implementationComplexity: 24,
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n^1.5)", average: "O(n^1.5)", worst: "O(n^1.5)"),

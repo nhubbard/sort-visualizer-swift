@@ -32,6 +32,7 @@ public struct TableSort: SortAlgorithm {
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
       family: .polynomialIntercept, coefficients: [0.172477, 35.0156, -170.746], rSquared: 0.999979),
+    implementationComplexity: 33,
     stable: true,
     timeComplexity: ComplexityBounds(
       best: "O(n log n)", average: "O(n log n)", worst: "O(n^2)"),

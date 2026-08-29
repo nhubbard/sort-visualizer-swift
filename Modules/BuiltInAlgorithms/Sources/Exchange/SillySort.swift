@@ -24,6 +24,7 @@ public struct SillySort: SortAlgorithm {
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
       family: .nToTheNLike, coefficients: [631.765, 0.0358603], rSquared: 0.999501),
+    implementationComplexity: 5,
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n^{log n})", average: "O(n^{log n})", worst: "O(n^{log n})"),

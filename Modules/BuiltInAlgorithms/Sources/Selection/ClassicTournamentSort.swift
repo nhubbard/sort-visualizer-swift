@@ -29,6 +29,7 @@ public struct ClassicTournamentSort: SortAlgorithm {
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
       family: .powerLog, coefficients: [8.86973, 1.0293], rSquared: 0.999267),
+    implementationComplexity: 23,
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n log n)", average: "O(n log n)", worst: "O(n log n)"),

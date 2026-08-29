@@ -10,6 +10,7 @@ private func makeMetadata(best: String, average: String, worst: String, space: S
     category: .exchange,
     sizeRange: 1...1,
     growthModel: .unconstrained,
+    implementationComplexity: 0,
     stable: true,
     timeComplexity: ComplexityBounds(best: best, average: average, worst: worst),
     spaceComplexity: space,

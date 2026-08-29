@@ -30,6 +30,7 @@ public struct OutOfPlaceHeapSort: SortAlgorithm {
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
       family: .powerLog, coefficients: [11.2339, 1.02985], rSquared: 0.999898),
+    implementationComplexity: 19,
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n log n)", average: "O(n log n)", worst: "O(n log n)"),

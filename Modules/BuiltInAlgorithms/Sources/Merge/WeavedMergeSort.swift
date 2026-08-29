@@ -29,6 +29,7 @@ public struct WeavedMergeSort: SortAlgorithm {
     // scatters an original run of equal values across many strided sub-sequences, this does NOT
     // reduce to "preserve original order" the way a normal stable merge's tie-break does.
     // Confirmed via tagged-duplicate fuzzing: ties come out reordered.
+    implementationComplexity: 13,
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n log n)", average: "O(n log n)", worst: "O(n log n)"),

@@ -181,6 +181,19 @@ public struct AlgorithmDetailSection: View {
         LabeledEquationCell(label: row("worst").label, equation: row("worst").latex)
         LabeledEquationCell(label: row("space").label, equation: row("space").latex)
       }
+      // Not another equation -- a plain integer, rendered through the same cell anyway (a bare
+      // number is valid LaTeX) so it lines up visually with best/average/worst/space instead of
+      // introducing a differently-styled row. Spans both columns: there's no natural second stat
+      // to pair it with. The actual point of showing this next to Big-O: a higher score here
+      // doesn't imply a worse growth curve above -- e.g. Quadsort's port is one of the most
+      // complex in the app but among the fastest in practice.
+      GridRow(alignment: .bottom) {
+        LabeledEquationCell(
+          label: "Implementation Complexity",
+          equation: "\(algorithm.metadata.implementationComplexity)"
+        )
+        .gridCellColumns(2)
+      }
     }
   }
 }

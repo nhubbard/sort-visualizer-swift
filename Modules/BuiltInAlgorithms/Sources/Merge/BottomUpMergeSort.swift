@@ -21,6 +21,7 @@ public struct BottomUpMergeSort: SortAlgorithm {
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
       family: .powerLog, coefficients: [6.19882, 1.0737], rSquared: 0.998405),
+    implementationComplexity: 16,
     stable: true,
     timeComplexity: ComplexityBounds(
       best: "O(n log n)", average: "O(n log n)", worst: "O(n log n)"),

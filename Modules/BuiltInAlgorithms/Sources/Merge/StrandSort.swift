@@ -12,6 +12,7 @@ public struct StrandSort: SortAlgorithm {
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
       family: .polynomialIntercept, coefficients: [2.5, 3.5, -4], rSquared: 1),
+    implementationComplexity: 11,
     stable: true,
     timeComplexity: ComplexityBounds(best: "O(n)", average: "O(n log n)", worst: "O(n^2)"),
     spaceComplexity: "O(n)",

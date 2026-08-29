@@ -25,6 +25,7 @@ public struct SimplifiedLibrarySort: SortAlgorithm {
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
       family: .polynomialIntercept, coefficients: [1.5031, 49.4357, -710.621], rSquared: 1),
+    implementationComplexity: 30,
     stable: true,
     timeComplexity: ComplexityBounds(best: "O(n)", average: "O(n log n)", worst: "O(n^2)"),
     spaceComplexity: "O(n)",

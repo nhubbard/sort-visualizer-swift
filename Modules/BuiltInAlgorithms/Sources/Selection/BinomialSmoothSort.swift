@@ -12,6 +12,7 @@ public struct BinomialSmoothSort: SortAlgorithm {
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
       family: .powerLog, coefficients: [2.08824, 1.46826], rSquared: 0.992037),
+    implementationComplexity: 17,
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n)", average: "O(n log n)", worst: "O(n log n)"),

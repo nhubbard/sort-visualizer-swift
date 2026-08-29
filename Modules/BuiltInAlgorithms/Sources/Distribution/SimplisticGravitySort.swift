@@ -22,6 +22,7 @@ public struct SimplisticGravitySort: SortAlgorithm {
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
       family: .polynomialIntercept, coefficients: [2, -2, 0], rSquared: 1),
+    implementationComplexity: 11,
     stable: true,
     timeComplexity: ComplexityBounds(
       best: "O(n \\times k)", average: "O(n \\times k)", worst: "O(n \\times k)"),

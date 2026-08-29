@@ -34,6 +34,7 @@ public struct OptimizedWeaveMergeSort: SortAlgorithm {
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
       family: .powerLog, coefficients: [3.8085, 1.32061], rSquared: 0.999046),
+    implementationComplexity: 33,
     stable: true,
     timeComplexity: ComplexityBounds(best: "O(n log n)", average: "O(n log n)", worst: "O(n log n)"),
     spaceComplexity: "O(1)",

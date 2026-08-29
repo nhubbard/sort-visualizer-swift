@@ -25,6 +25,7 @@ public struct TwinSort: SortAlgorithm {
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
       family: .powerLog, coefficients: [0.516654, 1.47654], rSquared: 0.633735),
+    implementationComplexity: 27,
     stable: true,
     timeComplexity: ComplexityBounds(
       best: "O(n)", average: "O(n log n)", worst: "O(n log n)"),

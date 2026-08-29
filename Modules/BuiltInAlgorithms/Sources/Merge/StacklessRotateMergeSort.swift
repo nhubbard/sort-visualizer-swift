@@ -36,6 +36,7 @@ public struct StacklessRotateMergeSort: SortAlgorithm {
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
       family: .powerLog, coefficients: [10.6138, 1.21265], rSquared: 0.997967),
+    implementationComplexity: 40,
     stable: true,
     timeComplexity: ComplexityBounds(
       best: "O(n log n)", average: "O(n log n)", worst: "O(n log n)"),

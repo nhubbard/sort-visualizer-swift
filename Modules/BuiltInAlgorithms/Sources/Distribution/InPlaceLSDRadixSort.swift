@@ -33,6 +33,7 @@ public struct InPlaceLSDRadixSort: SortAlgorithm {
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
       family: .polynomialIntercept, coefficients: [16.6802, -754.42, 12224], rSquared: 0.999925),
+    implementationComplexity: 16,
     stable: true,
     timeComplexity: ComplexityBounds(
       best: "O(n^2 log n)", average: "O(n^2 log n)", worst: "O(n^2 log n)"),

@@ -28,6 +28,7 @@ public struct PairwiseSortRecursive: SortAlgorithm {
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
       family: .powerLog, coefficients: [7.62654, 1.20495], rSquared: 0.999518),
+    implementationComplexity: 12,
     stable: true,
     timeComplexity: ComplexityBounds(
       best: "O(n log^2 n)", average: "O(n log^2 n)", worst: "O(n log^2 n)"),

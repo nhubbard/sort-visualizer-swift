@@ -12,6 +12,7 @@ public struct BurntPancakeSort: SortAlgorithm {
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
       family: .polynomialIntercept, coefficients: [7.23954, -34.1724, 279.982], rSquared: 0.999995),
+    implementationComplexity: 6,
     stable: false,
     timeComplexity: ComplexityBounds(best: "O(n^2)", average: "O(n^2)", worst: "O(n^2)"),
     spaceComplexity: "O(1)",

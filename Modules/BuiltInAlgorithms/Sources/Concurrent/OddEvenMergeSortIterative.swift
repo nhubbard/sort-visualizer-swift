@@ -12,6 +12,7 @@ public struct OddEvenMergeSortIterative: SortAlgorithm {
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
       family: .powerLaw, coefficients: [11.1341, 1.46761], rSquared: 0.993967),
+    implementationComplexity: 8,
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(log^2 n)", average: "O(log^2 n)", worst: "O(log^2 n)"),

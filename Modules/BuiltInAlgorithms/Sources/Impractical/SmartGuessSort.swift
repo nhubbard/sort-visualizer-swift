@@ -12,6 +12,7 @@ public struct SmartGuessSort: SortAlgorithm {
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
       family: .nToTheNLike, coefficients: [60.7972, 0.423037], rSquared: 0.996733),
+    implementationComplexity: 12,
     stable: false,
     timeComplexity: ComplexityBounds(best: "O(n)", average: "O(n^n)", worst: "O(n^n)"),
     spaceComplexity: "O(n)",

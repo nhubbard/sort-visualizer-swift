@@ -25,6 +25,7 @@ public struct BinaryDoubleInsertionSort: SortAlgorithm {
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
       family: .polynomialIntercept, coefficients: [0.267874, 20.0294, -153.637], rSquared: 0.999996),
+    implementationComplexity: 17,
     stable: true,
     timeComplexity: ComplexityBounds(best: "O(n)", average: "O(n^2)", worst: "O(n^2)"),
     spaceComplexity: "O(1)",

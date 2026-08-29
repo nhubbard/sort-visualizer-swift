@@ -23,6 +23,7 @@ public struct TreeSort: SortAlgorithm {
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
       family: .polynomialIntercept, coefficients: [2.5, -1.5, -6.79585e-11], rSquared: 1),
+    implementationComplexity: 19,
     stable: true,
     timeComplexity: ComplexityBounds(best: "O(n log n)", average: "O(n log n)", worst: "O(n^2)"),
     spaceComplexity: "O(n)",

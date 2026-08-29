@@ -24,6 +24,7 @@ public struct UnoptimizedCocktailShakerSort: SortAlgorithm {
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
       family: .polynomialIntercept, coefficients: [4.99995, -2.48194, -1.36904], rSquared: 1),
+    implementationComplexity: 7,
     stable: true,
     timeComplexity: ComplexityBounds(best: "O(n^2)", average: "O(n^2)", worst: "O(n^2)"),
     spaceComplexity: "O(1)",

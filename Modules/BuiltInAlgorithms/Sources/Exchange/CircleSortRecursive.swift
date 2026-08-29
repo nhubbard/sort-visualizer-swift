@@ -23,6 +23,7 @@ public struct CircleSortRecursive: SortAlgorithm {
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
       family: .powerLog, coefficients: [9.13569, 1.2496], rSquared: 0.99562),
+    implementationComplexity: 9,
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n log n)", average: "O(n log^2 n)", worst: "O(n log^2 n)"),

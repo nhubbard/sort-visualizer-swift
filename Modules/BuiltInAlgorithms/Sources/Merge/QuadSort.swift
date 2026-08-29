@@ -29,6 +29,7 @@ public struct QuadSort: SortAlgorithm {
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
       family: .powerLog, coefficients: [1.02001, 1.21198], rSquared: 0.859447),
+    implementationComplexity: 592,
     stable: true,
     timeComplexity: ComplexityBounds(
       best: "O(n)", average: "O(n log n)", worst: "O(n log n)"),

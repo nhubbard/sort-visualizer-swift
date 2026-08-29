@@ -12,6 +12,7 @@ public struct BitonicSortIterative: SortAlgorithm {
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
       family: .powerLaw, coefficients: [14.1579, 1.4515], rSquared: 0.991909),
+    implementationComplexity: 10,
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(log^2 n)", average: "O(log^2 n)", worst: "O(log^2 n)"),

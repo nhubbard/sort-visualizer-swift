@@ -26,6 +26,7 @@ public struct CreaseSort: SortAlgorithm {
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
       family: .powerLog, coefficients: [5.78236, 1.2632], rSquared: 0.996878),
+    implementationComplexity: 9,
     stable: true,
     timeComplexity: ComplexityBounds(
       best: "O(n log^2 n)", average: "O(n log^2 n)", worst: "O(n log^2 n)"),

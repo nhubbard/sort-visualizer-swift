@@ -18,6 +18,7 @@ public struct GrailSort: SortAlgorithm {
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
       family: .powerLog, coefficients: [6.66926, 1.21828], rSquared: 0.996923),
+    implementationComplexity: 214,
     stable: true,
     timeComplexity: ComplexityBounds(
       best: "O(n log n)", average: "O(n log n)", worst: "O(n log n)"),

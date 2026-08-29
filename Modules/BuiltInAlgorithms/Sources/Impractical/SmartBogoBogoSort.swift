@@ -12,6 +12,7 @@ public struct SmartBogoBogoSort: SortAlgorithm {
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
       family: .factorial, coefficients: [97.5984, 0.252089], rSquared: 0.99214),
+    implementationComplexity: 5,
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n)", average: "O(n \\times n!)", worst: "O(n \\times n!)"),

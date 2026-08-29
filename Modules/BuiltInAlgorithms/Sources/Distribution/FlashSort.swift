@@ -26,6 +26,7 @@ public struct FlashSort: SortAlgorithm {
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
       family: .polynomialIntercept, coefficients: [0.00518025, 9.68803, -17.3324], rSquared: 0.999018),
+    implementationComplexity: 21,
     stable: true,
     timeComplexity: ComplexityBounds(best: "O(n)", average: "O(n)", worst: "O(n^2)"),
     spaceComplexity: "O(n)",

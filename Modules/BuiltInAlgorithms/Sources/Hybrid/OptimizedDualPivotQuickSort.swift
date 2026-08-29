@@ -38,6 +38,7 @@ public struct OptimizedDualPivotQuickSort: SortAlgorithm {
     // (real partitioning), so no single smooth 2-parameter family can fit both regimes at once.
     // Every sampled size still sorted correctly; this is the same kind of threshold-adjacent poor
     // fit already accepted for other shipped algorithms (e.g. `indexsort+halfrotation` at 0.344).
+    implementationComplexity: 26,
     stable: false,
     timeComplexity: ComplexityBounds(best: "O(n log n)", average: "O(n log n)", worst: "O(n^2)"),
     spaceComplexity: "O(log n)",

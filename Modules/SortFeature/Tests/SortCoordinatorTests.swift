@@ -15,6 +15,7 @@ private struct FakeAlgorithm: SortAlgorithm {
     AlgorithmMetadata(
       displayName: "Coordinator Fake", category: .exchange, sizeRange: 1...64,
       growthModel: .unconstrained,
+      implementationComplexity: 0,
       stable: true,
       timeComplexity: ComplexityBounds(best: "O(n)", average: "O(n^2)", worst: "O(n^2)"),
       spaceComplexity: "O(1)", iconName: "fake")

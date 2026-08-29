@@ -15,6 +15,7 @@ public struct UnstableGrailSort: SortAlgorithm {
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
       family: .powerLog, coefficients: [4.96437, 1.24975], rSquared: 0.990058),
+    implementationComplexity: 98,
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n log n)", average: "O(n log n)", worst: "O(n log n)"),

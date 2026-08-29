@@ -26,6 +26,7 @@ public struct PairwiseMergeSortIterative: SortAlgorithm {
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
       family: .powerLog, coefficients: [7.88721, 1.217], rSquared: 0.998619),
+    implementationComplexity: 14,
     stable: true,
     timeComplexity: ComplexityBounds(
       best: "O(n log^2 n)", average: "O(n log^2 n)", worst: "O(n log^2 n)"),

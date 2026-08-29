@@ -10,6 +10,7 @@ private func makeMetadata(detectedGrowthModel: DetectedGrowthModel?) -> Algorith
     sizeRange: 1...1,
     growthModel: OperationGrowthModel(anchorSize: 219, coefficients: [238_710, 2185, 5]),
     detectedGrowthModel: detectedGrowthModel,
+    implementationComplexity: 0,
     stable: true,
     timeComplexity: ComplexityBounds(best: "O(1)", average: "O(1)", worst: "O(1)"),
     spaceComplexity: "O(1)",

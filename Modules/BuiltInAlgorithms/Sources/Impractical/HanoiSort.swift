@@ -41,6 +41,7 @@ public struct HanoiSort: SortAlgorithm {
       measuredSafeCeiling: 16),
     detectedGrowthModel: DetectedGrowthModel(
       family: .exponential, coefficients: [2.73103, 1.98323], rSquared: 0.998731),
+    implementationComplexity: 158,
     stable: false,
     timeComplexity: ComplexityBounds(best: "O(n log n)", average: "O(2^n)", worst: "O(2^n)"),
     spaceComplexity: "O(n)",

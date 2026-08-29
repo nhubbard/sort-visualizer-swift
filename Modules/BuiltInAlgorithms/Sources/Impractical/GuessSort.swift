@@ -12,6 +12,7 @@ public struct GuessSort: SortAlgorithm {
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
       family: .exponential, coefficients: [0.0908296, 20.479], rSquared: 0.997496),
+    implementationComplexity: 17,
     stable: false,
     timeComplexity: ComplexityBounds(best: "O(n)", average: "O(n^n)", worst: "O(n^n)"),
     spaceComplexity: "O(n)",

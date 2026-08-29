@@ -36,6 +36,7 @@ public struct SplaySort: SortAlgorithm {
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
       family: .powerLog, coefficients: [1.53133, 1.08701], rSquared: 0.999659),
+    implementationComplexity: 36,
     stable: true,
     timeComplexity: ComplexityBounds(best: "O(n)", average: "O(n log n)", worst: "O(n log n)"),
     spaceComplexity: "O(n)",

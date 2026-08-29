@@ -25,6 +25,7 @@ public struct AATreeSort: SortAlgorithm {
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
       family: .powerLog, coefficients: [5.18022, 1.08525], rSquared: 0.999728),
+    implementationComplexity: 17,
     stable: true,
     timeComplexity: ComplexityBounds(best: "O(n log n)", average: "O(n log n)", worst: "O(n log n)"),
     spaceComplexity: "O(n)",

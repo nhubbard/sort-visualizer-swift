@@ -23,6 +23,7 @@ public struct ForcedStableQuickSort: SortAlgorithm {
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
       family: .polynomialIntercept, coefficients: [0.172442, 43.6682, -241.159], rSquared: 0.99998),
+    implementationComplexity: 30,
     stable: true,
     timeComplexity: ComplexityBounds(
       best: "O(n log n)", average: "O(n log n)", worst: "O(n^2)"),

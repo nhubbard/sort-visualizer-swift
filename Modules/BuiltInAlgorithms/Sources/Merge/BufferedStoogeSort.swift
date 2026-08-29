@@ -40,6 +40,7 @@ public struct BufferedStoogeSort: SortAlgorithm {
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
       family: .polynomialIntercept, coefficients: [1.69348, 30.8934, -173.24], rSquared: 0.999994),
+    implementationComplexity: 14,
     stable: true,
     timeComplexity: ComplexityBounds(best: "O(n^2)", average: "O(n^2)", worst: "O(n^2)"),
     spaceComplexity: "O(log n)",

@@ -41,6 +41,7 @@ public struct SmoothSort: SortAlgorithm {
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
       family: .polynomialIntercept, coefficients: [0.0757706, 21.0747, -333.316], rSquared: 0.999608),
+    implementationComplexity: 28,
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n)", average: "O(n log n)", worst: "O(n log n)"),

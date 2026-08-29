@@ -15,6 +15,7 @@ public struct BinaryQuickSortIterative: SortAlgorithm {
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
       family: .powerLog, coefficients: [6.97262, 1.01882], rSquared: 0.997448),
+    implementationComplexity: 14,
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n log n)", average: "O(n log n)", worst: "O(n log n)"),

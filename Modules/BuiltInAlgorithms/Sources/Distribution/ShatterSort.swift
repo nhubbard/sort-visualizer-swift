@@ -19,6 +19,7 @@ public struct ShatterSort: SortAlgorithm {
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
       family: .polynomialIntercept, coefficients: [0.227713, 23.3957, -357.268], rSquared: 0.995959),
+    implementationComplexity: 13,
     stable: true,
     timeComplexity: ComplexityBounds(
       best: "O(n)", average: "O(n + k)", worst: "O(n^2)"),

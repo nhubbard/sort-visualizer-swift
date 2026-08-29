@@ -12,6 +12,7 @@ public struct StablePermutationSort: SortAlgorithm {
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
       family: .factorial, coefficients: [68.769, 1.06381], rSquared: 0.99929),
+    implementationComplexity: 12,
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n)", average: "O(n \\times n!)", worst: "O(n \\times n!)"),

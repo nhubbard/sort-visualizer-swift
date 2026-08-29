@@ -12,6 +12,7 @@ public struct StoogeSort: SortAlgorithm {
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
       family: .polynomialIntercept, coefficients: [140.924, -5601.35, 60301.7], rSquared: 0.999984),
+    implementationComplexity: 5,
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n^{2.71})", average: "O(n^{2.71})", worst: "O(n^{2.71})"),

@@ -41,6 +41,7 @@ public struct OptimizedBottomUpMergeSort: SortAlgorithm {
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
       family: .polynomialIntercept, coefficients: [0.031255, 9.79871, 22.3343], rSquared: 0.998999),
+    implementationComplexity: 26,
     stable: true,
     // No data-dependent short-circuit anywhere — the doubling merge structure runs the same
     // shape of passes regardless of input order.

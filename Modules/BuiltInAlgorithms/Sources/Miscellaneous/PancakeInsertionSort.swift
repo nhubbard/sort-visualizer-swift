@@ -27,6 +27,7 @@ public struct PancakeInsertionSort: SortAlgorithm {
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
       family: .polynomialIntercept, coefficients: [3.15629, 38.1929, -381.408], rSquared: 1),
+    implementationComplexity: 25,
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n)", average: "O(n^2)", worst: "O(n^2)"),

@@ -41,6 +41,7 @@ public struct AndreySort: SortAlgorithm {
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
       family: .powerLog, coefficients: [11.6503, 1.08463], rSquared: 0.996129),
+    implementationComplexity: 43,
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n log n)", average: "O(n log n)", worst: "O(n log n)"),

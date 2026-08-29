@@ -12,6 +12,7 @@ public struct BozoSort: SortAlgorithm {
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
       family: .exponential, coefficients: [0.0751986, 6.63643], rSquared: 0.998958),
+    implementationComplexity: 11,
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n)", average: "O(n \\times n!)", worst: "O(n \\times n!)"),

@@ -45,6 +45,7 @@ public struct BogoBogoSort: SortAlgorithm {
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
       family: .factorial, coefficients: [9.98816, 2.35705], rSquared: 0.458102),
+    implementationComplexity: 35,
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n)", average: "O(n \\times n!^2)", worst: "O(n \\times n!^2)"),

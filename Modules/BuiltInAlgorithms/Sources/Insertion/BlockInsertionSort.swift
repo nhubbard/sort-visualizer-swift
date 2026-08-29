@@ -34,6 +34,7 @@ public struct BlockInsertionSort: SortAlgorithm {
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
       family: .polynomialIntercept, coefficients: [0.763473, 20.1188, -139.595], rSquared: 0.999999),
+    implementationComplexity: 43,
     stable: true,
     timeComplexity: ComplexityBounds(
       best: "O(n)", average: "O(n log n)", worst: "O(n^2)"),

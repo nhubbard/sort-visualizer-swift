@@ -40,6 +40,7 @@ public struct ImprovedBlockSelectionSort: SortAlgorithm {
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
       family: .powerLog, coefficients: [9.0329, 1.20228], rSquared: 0.99526),
+    implementationComplexity: 53,
     stable: false,
     timeComplexity: ComplexityBounds(best: "O(n log n)", average: "O(n log n)", worst: "O(n log n)"),
     spaceComplexity: "O(1)",

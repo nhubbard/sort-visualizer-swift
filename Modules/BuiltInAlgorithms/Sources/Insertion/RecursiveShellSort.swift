@@ -12,6 +12,7 @@ public struct RecursiveShellSort: SortAlgorithm {
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
       family: .polynomialIntercept, coefficients: [0.235672, 52.0013, -524.469], rSquared: 0.999937),
+    implementationComplexity: 8,
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n log n)", average: "O(n^{1.25})", worst: "O(n^2)"),

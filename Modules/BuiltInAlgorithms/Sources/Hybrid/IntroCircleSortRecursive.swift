@@ -22,6 +22,7 @@ public struct IntroCircleSortRecursive: SortAlgorithm {
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
       family: .polynomialIntercept, coefficients: [0.251744, 81.7865, -969.005], rSquared: 0.999804),
+    implementationComplexity: 14,
     stable: false,
     // Best/average mirror CircleSortRecursive's O(n log n)/O(n log^2 n). Worst case differs:
     // passes are capped at `threshold`, then the insertion sort fallback's O(n^2) shift step

@@ -48,6 +48,7 @@ public struct DropMergeSort: SortAlgorithm {
     // right shuffle to bind against: growthModel exists to bound the *expensive* case, and an
     // adaptive sort's cheap case (already-sorted-like input) would badly understate real cost
     // for anything genuinely disordered.
+    implementationComplexity: 130,
     stable: false,
     timeComplexity: ComplexityBounds(best: "O(n)", average: "O(n log n)", worst: "O(n log n)"),
     spaceComplexity: "O(n)",

@@ -21,6 +21,7 @@ public struct IndexSort: SortAlgorithm {
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
       family: .powerLaw, coefficients: [0.00560557, 3.244], rSquared: 0.344362),
+    implementationComplexity: 7,
     stable: false,
     timeComplexity: ComplexityBounds(best: "O(n)", average: "O(n)", worst: "O(n)"),
     spaceComplexity: "O(1)",

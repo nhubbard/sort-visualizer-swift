@@ -27,6 +27,7 @@ public struct LRQuickSort: SortAlgorithm {
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
       family: .polynomialIntercept, coefficients: [0.752436, 14.0195, -2.24718], rSquared: 1),
+    implementationComplexity: 11,
     stable: false,
     timeComplexity: ComplexityBounds(best: "O(n log n)", average: "O(n log n)", worst: "O(n^2)"),
     spaceComplexity: "O(log n)",

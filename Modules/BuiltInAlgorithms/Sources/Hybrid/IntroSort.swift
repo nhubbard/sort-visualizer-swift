@@ -13,6 +13,7 @@ public struct IntroSort: SortAlgorithm {
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
       family: .polynomialIntercept, coefficients: [0.176868, 92.5566, -1295.45], rSquared: 0.999783),
+    implementationComplexity: 28,
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n log n)", average: "O(n log n)", worst: "O(n log n)"),

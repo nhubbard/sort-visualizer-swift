@@ -30,6 +30,7 @@ public struct WeaveSortRecursive: SortAlgorithm {
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
       family: .powerLog, coefficients: [8.05423, 1.19457], rSquared: 0.999815),
+    implementationComplexity: 12,
     stable: true,
     timeComplexity: ComplexityBounds(
       best: "O(n log^2 n)", average: "O(n log^2 n)", worst: "O(n log^2 n)"),

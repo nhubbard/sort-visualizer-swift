@@ -12,6 +12,7 @@ public struct AsynchronousSort: SortAlgorithm {
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
       family: .polynomialIntercept, coefficients: [2, 3, 0], rSquared: 1),
+    implementationComplexity: 8,
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n + k)", average: "O(n + k)", worst: "O(n + k)"),

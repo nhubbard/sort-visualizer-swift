@@ -12,6 +12,7 @@ public struct LazyHeapSort: SortAlgorithm {
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
       family: .polynomialIntercept, coefficients: [0.250817, 58.13, -557.877], rSquared: 0.999897),
+    implementationComplexity: 9,
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n \\times \\sqrt{n})", average: "O(n \\times \\sqrt{n})",

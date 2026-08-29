@@ -12,6 +12,7 @@ public struct OddEvenSort: SortAlgorithm {
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
       family: .polynomialIntercept, coefficients: [5.00077, -0.30601, 18.2392], rSquared: 1),
+    implementationComplexity: 7,
     stable: true,
     timeComplexity: ComplexityBounds(best: "O(n)", average: "O(n^2)", worst: "O(n^2)"),
     spaceComplexity: "O(1)",

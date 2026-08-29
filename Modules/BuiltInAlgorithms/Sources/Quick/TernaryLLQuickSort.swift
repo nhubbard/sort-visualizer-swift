@@ -12,6 +12,7 @@ public struct TernaryLLQuickSort: SortAlgorithm {
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
       family: .polynomialIntercept, coefficients: [3.74962, 17.6535, -11.6368], rSquared: 1),
+    implementationComplexity: 19,
     stable: false,
     timeComplexity: ComplexityBounds(best: "O(n log n)", average: "O(n log n)", worst: "O(n^2)"),
     spaceComplexity: "O(log n)",

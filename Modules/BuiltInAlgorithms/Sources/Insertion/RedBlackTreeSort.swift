@@ -23,6 +23,7 @@ public struct RedBlackTreeSort: SortAlgorithm {
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
       family: .powerLog, coefficients: [4.13756, 1.13222], rSquared: 0.998576),
+    implementationComplexity: 25,
     stable: true,
     timeComplexity: ComplexityBounds(best: "O(n log n)", average: "O(n log n)", worst: "O(n log n)"),
     spaceComplexity: "O(n)",

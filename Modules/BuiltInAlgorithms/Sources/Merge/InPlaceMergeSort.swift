@@ -22,6 +22,7 @@ public struct InPlaceMergeSort: SortAlgorithm {
     // (driven by the fixed index `mid + 1`), so `push` can walk a duplicate past another
     // occurrence of the same value at a different recursion level without the two ever being
     // compared directly.
+    implementationComplexity: 12,
     stable: false,
     // Best case (already-sorted): merge never swaps, push never runs, O(n log n). Average/worst:
     // push turns each merge into an insertion-sort-style shift across the two runs, so summed

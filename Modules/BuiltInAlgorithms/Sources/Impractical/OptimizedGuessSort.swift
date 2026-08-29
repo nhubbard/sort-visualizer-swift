@@ -12,6 +12,7 @@ public struct OptimizedGuessSort: SortAlgorithm {
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
       family: .nToTheNLike, coefficients: [9.19138, 0.959777], rSquared: 0.99994),
+    implementationComplexity: 10,
     stable: false,
     timeComplexity: ComplexityBounds(best: "O(n)", average: "O(n^n)", worst: "O(n^n)"),
     spaceComplexity: "O(n)",

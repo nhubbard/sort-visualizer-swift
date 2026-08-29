@@ -42,6 +42,7 @@ public struct NewShuffleMergeSort: SortAlgorithm {
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
       family: .powerLog, coefficients: [4.7408, 1.32409], rSquared: 0.997457),
+    implementationComplexity: 54,
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n log n)", average: "O(n log n)", worst: "O(n log n)"),

@@ -21,7 +21,7 @@ private struct FakeCountingSort: SortAlgorithm {
   let id = AlgorithmID(rawValue: "fake-countingsort")
   let metadata = AlgorithmMetadata(
     displayName: "Fake Counting Sort", category: .distribution, sizeRange: 16...256,
-    growthModel: .unconstrained, stable: true,
+    growthModel: .unconstrained, implementationComplexity: 0, stable: true,
     timeComplexity: ComplexityBounds(best: "O(n+k)", average: "O(n+k)", worst: "O(n+k)"),
     spaceComplexity: "O(n+k)", iconName: "fake"
   )

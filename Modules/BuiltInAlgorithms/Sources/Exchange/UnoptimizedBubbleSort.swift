@@ -12,6 +12,7 @@ public struct UnoptimizedBubbleSort: SortAlgorithm {
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
       family: .polynomialIntercept, coefficients: [7.5, -7.5, 0], rSquared: 1),
+    implementationComplexity: 5,
     stable: true,
     timeComplexity: ComplexityBounds(best: "O(n)", average: "O(n^2)", worst: "O(n^2)"),
     spaceComplexity: "O(1)",
