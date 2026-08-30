@@ -1,10 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define INSERTION_THRESHOLD 16
-
-int array[24] = {55, 12, 84, 3,  47, 91, 26, 68, 8,  73, 40, 97,
-                 15, 62, 34, 79, 21, 88, 5,  51, 66, 29, 44, 12};
+int array[40] = {55, 12, 84, 3,  47, 91, 26, 68, 8,  73, 40, 97, 15, 62,
+                 34, 79, 21, 88, 5,  51, 66, 29, 44, 12, 90, 1,  58, 33,
+                 71, 19, 60, 45, 27, 82, 6,  95, 38, 63, 9,  50};
 
 void printList(int items[], int size) {
   for (int i = 0; i < size; i++) {
@@ -18,81 +17,1029 @@ void printList(int items[], int size) {
   }
 }
 
-void insertionSort(int arr[], int lo, int hi) {
-  for (int i = lo + 1; i < hi; i++) {
-    int key = arr[i];
-    int j = i - 1;
-    while (j >= lo && arr[j] > key) {
-      arr[j + 1] = arr[j];
-      j--;
-    }
-    arr[j + 1] = key;
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+static void swap2(int arr[], int i, int j) {
+  int t = arr[i];
+  arr[i] = arr[j];
+  arr[j] = t;
+}
+
+static void reverseInclusive(int arr[], int lo, int hi) {
+  while (lo < hi) {
+    swap2(arr, lo, hi);
+    lo++;
+    hi--;
   }
 }
 
-/* Returns whichever of a, b, c indexes the middle value of the three. */
-int medianOfThree(int arr[], int a, int b, int c) {
-  if (arr[a] > arr[b]) {
-    int t = a;
-    a = b;
-    b = t;
+// -- Fixed-size sorting networks
+// --------------------------------------------------------------
+
+static void swapTwo(int arr[], int start) {
+  if (arr[start] > arr[start + 1]) {
+    swap2(arr, start, start + 1);
   }
-  if (arr[b] > arr[c]) {
-    b = c;
-    if (arr[a] > arr[b]) {
-      b = a;
-    }
-  }
-  return b;
 }
 
-void fluxSortRange(int arr[], int lo, int hi, int swap[]) {
-  int n = hi - lo;
-  if (n <= INSERTION_THRESHOLD) {
-    insertionSort(arr, lo, hi);
-    return;
-  }
-
-  int mid = lo + n / 2;
-  int pivot = arr[medianOfThree(arr, lo, mid, hi - 1)];
-
-  /* Partition into arr (elements <= pivot) and swap (elements > pivot). Ties go
-   * to the low side, which is what keeps the sort stable. */
-  int lowWrite = lo;
-  int highWrite = 0;
-  for (int read = lo; read < hi; read++) {
-    int value = arr[read];
-    if (value > pivot) {
-      swap[highWrite] = value;
-      highWrite++;
+static void swapThree(int arr[], int start) {
+  if (arr[start] > arr[start + 1]) {
+    if (arr[start] <= arr[start + 2]) {
+      swap2(arr, start, start + 1);
+    } else if (arr[start + 1] > arr[start + 2]) {
+      swap2(arr, start, start + 2);
     } else {
-      arr[lowWrite] = value;
-      lowWrite++;
+      int temp = arr[start];
+      arr[start] = arr[start + 1];
+      arr[start + 1] = arr[start + 2];
+      arr[start + 2] = temp;
+    }
+  } else if (arr[start + 1] > arr[start + 2]) {
+    if (arr[start] > arr[start + 2]) {
+      int temp = arr[start + 2];
+      arr[start + 2] = arr[start + 1];
+      arr[start + 1] = arr[start];
+      arr[start] = temp;
+    } else {
+      swap2(arr, start + 2, start + 1);
+    }
+  }
+}
+
+static void swapFour(int arr[], int start) {
+  if (arr[start] > arr[start + 1]) {
+    swap2(arr, start, start + 1);
+  }
+  if (arr[start + 2] > arr[start + 3]) {
+    swap2(arr, start + 2, start + 3);
+  }
+  if (arr[start + 1] > arr[start + 2]) {
+    if (arr[start] <= arr[start + 2]) {
+      if (arr[start + 1] <= arr[start + 3]) {
+        swap2(arr, start + 1, start + 2);
+      } else {
+        int temp = arr[start + 1];
+        arr[start + 1] = arr[start + 2];
+        arr[start + 2] = arr[start + 3];
+        arr[start + 3] = temp;
+      }
+    } else if (arr[start] > arr[start + 3]) {
+      swap2(arr, start + 1, start + 3);
+      swap2(arr, start, start + 2);
+    } else if (arr[start + 1] <= arr[start + 3]) {
+      int temp = arr[start + 1];
+      arr[start + 1] = arr[start];
+      arr[start] = arr[start + 2];
+      arr[start + 2] = temp;
+    } else {
+      int temp = arr[start + 1];
+      arr[start + 1] = arr[start];
+      arr[start] = arr[start + 2];
+      arr[start + 2] = arr[start + 3];
+      arr[start + 3] = temp;
+    }
+  }
+}
+
+// Inserts the element at `*end` into the already-sorted run [start, *end - 1]
+// (always exactly 4 elements: swapFour runs immediately before every call
+// site).
+static void swapFive(int arr[], int start, int *end) {
+  *end = start + 4;
+  int pta = *end;
+  *end += 1;
+  int ptt = pta;
+  pta -= 1;
+
+  if (arr[pta] > arr[ptt]) {
+    int key = arr[ptt];
+    arr[ptt] = arr[pta];
+    ptt -= 1;
+    pta -= 1;
+
+    if (pta > start && arr[pta - 1] > key) {
+      arr[ptt] = arr[pta];
+      ptt -= 1;
+      pta -= 1;
+      arr[ptt] = arr[pta];
+      ptt -= 1;
+      pta -= 1;
+    }
+
+    if (pta >= start && arr[pta] > key) {
+      arr[ptt] = arr[pta];
+      ptt -= 1;
+      pta -= 1; // NOLINT(clang-analyzer-deadcode.DeadStores)
+    }
+
+    arr[ptt] = key;
+  }
+}
+
+// Same shift logic as swapFive, one neighbor further out (checks pta - 2
+// first).
+static void tailSwapEight(int arr[], int start, int *end) {
+  int pta = *end;
+  *end += 1;
+  int ptt = pta;
+  pta -= 1;
+
+  if (arr[pta] > arr[ptt]) {
+    int key = arr[ptt];
+    arr[ptt] = arr[pta];
+    ptt -= 1;
+    pta -= 1;
+
+    if (arr[pta - 2] > key) {
+      for (int i = 0; i < 3; i++) {
+        arr[ptt] = arr[pta];
+        ptt -= 1;
+        pta -= 1;
+      }
+    }
+
+    if (pta > start && arr[pta - 1] > key) {
+      arr[ptt] = arr[pta];
+      ptt -= 1;
+      pta -= 1;
+      arr[ptt] = arr[pta];
+      ptt -= 1;
+      pta -= 1;
+    }
+
+    if (pta >= start && arr[pta] > key) {
+      arr[ptt] = arr[pta];
+      ptt -= 1;
+      pta -= 1; // NOLINT(clang-analyzer-deadcode.DeadStores)
+    }
+
+    arr[ptt] = key;
+  }
+}
+
+static void swapSix(int arr[], int start, int *end) {
+  swapFive(arr, start, end);
+  tailSwapEight(arr, start, end);
+}
+
+static void swapSeven(int arr[], int start, int *end) {
+  swapSix(arr, start, end);
+  tailSwapEight(arr, start, end);
+}
+
+static void swapEight(int arr[], int start, int *end) {
+  swapSeven(arr, start, end);
+  tailSwapEight(arr, start, end);
+}
+
+// ~4 items: one of the fixed sorting networks above. 5+: an unguarded insertion
+// sort -- swapFive/Six/Seven/Eight handle the first 5-8 elements by hand, then
+// a binary-search insertion (the `while (top > 1)` loop) places everything past
+// index 8.
+static void tailSwap(int arr[], int start, int nmemb) {
+  int end = 0;
+  switch (nmemb) {
+  case 0:
+  case 1:
+    return;
+  case 2:
+    swapTwo(arr, start);
+    return;
+  case 3:
+    swapThree(arr, start);
+    return;
+  case 4:
+    swapFour(arr, start);
+    return;
+  case 5:
+    swapFour(arr, start);
+    swapFive(arr, start, &end);
+    return;
+  case 6:
+    swapFour(arr, start);
+    swapSix(arr, start, &end);
+    return;
+  case 7:
+    swapFour(arr, start);
+    swapSeven(arr, start, &end);
+    return;
+  case 8:
+    swapFour(arr, start);
+    swapEight(arr, start, &end);
+    return;
+  default:
+    break;
+  }
+
+  swapFour(arr, start);
+  swapEight(arr, start, &end);
+  end = start + 8;
+  int offset = 8;
+
+  while (offset < nmemb) {
+    int top = offset;
+    offset += 1;
+    int pta = end;
+    end += 1;
+    int ptt = pta;
+    pta -= 1;
+
+    if (arr[pta] <= arr[ptt]) {
+      continue;
+    }
+
+    int temp = arr[ptt];
+    while (top > 1) {
+      int mid = top / 2;
+      if (arr[pta - mid] > temp) {
+        pta -= mid;
+      }
+      top -= mid;
+    }
+
+    int i = ptt;
+    while (i > pta) {
+      arr[i] = arr[i - 1];
+      i -= 1;
+    }
+    arr[pta] = temp;
+  }
+}
+
+// -- Parity merges (merge 4+4 into 8, or 8+8 into 16, tracking both ends at
+// once) ---------------
+
+// Merges the two 4-element runs at [start, start+4) and [start+4, start+8) from
+// the main array into dest (a scratch buffer), working from both ends toward
+// the middle simultaneously -- forward comparisons use <= and backward ones use
+// >, which is what keeps this stable.
+static void parityMerge4(int arr[], int start, int dest[], int auxOffset) {
+  int auxP = auxOffset;
+  int ptl = start;
+  int ptr = start + 4;
+
+  for (int i = 0; i < 3; i++) {
+    if (arr[ptl] <= arr[ptr]) {
+      dest[auxP] = arr[ptl];
+      ptl += 1;
+    } else {
+      dest[auxP] = arr[ptr];
+      ptr += 1;
+    }
+    auxP += 1;
+  }
+  if (arr[ptl] <= arr[ptr]) {
+    dest[auxP] = arr[ptl];
+  } else {
+    dest[auxP] = arr[ptr];
+  }
+
+  ptl = start + 3;
+  ptr = start + 7;
+  auxP += 4;
+
+  for (int i = 0; i < 3; i++) {
+    if (arr[ptl] > arr[ptr]) {
+      dest[auxP] = arr[ptl];
+      ptl -= 1;
+    } else {
+      dest[auxP] = arr[ptr];
+      ptr -= 1;
+    }
+    auxP -= 1;
+  }
+  if (arr[ptl] > arr[ptr]) {
+    dest[auxP] = arr[ptl];
+  } else {
+    dest[auxP] = arr[ptr];
+  }
+}
+
+// Same shape as parityMerge4, one level up: merges two 8-element runs from
+// `from` (a scratch buffer) back into the main array.
+static void parityMerge8(int arr[], const int from[], int start) {
+  int mainP = start;
+  int ptl = 0;
+  int ptr = 8;
+
+  for (int i = 0; i < 7; i++) {
+    if (from[ptl] <= from[ptr]) {
+      arr[mainP] = from[ptl];
+      ptl += 1;
+    } else {
+      arr[mainP] = from[ptr];
+      ptr += 1;
+    }
+    mainP += 1;
+  }
+  if (from[ptl] <= from[ptr]) {
+    arr[mainP] = from[ptl];
+  } else {
+    arr[mainP] = from[ptr];
+  }
+
+  ptl = 7;
+  ptr = 15;
+  mainP += 8;
+
+  for (int i = 0; i < 7; i++) {
+    if (from[ptl] > from[ptr]) {
+      arr[mainP] = from[ptl];
+      ptl -= 1;
+    } else {
+      arr[mainP] = from[ptr];
+      ptr -= 1;
+    }
+    mainP -= 1;
+  }
+  if (from[ptl] > from[ptr]) {
+    arr[mainP] = from[ptl];
+  } else {
+    arr[mainP] = from[ptr];
+  }
+}
+
+// Merges four already-sorted 4-element runs (16 elements total) via two
+// parityMerge4 passes into aux, then one parityMerge8 pass back -- but only if
+// they aren't already sorted, which the three comparisons below check cheaply.
+static void parityMerge16(int arr[], int start, int aux[]) {
+  if (arr[start + 3] <= arr[start + 4] && arr[start + 7] <= arr[start + 8] &&
+      arr[start + 11] <= arr[start + 12]) {
+    return;
+  }
+
+  parityMerge4(arr, start, aux, 0);
+  parityMerge4(arr, start + 8, aux, 8);
+  parityMerge8(arr, aux, start);
+}
+
+// -- Bottom-up tail merge (arrays under 256, and quadMerge's own fallback tail)
+// -----------------
+
+static void partialBackwardMerge(int arr[], int aux[], int start, int nmemb,
+                                 int block) {
+  int m = start + block;
+  int e = start + nmemb - 1;
+  int r = m;
+  m -= 1;
+
+  if (arr[m] <= arr[r]) {
+    return;
+  }
+  while (arr[m] <= arr[e]) {
+    e -= 1;
+  }
+
+  for (int i = r; i < r + (e - m); i++) {
+    aux[i - r] = arr[i];
+  }
+
+  int s = e - r;
+  arr[e] = arr[m];
+  e -= 1;
+  m -= 1;
+
+  // NOLINTNEXTLINE(clang-analyzer-core.UndefinedBinaryOperatorResult)
+  if (arr[start] <= aux[0]) {
+    do {
+      while (arr[m] > aux[s]) {
+        arr[e] = arr[m];
+        e -= 1;
+        m -= 1;
+      }
+      arr[e] = aux[s];
+      e -= 1;
+      s -= 1;
+    } while (s >= 0);
+  } else {
+    do {
+      while (arr[m] <= aux[s]) {
+        arr[e] = aux[s];
+        e -= 1;
+        s -= 1;
+      }
+      arr[e] = arr[m];
+      e -= 1;
+      m -= 1;
+    } while (m >= start);
+    do {
+      arr[e] = aux[s];
+      e -= 1;
+      s -= 1;
+    } while (s >= 0);
+  }
+}
+
+// Bottom-up merge pass: doubles `block` each round, merging every adjacent pair
+// of runs at the current width via partialBackwardMerge, until `block` covers
+// the whole [start, start + nmemb) range. Used directly for arrays under 256,
+// and as quadMerge's fallback tail for whatever doesn't divide evenly into quad
+// blocks.
+static void tailMerge(int arr[], int aux[], int start, int nmemb, int block) {
+  int pte = start + nmemb;
+
+  while (block < nmemb) {
+    int pta = start;
+    while (pta + block < pte) {
+      if (pta + block * 2 < pte) {
+        partialBackwardMerge(arr, aux, pta, block * 2, block);
+        pta += block * 2;
+        continue;
+      }
+      partialBackwardMerge(arr, aux, pta, pte - pta, block);
+      break;
+    }
+    block *= 2;
+  }
+}
+
+// -- Quad merge (arrays 256 and up)
+// -------------------------------------------------------------
+
+static int forwardMergeRead(const int arr[], const int aux[], int toAux,
+                            int i) {
+  return toAux ? arr[i] : aux[i];
+}
+
+static void forwardMergeWrite(int arr[], int aux[], int toAux, int i,
+                              int value) {
+  if (toAux) {
+    aux[i] = value;
+  } else {
+    arr[i] = value;
+  }
+}
+
+// Merges main-array run [start, start+block) with aux-buffer run starting at
+// auxStart (or vice versa, controlled by toAux) into the other side.
+static void forwardMerge(int arr[], int aux[], int start, int auxStart,
+                         int block, int toAux) {
+  int mergeP = toAux ? auxStart : start;
+  int l = toAux ? start : auxStart;
+  int r = toAux ? (start + block) : (auxStart + block);
+  int m = r;
+  int e = r + block;
+
+  if (forwardMergeRead(arr, aux, toAux, r - 1) <=
+      forwardMergeRead(arr, aux, toAux, e - 1)) {
+    while (l < m) {
+      if (forwardMergeRead(arr, aux, toAux, l) <=
+          forwardMergeRead(arr, aux, toAux, r)) {
+        forwardMergeWrite(arr, aux, toAux, mergeP,
+                          forwardMergeRead(arr, aux, toAux, l));
+        mergeP += 1;
+        l += 1;
+      } else {
+        forwardMergeWrite(arr, aux, toAux, mergeP,
+                          forwardMergeRead(arr, aux, toAux, r));
+        mergeP += 1;
+        r += 1;
+      }
+    }
+    while (r < e) {
+      forwardMergeWrite(arr, aux, toAux, mergeP,
+                        forwardMergeRead(arr, aux, toAux, r));
+      mergeP += 1;
+      r += 1;
+    }
+  } else {
+    while (r < e) {
+      if (forwardMergeRead(arr, aux, toAux, l) >
+          forwardMergeRead(arr, aux, toAux, r)) {
+        forwardMergeWrite(arr, aux, toAux, mergeP,
+                          forwardMergeRead(arr, aux, toAux, r));
+        mergeP += 1;
+        r += 1;
+      } else {
+        forwardMergeWrite(arr, aux, toAux, mergeP,
+                          forwardMergeRead(arr, aux, toAux, l));
+        mergeP += 1;
+        l += 1;
+      }
+    }
+    while (l < m) {
+      forwardMergeWrite(arr, aux, toAux, mergeP,
+                        forwardMergeRead(arr, aux, toAux, l));
+      mergeP += 1;
+      l += 1;
+    }
+  }
+}
+
+// Merges 4 adjacent `block`-sized runs ([start, start+4*block)) into one sorted
+// run, via up to 3 already-sorted fast-path checks that skip straight to a
+// smaller merge -- or none at all -- when consecutive runs are already in
+// order.
+static void quadMergeBlock(int arr[], int start, int aux[], int block) {
+  int blockX2 = block * 2;
+  int cMax = start + block;
+
+  if (arr[cMax - 1] <= arr[cMax]) {
+    cMax += blockX2;
+
+    if (arr[cMax - 1] <= arr[cMax]) {
+      cMax -= block;
+
+      if (arr[cMax - 1] <= arr[cMax]) {
+        return;
+      }
+
+      int pts = 0;
+      int c = start;
+      do {
+        aux[pts] = arr[c];
+        c += 1;
+        pts += 1;
+      } while (c < cMax);
+
+      cMax = c + blockX2;
+      do {
+        aux[pts] = arr[c];
+        c += 1;
+        pts += 1;
+      } while (c < cMax);
+
+      forwardMerge(arr, aux, start, 0, blockX2, 0);
+      return;
+    }
+
+    int pts = 0;
+    int c = start;
+    cMax = start + blockX2;
+    do {
+      aux[pts] = arr[c];
+      c += 1;
+      pts += 1;
+    } while (c < cMax);
+  } else {
+    forwardMerge(arr, aux, start, 0, block, 1);
+  }
+
+  forwardMerge(arr, aux, start + blockX2, blockX2, block, 1);
+  forwardMerge(arr, aux, start, 0, blockX2, 0);
+}
+
+// Quad-merges the entire [start, start+nmemb) range, doubling `block` by 4 each
+// round; falls back to tailMerge for whatever doesn't divide evenly into quad
+// blocks at the current size, and again at the very end for the final, coarsest
+// remainder.
+static void quadMerge(int arr[], int aux[], int start, int nmemb, int block) {
+  int pte = start + nmemb;
+  block = block * 4;
+
+  while (block * 2 <= nmemb) {
+    int pta = start;
+    do {
+      quadMergeBlock(arr, pta, aux, block / 4);
+      pta += block;
+    } while (pta + block <= pte);
+    tailMerge(arr, aux, pta, pte - pta, block / 4);
+    block *= 4;
+  }
+  tailMerge(arr, aux, start, nmemb, block / 4);
+}
+
+// -- Pre-sort pass
+// -------------------------------------------------------------------------------
+
+// Pre-sorting pass: a 4-item sorting network applied across the whole range,
+// with a side detector for strictly-decreasing runs -- reversed in place rather
+// than merged, since a reversal is cheaper and exactly reproduces a decreasing
+// run's sorted order. If the *entire* range turns out strictly decreasing, one
+// reversal finishes the sort outright (returns 1); otherwise this finishes with
+// parity-merge passes over what's left (returns 0, meaning the caller still has
+// more merging to do).
+static int quadSwap(int arr[], int start, int nmemb) {
+  int swapBuf[16];
+  int pta = start;
+  int count = nmemb / 4;
+  int pts = 0;
+
+  while (count > 0) {
+    count -= 1;
+
+    // innerA -- runs exactly once per outer iteration: either falls into innerB
+    // (a strictly descending run of at least 2 quad-blocks was detected) or
+    // finishes this block's own 4-item network and moves on.
+    if (arr[pta] > arr[pta + 1]) {
+      if (arr[pta + 2] > arr[pta + 3]) {
+        if (arr[pta + 1] > arr[pta + 2]) {
+          pts = pta;
+          pta += 4;
+          goto innerB;
+        }
+        swap2(arr, pta + 2, pta + 3);
+      }
+      swap2(arr, pta, pta + 1);
+    } else if (arr[pta + 2] > arr[pta + 3]) {
+      swap2(arr, pta + 2, pta + 3);
+    }
+
+    if (arr[pta + 1] > arr[pta + 2]) {
+      if (arr[pta] <= arr[pta + 2]) {
+        if (arr[pta + 1] <= arr[pta + 3]) {
+          swap2(arr, pta + 1, pta + 2);
+        } else {
+          int temp = arr[pta + 1];
+          arr[pta + 1] = arr[pta + 2];
+          arr[pta + 2] = arr[pta + 3];
+          arr[pta + 3] = temp;
+        }
+      } else if (arr[pta] > arr[pta + 3]) {
+        swap2(arr, pta + 1, pta + 3);
+        swap2(arr, pta, pta + 2);
+      } else if (arr[pta + 1] <= arr[pta + 3]) {
+        int temp = arr[pta + 1];
+        arr[pta + 1] = arr[pta];
+        arr[pta] = arr[pta + 2];
+        arr[pta + 2] = temp;
+      } else {
+        int temp = arr[pta + 1];
+        arr[pta + 1] = arr[pta];
+        arr[pta] = arr[pta + 2];
+        arr[pta + 2] = arr[pta + 3];
+        arr[pta + 3] = temp;
+      }
+    }
+    pta += 4;
+    goto swapper_continue;
+
+  innerB:
+    while (1) {
+      if (count > 0) {
+        count -= 1;
+
+        if (arr[pta] > arr[pta + 1]) {
+          if (arr[pta + 2] > arr[pta + 3]) {
+            if (arr[pta + 1] > arr[pta + 2]) {
+              if (arr[pta - 1] > arr[pta]) {
+                pta += 4;
+                continue;
+              }
+            }
+            swap2(arr, pta + 2, pta + 3);
+          }
+          swap2(arr, pta, pta + 1);
+        } else if (arr[pta + 2] > arr[pta + 3]) {
+          swap2(arr, pta + 2, pta + 3);
+        }
+
+        if (arr[pta + 1] > arr[pta + 2]) {
+          if (arr[pta] <= arr[pta + 2]) {
+            if (arr[pta + 1] <= arr[pta + 3]) {
+              swap2(arr, pta + 1, pta + 2);
+            } else {
+              int temp = arr[pta + 1];
+              arr[pta + 1] = arr[pta + 2];
+              arr[pta + 2] = arr[pta + 3];
+              arr[pta + 3] = temp;
+            }
+          } else if (arr[pta] > arr[pta + 3]) {
+            swap2(arr, pta, pta + 2);
+            swap2(arr, pta + 1, pta + 3);
+          } else if (arr[pta + 1] <= arr[pta + 3]) {
+            int temp = arr[pta];
+            arr[pta] = arr[pta + 2];
+            arr[pta + 2] = arr[pta + 1];
+            arr[pta + 1] = temp;
+          } else {
+            int temp = arr[pta];
+            arr[pta] = arr[pta + 2];
+            arr[pta + 2] = arr[pta + 3];
+            arr[pta + 3] = arr[pta + 1];
+            arr[pta + 1] = temp;
+          }
+        }
+
+        reverseInclusive(arr, pts, pta - 1);
+        pta += 4;
+        goto swapper_continue;
+      }
+
+      if (pts == start) {
+        int remainder = nmemb % 4;
+        if (remainder == 3) {
+          remainder = (arr[pta + 1] > arr[pta + 2]) ? 2 : -1;
+        }
+        if (remainder == 2) {
+          remainder = (arr[pta] > arr[pta + 1]) ? 1 : -1;
+        }
+        if (remainder == 1) {
+          remainder = (arr[pta - 1] > arr[pta]) ? 0 : -1;
+        }
+        if (remainder == 0) {
+          reverseInclusive(arr, pts, pts + nmemb - 1);
+          return 1;
+        }
+      }
+
+      reverseInclusive(arr, pts, pta - 1);
+      goto swapper_end;
+    }
+
+  swapper_continue:;
+  }
+swapper_end:;
+
+  tailSwap(arr, pta, nmemb % 4);
+
+  pta = start;
+  count = nmemb / 16;
+  while (count > 0) {
+    count -= 1;
+    parityMerge16(arr, pta, swapBuf);
+    pta += 16;
+  }
+
+  if (nmemb % 16 > 4) {
+    tailMerge(arr, swapBuf, pta, nmemb % 16, 4);
+  }
+
+  return 0;
+}
+
+// -- Entry points into the embedded quadsort core
+// -----------------------------------------------
+
+// Top-level dispatch by size: under 16 is a plain tailSwap; under 256 pre-sorts
+// via quadSwap then finishes with tailMerge; 256 and up finishes with the full
+// quadMerge pass instead. Allocates and frees its own scratch buffer each call.
+static void quadSortRange(int arr[], int start, int length) {
+  if (length < 16) {
+    tailSwap(arr, start, length);
+  } else if (length < 256) {
+    if (quadSwap(arr, start, length) == 0) {
+      int *buffer = malloc(128 * sizeof(int));
+      tailMerge(arr, buffer, start, length, 16);
+      free(buffer);
+    }
+  } else {
+    if (quadSwap(arr, start, length) == 0) {
+      int *buffer = malloc((length / 2) * sizeof(int));
+      quadMerge(arr, buffer, start, length, 16);
+      free(buffer);
+    }
+  }
+}
+
+// Same dispatch as quadSortRange, but merges into `swapBuf` -- a
+// caller-supplied scratch buffer
+// -- instead of allocating/freeing a fresh one. FluxSort uses this to reuse one
+// top-level scratch buffer across every depth of its own recursive partition.
+static void quadSortRangeUsing(int arr[], int swapBuf[], int start,
+                               int length) {
+  if (length < 16) {
+    tailSwap(arr, start, length);
+  } else if (length < 256) {
+    if (quadSwap(arr, start, length) == 0) {
+      tailMerge(arr, swapBuf, start, length, 16);
+    }
+  } else {
+    if (quadSwap(arr, start, length) == 0) {
+      quadMerge(arr, swapBuf, start, length, 16);
+    }
+  }
+}
+
+// -- FluxSort's own recursive partition
+// --------------------------------------------------------
+
+#define FLUX_OUT 24
+
+// One adjacent-pair scan counting inversions ("balance"). Returns 0 whenever
+// the array was fully handled without partitioning: already sorted, fully
+// reverse-sorted (one reversal away from sorted), or mostly-sorted-or-reversed
+// enough (balance within 1/6 of either end) that a plain quadSortRange wins
+// outright. Returns 1 only when real partitioning in fluxPartition is
+// worthwhile.
+static int fluxAnalyze(int arr[], int nmemb) {
+  int balance = 0;
+  int pta = 0;
+  int cnt = nmemb;
+  while (1) {
+    cnt -= 1;
+    if (cnt <= 0)
+      break;
+    int left = pta;
+    pta += 1;
+    if (arr[left] > arr[pta]) {
+      balance += 1;
     }
   }
 
-  for (int i = 0; i < highWrite; i++) {
-    arr[lowWrite + i] = swap[i];
+  if (balance == 0) {
+    return 0;
   }
 
-  if (lowWrite == hi) {
-    /* Every element in range was <= pivot -- a run of duplicates around the
-     * pivot value can cause this. There's no split to recurse into, so finish
-     * directly. */
-    insertionSort(arr, lo, hi);
-    return;
+  if (balance == nmemb - 1) {
+    reverseInclusive(arr, 0, nmemb - 1);
+    return 0;
   }
 
-  fluxSortRange(arr, lo, lowWrite, swap);
-  fluxSortRange(arr, lowWrite, hi, swap);
+  if (balance <= nmemb / 6 || balance >= nmemb / 6 * 5) {
+    quadSortRange(arr, 0, nmemb);
+    return 0;
+  }
+
+  return 1;
 }
 
+// 1 if main[a] > main[b], else 0. Branches on mainIsSwap per fluxsort's
+// aux-vs-main comparison rule: comparisons against the live array are real;
+// comparisons against the swap buffer (once a recursive call is reading from it
+// instead) are bare value comparisons.
+static int mainGT(const int arr[], const int swapBuf[], int mainIsSwap, int a,
+                  int b) {
+  if (mainIsSwap) {
+    return swapBuf[a] > swapBuf[b] ? 1 : 0;
+  }
+  return arr[a] > arr[b] ? 1 : 0;
+}
+
+// Median-of-3 index tournament.
+static int medianOfThree(const int arr[], const int swapBuf[], int mainIsSwap,
+                         int v0, int v1, int v2) {
+  int val = mainGT(arr, swapBuf, mainIsSwap, v0, v1);
+  int t0 = val;
+  int t1 = (1 - val);
+
+  val = mainGT(arr, swapBuf, mainIsSwap, v0, v2);
+  t0 += val;
+  if (t0 == 1) {
+    return v0;
+  }
+
+  val = mainGT(arr, swapBuf, mainIsSwap, v1, v2);
+  t1 += val;
+  return t1 == 1 ? v1 : v2;
+}
+
+// Median-of-5 index tournament.
+static int medianOfFive(const int arr[], const int swapBuf[], int mainIsSwap,
+                        int v0, int v1, int v2, int v3, int v4) {
+  int val = mainGT(arr, swapBuf, mainIsSwap, v0, v1);
+  int t0 = val;
+  int t1 = (1 - val);
+
+  val = mainGT(arr, swapBuf, mainIsSwap, v0, v2);
+  t0 += val;
+  int t2 = (1 - val);
+
+  val = mainGT(arr, swapBuf, mainIsSwap, v0, v3);
+  t0 += val;
+  int t3 = (1 - val);
+
+  val = mainGT(arr, swapBuf, mainIsSwap, v0, v4);
+  t0 += val;
+
+  if (t0 == 2) {
+    return v0;
+  }
+
+  val = mainGT(arr, swapBuf, mainIsSwap, v1, v2);
+  t1 += val;
+  t2 += (1 - val);
+
+  val = mainGT(arr, swapBuf, mainIsSwap, v1, v3);
+  t1 += val;
+  t3 += (1 - val);
+
+  val = mainGT(arr, swapBuf, mainIsSwap, v1, v4);
+  t1 += val;
+
+  if (t1 == 2) {
+    return v1;
+  }
+
+  val = mainGT(arr, swapBuf, mainIsSwap, v2, v3);
+  t2 += val;
+  t3 += (1 - val);
+
+  val = mainGT(arr, swapBuf, mainIsSwap, v2, v4);
+  t2 += val;
+
+  if (t2 == 2) {
+    return v2;
+  }
+
+  val = mainGT(arr, swapBuf, mainIsSwap, v3, v4);
+  t3 += val;
+
+  return t3 == 2 ? v3 : v4;
+}
+
+// Picks a pivot from 9 evenly-spaced samples via 3 median-of-3s feeding one
+// more -- used when the partition being pivoted is at most 1024 elements.
+static int medianOfNine(const int arr[], const int swapBuf[], int mainIsSwap,
+                        int ptx, int nmemb) {
+  int div = nmemb / 16;
+  int v0 = medianOfThree(arr, swapBuf, mainIsSwap, ptx + div * 2, ptx + div * 1,
+                         ptx + div * 4);
+  int v1 = medianOfThree(arr, swapBuf, mainIsSwap, ptx + div * 8, ptx + div * 6,
+                         ptx + div * 10);
+  int v2 = medianOfThree(arr, swapBuf, mainIsSwap, ptx + div * 14,
+                         ptx + div * 12, ptx + div * 15);
+  return medianOfThree(arr, swapBuf, mainIsSwap, v0, v1, v2);
+}
+
+// Picks a pivot from 15 evenly-spaced samples via 5 median-of-3s feeding one
+// median-of-5 -- used once the partition being pivoted exceeds 1024 elements.
+static int medianOfFifteen(const int arr[], const int swapBuf[], int mainIsSwap,
+                           int ptx, int nmemb) {
+  int div = nmemb / 16;
+  int v0 = medianOfThree(arr, swapBuf, mainIsSwap, ptx + div * 2, ptx + div * 1,
+                         ptx + div * 3);
+  int v1 = medianOfThree(arr, swapBuf, mainIsSwap, ptx + div * 5, ptx + div * 4,
+                         ptx + div * 6);
+  int v2 = medianOfThree(arr, swapBuf, mainIsSwap, ptx + div * 8, ptx + div * 7,
+                         ptx + div * 9);
+  int v3 = medianOfThree(arr, swapBuf, mainIsSwap, ptx + div * 11,
+                         ptx + div * 10, ptx + div * 12);
+  int v4 = medianOfThree(arr, swapBuf, mainIsSwap, ptx + div * 14,
+                         ptx + div * 13, ptx + div * 15);
+  return medianOfFive(arr, swapBuf, mainIsSwap, v2, v0, v1, v3, v4);
+}
+
+// The core recursive partition. Reads "main" (the live array if !mainIsSwap,
+// else swapBuf) left to right starting at mainIsSwap ? 0 : start, picks a pivot
+// via medianOfNine/medianOfFifteen, then for every element unconditionally
+// writes it to BOTH the array (at the forward cursor pta) and swapBuf (at the
+// forward cursor pts) -- but only advances whichever cursor is that element's
+// real destination (value > piv -> swapBuf/pts, else array/pta). This is
+// fluxsort's branchless partition trick: the "wrong" write for an element is
+// simply overwritten later by the next element that really belongs at that
+// slot, so no conditional/branch is needed to pick a destination up front.
+// Recurses into whichever side still needs it (skipping straight to
+// quadSortRangeUsing once a side is small or skewed enough), high side first.
+static void fluxPartition(int arr[], int swapBuf[], int mainIsSwap, int start,
+                          int nmemb) {
+  int ptxBase = mainIsSwap ? 0 : start;
+  int medianIndex =
+      nmemb > 1024 ? medianOfFifteen(arr, swapBuf, mainIsSwap, ptxBase, nmemb)
+                   : medianOfNine(arr, swapBuf, mainIsSwap, ptxBase, nmemb);
+  int piv = mainIsSwap ? swapBuf[medianIndex] : arr[medianIndex];
+
+  int pte = ptxBase + nmemb;
+  int pta = start;
+  int pts = 0;
+  int ptx = ptxBase;
+
+  while (ptx < pte) {
+    int value = mainIsSwap ? swapBuf[ptx] : arr[ptx];
+    int val = value > piv ? 1 : 0;
+
+    arr[pta] = value;
+    pta += 1 - val;
+
+    swapBuf[pts] = value;
+    pts += val;
+
+    ptx += 1;
+  }
+
+  int sSize = pts;
+  int aSize = nmemb - sSize;
+
+  if (aSize <= sSize / 16 || sSize <= FLUX_OUT) {
+    for (int i = 0; i < sSize; i++) {
+      arr[pta + i] = swapBuf[i];
+    }
+    quadSortRangeUsing(arr, swapBuf, pta, sSize);
+  } else {
+    fluxPartition(arr, swapBuf, 1, pta, sSize);
+  }
+
+  if (sSize <= aSize / 16 || aSize <= FLUX_OUT) {
+    quadSortRangeUsing(arr, swapBuf, start, aSize);
+  } else {
+    fluxPartition(arr, swapBuf, 0, start, aSize);
+  }
+}
+
+// -- Entry point
+// ---------------------------------------------------------------------------------
+
+// Below this size, bottoms out into the embedded quadsort outright rather than
+// partitioning at all -- matches fluxsort's own `nmemb < 32` fast path.
 void sort(int arr[], int n) {
-  if (n < 2)
+  if (n < 2) {
     return;
-  int *swap = malloc(n * sizeof(int));
-  fluxSortRange(arr, 0, n, swap);
-  free(swap);
+  }
+
+  if (n < 32) {
+    quadSortRange(arr, 0, n);
+    return;
+  }
+
+  if (!fluxAnalyze(arr, n)) {
+    return;
+  }
+
+  int *swapBuf = malloc(n * sizeof(int));
+  fluxPartition(arr, swapBuf, 0, 0, n);
+  free(swapBuf);
 }
 
 int main(int argc, char *argv[]) {
