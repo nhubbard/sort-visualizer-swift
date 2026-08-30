@@ -104,7 +104,7 @@ struct GrowthModelComparisonSection: View {
       RuleMark(x: .value("Operation Cap Cutoff", cutoffSize))
         .foregroundStyle(.secondary)
         .lineStyle(StrokeStyle(lineWidth: 1, dash: [2, 2]))
-        .annotation(position: .top, alignment: .center) {
+        .annotation(position: .bottom, alignment: .center) {
           Text("Cutoff").font(.caption2).foregroundStyle(.secondary)
         }
     }

@@ -261,6 +261,39 @@ struct BigOCorrelationTests {
     #expect(referenceSeries == ["Best & Average Case", "Worst Case"])
   }
 
+  /// A stale record with an out-of-range `arraySize` (the exact category `Tools/CloudKitCleanup`
+  /// targets for deletion) shouldn't get to stretch the whole chart's domain out to accommodate
+  /// it -- it should just be excluded, as if it were never recorded.
+  @Test
+  func outOfRangeArraySizeIsExcludedEntirely() async throws {
+    let service = try makeInMemoryService()
+    try await record(service, size: 10, total: 5)
+    try await record(service, size: 100, total: 50)
+    try await record(service, size: AlgorithmMetadata.maxReasonableArraySize + 1, total: 999_999)
+
+    let summaries = try await service.fetchAllForTesting()
+    let points = bigOChartPoints(for: summaries, timeComplexity: quicksortComplexity)
+
+    #expect(points.allSatisfy { $0.size <= AlgorithmMetadata.maxReasonableArraySize })
+    // The two real, in-range sizes should still render normally -- the outlier's exclusion
+    // shouldn't itself distort what the remaining points normalize against.
+    let trend = points.filter { $0.kind == .observedTrend }.sorted { $0.size < $1.size }
+    #expect(trend.map(\.size) == [10, 100])
+  }
+
+  /// If the out-of-range record was one of only two distinct sizes, excluding it should correctly
+  /// fall through to the existing "not enough data" empty state rather than rendering a
+  /// two-point chart where one point is silently gone but the domain still reflects it.
+  @Test
+  func outOfRangeArraySizeCanDropBelowTheMinimumDistinctSizesNeeded() async throws {
+    let service = try makeInMemoryService()
+    try await record(service, size: 10, total: 5)
+    try await record(service, size: AlgorithmMetadata.maxReasonableArraySize + 1, total: 999_999)
+
+    let summaries = try await service.fetchAllForTesting()
+    #expect(bigOChartPoints(for: summaries, timeComplexity: quicksortComplexity).isEmpty)
+  }
+
   /// When all three cases share the same shape, they should merge into a single series rather
   /// than three overlapping duplicates.
   @Test

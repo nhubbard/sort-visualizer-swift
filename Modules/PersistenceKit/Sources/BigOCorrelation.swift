@@ -120,6 +120,17 @@ public func bigOChartPoints(
   for summaries: [BigORecordSnapshot],
   timeComplexity: ComplexityBounds
 ) -> [BigOChartPoint] {
+  // A stale record with an out-of-range `arraySize` (the exact category `Tools/CloudKitCleanup`
+  // exists to delete -- see its own doc comment) would otherwise become `distinctSizes`' own
+  // min/max, silently stretching this chart's entire domain out to accommodate one bad point
+  // instead of the real, reasonable range every other point actually occupies. Filtering here
+  // means a stray bad record degrades gracefully -- either ignored outright, or (if it was one of
+  // only two distinct sizes) correctly falling through to the existing "not enough data" empty
+  // state below -- rather than distorting the chart for every real point alongside it.
+  let summaries = summaries.filter {
+    $0.arraySize > 0 && $0.arraySize <= AlgorithmMetadata.maxReasonableArraySize
+  }
+
   var totalsBySize: [Int: [Int]] = [:]
   for summary in summaries {
     let total =

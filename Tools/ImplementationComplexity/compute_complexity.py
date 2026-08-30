@@ -179,6 +179,12 @@ def extract_functions(masked_text: str) -> dict[str, list[str]]:
 
 _DECISION_KEYWORDS = re.compile(r"\b(if|guard|for|while|catch|case|where)\b")
 _BARE_CALL = re.compile(r"(?<!\.)\b([A-Za-z_]\w*)\s*\(")
+# A handful of algorithms (FluxSort, TimeSort, CocktailMergeSort) call their own static helpers as
+# `Self.helper(...)`/`self.helper(...)` rather than bare `helper(...)` -- `_BARE_CALL`'s negative
+# lookbehind is deliberately blind to *any* dot-prefixed call (so `engine.compare(...)` is never
+# mistaken for a local helper), which also blinds it to these. Matched separately so a real call
+# into a real local helper doesn't silently vanish from the walk.
+_SELF_CALL = re.compile(r"\b(?:self|Self)\.([A-Za-z_]\w*)\s*\(")
 _TEMPLATE_CALL = re.compile(
     r"\b(" + "|".join(re.escape(name) for name in _TEMPLATE_TYPE_NAMES) + r")\.(\w+)\s*\(")
 
@@ -197,6 +203,10 @@ def resolve_calls(body: str, current_file: Path, local_functions: dict[str, list
     # contributes its complexity to a given caller exactly once, however many times it's invoked.
     calls: set[tuple[Path, str]] = set()
     for match in _BARE_CALL.finditer(body):
+        name = match.group(1)
+        if name in local_functions:
+            calls.add((current_file, name))
+    for match in _SELF_CALL.finditer(body):
         name = match.group(1)
         if name in local_functions:
             calls.add((current_file, name))
@@ -233,11 +243,21 @@ def complexity_of(
 
     visiting.add(key)
     functions = get_functions(file, file_cache)
-    total = 0
-    for body in functions.get(name, []):
-        total += local_complexity(body)
-        for callee_file, callee_name in resolve_calls(body, file, functions):
-            total += complexity_of(callee_file, callee_name, file_cache, memo, visiting)
+    bodies = functions.get(name, [])
+    # Local complexity sums across every body sharing this name (overloads, or unrelated same-
+    # named locals nested in different outer functions -- see `extract_functions`'s doc comment).
+    # Outgoing calls are unioned across those same bodies *before* resolving, not resolved and
+    # summed per body: two overloads of the same function (e.g. `QuadSortingTemplate.sort(_:
+    # start:length:)` / `sort(_:using:start:length:)`) typically call nearly the same underlying
+    # machinery, and summing each overload's own resolution independently would count that shared
+    # machinery once per overload -- roughly doubling it for a function with 2 near-identical
+    # overloads, for no reason connected to real complexity.
+    total = sum(local_complexity(body) for body in bodies)
+    calls: set[tuple[Path, str]] = set()
+    for body in bodies:
+        calls.update(resolve_calls(body, file, functions))
+    for callee_file, callee_name in calls:
+        total += complexity_of(callee_file, callee_name, file_cache, memo, visiting)
     visiting.discard(key)
     memo[key] = total
     return total

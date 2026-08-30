@@ -59,7 +59,7 @@ public struct FluxSort: SortAlgorithm {
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
       family: .powerLog, coefficients: [0.601011, 1.41254], rSquared: 0.75106),
-    implementationComplexity: 594,
+    implementationComplexity: 935,
     stable: true,
     // fluxsort is documented worst-case O(n log n), unlike a plain median-of-one quicksort — the
     // fluxAnalyze early-outs and the FLUX_OUT/ratio guards against a degenerate partition keep it

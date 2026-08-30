@@ -32,7 +32,7 @@ public struct TimeSort: SortAlgorithm {
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
       family: .powerLog, coefficients: [4.65303, 0.883283], rSquared: 0.999378),
-    implementationComplexity: 7,
+    implementationComplexity: 15,
     stable: true,
     timeComplexity: ComplexityBounds(
       best: "O(n log n)", average: "O(n log n)", worst: "O(n log n)"),
