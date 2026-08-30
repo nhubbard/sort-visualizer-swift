@@ -27,10 +27,10 @@ public struct BoseNelsonSortRecursive: SortAlgorithm {
     category: .concurrent,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 654, coefficients: [239600, 647.462, 0.42732],
+      anchorSize: 659, coefficients: [239425, 595.02, 0.287916],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .polynomialIntercept, coefficients: [0.42732, 88.5281, -1069.1], rSquared: 0.999872),
+      family: .powerLaw, coefficients: [5.78818, 1.63775], rSquared: 0.99478),
     implementationComplexity: 10,
     stable: true,
     timeComplexity: ComplexityBounds(

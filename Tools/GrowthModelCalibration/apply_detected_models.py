@@ -65,22 +65,39 @@ _GROWTH_MODEL_BLOCK = re.compile(
     re.MULTILINE,
 )
 
+# Always exactly this 3-line shape too -- mirrors `_GROWTH_MODEL_BLOCK` above, so a re-calibration
+# run can find and replace a previously-applied `detectedGrowthModel:` block the same
+# structural way `apply_growth_models.py` now replaces an existing `growthModel:` block, instead
+# of silently no-op'ing on every algorithm that was ever calibrated before (the original
+# behavior here: unconditionally skip whenever the keyword was already present at all, which
+# meant a corrected re-calibration -- e.g. ShoveSort's real family, fixed after its first
+# calibration mis-detected `exponential` from too narrow a sampled range -- could never actually
+# reach the source file through this script).
+_DETECTED_MODEL_BLOCK = re.compile(
+    r"^(?P<indent>[ \t]*)detectedGrowthModel: DetectedGrowthModel\(\n"
+    r"[ \t]*family:.*rSquared:.*\),$",
+    re.MULTILINE,
+)
+
 
 def insert_detected_model(path: Path, family: str, coefficients: list[float], r_squared: float) -> bool:
     text = path.read_text()
+    coefficients_literal = ", ".join(format_double(c) for c in coefficients)
+    new_block = (
+        f"{{indent}}detectedGrowthModel: DetectedGrowthModel(\n"
+        f"{{indent}}  family: .{family}, coefficients: [{coefficients_literal}], "
+        f"rSquared: {format_double(r_squared)}),")
+
+    existing = _DETECTED_MODEL_BLOCK.search(text)
+    if existing is not None:
+        text = text[: existing.start()] + new_block.format(indent=existing.group("indent")) + text[existing.end() :]
+        path.write_text(text)
+        return True
+
     match = _GROWTH_MODEL_BLOCK.search(text)
     if match is None:
         return False
-    if "detectedGrowthModel:" in text:
-        return False  # already applied -- don't insert a second one on a re-run
-
-    indent = match.group("indent")
-    coefficients_literal = ", ".join(format_double(c) for c in coefficients)
-    new_block = (
-        f"{indent}detectedGrowthModel: DetectedGrowthModel(\n"
-        f"{indent}  family: .{family}, coefficients: [{coefficients_literal}], "
-        f"rSquared: {format_double(r_squared)}),")
-    text = text[: match.end()] + "\n" + new_block + text[match.end() :]
+    text = text[: match.end()] + "\n" + new_block.format(indent=match.group("indent")) + text[match.end() :]
     path.write_text(text)
     return True
 
@@ -96,7 +113,7 @@ def main() -> None:
 
     updated = 0
     skipped_no_source: list[str] = []
-    skipped_already_applied: list[str] = []
+    skipped_no_growth_model: list[str] = []
     for entry in entries:
         algorithm_id = entry["subjectID"].split("+")[0]
         if only is not None and algorithm_id not in only:
@@ -117,17 +134,17 @@ def main() -> None:
         ):
             updated += 1
         else:
-            skipped_already_applied.append(algorithm_id)
+            skipped_no_growth_model.append(algorithm_id)
 
-    print(f"\n{updated} file(s) updated.")
+    print(f"\n{updated} file(s) updated (inserted new or replaced an existing detectedGrowthModel:).")
     if skipped_no_source:
         print(
-            f"{len(skipped_no_source)} algorithm(s) skipped -- no growthModel: block found yet "
-            f"(not calibrated): {', '.join(sorted(skipped_no_source))}", file=sys.stderr)
-    if skipped_already_applied:
+            f"{len(skipped_no_source)} algorithm(s) skipped -- no source file found: "
+            f"{', '.join(sorted(skipped_no_source))}", file=sys.stderr)
+    if skipped_no_growth_model:
         print(
-            f"{len(skipped_already_applied)} algorithm(s) skipped -- already had "
-            f"detectedGrowthModel: {', '.join(sorted(skipped_already_applied))}", file=sys.stderr)
+            f"{len(skipped_no_growth_model)} algorithm(s) skipped -- no growthModel: block found "
+            f"yet (not calibrated): {', '.join(sorted(skipped_no_growth_model))}", file=sys.stderr)
 
 
 if __name__ == "__main__":

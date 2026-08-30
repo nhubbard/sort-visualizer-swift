@@ -53,6 +53,21 @@ struct CurveFittingTests {
   }
 
   @Test
+  func declaredCubicPrefersPowerLawNotPolynomialIntercept() {
+    // Reproduces the real ShoveSort bug: `family(matching:)` used to map every declared
+    // `.polynomial(_)` shape -- degree 3 included -- to the fixed-degree-2 `polynomialIntercept`
+    // family, so a correctly-declared `O(n^3)` complexity still tie-broke toward a family that
+    // can't structurally represent cubic growth, as long as its R² landed within 0.02 of the true
+    // `powerLaw(k≈3)` winner. Over a narrow sampled range (ShoveSort's real calibration data
+    // spanned just n=16 to n=38 before its safety ceiling stopped further sampling),
+    // `polynomialIntercept` fits pure cubic data almost as well as `powerLaw` does (both score
+    // essentially perfect R² here) -- exactly the near-tie that used to matter.
+    let samples = [16.0, 17, 18, 19, 38].map { GrowthSample(n: $0, value: pow($0, 3)) }
+    let best = CurveFitting.bestFit(samples, declaredShape: .polynomial(3))
+    #expect(best?.family == .powerLaw)
+  }
+
+  @Test
   func refusesAnOverParameterizedFitWithTooFewPoints() {
     // Reproduces the real bug this guard fixes: `bogosort+heapified`'s actual measured data (4
     // points) let the 3-parameter `polynomialIntercept` family threads the needle through all 4
@@ -92,6 +107,37 @@ struct CurveFittingTests {
     for model in models {
       var previous = -Double.infinity
       for n in stride(from: 1.0, through: 1400.0, by: 7.0) {
+        let value = model.predict(n: n)
+        if value.isInfinite { break }
+        #expect(value >= previous, "\(model.family) decreased at n=\(n)")
+        previous = value
+      }
+    }
+  }
+
+  @Test
+  func rejectsANonMonotonicFitWhoseDipIsNarrowRelativeToMaxN() {
+    // Reproduces the real `shovesort+sawtooth` calibration data (widened sampling out to n=304
+    // once ShoveSort's own O(n^3) complexity was correctly recognized instead of the mis-detected
+    // O(n^2)/exponential label): fits a `polynomialIntercept` parabola whose vertex sits at
+    // n≈54.7, dipping to *-764,748* before rising again to 44M by n=304. The old single
+    // `isMonotonicallyNondecreasing(from: 1, to: maxN * 100)` grid (200 steps across
+    // [1, 30_400]) spaces its points ~152 apart -- coarser than the ~55-wide dip itself, so every
+    // grid point landed on either side of it without a single sample falling inside. Splitting
+    // into a dense `[1, maxN]` grid plus a coarser `[maxN, maxN * 100]` one (this fix) guarantees
+    // resolving anything narrower than `maxN / 200` in exactly the region every real dip risk
+    // comes from.
+    let samples: [GrowthSample] = [
+      GrowthSample(n: 16, value: 2355), GrowthSample(n: 17, value: 3030),
+      GrowthSample(n: 18, value: 3795), GrowthSample(n: 19, value: 4660),
+      GrowthSample(n: 38, value: 58320), GrowthSample(n: 76, value: 585305),
+      GrowthSample(n: 152, value: 5_239_545), GrowthSample(n: 304, value: 44_312_475)
+    ]
+    let models = CurveFitting.fitAllFamilies(samples)
+    #expect(!models.contains { $0.family == .polynomialIntercept })
+    for model in models {
+      var previous = -Double.infinity
+      for n in stride(from: 1.0, through: 30_400.0, by: 50.0) {
         let value = model.predict(n: n)
         if value.isInfinite { break }
         #expect(value >= previous, "\(model.family) decreased at n=\(n)")

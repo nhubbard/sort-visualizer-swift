@@ -24,10 +24,10 @@ public struct TriangularHeapSort: SortAlgorithm {
     category: .selection,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 499, coefficients: [239702, 829.397, 0.692574],
+      anchorSize: 499, coefficients: [239242, 768.83, 0.464986],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .polynomialIntercept, coefficients: [0.692574, 138.207, -1715.4], rSquared: 0.999867),
+      family: .powerLaw, coefficients: [11.2771, 1.60359], rSquared: 0.998378),
     implementationComplexity: 24,
     stable: false,
     timeComplexity: ComplexityBounds(

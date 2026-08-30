@@ -19,10 +19,10 @@ public struct QuadStoogeSort: SortAlgorithm {
     category: .impractical,
     sizeRange: 16...48,
     growthModel: OperationGrowthModel(
-      anchorSize: 89, coefficients: [234447, 6880.98, 51.1949],
+      anchorSize: 92, coefficients: [239242, 6841.63, 60.6425, 0.138627],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .polynomialIntercept, coefficients: [51.1949, -2231.72, 27554.5], rSquared: 0.999815),
+      family: .powerLaw, coefficients: [1.63024, 2.63093], rSquared: 0.995196),
     implementationComplexity: 7,
     stable: false,
     timeComplexity: ComplexityBounds(

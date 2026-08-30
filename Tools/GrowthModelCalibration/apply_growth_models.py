@@ -248,13 +248,27 @@ def insert_growth_model(path: Path, anchor: float, coefficients: list[float], ce
     indent = match.group("indent")
     coefficients_literal = ", ".join(format_double(c) for c in coefficients)
     ceiling_literal = str(ceiling) if ceiling is not None else "nil"
-    # No trailing newline on this block -- `text[match.end():]` already starts with the original
-    # sizeRange line's own newline, which becomes this block's terminator.
     new_block = (
         f"{indent}growthModel: OperationGrowthModel(\n"
         f"{indent}  anchorSize: {format_double(anchor)}, coefficients: [{coefficients_literal}],\n"
         f"{indent}  measuredSafeCeiling: {ceiling_literal}),")
-    text = text[: match.end()] + "\n" + new_block + text[match.end() :]
+
+    # A re-calibration run (recalibrating an algorithm that already has a `growthModel:` field,
+    # not the initial bulk pass) needs to *replace* the existing block, not insert a second
+    # `growthModel:` argument alongside it -- the naive always-insert-after-`sizeRange:` version
+    # of this function silently produced a duplicate-keyword-argument Swift file (a compile
+    # error) the first time it was asked to recalibrate a single already-calibrated algorithm
+    # (ShoveSort) rather than run once across every algorithm fresh.
+    existing_block = re.compile(
+        rf"{re.escape(indent)}growthModel: OperationGrowthModel\(\n"
+        rf".*?\n{re.escape(indent)}  measuredSafeCeiling: .*?\),",
+        re.DOTALL)
+    if existing_block.search(text):
+        text = existing_block.sub(new_block, text, count=1)
+    else:
+        # No trailing newline on this block -- `text[match.end():]` already starts with the
+        # original sizeRange line's own newline, which becomes this block's terminator.
+        text = text[: match.end()] + "\n" + new_block + text[match.end() :]
     path.write_text(text)
 
 

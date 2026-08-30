@@ -29,10 +29,10 @@ public struct InPlaceLSDRadixSort: SortAlgorithm {
     category: .distribution,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 141, coefficients: [237470, 3949.39, 16.6802],
+      anchorSize: 141, coefficients: [236673, 3722.67, 16.0763, 0.00827803],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .polynomialIntercept, coefficients: [16.6802, -754.42, 12224], rSquared: 0.999925),
+      family: .powerLaw, coefficients: [4.05121, 2.21781], rSquared: 0.999568),
     implementationComplexity: 16,
     stable: true,
     timeComplexity: ComplexityBounds(
