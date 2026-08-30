@@ -2,9 +2,13 @@ import Foundation
 
 /// The real growth family `Tools/GrowthModelCalibration` detected for this algorithm, before it
 /// gets Taylor-expanded into the generic polynomial the app actually uses for sizing
-/// (`OperationGrowthModel`). Shipped purely as display metadata — nothing in the app's own sizing
-/// math reads this — so a user can see what the algorithm's real measured complexity looks like
-/// alongside the polynomial approximation the size stepper is actually built from.
+/// (`OperationGrowthModel`). `effectiveSizeRange`'s own size-safety math still reads only
+/// `OperationGrowthModel` — this exists so a user can see what the algorithm's real measured
+/// complexity looks like alongside the polynomial approximation the size stepper is actually
+/// built from — but `AlgorithmMetadata.estimatedOperations(atSize:)` also reads this directly: a
+/// local Taylor expansion isn't trustworthy far from the size it was anchored at, while this
+/// fitted family (power-law, exponential, ...) stays meaningful across the sizes that feature
+/// actually evaluates. See that method's doc comment for the full story.
 ///
 /// Deliberately duplicates `CurveFitting.swift`'s `GrowthFamily.predict` (in
 /// `Modules/BuiltInAlgorithms/Tests/Support/`, a test target this shipped module can't import
