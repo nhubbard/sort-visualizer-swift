@@ -4,23 +4,20 @@ import (
 	"fmt"
 )
 
-func partition(arr []int, low, high int) ([]int, int) {
-	pivot := arr[high]
-	i := low
-	for j := low; j < high; j++ {
-		if arr[j] < pivot {
-			arr[i], arr[j] = arr[j], arr[i]
-			i++
-		}
+func partition(arr []int, left, right int) int {
+	i, j := left, right
+	for i < j {
+		for i < j && arr[i] <= arr[left] { i++ }
+		for arr[j] > arr[left] { j-- }
+		if i < j { arr[i], arr[j] = arr[j], arr[i] }
 	}
-	arr[i], arr[high] = arr[high], arr[i]
-	return arr, i
+	arr[left], arr[j] = arr[j], arr[left]
+	return j
 }
 
 func quickSort(arr []int, low, high int) []int {
 	if low < high {
-		var p int
-		arr, p = partition(arr, low, high)
+		p := partition(arr, low, high)
 		arr = quickSort(arr, low, p-1)
 		arr = quickSort(arr, p+1, high)
 	}

@@ -1,16 +1,13 @@
 def partition(array, first, last)
-  pivot = array[last]
-  p_index = first
   i = first
-  while i < last
-    if array[i].to_i <= pivot.to_i
-      array[i], array[p_index] = array[p_index], array[i]
-      p_index += 1
-    end
-    i += 1
+  j = last
+  while i < j
+    i += 1 while i < j && array[i] <= array[first]
+    j -= 1 while array[j] > array[first]
+    array[i], array[j] = array[j], array[i] if i < j
   end
-  array[p_index], array[last] = array[last], array[p_index]
-  p_index
+  array[first], array[j] = array[j], array[first]
+  j
 end
 
 def quick_sort(array, first, last)

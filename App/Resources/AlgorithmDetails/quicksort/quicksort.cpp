@@ -15,17 +15,15 @@ void printList(int arr[], int n) {
   }
 }
 
-int partition(int arr[], int low, int high) {
-  int pivot = arr[high];
-  int i = low - 1;
-  for (int j = low; j < high; j++) {
-    if (arr[j] <= pivot) {
-      i++;
-      std::swap(arr[i], arr[j]);
-    }
+int partition(int arr[], int left, int right) {
+  int i = left, j = right;
+  while (i < j) {
+    while (i < j && arr[i] <= arr[left]) i++;
+    while (arr[j] > arr[left]) j--;
+    if (i < j) std::swap(arr[i], arr[j]);
   }
-  std::swap(arr[i + 1], arr[high]);
-  return i + 1;
+  std::swap(arr[left], arr[j]);
+  return j;
 }
 
 void sort(int arr[], int low, int high) {

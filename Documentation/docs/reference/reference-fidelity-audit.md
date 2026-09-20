@@ -7,8 +7,8 @@ sample follows the same algorithm. This audit compares control flow and data mov
 the app's Swift implementation. Targeted execution remains a separate validation step.
 
 All 169 algorithms outside the 13 Bogo/Bozo-named sorts received a read-only, major-phase and
-complexity review of their ten reference sources. Fourteen non-Bogo algorithms below were
-verified and corrected; 10 have confirmed differences listed below; the other 145 have no
+complexity review of their ten reference sources. Fifteen non-Bogo algorithms below were
+verified and corrected; 9 have confirmed differences listed below; the other 145 have no
 confirmed substitution from this structural review. Among those 145, exact equivalence remains
 uncertain for the large GrailSort, PDQBranchedSort, PDQBranchlessSort, QuadSort, and
 NewShuffleMergeSort implementations. The source review did not run all samples on boundary or
@@ -34,6 +34,7 @@ duplicate-heavy inputs and is not a proof of line-by-line equivalence.
 | LRQuickSort | Recurses into the smaller partition and loops over the larger one | Ten sample tests; 330 random Python cases and a 4,096-item middle-pivot killer with six peak recursive calls |
 | MergeSort | Stable left-biased merge with indexed reads and linear merge work | Ten sample tests; tagged duplicate stability checks in Python, JavaScript, and Ruby |
 | IterativeTopDownMergeSort | Reuses one `n`-element scratch buffer across proportional-slice merges | Ten sample tests; 3,870 tagged stable Python cases across lengths 0–128 |
+| QuickSort | Fixed left pivot and two-pointer partition | Ten sample tests; 5,654 sorted, reversed, and duplicate-heavy Python cases across lengths 0–256 |
 
 ## Confirmed non-Bogo mismatches (unfixed)
 
@@ -47,7 +48,6 @@ changed as part of this audit.
 | MergeInsertionSort | Iterative, in-place block swaps and block search; `O(1)` auxiliary space | Recursive tagged Ford–Johnson construction with a chain, partner map, and pending list | Different data movement and `O(n)` auxiliary storage instead of the app's in-place approach |
 | DualPivotQuickSort | Selects pivots near the thirds, adapts the divisor, and insertion-sorts tiny ranges | Selects the endpoint pivots with no adaptive divisor or insertion cutoff | Different partition and base-case behavior; no overall asymptotic difference established |
 | OptimizedDualPivotQuickSort | Adaptive divisor and insertion-sort cutoff through 27 elements, plus a pivot-equals pass | No adaptive divisor; insertion cutoff at 24 elements and a different equal-elements pass | Different behavior around the cutoff and duplicate-heavy partitions; no overall asymptotic difference established |
-| QuickSort | Fixed left pivot and its own two-pointer partition | Several different partition schemes; JavaScript even chooses a random pivot | Different pivot behavior and comparison/swap sequence; no overall asymptotic difference established |
 | BlockInsertionSort | Merges long runs through Grail's iterative binary-search-and-rotate `mergeWithoutBuffer` | Replaces that helper with recursive divide-and-rotate merging | Different merge work sequence and `O(log n)` recursion stack where Swift's helper uses `O(1)` auxiliary stack |
 | LazyStableSort | Uses Grail's iterative binary-search-and-rotate merge | All ten references use recursive divide-and-rotate merging | Different merge sequence and `O(log n)` recursion stack instead of Swift's `O(1)` helper stack |
 | LSDRadixSort | Stable radix-4 counting passes with an `n`-element output buffer | C, C++, C#, Go, Java, Kotlin, and Swift use radix-10 buckets capped at ten entries each; JavaScript loops once per maximum *value* rather than per digit; Python uses floating-point division for pass termination; Ruby uses ordinary decimal counting passes | Several samples change the work bound or fail for valid larger inputs; JavaScript is `O(n·maxValue)` and also returns a new array |
@@ -81,7 +81,7 @@ weave choices; `RandomGuessSort` enumerates guesses with a base-`n` counter; and
 
 The five large implementations named above need detailed control-flow comparison across every
 language. Targeted sample runs, duplicate-heavy inputs, non-power-of-two lengths, and larger
-arrays are needed to validate the 10 findings and look for additional edge-case discrepancies.
+arrays are needed to validate the 9 findings and look for additional edge-case discrepancies.
 In particular, the PDQ samples contain partition, partial-insertion, and heap-fallback machinery;
 the Grail samples contain block-building and combining machinery; and the QuadSort samples retain
 their parity and merge phases. Presence of those phases and source length alone do not prove

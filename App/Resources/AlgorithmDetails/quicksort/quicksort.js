@@ -1,23 +1,15 @@
 function quickSort(array, start, end) {
-  if (start === undefined) {
-    start = 0;
-    end = array.length - 1;
-  } else if (start >= end) {
-    return array;
+  if (start >= end) return;
+  let i = start;
+  let j = end;
+  while (i < j) {
+    while (i < j && array[i] <= array[start]) i++;
+    while (array[j] > array[start]) j--;
+    if (i < j) [array[i], array[j]] = [array[j], array[i]];
   }
-  var rStart = start,
-    rEnd = end;
-  var pivotIndex = Math.random() * (end - start + 1) + start;
-  var pivot = array[Math.floor(pivotIndex)];
-  while (start < end) {
-    while (array[start] <= pivot) start++;
-    while (array[end] > pivot) end--;
-    if (start < end) {
-      [array[start], array[end]] = [array[end], array[start]];
-    }
-  }
-  quickSort(array, rStart, start - 1);
-  quickSort(array, start, rEnd);
+  [array[start], array[j]] = [array[j], array[start]];
+  quickSort(array, start, j - 1);
+  quickSort(array, j + 1, end);
 }
 
 function sort(arr) {

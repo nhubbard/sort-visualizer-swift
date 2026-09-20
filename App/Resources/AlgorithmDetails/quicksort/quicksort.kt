@@ -1,14 +1,13 @@
 fun partition(arr: Array<Int>, begin: Int, end: Int): Int {
-  val pivot = arr[end]
-  var i = begin - 1
-  for (j in begin..(end - 1)) {
-    if (arr[j] <= pivot) {
-      i++
-      arr[i] = arr[j].also { arr[j] = arr[i] }
-    }
+  var i = begin
+  var j = end
+  while (i < j) {
+    while (i < j && arr[i] <= arr[begin]) i++
+    while (arr[j] > arr[begin]) j--
+    if (i < j) arr[i] = arr[j].also { arr[j] = arr[i] }
   }
-  arr[i + 1] = arr[end].also { arr[end] = arr[i + 1] }
-  return i + 1
+  arr[begin] = arr[j].also { arr[j] = arr[begin] }
+  return j
 }
 
 fun quickSort(arr: Array<Int>, begin: Int, end: Int) {

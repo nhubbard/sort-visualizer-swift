@@ -4,30 +4,21 @@ public class QuickSort
 {
   public static int[] Sort(int[] array, int left, int right)
   {
+    if (left >= right) return array;
     var i = left;
     var j = right;
-    var pivot = array[left];
-    while (i <= j)
+    while (i < j)
     {
-      while (array[i] < pivot)
-      {
-        i++;
-      }
-      while (array[j] > pivot)
-      {
-        j--;
-      }
-      if (i <= j)
+      while (i < j && array[i] <= array[left]) i++;
+      while (array[j] > array[left]) j--;
+      if (i < j)
       {
         (array[i], array[j]) = (array[j], array[i]);
-        i++;
-        j--;
       }
     }
-    if (left < j)
-      Sort(array, left, j);
-    if (i < right)
-      Sort(array, i, right);
+    (array[left], array[j]) = (array[j], array[left]);
+    Sort(array, left, j - 1);
+    Sort(array, j + 1, right);
     return array;
   }
 
