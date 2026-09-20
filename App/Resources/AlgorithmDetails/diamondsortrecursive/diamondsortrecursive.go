@@ -9,7 +9,7 @@ import (
 // comparison pattern below merges them together.
 func sort(arr []int, start, stop int, merge bool) {
 	if stop-start == 2 {
-		if arr[start] > arr[stop-1] {
+		if stop <= len(arr) && arr[start] > arr[stop-1] {
 			arr[start], arr[stop-1] = arr[stop-1], arr[start]
 		}
 	} else if stop-start >= 3 {
@@ -29,9 +29,20 @@ func sort(arr []int, start, stop int, merge bool) {
 	}
 }
 
+func sortArray(arr []int) {
+	if len(arr) < 2 {
+		return
+	}
+	paddedLength := 1
+	for paddedLength < len(arr) {
+		paddedLength *= 2
+	}
+	sort(arr, 0, paddedLength, true)
+}
+
 func main() {
 	array := []int{0, 39, 21, 62, 91, 77, 14, 23,
 		90, 69, 51, 81, 68, 83, 32, 56}
-	sort(array, 0, len(array), true)
+	sortArray(array)
 	fmt.Println(array)
 }

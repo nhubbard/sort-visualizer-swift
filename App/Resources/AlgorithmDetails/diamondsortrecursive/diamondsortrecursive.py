@@ -3,7 +3,7 @@
 # comparison pattern below merges them together.
 def sort(array, start, stop, merge):
     if stop - start == 2:
-        if array[start] > array[stop - 1]:
+        if stop <= len(array) and array[start] > array[stop - 1]:
             array[start], array[stop - 1] = array[stop - 1], array[start]
     elif stop - start >= 3:
         div = (stop - start) / 4.0
@@ -20,7 +20,16 @@ def sort(array, start, stop, merge):
         sort(array, quarter, three_quarters, False)
 
 
+def sort_array(array):
+    if len(array) < 2:
+        return
+    padded_length = 1
+    while padded_length < len(array):
+        padded_length *= 2
+    sort(array, 0, padded_length, True)
+
+
 if __name__ == "__main__":
     array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56]
-    sort(array, 0, len(array), True)
+    sort_array(array)
     print(array)

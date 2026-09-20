@@ -6,7 +6,7 @@ public class diamondsortrecursive {
   // comparison pattern below merges them together.
   private static void sort(int[] arr, int start, int stop, boolean merge) {
     if (stop - start == 2) {
-      if (arr[start] > arr[stop - 1]) {
+      if (stop <= arr.length && arr[start] > arr[stop - 1]) {
         int temp = arr[start];
         arr[start] = arr[stop - 1];
         arr[stop - 1] = temp;
@@ -28,9 +28,16 @@ public class diamondsortrecursive {
     }
   }
 
+  public static void sortArray(int[] arr) {
+    if (arr.length < 2) return;
+    int paddedLength = 1;
+    while (paddedLength < arr.length) paddedLength *= 2;
+    sort(arr, 0, paddedLength, true);
+  }
+
   public static void main(String[] args) {
     int[] array = new int[] {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
-    sort(array, 0, array.length, true);
+    sortArray(array);
     System.out.println(Arrays.toString(array));
   }
 }

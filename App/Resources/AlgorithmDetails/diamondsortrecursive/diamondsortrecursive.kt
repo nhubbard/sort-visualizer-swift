@@ -3,7 +3,7 @@
 // comparison pattern below merges them together.
 fun sort(arr: Array<Int>, start: Int, stop: Int, merge: Boolean) {
   if (stop - start == 2) {
-    if (arr[start] > arr[stop - 1]) {
+    if (stop <= arr.size && arr[start] > arr[stop - 1]) {
       arr[start] = arr[stop - 1].also { arr[stop - 1] = arr[start] }
     }
   } else if (stop - start >= 3) {
@@ -23,11 +23,18 @@ fun sort(arr: Array<Int>, start: Int, stop: Int, merge: Boolean) {
   }
 }
 
+fun sortArray(arr: Array<Int>) {
+  if (arr.size < 2) return
+  var paddedLength = 1
+  while (paddedLength < arr.size) paddedLength *= 2
+  sort(arr, 0, paddedLength, true)
+}
+
 fun main() {
   var array = arrayOf<Int>(
     0, 39, 21, 62, 91, 77, 14, 23,
     90, 69, 51, 81, 68, 83, 32, 56,
   )
-  sort(array, 0, array.size, true)
+  sortArray(array)
   println("[%s]".format(array.joinToString(", ")))
 }

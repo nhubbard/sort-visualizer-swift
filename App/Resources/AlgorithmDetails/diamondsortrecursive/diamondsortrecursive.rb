@@ -3,7 +3,7 @@
 # comparison pattern below merges them together.
 def sort(array, start, stop, merge)
   if stop - start == 2
-    if array[start] > array[stop - 1]
+    if stop <= array.length && array[start] > array[stop - 1]
       array[start], array[stop - 1] = array[stop - 1], array[start]
     end
   elsif stop - start >= 3
@@ -23,7 +23,14 @@ def sort(array, start, stop, merge)
   end
 end
 
+def sort_array(array)
+  return if array.length < 2
+  padded_length = 1
+  padded_length *= 2 while padded_length < array.length
+  sort(array, 0, padded_length, true)
+end
+
 array = [0, 39, 21, 62, 91, 77, 14, 23,
   90, 69, 51, 81, 68, 83, 32, 56]
-sort(array, 0, array.length, true)
+sort_array(array)
 p array
