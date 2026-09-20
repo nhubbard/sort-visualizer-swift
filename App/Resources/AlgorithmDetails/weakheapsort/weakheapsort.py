@@ -1,5 +1,7 @@
 def sort(arr):
     n = len(arr)
+    if n <= 1:
+        return
     flags = [False] * n
 
     def merge(i, j):

@@ -14,6 +14,7 @@ public class WeakHeapSort
   public static void Sort(int[] arr)
   {
     int n = arr.Length;
+    if (n <= 1) return;
     bool[] flags = new bool[n];
 
     for (int i = n - 1; i > 0; i--)

@@ -23,6 +23,7 @@ void merge(int arr[], bool flags[], int i, int j) {
 }
 
 void sort(int arr[], int n) {
+  if (n <= 1) return;
   bool flags[n];
   for (int i = 0; i < n; i++) {
     flags[i] = false;

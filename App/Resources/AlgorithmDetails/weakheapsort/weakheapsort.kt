@@ -7,6 +7,7 @@ fun merge(arr: Array<Int>, flags: Array<Boolean>, i: Int, j: Int) {
 
 fun sort(arr: Array<Int>) {
   val n = arr.size
+  if (n <= 1) return
   val flags = Array(n) { false }
 
   for (i in (n - 1) downTo 1) {

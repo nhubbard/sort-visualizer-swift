@@ -25,6 +25,7 @@ void mergeW(int arr[], int flags[], int i, int j) {
 }
 
 void sort(int arr[], int n) {
+  if (n <= 1) return;
   int flags[n];
   for (int i = 0; i < n; i++) {
     flags[i] = 0;

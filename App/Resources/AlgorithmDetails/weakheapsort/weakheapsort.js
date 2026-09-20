@@ -7,6 +7,7 @@ function merge(arr, flags, i, j) {
 
 function sort(arr) {
   const n = arr.length;
+  if (n <= 1) return arr;
   const flags = new Array(n).fill(false);
 
   for (let i = n - 1; i > 0; i--) {

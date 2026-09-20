@@ -102,7 +102,8 @@ func sort(array []int) []int {
 			tourney = rebuild(array, matches, tourney)
 		}
 	}
-	return output
+	copy(array, output)
+	return array
 }
 
 func main() {

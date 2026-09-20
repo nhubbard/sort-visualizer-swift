@@ -7,6 +7,7 @@ end
 
 def sort(arr)
   n = arr.length
+  return arr if n <= 1
   flags = Array.new(n, false)
 
   (n - 1).downto(1) do |i|

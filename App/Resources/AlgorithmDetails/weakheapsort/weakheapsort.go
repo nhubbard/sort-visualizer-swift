@@ -20,6 +20,9 @@ func merge(arr []int, flags []bool, i int, j int) {
 
 func sort(arr []int) []int {
 	n := len(arr)
+	if n <= 1 {
+		return arr
+	}
 	flags := make([]bool, n)
 
 	for i := n - 1; i > 0; i-- {

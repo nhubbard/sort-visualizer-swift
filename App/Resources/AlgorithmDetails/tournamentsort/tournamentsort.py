@@ -69,10 +69,12 @@ def sort(array):
         tourney = 0 if is_player(tourney) else rebuild(tourney)
         return result
 
-    return [pop() for _ in range(n)]
+    output = [pop() for _ in range(n)]
+    array[:] = output
+    return array
 
 
 if __name__ == "__main__":
     array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56]
-    array = sort(array)
+    sort(array)
     print(array)
