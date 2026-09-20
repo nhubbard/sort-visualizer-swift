@@ -17,6 +17,7 @@ public class lazyheapsort {
 
   public static void sort(int[] arr) {
     int n = arr.length;
+    if (n <= 1) return;
     int s = (int) Math.sqrt(n - 1) + 1;
 
     int i = 0;

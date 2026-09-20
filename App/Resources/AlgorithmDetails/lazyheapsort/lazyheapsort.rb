@@ -1,5 +1,6 @@
 def sort(arr)
   n = arr.length
+  return if n <= 1
 
   max_to_front = lambda do |a, b|
     best = a

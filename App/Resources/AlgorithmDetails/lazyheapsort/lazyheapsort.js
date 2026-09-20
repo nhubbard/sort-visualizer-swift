@@ -1,5 +1,6 @@
 function sort(arr) {
   const n = arr.length;
+  if (n <= 1) return;
 
   function maxToFront(a, b) {
     let best = a;

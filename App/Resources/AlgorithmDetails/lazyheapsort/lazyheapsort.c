@@ -31,6 +31,7 @@ void maxToFront(int arr[], int a, int b) {
 }
 
 void sort(int arr[], int n) {
+  if (n <= 1) return;
   int s = (int)sqrt((double)(n - 1)) + 1;
 
   int i = 0;

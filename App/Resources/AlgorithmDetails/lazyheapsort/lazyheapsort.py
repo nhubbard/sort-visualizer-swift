@@ -1,5 +1,7 @@
 def sort(arr):
     n = len(arr)
+    if n <= 1:
+        return
 
     def max_to_front(a, b):
         best = a

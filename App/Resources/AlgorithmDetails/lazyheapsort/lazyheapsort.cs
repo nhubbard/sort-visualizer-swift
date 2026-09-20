@@ -20,6 +20,7 @@ public class LazyHeapSort
   public static void Sort(int[] arr)
   {
     int n = arr.Length;
+    if (n <= 1) return;
     int s = (int)Math.Sqrt(n - 1) + 1;
 
     int i = 0;
