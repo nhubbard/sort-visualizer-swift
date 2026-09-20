@@ -16,6 +16,7 @@ void printList(int arr[], int n) {
 }
 
 void sort(int arr[], int n) {
+  if (n <= 1) return;
   int loops[n];
   for (int i = 0; i < n; i++) {
     loops[i] = 0;
@@ -36,7 +37,11 @@ void sort(int arr[], int n) {
       break;
     }
     for (int pos = 0; pos < n; pos++) {
-      loops[pos] = rand() % n;
+      if (loops[pos] < n - 1) {
+        ++loops[pos];
+        break;
+      }
+      loops[pos] = 0;
     }
   }
 

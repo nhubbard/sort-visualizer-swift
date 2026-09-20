@@ -2,11 +2,11 @@ package main
 
 import (
 	"fmt"
-	"math/rand"
 )
 
 func sort(arr []int) []int {
 	n := len(arr)
+	if n <= 1 { return arr }
 	loops := make([]int, n)
 	for {
 		isSorted := true
@@ -23,7 +23,11 @@ func sort(arr []int) []int {
 			break
 		}
 		for pos := 0; pos < n; pos++ {
-			loops[pos] = rand.Intn(n)
+			if loops[pos] < n-1 {
+				loops[pos]++
+				break
+			}
+			loops[pos] = 0
 		}
 	}
 

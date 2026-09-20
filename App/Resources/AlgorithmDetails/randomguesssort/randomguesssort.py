@@ -1,8 +1,7 @@
-import random
-
-
 def sort(arr):
     n = len(arr)
+    if n <= 1:
+        return
     loops = [0] * n
     while True:
         is_sorted = True
@@ -15,7 +14,10 @@ def sort(arr):
         if is_sorted:
             break
         for pos in range(n):
-            loops[pos] = random.randint(0, n - 1)
+            if loops[pos] < n - 1:
+                loops[pos] += 1
+                break
+            loops[pos] = 0
 
     mapped = [arr[i] for i in loops]
     for i in range(n):

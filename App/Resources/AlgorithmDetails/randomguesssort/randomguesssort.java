@@ -3,6 +3,7 @@ import java.util.Arrays;
 public class randomguesssort {
   public static void sort(int[] arr) {
     int n = arr.length;
+    if (n <= 1) return;
     int[] loops = new int[n];
     while (true) {
       boolean isSorted = true;
@@ -19,7 +20,11 @@ public class randomguesssort {
         break;
       }
       for (int pos = 0; pos < n; pos++) {
-        loops[pos] = (int) (Math.random() * n);
+        if (loops[pos] < n - 1) {
+          loops[pos]++;
+          break;
+        }
+        loops[pos] = 0;
       }
     }
 

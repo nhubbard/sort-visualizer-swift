@@ -1,5 +1,6 @@
 fun sort(arr: Array<Int>) {
   val n = arr.size
+  if (n <= 1) return
   val loops = IntArray(n)
   while (true) {
     var isSorted = true
@@ -16,7 +17,11 @@ fun sort(arr: Array<Int>) {
       break
     }
     for (pos in 0 until n) {
-      loops[pos] = (0 until n).random()
+      if (loops[pos] < n - 1) {
+        loops[pos]++
+        break
+      }
+      loops[pos] = 0
     }
   }
 
