@@ -16,6 +16,7 @@ void printList(int arr[], int n) {
 }
 
 void sort(int arr[], int n) {
+  if (n <= 1) return;
   int index = 0;
   while (index < n) {
     if (index == 0) {

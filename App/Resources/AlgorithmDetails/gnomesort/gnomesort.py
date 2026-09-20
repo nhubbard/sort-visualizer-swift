@@ -1,5 +1,7 @@
 def sort(arr):
     n = len(arr)
+    if n <= 1:
+        return
     index = 0
     while index < n:
         if index == 0:

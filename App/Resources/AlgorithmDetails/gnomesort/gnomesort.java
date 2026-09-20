@@ -3,6 +3,7 @@ import java.util.Arrays;
 public class gnomesort {
   public static void sort(int[] arr) {
     int n = arr.length;
+    if (n <= 1) return;
     int index = 0;
     while (index < n) {
       if (index == 0) {

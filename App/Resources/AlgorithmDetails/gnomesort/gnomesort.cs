@@ -5,6 +5,7 @@ public class GnomeSort
   public static void Sort(int[] arr)
   {
     int n = arr.Length;
+    if (n <= 1) return;
     int index = 0;
     while (index < n)
     {

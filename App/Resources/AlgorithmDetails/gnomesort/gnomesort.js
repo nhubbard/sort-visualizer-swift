@@ -1,5 +1,6 @@
 function sort(arr) {
   const n = arr.length;
+  if (n <= 1) return arr;
   let index = 0;
   while (index < n) {
     if (index == 0) {

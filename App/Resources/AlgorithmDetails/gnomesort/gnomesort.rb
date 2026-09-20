@@ -1,5 +1,6 @@
 def sort(arr)
   n = arr.length
+  return arr if n <= 1
   idx = 0
   while idx < n
     if idx == 0
