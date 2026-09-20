@@ -7,8 +7,8 @@ sample follows the same algorithm. This audit compares control flow and data mov
 the app's Swift implementation. Targeted execution remains a separate validation step.
 
 All 169 algorithms outside the 13 Bogo/Bozo-named sorts received a read-only, major-phase and
-complexity review of their ten reference sources. Twenty-one non-Bogo algorithms below were
-verified and corrected; 3 have confirmed differences listed below; the other 145 have no
+complexity review of their ten reference sources. Twenty-two non-Bogo algorithms below were
+verified and corrected; 2 have confirmed differences listed below; the other 145 have no
 confirmed substitution from this structural review. Among those 145, exact equivalence remains
 uncertain for the large GrailSort, PDQBranchedSort, PDQBranchlessSort, QuadSort, and
 NewShuffleMergeSort implementations. The source review did not run all samples on boundary or
@@ -41,6 +41,7 @@ duplicate-heavy inputs and is not a proof of line-by-line equivalence.
 | BlockInsertionSort | Grail iterative binary-search-and-rotate merge and the app’s empty-input guard | Ten sample tests; 1,600 Python cases through 256 items |
 | LazyStableSort | Grail iterative binary-search-and-rotate merge | Ten sample tests; 1,600 Python cases and 1,600 tagged stability cases through 256 items |
 | UnstableGrailSort | Grail iterative binary-search-and-rotate merge | Ten sample tests; 1,600 Python cases through 256 items |
+| RotateMSDRadixSort | Digit sort followed by the app’s stackless `i`/`b`/`q`/`m` bucket traversal | Ten sample tests; 3,400 Python and 1,300 JavaScript cases through 512 items |
 
 ## Confirmed non-Bogo mismatches (unfixed)
 
@@ -52,12 +53,10 @@ changed as part of this audit.
 |---|---|---|---|
 | DropMergeSort | Uses `PDQSortingTemplate.sortBranched` for the early fallback and the dropped tail | Use a simple three-way quicksort for both paths | Loses PDQSort's worst-case `O(n log n)` bound; reference quicksort can take `O(n²)` |
 | MergeInsertionSort | Iterative, in-place block swaps and block search; `O(1)` auxiliary space | Recursive tagged Ford–Johnson construction with a chain, partner map, and pending list | Different data movement and `O(n)` auxiliary storage instead of the app's in-place approach |
-| RotateMSDRadixSort | Splits the zero-digit region with `dist` and iteratively traverses digit buckets | All ten references use a conventional recursive bucket descent after digit sorting | Substantial control-flow difference; no overall asymptotic difference established |
 
 Key source locations: `Modules/BuiltInAlgorithms/Sources/Hybrid/DropMergeSort.swift` and
 `App/Resources/AlgorithmDetails/dropmergesort/`; `Hybrid/MergeInsertionSort.swift` and
-`mergeinsertionsort/`; `Distribution/RotateMSDRadixSort.swift` and
-`rotatemsdradixsort/`.
+`mergeinsertionsort/`.
 
 ## Expected Bogo-family divergence
 

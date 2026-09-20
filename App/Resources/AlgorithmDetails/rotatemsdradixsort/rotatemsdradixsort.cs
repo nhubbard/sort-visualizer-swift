@@ -97,45 +97,40 @@ public class RotateMSDRadixSort
   // buckets, then recurses into every resulting digit bucket one place lower --
   // an ordinary MSD radix sort built entirely out of the LSD variant's
   // rotate/binary-search machinery.
-  private static void MsdRotateSort(int[] arr, int a, int b, int place, int radix)
+  private static int Shift(int value, int places, int radix)
   {
-    if (b - a < 2 || place < 0)
-    {
-      return;
-    }
+    while (places-- > 0) value /= radix;
+    return value;
+  }
+
+  private static int Dist(int[] arr, int a, int b, int place, int radix)
+  {
     MergeSortDigit(arr, a, b, place, radix);
-    var start = a;
-    for (var d = 0; d < radix; d++)
-    {
-      var end = BinSearchDigit(arr, start, b, d + 1, place, radix);
-      MsdRotateSort(arr, start, end, place - 1, radix);
-      start = end;
-    }
+    return BinSearchDigit(arr, a, b, 1, place, radix);
   }
 
   public static int[] Sort(int[] array)
   {
-    if (array.Length <= 1)
+    int n = array.Length;
+    if (n <= 1) return array;
+    int radix = 4, maxValue = 0;
+    foreach (int value in array) if (value > maxValue) maxValue = value;
+    int q = 0, probe = radix;
+    while (probe <= maxValue) { q++; probe *= radix; }
+    int m = 0, i = 0, b = n;
+    while (i < n)
     {
-      return array;
-    }
-    var radix = 4;
-    var maxValue = array[0];
-    foreach (var value in array)
-    {
-      if (value > maxValue)
+      int p = b - i < 1 ? i : Dist(array, i, b, q, radix);
+      if (q == 0)
       {
-        maxValue = value;
+        m += radix;
+        int t = m / radix;
+        while (t % radix == 0) { t /= radix; q++; }
+        i = b;
+        while (b < n && Shift(array[b], q + 1, radix) == Shift(m, q + 1, radix)) b++;
       }
+      else { b = p; q--; }
     }
-    var highestPlace = 0;
-    var probe = radix;
-    while (probe <= maxValue)
-    {
-      highestPlace++;
-      probe *= radix;
-    }
-    MsdRotateSort(array, 0, array.Length, highestPlace, radix);
     return array;
   }
 

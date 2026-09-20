@@ -83,32 +83,36 @@ func mergeSortDigit(_ arr: inout [Int], _ a: Int, _ b: Int, _ place: Int, _ base
 /// buckets, then recurses into every resulting digit bucket one place lower --
 /// an ordinary MSD radix sort built entirely out of the LSD variant's
 /// rotate/binary-search machinery.
-func msdRotateSort(_ arr: inout [Int], _ a: Int, _ b: Int, _ place: Int, _ base: Int) {
-    if b - a < 2 || place < 0 {
-        return
-    }
+func shift(_ value: Int, _ places: Int, _ base: Int) -> Int {
+    var value = value
+    var places = places
+    while places > 0 { value /= base; places -= 1 }
+    return value
+}
+
+func dist(_ arr: inout [Int], _ a: Int, _ b: Int, _ place: Int, _ base: Int) -> Int {
     mergeSortDigit(&arr, a, b, place, base)
-    var start = a
-    for d in 0 ..< base {
-        let end = binSearchDigit(arr, start, b, d + 1, place, base)
-        msdRotateSort(&arr, start, end, place - 1, base)
-        start = end
-    }
+    return binSearchDigit(arr, a, b, 1, place, base)
 }
 
 func sort(_ arr: inout [Int]) {
-    if arr.count <= 1 {
-        return
-    }
+    let n = arr.count
+    if n <= 1 { return }
     let base = 4
     let maxValue = arr.max() ?? 0
-    var highestPlace = 0
-    var probe = base
-    while probe <= maxValue {
-        highestPlace += 1
-        probe *= base
+    var q = 0, probe = base
+    while probe <= maxValue { q += 1; probe *= base }
+    var m = 0, i = 0, b = n
+    while i < n {
+        let p = b - i < 1 ? i : dist(&arr, i, b, q, base)
+        if q == 0 {
+            m += base
+            var t = m / base
+            while t % base == 0 { t /= base; q += 1 }
+            i = b
+            while b < n && shift(arr[b], q + 1, base) == shift(m, q + 1, base) { b += 1 }
+        } else { b = p; q -= 1 }
     }
-    msdRotateSort(&arr, 0, arr.count, highestPlace, base)
 }
 
 var array: [Int] = [

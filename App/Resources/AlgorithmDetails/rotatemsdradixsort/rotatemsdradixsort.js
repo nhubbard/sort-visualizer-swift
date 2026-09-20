@@ -75,32 +75,34 @@ function mergeSortDigit(arr, a, b, place, base) {
 // buckets, then recurses into every resulting digit bucket one place lower --
 // an ordinary MSD radix sort built entirely out of the LSD variant's
 // rotate/binary-search machinery.
-function msdRotateSort(arr, a, b, place, base) {
-  if (b - a < 2 || place < 0) {
-    return;
-  }
+function shift(value, places, base) {
+  while (places-- > 0) value = Math.floor(value / base);
+  return value;
+}
+
+function dist(arr, a, b, place, base) {
   mergeSortDigit(arr, a, b, place, base);
-  var start = a;
-  for (var d = 0; d < base; d++) {
-    var end = binSearchDigit(arr, start, b, d + 1, place, base);
-    msdRotateSort(arr, start, end, place - 1, base);
-    start = end;
-  }
+  return binSearchDigit(arr, a, b, 1, place, base);
 }
 
 function sort(arr) {
-  if (arr.length <= 1) {
-    return arr;
+  const n = arr.length;
+  if (n <= 1) return arr;
+  const base = 4;
+  const maxValue = Math.max(...arr);
+  let q = 0, probe = base;
+  while (probe <= maxValue) { q++; probe *= base; }
+  let m = 0, i = 0, b = n;
+  while (i < n) {
+    const p = b - i < 1 ? i : dist(arr, i, b, q, base);
+    if (q === 0) {
+      m += base;
+      let t = Math.floor(m / base);
+      while (t % base === 0) { t = Math.floor(t / base); q++; }
+      i = b;
+      while (b < n && shift(arr[b], q + 1, base) === shift(m, q + 1, base)) b++;
+    } else { b = p; q--; }
   }
-  var base = 4;
-  var maxValue = Math.max.apply(null, arr);
-  var highestPlace = 0;
-  var probe = base;
-  while (probe <= maxValue) {
-    highestPlace++;
-    probe *= base;
-  }
-  msdRotateSort(arr, 0, arr.length, highestPlace, base);
   return arr;
 }
 

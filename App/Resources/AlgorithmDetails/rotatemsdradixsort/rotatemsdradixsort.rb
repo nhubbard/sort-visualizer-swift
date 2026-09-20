@@ -69,30 +69,49 @@ end
 # counting buckets, then recurses into every resulting digit bucket one
 # place lower -- an ordinary MSD radix sort built entirely out of the LSD
 # variant's rotate/binary-search machinery.
-def msd_rotate_sort(arr, a, b, place, base)
-  return if b - a < 2 || place.negative?
-
-  merge_sort_digit(arr, a, b, place, base)
-  start = a
-  (0...base).each do |d|
-    finish = bin_search_digit(arr, start, b, d + 1, place, base)
-    msd_rotate_sort(arr, start, finish, place - 1, base)
-    start = finish
+def shift(value, places, base)
+  while places > 0
+    value /= base
+    places -= 1
   end
+  value
+end
+
+def dist(arr, a, b, place, base)
+  merge_sort_digit(arr, a, b, place, base)
+  bin_search_digit(arr, a, b, 1, place, base)
 end
 
 def sort(arr)
-  return arr if arr.length <= 1
-
+  n = arr.length
+  return arr if n <= 1
   base = 4
   max_value = arr.max
-  highest_place = 0
+  q = 0
   probe = base
   while probe <= max_value
-    highest_place += 1
+    q += 1
     probe *= base
   end
-  msd_rotate_sort(arr, 0, arr.length, highest_place, base)
+  m = 0
+  i = 0
+  b = n
+  while i < n
+    p = b - i < 1 ? i : dist(arr, i, b, q, base)
+    if q == 0
+      m += base
+      t = m / base
+      while t % base == 0
+        t /= base
+        q += 1
+      end
+      i = b
+      b += 1 while b < n && shift(arr[b], q + 1, base) == shift(m, q + 1, base)
+    else
+      b = p
+      q -= 1
+    end
+  end
   arr
 end
 
