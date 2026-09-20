@@ -7,9 +7,9 @@ sample follows the same algorithm. This audit compares control flow and data mov
 the app's Swift implementation. Targeted execution remains a separate validation step.
 
 All 169 algorithms outside the 13 Bogo/Bozo-named sorts received a read-only, major-phase and
-complexity review of their ten reference sources. Twenty-three non-Bogo algorithms below were
-verified and corrected; 1 has a confirmed difference listed below; the other 145 have no
-confirmed substitution from this structural review. Among those 145, exact equivalence remains
+complexity review of their ten reference sources. Twenty-four non-Bogo algorithms below were
+verified and corrected; no confirmed non-Bogo deviations remain from this structural review.
+The other 145 have no confirmed substitution from this review. Among those 145, exact equivalence remains
 uncertain for the large GrailSort, PDQBranchedSort, PDQBranchlessSort, QuadSort, and
 NewShuffleMergeSort implementations. The source review did not run all samples on boundary or
 duplicate-heavy inputs and is not a proof of line-by-line equivalence.
@@ -43,19 +43,13 @@ duplicate-heavy inputs and is not a proof of line-by-line equivalence.
 | UnstableGrailSort | Grail iterative binary-search-and-rotate merge | Ten sample tests; 1,600 Python cases through 256 items |
 | RotateMSDRadixSort | Digit sort followed by the app’s stackless `i`/`b`/`q`/`m` bucket traversal | Ten sample tests; 3,400 Python and 1,300 JavaScript cases through 512 items |
 | MergeInsertionSort | Iterative in-place block swaps, block search, and Jacobsthal-ordered insertion | Ten sample tests; 4,000 Python and 4,000 JavaScript cases, plus C and C++ generated cases through 256 items |
+| DropMergeSort | Branched PDQ fallback for both the full array and dropped tail, plus the app’s index-seeded backtrack heuristic | Ten sample tests; 1,760 Python and 1,300 JavaScript cases, 520 nonzero-range PDQ cases, and C/C++ generated cases through 1,024 items |
 
-## Confirmed non-Bogo mismatches (unfixed)
+## Remaining non-Bogo deviations
 
-The following findings compare the app's Swift implementation with all ten language samples in
-each named reference folder. They are source-inspection findings; the samples have not been
-changed as part of this audit.
-
-| Algorithm | App Swift implementation | Reference samples | Impact |
-|---|---|---|---|
-| DropMergeSort | Uses `PDQSortingTemplate.sortBranched` for the early fallback and the dropped tail | Use a simple three-way quicksort for both paths | Loses PDQSort's worst-case `O(n log n)` bound; reference quicksort can take `O(n²)` |
-
-Key source locations: `Modules/BuiltInAlgorithms/Sources/Hybrid/DropMergeSort.swift` and
-`App/Resources/AlgorithmDetails/dropmergesort/`.
+None confirmed by this structural audit. The 145 algorithms without a confirmed substitution
+still require deeper equivalence checks, especially the large template-based implementations
+called out above.
 
 ## Expected Bogo-family divergence
 

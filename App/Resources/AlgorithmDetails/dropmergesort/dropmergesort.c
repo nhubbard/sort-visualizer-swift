@@ -20,49 +20,267 @@ void printList(int items[], int size) {
   }
 }
 
-/* A plain general-purpose sort for arr[lo..hi), used both as the early-out
- * fallback and to sort the leftover "dropped" elements before the final merge.
- * Any decent O(n log n) sort works here -- the algorithm doesn't depend on
- * which one. */
-void quicksort(int arr[], int lo, int hi) {
-  if (hi - lo <= 1) {
-    return;
-  }
-  int pivot = arr[lo + (hi - lo) / 2];
-  int n = hi - lo;
-  int *less = malloc(n * sizeof(int));
-  int *equal = malloc(n * sizeof(int));
-  int *greater = malloc(n * sizeof(int));
-  int lessCount = 0, equalCount = 0, greaterCount = 0;
+/* Branched PDQ fallback, matching the app’s PDQSortingTemplate. */
+#define INSERT_SORT_THRESHOLD 24
+#define NINTHER_THRESHOLD 128
+#define PARTIAL_INSERT_SORT_LIMIT 8
 
-  for (int i = lo; i < hi; i++) {
-    if (arr[i] < pivot) {
-      less[lessCount++] = arr[i];
-    } else if (arr[i] > pivot) {
-      greater[greaterCount++] = arr[i];
-    } else {
-      equal[equalCount++] = arr[i];
+void swap(int *a, int *b) {
+  int t = *a;
+  *a = *b;
+  *b = t;
+}
+
+typedef struct {
+  int pivotPos;
+  int alreadyParted;
+} PDQPair;
+
+int pdqLog(int n) {
+  int log = 0;
+  while ((n >>= 1) != 0)
+    log++;
+  return log;
+}
+
+void insertSort(int arr[], int begin, int end) {
+  for (int cur = begin + 1; cur < end; cur++) {
+    if (arr[cur] < arr[cur - 1]) {
+      int tmp = arr[cur];
+      int sift = cur;
+      int siftMinusOne = cur - 1;
+      do {
+        arr[sift--] = arr[siftMinusOne--];
+      } while (sift != begin && tmp < arr[siftMinusOne]);
+      arr[sift] = tmp;
     }
   }
-
-  quicksort(less, 0, lessCount);
-  quicksort(greater, 0, greaterCount);
-
-  int k = lo;
-  for (int i = 0; i < lessCount; i++) {
-    arr[k++] = less[i];
-  }
-  for (int i = 0; i < equalCount; i++) {
-    arr[k++] = equal[i];
-  }
-  for (int i = 0; i < greaterCount; i++) {
-    arr[k++] = greater[i];
-  }
-
-  free(less);
-  free(equal);
-  free(greater);
 }
+
+void unguardInsertSort(int arr[], int begin, int end) {
+  for (int cur = begin + 1; cur < end; cur++) {
+    if (arr[cur] < arr[cur - 1]) {
+      int tmp = arr[cur];
+      int sift = cur;
+      int siftMinusOne = cur - 1;
+      do {
+        arr[sift--] = arr[siftMinusOne--];
+      } while (tmp < arr[siftMinusOne]);
+      arr[sift] = tmp;
+    }
+  }
+}
+
+int partialInsertSort(int arr[], int begin, int end) {
+  int limit = 0;
+  for (int cur = begin + 1; cur < end; cur++) {
+    if (limit > PARTIAL_INSERT_SORT_LIMIT)
+      return 0;
+    if (arr[cur] < arr[cur - 1]) {
+      int tmp = arr[cur];
+      int sift = cur;
+      int siftMinusOne = cur - 1;
+      do {
+        arr[sift--] = arr[siftMinusOne--];
+      } while (sift != begin && tmp < arr[siftMinusOne]);
+      arr[sift] = tmp;
+      limit += cur - sift;
+    }
+  }
+  return 1;
+}
+
+void sortTwo(int arr[], int a, int b) {
+  if (arr[b] < arr[a])
+    swap(&arr[a], &arr[b]);
+}
+
+void sortThree(int arr[], int a, int b, int c) {
+  sortTwo(arr, a, b);
+  sortTwo(arr, b, c);
+  sortTwo(arr, a, b);
+}
+
+PDQPair partRight(int arr[], int begin, int end) {
+  int pivot = arr[begin];
+  int first = begin;
+  int last = end;
+
+  first++;
+  while (arr[first] < pivot)
+    first++;
+
+  if (first - 1 == begin) {
+    last--;
+    while (first < last && !(arr[last] < pivot))
+      last--;
+  } else {
+    last--;
+    while (!(arr[last] < pivot))
+      last--;
+  }
+
+  int alreadyParted = first >= last;
+  while (first < last) {
+    swap(&arr[first], &arr[last]);
+    first++;
+    while (arr[first] < pivot)
+      first++;
+    last--;
+    while (!(arr[last] < pivot))
+      last--;
+  }
+
+  int pivotPos = first - 1;
+  arr[begin] = arr[pivotPos];
+  arr[pivotPos] = pivot;
+
+  PDQPair result = {pivotPos, alreadyParted};
+  return result;
+}
+
+int partLeft(int arr[], int begin, int end) {
+  int pivot = arr[begin];
+  int first = begin;
+  int last = end;
+
+  last--;
+  while (pivot < arr[last])
+    last--;
+
+  if (last + 1 == end) {
+    first++;
+    while (first < last && !(pivot < arr[first]))
+      first++;
+  } else {
+    first++;
+    while (!(pivot < arr[first]))
+      first++;
+  }
+
+  while (first < last) {
+    swap(&arr[first], &arr[last]);
+    last--;
+    while (pivot < arr[last])
+      last--;
+    first++;
+    while (!(pivot < arr[first]))
+      first++;
+  }
+
+  int pivotPos = last;
+  arr[begin] = arr[pivotPos];
+  arr[pivotPos] = pivot;
+  return pivotPos;
+}
+
+void siftDown(int arr[], int begin, int root, int size) {
+  while (1) {
+    int child = 2 * root + 1;
+    if (child >= size)
+      break;
+    if (child + 1 < size && arr[begin + child] < arr[begin + child + 1])
+      child++;
+    if (arr[begin + root] < arr[begin + child]) {
+      swap(&arr[begin + root], &arr[begin + child]);
+      root = child;
+    } else {
+      break;
+    }
+  }
+}
+
+void heapSort(int arr[], int begin, int end) {
+  int n = end - begin;
+  for (int i = n / 2 - 1; i >= 0; i--)
+    siftDown(arr, begin, i, n);
+  for (int i = n - 1; i > 0; i--) {
+    swap(&arr[begin], &arr[begin + i]);
+    siftDown(arr, begin, 0, i);
+  }
+}
+
+void pdqLoop(int arr[], int begin, int end, int badAllowed) {
+  int leftmost = 1;
+  while (1) {
+    int size = end - begin;
+
+    if (size < INSERT_SORT_THRESHOLD) {
+      if (leftmost)
+        insertSort(arr, begin, end);
+      else
+        unguardInsertSort(arr, begin, end);
+      return;
+    }
+
+    int halfSize = size / 2;
+    if (size > NINTHER_THRESHOLD) {
+      sortThree(arr, begin, begin + halfSize, end - 1);
+      sortThree(arr, begin + 1, begin + halfSize - 1, end - 2);
+      sortThree(arr, begin + 2, begin + halfSize + 1, end - 3);
+      sortThree(arr, begin + halfSize - 1, begin + halfSize,
+                begin + halfSize + 1);
+      swap(&arr[begin], &arr[begin + halfSize]);
+    } else {
+      sortThree(arr, begin + halfSize, begin, end - 1);
+    }
+
+    if (!leftmost && !(arr[begin - 1] < arr[begin])) {
+      begin = partLeft(arr, begin, end) + 1;
+      continue;
+    }
+
+    PDQPair partResult = partRight(arr, begin, end);
+    int pivotPos = partResult.pivotPos;
+    int alreadyParted = partResult.alreadyParted;
+
+    int leftSize = pivotPos - begin;
+    int rightSize = end - (pivotPos + 1);
+    int highUnbalance = leftSize < size / 8 || rightSize < size / 8;
+
+    if (highUnbalance) {
+      if (--badAllowed == 0) {
+        heapSort(arr, begin, end);
+        return;
+      }
+
+      if (leftSize >= INSERT_SORT_THRESHOLD) {
+        swap(&arr[begin], &arr[begin + leftSize / 4]);
+        swap(&arr[pivotPos - 1], &arr[pivotPos - leftSize / 4]);
+        if (leftSize > NINTHER_THRESHOLD) {
+          swap(&arr[begin + 1], &arr[begin + (leftSize / 4 + 1)]);
+          swap(&arr[begin + 2], &arr[begin + (leftSize / 4 + 2)]);
+          swap(&arr[pivotPos - 2], &arr[pivotPos - (leftSize / 4 + 1)]);
+          swap(&arr[pivotPos - 3], &arr[pivotPos - (leftSize / 4 + 2)]);
+        }
+      }
+
+      if (rightSize >= INSERT_SORT_THRESHOLD) {
+        swap(&arr[pivotPos + 1], &arr[pivotPos + (1 + rightSize / 4)]);
+        swap(&arr[end - 1], &arr[end - rightSize / 4]);
+        if (rightSize > NINTHER_THRESHOLD) {
+          swap(&arr[pivotPos + 2], &arr[pivotPos + (2 + rightSize / 4)]);
+          swap(&arr[pivotPos + 3], &arr[pivotPos + (3 + rightSize / 4)]);
+          swap(&arr[end - 2], &arr[end - (1 + rightSize / 4)]);
+          swap(&arr[end - 3], &arr[end - (2 + rightSize / 4)]);
+        }
+      }
+    } else {
+      if (alreadyParted && partialInsertSort(arr, begin, pivotPos) &&
+          partialInsertSort(arr, pivotPos + 1, end)) {
+        return;
+      }
+    }
+
+    pdqLoop(arr, begin, pivotPos, badAllowed);
+    begin = pivotPos + 1;
+    leftmost = 0;
+  }
+}
+
+void pdqSort(int arr[], int begin, int end) { if (end - begin > 1) pdqLoop(arr, begin, end, pdqLog(end - begin)); }
+
+
 
 void sort(int arr[], int length) {
   if (length < 2) {
@@ -92,7 +310,7 @@ void sort(int arr[], int length) {
         write++;
       }
       droppedCount = 0;
-      quicksort(arr, 0, length);
+      pdqSort(arr, 0, length);
       free(dropped);
       return;
     }
@@ -125,7 +343,7 @@ void sort(int arr[], int length) {
       int numBacktracked = 1;
       write--;
 
-      int maxOfDropped = arr[read];
+      int maxOfDropped = read;
       for (int i = read + 1; i <= read + numDroppedInARow; i++) {
         if (arr[i] > maxOfDropped) {
           maxOfDropped = arr[i];
@@ -149,7 +367,7 @@ void sort(int arr[], int length) {
     arr[write + offset] = dropped[offset];
   }
 
-  quicksort(arr, write, length);
+  pdqSort(arr, write, length);
 
   /* Copy the now-sorted dropped tail before the final backward merge starts
    * overwriting arr[write:] in place. */
