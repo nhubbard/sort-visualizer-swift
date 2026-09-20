@@ -44,6 +44,7 @@ func stoogeSort(_ arr: inout [Int], _ a: Int, _ m: Int, _ b: Int, _ merge: Bool)
 }
 
 func sort(_ array: inout [Int]) {
+    guard array.count > 1 else { return }
     stoogeSort(&array, 0, 1, array.count, false)
 }
 

@@ -49,6 +49,7 @@ public class optimizedstoogesortstudio {
   }
 
   public static void sort(int[] arr) {
+    if (arr.length <= 1) return;
     stoogeSort(arr, 0, 1, arr.length, false);
   }
 

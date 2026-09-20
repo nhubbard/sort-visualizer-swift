@@ -36,6 +36,8 @@ def stooge_sort(arr, a, m, b, merge):
 
 
 def sort(arr):
+    if len(arr) <= 1:
+        return
     stooge_sort(arr, 0, 1, len(arr), False)
 
 

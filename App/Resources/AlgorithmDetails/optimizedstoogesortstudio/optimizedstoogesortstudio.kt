@@ -40,6 +40,7 @@ fun stoogeSort(arr: Array<Int>, a: Int, m: Int, b: Int, merge: Boolean): Boolean
 }
 
 fun sort(arr: Array<Int>) {
+  if (arr.size <= 1) return
   stoogeSort(arr, 0, 1, arr.size, false)
 }
 

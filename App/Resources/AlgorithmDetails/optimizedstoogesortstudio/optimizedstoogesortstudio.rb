@@ -34,6 +34,7 @@ def stooge_sort(arr, a, m, b, merge)
 end
 
 def sort(array)
+  return if array.length <= 1
   stooge_sort(array, 0, 1, array.length, false)
 end
 

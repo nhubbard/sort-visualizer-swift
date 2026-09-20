@@ -40,6 +40,7 @@ function stoogeSort(arr, a, m, b, merge) {
 }
 
 function sort(arr) {
+  if (arr.length <= 1) return;
   stoogeSort(arr, 0, 1, arr.length, false);
 }
 

@@ -66,7 +66,10 @@ int stoogeSort(int arr[], int a, int m, int b, int merge) {
   return lChange || rChange;
 }
 
-void sort(int arr[], int n) { stoogeSort(arr, 0, 1, n, 0); }
+void sort(int arr[], int n) {
+  if (n <= 1) return;
+  stoogeSort(arr, 0, 1, n, 0);
+}
 
 int main(int argc, char *argv[]) {
   int size = sizeof(array) / sizeof(array[0]);

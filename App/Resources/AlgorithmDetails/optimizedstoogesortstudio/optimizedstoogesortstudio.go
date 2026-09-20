@@ -57,6 +57,7 @@ func stoogeSort(arr []int, a, m, b int, merge bool) bool {
 }
 
 func sort(arr []int) []int {
+	if len(arr) <= 1 { return arr }
 	stoogeSort(arr, 0, 1, len(arr), false)
 	return arr
 }

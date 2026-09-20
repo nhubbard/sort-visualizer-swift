@@ -57,6 +57,7 @@ public class OptimizedStoogeSortStudio
 
   public static void Sort(int[] arr)
   {
+    if (arr.Length <= 1) return;
     StoogeSortRange(arr, 0, 1, arr.Length, false);
   }
 
