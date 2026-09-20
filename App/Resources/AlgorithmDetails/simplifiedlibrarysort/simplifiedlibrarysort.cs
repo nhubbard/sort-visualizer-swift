@@ -89,13 +89,18 @@ public class SimplifiedLibrarySort
   private static void LibrarySort(int[] arr)
   {
     var n = arr.Length;
-    if (n < 2)
+    if (n < 32)
     {
+      BinaryInsertionSort(arr, 0, n);
       return;
     }
 
-    var rebalanceFactor = 2;
-    var spineSize = 1;
+    var rebalanceFactor = 4;
+    var spineSize = n;
+    while (spineSize >= 32)
+    {
+      spineSize = (spineSize - 1) / rebalanceFactor + 1;
+    }
     BinaryInsertionSort(arr, 0, spineSize);
 
     var maxLevel = spineSize;

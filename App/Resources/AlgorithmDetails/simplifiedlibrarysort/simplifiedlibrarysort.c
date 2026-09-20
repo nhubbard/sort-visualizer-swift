@@ -79,12 +79,16 @@ void rebalance(int arr[], int temp[], int counts[], int locations[],
 }
 
 void librarySort(int arr[], int n) {
-  if (n < 2) {
+  if (n < 32) {
+    binaryInsertionSort(arr, 0, n);
     return;
   }
 
-  int rebalanceFactor = 2;
-  int spineSize = 1;
+  int rebalanceFactor = 4;
+  int spineSize = n;
+  while (spineSize >= 32) {
+    spineSize = (spineSize - 1) / rebalanceFactor + 1;
+  }
   binaryInsertionSort(arr, 0, spineSize);
 
   int maxLevel = spineSize;

@@ -72,10 +72,16 @@ func rebalance(
 
 func librarySort(_ array: inout [Int]) {
     let n = array.count
-    guard n >= 2 else { return }
+    guard n >= 32 else {
+        binaryInsertionSort(&array, 0, n)
+        return
+    }
 
-    let rebalanceFactor = 2
-    var spineSize = 1
+    let rebalanceFactor = 4
+    var spineSize = n
+    while spineSize >= 32 {
+        spineSize = (spineSize - 1) / rebalanceFactor + 1
+    }
     binaryInsertionSort(&array, 0, spineSize)
 
     var maxLevel = spineSize

@@ -62,12 +62,16 @@ function rebalance(array, temp, counts, locations, spineSize, batchEnd) {
 
 function librarySort(array) {
   var n = array.length;
-  if (n < 2) {
+  if (n < 32) {
+    binaryInsertionSort(array, 0, n);
     return array;
   }
 
-  var rebalanceFactor = 2;
-  var spineSize = 1;
+  var rebalanceFactor = 4;
+  var spineSize = n;
+  while (spineSize >= 32) {
+    spineSize = Math.floor((spineSize - 1) / rebalanceFactor) + 1;
+  }
   binaryInsertionSort(array, 0, spineSize);
 
   var maxLevel = spineSize;
