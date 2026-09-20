@@ -1,31 +1,24 @@
 function quickSort(array, p, r) {
-  if (p >= r) {
-    return;
-  }
-
-  var pivot = array[p + Math.floor((r - p + 1) / 2)];
-  var i = p;
-  var j = r;
-
-  while (i <= j) {
-    while (array[i] < pivot) {
-      i++;
+  while (p < r) {
+    const pivot = array[p + Math.floor((r - p + 1) / 2)];
+    let i = p;
+    let j = r;
+    while (i <= j) {
+      while (array[i] < pivot) i++;
+      while (array[j] > pivot) j--;
+      if (i <= j) {
+        [array[i], array[j]] = [array[j], array[i]];
+        i++;
+        j--;
+      }
     }
-    while (array[j] > pivot) {
-      j--;
+    if (j - p < r - i) {
+      if (p < j) quickSort(array, p, j);
+      p = i;
+    } else {
+      if (i < r) quickSort(array, i, r);
+      r = j;
     }
-    if (i <= j) {
-      [array[i], array[j]] = [array[j], array[i]];
-      i++;
-      j--;
-    }
-  }
-
-  if (p < j) {
-    quickSort(array, p, j);
-  }
-  if (i < r) {
-    quickSort(array, i, r);
   }
 }
 

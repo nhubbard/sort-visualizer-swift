@@ -4,40 +4,32 @@ public class LRQuickSort
 {
   private static void QuickSort(int[] arr, int p, int r)
   {
-    if (p >= r)
+    while (p < r)
     {
-      return;
-    }
-
-    int pivot = arr[p + (r - p + 1) / 2];
-    int i = p;
-    int j = r;
-
-    while (i <= j)
-    {
-      while (arr[i] < pivot)
+      int pivot = arr[p + (r - p + 1) / 2];
+      int i = p;
+      int j = r;
+      while (i <= j)
       {
-        i++;
+        while (arr[i] < pivot) i++;
+        while (arr[j] > pivot) j--;
+        if (i <= j)
+        {
+          (arr[i], arr[j]) = (arr[j], arr[i]);
+          i++;
+          j--;
+        }
       }
-      while (arr[j] > pivot)
+      if (j - p < r - i)
       {
-        j--;
+        if (p < j) QuickSort(arr, p, j);
+        p = i;
       }
-      if (i <= j)
+      else
       {
-        (arr[i], arr[j]) = (arr[j], arr[i]);
-        i++;
-        j--;
+        if (i < r) QuickSort(arr, i, r);
+        r = j;
       }
-    }
-
-    if (p < j)
-    {
-      QuickSort(arr, p, j);
-    }
-    if (i < r)
-    {
-      QuickSort(arr, i, r);
     }
   }
 

@@ -1,26 +1,25 @@
 def quick_sort(array, p, r)
-  return if p >= r
-
-  pivot = array[p + (r - p + 1) / 2]
-  i = p
-  j = r
-
-  while i <= j
-    while array[i] < pivot
-      i += 1
+  while p < r
+    pivot = array[p + (r - p + 1) / 2]
+    i = p
+    j = r
+    while i <= j
+      i += 1 while array[i] < pivot
+      j -= 1 while array[j] > pivot
+      if i <= j
+        array[i], array[j] = array[j], array[i]
+        i += 1
+        j -= 1
+      end
     end
-    while array[j] > pivot
-      j -= 1
-    end
-    if i <= j
-      array[i], array[j] = array[j], array[i]
-      i += 1
-      j -= 1
+    if j - p < r - i
+      quick_sort(array, p, j) if p < j
+      p = i
+    else
+      quick_sort(array, i, r) if i < r
+      r = j
     end
   end
-
-  quick_sort(array, p, j) if p < j
-  quick_sort(array, i, r) if i < r
 end
 
 def sort(arr)
