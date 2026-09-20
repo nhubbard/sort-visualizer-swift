@@ -18,7 +18,7 @@ sequential version, under a different name. Real thread interleaving has no mean
 single-writer model. Porting these variants would add duplicate content, not new algorithmic
 behavior.
 
-This leaves 196 candidates. 183 are shipped. 13 remain, in one category.
+This leaves 196 candidates. 184 are shipped. 12 remain, in one category.
 
 ### By category
 
@@ -31,7 +31,7 @@ This leaves 196 candidates. 183 are shipped. 13 remain, in one category.
 | Merge (19) | All ported |
 | Miscellaneous (4) | All ported |
 | Concurrent (22) | All ported |
-| Hybrid (41) | 28 ported, 13 remaining |
+| Hybrid (41) | 29 ported, 12 remaining |
 
 ### Remaining work
 
@@ -42,7 +42,7 @@ line count. Inherited template logic is real complexity a port must understand a
 
 **Hard** (201–400 effective lines, or a same-category prerequisite not yet ported):
 
-- `LazierestSort`, `CircularGrailSort`
+- `CircularGrailSort`
   (self-contained despite the name; it does not extend `GrailSorting`), `FifthMergeSort`,
   `BufferPartitionMergeSort`, `OptimizedRotateMergeSort`, `EctaSort`.
 

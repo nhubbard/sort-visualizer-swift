@@ -215,7 +215,7 @@ struct ContentView: View {
     .disabled(showcaseIndex != nil || sweepDriver.isRunning)
     .navigationTitle(contentTitle)
     .toolbar {
-      ToolbarItem(placement: .primaryAction) {
+      ToolbarItem(placement: .topBarTrailing) {
         Menu {
           Picker("Sort By", selection: $sortOption) {
             ForEach(SortOption.allCases) { option in

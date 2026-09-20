@@ -80,7 +80,7 @@ struct NativeAlgorithmCorrectnessTests {
     FlashSort(), FlippedMinHeapSort(), FlanSort(), FluxSort(), FoldSort(), ForcedStableQuickSort(), FunSort(), GnomeSort(),
     GrailSort(), GravitySort(), GuessSort(), HanoiSort(), HybridCombSort(), ImprovedBlockSelectionSort(),
     ImprovedInPlaceMergeSort(), InPlaceLSDRadixSort(), InPlaceMergeSort(), InsertionSort(), IntroCircleSortIterative(),
-    IntroCircleSortRecursive(), IntroSort(), IterativeTopDownMergeSort(), LaziestSort(), LazyHeapSort(),
+    IntroCircleSortRecursive(), IntroSort(), IterativeTopDownMergeSort(), LaziestSort(), LazierestSort(), LazyHeapSort(),
     LazyStableSort(), LessBogoSort(), LibrarySort(), LLQuickSort(), LRQuickSort(), LSDRadixSort(), MatrixSort(),
     MaxHeapSort(), MedianMergeSort(), MedianQuickBogoSort(), MergeBogoSort(), MergeExchangeSortIterative(), MergeInsertionSort(),
     MergeSort(), MinHeapSort(), MinMaxHeapSort(), MSDRadixSort(), NewShuffleMergeSort(), OddEvenMergeSortIterative(),
@@ -132,6 +132,31 @@ struct NativeAlgorithmCorrectnessTests {
         var engine = RecordingEngine(values: input)
         sort.record(into: &engine)
         #expect(engine.values == input.sorted(), "Median Merge failed duplicate-heavy fuzz at size \(size)")
+      }
+    }
+  }
+
+  @Test
+  func lazierestSortHandlesCubeRootBlockBoundaries() {
+    let sort = LazierestSort()
+    for size in [0, 1, 2, 16, 17, 26, 27, 28, 63, 64, 65, 124, 125, 126, 255, 256, 257, 512] {
+      let cases = [
+        Array(repeating: 3, count: size),
+        Array(0..<size),
+        Array((0..<size).reversed()),
+        (0..<size).map { ($0 * 19) % 11 },
+        (0..<size).map { min($0, size - 1 - $0) }
+      ]
+      for input in cases {
+        var engine = RecordingEngine(values: input)
+        sort.record(into: &engine)
+        #expect(engine.values == input.sorted(), "Lazierest failed size \(size): \(input) -> \(engine.values)")
+      }
+      for _ in 0..<30 where size > 16 {
+        let input = (0..<size).map { _ in Int.random(in: -8...8) }
+        var engine = RecordingEngine(values: input)
+        sort.record(into: &engine)
+        #expect(engine.values == input.sorted(), "Lazierest duplicate fuzz failed at size \(size)")
       }
     }
   }

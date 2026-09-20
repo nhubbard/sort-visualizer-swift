@@ -2217,6 +2217,36 @@
   },
   {
     "coefficients" : [
+      0.17011545336903683,
+      67.59153563273587,
+      -735.7244448887742
+    ],
+    "runnerUpFamily" : "powerLog",
+    "runnerUpRSquared" : 0.9982498725447183,
+    "safeMaxSizeByCap" : [
+      100000,
+      518,
+      300000,
+      1007,
+      1000000,
+      1979
+    ],
+    "sampleSizes" : [
+      16,
+      17,
+      18,
+      19,
+      38,
+      76,
+      152,
+      304
+    ],
+    "subjectID" : "lazierestsort+recradix",
+    "winningFamily" : "polynomialIntercept",
+    "winningRSquared" : 0.9998747595849736
+  },
+  {
+    "coefficients" : [
       1.3354330408930317,
       1.4583051726428462
     ],
