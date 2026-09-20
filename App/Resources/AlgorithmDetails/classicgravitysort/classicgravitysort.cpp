@@ -16,7 +16,7 @@ void printList(int items[], int size) {
 }
 
 void sort(int arr[], int n) {
-  if (n == 0)
+  if (n <= 1)
     return;
 
   int maxValue = arr[0];

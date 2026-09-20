@@ -1,6 +1,6 @@
 fun classicGravitySort(arr: Array<Int>) {
   val n = arr.size
-  if (n == 0) return
+  if (n <= 1) return
 
   var maxValue = arr[0]
   for (i in 1 until n) {

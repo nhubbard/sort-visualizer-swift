@@ -1,6 +1,6 @@
 function sort(arr) {
   const n = arr.length;
-  if (n === 0) return arr;
+  if (n <= 1) return arr;
 
   let maxValue = arr[0];
   for (let i = 1; i < n; i++) {

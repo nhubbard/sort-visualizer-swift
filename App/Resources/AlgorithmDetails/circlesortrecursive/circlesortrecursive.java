@@ -36,7 +36,7 @@ public class circlesortrecursive {
 
   public static void sort(int[] array) {
     int end = array.length;
-    if (end == 0) {
+    if (end <= 1) {
       return;
     }
     int paddedLength = nextPowerOfTwo(end);

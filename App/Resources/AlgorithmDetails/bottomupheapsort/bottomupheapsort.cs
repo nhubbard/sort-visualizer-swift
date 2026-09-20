@@ -30,6 +30,7 @@ public class BottomUpHeapSort
   public static void Sort(int[] arr)
   {
     int n = arr.Length;
+    if (n < 2) return;
     for (int i = (n - 1) / 2; i >= 0; i--)
     {
       SiftDown(arr, i, n);

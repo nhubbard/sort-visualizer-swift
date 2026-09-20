@@ -1,6 +1,6 @@
 func sort(_ arr: inout [Int]) {
     let n = arr.count
-    guard n > 0 else {
+    guard n > 1 else {
         return
     }
 

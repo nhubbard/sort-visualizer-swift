@@ -35,7 +35,7 @@ func circleSortRoutine(_ array: inout [Int], _ lo: Int, _ hi: Int, _ end: Int) -
 
 func sort(_ array: inout [Int]) {
     let end = array.count
-    guard end > 0 else {
+    guard end > 1 else {
         return
     }
     let paddedLength = nextPowerOfTwo(end)

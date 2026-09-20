@@ -38,7 +38,7 @@ int circleSortRoutine(int arr[], int lo, int hi, int end) {
 }
 
 void sort(int arr[], int n) {
-  if (n == 0) {
+  if (n <= 1) {
     return;
   }
   int paddedLength = nextPowerOfTwo(n);

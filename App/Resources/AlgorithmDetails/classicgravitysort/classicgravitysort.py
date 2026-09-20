@@ -1,6 +1,6 @@
 def sort(arr):
     n = len(arr)
-    if n == 0:
+    if n <= 1:
         return arr
     max_value = max(arr)
     transpose = [0] * max_value

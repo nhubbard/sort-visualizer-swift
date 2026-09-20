@@ -37,7 +37,7 @@ func circleSortRoutine(arr []int, lo, hi, end int) int {
 
 func sort(arr []int) []int {
 	end := len(arr)
-	if end == 0 {
+	if end <= 1 {
 		return arr
 	}
 	paddedLength := nextPowerOfTwo(end)

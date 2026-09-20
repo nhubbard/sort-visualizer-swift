@@ -43,7 +43,7 @@ public class CircleSortRecursive
   public static int[] Sort(int[] array)
   {
     var end = array.Length;
-    if (end == 0)
+    if (end <= 1)
     {
       return array;
     }

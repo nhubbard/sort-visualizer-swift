@@ -31,7 +31,7 @@ function circleSortRoutine(array, lo, hi, end) {
 
 function sort(arr) {
   var end = arr.length;
-  if (end === 0) {
+  if (end <= 1) {
     return arr;
   }
   var paddedLength = nextPowerOfTwo(end);

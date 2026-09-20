@@ -5,7 +5,7 @@ public class ClassicGravitySort
   public static void Sort(int[] arr)
   {
     int n = arr.Length;
-    if (n == 0)
+    if (n <= 1)
       return;
 
     int maxValue = arr[0];

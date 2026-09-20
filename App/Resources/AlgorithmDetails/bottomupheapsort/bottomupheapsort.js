@@ -1,5 +1,6 @@
 function sort(arr) {
   const n = arr.length;
+  if (n < 2) return;
 
   function siftDown(i, b) {
     let j = i;

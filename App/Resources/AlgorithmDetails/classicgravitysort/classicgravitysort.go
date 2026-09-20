@@ -6,7 +6,7 @@ import (
 
 func classicGravitySort(arr []int) {
 	n := len(arr)
-	if n == 0 {
+	if n <= 1 {
 		return
 	}
 

@@ -3,7 +3,7 @@ import java.util.Arrays;
 public class classicgravitysort {
   private static void classicGravitySort(int[] arr) {
     int n = arr.length;
-    if (n == 0) {
+    if (n <= 1) {
       return;
     }
 

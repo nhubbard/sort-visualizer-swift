@@ -1,5 +1,7 @@
 def sort(arr):
     n = len(arr)
+    if n < 2:
+        return
 
     def sift_down(i, b):
         j = i

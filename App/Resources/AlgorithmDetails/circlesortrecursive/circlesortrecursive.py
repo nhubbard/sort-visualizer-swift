@@ -26,7 +26,7 @@ def circle_sort_routine(array, lo, hi, end):
 
 def sort(arr):
     end = len(arr)
-    if end == 0:
+    if end <= 1:
         return
     padded_length = next_power_of_two(end)
     swaps = None

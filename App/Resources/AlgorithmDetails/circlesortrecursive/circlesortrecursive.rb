@@ -29,7 +29,7 @@ end
 
 def sort(array)
   ending = array.length
-  return array if ending == 0
+  return array if ending <= 1
   padded_length = next_power_of_two(ending)
   swaps = nil
   loop do

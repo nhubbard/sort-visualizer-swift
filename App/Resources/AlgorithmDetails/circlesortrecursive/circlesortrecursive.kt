@@ -33,7 +33,7 @@ fun circleSortRoutine(array: Array<Int>, lo: Int, hi: Int, end: Int): Int {
 
 fun sort(array: Array<Int>) {
   val end = array.size
-  if (end == 0) {
+  if (end <= 1) {
     return
   }
   val paddedLength = nextPowerOfTwo(end)

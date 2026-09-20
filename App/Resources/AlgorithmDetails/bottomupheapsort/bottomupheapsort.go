@@ -28,6 +28,9 @@ func siftDown(arr []int, i int, b int) {
 
 func sort(arr []int) []int {
 	n := len(arr)
+	if n < 2 {
+		return arr
+	}
 	for i := (n - 1) / 2; i >= 0; i-- {
 		siftDown(arr, i, n)
 	}

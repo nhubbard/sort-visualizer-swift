@@ -36,6 +36,7 @@ void siftDown(int arr[], int i, int b) {
 }
 
 void sort(int arr[], int n) {
+  if (n < 2) return;
   for (int i = (n - 1) / 2; i >= 0; i--) {
     siftDown(arr, i, n);
   }
