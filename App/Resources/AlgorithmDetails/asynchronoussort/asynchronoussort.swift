@@ -1,5 +1,6 @@
 func sort(_ arr: inout [Int]) {
     let n = arr.count
+    guard n > 0 else { return }
     var ext = arr
     var minValue = ext[0]
     var maxValue = ext[0]

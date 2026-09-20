@@ -58,7 +58,7 @@ public class americanflagsort {
       return;
     }
 
-    int radix = 10;
+    int radix = 4;
     int maxValue = arr[0];
     for (int value : arr) {
       if (value > maxValue) {

@@ -1,5 +1,6 @@
 def sort(arr)
   n = arr.length
+  return if n == 0
   ext = arr.dup
   min_value = ext.min
   max_value = ext.max + 1

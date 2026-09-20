@@ -66,7 +66,7 @@ func sort(arr []int) []int {
 		return arr
 	}
 
-	radix := 10
+	radix := 4
 	maxValue := arr[0]
 	for _, v := range arr {
 		if v > maxValue {

@@ -18,10 +18,11 @@ fun sort(arr: Array<Int>) {
     val pos = binarySearch(arr, item, 0, i)
     var j = i
     while (j > pos) {
+      val displaced = arr[j]
       arr[j] = arr[j - 1]
+      arr[j - 1] = displaced
       j--
     }
-    arr[pos] = item
   }
 }
 

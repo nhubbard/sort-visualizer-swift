@@ -1,5 +1,6 @@
 function sort(arr) {
   const n = arr.length;
+  if (n === 0) return;
   const ext = [...arr];
   let minValue = ext[0];
   let maxValue = ext[0];

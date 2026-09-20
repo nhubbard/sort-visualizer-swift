@@ -78,7 +78,7 @@ void sort(int arr[], int n) {
     return;
   }
 
-  int radix = 10;
+  int radix = 4;
   int maxValue = arr[0];
   for (int i = 1; i < n; i++) {
     if (arr[i] > maxValue) {

@@ -15,6 +15,7 @@ void printList(int arr[], int n) {
 }
 
 void sort(int arr[], int n) {
+  if (n == 0) return;
   int ext[n];
   int minValue = arr[0];
   int maxValue = arr[0];

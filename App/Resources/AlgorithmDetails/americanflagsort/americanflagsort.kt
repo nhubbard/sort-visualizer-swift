@@ -52,7 +52,7 @@ fun sort(arr: Array<Int>) {
     return
   }
 
-  val radix = 10
+  val radix = 4
   var maxValue = arr[0]
   for (value in arr) {
     if (value > maxValue) {

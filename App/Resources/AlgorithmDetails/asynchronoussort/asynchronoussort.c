@@ -16,6 +16,7 @@ void printList(int items[], int size) {
 }
 
 void sort(int arr[], int n) {
+  if (n == 0) return;
   int ext[n];
   for (int i = 0; i < n; i++) {
     ext[i] = arr[i];

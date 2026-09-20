@@ -55,7 +55,7 @@ function sort(arr) {
     return arr;
   }
 
-  var radix = 10;
+  var radix = 4;
   var maxValue = Math.max.apply(null, arr);
 
   var divisor = 1;

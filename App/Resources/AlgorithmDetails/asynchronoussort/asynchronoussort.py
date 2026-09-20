@@ -1,5 +1,7 @@
 def sort(arr):
     n = len(arr)
+    if n == 0:
+        return
     ext = list(arr)
     min_value = min(ext)
     max_value = max(ext) + 1

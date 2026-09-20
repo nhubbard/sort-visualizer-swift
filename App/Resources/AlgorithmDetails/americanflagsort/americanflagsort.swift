@@ -56,7 +56,7 @@ func sort(_ arr: inout [Int]) {
         return
     }
 
-    let radix = 10
+    let radix = 4
     let maxValue = arr.max() ?? 0
 
     var divisor = 1

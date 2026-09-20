@@ -5,6 +5,7 @@ public class AsynchronousSort
   public static void Sort(int[] arr)
   {
     int n = arr.Length;
+    if (n == 0) return;
     int[] ext = new int[n];
     Array.Copy(arr, ext, n);
     int minValue = ext[0];

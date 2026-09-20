@@ -1,4 +1,5 @@
 #include <cstdio>
+#include <utility>
 
 int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
 
@@ -34,10 +35,9 @@ void sort(int arr[], int n) {
     int pos = binarySearch(arr, item, 0, i);
     int j = i;
     while (j > pos) {
-      arr[j] = arr[j - 1];
+      std::swap(arr[j], arr[j - 1]);
       j--;
     }
-    arr[pos] = item;
   }
 }
 

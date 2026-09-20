@@ -16,9 +16,8 @@ def binary_insertion_sort(array):
         pos = binary_search(array, item, 0, i)
         j = i
         while j > pos:
-            array[j] = array[j - 1]
+            array[j], array[j - 1] = array[j - 1], array[j]
             j -= 1
-        array[pos] = item
 
 
 def sort(arr):

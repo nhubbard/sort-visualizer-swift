@@ -1,5 +1,6 @@
 fun sort(arr: Array<Int>) {
   val n = arr.size
+  if (n == 0) return
   val ext = arr.copyOf()
   var minValue = ext[0]
   var maxValue = ext[0]

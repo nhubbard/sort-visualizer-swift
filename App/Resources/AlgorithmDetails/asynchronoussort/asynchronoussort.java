@@ -3,6 +3,7 @@ import java.util.Arrays;
 public class asynchronoussort {
   public static void sort(int[] arr) {
     int n = arr.length;
+    if (n == 0) return;
     int[] ext = new int[n];
     System.arraycopy(arr, 0, ext, 0, n);
     int minValue = ext[0];

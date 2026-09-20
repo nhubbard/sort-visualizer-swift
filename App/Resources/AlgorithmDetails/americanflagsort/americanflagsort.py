@@ -48,7 +48,7 @@ def sort(arr):
     if n <= 1:
         return
 
-    radix = 10
+    radix = 4
     max_value = max(arr)
 
     divisor = 1

@@ -21,10 +21,11 @@ public class binaryinsertionsort {
       int pos = binarySearch(arr, item, 0, i);
       int j = i;
       while (j > pos) {
+        int displaced = arr[j];
         arr[j] = arr[j - 1];
+        arr[j - 1] = displaced;
         j--;
       }
-      arr[pos] = item;
     }
   }
 

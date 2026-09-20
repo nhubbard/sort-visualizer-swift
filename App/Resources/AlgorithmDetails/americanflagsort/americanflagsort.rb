@@ -50,7 +50,7 @@ end
 def sort(arr)
   return if arr.length <= 1
 
-  radix = 10
+  radix = 4
   max_value = arr.max
 
   divisor = 1

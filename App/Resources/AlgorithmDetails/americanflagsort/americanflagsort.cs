@@ -72,7 +72,7 @@ public class AmericanFlagSort
       return;
     }
 
-    var radix = 10;
+    var radix = 4;
     var maxValue = arr[0];
     foreach (var value in arr)
     {

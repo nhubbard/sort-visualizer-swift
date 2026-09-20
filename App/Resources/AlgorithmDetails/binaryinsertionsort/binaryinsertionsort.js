@@ -18,10 +18,9 @@ function sort(arr) {
     var pos = binarySearch(arr, item, 0, i);
     var j = i;
     while (j > pos) {
-      arr[j] = arr[j - 1];
+      [arr[j], arr[j - 1]] = [arr[j - 1], arr[j]];
       j--;
     }
-    arr[pos] = item;
   }
   return arr;
 }

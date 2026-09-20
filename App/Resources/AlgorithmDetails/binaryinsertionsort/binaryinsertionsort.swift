@@ -24,10 +24,9 @@ func binaryInsertionSort(_ array: inout [Int]) {
         let pos = binarySearch(array, item, 0, i)
         var j = i
         while j > pos {
-            array[j] = array[j - 1]
+            array.swapAt(j, j - 1)
             j -= 1
         }
-        array[pos] = item
     }
 }
 
