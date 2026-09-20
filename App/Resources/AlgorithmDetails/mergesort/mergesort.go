@@ -9,7 +9,7 @@ func merge(a []int, b []int) []int {
 	i := 0
 	j := 0
 	for i < len(a) && j < len(b) {
-		if a[i] < b[j] {
+		if a[i] <= b[j] {
 			final = append(final, a[i])
 			i++
 		} else {
