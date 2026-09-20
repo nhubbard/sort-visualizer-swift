@@ -21,7 +21,7 @@ def sort(arr)
   n = arr.length
   while n > 1
     max = max_index(arr, n)
-    if max != n
+    if max != n - 1
       flip(arr, max)
       flip(arr, n - 1)
     end

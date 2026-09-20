@@ -32,7 +32,7 @@ public class PancakeSort
     while (n > 1)
     {
       var max = MaxIndex(arr, n);
-      if (max != n)
+      if (max != n - 1)
       {
         Flip(arr, max);
         Flip(arr, n - 1);

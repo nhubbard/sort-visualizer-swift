@@ -20,7 +20,7 @@ func sort(_ arr: inout [Int]) {
     var n = arr.count
     while n > 1 {
         let max = maxIndex(&arr, n)
-        if max != n {
+        if max != n - 1 {
             flip(&arr, max)
             flip(&arr, n - 1)
         }

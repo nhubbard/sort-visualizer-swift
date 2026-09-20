@@ -18,7 +18,7 @@ def sort(arr):
     n = len(arr)
     while n > 1:
         max = max_index(arr, n)
-        if max != n:
+        if max != n - 1:
             flip(arr, max)
             flip(arr, n - 1)
         n -= 1

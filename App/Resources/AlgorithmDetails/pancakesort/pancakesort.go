@@ -28,7 +28,7 @@ func sort(arr []int) []int {
 	max := 0
 	for n > 1 {
 		max = maxIndex(arr, n)
-		if max != n {
+		if max != n-1 {
 			flip(arr, max)
 			flip(arr, n-1)
 		}

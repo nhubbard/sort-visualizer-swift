@@ -38,7 +38,7 @@ void sort(int arr[], int n) {
   int max;
   while (n > 1) {
     max = maxIndex(arr, n);
-    if (max != n) {
+    if (max != n - 1) {
       flip(arr, max);
       flip(arr, n - 1);
     }
