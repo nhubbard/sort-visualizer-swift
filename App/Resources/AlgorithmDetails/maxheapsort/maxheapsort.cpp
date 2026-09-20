@@ -15,29 +15,26 @@ void printList(int arr[], int n) {
   }
 }
 
-void heapify(int arr[], int n, int i) {
-  int largest = i;
-  int left = 2 * i + 1;
-  int right = 2 * i + 2;
-  if (left < n && arr[left] > arr[largest]) {
-    largest = left;
-  }
-  if (right < n && arr[right] > arr[largest]) {
-    largest = right;
-  }
-  if (largest != i) {
-    std::swap(arr[i], arr[largest]);
-    heapify(arr, n, largest);
+void siftDown(int arr[], int root, int size) {
+  while (true) {
+    int largest = root;
+    int left = 2 * root + 1;
+    int right = left + 1;
+    if (left < size && arr[largest] < arr[left]) largest = left;
+    if (right < size && arr[largest] < arr[right]) largest = right;
+    if (largest == root) break;
+    std::swap(arr[root], arr[largest]);
+    root = largest;
   }
 }
 
 void sort(int arr[], int n) {
   for (int i = n / 2 - 1; i >= 0; i--) {
-    heapify(arr, n, i);
+    siftDown(arr, i, n);
   }
-  for (int i = n - 1; i >= 0; i--) {
+  for (int i = n - 1; i > 0; i--) {
     std::swap(arr[0], arr[i]);
-    heapify(arr, i, 0);
+    siftDown(arr, 0, i);
   }
 }
 
