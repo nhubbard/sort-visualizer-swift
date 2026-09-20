@@ -3,16 +3,32 @@
 
 int array[7] = {0, 39, 21, 62, 91, 14, 23};
 
+void swap(int *a, int *b) {
+  int t = *a;
+  *a = *b;
+  *b = t;
+}
+
 void printList(int items[], int size) {
-  for (int i = 0; i < size; i++) {
-    if (i == 0) {
-      printf("[%d, ", items[i]);
-    } else if (i != size - 1) {
-      printf("%d, ", items[i]);
-    } else {
-      printf("%d]", items[i]);
+  printf("[");
+  if (size > 0) {
+    printf("%d", items[0]);
+    for (int i = 1; i < size; i++) {
+      printf(", %d", items[i]);
     }
   }
+  printf("]");
+}
+
+int isSorted(int arr[], int n);
+int permute(int arr[], int idx[], int n, int length);
+
+void sort(int arr[], int n) {
+  int idx[n];
+  for (int i = 0; i < n; i++) {
+    idx[i] = i;
+  }
+  permute(arr, idx, n, n);
 }
 
 int isSorted(int arr[], int n) {
@@ -53,14 +69,6 @@ int permute(int arr[], int idx[], int n, int length) {
   }
   arr[idx[length - 1]] = t2;
   return 0;
-}
-
-void sort(int arr[], int n) {
-  int idx[n];
-  for (int i = 0; i < n; i++) {
-    idx[i] = i;
-  }
-  permute(arr, idx, n, n);
 }
 
 int main(int argc, char *argv[]) {

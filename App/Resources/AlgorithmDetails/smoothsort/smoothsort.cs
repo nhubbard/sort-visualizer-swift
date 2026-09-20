@@ -8,6 +8,67 @@ public class SmoothSort
     177, 287, 465, 753, 1219, 1973, 3193, 5167, 8361, 13529, 21891,
   };
 
+  static void Sort(int[] array)
+  {
+    int n = array.Length;
+    if (n <= 1)
+      return;
+
+    int head = 0;
+    long p = 1;
+    int pshift = 1;
+    int hi = n - 1;
+
+    while (head < hi)
+    {
+      if ((p & 3) == 3)
+      {
+        Sift(array, pshift, head);
+        p >>= 2;
+        pshift += 2;
+      }
+      else
+      {
+        if (Leonardo[pshift - 1] >= hi - head)
+          Trinkle(array, p, pshift, head, false);
+        else
+          Sift(array, pshift, head);
+        if (pshift == 1)
+        {
+          p <<= 1;
+          pshift -= 1;
+        }
+        else
+        {
+          p <<= (pshift - 1);
+          pshift = 1;
+        }
+      }
+      p |= 1;
+      head += 1;
+    }
+
+    Trinkle(array, p, pshift, head, false);
+    while (pshift != 1 || p != 1)
+    {
+      if (pshift <= 1)
+      {
+        int trail = TrailingZeroCount(p);
+        p >>= trail;
+        pshift += trail;
+      }
+      else
+      {
+        p <<= 2;
+        p ^= 7;
+        pshift -= 2;
+        Trinkle(array, p >> 1, pshift + 1, head - (int)Leonardo[pshift] - 1, true);
+        Trinkle(array, p, pshift, head - 1, true);
+      }
+      head -= 1;
+    }
+  }
+
   static int TrailingZeroCount(long value)
   {
     long mask = value & ~1L;
@@ -80,70 +141,12 @@ public class SmoothSort
     }
   }
 
-  static void Sort(int[] array)
-  {
-    int n = array.Length;
-    if (n <= 1)
-      return;
-
-    int head = 0;
-    long p = 1;
-    int pshift = 1;
-    int hi = n - 1;
-
-    while (head < hi)
-    {
-      if ((p & 3) == 3)
-      {
-        Sift(array, pshift, head);
-        p >>= 2;
-        pshift += 2;
-      }
-      else
-      {
-        if (Leonardo[pshift - 1] >= hi - head)
-          Trinkle(array, p, pshift, head, false);
-        else
-          Sift(array, pshift, head);
-        if (pshift == 1)
-        {
-          p <<= 1;
-          pshift -= 1;
-        }
-        else
-        {
-          p <<= (pshift - 1);
-          pshift = 1;
-        }
-      }
-      p |= 1;
-      head += 1;
-    }
-
-    Trinkle(array, p, pshift, head, false);
-    while (pshift != 1 || p != 1)
-    {
-      if (pshift <= 1)
-      {
-        int trail = TrailingZeroCount(p);
-        p >>= trail;
-        pshift += trail;
-      }
-      else
-      {
-        p <<= 2;
-        p ^= 7;
-        pshift -= 2;
-        Trinkle(array, p >> 1, pshift + 1, head - (int)Leonardo[pshift] - 1, true);
-        Trinkle(array, p, pshift, head - 1, true);
-      }
-      head -= 1;
-    }
-  }
-
   public static void Main(String[] args)
   {
-    int[] array = { 0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56 };
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     Sort(array);
     string result = "[" + String.Join(", ", array) + "]";
     Console.WriteLine(result);

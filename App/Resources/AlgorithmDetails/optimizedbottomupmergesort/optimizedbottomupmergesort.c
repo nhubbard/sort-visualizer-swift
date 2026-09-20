@@ -7,55 +7,26 @@ int array[40] = {81, 14, 3,  94, 35, 31, 28, 17, 94, 13, 86, 94, 69, 11,
                  75, 54, 4,  3,  11, 27, 29, 64, 77, 3,  71, 25, 91, 83,
                  89, 69, 53, 28, 57, 75, 35, 0,  97, 20, 89, 54};
 
+void swap(int *a, int *b) {
+  int t = *a;
+  *a = *b;
+  *b = t;
+}
+
 void printList(int items[], int size) {
-  for (int i = 0; i < size; i++) {
-    if (i == 0) {
-      printf("[%d, ", items[i]);
-    } else if (i != size - 1) {
-      printf("%d, ", items[i]);
-    } else {
-      printf("%d]", items[i]);
+  printf("[");
+  if (size > 0) {
+    printf("%d", items[0]);
+    for (int i = 1; i < size; i++) {
+      printf(", %d", items[i]);
     }
   }
+  printf("]");
 }
 
-int minInt(int a, int b) { return a < b ? a : b; }
-
-void binaryInsertionSort(int arr[], int lo, int hi) {
-  for (int i = lo + 1; i < hi; i++) {
-    int key = arr[i];
-    int left = lo, right = i;
-    while (left < right) {
-      int mid = (left + right) / 2;
-      if (arr[mid] <= key) {
-        left = mid + 1;
-      } else {
-        right = mid;
-      }
-    }
-    for (int j = i; j > left; j--) {
-      arr[j] = arr[j - 1];
-    }
-    arr[left] = key;
-  }
-}
-
-void merge(int src[], int dst[], int low, int mid, int high) {
-  int i = low, j = mid, k = low;
-  while (i < mid && j < high) {
-    if (src[i] <= src[j]) {
-      dst[k++] = src[i++];
-    } else {
-      dst[k++] = src[j++];
-    }
-  }
-  while (i < mid) {
-    dst[k++] = src[i++];
-  }
-  while (j < high) {
-    dst[k++] = src[j++];
-  }
-}
+int minInt(int a, int b);
+void binaryInsertionSort(int arr[], int lo, int hi);
+void merge(int src[], int dst[], int low, int mid, int high);
 
 void sort(int arr[], int n) {
   if (n < BLOCK_SIZE) {
@@ -103,6 +74,46 @@ void sort(int arr[], int n) {
   }
 
   free(scratch);
+}
+
+int minInt(int a, int b) {
+  return a < b ? a : b;
+}
+
+void binaryInsertionSort(int arr[], int lo, int hi) {
+  for (int i = lo + 1; i < hi; i++) {
+    int key = arr[i];
+    int left = lo, right = i;
+    while (left < right) {
+      int mid = (left + right) / 2;
+      if (arr[mid] <= key) {
+        left = mid + 1;
+      } else {
+        right = mid;
+      }
+    }
+    for (int j = i; j > left; j--) {
+      arr[j] = arr[j - 1];
+    }
+    arr[left] = key;
+  }
+}
+
+void merge(int src[], int dst[], int low, int mid, int high) {
+  int i = low, j = mid, k = low;
+  while (i < mid && j < high) {
+    if (src[i] <= src[j]) {
+      dst[k++] = src[i++];
+    } else {
+      dst[k++] = src[j++];
+    }
+  }
+  while (i < mid) {
+    dst[k++] = src[i++];
+  }
+  while (j < high) {
+    dst[k++] = src[j++];
+  }
 }
 
 int main(int argc, char *argv[]) {

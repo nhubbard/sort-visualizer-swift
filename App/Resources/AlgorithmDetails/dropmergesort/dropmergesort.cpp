@@ -10,21 +10,135 @@ int array[30] = {0,  1,  2,  3,  4,  9,  6,  7,  8,  5,  10, 11, 12, 13, 14,
                  15, 21, 17, 18, 19, 20, 16, 22, 23, 24, 28, 26, 27, 25, 29};
 
 void printList(int items[], int size) {
-  for (int i = 0; i < size; i++) {
-    if (i == 0) {
-      printf("[%d, ", items[i]);
-    } else if (i != size - 1) {
-      printf("%d, ", items[i]);
-    } else {
-      printf("%d]", items[i]);
+  printf("[");
+  if (size > 0) {
+    printf("%d", items[0]);
+    for (int i = 1; i < size; i++) {
+      printf(", %d", items[i]);
     }
   }
+  printf("]");
 }
 
 // Branched PDQ fallback, matching the app PDQSortingTemplate.
 const int insertSortThreshold = 24;
 const int nintherThreshold = 128;
 const int partialInsertSortLimit = 8;
+
+int pdqLog(int n);
+void insertSort(int arr[], int begin, int end);
+void unguardInsertSort(int arr[], int begin, int end);
+bool partialInsertSort(int arr[], int begin, int end);
+void sortTwo(int arr[], int a, int b);
+void sortThree(int arr[], int a, int b, int c);
+std::pair<int, bool> partRight(int arr[], int begin, int end);
+int partLeft(int arr[], int begin, int end);
+void siftDown(int arr[], int begin, int root, int size);
+void heapSort(int arr[], int begin, int end);
+void pdqLoop(int arr[], int begin, int end, int badAllowed);
+void pdqSort(int arr[], int begin, int end);
+
+void sort(int arr[], int length) {
+  if (length < 2) {
+    return;
+  }
+
+  std::vector<int> dropped;
+  int numDroppedInARow = 0;
+  int read = 0;
+  int write = 0;
+  int iteration = 0;
+  int earlyOutStop = length / kEarlyOutTestAt;
+
+  while (read < length) {
+    iteration++;
+    if (iteration == earlyOutStop && static_cast<double>(dropped.size()) >
+                                         read * kEarlyOutDisorderFraction) {
+      // Too disordered for the adaptive approach to be worth it: flush what's
+      // been dropped so far back into the array and fall back to a plain full
+      // sort.
+      for (int value : dropped) {
+        arr[write] = value;
+        write++;
+      }
+      dropped.clear();
+      pdqSort(arr, 0, length);
+      return;
+    }
+
+    if (write == 0 || arr[read] >= arr[write - 1]) {
+      // In order -- keep it.
+      arr[write] = arr[read];
+      write++;
+      read++;
+      numDroppedInARow = 0;
+    } else if (numDroppedInARow == 0 && write >= 2 &&
+               arr[read] >= arr[write - 2]) {
+      // Quick undo: the element two back would have accepted this one just
+      // fine, so drop the one right before it instead of the new element.
+      dropped.push_back(arr[write - 1]);
+      arr[write - 1] = arr[read];
+      read++;
+    } else if (numDroppedInARow < kRecency) {
+      dropped.push_back(arr[read]);
+      read++;
+      numDroppedInARow++;
+    } else {
+      // Accepting something `numDroppedInARow` elements back made every
+      // subsequent element drop -- that accept was a mistake. Undo it, and any
+      // other recently accepted elements bigger than the dropped run's maximum.
+      dropped.resize(dropped.size() - numDroppedInARow);
+      read -= numDroppedInARow;
+
+      int numBacktracked = 1;
+      write--;
+
+      int maxOfDropped = read;
+      for (int i = read + 1; i <= read + numDroppedInARow; i++) {
+        if (arr[i] > maxOfDropped) {
+          maxOfDropped = arr[i];
+        }
+      }
+
+      while (write >= 1 && maxOfDropped < arr[write - 1]) {
+        write--;
+        numBacktracked++;
+      }
+
+      for (int i = write; i < write + numBacktracked; i++) {
+        dropped.push_back(arr[i]);
+      }
+
+      numDroppedInARow = 0;
+    }
+  }
+
+  for (size_t offset = 0; offset < dropped.size(); offset++) {
+    arr[write + static_cast<int>(offset)] = dropped[offset];
+  }
+
+  pdqSort(arr, write, length);
+
+  // Copy the now-sorted dropped tail before the final backward merge starts
+  // overwriting arr[write:] in place.
+  std::vector<int> buffer(arr + write, arr + write + dropped.size());
+
+  int i = static_cast<int>(buffer.size()) - 1;
+  int j = write - 1;
+  int k = length - 1;
+
+  while (i >= 0) {
+    if (j < 0 || buffer[i] > arr[j]) {
+      arr[k] = buffer[i];
+      k--;
+      i--;
+    } else {
+      arr[k] = arr[j];
+      k--;
+      j--;
+    }
+  }
+}
 
 int pdqLog(int n) {
   int log = 0;
@@ -265,110 +379,8 @@ void pdqLoop(int arr[], int begin, int end, int badAllowed) {
   }
 }
 
-void pdqSort(int arr[], int begin, int end) { if (end - begin > 1) pdqLoop(arr, begin, end, pdqLog(end - begin)); }
-
-
-
-void sort(int arr[], int length) {
-  if (length < 2) {
-    return;
-  }
-
-  std::vector<int> dropped;
-  int numDroppedInARow = 0;
-  int read = 0;
-  int write = 0;
-  int iteration = 0;
-  int earlyOutStop = length / kEarlyOutTestAt;
-
-  while (read < length) {
-    iteration++;
-    if (iteration == earlyOutStop && static_cast<double>(dropped.size()) >
-                                         read * kEarlyOutDisorderFraction) {
-      // Too disordered for the adaptive approach to be worth it: flush what's
-      // been dropped so far back into the array and fall back to a plain full
-      // sort.
-      for (int value : dropped) {
-        arr[write] = value;
-        write++;
-      }
-      dropped.clear();
-      pdqSort(arr, 0, length);
-      return;
-    }
-
-    if (write == 0 || arr[read] >= arr[write - 1]) {
-      // In order -- keep it.
-      arr[write] = arr[read];
-      write++;
-      read++;
-      numDroppedInARow = 0;
-    } else if (numDroppedInARow == 0 && write >= 2 &&
-               arr[read] >= arr[write - 2]) {
-      // Quick undo: the element two back would have accepted this one just
-      // fine, so drop the one right before it instead of the new element.
-      dropped.push_back(arr[write - 1]);
-      arr[write - 1] = arr[read];
-      read++;
-    } else if (numDroppedInARow < kRecency) {
-      dropped.push_back(arr[read]);
-      read++;
-      numDroppedInARow++;
-    } else {
-      // Accepting something `numDroppedInARow` elements back made every
-      // subsequent element drop -- that accept was a mistake. Undo it, and any
-      // other recently accepted elements bigger than the dropped run's maximum.
-      dropped.resize(dropped.size() - numDroppedInARow);
-      read -= numDroppedInARow;
-
-      int numBacktracked = 1;
-      write--;
-
-      int maxOfDropped = read;
-      for (int i = read + 1; i <= read + numDroppedInARow; i++) {
-        if (arr[i] > maxOfDropped) {
-          maxOfDropped = arr[i];
-        }
-      }
-
-      while (write >= 1 && maxOfDropped < arr[write - 1]) {
-        write--;
-        numBacktracked++;
-      }
-
-      for (int i = write; i < write + numBacktracked; i++) {
-        dropped.push_back(arr[i]);
-      }
-
-      numDroppedInARow = 0;
-    }
-  }
-
-  for (size_t offset = 0; offset < dropped.size(); offset++) {
-    arr[write + static_cast<int>(offset)] = dropped[offset];
-  }
-
-  pdqSort(arr, write, length);
-
-  // Copy the now-sorted dropped tail before the final backward merge starts
-  // overwriting arr[write:] in place.
-  std::vector<int> buffer(arr + write, arr + write + dropped.size());
-
-  int i = static_cast<int>(buffer.size()) - 1;
-  int j = write - 1;
-  int k = length - 1;
-
-  while (i >= 0) {
-    if (j < 0 || buffer[i] > arr[j]) {
-      arr[k] = buffer[i];
-      k--;
-      i--;
-    } else {
-      arr[k] = arr[j];
-      k--;
-      j--;
-    }
-  }
+void pdqSort(int arr[], int begin, int end) {
+  if (end - begin > 1) pdqLoop(arr, begin, end, pdqLog(end - begin));
 }
 
 int main(int argc, char *argv[]) {

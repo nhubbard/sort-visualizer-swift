@@ -1,7 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
+                 90, 69, 51, 81, 68, 83, 32, 56};
 
 void swap(int *a, int *b) {
   int t = *a;
@@ -10,15 +11,14 @@ void swap(int *a, int *b) {
 }
 
 void printList(int items[], int size) {
-  for (int i = 0; i < size; i++) {
-    if (i == 0) {
-      printf("[%d, ", items[i]);
-    } else if (i != size - 1) {
-      printf("%d, ", items[i]);
-    } else {
-      printf("%d]", items[i]);
+  printf("[");
+  if (size > 0) {
+    printf("%d", items[0]);
+    for (int i = 1; i < size; i++) {
+      printf(", %d", items[i]);
     }
   }
+  printf("]");
 }
 
 /* A literal Bogo Bogo Sort re-derives the "is it sorted?" answer through a
@@ -36,6 +36,34 @@ void printList(int items[], int size) {
  * (after resetting arr to its first, fully ascending permutation) once every
  * arrangement has been visited -- a deterministic stand-in for "shuffle the
  * array at random". */
+int nextPermutation(int *arr, int n);
+int bogoBogoIsSorted(int *arr, int n);
+void bogoBogoSort(int *arr, int n);
+void insertionSort(int *arr, int n);
+void mergeSorted(int *a, int aLen, int *b, int bLen, int *out);
+
+void sort(int arr[], int n) {
+  int limit = n < CHAOS_LIMIT ? n : CHAOS_LIMIT;
+  int chaos[CHAOS_LIMIT];
+  for (int k = 0; k < limit; k++) {
+    chaos[k] = arr[k];
+  }
+  int restLen = n - limit;
+  int *rest = malloc(sizeof(int) * (restLen > 0 ? restLen : 1));
+  for (int k = 0; k < restLen; k++) {
+    rest[k] = arr[limit + k];
+  }
+
+  bogoBogoSort(
+      chaos,
+      limit); /* the real, recursive-check algorithm -- kept tiny on purpose */
+  insertionSort(rest,
+                restLen); /* an ordinary fast sort for the rest of the array */
+
+  mergeSorted(chaos, limit, rest, restLen, arr);
+  free(rest);
+}
+
 int nextPermutation(int *arr, int n) {
   int i = n - 2;
   while (i >= 0 && arr[i] >= arr[i + 1]) {
@@ -123,28 +151,6 @@ void mergeSorted(int *a, int aLen, int *b, int bLen, int *out) {
   while (j < bLen) {
     out[k++] = b[j++];
   }
-}
-
-void sort(int arr[], int n) {
-  int limit = n < CHAOS_LIMIT ? n : CHAOS_LIMIT;
-  int chaos[CHAOS_LIMIT];
-  for (int k = 0; k < limit; k++) {
-    chaos[k] = arr[k];
-  }
-  int restLen = n - limit;
-  int *rest = malloc(sizeof(int) * (restLen > 0 ? restLen : 1));
-  for (int k = 0; k < restLen; k++) {
-    rest[k] = arr[limit + k];
-  }
-
-  bogoBogoSort(
-      chaos,
-      limit); /* the real, recursive-check algorithm -- kept tiny on purpose */
-  insertionSort(rest,
-                restLen); /* an ordinary fast sort for the rest of the array */
-
-  mergeSorted(chaos, limit, rest, restLen, arr);
-  free(rest);
 }
 
 int main(int argc, char *argv[]) {

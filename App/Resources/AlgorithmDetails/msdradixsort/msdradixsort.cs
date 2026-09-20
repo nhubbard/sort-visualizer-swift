@@ -3,6 +3,32 @@ using System.Collections.Generic;
 
 public class MSDRadixSort
 {
+  public static int[] Sort(int[] array)
+  {
+    if (array.Length <= 1)
+    {
+      return array;
+    }
+    var radix = 4;
+    var maxValue = array[0];
+    foreach (var value in array)
+    {
+      if (value > maxValue)
+      {
+        maxValue = value;
+      }
+    }
+    var highestPower = 0;
+    var probe = radix;
+    while (probe <= maxValue)
+    {
+      highestPower++;
+      probe *= radix;
+    }
+    RadixMSD(array, 0, array.Length, radix, highestPower);
+    return array;
+  }
+
   private static int IntPow(int b, int exponent)
   {
     var result = 1;
@@ -53,35 +79,12 @@ public class MSDRadixSort
     }
   }
 
-  public static int[] Sort(int[] array)
-  {
-    if (array.Length <= 1)
-    {
-      return array;
-    }
-    var radix = 4;
-    var maxValue = array[0];
-    foreach (var value in array)
-    {
-      if (value > maxValue)
-      {
-        maxValue = value;
-      }
-    }
-    var highestPower = 0;
-    var probe = radix;
-    while (probe <= maxValue)
-    {
-      highestPower++;
-      probe *= radix;
-    }
-    RadixMSD(array, 0, array.Length, radix, highestPower);
-    return array;
-  }
-
   public static void Main(String[] args)
   {
-    int[] array = { 0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56 };
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     Sort(array);
     string result = "[" + String.Join(", ", array) + "]";
     Console.WriteLine(result);

@@ -2,16 +2,25 @@
 #include <stdlib.h>
 #include <string.h>
 
+void swap(int *a, int *b) {
+  int t = *a;
+  *a = *b;
+  *b = t;
+}
+
 static int idx;
 
-void traverse(int arr[], int temp[], int lower[], int upper[], int r) {
-  if (lower[r] != 0) {
-    traverse(arr, temp, lower, upper, lower[r]);
+void traverse(int arr[], int temp[], int lower[], int upper[], int r);
+
+void printList(int items[], int size) {
+  printf("[");
+  if (size > 0) {
+    printf("%d", items[0]);
+    for (int i = 1; i < size; i++) {
+      printf(", %d", items[i]);
+    }
   }
-  temp[idx++] = arr[r];
-  if (upper[r] != 0) {
-    traverse(arr, temp, lower, upper, upper[r]);
-  }
+  printf("]");
 }
 
 void sort(int arr[], int n) {
@@ -44,17 +53,17 @@ void sort(int arr[], int n) {
   free(temp);
 }
 
-void printList(int arr[], int n) {
-  for (int i = 0; i < n; i++) {
-    if (i == 0) {
-      printf("[%d, ", arr[i]);
-    } else if (i != n - 1) {
-      printf("%d, ", arr[i]);
-    } else {
-      printf("%d]\n", arr[i]);
-    }
+void traverse(int arr[], int temp[], int lower[], int upper[], int r) {
+  if (lower[r] != 0) {
+    traverse(arr, temp, lower, upper, lower[r]);
+  }
+  temp[idx++] = arr[r];
+  if (upper[r] != 0) {
+    traverse(arr, temp, lower, upper, upper[r]);
   }
 }
+
+
 
 int main(void) {
   int array[16] = {0,  39, 21, 62, 91, 77, 14, 23,

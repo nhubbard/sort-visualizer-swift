@@ -4,17 +4,77 @@ static const long leonardo[21] = {1,    1,    3,    5,    9,    15,    25,
                                   41,   67,   109,  177,  287,  465,   753,
                                   1219, 1973, 3193, 5167, 8361, 13529, 21891};
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
+                 90, 69, 51, 81, 68, 83, 32, 56};
+
+void swap(int *a, int *b) {
+  int t = *a;
+  *a = *b;
+  *b = t;
+}
 
 void printList(int items[], int size) {
-  for (int i = 0; i < size; i++) {
-    if (i == 0) {
-      printf("[%d, ", items[i]);
-    } else if (i != size - 1) {
-      printf("%d, ", items[i]);
-    } else {
-      printf("%d]", items[i]);
+  printf("[");
+  if (size > 0) {
+    printf("%d", items[0]);
+    for (int i = 1; i < size; i++) {
+      printf(", %d", items[i]);
     }
+  }
+  printf("]");
+}
+
+int trailingZeroCount(long value);
+void sift(int arr[], int pshiftIn, int headIn);
+void trinkle(int arr[], long pIn, int pshiftIn, int headIn, int isTrustyIn);
+
+void sort(int arr[], int n) {
+  if (n <= 1) {
+    return;
+  }
+
+  int head = 0;
+  long p = 1;
+  int pshift = 1;
+  int hi = n - 1;
+
+  while (head < hi) {
+    if ((p & 3) == 3) {
+      sift(arr, pshift, head);
+      p >>= 2;
+      pshift += 2;
+    } else {
+      if (leonardo[pshift - 1] >= hi - head) {
+        trinkle(arr, p, pshift, head, 0);
+      } else {
+        sift(arr, pshift, head);
+      }
+      if (pshift == 1) {
+        p <<= 1;
+        pshift -= 1;
+      } else {
+        p <<= (pshift - 1);
+        pshift = 1;
+      }
+    }
+    p |= 1;
+    head += 1;
+  }
+
+  trinkle(arr, p, pshift, head, 0);
+  while (pshift != 1 || p != 1) {
+    if (pshift <= 1) {
+      int trail = trailingZeroCount(p);
+      p >>= trail;
+      pshift += trail;
+    } else {
+      p <<= 2;
+      p ^= 7;
+      pshift -= 2;
+      trinkle(arr, p >> 1, pshift + 1, head - (int)leonardo[pshift] - 1, 1);
+      trinkle(arr, p, pshift, head - 1, 1);
+    }
+    head -= 1;
   }
 }
 
@@ -79,56 +139,6 @@ void trinkle(int arr[], long pIn, int pshiftIn, int headIn, int isTrustyIn) {
   if (!isTrusty) {
     arr[head] = val;
     sift(arr, pshift, head);
-  }
-}
-
-void sort(int arr[], int n) {
-  if (n <= 1) {
-    return;
-  }
-
-  int head = 0;
-  long p = 1;
-  int pshift = 1;
-  int hi = n - 1;
-
-  while (head < hi) {
-    if ((p & 3) == 3) {
-      sift(arr, pshift, head);
-      p >>= 2;
-      pshift += 2;
-    } else {
-      if (leonardo[pshift - 1] >= hi - head) {
-        trinkle(arr, p, pshift, head, 0);
-      } else {
-        sift(arr, pshift, head);
-      }
-      if (pshift == 1) {
-        p <<= 1;
-        pshift -= 1;
-      } else {
-        p <<= (pshift - 1);
-        pshift = 1;
-      }
-    }
-    p |= 1;
-    head += 1;
-  }
-
-  trinkle(arr, p, pshift, head, 0);
-  while (pshift != 1 || p != 1) {
-    if (pshift <= 1) {
-      int trail = trailingZeroCount(p);
-      p >>= trail;
-      pshift += trail;
-    } else {
-      p <<= 2;
-      p ^= 7;
-      pshift -= 2;
-      trinkle(arr, p >> 1, pshift + 1, head - (int)leonardo[pshift] - 1, 1);
-      trinkle(arr, p, pshift, head - 1, 1);
-    }
-    head -= 1;
   }
 }
 

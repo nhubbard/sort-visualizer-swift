@@ -3,6 +3,14 @@ using System.Collections.Generic;
 
 public class SimpleShatterSort
 {
+  public static void Sort(int[] arr)
+  {
+    if (arr.Length < 2) return;
+    int n = arr.Length;
+    int rate = Math.Max(2, FloorLog2(n) / 2);
+    SimpleShatterSortRange(arr, n, 4, rate);
+  }
+
   public static void InsertionSort(int[] arr, int start, int end)
   {
     for (int i = start + 1; i < end; i++)
@@ -77,17 +85,12 @@ public class SimpleShatterSort
     }
   }
 
-  public static void Sort(int[] arr)
-  {
-    if (arr.Length < 2) return;
-    int n = arr.Length;
-    int rate = Math.Max(2, FloorLog2(n) / 2);
-    SimpleShatterSortRange(arr, n, 4, rate);
-  }
-
   public static void Main(String[] args)
   {
-    int[] array = { 0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56 };
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     Sort(array);
     string result = "[" + String.Join(", ", array) + "]";
     Console.WriteLine(result);

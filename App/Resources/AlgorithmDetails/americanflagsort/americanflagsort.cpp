@@ -1,18 +1,42 @@
 #include <cstdio>
 #include <vector>
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
+                 90, 69, 51, 81, 68, 83, 32, 56};
 
 void printList(int items[], int size) {
-  for (int i = 0; i < size; i++) {
-    if (i == 0) {
-      printf("[%d, ", items[i]);
-    } else if (i != size - 1) {
-      printf("%d, ", items[i]);
-    } else {
-      printf("%d]", items[i]);
+  printf("[");
+  if (size > 0) {
+    printf("%d", items[0]);
+    for (int i = 1; i < size; i++) {
+      printf(", %d", items[i]);
     }
   }
+  printf("]");
+}
+
+int digitAt(int value, int divisor, int radix);
+void flagSort(int arr[], int low, int high, int divisor, int radix);
+
+void sort(int arr[], int n) {
+  if (n <= 1) {
+    return;
+  }
+
+  int radix = 4;
+  int maxValue = arr[0];
+  for (int i = 1; i < n; i++) {
+    if (arr[i] > maxValue) {
+      maxValue = arr[i];
+    }
+  }
+
+  int divisor = 1;
+  while (maxValue / divisor >= radix) {
+    divisor *= radix;
+  }
+
+  flagSort(arr, 0, n, divisor, radix);
 }
 
 int digitAt(int value, int divisor, int radix) {
@@ -64,27 +88,6 @@ void flagSort(int arr[], int low, int high, int divisor, int radix) {
       }
     }
   }
-}
-
-void sort(int arr[], int n) {
-  if (n <= 1) {
-    return;
-  }
-
-  int radix = 4;
-  int maxValue = arr[0];
-  for (int i = 1; i < n; i++) {
-    if (arr[i] > maxValue) {
-      maxValue = arr[i];
-    }
-  }
-
-  int divisor = 1;
-  while (maxValue / divisor >= radix) {
-    divisor *= radix;
-  }
-
-  flagSort(arr, 0, n, divisor, radix);
 }
 
 int main(int argc, char *argv[]) {

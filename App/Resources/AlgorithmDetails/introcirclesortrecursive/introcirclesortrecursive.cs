@@ -2,6 +2,36 @@ using System;
 
 public class IntroCircleSortRecursive
 {
+  public static int[] Sort(int[] array)
+  {
+    var end = array.Length;
+    if (end <= 1)
+      return array;
+    var n = 1;
+    var threshold = 0;
+    while (n < end)
+    {
+      n <<= 1;
+      threshold++;
+    }
+    threshold /= 2;
+
+    var iterations = 0;
+    while (true)
+    {
+      iterations++;
+      if (iterations >= threshold)
+      {
+        BinaryInsertionSort(array, end);
+        return array;
+      }
+      if (CircleSortRoutine(array, 0, n - 1, end) == 0)
+      {
+        return array;
+      }
+    }
+  }
+
   public static int CircleSortRoutine(int[] array, int lo, int hi, int end)
   {
     if (lo == hi)
@@ -56,39 +86,12 @@ public class IntroCircleSortRecursive
     }
   }
 
-  public static int[] Sort(int[] array)
-  {
-    var end = array.Length;
-    if (end <= 1)
-      return array;
-    var n = 1;
-    var threshold = 0;
-    while (n < end)
-    {
-      n <<= 1;
-      threshold++;
-    }
-    threshold /= 2;
-
-    var iterations = 0;
-    while (true)
-    {
-      iterations++;
-      if (iterations >= threshold)
-      {
-        BinaryInsertionSort(array, end);
-        return array;
-      }
-      if (CircleSortRoutine(array, 0, n - 1, end) == 0)
-      {
-        return array;
-      }
-    }
-  }
-
   public static void Main(String[] args)
   {
-    int[] array = { 0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56 };
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     Sort(array);
     string result = "[" + String.Join(", ", array) + "]";
     Console.WriteLine(result);

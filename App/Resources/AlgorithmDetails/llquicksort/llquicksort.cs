@@ -2,6 +2,11 @@ using System;
 
 public class LLQuickSort
 {
+  public static void Sort(int[] arr)
+  {
+    QuickSort(arr, 0, arr.Length - 1);
+  }
+
   private static int Partition(int[] arr, int lo, int hi)
   {
     int pivot = arr[hi];
@@ -28,14 +33,12 @@ public class LLQuickSort
     }
   }
 
-  public static void Sort(int[] arr)
-  {
-    QuickSort(arr, 0, arr.Length - 1);
-  }
-
   public static void Main(String[] args)
   {
-    int[] array = { 0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56 };
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     Sort(array);
     string result = "[" + String.Join(", ", array) + "]";
     Console.WriteLine(result);

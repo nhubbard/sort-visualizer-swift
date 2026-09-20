@@ -1,7 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
+                 90, 69, 51, 81, 68, 83, 32, 56};
 
 void swap(int *a, int *b) {
   int t = *a;
@@ -10,20 +11,74 @@ void swap(int *a, int *b) {
 }
 
 void printList(int items[], int size) {
-  for (int i = 0; i < size; i++) {
-    if (i == 0) {
-      printf("[%d, ", items[i]);
-    } else if (i != size - 1) {
-      printf("%d, ", items[i]);
-    } else {
-      printf("%d]", items[i]);
+  printf("[");
+  if (size > 0) {
+    printf("%d", items[0]);
+    for (int i = 1; i < size; i++) {
+      printf(", %d", items[i]);
     }
+  }
+  printf("]");
+}
+
+int minInt(int a, int b);
+int maxInt(int a, int b);
+int blockRoot(int n);
+void multiSwap(int arr[], int a, int b, int len);
+void rotate(int arr[], int a, int m, int b);
+int selectRange(int arr[], int start, int end, int bLen);
+void blockSelect(int arr[], int a, int m, int b, int bLen);
+int inPlaceMerge(int arr[], int a, int m, int b);
+void inPlaceMergeBW(int arr[], int a, int m, int b);
+
+void sort(int arr[], int n) {
+  if (n <= 1) {
+    return;
+  }
+  int j = 1;
+  while (j < n) {
+    int bLen = blockRoot(j);
+    int runLength = j;
+    int b = n - n % bLen;
+
+    while (runLength > 16) {
+      int i = 0;
+      while (i + j < b) {
+        int k = i;
+        while (k + runLength < minInt(i + 2 * j, b)) {
+          blockSelect(arr, k, k + runLength, minInt(k + 2 * runLength, b),
+                      bLen);
+          k += runLength;
+        }
+        i += 2 * j;
+      }
+      runLength = bLen;
+      bLen = blockRoot(bLen);
+    }
+
+    int i = 0;
+    while (i + j < b) {
+      int k = i;
+      int f = i;
+      while (k + runLength < minInt(i + 2 * j, b)) {
+        f = inPlaceMerge(arr, f, k + runLength, minInt(k + 2 * runLength, b));
+        k += runLength;
+      }
+      i += 2 * j;
+    }
+
+    inPlaceMergeBW(arr, n - n % (2 * j), b, n);
+    j *= 2;
   }
 }
 
-int minInt(int a, int b) { return a < b ? a : b; }
+int minInt(int a, int b) {
+  return a < b ? a : b;
+}
 
-int maxInt(int a, int b) { return a > b ? a : b; }
+int maxInt(int a, int b) {
+  return a > b ? a : b;
+}
 
 int blockRoot(int n) {
   int i = 1;
@@ -149,47 +204,6 @@ void inPlaceMergeBW(int arr[], int a, int m, int b) {
     } else {
       j--;
     }
-  }
-}
-
-void sort(int arr[], int n) {
-  if (n <= 1) {
-    return;
-  }
-  int j = 1;
-  while (j < n) {
-    int bLen = blockRoot(j);
-    int runLength = j;
-    int b = n - n % bLen;
-
-    while (runLength > 16) {
-      int i = 0;
-      while (i + j < b) {
-        int k = i;
-        while (k + runLength < minInt(i + 2 * j, b)) {
-          blockSelect(arr, k, k + runLength, minInt(k + 2 * runLength, b),
-                      bLen);
-          k += runLength;
-        }
-        i += 2 * j;
-      }
-      runLength = bLen;
-      bLen = blockRoot(bLen);
-    }
-
-    int i = 0;
-    while (i + j < b) {
-      int k = i;
-      int f = i;
-      while (k + runLength < minInt(i + 2 * j, b)) {
-        f = inPlaceMerge(arr, f, k + runLength, minInt(k + 2 * runLength, b));
-        k += runLength;
-      }
-      i += 2 * j;
-    }
-
-    inPlaceMergeBW(arr, n - n % (2 * j), b, n);
-    j *= 2;
   }
 }
 

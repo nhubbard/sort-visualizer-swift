@@ -3,6 +3,32 @@ using System.Collections.Generic;
 
 public class BinaryQuickSortIterative
 {
+  public static void Sort(int[] arr)
+  {
+    int n = arr.Length;
+    if (n < 2) return;
+    int maxValue = arr[0];
+    for (int i = 1; i < n; i++)
+    {
+      if (arr[i] > maxValue) maxValue = arr[i];
+    }
+    int bit = MostSignificantBit(maxValue);
+
+    var tasks = new Queue<(int p, int r, int bit)>();
+    tasks.Enqueue((0, n - 1, bit));
+
+    while (tasks.Count > 0)
+    {
+      var (p, r, b) = tasks.Dequeue();
+      if (p < r && b >= 0)
+      {
+        int q = Partition(arr, p, r, b);
+        tasks.Enqueue((p, q, b - 1));
+        tasks.Enqueue((q + 1, r, b - 1));
+      }
+    }
+  }
+
   private static int MostSignificantBit(int value)
   {
     if (value == 0) return -1;
@@ -36,35 +62,12 @@ public class BinaryQuickSortIterative
     }
   }
 
-  public static void Sort(int[] arr)
-  {
-    int n = arr.Length;
-    if (n < 2) return;
-    int maxValue = arr[0];
-    for (int i = 1; i < n; i++)
-    {
-      if (arr[i] > maxValue) maxValue = arr[i];
-    }
-    int bit = MostSignificantBit(maxValue);
-
-    var tasks = new Queue<(int p, int r, int bit)>();
-    tasks.Enqueue((0, n - 1, bit));
-
-    while (tasks.Count > 0)
-    {
-      var (p, r, b) = tasks.Dequeue();
-      if (p < r && b >= 0)
-      {
-        int q = Partition(arr, p, r, b);
-        tasks.Enqueue((p, q, b - 1));
-        tasks.Enqueue((q + 1, r, b - 1));
-      }
-    }
-  }
-
   public static void Main(String[] args)
   {
-    int[] array = { 0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56 };
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     Sort(array);
     string result = "[" + String.Join(", ", array) + "]";
     Console.WriteLine(result);

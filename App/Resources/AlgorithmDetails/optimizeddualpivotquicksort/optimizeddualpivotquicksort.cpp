@@ -4,16 +4,22 @@
 int array[30] = {55, 12, 84, 3, 47, 91, 26, 68, 8,  73, 40, 97, 15, 62, 34,
                  79, 21, 88, 5, 51, 66, 29, 44, 12, 78, 33, 91, 6,  58, 12};
 
-void printList(int arr[], int n) {
-  for (int i = 0; i < n; i++) {
-    if (i == 0) {
-      printf("[%d, ", arr[i]);
-    } else if (i != n - 1) {
-      printf("%d, ", arr[i]);
-    } else {
-      printf("%d]", arr[i]);
+void printList(int items[], int size) {
+  printf("[");
+  if (size > 0) {
+    printf("%d", items[0]);
+    for (int i = 1; i < size; i++) {
+      printf(", %d", items[i]);
     }
   }
+  printf("]");
+}
+
+void insertionSort(int arr[], int left, int right);
+void dualPivot(int arr[], int left, int right, int divisor);
+
+void sort(int arr[], int n) {
+  if (n > 1) dualPivot(arr, 0, n - 1, 3);
 }
 
 void insertionSort(int arr[], int left, int right) {
@@ -71,8 +77,6 @@ void dualPivot(int arr[], int left, int right, int divisor) {
   }
   if (pivot1 < pivot2) dualPivot(arr, less, great, divisor);
 }
-
-void sort(int arr[], int n) { if (n > 1) dualPivot(arr, 0, n - 1, 3); }
 
 int main(int argc, char *argv[]) {
   int size = sizeof(array) / sizeof(array[0]);

@@ -3,18 +3,18 @@
 #include <utility>
 #include <vector>
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
+                 90, 69, 51, 81, 68, 83, 32, 56};
 
 void printList(int items[], int size) {
-  for (int i = 0; i < size; i++) {
-    if (i == 0) {
-      printf("[%d, ", items[i]);
-    } else if (i != size - 1) {
-      printf("%d, ", items[i]);
-    } else {
-      printf("%d]", items[i]);
+  printf("[");
+  if (size > 0) {
+    printf("%d", items[0]);
+    for (int i = 1; i < size; i++) {
+      printf(", %d", items[i]);
     }
   }
+  printf("]");
 }
 
 // A literal Bogo Bogo Sort re-derives the "is it sorted?" answer through a
@@ -32,6 +32,28 @@ constexpr int kChaosLimit = 5;
 // (after resetting arr to its first, fully ascending permutation) once every
 // arrangement has been visited -- a deterministic stand-in for "shuffle the
 // array at random".
+bool nextPermutation(std::vector<int> &arr);
+bool bogoBogoIsSorted(const std::vector<int> &arr);
+void bogoBogoSort(std::vector<int> &arr);
+void insertionSort(std::vector<int> &arr);
+std::vector<int> mergeSorted(const std::vector<int> &a,
+                             const std::vector<int> &b);
+
+void sort(int arr[], int n) {
+  int limit = n < kChaosLimit ? n : kChaosLimit;
+  std::vector<int> chaos(arr, arr + limit);
+  std::vector<int> rest(arr + limit, arr + n);
+
+  bogoBogoSort(
+      chaos); // the real, recursive-check algorithm -- kept tiny on purpose
+  insertionSort(rest); // an ordinary fast sort for the rest of the array
+
+  std::vector<int> merged = mergeSorted(chaos, rest);
+  for (int k = 0; k < n; k++) {
+    arr[k] = merged[k];
+  }
+}
+
 bool nextPermutation(std::vector<int> &arr) {
   int n = static_cast<int>(arr.size());
   int i = n - 2;
@@ -121,21 +143,6 @@ std::vector<int> mergeSorted(const std::vector<int> &a,
     merged.push_back(b[j++]);
   }
   return merged;
-}
-
-void sort(int arr[], int n) {
-  int limit = n < kChaosLimit ? n : kChaosLimit;
-  std::vector<int> chaos(arr, arr + limit);
-  std::vector<int> rest(arr + limit, arr + n);
-
-  bogoBogoSort(
-      chaos); // the real, recursive-check algorithm -- kept tiny on purpose
-  insertionSort(rest); // an ordinary fast sort for the rest of the array
-
-  std::vector<int> merged = mergeSorted(chaos, rest);
-  for (int k = 0; k < n; k++) {
-    arr[k] = merged[k];
-  }
 }
 
 int main(int argc, char *argv[]) {

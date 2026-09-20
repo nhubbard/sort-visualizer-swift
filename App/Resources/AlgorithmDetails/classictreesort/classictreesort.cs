@@ -4,19 +4,6 @@ public class ClassicTreeSort
 {
   private static int idx;
 
-  private static void Traverse(int[] arr, int[] temp, int[] lower, int[] upper, int r)
-  {
-    if (lower[r] != 0)
-    {
-      Traverse(arr, temp, lower, upper, lower[r]);
-    }
-    temp[idx++] = arr[r];
-    if (upper[r] != 0)
-    {
-      Traverse(arr, temp, lower, upper, upper[r]);
-    }
-  }
-
   public static void Sort(int[] arr)
   {
     int n = arr.Length;
@@ -51,9 +38,25 @@ public class ClassicTreeSort
     Array.Copy(temp, arr, n);
   }
 
+  private static void Traverse(int[] arr, int[] temp, int[] lower, int[] upper, int r)
+  {
+    if (lower[r] != 0)
+    {
+      Traverse(arr, temp, lower, upper, lower[r]);
+    }
+    temp[idx++] = arr[r];
+    if (upper[r] != 0)
+    {
+      Traverse(arr, temp, lower, upper, upper[r]);
+    }
+  }
+
   public static void Main(String[] args)
   {
-    int[] array = { 0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56 };
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     Sort(array);
     string result = "[" + String.Join(", ", array) + "]";
     Console.WriteLine(result);

@@ -11,6 +11,24 @@ class TournamentSort
   static int GetWinners(int[] matches, int root) => matches[root + 1];
   static int GetLosers(int[] matches, int root) => matches[root + 2];
 
+  static void Sort(int[] array)
+  {
+    int n = array.Length;
+    if (n <= 1)
+      return;
+
+    int[] matches = new int[6 * n];
+    int tourney = Knockout(array, matches, 0, n - 1, 3);
+
+    int[] output = new int[n];
+    for (int i = 0; i < n; i++)
+    {
+      output[i] = array[GetPlayer(array, matches, tourney)];
+      tourney = IsPlayer(tourney) ? 0 : Rebuild(array, matches, tourney);
+    }
+    Array.Copy(output, array, n);
+  }
+
   static void SetMatch(int[] matches, int root, int winner, int winners, int losers)
   {
     matches[root] = winner;
@@ -68,27 +86,12 @@ class TournamentSort
     return root;
   }
 
-  static void Sort(int[] array)
-  {
-    int n = array.Length;
-    if (n <= 1)
-      return;
-
-    int[] matches = new int[6 * n];
-    int tourney = Knockout(array, matches, 0, n - 1, 3);
-
-    int[] output = new int[n];
-    for (int i = 0; i < n; i++)
-    {
-      output[i] = array[GetPlayer(array, matches, tourney)];
-      tourney = IsPlayer(tourney) ? 0 : Rebuild(array, matches, tourney);
-    }
-    Array.Copy(output, array, n);
-  }
-
   static void Main()
   {
-    int[] array = { 0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56 };
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     Sort(array);
     Console.WriteLine("[" + string.Join(", ", array) + "]");
   }

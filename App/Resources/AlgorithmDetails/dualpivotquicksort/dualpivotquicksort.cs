@@ -2,6 +2,12 @@ using System;
 
 public class DualPivotQuickSort
 {
+  public static int[] Sort(int[] array, int low, int high)
+  {
+    DualPivot(array, low, high, 3);
+    return array;
+  }
+
   private static void InsertionSort(int[] array, int left, int right)
   {
     for (int i = left + 1; i <= right; i++)
@@ -65,15 +71,12 @@ public class DualPivotQuickSort
     DualPivot(array, great + 2, right, divisor);
   }
 
-  public static int[] Sort(int[] array, int low, int high)
-  {
-    DualPivot(array, low, high, 3);
-    return array;
-  }
-
   public static void Main(String[] args)
   {
-    int[] array = { 0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56 };
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     Sort(array, 0, array.Length - 1);
     string result = "[" + String.Join(", ", array) + "]";
     Console.WriteLine(result);

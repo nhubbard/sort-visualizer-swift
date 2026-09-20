@@ -1,7 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
+                 90, 69, 51, 81, 68, 83, 32, 56};
 
 void swap(int *a, int *b) {
   int t = *a;
@@ -10,38 +11,18 @@ void swap(int *a, int *b) {
 }
 
 void printList(int items[], int size) {
-  for (int i = 0; i < size; i++) {
-    if (i == 0) {
-      printf("[%d, ", items[i]);
-    } else if (i != size - 1) {
-      printf("%d, ", items[i]);
-    } else {
-      printf("%d]", items[i]);
+  printf("[");
+  if (size > 0) {
+    printf("%d", items[0]);
+    for (int i = 1; i < size; i++) {
+      printf(", %d", items[i]);
     }
   }
+  printf("]");
 }
 
-int compositeLess(int arr[], int key[], int mid, int i) {
-  if (arr[mid] < arr[i])
-    return 1;
-  if (arr[mid] == arr[i])
-    return key[mid] < key[i];
-  return 0;
-}
-
-int binarySearch(int arr[], int key[], int n, int i) {
-  int start = 0;
-  int end = n - 1;
-  while (start < end) {
-    int mid = (start + end) / 2;
-    if (compositeLess(arr, key, mid, i)) {
-      start = mid + 1;
-    } else {
-      end = mid;
-    }
-  }
-  return start;
-}
+int compositeLess(int arr[], int key[], int mid, int i);
+int binarySearch(int arr[], int key[], int n, int i);
 
 void sort(int arr[], int n) {
   int *key = malloc(n * sizeof(int));
@@ -65,6 +46,28 @@ void sort(int arr[], int n) {
   }
 
   free(key);
+}
+
+int compositeLess(int arr[], int key[], int mid, int i) {
+  if (arr[mid] < arr[i])
+    return 1;
+  if (arr[mid] == arr[i])
+    return key[mid] < key[i];
+  return 0;
+}
+
+int binarySearch(int arr[], int key[], int n, int i) {
+  int start = 0;
+  int end = n - 1;
+  while (start < end) {
+    int mid = (start + end) / 2;
+    if (compositeLess(arr, key, mid, i)) {
+      start = mid + 1;
+    } else {
+      end = mid;
+    }
+  }
+  return start;
 }
 
 int main(int argc, char *argv[]) {

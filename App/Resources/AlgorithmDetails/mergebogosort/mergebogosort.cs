@@ -6,6 +6,11 @@ public class MergeBogoSort
 {
   public static Random r = new Random();
 
+  public static void Sort(int[] arr)
+  {
+    Sort(arr, 0, arr.Length);
+  }
+
   public static bool IsSorted(int[] arr, int start, int end)
   {
     for (int i = start; i < end - 1; i++)
@@ -65,14 +70,11 @@ public class MergeBogoSort
     }
   }
 
-  public static void Sort(int[] arr)
-  {
-    Sort(arr, 0, arr.Length);
-  }
-
   public static void Main(String[] args)
   {
-    int[] array = { 0, 39, 21, 62, 91, 14, 23 };
+    int[] array = {
+      0, 39, 21, 62, 91, 14, 23
+    };
     Sort(array);
     string result = "[" + String.Join(", ", array) + "]";
     Console.WriteLine(result);

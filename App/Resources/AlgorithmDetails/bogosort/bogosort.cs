@@ -1,10 +1,6 @@
 using System;
 public class BogoSort
 {
-  static void Reverse(int[] a, int low, int high)
-  {
-    while (low < high) { int held = a[low]; a[low] = a[high]; a[high] = held; low++; high--; }
-  }
   public static void Sort(int[] a)
   {
     int n = a.Length; if (n < 2) return;
@@ -22,9 +18,17 @@ public class BogoSort
     }
     Reverse(a, 0, n - 1);
   }
+
+  static void Reverse(int[] a, int low, int high)
+  {
+    while (low < high) { int held = a[low]; a[low] = a[high]; a[high] = held; low++; high--; }
+  }
+
   public static void Main()
   {
-    int[] array = { 0, 39, 21, 62, 91, 77, 14, 23 }; Sort(array);
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23
+    }; Sort(array);
     Console.WriteLine("[" + string.Join(", ", array) + "]");
   }
 }

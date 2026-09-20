@@ -1,21 +1,35 @@
 #include <cstdio>
 #include <utility>
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
+                 90, 69, 51, 81, 68, 83, 32, 56};
 
 void printList(int items[], int size) {
-  for (int i = 0; i < size; i++) {
-    if (i == 0) {
-      printf("[%d, ", items[i]);
-    } else if (i != size - 1) {
-      printf("%d, ", items[i]);
-    } else {
-      printf("%d]", items[i]);
+  printf("[");
+  if (size > 0) {
+    printf("%d", items[0]);
+    for (int i = 1; i < size; i++) {
+      printf(", %d", items[i]);
     }
   }
+  printf("]");
 }
 
-void swapAt(int arr[], int a, int b) { std::swap(arr[a], arr[b]); }
+void swapAt(int arr[], int a, int b);
+void multiSwap(int arr[], int a, int b, int count);
+void rotate(int arr[], int pos, int lenA, int lenB);
+int binSearch(int arr[], int pos, int len, int keyPos, int isLeft);
+void mergeWithoutBuffer(int arr[], int pos, int len1, int len2);
+void insertionSortChunk(int arr[], int a, int b);
+void lazyStableSort(int arr[], int pos, int len);
+
+void sort(int arr[], int n) {
+  lazyStableSort(arr, 0, n);
+}
+
+void swapAt(int arr[], int a, int b) {
+  std::swap(arr[a], arr[b]);
+}
 
 void multiSwap(int arr[], int a, int b, int count) {
   for (int i = 0; i < count; i++)
@@ -142,8 +156,6 @@ void lazyStableSort(int arr[], int pos, int len) {
     part *= 2;
   }
 }
-
-void sort(int arr[], int n) { lazyStableSort(arr, 0, n); }
 
 int main(int argc, char *argv[]) {
   int size = sizeof(array) / sizeof(array[0]);

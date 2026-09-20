@@ -6,6 +6,13 @@ public class StacklessDualPivotQuickSort
 
   // Sorts arr[start..end) in place using a plain binary-search insertion sort -- the base case
   // once a segment shrinks small enough that further partitioning isn't worth it.
+  public static void Sort(int[] arr)
+  {
+    int n = arr.Length;
+    if (n < 2) return;
+    QuickSort(arr, 0, n);
+  }
+
   static void BinaryInsertionSort(int[] arr, int start, int end)
   {
     for (int i = start; i < end; i++)
@@ -186,13 +193,6 @@ public class StacklessDualPivotQuickSort
       }
       if (a == segmentEnd) reuseMedianCandidates = true;
     }
-  }
-
-  public static void Sort(int[] arr)
-  {
-    int n = arr.Length;
-    if (n < 2) return;
-    QuickSort(arr, 0, n);
   }
 
   public static void Main(String[] args)

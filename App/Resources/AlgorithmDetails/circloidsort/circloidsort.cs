@@ -2,6 +2,19 @@ using System;
 
 public class CircloidSort
 {
+  public static void Sort(int[] arr)
+  {
+    int n = arr.Length;
+    if (n <= 1)
+    {
+      return;
+    }
+    while (CirclePass(arr, 0, n - 1))
+    {
+      // repeat until a full sweep makes no swaps
+    }
+  }
+
   private static bool Circle(int[] arr, int left, int right)
   {
     int a = left;
@@ -38,22 +51,12 @@ public class CircloidSort
     return Circle(arr, left, right) || l || r;
   }
 
-  public static void Sort(int[] arr)
-  {
-    int n = arr.Length;
-    if (n <= 1)
-    {
-      return;
-    }
-    while (CirclePass(arr, 0, n - 1))
-    {
-      // repeat until a full sweep makes no swaps
-    }
-  }
-
   public static void Main(String[] args)
   {
-    int[] array = { 0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56 };
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     Sort(array);
     string result = "[" + String.Join(", ", array) + "]";
     Console.WriteLine(result);

@@ -30,6 +30,26 @@ public class RedBlackTreeSort
 
   private static bool IsRed(Node? node) => node != null && node.IsRed;
 
+  public static void Sort(int[] arr)
+  {
+    int n = arr.Length;
+    Node? root = null;
+    for (int i = 0; i < n; i++)
+    {
+      AddResult inserted = Add(root, arr[i]);
+      root = inserted.Node;
+      root.IsRed = false;
+    }
+
+    List<int> result = new List<int>();
+    Traverse(root, result);
+
+    for (int i = 0; i < n; i++)
+    {
+      arr[i] = result[i];
+    }
+  }
+
   private static Node SingleRotateRight(Node node)
   {
     Node b = node.Left!;
@@ -115,29 +135,12 @@ public class RedBlackTreeSort
     Traverse(node.Right, result);
   }
 
-  public static void Sort(int[] arr)
-  {
-    int n = arr.Length;
-    Node? root = null;
-    for (int i = 0; i < n; i++)
-    {
-      AddResult inserted = Add(root, arr[i]);
-      root = inserted.Node;
-      root.IsRed = false;
-    }
-
-    List<int> result = new List<int>();
-    Traverse(root, result);
-
-    for (int i = 0; i < n; i++)
-    {
-      arr[i] = result[i];
-    }
-  }
-
   public static void Main(String[] args)
   {
-    int[] array = { 0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56 };
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     Sort(array);
     string result = "[" + String.Join(", ", array) + "]";
     Console.WriteLine(result);

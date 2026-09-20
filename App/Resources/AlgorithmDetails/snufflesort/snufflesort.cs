@@ -2,6 +2,11 @@ using System;
 
 public class SnuffleSort
 {
+  public static void Sort(int[] arr)
+  {
+    SnuffleSortHelper(arr, 0, arr.Length - 1);
+  }
+
   private static void SnuffleSortHelper(int[] arr, int start, int stop)
   {
     if (stop - start + 1 >= 2)
@@ -23,14 +28,11 @@ public class SnuffleSort
     }
   }
 
-  public static void Sort(int[] arr)
-  {
-    SnuffleSortHelper(arr, 0, arr.Length - 1);
-  }
-
   public static void Main(String[] args)
   {
-    int[] array = { 0, 39, 21, 62, 91, 77, 14, 23 };
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23
+    };
     Sort(array);
     string result = "[" + String.Join(", ", array) + "]";
     Console.WriteLine(result);

@@ -2,6 +2,37 @@ using System;
 
 public class CompleteGraphSort
 {
+  public static void Sort(int[] arr)
+  {
+    int n = arr.Length;
+    if (n <= 1) return;
+    int d = 2, end = 1 << (int)(Math.Log(n - 1) / Math.Log(2) + 1);
+    while (d <= end)
+    {
+      int i = 0, dec = 0;
+      while (i < n)
+      {
+        int j = i;
+        dec += n;
+        while (dec >= d)
+        {
+          dec -= d;
+          j++;
+        }
+        int k = j;
+        dec += n;
+        while (dec >= d)
+        {
+          dec -= d;
+          k++;
+        }
+        Split(arr, i, j, k);
+        i = k;
+      }
+      d *= 2;
+    }
+  }
+
   public static void CompSwap(int[] arr, int a, int b)
   {
     if (arr[a] > arr[b])
@@ -39,40 +70,12 @@ public class CompleteGraphSort
     }
   }
 
-  public static void Sort(int[] arr)
-  {
-    int n = arr.Length;
-    if (n <= 1) return;
-    int d = 2, end = 1 << (int)(Math.Log(n - 1) / Math.Log(2) + 1);
-    while (d <= end)
-    {
-      int i = 0, dec = 0;
-      while (i < n)
-      {
-        int j = i;
-        dec += n;
-        while (dec >= d)
-        {
-          dec -= d;
-          j++;
-        }
-        int k = j;
-        dec += n;
-        while (dec >= d)
-        {
-          dec -= d;
-          k++;
-        }
-        Split(arr, i, j, k);
-        i = k;
-      }
-      d *= 2;
-    }
-  }
-
   public static void Main(String[] args)
   {
-    int[] array = { 0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56 };
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     Sort(array);
     string result = "[" + String.Join(", ", array) + "]";
     Console.WriteLine(result);

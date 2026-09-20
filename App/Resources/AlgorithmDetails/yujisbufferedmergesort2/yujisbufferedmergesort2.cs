@@ -2,6 +2,17 @@ using System;
 
 public class YujisBufferedMergeSort2
 {
+  public static int[] Sort(int[] array)
+  {
+    var n = array.Length;
+    if (n <= 1)
+    {
+      return array;
+    }
+    BufferedMerge(array, 0, n);
+    return array;
+  }
+
   private static int CeilLog(int n)
   {
     var i = 0;
@@ -229,20 +240,12 @@ public class YujisBufferedMergeSort2
     BufferedMerge(array, b - (m - a) - s, b);
   }
 
-  public static int[] Sort(int[] array)
-  {
-    var n = array.Length;
-    if (n <= 1)
-    {
-      return array;
-    }
-    BufferedMerge(array, 0, n);
-    return array;
-  }
-
   public static void Main(String[] args)
   {
-    int[] array = { 0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56 };
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     Sort(array);
     string result = "[" + String.Join(", ", array) + "]";
     Console.WriteLine(result);

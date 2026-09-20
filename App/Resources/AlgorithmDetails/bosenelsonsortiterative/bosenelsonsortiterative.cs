@@ -4,6 +4,28 @@ public class BoseNelsonSortIterative
 {
   private static int end;
 
+  public static int[] Sort(int[] array)
+  {
+    end = array.Length;
+    if (end <= 1)
+      return array;
+    var paddedLength = 1;
+    while (paddedLength < end)
+      paddedLength <<= 1;
+
+    for (var k = 2; k <= paddedLength; k *= 2)
+    {
+      for (var j = 0; j < k / 2; j++)
+      {
+        for (var i = 0; i + j < end; i += k)
+        {
+          RangeComp(array, i, i + k, j);
+        }
+      }
+    }
+    return array;
+  }
+
   private static void CompSwap(int[] array, int a, int b)
   {
     if (b >= end)
@@ -28,31 +50,12 @@ public class BoseNelsonSortIterative
     }
   }
 
-  public static int[] Sort(int[] array)
-  {
-    end = array.Length;
-    if (end <= 1)
-      return array;
-    var paddedLength = 1;
-    while (paddedLength < end)
-      paddedLength <<= 1;
-
-    for (var k = 2; k <= paddedLength; k *= 2)
-    {
-      for (var j = 0; j < k / 2; j++)
-      {
-        for (var i = 0; i + j < end; i += k)
-        {
-          RangeComp(array, i, i + k, j);
-        }
-      }
-    }
-    return array;
-  }
-
   public static void Main(String[] args)
   {
-    int[] array = { 0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56 };
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     Sort(array);
     string result = "[" + String.Join(", ", array) + "]";
     Console.WriteLine(result);

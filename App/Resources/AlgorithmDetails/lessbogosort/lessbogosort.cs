@@ -4,6 +4,18 @@ public class LessBogoSort
 {
   public static Random r = new Random();
 
+  public static void Sort(int[] arr)
+  {
+    int n = arr.Length;
+    for (int i = 0; i < n; i++)
+    {
+      while (!IsMinimum(arr, i, n))
+      {
+        ShuffleRange(arr, i, n);
+      }
+    }
+  }
+
   public static bool IsMinimum(int[] arr, int start, int end)
   {
     for (int k = start + 1; k < end; k++)
@@ -25,21 +37,11 @@ public class LessBogoSort
     }
   }
 
-  public static void Sort(int[] arr)
-  {
-    int n = arr.Length;
-    for (int i = 0; i < n; i++)
-    {
-      while (!IsMinimum(arr, i, n))
-      {
-        ShuffleRange(arr, i, n);
-      }
-    }
-  }
-
   public static void Main(String[] args)
   {
-    int[] array = { 0, 39, 21, 62, 91, 77, 14, 23 };
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23
+    };
     Sort(array);
     string result = "[" + String.Join(", ", array) + "]";
     Console.WriteLine(result);

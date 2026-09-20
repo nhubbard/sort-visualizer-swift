@@ -2,6 +2,23 @@ using System;
 
 class TriangularHeapSort
 {
+  static void Sort(int[] array)
+  {
+    int n = array.Length;
+    if (n <= 1)
+      return;
+    Heapify(array, n);
+    for (int i = 1; i < n - 1; i++)
+    {
+      (array[0], array[n - i]) = (array[n - i], array[0]);
+      SiftDown(array, 0, n - i);
+    }
+    if (array[0] > array[1])
+    {
+      (array[0], array[1]) = (array[1], array[0]);
+    }
+  }
+
   static int TriangularRoot(int val)
   {
     return ((int)Math.Sqrt((double)(8 * val + 1)) - 1) / 2;
@@ -36,26 +53,12 @@ class TriangularHeapSort
     }
   }
 
-  static void Sort(int[] array)
-  {
-    int n = array.Length;
-    if (n <= 1)
-      return;
-    Heapify(array, n);
-    for (int i = 1; i < n - 1; i++)
-    {
-      (array[0], array[n - i]) = (array[n - i], array[0]);
-      SiftDown(array, 0, n - i);
-    }
-    if (array[0] > array[1])
-    {
-      (array[0], array[1]) = (array[1], array[0]);
-    }
-  }
-
   static void Main()
   {
-    int[] array = { 0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56 };
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     Sort(array);
     Console.WriteLine("[" + string.Join(", ", array) + "]");
   }

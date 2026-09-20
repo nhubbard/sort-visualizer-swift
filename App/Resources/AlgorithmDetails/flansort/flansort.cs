@@ -6,6 +6,8 @@ public class FlanSort
   readonly int[] a;
   readonly int[] position = new int[Gap + 2], heap = new int[Gap + 2];
   ulong state = 0x9e3779b97f4a7c15UL;
+  public static void Sort(int[] values) { if (values.Length > 1) new FlanSort(values).Execute(); }
+
   FlanSort(int[] values)
   {
     a = values;
@@ -235,10 +237,13 @@ public class FlanSort
     }
     Insertion(first, finish);
   }
-  public static void Sort(int[] values) { if (values.Length > 1) new FlanSort(values).Execute(); }
+
   public static void Main()
   {
-    int[] array = { 0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56 };
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     Sort(array);
     Console.WriteLine("[" + string.Join(", ", array) + "]");
   }

@@ -1,7 +1,36 @@
+#include <cstdio>
 #include <algorithm>
 #include <iostream>
 #include <vector>
 using namespace std;
+static void mergeSort(vector<int> &scratch, vector<int> &buffer, int lo,
+                      int hi);
+
+
+
+void printList(const std::vector<int> &items) {
+  printf("[");
+  if (!items.empty()) {
+    printf("%d", items[0]);
+    for (size_t i = 1; i < items.size(); i++) {
+      printf(", %d", items[i]);
+    }
+  }
+  printf("]\n");
+}
+
+void sort(vector<int> &a) {
+  int n = (int)a.size();
+  if (n < 2)
+    return;
+  vector<int> scratch = a, buffer = scratch;
+  mergeSort(scratch, buffer, 0, n);
+  copy(scratch.begin(), scratch.end(), a.begin());
+  for (int i = 1; i < n; i++)
+    for (int j = i; j > 0 && a[j - 1] > a[j]; j--)
+      swap(a[j - 1], a[j]);
+}
+
 static void mergeSort(vector<int> &scratch, vector<int> &buffer, int lo,
                       int hi) {
   if (hi - lo < 2)
@@ -22,26 +51,10 @@ static void mergeSort(vector<int> &scratch, vector<int> &buffer, int lo,
     buffer[dest++] = scratch[right++];
   copy(buffer.begin() + lo, buffer.begin() + hi, scratch.begin() + lo);
 }
-void sort(vector<int> &a) {
-  int n = (int)a.size();
-  if (n < 2)
-    return;
-  vector<int> scratch = a, buffer = scratch;
-  mergeSort(scratch, buffer, 0, n);
-  copy(scratch.begin(), scratch.end(), a.begin());
-  for (int i = 1; i < n; i++)
-    for (int j = i; j > 0 && a[j - 1] > a[j]; j--)
-      swap(a[j - 1], a[j]);
-}
+
 int main() {
   vector<int> a = {0,  39, 21, 62, 91, 77, 14, 23,
                    90, 69, 51, 81, 68, 83, 32, 56};
   sort(a);
-  cout << "[";
-  for (size_t i = 0; i < a.size(); ++i) {
-    if (i)
-      cout << ", ";
-    cout << a[i];
-  }
-  cout << "]\n";
+  printList(a);
 }

@@ -11,15 +11,21 @@ void swap(int *a, int *b) {
 }
 
 void printList(int items[], int size) {
-  for (int i = 0; i < size; i++) {
-    if (i == 0) {
-      printf("[%d, ", items[i]);
-    } else if (i != size - 1) {
-      printf("%d, ", items[i]);
-    } else {
-      printf("%d]", items[i]);
+  printf("[");
+  if (size > 0) {
+    printf("%d", items[0]);
+    for (int i = 1; i < size; i++) {
+      printf(", %d", items[i]);
     }
   }
+  printf("]");
+}
+
+void insertionSort(int arr[], int left, int right);
+void dualPivot(int arr[], int left, int right, int divisor);
+
+void sort(int arr[], int n) {
+  if (n > 1) dualPivot(arr, 0, n - 1, 3);
 }
 
 void insertionSort(int arr[], int left, int right) {
@@ -77,8 +83,6 @@ void dualPivot(int arr[], int left, int right, int divisor) {
   }
   if (pivot1 < pivot2) dualPivot(arr, less, great, divisor);
 }
-
-void sort(int arr[], int n) { if (n > 1) dualPivot(arr, 0, n - 1, 3); }
 
 int main(int argc, char *argv[]) {
   int size = sizeof(array) / sizeof(array[0]);

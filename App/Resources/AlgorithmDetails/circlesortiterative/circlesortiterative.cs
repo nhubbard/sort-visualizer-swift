@@ -2,6 +2,25 @@ using System;
 
 public class CircleSortIterative
 {
+  public static int[] Sort(int[] array)
+  {
+    var end = array.Length;
+    if (end <= 1)
+      return array;
+    var n = 1;
+    while (n < end)
+    {
+      n <<= 1;
+    }
+
+    var numberOfSwaps = 1;
+    while (numberOfSwaps != 0)
+    {
+      numberOfSwaps = CircleSortRoutine(array, n, end);
+    }
+    return array;
+  }
+
   public static int CircleSortRoutine(int[] array, int length, int end)
   {
     var swapCount = 0;
@@ -26,28 +45,12 @@ public class CircleSortIterative
     return swapCount;
   }
 
-  public static int[] Sort(int[] array)
-  {
-    var end = array.Length;
-    if (end <= 1)
-      return array;
-    var n = 1;
-    while (n < end)
-    {
-      n <<= 1;
-    }
-
-    var numberOfSwaps = 1;
-    while (numberOfSwaps != 0)
-    {
-      numberOfSwaps = CircleSortRoutine(array, n, end);
-    }
-    return array;
-  }
-
   public static void Main(String[] args)
   {
-    int[] array = { 0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56 };
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     Sort(array);
     string result = "[" + String.Join(", ", array) + "]";
     Console.WriteLine(result);

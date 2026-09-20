@@ -1,6 +1,31 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+void swap(int *a, int *b) {
+  int t = *a;
+  *a = *b;
+  *b = t;
+}
+
+void merge(int arr[], int tmp[], int length, int residue, int modulus);
+
+void printList(int items[], int size) {
+  printf("[");
+  if (size > 0) {
+    printf("%d", items[0]);
+    for (int i = 1; i < size; i++) {
+      printf(", %d", items[i]);
+    }
+  }
+  printf("]");
+}
+
+void sort(int arr[], int length) {
+  int *tmp = malloc(sizeof(int) * length);
+  merge(arr, tmp, length, 0, 1);
+  free(tmp);
+}
+
 void merge(int arr[], int tmp[], int length, int residue, int modulus) {
   if (residue + modulus >= length) {
     return;
@@ -41,23 +66,7 @@ void merge(int arr[], int tmp[], int length, int residue, int modulus) {
   }
 }
 
-void sort(int arr[], int length) {
-  int *tmp = malloc(sizeof(int) * length);
-  merge(arr, tmp, length, 0, 1);
-  free(tmp);
-}
 
-void printList(int arr[], int n) {
-  for (int i = 0; i < n; i++) {
-    if (i == 0) {
-      printf("[%d, ", arr[i]);
-    } else if (i != n - 1) {
-      printf("%d, ", arr[i]);
-    } else {
-      printf("%d]\n", arr[i]);
-    }
-  }
-}
 
 int main(void) {
   int array[16] = {0,  39, 21, 62, 91, 77, 14, 23,

@@ -4,6 +4,11 @@ public class QuickBogoSort
 {
   public static Random r = new Random();
 
+  public static void Sort(int[] arr)
+  {
+    Sort(arr, 0, arr.Length);
+  }
+
   public static bool IsPartitioned(int[] arr, int start, int pivot, int end)
   {
     for (int i = start; i < pivot; i++)
@@ -53,14 +58,11 @@ public class QuickBogoSort
     Sort(arr, pivot + 1, end);
   }
 
-  public static void Sort(int[] arr)
-  {
-    Sort(arr, 0, arr.Length);
-  }
-
   public static void Main(String[] args)
   {
-    int[] array = { 0, 39, 21, 62, 91, 14, 23 };
+    int[] array = {
+      0, 39, 21, 62, 91, 14, 23
+    };
     Sort(array);
     string result = "[" + String.Join(", ", array) + "]";
     Console.WriteLine(result);

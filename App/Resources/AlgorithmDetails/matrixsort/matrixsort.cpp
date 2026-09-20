@@ -11,15 +11,24 @@ struct MatrixShape {
 };
 
 void printList(int items[], int size) {
-  for (int i = 0; i < size; i++) {
-    if (i == 0) {
-      printf("[%d, ", items[i]);
-    } else if (i != size - 1) {
-      printf("%d, ", items[i]);
-    } else {
-      printf("%d]", items[i]);
+  printf("[");
+  if (size > 0) {
+    printf("%d", items[0]);
+    for (int i = 1; i < size; i++) {
+      printf(", %d", items[i]);
     }
   }
+  printf("]");
+}
+
+int dirCompareVal(int left, int right, bool dir);
+void gapReverse(int arr[], int start, int end, int gap);
+bool insertLast(int arr[], int a, int b, int gap, bool dir);
+MatrixShape getMatrixDims(int length);
+bool matrixSort(int arr[], int start, int end, int gap, bool dir);
+
+void sort(int arr[], int n) {
+  matrixSort(arr, 0, n, 1, true);
 }
 
 int dirCompareVal(int left, int right, bool dir) {
@@ -125,8 +134,6 @@ bool matrixSort(int arr[], int start, int end, int gap, bool dir) {
     return did;
   }
 }
-
-void sort(int arr[], int n) { matrixSort(arr, 0, n, 1, true); }
 
 int main(int argc, char *argv[]) {
   int size = sizeof(array) / sizeof(array[0]);

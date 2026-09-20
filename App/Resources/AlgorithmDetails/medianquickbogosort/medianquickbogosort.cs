@@ -4,6 +4,11 @@ public class MedianQuickBogoSort
 {
   public static Random r = new Random();
 
+  public static void Sort(int[] arr)
+  {
+    Sort(arr, 0, arr.Length);
+  }
+
   public static bool IsSplit(int[] arr, int start, int mid, int end)
   {
     int lowMax = arr[start];
@@ -45,14 +50,11 @@ public class MedianQuickBogoSort
     Sort(arr, mid, end);
   }
 
-  public static void Sort(int[] arr)
-  {
-    Sort(arr, 0, arr.Length);
-  }
-
   public static void Main(String[] args)
   {
-    int[] array = { 0, 39, 21, 62, 91, 14, 23 };
+    int[] array = {
+      0, 39, 21, 62, 91, 14, 23
+    };
     Sort(array);
     string result = "[" + String.Join(", ", array) + "]";
     Console.WriteLine(result);

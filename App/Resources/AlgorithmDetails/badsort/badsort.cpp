@@ -1,6 +1,17 @@
 #include <cstdio>
 #include <vector>
 
+void printList(const std::vector<int> &items) {
+  printf("[");
+  if (!items.empty()) {
+    printf("%d", items[0]);
+    for (size_t i = 1; i < items.size(); i++) {
+      printf(", %d", items[i]);
+    }
+  }
+  printf("]\n");
+}
+
 void sort(std::vector<int> &array) {
   int currentLen = (int)array.size();
   for (int i = 0; i < currentLen; i++) {
@@ -28,13 +39,7 @@ void sort(std::vector<int> &array) {
   }
 }
 
-void printList(const std::vector<int> &arr) {
-  printf("[");
-  for (size_t i = 0; i < arr.size(); i++) {
-    printf("%d%s", arr[i], i + 1 == arr.size() ? "" : ", ");
-  }
-  printf("]\n");
-}
+
 
 int main() {
   std::vector<int> array = {0,  39, 21, 62, 91, 77, 14, 23,

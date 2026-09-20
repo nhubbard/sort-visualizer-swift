@@ -2,6 +2,28 @@ using System;
 
 public class OutOfPlaceHeapSort
 {
+  public static int[] Sort(int[] arr)
+  {
+    int n = arr.Length;
+    int[] output = new int[n];
+    if (n <= 1)
+    {
+      if (n == 1)
+      {
+        output[0] = arr[0];
+      }
+      return output;
+    }
+    Heapify(arr, n);
+    for (int i = n - 1; i >= 0; i--)
+    {
+      output[i] = arr[0];
+      arr[0] = -1;
+      FindNext(arr, n);
+    }
+    return output;
+  }
+
   static void SiftDown(int[] arr, int root, int size)
   {
     int index = root;
@@ -70,31 +92,12 @@ public class OutOfPlaceHeapSort
     }
   }
 
-  public static int[] Sort(int[] arr)
-  {
-    int n = arr.Length;
-    int[] output = new int[n];
-    if (n <= 1)
-    {
-      if (n == 1)
-      {
-        output[0] = arr[0];
-      }
-      return output;
-    }
-    Heapify(arr, n);
-    for (int i = n - 1; i >= 0; i--)
-    {
-      output[i] = arr[0];
-      arr[0] = -1;
-      FindNext(arr, n);
-    }
-    return output;
-  }
-
   public static void Main(String[] args)
   {
-    int[] array = { 0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56 };
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     int[] output = Sort(array);
     string result = "[" + String.Join(", ", output) + "]";
     Console.WriteLine(result);

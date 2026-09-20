@@ -1,7 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
+                 90, 69, 51, 81, 68, 83, 32, 56};
 
 void swap(int *a, int *b) {
   int t = *a;
@@ -10,45 +11,19 @@ void swap(int *a, int *b) {
 }
 
 void printList(int items[], int size) {
-  for (int i = 0; i < size; i++) {
-    if (i == 0) {
-      printf("[%d, ", items[i]);
-    } else if (i != size - 1) {
-      printf("%d, ", items[i]);
-    } else {
-      printf("%d]", items[i]);
+  printf("[");
+  if (size > 0) {
+    printf("%d", items[0]);
+    for (int i = 1; i < size; i++) {
+      printf(", %d", items[i]);
     }
   }
+  printf("]");
 }
 
-int mostSignificantBit(int value) {
-  if (value == 0)
-    return -1;
-  int bit = 0;
-  while ((value >> (bit + 1)) != 0)
-    bit++;
-  return bit;
-}
-
-int getBit(int value, int bit) { return (value >> bit) & 1; }
-
-int partition(int arr[], int lo, int hi, int bit) {
-  int i = lo - 1;
-  int j = hi;
-  while (1) {
-    i++;
-    while (i < j && !getBit(arr[i], bit))
-      i++;
-    j--;
-    while (j > i && getBit(arr[j], bit))
-      j--;
-    if (i < j) {
-      swap(&arr[i], &arr[j]);
-    } else {
-      return i;
-    }
-  }
-}
+int mostSignificantBit(int value);
+int getBit(int value, int bit);
+int partition(int arr[], int lo, int hi, int bit);
 
 void sort(int arr[], int n) {
   if (n <= 1)
@@ -81,6 +56,37 @@ void sort(int arr[], int n) {
     } else {
       b = p;
       q--;
+    }
+  }
+}
+
+int mostSignificantBit(int value) {
+  if (value == 0)
+    return -1;
+  int bit = 0;
+  while ((value >> (bit + 1)) != 0)
+    bit++;
+  return bit;
+}
+
+int getBit(int value, int bit) {
+  return (value >> bit) & 1;
+}
+
+int partition(int arr[], int lo, int hi, int bit) {
+  int i = lo - 1;
+  int j = hi;
+  while (1) {
+    i++;
+    while (i < j && !getBit(arr[i], bit))
+      i++;
+    j--;
+    while (j > i && getBit(arr[j], bit))
+      j--;
+    if (i < j) {
+      swap(&arr[i], &arr[j]);
+    } else {
+      return i;
     }
   }
 }

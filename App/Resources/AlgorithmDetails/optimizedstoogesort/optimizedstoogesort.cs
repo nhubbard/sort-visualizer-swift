@@ -2,6 +2,11 @@ using System;
 
 public class OptimizedStoogeSort
 {
+  public static void Sort(int[] arr)
+  {
+    Exchange(arr, arr.Length);
+  }
+
   public static void Forward(int[] arr, int left, int right)
   {
     while (left < right)
@@ -59,14 +64,12 @@ public class OptimizedStoogeSort
     Backward(arr, 1, length - 1);
   }
 
-  public static void Sort(int[] arr)
-  {
-    Exchange(arr, arr.Length);
-  }
-
   public static void Main(String[] args)
   {
-    int[] array = { 0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56 };
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     Sort(array);
     string result = "[" + String.Join(", ", array) + "]";
     Console.WriteLine(result);

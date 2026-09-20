@@ -2,87 +2,40 @@
 #include <stdlib.h>
 #include <string.h>
 
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
+                 90, 69, 51, 81, 68, 83, 32, 56};
+
+void swap(int *a, int *b) {
+  int t = *a;
+  *a = *b;
+  *b = t;
+}
+
+void printList(int items[], int size) {
+  printf("[");
+  if (size > 0) {
+    printf("%d", items[0]);
+    for (int i = 1; i < size; i++) {
+      printf(", %d", items[i]);
+    }
+  }
+  printf("]");
+}
+
 typedef struct {
   int *a, n, block, runLength, runs;
   int *keys, *buffer, *heap, *position, *destination;
   int size;
 } Remi;
 
-static int minimum(int x, int y) { return x < y ? x : y; }
-static int greater(Remi *s, int x, int y, int start) {
-  int left = s->a[start + x], right = s->a[start + y];
-  return left > right || (left == right && x > y);
-}
-static void tableSift(Remi *s, int root, int length, int start, int item) {
-  int j = root;
-  while (2 * j + 1 < length) {
-    j = 2 * j + 1;
-    if (j + 1 < length && greater(s, s->keys[j + 1], s->keys[j], start))
-      j++;
-  }
-  while (j > root && greater(s, item, s->keys[j], start))
-    j = (j - 1) / 2;
-  while (j > root) {
-    int old = s->keys[j];
-    s->keys[j] = item;
-    item = old;
-    j = (j - 1) / 2;
-  }
-  s->keys[root] = item;
-}
-static void tableSort(Remi *s, int start, int end) {
-  int length = end - start;
-  if (length < 2)
-    return;
-  for (int i = (length - 1) / 2; i >= 0; i--)
-    tableSift(s, i, length, start, s->keys[i]);
-  for (int i = length - 1; i > 0; i--) {
-    int item = s->keys[i];
-    s->keys[i] = s->keys[0];
-    tableSift(s, 0, i, start, item);
-  }
-  for (int i = 0; i < length; i++) {
-    if (s->keys[i] == i)
-      continue;
-    int held = s->a[start + i], j = i, next = s->keys[i];
-    do {
-      s->a[start + j] = s->a[start + next];
-      s->keys[j] = j;
-      j = next;
-      next = s->keys[next];
-    } while (next != i);
-    s->a[start + j] = held;
-    s->keys[j] = j;
-  }
-}
-static int less(Remi *s, int x, int y) {
-  int left = s->a[s->position[x]], right = s->a[s->position[y]];
-  return left < right || (left == right && x < y);
-}
-static void sift(Remi *s, int item, int root, int length) {
-  while (2 * root + 2 < length) {
-    int left = 2 * root + 1;
-    int child = less(s, s->heap[left], s->heap[left + 1]) ? left : left + 1;
-    if (!less(s, s->heap[child], item))
-      break;
-    s->heap[root] = s->heap[child];
-    root = child;
-  }
-  int last = 2 * root + 1;
-  if (last < length && less(s, s->heap[last], item)) {
-    s->heap[root] = s->heap[last];
-    root = last;
-  }
-  s->heap[root] = item;
-}
-static void advance(Remi *s, int run) {
-  s->position[run]++;
-  if (s->position[run] == minimum((run + 1) * s->runLength, s->n)) {
-    s->size--;
-    sift(s, s->heap[s->size], 0, s->size);
-  } else
-    sift(s, s->heap[0], 0, s->size);
-}
+static int minimum(int x, int y);
+static int greater(Remi *s, int x, int y, int start);
+static void tableSift(Remi *s, int root, int length, int start, int item);
+static void tableSort(Remi *s, int start, int end);
+static int less(Remi *s, int x, int y);
+static void sift(Remi *s, int item, int root, int length);
+static void advance(Remi *s, int run);
+
 void sort(int *a, int n) {
   if (n < 2)
     return;
@@ -192,13 +145,88 @@ void sort(int *a, int n) {
   free(s.position);
   free(s.destination);
 }
+
+static int minimum(int x, int y) {
+  return x < y ? x : y;
+}
+static int greater(Remi *s, int x, int y, int start) {
+  int left = s->a[start + x], right = s->a[start + y];
+  return left > right || (left == right && x > y);
+}
+static void tableSift(Remi *s, int root, int length, int start, int item) {
+  int j = root;
+  while (2 * j + 1 < length) {
+    j = 2 * j + 1;
+    if (j + 1 < length && greater(s, s->keys[j + 1], s->keys[j], start))
+      j++;
+  }
+  while (j > root && greater(s, item, s->keys[j], start))
+    j = (j - 1) / 2;
+  while (j > root) {
+    int old = s->keys[j];
+    s->keys[j] = item;
+    item = old;
+    j = (j - 1) / 2;
+  }
+  s->keys[root] = item;
+}
+static void tableSort(Remi *s, int start, int end) {
+  int length = end - start;
+  if (length < 2)
+    return;
+  for (int i = (length - 1) / 2; i >= 0; i--)
+    tableSift(s, i, length, start, s->keys[i]);
+  for (int i = length - 1; i > 0; i--) {
+    int item = s->keys[i];
+    s->keys[i] = s->keys[0];
+    tableSift(s, 0, i, start, item);
+  }
+  for (int i = 0; i < length; i++) {
+    if (s->keys[i] == i)
+      continue;
+    int held = s->a[start + i], j = i, next = s->keys[i];
+    do {
+      s->a[start + j] = s->a[start + next];
+      s->keys[j] = j;
+      j = next;
+      next = s->keys[next];
+    } while (next != i);
+    s->a[start + j] = held;
+    s->keys[j] = j;
+  }
+}
+static int less(Remi *s, int x, int y) {
+  int left = s->a[s->position[x]], right = s->a[s->position[y]];
+  return left < right || (left == right && x < y);
+}
+static void sift(Remi *s, int item, int root, int length) {
+  while (2 * root + 2 < length) {
+    int left = 2 * root + 1;
+    int child = less(s, s->heap[left], s->heap[left + 1]) ? left : left + 1;
+    if (!less(s, s->heap[child], item))
+      break;
+    s->heap[root] = s->heap[child];
+    root = child;
+  }
+  int last = 2 * root + 1;
+  if (last < length && less(s, s->heap[last], item)) {
+    s->heap[root] = s->heap[last];
+    root = last;
+  }
+  s->heap[root] = item;
+}
+static void advance(Remi *s, int run) {
+  s->position[run]++;
+  if (s->position[run] == minimum((run + 1) * s->runLength, s->n)) {
+    s->size--;
+    sift(s, s->heap[s->size], 0, s->size);
+  } else
+    sift(s, s->heap[0], 0, s->size);
+}
+
 int main(void) {
-  int array[] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
   int n = (int)(sizeof(array) / sizeof(array[0]));
   sort(array, n);
-  printf("[");
-  for (int i = 0; i < n; i++)
-    printf("%s%d", i ? ", " : "", array[i]);
-  printf("]\n");
+  printList(array, n);
   return 0;
 }

@@ -1,16 +1,59 @@
 #include <stdio.h>
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
+                 90, 69, 51, 81, 68, 83, 32, 56};
 
-void printList(int arr[], int n) {
-  for (int i = 0; i < n; i++) {
-    if (i == 0) {
-      printf("[%d, ", arr[i]);
-    } else if (i != n - 1) {
-      printf("%d, ", arr[i]);
-    } else {
-      printf("%d]", arr[i]);
+void swap(int *a, int *b) {
+  int t = *a;
+  *a = *b;
+  *b = t;
+}
+
+void printList(int items[], int size) {
+  printf("[");
+  if (size > 0) {
+    printf("%d", items[0]);
+    for (int i = 1; i < size; i++) {
+      printf(", %d", items[i]);
     }
+  }
+  printf("]");
+}
+
+void insertTo(int arr[], int a, int b);
+void multiSwap(int arr[], int a, int b, int len);
+void rotate(int arr[], int a, int m, int b);
+void bitReversal(int arr[], int a, int b);
+void weaveInsert(int arr[], int a, int b, int rightInit);
+void weaveMerge(int arr[], int a, int mInit, int b);
+
+void sort(int arr[], int size) {
+  int n = size;
+  if (n <= 1)
+    return;
+  int d = 1;
+  while (d < n)
+    d <<= 1;
+  while (d > 1) {
+    int i = 0;
+    int dec = 0;
+    while (i < n) {
+      int j = i;
+      dec += n;
+      while (dec >= d) {
+        dec -= d;
+        j++;
+      }
+      int k = j;
+      dec += n;
+      while (dec >= d) {
+        dec -= d;
+        k++;
+      }
+      weaveMerge(arr, i, j, k);
+      i = k;
+    }
+    d /= 2;
   }
 }
 
@@ -126,36 +169,6 @@ void weaveMerge(int arr[], int a, int mInit, int b) {
     e = f;
   }
   weaveInsert(arr, a, b, right);
-}
-
-void sort(int arr[], int size) {
-  int n = size;
-  if (n <= 1)
-    return;
-  int d = 1;
-  while (d < n)
-    d <<= 1;
-  while (d > 1) {
-    int i = 0;
-    int dec = 0;
-    while (i < n) {
-      int j = i;
-      dec += n;
-      while (dec >= d) {
-        dec -= d;
-        j++;
-      }
-      int k = j;
-      dec += n;
-      while (dec >= d) {
-        dec -= d;
-        k++;
-      }
-      weaveMerge(arr, i, j, k);
-      i = k;
-    }
-    d /= 2;
-  }
 }
 
 int main(int argc, char *argv[]) {

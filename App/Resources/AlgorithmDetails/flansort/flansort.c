@@ -1,14 +1,169 @@
 #include <stdint.h>
 #include <stdio.h>
 
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
+                 90, 69, 51, 81, 68, 83, 32, 56};
+
+void swap(int *a, int *b) {
+  int t = *a;
+  *a = *b;
+  *b = t;
+}
+
+void printList(int items[], int size) {
+  printf("[");
+  if (size > 0) {
+    printf("%d", items[0]);
+    for (int i = 1; i < size; i++) {
+      printf(", %d", items[i]);
+    }
+  }
+  printf("]");
+}
+
+static void flanSort(int *a, int n);
+
+void sort(int *a, int n) {
+  flanSort(a, n);
+}
+
 enum { GAP = 14, RATIO = 4 };
 typedef struct {
   int *a;
   int position[GAP + 2], heap[GAP + 2];
   uint64_t random;
 } Flan;
-static int minimum(int x, int y) { return x < y ? x : y; }
-static int maximum(int x, int y) { return x > y ? x : y; }
+static int minimum(int x, int y);
+static int maximum(int x, int y);
+static void exchange(Flan *s, int i, int j);
+static int choice(Flan *s, int count);
+static int median(Flan *s, int i, int m, int j);
+static int ninther(Flan *s, int first, int last);
+static int pivot(Flan *s, int first, int last);
+static int binarySearch(Flan *s, int first, int last, int value, int backward);
+static void insert(Flan *s, int value, int from, int to);
+static void insertion(Flan *s, int first, int last);
+static int blockSearch(Flan *s, int first, int last, int value, int right);
+static void retrieve(Flan *s, int finish, int scratch, int pEnd, int boundary,
+                     int backward);
+static void librarySort(Flan *s, int first, int last, int scratch, int boundary,
+                        int backward);
+static int less(Flan *s, int x, int y);
+static void sift(Flan *s, int item, int first, int size);
+static void merge(Flan *s, int runLength, int finish, int destination,
+                  int count);
+
+static void flanSort(int *a, int n) {
+  if (n < 2)
+    return;
+  Flan s = {0};
+  s.a = a;
+  s.random = UINT64_C(0x9e3779b97f4a7c15);
+  for (int i = 0; i < n; i++)
+    s.random =
+        (s.random ^ (uint64_t)(int64_t)a[i]) * UINT64_C(0xbf58476d1ce4e5b9) +
+        UINT64_C(0x94d049bb133111eb);
+  int first = 0, finish = n;
+  while (finish - first >= 32) {
+    int value = a[pivot(&s, first, finish)];
+    int before = first, i = first - 1, j = finish, after = finish;
+    while (1) {
+      i++;
+      while (i < j) {
+        if (a[i] == value) {
+          exchange(&s, before, i);
+          before++;
+        } else if (a[i] < value)
+          break;
+        i++;
+      }
+      j--;
+      while (j > i) {
+        if (a[j] == value) {
+          after--;
+          exchange(&s, after, j);
+        } else if (a[j] > value)
+          break;
+        j--;
+      }
+      if (i < j)
+        exchange(&s, i, j);
+      else {
+        if (before == finish)
+          return;
+        if (j < i)
+          j++;
+        while (before > first) {
+          i--;
+          before--;
+          exchange(&s, i, before);
+        }
+        while (after < finish) {
+          exchange(&s, j, after);
+          j++;
+          after++;
+        }
+        break;
+      }
+    }
+    int left = i - first, right = finish - j, count = 0;
+    if (left <= right) {
+      int move = finish - left;
+      left = maximum((right + 1) / (GAP + 1), 16);
+      for (int k = first; k < i; k += left) {
+        librarySort(&s, k, minimum(k + left, i), j, value, 1);
+        s.position[count++] = k;
+      }
+      merge(&s, left, i, move, count);
+      if (j - i < move - j) {
+        while (i < j) {
+          move--;
+          exchange(&s, i, move);
+          i++;
+        }
+        finish = move;
+      } else {
+        while (move > j) {
+          move--;
+          exchange(&s, i, move);
+          i++;
+        }
+        finish = i;
+      }
+    } else {
+      int move = first + right;
+      right = maximum((left + 1) / (GAP + 1), 16);
+      for (int k = j; k < finish; k += right) {
+        librarySort(&s, k, minimum(k + right, finish), first, value, 0);
+        s.position[count++] = k;
+      }
+      merge(&s, right, finish, first, count);
+      if (i - move < j - i) {
+        while (move < i) {
+          j--;
+          exchange(&s, move, j);
+          move++;
+        }
+        first = j;
+      } else {
+        while (j > i) {
+          j--;
+          exchange(&s, move, j);
+          move++;
+        }
+        first = move;
+      }
+    }
+  }
+  insertion(&s, first, finish);
+}
+
+static int minimum(int x, int y) {
+  return x < y ? x : y;
+}
+static int maximum(int x, int y) {
+  return x > y ? x : y;
+}
 static void exchange(Flan *s, int i, int j) {
   int item = s->a[i];
   s->a[i] = s->a[j];
@@ -210,117 +365,10 @@ static void merge(Flan *s, int runLength, int finish, int destination,
       sift(s, s->heap[0], 0, size);
   }
 }
-void sort(int *a, int n) {
-  if (n < 2)
-    return;
-  Flan s = {0};
-  s.a = a;
-  s.random = UINT64_C(0x9e3779b97f4a7c15);
-  for (int i = 0; i < n; i++)
-    s.random =
-        (s.random ^ (uint64_t)(int64_t)a[i]) * UINT64_C(0xbf58476d1ce4e5b9) +
-        UINT64_C(0x94d049bb133111eb);
-  int first = 0, finish = n;
-  while (finish - first >= 32) {
-    int value = a[pivot(&s, first, finish)];
-    int before = first, i = first - 1, j = finish, after = finish;
-    while (1) {
-      i++;
-      while (i < j) {
-        if (a[i] == value) {
-          exchange(&s, before, i);
-          before++;
-        } else if (a[i] < value)
-          break;
-        i++;
-      }
-      j--;
-      while (j > i) {
-        if (a[j] == value) {
-          after--;
-          exchange(&s, after, j);
-        } else if (a[j] > value)
-          break;
-        j--;
-      }
-      if (i < j)
-        exchange(&s, i, j);
-      else {
-        if (before == finish)
-          return;
-        if (j < i)
-          j++;
-        while (before > first) {
-          i--;
-          before--;
-          exchange(&s, i, before);
-        }
-        while (after < finish) {
-          exchange(&s, j, after);
-          j++;
-          after++;
-        }
-        break;
-      }
-    }
-    int left = i - first, right = finish - j, count = 0;
-    if (left <= right) {
-      int move = finish - left;
-      left = maximum((right + 1) / (GAP + 1), 16);
-      for (int k = first; k < i; k += left) {
-        librarySort(&s, k, minimum(k + left, i), j, value, 1);
-        s.position[count++] = k;
-      }
-      merge(&s, left, i, move, count);
-      if (j - i < move - j) {
-        while (i < j) {
-          move--;
-          exchange(&s, i, move);
-          i++;
-        }
-        finish = move;
-      } else {
-        while (move > j) {
-          move--;
-          exchange(&s, i, move);
-          i++;
-        }
-        finish = i;
-      }
-    } else {
-      int move = first + right;
-      right = maximum((left + 1) / (GAP + 1), 16);
-      for (int k = j; k < finish; k += right) {
-        librarySort(&s, k, minimum(k + right, finish), first, value, 0);
-        s.position[count++] = k;
-      }
-      merge(&s, right, finish, first, count);
-      if (i - move < j - i) {
-        while (move < i) {
-          j--;
-          exchange(&s, move, j);
-          move++;
-        }
-        first = j;
-      } else {
-        while (j > i) {
-          j--;
-          exchange(&s, move, j);
-          move++;
-        }
-        first = move;
-      }
-    }
-  }
-  insertion(&s, first, finish);
-}
+
 int main(void) {
-  int array[] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
   int n = (int)(sizeof(array) / sizeof(array[0]));
   sort(array, n);
-  printf("[");
-  for (int i = 0; i < n; i++)
-    printf("%s%d", i ? ", " : "", array[i]);
-  printf("]\n");
+  printList(array, n);
   return 0;
 }

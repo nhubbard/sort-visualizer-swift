@@ -2,6 +2,12 @@ using System;
 
 public class AndreySort
 {
+  public static void Sort(int[] arr)
+  {
+    int n = arr.Length;
+    MSort(arr, 0, n);
+  }
+
   private static void Swap(int[] arr, int i, int j)
   {
     int t = arr[i];
@@ -208,15 +214,12 @@ public class AndreySort
     MSort(arr, a, s);
   }
 
-  public static void Sort(int[] arr)
-  {
-    int n = arr.Length;
-    MSort(arr, 0, n);
-  }
-
   public static void Main(String[] args)
   {
-    int[] array = { 0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56 };
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     Sort(array);
     string result = "[" + String.Join(", ", array) + "]";
     Console.WriteLine(result);

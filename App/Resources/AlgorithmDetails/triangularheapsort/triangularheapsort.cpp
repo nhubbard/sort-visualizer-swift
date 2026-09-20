@@ -1,6 +1,38 @@
+#include <cstdio>
 #include <cmath>
 #include <iostream>
 #include <vector>
+
+int triangularRoot(int val);
+void siftDown(std::vector<int> &array, int root, int size);
+void heapify(std::vector<int> &array, int length);
+
+
+
+void printList(const std::vector<int> &items) {
+  printf("[");
+  if (!items.empty()) {
+    printf("%d", items[0]);
+    for (size_t i = 1; i < items.size(); i++) {
+      printf(", %d", items[i]);
+    }
+  }
+  printf("]\n");
+}
+
+void sort(std::vector<int> &array) {
+  int n = static_cast<int>(array.size());
+  if (n <= 1)
+    return;
+  heapify(array, n);
+  for (int i = 1; i < n - 1; i++) {
+    std::swap(array[0], array[n - i]);
+    siftDown(array, 0, n - i);
+  }
+  if (array[0] > array[1]) {
+    std::swap(array[0], array[1]);
+  }
+}
 
 int triangularRoot(int val) {
   return (static_cast<int>(std::sqrt(static_cast<double>(8 * val + 1))) - 1) /
@@ -32,30 +64,10 @@ void heapify(std::vector<int> &array, int length) {
   }
 }
 
-void sort(std::vector<int> &array) {
-  int n = static_cast<int>(array.size());
-  if (n <= 1)
-    return;
-  heapify(array, n);
-  for (int i = 1; i < n - 1; i++) {
-    std::swap(array[0], array[n - i]);
-    siftDown(array, 0, n - i);
-  }
-  if (array[0] > array[1]) {
-    std::swap(array[0], array[1]);
-  }
-}
-
 int main() {
   std::vector<int> array = {0,  39, 21, 62, 91, 77, 14, 23,
                             90, 69, 51, 81, 68, 83, 32, 56};
   sort(array);
-  std::cout << "[";
-  for (size_t i = 0; i < array.size(); i++) {
-    std::cout << array[i];
-    if (i != array.size() - 1)
-      std::cout << ", ";
-  }
-  std::cout << "]" << '\n';
+  printList(array);
   return 0;
 }

@@ -2,6 +2,31 @@ using System;
 
 public class QuadSort
 {
+  public static void Sort(int[] arr)
+  {
+    int n = arr.Length;
+    if (n < 16)
+    {
+      TailSwap(arr, 0, n);
+    }
+    else if (n < 256)
+    {
+      if (QuadSwap(arr, 0, n) == 0)
+      {
+        int[] buffer = new int[128];
+        TailMerge(arr, buffer, 0, n, 16);
+      }
+    }
+    else
+    {
+      if (QuadSwap(arr, 0, n) == 0)
+      {
+        int[] buffer = new int[n / 2];
+        QuadMerge(arr, buffer, 0, n, 16);
+      }
+    }
+  }
+
   static void Swap2(int[] arr, int i, int j)
   {
     int t = arr[i];
@@ -894,30 +919,6 @@ public class QuadSort
 
   // Top-level dispatch by size: under 16 is a plain TailSwap; under 256 pre-sorts via QuadSwap then
   // finishes with TailMerge; 256 and up finishes with the full QuadMerge pass instead.
-  public static void Sort(int[] arr)
-  {
-    int n = arr.Length;
-    if (n < 16)
-    {
-      TailSwap(arr, 0, n);
-    }
-    else if (n < 256)
-    {
-      if (QuadSwap(arr, 0, n) == 0)
-      {
-        int[] buffer = new int[128];
-        TailMerge(arr, buffer, 0, n, 16);
-      }
-    }
-    else
-    {
-      if (QuadSwap(arr, 0, n) == 0)
-      {
-        int[] buffer = new int[n / 2];
-        QuadMerge(arr, buffer, 0, n, 16);
-      }
-    }
-  }
 
   public static void Main(String[] args)
   {

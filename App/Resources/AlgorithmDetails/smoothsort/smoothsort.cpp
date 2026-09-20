@@ -1,9 +1,80 @@
+#include <cstdio>
 #include <iostream>
 #include <vector>
 
 static const long leonardo[21] = {1,    1,    3,    5,    9,    15,    25,
                                   41,   67,   109,  177,  287,  465,   753,
                                   1219, 1973, 3193, 5167, 8361, 13529, 21891};
+
+int trailingZeroCount(long value);
+void sift(std::vector<int> &array, int pshiftIn, int headIn);
+void trinkle(std::vector<int> &array, long pIn, int pshiftIn, int headIn,
+             bool isTrustyIn);
+
+
+
+void printList(const std::vector<int> &items) {
+  printf("[");
+  if (!items.empty()) {
+    printf("%d", items[0]);
+    for (size_t i = 1; i < items.size(); i++) {
+      printf(", %d", items[i]);
+    }
+  }
+  printf("]\n");
+}
+
+void sort(std::vector<int> &array) {
+  int n = static_cast<int>(array.size());
+  if (n <= 1) {
+    return;
+  }
+
+  int head = 0;
+  long p = 1;
+  int pshift = 1;
+  int hi = n - 1;
+
+  while (head < hi) {
+    if ((p & 3) == 3) {
+      sift(array, pshift, head);
+      p >>= 2;
+      pshift += 2;
+    } else {
+      if (leonardo[pshift - 1] >= hi - head) {
+        trinkle(array, p, pshift, head, false);
+      } else {
+        sift(array, pshift, head);
+      }
+      if (pshift == 1) {
+        p <<= 1;
+        pshift -= 1;
+      } else {
+        p <<= (pshift - 1);
+        pshift = 1;
+      }
+    }
+    p |= 1;
+    head += 1;
+  }
+
+  trinkle(array, p, pshift, head, false);
+  while (pshift != 1 || p != 1) {
+    if (pshift <= 1) {
+      int trail = trailingZeroCount(p);
+      p >>= trail;
+      pshift += trail;
+    } else {
+      p <<= 2;
+      p ^= 7;
+      pshift -= 2;
+      trinkle(array, p >> 1, pshift + 1,
+              head - static_cast<int>(leonardo[pshift]) - 1, true);
+      trinkle(array, p, pshift, head - 1, true);
+    }
+    head -= 1;
+  }
+}
 
 int trailingZeroCount(long value) {
   long mask = value & ~1L;
@@ -70,68 +141,10 @@ void trinkle(std::vector<int> &array, long pIn, int pshiftIn, int headIn,
   }
 }
 
-void sort(std::vector<int> &array) {
-  int n = static_cast<int>(array.size());
-  if (n <= 1) {
-    return;
-  }
-
-  int head = 0;
-  long p = 1;
-  int pshift = 1;
-  int hi = n - 1;
-
-  while (head < hi) {
-    if ((p & 3) == 3) {
-      sift(array, pshift, head);
-      p >>= 2;
-      pshift += 2;
-    } else {
-      if (leonardo[pshift - 1] >= hi - head) {
-        trinkle(array, p, pshift, head, false);
-      } else {
-        sift(array, pshift, head);
-      }
-      if (pshift == 1) {
-        p <<= 1;
-        pshift -= 1;
-      } else {
-        p <<= (pshift - 1);
-        pshift = 1;
-      }
-    }
-    p |= 1;
-    head += 1;
-  }
-
-  trinkle(array, p, pshift, head, false);
-  while (pshift != 1 || p != 1) {
-    if (pshift <= 1) {
-      int trail = trailingZeroCount(p);
-      p >>= trail;
-      pshift += trail;
-    } else {
-      p <<= 2;
-      p ^= 7;
-      pshift -= 2;
-      trinkle(array, p >> 1, pshift + 1,
-              head - static_cast<int>(leonardo[pshift]) - 1, true);
-      trinkle(array, p, pshift, head - 1, true);
-    }
-    head -= 1;
-  }
-}
-
 int main() {
   std::vector<int> array = {0,  39, 21, 62, 91, 77, 14, 23,
                             90, 69, 51, 81, 68, 83, 32, 56};
   sort(array);
-  std::cout << "[";
-  for (size_t i = 0; i < array.size(); i++) {
-    std::cout << array[i];
-    if (i != array.size() - 1)
-      std::cout << ", ";
-  }
-  std::cout << "]" << '\n';
+  printList(array);
   return 0;
 }

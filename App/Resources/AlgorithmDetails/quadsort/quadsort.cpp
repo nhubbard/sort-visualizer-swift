@@ -6,20 +6,64 @@ int array[40] = {55, 12, 84, 3,  47, 91, 26, 68, 8,  73, 40, 97, 15, 62,
                  71, 19, 60, 45, 27, 82, 6,  95, 38, 63, 9,  50};
 
 void printList(int items[], int size) {
-  for (int i = 0; i < size; i++) {
-    if (i == 0) {
-      printf("[%d, ", items[i]);
-    } else if (i != size - 1) {
-      printf("%d, ", items[i]);
-    } else {
-      printf("%d]", items[i]);
+  printf("[");
+  if (size > 0) {
+    printf("%d", items[0]);
+    for (int i = 1; i < size; i++) {
+      printf(", %d", items[i]);
     }
   }
+  printf("]");
 }
 
 #include <cstdio>
 #include <cstdlib>
 #include <string.h>
+
+static void swap2(int arr[], int i, int j);
+static void reverseInclusive(int arr[], int lo, int hi);
+static void swapTwo(int arr[], int start);
+static void swapThree(int arr[], int start);
+static void swapFour(int arr[], int start);
+static void swapFive(int arr[], int start, int *end);
+static void tailSwapEight(int arr[], int start, int *end);
+static void swapSix(int arr[], int start, int *end);
+static void swapSeven(int arr[], int start, int *end);
+static void swapEight(int arr[], int start, int *end);
+static void tailSwap(int arr[], int start, int nmemb);
+static void parityMerge4(int arr[], int start, int dest[], int auxOffset);
+static void parityMerge8(int arr[], const int from[], int start);
+static void parityMerge16(int arr[], int start, int aux[]);
+static void partialBackwardMerge(int arr[], int aux[], int start, int nmemb,
+                                 int block);
+static void tailMerge(int arr[], int aux[], int start, int nmemb, int block);
+static int forwardMergeRead(const int arr[], const int aux[], int toAux,
+                            int i);
+static void forwardMergeWrite(int arr[], int aux[], int toAux, int i,
+                              int value);
+static void forwardMerge(int arr[], int aux[], int start, int auxStart,
+                         int block, int toAux);
+static void quadMergeBlock(int arr[], int start, int aux[], int block);
+static void quadMerge(int arr[], int aux[], int start, int nmemb, int block);
+static int quadSwap(int arr[], int start, int nmemb);
+
+void sort(int arr[], int n) {
+  if (n < 16) {
+    tailSwap(arr, 0, n);
+  } else if (n < 256) {
+    if (quadSwap(arr, 0, n) == 0) {
+      int *buffer = static_cast<int *>(malloc(128 * sizeof(int)));
+      tailMerge(arr, buffer, 0, n, 16);
+      free(buffer);
+    }
+  } else {
+    if (quadSwap(arr, 0, n) == 0) {
+      int *buffer = static_cast<int *>(malloc((n / 2) * sizeof(int)));
+      quadMerge(arr, buffer, 0, n, 16);
+      free(buffer);
+    }
+  }
+}
 
 static void swap2(int arr[], int i, int j) {
   int t = arr[i];
@@ -765,23 +809,6 @@ swapper_end:;
 // Top-level dispatch by size: under 16 is a plain tailSwap; under 256 pre-sorts
 // via quadSwap then finishes with tailMerge; 256 and up finishes with the full
 // quadMerge pass instead.
-void sort(int arr[], int n) {
-  if (n < 16) {
-    tailSwap(arr, 0, n);
-  } else if (n < 256) {
-    if (quadSwap(arr, 0, n) == 0) {
-      int *buffer = static_cast<int *>(malloc(128 * sizeof(int)));
-      tailMerge(arr, buffer, 0, n, 16);
-      free(buffer);
-    }
-  } else {
-    if (quadSwap(arr, 0, n) == 0) {
-      int *buffer = static_cast<int *>(malloc((n / 2) * sizeof(int)));
-      quadMerge(arr, buffer, 0, n, 16);
-      free(buffer);
-    }
-  }
-}
 
 int main(int argc, char *argv[]) {
   int size = sizeof(array) / sizeof(array[0]);

@@ -4,14 +4,6 @@ public class PairwiseMergeSortIterative
 {
   private static int end;
 
-  private static void CompSwap(int[] array, int a, int b)
-  {
-    if (b < end && array[a] > array[b])
-    {
-      (array[a], array[b]) = (array[b], array[a]);
-    }
-  }
-
   public static int[] Sort(int[] array)
   {
     var length = array.Length;
@@ -63,9 +55,20 @@ public class PairwiseMergeSortIterative
     return array;
   }
 
+  private static void CompSwap(int[] array, int a, int b)
+  {
+    if (b < end && array[a] > array[b])
+    {
+      (array[a], array[b]) = (array[b], array[a]);
+    }
+  }
+
   public static void Main(String[] args)
   {
-    int[] array = { 0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56 };
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     Sort(array);
     string result = "[" + String.Join(", ", array) + "]";
     Console.WriteLine(result);

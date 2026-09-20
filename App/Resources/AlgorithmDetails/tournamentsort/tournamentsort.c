@@ -1,16 +1,75 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
+                 90, 69, 51, 81, 68, 83, 32, 56};
+
+void swap(int *a, int *b) {
+  int t = *a;
+  *a = *b;
+  *b = t;
+}
 
 /* A `ref` is either a player leaf, encoded as `-playerIndex` (so `ref <= 0`),
  * or another match node's root offset into `matches` (so `ref > 0`). */
-int isPlayer(int ref) { return ref <= 0; }
-int makePlayer(int index) { return -index; }
+int isPlayer(int ref);
+int makePlayer(int index);
+int getWinner(int *matches, int root);
+int getWinners(int *matches, int root);
+int getLosers(int *matches, int root);
+void setMatch(int *matches, int root, int winner, int winners, int losers);
+int getPlayer(int *arr, int *matches, int ref);
+int makeMatch(int *arr, int *matches, int top, int bot, int root);
+int knockout(int *arr, int *matches, int i, int k, int root);
+int rebuild(int *arr, int *matches, int root);
 
-int getWinner(int *matches, int root) { return matches[root]; }
-int getWinners(int *matches, int root) { return matches[root + 1]; }
-int getLosers(int *matches, int root) { return matches[root + 2]; }
+void printList(int items[], int size) {
+  printf("[");
+  if (size > 0) {
+    printf("%d", items[0]);
+    for (int i = 1; i < size; i++) {
+      printf(", %d", items[i]);
+    }
+  }
+  printf("]");
+}
+
+void sort(int arr[], int n) {
+  if (n <= 1)
+    return;
+
+  int *matches = calloc(6 * n, sizeof(int));
+  int tourney = knockout(arr, matches, 0, n - 1, 3);
+
+  int *output = malloc(n * sizeof(int));
+  for (int i = 0; i < n; i++) {
+    output[i] = arr[getPlayer(arr, matches, tourney)];
+    tourney = isPlayer(tourney) ? 0 : rebuild(arr, matches, tourney);
+  }
+  for (int i = 0; i < n; i++) {
+    arr[i] = output[i];
+  }
+
+  free(output);
+  free(matches);
+}
+
+int isPlayer(int ref) {
+  return ref <= 0;
+}
+int makePlayer(int index) {
+  return -index;
+}
+
+int getWinner(int *matches, int root) {
+  return matches[root];
+}
+int getWinners(int *matches, int root) {
+  return matches[root + 1];
+}
+int getLosers(int *matches, int root) {
+  return matches[root + 2];
+}
 
 void setMatch(int *matches, int root, int winner, int winners, int losers) {
   matches[root] = winner;
@@ -59,37 +118,7 @@ int rebuild(int *arr, int *matches, int root) {
   return root;
 }
 
-void printList(int items[], int size) {
-  for (int i = 0; i < size; i++) {
-    if (i == 0) {
-      printf("[%d, ", items[i]);
-    } else if (i != size - 1) {
-      printf("%d, ", items[i]);
-    } else {
-      printf("%d]", items[i]);
-    }
-  }
-}
 
-void sort(int arr[], int n) {
-  if (n <= 1)
-    return;
-
-  int *matches = calloc(6 * n, sizeof(int));
-  int tourney = knockout(arr, matches, 0, n - 1, 3);
-
-  int *output = malloc(n * sizeof(int));
-  for (int i = 0; i < n; i++) {
-    output[i] = arr[getPlayer(arr, matches, tourney)];
-    tourney = isPlayer(tourney) ? 0 : rebuild(arr, matches, tourney);
-  }
-  for (int i = 0; i < n; i++) {
-    arr[i] = output[i];
-  }
-
-  free(output);
-  free(matches);
-}
 
 int main(int argc, char *argv[]) {
   int size = sizeof(array) / sizeof(array[0]);

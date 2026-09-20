@@ -5,14 +5,40 @@ int array[24] = {55, 12, 84, 3,  47, 91, 26, 68, 8,  73, 40, 97,
                  15, 62, 34, 79, 21, 88, 5,  51, 66, 29, 44, 12};
 
 void printList(int items[], int size) {
-  for (int i = 0; i < size; i++) {
-    if (i == 0) {
-      printf("[%d, ", items[i]);
-    } else if (i != size - 1) {
-      printf("%d, ", items[i]);
-    } else {
-      printf("%d]", items[i]);
+  printf("[");
+  if (size > 0) {
+    printf("%d", items[0]);
+    for (int i = 1; i < size; i++) {
+      printf(", %d", items[i]);
     }
+  }
+  printf("]");
+}
+
+void binaryInsertionSort(int arr[], int lo, int hi);
+void swapRange(int arr[], int a, int b, int length);
+void rotate(int arr[], int lo, int mid, int hi);
+int gallop(int arr[], int lo, int hi, int value);
+void merge(int arr[], int lo, int mid, int hi);
+int integerSqrt(int n);
+
+void sort(int arr[], int n) {
+  if (n <= 16) {
+    binaryInsertionSort(arr, 0, n);
+    return;
+  }
+
+  int blockSize = std::max(16, integerSqrt(n));
+  int low = 0;
+  while (low + 2 * blockSize < n) {
+    binaryInsertionSort(arr, low, low + blockSize);
+    low += blockSize;
+  }
+  binaryInsertionSort(arr, low, n);
+
+  while (low >= blockSize) {
+    merge(arr, low - blockSize, low, n);
+    low -= blockSize;
   }
 }
 
@@ -112,26 +138,6 @@ int integerSqrt(int n) {
     r++;
   }
   return r;
-}
-
-void sort(int arr[], int n) {
-  if (n <= 16) {
-    binaryInsertionSort(arr, 0, n);
-    return;
-  }
-
-  int blockSize = std::max(16, integerSqrt(n));
-  int low = 0;
-  while (low + 2 * blockSize < n) {
-    binaryInsertionSort(arr, low, low + blockSize);
-    low += blockSize;
-  }
-  binaryInsertionSort(arr, low, n);
-
-  while (low >= blockSize) {
-    merge(arr, low - blockSize, low, n);
-    low -= blockSize;
-  }
 }
 
 int main(int argc, char *argv[]) {

@@ -1,29 +1,27 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
+                 90, 69, 51, 81, 68, 83, 32, 56};
+
+void swap(int *a, int *b) {
+  int t = *a;
+  *a = *b;
+  *b = t;
+}
 
 void printList(int items[], int size) {
-  for (int i = 0; i < size; i++) {
-    if (i == 0) {
-      printf("[%d, ", items[i]);
-    } else if (i != size - 1) {
-      printf("%d, ", items[i]);
-    } else {
-      printf("%d]", items[i]);
+  printf("[");
+  if (size > 0) {
+    printf("%d", items[0]);
+    for (int i = 1; i < size; i++) {
+      printf(", %d", items[i]);
     }
   }
+  printf("]");
 }
 
-void merge(int arr[], int scratch[], int low, int mid, int high) {
-  int left = low, right = mid, out = low;
-  while (left < mid && right < high) {
-    scratch[out++] = arr[left] <= arr[right] ? arr[left++] : arr[right++];
-  }
-  while (left < mid) scratch[out++] = arr[left++];
-  while (right < high) scratch[out++] = arr[right++];
-  for (int i = low; i < high; i++) arr[i] = scratch[i];
-}
+void merge(int arr[], int scratch[], int low, int mid, int high);
 
 void sort(int arr[], int n) {
   if (n < 2) return;
@@ -43,6 +41,16 @@ void sort(int arr[], int n) {
     subarrayCount /= 2;
   }
   free(scratch);
+}
+
+void merge(int arr[], int scratch[], int low, int mid, int high) {
+  int left = low, right = mid, out = low;
+  while (left < mid && right < high) {
+    scratch[out++] = arr[left] <= arr[right] ? arr[left++] : arr[right++];
+  }
+  while (left < mid) scratch[out++] = arr[left++];
+  while (right < high) scratch[out++] = arr[right++];
+  for (int i = low; i < high; i++) arr[i] = scratch[i];
 }
 
 int main(int argc, char *argv[]) {

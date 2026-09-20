@@ -1,5 +1,33 @@
 #include <stdio.h>
 
+void swap(int *a, int *b) {
+  int t = *a;
+  *a = *b;
+  *b = t;
+}
+
+void multiSwap(int arr[], int pos, int to);
+void weaveInsert(int arr[], int start, int end);
+void weaveMerge(int arr[], int min, int max, int mid);
+void weaveMergeSort(int arr[], int min, int max);
+
+void printList(int items[], int size) {
+  printf("[");
+  if (size > 0) {
+    printf("%d", items[0]);
+    for (int i = 1; i < size; i++) {
+      printf(", %d", items[i]);
+    }
+  }
+  printf("]");
+}
+
+void sort(int arr[], int length) {
+  if (length > 1) {
+    weaveMergeSort(arr, 0, length - 1);
+  }
+}
+
 void multiSwap(int arr[], int pos, int to) {
   if (to - pos > 0) {
     for (int i = pos; i < to; i++) {
@@ -53,23 +81,7 @@ void weaveMergeSort(int arr[], int min, int max) {
   }
 }
 
-void sort(int arr[], int length) {
-  if (length > 1) {
-    weaveMergeSort(arr, 0, length - 1);
-  }
-}
 
-void printList(int arr[], int n) {
-  for (int i = 0; i < n; i++) {
-    if (i == 0) {
-      printf("[%d, ", arr[i]);
-    } else if (i != n - 1) {
-      printf("%d, ", arr[i]);
-    } else {
-      printf("%d]\n", arr[i]);
-    }
-  }
-}
 
 int main(void) {
   int array[16] = {0,  39, 21, 62, 91, 77, 14, 23,

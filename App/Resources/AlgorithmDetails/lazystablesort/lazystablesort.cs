@@ -2,6 +2,31 @@ using System;
 
 public class LazyStableSort
 {
+  public static void Sort(int[] arr)
+  {
+    int n = arr.Length;
+    int dist = 1;
+    while (dist < n)
+    {
+      if (arr[dist - 1] > arr[dist]) (arr[dist - 1], arr[dist]) = (arr[dist], arr[dist - 1]);
+      dist += 2;
+    }
+    int part = 2;
+    while (part < n)
+    {
+      int left = 0;
+      int right = n - 2 * part;
+      while (left <= right)
+      {
+        MergeWithoutBuffer(arr, left, part, part);
+        left += 2 * part;
+      }
+      int rest = n - left;
+      if (rest > part) MergeWithoutBuffer(arr, left, part, rest - part);
+      part *= 2;
+    }
+  }
+
   public static void MultiSwap(int[] arr, int a, int b, int count)
   {
     for (int i = 0; i < count; i++)
@@ -65,34 +90,12 @@ public class LazyStableSort
     }
   }
 
-  public static void Sort(int[] arr)
-  {
-    int n = arr.Length;
-    int dist = 1;
-    while (dist < n)
-    {
-      if (arr[dist - 1] > arr[dist]) (arr[dist - 1], arr[dist]) = (arr[dist], arr[dist - 1]);
-      dist += 2;
-    }
-    int part = 2;
-    while (part < n)
-    {
-      int left = 0;
-      int right = n - 2 * part;
-      while (left <= right)
-      {
-        MergeWithoutBuffer(arr, left, part, part);
-        left += 2 * part;
-      }
-      int rest = n - left;
-      if (rest > part) MergeWithoutBuffer(arr, left, part, rest - part);
-      part *= 2;
-    }
-  }
-
   public static void Main(String[] args)
   {
-    int[] array = { 0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56 };
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     Sort(array);
     string result = "[" + String.Join(", ", array) + "]";
     Console.WriteLine(result);

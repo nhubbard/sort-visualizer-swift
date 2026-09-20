@@ -2,6 +2,40 @@ using System;
 
 public class OptimizedWeaveMergeSort
 {
+  public static int[] Sort(int[] array)
+  {
+    var n = array.Length;
+    if (n <= 1) return array;
+    var d = 1;
+    while (d < n) d <<= 1;
+    while (d > 1)
+    {
+      var i = 0;
+      var dec = 0;
+      while (i < n)
+      {
+        var j = i;
+        dec += n;
+        while (dec >= d)
+        {
+          dec -= d;
+          j++;
+        }
+        var k = j;
+        dec += n;
+        while (dec >= d)
+        {
+          dec -= d;
+          k++;
+        }
+        WeaveMerge(array, i, j, k);
+        i = k;
+      }
+      d /= 2;
+    }
+    return array;
+  }
+
   private static void InsertTo(int[] array, int a, int b)
   {
     var temp = array[a];
@@ -135,43 +169,12 @@ public class OptimizedWeaveMergeSort
     WeaveInsert(array, a, b, right);
   }
 
-  public static int[] Sort(int[] array)
-  {
-    var n = array.Length;
-    if (n <= 1) return array;
-    var d = 1;
-    while (d < n) d <<= 1;
-    while (d > 1)
-    {
-      var i = 0;
-      var dec = 0;
-      while (i < n)
-      {
-        var j = i;
-        dec += n;
-        while (dec >= d)
-        {
-          dec -= d;
-          j++;
-        }
-        var k = j;
-        dec += n;
-        while (dec >= d)
-        {
-          dec -= d;
-          k++;
-        }
-        WeaveMerge(array, i, j, k);
-        i = k;
-      }
-      d /= 2;
-    }
-    return array;
-  }
-
   public static void Main(String[] args)
   {
-    int[] array = { 0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56 };
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     Sort(array);
     string result = "[" + String.Join(", ", array) + "]";
     Console.WriteLine(result);

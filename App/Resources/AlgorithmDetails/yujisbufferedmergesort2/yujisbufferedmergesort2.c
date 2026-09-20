@@ -1,6 +1,7 @@
 #include <stdio.h>
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
+                 90, 69, 51, 81, 68, 83, 32, 56};
 
 void swap(int *a, int *b) {
   int t = *a;
@@ -8,16 +9,33 @@ void swap(int *a, int *b) {
   *b = t;
 }
 
-void printList(int arr[], int n) {
-  for (int i = 0; i < n; i++) {
-    if (i == 0) {
-      printf("[%d, ", arr[i]);
-    } else if (i != n - 1) {
-      printf("%d, ", arr[i]);
-    } else {
-      printf("%d]", arr[i]);
+void printList(int items[], int size) {
+  printf("[");
+  if (size > 0) {
+    printf("%d", items[0]);
+    for (int i = 1; i < size; i++) {
+      printf(", %d", items[i]);
     }
   }
+  printf("]");
+}
+
+int ceilLog(int n);
+void multiSwap(int arr[], int a, int b, int len);
+void insertTo(int arr[], int a, int b);
+int binarySearch(int arr[], int start, int end, int value, int left);
+void binaryInsertion(int arr[], int a, int b);
+int merge(int arr[], int a, int m, int b, int p);
+void mergeWithBufStatic(int arr[], int a, int m, int b, int p,
+                        int useBinarySearch);
+void mergeSort(int arr[], int a, int p, int length);
+void bufferedMerge(int arr[], int a, int b);
+
+void sort(int arr[], int n) {
+  if (n <= 1) {
+    return;
+  }
+  bufferedMerge(arr, 0, n);
 }
 
 int ceilLog(int n) {
@@ -201,13 +219,6 @@ void bufferedMerge(int arr[], int a, int b) {
   multiSwap(arr, a, b - (m - a), m - a);
   int s = merge(arr, m, b - (m - a), b, a);
   bufferedMerge(arr, b - (m - a) - s, b);
-}
-
-void sort(int arr[], int n) {
-  if (n <= 1) {
-    return;
-  }
-  bufferedMerge(arr, 0, n);
 }
 
 int main(int argc, char *argv[]) {

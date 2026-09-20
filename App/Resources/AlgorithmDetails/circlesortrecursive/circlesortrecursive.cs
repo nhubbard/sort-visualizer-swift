@@ -2,6 +2,22 @@ using System;
 
 public class CircleSortRecursive
 {
+  public static int[] Sort(int[] array)
+  {
+    var end = array.Length;
+    if (end <= 1)
+    {
+      return array;
+    }
+    var paddedLength = NextPowerOfTwo(end);
+    int swaps;
+    do
+    {
+      swaps = CircleSortRoutine(array, 0, paddedLength - 1, end);
+    } while (swaps != 0);
+    return array;
+  }
+
   public static int NextPowerOfTwo(int n)
   {
     var k = 1;
@@ -40,25 +56,12 @@ public class CircleSortRecursive
     return swaps;
   }
 
-  public static int[] Sort(int[] array)
-  {
-    var end = array.Length;
-    if (end <= 1)
-    {
-      return array;
-    }
-    var paddedLength = NextPowerOfTwo(end);
-    int swaps;
-    do
-    {
-      swaps = CircleSortRoutine(array, 0, paddedLength - 1, end);
-    } while (swaps != 0);
-    return array;
-  }
-
   public static void Main(String[] args)
   {
-    int[] array = { 0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56 };
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     Sort(array);
     string result = "[" + String.Join(", ", array) + "]";
     Console.WriteLine(result);

@@ -1,7 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
+                 90, 69, 51, 81, 68, 83, 32, 56};
 
 void swap(int *a, int *b) {
   int t = *a;
@@ -10,15 +11,53 @@ void swap(int *a, int *b) {
 }
 
 void printList(int items[], int size) {
-  for (int i = 0; i < size; i++) {
-    if (i == 0) {
-      printf("[%d, ", items[i]);
-    } else if (i != size - 1) {
-      printf("%d, ", items[i]);
-    } else {
-      printf("%d]", items[i]);
+  printf("[");
+  if (size > 0) {
+    printf("%d", items[0]);
+    for (int i = 1; i < size; i++) {
+      printf(", %d", items[i]);
     }
   }
+  printf("]");
+}
+
+void reverseRun(int arr[], int lo, int hi);
+int identifyRun(int arr[], int indexIn, int n);
+void mergeUp(int arr[], int start, int mid, int end, int *buffer);
+void mergeDown(int arr[], int start, int mid, int end, int *buffer);
+void mergeRuns(int arr[], int leftStart, int rightStart, int end, int *buffer);
+
+void sort(int arr[], int n) {
+  if (n < 2) {
+    return;
+  }
+
+  int *runs = malloc((size_t)n * sizeof(int));
+  int runCount = 0;
+  int lastRun = 0;
+  while (lastRun != -1) {
+    runs[runCount++] = lastRun;
+    lastRun = identifyRun(arr, lastRun, n);
+  }
+
+  int *buffer = malloc((size_t)n * sizeof(int));
+  while (runCount > 1) {
+    int i = 0;
+    while (i < runCount - 1) {
+      int end = (i + 2 >= runCount) ? n : runs[i + 2];
+      mergeRuns(arr, runs[i], runs[i + 1], end, buffer);
+      i += 2;
+    }
+
+    int newCount = 0;
+    for (int j = 0; j < runCount; j += 2) {
+      runs[newCount++] = runs[j];
+    }
+    runCount = newCount;
+  }
+
+  free(buffer);
+  free(runs);
 }
 
 void reverseRun(int arr[], int lo, int hi) {
@@ -113,39 +152,6 @@ void mergeRuns(int arr[], int leftStart, int rightStart, int end, int *buffer) {
   } else {
     mergeUp(arr, leftStart, rightStart, end, buffer);
   }
-}
-
-void sort(int arr[], int n) {
-  if (n < 2) {
-    return;
-  }
-
-  int *runs = malloc((size_t)n * sizeof(int));
-  int runCount = 0;
-  int lastRun = 0;
-  while (lastRun != -1) {
-    runs[runCount++] = lastRun;
-    lastRun = identifyRun(arr, lastRun, n);
-  }
-
-  int *buffer = malloc((size_t)n * sizeof(int));
-  while (runCount > 1) {
-    int i = 0;
-    while (i < runCount - 1) {
-      int end = (i + 2 >= runCount) ? n : runs[i + 2];
-      mergeRuns(arr, runs[i], runs[i + 1], end, buffer);
-      i += 2;
-    }
-
-    int newCount = 0;
-    for (int j = 0; j < runCount; j += 2) {
-      runs[newCount++] = runs[j];
-    }
-    runCount = newCount;
-  }
-
-  free(buffer);
-  free(runs);
 }
 
 int main(int argc, char *argv[]) {

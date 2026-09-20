@@ -2,6 +2,11 @@ using System;
 
 public class SillySort
 {
+  public static void Sort(int[] arr)
+  {
+    SillySortRange(arr, 0, arr.Length - 1);
+  }
+
   public static void SillySortRange(int[] arr, int i, int j)
   {
     if (i < j)
@@ -17,14 +22,12 @@ public class SillySort
     }
   }
 
-  public static void Sort(int[] arr)
-  {
-    SillySortRange(arr, 0, arr.Length - 1);
-  }
-
   public static void Main(String[] args)
   {
-    int[] array = { 0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56 };
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     Sort(array);
     string result = "[" + String.Join(", ", array) + "]";
     Console.WriteLine(result);

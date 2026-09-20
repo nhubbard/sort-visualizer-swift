@@ -2,6 +2,29 @@ using System;
 
 public class FluxSort
 {
+  public static void Sort(int[] arr)
+  {
+    int n = arr.Length;
+    if (n < 2)
+    {
+      return;
+    }
+
+    if (n < 32)
+    {
+      QuadSortRange(arr, 0, n);
+      return;
+    }
+
+    if (FluxAnalyze(arr, n) == 0)
+    {
+      return;
+    }
+
+    int[] swapBuf = new int[n];
+    FluxPartition(arr, swapBuf, 0, 0, n);
+  }
+
   static void Swap2(int[] arr, int i, int j)
   {
     int t = arr[i];
@@ -1168,28 +1191,6 @@ public class FluxSort
 
   // Below this size, bottoms out into the embedded quadsort outright rather than partitioning at
   // all -- matches fluxsort's own `nmemb < 32` fast path.
-  public static void Sort(int[] arr)
-  {
-    int n = arr.Length;
-    if (n < 2)
-    {
-      return;
-    }
-
-    if (n < 32)
-    {
-      QuadSortRange(arr, 0, n);
-      return;
-    }
-
-    if (FluxAnalyze(arr, n) == 0)
-    {
-      return;
-    }
-
-    int[] swapBuf = new int[n];
-    FluxPartition(arr, swapBuf, 0, 0, n);
-  }
 
   public static void Main(String[] args)
   {

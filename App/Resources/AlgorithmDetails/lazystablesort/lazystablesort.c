@@ -1,7 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
+                 90, 69, 51, 81, 68, 83, 32, 56};
 
 void swap(int arr[], int a, int b) {
   int t = arr[a];
@@ -10,14 +11,40 @@ void swap(int arr[], int a, int b) {
 }
 
 void printList(int items[], int size) {
-  for (int i = 0; i < size; i++) {
-    if (i == 0) {
-      printf("[%d, ", items[i]);
-    } else if (i != size - 1) {
-      printf("%d, ", items[i]);
-    } else {
-      printf("%d]", items[i]);
+  printf("[");
+  if (size > 0) {
+    printf("%d", items[0]);
+    for (int i = 1; i < size; i++) {
+      printf(", %d", items[i]);
     }
+  }
+  printf("]");
+}
+
+void multiSwap(int arr[], int a, int b, int count);
+void rotate(int arr[], int pos, int lenA, int lenB);
+int binSearch(int arr[], int pos, int len, int keyPos, int isLeft);
+void mergeWithoutBuffer(int arr[], int pos, int len1, int len2);
+
+void sort(int arr[], int n) {
+  int dist = 1;
+  while (dist < n) {
+    if (arr[dist - 1] > arr[dist])
+      swap(arr, dist - 1, dist);
+    dist += 2;
+  }
+  int part = 2;
+  while (part < n) {
+    int left = 0;
+    int right = n - 2 * part;
+    while (left <= right) {
+      mergeWithoutBuffer(arr, left, part, part);
+      left += 2 * part;
+    }
+    int rest = n - left;
+    if (rest > part)
+      mergeWithoutBuffer(arr, left, part, rest - part);
+    part *= 2;
   }
 }
 
@@ -68,28 +95,6 @@ void mergeWithoutBuffer(int arr[], int pos, int len1, int len2) {
       if (len1 == 0) break;
       do { len2--; } while (len2 != 0 && arr[pos + len1 - 1] <= arr[pos + len1 + len2 - 1]);
     }
-  }
-}
-
-void sort(int arr[], int n) {
-  int dist = 1;
-  while (dist < n) {
-    if (arr[dist - 1] > arr[dist])
-      swap(arr, dist - 1, dist);
-    dist += 2;
-  }
-  int part = 2;
-  while (part < n) {
-    int left = 0;
-    int right = n - 2 * part;
-    while (left <= right) {
-      mergeWithoutBuffer(arr, left, part, part);
-      left += 2 * part;
-    }
-    int rest = n - left;
-    if (rest > part)
-      mergeWithoutBuffer(arr, left, part, rest - part);
-    part *= 2;
   }
 }
 

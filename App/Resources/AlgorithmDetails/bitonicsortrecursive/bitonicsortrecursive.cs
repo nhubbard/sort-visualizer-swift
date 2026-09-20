@@ -2,6 +2,12 @@ using System;
 
 public class BitonicSortRecursive
 {
+  public static int[] Sort(int[] array)
+  {
+    BitonicSort(array, 0, array.Length, true);
+    return array;
+  }
+
   public static int GreatestPowerOfTwoLessThan(int n)
   {
     var k = 1;
@@ -46,15 +52,12 @@ public class BitonicSortRecursive
     }
   }
 
-  public static int[] Sort(int[] array)
-  {
-    BitonicSort(array, 0, array.Length, true);
-    return array;
-  }
-
   public static void Main(String[] args)
   {
-    int[] array = { 0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56 };
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     Sort(array);
     string result = "[" + String.Join(", ", array) + "]";
     Console.WriteLine(result);

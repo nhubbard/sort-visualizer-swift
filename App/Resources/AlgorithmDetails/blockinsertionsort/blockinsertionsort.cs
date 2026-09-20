@@ -2,6 +2,22 @@ using System;
 
 public class BlockInsertionSort
 {
+  public static void Sort(int[] arr)
+  {
+    int n = arr.Length;
+    if (n < 2) return;
+    int i = FindRun(arr, 0, n);
+    while (i < n)
+    {
+      int j = FindRun(arr, i, n);
+      int len = j - i;
+      if (len == 1) Insert1(arr, 0, i);
+      else if (len == 2) Insert2(arr, 0, i, i + 1);
+      else MergeWithoutBuffer(arr, 0, i, len);
+      i = j;
+    }
+  }
+
   public static void MultiSwap(int[] arr, int a, int b, int count)
   {
     for (int i = 0; i < count; i++)
@@ -120,25 +136,12 @@ public class BlockInsertionSort
     arr[l + 1] = tmpL;
   }
 
-  public static void Sort(int[] arr)
-  {
-    int n = arr.Length;
-    if (n < 2) return;
-    int i = FindRun(arr, 0, n);
-    while (i < n)
-    {
-      int j = FindRun(arr, i, n);
-      int len = j - i;
-      if (len == 1) Insert1(arr, 0, i);
-      else if (len == 2) Insert2(arr, 0, i, i + 1);
-      else MergeWithoutBuffer(arr, 0, i, len);
-      i = j;
-    }
-  }
-
   public static void Main(String[] args)
   {
-    int[] array = { 0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56 };
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     Sort(array);
     string result = "[" + String.Join(", ", array) + "]";
     Console.WriteLine(result);

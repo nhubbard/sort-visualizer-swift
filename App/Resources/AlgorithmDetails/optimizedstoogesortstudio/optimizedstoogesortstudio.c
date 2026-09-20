@@ -1,7 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
+                 90, 69, 51, 81, 68, 83, 32, 56};
 
 void swap(int *a, int *b) {
   int t = *a;
@@ -10,15 +11,23 @@ void swap(int *a, int *b) {
 }
 
 void printList(int items[], int size) {
-  for (int i = 0; i < size; i++) {
-    if (i == 0) {
-      printf("[%d, ", items[i]);
-    } else if (i != size - 1) {
-      printf("%d, ", items[i]);
-    } else {
-      printf("%d]", items[i]);
+  printf("[");
+  if (size > 0) {
+    printf("%d", items[0]);
+    for (int i = 1; i < size; i++) {
+      printf(", %d", items[i]);
     }
   }
+  printf("]");
+}
+
+int compSwap(int arr[], int a, int b);
+int max(int a, int b);
+int stoogeSort(int arr[], int a, int m, int b, int merge);
+
+void sort(int arr[], int n) {
+  if (n <= 1) return;
+  stoogeSort(arr, 0, 1, n, 0);
 }
 
 int compSwap(int arr[], int a, int b) {
@@ -29,7 +38,9 @@ int compSwap(int arr[], int a, int b) {
   return 0;
 }
 
-int max(int a, int b) { return a > b ? a : b; }
+int max(int a, int b) {
+  return a > b ? a : b;
+}
 
 int stoogeSort(int arr[], int a, int m, int b, int merge) {
   if (a >= m)
@@ -64,11 +75,6 @@ int stoogeSort(int arr[], int a, int m, int b, int merge) {
   }
 
   return lChange || rChange;
-}
-
-void sort(int arr[], int n) {
-  if (n <= 1) return;
-  stoogeSort(arr, 0, 1, n, 0);
 }
 
 int main(int argc, char *argv[]) {

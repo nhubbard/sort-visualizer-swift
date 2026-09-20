@@ -3,22 +3,56 @@
 
 #define RADIX_BASE 4
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
+                 90, 69, 51, 81, 68, 83, 32, 56};
+
+void swap(int *a, int *b) {
+  int t = *a;
+  *a = *b;
+  *b = t;
+}
 
 void printList(int items[], int size) {
-  for (int i = 0; i < size; i++) {
-    if (i == 0) {
-      printf("[%d, ", items[i]);
-    } else if (i != size - 1) {
-      printf("%d, ", items[i]);
-    } else {
-      printf("%d]", items[i]);
+  printf("[");
+  if (size > 0) {
+    printf("%d", items[0]);
+    for (int i = 1; i < size; i++) {
+      printf(", %d", items[i]);
     }
   }
+  printf("]");
 }
 
 /* Extracts the digit at `place` (0 = ones place) from `value`, in RADIX_BASE.
  */
+int digitAt(int value, int place);
+void multiSwap(int arr[], int a, int b, int len);
+void rotateBlock(int arr[], int a, int m, int b);
+int digitLowerBound(int arr[], int a, int b, int d, int place);
+void mergeByDigit(int arr[], int a, int m, int b, int da, int db, int place);
+void digitMergeSort(int arr[], int a, int b, int place);
+
+void sort(int arr[], int n) {
+  if (n < 2) {
+    return;
+  }
+  int maxValue = arr[0];
+  for (int i = 1; i < n; i++) {
+    if (arr[i] > maxValue) {
+      maxValue = arr[i];
+    }
+  }
+  int maxPlace = 0;
+  int probe = RADIX_BASE;
+  while (probe <= maxValue) {
+    maxPlace++;
+    probe *= RADIX_BASE;
+  }
+  for (int place = 0; place <= maxPlace; place++) {
+    digitMergeSort(arr, 0, n, place);
+  }
+}
+
 int digitAt(int value, int place) {
   int divisor = 1;
   for (int i = 0; i < place; i++) {
@@ -97,27 +131,6 @@ void digitMergeSort(int arr[], int a, int b, int place) {
   digitMergeSort(arr, a, mid, place);
   digitMergeSort(arr, mid, b, place);
   mergeByDigit(arr, a, mid, b, 0, RADIX_BASE, place);
-}
-
-void sort(int arr[], int n) {
-  if (n < 2) {
-    return;
-  }
-  int maxValue = arr[0];
-  for (int i = 1; i < n; i++) {
-    if (arr[i] > maxValue) {
-      maxValue = arr[i];
-    }
-  }
-  int maxPlace = 0;
-  int probe = RADIX_BASE;
-  while (probe <= maxValue) {
-    maxPlace++;
-    probe *= RADIX_BASE;
-  }
-  for (int place = 0; place <= maxPlace; place++) {
-    digitMergeSort(arr, 0, n, place);
-  }
 }
 
 int main(int argc, char *argv[]) {

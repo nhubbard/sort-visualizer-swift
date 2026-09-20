@@ -2,6 +2,33 @@ using System;
 
 public class AmericanFlagSort
 {
+  public static void Sort(int[] arr)
+  {
+    int n = arr.Length;
+    if (n <= 1)
+    {
+      return;
+    }
+
+    var radix = 4;
+    var maxValue = arr[0];
+    foreach (var value in arr)
+    {
+      if (value > maxValue)
+      {
+        maxValue = value;
+      }
+    }
+
+    var divisor = 1;
+    while (maxValue / divisor >= radix)
+    {
+      divisor *= radix;
+    }
+
+    FlagSort(arr, 0, n, divisor, radix);
+  }
+
   private static int DigitAt(int value, int divisor, int radix)
   {
     return (value / divisor) % radix;
@@ -64,36 +91,12 @@ public class AmericanFlagSort
     }
   }
 
-  public static void Sort(int[] arr)
-  {
-    int n = arr.Length;
-    if (n <= 1)
-    {
-      return;
-    }
-
-    var radix = 4;
-    var maxValue = arr[0];
-    foreach (var value in arr)
-    {
-      if (value > maxValue)
-      {
-        maxValue = value;
-      }
-    }
-
-    var divisor = 1;
-    while (maxValue / divisor >= radix)
-    {
-      divisor *= radix;
-    }
-
-    FlagSort(arr, 0, n, divisor, radix);
-  }
-
   public static void Main(String[] args)
   {
-    int[] array = { 0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56 };
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     Sort(array);
     string result = "[" + String.Join(", ", array) + "]";
     Console.WriteLine(result);

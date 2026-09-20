@@ -5,6 +5,14 @@ public class BinaryMergeSort
 {
   private const int Threshold = 32;
 
+  public static void Sort(int[] arr)
+  {
+    int n = arr.Length;
+    if (n < 2)
+      return;
+    MergeSort(arr, 0, n);
+  }
+
   public static void InsertionSort(int[] arr, int start, int end)
   {
     for (int i = start + 1; i < end; i++)
@@ -61,17 +69,12 @@ public class BinaryMergeSort
     Merge(arr, start, mid, end);
   }
 
-  public static void Sort(int[] arr)
-  {
-    int n = arr.Length;
-    if (n < 2)
-      return;
-    MergeSort(arr, 0, n);
-  }
-
   public static void Main(String[] args)
   {
-    int[] array = { 0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56 };
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     Sort(array);
     string result = "[" + String.Join(", ", array) + "]";
     Console.WriteLine(result);

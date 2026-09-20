@@ -1,7 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
+                 90, 69, 51, 81, 68, 83, 32, 56};
 
 void swap(int *a, int *b) {
   int t = *a;
@@ -10,32 +11,20 @@ void swap(int *a, int *b) {
 }
 
 void printList(int items[], int size) {
-  for (int i = 0; i < size; i++) {
-    if (i == 0) {
-      printf("[%d, ", items[i]);
-    } else if (i != size - 1) {
-      printf("%d, ", items[i]);
-    } else {
-      printf("%d]", items[i]);
+  printf("[");
+  if (size > 0) {
+    printf("%d", items[0]);
+    for (int i = 1; i < size; i++) {
+      printf(", %d", items[i]);
     }
   }
+  printf("]");
 }
 
 int end;
 
-void compSwap(int arr[], int a, int b) {
-  if (b < end && arr[a] > arr[b]) {
-    swap(&arr[a], &arr[b]);
-  }
-}
-
-void halver(int arr[], int low, int high) {
-  while (low < high) {
-    compSwap(arr, low, high);
-    low++;
-    high--;
-  }
-}
+void compSwap(int arr[], int a, int b);
+void halver(int arr[], int low, int high);
 
 void sort(int arr[], int n) {
   end = n;
@@ -57,6 +46,20 @@ void sort(int arr[], int n) {
       i >>= 1;
     }
     k >>= 1;
+  }
+}
+
+void compSwap(int arr[], int a, int b) {
+  if (b < end && arr[a] > arr[b]) {
+    swap(&arr[a], &arr[b]);
+  }
+}
+
+void halver(int arr[], int low, int high) {
+  while (low < high) {
+    compSwap(arr, low, high);
+    low++;
+    high--;
   }
 }
 

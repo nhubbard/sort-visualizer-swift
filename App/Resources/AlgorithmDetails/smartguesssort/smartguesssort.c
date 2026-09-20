@@ -3,37 +3,25 @@
 
 int array[7] = {0, 39, 21, 62, 91, 14, 23};
 
+void swap(int *a, int *b) {
+  int t = *a;
+  *a = *b;
+  *b = t;
+}
+
 void printList(int items[], int size) {
-  for (int i = 0; i < size; i++) {
-    if (i == 0) {
-      printf("[%d, ", items[i]);
-    } else if (i != size - 1) {
-      printf("%d, ", items[i]);
-    } else {
-      printf("%d]", items[i]);
+  printf("[");
+  if (size > 0) {
+    printf("%d", items[0]);
+    for (int i = 1; i < size; i++) {
+      printf(", %d", items[i]);
     }
   }
+  printf("]");
 }
 
-int pairOk(int arr[], int loops[], int i) {
-  int a = arr[loops[i]];
-  int b = arr[loops[i + 1]];
-  if (a < b) {
-    return 1;
-  }
-  if (a == b && loops[i] < loops[i + 1]) {
-    return 1;
-  }
-  return 0;
-}
-
-int firstFailure(int arr[], int loops[], int n) {
-  int i = n - 2;
-  while (i >= 0 && pairOk(arr, loops, i)) {
-    i--;
-  }
-  return i;
-}
+int pairOk(int arr[], int loops[], int i);
+int firstFailure(int arr[], int loops[], int n);
 
 void sort(int arr[], int n) {
   int loops[n];
@@ -63,6 +51,26 @@ void sort(int arr[], int n) {
   for (int i = 0; i < n; i++) {
     arr[i] = mapped[i];
   }
+}
+
+int pairOk(int arr[], int loops[], int i) {
+  int a = arr[loops[i]];
+  int b = arr[loops[i + 1]];
+  if (a < b) {
+    return 1;
+  }
+  if (a == b && loops[i] < loops[i + 1]) {
+    return 1;
+  }
+  return 0;
+}
+
+int firstFailure(int arr[], int loops[], int n) {
+  int i = n - 2;
+  while (i >= 0 && pairOk(arr, loops, i)) {
+    i--;
+  }
+  return i;
 }
 
 int main(int argc, char *argv[]) {

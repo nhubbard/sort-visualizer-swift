@@ -2,6 +2,31 @@ using System;
 
 public class LaziestSort
 {
+  public static void Sort(int[] arr)
+  {
+    int n = arr.Length;
+    if (n <= 16)
+    {
+      BinaryInsertionSort(arr, 0, n);
+      return;
+    }
+
+    int blockSize = Math.Max(16, IntegerSqrt(n));
+    int low = 0;
+    while (low + 2 * blockSize < n)
+    {
+      BinaryInsertionSort(arr, low, low + blockSize);
+      low += blockSize;
+    }
+    BinaryInsertionSort(arr, low, n);
+
+    while (low >= blockSize)
+    {
+      Merge(arr, low - blockSize, low, n);
+      low -= blockSize;
+    }
+  }
+
   static void BinaryInsertionSort(int[] arr, int lo, int hi)
   {
     for (int i = lo + 1; i < hi; i++)
@@ -132,35 +157,12 @@ public class LaziestSort
     return r;
   }
 
-  public static void Sort(int[] arr)
-  {
-    int n = arr.Length;
-    if (n <= 16)
-    {
-      BinaryInsertionSort(arr, 0, n);
-      return;
-    }
-
-    int blockSize = Math.Max(16, IntegerSqrt(n));
-    int low = 0;
-    while (low + 2 * blockSize < n)
-    {
-      BinaryInsertionSort(arr, low, low + blockSize);
-      low += blockSize;
-    }
-    BinaryInsertionSort(arr, low, n);
-
-    while (low >= blockSize)
-    {
-      Merge(arr, low - blockSize, low, n);
-      low -= blockSize;
-    }
-  }
-
   public static void Main(String[] args)
   {
     int[] array = {
-      55, 12, 84, 3, 47, 91, 26, 68, 8, 73, 40, 97, 15, 62, 34, 79, 21, 88, 5, 51, 66, 29, 44, 12
+      55, 12, 84, 3, 47, 91, 26, 68,
+      8, 73, 40, 97, 15, 62, 34, 79,
+      21, 88, 5, 51, 66, 29, 44, 12
     };
     Sort(array);
     string result = "[" + String.Join(", ", array) + "]";

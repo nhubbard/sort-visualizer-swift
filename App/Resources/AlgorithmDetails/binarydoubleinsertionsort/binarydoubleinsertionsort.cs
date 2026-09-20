@@ -2,6 +2,14 @@ using System;
 
 public static class BinaryDoubleInsertionSort
 {
+  public static void Sort(int[] arr)
+  {
+    if (arr.Length > 1)
+    {
+      DoubleInsertion(arr, 0, arr.Length);
+    }
+  }
+
   private static int LeftBinarySearch(int[] array, int a, int b, int val)
   {
     int lo = a,
@@ -102,17 +110,12 @@ public static class BinaryDoubleInsertionSort
     }
   }
 
-  public static void Sort(int[] arr)
-  {
-    if (arr.Length > 1)
-    {
-      DoubleInsertion(arr, 0, arr.Length);
-    }
-  }
-
   public static void Main()
   {
-    int[] array = { 0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56 };
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     Sort(array);
     Console.WriteLine("[" + string.Join(", ", array) + "]");
   }

@@ -5,16 +5,34 @@
 int array[30] = {55, 12, 84, 3, 47, 91, 26, 68, 8,  73, 40, 97, 15, 62, 34,
                  79, 21, 88, 5, 51, 66, 29, 44, 12, 78, 33, 91, 6,  58, 12};
 
+void swap(int *a, int *b) {
+  int t = *a;
+  *a = *b;
+  *b = t;
+}
+
 void printList(int items[], int size) {
-  for (int i = 0; i < size; i++) {
-    if (i == 0) {
-      printf("[%d, ", items[i]);
-    } else if (i != size - 1) {
-      printf("%d, ", items[i]);
-    } else {
-      printf("%d]", items[i]);
+  printf("[");
+  if (size > 0) {
+    printf("%d", items[0]);
+    for (int i = 1; i < size; i++) {
+      printf(", %d", items[i]);
     }
   }
+  printf("]");
+}
+
+void swapInts(int *a, int *b);
+void binaryInsertionSort(int arr[], int start, int end);
+int lowerBoundIndex(int arr[], int start, int end, int targetIndex);
+int partition(int arr[], int start, int end, int scratch);
+void quickSort(int arr[], int start, int end);
+
+void sort(int arr[], int n) {
+  if (n < 2) {
+    return;
+  }
+  quickSort(arr, 0, n);
 }
 
 void swapInts(int *a, int *b) {
@@ -182,13 +200,6 @@ void quickSort(int arr[], int start, int end) {
       reuseMedianCandidates = 1;
     }
   }
-}
-
-void sort(int arr[], int n) {
-  if (n < 2) {
-    return;
-  }
-  quickSort(arr, 0, n);
 }
 
 int main(int argc, char *argv[]) {

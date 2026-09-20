@@ -5,13 +5,29 @@
 int array[8] = {0, 39, 21, 62, 91, 77, 14, 23};
 
 void printList(int items[], int size) {
-  for (int i = 0; i < size; i++) {
-    if (i == 0)
-      printf("[%d, ", items[i]);
-    else if (i != size - 1)
-      printf("%d, ", items[i]);
+  printf("[");
+  if (size > 0) {
+    printf("%d", items[0]);
+    for (int i = 1; i < size; i++) {
+      printf(", %d", items[i]);
+    }
+  }
+  printf("]");
+}
+
+inline bool isMinimum(int arr[], int start, int end);
+inline bool isMaximum(int arr[], int start, int end);
+void shuffleRange(int arr[], int start, int end);
+
+void sort(int arr[], int n) {
+  int lo = 0, hi = n;
+  while (lo < hi - 1) {
+    if (isMinimum(arr, lo, hi))
+      ++lo;
+    else if (isMaximum(arr, lo, hi))
+      --hi;
     else
-      printf("%d]", items[i]);
+      shuffleRange(arr, lo, hi);
   }
 }
 
@@ -32,18 +48,6 @@ inline bool isMaximum(int arr[], int start, int end) {
 void shuffleRange(int arr[], int start, int end) {
   for (int i = start; i < end - 1; ++i)
     std::swap(arr[i], arr[i + rand() % (end - i)]);
-}
-
-void sort(int arr[], int n) {
-  int lo = 0, hi = n;
-  while (lo < hi - 1) {
-    if (isMinimum(arr, lo, hi))
-      ++lo;
-    else if (isMaximum(arr, lo, hi))
-      --hi;
-    else
-      shuffleRange(arr, lo, hi);
-  }
 }
 
 int main(int argc, char *argv[]) {

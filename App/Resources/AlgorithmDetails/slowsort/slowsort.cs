@@ -2,6 +2,12 @@ using System;
 
 public class SlowSort
 {
+  public static int[] Sort(int[] array)
+  {
+    SlowSortRange(array, 0, array.Length - 1);
+    return array;
+  }
+
   public static void SlowSortRange(int[] array, int i, int j)
   {
     if (i >= j)
@@ -18,15 +24,12 @@ public class SlowSort
     SlowSortRange(array, i, j - 1);
   }
 
-  public static int[] Sort(int[] array)
-  {
-    SlowSortRange(array, 0, array.Length - 1);
-    return array;
-  }
-
   public static void Main(String[] args)
   {
-    int[] array = { 0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56 };
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     Sort(array);
     string result = "[" + String.Join(", ", array) + "]";
     Console.WriteLine(result);

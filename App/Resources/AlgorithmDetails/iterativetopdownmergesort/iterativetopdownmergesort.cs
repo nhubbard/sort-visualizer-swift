@@ -2,25 +2,6 @@ using System;
 
 public class IterativeTopDownMergeSort
 {
-  private static void Merge(int[] array, int[] scratch, int low, int mid, int high)
-  {
-    int left = low, right = mid, output = low;
-    while (left < mid && right < high)
-    {
-      if (array[left] <= array[right])
-      {
-        scratch[output++] = array[left++];
-      }
-      else
-      {
-        scratch[output++] = array[right++];
-      }
-    }
-    while (left < mid) scratch[output++] = array[left++];
-    while (right < high) scratch[output++] = array[right++];
-    for (int i = low; i < high; i++) array[i] = scratch[i];
-  }
-
   public static void Sort(int[] arr)
   {
     int n = arr.Length;
@@ -45,9 +26,31 @@ public class IterativeTopDownMergeSort
     }
   }
 
+  private static void Merge(int[] array, int[] scratch, int low, int mid, int high)
+  {
+    int left = low, right = mid, output = low;
+    while (left < mid && right < high)
+    {
+      if (array[left] <= array[right])
+      {
+        scratch[output++] = array[left++];
+      }
+      else
+      {
+        scratch[output++] = array[right++];
+      }
+    }
+    while (left < mid) scratch[output++] = array[left++];
+    while (right < high) scratch[output++] = array[right++];
+    for (int i = low; i < high; i++) array[i] = scratch[i];
+  }
+
   public static void Main(String[] args)
   {
-    int[] array = { 0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56 };
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     Sort(array);
     string result = "[" + String.Join(", ", array) + "]";
     Console.WriteLine(result);

@@ -2,6 +2,25 @@
 #include <vector>
 
 void merge(std::vector<int> &arr, std::vector<int> &tmp, int length,
+           int residue, int modulus);
+
+void printList(const std::vector<int> &items) {
+  printf("[");
+  if (!items.empty()) {
+    printf("%d", items[0]);
+    for (size_t i = 1; i < items.size(); i++) {
+      printf(", %d", items[i]);
+    }
+  }
+  printf("]\n");
+}
+
+void sort(std::vector<int> &arr) {
+  std::vector<int> tmp(arr.size());
+  merge(arr, tmp, (int)arr.size(), 0, 1);
+}
+
+void merge(std::vector<int> &arr, std::vector<int> &tmp, int length,
            int residue, int modulus) {
   if (residue + modulus >= length) {
     return;
@@ -42,18 +61,7 @@ void merge(std::vector<int> &arr, std::vector<int> &tmp, int length,
   }
 }
 
-void sort(std::vector<int> &arr) {
-  std::vector<int> tmp(arr.size());
-  merge(arr, tmp, (int)arr.size(), 0, 1);
-}
 
-void printList(const std::vector<int> &arr) {
-  printf("[");
-  for (size_t i = 0; i < arr.size(); i++) {
-    printf("%d%s", arr[i], i + 1 == arr.size() ? "" : ", ");
-  }
-  printf("]\n");
-}
 
 int main() {
   std::vector<int> array = {0,  39, 21, 62, 91, 77, 14, 23,

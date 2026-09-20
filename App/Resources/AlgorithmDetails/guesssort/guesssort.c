@@ -3,37 +3,24 @@
 
 int array[4] = {0, 39, 21, 14};
 
-void printList(int items[], int size) {
-  for (int i = 0; i < size; i++) {
-    if (i == 0) {
-      printf("[%d, ", items[i]);
-    } else if (i != size - 1) {
-      printf("%d, ", items[i]);
-    } else {
-      printf("%d]", items[i]);
-    }
-  }
+void swap(int *a, int *b) {
+  int t = *a;
+  *a = *b;
+  *b = t;
 }
 
-int isValid(int arr[], int loops[], int n) {
-  int total = 0;
-  for (int i = 0; i < n; i++) {
-    for (int j = 0; j < n; j++) {
-      if (loops[i] == loops[j]) {
-        total += 1;
-      }
+void printList(int items[], int size) {
+  printf("[");
+  if (size > 0) {
+    printf("%d", items[0]);
+    for (int i = 1; i < size; i++) {
+      printf(", %d", items[i]);
     }
   }
-  for (int i = 0; i < n; i++) {
-    for (int j = 0; j < n; j++) {
-      if ((i < j && arr[loops[i]] > arr[loops[j]]) ||
-          (i > j && arr[loops[i]] < arr[loops[j]])) {
-        total += 1;
-      }
-    }
-  }
-  return total == n;
+  printf("]");
 }
+
+int isValid(int arr[], int loops[], int n);
 
 void sort(int arr[], int n) {
   int loops[n];
@@ -71,6 +58,26 @@ void sort(int arr[], int n) {
   for (int i = 0; i < n; i++) {
     arr[i] = original[indexes[i]];
   }
+}
+
+int isValid(int arr[], int loops[], int n) {
+  int total = 0;
+  for (int i = 0; i < n; i++) {
+    for (int j = 0; j < n; j++) {
+      if (loops[i] == loops[j]) {
+        total += 1;
+      }
+    }
+  }
+  for (int i = 0; i < n; i++) {
+    for (int j = 0; j < n; j++) {
+      if ((i < j && arr[loops[i]] > arr[loops[j]]) ||
+          (i > j && arr[loops[i]] < arr[loops[j]])) {
+        total += 1;
+      }
+    }
+  }
+  return total == n;
 }
 
 int main(int argc, char *argv[]) {

@@ -16,7 +16,9 @@ public class BubbleBogoSort
   }
   public static void Main()
   {
-    int[] array = { 0, 39, 21, 62, 91, 77, 14, 23 }; Sort(array);
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23
+    }; Sort(array);
     Console.WriteLine("[" + string.Join(", ", array) + "]");
   }
 }

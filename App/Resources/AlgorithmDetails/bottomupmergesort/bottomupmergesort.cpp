@@ -2,31 +2,21 @@
 #include <cstdio>
 #include <vector>
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
+                 90, 69, 51, 81, 68, 83, 32, 56};
 
-void printList(int arr[], int n) {
-  for (int i = 0; i < n; i++) {
-    if (i == 0) {
-      printf("[%d, ", arr[i]);
-    } else if (i != n - 1) {
-      printf("%d, ", arr[i]);
-    } else {
-      printf("%d]", arr[i]);
+void printList(int items[], int size) {
+  printf("[");
+  if (size > 0) {
+    printf("%d", items[0]);
+    for (int i = 1; i < size; i++) {
+      printf(", %d", items[i]);
     }
   }
+  printf("]");
 }
 
-int merge(int arr[], std::vector<int>& scratch, int n, int index, int mergeSize) {
-  int mid = index + mergeSize / 2;
-  int end = std::min(n, index + mergeSize);
-  if (mid >= end) return index;
-  int left = index, right = mid, out = index;
-  while (left < mid && right < end)
-    scratch[out++] = arr[left] <= arr[right] ? arr[left++] : arr[right++];
-  while (left < mid) scratch[out++] = arr[left++];
-  while (right < end) scratch[out++] = arr[right++];
-  return -1;
-}
+int merge(int arr[], std::vector<int>& scratch, int n, int index, int mergeSize);
 
 void sort(int arr[], int n) {
   if (n < 2) return;
@@ -46,6 +36,18 @@ void sort(int arr[], int n) {
     int copyLength = stop < 0 ? n : stop;
     for (int j = 0; j < copyLength; j++) arr[j] = scratch[j];
   }
+}
+
+int merge(int arr[], std::vector<int>& scratch, int n, int index, int mergeSize) {
+  int mid = index + mergeSize / 2;
+  int end = std::min(n, index + mergeSize);
+  if (mid >= end) return index;
+  int left = index, right = mid, out = index;
+  while (left < mid && right < end)
+    scratch[out++] = arr[left] <= arr[right] ? arr[left++] : arr[right++];
+  while (left < mid) scratch[out++] = arr[left++];
+  while (right < end) scratch[out++] = arr[right++];
+  return -1;
 }
 
 int main(int argc, char *argv[]) {

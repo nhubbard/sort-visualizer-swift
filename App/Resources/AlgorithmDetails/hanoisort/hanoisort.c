@@ -1,7 +1,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
+                 90, 69, 51, 81, 68, 83, 32, 56};
+
+void swap(int *a, int *b) {
+  int t = *a;
+  *a = *b;
+  *b = t;
+}
 
 typedef enum { STACK_TWO, STACK_THREE } StackId;
 
@@ -17,15 +24,53 @@ static int target;
 static int targetMoves;
 
 void printList(int items[], int size) {
-  for (int i = 0; i < size; i++) {
-    if (i == 0) {
-      printf("[%d, ", items[i]);
-    } else if (i != size - 1) {
-      printf("%d, ", items[i]);
-    } else {
-      printf("%d]", items[i]);
+  printf("[");
+  if (size > 0) {
+    printf("%d", items[0]);
+    for (int i = 1; i < size; i++) {
+      printf(", %d", items[i]);
     }
   }
+  printf("]");
+}
+
+static void push(StackId id, int value);
+static int popStack(StackId id);
+static int peekStack(StackId id);
+static int isEmptyStack(StackId id);
+static int moveFromMain(StackId id, int checkUnsorted);
+static void moveToMain(StackId id);
+static void moveBetweenStacks(StackId from, StackId to);
+static int validNumberMoves(int moves);
+static int getHeight(int movesPlus1);
+static int endConMet(int endCon, int moves);
+static int hanoi(int startStack, int goRight, int endCon);
+static void removeFromMainStack(void);
+static void returnToMainStack(void);
+
+void sort(int a[], int size) {
+  if (size <= 1) {
+    return;
+  }
+
+  arr = a;
+  n = size;
+  stack2 = malloc(sizeof(int) * n);
+  stack3 = malloc(sizeof(int) * n);
+  stack2Top = 0;
+  stack3Top = 0;
+  sp = 0;
+  unsorted = 0;
+  target = 0;
+  targetMoves = 0;
+
+  while (unsorted < n) {
+    removeFromMainStack();
+  }
+  returnToMainStack();
+
+  free(stack2);
+  free(stack3);
 }
 
 static void push(StackId id, int value) {
@@ -233,31 +278,6 @@ static void returnToMainStack(void) {
     targetMoves = moves;
     hanoi(3, 1, 2);
   }
-}
-
-void sort(int a[], int size) {
-  if (size <= 1) {
-    return;
-  }
-
-  arr = a;
-  n = size;
-  stack2 = malloc(sizeof(int) * n);
-  stack3 = malloc(sizeof(int) * n);
-  stack2Top = 0;
-  stack3Top = 0;
-  sp = 0;
-  unsorted = 0;
-  target = 0;
-  targetMoves = 0;
-
-  while (unsorted < n) {
-    removeFromMainStack();
-  }
-  returnToMainStack();
-
-  free(stack2);
-  free(stack3);
 }
 
 int main(int argc, char *argv[]) {

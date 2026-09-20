@@ -1,37 +1,22 @@
 #include <cstdio>
 #include <vector>
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
+                 90, 69, 51, 81, 68, 83, 32, 56};
 
 void printList(int items[], int size) {
-  for (int i = 0; i < size; i++) {
-    if (i == 0) {
-      printf("[%d, ", items[i]);
-    } else if (i != size - 1) {
-      printf("%d, ", items[i]);
-    } else {
-      printf("%d]", items[i]);
+  printf("[");
+  if (size > 0) {
+    printf("%d", items[0]);
+    for (int i = 1; i < size; i++) {
+      printf(", %d", items[i]);
     }
   }
+  printf("]");
 }
 
-void transferTo(int arr[], std::vector<int> &aux, int minValue, int index) {
-  int pointer = 0;
-  while (arr[index] > minValue) {
-    arr[index]--;
-    aux[pointer]++;
-    pointer++;
-  }
-}
-
-void transferFrom(int arr[], std::vector<int> &aux, int auxLength, int index) {
-  int pointer = 0;
-  while (pointer < auxLength && aux[pointer] != 0) {
-    arr[index]++;
-    aux[pointer]--;
-    pointer++;
-  }
-}
+void transferTo(int arr[], std::vector<int> &aux, int minValue, int index);
+void transferFrom(int arr[], std::vector<int> &aux, int auxLength, int index);
 
 void sort(int arr[], int n) {
   if (n < 2)
@@ -53,6 +38,24 @@ void sort(int arr[], int n) {
   }
   for (int i = n - 1; i >= 0; i--) {
     transferFrom(arr, aux, auxLength, i);
+  }
+}
+
+void transferTo(int arr[], std::vector<int> &aux, int minValue, int index) {
+  int pointer = 0;
+  while (arr[index] > minValue) {
+    arr[index]--;
+    aux[pointer]++;
+    pointer++;
+  }
+}
+
+void transferFrom(int arr[], std::vector<int> &aux, int auxLength, int index) {
+  int pointer = 0;
+  while (pointer < auxLength && aux[pointer] != 0) {
+    arr[index]++;
+    aux[pointer]--;
+    pointer++;
   }
 }
 

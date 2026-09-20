@@ -2,6 +2,55 @@ using System;
 
 public class ImprovedBlockSelectionSort
 {
+  public static void Sort(int[] arr)
+  {
+    var n = arr.Length;
+    if (n <= 1)
+    {
+      return;
+    }
+    var j = 1;
+    while (j < n)
+    {
+      var bLen = BlockRoot(j);
+      var runLength = j;
+      var b = n - n % bLen;
+
+      while (runLength > 16)
+      {
+        var i = 0;
+        while (i + j < b)
+        {
+          var k = i;
+          while (k + runLength < Math.Min(i + 2 * j, b))
+          {
+            BlockSelect(arr, k, k + runLength, Math.Min(k + 2 * runLength, b), bLen);
+            k += runLength;
+          }
+          i += 2 * j;
+        }
+        runLength = bLen;
+        bLen = BlockRoot(bLen);
+      }
+
+      var i2 = 0;
+      while (i2 + j < b)
+      {
+        var k = i2;
+        var f = i2;
+        while (k + runLength < Math.Min(i2 + 2 * j, b))
+        {
+          f = InPlaceMerge(arr, f, k + runLength, Math.Min(k + 2 * runLength, b));
+          k += runLength;
+        }
+        i2 += 2 * j;
+      }
+
+      InPlaceMergeBW(arr, n - n % (2 * j), b, n);
+      j *= 2;
+    }
+  }
+
   public static int BlockRoot(int n)
   {
     var i = 1;
@@ -166,58 +215,12 @@ public class ImprovedBlockSelectionSort
     }
   }
 
-  public static void Sort(int[] arr)
-  {
-    var n = arr.Length;
-    if (n <= 1)
-    {
-      return;
-    }
-    var j = 1;
-    while (j < n)
-    {
-      var bLen = BlockRoot(j);
-      var runLength = j;
-      var b = n - n % bLen;
-
-      while (runLength > 16)
-      {
-        var i = 0;
-        while (i + j < b)
-        {
-          var k = i;
-          while (k + runLength < Math.Min(i + 2 * j, b))
-          {
-            BlockSelect(arr, k, k + runLength, Math.Min(k + 2 * runLength, b), bLen);
-            k += runLength;
-          }
-          i += 2 * j;
-        }
-        runLength = bLen;
-        bLen = BlockRoot(bLen);
-      }
-
-      var i2 = 0;
-      while (i2 + j < b)
-      {
-        var k = i2;
-        var f = i2;
-        while (k + runLength < Math.Min(i2 + 2 * j, b))
-        {
-          f = InPlaceMerge(arr, f, k + runLength, Math.Min(k + 2 * runLength, b));
-          k += runLength;
-        }
-        i2 += 2 * j;
-      }
-
-      InPlaceMergeBW(arr, n - n % (2 * j), b, n);
-      j *= 2;
-    }
-  }
-
   public static void Main(String[] args)
   {
-    int[] array = { 0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56 };
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     Sort(array);
     string result = "[" + String.Join(", ", array) + "]";
     Console.WriteLine(result);

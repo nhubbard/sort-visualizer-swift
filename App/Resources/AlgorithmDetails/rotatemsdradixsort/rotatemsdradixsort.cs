@@ -2,6 +2,31 @@ using System;
 
 public class RotateMSDRadixSort
 {
+  public static int[] Sort(int[] array)
+  {
+    int n = array.Length;
+    if (n <= 1) return array;
+    int radix = 4, maxValue = 0;
+    foreach (int value in array) if (value > maxValue) maxValue = value;
+    int q = 0, probe = radix;
+    while (probe <= maxValue) { q++; probe *= radix; }
+    int m = 0, i = 0, b = n;
+    while (i < n)
+    {
+      int p = b - i < 1 ? i : Dist(array, i, b, q, radix);
+      if (q == 0)
+      {
+        m += radix;
+        int t = m / radix;
+        while (t % radix == 0) { t /= radix; q++; }
+        i = b;
+        while (b < n && Shift(array[b], q + 1, radix) == Shift(m, q + 1, radix)) b++;
+      }
+      else { b = p; q--; }
+    }
+    return array;
+  }
+
   private static int IntPow(int b, int exponent)
   {
     var result = 1;
@@ -109,34 +134,12 @@ public class RotateMSDRadixSort
     return BinSearchDigit(arr, a, b, 1, place, radix);
   }
 
-  public static int[] Sort(int[] array)
-  {
-    int n = array.Length;
-    if (n <= 1) return array;
-    int radix = 4, maxValue = 0;
-    foreach (int value in array) if (value > maxValue) maxValue = value;
-    int q = 0, probe = radix;
-    while (probe <= maxValue) { q++; probe *= radix; }
-    int m = 0, i = 0, b = n;
-    while (i < n)
-    {
-      int p = b - i < 1 ? i : Dist(array, i, b, q, radix);
-      if (q == 0)
-      {
-        m += radix;
-        int t = m / radix;
-        while (t % radix == 0) { t /= radix; q++; }
-        i = b;
-        while (b < n && Shift(array[b], q + 1, radix) == Shift(m, q + 1, radix)) b++;
-      }
-      else { b = p; q--; }
-    }
-    return array;
-  }
-
   public static void Main(String[] args)
   {
-    int[] array = { 0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56 };
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     Sort(array);
     string result = "[" + String.Join(", ", array) + "]";
     Console.WriteLine(result);

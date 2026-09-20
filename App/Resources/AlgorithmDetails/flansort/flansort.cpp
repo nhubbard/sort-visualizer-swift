@@ -1,8 +1,26 @@
+#include <cstdio>
 #include <algorithm>
 #include <cstdint>
 #include <iostream>
 #include <vector>
 using namespace std;
+
+void printList(const std::vector<int> &items) {
+  printf("[");
+  if (!items.empty()) {
+    printf("%d", items[0]);
+    for (size_t i = 1; i < items.size(); i++) {
+      printf(", %d", items[i]);
+    }
+  }
+  printf("]\n");
+}
+
+static void flanSort(vector<int> &values);
+
+void sort(vector<int> &values) {
+  flanSort(values);
+}
 
 class Flan {
   static constexpr int gap = 14, ratio = 4;
@@ -308,7 +326,9 @@ public:
     insertion(first, finish);
   }
 };
-void sort(vector<int> &values) {
+
+
+static void flanSort(vector<int> &values) {
   if (values.size() > 1)
     Flan(values).execute();
 }
@@ -316,11 +336,5 @@ int main() {
   vector<int> a = {0,  39, 21, 62, 91, 77, 14, 23,
                    90, 69, 51, 81, 68, 83, 32, 56};
   sort(a);
-  cout << "[";
-  for (size_t i = 0; i < a.size(); ++i) {
-    if (i)
-      cout << ", ";
-    cout << a[i];
-  }
-  cout << "]\n";
+  printList(a);
 }

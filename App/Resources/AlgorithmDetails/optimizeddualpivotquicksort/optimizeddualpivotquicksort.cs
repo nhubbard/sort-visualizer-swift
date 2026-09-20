@@ -2,6 +2,11 @@ using System;
 
 public class OptimizedDualPivotQuickSort
 {
+  public static void Sort(int[] array)
+  {
+    if (array.Length > 1) DualPivot(array, 0, array.Length - 1, 3);
+  }
+
   private static void InsertionSort(int[] array, int left, int right)
   {
     for (int i = left + 1; i <= right; i++)
@@ -76,11 +81,6 @@ public class OptimizedDualPivotQuickSort
       }
     }
     if (pivot1 < pivot2) DualPivot(array, less, great, divisor);
-  }
-
-  public static void Sort(int[] array)
-  {
-    if (array.Length > 1) DualPivot(array, 0, array.Length - 1, 3);
   }
 
   public static void Main(String[] args)

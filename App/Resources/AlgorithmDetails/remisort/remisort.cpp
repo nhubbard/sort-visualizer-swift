@@ -1,7 +1,21 @@
+#include <cstdio>
 #include <algorithm>
 #include <iostream>
 #include <vector>
 using namespace std;
+
+
+
+void printList(const std::vector<int> &items) {
+  printf("[");
+  if (!items.empty()) {
+    printf("%d", items[0]);
+    for (size_t i = 1; i < items.size(); i++) {
+      printf(", %d", items[i]);
+    }
+  }
+  printf("]\n");
+}
 
 void sort(vector<int> &a) {
   const int n = (int)a.size();
@@ -172,11 +186,5 @@ int main() {
   vector<int> a = {0,  39, 21, 62, 91, 77, 14, 23,
                    90, 69, 51, 81, 68, 83, 32, 56};
   sort(a);
-  cout << "[";
-  for (size_t i = 0; i < a.size(); ++i) {
-    if (i)
-      cout << ", ";
-    cout << a[i];
-  }
-  cout << "]\n";
+  printList(a);
 }

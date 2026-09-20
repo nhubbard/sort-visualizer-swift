@@ -2,6 +2,15 @@ using System;
 
 class PoplarHeapSort
 {
+  static void Sort(int[] array)
+  {
+    int n = array.Length;
+    if (n <= 1)
+      return;
+    MakeHeap(array, 0, n);
+    SortHeap(array, 0, n);
+  }
+
   static int Hyperfloor(int n)
   {
     int power = 1;
@@ -158,18 +167,12 @@ class PoplarHeapSort
     } while (size > 1);
   }
 
-  static void Sort(int[] array)
-  {
-    int n = array.Length;
-    if (n <= 1)
-      return;
-    MakeHeap(array, 0, n);
-    SortHeap(array, 0, n);
-  }
-
   static void Main()
   {
-    int[] array = { 0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56 };
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     Sort(array);
     Console.WriteLine("[" + string.Join(", ", array) + "]");
   }

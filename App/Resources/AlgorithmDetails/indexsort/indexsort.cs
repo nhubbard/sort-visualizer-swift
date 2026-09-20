@@ -26,7 +26,10 @@ public class IndexSort
 
   public static void Main(String[] args)
   {
-    int[] array = { 7, 3, 14, 0, 9, 5, 12, 1, 15, 4, 10, 2, 13, 6, 11, 8 };
+    int[] array = {
+      7, 3, 14, 0, 9, 5, 12, 1,
+      15, 4, 10, 2, 13, 6, 11, 8
+    };
     Sort(array);
     string result = "[" + String.Join(", ", array) + "]";
     Console.WriteLine(result);

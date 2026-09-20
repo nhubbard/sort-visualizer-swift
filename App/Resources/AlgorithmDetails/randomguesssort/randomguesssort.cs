@@ -49,7 +49,9 @@ public class RandomGuessSort
 
   public static void Main(String[] args)
   {
-    int[] array = { 0, 39, 21, 62, 14 };
+    int[] array = {
+      0, 39, 21, 62, 14
+    };
     Sort(array);
     string result = "[" + String.Join(", ", array) + "]";
     Console.WriteLine(result);

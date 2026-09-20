@@ -6,6 +6,13 @@ public class StacklessHybridQuickSort
 
   // Arranges arr[start], arr[mid], arr[end - 1] so the median of the three ends up at `start`,
   // ready to serve as Partition's pivot.
+  public static void Sort(int[] arr)
+  {
+    int n = arr.Length;
+    if (n < 2) return;
+    QuickSort(arr, 0, n);
+  }
+
   static void MedianOfThree(int[] arr, int start, int end)
   {
     int mid = start + (end - 1 - start) / 2;
@@ -164,13 +171,6 @@ public class StacklessHybridQuickSort
       }
       if (a == segmentEnd) refreshMedian = true;
     }
-  }
-
-  public static void Sort(int[] arr)
-  {
-    int n = arr.Length;
-    if (n < 2) return;
-    QuickSort(arr, 0, n);
   }
 
   public static void Main(String[] args)

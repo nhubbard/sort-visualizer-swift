@@ -2,14 +2,6 @@ using System;
 
 class ClassicTournamentSort
 {
-  static int CeilPow2(int value)
-  {
-    int r = 1;
-    while (r < value)
-      r *= 2;
-    return r;
-  }
-
   static void Sort(int[] array)
   {
     int n = array.Length;
@@ -92,9 +84,20 @@ class ClassicTournamentSort
     Array.Copy(output, array, n);
   }
 
+  static int CeilPow2(int value)
+  {
+    int r = 1;
+    while (r < value)
+      r *= 2;
+    return r;
+  }
+
   static void Main()
   {
-    int[] array = { 0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56 };
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     Sort(array);
     Console.WriteLine("[" + string.Join(", ", array) + "]");
   }
