@@ -58,10 +58,9 @@ void binaryInsertionSort(int arr[], int end) {
     }
     int j = i;
     while (j > lo) {
-      arr[j] = arr[j - 1];
+      swap(&arr[j], &arr[j - 1]);
       j--;
     }
-    arr[lo] = value;
   }
 }
 

@@ -38,10 +38,9 @@ func binaryInsertionSort(_ array: inout [Int], _ end: Int) {
         }
         var j = i
         while j > lo {
-            array[j] = array[j - 1]
+            array.swapAt(j, j - 1)
             j -= 1
         }
-        array[lo] = value
     }
 }
 

@@ -38,10 +38,9 @@ func binaryInsertionSort(arr []int, end int) {
 		}
 		j := i
 		for j > lo {
-			arr[j] = arr[j-1]
+			arr[j], arr[j-1] = arr[j-1], arr[j]
 			j--
 		}
-		arr[lo] = value
 	}
 }
 

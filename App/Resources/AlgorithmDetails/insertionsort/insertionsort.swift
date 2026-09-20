@@ -1,13 +1,11 @@
 func sort(_ arr: inout [Int]) {
     let n = arr.count
     for i in 1 ..< n {
-        let key = arr[i]
-        var j = i - 1
-        while j >= 0, arr[j] > key {
-            arr[j + 1] = arr[j]
+        var j = i
+        while j > 0, arr[j - 1] > arr[j] {
+            arr.swapAt(j, j - 1)
             j -= 1
         }
-        arr[j + 1] = key
     }
 }
 

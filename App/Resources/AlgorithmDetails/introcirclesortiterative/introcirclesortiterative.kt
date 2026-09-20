@@ -36,10 +36,11 @@ fun binaryInsertionSort(arr: Array<Int>, end: Int) {
     }
     var j = i
     while (j > lo) {
+      val temp = arr[j]
       arr[j] = arr[j - 1]
+      arr[j - 1] = temp
       j--
     }
-    arr[lo] = value
   }
 }
 

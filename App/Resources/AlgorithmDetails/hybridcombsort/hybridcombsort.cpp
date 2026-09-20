@@ -1,5 +1,6 @@
 #include <cstdio>
 #include <utility>
+#include <utility>
 
 int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
 
@@ -17,13 +18,11 @@ void printList(int items[], int size) {
 
 void insertionSort(int arr[], int n) {
   for (int i = 1; i < n; i++) {
-    int key = arr[i];
-    int j = i - 1;
-    while (j >= 0 && arr[j] > key) {
-      arr[j + 1] = arr[j];
-      j = j - 1;
+    int j = i;
+    while (j > 0 && arr[j - 1] > arr[j]) {
+      std::swap(arr[j], arr[j - 1]);
+      j--;
     }
-    arr[j + 1] = key;
   }
 }
 

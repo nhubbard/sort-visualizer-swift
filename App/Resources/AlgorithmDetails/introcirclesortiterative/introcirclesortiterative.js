@@ -32,10 +32,9 @@ function binaryInsertionSort(array, end) {
     }
     var j = i;
     while (j > lo) {
-      array[j] = array[j - 1];
+      [array[j], array[j - 1]] = [array[j - 1], array[j]];
       j--;
     }
-    array[lo] = value;
   }
 }
 

@@ -29,9 +29,8 @@ def binary_insertion_sort(array, end):
                 lo = mid + 1
         j = i
         while j > lo:
-            array[j] = array[j - 1]
+            array[j], array[j - 1] = array[j - 1], array[j]
             j -= 1
-        array[lo] = value
 
 
 def sort(arr):
