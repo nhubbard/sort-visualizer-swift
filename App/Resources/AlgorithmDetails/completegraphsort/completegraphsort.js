@@ -36,6 +36,7 @@ function split(arr, a, m, b) {
 
 function sort(arr) {
   const n = arr.length;
+  if (n <= 1) return arr;
   let d = 2;
   const end = 1 << Math.trunc(Math.log(n - 1) / Math.log(2) + 1);
   while (d <= end) {

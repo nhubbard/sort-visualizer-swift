@@ -52,6 +52,9 @@ func split(arr []int, a int, m int, b int) {
 
 func sort(arr []int) []int {
 	n := len(arr)
+	if n <= 1 {
+		return arr
+	}
 	d, end := 2, 1<<int(math.Log(float64(n-1))/math.Log(2)+1)
 	for d <= end {
 		i, dec := 0, 0

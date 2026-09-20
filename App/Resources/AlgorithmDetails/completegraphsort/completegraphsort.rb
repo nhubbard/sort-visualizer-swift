@@ -38,6 +38,7 @@ end
 
 def sort(arr)
   n = arr.length
+  return arr if n <= 1
   d = 2
   fin = 1 << (Math.log(n - 1) / Math.log(2) + 1).to_i
   while d <= fin

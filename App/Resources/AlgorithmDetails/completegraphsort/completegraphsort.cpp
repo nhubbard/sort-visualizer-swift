@@ -51,6 +51,7 @@ void split(int arr[], int a, int m, int b) {
 }
 
 void sort(int arr[], int n) {
+  if (n <= 1) return;
   int d = 2, end = 1 << (int)(std::log(n - 1) / std::log(2) + 1);
   while (d <= end) {
     int i = 0, dec = 0;

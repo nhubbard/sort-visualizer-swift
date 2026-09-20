@@ -42,6 +42,7 @@ public class CompleteGraphSort
   public static void Sort(int[] arr)
   {
     int n = arr.Length;
+    if (n <= 1) return;
     int d = 2, end = 1 << (int)(Math.Log(n - 1) / Math.Log(2) + 1);
     while (d <= end)
     {

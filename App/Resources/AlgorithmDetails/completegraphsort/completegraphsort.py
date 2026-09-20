@@ -36,6 +36,8 @@ def split(arr, a, m, b):
 
 def sort(arr):
     n = len(arr)
+    if n <= 1:
+        return
     d, end = 2, 1 << int(math.log(n - 1) / math.log(2) + 1)
     while d <= end:
         i, dec = 0, 0

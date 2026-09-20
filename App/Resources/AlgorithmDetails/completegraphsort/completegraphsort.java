@@ -47,6 +47,7 @@ public class completegraphsort {
 
   public static void sort(int[] arr) {
     int n = arr.length;
+    if (n <= 1) return;
     int d = 2;
     int end = 1 << (int) (Math.log(n - 1) / Math.log(2) + 1);
     while (d <= end) {

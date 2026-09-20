@@ -46,6 +46,7 @@ fun split(arr: Array<Int>, aIn: Int, m: Int, bIn: Int) {
 
 fun sort(arr: Array<Int>) {
   val n = arr.size
+  if (n <= 1) return
   var d = 2
   val end = 1 shl (ln((n - 1).toDouble()) / ln(2.0) + 1).toInt()
   while (d <= end) {
