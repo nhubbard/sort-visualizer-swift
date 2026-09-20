@@ -1,3 +1,7 @@
+fun sort(arr: Array<Int>) {
+  recursiveShellSort(arr, 0, arr.size, 1)
+}
+
 fun gappedInsertionSort(arr: Array<Int>, a: Int, b: Int, gap: Int) {
   var i = a + gap
   while (i < b) {
@@ -19,10 +23,6 @@ fun recursiveShellSort(arr: Array<Int>, start: Int, end: Int, g: Int) {
     recursiveShellSort(arr, start + (2 * g), end, 3 * g)
     gappedInsertionSort(arr, start, end, g)
   }
-}
-
-fun sort(arr: Array<Int>) {
-  recursiveShellSort(arr, 0, arr.size, 1)
 }
 
 fun main() {

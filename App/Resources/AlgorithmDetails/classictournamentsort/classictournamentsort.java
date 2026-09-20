@@ -1,6 +1,45 @@
 import java.util.Arrays;
 
 public final class classictournamentsort {
+  static void sort(int[] array) {
+    int n = array.length;
+    if (n <= 1) {
+      return;
+    }
+
+    int size = ceilPow2(n) - 1;
+    int mod = n % 2;
+    int treeSize = n + size + mod;
+    int[] tree = new int[treeSize];
+    Arrays.fill(tree, -1);
+
+    for (int i = size; i < treeSize - mod; i++) {
+      tree[i] = i - size;
+    }
+
+    int j = size;
+    int k = treeSize - mod;
+    while (j > 0) {
+      int i = j;
+      while (i + 1 < k) {
+        tree[i / 2] = treeCompare(array, tree, i, i + 1) ? tree[i] : tree[i + 1];
+        i += 2;
+      }
+      if (i < k) {
+        tree[i / 2] = tree[i];
+      }
+      j /= 2;
+      k /= 2;
+    }
+
+    int[] output = new int[n];
+    output[0] = array[tree[0]];
+    for (int i = 1; i < n; i++) {
+      output[i] = findNext(array, tree, size);
+    }
+    System.arraycopy(output, 0, array, 0, n);
+  }
+
   static int ceilPow2(int value) {
     int r = 1;
     while (r < value) {
@@ -46,47 +85,11 @@ public final class classictournamentsort {
     return array[tree[0]];
   }
 
-  static void sort(int[] array) {
-    int n = array.length;
-    if (n <= 1) {
-      return;
-    }
-
-    int size = ceilPow2(n) - 1;
-    int mod = n % 2;
-    int treeSize = n + size + mod;
-    int[] tree = new int[treeSize];
-    Arrays.fill(tree, -1);
-
-    for (int i = size; i < treeSize - mod; i++) {
-      tree[i] = i - size;
-    }
-
-    int j = size;
-    int k = treeSize - mod;
-    while (j > 0) {
-      int i = j;
-      while (i + 1 < k) {
-        tree[i / 2] = treeCompare(array, tree, i, i + 1) ? tree[i] : tree[i + 1];
-        i += 2;
-      }
-      if (i < k) {
-        tree[i / 2] = tree[i];
-      }
-      j /= 2;
-      k /= 2;
-    }
-
-    int[] output = new int[n];
-    output[0] = array[tree[0]];
-    for (int i = 1; i < n; i++) {
-      output[i] = findNext(array, tree, size);
-    }
-    System.arraycopy(output, 0, array, 0, n);
-  }
-
   public static void main(String[] args) {
-    int[] array = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     sort(array);
     System.out.println(Arrays.toString(array));
   }

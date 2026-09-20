@@ -1,11 +1,3 @@
-fun compSwap(arr: Array<Int>, a: Int, b: Int) {
-  if (arr[a] > arr[b]) {
-    val t = arr[a]
-    arr[a] = arr[b]
-    arr[b] = t
-  }
-}
-
 fun sort(arr: Array<Int>) {
   val n = arr.size
   var p = 1
@@ -38,6 +30,14 @@ fun sort(arr: Array<Int>) {
       compSwap(arr, i, i + 1)
       i += 2
     }
+  }
+}
+
+fun compSwap(arr: Array<Int>, a: Int, b: Int) {
+  if (arr[a] > arr[b]) {
+    val t = arr[a]
+    arr[a] = arr[b]
+    arr[b] = t
   }
 }
 

@@ -1,6 +1,47 @@
 import java.util.Arrays;
 
 public class improvedblockselectionsort {
+  public static void sort(int[] arr) {
+    int n = arr.length;
+    if (n <= 1) {
+      return;
+    }
+    int j = 1;
+    while (j < n) {
+      int bLen = blockRoot(j);
+      int runLength = j;
+      int b = n - n % bLen;
+
+      while (runLength > 16) {
+        int i = 0;
+        while (i + j < b) {
+          int k = i;
+          while (k + runLength < Math.min(i + 2 * j, b)) {
+            blockSelect(arr, k, k + runLength, Math.min(k + 2 * runLength, b), bLen);
+            k += runLength;
+          }
+          i += 2 * j;
+        }
+        runLength = bLen;
+        bLen = blockRoot(bLen);
+      }
+
+      int i = 0;
+      while (i + j < b) {
+        int k = i;
+        int f = i;
+        while (k + runLength < Math.min(i + 2 * j, b)) {
+          f = inPlaceMerge(arr, f, k + runLength, Math.min(k + 2 * runLength, b));
+          k += runLength;
+        }
+        i += 2 * j;
+      }
+
+      inPlaceMergeBW(arr, n - n % (2 * j), b, n);
+      j *= 2;
+    }
+  }
+
   private static int blockRoot(int n) {
     int i = 1;
     while (i * i < n) {
@@ -129,49 +170,11 @@ public class improvedblockselectionsort {
     }
   }
 
-  public static void sort(int[] arr) {
-    int n = arr.length;
-    if (n <= 1) {
-      return;
-    }
-    int j = 1;
-    while (j < n) {
-      int bLen = blockRoot(j);
-      int runLength = j;
-      int b = n - n % bLen;
-
-      while (runLength > 16) {
-        int i = 0;
-        while (i + j < b) {
-          int k = i;
-          while (k + runLength < Math.min(i + 2 * j, b)) {
-            blockSelect(arr, k, k + runLength, Math.min(k + 2 * runLength, b), bLen);
-            k += runLength;
-          }
-          i += 2 * j;
-        }
-        runLength = bLen;
-        bLen = blockRoot(bLen);
-      }
-
-      int i = 0;
-      while (i + j < b) {
-        int k = i;
-        int f = i;
-        while (k + runLength < Math.min(i + 2 * j, b)) {
-          f = inPlaceMerge(arr, f, k + runLength, Math.min(k + 2 * runLength, b));
-          k += runLength;
-        }
-        i += 2 * j;
-      }
-
-      inPlaceMergeBW(arr, n - n % (2 * j), b, n);
-      j *= 2;
-    }
-  }
-
   public static void main(String[] args) {
-    int[] array = new int[] {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     sort(array);
     System.out.println(Arrays.toString(array));
   }

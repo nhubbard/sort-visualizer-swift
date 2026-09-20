@@ -4,6 +4,14 @@ import (
 	"fmt"
 )
 
+func sort(arr []int) []int {
+	if len(arr) <= 1 {
+		return arr
+	}
+	pairwiseRecursive(arr, 0, len(arr), 1)
+	return arr
+}
+
 func compSwap(arr []int, a, b int) {
 	if arr[a] > arr[b] {
 		arr[a], arr[b] = arr[b], arr[a]
@@ -44,14 +52,6 @@ func pairwiseRecursive(arr []int, start, end, gap int) {
 		}
 		b += 2 * gap
 	}
-}
-
-func sort(arr []int) []int {
-	if len(arr) <= 1 {
-		return arr
-	}
-	pairwiseRecursive(arr, 0, len(arr), 1)
-	return arr
 }
 
 func main() {

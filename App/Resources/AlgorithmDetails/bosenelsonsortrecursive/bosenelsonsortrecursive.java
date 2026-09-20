@@ -1,6 +1,11 @@
 import java.util.Arrays;
 
 public class bosenelsonsortrecursive {
+  public static void sort(int[] arr) {
+    int n = arr.length;
+    boseNelson(arr, 0, n);
+  }
+
   private static void compSwap(int[] arr, int start, int end) {
     if (arr[start] > arr[end]) {
       int temp = arr[start];
@@ -36,13 +41,11 @@ public class bosenelsonsortrecursive {
     }
   }
 
-  public static void sort(int[] arr) {
-    int n = arr.length;
-    boseNelson(arr, 0, n);
-  }
-
   public static void main(String[] args) {
-    int[] array = new int[] {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     sort(array);
     System.out.println(Arrays.toString(array));
   }

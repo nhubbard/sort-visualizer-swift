@@ -5,6 +5,16 @@ import (
 	"math/rand"
 )
 
+func sort(arr []int) []int {
+	n := len(arr)
+	for i := 0; i < n; i++ {
+		for !isMinimum(arr, i, n) {
+			shuffleRange(arr, i, n)
+		}
+	}
+	return arr
+}
+
 func isMinimum(arr []int, start int, end int) bool {
 	for k := start + 1; k < end; k++ {
 		if arr[start] > arr[k] {
@@ -21,17 +31,9 @@ func shuffleRange(arr []int, start int, end int) {
 	}
 }
 
-func sort(arr []int) []int {
-	n := len(arr)
-	for i := 0; i < n; i++ {
-		for !isMinimum(arr, i, n) {
-			shuffleRange(arr, i, n)
-		}
-	}
-	return arr
-}
-
 func main() {
-	array := []int{0, 39, 21, 62, 91, 77, 14, 23}
+	array := []int{
+		0, 39, 21, 62, 91, 77, 14, 23,
+	}
 	fmt.Println(sort(array))
 }

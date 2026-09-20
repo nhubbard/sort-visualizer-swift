@@ -1,18 +1,6 @@
 import java.util.Arrays;
 
 public class bottomupmergesort {
-  private static int merge(int[] arr, int[] scratch, int n, int index, int mergeSize) {
-    int mid = index + mergeSize / 2;
-    int end = Math.min(n, index + mergeSize);
-    if (mid >= end) return index;
-    int left = index, right = mid, out = index;
-    while (left < mid && right < end)
-      scratch[out++] = arr[left] <= arr[right] ? arr[left++] : arr[right++];
-    while (left < mid) scratch[out++] = arr[left++];
-    while (right < end) scratch[out++] = arr[right++];
-    return -1;
-  }
-
   public static void sort(int[] arr) {
     int n = arr.length;
     if (n < 2) return;
@@ -33,8 +21,23 @@ public class bottomupmergesort {
     }
   }
 
+  private static int merge(int[] arr, int[] scratch, int n, int index, int mergeSize) {
+    int mid = index + mergeSize / 2;
+    int end = Math.min(n, index + mergeSize);
+    if (mid >= end) return index;
+    int left = index, right = mid, out = index;
+    while (left < mid && right < end)
+      scratch[out++] = arr[left] <= arr[right] ? arr[left++] : arr[right++];
+    while (left < mid) scratch[out++] = arr[left++];
+    while (right < end) scratch[out++] = arr[right++];
+    return -1;
+  }
+
   public static void main(String[] args) {
-    int[] array = new int[] {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     sort(array);
     System.out.println(Arrays.toString(array));
   }

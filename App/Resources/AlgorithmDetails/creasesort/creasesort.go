@@ -4,12 +4,6 @@ import (
 	"fmt"
 )
 
-func compSwap(arr []int, a int, b int) {
-	if arr[a] > arr[b] {
-		arr[a], arr[b] = arr[b], arr[a]
-	}
-}
-
 func sort(arr []int) []int {
 	n := len(arr)
 	maxVal := 1
@@ -38,6 +32,12 @@ func sort(arr []int) []int {
 		next /= 2
 	}
 	return arr
+}
+
+func compSwap(arr []int, a int, b int) {
+	if arr[a] > arr[b] {
+		arr[a], arr[b] = arr[b], arr[a]
+	}
 }
 
 func main() {

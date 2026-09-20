@@ -4,6 +4,13 @@ import (
 	"fmt"
 )
 
+func sort(arr []int) []int {
+	if len(arr) > 1 {
+		optimizedDualPivotQuickSort(arr, 0, len(arr)-1, 3)
+	}
+	return arr
+}
+
 func insertionSort(arr []int, left, right int) {
 	for i := left + 1; i <= right; i++ {
 		for j := i; j > left && arr[j] < arr[j-1]; j-- {
@@ -77,13 +84,6 @@ func optimizedDualPivotQuickSort(arr []int, left, right, divisor int) {
 	if pivot1 < pivot2 {
 		optimizedDualPivotQuickSort(arr, less, great, divisor)
 	}
-}
-
-func sort(arr []int) []int {
-	if len(arr) > 1 {
-		optimizedDualPivotQuickSort(arr, 0, len(arr)-1, 3)
-	}
-	return arr
 }
 
 func main() {

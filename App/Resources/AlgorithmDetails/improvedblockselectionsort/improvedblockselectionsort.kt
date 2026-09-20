@@ -1,3 +1,42 @@
+fun sort(arr: Array<Int>) {
+  val n = arr.size
+  if (n <= 1) return
+  var j = 1
+  while (j < n) {
+    var bLen = blockRoot(j)
+    var runLength = j
+    val b = n - n % bLen
+
+    while (runLength > 16) {
+      var i = 0
+      while (i + j < b) {
+        var k = i
+        while (k + runLength < minOf(i + 2 * j, b)) {
+          blockSelect(arr, k, k + runLength, minOf(k + 2 * runLength, b), bLen)
+          k += runLength
+        }
+        i += 2 * j
+      }
+      runLength = bLen
+      bLen = blockRoot(bLen)
+    }
+
+    var i = 0
+    while (i + j < b) {
+      var k = i
+      var f = i
+      while (k + runLength < minOf(i + 2 * j, b)) {
+        f = inPlaceMerge(arr, f, k + runLength, minOf(k + 2 * runLength, b))
+        k += runLength
+      }
+      i += 2 * j
+    }
+
+    inPlaceMergeBW(arr, n - n % (2 * j), b, n)
+    j *= 2
+  }
+}
+
 fun blockRoot(n: Int): Int {
   var i = 1
   while (i * i < n) {
@@ -116,45 +155,6 @@ fun inPlaceMergeBW(arr: Array<Int>, a: Int, m: Int, b: Int) {
     } else {
       j--
     }
-  }
-}
-
-fun sort(arr: Array<Int>) {
-  val n = arr.size
-  if (n <= 1) return
-  var j = 1
-  while (j < n) {
-    var bLen = blockRoot(j)
-    var runLength = j
-    val b = n - n % bLen
-
-    while (runLength > 16) {
-      var i = 0
-      while (i + j < b) {
-        var k = i
-        while (k + runLength < minOf(i + 2 * j, b)) {
-          blockSelect(arr, k, k + runLength, minOf(k + 2 * runLength, b), bLen)
-          k += runLength
-        }
-        i += 2 * j
-      }
-      runLength = bLen
-      bLen = blockRoot(bLen)
-    }
-
-    var i = 0
-    while (i + j < b) {
-      var k = i
-      var f = i
-      while (k + runLength < minOf(i + 2 * j, b)) {
-        f = inPlaceMerge(arr, f, k + runLength, minOf(k + 2 * runLength, b))
-        k += runLength
-      }
-      i += 2 * j
-    }
-
-    inPlaceMergeBW(arr, n - n % (2 * j), b, n)
-    j *= 2
   }
 }
 

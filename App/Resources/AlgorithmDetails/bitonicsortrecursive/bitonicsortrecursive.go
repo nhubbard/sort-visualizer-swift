@@ -4,6 +4,11 @@ import (
 	"fmt"
 )
 
+func sort(arr []int) []int {
+	bitonicSort(arr, 0, len(arr), true)
+	return arr
+}
+
 func greatestPowerOfTwoLessThan(n int) int {
 	k := 1
 	for k < n {
@@ -37,11 +42,6 @@ func bitonicSort(arr []int, lo, n int, dir bool) {
 		bitonicSort(arr, lo+m, n-m, dir)
 		bitonicMerge(arr, lo, n, dir)
 	}
-}
-
-func sort(arr []int) []int {
-	bitonicSort(arr, 0, len(arr), true)
-	return arr
 }
 
 func main() {

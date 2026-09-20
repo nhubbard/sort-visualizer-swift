@@ -1,3 +1,9 @@
+fun sort(arr: Array<Int>) {
+  val n = arr.size
+  if (n <= 1) return
+  bufferedMerge(arr, 0, n)
+}
+
 fun ceilLog(n: Int): Int {
   var i = 0
   while ((1 shl i) < n) i++
@@ -177,12 +183,6 @@ fun bufferedMerge(arr: Array<Int>, a: Int, b: Int) {
   multiSwap(arr, a, b - (m - a), m - a)
   val s = merge(arr, m, b - (m - a), b, a)
   bufferedMerge(arr, b - (m - a) - s, b)
-}
-
-fun sort(arr: Array<Int>) {
-  val n = arr.size
-  if (n <= 1) return
-  bufferedMerge(arr, 0, n)
 }
 
 fun main() {

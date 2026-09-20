@@ -4,6 +4,19 @@ import (
 	"fmt"
 )
 
+func sort(arr []int) []int {
+	end := len(arr)
+	if end <= 1 {
+		return arr
+	}
+	paddedLength := nextPowerOfTwo(end)
+	swaps := -1
+	for swaps != 0 {
+		swaps = circleSortRoutine(arr, 0, paddedLength-1, end)
+	}
+	return arr
+}
+
 func nextPowerOfTwo(n int) int {
 	k := 1
 	for k < n {
@@ -33,19 +46,6 @@ func circleSortRoutine(arr []int, lo, hi, end int) int {
 		swaps += circleSortRoutine(arr, low+mid+1, high, end)
 	}
 	return swaps
-}
-
-func sort(arr []int) []int {
-	end := len(arr)
-	if end <= 1 {
-		return arr
-	}
-	paddedLength := nextPowerOfTwo(end)
-	swaps := -1
-	for swaps != 0 {
-		swaps = circleSortRoutine(arr, 0, paddedLength-1, end)
-	}
-	return arr
 }
 
 func main() {

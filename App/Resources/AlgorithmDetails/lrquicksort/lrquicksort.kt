@@ -1,3 +1,7 @@
+fun sort(arr: Array<Int>) {
+  quickSort(arr, 0, arr.size - 1)
+}
+
 fun quickSort(arr: Array<Int>, p: Int, r: Int) {
   var left = p
   var right = r
@@ -22,10 +26,6 @@ fun quickSort(arr: Array<Int>, p: Int, r: Int) {
       right = j
     }
   }
-}
-
-fun sort(arr: Array<Int>) {
-  quickSort(arr, 0, arr.size - 1)
 }
 
 fun main() {

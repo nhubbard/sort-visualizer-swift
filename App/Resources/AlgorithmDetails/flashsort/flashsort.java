@@ -1,6 +1,10 @@
 import java.util.Arrays;
 
 public class flashsort {
+  public static void sort(int[] arr) {
+    flashSort(arr);
+  }
+
   private static int classify(int value, int minValue, double c) {
     return (int) ((value - minValue) * c) + 1;
   }
@@ -102,12 +106,11 @@ public class flashsort {
     }
   }
 
-  public static void sort(int[] arr) {
-    flashSort(arr);
-  }
-
   public static void main(String[] args) {
-    int[] array = new int[] {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     sort(array);
     System.out.println(Arrays.toString(array));
   }

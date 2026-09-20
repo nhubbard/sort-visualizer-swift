@@ -10,6 +10,19 @@ const val CHAOS_LIMIT = 5
 // Advances arr to its next lexicographic permutation in place. Returns false (after resetting
 // arr to its first, fully ascending permutation) once every arrangement has been visited -- a
 // deterministic stand-in for "shuffle the array at random".
+fun sort(arr: Array<Int>) {
+  val n = arr.size
+  val limit = minOf(CHAOS_LIMIT, n)
+  val chaos = arr.copyOfRange(0, limit)
+  val rest = arr.copyOfRange(limit, n)
+
+  bogoBogoSort(chaos) // the real, recursive-check algorithm -- kept tiny on purpose
+  insertionSort(rest) // an ordinary fast sort for the rest of the array
+
+  val merged = mergeSorted(chaos, rest)
+  merged.copyInto(arr)
+}
+
 fun nextPermutation(arr: Array<Int>): Boolean {
   val n = arr.size
   var i = n - 2
@@ -106,19 +119,6 @@ fun mergeSorted(a: Array<Int>, b: Array<Int>): Array<Int> {
     j++
   }
   return merged.toTypedArray()
-}
-
-fun sort(arr: Array<Int>) {
-  val n = arr.size
-  val limit = minOf(CHAOS_LIMIT, n)
-  val chaos = arr.copyOfRange(0, limit)
-  val rest = arr.copyOfRange(limit, n)
-
-  bogoBogoSort(chaos) // the real, recursive-check algorithm -- kept tiny on purpose
-  insertionSort(rest) // an ordinary fast sort for the rest of the array
-
-  val merged = mergeSorted(chaos, rest)
-  merged.copyInto(arr)
 }
 
 fun main() {

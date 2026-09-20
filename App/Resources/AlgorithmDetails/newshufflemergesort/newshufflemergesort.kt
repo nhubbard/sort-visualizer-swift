@@ -1,3 +1,23 @@
+fun sort(arr: Array<Int>) {
+  val n = arr.size
+  if (n < 2) {
+    return
+  }
+
+  var subarrayCount = ceilPow2(n)
+  while (subarrayCount > 1) {
+    var i = 0
+    while (i < subarrayCount) {
+      val lo = n * i / subarrayCount
+      val mid = n * (i + 1) / subarrayCount
+      val hi = n * (i + 2) / subarrayCount
+      merge(arr, lo, mid, hi)
+      i += 2
+    }
+    subarrayCount = subarrayCount shr 1
+  }
+}
+
 fun multiSwap(arr: Array<Int>, i: Int, j: Int, length: Int) {
   for (k in 0 until length) {
     val t = arr[i + k]
@@ -194,26 +214,6 @@ fun ceilPow2(x0: Int): Int {
     shift = shift shr 1
   }
   return x + 1
-}
-
-fun sort(arr: Array<Int>) {
-  val n = arr.size
-  if (n < 2) {
-    return
-  }
-
-  var subarrayCount = ceilPow2(n)
-  while (subarrayCount > 1) {
-    var i = 0
-    while (i < subarrayCount) {
-      val lo = n * i / subarrayCount
-      val mid = n * (i + 1) / subarrayCount
-      val hi = n * (i + 2) / subarrayCount
-      merge(arr, lo, mid, hi)
-      i += 2
-    }
-    subarrayCount = subarrayCount shr 1
-  }
 }
 
 fun main() {

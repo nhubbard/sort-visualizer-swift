@@ -1,9 +1,3 @@
-fun ceilPow2(value: Int): Int {
-  var r = 1
-  while (r < value) r *= 2
-  return r
-}
-
 fun sort(array: IntArray) {
   val n = array.size
   if (n <= 1) return
@@ -76,6 +70,12 @@ fun sort(array: IntArray) {
   for (i in 0 until n) {
     array[i] = output[i]
   }
+}
+
+fun ceilPow2(value: Int): Int {
+  var r = 1
+  while (r < value) r *= 2
+  return r
 }
 
 fun main() {

@@ -2,6 +2,12 @@ const val INSERT_SORT_THRESHOLD = 24
 const val NINTHER_THRESHOLD = 128
 const val PARTIAL_INSERT_SORT_LIMIT = 8
 
+fun sort(arr: Array<Int>) {
+  val n = arr.size
+  if (n < 2) return
+  pdqLoop(arr, 0, n, pdqLog(n))
+}
+
 fun pdqLog(n0: Int): Int {
   var n = n0
   var log = 0
@@ -234,12 +240,6 @@ fun pdqLoop(arr: Array<Int>, begin0: Int, end: Int, badAllowed0: Int) {
     begin = pivotPos + 1
     leftmost = false
   }
-}
-
-fun sort(arr: Array<Int>) {
-  val n = arr.size
-  if (n < 2) return
-  pdqLoop(arr, 0, n, pdqLog(n))
 }
 
 fun main() {

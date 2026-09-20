@@ -24,6 +24,23 @@ public class redblacktreesort {
     }
   }
 
+  public static void sort(int[] arr) {
+    int n = arr.length;
+    Node root = null;
+    for (int i = 0; i < n; i++) {
+      AddResult inserted = add(root, arr[i]);
+      root = inserted.node;
+      root.isRed = false;
+    }
+
+    List<Integer> result = new ArrayList<>();
+    traverse(root, result);
+
+    for (int i = 0; i < n; i++) {
+      arr[i] = result.get(i);
+    }
+  }
+
   private static boolean isRed(Node node) {
     return node != null && node.isRed;
   }
@@ -99,25 +116,11 @@ public class redblacktreesort {
     traverse(node.right, result);
   }
 
-  public static void sort(int[] arr) {
-    int n = arr.length;
-    Node root = null;
-    for (int i = 0; i < n; i++) {
-      AddResult inserted = add(root, arr[i]);
-      root = inserted.node;
-      root.isRed = false;
-    }
-
-    List<Integer> result = new ArrayList<>();
-    traverse(root, result);
-
-    for (int i = 0; i < n; i++) {
-      arr[i] = result.get(i);
-    }
-  }
-
   public static void main(String[] args) {
-    int[] array = new int[] {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     sort(array);
     System.out.println(Arrays.toString(array));
   }

@@ -2,6 +2,12 @@ package main
 
 import "fmt"
 
+func sort(arr []int) {
+	if len(arr) > 1 {
+		doubleInsertion(arr, 0, len(arr))
+	}
+}
+
 func leftBinarySearch(array []int, a, b, val int) int {
 	lo, hi := a, b
 	for lo < hi {
@@ -76,12 +82,6 @@ func doubleInsertion(array []int, a, b int) {
 		}
 		i--
 		j++
-	}
-}
-
-func sort(arr []int) {
-	if len(arr) > 1 {
-		doubleInsertion(arr, 0, len(arr))
 	}
 }
 

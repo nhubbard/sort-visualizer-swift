@@ -4,25 +4,6 @@ import (
 	"fmt"
 )
 
-func idx(p int, n int) int {
-	return n - p
-}
-
-func siftDown(arr []int, root int, dist int, n int) {
-	for root <= dist/2 {
-		leaf := 2 * root
-		if leaf < dist && arr[idx(leaf, n)] > arr[idx(leaf+1, n)] {
-			leaf += 1
-		}
-		if arr[idx(root, n)] > arr[idx(leaf, n)] {
-			arr[idx(root, n)], arr[idx(leaf, n)] = arr[idx(leaf, n)], arr[idx(root, n)]
-			root = leaf
-		} else {
-			break
-		}
-	}
-}
-
 func sort(arr []int) []int {
 	n := len(arr)
 
@@ -40,6 +21,25 @@ func sort(arr []int) []int {
 	}
 
 	return arr
+}
+
+func idx(p int, n int) int {
+	return n - p
+}
+
+func siftDown(arr []int, root int, dist int, n int) {
+	for root <= dist/2 {
+		leaf := 2 * root
+		if leaf < dist && arr[idx(leaf, n)] > arr[idx(leaf+1, n)] {
+			leaf += 1
+		}
+		if arr[idx(root, n)] > arr[idx(leaf, n)] {
+			arr[idx(root, n)], arr[idx(leaf, n)] = arr[idx(leaf, n)], arr[idx(root, n)]
+			root = leaf
+		} else {
+			break
+		}
+	}
 }
 
 func main() {

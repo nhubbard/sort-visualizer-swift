@@ -4,6 +4,11 @@ import (
 	"fmt"
 )
 
+func sort(arr []int) []int {
+	snuffleSort(arr, 0, len(arr)-1)
+	return arr
+}
+
 func snuffleSort(arr []int, start, stop int) {
 	if stop-start+1 >= 2 {
 		if arr[start] > arr[stop] {
@@ -20,12 +25,9 @@ func snuffleSort(arr []int, start, stop int) {
 	}
 }
 
-func sort(arr []int) []int {
-	snuffleSort(arr, 0, len(arr)-1)
-	return arr
-}
-
 func main() {
-	array := []int{0, 39, 21, 62, 91, 77, 14, 23}
+	array := []int{
+		0, 39, 21, 62, 91, 77, 14, 23,
+	}
 	fmt.Println(sort(array))
 }

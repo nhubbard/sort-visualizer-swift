@@ -4,6 +4,12 @@ import (
 	"fmt"
 )
 
+func sort(arr []int) []int {
+	n := len(arr)
+	boseNelson(arr, 0, n)
+	return arr
+}
+
 func compSwap(arr []int, start, end int) {
 	if arr[start] > arr[end] {
 		arr[start], arr[end] = arr[end], arr[start]
@@ -40,12 +46,6 @@ func boseNelson(arr []int, start, length int) {
 		boseNelson(arr, start+mid, length-mid)
 		merge(arr, start, mid, start+mid, length-mid)
 	}
-}
-
-func sort(arr []int) []int {
-	n := len(arr)
-	boseNelson(arr, 0, n)
-	return arr
 }
 
 func main() {

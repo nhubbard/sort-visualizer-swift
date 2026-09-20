@@ -4,6 +4,28 @@ import (
 	"fmt"
 )
 
+func sort(arr []int) []int {
+	n := len(arr)
+	if n <= 16 {
+		binaryInsertionSort(arr, 0, n)
+		return arr
+	}
+
+	blockSize := max(16, integerSqrt(n))
+	low := 0
+	for low+2*blockSize < n {
+		binaryInsertionSort(arr, low, low+blockSize)
+		low += blockSize
+	}
+	binaryInsertionSort(arr, low, n)
+
+	for low >= blockSize {
+		merge(arr, low-blockSize, low, n)
+		low -= blockSize
+	}
+	return arr
+}
+
 func binaryInsertionSort(arr []int, lo int, hi int) {
 	for i := lo + 1; i < hi; i++ {
 		key := arr[i]
@@ -119,28 +141,6 @@ func min(a int, b int) int {
 		return a
 	}
 	return b
-}
-
-func sort(arr []int) []int {
-	n := len(arr)
-	if n <= 16 {
-		binaryInsertionSort(arr, 0, n)
-		return arr
-	}
-
-	blockSize := max(16, integerSqrt(n))
-	low := 0
-	for low+2*blockSize < n {
-		binaryInsertionSort(arr, low, low+blockSize)
-		low += blockSize
-	}
-	binaryInsertionSort(arr, low, n)
-
-	for low >= blockSize {
-		merge(arr, low-blockSize, low, n)
-		low -= blockSize
-	}
-	return arr
 }
 
 func main() {

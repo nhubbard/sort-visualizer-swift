@@ -1,6 +1,10 @@
 import java.util.Arrays;
 
 public class swaplessbubblesort {
+  public static void sort(int[] arr) {
+    swaplessBubbleSort(arr);
+  }
+
   private static void swaplessBubbleSort(int[] arr) {
     int n = arr.length;
     int i = n;
@@ -25,12 +29,11 @@ public class swaplessbubblesort {
     }
   }
 
-  public static void sort(int[] arr) {
-    swaplessBubbleSort(arr);
-  }
-
   public static void main(String[] args) {
-    int[] array = new int[] {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     sort(array);
     System.out.println(Arrays.toString(array));
   }

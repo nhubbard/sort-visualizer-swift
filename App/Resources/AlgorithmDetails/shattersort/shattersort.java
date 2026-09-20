@@ -3,6 +3,12 @@ import java.util.Arrays;
 import java.util.List;
 
 public class shattersort {
+  public static void sort(int[] arr) {
+    if (arr.length < 2) return;
+    int n = arr.length;
+    shatterSort(arr, n, 4);
+  }
+
   public static void insertionSort(int[] arr, int start, int end) {
     for (int i = start + 1; i < end; i++) {
       int pos = i;
@@ -66,14 +72,11 @@ public class shattersort {
     }
   }
 
-  public static void sort(int[] arr) {
-    if (arr.length < 2) return;
-    int n = arr.length;
-    shatterSort(arr, n, 4);
-  }
-
   public static void main(String[] args) {
-    int[] array = new int[] {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     sort(array);
     System.out.println(Arrays.toString(array));
   }

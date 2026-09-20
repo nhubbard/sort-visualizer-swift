@@ -4,6 +4,12 @@ import (
 	"fmt"
 )
 
+func sort(arr []int) []int {
+	n := len(arr)
+	commonSort(arr, 0, n)
+	return arr
+}
+
 func swap(arr []int, a int, b int) {
 	arr[a], arr[b] = arr[b], arr[a]
 }
@@ -476,12 +482,6 @@ func commonSort(arr []int, pos int, length int) {
 	}
 	insertSort(arr, pos, dist)
 	mergeWithoutBuffer(arr, pos, dist, length-dist)
-}
-
-func sort(arr []int) []int {
-	n := len(arr)
-	commonSort(arr, 0, n)
-	return arr
 }
 
 func main() {

@@ -4,6 +4,32 @@ import (
 	"fmt"
 )
 
+func sort(arr []int) []int {
+	end := len(arr)
+	if end <= 1 {
+		return arr
+	}
+	n := 1
+	threshold := 0
+	for n < end {
+		n <<= 1
+		threshold++
+	}
+	threshold /= 2
+
+	iterations := 0
+	for {
+		iterations++
+		if iterations >= threshold {
+			binaryInsertionSort(arr, end)
+			return arr
+		}
+		if circleSortRoutine(arr, 0, n-1, end) == 0 {
+			return arr
+		}
+	}
+}
+
 func circleSortRoutine(arr []int, lo, hi, end int) int {
 	if lo == hi {
 		return 0
@@ -43,32 +69,6 @@ func binaryInsertionSort(arr []int, end int) {
 		for j > lo {
 			arr[j], arr[j-1] = arr[j-1], arr[j]
 			j--
-		}
-	}
-}
-
-func sort(arr []int) []int {
-	end := len(arr)
-	if end <= 1 {
-		return arr
-	}
-	n := 1
-	threshold := 0
-	for n < end {
-		n <<= 1
-		threshold++
-	}
-	threshold /= 2
-
-	iterations := 0
-	for {
-		iterations++
-		if iterations >= threshold {
-			binaryInsertionSort(arr, end)
-			return arr
-		}
-		if circleSortRoutine(arr, 0, n-1, end) == 0 {
-			return arr
 		}
 	}
 }

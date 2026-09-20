@@ -5,6 +5,11 @@ import (
 	"math/rand"
 )
 
+func sort(arr []int) []int {
+	sortRange(arr, 0, len(arr))
+	return arr
+}
+
 func isSplit(arr []int, start int, mid int, end int) bool {
 	lowMax := arr[start]
 	for i := start + 1; i < mid; i++ {
@@ -36,12 +41,9 @@ func sortRange(arr []int, start int, end int) {
 	sortRange(arr, mid, end)
 }
 
-func sort(arr []int) []int {
-	sortRange(arr, 0, len(arr))
-	return arr
-}
-
 func main() {
-	array := []int{0, 39, 21, 62, 91, 14, 23}
+	array := []int{
+		0, 39, 21, 62, 91, 14, 23,
+	}
 	fmt.Println(sort(array))
 }

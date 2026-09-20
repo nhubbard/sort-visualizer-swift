@@ -6,6 +6,18 @@ import (
 
 const base = 4
 
+func sort(arr []int) []int {
+	n := len(arr)
+	for i := n - 1; i >= 0; i-- {
+		siftDown(arr, i, n)
+	}
+	for end := n - 1; end > 0; end-- {
+		arr[0], arr[end] = arr[end], arr[0]
+		siftDown(arr, 0, end)
+	}
+	return arr
+}
+
 func siftDown(arr []int, node int, stop int) {
 	left := node*base + 1
 	if left >= stop {
@@ -21,18 +33,6 @@ func siftDown(arr []int, node int, stop int) {
 		arr[node], arr[maxIndex] = arr[maxIndex], arr[node]
 		siftDown(arr, maxIndex, stop)
 	}
-}
-
-func sort(arr []int) []int {
-	n := len(arr)
-	for i := n - 1; i >= 0; i-- {
-		siftDown(arr, i, n)
-	}
-	for end := n - 1; end > 0; end-- {
-		arr[0], arr[end] = arr[end], arr[0]
-		siftDown(arr, 0, end)
-	}
-	return arr
 }
 
 func main() {

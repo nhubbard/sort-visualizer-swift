@@ -5,6 +5,14 @@ public class stacklessdualpivotquicksort {
 
   // Sorts arr[start..end) in place using a plain binary-search insertion sort -- the base case
   // once a segment shrinks small enough that further partitioning isn't worth it.
+  public static void sort(int[] arr) {
+    int n = arr.length;
+    if (n < 2) {
+      return;
+    }
+    quickSort(arr, 0, n);
+  }
+
   static void binaryInsertionSort(int[] arr, int start, int end) {
     for (int i = start; i < end; i++) {
       int value = arr[i];
@@ -183,14 +191,6 @@ public class stacklessdualpivotquicksort {
         reuseMedianCandidates = true;
       }
     }
-  }
-
-  public static void sort(int[] arr) {
-    int n = arr.length;
-    if (n < 2) {
-      return;
-    }
-    quickSort(arr, 0, n);
   }
 
   public static void main(String[] args) {

@@ -1,16 +1,6 @@
 import java.util.Arrays;
 
 public class bogosort {
-  private static void reverse(int[] a, int low, int high) {
-    while (low < high) {
-      int held = a[low];
-      a[low] = a[high];
-      a[high] = held;
-      low++;
-      high--;
-    }
-  }
-
   public static void sort(int[] a) {
     int n = a.length;
     if (n < 2) return;
@@ -33,6 +23,16 @@ public class bogosort {
       reverse(a, pivot + 1, n - 1);
     }
     reverse(a, 0, n - 1);
+  }
+
+  private static void reverse(int[] a, int low, int high) {
+    while (low < high) {
+      int held = a[low];
+      a[low] = a[high];
+      a[high] = held;
+      low++;
+      high--;
+    }
   }
 
   public static void main(String[] args) {

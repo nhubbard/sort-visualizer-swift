@@ -1,6 +1,11 @@
 import java.util.Arrays;
 
 public class andreysort {
+  public static void sort(int[] arr) {
+    int n = arr.length;
+    msort(arr, 0, n);
+  }
+
   public static void swap(int[] arr, int i, int j) {
     int t = arr[i];
     arr[i] = arr[j];
@@ -181,13 +186,11 @@ public class andreysort {
     msort(arr, a, s);
   }
 
-  public static void sort(int[] arr) {
-    int n = arr.length;
-    msort(arr, 0, n);
-  }
-
   public static void main(String[] args) {
-    int[] array = new int[] {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     sort(array);
     System.out.println(Arrays.toString(array));
   }

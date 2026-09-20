@@ -1,3 +1,13 @@
+fun sort(arr: Array<Int>) {
+  val length = arr.size
+  val end = length
+
+  var n = 1
+  while (n < length) n = n shl 1
+
+  pairwiseMergeSort(arr, 0, n, end)
+}
+
 fun compSwap(arr: Array<Int>, a: Int, b: Int, end: Int) {
   if (b < end && arr[a] > arr[b]) {
     arr[a] = arr[b].also { arr[b] = arr[a] }
@@ -37,16 +47,6 @@ fun pairwiseMergeSort(arr: Array<Int>, a: Int, b: Int, end: Int) {
     pairwiseMergeSort(arr, m, b, end)
     pairwiseMerge(arr, a, b, end)
   }
-}
-
-fun sort(arr: Array<Int>) {
-  val length = arr.size
-  val end = length
-
-  var n = 1
-  while (n < length) n = n shl 1
-
-  pairwiseMergeSort(arr, 0, n, end)
 }
 
 fun main() {

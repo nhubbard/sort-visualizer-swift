@@ -4,6 +4,15 @@ import (
 	"fmt"
 )
 
+func sort(arr []int) []int {
+	if len(arr) < 2 {
+		return arr
+	}
+	first := sort(arr[:len(arr)/2])
+	second := sort(arr[len(arr)/2:])
+	return merge(first, second)
+}
+
 func merge(a []int, b []int) []int {
 	final := []int{}
 	i := 0
@@ -24,15 +33,6 @@ func merge(a []int, b []int) []int {
 		final = append(final, b[j])
 	}
 	return final
-}
-
-func sort(arr []int) []int {
-	if len(arr) < 2 {
-		return arr
-	}
-	first := sort(arr[:len(arr)/2])
-	second := sort(arr[len(arr)/2:])
-	return merge(first, second)
 }
 
 func main() {

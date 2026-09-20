@@ -1,3 +1,24 @@
+fun sort(arr: Array<Int>) {
+  if (arr.size <= 1) {
+    return
+  }
+
+  val radix = 4
+  var maxValue = arr[0]
+  for (value in arr) {
+    if (value > maxValue) {
+      maxValue = value
+    }
+  }
+
+  var divisor = 1
+  while (maxValue / divisor >= radix) {
+    divisor *= radix
+  }
+
+  flagSort(arr, 0, arr.size, divisor, radix)
+}
+
 fun digitAt(value: Int, divisor: Int, radix: Int): Int = (value / divisor) % radix
 
 fun flagSort(arr: Array<Int>, low: Int, high: Int, divisor: Int, radix: Int) {
@@ -45,27 +66,6 @@ fun flagSort(arr: Array<Int>, low: Int, high: Int, divisor: Int, radix: Int) {
       }
     }
   }
-}
-
-fun sort(arr: Array<Int>) {
-  if (arr.size <= 1) {
-    return
-  }
-
-  val radix = 4
-  var maxValue = arr[0]
-  for (value in arr) {
-    if (value > maxValue) {
-      maxValue = value
-    }
-  }
-
-  var divisor = 1
-  while (maxValue / divisor >= radix) {
-    divisor *= radix
-  }
-
-  flagSort(arr, 0, arr.size, divisor, radix)
 }
 
 fun main() {

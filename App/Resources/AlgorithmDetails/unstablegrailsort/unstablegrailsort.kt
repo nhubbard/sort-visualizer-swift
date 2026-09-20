@@ -1,3 +1,7 @@
+fun sort(arr: Array<Int>) {
+  commonSort(arr, 0, arr.size)
+}
+
 fun swap(arr: Array<Int>, a: Int, b: Int) {
   val t = arr[a]
   arr[a] = arr[b]
@@ -258,10 +262,6 @@ fun commonSort(arr: Array<Int>, pos: Int, len: Int) {
   }
   insertSort(arr, pos, blockLen)
   mergeWithoutBuffer(arr, pos, blockLen, len - blockLen)
-}
-
-fun sort(arr: Array<Int>) {
-  commonSort(arr, 0, arr.size)
 }
 
 fun main() {

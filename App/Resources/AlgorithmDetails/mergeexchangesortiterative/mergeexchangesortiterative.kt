@@ -1,3 +1,7 @@
+fun sort(arr: Array<Int>) {
+  mergeExchangeSort(arr)
+}
+
 fun mergeExchangeSort(arr: Array<Int>) {
   val n = arr.size
   if (n <= 1) return
@@ -21,10 +25,6 @@ fun mergeExchangeSort(arr: Array<Int>) {
     }
     p = p shr 1
   }
-}
-
-fun sort(arr: Array<Int>) {
-  mergeExchangeSort(arr)
 }
 
 fun main() {

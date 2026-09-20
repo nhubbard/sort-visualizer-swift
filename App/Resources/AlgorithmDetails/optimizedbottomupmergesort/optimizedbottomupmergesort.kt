@@ -1,44 +1,5 @@
 const val BLOCK_SIZE = 16
 
-fun binaryInsertionSort(arr: Array<Int>, lo: Int, hi: Int) {
-  for (i in lo + 1 until hi) {
-    val key = arr[i]
-    var left = lo
-    var right = i
-    while (left < right) {
-      val mid = (left + right) / 2
-      if (arr[mid] <= key) {
-        left = mid + 1
-      } else {
-        right = mid
-      }
-    }
-    for (j in i downTo left + 1) {
-      arr[j] = arr[j - 1]
-    }
-    arr[left] = key
-  }
-}
-
-fun merge(src: Array<Int>, dst: Array<Int>, low: Int, mid: Int, high: Int) {
-  var i = low
-  var j = mid
-  var k = low
-  while (i < mid && j < high) {
-    if (src[i] <= src[j]) {
-      dst[k++] = src[i++]
-    } else {
-      dst[k++] = src[j++]
-    }
-  }
-  while (i < mid) {
-    dst[k++] = src[i++]
-  }
-  while (j < high) {
-    dst[k++] = src[j++]
-  }
-}
-
 fun sort(arr: Array<Int>) {
   val n = arr.size
   if (n < BLOCK_SIZE) {
@@ -87,6 +48,45 @@ fun sort(arr: Array<Int>) {
     for (i in 0 until n) {
       arr[i] = src[i]
     }
+  }
+}
+
+fun binaryInsertionSort(arr: Array<Int>, lo: Int, hi: Int) {
+  for (i in lo + 1 until hi) {
+    val key = arr[i]
+    var left = lo
+    var right = i
+    while (left < right) {
+      val mid = (left + right) / 2
+      if (arr[mid] <= key) {
+        left = mid + 1
+      } else {
+        right = mid
+      }
+    }
+    for (j in i downTo left + 1) {
+      arr[j] = arr[j - 1]
+    }
+    arr[left] = key
+  }
+}
+
+fun merge(src: Array<Int>, dst: Array<Int>, low: Int, mid: Int, high: Int) {
+  var i = low
+  var j = mid
+  var k = low
+  while (i < mid && j < high) {
+    if (src[i] <= src[j]) {
+      dst[k++] = src[i++]
+    } else {
+      dst[k++] = src[j++]
+    }
+  }
+  while (i < mid) {
+    dst[k++] = src[i++]
+  }
+  while (j < high) {
+    dst[k++] = src[j++]
   }
 }
 

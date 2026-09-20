@@ -1,3 +1,7 @@
+fun sort(arr: Array<Int>) {
+  optimizedDualPivotQuickSort(arr, 0, arr.size - 1, 3)
+}
+
 fun swap(a: Array<Int>, i: Int, j: Int) {
   val t = a[i]; a[i] = a[j]; a[j] = t
 }
@@ -51,10 +55,6 @@ fun optimizedDualPivotQuickSort(a: Array<Int>, left: Int, right: Int, initialDiv
     }
   }
   if (pivot1 < pivot2) optimizedDualPivotQuickSort(a, less, great, divisor)
-}
-
-fun sort(arr: Array<Int>) {
-  optimizedDualPivotQuickSort(arr, 0, arr.size - 1, 3)
 }
 
 fun main() {

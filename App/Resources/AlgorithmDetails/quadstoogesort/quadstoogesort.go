@@ -4,6 +4,11 @@ import (
 	"fmt"
 )
 
+func sort(arr []int) []int {
+	quadStooge(arr, 0, len(arr))
+	return arr
+}
+
 func quadStooge(arr []int, pos, length int) {
 	if length >= 2 && arr[pos] > arr[pos+length-1] {
 		arr[pos], arr[pos+length-1] = arr[pos+length-1], arr[pos]
@@ -24,11 +29,6 @@ func quadStooge(arr []int, pos, length int) {
 	if length > 3 {
 		quadStooge(arr, pos+len1/2, len3)
 	}
-}
-
-func sort(arr []int) []int {
-	quadStooge(arr, 0, len(arr))
-	return arr
 }
 
 func main() {

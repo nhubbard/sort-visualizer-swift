@@ -1,3 +1,31 @@
+fun sort(arr: Array<Int>) {
+  val n = arr.size
+  if (n <= 1) return
+  var d = 1
+  while (d < n) d = d shl 1
+  while (d > 1) {
+    var i = 0
+    var dec = 0
+    while (i < n) {
+      var j = i
+      dec += n
+      while (dec >= d) {
+        dec -= d
+        j++
+      }
+      var k = j
+      dec += n
+      while (dec >= d) {
+        dec -= d
+        k++
+      }
+      weaveMerge(arr, i, j, k)
+      i = k
+    }
+    d /= 2
+  }
+}
+
 fun insertTo(arr: Array<Int>, aInit: Int, b: Int) {
   var a = aInit
   val temp = arr[a]
@@ -106,34 +134,6 @@ fun weaveMerge(arr: Array<Int>, a: Int, mInit: Int, b: Int) {
     e = f
   }
   weaveInsert(arr, a, b, right)
-}
-
-fun sort(arr: Array<Int>) {
-  val n = arr.size
-  if (n <= 1) return
-  var d = 1
-  while (d < n) d = d shl 1
-  while (d > 1) {
-    var i = 0
-    var dec = 0
-    while (i < n) {
-      var j = i
-      dec += n
-      while (dec >= d) {
-        dec -= d
-        j++
-      }
-      var k = j
-      dec += n
-      while (dec >= d) {
-        dec -= d
-        k++
-      }
-      weaveMerge(arr, i, j, k)
-      i = k
-    }
-    d /= 2
-  }
 }
 
 fun main() {

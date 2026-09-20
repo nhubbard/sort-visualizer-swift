@@ -5,6 +5,14 @@ public class stacklesshybridquicksort {
 
   // Arranges arr[start], arr[mid], arr[end - 1] so the median of the three ends up at `start`,
   // ready to serve as partition's pivot.
+  public static void sort(int[] arr) {
+    int n = arr.length;
+    if (n < 2) {
+      return;
+    }
+    quickSort(arr, 0, n);
+  }
+
   static void medianOfThree(int[] arr, int start, int end) {
     int mid = start + (end - 1 - start) / 2;
     if (arr[start] > arr[mid]) {
@@ -164,14 +172,6 @@ public class stacklesshybridquicksort {
         refreshMedian = true;
       }
     }
-  }
-
-  public static void sort(int[] arr) {
-    int n = arr.length;
-    if (n < 2) {
-      return;
-    }
-    quickSort(arr, 0, n);
   }
 
   public static void main(String[] args) {

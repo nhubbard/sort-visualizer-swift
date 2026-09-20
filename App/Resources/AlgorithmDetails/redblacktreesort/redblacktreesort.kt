@@ -11,6 +11,22 @@ class AddResult(
   val needsFix: Boolean,
 )
 
+fun sort(arr: Array<Int>) {
+  var root: Node? = null
+  for (v in arr) {
+    val inserted = add(root, v)
+    root = inserted.node
+    root.isRed = false
+  }
+
+  val result = mutableListOf<Int>()
+  traverse(root, result)
+
+  for (i in arr.indices) {
+    arr[i] = result[i]
+  }
+}
+
 fun isRed(node: Node?): Boolean = node?.isRed ?: false
 
 fun singleRotateRight(node: Node): Node {
@@ -80,22 +96,6 @@ fun traverse(node: Node?, result: MutableList<Int>) {
   traverse(node.left, result)
   result.add(node.value)
   traverse(node.right, result)
-}
-
-fun sort(arr: Array<Int>) {
-  var root: Node? = null
-  for (v in arr) {
-    val inserted = add(root, v)
-    root = inserted.node
-    root.isRed = false
-  }
-
-  val result = mutableListOf<Int>()
-  traverse(root, result)
-
-  for (i in arr.indices) {
-    arr[i] = result[i]
-  }
 }
 
 fun main() {

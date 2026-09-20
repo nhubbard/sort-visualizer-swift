@@ -1,3 +1,9 @@
+fun sort(arr: Array<Int>) {
+  if (arr.size >= 2) {
+    mergeSort(arr, 0, arr.size - 1)
+  }
+}
+
 fun push(arr: Array<Int>, low: Int, high: Int) {
   for (i in low..(high - 1)) {
     if (arr[i] > arr[i + 1]) {
@@ -29,12 +35,6 @@ fun mergeSort(arr: Array<Int>, low: Int, high: Int) {
     mergeSort(arr, low, mid)
     mergeSort(arr, mid + 1, high)
     merge(arr, low, high, mid)
-  }
-}
-
-fun sort(arr: Array<Int>) {
-  if (arr.size >= 2) {
-    mergeSort(arr, 0, arr.size - 1)
   }
 }
 

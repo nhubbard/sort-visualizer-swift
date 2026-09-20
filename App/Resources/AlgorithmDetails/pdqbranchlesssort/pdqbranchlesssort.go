@@ -10,6 +10,17 @@ const partialInsertSortLimit = 8
 const blockSize = 64
 const cachelineSize = 64
 
+func sort(arr []int) []int {
+	n := len(arr)
+	if n < 2 {
+		return arr
+	}
+	leftOffsets := make([]int, blockSize+cachelineSize)
+	rightOffsets := make([]int, blockSize+cachelineSize)
+	pdqLoop(arr, 0, n, pdqLog(n), leftOffsets, rightOffsets)
+	return arr
+}
+
 func pdqLog(n int) int {
 	log := 0
 	for {
@@ -428,17 +439,6 @@ func pdqLoop(arr []int, begin int, end int, badAllowed int, leftOffsets []int, r
 		begin = pivotPos + 1
 		leftmost = false
 	}
-}
-
-func sort(arr []int) []int {
-	n := len(arr)
-	if n < 2 {
-		return arr
-	}
-	leftOffsets := make([]int, blockSize+cachelineSize)
-	rightOffsets := make([]int, blockSize+cachelineSize)
-	pdqLoop(arr, 0, n, pdqLog(n), leftOffsets, rightOffsets)
-	return arr
 }
 
 func main() {

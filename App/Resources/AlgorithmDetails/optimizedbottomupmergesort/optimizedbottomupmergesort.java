@@ -3,45 +3,6 @@ import java.util.Arrays;
 public class optimizedbottomupmergesort {
   static final int BLOCK_SIZE = 16;
 
-  static void binaryInsertionSort(int[] arr, int lo, int hi) {
-    for (int i = lo + 1; i < hi; i++) {
-      int key = arr[i];
-      int left = lo;
-      int right = i;
-      while (left < right) {
-        int mid = (left + right) / 2;
-        if (arr[mid] <= key) {
-          left = mid + 1;
-        } else {
-          right = mid;
-        }
-      }
-      for (int j = i; j > left; j--) {
-        arr[j] = arr[j - 1];
-      }
-      arr[left] = key;
-    }
-  }
-
-  static void merge(int[] src, int[] dst, int low, int mid, int high) {
-    int i = low;
-    int j = mid;
-    int k = low;
-    while (i < mid && j < high) {
-      if (src[i] <= src[j]) {
-        dst[k++] = src[i++];
-      } else {
-        dst[k++] = src[j++];
-      }
-    }
-    while (i < mid) {
-      dst[k++] = src[i++];
-    }
-    while (j < high) {
-      dst[k++] = src[j++];
-    }
-  }
-
   public static void sort(int[] arr) {
     int n = arr.length;
     if (n < BLOCK_SIZE) {
@@ -81,6 +42,45 @@ public class optimizedbottomupmergesort {
     // number leaves it in scratch, needing this one explicit copy back.
     if (passes % 2 == 1) {
       System.arraycopy(src, 0, arr, 0, n);
+    }
+  }
+
+  static void binaryInsertionSort(int[] arr, int lo, int hi) {
+    for (int i = lo + 1; i < hi; i++) {
+      int key = arr[i];
+      int left = lo;
+      int right = i;
+      while (left < right) {
+        int mid = (left + right) / 2;
+        if (arr[mid] <= key) {
+          left = mid + 1;
+        } else {
+          right = mid;
+        }
+      }
+      for (int j = i; j > left; j--) {
+        arr[j] = arr[j - 1];
+      }
+      arr[left] = key;
+    }
+  }
+
+  static void merge(int[] src, int[] dst, int low, int mid, int high) {
+    int i = low;
+    int j = mid;
+    int k = low;
+    while (i < mid && j < high) {
+      if (src[i] <= src[j]) {
+        dst[k++] = src[i++];
+      } else {
+        dst[k++] = src[j++];
+      }
+    }
+    while (i < mid) {
+      dst[k++] = src[i++];
+    }
+    while (j < high) {
+      dst[k++] = src[j++];
     }
   }
 

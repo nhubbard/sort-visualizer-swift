@@ -1,6 +1,20 @@
 import java.util.Arrays;
 
 public class cocktailbogosort {
+  public static void sort(int[] arr) {
+    int lo = 0;
+    int hi = arr.length;
+    while (lo < hi - 1) {
+      if (isMinimum(arr, lo, hi)) {
+        lo++;
+      } else if (isMaximum(arr, lo, hi)) {
+        hi--;
+      } else {
+        shuffleRange(arr, lo, hi);
+      }
+    }
+  }
+
   public static boolean isMinimum(int[] arr, int start, int end) {
     for (int k = start + 1; k < end; k++) {
       if (arr[start] > arr[k]) {
@@ -28,22 +42,8 @@ public class cocktailbogosort {
     }
   }
 
-  public static void sort(int[] arr) {
-    int lo = 0;
-    int hi = arr.length;
-    while (lo < hi - 1) {
-      if (isMinimum(arr, lo, hi)) {
-        lo++;
-      } else if (isMaximum(arr, lo, hi)) {
-        hi--;
-      } else {
-        shuffleRange(arr, lo, hi);
-      }
-    }
-  }
-
   public static void main(String[] args) {
-    int[] array = new int[] {0, 39, 21, 62, 91, 77, 14, 23};
+    int[] array = {0, 39, 21, 62, 91, 77, 14, 23};
     sort(array);
     System.out.println(Arrays.toString(array));
   }

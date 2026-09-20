@@ -8,6 +8,15 @@ const insertionThreshold = 16
 
 // medianOfThree arranges arr[start], arr[mid], arr[end-1] so the median of the three ends up at
 // start, ready to serve as partition's pivot.
+func sort(arr []int) []int {
+	n := len(arr)
+	if n < 2 {
+		return arr
+	}
+	quickSort(arr, 0, n)
+	return arr
+}
+
 func medianOfThree(arr []int, start int, end int) {
 	mid := start + (end-1-start)/2
 	if arr[start] > arr[mid] {
@@ -146,15 +155,6 @@ func quickSort(arr []int, start int, end int) {
 			refreshMedian = true
 		}
 	}
-}
-
-func sort(arr []int) []int {
-	n := len(arr)
-	if n < 2 {
-		return arr
-	}
-	quickSort(arr, 0, n)
-	return arr
 }
 
 func main() {

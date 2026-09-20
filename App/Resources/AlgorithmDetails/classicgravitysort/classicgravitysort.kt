@@ -1,3 +1,7 @@
+fun sort(arr: Array<Int>) {
+  classicGravitySort(arr)
+}
+
 fun classicGravitySort(arr: Array<Int>) {
   val n = arr.size
   if (n <= 1) return
@@ -26,10 +30,6 @@ fun classicGravitySort(arr: Array<Int>) {
       transpose[j]--
     }
   }
-}
-
-fun sort(arr: Array<Int>) {
-  classicGravitySort(arr)
 }
 
 fun main() {

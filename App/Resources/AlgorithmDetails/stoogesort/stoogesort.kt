@@ -1,3 +1,8 @@
+fun sort(arr: Array<Int>) {
+  if (arr.size <= 1) return
+  stoogeSort(arr, 0, arr.size - 1)
+}
+
 fun stoogeSort(arr: Array<Int>, i: Int, j: Int) {
   if (arr[j] < arr[i]) {
     arr[i] = arr[j].also { arr[j] = arr[i] }
@@ -8,11 +13,6 @@ fun stoogeSort(arr: Array<Int>, i: Int, j: Int) {
     stoogeSort(arr, i + t, j)
     stoogeSort(arr, i, j - t)
   }
-}
-
-fun sort(arr: Array<Int>) {
-  if (arr.size <= 1) return
-  stoogeSort(arr, 0, arr.size - 1)
 }
 
 fun main() {

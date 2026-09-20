@@ -1,6 +1,18 @@
 import java.util.Arrays;
 
 public class circlesortrecursive {
+  public static void sort(int[] array) {
+    int end = array.length;
+    if (end <= 1) {
+      return;
+    }
+    int paddedLength = nextPowerOfTwo(end);
+    int swaps;
+    do {
+      swaps = circleSortRoutine(array, 0, paddedLength - 1, end);
+    } while (swaps != 0);
+  }
+
   private static int nextPowerOfTwo(int n) {
     int k = 1;
     while (k < n) {
@@ -34,20 +46,11 @@ public class circlesortrecursive {
     return swaps;
   }
 
-  public static void sort(int[] array) {
-    int end = array.length;
-    if (end <= 1) {
-      return;
-    }
-    int paddedLength = nextPowerOfTwo(end);
-    int swaps;
-    do {
-      swaps = circleSortRoutine(array, 0, paddedLength - 1, end);
-    } while (swaps != 0);
-  }
-
   public static void main(String[] args) {
-    int[] array = new int[] {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     sort(array);
     System.out.println(Arrays.toString(array));
   }

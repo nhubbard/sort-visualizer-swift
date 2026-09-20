@@ -5,6 +5,14 @@ public class pdqbranchedsort {
   private static final int NINTHER_THRESHOLD = 128;
   private static final int PARTIAL_INSERT_SORT_LIMIT = 8;
 
+  public static void sort(int[] arr) {
+    int n = arr.length;
+    if (n < 2) {
+      return;
+    }
+    pdqLoop(arr, 0, n, pdqLog(n));
+  }
+
   private static void swap(int[] arr, int a, int b) {
     int t = arr[a];
     arr[a] = arr[b];
@@ -279,16 +287,11 @@ public class pdqbranchedsort {
     }
   }
 
-  public static void sort(int[] arr) {
-    int n = arr.length;
-    if (n < 2) {
-      return;
-    }
-    pdqLoop(arr, 0, n, pdqLog(n));
-  }
-
   public static void main(String[] args) {
-    int[] array = new int[] {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     sort(array);
     System.out.println(Arrays.toString(array));
   }

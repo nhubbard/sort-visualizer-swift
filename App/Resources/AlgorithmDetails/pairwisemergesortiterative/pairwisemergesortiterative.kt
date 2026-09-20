@@ -1,9 +1,3 @@
-fun compSwap(arr: Array<Int>, a: Int, b: Int, end: Int) {
-  if (b < end && arr[a] > arr[b]) {
-    arr[a] = arr[b].also { arr[b] = arr[a] }
-  }
-}
-
 fun sort(arr: Array<Int>) {
   val length = arr.size
   val end = length
@@ -41,6 +35,12 @@ fun sort(arr: Array<Int>) {
       m = m shr 1
     }
     k = k shl 1
+  }
+}
+
+fun compSwap(arr: Array<Int>, a: Int, b: Int, end: Int) {
+  if (b < end && arr[a] > arr[b]) {
+    arr[a] = arr[b].also { arr[b] = arr[a] }
   }
 }
 

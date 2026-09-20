@@ -4,6 +4,32 @@ import (
 	"fmt"
 )
 
+func sort(arr []int) []int {
+	n := len(arr)
+	dist := 1
+	for dist < n {
+		if arr[dist-1] > arr[dist] {
+			arr[dist-1], arr[dist] = arr[dist], arr[dist-1]
+		}
+		dist += 2
+	}
+	part := 2
+	for part < n {
+		left := 0
+		right := n - 2*part
+		for left <= right {
+			mergeWithoutBuffer(arr, left, part, part)
+			left += 2 * part
+		}
+		rest := n - left
+		if rest > part {
+			mergeWithoutBuffer(arr, left, part, rest-part)
+		}
+		part *= 2
+	}
+	return arr
+}
+
 func multiSwap(arr []int, a int, b int, count int) {
 	for i := 0; i < count; i++ {
 		arr[a+i], arr[b+i] = arr[b+i], arr[a+i]
@@ -81,32 +107,6 @@ func mergeWithoutBuffer(arr []int, pos int, len1 int, len2 int) {
 			}
 		}
 	}
-}
-
-func sort(arr []int) []int {
-	n := len(arr)
-	dist := 1
-	for dist < n {
-		if arr[dist-1] > arr[dist] {
-			arr[dist-1], arr[dist] = arr[dist], arr[dist-1]
-		}
-		dist += 2
-	}
-	part := 2
-	for part < n {
-		left := 0
-		right := n - 2*part
-		for left <= right {
-			mergeWithoutBuffer(arr, left, part, part)
-			left += 2 * part
-		}
-		rest := n - left
-		if rest > part {
-			mergeWithoutBuffer(arr, left, part, rest-part)
-		}
-		part *= 2
-	}
-	return arr
 }
 
 func main() {

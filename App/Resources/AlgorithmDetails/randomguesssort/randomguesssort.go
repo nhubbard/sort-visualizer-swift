@@ -6,7 +6,9 @@ import (
 
 func sort(arr []int) []int {
 	n := len(arr)
-	if n <= 1 { return arr }
+	if n <= 1 {
+		return arr
+	}
 	loops := make([]int, n)
 	for {
 		isSorted := true
@@ -42,6 +44,8 @@ func sort(arr []int) []int {
 }
 
 func main() {
-	array := []int{0, 39, 21, 62, 14}
+	array := []int{
+		0, 39, 21, 62, 14,
+	}
 	fmt.Println(sort(array))
 }

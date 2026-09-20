@@ -4,6 +4,11 @@ import (
 	"fmt"
 )
 
+func sort(arr []int) []int {
+	bufferedStoogeSort(arr, 0, len(arr))
+	return arr
+}
+
 func bufferedStoogeSort(arr []int, start, stop int) {
 	if stop-start > 1 {
 		if stop-start == 2 && arr[start] > arr[stop-1] {
@@ -57,11 +62,6 @@ func bufferedStoogeSort(arr []int, start, stop int) {
 			}
 		}
 	}
-}
-
-func sort(arr []int) []int {
-	bufferedStoogeSort(arr, 0, len(arr))
-	return arr
 }
 
 func main() {

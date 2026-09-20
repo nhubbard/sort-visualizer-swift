@@ -5,6 +5,21 @@ import (
 	"math"
 )
 
+func sort(array []int) {
+	n := len(array)
+	if n <= 1 {
+		return
+	}
+	heapify(array, n)
+	for i := 1; i < n-1; i++ {
+		array[0], array[n-i] = array[n-i], array[0]
+		siftDown(array, 0, n-i)
+	}
+	if array[0] > array[1] {
+		array[0], array[1] = array[1], array[0]
+	}
+}
+
 func triangularRoot(val int) int {
 	return (int(math.Sqrt(float64(8*val+1))) - 1) / 2
 }
@@ -35,21 +50,6 @@ func siftDown(array []int, root int, size int) {
 func heapify(array []int, length int) {
 	for i := length - 1; i >= 0; i-- {
 		siftDown(array, i, length)
-	}
-}
-
-func sort(array []int) {
-	n := len(array)
-	if n <= 1 {
-		return
-	}
-	heapify(array, n)
-	for i := 1; i < n-1; i++ {
-		array[0], array[n-i] = array[n-i], array[0]
-		siftDown(array, 0, n-i)
-	}
-	if array[0] > array[1] {
-		array[0], array[1] = array[1], array[0]
 	}
 }
 

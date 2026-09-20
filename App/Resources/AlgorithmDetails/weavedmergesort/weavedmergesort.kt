@@ -1,3 +1,8 @@
+fun sort(arr: IntArray) {
+  val tmp = IntArray(arr.size)
+  merge(arr, tmp, arr.size, 0, 1)
+}
+
 fun merge(arr: IntArray, tmp: IntArray, length: Int, residue: Int, modulus: Int) {
   if (residue + modulus >= length) {
     return
@@ -38,11 +43,6 @@ fun merge(arr: IntArray, tmp: IntArray, length: Int, residue: Int, modulus: Int)
     arr[i] = tmp[i]
     i += modulus
   }
-}
-
-fun sort(arr: IntArray) {
-  val tmp = IntArray(arr.size)
-  merge(arr, tmp, arr.size, 0, 1)
 }
 
 fun main() {

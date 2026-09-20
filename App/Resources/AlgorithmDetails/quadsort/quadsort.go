@@ -4,6 +4,24 @@ import (
 	"fmt"
 )
 
+func sort(arr []int) []int {
+	n := len(arr)
+	if n < 16 {
+		tailSwap(arr, 0, n)
+	} else if n < 256 {
+		if quadSwap(arr, 0, n) == 0 {
+			buffer := make([]int, 128)
+			tailMerge(arr, buffer, 0, n, 16)
+		}
+	} else {
+		if quadSwap(arr, 0, n) == 0 {
+			buffer := make([]int, n/2)
+			quadMerge(arr, buffer, 0, n, 16)
+		}
+	}
+	return arr
+}
+
 func swap2(arr []int, i int, j int) {
 	arr[i], arr[j] = arr[j], arr[i]
 }
@@ -732,24 +750,6 @@ swapper:
 
 // sort dispatches by size: under 16 is a plain tailSwap; under 256 pre-sorts via quadSwap then
 // finishes with tailMerge; 256 and up finishes with the full quadMerge pass instead.
-func sort(arr []int) []int {
-	n := len(arr)
-	if n < 16 {
-		tailSwap(arr, 0, n)
-	} else if n < 256 {
-		if quadSwap(arr, 0, n) == 0 {
-			buffer := make([]int, 128)
-			tailMerge(arr, buffer, 0, n, 16)
-		}
-	} else {
-		if quadSwap(arr, 0, n) == 0 {
-			buffer := make([]int, n/2)
-			quadMerge(arr, buffer, 0, n, 16)
-		}
-	}
-	return arr
-}
-
 func main() {
 	array := []int{
 		55, 12, 84, 3, 47, 91, 26, 68, 8, 73, 40, 97, 15, 62, 34, 79, 21, 88, 5, 51,

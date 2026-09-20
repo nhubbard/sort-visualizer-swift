@@ -1,3 +1,7 @@
+fun sort(arr: Array<Int>) {
+  stableCycleSort(arr)
+}
+
 fun destination(arr: Array<Int>, flagged: BooleanArray, a: Int, b1: Int, b: Int): Int {
   val heldValue = arr[a]
   var d = a
@@ -30,10 +34,6 @@ fun stableCycleSort(arr: Array<Int>) {
       j = k
     } while (j != i)
   }
-}
-
-fun sort(arr: Array<Int>) {
-  stableCycleSort(arr)
 }
 
 fun main() {

@@ -7,6 +7,102 @@ const val INSERT_SORT_THRESHOLD = 24
 const val NINTHER_THRESHOLD = 128
 const val PARTIAL_INSERT_SORT_LIMIT = 8
 
+fun sort(arr: MutableList<Int>) {
+  val length = arr.size
+  if (length < 2) return
+
+  val dropped = mutableListOf<Int>()
+  var numDroppedInARow = 0
+  var read = 0
+  var write = 0
+  var iteration = 0
+  val earlyOutStop = length / EARLY_OUT_TEST_AT
+
+  while (read < length) {
+    iteration++
+    if (iteration == earlyOutStop && dropped.size > read * EARLY_OUT_DISORDER_FRACTION) {
+      // Too disordered for the adaptive approach to be worth it: flush what's been dropped so
+      // far back into the array and fall back to a plain full sort.
+      for (value in dropped) {
+        arr[write] = value
+        write++
+      }
+      dropped.clear()
+      pdqSort(arr, 0, length)
+      return
+    }
+
+    if (write == 0 || arr[read] >= arr[write - 1]) {
+      // In order -- keep it.
+      arr[write] = arr[read]
+      write++
+      read++
+      numDroppedInARow = 0
+    } else if (numDroppedInARow == 0 && write >= 2 && arr[read] >= arr[write - 2]) {
+      // Quick undo: the element two back would have accepted this one just fine, so drop the
+      // one right before it instead of the new element.
+      dropped.add(arr[write - 1])
+      arr[write - 1] = arr[read]
+      read++
+    } else if (numDroppedInARow < RECENCY) {
+      dropped.add(arr[read])
+      read++
+      numDroppedInARow++
+    } else {
+      // Accepting something `numDroppedInARow` elements back made every subsequent element
+      // drop -- that accept was a mistake. Undo it, and any other recently accepted elements
+      // bigger than the dropped run's maximum.
+      repeat(numDroppedInARow) { dropped.removeAt(dropped.size - 1) }
+      read -= numDroppedInARow
+
+      var numBacktracked = 1
+      write--
+
+      var maxOfDropped = read
+      for (i in (read + 1)..(read + numDroppedInARow)) {
+        if (arr[i] > maxOfDropped) maxOfDropped = arr[i]
+      }
+
+      while (write >= 1 && maxOfDropped < arr[write - 1]) {
+        write--
+        numBacktracked++
+      }
+
+      for (i in write until (write + numBacktracked)) {
+        dropped.add(arr[i])
+      }
+
+      numDroppedInARow = 0
+    }
+  }
+
+  for (offset in dropped.indices) {
+    arr[write + offset] = dropped[offset]
+  }
+
+  pdqSort(arr, write, length)
+
+  // Copy the now-sorted dropped tail before the final backward merge starts overwriting
+  // arr[write..] in place.
+  val buffer = arr.subList(write, write + dropped.size).toList()
+
+  var i = buffer.size - 1
+  var j = write - 1
+  var k = length - 1
+
+  while (i >= 0) {
+    if (j < 0 || buffer[i] > arr[j]) {
+      arr[k] = buffer[i]
+      k--
+      i--
+    } else {
+      arr[k] = arr[j]
+      k--
+      j--
+    }
+  }
+}
+
 fun pdqLog(n0: Int): Int {
   var n = n0
   var log = 0
@@ -241,105 +337,13 @@ fun pdqLoop(arr: MutableList<Int>, begin0: Int, end: Int, badAllowed0: Int) {
   }
 }
 
-fun pdqSort(arr: MutableList<Int>, begin: Int, end: Int) { if (end - begin > 1) pdqLoop(arr, begin, end, pdqLog(end - begin)) }
-
-
-
-fun sort(arr: MutableList<Int>) {
-  val length = arr.size
-  if (length < 2) return
-
-  val dropped = mutableListOf<Int>()
-  var numDroppedInARow = 0
-  var read = 0
-  var write = 0
-  var iteration = 0
-  val earlyOutStop = length / EARLY_OUT_TEST_AT
-
-  while (read < length) {
-    iteration++
-    if (iteration == earlyOutStop && dropped.size > read * EARLY_OUT_DISORDER_FRACTION) {
-      // Too disordered for the adaptive approach to be worth it: flush what's been dropped so
-      // far back into the array and fall back to a plain full sort.
-      for (value in dropped) {
-        arr[write] = value
-        write++
-      }
-      dropped.clear()
-      pdqSort(arr, 0, length)
-      return
-    }
-
-    if (write == 0 || arr[read] >= arr[write - 1]) {
-      // In order -- keep it.
-      arr[write] = arr[read]
-      write++
-      read++
-      numDroppedInARow = 0
-    } else if (numDroppedInARow == 0 && write >= 2 && arr[read] >= arr[write - 2]) {
-      // Quick undo: the element two back would have accepted this one just fine, so drop the
-      // one right before it instead of the new element.
-      dropped.add(arr[write - 1])
-      arr[write - 1] = arr[read]
-      read++
-    } else if (numDroppedInARow < RECENCY) {
-      dropped.add(arr[read])
-      read++
-      numDroppedInARow++
-    } else {
-      // Accepting something `numDroppedInARow` elements back made every subsequent element
-      // drop -- that accept was a mistake. Undo it, and any other recently accepted elements
-      // bigger than the dropped run's maximum.
-      repeat(numDroppedInARow) { dropped.removeAt(dropped.size - 1) }
-      read -= numDroppedInARow
-
-      var numBacktracked = 1
-      write--
-
-      var maxOfDropped = read
-      for (i in (read + 1)..(read + numDroppedInARow)) {
-        if (arr[i] > maxOfDropped) maxOfDropped = arr[i]
-      }
-
-      while (write >= 1 && maxOfDropped < arr[write - 1]) {
-        write--
-        numBacktracked++
-      }
-
-      for (i in write until (write + numBacktracked)) {
-        dropped.add(arr[i])
-      }
-
-      numDroppedInARow = 0
-    }
-  }
-
-  for (offset in dropped.indices) {
-    arr[write + offset] = dropped[offset]
-  }
-
-  pdqSort(arr, write, length)
-
-  // Copy the now-sorted dropped tail before the final backward merge starts overwriting
-  // arr[write..] in place.
-  val buffer = arr.subList(write, write + dropped.size).toList()
-
-  var i = buffer.size - 1
-  var j = write - 1
-  var k = length - 1
-
-  while (i >= 0) {
-    if (j < 0 || buffer[i] > arr[j]) {
-      arr[k] = buffer[i]
-      k--
-      i--
-    } else {
-      arr[k] = arr[j]
-      k--
-      j--
-    }
+fun pdqSort(arr: MutableList<Int>, begin: Int, end: Int) {
+  if (end - begin > 1) {
+    pdqLoop(arr, begin, end, pdqLog(end - begin))
   }
 }
+
+
 
 fun main() {
   val array =

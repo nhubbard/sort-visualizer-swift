@@ -6,6 +6,15 @@ import (
 
 const threshold = 32
 
+func sort(arr []int) []int {
+	n := len(arr)
+	if n < 2 {
+		return arr
+	}
+	mergeSort(arr, 0, n)
+	return arr
+}
+
 func insertionSort(arr []int, start int, end int) {
 	for i := start + 1; i < end; i++ {
 		j := i
@@ -51,15 +60,6 @@ func mergeSort(arr []int, start int, end int) {
 	mergeSort(arr, start, mid)
 	mergeSort(arr, mid, end)
 	merge(arr, start, mid, end)
-}
-
-func sort(arr []int) []int {
-	n := len(arr)
-	if n < 2 {
-		return arr
-	}
-	mergeSort(arr, 0, n)
-	return arr
 }
 
 func main() {

@@ -1,3 +1,8 @@
+fun sort(arr: Array<Int>) {
+  if (arr.size < 2) return
+  shatterSort(arr, arr.size, 4)
+}
+
 fun insertionSort(arr: Array<Int>, start: Int, end: Int) {
   for (i in start + 1 until end) {
     var pos = i
@@ -46,11 +51,6 @@ fun shatterSort(arr: Array<Int>, length: Int, num: Int) {
   for (i in 0 until offsets.size - 1) {
     if (offsets[i + 1] - offsets[i] > 1) insertionSort(arr, offsets[i], offsets[i + 1])
   }
-}
-
-fun sort(arr: Array<Int>) {
-  if (arr.size < 2) return
-  shatterSort(arr, arr.size, 4)
 }
 
 fun main() {

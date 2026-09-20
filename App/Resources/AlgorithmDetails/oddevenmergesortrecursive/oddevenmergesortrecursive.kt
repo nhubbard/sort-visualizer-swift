@@ -1,3 +1,7 @@
+fun sort(arr: Array<Int>) {
+  oddEvenMergeSort(arr, 0, arr.size)
+}
+
 fun oddEvenMergeCompare(arr: Array<Int>, i: Int, j: Int) {
   if (arr[i] > arr[j]) {
     arr[i] = arr[j].also { arr[j] = arr[i] }
@@ -44,10 +48,6 @@ fun oddEvenMergeSort(arr: Array<Int>, lo: Int, n: Int) {
     oddEvenMergeSort(arr, lo + m, n - m)
     oddEvenMerge(arr, lo, m, n, 1)
   }
-}
-
-fun sort(arr: Array<Int>) {
-  oddEvenMergeSort(arr, 0, arr.size)
 }
 
 fun main() {

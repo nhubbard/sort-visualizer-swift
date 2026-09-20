@@ -1,3 +1,13 @@
+fun sort(arr: IntArray) {
+  val n = arr.size
+  if (n <= 1) return
+  heapify(arr, n)
+  var heapSize = n
+  for (i in 0 until n - 1) {
+    heapSize = storeMax(arr, heapSize)
+  }
+}
+
 fun bitLength(valueIn: Int): Int {
   var value = valueIn
   var length = 0
@@ -78,16 +88,6 @@ fun storeMax(arr: IntArray, heapSize: Int): Int {
   val newSize = last
   if (imax < newSize) downheap(arr, imax, newSize)
   return newSize
-}
-
-fun sort(arr: IntArray) {
-  val n = arr.size
-  if (n <= 1) return
-  heapify(arr, n)
-  var heapSize = n
-  for (i in 0 until n - 1) {
-    heapSize = storeMax(arr, heapSize)
-  }
 }
 
 fun main() {

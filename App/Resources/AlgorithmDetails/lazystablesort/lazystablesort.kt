@@ -1,3 +1,26 @@
+fun sort(arr: Array<Int>) {
+  val n = arr.size
+  var dist = 1
+  while (dist < n) {
+    if (arr[dist - 1] > arr[dist]) {
+      arr[dist - 1] = arr[dist].also { arr[dist] = arr[dist - 1] }
+    }
+    dist += 2
+  }
+  var part = 2
+  while (part < n) {
+    var left = 0
+    val right = n - 2 * part
+    while (left <= right) {
+      mergeWithoutBuffer(arr, left, part, part)
+      left += 2 * part
+    }
+    val rest = n - left
+    if (rest > part) mergeWithoutBuffer(arr, left, part, rest - part)
+    part *= 2
+  }
+}
+
 fun multiSwap(arr: Array<Int>, a: Int, b: Int, count: Int) {
   for (i in 0 until count) {
     arr[a + i] = arr[b + i].also { arr[b + i] = arr[a + i] }
@@ -49,29 +72,6 @@ fun mergeWithoutBuffer(arr: Array<Int>, start: Int, leftLength: Int, rightLength
       if (len1 == 0) break
       do { len2-- } while (len2 != 0 && arr[pos + len1 - 1] <= arr[pos + len1 + len2 - 1])
     }
-  }
-}
-
-fun sort(arr: Array<Int>) {
-  val n = arr.size
-  var dist = 1
-  while (dist < n) {
-    if (arr[dist - 1] > arr[dist]) {
-      arr[dist - 1] = arr[dist].also { arr[dist] = arr[dist - 1] }
-    }
-    dist += 2
-  }
-  var part = 2
-  while (part < n) {
-    var left = 0
-    val right = n - 2 * part
-    while (left <= right) {
-      mergeWithoutBuffer(arr, left, part, part)
-      left += 2 * part
-    }
-    val rest = n - left
-    if (rest > part) mergeWithoutBuffer(arr, left, part, rest - part)
-    part *= 2
   }
 }
 

@@ -2,14 +2,6 @@ package main
 
 import "fmt"
 
-func ceilPow2(value int) int {
-	r := 1
-	for r < value {
-		r *= 2
-	}
-	return r
-}
-
 func sort(array []int) {
 	n := len(array)
 	if n <= 1 {
@@ -100,6 +92,14 @@ func sort(array []int) {
 		output[i] = findNext()
 	}
 	copy(array, output)
+}
+
+func ceilPow2(value int) int {
+	r := 1
+	for r < value {
+		r *= 2
+	}
+	return r
 }
 
 func main() {

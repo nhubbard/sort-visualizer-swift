@@ -11,6 +11,28 @@ class AddResult(
   val heightChanged: Boolean,
 )
 
+fun sort(arr: Array<Int>) {
+  var root: Node? = null
+  for (value in arr) {
+    root = add(root, value).node
+  }
+
+  val result = mutableListOf<Int>()
+
+  fun traverse(node: Node?) {
+    if (node == null) return
+    traverse(node.left)
+    result.add(node.value)
+    traverse(node.right)
+  }
+
+  traverse(root)
+
+  for (i in arr.indices) {
+    arr[i] = result[i]
+  }
+}
+
 fun singleRotateRight(node: Node): Node {
   val b = node.left!!
   node.left = b.right
@@ -87,28 +109,6 @@ fun add(node: Node?, value: Int): AddResult {
       return heightChangeRight(node)
     }
     return AddResult(node, false)
-  }
-}
-
-fun sort(arr: Array<Int>) {
-  var root: Node? = null
-  for (value in arr) {
-    root = add(root, value).node
-  }
-
-  val result = mutableListOf<Int>()
-
-  fun traverse(node: Node?) {
-    if (node == null) return
-    traverse(node.left)
-    result.add(node.value)
-    traverse(node.right)
-  }
-
-  traverse(root)
-
-  for (i in arr.indices) {
-    arr[i] = result[i]
   }
 }
 

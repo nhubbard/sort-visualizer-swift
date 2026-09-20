@@ -38,7 +38,7 @@ public class randomguesssort {
   }
 
   public static void main(String[] args) {
-    int[] array = new int[] {0, 39, 21, 62, 14};
+    int[] array = {0, 39, 21, 62, 14};
     sort(array);
     System.out.println(Arrays.toString(array));
   }

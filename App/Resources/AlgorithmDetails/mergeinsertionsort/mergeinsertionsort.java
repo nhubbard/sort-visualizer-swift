@@ -1,33 +1,6 @@
 import java.util.Arrays;
 
 public class mergeinsertionsort {
-  static void blockSwap(int[] arr, int a, int b, int size) {
-    for (int offset = 0; offset < size; offset++) {
-      int x = a - size + 1 + offset, y = b - size + 1 + offset;
-      int tmp = arr[x]; arr[x] = arr[y]; arr[y] = tmp;
-    }
-  }
-  static void blockInsert(int[] arr, int a, int b, int size) {
-    while (a - size >= b) { blockSwap(arr, a - size, a, size); a -= size; }
-  }
-  static void blockReversal(int[] arr, int a, int b, int size) {
-    b -= size;
-    while (b > a) { blockSwap(arr, a, b, size); a += size; b -= size; }
-  }
-  static int blockSearch(int[] arr, int a, int b, int size, int value) {
-    while (a < b) {
-      int mid = a + (((b - a) / size) / 2) * size;
-      if (value < arr[mid]) b = mid;
-      else a = mid + size;
-    }
-    return a;
-  }
-  static void order(int[] arr, int a, int b, int size) {
-    int i = a, j = i + size;
-    while (j < b) { blockInsert(arr, j, i, size); i += size; j += 2 * size; }
-    int mid = a + (((b - a) / size) / 2) * size;
-    blockReversal(arr, mid, b, size);
-  }
   public static void sort(int[] arr) {
     int length = arr.length;
     if (length < 2) return;
@@ -46,7 +19,8 @@ public class mergeinsertionsort {
         for (int j = i; j < i + k * g; j += k)
           blockInsert(arr, j, blockSearch(arr, a, b, k, arr[j]), k);
         i += k * g + k;
-        g = p - g; p *= 2;
+        g = p - g;
+        p *= 2;
       }
       while (i < length) {
         blockInsert(arr, i, blockSearch(arr, a, i, k, arr[i]), k);
@@ -54,6 +28,51 @@ public class mergeinsertionsort {
       }
       k /= 2;
     }
+  }
+
+  static void blockSwap(int[] arr, int a, int b, int size) {
+    for (int offset = 0; offset < size; offset++) {
+      int x = a - size + 1 + offset, y = b - size + 1 + offset;
+      int tmp = arr[x];
+      arr[x] = arr[y];
+      arr[y] = tmp;
+    }
+  }
+
+  static void blockInsert(int[] arr, int a, int b, int size) {
+    while (a - size >= b) {
+      blockSwap(arr, a - size, a, size);
+      a -= size;
+    }
+  }
+
+  static void blockReversal(int[] arr, int a, int b, int size) {
+    b -= size;
+    while (b > a) {
+      blockSwap(arr, a, b, size);
+      a += size;
+      b -= size;
+    }
+  }
+
+  static int blockSearch(int[] arr, int a, int b, int size, int value) {
+    while (a < b) {
+      int mid = a + (((b - a) / size) / 2) * size;
+      if (value < arr[mid]) b = mid;
+      else a = mid + size;
+    }
+    return a;
+  }
+
+  static void order(int[] arr, int a, int b, int size) {
+    int i = a, j = i + size;
+    while (j < b) {
+      blockInsert(arr, j, i, size);
+      i += size;
+      j += 2 * size;
+    }
+    int mid = a + (((b - a) / size) / 2) * size;
+    blockReversal(arr, mid, b, size);
   }
 
   public static void main(String[] args) {

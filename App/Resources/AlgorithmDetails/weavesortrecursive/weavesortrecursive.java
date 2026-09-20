@@ -3,6 +3,16 @@ import java.util.Arrays;
 public class weavesortrecursive {
   private static int end;
 
+  public static void sort(int[] arr) {
+    int n = arr.length;
+    end = n;
+    int padded = 1;
+    while (padded < end) {
+      padded *= 2;
+    }
+    weaveCircle(arr, 0, padded, 1);
+  }
+
   private static void compSwap(int[] arr, int a, int b) {
     if (b < end && arr[a] > arr[b]) {
       int temp = arr[a];
@@ -35,18 +45,11 @@ public class weavesortrecursive {
     circle(arr, pos, ln, gap);
   }
 
-  public static void sort(int[] arr) {
-    int n = arr.length;
-    end = n;
-    int padded = 1;
-    while (padded < end) {
-      padded *= 2;
-    }
-    weaveCircle(arr, 0, padded, 1);
-  }
-
   public static void main(String[] args) {
-    int[] array = new int[] {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     sort(array);
     System.out.println(Arrays.toString(array));
   }

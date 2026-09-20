@@ -18,6 +18,8 @@ func sort(arr []int, length int) []int {
 }
 
 func main() {
-	array := []int{0, 39, 21, 62, 91, 14, 23}
+	array := []int{
+		0, 39, 21, 62, 91, 14, 23,
+	}
 	fmt.Println(sort(array, len(array)))
 }

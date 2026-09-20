@@ -4,6 +4,12 @@ import (
 	"fmt"
 )
 
+func sort(arr []int) []int {
+	n := len(arr)
+	lazyStableSort(arr, 0, n)
+	return arr
+}
+
 func swap(arr []int, a int, b int) {
 	arr[a], arr[b] = arr[b], arr[a]
 }
@@ -152,12 +158,6 @@ func lazyStableSort(arr []int, pos int, length int) {
 		}
 		part *= 2
 	}
-}
-
-func sort(arr []int) []int {
-	n := len(arr)
-	lazyStableSort(arr, 0, n)
-	return arr
 }
 
 func main() {

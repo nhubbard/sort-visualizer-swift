@@ -1,3 +1,27 @@
+fun sort(arr: IntArray) {
+  val n = arr.size
+  if (n <= 1) return
+  val base = 4
+  var maxValue = 0
+  for (value in arr) if (value > maxValue) maxValue = value
+  var q = 0
+  var probe = base
+  while (probe <= maxValue) { q++; probe *= base }
+  var m = 0
+  var i = 0
+  var b = n
+  while (i < n) {
+    val p = if (b - i < 1) i else dist(arr, i, b, q, base)
+    if (q == 0) {
+      m += base
+      var t = m / base
+      while (t % base == 0) { t /= base; q++ }
+      i = b
+      while (b < n && shift(arr[b], q + 1, base) == shift(m, q + 1, base)) b++
+    } else { b = p; q-- }
+  }
+}
+
 fun intPow(base: Int, exponent: Int): Int {
   var result = 1
   for (i in 0 until exponent) {
@@ -88,30 +112,6 @@ fun shift(value: Int, places: Int, base: Int): Int {
 fun dist(arr: IntArray, a: Int, b: Int, place: Int, base: Int): Int {
   mergeSortDigit(arr, a, b, place, base)
   return binSearchDigit(arr, a, b, 1, place, base)
-}
-
-fun sort(arr: IntArray) {
-  val n = arr.size
-  if (n <= 1) return
-  val base = 4
-  var maxValue = 0
-  for (value in arr) if (value > maxValue) maxValue = value
-  var q = 0
-  var probe = base
-  while (probe <= maxValue) { q++; probe *= base }
-  var m = 0
-  var i = 0
-  var b = n
-  while (i < n) {
-    val p = if (b - i < 1) i else dist(arr, i, b, q, base)
-    if (q == 0) {
-      m += base
-      var t = m / base
-      while (t % base == 0) { t /= base; q++ }
-      i = b
-      while (b < n && shift(arr[b], q + 1, base) == shift(m, q + 1, base)) b++
-    } else { b = p; q-- }
-  }
 }
 
 fun main() {

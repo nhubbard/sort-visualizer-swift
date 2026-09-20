@@ -4,6 +4,47 @@ import (
 	"fmt"
 )
 
+func sort(arr []int) []int {
+	n := len(arr)
+	if n <= 1 {
+		return arr
+	}
+	base, maxValue := 4, 0
+	for _, value := range arr {
+		if value > maxValue {
+			maxValue = value
+		}
+	}
+	q, probe := 0, base
+	for probe <= maxValue {
+		q++
+		probe *= base
+	}
+	m, i, b := 0, 0, n
+	for i < n {
+		p := i
+		if b-i >= 1 {
+			p = dist(arr, i, b, q, base)
+		}
+		if q == 0 {
+			m += base
+			t := m / base
+			for t%base == 0 {
+				t /= base
+				q++
+			}
+			i = b
+			for b < n && shiftValue(arr[b], q+1, base) == shiftValue(m, q+1, base) {
+				b++
+			}
+		} else {
+			b = p
+			q--
+		}
+	}
+	return arr
+}
+
 func intPow(base, exponent int) int {
 	result := 1
 	for i := 0; i < exponent; i++ {
@@ -90,47 +131,6 @@ func shiftValue(value, places, base int) int {
 func dist(arr []int, a, b, place, base int) int {
 	mergeSortDigit(arr, a, b, place, base)
 	return binSearchDigit(arr, a, b, 1, place, base)
-}
-
-func sort(arr []int) []int {
-	n := len(arr)
-	if n <= 1 {
-		return arr
-	}
-	base, maxValue := 4, 0
-	for _, value := range arr {
-		if value > maxValue {
-			maxValue = value
-		}
-	}
-	q, probe := 0, base
-	for probe <= maxValue {
-		q++
-		probe *= base
-	}
-	m, i, b := 0, 0, n
-	for i < n {
-		p := i
-		if b-i >= 1 {
-			p = dist(arr, i, b, q, base)
-		}
-		if q == 0 {
-			m += base
-			t := m / base
-			for t%base == 0 {
-				t /= base
-				q++
-			}
-			i = b
-			for b < n && shiftValue(arr[b], q+1, base) == shiftValue(m, q+1, base) {
-				b++
-			}
-		} else {
-			b = p
-			q--
-		}
-	}
-	return arr
 }
 
 func main() {

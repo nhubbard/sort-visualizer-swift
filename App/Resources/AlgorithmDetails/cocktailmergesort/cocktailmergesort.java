@@ -1,6 +1,10 @@
 import java.util.Arrays;
 
 public class cocktailmergesort {
+  public static void sort(int[] arr) {
+    cocktailMergeSort(arr);
+  }
+
   private static int minRunLength(int n) {
     int r = 0;
     while (n >= 64) {
@@ -108,12 +112,11 @@ public class cocktailmergesort {
     }
   }
 
-  public static void sort(int[] arr) {
-    cocktailMergeSort(arr);
-  }
-
   public static void main(String[] args) {
-    int[] array = new int[] {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     sort(array);
     System.out.println(Arrays.toString(array));
   }

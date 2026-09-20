@@ -3,6 +3,38 @@ import java.util.Arrays;
 import java.util.List;
 
 public class pdmergesort {
+  public static void sort(int[] arr) {
+    int n = arr.length;
+    if (n < 2) {
+      return;
+    }
+
+    List<Integer> runs = new ArrayList<>();
+    int lastRun = 0;
+    while (lastRun != -1) {
+      runs.add(lastRun);
+      lastRun = identifyRun(arr, lastRun, n);
+    }
+
+    int[] buffer = new int[n];
+    int runCount = runs.size();
+    while (runCount > 1) {
+      int i = 0;
+      while (i < runCount - 1) {
+        int end = i + 2 >= runCount ? n : runs.get(i + 2);
+        mergeRuns(arr, runs.get(i), runs.get(i + 1), end, buffer);
+        i += 2;
+      }
+
+      List<Integer> compacted = new ArrayList<>();
+      for (int j = 0; j < runCount; j += 2) {
+        compacted.add(runs.get(j));
+      }
+      runs = compacted;
+      runCount = runs.size();
+    }
+  }
+
   static void reverseRun(int[] arr, int lo, int hi) {
     while (lo < hi) {
       int t = arr[lo];
@@ -99,40 +131,11 @@ public class pdmergesort {
     }
   }
 
-  public static void sort(int[] arr) {
-    int n = arr.length;
-    if (n < 2) {
-      return;
-    }
-
-    List<Integer> runs = new ArrayList<>();
-    int lastRun = 0;
-    while (lastRun != -1) {
-      runs.add(lastRun);
-      lastRun = identifyRun(arr, lastRun, n);
-    }
-
-    int[] buffer = new int[n];
-    int runCount = runs.size();
-    while (runCount > 1) {
-      int i = 0;
-      while (i < runCount - 1) {
-        int end = i + 2 >= runCount ? n : runs.get(i + 2);
-        mergeRuns(arr, runs.get(i), runs.get(i + 1), end, buffer);
-        i += 2;
-      }
-
-      List<Integer> compacted = new ArrayList<>();
-      for (int j = 0; j < runCount; j += 2) {
-        compacted.add(runs.get(j));
-      }
-      runs = compacted;
-      runCount = runs.size();
-    }
-  }
-
   public static void main(String[] args) {
-    int[] array = new int[] {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     sort(array);
     System.out.println(Arrays.toString(array));
   }

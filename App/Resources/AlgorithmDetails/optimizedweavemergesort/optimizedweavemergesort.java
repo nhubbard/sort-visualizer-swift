@@ -1,6 +1,38 @@
 import java.util.Arrays;
 
 public class optimizedweavemergesort {
+  public static void sort(int[] array) {
+    int n = array.length;
+    if (n <= 1) {
+      return;
+    }
+    int d = 1;
+    while (d < n) {
+      d <<= 1;
+    }
+    while (d > 1) {
+      int i = 0;
+      int dec = 0;
+      while (i < n) {
+        int j = i;
+        dec += n;
+        while (dec >= d) {
+          dec -= d;
+          j++;
+        }
+        int k = j;
+        dec += n;
+        while (dec >= d) {
+          dec -= d;
+          k++;
+        }
+        weaveMerge(array, i, j, k);
+        i = k;
+      }
+      d /= 2;
+    }
+  }
+
   private static void insertTo(int[] array, int a, int b) {
     int temp = array[a];
     while (a > b) {
@@ -119,40 +151,11 @@ public class optimizedweavemergesort {
     weaveInsert(array, a, b, right);
   }
 
-  public static void sort(int[] array) {
-    int n = array.length;
-    if (n <= 1) {
-      return;
-    }
-    int d = 1;
-    while (d < n) {
-      d <<= 1;
-    }
-    while (d > 1) {
-      int i = 0;
-      int dec = 0;
-      while (i < n) {
-        int j = i;
-        dec += n;
-        while (dec >= d) {
-          dec -= d;
-          j++;
-        }
-        int k = j;
-        dec += n;
-        while (dec >= d) {
-          dec -= d;
-          k++;
-        }
-        weaveMerge(array, i, j, k);
-        i = k;
-      }
-      d /= 2;
-    }
-  }
-
   public static void main(String[] args) {
-    int[] array = new int[] {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     sort(array);
     System.out.println(Arrays.toString(array));
   }

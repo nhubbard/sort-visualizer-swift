@@ -1,10 +1,5 @@
 import kotlin.random.Random
 
-fun isSorted(arr: Array<Int>): Boolean =
-  arr.toList().asSequence().zipWithNext { a, b ->
-    a <= b
-  }.all { it }
-
 fun sort(arr: Array<Int>): Array<Int> {
   val n = arr.size
   while (!isSorted(arr)) {
@@ -17,8 +12,15 @@ fun sort(arr: Array<Int>): Array<Int> {
   return arr
 }
 
+fun isSorted(arr: Array<Int>): Boolean =
+  arr.toList().asSequence().zipWithNext { a, b ->
+    a <= b
+  }.all { it }
+
 fun main() {
-  var array = arrayOf<Int>(0, 39, 21, 62, 91, 77)
+  var array = arrayOf<Int>(
+    0, 39, 21, 62, 91, 77,
+  )
   array = sort(array)
   println("[%s]".format(array.joinToString(", ")))
 }

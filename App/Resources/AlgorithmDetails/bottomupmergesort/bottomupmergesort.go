@@ -4,6 +4,34 @@ import (
 	"fmt"
 )
 
+func sort(arr []int) []int {
+	n := len(arr)
+	if n < 2 {
+		return arr
+	}
+	scratch := append([]int(nil), arr...)
+	mergeSize := 2
+	for mergeSize <= n {
+		copyLength := n
+		for index := 0; index < n; index += mergeSize {
+			stop := merge(arr, scratch, n, index, mergeSize)
+			if stop >= 0 {
+				copyLength = stop
+			}
+		}
+		copy(arr[:copyLength], scratch[:copyLength])
+		mergeSize *= 2
+	}
+	if mergeSize/2 != n {
+		stop := merge(arr, scratch, n, 0, mergeSize)
+		if stop < 0 {
+			stop = n
+		}
+		copy(arr[:stop], scratch[:stop])
+	}
+	return arr
+}
+
 func merge(arr, scratch []int, n, index, mergeSize int) int {
 	mid := index + mergeSize/2
 	end := index + mergeSize
@@ -35,34 +63,6 @@ func merge(arr, scratch []int, n, index, mergeSize int) int {
 		out++
 	}
 	return -1
-}
-
-func sort(arr []int) []int {
-	n := len(arr)
-	if n < 2 {
-		return arr
-	}
-	scratch := append([]int(nil), arr...)
-	mergeSize := 2
-	for mergeSize <= n {
-		copyLength := n
-		for index := 0; index < n; index += mergeSize {
-			stop := merge(arr, scratch, n, index, mergeSize)
-			if stop >= 0 {
-				copyLength = stop
-			}
-		}
-		copy(arr[:copyLength], scratch[:copyLength])
-		mergeSize *= 2
-	}
-	if mergeSize/2 != n {
-		stop := merge(arr, scratch, n, 0, mergeSize)
-		if stop < 0 {
-			stop = n
-		}
-		copy(arr[:stop], scratch[:stop])
-	}
-	return arr
 }
 
 func main() {

@@ -1,6 +1,24 @@
 import java.util.Arrays;
 
 public final class outofplaceheapsort {
+  public static int[] sort(int[] arr) {
+    int n = arr.length;
+    int[] output = new int[n];
+    if (n <= 1) {
+      if (n == 1) {
+        output[0] = arr[0];
+      }
+      return output;
+    }
+    heapify(arr, n);
+    for (int i = n - 1; i >= 0; i--) {
+      output[i] = arr[0];
+      arr[0] = -1;
+      findNext(arr, n);
+    }
+    return output;
+  }
+
   static void siftDown(int[] arr, int root, int size) {
     int index = root;
     while (2 * index + 1 < size) {
@@ -64,26 +82,11 @@ public final class outofplaceheapsort {
     }
   }
 
-  public static int[] sort(int[] arr) {
-    int n = arr.length;
-    int[] output = new int[n];
-    if (n <= 1) {
-      if (n == 1) {
-        output[0] = arr[0];
-      }
-      return output;
-    }
-    heapify(arr, n);
-    for (int i = n - 1; i >= 0; i--) {
-      output[i] = arr[0];
-      arr[0] = -1;
-      findNext(arr, n);
-    }
-    return output;
-  }
-
   public static void main(String[] args) {
-    int[] array = new int[] {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     int[] output = sort(array);
     System.out.println(Arrays.toString(output));
   }

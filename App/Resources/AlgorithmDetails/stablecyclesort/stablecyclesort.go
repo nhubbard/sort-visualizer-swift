@@ -4,6 +4,10 @@ import (
 	"fmt"
 )
 
+func sort(arr []int) []int {
+	return stableCycleSort(arr)
+}
+
 func destination(arr []int, flagged []bool, a, b1, b int) int {
 	heldValue := arr[a]
 	d := a
@@ -46,10 +50,6 @@ func stableCycleSort(arr []int) []int {
 		}
 	}
 	return arr
-}
-
-func sort(arr []int) []int {
-	return stableCycleSort(arr)
 }
 
 func main() {

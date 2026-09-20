@@ -4,6 +4,19 @@ import (
 	"fmt"
 )
 
+func sort(arr []int) []int {
+	for i := 1; i < len(arr); i++ {
+		item := arr[i]
+		pos := binarySearch(arr, item, 0, i)
+		j := i
+		for j > pos {
+			arr[j], arr[j-1] = arr[j-1], arr[j]
+			j--
+		}
+	}
+	return arr
+}
+
 func binarySearch(arr []int, item, start, end int) int {
 	low := start
 	high := end
@@ -16,19 +29,6 @@ func binarySearch(arr []int, item, start, end int) int {
 		}
 	}
 	return low
-}
-
-func sort(arr []int) []int {
-	for i := 1; i < len(arr); i++ {
-		item := arr[i]
-		pos := binarySearch(arr, item, 0, i)
-		j := i
-		for j > pos {
-			arr[j], arr[j-1] = arr[j-1], arr[j]
-			j--
-		}
-	}
-	return arr
 }
 
 func main() {

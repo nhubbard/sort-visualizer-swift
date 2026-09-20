@@ -6,6 +6,30 @@ class Node(
   var right: Node? = null
 }
 
+fun sort(arr: Array<Int>) {
+  val n = arr.size
+  var root: Node? = null
+
+  for (i in 0 until n) {
+    root = add(root, arr[i])
+  }
+
+  val result = mutableListOf<Int>()
+
+  fun traverse(node: Node?) {
+    if (node == null) return
+    traverse(node.left)
+    result.add(node.value)
+    traverse(node.right)
+  }
+
+  traverse(root)
+
+  for (i in 0 until n) {
+    arr[i] = result[i]
+  }
+}
+
 fun level(node: Node?): Int = node?.level ?: -1
 
 fun skew(node: Node): Node {
@@ -43,30 +67,6 @@ fun add(node: Node?, value: Int): Node {
       return split(node)
     }
     return node
-  }
-}
-
-fun sort(arr: Array<Int>) {
-  val n = arr.size
-  var root: Node? = null
-
-  for (i in 0 until n) {
-    root = add(root, arr[i])
-  }
-
-  val result = mutableListOf<Int>()
-
-  fun traverse(node: Node?) {
-    if (node == null) return
-    traverse(node.left)
-    result.add(node.value)
-    traverse(node.right)
-  }
-
-  traverse(root)
-
-  for (i in 0 until n) {
-    arr[i] = result[i]
   }
 }
 

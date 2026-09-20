@@ -1,3 +1,9 @@
+fun sort(arr: Array<Int>) {
+  if (arr.size > 1) {
+    doubleInsertionSort(arr, 0, arr.size)
+  }
+}
+
 fun doubleInsertionSort(arr: Array<Int>, start: Int, end: Int) {
   var left = start + (end - start) / 2 - 1
   var right = left + 1
@@ -56,12 +62,6 @@ fun doubleInsertionSort(arr: Array<Int>, start: Int, end: Int) {
       pos--
     }
     arr[pos + 1] = current
-  }
-}
-
-fun sort(arr: Array<Int>) {
-  if (arr.size > 1) {
-    doubleInsertionSort(arr, 0, arr.size)
   }
 }
 

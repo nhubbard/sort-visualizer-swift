@@ -4,6 +4,16 @@ import (
 	"fmt"
 )
 
+func sort(arr []int) []int {
+	heapify(arr)
+	for end := len(arr) - 1; end > 0; end-- {
+		arr[0], arr[end] = arr[end], arr[0]
+		siftDown(arr, 0, end)
+	}
+	reverse(arr)
+	return arr
+}
+
 func siftDown(arr []int, root, size int) {
 	for {
 		smallest := root
@@ -37,16 +47,6 @@ func reverse(arr []int) {
 		low++
 		high--
 	}
-}
-
-func sort(arr []int) []int {
-	heapify(arr)
-	for end := len(arr) - 1; end > 0; end-- {
-		arr[0], arr[end] = arr[end], arr[0]
-		siftDown(arr, 0, end)
-	}
-	reverse(arr)
-	return arr
 }
 
 func main() {

@@ -4,6 +4,10 @@ import (
 	"fmt"
 )
 
+func sort(arr []int) []int {
+	return swaplessBubbleSort(arr)
+}
+
 func swaplessBubbleSort(arr []int) []int {
 	n := len(arr)
 	i := n
@@ -27,10 +31,6 @@ func swaplessBubbleSort(arr []int) []int {
 		i = last
 	}
 	return arr
-}
-
-func sort(arr []int) []int {
-	return swaplessBubbleSort(arr)
 }
 
 func main() {

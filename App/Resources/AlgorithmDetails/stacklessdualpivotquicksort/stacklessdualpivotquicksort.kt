@@ -2,6 +2,12 @@ const val INSERTION_THRESHOLD = 24
 
 // Sorts arr[start..end) in place using a plain binary-search insertion sort -- the base case
 // once a segment shrinks small enough that further partitioning isn't worth it.
+fun sort(arr: Array<Int>) {
+  val n = arr.size
+  if (n < 2) return
+  quickSort(arr, 0, n)
+}
+
 fun binaryInsertionSort(arr: Array<Int>, start: Int, end: Int) {
   for (i in start until end) {
     val value = arr[i]
@@ -177,12 +183,6 @@ fun quickSort(arr: Array<Int>, start: Int, endIn: Int) {
     }
     if (a == segmentEnd) reuseMedianCandidates = true
   }
-}
-
-fun sort(arr: Array<Int>) {
-  val n = arr.size
-  if (n < 2) return
-  quickSort(arr, 0, n)
 }
 
 fun main() {

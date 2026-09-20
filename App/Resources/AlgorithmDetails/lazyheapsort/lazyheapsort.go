@@ -5,21 +5,11 @@ import (
 	"math"
 )
 
-func maxToFront(arr []int, a int, b int) {
-	best := a
-	i := a + 1
-	for i < b {
-		if arr[i] > arr[best] {
-			best = i
-		}
-		i++
-	}
-	arr[best], arr[a] = arr[a], arr[best]
-}
-
 func sort(arr []int) []int {
 	n := len(arr)
-	if n <= 1 { return arr }
+	if n <= 1 {
+		return arr
+	}
 	s := int(math.Sqrt(float64(n-1))) + 1
 
 	i := 0
@@ -43,6 +33,18 @@ func sort(arr []int) []int {
 		maxToFront(arr, best, min(best+s, j))
 	}
 	return arr
+}
+
+func maxToFront(arr []int, a int, b int) {
+	best := a
+	i := a + 1
+	for i < b {
+		if arr[i] > arr[best] {
+			best = i
+		}
+		i++
+	}
+	arr[best], arr[a] = arr[a], arr[best]
 }
 
 func main() {

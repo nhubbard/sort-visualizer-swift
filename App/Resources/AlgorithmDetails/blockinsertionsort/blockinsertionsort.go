@@ -4,6 +4,27 @@ import (
 	"fmt"
 )
 
+func sort(arr []int) []int {
+	n := len(arr)
+	if n < 2 {
+		return arr
+	}
+	i := findRun(arr, 0, n)
+	for i < n {
+		j := findRun(arr, i, n)
+		length := j - i
+		if length == 1 {
+			insert1(arr, 0, i)
+		} else if length == 2 {
+			insert2(arr, 0, i, i+1)
+		} else {
+			mergeWithoutBuffer(arr, 0, i, length)
+		}
+		i = j
+	}
+	return arr
+}
+
 func multiSwap(arr []int, a int, b int, count int) {
 	for i := 0; i < count; i++ {
 		arr[a+i], arr[b+i] = arr[b+i], arr[a+i]
@@ -133,27 +154,6 @@ func insert2(arr []int, a int, l int, r int) {
 		l--
 	}
 	arr[l+1] = tmpL
-}
-
-func sort(arr []int) []int {
-	n := len(arr)
-	if n < 2 {
-		return arr
-	}
-	i := findRun(arr, 0, n)
-	for i < n {
-		j := findRun(arr, i, n)
-		length := j - i
-		if length == 1 {
-			insert1(arr, 0, i)
-		} else if length == 2 {
-			insert2(arr, 0, i, i+1)
-		} else {
-			mergeWithoutBuffer(arr, 0, i, length)
-		}
-		i = j
-	}
-	return arr
 }
 
 func main() {

@@ -1,3 +1,17 @@
+fun sort(arr: Array<Int>) {
+  val n = arr.size
+  if (n < 2) return
+  var i = findRun(arr, 0, n)
+  while (i < n) {
+    val j = findRun(arr, i, n)
+    val len = j - i
+    if (len == 1) insert1(arr, 0, i)
+    else if (len == 2) insert2(arr, 0, i, i + 1)
+    else mergeWithoutBuffer(arr, 0, i, len)
+    i = j
+  }
+}
+
 fun multiSwap(arr: Array<Int>, a: Int, b: Int, count: Int) {
   for (i in 0 until count) {
     arr[a + i] = arr[b + i].also { arr[b + i] = arr[a + i] }
@@ -96,20 +110,6 @@ fun insert2(arr: Array<Int>, a: Int, l: Int, r: Int) {
     i--
   }
   arr[i + 1] = tmpL
-}
-
-fun sort(arr: Array<Int>) {
-  val n = arr.size
-  if (n < 2) return
-  var i = findRun(arr, 0, n)
-  while (i < n) {
-    val j = findRun(arr, i, n)
-    val len = j - i
-    if (len == 1) insert1(arr, 0, i)
-    else if (len == 2) insert2(arr, 0, i, i + 1)
-    else mergeWithoutBuffer(arr, 0, i, len)
-    i = j
-  }
 }
 
 fun main() {

@@ -1,3 +1,14 @@
+fun sort(arr: Array<Int>) {
+  var n = arr.size
+  for (i in (n / 2 - 1) downTo 0) {
+    siftDown(arr, i, n)
+  }
+  for (i in (n - 1) downTo 1) {
+    arr[0] = arr[i].also { arr[i] = arr[0] }
+    siftDown(arr, 0, i)
+  }
+}
+
 fun siftDown(arr: Array<Int>, rootIn: Int, size: Int) {
   var root = rootIn
   while (true) {
@@ -9,17 +20,6 @@ fun siftDown(arr: Array<Int>, rootIn: Int, size: Int) {
     if (largest == root) break
     arr[root] = arr[largest].also { arr[largest] = arr[root] }
     root = largest
-  }
-}
-
-fun sort(arr: Array<Int>) {
-  var n = arr.size
-  for (i in (n / 2 - 1) downTo 0) {
-    siftDown(arr, i, n)
-  }
-  for (i in (n - 1) downTo 1) {
-    arr[0] = arr[i].also { arr[i] = arr[0] }
-    siftDown(arr, 0, i)
   }
 }
 

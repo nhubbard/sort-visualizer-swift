@@ -4,19 +4,6 @@ import (
 	"fmt"
 )
 
-func is3Smooth(n int) bool {
-	for n%6 == 0 {
-		n /= 6
-	}
-	for n%3 == 0 {
-		n /= 3
-	}
-	for n%2 == 0 {
-		n /= 2
-	}
-	return n == 1
-}
-
 func sort(arr []int) []int {
 	length := len(arr)
 	for g := length - 1; g > 0; g-- {
@@ -29,6 +16,19 @@ func sort(arr []int) []int {
 		}
 	}
 	return arr
+}
+
+func is3Smooth(n int) bool {
+	for n%6 == 0 {
+		n /= 6
+	}
+	for n%3 == 0 {
+		n /= 3
+	}
+	for n%2 == 0 {
+		n /= 2
+	}
+	return n == 1
 }
 
 func main() {

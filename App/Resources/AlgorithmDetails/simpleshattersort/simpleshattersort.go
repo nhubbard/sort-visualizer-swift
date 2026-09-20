@@ -4,6 +4,19 @@ import (
 	"fmt"
 )
 
+func sort(arr []int) []int {
+	if len(arr) < 2 {
+		return arr
+	}
+	n := len(arr)
+	rate := floorLog2(n) / 2
+	if rate < 2 {
+		rate = 2
+	}
+	simpleShatterSort(arr, n, 4, rate)
+	return arr
+}
+
 func insertionSort(arr []int, start int, end int) {
 	for i := start + 1; i < end; i++ {
 		pos := i
@@ -75,17 +88,6 @@ func simpleShatterSort(arr []int, length int, num int, rate int) {
 			insertionSort(arr, offsets[k], offsets[k+1])
 		}
 	}
-}
-
-func sort(arr []int) []int {
-	if len(arr) < 2 { return arr }
-	n := len(arr)
-	rate := floorLog2(n) / 2
-	if rate < 2 {
-		rate = 2
-	}
-	simpleShatterSort(arr, n, 4, rate)
-	return arr
 }
 
 func main() {

@@ -4,19 +4,6 @@ import (
 	"fmt"
 )
 
-func siftDown(arr []int, root, size int) {
-	for {
-		largest := root
-		left := 2*root + 1
-		right := left + 1
-		if left < size && arr[largest] < arr[left] { largest = left }
-		if right < size && arr[largest] < arr[right] { largest = right }
-		if largest == root { break }
-		arr[root], arr[largest] = arr[largest], arr[root]
-		root = largest
-	}
-}
-
 func sort(arr []int) []int {
 	n := len(arr)
 	for i := n/2 - 1; i >= 0; i-- {
@@ -27,6 +14,25 @@ func sort(arr []int) []int {
 		siftDown(arr, 0, i)
 	}
 	return arr
+}
+
+func siftDown(arr []int, root, size int) {
+	for {
+		largest := root
+		left := 2*root + 1
+		right := left + 1
+		if left < size && arr[largest] < arr[left] {
+			largest = left
+		}
+		if right < size && arr[largest] < arr[right] {
+			largest = right
+		}
+		if largest == root {
+			break
+		}
+		arr[root], arr[largest] = arr[largest], arr[root]
+		root = largest
+	}
 }
 
 func main() {

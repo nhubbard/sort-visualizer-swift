@@ -1,3 +1,9 @@
+fun sort(arr: IntArray) {
+  if (arr.size > 1) {
+    staticSort(arr, 0, arr.size)
+  }
+}
+
 fun findMinMax(array: IntArray, a: Int, b: Int): Pair<Int, Int> {
   var minValue = array[a]
   var maxValue = array[a]
@@ -108,12 +114,6 @@ fun staticSort(array: IntArray, a: Int, b: Int) {
     } else {
       insertionSortRange(array, s, e)
     }
-  }
-}
-
-fun sort(arr: IntArray) {
-  if (arr.size > 1) {
-    staticSort(arr, 0, arr.size)
   }
 }
 

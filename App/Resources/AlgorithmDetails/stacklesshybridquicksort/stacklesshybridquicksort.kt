@@ -2,6 +2,12 @@ const val INSERTION_THRESHOLD = 16
 
 // Arranges arr[start], arr[mid], arr[end - 1] so the median of the three ends up at `start`,
 // ready to serve as partition's pivot.
+fun sort(arr: Array<Int>) {
+  val n = arr.size
+  if (n < 2) return
+  quickSort(arr, 0, n)
+}
+
 fun medianOfThree(arr: Array<Int>, start: Int, end: Int) {
   val mid = start + (end - 1 - start) / 2
   if (arr[start] > arr[mid]) {
@@ -151,12 +157,6 @@ fun quickSort(arr: Array<Int>, start: Int, end: Int) {
     }
     if (a == segmentEnd) refreshMedian = true
   }
-}
-
-fun sort(arr: Array<Int>) {
-  val n = arr.size
-  if (n < 2) return
-  quickSort(arr, 0, n)
 }
 
 fun main() {

@@ -8,6 +8,15 @@ const insertionThreshold = 24
 
 // binaryInsertionSort sorts arr[start:end] in place using a plain binary-search insertion sort
 // -- the base case once a segment shrinks small enough that further partitioning isn't worth it.
+func sort(arr []int) []int {
+	n := len(arr)
+	if n < 2 {
+		return arr
+	}
+	quickSort(arr, 0, n)
+	return arr
+}
+
 func binaryInsertionSort(arr []int, start int, end int) {
 	for i := start; i < end; i++ {
 		value := arr[i]
@@ -163,15 +172,6 @@ func quickSort(arr []int, start int, end int) {
 			reuseMedianCandidates = true
 		}
 	}
-}
-
-func sort(arr []int) []int {
-	n := len(arr)
-	if n < 2 {
-		return arr
-	}
-	quickSort(arr, 0, n)
-	return arr
 }
 
 func main() {

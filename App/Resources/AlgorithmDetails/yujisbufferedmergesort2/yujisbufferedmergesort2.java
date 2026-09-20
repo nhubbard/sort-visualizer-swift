@@ -1,6 +1,14 @@
 import java.util.Arrays;
 
 public class yujisbufferedmergesort2 {
+  public static void sort(int[] arr) {
+    int n = arr.length;
+    if (n <= 1) {
+      return;
+    }
+    bufferedMerge(arr, 0, n);
+  }
+
   private static int ceilLog(int n) {
     int i = 0;
     while ((1 << i) < n) {
@@ -207,16 +215,11 @@ public class yujisbufferedmergesort2 {
     bufferedMerge(arr, b - (m - a) - s, b);
   }
 
-  public static void sort(int[] arr) {
-    int n = arr.length;
-    if (n <= 1) {
-      return;
-    }
-    bufferedMerge(arr, 0, n);
-  }
-
   public static void main(String[] args) {
-    int[] array = new int[] {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     sort(array);
     System.out.println(Arrays.toString(array));
   }

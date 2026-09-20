@@ -1,3 +1,37 @@
+fun sort(arr: Array<Int>) {
+  val n = arr.size
+  if (n < 2) {
+    return
+  }
+
+  var runs = mutableListOf<Int>()
+  var lastRun = 0
+  while (lastRun != -1) {
+    runs.add(lastRun)
+    lastRun = identifyRun(arr, lastRun, n)
+  }
+
+  val buffer = Array(n) { 0 }
+  var runCount = runs.size
+  while (runCount > 1) {
+    var i = 0
+    while (i < runCount - 1) {
+      val end = if (i + 2 >= runCount) n else runs[i + 2]
+      mergeRuns(arr, runs[i], runs[i + 1], end, buffer)
+      i += 2
+    }
+
+    val compacted = mutableListOf<Int>()
+    var j = 0
+    while (j < runCount) {
+      compacted.add(runs[j])
+      j += 2
+    }
+    runs = compacted
+    runCount = runs.size
+  }
+}
+
 fun reverseRun(arr: Array<Int>, loIn: Int, hiIn: Int) {
   var lo = loIn
   var hi = hiIn
@@ -93,40 +127,6 @@ fun mergeRuns(arr: Array<Int>, leftStart: Int, rightStart: Int, end: Int, buffer
     mergeDown(arr, leftStart, rightStart, end, buffer)
   } else {
     mergeUp(arr, leftStart, rightStart, end, buffer)
-  }
-}
-
-fun sort(arr: Array<Int>) {
-  val n = arr.size
-  if (n < 2) {
-    return
-  }
-
-  var runs = mutableListOf<Int>()
-  var lastRun = 0
-  while (lastRun != -1) {
-    runs.add(lastRun)
-    lastRun = identifyRun(arr, lastRun, n)
-  }
-
-  val buffer = Array(n) { 0 }
-  var runCount = runs.size
-  while (runCount > 1) {
-    var i = 0
-    while (i < runCount - 1) {
-      val end = if (i + 2 >= runCount) n else runs[i + 2]
-      mergeRuns(arr, runs[i], runs[i + 1], end, buffer)
-      i += 2
-    }
-
-    val compacted = mutableListOf<Int>()
-    var j = 0
-    while (j < runCount) {
-      compacted.add(runs[j])
-      j += 2
-    }
-    runs = compacted
-    runCount = runs.size
   }
 }
 

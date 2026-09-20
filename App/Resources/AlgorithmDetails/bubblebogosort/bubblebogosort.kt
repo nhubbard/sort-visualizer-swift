@@ -16,7 +16,9 @@ fun sort(a: Array<Int>) {
 }
 
 fun main() {
-  val array = arrayOf(0, 39, 21, 62, 91, 77, 14, 23)
+  val array = arrayOf(
+    0, 39, 21, 62, 91, 77, 14, 23,
+  )
   sort(array)
   println("[%s]".format(array.joinToString(", ")))
 }

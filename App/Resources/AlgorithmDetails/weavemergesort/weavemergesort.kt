@@ -1,3 +1,9 @@
+fun sort(arr: IntArray) {
+  if (arr.size > 1) {
+    weaveMergeSort(arr, 0, arr.size - 1)
+  }
+}
+
 fun multiSwap(arr: IntArray, pos: Int, to: Int) {
   if (to - pos > 0) {
     for (i in pos until to) {
@@ -48,12 +54,6 @@ fun weaveMergeSort(arr: IntArray, min: Int, max: Int) {
     weaveMergeSort(arr, min, mid)
     weaveMergeSort(arr, mid + 1, max)
     weaveMerge(arr, min, max, mid)
-  }
-}
-
-fun sort(arr: IntArray) {
-  if (arr.size > 1) {
-    weaveMergeSort(arr, 0, arr.size - 1)
   }
 }
 

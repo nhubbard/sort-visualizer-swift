@@ -6,6 +6,10 @@ public class flansort {
   private final int[] positions = new int[GAP + 2], heap = new int[GAP + 2];
   private long state = 0x9e3779b97f4a7c15L;
 
+  public static void sort(int[] array) {
+    if (array.length > 1) new flansort(array).execute();
+  }
+
   private flansort(int[] array) {
     values = array;
     for (int value : values)
@@ -297,12 +301,11 @@ public class flansort {
     insertion(a, b);
   }
 
-  public static void sort(int[] array) {
-    if (array.length > 1) new flansort(array).execute();
-  }
-
   public static void main(String[] args) {
-    int[] array = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     sort(array);
     System.out.println(Arrays.toString(array));
   }

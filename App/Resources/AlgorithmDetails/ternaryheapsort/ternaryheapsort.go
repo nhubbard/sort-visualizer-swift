@@ -4,6 +4,20 @@ import (
 	"fmt"
 )
 
+func sort(arr []int) []int {
+	n := len(arr)
+	heapSize := n - 1
+	for i := n - 1; i >= 0; i-- {
+		maxHeapify(arr, i, heapSize)
+	}
+	for i := n - 1; i >= 0; i-- {
+		arr[0], arr[i] = arr[i], arr[0]
+		heapSize -= 1
+		maxHeapify(arr, 0, heapSize)
+	}
+	return arr
+}
+
 func maxHeapify(arr []int, i int, heapSize int) {
 	left := 3*i + 1
 	mid := 3*i + 2
@@ -22,20 +36,6 @@ func maxHeapify(arr []int, i int, heapSize int) {
 		arr[i], arr[largest] = arr[largest], arr[i]
 		maxHeapify(arr, largest, heapSize)
 	}
-}
-
-func sort(arr []int) []int {
-	n := len(arr)
-	heapSize := n - 1
-	for i := n - 1; i >= 0; i-- {
-		maxHeapify(arr, i, heapSize)
-	}
-	for i := n - 1; i >= 0; i-- {
-		arr[0], arr[i] = arr[i], arr[0]
-		heapSize -= 1
-		maxHeapify(arr, 0, heapSize)
-	}
-	return arr
 }
 
 func main() {

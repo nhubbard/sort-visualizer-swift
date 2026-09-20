@@ -3,7 +3,29 @@ import java.util.Arrays;
 public class fluxsort {
   static final int FLUX_OUT = 24;
 
+  public static void sort(int[] arr) {
+    sort(arr, arr.length);
+  }
+
   // -- Fixed-size sorting networks --------------------------------------------------------------
+
+  public static void sort(int[] arr, int n) {
+    if (n < 2) {
+      return;
+    }
+
+    if (n < 32) {
+      quadSortRange(arr, 0, n);
+      return;
+    }
+
+    if (!fluxAnalyze(arr, n)) {
+      return;
+    }
+
+    int[] swapBuf = new int[n];
+    fluxPartition(arr, swapBuf, false, 0, n);
+  }
 
   static void swapTwo(int[] arr, int start) {
     if (arr[start] > arr[start + 1]) {
@@ -898,31 +920,13 @@ public class fluxsort {
   // -- Entry point
   // ---------------------------------------------------------------------------------
 
-  public static void sort(int[] arr, int n) {
-    if (n < 2) {
-      return;
-    }
-
-    if (n < 32) {
-      quadSortRange(arr, 0, n);
-      return;
-    }
-
-    if (!fluxAnalyze(arr, n)) {
-      return;
-    }
-
-    int[] swapBuf = new int[n];
-    fluxPartition(arr, swapBuf, false, 0, n);
-  }
-
   public static void main(String[] args) {
     int[] array =
         new int[] {
           55, 12, 84, 3, 47, 91, 26, 68, 8, 73, 40, 97, 15, 62, 34, 79, 21, 88, 5, 51,
           66, 29, 44, 12, 90, 1, 58, 33, 71, 19, 60, 45, 27, 82, 6, 95, 38, 63, 9, 50
         };
-    sort(array, array.length);
+    sort(array);
     System.out.println(Arrays.toString(array));
   }
 }

@@ -4,6 +4,12 @@ import (
 	"fmt"
 )
 
+func sort(arr []int) []int {
+	tmp := make([]int, len(arr))
+	merge(arr, tmp, len(arr), 0, 1)
+	return arr
+}
+
 func merge(arr []int, tmp []int, length int, residue int, modulus int) {
 	if residue+modulus >= length {
 		return
@@ -42,12 +48,6 @@ func merge(arr []int, tmp []int, length int, residue int, modulus int) {
 	for i := residue; i < length; i += modulus {
 		arr[i] = tmp[i]
 	}
-}
-
-func sort(arr []int) []int {
-	tmp := make([]int, len(arr))
-	merge(arr, tmp, len(arr), 0, 1)
-	return arr
 }
 
 func main() {

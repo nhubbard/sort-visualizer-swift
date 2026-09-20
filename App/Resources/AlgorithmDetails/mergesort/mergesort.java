@@ -1,6 +1,10 @@
 import java.util.Arrays;
 
 public class mergesort {
+  public static void sort(int[] arr) {
+    mergeSort(arr, 0, arr.length - 1);
+  }
+
   public static void merge(int[] arr, int l, int m, int r) {
     int n1 = m - l + 1;
     int n2 = r - m;
@@ -48,12 +52,11 @@ public class mergesort {
     }
   }
 
-  public static void sort(int[] arr) {
-    mergeSort(arr, 0, arr.length - 1);
-  }
-
   public static void main(String[] args) {
-    int[] array = new int[] {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     sort(array);
     System.out.println(Arrays.toString(array));
   }

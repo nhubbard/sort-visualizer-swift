@@ -5,6 +5,11 @@ import (
 	"math"
 )
 
+func sort(arr []int) []int {
+	mergeExchangeSort(arr)
+	return arr
+}
+
 func mergeExchangeSort(arr []int) {
 	n := len(arr)
 	if n <= 1 {
@@ -30,11 +35,6 @@ func mergeExchangeSort(arr []int) {
 			r = p
 		}
 	}
-}
-
-func sort(arr []int) []int {
-	mergeExchangeSort(arr)
-	return arr
 }
 
 func main() {

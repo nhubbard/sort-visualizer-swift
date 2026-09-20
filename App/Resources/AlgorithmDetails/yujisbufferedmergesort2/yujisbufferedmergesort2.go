@@ -4,6 +4,15 @@ import (
 	"fmt"
 )
 
+func sort(arr []int) []int {
+	n := len(arr)
+	if n <= 1 {
+		return arr
+	}
+	bufferedMerge(arr, 0, n)
+	return arr
+}
+
 func ceilLog(n int) int {
 	i := 0
 	for (1 << i) < n {
@@ -191,15 +200,6 @@ func bufferedMerge(arr []int, a, b int) {
 	multiSwap(arr, a, b-(m-a), m-a)
 	s := merge(arr, m, b-(m-a), b, a)
 	bufferedMerge(arr, b-(m-a)-s, b)
-}
-
-func sort(arr []int) []int {
-	n := len(arr)
-	if n <= 1 {
-		return arr
-	}
-	bufferedMerge(arr, 0, n)
-	return arr
 }
 
 func main() {

@@ -1,3 +1,7 @@
+fun sort(arr: Array<Int>) {
+  quicksortTernaryLR(arr, 0, arr.size - 1)
+}
+
 fun compare3(arr: Array<Int>, a: Int, b: Int): Int {
   if (arr[a] == arr[b]) return 0
   return if (arr[a] > arr[b]) 1 else -1
@@ -82,10 +86,6 @@ fun quicksortTernaryLR(arr: Array<Int>, lo: Int, hi: Int) {
 
   quicksortTernaryLR(arr, lo, lo + numLess - 1)
   quicksortTernaryLR(arr, hi - numGreater + 1, hi)
-}
-
-fun sort(arr: Array<Int>) {
-  quicksortTernaryLR(arr, 0, arr.size - 1)
 }
 
 fun main() {

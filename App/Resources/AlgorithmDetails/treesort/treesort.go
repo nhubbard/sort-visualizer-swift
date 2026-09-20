@@ -10,6 +10,22 @@ type Node struct {
 	right   *Node
 }
 
+func sort(arr []int) []int {
+	n := len(arr)
+	var root *Node
+	for i := 0; i < n; i++ {
+		root = add(arr, root, i)
+	}
+
+	result := make([]int, 0, n)
+	traverse(arr, root, &result)
+
+	for i := 0; i < n; i++ {
+		arr[i] = result[i]
+	}
+	return arr
+}
+
 func add(arr []int, node *Node, addPtr int) *Node {
 	if node == nil {
 		return &Node{pointer: addPtr}
@@ -29,22 +45,6 @@ func traverse(arr []int, node *Node, result *[]int) {
 	traverse(arr, node.left, result)
 	*result = append(*result, arr[node.pointer])
 	traverse(arr, node.right, result)
-}
-
-func sort(arr []int) []int {
-	n := len(arr)
-	var root *Node
-	for i := 0; i < n; i++ {
-		root = add(arr, root, i)
-	}
-
-	result := make([]int, 0, n)
-	traverse(arr, root, &result)
-
-	for i := 0; i < n; i++ {
-		arr[i] = result[i]
-	}
-	return arr
 }
 
 func main() {

@@ -1,7 +1,27 @@
 import java.util.Arrays;
 
 public class quadsort {
+  public static void sort(int[] arr) {
+    sort(arr, arr.length);
+  }
+
   // -- Fixed-size sorting networks --------------------------------------------------------------
+
+  public static void sort(int[] arr, int n) {
+    if (n < 16) {
+      tailSwap(arr, 0, n);
+    } else if (n < 256) {
+      if (quadSwap(arr, 0, n) == 0) {
+        int[] buffer = new int[128];
+        tailMerge(arr, buffer, 0, n, 16);
+      }
+    } else {
+      if (quadSwap(arr, 0, n) == 0) {
+        int[] buffer = new int[n / 2];
+        quadMerge(arr, buffer, 0, n, 16);
+      }
+    }
+  }
 
   static void swapTwo(int[] arr, int start) {
     if (arr[start] > arr[start + 1]) {
@@ -724,29 +744,13 @@ public class quadsort {
 
   // Top-level dispatch by size: under 16 is a plain tailSwap; under 256 pre-sorts via quadSwap
   // then finishes with tailMerge; 256 and up finishes with the full quadMerge pass instead.
-  public static void sort(int[] arr, int n) {
-    if (n < 16) {
-      tailSwap(arr, 0, n);
-    } else if (n < 256) {
-      if (quadSwap(arr, 0, n) == 0) {
-        int[] buffer = new int[128];
-        tailMerge(arr, buffer, 0, n, 16);
-      }
-    } else {
-      if (quadSwap(arr, 0, n) == 0) {
-        int[] buffer = new int[n / 2];
-        quadMerge(arr, buffer, 0, n, 16);
-      }
-    }
-  }
-
   public static void main(String[] args) {
     int[] array =
         new int[] {
           55, 12, 84, 3, 47, 91, 26, 68, 8, 73, 40, 97, 15, 62, 34, 79, 21, 88, 5, 51,
           66, 29, 44, 12, 90, 1, 58, 33, 71, 19, 60, 45, 27, 82, 6, 95, 38, 63, 9, 50
         };
-    sort(array, array.length);
+    sort(array);
     System.out.println(Arrays.toString(array));
   }
 }

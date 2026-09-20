@@ -1,5 +1,55 @@
 // Reverses arr[0..hi] in place. This "flip" is the only move the algorithm ever performs; there
 // is no per-element shift anywhere.
+fun sort(arr: Array<Int>) {
+  val n = arr.size
+  if (n < 2) {
+    return
+  }
+
+  var ascending = sortFirstThree(arr, n)
+
+  for (i in 3 until n) {
+    if (ascending) {
+      if (arr[i - 1] <= arr[i]) {
+        // Already fits; the ascending prefix already ends at or below the new element.
+        continue
+      }
+      if (arr[0] > arr[i]) {
+        // The new element is smaller than everything in the prefix -- one flip turns the whole
+        // thing, including the new element, into a descending run.
+        flip(arr, i - 1)
+        ascending = false
+        continue
+      }
+      val idx = searchAscending(arr, 0, i, i)
+      flip(arr, i)
+      val tail = i - idx
+      flip(arr, tail)
+      flip(arr, tail - 1)
+      ascending = false
+    } else {
+      if (arr[i - 1] > arr[i]) {
+        continue
+      }
+      if (arr[0] <= arr[i]) {
+        flip(arr, i - 1)
+        ascending = true
+        continue
+      }
+      val idx = searchDescending(arr, 0, i, i)
+      flip(arr, i)
+      val tail = i - idx
+      flip(arr, tail)
+      flip(arr, tail - 1)
+      ascending = true
+    }
+  }
+
+  if (!ascending) {
+    flip(arr, n - 1)
+  }
+}
+
 fun flip(arr: Array<Int>, hiIn: Int) {
   var lo = 0
   var hi = hiIn
@@ -69,56 +119,6 @@ fun sortFirstThree(arr: Array<Int>, n: Int): Boolean {
     return true
   }
   return true
-}
-
-fun sort(arr: Array<Int>) {
-  val n = arr.size
-  if (n < 2) {
-    return
-  }
-
-  var ascending = sortFirstThree(arr, n)
-
-  for (i in 3 until n) {
-    if (ascending) {
-      if (arr[i - 1] <= arr[i]) {
-        // Already fits; the ascending prefix already ends at or below the new element.
-        continue
-      }
-      if (arr[0] > arr[i]) {
-        // The new element is smaller than everything in the prefix -- one flip turns the whole
-        // thing, including the new element, into a descending run.
-        flip(arr, i - 1)
-        ascending = false
-        continue
-      }
-      val idx = searchAscending(arr, 0, i, i)
-      flip(arr, i)
-      val tail = i - idx
-      flip(arr, tail)
-      flip(arr, tail - 1)
-      ascending = false
-    } else {
-      if (arr[i - 1] > arr[i]) {
-        continue
-      }
-      if (arr[0] <= arr[i]) {
-        flip(arr, i - 1)
-        ascending = true
-        continue
-      }
-      val idx = searchDescending(arr, 0, i, i)
-      flip(arr, i)
-      val tail = i - idx
-      flip(arr, tail)
-      flip(arr, tail - 1)
-      ascending = true
-    }
-  }
-
-  if (!ascending) {
-    flip(arr, n - 1)
-  }
 }
 
 fun main() {

@@ -1,6 +1,27 @@
 import java.util.Arrays;
 
 public class laziestsort {
+  public static void sort(int[] arr) {
+    int n = arr.length;
+    if (n <= 16) {
+      binaryInsertionSort(arr, 0, n);
+      return;
+    }
+
+    int blockSize = Math.max(16, integerSqrt(n));
+    int low = 0;
+    while (low + 2 * blockSize < n) {
+      binaryInsertionSort(arr, low, low + blockSize);
+      low += blockSize;
+    }
+    binaryInsertionSort(arr, low, n);
+
+    while (low >= blockSize) {
+      merge(arr, low - blockSize, low, n);
+      low -= blockSize;
+    }
+  }
+
   static void binaryInsertionSort(int[] arr, int lo, int hi) {
     for (int i = lo + 1; i < hi; i++) {
       int key = arr[i];
@@ -102,27 +123,6 @@ public class laziestsort {
       r--;
     }
     return r;
-  }
-
-  public static void sort(int[] arr) {
-    int n = arr.length;
-    if (n <= 16) {
-      binaryInsertionSort(arr, 0, n);
-      return;
-    }
-
-    int blockSize = Math.max(16, integerSqrt(n));
-    int low = 0;
-    while (low + 2 * blockSize < n) {
-      binaryInsertionSort(arr, low, low + blockSize);
-      low += blockSize;
-    }
-    binaryInsertionSort(arr, low, n);
-
-    while (low >= blockSize) {
-      merge(arr, low - blockSize, low, n);
-      low -= blockSize;
-    }
   }
 
   public static void main(String[] args) {

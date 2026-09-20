@@ -1,3 +1,25 @@
+fun sort(arr: Array<Int>) {
+  val n = arr.size
+  if (n < 2) return
+  var maxValue = arr[0]
+  for (i in 1 until n) {
+    if (arr[i] > maxValue) maxValue = arr[i]
+  }
+  val bit = mostSignificantBit(maxValue)
+
+  val tasks = ArrayDeque<Triple<Int, Int, Int>>()
+  tasks.addLast(Triple(0, n - 1, bit))
+
+  while (tasks.isNotEmpty()) {
+    val (p, r, b) = tasks.removeFirst()
+    if (p < r && b >= 0) {
+      val q = partition(arr, p, r, b)
+      tasks.addLast(Triple(p, q, b - 1))
+      tasks.addLast(Triple(q + 1, r, b - 1))
+    }
+  }
+}
+
 fun mostSignificantBit(value: Int): Int {
   if (value == 0) return -1
   var bit = 0
@@ -21,28 +43,6 @@ fun partition(arr: Array<Int>, p: Int, r: Int, bit: Int): Int {
       arr[j] = temp
     } else {
       return j
-    }
-  }
-}
-
-fun sort(arr: Array<Int>) {
-  val n = arr.size
-  if (n < 2) return
-  var maxValue = arr[0]
-  for (i in 1 until n) {
-    if (arr[i] > maxValue) maxValue = arr[i]
-  }
-  val bit = mostSignificantBit(maxValue)
-
-  val tasks = ArrayDeque<Triple<Int, Int, Int>>()
-  tasks.addLast(Triple(0, n - 1, bit))
-
-  while (tasks.isNotEmpty()) {
-    val (p, r, b) = tasks.removeFirst()
-    if (p < r && b >= 0) {
-      val q = partition(arr, p, r, b)
-      tasks.addLast(Triple(p, q, b - 1))
-      tasks.addLast(Triple(q + 1, r, b - 1))
     }
   }
 }

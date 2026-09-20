@@ -1,3 +1,7 @@
+fun sort(arr: IntArray) {
+  librarySort(arr)
+}
+
 fun binarySearch(arr: IntArray, item: Int, start: Int, end: Int): Int {
   var lo = start
   var hi = end
@@ -98,10 +102,6 @@ fun librarySort(arr: IntArray) {
     i++
   }
   rebalance(arr, temp, counts, locations, spineSize, n)
-}
-
-fun sort(arr: IntArray) {
-  librarySort(arr)
 }
 
 fun main() {

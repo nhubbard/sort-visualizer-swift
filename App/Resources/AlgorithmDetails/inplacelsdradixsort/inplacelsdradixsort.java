@@ -1,34 +1,6 @@
 import java.util.Arrays;
 
 public class inplacelsdradixsort {
-  private static int intPow(int base, int exponent) {
-    int result = 1;
-    for (int i = 0; i < exponent; i++) {
-      result *= base;
-    }
-    return result;
-  }
-
-  private static int getDigit(int value, int power, int radix) {
-    return (value / intPow(radix, power)) % radix;
-  }
-
-  private static void multiSwap(int[] arr, int pos, int to) {
-    if (to > pos) {
-      for (int k = pos; k < to; k++) {
-        int temp = arr[k];
-        arr[k] = arr[k + 1];
-        arr[k + 1] = temp;
-      }
-    } else if (to < pos) {
-      for (int k = pos; k > to; k--) {
-        int temp = arr[k];
-        arr[k] = arr[k - 1];
-        arr[k - 1] = temp;
-      }
-    }
-  }
-
   public static void sort(int[] arr) {
     int n = arr.length;
     if (n == 0) {
@@ -72,8 +44,39 @@ public class inplacelsdradixsort {
     }
   }
 
+  private static int intPow(int base, int exponent) {
+    int result = 1;
+    for (int i = 0; i < exponent; i++) {
+      result *= base;
+    }
+    return result;
+  }
+
+  private static int getDigit(int value, int power, int radix) {
+    return (value / intPow(radix, power)) % radix;
+  }
+
+  private static void multiSwap(int[] arr, int pos, int to) {
+    if (to > pos) {
+      for (int k = pos; k < to; k++) {
+        int temp = arr[k];
+        arr[k] = arr[k + 1];
+        arr[k + 1] = temp;
+      }
+    } else if (to < pos) {
+      for (int k = pos; k > to; k--) {
+        int temp = arr[k];
+        arr[k] = arr[k - 1];
+        arr[k - 1] = temp;
+      }
+    }
+  }
+
   public static void main(String[] args) {
-    int[] array = new int[] {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     sort(array);
     System.out.println(Arrays.toString(array));
   }

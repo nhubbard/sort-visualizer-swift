@@ -4,6 +4,39 @@ import (
 	"fmt"
 )
 
+func sort(arr []int) []int {
+	n := len(arr)
+	if n <= 1 {
+		return arr
+	}
+	d := 1
+	for d < n {
+		d <<= 1
+	}
+	for d > 1 {
+		i := 0
+		dec := 0
+		for i < n {
+			j := i
+			dec += n
+			for dec >= d {
+				dec -= d
+				j++
+			}
+			k := j
+			dec += n
+			for dec >= d {
+				dec -= d
+				k++
+			}
+			weaveMerge(arr, i, j, k)
+			i = k
+		}
+		d /= 2
+	}
+	return arr
+}
+
 func insertTo(arr []int, a, b int) {
 	temp := arr[a]
 	for a > b {
@@ -116,39 +149,6 @@ func weaveMerge(arr []int, a, mInit, b int) {
 		e = f
 	}
 	weaveInsert(arr, a, b, right)
-}
-
-func sort(arr []int) []int {
-	n := len(arr)
-	if n <= 1 {
-		return arr
-	}
-	d := 1
-	for d < n {
-		d <<= 1
-	}
-	for d > 1 {
-		i := 0
-		dec := 0
-		for i < n {
-			j := i
-			dec += n
-			for dec >= d {
-				dec -= d
-				j++
-			}
-			k := j
-			dec += n
-			for dec >= d {
-				dec -= d
-				k++
-			}
-			weaveMerge(arr, i, j, k)
-			i = k
-		}
-		d /= 2
-	}
-	return arr
 }
 
 func main() {

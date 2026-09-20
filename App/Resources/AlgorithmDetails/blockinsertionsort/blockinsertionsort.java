@@ -1,6 +1,24 @@
 import java.util.Arrays;
 
 public class blockinsertionsort {
+  public static void sort(int[] arr) {
+    int n = arr.length;
+    if (n < 2) return;
+    int i = findRun(arr, 0, n);
+    while (i < n) {
+      int j = findRun(arr, i, n);
+      int len = j - i;
+      if (len == 1) {
+        insert1(arr, 0, i);
+      } else if (len == 2) {
+        insert2(arr, 0, i, i + 1);
+      } else {
+        mergeWithoutBuffer(arr, 0, i, len);
+      }
+      i = j;
+    }
+  }
+
   public static void multiSwap(int[] arr, int a, int b, int count) {
     for (int i = 0; i < count; i++) {
       int t = arr[a + i];
@@ -41,16 +59,28 @@ public class blockinsertionsort {
     if (len1 < len2) {
       while (len1 != 0) {
         int loc = binSearch(arr, pos + len1, len2, pos, true);
-        if (loc != 0) { rotate(arr, pos, len1, loc); pos += loc; len2 -= loc; }
+        if (loc != 0) {
+          rotate(arr, pos, len1, loc);
+          pos += loc;
+          len2 -= loc;
+        }
         if (len2 == 0) break;
-        do { pos++; len1--; } while (len1 != 0 && arr[pos] <= arr[pos + len1]);
+        do {
+          pos++;
+          len1--;
+        } while (len1 != 0 && arr[pos] <= arr[pos + len1]);
       }
     } else {
       while (len2 != 0) {
         int loc = binSearch(arr, pos, len1, pos + len1 + len2 - 1, false);
-        if (loc != len1) { rotate(arr, pos + loc, len1 - loc, len2); len1 = loc; }
+        if (loc != len1) {
+          rotate(arr, pos + loc, len1 - loc, len2);
+          len1 = loc;
+        }
         if (len1 == 0) break;
-        do { len2--; } while (len2 != 0 && arr[pos + len1 - 1] <= arr[pos + len1 + len2 - 1]);
+        do {
+          len2--;
+        } while (len2 != 0 && arr[pos + len1 - 1] <= arr[pos + len1 + len2 - 1]);
       }
     }
   }
@@ -109,26 +139,11 @@ public class blockinsertionsort {
     arr[l + 1] = tmpL;
   }
 
-  public static void sort(int[] arr) {
-    int n = arr.length;
-    if (n < 2) return;
-    int i = findRun(arr, 0, n);
-    while (i < n) {
-      int j = findRun(arr, i, n);
-      int len = j - i;
-      if (len == 1) {
-        insert1(arr, 0, i);
-      } else if (len == 2) {
-        insert2(arr, 0, i, i + 1);
-      } else {
-        mergeWithoutBuffer(arr, 0, i, len);
-      }
-      i = j;
-    }
-  }
-
   public static void main(String[] args) {
-    int[] array = new int[] {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     sort(array);
     System.out.println(Arrays.toString(array));
   }

@@ -32,7 +32,9 @@ fun sort(arr: Array<Int>) {
 }
 
 fun main() {
-  var array = arrayOf<Int>(0, 39, 21, 62, 14)
+  var array = arrayOf<Int>(
+    0, 39, 21, 62, 14,
+  )
   sort(array)
   println("[%s]".format(array.joinToString(", ")))
 }

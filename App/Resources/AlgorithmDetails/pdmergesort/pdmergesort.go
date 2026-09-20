@@ -4,6 +4,43 @@ import (
 	"fmt"
 )
 
+func sort(arr []int) []int {
+	n := len(arr)
+	if n < 2 {
+		return arr
+	}
+
+	var runs []int
+	lastRun := 0
+	for lastRun != -1 {
+		runs = append(runs, lastRun)
+		lastRun = identifyRun(arr, lastRun, n)
+	}
+
+	buffer := make([]int, n)
+	runCount := len(runs)
+	for runCount > 1 {
+		i := 0
+		for i < runCount-1 {
+			end := n
+			if i+2 < runCount {
+				end = runs[i+2]
+			}
+			mergeRuns(arr, runs[i], runs[i+1], end, buffer)
+			i += 2
+		}
+
+		compacted := make([]int, 0, (runCount+1)/2)
+		for j := 0; j < runCount; j += 2 {
+			compacted = append(compacted, runs[j])
+		}
+		runs = compacted
+		runCount = len(runs)
+	}
+
+	return arr
+}
+
 func reverseRun(arr []int, lo, hi int) {
 	for lo < hi {
 		arr[lo], arr[hi] = arr[hi], arr[lo]
@@ -100,43 +137,6 @@ func mergeRuns(arr []int, leftStart, rightStart, end int, buffer []int) {
 	} else {
 		mergeUp(arr, leftStart, rightStart, end, buffer)
 	}
-}
-
-func sort(arr []int) []int {
-	n := len(arr)
-	if n < 2 {
-		return arr
-	}
-
-	var runs []int
-	lastRun := 0
-	for lastRun != -1 {
-		runs = append(runs, lastRun)
-		lastRun = identifyRun(arr, lastRun, n)
-	}
-
-	buffer := make([]int, n)
-	runCount := len(runs)
-	for runCount > 1 {
-		i := 0
-		for i < runCount-1 {
-			end := n
-			if i+2 < runCount {
-				end = runs[i+2]
-			}
-			mergeRuns(arr, runs[i], runs[i+1], end, buffer)
-			i += 2
-		}
-
-		compacted := make([]int, 0, (runCount+1)/2)
-		for j := 0; j < runCount; j += 2 {
-			compacted = append(compacted, runs[j])
-		}
-		runs = compacted
-		runCount = len(runs)
-	}
-
-	return arr
 }
 
 func main() {

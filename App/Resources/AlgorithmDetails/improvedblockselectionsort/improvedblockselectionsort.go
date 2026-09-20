@@ -4,6 +4,48 @@ import (
 	"fmt"
 )
 
+func sort(arr []int) []int {
+	n := len(arr)
+	if n <= 1 {
+		return arr
+	}
+	j := 1
+	for j < n {
+		bLen := blockRoot(j)
+		runLength := j
+		b := n - n%bLen
+
+		for runLength > 16 {
+			i := 0
+			for i+j < b {
+				k := i
+				for k+runLength < minInt(i+2*j, b) {
+					blockSelect(arr, k, k+runLength, minInt(k+2*runLength, b), bLen)
+					k += runLength
+				}
+				i += 2 * j
+			}
+			runLength = bLen
+			bLen = blockRoot(bLen)
+		}
+
+		i := 0
+		for i+j < b {
+			k := i
+			f := i
+			for k+runLength < minInt(i+2*j, b) {
+				f = inPlaceMerge(arr, f, k+runLength, minInt(k+2*runLength, b))
+				k += runLength
+			}
+			i += 2 * j
+		}
+
+		inPlaceMergeBW(arr, n-n%(2*j), b, n)
+		j *= 2
+	}
+	return arr
+}
+
 func blockRoot(n int) int {
 	i := 1
 	for i*i < n {
@@ -142,48 +184,6 @@ func minInt(a, b int) int {
 		return a
 	}
 	return b
-}
-
-func sort(arr []int) []int {
-	n := len(arr)
-	if n <= 1 {
-		return arr
-	}
-	j := 1
-	for j < n {
-		bLen := blockRoot(j)
-		runLength := j
-		b := n - n%bLen
-
-		for runLength > 16 {
-			i := 0
-			for i+j < b {
-				k := i
-				for k+runLength < minInt(i+2*j, b) {
-					blockSelect(arr, k, k+runLength, minInt(k+2*runLength, b), bLen)
-					k += runLength
-				}
-				i += 2 * j
-			}
-			runLength = bLen
-			bLen = blockRoot(bLen)
-		}
-
-		i := 0
-		for i+j < b {
-			k := i
-			f := i
-			for k+runLength < minInt(i+2*j, b) {
-				f = inPlaceMerge(arr, f, k+runLength, minInt(k+2*runLength, b))
-				k += runLength
-			}
-			i += 2 * j
-		}
-
-		inPlaceMergeBW(arr, n-n%(2*j), b, n)
-		j *= 2
-	}
-	return arr
 }
 
 func main() {

@@ -1,3 +1,7 @@
+fun sort(arr: Array<Int>) {
+  quickSort(arr, 0, arr.size - 1)
+}
+
 fun partition(arr: Array<Int>, lo: Int, hi: Int): Int {
   val pivot = arr[hi]
   var i = lo
@@ -17,10 +21,6 @@ fun quickSort(arr: Array<Int>, lo: Int, hi: Int) {
     quickSort(arr, lo, p - 1)
     quickSort(arr, p + 1, hi)
   }
-}
-
-fun sort(arr: Array<Int>) {
-  quickSort(arr, 0, arr.size - 1)
 }
 
 fun main() {

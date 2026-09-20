@@ -13,6 +13,109 @@ const insertSortThreshold = 24
 const nintherThreshold = 128
 const partialInsertSortLimit = 8
 
+func sort(arr []int) []int {
+	length := len(arr)
+	if length < 2 {
+		return arr
+	}
+
+	dropped := []int{}
+	numDroppedInARow := 0
+	read := 0
+	write := 0
+	iteration := 0
+	earlyOutStop := length / earlyOutTestAt
+
+	for read < length {
+		iteration++
+		if iteration == earlyOutStop && float64(len(dropped)) > float64(read)*earlyOutDisorderFraction {
+			// Too disordered for the adaptive approach to be worth it: flush what's been
+			// dropped so far back into the array and fall back to a plain full sort.
+			for _, value := range dropped {
+				arr[write] = value
+				write++
+			}
+			dropped = dropped[:0]
+			pdqSort(arr, 0, length)
+			return arr
+		}
+
+		if write == 0 || arr[read] >= arr[write-1] {
+			// In order -- keep it.
+			arr[write] = arr[read]
+			write++
+			read++
+			numDroppedInARow = 0
+		} else if numDroppedInARow == 0 && write >= 2 && arr[read] >= arr[write-2] {
+			// Quick undo: the element two back would have accepted this one just fine, so
+			// drop the one right before it instead of the new element.
+			dropped = append(dropped, arr[write-1])
+			arr[write-1] = arr[read]
+			read++
+		} else if numDroppedInARow < recency {
+			dropped = append(dropped, arr[read])
+			read++
+			numDroppedInARow++
+		} else {
+			// Accepting something numDroppedInARow elements back made every subsequent
+			// element drop -- that accept was a mistake. Undo it, and any other recently
+			// accepted elements bigger than the dropped run's maximum.
+			dropped = dropped[:len(dropped)-numDroppedInARow]
+			read -= numDroppedInARow
+
+			numBacktracked := 1
+			write--
+
+			maxOfDropped := arr[read]
+			for i := read + 1; i <= read+numDroppedInARow; i++ {
+				if arr[i] > maxOfDropped {
+					maxOfDropped = arr[i]
+				}
+			}
+
+			for write >= 1 && maxOfDropped < arr[write-1] {
+				write--
+				numBacktracked++
+			}
+
+			for i := write; i < write+numBacktracked; i++ {
+				dropped = append(dropped, arr[i])
+			}
+
+			numDroppedInARow = 0
+		}
+	}
+
+	for offset, value := range dropped {
+		arr[write+offset] = value
+	}
+
+	pdqSort(arr, write, length)
+
+	// Copy the now-sorted dropped tail before the final backward merge starts overwriting
+	// arr[write:] in place.
+	buffer := make([]int, len(dropped))
+	copy(buffer, arr[write:write+len(dropped)])
+
+	i := len(buffer) - 1
+	j := write - 1
+	k := length - 1
+
+	for i >= 0 {
+		if j < 0 || buffer[i] > arr[j] {
+			arr[k] = buffer[i]
+			k--
+			i--
+		} else {
+			arr[k] = arr[j]
+			k--
+			j--
+		}
+	}
+
+	return arr
+}
+
 func pdqLog(n int) int {
 	log := 0
 	for {
@@ -291,109 +394,6 @@ func pdqSort(arr []int, begin, end int) {
 	if end-begin > 1 {
 		pdqLoop(arr, begin, end, pdqLog(end-begin))
 	}
-}
-
-func sort(arr []int) []int {
-	length := len(arr)
-	if length < 2 {
-		return arr
-	}
-
-	dropped := []int{}
-	numDroppedInARow := 0
-	read := 0
-	write := 0
-	iteration := 0
-	earlyOutStop := length / earlyOutTestAt
-
-	for read < length {
-		iteration++
-		if iteration == earlyOutStop && float64(len(dropped)) > float64(read)*earlyOutDisorderFraction {
-			// Too disordered for the adaptive approach to be worth it: flush what's been
-			// dropped so far back into the array and fall back to a plain full sort.
-			for _, value := range dropped {
-				arr[write] = value
-				write++
-			}
-			dropped = dropped[:0]
-			pdqSort(arr, 0, length)
-			return arr
-		}
-
-		if write == 0 || arr[read] >= arr[write-1] {
-			// In order -- keep it.
-			arr[write] = arr[read]
-			write++
-			read++
-			numDroppedInARow = 0
-		} else if numDroppedInARow == 0 && write >= 2 && arr[read] >= arr[write-2] {
-			// Quick undo: the element two back would have accepted this one just fine, so
-			// drop the one right before it instead of the new element.
-			dropped = append(dropped, arr[write-1])
-			arr[write-1] = arr[read]
-			read++
-		} else if numDroppedInARow < recency {
-			dropped = append(dropped, arr[read])
-			read++
-			numDroppedInARow++
-		} else {
-			// Accepting something numDroppedInARow elements back made every subsequent
-			// element drop -- that accept was a mistake. Undo it, and any other recently
-			// accepted elements bigger than the dropped run's maximum.
-			dropped = dropped[:len(dropped)-numDroppedInARow]
-			read -= numDroppedInARow
-
-			numBacktracked := 1
-			write--
-
-			maxOfDropped := arr[read]
-			for i := read + 1; i <= read+numDroppedInARow; i++ {
-				if arr[i] > maxOfDropped {
-					maxOfDropped = arr[i]
-				}
-			}
-
-			for write >= 1 && maxOfDropped < arr[write-1] {
-				write--
-				numBacktracked++
-			}
-
-			for i := write; i < write+numBacktracked; i++ {
-				dropped = append(dropped, arr[i])
-			}
-
-			numDroppedInARow = 0
-		}
-	}
-
-	for offset, value := range dropped {
-		arr[write+offset] = value
-	}
-
-	pdqSort(arr, write, length)
-
-	// Copy the now-sorted dropped tail before the final backward merge starts overwriting
-	// arr[write:] in place.
-	buffer := make([]int, len(dropped))
-	copy(buffer, arr[write:write+len(dropped)])
-
-	i := len(buffer) - 1
-	j := write - 1
-	k := length - 1
-
-	for i >= 0 {
-		if j < 0 || buffer[i] > arr[j] {
-			arr[k] = buffer[i]
-			k--
-			i--
-		} else {
-			arr[k] = arr[j]
-			k--
-			j--
-		}
-	}
-
-	return arr
 }
 
 func main() {

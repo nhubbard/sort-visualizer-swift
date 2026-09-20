@@ -1,19 +1,3 @@
-fun compSwap(arr: Array<Int>, a: Int, b: Int, end: Int) {
-  if (b < end && arr[a] > arr[b]) {
-    arr[a] = arr[b].also { arr[b] = arr[a] }
-  }
-}
-
-fun halver(arr: Array<Int>, low: Int, high: Int, end: Int) {
-  var lo = low
-  var hi = high
-  while (lo < hi) {
-    compSwap(arr, lo, hi, end)
-    lo++
-    hi--
-  }
-}
-
 fun sort(arr: Array<Int>) {
   val n = arr.size
   var ceilLog = 1
@@ -33,6 +17,22 @@ fun sort(arr: Array<Int>) {
       i = i shr 1
     }
     k = k shr 1
+  }
+}
+
+fun compSwap(arr: Array<Int>, a: Int, b: Int, end: Int) {
+  if (b < end && arr[a] > arr[b]) {
+    arr[a] = arr[b].also { arr[b] = arr[a] }
+  }
+}
+
+fun halver(arr: Array<Int>, low: Int, high: Int, end: Int) {
+  var lo = low
+  var hi = high
+  while (lo < hi) {
+    compSwap(arr, lo, hi, end)
+    lo++
+    hi--
   }
 }
 

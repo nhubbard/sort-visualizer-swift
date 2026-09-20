@@ -4,6 +4,12 @@ import (
 	"fmt"
 )
 
+func sort(arr []int) []int {
+	n := len(arr)
+	twinsort(arr, n)
+	return arr
+}
+
 func reverseRange(arr []int, lo int, hi int) {
 	for lo < hi {
 		arr[lo], arr[hi] = arr[hi], arr[lo]
@@ -128,12 +134,6 @@ func twinsort(arr []int, nmemb int) {
 		buf := make([]int, nmemb/2)
 		tailMerge(arr, buf, nmemb, 2)
 	}
-}
-
-func sort(arr []int) []int {
-	n := len(arr)
-	twinsort(arr, n)
-	return arr
 }
 
 func main() {

@@ -1,6 +1,28 @@
 import java.util.Arrays;
 
 public class americanflagsort {
+  public static void sort(int[] arr) {
+    int n = arr.length;
+    if (n <= 1) {
+      return;
+    }
+
+    int radix = 4;
+    int maxValue = arr[0];
+    for (int value : arr) {
+      if (value > maxValue) {
+        maxValue = value;
+      }
+    }
+
+    int divisor = 1;
+    while (maxValue / divisor >= radix) {
+      divisor *= radix;
+    }
+
+    flagSort(arr, 0, n, divisor, radix);
+  }
+
   private static int digitAt(int value, int divisor, int radix) {
     return (value / divisor) % radix;
   }
@@ -52,30 +74,11 @@ public class americanflagsort {
     }
   }
 
-  public static void sort(int[] arr) {
-    int n = arr.length;
-    if (n <= 1) {
-      return;
-    }
-
-    int radix = 4;
-    int maxValue = arr[0];
-    for (int value : arr) {
-      if (value > maxValue) {
-        maxValue = value;
-      }
-    }
-
-    int divisor = 1;
-    while (maxValue / divisor >= radix) {
-      divisor *= radix;
-    }
-
-    flagSort(arr, 0, n, divisor, radix);
-  }
-
   public static void main(String[] args) {
-    int[] array = new int[] {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     sort(array);
     System.out.println(Arrays.toString(array));
   }

@@ -4,6 +4,13 @@ import (
 	"fmt"
 )
 
+func sort(arr []int) []int {
+	if len(arr) >= 2 {
+		mergeSort(arr, 0, len(arr)-1)
+	}
+	return arr
+}
+
 func push(arr []int, low, high int) {
 	for i := low; i < high; i++ {
 		if arr[i] > arr[i+1] {
@@ -36,13 +43,6 @@ func mergeSort(arr []int, low, high int) {
 		mergeSort(arr, mid+1, high)
 		merge(arr, low, high, mid)
 	}
-}
-
-func sort(arr []int) []int {
-	if len(arr) >= 2 {
-		mergeSort(arr, 0, len(arr)-1)
-	}
-	return arr
 }
 
 func main() {

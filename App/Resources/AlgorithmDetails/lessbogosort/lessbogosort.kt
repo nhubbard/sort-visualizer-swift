@@ -1,3 +1,10 @@
+fun sort(arr: Array<Int>) {
+  val n = arr.size
+  for (i in 0 until n)
+    while (!isMinimum(arr, i, n))
+      shuffleRange(arr, i, n)
+}
+
 fun isMinimum(arr: Array<Int>, start: Int, end: Int): Boolean {
   for (k in start + 1 until end)
     if (arr[start] > arr[k])
@@ -14,15 +21,10 @@ fun shuffleRange(arr: Array<Int>, start: Int, end: Int) {
   }
 }
 
-fun sort(arr: Array<Int>) {
-  val n = arr.size
-  for (i in 0 until n)
-    while (!isMinimum(arr, i, n))
-      shuffleRange(arr, i, n)
-}
-
 fun main() {
-  val array = arrayOf<Int>(0, 39, 21, 62, 91, 77, 14, 23)
+  val array = arrayOf<Int>(
+    0, 39, 21, 62, 91, 77, 14, 23,
+  )
   sort(array)
   println("[%s]".format(array.joinToString(", ")))
 }

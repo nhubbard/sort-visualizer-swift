@@ -1,6 +1,30 @@
 import java.util.Arrays;
 
 public class tablesort {
+  public static void sort(int[] arr) {
+    int n = arr.length;
+    int[] table = new int[n];
+    for (int i = 0; i < n; i++) {
+      table[i] = i;
+    }
+    quickSort(arr, table, 0, n);
+    for (int i = 0; i < n; i++) {
+      if (table[i] != i) {
+        int t = arr[i];
+        int j = i;
+        int next = table[i];
+        do {
+          arr[j] = arr[next];
+          table[j] = j;
+          j = next;
+          next = table[next];
+        } while (next != i);
+        arr[j] = t;
+        table[j] = j;
+      }
+    }
+  }
+
   public static boolean stableComp(int[] arr, int[] table, int a, int b) {
     int ta = table[a];
     int tb = table[b];
@@ -71,32 +95,11 @@ public class tablesort {
     quickSort(arr, table, p + 1, b);
   }
 
-  public static void sort(int[] arr) {
-    int n = arr.length;
-    int[] table = new int[n];
-    for (int i = 0; i < n; i++) {
-      table[i] = i;
-    }
-    quickSort(arr, table, 0, n);
-    for (int i = 0; i < n; i++) {
-      if (table[i] != i) {
-        int t = arr[i];
-        int j = i;
-        int next = table[i];
-        do {
-          arr[j] = arr[next];
-          table[j] = j;
-          j = next;
-          next = table[next];
-        } while (next != i);
-        arr[j] = t;
-        table[j] = j;
-      }
-    }
-  }
-
   public static void main(String[] args) {
-    int[] array = new int[] {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     sort(array);
     System.out.println(Arrays.toString(array));
   }

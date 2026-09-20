@@ -1,13 +1,3 @@
-fun flip(arr: Array<Int>, end: Int) {
-  var start = 0
-  var e = end
-  while (start < e) {
-    arr[start] = arr[e].also { arr[e] = arr[start] }
-    start++
-    e--
-  }
-}
-
 fun sort(arr: Array<Int>) {
   val n = arr.size
   for (i in n - 1 downTo 1) {
@@ -23,6 +13,16 @@ fun sort(arr: Array<Int>) {
       flip(arr, i - 1)
       flip(arr, max - 1)
     }
+  }
+}
+
+fun flip(arr: Array<Int>, end: Int) {
+  var start = 0
+  var e = end
+  while (start < e) {
+    arr[start] = arr[e].also { arr[e] = arr[start] }
+    start++
+    e--
   }
 }
 

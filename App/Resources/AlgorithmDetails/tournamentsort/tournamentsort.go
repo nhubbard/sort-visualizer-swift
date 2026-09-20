@@ -6,6 +6,28 @@ import (
 
 // A ref is either a player leaf, encoded as -playerIndex (so ref <= 0), or another match
 // node's root offset into matches (so ref > 0).
+func sort(array []int) []int {
+	n := len(array)
+	if n <= 1 {
+		return array
+	}
+
+	matches := make([]int, 6*n)
+	tourney := knockout(array, matches, 0, n-1, 3)
+
+	output := make([]int, n)
+	for i := 0; i < n; i++ {
+		output[i] = array[getPlayer(array, matches, tourney)]
+		if isPlayer(tourney) {
+			tourney = 0
+		} else {
+			tourney = rebuild(array, matches, tourney)
+		}
+	}
+	copy(array, output)
+	return array
+}
+
 func isPlayer(ref int) bool {
 	return ref <= 0
 }
@@ -82,28 +104,6 @@ func rebuild(array, matches []int, root int) int {
 		matches[root] = getPlayer(array, matches, getWinners(matches, root))
 	}
 	return root
-}
-
-func sort(array []int) []int {
-	n := len(array)
-	if n <= 1 {
-		return array
-	}
-
-	matches := make([]int, 6*n)
-	tourney := knockout(array, matches, 0, n-1, 3)
-
-	output := make([]int, n)
-	for i := 0; i < n; i++ {
-		output[i] = array[getPlayer(array, matches, tourney)]
-		if isPlayer(tourney) {
-			tourney = 0
-		} else {
-			tourney = rebuild(array, matches, tourney)
-		}
-	}
-	copy(array, output)
-	return array
 }
 
 func main() {

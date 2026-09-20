@@ -1,6 +1,15 @@
 import java.util.Arrays;
 
 public final class poplarheapsort {
+  static void sort(int[] array) {
+    int n = array.length;
+    if (n <= 1) {
+      return;
+    }
+    makeHeap(array, 0, n);
+    sortHeap(array, 0, n);
+  }
+
   static int hyperfloor(int n) {
     int power = 1;
     while (power * 2 <= n) {
@@ -153,17 +162,11 @@ public final class poplarheapsort {
     } while (size > 1);
   }
 
-  static void sort(int[] array) {
-    int n = array.length;
-    if (n <= 1) {
-      return;
-    }
-    makeHeap(array, 0, n);
-    sortHeap(array, 0, n);
-  }
-
   public static void main(String[] args) {
-    int[] array = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     sort(array);
     System.out.println(Arrays.toString(array));
   }

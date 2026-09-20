@@ -4,15 +4,6 @@ import (
 	"fmt"
 )
 
-func flip(arr []int, end int) {
-	start := 0
-	for start < end {
-		arr[start], arr[end] = arr[end], arr[start]
-		start++
-		end--
-	}
-}
-
 func sort(arr []int) []int {
 	n := len(arr)
 	for i := n - 1; i > 0; i-- {
@@ -30,6 +21,15 @@ func sort(arr []int) []int {
 		}
 	}
 	return arr
+}
+
+func flip(arr []int, end int) {
+	start := 0
+	for start < end {
+		arr[start], arr[end] = arr[end], arr[start]
+		start++
+		end--
+	}
 }
 
 func main() {

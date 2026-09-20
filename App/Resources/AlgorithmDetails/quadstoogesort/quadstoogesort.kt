@@ -1,3 +1,7 @@
+fun sort(arr: Array<Int>) {
+  quadStooge(arr, 0, arr.size)
+}
+
 fun quadStooge(arr: Array<Int>, pos: Int, length: Int) {
   if (length >= 2 && arr[pos] > arr[pos + length - 1]) {
     arr[pos] = arr[pos + length - 1].also { arr[pos + length - 1] = arr[pos] }
@@ -18,10 +22,6 @@ fun quadStooge(arr: Array<Int>, pos: Int, length: Int) {
   if (length > 3) {
     quadStooge(arr, pos + len1 / 2, len3)
   }
-}
-
-fun sort(arr: Array<Int>) {
-  quadStooge(arr, 0, arr.size)
 }
 
 fun main() {

@@ -1,3 +1,7 @@
+fun sort(arr: Array<Int>) {
+  gravitySort(arr)
+}
+
 fun gravitySort(arr: Array<Int>) {
   val n = arr.size
   if (n == 0) return
@@ -28,10 +32,6 @@ fun gravitySort(arr: Array<Int>) {
       arr[i] += inc
     }
   }
-}
-
-fun sort(arr: Array<Int>) {
-  gravitySort(arr)
 }
 
 fun main() {

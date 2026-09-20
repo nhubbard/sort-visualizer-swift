@@ -1,3 +1,19 @@
+fun sort(arr: Array<Int>, n: Int) {
+  if (n < 16) {
+    tailSwap(arr, 0, n)
+  } else if (n < 256) {
+    if (quadSwap(arr, 0, n) == 0) {
+      val buffer = Array(128) { 0 }
+      tailMerge(arr, buffer, 0, n, 16)
+    }
+  } else {
+    if (quadSwap(arr, 0, n) == 0) {
+      val buffer = Array(n / 2) { 0 }
+      quadMerge(arr, buffer, 0, n, 16)
+    }
+  }
+}
+
 fun swap2(arr: Array<Int>, i: Int, j: Int) {
   val t = arr[i]
   arr[i] = arr[j]
@@ -701,22 +717,6 @@ fun quadSwap(arr: Array<Int>, start: Int, nmemb: Int): Int {
 
 // Top-level dispatch by size: under 16 is a plain tailSwap; under 256 pre-sorts via quadSwap then
 // finishes with tailMerge; 256 and up finishes with the full quadMerge pass instead.
-fun sort(arr: Array<Int>, n: Int) {
-  if (n < 16) {
-    tailSwap(arr, 0, n)
-  } else if (n < 256) {
-    if (quadSwap(arr, 0, n) == 0) {
-      val buffer = Array(128) { 0 }
-      tailMerge(arr, buffer, 0, n, 16)
-    }
-  } else {
-    if (quadSwap(arr, 0, n) == 0) {
-      val buffer = Array(n / 2) { 0 }
-      quadMerge(arr, buffer, 0, n, 16)
-    }
-  }
-}
-
 fun main() {
   var array = arrayOf<Int>(
     55, 12, 84, 3, 47, 91, 26, 68, 8, 73, 40, 97, 15, 62, 34, 79, 21, 88, 5, 51,

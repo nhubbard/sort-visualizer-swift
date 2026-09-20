@@ -1,6 +1,18 @@
 import java.util.Arrays;
 
 public final class minmaxheapsort {
+  static void sort(int[] arr) {
+    int n = arr.length;
+    if (n <= 1) {
+      return;
+    }
+    heapify(arr, n);
+    int heapSize = n;
+    for (int i = 0; i < n - 1; i++) {
+      heapSize = storeMax(arr, heapSize);
+    }
+  }
+
   static int bitLength(int value) {
     int length = 0;
     while (value > 0) {
@@ -98,20 +110,11 @@ public final class minmaxheapsort {
     return newSize;
   }
 
-  static void sort(int[] arr) {
-    int n = arr.length;
-    if (n <= 1) {
-      return;
-    }
-    heapify(arr, n);
-    int heapSize = n;
-    for (int i = 0; i < n - 1; i++) {
-      heapSize = storeMax(arr, heapSize);
-    }
-  }
-
   public static void main(String[] args) {
-    int[] array = new int[] {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     sort(array);
     System.out.println(Arrays.toString(array));
   }

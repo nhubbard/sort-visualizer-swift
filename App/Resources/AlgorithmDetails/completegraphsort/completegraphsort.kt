@@ -1,5 +1,33 @@
 import kotlin.math.ln
 
+fun sort(arr: Array<Int>) {
+  val n = arr.size
+  if (n <= 1) return
+  var d = 2
+  val end = 1 shl (ln((n - 1).toDouble()) / ln(2.0) + 1).toInt()
+  while (d <= end) {
+    var i = 0
+    var dec = 0
+    while (i < n) {
+      var j = i
+      dec += n
+      while (dec >= d) {
+        dec -= d
+        j++
+      }
+      var k = j
+      dec += n
+      while (dec >= d) {
+        dec -= d
+        k++
+      }
+      split(arr, i, j, k)
+      i = k
+    }
+    d *= 2
+  }
+}
+
 fun compSwap(arr: Array<Int>, a: Int, b: Int) {
   if (arr[a] > arr[b]) {
     val tmp = arr[a]
@@ -41,34 +69,6 @@ fun split(arr: Array<Int>, aIn: Int, m: Int, bIn: Int) {
     } else {
       for (j in 0 until len1) compSwap(arr, a + j, c)
     }
-  }
-}
-
-fun sort(arr: Array<Int>) {
-  val n = arr.size
-  if (n <= 1) return
-  var d = 2
-  val end = 1 shl (ln((n - 1).toDouble()) / ln(2.0) + 1).toInt()
-  while (d <= end) {
-    var i = 0
-    var dec = 0
-    while (i < n) {
-      var j = i
-      dec += n
-      while (dec >= d) {
-        dec -= d
-        j++
-      }
-      var k = j
-      dec += n
-      while (dec >= d) {
-        dec -= d
-        k++
-      }
-      split(arr, i, j, k)
-      i = k
-    }
-    d *= 2
   }
 }
 

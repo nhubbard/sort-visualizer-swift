@@ -1,6 +1,32 @@
 import java.util.Arrays;
 
 public class introcirclesortiterative {
+  public static void sort(int[] arr) {
+    int end = arr.length;
+    if (end <= 1) {
+      return;
+    }
+    int n = 1;
+    int threshold = 0;
+    while (n < end) {
+      n <<= 1;
+      threshold++;
+    }
+    threshold /= 2;
+
+    int iterations = 0;
+    while (true) {
+      iterations++;
+      if (iterations >= threshold) {
+        binaryInsertionSort(arr, end);
+        return;
+      }
+      if (circleSortRoutine(arr, n, end) == 0) {
+        return;
+      }
+    }
+  }
+
   private static int circleSortRoutine(int[] arr, int length, int end) {
     int swapCount = 0;
     for (int gap = length / 2; gap > 0; gap /= 2) {
@@ -45,34 +71,11 @@ public class introcirclesortiterative {
     }
   }
 
-  public static void sort(int[] arr) {
-    int end = arr.length;
-    if (end <= 1) {
-      return;
-    }
-    int n = 1;
-    int threshold = 0;
-    while (n < end) {
-      n <<= 1;
-      threshold++;
-    }
-    threshold /= 2;
-
-    int iterations = 0;
-    while (true) {
-      iterations++;
-      if (iterations >= threshold) {
-        binaryInsertionSort(arr, end);
-        return;
-      }
-      if (circleSortRoutine(arr, n, end) == 0) {
-        return;
-      }
-    }
-  }
-
   public static void main(String[] args) {
-    int[] array = new int[] {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     sort(array);
     System.out.println(Arrays.toString(array));
   }

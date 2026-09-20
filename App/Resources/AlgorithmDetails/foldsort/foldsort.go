@@ -4,20 +4,6 @@ import (
 	"fmt"
 )
 
-func compSwap(arr []int, a, b, end int) {
-	if b < end && arr[a] > arr[b] {
-		arr[a], arr[b] = arr[b], arr[a]
-	}
-}
-
-func halver(arr []int, low, high, end int) {
-	for low < high {
-		compSwap(arr, low, high, end)
-		low++
-		high--
-	}
-}
-
 func sort(arr []int) []int {
 	n := len(arr)
 	ceilLog := 1
@@ -41,6 +27,20 @@ func sort(arr []int) []int {
 		k >>= 1
 	}
 	return arr
+}
+
+func compSwap(arr []int, a, b, end int) {
+	if b < end && arr[a] > arr[b] {
+		arr[a], arr[b] = arr[b], arr[a]
+	}
+}
+
+func halver(arr []int, low, high, end int) {
+	for low < high {
+		compSwap(arr, low, high, end)
+		low++
+		high--
+	}
 }
 
 func main() {

@@ -4,6 +4,14 @@ const val PARTIAL_INSERT_SORT_LIMIT = 8
 const val BLOCK_SIZE = 64
 const val CACHELINE_SIZE = 64
 
+fun sort(arr: Array<Int>) {
+  val n = arr.size
+  if (n < 2) return
+  val leftOffsets = IntArray(BLOCK_SIZE + CACHELINE_SIZE)
+  val rightOffsets = IntArray(BLOCK_SIZE + CACHELINE_SIZE)
+  pdqLoop(arr, 0, n, pdqLog(n), leftOffsets, rightOffsets)
+}
+
 fun pdqLog(n0: Int): Int {
   var n = n0
   var log = 0
@@ -364,14 +372,6 @@ fun pdqLoop(arr: Array<Int>, begin0: Int, end: Int, badAllowed0: Int, leftOffset
     begin = pivotPos + 1
     leftmost = false
   }
-}
-
-fun sort(arr: Array<Int>) {
-  val n = arr.size
-  if (n < 2) return
-  val leftOffsets = IntArray(BLOCK_SIZE + CACHELINE_SIZE)
-  val rightOffsets = IntArray(BLOCK_SIZE + CACHELINE_SIZE)
-  pdqLoop(arr, 0, n, pdqLog(n), leftOffsets, rightOffsets)
 }
 
 fun main() {

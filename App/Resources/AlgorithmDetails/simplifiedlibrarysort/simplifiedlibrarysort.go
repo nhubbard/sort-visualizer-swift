@@ -4,6 +4,11 @@ import (
 	"fmt"
 )
 
+func sort(arr []int) []int {
+	librarySort(arr)
+	return arr
+}
+
 func binarySearch(arr []int, item int, start int, end int) int {
 	lo := start
 	hi := end
@@ -104,11 +109,6 @@ func librarySort(arr []int) {
 		i++
 	}
 	rebalance(arr, temp, counts, locations, spineSize, n)
-}
-
-func sort(arr []int) []int {
-	librarySort(arr)
-	return arr
 }
 
 func main() {

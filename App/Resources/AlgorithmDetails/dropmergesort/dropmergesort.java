@@ -12,6 +12,106 @@ public class dropmergesort {
   private static final int NINTHER_THRESHOLD = 128;
   private static final int PARTIAL_INSERT_SORT_LIMIT = 8;
 
+  public static void sort(int[] arr) {
+    int length = arr.length;
+    if (length < 2) {
+      return;
+    }
+
+    List<Integer> dropped = new ArrayList<>();
+    int numDroppedInARow = 0;
+    int read = 0;
+    int write = 0;
+    int iteration = 0;
+    int earlyOutStop = length / EARLY_OUT_TEST_AT;
+
+    while (read < length) {
+      iteration++;
+      if (iteration == earlyOutStop && dropped.size() > read * EARLY_OUT_DISORDER_FRACTION) {
+        // Too disordered for the adaptive approach to be worth it: flush what's been dropped so
+        // far back into the array and fall back to a plain full sort.
+        for (int value : dropped) {
+          arr[write] = value;
+          write++;
+        }
+        dropped.clear();
+        pdqSort(arr, 0, length);
+        return;
+      }
+
+      if (write == 0 || arr[read] >= arr[write - 1]) {
+        // In order -- keep it.
+        arr[write] = arr[read];
+        write++;
+        read++;
+        numDroppedInARow = 0;
+      } else if (numDroppedInARow == 0 && write >= 2 && arr[read] >= arr[write - 2]) {
+        // Quick undo: the element two back would have accepted this one just fine, so drop the
+        // one right before it instead of the new element.
+        dropped.add(arr[write - 1]);
+        arr[write - 1] = arr[read];
+        read++;
+      } else if (numDroppedInARow < RECENCY) {
+        dropped.add(arr[read]);
+        read++;
+        numDroppedInARow++;
+      } else {
+        // Accepting something `numDroppedInARow` elements back made every subsequent element
+        // drop -- that accept was a mistake. Undo it, and any other recently accepted elements
+        // bigger than the dropped run's maximum.
+        dropped.subList(dropped.size() - numDroppedInARow, dropped.size()).clear();
+        read -= numDroppedInARow;
+
+        int numBacktracked = 1;
+        write--;
+
+        int maxOfDropped = read;
+        for (int i = read + 1; i <= read + numDroppedInARow; i++) {
+          if (arr[i] > maxOfDropped) {
+            maxOfDropped = arr[i];
+          }
+        }
+
+        while (write >= 1 && maxOfDropped < arr[write - 1]) {
+          write--;
+          numBacktracked++;
+        }
+
+        for (int i = write; i < write + numBacktracked; i++) {
+          dropped.add(arr[i]);
+        }
+
+        numDroppedInARow = 0;
+      }
+    }
+
+    for (int offset = 0; offset < dropped.size(); offset++) {
+      arr[write + offset] = dropped.get(offset);
+    }
+
+    pdqSort(arr, write, length);
+
+    // Copy the now-sorted dropped tail before the final backward merge starts overwriting
+    // arr[write..] in place.
+    int[] buffer = Arrays.copyOfRange(arr, write, write + dropped.size());
+
+    int i = buffer.length - 1;
+    int j = write - 1;
+    int k = length - 1;
+
+    while (i >= 0) {
+      if (j < 0 || buffer[i] > arr[j]) {
+        arr[k] = buffer[i];
+        k--;
+        i--;
+      } else {
+        arr[k] = arr[j];
+        k--;
+        j--;
+      }
+    }
+  }
+
   private static void swap(int[] arr, int a, int b) {
     int t = arr[a];
     arr[a] = arr[b];
@@ -286,108 +386,8 @@ public class dropmergesort {
     }
   }
 
-  static void pdqSort(int[] arr, int begin, int end) { if (end - begin > 1) pdqLoop(arr, begin, end, pdqLog(end - begin)); }
-
-
-
-  public static void sort(int[] arr) {
-    int length = arr.length;
-    if (length < 2) {
-      return;
-    }
-
-    List<Integer> dropped = new ArrayList<>();
-    int numDroppedInARow = 0;
-    int read = 0;
-    int write = 0;
-    int iteration = 0;
-    int earlyOutStop = length / EARLY_OUT_TEST_AT;
-
-    while (read < length) {
-      iteration++;
-      if (iteration == earlyOutStop && dropped.size() > read * EARLY_OUT_DISORDER_FRACTION) {
-        // Too disordered for the adaptive approach to be worth it: flush what's been dropped so
-        // far back into the array and fall back to a plain full sort.
-        for (int value : dropped) {
-          arr[write] = value;
-          write++;
-        }
-        dropped.clear();
-        pdqSort(arr, 0, length);
-        return;
-      }
-
-      if (write == 0 || arr[read] >= arr[write - 1]) {
-        // In order -- keep it.
-        arr[write] = arr[read];
-        write++;
-        read++;
-        numDroppedInARow = 0;
-      } else if (numDroppedInARow == 0 && write >= 2 && arr[read] >= arr[write - 2]) {
-        // Quick undo: the element two back would have accepted this one just fine, so drop the
-        // one right before it instead of the new element.
-        dropped.add(arr[write - 1]);
-        arr[write - 1] = arr[read];
-        read++;
-      } else if (numDroppedInARow < RECENCY) {
-        dropped.add(arr[read]);
-        read++;
-        numDroppedInARow++;
-      } else {
-        // Accepting something `numDroppedInARow` elements back made every subsequent element
-        // drop -- that accept was a mistake. Undo it, and any other recently accepted elements
-        // bigger than the dropped run's maximum.
-        dropped.subList(dropped.size() - numDroppedInARow, dropped.size()).clear();
-        read -= numDroppedInARow;
-
-        int numBacktracked = 1;
-        write--;
-
-        int maxOfDropped = read;
-        for (int i = read + 1; i <= read + numDroppedInARow; i++) {
-          if (arr[i] > maxOfDropped) {
-            maxOfDropped = arr[i];
-          }
-        }
-
-        while (write >= 1 && maxOfDropped < arr[write - 1]) {
-          write--;
-          numBacktracked++;
-        }
-
-        for (int i = write; i < write + numBacktracked; i++) {
-          dropped.add(arr[i]);
-        }
-
-        numDroppedInARow = 0;
-      }
-    }
-
-    for (int offset = 0; offset < dropped.size(); offset++) {
-      arr[write + offset] = dropped.get(offset);
-    }
-
-    pdqSort(arr, write, length);
-
-    // Copy the now-sorted dropped tail before the final backward merge starts overwriting
-    // arr[write..] in place.
-    int[] buffer = Arrays.copyOfRange(arr, write, write + dropped.size());
-
-    int i = buffer.length - 1;
-    int j = write - 1;
-    int k = length - 1;
-
-    while (i >= 0) {
-      if (j < 0 || buffer[i] > arr[j]) {
-        arr[k] = buffer[i];
-        k--;
-        i--;
-      } else {
-        arr[k] = arr[j];
-        k--;
-        j--;
-      }
-    }
+  static void pdqSort(int[] arr, int begin, int end) {
+    if (end - begin > 1) pdqLoop(arr, begin, end, pdqLog(end - begin));
   }
 
   public static void main(String[] args) {

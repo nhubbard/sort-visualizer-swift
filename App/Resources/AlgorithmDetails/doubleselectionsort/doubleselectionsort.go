@@ -4,6 +4,11 @@ import (
 	"fmt"
 )
 
+func sort(arr []int) []int {
+	doubleSelectionSort(arr)
+	return arr
+}
+
 func doubleSelectionSort(arr []int) {
 	n := len(arr)
 	if n <= 1 {
@@ -37,11 +42,6 @@ func doubleSelectionSort(arr []int) {
 		smallest = left
 		biggest = right
 	}
-}
-
-func sort(arr []int) []int {
-	doubleSelectionSort(arr)
-	return arr
 }
 
 func main() {

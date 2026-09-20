@@ -1,19 +1,6 @@
 import kotlin.math.floor
 import kotlin.math.min
 
-fun insertionSort(arr: Array<Int>) {
-  val n = arr.size
-  for (i in 1 until n) {
-    var j = i
-    while (j > 0 && arr[j - 1] > arr[j]) {
-      val temp = arr[j]
-      arr[j] = arr[j - 1]
-      arr[j - 1] = temp
-      j--
-    }
-  }
-}
-
 fun sort(arr: Array<Int>) {
   val n = arr.size
   var sm: Int
@@ -37,6 +24,19 @@ fun sort(arr: Array<Int>) {
         arr[i] = arr[sm].also { arr[sm] = arr[i] }
         sorted = false
       }
+    }
+  }
+}
+
+fun insertionSort(arr: Array<Int>) {
+  val n = arr.size
+  for (i in 1 until n) {
+    var j = i
+    while (j > 0 && arr[j - 1] > arr[j]) {
+      val temp = arr[j]
+      arr[j] = arr[j - 1]
+      arr[j - 1] = temp
+      j--
     }
   }
 }

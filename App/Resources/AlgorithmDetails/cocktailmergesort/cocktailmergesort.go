@@ -4,6 +4,11 @@ import (
 	"fmt"
 )
 
+func sort(arr []int) []int {
+	cocktailMergeSort(arr)
+	return arr
+}
+
 func minRunLength(n int) int {
 	r := 0
 	for n >= 64 {
@@ -108,11 +113,6 @@ func cocktailMergeSort(arr []int) {
 		}
 		width *= 2
 	}
-}
-
-func sort(arr []int) []int {
-	cocktailMergeSort(arr)
-	return arr
 }
 
 func main() {

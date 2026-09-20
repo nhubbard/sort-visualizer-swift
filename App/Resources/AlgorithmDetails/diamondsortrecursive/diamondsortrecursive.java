@@ -1,6 +1,17 @@
 import java.util.Arrays;
 
 public class diamondsortrecursive {
+  public static void sort(int[] arr) {
+    if (arr.length < 2) {
+      return;
+    }
+    int paddedLength = 1;
+    while (paddedLength < arr.length) {
+      paddedLength *= 2;
+    }
+    sort(arr, 0, paddedLength, true);
+  }
+
   // [start, stop) is the half-open range being sorted. merge selects whether
   // the two halves are recursively pre-sorted before the fixed diamond
   // comparison pattern below merges them together.
@@ -28,16 +39,12 @@ public class diamondsortrecursive {
     }
   }
 
-  public static void sortArray(int[] arr) {
-    if (arr.length < 2) return;
-    int paddedLength = 1;
-    while (paddedLength < arr.length) paddedLength *= 2;
-    sort(arr, 0, paddedLength, true);
-  }
-
   public static void main(String[] args) {
-    int[] array = new int[] {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
-    sortArray(array);
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
+    sort(array);
     System.out.println(Arrays.toString(array));
   }
 }

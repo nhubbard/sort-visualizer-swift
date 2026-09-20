@@ -4,6 +4,27 @@ import (
 	"fmt"
 )
 
+func sort(arr []int) []int {
+	n := len(arr)
+	if n < 2 {
+		return arr
+	}
+
+	subarrayCount := ceilPow2(n)
+	for subarrayCount > 1 {
+		i := 0
+		for i < subarrayCount {
+			lo := n * i / subarrayCount
+			mid := n * (i + 1) / subarrayCount
+			hi := n * (i + 2) / subarrayCount
+			merge(arr, lo, mid, hi)
+			i += 2
+		}
+		subarrayCount >>= 1
+	}
+	return arr
+}
+
 func multiSwap(arr []int, i, j, length int) {
 	for k := 0; k < length; k++ {
 		arr[i+k], arr[j+k] = arr[j+k], arr[i+k]
@@ -188,27 +209,6 @@ func ceilPow2(x int) int {
 		x |= x >> shift
 	}
 	return x + 1
-}
-
-func sort(arr []int) []int {
-	n := len(arr)
-	if n < 2 {
-		return arr
-	}
-
-	subarrayCount := ceilPow2(n)
-	for subarrayCount > 1 {
-		i := 0
-		for i < subarrayCount {
-			lo := n * i / subarrayCount
-			mid := n * (i + 1) / subarrayCount
-			hi := n * (i + 2) / subarrayCount
-			merge(arr, lo, mid, hi)
-			i += 2
-		}
-		subarrayCount >>= 1
-	}
-	return arr
 }
 
 func main() {

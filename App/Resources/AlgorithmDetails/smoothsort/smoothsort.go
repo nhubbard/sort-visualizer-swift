@@ -9,6 +9,58 @@ var leonardo = []int{
 	177, 287, 465, 753, 1219, 1973, 3193, 5167, 8361, 13529, 21891,
 }
 
+func sort(arr []int) []int {
+	n := len(arr)
+	if n <= 1 {
+		return arr
+	}
+
+	head := 0
+	p := 1
+	pshift := 1
+	hi := n - 1
+
+	for head < hi {
+		if p&3 == 3 {
+			sift(arr, pshift, head)
+			p >>= 2
+			pshift += 2
+		} else {
+			if leonardo[pshift-1] >= hi-head {
+				trinkle(arr, p, pshift, head, false)
+			} else {
+				sift(arr, pshift, head)
+			}
+			if pshift == 1 {
+				p <<= 1
+				pshift -= 1
+			} else {
+				p <<= (pshift - 1)
+				pshift = 1
+			}
+		}
+		p |= 1
+		head += 1
+	}
+
+	trinkle(arr, p, pshift, head, false)
+	for pshift != 1 || p != 1 {
+		if pshift <= 1 {
+			trail := trailingZeroCount(p)
+			p >>= trail
+			pshift += trail
+		} else {
+			p <<= 2
+			p ^= 7
+			pshift -= 2
+			trinkle(arr, p>>1, pshift+1, head-leonardo[pshift]-1, true)
+			trinkle(arr, p, pshift, head-1, true)
+		}
+		head -= 1
+	}
+	return arr
+}
+
 func trailingZeroCount(value int) int {
 	mask := value &^ 1
 	trail := 0
@@ -71,58 +123,6 @@ func trinkle(array []int, pIn int, pshiftIn int, headIn int, isTrustyIn bool) {
 		array[head] = val
 		sift(array, pshift, head)
 	}
-}
-
-func sort(arr []int) []int {
-	n := len(arr)
-	if n <= 1 {
-		return arr
-	}
-
-	head := 0
-	p := 1
-	pshift := 1
-	hi := n - 1
-
-	for head < hi {
-		if p&3 == 3 {
-			sift(arr, pshift, head)
-			p >>= 2
-			pshift += 2
-		} else {
-			if leonardo[pshift-1] >= hi-head {
-				trinkle(arr, p, pshift, head, false)
-			} else {
-				sift(arr, pshift, head)
-			}
-			if pshift == 1 {
-				p <<= 1
-				pshift -= 1
-			} else {
-				p <<= (pshift - 1)
-				pshift = 1
-			}
-		}
-		p |= 1
-		head += 1
-	}
-
-	trinkle(arr, p, pshift, head, false)
-	for pshift != 1 || p != 1 {
-		if pshift <= 1 {
-			trail := trailingZeroCount(p)
-			p >>= trail
-			pshift += trail
-		} else {
-			p <<= 2
-			p ^= 7
-			pshift -= 2
-			trinkle(arr, p>>1, pshift+1, head-leonardo[pshift]-1, true)
-			trinkle(arr, p, pshift, head-1, true)
-		}
-		head -= 1
-	}
-	return arr
 }
 
 func main() {

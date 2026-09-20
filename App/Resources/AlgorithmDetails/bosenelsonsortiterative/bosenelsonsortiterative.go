@@ -4,26 +4,6 @@ import (
 	"fmt"
 )
 
-func compSwap(arr []int, a, b, end int) {
-	if b >= end {
-		return
-	}
-	if arr[a] > arr[b] {
-		arr[a], arr[b] = arr[b], arr[a]
-	}
-}
-
-func rangeComp(arr []int, a, b, offset, end int) {
-	half := (b - a) / 2
-	m := a + half
-	base := a + offset
-	for i := 0; i < half-offset; i++ {
-		if (i &^ offset) == i {
-			compSwap(arr, base+i, m+i, end)
-		}
-	}
-}
-
 func sort(arr []int) []int {
 	end := len(arr)
 	if end <= 1 {
@@ -42,6 +22,26 @@ func sort(arr []int) []int {
 		}
 	}
 	return arr
+}
+
+func compSwap(arr []int, a, b, end int) {
+	if b >= end {
+		return
+	}
+	if arr[a] > arr[b] {
+		arr[a], arr[b] = arr[b], arr[a]
+	}
+}
+
+func rangeComp(arr []int, a, b, offset, end int) {
+	half := (b - a) / 2
+	m := a + half
+	base := a + offset
+	for i := 0; i < half-offset; i++ {
+		if (i &^ offset) == i {
+			compSwap(arr, base+i, m+i, end)
+		}
+	}
 }
 
 func main() {

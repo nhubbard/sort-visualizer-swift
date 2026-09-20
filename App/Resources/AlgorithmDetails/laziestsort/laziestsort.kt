@@ -1,3 +1,24 @@
+fun sort(arr: Array<Int>) {
+  val n = arr.size
+  if (n <= 16) {
+    binaryInsertionSort(arr, 0, n)
+    return
+  }
+
+  val blockSize = maxOf(16, integerSqrt(n))
+  var low = 0
+  while (low + 2 * blockSize < n) {
+    binaryInsertionSort(arr, low, low + blockSize)
+    low += blockSize
+  }
+  binaryInsertionSort(arr, low, n)
+
+  while (low >= blockSize) {
+    merge(arr, low - blockSize, low, n)
+    low -= blockSize
+  }
+}
+
 fun binaryInsertionSort(arr: Array<Int>, lo: Int, hi: Int) {
   for (i in lo + 1 until hi) {
     val key = arr[i]
@@ -99,27 +120,6 @@ fun integerSqrt(n: Int): Int {
     r--
   }
   return r
-}
-
-fun sort(arr: Array<Int>) {
-  val n = arr.size
-  if (n <= 16) {
-    binaryInsertionSort(arr, 0, n)
-    return
-  }
-
-  val blockSize = maxOf(16, integerSqrt(n))
-  var low = 0
-  while (low + 2 * blockSize < n) {
-    binaryInsertionSort(arr, low, low + blockSize)
-    low += blockSize
-  }
-  binaryInsertionSort(arr, low, n)
-
-  while (low >= blockSize) {
-    merge(arr, low - blockSize, low, n)
-    low -= blockSize
-  }
 }
 
 fun main() {

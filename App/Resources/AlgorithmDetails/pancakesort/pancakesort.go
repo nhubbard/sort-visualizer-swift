@@ -4,6 +4,20 @@ import (
 	"fmt"
 )
 
+func sort(arr []int) []int {
+	n := len(arr)
+	max := 0
+	for n > 1 {
+		max = maxIndex(arr, n)
+		if max != n-1 {
+			flip(arr, max)
+			flip(arr, n-1)
+		}
+		n--
+	}
+	return arr
+}
+
 func flip(arr []int, n int) {
 	left := 0
 	for left < n {
@@ -21,20 +35,6 @@ func maxIndex(arr []int, n int) int {
 		}
 	}
 	return index
-}
-
-func sort(arr []int) []int {
-	n := len(arr)
-	max := 0
-	for n > 1 {
-		max = maxIndex(arr, n)
-		if max != n-1 {
-			flip(arr, max)
-			flip(arr, n-1)
-		}
-		n--
-	}
-	return arr
 }
 
 func main() {

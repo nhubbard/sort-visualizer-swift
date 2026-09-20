@@ -12,6 +12,115 @@ type flan struct {
 	random   uint64
 }
 
+func sort(a []int) []int {
+	if len(a) < 2 {
+		return a
+	}
+	s := flan{a: a, random: 0x9e3779b97f4a7c15}
+	for _, value := range a {
+		s.random = (s.random^uint64(int64(value)))*0xbf58476d1ce4e5b9 + 0x94d049bb133111eb
+	}
+	left, right := 0, len(a)
+	for right-left >= 32 {
+		pivot := a[s.pivot(left, right)]
+		first, i, j, last := left, left-1, right, right
+		for {
+			i++
+			for i < j {
+				if a[i] == pivot {
+					s.swap(first, i)
+					first++
+				} else if a[i] < pivot {
+					break
+				}
+				i++
+			}
+			j--
+			for j > i {
+				if a[j] == pivot {
+					last--
+					s.swap(last, j)
+				} else if a[j] > pivot {
+					break
+				}
+				j--
+			}
+			if i < j {
+				s.swap(i, j)
+			} else {
+				if first == right {
+					return a
+				}
+				if j < i {
+					j++
+				}
+				for first > left {
+					i--
+					first--
+					s.swap(i, first)
+				}
+				for last < right {
+					s.swap(j, last)
+					j++
+					last++
+				}
+				break
+			}
+		}
+		leftSize, rightSize, count := i-left, right-j, 0
+		if leftSize <= rightSize {
+			move := right - leftSize
+			leftSize = max((rightSize+1)/(gap+1), 16)
+			for k := left; k < i; k += leftSize {
+				s.librarySort(k, min(k+leftSize, i), j, pivot, true)
+				s.position[count] = k
+				count++
+			}
+			s.merge(leftSize, i, move, count)
+			if j-i < move-j {
+				for i < j {
+					move--
+					s.swap(i, move)
+					i++
+				}
+				right = move
+			} else {
+				for move > j {
+					move--
+					s.swap(i, move)
+					i++
+				}
+				right = i
+			}
+		} else {
+			move := left + rightSize
+			rightSize = max((leftSize+1)/(gap+1), 16)
+			for k := j; k < right; k += rightSize {
+				s.librarySort(k, min(k+rightSize, right), left, pivot, false)
+				s.position[count] = k
+				count++
+			}
+			s.merge(rightSize, right, left, count)
+			if i-move < j-i {
+				for move < i {
+					j--
+					s.swap(move, j)
+					move++
+				}
+				left = j
+			} else {
+				for j > i {
+					j--
+					s.swap(move, j)
+					move++
+				}
+				left = move
+			}
+		}
+	}
+	s.insertion(left, right)
+	return a
+}
 func min(x, y int) int {
 	if x < y {
 		return x
@@ -242,116 +351,10 @@ func (s *flan) merge(runLength, b, dest, count int) {
 		}
 	}
 }
-func sort(a []int) []int {
-	if len(a) < 2 {
-		return a
-	}
-	s := flan{a: a, random: 0x9e3779b97f4a7c15}
-	for _, value := range a {
-		s.random = (s.random^uint64(int64(value)))*0xbf58476d1ce4e5b9 + 0x94d049bb133111eb
-	}
-	left, right := 0, len(a)
-	for right-left >= 32 {
-		pivot := a[s.pivot(left, right)]
-		first, i, j, last := left, left-1, right, right
-		for {
-			i++
-			for i < j {
-				if a[i] == pivot {
-					s.swap(first, i)
-					first++
-				} else if a[i] < pivot {
-					break
-				}
-				i++
-			}
-			j--
-			for j > i {
-				if a[j] == pivot {
-					last--
-					s.swap(last, j)
-				} else if a[j] > pivot {
-					break
-				}
-				j--
-			}
-			if i < j {
-				s.swap(i, j)
-			} else {
-				if first == right {
-					return a
-				}
-				if j < i {
-					j++
-				}
-				for first > left {
-					i--
-					first--
-					s.swap(i, first)
-				}
-				for last < right {
-					s.swap(j, last)
-					j++
-					last++
-				}
-				break
-			}
-		}
-		leftSize, rightSize, count := i-left, right-j, 0
-		if leftSize <= rightSize {
-			move := right - leftSize
-			leftSize = max((rightSize+1)/(gap+1), 16)
-			for k := left; k < i; k += leftSize {
-				s.librarySort(k, min(k+leftSize, i), j, pivot, true)
-				s.position[count] = k
-				count++
-			}
-			s.merge(leftSize, i, move, count)
-			if j-i < move-j {
-				for i < j {
-					move--
-					s.swap(i, move)
-					i++
-				}
-				right = move
-			} else {
-				for move > j {
-					move--
-					s.swap(i, move)
-					i++
-				}
-				right = i
-			}
-		} else {
-			move := left + rightSize
-			rightSize = max((leftSize+1)/(gap+1), 16)
-			for k := j; k < right; k += rightSize {
-				s.librarySort(k, min(k+rightSize, right), left, pivot, false)
-				s.position[count] = k
-				count++
-			}
-			s.merge(rightSize, right, left, count)
-			if i-move < j-i {
-				for move < i {
-					j--
-					s.swap(move, j)
-					move++
-				}
-				left = j
-			} else {
-				for j > i {
-					j--
-					s.swap(move, j)
-					move++
-				}
-				left = move
-			}
-		}
-	}
-	s.insertion(left, right)
-	return a
-}
 func main() {
-	array := []int{0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56}
+	array := []int{
+		0, 39, 21, 62, 91, 77, 14, 23,
+		90, 69, 51, 81, 68, 83, 32, 56,
+	}
 	fmt.Println(sort(array))
 }

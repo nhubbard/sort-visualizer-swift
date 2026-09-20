@@ -1,15 +1,5 @@
 var idx = 0
 
-fun traverse(arr: IntArray, temp: IntArray, lower: IntArray, upper: IntArray, r: Int) {
-  if (lower[r] != 0) {
-    traverse(arr, temp, lower, upper, lower[r])
-  }
-  temp[idx++] = arr[r]
-  if (upper[r] != 0) {
-    traverse(arr, temp, lower, upper, upper[r])
-  }
-}
-
 fun sort(arr: IntArray) {
   val n = arr.size
   if (n <= 1) {
@@ -35,6 +25,16 @@ fun sort(arr: IntArray) {
   idx = 0
   traverse(arr, temp, lower, upper, 0)
   temp.copyInto(arr)
+}
+
+fun traverse(arr: IntArray, temp: IntArray, lower: IntArray, upper: IntArray, r: Int) {
+  if (lower[r] != 0) {
+    traverse(arr, temp, lower, upper, lower[r])
+  }
+  temp[idx++] = arr[r]
+  if (upper[r] != 0) {
+    traverse(arr, temp, lower, upper, upper[r])
+  }
 }
 
 fun main() {

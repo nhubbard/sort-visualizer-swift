@@ -4,6 +4,19 @@ import (
 	"fmt"
 )
 
+func sort(arr []int) []int {
+	length := len(arr)
+	end := length
+
+	n := 1
+	for n < length {
+		n <<= 1
+	}
+
+	pairwiseMergeSort(arr, 0, n, end)
+	return arr
+}
+
 func compSwap(arr []int, a, b, end int) {
 	if b < end && arr[a] > arr[b] {
 		arr[a], arr[b] = arr[b], arr[a]
@@ -42,19 +55,6 @@ func pairwiseMergeSort(arr []int, a, b, end int) {
 		pairwiseMergeSort(arr, m, b, end)
 		pairwiseMerge(arr, a, b, end)
 	}
-}
-
-func sort(arr []int) []int {
-	length := len(arr)
-	end := length
-
-	n := 1
-	for n < length {
-		n <<= 1
-	}
-
-	pairwiseMergeSort(arr, 0, n, end)
-	return arr
 }
 
 func main() {

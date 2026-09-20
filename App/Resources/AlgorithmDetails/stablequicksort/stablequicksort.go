@@ -4,6 +4,12 @@ import (
 	"fmt"
 )
 
+func sort(arr []int) []int {
+	n := len(arr)
+	stableQuickSort(arr, 0, n-1)
+	return arr
+}
+
 func stablePartition(arr []int, start int, end int) int {
 	pivotValue := arr[start]
 	leftList := []int{}
@@ -38,12 +44,6 @@ func stableQuickSort(arr []int, start int, end int) {
 		stableQuickSort(arr, start, p-1)
 		stableQuickSort(arr, p+1, end)
 	}
-}
-
-func sort(arr []int) []int {
-	n := len(arr)
-	stableQuickSort(arr, 0, n-1)
-	return arr
 }
 
 func main() {

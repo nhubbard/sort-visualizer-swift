@@ -3,6 +3,26 @@ import java.util.Arrays;
 import java.util.List;
 
 public class msdradixsort {
+  public static void sort(int[] arr) {
+    if (arr.length <= 1) {
+      return;
+    }
+    int radix = 4;
+    int maxValue = arr[0];
+    for (int value : arr) {
+      if (value > maxValue) {
+        maxValue = value;
+      }
+    }
+    int highestPower = 0;
+    int probe = radix;
+    while (probe <= maxValue) {
+      highestPower++;
+      probe *= radix;
+    }
+    radixMSD(arr, 0, arr.length, radix, highestPower);
+  }
+
   private static int intPow(int base, int exponent) {
     int result = 1;
     for (int i = 0; i < exponent; i++) {
@@ -43,28 +63,11 @@ public class msdradixsort {
     }
   }
 
-  public static void sort(int[] arr) {
-    if (arr.length <= 1) {
-      return;
-    }
-    int radix = 4;
-    int maxValue = arr[0];
-    for (int value : arr) {
-      if (value > maxValue) {
-        maxValue = value;
-      }
-    }
-    int highestPower = 0;
-    int probe = radix;
-    while (probe <= maxValue) {
-      highestPower++;
-      probe *= radix;
-    }
-    radixMSD(arr, 0, arr.length, radix, highestPower);
-  }
-
   public static void main(String[] args) {
-    int[] array = new int[] {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     sort(array);
     System.out.println(Arrays.toString(array));
   }

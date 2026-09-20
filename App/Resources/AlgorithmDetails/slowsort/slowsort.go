@@ -4,6 +4,11 @@ import (
 	"fmt"
 )
 
+func sort(arr []int) []int {
+	slowSort(arr, 0, len(arr)-1)
+	return arr
+}
+
 func slowSort(arr []int, i, j int) {
 	if i >= j {
 		return
@@ -15,11 +20,6 @@ func slowSort(arr []int, i, j int) {
 		arr[m], arr[j] = arr[j], arr[m]
 	}
 	slowSort(arr, i, j-1)
-}
-
-func sort(arr []int) []int {
-	slowSort(arr, 0, len(arr)-1)
-	return arr
 }
 
 func main() {

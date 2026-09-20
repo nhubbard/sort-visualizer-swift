@@ -1,17 +1,3 @@
-fun binarySearch(arr: Array<Int>, item: Int, start: Int, end: Int): Int {
-  var low = start
-  var high = end
-  while (low < high) {
-    val mid = low + (high - low) / 2
-    if (item < arr[mid]) {
-      high = mid
-    } else {
-      low = mid + 1
-    }
-  }
-  return low
-}
-
 fun sort(arr: Array<Int>) {
   for (i in 1 until arr.size) {
     val item = arr[i]
@@ -24,6 +10,20 @@ fun sort(arr: Array<Int>) {
       j--
     }
   }
+}
+
+fun binarySearch(arr: Array<Int>, item: Int, start: Int, end: Int): Int {
+  var low = start
+  var high = end
+  while (low < high) {
+    val mid = low + (high - low) / 2
+    if (item < arr[mid]) {
+      high = mid
+    } else {
+      low = mid + 1
+    }
+  }
+  return low
 }
 
 fun main() {

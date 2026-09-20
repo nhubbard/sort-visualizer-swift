@@ -1,3 +1,7 @@
+fun sort(arr: Array<Int>) {
+  stableQuickSort(arr, 0, arr.size - 1)
+}
+
 fun stablePartition(arr: Array<Int>, start: Int, end: Int): Int {
   val pivotValue = arr[start]
   val leftList: MutableList<Int> = mutableListOf()
@@ -29,10 +33,6 @@ fun stableQuickSort(arr: Array<Int>, start: Int, end: Int) {
     stableQuickSort(arr, start, p - 1)
     stableQuickSort(arr, p + 1, end)
   }
-}
-
-fun sort(arr: Array<Int>) {
-  stableQuickSort(arr, 0, arr.size - 1)
 }
 
 fun main() {

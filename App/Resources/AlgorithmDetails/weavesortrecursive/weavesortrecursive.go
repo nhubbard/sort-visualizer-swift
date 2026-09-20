@@ -4,6 +4,16 @@ import (
 	"fmt"
 )
 
+func sort(arr []int) []int {
+	end := len(arr)
+	padded := 1
+	for padded < end {
+		padded *= 2
+	}
+	weaveCircle(arr, 0, padded, 1, end)
+	return arr
+}
+
 func compSwap(arr []int, a, b, end int) {
 	if b < end && arr[a] > arr[b] {
 		arr[a], arr[b] = arr[b], arr[a]
@@ -32,16 +42,6 @@ func weaveCircle(arr []int, pos, ln, gap, end int) {
 	weaveCircle(arr, pos, ln/2, 2*gap, end)
 	weaveCircle(arr, pos+gap, ln/2, 2*gap, end)
 	circle(arr, pos, ln, gap, end)
-}
-
-func sort(arr []int) []int {
-	end := len(arr)
-	padded := 1
-	for padded < end {
-		padded *= 2
-	}
-	weaveCircle(arr, 0, padded, 1, end)
-	return arr
 }
 
 func main() {

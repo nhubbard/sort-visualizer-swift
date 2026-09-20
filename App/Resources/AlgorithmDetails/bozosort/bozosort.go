@@ -3,12 +3,12 @@ package main
 import (
 	"fmt"
 	"math/rand"
-	"sort"
+	stdsort "sort"
 )
 
-func _sort(arr []int) []int {
+func sort(arr []int) []int {
 	n := len(arr)
-	for !sort.IntsAreSorted(arr) {
+	for !stdsort.IntsAreSorted(arr) {
 		i := rand.Intn(n)
 		j := rand.Intn(n)
 		arr[i], arr[j] = arr[j], arr[i]
@@ -17,6 +17,8 @@ func _sort(arr []int) []int {
 }
 
 func main() {
-	array := []int{0, 39, 21, 62, 91, 77}
-	fmt.Println(_sort(array))
+	array := []int{
+		0, 39, 21, 62, 91, 77,
+	}
+	fmt.Println(sort(array))
 }

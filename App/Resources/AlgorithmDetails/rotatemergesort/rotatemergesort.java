@@ -1,6 +1,10 @@
 import java.util.Arrays;
 
 public class rotatemergesort {
+  public static void sort(int[] arr) {
+    rotateMergeSort(arr, 0, arr.length);
+  }
+
   private static void multiSwap(int[] arr, int a, int b, int len) {
     for (int i = 0; i < len; i++) {
       int t = arr[a + i];
@@ -78,12 +82,11 @@ public class rotatemergesort {
     }
   }
 
-  public static void sort(int[] arr) {
-    rotateMergeSort(arr, 0, arr.length);
-  }
-
   public static void main(String[] args) {
-    int[] array = new int[] {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     sort(array);
     System.out.println(Arrays.toString(array));
   }

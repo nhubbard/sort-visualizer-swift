@@ -1,3 +1,21 @@
+fun sort(arr: Array<Int>, n: Int) {
+  if (n < 2) {
+    return
+  }
+
+  if (n < 32) {
+    quadSortRange(arr, 0, n)
+    return
+  }
+
+  if (!fluxAnalyze(arr, n)) {
+    return
+  }
+
+  val swapBuf = Array(n) { 0 }
+  fluxPartition(arr, swapBuf, false, 0, n)
+}
+
 fun swap2(arr: Array<Int>, i: Int, j: Int) {
   val t = arr[i]
   arr[i] = arr[j]
@@ -908,24 +926,6 @@ fun fluxPartition(arr: Array<Int>, swapBuf: Array<Int>, mainIsSwap: Boolean, sta
 }
 
 // -- Entry point ---------------------------------------------------------------------------------
-
-fun sort(arr: Array<Int>, n: Int) {
-  if (n < 2) {
-    return
-  }
-
-  if (n < 32) {
-    quadSortRange(arr, 0, n)
-    return
-  }
-
-  if (!fluxAnalyze(arr, n)) {
-    return
-  }
-
-  val swapBuf = Array(n) { 0 }
-  fluxPartition(arr, swapBuf, false, 0, n)
-}
 
 fun main() {
   var array = arrayOf<Int>(

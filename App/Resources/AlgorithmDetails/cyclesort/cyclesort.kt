@@ -1,3 +1,7 @@
+fun sort(arr: Array<Int>) {
+  cycleSort(arr)
+}
+
 fun cycleSort(arr: Array<Int>) {
   val n = arr.size
   for (cycleStart in 0..(n - 2)) {
@@ -20,10 +24,6 @@ fun cycleSort(arr: Array<Int>) {
       arr[pos] = item.also { item = arr[pos] }
     }
   }
-}
-
-fun sort(arr: Array<Int>) {
-  cycleSort(arr)
 }
 
 fun main() {

@@ -1,3 +1,7 @@
+fun sort(arr: Array<Int>) {
+  sillySort(arr, 0, arr.size - 1)
+}
+
 fun sillySort(arr: Array<Int>, i: Int, j: Int) {
   if (i < j) {
     val m = i + (j - i) / 2
@@ -8,10 +12,6 @@ fun sillySort(arr: Array<Int>, i: Int, j: Int) {
     }
     sillySort(arr, i + 1, j)
   }
-}
-
-fun sort(arr: Array<Int>) {
-  sillySort(arr, 0, arr.size - 1)
 }
 
 fun main() {

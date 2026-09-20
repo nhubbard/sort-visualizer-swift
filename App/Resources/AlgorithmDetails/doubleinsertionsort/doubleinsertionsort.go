@@ -4,6 +4,13 @@ import (
 	"fmt"
 )
 
+func sort(arr []int) []int {
+	if len(arr) > 1 {
+		doubleInsertionSort(arr, 0, len(arr))
+	}
+	return arr
+}
+
 func doubleInsertionSort(arr []int, start, end int) {
 	left := start + (end-start)/2 - 1
 	right := left + 1
@@ -63,13 +70,6 @@ func doubleInsertionSort(arr []int, start, end int) {
 		}
 		arr[pos+1] = current
 	}
-}
-
-func sort(arr []int) []int {
-	if len(arr) > 1 {
-		doubleInsertionSort(arr, 0, len(arr))
-	}
-	return arr
 }
 
 func main() {

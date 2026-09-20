@@ -4,6 +4,21 @@ import (
 	"fmt"
 )
 
+func sort(arr []int) []int {
+	n := len(arr)
+	if n < 2 {
+		return arr
+	}
+	for i := (n - 1) / 2; i >= 0; i-- {
+		siftDown(arr, i, n)
+	}
+	for i := n - 1; i > 0; i-- {
+		arr[0], arr[i] = arr[i], arr[0]
+		siftDown(arr, 0, i)
+	}
+	return arr
+}
+
 func siftDown(arr []int, i int, b int) {
 	j := i
 	for 2*j+1 < b {
@@ -24,21 +39,6 @@ func siftDown(arr []int, i int, b int) {
 		arr[i], arr[j] = arr[j], arr[i]
 		j = (j - 1) / 2
 	}
-}
-
-func sort(arr []int) []int {
-	n := len(arr)
-	if n < 2 {
-		return arr
-	}
-	for i := (n - 1) / 2; i >= 0; i-- {
-		siftDown(arr, i, n)
-	}
-	for i := n - 1; i > 0; i-- {
-		arr[0], arr[i] = arr[i], arr[0]
-		siftDown(arr, 0, i)
-	}
-	return arr
 }
 
 func main() {

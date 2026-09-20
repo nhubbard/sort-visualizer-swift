@@ -1,3 +1,12 @@
+fun sort(arr: Array<Int>) {
+  heapify(arr)
+  for (end in (arr.size - 1) downTo 1) {
+    arr[0] = arr[end].also { arr[end] = arr[0] }
+    siftDown(arr, 0, end)
+  }
+  reverse(arr)
+}
+
 fun siftDown(arr: Array<Int>, root: Int, size: Int) {
   var root = root
   while (true) {
@@ -32,15 +41,6 @@ fun reverse(arr: Array<Int>) {
     low++
     high--
   }
-}
-
-fun sort(arr: Array<Int>) {
-  heapify(arr)
-  for (end in (arr.size - 1) downTo 1) {
-    arr[0] = arr[end].also { arr[end] = arr[0] }
-    siftDown(arr, 0, end)
-  }
-  reverse(arr)
 }
 
 fun main() {

@@ -4,6 +4,26 @@ import (
 	"fmt"
 )
 
+func sort(arr []int) []int {
+	n := len(arr)
+	if n < 2 {
+		return arr
+	}
+
+	if n < 32 {
+		quadSortRange(arr, 0, n)
+		return arr
+	}
+
+	if !fluxAnalyze(arr, n) {
+		return arr
+	}
+
+	swapBuf := make([]int, n)
+	fluxPartition(arr, swapBuf, false, 0, n)
+	return arr
+}
+
 func swap2(arr []int, i int, j int) {
 	arr[i], arr[j] = arr[j], arr[i]
 }
@@ -966,26 +986,6 @@ func fluxPartition(arr []int, swapBuf []int, mainIsSwap bool, start int, nmemb i
 }
 
 // -- Entry point ---------------------------------------------------------------------------------
-
-func sort(arr []int) []int {
-	n := len(arr)
-	if n < 2 {
-		return arr
-	}
-
-	if n < 32 {
-		quadSortRange(arr, 0, n)
-		return arr
-	}
-
-	if !fluxAnalyze(arr, n) {
-		return arr
-	}
-
-	swapBuf := make([]int, n)
-	fluxPartition(arr, swapBuf, false, 0, n)
-	return arr
-}
 
 func main() {
 	array := []int{

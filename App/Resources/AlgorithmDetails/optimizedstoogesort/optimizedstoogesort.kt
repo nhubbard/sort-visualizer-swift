@@ -1,3 +1,7 @@
+fun sort(arr: Array<Int>) {
+  exchange(arr, arr.size)
+}
+
 fun forward(arr: Array<Int>, leftStart: Int, rightStart: Int) {
   var left = leftStart
   var right = rightStart
@@ -46,10 +50,6 @@ fun exchange(arr: Array<Int>, length: Int) {
 
   forward(arr, 0, length - 2)
   backward(arr, 1, length - 1)
-}
-
-fun sort(arr: Array<Int>) {
-  exchange(arr, arr.size)
 }
 
 fun main() {

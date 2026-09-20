@@ -1,3 +1,7 @@
+fun sort(arr: Array<Int>) {
+  quickSort(arr, 0, arr.size - 1)
+}
+
 fun partition(arr: Array<Int>, begin: Int, end: Int): Int {
   var i = begin
   var j = end
@@ -16,10 +20,6 @@ fun quickSort(arr: Array<Int>, begin: Int, end: Int) {
     quickSort(arr, begin, partitionIndex - 1)
     quickSort(arr, partitionIndex + 1, end)
   }
-}
-
-fun sort(arr: Array<Int>) {
-  quickSort(arr, 0, arr.size - 1)
 }
 
 fun main() {

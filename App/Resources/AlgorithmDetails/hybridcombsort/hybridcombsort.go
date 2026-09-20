@@ -4,17 +4,6 @@ import (
 	"fmt"
 )
 
-func insertionSort(arr []int) {
-	n := len(arr)
-	for i := 1; i < n; i++ {
-		j := i
-		for j > 0 && arr[j-1] > arr[j] {
-			arr[j], arr[j-1] = arr[j-1], arr[j]
-			j--
-		}
-	}
-}
-
 func sort(arr []int) []int {
 	n := len(arr)
 	shrink := 1.3
@@ -43,6 +32,17 @@ func sort(arr []int) []int {
 		}
 	}
 	return arr
+}
+
+func insertionSort(arr []int) {
+	n := len(arr)
+	for i := 1; i < n; i++ {
+		j := i
+		for j > 0 && arr[j-1] > arr[j] {
+			arr[j], arr[j-1] = arr[j-1], arr[j]
+			j--
+		}
+	}
 }
 
 func main() {

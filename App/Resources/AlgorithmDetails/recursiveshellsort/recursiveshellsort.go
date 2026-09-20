@@ -4,6 +4,11 @@ import (
 	"fmt"
 )
 
+func sort(arr []int) []int {
+	recursiveShellSort(arr, 0, len(arr), 1)
+	return arr
+}
+
 func gappedInsertionSort(arr []int, a, b, gap int) {
 	for i := a + gap; i < b; i += gap {
 		j := i
@@ -21,11 +26,6 @@ func recursiveShellSort(arr []int, start, end, g int) {
 		recursiveShellSort(arr, start+(2*g), end, 3*g)
 		gappedInsertionSort(arr, start, end, g)
 	}
-}
-
-func sort(arr []int) []int {
-	recursiveShellSort(arr, 0, len(arr), 1)
-	return arr
 }
 
 func main() {
