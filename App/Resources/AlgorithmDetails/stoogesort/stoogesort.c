@@ -22,6 +22,7 @@ void printList(int items[], int size) {
 }
 
 void sort(int arr[], int i, int j) {
+  if (i >= j) return;
   if (arr[j] < arr[i])
     swap(&arr[i], &arr[j]);
   if (j - i > 1) {

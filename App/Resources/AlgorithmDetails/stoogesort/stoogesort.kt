@@ -11,6 +11,7 @@ fun stoogeSort(arr: Array<Int>, i: Int, j: Int) {
 }
 
 fun sort(arr: Array<Int>) {
+  if (arr.size <= 1) return
   stoogeSort(arr, 0, arr.size - 1)
 }
 

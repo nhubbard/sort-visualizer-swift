@@ -17,6 +17,9 @@ func stoogeSort(arr []int, i, j int) {
 }
 
 func sort(arr []int) []int {
+	if len(arr) <= 1 {
+		return arr
+	}
 	stoogeSort(arr, 0, len(arr)-1)
 	return arr
 }

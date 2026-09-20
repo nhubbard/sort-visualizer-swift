@@ -11,6 +11,7 @@ def stooge_sort(arr, i, j)
 end
 
 def sort(array)
+  return array if array.length <= 1
   stooge_sort(array, 0, array.length - 1)
 end
 

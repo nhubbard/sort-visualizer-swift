@@ -9,6 +9,8 @@ def stooge_sort(arr, i, j):
 
 
 def sort(arr):
+    if len(arr) <= 1:
+        return
     stooge_sort(arr, 0, len(arr) - 1)
 
 

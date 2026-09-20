@@ -11,6 +11,7 @@ function stoogeSort(arr, i, j) {
 }
 
 function sort(arr) {
+  if (arr.length <= 1) return arr;
   stoogeSort(arr, 0, arr.length - 1);
 }
 

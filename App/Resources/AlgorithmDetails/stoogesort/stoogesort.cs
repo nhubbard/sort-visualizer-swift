@@ -4,6 +4,7 @@ public class StoogeSort
 {
   public static void Sort(int[] arr, int i, int j)
   {
+    if (i >= j) return;
     if (arr[j].CompareTo(arr[i]) < 0)
     {
       (arr[i], arr[j]) = (arr[j], arr[i]);
