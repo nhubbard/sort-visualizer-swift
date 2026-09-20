@@ -1,0 +1,880 @@
+{
+  "scope": "145 non-Bogo sorting algorithms without a previously confirmed substitution",
+  "criteria": [
+    "Compare the native Swift algorithm and called template control flow, data movement, cutoff/base cases, and metadata with every reference language.",
+    "Run each language sample; use larger, duplicate-heavy, sorted, reversed, and boundary inputs where the algorithm is practical.",
+    "Mark verified only after source-level review and test evidence; record mismatches until corrected and retested."
+  ],
+  "algorithms": [
+    {
+      "id": "aatreesort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Insertion/AATreeSort.swift",
+      "status": "verified",
+      "notes": "Swift/template and ten reference languages structurally reviewed; ten sample runs and targeted Python boundary/adversarial cases passed."
+    },
+    {
+      "id": "americanflagsort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Distribution/AmericanFlagSort.swift",
+      "status": "corrected",
+      "notes": "Reference mismatch corrected in 2d9d38d1; ten-language samples and targeted boundary cases passed. Archive repacked and verified."
+    },
+    {
+      "id": "andreysort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Merge/AndreySort.swift",
+      "status": "verified",
+      "notes": "Swift/template and ten reference languages structurally reviewed; ten sample runs and targeted Python boundary/adversarial cases passed."
+    },
+    {
+      "id": "asynchronoussort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Selection/AsynchronousSort.swift",
+      "status": "corrected",
+      "notes": "Reference mismatch corrected in 2d9d38d1; ten-language samples and targeted boundary cases passed. Archive repacked and verified."
+    },
+    {
+      "id": "avltreesort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Insertion/AVLTreeSort.swift",
+      "status": "verified",
+      "notes": "Swift/template and ten reference languages structurally reviewed; ten sample runs and targeted Python boundary/adversarial cases passed."
+    },
+    {
+      "id": "badsort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Selection/BadSort.swift",
+      "status": "verified",
+      "notes": "Swift/template and ten reference languages structurally reviewed; ten sample runs and targeted Python boundary/adversarial cases passed."
+    },
+    {
+      "id": "basenmaxheapsort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Selection/BaseNMaxHeapSort.swift",
+      "status": "verified",
+      "notes": "Swift/template and ten reference languages structurally reviewed; ten sample runs and targeted Python boundary/adversarial cases passed."
+    },
+    {
+      "id": "binarydoubleinsertionsort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Insertion/BinaryDoubleInsertionSort.swift",
+      "status": "verified",
+      "notes": "Swift/template and ten reference languages structurally reviewed; ten sample runs and targeted Python boundary/adversarial cases passed."
+    },
+    {
+      "id": "binarygnomesort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Exchange/BinaryGnomeSort.swift",
+      "status": "verified",
+      "notes": "Swift/template and ten reference languages structurally reviewed; ten sample runs and targeted Python boundary/adversarial cases passed."
+    },
+    {
+      "id": "binaryinsertionsort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Insertion/BinaryInsertionSort.swift",
+      "status": "corrected",
+      "notes": "Reference mismatch corrected in 2d9d38d1; ten-language samples and targeted boundary cases passed. Archive repacked and verified."
+    },
+    {
+      "id": "binarymergesort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Hybrid/BinaryMergeSort.swift",
+      "status": "verified",
+      "notes": "Swift/template and ten reference languages structurally reviewed; ten sample runs and targeted Python boundary/adversarial cases passed."
+    },
+    {
+      "id": "binaryquicksortiterative",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Distribution/BinaryQuickSortIterative.swift",
+      "status": "corrected",
+      "notes": "Reference mismatch corrected in a7109654; ten-language samples and targeted boundary cases passed. Archive repacked and verified."
+    },
+    {
+      "id": "binaryquicksortrecursive",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Distribution/BinaryQuickSortRecursive.swift",
+      "status": "corrected",
+      "notes": "Reference mismatch corrected in a7109654; ten-language samples and targeted boundary cases passed. Archive repacked and verified."
+    },
+    {
+      "id": "bingosort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Selection/BingoSort.swift",
+      "status": "verified",
+      "notes": "Swift/template and ten reference languages structurally reviewed; ten sample runs and targeted Python boundary/adversarial cases passed."
+    },
+    {
+      "id": "binomialheapsort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Selection/BinomialHeapSort.swift",
+      "status": "verified",
+      "notes": "Swift/template and ten reference languages structurally reviewed; ten sample runs and targeted Python boundary/adversarial cases passed."
+    },
+    {
+      "id": "binomialsmoothsort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Selection/BinomialSmoothSort.swift",
+      "status": "verified",
+      "notes": "Swift/template and ten reference languages structurally reviewed; ten sample runs and targeted Python boundary/adversarial cases passed."
+    },
+    {
+      "id": "bitonicsortrecursive",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Concurrent/BitonicSortRecursive.swift",
+      "status": "verified",
+      "notes": "Swift/template and ten reference languages structurally reviewed; ten sample runs and targeted Python boundary/adversarial cases passed."
+    },
+    {
+      "id": "blockswapmergesort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Merge/BlockSwapMergeSort.swift",
+      "status": "verified",
+      "notes": "Swift/template and ten reference languages structurally reviewed; ten sample runs and targeted Python boundary/adversarial cases passed."
+    },
+    {
+      "id": "bosenelsonsortiterative",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Concurrent/BoseNelsonSortIterative.swift",
+      "status": "verified",
+      "notes": "Swift/template and ten reference languages structurally reviewed; ten sample runs and targeted Python boundary/adversarial cases passed."
+    },
+    {
+      "id": "bosenelsonsortrecursive",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Concurrent/BoseNelsonSortRecursive.swift",
+      "status": "verified",
+      "notes": "Swift/template and ten reference languages structurally reviewed; ten sample runs and targeted Python boundary/adversarial cases passed."
+    },
+    {
+      "id": "bottomupheapsort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Selection/BottomUpHeapSort.swift",
+      "status": "corrected",
+      "notes": "Reference mismatch corrected in 398d6195; ten-language samples and targeted boundary cases passed. Archive repacked and verified."
+    },
+    {
+      "id": "bottomupmergesort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Merge/BottomUpMergeSort.swift",
+      "status": "corrected",
+      "notes": "Reference mismatch corrected in c3e6356f; ten-language samples and targeted boundary cases passed. Archive repacked and verified."
+    },
+    {
+      "id": "bubblesort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Exchange/BubbleSort.swift",
+      "status": "verified",
+      "notes": "Swift/template and ten reference languages structurally reviewed; ten sample runs and targeted Python boundary/adversarial cases passed."
+    },
+    {
+      "id": "bufferedstoogesort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Merge/BufferedStoogeSort.swift",
+      "status": "verified",
+      "notes": "Swift/template and ten reference languages structurally reviewed; ten sample runs and targeted Python boundary/adversarial cases passed."
+    },
+    {
+      "id": "burntpancakesort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Miscellaneous/BurntPancakeSort.swift",
+      "status": "verified",
+      "notes": "Swift/template and ten reference languages structurally reviewed; ten sample runs and targeted Python boundary/adversarial cases passed."
+    },
+    {
+      "id": "circlesortiterative",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Exchange/CircleSortIterative.swift",
+      "status": "verified",
+      "notes": "Swift/template and ten reference languages structurally reviewed; ten sample runs and targeted Python boundary/adversarial cases passed."
+    },
+    {
+      "id": "circlesortrecursive",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Exchange/CircleSortRecursive.swift",
+      "status": "corrected",
+      "notes": "Reference mismatch corrected in 398d6195; ten-language samples and targeted boundary cases passed. Archive repacked and verified."
+    },
+    {
+      "id": "circloidsort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Exchange/CircloidSort.swift",
+      "status": "verified",
+      "notes": "Swift/template and ten reference languages structurally reviewed; ten sample runs and targeted Python boundary/adversarial cases passed."
+    },
+    {
+      "id": "classicgravitysort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Distribution/ClassicGravitySort.swift",
+      "status": "corrected",
+      "notes": "Reference mismatch corrected in 398d6195; ten-language samples and targeted boundary cases passed. Archive repacked and verified."
+    },
+    {
+      "id": "classicthreesmoothcombsort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Exchange/ClassicThreeSmoothCombSort.swift",
+      "status": "verified",
+      "notes": "Swift/template and ten reference languages structurally reviewed; ten sample runs and targeted Python boundary/adversarial cases passed."
+    },
+    {
+      "id": "classictournamentsort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Selection/ClassicTournamentSort.swift",
+      "status": "verified",
+      "notes": "Swift/template and ten reference languages structurally reviewed; ten sample runs and targeted Python boundary/adversarial cases passed."
+    },
+    {
+      "id": "classictreesort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Insertion/ClassicTreeSort.swift",
+      "status": "verified",
+      "notes": "Swift/template and ten reference languages structurally reviewed; ten sample runs and targeted Python boundary/adversarial cases passed."
+    },
+    {
+      "id": "cocktailmergesort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Hybrid/CocktailMergeSort.swift",
+      "status": "verified",
+      "notes": "Swift/template and ten reference languages structurally reviewed; ten sample runs and targeted Python boundary/adversarial cases passed."
+    },
+    {
+      "id": "cocktailshakersort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Exchange/CocktailShakerSort.swift",
+      "status": "verified",
+      "notes": "Swift/template and ten reference languages structurally reviewed; ten sample runs and targeted Python boundary/adversarial cases passed."
+    },
+    {
+      "id": "combsort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Exchange/CombSort.swift",
+      "status": "verified",
+      "notes": "Swift/template and ten reference languages structurally reviewed; ten sample runs and targeted Python boundary/adversarial cases passed."
+    },
+    {
+      "id": "completegraphsort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Exchange/CompleteGraphSort.swift",
+      "status": "corrected",
+      "notes": "Reference mismatch corrected in 910c6faf; ten-language samples and targeted boundary cases passed. Archive repacked and verified."
+    },
+    {
+      "id": "countingsort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Distribution/CountingSort.swift",
+      "status": "verified",
+      "notes": "Swift/template and ten reference languages structurally reviewed; ten sample runs and targeted Python boundary/adversarial cases passed."
+    },
+    {
+      "id": "creasesort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Concurrent/CreaseSort.swift",
+      "status": "verified",
+      "notes": "Swift/template and ten reference languages structurally reviewed; ten sample runs and targeted Python boundary/adversarial cases passed."
+    },
+    {
+      "id": "cyclesort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Selection/CycleSort.swift",
+      "status": "verified",
+      "notes": "Swift/template and ten reference languages structurally reviewed; ten sample runs and targeted Python boundary/adversarial cases passed."
+    },
+    {
+      "id": "diamondsortiterative",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Concurrent/DiamondSortIterative.swift",
+      "status": "verified",
+      "notes": "Swift/template and ten reference languages structurally reviewed; ten sample runs and targeted Python boundary/adversarial cases passed."
+    },
+    {
+      "id": "doubleinsertionsort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Insertion/DoubleInsertionSort.swift",
+      "status": "verified",
+      "notes": "Swift/template and ten reference languages structurally reviewed; ten sample runs and targeted Python boundary/adversarial cases passed."
+    },
+    {
+      "id": "doubleselectionsort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Selection/DoubleSelectionSort.swift",
+      "status": "verified",
+      "notes": "Swift/template and ten reference languages structurally reviewed; ten sample runs and targeted Python boundary/adversarial cases passed."
+    },
+    {
+      "id": "flashsort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Distribution/FlashSort.swift",
+      "status": "verified",
+      "notes": "Swift/template and ten reference languages structurally reviewed; ten sample runs and targeted Python boundary/adversarial cases passed."
+    },
+    {
+      "id": "flippedminheapsort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Selection/FlippedMinHeapSort.swift",
+      "status": "verified",
+      "notes": "Swift/template and ten reference languages structurally reviewed; ten sample runs and targeted Python boundary/adversarial cases passed."
+    },
+    {
+      "id": "fluxsort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Hybrid/FluxSort.swift",
+      "status": "verified",
+      "notes": "Swift/template and ten reference languages structurally reviewed; ten sample runs and targeted Python boundary/adversarial cases passed."
+    },
+    {
+      "id": "foldsort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Concurrent/FoldSort.swift",
+      "status": "verified",
+      "notes": "Swift/template and ten reference languages structurally reviewed; ten sample runs and targeted Python boundary/adversarial cases passed."
+    },
+    {
+      "id": "forcedstablequicksort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Exchange/ForcedStableQuickSort.swift",
+      "status": "verified",
+      "notes": "Swift/template and ten reference languages structurally reviewed; ten sample runs and targeted Python boundary/adversarial cases passed."
+    },
+    {
+      "id": "funsort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Exchange/FunSort.swift",
+      "status": "verified",
+      "notes": "Swift/template and ten reference languages structurally reviewed; ten sample runs and targeted Python boundary/adversarial cases passed."
+    },
+    {
+      "id": "gnomesort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Exchange/GnomeSort.swift",
+      "status": "corrected",
+      "notes": "Reference mismatch corrected in 60726713; ten-language samples and targeted boundary cases passed. Archive repacked and verified."
+    },
+    {
+      "id": "grailsort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Hybrid/GrailSort.swift",
+      "status": "verified",
+      "notes": "Swift/template and ten reference languages structurally reviewed; ten sample runs and targeted Python boundary/adversarial cases passed."
+    },
+    {
+      "id": "gravitysort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Distribution/GravitySort.swift",
+      "status": "verified",
+      "notes": "Swift/template and ten reference languages structurally reviewed; ten sample runs and targeted Python boundary/adversarial cases passed."
+    },
+    {
+      "id": "guesssort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Impractical/GuessSort.swift",
+      "status": "verified",
+      "notes": "Swift/template and ten reference languages structurally reviewed; ten sample runs and targeted Python boundary/adversarial cases passed."
+    },
+    {
+      "id": "hanoisort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Impractical/HanoiSort.swift",
+      "status": "verified",
+      "notes": "Swift/template and ten reference languages structurally reviewed; ten sample runs and targeted Python boundary/adversarial cases passed."
+    },
+    {
+      "id": "hybridcombsort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Hybrid/HybridCombSort.swift",
+      "status": "corrected",
+      "notes": "Reference fidelity correction; source tested, shared archive repack pending."
+    },
+    {
+      "id": "improvedblockselectionsort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Hybrid/ImprovedBlockSelectionSort.swift",
+      "status": "verified",
+      "notes": "Swift/template and ten reference languages structurally reviewed; ten sample runs and targeted Python boundary/adversarial cases passed."
+    },
+    {
+      "id": "improvedinplacemergesort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Merge/ImprovedInPlaceMergeSort.swift",
+      "status": "verified",
+      "notes": "Swift/template and ten reference languages structurally reviewed; ten sample runs and targeted Python boundary/adversarial cases passed."
+    },
+    {
+      "id": "indexsort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Distribution/IndexSort.swift",
+      "status": "verified",
+      "notes": "Swift/template and ten reference languages structurally reviewed; ten sample runs and targeted Python boundary/adversarial cases passed."
+    },
+    {
+      "id": "inplacelsdradixsort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Distribution/InPlaceLSDRadixSort.swift",
+      "status": "verified",
+      "notes": "Swift/template and ten reference languages structurally reviewed; ten sample runs and targeted Python boundary/adversarial cases passed."
+    },
+    {
+      "id": "inplacemergesort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Merge/InPlaceMergeSort.swift",
+      "status": "verified",
+      "notes": "Swift/template and ten reference languages structurally reviewed; ten sample runs and targeted Python boundary/adversarial cases passed."
+    },
+    {
+      "id": "insertionsort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Insertion/InsertionSort.swift",
+      "status": "corrected",
+      "notes": "Reference fidelity correction; source tested, shared archive repack pending."
+    },
+    {
+      "id": "introcirclesortiterative",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Hybrid/IntroCircleSortIterative.swift",
+      "status": "corrected",
+      "notes": "Reference fidelity correction; source tested, shared archive repack pending."
+    },
+    {
+      "id": "introcirclesortrecursive",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Hybrid/IntroCircleSortRecursive.swift",
+      "status": "corrected",
+      "notes": "Reference fidelity correction; source tested, shared archive repack pending."
+    },
+    {
+      "id": "introsort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Hybrid/IntroSort.swift",
+      "status": "verified",
+      "notes": "Swift/template and ten reference languages structurally reviewed; ten sample runs and targeted Python boundary/adversarial cases passed. Empty-input failure exists in both Swift and references; native defect recorded separately."
+    },
+    {
+      "id": "lazyheapsort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Selection/LazyHeapSort.swift",
+      "status": "corrected",
+      "notes": "Reference fidelity correction; source tested, shared archive repack pending."
+    },
+    {
+      "id": "librarysort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Insertion/LibrarySort.swift",
+      "status": "verified",
+      "notes": "Swift/template and ten reference languages structurally reviewed; ten sample runs and targeted Python boundary/adversarial cases passed."
+    },
+    {
+      "id": "llquicksort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Exchange/LLQuickSort.swift",
+      "status": "verified",
+      "notes": "Swift/template and ten reference languages structurally reviewed; ten sample runs and targeted Python boundary/adversarial cases passed."
+    },
+    {
+      "id": "matrixsort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Concurrent/MatrixSort.swift",
+      "status": "verified",
+      "notes": "Swift/template and ten reference languages structurally reviewed; ten sample runs and targeted Python boundary/adversarial cases passed."
+    },
+    {
+      "id": "maxheapsort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Selection/MaxHeapSort.swift",
+      "status": "corrected",
+      "notes": "Reference fidelity correction; source tested, shared archive repack pending."
+    },
+    {
+      "id": "mergeexchangesortiterative",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Concurrent/MergeExchangeSortIterative.swift",
+      "status": "verified",
+      "notes": "Swift/template and ten reference languages structurally reviewed; ten sample runs and targeted Python boundary/adversarial cases passed."
+    },
+    {
+      "id": "minheapsort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Selection/MinHeapSort.swift",
+      "status": "verified",
+      "notes": "Swift/template and ten reference languages structurally reviewed; ten sample runs and targeted Python boundary/adversarial cases passed."
+    },
+    {
+      "id": "minmaxheapsort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Selection/MinMaxHeapSort.swift",
+      "status": "verified",
+      "notes": "Swift/template and ten reference languages structurally reviewed; ten sample runs and targeted Python boundary/adversarial cases passed."
+    },
+    {
+      "id": "msdradixsort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Distribution/MSDRadixSort.swift",
+      "status": "verified",
+      "notes": "Swift/template and ten reference languages structurally reviewed; ten sample runs and targeted Python boundary/adversarial cases passed."
+    },
+    {
+      "id": "newshufflemergesort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Merge/NewShuffleMergeSort.swift",
+      "status": "verified",
+      "notes": "Swift/template and ten reference languages structurally reviewed; ten sample runs and targeted Python boundary/adversarial cases passed."
+    },
+    {
+      "id": "oddevenmergesortiterative",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Concurrent/OddEvenMergeSortIterative.swift",
+      "status": "verified",
+      "notes": "Structural Swift/reference review, ten-language samples, targeted boundary/adversarial cases passed."
+    },
+    {
+      "id": "oddevenmergesortrecursive",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Concurrent/OddEvenMergeSortRecursive.swift",
+      "status": "verified",
+      "notes": "Structural Swift/reference review, ten-language samples, targeted boundary/adversarial cases passed."
+    },
+    {
+      "id": "oddevensort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Exchange/OddEvenSort.swift",
+      "status": "verified",
+      "notes": "Structural Swift/reference review, ten-language samples, targeted boundary/adversarial cases passed."
+    },
+    {
+      "id": "optimizedbottomupmergesort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Hybrid/OptimizedBottomUpMergeSort.swift",
+      "status": "verified",
+      "notes": "Structural Swift/reference review, ten-language samples, targeted boundary/adversarial cases passed."
+    },
+    {
+      "id": "optimizedbubblesort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Exchange/OptimizedBubbleSort.swift",
+      "status": "verified",
+      "notes": "Structural Swift/reference review, ten-language samples, targeted boundary/adversarial cases passed."
+    },
+    {
+      "id": "optimizedcocktailshakersort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Exchange/OptimizedCocktailShakerSort.swift",
+      "status": "verified",
+      "notes": "Structural Swift/reference review, ten-language samples, targeted boundary/adversarial cases passed."
+    },
+    {
+      "id": "optimizedgnomesort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Exchange/OptimizedGnomeSort.swift",
+      "status": "verified",
+      "notes": "Structural Swift/reference review, ten-language samples, targeted boundary/adversarial cases passed."
+    },
+    {
+      "id": "optimizedguesssort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Impractical/OptimizedGuessSort.swift",
+      "status": "verified",
+      "notes": "Structural Swift/reference review, ten-language samples, targeted boundary/adversarial cases passed."
+    },
+    {
+      "id": "optimizedlazystablesort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Merge/OptimizedLazyStableSort.swift",
+      "status": "verified",
+      "notes": "Swift/template and ten reference languages structurally reviewed; ten sample runs and targeted Python boundary/adversarial cases passed."
+    },
+    {
+      "id": "optimizedstoogesort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Exchange/OptimizedStoogeSort.swift",
+      "status": "verified",
+      "notes": "Structural Swift/reference review, ten-language samples, targeted boundary/adversarial cases passed."
+    },
+    {
+      "id": "optimizedstoogesortstudio",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Exchange/OptimizedStoogeSortStudio.swift",
+      "status": "corrected",
+      "notes": "Reference fidelity correction; ten-language samples and targeted cases passed. Archive repacked and verified."
+    },
+    {
+      "id": "optimizedweavemergesort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Hybrid/OptimizedWeaveMergeSort.swift",
+      "status": "verified",
+      "notes": "Structural Swift/reference review, ten-language samples, and targeted boundary/adversarial cases passed."
+    },
+    {
+      "id": "outofplaceheapsort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Selection/OutOfPlaceHeapSort.swift",
+      "status": "verified",
+      "notes": "Structural Swift/reference review, ten-language samples, and targeted boundary/adversarial cases passed."
+    },
+    {
+      "id": "pairwisemergesortiterative",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Concurrent/PairwiseMergeSortIterative.swift",
+      "status": "verified",
+      "notes": "Structural Swift/reference review, ten-language samples, and targeted boundary/adversarial cases passed."
+    },
+    {
+      "id": "pairwisemergesortrecursive",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Concurrent/PairwiseMergeSortRecursive.swift",
+      "status": "verified",
+      "notes": "Structural Swift/reference review, ten-language samples, and targeted boundary/adversarial cases passed."
+    },
+    {
+      "id": "pairwisesortiterative",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Concurrent/PairwiseSortIterative.swift",
+      "status": "verified",
+      "notes": "Structural Swift/reference review, ten-language samples, and targeted boundary/adversarial cases passed."
+    },
+    {
+      "id": "pairwisesortrecursive",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Concurrent/PairwiseSortRecursive.swift",
+      "status": "corrected",
+      "notes": "Reference fidelity correction; source tested, shared archive repack pending."
+    },
+    {
+      "id": "pancakeinsertionsort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Miscellaneous/PancakeInsertionSort.swift",
+      "status": "verified",
+      "notes": "Structural Swift/reference review, ten-language samples, and targeted boundary/adversarial cases passed."
+    },
+    {
+      "id": "patiencesort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Insertion/PatienceSort.swift",
+      "status": "verified",
+      "notes": "Structural Swift/reference review, ten-language samples, and targeted boundary/adversarial cases passed."
+    },
+    {
+      "id": "pdmergesort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Merge/PDMergeSort.swift",
+      "status": "verified",
+      "notes": "Swift/template and ten reference languages structurally reviewed; ten sample runs and targeted Python boundary/adversarial cases passed."
+    },
+    {
+      "id": "pdqbranchedsort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Hybrid/PDQBranchedSort.swift",
+      "status": "verified",
+      "notes": "Swift/template and ten reference languages structurally reviewed; ten sample runs and targeted Python boundary/adversarial cases passed."
+    },
+    {
+      "id": "pdqbranchlesssort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Hybrid/PDQBranchlessSort.swift",
+      "status": "verified",
+      "notes": "Swift/template and ten reference languages structurally reviewed; ten sample runs and targeted Python boundary/adversarial cases passed."
+    },
+    {
+      "id": "pigeonholesort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Distribution/PigeonholeSort.swift",
+      "status": "verified",
+      "notes": "Structural Swift/reference review, ten-language samples, and targeted boundary/adversarial cases passed."
+    },
+    {
+      "id": "poplarheapsort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Selection/PoplarHeapSort.swift",
+      "status": "verified",
+      "notes": "Structural Swift/reference review, ten-language samples, and targeted boundary/adversarial cases passed."
+    },
+    {
+      "id": "quadsort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Merge/QuadSort.swift",
+      "status": "verified",
+      "notes": "Swift/template and ten reference languages structurally reviewed; ten sample runs and targeted Python boundary/adversarial cases passed."
+    },
+    {
+      "id": "quadstoogesort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Impractical/QuadStoogeSort.swift",
+      "status": "verified",
+      "notes": "Structural Swift/reference review, ten-language samples, and targeted boundary/adversarial cases passed."
+    },
+    {
+      "id": "randomguesssort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Impractical/RandomGuessSort.swift",
+      "status": "corrected",
+      "notes": "Reference fidelity correction; ten-language samples and targeted cases passed. Archive repacked and verified."
+    },
+    {
+      "id": "recursiveshellsort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Insertion/RecursiveShellSort.swift",
+      "status": "corrected",
+      "notes": "Reference fidelity correction; ten-language samples and targeted cases passed. Archive repacked and verified."
+    },
+    {
+      "id": "redblacktreesort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Insertion/RedBlackTreeSort.swift",
+      "status": "verified",
+      "notes": "Structural Swift/reference review, ten-language samples, and targeted boundary/adversarial cases passed."
+    },
+    {
+      "id": "rotatemergesort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Merge/RotateMergeSort.swift",
+      "status": "verified",
+      "notes": "Structural Swift/reference review, ten-language samples, and targeted boundary/adversarial cases passed."
+    },
+    {
+      "id": "selectionsort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Selection/SelectionSort.swift",
+      "status": "verified",
+      "notes": "Structural Swift/reference review, ten-language samples, and targeted boundary/adversarial cases passed."
+    },
+    {
+      "id": "shattersort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Distribution/ShatterSort.swift",
+      "status": "corrected",
+      "notes": "Reference fidelity correction; ten-language samples and targeted cases passed. Archive repacked and verified."
+    },
+    {
+      "id": "shovesort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Impractical/ShoveSort.swift",
+      "status": "verified",
+      "notes": "Structural Swift/reference review, ten-language samples, and targeted boundary/adversarial cases passed."
+    },
+    {
+      "id": "sillysort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Exchange/SillySort.swift",
+      "status": "verified",
+      "notes": "Structural Swift/reference review, ten-language samples, and targeted boundary/adversarial cases passed."
+    },
+    {
+      "id": "simpleshattersort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Distribution/SimpleShatterSort.swift",
+      "status": "corrected",
+      "notes": "Reference fidelity correction; ten-language samples and targeted cases passed. Archive repacked and verified."
+    },
+    {
+      "id": "simplisticgravitysort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Distribution/SimplisticGravitySort.swift",
+      "status": "corrected",
+      "notes": "Reference fidelity correction; ten-language samples and targeted cases passed. Archive repacked and verified."
+    },
+    {
+      "id": "slopesort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Exchange/SlopeSort.swift",
+      "status": "verified",
+      "notes": "Structural Swift/reference review, ten-language samples, and targeted boundary/adversarial cases passed."
+    },
+    {
+      "id": "slowsort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Exchange/SlowSort.swift",
+      "status": "verified",
+      "notes": "Structural Swift/reference review, ten-language samples, and targeted boundary/adversarial cases passed."
+    },
+    {
+      "id": "smartguesssort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Impractical/SmartGuessSort.swift",
+      "status": "verified",
+      "notes": "Structural Swift/reference review, ten-language samples, and targeted boundary/adversarial cases passed."
+    },
+    {
+      "id": "smoothsort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Selection/SmoothSort.swift",
+      "status": "verified",
+      "notes": "Structural Swift/reference review, ten-language samples, and targeted boundary/adversarial cases passed."
+    },
+    {
+      "id": "snufflesort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Exchange/SnuffleSort.swift",
+      "status": "verified",
+      "notes": "Structural Swift/reference review, ten-language samples, and targeted boundary/adversarial cases passed."
+    },
+    {
+      "id": "splaysort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Insertion/SplaySort.swift",
+      "status": "verified",
+      "notes": "Structural Swift/reference review, ten-language samples, and targeted boundary/adversarial cases passed."
+    },
+    {
+      "id": "stablecyclesort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Selection/StableCycleSort.swift",
+      "status": "verified",
+      "notes": "Structural Swift/reference review, ten-language samples, and targeted boundary/adversarial cases passed."
+    },
+    {
+      "id": "stablequicksort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Exchange/StableQuickSort.swift",
+      "status": "verified",
+      "notes": "Structural Swift/reference review, ten-language samples, and targeted boundary/adversarial cases passed."
+    },
+    {
+      "id": "stableselectionsort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Selection/StableSelectionSort.swift",
+      "status": "verified",
+      "notes": "Structural Swift/reference review, ten-language samples, and targeted boundary/adversarial cases passed."
+    },
+    {
+      "id": "stacklessamericanflagsort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Distribution/StacklessAmericanFlagSort.swift",
+      "status": "verified",
+      "notes": "Structural Swift/reference review, ten-language samples, and targeted boundary/adversarial cases passed."
+    },
+    {
+      "id": "stacklessbinaryquicksort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Distribution/StacklessBinaryQuickSort.swift",
+      "status": "verified",
+      "notes": "Structural Swift/reference review, ten-language samples, and targeted boundary/adversarial cases passed."
+    },
+    {
+      "id": "stacklessdualpivotquicksort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Hybrid/StacklessDualPivotQuickSort.swift",
+      "status": "verified",
+      "notes": "Structural Swift/reference review, ten-language samples, and targeted boundary/adversarial cases passed."
+    },
+    {
+      "id": "stacklesshybridquicksort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Hybrid/StacklessHybridQuickSort.swift",
+      "status": "verified",
+      "notes": "Structural Swift/reference review, ten-language samples, and targeted boundary/adversarial cases passed."
+    },
+    {
+      "id": "stacklessrotatemergesort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Merge/StacklessRotateMergeSort.swift",
+      "status": "verified",
+      "notes": "Structural Swift/reference review, ten-language samples, and targeted boundary/adversarial cases passed."
+    },
+    {
+      "id": "staticsort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Distribution/StaticSort.swift",
+      "status": "verified",
+      "notes": "Structural Swift/reference review, ten-language samples, and targeted boundary/adversarial cases passed."
+    },
+    {
+      "id": "stoogesort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Impractical/StoogeSort.swift",
+      "status": "corrected",
+      "notes": "Reference fidelity correction; ten-language samples and targeted cases passed. Archive repacked and verified."
+    },
+    {
+      "id": "strandsort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Merge/StrandSort.swift",
+      "status": "verified",
+      "notes": "Structural Swift/reference review, ten-language samples, and targeted boundary/adversarial cases passed."
+    },
+    {
+      "id": "swaplessbubblesort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Exchange/SwaplessBubbleSort.swift",
+      "status": "verified",
+      "notes": "Structural Swift/reference review, ten-language samples, and targeted boundary/adversarial cases passed."
+    },
+    {
+      "id": "tablesort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Exchange/TableSort.swift",
+      "status": "verified",
+      "notes": "Structural Swift/reference review, ten-language samples, and targeted boundary/adversarial cases passed."
+    },
+    {
+      "id": "ternaryheapsort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Selection/TernaryHeapSort.swift",
+      "status": "verified",
+      "notes": "Structural Swift/reference review, ten-language samples, and targeted boundary/adversarial cases passed."
+    },
+    {
+      "id": "ternaryllquicksort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Quick/TernaryLLQuickSort.swift",
+      "status": "verified",
+      "notes": "Structural Swift/reference review, ten-language samples, and targeted boundary/adversarial cases passed."
+    },
+    {
+      "id": "ternarylrquicksort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Quick/TernaryLRQuickSort.swift",
+      "status": "verified",
+      "notes": "Structural Swift/reference review, ten-language samples, and targeted boundary/adversarial cases passed."
+    },
+    {
+      "id": "threesmoothcombsortiterative",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Exchange/ThreeSmoothCombSortIterative.swift",
+      "status": "verified",
+      "notes": "Structural Swift/reference review, ten-language samples, and targeted boundary/adversarial cases passed."
+    },
+    {
+      "id": "threesmoothcombsortrecursive",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Exchange/ThreeSmoothCombSortRecursive.swift",
+      "status": "verified",
+      "notes": "Structural Swift/reference review, ten-language samples, and targeted boundary/adversarial cases passed."
+    },
+    {
+      "id": "tournamentsort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Selection/TournamentSort.swift",
+      "status": "corrected",
+      "notes": "Reference fidelity correction; ten-language samples and targeted cases passed. Archive repacked and verified."
+    },
+    {
+      "id": "treesort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Insertion/TreeSort.swift",
+      "status": "verified",
+      "notes": "Structural Swift/reference review, ten-language samples, targeted boundary/adversarial cases passed."
+    },
+    {
+      "id": "triangularheapsort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Selection/TriangularHeapSort.swift",
+      "status": "verified",
+      "notes": "Structural Swift/reference review, ten-language samples, targeted boundary/adversarial cases passed."
+    },
+    {
+      "id": "twinsort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Merge/TwinSort.swift",
+      "status": "verified",
+      "notes": "Swift/template and ten reference languages structurally reviewed; ten sample runs and targeted Python boundary/adversarial cases passed."
+    },
+    {
+      "id": "unoptimizedbubblesort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Exchange/UnoptimizedBubbleSort.swift",
+      "status": "verified",
+      "notes": "Structural Swift/reference review, ten-language samples, targeted boundary/adversarial cases passed."
+    },
+    {
+      "id": "unoptimizedcocktailshakersort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Exchange/UnoptimizedCocktailShakerSort.swift",
+      "status": "verified",
+      "notes": "Structural Swift/reference review, ten-language samples, targeted boundary/adversarial cases passed."
+    },
+    {
+      "id": "weakheapsort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Selection/WeakHeapSort.swift",
+      "status": "corrected",
+      "notes": "Reference fidelity correction; ten-language samples and targeted cases passed. Archive repacked and verified."
+    },
+    {
+      "id": "weavedmergesort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Merge/WeavedMergeSort.swift",
+      "status": "verified",
+      "notes": "Structural Swift/reference review, ten-language samples, targeted boundary/adversarial cases passed."
+    },
+    {
+      "id": "weavemergesort",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Hybrid/WeaveMergeSort.swift",
+      "status": "verified",
+      "notes": "Swift/template and ten reference languages structurally reviewed; ten sample runs and targeted Python boundary/adversarial cases passed."
+    },
+    {
+      "id": "weavesortiterative",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Concurrent/WeaveSortIterative.swift",
+      "status": "verified",
+      "notes": "Structural Swift/reference review, ten-language samples, targeted boundary/adversarial cases passed."
+    },
+    {
+      "id": "weavesortrecursive",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Concurrent/WeaveSortRecursive.swift",
+      "status": "verified",
+      "notes": "Structural Swift/reference review, ten-language samples, targeted boundary/adversarial cases passed."
+    },
+    {
+      "id": "yujisbufferedmergesort2",
+      "swift": "Modules/BuiltInAlgorithms/Sources/Hybrid/YujisBufferedMergeSort2.swift",
+      "status": "verified",
+      "notes": "Structural Swift/reference review, ten-language samples, targeted boundary/adversarial cases passed."
+    }
+  ]
+}

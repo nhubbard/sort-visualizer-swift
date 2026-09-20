@@ -6,13 +6,7 @@ A sorted-output sample test establishes output correctness only; it cannot estab
 sample follows the same algorithm. This audit compares control flow and data movement against
 the app's Swift implementation. Targeted execution remains a separate validation step.
 
-All 169 algorithms outside the 13 Bogo/Bozo-named sorts received a read-only, major-phase and
-complexity review of their ten reference sources. Twenty-four non-Bogo algorithms below were
-verified and corrected; no confirmed non-Bogo deviations remain from this structural review.
-The other 145 have no confirmed substitution from this review. Among those 145, exact equivalence remains
-uncertain for the large GrailSort, PDQBranchedSort, PDQBranchlessSort, QuadSort, and
-NewShuffleMergeSort implementations. The source review did not run all samples on boundary or
-duplicate-heavy inputs and is not a proof of line-by-line equivalence.
+All 169 algorithms outside the 13 Bogo/Bozo-named sorts received a major-phase review. The original 24 corrected algorithms are listed below. The other 145 now also have an individual [verification ledger](reference-fidelity-verification.json): each Swift body and called template was compared with its ten reference samples, all ten provided samples were run, and targeted boundary, duplicate-heavy, sorted, reversed, and adversarial cases were run in Python. The ledger distinguishes verified, corrected, and in-progress entries. This is execution-backed source review, not a formal equivalence proof; the app’s size limits and deliberately impractical algorithms constrain the larger tests.
 
 ## Verified and corrected
 
@@ -45,17 +39,17 @@ duplicate-heavy inputs and is not a proof of line-by-line equivalence.
 | MergeInsertionSort | Iterative in-place block swaps, block search, and Jacobsthal-ordered insertion | Ten sample tests; 4,000 Python and 4,000 JavaScript cases, plus C and C++ generated cases through 256 items |
 | DropMergeSort | Branched PDQ fallback for both the full array and dropped tail, plus the app’s index-seeded backtrack heuristic | Ten sample tests; 1,760 Python and 1,300 JavaScript cases, 520 nonzero-range PDQ cases, and C/C++ generated cases through 1,024 items |
 
-## Remaining non-Bogo deviations
+## Additional non-Bogo findings
 
-None confirmed by this structural audit. The 145 algorithms without a confirmed substitution
-still require deeper equivalence checks, especially the large template-based implementations
-called out above.
+The individual ledger records corrections across the other 145 algorithms. Confirmed differences included held-key shifts where Swift uses adjacent swaps (BinaryInsertionSort, InsertionSort, HybridCombSort, both IntroCircleSorts, RecursiveShellSort, ShatterSort, and SimpleShatterSort), BottomUpMergeSort’s per-merge buffers versus Swift’s pass-level scratch buffer, radix choice in AmericanFlagSort, iterative heap sifting in MaxHeapSort, in-place output in TournamentSort, deterministic enumeration in RandomGuessSort, and missing empty or singleton guards in several families. The shared `AlgorithmDetails.algz` archive was regenerated and verified after the source edits.
+
+The native IntroSort and its references both fail on empty input because of an unguarded logarithm; that is a shared implementation defect, not a reference mismatch. SplaySort’s references express splaying and traversal recursively, while Swift uses explicit stacks; their phases and complexity agree, but very large standalone reference inputs could exhaust a call stack.
 
 ## Expected Bogo-family divergence
 
 Source scans find randomness in samples for `BozoSort`, `CocktailBogoSort`,
 `ExchangeBogoSort`, `LessBogoSort`, `MedianQuickBogoSort`, `MergeBogoSort`, `QuickBogoSort`,
-`RandomGuessSort`, `SelectionBogoSort`, and `SmartBogoBogoSort`; their Swift ports may use finite,
+`SelectionBogoSort`, and `SmartBogoBogoSort`; their Swift ports may use finite,
 deterministic substitutes. The app needs a finite recording process, so this divergence is
 expected. The decision to align these examples with the Swift behavior or label their difference
 is deferred; it is outside the current non-Bogo audit.
@@ -65,16 +59,8 @@ Direct inspection confirms the divergence is real, not merely suspicious imports
 `ExchangeBogoSort` uses an ordered pair scan instead of a random exchange loop;
 `CocktailBogoSort`, `LessBogoSort`, `MedianQuickBogoSort`, `QuickBogoSort`, and
 `SmartBogoBogoSort` advance permutations within a chosen range; `MergeBogoSort` enumerates
-weave choices; `RandomGuessSort` enumerates guesses with a base-`n` counter; and
-`SelectionBogoSort` selects a minimum with a deterministic scan.
+weave choices; `SelectionBogoSort` selects a minimum with a deterministic scan.
 
-## Remaining validation
+## Validation scope
 
-The five large implementations named above need detailed control-flow comparison across every
-language. Targeted sample runs, duplicate-heavy inputs, non-power-of-two lengths, and larger
-arrays are needed to validate the 8 findings and look for additional edge-case discrepancies.
-In particular, the PDQ samples contain partition, partial-insertion, and heap-fallback machinery;
-the Grail samples contain block-building and combining machinery; and the QuadSort samples retain
-their parity and merge phases. Presence of those phases and source length alone do not prove
-equivalence. The project must not describe the corpus as fully verified until that validation is
-complete.
+The five largest template-driven families—GrailSort, PDQBranchedSort, PDQBranchlessSort, QuadSort, and NewShuffleMergeSort—retained their core control flow and data movement in all ten samples, passed their ten-language sample tests, and passed targeted Python boundary and adversarial cases. The source review and tests establish practical fidelity for the app’s documented input range. They do not prove line-by-line identity for every possible standalone input.
