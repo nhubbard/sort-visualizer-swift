@@ -82,7 +82,7 @@ struct NativeAlgorithmCorrectnessTests {
     ImprovedInPlaceMergeSort(), InPlaceLSDRadixSort(), InPlaceMergeSort(), InsertionSort(), IntroCircleSortIterative(),
     IntroCircleSortRecursive(), IntroSort(), IterativeTopDownMergeSort(), LaziestSort(), LazyHeapSort(),
     LazyStableSort(), LessBogoSort(), LibrarySort(), LLQuickSort(), LRQuickSort(), LSDRadixSort(), MatrixSort(),
-    MaxHeapSort(), MedianQuickBogoSort(), MergeBogoSort(), MergeExchangeSortIterative(), MergeInsertionSort(),
+    MaxHeapSort(), MedianMergeSort(), MedianQuickBogoSort(), MergeBogoSort(), MergeExchangeSortIterative(), MergeInsertionSort(),
     MergeSort(), MinHeapSort(), MinMaxHeapSort(), MSDRadixSort(), NewShuffleMergeSort(), OddEvenMergeSortIterative(),
     OddEvenMergeSortRecursive(), OddEvenSort(), OptimizedBottomUpMergeSort(), OptimizedBubbleSort(),
     OptimizedCocktailShakerSort(), OptimizedDualPivotQuickSort(), OptimizedGnomeSort(), OptimizedGuessSort(),
@@ -107,6 +107,33 @@ struct NativeAlgorithmCorrectnessTests {
   func everyAlgorithmHasAUniqueID() {
     let ids = Self.algorithms.map(\.id)
     #expect(Set(ids).count == ids.count, "duplicate AlgorithmID across native algorithms")
+  }
+
+  @Test
+  func medianMergeSortHandlesPartitionsAndDuplicates() {
+    let sort = MedianMergeSort()
+    for size in [0, 1, 2, 15, 16, 17, 31, 32, 63, 64, 127, 256, 511] {
+      let inputs = [
+        Array(repeating: 7, count: size),
+        Array(0..<size),
+        Array((0..<size).reversed()),
+        (0..<size).map { ($0 * 17) % 9 },
+        (0..<size).map { _ in Int.random(in: -size...size) },
+        (0..<size).map { min($0, size - 1 - $0) },
+        (0..<size).map { $0.isMultiple(of: 3) ? 0 : $0 }
+      ]
+      for input in inputs {
+        var engine = RecordingEngine(values: input)
+        sort.record(into: &engine)
+        #expect(engine.values == input.sorted(), "Median Merge failed size \(size): \(input) -> \(engine.values)")
+      }
+      for _ in 0..<50 where size > 16 {
+        let input = (0..<size).map { _ in Int.random(in: -8...8) }
+        var engine = RecordingEngine(values: input)
+        sort.record(into: &engine)
+        #expect(engine.values == input.sorted(), "Median Merge failed duplicate-heavy fuzz at size \(size)")
+      }
+    }
   }
 
   @Test

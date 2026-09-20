@@ -45,7 +45,7 @@ struct Sort2App: App {
       InsertionSort(), IntroCircleSortIterative(), IntroCircleSortRecursive(), IntroSort(), IterativeTopDownMergeSort(),
       LaziestSort(), LazyHeapSort(), LazyStableSort(), LessBogoSort(), LibrarySort(), LLQuickSort(),
       LRQuickSort(), LSDRadixSort(),
-      MatrixSort(), MaxHeapSort(), MedianQuickBogoSort(), MergeBogoSort(), MergeExchangeSortIterative(),
+      MatrixSort(), MaxHeapSort(), MedianMergeSort(), MedianQuickBogoSort(), MergeBogoSort(), MergeExchangeSortIterative(),
       MergeInsertionSort(), MergeSort(), MinHeapSort(), MinMaxHeapSort(), MSDRadixSort(), NewShuffleMergeSort(),
       OddEvenMergeSortIterative(), OddEvenMergeSortRecursive(), OddEvenSort(),
       OptimizedBottomUpMergeSort(), OptimizedBubbleSort(),
