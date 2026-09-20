@@ -86,18 +86,14 @@ def sort(arr):
 
     block_size = max(16, math.isqrt(n))
     lo = 0
-    while lo < n:
-        binary_insertion_sort(arr, lo, min(lo + block_size, n))
+    while lo + 2 * block_size < n:
+        binary_insertion_sort(arr, lo, lo + block_size)
         lo += block_size
+    binary_insertion_sort(arr, lo, n)
 
-    # Merge blocks back to front: the already-sorted run always starts at `merged_start`,
-    # and each step folds the block immediately before it into that run.
-    num_blocks = (n + block_size - 1) // block_size
-    merged_start = (num_blocks - 1) * block_size
-    for i in range(num_blocks - 2, -1, -1):
-        left_start = i * block_size
-        merge(arr, left_start, merged_start, n)
-        merged_start = left_start
+    while lo >= block_size:
+        merge(arr, lo - block_size, lo, n)
+        lo -= block_size
 
 
 if __name__ == "__main__":

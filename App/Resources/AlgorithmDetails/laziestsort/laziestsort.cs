@@ -142,20 +142,18 @@ public class LaziestSort
     }
 
     int blockSize = Math.Max(16, IntegerSqrt(n));
-    for (int low = 0; low < n; low += blockSize)
+    int low = 0;
+    while (low + 2 * blockSize < n)
     {
-      BinaryInsertionSort(arr, low, Math.Min(low + blockSize, n));
+      BinaryInsertionSort(arr, low, low + blockSize);
+      low += blockSize;
     }
+    BinaryInsertionSort(arr, low, n);
 
-    // Merge blocks back to front: the already-sorted run always starts at
-    // mergedStart, and each step folds the block immediately before it into that run.
-    int numBlocks = (n + blockSize - 1) / blockSize;
-    int mergedStart = (numBlocks - 1) * blockSize;
-    for (int i = numBlocks - 2; i >= 0; i--)
+    while (low >= blockSize)
     {
-      int leftStart = i * blockSize;
-      Merge(arr, leftStart, mergedStart, n);
-      mergedStart = leftStart;
+      Merge(arr, low - blockSize, low, n);
+      low -= blockSize;
     }
   }
 

@@ -102,19 +102,15 @@ def sort(arr)
 
   block_size = [16, integer_sqrt(n)].max
   low = 0
-  while low < n
-    binary_insertion_sort(arr, low, [low + block_size, n].min)
+  while low + 2 * block_size < n
+    binary_insertion_sort(arr, low, low + block_size)
     low += block_size
   end
+  binary_insertion_sort(arr, low, n)
 
-  # Merge blocks back to front: the already-sorted run always starts at merged_start,
-  # and each step folds the block immediately before it into that run.
-  num_blocks = (n + block_size - 1) / block_size
-  merged_start = (num_blocks - 1) * block_size
-  (num_blocks - 2).downto(0) do |i|
-    left_start = i * block_size
-    merge(arr, left_start, merged_start, n)
-    merged_start = left_start
+  while low >= block_size
+    merge(arr, low - block_size, low, n)
+    low -= block_size
   end
 end
 

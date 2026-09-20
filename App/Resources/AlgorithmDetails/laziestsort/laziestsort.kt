@@ -110,19 +110,15 @@ fun sort(arr: Array<Int>) {
 
   val blockSize = maxOf(16, integerSqrt(n))
   var low = 0
-  while (low < n) {
-    binaryInsertionSort(arr, low, minOf(low + blockSize, n))
+  while (low + 2 * blockSize < n) {
+    binaryInsertionSort(arr, low, low + blockSize)
     low += blockSize
   }
+  binaryInsertionSort(arr, low, n)
 
-  // Merge blocks back to front: the already-sorted run always starts at mergedStart,
-  // and each step folds the block immediately before it into that run.
-  val numBlocks = (n + blockSize - 1) / blockSize
-  var mergedStart = (numBlocks - 1) * blockSize
-  for (i in numBlocks - 2 downTo 0) {
-    val leftStart = i * blockSize
-    merge(arr, leftStart, mergedStart, n)
-    mergedStart = leftStart
+  while (low >= blockSize) {
+    merge(arr, low - blockSize, low, n)
+    low -= blockSize
   }
 }
 

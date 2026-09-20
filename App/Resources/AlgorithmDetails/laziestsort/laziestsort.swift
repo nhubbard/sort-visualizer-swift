@@ -114,19 +114,15 @@ func sort(_ arr: inout [Int]) {
 
     let blockSize = max(16, integerSqrt(n))
     var low = 0
-    while low < n {
-        binaryInsertionSort(&arr, low, min(low + blockSize, n))
+    while low + 2 * blockSize < n {
+        binaryInsertionSort(&arr, low, low + blockSize)
         low += blockSize
     }
+    binaryInsertionSort(&arr, low, n)
 
-    // Merge blocks back to front: the already-sorted run always starts at
-    // mergedStart, and each step folds the block immediately before it into that run.
-    let numBlocks = (n + blockSize - 1) / blockSize
-    var mergedStart = (numBlocks - 1) * blockSize
-    for i in stride(from: numBlocks - 2, through: 0, by: -1) {
-        let leftStart = i * blockSize
-        merge(&arr, leftStart, mergedStart, n)
-        mergedStart = leftStart
+    while low >= blockSize {
+        merge(&arr, low - blockSize, low, n)
+        low -= blockSize
     }
 }
 

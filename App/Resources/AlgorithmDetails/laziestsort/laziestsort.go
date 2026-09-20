@@ -129,18 +129,16 @@ func sort(arr []int) []int {
 	}
 
 	blockSize := max(16, integerSqrt(n))
-	for low := 0; low < n; low += blockSize {
-		binaryInsertionSort(arr, low, min(low+blockSize, n))
+	low := 0
+	for low+2*blockSize < n {
+		binaryInsertionSort(arr, low, low+blockSize)
+		low += blockSize
 	}
+	binaryInsertionSort(arr, low, n)
 
-	// Merge blocks back to front: the already-sorted run always starts at
-	// mergedStart, and each step folds the block immediately before it into that run.
-	numBlocks := (n + blockSize - 1) / blockSize
-	mergedStart := (numBlocks - 1) * blockSize
-	for i := numBlocks - 2; i >= 0; i-- {
-		leftStart := i * blockSize
-		merge(arr, leftStart, mergedStart, n)
-		mergedStart = leftStart
+	for low >= blockSize {
+		merge(arr, low-blockSize, low, n)
+		low -= blockSize
 	}
 	return arr
 }
