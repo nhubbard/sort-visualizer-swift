@@ -17,45 +17,38 @@ void printList(int arr[], int n) {
 
 int min(int a, int b) { return a < b ? a : b; }
 
-void merge(int arr[], int low, int mid, int high) {
-  int leftSize = mid - low;
-  int rightSize = high - mid;
-  int *left = malloc(leftSize * sizeof(int));
-  int *right = malloc(rightSize * sizeof(int));
-  for (int x = 0; x < leftSize; x++)
-    left[x] = arr[low + x];
-  for (int x = 0; x < rightSize; x++)
-    right[x] = arr[mid + x];
-
-  int i = 0, j = 0, k = low;
-  while (i < leftSize && j < rightSize) {
-    if (left[i] <= right[j]) {
-      arr[k++] = left[i++];
-    } else {
-      arr[k++] = right[j++];
-    }
-  }
-  while (i < leftSize) {
-    arr[k++] = left[i++];
-  }
-  while (j < rightSize) {
-    arr[k++] = right[j++];
-  }
-
-  free(left);
-  free(right);
+int merge(int arr[], int scratch[], int n, int index, int mergeSize) {
+  int mid = index + mergeSize / 2;
+  int end = index + mergeSize < n ? index + mergeSize : n;
+  if (mid >= end) return index;
+  int left = index, right = mid, out = index;
+  while (left < mid && right < end)
+    scratch[out++] = arr[left] <= arr[right] ? arr[left++] : arr[right++];
+  while (left < mid) scratch[out++] = arr[left++];
+  while (right < end) scratch[out++] = arr[right++];
+  return -1;
 }
 
 void sort(int arr[], int n) {
-  for (int width = 1; width < n; width *= 2) {
-    for (int low = 0; low < n; low += 2 * width) {
-      int mid = min(low + width, n);
-      int high = min(low + 2 * width, n);
-      if (mid < high) {
-        merge(arr, low, mid, high);
-      }
+  if (n < 2) return;
+  int *scratch = malloc((size_t)n * sizeof(int));
+  for (int j = 0; j < n; j++) scratch[j] = arr[j];
+  int mergeSize = 2;
+  while (mergeSize <= n) {
+    int copyLength = n;
+    for (int index = 0; index < n; index += mergeSize) {
+      int stop = merge(arr, scratch, n, index, mergeSize);
+      if (stop >= 0) copyLength = stop;
     }
+    for (int j = 0; j < copyLength; j++) arr[j] = scratch[j];
+    mergeSize *= 2;
   }
+  if (mergeSize / 2 != n) {
+    int stop = merge(arr, scratch, n, 0, mergeSize);
+    int copyLength = stop < 0 ? n : stop;
+    for (int j = 0; j < copyLength; j++) arr[j] = scratch[j];
+  }
+  free(scratch);
 }
 
 int main(int argc, char *argv[]) {

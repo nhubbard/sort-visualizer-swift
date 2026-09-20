@@ -2,59 +2,41 @@ using System;
 
 public class BottomUpMergeSort
 {
-  private static void Merge(int[] array, int low, int mid, int high)
+  private static int Merge(int[] array, int[] scratch, int n, int index, int mergeSize)
   {
-    int[] left = new int[mid - low];
-    int[] right = new int[high - mid];
-    Array.Copy(array, low, left, 0, left.Length);
-    Array.Copy(array, mid, right, 0, right.Length);
-    int i = 0,
-      j = 0,
-      k = low;
-    while (i < left.Length && j < right.Length)
-    {
-      if (left[i] <= right[j])
-      {
-        array[k] = left[i];
-        i++;
-      }
-      else
-      {
-        array[k] = right[j];
-        j++;
-      }
-      k++;
-    }
-    while (i < left.Length)
-    {
-      array[k] = left[i];
-      i++;
-      k++;
-    }
-    while (j < right.Length)
-    {
-      array[k] = right[j];
-      j++;
-      k++;
-    }
+    int mid = index + mergeSize / 2;
+    int end = Math.Min(n, index + mergeSize);
+    if (mid >= end) return index;
+    int left = index, right = mid, output = index;
+    while (left < mid && right < end)
+      scratch[output++] = array[left] <= array[right] ? array[left++] : array[right++];
+    while (left < mid) scratch[output++] = array[left++];
+    while (right < end) scratch[output++] = array[right++];
+    return -1;
   }
 
-  public static int[] Sort(int[] array)
+  public static void Sort(int[] array)
   {
-    var n = array.Length;
-    for (var width = 1; width < n; width *= 2)
+    int n = array.Length;
+    if (n < 2) return;
+    int[] scratch = (int[])array.Clone();
+    int mergeSize = 2;
+    while (mergeSize <= n)
     {
-      for (var low = 0; low < n; low += 2 * width)
+      int copyLength = n;
+      for (int index = 0; index < n; index += mergeSize)
       {
-        var mid = Math.Min(low + width, n);
-        var high = Math.Min(low + 2 * width, n);
-        if (mid < high)
-        {
-          Merge(array, low, mid, high);
-        }
+        int stop = Merge(array, scratch, n, index, mergeSize);
+        if (stop >= 0) copyLength = stop;
       }
+      Array.Copy(scratch, array, copyLength);
+      mergeSize *= 2;
     }
-    return array;
+    if (mergeSize / 2 != n)
+    {
+      int stop = Merge(array, scratch, n, 0, mergeSize);
+      Array.Copy(scratch, array, stop < 0 ? n : stop);
+    }
   }
 
   public static void Main(String[] args)

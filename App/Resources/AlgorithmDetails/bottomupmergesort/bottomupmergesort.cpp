@@ -16,35 +16,35 @@ void printList(int arr[], int n) {
   }
 }
 
-void merge(int arr[], int low, int mid, int high) {
-  std::vector<int> left(arr + low, arr + mid);
-  std::vector<int> right(arr + mid, arr + high);
-  size_t i = 0, j = 0;
-  int k = low;
-  while (i < left.size() && j < right.size()) {
-    if (left[i] <= right[j]) {
-      arr[k++] = left[i++];
-    } else {
-      arr[k++] = right[j++];
-    }
-  }
-  while (i < left.size()) {
-    arr[k++] = left[i++];
-  }
-  while (j < right.size()) {
-    arr[k++] = right[j++];
-  }
+int merge(int arr[], std::vector<int>& scratch, int n, int index, int mergeSize) {
+  int mid = index + mergeSize / 2;
+  int end = std::min(n, index + mergeSize);
+  if (mid >= end) return index;
+  int left = index, right = mid, out = index;
+  while (left < mid && right < end)
+    scratch[out++] = arr[left] <= arr[right] ? arr[left++] : arr[right++];
+  while (left < mid) scratch[out++] = arr[left++];
+  while (right < end) scratch[out++] = arr[right++];
+  return -1;
 }
 
 void sort(int arr[], int n) {
-  for (int width = 1; width < n; width *= 2) {
-    for (int low = 0; low < n; low += 2 * width) {
-      int mid = std::min(low + width, n);
-      int high = std::min(low + 2 * width, n);
-      if (mid < high) {
-        merge(arr, low, mid, high);
-      }
+  if (n < 2) return;
+  std::vector<int> scratch(arr, arr + n);
+  int mergeSize = 2;
+  while (mergeSize <= n) {
+    int copyLength = n;
+    for (int index = 0; index < n; index += mergeSize) {
+      int stop = merge(arr, scratch, n, index, mergeSize);
+      if (stop >= 0) copyLength = stop;
     }
+    for (int j = 0; j < copyLength; j++) arr[j] = scratch[j];
+    mergeSize *= 2;
+  }
+  if (mergeSize / 2 != n) {
+    int stop = merge(arr, scratch, n, 0, mergeSize);
+    int copyLength = stop < 0 ? n : stop;
+    for (int j = 0; j < copyLength; j++) arr[j] = scratch[j];
   }
 }
 

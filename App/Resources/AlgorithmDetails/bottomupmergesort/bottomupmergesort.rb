@@ -1,45 +1,52 @@
-def merge(array, low, mid, high)
-  left = array[low...mid]
-  right = array[mid...high]
-  i = 0
-  j = 0
-  k = low
-  while i < left.length && j < right.length
-    if left[i] <= right[j]
-      array[k] = left[i]
-      i += 1
+def merge(array, scratch, n, index, merge_size)
+  mid = index + merge_size / 2
+  finish = [n, index + merge_size].min
+  return index if mid >= finish
+  left, right, out = index, mid, index
+  while left < mid && right < finish
+    if array[left] <= array[right]
+      scratch[out] = array[left]
+      left += 1
     else
-      array[k] = right[j]
-      j += 1
+      scratch[out] = array[right]
+      right += 1
     end
-    k += 1
+    out += 1
   end
-  while i < left.length
-    array[k] = left[i]
-    i += 1
-    k += 1
+  while left < mid
+    scratch[out] = array[left]
+    left += 1
+    out += 1
   end
-  while j < right.length
-    array[k] = right[j]
-    j += 1
-    k += 1
+  while right < finish
+    scratch[out] = array[right]
+    right += 1
+    out += 1
   end
+  nil
 end
 
-def sort(array)
-  n = array.length
-  width = 1
-  while width < n
-    low = 0
-    while low < n
-      mid = [low + width, n].min
-      high = [low + 2 * width, n].min
-      merge(array, low, mid, high) if mid < high
-      low += 2 * width
+def sort(arr)
+  n = arr.length
+  return if n < 2
+  scratch = arr.dup
+  merge_size = 2
+  while merge_size <= n
+    copy_length = n
+    index = 0
+    while index < n
+      stop = merge(arr, scratch, n, index, merge_size)
+      copy_length = stop unless stop.nil?
+      index += merge_size
     end
-    width *= 2
+    arr[0...copy_length] = scratch[0...copy_length]
+    merge_size *= 2
   end
-  array
+  if merge_size / 2 != n
+    stop = merge(arr, scratch, n, 0, merge_size)
+    copy_length = stop.nil? ? n : stop
+    arr[0...copy_length] = scratch[0...copy_length]
+  end
 end
 
 array = [0, 39, 21, 62, 91, 77, 14, 23,

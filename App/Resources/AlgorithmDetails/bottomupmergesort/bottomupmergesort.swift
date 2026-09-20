@@ -1,47 +1,38 @@
 import Foundation
 
-func merge(_ array: inout [Int], _ low: Int, _ mid: Int, _ high: Int) {
-    let left = Array(array[low ..< mid])
-    let right = Array(array[mid ..< high])
-    var i = 0
-    var j = 0
-    var k = low
-    while i < left.count, j < right.count {
-        if left[i] <= right[j] {
-            array[k] = left[i]
-            i += 1
-        } else {
-            array[k] = right[j]
-            j += 1
-        }
-        k += 1
+func merge(_ arr: [Int], _ scratch: inout [Int], _ n: Int, _ index: Int, _ mergeSize: Int) -> Int? {
+    let mid = index + mergeSize / 2
+    let end = min(n, index + mergeSize)
+    if mid >= end { return index }
+    var left = index, right = mid, out = index
+    while left < mid && right < end {
+        if arr[left] <= arr[right] { scratch[out] = arr[left]; left += 1 }
+        else { scratch[out] = arr[right]; right += 1 }
+        out += 1
     }
-    while i < left.count {
-        array[k] = left[i]
-        i += 1
-        k += 1
-    }
-    while j < right.count {
-        array[k] = right[j]
-        j += 1
-        k += 1
-    }
+    while left < mid { scratch[out] = arr[left]; left += 1; out += 1 }
+    while right < end { scratch[out] = arr[right]; right += 1; out += 1 }
+    return nil
 }
 
-func sort(_ array: inout [Int]) {
-    let n = array.count
-    var width = 1
-    while width < n {
-        var low = 0
-        while low < n {
-            let mid = min(low + width, n)
-            let high = min(low + 2 * width, n)
-            if mid < high {
-                merge(&array, low, mid, high)
-            }
-            low += 2 * width
+func sort(_ arr: inout [Int]) {
+    let n = arr.count
+    if n < 2 { return }
+    var scratch = arr
+    var mergeSize = 2
+    while mergeSize <= n {
+        var copyLength = n
+        var index = 0
+        while index < n {
+            if let stop = merge(arr, &scratch, n, index, mergeSize) { copyLength = stop }
+            index += mergeSize
         }
-        width *= 2
+        for j in 0..<copyLength { arr[j] = scratch[j] }
+        mergeSize *= 2
+    }
+    if mergeSize / 2 != n {
+        let copyLength = merge(arr, &scratch, n, 0, mergeSize) ?? n
+        for j in 0..<copyLength { arr[j] = scratch[j] }
     }
 }
 

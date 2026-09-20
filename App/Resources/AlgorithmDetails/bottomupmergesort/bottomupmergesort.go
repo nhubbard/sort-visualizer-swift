@@ -4,51 +4,63 @@ import (
 	"fmt"
 )
 
-func merge(arr []int, low, mid, high int) {
-	left := make([]int, mid-low)
-	right := make([]int, high-mid)
-	copy(left, arr[low:mid])
-	copy(right, arr[mid:high])
-	i, j, k := 0, 0, low
-	for i < len(left) && j < len(right) {
-		if left[i] <= right[j] {
-			arr[k] = left[i]
-			i++
+func merge(arr, scratch []int, n, index, mergeSize int) int {
+	mid := index + mergeSize/2
+	end := index + mergeSize
+	if end > n {
+		end = n
+	}
+	if mid >= end {
+		return index
+	}
+	left, right, out := index, mid, index
+	for left < mid && right < end {
+		if arr[left] <= arr[right] {
+			scratch[out] = arr[left]
+			left++
 		} else {
-			arr[k] = right[j]
-			j++
+			scratch[out] = arr[right]
+			right++
 		}
-		k++
+		out++
 	}
-	for i < len(left) {
-		arr[k] = left[i]
-		i++
-		k++
+	for left < mid {
+		scratch[out] = arr[left]
+		left++
+		out++
 	}
-	for j < len(right) {
-		arr[k] = right[j]
-		j++
-		k++
+	for right < end {
+		scratch[out] = arr[right]
+		right++
+		out++
 	}
-}
-
-func min(a, b int) int {
-	if a < b {
-		return a
-	}
-	return b
+	return -1
 }
 
 func sort(arr []int) []int {
 	n := len(arr)
-	for width := 1; width < n; width *= 2 {
-		for low := 0; low < n; low += 2 * width {
-			mid := min(low+width, n)
-			high := min(low+2*width, n)
-			if mid < high {
-				merge(arr, low, mid, high)
+	if n < 2 {
+		return arr
+	}
+	scratch := append([]int(nil), arr...)
+	mergeSize := 2
+	for mergeSize <= n {
+		copyLength := n
+		for index := 0; index < n; index += mergeSize {
+			stop := merge(arr, scratch, n, index, mergeSize)
+			if stop >= 0 {
+				copyLength = stop
 			}
 		}
+		copy(arr[:copyLength], scratch[:copyLength])
+		mergeSize *= 2
+	}
+	if mergeSize/2 != n {
+		stop := merge(arr, scratch, n, 0, mergeSize)
+		if stop < 0 {
+			stop = n
+		}
+		copy(arr[:stop], scratch[:stop])
 	}
 	return arr
 }

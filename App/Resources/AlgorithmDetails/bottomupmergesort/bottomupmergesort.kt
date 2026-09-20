@@ -1,45 +1,39 @@
-fun merge(arr: Array<Int>, low: Int, mid: Int, high: Int) {
-  val left = arr.copyOfRange(low, mid)
-  val right = arr.copyOfRange(mid, high)
-  var i = 0
-  var j = 0
-  var k = low
-  while (i < left.size && j < right.size) {
-    if (left[i] <= right[j]) {
-      arr[k] = left[i]
-      i++
-    } else {
-      arr[k] = right[j]
-      j++
-    }
-    k++
+fun merge(arr: Array<Int>, scratch: Array<Int>, n: Int, index: Int, mergeSize: Int): Int {
+  val mid = index + mergeSize / 2
+  val end = minOf(n, index + mergeSize)
+  if (mid >= end) return index
+  var left = index
+  var right = mid
+  var out = index
+  while (left < mid && right < end) {
+    if (arr[left] <= arr[right]) scratch[out] = arr[left++] else scratch[out] = arr[right++]
+    out++
   }
-  while (i < left.size) {
-    arr[k] = left[i]
-    i++
-    k++
-  }
-  while (j < right.size) {
-    arr[k] = right[j]
-    j++
-    k++
-  }
+  while (left < mid) scratch[out++] = arr[left++]
+  while (right < end) scratch[out++] = arr[right++]
+  return -1
 }
 
 fun sort(arr: Array<Int>) {
   val n = arr.size
-  var width = 1
-  while (width < n) {
-    var low = 0
-    while (low < n) {
-      val mid = minOf(low + width, n)
-      val high = minOf(low + 2 * width, n)
-      if (mid < high) {
-        merge(arr, low, mid, high)
-      }
-      low += 2 * width
+  if (n < 2) return
+  val scratch = arr.copyOf()
+  var mergeSize = 2
+  while (mergeSize <= n) {
+    var copyLength = n
+    var index = 0
+    while (index < n) {
+      val stop = merge(arr, scratch, n, index, mergeSize)
+      if (stop >= 0) copyLength = stop
+      index += mergeSize
     }
-    width *= 2
+    for (j in 0 until copyLength) arr[j] = scratch[j]
+    mergeSize *= 2
+  }
+  if (mergeSize / 2 != n) {
+    val stop = merge(arr, scratch, n, 0, mergeSize)
+    val copyLength = if (stop < 0) n else stop
+    for (j in 0 until copyLength) arr[j] = scratch[j]
   }
 }
 

@@ -1,38 +1,46 @@
-def merge(array, low, mid, high):
-    left = array[low:mid]
-    right = array[mid:high]
-    i = j = 0
-    k = low
-    while i < len(left) and j < len(right):
-        if left[i] <= right[j]:
-            array[k] = left[i]
-            i = i + 1
-        else:
-            array[k] = right[j]
-            j = j + 1
-        k = k + 1
-    while i < len(left):
-        array[k] = left[i]
-        i = i + 1
-        k = k + 1
-    while j < len(right):
-        array[k] = right[j]
-        j = j + 1
-        k = k + 1
-
-
 def sort(arr):
     n = len(arr)
-    width = 1
-    while width < n:
-        low = 0
-        while low < n:
-            mid = min(low + width, n)
-            high = min(low + 2 * width, n)
-            if mid < high:
-                merge(arr, low, mid, high)
-            low = low + 2 * width
-        width = width * 2
+    if n < 2:
+        return
+    scratch = arr.copy()
+
+    def merge(index, merge_size):
+        mid = index + merge_size // 2
+        end = min(n, index + merge_size)
+        if mid >= end:
+            return index
+        left, right, out = index, mid, index
+        while left < mid and right < end:
+            if arr[left] <= arr[right]:
+                scratch[out] = arr[left]
+                left += 1
+            else:
+                scratch[out] = arr[right]
+                right += 1
+            out += 1
+        while left < mid:
+            scratch[out] = arr[left]
+            left += 1
+            out += 1
+        while right < end:
+            scratch[out] = arr[right]
+            right += 1
+            out += 1
+        return None
+
+    merge_size = 2
+    while merge_size <= n:
+        copy_length = n
+        for index in range(0, n, merge_size):
+            stop = merge(index, merge_size)
+            if stop is not None:
+                copy_length = stop
+        arr[:copy_length] = scratch[:copy_length]
+        merge_size *= 2
+    if merge_size // 2 != n:
+        stop = merge(0, merge_size)
+        copy_length = n if stop is None else stop
+        arr[:copy_length] = scratch[:copy_length]
 
 
 if __name__ == "__main__":
