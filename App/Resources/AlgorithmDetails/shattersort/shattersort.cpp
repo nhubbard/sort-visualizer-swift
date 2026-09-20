@@ -19,13 +19,11 @@ void printList(int items[], int size) {
 
 void insertionSort(int arr[], int start, int end) {
   for (int i = start + 1; i < end; i++) {
-    int key = arr[i];
-    int j = i - 1;
-    while (j >= start && arr[j] > key) {
-      arr[j + 1] = arr[j];
-      j--;
+    int pos = i;
+    while (pos > start && arr[pos - 1] > arr[pos]) {
+      std::swap(arr[pos - 1], arr[pos]);
+      pos--;
     }
-    arr[j + 1] = key;
   }
 }
 
@@ -71,7 +69,8 @@ void shatterSort(int arr[], int length, int num) {
   }
 }
 
-void sort(int arr[], int n) { shatterSort(arr, n, 4); }
+void sort(int arr[], int n) {
+  if (n < 2) return; shatterSort(arr, n, 4); }
 
 int main(int argc, char *argv[]) {
   int size = sizeof(array) / sizeof(array[0]);

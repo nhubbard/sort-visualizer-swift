@@ -21,7 +21,7 @@ public class simplisticgravitysort {
 
   public static void sort(int[] arr) {
     int n = arr.length;
-    if (n == 0) {
+    if (n < 2) {
       return;
     }
 

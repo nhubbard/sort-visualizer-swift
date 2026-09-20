@@ -1,12 +1,9 @@
 def insertion_sort(arr, start, end):
     for i in range(start + 1, end):
-        key = arr[i]
-        j = i - 1
-        while j >= start and arr[j] > key:
-            arr[j + 1] = arr[j]
-            j -= 1
-        arr[j + 1] = key
-
+        pos = i
+        while pos > start and arr[pos - 1] > arr[pos]:
+            arr[pos - 1], arr[pos] = arr[pos], arr[pos - 1]
+            pos -= 1
 
 def shatter_partition(arr, start, length, num):
     window = arr[start : start + length]
@@ -53,6 +50,8 @@ def simple_shatter_sort(arr, length, num, rate):
 
 
 def sort(arr):
+    if len(arr) < 2:
+        return
     n = len(arr)
     rate = max(2, floor_log2(n) // 2)
     simple_shatter_sort(arr, n, 4, rate)

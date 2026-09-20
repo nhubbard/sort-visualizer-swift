@@ -1,12 +1,10 @@
 function insertionSort(arr, start, end) {
   for (let i = start + 1; i < end; i++) {
-    const key = arr[i];
-    let j = i - 1;
-    while (j >= start && arr[j] > key) {
-      arr[j + 1] = arr[j];
-      j--;
+    let pos = i;
+    while (pos > start && arr[pos - 1] > arr[pos]) {
+      [arr[pos - 1], arr[pos]] = [arr[pos], arr[pos - 1]];
+      pos--;
     }
-    arr[j + 1] = key;
   }
 }
 
@@ -50,6 +48,7 @@ function shatterSort(arr, length, num) {
 }
 
 function sort(arr) {
+  if (arr.length < 2) return;
   const n = arr.length;
   shatterSort(arr, n, 4);
 }

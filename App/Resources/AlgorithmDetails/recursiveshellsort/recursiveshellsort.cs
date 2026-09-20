@@ -6,14 +6,14 @@ public class RecursiveShellSort
   {
     for (var i = a + gap; i < b; i += gap)
     {
-      var key = array[i];
-      var j = i - gap;
-      while (j >= a && key < array[j])
+      var j = i;
+      while (j - gap >= a && array[j] < array[j - gap])
       {
-        array[j + gap] = array[j];
+        var temp = array[j];
+        array[j] = array[j - gap];
+        array[j - gap] = temp;
         j -= gap;
       }
-      array[j + gap] = key;
     }
   }
 

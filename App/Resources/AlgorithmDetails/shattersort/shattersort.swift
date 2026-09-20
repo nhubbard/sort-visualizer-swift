@@ -1,14 +1,10 @@
 func insertionSort(_ arr: inout [Int], _ start: Int, _ end: Int) {
-    var i = start + 1
-    while i < end {
-        let key = arr[i]
-        var j = i - 1
-        while j >= start, arr[j] > key {
-            arr[j + 1] = arr[j]
-            j -= 1
+    for i in (start + 1) ..< end {
+        var pos = i
+        while pos > start && arr[pos - 1] > arr[pos] {
+            arr.swapAt(pos - 1, pos)
+            pos -= 1
         }
-        arr[j + 1] = key
-        i += 1
     }
 }
 
@@ -57,6 +53,7 @@ func shatterSort(_ arr: inout [Int], _ length: Int, _ num: Int) {
 }
 
 func sort(_ arr: inout [Int]) {
+    if arr.count < 2 { return }
     let n = arr.count
     shatterSort(&arr, n, 4)
 }

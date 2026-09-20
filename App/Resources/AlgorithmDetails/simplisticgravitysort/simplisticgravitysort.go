@@ -24,7 +24,7 @@ func transferFrom(arr []int, aux []int, auxLength int, index int) {
 
 func sort(arr []int) []int {
 	n := len(arr)
-	if n == 0 {
+	if n < 2 {
 		return arr
 	}
 

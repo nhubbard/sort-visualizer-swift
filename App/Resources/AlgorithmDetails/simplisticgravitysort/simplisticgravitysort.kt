@@ -1,6 +1,6 @@
 fun sort(arr: Array<Int>) {
   val n = arr.size
-  if (n == 0) return
+  if (n < 2) return
 
   val minValue = arr.min()
   val maxValue = arr.max()

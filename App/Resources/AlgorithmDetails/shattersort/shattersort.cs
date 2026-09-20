@@ -7,14 +7,12 @@ public class ShatterSort
   {
     for (int i = start + 1; i < end; i++)
     {
-      int key = arr[i];
-      int j = i - 1;
-      while (j >= start && arr[j] > key)
+      int pos = i;
+      while (pos > start && arr[pos - 1] > arr[pos])
       {
-        arr[j + 1] = arr[j];
-        j--;
+        (arr[pos - 1], arr[pos]) = (arr[pos], arr[pos - 1]);
+        pos--;
       }
-      arr[j + 1] = key;
     }
   }
 
@@ -63,6 +61,7 @@ public class ShatterSort
 
   public static void Sort(int[] arr)
   {
+    if (arr.Length < 2) return;
     int n = arr.Length;
     ShatterSortRange(arr, n, 4);
   }

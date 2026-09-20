@@ -27,7 +27,7 @@ public class SimplisticGravitySort
   public static void Sort(int[] arr)
   {
     int n = arr.Length;
-    if (n == 0)
+    if (n < 2)
       return;
 
     int minValue = arr[0];

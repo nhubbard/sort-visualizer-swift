@@ -1,12 +1,10 @@
 def insertion_sort(arr, start, fin)
   (start + 1...fin).each do |i|
-    key = arr[i]
-    j = i - 1
-    while j >= start && arr[j] > key
-      arr[j + 1] = arr[j]
-      j -= 1
+    pos = i
+    while pos > start && arr[pos - 1] > arr[pos]
+      arr[pos - 1], arr[pos] = arr[pos], arr[pos - 1]
+      pos -= 1
     end
-    arr[j + 1] = key
   end
 end
 
@@ -59,6 +57,7 @@ def simple_shatter_sort(arr, length, num, rate)
 end
 
 def sort(arr)
+  return if arr.length < 2
   n = arr.length
   rate = [2, floor_log2(n) / 2].max
   simple_shatter_sort(arr, n, 4, rate)

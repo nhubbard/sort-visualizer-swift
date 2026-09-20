@@ -1,13 +1,11 @@
 def gapped_insertion_sort(array, a, b, gap)
   i = a + gap
   while i < b
-    key = array[i]
-    j = i - gap
-    while j >= a && key < array[j]
-      array[j + gap] = array[j]
+    j = i
+    while j - gap >= a && array[j] < array[j - gap]
+      array[j], array[j - gap] = array[j - gap], array[j]
       j -= gap
     end
-    array[j + gap] = key
     i += gap
   end
 end

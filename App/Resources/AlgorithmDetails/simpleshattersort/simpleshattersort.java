@@ -5,13 +5,13 @@ import java.util.List;
 public class simpleshattersort {
   public static void insertionSort(int[] arr, int start, int end) {
     for (int i = start + 1; i < end; i++) {
-      int key = arr[i];
-      int j = i - 1;
-      while (j >= start && arr[j] > key) {
-        arr[j + 1] = arr[j];
-        j--;
+      int pos = i;
+      while (pos > start && arr[pos - 1] > arr[pos]) {
+        int temp = arr[pos - 1];
+        arr[pos - 1] = arr[pos];
+        arr[pos] = temp;
+        pos--;
       }
-      arr[j + 1] = key;
     }
   }
 
@@ -82,6 +82,7 @@ public class simpleshattersort {
   }
 
   public static void sort(int[] arr) {
+    if (arr.length < 2) return;
     int n = arr.length;
     int rate = Math.max(2, floorLog2(n) / 2);
     simpleShatterSort(arr, n, 4, rate);

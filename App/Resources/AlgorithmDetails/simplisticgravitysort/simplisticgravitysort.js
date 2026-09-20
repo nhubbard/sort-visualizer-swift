@@ -1,6 +1,6 @@
 function sort(arr) {
   const n = arr.length;
-  if (n === 0) return arr;
+  if (n < 2) return arr;
 
   const minValue = Math.min.apply(null, arr);
   const maxValue = Math.max.apply(null, arr);

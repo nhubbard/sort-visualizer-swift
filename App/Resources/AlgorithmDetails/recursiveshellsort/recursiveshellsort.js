@@ -1,12 +1,10 @@
 function gappedInsertionSort(array, a, b, gap) {
-  for (var i = a + gap; i < b; i += gap) {
-    var key = array[i];
-    var j = i - gap;
-    while (j >= a && key < array[j]) {
-      array[j + gap] = array[j];
+  for (let i = a + gap; i < b; i += gap) {
+    let j = i;
+    while (j - gap >= a && array[j] < array[j - gap]) {
+      [array[j], array[j - gap]] = [array[j - gap], array[j]];
       j -= gap;
     }
-    array[j + gap] = key;
   }
 }
 

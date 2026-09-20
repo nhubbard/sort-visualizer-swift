@@ -1,6 +1,6 @@
 def sort(arr):
     n = len(arr)
-    if n == 0:
+    if n < 2:
         return arr
 
     min_value = min(arr)

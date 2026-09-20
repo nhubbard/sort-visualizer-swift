@@ -34,7 +34,7 @@ void transferFrom(int arr[], std::vector<int> &aux, int auxLength, int index) {
 }
 
 void sort(int arr[], int n) {
-  if (n == 0)
+  if (n < 2)
     return;
 
   int minValue = arr[0];

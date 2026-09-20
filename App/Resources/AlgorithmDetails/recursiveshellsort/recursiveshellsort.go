@@ -6,13 +6,11 @@ import (
 
 func gappedInsertionSort(arr []int, a, b, gap int) {
 	for i := a + gap; i < b; i += gap {
-		key := arr[i]
-		j := i - gap
-		for j >= a && key < arr[j] {
-			arr[j+gap] = arr[j]
+		j := i
+		for j-gap >= a && arr[j] < arr[j-gap] {
+			arr[j], arr[j-gap] = arr[j-gap], arr[j]
 			j -= gap
 		}
-		arr[j+gap] = key
 	}
 }
 

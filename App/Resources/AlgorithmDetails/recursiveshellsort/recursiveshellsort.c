@@ -17,13 +17,13 @@ void printList(int arr[], int n) {
 
 void gappedInsertionSort(int arr[], int a, int b, int gap) {
   for (int i = a + gap; i < b; i += gap) {
-    int key = arr[i];
-    int j = i - gap;
-    while (j >= a && key < arr[j]) {
-      arr[j + gap] = arr[j];
+    int j = i;
+    while (j - gap >= a && arr[j] < arr[j - gap]) {
+      int temp = arr[j];
+      arr[j] = arr[j - gap];
+      arr[j - gap] = temp;
       j -= gap;
     }
-    arr[j + gap] = key;
   }
 }
 
