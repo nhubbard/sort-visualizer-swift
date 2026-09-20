@@ -16,13 +16,15 @@ void printList(int arr[], int n) {
 }
 
 void sort(int arr[], int n) {
-  for (int k = 2; k <= n; k *= 2) {
+  for (int k = 2; k < 2 * n; k *= 2) {
+    bool m = ((n + k - 1) / k) % 2 != 0;
     for (int j = k / 2; j > 0; j /= 2) {
       for (int i = 0; i < n; i++) {
         int l = i ^ j;
-        if (l > i) {
-          if (((i & k) == 0) && (arr[i] > arr[l]) ||
-              (((i & k) != 0) && (arr[i] < arr[l]))) {
+        if (l > i && l < n) {
+          bool ascending = ((i & k) == 0) == m;
+          if ((ascending && arr[i] > arr[l]) ||
+              (!ascending && arr[i] < arr[l])) {
             std::swap(arr[i], arr[l]);
           }
         }

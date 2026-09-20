@@ -6,13 +6,14 @@ import (
 
 func sort(arr []int) []int {
 	n := len(arr)
-	for k := 2; k <= n; k *= 2 {
+	for k := 2; k < 2*n; k *= 2 {
+		m := ((n + k - 1) / k % 2) != 0
 		for j := k / 2; j > 0; j /= 2 {
 			for i := 0; i < n; i++ {
 				l := i ^ j
-				if l > i {
-					if ((i&k) == 0) && (arr[i] > arr[l]) ||
-						(((i & k) != 0) && (arr[i] < arr[l])) {
+				if l > i && l < n {
+					ascending := ((i & k) == 0) == m
+					if (ascending && arr[i] > arr[l]) || (!ascending && arr[i] < arr[l]) {
 						arr[i], arr[l] = arr[l], arr[i]
 					}
 				}
