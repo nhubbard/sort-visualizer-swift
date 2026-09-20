@@ -31,6 +31,7 @@ func partition(_ arr: inout [Int], _ p: Int, _ r: Int, _ bit: Int) -> Int {
 
 func sort(_ arr: inout [Int]) {
     let n = arr.count
+    if n < 2 { return }
     let maxValue = arr.max() ?? 0
     let bit = mostSignificantBit(maxValue)
 

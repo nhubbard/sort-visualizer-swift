@@ -33,6 +33,7 @@ function binaryQuickSortRecursive(arr, p, r, bit) {
 
 function sort(arr) {
   const n = arr.length;
+  if (n < 2) return arr;
   let maxValue = arr[0];
   for (let i = 1; i < n; i++) {
     if (arr[i] > maxValue) maxValue = arr[i];

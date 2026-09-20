@@ -28,6 +28,8 @@ def partition(arr, p, r, bit):
 
 def sort(arr):
     n = len(arr)
+    if n < 2:
+        return
     max_value = max(arr)
     bit = most_significant_bit(max_value)
 

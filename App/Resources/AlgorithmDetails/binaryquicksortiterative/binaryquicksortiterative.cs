@@ -39,6 +39,7 @@ public class BinaryQuickSortIterative
   public static void Sort(int[] arr)
   {
     int n = arr.Length;
+    if (n < 2) return;
     int maxValue = arr[0];
     for (int i = 1; i < n; i++)
     {

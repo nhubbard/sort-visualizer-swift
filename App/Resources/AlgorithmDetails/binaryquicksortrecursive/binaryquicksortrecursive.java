@@ -42,6 +42,7 @@ public class binaryquicksortrecursive {
 
   public static void sort(int[] arr) {
     int n = arr.length;
+    if (n < 2) return;
     int maxValue = arr[0];
     for (int i = 1; i < n; i++) {
       if (arr[i] > maxValue) {

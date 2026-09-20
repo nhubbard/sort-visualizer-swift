@@ -55,6 +55,7 @@ typedef struct {
 } Task;
 
 void sort(int arr[], int n) {
+  if (n < 2) return;
   int maxValue = arr[0];
   for (int i = 1; i < n; i++) {
     if (arr[i] > maxValue)

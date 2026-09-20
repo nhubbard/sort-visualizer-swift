@@ -45,6 +45,9 @@ func binaryQuickSortRecursive(arr []int, p, r, bit int) {
 
 func sort(arr []int) []int {
 	n := len(arr)
+	if n < 2 {
+		return arr
+	}
 	maxValue := arr[0]
 	for i := 1; i < n; i++ {
 		if arr[i] > maxValue {

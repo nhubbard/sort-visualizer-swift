@@ -23,6 +23,7 @@ end
 
 def sort(arr)
   n = arr.length
+  return arr if n < 2
   bit = most_significant_bit(arr.max)
 
   tasks = [[0, n - 1, bit]]

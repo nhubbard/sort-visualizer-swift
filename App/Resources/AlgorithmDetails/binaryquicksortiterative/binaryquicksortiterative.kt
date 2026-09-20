@@ -27,6 +27,7 @@ fun partition(arr: Array<Int>, p: Int, r: Int, bit: Int): Int {
 
 fun sort(arr: Array<Int>) {
   val n = arr.size
+  if (n < 2) return
   var maxValue = arr[0]
   for (i in 1 until n) {
     if (arr[i] > maxValue) maxValue = arr[i]
