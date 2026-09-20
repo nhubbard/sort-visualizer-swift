@@ -2,154 +2,85 @@ using System;
 
 public class OptimizedDualPivotQuickSort
 {
-  const int InsertionThreshold = 24;
-
-  // Once a range's "between the pivots" middle partition holds more than this fraction of the
-  // range, it's worth pausing to scan out any elements that exactly equal one of the two
-  // pivots before recursing into what's left.
-  const int EqualElementsMinFraction = 4;
-
-  // Sorts arr[low..high] in place (both bounds inclusive).
-  static void InsertionSort(int[] arr, int low, int high)
+  private static void InsertionSort(int[] array, int left, int right)
   {
-    for (int i = low + 1; i <= high; i++)
+    for (int i = left + 1; i <= right; i++)
     {
-      int key = arr[i];
-      int j = i - 1;
-      while (j >= low && arr[j] > key)
+      int j = i;
+      while (j > left && array[j] < array[j - 1])
       {
-        arr[j + 1] = arr[j];
+        (array[j], array[j - 1]) = (array[j - 1], array[j]);
         j--;
       }
-      arr[j + 1] = key;
     }
   }
 
-  // arr[low..high] holds only values in the closed range [pivot1, pivot2]. In a single scan,
-  // moves every element equal to pivot1 to the front and every element equal to pivot2 to the
-  // back -- a Dutch-national-flag-style three-way partition, generalized to two specific
-  // target values instead of "less than/greater than a pivot". Returns the inclusive bounds
-  // of what's left strictly between the two pivots.
-  static (int, int) MovePivotDuplicatesOut(int[] arr, int low, int high, int pivot1, int pivot2)
+  private static void DualPivot(int[] array, int left, int right, int divisor)
   {
-    int writeLow = low;
-    int read = low;
-    int writeHigh = high;
-    while (read <= writeHigh)
+    int length = right - left;
+    if (length < 27)
     {
-      if (arr[read] == pivot1)
-      {
-        (arr[read], arr[writeLow]) = (arr[writeLow], arr[read]);
-        writeLow++;
-        read++;
-      }
-      else if (arr[read] == pivot2)
-      {
-        (arr[read], arr[writeHigh]) = (arr[writeHigh], arr[read]);
-        writeHigh--;
-      }
-      else
-      {
-        read++;
-      }
-    }
-    return (writeLow, writeHigh);
-  }
-
-  // Sorts arr[low..high] in place (both bounds inclusive).
-  static void OptimizedSort(int[] arr, int low, int high)
-  {
-    int size = high - low + 1;
-    if (size <= InsertionThreshold)
-    {
-      if (size > 1) InsertionSort(arr, low, high);
+      InsertionSort(array, left, right);
       return;
     }
-
-    // Sample two candidates roughly a third of the way in from each end and seed the two
-    // pivots from them, smaller one first.
-    int third = size / 3;
-    int pivot1Index = low + third;
-    int pivot2Index = high - third;
-    if (arr[pivot1Index] > arr[pivot2Index])
+    int third = length / divisor;
+    int med1 = Math.Max(left + 1, left + third);
+    int med2 = Math.Min(right - 1, right - third);
+    if (array[med1] < array[med2])
     {
-      (arr[pivot1Index], arr[pivot2Index]) = (arr[pivot2Index], arr[pivot1Index]);
+      (array[med1], array[left]) = (array[left], array[med1]);
+      (array[med2], array[right]) = (array[right], array[med2]);
     }
-    (arr[low], arr[pivot1Index]) = (arr[pivot1Index], arr[low]);
-    (arr[high], arr[pivot2Index]) = (arr[pivot2Index], arr[high]);
-    int pivot1 = arr[low];
-    int pivot2 = arr[high];
-
-    // Single left-to-right scan splitting the interior into three regions: less than pivot1,
-    // between the two pivots, and greater than pivot2.
-    int less = low + 1;
-    int great = high - 1;
-    int k = less;
-    while (k <= great)
+    else
     {
-      if (arr[k] < pivot1)
+      (array[med1], array[right]) = (array[right], array[med1]);
+      (array[med2], array[left]) = (array[left], array[med2]);
+    }
+    int pivot1 = array[left], pivot2 = array[right];
+    int less = left + 1, great = right - 1;
+    for (int k = less; k <= great; k++)
+    {
+      if (array[k] < pivot1)
       {
-        (arr[k], arr[less]) = (arr[less], arr[k]);
+        (array[k], array[less]) = (array[less], array[k]);
         less++;
       }
-      else if (arr[k] > pivot2)
+      else if (array[k] > pivot2)
       {
-        while (k < great && arr[great] > pivot2)
-        {
-          great--;
-        }
-        (arr[k], arr[great]) = (arr[great], arr[k]);
+        while (k < great && array[great] > pivot2) great--;
+        (array[k], array[great]) = (array[great], array[k]);
         great--;
-        if (arr[k] < pivot1)
+        if (array[k] < pivot1)
         {
-          (arr[k], arr[less]) = (arr[less], arr[k]);
+          (array[k], array[less]) = (array[less], array[k]);
           less++;
         }
       }
-      k++;
     }
-
-    // Drop the two pivots into place at the boundaries of their regions.
-    less--;
-    great++;
-    (arr[low], arr[less]) = (arr[less], arr[low]);
-    (arr[high], arr[great]) = (arr[great], arr[high]);
-
-    // arr[low..less-1] < pivot1, arr[less] == pivot1, arr[less+1..great-1] is the middle
-    // region, arr[great] == pivot2, arr[great+1..high] > pivot2.
-    OptimizedSort(arr, low, less - 1);
-    OptimizedSort(arr, great + 1, high);
-
-    int middleLow = less + 1;
-    int middleHigh = great - 1;
-
-    if (pivot1 != pivot2 && middleHigh >= middleLow)
+    int dist = great - less;
+    if (dist < 13) divisor++;
+    (array[less - 1], array[left]) = (array[left], array[less - 1]);
+    (array[great + 1], array[right]) = (array[right], array[great + 1]);
+    DualPivot(array, left, less - 2, divisor);
+    DualPivot(array, great + 2, right, divisor);
+    if (dist > length - 13 && pivot1 != pivot2)
     {
-      int middleSize = middleHigh - middleLow + 1;
-      // Equal-elements optimization: a middle region this large is usually full of values
-      // tied to one pivot or the other, which would otherwise get pointlessly
-      // re-partitioned by the recursive call below. Shrink it first by scanning out the
-      // exact duplicates. They're already correctly positioned relative to the low and high
-      // regions -- every pivot1 duplicate is >= everything already sorted into the low
-      // region, and every pivot2 duplicate is <= everything already sorted into the high
-      // region -- so neither of those two regions needs to be touched again.
-      if (middleSize > size / EqualElementsMinFraction)
+      for (int k = less; k <= great; k++)
       {
-        (middleLow, middleHigh) = MovePivotDuplicatesOut(arr, middleLow, middleHigh, pivot1, pivot2);
+        if (array[k] == pivot1) { (array[k], array[less]) = (array[less], array[k]); less++; }
+        else if (array[k] == pivot2)
+        {
+          (array[k], array[great]) = (array[great], array[k]); great--;
+          if (array[k] == pivot1) { (array[k], array[less]) = (array[less], array[k]); less++; }
+        }
       }
     }
-
-    if (pivot1 != pivot2 && middleHigh >= middleLow)
-    {
-      OptimizedSort(arr, middleLow, middleHigh);
-    }
+    if (pivot1 < pivot2) DualPivot(array, less, great, divisor);
   }
 
-  public static void Sort(int[] arr)
+  public static void Sort(int[] array)
   {
-    int n = arr.Length;
-    if (n < 2) return;
-    OptimizedSort(arr, 0, n - 1);
+    if (array.Length > 1) DualPivot(array, 0, array.Length - 1, 3);
   }
 
   public static void Main(String[] args)

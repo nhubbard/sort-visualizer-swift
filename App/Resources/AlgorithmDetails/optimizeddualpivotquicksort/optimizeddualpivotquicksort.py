@@ -1,120 +1,73 @@
-INSERTION_THRESHOLD = 24
-
-# Once a range's "between the pivots" middle partition holds more than this fraction of the
-# range, it's worth pausing to scan out any elements that exactly equal one of the two pivots
-# before recursing into what's left.
-EQUAL_ELEMENTS_MIN_FRACTION = 4
-
-
-def insertion_sort(arr, low, high):
-    # Sorts arr[low..high] in place (both bounds inclusive).
-    for i in range(low + 1, high + 1):
-        key = arr[i]
-        j = i - 1
-        while j >= low and arr[j] > key:
-            arr[j + 1] = arr[j]
+def insertion_sort(array, left, right):
+    for i in range(left + 1, right + 1):
+        j = i
+        while j > left and array[j] < array[j - 1]:
+            array[j], array[j - 1] = array[j - 1], array[j]
             j -= 1
-        arr[j + 1] = key
 
 
-def move_pivot_duplicates_out(arr, low, high, pivot1, pivot2):
-    # arr[low..high] holds only values in the closed range [pivot1, pivot2]. In a single scan,
-    # moves every element equal to pivot1 to the front and every element equal to pivot2 to the
-    # back -- a Dutch-national-flag-style three-way partition, generalized to two specific
-    # target values instead of "less than/greater than a pivot". Returns (low, high): the
-    # inclusive bounds of what's left strictly between the two pivots.
-    write_low = low
-    read = low
-    write_high = high
-    while read <= write_high:
-        if arr[read] == pivot1:
-            arr[read], arr[write_low] = arr[write_low], arr[read]
-            write_low += 1
-            read += 1
-        elif arr[read] == pivot2:
-            arr[read], arr[write_high] = arr[write_high], arr[read]
-            write_high -= 1
-        else:
-            read += 1
-    return write_low, write_high
-
-
-def optimized_dual_pivot_quick_sort(arr, low, high):
-    # Sorts arr[low..high] in place (both bounds inclusive).
-    size = high - low + 1
-    if size <= INSERTION_THRESHOLD:
-        if size > 1:
-            insertion_sort(arr, low, high)
+def optimized_dual_pivot_quick_sort(array, left, right, divisor):
+    length = right - left
+    if length < 27:
+        insertion_sort(array, left, right)
         return
 
-    # Sample two candidates roughly a third of the way in from each end and seed the two
-    # pivots from them, smaller one first.
-    third = size // 3
-    pivot1_index = low + third
-    pivot2_index = high - third
-    if arr[pivot1_index] > arr[pivot2_index]:
-        arr[pivot1_index], arr[pivot2_index] = arr[pivot2_index], arr[pivot1_index]
-    arr[low], arr[pivot1_index] = arr[pivot1_index], arr[low]
-    arr[high], arr[pivot2_index] = arr[pivot2_index], arr[high]
-    pivot1 = arr[low]
-    pivot2 = arr[high]
+    third = length // divisor
+    med1 = max(left + third, left + 1)
+    med2 = min(right - third, right - 1)
+    if array[med1] < array[med2]:
+        array[med1], array[left] = array[left], array[med1]
+        array[med2], array[right] = array[right], array[med2]
+    else:
+        array[med1], array[right] = array[right], array[med1]
+        array[med2], array[left] = array[left], array[med2]
 
-    # Single left-to-right scan splitting the interior into three regions: less than pivot1,
-    # between the two pivots, and greater than pivot2.
-    less = low + 1
-    great = high - 1
+    pivot1, pivot2 = array[left], array[right]
+    less, great = left + 1, right - 1
     k = less
     while k <= great:
-        if arr[k] < pivot1:
-            arr[k], arr[less] = arr[less], arr[k]
+        if array[k] < pivot1:
+            array[k], array[less] = array[less], array[k]
             less += 1
-        elif arr[k] > pivot2:
-            while k < great and arr[great] > pivot2:
+        elif array[k] > pivot2:
+            while k < great and array[great] > pivot2:
                 great -= 1
-            arr[k], arr[great] = arr[great], arr[k]
+            array[k], array[great] = array[great], array[k]
             great -= 1
-            if arr[k] < pivot1:
-                arr[k], arr[less] = arr[less], arr[k]
+            if array[k] < pivot1:
+                array[k], array[less] = array[less], array[k]
                 less += 1
         k += 1
 
-    # Drop the two pivots into place at the boundaries of their regions.
-    less -= 1
-    great += 1
-    arr[low], arr[less] = arr[less], arr[low]
-    arr[high], arr[great] = arr[great], arr[high]
+    dist = great - less
+    if dist < 13:
+        divisor += 1
+    array[less - 1], array[left] = array[left], array[less - 1]
+    array[great + 1], array[right] = array[right], array[great + 1]
+    optimized_dual_pivot_quick_sort(array, left, less - 2, divisor)
+    optimized_dual_pivot_quick_sort(array, great + 2, right, divisor)
 
-    # arr[low..less-1] < pivot1, arr[less] == pivot1, arr[less+1..great-1] is the middle
-    # region, arr[great] == pivot2, arr[great+1..high] > pivot2.
-    optimized_dual_pivot_quick_sort(arr, low, less - 1)
-    optimized_dual_pivot_quick_sort(arr, great + 1, high)
+    if dist > length - 13 and pivot1 != pivot2:
+        k = less
+        while k <= great:
+            if array[k] == pivot1:
+                array[k], array[less] = array[less], array[k]
+                less += 1
+            elif array[k] == pivot2:
+                array[k], array[great] = array[great], array[k]
+                great -= 1
+                if array[k] == pivot1:
+                    array[k], array[less] = array[less], array[k]
+                    less += 1
+            k += 1
 
-    middle_low = less + 1
-    middle_high = great - 1
-
-    if pivot1 != pivot2 and middle_high >= middle_low:
-        middle_size = middle_high - middle_low + 1
-        # Equal-elements optimization: a middle region this large is usually full of values
-        # tied to one pivot or the other, which would otherwise get pointlessly re-partitioned
-        # by the recursive call below. Shrink it first by scanning out the exact duplicates.
-        # They're already correctly positioned relative to the low and high regions -- every
-        # pivot1 duplicate is >= everything already sorted into the low region, and every
-        # pivot2 duplicate is <= everything already sorted into the high region -- so neither
-        # of those two regions needs to be touched again.
-        if middle_size > size // EQUAL_ELEMENTS_MIN_FRACTION:
-            middle_low, middle_high = move_pivot_duplicates_out(
-                arr, middle_low, middle_high, pivot1, pivot2
-            )
-
-    if pivot1 != pivot2 and middle_high >= middle_low:
-        optimized_dual_pivot_quick_sort(arr, middle_low, middle_high)
+    if pivot1 < pivot2:
+        optimized_dual_pivot_quick_sort(array, less, great, divisor)
 
 
 def sort(arr):
-    n = len(arr)
-    if n < 2:
-        return
-    optimized_dual_pivot_quick_sort(arr, 0, n - 1)
+    if len(arr) > 1:
+        optimized_dual_pivot_quick_sort(arr, 0, len(arr) - 1, 3)
 
 
 if __name__ == "__main__":

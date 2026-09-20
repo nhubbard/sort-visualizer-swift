@@ -1,136 +1,81 @@
-let insertionThreshold = 24
+import Foundation
 
-/// Once a range's "between the pivots" middle partition holds more than this fraction of the
-/// range, it's worth pausing to scan out any elements that exactly equal one of the two pivots
-/// before recursing into what's left.
-let equalElementsMinFraction = 4
-
-/// Sorts arr[low...high] in place (both bounds inclusive).
-func insertionSort(_ arr: inout [Int], _ low: Int, _ high: Int) {
-    var i = low + 1
-    while i <= high {
-        let key = arr[i]
-        var j = i - 1
-        while j >= low, arr[j] > key {
-            arr[j + 1] = arr[j]
+func insertionSort(_ array: inout [Int], _ start: Int, _ end: Int) {
+    guard start + 1 < end else { return }
+    for i in (start + 1)..<end {
+        var j = i
+        while j > start && array[j] < array[j - 1] {
+            array.swapAt(j - 1, j)
             j -= 1
         }
-        arr[j + 1] = key
-        i += 1
     }
 }
 
-/// arr[low...high] holds only values in the closed range [pivot1, pivot2]. In a single scan,
-/// moves every element equal to pivot1 to the front and every element equal to pivot2 to the
-/// back -- a Dutch-national-flag-style three-way partition, generalized to two specific
-/// target values instead of "less than/greater than a pivot". Returns the inclusive bounds of
-/// what's left strictly between the two pivots.
-func movePivotDuplicatesOut(
-    _ arr: inout [Int], _ low: Int, _ high: Int, _ pivot1: Int, _ pivot2: Int
-) -> (Int, Int) {
-    var writeLow = low
-    var read = low
-    var writeHigh = high
-    while read <= writeHigh {
-        if arr[read] == pivot1 {
-            arr.swapAt(read, writeLow)
-            writeLow += 1
-            read += 1
-        } else if arr[read] == pivot2 {
-            arr.swapAt(read, writeHigh)
-            writeHigh -= 1
-        } else {
-            read += 1
-        }
-    }
-    return (writeLow, writeHigh)
-}
-
-/// Sorts arr[low...high] in place (both bounds inclusive).
-func optimizedDualPivotQuickSort(_ arr: inout [Int], _ low: Int, _ high: Int) {
-    let size = high - low + 1
-    if size <= insertionThreshold {
-        if size > 1 {
-            insertionSort(&arr, low, high)
-        }
+func optimizedDualPivotQuickSort(_ array: inout [Int], _ left: Int, _ right: Int, _ initialDivisor: Int) {
+    let length = right - left
+    if length < 27 {
+        insertionSort(&array, left, right + 1)
         return
     }
-
-    // Sample two candidates roughly a third of the way in from each end and seed the two
-    // pivots from them, smaller one first.
-    let third = size / 3
-    let pivot1Index = low + third
-    let pivot2Index = high - third
-    if arr[pivot1Index] > arr[pivot2Index] {
-        arr.swapAt(pivot1Index, pivot2Index)
+    var divisor = initialDivisor
+    let third = length / divisor
+    var med1 = left + third
+    var med2 = right - third
+    if med1 <= left { med1 = left + 1 }
+    if med2 >= right { med2 = right - 1 }
+    if array[med1] < array[med2] {
+        array.swapAt(med1, left)
+        array.swapAt(med2, right)
+    } else {
+        array.swapAt(med1, right)
+        array.swapAt(med2, left)
     }
-    arr.swapAt(low, pivot1Index)
-    arr.swapAt(high, pivot2Index)
-    let pivot1 = arr[low]
-    let pivot2 = arr[high]
-
-    // Single left-to-right scan splitting the interior into three regions: less than pivot1,
-    // between the two pivots, and greater than pivot2.
-    var less = low + 1
-    var great = high - 1
+    let pivot1 = array[left], pivot2 = array[right]
+    var less = left + 1, great = right - 1
     var k = less
     while k <= great {
-        if arr[k] < pivot1 {
-            arr.swapAt(k, less)
+        if array[k] < pivot1 {
+            array.swapAt(k, less)
             less += 1
-        } else if arr[k] > pivot2 {
-            while k < great, arr[great] > pivot2 {
-                great -= 1
-            }
-            arr.swapAt(k, great)
+        } else if array[k] > pivot2 {
+            while k < great && array[great] > pivot2 { great -= 1 }
+            array.swapAt(k, great)
             great -= 1
-            if arr[k] < pivot1 {
-                arr.swapAt(k, less)
+            if array[k] < pivot1 {
+                array.swapAt(k, less)
                 less += 1
             }
         }
         k += 1
     }
-
-    // Drop the two pivots into place at the boundaries of their regions.
-    less -= 1
-    great += 1
-    arr.swapAt(low, less)
-    arr.swapAt(high, great)
-
-    // arr[low...less-1] < pivot1, arr[less] == pivot1, arr[less+1...great-1] is the middle
-    // region, arr[great] == pivot2, arr[great+1...high] > pivot2.
-    optimizedDualPivotQuickSort(&arr, low, less - 1)
-    optimizedDualPivotQuickSort(&arr, great + 1, high)
-
-    var middleLow = less + 1
-    var middleHigh = great - 1
-
-    if pivot1 != pivot2, middleHigh >= middleLow {
-        let middleSize = middleHigh - middleLow + 1
-        // Equal-elements optimization: a middle region this large is usually full of values
-        // tied to one pivot or the other, which would otherwise get pointlessly
-        // re-partitioned by the recursive call below. Shrink it first by scanning out the
-        // exact duplicates. They're already correctly positioned relative to the low and
-        // high regions -- every pivot1 duplicate is >= everything already sorted into the
-        // low region, and every pivot2 duplicate is <= everything already sorted into the
-        // high region -- so neither of those two regions needs to be touched again.
-        if middleSize > size / equalElementsMinFraction {
-            (middleLow, middleHigh) = movePivotDuplicatesOut(&arr, middleLow, middleHigh, pivot1, pivot2)
+    let dist = great - less
+    if dist < 13 { divisor += 1 }
+    array.swapAt(less - 1, left)
+    array.swapAt(great + 1, right)
+    optimizedDualPivotQuickSort(&array, left, less - 2, divisor)
+    optimizedDualPivotQuickSort(&array, great + 2, right, divisor)
+    if dist > length - 13, pivot1 != pivot2 {
+        var k = less
+        while k <= great {
+            if array[k] == pivot1 {
+                array.swapAt(k, less)
+                less += 1
+            } else if array[k] == pivot2 {
+                array.swapAt(k, great)
+                great -= 1
+                if array[k] == pivot1 {
+                    array.swapAt(k, less)
+                    less += 1
+                }
+            }
+            k += 1
         }
     }
-
-    if pivot1 != pivot2, middleHigh >= middleLow {
-        optimizedDualPivotQuickSort(&arr, middleLow, middleHigh)
-    }
+    if pivot1 < pivot2 { optimizedDualPivotQuickSort(&array, less, great, divisor) }
 }
 
-func sort(_ arr: inout [Int]) {
-    let n = arr.count
-    if n < 2 {
-        return
-    }
-    optimizedDualPivotQuickSort(&arr, 0, n - 1)
+func sort(_ array: inout [Int]) {
+    optimizedDualPivotQuickSort(&array, 0, array.count - 1, 3)
 }
 
 var array: [Int] = [
