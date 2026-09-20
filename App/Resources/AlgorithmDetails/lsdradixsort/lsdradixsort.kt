@@ -1,32 +1,20 @@
 fun sort(arr: Array<Int>) {
   val n = arr.size
-  var bucket = Array(10) { Array(10) { 0 } }
-  var bucketCount = Array(10) { 0 }
-  var lar: Int
-  var nop = 0
+  val maxValue = arr.maxOrNull() ?: 0
+  val output = Array(n) { 0 }
   var divisor = 1
-  lar = arr.maxOrNull() ?: 0
-  while (lar > 0) {
-    nop++
-    lar /= 10
-  }
-  for (pass in 0 until nop) {
-    for (i in 0 until 10) {
-      bucketCount[i] = 0
+  while (true) {
+    val counts = IntArray(4)
+    for (value in arr) counts[(value / divisor) % 4]++
+    for (digit in 1 until 4) counts[digit] += counts[digit - 1]
+    for (i in n - 1 downTo 0) {
+      val digit = (arr[i] / divisor) % 4
+      counts[digit]--
+      output[counts[digit]] = arr[i]
     }
-    for (i in 0 until n) {
-      val r = (arr[i] / divisor) % 10
-      bucket[r][bucketCount[r]] = arr[i]
-      bucketCount[r] += 1
-    }
-    var i = 0
-    for (k in 0 until 10) {
-      for (j in 0 until bucketCount[k]) {
-        arr[i] = bucket[k][j]
-        i++
-      }
-    }
-    divisor *= 10
+    for (i in 0 until n) arr[i] = output[i]
+    if (divisor > maxValue / 4) break
+    divisor *= 4
   }
 }
 

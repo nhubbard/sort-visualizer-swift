@@ -1,49 +1,30 @@
 using System;
-using System.Linq;
 
 public class RadixSort
 {
   public static void Sort(int[] arr)
   {
     int n = arr.Length;
-    int[,] bucket = new int[10, 10];
-    int[] bucketCount = new int[10];
-    int i,
-      j,
-      k,
-      r,
-      nop = 0,
-      divisor = 1,
-      lar,
-      pass;
-    lar = arr.Max();
-    while (lar > 0)
+    int maxValue = 0;
+    foreach (int value in arr)
     {
-      nop++;
-      lar /= 10;
+      if (value > maxValue) maxValue = value;
     }
-    for (pass = 0; pass < nop; pass++)
+    int[] output = new int[n];
+    int divisor = 1;
+    while (true)
     {
-      for (i = 0; i < 10; i++)
+      int[] counts = new int[4];
+      for (int i = 0; i < n; i++) counts[(arr[i] / divisor) % 4]++;
+      for (int digit = 1; digit < 4; digit++) counts[digit] += counts[digit - 1];
+      for (int i = n - 1; i >= 0; i--)
       {
-        bucketCount[i] = 0;
+        int digit = (arr[i] / divisor) % 4;
+        output[--counts[digit]] = arr[i];
       }
-      for (i = 0; i < n; i++)
-      {
-        r = (arr[i] / divisor) % 10;
-        bucket[r, bucketCount[r]] = arr[i];
-        bucketCount[r] += 1;
-      }
-      i = 0;
-      for (k = 0; k < 10; k++)
-      {
-        for (j = 0; j < bucketCount[k]; j++)
-        {
-          arr[i] = bucket[k, j];
-          i++;
-        }
-      }
-      divisor *= 10;
+      Array.Copy(output, arr, n);
+      if (divisor > maxValue / 4) break;
+      divisor *= 4;
     }
   }
 

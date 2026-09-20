@@ -1,29 +1,23 @@
-def counting(arr, e):
-    n = len(arr)
-    output = [0] * n
-    count = [0] * (10)
-    for i in range(n):
-        index = arr[i] / e
-        count[int(index % 10)] += 1
-    for i in range(1, 10):
-        count[i] += count[i - 1]
-    i = n - 1
-    while i >= 0:
-        index = arr[i] / e
-        output[count[int(index % 10)] - 1] = arr[i]
-        count[int(index % 10)] -= 1
-        i -= 1
-    i = 0
-    for i in range(len(arr)):
-        arr[i] = output[i]
-
-
 def sort(arr):
-    x = max(arr)
-    e = 1
-    while x / e > 0:
-        counting(arr, e)
-        e *= 10
+    n = len(arr)
+    max_value = max(arr, default=0)
+    output = [0] * n
+    divisor = 1
+    while True:
+        counts = [0] * 4
+        for value in arr:
+            counts[(value // divisor) % 4] += 1
+        for digit in range(1, 4):
+            counts[digit] += counts[digit - 1]
+        for i in range(n - 1, -1, -1):
+            digit = (arr[i] // divisor) % 4
+            counts[digit] -= 1
+            output[counts[digit]] = arr[i]
+        for i in range(n):
+            arr[i] = output[i]
+        if divisor > max_value // 4:
+            break
+        divisor *= 4
 
 
 if __name__ == "__main__":

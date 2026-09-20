@@ -3,38 +3,23 @@ import java.util.Arrays;
 public class lsdradixsort {
   public static void sort(int[] arr) {
     int n = arr.length;
-    int[][] bucket = new int[10][10];
-    int[] bucketCount = new int[10];
-    int i;
-    int j;
-    int k;
-    int r;
-    int nop = 0;
-    int divisor = 1;
-    int lar;
-    int pass;
-    lar = Arrays.stream(arr).summaryStatistics().getMax();
-    while (lar > 0) {
-      nop++;
-      lar /= 10;
+    int maxValue = 0;
+    for (int value : arr) {
+      if (value > maxValue) maxValue = value;
     }
-    for (pass = 0; pass < nop; pass++) {
-      for (i = 0; i < 10; i++) {
-        bucketCount[i] = 0;
+    int[] output = new int[n];
+    int divisor = 1;
+    while (true) {
+      int[] counts = new int[4];
+      for (int i = 0; i < n; i++) counts[(arr[i] / divisor) % 4]++;
+      for (int digit = 1; digit < 4; digit++) counts[digit] += counts[digit - 1];
+      for (int i = n - 1; i >= 0; i--) {
+        int digit = (arr[i] / divisor) % 4;
+        output[--counts[digit]] = arr[i];
       }
-      for (i = 0; i < n; i++) {
-        r = (arr[i] / divisor) % 10;
-        bucket[r][bucketCount[r]] = arr[i];
-        bucketCount[r] += 1;
-      }
-      i = 0;
-      for (k = 0; k < 10; k++) {
-        for (j = 0; j < bucketCount[k]; j++) {
-          arr[i] = bucket[k][j];
-          i++;
-        }
-      }
-      divisor *= 10;
+      System.arraycopy(output, 0, arr, 0, n);
+      if (divisor > maxValue / 4) break;
+      divisor *= 4;
     }
   }
 
