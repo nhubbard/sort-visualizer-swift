@@ -1,3 +1,8 @@
+func sort(_ array: inout [Int]) {
+    if array.count <= 1 { return }
+    stoogeSort(&array, 0, array.count - 1)
+}
+
 func stoogeSort(_ arr: inout [Int],
                 _ i: Int,
                 _ j: Int)
@@ -13,9 +18,6 @@ func stoogeSort(_ arr: inout [Int],
     }
 }
 
-func sort(_ array: inout [Int]) {
-    stoogeSort(&array, 0, array.count - 1)
-}
 
 var array: [Int] = [
     0, 39, 21, 62, 91, 77, 14, 23,

@@ -13,8 +13,11 @@ public struct BinaryGnomeSort: SortAlgorithm {
     category: .exchange,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 303, coefficients: [239852, 1559, 2.5301],
+      anchorSize: 303, coefficients: [239850, 1559, 2.5301],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .polynomialIntercept, coefficients: [2.5301, 25.7589, -240.373], rSquared: 1),
+    implementationComplexity: 6,
     stable: true,
     timeComplexity: ComplexityBounds(best: "O(n)", average: "O(n^2)", worst: "O(n^2)"),
     spaceComplexity: "O(1)",

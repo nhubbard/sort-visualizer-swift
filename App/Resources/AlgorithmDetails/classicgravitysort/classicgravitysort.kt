@@ -1,6 +1,10 @@
+fun sort(arr: Array<Int>) {
+  classicGravitySort(arr)
+}
+
 fun classicGravitySort(arr: Array<Int>) {
   val n = arr.size
-  if (n == 0) return
+  if (n <= 1) return
 
   var maxValue = arr[0]
   for (i in 1 until n) {
@@ -26,10 +30,6 @@ fun classicGravitySort(arr: Array<Int>) {
       transpose[j]--
     }
   }
-}
-
-fun sort(arr: Array<Int>) {
-  classicGravitySort(arr)
 }
 
 fun main() {

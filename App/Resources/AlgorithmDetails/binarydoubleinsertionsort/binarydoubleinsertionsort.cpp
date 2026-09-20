@@ -1,5 +1,31 @@
+#include <cstdio>
 #include <iostream>
 #include <vector>
+
+int leftBinarySearch(std::vector<int> &array, int a, int b, int val);
+int rightBinarySearch(std::vector<int> &array, int a, int b, int val);
+void insertToLeft(std::vector<int> &array, int a, int b, int temp);
+void insertToRight(std::vector<int> &array, int a, int b, int temp);
+void doubleInsertion(std::vector<int> &array, int a, int b);
+
+
+
+void printList(const std::vector<int> &items) {
+  printf("[");
+  if (!items.empty()) {
+    printf("%d", items[0]);
+    for (size_t i = 1; i < items.size(); i++) {
+      printf(", %d", items[i]);
+    }
+  }
+  printf("]\n");
+}
+
+void sort(std::vector<int> &arr) {
+  if (arr.size() > 1) {
+    doubleInsertion(arr, 0, static_cast<int>(arr.size()));
+  }
+}
 
 int leftBinarySearch(std::vector<int> &array, int a, int b, int val) {
   int lo = a, hi = b;
@@ -78,24 +104,11 @@ void doubleInsertion(std::vector<int> &array, int a, int b) {
   }
 }
 
-void sort(std::vector<int> &arr) {
-  if (arr.size() > 1) {
-    doubleInsertion(arr, 0, static_cast<int>(arr.size()));
-  }
-}
-
 int main() {
   std::vector<int> array = {0,  39, 21, 62, 91, 77, 14, 23,
                             90, 69, 51, 81, 68, 83, 32, 56};
   sort(array);
 
-  std::cout << "[";
-  for (size_t i = 0; i < array.size(); i++) {
-    std::cout << array[i];
-    if (i != array.size() - 1) {
-      std::cout << ", ";
-    }
-  }
-  std::cout << "]" << '\n';
+  printList(array);
   return 0;
 }

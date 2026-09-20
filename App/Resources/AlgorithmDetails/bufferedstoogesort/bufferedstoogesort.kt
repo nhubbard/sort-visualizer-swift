@@ -1,3 +1,7 @@
+fun sort(arr: Array<Int>) {
+  bufferedStoogeSort(arr, 0, arr.size)
+}
+
 fun bufferedStoogeSort(arr: Array<Int>, start: Int, stop: Int) {
   if (stop - start > 1) {
     if (stop - start == 2 && arr[start] > arr[stop - 1]) {
@@ -51,10 +55,6 @@ fun bufferedStoogeSort(arr: Array<Int>, start: Int, stop: Int) {
       }
     }
   }
-}
-
-fun sort(arr: Array<Int>) {
-  bufferedStoogeSort(arr, 0, arr.size)
 }
 
 fun main() {

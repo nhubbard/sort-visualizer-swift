@@ -4,27 +4,6 @@ import (
 	"fmt"
 )
 
-func mergeTo(arr []int, subList []int, a int, m int, b int) {
-	i := 0
-	s := m - a
-	for i < s && m < b {
-		if subList[i] < arr[m] {
-			arr[a] = subList[i]
-			a++
-			i++
-		} else {
-			arr[a] = arr[m]
-			a++
-			m++
-		}
-	}
-	for i < s {
-		arr[a] = subList[i]
-		a++
-		i++
-	}
-}
-
 func sort(arr []int) []int {
 	n := len(arr)
 	if n < 2 {
@@ -56,6 +35,27 @@ func sort(arr []int) []int {
 		j = k
 	}
 	return arr
+}
+
+func mergeTo(arr []int, subList []int, a int, m int, b int) {
+	i := 0
+	s := m - a
+	for i < s && m < b {
+		if subList[i] < arr[m] {
+			arr[a] = subList[i]
+			a++
+			i++
+		} else {
+			arr[a] = arr[m]
+			a++
+			m++
+		}
+	}
+	for i < s {
+		arr[a] = subList[i]
+		a++
+		i++
+	}
 }
 
 func main() {

@@ -4,6 +4,10 @@ import (
 	"fmt"
 )
 
+func sort(arr []int) []int {
+	return unoptimizedCocktailShakerSort(arr)
+}
+
 func unoptimizedCocktailShakerSort(arr []int) []int {
 	n := len(arr)
 	i := 0
@@ -21,10 +25,6 @@ func unoptimizedCocktailShakerSort(arr []int) []int {
 		i++
 	}
 	return arr
-}
-
-func sort(arr []int) []int {
-	return unoptimizedCocktailShakerSort(arr)
 }
 
 func main() {

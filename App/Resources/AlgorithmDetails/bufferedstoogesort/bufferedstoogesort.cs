@@ -2,6 +2,11 @@ using System;
 
 public class BufferedStoogeSort
 {
+  public static void Sort(int[] arr)
+  {
+    Sort(arr, 0, arr.Length);
+  }
+
   private static void Sort(int[] arr, int start, int stop)
   {
     if (stop - start > 1)
@@ -71,14 +76,12 @@ public class BufferedStoogeSort
     }
   }
 
-  public static void Sort(int[] arr)
-  {
-    Sort(arr, 0, arr.Length);
-  }
-
   public static void Main(String[] args)
   {
-    int[] array = { 0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56 };
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     Sort(array);
     string result = "[" + String.Join(", ", array) + "]";
     Console.WriteLine(result);

@@ -1,49 +1,43 @@
 import java.util.Arrays;
 
 public class bottomupmergesort {
-  private static void merge(int[] arr, int low, int mid, int high) {
-    int[] left = Arrays.copyOfRange(arr, low, mid);
-    int[] right = Arrays.copyOfRange(arr, mid, high);
-    int i = 0;
-    int j = 0;
-    int k = low;
-    while (i < left.length && j < right.length) {
-      if (left[i] <= right[j]) {
-        arr[k] = left[i];
-        i++;
-      } else {
-        arr[k] = right[j];
-        j++;
+  public static void sort(int[] arr) {
+    int n = arr.length;
+    if (n < 2) return;
+    int[] scratch = arr.clone();
+    int mergeSize = 2;
+    while (mergeSize <= n) {
+      int copyLength = n;
+      for (int index = 0; index < n; index += mergeSize) {
+        int stop = merge(arr, scratch, n, index, mergeSize);
+        if (stop >= 0) copyLength = stop;
       }
-      k++;
+      System.arraycopy(scratch, 0, arr, 0, copyLength);
+      mergeSize *= 2;
     }
-    while (i < left.length) {
-      arr[k] = left[i];
-      i++;
-      k++;
-    }
-    while (j < right.length) {
-      arr[k] = right[j];
-      j++;
-      k++;
+    if (mergeSize / 2 != n) {
+      int stop = merge(arr, scratch, n, 0, mergeSize);
+      System.arraycopy(scratch, 0, arr, 0, stop < 0 ? n : stop);
     }
   }
 
-  public static void sort(int[] arr) {
-    int n = arr.length;
-    for (int width = 1; width < n; width *= 2) {
-      for (int low = 0; low < n; low += 2 * width) {
-        int mid = Math.min(low + width, n);
-        int high = Math.min(low + 2 * width, n);
-        if (mid < high) {
-          merge(arr, low, mid, high);
-        }
-      }
-    }
+  private static int merge(int[] arr, int[] scratch, int n, int index, int mergeSize) {
+    int mid = index + mergeSize / 2;
+    int end = Math.min(n, index + mergeSize);
+    if (mid >= end) return index;
+    int left = index, right = mid, out = index;
+    while (left < mid && right < end)
+      scratch[out++] = arr[left] <= arr[right] ? arr[left++] : arr[right++];
+    while (left < mid) scratch[out++] = arr[left++];
+    while (right < end) scratch[out++] = arr[right++];
+    return -1;
   }
 
   public static void main(String[] args) {
-    int[] array = new int[] {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     sort(array);
     System.out.println(Arrays.toString(array));
   }

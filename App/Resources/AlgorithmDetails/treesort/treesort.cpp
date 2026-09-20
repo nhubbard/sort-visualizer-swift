@@ -1,7 +1,8 @@
 #include <cstdio>
 #include <vector>
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
+                 90, 69, 51, 81, 68, 83, 32, 56};
 
 struct Node {
   int pointer;
@@ -13,15 +14,34 @@ struct Node {
 };
 
 void printList(int items[], int size) {
-  for (int i = 0; i < size; i++) {
-    if (i == 0) {
-      printf("[%d, ", items[i]);
-    } else if (i != size - 1) {
-      printf("%d, ", items[i]);
-    } else {
-      printf("%d]", items[i]);
+  printf("[");
+  if (size > 0) {
+    printf("%d", items[0]);
+    for (int i = 1; i < size; i++) {
+      printf(", %d", items[i]);
     }
   }
+  printf("]");
+}
+
+Node *add(int arr[], Node *node, int addPtr);
+void traverse(int arr[], Node *node, std::vector<int> &result);
+void freeTree(Node *node);
+
+void sort(int arr[], int n) {
+  Node *root = nullptr;
+  for (int i = 0; i < n; i++) {
+    root = add(arr, root, i);
+  }
+
+  std::vector<int> result;
+  traverse(arr, root, result);
+
+  for (int i = 0; i < n; i++) {
+    arr[i] = result[i];
+  }
+
+  freeTree(root);
 }
 
 Node *add(int arr[], Node *node, int addPtr) {
@@ -52,22 +72,6 @@ void freeTree(Node *node) {
   freeTree(node->left);
   freeTree(node->right);
   delete node;
-}
-
-void sort(int arr[], int n) {
-  Node *root = nullptr;
-  for (int i = 0; i < n; i++) {
-    root = add(arr, root, i);
-  }
-
-  std::vector<int> result;
-  traverse(arr, root, result);
-
-  for (int i = 0; i < n; i++) {
-    arr[i] = result[i];
-  }
-
-  freeTree(root);
 }
 
 int main(int argc, char *argv[]) {

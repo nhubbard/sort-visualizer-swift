@@ -1,3 +1,14 @@
+fun sort(arr: Array<Int>) {
+  val n = arr.size
+  if (n < 2) return
+  var maxValue = arr[0]
+  for (i in 1 until n) {
+    if (arr[i] > maxValue) maxValue = arr[i]
+  }
+  val bit = mostSignificantBit(maxValue)
+  binaryQuickSortRecursive(arr, 0, n - 1, bit)
+}
+
 fun mostSignificantBit(value: Int): Int {
   if (value == 0) return -1
   var bit = 0
@@ -31,16 +42,6 @@ fun binaryQuickSortRecursive(arr: Array<Int>, p: Int, r: Int, bit: Int) {
     binaryQuickSortRecursive(arr, p, q, bit - 1)
     binaryQuickSortRecursive(arr, q + 1, r, bit - 1)
   }
-}
-
-fun sort(arr: Array<Int>) {
-  val n = arr.size
-  var maxValue = arr[0]
-  for (i in 1 until n) {
-    if (arr[i] > maxValue) maxValue = arr[i]
-  }
-  val bit = mostSignificantBit(maxValue)
-  binaryQuickSortRecursive(arr, 0, n - 1, bit)
 }
 
 fun main() {

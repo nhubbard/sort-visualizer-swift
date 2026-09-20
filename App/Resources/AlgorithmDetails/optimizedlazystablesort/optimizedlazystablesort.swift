@@ -1,3 +1,8 @@
+func sort(_ arr: inout [Int]) {
+    let n = arr.count
+    lazyStableSort(&arr, 0, n)
+}
+
 func swap(_ arr: inout [Int], _ a: Int, _ b: Int) {
     arr.swapAt(a, b)
 }
@@ -144,10 +149,6 @@ func lazyStableSort(_ arr: inout [Int], _ pos: Int, _ len: Int) {
     }
 }
 
-func sort(_ arr: inout [Int]) {
-    let n = arr.count
-    lazyStableSort(&arr, 0, n)
-}
 
 var array: [Int] = [
     0, 39, 21, 62, 91, 77, 14, 23,

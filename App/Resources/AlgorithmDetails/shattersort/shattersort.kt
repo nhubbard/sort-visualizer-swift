@@ -1,12 +1,17 @@
+fun sort(arr: Array<Int>) {
+  if (arr.size < 2) return
+  shatterSort(arr, arr.size, 4)
+}
+
 fun insertionSort(arr: Array<Int>, start: Int, end: Int) {
   for (i in start + 1 until end) {
-    val key = arr[i]
-    var j = i - 1
-    while (j >= start && arr[j] > key) {
-      arr[j + 1] = arr[j]
-      j--
+    var pos = i
+    while (pos > start && arr[pos - 1] > arr[pos]) {
+      val temp = arr[pos - 1]
+      arr[pos - 1] = arr[pos]
+      arr[pos] = temp
+      pos--
     }
-    arr[j + 1] = key
   }
 }
 
@@ -46,10 +51,6 @@ fun shatterSort(arr: Array<Int>, length: Int, num: Int) {
   for (i in 0 until offsets.size - 1) {
     if (offsets[i + 1] - offsets[i] > 1) insertionSort(arr, offsets[i], offsets[i + 1])
   }
-}
-
-fun sort(arr: Array<Int>) {
-  shatterSort(arr, arr.size, 4)
 }
 
 fun main() {

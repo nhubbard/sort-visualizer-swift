@@ -1,12 +1,19 @@
+fun sort(arr: Array<Int>) {
+  if (arr.size < 2) return
+  val n = arr.size
+  val rate = maxOf(2, floorLog2(n) / 2)
+  simpleShatterSort(arr, n, 4, rate)
+}
+
 fun insertionSort(arr: Array<Int>, start: Int, end: Int) {
   for (i in start + 1 until end) {
-    val key = arr[i]
-    var j = i - 1
-    while (j >= start && arr[j] > key) {
-      arr[j + 1] = arr[j]
-      j--
+    var pos = i
+    while (pos > start && arr[pos - 1] > arr[pos]) {
+      val temp = arr[pos - 1]
+      arr[pos - 1] = arr[pos]
+      arr[pos] = temp
+      pos--
     }
-    arr[j + 1] = key
   }
 }
 
@@ -61,12 +68,6 @@ fun simpleShatterSort(arr: Array<Int>, length: Int, num: Int, rate: Int) {
   for (k in 0 until offsets.size - 1) {
     if (offsets[k + 1] - offsets[k] > 1) insertionSort(arr, offsets[k], offsets[k + 1])
   }
-}
-
-fun sort(arr: Array<Int>) {
-  val n = arr.size
-  val rate = maxOf(2, floorLog2(n) / 2)
-  simpleShatterSort(arr, n, 4, rate)
 }
 
 fun main() {

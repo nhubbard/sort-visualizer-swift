@@ -8,8 +8,11 @@ public struct BinomialHeapSort: SortAlgorithm {
     category: .selection,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 900, coefficients: [225607, 373.111, 0.0982337],
+      anchorSize: 938, coefficients: [224305, 348.393, 0.0821321],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .powerLog, coefficients: [4.16484, 1.31079], rSquared: 0.996284),
+    implementationComplexity: 15,
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n log n)", average: "O(n log n)", worst: "O(n log n)"),

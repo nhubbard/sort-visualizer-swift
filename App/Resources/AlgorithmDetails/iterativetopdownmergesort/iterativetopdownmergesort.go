@@ -4,36 +4,12 @@ import (
 	"fmt"
 )
 
-func merge(arr []int, low, mid, high int) {
-	left := make([]int, mid-low)
-	right := make([]int, high-mid)
-	copy(left, arr[low:mid])
-	copy(right, arr[mid:high])
-	i, j, k := 0, 0, low
-	for i < len(left) && j < len(right) {
-		if left[i] <= right[j] {
-			arr[k] = left[i]
-			i++
-		} else {
-			arr[k] = right[j]
-			j++
-		}
-		k++
-	}
-	for i < len(left) {
-		arr[k] = left[i]
-		i++
-		k++
-	}
-	for j < len(right) {
-		arr[k] = right[j]
-		j++
-		k++
-	}
-}
-
 func sort(arr []int) []int {
 	n := len(arr)
+	if n < 2 {
+		return arr
+	}
+	scratch := make([]int, n)
 	subarrayCount := 1
 	for subarrayCount < n {
 		subarrayCount *= 2
@@ -44,11 +20,36 @@ func sort(arr []int) []int {
 			low := n * i / subarrayCount
 			mid := n * (i + 1) / subarrayCount
 			high := n * (i + 2) / subarrayCount
-			merge(arr, low, mid, high)
+			merge(arr, scratch, low, mid, high)
 		}
 		subarrayCount /= 2
 	}
 	return arr
+}
+
+func merge(arr, scratch []int, low, mid, high int) {
+	left, right, out := low, mid, low
+	for left < mid && right < high {
+		if arr[left] <= arr[right] {
+			scratch[out] = arr[left]
+			left++
+		} else {
+			scratch[out] = arr[right]
+			right++
+		}
+		out++
+	}
+	for left < mid {
+		scratch[out] = arr[left]
+		left++
+		out++
+	}
+	for right < high {
+		scratch[out] = arr[right]
+		right++
+		out++
+	}
+	copy(arr[low:high], scratch[low:high])
 }
 
 func main() {

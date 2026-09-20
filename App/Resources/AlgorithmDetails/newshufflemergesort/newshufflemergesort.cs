@@ -2,6 +2,30 @@ using System;
 
 public class NewShuffleMergeSort
 {
+  public static void Sort(int[] arr)
+  {
+    int n = arr.Length;
+    if (n < 2)
+    {
+      return;
+    }
+
+    int subarrayCount = CeilPow2(n);
+    while (subarrayCount > 1)
+    {
+      int i = 0;
+      while (i < subarrayCount)
+      {
+        int lo = n * i / subarrayCount;
+        int mid = n * (i + 1) / subarrayCount;
+        int hi = n * (i + 2) / subarrayCount;
+        Merge(arr, lo, mid, hi);
+        i += 2;
+      }
+      subarrayCount >>= 1;
+    }
+  }
+
   private static void MultiSwap(int[] arr, int i, int j, int length)
   {
     for (int k = 0; k < length; k++)
@@ -237,33 +261,12 @@ public class NewShuffleMergeSort
     return x + 1;
   }
 
-  public static void Sort(int[] arr)
-  {
-    int n = arr.Length;
-    if (n < 2)
-    {
-      return;
-    }
-
-    int subarrayCount = CeilPow2(n);
-    while (subarrayCount > 1)
-    {
-      int i = 0;
-      while (i < subarrayCount)
-      {
-        int lo = n * i / subarrayCount;
-        int mid = n * (i + 1) / subarrayCount;
-        int hi = n * (i + 2) / subarrayCount;
-        Merge(arr, lo, mid, hi);
-        i += 2;
-      }
-      subarrayCount >>= 1;
-    }
-  }
-
   public static void Main(String[] args)
   {
-    int[] array = { 0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56 };
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     Sort(array);
     string result = "[" + String.Join(", ", array) + "]";
     Console.WriteLine(result);

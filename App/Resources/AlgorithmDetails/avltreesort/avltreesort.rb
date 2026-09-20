@@ -11,6 +11,17 @@ end
 
 AddResult = Struct.new(:node, :height_changed)
 
+def sort(arr)
+  root = nil
+  arr.each { |value| root = add(root, value).node }
+
+  result = []
+  traverse(root, result)
+
+  (0...arr.length).each { |i| arr[i] = result[i] }
+  arr
+end
+
 def single_rotate_right(node)
   b = node.left
   node.left = b.right
@@ -91,16 +102,6 @@ def traverse(node, result)
   traverse(node.right, result)
 end
 
-def sort(arr)
-  root = nil
-  arr.each { |value| root = add(root, value).node }
-
-  result = []
-  traverse(root, result)
-
-  (0...arr.length).each { |i| arr[i] = result[i] }
-  arr
-end
 
 array = [0, 39, 21, 62, 91, 77, 14, 23,
   90, 69, 51, 81, 68, 83, 32, 56]

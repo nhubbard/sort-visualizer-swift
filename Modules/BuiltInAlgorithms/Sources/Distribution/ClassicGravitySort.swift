@@ -20,8 +20,11 @@ public struct ClassicGravitySort: SortAlgorithm {
     category: .distribution,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 399, coefficients: [239400, 1198.5, 1.5],
+      anchorSize: 308, coefficients: [238547, 1544.5, 2.5],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .polynomialIntercept, coefficients: [2.5, 4.5, 1], rSquared: 1),
+    implementationComplexity: 10,
     stable: true,
     timeComplexity: ComplexityBounds(
       best: "O(n \\times k)", average: "O(n \\times k)", worst: "O(n \\times k)"),
@@ -35,16 +38,16 @@ public struct ClassicGravitySort: SortAlgorithm {
     let n = engine.count
     guard n > 1 else { return }
 
-    var maxValue = engine.values[0]
-    for i in 1..<n where engine.values[i] > maxValue {
-      maxValue = engine.values[i]
+    var maxValue = engine.readValue(at: 0)
+    for i in 1..<n where engine.readValue(at: i) > maxValue {
+      maxValue = engine.readValue(at: i)
     }
 
     let transposeHandle = engine.createAuxArray(length: maxValue)
     var transpose = [Int](repeating: 0, count: maxValue)
 
     for i in 0..<n {
-      let value = engine.values[i]
+      let value = engine.readValue(at: i)
       for j in 0..<value {
         transpose[j] += 1
         engine.writeAux(transposeHandle, at: j, value: transpose[j])
@@ -53,8 +56,15 @@ public struct ClassicGravitySort: SortAlgorithm {
 
     for i in 0..<n {
       var sum = 0
-      for j in 0..<maxValue where transpose[j] > 0 {
-        sum += 1
+      // Re-reads the `transpose` shadow array in full for every one of `n` output slots -- real,
+      // repeated work the tape didn't previously see at all (only the decrements below were
+      // visible via `writeAux`) -- so each read is marked via `markAuxRead` right where it
+      // happens.
+      for j in 0..<maxValue {
+        engine.markAuxRead(transposeHandle, at: j)
+        if transpose[j] > 0 {
+          sum += 1
+        }
       }
       engine.setValue(n - i - 1, sum)
       for j in 0..<maxValue {

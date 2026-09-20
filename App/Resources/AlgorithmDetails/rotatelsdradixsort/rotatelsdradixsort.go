@@ -4,9 +4,32 @@ import (
 	"fmt"
 )
 
-const radixBase = 10
+const radixBase = 4
 
 // digitAt extracts the digit at place (0 = ones place) from value, in radixBase.
+func sort(arr []int) []int {
+	n := len(arr)
+	if n < 2 {
+		return arr
+	}
+	maxValue := arr[0]
+	for i := 1; i < n; i++ {
+		if arr[i] > maxValue {
+			maxValue = arr[i]
+		}
+	}
+	maxPlace := 0
+	probe := radixBase
+	for probe <= maxValue {
+		maxPlace++
+		probe *= radixBase
+	}
+	for place := 0; place <= maxPlace; place++ {
+		digitMergeSort(arr, 0, n, place)
+	}
+	return arr
+}
+
 func digitAt(value int, place int) int {
 	divisor := 1
 	for i := 0; i < place; i++ {
@@ -82,29 +105,6 @@ func digitMergeSort(arr []int, a int, b int, place int) {
 	digitMergeSort(arr, a, mid, place)
 	digitMergeSort(arr, mid, b, place)
 	mergeByDigit(arr, a, mid, b, 0, radixBase, place)
-}
-
-func sort(arr []int) []int {
-	n := len(arr)
-	if n < 2 {
-		return arr
-	}
-	maxValue := arr[0]
-	for i := 1; i < n; i++ {
-		if arr[i] > maxValue {
-			maxValue = arr[i]
-		}
-	}
-	maxPlace := 0
-	probe := radixBase
-	for probe <= maxValue {
-		maxPlace++
-		probe *= radixBase
-	}
-	for place := 0; place <= maxPlace; place++ {
-		digitMergeSort(arr, 0, n, place)
-	}
-	return arr
 }
 
 func main() {

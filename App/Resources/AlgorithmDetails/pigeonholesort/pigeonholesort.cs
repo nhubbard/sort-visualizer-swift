@@ -31,7 +31,10 @@ public class PigeonholeSort
 
   public static void Main(String[] args)
   {
-    int[] array = { 0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56 };
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     array = Sort(array);
     string result = "[" + String.Join(", ", array) + "]";
     Console.WriteLine(result);

@@ -4,17 +4,6 @@ import (
 	"fmt"
 )
 
-func traverse(arr []int, temp []int, lower []int, upper []int, idx *int, r int) {
-	if lower[r] != 0 {
-		traverse(arr, temp, lower, upper, idx, lower[r])
-	}
-	temp[*idx] = arr[r]
-	*idx++
-	if upper[r] != 0 {
-		traverse(arr, temp, lower, upper, idx, upper[r])
-	}
-}
-
 func sort(arr []int) []int {
 	n := len(arr)
 	if n <= 1 {
@@ -46,6 +35,17 @@ func sort(arr []int) []int {
 	traverse(arr, temp, lower, upper, &idx, 0)
 	copy(arr, temp)
 	return arr
+}
+
+func traverse(arr []int, temp []int, lower []int, upper []int, idx *int, r int) {
+	if lower[r] != 0 {
+		traverse(arr, temp, lower, upper, idx, lower[r])
+	}
+	temp[*idx] = arr[r]
+	*idx++
+	if upper[r] != 0 {
+		traverse(arr, temp, lower, upper, idx, upper[r])
+	}
 }
 
 func main() {

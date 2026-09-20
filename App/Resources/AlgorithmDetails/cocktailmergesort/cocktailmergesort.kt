@@ -1,3 +1,7 @@
+fun sort(arr: Array<Int>) {
+  cocktailMergeSort(arr)
+}
+
 fun minRunLength(length: Int): Int {
   var n = length
   var r = 0
@@ -98,10 +102,6 @@ fun cocktailMergeSort(arr: Array<Int>) {
     }
     width *= 2
   }
-}
-
-fun sort(arr: Array<Int>) {
-  cocktailMergeSort(arr)
 }
 
 fun main() {

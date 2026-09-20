@@ -4,6 +4,23 @@ import (
 	"fmt"
 )
 
+func sort(arr []int) []int {
+	end := len(arr)
+	if end <= 1 {
+		return arr
+	}
+	n := 1
+	for n < end {
+		n <<= 1
+	}
+
+	numberOfSwaps := 1
+	for numberOfSwaps != 0 {
+		numberOfSwaps = circleSortRoutine(arr, n, end)
+	}
+	return arr
+}
+
 func circleSortRoutine(arr []int, length, end int) int {
 	swapCount := 0
 	for gap := length / 2; gap > 0; gap /= 2 {
@@ -21,23 +38,6 @@ func circleSortRoutine(arr []int, length, end int) int {
 		}
 	}
 	return swapCount
-}
-
-func sort(arr []int) []int {
-	end := len(arr)
-	if end <= 1 {
-		return arr
-	}
-	n := 1
-	for n < end {
-		n <<= 1
-	}
-
-	numberOfSwaps := 1
-	for numberOfSwaps != 0 {
-		numberOfSwaps = circleSortRoutine(arr, n, end)
-	}
-	return arr
 }
 
 func main() {

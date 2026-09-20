@@ -38,8 +38,11 @@ public struct NewShuffleMergeSort: SortAlgorithm {
     category: .merge,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 818, coefficients: [228622, 411.74, 0.115292],
+      anchorSize: 604, coefficients: [235777, 602.51, 0.263185],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .powerLog, coefficients: [5.10411, 1.38731], rSquared: 0.995474),
+    implementationComplexity: 54,
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n log n)", average: "O(n log n)", worst: "O(n log n)"),
@@ -77,10 +80,10 @@ public struct NewShuffleMergeSort: SortAlgorithm {
     func shuffleEasy(_ start: Int, _ size: Int) {
       var i = 1
       while i < size {
-        var val = engine.values[start + i - 1]
+        var val = engine.readValue(at: start + i - 1)
         var j = i * 2 % size
         while j != i {
-          let nval = engine.values[start + j - 1]
+          let nval = engine.readValue(at: start + j - 1)
           engine.setValue(start + j - 1, val)
           val = nval
           j = j * 2 % size
@@ -150,10 +153,10 @@ public struct NewShuffleMergeSort: SortAlgorithm {
       var i = 1
       while i < size {
         var prev = i
-        let val = engine.values[start + i - 1]
+        let val = engine.readValue(at: start + i - 1)
         var j = i * 2 % size
         while j != i {
-          engine.setValue(start + prev - 1, engine.values[start + j - 1])
+          engine.setValue(start + prev - 1, engine.readValue(at: start + j - 1))
           prev = j
           j = j * 2 % size
         }
@@ -181,7 +184,7 @@ public struct NewShuffleMergeSort: SortAlgorithm {
     // read rather than issuing a second one.
     func compare3(_ i: Int, _ j: Int) -> Int {
       if engine.compare(i, j, by: (<)) { return -1 }
-      return engine.values[i] == engine.values[j] ? 0 : 1
+      return engine.readValue(at: i) == engine.readValue(at: j) ? 0 : 1
     }
 
     func mergeUp(_ start: Int, _ end: Int, _ typeIn: Bool) {

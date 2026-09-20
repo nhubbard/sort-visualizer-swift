@@ -14,8 +14,11 @@ public struct GrailSort: SortAlgorithm {
     category: .hybrid,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 1118, coefficients: [239948, 354.287, 0.124527],
+      anchorSize: 1057, coefficients: [239687, 390.7, 0.15444],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .polynomialIntercept, coefficients: [0.15444, 64.2135, -734.95], rSquared: 0.999777),
+    implementationComplexity: 214,
     stable: true,
     timeComplexity: ComplexityBounds(
       best: "O(n log n)", average: "O(n log n)", worst: "O(n log n)"),

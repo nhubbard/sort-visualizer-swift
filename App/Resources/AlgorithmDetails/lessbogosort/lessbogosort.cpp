@@ -5,15 +5,23 @@
 int array[8] = {0, 39, 21, 62, 91, 77, 14, 23};
 
 void printList(int items[], int size) {
-  for (int i = 0; i < size; i++) {
-    if (i == 0) {
-      printf("[%d, ", items[i]);
-    } else if (i != size - 1) {
-      printf("%d, ", items[i]);
-    } else {
-      printf("%d]", items[i]);
+  printf("[");
+  if (size > 0) {
+    printf("%d", items[0]);
+    for (int i = 1; i < size; i++) {
+      printf(", %d", items[i]);
     }
   }
+  printf("]");
+}
+
+inline bool isMinimum(int arr[], int start, int end);
+inline void shuffleRange(int arr[], int start, int end);
+
+void sort(int arr[], int n) {
+  for (int i = 0; i < n; i++)
+    while (!isMinimum(arr, i, n))
+      shuffleRange(arr, i, n);
 }
 
 inline bool isMinimum(int arr[], int start, int end) {
@@ -26,12 +34,6 @@ inline bool isMinimum(int arr[], int start, int end) {
 inline void shuffleRange(int arr[], int start, int end) {
   for (int i = start; i < end - 1; i++)
     std::swap(arr[i], arr[i + rand() % (end - i)]);
-}
-
-void sort(int arr[], int n) {
-  for (int i = 0; i < n; i++)
-    while (!isMinimum(arr, i, n))
-      shuffleRange(arr, i, n);
 }
 
 int main(int argc, char *argv[]) {

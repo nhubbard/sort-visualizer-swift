@@ -1,3 +1,14 @@
+def sort(array)
+  n = array.length
+  return if n <= 1
+  heapify(array, n)
+  (1...n - 1).each do |i|
+    array[0], array[n - i] = array[n - i], array[0]
+    sift_down(array, 0, n - i)
+  end
+  array[0], array[1] = array[1], array[0] if array[0] > array[1]
+end
+
 def triangular_root(val)
   (Math.sqrt(8 * val + 1).to_i - 1) / 2
 end
@@ -23,16 +34,6 @@ def heapify(array, length)
   end
 end
 
-def sort(array)
-  n = array.length
-  return if n <= 1
-  heapify(array, n)
-  (1...n - 1).each do |i|
-    array[0], array[n - i] = array[n - i], array[0]
-    sift_down(array, 0, n - i)
-  end
-  array[0], array[1] = array[1], array[0] if array[0] > array[1]
-end
 
 array = [0, 39, 21, 62, 91, 77, 14, 23,
   90, 69, 51, 81, 68, 83, 32, 56]

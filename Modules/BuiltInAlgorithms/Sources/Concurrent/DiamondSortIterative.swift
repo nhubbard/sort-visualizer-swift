@@ -25,8 +25,11 @@ public struct DiamondSortIterative: SortAlgorithm {
     category: .concurrent,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 187, coefficients: [238567, 2558.99, 6.85996],
+      anchorSize: 187, coefficients: [238565, 2558.99, 6.85996],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .polynomialIntercept, coefficients: [6.85996, -6.6338, -80.6044], rSquared: 0.999999),
+    implementationComplexity: 12,
     stable: true,
     timeComplexity: ComplexityBounds(best: "O(n^2)", average: "O(n^2)", worst: "O(n^2)"),
     spaceComplexity: "O(1)",

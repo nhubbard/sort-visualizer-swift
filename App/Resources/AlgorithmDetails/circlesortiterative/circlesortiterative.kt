@@ -1,3 +1,17 @@
+fun sort(arr: Array<Int>) {
+  val end = arr.size
+  if (end <= 1) return
+  var n = 1
+  while (n < end) {
+    n = n shl 1
+  }
+
+  var numberOfSwaps = 1
+  while (numberOfSwaps != 0) {
+    numberOfSwaps = circleSortRoutine(arr, n, end)
+  }
+}
+
 fun circleSortRoutine(arr: Array<Int>, length: Int, end: Int): Int {
   var swapCount = 0
   var gap = length / 2
@@ -19,20 +33,6 @@ fun circleSortRoutine(arr: Array<Int>, length: Int, end: Int): Int {
     gap /= 2
   }
   return swapCount
-}
-
-fun sort(arr: Array<Int>) {
-  val end = arr.size
-  if (end <= 1) return
-  var n = 1
-  while (n < end) {
-    n = n shl 1
-  }
-
-  var numberOfSwaps = 1
-  while (numberOfSwaps != 0) {
-    numberOfSwaps = circleSortRoutine(arr, n, end)
-  }
 }
 
 fun main() {

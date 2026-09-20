@@ -3,29 +3,38 @@
 #include <utility>
 #include <vector>
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
+                 90, 69, 51, 81, 68, 83, 32, 56};
 
 void printList(int items[], int size) {
-  for (int i = 0; i < size; i++) {
-    if (i == 0) {
-      printf("[%d, ", items[i]);
-    } else if (i != size - 1) {
-      printf("%d, ", items[i]);
-    } else {
-      printf("%d]", items[i]);
+  printf("[");
+  if (size > 0) {
+    printf("%d", items[0]);
+    for (int i = 1; i < size; i++) {
+      printf(", %d", items[i]);
     }
   }
+  printf("]");
+}
+
+void insertionSort(int arr[], int start, int end);
+std::vector<int> shatterPartition(int arr[], int start, int length, int num);
+int floorLog2(int n);
+void simpleShatterSort(int arr[], int length, int num, int rate);
+
+void sort(int arr[], int n) {
+  if (n < 2) return;
+  int rate = std::max(2, floorLog2(n) / 2);
+  simpleShatterSort(arr, n, 4, rate);
 }
 
 void insertionSort(int arr[], int start, int end) {
   for (int i = start + 1; i < end; i++) {
-    int key = arr[i];
-    int j = i - 1;
-    while (j >= start && arr[j] > key) {
-      arr[j + 1] = arr[j];
-      j--;
+    int pos = i;
+    while (pos > start && arr[pos - 1] > arr[pos]) {
+      std::swap(arr[pos - 1], arr[pos]);
+      pos--;
     }
-    arr[j + 1] = key;
   }
 }
 
@@ -84,11 +93,6 @@ void simpleShatterSort(int arr[], int length, int num, int rate) {
       insertionSort(arr, offsets[k], offsets[k + 1]);
     }
   }
-}
-
-void sort(int arr[], int n) {
-  int rate = std::max(2, floorLog2(n) / 2);
-  simpleShatterSort(arr, n, 4, rate);
 }
 
 int main(int argc, char *argv[]) {

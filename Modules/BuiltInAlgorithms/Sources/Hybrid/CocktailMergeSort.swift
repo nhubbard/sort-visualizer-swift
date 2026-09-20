@@ -20,8 +20,11 @@ public struct CocktailMergeSort: SortAlgorithm {
     category: .hybrid,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 756, coefficients: [239683, 1763.36, 6.48657, 0.0159073, 2.92578e-05, 4.30503e-08],
+      anchorSize: 735, coefficients: [233440, 399.443, 0.0650559],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .powerLog, coefficients: [23.8834, 1.10615], rSquared: 0.947049),
+    implementationComplexity: 29,
     stable: true,
     timeComplexity: ComplexityBounds(
       best: "O(n log n)", average: "O(n log n)", worst: "O(n^2)"),
@@ -108,7 +111,7 @@ public struct CocktailMergeSort: SortAlgorithm {
     // except the initial atomic run width is `minRunLen` (from Cocktail Shaker, above) instead
     // of 1, so the doubling sequence of merge widths starts at `2 * minRunLen` instead of `2`.
     let tempHandle = engine.createAuxArray(length: n)
-    var scratch = engine.values
+    var scratch = engine.readAllValues()
 
     @discardableResult
     func merge(_ index: Int, _ mergeSize: Int) -> Int? {
@@ -125,25 +128,25 @@ public struct CocktailMergeSort: SortAlgorithm {
 
       while left < mid && right < end {
         if engine.compare(right, left) {
-          scratch[scratchIndex] = engine.values[left]
-          engine.writeAux(tempHandle, at: scratchIndex, value: engine.values[left])
+          scratch[scratchIndex] = engine.readValue(at: left)
+          engine.writeAux(tempHandle, at: scratchIndex, value: engine.readValue(at: left))
           left += 1
         } else {
-          scratch[scratchIndex] = engine.values[right]
-          engine.writeAux(tempHandle, at: scratchIndex, value: engine.values[right])
+          scratch[scratchIndex] = engine.readValue(at: right)
+          engine.writeAux(tempHandle, at: scratchIndex, value: engine.readValue(at: right))
           right += 1
         }
         scratchIndex += 1
       }
       while left < mid {
-        scratch[scratchIndex] = engine.values[left]
-        engine.writeAux(tempHandle, at: scratchIndex, value: engine.values[left])
+        scratch[scratchIndex] = engine.readValue(at: left)
+        engine.writeAux(tempHandle, at: scratchIndex, value: engine.readValue(at: left))
         left += 1
         scratchIndex += 1
       }
       while right < end {
-        scratch[scratchIndex] = engine.values[right]
-        engine.writeAux(tempHandle, at: scratchIndex, value: engine.values[right])
+        scratch[scratchIndex] = engine.readValue(at: right)
+        engine.writeAux(tempHandle, at: scratchIndex, value: engine.readValue(at: right))
         right += 1
         scratchIndex += 1
       }

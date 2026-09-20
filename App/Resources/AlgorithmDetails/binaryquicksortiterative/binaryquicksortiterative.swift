@@ -1,3 +1,22 @@
+func sort(_ arr: inout [Int]) {
+    let n = arr.count
+    if n < 2 { return }
+    let maxValue = arr.max() ?? 0
+    let bit = mostSignificantBit(maxValue)
+
+    var tasks: [(p: Int, r: Int, bit: Int)] = [(0, n - 1, bit)]
+    var head = 0
+    while head < tasks.count {
+        let t = tasks[head]
+        head += 1
+        if t.p < t.r, t.bit >= 0 {
+            let q = partition(&arr, t.p, t.r, t.bit)
+            tasks.append((t.p, q, t.bit - 1))
+            tasks.append((q + 1, t.r, t.bit - 1))
+        }
+    }
+}
+
 func mostSignificantBit(_ value: Int) -> Int {
     if value == 0 {
         return -1
@@ -29,23 +48,6 @@ func partition(_ arr: inout [Int], _ p: Int, _ r: Int, _ bit: Int) -> Int {
     }
 }
 
-func sort(_ arr: inout [Int]) {
-    let n = arr.count
-    let maxValue = arr.max() ?? 0
-    let bit = mostSignificantBit(maxValue)
-
-    var tasks: [(p: Int, r: Int, bit: Int)] = [(0, n - 1, bit)]
-    var head = 0
-    while head < tasks.count {
-        let t = tasks[head]
-        head += 1
-        if t.p < t.r, t.bit >= 0 {
-            let q = partition(&arr, t.p, t.r, t.bit)
-            tasks.append((t.p, q, t.bit - 1))
-            tasks.append((q + 1, t.r, t.bit - 1))
-        }
-    }
-}
 
 var array: [Int] = [
     0, 39, 21, 62, 91, 77, 14, 23,

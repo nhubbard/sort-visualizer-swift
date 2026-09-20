@@ -2,6 +2,15 @@ using System;
 
 public class DoubleInsertionSort
 {
+  public static int[] Sort(int[] array)
+  {
+    if (array.Length > 1)
+    {
+      InsertionSort(array, 0, array.Length);
+    }
+    return array;
+  }
+
   public static void InsertionSort(int[] array, int start, int end)
   {
     var left = start + (end - start) / 2 - 1;
@@ -75,18 +84,12 @@ public class DoubleInsertionSort
     }
   }
 
-  public static int[] Sort(int[] array)
-  {
-    if (array.Length > 1)
-    {
-      InsertionSort(array, 0, array.Length);
-    }
-    return array;
-  }
-
   public static void Main(String[] args)
   {
-    int[] array = { 0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56 };
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     Sort(array);
     string result = "[" + String.Join(", ", array) + "]";
     Console.WriteLine(result);

@@ -1,59 +1,5 @@
 const val RADIX = 4
 
-fun getDigit(value: Int, place: Int): Int {
-  var v = value
-  for (p in 0 until place) {
-    v /= RADIX
-  }
-  return v % RADIX
-}
-
-fun shift(value: Int, places: Int): Int {
-  var v = value
-  for (p in 0 until places) {
-    v /= RADIX
-  }
-  return v
-}
-
-// Turns the raw per-bucket counts already accumulated in `counts` into
-// starting offsets, then places every element in [start, end) by
-// following displacement cycles, one bucket at a time.
-fun distribute(
-  arr: Array<Int>,
-  counts: IntArray,
-  offsets: IntArray,
-  start: Int,
-  end: Int,
-  place: Int,
-): Int {
-  for (i in 1 until RADIX) {
-    counts[i] += counts[i - 1]
-    offsets[i] = counts[i - 1]
-  }
-
-  for (bucket in 0 until RADIX - 1) {
-    val position = start + offsets[bucket]
-    if (counts[bucket] > offsets[bucket]) {
-      var held = arr[position]
-      do {
-        val digit = getDigit(held, place)
-        counts[digit]--
-        val displaced = arr[start + counts[digit]]
-        arr[start + counts[digit]] = held
-        held = displaced
-      } while (counts[bucket] > offsets[bucket])
-    }
-  }
-
-  val split = start + offsets[1]
-  for (i in 0 until RADIX) {
-    counts[i] = 0
-    offsets[i] = 0
-  }
-  return split
-}
-
 fun sort(arr: Array<Int>) {
   val n = arr.size
   if (n < 2) {
@@ -107,6 +53,60 @@ fun sort(arr: Array<Int>) {
       }
     }
   }
+}
+
+fun getDigit(value: Int, place: Int): Int {
+  var v = value
+  for (p in 0 until place) {
+    v /= RADIX
+  }
+  return v % RADIX
+}
+
+fun shift(value: Int, places: Int): Int {
+  var v = value
+  for (p in 0 until places) {
+    v /= RADIX
+  }
+  return v
+}
+
+// Turns the raw per-bucket counts already accumulated in `counts` into
+// starting offsets, then places every element in [start, end) by
+// following displacement cycles, one bucket at a time.
+fun distribute(
+  arr: Array<Int>,
+  counts: IntArray,
+  offsets: IntArray,
+  start: Int,
+  end: Int,
+  place: Int,
+): Int {
+  for (i in 1 until RADIX) {
+    counts[i] += counts[i - 1]
+    offsets[i] = counts[i - 1]
+  }
+
+  for (bucket in 0 until RADIX - 1) {
+    val position = start + offsets[bucket]
+    if (counts[bucket] > offsets[bucket]) {
+      var held = arr[position]
+      do {
+        val digit = getDigit(held, place)
+        counts[digit]--
+        val displaced = arr[start + counts[digit]]
+        arr[start + counts[digit]] = held
+        held = displaced
+      } while (counts[bucket] > offsets[bucket])
+    }
+  }
+
+  val split = start + offsets[1]
+  for (i in 0 until RADIX) {
+    counts[i] = 0
+    offsets[i] = 0
+  }
+  return split
 }
 
 fun main() {

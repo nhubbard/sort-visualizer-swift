@@ -2,14 +2,6 @@ using System;
 
 public class CreaseSort
 {
-  private static void CompSwap(int[] arr, int a, int b)
-  {
-    if (arr[a] > arr[b])
-    {
-      (arr[a], arr[b]) = (arr[b], arr[a]);
-    }
-  }
-
   public static void Sort(int[] arr)
   {
     int n = arr.Length;
@@ -45,9 +37,20 @@ public class CreaseSort
     }
   }
 
+  private static void CompSwap(int[] arr, int a, int b)
+  {
+    if (arr[a] > arr[b])
+    {
+      (arr[a], arr[b]) = (arr[b], arr[a]);
+    }
+  }
+
   public static void Main(String[] args)
   {
-    int[] array = { 0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56 };
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     Sort(array);
     string result = "[" + String.Join(", ", array) + "]";
     Console.WriteLine(result);

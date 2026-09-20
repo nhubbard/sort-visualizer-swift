@@ -1,17 +1,34 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
+                 90, 69, 51, 81, 68, 83, 32, 56};
 
-void printList(int arr[], int n) {
-  for (int i = 0; i < n; i++) {
-    if (i == 0) {
-      printf("[%d, ", arr[i]);
-    } else if (i != n - 1) {
-      printf("%d, ", arr[i]);
-    } else {
-      printf("%d]", arr[i]);
+void swap(int *a, int *b) {
+  int t = *a;
+  *a = *b;
+  *b = t;
+}
+
+void printList(int items[], int size) {
+  printf("[");
+  if (size > 0) {
+    printf("%d", items[0]);
+    for (int i = 1; i < size; i++) {
+      printf(", %d", items[i]);
     }
+  }
+  printf("]");
+}
+
+void merge(int arr[], int l, int m, int r);
+
+void sort(int arr[], int l, int r) {
+  if (l < r) {
+    int m = l + (r - l) / 2;
+    sort(arr, l, m);
+    sort(arr, m + 1, r);
+    merge(arr, l, m, r);
   }
 }
 
@@ -46,15 +63,6 @@ void merge(int arr[], int l, int m, int r) {
     arr[k] = R[j];
     j++;
     k++;
-  }
-}
-
-void sort(int arr[], int l, int r) {
-  if (l < r) {
-    int m = l + (r - l) / 2;
-    sort(arr, l, m);
-    sort(arr, m + 1, r);
-    merge(arr, l, m, r);
   }
 }
 

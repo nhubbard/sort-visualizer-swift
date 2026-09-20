@@ -20,8 +20,11 @@ public struct OptimizedStoogeSort: SortAlgorithm {
     category: .exchange,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 253, coefficients: [239401, 1895, 3.74998],
+      anchorSize: 253, coefficients: [239399, 1895, 3.74998],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .polynomialIntercept, coefficients: [3.74998, -2.49097, -2.68452], rSquared: 1),
+    implementationComplexity: 13,
     stable: false,
     timeComplexity: ComplexityBounds(best: "O(n^2)", average: "O(n^2)", worst: "O(n^2)"),
     spaceComplexity: "O(1)",

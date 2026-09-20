@@ -1,3 +1,7 @@
+func sort(_ arr: inout [Int]) {
+    bufferedStoogeSort(&arr, 0, arr.count)
+}
+
 func bufferedStoogeSort(_ arr: inout [Int], _ start: Int, _ stop: Int) {
     if stop - start > 1 {
         if stop - start == 2, arr[start] > arr[stop - 1] {
@@ -53,9 +57,6 @@ func bufferedStoogeSort(_ arr: inout [Int], _ start: Int, _ stop: Int) {
     }
 }
 
-func sort(_ arr: inout [Int]) {
-    bufferedStoogeSort(&arr, 0, arr.count)
-}
 
 var array: [Int] = [
     0, 39, 21, 62, 91, 77, 14, 23,

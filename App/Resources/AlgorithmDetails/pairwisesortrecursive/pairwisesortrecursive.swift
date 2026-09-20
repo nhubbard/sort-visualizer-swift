@@ -1,4 +1,5 @@
 func sort(_ arr: inout [Int]) {
+    if arr.count <= 1 { return }
     func compSwap(_ a: Int, _ b: Int) {
         if arr[a] > arr[b] {
             arr.swapAt(a, b)

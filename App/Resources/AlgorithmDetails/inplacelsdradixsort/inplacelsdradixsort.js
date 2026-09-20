@@ -1,31 +1,3 @@
-function intPow(base, exponent) {
-  var result = 1;
-  for (var i = 0; i < exponent; i++) {
-    result *= base;
-  }
-  return result;
-}
-
-function getDigit(value, power, radix) {
-  return Math.floor(value / intPow(radix, power)) % radix;
-}
-
-function multiSwap(arr, pos, to) {
-  if (to > pos) {
-    for (let k = pos; k < to; k++) {
-      let temp = arr[k];
-      arr[k] = arr[k + 1];
-      arr[k + 1] = temp;
-    }
-  } else if (to < pos) {
-    for (let k = pos; k > to; k--) {
-      let temp = arr[k];
-      arr[k] = arr[k - 1];
-      arr[k - 1] = temp;
-    }
-  }
-}
-
 function sort(arr) {
   const n = arr.length;
   if (n === 0) {
@@ -70,6 +42,38 @@ function sort(arr) {
   return arr;
 }
 
-var array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56];
+function intPow(base, exponent) {
+  var result = 1;
+  for (var i = 0; i < exponent; i++) {
+    result *= base;
+  }
+  return result;
+}
+
+function getDigit(value, power, radix) {
+  return Math.floor(value / intPow(radix, power)) % radix;
+}
+
+function multiSwap(arr, pos, to) {
+  if (to > pos) {
+    for (let k = pos; k < to; k++) {
+      let temp = arr[k];
+      arr[k] = arr[k + 1];
+      arr[k + 1] = temp;
+    }
+  } else if (to < pos) {
+    for (let k = pos; k > to; k--) {
+      let temp = arr[k];
+      arr[k] = arr[k - 1];
+      arr[k - 1] = temp;
+    }
+  }
+}
+
+
+const array = [
+  0, 39, 21, 62, 91, 77, 14, 23,
+  90, 69, 51, 81, 68, 83, 32, 56,
+];
 sort(array);
 console.log("[" + array.join(", ") + "]");

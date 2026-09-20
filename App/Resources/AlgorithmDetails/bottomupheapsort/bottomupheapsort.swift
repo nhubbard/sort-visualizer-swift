@@ -1,5 +1,6 @@
 func sort(_ arr: inout [Int]) {
     let n = arr.count
+    if n < 2 { return }
 
     func siftDown(_ i: Int, _ b: Int) {
         var j = i

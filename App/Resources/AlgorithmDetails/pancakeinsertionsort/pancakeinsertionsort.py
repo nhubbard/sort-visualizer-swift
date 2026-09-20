@@ -1,3 +1,46 @@
+def sort(arr):
+    n = len(arr)
+    if n < 2:
+        return
+
+    ascending = sort_first_three(arr, n)
+
+    i = 3
+    while i < n:
+        if ascending:
+            if arr[i - 1] <= arr[i]:
+                # Already fits; the ascending prefix already ends at or below the new element.
+                pass
+            elif arr[0] > arr[i]:
+                # The new element is smaller than everything in the prefix -- one flip turns
+                # the whole thing, including the new element, into a descending run.
+                flip(arr, i - 1)
+                ascending = False
+            else:
+                idx = search_ascending(arr, 0, i, i)
+                flip(arr, i)
+                tail = i - idx
+                flip(arr, tail)
+                flip(arr, tail - 1)
+                ascending = False
+        else:
+            if arr[i - 1] > arr[i]:
+                pass
+            elif arr[0] <= arr[i]:
+                flip(arr, i - 1)
+                ascending = True
+            else:
+                idx = search_descending(arr, 0, i, i)
+                flip(arr, i)
+                tail = i - idx
+                flip(arr, tail)
+                flip(arr, tail - 1)
+                ascending = True
+        i += 1
+
+    if not ascending:
+        flip(arr, n - 1)
+
 def flip(arr, hi):
     """Reverses arr[0..hi] in place. This "flip" is the only move the algorithm ever performs;
     there is no per-element shift anywhere."""
@@ -54,51 +97,12 @@ def sort_first_three(arr, n):
     return True
 
 
-def sort(arr):
-    n = len(arr)
-    if n < 2:
-        return
-
-    ascending = sort_first_three(arr, n)
-
-    i = 3
-    while i < n:
-        if ascending:
-            if arr[i - 1] <= arr[i]:
-                # Already fits; the ascending prefix already ends at or below the new element.
-                pass
-            elif arr[0] > arr[i]:
-                # The new element is smaller than everything in the prefix -- one flip turns
-                # the whole thing, including the new element, into a descending run.
-                flip(arr, i - 1)
-                ascending = False
-            else:
-                idx = search_ascending(arr, 0, i, i)
-                flip(arr, i)
-                tail = i - idx
-                flip(arr, tail)
-                flip(arr, tail - 1)
-                ascending = False
-        else:
-            if arr[i - 1] > arr[i]:
-                pass
-            elif arr[0] <= arr[i]:
-                flip(arr, i - 1)
-                ascending = True
-            else:
-                idx = search_descending(arr, 0, i, i)
-                flip(arr, i)
-                tail = i - idx
-                flip(arr, tail)
-                flip(arr, tail - 1)
-                ascending = True
-        i += 1
-
-    if not ascending:
-        flip(arr, n - 1)
 
 
 if __name__ == "__main__":
-    array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56]
+    array = [
+        0, 39, 21, 62, 91, 77, 14, 23,
+        90, 69, 51, 81, 68, 83, 32, 56,
+    ]
     sort(array)
     print(array)

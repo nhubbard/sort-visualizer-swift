@@ -1,7 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
+                 90, 69, 51, 81, 68, 83, 32, 56};
 
 void swap(int *a, int *b) {
   int t = *a;
@@ -10,19 +11,29 @@ void swap(int *a, int *b) {
 }
 
 void printList(int items[], int size) {
-  for (int i = 0; i < size; i++) {
-    if (i == 0) {
-      printf("[%d, ", items[i]);
-    } else if (i != size - 1) {
-      printf("%d, ", items[i]);
-    } else {
-      printf("%d]", items[i]);
+  printf("[");
+  if (size > 0) {
+    printf("%d", items[0]);
+    for (int i = 1; i < size; i++) {
+      printf(", %d", items[i]);
     }
   }
+  printf("]");
 }
 
 /* Base case below length 12: repeatedly swap the minimum of the remaining
  * range to the front. */
+void selectionSort(int arr[], int a, int b);
+void aswap(int arr[], int arr1, int arr2, int l);
+int backmerge(int arr[], int arr1, int l1, int arr2, int l2);
+void rmerge(int arr[], int a, int l, int r);
+int rbnd(int len);
+void msort(int arr[], int a, int len);
+
+void sort(int arr[], int n) {
+  msort(arr, 0, n);
+}
+
 void selectionSort(int arr[], int a, int b) {
   while (b > 1) {
     int k = 0;
@@ -185,8 +196,6 @@ void msort(int arr[], int a, int len) {
   int s = s0 + backmerge(arr, a + (s0 - 1), s0, a + (lr - 1), lr - s0);
   msort(arr, a, s);
 }
-
-void sort(int arr[], int n) { msort(arr, 0, n); }
 
 int main(int argc, char *argv[]) {
   int size = sizeof(array) / sizeof(array[0]);

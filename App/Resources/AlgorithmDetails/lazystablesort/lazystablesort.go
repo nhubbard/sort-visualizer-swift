@@ -4,6 +4,32 @@ import (
 	"fmt"
 )
 
+func sort(arr []int) []int {
+	n := len(arr)
+	dist := 1
+	for dist < n {
+		if arr[dist-1] > arr[dist] {
+			arr[dist-1], arr[dist] = arr[dist], arr[dist-1]
+		}
+		dist += 2
+	}
+	part := 2
+	for part < n {
+		left := 0
+		right := n - 2*part
+		for left <= right {
+			mergeWithoutBuffer(arr, left, part, part)
+			left += 2 * part
+		}
+		rest := n - left
+		if rest > part {
+			mergeWithoutBuffer(arr, left, part, rest-part)
+		}
+		part *= 2
+	}
+	return arr
+}
+
 func multiSwap(arr []int, a int, b int, count int) {
 	for i := 0; i < count; i++ {
 		arr[a+i], arr[b+i] = arr[b+i], arr[a+i]
@@ -44,50 +70,43 @@ func binSearch(arr []int, pos int, length int, keyPos int, isLeft bool) int {
 }
 
 func mergeWithoutBuffer(arr []int, pos int, len1 int, len2 int) {
-	if len1 == 0 || len2 == 0 {
-		return
-	}
-	if len1 == 1 {
-		loc := binSearch(arr, pos+1, len2, pos, true)
-		rotate(arr, pos, 1, loc)
-		return
-	}
-	if len2 == 1 {
-		loc := binSearch(arr, pos, len1, pos+len1, false)
-		rotate(arr, pos+loc, len1-loc, 1)
-		return
-	}
-	mid1 := len1 / 2
-	loc := binSearch(arr, pos+len1, len2, pos+mid1, true)
-	rotate(arr, pos+mid1, len1-mid1, loc)
-	mergeWithoutBuffer(arr, pos, mid1, loc)
-	mergeWithoutBuffer(arr, pos+mid1+loc, len1-mid1, len2-loc)
-}
-
-func sort(arr []int) []int {
-	n := len(arr)
-	dist := 1
-	for dist < n {
-		if arr[dist-1] > arr[dist] {
-			arr[dist-1], arr[dist] = arr[dist], arr[dist-1]
+	if len1 < len2 {
+		for len1 != 0 {
+			loc := binSearch(arr, pos+len1, len2, pos, true)
+			if loc != 0 {
+				rotate(arr, pos, len1, loc)
+				pos += loc
+				len2 -= loc
+			}
+			if len2 == 0 {
+				break
+			}
+			for {
+				pos++
+				len1--
+				if len1 == 0 || arr[pos] > arr[pos+len1] {
+					break
+				}
+			}
 		}
-		dist += 2
-	}
-	part := 2
-	for part < n {
-		left := 0
-		right := n - 2*part
-		for left <= right {
-			mergeWithoutBuffer(arr, left, part, part)
-			left += 2 * part
+	} else {
+		for len2 != 0 {
+			loc := binSearch(arr, pos, len1, pos+len1+len2-1, false)
+			if loc != len1 {
+				rotate(arr, pos+loc, len1-loc, len2)
+				len1 = loc
+			}
+			if len1 == 0 {
+				break
+			}
+			for {
+				len2--
+				if len2 == 0 || arr[pos+len1-1] > arr[pos+len1+len2-1] {
+					break
+				}
+			}
 		}
-		rest := n - left
-		if rest > part {
-			mergeWithoutBuffer(arr, left, part, rest-part)
-		}
-		part *= 2
 	}
-	return arr
 }
 
 func main() {

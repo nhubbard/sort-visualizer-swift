@@ -430,7 +430,7 @@ def _find_brew_tool(name: str, formula: str) -> str | None:
             check=True,
             timeout=15,
         ).stdout.strip()
-    except subprocess.CalledProcessError, FileNotFoundError, subprocess.TimeoutExpired:
+    except (subprocess.CalledProcessError, FileNotFoundError, subprocess.TimeoutExpired):
         return None
     candidate = Path(prefix) / "bin" / name
     return str(candidate) if candidate.exists() else None

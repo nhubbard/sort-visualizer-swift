@@ -1,18 +1,19 @@
-function isSorted(arr) {
-  for (let i = 1; i < arr.length; i++) if (arr[i - 1] > arr[i]) return false;
-  return true;
-}
-
-function sort(arr) {
-  const n = arr.length;
-  while (!isSorted(arr)) {
-    const index = Math.floor(Math.random() * (n - 1));
-    if (arr[index] > arr[index + 1]) {
-      [arr[index], arr[index + 1]] = [arr[index + 1], arr[index]];
+function sort(a) {
+  const n = a.length;
+  if (n < 2) return;
+  let swapped = true;
+  while (swapped) {
+    swapped = false;
+    for (let i = 0; i + 1 < n; i++) {
+      if (a[i] > a[i + 1]) {
+        [a[i], a[i + 1]] = [a[i + 1], a[i]];
+        swapped = true;
+      }
     }
   }
 }
-
-var array = [0, 39, 21, 62, 91, 77, 14, 23];
+const array = [
+  0, 39, 21, 62, 91, 77, 14, 23,
+];
 sort(array);
 console.log("[" + array.join(", ") + "]");

@@ -4,15 +4,22 @@ import (
 	"fmt"
 )
 
+func sort(arr []int) []int {
+	if len(arr) < 2 {
+		return arr
+	}
+	n := len(arr)
+	shatterSort(arr, n, 4)
+	return arr
+}
+
 func insertionSort(arr []int, start int, end int) {
 	for i := start + 1; i < end; i++ {
-		key := arr[i]
-		j := i - 1
-		for j >= start && arr[j] > key {
-			arr[j+1] = arr[j]
-			j--
+		pos := i
+		for pos > start && arr[pos-1] > arr[pos] {
+			arr[pos-1], arr[pos] = arr[pos], arr[pos-1]
+			pos--
 		}
-		arr[j+1] = key
 	}
 }
 
@@ -62,12 +69,6 @@ func shatterSort(arr []int, length int, num int) {
 			insertionSort(arr, offsets[i], offsets[i+1])
 		}
 	}
-}
-
-func sort(arr []int) []int {
-	n := len(arr)
-	shatterSort(arr, n, 4)
-	return arr
 }
 
 func main() {

@@ -2,6 +2,18 @@ using System;
 
 public class MinHeapSort
 {
+  public static int[] Sort(int[] array)
+  {
+    Heapify(array);
+    for (var end = array.Length - 1; end > 0; end--)
+    {
+      (array[0], array[end]) = (array[end], array[0]);
+      SiftDown(array, 0, end);
+    }
+    Array.Reverse(array);
+    return array;
+  }
+
   private static void SiftDown(int[] arr, int root, int size)
   {
     while (true)
@@ -34,21 +46,12 @@ public class MinHeapSort
     }
   }
 
-  public static int[] Sort(int[] array)
-  {
-    Heapify(array);
-    for (var end = array.Length - 1; end > 0; end--)
-    {
-      (array[0], array[end]) = (array[end], array[0]);
-      SiftDown(array, 0, end);
-    }
-    Array.Reverse(array);
-    return array;
-  }
-
   public static void Main(String[] args)
   {
-    int[] array = { 0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56 };
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     Sort(array);
     string result = "[" + String.Join(", ", array) + "]";
     Console.WriteLine(result);

@@ -3,6 +3,25 @@ import java.util.Arrays;
 public class bosenelsonsortiterative {
   private static int end;
 
+  public static void sort(int[] arr) {
+    end = arr.length;
+    if (end <= 1) {
+      return;
+    }
+    int paddedLength = 1;
+    while (paddedLength < end) {
+      paddedLength <<= 1;
+    }
+
+    for (int k = 2; k <= paddedLength; k *= 2) {
+      for (int j = 0; j < k / 2; j++) {
+        for (int i = 0; i + j < end; i += k) {
+          rangeComp(arr, i, i + k, j);
+        }
+      }
+    }
+  }
+
   private static void compSwap(int[] arr, int a, int b) {
     if (b >= end) {
       return;
@@ -25,27 +44,11 @@ public class bosenelsonsortiterative {
     }
   }
 
-  public static void sort(int[] arr) {
-    end = arr.length;
-    if (end <= 1) {
-      return;
-    }
-    int paddedLength = 1;
-    while (paddedLength < end) {
-      paddedLength <<= 1;
-    }
-
-    for (int k = 2; k <= paddedLength; k *= 2) {
-      for (int j = 0; j < k / 2; j++) {
-        for (int i = 0; i + j < end; i += k) {
-          rangeComp(arr, i, i + k, j);
-        }
-      }
-    }
-  }
-
   public static void main(String[] args) {
-    int[] array = new int[] {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     sort(array);
     System.out.println(Arrays.toString(array));
   }

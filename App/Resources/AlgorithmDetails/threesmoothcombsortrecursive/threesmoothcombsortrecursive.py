@@ -1,3 +1,8 @@
+def sort(arr):
+    n = len(arr)
+    if n > 1:
+        recursive_comb(arr, 0, 1, n)
+
 def power_of_three(arr, pos, gap, end):
     if pos + gap > end:
         return
@@ -23,13 +28,12 @@ def recursive_comb(arr, pos, gap, end):
     power_of_three(arr, pos, gap, end)
 
 
-def sort(arr):
-    n = len(arr)
-    if n > 1:
-        recursive_comb(arr, 0, 1, n)
 
 
 if __name__ == "__main__":
-    array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56]
+    array = [
+        0, 39, 21, 62, 91, 77, 14, 23,
+        90, 69, 51, 81, 68, 83, 32, 56,
+    ]
     sort(array)
     print(array)

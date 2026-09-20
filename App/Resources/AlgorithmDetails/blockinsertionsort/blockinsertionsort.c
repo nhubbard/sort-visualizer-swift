@@ -1,7 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
+                 90, 69, 51, 81, 68, 83, 32, 56};
 
 void swap(int arr[], int a, int b) {
   int t = arr[a];
@@ -10,14 +11,37 @@ void swap(int arr[], int a, int b) {
 }
 
 void printList(int items[], int size) {
-  for (int i = 0; i < size; i++) {
-    if (i == 0) {
-      printf("[%d, ", items[i]);
-    } else if (i != size - 1) {
-      printf("%d, ", items[i]);
-    } else {
-      printf("%d]", items[i]);
+  printf("[");
+  if (size > 0) {
+    printf("%d", items[0]);
+    for (int i = 1; i < size; i++) {
+      printf(", %d", items[i]);
     }
+  }
+  printf("]");
+}
+
+void multiSwap(int arr[], int a, int b, int count);
+void rotate(int arr[], int pos, int lenA, int lenB);
+int binSearch(int arr[], int pos, int len, int keyPos, int isLeft);
+void mergeWithoutBuffer(int arr[], int pos, int len1, int len2);
+int findRun(int arr[], int a, int b);
+void insert1(int arr[], int a, int l);
+void insert2(int arr[], int a, int l, int r);
+
+void sort(int arr[], int n) {
+  if (n < 2) return;
+  int i = findRun(arr, 0, n);
+  while (i < n) {
+    int j = findRun(arr, i, n);
+    int len = j - i;
+    if (len == 1)
+      insert1(arr, 0, i);
+    else if (len == 2)
+      insert2(arr, 0, i, i + 1);
+    else
+      mergeWithoutBuffer(arr, 0, i, len);
+    i = j;
   }
 }
 
@@ -54,23 +78,21 @@ int binSearch(int arr[], int pos, int len, int keyPos, int isLeft) {
 }
 
 void mergeWithoutBuffer(int arr[], int pos, int len1, int len2) {
-  if (len1 == 0 || len2 == 0)
-    return;
-  if (len1 == 1) {
-    int loc = binSearch(arr, pos + 1, len2, pos, 1);
-    rotate(arr, pos, 1, loc);
-    return;
+  if (len1 < len2) {
+    while (len1 != 0) {
+      int loc = binSearch(arr, pos + len1, len2, pos, 1);
+      if (loc != 0) { rotate(arr, pos, len1, loc); pos += loc; len2 -= loc; }
+      if (len2 == 0) break;
+      do { pos++; len1--; } while (len1 != 0 && arr[pos] <= arr[pos + len1]);
+    }
+  } else {
+    while (len2 != 0) {
+      int loc = binSearch(arr, pos, len1, pos + len1 + len2 - 1, 0);
+      if (loc != len1) { rotate(arr, pos + loc, len1 - loc, len2); len1 = loc; }
+      if (len1 == 0) break;
+      do { len2--; } while (len2 != 0 && arr[pos + len1 - 1] <= arr[pos + len1 + len2 - 1]);
+    }
   }
-  if (len2 == 1) {
-    int loc = binSearch(arr, pos, len1, pos + len1, 0);
-    rotate(arr, pos + loc, len1 - loc, 1);
-    return;
-  }
-  int mid1 = len1 / 2;
-  int loc = binSearch(arr, pos + len1, len2, pos + mid1, 1);
-  rotate(arr, pos + mid1, len1 - mid1, loc);
-  mergeWithoutBuffer(arr, pos, mid1, loc);
-  mergeWithoutBuffer(arr, pos + mid1 + loc, len1 - mid1, len2 - loc);
 }
 
 int findRun(int arr[], int a, int b) {
@@ -119,21 +141,6 @@ void insert2(int arr[], int a, int l, int r) {
     l--;
   }
   arr[l + 1] = tmpL;
-}
-
-void sort(int arr[], int n) {
-  int i = findRun(arr, 0, n);
-  while (i < n) {
-    int j = findRun(arr, i, n);
-    int len = j - i;
-    if (len == 1)
-      insert1(arr, 0, i);
-    else if (len == 2)
-      insert2(arr, 0, i, i + 1);
-    else
-      mergeWithoutBuffer(arr, 0, i, len);
-    i = j;
-  }
 }
 
 int main(int argc, char *argv[]) {

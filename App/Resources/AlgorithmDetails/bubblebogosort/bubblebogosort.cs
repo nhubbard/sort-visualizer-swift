@@ -1,39 +1,24 @@
 using System;
-
 public class BubbleBogoSort
 {
-  public static Random r = new Random();
-
-  public static bool IsSorted(int[] arr)
+  public static void Sort(int[] a)
   {
-    for (int i = 1; i < arr.Length; i++)
+    int n = a.Length; if (n < 2) return;
+    bool swapped = true;
+    while (swapped)
     {
-      if (arr[i - 1] > arr[i])
+      swapped = false;
+      for (int i = 0; i + 1 < n; i++) if (a[i] > a[i + 1])
       {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  public static void Sort(int[] arr)
-  {
-    int n = arr.Length;
-    while (!IsSorted(arr))
-    {
-      int index = r.Next(0, n - 1);
-      if (arr[index] > arr[index + 1])
-      {
-        (arr[index], arr[index + 1]) = (arr[index + 1], arr[index]);
+        int held = a[i]; a[i] = a[i + 1]; a[i + 1] = held; swapped = true;
       }
     }
   }
-
-  public static void Main(String[] args)
+  public static void Main()
   {
-    int[] array = { 0, 39, 21, 62, 91, 77, 14, 23 };
-    Sort(array);
-    string result = "[" + String.Join(", ", array) + "]";
-    Console.WriteLine(result);
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23
+    }; Sort(array);
+    Console.WriteLine("[" + string.Join(", ", array) + "]");
   }
 }

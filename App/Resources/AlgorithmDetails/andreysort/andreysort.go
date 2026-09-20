@@ -4,6 +4,12 @@ import (
 	"fmt"
 )
 
+func sort(arr []int) []int {
+	n := len(arr)
+	msort(arr, 0, n)
+	return arr
+}
+
 func swap(arr []int, i int, j int) {
 	arr[i], arr[j] = arr[j], arr[i]
 }
@@ -183,12 +189,6 @@ func msort(arr []int, a int, length int) {
 	aswap(arr, a, a+lr, s0)
 	s := s0 + backmerge(arr, a+(s0-1), s0, a+(lr-1), lr-s0)
 	msort(arr, a, s)
-}
-
-func sort(arr []int) []int {
-	n := len(arr)
-	msort(arr, 0, n)
-	return arr
 }
 
 func main() {

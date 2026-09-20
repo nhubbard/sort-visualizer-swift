@@ -10,6 +10,7 @@ private struct FakeAlgorithm: SortAlgorithm {
     category: .exchange,
     sizeRange: 1...10,
     growthModel: .unconstrained,
+    implementationComplexity: 0,
     stable: true,
     timeComplexity: ComplexityBounds(best: "O(1)", average: "O(1)", worst: "O(1)"),
     spaceComplexity: "O(1)",

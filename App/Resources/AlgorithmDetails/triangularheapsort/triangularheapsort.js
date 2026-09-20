@@ -1,3 +1,16 @@
+function sort(array) {
+  const n = array.length;
+  if (n <= 1) return;
+  heapify(array, n);
+  for (let i = 1; i < n - 1; i++) {
+    [array[0], array[n - i]] = [array[n - i], array[0]];
+    siftDown(array, 0, n - i);
+  }
+  if (array[0] > array[1]) {
+    [array[0], array[1]] = [array[1], array[0]];
+  }
+}
+
 function triangularRoot(val) {
   return ((Math.floor(Math.sqrt(8 * val + 1)) - 1) / 2) | 0;
 }
@@ -23,19 +36,10 @@ function heapify(array, length) {
   }
 }
 
-function sort(array) {
-  const n = array.length;
-  if (n <= 1) return;
-  heapify(array, n);
-  for (let i = 1; i < n - 1; i++) {
-    [array[0], array[n - i]] = [array[n - i], array[0]];
-    siftDown(array, 0, n - i);
-  }
-  if (array[0] > array[1]) {
-    [array[0], array[1]] = [array[1], array[0]];
-  }
-}
 
-const array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56];
+const array = [
+  0, 39, 21, 62, 91, 77, 14, 23,
+  90, 69, 51, 81, 68, 83, 32, 56,
+];
 sort(array);
 console.log(`[${array.join(", ")}]`);

@@ -4,41 +4,6 @@ import (
 	"fmt"
 )
 
-func mostSignificantBit(value int) int {
-	if value == 0 {
-		return -1
-	}
-	bit := 0
-	for (value >> (bit + 1)) != 0 {
-		bit++
-	}
-	return bit
-}
-
-func getBit(value, bit int) bool {
-	return (value>>bit)&1 == 1
-}
-
-func partition(arr []int, lo, hi, bit int) int {
-	i := lo - 1
-	j := hi
-	for {
-		i++
-		for i < j && !getBit(arr[i], bit) {
-			i++
-		}
-		j--
-		for j > i && getBit(arr[j], bit) {
-			j--
-		}
-		if i < j {
-			arr[i], arr[j] = arr[j], arr[i]
-		} else {
-			return i
-		}
-	}
-}
-
 func sort(arr []int) []int {
 	n := len(arr)
 	if n <= 1 {
@@ -82,6 +47,41 @@ func sort(arr []int) []int {
 		}
 	}
 	return arr
+}
+
+func mostSignificantBit(value int) int {
+	if value == 0 {
+		return -1
+	}
+	bit := 0
+	for (value >> (bit + 1)) != 0 {
+		bit++
+	}
+	return bit
+}
+
+func getBit(value, bit int) bool {
+	return (value>>bit)&1 == 1
+}
+
+func partition(arr []int, lo, hi, bit int) int {
+	i := lo - 1
+	j := hi
+	for {
+		i++
+		for i < j && !getBit(arr[i], bit) {
+			i++
+		}
+		j--
+		for j > i && getBit(arr[j], bit) {
+			j--
+		}
+		if i < j {
+			arr[i], arr[j] = arr[j], arr[i]
+		} else {
+			return i
+		}
+	}
 }
 
 func main() {

@@ -4,6 +4,12 @@ import (
 	"fmt"
 )
 
+func sort(arr []int) []int {
+	n := len(arr)
+	commonSort(arr, 0, n)
+	return arr
+}
+
 func swap(arr []int, a int, b int) {
 	arr[a], arr[b] = arr[b], arr[a]
 }
@@ -59,26 +65,43 @@ func binSearch(arr []int, pos int, length int, keyPos int, isLeft bool) int {
 }
 
 func mergeWithoutBuffer(arr []int, pos int, len1 int, len2 int) {
-	if len1 == 0 || len2 == 0 {
-		return
-	}
-	if len1+len2 == 2 {
-		if arr[pos] > arr[pos+1] {
-			swap(arr, pos, pos+1)
+	if len1 < len2 {
+		for len1 != 0 {
+			loc := binSearch(arr, pos+len1, len2, pos, true)
+			if loc != 0 {
+				rotate(arr, pos, len1, loc)
+				pos += loc
+				len2 -= loc
+			}
+			if len2 == 0 {
+				break
+			}
+			for {
+				pos++
+				len1--
+				if len1 == 0 || arr[pos] > arr[pos+len1] {
+					break
+				}
+			}
 		}
-		return
-	}
-	var mid1, mid2 int
-	if len1 > len2 {
-		mid1 = len1 / 2
-		mid2 = binSearch(arr, pos+len1, len2, pos+mid1, true)
 	} else {
-		mid2 = len2 / 2
-		mid1 = binSearch(arr, pos, len1, pos+len1+mid2, false)
+		for len2 != 0 {
+			loc := binSearch(arr, pos, len1, pos+len1+len2-1, false)
+			if loc != len1 {
+				rotate(arr, pos+loc, len1-loc, len2)
+				len1 = loc
+			}
+			if len1 == 0 {
+				break
+			}
+			for {
+				len2--
+				if len2 == 0 || arr[pos+len1-1] > arr[pos+len1+len2-1] {
+					break
+				}
+			}
+		}
 	}
-	rotate(arr, pos+mid1, len1-mid1, mid2)
-	mergeWithoutBuffer(arr, pos, mid1, mid2)
-	mergeWithoutBuffer(arr, pos+mid1+mid2, len1-mid1, len2-mid2)
 }
 
 func mergeLeft(arr []int, pos int, leftLen int, rightLen int, dist int) {
@@ -292,12 +315,6 @@ func commonSort(arr []int, pos int, length int) {
 	}
 	insertSort(arr, pos, blockLen)
 	mergeWithoutBuffer(arr, pos, blockLen, length-blockLen)
-}
-
-func sort(arr []int) []int {
-	n := len(arr)
-	commonSort(arr, 0, n)
-	return arr
 }
 
 func main() {

@@ -4,6 +4,67 @@ public class PancakeInsertionSort
 {
   // Reverses arr[0..hi] in place. This "flip" is the only move the algorithm ever performs;
   // there is no per-element shift anywhere.
+  public static void Sort(int[] arr)
+  {
+    var n = arr.Length;
+    if (n < 2)
+    {
+      return;
+    }
+
+    var ascending = SortFirstThree(arr, n);
+
+    for (var i = 3; i < n; i++)
+    {
+      if (ascending)
+      {
+        if (arr[i - 1] <= arr[i])
+        {
+          // Already fits; the ascending prefix already ends at or below the new element.
+          continue;
+        }
+        if (arr[0] > arr[i])
+        {
+          // The new element is smaller than everything in the prefix -- one flip turns the
+          // whole thing, including the new element, into a descending run.
+          Flip(arr, i - 1);
+          ascending = false;
+          continue;
+        }
+        var idx = SearchAscending(arr, 0, i, i);
+        Flip(arr, i);
+        var tail = i - idx;
+        Flip(arr, tail);
+        Flip(arr, tail - 1);
+        ascending = false;
+      }
+      else
+      {
+        if (arr[i - 1] > arr[i])
+        {
+          continue;
+        }
+        if (arr[0] <= arr[i])
+        {
+          Flip(arr, i - 1);
+          ascending = true;
+          continue;
+        }
+        var idx = SearchDescending(arr, 0, i, i);
+        Flip(arr, i);
+        var tail = i - idx;
+        Flip(arr, tail);
+        Flip(arr, tail - 1);
+        ascending = true;
+      }
+    }
+
+    if (!ascending)
+    {
+      Flip(arr, n - 1);
+    }
+  }
+
   private static void Flip(int[] arr, int hi)
   {
     var lo = 0;
@@ -88,70 +149,12 @@ public class PancakeInsertionSort
     return true;
   }
 
-  public static void Sort(int[] arr)
-  {
-    var n = arr.Length;
-    if (n < 2)
-    {
-      return;
-    }
-
-    var ascending = SortFirstThree(arr, n);
-
-    for (var i = 3; i < n; i++)
-    {
-      if (ascending)
-      {
-        if (arr[i - 1] <= arr[i])
-        {
-          // Already fits; the ascending prefix already ends at or below the new element.
-          continue;
-        }
-        if (arr[0] > arr[i])
-        {
-          // The new element is smaller than everything in the prefix -- one flip turns the
-          // whole thing, including the new element, into a descending run.
-          Flip(arr, i - 1);
-          ascending = false;
-          continue;
-        }
-        var idx = SearchAscending(arr, 0, i, i);
-        Flip(arr, i);
-        var tail = i - idx;
-        Flip(arr, tail);
-        Flip(arr, tail - 1);
-        ascending = false;
-      }
-      else
-      {
-        if (arr[i - 1] > arr[i])
-        {
-          continue;
-        }
-        if (arr[0] <= arr[i])
-        {
-          Flip(arr, i - 1);
-          ascending = true;
-          continue;
-        }
-        var idx = SearchDescending(arr, 0, i, i);
-        Flip(arr, i);
-        var tail = i - idx;
-        Flip(arr, tail);
-        Flip(arr, tail - 1);
-        ascending = true;
-      }
-    }
-
-    if (!ascending)
-    {
-      Flip(arr, n - 1);
-    }
-  }
-
   public static void Main(String[] args)
   {
-    int[] array = { 0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56 };
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     Sort(array);
     string result = "[" + String.Join(", ", array) + "]";
     Console.WriteLine(result);

@@ -1,43 +1,44 @@
 import java.util.Arrays;
-import java.util.Comparator;
 
 public class timesort {
-  public static void sort(int[] arr) {
-    int n = arr.length;
-    if (n <= 1) {
-      return;
-    }
-
-    // Simulate the reporting order that proportional-to-value sleep durations
-    // would produce in a jitter-free race: sort by value, ties broken by the
-    // original position, i.e. the order the sleeps were originally scheduled.
-    Integer[] indices = new Integer[n];
-    for (int i = 0; i < n; i++) {
-      indices[i] = i;
-    }
-    Arrays.sort(indices, Comparator.<Integer>comparingInt(i -> arr[i]).thenComparingInt(i -> i));
-
-    int[] woken = new int[n];
-    for (int i = 0; i < n; i++) {
-      woken[i] = arr[indices[i]];
-    }
-    System.arraycopy(woken, 0, arr, 0, n);
-
-    // Defensive cleanup pass: real scheduling jitter can't be fully trusted,
-    // so finish with an ordinary insertion sort no matter what the race produced.
+  public static void sort(int[] a) {
+    int n = a.length;
+    if (n < 2) return;
+    int[] scratch = a.clone();
+    int[] buffer = scratch.clone();
+    mergeSort(scratch, buffer, 0, n);
+    System.arraycopy(scratch, 0, a, 0, n);
     for (int i = 1; i < n; i++) {
       int j = i;
-      while (j > 0 && arr[j - 1] > arr[j]) {
-        int t = arr[j - 1];
-        arr[j - 1] = arr[j];
-        arr[j] = t;
+      while (j > 0 && a[j - 1] > a[j]) {
+        int held = a[j - 1];
+        a[j - 1] = a[j];
+        a[j] = held;
         j--;
       }
     }
   }
 
+  private static void mergeSort(int[] scratch, int[] buffer, int lo, int hi) {
+    if (hi - lo < 2) return;
+    int mid = lo + (hi - lo) / 2;
+    mergeSort(scratch, buffer, lo, mid);
+    mergeSort(scratch, buffer, mid, hi);
+    int left = lo, right = mid, dest = lo;
+    while (left < mid && right < hi) {
+      if (scratch[left] <= scratch[right]) buffer[dest++] = scratch[left++];
+      else buffer[dest++] = scratch[right++];
+    }
+    while (left < mid) buffer[dest++] = scratch[left++];
+    while (right < hi) buffer[dest++] = scratch[right++];
+    System.arraycopy(buffer, lo, scratch, lo, hi - lo);
+  }
+
   public static void main(String[] args) {
-    int[] array = new int[] {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     sort(array);
     System.out.println(Arrays.toString(array));
   }

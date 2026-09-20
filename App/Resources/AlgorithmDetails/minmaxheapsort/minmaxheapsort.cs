@@ -2,6 +2,19 @@ using System;
 
 public class MinMaxHeapSort
 {
+  public static void Sort(int[] arr)
+  {
+    int n = arr.Length;
+    if (n <= 1)
+      return;
+    Heapify(arr, n);
+    int heapSize = n;
+    for (int i = 0; i < n - 1; i++)
+    {
+      heapSize = StoreMax(arr, heapSize);
+    }
+  }
+
   static int BitLength(int value)
   {
     int length = 0;
@@ -97,22 +110,12 @@ public class MinMaxHeapSort
     return newSize;
   }
 
-  public static void Sort(int[] arr)
-  {
-    int n = arr.Length;
-    if (n <= 1)
-      return;
-    Heapify(arr, n);
-    int heapSize = n;
-    for (int i = 0; i < n - 1; i++)
-    {
-      heapSize = StoreMax(arr, heapSize);
-    }
-  }
-
   public static void Main(String[] args)
   {
-    int[] array = { 0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56 };
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     Sort(array);
     string result = "[" + String.Join(", ", array) + "]";
     Console.WriteLine(result);

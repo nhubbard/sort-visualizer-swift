@@ -6,20 +6,6 @@ import (
 
 const radix = 4
 
-func getDigit(value int, place int) int {
-	for p := 0; p < place; p++ {
-		value /= radix
-	}
-	return value % radix
-}
-
-func shift(value int, places int) int {
-	for p := 0; p < places; p++ {
-		value /= radix
-	}
-	return value
-}
-
 func sort(arr []int) []int {
 	n := len(arr)
 	if n < 2 {
@@ -123,6 +109,20 @@ func sort(arr []int) []int {
 	}
 
 	return arr
+}
+
+func getDigit(value int, place int) int {
+	for p := 0; p < place; p++ {
+		value /= radix
+	}
+	return value % radix
+}
+
+func shift(value int, places int) int {
+	for p := 0; p < places; p++ {
+		value /= radix
+	}
+	return value
 }
 
 func main() {

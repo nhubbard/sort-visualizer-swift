@@ -4,6 +4,14 @@ import (
 	"fmt"
 )
 
+func sort(arr []int) []int {
+	if len(arr) <= 1 {
+		return arr
+	}
+	stoogeSort(arr, 0, 1, len(arr), false)
+	return arr
+}
+
 func compSwap(arr []int, a, b int) bool {
 	if arr[a] > arr[b] {
 		arr[a], arr[b] = arr[b], arr[a]
@@ -54,11 +62,6 @@ func stoogeSort(arr []int, a, m, b int, merge bool) bool {
 	}
 
 	return lChange || rChange
-}
-
-func sort(arr []int) []int {
-	stoogeSort(arr, 0, 1, len(arr), false)
-	return arr
 }
 
 func main() {

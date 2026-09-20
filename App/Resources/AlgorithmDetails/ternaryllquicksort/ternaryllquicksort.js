@@ -1,3 +1,7 @@
+function sort(arr) {
+  quicksortTernaryLL(arr, 0, arr.length);
+}
+
 function compare3(arr, a, b) {
   if (arr[a] === arr[b]) return 0;
   return arr[a] > arr[b] ? 1 : -1;
@@ -53,10 +57,10 @@ function quicksortTernaryLL(arr, lo, hi) {
   }
 }
 
-function sort(arr) {
-  quicksortTernaryLL(arr, 0, arr.length);
-}
 
-var array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56];
+const array = [
+  0, 39, 21, 62, 91, 77, 14, 23,
+  90, 69, 51, 81, 68, 83, 32, 56,
+];
 sort(array);
 console.log("[" + array.join(", ") + "]");

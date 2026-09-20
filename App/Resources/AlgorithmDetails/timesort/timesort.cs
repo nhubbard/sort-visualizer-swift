@@ -1,49 +1,40 @@
 using System;
-using System.Linq;
-
 public class TimeSort
 {
-  public static void Sort(int[] arr)
+  public static void Sort(int[] a)
   {
-    int n = arr.Length;
-    if (n <= 1)
-    {
-      return;
-    }
-
-    // Simulate the reporting order that proportional-to-value sleep durations
-    // would produce in a jitter-free race: sort by value, ties broken by the
-    // original position, i.e. the order the sleeps were originally scheduled.
-    var woken = arr
-      .Select((value, index) => (value, index))
-      .OrderBy(pair => pair.value)
-      .ThenBy(pair => pair.index)
-      .ToArray();
-    for (int i = 0; i < n; i++)
-    {
-      arr[i] = woken[i].value;
-    }
-
-    // Defensive cleanup pass: real scheduling jitter can't be fully trusted,
-    // so finish with an ordinary insertion sort no matter what the race produced.
+    int n = a.Length; if (n < 2) return;
+    int[] scratch = (int[])a.Clone(), buffer = (int[])scratch.Clone();
+    MergeSort(scratch, buffer, 0, n); Array.Copy(scratch, a, n);
     for (int i = 1; i < n; i++)
     {
       int j = i;
-      while (j > 0 && arr[j - 1] > arr[j])
-      {
-        int t = arr[j - 1];
-        arr[j - 1] = arr[j];
-        arr[j] = t;
-        j--;
-      }
+      while (j > 0 && a[j - 1] > a[j]) { int held = a[j - 1]; a[j - 1] = a[j]; a[j] = held; j--; }
     }
   }
 
-  public static void Main(String[] args)
+  static void MergeSort(int[] scratch, int[] buffer, int lo, int hi)
   {
-    int[] array = { 0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56 };
-    Sort(array);
-    string result = "[" + String.Join(", ", array) + "]";
-    Console.WriteLine(result);
+    if (hi - lo < 2) return;
+    int mid = lo + (hi - lo) / 2;
+    MergeSort(scratch, buffer, lo, mid); MergeSort(scratch, buffer, mid, hi);
+    int left = lo, right = mid, dest = lo;
+    while (left < mid && right < hi)
+    {
+      if (scratch[left] <= scratch[right]) buffer[dest++] = scratch[left++];
+      else buffer[dest++] = scratch[right++];
+    }
+    while (left < mid) buffer[dest++] = scratch[left++];
+    while (right < hi) buffer[dest++] = scratch[right++];
+    Array.Copy(buffer, lo, scratch, lo, hi - lo);
+  }
+
+  public static void Main()
+  {
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
+    Sort(array); Console.WriteLine("[" + string.Join(", ", array) + "]");
   }
 }

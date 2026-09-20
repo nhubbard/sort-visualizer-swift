@@ -21,8 +21,11 @@ public struct AATreeSort: SortAlgorithm {
     category: .insertion,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 2364, coefficients: [184459, 94.7247, 0.0040135],
+      anchorSize: 2281, coefficients: [183396, 101.258, 0.00546289],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .powerLog, coefficients: [3.80318, 1.13007], rSquared: 0.997387),
+    implementationComplexity: 17,
     stable: true,
     timeComplexity: ComplexityBounds(best: "O(n log n)", average: "O(n log n)", worst: "O(n log n)"),
     spaceComplexity: "O(n)",
@@ -92,7 +95,7 @@ public struct AATreeSort: SortAlgorithm {
     func traverse(_ node: Node?) {
       guard let node else { return }
       traverse(node.left)
-      sortedValues.append(engine.values[node.pointer])
+      sortedValues.append(engine.readValue(at: node.pointer))
       traverse(node.right)
     }
     traverse(root)

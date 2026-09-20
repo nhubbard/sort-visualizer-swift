@@ -1,5 +1,6 @@
 def sort(arr)
   n = arr.length
+  return arr if n < 2
 
   sift_down = lambda do |i, b|
     j = i

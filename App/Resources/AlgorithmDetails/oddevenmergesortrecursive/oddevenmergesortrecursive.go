@@ -4,6 +4,11 @@ import (
 	"fmt"
 )
 
+func sort(arr []int) []int {
+	oddEvenMergeSort(arr, 0, len(arr))
+	return arr
+}
+
 func oddEvenMergeCompare(arr []int, i, j int) {
 	if arr[i] > arr[j] {
 		arr[i], arr[j] = arr[j], arr[i]
@@ -46,11 +51,6 @@ func oddEvenMergeSort(arr []int, lo, n int) {
 		oddEvenMergeSort(arr, lo+m, n-m)
 		oddEvenMerge(arr, lo, m, n, 1)
 	}
-}
-
-func sort(arr []int) []int {
-	oddEvenMergeSort(arr, 0, len(arr))
-	return arr
 }
 
 func main() {

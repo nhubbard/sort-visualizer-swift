@@ -1,33 +1,7 @@
-fun merge(arr: Array<Int>, low: Int, mid: Int, high: Int) {
-  val left = arr.copyOfRange(low, mid)
-  val right = arr.copyOfRange(mid, high)
-  var i = 0
-  var j = 0
-  var k = low
-  while (i < left.size && j < right.size) {
-    if (left[i] <= right[j]) {
-      arr[k] = left[i]
-      i++
-    } else {
-      arr[k] = right[j]
-      j++
-    }
-    k++
-  }
-  while (i < left.size) {
-    arr[k] = left[i]
-    i++
-    k++
-  }
-  while (j < right.size) {
-    arr[k] = right[j]
-    j++
-    k++
-  }
-}
-
 fun sort(arr: Array<Int>) {
   val n = arr.size
+  if (n < 2) return
+  val scratch = Array(n) { 0 }
   var subarrayCount = 1
   while (subarrayCount < n) {
     subarrayCount *= 2
@@ -39,11 +13,34 @@ fun sort(arr: Array<Int>) {
       val low = n * i / subarrayCount
       val mid = n * (i + 1) / subarrayCount
       val high = n * (i + 2) / subarrayCount
-      merge(arr, low, mid, high)
+      merge(arr, scratch, low, mid, high)
       i += 2
     }
     subarrayCount /= 2
   }
+}
+
+fun merge(arr: Array<Int>, scratch: Array<Int>, low: Int, mid: Int, high: Int) {
+  var left = low
+  var right = mid
+  var out = low
+  while (left < mid && right < high) {
+    if (arr[left] <= arr[right]) {
+      scratch[out] = arr[left]
+      left++
+    } else {
+      scratch[out] = arr[right]
+      right++
+    }
+    out++
+  }
+  while (left < mid) {
+    scratch[out++] = arr[left++]
+  }
+  while (right < high) {
+    scratch[out++] = arr[right++]
+  }
+  for (i in low until high) arr[i] = scratch[i]
 }
 
 fun main() {

@@ -2,21 +2,6 @@ using System;
 
 public class OptimizedGuessSort
 {
-  public static bool IsValid(int[] arr, int[] loops, int n)
-  {
-    for (int i = 0; i < n - 1; i++)
-    {
-      int a = arr[loops[i]];
-      int b = arr[loops[i + 1]];
-      if (a < b || (a == b && loops[i] < loops[i + 1]))
-      {
-        continue;
-      }
-      return false;
-    }
-    return true;
-  }
-
   public static void Sort(int[] arr)
   {
     int n = arr.Length;
@@ -49,9 +34,26 @@ public class OptimizedGuessSort
     }
   }
 
+  public static bool IsValid(int[] arr, int[] loops, int n)
+  {
+    for (int i = 0; i < n - 1; i++)
+    {
+      int a = arr[loops[i]];
+      int b = arr[loops[i + 1]];
+      if (a < b || (a == b && loops[i] < loops[i + 1]))
+      {
+        continue;
+      }
+      return false;
+    }
+    return true;
+  }
+
   public static void Main(String[] args)
   {
-    int[] array = { 0, 39, 21, 62, 14 };
+    int[] array = {
+      0, 39, 21, 62, 14
+    };
     Sort(array);
     string result = "[" + String.Join(", ", array) + "]";
     Console.WriteLine(result);

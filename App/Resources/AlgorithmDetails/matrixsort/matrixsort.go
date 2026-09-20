@@ -10,6 +10,11 @@ type matrixShape struct {
 	insertLast bool
 }
 
+func sort(arr []int) []int {
+	matrixSort(arr, 0, len(arr), 1, true)
+	return arr
+}
+
 func dirCompareVal(left, right int, dir bool) int {
 	var res int
 	if left > right {
@@ -112,11 +117,6 @@ func matrixSort(arr []int, start, end, gap int, dir bool) bool {
 	}
 
 	return did
-}
-
-func sort(arr []int) []int {
-	matrixSort(arr, 0, len(arr), 1, true)
-	return arr
 }
 
 func main() {

@@ -1,5 +1,6 @@
 func sort(_ arr: inout [Int]) {
     let n = arr.count
+    if n <= 1 { return }
     var index = 0
     while index < n {
         if index == 0 {

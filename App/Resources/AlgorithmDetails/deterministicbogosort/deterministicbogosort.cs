@@ -2,6 +2,12 @@ using System;
 
 public class DeterministicBogoSort
 {
+  public static void Sort(int[] arr)
+  {
+    int n = arr.Length;
+    PermutationSort(arr, 0, n);
+  }
+
   public static bool IsSorted(int[] arr)
   {
     for (int i = 0; i < arr.Length - 1; i++)
@@ -38,15 +44,11 @@ public class DeterministicBogoSort
     return PermutationSort(arr, depth + 1, n);
   }
 
-  public static void Sort(int[] arr)
-  {
-    int n = arr.Length;
-    PermutationSort(arr, 0, n);
-  }
-
   public static void Main(String[] args)
   {
-    int[] array = { 0, 39, 21, 62, 91, 14, 23 };
+    int[] array = {
+      0, 39, 21, 62, 91, 14, 23
+    };
     Sort(array);
     string result = "[" + String.Join(", ", array) + "]";
     Console.WriteLine(result);

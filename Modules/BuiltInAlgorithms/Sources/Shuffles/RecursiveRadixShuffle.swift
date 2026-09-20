@@ -24,7 +24,7 @@ public struct RecursiveRadixShuffle: ShuffleAlgorithm {
     var i = pos
     var j = 0
     while i < pos + gap * mid {
-      temp[j] = engine.values[i]
+      temp[j] = engine.readValue(at: i)
       i += gap
       j += 1
     }
@@ -33,7 +33,7 @@ public struct RecursiveRadixShuffle: ShuffleAlgorithm {
     var k = 0
     j = pos
     while i < pos + gap * evenLength {
-      engine.setValue(j, engine.values[i])
+      engine.setValue(j, engine.readValue(at: i))
       engine.setValue(j + gap, temp[k])
       i += gap
       j += 2 * gap

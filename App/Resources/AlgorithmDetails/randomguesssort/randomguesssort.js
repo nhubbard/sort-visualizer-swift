@@ -1,5 +1,6 @@
 function sort(arr) {
   const n = arr.length;
+  if (n <= 1) return;
   const loops = new Array(n).fill(0);
   while (true) {
     let isSorted = true;
@@ -16,7 +17,11 @@ function sort(arr) {
       break;
     }
     for (let pos = 0; pos < n; pos++) {
-      loops[pos] = Math.floor(Math.random() * n);
+      if (loops[pos] < n - 1) {
+        loops[pos]++;
+        break;
+      }
+      loops[pos] = 0;
     }
   }
 
@@ -26,6 +31,8 @@ function sort(arr) {
   }
 }
 
-var array = [0, 39, 21, 62, 14];
+const array = [
+  0, 39, 21, 62, 14,
+];
 sort(array);
 console.log("[" + array.join(", ") + "]");

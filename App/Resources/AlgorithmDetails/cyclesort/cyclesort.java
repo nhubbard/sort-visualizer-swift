@@ -1,6 +1,10 @@
 import java.util.Arrays;
 
 public class cyclesort {
+  public static void sort(int[] arr) {
+    cycleSort(arr);
+  }
+
   private static void cycleSort(int[] arr) {
     int n = arr.length;
     for (int cycleStart = 0; cycleStart < n - 1; cycleStart++) {
@@ -39,12 +43,11 @@ public class cyclesort {
     }
   }
 
-  public static void sort(int[] arr) {
-    cycleSort(arr);
-  }
-
   public static void main(String[] args) {
-    int[] array = new int[] {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     sort(array);
     System.out.println(Arrays.toString(array));
   }

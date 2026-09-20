@@ -4,46 +4,34 @@ import (
 	"fmt"
 )
 
-func max(arr []int) int {
-	n := len(arr)
-	max := arr[0]
-	for i := 1; i < n; i++ {
-		if arr[i] > max {
-			max = arr[i]
-		}
-	}
-	return max
-}
-
 func sort(arr []int) []int {
 	n := len(arr)
-	var bucket [10][10]int
-	var bucketCount [10]int
-	nop := 0
-	divisor := 1
-	lar := max(arr)
-	for lar > 0 {
-		nop++
-		lar /= 10
+	maxValue := 0
+	for _, value := range arr {
+		if value > maxValue {
+			maxValue = value
+		}
 	}
-	for pass := 0; pass < nop; pass++ {
-		i := 0
-		for i = 0; i < 10; i++ {
-			bucketCount[i] = 0
+	output := make([]int, n)
+	divisor := 1
+	for {
+		var counts [4]int
+		for _, value := range arr {
+			counts[(value/divisor)%4]++
 		}
-		for i = 0; i < n; i++ {
-			r := (arr[i] / divisor) % 10
-			bucket[r][bucketCount[r]] = arr[i]
-			bucketCount[r] += 1
+		for digit := 1; digit < 4; digit++ {
+			counts[digit] += counts[digit-1]
 		}
-		i = 0
-		for k := 0; k < 10; k++ {
-			for j := 0; j < bucketCount[k]; j++ {
-				arr[i] = bucket[k][j]
-				i++
-			}
+		for i := n - 1; i >= 0; i-- {
+			digit := (arr[i] / divisor) % 4
+			counts[digit]--
+			output[counts[digit]] = arr[i]
 		}
-		divisor *= 10
+		copy(arr, output)
+		if divisor > maxValue/4 {
+			break
+		}
+		divisor *= 4
 	}
 	return arr
 }

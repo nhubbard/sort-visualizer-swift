@@ -1,3 +1,8 @@
+def sort(array)
+  multi_swap_merge_sort(array, 0, array.length)
+  array
+end
+
 def multi_swap(array, a, b, len)
   len.times do |i|
     array[a + i], array[b + i] = array[b + i], array[a + i]
@@ -46,10 +51,6 @@ def multi_swap_merge_sort(array, a, b)
   end
 end
 
-def sort(array)
-  multi_swap_merge_sort(array, 0, array.length)
-  array
-end
 
 array = [0, 39, 21, 62, 91, 77, 14, 23,
   90, 69, 51, 81, 68, 83, 32, 56]

@@ -176,7 +176,7 @@ public final class SortSession {
       let sessionError: SortSessionError
       if case .tooLarge(
         let operationCount, let cap, let compareCount, let swapCount, let mainWriteCount,
-        let auxWriteCount) = error as? TapeRecordingError {
+        let auxWriteCount, _) = error as? TapeRecordingError {
         sessionError = .recordingTooLarge(
           operationCount: operationCount, cap: cap, compareCount: compareCount,
           swapCount: swapCount, mainWriteCount: mainWriteCount, auxWriteCount: auxWriteCount)
@@ -476,6 +476,12 @@ public final class SortSession {
           arraySize: arraySize, operationKind: .compare)
         audio.play(
           value: replay.frame[j].value, in: range, holdSeconds: holdSeconds, index: j,
+          arraySize: arraySize, operationKind: .compare)
+      case .compareValue(let i, _):
+        // Only one real array position here (the other side is a value an algorithm is holding
+        // onto, not a live index) — one tone, not the two `.compare` plays above.
+        audio.play(
+          value: replay.frame[i].value, in: range, holdSeconds: holdSeconds, index: i,
           arraySize: arraySize, operationKind: .compare)
       case .swap(let i, let j):
         audio.play(

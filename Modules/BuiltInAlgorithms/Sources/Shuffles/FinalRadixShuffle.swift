@@ -13,12 +13,12 @@ public struct FinalRadixShuffle: ShuffleAlgorithm {
     let evenLength = engine.count - engine.count % 2
     guard evenLength > 0 else { return }
     let mid = evenLength / 2
-    let firstHalf = Array(engine.values[0..<mid])
+    let firstHalf = engine.readValues(in: 0..<mid)
 
     var i = mid
     var j = 0
     while i < evenLength {
-      let secondHalfElement = engine.values[i]
+      let secondHalfElement = engine.readValue(at: i)
       engine.setValue(j, secondHalfElement)
       engine.setValue(j + 1, firstHalf[i - mid])
       i += 1

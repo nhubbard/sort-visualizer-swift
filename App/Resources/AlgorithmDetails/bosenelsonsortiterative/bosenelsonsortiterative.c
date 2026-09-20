@@ -1,18 +1,44 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
+                 90, 69, 51, 81, 68, 83, 32, 56};
+
+void swap(int *a, int *b) {
+  int t = *a;
+  *a = *b;
+  *b = t;
+}
 
 int end;
 
-void printList(int arr[], int n) {
-  for (int i = 0; i < n; i++) {
-    if (i == 0) {
-      printf("[%d, ", arr[i]);
-    } else if (i != n - 1) {
-      printf("%d, ", arr[i]);
-    } else {
-      printf("%d]", arr[i]);
+void printList(int items[], int size) {
+  printf("[");
+  if (size > 0) {
+    printf("%d", items[0]);
+    for (int i = 1; i < size; i++) {
+      printf(", %d", items[i]);
+    }
+  }
+  printf("]");
+}
+
+void compSwap(int arr[], int a, int b);
+void rangeComp(int arr[], int a, int b, int offset);
+
+void sort(int arr[], int n) {
+  end = n;
+  if (n <= 1)
+    return;
+  int paddedLength = 1;
+  while (paddedLength < n)
+    paddedLength <<= 1;
+
+  for (int k = 2; k <= paddedLength; k *= 2) {
+    for (int j = 0; j < k / 2; j++) {
+      for (int i = 0; i + j < n; i += k) {
+        rangeComp(arr, i, i + k, j);
+      }
     }
   }
 }
@@ -34,23 +60,6 @@ void rangeComp(int arr[], int a, int b, int offset) {
   for (int i = 0; i < half - offset; i++) {
     if ((i & ~offset) == i) {
       compSwap(arr, base + i, m + i);
-    }
-  }
-}
-
-void sort(int arr[], int n) {
-  end = n;
-  if (n <= 1)
-    return;
-  int paddedLength = 1;
-  while (paddedLength < n)
-    paddedLength <<= 1;
-
-  for (int k = 2; k <= paddedLength; k *= 2) {
-    for (int j = 0; j < k / 2; j++) {
-      for (int i = 0; i + j < n; i += k) {
-        rangeComp(arr, i, i + k, j);
-      }
     }
   }
 }

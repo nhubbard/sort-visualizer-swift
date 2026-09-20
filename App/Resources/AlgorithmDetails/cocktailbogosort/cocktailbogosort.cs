@@ -4,6 +4,27 @@ public class CocktailBogoSort
 {
   public static Random r = new Random();
 
+  public static void Sort(int[] arr)
+  {
+    int lo = 0;
+    int hi = arr.Length;
+    while (lo < hi - 1)
+    {
+      if (IsMinimum(arr, lo, hi))
+      {
+        lo++;
+      }
+      else if (IsMaximum(arr, lo, hi))
+      {
+        hi--;
+      }
+      else
+      {
+        ShuffleRange(arr, lo, hi);
+      }
+    }
+  }
+
   public static bool IsMinimum(int[] arr, int start, int end)
   {
     for (int k = start + 1; k < end; k++)
@@ -37,30 +58,11 @@ public class CocktailBogoSort
     }
   }
 
-  public static void Sort(int[] arr)
-  {
-    int lo = 0;
-    int hi = arr.Length;
-    while (lo < hi - 1)
-    {
-      if (IsMinimum(arr, lo, hi))
-      {
-        lo++;
-      }
-      else if (IsMaximum(arr, lo, hi))
-      {
-        hi--;
-      }
-      else
-      {
-        ShuffleRange(arr, lo, hi);
-      }
-    }
-  }
-
   public static void Main(String[] args)
   {
-    int[] array = { 0, 39, 21, 62, 91, 77, 14, 23 };
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23
+    };
     Sort(array);
     string result = "[" + String.Join(", ", array) + "]";
     Console.WriteLine(result);

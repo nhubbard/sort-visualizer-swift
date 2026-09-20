@@ -4,6 +4,14 @@ PARTIAL_INSERT_SORT_LIMIT = 8
 BLOCK_SIZE = 64
 CACHELINE_SIZE = 64
 
+def sort(arr)
+  n = arr.length
+  return if n < 2
+  left_offsets = Array.new(BLOCK_SIZE + CACHELINE_SIZE, 0)
+  right_offsets = Array.new(BLOCK_SIZE + CACHELINE_SIZE, 0)
+  pdq_loop(arr, 0, n, pdq_log(n), left_offsets, right_offsets)
+end
+
 def pdq_log(n)
   log = 0
   loop do
@@ -369,13 +377,6 @@ def pdq_loop(arr, begin_, end_, bad_allowed, left_offsets, right_offsets)
   end
 end
 
-def sort(arr)
-  n = arr.length
-  return if n < 2
-  left_offsets = Array.new(BLOCK_SIZE + CACHELINE_SIZE, 0)
-  right_offsets = Array.new(BLOCK_SIZE + CACHELINE_SIZE, 0)
-  pdq_loop(arr, 0, n, pdq_log(n), left_offsets, right_offsets)
-end
 
 array = [0, 39, 21, 62, 91, 77, 14, 23,
   90, 69, 51, 81, 68, 83, 32, 56]

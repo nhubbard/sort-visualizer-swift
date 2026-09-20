@@ -8,8 +8,11 @@ public struct OddEvenMergeSortIterative: SortAlgorithm {
     category: .concurrent,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 897, coefficients: [239988, 392.652, 0.102345],
+      anchorSize: 895, coefficients: [239630, 393.237, 0.102968],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .powerLaw, coefficients: [11.0709, 1.46871], rSquared: 0.99385),
+    implementationComplexity: 8,
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(log^2 n)", average: "O(log^2 n)", worst: "O(log^2 n)"),

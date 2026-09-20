@@ -1,13 +1,13 @@
 fun sort(arr: Array<Int>) {
   val n = arr.size
   for (i in 1 until n) {
-    val key = arr[i]
-    var j = i - 1
-    while (j >= 0 && arr[j] > key) {
-      arr[j + 1] = arr[j]
-      j = j - 1
+    var j = i
+    while (j > 0 && arr[j - 1] > arr[j]) {
+      val temp = arr[j]
+      arr[j] = arr[j - 1]
+      arr[j - 1] = temp
+      j--
     }
-    arr[j + 1] = key
   }
 }
 

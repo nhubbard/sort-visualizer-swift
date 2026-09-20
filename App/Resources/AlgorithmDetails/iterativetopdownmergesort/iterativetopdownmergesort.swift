@@ -1,33 +1,7 @@
-func merge(_ array: inout [Int], _ low: Int, _ mid: Int, _ high: Int) {
-    let left = Array(array[low ..< mid])
-    let right = Array(array[mid ..< high])
-    var i = 0
-    var j = 0
-    var k = low
-    while i < left.count, j < right.count {
-        if left[i] <= right[j] {
-            array[k] = left[i]
-            i += 1
-        } else {
-            array[k] = right[j]
-            j += 1
-        }
-        k += 1
-    }
-    while i < left.count {
-        array[k] = left[i]
-        i += 1
-        k += 1
-    }
-    while j < right.count {
-        array[k] = right[j]
-        j += 1
-        k += 1
-    }
-}
-
 func sort(_ arr: inout [Int]) {
     let n = arr.count
+    guard n > 1 else { return }
+    var scratch = [Int](repeating: 0, count: n)
     var subarrayCount = 1
     while subarrayCount < n {
         subarrayCount *= 2
@@ -39,12 +13,40 @@ func sort(_ arr: inout [Int]) {
             let low = n * i / subarrayCount
             let mid = n * (i + 1) / subarrayCount
             let high = n * (i + 2) / subarrayCount
-            merge(&arr, low, mid, high)
+            merge(&arr, &scratch, low, mid, high)
             i += 2
         }
         subarrayCount /= 2
     }
 }
+
+func merge(_ array: inout [Int], _ scratch: inout [Int], _ low: Int, _ mid: Int, _ high: Int) {
+    var left = low
+    var right = mid
+    var out = low
+    while left < mid && right < high {
+        if array[left] <= array[right] {
+            scratch[out] = array[left]
+            left += 1
+        } else {
+            scratch[out] = array[right]
+            right += 1
+        }
+        out += 1
+    }
+    while left < mid {
+        scratch[out] = array[left]
+        left += 1
+        out += 1
+    }
+    while right < high {
+        scratch[out] = array[right]
+        right += 1
+        out += 1
+    }
+    for i in low ..< high { array[i] = scratch[i] }
+}
+
 
 var array: [Int] = [
     0, 39, 21, 62, 91, 77, 14, 23,

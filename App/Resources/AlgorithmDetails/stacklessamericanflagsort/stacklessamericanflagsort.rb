@@ -1,47 +1,5 @@
 RADIX = 4
 
-def get_digit(value, place)
-  place.times { value /= RADIX }
-  value % RADIX
-end
-
-def shift(value, places)
-  places.times { value /= RADIX }
-  value
-end
-
-# Turns the raw per-bucket counts already accumulated in `counts` into
-# starting offsets, then places every element in [start, end) by following
-# displacement cycles, one bucket at a time.
-def distribute(arr, counts, offsets, start, _end, place)
-  (1...RADIX).each do |i|
-    counts[i] += counts[i - 1]
-    offsets[i] = counts[i - 1]
-  end
-
-  (0...RADIX - 1).each do |bucket|
-    position = start + offsets[bucket]
-    next unless counts[bucket] > offsets[bucket]
-
-    held = arr[position]
-    loop do
-      digit = get_digit(held, place)
-      counts[digit] -= 1
-      displaced = arr[start + counts[digit]]
-      arr[start + counts[digit]] = held
-      held = displaced
-      break if counts[bucket] <= offsets[bucket]
-    end
-  end
-
-  split = start + offsets[1]
-  (0...RADIX).each do |i|
-    counts[i] = 0
-    offsets[i] = 0
-  end
-  split
-end
-
 def sort(arr)
   n = arr.length
   return if n < 2
@@ -90,6 +48,49 @@ def sort(arr)
     end
   end
 end
+
+def get_digit(value, place)
+  place.times { value /= RADIX }
+  value % RADIX
+end
+
+def shift(value, places)
+  places.times { value /= RADIX }
+  value
+end
+
+# Turns the raw per-bucket counts already accumulated in `counts` into
+# starting offsets, then places every element in [start, end) by following
+# displacement cycles, one bucket at a time.
+def distribute(arr, counts, offsets, start, _end, place)
+  (1...RADIX).each do |i|
+    counts[i] += counts[i - 1]
+    offsets[i] = counts[i - 1]
+  end
+
+  (0...RADIX - 1).each do |bucket|
+    position = start + offsets[bucket]
+    next unless counts[bucket] > offsets[bucket]
+
+    held = arr[position]
+    loop do
+      digit = get_digit(held, place)
+      counts[digit] -= 1
+      displaced = arr[start + counts[digit]]
+      arr[start + counts[digit]] = held
+      held = displaced
+      break if counts[bucket] <= offsets[bucket]
+    end
+  end
+
+  split = start + offsets[1]
+  (0...RADIX).each do |i|
+    counts[i] = 0
+    offsets[i] = 0
+  end
+  split
+end
+
 
 array = [0, 39, 21, 62, 91, 77, 14, 23,
   90, 69, 51, 81, 68, 83, 32, 56]

@@ -1,18 +1,48 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
+                 90, 69, 51, 81, 68, 83, 32, 56};
 
-void printList(int arr[], int n) {
-  for (int i = 0; i < n; i++) {
-    if (i == 0) {
-      printf("[%d, ", arr[i]);
-    } else if (i != n - 1) {
-      printf("%d, ", arr[i]);
-    } else {
-      printf("%d]", arr[i]);
+void swap(int *a, int *b) {
+  int t = *a;
+  *a = *b;
+  *b = t;
+}
+
+void printList(int items[], int size) {
+  printf("[");
+  if (size > 0) {
+    printf("%d", items[0]);
+    for (int i = 1; i < size; i++) {
+      printf(", %d", items[i]);
     }
   }
+  printf("]");
+}
+
+int intPow(int base, int exponent);
+int getDigit(int value, int power, int radix);
+void radixMSD(int arr[], int low, int high, int radix, int power);
+
+void sort(int arr[], int n) {
+  if (n <= 1) {
+    return;
+  }
+  int radix = 4;
+  int maxValue = arr[0];
+  for (int i = 1; i < n; i++) {
+    if (arr[i] > maxValue) {
+      maxValue = arr[i];
+    }
+  }
+  int highestPower = 0;
+  int probe = radix;
+  while (probe <= maxValue) {
+    highestPower++;
+    probe *= radix;
+  }
+  radixMSD(arr, 0, n, radix, highestPower);
 }
 
 int intPow(int base, int exponent) {
@@ -73,26 +103,6 @@ void radixMSD(int arr[], int low, int high, int radix, int power) {
   free(starts);
   free(cursor);
   free(temp);
-}
-
-void sort(int arr[], int n) {
-  if (n <= 1) {
-    return;
-  }
-  int radix = 4;
-  int maxValue = arr[0];
-  for (int i = 1; i < n; i++) {
-    if (arr[i] > maxValue) {
-      maxValue = arr[i];
-    }
-  }
-  int highestPower = 0;
-  int probe = radix;
-  while (probe <= maxValue) {
-    highestPower++;
-    probe *= radix;
-  }
-  radixMSD(arr, 0, n, radix, highestPower);
 }
 
 int main(int argc, char *argv[]) {

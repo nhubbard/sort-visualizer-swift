@@ -1,3 +1,8 @@
+def sort(array)
+  slow_sort(array, 0, array.length - 1)
+  array
+end
+
 def slow_sort(array, i, j)
   return if i >= j
   m = i + (j - i) / 2
@@ -9,10 +14,6 @@ def slow_sort(array, i, j)
   slow_sort(array, i, j - 1)
 end
 
-def sort(array)
-  slow_sort(array, 0, array.length - 1)
-  array
-end
 
 array = [0, 39, 21, 62, 91, 77, 14, 23,
   90, 69, 51, 81, 68, 83, 32, 56]

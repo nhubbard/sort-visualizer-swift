@@ -1,24 +1,37 @@
-function merge(left, right) {
-  let arr = [];
-  while (left.length && right.length) {
-    if (left[0] < right[0]) {
-      arr.push(left.shift());
-    } else {
-      arr.push(right.shift());
-    }
-  }
-  return [...arr, ...left, ...right];
-}
-
 function sort(array) {
-  const half = array.length / 2;
-  if (array.length < 2) {
-    return array;
+  const scratch = new Array(array.length);
+
+  function merge(start, mid, end) {
+    let left = start;
+    let right = mid;
+    let out = start;
+    while (left < mid && right < end) {
+      if (array[left] <= array[right]) {
+        scratch[out++] = array[left++];
+      } else {
+        scratch[out++] = array[right++];
+      }
+    }
+    while (left < mid) scratch[out++] = array[left++];
+    while (right < end) scratch[out++] = array[right++];
+    for (let i = start; i < end; i++) array[i] = scratch[i];
   }
-  const left = array.splice(0, half);
-  return merge(sort(left), sort(array));
+
+  function mergeSort(start, end) {
+    if (end - start < 2) return;
+    const mid = start + Math.floor((end - start) / 2);
+    mergeSort(start, mid);
+    mergeSort(mid, end);
+    merge(start, mid, end);
+  }
+
+  mergeSort(0, array.length);
+  return array;
 }
 
-var array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56];
-array = sort(array);
+const array = [
+  0, 39, 21, 62, 91, 77, 14, 23,
+  90, 69, 51, 81, 68, 83, 32, 56,
+];
+sort(array);
 console.log("[" + array.join(", ") + "]");

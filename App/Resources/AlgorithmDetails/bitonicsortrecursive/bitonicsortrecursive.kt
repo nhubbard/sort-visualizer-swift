@@ -1,3 +1,7 @@
+fun sort(array: Array<Int>) {
+  bitonicSort(array, 0, array.size, true)
+}
+
 fun greatestPowerOfTwoLessThan(n: Int): Int {
   var k = 1
   while (k < n) {
@@ -31,10 +35,6 @@ fun bitonicSort(array: Array<Int>, lo: Int, n: Int, dir: Boolean) {
     bitonicSort(array, lo + m, n - m, dir)
     bitonicMerge(array, lo, n, dir)
   }
-}
-
-fun sort(array: Array<Int>) {
-  bitonicSort(array, 0, array.size, true)
 }
 
 fun main() {

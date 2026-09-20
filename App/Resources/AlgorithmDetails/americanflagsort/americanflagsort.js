@@ -1,3 +1,21 @@
+function sort(arr) {
+  const n = arr.length;
+  if (n <= 1) {
+    return arr;
+  }
+
+  var radix = 4;
+  var maxValue = Math.max.apply(null, arr);
+
+  var divisor = 1;
+  while (Math.floor(maxValue / divisor) >= radix) {
+    divisor *= radix;
+  }
+
+  flagSort(arr, 0, n, divisor, radix);
+  return arr;
+}
+
 function digitAt(value, divisor, radix) {
   return Math.floor(value / divisor) % radix;
 }
@@ -49,24 +67,10 @@ function flagSort(arr, low, high, divisor, radix) {
   }
 }
 
-function sort(arr) {
-  const n = arr.length;
-  if (n <= 1) {
-    return arr;
-  }
 
-  var radix = 10;
-  var maxValue = Math.max.apply(null, arr);
-
-  var divisor = 1;
-  while (Math.floor(maxValue / divisor) >= radix) {
-    divisor *= radix;
-  }
-
-  flagSort(arr, 0, n, divisor, radix);
-  return arr;
-}
-
-var array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56];
+const array = [
+  0, 39, 21, 62, 91, 77, 14, 23,
+  90, 69, 51, 81, 68, 83, 32, 56,
+];
 sort(array);
 console.log("[" + array.join(", ") + "]");

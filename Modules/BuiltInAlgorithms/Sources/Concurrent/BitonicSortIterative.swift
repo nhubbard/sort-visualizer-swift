@@ -8,8 +8,11 @@ public struct BitonicSortIterative: SortAlgorithm {
     category: .concurrent,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 819, coefficients: [239681, 424.783, 0.117088],
+      anchorSize: 818, coefficients: [239600, 425.432, 0.117653],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .powerLaw, coefficients: [14.0899, 1.45243], rSquared: 0.991791),
+    implementationComplexity: 10,
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(log^2 n)", average: "O(log^2 n)", worst: "O(log^2 n)"),

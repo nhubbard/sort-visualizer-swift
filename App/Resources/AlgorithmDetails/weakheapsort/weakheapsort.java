@@ -1,17 +1,9 @@
 import java.util.Arrays;
 
 public class weakheapsort {
-  public static void merge(int[] arr, boolean[] flags, int i, int j) {
-    if (arr[i] < arr[j]) {
-      flags[j] = !flags[j];
-      int temp = arr[i];
-      arr[i] = arr[j];
-      arr[j] = temp;
-    }
-  }
-
   public static void sort(int[] arr) {
     int n = arr.length;
+    if (n <= 1) return;
     boolean[] flags = new boolean[n];
 
     for (int i = n - 1; i > 0; i--) {
@@ -45,8 +37,20 @@ public class weakheapsort {
     arr[1] = temp;
   }
 
+  public static void merge(int[] arr, boolean[] flags, int i, int j) {
+    if (arr[i] < arr[j]) {
+      flags[j] = !flags[j];
+      int temp = arr[i];
+      arr[i] = arr[j];
+      arr[j] = temp;
+    }
+  }
+
   public static void main(String[] args) {
-    int[] array = new int[] {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     sort(array);
     System.out.println(Arrays.toString(array));
   }

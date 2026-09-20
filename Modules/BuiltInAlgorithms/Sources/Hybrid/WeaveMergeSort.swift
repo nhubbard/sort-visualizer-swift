@@ -24,8 +24,11 @@ public struct WeaveMergeSort: SortAlgorithm {
     category: .hybrid,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 310, coefficients: [239475, 1547.5, 2.5],
+      anchorSize: 280, coefficients: [238572, 1696.75, 3.01541],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .polynomialIntercept, coefficients: [3.01541, 8.12108, -109.541], rSquared: 1),
+    implementationComplexity: 17,
     stable: false,
     timeComplexity: ComplexityBounds(best: "O(n^2)", average: "O(n^2)", worst: "O(n^2)"),
     spaceComplexity: "O(log n)",
@@ -54,7 +57,7 @@ public struct WeaveMergeSort: SortAlgorithm {
       // than going through `engine.compare` — the same convention `DoubleInsertionSort`/
       // `WeavedMergeSort` already use for comparisons ArrayV itself performs via
       // `compareValues` rather than `compareIndices`. Ties are left untouched.
-      if engine.values[min] > engine.values[max] {
+      if engine.readValue(at: min) > engine.readValue(at: max) {
         engine.swap(min, max)
       }
     } else {
@@ -110,7 +113,7 @@ public struct WeaveMergeSort: SortAlgorithm {
     guard start < end else { return }
     for j in start..<end {
       var pos = j
-      while pos > start && engine.values[pos] <= engine.values[pos - 1] {
+      while pos > start && engine.readValue(at: pos) <= engine.readValue(at: pos - 1) {
         engine.swap(pos, pos - 1)
         pos -= 1
       }

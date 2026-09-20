@@ -4,6 +4,14 @@ import (
 	"fmt"
 )
 
+func sort(arr []int) []int {
+	n := len(arr)
+	if n > 1 {
+		recursiveComb(arr, 0, 1, n)
+	}
+	return arr
+}
+
 func powerOfThree(arr []int, pos, gap, end int) {
 	if pos+gap > end {
 		return
@@ -29,14 +37,6 @@ func recursiveComb(arr []int, pos, gap, end int) {
 	recursiveComb(arr, pos+gap, gap*2, end)
 
 	powerOfThree(arr, pos, gap, end)
-}
-
-func sort(arr []int) []int {
-	n := len(arr)
-	if n > 1 {
-		recursiveComb(arr, 0, 1, n)
-	}
-	return arr
 }
 
 func main() {

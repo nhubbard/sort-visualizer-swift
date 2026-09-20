@@ -25,8 +25,11 @@ public struct ClassicTournamentSort: SortAlgorithm {
     category: .selection,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 2255, coefficients: [193624, 99.5009, 0.00318444],
+      anchorSize: 2270, coefficients: [194405, 98.4853, 0.00293759],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .powerLog, coefficients: [9.45363, 1.02057], rSquared: 0.999448),
+    implementationComplexity: 23,
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n log n)", average: "O(n log n)", worst: "O(n log n)"),
@@ -118,12 +121,12 @@ public struct ClassicTournamentSort: SortAlgorithm {
           setTree(node, winner)
         }
       }
-      return engine.values[tree[0]]
+      return engine.readValue(at: tree[0])
     }
 
     let outHandle = engine.createAuxArray(length: n)
     var output = [Int](repeating: 0, count: n)
-    output[0] = engine.values[tree[0]]
+    output[0] = engine.readValue(at: tree[0])
     engine.writeAux(outHandle, at: 0, value: output[0])
     for i in 1..<n {
       output[i] = findNext()

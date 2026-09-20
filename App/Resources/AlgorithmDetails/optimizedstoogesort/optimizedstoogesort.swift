@@ -1,3 +1,7 @@
+func sort(_ array: inout [Int]) {
+    exchange(&array, array.count)
+}
+
 func forward(_ arr: inout [Int], _ leftStart: Int, _ rightStart: Int) {
     var left = leftStart
     var right = rightStart
@@ -48,9 +52,6 @@ func exchange(_ arr: inout [Int], _ length: Int) {
     backward(&arr, 1, length - 1)
 }
 
-func sort(_ array: inout [Int]) {
-    exchange(&array, array.count)
-}
 
 var array: [Int] = [
     0, 39, 21, 62, 91, 77, 14, 23,

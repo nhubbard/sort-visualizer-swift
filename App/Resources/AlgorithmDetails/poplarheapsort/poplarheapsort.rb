@@ -1,3 +1,10 @@
+def sort(array)
+  n = array.length
+  return if n <= 1
+  make_heap(array, 0, n)
+  sort_heap(array, 0, n)
+end
+
 def hyperfloor(n)
   power = 1
   power *= 2 while power * 2 <= n
@@ -120,12 +127,6 @@ def sort_heap(array, first, last_in)
   end
 end
 
-def sort(array)
-  n = array.length
-  return if n <= 1
-  make_heap(array, 0, n)
-  sort_heap(array, 0, n)
-end
 
 array = [0, 39, 21, 62, 91, 77, 14, 23,
   90, 69, 51, 81, 68, 83, 32, 56]

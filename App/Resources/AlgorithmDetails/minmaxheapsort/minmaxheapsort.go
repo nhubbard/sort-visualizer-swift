@@ -4,6 +4,19 @@ import (
 	"fmt"
 )
 
+func sort(arr []int) []int {
+	n := len(arr)
+	if n <= 1 {
+		return arr
+	}
+	heapify(arr, n)
+	heapSize := n
+	for i := 0; i < n-1; i++ {
+		heapSize = storeMax(arr, heapSize)
+	}
+	return arr
+}
+
 func bitLength(value int) int {
 	length := 0
 	for value > 0 {
@@ -92,19 +105,6 @@ func storeMax(arr []int, heapSize int) int {
 		downheap(arr, imax, newSize)
 	}
 	return newSize
-}
-
-func sort(arr []int) []int {
-	n := len(arr)
-	if n <= 1 {
-		return arr
-	}
-	heapify(arr, n)
-	heapSize := n
-	for i := 0; i < n-1; i++ {
-		heapSize = storeMax(arr, heapSize)
-	}
-	return arr
 }
 
 func main() {

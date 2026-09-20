@@ -176,6 +176,75 @@ struct BigOCorrelationTests {
     #expect(!averageCase.isEmpty)
   }
 
+  /// Covers min/max/median/mean (mean via the existing `.observedTrend`) and sample standard
+  /// deviation together against a hand-computed set of five totals at one size, chosen so every
+  /// one of those five statistics lands on a distinct value.
+  @Test
+  func rainbowStatPointsMatchHandComputedStatistics() async throws {
+    let service = try makeInMemoryService()
+    for total in [10, 20, 30, 40, 50] {
+      try await record(service, size: 50, total: total)
+    }
+    try await record(service, size: 100, total: 200)
+
+    let summaries = try await service.fetchAllForTesting()
+    let points = bigOChartPoints(for: summaries, timeComplexity: quicksortComplexity)
+    let atSize50 = { (kind: BigOChartPoint.Kind) in points.filter { $0.kind == kind && $0.size == 50 } }
+
+    // maxObservedValue is 200 (the size-100 run), so every normalized value below is the raw
+    // statistic divided by 200.
+    #expect(abs((atSize50(.statMin).first?.normalizedValue ?? -1) - 0.05) < 0.0001)
+    #expect(abs((atSize50(.statMax).first?.normalizedValue ?? -1) - 0.25) < 0.0001)
+    #expect(abs((atSize50(.statMedian).first?.normalizedValue ?? -1) - 0.15) < 0.0001)
+    #expect(abs((atSize50(.observedTrend).first?.normalizedValue ?? -1) - 0.15) < 0.0001)
+
+    // Sample standard deviation of [10, 20, 30, 40, 50] is sqrt(1000 / 4) ≈ 15.8114.
+    let stdDevBand = atSize50(.statStdDevBand).sorted { $0.normalizedValue < $1.normalizedValue }
+    #expect(stdDevBand.count == 2)
+    #expect(abs(stdDevBand[0].normalizedValue - (30 - 15.8114) / 200) < 0.001)
+    #expect(abs(stdDevBand[1].normalizedValue - (30 + 15.8114) / 200) < 0.001)
+  }
+
+  /// A size with exactly one recorded run has zero variance by definition — every rainbow stat
+  /// (including both ends of the stddev band) should collapse onto that single value.
+  @Test
+  func aSingleRunPerSizeCollapsesEveryStatToTheSameValue() async throws {
+    let service = try makeInMemoryService()
+    try await record(service, size: 10, total: 5)
+    try await record(service, size: 20, total: 8)
+
+    let summaries = try await service.fetchAllForTesting()
+    let points = bigOChartPoints(for: summaries, timeComplexity: quicksortComplexity)
+    let atSize10 = points.filter { $0.size == 10 }
+
+    let expected = 5.0 / 8.0  // maxObservedValue is 8 (the size-20 run).
+    for kind: BigOChartPoint.Kind in [.statMin, .statMax, .statMedian, .observedTrend, .statStdDevBand] {
+      for point in atSize10.filter({ $0.kind == kind }) {
+        #expect(abs(point.normalizedValue - expected) < 0.0001, "\(kind): \(point.normalizedValue)")
+      }
+    }
+  }
+
+  /// An even run count averages the two middle values for the median, which should land on a
+  /// different value than the mean when the totals aren't symmetric around their own center.
+  @Test
+  func medianAveragesTheTwoMiddleValuesOnAnEvenRunCount() async throws {
+    let service = try makeInMemoryService()
+    for total in [10, 20, 30, 100] {
+      try await record(service, size: 10, total: total)
+    }
+    try await record(service, size: 99, total: 1)
+
+    let summaries = try await service.fetchAllForTesting()
+    let points = bigOChartPoints(for: summaries, timeComplexity: quicksortComplexity)
+    // maxObservedValue is 100, so median (25) and mean (40) normalize to 0.25 and 0.40.
+    let median = points.first { $0.kind == .statMedian && $0.size == 10 }
+    let mean = points.first { $0.kind == .observedTrend && $0.size == 10 }
+
+    #expect(abs((median?.normalizedValue ?? -1) - 0.25) < 0.0001)
+    #expect(abs((mean?.normalizedValue ?? -1) - 0.40) < 0.0001)
+  }
+
   /// Exercises the merge itself: `QuickSort`'s real declared bounds duplicate `"O(n log n)"`
   /// across best and average while worst differs, so those two should merge into one labeled
   /// series and worst should remain separate.
@@ -190,6 +259,39 @@ struct BigOCorrelationTests {
     let referenceSeries = Set(points.filter { $0.kind == .reference }.map(\.series))
 
     #expect(referenceSeries == ["Best & Average Case", "Worst Case"])
+  }
+
+  /// A stale record with an out-of-range `arraySize` (the exact category `Tools/CloudKitCleanup`
+  /// targets for deletion) shouldn't get to stretch the whole chart's domain out to accommodate
+  /// it -- it should just be excluded, as if it were never recorded.
+  @Test
+  func outOfRangeArraySizeIsExcludedEntirely() async throws {
+    let service = try makeInMemoryService()
+    try await record(service, size: 10, total: 5)
+    try await record(service, size: 100, total: 50)
+    try await record(service, size: AlgorithmMetadata.maxReasonableArraySize + 1, total: 999_999)
+
+    let summaries = try await service.fetchAllForTesting()
+    let points = bigOChartPoints(for: summaries, timeComplexity: quicksortComplexity)
+
+    #expect(points.allSatisfy { $0.size <= AlgorithmMetadata.maxReasonableArraySize })
+    // The two real, in-range sizes should still render normally -- the outlier's exclusion
+    // shouldn't itself distort what the remaining points normalize against.
+    let trend = points.filter { $0.kind == .observedTrend }.sorted { $0.size < $1.size }
+    #expect(trend.map(\.size) == [10, 100])
+  }
+
+  /// If the out-of-range record was one of only two distinct sizes, excluding it should correctly
+  /// fall through to the existing "not enough data" empty state rather than rendering a
+  /// two-point chart where one point is silently gone but the domain still reflects it.
+  @Test
+  func outOfRangeArraySizeCanDropBelowTheMinimumDistinctSizesNeeded() async throws {
+    let service = try makeInMemoryService()
+    try await record(service, size: 10, total: 5)
+    try await record(service, size: AlgorithmMetadata.maxReasonableArraySize + 1, total: 999_999)
+
+    let summaries = try await service.fetchAllForTesting()
+    #expect(bigOChartPoints(for: summaries, timeComplexity: quicksortComplexity).isEmpty)
   }
 
   /// When all three cases share the same shape, they should merge into a single series rather

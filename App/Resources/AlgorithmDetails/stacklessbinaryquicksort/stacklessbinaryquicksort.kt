@@ -1,30 +1,3 @@
-fun mostSignificantBit(value: Int): Int {
-  if (value == 0) return -1
-  var bit = 0
-  while ((value shr (bit + 1)) != 0) bit++
-  return bit
-}
-
-fun getBit(value: Int, bit: Int): Boolean = (value shr bit) and 1 == 1
-
-fun partition(arr: Array<Int>, lo: Int, hi: Int, bit: Int): Int {
-  var i = lo - 1
-  var j = hi
-  while (true) {
-    i++
-    while (i < j && !getBit(arr[i], bit)) i++
-    j--
-    while (j > i && getBit(arr[j], bit)) j--
-    if (i < j) {
-      val temp = arr[i]
-      arr[i] = arr[j]
-      arr[j] = temp
-    } else {
-      return i
-    }
-  }
-}
-
 fun sort(arr: Array<Int>) {
   val n = arr.size
   if (n <= 1) return
@@ -52,6 +25,33 @@ fun sort(arr: Array<Int>) {
     } else {
       b = p
       q--
+    }
+  }
+}
+
+fun mostSignificantBit(value: Int): Int {
+  if (value == 0) return -1
+  var bit = 0
+  while ((value shr (bit + 1)) != 0) bit++
+  return bit
+}
+
+fun getBit(value: Int, bit: Int): Boolean = (value shr bit) and 1 == 1
+
+fun partition(arr: Array<Int>, lo: Int, hi: Int, bit: Int): Int {
+  var i = lo - 1
+  var j = hi
+  while (true) {
+    i++
+    while (i < j && !getBit(arr[i], bit)) i++
+    j--
+    while (j > i && getBit(arr[j], bit)) j--
+    if (i < j) {
+      val temp = arr[i]
+      arr[i] = arr[j]
+      arr[j] = temp
+    } else {
+      return i
     }
   }
 }

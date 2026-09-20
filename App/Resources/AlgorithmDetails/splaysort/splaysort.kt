@@ -5,6 +5,26 @@ class Node(
   var right: Node? = null
 }
 
+fun sort(arr: Array<Int>) {
+  var root: Node? = null
+  for (x in arr) {
+    root = insertRec(root, x)
+  }
+  val result = mutableListOf<Int>()
+
+  fun traverse(node: Node?) {
+    if (node != null) {
+      traverse(node.left)
+      result.add(node.key)
+      traverse(node.right)
+    }
+  }
+  traverse(root)
+  for (i in arr.indices) {
+    arr[i] = result[i]
+  }
+}
+
 fun leftRotate(x: Node): Node {
   val y = x.right!!
   x.right = y.left
@@ -71,26 +91,6 @@ fun insertRec(rootArg: Node?, key: Int): Node {
     root.right = null
   }
   return n
-}
-
-fun sort(arr: Array<Int>) {
-  var root: Node? = null
-  for (x in arr) {
-    root = insertRec(root, x)
-  }
-  val result = mutableListOf<Int>()
-
-  fun traverse(node: Node?) {
-    if (node != null) {
-      traverse(node.left)
-      result.add(node.key)
-      traverse(node.right)
-    }
-  }
-  traverse(root)
-  for (i in arr.indices) {
-    arr[i] = result[i]
-  }
 }
 
 fun main() {

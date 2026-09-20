@@ -2,9 +2,37 @@ using System;
 
 public class RotateLsdRadixSort
 {
-  private const int RadixBase = 10;
+  private const int RadixBase = 4;
 
   // Extracts the digit at `place` (0 = ones place) from `value`, in RadixBase.
+  public static void Sort(int[] arr)
+  {
+    int n = arr.Length;
+    if (n < 2)
+    {
+      return;
+    }
+    int maxValue = arr[0];
+    for (int i = 1; i < n; i++)
+    {
+      if (arr[i] > maxValue)
+      {
+        maxValue = arr[i];
+      }
+    }
+    int maxPlace = 0;
+    int probe = RadixBase;
+    while (probe <= maxValue)
+    {
+      maxPlace++;
+      probe *= RadixBase;
+    }
+    for (int place = 0; place <= maxPlace; place++)
+    {
+      DigitMergeSort(arr, 0, n, place);
+    }
+  }
+
   private static int DigitAt(int value, int place)
   {
     int divisor = 1;
@@ -100,37 +128,12 @@ public class RotateLsdRadixSort
     MergeByDigit(arr, a, mid, b, 0, RadixBase, place);
   }
 
-  public static void Sort(int[] arr)
-  {
-    int n = arr.Length;
-    if (n < 2)
-    {
-      return;
-    }
-    int maxValue = arr[0];
-    for (int i = 1; i < n; i++)
-    {
-      if (arr[i] > maxValue)
-      {
-        maxValue = arr[i];
-      }
-    }
-    int maxPlace = 0;
-    int probe = RadixBase;
-    while (probe <= maxValue)
-    {
-      maxPlace++;
-      probe *= RadixBase;
-    }
-    for (int place = 0; place <= maxPlace; place++)
-    {
-      DigitMergeSort(arr, 0, n, place);
-    }
-  }
-
   public static void Main(String[] args)
   {
-    int[] array = { 0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56 };
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     Sort(array);
     string result = "[" + String.Join(", ", array) + "]";
     Console.WriteLine(result);

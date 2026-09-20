@@ -23,8 +23,11 @@ public struct PancakeInsertionSort: SortAlgorithm {
     category: .miscellaneous,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 269, coefficients: [238285, 1736.27, 3.15629],
+      anchorSize: 51, coefficients: [99786.2, 23893.2, 2920.13, 242.19, 15.3034, 0.78455],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .factorial, coefficients: [11.0782, 0.060899], rSquared: 0.99927),
+    implementationComplexity: 25,
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n)", average: "O(n^2)", worst: "O(n^2)"),

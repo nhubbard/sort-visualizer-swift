@@ -4,6 +4,11 @@ import (
 	"fmt"
 )
 
+func sort(arr []int) []int {
+	flashSort(arr)
+	return arr
+}
+
 func classify(value, minValue int, c float64) int {
 	return int(float64(value-minValue)*c) + 1
 }
@@ -94,11 +99,6 @@ func flashSort(array []int) {
 		}
 		array[pos+1] = current
 	}
-}
-
-func sort(arr []int) []int {
-	flashSort(arr)
-	return arr
 }
 
 func main() {

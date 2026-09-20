@@ -1,3 +1,27 @@
+fun sort(arr: IntArray) {
+  val n = arr.size
+  if (n <= 1) return
+  val base = 4
+  var maxValue = 0
+  for (value in arr) if (value > maxValue) maxValue = value
+  var q = 0
+  var probe = base
+  while (probe <= maxValue) { q++; probe *= base }
+  var m = 0
+  var i = 0
+  var b = n
+  while (i < n) {
+    val p = if (b - i < 1) i else dist(arr, i, b, q, base)
+    if (q == 0) {
+      m += base
+      var t = m / base
+      while (t % base == 0) { t /= base; q++ }
+      i = b
+      while (b < n && shift(arr[b], q + 1, base) == shift(m, q + 1, base)) b++
+    } else { b = p; q-- }
+  }
+}
+
 fun intPow(base: Int, exponent: Int): Int {
   var result = 1
   for (i in 0 until exponent) {
@@ -78,37 +102,16 @@ fun mergeSortDigit(array: IntArray, a: Int, b: Int, place: Int, base: Int) {
 // buckets, then recurses into every resulting digit bucket one place lower --
 // an ordinary MSD radix sort built entirely out of the LSD variant's
 // rotate/binary-search machinery.
-fun msdRotateSort(array: IntArray, a: Int, b: Int, place: Int, base: Int) {
-  if (b - a < 2 || place < 0) {
-    return
-  }
-  mergeSortDigit(array, a, b, place, base)
-  var start = a
-  for (d in 0 until base) {
-    val end = binSearchDigit(array, start, b, d + 1, place, base)
-    msdRotateSort(array, start, end, place - 1, base)
-    start = end
-  }
+fun shift(value: Int, places: Int, base: Int): Int {
+  var value = value
+  var places = places
+  while (places > 0) { value /= base; places-- }
+  return value
 }
 
-fun sort(arr: IntArray) {
-  if (arr.size <= 1) {
-    return
-  }
-  val base = 4
-  var maxValue = arr[0]
-  for (value in arr) {
-    if (value > maxValue) {
-      maxValue = value
-    }
-  }
-  var highestPlace = 0
-  var probe = base
-  while (probe <= maxValue) {
-    highestPlace++
-    probe *= base
-  }
-  msdRotateSort(arr, 0, arr.size, highestPlace, base)
+fun dist(arr: IntArray, a: Int, b: Int, place: Int, base: Int): Int {
+  mergeSortDigit(arr, a, b, place, base)
+  return binSearchDigit(arr, a, b, 1, place, base)
 }
 
 fun main() {

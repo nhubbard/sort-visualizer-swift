@@ -2,39 +2,6 @@ using System;
 
 public class InPlaceLSDRadixSort
 {
-  private static int IntPow(int b, int exponent)
-  {
-    var result = 1;
-    for (var i = 0; i < exponent; i++)
-    {
-      result *= b;
-    }
-    return result;
-  }
-
-  private static int GetDigit(int value, int power, int radix)
-  {
-    return (value / IntPow(radix, power)) % radix;
-  }
-
-  private static void MultiSwap(int[] arr, int pos, int to)
-  {
-    if (to > pos)
-    {
-      for (var k = pos; k < to; k++)
-      {
-        (arr[k], arr[k + 1]) = (arr[k + 1], arr[k]);
-      }
-    }
-    else if (to < pos)
-    {
-      for (var k = pos; k > to; k--)
-      {
-        (arr[k], arr[k - 1]) = (arr[k - 1], arr[k]);
-      }
-    }
-  }
-
   public static void Sort(int[] arr)
   {
     int n = arr.Length;
@@ -90,9 +57,45 @@ public class InPlaceLSDRadixSort
     }
   }
 
+  private static int IntPow(int b, int exponent)
+  {
+    var result = 1;
+    for (var i = 0; i < exponent; i++)
+    {
+      result *= b;
+    }
+    return result;
+  }
+
+  private static int GetDigit(int value, int power, int radix)
+  {
+    return (value / IntPow(radix, power)) % radix;
+  }
+
+  private static void MultiSwap(int[] arr, int pos, int to)
+  {
+    if (to > pos)
+    {
+      for (var k = pos; k < to; k++)
+      {
+        (arr[k], arr[k + 1]) = (arr[k + 1], arr[k]);
+      }
+    }
+    else if (to < pos)
+    {
+      for (var k = pos; k > to; k--)
+      {
+        (arr[k], arr[k - 1]) = (arr[k - 1], arr[k]);
+      }
+    }
+  }
+
   public static void Main(String[] args)
   {
-    int[] array = { 0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56 };
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     Sort(array);
     string result = "[" + String.Join(", ", array) + "]";
     Console.WriteLine(result);

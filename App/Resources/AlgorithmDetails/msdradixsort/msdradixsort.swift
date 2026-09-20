@@ -1,5 +1,20 @@
 import Foundation
 
+func sort(_ array: inout [Int]) {
+    if array.count <= 1 {
+        return
+    }
+    let radix = 4
+    let maxValue = array.max() ?? 0
+    var highestPower = 0
+    var probe = radix
+    while probe <= maxValue {
+        highestPower += 1
+        probe *= radix
+    }
+    radixMSD(&array, 0, array.count, radix, highestPower)
+}
+
 func intPow(_ base: Int, _ exponent: Int) -> Int {
     var result = 1
     for _ in 0 ..< exponent {
@@ -37,20 +52,6 @@ func radixMSD(_ array: inout [Int], _ low: Int, _ high: Int, _ radix: Int, _ pow
     }
 }
 
-func sort(_ array: inout [Int]) {
-    if array.count <= 1 {
-        return
-    }
-    let radix = 4
-    let maxValue = array.max() ?? 0
-    var highestPower = 0
-    var probe = radix
-    while probe <= maxValue {
-        highestPower += 1
-        probe *= radix
-    }
-    radixMSD(&array, 0, array.count, radix, highestPower)
-}
 
 var array: [Int] = [
     0, 39, 21, 62, 91, 77, 14, 23,

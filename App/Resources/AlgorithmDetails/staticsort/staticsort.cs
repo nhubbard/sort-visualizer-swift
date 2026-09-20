@@ -2,6 +2,15 @@ using System;
 
 public class StaticSort
 {
+  public static int[] Sort(int[] array)
+  {
+    if (array.Length > 1)
+    {
+      DoStaticSort(array, 0, array.Length);
+    }
+    return array;
+  }
+
   private static (int min, int max) FindMinMax(int[] array, int a, int b)
   {
     var minValue = array[a];
@@ -139,18 +148,12 @@ public class StaticSort
     }
   }
 
-  public static int[] Sort(int[] array)
-  {
-    if (array.Length > 1)
-    {
-      DoStaticSort(array, 0, array.Length);
-    }
-    return array;
-  }
-
   public static void Main(String[] args)
   {
-    int[] array = { 0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56 };
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     Sort(array);
     string result = "[" + String.Join(", ", array) + "]";
     Console.WriteLine(result);

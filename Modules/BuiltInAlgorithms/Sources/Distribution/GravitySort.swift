@@ -18,8 +18,11 @@ public struct GravitySort: SortAlgorithm {
     category: .distribution,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 488, coefficients: [239607, 979, 1],
+      anchorSize: 281, coefficients: [238346, 1693.79, 3.00872],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .polynomialIntercept, coefficients: [3.00872, 2.8842, -36.1664], rSquared: 0.999996),
+    implementationComplexity: 10,
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n \\times k)", average: "O(n \\times k)", worst: "O(n \\times k)"),
@@ -37,11 +40,11 @@ public struct GravitySort: SortAlgorithm {
     // `engine.values` and compares against the plain local `min`/`max` variables rather than
     // going through `engine.compare` — the same held-value pattern as `CycleSort`'s `t` and
     // `PigeonholeSort`'s own min/max scan.
-    var minValue = engine.values[0]
-    var maxValue = engine.values[0]
+    var minValue = engine.readValue(at: 0)
+    var maxValue = engine.readValue(at: 0)
     for i in 1..<n {
-      if engine.values[i] < minValue { minValue = engine.values[i] }
-      if engine.values[i] > maxValue { maxValue = engine.values[i] }
+      if engine.readValue(at: i) < minValue { minValue = engine.readValue(at: i) }
+      if engine.readValue(at: i) > maxValue { maxValue = engine.readValue(at: i) }
     }
 
     let mi = minValue
@@ -59,7 +62,7 @@ public struct GravitySort: SortAlgorithm {
     // Save a shifted copy of the input in `x`, and tally the count of each shifted value in
     // `y`.
     for i in 0..<n {
-      let shifted = engine.values[i] - mi
+      let shifted = engine.readValue(at: i) - mi
       x[i] = shifted
       engine.writeAux(xHandle, at: i, value: shifted)
 
@@ -79,10 +82,21 @@ public struct GravitySort: SortAlgorithm {
     // `i` is one of the rightmost `y[j]` positions known to end up `>= j`) or debits it back
     // out (if position `i`'s original shifted value already started `>= j`, so it shouldn't be
     // credited again on the way down).
+    //
+    // `y[j]`/`x[i]` are re-read from `writeAux`'s own local shadow copies on every one of the
+    // `ySize * n` inner iterations -- real, repeated work the tape didn't previously see at all
+    // (only the occasional resulting `setValue` was visible), so each read is marked via
+    // `markAuxRead` right where it happens.
     for j in stride(from: ySize - 1, through: 0, by: -1) {
       for i in 0..<n {
+        engine.markAuxRead(yHandle, at: j)
+        engine.markAuxRead(xHandle, at: i)
         let inc = (i >= n - y[j] ? 1 : 0) - (x[i] >= j ? 1 : 0)
-        engine.setValue(i, engine.values[i] + inc)
+        // Most `(j, i)` pairs across a full `ySize * n` sweep leave position `i` unchanged at
+        // this level (`inc == 0`) -- skipping the write is a genuine no-op (`values[i] + 0 ==
+        // values[i]`), not a behavior change, and cuts real, redundant tape volume.
+        guard inc != 0 else { continue }
+        engine.setValue(i, engine.readValue(at: i) + inc)
       }
     }
 

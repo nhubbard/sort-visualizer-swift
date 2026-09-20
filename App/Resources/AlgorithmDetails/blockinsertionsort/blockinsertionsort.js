@@ -1,3 +1,17 @@
+function sort(arr) {
+  const n = arr.length;
+  if (n < 2) return;
+  let i = findRun(arr, 0, n);
+  while (i < n) {
+    const j = findRun(arr, i, n);
+    const len = j - i;
+    if (len === 1) insert1(arr, 0, i);
+    else if (len === 2) insert2(arr, 0, i, i + 1);
+    else mergeWithoutBuffer(arr, 0, i, len);
+    i = j;
+  }
+}
+
 function multiSwap(arr, a, b, count) {
   for (let i = 0; i < count; i++) {
     [arr[a + i], arr[b + i]] = [arr[b + i], arr[a + i]];
@@ -32,22 +46,21 @@ function binSearch(arr, pos, len, keyPos, isLeft) {
 }
 
 function mergeWithoutBuffer(arr, pos, len1, len2) {
-  if (len1 === 0 || len2 === 0) return;
-  if (len1 === 1) {
-    const loc = binSearch(arr, pos + 1, len2, pos, true);
-    rotate(arr, pos, 1, loc);
-    return;
+  if (len1 < len2) {
+    while (len1 !== 0) {
+      const loc = binSearch(arr, pos + len1, len2, pos, true);
+      if (loc !== 0) { rotate(arr, pos, len1, loc); pos += loc; len2 -= loc; }
+      if (len2 === 0) break;
+      do { pos++; len1--; } while (len1 !== 0 && arr[pos] <= arr[pos + len1]);
+    }
+  } else {
+    while (len2 !== 0) {
+      const loc = binSearch(arr, pos, len1, pos + len1 + len2 - 1, false);
+      if (loc !== len1) { rotate(arr, pos + loc, len1 - loc, len2); len1 = loc; }
+      if (len1 === 0) break;
+      do { len2--; } while (len2 !== 0 && arr[pos + len1 - 1] <= arr[pos + len1 + len2 - 1]);
+    }
   }
-  if (len2 === 1) {
-    const loc = binSearch(arr, pos, len1, pos + len1, false);
-    rotate(arr, pos + loc, len1 - loc, 1);
-    return;
-  }
-  const mid1 = Math.floor(len1 / 2);
-  const loc = binSearch(arr, pos + len1, len2, pos + mid1, true);
-  rotate(arr, pos + mid1, len1 - mid1, loc);
-  mergeWithoutBuffer(arr, pos, mid1, loc);
-  mergeWithoutBuffer(arr, pos + mid1 + loc, len1 - mid1, len2 - loc);
 }
 
 function findRun(arr, a, b) {
@@ -96,19 +109,10 @@ function insert2(arr, a, l, r) {
   arr[l + 1] = tmpL;
 }
 
-function sort(arr) {
-  const n = arr.length;
-  let i = findRun(arr, 0, n);
-  while (i < n) {
-    const j = findRun(arr, i, n);
-    const len = j - i;
-    if (len === 1) insert1(arr, 0, i);
-    else if (len === 2) insert2(arr, 0, i, i + 1);
-    else mergeWithoutBuffer(arr, 0, i, len);
-    i = j;
-  }
-}
 
-var array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56];
+const array = [
+  0, 39, 21, 62, 91, 77, 14, 23,
+  90, 69, 51, 81, 68, 83, 32, 56,
+];
 sort(array);
 console.log("[" + array.join(", ") + "]");

@@ -2,7 +2,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
+                 90, 69, 51, 81, 68, 83, 32, 56};
 
 void swap(int *a, int *b) {
   int t = *a;
@@ -11,15 +12,27 @@ void swap(int *a, int *b) {
 }
 
 void printList(int items[], int size) {
-  for (int i = 0; i < size; i++) {
-    if (i == 0) {
-      printf("[%d, ", items[i]);
-    } else if (i != size - 1) {
-      printf("%d, ", items[i]);
-    } else {
-      printf("%d]", items[i]);
+  printf("[");
+  if (size > 0) {
+    printf("%d", items[0]);
+    for (int i = 1; i < size; i++) {
+      printf(", %d", items[i]);
     }
   }
+  printf("]");
+}
+
+int medianOf3(int arr[], int left, int mid, int right);
+int partition(int arr[], int lo, int hi, int pivotValue);
+void siftDown(int arr[], int lo, int root, int rangeSize);
+void heapSortRange(int arr[], int lo, int hi);
+void insertionSort(int arr[], int start, int end);
+int floorLog2(int a);
+void introsortLoop(int arr[], int lo, int hi, int depthLimit);
+
+void sort(int arr[], int n) {
+  introsortLoop(arr, 0, n, 2 * floorLog2(n));
+  insertionSort(arr, 0, n);
 }
 
 int medianOf3(int arr[], int left, int mid, int right) {
@@ -86,7 +99,9 @@ void insertionSort(int arr[], int start, int end) {
   }
 }
 
-int floorLog2(int a) { return (int)floor(log((double)a) / log(2.0)); }
+int floorLog2(int a) {
+  return (int)floor(log((double)a) / log(2.0));
+}
 
 void introsortLoop(int arr[], int lo, int hi, int depthLimit) {
   while (hi - lo > 16) {
@@ -102,11 +117,6 @@ void introsortLoop(int arr[], int lo, int hi, int depthLimit) {
     introsortLoop(arr, p, hi, depthLimit);
     hi = p;
   }
-}
-
-void sort(int arr[], int n) {
-  introsortLoop(arr, 0, n, 2 * floorLog2(n));
-  insertionSort(arr, 0, n);
 }
 
 int main(int argc, char *argv[]) {

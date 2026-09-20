@@ -1,3 +1,15 @@
+fun sort(arr: Array<Int>) {
+  var n = arr.size
+  while (n > 1) {
+    val max = maxIndex(arr, n)
+    if (max != n - 1) {
+      flip(arr, max)
+      flip(arr, n - 1)
+    }
+    n--
+  }
+}
+
 fun flip(arr: Array<Int>, k: Int) {
   var n = k
   var left = 0
@@ -16,18 +28,6 @@ fun maxIndex(arr: Array<Int>, n: Int): Int {
     }
   }
   return index
-}
-
-fun sort(arr: Array<Int>) {
-  var n = arr.size
-  while (n > 1) {
-    val max = maxIndex(arr, n)
-    if (max != n) {
-      flip(arr, max)
-      flip(arr, n - 1)
-    }
-    n--
-  }
 }
 
 fun main() {

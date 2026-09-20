@@ -2,6 +2,12 @@ using System;
 
 public class WeavedMergeSort
 {
+  public static void Sort(int[] arr)
+  {
+    int[] tmp = new int[arr.Length];
+    Merge(arr, tmp, arr.Length, 0, 1);
+  }
+
   private static void Merge(int[] arr, int[] tmp, int length, int residue, int modulus)
   {
     if (residue + modulus >= length)
@@ -54,15 +60,12 @@ public class WeavedMergeSort
     }
   }
 
-  public static void Sort(int[] arr)
-  {
-    int[] tmp = new int[arr.Length];
-    Merge(arr, tmp, arr.Length, 0, 1);
-  }
-
   public static void Main(String[] args)
   {
-    int[] array = { 0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56 };
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     Sort(array);
     string result = "[" + String.Join(", ", array) + "]";
     Console.WriteLine(result);

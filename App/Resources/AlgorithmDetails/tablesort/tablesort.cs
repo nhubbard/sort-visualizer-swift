@@ -2,6 +2,32 @@ using System;
 
 public class TableSort
 {
+  public static void Sort(int[] arr)
+  {
+    int n = arr.Length;
+    int[] table = new int[n];
+    for (int i = 0; i < n; i++) table[i] = i;
+    QuickSort(arr, table, 0, n);
+    for (int i = 0; i < n; i++)
+    {
+      if (table[i] != i)
+      {
+        int t = arr[i];
+        int j = i;
+        int next = table[i];
+        do
+        {
+          arr[j] = arr[next];
+          table[j] = j;
+          j = next;
+          next = table[next];
+        } while (next != i);
+        arr[j] = t;
+        table[j] = j;
+      }
+    }
+  }
+
   public static bool StableComp(int[] arr, int[] table, int a, int b)
   {
     int ta = table[a];
@@ -65,35 +91,12 @@ public class TableSort
     QuickSort(arr, table, p + 1, b);
   }
 
-  public static void Sort(int[] arr)
-  {
-    int n = arr.Length;
-    int[] table = new int[n];
-    for (int i = 0; i < n; i++) table[i] = i;
-    QuickSort(arr, table, 0, n);
-    for (int i = 0; i < n; i++)
-    {
-      if (table[i] != i)
-      {
-        int t = arr[i];
-        int j = i;
-        int next = table[i];
-        do
-        {
-          arr[j] = arr[next];
-          table[j] = j;
-          j = next;
-          next = table[next];
-        } while (next != i);
-        arr[j] = t;
-        table[j] = j;
-      }
-    }
-  }
-
   public static void Main(String[] args)
   {
-    int[] array = { 0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56 };
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     Sort(array);
     string result = "[" + String.Join(", ", array) + "]";
     Console.WriteLine(result);

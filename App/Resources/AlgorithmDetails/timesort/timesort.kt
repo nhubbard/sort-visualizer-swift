@@ -1,30 +1,40 @@
-fun sort(arr: Array<Int>) {
-  val n = arr.size
-  if (n <= 1) return
+fun sort(a: Array<Int>) {
+  val n = a.size
+  if (n < 2) return
+  val scratch = a.copyOf()
+  val buffer = scratch.copyOf()
 
-  // Simulate the reporting order that proportional-to-value sleep durations
-  // would produce in a jitter-free race: sort by value, ties broken by the
-  // original position, i.e. the order the sleeps were originally scheduled.
-  val woken = arr.withIndex().sortedWith(compareBy({ it.value }, { it.index }))
-  for (i in 0 until n) {
-    arr[i] = woken[i].value
+  fun mergeSort(lo: Int, hi: Int) {
+    if (hi - lo < 2) return
+    val mid = lo + (hi - lo) / 2
+    mergeSort(lo, mid)
+    mergeSort(mid, hi)
+    var left = lo
+    var right = mid
+    var dest = lo
+    while (left < mid && right < hi) {
+      if (scratch[left] <= scratch[right]) buffer[dest++] = scratch[left++]
+      else buffer[dest++] = scratch[right++]
+    }
+    while (left < mid) buffer[dest++] = scratch[left++]
+    while (right < hi) buffer[dest++] = scratch[right++]
+    for (i in lo until hi) scratch[i] = buffer[i]
   }
-
-  // Defensive cleanup pass: real scheduling jitter can't be fully trusted,
-  // so finish with an ordinary insertion sort no matter what the race produced.
+  mergeSort(0, n)
+  for (i in 0 until n) a[i] = scratch[i]
   for (i in 1 until n) {
     var j = i
-    while (j > 0 && arr[j - 1] > arr[j]) {
-      val t = arr[j - 1]
-      arr[j - 1] = arr[j]
-      arr[j] = t
+    while (j > 0 && a[j - 1] > a[j]) {
+      val held = a[j - 1]
+      a[j - 1] = a[j]
+      a[j] = held
       j--
     }
   }
 }
 
 fun main() {
-  var array = arrayOf<Int>(
+  val array = arrayOf(
     0, 39, 21, 62, 91, 77, 14, 23,
     90, 69, 51, 81, 68, 83, 32, 56,
   )

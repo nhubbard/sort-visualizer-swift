@@ -19,8 +19,11 @@ public struct OptimizedStoogeSortStudio: SortAlgorithm {
     category: .exchange,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 219, coefficients: [238710, 2185, 5],
+      anchorSize: 55, coefficients: [270669, 66306, 8271.93, 699.113, 44.9548, 2.34275],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .factorial, coefficients: [10.9952, 0.0611306], rSquared: 0.999262),
+    implementationComplexity: 13,
     stable: true,
     timeComplexity: ComplexityBounds(best: "O(n)", average: "O(n^2)", worst: "O(n^2)"),
     spaceComplexity: "O(log n)",

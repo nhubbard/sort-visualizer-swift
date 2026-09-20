@@ -1,17 +1,34 @@
 #include <cstdio>
 #include <utility>
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
+                 90, 69, 51, 81, 68, 83, 32, 56};
 
 void printList(int items[], int size) {
-  for (int i = 0; i < size; i++) {
-    if (i == 0) {
-      printf("[%d, ", items[i]);
-    } else if (i != size - 1) {
-      printf("%d, ", items[i]);
-    } else {
-      printf("%d]", items[i]);
+  printf("[");
+  if (size > 0) {
+    printf("%d", items[0]);
+    for (int i = 1; i < size; i++) {
+      printf(", %d", items[i]);
     }
+  }
+  printf("]");
+}
+
+int bitLength(int value);
+bool isMinLevel(int index);
+bool betterThan(int a, int b, bool minLevel);
+void downheap(int arr[], int start, int size);
+void heapify(int arr[], int length);
+int storeMax(int arr[], int heapSize);
+
+void sort(int arr[], int n) {
+  if (n <= 1)
+    return;
+  heapify(arr, n);
+  int heapSize = n;
+  for (int i = 0; i < n - 1; i++) {
+    heapSize = storeMax(arr, heapSize);
   }
 }
 
@@ -24,7 +41,9 @@ int bitLength(int value) {
   return length;
 }
 
-bool isMinLevel(int index) { return bitLength(index + 1) % 2 == 1; }
+bool isMinLevel(int index) {
+  return bitLength(index + 1) % 2 == 1;
+}
 
 bool betterThan(int a, int b, bool minLevel) {
   return minLevel ? (a < b) : (a > b);
@@ -89,16 +108,6 @@ int storeMax(int arr[], int heapSize) {
   if (imax < newSize)
     downheap(arr, imax, newSize);
   return newSize;
-}
-
-void sort(int arr[], int n) {
-  if (n <= 1)
-    return;
-  heapify(arr, n);
-  int heapSize = n;
-  for (int i = 0; i < n - 1; i++) {
-    heapSize = storeMax(arr, heapSize);
-  }
 }
 
 int main(int argc, char *argv[]) {

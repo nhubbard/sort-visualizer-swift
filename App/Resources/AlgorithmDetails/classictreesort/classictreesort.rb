@@ -1,10 +1,3 @@
-def traverse(arr, temp, lower, upper, idx, r)
-  traverse(arr, temp, lower, upper, idx, lower[r]) if lower[r] != 0
-  temp[idx[0]] = arr[r]
-  idx[0] += 1
-  traverse(arr, temp, lower, upper, idx, upper[r]) if upper[r] != 0
-end
-
 def sort(arr)
   n = arr.length
   return arr if n <= 1
@@ -30,6 +23,14 @@ def sort(arr)
   (0...n).each { |i| arr[i] = temp[i] }
   arr
 end
+
+def traverse(arr, temp, lower, upper, idx, r)
+  traverse(arr, temp, lower, upper, idx, lower[r]) if lower[r] != 0
+  temp[idx[0]] = arr[r]
+  idx[0] += 1
+  traverse(arr, temp, lower, upper, idx, upper[r]) if upper[r] != 0
+end
+
 
 array = [0, 39, 21, 62, 91, 77, 14, 23,
   90, 69, 51, 81, 68, 83, 32, 56]

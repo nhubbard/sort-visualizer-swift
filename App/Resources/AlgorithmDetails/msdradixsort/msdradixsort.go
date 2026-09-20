@@ -4,6 +4,27 @@ import (
 	"fmt"
 )
 
+func sort(arr []int) []int {
+	if len(arr) <= 1 {
+		return arr
+	}
+	radix := 4
+	maxValue := arr[0]
+	for _, v := range arr {
+		if v > maxValue {
+			maxValue = v
+		}
+	}
+	highestPower := 0
+	probe := radix
+	for probe <= maxValue {
+		highestPower++
+		probe *= radix
+	}
+	radixMSD(arr, 0, len(arr), radix, highestPower)
+	return arr
+}
+
 func intPow(base, exponent int) int {
 	result := 1
 	for i := 0; i < exponent; i++ {
@@ -40,27 +61,6 @@ func radixMSD(arr []int, low, high, radix, power int) {
 		radixMSD(arr, start, start+len(bucket), radix, power-1)
 		start += len(bucket)
 	}
-}
-
-func sort(arr []int) []int {
-	if len(arr) <= 1 {
-		return arr
-	}
-	radix := 4
-	maxValue := arr[0]
-	for _, v := range arr {
-		if v > maxValue {
-			maxValue = v
-		}
-	}
-	highestPower := 0
-	probe := radix
-	for probe <= maxValue {
-		highestPower++
-		probe *= radix
-	}
-	radixMSD(arr, 0, len(arr), radix, highestPower)
-	return arr
 }
 
 func main() {

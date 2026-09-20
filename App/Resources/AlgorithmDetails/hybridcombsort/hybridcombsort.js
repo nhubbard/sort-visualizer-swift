@@ -1,16 +1,3 @@
-function insertionSort(arr) {
-  const n = arr.length;
-  for (let i = 1; i < n; i++) {
-    let key = arr[i];
-    let j = i - 1;
-    while (j >= 0 && arr[j] > key) {
-      arr[j + 1] = arr[j];
-      j = j - 1;
-    }
-    arr[j + 1] = key;
-  }
-}
-
 function sort(arr) {
   const n = arr.length;
   let shrink = 1.3;
@@ -37,6 +24,21 @@ function sort(arr) {
   }
 }
 
-var array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56];
+function insertionSort(arr) {
+  const n = arr.length;
+  for (let i = 1; i < n; i++) {
+    let j = i;
+    while (j > 0 && arr[j - 1] > arr[j]) {
+      [arr[j], arr[j - 1]] = [arr[j - 1], arr[j]];
+      j--;
+    }
+  }
+}
+
+
+const array = [
+  0, 39, 21, 62, 91, 77, 14, 23,
+  90, 69, 51, 81, 68, 83, 32, 56,
+];
 sort(array);
 console.log("[" + array.join(", ") + "]");

@@ -1,5 +1,11 @@
 const val THRESHOLD = 32
 
+fun sort(arr: Array<Int>) {
+  val n = arr.size
+  if (n < 2) return
+  mergeSort(arr, 0, n)
+}
+
 fun insertionSort(arr: Array<Int>, start: Int, end: Int) {
   for (i in start + 1 until end) {
     var j = i
@@ -47,12 +53,6 @@ fun mergeSort(arr: Array<Int>, start: Int, end: Int) {
   mergeSort(arr, start, mid)
   mergeSort(arr, mid, end)
   merge(arr, start, mid, end)
-}
-
-fun sort(arr: Array<Int>) {
-  val n = arr.size
-  if (n < 2) return
-  mergeSort(arr, 0, n)
 }
 
 fun main() {

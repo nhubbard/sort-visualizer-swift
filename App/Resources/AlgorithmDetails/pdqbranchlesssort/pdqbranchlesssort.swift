@@ -4,6 +4,16 @@ let partialInsertSortLimit = 8
 let blockSize = 64
 let cachelineSize = 64
 
+func sort(_ arr: inout [Int]) {
+    let n = arr.count
+    if n < 2 {
+        return
+    }
+    var leftOffsets = [Int](repeating: 0, count: blockSize + cachelineSize)
+    var rightOffsets = [Int](repeating: 0, count: blockSize + cachelineSize)
+    pdqLoop(&arr, 0, n, pdqLog(n), &leftOffsets, &rightOffsets)
+}
+
 func pdqLog(_ n0: Int) -> Int {
     var n = n0
     var log = 0
@@ -418,15 +428,6 @@ func pdqLoop(
     }
 }
 
-func sort(_ arr: inout [Int]) {
-    let n = arr.count
-    if n < 2 {
-        return
-    }
-    var leftOffsets = [Int](repeating: 0, count: blockSize + cachelineSize)
-    var rightOffsets = [Int](repeating: 0, count: blockSize + cachelineSize)
-    pdqLoop(&arr, 0, n, pdqLog(n), &leftOffsets, &rightOffsets)
-}
 
 var array: [Int] = [
     0, 39, 21, 62, 91, 77, 14, 23,

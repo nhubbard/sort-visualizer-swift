@@ -6,6 +6,9 @@ import (
 
 func sort(arr []int) []int {
 	n := len(arr)
+	if n == 0 {
+		return arr
+	}
 	ext := make([]int, n)
 	copy(ext, arr)
 	minValue := ext[0]

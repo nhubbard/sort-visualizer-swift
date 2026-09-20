@@ -25,8 +25,11 @@ public struct IterativeTopDownMergeSort: SortAlgorithm {
     category: .merge,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 2390, coefficients: [188980, 92.2662, 0.00294775],
+      anchorSize: 2014, coefficients: [201495, 114.944, 0.00381989],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .powerLog, coefficients: [11.515, 1.01746], rSquared: 0.999847),
+    implementationComplexity: 15,
     stable: true,
     timeComplexity: ComplexityBounds(
       best: "O(n log n)", average: "O(n log n)", worst: "O(n log n)"),
@@ -41,7 +44,7 @@ public struct IterativeTopDownMergeSort: SortAlgorithm {
     guard n >= 2 else { return }
 
     let tempHandle = engine.createAuxArray(length: n)
-    var scratch = engine.values
+    var scratch = engine.readAllValues()
 
     func merge(_ start: Int, _ mid: Int, _ end: Int) {
       var low = start
@@ -49,8 +52,8 @@ public struct IterativeTopDownMergeSort: SortAlgorithm {
       var nxt = start
 
       func take(from source: Int) {
-        scratch[nxt] = engine.values[source]
-        engine.writeAux(tempHandle, at: nxt, value: engine.values[source])
+        scratch[nxt] = engine.readValue(at: source)
+        engine.writeAux(tempHandle, at: nxt, value: engine.readValue(at: source))
       }
 
       while low < mid && high < end {

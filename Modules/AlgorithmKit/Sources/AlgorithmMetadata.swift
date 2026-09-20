@@ -75,6 +75,20 @@ public struct AlgorithmMetadata: Sendable, Codable, Equatable {
   /// `OperationGrowthModel`), used by `effectiveSizeRange(operationCap:)` to compute a live upper
   /// bound instead of trusting `sizeRange.upperBound`'s hand-picked guess.
   public var growthModel: OperationGrowthModel
+  /// The growth family `Tools/GrowthModelCalibration` actually detected for this algorithm,
+  /// before it got Taylor-expanded into `growthModel`. Nil for any algorithm
+  /// `Tools/GrowthModelCalibration/apply_detected_models.py` hasn't processed yet (e.g. one just
+  /// added and not yet calibrated). Mostly display metadata (the growth-comparison chart), but
+  /// also the curve `estimatedOperations(atSize:)` evaluates -- see that method's own doc comment
+  /// for why `growthModel` itself is the wrong one to use there.
+  public var detectedGrowthModel: DetectedGrowthModel?
+  /// A McCabe-style cyclomatic complexity score for this algorithm's Swift port, computed by
+  /// `Tools/ImplementationComplexity/compute_complexity.py` and baked in the same way
+  /// `growthModel` is -- walking the call graph from `record(into:)` through same-file helpers
+  /// and any shared sorting template it calls (see that script's own doc comment), so a thin
+  /// wrapper around a heavily-branched template doesn't read as artificially simple. Lets the UI
+  /// make the point that a more complex-looking implementation isn't necessarily slower.
+  public var implementationComplexity: Int
   public var stable: Bool
   public var timeComplexity: ComplexityBounds
   public var spaceComplexity: String
@@ -85,6 +99,8 @@ public struct AlgorithmMetadata: Sendable, Codable, Equatable {
     category: AlgorithmCategory,
     sizeRange: ClosedRange<Int>,
     growthModel: OperationGrowthModel,
+    detectedGrowthModel: DetectedGrowthModel? = nil,
+    implementationComplexity: Int,
     stable: Bool,
     timeComplexity: ComplexityBounds,
     spaceComplexity: String,
@@ -94,6 +110,8 @@ public struct AlgorithmMetadata: Sendable, Codable, Equatable {
     self.category = category
     self.sizeRange = sizeRange
     self.growthModel = growthModel
+    self.detectedGrowthModel = detectedGrowthModel
+    self.implementationComplexity = implementationComplexity
     self.stable = stable
     self.timeComplexity = timeComplexity
     self.spaceComplexity = spaceComplexity
@@ -134,5 +152,30 @@ public struct AlgorithmMetadata: Sendable, Codable, Equatable {
     let step = (sizeRange.lowerBound...rawMaxSize).steppedSizeStep
     let steppedMaxSize = sizeRange.lowerBound + step * ((rawMaxSize - sizeRange.lowerBound) / step)
     return sizeRange.lowerBound...steppedMaxSize
+  }
+
+  /// A "how long will this actually take to run" estimate for ranking algorithms against each
+  /// other, evaluated from `detectedGrowthModel` -- NOT `growthModel`. `growthModel` is a Taylor
+  /// polynomial expanded around `anchorSize`, which `apply_growth_models.py` picks to hit a
+  /// specific operation-count cap (see `OperationGrowthModel`'s doc comment); for any algorithm
+  /// fast enough that reaching that cap takes more elements than this app ever displays (most of
+  /// them -- `anchorSize` is comfortably past 256 for the large majority of built-in algorithms),
+  /// evaluating it at a small, fixed reference size like `AppSettings.defaultArraySize` isn't a
+  /// modest extrapolation, it's hundreds of units away from the only region the polynomial was
+  /// ever fit to track -- and a several-term polynomial evaluated that far from its anchor doesn't
+  /// degrade gracefully, it can swing wildly negative (confirmed: Cocktail Merge Sort's own
+  /// 5th-degree fit, anchored at `n = 756`, predicts *-525,476* operations at `n = 256`).
+  /// `detectedGrowthModel` doesn't have this problem: it's the actual functional family
+  /// (`Tools/GrowthModelCalibration` fits power-law/power-log/exponential/etc. shapes, not a local
+  /// polynomial) fit across every sampled size from calibration, which starts near `sizeRange`'s
+  /// own lower bound -- so it stays trustworthy at the sizes this feature actually evaluates.
+  /// `nil` when `detectedGrowthModel` itself is `nil` (not yet calibrated) or when `n` falls
+  /// outside `sizeRange` -- the latter so an algorithm that's only ever practical on tiny arrays
+  /// can't rank as deceptively "fast" just because it was never asked to run at a comparable
+  /// scale; the intended reading for a `nil` result is "not practical at this size," not
+  /// "unknown."
+  public func estimatedOperations(atSize n: Int) -> Double? {
+    guard sizeRange.contains(n) else { return nil }
+    return detectedGrowthModel?.predictedOperations(atSize: Double(n))
   }
 }

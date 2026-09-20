@@ -17,8 +17,11 @@ public struct SimpleShatterSort: SortAlgorithm {
     category: .distribution,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 16527, coefficients: [239998, 24.634, 0.000611972],
+      anchorSize: 8428, coefficients: [239975, 47.2573, 0.00223014],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .polynomialIntercept, coefficients: [0.00223014, 9.66618, 99.1472], rSquared: 0.998699),
+    implementationComplexity: 14,
     stable: true,
     timeComplexity: ComplexityBounds(
       best: "O(n)", average: "O(n log n)", worst: "O(n^2)"),

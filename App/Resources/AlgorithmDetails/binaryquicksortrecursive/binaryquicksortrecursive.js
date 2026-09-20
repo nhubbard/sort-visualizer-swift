@@ -1,3 +1,14 @@
+function sort(arr) {
+  const n = arr.length;
+  if (n < 2) return arr;
+  let maxValue = arr[0];
+  for (let i = 1; i < n; i++) {
+    if (arr[i] > maxValue) maxValue = arr[i];
+  }
+  const bit = mostSignificantBit(maxValue);
+  binaryQuickSortRecursive(arr, 0, n - 1, bit);
+}
+
 function mostSignificantBit(value) {
   if (value === 0) return -1;
   let bit = 0;
@@ -31,16 +42,10 @@ function binaryQuickSortRecursive(arr, p, r, bit) {
   }
 }
 
-function sort(arr) {
-  const n = arr.length;
-  let maxValue = arr[0];
-  for (let i = 1; i < n; i++) {
-    if (arr[i] > maxValue) maxValue = arr[i];
-  }
-  const bit = mostSignificantBit(maxValue);
-  binaryQuickSortRecursive(arr, 0, n - 1, bit);
-}
 
-var array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56];
+const array = [
+  0, 39, 21, 62, 91, 77, 14, 23,
+  90, 69, 51, 81, 68, 83, 32, 56,
+];
 sort(array);
 console.log("[" + array.join(", ") + "]");

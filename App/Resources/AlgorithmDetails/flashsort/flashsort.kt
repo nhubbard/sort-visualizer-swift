@@ -1,3 +1,7 @@
+fun sort(arr: IntArray) {
+  flashSort(arr)
+}
+
 fun classify(value: Int, minValue: Int, c: Double): Int = ((value - minValue) * c).toInt() + 1
 
 fun flashSort(array: IntArray) {
@@ -91,10 +95,6 @@ fun flashSort(array: IntArray) {
     }
     array[pos + 1] = current
   }
-}
-
-fun sort(arr: IntArray) {
-  flashSort(arr)
 }
 
 fun main() {

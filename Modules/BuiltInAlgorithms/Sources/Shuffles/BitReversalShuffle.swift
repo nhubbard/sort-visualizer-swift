@@ -76,7 +76,7 @@ public struct BitReversalShuffle: ShuffleAlgorithm {
       }
     }
 
-    let original = engine.values
+    let original = engine.readAllValues()
     for i in 0..<n {
       engine.setValue(i, original[arr[i]])
     }

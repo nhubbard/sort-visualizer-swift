@@ -8,8 +8,11 @@ public struct PancakeSort: SortAlgorithm {
     category: .miscellaneous,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 228, coefficients: [238503, 2093.78, 4.5946],
+      anchorSize: 228, coefficients: [238501, 2093.78, 4.5946],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .polynomialIntercept, coefficients: [4.5946, -1.35518, -35.802], rSquared: 1),
+    implementationComplexity: 7,
     stable: false,
     timeComplexity: ComplexityBounds(best: "O(n^2)", average: "O(n^2)", worst: "O(n^2)"),
     spaceComplexity: "O(1)",

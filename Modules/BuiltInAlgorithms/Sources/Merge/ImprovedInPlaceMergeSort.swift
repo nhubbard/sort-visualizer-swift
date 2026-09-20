@@ -32,8 +32,11 @@ public struct ImprovedInPlaceMergeSort: SortAlgorithm {
     category: .merge,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 661, coefficients: [239574, 704.958, 0.51783],
+      anchorSize: 473, coefficients: [239097, 988.749, 1.0209],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .polynomialIntercept, coefficients: [1.0209, 22.9803, -177.246], rSquared: 0.999999),
+    implementationComplexity: 12,
     stable: true,
     timeComplexity: ComplexityBounds(best: "O(n log n)", average: "O(n^2)", worst: "O(n^2)"),
     spaceComplexity: "O(log n)",
@@ -48,10 +51,10 @@ public struct ImprovedInPlaceMergeSort: SortAlgorithm {
 
     func push(_ p: Int, _ a: Int, _ b: Int) {
       guard a != b else { return }
-      let temp = engine.values[p]
-      engine.setValue(p, engine.values[a])
+      let temp = engine.readValue(at: p)
+      engine.setValue(p, engine.readValue(at: a))
       for i in (a + 1)..<b {
-        engine.setValue(i - 1, engine.values[i])
+        engine.setValue(i - 1, engine.readValue(at: i))
       }
       engine.setValue(b - 1, temp)
     }

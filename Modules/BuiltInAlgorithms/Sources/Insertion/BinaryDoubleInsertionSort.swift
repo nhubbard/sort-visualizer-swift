@@ -21,8 +21,11 @@ public struct BinaryDoubleInsertionSort: SortAlgorithm {
     category: .insertion,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 973, coefficients: [239538, 489.325, 0.249887],
+      anchorSize: 661, coefficients: [239688, 705.179, 0.517896],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .polynomialIntercept, coefficients: [0.517896, 20.5204, -155.952], rSquared: 0.999999),
+    implementationComplexity: 17,
     stable: true,
     timeComplexity: ComplexityBounds(best: "O(n)", average: "O(n^2)", worst: "O(n^2)"),
     spaceComplexity: "O(1)",
@@ -40,7 +43,7 @@ public struct BinaryDoubleInsertionSort: SortAlgorithm {
       var hi = b
       while lo < hi {
         let mid = lo + (hi - lo) / 2
-        if val <= engine.values[mid] {
+        if engine.compareValue(mid, against: val, by: (>=)) {
           hi = mid
         } else {
           lo = mid + 1
@@ -56,7 +59,7 @@ public struct BinaryDoubleInsertionSort: SortAlgorithm {
       var hi = b
       while lo < hi {
         let mid = lo + (hi - lo) / 2
-        if val < engine.values[mid] {
+        if engine.compareValue(mid, against: val, by: (>)) {
           hi = mid
         } else {
           lo = mid + 1
@@ -71,7 +74,7 @@ public struct BinaryDoubleInsertionSort: SortAlgorithm {
     func insertToLeft(_ a: Int, _ b: Int, _ temp: Int) {
       var a = a
       while a > b {
-        engine.setValue(a, engine.values[a - 1])
+        engine.setValue(a, engine.readValue(at: a - 1))
         a -= 1
       }
       engine.setValue(b, temp)
@@ -82,7 +85,7 @@ public struct BinaryDoubleInsertionSort: SortAlgorithm {
     func insertToRight(_ a: Int, _ b: Int, _ temp: Int) {
       var a = a
       while a < b {
-        engine.setValue(a, engine.values[a + 1])
+        engine.setValue(a, engine.readValue(at: a + 1))
         a += 1
       }
       engine.setValue(a, temp)
@@ -114,8 +117,8 @@ public struct BinaryDoubleInsertionSort: SortAlgorithm {
         if engine.compare(i, j, by: (>)) {
           // `l`/`r` are captured *before* either insertion below writes anything,
           // matching ArrayV's `int l = array[j]; int r = array[i];` ordering exactly.
-          let l = engine.values[j]
-          let r = engine.values[i]
+          let l = engine.readValue(at: j)
+          let r = engine.readValue(at: i)
 
           // `l` (from `j`) uses `rightBinarySearch`; `r` (from `i`) uses `leftBinarySearch` —
           // see the type-level stability note for why.
@@ -124,8 +127,8 @@ public struct BinaryDoubleInsertionSort: SortAlgorithm {
           let dest = leftBinarySearch(m, j, r)
           insertToLeft(j, dest, r)
         } else {
-          let l = engine.values[i]
-          let r = engine.values[j]
+          let l = engine.readValue(at: i)
+          let r = engine.readValue(at: j)
 
           // Branches swapped relative to the `if` above: `l` (from `i`) now uses
           // `leftBinarySearch`, `r` (from `j`) uses `rightBinarySearch`.

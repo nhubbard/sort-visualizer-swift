@@ -4,6 +4,16 @@ import (
 	"fmt"
 )
 
+func sort(arr []int) []int {
+	n := len(arr)
+	idx := make([]int, n)
+	for i := 0; i < n; i++ {
+		idx[i] = i
+	}
+	permute(arr, idx, n, n)
+	return arr
+}
+
 func isSorted(arr []int) bool {
 	for i := 1; i < len(arr); i++ {
 		if arr[i] < arr[i-1] {
@@ -40,17 +50,9 @@ func permute(arr []int, idx []int, length int, n int) bool {
 	return false
 }
 
-func sort(arr []int) []int {
-	n := len(arr)
-	idx := make([]int, n)
-	for i := 0; i < n; i++ {
-		idx[i] = i
-	}
-	permute(arr, idx, n, n)
-	return arr
-}
-
 func main() {
-	array := []int{0, 39, 21, 62, 91, 14, 23}
+	array := []int{
+		0, 39, 21, 62, 91, 14, 23,
+	}
 	fmt.Println(sort(array))
 }

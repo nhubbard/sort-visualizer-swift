@@ -1,29 +1,3 @@
-fun intPow(base: Int, exponent: Int): Int {
-  var result = 1
-  for (i in 0 until exponent) {
-    result *= base
-  }
-  return result
-}
-
-fun getDigit(value: Int, power: Int, radix: Int): Int = (value / intPow(radix, power)) % radix
-
-fun multiSwap(arr: Array<Int>, pos: Int, to: Int) {
-  if (to > pos) {
-    for (k in pos until to) {
-      val temp = arr[k]
-      arr[k] = arr[k + 1]
-      arr[k + 1] = temp
-    }
-  } else if (to < pos) {
-    for (k in pos downTo to + 1) {
-      val temp = arr[k]
-      arr[k] = arr[k - 1]
-      arr[k - 1] = temp
-    }
-  }
-}
-
 fun sort(arr: Array<Int>) {
   val n = arr.size
   if (n == 0) {
@@ -63,6 +37,32 @@ fun sort(arr: Array<Int>) {
           vregs[j - 1]--
         }
       }
+    }
+  }
+}
+
+fun intPow(base: Int, exponent: Int): Int {
+  var result = 1
+  for (i in 0 until exponent) {
+    result *= base
+  }
+  return result
+}
+
+fun getDigit(value: Int, power: Int, radix: Int): Int = (value / intPow(radix, power)) % radix
+
+fun multiSwap(arr: Array<Int>, pos: Int, to: Int) {
+  if (to > pos) {
+    for (k in pos until to) {
+      val temp = arr[k]
+      arr[k] = arr[k + 1]
+      arr[k + 1] = temp
+    }
+  } else if (to < pos) {
+    for (k in pos downTo to + 1) {
+      val temp = arr[k]
+      arr[k] = arr[k - 1]
+      arr[k - 1] = temp
     }
   }
 }

@@ -6,6 +6,9 @@ import (
 
 func sort(arr []int) []int {
 	n := len(arr)
+	if n <= 1 {
+		return arr
+	}
 	index := 0
 	for index < n {
 		if index == 0 {

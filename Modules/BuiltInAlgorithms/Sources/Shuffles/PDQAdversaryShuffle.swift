@@ -70,7 +70,7 @@ public struct PDQAdversaryShuffle: ShuffleAlgorithm {
       return temp[a] < temp[b]
     }
 
-    let copy = engine.values
+    let copy = engine.readAllValues()
     for i in 0..<n {
       engine.setValue(i, i)
     }
@@ -100,14 +100,14 @@ public struct PDQAdversaryShuffle: ShuffleAlgorithm {
   ) {
     guard begin != end else { return }
     for cur in (begin + 1)..<end where engine.compare(cur, cur - 1, by: less) {
-      let tmp = engine.values[cur]
+      let tmp = engine.readValue(at: cur)
       var sift = cur
       var siftMinusOne = cur - 1
       repeat {
-        engine.setValue(sift, engine.values[siftMinusOne])
+        engine.setValue(sift, engine.readValue(at: siftMinusOne))
         sift -= 1
         siftMinusOne -= 1
-      } while sift != begin && less(tmp, engine.values[siftMinusOne])
+      } while sift != begin && less(tmp, engine.readValue(at: siftMinusOne))
       engine.setValue(sift, tmp)
     }
   }
@@ -117,14 +117,14 @@ public struct PDQAdversaryShuffle: ShuffleAlgorithm {
   ) {
     guard begin != end else { return }
     for cur in (begin + 1)..<end where engine.compare(cur, cur - 1, by: less) {
-      let tmp = engine.values[cur]
+      let tmp = engine.readValue(at: cur)
       var sift = cur
       var siftMinusOne = cur - 1
       repeat {
-        engine.setValue(sift, engine.values[siftMinusOne])
+        engine.setValue(sift, engine.readValue(at: siftMinusOne))
         sift -= 1
         siftMinusOne -= 1
-      } while less(tmp, engine.values[siftMinusOne])
+      } while less(tmp, engine.readValue(at: siftMinusOne))
       engine.setValue(sift, tmp)
     }
   }
@@ -137,14 +137,14 @@ public struct PDQAdversaryShuffle: ShuffleAlgorithm {
     for cur in (begin + 1)..<end {
       if limit > Self.partialInsertSortLimit { return false }
       if engine.compare(cur, cur - 1, by: less) {
-        let tmp = engine.values[cur]
+        let tmp = engine.readValue(at: cur)
         var sift = cur
         var siftMinusOne = cur - 1
         repeat {
-          engine.setValue(sift, engine.values[siftMinusOne])
+          engine.setValue(sift, engine.readValue(at: siftMinusOne))
           sift -= 1
           siftMinusOne -= 1
-        } while sift != begin && less(tmp, engine.values[siftMinusOne])
+        } while sift != begin && less(tmp, engine.readValue(at: siftMinusOne))
         engine.setValue(sift, tmp)
         limit += cur - sift
       }
@@ -224,8 +224,8 @@ public struct PDQAdversaryShuffle: ShuffleAlgorithm {
     }
 
     let pivotPos = first - 1
-    let pivotValue = engine.values[begin]
-    engine.setValue(begin, engine.values[pivotPos])
+    let pivotValue = engine.readValue(at: begin)
+    engine.setValue(begin, engine.readValue(at: pivotPos))
     engine.setValue(pivotPos, pivotValue)
     return (pivotPos, alreadyParted)
   }
@@ -251,8 +251,8 @@ public struct PDQAdversaryShuffle: ShuffleAlgorithm {
     }
 
     let pivotPos = last
-    let pivotValue = engine.values[begin]
-    engine.setValue(begin, engine.values[pivotPos])
+    let pivotValue = engine.readValue(at: begin)
+    engine.setValue(begin, engine.readValue(at: pivotPos))
     engine.setValue(pivotPos, pivotValue)
     return pivotPos
   }

@@ -1,16 +1,5 @@
 import Foundation
 
-func traverse(_ arr: [Int], _ temp: inout [Int], _ lower: [Int], _ upper: [Int], _ idx: inout Int, _ r: Int) {
-    if lower[r] != 0 {
-        traverse(arr, &temp, lower, upper, &idx, lower[r])
-    }
-    temp[idx] = arr[r]
-    idx += 1
-    if upper[r] != 0 {
-        traverse(arr, &temp, lower, upper, &idx, upper[r])
-    }
-}
-
 func sort(_ arr: inout [Int]) {
     let n = arr.count
     if n <= 1 {
@@ -45,6 +34,18 @@ func sort(_ arr: inout [Int]) {
     traverse(arr, &temp, lower, upper, &idx, 0)
     arr = temp
 }
+
+func traverse(_ arr: [Int], _ temp: inout [Int], _ lower: [Int], _ upper: [Int], _ idx: inout Int, _ r: Int) {
+    if lower[r] != 0 {
+        traverse(arr, &temp, lower, upper, &idx, lower[r])
+    }
+    temp[idx] = arr[r]
+    idx += 1
+    if upper[r] != 0 {
+        traverse(arr, &temp, lower, upper, &idx, upper[r])
+    }
+}
+
 
 var array: [Int] = [
     0, 39, 21, 62, 91, 77, 14, 23,

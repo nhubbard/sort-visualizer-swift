@@ -1,6 +1,10 @@
 import java.util.Arrays;
 
 public class matrixsort {
+  public static void sort(int[] arr) {
+    matrixSort(arr, 0, arr.length, 1, true);
+  }
+
   private static int dirCompareVal(int left, int right, boolean dir) {
     int res;
     if (left > right) {
@@ -114,10 +118,6 @@ public class matrixsort {
 
       return did;
     }
-  }
-
-  public static void sort(int[] arr) {
-    matrixSort(arr, 0, arr.length, 1, true);
   }
 
   public static void main(String[] args) {

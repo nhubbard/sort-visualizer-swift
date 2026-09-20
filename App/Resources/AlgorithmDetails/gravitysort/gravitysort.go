@@ -4,6 +4,11 @@ import (
 	"fmt"
 )
 
+func sort(arr []int) []int {
+	gravitySort(arr)
+	return arr
+}
+
 func gravitySort(arr []int) {
 	n := len(arr)
 	if n == 0 {
@@ -46,11 +51,6 @@ func gravitySort(arr []int) {
 			arr[i] += inc
 		}
 	}
-}
-
-func sort(arr []int) []int {
-	gravitySort(arr)
-	return arr
 }
 
 func main() {

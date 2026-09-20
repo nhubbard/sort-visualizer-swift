@@ -2,6 +2,47 @@ using System;
 
 public class CocktailMergeSort
 {
+  public static void Sort(int[] array)
+  {
+    int n = array.Length;
+    if (n <= 1)
+    {
+      return;
+    }
+    int minRun = MinRunLength(n);
+    if (n == minRun)
+    {
+      CocktailShakerSort(array, 0, n);
+      return;
+    }
+    int i = 0;
+    while (i <= n - minRun)
+    {
+      CocktailShakerSort(array, i, i + minRun);
+      i += minRun;
+    }
+    if (i < n)
+    {
+      CocktailShakerSort(array, i, n);
+    }
+    int width = minRun;
+    while (width < n)
+    {
+      i = 0;
+      while (i < n)
+      {
+        int mid = Math.Min(i + width, n);
+        int end = Math.Min(i + 2 * width, n);
+        if (mid < end)
+        {
+          Merge(array, i, mid, end);
+        }
+        i += 2 * width;
+      }
+      width *= 2;
+    }
+  }
+
   public static int MinRunLength(int n)
   {
     int r = 0;
@@ -91,50 +132,12 @@ public class CocktailMergeSort
     }
   }
 
-  public static void Sort(int[] array)
-  {
-    int n = array.Length;
-    if (n <= 1)
-    {
-      return;
-    }
-    int minRun = MinRunLength(n);
-    if (n == minRun)
-    {
-      CocktailShakerSort(array, 0, n);
-      return;
-    }
-    int i = 0;
-    while (i <= n - minRun)
-    {
-      CocktailShakerSort(array, i, i + minRun);
-      i += minRun;
-    }
-    if (i < n)
-    {
-      CocktailShakerSort(array, i, n);
-    }
-    int width = minRun;
-    while (width < n)
-    {
-      i = 0;
-      while (i < n)
-      {
-        int mid = Math.Min(i + width, n);
-        int end = Math.Min(i + 2 * width, n);
-        if (mid < end)
-        {
-          Merge(array, i, mid, end);
-        }
-        i += 2 * width;
-      }
-      width *= 2;
-    }
-  }
-
   public static void Main(String[] args)
   {
-    int[] array = { 0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56 };
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     Sort(array);
     string result = "[" + String.Join(", ", array) + "]";
     Console.WriteLine(result);

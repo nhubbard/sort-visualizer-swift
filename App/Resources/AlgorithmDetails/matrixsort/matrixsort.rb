@@ -1,5 +1,10 @@
 MatrixShape = Struct.new(:width, :insert_last)
 
+def sort(arr)
+  matrix_sort(arr, 0, arr.length, 1, true)
+  arr
+end
+
 def dir_compare_val(left, right, dir)
   res = if left > right
     1
@@ -101,10 +106,6 @@ def matrix_sort(array, start, fin, gap, dir)
   end
 end
 
-def sort(arr)
-  matrix_sort(arr, 0, arr.length, 1, true)
-  arr
-end
 
 array = [15, 3, 22, 8, 19, 1, 24, 11, 6, 20,
   9, 17, 2, 14, 23, 5, 18, 0, 12, 21,

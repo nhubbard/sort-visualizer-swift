@@ -1,3 +1,25 @@
+def sort(arr)
+  n = arr.length
+  table = (0...n).to_a
+  quick_sort(arr, table, 0, n)
+  (0...n).each do |i|
+    next if table[i] == i
+
+    t = arr[i]
+    j = i
+    nxt = table[i]
+    loop do
+      arr[j] = arr[nxt]
+      table[j] = j
+      j = nxt
+      nxt = table[nxt]
+      break unless nxt != i
+    end
+    arr[j] = t
+    table[j] = j
+  end
+end
+
 def stable_comp(arr, table, a, b)
   ta = table[a]
   tb = table[b]
@@ -50,27 +72,6 @@ def quick_sort(arr, table, a, b)
   quick_sort(arr, table, p + 1, b)
 end
 
-def sort(arr)
-  n = arr.length
-  table = (0...n).to_a
-  quick_sort(arr, table, 0, n)
-  (0...n).each do |i|
-    next if table[i] == i
-
-    t = arr[i]
-    j = i
-    nxt = table[i]
-    loop do
-      arr[j] = arr[nxt]
-      table[j] = j
-      j = nxt
-      nxt = table[nxt]
-      break unless nxt != i
-    end
-    arr[j] = t
-    table[j] = j
-  end
-end
 
 array = [0, 39, 21, 62, 91, 77, 14, 23,
   90, 69, 51, 81, 68, 83, 32, 56]

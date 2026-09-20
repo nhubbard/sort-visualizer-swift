@@ -13,8 +13,11 @@ public struct BingoSort: SortAlgorithm {
     category: .selection,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 7700, coefficients: [239958, 58.86, 0.00359711],
+      anchorSize: 271, coefficients: [239758, 1765.49, 3.24996],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .polynomialIntercept, coefficients: [3.24996, 4.01626, -10.2321], rSquared: 1),
+    implementationComplexity: 12,
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n+m^2)", average: "O(n \\times m)", worst: "O(n \\times m)"),
@@ -28,44 +31,41 @@ public struct BingoSort: SortAlgorithm {
     guard n > 1 else { return }
 
     var maximum = n - 1
-    // `next` is a held value, not a live index — same held-value-vs-array-value pattern as
-    // CycleSort's cached `t`, so this reads `engine.values` directly instead of going through
-    // `engine.compare` (which only supports index-vs-index comparisons).
-    var next = engine.values[maximum]
+    // `next`/`val` are held values, not live indices — same held-value-vs-array-value pattern
+    // as CycleSort's cached `t`, so comparisons against them go through `engine.compareValue`
+    // rather than `engine.compare` (which only supports index-vs-index).
+    var next = engine.readValue(at: maximum)
     var i = maximum - 1
     while i >= 0 {
-      if engine.values[i] > next {
-        next = engine.values[i]
+      if engine.compareValue(i, against: next, by: >) {
+        next = engine.readValue(at: i)
       }
       i -= 1
     }
     // Skip past any elements at the tail that already equal the true maximum — nothing to do
     // for them yet.
-    while maximum > 0 && engine.values[maximum] == next {
+    while maximum > 0 && engine.compareValue(maximum, against: next, by: ==) {
       maximum -= 1
     }
 
     while maximum > 0 {
       let val = next
-      next = engine.values[maximum]
+      next = engine.readValue(at: maximum)
 
       // `j`'s starting bound is fixed here, before any swaps in this pass can move
       // `maximum` — mirrors ArrayV's `for (int j = maximum - 1; j >= 0; j--)`, whose
       // initializer runs exactly once even though the loop body mutates `maximum`.
       var j = maximum - 1
       while j >= 0 {
-        // Held-value equality against the local `val` — ArrayV routes this one through
-        // `Reads.compareValues` for its own stat tracking, but `val` is still a local, not
-        // a live index, so the held-value pattern applies regardless: read directly.
-        if engine.values[j] == val {
+        if engine.compareValue(j, against: val, by: ==) {
           engine.swap(j, maximum)
           maximum -= 1
-        } else if engine.values[j] > next {
-          next = engine.values[j]
+        } else if engine.compareValue(j, against: next, by: >) {
+          next = engine.readValue(at: j)
         }
         j -= 1
       }
-      while maximum > 0 && engine.values[maximum] == next {
+      while maximum > 0 && engine.compareValue(maximum, against: next, by: ==) {
         maximum -= 1
       }
     }

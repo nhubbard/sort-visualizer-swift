@@ -1,3 +1,7 @@
+function sort(arr) {
+  cycleSort(arr);
+}
+
 function cycleSort(array) {
   var n = array.length;
   for (var cycleStart = 0; cycleStart < n - 1; cycleStart++) {
@@ -21,10 +25,10 @@ function cycleSort(array) {
   return array;
 }
 
-function sort(arr) {
-  cycleSort(arr);
-}
 
-var array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56];
+const array = [
+  0, 39, 21, 62, 91, 77, 14, 23,
+  90, 69, 51, 81, 68, 83, 32, 56,
+];
 sort(array);
 console.log("[" + array.join(", ") + "]");

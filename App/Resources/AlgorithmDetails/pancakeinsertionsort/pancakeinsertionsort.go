@@ -6,6 +6,58 @@ import (
 
 // flip reverses arr[0..hi] in place. This is the only move the algorithm ever performs; there
 // is no per-element shift anywhere.
+func sort(arr []int) []int {
+	n := len(arr)
+	if n < 2 {
+		return arr
+	}
+
+	ascending := sortFirstThree(arr, n)
+
+	for i := 3; i < n; i++ {
+		if ascending {
+			if arr[i-1] <= arr[i] {
+				// Already fits; the ascending prefix already ends at or below the new element.
+				continue
+			}
+			if arr[0] > arr[i] {
+				// The new element is smaller than everything in the prefix -- one flip turns the
+				// whole thing, including the new element, into a descending run.
+				flip(arr, i-1)
+				ascending = false
+				continue
+			}
+			idx := searchAscending(arr, 0, i, i)
+			flip(arr, i)
+			tail := i - idx
+			flip(arr, tail)
+			flip(arr, tail-1)
+			ascending = false
+		} else {
+			if arr[i-1] > arr[i] {
+				continue
+			}
+			if arr[0] <= arr[i] {
+				flip(arr, i-1)
+				ascending = true
+				continue
+			}
+			idx := searchDescending(arr, 0, i, i)
+			flip(arr, i)
+			tail := i - idx
+			flip(arr, tail)
+			flip(arr, tail-1)
+			ascending = true
+		}
+	}
+
+	if !ascending {
+		flip(arr, n-1)
+	}
+
+	return arr
+}
+
 func flip(arr []int, hi int) {
 	lo := 0
 	for lo < hi {
@@ -71,58 +123,6 @@ func sortFirstThree(arr []int, n int) bool {
 		return true
 	}
 	return true
-}
-
-func sort(arr []int) []int {
-	n := len(arr)
-	if n < 2 {
-		return arr
-	}
-
-	ascending := sortFirstThree(arr, n)
-
-	for i := 3; i < n; i++ {
-		if ascending {
-			if arr[i-1] <= arr[i] {
-				// Already fits; the ascending prefix already ends at or below the new element.
-				continue
-			}
-			if arr[0] > arr[i] {
-				// The new element is smaller than everything in the prefix -- one flip turns the
-				// whole thing, including the new element, into a descending run.
-				flip(arr, i-1)
-				ascending = false
-				continue
-			}
-			idx := searchAscending(arr, 0, i, i)
-			flip(arr, i)
-			tail := i - idx
-			flip(arr, tail)
-			flip(arr, tail-1)
-			ascending = false
-		} else {
-			if arr[i-1] > arr[i] {
-				continue
-			}
-			if arr[0] <= arr[i] {
-				flip(arr, i-1)
-				ascending = true
-				continue
-			}
-			idx := searchDescending(arr, 0, i, i)
-			flip(arr, i)
-			tail := i - idx
-			flip(arr, tail)
-			flip(arr, tail-1)
-			ascending = true
-		}
-	}
-
-	if !ascending {
-		flip(arr, n-1)
-	}
-
-	return arr
 }
 
 func main() {

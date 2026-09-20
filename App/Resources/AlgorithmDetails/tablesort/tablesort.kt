@@ -1,3 +1,24 @@
+fun sort(arr: Array<Int>) {
+  val n = arr.size
+  val table = Array(n) { it }
+  quickSort(arr, table, 0, n)
+  for (i in 0 until n) {
+    if (table[i] != i) {
+      val t = arr[i]
+      var j = i
+      var next = table[i]
+      do {
+        arr[j] = arr[next]
+        table[j] = j
+        j = next
+        next = table[next]
+      } while (next != i)
+      arr[j] = t
+      table[j] = j
+    }
+  }
+}
+
 fun stableComp(arr: Array<Int>, table: Array<Int>, a: Int, b: Int): Boolean {
   val ta = table[a]
   val tb = table[b]
@@ -48,27 +69,6 @@ fun quickSort(arr: Array<Int>, table: Array<Int>, a: Int, b: Int) {
   table[a] = table[p].also { table[p] = table[a] }
   quickSort(arr, table, a, p)
   quickSort(arr, table, p + 1, b)
-}
-
-fun sort(arr: Array<Int>) {
-  val n = arr.size
-  val table = Array(n) { it }
-  quickSort(arr, table, 0, n)
-  for (i in 0 until n) {
-    if (table[i] != i) {
-      val t = arr[i]
-      var j = i
-      var next = table[i]
-      do {
-        arr[j] = arr[next]
-        table[j] = j
-        j = next
-        next = table[next]
-      } while (next != i)
-      arr[j] = t
-      table[j] = j
-    }
-  }
 }
 
 fun main() {

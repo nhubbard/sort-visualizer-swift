@@ -1,3 +1,17 @@
+def sort(arr):
+    n = len(arr)
+    if n <= 1:
+        return
+
+    radix = 4
+    max_value = max(arr)
+
+    divisor = 1
+    while max_value // divisor >= radix:
+        divisor *= radix
+
+    flag_sort(arr, 0, n, divisor, radix)
+
 def digit_at(value, divisor, radix):
     return (value // divisor) % radix
 
@@ -43,22 +57,12 @@ def flag_sort(arr, low, high, divisor, radix):
                 flag_sort(arr, begin, end, divisor // radix, radix)
 
 
-def sort(arr):
-    n = len(arr)
-    if n <= 1:
-        return
-
-    radix = 10
-    max_value = max(arr)
-
-    divisor = 1
-    while max_value // divisor >= radix:
-        divisor *= radix
-
-    flag_sort(arr, 0, n, divisor, radix)
 
 
 if __name__ == "__main__":
-    array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56]
+    array = [
+        0, 39, 21, 62, 91, 77, 14, 23,
+        90, 69, 51, 81, 68, 83, 32, 56,
+    ]
     sort(array)
     print(array)

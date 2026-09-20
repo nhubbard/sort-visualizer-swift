@@ -20,13 +20,16 @@ public struct WeavedMergeSort: SortAlgorithm {
     category: .merge,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 5553, coefficients: [139568, 28.052],
+      anchorSize: 2398, coefficients: [191514, 91.6224, 0.00253767],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .powerLog, coefficients: [8.8701, 1.01873], rSquared: 0.999878),
     // The tie-break (`cmp == 0 && low > high` picks `array[high]`) decides between equal values
     // by their current strided *position*, not original input order — and since interleaving
     // scatters an original run of equal values across many strided sub-sequences, this does NOT
     // reduce to "preserve original order" the way a normal stable merge's tie-break does.
     // Confirmed via tagged-duplicate fuzzing: ties come out reordered.
+    implementationComplexity: 13,
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n log n)", average: "O(n log n)", worst: "O(n log n)"),
@@ -44,7 +47,7 @@ public struct WeavedMergeSort: SortAlgorithm {
     // The real backing store for the scratch buffer — `writeAux` only feeds the tape/visualizer,
     // it can't be read back, so the merge's actual working data lives here (mirroring how
     // `BottomUpMergeSort`/`MergeSort` keep their own shadow arrays alongside the aux writes).
-    var tmp = engine.values
+    var tmp = engine.readAllValues()
 
     func merge(_ residue: Int, _ modulus: Int) {
       guard residue + modulus < n else { return }
@@ -59,15 +62,15 @@ public struct WeavedMergeSort: SortAlgorithm {
       var nxt = residue
       while low < n && high < n {
         let takeHigh =
-          engine.values[low] > engine.values[high]
-          || (engine.values[low] == engine.values[high] && low > high)
+          engine.readValue(at: low) > engine.readValue(at: high)
+          || (engine.readValue(at: low) == engine.readValue(at: high) && low > high)
         if takeHigh {
-          tmp[nxt] = engine.values[high]
-          engine.writeAux(tempHandle, at: nxt, value: engine.values[high])
+          tmp[nxt] = engine.readValue(at: high)
+          engine.writeAux(tempHandle, at: nxt, value: engine.readValue(at: high))
           high += dmodulus
         } else {
-          tmp[nxt] = engine.values[low]
-          engine.writeAux(tempHandle, at: nxt, value: engine.values[low])
+          tmp[nxt] = engine.readValue(at: low)
+          engine.writeAux(tempHandle, at: nxt, value: engine.readValue(at: low))
           low += dmodulus
         }
         nxt += modulus
@@ -75,15 +78,15 @@ public struct WeavedMergeSort: SortAlgorithm {
 
       if low >= n {
         while high < n {
-          tmp[nxt] = engine.values[high]
-          engine.writeAux(tempHandle, at: nxt, value: engine.values[high])
+          tmp[nxt] = engine.readValue(at: high)
+          engine.writeAux(tempHandle, at: nxt, value: engine.readValue(at: high))
           nxt += modulus
           high += dmodulus
         }
       } else {
         while low < n {
-          tmp[nxt] = engine.values[low]
-          engine.writeAux(tempHandle, at: nxt, value: engine.values[low])
+          tmp[nxt] = engine.readValue(at: low)
+          engine.writeAux(tempHandle, at: nxt, value: engine.readValue(at: low))
           nxt += modulus
           low += dmodulus
         }

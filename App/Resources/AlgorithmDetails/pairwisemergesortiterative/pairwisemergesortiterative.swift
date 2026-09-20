@@ -1,11 +1,5 @@
 import Foundation
 
-func compSwap(_ array: inout [Int], _ a: Int, _ b: Int, _ end: Int) {
-    if b < end, array[a] > array[b] {
-        array.swapAt(a, b)
-    }
-}
-
 func sort(_ arr: inout [Int]) {
     let length = arr.count
     let end = length
@@ -47,6 +41,13 @@ func sort(_ arr: inout [Int]) {
         k <<= 1
     }
 }
+
+func compSwap(_ array: inout [Int], _ a: Int, _ b: Int, _ end: Int) {
+    if b < end, array[a] > array[b] {
+        array.swapAt(a, b)
+    }
+}
+
 
 var array: [Int] = [
     0, 39, 21, 62, 91, 77, 14, 23,

@@ -2,7 +2,7 @@ import Foundation
 
 /// The decompressed inner payload of a tape archive: a "TAPE"-magic header, `TapeHeader`'s 13
 /// fields at fixed widths, then `operations` as a tag-byte-per-case mirror of `SortOperation`'s
-/// 12 cases — more compact than a fixed-max-width record, and a direct structural mirror of the
+/// 14 cases — more compact than a fixed-max-width record, and a direct structural mirror of the
 /// enum itself.
 enum TapeArchivePayload {
   private static let magic: [UInt8] = [0x54, 0x41, 0x50, 0x45]  // "TAPE"
@@ -151,9 +151,10 @@ enum TapeArchivePayload {
 
   // MARK: - Operations
 
-  /// Tag byte per case, in `SortOperation`'s own declaration order — 0 through 11. Each case's
-  /// fields are written as plain `Int32`s (0 to 3 of them, per the case), the same width used for
-  /// every other count-like field in this format.
+  /// Tag byte per case, in `SortOperation`'s own declaration order — 0 through 11, plus 12
+  /// (`.compareValue`), 13 (`.compareValues`), 14 (`.auxRead`), and 15 (`.readValue`) appended later, after this
+  /// format already shipped. Each case's fields are written as plain `Int32`s (0 to 3 of them,
+  /// per the case), the same width used for every other count-like field in this format.
   private static func encode(_ operation: SortOperation, into writer: inout TapeArchiveByteWriter) {
     func writeInt32(_ value: Int) {
       writer.writeLittleEndianUInt(UInt64(UInt32(truncatingIfNeeded: value)), byteCount: 4)
@@ -201,6 +202,24 @@ enum TapeArchivePayload {
       writeInt32(handle)
     case .reversal:
       writer.writeLittleEndianUInt(11, byteCount: 1)
+    case .compareValue(let index, let value):
+      // Tag 12, appended after the original 0-11 — never renumber existing tags, that would
+      // break already-exported `.tape` files.
+      writer.writeLittleEndianUInt(12, byteCount: 1)
+      writeInt32(index)
+      writeInt32(value)
+    case .compareValues(let a, let b):
+      // Tag 13, appended alongside 12 — same "never renumber" rule.
+      writer.writeLittleEndianUInt(13, byteCount: 1)
+      writeInt32(a)
+      writeInt32(b)
+    case .auxRead(let handle, let index):
+      writer.writeLittleEndianUInt(14, byteCount: 1)
+      writeInt32(handle)
+      writeInt32(index)
+    case .readValue(let index):
+      writer.writeLittleEndianUInt(15, byteCount: 1)
+      writeInt32(index)
     }
   }
 
@@ -222,6 +241,11 @@ enum TapeArchivePayload {
         value: try readInt32(from: &reader))
     case 10: return .auxDelete(handle: try readInt32(from: &reader))
     case 11: return .reversal
+    case 12: return .compareValue(try readInt32(from: &reader), try readInt32(from: &reader))
+    case 13: return .compareValues(try readInt32(from: &reader), try readInt32(from: &reader))
+    case 14:
+      return .auxRead(handle: try readInt32(from: &reader), index: try readInt32(from: &reader))
+    case 15: return .readValue(try readInt32(from: &reader))
     default: throw TapeArchiveError.unknownOperationTag
     }
   }

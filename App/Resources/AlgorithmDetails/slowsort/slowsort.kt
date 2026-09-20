@@ -1,3 +1,7 @@
+fun sort(arr: Array<Int>) {
+  slowSort(arr, 0, arr.size - 1)
+}
+
 fun slowSort(arr: Array<Int>, i: Int, j: Int) {
   if (i >= j) {
     return
@@ -9,10 +13,6 @@ fun slowSort(arr: Array<Int>, i: Int, j: Int) {
     arr[m] = arr[j].also { arr[j] = arr[m] }
   }
   slowSort(arr, i, j - 1)
-}
-
-fun sort(arr: Array<Int>) {
-  slowSort(arr, 0, arr.size - 1)
 }
 
 fun main() {

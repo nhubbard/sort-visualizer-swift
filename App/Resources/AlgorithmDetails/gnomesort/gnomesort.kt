@@ -1,5 +1,6 @@
 fun sort(arr: Array<Int>) {
   val n = arr.size
+  if (n <= 1) return
   var index = 0
   while (index < n) {
     if (index == 0) {

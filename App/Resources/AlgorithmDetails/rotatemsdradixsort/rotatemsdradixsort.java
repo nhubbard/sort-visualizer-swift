@@ -1,6 +1,35 @@
 import java.util.Arrays;
 
 public class rotatemsdradixsort {
+  public static void sort(int[] arr) {
+    int n = arr.length;
+    if (n <= 1) return;
+    int base = 4, maxValue = 0;
+    for (int value : arr) if (value > maxValue) maxValue = value;
+    int q = 0, probe = base;
+    while (probe <= maxValue) {
+      q++;
+      probe *= base;
+    }
+    int m = 0, i = 0, b = n;
+    while (i < n) {
+      int p = b - i < 1 ? i : dist(arr, i, b, q, base);
+      if (q == 0) {
+        m += base;
+        int t = m / base;
+        while (t % base == 0) {
+          t /= base;
+          q++;
+        }
+        i = b;
+        while (b < n && shift(arr[b], q + 1, base) == shift(m, q + 1, base)) b++;
+      } else {
+        b = p;
+        q--;
+      }
+    }
+  }
+
   private static int intPow(int base, int exponent) {
     int result = 1;
     for (int i = 0; i < exponent; i++) {
@@ -79,41 +108,21 @@ public class rotatemsdradixsort {
   // buckets, then recurses into every resulting digit bucket one place lower --
   // an ordinary MSD radix sort built entirely out of the LSD variant's
   // rotate/binary-search machinery.
-  private static void msdRotateSort(int[] arr, int a, int b, int place, int base) {
-    if (b - a < 2 || place < 0) {
-      return;
-    }
-    mergeSortDigit(arr, a, b, place, base);
-    int start = a;
-    for (int d = 0; d < base; d++) {
-      int end = binSearchDigit(arr, start, b, d + 1, place, base);
-      msdRotateSort(arr, start, end, place - 1, base);
-      start = end;
-    }
+  private static int shift(int value, int places, int base) {
+    while (places-- > 0) value /= base;
+    return value;
   }
 
-  public static void sort(int[] arr) {
-    if (arr.length <= 1) {
-      return;
-    }
-    int base = 4;
-    int maxValue = arr[0];
-    for (int value : arr) {
-      if (value > maxValue) {
-        maxValue = value;
-      }
-    }
-    int highestPlace = 0;
-    int probe = base;
-    while (probe <= maxValue) {
-      highestPlace++;
-      probe *= base;
-    }
-    msdRotateSort(arr, 0, arr.length, highestPlace, base);
+  private static int dist(int[] arr, int a, int b, int place, int base) {
+    mergeSortDigit(arr, a, b, place, base);
+    return binSearchDigit(arr, a, b, 1, place, base);
   }
 
   public static void main(String[] args) {
-    int[] array = new int[] {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     sort(array);
     System.out.println(Arrays.toString(array));
   }

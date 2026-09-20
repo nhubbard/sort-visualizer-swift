@@ -8,8 +8,11 @@ public struct SmartGuessSort: SortAlgorithm {
     category: .impractical,
     sizeRange: 4...8,
     growthModel: OperationGrowthModel(
-      anchorSize: 8, coefficients: [69216.4, 90169.4, 60562.7, 27811.9, 9788.65, 2809.08],
+      anchorSize: 8, coefficients: [69143.1, 89999.5, 60400.2, 27715.5, 9747.18, 2795.05],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .nToTheNLike, coefficients: [61.0868, 0.422688], rSquared: 0.99677),
+    implementationComplexity: 12,
     stable: false,
     timeComplexity: ComplexityBounds(best: "O(n)", average: "O(n^n)", worst: "O(n^n)"),
     spaceComplexity: "O(n)",
@@ -59,7 +62,7 @@ public struct SmartGuessSort: SortAlgorithm {
       }
     }
 
-    let mapped = loops.map { engine.values[$0] }
+    let mapped = loops.map { engine.readValue(at: $0) }
     for i in 0..<n {
       engine.setValue(i, mapped[i])
     }

@@ -2,6 +2,53 @@ import Foundation
 
 /// Reverses `arr[0...hi]` in place. This "flip" is the only move the algorithm ever performs;
 /// there is no per-element shift anywhere.
+func sort(_ arr: inout [Int]) {
+    let n = arr.count
+    guard n >= 2 else { return }
+
+    var ascending = sortFirstThree(&arr, n)
+
+    var i = 3
+    while i < n {
+        if ascending {
+            if arr[i - 1] <= arr[i] {
+                // Already fits; the ascending prefix already ends at or below the new element.
+            } else if arr[0] > arr[i] {
+                // The new element is smaller than everything in the prefix -- one flip turns
+                // the whole thing, including the new element, into a descending run.
+                flip(&arr, i - 1)
+                ascending = false
+            } else {
+                let idx = searchAscending(arr, 0, i, i)
+                flip(&arr, i)
+                let tail = i - idx
+                flip(&arr, tail)
+                flip(&arr, tail - 1)
+                ascending = false
+            }
+        } else {
+            if arr[i - 1] > arr[i] {
+                // Already fits; the descending prefix already ends at or above the new element.
+            } else if arr[0] <= arr[i] {
+                flip(&arr, i - 1)
+                ascending = true
+            } else {
+                let idx = searchDescending(arr, 0, i, i)
+                flip(&arr, i)
+                let tail = i - idx
+                flip(&arr, tail)
+                flip(&arr, tail - 1)
+                ascending = true
+            }
+        }
+        i += 1
+    }
+
+    if !ascending {
+        flip(&arr, n - 1)
+    }
+}
+
 func flip(_ arr: inout [Int], _ hi: Int) {
     var lo = 0
     var hi = hi
@@ -71,52 +118,6 @@ func sortFirstThree(_ arr: inout [Int], _ n: Int) -> Bool {
     return true
 }
 
-func sort(_ arr: inout [Int]) {
-    let n = arr.count
-    guard n >= 2 else { return }
-
-    var ascending = sortFirstThree(&arr, n)
-
-    var i = 3
-    while i < n {
-        if ascending {
-            if arr[i - 1] <= arr[i] {
-                // Already fits; the ascending prefix already ends at or below the new element.
-            } else if arr[0] > arr[i] {
-                // The new element is smaller than everything in the prefix -- one flip turns
-                // the whole thing, including the new element, into a descending run.
-                flip(&arr, i - 1)
-                ascending = false
-            } else {
-                let idx = searchAscending(arr, 0, i, i)
-                flip(&arr, i)
-                let tail = i - idx
-                flip(&arr, tail)
-                flip(&arr, tail - 1)
-                ascending = false
-            }
-        } else {
-            if arr[i - 1] > arr[i] {
-                // Already fits; the descending prefix already ends at or above the new element.
-            } else if arr[0] <= arr[i] {
-                flip(&arr, i - 1)
-                ascending = true
-            } else {
-                let idx = searchDescending(arr, 0, i, i)
-                flip(&arr, i)
-                let tail = i - idx
-                flip(&arr, tail)
-                flip(&arr, tail - 1)
-                ascending = true
-            }
-        }
-        i += 1
-    }
-
-    if !ascending {
-        flip(&arr, n - 1)
-    }
-}
 
 var array: [Int] = [
     0, 39, 21, 62, 91, 77, 14, 23,

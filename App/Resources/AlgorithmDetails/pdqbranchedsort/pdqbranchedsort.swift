@@ -2,6 +2,14 @@ let insertSortThreshold = 24
 let nintherThreshold = 128
 let partialInsertSortLimit = 8
 
+func sort(_ arr: inout [Int]) {
+    let n = arr.count
+    if n < 2 {
+        return
+    }
+    pdqLoop(&arr, 0, n, pdqLog(n))
+}
+
 func pdqLog(_ n0: Int) -> Int {
     var n = n0
     var log = 0
@@ -275,13 +283,6 @@ func pdqLoop(_ arr: inout [Int], _ begin0: Int, _ end: Int, _ badAllowed0: Int) 
     }
 }
 
-func sort(_ arr: inout [Int]) {
-    let n = arr.count
-    if n < 2 {
-        return
-    }
-    pdqLoop(&arr, 0, n, pdqLog(n))
-}
 
 var array: [Int] = [
     0, 39, 21, 62, 91, 77, 14, 23,

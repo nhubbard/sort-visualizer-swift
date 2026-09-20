@@ -1,5 +1,50 @@
 # Reverses arr[0..hi] in place. This "flip" is the only move the algorithm ever performs; there
 # is no per-element shift anywhere.
+def sort(arr)
+  n = arr.length
+  return arr if n < 2
+
+  ascending = sort_first_three(arr, n)
+
+  i = 3
+  while i < n
+    if ascending
+      if arr[i - 1] <= arr[i]
+        # Already fits; the ascending prefix already ends at or below the new element.
+      elsif arr[0] > arr[i]
+        # The new element is smaller than everything in the prefix -- one flip turns the whole
+        # thing, including the new element, into a descending run.
+        flip(arr, i - 1)
+        ascending = false
+      else
+        idx = search_ascending(arr, 0, i, i)
+        flip(arr, i)
+        tail = i - idx
+        flip(arr, tail)
+        flip(arr, tail - 1)
+        ascending = false
+      end
+    elsif arr[i - 1] > arr[i]
+    # already fits
+    elsif arr[0] <= arr[i]
+      flip(arr, i - 1)
+      ascending = true
+    else
+      idx = search_descending(arr, 0, i, i)
+      flip(arr, i)
+      tail = i - idx
+      flip(arr, tail)
+      flip(arr, tail - 1)
+      ascending = true
+    end
+    i += 1
+  end
+
+  flip(arr, n - 1) unless ascending
+
+  arr
+end
+
 def flip(arr, hi)
   lo = 0
   while lo < hi
@@ -53,50 +98,6 @@ def sort_first_three(arr, n)
   true
 end
 
-def sort(arr)
-  n = arr.length
-  return arr if n < 2
-
-  ascending = sort_first_three(arr, n)
-
-  i = 3
-  while i < n
-    if ascending
-      if arr[i - 1] <= arr[i]
-        # Already fits; the ascending prefix already ends at or below the new element.
-      elsif arr[0] > arr[i]
-        # The new element is smaller than everything in the prefix -- one flip turns the whole
-        # thing, including the new element, into a descending run.
-        flip(arr, i - 1)
-        ascending = false
-      else
-        idx = search_ascending(arr, 0, i, i)
-        flip(arr, i)
-        tail = i - idx
-        flip(arr, tail)
-        flip(arr, tail - 1)
-        ascending = false
-      end
-    elsif arr[i - 1] > arr[i]
-    # already fits
-    elsif arr[0] <= arr[i]
-      flip(arr, i - 1)
-      ascending = true
-    else
-      idx = search_descending(arr, 0, i, i)
-      flip(arr, i)
-      tail = i - idx
-      flip(arr, tail)
-      flip(arr, tail - 1)
-      ascending = true
-    end
-    i += 1
-  end
-
-  flip(arr, n - 1) unless ascending
-
-  arr
-end
 
 array = [0, 39, 21, 62, 91, 77, 14, 23,
   90, 69, 51, 81, 68, 83, 32, 56]

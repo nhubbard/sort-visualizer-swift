@@ -1,3 +1,31 @@
+def sort(arr):
+    n = len(arr)
+    if n <= 1:
+        return
+    base = 4
+    max_value = max(arr)
+    q = 0
+    probe = base
+    while probe <= max_value:
+        q += 1
+        probe *= base
+    m = i = 0
+    b = n
+    while i < n:
+        p = i if b - i < 1 else dist(arr, i, b, q, base)
+        if q == 0:
+            m += base
+            t = m // base
+            while t % base == 0:
+                t //= base
+                q += 1
+            i = b
+            while b < n and shift(arr[b], q + 1, base) == shift(m, q + 1, base):
+                b += 1
+        else:
+            b = p
+            q -= 1
+
 def int_pow(base, exponent):
     result = 1
     for _ in range(exponent):
@@ -61,35 +89,24 @@ def merge_sort_digit(arr, a, b, place, base):
     merge_digit(arr, a, mid, b, 0, base, place, base)
 
 
-def msd_rotate_sort(arr, a, b, place, base):
-    """Digit-sorts arr[a:b] in place by `place` using rotation instead of
-    counting buckets, then recurses into every resulting digit bucket one
-    place lower -- an ordinary MSD radix sort built entirely out of the LSD
-    variant's rotate/binary-search machinery."""
-    if b - a < 2 or place < 0:
-        return
+def shift(value, places, base):
+    while places > 0:
+        value //= base
+        places -= 1
+    return value
+
+
+def dist(arr, a, b, place, base):
     merge_sort_digit(arr, a, b, place, base)
-    start = a
-    for d in range(base):
-        end = bin_search_digit(arr, start, b, d + 1, place, base)
-        msd_rotate_sort(arr, start, end, place - 1, base)
-        start = end
+    return bin_search_digit(arr, a, b, 1, place, base)
 
 
-def sort(arr):
-    if len(arr) <= 1:
-        return
-    base = 4
-    max_value = max(arr)
-    highest_place = 0
-    probe = base
-    while probe <= max_value:
-        highest_place += 1
-        probe *= base
-    msd_rotate_sort(arr, 0, len(arr), highest_place, base)
 
 
 if __name__ == "__main__":
-    array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56]
+    array = [
+        0, 39, 21, 62, 91, 77, 14, 23,
+        90, 69, 51, 81, 68, 83, 32, 56,
+    ]
     sort(array)
     print(array)

@@ -10,6 +10,18 @@ type Node struct {
 	right *Node
 }
 
+func sort(arr []int) []int {
+	var root *Node
+	for _, x := range arr {
+		root = insertRec(root, x)
+	}
+	result := make([]int, len(arr))
+	idx := 0
+	traverse(root, result, &idx)
+	copy(arr, result)
+	return arr
+}
+
 func leftRotate(x *Node) *Node {
 	y := x.right
 	x.right = y.left
@@ -90,18 +102,6 @@ func traverse(node *Node, result []int, idx *int) {
 		*idx++
 		traverse(node.right, result, idx)
 	}
-}
-
-func sort(arr []int) []int {
-	var root *Node
-	for _, x := range arr {
-		root = insertRec(root, x)
-	}
-	result := make([]int, len(arr))
-	idx := 0
-	traverse(root, result, &idx)
-	copy(arr, result)
-	return arr
 }
 
 func main() {

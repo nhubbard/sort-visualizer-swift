@@ -47,8 +47,9 @@ public protocol SortAlgorithm: Sendable {
 
 Start from a structurally similar, already-shipped algorithm rather than a blank file: a
 node-based tree sort, a hand-rolled heap, or whichever shape matches. Use
-`engine.compare`/`engine.swap`/`engine.setValue`/`engine.values` and the rest of
-`RecordingEngine`. Do not use raw Swift array mutation; the engine calls are what make the
+`engine.compare`/`engine.swap`/`engine.setValue`/`engine.readValue(at:)` and the rest of
+`RecordingEngine`. Use `readAllValues()` or `readValues(in:)` when a scratch copy is needed.
+Do not read `engine.values` directly or use raw Swift array mutation; the engine calls are what make the
 visualizer's tape and the growth-model op-counting possible. Route any auxiliary or scratch buffer
 through `engine.createAuxArray`/`writeAux`, so `auxWriteCount` reflects it. See
 [Engine layer](../architecture/engine.md#recordingengine) for the full `RecordingEngine` surface.

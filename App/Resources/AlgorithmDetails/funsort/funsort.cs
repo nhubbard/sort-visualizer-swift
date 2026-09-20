@@ -2,32 +2,6 @@ using System;
 
 public class FunSort
 {
-  public static bool CompositeLess(int[] arr, int[] key, int mid, int i)
-  {
-    if (arr[mid] < arr[i]) return true;
-    if (arr[mid] == arr[i]) return key[mid] < key[i];
-    return false;
-  }
-
-  public static int BinarySearch(int[] arr, int[] key, int n, int i)
-  {
-    int start = 0;
-    int end = n - 1;
-    while (start < end)
-    {
-      int mid = (start + end) / 2;
-      if (CompositeLess(arr, key, mid, i))
-      {
-        start = mid + 1;
-      }
-      else
-      {
-        end = mid;
-      }
-    }
-    return start;
-  }
-
   public static void Sort(int[] arr)
   {
     int n = arr.Length;
@@ -58,9 +32,38 @@ public class FunSort
     }
   }
 
+  public static bool CompositeLess(int[] arr, int[] key, int mid, int i)
+  {
+    if (arr[mid] < arr[i]) return true;
+    if (arr[mid] == arr[i]) return key[mid] < key[i];
+    return false;
+  }
+
+  public static int BinarySearch(int[] arr, int[] key, int n, int i)
+  {
+    int start = 0;
+    int end = n - 1;
+    while (start < end)
+    {
+      int mid = (start + end) / 2;
+      if (CompositeLess(arr, key, mid, i))
+      {
+        start = mid + 1;
+      }
+      else
+      {
+        end = mid;
+      }
+    }
+    return start;
+  }
+
   public static void Main(String[] args)
   {
-    int[] array = { 0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56 };
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     Sort(array);
     string result = "[" + String.Join(", ", array) + "]";
     Console.WriteLine(result);

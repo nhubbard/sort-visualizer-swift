@@ -1,6 +1,25 @@
 import java.util.Arrays;
 
 public final class triangularheapsort {
+  static void sort(int[] array) {
+    int n = array.length;
+    if (n <= 1) {
+      return;
+    }
+    heapify(array, n);
+    for (int i = 1; i < n - 1; i++) {
+      int temp = array[0];
+      array[0] = array[n - i];
+      array[n - i] = temp;
+      siftDown(array, 0, n - i);
+    }
+    if (array[0] > array[1]) {
+      int temp = array[0];
+      array[0] = array[1];
+      array[1] = temp;
+    }
+  }
+
   static int triangularRoot(int val) {
     return ((int) Math.sqrt((double) (8 * val + 1)) - 1) / 2;
   }
@@ -36,27 +55,11 @@ public final class triangularheapsort {
     }
   }
 
-  static void sort(int[] array) {
-    int n = array.length;
-    if (n <= 1) {
-      return;
-    }
-    heapify(array, n);
-    for (int i = 1; i < n - 1; i++) {
-      int temp = array[0];
-      array[0] = array[n - i];
-      array[n - i] = temp;
-      siftDown(array, 0, n - i);
-    }
-    if (array[0] > array[1]) {
-      int temp = array[0];
-      array[0] = array[1];
-      array[1] = temp;
-    }
-  }
-
   public static void main(String[] args) {
-    int[] array = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     sort(array);
     System.out.println(Arrays.toString(array));
   }

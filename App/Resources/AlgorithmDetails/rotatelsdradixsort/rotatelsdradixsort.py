@@ -1,5 +1,18 @@
-RADIX_BASE = 10
+RADIX_BASE = 4
 
+
+def sort(arr):
+    n = len(arr)
+    if n < 2:
+        return
+    max_value = max(arr)
+    max_place = 0
+    probe = RADIX_BASE
+    while probe <= max_value:
+        max_place += 1
+        probe *= RADIX_BASE
+    for place in range(max_place + 1):
+        digit_merge_sort(arr, 0, n, place)
 
 def digit_at(value, place):
     # Extracts the digit at `place` (0 = ones place) from `value`, in RADIX_BASE.
@@ -70,21 +83,12 @@ def digit_merge_sort(arr, a, b, place):
     merge_by_digit(arr, a, mid, b, 0, RADIX_BASE, place)
 
 
-def sort(arr):
-    n = len(arr)
-    if n < 2:
-        return
-    max_value = max(arr)
-    max_place = 0
-    probe = RADIX_BASE
-    while probe <= max_value:
-        max_place += 1
-        probe *= RADIX_BASE
-    for place in range(max_place + 1):
-        digit_merge_sort(arr, 0, n, place)
 
 
 if __name__ == "__main__":
-    array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56]
+    array = [
+        0, 39, 21, 62, 91, 77, 14, 23,
+        90, 69, 51, 81, 68, 83, 32, 56,
+    ]
     sort(array)
     print(array)

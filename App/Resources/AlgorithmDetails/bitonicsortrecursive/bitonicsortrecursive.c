@@ -1,5 +1,31 @@
 #include <stdio.h>
 
+void swap(int *a, int *b) {
+  int t = *a;
+  *a = *b;
+  *b = t;
+}
+
+int greatestPowerOfTwoLessThan(int n);
+void compare(int arr[], int i, int j, int dir);
+void bitonicMerge(int arr[], int lo, int n, int dir);
+void bitonicSort(int arr[], int lo, int n, int dir);
+
+void printList(int items[], int size) {
+  printf("[");
+  if (size > 0) {
+    printf("%d", items[0]);
+    for (int i = 1; i < size; i++) {
+      printf(", %d", items[i]);
+    }
+  }
+  printf("]");
+}
+
+void sort(int arr[], int n) {
+  bitonicSort(arr, 0, n, 1);
+}
+
 int greatestPowerOfTwoLessThan(int n) {
   int k = 1;
   while (k < n) {
@@ -37,19 +63,7 @@ void bitonicSort(int arr[], int lo, int n, int dir) {
   }
 }
 
-void sort(int arr[], int n) { bitonicSort(arr, 0, n, 1); }
 
-void printList(int arr[], int n) {
-  for (int i = 0; i < n; i++) {
-    if (i == 0) {
-      printf("[%d, ", arr[i]);
-    } else if (i != n - 1) {
-      printf("%d, ", arr[i]);
-    } else {
-      printf("%d]", arr[i]);
-    }
-  }
-}
 
 int main(int argc, char *argv[]) {
   int array[16] = {0,  39, 21, 62, 91, 77, 14, 23,

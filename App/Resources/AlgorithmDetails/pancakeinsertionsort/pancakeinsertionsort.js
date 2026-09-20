@@ -1,5 +1,55 @@
 // Reverses arr[0..hi] in place. This "flip" is the only move the algorithm ever performs; there
 // is no per-element shift anywhere.
+function sort(arr) {
+  const n = arr.length;
+  if (n < 2) {
+    return;
+  }
+
+  var ascending = sortFirstThree(arr, n);
+
+  for (var i = 3; i < n; i++) {
+    if (ascending) {
+      if (arr[i - 1] <= arr[i]) {
+        // Already fits; the ascending prefix already ends at or below the new element.
+        continue;
+      }
+      if (arr[0] > arr[i]) {
+        // The new element is smaller than everything in the prefix -- one flip turns
+        // the whole thing, including the new element, into a descending run.
+        flip(arr, i - 1);
+        ascending = false;
+        continue;
+      }
+      var idxAsc = searchAscending(arr, 0, i, i);
+      flip(arr, i);
+      var tailAsc = i - idxAsc;
+      flip(arr, tailAsc);
+      flip(arr, tailAsc - 1);
+      ascending = false;
+    } else {
+      if (arr[i - 1] > arr[i]) {
+        continue;
+      }
+      if (arr[0] <= arr[i]) {
+        flip(arr, i - 1);
+        ascending = true;
+        continue;
+      }
+      var idxDesc = searchDescending(arr, 0, i, i);
+      flip(arr, i);
+      var tailDesc = i - idxDesc;
+      flip(arr, tailDesc);
+      flip(arr, tailDesc - 1);
+      ascending = true;
+    }
+  }
+
+  if (!ascending) {
+    flip(arr, n - 1);
+  }
+}
+
 function flip(arr, hi) {
   var lo = 0;
   while (lo < hi) {
@@ -68,56 +118,10 @@ function sortFirstThree(arr, n) {
   return true;
 }
 
-function sort(arr) {
-  const n = arr.length;
-  if (n < 2) {
-    return;
-  }
 
-  var ascending = sortFirstThree(arr, n);
-
-  for (var i = 3; i < n; i++) {
-    if (ascending) {
-      if (arr[i - 1] <= arr[i]) {
-        // Already fits; the ascending prefix already ends at or below the new element.
-        continue;
-      }
-      if (arr[0] > arr[i]) {
-        // The new element is smaller than everything in the prefix -- one flip turns
-        // the whole thing, including the new element, into a descending run.
-        flip(arr, i - 1);
-        ascending = false;
-        continue;
-      }
-      var idxAsc = searchAscending(arr, 0, i, i);
-      flip(arr, i);
-      var tailAsc = i - idxAsc;
-      flip(arr, tailAsc);
-      flip(arr, tailAsc - 1);
-      ascending = false;
-    } else {
-      if (arr[i - 1] > arr[i]) {
-        continue;
-      }
-      if (arr[0] <= arr[i]) {
-        flip(arr, i - 1);
-        ascending = true;
-        continue;
-      }
-      var idxDesc = searchDescending(arr, 0, i, i);
-      flip(arr, i);
-      var tailDesc = i - idxDesc;
-      flip(arr, tailDesc);
-      flip(arr, tailDesc - 1);
-      ascending = true;
-    }
-  }
-
-  if (!ascending) {
-    flip(arr, n - 1);
-  }
-}
-
-var array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56];
+const array = [
+  0, 39, 21, 62, 91, 77, 14, 23,
+  90, 69, 51, 81, 68, 83, 32, 56,
+];
 sort(array);
 console.log("[" + array.join(", ") + "]");

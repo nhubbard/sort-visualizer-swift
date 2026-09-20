@@ -1,3 +1,8 @@
+func sort(_ arr: inout [Int]) {
+    let n = arr.count
+    commonSort(&arr, 0, n)
+}
+
 func swap(_ arr: inout [Int], _ a: Int, _ b: Int) {
     arr.swapAt(a, b)
 }
@@ -53,28 +58,25 @@ func binSearch(_ arr: [Int], _ pos: Int, _ len: Int, _ keyPos: Int, _ isLeft: Bo
     return right
 }
 
-func mergeWithoutBuffer(_ arr: inout [Int], _ pos: Int, _ len1: Int, _ len2: Int) {
-    if len1 == 0 || len2 == 0 {
-        return
-    }
-    if len1 + len2 == 2 {
-        if arr[pos] > arr[pos + 1] {
-            swap(&arr, pos, pos + 1)
+func mergeWithoutBuffer(_ arr: inout [Int], _ start: Int, _ leftLength: Int, _ rightLength: Int) {
+    var pos = start
+    var len1 = leftLength
+    var len2 = rightLength
+    if len1 < len2 {
+        while len1 != 0 {
+            let loc = binSearch(arr, pos + len1, len2, pos, true)
+            if loc != 0 { rotate(&arr, pos, len1, loc); pos += loc; len2 -= loc }
+            if len2 == 0 { break }
+            repeat { pos += 1; len1 -= 1 } while len1 != 0 && arr[pos] <= arr[pos + len1]
         }
-        return
-    }
-    let mid1: Int
-    let mid2: Int
-    if len1 > len2 {
-        mid1 = len1 / 2
-        mid2 = binSearch(arr, pos + len1, len2, pos + mid1, true)
     } else {
-        mid2 = len2 / 2
-        mid1 = binSearch(arr, pos, len1, pos + len1 + mid2, false)
+        while len2 != 0 {
+            let loc = binSearch(arr, pos, len1, pos + len1 + len2 - 1, false)
+            if loc != len1 { rotate(&arr, pos + loc, len1 - loc, len2); len1 = loc }
+            if len1 == 0 { break }
+            repeat { len2 -= 1 } while len2 != 0 && arr[pos + len1 - 1] <= arr[pos + len1 + len2 - 1]
+        }
     }
-    rotate(&arr, pos + mid1, len1 - mid1, mid2)
-    mergeWithoutBuffer(&arr, pos, mid1, mid2)
-    mergeWithoutBuffer(&arr, pos + mid1 + mid2, len1 - mid1, len2 - mid2)
 }
 
 func mergeLeft(_ arr: inout [Int], _ pos: Int, _ leftLen: Int, _ rightLenArg: Int, _ distArg: Int) {
@@ -269,10 +271,6 @@ func commonSort(_ arr: inout [Int], _ pos: Int, _ len: Int) {
     mergeWithoutBuffer(&arr, pos, blockLen, len - blockLen)
 }
 
-func sort(_ arr: inout [Int]) {
-    let n = arr.count
-    commonSort(&arr, 0, n)
-}
 
 var array: [Int] = [
     0, 39, 21, 62, 91, 77, 14, 23,

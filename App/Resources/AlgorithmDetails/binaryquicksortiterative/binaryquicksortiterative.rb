@@ -1,3 +1,19 @@
+def sort(arr)
+  n = arr.length
+  return arr if n < 2
+  bit = most_significant_bit(arr.max)
+
+  tasks = [[0, n - 1, bit]]
+  until tasks.empty?
+    p, r, b = tasks.shift
+    if p < r && b >= 0
+      q = partition(arr, p, r, b)
+      tasks << [p, q, b - 1]
+      tasks << [q + 1, r, b - 1]
+    end
+  end
+end
+
 def most_significant_bit(value)
   return -1 if value == 0
   bit = 0
@@ -21,20 +37,6 @@ def partition(arr, p, r, bit)
   end
 end
 
-def sort(arr)
-  n = arr.length
-  bit = most_significant_bit(arr.max)
-
-  tasks = [[0, n - 1, bit]]
-  until tasks.empty?
-    p, r, b = tasks.shift
-    if p < r && b >= 0
-      q = partition(arr, p, r, b)
-      tasks << [p, q, b - 1]
-      tasks << [q + 1, r, b - 1]
-    end
-  end
-end
 
 array = [0, 39, 21, 62, 91, 77, 14, 23,
   90, 69, 51, 81, 68, 83, 32, 56]

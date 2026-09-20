@@ -1,5 +1,17 @@
 import Foundation
 
+func sort(_ array: inout [Int]) {
+    let end = array.count
+    guard end > 1 else {
+        return
+    }
+    let paddedLength = nextPowerOfTwo(end)
+    var swaps: Int
+    repeat {
+        swaps = circleSortRoutine(&array, 0, paddedLength - 1, end)
+    } while swaps != 0
+}
+
 func nextPowerOfTwo(_ n: Int) -> Int {
     var k = 1
     while k < n {
@@ -33,17 +45,6 @@ func circleSortRoutine(_ array: inout [Int], _ lo: Int, _ hi: Int, _ end: Int) -
     return swaps
 }
 
-func sort(_ array: inout [Int]) {
-    let end = array.count
-    guard end > 0 else {
-        return
-    }
-    let paddedLength = nextPowerOfTwo(end)
-    var swaps: Int
-    repeat {
-        swaps = circleSortRoutine(&array, 0, paddedLength - 1, end)
-    } while swaps != 0
-}
 
 var array: [Int] = [
     0, 39, 21, 62, 91, 77, 14, 23,

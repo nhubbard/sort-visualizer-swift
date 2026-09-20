@@ -2,6 +2,14 @@ using System;
 
 public class WeaveMergeSort
 {
+  public static void Sort(int[] arr)
+  {
+    if (arr.Length > 1)
+    {
+      WeaveMergeSortRange(arr, 0, arr.Length - 1);
+    }
+  }
+
   private static void MultiSwap(int[] arr, int pos, int to)
   {
     if (to - pos > 0)
@@ -65,17 +73,12 @@ public class WeaveMergeSort
     }
   }
 
-  public static void Sort(int[] arr)
-  {
-    if (arr.Length > 1)
-    {
-      WeaveMergeSortRange(arr, 0, arr.Length - 1);
-    }
-  }
-
   public static void Main(String[] args)
   {
-    int[] array = { 0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56 };
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     Sort(array);
     string result = "[" + String.Join(", ", array) + "]";
     Console.WriteLine(result);

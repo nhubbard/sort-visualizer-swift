@@ -4,27 +4,9 @@ import (
 	"fmt"
 )
 
-func transferTo(arr []int, aux []int, minValue int, index int) {
-	pointer := 0
-	for arr[index] > minValue {
-		arr[index]--
-		aux[pointer]++
-		pointer++
-	}
-}
-
-func transferFrom(arr []int, aux []int, auxLength int, index int) {
-	pointer := 0
-	for pointer < auxLength && aux[pointer] != 0 {
-		arr[index]++
-		aux[pointer]--
-		pointer++
-	}
-}
-
 func sort(arr []int) []int {
 	n := len(arr)
-	if n == 0 {
+	if n < 2 {
 		return arr
 	}
 
@@ -49,6 +31,24 @@ func sort(arr []int) []int {
 	}
 
 	return arr
+}
+
+func transferTo(arr []int, aux []int, minValue int, index int) {
+	pointer := 0
+	for arr[index] > minValue {
+		arr[index]--
+		aux[pointer]++
+		pointer++
+	}
+}
+
+func transferFrom(arr []int, aux []int, auxLength int, index int) {
+	pointer := 0
+	for pointer < auxLength && aux[pointer] != 0 {
+		arr[index]++
+		aux[pointer]--
+		pointer++
+	}
 }
 
 func main() {

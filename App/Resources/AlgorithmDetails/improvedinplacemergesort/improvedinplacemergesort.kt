@@ -1,3 +1,7 @@
+fun sort(arr: Array<Int>) {
+  mergeSort(arr, 0, arr.size)
+}
+
 fun push(arr: Array<Int>, p: Int, a: Int, b: Int) {
   if (a == b) {
     return
@@ -36,10 +40,6 @@ fun mergeSort(arr: Array<Int>, a: Int, b: Int) {
     mergeSort(arr, m, b)
   }
   merge(arr, a, m, b)
-}
-
-fun sort(arr: Array<Int>) {
-  mergeSort(arr, 0, arr.size)
 }
 
 fun main() {

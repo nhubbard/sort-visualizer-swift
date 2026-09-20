@@ -1,3 +1,20 @@
+def sort(arr):
+    root = None
+    for x in arr:
+        root = insert_rec(root, x)
+    result = []
+
+    def traverse(node):
+        if node is not None:
+            traverse(node.left)
+            result.append(node.key)
+            traverse(node.right)
+
+    traverse(root)
+    for i in range(len(arr)):
+        arr[i] = result[i]
+    return arr
+
 class Node:
     def __init__(self, key):
         self.key = key
@@ -62,25 +79,12 @@ def insert_rec(root, key):
     return n
 
 
-def sort(arr):
-    root = None
-    for x in arr:
-        root = insert_rec(root, x)
-    result = []
-
-    def traverse(node):
-        if node is not None:
-            traverse(node.left)
-            result.append(node.key)
-            traverse(node.right)
-
-    traverse(root)
-    for i in range(len(arr)):
-        arr[i] = result[i]
-    return arr
 
 
 if __name__ == "__main__":
-    array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56]
+    array = [
+        0, 39, 21, 62, 91, 77, 14, 23,
+        90, 69, 51, 81, 68, 83, 32, 56,
+    ]
     sort(array)
     print(array)

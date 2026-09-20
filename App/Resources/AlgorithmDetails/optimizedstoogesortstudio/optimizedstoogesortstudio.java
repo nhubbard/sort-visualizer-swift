@@ -1,6 +1,11 @@
 import java.util.Arrays;
 
 public class optimizedstoogesortstudio {
+  public static void sort(int[] arr) {
+    if (arr.length <= 1) return;
+    stoogeSort(arr, 0, 1, arr.length, false);
+  }
+
   private static boolean compSwap(int[] arr, int a, int b) {
     if (arr[a] > arr[b]) {
       int temp = arr[a];
@@ -48,12 +53,11 @@ public class optimizedstoogesortstudio {
     return lChange || rChange;
   }
 
-  public static void sort(int[] arr) {
-    stoogeSort(arr, 0, 1, arr.length, false);
-  }
-
   public static void main(String[] args) {
-    int[] array = new int[] {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     sort(array);
     System.out.println(Arrays.toString(array));
   }

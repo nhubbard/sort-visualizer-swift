@@ -1,7 +1,3 @@
-def sorted?(arr)
-  (1...arr.length).all? { |i| arr[i - 1] <= arr[i] }
-end
-
 def sort(arr)
   n = arr.length
   until sorted?(arr)
@@ -11,6 +7,11 @@ def sort(arr)
   end
   arr
 end
+
+def sorted?(arr)
+  (1...arr.length).all? { |i| arr[i - 1] <= arr[i] }
+end
+
 
 array = [0, 39, 21, 62, 91, 77]
 array = sort(array)

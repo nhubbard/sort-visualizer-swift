@@ -1,5 +1,9 @@
 import Foundation
 
+func sort(_ arr: inout [Int]) {
+    gravitySort(&arr)
+}
+
 func gravitySort(_ arr: inout [Int]) {
     let n = arr.count
     guard n > 0 else {
@@ -30,9 +34,6 @@ func gravitySort(_ arr: inout [Int]) {
     }
 }
 
-func sort(_ arr: inout [Int]) {
-    gravitySort(&arr)
-}
 
 var array: [Int] = [
     0, 39, 21, 62, 91, 77, 14, 23,

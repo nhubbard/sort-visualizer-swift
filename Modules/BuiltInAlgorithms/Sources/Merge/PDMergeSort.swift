@@ -24,8 +24,11 @@ public struct PDMergeSort: SortAlgorithm {
     category: .merge,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 6078, coefficients: [144878, 25.6429],
+      anchorSize: 2296, coefficients: [189132, 97.7453, 0.00367241],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .powerLog, coefficients: [6.8274, 1.05738], rSquared: 0.998344),
+    implementationComplexity: 28,
     stable: true,
     timeComplexity: ComplexityBounds(
       best: "O(n)", average: "O(n log n)", worst: "O(n log n)"),
@@ -49,17 +52,21 @@ public struct PDMergeSort: SortAlgorithm {
 
     func mergeUp(_ start: Int, _ mid: Int, _ end: Int) {
       for i in 0..<(mid - start) {
-        writeCopied(i, engine.values[i + start])
+        writeCopied(i, engine.readValue(at: i + start))
       }
       var bufferPointer = 0
       var left = start
       var right = mid
       while left < right && right < end {
-        if copied[bufferPointer] <= engine.values[right] {
+        // `copied[bufferPointer]` is a real re-read of the `copiedHandle`-shadowed buffer
+        // (marked via `markAuxRead`), then compared against the live `right` index via
+        // `engine.compareValue` — the aux-held value plays the "held value" role.
+        engine.markAuxRead(copiedHandle, at: bufferPointer)
+        if engine.compareValue(right, against: copied[bufferPointer], by: (>=)) {
           engine.setValue(left, copied[bufferPointer])
           bufferPointer += 1
         } else {
-          engine.setValue(left, engine.values[right])
+          engine.setValue(left, engine.readValue(at: right))
           right += 1
         }
         left += 1
@@ -73,17 +80,19 @@ public struct PDMergeSort: SortAlgorithm {
 
     func mergeDown(_ start: Int, _ mid: Int, _ end: Int) {
       for i in 0..<(end - mid) {
-        writeCopied(i, engine.values[i + mid])
+        writeCopied(i, engine.readValue(at: i + mid))
       }
       var bufferPointer = end - mid - 1
       var left = mid - 1
       var right = end - 1
       while right > left && left >= start {
-        if copied[bufferPointer] >= engine.values[left] {
+        // Same `markAuxRead` + `engine.compareValue` pairing as `mergeUp` above.
+        engine.markAuxRead(copiedHandle, at: bufferPointer)
+        if engine.compareValue(left, against: copied[bufferPointer], by: (<=)) {
           engine.setValue(right, copied[bufferPointer])
           bufferPointer -= 1
         } else {
-          engine.setValue(right, engine.values[left])
+          engine.setValue(right, engine.readValue(at: left))
           left -= 1
         }
         right -= 1

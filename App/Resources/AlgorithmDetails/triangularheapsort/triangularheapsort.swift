@@ -1,5 +1,22 @@
 import Foundation
 
+func sort(_ array: inout [Int]) {
+    let n = array.count
+    guard n > 1 else {
+        return
+    }
+    heapify(&array, n)
+    var i = 1
+    while i < n - 1 {
+        array.swapAt(0, n - i)
+        siftDown(&array, 0, n - i)
+        i += 1
+    }
+    if array[0] > array[1] {
+        array.swapAt(0, 1)
+    }
+}
+
 func triangularRoot(_ val: Int) -> Int {
     let integerSqrt = Int(Double(8 * val + 1).squareRoot())
     return (integerSqrt - 1) / 2
@@ -37,22 +54,6 @@ func heapify(_ array: inout [Int], _ length: Int) {
     }
 }
 
-func sort(_ array: inout [Int]) {
-    let n = array.count
-    guard n > 1 else {
-        return
-    }
-    heapify(&array, n)
-    var i = 1
-    while i < n - 1 {
-        array.swapAt(0, n - i)
-        siftDown(&array, 0, n - i)
-        i += 1
-    }
-    if array[0] > array[1] {
-        array.swapAt(0, 1)
-    }
-}
 
 var array: [Int] = [
     0, 39, 21, 62, 91, 77, 14, 23,

@@ -8,8 +8,11 @@ public struct OptimizedBubbleSort: SortAlgorithm {
     category: .exchange,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 219, coefficients: [238710, 2185, 5],
+      anchorSize: 51, coefficients: [110831, 26928.6, 3338.57, 280.829, 17.9939, 0.935308],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .factorial, coefficients: [10.7602, 0.0617958], rSquared: 0.99924),
+    implementationComplexity: 5,
     stable: true,
     timeComplexity: ComplexityBounds(best: "O(n)", average: "O(n^2)", worst: "O(n^2)"),
     spaceComplexity: "O(1)",

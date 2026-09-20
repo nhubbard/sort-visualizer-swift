@@ -5,8 +5,8 @@ import SortEngineKit
 /// pile whose current top is `>=` it (starting a new pile if none qualifies), then repeatedly lift
 /// the smallest top across every pile to rebuild the sorted order. Piles hold plain values, not
 /// array positions — every comparison here (finding a pile's insertion point, finding the
-/// currently-smallest top) is between held values, the same pattern `CountingSort`/`GravitySort`
-/// use for their own bucket bookkeeping, so none of it goes through `engine.compare`.
+/// currently-smallest top) is between two held values, neither a live array index, so it goes
+/// through `engine.compareValues` rather than `engine.compare`/`engine.compareValue`.
 ///
 /// The deal phase keeps `tops` sorted ascending as an invariant: choosing the *leftmost* pile with
 /// `top >= x` and then dropping `x` onto it can only ever raise that pile's neighbor-to-the-left
@@ -23,8 +23,11 @@ public struct PatienceSort: SortAlgorithm {
     category: .insertion,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 304, coefficients: [293.481, 0.89195],
+      anchorSize: 3558, coefficients: [239920, 119.772, 0.014697],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .polynomialIntercept, coefficients: [0.014697, 15.1886, -174.995], rSquared: 0.999933),
+    implementationComplexity: 9,
     stable: true,
     timeComplexity: ComplexityBounds(
       best: "O(n log n)", average: "O(n log n)", worst: "O(n log n)"),
@@ -48,18 +51,18 @@ public struct PatienceSort: SortAlgorithm {
 
       var isEmpty: Bool { storage.isEmpty }
 
-      mutating func push(_ entry: HeapEntry) {
+      mutating func push(_ engine: inout RecordingEngine, _ entry: HeapEntry) {
         storage.append(entry)
         var i = storage.count - 1
         while i > 0 {
           let parent = (i - 1) / 2
-          if storage[parent].top <= storage[i].top { break }
+          if engine.compareValues(storage[parent].top, storage[i].top, by: (<=)) { break }
           storage.swapAt(parent, i)
           i = parent
         }
       }
 
-      mutating func popMin() -> HeapEntry {
+      mutating func popMin(_ engine: inout RecordingEngine) -> HeapEntry {
         let result = storage[0]
         storage[0] = storage[storage.count - 1]
         storage.removeLast()
@@ -68,8 +71,12 @@ public struct PatienceSort: SortAlgorithm {
           let left = 2 * i + 1
           let right = 2 * i + 2
           var smallest = i
-          if left < storage.count, storage[left].top < storage[smallest].top { smallest = left }
-          if right < storage.count, storage[right].top < storage[smallest].top { smallest = right }
+          if left < storage.count, engine.compareValues(storage[left].top, storage[smallest].top, by: (<)) {
+            smallest = left
+          }
+          if right < storage.count, engine.compareValues(storage[right].top, storage[smallest].top, by: (<)) {
+            smallest = right
+          }
           if smallest == i { break }
           storage.swapAt(i, smallest)
           i = smallest
@@ -82,12 +89,12 @@ public struct PatienceSort: SortAlgorithm {
     var tops: [Int] = []
 
     for i in 0..<n {
-      let x = engine.values[i]
+      let x = engine.readValue(at: i)
       var lo = 0
       var hi = piles.count
       while lo < hi {
         let mid = (lo + hi) / 2
-        if tops[mid] >= x {
+        if engine.compareValues(tops[mid], x, by: (>=)) {
           hi = mid
         } else {
           lo = mid + 1
@@ -104,15 +111,15 @@ public struct PatienceSort: SortAlgorithm {
 
     var heap = MinHeap()
     for i in 0..<piles.count {
-      heap.push(HeapEntry(top: tops[i], pileIndex: i))
+      heap.push(&engine, HeapEntry(top: tops[i], pileIndex: i))
     }
 
     for c in 0..<n {
-      let entry = heap.popMin()
+      let entry = heap.popMin(&engine)
       let value = piles[entry.pileIndex].removeLast()
       engine.setValue(c, value)
       if let newTop = piles[entry.pileIndex].last {
-        heap.push(HeapEntry(top: newTop, pileIndex: entry.pileIndex))
+        heap.push(&engine, HeapEntry(top: newTop, pileIndex: entry.pileIndex))
       }
     }
   }

@@ -1,3 +1,6 @@
+def sort(arr):
+    bitonic_sort(arr, 0, len(arr), True)
+
 def greatest_power_of_two_less_than(n):
     k = 1
     while k < n:
@@ -28,11 +31,12 @@ def bitonic_sort(array, lo, n, dir):
         bitonic_merge(array, lo, n, dir)
 
 
-def sort(arr):
-    bitonic_sort(arr, 0, len(arr), True)
 
 
 if __name__ == "__main__":
-    array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56]
+    array = [
+        0, 39, 21, 62, 91, 77, 14, 23,
+        90, 69, 51, 81, 68, 83, 32, 56,
+    ]
     sort(array)
     print(array)

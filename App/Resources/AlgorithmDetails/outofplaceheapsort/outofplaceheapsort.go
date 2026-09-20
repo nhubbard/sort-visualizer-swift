@@ -4,6 +4,24 @@ import (
 	"fmt"
 )
 
+func sort(arr []int) []int {
+	n := len(arr)
+	output := make([]int, n)
+	if n <= 1 {
+		if n == 1 {
+			output[0] = arr[0]
+		}
+		return output
+	}
+	heapify(arr, n)
+	for i := n - 1; i >= 0; i-- {
+		output[i] = arr[0]
+		arr[0] = -1
+		findNext(arr, n)
+	}
+	return output
+}
+
 func siftDown(arr []int, root int, size int) {
 	index := root
 	for 2*index+1 < size {
@@ -53,24 +71,6 @@ func findNext(arr []int, size int) {
 	if left < size && arr[left] != -1 {
 		arr[hole], arr[left] = arr[left], arr[hole]
 	}
-}
-
-func sort(arr []int) []int {
-	n := len(arr)
-	output := make([]int, n)
-	if n <= 1 {
-		if n == 1 {
-			output[0] = arr[0]
-		}
-		return output
-	}
-	heapify(arr, n)
-	for i := n - 1; i >= 0; i-- {
-		output[i] = arr[0]
-		arr[0] = -1
-		findNext(arr, n)
-	}
-	return output
 }
 
 func main() {

@@ -2,17 +2,6 @@ using System;
 
 public class BurntPancakeSort
 {
-  public static void Flip(int[] arr, int end)
-  {
-    var start = 0;
-    while (start < end)
-    {
-      (arr[start], arr[end]) = (arr[end], arr[start]);
-      start++;
-      end--;
-    }
-  }
-
   public static void Sort(int[] arr)
   {
     int n = arr.Length;
@@ -36,9 +25,23 @@ public class BurntPancakeSort
     }
   }
 
+  public static void Flip(int[] arr, int end)
+  {
+    var start = 0;
+    while (start < end)
+    {
+      (arr[start], arr[end]) = (arr[end], arr[start]);
+      start++;
+      end--;
+    }
+  }
+
   public static void Main(String[] args)
   {
-    int[] array = { 0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56 };
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     Sort(array);
     string result = "[" + String.Join(", ", array) + "]";
     Console.WriteLine(result);

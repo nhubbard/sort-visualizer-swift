@@ -4,22 +4,11 @@ import (
 	"fmt"
 )
 
-func flagBit(b bool) int {
-	if b {
-		return 1
-	}
-	return 0
-}
-
-func merge(arr []int, flags []bool, i int, j int) {
-	if arr[i] < arr[j] {
-		flags[j] = !flags[j]
-		arr[i], arr[j] = arr[j], arr[i]
-	}
-}
-
 func sort(arr []int) []int {
 	n := len(arr)
+	if n <= 1 {
+		return arr
+	}
 	flags := make([]bool, n)
 
 	for i := n - 1; i > 0; i-- {
@@ -48,6 +37,20 @@ func sort(arr []int) []int {
 	}
 	arr[0], arr[1] = arr[1], arr[0]
 	return arr
+}
+
+func flagBit(b bool) int {
+	if b {
+		return 1
+	}
+	return 0
+}
+
+func merge(arr []int, flags []bool, i int, j int) {
+	if arr[i] < arr[j] {
+		flags[j] = !flags[j]
+		arr[i], arr[j] = arr[j], arr[i]
+	}
 }
 
 func main() {

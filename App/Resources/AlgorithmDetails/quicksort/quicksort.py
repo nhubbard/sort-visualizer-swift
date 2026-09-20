@@ -1,18 +1,17 @@
+def sort(arr):
+    quick_sort(arr, 0, len(arr) - 1)
+
 def partition(array, start, end):
-    pivot = array[start]
-    low = start + 1
-    high = end
-    while True:
-        while low <= high and array[high] >= pivot:
-            high = high - 1
-        while low <= high and array[low] <= pivot:
-            low = low + 1
-        if low <= high:
-            array[low], array[high] = array[high], array[low]
-        else:
-            break
-    array[start], array[high] = array[high], array[start]
-    return high
+    i, j = start, end
+    while i < j:
+        while i < j and array[i] <= array[start]:
+            i += 1
+        while array[j] > array[start]:
+            j -= 1
+        if i < j:
+            array[i], array[j] = array[j], array[i]
+    array[start], array[j] = array[j], array[start]
+    return j
 
 
 def quick_sort(array, start, end):
@@ -23,11 +22,12 @@ def quick_sort(array, start, end):
     quick_sort(array, p + 1, end)
 
 
-def sort(arr):
-    quick_sort(arr, 0, len(arr) - 1)
 
 
 if __name__ == "__main__":
-    array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56]
+    array = [
+        0, 39, 21, 62, 91, 77, 14, 23,
+        90, 69, 51, 81, 68, 83, 32, 56,
+    ]
     sort(array)
     print(array)

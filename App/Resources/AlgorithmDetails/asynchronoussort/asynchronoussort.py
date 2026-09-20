@@ -1,5 +1,7 @@
 def sort(arr):
     n = len(arr)
+    if n == 0:
+        return
     ext = list(arr)
     min_value = min(ext)
     max_value = max(ext) + 1
@@ -15,6 +17,10 @@ def sort(arr):
         cur += 1
 
 
-array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56]
-sort(array)
-print(array)
+if __name__ == "__main__":
+    array = [
+        0, 39, 21, 62, 91, 77, 14, 23,
+        90, 69, 51, 81, 68, 83, 32, 56,
+    ]
+    sort(array)
+    print(array)

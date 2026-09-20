@@ -4,6 +4,10 @@ import (
 	"fmt"
 )
 
+func sort(arr []int) []int {
+	return quickSort(arr, 0, len(arr)-1)
+}
+
 func partition(arr []int, lo, hi int) ([]int, int) {
 	pivot := arr[hi]
 	i := lo
@@ -25,10 +29,6 @@ func quickSort(arr []int, lo, hi int) []int {
 		arr = quickSort(arr, p+1, hi)
 	}
 	return arr
-}
-
-func sort(arr []int) []int {
-	return quickSort(arr, 0, len(arr)-1)
 }
 
 func main() {

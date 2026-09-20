@@ -6,6 +6,57 @@ public final class smoothsort {
     21891,
   };
 
+  static void sort(int[] array) {
+    int n = array.length;
+    if (n <= 1) {
+      return;
+    }
+
+    int head = 0;
+    long p = 1;
+    int pshift = 1;
+    int hi = n - 1;
+
+    while (head < hi) {
+      if ((p & 3) == 3) {
+        sift(array, pshift, head);
+        p >>= 2;
+        pshift += 2;
+      } else {
+        if (LEONARDO[pshift - 1] >= hi - head) {
+          trinkle(array, p, pshift, head, false);
+        } else {
+          sift(array, pshift, head);
+        }
+        if (pshift == 1) {
+          p <<= 1;
+          pshift -= 1;
+        } else {
+          p <<= (pshift - 1);
+          pshift = 1;
+        }
+      }
+      p |= 1;
+      head += 1;
+    }
+
+    trinkle(array, p, pshift, head, false);
+    while (pshift != 1 || p != 1) {
+      if (pshift <= 1) {
+        int trail = trailingZeroCount(p);
+        p >>= trail;
+        pshift += trail;
+      } else {
+        p <<= 2;
+        p ^= 7;
+        pshift -= 2;
+        trinkle(array, p >> 1, pshift + 1, head - (int) LEONARDO[pshift] - 1, true);
+        trinkle(array, p, pshift, head - 1, true);
+      }
+      head -= 1;
+    }
+  }
+
   static int trailingZeroCount(long value) {
     long mask = value & ~1L;
     int trail = 0;
@@ -70,59 +121,11 @@ public final class smoothsort {
     }
   }
 
-  static void sort(int[] array) {
-    int n = array.length;
-    if (n <= 1) {
-      return;
-    }
-
-    int head = 0;
-    long p = 1;
-    int pshift = 1;
-    int hi = n - 1;
-
-    while (head < hi) {
-      if ((p & 3) == 3) {
-        sift(array, pshift, head);
-        p >>= 2;
-        pshift += 2;
-      } else {
-        if (LEONARDO[pshift - 1] >= hi - head) {
-          trinkle(array, p, pshift, head, false);
-        } else {
-          sift(array, pshift, head);
-        }
-        if (pshift == 1) {
-          p <<= 1;
-          pshift -= 1;
-        } else {
-          p <<= (pshift - 1);
-          pshift = 1;
-        }
-      }
-      p |= 1;
-      head += 1;
-    }
-
-    trinkle(array, p, pshift, head, false);
-    while (pshift != 1 || p != 1) {
-      if (pshift <= 1) {
-        int trail = trailingZeroCount(p);
-        p >>= trail;
-        pshift += trail;
-      } else {
-        p <<= 2;
-        p ^= 7;
-        pshift -= 2;
-        trinkle(array, p >> 1, pshift + 1, head - (int) LEONARDO[pshift] - 1, true);
-        trinkle(array, p, pshift, head - 1, true);
-      }
-      head -= 1;
-    }
-  }
-
   public static void main(String[] args) {
-    int[] array = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     sort(array);
     System.out.println(Arrays.toString(array));
   }

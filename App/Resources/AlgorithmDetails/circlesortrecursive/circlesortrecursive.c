@@ -1,5 +1,36 @@
 #include <stdio.h>
 
+void swap(int *a, int *b) {
+  int t = *a;
+  *a = *b;
+  *b = t;
+}
+
+int nextPowerOfTwo(int n);
+int circleSortRoutine(int arr[], int lo, int hi, int end);
+
+void printList(int items[], int size) {
+  printf("[");
+  if (size > 0) {
+    printf("%d", items[0]);
+    for (int i = 1; i < size; i++) {
+      printf(", %d", items[i]);
+    }
+  }
+  printf("]");
+}
+
+void sort(int arr[], int n) {
+  if (n <= 1) {
+    return;
+  }
+  int paddedLength = nextPowerOfTwo(n);
+  int swaps;
+  do {
+    swaps = circleSortRoutine(arr, 0, paddedLength - 1, n);
+  } while (swaps != 0);
+}
+
 int nextPowerOfTwo(int n) {
   int k = 1;
   while (k < n) {
@@ -38,28 +69,7 @@ int circleSortRoutine(int arr[], int lo, int hi, int end) {
   return swaps;
 }
 
-void sort(int arr[], int n) {
-  if (n == 0) {
-    return;
-  }
-  int paddedLength = nextPowerOfTwo(n);
-  int swaps;
-  do {
-    swaps = circleSortRoutine(arr, 0, paddedLength - 1, n);
-  } while (swaps != 0);
-}
 
-void printList(int arr[], int n) {
-  for (int i = 0; i < n; i++) {
-    if (i == 0) {
-      printf("[%d, ", arr[i]);
-    } else if (i != n - 1) {
-      printf("%d, ", arr[i]);
-    } else {
-      printf("%d]", arr[i]);
-    }
-  }
-}
 
 int main(int argc, char *argv[]) {
   int array[16] = {0,  39, 21, 62, 91, 77, 14, 23,

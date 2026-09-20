@@ -1,3 +1,19 @@
+fun sort(arr: Array<Int>): Array<Int> {
+  val n = arr.size
+  val output = Array(n) { 0 }
+  if (n <= 1) {
+    if (n == 1) output[0] = arr[0]
+    return output
+  }
+  heapify(arr, n)
+  for (i in n - 1 downTo 0) {
+    output[i] = arr[0]
+    arr[0] = -1
+    findNext(arr, n)
+  }
+  return output
+}
+
 fun siftDown(arr: Array<Int>, root: Int, size: Int) {
   var index = root
   while (2 * index + 1 < size) {
@@ -57,22 +73,6 @@ fun findNext(arr: Array<Int>, size: Int) {
     arr[hole] = arr[left]
     arr[left] = temp
   }
-}
-
-fun sort(arr: Array<Int>): Array<Int> {
-  val n = arr.size
-  val output = Array(n) { 0 }
-  if (n <= 1) {
-    if (n == 1) output[0] = arr[0]
-    return output
-  }
-  heapify(arr, n)
-  for (i in n - 1 downTo 0) {
-    output[i] = arr[0]
-    arr[0] = -1
-    findNext(arr, n)
-  }
-  return output
 }
 
 fun main() {

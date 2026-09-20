@@ -1,6 +1,6 @@
 def sort(arr)
   n = arr.length
-  return arr if n == 0
+  return arr if n <= 1
 
   max_value = arr.max
   transpose = Array.new(max_value, 0)

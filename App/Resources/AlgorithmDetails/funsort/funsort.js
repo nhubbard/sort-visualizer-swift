@@ -1,23 +1,3 @@
-function compositeLess(arr, key, mid, i) {
-  if (arr[mid] < arr[i]) return true;
-  if (arr[mid] === arr[i]) return key[mid] < key[i];
-  return false;
-}
-
-function binarySearch(arr, key, n, i) {
-  let start = 0;
-  let end = n - 1;
-  while (start < end) {
-    const mid = Math.floor((start + end) / 2);
-    if (compositeLess(arr, key, mid, i)) {
-      start = mid + 1;
-    } else {
-      end = mid;
-    }
-  }
-  return start;
-}
-
 function sort(arr) {
   const n = arr.length;
   const key = [];
@@ -40,6 +20,30 @@ function sort(arr) {
   }
 }
 
-var array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56];
+function compositeLess(arr, key, mid, i) {
+  if (arr[mid] < arr[i]) return true;
+  if (arr[mid] === arr[i]) return key[mid] < key[i];
+  return false;
+}
+
+function binarySearch(arr, key, n, i) {
+  let start = 0;
+  let end = n - 1;
+  while (start < end) {
+    const mid = Math.floor((start + end) / 2);
+    if (compositeLess(arr, key, mid, i)) {
+      start = mid + 1;
+    } else {
+      end = mid;
+    }
+  }
+  return start;
+}
+
+
+const array = [
+  0, 39, 21, 62, 91, 77, 14, 23,
+  90, 69, 51, 81, 68, 83, 32, 56,
+];
 sort(array);
 console.log("[" + array.join(", ") + "]");

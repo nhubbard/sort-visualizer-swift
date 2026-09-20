@@ -1,9 +1,31 @@
 import java.util.Arrays;
 
 public class rotatelsdradixsort {
-  private static final int RADIX_BASE = 10;
+  private static final int RADIX_BASE = 4;
 
   // Extracts the digit at `place` (0 = ones place) from `value`, in RADIX_BASE.
+  public static void sort(int[] arr) {
+    int n = arr.length;
+    if (n < 2) {
+      return;
+    }
+    int maxValue = arr[0];
+    for (int i = 1; i < n; i++) {
+      if (arr[i] > maxValue) {
+        maxValue = arr[i];
+      }
+    }
+    int maxPlace = 0;
+    int probe = RADIX_BASE;
+    while (probe <= maxValue) {
+      maxPlace++;
+      probe *= RADIX_BASE;
+    }
+    for (int place = 0; place <= maxPlace; place++) {
+      digitMergeSort(arr, 0, n, place);
+    }
+  }
+
   private static int digitAt(int value, int place) {
     int divisor = 1;
     for (int i = 0; i < place; i++) {
@@ -83,30 +105,11 @@ public class rotatelsdradixsort {
     mergeByDigit(arr, a, mid, b, 0, RADIX_BASE, place);
   }
 
-  public static void sort(int[] arr) {
-    int n = arr.length;
-    if (n < 2) {
-      return;
-    }
-    int maxValue = arr[0];
-    for (int i = 1; i < n; i++) {
-      if (arr[i] > maxValue) {
-        maxValue = arr[i];
-      }
-    }
-    int maxPlace = 0;
-    int probe = RADIX_BASE;
-    while (probe <= maxValue) {
-      maxPlace++;
-      probe *= RADIX_BASE;
-    }
-    for (int place = 0; place <= maxPlace; place++) {
-      digitMergeSort(arr, 0, n, place);
-    }
-  }
-
   public static void main(String[] args) {
-    int[] array = new int[] {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     sort(array);
     System.out.println(Arrays.toString(array));
   }

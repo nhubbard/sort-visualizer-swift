@@ -1,16 +1,30 @@
 #include <cstdio>
 #include <utility>
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
+                 90, 69, 51, 81, 68, 83, 32, 56};
 
 void printList(int items[], int size) {
-  for (int i = 0; i < size; i++) {
-    if (i == 0) {
-      printf("[%d, ", items[i]);
-    } else if (i != size - 1) {
-      printf("%d, ", items[i]);
-    } else {
-      printf("%d]", items[i]);
+  printf("[");
+  if (size > 0) {
+    printf("%d", items[0]);
+    for (int i = 1; i < size; i++) {
+      printf(", %d", items[i]);
+    }
+  }
+  printf("]");
+}
+
+bool is3Smooth(int n);
+
+void sort(int arr[], int n) {
+  for (int g = n - 1; g > 0; g--) {
+    if (is3Smooth(g)) {
+      for (int i = g; i < n; i++) {
+        if (arr[i - g] > arr[i]) {
+          std::swap(arr[i - g], arr[i]);
+        }
+      }
     }
   }
 }
@@ -26,18 +40,6 @@ bool is3Smooth(int n) {
     n /= 2;
   }
   return n == 1;
-}
-
-void sort(int arr[], int n) {
-  for (int g = n - 1; g > 0; g--) {
-    if (is3Smooth(g)) {
-      for (int i = g; i < n; i++) {
-        if (arr[i - g] > arr[i]) {
-          std::swap(arr[i - g], arr[i]);
-        }
-      }
-    }
-  }
 }
 
 int main(int argc, char *argv[]) {

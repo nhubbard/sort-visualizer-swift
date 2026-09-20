@@ -1,3 +1,27 @@
+fun sort(arr: Array<Int>) {
+  val end = arr.size
+  if (end <= 1) return
+  var n = 1
+  var threshold = 0
+  while (n < end) {
+    n = n shl 1
+    threshold++
+  }
+  threshold /= 2
+
+  var iterations = 0
+  while (true) {
+    iterations++
+    if (iterations >= threshold) {
+      binaryInsertionSort(arr, end)
+      return
+    }
+    if (circleSortRoutine(arr, n, end) == 0) {
+      return
+    }
+  }
+}
+
 fun circleSortRoutine(arr: Array<Int>, length: Int, end: Int): Int {
   var swapCount = 0
   var gap = length / 2
@@ -36,33 +60,10 @@ fun binaryInsertionSort(arr: Array<Int>, end: Int) {
     }
     var j = i
     while (j > lo) {
+      val temp = arr[j]
       arr[j] = arr[j - 1]
+      arr[j - 1] = temp
       j--
-    }
-    arr[lo] = value
-  }
-}
-
-fun sort(arr: Array<Int>) {
-  val end = arr.size
-  if (end <= 1) return
-  var n = 1
-  var threshold = 0
-  while (n < end) {
-    n = n shl 1
-    threshold++
-  }
-  threshold /= 2
-
-  var iterations = 0
-  while (true) {
-    iterations++
-    if (iterations >= threshold) {
-      binaryInsertionSort(arr, end)
-      return
-    }
-    if (circleSortRoutine(arr, n, end) == 0) {
-      return
     }
   }
 }

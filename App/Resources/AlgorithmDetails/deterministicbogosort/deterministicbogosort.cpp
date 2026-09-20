@@ -3,16 +3,22 @@
 
 int array[7] = {0, 39, 21, 62, 91, 14, 23};
 
-void printList(int arr[], int n) {
-  for (int i = 0; i < n; i++) {
-    if (i == 0) {
-      printf("[%d, ", arr[i]);
-    } else if (i != n - 1) {
-      printf("%d, ", arr[i]);
-    } else {
-      printf("%d]", arr[i]);
+void printList(int items[], int size) {
+  printf("[");
+  if (size > 0) {
+    printf("%d", items[0]);
+    for (int i = 1; i < size; i++) {
+      printf(", %d", items[i]);
     }
   }
+  printf("]");
+}
+
+bool isSorted(int arr[], int n);
+bool permutationSort(int arr[], int n, int depth);
+
+void sort(int arr[], int n) {
+  permutationSort(arr, n, 0);
 }
 
 bool isSorted(int arr[], int n) {
@@ -40,8 +46,6 @@ bool permutationSort(int arr[], int n, int depth) {
   }
   return permutationSort(arr, n, depth + 1);
 }
-
-void sort(int arr[], int n) { permutationSort(arr, n, 0); }
 
 int main(int argc, char *argv[]) {
   int size = sizeof(array) / sizeof(array[0]);

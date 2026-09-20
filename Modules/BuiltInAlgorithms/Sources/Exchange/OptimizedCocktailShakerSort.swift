@@ -13,8 +13,11 @@ public struct OptimizedCocktailShakerSort: SortAlgorithm {
     category: .exchange,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 219, coefficients: [238710, 2185, 5],
+      anchorSize: 53, coefficients: [172439, 42053.8, 5227.89, 440.605, 28.269, 1.47062],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .factorial, coefficients: [10.8904, 0.0614253], rSquared: 0.999253),
+    implementationComplexity: 7,
     stable: true,
     timeComplexity: ComplexityBounds(best: "O(n)", average: "O(n^2)", worst: "O(n^2)"),
     spaceComplexity: "O(1)",

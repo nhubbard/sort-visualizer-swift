@@ -2,6 +2,12 @@ using System;
 
 public class UnstableGrailSort
 {
+  public static void Sort(int[] arr)
+  {
+    int n = arr.Length;
+    CommonSort(arr, 0, n);
+  }
+
   public static void Swap(int[] arr, int a, int b)
   {
     (arr[a], arr[b]) = (arr[b], arr[a]);
@@ -59,26 +65,26 @@ public class UnstableGrailSort
 
   public static void MergeWithoutBuffer(int[] arr, int pos, int len1, int len2)
   {
-    if (len1 == 0 || len2 == 0) return;
-    if (len1 + len2 == 2)
+    if (len1 < len2)
     {
-      if (arr[pos] > arr[pos + 1]) Swap(arr, pos, pos + 1);
-      return;
-    }
-    int mid1, mid2;
-    if (len1 > len2)
-    {
-      mid1 = len1 / 2;
-      mid2 = BinSearch(arr, pos + len1, len2, pos + mid1, true);
+      while (len1 != 0)
+      {
+        int loc = BinSearch(arr, pos + len1, len2, pos, true);
+        if (loc != 0) { Rotate(arr, pos, len1, loc); pos += loc; len2 -= loc; }
+        if (len2 == 0) break;
+        do { pos++; len1--; } while (len1 != 0 && arr[pos] <= arr[pos + len1]);
+      }
     }
     else
     {
-      mid2 = len2 / 2;
-      mid1 = BinSearch(arr, pos, len1, pos + len1 + mid2, false);
+      while (len2 != 0)
+      {
+        int loc = BinSearch(arr, pos, len1, pos + len1 + len2 - 1, false);
+        if (loc != len1) { Rotate(arr, pos + loc, len1 - loc, len2); len1 = loc; }
+        if (len1 == 0) break;
+        do { len2--; } while (len2 != 0 && arr[pos + len1 - 1] <= arr[pos + len1 + len2 - 1]);
+      }
     }
-    Rotate(arr, pos + mid1, len1 - mid1, mid2);
-    MergeWithoutBuffer(arr, pos, mid1, mid2);
-    MergeWithoutBuffer(arr, pos + mid1 + mid2, len1 - mid1, len2 - mid2);
   }
 
   public static void MergeLeft(int[] arr, int pos, int leftLen, int rightLen, int dist)
@@ -294,15 +300,12 @@ public class UnstableGrailSort
     MergeWithoutBuffer(arr, pos, blockLen, len - blockLen);
   }
 
-  public static void Sort(int[] arr)
-  {
-    int n = arr.Length;
-    CommonSort(arr, 0, n);
-  }
-
   public static void Main(String[] args)
   {
-    int[] array = { 0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56 };
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     Sort(array);
     string result = "[" + String.Join(", ", array) + "]";
     Console.WriteLine(result);

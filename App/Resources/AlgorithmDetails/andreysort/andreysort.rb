@@ -1,3 +1,8 @@
+def sort(arr)
+  n = arr.length
+  msort(arr, 0, n)
+end
+
 def swap(arr, i, j)
   arr[i], arr[j] = arr[j], arr[i]
 end
@@ -162,10 +167,6 @@ def msort(arr, a, length)
   msort(arr, a, s)
 end
 
-def sort(arr)
-  n = arr.length
-  msort(arr, 0, n)
-end
 
 array = [0, 39, 21, 62, 91, 77, 14, 23,
   90, 69, 51, 81, 68, 83, 32, 56]

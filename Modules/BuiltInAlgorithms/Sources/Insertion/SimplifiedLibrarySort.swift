@@ -21,8 +21,11 @@ public struct SimplifiedLibrarySort: SortAlgorithm {
     category: .insertion,
     sizeRange: 32...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 390, coefficients: [239459, 1197.06, 1.49226],
+      anchorSize: 383, coefficients: [239576, 1203.2, 1.50334],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .polynomialIntercept, coefficients: [1.50334, 51.6357, -724.117], rSquared: 1),
+    implementationComplexity: 30,
     stable: true,
     timeComplexity: ComplexityBounds(best: "O(n)", average: "O(n log n)", worst: "O(n^2)"),
     spaceComplexity: "O(n)",
@@ -71,15 +74,14 @@ public struct SimplifiedLibrarySort: SortAlgorithm {
     // ArrayV's separate `binarySearch(array, a, b, val, sleep)`: finds where `val` would
     // insert among the sorted spine `[a, b)`. Unlike `binaryInsert` above, `val` here is
     // `engine.values[i]` for an `i` *outside* `[a, b)` (a not-yet-classified batch element), so
-    // it's a held value read once rather than a live index compared against another live
-    // index — the same pattern `CycleSort`'s `countLesser`/`IntroSort`'s cached pivot use — and
-    // is therefore not run through `engine.compare`.
+    // it's a held value compared against a live spine index — `engine.compareValue`, the same
+    // pattern `IntroSort`'s cached pivot uses, not `engine.compare`'s two-live-index shape.
     func gapSearch(_ a: Int, _ b: Int, _ val: Int) -> Int {
       var lo = a
       var hi = b
       while lo < hi {
         let mid = lo + (hi - lo) / 2
-        if val < engine.values[mid] {
+        if engine.compareValue(mid, against: val, by: (>)) {
           hi = mid
         } else {
           lo = mid + 1
@@ -142,7 +144,7 @@ public struct SimplifiedLibrarySort: SortAlgorithm {
       for i in m..<b {
         let loc = locsShadow[k]
         let pos = cntsShadow[loc]
-        let value = engine.values[i]
+        let value = engine.readValue(at: i)
         tempShadow[pos] = value
         engine.writeAux(tempHandle, at: pos, value: value)
         cntsShadow[loc] = pos + 1
@@ -154,7 +156,7 @@ public struct SimplifiedLibrarySort: SortAlgorithm {
       // own gap.
       for i in 0..<m {
         let pos = cntsShadow[i]
-        let value = engine.values[i]
+        let value = engine.readValue(at: i)
         tempShadow[pos] = value
         engine.writeAux(tempHandle, at: pos, value: value)
         cntsShadow[i] = pos + 1
@@ -196,7 +198,7 @@ public struct SimplifiedLibrarySort: SortAlgorithm {
 
       // Classify which of the `spineSize + 1` gaps `engine.values[i]` belongs in, and tally
       // it for the upcoming rebalance.
-      let loc = gapSearch(0, spineSize, engine.values[i])
+      let loc = gapSearch(0, spineSize, engine.readValue(at: i))
       let updatedCount = cntsShadow[loc + 1] + 1
       cntsShadow[loc + 1] = updatedCount
       engine.writeAux(cntsHandle, at: loc + 1, value: updatedCount)

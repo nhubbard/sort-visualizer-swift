@@ -12,10 +12,7 @@ import SortEngineKit
 /// heap-order property after a heap's root changes) are ArrayV's own names, kept because this is
 /// a well-known, specifically-shaped algorithm (see e.g.
 /// <https://en.wikipedia.org/wiki/Smoothsort>) rather than an invented one — divergent naming
-/// would only make it harder to cross-reference against other implementations. `smoothHeapify`
-/// is kept as its own entry point (a partial run with `fullSort: false`) rather than folded into
-/// `record`, since `HeapifiedShuffle`'s `SMOOTH` sibling (`SmoothifiedShuffle`) calls this exact
-/// step directly — see Documentation/docs/reference/port-status.md.
+/// would only make it harder to cross-reference against other implementations.
 ///
 /// `sift`/`trinkle` hold a candidate value in a plain local (`val`), only ever writing it to its
 /// final resting index once its correct position is found — the same "hole" shape already used
@@ -40,8 +37,11 @@ public struct SmoothSort: SortAlgorithm {
     category: .selection,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 1647, coefficients: [239913, 270.663, 0.0757706],
+      anchorSize: 1437, coefficients: [206475, 215.205, 0.0363262],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .powerLog, coefficients: [1.44047, 1.36021], rSquared: 0.989721),
+    implementationComplexity: 28,
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n)", average: "O(n log n)", worst: "O(n log n)"),
@@ -58,26 +58,26 @@ public struct SmoothSort: SortAlgorithm {
   public func record(into engine: inout RecordingEngine) {
     let n = engine.count
     guard n > 1 else { return }
-    smoothSort(into: &engine, lo: 0, hi: n - 1, fullSort: true)
+    smoothSort(into: &engine, lo: 0, hi: n - 1)
   }
 
-  func smoothSort(into engine: inout RecordingEngine, lo: Int, hi: Int, fullSort: Bool) {
+  private func smoothSort(into engine: inout RecordingEngine, lo: Int, hi: Int) {
     let lp = Self.leonardo
 
     func sift(_ pshiftIn: Int, _ headIn: Int) {
       var pshift = pshiftIn
       var head = headIn
-      let val = engine.values[head]
+      let val = engine.readValue(at: head)
       while pshift > 1 {
         let rt = head - 1
         let lf = head - 1 - lp[pshift - 2]
-        if val >= engine.values[lf] && val >= engine.values[rt] { break }
+        if val >= engine.readValue(at: lf) && val >= engine.readValue(at: rt) { break }
         if engine.compare(lf, rt, by: >=) {
-          engine.setValue(head, engine.values[lf])
+          engine.setValue(head, engine.readValue(at: lf))
           head = lf
           pshift -= 1
         } else {
-          engine.setValue(head, engine.values[rt])
+          engine.setValue(head, engine.readValue(at: rt))
           head = rt
           pshift -= 2
         }
@@ -90,10 +90,10 @@ public struct SmoothSort: SortAlgorithm {
       var pshift = pshiftIn
       var head = headIn
       var isTrusty = isTrustyIn
-      let val = engine.values[head]
+      let val = engine.readValue(at: head)
       while p != 1 {
         let stepson = head - lp[pshift]
-        if engine.values[stepson] <= val { break }
+        if engine.readValue(at: stepson) <= val { break }
         if !isTrusty && pshift > 1 {
           let rt = head - 1
           let lf = head - 1 - lp[pshift - 2]
@@ -101,7 +101,7 @@ public struct SmoothSort: SortAlgorithm {
             break
           }
         }
-        engine.setValue(head, engine.values[stepson])
+        engine.setValue(head, engine.readValue(at: stepson))
         head = stepson
         let trail = (p & ~1).trailingZeroBitCount
         p = p &>> trail
@@ -141,28 +141,20 @@ public struct SmoothSort: SortAlgorithm {
       head += 1
     }
 
-    if fullSort {
-      trinkle(p, pshift, head, false)
-      while pshift != 1 || p != 1 {
-        if pshift <= 1 {
-          let trail = (p & ~1).trailingZeroBitCount
-          p = p &>> trail
-          pshift += trail
-        } else {
-          p = p &<< 2
-          p ^= 7
-          pshift -= 2
-          trinkle(p &>> 1, pshift + 1, head - lp[pshift] - 1, true)
-          trinkle(p, pshift, head - 1, true)
-        }
-        head -= 1
+    trinkle(p, pshift, head, false)
+    while pshift != 1 || p != 1 {
+      if pshift <= 1 {
+        let trail = (p & ~1).trailingZeroBitCount
+        p = p &>> trail
+        pshift += trail
+      } else {
+        p = p &<< 2
+        p ^= 7
+        pshift -= 2
+        trinkle(p &>> 1, pshift + 1, head - lp[pshift] - 1, true)
+        trinkle(p, pshift, head - 1, true)
       }
+      head -= 1
     }
-  }
-
-  public func smoothHeapify(into engine: inout RecordingEngine) {
-    let n = engine.count
-    guard n > 1 else { return }
-    smoothSort(into: &engine, lo: 0, hi: n - 1, fullSort: false)
   }
 }

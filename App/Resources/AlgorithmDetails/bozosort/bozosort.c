@@ -10,14 +10,23 @@ void swap(int *a, int *b) {
 }
 
 void printList(int items[], int size) {
-  for (int i = 0; i < size; i++) {
-    if (i == 0) {
-      printf("[%d, ", items[i]);
-    } else if (i != size - 1) {
-      printf("%d, ", items[i]);
-    } else {
-      printf("%d]", items[i]);
+  printf("[");
+  if (size > 0) {
+    printf("%d", items[0]);
+    for (int i = 1; i < size; i++) {
+      printf(", %d", items[i]);
     }
+  }
+  printf("]");
+}
+
+int isSorted(int arr[], int n);
+
+void sort(int arr[], int n) {
+  while (!isSorted(arr, n)) {
+    int i = rand() % n;
+    int j = rand() % n;
+    swap(&arr[i], &arr[j]);
   }
 }
 
@@ -28,14 +37,6 @@ int isSorted(int arr[], int n) {
     }
   }
   return 1;
-}
-
-void sort(int arr[], int n) {
-  while (!isSorted(arr, n)) {
-    int i = rand() % n;
-    int j = rand() % n;
-    swap(&arr[i], &arr[j]);
-  }
 }
 
 int main(int argc, char *argv[]) {

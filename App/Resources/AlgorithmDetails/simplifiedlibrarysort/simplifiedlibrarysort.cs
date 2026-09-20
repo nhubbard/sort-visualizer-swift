@@ -2,6 +2,12 @@ using System;
 
 public class SimplifiedLibrarySort
 {
+  public static int[] Sort(int[] array)
+  {
+    LibrarySort(array);
+    return array;
+  }
+
   private static int BinarySearch(int[] arr, int item, int start, int end)
   {
     var lo = start;
@@ -89,13 +95,18 @@ public class SimplifiedLibrarySort
   private static void LibrarySort(int[] arr)
   {
     var n = arr.Length;
-    if (n < 2)
+    if (n < 32)
     {
+      BinaryInsertionSort(arr, 0, n);
       return;
     }
 
-    var rebalanceFactor = 2;
-    var spineSize = 1;
+    var rebalanceFactor = 4;
+    var spineSize = n;
+    while (spineSize >= 32)
+    {
+      spineSize = (spineSize - 1) / rebalanceFactor + 1;
+    }
     BinaryInsertionSort(arr, 0, spineSize);
 
     var maxLevel = spineSize;
@@ -127,15 +138,12 @@ public class SimplifiedLibrarySort
     Rebalance(arr, temp, counts, locations, spineSize, n);
   }
 
-  public static int[] Sort(int[] array)
-  {
-    LibrarySort(array);
-    return array;
-  }
-
   public static void Main(String[] args)
   {
-    int[] array = { 0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56 };
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     array = Sort(array);
     string result = "[" + String.Join(", ", array) + "]";
     Console.WriteLine(result);

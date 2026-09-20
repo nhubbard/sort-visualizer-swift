@@ -100,7 +100,7 @@ before the user opens a detail view.
 - **`CoverageSweepDriver`**, with its pure, registry-agnostic `CoverageSweepEnumerator` factored out
   for testability, drives Full Sweep: every algorithm, shuffle, and visualizer combination. An
   append-only TSV log makes a sweep resumable across app launches or interruptions. At current
-  content counts, Full Sweep covers 167 algorithms × 46 shuffles × 15 visualizers, or 115,230
+  content counts, Full Sweep covers 167 algorithms × 44 shuffles × 15 visualizers, or 110,220
   combinations.
 - **`TapeArchiveDocument`** implements the Export Tape and Import Tape feature: a `FileDocument`
   conformance wrapping `Tape.archived()`/`Tape(archivedData:)` (see

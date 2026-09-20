@@ -4,6 +4,12 @@ import (
 	"fmt"
 )
 
+func sort(arr []int) []int {
+	n := len(arr)
+	mergeSort(arr, 0, n)
+	return arr
+}
+
 func push(arr []int, p, a, b int) {
 	if a == b {
 		return
@@ -41,12 +47,6 @@ func mergeSort(arr []int, a, b int) {
 		mergeSort(arr, m, b)
 	}
 	merge(arr, a, m, b)
-}
-
-func sort(arr []int) []int {
-	n := len(arr)
-	mergeSort(arr, 0, n)
-	return arr
 }
 
 func main() {

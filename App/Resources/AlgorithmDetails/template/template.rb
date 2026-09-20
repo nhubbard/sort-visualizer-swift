@@ -1,5 +1,4 @@
 def sort(arr)
-  arr.length
   # TODO: Insert Ruby implementation of algorithm here.
 end
 

@@ -1,3 +1,25 @@
+function sort(arr) {
+  const n = arr.length;
+  const table = [];
+  for (let i = 0; i < n; i++) table[i] = i;
+  quickSort(arr, table, 0, n);
+  for (let i = 0; i < n; i++) {
+    if (table[i] !== i) {
+      const t = arr[i];
+      let j = i;
+      let next = table[i];
+      do {
+        arr[j] = arr[next];
+        table[j] = j;
+        j = next;
+        next = table[next];
+      } while (next !== i);
+      arr[j] = t;
+      table[j] = j;
+    }
+  }
+}
+
 function stableComp(arr, table, a, b) {
   const ta = table[a];
   const tb = table[b];
@@ -48,28 +70,10 @@ function quickSort(arr, table, a, b) {
   quickSort(arr, table, p + 1, b);
 }
 
-function sort(arr) {
-  const n = arr.length;
-  const table = [];
-  for (let i = 0; i < n; i++) table[i] = i;
-  quickSort(arr, table, 0, n);
-  for (let i = 0; i < n; i++) {
-    if (table[i] !== i) {
-      const t = arr[i];
-      let j = i;
-      let next = table[i];
-      do {
-        arr[j] = arr[next];
-        table[j] = j;
-        j = next;
-        next = table[next];
-      } while (next !== i);
-      arr[j] = t;
-      table[j] = j;
-    }
-  }
-}
 
-var array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56];
+const array = [
+  0, 39, 21, 62, 91, 77, 14, 23,
+  90, 69, 51, 81, 68, 83, 32, 56,
+];
 sort(array);
 console.log("[" + array.join(", ") + "]");

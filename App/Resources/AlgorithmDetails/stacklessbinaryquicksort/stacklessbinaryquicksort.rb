@@ -1,3 +1,29 @@
+def sort(arr)
+  n = arr.length
+  return if n <= 1
+
+  q = most_significant_bit(arr.max)
+  return if q < 0
+
+  m = 0
+  i = 0
+  b = n
+
+  while i < n
+    p = (b - i < 1) ? i : partition(arr, i, b, q)
+
+    if q == 0
+      m += 2
+      q += 1 until get_bit(m, q + 1)
+      i = b
+      b += 1 while b < n && (arr[b] >> (q + 1)) == (m >> (q + 1))
+    else
+      b = p
+      q -= 1
+    end
+  end
+end
+
 def most_significant_bit(value)
   return -1 if value == 0
   bit = 0
@@ -25,31 +51,6 @@ def partition(arr, lo, hi, bit)
   end
 end
 
-def sort(arr)
-  n = arr.length
-  return if n <= 1
-
-  q = most_significant_bit(arr.max)
-  return if q < 0
-
-  m = 0
-  i = 0
-  b = n
-
-  while i < n
-    p = (b - i < 1) ? i : partition(arr, i, b, q)
-
-    if q == 0
-      m += 2
-      q += 1 until get_bit(m, q + 1)
-      i = b
-      b += 1 while b < n && (arr[b] >> (q + 1)) == (m >> (q + 1))
-    else
-      b = p
-      q -= 1
-    end
-  end
-end
 
 array = [0, 39, 21, 62, 91, 77, 14, 23,
   90, 69, 51, 81, 68, 83, 32, 56]

@@ -1,5 +1,22 @@
 import kotlin.math.sqrt
 
+fun sort(array: IntArray) {
+  val n = array.size
+  if (n <= 1) return
+  heapify(array, n)
+  for (i in 1 until n - 1) {
+    val temp = array[0]
+    array[0] = array[n - i]
+    array[n - i] = temp
+    siftDown(array, 0, n - i)
+  }
+  if (array[0] > array[1]) {
+    val temp = array[0]
+    array[0] = array[1]
+    array[1] = temp
+  }
+}
+
 fun triangularRoot(val_: Int): Int = ((sqrt((8 * val_ + 1).toDouble())).toInt() - 1) / 2
 
 fun siftDown(array: IntArray, rootIn: Int, size: Int) {
@@ -23,23 +40,6 @@ fun siftDown(array: IntArray, rootIn: Int, size: Int) {
 fun heapify(array: IntArray, length: Int) {
   for (i in length - 1 downTo 0) {
     siftDown(array, i, length)
-  }
-}
-
-fun sort(array: IntArray) {
-  val n = array.size
-  if (n <= 1) return
-  heapify(array, n)
-  for (i in 1 until n - 1) {
-    val temp = array[0]
-    array[0] = array[n - i]
-    array[n - i] = temp
-    siftDown(array, 0, n - i)
-  }
-  if (array[0] > array[1]) {
-    val temp = array[0]
-    array[0] = array[1]
-    array[1] = temp
   }
 }
 

@@ -4,6 +4,11 @@ import (
 	"fmt"
 )
 
+func sort(arr []int) []int {
+	quicksortTernaryLR(arr, 0, len(arr)-1)
+	return arr
+}
+
 func compare3(arr []int, a, b int) int {
 	if arr[a] == arr[b] {
 		return 0
@@ -115,11 +120,6 @@ func quicksortTernaryLR(arr []int, lo, hi int) {
 
 	quicksortTernaryLR(arr, lo, lo+numLess-1)
 	quicksortTernaryLR(arr, hi-numGreater+1, hi)
-}
-
-func sort(arr []int) []int {
-	quicksortTernaryLR(arr, 0, len(arr)-1)
-	return arr
 }
 
 func main() {

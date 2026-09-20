@@ -19,7 +19,7 @@ public struct ShuffledHeadShuffle: ShuffleAlgorithm {
 
     let auxHandle = engine.createAuxArray(length: n)
     var aux = [Int](repeating: 0, count: n)
-    var values = engine.values
+    var values = engine.readAllValues()
 
     var i = n - 1
     var j = n - 1

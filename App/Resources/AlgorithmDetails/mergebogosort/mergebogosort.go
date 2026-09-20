@@ -5,15 +5,6 @@ import (
 	"math/rand"
 )
 
-func isSorted(arr []int, start int, end int) bool {
-	for i := start; i < end-1; i++ {
-		if arr[i] > arr[i+1] {
-			return false
-		}
-	}
-	return true
-}
-
 func sort(arr []int, start int, end int) []int {
 	if start >= end-1 {
 		return arr
@@ -47,7 +38,18 @@ func sort(arr []int, start int, end int) []int {
 	return arr
 }
 
+func isSorted(arr []int, start int, end int) bool {
+	for i := start; i < end-1; i++ {
+		if arr[i] > arr[i+1] {
+			return false
+		}
+	}
+	return true
+}
+
 func main() {
-	array := []int{0, 39, 21, 62, 91, 14, 23}
+	array := []int{
+		0, 39, 21, 62, 91, 14, 23,
+	}
 	fmt.Println(sort(array, 0, len(array)))
 }

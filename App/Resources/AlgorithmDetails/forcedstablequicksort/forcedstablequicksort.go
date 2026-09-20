@@ -4,6 +4,16 @@ import (
 	"fmt"
 )
 
+func sort(arr []int) []int {
+	n := len(arr)
+	key := make([]int, n)
+	for i := 0; i < n; i++ {
+		key[i] = i
+	}
+	quickSort(arr, key, 0, n)
+	return arr
+}
+
 func stableComp(arr []int, key []int, a int, b int) bool {
 	if arr[a] > arr[b] {
 		return true
@@ -69,16 +79,6 @@ func quickSort(arr []int, key []int, a int, b int) {
 	stableSwap(arr, key, a, p)
 	quickSort(arr, key, a, p)
 	quickSort(arr, key, p+1, b)
-}
-
-func sort(arr []int) []int {
-	n := len(arr)
-	key := make([]int, n)
-	for i := 0; i < n; i++ {
-		key[i] = i
-	}
-	quickSort(arr, key, 0, n)
-	return arr
 }
 
 func main() {

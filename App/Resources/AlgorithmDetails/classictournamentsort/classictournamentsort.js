@@ -1,9 +1,3 @@
-function ceilPow2(value) {
-  let r = 1;
-  while (r < value) r *= 2;
-  return r;
-}
-
 function sort(array) {
   const n = array.length;
   if (n <= 1) return;
@@ -81,6 +75,16 @@ function sort(array) {
   }
 }
 
-const array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56];
+function ceilPow2(value) {
+  let r = 1;
+  while (r < value) r *= 2;
+  return r;
+}
+
+
+const array = [
+  0, 39, 21, 62, 91, 77, 14, 23,
+  90, 69, 51, 81, 68, 83, 32, 56,
+];
 sort(array);
 console.log(`[${array.join(", ")}]`);

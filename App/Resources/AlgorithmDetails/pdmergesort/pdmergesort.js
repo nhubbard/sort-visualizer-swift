@@ -1,3 +1,35 @@
+function sort(arr) {
+  const n = arr.length;
+  if (n < 2) {
+    return;
+  }
+
+  let runs = [];
+  let lastRun = 0;
+  while (lastRun !== -1) {
+    runs.push(lastRun);
+    lastRun = identifyRun(arr, lastRun, n);
+  }
+
+  const buffer = new Array(n);
+  let runCount = runs.length;
+  while (runCount > 1) {
+    let i = 0;
+    while (i < runCount - 1) {
+      const end = i + 2 >= runCount ? n : runs[i + 2];
+      mergeRuns(arr, runs[i], runs[i + 1], end, buffer);
+      i += 2;
+    }
+
+    const compacted = [];
+    for (let j = 0; j < runCount; j += 2) {
+      compacted.push(runs[j]);
+    }
+    runs = compacted;
+    runCount = runs.length;
+  }
+}
+
 function reverseRun(arr, lo, hi) {
   while (lo < hi) {
     const t = arr[lo];
@@ -94,38 +126,10 @@ function mergeRuns(arr, leftStart, rightStart, end, buffer) {
   }
 }
 
-function sort(arr) {
-  const n = arr.length;
-  if (n < 2) {
-    return;
-  }
 
-  let runs = [];
-  let lastRun = 0;
-  while (lastRun !== -1) {
-    runs.push(lastRun);
-    lastRun = identifyRun(arr, lastRun, n);
-  }
-
-  const buffer = new Array(n);
-  let runCount = runs.length;
-  while (runCount > 1) {
-    let i = 0;
-    while (i < runCount - 1) {
-      const end = i + 2 >= runCount ? n : runs[i + 2];
-      mergeRuns(arr, runs[i], runs[i + 1], end, buffer);
-      i += 2;
-    }
-
-    const compacted = [];
-    for (let j = 0; j < runCount; j += 2) {
-      compacted.push(runs[j]);
-    }
-    runs = compacted;
-    runCount = runs.length;
-  }
-}
-
-var array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56];
+const array = [
+  0, 39, 21, 62, 91, 77, 14, 23,
+  90, 69, 51, 81, 68, 83, 32, 56,
+];
 sort(array);
 console.log("[" + array.join(", ") + "]");

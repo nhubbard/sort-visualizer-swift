@@ -28,6 +28,23 @@ public class AvlTreeSort
     }
   }
 
+  public static void Sort(int[] arr)
+  {
+    Node? root = null;
+    foreach (int value in arr)
+    {
+      root = Add(root, value).Node;
+    }
+
+    List<int> result = new List<int>();
+    Traverse(root, result);
+
+    for (int i = 0; i < arr.Length; i++)
+    {
+      arr[i] = result[i];
+    }
+  }
+
   private static Node SingleRotateRight(Node node)
   {
     Node b = node.Left!;
@@ -137,26 +154,12 @@ public class AvlTreeSort
     Traverse(node.Right, result);
   }
 
-  public static void Sort(int[] arr)
-  {
-    Node? root = null;
-    foreach (int value in arr)
-    {
-      root = Add(root, value).Node;
-    }
-
-    List<int> result = new List<int>();
-    Traverse(root, result);
-
-    for (int i = 0; i < arr.Length; i++)
-    {
-      arr[i] = result[i];
-    }
-  }
-
   public static void Main(String[] args)
   {
-    int[] array = { 0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56 };
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     Sort(array);
     string result = "[" + String.Join(", ", array) + "]";
     Console.WriteLine(result);

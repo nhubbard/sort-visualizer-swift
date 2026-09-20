@@ -1,11 +1,60 @@
+#include <cstdio>
 #include <cstdlib>
 #include <iostream>
 #include <vector>
 
 /* A `ref` is either a player leaf, encoded as `-playerIndex` (so `ref <= 0`),
  * or another match node's root offset into `matches` (so `ref > 0`). */
-bool isPlayer(int ref) { return ref <= 0; }
-int makePlayer(int index) { return -index; }
+bool isPlayer(int ref);
+int makePlayer(int index);
+int getWinner(const std::vector<int> &matches, int root);
+int getWinners(const std::vector<int> &matches, int root);
+int getLosers(const std::vector<int> &matches, int root);
+void setMatch(std::vector<int> &matches, int root, int winner, int winners,
+              int losers);
+int getPlayer(const std::vector<int> &array, const std::vector<int> &matches,
+              int ref);
+int makeMatch(std::vector<int> &array, std::vector<int> &matches, int top,
+              int bot, int root);
+int knockout(std::vector<int> &array, std::vector<int> &matches, int i, int k,
+             int root);
+int rebuild(std::vector<int> &array, std::vector<int> &matches, int root);
+
+
+
+void printList(const std::vector<int> &items) {
+  printf("[");
+  if (!items.empty()) {
+    printf("%d", items[0]);
+    for (size_t i = 1; i < items.size(); i++) {
+      printf(", %d", items[i]);
+    }
+  }
+  printf("]\n");
+}
+
+void sort(std::vector<int> &array) {
+  int n = static_cast<int>(array.size());
+  if (n <= 1)
+    return;
+
+  std::vector<int> matches(6 * n, 0);
+  int tourney = knockout(array, matches, 0, n - 1, 3);
+
+  std::vector<int> output(n);
+  for (int i = 0; i < n; i++) {
+    output[i] = array[getPlayer(array, matches, tourney)];
+    tourney = isPlayer(tourney) ? 0 : rebuild(array, matches, tourney);
+  }
+  array = output;
+}
+
+bool isPlayer(int ref) {
+  return ref <= 0;
+}
+int makePlayer(int index) {
+  return -index;
+}
 
 int getWinner(const std::vector<int> &matches, int root) {
   return matches[root];
@@ -68,32 +117,10 @@ int rebuild(std::vector<int> &array, std::vector<int> &matches, int root) {
   return root;
 }
 
-void sort(std::vector<int> &array) {
-  int n = static_cast<int>(array.size());
-  if (n <= 1)
-    return;
-
-  std::vector<int> matches(6 * n, 0);
-  int tourney = knockout(array, matches, 0, n - 1, 3);
-
-  std::vector<int> output(n);
-  for (int i = 0; i < n; i++) {
-    output[i] = array[getPlayer(array, matches, tourney)];
-    tourney = isPlayer(tourney) ? 0 : rebuild(array, matches, tourney);
-  }
-  array = output;
-}
-
 int main() {
   std::vector<int> array = {0,  39, 21, 62, 91, 77, 14, 23,
                             90, 69, 51, 81, 68, 83, 32, 56};
   sort(array);
-  std::cout << "[";
-  for (size_t i = 0; i < array.size(); i++) {
-    std::cout << array[i];
-    if (i != array.size() - 1)
-      std::cout << ", ";
-  }
-  std::cout << "]" << '\n';
+  printList(array);
   return 0;
 }

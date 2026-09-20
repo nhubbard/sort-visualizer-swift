@@ -9,7 +9,7 @@ public class DiamondSortRecursive
   {
     if (stop - start == 2)
     {
-      if (arr[start] > arr[stop - 1])
+      if (stop <= arr.Length && arr[start] > arr[stop - 1])
       {
         (arr[start], arr[stop - 1]) = (arr[stop - 1], arr[start]);
       }
@@ -33,10 +33,21 @@ public class DiamondSortRecursive
     }
   }
 
+  public static void SortArray(int[] arr)
+  {
+    if (arr.Length < 2) return;
+    int paddedLength = 1;
+    while (paddedLength < arr.Length) paddedLength *= 2;
+    Sort(arr, 0, paddedLength, true);
+  }
+
   public static void Main(String[] args)
   {
-    int[] array = { 0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56 };
-    Sort(array, 0, array.Length, true);
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
+    SortArray(array);
     string result = "[" + String.Join(", ", array) + "]";
     Console.WriteLine(result);
   }

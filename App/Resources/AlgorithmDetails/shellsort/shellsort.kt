@@ -1,19 +1,17 @@
 fun sort(arr: Array<Int>) {
   val n = arr.size
-  var i = n / 2
-  while (i > 0) {
-    for (j in i until n) {
-      var k = j - i
-      while (k >= 0) {
-        if (arr[k + i] >= arr[k]) {
-          break
-        } else {
-          arr[k] = arr[k + i].also { arr[k + i] = arr[k] }
-        }
-        k -= i
+  val gaps = intArrayOf(8861, 3938, 1750, 701, 301, 132, 57, 23, 10, 4, 1)
+  for (gap in gaps) {
+    if (gap >= n) continue
+    for (i in gap until n) {
+      var j = i
+      while (j >= gap && arr[j] < arr[j - gap]) {
+        val temp = arr[j]
+        arr[j] = arr[j - gap]
+        arr[j - gap] = temp
+        j -= gap
       }
     }
-    i /= 2
   }
 }
 

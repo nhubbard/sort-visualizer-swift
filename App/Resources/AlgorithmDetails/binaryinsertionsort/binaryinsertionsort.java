@@ -1,6 +1,20 @@
 import java.util.Arrays;
 
 public class binaryinsertionsort {
+  public static void sort(int[] arr) {
+    for (int i = 1; i < arr.length; i++) {
+      int item = arr[i];
+      int pos = binarySearch(arr, item, 0, i);
+      int j = i;
+      while (j > pos) {
+        int displaced = arr[j];
+        arr[j] = arr[j - 1];
+        arr[j - 1] = displaced;
+        j--;
+      }
+    }
+  }
+
   private static int binarySearch(int[] arr, int item, int start, int end) {
     int low = start;
     int high = end;
@@ -15,21 +29,11 @@ public class binaryinsertionsort {
     return low;
   }
 
-  public static void sort(int[] arr) {
-    for (int i = 1; i < arr.length; i++) {
-      int item = arr[i];
-      int pos = binarySearch(arr, item, 0, i);
-      int j = i;
-      while (j > pos) {
-        arr[j] = arr[j - 1];
-        j--;
-      }
-      arr[pos] = item;
-    }
-  }
-
   public static void main(String[] args) {
-    int[] array = new int[] {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     sort(array);
     System.out.println(Arrays.toString(array));
   }

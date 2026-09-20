@@ -1,6 +1,10 @@
 import java.util.Arrays;
 
 public class optimizedstoogesort {
+  public static void sort(int[] arr) {
+    exchange(arr, arr.length);
+  }
+
   private static void forward(int[] arr, int left, int right) {
     while (left < right) {
       int index = right;
@@ -53,12 +57,11 @@ public class optimizedstoogesort {
     backward(arr, 1, length - 1);
   }
 
-  public static void sort(int[] arr) {
-    exchange(arr, arr.length);
-  }
-
   public static void main(String[] args) {
-    int[] array = new int[] {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     sort(array);
     System.out.println(Arrays.toString(array));
   }

@@ -71,6 +71,29 @@ struct ContentView: View {
 
   @State private var selectedSidebarCategory: SidebarCategory? = .all
 
+  /// The content column's display order — `.name` reproduces today's plain alphabetical order;
+  /// the other two are display-only orderings, not persisted (same precedent as `searchText`)
+  /// since they're a one-off browsing convenience, not a setting. Showcase mode's own run order
+  /// (`startShowcase()`) is deliberately independent of this — it always runs alphabetically for
+  /// a reproducible full pass, regardless of whatever's currently selected here.
+  private enum SortOption: String, CaseIterable, Identifiable {
+    case name
+    case complexity
+    case estimatedSpeed
+
+    var id: Self { self }
+
+    var displayName: String {
+      switch self {
+      case .name: "Name"
+      case .complexity: "Implementation Complexity"
+      case .estimatedSpeed: "Estimated Speed"
+      }
+    }
+  }
+
+  @State private var sortOption: SortOption = .name
+
   var body: some View {
     NavigationSplitView {
       categorySidebar
@@ -164,6 +187,10 @@ struct ContentView: View {
             text: algorithm.metadata.displayName,
             iconName: algorithm.metadata.iconName)
         }
+        // `nil` (not an empty string) when sorting by name -- `.badge(Text?)` shows nothing at
+        // all for `nil`, whereas an empty string still reserves badge layout space on some
+        // platforms.
+        .badge(sortCaption(for: algorithm).map(Text.init))
         .accessibilityIdentifier("algorithmLink.\(algorithm.id.rawValue)")
         .contextMenu {
           Button("Run Size Sweep") {
@@ -187,6 +214,42 @@ struct ContentView: View {
     .searchable(text: $searchText, prompt: "Search Algorithms")
     .disabled(showcaseIndex != nil || sweepDriver.isRunning)
     .navigationTitle(contentTitle)
+    .toolbar {
+      ToolbarItem(placement: .primaryAction) {
+        Menu {
+          Picker("Sort By", selection: $sortOption) {
+            ForEach(SortOption.allCases) { option in
+              Text(option.displayName).tag(option)
+            }
+          }
+        } label: {
+          Label("Sort By", systemImage: "arrow.up.arrow.down")
+        }
+        .accessibilityIdentifier("algorithmSortMenu")
+      }
+    }
+  }
+
+  /// `nil` for `.name` (today's plain alphabetical order needs no extra explanation); otherwise a
+  /// trailing badge that makes the *reason* for the current order legible instead of an invisible
+  /// sort key. `.estimatedSpeed`'s "N/A" case is deliberate, not a missing value -- see
+  /// `AlgorithmMetadata.estimatedOperations(atSize:)`'s own doc comment for why an algorithm whose
+  /// `sizeRange` can't reach `settings.defaultArraySize` is called out rather than silently
+  /// evaluated at its own (much smaller) practical range.
+  private func sortCaption(for algorithm: any SortAlgorithm) -> String? {
+    switch sortOption {
+    case .name:
+      return nil
+    case .complexity:
+      return "Complexity: \(algorithm.metadata.implementationComplexity)"
+    case .estimatedSpeed:
+      let referenceSize = settings.defaultArraySize
+      guard let ops = algorithm.metadata.estimatedOperations(atSize: referenceSize) else {
+        return "N/A above n=\(algorithm.metadata.sizeRange.upperBound)"
+      }
+      let opsText = ops.rounded().formatted(.number.notation(.compactName))
+      return "~\(opsText) ops at n=\(referenceSize)"
+    }
   }
 
   private var contentTitle: String {
@@ -207,8 +270,39 @@ struct ContentView: View {
     case .some(.category(let category)):
       base = AlgorithmRegistry.shared.algorithms(in: category)
     }
-    guard !searchText.isEmpty else { return base }
-    return base.filter { $0.metadata.displayName.localizedCaseInsensitiveContains(searchText) }
+    let filtered =
+      searchText.isEmpty
+      ? base
+      : base.filter { $0.metadata.displayName.localizedCaseInsensitiveContains(searchText) }
+    return sortedByOption(filtered)
+  }
+
+  /// `base`/`filtered` above are already alphabetical either way (`AlgorithmRegistry.algorithms`/
+  /// `.algorithms(in:)` both sort by `displayName`), so `.name` is a no-op re-sort here rather
+  /// than special-cased away -- one fewer branch to keep in sync with that upstream ordering.
+  /// The other two options re-sort on top of that alphabetical base, so ties (equal complexity,
+  /// or both `nil`/equal `estimatedOperations`) fall back to it automatically.
+  private func sortedByOption(_ algorithms: [any SortAlgorithm]) -> [any SortAlgorithm] {
+    switch sortOption {
+    case .name:
+      return algorithms
+    case .complexity:
+      return algorithms.sorted {
+        $0.metadata.implementationComplexity < $1.metadata.implementationComplexity
+      }
+    case .estimatedSpeed:
+      let referenceSize = settings.defaultArraySize
+      return algorithms.sorted { lhs, rhs in
+        let lhsOps = lhs.metadata.estimatedOperations(atSize: referenceSize)
+        let rhsOps = rhs.metadata.estimatedOperations(atSize: referenceSize)
+        switch (lhsOps, rhsOps) {
+        case let (lhsOps?, rhsOps?): return lhsOps < rhsOps
+        case (nil, nil): return false
+        case (nil, _): return false  // N/A always sorts after every real estimate
+        case (_, nil): return true
+        }
+      }
+    }
   }
 
   /// Moves the sidebar to whichever category actually contains `algorithmID`, but only when it

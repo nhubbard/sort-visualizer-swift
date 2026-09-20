@@ -1,5 +1,11 @@
 THRESHOLD = 32
 
+def sort(arr)
+  n = arr.length
+  return if n < 2
+  merge_sort(arr, 0, n)
+end
+
 def insertion_sort(arr, start, stop)
   ((start + 1)...stop).each do |i|
     j = i
@@ -47,11 +53,6 @@ def merge_sort(arr, start, stop)
   merge(arr, start, mid, stop)
 end
 
-def sort(arr)
-  n = arr.length
-  return if n < 2
-  merge_sort(arr, 0, n)
-end
 
 array = [0, 39, 21, 62, 91, 77, 14, 23,
   90, 69, 51, 81, 68, 83, 32, 56]

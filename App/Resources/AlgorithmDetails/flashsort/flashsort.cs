@@ -2,6 +2,12 @@ using System;
 
 public class FlashSort
 {
+  public static int[] Sort(int[] array)
+  {
+    DoFlashSort(array);
+    return array;
+  }
+
   private static int Classify(int value, int minValue, double c)
   {
     return (int)((value - minValue) * c) + 1;
@@ -116,15 +122,12 @@ public class FlashSort
     }
   }
 
-  public static int[] Sort(int[] array)
-  {
-    DoFlashSort(array);
-    return array;
-  }
-
   public static void Main(String[] args)
   {
-    int[] array = { 0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56 };
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     Sort(array);
     string result = "[" + String.Join(", ", array) + "]";
     Console.WriteLine(result);

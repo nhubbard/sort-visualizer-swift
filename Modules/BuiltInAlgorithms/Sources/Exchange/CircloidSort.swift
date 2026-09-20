@@ -24,8 +24,11 @@ public struct CircloidSort: SortAlgorithm {
     category: .exchange,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 564, coefficients: [236497, 638.268, 0.28619],
+      anchorSize: 564, coefficients: [236752, 639.334, 0.287181],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .powerLog, coefficients: [6.55418, 1.36519], rSquared: 0.996344),
+    implementationComplexity: 11,
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n log n)", average: "O(n log^2 n)", worst: "O(n log^2 n)"),

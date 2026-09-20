@@ -1,3 +1,7 @@
+def sort(array)
+  cycle_sort(array)
+end
+
 def cycle_sort(array)
   n = array.length
   (0...(n - 1)).each do |cycle_start|
@@ -21,9 +25,6 @@ def cycle_sort(array)
   array
 end
 
-def sort(array)
-  cycle_sort(array)
-end
 
 array = [0, 39, 21, 62, 91, 77, 14, 23,
   90, 69, 51, 81, 68, 83, 32, 56]

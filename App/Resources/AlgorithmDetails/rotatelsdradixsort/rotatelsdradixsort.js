@@ -1,6 +1,28 @@
-const RADIX_BASE = 10;
+const RADIX_BASE = 4;
 
 // Extracts the digit at `place` (0 = ones place) from `value`, in RADIX_BASE.
+function sort(arr) {
+  const n = arr.length;
+  if (n < 2) {
+    return;
+  }
+  let maxValue = arr[0];
+  for (let i = 1; i < n; i++) {
+    if (arr[i] > maxValue) {
+      maxValue = arr[i];
+    }
+  }
+  let maxPlace = 0;
+  let probe = RADIX_BASE;
+  while (probe <= maxValue) {
+    maxPlace++;
+    probe *= RADIX_BASE;
+  }
+  for (let place = 0; place <= maxPlace; place++) {
+    digitMergeSort(arr, 0, n, place);
+  }
+}
+
 function digitAt(value, place) {
   let divisor = 1;
   for (let i = 0; i < place; i++) {
@@ -80,28 +102,10 @@ function digitMergeSort(arr, a, b, place) {
   mergeByDigit(arr, a, mid, b, 0, RADIX_BASE, place);
 }
 
-function sort(arr) {
-  const n = arr.length;
-  if (n < 2) {
-    return;
-  }
-  let maxValue = arr[0];
-  for (let i = 1; i < n; i++) {
-    if (arr[i] > maxValue) {
-      maxValue = arr[i];
-    }
-  }
-  let maxPlace = 0;
-  let probe = RADIX_BASE;
-  while (probe <= maxValue) {
-    maxPlace++;
-    probe *= RADIX_BASE;
-  }
-  for (let place = 0; place <= maxPlace; place++) {
-    digitMergeSort(arr, 0, n, place);
-  }
-}
 
-var array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56];
+const array = [
+  0, 39, 21, 62, 91, 77, 14, 23,
+  90, 69, 51, 81, 68, 83, 32, 56,
+];
 sort(array);
 console.log("[" + array.join(", ") + "]");

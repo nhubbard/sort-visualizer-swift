@@ -1,3 +1,9 @@
+fun sort(arr: IntArray) {
+  if (arr.size > 1) {
+    doubleInsertion(arr, 0, arr.size)
+  }
+}
+
 fun leftBinarySearch(array: IntArray, a: Int, b: Int, `val`: Int): Int {
   var lo = a
   var hi = b
@@ -80,12 +86,6 @@ fun doubleInsertion(array: IntArray, a: Int, b: Int) {
     }
     i--
     j++
-  }
-}
-
-fun sort(arr: IntArray) {
-  if (arr.size > 1) {
-    doubleInsertion(arr, 0, arr.size)
   }
 }
 

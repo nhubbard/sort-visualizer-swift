@@ -8,8 +8,11 @@ public struct StablePermutationSort: SortAlgorithm {
     category: .exchange,
     sizeRange: 4...8,
     growthModel: OperationGrowthModel(
-      anchorSize: 7, coefficients: [78799.3, 163121, 174825, 128613, 72779.7, 33693.6],
+      anchorSize: 7, coefficients: [40977.5, 88319.8, 95179, 68380.6, 36845.6, 15882.9],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .exponential, coefficients: [0.0114874, 8.6307], rSquared: 0.99681),
+    implementationComplexity: 12,
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n)", average: "O(n \\times n!)", worst: "O(n \\times n!)"),
@@ -56,9 +59,9 @@ public struct StablePermutationSort: SortAlgorithm {
       // ...then carry the underlying array's values through the SAME rotation, along the
       // now-rotated idx sequence. Each position is read as a source before it's ever
       // overwritten as a target later in this loop, so no temp copy beyond `t` is needed.
-      let carried = engine.values[idx[0]]
+      let carried = engine.readValue(at: idx[0])
       for i in 1..<len {
-        engine.setValue(idx[i - 1], engine.values[idx[i]])
+        engine.setValue(idx[i - 1], engine.readValue(at: idx[i]))
       }
       engine.setValue(idx[len - 1], carried)
 

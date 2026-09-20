@@ -1,12 +1,20 @@
+#include <cstdio>
 #include <iostream>
 #include <vector>
 
-int ceilPow2(int value) {
-  int r = 1;
-  while (r < value) {
-    r *= 2;
+int ceilPow2(int value);
+
+
+
+void printList(const std::vector<int> &items) {
+  printf("[");
+  if (!items.empty()) {
+    printf("%d", items[0]);
+    for (size_t i = 1; i < items.size(); i++) {
+      printf(", %d", items[i]);
+    }
   }
-  return r;
+  printf("]\n");
 }
 
 void sort(std::vector<int> &array) {
@@ -83,16 +91,18 @@ void sort(std::vector<int> &array) {
   array = output;
 }
 
+int ceilPow2(int value) {
+  int r = 1;
+  while (r < value) {
+    r *= 2;
+  }
+  return r;
+}
+
 int main() {
   std::vector<int> array = {0,  39, 21, 62, 91, 77, 14, 23,
                             90, 69, 51, 81, 68, 83, 32, 56};
   sort(array);
-  std::cout << "[";
-  for (size_t i = 0; i < array.size(); i++) {
-    std::cout << array[i];
-    if (i != array.size() - 1)
-      std::cout << ", ";
-  }
-  std::cout << "]" << '\n';
+  printList(array);
   return 0;
 }

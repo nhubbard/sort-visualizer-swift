@@ -31,7 +31,7 @@ the resulting design. This page covers how the app got there.
 | 3 | Build a JavaScript scripting bridge for algorithms, proven with Bubble Sort. | Done, later removed entirely. Every algorithm and shuffle is native Swift, with no scripting layer. |
 | 4 | Build `VisualizationKit` and a first native visualizer (Bar Graph); build the first real sort screen. | Done. Rendering has since moved from `Canvas` to Metal; see [Architecture overview](overview.md#rendering-metal-not-canvas). |
 | 5 | Add a second and third visualizer, proving the visualization axis is independent of the algorithm. | Done. 15 visualizer styles ship today. |
-| 6 | Make shuffles into tapes: `ShuffleAlgorithm`, concatenated shuffle-and-sort recording. | Done. 46 shuffles ship today. |
+| 6 | Make shuffles into tapes: `ShuffleAlgorithm`, concatenated shuffle-and-sort recording. | Done. 44 shuffles ship today. |
 | 7 | Port ArrayV content at scale. | Ongoing. See [Port status](../reference/port-status.md) for current progress. |
 | 8 | Decompose services: `AudioService`, `AnalyticsService` (CloudKit), `AppSettings`. | Done. `AudioService` uses a local synth built on `AVAudioEngine`, not a third-party audio package. |
 | 9 | Build a data-driven `ContentView` and real `SettingsFeature`/`HomeFeature` views. | Done. |

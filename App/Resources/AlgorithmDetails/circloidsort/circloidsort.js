@@ -1,3 +1,13 @@
+function sort(arr) {
+  const n = arr.length;
+  if (n <= 1) {
+    return;
+  }
+  while (circlePass(arr, 0, n - 1)) {
+    // repeat until a full sweep makes no swaps
+  }
+}
+
 function circle(array, left, right) {
   var a = left;
   var b = right;
@@ -28,16 +38,10 @@ function circlePass(array, left, right) {
   return circle(array, left, right) || l || r;
 }
 
-function sort(arr) {
-  const n = arr.length;
-  if (n <= 1) {
-    return;
-  }
-  while (circlePass(arr, 0, n - 1)) {
-    // repeat until a full sweep makes no swaps
-  }
-}
 
-var array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56];
+const array = [
+  0, 39, 21, 62, 91, 77, 14, 23,
+  90, 69, 51, 81, 68, 83, 32, 56,
+];
 sort(array);
 console.log("[" + array.join(", ") + "]");

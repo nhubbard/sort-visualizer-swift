@@ -4,6 +4,10 @@ import (
 	"fmt"
 )
 
+func sort(arr []int) []int {
+	return cycleSort(arr)
+}
+
 func cycleSort(arr []int) []int {
 	n := len(arr)
 	for cycleStart := 0; cycleStart < n-1; cycleStart++ {
@@ -37,10 +41,6 @@ func cycleSort(arr []int) []int {
 		}
 	}
 	return arr
-}
-
-func sort(arr []int) []int {
-	return cycleSort(arr)
 }
 
 func main() {

@@ -1,3 +1,7 @@
+def sort(arr)
+  stable_quick_sort(arr, 0, arr.length - 1)
+end
+
 def stable_partition(arr, start, endpos)
   pivot_value = arr[start]
   left_list = []
@@ -34,9 +38,6 @@ def stable_quick_sort(arr, start, endpos)
   end
 end
 
-def sort(arr)
-  stable_quick_sort(arr, 0, arr.length - 1)
-end
 
 array = [0, 39, 21, 62, 91, 77, 14, 23,
   90, 69, 51, 81, 68, 83, 32, 56]

@@ -1,3 +1,13 @@
+fun sort(arr: Array<Int>) {
+  val n = arr.size
+  if (n <= 1) {
+    return
+  }
+  while (circlePass(arr, 0, n - 1)) {
+    // repeat until a full sweep makes no swaps
+  }
+}
+
 fun circle(arr: Array<Int>, left: Int, right: Int): Boolean {
   var a = left
   var b = right
@@ -26,16 +36,6 @@ fun circlePass(arr: Array<Int>, left: Int, right: Int): Boolean {
   val l = circlePass(arr, left, mid)
   val r = circlePass(arr, mid + 1, right)
   return circle(arr, left, right) || l || r
-}
-
-fun sort(arr: Array<Int>) {
-  val n = arr.size
-  if (n <= 1) {
-    return
-  }
-  while (circlePass(arr, 0, n - 1)) {
-    // repeat until a full sweep makes no swaps
-  }
 }
 
 fun main() {

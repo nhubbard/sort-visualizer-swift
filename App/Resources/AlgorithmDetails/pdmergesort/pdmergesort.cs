@@ -3,6 +3,44 @@ using System.Collections.Generic;
 
 public class PDMergeSort
 {
+  public static void Sort(int[] arr)
+  {
+    int n = arr.Length;
+    if (n < 2)
+    {
+      return;
+    }
+
+    var runs = new List<int>();
+    int lastRun = 0;
+    while (lastRun != -1)
+    {
+      runs.Add(lastRun);
+      lastRun = IdentifyRun(arr, lastRun, n);
+    }
+
+    int[] buffer = new int[n];
+    int runCount = runs.Count;
+    while (runCount > 1)
+    {
+      int i = 0;
+      while (i < runCount - 1)
+      {
+        int end = i + 2 >= runCount ? n : runs[i + 2];
+        MergeRuns(arr, runs[i], runs[i + 1], end, buffer);
+        i += 2;
+      }
+
+      var compacted = new List<int>();
+      for (int j = 0; j < runCount; j += 2)
+      {
+        compacted.Add(runs[j]);
+      }
+      runs = compacted;
+      runCount = runs.Count;
+    }
+  }
+
   public static void ReverseRun(int[] arr, int lo, int hi)
   {
     while (lo < hi)
@@ -122,47 +160,12 @@ public class PDMergeSort
     }
   }
 
-  public static void Sort(int[] arr)
-  {
-    int n = arr.Length;
-    if (n < 2)
-    {
-      return;
-    }
-
-    var runs = new List<int>();
-    int lastRun = 0;
-    while (lastRun != -1)
-    {
-      runs.Add(lastRun);
-      lastRun = IdentifyRun(arr, lastRun, n);
-    }
-
-    int[] buffer = new int[n];
-    int runCount = runs.Count;
-    while (runCount > 1)
-    {
-      int i = 0;
-      while (i < runCount - 1)
-      {
-        int end = i + 2 >= runCount ? n : runs[i + 2];
-        MergeRuns(arr, runs[i], runs[i + 1], end, buffer);
-        i += 2;
-      }
-
-      var compacted = new List<int>();
-      for (int j = 0; j < runCount; j += 2)
-      {
-        compacted.Add(runs[j]);
-      }
-      runs = compacted;
-      runCount = runs.Count;
-    }
-  }
-
   public static void Main(String[] args)
   {
-    int[] array = { 0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56 };
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     Sort(array);
     string result = "[" + String.Join(", ", array) + "]";
     Console.WriteLine(result);

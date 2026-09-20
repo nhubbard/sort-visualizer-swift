@@ -1,17 +1,53 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
+                 90, 69, 51, 81, 68, 83, 32, 56};
+
+void swap(int *a, int *b) {
+  int t = *a;
+  *a = *b;
+  *b = t;
+}
 
 void printList(int items[], int size) {
-  for (int i = 0; i < size; i++) {
-    if (i == 0) {
-      printf("[%d, ", items[i]);
-    } else if (i != size - 1) {
-      printf("%d, ", items[i]);
-    } else {
-      printf("%d]", items[i]);
+  printf("[");
+  if (size > 0) {
+    printf("%d", items[0]);
+    for (int i = 1; i < size; i++) {
+      printf(", %d", items[i]);
     }
+  }
+  printf("]");
+}
+
+int intPow(int base, int exponent);
+int getDigit(int value, int place, int base);
+void multiSwap(int arr[], int a, int b, int len);
+void rotateBlocks(int arr[], int a, int m, int b);
+int binSearchDigit(int arr[], int a, int b, int d, int place, int base);
+void mergeDigit(int arr[], int a, int m, int b, int da, int db, int place,
+                int base);
+void mergeSortDigit(int arr[], int a, int b, int place, int base);
+int shiftValue(int value, int places, int base);
+int dist(int arr[], int a, int b, int place, int base);
+
+void sort(int arr[], int n) {
+  if (n <= 1) return;
+  int base = 4, maxValue = 0;
+  for (int j = 0; j < n; j++) if (arr[j] > maxValue) maxValue = arr[j];
+  int q = 0, probe = base;
+  while (probe <= maxValue) { q++; probe *= base; }
+  int m = 0, i = 0, b = n;
+  while (i < n) {
+    int p = b - i < 1 ? i : dist(arr, i, b, q, base);
+    if (q == 0) {
+      m += base;
+      int t = m / base;
+      while (t % base == 0) { t /= base; q++; }
+      i = b;
+      while (b < n && shiftValue(arr[b], q + 1, base) == shiftValue(m, q + 1, base)) b++;
+    } else { b = p; q--; }
   }
 }
 
@@ -93,37 +129,14 @@ void mergeSortDigit(int arr[], int a, int b, int place, int base) {
  * buckets, then recurses into every resulting digit bucket one place lower --
  * an ordinary MSD radix sort built entirely out of the LSD variant's
  * rotate/binary-search machinery. */
-void msdRotateSort(int arr[], int a, int b, int place, int base) {
-  if (b - a < 2 || place < 0) {
-    return;
-  }
-  mergeSortDigit(arr, a, b, place, base);
-  int start = a;
-  for (int d = 0; d < base; d++) {
-    int end = binSearchDigit(arr, start, b, d + 1, place, base);
-    msdRotateSort(arr, start, end, place - 1, base);
-    start = end;
-  }
+int shiftValue(int value, int places, int base) {
+  while (places-- > 0) value /= base;
+  return value;
 }
 
-void sort(int arr[], int n) {
-  if (n <= 1) {
-    return;
-  }
-  int base = 4;
-  int maxValue = arr[0];
-  for (int i = 1; i < n; i++) {
-    if (arr[i] > maxValue) {
-      maxValue = arr[i];
-    }
-  }
-  int highestPlace = 0;
-  int probe = base;
-  while (probe <= maxValue) {
-    highestPlace++;
-    probe *= base;
-  }
-  msdRotateSort(arr, 0, n, highestPlace, base);
+int dist(int arr[], int a, int b, int place, int base) {
+  mergeSortDigit(arr, a, b, place, base);
+  return binSearchDigit(arr, a, b, 1, place, base);
 }
 
 int main(int argc, char *argv[]) {

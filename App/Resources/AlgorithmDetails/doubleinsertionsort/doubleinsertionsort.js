@@ -1,3 +1,10 @@
+function sort(arr) {
+  if (arr.length > 1) {
+    doubleInsertionSort(arr, 0, arr.length);
+  }
+  return arr;
+}
+
 function doubleInsertionSort(array, start, end) {
   var left = start + Math.floor((end - start) / 2) - 1;
   var right = left + 1;
@@ -61,13 +68,10 @@ function doubleInsertionSort(array, start, end) {
   }
 }
 
-function sort(arr) {
-  if (arr.length > 1) {
-    doubleInsertionSort(arr, 0, arr.length);
-  }
-  return arr;
-}
 
-var array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56];
+const array = [
+  0, 39, 21, 62, 91, 77, 14, 23,
+  90, 69, 51, 81, 68, 83, 32, 56,
+];
 sort(array);
 console.log("[" + array.join(", ") + "]");

@@ -4,6 +4,15 @@ import (
 	"fmt"
 )
 
+func sort(array []int) {
+	n := len(array)
+	if n <= 1 {
+		return
+	}
+	makeHeap(array, 0, n)
+	sortHeap(array, 0, n)
+}
+
 func hyperfloor(n int) int {
 	power := 1
 	for power*2 <= n {
@@ -153,15 +162,6 @@ func sortHeap(array []int, first int, lastIn int) {
 			break
 		}
 	}
-}
-
-func sort(array []int) {
-	n := len(array)
-	if n <= 1 {
-		return
-	}
-	makeHeap(array, 0, n)
-	sortHeap(array, 0, n)
 }
 
 func main() {

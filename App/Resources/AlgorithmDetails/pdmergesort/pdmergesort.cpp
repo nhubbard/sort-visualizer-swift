@@ -2,17 +2,56 @@
 #include <utility>
 #include <vector>
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
+                 90, 69, 51, 81, 68, 83, 32, 56};
 
 void printList(int items[], int size) {
-  for (int i = 0; i < size; i++) {
-    if (i == 0) {
-      printf("[%d, ", items[i]);
-    } else if (i != size - 1) {
-      printf("%d, ", items[i]);
-    } else {
-      printf("%d]", items[i]);
+  printf("[");
+  if (size > 0) {
+    printf("%d", items[0]);
+    for (int i = 1; i < size; i++) {
+      printf(", %d", items[i]);
     }
+  }
+  printf("]");
+}
+
+void reverseRun(int arr[], int lo, int hi);
+int identifyRun(int arr[], int indexIn, int n);
+void mergeUp(int arr[], int start, int mid, int end, std::vector<int> &buffer);
+void mergeDown(int arr[], int start, int mid, int end,
+               std::vector<int> &buffer);
+void mergeRuns(int arr[], int leftStart, int rightStart, int end,
+               std::vector<int> &buffer);
+
+void sort(int arr[], int n) {
+  if (n < 2) {
+    return;
+  }
+
+  std::vector<int> runs;
+  int lastRun = 0;
+  while (lastRun != -1) {
+    runs.push_back(lastRun);
+    lastRun = identifyRun(arr, lastRun, n);
+  }
+
+  std::vector<int> buffer(n);
+  int runCount = static_cast<int>(runs.size());
+  while (runCount > 1) {
+    int i = 0;
+    while (i < runCount - 1) {
+      int end = (i + 2 >= runCount) ? n : runs[i + 2];
+      mergeRuns(arr, runs[i], runs[i + 1], end, buffer);
+      i += 2;
+    }
+
+    std::vector<int> compacted;
+    for (int j = 0; j < runCount; j += 2) {
+      compacted.push_back(runs[j]);
+    }
+    runs = compacted;
+    runCount = static_cast<int>(runs.size());
   }
 }
 
@@ -109,37 +148,6 @@ void mergeRuns(int arr[], int leftStart, int rightStart, int end,
     mergeDown(arr, leftStart, rightStart, end, buffer);
   } else {
     mergeUp(arr, leftStart, rightStart, end, buffer);
-  }
-}
-
-void sort(int arr[], int n) {
-  if (n < 2) {
-    return;
-  }
-
-  std::vector<int> runs;
-  int lastRun = 0;
-  while (lastRun != -1) {
-    runs.push_back(lastRun);
-    lastRun = identifyRun(arr, lastRun, n);
-  }
-
-  std::vector<int> buffer(n);
-  int runCount = static_cast<int>(runs.size());
-  while (runCount > 1) {
-    int i = 0;
-    while (i < runCount - 1) {
-      int end = (i + 2 >= runCount) ? n : runs[i + 2];
-      mergeRuns(arr, runs[i], runs[i + 1], end, buffer);
-      i += 2;
-    }
-
-    std::vector<int> compacted;
-    for (int j = 0; j < runCount; j += 2) {
-      compacted.push_back(runs[j]);
-    }
-    runs = compacted;
-    runCount = static_cast<int>(runs.size());
   }
 }
 

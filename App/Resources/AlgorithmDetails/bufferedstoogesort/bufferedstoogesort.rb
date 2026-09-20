@@ -1,3 +1,7 @@
+def sort(arr)
+  buffered_stooge_sort(arr, 0, arr.length)
+end
+
 def buffered_stooge_sort(arr, start, stop)
   if stop - start > 1
     if stop - start == 2 && arr[start] > arr[stop - 1]
@@ -49,9 +53,6 @@ def buffered_stooge_sort(arr, start, stop)
   end
 end
 
-def sort(arr)
-  buffered_stooge_sort(arr, 0, arr.length)
-end
 
 array = [0, 39, 21, 62, 91, 77, 14, 23,
   90, 69, 51, 81, 68, 83, 32, 56]

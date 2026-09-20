@@ -1,6 +1,28 @@
 import math
 
 
+def sort(arr):
+    n = len(arr)
+    if n <= 1:
+        return
+    d, end = 2, 1 << int(math.log(n - 1) / math.log(2) + 1)
+    while d <= end:
+        i, dec = 0, 0
+        while i < n:
+            j = i
+            dec += n
+            while dec >= d:
+                dec -= d
+                j += 1
+            k = j
+            dec += n
+            while dec >= d:
+                dec -= d
+                k += 1
+            split(arr, i, j, k)
+            i = k
+        d *= 2
+
 def comp_swap(arr, a, b):
     if arr[a] > arr[b]:
         arr[a], arr[b] = arr[b], arr[a]
@@ -34,28 +56,12 @@ def split(arr, a, m, b):
                 comp_swap(arr, a + j, c)
 
 
-def sort(arr):
-    n = len(arr)
-    d, end = 2, 1 << int(math.log(n - 1) / math.log(2) + 1)
-    while d <= end:
-        i, dec = 0, 0
-        while i < n:
-            j = i
-            dec += n
-            while dec >= d:
-                dec -= d
-                j += 1
-            k = j
-            dec += n
-            while dec >= d:
-                dec -= d
-                k += 1
-            split(arr, i, j, k)
-            i = k
-        d *= 2
 
 
 if __name__ == "__main__":
-    array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56]
+    array = [
+        0, 39, 21, 62, 91, 77, 14, 23,
+        90, 69, 51, 81, 68, 83, 32, 56,
+    ]
     sort(array)
     print(array)

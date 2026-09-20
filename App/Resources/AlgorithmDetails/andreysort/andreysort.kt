@@ -1,3 +1,7 @@
+fun sort(arr: Array<Int>) {
+  msort(arr, 0, arr.size)
+}
+
 fun swap(arr: Array<Int>, i: Int, j: Int) {
   val t = arr[i]
   arr[i] = arr[j]
@@ -176,10 +180,6 @@ fun msort(arr: Array<Int>, a: Int, len: Int) {
   aswap(arr, a, a + lr, s0)
   val s = s0 + backmerge(arr, a + (s0 - 1), s0, a + (lr - 1), lr - s0)
   msort(arr, a, s)
-}
-
-fun sort(arr: Array<Int>) {
-  msort(arr, 0, arr.size)
 }
 
 fun main() {

@@ -3,6 +3,11 @@ import java.util.Arrays;
 import java.util.List;
 
 public class stablequicksort {
+  public static void sort(int[] arr) {
+    int n = arr.length;
+    stableQuickSort(arr, 0, n - 1);
+  }
+
   public static int stablePartition(int[] arr, int start, int end) {
     int pivotValue = arr[start];
     List<Integer> leftList = new ArrayList<>();
@@ -36,13 +41,11 @@ public class stablequicksort {
     }
   }
 
-  public static void sort(int[] arr) {
-    int n = arr.length;
-    stableQuickSort(arr, 0, n - 1);
-  }
-
   public static void main(String[] args) {
-    int[] array = new int[] {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     sort(array);
     System.out.println(Arrays.toString(array));
   }

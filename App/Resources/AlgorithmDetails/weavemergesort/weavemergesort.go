@@ -4,6 +4,13 @@ import (
 	"fmt"
 )
 
+func sort(arr []int) []int {
+	if len(arr) > 1 {
+		weaveMergeSort(arr, 0, len(arr)-1)
+	}
+	return arr
+}
+
 func multiSwap(arr []int, pos int, to int) {
 	if to-pos > 0 {
 		for i := pos; i < to; i++ {
@@ -47,13 +54,6 @@ func weaveMergeSort(arr []int, min int, max int) {
 		weaveMergeSort(arr, mid+1, max)
 		weaveMerge(arr, min, max, mid)
 	}
-}
-
-func sort(arr []int) []int {
-	if len(arr) > 1 {
-		weaveMergeSort(arr, 0, len(arr)-1)
-	}
-	return arr
 }
 
 func main() {

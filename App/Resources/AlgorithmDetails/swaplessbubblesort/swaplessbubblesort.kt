@@ -1,3 +1,7 @@
+fun sort(arr: Array<Int>) {
+  swaplessBubbleSort(arr)
+}
+
 fun swaplessBubbleSort(arr: Array<Int>) {
   var i = arr.size
   while (i > 0) {
@@ -19,10 +23,6 @@ fun swaplessBubbleSort(arr: Array<Int>) {
     arr[i - 1] = comp
     i = last
   }
-}
-
-fun sort(arr: Array<Int>) {
-  swaplessBubbleSort(arr)
 }
 
 fun main() {

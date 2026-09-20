@@ -1,19 +1,5 @@
 const RADIX = 4;
 
-function getDigit(value, place) {
-  for (let p = 0; p < place; p++) {
-    value = Math.floor(value / RADIX);
-  }
-  return value % RADIX;
-}
-
-function shift(value, places) {
-  for (let p = 0; p < places; p++) {
-    value = Math.floor(value / RADIX);
-  }
-  return value;
-}
-
 function sort(arr) {
   const n = arr.length;
   if (n < 2) {
@@ -104,6 +90,24 @@ function sort(arr) {
   }
 }
 
-var array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56];
+function getDigit(value, place) {
+  for (let p = 0; p < place; p++) {
+    value = Math.floor(value / RADIX);
+  }
+  return value % RADIX;
+}
+
+function shift(value, places) {
+  for (let p = 0; p < places; p++) {
+    value = Math.floor(value / RADIX);
+  }
+  return value;
+}
+
+
+const array = [
+  0, 39, 21, 62, 91, 77, 14, 23,
+  90, 69, 51, 81, 68, 83, 32, 56,
+];
 sort(array);
 console.log("[" + array.join(", ") + "]");

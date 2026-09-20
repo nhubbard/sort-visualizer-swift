@@ -1,27 +1,9 @@
 import java.util.Arrays;
 
 public class simplisticgravitysort {
-  private static void transferTo(int[] arr, int[] aux, int minValue, int index) {
-    int pointer = 0;
-    while (arr[index] > minValue) {
-      arr[index]--;
-      aux[pointer]++;
-      pointer++;
-    }
-  }
-
-  private static void transferFrom(int[] arr, int[] aux, int auxLength, int index) {
-    int pointer = 0;
-    while (pointer < auxLength && aux[pointer] != 0) {
-      arr[index]++;
-      aux[pointer]--;
-      pointer++;
-    }
-  }
-
   public static void sort(int[] arr) {
     int n = arr.length;
-    if (n == 0) {
+    if (n < 2) {
       return;
     }
 
@@ -46,8 +28,29 @@ public class simplisticgravitysort {
     }
   }
 
+  private static void transferTo(int[] arr, int[] aux, int minValue, int index) {
+    int pointer = 0;
+    while (arr[index] > minValue) {
+      arr[index]--;
+      aux[pointer]++;
+      pointer++;
+    }
+  }
+
+  private static void transferFrom(int[] arr, int[] aux, int auxLength, int index) {
+    int pointer = 0;
+    while (pointer < auxLength && aux[pointer] != 0) {
+      arr[index]++;
+      aux[pointer]--;
+      pointer++;
+    }
+  }
+
   public static void main(String[] args) {
-    int[] array = new int[] {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     sort(array);
     System.out.println(Arrays.toString(array));
   }

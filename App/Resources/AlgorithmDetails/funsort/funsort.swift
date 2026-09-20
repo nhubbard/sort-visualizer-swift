@@ -1,3 +1,24 @@
+func sort(_ arr: inout [Int]) {
+    let n = arr.count
+    var key = Array(0 ..< n)
+
+    for i in 1 ..< n {
+        var done = false
+        while !done {
+            let pos = binarySearch(arr, key, n, i)
+            if pos == i {
+                done = true
+            } else if i < pos - 1 {
+                arr.swapAt(i, pos - 1)
+                key.swapAt(i, pos - 1)
+            } else {
+                arr.swapAt(i, pos)
+                key.swapAt(i, pos)
+            }
+        }
+    }
+}
+
 func compositeLess(_ arr: [Int], _ key: [Int], _ mid: Int, _ i: Int) -> Bool {
     if arr[mid] < arr[i] {
         return true
@@ -22,26 +43,6 @@ func binarySearch(_ arr: [Int], _ key: [Int], _ n: Int, _ i: Int) -> Int {
     return start
 }
 
-func sort(_ arr: inout [Int]) {
-    let n = arr.count
-    var key = Array(0 ..< n)
-
-    for i in 1 ..< n {
-        var done = false
-        while !done {
-            let pos = binarySearch(arr, key, n, i)
-            if pos == i {
-                done = true
-            } else if i < pos - 1 {
-                arr.swapAt(i, pos - 1)
-                key.swapAt(i, pos - 1)
-            } else {
-                arr.swapAt(i, pos)
-                key.swapAt(i, pos)
-            }
-        }
-    }
-}
 
 var array: [Int] = [
     0, 39, 21, 62, 91, 77, 14, 23,

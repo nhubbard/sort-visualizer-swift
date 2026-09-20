@@ -19,7 +19,7 @@ public struct LogarithmicSlopesShuffle: ShuffleAlgorithm {
   public func record(into engine: inout RecordingEngine) {
     let n = engine.count
     guard n > 0 else { return }
-    let original = engine.values
+    let original = engine.readAllValues()
 
     engine.setValue(0, original.min()!)
     for i in 1..<n {

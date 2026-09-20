@@ -51,14 +51,14 @@ enum ShatterSortingTemplate {
   static func shatterPartition(_ engine: inout RecordingEngine, _ start: Int, _ length: Int, _ num: Int)
     -> [Int] {
     let window = start..<(start + length)
-    let minValue = window.map { engine.values[$0] }.min()!
-    let maxValue = window.map { engine.values[$0] }.max()!
+    let minValue = window.map { engine.readValue(at: $0) }.min()!
+    let maxValue = window.map { engine.readValue(at: $0) }.max()!
     let valueRange = maxValue - minValue + 1
     let shatters = (length + num - 1) / num
 
     var buckets = [[Int]](repeating: [], count: shatters)
     for i in window {
-      let value = engine.values[i]
+      let value = engine.readValue(at: i)
       let idx = min(shatters - 1, (value - minValue) * shatters / valueRange)
       buckets[idx].append(value)
     }

@@ -1,7 +1,8 @@
 #include <cstdio>
 #include <vector>
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
+                 90, 69, 51, 81, 68, 83, 32, 56};
 
 struct Node {
   int value;
@@ -14,18 +15,42 @@ struct Node {
 };
 
 void printList(int items[], int size) {
-  for (int i = 0; i < size; i++) {
-    if (i == 0) {
-      printf("[%d, ", items[i]);
-    } else if (i != size - 1) {
-      printf("%d, ", items[i]);
-    } else {
-      printf("%d]", items[i]);
+  printf("[");
+  if (size > 0) {
+    printf("%d", items[0]);
+    for (int i = 1; i < size; i++) {
+      printf(", %d", items[i]);
     }
   }
+  printf("]");
 }
 
-int nodeLevel(Node *node) { return node == nullptr ? -1 : node->level; }
+int nodeLevel(Node *node);
+Node *skew(Node *node);
+Node *split(Node *node);
+Node *add(Node *node, int value);
+void traverse(Node *node, std::vector<int> &result);
+void freeTree(Node *node);
+
+void sort(int arr[], int n) {
+  Node *root = nullptr;
+  for (int i = 0; i < n; i++) {
+    root = add(root, arr[i]);
+  }
+
+  std::vector<int> result;
+  traverse(root, result);
+
+  for (int i = 0; i < n; i++) {
+    arr[i] = result[i];
+  }
+
+  freeTree(root);
+}
+
+int nodeLevel(Node *node) {
+  return node == nullptr ? -1 : node->level;
+}
 
 Node *skew(Node *node) {
   if (node->left == nullptr) {
@@ -87,22 +112,6 @@ void freeTree(Node *node) {
   freeTree(node->left);
   freeTree(node->right);
   delete node;
-}
-
-void sort(int arr[], int n) {
-  Node *root = nullptr;
-  for (int i = 0; i < n; i++) {
-    root = add(root, arr[i]);
-  }
-
-  std::vector<int> result;
-  traverse(root, result);
-
-  for (int i = 0; i < n; i++) {
-    arr[i] = result[i];
-  }
-
-  freeTree(root);
 }
 
 int main(int argc, char *argv[]) {

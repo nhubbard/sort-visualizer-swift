@@ -1,3 +1,7 @@
+function sort(arr) {
+  return librarySort(arr);
+}
+
 function binarySearch(array, item, start, end) {
   var lo = start;
   var hi = end;
@@ -62,12 +66,16 @@ function rebalance(array, temp, counts, locations, spineSize, batchEnd) {
 
 function librarySort(array) {
   var n = array.length;
-  if (n < 2) {
+  if (n < 32) {
+    binaryInsertionSort(array, 0, n);
     return array;
   }
 
-  var rebalanceFactor = 2;
-  var spineSize = 1;
+  var rebalanceFactor = 4;
+  var spineSize = n;
+  while (spineSize >= 32) {
+    spineSize = Math.floor((spineSize - 1) / rebalanceFactor) + 1;
+  }
   binaryInsertionSort(array, 0, spineSize);
 
   var maxLevel = spineSize;
@@ -97,10 +105,10 @@ function librarySort(array) {
   return array;
 }
 
-function sort(arr) {
-  return librarySort(arr);
-}
 
-var array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56];
+const array = [
+  0, 39, 21, 62, 91, 77, 14, 23,
+  90, 69, 51, 81, 68, 83, 32, 56,
+];
 sort(array);
 console.log("[" + array.join(", ") + "]");

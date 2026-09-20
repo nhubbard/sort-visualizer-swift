@@ -14,12 +14,15 @@ public struct InPlaceMergeSort: SortAlgorithm {
     category: .merge,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 219, coefficients: [238710, 2185, 5],
+      anchorSize: 212, coefficients: [230395, 2923.79, 11.5669, 0.0119926],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .powerLog, coefficients: [0.0644486, 2.50367], rSquared: 0.600404),
     // Not stable, despite resembling a textbook (stable) merge: `merge`'s swaps are positional
     // (driven by the fixed index `mid + 1`), so `push` can walk a duplicate past another
     // occurrence of the same value at a different recursion level without the two ever being
     // compared directly.
+    implementationComplexity: 12,
     stable: false,
     // Best case (already-sorted): merge never swaps, push never runs, O(n log n). Average/worst:
     // push turns each merge into an insertion-sort-style shift across the two runs, so summed

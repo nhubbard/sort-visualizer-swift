@@ -1,5 +1,21 @@
 import Foundation
 
+func sort(_ array: inout [Int]) {
+    let end = array.count
+    if end <= 1 {
+        return
+    }
+    var n = 1
+    while n < end {
+        n <<= 1
+    }
+
+    var numberOfSwaps = 1
+    while numberOfSwaps != 0 {
+        numberOfSwaps = circleSortRoutine(&array, n, end)
+    }
+}
+
 func circleSortRoutine(_ array: inout [Int], _ length: Int, _ end: Int) -> Int {
     var swapCount = 0
     var gap = length / 2
@@ -23,21 +39,6 @@ func circleSortRoutine(_ array: inout [Int], _ length: Int, _ end: Int) -> Int {
     return swapCount
 }
 
-func sort(_ array: inout [Int]) {
-    let end = array.count
-    if end <= 1 {
-        return
-    }
-    var n = 1
-    while n < end {
-        n <<= 1
-    }
-
-    var numberOfSwaps = 1
-    while numberOfSwaps != 0 {
-        numberOfSwaps = circleSortRoutine(&array, n, end)
-    }
-}
 
 var array: [Int] = [
     0, 39, 21, 62, 91, 77, 14, 23,

@@ -1,16 +1,3 @@
-def is_3_smooth?(n)
-  while n % 6 == 0
-    n /= 6
-  end
-  while n % 3 == 0
-    n /= 3
-  end
-  while n % 2 == 0
-    n /= 2
-  end
-  n == 1
-end
-
 def sort(arr)
   n = arr.length
   (n - 1).downto(1) do |g|
@@ -24,6 +11,20 @@ def sort(arr)
   end
   arr
 end
+
+def is_3_smooth?(n)
+  while n % 6 == 0
+    n /= 6
+  end
+  while n % 3 == 0
+    n /= 3
+  end
+  while n % 2 == 0
+    n /= 2
+  end
+  n == 1
+end
+
 
 array = [0, 39, 21, 62, 91, 77, 14, 23,
   90, 69, 51, 81, 68, 83, 32, 56]

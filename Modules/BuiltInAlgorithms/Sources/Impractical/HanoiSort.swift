@@ -37,8 +37,11 @@ public struct HanoiSort: SortAlgorithm {
     category: .impractical,
     sizeRange: 4...16,
     growthModel: OperationGrowthModel(
-      anchorSize: 16, coefficients: [156426, 107109, 36670.3, 8369.74, 1432.75, 196.209],
-      measuredSafeCeiling: 16),
+      anchorSize: 10, coefficients: [30346, 37567.5, 24069.6, 10578.6, 3573.64, 986.889],
+      measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .factorial, coefficients: [27.5811, 0.537645], rSquared: 0.967211),
+    implementationComplexity: 158,
     stable: false,
     timeComplexity: ComplexityBounds(best: "O(n log n)", average: "O(2^n)", worst: "O(2^n)"),
     spaceComplexity: "O(n)",
@@ -95,12 +98,12 @@ public struct HanoiSort: SortAlgorithm {
     @discardableResult
     func moveFromMain(_ id: StackID, checkUnsorted: Bool) -> Int {
       var duplicates = 1
-      push(id, engine.values[sp])
+      push(id, engine.readValue(at: sp))
       sp += 1
       var endOnLength = sp >= n || (checkUnsorted && sp >= unsorted)
-      while !endOnLength, engine.values[sp] == peek(id) {
+      while !endOnLength, engine.readValue(at: sp) == peek(id) {
         duplicates += 1
-        push(id, engine.values[sp])
+        push(id, engine.readValue(at: sp))
         sp += 1
         endOnLength = sp >= n || (checkUnsorted && sp >= unsorted)
       }
@@ -110,7 +113,7 @@ public struct HanoiSort: SortAlgorithm {
     func moveToMain(_ id: StackID) {
       sp -= 1
       engine.setValue(sp, pop(id))
-      while !isEmpty(id), peek(id) == engine.values[sp] {
+      while !isEmpty(id), peek(id) == engine.readValue(at: sp) {
         sp -= 1
         engine.setValue(sp, pop(id))
       }
@@ -196,7 +199,7 @@ public struct HanoiSort: SortAlgorithm {
             minPoleLoc = 3
           }
         case 2:
-          if stack3.isEmpty || (sp < unsorted && engine.values[sp] < stack3.last!) {
+          if stack3.isEmpty || (sp < unsorted && engine.readValue(at: sp) < stack3.last!) {
             moveFromMain(.three, checkUnsorted: true)
           } else {
             moveToMain(.three)
@@ -209,7 +212,7 @@ public struct HanoiSort: SortAlgorithm {
             minPoleLoc = 1
           }
         default: // 3
-          if stack2.isEmpty || (sp < unsorted && engine.values[sp] < stack2.last!) {
+          if stack2.isEmpty || (sp < unsorted && engine.readValue(at: sp) < stack2.last!) {
             moveFromMain(.two, checkUnsorted: true)
           } else {
             moveToMain(.two)
@@ -228,7 +231,7 @@ public struct HanoiSort: SortAlgorithm {
     }
 
     func removeFromMainStack() {
-      target = engine.values[sp]
+      target = engine.readValue(at: sp)
       let moves = hanoi(2, true, 1)
       let height = getHeight(moves + 1)
       targetMoves = moves

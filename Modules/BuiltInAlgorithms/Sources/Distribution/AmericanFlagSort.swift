@@ -32,8 +32,11 @@ public struct AmericanFlagSort: SortAlgorithm {
     category: .distribution,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 2928, coefficients: [239957, 149.836, 0.0231814],
+      anchorSize: 2012, coefficients: [239798, 214.964, 0.047609],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .polynomialIntercept, coefficients: [0.047609, 23.3853, 18.1642], rSquared: 0.998847),
+    implementationComplexity: 15,
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(d \\times (n+b))", average: "O(d \\times (n+b))", worst: "O(d \\times (n+b))"),
@@ -59,7 +62,7 @@ public struct AmericanFlagSort: SortAlgorithm {
       let offsetHandle = engine.createAuxArray(length: radix)
 
       for i in start..<end {
-        let digit = getDigit(engine.values[i], divisor)
+        let digit = getDigit(engine.readValue(at: i), divisor)
         count[digit] += 1
         engine.writeAux(countHandle, at: digit, value: count[digit])
       }
@@ -75,7 +78,7 @@ public struct AmericanFlagSort: SortAlgorithm {
         while count[b] > 0 {
           let origin = offset[b]
           var from = origin
-          var num = engine.values[from]
+          var num = engine.readValue(at: from)
           repeat {
             let digit = getDigit(num, divisor)
             let to = offset[digit]
@@ -84,7 +87,7 @@ public struct AmericanFlagSort: SortAlgorithm {
             count[digit] -= 1
             engine.writeAux(countHandle, at: digit, value: count[digit])
 
-            let displaced = engine.values[to]
+            let displaced = engine.readValue(at: to)
             engine.setValue(to, num)
             num = displaced
             from = to
@@ -107,7 +110,7 @@ public struct AmericanFlagSort: SortAlgorithm {
     }
 
     var maxValue = 0
-    for i in 0..<n { maxValue = max(maxValue, engine.values[i]) }
+    for i in 0..<n { maxValue = max(maxValue, engine.readValue(at: i)) }
     var numberOfDigits = 1
     var probe = radix
     while probe <= maxValue {

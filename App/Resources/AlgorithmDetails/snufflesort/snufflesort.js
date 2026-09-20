@@ -1,3 +1,7 @@
+function sort(arr) {
+  snuffleSort(arr, 0, arr.length - 1);
+}
+
 function snuffleSort(arr, start, stop) {
   if (stop - start + 1 >= 2) {
     if (arr[start] > arr[stop]) {
@@ -14,10 +18,9 @@ function snuffleSort(arr, start, stop) {
   }
 }
 
-function sort(arr) {
-  snuffleSort(arr, 0, arr.length - 1);
-}
 
-var array = [0, 39, 21, 62, 91, 77, 14, 23];
+const array = [
+  0, 39, 21, 62, 91, 77, 14, 23,
+];
 sort(array);
 console.log("[" + array.join(", ") + "]");

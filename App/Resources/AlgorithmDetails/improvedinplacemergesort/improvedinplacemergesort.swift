@@ -1,3 +1,8 @@
+func sort(_ arr: inout [Int]) {
+    let n = arr.count
+    mergeSort(&arr, 0, n)
+}
+
 func push(_ array: inout [Int], _ p: Int, _ a: Int, _ b: Int) {
     if a == b {
         return
@@ -38,10 +43,6 @@ func mergeSort(_ array: inout [Int], _ a: Int, _ b: Int) {
     merge(&array, a, m, b)
 }
 
-func sort(_ arr: inout [Int]) {
-    let n = arr.count
-    mergeSort(&arr, 0, n)
-}
 
 var array: [Int] = [
     0, 39, 21, 62, 91, 77, 14, 23,

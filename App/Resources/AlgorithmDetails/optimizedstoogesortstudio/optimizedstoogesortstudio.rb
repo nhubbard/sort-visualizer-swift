@@ -1,3 +1,8 @@
+def sort(array)
+  return if array.length <= 1
+  stooge_sort(array, 0, 1, array.length, false)
+end
+
 def comp_swap(arr, a, b)
   if arr[a] > arr[b]
     arr[a], arr[b] = arr[b], arr[a]
@@ -33,9 +38,6 @@ def stooge_sort(arr, a, m, b, merge)
   l_change || r_change
 end
 
-def sort(array)
-  stooge_sort(array, 0, 1, array.length, false)
-end
 
 array = [0, 39, 21, 62, 91, 77, 14, 23,
   90, 69, 51, 81, 68, 83, 32, 56]

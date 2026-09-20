@@ -4,6 +4,13 @@ import (
 	"fmt"
 )
 
+func sort(arr []int) []int {
+	if len(arr) > 1 {
+		staticSort(arr, 0, len(arr))
+	}
+	return arr
+}
+
 func findMinMax(array []int, a, b int) (int, int) {
 	minValue := array[a]
 	maxValue := array[a]
@@ -122,13 +129,6 @@ func staticSort(array []int, a, b int) {
 			insertionSortRange(array, s, e)
 		}
 	}
-}
-
-func sort(arr []int) []int {
-	if len(arr) > 1 {
-		staticSort(arr, 0, len(arr))
-	}
-	return arr
 }
 
 func main() {

@@ -1,36 +1,10 @@
 import java.util.Arrays;
 
 public class iterativetopdownmergesort {
-  private static void merge(int[] arr, int low, int mid, int high) {
-    int[] left = Arrays.copyOfRange(arr, low, mid);
-    int[] right = Arrays.copyOfRange(arr, mid, high);
-    int i = 0;
-    int j = 0;
-    int k = low;
-    while (i < left.length && j < right.length) {
-      if (left[i] <= right[j]) {
-        arr[k] = left[i];
-        i++;
-      } else {
-        arr[k] = right[j];
-        j++;
-      }
-      k++;
-    }
-    while (i < left.length) {
-      arr[k] = left[i];
-      i++;
-      k++;
-    }
-    while (j < right.length) {
-      arr[k] = right[j];
-      j++;
-      k++;
-    }
-  }
-
   public static void sort(int[] arr) {
     int n = arr.length;
+    if (n < 2) return;
+    int[] scratch = new int[n];
     int subarrayCount = 1;
     while (subarrayCount < n) {
       subarrayCount *= 2;
@@ -41,14 +15,40 @@ public class iterativetopdownmergesort {
         int low = n * i / subarrayCount;
         int mid = n * (i + 1) / subarrayCount;
         int high = n * (i + 2) / subarrayCount;
-        merge(arr, low, mid, high);
+        merge(arr, scratch, low, mid, high);
       }
       subarrayCount /= 2;
     }
   }
 
+  private static void merge(int[] arr, int[] scratch, int low, int mid, int high) {
+    int left = low;
+    int right = mid;
+    int out = low;
+    while (left < mid && right < high) {
+      if (arr[left] <= arr[right]) {
+        scratch[out] = arr[left];
+        left++;
+      } else {
+        scratch[out] = arr[right];
+        right++;
+      }
+      out++;
+    }
+    while (left < mid) {
+      scratch[out++] = arr[left++];
+    }
+    while (right < high) {
+      scratch[out++] = arr[right++];
+    }
+    System.arraycopy(scratch, low, arr, low, high - low);
+  }
+
   public static void main(String[] args) {
-    int[] array = new int[] {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     sort(array);
     System.out.println(Arrays.toString(array));
   }

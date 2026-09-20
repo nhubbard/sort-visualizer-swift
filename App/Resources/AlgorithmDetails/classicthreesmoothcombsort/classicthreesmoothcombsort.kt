@@ -1,17 +1,3 @@
-fun is3Smooth(n0: Int): Boolean {
-  var n = n0
-  while (n % 6 == 0) {
-    n /= 6
-  }
-  while (n % 3 == 0) {
-    n /= 3
-  }
-  while (n % 2 == 0) {
-    n /= 2
-  }
-  return n == 1
-}
-
 fun sort(arr: Array<Int>) {
   val length = arr.size
   for (g in length - 1 downTo 1) {
@@ -25,6 +11,20 @@ fun sort(arr: Array<Int>) {
       }
     }
   }
+}
+
+fun is3Smooth(n0: Int): Boolean {
+  var n = n0
+  while (n % 6 == 0) {
+    n /= 6
+  }
+  while (n % 3 == 0) {
+    n /= 3
+  }
+  while (n % 2 == 0) {
+    n /= 2
+  }
+  return n == 1
 }
 
 fun main() {

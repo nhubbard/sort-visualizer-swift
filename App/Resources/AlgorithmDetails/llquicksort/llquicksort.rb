@@ -1,3 +1,7 @@
+def sort(array)
+  quick_sort(array, 0, array.length - 1)
+end
+
 def partition(array, lo, hi)
   pivot = array[hi]
   i = lo
@@ -22,9 +26,6 @@ def quick_sort(array, lo, hi)
   array
 end
 
-def sort(array)
-  quick_sort(array, 0, array.length - 1)
-end
 
 array = [0, 39, 21, 62, 91, 77, 14, 23,
   90, 69, 51, 81, 68, 83, 32, 56]

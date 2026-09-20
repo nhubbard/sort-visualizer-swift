@@ -1,13 +1,5 @@
 import Foundation
 
-func ceilPow2(_ value: Int) -> Int {
-    var r = 1
-    while r < value {
-        r *= 2
-    }
-    return r
-}
-
 func sort(_ array: inout [Int]) {
     let n = array.count
     guard n > 1 else {
@@ -81,6 +73,15 @@ func sort(_ array: inout [Int]) {
     }
     array = output
 }
+
+func ceilPow2(_ value: Int) -> Int {
+    var r = 1
+    while r < value {
+        r *= 2
+    }
+    return r
+}
+
 
 var array: [Int] = [
     0, 39, 21, 62, 91, 77, 14, 23,

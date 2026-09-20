@@ -1,3 +1,9 @@
+def sort(arr)
+  return arr if arr.length <= 1
+  pairwise_recursive(arr, 0, arr.length, 1)
+  arr
+end
+
 def comp_swap(array, a, b)
   return unless array[a] > array[b]
   array[a], array[b] = array[b], array[a]
@@ -37,10 +43,6 @@ def pairwise_recursive(array, start, fin, gap)
   end
 end
 
-def sort(arr)
-  pairwise_recursive(arr, 0, arr.length, 1)
-  arr
-end
 
 array = [0, 39, 21, 62, 91, 77, 14, 23,
   90, 69, 51, 81, 68, 83, 32, 56]

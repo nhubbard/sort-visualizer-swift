@@ -1,6 +1,28 @@
-const val RADIX_BASE = 10
+const val RADIX_BASE = 4
 
 // Extracts the digit at `place` (0 = ones place) from `value`, in RADIX_BASE.
+fun sort(arr: Array<Int>) {
+  val n = arr.size
+  if (n < 2) {
+    return
+  }
+  var maxValue = arr[0]
+  for (i in 1 until n) {
+    if (arr[i] > maxValue) {
+      maxValue = arr[i]
+    }
+  }
+  var maxPlace = 0
+  var probe = RADIX_BASE
+  while (probe <= maxValue) {
+    maxPlace++
+    probe *= RADIX_BASE
+  }
+  for (place in 0..maxPlace) {
+    digitMergeSort(arr, 0, n, place)
+  }
+}
+
 fun digitAt(value: Int, place: Int): Int {
   var divisor = 1
   for (i in 0 until place) {
@@ -83,28 +105,6 @@ fun digitMergeSort(arr: Array<Int>, a: Int, b: Int, place: Int) {
   digitMergeSort(arr, a, mid, place)
   digitMergeSort(arr, mid, b, place)
   mergeByDigit(arr, a, mid, b, 0, RADIX_BASE, place)
-}
-
-fun sort(arr: Array<Int>) {
-  val n = arr.size
-  if (n < 2) {
-    return
-  }
-  var maxValue = arr[0]
-  for (i in 1 until n) {
-    if (arr[i] > maxValue) {
-      maxValue = arr[i]
-    }
-  }
-  var maxPlace = 0
-  var probe = RADIX_BASE
-  while (probe <= maxValue) {
-    maxPlace++
-    probe *= RADIX_BASE
-  }
-  for (place in 0..maxPlace) {
-    digitMergeSort(arr, 0, n, place)
-  }
 }
 
 fun main() {

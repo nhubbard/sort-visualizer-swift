@@ -4,14 +4,17 @@
 static int idx;
 
 void traverse(const std::vector<int> &arr, std::vector<int> &temp,
-              std::vector<int> &lower, std::vector<int> &upper, int r) {
-  if (lower[r] != 0) {
-    traverse(arr, temp, lower, upper, lower[r]);
+              std::vector<int> &lower, std::vector<int> &upper, int r);
+
+void printList(const std::vector<int> &items) {
+  printf("[");
+  if (!items.empty()) {
+    printf("%d", items[0]);
+    for (size_t i = 1; i < items.size(); i++) {
+      printf(", %d", items[i]);
+    }
   }
-  temp[idx++] = arr[r];
-  if (upper[r] != 0) {
-    traverse(arr, temp, lower, upper, upper[r]);
-  }
+  printf("]\n");
 }
 
 void sort(std::vector<int> &arr) {
@@ -41,13 +44,18 @@ void sort(std::vector<int> &arr) {
   arr = temp;
 }
 
-void printList(const std::vector<int> &arr) {
-  printf("[");
-  for (size_t i = 0; i < arr.size(); i++) {
-    printf("%d%s", arr[i], i + 1 == arr.size() ? "" : ", ");
+void traverse(const std::vector<int> &arr, std::vector<int> &temp,
+              std::vector<int> &lower, std::vector<int> &upper, int r) {
+  if (lower[r] != 0) {
+    traverse(arr, temp, lower, upper, lower[r]);
   }
-  printf("]\n");
+  temp[idx++] = arr[r];
+  if (upper[r] != 0) {
+    traverse(arr, temp, lower, upper, upper[r]);
+  }
 }
+
+
 
 int main() {
   std::vector<int> array = {0,  39, 21, 62, 91, 77, 14, 23,

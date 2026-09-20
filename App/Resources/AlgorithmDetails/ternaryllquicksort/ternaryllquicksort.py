@@ -1,3 +1,6 @@
+def sort(arr):
+    quicksort_ternary_ll(arr, 0, len(arr))
+
 def compare3(arr, a, b):
     if arr[a] == arr[b]:
         return 0
@@ -53,11 +56,12 @@ def quicksort_ternary_ll(arr, lo, hi):
         quicksort_ternary_ll(arr, second, hi)
 
 
-def sort(arr):
-    quicksort_ternary_ll(arr, 0, len(arr))
 
 
 if __name__ == "__main__":
-    array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56]
+    array = [
+        0, 39, 21, 62, 91, 77, 14, 23,
+        90, 69, 51, 81, 68, 83, 32, 56,
+    ]
     sort(array)
     print(array)

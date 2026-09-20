@@ -1,26 +1,3 @@
-fun mergeTo(arr: Array<Int>, subList: Array<Int>, a0: Int, m0: Int, b: Int) {
-  var a = a0
-  var m = m0
-  var i = 0
-  val s = m - a
-  while (i < s && m < b) {
-    if (subList[i] < arr[m]) {
-      arr[a] = subList[i]
-      a++
-      i++
-    } else {
-      arr[a] = arr[m]
-      a++
-      m++
-    }
-  }
-  while (i < s) {
-    arr[a] = subList[i]
-    a++
-    i++
-  }
-}
-
 fun sort(arr: Array<Int>) {
   val n = arr.size
   if (n < 2) return
@@ -50,6 +27,29 @@ fun sort(arr: Array<Int>) {
 
     mergeTo(arr, subList, k, j, n)
     j = k
+  }
+}
+
+fun mergeTo(arr: Array<Int>, subList: Array<Int>, a0: Int, m0: Int, b: Int) {
+  var a = a0
+  var m = m0
+  var i = 0
+  val s = m - a
+  while (i < s && m < b) {
+    if (subList[i] < arr[m]) {
+      arr[a] = subList[i]
+      a++
+      i++
+    } else {
+      arr[a] = arr[m]
+      a++
+      m++
+    }
+  }
+  while (i < s) {
+    arr[a] = subList[i]
+    a++
+    i++
   }
 }
 

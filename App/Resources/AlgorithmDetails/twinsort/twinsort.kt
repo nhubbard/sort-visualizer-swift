@@ -1,3 +1,8 @@
+fun sort(arr: Array<Int>) {
+  val n = arr.size
+  twinsort(arr, n)
+}
+
 fun reverseRange(arr: Array<Int>, lo0: Int, hi0: Int) {
   var lo = lo0
   var hi = hi0
@@ -130,11 +135,6 @@ fun twinsort(arr: Array<Int>, nmemb: Int) {
     val buf = IntArray(nmemb / 2)
     tailMerge(arr, buf, nmemb, 2)
   }
-}
-
-fun sort(arr: Array<Int>) {
-  val n = arr.size
-  twinsort(arr, n)
 }
 
 fun main() {

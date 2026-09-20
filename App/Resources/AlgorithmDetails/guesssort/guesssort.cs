@@ -2,36 +2,6 @@ using System;
 
 public class GuessSort
 {
-  public static bool IsValid(int[] arr, int[] loops, int n)
-  {
-    int total = 0;
-    for (int i = 0; i < n; i++)
-    {
-      for (int j = 0; j < n; j++)
-      {
-        if (loops[i] == loops[j])
-        {
-          total += 1;
-        }
-      }
-    }
-    for (int i = 0; i < n; i++)
-    {
-      for (int j = 0; j < n; j++)
-      {
-        if (i < j && arr[loops[i]] > arr[loops[j]])
-        {
-          total += 1;
-        }
-        else if (i > j && arr[loops[i]] < arr[loops[j]])
-        {
-          total += 1;
-        }
-      }
-    }
-    return total == n;
-  }
-
   public static void Sort(int[] arr)
   {
     int n = arr.Length;
@@ -71,9 +41,41 @@ public class GuessSort
     }
   }
 
+  public static bool IsValid(int[] arr, int[] loops, int n)
+  {
+    int total = 0;
+    for (int i = 0; i < n; i++)
+    {
+      for (int j = 0; j < n; j++)
+      {
+        if (loops[i] == loops[j])
+        {
+          total += 1;
+        }
+      }
+    }
+    for (int i = 0; i < n; i++)
+    {
+      for (int j = 0; j < n; j++)
+      {
+        if (i < j && arr[loops[i]] > arr[loops[j]])
+        {
+          total += 1;
+        }
+        else if (i > j && arr[loops[i]] < arr[loops[j]])
+        {
+          total += 1;
+        }
+      }
+    }
+    return total == n;
+  }
+
   public static void Main(String[] args)
   {
-    int[] array = { 0, 39, 21, 14 };
+    int[] array = {
+      0, 39, 21, 14
+    };
     Sort(array);
     string result = "[" + String.Join(", ", array) + "]";
     Console.WriteLine(result);

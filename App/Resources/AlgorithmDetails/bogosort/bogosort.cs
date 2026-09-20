@@ -1,46 +1,34 @@
 using System;
-
 public class BogoSort
 {
-  public static Random r = new Random();
-
-  public static bool IsSorted(int[] arr)
+  public static void Sort(int[] a)
   {
-    for (int i = 1; i < arr.Length; i++)
+    int n = a.Length; if (n < 2) return;
+    bool ordered = true; for (int i = 1; i < n; i++) if (a[i] < a[i - 1]) { ordered = false; break; }
+    if (ordered) return;
+    while (true)
     {
-      if (arr[i - 1] > arr[i])
-      {
-        return false;
-      }
+      int pivot = n - 2;
+      while (pivot >= 0 && a[pivot] >= a[pivot + 1]) pivot--;
+      if (pivot < 0) break;
+      int successor = n - 1;
+      while (a[successor] <= a[pivot]) successor--;
+      int held = a[pivot]; a[pivot] = a[successor]; a[successor] = held;
+      Reverse(a, pivot + 1, n - 1);
     }
-    return true;
+    Reverse(a, 0, n - 1);
   }
 
-  public static void Shuffle(int[] arr)
+  static void Reverse(int[] a, int low, int high)
   {
-    int n = arr.Length;
-    for (int i = 0; i < n; i++)
-    {
-      int a = r.Next(n);
-      int b = r.Next(n);
-      (arr[a], arr[b]) = (arr[b], arr[a]);
-    }
+    while (low < high) { int held = a[low]; a[low] = a[high]; a[high] = held; low++; high--; }
   }
 
-  public static void Sort(int[] arr)
+  public static void Main()
   {
-    int n = arr.Length;
-    while (!IsSorted(arr))
-    {
-      Shuffle(arr);
-    }
-  }
-
-  public static void Main(String[] args)
-  {
-    int[] array = { 0, 39, 21, 62, 91, 77, 14, 23 };
-    Sort(array);
-    string result = "[" + String.Join(", ", array) + "]";
-    Console.WriteLine(result);
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23
+    }; Sort(array);
+    Console.WriteLine("[" + string.Join(", ", array) + "]");
   }
 }

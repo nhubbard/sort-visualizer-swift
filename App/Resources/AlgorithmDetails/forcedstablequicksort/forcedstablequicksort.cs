@@ -2,6 +2,14 @@ using System;
 
 public class ForcedStableQuickSort
 {
+  public static void Sort(int[] arr)
+  {
+    int n = arr.Length;
+    int[] key = new int[n];
+    for (int i = 0; i < n; i++) key[i] = i;
+    QuickSort(arr, key, 0, n);
+  }
+
   private static bool StableComp(int[] arr, int[] key, int a, int b)
   {
     if (arr[a] > arr[b]) return true;
@@ -66,17 +74,12 @@ public class ForcedStableQuickSort
     QuickSort(arr, key, p + 1, b);
   }
 
-  public static void Sort(int[] arr)
-  {
-    int n = arr.Length;
-    int[] key = new int[n];
-    for (int i = 0; i < n; i++) key[i] = i;
-    QuickSort(arr, key, 0, n);
-  }
-
   public static void Main(String[] args)
   {
-    int[] array = { 0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56 };
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     Sort(array);
     string result = "[" + String.Join(", ", array) + "]";
     Console.WriteLine(result);

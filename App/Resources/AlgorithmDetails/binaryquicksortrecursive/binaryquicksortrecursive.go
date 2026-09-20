@@ -4,6 +4,22 @@ import (
 	"fmt"
 )
 
+func sort(arr []int) []int {
+	n := len(arr)
+	if n < 2 {
+		return arr
+	}
+	maxValue := arr[0]
+	for i := 1; i < n; i++ {
+		if arr[i] > maxValue {
+			maxValue = arr[i]
+		}
+	}
+	bit := mostSignificantBit(maxValue)
+	binaryQuickSortRecursive(arr, 0, n-1, bit)
+	return arr
+}
+
 func mostSignificantBit(value int) int {
 	if value == 0 {
 		return -1
@@ -41,19 +57,6 @@ func binaryQuickSortRecursive(arr []int, p, r, bit int) {
 		binaryQuickSortRecursive(arr, p, q, bit-1)
 		binaryQuickSortRecursive(arr, q+1, r, bit-1)
 	}
-}
-
-func sort(arr []int) []int {
-	n := len(arr)
-	maxValue := arr[0]
-	for i := 1; i < n; i++ {
-		if arr[i] > maxValue {
-			maxValue = arr[i]
-		}
-	}
-	bit := mostSignificantBit(maxValue)
-	binaryQuickSortRecursive(arr, 0, n-1, bit)
-	return arr
 }
 
 func main() {

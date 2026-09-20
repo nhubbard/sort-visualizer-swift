@@ -1,3 +1,7 @@
+fun sort(arr: Array<Int>) {
+  rotatePartitionMergeSort(arr, arr.size)
+}
+
 fun multiSwap(arr: Array<Int>, a: Int, b: Int, len: Int) {
   for (i in 0 until len) {
     val t = arr[a + i]
@@ -121,10 +125,6 @@ fun rotatePartitionMergeSort(arr: Array<Int>, n: Int) {
 
     j *= 2
   }
-}
-
-fun sort(arr: Array<Int>) {
-  rotatePartitionMergeSort(arr, arr.size)
 }
 
 fun main() {

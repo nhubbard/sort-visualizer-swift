@@ -5,20 +5,6 @@ import (
 	"math/rand"
 )
 
-func isPartitioned(arr []int, start int, pivot int, end int) bool {
-	for i := start; i < pivot; i++ {
-		if arr[i] > arr[pivot] {
-			return false
-		}
-	}
-	for i := pivot + 1; i < end; i++ {
-		if arr[pivot] > arr[i] {
-			return false
-		}
-	}
-	return true
-}
-
 func sort(arr []int, start int, end int) []int {
 	if start >= end-1 {
 		return arr
@@ -44,7 +30,23 @@ func sort(arr []int, start int, end int) []int {
 	return arr
 }
 
+func isPartitioned(arr []int, start int, pivot int, end int) bool {
+	for i := start; i < pivot; i++ {
+		if arr[i] > arr[pivot] {
+			return false
+		}
+	}
+	for i := pivot + 1; i < end; i++ {
+		if arr[pivot] > arr[i] {
+			return false
+		}
+	}
+	return true
+}
+
 func main() {
-	array := []int{0, 39, 21, 62, 91, 14, 23}
+	array := []int{
+		0, 39, 21, 62, 91, 14, 23,
+	}
 	fmt.Println(sort(array, 0, len(array)))
 }

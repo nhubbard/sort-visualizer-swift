@@ -2,6 +2,11 @@ using System;
 
 public class OddEvenMergeSortRecursive
 {
+  public static void Sort(int[] array)
+  {
+    OddEvenMergeSort(array, 0, array.Length);
+  }
+
   private static void OddEvenMergeCompare(int[] array, int i, int j)
   {
     if (array[i] > array[j])
@@ -63,14 +68,12 @@ public class OddEvenMergeSortRecursive
     }
   }
 
-  public static void Sort(int[] array)
-  {
-    OddEvenMergeSort(array, 0, array.Length);
-  }
-
   public static void Main(String[] args)
   {
-    int[] array = { 0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56 };
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     Sort(array);
     string result = "[" + String.Join(", ", array) + "]";
     Console.WriteLine(result);

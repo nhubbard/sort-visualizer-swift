@@ -4,6 +4,11 @@ import (
 	"fmt"
 )
 
+func sort(arr []int) []int {
+	librarySort(arr)
+	return arr
+}
+
 func binarySearch(arr []int, item int, start int, end int) int {
 	lo := start
 	hi := end
@@ -68,12 +73,16 @@ func rebalance(arr []int, temp []int, counts []int, locations []int, spineSize i
 
 func librarySort(arr []int) {
 	n := len(arr)
-	if n < 2 {
+	if n < 32 {
+		binaryInsertionSort(arr, 0, n)
 		return
 	}
 
-	rebalanceFactor := 2
-	spineSize := 1
+	rebalanceFactor := 4
+	spineSize := n
+	for spineSize >= 32 {
+		spineSize = (spineSize-1)/rebalanceFactor + 1
+	}
 	binaryInsertionSort(arr, 0, spineSize)
 
 	maxLevel := spineSize
@@ -100,11 +109,6 @@ func librarySort(arr []int) {
 		i++
 	}
 	rebalance(arr, temp, counts, locations, spineSize, n)
-}
-
-func sort(arr []int) []int {
-	librarySort(arr)
-	return arr
 }
 
 func main() {

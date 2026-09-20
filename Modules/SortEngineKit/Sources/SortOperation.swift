@@ -15,11 +15,26 @@ public enum SortOperation: Sendable, Codable, Equatable {
   case unmarkIndex(marker: Int, index: Int)
   /// Counted, structurally inert — never changes `values`.
   case compare(Int, Int)
+  /// Like `.compare`, but against a value an algorithm is holding onto rather than a second live
+  /// array index (e.g. Cycle Sort's in-flight rotation value) — see
+  /// `RecordingEngine.compareValue(_:against:by:)`. `(index, value)`.
+  case compareValue(Int, Int)
   /// Permanent "done" marker at completion.
   case markSorted(Int)
   case auxCreate(handle: Int, length: Int)
   case auxWrite(handle: Int, index: Int, value: Int)
   case auxDelete(handle: Int)
+  /// Like `.compareValue`, but for a comparison where *neither* side is a live array index (e.g.
+  /// two held tree-node keys, two scratch-array entries) — see
+  /// `RecordingEngine.compareValues(_:_:by:)`. `(a, b)` are the two held values themselves, not
+  /// indices — there's nothing to highlight.
+  case compareValues(Int, Int)
+  /// A real re-read of a `writeAux`-shadowed buffer for a decision, distinct from the write
+  /// itself — see `RecordingEngine.markAuxRead(_:at:)`. `(handle, index)`.
+  case auxRead(handle: Int, index: Int)
+  /// A read of a live array value. The recorder returns the value; replay keeps this as a
+  /// separate, structurally inert step so reads are visible in the operation tape.
+  case readValue(Int)
   /// Counted, structurally inert — like `.compare`, never changes `values` on its own. Emitted
   /// once per `RecordingEngine.reversal(_:_:)` call, immediately before the individual `.swap`s
   /// that actually perform the flip, so a whole-range reverse is still visible swap-by-swap
@@ -41,8 +56,14 @@ public enum SortOperation: Sendable, Codable, Equatable {
   /// sync by hand if this ever changes.
   public var isAudible: Bool {
     switch self {
-    case .compare, .swap, .setValue, .auxWrite: true
-    case .mark, .unmark, .unmarkAll, .unmarkIndex, .markSorted, .auxCreate, .auxDelete, .reversal:
+    case .compare, .compareValue, .swap, .setValue, .auxWrite: true
+    case .mark, .unmark, .unmarkAll, .unmarkIndex, .markSorted, .auxCreate, .auxDelete, .reversal,
+      .compareValues, .auxRead, .readValue:
+      // `.compareValues` has no live array position to sonify (unlike `.compareValue`, which
+      // still has one real index). `.auxRead` risks the same "wall of noise" `.auxWrite` needed
+      // throttling for (see `SortSession.makeOnStepClosure`) -- starting silent avoids needing
+      // that same throttling from day one, since aux re-reads can vastly outnumber aux writes
+      // (e.g. `GravitySort`'s O(n·k) reconstruction loop).
       false
     }
   }

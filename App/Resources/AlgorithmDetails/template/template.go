@@ -1,11 +1,8 @@
 package main
 
-import (
-	"fmt"
-)
+import "fmt"
 
 func sort(arr []int) []int {
-	n := len(arr)
 	/* TODO: Insert Go algorithm implementation here. */
 	return arr
 }

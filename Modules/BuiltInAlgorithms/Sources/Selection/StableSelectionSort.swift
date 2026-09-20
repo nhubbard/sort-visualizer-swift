@@ -8,8 +8,11 @@ public struct StableSelectionSort: SortAlgorithm {
     category: .selection,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 283, coefficients: [239700, 1696, 3],
+      anchorSize: 262, coefficients: [239857, 1832.5, 3.5],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .polynomialIntercept, coefficients: [3.5, -1.5, -4], rSquared: 1),
+    implementationComplexity: 6,
     stable: true,
     timeComplexity: ComplexityBounds(best: "O(n^2)", average: "O(n^2)", worst: "O(n^2)"),
     spaceComplexity: "O(1)",
@@ -24,10 +27,10 @@ public struct StableSelectionSort: SortAlgorithm {
       for j in (i + 1)..<n where engine.compare(j, min, by: (<)) {
         min = j
       }
-      let tmp = engine.values[min]
+      let tmp = engine.readValue(at: min)
       var pos = min
       while pos > i {
-        engine.setValue(pos, engine.values[pos - 1])
+        engine.setValue(pos, engine.readValue(at: pos - 1))
         pos -= 1
       }
       engine.setValue(pos, tmp)

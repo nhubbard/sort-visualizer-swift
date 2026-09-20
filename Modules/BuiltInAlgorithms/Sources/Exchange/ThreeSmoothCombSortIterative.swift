@@ -27,8 +27,11 @@ public struct ThreeSmoothCombSortIterative: SortAlgorithm {
     category: .exchange,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 959, coefficients: [224607, 317.145, 0.0559625],
+      anchorSize: 938, coefficients: [224710, 333.33, 0.0668197],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .powerLog, coefficients: [6.53235, 1.24529], rSquared: 0.998403),
+    implementationComplexity: 6,
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n log^2 n)", average: "O(n log^2 n)", worst: "O(n log^2 n)"),

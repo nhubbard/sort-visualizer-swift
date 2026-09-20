@@ -20,8 +20,11 @@ public struct SillySort: SortAlgorithm {
     category: .exchange,
     sizeRange: 16...64,
     growthModel: OperationGrowthModel(
-      anchorSize: 43, coefficients: [208617, 35618.8, 3127.73, 187.234, 8.56559, 0.318619],
+      anchorSize: 43, coefficients: [210681, 36098.7, 3180.8, 191.056, 8.76969, 0.327293],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .nToTheNLike, coefficients: [625.031, 0.0359874], rSquared: 0.999534),
+    implementationComplexity: 5,
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n^{log n})", average: "O(n^{log n})", worst: "O(n^{log n})"),

@@ -1,3 +1,9 @@
+fun sort(arr: Array<Int>) {
+  val n = arr.size
+  val key = Array(n) { it }
+  quickSort(arr, key, 0, n)
+}
+
 fun stableComp(arr: Array<Int>, key: Array<Int>, a: Int, b: Int): Boolean {
   if (arr[a] > arr[b]) return true
   if (arr[a] == arr[b]) return key[a] > key[b]
@@ -51,12 +57,6 @@ fun quickSort(arr: Array<Int>, key: Array<Int>, a: Int, b: Int) {
   stableSwap(arr, key, a, p)
   quickSort(arr, key, a, p)
   quickSort(arr, key, p + 1, b)
-}
-
-fun sort(arr: Array<Int>) {
-  val n = arr.size
-  val key = Array(n) { it }
-  quickSort(arr, key, 0, n)
 }
 
 fun main() {

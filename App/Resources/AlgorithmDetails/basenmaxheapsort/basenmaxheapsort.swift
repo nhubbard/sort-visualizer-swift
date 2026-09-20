@@ -1,5 +1,20 @@
 let base = 4
 
+func sort(_ arr: inout [Int]) {
+    let n = arr.count
+    var i = n - 1
+    while i >= 0 {
+        siftDown(&arr, i, n)
+        i -= 1
+    }
+    var end = n - 1
+    while end > 0 {
+        arr.swapAt(0, end)
+        siftDown(&arr, 0, end)
+        end -= 1
+    }
+}
+
 func siftDown(_ arr: inout [Int], _ node: Int, _ stop: Int) {
     let left = node * base + 1
     if left >= stop {
@@ -19,20 +34,6 @@ func siftDown(_ arr: inout [Int], _ node: Int, _ stop: Int) {
     }
 }
 
-func sort(_ arr: inout [Int]) {
-    let n = arr.count
-    var i = n - 1
-    while i >= 0 {
-        siftDown(&arr, i, n)
-        i -= 1
-    }
-    var end = n - 1
-    while end > 0 {
-        arr.swapAt(0, end)
-        siftDown(&arr, 0, end)
-        end -= 1
-    }
-}
 
 var array: [Int] = [
     0, 39, 21, 62, 91, 77, 14, 23,

@@ -1,6 +1,10 @@
 import java.util.Arrays;
 
 public class smartbogobogosort {
+  public static void sort(int[] arr) {
+    sort(arr, arr.length);
+  }
+
   public static void sort(int[] arr, int length) {
     if (length == 1) {
       return;
@@ -17,12 +21,8 @@ public class smartbogobogosort {
     }
   }
 
-  public static void sort(int[] arr) {
-    sort(arr, arr.length);
-  }
-
   public static void main(String[] args) {
-    int[] array = new int[] {0, 39, 21, 62, 91, 14, 23};
+    int[] array = {0, 39, 21, 62, 91, 14, 23};
     sort(array);
     System.out.println(Arrays.toString(array));
   }

@@ -2,6 +2,35 @@
 #include <utility>
 #include <vector>
 
+int hyperfloor(int n);
+void uncheckedInsertionSort(std::vector<int> &array, int first, int last);
+void insertionSort(std::vector<int> &array, int first, int last);
+void poplarSift(std::vector<int> &array, int firstIn, int sizeIn);
+void popHeapWithSize(std::vector<int> &array, int first, int last, int sizeIn);
+void makeHeap(std::vector<int> &array, int first, int last);
+void sortHeap(std::vector<int> &array, int first, int lastIn);
+
+
+
+void printList(const std::vector<int> &items) {
+  printf("[");
+  if (!items.empty()) {
+    printf("%d", items[0]);
+    for (size_t i = 1; i < items.size(); i++) {
+      printf(", %d", items[i]);
+    }
+  }
+  printf("]\n");
+}
+
+void sort(std::vector<int> &array) {
+  int n = static_cast<int>(array.size());
+  if (n <= 1)
+    return;
+  makeHeap(array, 0, n);
+  sortHeap(array, 0, n);
+}
+
 int hyperfloor(int n) {
   int power = 1;
   while (power * 2 <= n) {
@@ -138,24 +167,10 @@ void sortHeap(std::vector<int> &array, int first, int lastIn) {
   } while (size > 1);
 }
 
-void sort(std::vector<int> &array) {
-  int n = static_cast<int>(array.size());
-  if (n <= 1)
-    return;
-  makeHeap(array, 0, n);
-  sortHeap(array, 0, n);
-}
-
 int main() {
   std::vector<int> array = {0,  39, 21, 62, 91, 77, 14, 23,
                             90, 69, 51, 81, 68, 83, 32, 56};
   sort(array);
-  printf("[");
-  for (size_t i = 0; i < array.size(); i++) {
-    printf("%d", array[i]);
-    if (i != array.size() - 1)
-      printf(", ");
-  }
-  printf("]\n");
+  printList(array);
   return 0;
 }

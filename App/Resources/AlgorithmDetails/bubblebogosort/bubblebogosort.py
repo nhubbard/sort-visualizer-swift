@@ -1,14 +1,17 @@
-import random
+def sort(a):
+    n = len(a)
+    if n < 2:
+        return
+    swapped = True
+    while swapped:
+        swapped = False
+        for i in range(n - 1):
+            if a[i] > a[i + 1]:
+                a[i], a[i + 1] = a[i + 1], a[i]
+                swapped = True
 
 
-def sort(arr):
-    n = len(arr)
-    while arr != sorted(arr):
-        index = random.randint(0, n - 2)
-        if arr[index] > arr[index + 1]:
-            arr[index], arr[index + 1] = arr[index + 1], arr[index]
-
-
-array = [0, 39, 21, 62, 91, 77, 14, 23]
-sort(array)
-print(array)
+if __name__ == "__main__":
+    array = [0, 39, 21, 62, 91, 77, 14, 23]
+    sort(array)
+    print(array)

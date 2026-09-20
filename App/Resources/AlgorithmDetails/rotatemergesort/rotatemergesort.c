@@ -1,18 +1,34 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
+                 90, 69, 51, 81, 68, 83, 32, 56};
 
-void printList(int arr[], int n) {
-  for (int i = 0; i < n; i++) {
-    if (i == 0) {
-      printf("[%d, ", arr[i]);
-    } else if (i != n - 1) {
-      printf("%d, ", arr[i]);
-    } else {
-      printf("%d]", arr[i]);
+void swap(int *a, int *b) {
+  int t = *a;
+  *a = *b;
+  *b = t;
+}
+
+void printList(int items[], int size) {
+  printf("[");
+  if (size > 0) {
+    printf("%d", items[0]);
+    for (int i = 1; i < size; i++) {
+      printf(", %d", items[i]);
     }
   }
+  printf("]");
+}
+
+void multiSwap(int arr[], int a, int b, int len);
+void rotate(int arr[], int a, int m, int b);
+int binarySearch(int arr[], int a, int b, int value, int left);
+void rotateMerge(int arr[], int a, int m, int b);
+void rotateMergeSort(int arr[], int a, int b);
+
+void sort(int arr[], int n) {
+  rotateMergeSort(arr, 0, n);
 }
 
 void multiSwap(int arr[], int a, int b, int len) {
@@ -90,8 +106,6 @@ void rotateMergeSort(int arr[], int a, int b) {
     j *= 2;
   }
 }
-
-void sort(int arr[], int n) { rotateMergeSort(arr, 0, n); }
 
 int main(int argc, char *argv[]) {
   int size = sizeof(array) / sizeof(array[0]);

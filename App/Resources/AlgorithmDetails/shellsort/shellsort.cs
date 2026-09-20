@@ -5,20 +5,17 @@ public class ShellSort
   public static void Sort(int[] arr)
   {
     int n = arr.Length;
-    for (var i = n / 2; i > 0; i /= 2)
+    int[] gaps = { 8861, 3938, 1750, 701, 301, 132, 57, 23, 10, 4, 1 };
+    foreach (int gap in gaps)
     {
-      for (var j = i; j < n; j++)
+      if (gap >= n) continue;
+      for (var i = gap; i < n; i++)
       {
-        for (var k = j - i; k >= 0; k -= i)
+        var j = i;
+        while (j >= gap && arr[j] < arr[j - gap])
         {
-          if (arr[k + i] >= arr[k])
-          {
-            break;
-          }
-          else
-          {
-            (arr[k], arr[k + i]) = (arr[k + i], arr[k]);
-          }
+          (arr[j], arr[j - gap]) = (arr[j - gap], arr[j]);
+          j -= gap;
         }
       }
     }
@@ -26,7 +23,10 @@ public class ShellSort
 
   public static void Main(String[] args)
   {
-    int[] array = { 0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56 };
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     Sort(array);
     string result = "[" + String.Join(", ", array) + "]";
     Console.WriteLine(result);

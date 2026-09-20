@@ -1,13 +1,17 @@
-def sort(arr)
-  n = arr.length
-  until arr.each_cons(2).all? { |a, b| a <= b }
-    index = rand(n - 1)
-    if arr[index] > arr[index + 1]
-      arr[index], arr[index + 1] = arr[index + 1], arr[index]
+def sort(a)
+  n = a.length
+  return a if n < 2
+  swapped = true
+  while swapped
+    swapped = false
+    (0...(n - 1)).each do |i|
+      if a[i] > a[i + 1]
+        a[i], a[i + 1] = a[i + 1], a[i]
+        swapped = true
+      end
     end
   end
+  a
 end
-
 array = [0, 39, 21, 62, 91, 77, 14, 23]
-sort(array)
-p array
+puts sort(array).inspect

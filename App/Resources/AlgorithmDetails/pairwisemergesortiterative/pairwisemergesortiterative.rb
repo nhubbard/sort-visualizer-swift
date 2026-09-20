@@ -1,10 +1,3 @@
-def comp_swap(array, a, b, sort_end)
-  return if b >= sort_end
-  if array[a] > array[b]
-    array[a], array[b] = array[b], array[a]
-  end
-end
-
 def sort(array)
   length = array.length
   sort_end = length
@@ -41,6 +34,14 @@ def sort(array)
   end
   array
 end
+
+def comp_swap(array, a, b, sort_end)
+  return if b >= sort_end
+  if array[a] > array[b]
+    array[a], array[b] = array[b], array[a]
+  end
+end
+
 
 array = [0, 39, 21, 62, 91, 77, 14, 23,
   90, 69, 51, 81, 68, 83, 32, 56]

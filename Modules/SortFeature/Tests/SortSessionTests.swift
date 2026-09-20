@@ -56,6 +56,7 @@ private struct FakeAlgorithm: SortAlgorithm {
       // getting silently pre-clamped before recording ever starts.
       growthModel: OperationGrowthModel(
         anchorSize: 0, coefficients: [0, 1e-9], measuredSafeCeiling: sizeRange.upperBound),
+      implementationComplexity: 0,
       stable: true,
       timeComplexity: ComplexityBounds(best: "O(n)", average: "O(n^2)", worst: "O(n^2)"),
       spaceComplexity: "O(1)",
@@ -86,6 +87,7 @@ private struct FakeAuxWritingAlgorithm: SortAlgorithm {
       sizeRange: 2...16,
       growthModel: OperationGrowthModel(
         anchorSize: 0, coefficients: [0, 1e-9], measuredSafeCeiling: 16),
+      implementationComplexity: 0,
       stable: true,
       timeComplexity: ComplexityBounds(best: "O(n)", average: "O(n)", worst: "O(n)"),
       spaceComplexity: "O(1)",

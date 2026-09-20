@@ -1,13 +1,3 @@
-def flip(arr, end_index)
-  start = 0
-  e = end_index
-  while start < e
-    arr[start], arr[e] = arr[e], arr[start]
-    start += 1
-    e -= 1
-  end
-end
-
 def sort(arr)
   n = arr.length
   (n - 1).downto(1).each do |i|
@@ -25,6 +15,17 @@ def sort(arr)
     end
   end
 end
+
+def flip(arr, end_index)
+  start = 0
+  e = end_index
+  while start < e
+    arr[start], arr[e] = arr[e], arr[start]
+    start += 1
+    e -= 1
+  end
+end
+
 
 array = [0, 39, 21, 62, 91, 77, 14, 23,
   90, 69, 51, 81, 68, 83, 32, 56]

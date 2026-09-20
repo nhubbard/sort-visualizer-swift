@@ -1,5 +1,9 @@
 import Foundation
 
+func sort(_ array: inout [Int]) {
+    cocktailMergeSort(&array)
+}
+
 func minRunLength(_ length: Int) -> Int {
     var n = length
     var r = 0
@@ -102,9 +106,6 @@ func cocktailMergeSort(_ array: inout [Int]) {
     }
 }
 
-func sort(_ array: inout [Int]) {
-    cocktailMergeSort(&array)
-}
 
 var array: [Int] = [
     0, 39, 21, 62, 91, 77, 14, 23,

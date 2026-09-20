@@ -1,6 +1,10 @@
 import java.util.Arrays;
 
 public class stablecyclesort {
+  public static void sort(int[] arr) {
+    stableCycleSort(arr);
+  }
+
   private static int destination(int[] arr, boolean[] flagged, int a, int b1, int b) {
     int heldValue = arr[a];
     int d = a;
@@ -43,12 +47,11 @@ public class stablecyclesort {
     }
   }
 
-  public static void sort(int[] arr) {
-    stableCycleSort(arr);
-  }
-
   public static void main(String[] args) {
-    int[] array = new int[] {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     sort(array);
     System.out.println(Arrays.toString(array));
   }

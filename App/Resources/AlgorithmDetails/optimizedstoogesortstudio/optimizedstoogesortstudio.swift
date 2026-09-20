@@ -1,4 +1,9 @@
 @discardableResult
+func sort(_ array: inout [Int]) {
+    guard array.count > 1 else { return }
+    stoogeSort(&array, 0, 1, array.count, false)
+}
+
 func compSwap(_ arr: inout [Int], _ a: Int, _ b: Int) -> Bool {
     if arr[a] > arr[b] {
         arr.swapAt(a, b)
@@ -43,9 +48,6 @@ func stoogeSort(_ arr: inout [Int], _ a: Int, _ m: Int, _ b: Int, _ merge: Bool)
     return lChange || rChange
 }
 
-func sort(_ array: inout [Int]) {
-    stoogeSort(&array, 0, 1, array.count, false)
-}
 
 var array: [Int] = [
     0, 39, 21, 62, 91, 77, 14, 23,

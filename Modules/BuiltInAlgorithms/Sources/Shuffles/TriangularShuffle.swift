@@ -44,7 +44,7 @@ public struct TriangularShuffle: ShuffleAlgorithm {
       triangle[pos] = counts[level]
     }
 
-    let original = engine.values
+    let original = engine.readAllValues()
     for pos in 0..<n {
       engine.setValue(pos, original[triangle[pos]])
     }

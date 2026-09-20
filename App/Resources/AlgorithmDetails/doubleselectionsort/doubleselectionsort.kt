@@ -1,3 +1,7 @@
+fun sort(arr: Array<Int>) {
+  doubleSelectionSort(arr)
+}
+
 fun doubleSelectionSort(arr: Array<Int>) {
   val n = arr.size
   if (n <= 1) {
@@ -31,10 +35,6 @@ fun doubleSelectionSort(arr: Array<Int>) {
     smallest = left
     biggest = right
   }
-}
-
-fun sort(arr: Array<Int>) {
-  doubleSelectionSort(arr)
 }
 
 fun main() {

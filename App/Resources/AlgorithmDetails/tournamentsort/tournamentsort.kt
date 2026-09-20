@@ -2,6 +2,21 @@ import kotlin.math.abs
 
 // A ref is either a player leaf, encoded as -playerIndex (so ref <= 0), or another match
 // node's root offset into matches (so ref > 0).
+fun sort(array: IntArray) {
+  val n = array.size
+  if (n <= 1) return
+
+  val matches = IntArray(6 * n)
+  var tourney = knockout(array, matches, 0, n - 1, 3)
+
+  val output = IntArray(n)
+  for (i in 0 until n) {
+    output[i] = array[getPlayer(array, matches, tourney)]
+    tourney = if (isPlayer(tourney)) 0 else rebuild(array, matches, tourney)
+  }
+  output.copyInto(array)
+}
+
 fun isPlayer(ref: Int): Boolean = ref <= 0
 
 fun makePlayer(index: Int): Int = -index
@@ -56,21 +71,6 @@ fun rebuild(array: IntArray, matches: IntArray, root: Int): Int {
     matches[root] = getPlayer(array, matches, getWinners(matches, root))
   }
   return root
-}
-
-fun sort(array: IntArray) {
-  val n = array.size
-  if (n <= 1) return
-
-  val matches = IntArray(6 * n)
-  var tourney = knockout(array, matches, 0, n - 1, 3)
-
-  val output = IntArray(n)
-  for (i in 0 until n) {
-    output[i] = array[getPlayer(array, matches, tourney)]
-    tourney = if (isPlayer(tourney)) 0 else rebuild(array, matches, tourney)
-  }
-  output.copyInto(array)
 }
 
 fun main() {

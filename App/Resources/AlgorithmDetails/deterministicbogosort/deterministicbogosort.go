@@ -2,11 +2,17 @@ package main
 
 import (
 	"fmt"
-	"sort"
+	stdsort "sort"
 )
 
+func sort(arr []int) []int {
+	n := len(arr)
+	permutationSort(arr, 0, n)
+	return arr
+}
+
 func isSorted(arr []int) bool {
-	return sort.IntsAreSorted(arr)
+	return stdsort.IntsAreSorted(arr)
 }
 
 func permutationSort(arr []int, depth int, n int) bool {
@@ -26,13 +32,9 @@ func permutationSort(arr []int, depth int, n int) bool {
 	return permutationSort(arr, depth+1, n)
 }
 
-func _sort(arr []int) []int {
-	n := len(arr)
-	permutationSort(arr, 0, n)
-	return arr
-}
-
 func main() {
-	array := []int{0, 39, 21, 62, 91, 14, 23}
-	fmt.Println(_sort(array))
+	array := []int{
+		0, 39, 21, 62, 91, 14, 23,
+	}
+	fmt.Println(sort(array))
 }

@@ -16,6 +16,25 @@ const chaosLimit = 5
 // nextPermutation advances arr to its next lexicographic permutation in place. It returns false
 // (after resetting arr to its first, fully ascending permutation) once every arrangement has been
 // visited -- a deterministic stand-in for "shuffle the array at random".
+func sort(arr []int) []int {
+	n := len(arr)
+	limit := chaosLimit
+	if n < limit {
+		limit = n
+	}
+	chaos := make([]int, limit)
+	copy(chaos, arr[:limit])
+	rest := make([]int, n-limit)
+	copy(rest, arr[limit:])
+
+	bogoBogoSort(chaos) // the real, recursive-check algorithm -- kept tiny on purpose
+	insertionSort(rest) // an ordinary fast sort for the rest of the array
+
+	merged := mergeSorted(chaos, rest)
+	copy(arr, merged)
+	return arr
+}
+
 func nextPermutation(arr []int) bool {
 	n := len(arr)
 	i := n - 2
@@ -104,25 +123,6 @@ func mergeSorted(a, b []int) []int {
 	merged = append(merged, a[i:]...)
 	merged = append(merged, b[j:]...)
 	return merged
-}
-
-func sort(arr []int) []int {
-	n := len(arr)
-	limit := chaosLimit
-	if n < limit {
-		limit = n
-	}
-	chaos := make([]int, limit)
-	copy(chaos, arr[:limit])
-	rest := make([]int, n-limit)
-	copy(rest, arr[limit:])
-
-	bogoBogoSort(chaos) // the real, recursive-check algorithm -- kept tiny on purpose
-	insertionSort(rest) // an ordinary fast sort for the rest of the array
-
-	merged := mergeSorted(chaos, rest)
-	copy(arr, merged)
-	return arr
 }
 
 func main() {

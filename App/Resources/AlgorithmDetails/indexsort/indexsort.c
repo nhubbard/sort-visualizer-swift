@@ -1,7 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int array[16] = {7, 3, 14, 0, 9, 5, 12, 1, 15, 4, 10, 2, 13, 6, 11, 8};
+int array[16] = {7, 3, 14, 0, 9, 5, 12, 1,
+                 15, 4, 10, 2, 13, 6, 11, 8};
 
 void swap(int *a, int *b) {
   int t = *a;
@@ -10,26 +11,17 @@ void swap(int *a, int *b) {
 }
 
 void printList(int items[], int size) {
-  for (int i = 0; i < size; i++) {
-    if (i == 0) {
-      printf("[%d, ", items[i]);
-    } else if (i != size - 1) {
-      printf("%d, ", items[i]);
-    } else {
-      printf("%d]", items[i]);
+  printf("[");
+  if (size > 0) {
+    printf("%d", items[0]);
+    for (int i = 1; i < size; i++) {
+      printf(", %d", items[i]);
     }
   }
+  printf("]");
 }
 
-int findMin(int arr[], int n) {
-  int min = arr[0];
-  for (int i = 1; i < n; i++) {
-    if (arr[i] < min) {
-      min = arr[i];
-    }
-  }
-  return min;
-}
+int findMin(int arr[], int n);
 
 void sort(int arr[], int n) {
   int minValue = findMin(arr, n);
@@ -44,6 +36,16 @@ void sort(int arr[], int n) {
       break;
     }
   }
+}
+
+int findMin(int arr[], int n) {
+  int min = arr[0];
+  for (int i = 1; i < n; i++) {
+    if (arr[i] < min) {
+      min = arr[i];
+    }
+  }
+  return min;
 }
 
 int main(int argc, char *argv[]) {

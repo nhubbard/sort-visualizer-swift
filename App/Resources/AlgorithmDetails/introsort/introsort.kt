@@ -1,5 +1,11 @@
 const val SIZE_THRESHOLD = 16
 
+fun sort(arr: Array<Int>) {
+  val n = arr.size
+  introsortLoop(arr, 0, n, 2 * floorLog2(n))
+  insertionSort(arr, 0, n)
+}
+
 fun swap(arr: Array<Int>, a: Int, b: Int) {
   val t = arr[a]
   arr[a] = arr[b]
@@ -83,12 +89,6 @@ fun introsortLoop(arr: Array<Int>, lo: Int, hiStart: Int, depthLimitStart: Int) 
     introsortLoop(arr, p, hi, depthLimit)
     hi = p
   }
-}
-
-fun sort(arr: Array<Int>) {
-  val n = arr.size
-  introsortLoop(arr, 0, n, 2 * floorLog2(n))
-  insertionSort(arr, 0, n)
 }
 
 fun main() {

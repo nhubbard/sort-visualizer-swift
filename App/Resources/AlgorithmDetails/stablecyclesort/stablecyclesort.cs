@@ -2,6 +2,28 @@ using System;
 
 public class StableCycleSort
 {
+  public static int[] Sort(int[] array)
+  {
+    var n = array.Length;
+    if (n <= 1)
+      return array;
+    var flagged = new bool[n];
+    for (var i = 0; i < n - 1; i++)
+    {
+      if (flagged[i])
+        continue;
+      var j = i;
+      do
+      {
+        var k = Destination(array, flagged, i, j, n);
+        (array[i], array[k]) = (array[k], array[i]);
+        flagged[k] = true;
+        j = k;
+      } while (j != i);
+    }
+    return array;
+  }
+
   private static int Destination(int[] arr, bool[] flagged, int a, int b1, int b)
   {
     var heldValue = arr[a];
@@ -27,31 +49,12 @@ public class StableCycleSort
     return d;
   }
 
-  public static int[] Sort(int[] array)
-  {
-    var n = array.Length;
-    if (n <= 1)
-      return array;
-    var flagged = new bool[n];
-    for (var i = 0; i < n - 1; i++)
-    {
-      if (flagged[i])
-        continue;
-      var j = i;
-      do
-      {
-        var k = Destination(array, flagged, i, j, n);
-        (array[i], array[k]) = (array[k], array[i]);
-        flagged[k] = true;
-        j = k;
-      } while (j != i);
-    }
-    return array;
-  }
-
   public static void Main(String[] args)
   {
-    int[] array = { 0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56 };
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     Sort(array);
     string result = "[" + String.Join(", ", array) + "]";
     Console.WriteLine(result);

@@ -3,7 +3,7 @@
 // comparison pattern below merges them together.
 function sort(arr, start, stop, merge) {
   if (stop - start === 2) {
-    if (arr[start] > arr[stop - 1]) {
+    if (stop <= arr.length && arr[start] > arr[stop - 1]) {
       [arr[start], arr[stop - 1]] = [arr[stop - 1], arr[start]];
     }
   } else if (stop - start >= 3) {
@@ -23,6 +23,16 @@ function sort(arr, start, stop, merge) {
   }
 }
 
-var array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56];
-sort(array, 0, array.length, true);
+function sortArray(arr) {
+  if (arr.length < 2) return;
+  let paddedLength = 1;
+  while (paddedLength < arr.length) paddedLength *= 2;
+  sort(arr, 0, paddedLength, true);
+}
+
+const array = [
+  0, 39, 21, 62, 91, 77, 14, 23,
+  90, 69, 51, 81, 68, 83, 32, 56,
+];
+sortArray(array);
 console.log("[" + array.join(", ") + "]");

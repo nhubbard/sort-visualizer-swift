@@ -22,8 +22,11 @@ public struct FlashSort: SortAlgorithm {
     category: .distribution,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 5935, coefficients: [239951, 71.1776, 0.00518025],
+      anchorSize: 3083, coefficients: [239904, 137.838, 0.019464],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .polynomialIntercept, coefficients: [0.019464, 17.8226, -46.7516], rSquared: 0.999974),
+    implementationComplexity: 21,
     stable: true,
     timeComplexity: ComplexityBounds(best: "O(n)", average: "O(n)", worst: "O(n^2)"),
     spaceComplexity: "O(n)",
@@ -46,8 +49,8 @@ public struct FlashSort: SortAlgorithm {
     // live-index compare per pair, then folds that pair's bigger/smaller value into the
     // running min/max via plain local-variable comparisons — `big`/`small` are held values at
     // that point, not necessarily live at any index once the pair has been classified.
-    var minValue = engine.values[0]
-    var maxValue = engine.values[0]
+    var minValue = engine.readValue(at: 0)
+    var maxValue = engine.readValue(at: 0)
     var maxIndex = 0
 
     var i = 1
@@ -56,13 +59,13 @@ public struct FlashSort: SortAlgorithm {
       let big: Int
       let bigIndex: Int
       if engine.compare(i, i + 1, by: (<)) {
-        small = engine.values[i]
-        big = engine.values[i + 1]
+        small = engine.readValue(at: i)
+        big = engine.readValue(at: i + 1)
         bigIndex = i + 1
       } else {
-        big = engine.values[i]
+        big = engine.readValue(at: i)
         bigIndex = i
-        small = engine.values[i + 1]
+        small = engine.readValue(at: i + 1)
       }
       if big > maxValue {
         maxValue = big
@@ -77,7 +80,7 @@ public struct FlashSort: SortAlgorithm {
     // ArrayV always re-examines the last element on its own, regardless of whether the paired
     // loop above already visited it — a held-value-vs-live-index-value comparison, not a
     // two-live-index compare.
-    let last = engine.values[n - 1]
+    let last = engine.readValue(at: n - 1)
     if last < minValue {
       minValue = last
     } else if last > maxValue {
@@ -108,7 +111,7 @@ public struct FlashSort: SortAlgorithm {
     }
 
     for h in 0..<n {
-      let k = classOf(engine.values[h])
+      let k = classOf(engine.readValue(at: h))
       L[k] += 1
       engine.writeAux(auxHandle, at: k, value: L[k])
     }
@@ -139,10 +142,10 @@ public struct FlashSort: SortAlgorithm {
       // for classification math, not a two-live-index compare).
       while j >= L[k] {
         j += 1
-        k = classOf(engine.values[j])
+        k = classOf(engine.readValue(at: j))
       }
 
-      var evicted = engine.values[j]
+      var evicted = engine.readValue(at: j)
 
       // Follow the cycle: repeatedly reclassify the evicted value, place it at its class's
       // next free slot (`L[k] - 1`), and adopt whatever was sitting there as the new
@@ -151,7 +154,7 @@ public struct FlashSort: SortAlgorithm {
       while j < L[k] {
         k = classOf(evicted)
         let location = L[k] - 1
-        let temp = engine.values[location]
+        let temp = engine.readValue(at: location)
         engine.setValue(location, evicted)
         evicted = temp
         L[k] -= 1
@@ -178,10 +181,10 @@ public struct FlashSort: SortAlgorithm {
   private func straightInsertionSort(into engine: inout RecordingEngine, n: Int) {
     guard n > 1 else { return }
     for i in 1..<n {
-      let current = engine.values[i]
+      let current = engine.readValue(at: i)
       var pos = i - 1
-      while pos >= 0 && engine.values[pos] > current {
-        engine.setValue(pos + 1, engine.values[pos])
+      while pos >= 0 && engine.readValue(at: pos) > current {
+        engine.setValue(pos + 1, engine.readValue(at: pos))
         pos -= 1
       }
       engine.setValue(pos + 1, current)

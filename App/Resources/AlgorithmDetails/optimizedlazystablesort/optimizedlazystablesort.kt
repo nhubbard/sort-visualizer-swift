@@ -1,3 +1,7 @@
+fun sort(arr: Array<Int>) {
+  lazyStableSort(arr, 0, arr.size)
+}
+
 fun swap(arr: Array<Int>, a: Int, b: Int) {
   val t = arr[a]
   arr[a] = arr[b]
@@ -122,10 +126,6 @@ fun lazyStableSort(arr: Array<Int>, pos: Int, len: Int) {
     if (rest > part) mergeWithoutBuffer(arr, pos + left, part, rest - part)
     part *= 2
   }
-}
-
-fun sort(arr: Array<Int>) {
-  lazyStableSort(arr, 0, arr.size)
 }
 
 fun main() {

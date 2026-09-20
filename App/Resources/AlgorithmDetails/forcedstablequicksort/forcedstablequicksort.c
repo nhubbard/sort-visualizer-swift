@@ -1,7 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
+                 90, 69, 51, 81, 68, 83, 32, 56};
 
 void swap(int *a, int *b) {
   int t = *a;
@@ -10,15 +11,28 @@ void swap(int *a, int *b) {
 }
 
 void printList(int items[], int size) {
-  for (int i = 0; i < size; i++) {
-    if (i == 0) {
-      printf("[%d, ", items[i]);
-    } else if (i != size - 1) {
-      printf("%d, ", items[i]);
-    } else {
-      printf("%d]", items[i]);
+  printf("[");
+  if (size > 0) {
+    printf("%d", items[0]);
+    for (int i = 1; i < size; i++) {
+      printf(", %d", items[i]);
     }
   }
+  printf("]");
+}
+
+int stableComp(int arr[], int key[], int a, int b);
+void stableSwap(int arr[], int key[], int a, int b);
+void medianOfThree(int arr[], int key[], int a, int b);
+int partition(int arr[], int key[], int a, int b, int p);
+void quickSort(int arr[], int key[], int a, int b);
+
+void sort(int arr[], int n) {
+  int *key = malloc(sizeof(int) * n);
+  for (int i = 0; i < n; i++)
+    key[i] = i;
+  quickSort(arr, key, 0, n);
+  free(key);
 }
 
 int stableComp(int arr[], int key[], int a, int b) {
@@ -76,14 +90,6 @@ void quickSort(int arr[], int key[], int a, int b) {
   stableSwap(arr, key, a, p);
   quickSort(arr, key, a, p);
   quickSort(arr, key, p + 1, b);
-}
-
-void sort(int arr[], int n) {
-  int *key = malloc(sizeof(int) * n);
-  for (int i = 0; i < n; i++)
-    key[i] = i;
-  quickSort(arr, key, 0, n);
-  free(key);
 }
 
 int main(int argc, char *argv[]) {

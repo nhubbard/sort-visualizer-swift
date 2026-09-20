@@ -1,3 +1,8 @@
+def sort(array)
+  merge_exchange_sort(array)
+  array
+end
+
 def merge_exchange_sort(array)
   n = array.length
   return if n <= 1
@@ -25,10 +30,6 @@ def merge_exchange_sort(array)
   end
 end
 
-def sort(array)
-  merge_exchange_sort(array)
-  array
-end
 
 array = [0, 39, 21, 62, 91, 77, 14, 23,
   90, 69, 51, 81, 68, 83, 32, 56]

@@ -14,6 +14,19 @@ public class bogobogosort {
   // Advances arr to its next lexicographic permutation in place. Returns false (after resetting
   // arr to its first, fully ascending permutation) once every arrangement has been visited -- a
   // deterministic stand-in for "shuffle the array at random".
+  public static void sort(int[] arr) {
+    int n = arr.length;
+    int limit = Math.min(CHAOS_LIMIT, n);
+    int[] chaos = Arrays.copyOfRange(arr, 0, limit);
+    int[] rest = Arrays.copyOfRange(arr, limit, n);
+
+    bogoBogoSort(chaos); // the real, recursive-check algorithm -- kept tiny on purpose
+    insertionSort(rest); // an ordinary fast sort for the rest of the array
+
+    int[] merged = mergeSorted(chaos, rest);
+    System.arraycopy(merged, 0, arr, 0, n);
+  }
+
   private static boolean nextPermutation(int[] arr) {
     int n = arr.length;
     int i = n - 2;
@@ -105,21 +118,11 @@ public class bogobogosort {
     return merged;
   }
 
-  public static void sort(int[] arr) {
-    int n = arr.length;
-    int limit = Math.min(CHAOS_LIMIT, n);
-    int[] chaos = Arrays.copyOfRange(arr, 0, limit);
-    int[] rest = Arrays.copyOfRange(arr, limit, n);
-
-    bogoBogoSort(chaos); // the real, recursive-check algorithm -- kept tiny on purpose
-    insertionSort(rest); // an ordinary fast sort for the rest of the array
-
-    int[] merged = mergeSorted(chaos, rest);
-    System.arraycopy(merged, 0, arr, 0, n);
-  }
-
   public static void main(String[] args) {
-    int[] array = new int[] {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     sort(array);
     System.out.println(Arrays.toString(array));
   }

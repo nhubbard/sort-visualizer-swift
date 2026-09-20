@@ -1,6 +1,10 @@
 import java.util.Arrays;
 
 public class medianquickbogosort {
+  public static void sort(int[] arr) {
+    sort(arr, 0, arr.length);
+  }
+
   public static boolean isSplit(int[] arr, int start, int mid, int end) {
     int lowMax = arr[start];
     for (int i = start + 1; i < mid; i++) {
@@ -35,12 +39,8 @@ public class medianquickbogosort {
     sort(arr, mid, end);
   }
 
-  public static void sort(int[] arr) {
-    sort(arr, 0, arr.length);
-  }
-
   public static void main(String[] args) {
-    int[] array = new int[] {0, 39, 21, 62, 91, 14, 23};
+    int[] array = {0, 39, 21, 62, 91, 14, 23};
     sort(array);
     System.out.println(Arrays.toString(array));
   }

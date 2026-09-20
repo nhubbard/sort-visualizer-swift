@@ -1,12 +1,16 @@
+def sort(arr)
+  return if arr.length < 2
+  n = arr.length
+  shatter_sort(arr, n, 4)
+end
+
 def insertion_sort(arr, start, fin)
   (start + 1...fin).each do |i|
-    key = arr[i]
-    j = i - 1
-    while j >= start && arr[j] > key
-      arr[j + 1] = arr[j]
-      j -= 1
+    pos = i
+    while pos > start && arr[pos - 1] > arr[pos]
+      arr[pos - 1], arr[pos] = arr[pos], arr[pos - 1]
+      pos -= 1
     end
-    arr[j + 1] = key
   end
 end
 
@@ -43,10 +47,6 @@ def shatter_sort(arr, length, num)
   end
 end
 
-def sort(arr)
-  n = arr.length
-  shatter_sort(arr, n, 4)
-end
 
 array = [0, 39, 21, 62, 91, 77, 14, 23,
   90, 69, 51, 81, 68, 83, 32, 56]

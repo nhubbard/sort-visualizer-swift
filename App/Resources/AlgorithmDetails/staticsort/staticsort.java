@@ -1,6 +1,12 @@
 import java.util.Arrays;
 
 public class staticsort {
+  public static void sort(int[] arr) {
+    if (arr.length > 1) {
+      staticSort(arr, 0, arr.length);
+    }
+  }
+
   private static int[] findMinMax(int[] array, int a, int b) {
     int minValue = array[a];
     int maxValue = array[a];
@@ -123,14 +129,11 @@ public class staticsort {
     }
   }
 
-  public static void sort(int[] arr) {
-    if (arr.length > 1) {
-      staticSort(arr, 0, arr.length);
-    }
-  }
-
   public static void main(String[] args) {
-    int[] array = new int[] {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     sort(array);
     System.out.println(Arrays.toString(array));
   }

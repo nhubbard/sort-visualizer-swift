@@ -1,3 +1,10 @@
+function sort(array) {
+  const n = array.length;
+  if (n <= 1) return;
+  makeHeap(array, 0, n);
+  sortHeap(array, 0, n);
+}
+
 function hyperfloor(n) {
   let power = 1;
   while (power * 2 <= n) power *= 2;
@@ -120,13 +127,10 @@ function sortHeap(array, first, lastIn) {
   } while (size > 1);
 }
 
-function sort(array) {
-  const n = array.length;
-  if (n <= 1) return;
-  makeHeap(array, 0, n);
-  sortHeap(array, 0, n);
-}
 
-const array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56];
+const array = [
+  0, 39, 21, 62, 91, 77, 14, 23,
+  90, 69, 51, 81, 68, 83, 32, 56,
+];
 sort(array);
 console.log(`[${array.join(", ")}]`);

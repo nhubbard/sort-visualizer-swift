@@ -3,6 +3,23 @@ import java.util.Arrays;
 public final class tournamentsort {
   // A ref is either a player leaf, encoded as -playerIndex (so ref <= 0), or another match
   // node's root offset into matches (so ref > 0).
+  static void sort(int[] array) {
+    int n = array.length;
+    if (n <= 1) {
+      return;
+    }
+
+    int[] matches = new int[6 * n];
+    int tourney = knockout(array, matches, 0, n - 1, 3);
+
+    int[] output = new int[n];
+    for (int i = 0; i < n; i++) {
+      output[i] = array[getPlayer(array, matches, tourney)];
+      tourney = isPlayer(tourney) ? 0 : rebuild(array, matches, tourney);
+    }
+    System.arraycopy(output, 0, array, 0, n);
+  }
+
   static boolean isPlayer(int ref) {
     return ref <= 0;
   }
@@ -71,25 +88,11 @@ public final class tournamentsort {
     return root;
   }
 
-  static void sort(int[] array) {
-    int n = array.length;
-    if (n <= 1) {
-      return;
-    }
-
-    int[] matches = new int[6 * n];
-    int tourney = knockout(array, matches, 0, n - 1, 3);
-
-    int[] output = new int[n];
-    for (int i = 0; i < n; i++) {
-      output[i] = array[getPlayer(array, matches, tourney)];
-      tourney = isPlayer(tourney) ? 0 : rebuild(array, matches, tourney);
-    }
-    System.arraycopy(output, 0, array, 0, n);
-  }
-
   public static void main(String[] args) {
-    int[] array = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     sort(array);
     System.out.println(Arrays.toString(array));
   }

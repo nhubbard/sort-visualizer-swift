@@ -1,3 +1,8 @@
+def sort(arr)
+  rotate_partition_merge_sort(arr, arr.length)
+  arr
+end
+
 def multi_swap(array, a, b, len)
   len.times do |i|
     array[a + i], array[b + i] = array[b + i], array[a + i]
@@ -106,10 +111,6 @@ def rotate_partition_merge_sort(array, n)
   end
 end
 
-def sort(arr)
-  rotate_partition_merge_sort(arr, arr.length)
-  arr
-end
 
 array = [0, 39, 21, 62, 91, 77, 14, 23,
   90, 69, 51, 81, 68, 83, 32, 56]

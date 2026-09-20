@@ -1,5 +1,9 @@
 import Foundation
 
+func sort(_ array: inout [Int]) {
+    bitonicSort(&array, 0, array.count, true)
+}
+
 func greatestPowerOfTwoLessThan(_ n: Int) -> Int {
     var k = 1
     while k < n {
@@ -35,9 +39,6 @@ func bitonicSort(_ array: inout [Int], _ lo: Int, _ n: Int, _ dir: Bool) {
     }
 }
 
-func sort(_ array: inout [Int]) {
-    bitonicSort(&array, 0, array.count, true)
-}
 
 var array: [Int] = [
     0, 39, 21, 62, 91, 77, 14, 23,

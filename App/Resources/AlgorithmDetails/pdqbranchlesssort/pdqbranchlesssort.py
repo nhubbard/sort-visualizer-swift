@@ -5,6 +5,14 @@ BLOCK_SIZE = 64
 CACHELINE_SIZE = 64
 
 
+def sort(arr):
+    n = len(arr)
+    if n < 2:
+        return
+    left_offsets = [0] * (BLOCK_SIZE + CACHELINE_SIZE)
+    right_offsets = [0] * (BLOCK_SIZE + CACHELINE_SIZE)
+    pdq_loop(arr, 0, n, pdq_log(n), left_offsets, right_offsets)
+
 def pdq_log(n):
     log = 0
     while True:
@@ -421,16 +429,12 @@ def pdq_loop(arr, begin, end, bad_allowed, left_offsets, right_offsets):
         leftmost = False
 
 
-def sort(arr):
-    n = len(arr)
-    if n < 2:
-        return
-    left_offsets = [0] * (BLOCK_SIZE + CACHELINE_SIZE)
-    right_offsets = [0] * (BLOCK_SIZE + CACHELINE_SIZE)
-    pdq_loop(arr, 0, n, pdq_log(n), left_offsets, right_offsets)
 
 
 if __name__ == "__main__":
-    array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56]
+    array = [
+        0, 39, 21, 62, 91, 77, 14, 23,
+        90, 69, 51, 81, 68, 83, 32, 56,
+    ]
     sort(array)
     print(array)

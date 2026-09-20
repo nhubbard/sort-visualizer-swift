@@ -1,3 +1,13 @@
+fun sort(list: List<Int>): List<Int> {
+  if (list.size <= 1) {
+    return list
+  }
+  val middle = list.size / 2
+  var left = list.subList(0, middle)
+  var right = list.subList(middle, list.size)
+  return merge(sort(left), sort(right))
+}
+
 fun merge(left: List<Int>, right: List<Int>): List<Int> {
   var indexLeft = 0
   var indexRight = 0
@@ -20,16 +30,6 @@ fun merge(left: List<Int>, right: List<Int>): List<Int> {
     indexRight++
   }
   return newList
-}
-
-fun sort(list: List<Int>): List<Int> {
-  if (list.size <= 1) {
-    return list
-  }
-  val middle = list.size / 2
-  var left = list.subList(0, middle)
-  var right = list.subList(middle, list.size)
-  return merge(sort(left), sort(right))
 }
 
 fun main() {

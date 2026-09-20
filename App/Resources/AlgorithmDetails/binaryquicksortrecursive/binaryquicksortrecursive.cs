@@ -2,6 +2,19 @@ using System;
 
 public class BinaryQuickSortRecursive
 {
+  public static void Sort(int[] arr)
+  {
+    int n = arr.Length;
+    if (n < 2) return;
+    int maxValue = arr[0];
+    for (int i = 1; i < n; i++)
+    {
+      if (arr[i] > maxValue) maxValue = arr[i];
+    }
+    int bit = MostSignificantBit(maxValue);
+    BinaryQuickSort(arr, 0, n - 1, bit);
+  }
+
   private static int MostSignificantBit(int value)
   {
     if (value == 0) return -1;
@@ -45,21 +58,12 @@ public class BinaryQuickSortRecursive
     }
   }
 
-  public static void Sort(int[] arr)
-  {
-    int n = arr.Length;
-    int maxValue = arr[0];
-    for (int i = 1; i < n; i++)
-    {
-      if (arr[i] > maxValue) maxValue = arr[i];
-    }
-    int bit = MostSignificantBit(maxValue);
-    BinaryQuickSort(arr, 0, n - 1, bit);
-  }
-
   public static void Main(String[] args)
   {
-    int[] array = { 0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56 };
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     Sort(array);
     string result = "[" + String.Join(", ", array) + "]";
     Console.WriteLine(result);

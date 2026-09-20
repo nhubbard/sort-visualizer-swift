@@ -1,6 +1,15 @@
 import java.util.Arrays;
 
 public class forcedstablequicksort {
+  public static void sort(int[] arr) {
+    int n = arr.length;
+    int[] key = new int[n];
+    for (int i = 0; i < n; i++) {
+      key[i] = i;
+    }
+    quickSort(arr, key, 0, n);
+  }
+
   private static boolean stableComp(int[] arr, int[] key, int a, int b) {
     if (arr[a] > arr[b]) {
       return true;
@@ -66,17 +75,11 @@ public class forcedstablequicksort {
     quickSort(arr, key, p + 1, b);
   }
 
-  public static void sort(int[] arr) {
-    int n = arr.length;
-    int[] key = new int[n];
-    for (int i = 0; i < n; i++) {
-      key[i] = i;
-    }
-    quickSort(arr, key, 0, n);
-  }
-
   public static void main(String[] args) {
-    int[] array = new int[] {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     sort(array);
     System.out.println(Arrays.toString(array));
   }

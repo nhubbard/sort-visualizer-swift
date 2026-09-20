@@ -1,5 +1,6 @@
 fun sort(arr: Array<Int>) {
   val n = arr.size
+  if (n < 2) return
 
   fun siftDown(i: Int, b: Int) {
     var j = i

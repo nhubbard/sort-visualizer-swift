@@ -9,8 +9,11 @@ public struct CountingSort: SortAlgorithm {
     category: .distribution,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 120000, coefficients: [240000, 2],
+      anchorSize: 18182, coefficients: [239993, 22.5863, 0.000516332],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .polynomialIntercept, coefficients: [0.000516332, 3.81043, 19.6641], rSquared: 0.999896),
+    implementationComplexity: 9,
     stable: true,
     timeComplexity: ComplexityBounds(best: "O(n+k)", average: "O(n+k)", worst: "O(n+k)"),
     spaceComplexity: "O(n+k)",
@@ -25,15 +28,15 @@ public struct CountingSort: SortAlgorithm {
 
     // ArrayV's `Reads.analyzeMax` reads values directly (no stat-tracked compares), so the
     // scan for the maximum here does the same via `engine.values` rather than `engine.compare`.
-    var maxValue = engine.values[0]
-    for i in 1..<n where engine.values[i] > maxValue {
-      maxValue = engine.values[i]
+    var maxValue = engine.readValue(at: 0)
+    for i in 1..<n where engine.readValue(at: i) > maxValue {
+      maxValue = engine.readValue(at: i)
     }
 
     var values = [Int]()
     values.reserveCapacity(n)
     for i in 0..<n {
-      values.append(engine.values[i])
+      values.append(engine.readValue(at: i))
     }
 
     // ArrayV's per-value `counts` table is bookkeeping the visualizer never renders as a bar

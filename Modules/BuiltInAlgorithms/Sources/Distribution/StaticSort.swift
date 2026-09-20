@@ -24,8 +24,11 @@ public struct StaticSort: SortAlgorithm {
     category: .distribution,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 6815, coefficients: [135181, 21.4058],
+      anchorSize: 7797, coefficients: [155683, 20.3849],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .powerLog, coefficients: [5.02096, 0.909337], rSquared: 0.991656),
+    implementationComplexity: 32,
     stable: false,
     timeComplexity: ComplexityBounds(best: "O(n)", average: "O(n)", worst: "O(n^2)"),
     spaceComplexity: "O(n)",
@@ -43,12 +46,12 @@ public struct StaticSort: SortAlgorithm {
   /// Ports ArrayV's `findMinMax`: a held-value-vs-live-index-value scan, not a stat-tracked
   /// `engine.compare` — it's comparing a live array value against a running local min/max, the
   /// same held-value pattern `CycleSort`'s `t` and `FlashSort`'s own min/max scan already use.
-  private func findMinMax(_ engine: RecordingEngine, _ a: Int, _ b: Int) -> (min: Int, max: Int) {
-    var minValue = engine.values[a]
+  private func findMinMax(_ engine: inout RecordingEngine, _ a: Int, _ b: Int) -> (min: Int, max: Int) {
+    var minValue = engine.readValue(at: a)
     var maxValue = minValue
     var i = a + 1
     while i < b {
-      let v = engine.values[i]
+      let v = engine.readValue(at: i)
       if v < minValue {
         minValue = v
       } else if v > maxValue {
@@ -60,7 +63,7 @@ public struct StaticSort: SortAlgorithm {
   }
 
   private func staticSort(into engine: inout RecordingEngine, a: Int, b: Int) {
-    let (minValue, maxValue) = findMinMax(engine, a, b)
+    let (minValue, maxValue) = findMinMax(&engine, a, b)
     let auxLen = b - a
 
     // See the type-level doc comment: `CONST`'s `+ 1` denominator keeps this finite even when
@@ -80,7 +83,7 @@ public struct StaticSort: SortAlgorithm {
     var offset = [Int](repeating: 0, count: auxLen + 1)
 
     for i in a..<b {
-      let idx = classify(engine.values[i])
+      let idx = classify(engine.readValue(at: i))
       count[idx] += 1
       engine.writeAux(countHandle, at: idx, value: count[idx])
     }
@@ -100,7 +103,7 @@ public struct StaticSort: SortAlgorithm {
       while count[v] > 0 {
         let origin = offset[v]
         var from = origin
-        var num = engine.values[from]
+        var num = engine.readValue(at: from)
 
         // Transient sentinel write matching ArrayV's `Writes.write(array, from, -1, ...)`.
         // `-1` is never a valid value here (shuffles are always `Array(1...size)`), so this
@@ -115,7 +118,7 @@ public struct StaticSort: SortAlgorithm {
           count[idx] -= 1
           engine.writeAux(countHandle, at: idx, value: count[idx])
 
-          let temp = engine.values[to]
+          let temp = engine.readValue(at: to)
           engine.setValue(to, num)
           num = temp
           from = to

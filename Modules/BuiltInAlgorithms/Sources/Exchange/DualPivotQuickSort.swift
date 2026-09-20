@@ -14,8 +14,11 @@ public struct DualPivotQuickSort: SortAlgorithm {
     category: .exchange,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 2686, coefficients: [239877, 165.612, 0.028404],
+      anchorSize: 1489, coefficients: [239984, 297.286, 0.0913472],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .polynomialIntercept, coefficients: [0.0913472, 25.254, -147.107], rSquared: 0.999642),
+    implementationComplexity: 20,
     stable: false,
     timeComplexity: ComplexityBounds(best: "O(n log n)", average: "O(n log n)", worst: "O(n^2)"),
     spaceComplexity: "O(log n)",
@@ -73,24 +76,24 @@ public struct DualPivotQuickSort: SortAlgorithm {
     // partitioning loop below moves other elements through positions `left`/`right` while
     // `pivot1`/`pivot2` must stay fixed at the values captured here. Same held-value pattern
     // as `CycleSort.swift`'s cached `t`.
-    let pivot1 = engine.values[left]
-    let pivot2 = engine.values[right]
+    let pivot1 = engine.readValue(at: left)
+    let pivot2 = engine.readValue(at: right)
 
     var less = left + 1
     var great = right - 1
 
     var k = less
     while k <= great {
-      if engine.values[k] < pivot1 {
+      if engine.compareValue(k, against: pivot1, by: (<)) {
         engine.swap(k, less)
         less += 1
-      } else if engine.values[k] > pivot2 {
-        while k < great && engine.values[great] > pivot2 {
+      } else if engine.compareValue(k, against: pivot2, by: (>)) {
+        while k < great && engine.compareValue(great, against: pivot2, by: (>)) {
           great -= 1
         }
         engine.swap(k, great)
         great -= 1
-        if engine.values[k] < pivot1 {
+        if engine.compareValue(k, against: pivot1, by: (<)) {
           engine.swap(k, less)
           less += 1
         }
@@ -106,7 +109,10 @@ public struct DualPivotQuickSort: SortAlgorithm {
     engine.swap(great + 1, right)
 
     dualPivot(&engine, left, less - 2, divisor)
-    if pivot1 < pivot2 {
+    // `pivot1`/`pivot2` are both held values at this point (the array positions they were
+    // captured from have long since been overwritten by the partitioning above) -- neither side
+    // is a live index, so this goes through `engine.compareValues`, not a raw `<`.
+    if engine.compareValues(pivot1, pivot2, by: (<)) {
       dualPivot(&engine, less, great, divisor)
     }
     dualPivot(&engine, great + 2, right, divisor)

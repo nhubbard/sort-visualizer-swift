@@ -1,27 +1,6 @@
 import java.util.Arrays;
 
 public class guesssort {
-  public static boolean isValid(int[] arr, int[] loops, int n) {
-    int total = 0;
-    for (int i = 0; i < n; i++) {
-      for (int j = 0; j < n; j++) {
-        if (loops[i] == loops[j]) {
-          total += 1;
-        }
-      }
-    }
-    for (int i = 0; i < n; i++) {
-      for (int j = 0; j < n; j++) {
-        if (i < j && arr[loops[i]] > arr[loops[j]]) {
-          total += 1;
-        } else if (i > j && arr[loops[i]] < arr[loops[j]]) {
-          total += 1;
-        }
-      }
-    }
-    return total == n;
-  }
-
   public static void sort(int[] arr) {
     int n = arr.length;
     int[] loops = new int[n];
@@ -52,8 +31,29 @@ public class guesssort {
     }
   }
 
+  public static boolean isValid(int[] arr, int[] loops, int n) {
+    int total = 0;
+    for (int i = 0; i < n; i++) {
+      for (int j = 0; j < n; j++) {
+        if (loops[i] == loops[j]) {
+          total += 1;
+        }
+      }
+    }
+    for (int i = 0; i < n; i++) {
+      for (int j = 0; j < n; j++) {
+        if (i < j && arr[loops[i]] > arr[loops[j]]) {
+          total += 1;
+        } else if (i > j && arr[loops[i]] < arr[loops[j]]) {
+          total += 1;
+        }
+      }
+    }
+    return total == n;
+  }
+
   public static void main(String[] args) {
-    int[] array = new int[] {0, 39, 21, 14};
+    int[] array = {0, 39, 21, 14};
     sort(array);
     System.out.println(Arrays.toString(array));
   }

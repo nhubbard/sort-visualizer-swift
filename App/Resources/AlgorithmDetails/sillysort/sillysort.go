@@ -4,6 +4,11 @@ import (
 	"fmt"
 )
 
+func sort(arr []int) []int {
+	sillySort(arr, 0, len(arr)-1)
+	return arr
+}
+
 func sillySort(arr []int, i, j int) {
 	if i < j {
 		m := i + (j-i)/2
@@ -14,11 +19,6 @@ func sillySort(arr []int, i, j int) {
 		}
 		sillySort(arr, i+1, j)
 	}
-}
-
-func sort(arr []int) []int {
-	sillySort(arr, 0, len(arr)-1)
-	return arr
 }
 
 func main() {

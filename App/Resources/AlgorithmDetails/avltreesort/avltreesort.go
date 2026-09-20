@@ -16,6 +16,21 @@ type addResult struct {
 	heightChanged bool
 }
 
+func sort(arr []int) []int {
+	var root *Node
+	for _, value := range arr {
+		root = add(root, value).node
+	}
+
+	result := make([]int, 0, len(arr))
+	traverse(root, &result)
+
+	for i := range arr {
+		arr[i] = result[i]
+	}
+	return arr
+}
+
 func singleRotateRight(node *Node) *Node {
 	b := node.left
 	node.left = b.right
@@ -109,21 +124,6 @@ func traverse(node *Node, result *[]int) {
 	traverse(node.left, result)
 	*result = append(*result, node.value)
 	traverse(node.right, result)
-}
-
-func sort(arr []int) []int {
-	var root *Node
-	for _, value := range arr {
-		root = add(root, value).node
-	}
-
-	result := make([]int, 0, len(arr))
-	traverse(root, &result)
-
-	for i := range arr {
-		arr[i] = result[i]
-	}
-	return arr
 }
 
 func main() {

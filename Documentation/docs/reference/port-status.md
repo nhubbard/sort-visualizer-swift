@@ -18,7 +18,7 @@ sequential version, under a different name. Real thread interleaving has no mean
 single-writer model. Porting these variants would add duplicate content, not new algorithmic
 behavior.
 
-This leaves 196 candidates. 167 are shipped. 29 remain, in two categories.
+This leaves 196 candidates. 182 are shipped. 14 remain, in one category.
 
 ### By category
 
@@ -28,10 +28,10 @@ This leaves 196 candidates. 167 are shipped. 29 remain, in two categories.
 | Insertion (18) | All ported |
 | Selection (25) | All ported |
 | Distribution (36) | All ported |
-| Merge (19) | All ported except `QuadSort` |
+| Merge (19) | All ported |
 | Miscellaneous (4) | All ported |
 | Concurrent (22) | All ported |
-| Hybrid (41) | 13 ported, 28 remaining |
+| Hybrid (41) | 27 ported, 14 remaining |
 
 ### Remaining work
 
@@ -40,50 +40,37 @@ alphabetical order. The line count cited per algorithm is "effective lines": the
 class, plus, when it extends a shared template rather than the bare base class, that template's
 line count. Inherited template logic is real complexity a port must understand and translate.
 
-**Medium** (101–200 effective lines):
-
-- `IntroCircleSortRecursive`, `MergeInsertionSort`, `OptimizedDualPivotQuickSort`,
-  `OptimizedBottomUpMergeSort`, `LaziestSort`, `StacklessDualPivotQuickSort`,
-  `StacklessHybridQuickSort`, `DropMergeSort`, `OptimizedWeaveMergeSort`,
-  `ImprovedBlockSelectionSort`.
-
 **Hard** (201–400 effective lines, or a same-category prerequisite not yet ported):
 
-- `YujisBufferedMergeSort2`, `MedianMergeSort`, `LazierestSort`, `CircularGrailSort`
+- `MedianMergeSort`, `LazierestSort`, `CircularGrailSort`
   (self-contained despite the name; it does not extend `GrailSorting`), `FifthMergeSort`,
-  `BufferPartitionMergeSort`, `OptimizedRotateMergeSort`, `RemiSort` (270 own plus 82 for the
-  shared `MultiWayMergeSorting` template), `EctaSort`.
+  `BufferPartitionMergeSort`, `OptimizedRotateMergeSort`, `EctaSort`.
 
 **Very Hard** (400+ effective lines, or extending one of the largest remaining templates):
 
-- `SqrtSort`, `FlanSort` (367 own plus 82 for `MultiWayMergeSorting`), `SynchronousSqrtSort` (190
+- `SqrtSort`, `SynchronousSqrtSort` (190
   own plus 352 for `BlockMergeSorting`), `AdaptiveGrailSort` (915 lines, self-contained despite the
-  name), `TimSort` (a 45-line wrapper over the 950-line `TimSorting` template), `FluxSort` (202 own
-  plus 875 for `QuadSorting`), `ChaliceSort` (767 own plus 352 for `BlockMergeSorting`), `WikiSort`
-  (a 75-line wrapper over the 1068-line `WikiSorting` template), `KotaSort` (a 33-line wrapper over
-  the 1142-line `KotaSorting` template, the largest template in ArrayV's `sorts/` tree), and
-  `QuadSort` (51 own plus 875 for `QuadSorting`, filed under Merge rather than Hybrid).
+  name), `TimSort` (a 45-line wrapper over the 950-line `TimSorting` template), `ChaliceSort` (767
+  own plus 352 for `BlockMergeSorting`), `WikiSort` (a 75-line wrapper over the 1068-line
+  `WikiSorting` template), and `KotaSort` (a 33-line wrapper over the 1142-line `KotaSorting`
+  template, the largest template in ArrayV's `sorts/` tree).
 
 Several of these algorithms share one large template or one unported prerequisite. Porting the
 shared piece once reduces the cost of every sibling in that cluster:
 
-- **Quad cluster**: `QuadSort` (Merge) and `FluxSort` (Hybrid) both extend `QuadSorting` (875
-  lines).
-- **MultiWayMerge cluster**: `FlanSort` and `RemiSort` (both Hybrid) both extend
-  `MultiWayMergeSorting` (82 lines). This template is much smaller than `QuadSorting`, so this pair
-  costs less than the members' own size alone suggests.
 - **BlockMerge cluster**: `ChaliceSort` and `SynchronousSqrtSort` (both Hybrid) both extend
   `BlockMergeSorting` (352 lines).
 
-`QuadSort` and `FluxSort` are deferred as a policy, not scheduled piecemeal. `QuadSorting` is 875
-lines of dense, hand-unrolled production code (Igor van den Hoven's actual quadsort): a multi-day
-undertaking. Both are earmarked for a future batch covering the largest remaining sorts across
-every category.
+The rest of the Hybrid backlog is deferred as a policy, not scheduled piecemeal, earmarked for a
+future batch covering the largest remaining sorts across every category.
 
 ### Completed clusters
 
-Two large clusters were tackled as a unit and have shipped in full, validating the
+Several clusters were tackled as a unit and have shipped in full, validating the
 port-the-shared-template-once strategy:
+
+- **MultiWayMerge cluster**: `FlanSort` and `RemiSort` (both Hybrid) now share the heap helpers
+  ported from `MultiWayMergeSorting`; each keeps its distinct merge and sorting logic.
 
 - **Bogo/Guess family**, spread across the Exchange and Distribution categories: all extend
   `BogoSorting` (261 lines). The real blocker for this cluster was never the template. It was the
@@ -100,35 +87,50 @@ port-the-shared-template-once strategy:
   non-decorative reuse of the shared template across all four ports.
 - **PDQ cluster**: `PDQBranchedSort` and `PDQBranchlessSort` (both Hybrid) both extend
   `PDQSorting` (570 lines). Both shipped.
-- `IntroCircleSortIterative`/`IntroCircleSortRecursive` (Hybrid) extend the small
-  `IterativeCircleSorting`/`CircleSorting` templates (44/48 lines). The already-shipped
-  `CircleSort` family established the pattern; only the recursive variant remains (see the Medium
-  tier above).
+- **Circle cluster**: `IntroCircleSortIterative` and `IntroCircleSortRecursive` (both Hybrid)
+  extend the small `IterativeCircleSorting`/`CircleSorting` templates (44/48 lines). Both shipped,
+  each inlining its own routine rather than sharing a dedicated template file — small enough not to
+  be worth extracting, matching how the already-shipped `CircleSort` family itself is structured.
+- **Quad cluster**: `QuadSort` (Merge) shipped, along with the `QuadSorting` template (875 lines)
+  it extends — Igor van den Hoven's actual quadsort, dense and hand-unrolled, a multi-day
+  undertaking on its own. `FluxSort` (Hybrid), the cluster's other member, has since shipped too;
+  porting it only needed its own 202 lines built on top of the already-shipped, already-tested
+  template plus one new template entry point (`sort(_:using:start:length:)`, ArrayV's
+  `quadSortSwap`) for reusing a caller-supplied scratch buffer across recursive partition calls.
 
 A retired scratch document, previously kept at `Documentation/TEMPLATE_PORT_REFERENCE.md`, carried
 hand-transcribed Java-to-pseudocode notes for six templates: `BinaryQuickSortingTemplate`,
 `ShatterSortingTemplate`, `TwinSortingTemplate`, `UnstableGrailSortingTemplate`,
 `PDQSortingTemplate`, and `GrailSortingTemplate`. Every algorithm built on those six templates has
 shipped, so the team retired that document instead of carrying it forward. It does not cover any of
-the templates listed above as still open (`QuadSorting`, `MultiWayMergeSorting`,
-`BlockMergeSorting`, `TimSorting`, `WikiSorting`, `KotaSorting`). A similar transcription pass is
-worth doing again before tackling those templates, given how dense and index-arithmetic-heavy this
-style of algorithm tends to be.
+the templates listed above as still open (`BlockMergeSorting`,
+`TimSorting`, `WikiSorting`, `KotaSorting`) — nor `QuadSorting`, which has since shipped without
+one. A similar transcription pass is worth doing again before tackling the remaining open
+templates, given how dense and index-arithmetic-heavy this style of algorithm tends to be.
 
 ## Shuffles
 
-ArrayV's `Shuffles.java` enum lists 45 cases, flat with no subdirectories. This app ships 46
+ArrayV's `Shuffles.java` enum lists 45 cases, flat with no subdirectories. This app ships 44
 shuffles today, all complete. This project's original set of 5 shuffles did not map one-to-one
 onto ArrayV's list when shuffles were first ported, which accounts for the difference.
 
 Notes on specific shuffles:
 
-- `HeapifiedShuffle`, `SmoothifiedShuffle`, `PoplarifiedShuffle`, and `TriangularHeapifiedShuffle`
-  each call directly into a sort's own heapify step (`MaxHeapSort.makeHeap`,
-  `SmoothSort.smoothHeapify`, `PoplarHeapSort.poplarHeapify`, `TriangularHeapSort.
-  triangularHeapify`) rather than reimplementing it. Three of these four sorts needed a small
-  refactor first, extracting a dedicated public heapify-only entry point, before their shuffle
-  could call it directly.
+- `HeapifiedShuffle` and `TriangularHeapifiedShuffle` each call directly into a sort's own
+  heapify step (`MaxHeapSort.makeHeap`, `TriangularHeapSort.triangularHeapify`) rather than
+  reimplementing it. `TriangularHeapSort` needed a small refactor first, extracting a dedicated
+  public heapify-only entry point, before its shuffle could call it directly.
+- `PoplarifiedShuffle` and `SmoothifiedShuffle` were ported the same way (calling into
+  `PoplarHeapSort`'s/`SmoothSort`'s own heapify steps) but were later removed: both heap
+  conventions define a poplar/Leonardo-heap's "root" as the *last* index of its run, and on this
+  app's ascending identity starting array that index already holds the run's maximum by
+  construction, so their sift step never swaps anything. The "shuffle" was silently a no-op,
+  always producing plain ascending order — confirmed for every size from 8 to 256. `MaxHeapSort`/
+  `TriangularHeapSort`'s classic convention (root = first index, children at higher indices)
+  doesn't share this failure mode, since ascending input actually violates the max-heap property
+  at every internal node, so those two shuffles were kept. `PoplarHeapSort`/`SmoothSort` the
+  *sorts* are unaffected and still ship — only their now-unused dedicated heapify entry points
+  (`poplarHeapify`/`smoothHeapify`) were removed along with the shuffles.
 - `QuicksortAdversaryShuffle`, `PDQAdversaryShuffle`, `GrailsortAdversaryShuffle`, and
   `ShuffleMergeAdversaryShuffle` sound like they need their namesake sort already ported, to
   reverse-engineer its worst case. They do not. Each embeds its own self-contained adversarial-input

@@ -16,6 +16,24 @@ type addResult struct {
 	needsFix bool
 }
 
+func sort(arr []int) []int {
+	n := len(arr)
+	var root *Node
+	for i := 0; i < n; i++ {
+		inserted := add(root, arr[i])
+		root = inserted.node
+		root.isRed = false
+	}
+
+	result := make([]int, 0, n)
+	traverse(root, &result)
+
+	for i := 0; i < n; i++ {
+		arr[i] = result[i]
+	}
+	return arr
+}
+
 func isRed(node *Node) bool {
 	return node != nil && node.isRed
 }
@@ -89,24 +107,6 @@ func traverse(node *Node, result *[]int) {
 	traverse(node.left, result)
 	*result = append(*result, node.value)
 	traverse(node.right, result)
-}
-
-func sort(arr []int) []int {
-	n := len(arr)
-	var root *Node
-	for i := 0; i < n; i++ {
-		inserted := add(root, arr[i])
-		root = inserted.node
-		root.isRed = false
-	}
-
-	result := make([]int, 0, n)
-	traverse(root, &result)
-
-	for i := 0; i < n; i++ {
-		arr[i] = result[i]
-	}
-	return arr
 }
 
 func main() {

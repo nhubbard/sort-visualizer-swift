@@ -2,11 +2,10 @@ using System;
 
 public class RandomGuessSort
 {
-  public static Random r = new Random();
-
   public static void Sort(int[] arr)
   {
     int n = arr.Length;
+    if (n <= 1) return;
     int[] loops = new int[n];
     while (true)
     {
@@ -28,7 +27,12 @@ public class RandomGuessSort
       }
       for (int pos = 0; pos < n; pos++)
       {
-        loops[pos] = r.Next(n);
+        if (loops[pos] < n - 1)
+        {
+          loops[pos]++;
+          break;
+        }
+        loops[pos] = 0;
       }
     }
 
@@ -45,7 +49,9 @@ public class RandomGuessSort
 
   public static void Main(String[] args)
   {
-    int[] array = { 0, 39, 21, 62, 14 };
+    int[] array = {
+      0, 39, 21, 62, 14
+    };
     Sort(array);
     string result = "[" + String.Join(", ", array) + "]";
     Console.WriteLine(result);

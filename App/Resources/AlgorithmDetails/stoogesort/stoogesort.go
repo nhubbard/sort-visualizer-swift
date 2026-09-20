@@ -4,6 +4,14 @@ import (
 	"fmt"
 )
 
+func sort(arr []int) []int {
+	if len(arr) <= 1 {
+		return arr
+	}
+	stoogeSort(arr, 0, len(arr)-1)
+	return arr
+}
+
 func stoogeSort(arr []int, i, j int) {
 	if arr[j] < arr[i] {
 		arr[i], arr[j] = arr[j], arr[i]
@@ -14,11 +22,6 @@ func stoogeSort(arr []int, i, j int) {
 		stoogeSort(arr, i+t, j)
 		stoogeSort(arr, i, j-t)
 	}
-}
-
-func sort(arr []int) []int {
-	stoogeSort(arr, 0, len(arr)-1)
-	return arr
 }
 
 func main() {

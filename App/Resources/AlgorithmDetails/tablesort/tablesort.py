@@ -1,3 +1,22 @@
+def sort(arr):
+    n = len(arr)
+    table = list(range(n))
+    quick_sort(arr, table, 0, n)
+    for i in range(n):
+        if table[i] != i:
+            t = arr[i]
+            j = i
+            next_ = table[i]
+            while True:
+                arr[j] = arr[next_]
+                table[j] = j
+                j = next_
+                next_ = table[next_]
+                if next_ == i:
+                    break
+            arr[j] = t
+            table[j] = j
+
 def stable_comp(arr, table, a, b):
     ta = table[a]
     tb = table[b]
@@ -49,27 +68,12 @@ def quick_sort(arr, table, a, b):
     quick_sort(arr, table, p + 1, b)
 
 
-def sort(arr):
-    n = len(arr)
-    table = list(range(n))
-    quick_sort(arr, table, 0, n)
-    for i in range(n):
-        if table[i] != i:
-            t = arr[i]
-            j = i
-            next_ = table[i]
-            while True:
-                arr[j] = arr[next_]
-                table[j] = j
-                j = next_
-                next_ = table[next_]
-                if next_ == i:
-                    break
-            arr[j] = t
-            table[j] = j
 
 
 if __name__ == "__main__":
-    array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56]
+    array = [
+        0, 39, 21, 62, 91, 77, 14, 23,
+        90, 69, 51, 81, 68, 83, 32, 56,
+    ]
     sort(array)
     print(array)

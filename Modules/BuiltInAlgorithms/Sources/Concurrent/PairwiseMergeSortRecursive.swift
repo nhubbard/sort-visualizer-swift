@@ -23,8 +23,11 @@ public struct PairwiseMergeSortRecursive: SortAlgorithm {
     category: .concurrent,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 943, coefficients: [225178, 325.47, 0.0599447],
+      anchorSize: 941, coefficients: [224940, 326.091, 0.0603859],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .powerLog, coefficients: [7.84241, 1.2181], rSquared: 0.998564),
+    implementationComplexity: 16,
     stable: true,
     timeComplexity: ComplexityBounds(
       best: "O(n log^2 n)", average: "O(n log^2 n)", worst: "O(n log^2 n)"),

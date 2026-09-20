@@ -2,7 +2,8 @@
 #include <utility>
 #include <vector>
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
+                 90, 69, 51, 81, 68, 83, 32, 56};
 
 const int insertSortThreshold = 24;
 const int nintherThreshold = 128;
@@ -11,15 +12,41 @@ const int blockSize = 64;
 const int cachelineSize = 64;
 
 void printList(int items[], int size) {
-  for (int i = 0; i < size; i++) {
-    if (i == 0) {
-      printf("[%d, ", items[i]);
-    } else if (i != size - 1) {
-      printf("%d, ", items[i]);
-    } else {
-      printf("%d]", items[i]);
+  printf("[");
+  if (size > 0) {
+    printf("%d", items[0]);
+    for (int i = 1; i < size; i++) {
+      printf(", %d", items[i]);
     }
   }
+  printf("]");
+}
+
+int pdqLog(int n);
+int truncDiv(int a, int b);
+void insertSort(int arr[], int begin, int end);
+void unguardInsertSort(int arr[], int begin, int end);
+bool partialInsertSort(int arr[], int begin, int end);
+void sortTwo(int arr[], int a, int b);
+void sortThree(int arr[], int a, int b, int c);
+void swapOffsets(int arr[], int first, int last, std::vector<int> &leftOffsets,
+                 int leftPos, std::vector<int> &rightOffsets, int rightPos,
+                 int num, bool useSwaps);
+std::pair<int, bool> partRightBranchless(int arr[], int begin, int end,
+                                         std::vector<int> &leftOffsets,
+                                         std::vector<int> &rightOffsets);
+int partLeft(int arr[], int begin, int end);
+void siftDown(int arr[], int begin, int root, int size);
+void heapSort(int arr[], int begin, int end);
+void pdqLoop(int arr[], int begin, int end, int badAllowed,
+             std::vector<int> &leftOffsets, std::vector<int> &rightOffsets);
+
+void sort(int arr[], int n) {
+  if (n < 2)
+    return;
+  std::vector<int> leftOffsets(blockSize + cachelineSize, 0);
+  std::vector<int> rightOffsets(blockSize + cachelineSize, 0);
+  pdqLoop(arr, 0, n, pdqLog(n), leftOffsets, rightOffsets);
 }
 
 int pdqLog(int n) {
@@ -33,7 +60,9 @@ int pdqLog(int n) {
 // zero for negative operands, which is what the pivot-position arithmetic below
 // needs at the one call site where the dividend can go negative -- this helper
 // just names that intent.
-int truncDiv(int a, int b) { return a / b; }
+int truncDiv(int a, int b) {
+  return a / b;
+}
 
 void insertSort(int arr[], int begin, int end) {
   for (int cur = begin + 1; cur < end; cur++) {
@@ -392,14 +421,6 @@ void pdqLoop(int arr[], int begin, int end, int badAllowed,
     begin = pivotPos + 1;
     leftmost = false;
   }
-}
-
-void sort(int arr[], int n) {
-  if (n < 2)
-    return;
-  std::vector<int> leftOffsets(blockSize + cachelineSize, 0);
-  std::vector<int> rightOffsets(blockSize + cachelineSize, 0);
-  pdqLoop(arr, 0, n, pdqLog(n), leftOffsets, rightOffsets);
 }
 
 int main(int argc, char *argv[]) {

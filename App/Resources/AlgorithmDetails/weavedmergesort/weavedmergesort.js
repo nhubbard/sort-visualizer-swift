@@ -1,3 +1,8 @@
+function sort(arr) {
+  var tmp = new Array(arr.length);
+  merge(arr, tmp, arr.length, 0, 1);
+}
+
 function merge(arr, tmp, length, residue, modulus) {
   if (residue + modulus >= length) {
     return;
@@ -38,11 +43,10 @@ function merge(arr, tmp, length, residue, modulus) {
   }
 }
 
-function sort(arr) {
-  var tmp = new Array(arr.length);
-  merge(arr, tmp, arr.length, 0, 1);
-}
 
-var array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56];
+const array = [
+  0, 39, 21, 62, 91, 77, 14, 23,
+  90, 69, 51, 81, 68, 83, 32, 56,
+];
 sort(array);
 console.log("[" + array.join(", ") + "]");

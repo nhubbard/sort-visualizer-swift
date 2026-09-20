@@ -1,3 +1,7 @@
+fun sort(arr: Array<Int>) {
+  multiSwapMergeSort(arr, 0, arr.size)
+}
+
 fun multiSwap(arr: Array<Int>, a: Int, b: Int, len: Int) {
   for (i in 0 until len) {
     val t = arr[a + i]
@@ -48,10 +52,6 @@ fun multiSwapMergeSort(arr: Array<Int>, a: Int, b: Int) {
     }
     j *= 2
   }
-}
-
-fun sort(arr: Array<Int>) {
-  multiSwapMergeSort(arr, 0, arr.size)
 }
 
 fun main() {

@@ -6,7 +6,7 @@ import Foundation
 
 func sort(_ arr: inout [Int], _ start: Int, _ stop: Int, _ merge: Bool) {
     if stop - start == 2 {
-        if arr[start] > arr[stop - 1] {
+        if stop <= arr.count && arr[start] > arr[stop - 1] {
             arr.swapAt(start, stop - 1)
         }
     } else if stop - start >= 3 {
@@ -26,9 +26,16 @@ func sort(_ arr: inout [Int], _ start: Int, _ stop: Int, _ merge: Bool) {
     }
 }
 
+func sortArray(_ arr: inout [Int]) {
+    guard arr.count > 1 else { return }
+    var paddedLength = 1
+    while paddedLength < arr.count { paddedLength *= 2 }
+    sort(&arr, 0, paddedLength, true)
+}
+
 var array: [Int] = [
     0, 39, 21, 62, 91, 77, 14, 23,
     90, 69, 51, 81, 68, 83, 32, 56,
 ]
-sort(&array, 0, array.count, true)
+sortArray(&array)
 print(array)

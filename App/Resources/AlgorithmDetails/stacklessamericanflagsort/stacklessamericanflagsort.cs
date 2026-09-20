@@ -4,61 +4,6 @@ public class StacklessAmericanFlagSort
 {
   const int Radix = 4;
 
-  static int GetDigit(int value, int place)
-  {
-    for (int p = 0; p < place; p++)
-    {
-      value /= Radix;
-    }
-    return value % Radix;
-  }
-
-  static int Shift(int value, int places)
-  {
-    for (int p = 0; p < places; p++)
-    {
-      value /= Radix;
-    }
-    return value;
-  }
-
-  // Turns the raw per-bucket counts already accumulated in `counts` into
-  // starting offsets, then places every element in [start, end) by
-  // following displacement cycles, one bucket at a time.
-  static int Distribute(int[] arr, int[] counts, int[] offsets, int start, int end, int place)
-  {
-    for (int i = 1; i < Radix; i++)
-    {
-      counts[i] += counts[i - 1];
-      offsets[i] = counts[i - 1];
-    }
-
-    for (int bucket = 0; bucket < Radix - 1; bucket++)
-    {
-      int position = start + offsets[bucket];
-      if (counts[bucket] > offsets[bucket])
-      {
-        int held = arr[position];
-        do
-        {
-          int digit = GetDigit(held, place);
-          counts[digit]--;
-          int displaced = arr[start + counts[digit]];
-          arr[start + counts[digit]] = held;
-          held = displaced;
-        } while (counts[bucket] > offsets[bucket]);
-      }
-    }
-
-    int split = start + offsets[1];
-    for (int i = 0; i < Radix; i++)
-    {
-      counts[i] = 0;
-      offsets[i] = 0;
-    }
-    return split;
-  }
-
   public static void Sort(int[] arr)
   {
     int n = arr.Length;
@@ -132,9 +77,67 @@ public class StacklessAmericanFlagSort
     }
   }
 
+  static int GetDigit(int value, int place)
+  {
+    for (int p = 0; p < place; p++)
+    {
+      value /= Radix;
+    }
+    return value % Radix;
+  }
+
+  static int Shift(int value, int places)
+  {
+    for (int p = 0; p < places; p++)
+    {
+      value /= Radix;
+    }
+    return value;
+  }
+
+  // Turns the raw per-bucket counts already accumulated in `counts` into
+  // starting offsets, then places every element in [start, end) by
+  // following displacement cycles, one bucket at a time.
+  static int Distribute(int[] arr, int[] counts, int[] offsets, int start, int end, int place)
+  {
+    for (int i = 1; i < Radix; i++)
+    {
+      counts[i] += counts[i - 1];
+      offsets[i] = counts[i - 1];
+    }
+
+    for (int bucket = 0; bucket < Radix - 1; bucket++)
+    {
+      int position = start + offsets[bucket];
+      if (counts[bucket] > offsets[bucket])
+      {
+        int held = arr[position];
+        do
+        {
+          int digit = GetDigit(held, place);
+          counts[digit]--;
+          int displaced = arr[start + counts[digit]];
+          arr[start + counts[digit]] = held;
+          held = displaced;
+        } while (counts[bucket] > offsets[bucket]);
+      }
+    }
+
+    int split = start + offsets[1];
+    for (int i = 0; i < Radix; i++)
+    {
+      counts[i] = 0;
+      offsets[i] = 0;
+    }
+    return split;
+  }
+
   public static void Main(String[] args)
   {
-    int[] array = { 0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56 };
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     Sort(array);
     string result = "[" + String.Join(", ", array) + "]";
     Console.WriteLine(result);

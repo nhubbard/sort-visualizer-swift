@@ -1,3 +1,7 @@
+function sort(arr) {
+  oddEvenMergeSort(arr, 0, arr.length);
+}
+
 function oddEvenMergeCompare(array, i, j) {
   if (array[i] > array[j]) {
     [array[i], array[j]] = [array[j], array[i]];
@@ -42,10 +46,10 @@ function oddEvenMergeSort(array, lo, n) {
   }
 }
 
-function sort(arr) {
-  oddEvenMergeSort(arr, 0, arr.length);
-}
 
-var array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56];
+const array = [
+  0, 39, 21, 62, 91, 77, 14, 23,
+  90, 69, 51, 81, 68, 83, 32, 56,
+];
 sort(array);
 console.log("[" + array.join(", ") + "]");

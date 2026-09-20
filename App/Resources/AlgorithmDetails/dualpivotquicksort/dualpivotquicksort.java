@@ -1,66 +1,68 @@
 import java.util.Arrays;
 
 public class dualpivotquicksort {
-  private static int[] partition(int[] arr, int low, int high) {
-    if (arr[low] > arr[high]) {
-      int t = arr[low];
-      arr[low] = arr[high];
-      arr[high] = t;
+  public static void sort(int[] arr) {
+    dualPivotQuickSort(arr, 0, arr.length - 1, 3);
+  }
+
+  private static void swap(int[] a, int i, int j) {
+    int t = a[i];
+    a[i] = a[j];
+    a[j] = t;
+  }
+
+  private static void insertionSort(int[] a, int start, int end) {
+    for (int i = start + 1; i < end; i++) {
+      for (int j = i; j > start && a[j] < a[j - 1]; j--) swap(a, j - 1, j);
     }
-    int j = low + 1;
-    int g = high - 1;
-    int k = low + 1;
-    int p = arr[low];
-    int q = arr[high];
-    while (k <= g) {
-      if (arr[k] < p) {
-        int t = arr[k];
-        arr[k] = arr[j];
-        arr[j] = t;
-        j++;
-      } else if (arr[k] >= q) {
-        while (arr[g] > q && k < g) {
-          g--;
-        }
-        int t = arr[k];
-        arr[k] = arr[g];
-        arr[g] = t;
-        g--;
-        if (arr[k] < p) {
-          int t2 = arr[k];
-          arr[k] = arr[j];
-          arr[j] = t2;
-          j++;
+  }
+
+  private static void dualPivotQuickSort(int[] a, int left, int right, int divisor) {
+    int length = right - left;
+    if (length < 4) {
+      insertionSort(a, left, right + 1);
+      return;
+    }
+    int third = length / divisor;
+    int med1 = left + third, med2 = right - third;
+    if (med1 <= left) med1 = left + 1;
+    if (med2 >= right) med2 = right - 1;
+    if (a[med1] < a[med2]) {
+      swap(a, med1, left);
+      swap(a, med2, right);
+    } else {
+      swap(a, med1, right);
+      swap(a, med2, left);
+    }
+    int pivot1 = a[left], pivot2 = a[right];
+    int less = left + 1, great = right - 1;
+    for (int k = less; k <= great; k++) {
+      if (a[k] < pivot1) {
+        swap(a, k, less);
+        less++;
+      } else if (a[k] > pivot2) {
+        while (k < great && a[great] > pivot2) great--;
+        swap(a, k, great);
+        great--;
+        if (a[k] < pivot1) {
+          swap(a, k, less);
+          less++;
         }
       }
-      k++;
     }
-    j--;
-    g++;
-    int t = arr[low];
-    arr[low] = arr[j];
-    arr[j] = t;
-    int t2 = arr[high];
-    arr[high] = arr[g];
-    arr[g] = t2;
-    return new int[] {j, g};
-  }
-
-  public static void dualPivotQuickSort(int[] arr, int low, int high) {
-    if (low < high) {
-      int[] pivots = partition(arr, low, high);
-      dualPivotQuickSort(arr, low, pivots[0] - 1);
-      dualPivotQuickSort(arr, pivots[0] + 1, pivots[1] - 1);
-      dualPivotQuickSort(arr, pivots[1] + 1, high);
-    }
-  }
-
-  public static void sort(int[] arr) {
-    dualPivotQuickSort(arr, 0, arr.length - 1);
+    if (great - less < 13) divisor++;
+    swap(a, less - 1, left);
+    swap(a, great + 1, right);
+    dualPivotQuickSort(a, left, less - 2, divisor);
+    if (pivot1 < pivot2) dualPivotQuickSort(a, less, great, divisor);
+    dualPivotQuickSort(a, great + 2, right, divisor);
   }
 
   public static void main(String[] args) {
-    int[] array = new int[] {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     sort(array);
     System.out.println(Arrays.toString(array));
   }

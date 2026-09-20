@@ -1,3 +1,7 @@
+fun sort(arr: IntArray) {
+  librarySort(arr)
+}
+
 fun binarySearch(arr: IntArray, item: Int, start: Int, end: Int): Int {
   var lo = start
   var hi = end
@@ -62,12 +66,16 @@ fun rebalance(arr: IntArray, temp: IntArray, counts: IntArray, locations: IntArr
 
 fun librarySort(arr: IntArray) {
   val n = arr.size
-  if (n < 2) {
+  if (n < 32) {
+    binaryInsertionSort(arr, 0, n)
     return
   }
 
-  val rebalanceFactor = 2
-  var spineSize = 1
+  val rebalanceFactor = 4
+  var spineSize = n
+  while (spineSize >= 32) {
+    spineSize = (spineSize - 1) / rebalanceFactor + 1
+  }
   binaryInsertionSort(arr, 0, spineSize)
 
   var maxLevel = spineSize
@@ -94,10 +102,6 @@ fun librarySort(arr: IntArray) {
     i++
   }
   rebalance(arr, temp, counts, locations, spineSize, n)
-}
-
-fun sort(arr: IntArray) {
-  librarySort(arr)
 }
 
 fun main() {

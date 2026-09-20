@@ -9,8 +9,11 @@ public struct IntroSort: SortAlgorithm {
     category: .hybrid,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 1247, coefficients: [213291, 237.961, 0.0359793],
+      anchorSize: 935, coefficients: [239682, 422.736, 0.176473],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .polynomialIntercept, coefficients: [0.176473, 92.7304, -1298.23], rSquared: 0.999788),
+    implementationComplexity: 28,
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n log n)", average: "O(n log n)", worst: "O(n log n)"),
@@ -41,9 +44,9 @@ public struct IntroSort: SortAlgorithm {
       var i = lo
       var j = hi
       while true {
-        while engine.values[i] < pivotValue { i += 1 }
+        while engine.compareValue(i, against: pivotValue, by: (<)) { i += 1 }
         j -= 1
-        while pivotValue < engine.values[j] { j -= 1 }
+        while engine.compareValue(j, against: pivotValue, by: (>)) { j -= 1 }
         if !(i < j) { return i }
         engine.swap(i, j)
         i += 1
@@ -91,7 +94,7 @@ public struct IntroSort: SortAlgorithm {
         depthLimit -= 1
         let mid = lo + (hi - lo) / 2
         let pivotIndex = medianOf3(lo, mid, hi - 1)
-        let pivotValue = engine.values[pivotIndex]
+        let pivotValue = engine.readValue(at: pivotIndex)
         let p = partition(lo, hi, pivotValue)
         introsortLoop(p, hi, depthLimit)
         hi = p

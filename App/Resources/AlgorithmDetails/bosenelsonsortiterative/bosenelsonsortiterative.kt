@@ -1,21 +1,3 @@
-fun compSwap(arr: Array<Int>, a: Int, b: Int, end: Int) {
-  if (b >= end) return
-  if (arr[a] > arr[b]) {
-    arr[a] = arr[b].also { arr[b] = arr[a] }
-  }
-}
-
-fun rangeComp(arr: Array<Int>, a: Int, b: Int, offset: Int, end: Int) {
-  val half = (b - a) / 2
-  val m = a + half
-  val base = a + offset
-  for (i in 0 until (half - offset)) {
-    if ((i and offset.inv()) == i) {
-      compSwap(arr, base + i, m + i, end)
-    }
-  }
-}
-
 fun sort(arr: Array<Int>) {
   val end = arr.size
   if (end <= 1) return
@@ -34,6 +16,24 @@ fun sort(arr: Array<Int>) {
       j++
     }
     k *= 2
+  }
+}
+
+fun compSwap(arr: Array<Int>, a: Int, b: Int, end: Int) {
+  if (b >= end) return
+  if (arr[a] > arr[b]) {
+    arr[a] = arr[b].also { arr[b] = arr[a] }
+  }
+}
+
+fun rangeComp(arr: Array<Int>, a: Int, b: Int, offset: Int, end: Int) {
+  val half = (b - a) / 2
+  val m = a + half
+  val base = a + offset
+  for (i in 0 until (half - offset)) {
+    if ((i and offset.inv()) == i) {
+      compSwap(arr, base + i, m + i, end)
+    }
   }
 }
 

@@ -11,7 +11,7 @@ public struct InterlacedShuffle: ShuffleAlgorithm {
   public func record(into engine: inout RecordingEngine) {
     let n = engine.count
     guard n > 1 else { return }
-    let reference = engine.values
+    let reference = engine.readAllValues()
 
     var leftIndex = 1
     var rightIndex = n - 1

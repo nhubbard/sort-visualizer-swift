@@ -3,6 +3,33 @@ import java.util.Arrays;
 import java.util.Deque;
 
 public class binaryquicksortiterative {
+  public static void sort(int[] arr) {
+    int n = arr.length;
+    if (n < 2) return;
+    int maxValue = arr[0];
+    for (int i = 1; i < n; i++) {
+      if (arr[i] > maxValue) {
+        maxValue = arr[i];
+      }
+    }
+    int bit = mostSignificantBit(maxValue);
+
+    Deque<int[]> tasks = new ArrayDeque<>();
+    tasks.addLast(new int[] {0, n - 1, bit});
+
+    while (!tasks.isEmpty()) {
+      int[] t = tasks.removeFirst();
+      int p = t[0];
+      int r = t[1];
+      int b = t[2];
+      if (p < r && b >= 0) {
+        int q = partition(arr, p, r, b);
+        tasks.addLast(new int[] {p, q, b - 1});
+        tasks.addLast(new int[] {q + 1, r, b - 1});
+      }
+    }
+  }
+
   private static int mostSignificantBit(int value) {
     if (value == 0) {
       return -1;
@@ -34,34 +61,11 @@ public class binaryquicksortiterative {
     }
   }
 
-  public static void sort(int[] arr) {
-    int n = arr.length;
-    int maxValue = arr[0];
-    for (int i = 1; i < n; i++) {
-      if (arr[i] > maxValue) {
-        maxValue = arr[i];
-      }
-    }
-    int bit = mostSignificantBit(maxValue);
-
-    Deque<int[]> tasks = new ArrayDeque<>();
-    tasks.addLast(new int[] {0, n - 1, bit});
-
-    while (!tasks.isEmpty()) {
-      int[] t = tasks.removeFirst();
-      int p = t[0];
-      int r = t[1];
-      int b = t[2];
-      if (p < r && b >= 0) {
-        int q = partition(arr, p, r, b);
-        tasks.addLast(new int[] {p, q, b - 1});
-        tasks.addLast(new int[] {q + 1, r, b - 1});
-      }
-    }
-  }
-
   public static void main(String[] args) {
-    int[] array = new int[] {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     sort(array);
     System.out.println(Arrays.toString(array));
   }

@@ -1,7 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
+                 90, 69, 51, 81, 68, 83, 32, 56};
 
 void swap(int *a, int *b) {
   int t = *a;
@@ -10,59 +12,58 @@ void swap(int *a, int *b) {
 }
 
 void printList(int items[], int size) {
-  for (int i = 0; i < size; i++) {
-    if (i == 0) {
-      printf("[%d, ", items[i]);
-    } else if (i != size - 1) {
-      printf("%d, ", items[i]);
-    } else {
-      printf("%d]", items[i]);
+  printf("[");
+  if (size > 0) {
+    printf("%d", items[0]);
+    for (int i = 1; i < size; i++) {
+      printf(", %d", items[i]);
     }
   }
+  printf("]");
 }
+static void mergeSort(int *scratch, int *buffer, int lo, int hi);
 
-void sort(int arr[], int n) {
-  if (n <= 1) {
+void sort(int *a, int n) {
+  if (n < 2)
     return;
-  }
-
-  /* Simulate the reporting order that proportional-to-value sleep durations
-   * would produce in a jitter-free race: stable-sort the original positions
-   * by value, so ties wake in the order they were originally scheduled. */
-  int indices[n];
-  for (int i = 0; i < n; i++) {
-    indices[i] = i;
-  }
-  for (int i = 1; i < n; i++) {
-    int j = i;
-    while (j > 0 && arr[indices[j - 1]] > arr[indices[j]]) {
-      swap(&indices[j - 1], &indices[j]);
-      j--;
+  int *scratch = malloc((size_t)n * sizeof(int)),
+      *buffer = malloc((size_t)n * sizeof(int));
+  memcpy(scratch, a, (size_t)n * sizeof(int));
+  memcpy(buffer, scratch, (size_t)n * sizeof(int));
+  mergeSort(scratch, buffer, 0, n);
+  memcpy(a, scratch, (size_t)n * sizeof(int));
+  free(scratch);
+  free(buffer);
+  for (int i = 1; i < n; i++)
+    for (int j = i; j > 0 && a[j - 1] > a[j]; j--) {
+      int held = a[j - 1];
+      a[j - 1] = a[j];
+      a[j] = held;
     }
-  }
-
-  int woke[n];
-  for (int i = 0; i < n; i++) {
-    woke[i] = arr[indices[i]];
-  }
-  for (int i = 0; i < n; i++) {
-    arr[i] = woke[i];
-  }
-
-  /* Defensive cleanup pass: real scheduling jitter can't be fully trusted, so
-   * finish with an ordinary insertion sort no matter what the race produced. */
-  for (int i = 1; i < n; i++) {
-    int j = i;
-    while (j > 0 && arr[j - 1] > arr[j]) {
-      swap(&arr[j - 1], &arr[j]);
-      j--;
-    }
-  }
 }
 
-int main(int argc, char *argv[]) {
-  int size = sizeof(array) / sizeof(array[0]);
-  sort(array, size);
-  printList(array, size);
-  return 0;
+static void mergeSort(int *scratch, int *buffer, int lo, int hi) {
+  if (hi - lo < 2)
+    return;
+  int mid = lo + (hi - lo) / 2;
+  mergeSort(scratch, buffer, lo, mid);
+  mergeSort(scratch, buffer, mid, hi);
+  int left = lo, right = mid, dest = lo;
+  while (left < mid && right < hi) {
+    if (scratch[left] <= scratch[right])
+      buffer[dest++] = scratch[left++];
+    else
+      buffer[dest++] = scratch[right++];
+  }
+  while (left < mid)
+    buffer[dest++] = scratch[left++];
+  while (right < hi)
+    buffer[dest++] = scratch[right++];
+  memcpy(scratch + lo, buffer + lo, (size_t)(hi - lo) * sizeof(int));
+}
+
+int main(void) {
+  int n = (int)(sizeof(array) / sizeof(array[0]));
+  sort(array, n);
+  printList(array, n);
 }

@@ -17,8 +17,11 @@ public struct BottomUpMergeSort: SortAlgorithm {
     category: .merge,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 2239, coefficients: [189030, 101.593, 0.00429632],
+      anchorSize: 1942, coefficients: [200452, 121.262, 0.00499385],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .powerLog, coefficients: [9.86482, 1.04273], rSquared: 0.999357),
+    implementationComplexity: 16,
     stable: true,
     timeComplexity: ComplexityBounds(
       best: "O(n log n)", average: "O(n log n)", worst: "O(n log n)"),
@@ -34,7 +37,7 @@ public struct BottomUpMergeSort: SortAlgorithm {
     // The real backing store for the scratch buffer — `writeAux` only feeds the tape/visualizer,
     // it can't be read back, so the merge's actual working data lives here (mirroring how
     // MergeSort.swift keeps its own `merged` array alongside the aux writes).
-    var scratch = engine.values
+    var scratch = engine.readAllValues()
 
     // Merges the two runs of length `mergeSize / 2` starting at `index` into `scratch`. Returns
     // a "copy up to here" override only when the right run is empty; nil means copy the whole
@@ -54,25 +57,25 @@ public struct BottomUpMergeSort: SortAlgorithm {
 
       while left < mid && right < end {
         if engine.compare(right, left) {
-          scratch[scratchIndex] = engine.values[left]
-          engine.writeAux(tempHandle, at: scratchIndex, value: engine.values[left])
+          scratch[scratchIndex] = engine.readValue(at: left)
+          engine.writeAux(tempHandle, at: scratchIndex, value: engine.readValue(at: left))
           left += 1
         } else {
-          scratch[scratchIndex] = engine.values[right]
-          engine.writeAux(tempHandle, at: scratchIndex, value: engine.values[right])
+          scratch[scratchIndex] = engine.readValue(at: right)
+          engine.writeAux(tempHandle, at: scratchIndex, value: engine.readValue(at: right))
           right += 1
         }
         scratchIndex += 1
       }
       while left < mid {
-        scratch[scratchIndex] = engine.values[left]
-        engine.writeAux(tempHandle, at: scratchIndex, value: engine.values[left])
+        scratch[scratchIndex] = engine.readValue(at: left)
+        engine.writeAux(tempHandle, at: scratchIndex, value: engine.readValue(at: left))
         left += 1
         scratchIndex += 1
       }
       while right < end {
-        scratch[scratchIndex] = engine.values[right]
-        engine.writeAux(tempHandle, at: scratchIndex, value: engine.values[right])
+        scratch[scratchIndex] = engine.readValue(at: right)
+        engine.writeAux(tempHandle, at: scratchIndex, value: engine.readValue(at: right))
         right += 1
         scratchIndex += 1
       }

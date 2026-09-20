@@ -1,3 +1,14 @@
+def sort(arr)
+  n = arr.length
+  return if n <= 1
+
+  heapify(arr, n)
+  heap_size = n
+  (n - 1).times do
+    heap_size = store_max(arr, heap_size)
+  end
+end
+
 def bit_length(value)
   length = 0
   while value > 0
@@ -69,16 +80,6 @@ def store_max(array, heap_size)
   new_size
 end
 
-def sort(arr)
-  n = arr.length
-  return if n <= 1
-
-  heapify(arr, n)
-  heap_size = n
-  (n - 1).times do
-    heap_size = store_max(arr, heap_size)
-  end
-end
 
 array = [0, 39, 21, 62, 91, 77, 14, 23,
   90, 69, 51, 81, 68, 83, 32, 56]

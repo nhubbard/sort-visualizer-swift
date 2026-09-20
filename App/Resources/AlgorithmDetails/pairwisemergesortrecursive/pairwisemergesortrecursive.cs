@@ -4,6 +4,19 @@ public class PairwiseMergeSortRecursive
 {
   private static int end;
 
+  public static int[] Sort(int[] array)
+  {
+    var length = array.Length;
+    end = length;
+
+    var n = 1;
+    while (n < length)
+      n <<= 1;
+
+    PairwiseMergeSort(array, 0, n);
+    return array;
+  }
+
   private static void CompSwap(int[] array, int a, int b)
   {
     if (b < end && array[a] > array[b])
@@ -54,22 +67,12 @@ public class PairwiseMergeSortRecursive
     }
   }
 
-  public static int[] Sort(int[] array)
-  {
-    var length = array.Length;
-    end = length;
-
-    var n = 1;
-    while (n < length)
-      n <<= 1;
-
-    PairwiseMergeSort(array, 0, n);
-    return array;
-  }
-
   public static void Main(String[] args)
   {
-    int[] array = { 0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56 };
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     Sort(array);
     string result = "[" + String.Join(", ", array) + "]";
     Console.WriteLine(result);

@@ -28,7 +28,7 @@ struct RunControlBar: View {
   var body: some View {
     VStack(spacing: 8) {
       scrubSlider
-      statsCaption
+      RunControlStatsCaption(replay: replay)
       transportRow
       if isSpeedExpanded {
         speedRow
@@ -60,86 +60,6 @@ struct RunControlBar: View {
       in: 0...Double(max(replay.totalOperationCount, 1))
     )
     .accessibilityIdentifier("runControlScrubSlider")
-  }
-
-  /// Each stat is a `[number][label]` cell (`statCell`) in an `HStack`; spacing alone separates
-  /// cells now that there's no `·` separator. Not `LazyHStack` — laziness only helps children a
-  /// scrolling ancestor can defer, and this row never scrolls.
-  ///
-  /// `ViewThatFits` falls back between one full-width row and two half-width rows, both built
-  /// from the same `statCell`s, so every cell's accessibility subtree survives either arrangement.
-  private var statsCaption: some View {
-    ViewThatFits(in: .horizontal) {
-      HStack(spacing: 12) { statCells }
-      VStack(spacing: 4) {
-        HStack(spacing: 12) { firstHalfStatCells }
-        HStack(spacing: 12) { secondHalfStatCells }
-      }
-    }
-    .font(.caption)
-    .foregroundStyle(.secondary)
-    .accessibilityElement(children: .combine)
-    .accessibilityIdentifier("runControlStatsCaption")
-  }
-
-  // Matches ArrayV's on-screen order (Comparisons, Swaps, Reversals, Writes to Main Array, Writes
-  // to Auxiliary Array(s), Items in External Arrays); always shown, even at zero, to avoid
-  // reflowing the fixed-width slots in `statSlot`. Split into two halves so the stacked
-  // `ViewThatFits` candidate above can lay them out as two rows of four.
-  @ViewBuilder
-  private var firstHalfStatCells: some View {
-    statCell(replay.compareCount, digits: 6, label: "compares")
-    statCell(replay.swapCount, digits: 6, label: "swaps")
-    statCell(replay.reversalCount, digits: 4, label: "reversals")
-    statCell(replay.mainWriteCount, digits: 6, label: "writes")
-  }
-
-  @ViewBuilder
-  private var secondHalfStatCells: some View {
-    statCell(replay.auxWriteCount, digits: 6, label: "aux writes")
-    statCell(replay.externalArrayItemCount, digits: 5, label: "in external arrays")
-    statSlot(String(format: "%.1fs", replay.elapsedPlaybackDuration), digits: 6)
-    // Number and unit are separate `Text`s, not one formatted string — folding " ops/sec" into
-    // the same string let the whole string's width shift whenever the number crossed a digit
-    // boundary (e.g. 3->4 digits near 1000 ops/sec), causing visible reflow during fast playback.
-    statCell(
-      Int(
-        opsPerSecond(
-          significantOperationCount: replay.significantOperationCount,
-          elapsedPlaybackDuration: replay.elapsedPlaybackDuration)),
-      digits: 4, label: "ops/sec")
-  }
-
-  @ViewBuilder
-  private var statCells: some View {
-    firstHalfStatCells
-    secondHalfStatCells
-  }
-
-  /// One stat's fixed-width number plus its label, kept tight (`spacing: 4`) so the pair reads as
-  /// a single unit — the looser `spacing: 12` between cells in `statsCaption` above is what
-  /// visually separates one stat from the next now that there's no `·` glyph doing that job.
-  private func statCell(_ value: Int, digits: Int, label: String) -> some View {
-    HStack(spacing: 4) {
-      statSlot(value, digits: digits)
-      Text(label)
-    }
-  }
-
-  private func statSlot(_ value: Int, digits: Int) -> some View {
-    Text("\(value)")
-      .monospacedDigit()
-      .contentTransition(.numericText(value: Double(value)))
-      .animation(.snappy(duration: 0.15), value: value)
-      .frame(minWidth: CGFloat(digits) * 7.5, alignment: .trailing)
-  }
-
-  private func statSlot(_ text: String, digits: Int) -> some View {
-    Text(text)
-      .monospacedDigit()
-      .contentTransition(.numericText())
-      .animation(.snappy(duration: 0.15), value: text)
-      .frame(minWidth: CGFloat(digits) * 7.5, alignment: .trailing)
   }
 
   /// `ViewThatFits` between one full-width row and two rows (playback transport, then
@@ -216,29 +136,25 @@ struct RunControlBar: View {
     }
   }
 
-  /// Bound through a custom `Binding`, same idiom as `scrubSlider` above — every tap doesn't
-  /// just change a number, it immediately stops the current sort and re-records+replays a fresh
-  /// one at the new size (`SortSession.start(size:)` already pauses any in-flight playback).
+  /// Every reachable size (`effectiveSizeRange.steppedValues(by:)`) as tap-to-select chips, not a
+  /// `Stepper` — same tap-driven idiom as `scrubSlider` above: picking a chip doesn't just change
+  /// a number, it immediately stops the current sort and re-records+replays a fresh one at the
+  /// new size (`SortSession.start(size:)` already pauses any in-flight playback). Built from
+  /// exactly the same `steppedValues(by:)` call `SortSession.cycleArraySize()` uses for `⌘S`, so
+  /// the chip set and the keyboard-cycle set never disagree about which sizes are reachable.
   private var sizeRow: some View {
     let effectiveSizeRange = algorithm.metadata.effectiveSizeRange(
       operationCap: settings.recordingOperationCap)
+    let sizes = effectiveSizeRange.steppedValues(by: effectiveSizeRange.steppedSizeStep)
     return HStack(spacing: 8) {
       Text("Size")
         .font(.caption)
         .foregroundStyle(.secondary)
-      Stepper(
-        value: Binding(
-          get: { session.arraySize },
-          set: { newValue in Task { await session.start(size: newValue) } }
-        ),
-        in: effectiveSizeRange,
-        step: effectiveSizeRange.steppedSizeStep
-      ) {
-        Text("\(session.arraySize) elements")
-          .font(.caption.monospacedDigit())
-          .frame(minWidth: 90, alignment: .trailing)
-      }
-      .accessibilityIdentifier("runControlSizeStepper")
+      SizeChipRow(
+        sizes: sizes,
+        selection: session.arraySize,
+        onSelect: { newValue in Task { await session.start(size: newValue) } }
+      )
     }
   }
 
@@ -263,6 +179,133 @@ struct RunControlBar: View {
     }
   }
 
+}
+
+/// Extracted from `RunControlBar` so `@Observable`'s per-view dependency tracking applies to it
+/// independently, same as `PlaybackTransportButtons`/`UtilityButtons` below — otherwise every
+/// tick's counter change forces `RunControlBar.body` itself to re-evaluate, recompositing its
+/// shared `.glassOrMaterialBackground()` along with it. On top of that isolation, this view also
+/// throttles what it actually displays to a capped ~30Hz via `displayed`, polled off `replay`
+/// in the `.task` loop below, rather than re-rendering at however fast ticks actually arrive
+/// (display-link rate, so up to 120Hz on ProMotion). An Instruments trace of a fast Showcase run
+/// found this combination — per-tick `.contentTransition(.numericText)` digit animation plus glass
+/// recompositing — dominating main-thread time, well past `ReplayEngine`/Metal renderer cost.
+/// Numbers only need to be legible, not literally live to the operation.
+private struct RunControlStatsCaption: View {
+  let replay: ReplayEngine
+  @State private var displayed = DisplayedStats()
+
+  private static let refreshInterval = Duration.milliseconds(33)
+
+  var body: some View {
+    ViewThatFits(in: .horizontal) {
+      HStack(spacing: 12) { statCells }
+      VStack(spacing: 4) {
+        HStack(spacing: 12) { firstHalfStatCells }
+        HStack(spacing: 12) { secondHalfStatCells }
+      }
+    }
+    .font(.caption)
+    .foregroundStyle(.secondary)
+    .accessibilityElement(children: .combine)
+    .accessibilityIdentifier("runControlStatsCaption")
+    .task {
+      while !Task.isCancelled {
+        let next = DisplayedStats(replay: replay)
+        if next != displayed { displayed = next }
+        try? await Task.sleep(for: Self.refreshInterval)
+      }
+    }
+  }
+
+  // Matches ArrayV's on-screen order (Comparisons, Swaps, Reversals, Writes to Main Array, Writes
+  // to Auxiliary Array(s), Items in External Arrays); always shown, even at zero, to avoid
+  // reflowing the fixed-width slots in `statSlot`. Split into two halves so the stacked
+  // `ViewThatFits` candidate above can lay them out as two rows of four.
+  @ViewBuilder
+  private var firstHalfStatCells: some View {
+    statCell(displayed.compareCount, digits: 6, label: "compares")
+    statCell(displayed.swapCount, digits: 6, label: "swaps")
+    statCell(displayed.reversalCount, digits: 4, label: "reversals")
+    statCell(displayed.mainWriteCount, digits: 6, label: "writes")
+  }
+
+  @ViewBuilder
+  private var secondHalfStatCells: some View {
+    statCell(displayed.auxWriteCount, digits: 6, label: "aux writes")
+    statCell(displayed.externalArrayItemCount, digits: 5, label: "in external arrays")
+    statSlot(String(format: "%.1fs", displayed.elapsedPlaybackDuration), digits: 6)
+    // Number and unit are separate `Text`s, not one formatted string — folding " ops/sec" into
+    // the same string let the whole string's width shift whenever the number crossed a digit
+    // boundary (e.g. 3->4 digits near 1000 ops/sec), causing visible reflow during fast playback.
+    statCell(
+      Int(
+        opsPerSecond(
+          significantOperationCount: displayed.significantOperationCount,
+          elapsedPlaybackDuration: displayed.elapsedPlaybackDuration)),
+      digits: 4, label: "ops/sec")
+  }
+
+  @ViewBuilder
+  private var statCells: some View {
+    firstHalfStatCells
+    secondHalfStatCells
+  }
+
+  /// One stat's fixed-width number plus its label, kept tight (`spacing: 4`) so the pair reads as
+  /// a single unit — the looser `spacing: 12` between cells above is what visually separates one
+  /// cell from the next now that there's no `·` glyph doing that job.
+  private func statCell(_ value: Int, digits: Int, label: String) -> some View {
+    HStack(spacing: 4) {
+      statSlot(value, digits: digits)
+      Text(label)
+    }
+  }
+
+  private func statSlot(_ value: Int, digits: Int) -> some View {
+    Text("\(value)")
+      .monospacedDigit()
+      .contentTransition(.numericText(value: Double(value)))
+      .animation(.snappy(duration: 0.15), value: value)
+      .frame(minWidth: CGFloat(digits) * 7.5, alignment: .trailing)
+  }
+
+  private func statSlot(_ text: String, digits: Int) -> some View {
+    Text(text)
+      .monospacedDigit()
+      .contentTransition(.numericText())
+      .animation(.snappy(duration: 0.15), value: text)
+      .frame(minWidth: CGFloat(digits) * 7.5, alignment: .trailing)
+  }
+}
+
+/// Snapshot of the counters `RunControlStatsCaption` displays, taken at its own throttled rate
+/// instead of on every `replay` tick — see that type's doc comment for why. Equatable so the
+/// `.task` polling loop can skip reassigning `@State` (and thus skip a re-render) once playback
+/// pauses or finishes and the snapshot stops changing.
+private struct DisplayedStats: Equatable {
+  var compareCount = 0
+  var swapCount = 0
+  var reversalCount = 0
+  var mainWriteCount = 0
+  var auxWriteCount = 0
+  var externalArrayItemCount = 0
+  var elapsedPlaybackDuration: Double = 0
+  var significantOperationCount = 0
+
+  init() {}
+
+  @MainActor
+  init(replay: ReplayEngine) {
+    compareCount = replay.compareCount
+    swapCount = replay.swapCount
+    reversalCount = replay.reversalCount
+    mainWriteCount = replay.mainWriteCount
+    auxWriteCount = replay.auxWriteCount
+    externalArrayItemCount = replay.externalArrayItemCount
+    elapsedPlaybackDuration = replay.elapsedPlaybackDuration
+    significantOperationCount = replay.significantOperationCount
+  }
 }
 
 /// Extracted from `RunControlBar` so `@Observable`'s per-view dependency tracking applies to it
@@ -431,7 +474,7 @@ private struct UtilityButtons: View {
       }
       .accessibilityIdentifier("runControlSizeButton")
       .accessibilityLabel("Array Size")
-      .help("Show or hide the array size stepper (⌘S cycles to the next size)")
+      .help("Show or hide the array size picker (⌘S cycles to the next size)")
 
       Button {
         isVisualizerExpanded.toggle()
@@ -451,6 +494,82 @@ private struct UtilityButtons: View {
   private var exportDocument: TapeArchiveDocument {
     TapeArchiveDocument(
       tape: replay.tape, suggestedFileName: "\(algorithm.id.rawValue)-\(session.arraySize).tape")
+  }
+}
+
+/// Adapted from an approved standalone prototype. `selection`/`onSelect` are a plain value plus
+/// callback, not a `Binding<Int>` — the real action is `Task { await session.start(size:) }`
+/// (same idiom as `scrubSlider`'s custom `Binding` above), so the callback keeps that Task-wrap at
+/// the one call site in `sizeRow` rather than hiding it behind a `Binding`'s `set:`.
+private struct SizeChipRow: View {
+  let sizes: [Int]
+  let selection: Int
+  let onSelect: (Int) -> Void
+
+  var body: some View {
+    GeometryReader { geo in
+      ScrollViewReader { proxy in
+        ScrollView(.horizontal, showsIndicators: false) {
+          LazyHStack(spacing: 8) {
+            ForEach(sizes, id: \.self) { size in
+              SizeChip(size: size, isSelected: size == selection) {
+                onSelect(size)
+              }
+              .id(size)
+              .accessibilityIdentifier("runControlSizeChip-\(size)")
+            }
+          }
+          // Half-viewport padding lets the first/last chip still reach true center. Because
+          // `SizeChipRow` sits next to a fixed-width `Text("Size")` inside sizeRow's HStack,
+          // `geo.size.width` here is already "row width minus the caption" — HStack hands a
+          // flexible child (GeometryReader always reports as flexible) whatever space is left
+          // after fixed-width siblings size themselves.
+          .padding(.horizontal, geo.size.width / 2)
+        }
+        // Reacting to `selection` itself (not just inside the chip's tap handler) means any
+        // change re-centers the same way — a chip tap, but also a programmatic one from
+        // automation, `⌘S`, or an App Intent.
+        .onChange(of: selection) { _, newValue in
+          withAnimation(.easeInOut(duration: 0.25)) {
+            proxy.scrollTo(newValue, anchor: .center)
+          }
+        }
+        .task {
+          // A same-frame scrollTo can fire before the ScrollView has measured content on first
+          // layout; the tiny delay makes initial centering reliable.
+          try? await Task.sleep(nanoseconds: 50_000_000)
+          proxy.scrollTo(selection, anchor: .center)
+        }
+      }
+    }
+    .frame(height: 44)
+    .accessibilityIdentifier("runControlSizeChipRow")
+  }
+}
+
+private struct SizeChip: View {
+  let size: Int
+  let isSelected: Bool
+  let action: () -> Void
+
+  var body: some View {
+    Button(action: action) {
+      Text("\(size)")
+        .font(.callout.monospacedDigit())
+        .fontWeight(isSelected ? .semibold : .regular)
+        .padding(.horizontal, 14)
+        .padding(.vertical, 8)
+        .background {
+          Capsule().fill(isSelected ? Color.accentColor : Color.secondary.opacity(0.15))
+        }
+        .foregroundStyle(isSelected ? Color.white : Color.primary)
+    }
+    .buttonStyle(.plain)
+    // Announces the current size to VoiceOver the same way a segmented control would, and gives
+    // UI tests a stable, semantic signal to assert on — `runControlSizeButton`'s own accessibility
+    // label is the fixed string "Array Size", not a live "n=size" value, so it can't be used for
+    // this instead.
+    .accessibilityAddTraits(isSelected ? .isSelected : [])
   }
 }
 

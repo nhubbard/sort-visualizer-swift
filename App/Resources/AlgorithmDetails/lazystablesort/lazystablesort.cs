@@ -2,6 +2,31 @@ using System;
 
 public class LazyStableSort
 {
+  public static void Sort(int[] arr)
+  {
+    int n = arr.Length;
+    int dist = 1;
+    while (dist < n)
+    {
+      if (arr[dist - 1] > arr[dist]) (arr[dist - 1], arr[dist]) = (arr[dist], arr[dist - 1]);
+      dist += 2;
+    }
+    int part = 2;
+    while (part < n)
+    {
+      int left = 0;
+      int right = n - 2 * part;
+      while (left <= right)
+      {
+        MergeWithoutBuffer(arr, left, part, part);
+        left += 2 * part;
+      }
+      int rest = n - left;
+      if (rest > part) MergeWithoutBuffer(arr, left, part, rest - part);
+      part *= 2;
+    }
+  }
+
   public static void MultiSwap(int[] arr, int a, int b, int count)
   {
     for (int i = 0; i < count; i++)
@@ -43,54 +68,34 @@ public class LazyStableSort
 
   public static void MergeWithoutBuffer(int[] arr, int pos, int len1, int len2)
   {
-    if (len1 == 0 || len2 == 0) return;
-    if (len1 == 1)
+    if (len1 < len2)
     {
-      int loc = BinSearch(arr, pos + 1, len2, pos, true);
-      Rotate(arr, pos, 1, loc);
-      return;
-    }
-    if (len2 == 1)
-    {
-      int loc = BinSearch(arr, pos, len1, pos + len1, false);
-      Rotate(arr, pos + loc, len1 - loc, 1);
-      return;
-    }
-    int mid1 = len1 / 2;
-    int loc2 = BinSearch(arr, pos + len1, len2, pos + mid1, true);
-    Rotate(arr, pos + mid1, len1 - mid1, loc2);
-    MergeWithoutBuffer(arr, pos, mid1, loc2);
-    MergeWithoutBuffer(arr, pos + mid1 + loc2, len1 - mid1, len2 - loc2);
-  }
-
-  public static void Sort(int[] arr)
-  {
-    int n = arr.Length;
-    int dist = 1;
-    while (dist < n)
-    {
-      if (arr[dist - 1] > arr[dist]) (arr[dist - 1], arr[dist]) = (arr[dist], arr[dist - 1]);
-      dist += 2;
-    }
-    int part = 2;
-    while (part < n)
-    {
-      int left = 0;
-      int right = n - 2 * part;
-      while (left <= right)
+      while (len1 != 0)
       {
-        MergeWithoutBuffer(arr, left, part, part);
-        left += 2 * part;
+        int loc = BinSearch(arr, pos + len1, len2, pos, true);
+        if (loc != 0) { Rotate(arr, pos, len1, loc); pos += loc; len2 -= loc; }
+        if (len2 == 0) break;
+        do { pos++; len1--; } while (len1 != 0 && arr[pos] <= arr[pos + len1]);
       }
-      int rest = n - left;
-      if (rest > part) MergeWithoutBuffer(arr, left, part, rest - part);
-      part *= 2;
+    }
+    else
+    {
+      while (len2 != 0)
+      {
+        int loc = BinSearch(arr, pos, len1, pos + len1 + len2 - 1, false);
+        if (loc != len1) { Rotate(arr, pos + loc, len1 - loc, len2); len1 = loc; }
+        if (len1 == 0) break;
+        do { len2--; } while (len2 != 0 && arr[pos + len1 - 1] <= arr[pos + len1 + len2 - 1]);
+      }
     }
   }
 
   public static void Main(String[] args)
   {
-    int[] array = { 0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56 };
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     Sort(array);
     string result = "[" + String.Join(", ", array) + "]";
     Console.WriteLine(result);

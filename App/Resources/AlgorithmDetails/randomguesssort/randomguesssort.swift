@@ -1,5 +1,6 @@
 func sort(_ arr: inout [Int]) {
     let n = arr.count
+    guard n > 1 else { return }
     var loops = [Int](repeating: 0, count: n)
     while true {
         var isSorted = true
@@ -16,7 +17,11 @@ func sort(_ arr: inout [Int]) {
             break
         }
         for pos in 0 ..< n {
-            loops[pos] = Int.random(in: 0 ..< n)
+            if loops[pos] < n - 1 {
+                loops[pos] += 1
+                break
+            }
+            loops[pos] = 0
         }
     }
 

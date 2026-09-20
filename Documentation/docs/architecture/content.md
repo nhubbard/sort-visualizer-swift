@@ -11,7 +11,7 @@ what already exists.
 ## `BuiltInAlgorithms`
 
 `BuiltInAlgorithms` depends only on `AlgorithmKit`. It ships 167 `SortAlgorithm` conformances and
-46 `ShuffleAlgorithm` conformances, organized under `Modules/BuiltInAlgorithms/Sources/` by
+44 `ShuffleAlgorithm` conformances, organized under `Modules/BuiltInAlgorithms/Sources/` by
 `AlgorithmCategory`.
 
 | Category | Count | Contents |
@@ -36,7 +36,7 @@ Porting from ArrayV is ongoing. Not every ArrayV algorithm has a Swift counterpa
 
 ### Shuffles are tapes too
 
-Every shuffle in `Shuffles/` (46 total, ranging from naive random shuffles to structured ones like
+Every shuffle in `Shuffles/` (44 total, ranging from naive random shuffles to structured ones like
 radix, bitonic, merge, BST-traversal, and Sierpinski-curve shuffles) is a `ShuffleAlgorithm` that
 records against the same `RecordingEngine` a sort uses, starting from a sorted identity array. No
 separate shuffle engine exists. This is why "watch a fractal shuffle un-scramble the array" works

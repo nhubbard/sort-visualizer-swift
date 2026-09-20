@@ -8,6 +8,15 @@ class Node
   end
 end
 
+def sort(arr)
+  root = nil
+  arr.each { |x| root = insert_rec(root, x) }
+  result = []
+  traverse(root, result)
+  (0...arr.length).each { |i| arr[i] = result[i] }
+  arr
+end
+
 def left_rotate(x)
   y = x.right
   x.right = y.left
@@ -70,14 +79,6 @@ def traverse(node, result)
   traverse(node.right, result)
 end
 
-def sort(arr)
-  root = nil
-  arr.each { |x| root = insert_rec(root, x) }
-  result = []
-  traverse(root, result)
-  (0...arr.length).each { |i| arr[i] = result[i] }
-  arr
-end
 
 array = [0, 39, 21, 62, 91, 77, 14, 23,
   90, 69, 51, 81, 68, 83, 32, 56]

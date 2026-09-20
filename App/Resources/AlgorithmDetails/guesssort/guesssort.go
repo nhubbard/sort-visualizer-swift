@@ -4,27 +4,6 @@ import (
 	"fmt"
 )
 
-func isValid(arr []int, loops []int, n int) bool {
-	total := 0
-	for i := 0; i < n; i++ {
-		for j := 0; j < n; j++ {
-			if loops[i] == loops[j] {
-				total += 1
-			}
-		}
-	}
-	for i := 0; i < n; i++ {
-		for j := 0; j < n; j++ {
-			if i < j && arr[loops[i]] > arr[loops[j]] {
-				total += 1
-			} else if i > j && arr[loops[i]] < arr[loops[j]] {
-				total += 1
-			}
-		}
-	}
-	return total == n
-}
-
 func sort(arr []int) []int {
 	n := len(arr)
 	loops := make([]int, n)
@@ -56,7 +35,30 @@ func sort(arr []int) []int {
 	return arr
 }
 
+func isValid(arr []int, loops []int, n int) bool {
+	total := 0
+	for i := 0; i < n; i++ {
+		for j := 0; j < n; j++ {
+			if loops[i] == loops[j] {
+				total += 1
+			}
+		}
+	}
+	for i := 0; i < n; i++ {
+		for j := 0; j < n; j++ {
+			if i < j && arr[loops[i]] > arr[loops[j]] {
+				total += 1
+			} else if i > j && arr[loops[i]] < arr[loops[j]] {
+				total += 1
+			}
+		}
+	}
+	return total == n
+}
+
 func main() {
-	array := []int{0, 39, 21, 14}
+	array := []int{
+		0, 39, 21, 14,
+	}
 	fmt.Println(sort(array))
 }

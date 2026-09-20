@@ -1,5 +1,6 @@
 def sort(arr)
   n = arr.length
+  return if n <= 1
   loops = Array.new(n, 0)
   loop do
     is_sorted = true
@@ -14,7 +15,11 @@ def sort(arr)
     end
     break if is_sorted
     (0...n).each do |pos|
-      loops[pos] = rand(n)
+      if loops[pos] < n - 1
+        loops[pos] += 1
+        break
+      end
+      loops[pos] = 0
     end
   end
 

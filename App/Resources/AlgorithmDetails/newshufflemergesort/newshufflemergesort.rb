@@ -1,3 +1,21 @@
+def sort(arr)
+  n = arr.length
+  return if n < 2
+
+  subarray_count = ceil_pow2(n)
+  while subarray_count > 1
+    i = 0
+    while i < subarray_count
+      lo = n * i / subarray_count
+      mid = n * (i + 1) / subarray_count
+      hi = n * (i + 2) / subarray_count
+      merge(arr, lo, mid, hi)
+      i += 2
+    end
+    subarray_count >>= 1
+  end
+end
+
 def multi_swap(arr, i, j, length)
   length.times do |k|
     arr[i + k], arr[j + k] = arr[j + k], arr[i + k]
@@ -173,23 +191,6 @@ def ceil_pow2(x)
   x + 1
 end
 
-def sort(arr)
-  n = arr.length
-  return if n < 2
-
-  subarray_count = ceil_pow2(n)
-  while subarray_count > 1
-    i = 0
-    while i < subarray_count
-      lo = n * i / subarray_count
-      mid = n * (i + 1) / subarray_count
-      hi = n * (i + 2) / subarray_count
-      merge(arr, lo, mid, hi)
-      i += 2
-    end
-    subarray_count >>= 1
-  end
-end
 
 array = [0, 39, 21, 62, 91, 77, 14, 23,
   90, 69, 51, 81, 68, 83, 32, 56]

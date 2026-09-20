@@ -1,3 +1,10 @@
+fun sort(arr: Array<Int>) {
+  val n = arr.size
+  if (n > 1) {
+    recursiveComb(arr, 0, 1, n)
+  }
+}
+
 fun powerOfThree(arr: Array<Int>, pos: Int, gap: Int, end: Int) {
   if (pos + gap > end) {
     return
@@ -27,13 +34,6 @@ fun recursiveComb(arr: Array<Int>, pos: Int, gap: Int, end: Int) {
   recursiveComb(arr, pos + gap, gap * 2, end)
 
   powerOfThree(arr, pos, gap, end)
-}
-
-fun sort(arr: Array<Int>) {
-  val n = arr.size
-  if (n > 1) {
-    recursiveComb(arr, 0, 1, n)
-  }
 }
 
 fun main() {

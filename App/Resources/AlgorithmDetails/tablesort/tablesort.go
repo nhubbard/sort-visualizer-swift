@@ -4,6 +4,34 @@ import (
 	"fmt"
 )
 
+func sort(arr []int) []int {
+	n := len(arr)
+	table := make([]int, n)
+	for i := 0; i < n; i++ {
+		table[i] = i
+	}
+	quickSort(arr, table, 0, n)
+	for i := 0; i < n; i++ {
+		if table[i] != i {
+			t := arr[i]
+			j := i
+			next := table[i]
+			for {
+				arr[j] = arr[next]
+				table[j] = j
+				j = next
+				next = table[next]
+				if next == i {
+					break
+				}
+			}
+			arr[j] = t
+			table[j] = j
+		}
+	}
+	return arr
+}
+
 func stableComp(arr []int, table []int, a int, b int) bool {
 	ta := table[a]
 	tb := table[b]
@@ -66,34 +94,6 @@ func quickSort(arr []int, table []int, a int, b int) {
 	table[a], table[p] = table[p], table[a]
 	quickSort(arr, table, a, p)
 	quickSort(arr, table, p+1, b)
-}
-
-func sort(arr []int) []int {
-	n := len(arr)
-	table := make([]int, n)
-	for i := 0; i < n; i++ {
-		table[i] = i
-	}
-	quickSort(arr, table, 0, n)
-	for i := 0; i < n; i++ {
-		if table[i] != i {
-			t := arr[i]
-			j := i
-			next := table[i]
-			for {
-				arr[j] = arr[next]
-				table[j] = j
-				j = next
-				next = table[next]
-				if next == i {
-					break
-				}
-			}
-			arr[j] = t
-			table[j] = j
-		}
-	}
-	return arr
 }
 
 func main() {

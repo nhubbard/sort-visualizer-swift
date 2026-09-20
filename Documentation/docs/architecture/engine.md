@@ -27,12 +27,15 @@ public enum SortOperation: Sendable, Codable, Equatable {
   case auxCreate(handle: Int, length: Int)
   case auxWrite(handle: Int, index: Int, value: Int)
   case auxDelete(handle: Int)
+  case compareValue(Int, Int)
+  case compareValues(Int, Int)
+  case auxRead(handle: Int, index: Int)
+  case readValue(Int)
   case reversal
 }
 ```
 
-Two cases are counted but structurally inert: `.compare` and `.reversal` never change `values`
-directly.
+Comparisons and reads are counted but structurally inert; they never change `values` directly.
 
 - A `.reversal` is immediately followed by the individual `.swap`s that perform the flip. Scrubbing
   shows the reversal swap by swap. The `.reversal` case itself counts once against
@@ -51,6 +54,9 @@ public struct RecordingEngine: Sendable {
   public mutating func compare(_ i: Int, _ j: Int, by cmp: (Int, Int) -> Bool = (>=)) -> Bool
   public mutating func swap(_ i: Int, _ j: Int)
   public mutating func setValue(_ i: Int, _ value: Int)
+  public mutating func readValue(at index: Int) -> Int
+  public mutating func readValues(in range: Range<Int>) -> [Int]
+  public mutating func readAllValues() -> [Int]
   public mutating func mark(_ marker: Int, at index: Int)
   public mutating func createAuxArray(length: Int) -> AuxHandle
   public mutating func writeAux(_ handle: AuxHandle, at index: Int, value: Int)
@@ -263,10 +269,8 @@ recording-operation-cap setting immediately recalculates every algorithm's real 
 rounded down to a size the manual stepper can reach.
 
 A separate hard constant, `maxReasonableArraySize` (8192), caps this value independently of the
-operation cap. Some algorithms' true cost is not fully captured by their recorded operation count.
-For example, `CycleSort`'s O(n²) comparisons happen through direct `engine.values` reads, not
-`engine.compare`. Without the hard cap, such an algorithm's curve could solve to an unreasonable
-size once a user raises the operation cap.
+operation cap. It protects against imperfect curve fits and work outside array access. Reads of
+the live array pass through `RecordingEngine.readValue(at:)` and appear in the operation tape.
 
 ### Registries
 

@@ -3,6 +3,14 @@ import java.util.Arrays;
 public class binarymergesort {
   private static final int THRESHOLD = 32;
 
+  public static void sort(int[] arr) {
+    int n = arr.length;
+    if (n < 2) {
+      return;
+    }
+    mergeSort(arr, 0, n);
+  }
+
   public static void insertionSort(int[] arr, int start, int end) {
     for (int i = start + 1; i < end; i++) {
       int j = i;
@@ -49,16 +57,11 @@ public class binarymergesort {
     merge(arr, start, mid, end);
   }
 
-  public static void sort(int[] arr) {
-    int n = arr.length;
-    if (n < 2) {
-      return;
-    }
-    mergeSort(arr, 0, n);
-  }
-
   public static void main(String[] args) {
-    int[] array = new int[] {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     sort(array);
     System.out.println(Arrays.toString(array));
   }

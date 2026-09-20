@@ -1,5 +1,9 @@
 import Foundation
 
+func sort(_ array: inout [Int]) {
+    flashSort(&array)
+}
+
 func classify(_ value: Int, _ minValue: Int, _ c: Double) -> Int {
     Int(Double(value - minValue) * c) + 1
 }
@@ -98,9 +102,6 @@ func flashSort(_ array: inout [Int]) {
     }
 }
 
-func sort(_ array: inout [Int]) {
-    flashSort(&array)
-}
 
 var array: [Int] = [
     0, 39, 21, 62, 91, 77, 14, 23,

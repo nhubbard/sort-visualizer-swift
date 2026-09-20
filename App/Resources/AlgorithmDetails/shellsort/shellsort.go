@@ -6,14 +6,13 @@ import (
 
 func sort(arr []int) []int {
 	n := len(arr)
-	for i := n / 2; i > 0; i /= 2 {
-		for j := i; j < n; j++ {
-			for k := j - i; k >= 0; k -= i {
-				if arr[k+i] >= arr[k] {
-					break
-				} else {
-					arr[k], arr[k+i] = arr[k+i], arr[k]
-				}
+	for _, gap := range []int{8861, 3938, 1750, 701, 301, 132, 57, 23, 10, 4, 1} {
+		if gap >= n {
+			continue
+		}
+		for i := gap; i < n; i++ {
+			for j := i; j >= gap && arr[j] < arr[j-gap]; j -= gap {
+				arr[j], arr[j-gap] = arr[j-gap], arr[j]
 			}
 		}
 	}

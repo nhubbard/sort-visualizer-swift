@@ -8,8 +8,11 @@ public struct LazyHeapSort: SortAlgorithm {
     category: .selection,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 870, coefficients: [239859, 494.552, 0.250817],
+      anchorSize: 862, coefficients: [239743, 500.88, 0.257646],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .polynomialIntercept, coefficients: [0.257646, 56.698, -572.851], rSquared: 0.999829),
+    implementationComplexity: 9,
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n \\times \\sqrt{n})", average: "O(n \\times \\sqrt{n})",

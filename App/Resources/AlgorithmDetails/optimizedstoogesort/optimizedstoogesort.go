@@ -4,6 +4,11 @@ import (
 	"fmt"
 )
 
+func sort(arr []int) []int {
+	exchange(arr, len(arr))
+	return arr
+}
+
 func forward(arr []int, left, right int) {
 	for left < right {
 		index := right
@@ -48,11 +53,6 @@ func exchange(arr []int, length int) {
 
 	forward(arr, 0, length-2)
 	backward(arr, 1, length-1)
-}
-
-func sort(arr []int) []int {
-	exchange(arr, len(arr))
-	return arr
 }
 
 func main() {

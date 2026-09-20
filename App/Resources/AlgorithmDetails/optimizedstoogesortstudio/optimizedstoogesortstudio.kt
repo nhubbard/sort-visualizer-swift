@@ -1,3 +1,8 @@
+fun sort(arr: Array<Int>) {
+  if (arr.size <= 1) return
+  stoogeSort(arr, 0, 1, arr.size, false)
+}
+
 fun compSwap(arr: Array<Int>, a: Int, b: Int): Boolean {
   if (arr[a] > arr[b]) {
     arr[a] = arr[b].also { arr[b] = arr[a] }
@@ -37,10 +42,6 @@ fun stoogeSort(arr: Array<Int>, a: Int, m: Int, b: Int, merge: Boolean): Boolean
   }
 
   return lChange || rChange
-}
-
-fun sort(arr: Array<Int>) {
-  stoogeSort(arr, 0, 1, arr.size, false)
 }
 
 fun main() {

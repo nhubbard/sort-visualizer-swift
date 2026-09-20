@@ -4,6 +4,29 @@ import (
 	"fmt"
 )
 
+func sort(arr []int) []int {
+	n := len(arr)
+	if n <= 1 {
+		return arr
+	}
+
+	radix := 4
+	maxValue := arr[0]
+	for _, v := range arr {
+		if v > maxValue {
+			maxValue = v
+		}
+	}
+
+	divisor := 1
+	for maxValue/divisor >= radix {
+		divisor *= radix
+	}
+
+	flagSort(arr, 0, n, divisor, radix)
+	return arr
+}
+
 func digitAt(value, divisor, radix int) int {
 	return (value / divisor) % radix
 }
@@ -58,29 +81,6 @@ func flagSort(arr []int, low, high, divisor, radix int) {
 			}
 		}
 	}
-}
-
-func sort(arr []int) []int {
-	n := len(arr)
-	if n <= 1 {
-		return arr
-	}
-
-	radix := 10
-	maxValue := arr[0]
-	for _, v := range arr {
-		if v > maxValue {
-			maxValue = v
-		}
-	}
-
-	divisor := 1
-	for maxValue/divisor >= radix {
-		divisor *= radix
-	}
-
-	flagSort(arr, 0, n, divisor, radix)
-	return arr
 }
 
 func main() {

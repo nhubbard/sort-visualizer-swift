@@ -16,7 +16,7 @@ public struct SierpinskiShuffle: ShuffleAlgorithm {
     var triangle = [Int](repeating: 0, count: n)
     triangleRec(&triangle, a: 0, b: n)
 
-    let original = engine.values
+    let original = engine.readAllValues()
     for i in 0..<n {
       engine.setValue(i, original[triangle[i]])
     }

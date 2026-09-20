@@ -1,5 +1,9 @@
 import Foundation
 
+func sort(_ array: inout [Int]) {
+    librarySort(&array)
+}
+
 func binarySearch(_ array: [Int], _ item: Int, _ start: Int, _ end: Int) -> Int {
     var lo = start
     var hi = end
@@ -72,10 +76,16 @@ func rebalance(
 
 func librarySort(_ array: inout [Int]) {
     let n = array.count
-    guard n >= 2 else { return }
+    guard n >= 32 else {
+        binaryInsertionSort(&array, 0, n)
+        return
+    }
 
-    let rebalanceFactor = 2
-    var spineSize = 1
+    let rebalanceFactor = 4
+    var spineSize = n
+    while spineSize >= 32 {
+        spineSize = (spineSize - 1) / rebalanceFactor + 1
+    }
     binaryInsertionSort(&array, 0, spineSize)
 
     var maxLevel = spineSize
@@ -104,9 +114,6 @@ func librarySort(_ array: inout [Int]) {
     rebalance(&array, &temp, &counts, locations, spineSize, n)
 }
 
-func sort(_ array: inout [Int]) {
-    librarySort(&array)
-}
 
 var array: [Int] = [
     0, 39, 21, 62, 91, 77, 14, 23,

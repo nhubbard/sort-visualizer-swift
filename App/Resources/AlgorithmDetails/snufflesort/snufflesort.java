@@ -1,6 +1,10 @@
 import java.util.Arrays;
 
 public class snufflesort {
+  public static void sort(int[] arr) {
+    snuffleSort(arr, 0, arr.length - 1);
+  }
+
   private static void snuffleSort(int[] arr, int start, int stop) {
     if (stop - start + 1 >= 2) {
       if (arr[start] > arr[stop]) {
@@ -19,12 +23,8 @@ public class snufflesort {
     }
   }
 
-  public static void sort(int[] arr) {
-    snuffleSort(arr, 0, arr.length - 1);
-  }
-
   public static void main(String[] args) {
-    int[] array = new int[] {0, 39, 21, 62, 91, 77, 14, 23};
+    int[] array = {0, 39, 21, 62, 91, 77, 14, 23};
     sort(array);
     System.out.println(Arrays.toString(array));
   }

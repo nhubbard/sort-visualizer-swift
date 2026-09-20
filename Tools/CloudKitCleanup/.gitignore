@@ -1,0 +1,10 @@
+# Secrets and machine-specific config -- never commit these.
+.management-token
+.user-token
+.team-id
+.dev-schema
+.prod-schema
+
+# Cached query results (real user CloudKit record names/data) -- local scratch state only.
+.cache/
+__pycache__/

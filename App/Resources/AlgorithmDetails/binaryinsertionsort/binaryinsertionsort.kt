@@ -1,3 +1,17 @@
+fun sort(arr: Array<Int>) {
+  for (i in 1 until arr.size) {
+    val item = arr[i]
+    val pos = binarySearch(arr, item, 0, i)
+    var j = i
+    while (j > pos) {
+      val displaced = arr[j]
+      arr[j] = arr[j - 1]
+      arr[j - 1] = displaced
+      j--
+    }
+  }
+}
+
 fun binarySearch(arr: Array<Int>, item: Int, start: Int, end: Int): Int {
   var low = start
   var high = end
@@ -10,19 +24,6 @@ fun binarySearch(arr: Array<Int>, item: Int, start: Int, end: Int): Int {
     }
   }
   return low
-}
-
-fun sort(arr: Array<Int>) {
-  for (i in 1 until arr.size) {
-    val item = arr[i]
-    val pos = binarySearch(arr, item, 0, i)
-    var j = i
-    while (j > pos) {
-      arr[j] = arr[j - 1]
-      j--
-    }
-    arr[pos] = item
-  }
 }
 
 fun main() {

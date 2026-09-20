@@ -1,7 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
+                 90, 69, 51, 81, 68, 83, 32, 56};
 
 void swap(int *a, int *b) {
   int t = *a;
@@ -9,60 +10,68 @@ void swap(int *a, int *b) {
   *b = t;
 }
 
-void printList(int arr[], int n) {
-  for (int i = 0; i < n; i++) {
-    if (i == 0) {
-      printf("[%d, ", arr[i]);
-    } else if (i != n - 1) {
-      printf("%d, ", arr[i]);
-    } else {
-      printf("%d]", arr[i]);
+void printList(int items[], int size) {
+  printf("[");
+  if (size > 0) {
+    printf("%d", items[0]);
+    for (int i = 1; i < size; i++) {
+      printf(", %d", items[i]);
+    }
+  }
+  printf("]");
+}
+
+void insertionSort(int arr[], int left, int right);
+void dualPivot(int arr[], int left, int right, int divisor);
+
+void sort(int arr[], int left, int right) {
+  dualPivot(arr, left, right, 3);
+}
+
+void insertionSort(int arr[], int left, int right) {
+  for (int i = left + 1; i <= right; i++) {
+    int j = i;
+    while (j > left && arr[j] < arr[j - 1]) {
+      swap(&arr[j], &arr[j - 1]);
+      j--;
     }
   }
 }
 
-void partition(int arr[], int low, int high, int *outJ, int *outG) {
-  if (arr[low] > arr[high]) {
-    swap(&arr[low], &arr[high]);
+void dualPivot(int arr[], int left, int right, int divisor) {
+  int length = right - left;
+  if (length < 4) {
+    insertionSort(arr, left, right);
+    return;
   }
-  int j = low + 1;
-  int g = high - 1;
-  int k = low + 1;
-  int p = arr[low];
-  int q = arr[high];
-  while (k <= g) {
-    if (arr[k] < p) {
-      swap(&arr[k], &arr[j]);
-      j++;
-    } else if (arr[k] >= q) {
-      while (arr[g] > q && k < g) {
-        g--;
-      }
-      swap(&arr[k], &arr[g]);
-      g--;
-      if (arr[k] < p) {
-        swap(&arr[k], &arr[j]);
-        j++;
-      }
+  int third = length / divisor;
+  int med1 = left + third, med2 = right - third;
+  if (med1 <= left) med1 = left + 1;
+  if (med2 >= right) med2 = right - 1;
+  if (arr[med1] < arr[med2]) {
+    swap(&arr[med1], &arr[left]);
+    swap(&arr[med2], &arr[right]);
+  } else {
+    swap(&arr[med1], &arr[right]);
+    swap(&arr[med2], &arr[left]);
+  }
+  int pivot1 = arr[left], pivot2 = arr[right];
+  int less = left + 1, great = right - 1;
+  for (int k = less; k <= great; k++) {
+    if (arr[k] < pivot1) {
+      swap(&arr[k], &arr[less++]);
+    } else if (arr[k] > pivot2) {
+      while (k < great && arr[great] > pivot2) great--;
+      swap(&arr[k], &arr[great--]);
+      if (arr[k] < pivot1) swap(&arr[k], &arr[less++]);
     }
-    k++;
   }
-  j--;
-  g++;
-  swap(&arr[low], &arr[j]);
-  swap(&arr[high], &arr[g]);
-  *outJ = j;
-  *outG = g;
-}
-
-void sort(int arr[], int low, int high) {
-  if (low < high) {
-    int j, g;
-    partition(arr, low, high, &j, &g);
-    sort(arr, low, j - 1);
-    sort(arr, j + 1, g - 1);
-    sort(arr, g + 1, high);
-  }
+  if (great - less < 13) divisor++;
+  swap(&arr[less - 1], &arr[left]);
+  swap(&arr[great + 1], &arr[right]);
+  dualPivot(arr, left, less - 2, divisor);
+  if (pivot1 < pivot2) dualPivot(arr, less, great, divisor);
+  dualPivot(arr, great + 2, right, divisor);
 }
 
 int main(int argc, char *argv[]) {

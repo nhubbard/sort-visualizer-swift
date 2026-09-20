@@ -1,3 +1,6 @@
+def sort(arr):
+    return library_sort(arr)
+
 def binary_search(array, item, start, end):
     lo = start
     hi = end
@@ -50,11 +53,14 @@ def rebalance(array, temp, counts, locations, spine_size, batch_end):
 
 def library_sort(array):
     n = len(array)
-    if n < 2:
+    if n < 32:
+        binary_insertion_sort(array, 0, n)
         return array
 
-    rebalance_factor = 2
-    spine_size = 1
+    rebalance_factor = 4
+    spine_size = n
+    while spine_size >= 32:
+        spine_size = (spine_size - 1) // rebalance_factor + 1
     binary_insertion_sort(array, 0, spine_size)
 
     max_level = spine_size
@@ -81,11 +87,12 @@ def library_sort(array):
     return array
 
 
-def sort(arr):
-    return library_sort(arr)
 
 
 if __name__ == "__main__":
-    array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56]
+    array = [
+        0, 39, 21, 62, 91, 77, 14, 23,
+        90, 69, 51, 81, 68, 83, 32, 56,
+    ]
     sort(array)
     print(array)

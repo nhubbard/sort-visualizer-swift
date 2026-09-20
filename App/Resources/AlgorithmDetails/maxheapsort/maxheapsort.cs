@@ -2,43 +2,41 @@ using System;
 
 public class HeapSort
 {
-  public static void Heapify(int[] arr, int n, int i)
-  {
-    int largest = i;
-    int l = 2 * i + 1;
-    int r = 2 * i + 2;
-    if (l < n && arr[l] > arr[largest])
-    {
-      largest = l;
-    }
-    if (r < n && arr[r] > arr[largest])
-    {
-      largest = r;
-    }
-    if (largest != i)
-    {
-      (arr[i], arr[largest]) = (arr[largest], arr[i]);
-      Heapify(arr, n, largest);
-    }
-  }
-
   public static void Sort(int[] arr)
   {
     int n = arr.Length;
     for (int i = n / 2 - 1; i >= 0; i--)
     {
-      Heapify(arr, n, i);
+      SiftDown(arr, i, n);
     }
-    for (int i = n - 1; i >= 0; i--)
+    for (int i = n - 1; i > 0; i--)
     {
       (arr[0], arr[i]) = (arr[i], arr[0]);
-      Heapify(arr, i, 0);
+      SiftDown(arr, 0, i);
+    }
+  }
+
+  private static void SiftDown(int[] arr, int root, int size)
+  {
+    while (true)
+    {
+      int largest = root;
+      int left = 2 * root + 1;
+      int right = left + 1;
+      if (left < size && arr[largest] < arr[left]) largest = left;
+      if (right < size && arr[largest] < arr[right]) largest = right;
+      if (largest == root) break;
+      (arr[root], arr[largest]) = (arr[largest], arr[root]);
+      root = largest;
     }
   }
 
   public static void Main(String[] args)
   {
-    int[] array = { 0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56 };
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     Sort(array);
     string result = "[" + String.Join(", ", array) + "]";
     Console.WriteLine(result);

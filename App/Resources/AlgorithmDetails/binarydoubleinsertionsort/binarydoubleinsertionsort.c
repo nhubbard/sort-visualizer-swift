@@ -1,5 +1,37 @@
 #include <stdio.h>
 
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
+                 90, 69, 51, 81, 68, 83, 32, 56};
+
+void swap(int *a, int *b) {
+  int t = *a;
+  *a = *b;
+  *b = t;
+}
+
+void printList(int items[], int size) {
+  printf("[");
+  if (size > 0) {
+    printf("%d", items[0]);
+    for (int i = 1; i < size; i++) {
+      printf(", %d", items[i]);
+    }
+  }
+  printf("]");
+}
+
+int leftBinarySearch(int *array, int a, int b, int val);
+int rightBinarySearch(int *array, int a, int b, int val);
+void insertToLeft(int *array, int a, int b, int temp);
+void insertToRight(int *array, int a, int b, int temp);
+void doubleInsertion(int *array, int a, int b);
+
+void sort(int *arr, int n) {
+  if (n > 1) {
+    doubleInsertion(arr, 0, n);
+  }
+}
+
 int leftBinarySearch(int *array, int a, int b, int val) {
   int lo = a, hi = b;
   while (lo < hi) {
@@ -79,24 +111,10 @@ void doubleInsertion(int *array, int a, int b) {
   }
 }
 
-void sort(int *arr, int n) {
-  if (n > 1) {
-    doubleInsertion(arr, 0, n);
-  }
-}
-
 int main(void) {
-  int array[] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
   int n = sizeof(array) / sizeof(array[0]);
   sort(array, n);
 
-  printf("[");
-  for (int i = 0; i < n; i++) {
-    printf("%d", array[i]);
-    if (i != n - 1) {
-      printf(", ");
-    }
-  }
-  printf("]\n");
+  printList(array, n);
   return 0;
 }

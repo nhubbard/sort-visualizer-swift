@@ -12,7 +12,7 @@ public struct BSTTraversalShuffle: ShuffleAlgorithm {
   public func record(into engine: inout RecordingEngine) {
     let n = engine.count
     guard n > 0 else { return }
-    let original = engine.values
+    let original = engine.readAllValues()
 
     var queue: [(start: Int, end: Int)] = [(0, n)]
     var i = 0

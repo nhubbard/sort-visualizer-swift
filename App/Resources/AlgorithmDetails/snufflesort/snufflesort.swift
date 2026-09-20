@@ -1,3 +1,7 @@
+func sort(_ array: inout [Int]) {
+    snuffleSort(&array, 0, array.count - 1)
+}
+
 func snuffleSort(_ arr: inout [Int],
                  _ start: Int,
                  _ stop: Int)
@@ -17,9 +21,6 @@ func snuffleSort(_ arr: inout [Int],
     }
 }
 
-func sort(_ array: inout [Int]) {
-    snuffleSort(&array, 0, array.count - 1)
-}
 
 var array: [Int] = [0, 39, 21, 62, 91, 77, 14, 23]
 sort(&array)

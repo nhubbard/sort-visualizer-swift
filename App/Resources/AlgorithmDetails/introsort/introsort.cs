@@ -4,6 +4,13 @@ public class Introsort
 {
   private const int SizeThreshold = 16;
 
+  public static void Sort(int[] arr)
+  {
+    int n = arr.Length;
+    IntrosortLoop(arr, 0, n, 2 * FloorLog2(n));
+    InsertionSort(arr, 0, n);
+  }
+
   private static void Swap(int[] arr, int a, int b)
   {
     (arr[a], arr[b]) = (arr[b], arr[a]);
@@ -111,16 +118,12 @@ public class Introsort
     }
   }
 
-  public static void Sort(int[] arr)
-  {
-    int n = arr.Length;
-    IntrosortLoop(arr, 0, n, 2 * FloorLog2(n));
-    InsertionSort(arr, 0, n);
-  }
-
   public static void Main(String[] args)
   {
-    int[] array = { 0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56 };
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     Sort(array);
     string result = "[" + String.Join(", ", array) + "]";
     Console.WriteLine(result);

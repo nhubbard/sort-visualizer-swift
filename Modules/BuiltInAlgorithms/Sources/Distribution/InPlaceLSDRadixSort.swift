@@ -29,8 +29,11 @@ public struct InPlaceLSDRadixSort: SortAlgorithm {
     category: .distribution,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 141, coefficients: [237470, 3949.39, 16.6802],
+      anchorSize: 141, coefficients: [238156, 3738.87, 16.0902, 0.00812452],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .powerLaw, coefficients: [4.16272, 2.21359], rSquared: 0.99969),
+    implementationComplexity: 16,
     stable: true,
     timeComplexity: ComplexityBounds(
       best: "O(n^2 log n)", average: "O(n^2 log n)", worst: "O(n^2 log n)"),
@@ -56,7 +59,7 @@ public struct InPlaceLSDRadixSort: SortAlgorithm {
     }
 
     var maxValue = 0
-    for i in 0..<n { maxValue = max(maxValue, engine.values[i]) }
+    for i in 0..<n { maxValue = max(maxValue, engine.readValue(at: i)) }
     var maxPower = 0
     var probe = radix
     while probe <= maxValue {
@@ -75,7 +78,7 @@ public struct InPlaceLSDRadixSort: SortAlgorithm {
 
       var pos = 0
       for _ in 0..<n {
-        let digit = getDigit(engine.values[pos], power)
+        let digit = getDigit(engine.readValue(at: pos), power)
         if digit == 0 {
           pos += 1
         } else {

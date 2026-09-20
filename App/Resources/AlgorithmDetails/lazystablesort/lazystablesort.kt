@@ -1,3 +1,26 @@
+fun sort(arr: Array<Int>) {
+  val n = arr.size
+  var dist = 1
+  while (dist < n) {
+    if (arr[dist - 1] > arr[dist]) {
+      arr[dist - 1] = arr[dist].also { arr[dist] = arr[dist - 1] }
+    }
+    dist += 2
+  }
+  var part = 2
+  while (part < n) {
+    var left = 0
+    val right = n - 2 * part
+    while (left <= right) {
+      mergeWithoutBuffer(arr, left, part, part)
+      left += 2 * part
+    }
+    val rest = n - left
+    if (rest > part) mergeWithoutBuffer(arr, left, part, rest - part)
+    part *= 2
+  }
+}
+
 fun multiSwap(arr: Array<Int>, a: Int, b: Int, count: Int) {
   for (i in 0 until count) {
     arr[a + i] = arr[b + i].also { arr[b + i] = arr[a + i] }
@@ -31,45 +54,24 @@ fun binSearch(arr: Array<Int>, pos: Int, len: Int, keyPos: Int, isLeft: Boolean)
   return left
 }
 
-fun mergeWithoutBuffer(arr: Array<Int>, pos: Int, len1: Int, len2: Int) {
-  if (len1 == 0 || len2 == 0) return
-  if (len1 == 1) {
-    val loc = binSearch(arr, pos + 1, len2, pos, true)
-    rotate(arr, pos, 1, loc)
-    return
-  }
-  if (len2 == 1) {
-    val loc = binSearch(arr, pos, len1, pos + len1, false)
-    rotate(arr, pos + loc, len1 - loc, 1)
-    return
-  }
-  val mid1 = len1 / 2
-  val loc = binSearch(arr, pos + len1, len2, pos + mid1, true)
-  rotate(arr, pos + mid1, len1 - mid1, loc)
-  mergeWithoutBuffer(arr, pos, mid1, loc)
-  mergeWithoutBuffer(arr, pos + mid1 + loc, len1 - mid1, len2 - loc)
-}
-
-fun sort(arr: Array<Int>) {
-  val n = arr.size
-  var dist = 1
-  while (dist < n) {
-    if (arr[dist - 1] > arr[dist]) {
-      arr[dist - 1] = arr[dist].also { arr[dist] = arr[dist - 1] }
+fun mergeWithoutBuffer(arr: Array<Int>, start: Int, leftLength: Int, rightLength: Int) {
+  var pos = start
+  var len1 = leftLength
+  var len2 = rightLength
+  if (len1 < len2) {
+    while (len1 != 0) {
+      val loc = binSearch(arr, pos + len1, len2, pos, true)
+      if (loc != 0) { rotate(arr, pos, len1, loc); pos += loc; len2 -= loc }
+      if (len2 == 0) break
+      do { pos++; len1-- } while (len1 != 0 && arr[pos] <= arr[pos + len1])
     }
-    dist += 2
-  }
-  var part = 2
-  while (part < n) {
-    var left = 0
-    val right = n - 2 * part
-    while (left <= right) {
-      mergeWithoutBuffer(arr, left, part, part)
-      left += 2 * part
+  } else {
+    while (len2 != 0) {
+      val loc = binSearch(arr, pos, len1, pos + len1 + len2 - 1, false)
+      if (loc != len1) { rotate(arr, pos + loc, len1 - loc, len2); len1 = loc }
+      if (len1 == 0) break
+      do { len2-- } while (len2 != 0 && arr[pos + len1 - 1] <= arr[pos + len1 + len2 - 1])
     }
-    val rest = n - left
-    if (rest > part) mergeWithoutBuffer(arr, left, part, rest - part)
-    part *= 2
   }
 }
 

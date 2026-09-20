@@ -1,32 +1,46 @@
-def sort(numbers)
-  num_elements = numbers.length
-  if num_elements <= 1
-    return numbers
-  end
-  half_of_elements = (num_elements / 2).round
-  left = numbers.take(half_of_elements)
-  right = numbers.drop(half_of_elements)
-  sorted_left = sort(left)
-  sorted_right = sort(right)
-  merge(sorted_left, sorted_right)
+def sort(array)
+  scratch = Array.new(array.length)
+  merge_sort(array, scratch, 0, array.length)
+  array
 end
 
-def merge(left_array, right_array)
-  if right_array.empty?
-    return left_array
+def merge(array, scratch, start, mid, finish)
+  left = start
+  right = mid
+  out = start
+  while left < mid && right < finish
+    if array[left] <= array[right]
+      scratch[out] = array[left]
+      left += 1
+    else
+      scratch[out] = array[right]
+      right += 1
+    end
+    out += 1
   end
-  if left_array.empty?
-    return right_array
+  while left < mid
+    scratch[out] = array[left]
+    left += 1
+    out += 1
   end
-  smallest_number = if left_array.first <= right_array.first
-    left_array.shift
-  else
-    right_array.shift
+  while right < finish
+    scratch[out] = array[right]
+    right += 1
+    out += 1
   end
-  recursive = merge(left_array, right_array)
-  [smallest_number].concat(recursive)
+  (start...finish).each { |i| array[i] = scratch[i] }
 end
+
+def merge_sort(array, scratch, start, finish)
+  return if finish - start < 2
+  mid = start + (finish - start) / 2
+  merge_sort(array, scratch, start, mid)
+  merge_sort(array, scratch, mid, finish)
+  merge(array, scratch, start, mid, finish)
+end
+
 
 array = [0, 39, 21, 62, 91, 77, 14, 23,
   90, 69, 51, 81, 68, 83, 32, 56]
-p sort(array)
+sort(array)
+p array

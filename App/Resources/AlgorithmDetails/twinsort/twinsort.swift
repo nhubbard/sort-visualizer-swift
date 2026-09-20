@@ -1,3 +1,8 @@
+func sort(_ arr: inout [Int]) {
+    let n = arr.count
+    twinsort(&arr, n)
+}
+
 func reverseRange(_ arr: inout [Int], _ lo0: Int, _ hi0: Int) {
     var lo = lo0
     var hi = hi0
@@ -114,10 +119,6 @@ func twinsort(_ arr: inout [Int], _ nmemb: Int) {
     }
 }
 
-func sort(_ arr: inout [Int]) {
-    let n = arr.count
-    twinsort(&arr, n)
-}
 
 var array: [Int] = [
     0, 39, 21, 62, 91, 77, 14, 23,

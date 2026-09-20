@@ -1,25 +1,3 @@
-def int_pow(base, exponent)
-  result = 1
-  exponent.times { result *= base }
-  result
-end
-
-def get_digit(value, power, radix)
-  (value / int_pow(radix, power)) % radix
-end
-
-def multi_swap(arr, pos, to)
-  if to > pos
-    (pos...to).each do |k|
-      arr[k], arr[k + 1] = arr[k + 1], arr[k]
-    end
-  elsif to < pos
-    pos.downto(to + 1) do |k|
-      arr[k], arr[k - 1] = arr[k - 1], arr[k]
-    end
-  end
-end
-
 def sort(arr)
   n = arr.length
   return arr if n == 0
@@ -52,6 +30,29 @@ def sort(arr)
   end
   arr
 end
+
+def int_pow(base, exponent)
+  result = 1
+  exponent.times { result *= base }
+  result
+end
+
+def get_digit(value, power, radix)
+  (value / int_pow(radix, power)) % radix
+end
+
+def multi_swap(arr, pos, to)
+  if to > pos
+    (pos...to).each do |k|
+      arr[k], arr[k + 1] = arr[k + 1], arr[k]
+    end
+  elsif to < pos
+    pos.downto(to + 1) do |k|
+      arr[k], arr[k - 1] = arr[k - 1], arr[k]
+    end
+  end
+end
+
 
 array = [0, 39, 21, 62, 91, 77, 14, 23,
   90, 69, 51, 81, 68, 83, 32, 56]

@@ -2,6 +2,11 @@ using System;
 
 public class MatrixSort
 {
+  public static void Sort(int[] arr)
+  {
+    MatrixSortRec(arr, 0, arr.Length, 1, true);
+  }
+
   private static int DirCompareVal(int left, int right, bool dir)
   {
     int res;
@@ -134,14 +139,14 @@ public class MatrixSort
     }
   }
 
-  public static void Sort(int[] arr)
-  {
-    MatrixSortRec(arr, 0, arr.Length, 1, true);
-  }
-
   public static void Main(String[] args)
   {
-    int[] array = { 15, 3, 22, 8, 19, 1, 24, 11, 6, 20, 9, 17, 2, 14, 23, 5, 18, 0, 12, 21, 7, 16, 4, 13, 10 };
+    int[] array = {
+      15, 3, 22, 8, 19, 1, 24, 11,
+      6, 20, 9, 17, 2, 14, 23, 5,
+      18, 0, 12, 21, 7, 16, 4, 13,
+      10
+    };
     Sort(array);
     string result = "[" + String.Join(", ", array) + "]";
     Console.WriteLine(result);

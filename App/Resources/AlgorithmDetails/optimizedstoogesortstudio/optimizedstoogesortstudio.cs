@@ -2,6 +2,12 @@ using System;
 
 public class OptimizedStoogeSortStudio
 {
+  public static void Sort(int[] arr)
+  {
+    if (arr.Length <= 1) return;
+    StoogeSortRange(arr, 0, 1, arr.Length, false);
+  }
+
   public static bool CompSwap(int[] arr, int a, int b)
   {
     if (arr[a] > arr[b])
@@ -55,14 +61,12 @@ public class OptimizedStoogeSortStudio
     return lChange || rChange;
   }
 
-  public static void Sort(int[] arr)
-  {
-    StoogeSortRange(arr, 0, 1, arr.Length, false);
-  }
-
   public static void Main(String[] args)
   {
-    int[] array = { 0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56 };
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     Sort(array);
     string result = "[" + String.Join(", ", array) + "]";
     Console.WriteLine(result);

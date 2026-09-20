@@ -3,7 +3,8 @@
 
 #define RADIX 4
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
+                 90, 69, 51, 81, 68, 83, 32, 56};
 
 static int counts[RADIX];
 static int offsets[RADIX];
@@ -15,63 +16,20 @@ void swap(int *a, int *b) {
 }
 
 void printList(int items[], int size) {
-  for (int i = 0; i < size; i++) {
-    if (i == 0) {
-      printf("[%d, ", items[i]);
-    } else if (i != size - 1) {
-      printf("%d, ", items[i]);
-    } else {
-      printf("%d]", items[i]);
+  printf("[");
+  if (size > 0) {
+    printf("%d", items[0]);
+    for (int i = 1; i < size; i++) {
+      printf(", %d", items[i]);
     }
   }
+  printf("]");
 }
 
-int getDigit(int value, int place) {
-  for (int p = 0; p < place; p++) {
-    value /= RADIX;
-  }
-  return value % RADIX;
-}
-
-int shiftValue(int value, int places) {
-  for (int p = 0; p < places; p++) {
-    value /= RADIX;
-  }
-  return value;
-}
-
-void bump(int digit) { counts[digit]++; }
-
-/* Turns the raw per-bucket counts already accumulated in `counts` into
- * starting offsets, then places every element in [start, end) by
- * following displacement cycles, one bucket at a time. */
-int distribute(int arr[], int start, int end, int place) {
-  for (int i = 1; i < RADIX; i++) {
-    counts[i] += counts[i - 1];
-    offsets[i] = counts[i - 1];
-  }
-
-  for (int bucket = 0; bucket < RADIX - 1; bucket++) {
-    int position = start + offsets[bucket];
-    if (counts[bucket] > offsets[bucket]) {
-      int held = arr[position];
-      do {
-        int digit = getDigit(held, place);
-        counts[digit]--;
-        int displaced = arr[start + counts[digit]];
-        arr[start + counts[digit]] = held;
-        held = displaced;
-      } while (counts[bucket] > offsets[bucket]);
-    }
-  }
-
-  int split = start + offsets[1];
-  for (int i = 0; i < RADIX; i++) {
-    counts[i] = 0;
-    offsets[i] = 0;
-  }
-  return split;
-}
+int getDigit(int value, int place);
+int shiftValue(int value, int places);
+void bump(int digit);
+int distribute(int arr[], int start, int end, int place);
 
 void sort(int arr[], int n) {
   if (n < 2) {
@@ -132,6 +90,55 @@ void sort(int arr[], int n) {
       }
     }
   }
+}
+
+int getDigit(int value, int place) {
+  for (int p = 0; p < place; p++) {
+    value /= RADIX;
+  }
+  return value % RADIX;
+}
+
+int shiftValue(int value, int places) {
+  for (int p = 0; p < places; p++) {
+    value /= RADIX;
+  }
+  return value;
+}
+
+void bump(int digit) {
+  counts[digit]++;
+}
+
+/* Turns the raw per-bucket counts already accumulated in `counts` into
+ * starting offsets, then places every element in [start, end) by
+ * following displacement cycles, one bucket at a time. */
+int distribute(int arr[], int start, int end, int place) {
+  for (int i = 1; i < RADIX; i++) {
+    counts[i] += counts[i - 1];
+    offsets[i] = counts[i - 1];
+  }
+
+  for (int bucket = 0; bucket < RADIX - 1; bucket++) {
+    int position = start + offsets[bucket];
+    if (counts[bucket] > offsets[bucket]) {
+      int held = arr[position];
+      do {
+        int digit = getDigit(held, place);
+        counts[digit]--;
+        int displaced = arr[start + counts[digit]];
+        arr[start + counts[digit]] = held;
+        held = displaced;
+      } while (counts[bucket] > offsets[bucket]);
+    }
+  }
+
+  int split = start + offsets[1];
+  for (int i = 0; i < RADIX; i++) {
+    counts[i] = 0;
+    offsets[i] = 0;
+  }
+  return split;
 }
 
 int main(int argc, char *argv[]) {

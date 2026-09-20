@@ -1,5 +1,9 @@
 import Foundation
 
+func sort(_ array: inout [Int]) {
+    unoptimizedCocktailShakerSort(&array)
+}
+
 func unoptimizedCocktailShakerSort(_ array: inout [Int]) {
     let n = array.count
     var i = 0
@@ -22,9 +26,6 @@ func unoptimizedCocktailShakerSort(_ array: inout [Int]) {
     }
 }
 
-func sort(_ array: inout [Int]) {
-    unoptimizedCocktailShakerSort(&array)
-}
 
 var array: [Int] = [
     0, 39, 21, 62, 91, 77, 14, 23,

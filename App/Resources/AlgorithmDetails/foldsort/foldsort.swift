@@ -1,19 +1,3 @@
-func compSwap(_ arr: inout [Int], _ a: Int, _ b: Int, _ end: Int) {
-    if b < end, arr[a] > arr[b] {
-        arr.swapAt(a, b)
-    }
-}
-
-func halver(_ arr: inout [Int], _ low: Int, _ high: Int, _ end: Int) {
-    var lo = low
-    var hi = high
-    while lo < hi {
-        compSwap(&arr, lo, hi, end)
-        lo += 1
-        hi -= 1
-    }
-}
-
 func sort(_ arr: inout [Int]) {
     let n = arr.count
     var ceilLog = 1
@@ -37,6 +21,23 @@ func sort(_ arr: inout [Int]) {
         k >>= 1
     }
 }
+
+func compSwap(_ arr: inout [Int], _ a: Int, _ b: Int, _ end: Int) {
+    if b < end, arr[a] > arr[b] {
+        arr.swapAt(a, b)
+    }
+}
+
+func halver(_ arr: inout [Int], _ low: Int, _ high: Int, _ end: Int) {
+    var lo = low
+    var hi = high
+    while lo < hi {
+        compSwap(&arr, lo, hi, end)
+        lo += 1
+        hi -= 1
+    }
+}
+
 
 var array: [Int] = [
     0, 39, 21, 62, 91, 77, 14, 23,

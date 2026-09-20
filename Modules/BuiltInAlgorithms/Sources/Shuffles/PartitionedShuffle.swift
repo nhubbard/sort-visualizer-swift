@@ -25,17 +25,17 @@ public struct PartitionedShuffle: ShuffleAlgorithm {
 
   private func pigeonholeSortRange(_ engine: inout RecordingEngine, from start: Int, to end: Int) {
     guard start < end else { return }
-    var minValue = engine.values[start]
+    var minValue = engine.readValue(at: start)
     var maxValue = minValue
     for i in (start + 1)..<end {
-      let v = engine.values[i]
+      let v = engine.readValue(at: i)
       if v < minValue { minValue = v }
       if v > maxValue { maxValue = v }
     }
 
     var holes = [Int](repeating: 0, count: maxValue - minValue + 1)
     for i in start..<end {
-      holes[engine.values[i] - minValue] += 1
+      holes[engine.readValue(at: i) - minValue] += 1
     }
 
     var j = start

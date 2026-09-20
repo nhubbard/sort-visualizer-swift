@@ -192,6 +192,60 @@ struct RecordingEngineTests {
       ])
     // Real work past the cap still happened — only the tape stopped growing.
     #expect(summary.compareCount == 2)
+    #expect(summary.totalOperationCount == 8)
+  }
+
+  @Test
+  func compareValuesRecordsNoMarksButCountsAsACompare() {
+    var engine = RecordingEngine(values: [5, 3])
+    let result = engine.compareValues(10, 4, by: (<))
+
+    #expect(result == false)
+    // Neither operand is a live index -- no marks, unlike compare()/compareValue().
+    let summary = engine.finish()
+    #expect(summary.tape == [.compareValues(10, 4)])
+    #expect(summary.compareCount == 1)
+    #expect(summary.compareValuesCount == 1)
+    #expect(summary.compareValueCount == 0)
+    // values/mainWriteCount are untouched -- this never reads or writes the live array.
+    #expect(engine.values == [5, 3])
+    #expect(summary.mainWriteCount == 0)
+  }
+
+  @Test
+  func markAuxReadRecordsWithoutMutatingValuesOrAuxWriteCount() {
+    var engine = RecordingEngine(values: [1, 2, 3])
+    let handle = engine.createAuxArray(length: 2)
+    engine.writeAux(handle, at: 0, value: 42)
+    engine.markAuxRead(handle, at: 0)
+    engine.markAuxRead(handle, at: 0)
+
+    let summary = engine.finish()
+    #expect(
+      summary.tape == [
+        .auxCreate(handle: handle.rawValue, length: 2),
+        .auxWrite(handle: handle.rawValue, index: 0, value: 42),
+        .auxRead(handle: handle.rawValue, index: 0),
+        .auxRead(handle: handle.rawValue, index: 0)
+      ])
+    #expect(summary.auxWriteCount == 1)
+    #expect(summary.auxReadCount == 2)
+    #expect(engine.values == [1, 2, 3])
+  }
+
+  @Test
+  func liveReadsRecordEachElementWithoutChangingValues() {
+    var engine = RecordingEngine(values: [4, 1, 7])
+    #expect(engine.readValue(at: 1) == 1)
+    #expect(engine.readValues(in: 0..<2) == [4, 1])
+    #expect(engine.readAllValues() == [4, 1, 7])
+    #expect(engine.finish().tape == [
+      .readValue(1), .readValue(0), .readValue(1),
+      .readValue(0), .readValue(1), .readValue(2)
+    ])
+    #expect(engine.finish().mainReadCount == 6)
+    #expect(engine.finish().totalOperationCount == 6)
+    #expect(engine.values == [4, 1, 7])
   }
 
   @Test

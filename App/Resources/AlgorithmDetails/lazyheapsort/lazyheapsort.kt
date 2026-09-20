@@ -1,5 +1,6 @@
 fun sort(arr: Array<Int>) {
   val n = arr.size
+  if (n <= 1) return
 
   fun maxToFront(a: Int, b: Int) {
     var best = a

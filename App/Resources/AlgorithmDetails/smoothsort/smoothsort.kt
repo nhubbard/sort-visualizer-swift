@@ -3,6 +3,55 @@ val leonardo = intArrayOf(
   177, 287, 465, 753, 1219, 1973, 3193, 5167, 8361, 13529, 21891,
 )
 
+fun sort(arr: IntArray) {
+  val n = arr.size
+  if (n <= 1) return
+
+  var head = 0
+  var p = 1
+  var pshift = 1
+  val hi = n - 1
+
+  while (head < hi) {
+    if (p and 3 == 3) {
+      sift(arr, pshift, head)
+      p = p shr 2
+      pshift += 2
+    } else {
+      if (leonardo[pshift - 1] >= hi - head) {
+        trinkle(arr, p, pshift, head, false)
+      } else {
+        sift(arr, pshift, head)
+      }
+      if (pshift == 1) {
+        p = p shl 1
+        pshift -= 1
+      } else {
+        p = p shl (pshift - 1)
+        pshift = 1
+      }
+    }
+    p = p or 1
+    head += 1
+  }
+
+  trinkle(arr, p, pshift, head, false)
+  while (pshift != 1 || p != 1) {
+    if (pshift <= 1) {
+      val trail = trailingZeroCount(p)
+      p = p shr trail
+      pshift += trail
+    } else {
+      p = p shl 2
+      p = p xor 7
+      pshift -= 2
+      trinkle(arr, p shr 1, pshift + 1, head - leonardo[pshift] - 1, true)
+      trinkle(arr, p, pshift, head - 1, true)
+    }
+    head -= 1
+  }
+}
+
 fun trailingZeroCount(value: Int): Int {
   var mask = value and 1.inv()
   var trail = 0
@@ -58,55 +107,6 @@ fun trinkle(array: IntArray, pIn: Int, pshiftIn: Int, headIn: Int, isTrustyIn: B
   if (!isTrusty) {
     array[head] = nodeValue
     sift(array, pshift, head)
-  }
-}
-
-fun sort(arr: IntArray) {
-  val n = arr.size
-  if (n <= 1) return
-
-  var head = 0
-  var p = 1
-  var pshift = 1
-  val hi = n - 1
-
-  while (head < hi) {
-    if (p and 3 == 3) {
-      sift(arr, pshift, head)
-      p = p shr 2
-      pshift += 2
-    } else {
-      if (leonardo[pshift - 1] >= hi - head) {
-        trinkle(arr, p, pshift, head, false)
-      } else {
-        sift(arr, pshift, head)
-      }
-      if (pshift == 1) {
-        p = p shl 1
-        pshift -= 1
-      } else {
-        p = p shl (pshift - 1)
-        pshift = 1
-      }
-    }
-    p = p or 1
-    head += 1
-  }
-
-  trinkle(arr, p, pshift, head, false)
-  while (pshift != 1 || p != 1) {
-    if (pshift <= 1) {
-      val trail = trailingZeroCount(p)
-      p = p shr trail
-      pshift += trail
-    } else {
-      p = p shl 2
-      p = p xor 7
-      pshift -= 2
-      trinkle(arr, p shr 1, pshift + 1, head - leonardo[pshift] - 1, true)
-      trinkle(arr, p, pshift, head - 1, true)
-    }
-    head -= 1
   }
 }
 

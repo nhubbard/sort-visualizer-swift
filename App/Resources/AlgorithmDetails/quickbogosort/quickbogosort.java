@@ -1,6 +1,10 @@
 import java.util.Arrays;
 
 public class quickbogosort {
+  public static void sort(int[] arr) {
+    sort(arr, 0, arr.length);
+  }
+
   public static boolean isPartitioned(int[] arr, int start, int pivot, int end) {
     for (int i = start; i < pivot; i++) {
       if (arr[i] > arr[pivot]) {
@@ -40,12 +44,8 @@ public class quickbogosort {
     sort(arr, pivot + 1, end);
   }
 
-  public static void sort(int[] arr) {
-    sort(arr, 0, arr.length);
-  }
-
   public static void main(String[] args) {
-    int[] array = new int[] {0, 39, 21, 62, 91, 14, 23};
+    int[] array = {0, 39, 21, 62, 91, 14, 23};
     sort(array);
     System.out.println(Arrays.toString(array));
   }

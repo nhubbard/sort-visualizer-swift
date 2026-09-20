@@ -8,8 +8,11 @@ public struct MergeBogoSort: SortAlgorithm {
     category: .impractical,
     sizeRange: 4...10,
     growthModel: OperationGrowthModel(
-      anchorSize: 15, coefficients: [188543, 126003, 42104, 9379.37, 1567.06, 209.453],
-      measuredSafeCeiling: nil),
+      anchorSize: 7, coefficients: [122.387, 31.0424, 1.3897],
+      measuredSafeCeiling: 7),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .powerLog, coefficients: [5.40061, 1.26159], rSquared: 0.980873),
+    implementationComplexity: 20,
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n)", average: "O(n \\times 2^n)", worst: "O(n \\times 2^n)"),
@@ -90,7 +93,7 @@ public struct MergeBogoSort: SortAlgorithm {
       mergeBogo(mid, end)
 
       for i in start..<end {
-        tmp[i] = engine.values[i]
+        tmp[i] = engine.readValue(at: i)
         engine.writeAux(tmpHandle, at: i, value: tmp[i])
       }
 

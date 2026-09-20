@@ -8,8 +8,11 @@ public struct OddEvenSort: SortAlgorithm {
     category: .exchange,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 219, coefficients: [239793, 2190.03, 5.00077],
+      anchorSize: 50, coefficients: [96784.2, 23754.9, 2975.93, 253.004, 16.3875, 0.861204],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .factorial, coefficients: [10.4352, 0.0627403], rSquared: 0.999209),
+    implementationComplexity: 7,
     stable: true,
     timeComplexity: ComplexityBounds(best: "O(n)", average: "O(n^2)", worst: "O(n^2)"),
     spaceComplexity: "O(1)",

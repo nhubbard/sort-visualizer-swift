@@ -1,6 +1,6 @@
 function sort(arr) {
   const n = arr.length;
-  if (n === 0) return arr;
+  if (n < 2) return arr;
 
   const minValue = Math.min.apply(null, arr);
   const maxValue = Math.max.apply(null, arr);
@@ -35,6 +35,9 @@ function sort(arr) {
   return arr;
 }
 
-var array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56];
+const array = [
+  0, 39, 21, 62, 91, 77, 14, 23,
+  90, 69, 51, 81, 68, 83, 32, 56,
+];
 sort(array);
 console.log("[" + array.join(", ") + "]");

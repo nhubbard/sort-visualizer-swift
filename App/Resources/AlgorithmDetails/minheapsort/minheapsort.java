@@ -1,6 +1,17 @@
 import java.util.Arrays;
 
 public class minheapsort {
+  public static void sort(int[] arr) {
+    heapify(arr);
+    for (int end = arr.length - 1; end > 0; end--) {
+      int temp = arr[0];
+      arr[0] = arr[end];
+      arr[end] = temp;
+      siftDown(arr, 0, end);
+    }
+    reverse(arr);
+  }
+
   private static void siftDown(int[] arr, int root, int size) {
     while (true) {
       int smallest = root;
@@ -40,19 +51,11 @@ public class minheapsort {
     }
   }
 
-  public static void sort(int[] arr) {
-    heapify(arr);
-    for (int end = arr.length - 1; end > 0; end--) {
-      int temp = arr[0];
-      arr[0] = arr[end];
-      arr[end] = temp;
-      siftDown(arr, 0, end);
-    }
-    reverse(arr);
-  }
-
   public static void main(String[] args) {
-    int[] array = new int[] {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     sort(array);
     System.out.println(Arrays.toString(array));
   }

@@ -19,6 +19,8 @@ public struct RecordingEngine: Sendable {
 
   public private(set) var values: [Int]
   private var tape: [SortOperation] = []
+  /// Counts every operation even after `operationCap` stops retaining tape entries.
+  private var totalOperationCount = 0
   private let operationCap: Int
   /// Set once `tape.count` reaches `operationCap` — from that point on, `compare`/`swap`/etc.
   /// keep doing real work on `values` (so the algorithm still runs to genuine, correct
@@ -27,22 +29,58 @@ public struct RecordingEngine: Sendable {
   /// to skip the run entirely rather than building a `Tape`/`ReplayEngine` from a truncated one.
   public private(set) var didExceedCap = false
   private var compareCount = 0
+  /// How many of `compareCount`'s increments came from `compareValue` rather than `compare` --
+  /// tracked separately because each `compareValue` call only ever marks one index (never a
+  /// second/`secondary`), so it costs fewer raw tape entries per call than a real two-index
+  /// `compare`/`swap`. `GrowthModelCalibrationTests.tapeEstimate` needs this split to keep
+  /// approximating real tape size accurately now that `compareCount` mixes both call shapes.
+  private var compareValueCount = 0
+  /// How many of `compareCount`'s increments came from `compareValues` -- see that method's own
+  /// doc comment. Tracked separately from `compareValueCount` since a `compareValues` call marks
+  /// nothing at all (neither side is a live index), so it costs even fewer raw tape entries per
+  /// call than `compareValue` does.
+  private var compareValuesCount = 0
   private var swapCount = 0
   private var mainWriteCount = 0
+  private var mainReadCount = 0
   private var auxWriteCount = 0
+  /// How many times an algorithm re-read a `writeAux`-shadowed local buffer for a real decision,
+  /// via `markAuxRead` -- see that method's own doc comment.
+  private var auxReadCount = 0
   private var reversalCount = 0
   private var nextAuxHandle = 0
   private var primaryIndex: Int?
   private var secondaryIndex: Int?
+  #if DEBUG
+  /// Test-only key projection for tracking original identities through `setValue` moves.
+  /// Release builds keep their original comparison path and cost.
+  private var comparisonKeyForTesting: (@Sendable (Int) -> Int)?
+  #endif
 
   public init(values: [Int], operationCap: Int = RecordingEngine.defaultOperationCap) {
     self.values = values
     self.operationCap = operationCap
+    #if DEBUG
+    comparisonKeyForTesting = nil
+    #endif
   }
+
+  #if DEBUG
+  /// Allows tests to encode `(sort key, original index)` in each integer while algorithms
+  /// compare only the key. No production code should use this initializer.
+  public init(
+    values: [Int], operationCap: Int = RecordingEngine.defaultOperationCap,
+    comparisonKeyForTesting: @escaping @Sendable (Int) -> Int
+  ) {
+    self.init(values: values, operationCap: operationCap)
+    self.comparisonKeyForTesting = comparisonKeyForTesting
+  }
+  #endif
 
   public var count: Int { values.count }
 
   private mutating func appendOp(_ op: SortOperation) {
+    totalOperationCount += 1
     guard !didExceedCap else { return }
     guard tape.count < operationCap else {
       didExceedCap = true
@@ -56,6 +94,11 @@ public struct RecordingEngine: Sendable {
     markPrimarySecondary(i, j)
     appendOp(.compare(i, j))
     compareCount += 1
+    #if DEBUG
+    if let comparisonKeyForTesting {
+      return cmp(comparisonKeyForTesting(values[i]), comparisonKeyForTesting(values[j]))
+    }
+    #endif
     return cmp(values[i], values[j])
   }
 
@@ -81,10 +124,90 @@ public struct RecordingEngine: Sendable {
     secondaryIndex = j
   }
 
+  /// Same retract-then-mark shape as `markPrimarySecondary`, but for a comparison with only one
+  /// real array side — `compareValue`'s `value` argument isn't stored at any index, so there's
+  /// nothing to mark as secondary.
+  private mutating func markPrimaryOnly(_ i: Int) {
+    if let primaryIndex {
+      appendOp(.unmarkIndex(marker: Marker.primary, index: primaryIndex))
+    }
+    if let secondaryIndex {
+      appendOp(.unmarkIndex(marker: Marker.secondary, index: secondaryIndex))
+    }
+    appendOp(.mark(marker: Marker.primary, index: i))
+    primaryIndex = i
+    secondaryIndex = nil
+  }
+
+  /// For comparisons where one side is a value an algorithm is holding onto rather than a live
+  /// array index — e.g. Cycle Sort's in-flight rotation value, which stops being stored anywhere
+  /// in `values` the moment its original slot gets overwritten. Routing these through
+  /// `engine.values[i] < heldValue` directly (bypassing this method) makes the comparison
+  /// invisible to `compareCount` — and therefore to the growth-model curve `effectiveSizeRange`
+  /// sizes algorithms against — even though it's exactly as expensive as a real `compare()` call.
+  @discardableResult
+  public mutating func compareValue(_ i: Int, against value: Int, by cmp: (Int, Int) -> Bool = (>=)) -> Bool {
+    markPrimaryOnly(i)
+    appendOp(.compareValue(i, value))
+    compareCount += 1
+    compareValueCount += 1
+    #if DEBUG
+    if let comparisonKeyForTesting {
+      return cmp(comparisonKeyForTesting(values[i]), comparisonKeyForTesting(value))
+    }
+    #endif
+    return cmp(values[i], value)
+  }
+
+  /// For comparisons where *neither* side is a live array index -- e.g. `SplaySort`'s two tree
+  /// node keys, `PatienceSort`'s pile-top/heap-entry values, `TimeSort`'s two scratch-array
+  /// entries. `compareValue(_:against:by:)` already covers "one live index, one held value"; this
+  /// covers the remaining case where both sides have already left the array. There's nothing to
+  /// mark -- no live index exists on either side at this moment -- but the call still records a
+  /// tape entry and counts toward `compareCount`, since it costs exactly as much real CPU time as
+  /// any other comparison and was previously invisible to the growth-model curve
+  /// `effectiveSizeRange` sizes algorithms against.
+  @discardableResult
+  public mutating func compareValues(_ a: Int, _ b: Int, by cmp: (Int, Int) -> Bool = (>=)) -> Bool {
+    appendOp(.compareValues(a, b))
+    compareCount += 1
+    compareValuesCount += 1
+    #if DEBUG
+    if let comparisonKeyForTesting {
+      return cmp(comparisonKeyForTesting(a), comparisonKeyForTesting(b))
+    }
+    #endif
+    return cmp(a, b)
+  }
+
   public mutating func setValue(_ i: Int, _ value: Int) {
     appendOp(.setValue(i, value))
     values[i] = value
     mainWriteCount += 1
+  }
+
+  /// Returns a live value and records the read as its own playback step. Algorithms should use
+  /// this for value moves, sentinels, pivot capture, and any other direct read of the main array.
+  public mutating func readValue(at index: Int) -> Int {
+    appendOp(.readValue(index))
+    mainReadCount += 1
+    return values[index]
+  }
+
+  /// Reads the complete live array through the same recorded path, for algorithms that need a
+  /// scratch copy or an initial traversal. The returned array is independent of the engine.
+  public mutating func readAllValues() -> [Int] {
+    var result: [Int] = []
+    result.reserveCapacity(values.count)
+    for index in values.indices { result.append(readValue(at: index)) }
+    return result
+  }
+
+  public mutating func readValues(in range: Range<Int>) -> [Int] {
+    var result: [Int] = []
+    result.reserveCapacity(range.count)
+    for index in range { result.append(readValue(at: index)) }
+    return result
   }
 
   public mutating func mark(_ marker: Int, at index: Int) {
@@ -110,6 +233,18 @@ public struct RecordingEngine: Sendable {
   public mutating func writeAux(_ handle: AuxHandle, at index: Int, value: Int) {
     appendOp(.auxWrite(handle: handle.rawValue, index: index, value: value))
     auxWriteCount += 1
+  }
+
+  /// `RecordingEngine` doesn't retain aux-buffer contents (see `writeAux`'s own doc comment on
+  /// why callers keep a local shadow array), so this can't return a value the way `values[i]`
+  /// reads do -- it exists purely to make a real, repeated re-read of that shadow array visible
+  /// to the tape/op-count, the same way `writeAux` makes writes to it visible. Algorithms like
+  /// `GravitySort`/`ClassicGravitySort` that rescan a shadowed bucket/tally array many times per
+  /// element (not just write it once) should call this alongside each read that represents real
+  /// work, keeping their own local copy for the actual value.
+  public mutating func markAuxRead(_ handle: AuxHandle, at index: Int) {
+    appendOp(.auxRead(handle: handle.rawValue, index: index))
+    auxReadCount += 1
   }
 
   public mutating func deleteAuxArray(_ handle: AuxHandle) {
@@ -140,10 +275,15 @@ public struct RecordingEngine: Sendable {
   public func finish() -> RecordingSummary {
     RecordingSummary(
       tape: tape,
+      totalOperationCount: totalOperationCount,
       compareCount: compareCount,
+      compareValueCount: compareValueCount,
+      compareValuesCount: compareValuesCount,
       swapCount: swapCount,
       mainWriteCount: mainWriteCount,
+      mainReadCount: mainReadCount,
       auxWriteCount: auxWriteCount,
+      auxReadCount: auxReadCount,
       reversalCount: reversalCount,
       didExceedCap: didExceedCap
     )
@@ -155,10 +295,21 @@ public struct RecordingEngine: Sendable {
 /// destructuring arity.
 public struct RecordingSummary: Sendable {
   public let tape: [SortOperation]
+  public let totalOperationCount: Int
   public let compareCount: Int
+  /// The portion of `compareCount` that came from `compareValue` rather than `compare` -- see
+  /// that field's own doc comment on `RecordingEngine`.
+  public let compareValueCount: Int
+  /// The portion of `compareCount` that came from `compareValues` -- see that field's own doc
+  /// comment on `RecordingEngine`.
+  public let compareValuesCount: Int
   public let swapCount: Int
   public let mainWriteCount: Int
+  public let mainReadCount: Int
   public let auxWriteCount: Int
+  /// Real re-reads of a `writeAux`-shadowed buffer, recorded via `markAuxRead` -- see that
+  /// field's own doc comment on `RecordingEngine`.
+  public let auxReadCount: Int
   public let reversalCount: Int
   /// `true` if `tape` was cut short at `RecordingEngine`'s `operationCap` — `tape` still reflects
   /// a genuinely-completed run's real touches up to the cap, but stops short of the whole thing.

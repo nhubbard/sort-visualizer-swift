@@ -1,3 +1,15 @@
+def sort(array)
+  ending = array.length
+  return array if ending <= 1
+  padded_length = next_power_of_two(ending)
+  swaps = nil
+  loop do
+    swaps = circle_sort_routine(array, 0, padded_length - 1, ending)
+    break unless swaps != 0
+  end
+  array
+end
+
 def next_power_of_two(n)
   k = 1
   while k < n
@@ -27,17 +39,6 @@ def circle_sort_routine(array, lo, hi, ending)
   swaps
 end
 
-def sort(array)
-  ending = array.length
-  return array if ending == 0
-  padded_length = next_power_of_two(ending)
-  swaps = nil
-  loop do
-    swaps = circle_sort_routine(array, 0, padded_length - 1, ending)
-    break unless swaps != 0
-  end
-  array
-end
 
 array = [0, 39, 21, 62, 91, 77, 14, 23,
   90, 69, 51, 81, 68, 83, 32, 56]

@@ -1,3 +1,6 @@
+def sort(arr):
+    snuffle_sort(arr, 0, len(arr) - 1)
+
 def snuffle_sort(arr, start, stop):
     if stop - start + 1 >= 2:
         if arr[start] > arr[stop]:
@@ -10,8 +13,6 @@ def snuffle_sort(arr, start, stop):
                 snuffle_sort(arr, mid, stop)
 
 
-def sort(arr):
-    snuffle_sort(arr, 0, len(arr) - 1)
 
 
 if __name__ == "__main__":

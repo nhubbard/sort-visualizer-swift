@@ -1,5 +1,9 @@
 import Foundation
 
+func sort(_ arr: inout [Int]) {
+    rotatePartitionMergeSort(&arr, arr.count)
+}
+
 func multiSwap(_ array: inout [Int], _ a: Int, _ b: Int, _ len: Int) {
     for i in 0 ..< len {
         array.swapAt(a + i, b + i)
@@ -123,9 +127,6 @@ func rotatePartitionMergeSort(_ array: inout [Int], _ n: Int) {
     }
 }
 
-func sort(_ arr: inout [Int]) {
-    rotatePartitionMergeSort(&arr, arr.count)
-}
 
 var array: [Int] = [
     0, 39, 21, 62, 91, 77, 14, 23,

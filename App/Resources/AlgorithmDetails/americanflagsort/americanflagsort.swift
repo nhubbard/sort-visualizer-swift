@@ -1,3 +1,20 @@
+func sort(_ arr: inout [Int]) {
+    let n = arr.count
+    if n <= 1 {
+        return
+    }
+
+    let radix = 4
+    let maxValue = arr.max() ?? 0
+
+    var divisor = 1
+    while maxValue / divisor >= radix {
+        divisor *= radix
+    }
+
+    flagSort(&arr, 0, n, divisor, radix)
+}
+
 func digitAt(_ value: Int, _ divisor: Int, _ radix: Int) -> Int {
     (value / divisor) % radix
 }
@@ -50,22 +67,6 @@ func flagSort(_ arr: inout [Int], _ low: Int, _ high: Int, _ divisor: Int, _ rad
     }
 }
 
-func sort(_ arr: inout [Int]) {
-    let n = arr.count
-    if n <= 1 {
-        return
-    }
-
-    let radix = 10
-    let maxValue = arr.max() ?? 0
-
-    var divisor = 1
-    while maxValue / divisor >= radix {
-        divisor *= radix
-    }
-
-    flagSort(&arr, 0, n, divisor, radix)
-}
 
 var array: [Int] = [
     0, 39, 21, 62, 91, 77, 14, 23,

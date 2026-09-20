@@ -1,3 +1,10 @@
+function sort(arr) {
+  const n = arr.length;
+  const key = [];
+  for (let i = 0; i < n; i++) key.push(i);
+  quickSort(arr, key, 0, n);
+}
+
 function stableComp(arr, key, a, b) {
   if (arr[a] > arr[b]) return true;
   if (arr[a] === arr[b]) return key[a] > key[b];
@@ -50,13 +57,10 @@ function quickSort(arr, key, a, b) {
   quickSort(arr, key, p + 1, b);
 }
 
-function sort(arr) {
-  const n = arr.length;
-  const key = [];
-  for (let i = 0; i < n; i++) key.push(i);
-  quickSort(arr, key, 0, n);
-}
 
-var array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56];
+const array = [
+  0, 39, 21, 62, 91, 77, 14, 23,
+  90, 69, 51, 81, 68, 83, 32, 56,
+];
 sort(array);
 console.log("[" + array.join(", ") + "]");

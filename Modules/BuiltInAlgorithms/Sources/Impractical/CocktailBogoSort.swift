@@ -8,8 +8,11 @@ public struct CocktailBogoSort: SortAlgorithm {
     category: .impractical,
     sizeRange: 4...7,
     growthModel: OperationGrowthModel(
-      anchorSize: 7, coefficients: [342.496, 113.409, 9.75276],
+      anchorSize: 7, coefficients: [261.641, 34.196],
       measuredSafeCeiling: 7),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .powerLaw, coefficients: [44.1097, 0.914889], rSquared: 0.999948),
+    implementationComplexity: 16,
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n)", average: "O(n \\times n!)", worst: "O(n \\times n!)"),

@@ -2,6 +2,12 @@ using System;
 
 public class DoubleSelectionSort
 {
+  public static int[] Sort(int[] array)
+  {
+    SortInPlace(array);
+    return array;
+  }
+
   public static void SortInPlace(int[] array)
   {
     int n = array.Length;
@@ -44,15 +50,12 @@ public class DoubleSelectionSort
     }
   }
 
-  public static int[] Sort(int[] array)
-  {
-    SortInPlace(array);
-    return array;
-  }
-
   public static void Main(String[] args)
   {
-    int[] array = { 0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56 };
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     Sort(array);
     string result = "[" + String.Join(", ", array) + "]";
     Console.WriteLine(result);

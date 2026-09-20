@@ -2,17 +2,45 @@
 #include <cstdio>
 #include <utility>
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
+                 90, 69, 51, 81, 68, 83, 32, 56};
 
 void printList(int items[], int size) {
-  for (int i = 0; i < size; i++) {
-    if (i == 0) {
-      printf("[%d, ", items[i]);
-    } else if (i != size - 1) {
-      printf("%d, ", items[i]);
-    } else {
-      printf("%d]", items[i]);
+  printf("[");
+  if (size > 0) {
+    printf("%d", items[0]);
+    for (int i = 1; i < size; i++) {
+      printf(", %d", items[i]);
     }
+  }
+  printf("]");
+}
+
+void compSwap(int arr[], int a, int b);
+void split(int arr[], int a, int m, int b);
+
+void sort(int arr[], int n) {
+  if (n <= 1) return;
+  int d = 2, end = 1 << (int)(std::log(n - 1) / std::log(2) + 1);
+  while (d <= end) {
+    int i = 0, dec = 0;
+    while (i < n) {
+      int j = i;
+      dec += n;
+      while (dec >= d) {
+        dec -= d;
+        j++;
+      }
+      int k = j;
+      dec += n;
+      while (dec >= d) {
+        dec -= d;
+        k++;
+      }
+      split(arr, i, j, k);
+      i = k;
+    }
+    d *= 2;
   }
 }
 
@@ -47,30 +75,6 @@ void split(int arr[], int a, int m, int b) {
       for (int j = 0; j < len1; j++)
         compSwap(arr, a + j, c);
     }
-  }
-}
-
-void sort(int arr[], int n) {
-  int d = 2, end = 1 << (int)(std::log(n - 1) / std::log(2) + 1);
-  while (d <= end) {
-    int i = 0, dec = 0;
-    while (i < n) {
-      int j = i;
-      dec += n;
-      while (dec >= d) {
-        dec -= d;
-        j++;
-      }
-      int k = j;
-      dec += n;
-      while (dec >= d) {
-        dec -= d;
-        k++;
-      }
-      split(arr, i, j, k);
-      i = k;
-    }
-    d *= 2;
   }
 }
 

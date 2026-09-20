@@ -1,6 +1,11 @@
 import java.util.Arrays;
 
 public class weavedmergesort {
+  public static void sort(int[] arr) {
+    int[] tmp = new int[arr.length];
+    merge(arr, tmp, arr.length, 0, 1);
+  }
+
   private static void merge(int[] arr, int[] tmp, int length, int residue, int modulus) {
     if (residue + modulus >= length) {
       return;
@@ -41,13 +46,11 @@ public class weavedmergesort {
     }
   }
 
-  public static void sort(int[] arr) {
-    int[] tmp = new int[arr.length];
-    merge(arr, tmp, arr.length, 0, 1);
-  }
-
   public static void main(String[] args) {
-    int[] array = new int[] {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     sort(array);
     System.out.println(Arrays.toString(array));
   }

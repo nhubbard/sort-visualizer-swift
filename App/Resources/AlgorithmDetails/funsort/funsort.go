@@ -4,30 +4,6 @@ import (
 	"fmt"
 )
 
-func compositeLess(arr []int, key []int, mid int, i int) bool {
-	if arr[mid] < arr[i] {
-		return true
-	}
-	if arr[mid] == arr[i] {
-		return key[mid] < key[i]
-	}
-	return false
-}
-
-func binarySearch(arr []int, key []int, n int, i int) int {
-	start := 0
-	end := n - 1
-	for start < end {
-		mid := (start + end) / 2
-		if compositeLess(arr, key, mid, i) {
-			start = mid + 1
-		} else {
-			end = mid
-		}
-	}
-	return start
-}
-
 func sort(arr []int) []int {
 	n := len(arr)
 	key := make([]int, n)
@@ -51,6 +27,30 @@ func sort(arr []int) []int {
 		}
 	}
 	return arr
+}
+
+func compositeLess(arr []int, key []int, mid int, i int) bool {
+	if arr[mid] < arr[i] {
+		return true
+	}
+	if arr[mid] == arr[i] {
+		return key[mid] < key[i]
+	}
+	return false
+}
+
+func binarySearch(arr []int, key []int, n int, i int) int {
+	start := 0
+	end := n - 1
+	for start < end {
+		mid := (start + end) / 2
+		if compositeLess(arr, key, mid, i) {
+			start = mid + 1
+		} else {
+			end = mid
+		}
+	}
+	return start
 }
 
 func main() {

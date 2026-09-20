@@ -8,8 +8,11 @@ public struct CircleSortIterative: SortAlgorithm {
     category: .exchange,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 739, coefficients: [231890, 439.615, 0.114404],
+      anchorSize: 722, coefficients: [231813, 475.712, 0.15354],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .powerLog, coefficients: [5.56862, 1.32971], rSquared: 0.992768),
+    implementationComplexity: 10,
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n log n)", average: "O(n log n)", worst: "O(n log^2 n)"),

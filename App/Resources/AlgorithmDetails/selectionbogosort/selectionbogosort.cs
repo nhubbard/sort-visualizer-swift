@@ -34,7 +34,9 @@ public class SelectionBogoSort
 
   public static void Main(String[] args)
   {
-    int[] array = { 0, 39, 21, 62, 91, 14, 23 };
+    int[] array = {
+      0, 39, 21, 62, 91, 14, 23
+    };
     Sort(array);
     string result = "[" + String.Join(", ", array) + "]";
     Console.WriteLine(result);

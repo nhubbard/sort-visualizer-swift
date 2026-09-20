@@ -1,6 +1,19 @@
 import java.util.Arrays;
 
 public class pancakesort {
+  public static void sort(int[] arr) {
+    int n = arr.length;
+    int max;
+    while (n > 1) {
+      max = maxIndex(arr, n);
+      if (max != n - 1) {
+        flip(arr, max);
+        flip(arr, n - 1);
+      }
+      n--;
+    }
+  }
+
   public static void flip(int[] arr, int n) {
     int left = 0;
     while (left < n) {
@@ -22,21 +35,11 @@ public class pancakesort {
     return index;
   }
 
-  public static void sort(int[] arr) {
-    int n = arr.length;
-    int max;
-    while (n > 1) {
-      max = maxIndex(arr, n);
-      if (max != n) {
-        flip(arr, max);
-        flip(arr, n - 1);
-      }
-      n--;
-    }
-  }
-
   public static void main(String[] args) {
-    int[] array = new int[] {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     sort(array);
     System.out.println(Arrays.toString(array));
   }

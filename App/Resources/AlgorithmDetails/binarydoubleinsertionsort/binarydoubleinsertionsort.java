@@ -1,6 +1,12 @@
 import java.util.Arrays;
 
 public final class binarydoubleinsertionsort {
+  public static void sort(int[] arr) {
+    if (arr.length > 1) {
+      doubleInsertion(arr, 0, arr.length);
+    }
+  }
+
   private static int leftBinarySearch(int[] array, int a, int b, int val) {
     int lo = a;
     int hi = b;
@@ -82,14 +88,11 @@ public final class binarydoubleinsertionsort {
     }
   }
 
-  public static void sort(int[] arr) {
-    if (arr.length > 1) {
-      doubleInsertion(arr, 0, arr.length);
-    }
-  }
-
   public static void main(String[] args) {
-    int[] array = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     sort(array);
     System.out.println(Arrays.toString(array));
   }

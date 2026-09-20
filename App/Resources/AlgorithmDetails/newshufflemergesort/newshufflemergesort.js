@@ -1,3 +1,21 @@
+function sort(arr) {
+  var n = arr.length;
+  if (n < 2) return;
+
+  var subarrayCount = ceilPow2(n);
+  while (subarrayCount > 1) {
+    var i = 0;
+    while (i < subarrayCount) {
+      var lo = Math.floor((n * i) / subarrayCount);
+      var mid = Math.floor((n * (i + 1)) / subarrayCount);
+      var hi = Math.floor((n * (i + 2)) / subarrayCount);
+      merge(arr, lo, mid, hi);
+      i += 2;
+    }
+    subarrayCount >>= 1;
+  }
+}
+
 function multiSwap(arr, i, j, length) {
   for (var k = 0; k < length; k++) {
     var t = arr[i + k];
@@ -180,24 +198,10 @@ function ceilPow2(x) {
   return x + 1;
 }
 
-function sort(arr) {
-  var n = arr.length;
-  if (n < 2) return;
 
-  var subarrayCount = ceilPow2(n);
-  while (subarrayCount > 1) {
-    var i = 0;
-    while (i < subarrayCount) {
-      var lo = Math.floor((n * i) / subarrayCount);
-      var mid = Math.floor((n * (i + 1)) / subarrayCount);
-      var hi = Math.floor((n * (i + 2)) / subarrayCount);
-      merge(arr, lo, mid, hi);
-      i += 2;
-    }
-    subarrayCount >>= 1;
-  }
-}
-
-var array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56];
+const array = [
+  0, 39, 21, 62, 91, 77, 14, 23,
+  90, 69, 51, 81, 68, 83, 32, 56,
+];
 sort(array);
 console.log("[" + array.join(", ") + "]");

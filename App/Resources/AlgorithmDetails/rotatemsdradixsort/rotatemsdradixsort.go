@@ -4,6 +4,47 @@ import (
 	"fmt"
 )
 
+func sort(arr []int) []int {
+	n := len(arr)
+	if n <= 1 {
+		return arr
+	}
+	base, maxValue := 4, 0
+	for _, value := range arr {
+		if value > maxValue {
+			maxValue = value
+		}
+	}
+	q, probe := 0, base
+	for probe <= maxValue {
+		q++
+		probe *= base
+	}
+	m, i, b := 0, 0, n
+	for i < n {
+		p := i
+		if b-i >= 1 {
+			p = dist(arr, i, b, q, base)
+		}
+		if q == 0 {
+			m += base
+			t := m / base
+			for t%base == 0 {
+				t /= base
+				q++
+			}
+			i = b
+			for b < n && shiftValue(arr[b], q+1, base) == shiftValue(m, q+1, base) {
+				b++
+			}
+		} else {
+			b = p
+			q--
+		}
+	}
+	return arr
+}
+
 func intPow(base, exponent int) int {
 	result := 1
 	for i := 0; i < exponent; i++ {
@@ -79,39 +120,17 @@ func mergeSortDigit(arr []int, a, b, place, base int) {
 // of counting buckets, then recurses into every resulting digit bucket one
 // place lower -- an ordinary MSD radix sort built entirely out of the LSD
 // variant's rotate/binary-search machinery.
-func msdRotateSort(arr []int, a, b, place, base int) {
-	if b-a < 2 || place < 0 {
-		return
+func shiftValue(value, places, base int) int {
+	for places > 0 {
+		value /= base
+		places--
 	}
-	mergeSortDigit(arr, a, b, place, base)
-	start := a
-	for d := 0; d < base; d++ {
-		end := binSearchDigit(arr, start, b, d+1, place, base)
-		msdRotateSort(arr, start, end, place-1, base)
-		start = end
-	}
+	return value
 }
 
-func sort(arr []int) []int {
-	n := len(arr)
-	if n <= 1 {
-		return arr
-	}
-	base := 4
-	maxValue := arr[0]
-	for _, v := range arr {
-		if v > maxValue {
-			maxValue = v
-		}
-	}
-	highestPlace := 0
-	probe := base
-	for probe <= maxValue {
-		highestPlace++
-		probe *= base
-	}
-	msdRotateSort(arr, 0, n, highestPlace, base)
-	return arr
+func dist(arr []int, a, b, place, base int) int {
+	mergeSortDigit(arr, a, b, place, base)
+	return binSearchDigit(arr, a, b, 1, place, base)
 }
 
 func main() {

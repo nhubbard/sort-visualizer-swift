@@ -1,23 +1,3 @@
-fun compositeLess(arr: Array<Int>, key: Array<Int>, mid: Int, i: Int): Boolean {
-  if (arr[mid] < arr[i]) return true
-  if (arr[mid] == arr[i]) return key[mid] < key[i]
-  return false
-}
-
-fun binarySearch(arr: Array<Int>, key: Array<Int>, n: Int, i: Int): Int {
-  var start = 0
-  var end = n - 1
-  while (start < end) {
-    val mid = (start + end) / 2
-    if (compositeLess(arr, key, mid, i)) {
-      start = mid + 1
-    } else {
-      end = mid
-    }
-  }
-  return start
-}
-
 fun sort(arr: Array<Int>) {
   val n = arr.size
   val key = Array(n) { it }
@@ -37,6 +17,26 @@ fun sort(arr: Array<Int>) {
       }
     }
   }
+}
+
+fun compositeLess(arr: Array<Int>, key: Array<Int>, mid: Int, i: Int): Boolean {
+  if (arr[mid] < arr[i]) return true
+  if (arr[mid] == arr[i]) return key[mid] < key[i]
+  return false
+}
+
+fun binarySearch(arr: Array<Int>, key: Array<Int>, n: Int, i: Int): Int {
+  var start = 0
+  var end = n - 1
+  while (start < end) {
+    val mid = (start + end) / 2
+    if (compositeLess(arr, key, mid, i)) {
+      start = mid + 1
+    } else {
+      end = mid
+    }
+  }
+  return start
 }
 
 fun main() {

@@ -1,3 +1,9 @@
+func sort(_ arr: inout [Int]) {
+    let n = arr.count
+    var key = Array(0 ..< n)
+    quickSort(&arr, &key, 0, n)
+}
+
 func stableComp(_ arr: [Int], _ key: [Int], _ a: Int, _ b: Int) -> Bool {
     if arr[a] > arr[b] {
         return true
@@ -59,11 +65,6 @@ func quickSort(_ arr: inout [Int], _ key: inout [Int], _ a: Int, _ b: Int) {
     quickSort(&arr, &key, p + 1, b)
 }
 
-func sort(_ arr: inout [Int]) {
-    let n = arr.count
-    var key = Array(0 ..< n)
-    quickSort(&arr, &key, 0, n)
-}
 
 var array: [Int] = [
     0, 39, 21, 62, 91, 77, 14, 23,

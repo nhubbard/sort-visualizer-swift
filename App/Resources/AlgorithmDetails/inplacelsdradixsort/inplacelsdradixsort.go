@@ -4,30 +4,6 @@ import (
 	"fmt"
 )
 
-func intPow(base, exponent int) int {
-	result := 1
-	for i := 0; i < exponent; i++ {
-		result *= base
-	}
-	return result
-}
-
-func getDigit(value, power, radix int) int {
-	return (value / intPow(radix, power)) % radix
-}
-
-func multiSwap(arr []int, pos, to int) {
-	if to > pos {
-		for k := pos; k < to; k++ {
-			arr[k], arr[k+1] = arr[k+1], arr[k]
-		}
-	} else if to < pos {
-		for k := pos; k > to; k-- {
-			arr[k], arr[k-1] = arr[k-1], arr[k]
-		}
-	}
-}
-
 func sort(arr []int) []int {
 	n := len(arr)
 	if n == 0 {
@@ -70,6 +46,30 @@ func sort(arr []int) []int {
 		}
 	}
 	return arr
+}
+
+func intPow(base, exponent int) int {
+	result := 1
+	for i := 0; i < exponent; i++ {
+		result *= base
+	}
+	return result
+}
+
+func getDigit(value, power, radix int) int {
+	return (value / intPow(radix, power)) % radix
+}
+
+func multiSwap(arr []int, pos, to int) {
+	if to > pos {
+		for k := pos; k < to; k++ {
+			arr[k], arr[k+1] = arr[k+1], arr[k]
+		}
+	} else if to < pos {
+		for k := pos; k > to; k-- {
+			arr[k], arr[k-1] = arr[k-1], arr[k]
+		}
+	}
 }
 
 func main() {

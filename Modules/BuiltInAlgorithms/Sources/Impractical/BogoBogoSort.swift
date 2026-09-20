@@ -41,8 +41,11 @@ public struct BogoBogoSort: SortAlgorithm {
     category: .impractical,
     sizeRange: 3...5,
     growthModel: OperationGrowthModel(
-      anchorSize: 5, coefficients: [13144.9, 49865.6, 97681.7, 131149, 135324, 114176],
-      measuredSafeCeiling: nil),
+      anchorSize: 12, coefficients: [3451.29, 1516.82, 333.315, 48.83, 5.36511, 0.471586, 0.0345432],
+      measuredSafeCeiling: 12),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .exponential, coefficients: [17.6826, 1.55192], rSquared: 0.984783),
+    implementationComplexity: 35,
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n)", average: "O(n \\times n!^2)", worst: "O(n \\times n!^2)"),
@@ -141,7 +144,7 @@ public struct BogoBogoSort: SortAlgorithm {
     // aux-mirroring needed) instead of a shallower `tmp` buffer.
     func topIsSorted() -> Bool {
       let idx = n - 2
-      for i in 0..<n { writeTmp(idx, i, engine.values[i]) }
+      for i in 0..<n { writeTmp(idx, i, engine.readValue(at: i)) }
       localBogoBogo(idx, n - 1)
 
       var candidate = 0
@@ -154,7 +157,7 @@ public struct BogoBogoSort: SortAlgorithm {
         localBogoBogo(idx, n - 1)
       }
 
-      for i in 0..<n where engine.values[i] != tmp[idx][i] { return false }
+      for i in 0..<n where engine.readValue(at: i) != tmp[idx][i] { return false }
       return true
     }
 

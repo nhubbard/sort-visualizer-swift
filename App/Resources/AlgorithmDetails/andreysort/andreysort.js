@@ -1,3 +1,8 @@
+function sort(arr) {
+  const n = arr.length;
+  msort(arr, 0, n);
+}
+
 function swap(arr, i, j) {
   const t = arr[i];
   arr[i] = arr[j];
@@ -178,11 +183,10 @@ function msort(arr, a, len) {
   msort(arr, a, s);
 }
 
-function sort(arr) {
-  const n = arr.length;
-  msort(arr, 0, n);
-}
 
-var array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56];
+const array = [
+  0, 39, 21, 62, 91, 77, 14, 23,
+  90, 69, 51, 81, 68, 83, 32, 56,
+];
 sort(array);
 console.log("[" + array.join(", ") + "]");

@@ -22,8 +22,11 @@ public struct CompleteGraphSort: SortAlgorithm {
     category: .exchange,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 304, coefficients: [239996, 1506.77, 2.21202],
+      anchorSize: 296, coefficients: [238729, 1596.9, 2.60141],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .powerLog, coefficients: [1.45858, 1.80425], rSquared: 0.999635),
+    implementationComplexity: 19,
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n log^2 n)", average: "O(n log^2 n)", worst: "O(n log^2 n)"),

@@ -7,6 +7,13 @@ import (
 
 const sizeThreshold = 16
 
+func sort(arr []int) []int {
+	n := len(arr)
+	introsortLoop(arr, 0, n, 2*floorLog2(n))
+	insertionSort(arr, 0, n)
+	return arr
+}
+
 func swap(arr []int, a int, b int) {
 	arr[a], arr[b] = arr[b], arr[a]
 }
@@ -100,13 +107,6 @@ func introsortLoop(arr []int, lo int, hi int, depthLimit int) {
 		introsortLoop(arr, p, hi, depthLimit)
 		hi = p
 	}
-}
-
-func sort(arr []int) []int {
-	n := len(arr)
-	introsortLoop(arr, 0, n, 2*floorLog2(n))
-	insertionSort(arr, 0, n)
-	return arr
 }
 
 func main() {

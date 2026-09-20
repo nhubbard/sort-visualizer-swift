@@ -9,70 +9,98 @@ import Testing
 /// that used to be a `.js`/`.manifest.json` pair before all 20 were ported to native Swift.
 @Suite
 struct NativeAlgorithmCorrectnessTests {
+  @Test
+  func multiWayMergeClusterSortsAndRecordsDeterministically() {
+    for algorithm in [RemiSort(), FlanSort()] as [any SortAlgorithm] {
+      for size in [2, 15, 16, 31, 32, 33, 63, 64, 127, 128, 256, 512] {
+        for seed in 0..<32 {
+          var state = UInt64(size * 1_009 + seed + 1)
+          let input = (0..<size).map { _ in
+            state = state &* 6_364_136_223_846_793_005 &+ 1_442_695_040_888_963_407
+            return Int(state % 11) - 5
+          }
+          var first = RecordingEngine(values: input, operationCap: 2_000_000)
+          var second = RecordingEngine(values: input, operationCap: 2_000_000)
+          algorithm.record(into: &first)
+          algorithm.record(into: &second)
+          #expect(first.values == input.sorted(), "\(algorithm.id.rawValue) failed at size \(size), seed \(seed)")
+          #expect(first.values == second.values)
+          #expect(first.finish().tape == second.finish().tape, "\(algorithm.id.rawValue) produced a different tape")
+        }
+      }
+    }
+  }
+
+  @Test
+  func remiPreservesAndFlanCanReorderEqualValues() {
+    let radix = 1024
+    var sawFlanReorder = false
+    for size in [32, 33, 64, 127, 256] {
+      for seed in 0..<40 {
+        var state = UInt64(size * 4_093 + seed + 1)
+        let input = (0..<size).map { index in
+          state = state &* 6_364_136_223_846_793_005 &+ 1_442_695_040_888_963_407
+          return Int(state % 4) * radix + index
+        }
+        for algorithm in [RemiSort(), FlanSort()] as [any SortAlgorithm] {
+          var engine = RecordingEngine(
+            values: input, operationCap: 2_000_000,
+            comparisonKeyForTesting: { $0 / radix }
+          )
+          algorithm.record(into: &engine)
+          let output = engine.values
+          #expect(output.map { $0 / radix } == input.map { $0 / radix }.sorted())
+          for i in 1..<size where output[i - 1] / radix == output[i] / radix {
+            if output[i - 1] % radix > output[i] % radix {
+              if algorithm.id.rawValue == "remisort" {
+                Issue.record("Remi Sort reordered equal values at size \(size), seed \(seed)")
+              } else {
+                sawFlanReorder = true
+              }
+              break
+            }
+          }
+        }
+      }
+    }
+    #expect(sawFlanReorder, "expected to witness Flan Sort's claimed instability")
+  }
+
   private static let algorithms: [any SortAlgorithm] = [
-    AATreeSort(), AVLTreeSort(), AmericanFlagSort(),
-    AsynchronousSort(), BadSort(), BaseNMaxHeapSort(), BinaryDoubleInsertionSort(),
-    BinaryGnomeSort(),
-    BinaryInsertionSort(), BinaryMergeSort(), BinaryQuickSortIterative(),
-    BinaryQuickSortRecursive(), BingoSort(), BinomialHeapSort(), BinomialSmoothSort(),
-    BitonicSortIterative(),
-    BitonicSortRecursive(), BlockInsertionSort(), BlockSwapMergeSort(), BogoBogoSort(),
-    BogoSort(),
-    BoseNelsonSortIterative(), BoseNelsonSortRecursive(),
-    BottomUpHeapSort(), BottomUpMergeSort(), BozoSort(), BubbleBogoSort(), BubbleSort(),
-    BufferedStoogeSort(),
-    BurntPancakeSort(),
-    CircleSortIterative(), CircleSortRecursive(), CircloidSort(),
-    ClassicGravitySort(), ClassicThreeSmoothCombSort(), ClassicTournamentSort(), ClassicTreeSort(),
-    CocktailBogoSort(),
-    CocktailMergeSort(), CocktailShakerSort(), CombSort(), CompleteGraphSort(), CountingSort(),
-    CreaseSort(),
-    CycleSort(),
-    DeterministicBogoSort(), DiamondSortIterative(), DiamondSortRecursive(),
-    DoubleInsertionSort(), DoubleSelectionSort(),
-    DualPivotQuickSort(), ExchangeBogoSort(), FlashSort(), FlippedMinHeapSort(), FoldSort(),
-    ForcedStableQuickSort(), FunSort(), GnomeSort(), GrailSort(),
-    GravitySort(),
-    GuessSort(), HanoiSort(), HybridCombSort(), ImprovedInPlaceMergeSort(), InPlaceLSDRadixSort(),
-    InPlaceMergeSort(), InsertionSort(),
-    IntroCircleSortIterative(),
-    IntroSort(), IterativeTopDownMergeSort(),
-    LazyHeapSort(), LazyStableSort(), LessBogoSort(), LibrarySort(), LLQuickSort(),
-    LRQuickSort(),
-    LSDRadixSort(),
-    MatrixSort(), MaxHeapSort(),
-    MedianQuickBogoSort(), MergeBogoSort(), MergeExchangeSortIterative(), MergeSort(),
-    MinHeapSort(), MinMaxHeapSort(), MSDRadixSort(), NewShuffleMergeSort(),
-    OddEvenMergeSortIterative(), OddEvenMergeSortRecursive(), OddEvenSort(),
-    OptimizedBubbleSort(), OptimizedCocktailShakerSort(), OptimizedGnomeSort(),
-    OptimizedGuessSort(), OptimizedLazyStableSort(), OptimizedStoogeSort(),
-    OptimizedStoogeSortStudio(), OutOfPlaceHeapSort(),
-    PairwiseMergeSortIterative(), PairwiseMergeSortRecursive(),
-    PairwiseSortIterative(), PairwiseSortRecursive(), PancakeInsertionSort(), PancakeSort(),
-    PatienceSort(), PDMergeSort(),
-    PDQBranchedSort(),
-    PDQBranchlessSort(),
-    PigeonholeSort(), PoplarHeapSort(), QuadStoogeSort(),
-    QuickBogoSort(), QuickSort(),
-    RandomGuessSort(), RecursiveShellSort(), RedBlackTreeSort(), RotateLSDRadixSort(),
-    RotateMergeSort(), RotateMSDRadixSort(),
-    SelectionBogoSort(),
-    SelectionSort(), ShatterSort(), ShellSort(), ShoveSort(), SillySort(), SimpleShatterSort(),
-    SimplifiedLibrarySort(), SimplisticGravitySort(), SlopeSort(), SlowSort(), SmartBogoBogoSort(),
-    SmartGuessSort(), SmoothSort(),
-    SnuffleSort(), SplaySort(), StableCycleSort(),
-    StablePermutationSort(), StableQuickSort(), StableSelectionSort(),
-    StacklessAmericanFlagSort(), StacklessBinaryQuickSort(), StacklessRotateMergeSort(),
-    StaticSort(), StoogeSort(),
-    StrandSort(),
-    SwaplessBubbleSort(),
-    TableSort(), TernaryHeapSort(), TernaryLLQuickSort(), TernaryLRQuickSort(),
-    ThreeSmoothCombSortIterative(),
-    ThreeSmoothCombSortRecursive(), TimeSort(), TournamentSort(), TreeSort(), TriangularHeapSort(),
-    TwinSort(),
-    UnoptimizedBubbleSort(),
-    UnoptimizedCocktailShakerSort(), UnstableGrailSort(), WeakHeapSort(), WeavedMergeSort(),
-    WeaveMergeSort(), WeaveSortIterative(), WeaveSortRecursive()
+    AATreeSort(), AVLTreeSort(), AmericanFlagSort(), AsynchronousSort(), BadSort(), BaseNMaxHeapSort(),
+    BinaryDoubleInsertionSort(), BinaryGnomeSort(), BinaryInsertionSort(), BinaryMergeSort(),
+    BinaryQuickSortIterative(), BinaryQuickSortRecursive(), BingoSort(), BinomialHeapSort(), BinomialSmoothSort(),
+    BitonicSortIterative(), BitonicSortRecursive(), BlockInsertionSort(), BlockSwapMergeSort(), BogoBogoSort(),
+    BogoSort(), BoseNelsonSortIterative(), BoseNelsonSortRecursive(), BottomUpHeapSort(), BottomUpMergeSort(),
+    BozoSort(), BubbleBogoSort(), BubbleSort(), BufferedStoogeSort(), BurntPancakeSort(), CircleSortIterative(),
+    CircleSortRecursive(), CircloidSort(), ClassicGravitySort(), ClassicThreeSmoothCombSort(), ClassicTournamentSort(),
+    ClassicTreeSort(), CocktailBogoSort(), CocktailMergeSort(), CocktailShakerSort(), CombSort(), CompleteGraphSort(),
+    CountingSort(), CreaseSort(), CycleSort(), DeterministicBogoSort(), DiamondSortIterative(), DiamondSortRecursive(),
+    DoubleInsertionSort(), DoubleSelectionSort(), DropMergeSort(), DualPivotQuickSort(), ExchangeBogoSort(),
+    FlashSort(), FlippedMinHeapSort(), FlanSort(), FluxSort(), FoldSort(), ForcedStableQuickSort(), FunSort(), GnomeSort(),
+    GrailSort(), GravitySort(), GuessSort(), HanoiSort(), HybridCombSort(), ImprovedBlockSelectionSort(),
+    ImprovedInPlaceMergeSort(), InPlaceLSDRadixSort(), InPlaceMergeSort(), InsertionSort(), IntroCircleSortIterative(),
+    IntroCircleSortRecursive(), IntroSort(), IterativeTopDownMergeSort(), LaziestSort(), LazyHeapSort(),
+    LazyStableSort(), LessBogoSort(), LibrarySort(), LLQuickSort(), LRQuickSort(), LSDRadixSort(), MatrixSort(),
+    MaxHeapSort(), MedianQuickBogoSort(), MergeBogoSort(), MergeExchangeSortIterative(), MergeInsertionSort(),
+    MergeSort(), MinHeapSort(), MinMaxHeapSort(), MSDRadixSort(), NewShuffleMergeSort(), OddEvenMergeSortIterative(),
+    OddEvenMergeSortRecursive(), OddEvenSort(), OptimizedBottomUpMergeSort(), OptimizedBubbleSort(),
+    OptimizedCocktailShakerSort(), OptimizedDualPivotQuickSort(), OptimizedGnomeSort(), OptimizedGuessSort(),
+    OptimizedLazyStableSort(), OptimizedStoogeSort(), OptimizedStoogeSortStudio(), OptimizedWeaveMergeSort(),
+    OutOfPlaceHeapSort(), PairwiseMergeSortIterative(), PairwiseMergeSortRecursive(), PairwiseSortIterative(),
+    PairwiseSortRecursive(), PancakeInsertionSort(), PancakeSort(), PatienceSort(), PDMergeSort(), PDQBranchedSort(),
+    PDQBranchlessSort(), PigeonholeSort(), PoplarHeapSort(), QuadSort(), QuadStoogeSort(), QuickBogoSort(), QuickSort(),
+    RandomGuessSort(), RemiSort(), RecursiveShellSort(), RedBlackTreeSort(), RotateLSDRadixSort(), RotateMergeSort(),
+    RotateMSDRadixSort(), SelectionBogoSort(), SelectionSort(), ShatterSort(), ShellSort(), ShoveSort(), SillySort(),
+    SimpleShatterSort(), SimplifiedLibrarySort(), SimplisticGravitySort(), SlopeSort(), SlowSort(), SmartBogoBogoSort(),
+    SmartGuessSort(), SmoothSort(), SnuffleSort(), SplaySort(), StableCycleSort(), StablePermutationSort(),
+    StableQuickSort(), StableSelectionSort(), StacklessAmericanFlagSort(), StacklessBinaryQuickSort(),
+    StacklessDualPivotQuickSort(), StacklessHybridQuickSort(), StacklessRotateMergeSort(), StaticSort(), StoogeSort(),
+    StrandSort(), SwaplessBubbleSort(), TableSort(), TernaryHeapSort(), TernaryLLQuickSort(), TernaryLRQuickSort(),
+    ThreeSmoothCombSortIterative(), ThreeSmoothCombSortRecursive(), TimeSort(), TournamentSort(), TreeSort(),
+    TriangularHeapSort(), TwinSort(), UnoptimizedBubbleSort(), UnoptimizedCocktailShakerSort(), UnstableGrailSort(),
+    WeakHeapSort(), WeavedMergeSort(), WeaveMergeSort(), WeaveSortIterative(), WeaveSortRecursive(),
+    YujisBufferedMergeSort2()
   ]
 
   @Test
@@ -2362,6 +2390,1264 @@ struct NativeAlgorithmCorrectnessTests {
       duplicate-heavy trials, confirming it is not a stable sort
       """
     )
+  }
+
+  /// `QuadSortingTemplate`'s top-level dispatcher (`quadSort`) genuinely branches into three
+  /// structurally different code paths by size: under 16 is a plain `tailSwap`, 16 up to 256 pre-
+  /// sorts via `quadSwap` then finishes with `tailMerge`, and 256 and up finishes with the full
+  /// `quadMerge` pass instead. The generic suite's single trial at `sizeRange.lowerBound` (16)
+  /// only ever exercises the middle path's *entry* size — this fuzzes across (and past) every
+  /// boundary explicitly, including below `QuadSort`'s declared `sizeRange` (`record(into:)`'s
+  /// only guard is `n > 1`, so feeding it a smaller array is a real, reachable code path, not an
+  /// artificial one).
+  @Test
+  func quadSortWideSizeRangeAndBoundaryFuzz() {
+    let algorithm = QuadSort()
+
+    let boundarySizes = [0, 1, 2, 3, 15, 16, 17, 255, 256, 257, 300]
+    for size in boundarySizes {
+      for attempt in 0..<20 {
+        let input = (0..<size).map { _ in Int.random(in: 0...(max(size, 1) / 4)) }
+        var engine = RecordingEngine(values: input)
+        algorithm.record(into: &engine)
+        #expect(
+          engine.values == input.sorted(),
+          """
+          QuadSort failed duplicate-heavy fuzz attempt \(attempt) of boundary size \(size): \
+          \(input) -> \(engine.values)
+          """
+        )
+      }
+    }
+
+    for size in stride(from: 4, through: 320, by: 5) {
+      for attempt in 0..<10 {
+        let input = (0..<size).map { _ in Int.random(in: 0...1_000_000) }
+        var engine = RecordingEngine(values: input)
+        algorithm.record(into: &engine)
+        #expect(
+          engine.values == input.sorted(),
+          """
+          QuadSort failed wide-range fuzz attempt \(attempt) of size \(size): \(input) -> \
+          \(engine.values)
+          """
+        )
+      }
+    }
+
+    for size in [0, 1, 2, 4, 8, 15, 16, 32, 64, 128, 256, 300] {
+      let sorted = Array(0..<size)
+      var engineSorted = RecordingEngine(values: sorted)
+      algorithm.record(into: &engineSorted)
+      #expect(engineSorted.values == sorted, "QuadSort failed already-sorted input of size \(size)")
+
+      let reversed = Array((0..<size).reversed())
+      var engineReversed = RecordingEngine(values: reversed)
+      algorithm.record(into: &engineReversed)
+      #expect(
+        engineReversed.values == reversed.sorted(),
+        "QuadSort failed reverse-sorted input of size \(size)")
+    }
+  }
+
+  /// `FluxSort` branches by size at several points: `record(into:)` special-cases `nmemb < 32`
+  /// directly into `QuadSortingTemplate.sort`; `fluxAnalyze` early-outs on already-sorted, fully
+  /// reversed, or balance within 1/6 of either end; `fluxPartition` recurses until a side is
+  /// `<= FLUX_OUT` (24) or skewed `<= other/16`, and switches pivot-selection strategy once
+  /// `nmemb > 1024`. The generic suite's single trial at `sizeRange.lowerBound` (16) only
+  /// exercises the smallest `record(into:)` branch — this fuzzes across those boundaries
+  /// explicitly, plus deliberately near-sorted input to exercise `fluxAnalyze`'s ratio early-out.
+  @Test
+  func fluxSortWideSizeRangeAndBoundaryFuzz() {
+    let algorithm = FluxSort()
+
+    let boundarySizes = [0, 1, 2, 3, 24, 25, 31, 32, 33, 48, 49, 1023, 1024, 1025]
+    for size in boundarySizes {
+      for attempt in 0..<20 {
+        let input = (0..<size).map { _ in Int.random(in: 0...(max(size, 1) / 4)) }
+        var engine = RecordingEngine(values: input)
+        algorithm.record(into: &engine)
+        #expect(
+          engine.values == input.sorted(),
+          """
+          FluxSort failed duplicate-heavy fuzz attempt \(attempt) of boundary size \(size): \
+          \(input) -> \(engine.values)
+          """
+        )
+      }
+    }
+
+    for size in stride(from: 4, through: 512, by: 7) {
+      for attempt in 0..<10 {
+        let input = (0..<size).map { _ in Int.random(in: 0...1_000_000) }
+        var engine = RecordingEngine(values: input)
+        algorithm.record(into: &engine)
+        #expect(
+          engine.values == input.sorted(),
+          """
+          FluxSort failed wide-range fuzz attempt \(attempt) of size \(size): \(input) -> \
+          \(engine.values)
+          """
+        )
+      }
+    }
+
+    for size in [0, 1, 2, 24, 32, 64, 128, 256, 512, 1030] {
+      let sorted = Array(0..<size)
+      var engineSorted = RecordingEngine(values: sorted)
+      algorithm.record(into: &engineSorted)
+      #expect(engineSorted.values == sorted, "FluxSort failed already-sorted input of size \(size)")
+
+      let reversed = Array((0..<size).reversed())
+      var engineReversed = RecordingEngine(values: reversed)
+      algorithm.record(into: &engineReversed)
+      #expect(
+        engineReversed.values == reversed.sorted(),
+        "FluxSort failed reverse-sorted input of size \(size)")
+    }
+
+    // fluxAnalyze's "mostly sorted/reversed" early-out triggers when balance stays within 1/6 of
+    // either end — a handful of random swaps on an otherwise-sorted array lands squarely there.
+    for size in [64, 128, 300, 1200] {
+      for attempt in 0..<10 {
+        var nearlySorted = Array(0..<size)
+        let swapCount = max(1, size / 20)
+        for _ in 0..<swapCount {
+          let i = Int.random(in: 0..<size)
+          let j = Int.random(in: 0..<size)
+          nearlySorted.swapAt(i, j)
+        }
+        var engine = RecordingEngine(values: nearlySorted)
+        algorithm.record(into: &engine)
+        #expect(
+          engine.values == nearlySorted.sorted(),
+          """
+          FluxSort failed nearly-sorted fuzz attempt \(attempt) of size \(size): \
+          \(nearlySorted) -> \(engine.values)
+          """
+        )
+      }
+    }
+  }
+
+  /// `MergeInsertionSort`'s doubling pre-pass and halving Jacobsthal-insertion phase both branch
+  /// on `k` relative to `length` at several points (`2*k <= length`, `i+2*k*g-k <= length`) — the
+  /// generic suite's single trial at `sizeRange.lowerBound` (16) only exercises one specific
+  /// combination of those boundaries. This fuzzes across a wide size sweep, explicitly including
+  /// the doubling boundaries (powers of two and their neighbors) most likely to expose an
+  /// off-by-one in the Jacobsthal `g`/`p` sequence.
+  @Test
+  func mergeInsertionSortWideSizeRangeAndBoundaryFuzz() {
+    let algorithm = MergeInsertionSort()
+
+    let boundarySizes = [0, 1, 2, 3, 4, 7, 8, 9, 15, 16, 17, 31, 32, 33, 63, 64, 65, 127, 128, 129]
+    for size in boundarySizes {
+      for attempt in 0..<20 {
+        let input = (0..<size).map { _ in Int.random(in: 0...(max(size, 1) / 4)) }
+        var engine = RecordingEngine(values: input)
+        algorithm.record(into: &engine)
+        #expect(
+          engine.values == input.sorted(),
+          """
+          MergeInsertionSort failed duplicate-heavy fuzz attempt \(attempt) of boundary size \
+          \(size): \(input) -> \(engine.values)
+          """
+        )
+      }
+    }
+
+    for size in stride(from: 4, through: 320, by: 5) {
+      for attempt in 0..<10 {
+        let input = (0..<size).map { _ in Int.random(in: 0...1_000_000) }
+        var engine = RecordingEngine(values: input)
+        algorithm.record(into: &engine)
+        #expect(
+          engine.values == input.sorted(),
+          """
+          MergeInsertionSort failed wide-range fuzz attempt \(attempt) of size \(size): \(input) \
+          -> \(engine.values)
+          """
+        )
+      }
+    }
+
+    for size in [0, 1, 2, 4, 8, 16, 32, 64, 128, 256, 300] {
+      let sorted = Array(0..<size)
+      var engineSorted = RecordingEngine(values: sorted)
+      algorithm.record(into: &engineSorted)
+      #expect(
+        engineSorted.values == sorted, "MergeInsertionSort failed already-sorted input of size \(size)")
+
+      let reversed = Array((0..<size).reversed())
+      var engineReversed = RecordingEngine(values: reversed)
+      algorithm.record(into: &engineReversed)
+      #expect(
+        engineReversed.values == reversed.sorted(),
+        "MergeInsertionSort failed reverse-sorted input of size \(size)")
+    }
+  }
+
+  /// Verifies `MergeInsertionSort`'s `stable: false` claim empirically (discovered by this test
+  /// failing when first written as an `expectStable` claim, not assumed up front): replays the
+  /// recorded tape's `.swap` operations onto a parallel identity array to track each element's
+  /// original index, then checks whether any group of equal final values has a later position
+  /// with a smaller original index than an earlier one. Every mutation here is a `blockSwap` (in
+  /// turn built purely from `engine.swap`), so this technique is valid — unlike `QuadSort`/
+  /// `FluxSort`'s `setValue`-heavy merges (see `[[stability_test_tagging_pitfall]]`).
+  @Test
+  func mergeInsertionSortIsNotStable() {
+    let algorithm = MergeInsertionSort()
+    let size = 64
+
+    var foundReordering = false
+    for _ in 0..<25 {
+      let input = (0..<size).map { _ in Int.random(in: 0...3) }
+      var engine = RecordingEngine(values: input)
+      algorithm.record(into: &engine)
+      let summary = engine.finish()
+
+      var originalIndex = Array(0..<size)
+      for operation in summary.tape {
+        if case .swap(let i, let j) = operation {
+          originalIndex.swapAt(i, j)
+        }
+      }
+
+      var lastOriginalIndexForValue: [Int: Int] = [:]
+      for position in 0..<size {
+        let value = engine.values[position]
+        let tag = originalIndex[position]
+        if let previousTag = lastOriginalIndexForValue[value], previousTag > tag {
+          foundReordering = true
+          break
+        }
+        lastOriginalIndexForValue[value] = tag
+      }
+
+      if foundReordering { break }
+    }
+
+    #expect(
+      foundReordering,
+      "expected at least one tagged-duplicate trial to reorder equal elements, confirming mergeinsertionsort is not stable"
+    )
+  }
+
+  /// `OptimizedDualPivotQuickSort` branches on `length` at a much larger insertion-sort cutoff
+  /// (27, vs. plain `DualPivotQuickSort`'s 4) and gains an "equal elements" pass that only
+  /// activates when the middle partition comes out large (`dist > length - 13`) and the two
+  /// pivots differ. The generic suite's single trial at `sizeRange.lowerBound` (16) never reaches
+  /// either the real partition path (below 27) or exercises the equal-elements pass at all — this
+  /// fuzzes across the insertion-sort boundary and includes heavy-duplicate input specifically to
+  /// exercise that pass.
+  @Test
+  func optimizedDualPivotQuickSortWideSizeRangeAndBoundaryFuzz() {
+    let algorithm = OptimizedDualPivotQuickSort()
+
+    let boundarySizes = [0, 1, 2, 3, 26, 27, 28, 29, 40, 41]
+    for size in boundarySizes {
+      for attempt in 0..<20 {
+        let input = (0..<size).map { _ in Int.random(in: 0...(max(size, 1) / 4)) }
+        var engine = RecordingEngine(values: input)
+        algorithm.record(into: &engine)
+        #expect(
+          engine.values == input.sorted(),
+          """
+          OptimizedDualPivotQuickSort failed duplicate-heavy fuzz attempt \(attempt) of boundary \
+          size \(size): \(input) -> \(engine.values)
+          """
+        )
+      }
+    }
+
+    for size in stride(from: 4, through: 320, by: 5) {
+      for attempt in 0..<10 {
+        let input = (0..<size).map { _ in Int.random(in: 0...1_000_000) }
+        var engine = RecordingEngine(values: input)
+        algorithm.record(into: &engine)
+        #expect(
+          engine.values == input.sorted(),
+          """
+          OptimizedDualPivotQuickSort failed wide-range fuzz attempt \(attempt) of size \(size): \
+          \(input) -> \(engine.values)
+          """
+        )
+      }
+    }
+
+    // Heavy-duplicate input on larger arrays specifically targets the equal-elements pass, which
+    // only ever does anything when many elements tie the chosen pivots.
+    for size in [50, 100, 200, 400] {
+      for attempt in 0..<20 {
+        let input = (0..<size).map { _ in Int.random(in: 0...4) }
+        var engine = RecordingEngine(values: input)
+        algorithm.record(into: &engine)
+        #expect(
+          engine.values == input.sorted(),
+          """
+          OptimizedDualPivotQuickSort failed heavy-duplicate fuzz attempt \(attempt) of size \
+          \(size): \(input) -> \(engine.values)
+          """
+        )
+      }
+    }
+
+    for size in [0, 1, 2, 27, 32, 64, 128, 256, 300] {
+      let sorted = Array(0..<size)
+      var engineSorted = RecordingEngine(values: sorted)
+      algorithm.record(into: &engineSorted)
+      #expect(
+        engineSorted.values == sorted,
+        "OptimizedDualPivotQuickSort failed already-sorted input of size \(size)")
+
+      let reversed = Array((0..<size).reversed())
+      var engineReversed = RecordingEngine(values: reversed)
+      algorithm.record(into: &engineReversed)
+      #expect(
+        engineReversed.values == reversed.sorted(),
+        "OptimizedDualPivotQuickSort failed reverse-sorted input of size \(size)")
+    }
+  }
+
+  /// `OptimizedBottomUpMergeSort` branches on `length < 16` directly into a single binary-
+  /// insertion pass with no merge phase at all — the generic suite's single trial at
+  /// `sizeRange.lowerBound` (16) never reaches that path. This is also exactly the boundary
+  /// where ArrayV's own source has a real bug this port deliberately does not reproduce
+  /// (`customBinaryInsert(a, 0, 16, ...)` — a hardcoded `16` instead of `n`, which would read/
+  /// write out of bounds for any array shorter than 16 elements): fuzzing sizes 0-15 here is
+  /// exactly what would have caught that bug if the fix had been missed.
+  @Test
+  func optimizedBottomUpMergeSortWideSizeRangeAndBoundaryFuzz() {
+    let algorithm = OptimizedBottomUpMergeSort()
+
+    let boundarySizes = [0, 1, 2, 3, 15, 16, 17, 31, 32, 33]
+    for size in boundarySizes {
+      for attempt in 0..<20 {
+        let input = (0..<size).map { _ in Int.random(in: 0...(max(size, 1) / 4)) }
+        var engine = RecordingEngine(values: input)
+        algorithm.record(into: &engine)
+        #expect(
+          engine.values == input.sorted(),
+          """
+          OptimizedBottomUpMergeSort failed duplicate-heavy fuzz attempt \(attempt) of boundary \
+          size \(size): \(input) -> \(engine.values)
+          """
+        )
+      }
+    }
+
+    for size in stride(from: 4, through: 320, by: 5) {
+      for attempt in 0..<10 {
+        let input = (0..<size).map { _ in Int.random(in: 0...1_000_000) }
+        var engine = RecordingEngine(values: input)
+        algorithm.record(into: &engine)
+        #expect(
+          engine.values == input.sorted(),
+          """
+          OptimizedBottomUpMergeSort failed wide-range fuzz attempt \(attempt) of size \(size): \
+          \(input) -> \(engine.values)
+          """
+        )
+      }
+    }
+
+    for size in [0, 1, 2, 15, 16, 32, 64, 128, 256, 300] {
+      let sorted = Array(0..<size)
+      var engineSorted = RecordingEngine(values: sorted)
+      algorithm.record(into: &engineSorted)
+      #expect(
+        engineSorted.values == sorted,
+        "OptimizedBottomUpMergeSort failed already-sorted input of size \(size)")
+
+      let reversed = Array((0..<size).reversed())
+      var engineReversed = RecordingEngine(values: reversed)
+      algorithm.record(into: &engineReversed)
+      #expect(
+        engineReversed.values == reversed.sorted(),
+        "OptimizedBottomUpMergeSort failed reverse-sorted input of size \(size)")
+    }
+  }
+
+  /// `LaziestSort` branches on `n <= 16` directly into a single binary-insertion pass with no
+  /// block/merge structure at all, and its block size (`max(16, sqrt(n))`) only grows past the
+  /// fixed value of 16 once `n > 256` — the generic suite's single trial at `sizeRange.lowerBound`
+  /// (16) reaches neither the block-merge path in general nor the `sqrt(n) > 16` block-size
+  /// transition specifically. This fuzzes both boundaries explicitly.
+  @Test
+  func laziestSortWideSizeRangeAndBoundaryFuzz() {
+    let algorithm = LaziestSort()
+
+    // Regression case: the sibling content-bundle reference implementation (hand-derived from a
+    // natural-language description of this algorithm, not a literal ArrayV translation like this
+    // Swift port) initially got its merge loop's boundary wrong — guarding on the *original*
+    // fixed midpoint instead of the live, shrinking right-run pointer — and this exact array
+    // caught it. This port's own `inPlaceMerge` was translated directly from ArrayV's real
+    // `i < j && j < b` condition, so it was never actually at risk, but the case is cheap
+    // insurance against ever regressing to that same mistake.
+    let knownRegressionInput = [1, 1, 1, 1, 2, 3, 4, 3, 0, 2, 4, 0, 2, 5, 3, 0, 4, 2]
+    var regressionEngine = RecordingEngine(values: knownRegressionInput)
+    algorithm.record(into: &regressionEngine)
+    #expect(
+      regressionEngine.values == knownRegressionInput.sorted(),
+      "LaziestSort failed the known merge-boundary regression case: \(knownRegressionInput) -> \(regressionEngine.values)"
+    )
+
+    let boundarySizes = [0, 1, 2, 15, 16, 17, 18, 32, 33, 48, 49, 255, 256, 257, 288, 289, 290, 320]
+    for size in boundarySizes {
+      for attempt in 0..<20 {
+        let input = (0..<size).map { _ in Int.random(in: 0...(max(size, 1) / 4)) }
+        var engine = RecordingEngine(values: input)
+        algorithm.record(into: &engine)
+        #expect(
+          engine.values == input.sorted(),
+          """
+          LaziestSort failed duplicate-heavy fuzz attempt \(attempt) of boundary size \(size): \
+          \(input) -> \(engine.values)
+          """
+        )
+      }
+    }
+
+    for size in stride(from: 4, through: 400, by: 7) {
+      for attempt in 0..<10 {
+        let input = (0..<size).map { _ in Int.random(in: 0...1_000_000) }
+        var engine = RecordingEngine(values: input)
+        algorithm.record(into: &engine)
+        #expect(
+          engine.values == input.sorted(),
+          """
+          LaziestSort failed wide-range fuzz attempt \(attempt) of size \(size): \(input) -> \
+          \(engine.values)
+          """
+        )
+      }
+    }
+
+    for size in [0, 1, 2, 16, 17, 32, 64, 128, 256, 289, 320] {
+      let sorted = Array(0..<size)
+      var engineSorted = RecordingEngine(values: sorted)
+      algorithm.record(into: &engineSorted)
+      #expect(engineSorted.values == sorted, "LaziestSort failed already-sorted input of size \(size)")
+
+      let reversed = Array((0..<size).reversed())
+      var engineReversed = RecordingEngine(values: reversed)
+      algorithm.record(into: &engineReversed)
+      #expect(
+        engineReversed.values == reversed.sorted(),
+        "LaziestSort failed reverse-sorted input of size \(size)")
+    }
+  }
+
+  /// `StacklessDualPivotQuickSort`'s `partition` only runs once a segment's length exceeds 24 —
+  /// the generic suite's single trial at `sizeRange.lowerBound` (16) never reaches it, exercising
+  /// only the max-extraction pass and the `binaryInsert` base case. This fuzzes across that
+  /// boundary directly, plus heavy-duplicate input to exercise the `med`-flag duplicate-skip loop
+  /// (`leftBinSearch` + the `array[a-1] == array[a]` absorption while) that only does anything
+  /// once a pivot value repeats.
+  @Test
+  func stacklessDualPivotQuickSortWideSizeRangeAndBoundaryFuzz() {
+    let algorithm = StacklessDualPivotQuickSort()
+
+    let boundarySizes = [0, 1, 2, 3, 22, 23, 24, 25, 26, 48, 49]
+    for size in boundarySizes {
+      for attempt in 0..<20 {
+        let input = (0..<size).map { _ in Int.random(in: 0...(max(size, 1) / 4)) }
+        var engine = RecordingEngine(values: input)
+        algorithm.record(into: &engine)
+        #expect(
+          engine.values == input.sorted(),
+          """
+          StacklessDualPivotQuickSort failed duplicate-heavy fuzz attempt \(attempt) of boundary \
+          size \(size): \(input) -> \(engine.values)
+          """
+        )
+      }
+    }
+
+    for size in stride(from: 4, through: 320, by: 5) {
+      for attempt in 0..<10 {
+        let input = (0..<size).map { _ in Int.random(in: 0...1_000_000) }
+        var engine = RecordingEngine(values: input)
+        algorithm.record(into: &engine)
+        #expect(
+          engine.values == input.sorted(),
+          """
+          StacklessDualPivotQuickSort failed wide-range fuzz attempt \(attempt) of size \(size): \
+          \(input) -> \(engine.values)
+          """
+        )
+      }
+    }
+
+    // Heavy-duplicate input, including an all-equal extreme, specifically targets the
+    // max-extraction pass and the `med`-flag duplicate-absorption loop.
+    for size in [50, 100, 200, 256] {
+      for attempt in 0..<20 {
+        let input = (0..<size).map { _ in Int.random(in: 0...4) }
+        var engine = RecordingEngine(values: input)
+        algorithm.record(into: &engine)
+        #expect(
+          engine.values == input.sorted(),
+          """
+          StacklessDualPivotQuickSort failed heavy-duplicate fuzz attempt \(attempt) of size \
+          \(size): \(input) -> \(engine.values)
+          """
+        )
+      }
+
+      let allEqual = Array(repeating: 7, count: size)
+      var allEqualEngine = RecordingEngine(values: allEqual)
+      algorithm.record(into: &allEqualEngine)
+      #expect(
+        allEqualEngine.values == allEqual,
+        "StacklessDualPivotQuickSort failed all-equal input of size \(size)")
+    }
+
+    for size in [0, 1, 2, 24, 25, 32, 64, 128, 256, 300] {
+      let sorted = Array(0..<size)
+      var engineSorted = RecordingEngine(values: sorted)
+      algorithm.record(into: &engineSorted)
+      #expect(
+        engineSorted.values == sorted,
+        "StacklessDualPivotQuickSort failed already-sorted input of size \(size)")
+
+      let reversed = Array((0..<size).reversed())
+      var engineReversed = RecordingEngine(values: reversed)
+      algorithm.record(into: &engineReversed)
+      #expect(
+        engineReversed.values == reversed.sorted(),
+        "StacklessDualPivotQuickSort failed reverse-sorted input of size \(size)")
+    }
+  }
+
+  /// `StacklessHybridQuickSort`'s `partition` only runs once a segment's length exceeds 16 —
+  /// the generic suite's single trial at `sizeRange.lowerBound` (16) never reaches it, exercising
+  /// only the max-extraction pass and the `binaryInsert` base case. This fuzzes across that
+  /// boundary directly, plus heavy-duplicate input to exercise the `med`-flag duplicate-skip loop.
+  @Test
+  func stacklessHybridQuickSortWideSizeRangeAndBoundaryFuzz() {
+    let algorithm = StacklessHybridQuickSort()
+
+    let boundarySizes = [0, 1, 2, 3, 14, 15, 16, 17, 18, 32, 33]
+    for size in boundarySizes {
+      for attempt in 0..<20 {
+        let input = (0..<size).map { _ in Int.random(in: 0...(max(size, 1) / 4)) }
+        var engine = RecordingEngine(values: input)
+        algorithm.record(into: &engine)
+        #expect(
+          engine.values == input.sorted(),
+          """
+          StacklessHybridQuickSort failed duplicate-heavy fuzz attempt \(attempt) of boundary \
+          size \(size): \(input) -> \(engine.values)
+          """
+        )
+      }
+    }
+
+    for size in stride(from: 4, through: 320, by: 5) {
+      for attempt in 0..<10 {
+        let input = (0..<size).map { _ in Int.random(in: 0...1_000_000) }
+        var engine = RecordingEngine(values: input)
+        algorithm.record(into: &engine)
+        #expect(
+          engine.values == input.sorted(),
+          """
+          StacklessHybridQuickSort failed wide-range fuzz attempt \(attempt) of size \(size): \
+          \(input) -> \(engine.values)
+          """
+        )
+      }
+    }
+
+    // Heavy-duplicate input, including an all-equal extreme, specifically targets the
+    // max-extraction pass and the `med`-flag duplicate-absorption loop.
+    for size in [50, 100, 200, 256] {
+      for attempt in 0..<20 {
+        let input = (0..<size).map { _ in Int.random(in: 0...4) }
+        var engine = RecordingEngine(values: input)
+        algorithm.record(into: &engine)
+        #expect(
+          engine.values == input.sorted(),
+          """
+          StacklessHybridQuickSort failed heavy-duplicate fuzz attempt \(attempt) of size \
+          \(size): \(input) -> \(engine.values)
+          """
+        )
+      }
+
+      let allEqual = Array(repeating: 7, count: size)
+      var allEqualEngine = RecordingEngine(values: allEqual)
+      algorithm.record(into: &allEqualEngine)
+      #expect(
+        allEqualEngine.values == allEqual,
+        "StacklessHybridQuickSort failed all-equal input of size \(size)")
+    }
+
+    for size in [0, 1, 2, 16, 17, 32, 64, 128, 256, 300] {
+      let sorted = Array(0..<size)
+      var engineSorted = RecordingEngine(values: sorted)
+      algorithm.record(into: &engineSorted)
+      #expect(
+        engineSorted.values == sorted,
+        "StacklessHybridQuickSort failed already-sorted input of size \(size)")
+
+      let reversed = Array((0..<size).reversed())
+      var engineReversed = RecordingEngine(values: reversed)
+      algorithm.record(into: &engineReversed)
+      #expect(
+        engineReversed.values == reversed.sorted(),
+        "StacklessHybridQuickSort failed reverse-sorted input of size \(size)")
+    }
+  }
+
+  /// `DropMergeSort` is an adaptive sort whose whole design targets nearly-sorted input — the
+  /// generic suite's uniform-random/sorted/reverse-sorted/duplicate-heavy trials at
+  /// `sizeRange.lowerBound` don't reliably exercise its "quick undo," 8-drops-in-a-row backtrack,
+  /// or early-out-to-full-PDQ paths. This fuzzes across a spread of disorder fractions
+  /// specifically, plus a known regression input that hits the backtrack branch, plus
+  /// reverse-sorted input (which reliably triggers the early-out fallback at every size tried).
+  @Test
+  func dropMergeSortAdaptiveDisorderFuzz() {
+    let algorithm = DropMergeSort()
+
+    // Regression case: found by fuzzing the validated reference implementation for an input
+    // that specifically exercises the `numDroppedInARow == recency` backtrack branch (undoing
+    // a run of drops plus however many already-accepted elements exceed their maximum).
+    let knownBacktrackInput = [0, 1, 8, 3, 5, 7, 19, 4, 2, 9, 10, 11, 16, 13, 14, 15, 12, 17, 18, 6]
+    var backtrackEngine = RecordingEngine(values: knownBacktrackInput)
+    algorithm.record(into: &backtrackEngine)
+    #expect(
+      backtrackEngine.values == knownBacktrackInput.sorted(),
+      "DropMergeSort failed the known backtrack-triggering regression case: \(knownBacktrackInput)"
+    )
+
+    // A spread of disorder fractions (fraction of random pairwise swaps applied to an
+    // originally-sorted array) from "barely touched" to "fully shuffled," specifically
+    // targeting this algorithm's adaptive design rather than uniform-random input.
+    for size in [16, 20, 30, 40, 64, 100, 150, 256] {
+      for disorderTenths in 0...10 {
+        let disorder = Double(disorderTenths) / 10
+        for attempt in 0..<8 {
+          var input = Array(0..<size)
+          let swapCount = Int(Double(size) * disorder)
+          for _ in 0..<swapCount {
+            let i = Int.random(in: 0..<max(size, 1))
+            let j = Int.random(in: 0..<max(size, 1))
+            input.swapAt(i, j)
+          }
+          var engine = RecordingEngine(values: input)
+          algorithm.record(into: &engine)
+          #expect(
+            engine.values == input.sorted(),
+            """
+            DropMergeSort failed disorder-fuzz attempt \(attempt) at size \(size), disorder \
+            \(disorder): \(input) -> \(engine.values)
+            """
+          )
+        }
+      }
+    }
+
+    // Heavy-duplicate near-sorted input, exercising the `>=`-based "in order" acceptance test
+    // against ties.
+    for size in [30, 64, 128, 256] {
+      for attempt in 0..<20 {
+        var input = Array(0..<size).map { $0 % max(size / 8, 1) }
+        for _ in 0..<(size / 3) {
+          let i = Int.random(in: 0..<size)
+          let j = Int.random(in: 0..<size)
+          input.swapAt(i, j)
+        }
+        var engine = RecordingEngine(values: input)
+        algorithm.record(into: &engine)
+        #expect(
+          engine.values == input.sorted(),
+          """
+          DropMergeSort failed heavy-duplicate near-sorted fuzz attempt \(attempt) of size \
+          \(size): \(input) -> \(engine.values)
+          """
+        )
+      }
+
+      let allEqual = Array(repeating: 7, count: size)
+      var allEqualEngine = RecordingEngine(values: allEqual)
+      algorithm.record(into: &allEqualEngine)
+      #expect(
+        allEqualEngine.values == allEqual,
+        "DropMergeSort failed all-equal input of size \(size)")
+    }
+
+    for size in [0, 1, 2, 15, 16, 32, 64, 128, 256, 300] {
+      let sorted = Array(0..<size)
+      var engineSorted = RecordingEngine(values: sorted)
+      algorithm.record(into: &engineSorted)
+      #expect(
+        engineSorted.values == sorted,
+        "DropMergeSort failed already-sorted input of size \(size)")
+
+      // Reverse-sorted reliably triggers the early-out-to-full-PDQ fallback at every size
+      // tried during development — the maximally adversarial case for an adaptive sort.
+      let reversed = Array((0..<size).reversed())
+      var engineReversed = RecordingEngine(values: reversed)
+      algorithm.record(into: &engineReversed)
+      #expect(
+        engineReversed.values == reversed.sorted(),
+        "DropMergeSort failed reverse-sorted (early-out) input of size \(size)")
+    }
+  }
+
+  /// Confirms `ImprovedBlockSelectionSort`'s `stable: false` claim empirically. Its
+  /// `inPlaceMerge`/`inPlaceMergeBW` comparisons are all strict (`>`, never `>=`), which looks
+  /// stable in isolation, but `blockSelect` runs first and reorders whole `bLen`-sized blocks as
+  /// atomic units by comparing only representative elements — two blocks tying on their
+  /// representative can still swap wholesale, taking along elements that share a value with ones
+  /// in a different, not-yet-repositioned block, before the strict merge ever runs. All real
+  /// movement in this algorithm goes through `multiSwap`/`rotate`, both built from `engine.swap`
+  /// — no `setValue` anywhere — so swap-tape-shadow replay validly reconstructs each final
+  /// position's original index.
+  @Test
+  func improvedBlockSelectionSortTiedElementsCanLoseTheirOriginalRelativeOrder() {
+    let algorithm = ImprovedBlockSelectionSort()
+    let size = 64
+    var sawReordering = false
+
+    for _ in 0..<50 {
+      let input = (0..<size).map { _ in Int.random(in: 0...3) }
+      var engine = RecordingEngine(values: input)
+      algorithm.record(into: &engine)
+
+      var shadow = Array(0..<size)
+      for operation in engine.finish().tape {
+        if case .swap(let i, let j) = operation {
+          shadow.swapAt(i, j)
+        }
+      }
+
+      var originalIndicesByValueInFinalOrder: [Int: [Int]] = [:]
+      for finalPosition in 0..<size {
+        let originalIndex = shadow[finalPosition]
+        let value = input[originalIndex]
+        originalIndicesByValueInFinalOrder[value, default: []].append(originalIndex)
+      }
+
+      if originalIndicesByValueInFinalOrder.values.contains(where: { $0 != $0.sorted() }) {
+        sawReordering = true
+        break
+      }
+    }
+
+    #expect(
+      sawReordering,
+      """
+      expected ImprovedBlockSelectionSort's block-level reordering in blockSelect to reorder at \
+      least one run of equal-valued elements relative to their original input order across \
+      randomized duplicate-heavy trials, confirming it is not a stable sort
+      """
+    )
+  }
+
+  /// Confirms `OptimizedWeaveMergeSort`'s `stable: true` claim empirically. This algorithm moves
+  /// data through both `engine.swap` (the `rotate`/`bitReversal` shuffle) and `engine.setValue`
+  /// (`insertTo`'s shift-and-place cleanup), so swap-tape-shadow replay can't validly reconstruct
+  /// original indices here — a `setValue` op only records the destination index and the raw value
+  /// written, not which original index that value came from (see `ClassicTreeSort`'s equivalent
+  /// gap above). Instead, this reimplements the algorithm directly over `[Tagged]` (comparing
+  /// only `.value`, moving whole `Tagged` pairs on every swap/shift), sidestepping the engine's
+  /// tape entirely — the same technique `classicTreeSortTiedElementsKeepTheirOriginalRelativeOrder`
+  /// uses for the same reason.
+  @Test
+  func optimizedWeaveMergeSortIsStable() {
+    struct Tagged {
+      let value: Int
+      let originalIndex: Int
+    }
+
+    func insertTo(_ array: inout [Tagged], _ a: Int, _ b: Int) {
+      let temp = array[a]
+      var a = a
+      while a > b {
+        a -= 1
+        array[a + 1] = array[a]
+      }
+      array[b] = temp
+    }
+
+    func multiSwap(_ array: inout [Tagged], _ a: Int, _ b: Int, _ len: Int) {
+      for i in 0..<len {
+        array.swapAt(a + i, b + i)
+      }
+    }
+
+    func rotate(_ array: inout [Tagged], _ a: Int, _ m: Int, _ b: Int) {
+      var a = a
+      var m = m
+      var b = b
+      var l = m - a
+      var r = b - m
+      while l > 0 && r > 0 {
+        if r < l {
+          multiSwap(&array, m - r, m, r)
+          b -= r
+          m -= r
+          l -= r
+        } else {
+          multiSwap(&array, a, m, l)
+          a += l
+          m += l
+          r -= l
+        }
+      }
+    }
+
+    func bitReversal(_ array: inout [Tagged], _ a: Int, _ b: Int) {
+      let len = b - a
+      var m = 0
+      let d1 = len >> 1
+      let d2 = d1 + (d1 >> 1)
+      var i = 1
+      while i < len - 1 {
+        var j = d1
+        var k = i
+        var nn = d2
+        while k & 1 == 0 {
+          j -= nn
+          k >>= 1
+          nn >>= 1
+        }
+        m += j
+        if m > i {
+          array.swapAt(a + i, a + m)
+        }
+        i += 1
+      }
+    }
+
+    func weaveInsert(_ array: inout [Tagged], _ a: Int, _ b: Int, _ rightInit: Bool) {
+      var right = rightInit
+      var i = a
+      var j = a + 1
+      while j < b {
+        if right {
+          while i < j && array[i].value <= array[j].value { i += 1 }
+        } else {
+          while i < j && array[i].value < array[j].value { i += 1 }
+        }
+        if i == j {
+          right.toggle()
+          j += 1
+        } else {
+          insertTo(&array, j, i)
+          i += 1
+          j += 2
+        }
+      }
+    }
+
+    func weaveMerge(_ array: inout [Tagged], _ a: Int, _ mInit: Int, _ b: Int) {
+      guard b - a >= 2 else { return }
+      var a1 = a
+      var b1 = b
+      var right = true
+      if (b - a) % 2 == 1 {
+        if mInit - a < b - mInit {
+          a1 -= 1
+          right = false
+        } else {
+          b1 += 1
+        }
+      }
+      var e = b1
+      while e - a1 > 2 {
+        var m = (a1 + e) / 2
+        var p = 1
+        while p * 2 <= m - a1 { p *= 2 }
+        rotate(&array, m - p, m, e - p)
+        m = e - p
+        let f = m - p
+        bitReversal(&array, f, m)
+        bitReversal(&array, m, e)
+        bitReversal(&array, f, e)
+        e = f
+      }
+      weaveInsert(&array, a, b, right)
+    }
+
+    func optimizedWeaveMergeSortTagged(_ array: inout [Tagged]) {
+      let n = array.count
+      guard n > 1 else { return }
+      var d = 1
+      while d < n { d <<= 1 }
+      while d > 1 {
+        var i = 0
+        var dec = 0
+        while i < n {
+          var j = i
+          dec += n
+          while dec >= d {
+            dec -= d
+            j += 1
+          }
+          var k = j
+          dec += n
+          while dec >= d {
+            dec -= d
+            k += 1
+          }
+          weaveMerge(&array, i, j, k)
+          i = k
+        }
+        d /= 2
+      }
+    }
+
+    for size in [8, 15, 16, 17, 33, 63, 64, 65, 100, 127, 200] {
+      for _ in 0..<50 {
+        let values = (0..<size).map { _ in Int.random(in: 0...3) }
+        var tagged = values.enumerated().map { Tagged(value: $0.element, originalIndex: $0.offset) }
+        optimizedWeaveMergeSortTagged(&tagged)
+
+        #expect(tagged.map(\.value) == values.sorted())
+
+        var byValue: [Int: [Int]] = [:]
+        for t in tagged {
+          byValue[t.value, default: []].append(t.originalIndex)
+        }
+        #expect(
+          byValue.values.allSatisfy { $0 == $0.sorted() },
+          "expected optimizedweavemergesort to preserve original relative order among tied elements at size \(size)"
+        )
+      }
+    }
+  }
+
+  /// Boundary/wide-size-range fuzz for `OptimizedWeaveMergeSort`, targeting `weaveMerge`'s
+  /// odd-length sentinel-borrow branch (`a1 = a - 1` when the left run is shorter) — the one place
+  /// this port explicitly diverges from a literal translation of ArrayV's `Math.log`-based `d`
+  /// calculation. Every size from 0 through 40 hits both parities and a wide spread of run-length
+  /// ratios via `runSort`'s Bresenham-style pass splitting; sizes near several power-of-two
+  /// boundaries add larger-scale coverage.
+  @Test
+  func optimizedWeaveMergeSortWideSizeRangeAndBoundaryFuzz() {
+    let algorithm = OptimizedWeaveMergeSort()
+
+    for size in 0...40 {
+      for attempt in 0..<10 {
+        let input = (0..<size).map { _ in Int.random(in: 0...(max(size, 1) / 4)) }
+        var engine = RecordingEngine(values: input)
+        algorithm.record(into: &engine)
+        #expect(
+          engine.values == input.sorted(),
+          """
+          OptimizedWeaveMergeSort failed duplicate-heavy fuzz attempt \(attempt) at size \(size): \
+          \(input) -> \(engine.values)
+          """
+        )
+      }
+    }
+
+    for size in [63, 64, 65, 127, 128, 129, 255, 256, 257] {
+      for attempt in 0..<10 {
+        let input = (0..<size).map { _ in Int.random(in: 0...1_000_000) }
+        var engine = RecordingEngine(values: input)
+        algorithm.record(into: &engine)
+        #expect(
+          engine.values == input.sorted(),
+          """
+          OptimizedWeaveMergeSort failed wide-range fuzz attempt \(attempt) at boundary size \
+          \(size): \(input) -> \(engine.values)
+          """
+        )
+      }
+    }
+  }
+
+  /// Determines `YujisBufferedMergeSort2`'s stability empirically. This algorithm moves data
+  /// through both `engine.swap` (everywhere except `insertTo`) and `engine.setValue` (`insertTo`'s
+  /// shift-and-place, used by `binaryInsertion`), so swap-tape-shadow replay can't validly
+  /// reconstruct original indices here -- same situation as `OptimizedWeaveMergeSort`. Reimplements
+  /// the algorithm directly over `[Tagged]` (comparing only `.value`, moving whole `Tagged` pairs),
+  /// sidestepping the engine's tape entirely.
+  @Test
+  func yujisBufferedMergeSort2TiedElementsCanLoseTheirOriginalRelativeOrder() {
+    struct Tagged {
+      let value: Int
+      let originalIndex: Int
+    }
+
+    func ceilLog(_ value: Int) -> Int {
+      var i = 0
+      while (1 << i) < value {
+        i += 1
+      }
+      return i
+    }
+
+    func multiSwap(_ array: inout [Tagged], _ a: Int, _ b: Int, _ len: Int) {
+      for i in 0..<len {
+        array.swapAt(a + i, b + i)
+      }
+    }
+
+    func insertTo(_ array: inout [Tagged], _ a: Int, _ b: Int) {
+      let temp = array[a]
+      var a = a
+      while a > b {
+        a -= 1
+        array[a + 1] = array[a]
+      }
+      array[b] = temp
+    }
+
+    func binarySearch(_ array: [Tagged], _ start: Int, _ end: Int, _ value: Int, left: Bool)
+      -> Int
+    {
+      var a = start
+      var b = end
+      while a < b {
+        let m = a + (b - a) / 2
+        let comp = left ? value <= array[m].value : value < array[m].value
+        if comp {
+          b = m
+        } else {
+          a = m + 1
+        }
+      }
+      return a
+    }
+
+    func binaryInsertion(_ array: inout [Tagged], _ a: Int, _ b: Int) {
+      var i = a + 1
+      while i < b {
+        let value = array[i].value
+        insertTo(&array, i, binarySearch(array, a, i, value, left: false))
+        i += 1
+      }
+    }
+
+    func merge(_ array: inout [Tagged], _ a: Int, _ m: Int, _ b: Int, _ pIn: Int) -> Int {
+      var i = a
+      var j = m
+      var p = pIn
+      while i < m && j < b {
+        if array[i].value <= array[j].value {
+          array.swapAt(p, i)
+          p += 1
+          i += 1
+        } else {
+          array.swapAt(p, j)
+          p += 1
+          j += 1
+        }
+      }
+      var leftover = 0
+      while i < m {
+        array.swapAt(p, i)
+        p += 1
+        i += 1
+      }
+      while j < b {
+        array.swapAt(p, j)
+        p += 1
+        j += 1
+        leftover += 1
+      }
+      return leftover
+    }
+
+    func mergeWithBufStatic(
+      _ array: inout [Tagged], _ a: Int, _ m: Int, _ b: Int, _ p: Int, _ useBinarySearch: Bool
+    ) {
+      var i = 0
+      var j = m
+      var k = a
+
+      if useBinarySearch {
+        while i < m - a && j < b {
+          if array[j].value < array[p + i].value {
+            let value = array[p + i].value
+            let q = binarySearch(array, j, b, value, left: true)
+            while j < q {
+              array.swapAt(k, j)
+              k += 1
+              j += 1
+            }
+          }
+          array.swapAt(k, p + i)
+          k += 1
+          i += 1
+        }
+        while i < m - a {
+          array.swapAt(k, p + i)
+          k += 1
+          i += 1
+        }
+      } else {
+        while i < m - a && j < b {
+          if array[p + i].value <= array[j].value {
+            array.swapAt(k, p + i)
+            k += 1
+            i += 1
+          } else {
+            array.swapAt(k, j)
+            k += 1
+            j += 1
+          }
+        }
+        while i < m - a {
+          array.swapAt(k, p + i)
+          k += 1
+          i += 1
+        }
+      }
+    }
+
+    func mergeSort(_ array: inout [Tagged], _ a: Int, _ p: Int, _ length: Int) {
+      var j = 16
+      let ceilLogValue = ceilLog(length)
+
+      var pos: Int
+      if length > 16 && (ceilLogValue & 1) == 1 {
+        pos = p
+      } else {
+        pos = a
+      }
+
+      var i = pos
+      while i + 16 <= pos + length {
+        binaryInsertion(&array, i, i + 16)
+        i += 16
+      }
+      binaryInsertion(&array, i, pos + length)
+
+      var next = pos
+      while j < length {
+        pos = next
+        next ^= a ^ p
+        var posNext = next
+
+        i = pos
+        while i + 2 * j <= pos + length {
+          _ = merge(&array, i, i + j, i + 2 * j, posNext)
+          i += 2 * j
+          posNext += 2 * j
+        }
+        if i + j < pos + length {
+          _ = merge(&array, i, i + j, pos + length, posNext)
+        } else {
+          while i < pos + length {
+            array.swapAt(i, posNext)
+            i += 1
+            posNext += 1
+          }
+        }
+        j *= 2
+      }
+    }
+
+    func bufferedMerge(_ array: inout [Tagged], _ a: Int, _ b: Int) {
+      if b - a <= 16 {
+        binaryInsertion(&array, a, b)
+        return
+      }
+
+      var m = (a + b + 1) / 2
+      mergeSort(&array, m, 2 * m - b, b - m)
+
+      var n = (a + m + 1) / 2
+      let limit = (b - a) / 16
+      while m - a > limit {
+        mergeSort(&array, 2 * n - m, n, m - n)
+        mergeWithBufStatic(&array, n, m, b, 2 * n - m, (b - m) / (m - n) >= ceilLog(n - a))
+        m = n
+        n = (a + m + 1) / 2
+      }
+
+      bufferedMerge(&array, a, m)
+      multiSwap(&array, a, b - (m - a), m - a)
+      let s = merge(&array, m, b - (m - a), b, a)
+      bufferedMerge(&array, b - (m - a) - s, b)
+    }
+
+    var sawReordering = false
+    for size in [8, 15, 16, 17, 33, 63, 64, 65, 100, 127, 200] {
+      for _ in 0..<50 {
+        let values = (0..<size).map { _ in Int.random(in: 0...3) }
+        var tagged = values.enumerated().map { Tagged(value: $0.element, originalIndex: $0.offset) }
+        bufferedMerge(&tagged, 0, size)
+
+        #expect(tagged.map(\.value) == values.sorted())
+
+        var byValue: [Int: [Int]] = [:]
+        for t in tagged {
+          byValue[t.value, default: []].append(t.originalIndex)
+        }
+        if byValue.values.contains(where: { $0 != $0.sorted() }) {
+          sawReordering = true
+        }
+      }
+    }
+
+    #expect(
+      sawReordering,
+      """
+      expected YujisBufferedMergeSort2's buffered merge to reorder at least one run of \
+      equal-valued elements relative to their original input order across randomized \
+      duplicate-heavy trials, confirming it is not a stable sort
+      """
+    )
+  }
+
+  /// Boundary and recursion-depth fuzz for `YujisBufferedMergeSort2`. `bufferedMerge` recurses on
+  /// both halves of its range every level it doesn't hit the `b - a <= 16` base case, so this
+  /// exercises a wide spread of sizes -- including several hundred elements, well past this
+  /// algorithm's own `sizeRange` -- to catch a stack-overflow or off-by-one that only a deeper
+  /// recursion would surface (the failure mode this codebase has hit before in similarly-shaped
+  /// merge/tree sorts).
+  @Test
+  func yujisBufferedMergeSort2WideSizeRangeAndBoundaryFuzz() {
+    let algorithm = YujisBufferedMergeSort2()
+
+    let boundarySizes = [0, 1, 2, 15, 16, 17, 32, 33, 255, 256, 257]
+    for size in boundarySizes {
+      for attempt in 0..<10 {
+        let input = (0..<size).map { _ in Int.random(in: 0...(max(size, 1) / 4)) }
+        var engine = RecordingEngine(values: input)
+        algorithm.record(into: &engine)
+        #expect(
+          engine.values == input.sorted(),
+          """
+          YujisBufferedMergeSort2 failed duplicate-heavy fuzz attempt \(attempt) at boundary size \
+          \(size): \(input) -> \(engine.values)
+          """
+        )
+      }
+    }
+
+    for size in stride(from: 4, through: 2000, by: 47) {
+      let input = (0..<size).map { _ in Int.random(in: 0...1_000_000) }
+      var engine = RecordingEngine(values: input)
+      algorithm.record(into: &engine)
+      #expect(
+        engine.values == input.sorted(),
+        "YujisBufferedMergeSort2 failed wide-range fuzz at size \(size): \(input) -> \(engine.values)"
+      )
+    }
+
+    for size in [0, 1, 2, 16, 17, 256, 257, 500, 1000] {
+      let sorted = Array(0..<size)
+      var engineSorted = RecordingEngine(values: sorted)
+      algorithm.record(into: &engineSorted)
+      #expect(
+        engineSorted.values == sorted,
+        "YujisBufferedMergeSort2 failed already-sorted input of size \(size)")
+
+      let reversed = Array((0..<size).reversed())
+      var engineReversed = RecordingEngine(values: reversed)
+      algorithm.record(into: &engineReversed)
+      #expect(
+        engineReversed.values == reversed.sorted(),
+        "YujisBufferedMergeSort2 failed reverse-sorted input of size \(size)")
+    }
   }
 
 }

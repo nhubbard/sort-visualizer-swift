@@ -1,3 +1,15 @@
+fun sort(array: Array<Int>) {
+  val end = array.size
+  if (end <= 1) {
+    return
+  }
+  val paddedLength = nextPowerOfTwo(end)
+  var swaps: Int
+  do {
+    swaps = circleSortRoutine(array, 0, paddedLength - 1, end)
+  } while (swaps != 0)
+}
+
 fun nextPowerOfTwo(n: Int): Int {
   var k = 1
   while (k < n) {
@@ -29,18 +41,6 @@ fun circleSortRoutine(array: Array<Int>, lo: Int, hi: Int, end: Int): Int {
     swaps += circleSortRoutine(array, low + mid + 1, high, end)
   }
   return swaps
-}
-
-fun sort(array: Array<Int>) {
-  val end = array.size
-  if (end == 0) {
-    return
-  }
-  val paddedLength = nextPowerOfTwo(end)
-  var swaps: Int
-  do {
-    swaps = circleSortRoutine(array, 0, paddedLength - 1, end)
-  } while (swaps != 0)
 }
 
 fun main() {

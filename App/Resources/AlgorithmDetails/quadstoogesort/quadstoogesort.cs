@@ -2,6 +2,11 @@ using System;
 
 public class QuadStoogeSort
 {
+  public static void Sort(int[] arr)
+  {
+    QuadStooge(arr, 0, arr.Length);
+  }
+
   public static void QuadStooge(int[] arr, int pos, int length)
   {
     if (length >= 2 && arr[pos] > arr[pos + length - 1])
@@ -28,14 +33,12 @@ public class QuadStoogeSort
     }
   }
 
-  public static void Sort(int[] arr)
-  {
-    QuadStooge(arr, 0, arr.Length);
-  }
-
   public static void Main(String[] args)
   {
-    int[] array = { 0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56 };
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     Sort(array);
     string result = "[" + String.Join(", ", array) + "]";
     Console.WriteLine(result);

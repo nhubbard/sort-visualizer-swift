@@ -8,6 +8,15 @@ const insertSortThreshold = 24
 const nintherThreshold = 128
 const partialInsertSortLimit = 8
 
+func sort(arr []int) []int {
+	n := len(arr)
+	if n < 2 {
+		return arr
+	}
+	pdqLoop(arr, 0, n, pdqLog(n))
+	return arr
+}
+
 func pdqLog(n int) int {
 	log := 0
 	for {
@@ -280,15 +289,6 @@ func pdqLoop(arr []int, begin int, end int, badAllowed int) {
 		begin = pivotPos + 1
 		leftmost = false
 	}
-}
-
-func sort(arr []int) []int {
-	n := len(arr)
-	if n < 2 {
-		return arr
-	}
-	pdqLoop(arr, 0, n, pdqLog(n))
-	return arr
 }
 
 func main() {

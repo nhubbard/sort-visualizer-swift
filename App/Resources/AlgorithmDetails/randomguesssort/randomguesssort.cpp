@@ -3,19 +3,19 @@
 
 int array[5] = {0, 39, 21, 62, 14};
 
-void printList(int arr[], int n) {
-  for (int i = 0; i < n; i++) {
-    if (i == 0) {
-      printf("[%d, ", arr[i]);
-    } else if (i != n - 1) {
-      printf("%d, ", arr[i]);
-    } else {
-      printf("%d]", arr[i]);
+void printList(int items[], int size) {
+  printf("[");
+  if (size > 0) {
+    printf("%d", items[0]);
+    for (int i = 1; i < size; i++) {
+      printf(", %d", items[i]);
     }
   }
+  printf("]");
 }
 
 void sort(int arr[], int n) {
+  if (n <= 1) return;
   int loops[n];
   for (int i = 0; i < n; i++) {
     loops[i] = 0;
@@ -36,7 +36,11 @@ void sort(int arr[], int n) {
       break;
     }
     for (int pos = 0; pos < n; pos++) {
-      loops[pos] = rand() % n;
+      if (loops[pos] < n - 1) {
+        ++loops[pos];
+        break;
+      }
+      loops[pos] = 0;
     }
   }
 

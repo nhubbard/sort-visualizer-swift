@@ -4,9 +4,14 @@ import (
 	"fmt"
 )
 
+func sort(arr []int) []int {
+	classicGravitySort(arr)
+	return arr
+}
+
 func classicGravitySort(arr []int) {
 	n := len(arr)
-	if n == 0 {
+	if n <= 1 {
 		return
 	}
 
@@ -38,11 +43,6 @@ func classicGravitySort(arr []int) {
 			transpose[j]--
 		}
 	}
-}
-
-func sort(arr []int) []int {
-	classicGravitySort(arr)
-	return arr
 }
 
 func main() {

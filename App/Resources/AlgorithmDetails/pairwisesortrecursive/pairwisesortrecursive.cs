@@ -2,6 +2,13 @@ using System;
 
 public class PairwiseSortRecursive
 {
+  public static void Sort(int[] arr)
+  {
+    int n = arr.Length;
+    if (n <= 1) return;
+    PairwiseRecursive(arr, 0, n, 1);
+  }
+
   private static void CompSwap(int[] arr, int a, int b)
   {
     if (arr[a] > arr[b])
@@ -54,15 +61,12 @@ public class PairwiseSortRecursive
     }
   }
 
-  public static void Sort(int[] arr)
-  {
-    int n = arr.Length;
-    PairwiseRecursive(arr, 0, n, 1);
-  }
-
   public static void Main(String[] args)
   {
-    int[] array = { 0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56 };
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     Sort(array);
     string result = "[" + String.Join(", ", array) + "]";
     Console.WriteLine(result);

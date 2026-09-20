@@ -1,6 +1,6 @@
 def sort(arr)
   n = arr.length
-  return arr if n == 0
+  return arr if n < 2
 
   min_value = arr.min
   max_value = arr.max

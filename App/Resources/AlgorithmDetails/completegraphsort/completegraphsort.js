@@ -1,3 +1,31 @@
+function sort(arr) {
+  const n = arr.length;
+  if (n <= 1) return arr;
+  let d = 2;
+  const end = 1 << Math.trunc(Math.log(n - 1) / Math.log(2) + 1);
+  while (d <= end) {
+    let i = 0,
+      dec = 0;
+    while (i < n) {
+      let j = i;
+      dec += n;
+      while (dec >= d) {
+        dec -= d;
+        j++;
+      }
+      let k = j;
+      dec += n;
+      while (dec >= d) {
+        dec -= d;
+        k++;
+      }
+      split(arr, i, j, k);
+      i = k;
+    }
+    d *= 2;
+  }
+}
+
 function compSwap(arr, a, b) {
   if (arr[a] > arr[b]) {
     const tmp = arr[a];
@@ -34,33 +62,10 @@ function split(arr, a, m, b) {
   }
 }
 
-function sort(arr) {
-  const n = arr.length;
-  let d = 2;
-  const end = 1 << Math.trunc(Math.log(n - 1) / Math.log(2) + 1);
-  while (d <= end) {
-    let i = 0,
-      dec = 0;
-    while (i < n) {
-      let j = i;
-      dec += n;
-      while (dec >= d) {
-        dec -= d;
-        j++;
-      }
-      let k = j;
-      dec += n;
-      while (dec >= d) {
-        dec -= d;
-        k++;
-      }
-      split(arr, i, j, k);
-      i = k;
-    }
-    d *= 2;
-  }
-}
 
-var array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56];
+const array = [
+  0, 39, 21, 62, 91, 77, 14, 23,
+  90, 69, 51, 81, 68, 83, 32, 56,
+];
 sort(array);
 console.log("[" + array.join(", ") + "]");

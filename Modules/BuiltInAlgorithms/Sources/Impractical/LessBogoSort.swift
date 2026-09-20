@@ -8,8 +8,11 @@ public struct LessBogoSort: SortAlgorithm {
     category: .impractical,
     sizeRange: 4...7,
     growthModel: OperationGrowthModel(
-      anchorSize: 7, coefficients: [20063, 50677.5, 65863.7, 58499.3, 39833, 22130.3],
+      anchorSize: 7, coefficients: [39800.1, 74893.9, 73214.9, 49241.9, 25518.4, 10833.2],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .factorial, coefficients: [65.9287, 0.967028], rSquared: 0.944331),
+    implementationComplexity: 12,
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n)", average: "O(n \\times n!)", worst: "O(n \\times n!)"),

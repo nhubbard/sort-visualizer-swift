@@ -80,13 +80,13 @@ public struct ShuffleMergeAdversaryShuffle: ShuffleAlgorithm {
     var j = windowStart
     var i = windowStart + 1
     while i < windowEnd {
-      tmp[j] = engine.values[i]
+      tmp[j] = engine.readValue(at: i)
       j += 1
       i += 2
     }
     i = windowStart
     while i < windowEnd {
-      tmp[j] = engine.values[i]
+      tmp[j] = engine.readValue(at: i)
       j += 1
       i += 2
     }

@@ -1,3 +1,18 @@
+def sort(arr):
+    n = len(arr)
+    if n < 2:
+        return
+    subarray_count = ceil_pow2(n)
+    while subarray_count > 1:
+        i = 0
+        while i < subarray_count:
+            lo = n * i // subarray_count
+            mid = n * (i + 1) // subarray_count
+            hi = n * (i + 2) // subarray_count
+            merge(arr, lo, mid, hi)
+            i += 2
+        subarray_count >>= 1
+
 def multi_swap(arr, i, j, length):
     for k in range(length):
         arr[i + k], arr[j + k] = arr[j + k], arr[i + k]
@@ -160,23 +175,12 @@ def ceil_pow2(x):
     return x + 1
 
 
-def sort(arr):
-    n = len(arr)
-    if n < 2:
-        return
-    subarray_count = ceil_pow2(n)
-    while subarray_count > 1:
-        i = 0
-        while i < subarray_count:
-            lo = n * i // subarray_count
-            mid = n * (i + 1) // subarray_count
-            hi = n * (i + 2) // subarray_count
-            merge(arr, lo, mid, hi)
-            i += 2
-        subarray_count >>= 1
 
 
 if __name__ == "__main__":
-    array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56]
+    array = [
+        0, 39, 21, 62, 91, 77, 14, 23,
+        90, 69, 51, 81, 68, 83, 32, 56,
+    ]
     sort(array)
     print(array)

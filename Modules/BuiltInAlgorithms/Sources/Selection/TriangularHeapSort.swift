@@ -24,8 +24,11 @@ public struct TriangularHeapSort: SortAlgorithm {
     category: .selection,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 499, coefficients: [239702, 829.397, 0.692574],
+      anchorSize: 499, coefficients: [239232, 768.828, 0.465037],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .powerLaw, coefficients: [11.2719, 1.60366], rSquared: 0.998403),
+    implementationComplexity: 24,
     stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n^1.5)", average: "O(n^1.5)", worst: "O(n^1.5)"),
@@ -48,14 +51,20 @@ public struct TriangularHeapSort: SortAlgorithm {
     // The explicit tidy-up `MaxHeapSort` doesn't need — see the doc comment above. ArrayV
     // performs this via the non-marking `Reads.compareValues`, so this reads `engine.values`
     // directly rather than calling `engine.compare`.
-    if engine.values[0] > engine.values[1] {
+    if engine.readValue(at: 0) > engine.readValue(at: 1) {
       engine.swap(0, 1)
     }
   }
 
   /// Just the build-heap sweep, stopping short of `record`'s extraction phase — the entry point
-  /// `Shuffles.TRI_HEAP` calls directly (`triangularHeapify`), matching `SmoothSort.smoothHeapify`/
-  /// `PoplarHeapSort.poplarHeapify`'s own dedicated-entry-point shape.
+  /// `TriangularHeapifiedShuffle` calls directly. `PoplarHeapSort`/`SmoothSort` once exposed the
+  /// same kind of dedicated entry point for their own heapify-shuffle siblings
+  /// (`PoplarifiedShuffle`/`SmoothifiedShuffle`), but both were removed: on this app's identity
+  /// starting array, their "root = last index of the run" heap convention means the run's last
+  /// index already holds that run's max by construction, so their sift step never swaps — the
+  /// shuffle was silently a no-op, always identical to plain ascending order. This binary-heap
+  /// convention (root = first index, children at higher indices) doesn't share that failure
+  /// mode, since ascending input actually violates the max-heap property at every internal node.
   public func triangularHeapify(into engine: inout RecordingEngine) {
     let n = engine.count
     guard n > 1 else { return }

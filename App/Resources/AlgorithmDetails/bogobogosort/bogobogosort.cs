@@ -15,6 +15,22 @@ public class BogoBogoSort
   // Advances arr to its next lexicographic permutation in place. Returns false (after resetting
   // arr to its first, fully ascending permutation) once every arrangement has been visited -- a
   // deterministic stand-in for "shuffle the array at random".
+  public static void Sort(int[] arr)
+  {
+    int n = arr.Length;
+    int limit = Math.Min(ChaosLimit, n);
+    int[] chaos = new int[limit];
+    Array.Copy(arr, chaos, limit);
+    int[] rest = new int[n - limit];
+    Array.Copy(arr, limit, rest, 0, n - limit);
+
+    BogoBogoSortRange(chaos); // the real, recursive-check algorithm -- kept tiny on purpose
+    InsertionSort(rest); // an ordinary fast sort for the rest of the array
+
+    int[] merged = MergeSorted(chaos, rest);
+    Array.Copy(merged, arr, n);
+  }
+
   private static bool NextPermutation(int[] arr)
   {
     int n = arr.Length;
@@ -116,25 +132,12 @@ public class BogoBogoSort
     return merged;
   }
 
-  public static void Sort(int[] arr)
-  {
-    int n = arr.Length;
-    int limit = Math.Min(ChaosLimit, n);
-    int[] chaos = new int[limit];
-    Array.Copy(arr, chaos, limit);
-    int[] rest = new int[n - limit];
-    Array.Copy(arr, limit, rest, 0, n - limit);
-
-    BogoBogoSortRange(chaos); // the real, recursive-check algorithm -- kept tiny on purpose
-    InsertionSort(rest); // an ordinary fast sort for the rest of the array
-
-    int[] merged = MergeSorted(chaos, rest);
-    Array.Copy(merged, arr, n);
-  }
-
   public static void Main(String[] args)
   {
-    int[] array = { 0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56 };
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     Sort(array);
     string result = "[" + String.Join(", ", array) + "]";
     Console.WriteLine(result);

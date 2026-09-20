@@ -1,6 +1,28 @@
 #include <cstdio>
 #include <vector>
 
+void multiSwap(std::vector<int> &arr, int pos, int to);
+void weaveInsert(std::vector<int> &arr, int start, int end);
+void weaveMerge(std::vector<int> &arr, int min, int max, int mid);
+void weaveMergeSort(std::vector<int> &arr, int min, int max);
+
+void printList(const std::vector<int> &items) {
+  printf("[");
+  if (!items.empty()) {
+    printf("%d", items[0]);
+    for (size_t i = 1; i < items.size(); i++) {
+      printf(", %d", items[i]);
+    }
+  }
+  printf("]\n");
+}
+
+void sort(std::vector<int> &arr) {
+  if (arr.size() > 1) {
+    weaveMergeSort(arr, 0, (int)arr.size() - 1);
+  }
+}
+
 void multiSwap(std::vector<int> &arr, int pos, int to) {
   if (to - pos > 0) {
     for (int i = pos; i < to; i++) {
@@ -46,19 +68,7 @@ void weaveMergeSort(std::vector<int> &arr, int min, int max) {
   }
 }
 
-void sort(std::vector<int> &arr) {
-  if (arr.size() > 1) {
-    weaveMergeSort(arr, 0, (int)arr.size() - 1);
-  }
-}
 
-void printList(const std::vector<int> &arr) {
-  printf("[");
-  for (size_t i = 0; i < arr.size(); i++) {
-    printf("%d%s", arr[i], i + 1 == arr.size() ? "" : ", ");
-  }
-  printf("]\n");
-}
 
 int main() {
   std::vector<int> array = {0,  39, 21, 62, 91, 77, 14, 23,

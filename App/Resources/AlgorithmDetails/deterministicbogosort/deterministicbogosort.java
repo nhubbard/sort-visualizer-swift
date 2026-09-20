@@ -1,6 +1,11 @@
 import java.util.Arrays;
 
 public class deterministicbogosort {
+  public static void sort(int[] arr) {
+    int n = arr.length;
+    permutationSort(arr, 0, n);
+  }
+
   public static boolean isSorted(int[] arr) {
     for (int i = 0; i < arr.length - 1; i++) {
       if (arr[i] > arr[i + 1]) {
@@ -31,13 +36,8 @@ public class deterministicbogosort {
     return permutationSort(arr, depth + 1, n);
   }
 
-  public static void sort(int[] arr) {
-    int n = arr.length;
-    permutationSort(arr, 0, n);
-  }
-
   public static void main(String[] args) {
-    int[] array = new int[] {0, 39, 21, 62, 91, 14, 23};
+    int[] array = {0, 39, 21, 62, 91, 14, 23};
     sort(array);
     System.out.println(Arrays.toString(array));
   }

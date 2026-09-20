@@ -1,5 +1,6 @@
 func sort(_ arr: inout [Int]) {
     let n = arr.count
+    guard n > 1 else { return }
 
     func maxToFront(_ a: Int, _ b: Int) {
         var best = a

@@ -1,3 +1,8 @@
+func sort(_ arr: inout [Int]) {
+    let n = arr.count
+    stableQuickSort(&arr, 0, n - 1)
+}
+
 func stablePartition(_ arr: inout [Int], _ start: Int, _ end: Int) -> Int {
     let pivotValue = arr[start]
     var leftList: [Int] = []
@@ -34,10 +39,6 @@ func stableQuickSort(_ arr: inout [Int], _ start: Int, _ end: Int) {
     }
 }
 
-func sort(_ arr: inout [Int]) {
-    let n = arr.count
-    stableQuickSort(&arr, 0, n - 1)
-}
 
 var array: [Int] = [
     0, 39, 21, 62, 91, 77, 14, 23,

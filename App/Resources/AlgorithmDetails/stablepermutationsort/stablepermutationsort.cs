@@ -2,6 +2,17 @@ using System;
 
 public class StablePermutationSort
 {
+  public static void Sort(int[] arr)
+  {
+    int n = arr.Length;
+    int[] idx = new int[n];
+    for (int i = 0; i < n; i++)
+    {
+      idx[i] = i;
+    }
+    Permute(arr, idx, n, n);
+  }
+
   public static bool IsSorted(int[] arr)
   {
     for (int i = 1; i < arr.Length; i++)
@@ -52,20 +63,11 @@ public class StablePermutationSort
     return false;
   }
 
-  public static void Sort(int[] arr)
-  {
-    int n = arr.Length;
-    int[] idx = new int[n];
-    for (int i = 0; i < n; i++)
-    {
-      idx[i] = i;
-    }
-    Permute(arr, idx, n, n);
-  }
-
   public static void Main(String[] args)
   {
-    int[] array = { 0, 39, 21, 62, 91, 14, 23 };
+    int[] array = {
+      0, 39, 21, 62, 91, 14, 23
+    };
     Sort(array);
     string result = "[" + String.Join(", ", array) + "]";
     Console.WriteLine(result);

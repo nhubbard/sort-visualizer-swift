@@ -1,3 +1,24 @@
+func sort(_ arr: inout [Int]) {
+    let n = arr.count
+    var table = Array(0 ..< n)
+    quickSort(arr, &table, 0, n)
+    for i in 0 ..< n {
+        if table[i] != i {
+            let t = arr[i]
+            var j = i
+            var next = table[i]
+            repeat {
+                arr[j] = arr[next]
+                table[j] = j
+                j = next
+                next = table[next]
+            } while next != i
+            arr[j] = t
+            table[j] = j
+        }
+    }
+}
+
 func stableComp(_ arr: [Int], _ table: [Int], _ a: Int, _ b: Int) -> Bool {
     let ta = table[a]
     let tb = table[b]
@@ -56,26 +77,6 @@ func quickSort(_ arr: [Int], _ table: inout [Int], _ a: Int, _ b: Int) {
     quickSort(arr, &table, p + 1, b)
 }
 
-func sort(_ arr: inout [Int]) {
-    let n = arr.count
-    var table = Array(0 ..< n)
-    quickSort(arr, &table, 0, n)
-    for i in 0 ..< n {
-        if table[i] != i {
-            let t = arr[i]
-            var j = i
-            var next = table[i]
-            repeat {
-                arr[j] = arr[next]
-                table[j] = j
-                j = next
-                next = table[next]
-            } while next != i
-            arr[j] = t
-            table[j] = j
-        }
-    }
-}
 
 var array: [Int] = [
     0, 39, 21, 62, 91, 77, 14, 23,

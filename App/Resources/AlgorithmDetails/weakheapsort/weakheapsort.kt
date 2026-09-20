@@ -1,12 +1,6 @@
-fun merge(arr: Array<Int>, flags: Array<Boolean>, i: Int, j: Int) {
-  if (arr[i] < arr[j]) {
-    flags[j] = !flags[j]
-    arr[i] = arr[j].also { arr[j] = arr[i] }
-  }
-}
-
 fun sort(arr: Array<Int>) {
   val n = arr.size
+  if (n <= 1) return
   val flags = Array(n) { false }
 
   for (i in (n - 1) downTo 1) {
@@ -34,6 +28,13 @@ fun sort(arr: Array<Int>) {
     }
   }
   arr[0] = arr[1].also { arr[1] = arr[0] }
+}
+
+fun merge(arr: Array<Int>, flags: Array<Boolean>, i: Int, j: Int) {
+  if (arr[i] < arr[j]) {
+    flags[j] = !flags[j]
+    arr[i] = arr[j].also { arr[j] = arr[i] }
+  }
 }
 
 fun main() {

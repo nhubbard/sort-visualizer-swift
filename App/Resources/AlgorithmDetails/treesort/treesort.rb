@@ -8,6 +8,18 @@ class Node
   end
 end
 
+def sort(arr)
+  n = arr.length
+  root = nil
+  (0...n).each { |i| root = add(arr, root, i) }
+
+  result = []
+  traverse(arr, root, result)
+
+  (0...n).each { |i| arr[i] = result[i] }
+  arr
+end
+
 def add(arr, node, add_ptr)
   return Node.new(add_ptr) if node.nil?
 
@@ -27,17 +39,6 @@ def traverse(arr, node, result)
   traverse(arr, node.right, result)
 end
 
-def sort(arr)
-  n = arr.length
-  root = nil
-  (0...n).each { |i| root = add(arr, root, i) }
-
-  result = []
-  traverse(arr, root, result)
-
-  (0...n).each { |i| arr[i] = result[i] }
-  arr
-end
 
 array = [0, 39, 21, 62, 91, 77, 14, 23,
   90, 69, 51, 81, 68, 83, 32, 56]

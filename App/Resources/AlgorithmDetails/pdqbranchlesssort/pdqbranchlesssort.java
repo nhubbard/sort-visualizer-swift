@@ -7,6 +7,16 @@ public class pdqbranchlesssort {
   private static final int BLOCK_SIZE = 64;
   private static final int CACHELINE_SIZE = 64;
 
+  public static void sort(int[] arr) {
+    int n = arr.length;
+    if (n < 2) {
+      return;
+    }
+    int[] leftOffsets = new int[BLOCK_SIZE + CACHELINE_SIZE];
+    int[] rightOffsets = new int[BLOCK_SIZE + CACHELINE_SIZE];
+    pdqLoop(arr, 0, n, pdqLog(n), leftOffsets, rightOffsets);
+  }
+
   private static void swap(int[] arr, int a, int b) {
     int t = arr[a];
     arr[a] = arr[b];
@@ -443,18 +453,11 @@ public class pdqbranchlesssort {
     }
   }
 
-  public static void sort(int[] arr) {
-    int n = arr.length;
-    if (n < 2) {
-      return;
-    }
-    int[] leftOffsets = new int[BLOCK_SIZE + CACHELINE_SIZE];
-    int[] rightOffsets = new int[BLOCK_SIZE + CACHELINE_SIZE];
-    pdqLoop(arr, 0, n, pdqLog(n), leftOffsets, rightOffsets);
-  }
-
   public static void main(String[] args) {
-    int[] array = new int[] {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     sort(array);
     System.out.println(Arrays.toString(array));
   }

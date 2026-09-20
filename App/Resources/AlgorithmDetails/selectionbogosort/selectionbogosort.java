@@ -1,16 +1,6 @@
 import java.util.Arrays;
 
 public class selectionbogosort {
-  public static int minFrom(int[] arr, int i) {
-    int m = arr[i];
-    for (int k = i + 1; k < arr.length; k++) {
-      if (arr[k] < m) {
-        m = arr[k];
-      }
-    }
-    return m;
-  }
-
   public static void sort(int[] arr) {
     int n = arr.length;
     for (int i = 0; i < n; i++) {
@@ -23,8 +13,18 @@ public class selectionbogosort {
     }
   }
 
+  public static int minFrom(int[] arr, int i) {
+    int m = arr[i];
+    for (int k = i + 1; k < arr.length; k++) {
+      if (arr[k] < m) {
+        m = arr[k];
+      }
+    }
+    return m;
+  }
+
   public static void main(String[] args) {
-    int[] array = new int[] {0, 39, 21, 62, 91, 14, 23};
+    int[] array = {0, 39, 21, 62, 91, 14, 23};
     sort(array);
     System.out.println(Arrays.toString(array));
   }

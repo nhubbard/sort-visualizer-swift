@@ -1,12 +1,3 @@
-Random Guess Sort treats sorting as a guessing game about *indices* rather than values: it repeatedly draws a fresh
-array of `n` random index guesses — one guess per output position, each independently anywhere from 0 to `n - 1`, with
-no requirement that the guesses even form a valid permutation — and checks whether reading the original array through
-that guessed order comes out non-decreasing. If two guessed indices happen to point at equal values, the guess is only
-accepted if the earlier output position points at the earlier original index, so a lucky-but-index-scrambled guess
-doesn't slip through.
+Random Guess Sort treats sorting as a guessing game about *indices* rather than values. The app starts with an array of `n` zero indices and advances it as a base-`n` counter, with the first output position changing fastest. Each counter state chooses one original input index for each output position. Guesses may repeat indices, so they need not be permutations.
 
-Because the guesses aren't constrained to be a permutation at all, the space it's searching is every possible sequence
-of `n` index choices — `n` raised to the power `n` — a search space that grows dramatically faster than the `n!`
-permutations a more disciplined shuffle-based sort would explore. It always finds a correct arrangement eventually (a
-genuine sorting permutation always exists among its guesses), but it can spend a very long time re-drawing bad guesses
-first, which is why it's only ever run on tiny arrays.
+At each state, the app checks whether the referenced values are non-decreasing. When two values are equal, their original indices must also be increasing. The first guess that passes is copied back into the live array. Enumerating guesses makes recording finite and reproducible for the app's tiny supported inputs; it can still take up to `n^n` candidates.

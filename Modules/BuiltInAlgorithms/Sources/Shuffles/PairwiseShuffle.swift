@@ -35,7 +35,7 @@ public struct PairwiseShuffle: ShuffleAlgorithm {
     for m in 0..<2 {
       var kk = m
       while kk < n {
-        counts[engine.values[kk] - 1] += 1
+        counts[engine.readValue(at: kk) - 1] += 1
         kk += 2
       }
 

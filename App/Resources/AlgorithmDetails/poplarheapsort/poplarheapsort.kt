@@ -1,3 +1,10 @@
+fun sort(array: IntArray) {
+  val n = array.size
+  if (n <= 1) return
+  makeHeap(array, 0, n)
+  sortHeap(array, 0, n)
+}
+
 fun hyperfloor(n: Int): Int {
   var power = 1
   while (power * 2 <= n) power *= 2
@@ -122,13 +129,6 @@ fun sortHeap(array: IntArray, first: Int, lastIn: Int) {
     last--
     size--
   } while (size > 1)
-}
-
-fun sort(array: IntArray) {
-  val n = array.size
-  if (n <= 1) return
-  makeHeap(array, 0, n)
-  sortHeap(array, 0, n)
 }
 
 fun main() {

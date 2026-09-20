@@ -4,6 +4,11 @@ import (
 	"fmt"
 )
 
+func sort(arr []int) []int {
+	rotateMergeSort(arr, 0, len(arr))
+	return arr
+}
+
 func multiSwap(arr []int, a, b, length int) {
 	for i := 0; i < length; i++ {
 		arr[a+i], arr[b+i] = arr[b+i], arr[a+i]
@@ -79,11 +84,6 @@ func rotateMergeSort(arr []int, a, b int) {
 			rotateMerge(arr, i, i+j, b)
 		}
 	}
-}
-
-func sort(arr []int) []int {
-	rotateMergeSort(arr, 0, len(arr))
-	return arr
 }
 
 func main() {

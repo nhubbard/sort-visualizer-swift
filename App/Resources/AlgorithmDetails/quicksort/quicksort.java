@@ -1,21 +1,26 @@
 import java.util.Arrays;
 
 public class quicksort {
-  private static int partition(int[] arr, int begin, int end) {
-    int pivot = arr[end];
-    int i = begin - 1;
-    for (int j = begin; j < end; j++) {
-      if (arr[j] <= pivot) {
-        i++;
+  public static void sort(int[] arr) {
+    quickSort(arr, 0, arr.length - 1);
+  }
+
+  private static int partition(int[] arr, int left, int right) {
+    int i = left;
+    int j = right;
+    while (i < j) {
+      while (i < j && arr[i] <= arr[left]) i++;
+      while (arr[j] > arr[left]) j--;
+      if (i < j) {
         int temp = arr[i];
         arr[i] = arr[j];
         arr[j] = temp;
       }
     }
-    int temp = arr[i + 1];
-    arr[i + 1] = arr[end];
-    arr[end] = temp;
-    return i + 1;
+    int temp = arr[left];
+    arr[left] = arr[j];
+    arr[j] = temp;
+    return j;
   }
 
   public static void quickSort(int[] arr, int begin, int end) {
@@ -26,12 +31,11 @@ public class quicksort {
     }
   }
 
-  public static void sort(int[] arr) {
-    quickSort(arr, 0, arr.length - 1);
-  }
-
   public static void main(String[] args) {
-    int[] array = new int[] {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+    int[] array = {
+      0, 39, 21, 62, 91, 77, 14, 23,
+      90, 69, 51, 81, 68, 83, 32, 56
+    };
     sort(array);
     System.out.println(Arrays.toString(array));
   }

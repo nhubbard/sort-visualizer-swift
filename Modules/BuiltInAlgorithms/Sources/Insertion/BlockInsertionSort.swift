@@ -30,8 +30,11 @@ public struct BlockInsertionSort: SortAlgorithm {
     category: .insertion,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 573, coefficients: [239718, 808.206, 0.679677],
+      anchorSize: 498, coefficients: [239858, 950.764, 0.941836],
       measuredSafeCeiling: nil),
+    detectedGrowthModel: DetectedGrowthModel(
+      family: .polynomialIntercept, coefficients: [0.941836, 12.6947, -43.1326], rSquared: 1),
+    implementationComplexity: 43,
     stable: true,
     timeComplexity: ComplexityBounds(
       best: "O(n)", average: "O(n log n)", worst: "O(n^2)"),
@@ -63,10 +66,10 @@ public struct BlockInsertionSort: SortAlgorithm {
 
     // Classic single-element insertion-sort shift.
     func insert1(_ a: Int, _ l: Int) {
-      let tmp = engine.values[l]
+      let tmp = engine.readValue(at: l)
       var l = l - 1
-      while l >= a && engine.values[l] > tmp {
-        engine.setValue(l + 1, engine.values[l])
+      while l >= a && engine.compareValue(l, against: tmp, by: (>)) {
+        engine.setValue(l + 1, engine.readValue(at: l))
         l -= 1
       }
       engine.setValue(l + 1, tmp)
@@ -75,16 +78,16 @@ public struct BlockInsertionSort: SortAlgorithm {
     // Inserts a known-ordered PAIR (values at `l` and `r`, `l < r`) in one pass, avoiding a
     // re-scan for the second element.
     func insert2(_ a: Int, _ l: Int, _ r: Int) {
-      let tmpL = engine.values[l]
-      let tmpR = engine.values[r]
+      let tmpL = engine.readValue(at: l)
+      let tmpR = engine.readValue(at: r)
       var l = l - 1
-      while l >= a && engine.values[l] > tmpR {
-        engine.setValue(l + 2, engine.values[l])
+      while l >= a && engine.compareValue(l, against: tmpR, by: (>)) {
+        engine.setValue(l + 2, engine.readValue(at: l))
         l -= 1
       }
       engine.setValue(l + 2, tmpR)
-      while l >= a && engine.values[l] > tmpL {
-        engine.setValue(l + 1, engine.values[l])
+      while l >= a && engine.compareValue(l, against: tmpL, by: (>)) {
+        engine.setValue(l + 1, engine.readValue(at: l))
         l -= 1
       }
       engine.setValue(l + 1, tmpL)

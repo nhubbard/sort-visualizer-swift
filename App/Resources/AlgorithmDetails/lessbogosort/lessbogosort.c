@@ -10,13 +10,23 @@ void swap(int *a, int *b) {
 }
 
 void printList(int items[], int size) {
-  for (int i = 0; i < size; i++) {
-    if (i == 0) {
-      printf("[%d, ", items[i]);
-    } else if (i != size - 1) {
-      printf("%d, ", items[i]);
-    } else {
-      printf("%d]", items[i]);
+  printf("[");
+  if (size > 0) {
+    printf("%d", items[0]);
+    for (int i = 1; i < size; i++) {
+      printf(", %d", items[i]);
+    }
+  }
+  printf("]");
+}
+
+int isMinimum(int arr[], int start, int end);
+void shuffleRange(int arr[], int start, int end);
+
+void sort(int arr[], int n) {
+  for (int i = 0; i < n; i++) {
+    while (!isMinimum(arr, i, n)) {
+      shuffleRange(arr, i, n);
     }
   }
 }
@@ -34,14 +44,6 @@ void shuffleRange(int arr[], int start, int end) {
   for (int i = start; i < end - 1; i++) {
     int j = i + rand() % (end - i);
     swap(&arr[i], &arr[j]);
-  }
-}
-
-void sort(int arr[], int n) {
-  for (int i = 0; i < n; i++) {
-    while (!isMinimum(arr, i, n)) {
-      shuffleRange(arr, i, n);
-    }
   }
 }
 

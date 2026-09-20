@@ -110,7 +110,15 @@ enum CurveFitting {
   private static func family(matching shape: BigOShape) -> GrowthFamily? {
     switch shape {
     case .constant, .logarithmic, .logarithmicSquared, .linear: return .powerLaw
-    case .polynomial: return .polynomialIntercept
+    // `.polynomialIntercept` is a *fixed*-degree-2 shape (`a*n^2 + b*n + c`) -- a real structural
+    // match only for a declared exponent of exactly 2. Any other declared polynomial degree (3,
+    // 4, 2.71, ...) needs `.powerLaw`'s free exponent instead; matching every `.polynomial(_)` to
+    // `.polynomialIntercept` regardless of its associated exponent (the bug this replaced) meant
+    // a declared `O(n^3)` would still tie-break toward a family that can't represent cubic growth
+    // at scale, no matter how badly it underfits next to the correct `powerLaw(k≈3)` candidate --
+    // exactly what let ShoveSort's mislabeled `O(n^2)` (and, worse, would have kept doing so even
+    // after correcting the label to `O(n^3)`) fight off `bestFit`'s own better-scoring pick.
+    case .polynomial(let exponent): return exponent == 2 ? .polynomialIntercept : .powerLaw
     case .linearithmic, .linearithmicSquared: return .powerLog
     case .superLinearithmic, .nToTheN: return .nToTheNLike
     case .factorial: return .factorial
@@ -225,7 +233,21 @@ enum CurveFitting {
     // Starting from `n = 1`, not the smallest *measured* size -- a dip below the sampled range
     // is exactly as dangerous as one inside it (the original `bogosort+heapified` bug was a fit
     // that predicted ~8.5 million ops at n=1, well below its smallest sample of 4).
-    guard isMonotonicallyNondecreasing(predict, from: 1, to: maxN * 100) else {
+    //
+    // Two separate grids, not one spanning `[1, maxN * 100]` -- a single 200-step grid across
+    // that full range spaces its points `maxN / 2` apart, which is *coarser* than `maxN` itself
+    // whenever the real dip sits close to the origin relative to `maxN` (a `polynomialIntercept`
+    // fit's vertex can land anywhere; ShoveSort's real calibration data, sampled out to n=304,
+    // produced a fit whose vertex sat at n≈55 -- entirely inside the grid's very first gap, `[1,
+    // 153]`, so the check saw it dip from 1.3M straight to 44M and called that "nondecreasing"
+    // while silently skipping straight over a swing down to -764K in between). Checking `[1,
+    // maxN]` on its own dense grid guarantees resolving anything narrower than `maxN / 200` in
+    // the one region every dip risk actually derives from (a fit's own parameters, shaped by
+    // wherever the real samples were); `(maxN, maxN * 100]` only needs enough resolution to catch
+    // a curve turning back down somewhere in the pure-extrapolation tail beyond the data.
+    guard isMonotonicallyNondecreasing(predict, from: 1, to: maxN),
+      isMonotonicallyNondecreasing(predict, from: maxN, to: maxN * 100)
+    else {
       return nil
     }
 
