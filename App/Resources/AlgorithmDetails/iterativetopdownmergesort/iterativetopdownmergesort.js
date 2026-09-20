@@ -1,33 +1,23 @@
-function merge(array, low, mid, high) {
-  var left = array.slice(low, mid);
-  var right = array.slice(mid, high);
-  var i = 0,
-    j = 0,
-    k = low;
-  while (i < left.length && j < right.length) {
-    if (left[i] <= right[j]) {
-      array[k] = left[i];
-      i++;
+function merge(array, scratch, low, mid, high) {
+  let left = low;
+  let right = mid;
+  let out = low;
+  while (left < mid && right < high) {
+    if (array[left] <= array[right]) {
+      scratch[out++] = array[left++];
     } else {
-      array[k] = right[j];
-      j++;
+      scratch[out++] = array[right++];
     }
-    k++;
   }
-  while (i < left.length) {
-    array[k] = left[i];
-    i++;
-    k++;
-  }
-  while (j < right.length) {
-    array[k] = right[j];
-    j++;
-    k++;
-  }
+  while (left < mid) scratch[out++] = array[left++];
+  while (right < high) scratch[out++] = array[right++];
+  for (let i = low; i < high; i++) array[i] = scratch[i];
 }
 
 function sort(arr) {
   var n = arr.length;
+  if (n < 2) return arr;
+  const scratch = new Array(n);
   var subarrayCount = 1;
   while (subarrayCount < n) {
     subarrayCount *= 2;
@@ -38,7 +28,7 @@ function sort(arr) {
       var low = Math.floor((n * i) / subarrayCount);
       var mid = Math.floor((n * (i + 1)) / subarrayCount);
       var high = Math.floor((n * (i + 2)) / subarrayCount);
-      merge(arr, low, mid, high);
+      merge(arr, scratch, low, mid, high);
     }
     subarrayCount = Math.floor(subarrayCount / 2);
   }

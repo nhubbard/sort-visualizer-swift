@@ -1,36 +1,33 @@
 import java.util.Arrays;
 
 public class iterativetopdownmergesort {
-  private static void merge(int[] arr, int low, int mid, int high) {
-    int[] left = Arrays.copyOfRange(arr, low, mid);
-    int[] right = Arrays.copyOfRange(arr, mid, high);
-    int i = 0;
-    int j = 0;
-    int k = low;
-    while (i < left.length && j < right.length) {
-      if (left[i] <= right[j]) {
-        arr[k] = left[i];
-        i++;
+  private static void merge(int[] arr, int[] scratch, int low, int mid, int high) {
+    int left = low;
+    int right = mid;
+    int out = low;
+    while (left < mid && right < high) {
+      if (arr[left] <= arr[right]) {
+        scratch[out] = arr[left];
+        left++;
       } else {
-        arr[k] = right[j];
-        j++;
+        scratch[out] = arr[right];
+        right++;
       }
-      k++;
+      out++;
     }
-    while (i < left.length) {
-      arr[k] = left[i];
-      i++;
-      k++;
+    while (left < mid) {
+      scratch[out++] = arr[left++];
     }
-    while (j < right.length) {
-      arr[k] = right[j];
-      j++;
-      k++;
+    while (right < high) {
+      scratch[out++] = arr[right++];
     }
+    System.arraycopy(scratch, low, arr, low, high - low);
   }
 
   public static void sort(int[] arr) {
     int n = arr.length;
+    if (n < 2) return;
+    int[] scratch = new int[n];
     int subarrayCount = 1;
     while (subarrayCount < n) {
       subarrayCount *= 2;
@@ -41,7 +38,7 @@ public class iterativetopdownmergesort {
         int low = n * i / subarrayCount;
         int mid = n * (i + 1) / subarrayCount;
         int high = n * (i + 2) / subarrayCount;
-        merge(arr, low, mid, high);
+        merge(arr, scratch, low, mid, high);
       }
       subarrayCount /= 2;
     }

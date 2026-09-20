@@ -2,46 +2,30 @@ using System;
 
 public class IterativeTopDownMergeSort
 {
-  private static void Merge(int[] array, int low, int mid, int high)
+  private static void Merge(int[] array, int[] scratch, int low, int mid, int high)
   {
-    int[] left = new int[mid - low];
-    int[] right = new int[high - mid];
-    Array.Copy(array, low, left, 0, left.Length);
-    Array.Copy(array, mid, right, 0, right.Length);
-    int i = 0,
-      j = 0,
-      k = low;
-    while (i < left.Length && j < right.Length)
+    int left = low, right = mid, output = low;
+    while (left < mid && right < high)
     {
-      if (left[i] <= right[j])
+      if (array[left] <= array[right])
       {
-        array[k] = left[i];
-        i++;
+        scratch[output++] = array[left++];
       }
       else
       {
-        array[k] = right[j];
-        j++;
+        scratch[output++] = array[right++];
       }
-      k++;
     }
-    while (i < left.Length)
-    {
-      array[k] = left[i];
-      i++;
-      k++;
-    }
-    while (j < right.Length)
-    {
-      array[k] = right[j];
-      j++;
-      k++;
-    }
+    while (left < mid) scratch[output++] = array[left++];
+    while (right < high) scratch[output++] = array[right++];
+    for (int i = low; i < high; i++) array[i] = scratch[i];
   }
 
   public static void Sort(int[] arr)
   {
     int n = arr.Length;
+    if (n < 2) return;
+    int[] scratch = new int[n];
     int subarrayCount = 1;
     while (subarrayCount < n)
     {
@@ -55,7 +39,7 @@ public class IterativeTopDownMergeSort
         int low = n * i / subarrayCount;
         int mid = n * (i + 1) / subarrayCount;
         int high = n * (i + 2) / subarrayCount;
-        Merge(arr, low, mid, high);
+        Merge(arr, scratch, low, mid, high);
       }
       subarrayCount /= 2;
     }

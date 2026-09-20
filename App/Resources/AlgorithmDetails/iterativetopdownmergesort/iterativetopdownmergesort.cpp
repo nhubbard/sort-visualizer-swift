@@ -15,27 +15,19 @@ void printList(int items[], int size) {
   }
 }
 
-void merge(int arr[], int low, int mid, int high) {
-  std::vector<int> left(arr + low, arr + mid);
-  std::vector<int> right(arr + mid, arr + high);
-  size_t i = 0, j = 0;
-  int k = low;
-  while (i < left.size() && j < right.size()) {
-    if (left[i] <= right[j]) {
-      arr[k++] = left[i++];
-    } else {
-      arr[k++] = right[j++];
-    }
+void merge(int arr[], std::vector<int>& scratch, int low, int mid, int high) {
+  int left = low, right = mid, out = low;
+  while (left < mid && right < high) {
+    scratch[out++] = arr[left] <= arr[right] ? arr[left++] : arr[right++];
   }
-  while (i < left.size()) {
-    arr[k++] = left[i++];
-  }
-  while (j < right.size()) {
-    arr[k++] = right[j++];
-  }
+  while (left < mid) scratch[out++] = arr[left++];
+  while (right < high) scratch[out++] = arr[right++];
+  for (int i = low; i < high; i++) arr[i] = scratch[i];
 }
 
 void sort(int arr[], int n) {
+  if (n < 2) return;
+  std::vector<int> scratch(n);
   int subarrayCount = 1;
   while (subarrayCount < n) {
     subarrayCount *= 2;
@@ -46,7 +38,7 @@ void sort(int arr[], int n) {
       int low = n * i / subarrayCount;
       int mid = n * (i + 1) / subarrayCount;
       int high = n * (i + 2) / subarrayCount;
-      merge(arr, low, mid, high);
+      merge(arr, scratch, low, mid, high);
     }
     subarrayCount /= 2;
   }
