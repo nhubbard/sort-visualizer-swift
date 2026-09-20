@@ -1,41 +1,41 @@
-#include <cstdio>
-#include <cstdlib>
-
-int array[8] = {0, 39, 21, 62, 91, 77, 14, 23};
-
-inline void swap(int *a, int *b) {
-  int t = *a;
-  *a = *b;
-  *b = t;
-}
-
-void printList(int items[], int size) {
-  for (int i = 0; i < size; i++) {
-    if (i == 0)
-      printf("[%d, ", items[i]);
-    else if (i != size - 1)
-      printf("%d, ", items[i]);
-    else
-      printf("%d]", items[i]);
+#include <algorithm>
+#include <iostream>
+#include <vector>
+using namespace std;
+void sort(vector<int> &a) {
+  int n = (int)a.size();
+  if (n < 2)
+    return;
+  bool ordered = true;
+  for (int i = 1; i < n; ++i)
+    if (a[i] < a[i - 1]) {
+      ordered = false;
+      break;
+    }
+  if (ordered)
+    return;
+  while (true) {
+    int pivot = n - 2;
+    while (pivot >= 0 && a[pivot] >= a[pivot + 1])
+      --pivot;
+    if (pivot < 0)
+      break;
+    int successor = n - 1;
+    while (a[successor] <= a[pivot])
+      --successor;
+    swap(a[pivot], a[successor]);
+    reverse(a.begin() + pivot + 1, a.end());
   }
+  reverse(a.begin(), a.end());
 }
-
-inline bool isSorted(int arr[], int n) {
-  while (--n >= 1)
-    if (arr[n] < arr[n - 1])
-      return false;
-  return true;
-}
-
-void sort(int arr[], int n) {
-  while (!isSorted(arr, n))
-    for (int i = 0; i < n; i++)
-      swap(&arr[i], &arr[rand() % n]);
-}
-
-int main(int argc, char *argv[]) {
-  int size = sizeof(array) / sizeof(array[0]);
-  sort(array, size);
-  printList(array, size);
-  return 0;
+int main() {
+  vector<int> a = {0, 39, 21, 62, 91, 77, 14, 23};
+  sort(a);
+  cout << "[";
+  for (size_t i = 0; i < a.size(); ++i) {
+    if (i)
+      cout << ", ";
+    cout << a[i];
+  }
+  cout << "]\n";
 }

@@ -1,20 +1,22 @@
-fun isSorted(arr: Array<Int>): Boolean =
-  arr.toList().asSequence().zipWithNext { a, b ->
-    a <= b
-  }.all { it }
-
-fun sort(arr: Array<Int>) {
-  val n = arr.size
-  while (!isSorted(arr)) {
-    val index = (0..(n - 2)).random()
-    if (arr[index] > arr[index + 1]) {
-      arr[index] = arr[index + 1].also { arr[index + 1] = arr[index] }
+fun sort(a: Array<Int>) {
+  val n = a.size
+  if (n < 2) return
+  var swapped = true
+  while (swapped) {
+    swapped = false
+    for (i in 0 until n - 1) {
+      if (a[i] > a[i + 1]) {
+        val held = a[i]
+        a[i] = a[i + 1]
+        a[i + 1] = held
+        swapped = true
+      }
     }
   }
 }
 
 fun main() {
-  val array = arrayOf<Int>(0, 39, 21, 62, 91, 77, 14, 23)
+  val array = arrayOf(0, 39, 21, 62, 91, 77, 14, 23)
   sort(array)
   println("[%s]".format(array.joinToString(", ")))
 }

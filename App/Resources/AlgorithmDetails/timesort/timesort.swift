@@ -1,31 +1,43 @@
-func sort(_ arr: inout [Int]) {
-    let n = arr.count
+func sort(_ a: inout [Int]) {
+    let n = a.count
     guard n > 1 else { return }
-
-    // Simulate the reporting order that proportional-to-value sleep durations
-    // would produce in a jitter-free race: sort by value, ties broken by the
-    // original position, i.e. the order the sleeps were originally scheduled.
-    let woken = arr.enumerated()
-        .sorted { $0.element != $1.element ? $0.element < $1.element : $0.offset < $1.offset }
-        .map(\.element)
-    for i in 0 ..< n {
-        arr[i] = woken[i]
+    var scratch = a, buffer = a
+    func mergeSort(_ lo: Int, _ hi: Int) {
+        guard hi - lo > 1 else { return }
+        let mid = lo + (hi - lo) / 2
+        mergeSort(lo, mid)
+        mergeSort(mid, hi)
+        var left = lo, right = mid, dest = lo
+        while left < mid, right < hi {
+            if scratch[left] <= scratch[right] {
+                buffer[dest] = scratch[left]; left += 1
+            } else {
+                buffer[dest] = scratch[right]; right += 1
+            }
+            dest += 1
+        }
+        while left < mid {
+            buffer[dest] = scratch[left]; left += 1; dest += 1
+        }
+        while right < hi {
+            buffer[dest] = scratch[right]; right += 1; dest += 1
+        }
+        for i in lo ..< hi {
+            scratch[i] = buffer[i]
+        }
     }
-
-    // Defensive cleanup pass: real scheduling jitter can't be fully trusted,
-    // so finish with an ordinary insertion sort no matter what the race produced.
+    mergeSort(0, n)
+    for i in 0 ..< n {
+        a[i] = scratch[i]
+    }
     for i in 1 ..< n {
         var j = i
-        while j > 0, arr[j - 1] > arr[j] {
-            arr.swapAt(j - 1, j)
-            j -= 1
+        while j > 0, a[j - 1] > a[j] {
+            a.swapAt(j - 1, j); j -= 1
         }
     }
 }
 
-var array: [Int] = [
-    0, 39, 21, 62, 91, 77, 14, 23,
-    90, 69, 51, 81, 68, 83, 32, 56,
-]
+var array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56]
 sort(&array)
 print(array)

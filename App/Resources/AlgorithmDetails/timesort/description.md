@@ -27,3 +27,7 @@ already happened to be sorted; on a run where the scheduler was unkind to a coup
 quietly corrects them. Either way, correctness ends up resting on the comparison pass rather than
 on the race, which makes the sleeping and reporting mostly a colorful, needlessly expensive way of
 producing a starting point that is usually already sorted or very close to it.
+
+For a repeatable recording, the app simulates the ideal wake order with an explicit stable merge
+sort over a scratch copy, writes that order back, then performs the insertion cleanup pass. The
+reference samples implement this same sequence without creating sleeping threads.

@@ -1,50 +1,55 @@
 package main
 
-import (
-	"fmt"
-)
+import "fmt"
 
-func sort(arr []int) []int {
-	n := len(arr)
-	if n <= 1 {
-		return arr
+func sort(a []int) []int {
+	n := len(a)
+	if n < 2 {
+		return a
 	}
-
-	// Simulate the reporting order that proportional-to-value sleep durations
-	// would produce in a jitter-free race: a stable sort of the original
-	// positions by value, so ties wake in the order they were scheduled.
-	indices := make([]int, n)
-	for i := range indices {
-		indices[i] = i
+	scratch := append([]int(nil), a...)
+	buffer := append([]int(nil), scratch...)
+	var mergeSort func(int, int)
+	mergeSort = func(lo, hi int) {
+		if hi-lo < 2 {
+			return
+		}
+		mid := lo + (hi-lo)/2
+		mergeSort(lo, mid)
+		mergeSort(mid, hi)
+		left, right, dest := lo, mid, lo
+		for left < mid && right < hi {
+			if scratch[left] <= scratch[right] {
+				buffer[dest] = scratch[left]
+				left++
+			} else {
+				buffer[dest] = scratch[right]
+				right++
+			}
+			dest++
+		}
+		for left < mid {
+			buffer[dest] = scratch[left]
+			left++
+			dest++
+		}
+		for right < hi {
+			buffer[dest] = scratch[right]
+			right++
+			dest++
+		}
+		copy(scratch[lo:hi], buffer[lo:hi])
 	}
+	mergeSort(0, n)
+	copy(a, scratch)
 	for i := 1; i < n; i++ {
-		j := i
-		for j > 0 && arr[indices[j-1]] > arr[indices[j]] {
-			indices[j-1], indices[j] = indices[j], indices[j-1]
-			j--
+		for j := i; j > 0 && a[j-1] > a[j]; j-- {
+			a[j-1], a[j] = a[j], a[j-1]
 		}
 	}
-
-	woken := make([]int, n)
-	for i, idx := range indices {
-		woken[i] = arr[idx]
-	}
-	copy(arr, woken)
-
-	// Defensive cleanup pass: real scheduling jitter can't be fully trusted,
-	// so finish with an ordinary insertion sort no matter what the race produced.
-	for i := 1; i < n; i++ {
-		j := i
-		for j > 0 && arr[j-1] > arr[j] {
-			arr[j-1], arr[j] = arr[j], arr[j-1]
-			j--
-		}
-	}
-	return arr
+	return a
 }
-
 func main() {
-	array := []int{0, 39, 21, 62, 91, 77, 14, 23,
-		90, 69, 51, 81, 68, 83, 32, 56}
+	array := []int{0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56}
 	fmt.Println(sort(array))
 }

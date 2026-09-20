@@ -1,42 +1,30 @@
-#include <cstdio>
-#include <cstdlib>
-#include <utility>
-
-int array[8] = {0, 39, 21, 62, 91, 77, 14, 23};
-
-void printList(int arr[], int n) {
-  for (int i = 0; i < n; i++) {
-    if (i == 0) {
-      printf("[%d, ", arr[i]);
-    } else if (i != n - 1) {
-      printf("%d, ", arr[i]);
-    } else {
-      printf("%d]", arr[i]);
-    }
+#include <iostream>
+#include <vector>
+using namespace std;
+void sort(vector<int> &a) {
+  int n = (int)a.size();
+  if (n < 2)
+    return;
+  bool swapped = true;
+  while (swapped) {
+    swapped = false;
+    for (int i = 0; i + 1 < n; i++)
+      if (a[i] > a[i + 1]) {
+        int held = a[i];
+        a[i] = a[i + 1];
+        a[i + 1] = held;
+        swapped = true;
+      }
   }
 }
-
-bool isSorted(int arr[], int n) {
-  for (int i = 1; i < n; i++) {
-    if (arr[i] < arr[i - 1]) {
-      return false;
-    }
+int main() {
+  vector<int> a = {0, 39, 21, 62, 91, 77, 14, 23};
+  sort(a);
+  cout << "[";
+  for (size_t i = 0; i < a.size(); ++i) {
+    if (i)
+      cout << ", ";
+    cout << a[i];
   }
-  return true;
-}
-
-void sort(int arr[], int n) {
-  while (!isSorted(arr, n)) {
-    int index = rand() % (n - 1);
-    if (arr[index] > arr[index + 1]) {
-      std::swap(arr[index], arr[index + 1]);
-    }
-  }
-}
-
-int main(int argc, char *argv[]) {
-  int size = sizeof(array) / sizeof(array[0]);
-  sort(array, size);
-  printList(array, size);
-  return 0;
+  cout << "]\n";
 }

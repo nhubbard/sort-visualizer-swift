@@ -1,12 +1,14 @@
-import random
-
-
-def sort(arr):
-    n = len(arr)
-    while arr != sorted(arr):
-        index = random.randint(0, n - 2)
-        if arr[index] > arr[index + 1]:
-            arr[index], arr[index + 1] = arr[index + 1], arr[index]
+def sort(a):
+    n = len(a)
+    if n < 2:
+        return
+    swapped = True
+    while swapped:
+        swapped = False
+        for i in range(n - 1):
+            if a[i] > a[i + 1]:
+                a[i], a[i + 1] = a[i + 1], a[i]
+                swapped = True
 
 
 array = [0, 39, 21, 62, 91, 77, 14, 23]

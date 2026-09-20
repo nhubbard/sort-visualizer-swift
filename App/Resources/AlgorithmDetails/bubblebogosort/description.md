@@ -8,3 +8,7 @@ fix every inversion in a handful of draws, while an unlucky one can spend long s
 already correct before it happens to land on the one pair still out of place. It terminates with probability 1 (every
 inversion is eventually drawn and, once found, is always fixed rather than reintroduced), but the number of draws needed
 is an open-ended random variable rather than a guarantee.
+
+The app records a deterministic version so every run finishes: it sweeps adjacent pairs from left
+to right, swapping inverted neighbors, and repeats until a complete sweep makes no swap. The
+reference samples show that same bounded behavior.
