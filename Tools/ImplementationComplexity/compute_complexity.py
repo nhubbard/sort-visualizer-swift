@@ -48,6 +48,7 @@ _SOURCES_DIR = Path(__file__).parents[2] / "Modules" / "BuiltInAlgorithms" / "So
 _TEMPLATES_DIR = _SOURCES_DIR / "Templates"
 
 _TEMPLATE_TYPE_NAMES = [
+    "MultiWayMergeSortingTemplate",
     "UnstableGrailSortingTemplate",
     "BinaryQuickSortingTemplate",
     "ShatterSortingTemplate",

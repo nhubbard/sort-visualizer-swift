@@ -5,6 +5,9 @@ end date. This page tracks what's shipped and what remains, and the team keeps i
 algorithms move from one list to the other. See
 [Adding a sorting algorithm](../guides/adding-an-algorithm.md) for the porting process.
 
+The [reference fidelity audit](reference-fidelity-audit.md) tracks whether the ten language
+samples for each shipped algorithm reflect the native Swift implementation.
+
 ## Sorting algorithms
 
 ArrayV defines 208 sorting-algorithm classes across nine categories, plus 21 shared template base
@@ -18,7 +21,7 @@ sequential version, under a different name. Real thread interleaving has no mean
 single-writer model. Porting these variants would add duplicate content, not new algorithmic
 behavior.
 
-This leaves 196 candidates. 180 are shipped. 16 remain, in one category.
+This leaves 196 candidates. 182 are shipped. 14 remain, in one category.
 
 ### By category
 
@@ -31,7 +34,7 @@ This leaves 196 candidates. 180 are shipped. 16 remain, in one category.
 | Merge (19) | All ported |
 | Miscellaneous (4) | All ported |
 | Concurrent (22) | All ported |
-| Hybrid (41) | 25 ported, 16 remaining |
+| Hybrid (41) | 27 ported, 14 remaining |
 
 ### Remaining work
 
@@ -44,12 +47,11 @@ line count. Inherited template logic is real complexity a port must understand a
 
 - `MedianMergeSort`, `LazierestSort`, `CircularGrailSort`
   (self-contained despite the name; it does not extend `GrailSorting`), `FifthMergeSort`,
-  `BufferPartitionMergeSort`, `OptimizedRotateMergeSort`, `RemiSort` (270 own plus 82 for the
-  shared `MultiWayMergeSorting` template), `EctaSort`.
+  `BufferPartitionMergeSort`, `OptimizedRotateMergeSort`, `EctaSort`.
 
 **Very Hard** (400+ effective lines, or extending one of the largest remaining templates):
 
-- `SqrtSort`, `FlanSort` (367 own plus 82 for `MultiWayMergeSorting`), `SynchronousSqrtSort` (190
+- `SqrtSort`, `SynchronousSqrtSort` (190
   own plus 352 for `BlockMergeSorting`), `AdaptiveGrailSort` (915 lines, self-contained despite the
   name), `TimSort` (a 45-line wrapper over the 950-line `TimSorting` template), `ChaliceSort` (767
   own plus 352 for `BlockMergeSorting`), `WikiSort` (a 75-line wrapper over the 1068-line
@@ -59,9 +61,6 @@ line count. Inherited template logic is real complexity a port must understand a
 Several of these algorithms share one large template or one unported prerequisite. Porting the
 shared piece once reduces the cost of every sibling in that cluster:
 
-- **MultiWayMerge cluster**: `FlanSort` and `RemiSort` (both Hybrid) both extend
-  `MultiWayMergeSorting` (82 lines). This template is much smaller than `QuadSorting`, so this pair
-  costs less than the members' own size alone suggests.
 - **BlockMerge cluster**: `ChaliceSort` and `SynchronousSqrtSort` (both Hybrid) both extend
   `BlockMergeSorting` (352 lines).
 
@@ -70,8 +69,11 @@ future batch covering the largest remaining sorts across every category.
 
 ### Completed clusters
 
-Two large clusters were tackled as a unit and have shipped in full, validating the
+Several clusters were tackled as a unit and have shipped in full, validating the
 port-the-shared-template-once strategy:
+
+- **MultiWayMerge cluster**: `FlanSort` and `RemiSort` (both Hybrid) now share the heap helpers
+  ported from `MultiWayMergeSorting`; each keeps its distinct merge and sorting logic.
 
 - **Bogo/Guess family**, spread across the Exchange and Distribution categories: all extend
   `BogoSorting` (261 lines). The real blocker for this cluster was never the template. It was the
@@ -104,7 +106,7 @@ hand-transcribed Java-to-pseudocode notes for six templates: `BinaryQuickSorting
 `ShatterSortingTemplate`, `TwinSortingTemplate`, `UnstableGrailSortingTemplate`,
 `PDQSortingTemplate`, and `GrailSortingTemplate`. Every algorithm built on those six templates has
 shipped, so the team retired that document instead of carrying it forward. It does not cover any of
-the templates listed above as still open (`MultiWayMergeSorting`, `BlockMergeSorting`,
+the templates listed above as still open (`BlockMergeSorting`,
 `TimSorting`, `WikiSorting`, `KotaSorting`) — nor `QuadSorting`, which has since shipped without
 one. A similar transcription pass is worth doing again before tackling the remaining open
 templates, given how dense and index-arithmetic-heavy this style of algorithm tends to be.

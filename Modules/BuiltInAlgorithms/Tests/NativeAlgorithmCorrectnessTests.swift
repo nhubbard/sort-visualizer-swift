@@ -9,6 +9,63 @@ import Testing
 /// that used to be a `.js`/`.manifest.json` pair before all 20 were ported to native Swift.
 @Suite
 struct NativeAlgorithmCorrectnessTests {
+  @Test
+  func multiWayMergeClusterSortsAndRecordsDeterministically() {
+    for algorithm in [RemiSort(), FlanSort()] as [any SortAlgorithm] {
+      for size in [2, 15, 16, 31, 32, 33, 63, 64, 127, 128, 256, 512] {
+        for seed in 0..<32 {
+          var state = UInt64(size * 1_009 + seed + 1)
+          let input = (0..<size).map { _ in
+            state = state &* 6_364_136_223_846_793_005 &+ 1_442_695_040_888_963_407
+            return Int(state % 11) - 5
+          }
+          var first = RecordingEngine(values: input, operationCap: 2_000_000)
+          var second = RecordingEngine(values: input, operationCap: 2_000_000)
+          algorithm.record(into: &first)
+          algorithm.record(into: &second)
+          #expect(first.values == input.sorted(), "\(algorithm.id.rawValue) failed at size \(size), seed \(seed)")
+          #expect(first.values == second.values)
+          #expect(first.finish().tape == second.finish().tape, "\(algorithm.id.rawValue) produced a different tape")
+        }
+      }
+    }
+  }
+
+  @Test
+  func remiPreservesAndFlanCanReorderEqualValues() {
+    let radix = 1024
+    var sawFlanReorder = false
+    for size in [32, 33, 64, 127, 256] {
+      for seed in 0..<40 {
+        var state = UInt64(size * 4_093 + seed + 1)
+        let input = (0..<size).map { index in
+          state = state &* 6_364_136_223_846_793_005 &+ 1_442_695_040_888_963_407
+          return Int(state % 4) * radix + index
+        }
+        for algorithm in [RemiSort(), FlanSort()] as [any SortAlgorithm] {
+          var engine = RecordingEngine(
+            values: input, operationCap: 2_000_000,
+            comparisonKeyForTesting: { $0 / radix }
+          )
+          algorithm.record(into: &engine)
+          let output = engine.values
+          #expect(output.map { $0 / radix } == input.map { $0 / radix }.sorted())
+          for i in 1..<size where output[i - 1] / radix == output[i] / radix {
+            if output[i - 1] % radix > output[i] % radix {
+              if algorithm.id.rawValue == "remisort" {
+                Issue.record("Remi Sort reordered equal values at size \(size), seed \(seed)")
+              } else {
+                sawFlanReorder = true
+              }
+              break
+            }
+          }
+        }
+      }
+    }
+    #expect(sawFlanReorder, "expected to witness Flan Sort's claimed instability")
+  }
+
   private static let algorithms: [any SortAlgorithm] = [
     AATreeSort(), AVLTreeSort(), AmericanFlagSort(), AsynchronousSort(), BadSort(), BaseNMaxHeapSort(),
     BinaryDoubleInsertionSort(), BinaryGnomeSort(), BinaryInsertionSort(), BinaryMergeSort(),
@@ -20,7 +77,7 @@ struct NativeAlgorithmCorrectnessTests {
     ClassicTreeSort(), CocktailBogoSort(), CocktailMergeSort(), CocktailShakerSort(), CombSort(), CompleteGraphSort(),
     CountingSort(), CreaseSort(), CycleSort(), DeterministicBogoSort(), DiamondSortIterative(), DiamondSortRecursive(),
     DoubleInsertionSort(), DoubleSelectionSort(), DropMergeSort(), DualPivotQuickSort(), ExchangeBogoSort(),
-    FlashSort(), FlippedMinHeapSort(), FluxSort(), FoldSort(), ForcedStableQuickSort(), FunSort(), GnomeSort(),
+    FlashSort(), FlippedMinHeapSort(), FlanSort(), FluxSort(), FoldSort(), ForcedStableQuickSort(), FunSort(), GnomeSort(),
     GrailSort(), GravitySort(), GuessSort(), HanoiSort(), HybridCombSort(), ImprovedBlockSelectionSort(),
     ImprovedInPlaceMergeSort(), InPlaceLSDRadixSort(), InPlaceMergeSort(), InsertionSort(), IntroCircleSortIterative(),
     IntroCircleSortRecursive(), IntroSort(), IterativeTopDownMergeSort(), LaziestSort(), LazyHeapSort(),
@@ -33,7 +90,7 @@ struct NativeAlgorithmCorrectnessTests {
     OutOfPlaceHeapSort(), PairwiseMergeSortIterative(), PairwiseMergeSortRecursive(), PairwiseSortIterative(),
     PairwiseSortRecursive(), PancakeInsertionSort(), PancakeSort(), PatienceSort(), PDMergeSort(), PDQBranchedSort(),
     PDQBranchlessSort(), PigeonholeSort(), PoplarHeapSort(), QuadSort(), QuadStoogeSort(), QuickBogoSort(), QuickSort(),
-    RandomGuessSort(), RecursiveShellSort(), RedBlackTreeSort(), RotateLSDRadixSort(), RotateMergeSort(),
+    RandomGuessSort(), RemiSort(), RecursiveShellSort(), RedBlackTreeSort(), RotateLSDRadixSort(), RotateMergeSort(),
     RotateMSDRadixSort(), SelectionBogoSort(), SelectionSort(), ShatterSort(), ShellSort(), ShoveSort(), SillySort(),
     SimpleShatterSort(), SimplifiedLibrarySort(), SimplisticGravitySort(), SlopeSort(), SlowSort(), SmartBogoBogoSort(),
     SmartGuessSort(), SmoothSort(), SnuffleSort(), SplaySort(), StableCycleSort(), StablePermutationSort(),
