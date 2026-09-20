@@ -4,7 +4,10 @@ def sort(arr):
 
     def permute(length):
         if length < 2:
-            return arr == sorted(arr)
+            for i in range(1, n):
+                if arr[i] < arr[i - 1]:
+                    return False
+            return True
         for i in range(length - 2, -1, -1):
             if permute(length - 1):
                 return True

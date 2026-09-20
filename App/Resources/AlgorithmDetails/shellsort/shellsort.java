@@ -3,16 +3,14 @@ import java.util.Arrays;
 public class shellsort {
   public static void sort(int[] arr) {
     int n = arr.length;
-    for (int i = n / 2; i > 0; i /= 2) {
-      for (int j = i; j < n; j++) {
-        for (int k = j - i; k >= 0; k -= i) {
-          if (arr[k + i] >= arr[k]) {
-            break;
-          } else {
-            int temp = arr[k];
-            arr[k] = arr[k + i];
-            arr[k + i] = temp;
-          }
+    int[] gaps = {8861, 3938, 1750, 701, 301, 132, 57, 23, 10, 4, 1};
+    for (int gap : gaps) {
+      if (gap >= n) continue;
+      for (int i = gap; i < n; i++) {
+        for (int j = i; j >= gap && arr[j] < arr[j - gap]; j -= gap) {
+          int temp = arr[j];
+          arr[j] = arr[j - gap];
+          arr[j - gap] = temp;
         }
       }
     }

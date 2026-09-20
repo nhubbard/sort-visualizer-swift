@@ -1,21 +1,15 @@
 def sort(arr)
   n = arr.length
-  i = n / 2
-  while i > 0
-    j = i
-    while j < n
-      k = j - i
-      while k >= 0
-        if arr[k + i] >= arr[k]
-          break
-        else
-          arr[k], arr[k + i] = arr[k + i], arr[k]
-        end
-        k -= i
+  gaps = [8861, 3938, 1750, 701, 301, 132, 57, 23, 10, 4, 1]
+  gaps.each do |gap|
+    next if gap >= n
+    (gap...n).each do |i|
+      j = i
+      while j >= gap && arr[j] < arr[j - gap]
+        arr[j], arr[j - gap] = arr[j - gap], arr[j]
+        j -= gap
       end
-      j += 1
     end
-    i /= 2
   end
 end
 

@@ -22,14 +22,15 @@ void printList(int items[], int size) {
 }
 
 void sort(int arr[], int n) {
-  for (int i = n / 2; i > 0; i /= 2) {
-    for (int j = i; j < n; j++) {
-      for (int k = j - i; k >= 0; k -= i) {
-        if (arr[k + i] >= arr[k]) {
-          break;
-        } else {
-          swap(&arr[k], &arr[k + i]);
-        }
+  const int gaps[] = {8861, 3938, 1750, 701, 301, 132, 57, 23, 10, 4, 1};
+  for (int g = 0; g < 11; g++) {
+    int gap = gaps[g];
+    if (gap >= n) continue;
+    for (int i = gap; i < n; i++) {
+      int j = i;
+      while (j >= gap && arr[j] < arr[j - gap]) {
+        swap(&arr[j], &arr[j - gap]);
+        j -= gap;
       }
     }
   }

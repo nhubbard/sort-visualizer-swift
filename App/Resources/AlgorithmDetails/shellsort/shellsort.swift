@@ -1,19 +1,14 @@
 func sort(_ arr: inout [Int]) {
     let n = arr.count
-    var i = n / 2
-    while i > 0 {
-        for j in i ..< n {
-            var k = j - i
-            while k >= 0 {
-                if arr[k + i] >= arr[k] {
-                    break
-                } else {
-                    arr.swapAt(k, k + i)
-                }
-                k -= i
+    let gaps = [8861, 3938, 1750, 701, 301, 132, 57, 23, 10, 4, 1]
+    for gap in gaps where gap < n {
+        for i in gap ..< n {
+            var j = i
+            while j >= gap && arr[j] < arr[j - gap] {
+                arr.swapAt(j, j - gap)
+                j -= gap
             }
         }
-        i /= 2
     }
 }
 
