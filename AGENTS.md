@@ -21,4 +21,27 @@ This is **Sort Symphony**, a Swift/SwiftUI sorting visualizer for iOS, iPadOS, a
 - Run SwiftFormat serially if needed; prior parallel formatting corrupted source files.
 - Tuist's manifest cache can miss dynamically discovered source files. Regenerate the project after adding files; clean manifests if discovery remains stale.
 
+## Reference implementation preferences
+
+- The ten-language samples in `App/Resources/AlgorithmDetails/` are teaching examples. Preserve
+  each algorithm's defining logic and make the control flow easy to follow; exhaustive behavior
+  on every possible input is not the goal. Prefer clear, multiline implementations over compressed
+  one-liners or dense formatting.
+- Use the files in `App/Resources/AlgorithmDetails/template/` as the structural baseline. Put
+  shared template declarations and methods (including the public `sort` entry point) first,
+  algorithm-specific helpers next, and the executable `main` or sample block last. Use forward
+  declarations or thin wrappers where a language requires them, without obscuring the algorithm.
+- Improve efficiency when the simpler implementation is also clearer, as with the C/C++
+  `printList` loop. Do not replace an algorithm's characteristic steps merely to optimize a
+  demonstration.
+- After editing reference sources, use `App/Resources/AlgorithmDetails/manage.py` to run the
+  relevant `test` checks, then `highlight` and `pack` so the shipped `AlgorithmDetails.algz`
+  matches the source. Check the rendered code for readability when formatting changes are broad.
+- Do not impose one 128-element input on every sample: calibrated slow algorithms need smaller
+  examples, and a unique-value permutation does not cover duplicate paths. Add size-aware test
+  cases when needed rather than making the displayed example unwieldy.
+- For broad reference changes, group related source edits into focused commits and keep generated
+  content separate. Temporary verification ledgers should not remain in the final PR tree; check
+  the PR base and explain inherited branch history before publishing.
+
 Claude's longer historical notes are at `~/.claude/projects/-Users-nhubbard-XcodeProjects-sort-visualizer-swift-xc16/memory/MEMORY.md`. They are useful background, but verify old paths, counts, and claims against current source and docs before relying on them.
