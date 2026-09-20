@@ -1,5 +1,4 @@
 func sort(_ arr: inout [Int]) {
-    let n = arr.count
     // TODO: Insert Swift implementation of algorithm here.
 }
 

@@ -1,6 +1,7 @@
 def sort(arr):
     n = len(arr)
     # TODO: Insert Python implementation of algorithm here.
+    pass
 
 
 if __name__ == "__main__":
