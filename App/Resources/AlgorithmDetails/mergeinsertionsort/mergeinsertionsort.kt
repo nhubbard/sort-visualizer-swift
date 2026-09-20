@@ -1,107 +1,69 @@
-// Tags a value with its original index so a pending element can find its way back to the
-// right chain partner even after the chain has been recursively reordered.
-data class Elem(
-  val value: Int,
-  val index: Int,
-)
-
-// Inserts elem into the already-sorted seq via binary search, comparing by value only.
-fun binaryInsert(seq: MutableList<Elem>, elem: Elem) {
-  var lo = 0
-  var hi = seq.size
-  while (lo < hi) {
-    val mid = (lo + hi) / 2
-    if (seq[mid].value <= elem.value) {
-      lo = mid + 1
-    } else {
-      hi = mid
-    }
+fun blockSwap(arr: Array<Int>, a: Int, b: Int, size: Int) {
+  for (offset in 0 until size) {
+    val x = a - size + 1 + offset
+    val y = b - size + 1 + offset
+    val tmp = arr[x]; arr[x] = arr[y]; arr[y] = tmp
   }
-  seq.add(lo, elem)
 }
-
-// Returns, as 1-based positions into a list of `count` not-yet-placed pending elements, the
-// order to insert them in: 2, then 4 and 3, then 10 down to 5, then 20 down to 11, and so on.
-// This Jacobsthal-number grouping is what makes merge-insertion sort comparison-optimal.
-// Position 1 is never included -- it is always placed for free before any of these insertions
-// happen.
-fun jacobsthalInsertionOrder(count: Int): List<Int> {
-  val maxPosition = count + 1
-  val order = mutableListOf<Int>()
-  var placedThrough = 1
-  var k = 2
-  while (placedThrough < maxPosition) {
-    val sign = if (k % 2 == 0) 1 else -1
-    val t = ((1 shl (k + 1)) + sign) / 3
-    val groupEnd = minOf(t - 1, maxPosition)
-    for (position in groupEnd downTo placedThrough + 1) {
-      order.add(position)
-    }
-    placedThrough = groupEnd
-    k++
-  }
-  return order
+fun blockInsert(arr: Array<Int>, end: Int, target: Int, size: Int) {
+  var end = end
+  while (end - size >= target) { blockSwap(arr, end - size, end, size); end -= size }
 }
-
-// Splits items into a (chain, partnerOf, extra) triple: chain holds the larger element of each
-// adjacent pair, partnerOf maps a chain element's original index to its paired (smaller)
-// element, and extra is a leftover element with no partner when items has odd length.
-fun pairUp(items: List<Elem>): Triple<List<Elem>, Map<Int, Elem>, Elem?> {
-  val chain = mutableListOf<Elem>()
-  val partnerOf = mutableMapOf<Int, Elem>()
-  var i = 0
-  val n = items.size
-  while (i + 1 < n) {
-    val a = items[i]
-    val b = items[i + 1]
-    val small = if (a.value <= b.value) a else b
-    val large = if (a.value <= b.value) b else a
-    partnerOf[large.index] = small
-    chain.add(large)
-    i += 2
-  }
-  val extra = if (i < n) items[i] else null
-  return Triple(chain, partnerOf, extra)
+fun blockReversal(arr: Array<Int>, start: Int, finish: Int, size: Int) {
+  var a = start
+  var b = finish - size
+  while (b > a) { blockSwap(arr, a, b, size); a += size; b -= size }
 }
-
-// Sorts a list of Elem by value. The index tags are what let a pending element find its way
-// back to the right chain partner after the chain has been recursively reordered by this same
-// function one level down.
-fun sortTagged(items: List<Elem>): List<Elem> {
-  if (items.size <= 1) {
-    return items.toList()
+fun blockSearch(arr: Array<Int>, start: Int, finish: Int, size: Int, value: Int): Int {
+  var a = start
+  var b = finish
+  while (a < b) {
+    val mid = a + (((b - a) / size) / 2) * size
+    if (value < arr[mid]) b = mid else a = mid + size
   }
-
-  val (chain, partnerOf, extra) = pairUp(items)
-  val sortedChain = sortTagged(chain)
-
-  // The pending partner of the smallest chain element is guaranteed smaller than every other
-  // chain element too, so it can go straight to the front with no comparison at all.
-  val sequence = mutableListOf(partnerOf[sortedChain[0].index]!!)
-  sequence.addAll(sortedChain)
-
-  val remaining = mutableListOf<Elem>()
-  for (k in 1 until sortedChain.size) {
-    remaining.add(partnerOf[sortedChain[k].index]!!)
-  }
-  if (extra != null) {
-    remaining.add(extra)
-  }
-
-  for (position in jacobsthalInsertionOrder(remaining.size)) {
-    binaryInsert(sequence, remaining[position - 2])
-  }
-
-  return sequence
+  return a
 }
-
+fun order(arr: Array<Int>, a: Int, b: Int, size: Int) {
+  var i = a
+  var j = i + size
+  while (j < b) { blockInsert(arr, j, i, size); i += size; j += 2 * size }
+  val mid = a + (((b - a) / size) / 2) * size
+  blockReversal(arr, mid, b, size)
+}
 fun sort(arr: Array<Int>) {
-  val n = arr.size
-  if (n < 2) return
-  val tagged = arr.mapIndexed { index, value -> Elem(value, index) }
-  val sortedTagged = sortTagged(tagged)
-  for (i in 0 until n) {
-    arr[i] = sortedTagged[i].value
+  val length = arr.size
+  if (length < 2) return
+  var k = 1
+  while (2 * k <= length) {
+    var i = 2 * k - 1
+    while (i < length) {
+      if (arr[i - k] > arr[i]) blockSwap(arr, i - k, i, k)
+      i += 2 * k
+    }
+    k *= 2
+  }
+  while (k > 0) {
+    val a = k - 1
+    var i = a + 2 * k
+    var g = 2
+    var p = 4
+    while (i + 2 * k * g - k <= length) {
+      order(arr, i, i + 2 * k * g - k, k)
+      val b = a + k * (p - 1)
+      i += k * g - k
+      var j = i
+      while (j < i + k * g) {
+        blockInsert(arr, j, blockSearch(arr, a, b, k, arr[j]), k)
+        j += k
+      }
+      i += k * g + k
+      g = p - g; p *= 2
+    }
+    while (i < length) {
+      blockInsert(arr, i, blockSearch(arr, a, i, k, arr[i]), k)
+      i += 2 * k
+    }
+    k /= 2
   }
 }
 

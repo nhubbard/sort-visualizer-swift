@@ -1,140 +1,71 @@
 using System;
-using System.Collections.Generic;
 
 public class MergeInsertionSort
 {
-  // Tags a value with its original index so a pending element can find its way back to the
-  // right chain partner even after the chain has been recursively reordered.
-  struct Elem
+  static void BlockSwap(int[] arr, int a, int b, int size)
   {
-    public int Value;
-    public int Index;
-
-    public Elem(int value, int index)
+    for (int offset = 0; offset < size; offset++)
     {
-      Value = value;
-      Index = index;
+      int x = a - size + 1 + offset, y = b - size + 1 + offset;
+      (arr[x], arr[y]) = (arr[y], arr[x]);
     }
   }
-
-  // Inserts elem into the already-sorted seq via binary search, comparing by value only.
-  static void BinaryInsert(List<Elem> seq, Elem elem)
+  static void BlockInsert(int[] arr, int a, int b, int size)
   {
-    int lo = 0;
-    int hi = seq.Count;
-    while (lo < hi)
-    {
-      int mid = (lo + hi) / 2;
-      if (seq[mid].Value <= elem.Value)
-      {
-        lo = mid + 1;
-      }
-      else
-      {
-        hi = mid;
-      }
-    }
-    seq.Insert(lo, elem);
+    while (a - size >= b) { BlockSwap(arr, a - size, a, size); a -= size; }
   }
-
-  // Returns, as 1-based positions into a list of `count` not-yet-placed pending elements, the
-  // order to insert them in: 2, then 4 and 3, then 10 down to 5, then 20 down to 11, and so on.
-  // This Jacobsthal-number grouping is what makes merge-insertion sort comparison-optimal.
-  // Position 1 is never included -- it is always placed for free before any of these
-  // insertions happen.
-  static List<int> JacobsthalInsertionOrder(int count)
+  static void BlockReversal(int[] arr, int a, int b, int size)
   {
-    int maxPosition = count + 1;
-    List<int> order = new List<int>();
-    int placedThrough = 1;
-    int k = 2;
-    while (placedThrough < maxPosition)
-    {
-      int sign = (k % 2 == 0) ? 1 : -1;
-      int t = ((1 << (k + 1)) + sign) / 3;
-      int groupEnd = Math.Min(t - 1, maxPosition);
-      for (int position = groupEnd; position > placedThrough; position--)
-      {
-        order.Add(position);
-      }
-      placedThrough = groupEnd;
-      k++;
-    }
-    return order;
+    b -= size;
+    while (b > a) { BlockSwap(arr, a, b, size); a += size; b -= size; }
   }
-
-  // Splits items into chain (the larger element of each adjacent pair), partnerOf (mapping a
-  // chain element's original index to its paired, smaller element), and extra (a leftover
-  // element with no partner when items has odd length).
-  static (List<Elem>, Dictionary<int, Elem>, Elem?) PairUp(List<Elem> items)
+  static int BlockSearch(int[] arr, int a, int b, int size, int value)
   {
-    List<Elem> chain = new List<Elem>();
-    Dictionary<int, Elem> partnerOf = new Dictionary<int, Elem>();
-    int i = 0;
-    int n = items.Count;
-    while (i + 1 < n)
+    while (a < b)
     {
-      Elem a = items[i];
-      Elem b = items[i + 1];
-      Elem small = a.Value <= b.Value ? a : b;
-      Elem large = a.Value <= b.Value ? b : a;
-      partnerOf[large.Index] = small;
-      chain.Add(large);
-      i += 2;
+      int mid = a + (((b - a) / size) / 2) * size;
+      if (value < arr[mid]) b = mid;
+      else a = mid + size;
     }
-    Elem? extra = i < n ? items[i] : (Elem?)null;
-    return (chain, partnerOf, extra);
+    return a;
   }
-
-  // Sorts a list of Elem by value. The index tags are what let a pending element find its way
-  // back to the right chain partner after the chain has been recursively reordered by this
-  // same function one level down.
-  static List<Elem> SortTagged(List<Elem> items)
+  static void Order(int[] arr, int a, int b, int size)
   {
-    if (items.Count <= 1)
-    {
-      return new List<Elem>(items);
-    }
-
-    var (chain, partnerOf, extra) = PairUp(items);
-    List<Elem> sortedChain = SortTagged(chain);
-
-    // The pending partner of the smallest chain element is guaranteed smaller than every
-    // other chain element too, so it can go straight to the front with no comparison at all.
-    List<Elem> sequence = new List<Elem> { partnerOf[sortedChain[0].Index] };
-    sequence.AddRange(sortedChain);
-
-    List<Elem> remaining = new List<Elem>();
-    for (int k = 1; k < sortedChain.Count; k++)
-    {
-      remaining.Add(partnerOf[sortedChain[k].Index]);
-    }
-    if (extra != null)
-    {
-      remaining.Add(extra.Value);
-    }
-
-    foreach (int position in JacobsthalInsertionOrder(remaining.Count))
-    {
-      BinaryInsert(sequence, remaining[position - 2]);
-    }
-
-    return sequence;
+    int i = a, j = i + size;
+    while (j < b) { BlockInsert(arr, j, i, size); i += size; j += 2 * size; }
+    int mid = a + (((b - a) / size) / 2) * size;
+    BlockReversal(arr, mid, b, size);
   }
-
   public static void Sort(int[] arr)
   {
-    int n = arr.Length;
-    if (n < 2) return;
-    List<Elem> tagged = new List<Elem>();
-    for (int i = 0; i < n; i++)
+    int length = arr.Length;
+    if (length < 2) return;
+    int k = 1;
+    while (2 * k <= length)
     {
-      tagged.Add(new Elem(arr[i], i));
+      for (int i = 2 * k - 1; i < length; i += 2 * k)
+        if (arr[i - k] > arr[i]) BlockSwap(arr, i - k, i, k);
+      k *= 2;
     }
-    List<Elem> sortedTagged = SortTagged(tagged);
-    for (int i = 0; i < n; i++)
+    while (k > 0)
     {
-      arr[i] = sortedTagged[i].Value;
+      int a = k - 1, i = a + 2 * k, g = 2, p = 4;
+      while (i + 2 * k * g - k <= length)
+      {
+        Order(arr, i, i + 2 * k * g - k, k);
+        int b = a + k * (p - 1);
+        i += k * g - k;
+        for (int j = i; j < i + k * g; j += k)
+          BlockInsert(arr, j, BlockSearch(arr, a, b, k, arr[j]), k);
+        i += k * g + k;
+        g = p - g; p *= 2;
+      }
+      while (i < length)
+      {
+        BlockInsert(arr, i, BlockSearch(arr, a, i, k, arr[i]), k);
+        i += 2 * k;
+      }
+      k /= 2;
     }
   }
 

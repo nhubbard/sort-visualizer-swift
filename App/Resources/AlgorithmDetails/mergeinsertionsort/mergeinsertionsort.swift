@@ -1,111 +1,61 @@
-/// Tags a value with its original index so a pending element can find its way back to the
-/// right chain partner even after the chain has been recursively reordered.
-struct Elem {
-    let value: Int
-    let index: Int
-}
-
-/// Inserts elem into the already-sorted seq via binary search, comparing by value only.
-func binaryInsert(_ seq: inout [Elem], _ elem: Elem) {
-    var lo = 0
-    var hi = seq.count
-    while lo < hi {
-        let mid = (lo + hi) / 2
-        if seq[mid].value <= elem.value {
-            lo = mid + 1
-        } else {
-            hi = mid
-        }
-    }
-    seq.insert(elem, at: lo)
-}
-
-/// Returns, as 1-based positions into a list of `count` not-yet-placed pending elements, the
-/// order to insert them in: 2, then 4 and 3, then 10 down to 5, then 20 down to 11, and so on.
-/// This Jacobsthal-number grouping is what makes merge-insertion sort comparison-optimal.
-/// Position 1 is never included -- it is always placed for free before any of these insertions
-/// happen.
-func jacobsthalInsertionOrder(_ count: Int) -> [Int] {
-    let maxPosition = count + 1
-    var order: [Int] = []
-    var placedThrough = 1
-    var k = 2
-    while placedThrough < maxPosition {
-        let sign = (k % 2 == 0) ? 1 : -1
-        let t = ((1 << (k + 1)) + sign) / 3
-        let groupEnd = min(t - 1, maxPosition)
-        var position = groupEnd
-        while position > placedThrough {
-            order.append(position)
-            position -= 1
-        }
-        placedThrough = groupEnd
-        k += 1
-    }
-    return order
-}
-
-/// Splits items into a (chain, partnerOf, extra) triple: chain holds the larger element of each
-/// adjacent pair, partnerOf maps a chain element's original index to its paired (smaller)
-/// element, and extra is a leftover element with no partner when items has odd length.
-func pairUp(_ items: [Elem]) -> (chain: [Elem], partnerOf: [Int: Elem], extra: Elem?) {
-    var chain: [Elem] = []
-    var partnerOf: [Int: Elem] = [:]
-    var i = 0
-    let n = items.count
-    while i + 1 < n {
-        let a = items[i]
-        let b = items[i + 1]
-        let small = a.value <= b.value ? a : b
-        let large = a.value <= b.value ? b : a
-        partnerOf[large.index] = small
-        chain.append(large)
-        i += 2
-    }
-    let extra = i < n ? items[i] : nil
-    return (chain, partnerOf, extra)
-}
-
-/// Sorts a list of Elem by value. The index tags are what let a pending element find its way
-/// back to the right chain partner after the chain has been recursively reordered by this same
-/// function one level down.
-func sortTagged(_ items: [Elem]) -> [Elem] {
-    if items.count <= 1 {
-        return items
-    }
-
-    let (chain, partnerOf, extra) = pairUp(items)
-    let sortedChain = sortTagged(chain)
-
-    // The pending partner of the smallest chain element is guaranteed smaller than every other
-    // chain element too, so it can go straight to the front with no comparison at all.
-    var sequence = [partnerOf[sortedChain[0].index]!]
-    sequence.append(contentsOf: sortedChain)
-
-    var remaining: [Elem] = []
-    for k in 1 ..< sortedChain.count {
-        remaining.append(partnerOf[sortedChain[k].index]!)
-    }
-    if let extra {
-        remaining.append(extra)
-    }
-
-    for position in jacobsthalInsertionOrder(remaining.count) {
-        binaryInsert(&sequence, remaining[position - 2])
-    }
-
-    return sequence
-}
-
 func sort(_ arr: inout [Int]) {
-    let n = arr.count
-    if n < 2 {
-        return
+    let length = arr.count
+    if length < 2 { return }
+    func blockSwap(_ a: Int, _ b: Int, _ size: Int) {
+        for offset in 0..<size { arr.swapAt(a - size + 1 + offset, b - size + 1 + offset) }
     }
-    let tagged = arr.enumerated().map { Elem(value: $1, index: $0) }
-    let sortedTagged = sortTagged(tagged)
-    for i in 0 ..< n {
-        arr[i] = sortedTagged[i].value
+    func blockInsert(_ end: Int, _ target: Int, _ size: Int) {
+        var end = end
+        while end - size >= target { blockSwap(end - size, end, size); end -= size }
+    }
+    func blockReversal(_ start: Int, _ end: Int, _ size: Int) {
+        var start = start, end = end - size
+        while end > start { blockSwap(start, end, size); start += size; end -= size }
+    }
+    func blockSearch(_ start: Int, _ end: Int, _ size: Int, _ value: Int) -> Int {
+        var start = start, end = end
+        while start < end {
+            let mid = start + (((end - start) / size) / 2) * size
+            if value < arr[mid] { end = mid } else { start = mid + size }
+        }
+        return start
+    }
+    func order(_ a: Int, _ b: Int, _ size: Int) {
+        var i = a, j = i + size
+        while j < b { blockInsert(j, i, size); i += size; j += 2 * size }
+        let mid = a + (((b - a) / size) / 2) * size
+        blockReversal(mid, b, size)
+    }
+    var k = 1
+    while 2 * k <= length {
+        var i = 2 * k - 1
+        while i < length {
+            if arr[i - k] > arr[i] { blockSwap(i - k, i, k) }
+            i += 2 * k
+        }
+        k *= 2
+    }
+    while k > 0 {
+        let a = k - 1
+        var i = a + 2 * k, g = 2, p = 4
+        while i + 2 * k * g - k <= length {
+            order(i, i + 2 * k * g - k, k)
+            let b = a + k * (p - 1)
+            i += k * g - k
+            var j = i
+            while j < i + k * g {
+                blockInsert(j, blockSearch(a, b, k, arr[j]), k)
+                j += k
+            }
+            i += k * g + k
+            g = p - g
+            p *= 2
+        }
+        while i < length {
+            blockInsert(i, blockSearch(a, i, k, arr[i]), k)
+            i += 2 * k
+        }
+        k /= 2
     }
 }
 

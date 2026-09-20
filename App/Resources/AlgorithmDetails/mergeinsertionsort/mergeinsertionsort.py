@@ -1,86 +1,71 @@
-def binary_insert(seq, elem):
-    # Inserts elem into the already-sorted seq via binary search, comparing by value only.
-    lo, hi = 0, len(seq)
-    value = elem[0]
-    while lo < hi:
-        mid = (lo + hi) // 2
-        if seq[mid][0] <= value:
-            lo = mid + 1
-        else:
-            hi = mid
-    seq.insert(lo, elem)
-
-
-def jacobsthal_insertion_order(count):
-    # Returns, as 1-based positions into a list of `count` not-yet-placed pending elements,
-    # the order to insert them in: 2, then 4 and 3, then 10 down to 5, then 20 down to 11, and
-    # so on. This Jacobsthal-number grouping is what makes merge-insertion sort
-    # comparison-optimal. Position 1 is never included -- it is always placed for free before
-    # any of these insertions happen.
-    max_position = count + 1
-    order = []
-    placed_through = 1
-    k = 2
-    while placed_through < max_position:
-        group_end = min((2 ** (k + 1) + (-1) ** k) // 3 - 1, max_position)
-        order.extend(range(group_end, placed_through, -1))
-        placed_through = group_end
-        k += 1
-    return order
-
-
-def pair_up(items):
-    # Splits items into (chain, partner_of, extra): chain holds the larger element of each
-    # adjacent pair, partner_of maps a chain element's original index to its paired (smaller)
-    # element, and extra is a leftover element with no partner when items has odd length.
-    # Every element keeps its original index tagged alongside its value so a later step can
-    # find the right partner even when values repeat.
-    chain = []
-    partner_of = {}
-    i = 0
-    n = len(items)
-    while i + 1 < n:
-        a, b = items[i], items[i + 1]
-        small, large = (a, b) if a[0] <= b[0] else (b, a)
-        partner_of[large[1]] = small
-        chain.append(large)
-        i += 2
-    extra = items[i] if i < n else None
-    return chain, partner_of, extra
-
-
-def sort_tagged(items):
-    # Sorts a list of (value, original_index) tuples by value. The index tags are what let a
-    # pending element find its way back to the right chain partner after the chain has been
-    # recursively reordered by this same function one level down.
-    if len(items) <= 1:
-        return list(items)
-
-    chain, partner_of, extra = pair_up(items)
-    sorted_chain = sort_tagged(chain)
-
-    # The pending partner of the smallest chain element is guaranteed smaller than every other
-    # chain element too, so it can go straight to the front with no comparison at all.
-    sequence = [partner_of[sorted_chain[0][1]]] + sorted_chain
-
-    remaining = [partner_of[sorted_chain[k][1]] for k in range(1, len(sorted_chain))]
-    if extra is not None:
-        remaining.append(extra)
-
-    for position in jacobsthal_insertion_order(len(remaining)):
-        binary_insert(sequence, remaining[position - 2])
-
-    return sequence
-
-
 def sort(arr):
-    n = len(arr)
-    if n < 2:
+    length = len(arr)
+    if length <= 1:
         return
-    tagged = [(value, index) for index, value in enumerate(arr)]
-    sorted_tagged = sort_tagged(tagged)
-    for i, (value, _index) in enumerate(sorted_tagged):
-        arr[i] = value
+
+    def block_swap(a, b, size):
+        for offset in range(size):
+            left, right = a - size + 1 + offset, b - size + 1 + offset
+            arr[left], arr[right] = arr[right], arr[left]
+
+    def block_insert(a, b, size):
+        while a - size >= b:
+            block_swap(a - size, a, size)
+            a -= size
+
+    def block_reversal(a, b, size):
+        b -= size
+        while b > a:
+            block_swap(a, b, size)
+            a += size
+            b -= size
+
+    def block_search(a, b, size, value):
+        while a < b:
+            middle = a + (((b - a) // size) // 2) * size
+            if value < arr[middle]:
+                b = middle
+            else:
+                a = middle + size
+        return a
+
+    def order(a, b, size):
+        i, j = a, a + size
+        while j < b:
+            block_insert(j, i, size)
+            i += size
+            j += 2 * size
+        middle = a + (((b - a) // size) // 2) * size
+        block_reversal(middle, b, size)
+
+    k = 1
+    while 2 * k <= length:
+        i = 2 * k - 1
+        while i < length:
+            if arr[i - k] > arr[i]:
+                block_swap(i - k, i, k)
+            i += 2 * k
+        k *= 2
+
+    while k > 0:
+        a = k - 1
+        i = a + 2 * k
+        g, p = 2, 4
+        while i + 2 * k * g - k <= length:
+            order(i, i + 2 * k * g - k, k)
+            b = a + k * (p - 1)
+            i += k * g - k
+            j = i
+            while j < i + k * g:
+                block_insert(j, block_search(a, b, k, arr[j]), k)
+                j += k
+            i += k * g + k
+            g = p - g
+            p *= 2
+        while i < length:
+            block_insert(i, block_search(a, i, k, arr[i]), k)
+            i += 2 * k
+        k //= 2
 
 
 if __name__ == "__main__":
