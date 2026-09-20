@@ -7,8 +7,8 @@ sample follows the same algorithm. This audit compares control flow and data mov
 the app's Swift implementation. Targeted execution remains a separate validation step.
 
 All 169 algorithms outside the 13 Bogo/Bozo-named sorts received a read-only, major-phase and
-complexity review of their ten reference sources. Sixteen non-Bogo algorithms below were
-verified and corrected; 8 have confirmed differences listed below; the other 145 have no
+complexity review of their ten reference sources. Seventeen non-Bogo algorithms below were
+verified and corrected; 7 have confirmed differences listed below; the other 145 have no
 confirmed substitution from this structural review. Among those 145, exact equivalence remains
 uncertain for the large GrailSort, PDQBranchedSort, PDQBranchlessSort, QuadSort, and
 NewShuffleMergeSort implementations. The source review did not run all samples on boundary or
@@ -36,6 +36,7 @@ duplicate-heavy inputs and is not a proof of line-by-line equivalence.
 | IterativeTopDownMergeSort | Reuses one `n`-element scratch buffer across proportional-slice merges | Ten sample tests; 3,870 tagged stable Python cases across lengths 0–128 |
 | QuickSort | Fixed left pivot and two-pointer partition | Ten sample tests; 5,654 sorted, reversed, and duplicate-heavy Python cases across lengths 0–256 |
 | LSDRadixSort | Stable radix-4 counting passes with reusable `n`-element output | Ten sample tests; 1,200 Python cases and larger-bucket cases in C, C++, and JavaScript through 256 items |
+| DualPivotQuickSort | Thirds-based pivot candidates, adaptive divisor, and insertion sort on tiny ranges | Ten sample tests; 6,400 Python cases through 512 items |
 
 ## Confirmed non-Bogo mismatches (unfixed)
 
@@ -47,7 +48,6 @@ changed as part of this audit.
 |---|---|---|---|
 | DropMergeSort | Uses `PDQSortingTemplate.sortBranched` for the early fallback and the dropped tail | Use a simple three-way quicksort for both paths | Loses PDQSort's worst-case `O(n log n)` bound; reference quicksort can take `O(n²)` |
 | MergeInsertionSort | Iterative, in-place block swaps and block search; `O(1)` auxiliary space | Recursive tagged Ford–Johnson construction with a chain, partner map, and pending list | Different data movement and `O(n)` auxiliary storage instead of the app's in-place approach |
-| DualPivotQuickSort | Selects pivots near the thirds, adapts the divisor, and insertion-sorts tiny ranges | Selects the endpoint pivots with no adaptive divisor or insertion cutoff | Different partition and base-case behavior; no overall asymptotic difference established |
 | OptimizedDualPivotQuickSort | Adaptive divisor and insertion-sort cutoff through 27 elements, plus a pivot-equals pass | No adaptive divisor; insertion cutoff at 24 elements and a different equal-elements pass | Different behavior around the cutoff and duplicate-heavy partitions; no overall asymptotic difference established |
 | BlockInsertionSort | Merges long runs through Grail's iterative binary-search-and-rotate `mergeWithoutBuffer` | Replaces that helper with recursive divide-and-rotate merging | Different merge work sequence and `O(log n)` recursion stack where Swift's helper uses `O(1)` auxiliary stack |
 | LazyStableSort | Uses Grail's iterative binary-search-and-rotate merge | All ten references use recursive divide-and-rotate merging | Different merge sequence and `O(log n)` recursion stack instead of Swift's `O(1)` helper stack |
@@ -56,8 +56,7 @@ changed as part of this audit.
 
 Key source locations: `Modules/BuiltInAlgorithms/Sources/Hybrid/DropMergeSort.swift` and
 `App/Resources/AlgorithmDetails/dropmergesort/`; `Hybrid/MergeInsertionSort.swift` and
-`mergeinsertionsort/`; `Exchange/DualPivotQuickSort.swift` and `dualpivotquicksort/`;
-`Hybrid/OptimizedDualPivotQuickSort.swift` and `optimizeddualpivotquicksort/`;
+`mergeinsertionsort/`; `Hybrid/OptimizedDualPivotQuickSort.swift` and `optimizeddualpivotquicksort/`;
 `Exchange/QuickSort.swift` and `quicksort/`.
 
 ## Expected Bogo-family divergence
