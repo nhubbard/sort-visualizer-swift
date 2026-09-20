@@ -46,24 +46,25 @@ fun binSearch(arr: Array<Int>, pos: Int, len: Int, keyPos: Int, isLeft: Boolean)
   return right
 }
 
-fun mergeWithoutBuffer(arr: Array<Int>, pos: Int, len1: Int, len2: Int) {
-  if (len1 == 0 || len2 == 0) return
-  if (len1 + len2 == 2) {
-    if (arr[pos] > arr[pos + 1]) swap(arr, pos, pos + 1)
-    return
-  }
-  val mid1: Int
-  val mid2: Int
-  if (len1 > len2) {
-    mid1 = len1 / 2
-    mid2 = binSearch(arr, pos + len1, len2, pos + mid1, true)
+fun mergeWithoutBuffer(arr: Array<Int>, start: Int, leftLength: Int, rightLength: Int) {
+  var pos = start
+  var len1 = leftLength
+  var len2 = rightLength
+  if (len1 < len2) {
+    while (len1 != 0) {
+      val loc = binSearch(arr, pos + len1, len2, pos, true)
+      if (loc != 0) { rotate(arr, pos, len1, loc); pos += loc; len2 -= loc }
+      if (len2 == 0) break
+      do { pos++; len1-- } while (len1 != 0 && arr[pos] <= arr[pos + len1])
+    }
   } else {
-    mid2 = len2 / 2
-    mid1 = binSearch(arr, pos, len1, pos + len1 + mid2, false)
+    while (len2 != 0) {
+      val loc = binSearch(arr, pos, len1, pos + len1 + len2 - 1, false)
+      if (loc != len1) { rotate(arr, pos + loc, len1 - loc, len2); len1 = loc }
+      if (len1 == 0) break
+      do { len2-- } while (len2 != 0 && arr[pos + len1 - 1] <= arr[pos + len1 + len2 - 1])
+    }
   }
-  rotate(arr, pos + mid1, len1 - mid1, mid2)
-  mergeWithoutBuffer(arr, pos, mid1, mid2)
-  mergeWithoutBuffer(arr, pos + mid1 + mid2, len1 - mid1, len2 - mid2)
 }
 
 fun mergeLeft(arr: Array<Int>, pos: Int, leftLen: Int, rightLenArg: Int, distArg: Int) {

@@ -43,24 +43,26 @@ public class BlockInsertionSort
 
   public static void MergeWithoutBuffer(int[] arr, int pos, int len1, int len2)
   {
-    if (len1 == 0 || len2 == 0) return;
-    if (len1 == 1)
+    if (len1 < len2)
     {
-      int loc = BinSearch(arr, pos + 1, len2, pos, true);
-      Rotate(arr, pos, 1, loc);
-      return;
+      while (len1 != 0)
+      {
+        int loc = BinSearch(arr, pos + len1, len2, pos, true);
+        if (loc != 0) { Rotate(arr, pos, len1, loc); pos += loc; len2 -= loc; }
+        if (len2 == 0) break;
+        do { pos++; len1--; } while (len1 != 0 && arr[pos] <= arr[pos + len1]);
+      }
     }
-    if (len2 == 1)
+    else
     {
-      int loc = BinSearch(arr, pos, len1, pos + len1, false);
-      Rotate(arr, pos + loc, len1 - loc, 1);
-      return;
+      while (len2 != 0)
+      {
+        int loc = BinSearch(arr, pos, len1, pos + len1 + len2 - 1, false);
+        if (loc != len1) { Rotate(arr, pos + loc, len1 - loc, len2); len1 = loc; }
+        if (len1 == 0) break;
+        do { len2--; } while (len2 != 0 && arr[pos + len1 - 1] <= arr[pos + len1 + len2 - 1]);
+      }
     }
-    int mid1 = len1 / 2;
-    int loc2 = BinSearch(arr, pos + len1, len2, pos + mid1, true);
-    Rotate(arr, pos + mid1, len1 - mid1, loc2);
-    MergeWithoutBuffer(arr, pos, mid1, loc2);
-    MergeWithoutBuffer(arr, pos + mid1 + loc2, len1 - mid1, len2 - loc2);
   }
 
   public static int FindRun(int[] arr, int a, int b)
@@ -121,6 +123,7 @@ public class BlockInsertionSort
   public static void Sort(int[] arr)
   {
     int n = arr.Length;
+    if (n < 2) return;
     int i = FindRun(arr, 0, n);
     while (i < n)
     {

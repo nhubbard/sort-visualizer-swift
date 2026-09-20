@@ -41,21 +41,32 @@ def bin_search(arr, pos, length, key_pos, is_left):
 
 
 def merge_without_buffer(arr, pos, len1, len2):
-    if len1 == 0 or len2 == 0:
-        return
-    if len1 + len2 == 2:
-        if arr[pos] > arr[pos + 1]:
-            swap(arr, pos, pos + 1)
-        return
-    if len1 > len2:
-        mid1 = len1 // 2
-        mid2 = bin_search(arr, pos + len1, len2, pos + mid1, True)
+    if len1 < len2:
+        while len1:
+            loc = bin_search(arr, pos + len1, len2, pos, True)
+            if loc:
+                rotate(arr, pos, len1, loc)
+                pos += loc
+                len2 -= loc
+            if not len2:
+                break
+            while True:
+                pos += 1
+                len1 -= 1
+                if not len1 or arr[pos] > arr[pos + len1]:
+                    break
     else:
-        mid2 = len2 // 2
-        mid1 = bin_search(arr, pos, len1, pos + len1 + mid2, False)
-    rotate(arr, pos + mid1, len1 - mid1, mid2)
-    merge_without_buffer(arr, pos, mid1, mid2)
-    merge_without_buffer(arr, pos + mid1 + mid2, len1 - mid1, len2 - mid2)
+        while len2:
+            loc = bin_search(arr, pos, len1, pos + len1 + len2 - 1, False)
+            if loc != len1:
+                rotate(arr, pos + loc, len1 - loc, len2)
+                len1 = loc
+            if not len1:
+                break
+            while True:
+                len2 -= 1
+                if not len2 or arr[pos + len1 - 1] > arr[pos + len1 + len2 - 1]:
+                    break
 
 
 def merge_left(arr, pos, left_len, right_len, dist):
