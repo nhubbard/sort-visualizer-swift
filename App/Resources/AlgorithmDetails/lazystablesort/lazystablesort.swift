@@ -1,3 +1,28 @@
+func sort(_ arr: inout [Int]) {
+    let n = arr.count
+    var dist = 1
+    while dist < n {
+        if arr[dist - 1] > arr[dist] {
+            arr.swapAt(dist - 1, dist)
+        }
+        dist += 2
+    }
+    var part = 2
+    while part < n {
+        var left = 0
+        let right = n - 2 * part
+        while left <= right {
+            mergeWithoutBuffer(&arr, left, part, part)
+            left += 2 * part
+        }
+        let rest = n - left
+        if rest > part {
+            mergeWithoutBuffer(&arr, left, part, rest - part)
+        }
+        part *= 2
+    }
+}
+
 func multiSwap(_ arr: inout [Int], _ a: Int, _ b: Int, _ count: Int) {
     for i in 0 ..< count {
         arr.swapAt(a + i, b + i)
@@ -56,30 +81,6 @@ func mergeWithoutBuffer(_ arr: inout [Int], _ start: Int, _ leftLength: Int, _ r
     }
 }
 
-func sort(_ arr: inout [Int]) {
-    let n = arr.count
-    var dist = 1
-    while dist < n {
-        if arr[dist - 1] > arr[dist] {
-            arr.swapAt(dist - 1, dist)
-        }
-        dist += 2
-    }
-    var part = 2
-    while part < n {
-        var left = 0
-        let right = n - 2 * part
-        while left <= right {
-            mergeWithoutBuffer(&arr, left, part, part)
-            left += 2 * part
-        }
-        let rest = n - left
-        if rest > part {
-            mergeWithoutBuffer(&arr, left, part, rest - part)
-        }
-        part *= 2
-    }
-}
 
 var array: [Int] = [
     0, 39, 21, 62, 91, 77, 14, 23,

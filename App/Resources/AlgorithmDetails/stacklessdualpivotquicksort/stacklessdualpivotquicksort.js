@@ -1,5 +1,11 @@
 const INSERTION_THRESHOLD = 24;
 
+function sort(arr) {
+  const n = arr.length;
+  if (n < 2) return;
+  quickSort(arr, 0, n);
+}
+
 function binaryInsertionSort(arr, start, end) {
   // Sorts arr[start..end) in place using a plain binary-search insertion sort -- the base case
   // once a segment shrinks small enough that further partitioning isn't worth it.
@@ -156,15 +162,12 @@ function quickSort(arr, start, endIn) {
   }
 }
 
-function sort(arr) {
-  const n = arr.length;
-  if (n < 2) return;
-  quickSort(arr, 0, n);
-}
 
-var array = [
-  55, 12, 84, 3, 47, 91, 26, 68, 8, 73, 40, 97, 15, 62, 34, 79, 21, 88, 5, 51,
-  66, 29, 44, 12, 78, 33, 91, 6, 58, 12,
+const array = [
+  55, 12, 84, 3, 47, 91, 26, 68,
+  8, 73, 40, 97, 15, 62, 34, 79,
+  21, 88, 5, 51, 66, 29, 44, 12,
+  78, 33, 91, 6, 58, 12,
 ];
 sort(array);
 console.log("[" + array.join(", ") + "]");

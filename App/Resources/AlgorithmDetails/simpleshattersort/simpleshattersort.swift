@@ -1,3 +1,10 @@
+func sort(_ arr: inout [Int]) {
+    if arr.count < 2 { return }
+    let n = arr.count
+    let rate = max(2, floorLog2(n) / 2)
+    simpleShatterSort(&arr, n, 4, rate)
+}
+
 func insertionSort(_ arr: inout [Int], _ start: Int, _ end: Int) {
     for i in (start + 1) ..< end {
         var pos = i
@@ -67,12 +74,6 @@ func simpleShatterSort(_ arr: inout [Int], _ length: Int, _ num: Int, _ rate: In
     }
 }
 
-func sort(_ arr: inout [Int]) {
-    if arr.count < 2 { return }
-    let n = arr.count
-    let rate = max(2, floorLog2(n) / 2)
-    simpleShatterSort(&arr, n, 4, rate)
-}
 
 var array: [Int] = [
     0, 39, 21, 62, 91, 77, 14, 23,

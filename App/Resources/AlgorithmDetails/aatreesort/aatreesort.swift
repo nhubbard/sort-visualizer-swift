@@ -9,6 +9,22 @@ final class Node {
     }
 }
 
+func sort(_ arr: inout [Int]) {
+    var root: Node?
+    for v in arr {
+        root = add(root, v)
+    }
+    var result: [Int] = []
+    func traverse(_ node: Node?) {
+        guard let node else { return }
+        traverse(node.left)
+        result.append(node.value)
+        traverse(node.right)
+    }
+    traverse(root)
+    arr = result
+}
+
 func level(_ node: Node?) -> Int {
     node?.level ?? -1
 }
@@ -49,21 +65,6 @@ func add(_ node: Node?, _ value: Int) -> Node {
     }
 }
 
-func sort(_ arr: inout [Int]) {
-    var root: Node?
-    for v in arr {
-        root = add(root, v)
-    }
-    var result: [Int] = []
-    func traverse(_ node: Node?) {
-        guard let node else { return }
-        traverse(node.left)
-        result.append(node.value)
-        traverse(node.right)
-    }
-    traverse(root)
-    arr = result
-}
 
 var array: [Int] = [
     0, 39, 21, 62, 91, 77, 14, 23,

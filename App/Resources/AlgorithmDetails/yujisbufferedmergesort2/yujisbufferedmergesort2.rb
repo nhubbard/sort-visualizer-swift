@@ -1,3 +1,9 @@
+def sort(array)
+  n = array.length
+  return if n <= 1
+  buffered_merge(array, 0, n)
+end
+
 def ceil_log(n)
   i = 0
   i += 1 while (1 << i) < n
@@ -172,11 +178,6 @@ def buffered_merge(array, a, b)
   buffered_merge(array, b - (m - a) - s, b)
 end
 
-def sort(array)
-  n = array.length
-  return if n <= 1
-  buffered_merge(array, 0, n)
-end
 
 array = [0, 39, 21, 62, 91, 77, 14, 23,
   90, 69, 51, 81, 68, 83, 32, 56]

@@ -1,5 +1,46 @@
 import Foundation
 
+func sort(_ array: inout [Int]) {
+    let n = array.count
+    if n <= 1 {
+        return
+    }
+    var j = 1
+    while j < n {
+        var bLen = blockRoot(j)
+        var runLength = j
+        let b = n - n % bLen
+
+        while runLength > 16 {
+            var i = 0
+            while i + j < b {
+                var k = i
+                while k + runLength < min(i + 2 * j, b) {
+                    blockSelect(&array, k, k + runLength, min(k + 2 * runLength, b), bLen)
+                    k += runLength
+                }
+                i += 2 * j
+            }
+            runLength = bLen
+            bLen = blockRoot(bLen)
+        }
+
+        var i = 0
+        while i + j < b {
+            var k = i
+            var f = i
+            while k + runLength < min(i + 2 * j, b) {
+                f = inPlaceMerge(&array, f, k + runLength, min(k + 2 * runLength, b))
+                k += runLength
+            }
+            i += 2 * j
+        }
+
+        inPlaceMergeBW(&array, n - n % (2 * j), b, n)
+        j *= 2
+    }
+}
+
 func blockRoot(_ n: Int) -> Int {
     var i = 1
     while i * i < n {
@@ -127,46 +168,6 @@ func inPlaceMergeBW(_ array: inout [Int], _ a: Int, _ m: Int, _ b: Int) {
     }
 }
 
-func sort(_ array: inout [Int]) {
-    let n = array.count
-    if n <= 1 {
-        return
-    }
-    var j = 1
-    while j < n {
-        var bLen = blockRoot(j)
-        var runLength = j
-        let b = n - n % bLen
-
-        while runLength > 16 {
-            var i = 0
-            while i + j < b {
-                var k = i
-                while k + runLength < min(i + 2 * j, b) {
-                    blockSelect(&array, k, k + runLength, min(k + 2 * runLength, b), bLen)
-                    k += runLength
-                }
-                i += 2 * j
-            }
-            runLength = bLen
-            bLen = blockRoot(bLen)
-        }
-
-        var i = 0
-        while i + j < b {
-            var k = i
-            var f = i
-            while k + runLength < min(i + 2 * j, b) {
-                f = inPlaceMerge(&array, f, k + runLength, min(k + 2 * runLength, b))
-                k += runLength
-            }
-            i += 2 * j
-        }
-
-        inPlaceMergeBW(&array, n - n % (2 * j), b, n)
-        j *= 2
-    }
-}
 
 var array: [Int] = [
     0, 39, 21, 62, 91, 77, 14, 23,

@@ -1,11 +1,3 @@
-function compSwap(array, a, b, end) {
-  if (b < end && array[a] > array[b]) {
-    var temp = array[a];
-    array[a] = array[b];
-    array[b] = temp;
-  }
-}
-
 function sort(arr) {
   var length = arr.length;
   var end = length;
@@ -48,6 +40,18 @@ function sort(arr) {
   return arr;
 }
 
-var array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56];
+function compSwap(array, a, b, end) {
+  if (b < end && array[a] > array[b]) {
+    var temp = array[a];
+    array[a] = array[b];
+    array[b] = temp;
+  }
+}
+
+
+const array = [
+  0, 39, 21, 62, 91, 77, 14, 23,
+  90, 69, 51, 81, 68, 83, 32, 56,
+];
 sort(array);
 console.log("[" + array.join(", ") + "]");

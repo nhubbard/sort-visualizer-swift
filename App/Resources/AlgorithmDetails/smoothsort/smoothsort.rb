@@ -3,6 +3,55 @@ LEONARDO = [
   177, 287, 465, 753, 1219, 1973, 3193, 5167, 8361, 13529, 21891
 ].freeze
 
+def sort(arr)
+  n = arr.length
+  return if n <= 1
+
+  head = 0
+  p = 1
+  pshift = 1
+  hi = n - 1
+
+  while head < hi
+    if p & 3 == 3
+      sift(arr, pshift, head)
+      p >>= 2
+      pshift += 2
+    else
+      if LEONARDO[pshift - 1] >= hi - head
+        trinkle(arr, p, pshift, head, false)
+      else
+        sift(arr, pshift, head)
+      end
+      if pshift == 1
+        p <<= 1
+        pshift -= 1
+      else
+        p <<= (pshift - 1)
+        pshift = 1
+      end
+    end
+    p |= 1
+    head += 1
+  end
+
+  trinkle(arr, p, pshift, head, false)
+  while pshift != 1 || p != 1
+    if pshift <= 1
+      trail = trailing_zero_count(p)
+      p >>= trail
+      pshift += trail
+    else
+      p <<= 2
+      p ^= 7
+      pshift -= 2
+      trinkle(arr, p >> 1, pshift + 1, head - LEONARDO[pshift] - 1, true)
+      trinkle(arr, p, pshift, head - 1, true)
+    end
+    head -= 1
+  end
+end
+
 def trailing_zero_count(value)
   mask = value & ~1
   trail = 0
@@ -61,54 +110,6 @@ def trinkle(array, p_in, pshift_in, head_in, is_trusty_in)
   end
 end
 
-def sort(arr)
-  n = arr.length
-  return if n <= 1
-
-  head = 0
-  p = 1
-  pshift = 1
-  hi = n - 1
-
-  while head < hi
-    if p & 3 == 3
-      sift(arr, pshift, head)
-      p >>= 2
-      pshift += 2
-    else
-      if LEONARDO[pshift - 1] >= hi - head
-        trinkle(arr, p, pshift, head, false)
-      else
-        sift(arr, pshift, head)
-      end
-      if pshift == 1
-        p <<= 1
-        pshift -= 1
-      else
-        p <<= (pshift - 1)
-        pshift = 1
-      end
-    end
-    p |= 1
-    head += 1
-  end
-
-  trinkle(arr, p, pshift, head, false)
-  while pshift != 1 || p != 1
-    if pshift <= 1
-      trail = trailing_zero_count(p)
-      p >>= trail
-      pshift += trail
-    else
-      p <<= 2
-      p ^= 7
-      pshift -= 2
-      trinkle(arr, p >> 1, pshift + 1, head - LEONARDO[pshift] - 1, true)
-      trinkle(arr, p, pshift, head - 1, true)
-    end
-    head -= 1
-  end
-end
 
 array = [0, 39, 21, 62, 91, 77, 14, 23,
   90, 69, 51, 81, 68, 83, 32, 56]

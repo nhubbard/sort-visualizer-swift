@@ -4,6 +4,14 @@ const PARTIAL_INSERT_SORT_LIMIT = 8;
 const BLOCK_SIZE = 64;
 const CACHELINE_SIZE = 64;
 
+function sort(arr) {
+  const n = arr.length;
+  if (n < 2) return;
+  const leftOffsets = new Array(BLOCK_SIZE + CACHELINE_SIZE).fill(0);
+  const rightOffsets = new Array(BLOCK_SIZE + CACHELINE_SIZE).fill(0);
+  pdqLoop(arr, 0, n, pdqLog(n), leftOffsets, rightOffsets);
+}
+
 function pdqLog(n) {
   let log = 0;
   while ((n >>= 1) !== 0) log++;
@@ -403,14 +411,10 @@ function pdqLoop(arr, begin, end, badAllowed, leftOffsets, rightOffsets) {
   }
 }
 
-function sort(arr) {
-  const n = arr.length;
-  if (n < 2) return;
-  const leftOffsets = new Array(BLOCK_SIZE + CACHELINE_SIZE).fill(0);
-  const rightOffsets = new Array(BLOCK_SIZE + CACHELINE_SIZE).fill(0);
-  pdqLoop(arr, 0, n, pdqLog(n), leftOffsets, rightOffsets);
-}
 
-var array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56];
+const array = [
+  0, 39, 21, 62, 91, 77, 14, 23,
+  90, 69, 51, 81, 68, 83, 32, 56,
+];
 sort(array);
 console.log("[" + array.join(", ") + "]");

@@ -1,17 +1,3 @@
-def comp_swap(arr, a, b, sort_end)
-  if b < sort_end && arr[a] > arr[b]
-    arr[a], arr[b] = arr[b], arr[a]
-  end
-end
-
-def halver(arr, low, high, sort_end)
-  while low < high
-    comp_swap(arr, low, high, sort_end)
-    low += 1
-    high -= 1
-  end
-end
-
 def sort(arr)
   n = arr.length
   ceil_log = 1
@@ -35,6 +21,21 @@ def sort(arr)
     k >>= 1
   end
 end
+
+def comp_swap(arr, a, b, sort_end)
+  if b < sort_end && arr[a] > arr[b]
+    arr[a], arr[b] = arr[b], arr[a]
+  end
+end
+
+def halver(arr, low, high, sort_end)
+  while low < high
+    comp_swap(arr, low, high, sort_end)
+    low += 1
+    high -= 1
+  end
+end
+
 
 array = [0, 39, 21, 62, 91, 77, 14, 23,
   90, 69, 51, 81, 68, 83, 32, 56]

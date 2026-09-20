@@ -1,5 +1,9 @@
 import Foundation
 
+func sort(_ array: inout [Int]) {
+    recursiveShellSort(&array, 0, array.count, 1)
+}
+
 func gappedInsertionSort(_ array: inout [Int], _ a: Int, _ b: Int, _ gap: Int) {
     var i = a + gap
     while i < b {
@@ -21,9 +25,6 @@ func recursiveShellSort(_ array: inout [Int], _ start: Int, _ end: Int, _ g: Int
     }
 }
 
-func sort(_ array: inout [Int]) {
-    recursiveShellSort(&array, 0, array.count, 1)
-}
 
 var array: [Int] = [
     0, 39, 21, 62, 91, 77, 14, 23,

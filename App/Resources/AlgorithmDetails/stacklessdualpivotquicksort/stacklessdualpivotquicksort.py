@@ -1,6 +1,12 @@
 INSERTION_THRESHOLD = 24
 
 
+def sort(arr):
+    n = len(arr)
+    if n < 2:
+        return
+    quick_sort(arr, 0, n)
+
 def binary_insertion_sort(arr, start, end):
     """Sorts arr[start:end] in place using a plain binary-search insertion sort — the base case
     once a segment shrinks small enough that further partitioning isn't worth it."""
@@ -135,44 +141,38 @@ def quick_sort(arr, start, end):
             reuse_median_candidates = True
 
 
-def sort(arr):
-    n = len(arr)
-    if n < 2:
-        return
-    quick_sort(arr, 0, n)
-
-
-array = [
-    55,
-    12,
-    84,
-    3,
-    47,
-    91,
-    26,
-    68,
-    8,
-    73,
-    40,
-    97,
-    15,
-    62,
-    34,
-    79,
-    21,
-    88,
-    5,
-    51,
-    66,
-    29,
-    44,
-    12,
-    78,
-    33,
-    91,
-    6,
-    58,
-    12,
-]
-sort(array)
-print(array)
+if __name__ == "__main__":
+    array = [
+        55,
+        12,
+        84,
+        3,
+        47,
+        91,
+        26,
+        68,
+        8,
+        73,
+        40,
+        97,
+        15,
+        62,
+        34,
+        79,
+        21,
+        88,
+        5,
+        51,
+        66,
+        29,
+        44,
+        12,
+        78,
+        33,
+        91,
+        6,
+        58,
+        12,
+    ]
+    sort(array)
+    print(array)

@@ -1,3 +1,20 @@
+func sort(_ arr: inout [Int]) {
+    let n = arr.count
+    if n < 16 {
+        tailSwap(&arr, 0, n)
+    } else if n < 256 {
+        if quadSwap(&arr, 0, n) == 0 {
+            var buffer = [Int](repeating: 0, count: 128)
+            tailMerge(&arr, &buffer, 0, n, 16)
+        }
+    } else {
+        if quadSwap(&arr, 0, n) == 0 {
+            var buffer = [Int](repeating: 0, count: n / 2)
+            quadMerge(&arr, &buffer, 0, n, 16)
+        }
+    }
+}
+
 func swap2(_ arr: inout [Int], _ i: Int, _ j: Int) {
     arr.swapAt(i, j)
 }
@@ -691,22 +708,6 @@ func quadSwap(_ arr: inout [Int], _ start: Int, _ nmemb: Int) -> Int {
 
 /// Top-level dispatch by size: under 16 is a plain tailSwap; under 256 pre-sorts via quadSwap then
 /// finishes with tailMerge; 256 and up finishes with the full quadMerge pass instead.
-func sort(_ arr: inout [Int]) {
-    let n = arr.count
-    if n < 16 {
-        tailSwap(&arr, 0, n)
-    } else if n < 256 {
-        if quadSwap(&arr, 0, n) == 0 {
-            var buffer = [Int](repeating: 0, count: 128)
-            tailMerge(&arr, &buffer, 0, n, 16)
-        }
-    } else {
-        if quadSwap(&arr, 0, n) == 0 {
-            var buffer = [Int](repeating: 0, count: n / 2)
-            quadMerge(&arr, &buffer, 0, n, 16)
-        }
-    }
-}
 
 var array: [Int] = [
     55, 12, 84, 3, 47, 91, 26, 68, 8, 73, 40, 97, 15, 62, 34, 79, 21, 88, 5, 51,

@@ -1,5 +1,14 @@
 import Foundation
 
+func sort(_ array: inout [Int]) {
+    let n = array.count
+    guard n > 1 else {
+        return
+    }
+    makeHeap(&array, 0, n)
+    sortHeap(&array, 0, n)
+}
+
 func hyperfloor(_ n: Int) -> Int {
     var power = 1
     while power * 2 <= n {
@@ -148,14 +157,6 @@ func sortHeap(_ array: inout [Int], _ first: Int, _ lastIn: Int) {
     } while size > 1
 }
 
-func sort(_ array: inout [Int]) {
-    let n = array.count
-    guard n > 1 else {
-        return
-    }
-    makeHeap(&array, 0, n)
-    sortHeap(&array, 0, n)
-}
 
 var array: [Int] = [
     0, 39, 21, 62, 91, 77, 14, 23,

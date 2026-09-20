@@ -1,6 +1,23 @@
 import math
 
 
+def sort(arr):
+    n = len(arr)
+    if n <= 16:
+        binary_insertion_sort(arr, 0, n)
+        return
+
+    block_size = max(16, math.isqrt(n))
+    lo = 0
+    while lo + 2 * block_size < n:
+        binary_insertion_sort(arr, lo, lo + block_size)
+        lo += block_size
+    binary_insertion_sort(arr, lo, n)
+
+    while lo >= block_size:
+        merge(arr, lo - block_size, lo, n)
+        lo -= block_size
+
 def binary_insertion_sort(arr, lo, hi):
     for i in range(lo + 1, hi):
         key = arr[i]
@@ -78,22 +95,6 @@ def merge(arr, lo, mid, hi):
             right = boundary
 
 
-def sort(arr):
-    n = len(arr)
-    if n <= 16:
-        binary_insertion_sort(arr, 0, n)
-        return
-
-    block_size = max(16, math.isqrt(n))
-    lo = 0
-    while lo + 2 * block_size < n:
-        binary_insertion_sort(arr, lo, lo + block_size)
-        lo += block_size
-    binary_insertion_sort(arr, lo, n)
-
-    while lo >= block_size:
-        merge(arr, lo - block_size, lo, n)
-        lo -= block_size
 
 
 if __name__ == "__main__":

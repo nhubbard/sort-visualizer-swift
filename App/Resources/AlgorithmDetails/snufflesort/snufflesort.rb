@@ -1,3 +1,7 @@
+def sort(array)
+  snuffle_sort(array, 0, array.length - 1)
+end
+
 def snuffle_sort(arr, start, stop)
   if stop - start + 1 >= 2
     if arr[start] > arr[stop]
@@ -14,9 +18,6 @@ def snuffle_sort(arr, start, stop)
   end
 end
 
-def sort(array)
-  snuffle_sort(array, 0, array.length - 1)
-end
 
 array = [0, 39, 21, 62, 91, 77, 14, 23]
 sort(array)

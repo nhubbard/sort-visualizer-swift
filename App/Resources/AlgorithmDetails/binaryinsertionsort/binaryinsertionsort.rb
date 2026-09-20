@@ -1,3 +1,7 @@
+def sort(array)
+  binary_insertion_sort(array)
+end
+
 def binary_search(array, item, first, last)
   low = first
   high = last
@@ -25,9 +29,6 @@ def binary_insertion_sort(array)
   array
 end
 
-def sort(array)
-  binary_insertion_sort(array)
-end
 
 array = [0, 39, 21, 62, 91, 77, 14, 23,
   90, 69, 51, 81, 68, 83, 32, 56]

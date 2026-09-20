@@ -1,3 +1,15 @@
+def sort(arr)
+  n = arr.length
+  while n > 1
+    max = max_index(arr, n)
+    if max != n - 1
+      flip(arr, max)
+      flip(arr, n - 1)
+    end
+    n -= 1
+  end
+end
+
 def flip(arr, n)
   left = 0
   while left < n
@@ -17,17 +29,6 @@ def max_index(arr, n)
   index
 end
 
-def sort(arr)
-  n = arr.length
-  while n > 1
-    max = max_index(arr, n)
-    if max != n - 1
-      flip(arr, max)
-      flip(arr, n - 1)
-    end
-    n -= 1
-  end
-end
 
 array = [0, 39, 21, 62, 91, 77, 14, 23,
   90, 69, 51, 81, 68, 83, 32, 56]

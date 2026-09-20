@@ -1,5 +1,17 @@
 import Foundation
 
+func sort(_ arr: inout [Int]) {
+    let length = arr.count
+    let end = length
+
+    var n = 1
+    while n < length {
+        n <<= 1
+    }
+
+    pairwiseMergeSort(&arr, 0, n, end)
+}
+
 func compSwap(_ array: inout [Int], _ a: Int, _ b: Int, _ end: Int) {
     if b < end, array[a] > array[b] {
         array.swapAt(a, b)
@@ -41,17 +53,6 @@ func pairwiseMergeSort(_ array: inout [Int], _ a: Int, _ b: Int, _ end: Int) {
     }
 }
 
-func sort(_ arr: inout [Int]) {
-    let length = arr.count
-    let end = length
-
-    var n = 1
-    while n < length {
-        n <<= 1
-    }
-
-    pairwiseMergeSort(&arr, 0, n, end)
-}
 
 var array: [Int] = [
     0, 39, 21, 62, 91, 77, 14, 23,

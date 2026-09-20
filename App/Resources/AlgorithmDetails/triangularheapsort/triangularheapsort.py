@@ -1,6 +1,17 @@
 import math
 
 
+def sort(array):
+    n = len(array)
+    if n <= 1:
+        return
+    heapify(array, n)
+    for i in range(1, n - 1):
+        array[0], array[n - i] = array[n - i], array[0]
+        sift_down(array, 0, n - i)
+    if array[0] > array[1]:
+        array[0], array[1] = array[1], array[0]
+
 def triangular_root(val):
     return (int(math.sqrt(8 * val + 1)) - 1) // 2
 
@@ -28,19 +39,12 @@ def heapify(array, length):
         sift_down(array, i, length)
 
 
-def sort(array):
-    n = len(array)
-    if n <= 1:
-        return
-    heapify(array, n)
-    for i in range(1, n - 1):
-        array[0], array[n - i] = array[n - i], array[0]
-        sift_down(array, 0, n - i)
-    if array[0] > array[1]:
-        array[0], array[1] = array[1], array[0]
 
 
 if __name__ == "__main__":
-    array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56]
+    array = [
+        0, 39, 21, 62, 91, 77, 14, 23,
+        90, 69, 51, 81, 68, 83, 32, 56,
+    ]
     sort(array)
     print(array)

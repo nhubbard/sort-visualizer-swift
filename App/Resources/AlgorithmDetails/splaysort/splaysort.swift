@@ -8,6 +8,25 @@ final class Node {
     }
 }
 
+func sort(_ arr: inout [Int]) {
+    var root: Node?
+    for x in arr {
+        root = insertRec(root, x)
+    }
+    var result: [Int] = []
+    func traverse(_ node: Node?) {
+        if let node = node {
+            traverse(node.left)
+            result.append(node.key)
+            traverse(node.right)
+        }
+    }
+    traverse(root)
+    for i in 0 ..< arr.count {
+        arr[i] = result[i]
+    }
+}
+
 func leftRotate(_ x: Node) -> Node {
     let y = x.right!
     x.right = y.left
@@ -75,24 +94,6 @@ func insertRec(_ rootArg: Node?, _ key: Int) -> Node {
     return n
 }
 
-func sort(_ arr: inout [Int]) {
-    var root: Node?
-    for x in arr {
-        root = insertRec(root, x)
-    }
-    var result: [Int] = []
-    func traverse(_ node: Node?) {
-        if let node = node {
-            traverse(node.left)
-            result.append(node.key)
-            traverse(node.right)
-        }
-    }
-    traverse(root)
-    for i in 0 ..< arr.count {
-        arr[i] = result[i]
-    }
-}
 
 var array: [Int] = [
     0, 39, 21, 62, 91, 77, 14, 23,

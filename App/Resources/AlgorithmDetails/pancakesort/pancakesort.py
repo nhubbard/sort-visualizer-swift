@@ -1,3 +1,12 @@
+def sort(arr):
+    n = len(arr)
+    while n > 1:
+        max = max_index(arr, n)
+        if max != n - 1:
+            flip(arr, max)
+            flip(arr, n - 1)
+        n -= 1
+
 def flip(arr, n):
     left = 0
     while left < n:
@@ -14,17 +23,12 @@ def max_index(arr, n):
     return index
 
 
-def sort(arr):
-    n = len(arr)
-    while n > 1:
-        max = max_index(arr, n)
-        if max != n - 1:
-            flip(arr, max)
-            flip(arr, n - 1)
-        n -= 1
 
 
 if __name__ == "__main__":
-    array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56]
+    array = [
+        0, 39, 21, 62, 91, 77, 14, 23,
+        90, 69, 51, 81, 68, 83, 32, 56,
+    ]
     sort(array)
     print(array)

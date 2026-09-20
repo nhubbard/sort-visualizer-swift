@@ -10,6 +10,18 @@ CHAOS_LIMIT = 5
 # Advances arr to its next lexicographic permutation in place. Returns false (after resetting arr
 # to its first, fully ascending permutation) once every arrangement has been visited -- a
 # deterministic stand-in for "shuffle the array at random".
+def sort(arr)
+  n = arr.length
+  limit = [CHAOS_LIMIT, n].min
+  chaos = arr[0...limit]
+  rest = arr[limit...n]
+
+  bogo_bogo_sort(chaos) # the real, recursive-check algorithm -- kept tiny on purpose
+  insertion_sort(rest) # an ordinary fast sort for the rest of the array
+
+  arr[0...n] = merge_sorted(chaos, rest)
+end
+
 def next_permutation(arr)
   n = arr.length
   i = n - 2
@@ -83,17 +95,6 @@ def merge_sorted(a, b)
   merged
 end
 
-def sort(arr)
-  n = arr.length
-  limit = [CHAOS_LIMIT, n].min
-  chaos = arr[0...limit]
-  rest = arr[limit...n]
-
-  bogo_bogo_sort(chaos) # the real, recursive-check algorithm -- kept tiny on purpose
-  insertion_sort(rest) # an ordinary fast sort for the rest of the array
-
-  arr[0...n] = merge_sorted(chaos, rest)
-end
 
 array = [0, 39, 21, 62, 91, 77, 14, 23,
   90, 69, 51, 81, 68, 83, 32, 56]

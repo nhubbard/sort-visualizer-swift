@@ -1,3 +1,18 @@
+def sort(arr)
+  n = arr.length
+  return if n < 2
+
+  if n < 32
+    quad_sort_range(arr, 0, n)
+    return
+  end
+
+  return unless flux_analyze(arr, n)
+
+  swap_buf = Array.new(n, 0)
+  flux_partition(arr, swap_buf, false, 0, n)
+end
+
 def swap2(arr, i, j)
   arr[i], arr[j] = arr[j], arr[i]
 end
@@ -892,20 +907,6 @@ end
 
 # Below this size, bottoms out into the embedded quadsort outright rather than partitioning at
 # all -- matches fluxsort's own `nmemb < 32` fast path.
-def sort(arr)
-  n = arr.length
-  return if n < 2
-
-  if n < 32
-    quad_sort_range(arr, 0, n)
-    return
-  end
-
-  return unless flux_analyze(arr, n)
-
-  swap_buf = Array.new(n, 0)
-  flux_partition(arr, swap_buf, false, 0, n)
-end
 
 array = [
   55, 12, 84, 3, 47, 91, 26, 68, 8, 73, 40, 97, 15, 62, 34, 79, 21, 88, 5, 51,

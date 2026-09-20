@@ -1,3 +1,22 @@
+func sort(_ arr: inout [Int]) {
+    let n = arr.count
+    if n < 2 {
+        return
+    }
+
+    if n < 32 {
+        quadSortRange(&arr, 0, n)
+        return
+    }
+
+    if !fluxAnalyze(&arr, n) {
+        return
+    }
+
+    var swapBuf = [Int](repeating: 0, count: n)
+    fluxPartition(&arr, &swapBuf, false, 0, n)
+}
+
 func swap2(_ arr: inout [Int], _ i: Int, _ j: Int) {
     arr.swapAt(i, j)
 }
@@ -901,24 +920,6 @@ func fluxPartition(_ arr: inout [Int], _ swapBuf: inout [Int], _ mainIsSwap: Boo
 
 // -- Entry point ---------------------------------------------------------------------------------
 
-func sort(_ arr: inout [Int]) {
-    let n = arr.count
-    if n < 2 {
-        return
-    }
-
-    if n < 32 {
-        quadSortRange(&arr, 0, n)
-        return
-    }
-
-    if !fluxAnalyze(&arr, n) {
-        return
-    }
-
-    var swapBuf = [Int](repeating: 0, count: n)
-    fluxPartition(&arr, &swapBuf, false, 0, n)
-}
 
 var array: [Int] = [
     55, 12, 84, 3, 47, 91, 26, 68, 8, 73, 40, 97, 15, 62, 34, 79, 21, 88, 5, 51,

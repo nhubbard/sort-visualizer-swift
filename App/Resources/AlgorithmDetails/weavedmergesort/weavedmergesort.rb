@@ -1,3 +1,9 @@
+def sort(arr)
+  tmp = Array.new(arr.length, 0)
+  merge(arr, tmp, arr.length, 0, 1)
+  arr
+end
+
 def merge(arr, tmp, length, residue, modulus)
   return if residue + modulus >= length
 
@@ -41,11 +47,6 @@ def merge(arr, tmp, length, residue, modulus)
   end
 end
 
-def sort(arr)
-  tmp = Array.new(arr.length, 0)
-  merge(arr, tmp, arr.length, 0, 1)
-  arr
-end
 
 array = [0, 39, 21, 62, 91, 77, 14, 23,
   90, 69, 51, 81, 68, 83, 32, 56]

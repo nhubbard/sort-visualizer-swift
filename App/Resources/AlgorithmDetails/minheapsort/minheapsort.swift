@@ -1,5 +1,16 @@
 import Foundation
 
+func sort(_ arr: inout [Int]) {
+    heapify(&arr)
+    var end = arr.count - 1
+    while end > 0 {
+        arr.swapAt(0, end)
+        siftDown(&arr, 0, end)
+        end -= 1
+    }
+    arr.reverse()
+}
+
 func siftDown(_ arr: inout [Int], _ root: Int, _ size: Int) {
     var root = root
     while true {
@@ -28,16 +39,6 @@ func heapify(_ arr: inout [Int]) {
     }
 }
 
-func sort(_ arr: inout [Int]) {
-    heapify(&arr)
-    var end = arr.count - 1
-    while end > 0 {
-        arr.swapAt(0, end)
-        siftDown(&arr, 0, end)
-        end -= 1
-    }
-    arr.reverse()
-}
 
 var array: [Int] = [
     0, 39, 21, 62, 91, 77, 14, 23,

@@ -1,5 +1,9 @@
 import Foundation
 
+func sort(_ array: inout [Int]) {
+    doubleSelectionSort(&array)
+}
+
 func doubleSelectionSort(_ array: inout [Int]) {
     let n = array.count
     if n <= 1 {
@@ -35,9 +39,6 @@ func doubleSelectionSort(_ array: inout [Int]) {
     }
 }
 
-func sort(_ array: inout [Int]) {
-    doubleSelectionSort(&array)
-}
 
 var array: [Int] = [
     0, 39, 21, 62, 91, 77, 14, 23,

@@ -1,5 +1,13 @@
 let threshold = 32
 
+func sort(_ arr: inout [Int]) {
+    let n = arr.count
+    if n < 2 {
+        return
+    }
+    mergeSort(&arr, 0, n)
+}
+
 func insertionSort(_ arr: inout [Int], _ start: Int, _ end: Int) {
     var i = start + 1
     while i < end {
@@ -49,13 +57,6 @@ func mergeSort(_ arr: inout [Int], _ start: Int, _ end: Int) {
     merge(&arr, start, mid, end)
 }
 
-func sort(_ arr: inout [Int]) {
-    let n = arr.count
-    if n < 2 {
-        return
-    }
-    mergeSort(&arr, 0, n)
-}
 
 var array: [Int] = [
     0, 39, 21, 62, 91, 77, 14, 23,

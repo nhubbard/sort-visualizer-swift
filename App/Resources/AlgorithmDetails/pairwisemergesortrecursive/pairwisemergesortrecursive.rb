@@ -1,3 +1,14 @@
+def sort(array)
+  length = array.length
+  sort_end = length
+
+  n = 1
+  n <<= 1 while n < length
+
+  pairwise_merge_sort(array, 0, n, sort_end)
+  array
+end
+
 def comp_swap(array, a, b, sort_end)
   return if b >= sort_end
   if array[a] > array[b]
@@ -38,16 +49,6 @@ def pairwise_merge_sort(array, a, b, sort_end)
   end
 end
 
-def sort(array)
-  length = array.length
-  sort_end = length
-
-  n = 1
-  n <<= 1 while n < length
-
-  pairwise_merge_sort(array, 0, n, sort_end)
-  array
-end
 
 array = [0, 39, 21, 62, 91, 77, 14, 23,
   90, 69, 51, 81, 68, 83, 32, 56]

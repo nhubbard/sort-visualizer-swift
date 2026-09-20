@@ -1,5 +1,13 @@
 import Foundation
 
+func sort(_ arr: inout [Int]) {
+    let n = arr.count
+    if n <= 1 {
+        return
+    }
+    while circlePass(&arr, 0, n - 1) {}
+}
+
 func circle(_ array: inout [Int], _ left: Int, _ right: Int) -> Bool {
     var a = left
     var b = right
@@ -28,13 +36,6 @@ func circlePass(_ array: inout [Int], _ left: Int, _ right: Int) -> Bool {
     return circle(&array, left, right) || l || r
 }
 
-func sort(_ arr: inout [Int]) {
-    let n = arr.count
-    if n <= 1 {
-        return
-    }
-    while circlePass(&arr, 0, n - 1) {}
-}
 
 var array: [Int] = [
     0, 39, 21, 62, 91, 77, 14, 23,

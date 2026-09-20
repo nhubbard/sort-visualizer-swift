@@ -1,3 +1,8 @@
+def sort(array)
+  double_insertion_sort(array, 0, array.length) if array.length > 1
+  array
+end
+
 def double_insertion_sort(array, start, last)
   left = start + (last - start) / 2 - 1
   right = left + 1
@@ -58,10 +63,6 @@ def double_insertion_sort(array, start, last)
   end
 end
 
-def sort(array)
-  double_insertion_sort(array, 0, array.length) if array.length > 1
-  array
-end
 
 array = [0, 39, 21, 62, 91, 77, 14, 23,
   90, 69, 51, 81, 68, 83, 32, 56]

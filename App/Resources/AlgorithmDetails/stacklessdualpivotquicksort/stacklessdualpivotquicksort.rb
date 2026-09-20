@@ -2,6 +2,12 @@ INSERTION_THRESHOLD = 24
 
 # Sorts arr[start...end] in place using a plain binary-search insertion sort -- the base case
 # once a segment shrinks small enough that further partitioning isn't worth it.
+def sort(arr)
+  n = arr.length
+  return if n < 2
+  quick_sort(arr, 0, n)
+end
+
 def binary_insertion_sort(arr, start, fin)
   (start...fin).each do |i|
     value = arr[i]
@@ -151,11 +157,6 @@ def quick_sort(arr, start, fin)
   end
 end
 
-def sort(arr)
-  n = arr.length
-  return if n < 2
-  quick_sort(arr, 0, n)
-end
 
 array = [
   55, 12, 84, 3, 47, 91, 26, 68, 8, 73, 40, 97, 15, 62, 34, 79,

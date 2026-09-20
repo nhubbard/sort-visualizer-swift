@@ -1,5 +1,9 @@
 import Foundation
 
+func sort(_ array: inout [Int]) {
+    multiSwapMergeSort(&array, 0, array.count)
+}
+
 func multiSwap(_ array: inout [Int], _ a: Int, _ b: Int, _ len: Int) {
     for i in 0 ..< len {
         array.swapAt(a + i, b + i)
@@ -51,9 +55,6 @@ func multiSwapMergeSort(_ array: inout [Int], _ a: Int, _ b: Int) {
     }
 }
 
-func sort(_ array: inout [Int]) {
-    multiSwapMergeSort(&array, 0, array.count)
-}
 
 var array: [Int] = [
     0, 39, 21, 62, 91, 77, 14, 23,

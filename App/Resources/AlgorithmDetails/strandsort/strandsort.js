@@ -1,24 +1,3 @@
-function mergeTo(arr, subList, a, m, b) {
-  let i = 0;
-  const s = m - a;
-  while (i < s && m < b) {
-    if (subList[i] < arr[m]) {
-      arr[a] = subList[i];
-      a++;
-      i++;
-    } else {
-      arr[a] = arr[m];
-      a++;
-      m++;
-    }
-  }
-  while (i < s) {
-    arr[a] = subList[i];
-    a++;
-    i++;
-  }
-}
-
 function sort(arr) {
   const n = arr.length;
   if (n < 2) return;
@@ -49,6 +28,31 @@ function sort(arr) {
   }
 }
 
-var array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56];
+function mergeTo(arr, subList, a, m, b) {
+  let i = 0;
+  const s = m - a;
+  while (i < s && m < b) {
+    if (subList[i] < arr[m]) {
+      arr[a] = subList[i];
+      a++;
+      i++;
+    } else {
+      arr[a] = arr[m];
+      a++;
+      m++;
+    }
+  }
+  while (i < s) {
+    arr[a] = subList[i];
+    a++;
+    i++;
+  }
+}
+
+
+const array = [
+  0, 39, 21, 62, 91, 77, 14, 23,
+  90, 69, 51, 81, 68, 83, 32, 56,
+];
 sort(array);
 console.log("[" + array.join(", ") + "]");

@@ -1,3 +1,7 @@
+def sort(arr):
+    if len(arr) > 1:
+        static_sort(arr, 0, len(arr))
+
 def find_min_max(array, a, b):
     min_value = array[a]
     max_value = min_value
@@ -94,12 +98,12 @@ def static_sort(array, a, b):
             insertion_sort_range(array, s, e)
 
 
-def sort(arr):
-    if len(arr) > 1:
-        static_sort(arr, 0, len(arr))
 
 
 if __name__ == "__main__":
-    array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56]
+    array = [
+        0, 39, 21, 62, 91, 77, 14, 23,
+        90, 69, 51, 81, 68, 83, 32, 56,
+    ]
     sort(array)
     print(array)

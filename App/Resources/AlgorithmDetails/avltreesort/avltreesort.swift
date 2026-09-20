@@ -14,6 +14,27 @@ struct AddResult {
     var heightChanged: Bool
 }
 
+func sort(_ arr: inout [Int]) {
+    var root: Node?
+    for value in arr {
+        root = add(root, value).node
+    }
+
+    var result: [Int] = []
+
+    func traverse(_ node: Node?) {
+        guard let node = node else {
+            return
+        }
+        traverse(node.left)
+        result.append(node.value)
+        traverse(node.right)
+    }
+
+    traverse(root)
+    arr = result
+}
+
 func singleRotateRight(_ node: Node) -> Node {
     let b = node.left!
     node.left = b.right
@@ -101,26 +122,6 @@ func add(_ node: Node?, _ value: Int) -> AddResult {
     }
 }
 
-func sort(_ arr: inout [Int]) {
-    var root: Node?
-    for value in arr {
-        root = add(root, value).node
-    }
-
-    var result: [Int] = []
-
-    func traverse(_ node: Node?) {
-        guard let node = node else {
-            return
-        }
-        traverse(node.left)
-        result.append(node.value)
-        traverse(node.right)
-    }
-
-    traverse(root)
-    arr = result
-}
 
 var array: [Int] = [
     0, 39, 21, 62, 91, 77, 14, 23,

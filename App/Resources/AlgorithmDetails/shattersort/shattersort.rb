@@ -1,3 +1,9 @@
+def sort(arr)
+  return if arr.length < 2
+  n = arr.length
+  shatter_sort(arr, n, 4)
+end
+
 def insertion_sort(arr, start, fin)
   (start + 1...fin).each do |i|
     pos = i
@@ -41,11 +47,6 @@ def shatter_sort(arr, length, num)
   end
 end
 
-def sort(arr)
-  return if arr.length < 2
-  n = arr.length
-  shatter_sort(arr, n, 4)
-end
 
 array = [0, 39, 21, 62, 91, 77, 14, 23,
   90, 69, 51, 81, 68, 83, 32, 56]

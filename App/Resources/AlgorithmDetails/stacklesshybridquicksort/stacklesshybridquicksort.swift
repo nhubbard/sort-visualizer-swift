@@ -2,6 +2,14 @@ let insertionThreshold = 16
 
 /// Arranges arr[start], arr[mid], arr[end - 1] so the median of the three ends up at `start`,
 /// ready to serve as partition's pivot.
+func sort(_ arr: inout [Int]) {
+    let n = arr.count
+    if n < 2 {
+        return
+    }
+    quickSort(&arr, 0, n)
+}
+
 func medianOfThree(_ arr: inout [Int], _ start: Int, _ end: Int) {
     let mid = start + (end - 1 - start) / 2
     if arr[start] > arr[mid] {
@@ -152,13 +160,6 @@ func quickSort(_ arr: inout [Int], _ start: Int, _ endIn: Int) {
     }
 }
 
-func sort(_ arr: inout [Int]) {
-    let n = arr.count
-    if n < 2 {
-        return
-    }
-    quickSort(&arr, 0, n)
-}
 
 var array: [Int] = [
     55, 12, 84, 3, 47, 91, 26, 68, 8, 73, 40, 97, 15, 62, 34, 79,

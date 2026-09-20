@@ -51,6 +51,8 @@ function sort(arr) {
   }
 }
 
-var array = [0, 39, 21, 14];
+const array = [
+  0, 39, 21, 14,
+];
 sort(array);
 console.log("[" + array.join(", ") + "]");

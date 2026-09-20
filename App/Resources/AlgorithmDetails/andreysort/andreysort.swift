@@ -1,3 +1,8 @@
+func sort(_ arr: inout [Int]) {
+    let n = arr.count
+    msort(&arr, 0, n)
+}
+
 func swap(_ arr: inout [Int], _ i: Int, _ j: Int) {
     let t = arr[i]
     arr[i] = arr[j]
@@ -178,10 +183,6 @@ func msort(_ arr: inout [Int], _ a: Int, _ len: Int) {
     msort(&arr, a, s)
 }
 
-func sort(_ arr: inout [Int]) {
-    let n = arr.count
-    msort(&arr, 0, n)
-}
 
 var array: [Int] = [
     0, 39, 21, 62, 91, 77, 14, 23,

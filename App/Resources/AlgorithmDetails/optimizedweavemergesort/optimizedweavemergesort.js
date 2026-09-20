@@ -1,3 +1,32 @@
+function sort(arr) {
+  var n = arr.length;
+  if (n <= 1) return arr;
+  var d = 1;
+  while (d < n) d <<= 1;
+  while (d > 1) {
+    var i = 0;
+    var dec = 0;
+    while (i < n) {
+      var j = i;
+      dec += n;
+      while (dec >= d) {
+        dec -= d;
+        j++;
+      }
+      var k = j;
+      dec += n;
+      while (dec >= d) {
+        dec -= d;
+        k++;
+      }
+      weaveMerge(arr, i, j, k);
+      i = k;
+    }
+    d = Math.floor(d / 2);
+  }
+  return arr;
+}
+
 function insertTo(array, a, b) {
   var temp = array[a];
   while (a > b) {
@@ -104,35 +133,10 @@ function weaveMerge(array, a, mInit, b) {
   weaveInsert(array, a, b, right);
 }
 
-function sort(arr) {
-  var n = arr.length;
-  if (n <= 1) return arr;
-  var d = 1;
-  while (d < n) d <<= 1;
-  while (d > 1) {
-    var i = 0;
-    var dec = 0;
-    while (i < n) {
-      var j = i;
-      dec += n;
-      while (dec >= d) {
-        dec -= d;
-        j++;
-      }
-      var k = j;
-      dec += n;
-      while (dec >= d) {
-        dec -= d;
-        k++;
-      }
-      weaveMerge(arr, i, j, k);
-      i = k;
-    }
-    d = Math.floor(d / 2);
-  }
-  return arr;
-}
 
-var array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56];
+const array = [
+  0, 39, 21, 62, 91, 77, 14, 23,
+  90, 69, 51, 81, 68, 83, 32, 56,
+];
 sort(array);
 console.log("[" + array.join(", ") + "]");

@@ -1,3 +1,23 @@
+def sort(arr):
+    n = len(arr)
+    root = None
+    for i in range(n):
+        root = add(root, arr[i])
+
+    result = []
+
+    def traverse(node):
+        if node is None:
+            return
+        traverse(node.left)
+        result.append(node.value)
+        traverse(node.right)
+
+    traverse(root)
+
+    for i in range(n):
+        arr[i] = result[i]
+
 class Node:
     def __init__(self, value):
         self.value = value
@@ -47,28 +67,12 @@ def add(node, value):
         return node
 
 
-def sort(arr):
-    n = len(arr)
-    root = None
-    for i in range(n):
-        root = add(root, arr[i])
-
-    result = []
-
-    def traverse(node):
-        if node is None:
-            return
-        traverse(node.left)
-        result.append(node.value)
-        traverse(node.right)
-
-    traverse(root)
-
-    for i in range(n):
-        arr[i] = result[i]
 
 
 if __name__ == "__main__":
-    array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56]
+    array = [
+        0, 39, 21, 62, 91, 77, 14, 23,
+        90, 69, 51, 81, 68, 83, 32, 56,
+    ]
     sort(array)
     print(array)

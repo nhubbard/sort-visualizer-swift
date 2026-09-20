@@ -1,3 +1,6 @@
+def sort(arr):
+    odd_even_merge_sort(arr, 0, len(arr))
+
 def odd_even_merge_compare(array, i, j):
     if array[i] > array[j]:
         array[i], array[j] = array[j], array[i]
@@ -38,11 +41,12 @@ def odd_even_merge_sort(array, lo, n):
         odd_even_merge(array, lo, m, n, 1)
 
 
-def sort(arr):
-    odd_even_merge_sort(arr, 0, len(arr))
 
 
 if __name__ == "__main__":
-    array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56]
+    array = [
+        0, 39, 21, 62, 91, 77, 14, 23,
+        90, 69, 51, 81, 68, 83, 32, 56,
+    ]
     sort(array)
     print(array)

@@ -1,3 +1,9 @@
+def sort(array)
+  scratch = Array.new(array.length)
+  merge_sort(array, scratch, 0, array.length)
+  array
+end
+
 def merge(array, scratch, start, mid, finish)
   left = start
   right = mid
@@ -33,11 +39,6 @@ def merge_sort(array, scratch, start, finish)
   merge(array, scratch, start, mid, finish)
 end
 
-def sort(array)
-  scratch = Array.new(array.length)
-  merge_sort(array, scratch, 0, array.length)
-  array
-end
 
 array = [0, 39, 21, 62, 91, 77, 14, 23,
   90, 69, 51, 81, 68, 83, 32, 56]

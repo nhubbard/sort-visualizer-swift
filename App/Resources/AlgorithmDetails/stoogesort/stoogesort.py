@@ -1,3 +1,8 @@
+def sort(arr):
+    if len(arr) <= 1:
+        return
+    stooge_sort(arr, 0, len(arr) - 1)
+
 def stooge_sort(arr, i, j):
     if arr[j] < arr[i]:
         arr[i], arr[j] = arr[j], arr[i]
@@ -8,13 +13,12 @@ def stooge_sort(arr, i, j):
         stooge_sort(arr, i, j - t)
 
 
-def sort(arr):
-    if len(arr) <= 1:
-        return
-    stooge_sort(arr, 0, len(arr) - 1)
 
 
 if __name__ == "__main__":
-    array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56]
+    array = [
+        0, 39, 21, 62, 91, 77, 14, 23,
+        90, 69, 51, 81, 68, 83, 32, 56,
+    ]
     sort(array)
     print(array)

@@ -7,6 +7,33 @@ class Node {
   }
 }
 
+function sort(arr) {
+  const n = arr.length;
+  let root = null;
+
+  for (let i = 0; i < n; i++) {
+    root = add(root, arr[i]);
+  }
+
+  const result = [];
+
+  function traverse(node) {
+    if (node === null) {
+      return;
+    }
+    traverse(node.left);
+    result.push(node.value);
+    traverse(node.right);
+  }
+
+  traverse(root);
+
+  for (let i = 0; i < n; i++) {
+    arr[i] = result[i];
+  }
+  return arr;
+}
+
 function level(node) {
   return node === null ? -1 : node.level;
 }
@@ -55,33 +82,10 @@ function add(node, value) {
   }
 }
 
-function sort(arr) {
-  const n = arr.length;
-  let root = null;
 
-  for (let i = 0; i < n; i++) {
-    root = add(root, arr[i]);
-  }
-
-  const result = [];
-
-  function traverse(node) {
-    if (node === null) {
-      return;
-    }
-    traverse(node.left);
-    result.push(node.value);
-    traverse(node.right);
-  }
-
-  traverse(root);
-
-  for (let i = 0; i < n; i++) {
-    arr[i] = result[i];
-  }
-  return arr;
-}
-
-var array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56];
+const array = [
+  0, 39, 21, 62, 91, 77, 14, 23,
+  90, 69, 51, 81, 68, 83, 32, 56,
+];
 sort(array);
 console.log("[" + array.join(", ") + "]");

@@ -1,5 +1,31 @@
 import Foundation
 
+func sort(_ array: inout [Int]) {
+    let end = array.count
+    if end <= 1 {
+        return
+    }
+    var n = 1
+    var threshold = 0
+    while n < end {
+        n <<= 1
+        threshold += 1
+    }
+    threshold /= 2
+
+    var iterations = 0
+    while true {
+        iterations += 1
+        if iterations >= threshold {
+            binaryInsertionSort(&array, end)
+            return
+        }
+        if circleSortRoutine(&array, n, end) == 0 {
+            return
+        }
+    }
+}
+
 func circleSortRoutine(_ array: inout [Int], _ length: Int, _ end: Int) -> Int {
     var swapCount = 0
     var gap = length / 2
@@ -44,31 +70,6 @@ func binaryInsertionSort(_ array: inout [Int], _ end: Int) {
     }
 }
 
-func sort(_ array: inout [Int]) {
-    let end = array.count
-    if end <= 1 {
-        return
-    }
-    var n = 1
-    var threshold = 0
-    while n < end {
-        n <<= 1
-        threshold += 1
-    }
-    threshold /= 2
-
-    var iterations = 0
-    while true {
-        iterations += 1
-        if iterations >= threshold {
-            binaryInsertionSort(&array, end)
-            return
-        }
-        if circleSortRoutine(&array, n, end) == 0 {
-            return
-        }
-    }
-}
 
 var array: [Int] = [
     0, 39, 21, 62, 91, 77, 14, 23,

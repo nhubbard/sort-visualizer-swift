@@ -1,3 +1,21 @@
+def sort(arr)
+  n = arr.length
+  return if n < 2
+  i = find_run(arr, 0, n)
+  while i < n
+    j = find_run(arr, i, n)
+    len = j - i
+    if len == 1
+      insert1(arr, 0, i)
+    elsif len == 2
+      insert2(arr, 0, i, i + 1)
+    else
+      merge_without_buffer(arr, 0, i, len)
+    end
+    i = j
+  end
+end
+
 def multi_swap(arr, a, b, count)
   (0...count).each do |i|
     arr[a + i], arr[b + i] = arr[b + i], arr[a + i]
@@ -111,23 +129,6 @@ def insert2(arr, a, l, r)
   arr[l + 1] = tmp_l
 end
 
-def sort(arr)
-  n = arr.length
-  return if n < 2
-  i = find_run(arr, 0, n)
-  while i < n
-    j = find_run(arr, i, n)
-    len = j - i
-    if len == 1
-      insert1(arr, 0, i)
-    elsif len == 2
-      insert2(arr, 0, i, i + 1)
-    else
-      merge_without_buffer(arr, 0, i, len)
-    end
-    i = j
-  end
-end
 
 array = [0, 39, 21, 62, 91, 77, 14, 23,
   90, 69, 51, 81, 68, 83, 32, 56]

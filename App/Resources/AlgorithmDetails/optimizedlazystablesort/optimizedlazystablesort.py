@@ -1,3 +1,7 @@
+def sort(arr):
+    n = len(arr)
+    lazy_stable_sort(arr, 0, n)
+
 def swap(arr, a, b):
     arr[a], arr[b] = arr[b], arr[a]
 
@@ -116,12 +120,12 @@ def lazy_stable_sort(arr, pos, length):
         part *= 2
 
 
-def sort(arr):
-    n = len(arr)
-    lazy_stable_sort(arr, 0, n)
 
 
 if __name__ == "__main__":
-    array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56]
+    array = [
+        0, 39, 21, 62, 91, 77, 14, 23,
+        90, 69, 51, 81, 68, 83, 32, 56,
+    ]
     sort(array)
     print(array)

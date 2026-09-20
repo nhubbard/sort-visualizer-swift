@@ -1,20 +1,5 @@
 import Foundation
 
-func merge(_ arr: [Int], _ scratch: inout [Int], _ n: Int, _ index: Int, _ mergeSize: Int) -> Int? {
-    let mid = index + mergeSize / 2
-    let end = min(n, index + mergeSize)
-    if mid >= end { return index }
-    var left = index, right = mid, out = index
-    while left < mid && right < end {
-        if arr[left] <= arr[right] { scratch[out] = arr[left]; left += 1 }
-        else { scratch[out] = arr[right]; right += 1 }
-        out += 1
-    }
-    while left < mid { scratch[out] = arr[left]; left += 1; out += 1 }
-    while right < end { scratch[out] = arr[right]; right += 1; out += 1 }
-    return nil
-}
-
 func sort(_ arr: inout [Int]) {
     let n = arr.count
     if n < 2 { return }
@@ -35,6 +20,22 @@ func sort(_ arr: inout [Int]) {
         for j in 0..<copyLength { arr[j] = scratch[j] }
     }
 }
+
+func merge(_ arr: [Int], _ scratch: inout [Int], _ n: Int, _ index: Int, _ mergeSize: Int) -> Int? {
+    let mid = index + mergeSize / 2
+    let end = min(n, index + mergeSize)
+    if mid >= end { return index }
+    var left = index, right = mid, out = index
+    while left < mid && right < end {
+        if arr[left] <= arr[right] { scratch[out] = arr[left]; left += 1 }
+        else { scratch[out] = arr[right]; right += 1 }
+        out += 1
+    }
+    while left < mid { scratch[out] = arr[left]; left += 1; out += 1 }
+    while right < end { scratch[out] = arr[right]; right += 1; out += 1 }
+    return nil
+}
+
 
 var array: [Int] = [
     0, 39, 21, 62, 91, 77, 14, 23,

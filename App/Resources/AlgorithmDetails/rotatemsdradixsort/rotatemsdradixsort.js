@@ -1,3 +1,24 @@
+function sort(arr) {
+  const n = arr.length;
+  if (n <= 1) return arr;
+  const base = 4;
+  const maxValue = Math.max(...arr);
+  let q = 0, probe = base;
+  while (probe <= maxValue) { q++; probe *= base; }
+  let m = 0, i = 0, b = n;
+  while (i < n) {
+    const p = b - i < 1 ? i : dist(arr, i, b, q, base);
+    if (q === 0) {
+      m += base;
+      let t = Math.floor(m / base);
+      while (t % base === 0) { t = Math.floor(t / base); q++; }
+      i = b;
+      while (b < n && shift(arr[b], q + 1, base) === shift(m, q + 1, base)) b++;
+    } else { b = p; q--; }
+  }
+  return arr;
+}
+
 function intPow(base, exponent) {
   var result = 1;
   for (var i = 0; i < exponent; i++) {
@@ -85,27 +106,10 @@ function dist(arr, a, b, place, base) {
   return binSearchDigit(arr, a, b, 1, place, base);
 }
 
-function sort(arr) {
-  const n = arr.length;
-  if (n <= 1) return arr;
-  const base = 4;
-  const maxValue = Math.max(...arr);
-  let q = 0, probe = base;
-  while (probe <= maxValue) { q++; probe *= base; }
-  let m = 0, i = 0, b = n;
-  while (i < n) {
-    const p = b - i < 1 ? i : dist(arr, i, b, q, base);
-    if (q === 0) {
-      m += base;
-      let t = Math.floor(m / base);
-      while (t % base === 0) { t = Math.floor(t / base); q++; }
-      i = b;
-      while (b < n && shift(arr[b], q + 1, base) === shift(m, q + 1, base)) b++;
-    } else { b = p; q--; }
-  }
-  return arr;
-}
 
-var array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56];
+const array = [
+  0, 39, 21, 62, 91, 77, 14, 23,
+  90, 69, 51, 81, 68, 83, 32, 56,
+];
 sort(array);
 console.log("[" + array.join(", ") + "]");

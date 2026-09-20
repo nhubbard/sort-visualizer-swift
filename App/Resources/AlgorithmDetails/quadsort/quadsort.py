@@ -1,3 +1,19 @@
+def sort(arr):
+    # Top-level dispatch by size: under 16 is a plain tail_swap; under 256 pre-sorts via
+    # quad_swap then finishes with tail_merge; 256 and up finishes with the full quad_merge pass
+    # instead.
+    n = len(arr)
+    if n < 16:
+        tail_swap(arr, 0, n)
+    elif n < 256:
+        if not quad_swap(arr, 0, n):
+            buffer = [0] * 128
+            tail_merge(arr, buffer, 0, n, 16)
+    else:
+        if not quad_swap(arr, 0, n):
+            buffer = [0] * (n // 2)
+            quad_merge(arr, buffer, 0, n, 16)
+
 def swap2(arr, i, j):
     arr[i], arr[j] = arr[j], arr[i]
 
@@ -656,21 +672,6 @@ def quad_swap(arr, start, nmemb):
 # -- Entry point -----------------------------------------------------------------------------
 
 
-def sort(arr):
-    # Top-level dispatch by size: under 16 is a plain tail_swap; under 256 pre-sorts via
-    # quad_swap then finishes with tail_merge; 256 and up finishes with the full quad_merge pass
-    # instead.
-    n = len(arr)
-    if n < 16:
-        tail_swap(arr, 0, n)
-    elif n < 256:
-        if not quad_swap(arr, 0, n):
-            buffer = [0] * 128
-            tail_merge(arr, buffer, 0, n, 16)
-    else:
-        if not quad_swap(arr, 0, n):
-            buffer = [0] * (n // 2)
-            quad_merge(arr, buffer, 0, n, 16)
 
 
 if __name__ == "__main__":

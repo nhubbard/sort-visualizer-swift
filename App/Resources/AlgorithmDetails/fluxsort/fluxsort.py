@@ -1,3 +1,20 @@
+def sort(arr):
+    # Below this size, bottoms out into the embedded quadsort outright rather than partitioning
+    # at all -- matches fluxsort's own `nmemb < 32` fast path.
+    n = len(arr)
+    if n < 2:
+        return
+
+    if n < 32:
+        quad_sort_range(arr, 0, n)
+        return
+
+    if not flux_analyze(arr, n):
+        return
+
+    swap_buf = [0] * n
+    flux_partition(arr, swap_buf, False, 0, n)
+
 def swap2(arr, i, j):
     arr[i], arr[j] = arr[j], arr[i]
 
@@ -890,22 +907,6 @@ def flux_partition(arr, swap_buf, main_is_swap, start, nmemb):
 # -- Entry point ---------------------------------------------------------------------------------
 
 
-def sort(arr):
-    # Below this size, bottoms out into the embedded quadsort outright rather than partitioning
-    # at all -- matches fluxsort's own `nmemb < 32` fast path.
-    n = len(arr)
-    if n < 2:
-        return
-
-    if n < 32:
-        quad_sort_range(arr, 0, n)
-        return
-
-    if not flux_analyze(arr, n):
-        return
-
-    swap_buf = [0] * n
-    flux_partition(arr, swap_buf, False, 0, n)
 
 
 if __name__ == "__main__":

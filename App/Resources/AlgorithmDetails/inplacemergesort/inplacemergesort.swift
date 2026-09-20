@@ -1,5 +1,12 @@
 import Foundation
 
+func sort(_ array: inout [Int]) {
+    guard array.count >= 2 else {
+        return
+    }
+    mergeSort(&array, 0, array.count - 1)
+}
+
 func push(_ array: inout [Int], _ low: Int, _ high: Int) {
     var i = low
     while i < high {
@@ -36,12 +43,6 @@ func mergeSort(_ array: inout [Int], _ low: Int, _ high: Int) {
     }
 }
 
-func sort(_ array: inout [Int]) {
-    guard array.count >= 2 else {
-        return
-    }
-    mergeSort(&array, 0, array.count - 1)
-}
 
 var array: [Int] = [
     0, 39, 21, 62, 91, 77, 14, 23,

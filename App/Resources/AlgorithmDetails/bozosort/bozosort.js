@@ -1,8 +1,3 @@
-function isSorted(arr) {
-  for (let i = 1; i < arr.length; i++) if (arr[i - 1] > arr[i]) return false;
-  return true;
-}
-
 function sort(arr) {
   let n = arr.length;
   while (!isSorted(arr)) {
@@ -12,6 +7,14 @@ function sort(arr) {
   }
 }
 
-var array = [0, 39, 21, 62, 91, 77];
+function isSorted(arr) {
+  for (let i = 1; i < arr.length; i++) if (arr[i - 1] > arr[i]) return false;
+  return true;
+}
+
+
+const array = [
+  0, 39, 21, 62, 91, 77,
+];
 sort(array);
 console.log("[" + array.join(", ") + "]");

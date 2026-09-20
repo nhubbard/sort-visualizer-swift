@@ -6,6 +6,109 @@ const INSERT_SORT_THRESHOLD = 24;
 const NINTHER_THRESHOLD = 128;
 const PARTIAL_INSERT_SORT_LIMIT = 8;
 
+function sort(arr) {
+  const length = arr.length;
+  if (length < 2) return;
+
+  const dropped = [];
+  let numDroppedInARow = 0;
+  let read = 0;
+  let write = 0;
+  let iteration = 0;
+  const earlyOutStop = Math.floor(length / EARLY_OUT_TEST_AT);
+
+  while (read < length) {
+    iteration++;
+    if (
+      iteration === earlyOutStop &&
+      dropped.length > read * EARLY_OUT_DISORDER_FRACTION
+    ) {
+      // Too disordered for the adaptive approach to be worth it: flush what's been dropped so
+      // far back into the array and fall back to a plain full sort.
+      for (const value of dropped) {
+        arr[write] = value;
+        write++;
+      }
+      dropped.length = 0;
+      pdqSort(arr, 0, length);
+      return;
+    }
+
+    if (write === 0 || arr[read] >= arr[write - 1]) {
+      // In order -- keep it.
+      arr[write] = arr[read];
+      write++;
+      read++;
+      numDroppedInARow = 0;
+    } else if (
+      numDroppedInARow === 0 &&
+      write >= 2 &&
+      arr[read] >= arr[write - 2]
+    ) {
+      // Quick undo: the element two back would have accepted this one just fine, so drop the
+      // one right before it instead of the new element.
+      dropped.push(arr[write - 1]);
+      arr[write - 1] = arr[read];
+      read++;
+    } else if (numDroppedInARow < RECENCY) {
+      dropped.push(arr[read]);
+      read++;
+      numDroppedInARow++;
+    } else {
+      // Accepting something `numDroppedInARow` elements back made every subsequent element
+      // drop -- that accept was a mistake. Undo it, and any other recently accepted elements
+      // bigger than the dropped run's maximum.
+      dropped.splice(dropped.length - numDroppedInARow, numDroppedInARow);
+      read -= numDroppedInARow;
+
+      let numBacktracked = 1;
+      write--;
+
+      let maxOfDropped = read;
+      for (let i = read + 1; i <= read + numDroppedInARow; i++) {
+        if (arr[i] > maxOfDropped) maxOfDropped = arr[i];
+      }
+
+      while (write >= 1 && maxOfDropped < arr[write - 1]) {
+        write--;
+        numBacktracked++;
+      }
+
+      for (let i = write; i < write + numBacktracked; i++) {
+        dropped.push(arr[i]);
+      }
+
+      numDroppedInARow = 0;
+    }
+  }
+
+  for (let offset = 0; offset < dropped.length; offset++) {
+    arr[write + offset] = dropped[offset];
+  }
+
+  pdqSort(arr, write, length);
+
+  // Copy the now-sorted dropped tail before the final backward merge starts overwriting
+  // arr[write:] in place.
+  const buffer = arr.slice(write, write + dropped.length);
+
+  let i = buffer.length - 1;
+  let j = write - 1;
+  let k = length - 1;
+
+  while (i >= 0) {
+    if (j < 0 || buffer[i] > arr[j]) {
+      arr[k] = buffer[i];
+      k--;
+      i--;
+    } else {
+      arr[k] = arr[j];
+      k--;
+      j--;
+    }
+  }
+}
+
 function pdqLog(n) {
   let log = 0;
   while ((n >>= 1) !== 0) log++;
@@ -247,116 +350,20 @@ function pdqLoop(arr, begin, end, badAllowed) {
   }
 }
 
-function pdqSort(arr, begin, end) { if (end - begin > 1) pdqLoop(arr, begin, end, pdqLog(end - begin)); }
-
-
-
-function sort(arr) {
-  const length = arr.length;
-  if (length < 2) return;
-
-  const dropped = [];
-  let numDroppedInARow = 0;
-  let read = 0;
-  let write = 0;
-  let iteration = 0;
-  const earlyOutStop = Math.floor(length / EARLY_OUT_TEST_AT);
-
-  while (read < length) {
-    iteration++;
-    if (
-      iteration === earlyOutStop &&
-      dropped.length > read * EARLY_OUT_DISORDER_FRACTION
-    ) {
-      // Too disordered for the adaptive approach to be worth it: flush what's been dropped so
-      // far back into the array and fall back to a plain full sort.
-      for (const value of dropped) {
-        arr[write] = value;
-        write++;
-      }
-      dropped.length = 0;
-      pdqSort(arr, 0, length);
-      return;
-    }
-
-    if (write === 0 || arr[read] >= arr[write - 1]) {
-      // In order -- keep it.
-      arr[write] = arr[read];
-      write++;
-      read++;
-      numDroppedInARow = 0;
-    } else if (
-      numDroppedInARow === 0 &&
-      write >= 2 &&
-      arr[read] >= arr[write - 2]
-    ) {
-      // Quick undo: the element two back would have accepted this one just fine, so drop the
-      // one right before it instead of the new element.
-      dropped.push(arr[write - 1]);
-      arr[write - 1] = arr[read];
-      read++;
-    } else if (numDroppedInARow < RECENCY) {
-      dropped.push(arr[read]);
-      read++;
-      numDroppedInARow++;
-    } else {
-      // Accepting something `numDroppedInARow` elements back made every subsequent element
-      // drop -- that accept was a mistake. Undo it, and any other recently accepted elements
-      // bigger than the dropped run's maximum.
-      dropped.splice(dropped.length - numDroppedInARow, numDroppedInARow);
-      read -= numDroppedInARow;
-
-      let numBacktracked = 1;
-      write--;
-
-      let maxOfDropped = read;
-      for (let i = read + 1; i <= read + numDroppedInARow; i++) {
-        if (arr[i] > maxOfDropped) maxOfDropped = arr[i];
-      }
-
-      while (write >= 1 && maxOfDropped < arr[write - 1]) {
-        write--;
-        numBacktracked++;
-      }
-
-      for (let i = write; i < write + numBacktracked; i++) {
-        dropped.push(arr[i]);
-      }
-
-      numDroppedInARow = 0;
-    }
-  }
-
-  for (let offset = 0; offset < dropped.length; offset++) {
-    arr[write + offset] = dropped[offset];
-  }
-
-  pdqSort(arr, write, length);
-
-  // Copy the now-sorted dropped tail before the final backward merge starts overwriting
-  // arr[write:] in place.
-  const buffer = arr.slice(write, write + dropped.length);
-
-  let i = buffer.length - 1;
-  let j = write - 1;
-  let k = length - 1;
-
-  while (i >= 0) {
-    if (j < 0 || buffer[i] > arr[j]) {
-      arr[k] = buffer[i];
-      k--;
-      i--;
-    } else {
-      arr[k] = arr[j];
-      k--;
-      j--;
-    }
+function pdqSort(arr, begin, end) {
+  if (end - begin > 1) {
+    pdqLoop(arr, begin, end, pdqLog(end - begin));
   }
 }
 
-var array = [
-  0, 1, 2, 3, 4, 9, 6, 7, 8, 5, 10, 11, 12, 13, 14, 15, 21, 17, 18, 19, 20, 16,
-  22, 23, 24, 28, 26, 27, 25, 29,
+
+
+
+const array = [
+  0, 1, 2, 3, 4, 9, 6, 7,
+  8, 5, 10, 11, 12, 13, 14, 15,
+  21, 17, 18, 19, 20, 16, 22, 23,
+  24, 28, 26, 27, 25, 29,
 ];
 sort(array);
 console.log("[" + array.join(", ") + "]");

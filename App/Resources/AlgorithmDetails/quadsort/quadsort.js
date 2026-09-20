@@ -1,3 +1,19 @@
+function sort(arr, n) {
+  if (n < 16) {
+    tailSwap(arr, 0, n);
+  } else if (n < 256) {
+    if (quadSwap(arr, 0, n) === 0) {
+      const buffer = new Array(128).fill(0);
+      tailMerge(arr, buffer, 0, n, 16);
+    }
+  } else {
+    if (quadSwap(arr, 0, n) === 0) {
+      const buffer = new Array(Math.floor(n / 2)).fill(0);
+      quadMerge(arr, buffer, 0, n, 16);
+    }
+  }
+}
+
 function swap2(arr, i, j) {
   const t = arr[i];
   arr[i] = arr[j];
@@ -734,25 +750,13 @@ function quadSwap(arr, start, nmemb) {
 
 // Top-level dispatch by size: under 16 is a plain tailSwap; under 256 pre-sorts via quadSwap then
 // finishes with tailMerge; 256 and up finishes with the full quadMerge pass instead.
-function sort(arr, n) {
-  if (n < 16) {
-    tailSwap(arr, 0, n);
-  } else if (n < 256) {
-    if (quadSwap(arr, 0, n) === 0) {
-      const buffer = new Array(128).fill(0);
-      tailMerge(arr, buffer, 0, n, 16);
-    }
-  } else {
-    if (quadSwap(arr, 0, n) === 0) {
-      const buffer = new Array(Math.floor(n / 2)).fill(0);
-      quadMerge(arr, buffer, 0, n, 16);
-    }
-  }
-}
 
-var array = [
-  55, 12, 84, 3, 47, 91, 26, 68, 8, 73, 40, 97, 15, 62, 34, 79, 21, 88, 5, 51,
-  66, 29, 44, 12, 90, 1, 58, 33, 71, 19, 60, 45, 27, 82, 6, 95, 38, 63, 9, 50,
+const array = [
+  55, 12, 84, 3, 47, 91, 26, 68,
+  8, 73, 40, 97, 15, 62, 34, 79,
+  21, 88, 5, 51, 66, 29, 44, 12,
+  90, 1, 58, 33, 71, 19, 60, 45,
+  27, 82, 6, 95, 38, 63, 9, 50,
 ];
 sort(array, array.length);
 console.log("[" + array.join(", ") + "]");

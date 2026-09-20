@@ -1,13 +1,3 @@
-function traverse(arr, temp, lower, upper, state, r) {
-  if (lower[r] !== 0) {
-    traverse(arr, temp, lower, upper, state, lower[r]);
-  }
-  temp[state.idx++] = arr[r];
-  if (upper[r] !== 0) {
-    traverse(arr, temp, lower, upper, state, upper[r]);
-  }
-}
-
 function sort(arr) {
   var n = arr.length;
   if (n <= 1) {
@@ -36,6 +26,20 @@ function sort(arr) {
   }
 }
 
-var array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56];
+function traverse(arr, temp, lower, upper, state, r) {
+  if (lower[r] !== 0) {
+    traverse(arr, temp, lower, upper, state, lower[r]);
+  }
+  temp[state.idx++] = arr[r];
+  if (upper[r] !== 0) {
+    traverse(arr, temp, lower, upper, state, upper[r]);
+  }
+}
+
+
+const array = [
+  0, 39, 21, 62, 91, 77, 14, 23,
+  90, 69, 51, 81, 68, 83, 32, 56,
+];
 sort(array);
 console.log("[" + array.join(", ") + "]");

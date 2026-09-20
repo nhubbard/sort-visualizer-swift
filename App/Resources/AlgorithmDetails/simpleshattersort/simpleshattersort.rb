@@ -1,3 +1,10 @@
+def sort(arr)
+  return if arr.length < 2
+  n = arr.length
+  rate = [2, floor_log2(n) / 2].max
+  simple_shatter_sort(arr, n, 4, rate)
+end
+
 def insertion_sort(arr, start, fin)
   (start + 1...fin).each do |i|
     pos = i
@@ -56,12 +63,6 @@ def simple_shatter_sort(arr, length, num, rate)
   end
 end
 
-def sort(arr)
-  return if arr.length < 2
-  n = arr.length
-  rate = [2, floor_log2(n) / 2].max
-  simple_shatter_sort(arr, n, 4, rate)
-end
 
 array = [0, 39, 21, 62, 91, 77, 14, 23,
   90, 69, 51, 81, 68, 83, 32, 56]

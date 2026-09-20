@@ -1,3 +1,54 @@
+function sort(arr) {
+  var n = arr.length;
+  if (n <= 1) return arr;
+  var j = 1;
+  while (j < n) {
+    var bLen = blockRoot(j);
+    var runLength = j;
+    var b = n - (n % bLen);
+
+    while (runLength > 16) {
+      var i = 0;
+      while (i + j < b) {
+        var k = i;
+        while (k + runLength < Math.min(i + 2 * j, b)) {
+          blockSelect(
+            arr,
+            k,
+            k + runLength,
+            Math.min(k + 2 * runLength, b),
+            bLen,
+          );
+          k += runLength;
+        }
+        i += 2 * j;
+      }
+      runLength = bLen;
+      bLen = blockRoot(bLen);
+    }
+
+    var i2 = 0;
+    while (i2 + j < b) {
+      var k2 = i2;
+      var f = i2;
+      while (k2 + runLength < Math.min(i2 + 2 * j, b)) {
+        f = inPlaceMerge(
+          arr,
+          f,
+          k2 + runLength,
+          Math.min(k2 + 2 * runLength, b),
+        );
+        k2 += runLength;
+      }
+      i2 += 2 * j;
+    }
+
+    inPlaceMergeBW(arr, n - (n % (2 * j)), b, n);
+    j *= 2;
+  }
+  return arr;
+}
+
 function blockRoot(n) {
   var i = 1;
   while (i * i < n) {
@@ -119,57 +170,10 @@ function inPlaceMergeBW(array, a, m, b) {
   }
 }
 
-function sort(arr) {
-  var n = arr.length;
-  if (n <= 1) return arr;
-  var j = 1;
-  while (j < n) {
-    var bLen = blockRoot(j);
-    var runLength = j;
-    var b = n - (n % bLen);
 
-    while (runLength > 16) {
-      var i = 0;
-      while (i + j < b) {
-        var k = i;
-        while (k + runLength < Math.min(i + 2 * j, b)) {
-          blockSelect(
-            arr,
-            k,
-            k + runLength,
-            Math.min(k + 2 * runLength, b),
-            bLen,
-          );
-          k += runLength;
-        }
-        i += 2 * j;
-      }
-      runLength = bLen;
-      bLen = blockRoot(bLen);
-    }
-
-    var i2 = 0;
-    while (i2 + j < b) {
-      var k2 = i2;
-      var f = i2;
-      while (k2 + runLength < Math.min(i2 + 2 * j, b)) {
-        f = inPlaceMerge(
-          arr,
-          f,
-          k2 + runLength,
-          Math.min(k2 + 2 * runLength, b),
-        );
-        k2 += runLength;
-      }
-      i2 += 2 * j;
-    }
-
-    inPlaceMergeBW(arr, n - (n % (2 * j)), b, n);
-    j *= 2;
-  }
-  return arr;
-}
-
-var array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56];
+const array = [
+  0, 39, 21, 62, 91, 77, 14, 23,
+  90, 69, 51, 81, 68, 83, 32, 56,
+];
 sort(array);
 console.log("[" + array.join(", ") + "]");

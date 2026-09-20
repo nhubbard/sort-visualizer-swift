@@ -1,12 +1,3 @@
-def traverse(arr, temp, lower, upper, state, r):
-    if lower[r] != 0:
-        traverse(arr, temp, lower, upper, state, lower[r])
-    temp[state[0]] = arr[r]
-    state[0] += 1
-    if upper[r] != 0:
-        traverse(arr, temp, lower, upper, state, upper[r])
-
-
 def sort(arr):
     n = len(arr)
     if n <= 1:
@@ -30,8 +21,21 @@ def sort(arr):
     for i in range(n):
         arr[i] = temp[i]
 
+def traverse(arr, temp, lower, upper, state, r):
+    if lower[r] != 0:
+        traverse(arr, temp, lower, upper, state, lower[r])
+    temp[state[0]] = arr[r]
+    state[0] += 1
+    if upper[r] != 0:
+        traverse(arr, temp, lower, upper, state, upper[r])
+
+
+
 
 if __name__ == "__main__":
-    array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56]
+    array = [
+        0, 39, 21, 62, 91, 77, 14, 23,
+        90, 69, 51, 81, 68, 83, 32, 56,
+    ]
     sort(array)
     print(array)

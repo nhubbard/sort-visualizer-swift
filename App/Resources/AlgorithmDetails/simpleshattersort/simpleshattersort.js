@@ -1,3 +1,10 @@
+function sort(arr) {
+  if (arr.length < 2) return;
+  const n = arr.length;
+  const rate = Math.max(2, Math.floor(floorLog2(n) / 2));
+  simpleShatterSort(arr, n, 4, rate);
+}
+
 function insertionSort(arr, start, end) {
   for (let i = start + 1; i < end; i++) {
     let pos = i;
@@ -62,13 +69,10 @@ function simpleShatterSort(arr, length, num, rate) {
   }
 }
 
-function sort(arr) {
-  if (arr.length < 2) return;
-  const n = arr.length;
-  const rate = Math.max(2, Math.floor(floorLog2(n) / 2));
-  simpleShatterSort(arr, n, 4, rate);
-}
 
-var array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56];
+const array = [
+  0, 39, 21, 62, 91, 77, 14, 23,
+  90, 69, 51, 81, 68, 83, 32, 56,
+];
 sort(array);
 console.log("[" + array.join(", ") + "]");

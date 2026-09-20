@@ -1,3 +1,6 @@
+def sort(arr):
+    swapless_bubble_sort(arr)
+
 def swapless_bubble_sort(array):
     i = len(array)
     while i > 0:
@@ -17,11 +20,12 @@ def swapless_bubble_sort(array):
         i = last
 
 
-def sort(arr):
-    swapless_bubble_sort(arr)
 
 
 if __name__ == "__main__":
-    array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56]
+    array = [
+        0, 39, 21, 62, 91, 77, 14, 23,
+        90, 69, 51, 81, 68, 83, 32, 56,
+    ]
     sort(array)
     print(array)

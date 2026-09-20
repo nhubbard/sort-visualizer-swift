@@ -1,3 +1,7 @@
+func sort(_ array: inout [Int]) {
+    quadStooge(&array, 0, array.count)
+}
+
 func quadStooge(_ arr: inout [Int], _ pos: Int, _ length: Int) {
     if length >= 2, arr[pos] > arr[pos + length - 1] {
         arr.swapAt(pos, pos + length - 1)
@@ -20,9 +24,6 @@ func quadStooge(_ arr: inout [Int], _ pos: Int, _ length: Int) {
     }
 }
 
-func sort(_ array: inout [Int]) {
-    quadStooge(&array, 0, array.count)
-}
 
 var array: [Int] = [
     0, 39, 21, 62, 91, 77, 14, 23,

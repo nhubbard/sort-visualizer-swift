@@ -1,3 +1,7 @@
+def sort(arr):
+    if len(arr) > 1:
+        double_insertion(arr, 0, len(arr))
+
 def left_binary_search(array, a, b, val):
     lo, hi = a, b
     while lo < hi:
@@ -65,12 +69,12 @@ def double_insertion(array, a, b):
         j += 1
 
 
-def sort(arr):
-    if len(arr) > 1:
-        double_insertion(arr, 0, len(arr))
 
 
 if __name__ == "__main__":
-    array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56]
+    array = [
+        0, 39, 21, 62, 91, 77, 14, 23,
+        90, 69, 51, 81, 68, 83, 32, 56,
+    ]
     sort(array)
     print(array)

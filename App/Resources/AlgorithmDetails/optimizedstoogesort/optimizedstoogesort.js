@@ -1,3 +1,7 @@
+function sort(arr) {
+  exchange(arr, arr.length);
+}
+
 function forward(arr, left, right) {
   while (left < right) {
     let index = right;
@@ -44,10 +48,10 @@ function exchange(arr, length) {
   backward(arr, 1, length - 1);
 }
 
-function sort(arr) {
-  exchange(arr, arr.length);
-}
 
-var array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56];
+const array = [
+  0, 39, 21, 62, 91, 77, 14, 23,
+  90, 69, 51, 81, 68, 83, 32, 56,
+];
 sort(array);
 console.log("[" + array.join(", ") + "]");

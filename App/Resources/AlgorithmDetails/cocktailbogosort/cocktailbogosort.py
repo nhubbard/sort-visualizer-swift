@@ -1,6 +1,17 @@
 import random
 
 
+def sort(arr):
+    lo = 0
+    hi = len(arr)
+    while lo < hi - 1:
+        if is_minimum(arr, lo, hi):
+            lo += 1
+        elif is_maximum(arr, lo, hi):
+            hi -= 1
+        else:
+            shuffle_range(arr, lo, hi)
+
 def is_minimum(arr, start, end):
     for k in range(start + 1, end):
         if arr[start] > arr[k]:
@@ -21,16 +32,6 @@ def shuffle_range(arr, start, end):
         arr[i], arr[j] = arr[j], arr[i]
 
 
-def sort(arr):
-    lo = 0
-    hi = len(arr)
-    while lo < hi - 1:
-        if is_minimum(arr, lo, hi):
-            lo += 1
-        elif is_maximum(arr, lo, hi):
-            hi -= 1
-        else:
-            shuffle_range(arr, lo, hi)
 
 
 if __name__ == "__main__":

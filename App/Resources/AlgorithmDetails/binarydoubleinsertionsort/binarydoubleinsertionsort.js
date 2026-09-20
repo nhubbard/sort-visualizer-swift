@@ -1,3 +1,9 @@
+function sort(arr) {
+  if (arr.length > 1) {
+    doubleInsertion(arr, 0, arr.length);
+  }
+}
+
 function leftBinarySearch(array, a, b, val) {
   let lo = a,
     hi = b;
@@ -77,12 +83,10 @@ function doubleInsertion(array, a, b) {
   }
 }
 
-function sort(arr) {
-  if (arr.length > 1) {
-    doubleInsertion(arr, 0, arr.length);
-  }
-}
 
-const array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56];
+const array = [
+  0, 39, 21, 62, 91, 77, 14, 23,
+  90, 69, 51, 81, 68, 83, 32, 56,
+];
 sort(array);
 console.log("[" + array.join(", ") + "]");

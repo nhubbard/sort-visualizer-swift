@@ -1,3 +1,19 @@
+def sort(arr):
+    n = len(arr)
+    if n < 2:
+        return
+    i = find_run(arr, 0, n)
+    while i < n:
+        j = find_run(arr, i, n)
+        length = j - i
+        if length == 1:
+            insert1(arr, 0, i)
+        elif length == 2:
+            insert2(arr, 0, i, i + 1)
+        else:
+            merge_without_buffer(arr, 0, i, length)
+        i = j
+
 def multi_swap(arr, a, b, count):
     for i in range(count):
         arr[a + i], arr[b + i] = arr[b + i], arr[a + i]
@@ -100,24 +116,12 @@ def insert2(arr, a, l, r):
     arr[l + 1] = tmp_l
 
 
-def sort(arr):
-    n = len(arr)
-    if n < 2:
-        return
-    i = find_run(arr, 0, n)
-    while i < n:
-        j = find_run(arr, i, n)
-        length = j - i
-        if length == 1:
-            insert1(arr, 0, i)
-        elif length == 2:
-            insert2(arr, 0, i, i + 1)
-        else:
-            merge_without_buffer(arr, 0, i, length)
-        i = j
 
 
 if __name__ == "__main__":
-    array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56]
+    array = [
+        0, 39, 21, 62, 91, 77, 14, 23,
+        90, 69, 51, 81, 68, 83, 32, 56,
+    ]
     sort(array)
     print(array)

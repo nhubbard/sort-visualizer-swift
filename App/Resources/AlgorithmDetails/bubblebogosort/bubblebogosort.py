@@ -11,6 +11,7 @@ def sort(a):
                 swapped = True
 
 
-array = [0, 39, 21, 62, 91, 77, 14, 23]
-sort(array)
-print(array)
+if __name__ == "__main__":
+    array = [0, 39, 21, 62, 91, 77, 14, 23]
+    sort(array)
+    print(array)

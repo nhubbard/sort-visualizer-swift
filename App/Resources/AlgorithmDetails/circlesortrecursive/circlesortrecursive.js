@@ -1,3 +1,16 @@
+function sort(arr) {
+  var end = arr.length;
+  if (end <= 1) {
+    return arr;
+  }
+  var paddedLength = nextPowerOfTwo(end);
+  var swaps;
+  do {
+    swaps = circleSortRoutine(arr, 0, paddedLength - 1, end);
+  } while (swaps !== 0);
+  return arr;
+}
+
 function nextPowerOfTwo(n) {
   var k = 1;
   while (k < n) {
@@ -29,19 +42,10 @@ function circleSortRoutine(array, lo, hi, end) {
   return swaps;
 }
 
-function sort(arr) {
-  var end = arr.length;
-  if (end <= 1) {
-    return arr;
-  }
-  var paddedLength = nextPowerOfTwo(end);
-  var swaps;
-  do {
-    swaps = circleSortRoutine(arr, 0, paddedLength - 1, end);
-  } while (swaps !== 0);
-  return arr;
-}
 
-var array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56];
+const array = [
+  0, 39, 21, 62, 91, 77, 14, 23,
+  90, 69, 51, 81, 68, 83, 32, 56,
+];
 sort(array);
 console.log("[" + array.join(", ") + "]");

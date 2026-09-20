@@ -1,3 +1,38 @@
+def sort(array):
+    n = len(array)
+    if n <= 1:
+        return
+    j = 1
+    while j < n:
+        b_len = block_root(j)
+        run_length = j
+        b = n - n % b_len
+
+        while run_length > 16:
+            i = 0
+            while i + j < b:
+                k = i
+                while k + run_length < min(i + 2 * j, b):
+                    block_select(
+                        array, k, k + run_length, min(k + 2 * run_length, b), b_len
+                    )
+                    k += run_length
+                i += 2 * j
+            run_length = b_len
+            b_len = block_root(b_len)
+
+        i = 0
+        while i + j < b:
+            k = i
+            f = i
+            while k + run_length < min(i + 2 * j, b):
+                f = in_place_merge(array, f, k + run_length, min(k + 2 * run_length, b))
+                k += run_length
+            i += 2 * j
+
+        in_place_merge_bw(array, n - n % (2 * j), b, n)
+        j *= 2
+
 def block_root(n):
     i = 1
     while i * i < n:
@@ -105,43 +140,12 @@ def in_place_merge_bw(array, a, m, b):
             j -= 1
 
 
-def sort(array):
-    n = len(array)
-    if n <= 1:
-        return
-    j = 1
-    while j < n:
-        b_len = block_root(j)
-        run_length = j
-        b = n - n % b_len
-
-        while run_length > 16:
-            i = 0
-            while i + j < b:
-                k = i
-                while k + run_length < min(i + 2 * j, b):
-                    block_select(
-                        array, k, k + run_length, min(k + 2 * run_length, b), b_len
-                    )
-                    k += run_length
-                i += 2 * j
-            run_length = b_len
-            b_len = block_root(b_len)
-
-        i = 0
-        while i + j < b:
-            k = i
-            f = i
-            while k + run_length < min(i + 2 * j, b):
-                f = in_place_merge(array, f, k + run_length, min(k + 2 * run_length, b))
-                k += run_length
-            i += 2 * j
-
-        in_place_merge_bw(array, n - n % (2 * j), b, n)
-        j *= 2
 
 
 if __name__ == "__main__":
-    array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56]
+    array = [
+        0, 39, 21, 62, 91, 77, 14, 23,
+        90, 69, 51, 81, 68, 83, 32, 56,
+    ]
     sort(array)
     print(array)

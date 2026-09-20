@@ -1,3 +1,7 @@
+def sort(array)
+  exchange(array, array.length)
+end
+
 def forward(arr, left, right)
   while left < right
     index = right
@@ -38,9 +42,6 @@ def exchange(arr, length)
   backward(arr, 1, length - 1)
 end
 
-def sort(array)
-  exchange(array, array.length)
-end
 
 array = [0, 39, 21, 62, 91, 77, 14, 23,
   90, 69, 51, 81, 68, 83, 32, 56]

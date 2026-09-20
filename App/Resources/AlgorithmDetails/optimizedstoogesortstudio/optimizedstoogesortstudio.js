@@ -1,3 +1,8 @@
+function sort(arr) {
+  if (arr.length <= 1) return;
+  stoogeSort(arr, 0, 1, arr.length, false);
+}
+
 function compSwap(arr, a, b) {
   if (arr[a] > arr[b]) {
     [arr[a], arr[b]] = [arr[b], arr[a]];
@@ -39,11 +44,10 @@ function stoogeSort(arr, a, m, b, merge) {
   return lChange || rChange;
 }
 
-function sort(arr) {
-  if (arr.length <= 1) return;
-  stoogeSort(arr, 0, 1, arr.length, false);
-}
 
-var array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56];
+const array = [
+  0, 39, 21, 62, 91, 77, 14, 23,
+  90, 69, 51, 81, 68, 83, 32, 56,
+];
 sort(array);
 console.log("[" + array.join(", ") + "]");

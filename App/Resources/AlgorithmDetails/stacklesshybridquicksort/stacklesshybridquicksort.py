@@ -1,6 +1,12 @@
 INSERTION_THRESHOLD = 16
 
 
+def sort(arr):
+    n = len(arr)
+    if n < 2:
+        return
+    quick_sort(arr, 0, n)
+
 def median_of_three(arr, start, end):
     """Arranges arr[start], arr[mid], arr[end - 1] so the median of the three ends up at
     `start`, ready to serve as partition's pivot."""
@@ -118,44 +124,38 @@ def quick_sort(arr, start, end):
             refresh_median = True
 
 
-def sort(arr):
-    n = len(arr)
-    if n < 2:
-        return
-    quick_sort(arr, 0, n)
-
-
-array = [
-    55,
-    12,
-    84,
-    3,
-    47,
-    91,
-    26,
-    68,
-    8,
-    73,
-    40,
-    97,
-    15,
-    62,
-    34,
-    79,
-    21,
-    88,
-    5,
-    51,
-    66,
-    29,
-    44,
-    12,
-    78,
-    33,
-    91,
-    6,
-    58,
-    12,
-]
-sort(array)
-print(array)
+if __name__ == "__main__":
+    array = [
+        55,
+        12,
+        84,
+        3,
+        47,
+        91,
+        26,
+        68,
+        8,
+        73,
+        40,
+        97,
+        15,
+        62,
+        34,
+        79,
+        21,
+        88,
+        5,
+        51,
+        66,
+        29,
+        44,
+        12,
+        78,
+        33,
+        91,
+        6,
+        58,
+        12,
+    ]
+    sort(array)
+    print(array)

@@ -1,3 +1,10 @@
+function sort(arr) {
+  var n = arr.length;
+  if (n > 1) {
+    recursiveComb(arr, 0, 1, n);
+  }
+}
+
 function powerOfThree(arr, pos, gap, end) {
   if (pos + gap > end) {
     return;
@@ -27,13 +34,10 @@ function recursiveComb(arr, pos, gap, end) {
   powerOfThree(arr, pos, gap, end);
 }
 
-function sort(arr) {
-  var n = arr.length;
-  if (n > 1) {
-    recursiveComb(arr, 0, 1, n);
-  }
-}
 
-var array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56];
+const array = [
+  0, 39, 21, 62, 91, 77, 14, 23,
+  90, 69, 51, 81, 68, 83, 32, 56,
+];
 sort(array);
 console.log("[" + array.join(", ") + "]");

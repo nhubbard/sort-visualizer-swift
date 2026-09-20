@@ -1,3 +1,6 @@
+def sort(array):
+    return stable_cycle_sort(array)
+
 def destination(array, flagged, a, b1, b):
     held_value = array[a]
     d = a
@@ -33,11 +36,12 @@ def stable_cycle_sort(array):
     return array
 
 
-def sort(array):
-    return stable_cycle_sort(array)
 
 
 if __name__ == "__main__":
-    array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56]
+    array = [
+        0, 39, 21, 62, 91, 77, 14, 23,
+        90, 69, 51, 81, 68, 83, 32, 56,
+    ]
     sort(array)
     print(array)

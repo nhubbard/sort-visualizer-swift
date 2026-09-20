@@ -1,3 +1,17 @@
+function sort(arr) {
+  const n = arr.length;
+  if (n < 2) return;
+  let i = findRun(arr, 0, n);
+  while (i < n) {
+    const j = findRun(arr, i, n);
+    const len = j - i;
+    if (len === 1) insert1(arr, 0, i);
+    else if (len === 2) insert2(arr, 0, i, i + 1);
+    else mergeWithoutBuffer(arr, 0, i, len);
+    i = j;
+  }
+}
+
 function multiSwap(arr, a, b, count) {
   for (let i = 0; i < count; i++) {
     [arr[a + i], arr[b + i]] = [arr[b + i], arr[a + i]];
@@ -95,20 +109,10 @@ function insert2(arr, a, l, r) {
   arr[l + 1] = tmpL;
 }
 
-function sort(arr) {
-  const n = arr.length;
-  if (n < 2) return;
-  let i = findRun(arr, 0, n);
-  while (i < n) {
-    const j = findRun(arr, i, n);
-    const len = j - i;
-    if (len === 1) insert1(arr, 0, i);
-    else if (len === 2) insert2(arr, 0, i, i + 1);
-    else mergeWithoutBuffer(arr, 0, i, len);
-    i = j;
-  }
-}
 
-var array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56];
+const array = [
+  0, 39, 21, 62, 91, 77, 14, 23,
+  90, 69, 51, 81, 68, 83, 32, 56,
+];
 sort(array);
 console.log("[" + array.join(", ") + "]");

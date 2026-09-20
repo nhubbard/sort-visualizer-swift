@@ -1,3 +1,20 @@
+def sort(arr)
+  n = arr.length
+  if n < 16
+    tail_swap(arr, 0, n)
+  elsif n < 256
+    unless quad_swap(arr, 0, n)
+      buffer = Array.new(128, 0)
+      tail_merge(arr, buffer, 0, n, 16)
+    end
+  else
+    unless quad_swap(arr, 0, n)
+      buffer = Array.new(n / 2, 0)
+      quad_merge(arr, buffer, 0, n, 16)
+    end
+  end
+end
+
 def swap2(arr, i, j)
   arr[i], arr[j] = arr[j], arr[i]
 end
@@ -681,22 +698,6 @@ end
 
 # Top-level dispatch by size: under 16 is a plain tail_swap; under 256 pre-sorts via quad_swap then
 # finishes with tail_merge; 256 and up finishes with the full quad_merge pass instead.
-def sort(arr)
-  n = arr.length
-  if n < 16
-    tail_swap(arr, 0, n)
-  elsif n < 256
-    unless quad_swap(arr, 0, n)
-      buffer = Array.new(128, 0)
-      tail_merge(arr, buffer, 0, n, 16)
-    end
-  else
-    unless quad_swap(arr, 0, n)
-      buffer = Array.new(n / 2, 0)
-      quad_merge(arr, buffer, 0, n, 16)
-    end
-  end
-end
 
 array = [
   55, 12, 84, 3, 47, 91, 26, 68, 8, 73, 40, 97, 15, 62, 34, 79, 21, 88, 5, 51,

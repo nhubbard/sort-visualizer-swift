@@ -1,3 +1,24 @@
+def sort(arr):
+    root = None
+    for v in arr:
+        root, _ = add(root, v)
+        root.is_red = False
+
+    result = []
+
+    def traverse(node):
+        if node is None:
+            return
+        traverse(node.left)
+        result.append(node.value)
+        traverse(node.right)
+
+    traverse(root)
+
+    for i in range(len(arr)):
+        arr[i] = result[i]
+    return arr
+
 class Node:
     def __init__(self, value):
         self.value = value
@@ -65,29 +86,12 @@ def add(node, value):
         return node, node.is_red and is_red(node.right)
 
 
-def sort(arr):
-    root = None
-    for v in arr:
-        root, _ = add(root, v)
-        root.is_red = False
-
-    result = []
-
-    def traverse(node):
-        if node is None:
-            return
-        traverse(node.left)
-        result.append(node.value)
-        traverse(node.right)
-
-    traverse(root)
-
-    for i in range(len(arr)):
-        arr[i] = result[i]
-    return arr
 
 
 if __name__ == "__main__":
-    array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56]
+    array = [
+        0, 39, 21, 62, 91, 77, 14, 23,
+        90, 69, 51, 81, 68, 83, 32, 56,
+    ]
     sort(array)
     print(array)

@@ -1,3 +1,17 @@
+def sort(array):
+    n = len(array)
+    output = [0] * n
+    if n <= 1:
+        if n == 1:
+            output[0] = array[0]
+        return output
+    heapify(array, n)
+    for i in range(n - 1, -1, -1):
+        output[i] = array[0]
+        array[0] = -1
+        find_next(array, n)
+    return output
+
 def sift_down(array, root, size):
     index = root
     while 2 * index + 1 < size:
@@ -41,22 +55,12 @@ def find_next(array, size):
         array[hole], array[left] = array[left], array[hole]
 
 
-def sort(array):
-    n = len(array)
-    output = [0] * n
-    if n <= 1:
-        if n == 1:
-            output[0] = array[0]
-        return output
-    heapify(array, n)
-    for i in range(n - 1, -1, -1):
-        output[i] = array[0]
-        array[0] = -1
-        find_next(array, n)
-    return output
 
 
 if __name__ == "__main__":
-    array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56]
+    array = [
+        0, 39, 21, 62, 91, 77, 14, 23,
+        90, 69, 51, 81, 68, 83, 32, 56,
+    ]
     output = sort(array)
     print(output)

@@ -1,44 +1,5 @@
 const BLOCK_SIZE = 16;
 
-function binaryInsertionSort(arr, lo, hi) {
-  for (let i = lo + 1; i < hi; i++) {
-    const key = arr[i];
-    let left = lo;
-    let right = i;
-    while (left < right) {
-      const mid = Math.floor((left + right) / 2);
-      if (arr[mid] <= key) {
-        left = mid + 1;
-      } else {
-        right = mid;
-      }
-    }
-    for (let j = i; j > left; j--) {
-      arr[j] = arr[j - 1];
-    }
-    arr[left] = key;
-  }
-}
-
-function merge(src, dst, low, mid, high) {
-  let i = low;
-  let j = mid;
-  let k = low;
-  while (i < mid && j < high) {
-    if (src[i] <= src[j]) {
-      dst[k++] = src[i++];
-    } else {
-      dst[k++] = src[j++];
-    }
-  }
-  while (i < mid) {
-    dst[k++] = src[i++];
-  }
-  while (j < high) {
-    dst[k++] = src[j++];
-  }
-}
-
 function sort(arr) {
   const n = arr.length;
   if (n < BLOCK_SIZE) {
@@ -85,9 +46,52 @@ function sort(arr) {
   }
 }
 
-var array = [
-  81, 14, 3, 94, 35, 31, 28, 17, 94, 13, 86, 94, 69, 11, 75, 54, 4, 3, 11, 27,
-  29, 64, 77, 3, 71, 25, 91, 83, 89, 69, 53, 28, 57, 75, 35, 0, 97, 20, 89, 54,
+function binaryInsertionSort(arr, lo, hi) {
+  for (let i = lo + 1; i < hi; i++) {
+    const key = arr[i];
+    let left = lo;
+    let right = i;
+    while (left < right) {
+      const mid = Math.floor((left + right) / 2);
+      if (arr[mid] <= key) {
+        left = mid + 1;
+      } else {
+        right = mid;
+      }
+    }
+    for (let j = i; j > left; j--) {
+      arr[j] = arr[j - 1];
+    }
+    arr[left] = key;
+  }
+}
+
+function merge(src, dst, low, mid, high) {
+  let i = low;
+  let j = mid;
+  let k = low;
+  while (i < mid && j < high) {
+    if (src[i] <= src[j]) {
+      dst[k++] = src[i++];
+    } else {
+      dst[k++] = src[j++];
+    }
+  }
+  while (i < mid) {
+    dst[k++] = src[i++];
+  }
+  while (j < high) {
+    dst[k++] = src[j++];
+  }
+}
+
+
+const array = [
+  81, 14, 3, 94, 35, 31, 28, 17,
+  94, 13, 86, 94, 69, 11, 75, 54,
+  4, 3, 11, 27, 29, 64, 77, 3,
+  71, 25, 91, 83, 89, 69, 53, 28,
+  57, 75, 35, 0, 97, 20, 89, 54,
 ];
 sort(array);
 console.log("[" + array.join(", ") + "]");

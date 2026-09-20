@@ -1,3 +1,7 @@
+function sort(arr) {
+  quickSort(arr, 0, arr.length - 1);
+}
+
 function quickSort(array, p, r) {
   while (p < r) {
     const pivot = array[p + Math.floor((r - p + 1) / 2)];
@@ -22,10 +26,10 @@ function quickSort(array, p, r) {
   }
 }
 
-function sort(arr) {
-  quickSort(arr, 0, arr.length - 1);
-}
 
-var array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56];
+const array = [
+  0, 39, 21, 62, 91, 77, 14, 23,
+  90, 69, 51, 81, 68, 83, 32, 56,
+];
 sort(array);
 console.log("[" + array.join(", ") + "]");

@@ -1,5 +1,13 @@
 import Foundation
 
+func sort(_ array: inout [Int]) {
+    let n = array.count
+    if n <= 1 {
+        return
+    }
+    bufferedMerge(&array, 0, n)
+}
+
 func ceilLog(_ n: Int) -> Int {
     var i = 0
     while (1 << i) < n {
@@ -185,13 +193,6 @@ func bufferedMerge(_ array: inout [Int], _ a: Int, _ b: Int) {
     bufferedMerge(&array, b - (m - a) - s, b)
 }
 
-func sort(_ array: inout [Int]) {
-    let n = array.count
-    if n <= 1 {
-        return
-    }
-    bufferedMerge(&array, 0, n)
-}
 
 var array: [Int] = [
     0, 39, 21, 62, 91, 77, 14, 23,

@@ -1,3 +1,21 @@
+function sort(arr, n) {
+  if (n < 2) {
+    return;
+  }
+
+  if (n < 32) {
+    quadSortRange(arr, 0, n);
+    return;
+  }
+
+  if (!fluxAnalyze(arr, n)) {
+    return;
+  }
+
+  const swapBuf = new Array(n).fill(0);
+  fluxPartition(arr, swapBuf, false, 0, n);
+}
+
 function swap2(arr, i, j) {
   const t = arr[i];
   arr[i] = arr[j];
@@ -996,27 +1014,13 @@ function fluxPartition(arr, swapBuf, mainIsSwap, start, nmemb) {
 
 // -- Entry point ---------------------------------------------------------------------------------
 
-function sort(arr, n) {
-  if (n < 2) {
-    return;
-  }
 
-  if (n < 32) {
-    quadSortRange(arr, 0, n);
-    return;
-  }
-
-  if (!fluxAnalyze(arr, n)) {
-    return;
-  }
-
-  const swapBuf = new Array(n).fill(0);
-  fluxPartition(arr, swapBuf, false, 0, n);
-}
-
-var array = [
-  55, 12, 84, 3, 47, 91, 26, 68, 8, 73, 40, 97, 15, 62, 34, 79, 21, 88, 5, 51,
-  66, 29, 44, 12, 90, 1, 58, 33, 71, 19, 60, 45, 27, 82, 6, 95, 38, 63, 9, 50,
+const array = [
+  55, 12, 84, 3, 47, 91, 26, 68,
+  8, 73, 40, 97, 15, 62, 34, 79,
+  21, 88, 5, 51, 66, 29, 44, 12,
+  90, 1, 58, 33, 71, 19, 60, 45,
+  27, 82, 6, 95, 38, 63, 9, 50,
 ];
 sort(array, array.length);
 console.log("[" + array.join(", ") + "]");

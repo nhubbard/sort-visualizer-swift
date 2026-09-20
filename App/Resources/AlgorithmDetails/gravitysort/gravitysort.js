@@ -1,3 +1,7 @@
+function sort(arr) {
+  return gravitySort(arr);
+}
+
 function gravitySort(arr) {
   var n = arr.length;
   if (n === 0) return arr;
@@ -28,10 +32,10 @@ function gravitySort(arr) {
   return arr;
 }
 
-function sort(arr) {
-  return gravitySort(arr);
-}
 
-var array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56];
+const array = [
+  0, 39, 21, 62, 91, 77, 14, 23,
+  90, 69, 51, 81, 68, 83, 32, 56,
+];
 sort(array);
 console.log("[" + array.join(", ") + "]");

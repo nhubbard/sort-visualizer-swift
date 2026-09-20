@@ -1,3 +1,22 @@
+def sort(arr):
+    n = len(arr)
+    dist = 1
+    while dist < n:
+        if arr[dist - 1] > arr[dist]:
+            arr[dist - 1], arr[dist] = arr[dist], arr[dist - 1]
+        dist += 2
+    part = 2
+    while part < n:
+        left = 0
+        right = n - 2 * part
+        while left <= right:
+            merge_without_buffer(arr, left, part, part)
+            left += 2 * part
+        rest = n - left
+        if rest > part:
+            merge_without_buffer(arr, left, part, rest - part)
+        part *= 2
+
 def multi_swap(arr, a, b, count):
     for i in range(count):
         arr[a + i], arr[b + i] = arr[b + i], arr[a + i]
@@ -57,27 +76,12 @@ def merge_without_buffer(arr, pos, len1, len2):
                     break
 
 
-def sort(arr):
-    n = len(arr)
-    dist = 1
-    while dist < n:
-        if arr[dist - 1] > arr[dist]:
-            arr[dist - 1], arr[dist] = arr[dist], arr[dist - 1]
-        dist += 2
-    part = 2
-    while part < n:
-        left = 0
-        right = n - 2 * part
-        while left <= right:
-            merge_without_buffer(arr, left, part, part)
-            left += 2 * part
-        rest = n - left
-        if rest > part:
-            merge_without_buffer(arr, left, part, rest - part)
-        part *= 2
 
 
 if __name__ == "__main__":
-    array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56]
+    array = [
+        0, 39, 21, 62, 91, 77, 14, 23,
+        90, 69, 51, 81, 68, 83, 32, 56,
+    ]
     sort(array)
     print(array)

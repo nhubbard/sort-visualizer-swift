@@ -1,5 +1,11 @@
 import Foundation
 
+func sort(_ array: inout [Int]) {
+    if array.count > 1 {
+        doubleInsertionSort(&array, 0, array.count)
+    }
+}
+
 func doubleInsertionSort(_ array: inout [Int], _ start: Int, _ end: Int) {
     var left = start + (end - start) / 2 - 1
     var right = left + 1
@@ -61,11 +67,6 @@ func doubleInsertionSort(_ array: inout [Int], _ start: Int, _ end: Int) {
     }
 }
 
-func sort(_ array: inout [Int]) {
-    if array.count > 1 {
-        doubleInsertionSort(&array, 0, array.count)
-    }
-}
 
 var array: [Int] = [
     0, 39, 21, 62, 91, 77, 14, 23,

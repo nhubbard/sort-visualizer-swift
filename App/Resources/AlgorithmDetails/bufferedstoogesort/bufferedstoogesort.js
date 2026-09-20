@@ -1,3 +1,7 @@
+function sort(arr) {
+  bufferedStoogeSort(arr, 0, arr.length);
+}
+
 function bufferedStoogeSort(arr, start, stop) {
   if (stop - start > 1) {
     if (stop - start === 2 && arr[start] > arr[stop - 1]) {
@@ -53,10 +57,10 @@ function bufferedStoogeSort(arr, start, stop) {
   }
 }
 
-function sort(arr) {
-  bufferedStoogeSort(arr, 0, arr.length);
-}
 
-var array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56];
+const array = [
+  0, 39, 21, 62, 91, 77, 14, 23,
+  90, 69, 51, 81, 68, 83, 32, 56,
+];
 sort(array);
 console.log("[" + array.join(", ") + "]");

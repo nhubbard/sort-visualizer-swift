@@ -1,3 +1,7 @@
+function sort(arr) {
+  return librarySort(arr);
+}
+
 function binarySearch(array, item, start, end) {
   var lo = start;
   var hi = end;
@@ -101,10 +105,10 @@ function librarySort(array) {
   return array;
 }
 
-function sort(arr) {
-  return librarySort(arr);
-}
 
-var array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56];
+const array = [
+  0, 39, 21, 62, 91, 77, 14, 23,
+  90, 69, 51, 81, 68, 83, 32, 56,
+];
 sort(array);
 console.log("[" + array.join(", ") + "]");

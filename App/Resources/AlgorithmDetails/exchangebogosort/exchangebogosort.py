@@ -1,10 +1,6 @@
 import random
 
 
-def is_sorted(arr):
-    return all(arr[i - 1] <= arr[i] for i in range(1, len(arr)))
-
-
 def sort(arr):
     n = len(arr)
     while not is_sorted(arr):
@@ -12,6 +8,11 @@ def sort(arr):
         j = random.randrange(n)
         if (i < j and arr[i] > arr[j]) or (i > j and arr[i] < arr[j]):
             arr[i], arr[j] = arr[j], arr[i]
+
+def is_sorted(arr):
+    return all(arr[i - 1] <= arr[i] for i in range(1, len(arr)))
+
+
 
 
 if __name__ == "__main__":

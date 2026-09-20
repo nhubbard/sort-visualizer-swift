@@ -1,3 +1,7 @@
+def sort(array)
+  optimized_dual_pivot_quick_sort(array, 0, array.length - 1, 3)
+end
+
 def insertion_sort(a, start, finish)
   (start + 1...finish).each do |i|
     j = i
@@ -65,9 +69,6 @@ def optimized_dual_pivot_quick_sort(a, left, right, divisor)
   optimized_dual_pivot_quick_sort(a, less, great, divisor) if pivot1 < pivot2
 end
 
-def sort(array)
-  optimized_dual_pivot_quick_sort(array, 0, array.length - 1, 3)
-end
 
 array = [
   55, 12, 84, 3, 47, 91, 26, 68, 8, 73, 40, 97, 15, 62, 34, 79,

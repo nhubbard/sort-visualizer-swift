@@ -1,3 +1,15 @@
+function sort(arr) {
+  let n = arr.length;
+  while (n > 1) {
+    let max = maxIndex(arr, n);
+    if (max != n - 1) {
+      flip(arr, max);
+      flip(arr, n - 1);
+    }
+    n--;
+  }
+}
+
 function flip(arr, n) {
   let left = 0;
   while (left < n) {
@@ -17,18 +29,10 @@ function maxIndex(arr, n) {
   return index;
 }
 
-function sort(arr) {
-  let n = arr.length;
-  while (n > 1) {
-    let max = maxIndex(arr, n);
-    if (max != n - 1) {
-      flip(arr, max);
-      flip(arr, n - 1);
-    }
-    n--;
-  }
-}
 
-var array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56];
+const array = [
+  0, 39, 21, 62, 91, 77, 14, 23,
+  90, 69, 51, 81, 68, 83, 32, 56,
+];
 sort(array);
 console.log("[" + array.join(", ") + "]");

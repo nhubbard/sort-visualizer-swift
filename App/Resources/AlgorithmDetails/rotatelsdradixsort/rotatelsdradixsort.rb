@@ -1,6 +1,22 @@
 RADIX_BASE = 4
 
 # Extracts the digit at `place` (0 = ones place) from `value`, in RADIX_BASE.
+def sort(arr)
+  n = arr.length
+  return if n < 2
+
+  max_value = arr.max
+  max_place = 0
+  probe = RADIX_BASE
+  while probe <= max_value
+    max_place += 1
+    probe *= RADIX_BASE
+  end
+  (0..max_place).each do |place|
+    digit_merge_sort(arr, 0, n, place)
+  end
+end
+
 def digit_at(value, place)
   divisor = RADIX_BASE**place
   (value / divisor) % RADIX_BASE
@@ -73,21 +89,6 @@ def digit_merge_sort(arr, a, b, place)
   merge_by_digit(arr, a, mid, b, 0, RADIX_BASE, place)
 end
 
-def sort(arr)
-  n = arr.length
-  return if n < 2
-
-  max_value = arr.max
-  max_place = 0
-  probe = RADIX_BASE
-  while probe <= max_value
-    max_place += 1
-    probe *= RADIX_BASE
-  end
-  (0..max_place).each do |place|
-    digit_merge_sort(arr, 0, n, place)
-  end
-end
 
 array = [0, 39, 21, 62, 91, 77, 14, 23,
   90, 69, 51, 81, 68, 83, 32, 56]

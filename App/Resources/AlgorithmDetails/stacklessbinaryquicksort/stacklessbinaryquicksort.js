@@ -1,30 +1,3 @@
-function mostSignificantBit(value) {
-  if (value === 0) return -1;
-  let bit = 0;
-  while (value >> (bit + 1) !== 0) bit++;
-  return bit;
-}
-
-function getBit(value, bit) {
-  return ((value >> bit) & 1) === 1;
-}
-
-function partition(arr, lo, hi, bit) {
-  let i = lo - 1;
-  let j = hi;
-  while (true) {
-    i++;
-    while (i < j && !getBit(arr[i], bit)) i++;
-    j--;
-    while (j > i && getBit(arr[j], bit)) j--;
-    if (i < j) {
-      [arr[i], arr[j]] = [arr[j], arr[i]];
-    } else {
-      return i;
-    }
-  }
-}
-
 function sort(arr) {
   const n = arr.length;
   if (n <= 1) return;
@@ -56,6 +29,37 @@ function sort(arr) {
   }
 }
 
-var array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56];
+function mostSignificantBit(value) {
+  if (value === 0) return -1;
+  let bit = 0;
+  while (value >> (bit + 1) !== 0) bit++;
+  return bit;
+}
+
+function getBit(value, bit) {
+  return ((value >> bit) & 1) === 1;
+}
+
+function partition(arr, lo, hi, bit) {
+  let i = lo - 1;
+  let j = hi;
+  while (true) {
+    i++;
+    while (i < j && !getBit(arr[i], bit)) i++;
+    j--;
+    while (j > i && getBit(arr[j], bit)) j--;
+    if (i < j) {
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    } else {
+      return i;
+    }
+  }
+}
+
+
+const array = [
+  0, 39, 21, 62, 91, 77, 14, 23,
+  90, 69, 51, 81, 68, 83, 32, 56,
+];
 sort(array);
 console.log("[" + array.join(", ") + "]");

@@ -1,5 +1,9 @@
 import Foundation
 
+func sort(_ array: inout [Int]) {
+    cycleSort(&array)
+}
+
 func cycleSort(_ array: inout [Int]) {
     let n = array.count
     guard n > 1 else { return }
@@ -32,9 +36,6 @@ func cycleSort(_ array: inout [Int]) {
     }
 }
 
-func sort(_ array: inout [Int]) {
-    cycleSort(&array)
-}
 
 var array: [Int] = [
     0, 39, 21, 62, 91, 77, 14, 23,

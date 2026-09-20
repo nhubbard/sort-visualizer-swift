@@ -23,6 +23,49 @@ LEONARDO = [
 ]
 
 
+def sort(arr):
+    n = len(arr)
+    if n <= 1:
+        return
+
+    head = 0
+    p = 1
+    pshift = 1
+    hi = n - 1
+
+    while head < hi:
+        if p & 3 == 3:
+            sift(arr, pshift, head)
+            p >>= 2
+            pshift += 2
+        else:
+            if LEONARDO[pshift - 1] >= hi - head:
+                trinkle(arr, p, pshift, head, False)
+            else:
+                sift(arr, pshift, head)
+            if pshift == 1:
+                p <<= 1
+                pshift -= 1
+            else:
+                p <<= pshift - 1
+                pshift = 1
+        p |= 1
+        head += 1
+
+    trinkle(arr, p, pshift, head, False)
+    while pshift != 1 or p != 1:
+        if pshift <= 1:
+            trail = trailing_zero_count(p)
+            p >>= trail
+            pshift += trail
+        else:
+            p <<= 2
+            p ^= 7
+            pshift -= 2
+            trinkle(arr, p >> 1, pshift + 1, head - LEONARDO[pshift] - 1, True)
+            trinkle(arr, p, pshift, head - 1, True)
+        head -= 1
+
 def trailing_zero_count(value):
     mask = value & ~1
     trail = 0
@@ -78,51 +121,12 @@ def trinkle(array, p_in, pshift_in, head_in, is_trusty_in):
         sift(array, pshift, head)
 
 
-def sort(arr):
-    n = len(arr)
-    if n <= 1:
-        return
-
-    head = 0
-    p = 1
-    pshift = 1
-    hi = n - 1
-
-    while head < hi:
-        if p & 3 == 3:
-            sift(arr, pshift, head)
-            p >>= 2
-            pshift += 2
-        else:
-            if LEONARDO[pshift - 1] >= hi - head:
-                trinkle(arr, p, pshift, head, False)
-            else:
-                sift(arr, pshift, head)
-            if pshift == 1:
-                p <<= 1
-                pshift -= 1
-            else:
-                p <<= pshift - 1
-                pshift = 1
-        p |= 1
-        head += 1
-
-    trinkle(arr, p, pshift, head, False)
-    while pshift != 1 or p != 1:
-        if pshift <= 1:
-            trail = trailing_zero_count(p)
-            p >>= trail
-            pshift += trail
-        else:
-            p <<= 2
-            p ^= 7
-            pshift -= 2
-            trinkle(arr, p >> 1, pshift + 1, head - LEONARDO[pshift] - 1, True)
-            trinkle(arr, p, pshift, head - 1, True)
-        head -= 1
 
 
 if __name__ == "__main__":
-    array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56]
+    array = [
+        0, 39, 21, 62, 91, 77, 14, 23,
+        90, 69, 51, 81, 68, 83, 32, 56,
+    ]
     sort(array)
     print(array)

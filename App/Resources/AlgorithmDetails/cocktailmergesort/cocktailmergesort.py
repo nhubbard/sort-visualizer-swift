@@ -1,3 +1,6 @@
+def sort(arr):
+    cocktail_merge_sort(arr)
+
 def min_run_length(n):
     r = 0
     while n >= 64:
@@ -85,11 +88,12 @@ def cocktail_merge_sort(array):
         width *= 2
 
 
-def sort(arr):
-    cocktail_merge_sort(arr)
 
 
 if __name__ == "__main__":
-    array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56]
+    array = [
+        0, 39, 21, 62, 91, 77, 14, 23,
+        90, 69, 51, 81, 68, 83, 32, 56,
+    ]
     sort(array)
     print(array)

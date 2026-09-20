@@ -1,3 +1,8 @@
+def sort(array)
+  merge_sort(array, 0, array.length - 1) if array.length >= 2
+  array
+end
+
 def push(array, low, high)
   i = low
   while i < high
@@ -34,10 +39,6 @@ def merge_sort(array, low, high)
   end
 end
 
-def sort(array)
-  merge_sort(array, 0, array.length - 1) if array.length >= 2
-  array
-end
 
 array = [0, 39, 21, 62, 91, 77, 14, 23,
   90, 69, 51, 81, 68, 83, 32, 56]

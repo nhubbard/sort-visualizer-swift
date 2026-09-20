@@ -1,3 +1,6 @@
+def sort(arr):
+    cycle_sort(arr)
+
 def cycle_sort(array):
     n = len(array)
     for cycle_start in range(n - 1):
@@ -22,11 +25,12 @@ def cycle_sort(array):
     return array
 
 
-def sort(arr):
-    cycle_sort(arr)
 
 
 if __name__ == "__main__":
-    array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56]
+    array = [
+        0, 39, 21, 62, 91, 77, 14, 23,
+        90, 69, 51, 81, 68, 83, 32, 56,
+    ]
     sort(array)
     print(array)

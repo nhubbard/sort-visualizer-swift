@@ -1,3 +1,6 @@
+def sort(arr):
+    quick_sort(arr, 0, len(arr) - 1)
+
 def quick_sort(array, p, r):
     while p < r:
         pivot = array[p + (r - p + 1) // 2]
@@ -21,11 +24,12 @@ def quick_sort(array, p, r):
             r = j
 
 
-def sort(arr):
-    quick_sort(arr, 0, len(arr) - 1)
 
 
 if __name__ == "__main__":
-    array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56]
+    array = [
+        0, 39, 21, 62, 91, 77, 14, 23,
+        90, 69, 51, 81, 68, 83, 32, 56,
+    ]
     sort(array)
     print(array)

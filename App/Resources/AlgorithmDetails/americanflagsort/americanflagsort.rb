@@ -1,3 +1,15 @@
+def sort(arr)
+  return if arr.length <= 1
+
+  radix = 4
+  max_value = arr.max
+
+  divisor = 1
+  divisor *= radix while max_value / divisor >= radix
+
+  flag_sort(arr, 0, arr.length, divisor, radix)
+end
+
 def digit_at(value, divisor, radix)
   (value / divisor) % radix
 end
@@ -47,17 +59,6 @@ def flag_sort(arr, low, high, divisor, radix)
   end
 end
 
-def sort(arr)
-  return if arr.length <= 1
-
-  radix = 4
-  max_value = arr.max
-
-  divisor = 1
-  divisor *= radix while max_value / divisor >= radix
-
-  flag_sort(arr, 0, arr.length, divisor, radix)
-end
 
 array = [0, 39, 21, 62, 91, 77, 14, 23,
   90, 69, 51, 81, 68, 83, 32, 56]

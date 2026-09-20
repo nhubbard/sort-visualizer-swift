@@ -1,23 +1,3 @@
-def int_pow(base, exponent):
-    result = 1
-    for _ in range(exponent):
-        result *= base
-    return result
-
-
-def get_digit(value, power, radix):
-    return (value // int_pow(radix, power)) % radix
-
-
-def multi_swap(arr, pos, to):
-    if to > pos:
-        for k in range(pos, to):
-            arr[k], arr[k + 1] = arr[k + 1], arr[k]
-    elif to < pos:
-        for k in range(pos, to, -1):
-            arr[k], arr[k - 1] = arr[k - 1], arr[k]
-
-
 def sort(arr):
     n = len(arr)
     if n == 0:
@@ -49,8 +29,32 @@ def sort(arr):
                     vregs[j - 1] -= 1
     return arr
 
+def int_pow(base, exponent):
+    result = 1
+    for _ in range(exponent):
+        result *= base
+    return result
+
+
+def get_digit(value, power, radix):
+    return (value // int_pow(radix, power)) % radix
+
+
+def multi_swap(arr, pos, to):
+    if to > pos:
+        for k in range(pos, to):
+            arr[k], arr[k + 1] = arr[k + 1], arr[k]
+    elif to < pos:
+        for k in range(pos, to, -1):
+            arr[k], arr[k - 1] = arr[k - 1], arr[k]
+
+
+
 
 if __name__ == "__main__":
-    array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56]
+    array = [
+        0, 39, 21, 62, 91, 77, 14, 23,
+        90, 69, 51, 81, 68, 83, 32, 56,
+    ]
     sort(array)
     print(array)

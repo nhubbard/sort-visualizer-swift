@@ -1,3 +1,24 @@
+def sort(arr)
+  n = arr.length
+  if n <= 16
+    binary_insertion_sort(arr, 0, n)
+    return
+  end
+
+  block_size = [16, integer_sqrt(n)].max
+  low = 0
+  while low + 2 * block_size < n
+    binary_insertion_sort(arr, low, low + block_size)
+    low += block_size
+  end
+  binary_insertion_sort(arr, low, n)
+
+  while low >= block_size
+    merge(arr, low - block_size, low, n)
+    low -= block_size
+  end
+end
+
 def binary_insertion_sort(arr, lo, hi)
   ((lo + 1)...hi).each do |i|
     key = arr[i]
@@ -93,27 +114,11 @@ def integer_sqrt(n)
   Integer.sqrt(n)
 end
 
-def sort(arr)
-  n = arr.length
-  if n <= 16
-    binary_insertion_sort(arr, 0, n)
-    return
-  end
 
-  block_size = [16, integer_sqrt(n)].max
-  low = 0
-  while low + 2 * block_size < n
-    binary_insertion_sort(arr, low, low + block_size)
-    low += block_size
-  end
-  binary_insertion_sort(arr, low, n)
-
-  while low >= block_size
-    merge(arr, low - block_size, low, n)
-    low -= block_size
-  end
-end
-
-array = [55, 12, 84, 3, 47, 91, 26, 68, 8, 73, 40, 97, 15, 62, 34, 79, 21, 88, 5, 51, 66, 29, 44, 12]
+array = [
+  55, 12, 84, 3, 47, 91, 26, 68,
+  8, 73, 40, 97, 15, 62, 34, 79,
+  21, 88, 5, 51, 66, 29, 44, 12,
+]
 sort(array)
 p array

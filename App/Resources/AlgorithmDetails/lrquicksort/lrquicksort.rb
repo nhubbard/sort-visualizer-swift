@@ -1,3 +1,8 @@
+def sort(arr)
+  quick_sort(arr, 0, arr.length - 1)
+  arr
+end
+
 def quick_sort(array, p, r)
   while p < r
     pivot = array[p + (r - p + 1) / 2]
@@ -22,10 +27,6 @@ def quick_sort(array, p, r)
   end
 end
 
-def sort(arr)
-  quick_sort(arr, 0, arr.length - 1)
-  arr
-end
 
 array = [0, 39, 21, 62, 91, 77, 14, 23,
   90, 69, 51, 81, 68, 83, 32, 56]

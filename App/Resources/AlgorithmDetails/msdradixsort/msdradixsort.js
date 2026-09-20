@@ -1,3 +1,19 @@
+function sort(arr) {
+  if (arr.length <= 1) {
+    return arr;
+  }
+  var radix = 4;
+  var maxValue = Math.max.apply(null, arr);
+  var highestPower = 0;
+  var probe = radix;
+  while (probe <= maxValue) {
+    highestPower++;
+    probe *= radix;
+  }
+  radixMSD(arr, 0, arr.length, radix, highestPower);
+  return arr;
+}
+
 function intPow(base, exponent) {
   var result = 1;
   for (var i = 0; i < exponent; i++) {
@@ -38,22 +54,10 @@ function radixMSD(array, low, high, radix, power) {
   }
 }
 
-function sort(arr) {
-  if (arr.length <= 1) {
-    return arr;
-  }
-  var radix = 4;
-  var maxValue = Math.max.apply(null, arr);
-  var highestPower = 0;
-  var probe = radix;
-  while (probe <= maxValue) {
-    highestPower++;
-    probe *= radix;
-  }
-  radixMSD(arr, 0, arr.length, radix, highestPower);
-  return arr;
-}
 
-var array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56];
+const array = [
+  0, 39, 21, 62, 91, 77, 14, 23,
+  90, 69, 51, 81, 68, 83, 32, 56,
+];
 sort(array);
 console.log("[" + array.join(", ") + "]");

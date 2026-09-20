@@ -1,5 +1,37 @@
 import Foundation
 
+func sort(_ array: inout [Int]) {
+    let n = array.count
+    if n <= 1 {
+        return
+    }
+    var d = 1
+    while d < n {
+        d <<= 1
+    }
+    while d > 1 {
+        var i = 0
+        var dec = 0
+        while i < n {
+            var j = i
+            dec += n
+            while dec >= d {
+                dec -= d
+                j += 1
+            }
+            var k = j
+            dec += n
+            while dec >= d {
+                dec -= d
+                k += 1
+            }
+            weaveMerge(&array, i, j, k)
+            i = k
+        }
+        d /= 2
+    }
+}
+
 func insertTo(_ array: inout [Int], _ a: Int, _ b: Int) {
     let temp = array[a]
     var a = a
@@ -118,37 +150,6 @@ func weaveMerge(_ array: inout [Int], _ a: Int, _ mInit: Int, _ b: Int) {
     weaveInsert(&array, a, b, right)
 }
 
-func sort(_ array: inout [Int]) {
-    let n = array.count
-    if n <= 1 {
-        return
-    }
-    var d = 1
-    while d < n {
-        d <<= 1
-    }
-    while d > 1 {
-        var i = 0
-        var dec = 0
-        while i < n {
-            var j = i
-            dec += n
-            while dec >= d {
-                dec -= d
-                j += 1
-            }
-            var k = j
-            dec += n
-            while dec >= d {
-                dec -= d
-                k += 1
-            }
-            weaveMerge(&array, i, j, k)
-            i = k
-        }
-        d /= 2
-    }
-}
 
 var array: [Int] = [
     0, 39, 21, 62, 91, 77, 14, 23,

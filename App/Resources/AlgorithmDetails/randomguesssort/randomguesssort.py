@@ -24,6 +24,7 @@ def sort(arr):
         arr[i] = mapped[i]
 
 
-array = [0, 39, 21, 62, 14]
-sort(array)
-print(array)
+if __name__ == "__main__":
+    array = [0, 39, 21, 62, 14]
+    sort(array)
+    print(array)

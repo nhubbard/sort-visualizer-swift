@@ -1,3 +1,11 @@
+func sort(_ array: [Int]) -> [Int] {
+    guard array.count > 1 else { return array }
+    let middleIndex = array.count / 2
+    let leftArray = sort(Array(array[0 ..< middleIndex]))
+    let rightArray = sort(Array(array[middleIndex ..< array.count]))
+    return merge(leftArray, rightArray)
+}
+
 func merge(_ left: [Int], _ right: [Int]) -> [Int] {
     var leftIndex = 0
     var rightIndex = 0
@@ -29,13 +37,6 @@ func merge(_ left: [Int], _ right: [Int]) -> [Int] {
     return orderedArray
 }
 
-func sort(_ array: [Int]) -> [Int] {
-    guard array.count > 1 else { return array }
-    let middleIndex = array.count / 2
-    let leftArray = sort(Array(array[0 ..< middleIndex]))
-    let rightArray = sort(Array(array[middleIndex ..< array.count]))
-    return merge(leftArray, rightArray)
-}
 
 var array: [Int] = [
     0, 39, 21, 62, 91, 77, 14, 23,

@@ -1,3 +1,8 @@
+def sort(array)
+  flash_sort(array)
+  array
+end
+
 def classify(value, min_value, c)
   ((value - min_value) * c).to_i + 1
 end
@@ -83,10 +88,6 @@ def flash_sort(array)
   end
 end
 
-def sort(array)
-  flash_sort(array)
-  array
-end
 
 array = [0, 39, 21, 62, 91, 77, 14, 23,
   90, 69, 51, 81, 68, 83, 32, 56]

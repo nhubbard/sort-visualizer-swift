@@ -39,6 +39,7 @@ def sort(arr):
         arr[i] = original[indexes[i]]
 
 
-array = [0, 39, 21, 14]
-sort(array)
-print(array)
+if __name__ == "__main__":
+    array = [0, 39, 21, 14]
+    sort(array)
+    print(array)

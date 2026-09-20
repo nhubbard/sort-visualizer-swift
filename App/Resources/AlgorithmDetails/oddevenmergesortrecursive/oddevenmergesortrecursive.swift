@@ -1,5 +1,9 @@
 import Foundation
 
+func sort(_ array: inout [Int]) {
+    oddEvenMergeSort(&array, 0, array.count)
+}
+
 func oddEvenMergeCompare(_ array: inout [Int], _ i: Int, _ j: Int) {
     if array[i] > array[j] {
         array.swapAt(i, j)
@@ -54,9 +58,6 @@ func oddEvenMergeSort(_ array: inout [Int], _ lo: Int, _ n: Int) {
     }
 }
 
-func sort(_ array: inout [Int]) {
-    oddEvenMergeSort(&array, 0, array.count)
-}
 
 var array: [Int] = [
     0, 39, 21, 62, 91, 77, 14, 23,

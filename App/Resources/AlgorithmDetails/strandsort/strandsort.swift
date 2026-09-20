@@ -1,26 +1,3 @@
-func mergeTo(_ arr: inout [Int], _ subList: [Int], _ a: Int, _ m: Int, _ b: Int) {
-    var a = a
-    var m = m
-    var i = 0
-    let s = m - a
-    while i < s, m < b {
-        if subList[i] < arr[m] {
-            arr[a] = subList[i]
-            a += 1
-            i += 1
-        } else {
-            arr[a] = arr[m]
-            a += 1
-            m += 1
-        }
-    }
-    while i < s {
-        arr[a] = subList[i]
-        a += 1
-        i += 1
-    }
-}
-
 func sort(_ arr: inout [Int]) {
     let n = arr.count
     if n < 2 {
@@ -54,6 +31,30 @@ func sort(_ arr: inout [Int]) {
         j = k
     }
 }
+
+func mergeTo(_ arr: inout [Int], _ subList: [Int], _ a: Int, _ m: Int, _ b: Int) {
+    var a = a
+    var m = m
+    var i = 0
+    let s = m - a
+    while i < s, m < b {
+        if subList[i] < arr[m] {
+            arr[a] = subList[i]
+            a += 1
+            i += 1
+        } else {
+            arr[a] = arr[m]
+            a += 1
+            m += 1
+        }
+    }
+    while i < s {
+        arr[a] = subList[i]
+        a += 1
+        i += 1
+    }
+}
+
 
 var array: [Int] = [
     0, 39, 21, 62, 91, 77, 14, 23,

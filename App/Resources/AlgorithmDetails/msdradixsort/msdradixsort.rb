@@ -1,3 +1,17 @@
+def sort(arr)
+  return arr if arr.length <= 1
+  radix = 4
+  max_value = arr.max
+  highest_power = 0
+  probe = radix
+  while probe <= max_value
+    highest_power += 1
+    probe *= radix
+  end
+  radix_msd(arr, 0, arr.length, radix, highest_power)
+  arr
+end
+
 def int_pow(base, exponent)
   result = 1
   exponent.times { result *= base }
@@ -31,19 +45,6 @@ def radix_msd(array, low, high, radix, power)
   end
 end
 
-def sort(arr)
-  return arr if arr.length <= 1
-  radix = 4
-  max_value = arr.max
-  highest_power = 0
-  probe = radix
-  while probe <= max_value
-    highest_power += 1
-    probe *= radix
-  end
-  radix_msd(arr, 0, arr.length, radix, highest_power)
-  arr
-end
 
 array = [0, 39, 21, 62, 91, 77, 14, 23,
   90, 69, 51, 81, 68, 83, 32, 56]

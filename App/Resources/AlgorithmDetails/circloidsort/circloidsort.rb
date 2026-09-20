@@ -1,3 +1,10 @@
+def sort(arr)
+  n = arr.length
+  return if n <= 1
+  while circle_pass(arr, 0, n - 1)
+  end
+end
+
 def circle(array, left, right)
   a = left
   b = right
@@ -24,12 +31,6 @@ def circle_pass(array, left, right)
   circle(array, left, right) || l || r
 end
 
-def sort(arr)
-  n = arr.length
-  return if n <= 1
-  while circle_pass(arr, 0, n - 1)
-  end
-end
 
 array = [0, 39, 21, 62, 91, 77, 14, 23,
   90, 69, 51, 81, 68, 83, 32, 56]

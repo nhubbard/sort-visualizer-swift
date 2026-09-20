@@ -1,5 +1,9 @@
 import Foundation
 
+func sort(_ array: inout [Int]) {
+    binaryInsertionSort(&array)
+}
+
 func binarySearch(_ array: [Int],
                   _ item: Int,
                   _ start: Int,
@@ -30,9 +34,6 @@ func binaryInsertionSort(_ array: inout [Int]) {
     }
 }
 
-func sort(_ array: inout [Int]) {
-    binaryInsertionSort(&array)
-}
 
 var array: [Int] = [
     0, 39, 21, 62, 91, 77, 14, 23,

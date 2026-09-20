@@ -1,5 +1,9 @@
 import Foundation
 
+func sort(_ array: inout [Int]) {
+    slowSort(&array, 0, array.count - 1)
+}
+
 func slowSort(_ array: inout [Int], _ i: Int, _ j: Int) {
     if i >= j {
         return
@@ -13,9 +17,6 @@ func slowSort(_ array: inout [Int], _ i: Int, _ j: Int) {
     slowSort(&array, i, j - 1)
 }
 
-func sort(_ array: inout [Int]) {
-    slowSort(&array, 0, array.count - 1)
-}
 
 var array: [Int] = [
     0, 39, 21, 62, 91, 77, 14, 23,

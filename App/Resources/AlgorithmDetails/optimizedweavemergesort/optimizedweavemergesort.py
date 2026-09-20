@@ -1,3 +1,28 @@
+def sort(array):
+    n = len(array)
+    if n <= 1:
+        return
+    d = 1
+    while d < n:
+        d <<= 1
+    while d > 1:
+        i = 0
+        dec = 0
+        while i < n:
+            j = i
+            dec += n
+            while dec >= d:
+                dec -= d
+                j += 1
+            k = j
+            dec += n
+            while dec >= d:
+                dec -= d
+                k += 1
+            weave_merge(array, i, j, k)
+            i = k
+        d //= 2
+
 def insert_to(array, a, b):
     temp = array[a]
     while a > b:
@@ -94,33 +119,12 @@ def weave_merge(array, a, m_init, b):
     weave_insert(array, a, b, right)
 
 
-def sort(array):
-    n = len(array)
-    if n <= 1:
-        return
-    d = 1
-    while d < n:
-        d <<= 1
-    while d > 1:
-        i = 0
-        dec = 0
-        while i < n:
-            j = i
-            dec += n
-            while dec >= d:
-                dec -= d
-                j += 1
-            k = j
-            dec += n
-            while dec >= d:
-                dec -= d
-                k += 1
-            weave_merge(array, i, j, k)
-            i = k
-        d //= 2
 
 
 if __name__ == "__main__":
-    array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56]
+    array = [
+        0, 39, 21, 62, 91, 77, 14, 23,
+        90, 69, 51, 81, 68, 83, 32, 56,
+    ]
     sort(array)
     print(array)

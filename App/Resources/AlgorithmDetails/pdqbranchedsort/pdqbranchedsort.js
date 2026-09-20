@@ -2,6 +2,12 @@ const INSERT_SORT_THRESHOLD = 24;
 const NINTHER_THRESHOLD = 128;
 const PARTIAL_INSERT_SORT_LIMIT = 8;
 
+function sort(arr) {
+  const n = arr.length;
+  if (n < 2) return;
+  pdqLoop(arr, 0, n, pdqLog(n));
+}
+
 function pdqLog(n) {
   let log = 0;
   while ((n >>= 1) !== 0) log++;
@@ -243,12 +249,10 @@ function pdqLoop(arr, begin, end, badAllowed) {
   }
 }
 
-function sort(arr) {
-  const n = arr.length;
-  if (n < 2) return;
-  pdqLoop(arr, 0, n, pdqLog(n));
-}
 
-var array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56];
+const array = [
+  0, 39, 21, 62, 91, 77, 14, 23,
+  90, 69, 51, 81, 68, 83, 32, 56,
+];
 sort(array);
 console.log("[" + array.join(", ") + "]");

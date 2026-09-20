@@ -1,3 +1,25 @@
+def sort(array)
+  last = array.length
+  return if last <= 1
+  n = 1
+  threshold = 0
+  while n < last
+    n <<= 1
+    threshold += 1
+  end
+  threshold /= 2
+
+  iterations = 0
+  loop do
+    iterations += 1
+    if iterations >= threshold
+      binary_insertion_sort(array, last)
+      return array
+    end
+    return array if circle_sort_routine(array, 0, n - 1, last) == 0
+  end
+end
+
 def circle_sort_routine(array, lo, hi, last)
   return 0 if lo == hi
 
@@ -39,27 +61,6 @@ def binary_insertion_sort(array, last)
   end
 end
 
-def sort(array)
-  last = array.length
-  return if last <= 1
-  n = 1
-  threshold = 0
-  while n < last
-    n <<= 1
-    threshold += 1
-  end
-  threshold /= 2
-
-  iterations = 0
-  loop do
-    iterations += 1
-    if iterations >= threshold
-      binary_insertion_sort(array, last)
-      return array
-    end
-    return array if circle_sort_routine(array, 0, n - 1, last) == 0
-  end
-end
 
 array = [0, 39, 21, 62, 91, 77, 14, 23,
   90, 69, 51, 81, 68, 83, 32, 56]

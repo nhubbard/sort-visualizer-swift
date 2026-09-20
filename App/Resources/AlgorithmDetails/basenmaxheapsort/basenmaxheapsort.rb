@@ -1,5 +1,16 @@
 BASE = 4
 
+def sort(arr)
+  n = arr.length
+  (n - 1).downto(0) do |i|
+    sift_down(arr, i, n)
+  end
+  (n - 1).downto(1) do |end_index|
+    arr[0], arr[end_index] = arr[end_index], arr[0]
+    sift_down(arr, 0, end_index)
+  end
+end
+
 def sift_down(arr, node, stop)
   left = node * BASE + 1
   return if left >= stop
@@ -15,16 +26,6 @@ def sift_down(arr, node, stop)
   end
 end
 
-def sort(arr)
-  n = arr.length
-  (n - 1).downto(0) do |i|
-    sift_down(arr, i, n)
-  end
-  (n - 1).downto(1) do |end_index|
-    arr[0], arr[end_index] = arr[end_index], arr[0]
-    sift_down(arr, 0, end_index)
-  end
-end
 
 array = [0, 39, 21, 62, 91, 77, 14, 23,
   90, 69, 51, 81, 68, 83, 32, 56]

@@ -1,9 +1,3 @@
-func compSwap(_ arr: inout [Int], _ a: Int, _ b: Int) {
-    if arr[a] > arr[b] {
-        arr.swapAt(a, b)
-    }
-}
-
 func sort(_ arr: inout [Int]) {
     let n = arr.count
     var p = 1
@@ -38,6 +32,13 @@ func sort(_ arr: inout [Int]) {
         }
     }
 }
+
+func compSwap(_ arr: inout [Int], _ a: Int, _ b: Int) {
+    if arr[a] > arr[b] {
+        arr.swapAt(a, b)
+    }
+}
+
 
 var array: [Int] = [
     0, 39, 21, 62, 91, 77, 14, 23,

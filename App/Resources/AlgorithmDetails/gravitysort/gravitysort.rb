@@ -1,3 +1,7 @@
+def sort(arr)
+  gravity_sort(arr)
+end
+
 def gravity_sort(arr)
   n = arr.length
   return arr if n == 0
@@ -28,9 +32,6 @@ def gravity_sort(arr)
   arr
 end
 
-def sort(arr)
-  gravity_sort(arr)
-end
 
 array = [0, 39, 21, 62, 91, 77, 14, 23,
   90, 69, 51, 81, 68, 83, 32, 56]

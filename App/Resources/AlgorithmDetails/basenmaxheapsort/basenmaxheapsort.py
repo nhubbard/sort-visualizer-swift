@@ -1,6 +1,14 @@
 BASE = 4
 
 
+def sort(arr):
+    n = len(arr)
+    for i in range(n - 1, -1, -1):
+        sift_down(arr, i, n)
+    for end in range(n - 1, 0, -1):
+        arr[0], arr[end] = arr[end], arr[0]
+        sift_down(arr, 0, end)
+
 def sift_down(arr, node, stop):
     left = node * BASE + 1
     if left >= stop:
@@ -16,16 +24,12 @@ def sift_down(arr, node, stop):
         sift_down(arr, max_index, stop)
 
 
-def sort(arr):
-    n = len(arr)
-    for i in range(n - 1, -1, -1):
-        sift_down(arr, i, n)
-    for end in range(n - 1, 0, -1):
-        arr[0], arr[end] = arr[end], arr[0]
-        sift_down(arr, 0, end)
 
 
 if __name__ == "__main__":
-    array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56]
+    array = [
+        0, 39, 21, 62, 91, 77, 14, 23,
+        90, 69, 51, 81, 68, 83, 32, 56,
+    ]
     sort(array)
     print(array)

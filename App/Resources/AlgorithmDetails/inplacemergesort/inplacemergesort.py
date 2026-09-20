@@ -1,3 +1,7 @@
+def sort(arr):
+    if len(arr) >= 2:
+        merge_sort(arr, 0, len(arr) - 1)
+
 def push(array, low, high):
     for i in range(low, high):
         if array[i] > array[i + 1]:
@@ -26,12 +30,12 @@ def merge_sort(array, low, high):
         merge(array, low, high, mid)
 
 
-def sort(arr):
-    if len(arr) >= 2:
-        merge_sort(arr, 0, len(arr) - 1)
 
 
 if __name__ == "__main__":
-    array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56]
+    array = [
+        0, 39, 21, 62, 91, 77, 14, 23,
+        90, 69, 51, 81, 68, 83, 32, 56,
+    ]
     sort(array)
     print(array)

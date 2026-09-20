@@ -9,6 +9,20 @@ class Node
   end
 end
 
+def sort(arr)
+  root = nil
+  arr.each do |v|
+    root, = add(root, v)
+    root.is_red = false
+  end
+
+  result = []
+  traverse(root, result)
+
+  (0...arr.length).each { |i| arr[i] = result[i] }
+  arr
+end
+
 def red?(node)
   !node.nil? && node.is_red
 end
@@ -77,19 +91,6 @@ def traverse(node, result)
   traverse(node.right, result)
 end
 
-def sort(arr)
-  root = nil
-  arr.each do |v|
-    root, = add(root, v)
-    root.is_red = false
-  end
-
-  result = []
-  traverse(root, result)
-
-  (0...arr.length).each { |i| arr[i] = result[i] }
-  arr
-end
 
 array = [0, 39, 21, 62, 91, 77, 14, 23,
   90, 69, 51, 81, 68, 83, 32, 56]

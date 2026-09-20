@@ -1,19 +1,3 @@
-function compSwap(arr, a, b, end) {
-  if (b < end && arr[a] > arr[b]) {
-    var temp = arr[a];
-    arr[a] = arr[b];
-    arr[b] = temp;
-  }
-}
-
-function halver(arr, low, high, end) {
-  while (low < high) {
-    compSwap(arr, low, high, end);
-    low++;
-    high--;
-  }
-}
-
 function sort(arr) {
   const n = arr.length;
   let ceilLog = 1;
@@ -38,6 +22,26 @@ function sort(arr) {
   }
 }
 
-var array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56];
+function compSwap(arr, a, b, end) {
+  if (b < end && arr[a] > arr[b]) {
+    var temp = arr[a];
+    arr[a] = arr[b];
+    arr[b] = temp;
+  }
+}
+
+function halver(arr, low, high, end) {
+  while (low < high) {
+    compSwap(arr, low, high, end);
+    low++;
+    high--;
+  }
+}
+
+
+const array = [
+  0, 39, 21, 62, 91, 77, 14, 23,
+  90, 69, 51, 81, 68, 83, 32, 56,
+];
 sort(array);
 console.log("[" + array.join(", ") + "]");

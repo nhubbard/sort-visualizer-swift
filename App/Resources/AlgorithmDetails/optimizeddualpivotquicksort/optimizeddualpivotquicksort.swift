@@ -1,5 +1,9 @@
 import Foundation
 
+func sort(_ array: inout [Int]) {
+    optimizedDualPivotQuickSort(&array, 0, array.count - 1, 3)
+}
+
 func insertionSort(_ array: inout [Int], _ start: Int, _ end: Int) {
     guard start + 1 < end else { return }
     for i in (start + 1)..<end {
@@ -74,9 +78,6 @@ func optimizedDualPivotQuickSort(_ array: inout [Int], _ left: Int, _ right: Int
     if pivot1 < pivot2 { optimizedDualPivotQuickSort(&array, less, great, divisor) }
 }
 
-func sort(_ array: inout [Int]) {
-    optimizedDualPivotQuickSort(&array, 0, array.count - 1, 3)
-}
 
 var array: [Int] = [
     55, 12, 84, 3, 47, 91, 26, 68, 8, 73, 40, 97, 15, 62, 34, 79,

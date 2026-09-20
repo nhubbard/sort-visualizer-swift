@@ -1,5 +1,11 @@
 import Foundation
 
+func sort(_ arr: inout [Int]) {
+    if arr.count > 1 {
+        weaveMergeSort(&arr, 0, arr.count - 1)
+    }
+}
+
 func multiSwap(_ arr: inout [Int], _ pos: Int, _ to: Int) {
     if to - pos > 0 {
         var i = pos
@@ -51,11 +57,6 @@ func weaveMergeSort(_ arr: inout [Int], _ min: Int, _ max: Int) {
     }
 }
 
-func sort(_ arr: inout [Int]) {
-    if arr.count > 1 {
-        weaveMergeSort(&arr, 0, arr.count - 1)
-    }
-}
 
 var array: [Int] = [
     0, 39, 21, 62, 91, 77, 14, 23,

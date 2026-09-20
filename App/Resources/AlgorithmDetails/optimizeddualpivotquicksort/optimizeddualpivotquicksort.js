@@ -1,3 +1,7 @@
+function sort(arr) {
+  optimizedDualPivotQuickSort(arr, 0, arr.length - 1, 3);
+}
+
 function insertionSort(a, start, end) {
   for (let i = start + 1; i < end; i++) {
     for (let j = i; j > start && a[j] < a[j - 1]; j--) {
@@ -48,13 +52,12 @@ function optimizedDualPivotQuickSort(a, left, right, divisor) {
   if (pivot1 < pivot2) optimizedDualPivotQuickSort(a, less, great, divisor);
 }
 
-function sort(arr) {
-  optimizedDualPivotQuickSort(arr, 0, arr.length - 1, 3);
-}
 
-var array = [
-  55, 12, 84, 3, 47, 91, 26, 68, 8, 73, 40, 97, 15, 62, 34, 79, 21, 88, 5, 51,
-  66, 29, 44, 12, 78, 33, 91, 6, 58, 12,
+const array = [
+  55, 12, 84, 3, 47, 91, 26, 68,
+  8, 73, 40, 97, 15, 62, 34, 79,
+  21, 88, 5, 51, 66, 29, 44, 12,
+  78, 33, 91, 6, 58, 12,
 ];
 sort(array);
 console.log("[" + array.join(", ") + "]");

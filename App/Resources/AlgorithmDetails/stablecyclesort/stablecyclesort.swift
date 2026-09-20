@@ -1,5 +1,9 @@
 import Foundation
 
+func sort(_ array: inout [Int]) {
+    stableCycleSort(&array)
+}
+
 func destination(_ array: [Int], _ flagged: [Bool], _ a: Int, _ b1: Int, _ b: Int) -> Int {
     let heldValue = array[a]
     var d = a
@@ -38,9 +42,6 @@ func stableCycleSort(_ array: inout [Int]) {
     }
 }
 
-func sort(_ array: inout [Int]) {
-    stableCycleSort(&array)
-}
 
 var array: [Int] = [
     0, 39, 21, 62, 91, 77, 14, 23,

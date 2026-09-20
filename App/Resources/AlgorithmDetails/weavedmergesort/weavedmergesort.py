@@ -1,3 +1,7 @@
+def sort(arr):
+    tmp = [0] * len(arr)
+    merge(arr, tmp, len(arr), 0, 1)
+
 def merge(arr, tmp, length, residue, modulus):
     if residue + modulus >= length:
         return
@@ -35,12 +39,12 @@ def merge(arr, tmp, length, residue, modulus):
         i += modulus
 
 
-def sort(arr):
-    tmp = [0] * len(arr)
-    merge(arr, tmp, len(arr), 0, 1)
 
 
 if __name__ == "__main__":
-    array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56]
+    array = [
+        0, 39, 21, 62, 91, 77, 14, 23,
+        90, 69, 51, 81, 68, 83, 32, 56,
+    ]
     sort(array)
     print(array)

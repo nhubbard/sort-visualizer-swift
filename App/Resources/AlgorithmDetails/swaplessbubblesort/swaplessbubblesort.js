@@ -1,3 +1,7 @@
+function sort(arr) {
+  return swaplessBubbleSort(arr);
+}
+
 function swaplessBubbleSort(array) {
   var n = array.length;
   var i = n;
@@ -23,10 +27,10 @@ function swaplessBubbleSort(array) {
   return array;
 }
 
-function sort(arr) {
-  return swaplessBubbleSort(arr);
-}
 
-var array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56];
+const array = [
+  0, 39, 21, 62, 91, 77, 14, 23,
+  90, 69, 51, 81, 68, 83, 32, 56,
+];
 sort(array);
 console.log("[" + array.join(", ") + "]");

@@ -1,3 +1,13 @@
+function sort(arr) {
+  heapify(arr);
+  for (var end = arr.length - 1; end > 0; end--) {
+    [arr[0], arr[end]] = [arr[end], arr[0]];
+    siftDown(arr, 0, end);
+  }
+  arr.reverse();
+  return arr;
+}
+
 function siftDown(arr, root, size) {
   while (true) {
     var smallest = root;
@@ -23,16 +33,10 @@ function heapify(arr) {
   }
 }
 
-function sort(arr) {
-  heapify(arr);
-  for (var end = arr.length - 1; end > 0; end--) {
-    [arr[0], arr[end]] = [arr[end], arr[0]];
-    siftDown(arr, 0, end);
-  }
-  arr.reverse();
-  return arr;
-}
 
-var array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56];
+const array = [
+  0, 39, 21, 62, 91, 77, 14, 23,
+  90, 69, 51, 81, 68, 83, 32, 56,
+];
 sort(array);
 console.log("[" + array.join(", ") + "]");

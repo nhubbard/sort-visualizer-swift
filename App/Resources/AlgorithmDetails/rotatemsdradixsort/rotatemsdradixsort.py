@@ -1,3 +1,31 @@
+def sort(arr):
+    n = len(arr)
+    if n <= 1:
+        return
+    base = 4
+    max_value = max(arr)
+    q = 0
+    probe = base
+    while probe <= max_value:
+        q += 1
+        probe *= base
+    m = i = 0
+    b = n
+    while i < n:
+        p = i if b - i < 1 else dist(arr, i, b, q, base)
+        if q == 0:
+            m += base
+            t = m // base
+            while t % base == 0:
+                t //= base
+                q += 1
+            i = b
+            while b < n and shift(arr[b], q + 1, base) == shift(m, q + 1, base):
+                b += 1
+        else:
+            b = p
+            q -= 1
+
 def int_pow(base, exponent):
     result = 1
     for _ in range(exponent):
@@ -73,36 +101,12 @@ def dist(arr, a, b, place, base):
     return bin_search_digit(arr, a, b, 1, place, base)
 
 
-def sort(arr):
-    n = len(arr)
-    if n <= 1:
-        return
-    base = 4
-    max_value = max(arr)
-    q = 0
-    probe = base
-    while probe <= max_value:
-        q += 1
-        probe *= base
-    m = i = 0
-    b = n
-    while i < n:
-        p = i if b - i < 1 else dist(arr, i, b, q, base)
-        if q == 0:
-            m += base
-            t = m // base
-            while t % base == 0:
-                t //= base
-                q += 1
-            i = b
-            while b < n and shift(arr[b], q + 1, base) == shift(m, q + 1, base):
-                b += 1
-        else:
-            b = p
-            q -= 1
 
 
 if __name__ == "__main__":
-    array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56]
+    array = [
+        0, 39, 21, 62, 91, 77, 14, 23,
+        90, 69, 51, 81, 68, 83, 32, 56,
+    ]
     sort(array)
     print(array)

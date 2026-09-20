@@ -1,5 +1,9 @@
 import Foundation
 
+func sort(_ array: inout [Int]) {
+    librarySort(&array)
+}
+
 func binarySearch(_ array: [Int], _ item: Int, _ start: Int, _ end: Int) -> Int {
     var lo = start
     var hi = end
@@ -110,9 +114,6 @@ func librarySort(_ array: inout [Int]) {
     rebalance(&array, &temp, &counts, locations, spineSize, n)
 }
 
-func sort(_ array: inout [Int]) {
-    librarySort(&array)
-}
 
 var array: [Int] = [
     0, 39, 21, 62, 91, 77, 14, 23,

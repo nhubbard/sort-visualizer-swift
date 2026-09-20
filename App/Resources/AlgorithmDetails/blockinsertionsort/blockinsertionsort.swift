@@ -1,3 +1,21 @@
+func sort(_ arr: inout [Int]) {
+    let n = arr.count
+    if n < 2 { return }
+    var i = findRun(&arr, 0, n)
+    while i < n {
+        let j = findRun(&arr, i, n)
+        let len = j - i
+        if len == 1 {
+            insert1(&arr, 0, i)
+        } else if len == 2 {
+            insert2(&arr, 0, i, i + 1)
+        } else {
+            mergeWithoutBuffer(&arr, 0, i, len)
+        }
+        i = j
+    }
+}
+
 func multiSwap(_ arr: inout [Int], _ a: Int, _ b: Int, _ count: Int) {
     for i in 0 ..< count {
         arr.swapAt(a + i, b + i)
@@ -108,23 +126,6 @@ func insert2(_ arr: inout [Int], _ a: Int, _ l: Int, _ r: Int) {
     arr[i + 1] = tmpL
 }
 
-func sort(_ arr: inout [Int]) {
-    let n = arr.count
-    if n < 2 { return }
-    var i = findRun(&arr, 0, n)
-    while i < n {
-        let j = findRun(&arr, i, n)
-        let len = j - i
-        if len == 1 {
-            insert1(&arr, 0, i)
-        } else if len == 2 {
-            insert2(&arr, 0, i, i + 1)
-        } else {
-            mergeWithoutBuffer(&arr, 0, i, len)
-        }
-        i = j
-    }
-}
 
 var array: [Int] = [
     0, 39, 21, 62, 91, 77, 14, 23,

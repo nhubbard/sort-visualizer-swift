@@ -1,3 +1,7 @@
+func sort(_ arr: inout [Int]) {
+    quicksortTernaryLL(&arr, 0, arr.count)
+}
+
 func compare3(_ arr: [Int], _ a: Int, _ b: Int) -> Int {
     if arr[a] == arr[b] {
         return 0
@@ -61,9 +65,6 @@ func quicksortTernaryLL(_ arr: inout [Int], _ lo: Int, _ hi: Int) {
     }
 }
 
-func sort(_ arr: inout [Int]) {
-    quicksortTernaryLL(&arr, 0, arr.count)
-}
 
 var array: [Int] = [
     0, 39, 21, 62, 91, 77, 14, 23,

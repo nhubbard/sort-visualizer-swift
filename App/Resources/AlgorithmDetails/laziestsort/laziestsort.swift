@@ -1,5 +1,26 @@
 import Foundation
 
+func sort(_ arr: inout [Int]) {
+    let n = arr.count
+    if n <= 16 {
+        binaryInsertionSort(&arr, 0, n)
+        return
+    }
+
+    let blockSize = max(16, integerSqrt(n))
+    var low = 0
+    while low + 2 * blockSize < n {
+        binaryInsertionSort(&arr, low, low + blockSize)
+        low += blockSize
+    }
+    binaryInsertionSort(&arr, low, n)
+
+    while low >= blockSize {
+        merge(&arr, low - blockSize, low, n)
+        low -= blockSize
+    }
+}
+
 func binaryInsertionSort(_ arr: inout [Int], _ lo: Int, _ hi: Int) {
     var i = lo + 1
     while i < hi {
@@ -105,26 +126,6 @@ func integerSqrt(_ n: Int) -> Int {
     return r
 }
 
-func sort(_ arr: inout [Int]) {
-    let n = arr.count
-    if n <= 16 {
-        binaryInsertionSort(&arr, 0, n)
-        return
-    }
-
-    let blockSize = max(16, integerSqrt(n))
-    var low = 0
-    while low + 2 * blockSize < n {
-        binaryInsertionSort(&arr, low, low + blockSize)
-        low += blockSize
-    }
-    binaryInsertionSort(&arr, low, n)
-
-    while low >= blockSize {
-        merge(&arr, low - blockSize, low, n)
-        low -= blockSize
-    }
-}
 
 var array: [Int] = [
     55, 12, 84, 3, 47, 91, 26, 68, 8, 73, 40, 97, 15, 62, 34, 79, 21, 88, 5, 51, 66, 29, 44, 12,

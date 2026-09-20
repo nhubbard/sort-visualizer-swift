@@ -1,3 +1,7 @@
+function sort(arr) {
+  quickSort(arr, 0, arr.length - 1);
+}
+
 function quickSort(array, start, end) {
   if (start >= end) return;
   let i = start;
@@ -12,10 +16,10 @@ function quickSort(array, start, end) {
   quickSort(array, j + 1, end);
 }
 
-function sort(arr) {
-  quickSort(arr, 0, arr.length - 1);
-}
 
-var array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56];
+const array = [
+  0, 39, 21, 62, 91, 77, 14, 23,
+  90, 69, 51, 81, 68, 83, 32, 56,
+];
 sort(array);
 console.log("[" + array.join(", ") + "]");

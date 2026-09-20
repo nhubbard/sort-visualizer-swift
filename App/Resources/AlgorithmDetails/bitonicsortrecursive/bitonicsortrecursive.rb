@@ -1,3 +1,7 @@
+def sort(array)
+  bitonic_sort(array, 0, array.length, true)
+end
+
 def greatest_power_of_two_less_than(n)
   k = 1
   while k < n
@@ -33,9 +37,6 @@ def bitonic_sort(array, lo, n, dir)
   end
 end
 
-def sort(array)
-  bitonic_sort(array, 0, array.length, true)
-end
 
 array = [0, 39, 21, 62, 91, 77, 14, 23,
   90, 69, 51, 81, 68, 83, 32, 56]

@@ -1,3 +1,9 @@
+function sort(arr) {
+  if (arr.length < 2) return;
+  const n = arr.length;
+  shatterSort(arr, n, 4);
+}
+
 function insertionSort(arr, start, end) {
   for (let i = start + 1; i < end; i++) {
     let pos = i;
@@ -47,12 +53,10 @@ function shatterSort(arr, length, num) {
   }
 }
 
-function sort(arr) {
-  if (arr.length < 2) return;
-  const n = arr.length;
-  shatterSort(arr, n, 4);
-}
 
-var array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56];
+const array = [
+  0, 39, 21, 62, 91, 77, 14, 23,
+  90, 69, 51, 81, 68, 83, 32, 56,
+];
 sort(array);
 console.log("[" + array.join(", ") + "]");

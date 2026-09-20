@@ -1,5 +1,23 @@
 import Foundation
 
+func sort(_ arr: inout [Int]) {
+    let n = arr.count
+    guard n >= 2 else { return }
+
+    var subarrayCount = ceilPow2(n)
+    while subarrayCount > 1 {
+        var i = 0
+        while i < subarrayCount {
+            let lo = n * i / subarrayCount
+            let mid = n * (i + 1) / subarrayCount
+            let hi = n * (i + 2) / subarrayCount
+            merge(&arr, lo, mid, hi)
+            i += 2
+        }
+        subarrayCount >>= 1
+    }
+}
+
 func multiSwap(_ array: inout [Int], _ i: Int, _ j: Int, _ length: Int) {
     for k in 0 ..< length {
         array.swapAt(i + k, j + k)
@@ -196,23 +214,6 @@ func ceilPow2(_ xIn: Int) -> Int {
     return x + 1
 }
 
-func sort(_ arr: inout [Int]) {
-    let n = arr.count
-    guard n >= 2 else { return }
-
-    var subarrayCount = ceilPow2(n)
-    while subarrayCount > 1 {
-        var i = 0
-        while i < subarrayCount {
-            let lo = n * i / subarrayCount
-            let mid = n * (i + 1) / subarrayCount
-            let hi = n * (i + 2) / subarrayCount
-            merge(&arr, lo, mid, hi)
-            i += 2
-        }
-        subarrayCount >>= 1
-    }
-}
 
 var array: [Int] = [
     0, 39, 21, 62, 91, 77, 14, 23,

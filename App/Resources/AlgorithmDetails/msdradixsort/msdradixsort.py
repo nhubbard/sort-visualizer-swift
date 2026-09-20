@@ -1,3 +1,15 @@
+def sort(arr):
+    if len(arr) <= 1:
+        return
+    radix = 4
+    max_value = max(arr)
+    highest_power = 0
+    probe = radix
+    while probe <= max_value:
+        highest_power += 1
+        probe *= radix
+    radix_msd(arr, 0, len(arr), radix, highest_power)
+
 def int_pow(base, exponent):
     result = 1
     for _ in range(exponent):
@@ -29,20 +41,12 @@ def radix_msd(array, low, high, radix, power):
         start += len(bucket)
 
 
-def sort(arr):
-    if len(arr) <= 1:
-        return
-    radix = 4
-    max_value = max(arr)
-    highest_power = 0
-    probe = radix
-    while probe <= max_value:
-        highest_power += 1
-        probe *= radix
-    radix_msd(arr, 0, len(arr), radix, highest_power)
 
 
 if __name__ == "__main__":
-    array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56]
+    array = [
+        0, 39, 21, 62, 91, 77, 14, 23,
+        90, 69, 51, 81, 68, 83, 32, 56,
+    ]
     sort(array)
     print(array)

@@ -1,3 +1,7 @@
+function sort(arr) {
+  slowSort(arr, 0, arr.length - 1);
+}
+
 function slowSort(array, i, j) {
   if (i >= j) {
     return;
@@ -11,10 +15,10 @@ function slowSort(array, i, j) {
   slowSort(array, i, j - 1);
 }
 
-function sort(arr) {
-  slowSort(arr, 0, arr.length - 1);
-}
 
-var array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56];
+const array = [
+  0, 39, 21, 62, 91, 77, 14, 23,
+  90, 69, 51, 81, 68, 83, 32, 56,
+];
 sort(array);
 console.log("[" + array.join(", ") + "]");

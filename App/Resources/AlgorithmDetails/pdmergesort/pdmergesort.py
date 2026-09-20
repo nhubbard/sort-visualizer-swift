@@ -1,3 +1,26 @@
+def sort(arr):
+    n = len(arr)
+    if n < 2:
+        return
+
+    runs = []
+    last_run = 0
+    while last_run != -1:
+        runs.append(last_run)
+        last_run = identify_run(arr, last_run, n)
+
+    buffer = [0] * n
+    run_count = len(runs)
+    while run_count > 1:
+        i = 0
+        while i < run_count - 1:
+            end = n if i + 2 >= run_count else runs[i + 2]
+            merge_runs(arr, runs[i], runs[i + 1], end, buffer)
+            i += 2
+
+        runs = runs[0:run_count:2]
+        run_count = len(runs)
+
 def reverse_run(arr, lo, hi):
     while lo < hi:
         arr[lo], arr[hi] = arr[hi], arr[lo]
@@ -78,31 +101,12 @@ def merge_runs(arr, left_start, right_start, end, buffer):
         merge_up(arr, left_start, right_start, end, buffer)
 
 
-def sort(arr):
-    n = len(arr)
-    if n < 2:
-        return
-
-    runs = []
-    last_run = 0
-    while last_run != -1:
-        runs.append(last_run)
-        last_run = identify_run(arr, last_run, n)
-
-    buffer = [0] * n
-    run_count = len(runs)
-    while run_count > 1:
-        i = 0
-        while i < run_count - 1:
-            end = n if i + 2 >= run_count else runs[i + 2]
-            merge_runs(arr, runs[i], runs[i + 1], end, buffer)
-            i += 2
-
-        runs = runs[0:run_count:2]
-        run_count = len(runs)
 
 
 if __name__ == "__main__":
-    array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56]
+    array = [
+        0, 39, 21, 62, 91, 77, 14, 23,
+        90, 69, 51, 81, 68, 83, 32, 56,
+    ]
     sort(array)
     print(array)

@@ -1,3 +1,7 @@
+func sort(_ array: inout [Int]) {
+    sillySort(&array, 0, array.count - 1)
+}
+
 func sillySort(_ arr: inout [Int], _ i: Int, _ j: Int) {
     if i < j {
         let m = i + (j - i) / 2
@@ -10,9 +14,6 @@ func sillySort(_ arr: inout [Int], _ i: Int, _ j: Int) {
     }
 }
 
-func sort(_ array: inout [Int]) {
-    sillySort(&array, 0, array.count - 1)
-}
 
 var array: [Int] = [
     0, 39, 21, 62, 91, 77, 14, 23,

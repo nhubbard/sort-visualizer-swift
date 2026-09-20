@@ -2,6 +2,14 @@ let insertionThreshold = 24
 
 /// Sorts arr[start..<end] in place using a plain binary-search insertion sort — the base case
 /// once a segment shrinks small enough that further partitioning isn't worth it.
+func sort(_ arr: inout [Int]) {
+    let n = arr.count
+    if n < 2 {
+        return
+    }
+    quickSort(&arr, 0, n)
+}
+
 func binaryInsertionSort(_ arr: inout [Int], _ start: Int, _ end: Int) {
     var i = start
     while i < end {
@@ -164,13 +172,6 @@ func quickSort(_ arr: inout [Int], _ start: Int, _ endIn: Int) {
     }
 }
 
-func sort(_ arr: inout [Int]) {
-    let n = arr.count
-    if n < 2 {
-        return
-    }
-    quickSort(&arr, 0, n)
-}
 
 var array: [Int] = [
     55, 12, 84, 3, 47, 91, 26, 68, 8, 73, 40, 97, 15, 62, 34, 79,

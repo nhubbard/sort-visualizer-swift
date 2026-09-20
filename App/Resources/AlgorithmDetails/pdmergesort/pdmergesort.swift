@@ -1,3 +1,29 @@
+func sort(_ arr: inout [Int]) {
+    let n = arr.count
+    guard n >= 2 else { return }
+
+    var runs: [Int] = []
+    var lastRun = 0
+    while lastRun != -1 {
+        runs.append(lastRun)
+        lastRun = identifyRun(&arr, lastRun, n)
+    }
+
+    var buffer = [Int](repeating: 0, count: n)
+    var runCount = runs.count
+    while runCount > 1 {
+        var i = 0
+        while i < runCount - 1 {
+            let end = i + 2 >= runCount ? n : runs[i + 2]
+            mergeRuns(&arr, runs[i], runs[i + 1], end, &buffer)
+            i += 2
+        }
+
+        runs = stride(from: 0, to: runCount, by: 2).map { runs[$0] }
+        runCount = runs.count
+    }
+}
+
 func reverseRun(_ arr: inout [Int], _ loIn: Int, _ hiIn: Int) {
     var lo = loIn
     var hi = hiIn
@@ -94,31 +120,6 @@ func mergeRuns(_ arr: inout [Int], _ leftStart: Int, _ rightStart: Int, _ end: I
     }
 }
 
-func sort(_ arr: inout [Int]) {
-    let n = arr.count
-    guard n >= 2 else { return }
-
-    var runs: [Int] = []
-    var lastRun = 0
-    while lastRun != -1 {
-        runs.append(lastRun)
-        lastRun = identifyRun(&arr, lastRun, n)
-    }
-
-    var buffer = [Int](repeating: 0, count: n)
-    var runCount = runs.count
-    while runCount > 1 {
-        var i = 0
-        while i < runCount - 1 {
-            let end = i + 2 >= runCount ? n : runs[i + 2]
-            mergeRuns(&arr, runs[i], runs[i + 1], end, &buffer)
-            i += 2
-        }
-
-        runs = stride(from: 0, to: runCount, by: 2).map { runs[$0] }
-        runCount = runs.count
-    }
-}
 
 var array: [Int] = [
     0, 39, 21, 62, 91, 77, 14, 23,

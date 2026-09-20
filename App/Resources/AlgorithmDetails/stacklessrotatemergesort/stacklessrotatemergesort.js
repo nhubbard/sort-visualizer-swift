@@ -1,3 +1,8 @@
+function sort(arr) {
+  rotatePartitionMergeSort(arr, arr.length);
+  return arr;
+}
+
 function multiSwap(array, a, b, len) {
   for (var i = 0; i < len; i++) {
     var t = array[a + i];
@@ -112,11 +117,10 @@ function rotatePartitionMergeSort(array, n) {
   }
 }
 
-function sort(arr) {
-  rotatePartitionMergeSort(arr, arr.length);
-  return arr;
-}
 
-var array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56];
+const array = [
+  0, 39, 21, 62, 91, 77, 14, 23,
+  90, 69, 51, 81, 68, 83, 32, 56,
+];
 sort(array);
 console.log("[" + array.join(", ") + "]");

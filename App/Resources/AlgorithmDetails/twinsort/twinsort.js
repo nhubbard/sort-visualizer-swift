@@ -1,3 +1,8 @@
+function sort(arr) {
+  const n = arr.length;
+  twinsort(arr, n);
+}
+
 function reverseRange(arr, lo, hi) {
   while (lo < hi) {
     [arr[lo], arr[hi]] = [arr[hi], arr[lo]];
@@ -124,11 +129,10 @@ function twinsort(arr, nmemb) {
   }
 }
 
-function sort(arr) {
-  const n = arr.length;
-  twinsort(arr, n);
-}
 
-var array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56];
+const array = [
+  0, 39, 21, 62, 91, 77, 14, 23,
+  90, 69, 51, 81, 68, 83, 32, 56,
+];
 sort(array);
 console.log("[" + array.join(", ") + "]");

@@ -1,3 +1,7 @@
+def sort(array)
+  library_sort(array)
+end
+
 def binary_search(array, item, start, stop)
   lo = start
   hi = stop
@@ -99,9 +103,6 @@ def library_sort(array)
   array
 end
 
-def sort(array)
-  library_sort(array)
-end
 
 array = [0, 39, 21, 62, 91, 77, 14, 23,
   90, 69, 51, 81, 68, 83, 32, 56]

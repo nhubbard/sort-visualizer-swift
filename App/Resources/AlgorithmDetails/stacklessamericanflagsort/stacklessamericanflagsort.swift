@@ -1,21 +1,5 @@
 let radix = 4
 
-func getDigit(_ value: Int, _ place: Int) -> Int {
-    var value = value
-    for _ in 0 ..< place {
-        value /= radix
-    }
-    return value % radix
-}
-
-func shift(_ value: Int, _ places: Int) -> Int {
-    var value = value
-    for _ in 0 ..< places {
-        value /= radix
-    }
-    return value
-}
-
 func sort(_ arr: inout [Int]) {
     let n = arr.count
     guard n > 1 else { return }
@@ -103,6 +87,23 @@ func sort(_ arr: inout [Int]) {
         }
     }
 }
+
+func getDigit(_ value: Int, _ place: Int) -> Int {
+    var value = value
+    for _ in 0 ..< place {
+        value /= radix
+    }
+    return value % radix
+}
+
+func shift(_ value: Int, _ places: Int) -> Int {
+    var value = value
+    for _ in 0 ..< places {
+        value /= radix
+    }
+    return value
+}
+
 
 var array: [Int] = [
     0, 39, 21, 62, 91, 77, 14, 23,

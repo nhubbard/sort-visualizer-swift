@@ -1,5 +1,25 @@
 import Foundation
 
+func sort(_ arr: inout [Int]) {
+    let n = arr.count
+    if n <= 1 { return }
+    let base = 4
+    let maxValue = arr.max() ?? 0
+    var q = 0, probe = base
+    while probe <= maxValue { q += 1; probe *= base }
+    var m = 0, i = 0, b = n
+    while i < n {
+        let p = b - i < 1 ? i : dist(&arr, i, b, q, base)
+        if q == 0 {
+            m += base
+            var t = m / base
+            while t % base == 0 { t /= base; q += 1 }
+            i = b
+            while b < n && shift(arr[b], q + 1, base) == shift(m, q + 1, base) { b += 1 }
+        } else { b = p; q -= 1 }
+    }
+}
+
 func intPow(_ base: Int, _ exponent: Int) -> Int {
     var result = 1
     for _ in 0 ..< exponent {
@@ -95,25 +115,6 @@ func dist(_ arr: inout [Int], _ a: Int, _ b: Int, _ place: Int, _ base: Int) -> 
     return binSearchDigit(arr, a, b, 1, place, base)
 }
 
-func sort(_ arr: inout [Int]) {
-    let n = arr.count
-    if n <= 1 { return }
-    let base = 4
-    let maxValue = arr.max() ?? 0
-    var q = 0, probe = base
-    while probe <= maxValue { q += 1; probe *= base }
-    var m = 0, i = 0, b = n
-    while i < n {
-        let p = b - i < 1 ? i : dist(&arr, i, b, q, base)
-        if q == 0 {
-            m += base
-            var t = m / base
-            while t % base == 0 { t /= base; q += 1 }
-            i = b
-            while b < n && shift(arr[b], q + 1, base) == shift(m, q + 1, base) { b += 1 }
-        } else { b = p; q -= 1 }
-    }
-}
 
 var array: [Int] = [
     0, 39, 21, 62, 91, 77, 14, 23,

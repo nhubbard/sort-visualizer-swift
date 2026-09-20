@@ -1,15 +1,3 @@
-function merge(array, scratch, n, index, mergeSize) {
-  const mid = index + Math.floor(mergeSize / 2);
-  const end = Math.min(n, index + mergeSize);
-  if (mid >= end) return index;
-  let left = index, right = mid, out = index;
-  while (left < mid && right < end)
-    scratch[out++] = array[left] <= array[right] ? array[left++] : array[right++];
-  while (left < mid) scratch[out++] = array[left++];
-  while (right < end) scratch[out++] = array[right++];
-  return -1;
-}
-
 function sort(arr) {
   const n = arr.length;
   if (n < 2) return;
@@ -31,6 +19,22 @@ function sort(arr) {
   }
 }
 
-var array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56];
+function merge(array, scratch, n, index, mergeSize) {
+  const mid = index + Math.floor(mergeSize / 2);
+  const end = Math.min(n, index + mergeSize);
+  if (mid >= end) return index;
+  let left = index, right = mid, out = index;
+  while (left < mid && right < end)
+    scratch[out++] = array[left] <= array[right] ? array[left++] : array[right++];
+  while (left < mid) scratch[out++] = array[left++];
+  while (right < end) scratch[out++] = array[right++];
+  return -1;
+}
+
+
+const array = [
+  0, 39, 21, 62, 91, 77, 14, 23,
+  90, 69, 51, 81, 68, 83, 32, 56,
+];
 sort(array);
 console.log("[" + array.join(", ") + "]");

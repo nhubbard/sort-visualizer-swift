@@ -1,3 +1,29 @@
+def sort(arr)
+  n = arr.length
+  return if n < 2
+
+  runs = []
+  last_run = 0
+  while last_run != -1
+    runs << last_run
+    last_run = identify_run(arr, last_run, n)
+  end
+
+  buffer = Array.new(n, 0)
+  run_count = runs.length
+  while run_count > 1
+    i = 0
+    while i < run_count - 1
+      last = (i + 2 >= run_count) ? n : runs[i + 2]
+      merge_runs(arr, runs[i], runs[i + 1], last, buffer)
+      i += 2
+    end
+
+    runs = runs.each_slice(2).map(&:first)
+    run_count = runs.length
+  end
+end
+
 def reverse_run(arr, lo, hi)
   while lo < hi
     arr[lo], arr[hi] = arr[hi], arr[lo]
@@ -84,31 +110,6 @@ def merge_runs(arr, left_start, right_start, last, buffer)
   end
 end
 
-def sort(arr)
-  n = arr.length
-  return if n < 2
-
-  runs = []
-  last_run = 0
-  while last_run != -1
-    runs << last_run
-    last_run = identify_run(arr, last_run, n)
-  end
-
-  buffer = Array.new(n, 0)
-  run_count = runs.length
-  while run_count > 1
-    i = 0
-    while i < run_count - 1
-      last = (i + 2 >= run_count) ? n : runs[i + 2]
-      merge_runs(arr, runs[i], runs[i + 1], last, buffer)
-      i += 2
-    end
-
-    runs = runs.each_slice(2).map(&:first)
-    run_count = runs.length
-  end
-end
 
 array = [0, 39, 21, 62, 91, 77, 14, 23,
   90, 69, 51, 81, 68, 83, 32, 56]

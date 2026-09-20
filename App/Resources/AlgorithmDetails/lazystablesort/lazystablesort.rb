@@ -1,3 +1,24 @@
+def sort(arr)
+  n = arr.length
+  dist = 1
+  while dist < n
+    arr[dist - 1], arr[dist] = arr[dist], arr[dist - 1] if arr[dist - 1] > arr[dist]
+    dist += 2
+  end
+  part = 2
+  while part < n
+    left = 0
+    right = n - 2 * part
+    while left <= right
+      merge_without_buffer(arr, left, part, part)
+      left += 2 * part
+    end
+    rest = n - left
+    merge_without_buffer(arr, left, part, rest - part) if rest > part
+    part *= 2
+  end
+end
+
 def multi_swap(arr, a, b, count)
   (0...count).each do |i|
     arr[a + i], arr[b + i] = arr[b + i], arr[a + i]
@@ -64,26 +85,6 @@ def merge_without_buffer(arr, pos, len1, len2)
   end
 end
 
-def sort(arr)
-  n = arr.length
-  dist = 1
-  while dist < n
-    arr[dist - 1], arr[dist] = arr[dist], arr[dist - 1] if arr[dist - 1] > arr[dist]
-    dist += 2
-  end
-  part = 2
-  while part < n
-    left = 0
-    right = n - 2 * part
-    while left <= right
-      merge_without_buffer(arr, left, part, part)
-      left += 2 * part
-    end
-    rest = n - left
-    merge_without_buffer(arr, left, part, rest - part) if rest > part
-    part *= 2
-  end
-end
 
 array = [0, 39, 21, 62, 91, 77, 14, 23,
   90, 69, 51, 81, 68, 83, 32, 56]

@@ -1,10 +1,3 @@
-def merge(arr, flags, i, j)
-  if arr[i] < arr[j]
-    flags[j] = !flags[j]
-    arr[i], arr[j] = arr[j], arr[i]
-  end
-end
-
 def sort(arr)
   n = arr.length
   return arr if n <= 1
@@ -34,6 +27,14 @@ def sort(arr)
   end
   arr[0], arr[1] = arr[1], arr[0]
 end
+
+def merge(arr, flags, i, j)
+  if arr[i] < arr[j]
+    flags[j] = !flags[j]
+    arr[i], arr[j] = arr[j], arr[i]
+  end
+end
+
 
 array = [0, 39, 21, 62, 91, 77, 14, 23,
   90, 69, 51, 81, 68, 83, 32, 56]

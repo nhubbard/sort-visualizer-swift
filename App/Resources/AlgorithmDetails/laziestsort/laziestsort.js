@@ -1,3 +1,24 @@
+function sort(arr) {
+  const n = arr.length;
+  if (n <= 16) {
+    binaryInsertionSort(arr, 0, n);
+    return;
+  }
+
+  const blockSize = Math.max(16, integerSqrt(n));
+  let low = 0;
+  while (low + 2 * blockSize < n) {
+    binaryInsertionSort(arr, low, low + blockSize);
+    low += blockSize;
+  }
+  binaryInsertionSort(arr, low, n);
+
+  while (low >= blockSize) {
+    merge(arr, low - blockSize, low, n);
+    low -= blockSize;
+  }
+}
+
 function binaryInsertionSort(arr, lo, hi) {
   for (let i = lo + 1; i < hi; i++) {
     const key = arr[i];
@@ -101,30 +122,11 @@ function integerSqrt(n) {
   return r;
 }
 
-function sort(arr) {
-  const n = arr.length;
-  if (n <= 16) {
-    binaryInsertionSort(arr, 0, n);
-    return;
-  }
 
-  const blockSize = Math.max(16, integerSqrt(n));
-  let low = 0;
-  while (low + 2 * blockSize < n) {
-    binaryInsertionSort(arr, low, low + blockSize);
-    low += blockSize;
-  }
-  binaryInsertionSort(arr, low, n);
-
-  while (low >= blockSize) {
-    merge(arr, low - blockSize, low, n);
-    low -= blockSize;
-  }
-}
-
-var array = [
-  55, 12, 84, 3, 47, 91, 26, 68, 8, 73, 40, 97, 15, 62, 34, 79, 21, 88, 5, 51,
-  66, 29, 44, 12,
+const array = [
+  55, 12, 84, 3, 47, 91, 26, 68,
+  8, 73, 40, 97, 15, 62, 34, 79,
+  21, 88, 5, 51, 66, 29, 44, 12,
 ];
 sort(array);
 console.log("[" + array.join(", ") + "]");

@@ -1,5 +1,19 @@
 import Foundation
 
+func sort(_ arr: inout [Int]) {
+    let n = arr.count
+    guard n > 1 else {
+        return
+    }
+    heapify(&arr, n)
+    var heapSize = n
+    var i = 0
+    while i < n - 1 {
+        heapSize = storeMax(&arr, heapSize)
+        i += 1
+    }
+}
+
 func bitLength(_ valueIn: Int) -> Int {
     var value = valueIn
     var length = 0
@@ -90,19 +104,6 @@ func storeMax(_ arr: inout [Int], _ heapSize: Int) -> Int {
     return newSize
 }
 
-func sort(_ arr: inout [Int]) {
-    let n = arr.count
-    guard n > 1 else {
-        return
-    }
-    heapify(&arr, n)
-    var heapSize = n
-    var i = 0
-    while i < n - 1 {
-        heapSize = storeMax(&arr, heapSize)
-        i += 1
-    }
-}
 
 var array: [Int] = [
     0, 39, 21, 62, 91, 77, 14, 23,

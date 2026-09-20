@@ -1,3 +1,7 @@
+def sort(arr)
+  quicksort_ternary_ll(arr, 0, arr.length)
+end
+
 def compare3(arr, a, b)
   return 0 if arr[a] == arr[b]
   (arr[a] > arr[b]) ? 1 : -1
@@ -61,9 +65,6 @@ def quicksort_ternary_ll(arr, lo, hi)
   end
 end
 
-def sort(arr)
-  quicksort_ternary_ll(arr, 0, arr.length)
-end
 
 array = [0, 39, 21, 62, 91, 77, 14, 23,
   90, 69, 51, 81, 68, 83, 32, 56]

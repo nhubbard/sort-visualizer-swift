@@ -1,16 +1,5 @@
 import Foundation
 
-func insertionSort(_ arr: inout [Int]) {
-    let n = arr.count
-    for i in 1 ..< n {
-        var j = i
-        while j > 0, arr[j - 1] > arr[j] {
-            arr.swapAt(j, j - 1)
-            j -= 1
-        }
-    }
-}
-
 func sort(_ arr: inout [Int]) {
     let n = arr.count
     let shrink = 1.3
@@ -36,6 +25,18 @@ func sort(_ arr: inout [Int]) {
         }
     }
 }
+
+func insertionSort(_ arr: inout [Int]) {
+    let n = arr.count
+    for i in 1 ..< n {
+        var j = i
+        while j > 0, arr[j - 1] > arr[j] {
+            arr.swapAt(j, j - 1)
+            j -= 1
+        }
+    }
+}
+
 
 var array: [Int] = [
     0, 39, 21, 62, 91, 77, 14, 23,

@@ -10,6 +10,19 @@ const CHAOS_LIMIT = 5;
 // Advances arr to its next lexicographic permutation in place. Returns false (after resetting
 // arr to its first, fully ascending permutation) once every arrangement has been visited -- a
 // deterministic stand-in for "shuffle the array at random".
+function sort(arr) {
+  const n = arr.length;
+  const limit = Math.min(CHAOS_LIMIT, n);
+  const chaos = arr.slice(0, limit);
+  const rest = arr.slice(limit);
+  bogoBogoSort(chaos); // the real, recursive-check algorithm -- kept tiny on purpose
+  insertionSort(rest); // an ordinary fast sort for everything past the demonstration slice
+  const merged = mergeSorted(chaos, rest);
+  for (let k = 0; k < n; k++) {
+    arr[k] = merged[k];
+  }
+}
+
 function nextPermutation(arr) {
   const n = arr.length;
   let i = n - 2;
@@ -106,19 +119,10 @@ function mergeSorted(a, b) {
   return merged;
 }
 
-function sort(arr) {
-  const n = arr.length;
-  const limit = Math.min(CHAOS_LIMIT, n);
-  const chaos = arr.slice(0, limit);
-  const rest = arr.slice(limit);
-  bogoBogoSort(chaos); // the real, recursive-check algorithm -- kept tiny on purpose
-  insertionSort(rest); // an ordinary fast sort for everything past the demonstration slice
-  const merged = mergeSorted(chaos, rest);
-  for (let k = 0; k < n; k++) {
-    arr[k] = merged[k];
-  }
-}
 
-var array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56];
+const array = [
+  0, 39, 21, 62, 91, 77, 14, 23,
+  90, 69, 51, 81, 68, 83, 32, 56,
+];
 sort(array);
 console.log("[" + array.join(", ") + "]");

@@ -1,3 +1,7 @@
+function sort(arr) {
+  dualPivotQuickSort(arr, 0, arr.length - 1, 3);
+}
+
 function insertionSort(a, start, end) {
   for (let i = start + 1; i < end; i++) {
     for (let j = i; j > start && a[j] < a[j - 1]; j--) {
@@ -38,10 +42,10 @@ function dualPivotQuickSort(a, left, right, divisor) {
   dualPivotQuickSort(a, great + 2, right, divisor);
 }
 
-function sort(arr) {
-  dualPivotQuickSort(arr, 0, arr.length - 1, 3);
-}
 
-var array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56];
+const array = [
+  0, 39, 21, 62, 91, 77, 14, 23,
+  90, 69, 51, 81, 68, 83, 32, 56,
+];
 sort(array);
 console.log("[" + array.join(", ") + "]");

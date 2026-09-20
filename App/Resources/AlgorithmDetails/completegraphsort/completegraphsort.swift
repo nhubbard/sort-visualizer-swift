@@ -1,5 +1,33 @@
 import Foundation
 
+func sort(_ arr: inout [Int]) {
+    let n = arr.count
+    if n <= 1 { return }
+    var d = 2
+    let end = 1 << Int(log(Double(n - 1)) / log(2.0) + 1)
+    while d <= end {
+        var i = 0
+        var dec = 0
+        while i < n {
+            var j = i
+            dec += n
+            while dec >= d {
+                dec -= d
+                j += 1
+            }
+            var k = j
+            dec += n
+            while dec >= d {
+                dec -= d
+                k += 1
+            }
+            split(&arr, i, j, k)
+            i = k
+        }
+        d *= 2
+    }
+}
+
 func compSwap(_ arr: inout [Int], _ a: Int, _ b: Int) {
     if arr[a] > arr[b] {
         arr.swapAt(a, b)
@@ -48,33 +76,6 @@ func split(_ arr: inout [Int], _ aIn: Int, _ m: Int, _ bIn: Int) {
     }
 }
 
-func sort(_ arr: inout [Int]) {
-    let n = arr.count
-    if n <= 1 { return }
-    var d = 2
-    let end = 1 << Int(log(Double(n - 1)) / log(2.0) + 1)
-    while d <= end {
-        var i = 0
-        var dec = 0
-        while i < n {
-            var j = i
-            dec += n
-            while dec >= d {
-                dec -= d
-                j += 1
-            }
-            var k = j
-            dec += n
-            while dec >= d {
-                dec -= d
-                k += 1
-            }
-            split(&arr, i, j, k)
-            i = k
-        }
-        d *= 2
-    }
-}
 
 var array: [Int] = [
     0, 39, 21, 62, 91, 77, 14, 23,

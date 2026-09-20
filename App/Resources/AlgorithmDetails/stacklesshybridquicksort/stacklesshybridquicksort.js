@@ -1,5 +1,11 @@
 const INSERTION_THRESHOLD = 16;
 
+function sort(arr) {
+  const n = arr.length;
+  if (n < 2) return;
+  quickSort(arr, 0, n);
+}
+
 function medianOfThree(arr, start, end) {
   // Arranges arr[start], arr[mid], arr[end - 1] so the median of the three ends up at `start`,
   // ready to serve as partition's pivot.
@@ -142,15 +148,12 @@ function quickSort(arr, start, end) {
   }
 }
 
-function sort(arr) {
-  const n = arr.length;
-  if (n < 2) return;
-  quickSort(arr, 0, n);
-}
 
-var array = [
-  55, 12, 84, 3, 47, 91, 26, 68, 8, 73, 40, 97, 15, 62, 34, 79, 21, 88, 5, 51,
-  66, 29, 44, 12, 78, 33, 91, 6, 58, 12,
+const array = [
+  55, 12, 84, 3, 47, 91, 26, 68,
+  8, 73, 40, 97, 15, 62, 34, 79,
+  21, 88, 5, 51, 66, 29, 44, 12,
+  78, 33, 91, 6, 58, 12,
 ];
 sort(array);
 console.log("[" + array.join(", ") + "]");

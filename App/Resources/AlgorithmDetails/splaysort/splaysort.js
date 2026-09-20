@@ -6,6 +6,25 @@ class Node {
   }
 }
 
+function sort(arr) {
+  var root = null;
+  for (var i = 0; i < arr.length; i++) {
+    root = insertRec(root, arr[i]);
+  }
+  var result = [];
+  function traverse(node) {
+    if (node !== null) {
+      traverse(node.left);
+      result.push(node.key);
+      traverse(node.right);
+    }
+  }
+  traverse(root);
+  for (var j = 0; j < arr.length; j++) {
+    arr[j] = result[j];
+  }
+}
+
 function leftRotate(x) {
   var y = x.right;
   x.right = y.left;
@@ -73,25 +92,10 @@ function insertRec(root, key) {
   return n;
 }
 
-function sort(arr) {
-  var root = null;
-  for (var i = 0; i < arr.length; i++) {
-    root = insertRec(root, arr[i]);
-  }
-  var result = [];
-  function traverse(node) {
-    if (node !== null) {
-      traverse(node.left);
-      result.push(node.key);
-      traverse(node.right);
-    }
-  }
-  traverse(root);
-  for (var j = 0; j < arr.length; j++) {
-    arr[j] = result[j];
-  }
-}
 
-var array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56];
+const array = [
+  0, 39, 21, 62, 91, 77, 14, 23,
+  90, 69, 51, 81, 68, 83, 32, 56,
+];
 sort(array);
 console.log("[" + array.join(", ") + "]");

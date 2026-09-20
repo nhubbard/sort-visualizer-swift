@@ -1,5 +1,11 @@
 import Foundation
 
+func sort(_ array: inout [Int]) {
+    if array.count > 1 {
+        doubleInsertion(&array, 0, array.count)
+    }
+}
+
 func leftBinarySearch(_ array: [Int], _ a: Int, _ b: Int, _ val: Int) -> Int {
     var lo = a
     var hi = b
@@ -83,11 +89,6 @@ func doubleInsertion(_ array: inout [Int], _ a: Int, _ b: Int) {
     }
 }
 
-func sort(_ array: inout [Int]) {
-    if array.count > 1 {
-        doubleInsertion(&array, 0, array.count)
-    }
-}
 
 var array: [Int] = [
     0, 39, 21, 62, 91, 77, 14, 23,

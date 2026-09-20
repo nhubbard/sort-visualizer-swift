@@ -1,5 +1,9 @@
 import Foundation
 
+func sort(_ arr: inout [Int]) {
+    quicksortTernaryLR(&arr, 0, arr.count - 1)
+}
+
 func compare3(_ arr: [Int], _ a: Int, _ b: Int) -> Int {
     if arr[a] == arr[b] {
         return 0
@@ -100,9 +104,6 @@ func quicksortTernaryLR(_ arr: inout [Int], _ lo: Int, _ hi: Int) {
     quicksortTernaryLR(&arr, hi - numGreater + 1, hi)
 }
 
-func sort(_ arr: inout [Int]) {
-    quicksortTernaryLR(&arr, 0, arr.count - 1)
-}
 
 var array: [Int] = [
     0, 39, 21, 62, 91, 77, 14, 23,

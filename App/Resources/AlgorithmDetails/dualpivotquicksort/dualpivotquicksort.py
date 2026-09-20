@@ -1,3 +1,7 @@
+def sort(arr):
+    if len(arr) > 1:
+        dual_pivot_quick_sort(arr, 0, len(arr) - 1, 3)
+
 def insertion_sort(array, left, right):
     for i in range(left + 1, right + 1):
         j = i
@@ -49,12 +53,12 @@ def dual_pivot_quick_sort(array, left, right, divisor):
     dual_pivot_quick_sort(array, great + 2, right, divisor)
 
 
-def sort(arr):
-    if len(arr) > 1:
-        dual_pivot_quick_sort(arr, 0, len(arr) - 1, 3)
 
 
 if __name__ == "__main__":
-    array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56]
+    array = [
+        0, 39, 21, 62, 91, 77, 14, 23,
+        90, 69, 51, 81, 68, 83, 32, 56,
+    ]
     sort(array)
     print(array)

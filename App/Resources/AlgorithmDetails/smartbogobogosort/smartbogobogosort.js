@@ -14,6 +14,8 @@ function sort(arr, length = arr.length) {
   }
 }
 
-var array = [0, 39, 21, 62, 91, 14, 23];
+const array = [
+  0, 39, 21, 62, 91, 14, 23,
+];
 sort(array);
 console.log("[" + array.join(", ") + "]");

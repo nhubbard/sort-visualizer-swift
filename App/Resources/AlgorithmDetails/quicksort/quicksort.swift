@@ -1,5 +1,9 @@
 import Foundation
 
+func sort(_ array: inout [Int]) {
+    quickSort(&array, 0, array.count - 1)
+}
+
 func partition(_ array: inout [Int], _ begin: Int, _ end: Int) -> Int {
     var i = begin
     var j = end
@@ -20,9 +24,6 @@ func quickSort(_ array: inout [Int], _ begin: Int, _ end: Int) {
     }
 }
 
-func sort(_ array: inout [Int]) {
-    quickSort(&array, 0, array.count - 1)
-}
 
 var array: [Int] = [
     0, 39, 21, 62, 91, 77, 14, 23,

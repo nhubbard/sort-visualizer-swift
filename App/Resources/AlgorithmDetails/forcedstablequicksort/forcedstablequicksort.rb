@@ -1,3 +1,9 @@
+def sort(arr)
+  n = arr.length
+  key = (0...n).to_a
+  quick_sort(arr, key, 0, n)
+end
+
 def stable_comp(arr, key, a, b)
   return true if arr[a] > arr[b]
   return key[a] > key[b] if arr[a] == arr[b]
@@ -52,11 +58,6 @@ def quick_sort(arr, key, a, b)
   quick_sort(arr, key, p + 1, b)
 end
 
-def sort(arr)
-  n = arr.length
-  key = (0...n).to_a
-  quick_sort(arr, key, 0, n)
-end
 
 array = [0, 39, 21, 62, 91, 77, 14, 23,
   90, 69, 51, 81, 68, 83, 32, 56]

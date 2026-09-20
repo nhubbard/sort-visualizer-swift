@@ -1,3 +1,8 @@
+def sort(arr)
+  weave_merge_sort(arr, 0, arr.length - 1) if arr.length > 1
+  arr
+end
+
 def multi_swap(arr, pos, to)
   if to - pos > 0
     (pos...to).each do |i|
@@ -41,10 +46,6 @@ def weave_merge_sort(arr, min, max)
   end
 end
 
-def sort(arr)
-  weave_merge_sort(arr, 0, arr.length - 1) if arr.length > 1
-  arr
-end
 
 array = [0, 39, 21, 62, 91, 77, 14, 23,
   90, 69, 51, 81, 68, 83, 32, 56]

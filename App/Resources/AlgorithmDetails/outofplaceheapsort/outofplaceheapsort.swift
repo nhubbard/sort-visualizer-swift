@@ -1,3 +1,23 @@
+func sort(_ arr: inout [Int]) -> [Int] {
+    let n = arr.count
+    var output = [Int](repeating: 0, count: n)
+    guard n > 1 else {
+        if n == 1 {
+            output[0] = arr[0]
+        }
+        return output
+    }
+    heapify(&arr, n)
+    var i = n - 1
+    while i >= 0 {
+        output[i] = arr[0]
+        arr[0] = -1
+        findNext(&arr, n)
+        i -= 1
+    }
+    return output
+}
+
 func siftDown(_ arr: inout [Int], _ root: Int, _ size: Int) {
     var index = root
     while 2 * index + 1 < size {
@@ -51,25 +71,6 @@ func findNext(_ arr: inout [Int], _ size: Int) {
     }
 }
 
-func sort(_ arr: inout [Int]) -> [Int] {
-    let n = arr.count
-    var output = [Int](repeating: 0, count: n)
-    guard n > 1 else {
-        if n == 1 {
-            output[0] = arr[0]
-        }
-        return output
-    }
-    heapify(&arr, n)
-    var i = n - 1
-    while i >= 0 {
-        output[i] = arr[0]
-        arr[0] = -1
-        findNext(&arr, n)
-        i -= 1
-    }
-    return output
-}
 
 var array: [Int] = [
     0, 39, 21, 62, 91, 77, 14, 23,

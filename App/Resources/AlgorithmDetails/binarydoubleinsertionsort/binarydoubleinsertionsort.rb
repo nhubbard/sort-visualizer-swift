@@ -1,3 +1,7 @@
+def sort(arr)
+  double_insertion(arr, 0, arr.length) if arr.length > 1
+end
+
 def left_binary_search(array, a, b, val)
   lo, hi = a, b
   while lo < hi
@@ -72,9 +76,6 @@ def double_insertion(array, a, b)
   end
 end
 
-def sort(arr)
-  double_insertion(arr, 0, arr.length) if arr.length > 1
-end
 
 array = [0, 39, 21, 62, 91, 77, 14, 23,
   90, 69, 51, 81, 68, 83, 32, 56]

@@ -1,3 +1,26 @@
+def sort(arr)
+  n = arr.length
+  return arr if n < 2
+  scratch = Array.new(n)
+  subarray_count = 1
+  while subarray_count < n
+    subarray_count *= 2
+  end
+
+  while subarray_count > 1
+    i = 0
+    while i < subarray_count
+      low = n * i / subarray_count
+      mid = n * (i + 1) / subarray_count
+      high = n * (i + 2) / subarray_count
+      merge(arr, scratch, low, mid, high)
+      i += 2
+    end
+    subarray_count /= 2
+  end
+  arr
+end
+
 def merge(array, scratch, low, mid, high)
   left = low
   right = mid
@@ -25,28 +48,6 @@ def merge(array, scratch, low, mid, high)
   (low...high).each { |i| array[i] = scratch[i] }
 end
 
-def sort(arr)
-  n = arr.length
-  return arr if n < 2
-  scratch = Array.new(n)
-  subarray_count = 1
-  while subarray_count < n
-    subarray_count *= 2
-  end
-
-  while subarray_count > 1
-    i = 0
-    while i < subarray_count
-      low = n * i / subarray_count
-      mid = n * (i + 1) / subarray_count
-      high = n * (i + 2) / subarray_count
-      merge(arr, scratch, low, mid, high)
-      i += 2
-    end
-    subarray_count /= 2
-  end
-  arr
-end
 
 array = [0, 39, 21, 62, 91, 77, 14, 23,
   90, 69, 51, 81, 68, 83, 32, 56]

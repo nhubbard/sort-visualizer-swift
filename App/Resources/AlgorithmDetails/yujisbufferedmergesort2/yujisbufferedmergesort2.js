@@ -1,3 +1,10 @@
+function sort(arr) {
+  var n = arr.length;
+  if (n <= 1) return arr;
+  bufferedMerge(arr, 0, n);
+  return arr;
+}
+
 function ceilLog(n) {
   var i = 0;
   while (1 << i < n) {
@@ -186,13 +193,10 @@ function bufferedMerge(array, a, b) {
   bufferedMerge(array, b - (m - a) - s, b);
 }
 
-function sort(arr) {
-  var n = arr.length;
-  if (n <= 1) return arr;
-  bufferedMerge(arr, 0, n);
-  return arr;
-}
 
-var array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56];
+const array = [
+  0, 39, 21, 62, 91, 77, 14, 23,
+  90, 69, 51, 81, 68, 83, 32, 56,
+];
 sort(array);
 console.log("[" + array.join(", ") + "]");

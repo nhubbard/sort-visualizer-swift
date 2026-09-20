@@ -1,3 +1,26 @@
+function sort(arr) {
+  const n = arr.length;
+  let dist = 1;
+  while (dist < n) {
+    if (arr[dist - 1] > arr[dist]) {
+      [arr[dist - 1], arr[dist]] = [arr[dist], arr[dist - 1]];
+    }
+    dist += 2;
+  }
+  let part = 2;
+  while (part < n) {
+    let left = 0;
+    const right = n - 2 * part;
+    while (left <= right) {
+      mergeWithoutBuffer(arr, left, part, part);
+      left += 2 * part;
+    }
+    const rest = n - left;
+    if (rest > part) mergeWithoutBuffer(arr, left, part, rest - part);
+    part *= 2;
+  }
+}
+
 function multiSwap(arr, a, b, count) {
   for (let i = 0; i < count; i++) {
     [arr[a + i], arr[b + i]] = [arr[b + i], arr[a + i]];
@@ -49,29 +72,10 @@ function mergeWithoutBuffer(arr, pos, len1, len2) {
   }
 }
 
-function sort(arr) {
-  const n = arr.length;
-  let dist = 1;
-  while (dist < n) {
-    if (arr[dist - 1] > arr[dist]) {
-      [arr[dist - 1], arr[dist]] = [arr[dist], arr[dist - 1]];
-    }
-    dist += 2;
-  }
-  let part = 2;
-  while (part < n) {
-    let left = 0;
-    const right = n - 2 * part;
-    while (left <= right) {
-      mergeWithoutBuffer(arr, left, part, part);
-      left += 2 * part;
-    }
-    const rest = n - left;
-    if (rest > part) mergeWithoutBuffer(arr, left, part, rest - part);
-    part *= 2;
-  }
-}
 
-var array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56];
+const array = [
+  0, 39, 21, 62, 91, 77, 14, 23,
+  90, 69, 51, 81, 68, 83, 32, 56,
+];
 sort(array);
 console.log("[" + array.join(", ") + "]");

@@ -1,3 +1,12 @@
+def sort(arr):
+    end = len(arr)
+    if end <= 1:
+        return
+    padded_length = next_power_of_two(end)
+    swaps = None
+    while swaps != 0:
+        swaps = circle_sort_routine(arr, 0, padded_length - 1, end)
+
 def next_power_of_two(n):
     k = 1
     while k < n:
@@ -24,17 +33,12 @@ def circle_sort_routine(array, lo, hi, end):
     return swaps
 
 
-def sort(arr):
-    end = len(arr)
-    if end <= 1:
-        return
-    padded_length = next_power_of_two(end)
-    swaps = None
-    while swaps != 0:
-        swaps = circle_sort_routine(arr, 0, padded_length - 1, end)
 
 
 if __name__ == "__main__":
-    array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56]
+    array = [
+        0, 39, 21, 62, 91, 77, 14, 23,
+        90, 69, 51, 81, 68, 83, 32, 56,
+    ]
     sort(array)
     print(array)

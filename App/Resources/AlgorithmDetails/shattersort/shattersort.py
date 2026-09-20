@@ -1,3 +1,9 @@
+def sort(arr):
+    if len(arr) < 2:
+        return
+    n = len(arr)
+    shatter_sort(arr, n, 4)
+
 def insertion_sort(arr, start, end):
     for i in range(start + 1, end):
         pos = i
@@ -36,14 +42,12 @@ def shatter_sort(arr, length, num):
             insertion_sort(arr, offsets[i], offsets[i + 1])
 
 
-def sort(arr):
-    if len(arr) < 2:
-        return
-    n = len(arr)
-    shatter_sort(arr, n, 4)
 
 
 if __name__ == "__main__":
-    array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56]
+    array = [
+        0, 39, 21, 62, 91, 77, 14, 23,
+        90, 69, 51, 81, 68, 83, 32, 56,
+    ]
     sort(array)
     print(array)

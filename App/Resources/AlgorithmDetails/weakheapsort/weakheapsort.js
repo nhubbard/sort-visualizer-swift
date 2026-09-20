@@ -1,10 +1,3 @@
-function merge(arr, flags, i, j) {
-  if (arr[i] < arr[j]) {
-    flags[j] = !flags[j];
-    [arr[i], arr[j]] = [arr[j], arr[i]];
-  }
-}
-
 function sort(arr) {
   const n = arr.length;
   if (n <= 1) return arr;
@@ -37,6 +30,17 @@ function sort(arr) {
   [arr[0], arr[1]] = [arr[1], arr[0]];
 }
 
-var array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56];
+function merge(arr, flags, i, j) {
+  if (arr[i] < arr[j]) {
+    flags[j] = !flags[j];
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+}
+
+
+const array = [
+  0, 39, 21, 62, 91, 77, 14, 23,
+  90, 69, 51, 81, 68, 83, 32, 56,
+];
 sort(array);
 console.log("[" + array.join(", ") + "]");

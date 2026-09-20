@@ -1,3 +1,19 @@
+def sort(arr)
+  n = arr.length
+  output = Array.new(n, 0)
+  if n <= 1
+    output[0] = arr[0] if n == 1
+    return output
+  end
+  heapify(arr, n)
+  (n - 1).downto(0) do |i|
+    output[i] = arr[0]
+    arr[0] = -1
+    find_next(arr, n)
+  end
+  output
+end
+
 def sift_down(arr, root, size)
   index = root
   while 2 * index + 1 < size
@@ -43,21 +59,6 @@ def find_next(arr, size)
   arr[hole], arr[left] = arr[left], arr[hole] if left < size && arr[left] != -1
 end
 
-def sort(arr)
-  n = arr.length
-  output = Array.new(n, 0)
-  if n <= 1
-    output[0] = arr[0] if n == 1
-    return output
-  end
-  heapify(arr, n)
-  (n - 1).downto(0) do |i|
-    output[i] = arr[0]
-    arr[0] = -1
-    find_next(arr, n)
-  end
-  output
-end
 
 array = [0, 39, 21, 62, 91, 77, 14, 23,
   90, 69, 51, 81, 68, 83, 32, 56]

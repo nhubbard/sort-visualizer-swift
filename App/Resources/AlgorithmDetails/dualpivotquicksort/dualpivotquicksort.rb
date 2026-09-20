@@ -1,3 +1,7 @@
+def sort(array)
+  dual_pivot_quick_sort(array, 0, array.length - 1, 3)
+end
+
 def insertion_sort(a, start, finish)
   (start + 1...finish).each do |i|
     j = i
@@ -50,9 +54,6 @@ def dual_pivot_quick_sort(a, left, right, divisor)
   dual_pivot_quick_sort(a, great + 2, right, divisor)
 end
 
-def sort(array)
-  dual_pivot_quick_sort(array, 0, array.length - 1, 3)
-end
 
 array = [0, 39, 21, 62, 91, 77, 14, 23,
   90, 69, 51, 81, 68, 83, 32, 56]

@@ -1,5 +1,10 @@
 import Foundation
 
+func sort(_ arr: inout [Int]) {
+    var tmp = [Int](repeating: 0, count: arr.count)
+    merge(&arr, &tmp, arr.count, 0, 1)
+}
+
 func merge(_ arr: inout [Int], _ tmp: inout [Int], _ length: Int, _ residue: Int, _ modulus: Int) {
     if residue + modulus >= length {
         return
@@ -42,10 +47,6 @@ func merge(_ arr: inout [Int], _ tmp: inout [Int], _ length: Int, _ residue: Int
     }
 }
 
-func sort(_ arr: inout [Int]) {
-    var tmp = [Int](repeating: 0, count: arr.count)
-    merge(&arr, &tmp, arr.count, 0, 1)
-}
 
 var array: [Int] = [
     0, 39, 21, 62, 91, 77, 14, 23,

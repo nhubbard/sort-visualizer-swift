@@ -11,6 +11,16 @@ let chaosLimit = 5
 /// `arr` to its first, fully ascending permutation) once every arrangement has been visited -- a
 /// deterministic stand-in for "shuffle the array at random".
 @discardableResult
+func sort(_ arr: inout [Int]) {
+    let n = arr.count
+    let limit = min(chaosLimit, n)
+    var chaos = Array(arr[0 ..< limit])
+    var rest = Array(arr[limit...])
+    bogoBogoSort(&chaos) // the real, recursive-check algorithm -- kept tiny on purpose
+    insertionSort(&rest) // an ordinary fast sort for everything past the demonstration slice
+    arr = mergeSorted(chaos, rest)
+}
+
 func nextPermutation(_ arr: inout [Int]) -> Bool {
     let n = arr.count
     var i = n - 2
@@ -90,15 +100,6 @@ func mergeSorted(_ a: [Int], _ b: [Int]) -> [Int] {
     return merged
 }
 
-func sort(_ arr: inout [Int]) {
-    let n = arr.count
-    let limit = min(chaosLimit, n)
-    var chaos = Array(arr[0 ..< limit])
-    var rest = Array(arr[limit...])
-    bogoBogoSort(&chaos) // the real, recursive-check algorithm -- kept tiny on purpose
-    insertionSort(&rest) // an ordinary fast sort for everything past the demonstration slice
-    arr = mergeSorted(chaos, rest)
-}
 
 var array: [Int] = [
     0, 39, 21, 62, 91, 77, 14, 23,

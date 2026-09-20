@@ -3,6 +3,55 @@ const leonardo = [
   5167, 8361, 13529, 21891,
 ];
 
+function sort(arr) {
+  const n = arr.length;
+  if (n <= 1) return;
+
+  let head = 0;
+  let p = 1;
+  let pshift = 1;
+  const hi = n - 1;
+
+  while (head < hi) {
+    if ((p & 3) === 3) {
+      sift(arr, pshift, head);
+      p >>= 2;
+      pshift += 2;
+    } else {
+      if (leonardo[pshift - 1] >= hi - head) {
+        trinkle(arr, p, pshift, head, false);
+      } else {
+        sift(arr, pshift, head);
+      }
+      if (pshift === 1) {
+        p <<= 1;
+        pshift -= 1;
+      } else {
+        p <<= pshift - 1;
+        pshift = 1;
+      }
+    }
+    p |= 1;
+    head += 1;
+  }
+
+  trinkle(arr, p, pshift, head, false);
+  while (pshift !== 1 || p !== 1) {
+    if (pshift <= 1) {
+      const trail = trailingZeroCount(p);
+      p >>= trail;
+      pshift += trail;
+    } else {
+      p <<= 2;
+      p ^= 7;
+      pshift -= 2;
+      trinkle(arr, p >> 1, pshift + 1, head - leonardo[pshift] - 1, true);
+      trinkle(arr, p, pshift, head - 1, true);
+    }
+    head -= 1;
+  }
+}
+
 function trailingZeroCount(value) {
   let mask = value & ~1;
   let trail = 0;
@@ -61,55 +110,10 @@ function trinkle(array, pIn, pshiftIn, headIn, isTrustyIn) {
   }
 }
 
-function sort(arr) {
-  const n = arr.length;
-  if (n <= 1) return;
 
-  let head = 0;
-  let p = 1;
-  let pshift = 1;
-  const hi = n - 1;
-
-  while (head < hi) {
-    if ((p & 3) === 3) {
-      sift(arr, pshift, head);
-      p >>= 2;
-      pshift += 2;
-    } else {
-      if (leonardo[pshift - 1] >= hi - head) {
-        trinkle(arr, p, pshift, head, false);
-      } else {
-        sift(arr, pshift, head);
-      }
-      if (pshift === 1) {
-        p <<= 1;
-        pshift -= 1;
-      } else {
-        p <<= pshift - 1;
-        pshift = 1;
-      }
-    }
-    p |= 1;
-    head += 1;
-  }
-
-  trinkle(arr, p, pshift, head, false);
-  while (pshift !== 1 || p !== 1) {
-    if (pshift <= 1) {
-      const trail = trailingZeroCount(p);
-      p >>= trail;
-      pshift += trail;
-    } else {
-      p <<= 2;
-      p ^= 7;
-      pshift -= 2;
-      trinkle(arr, p >> 1, pshift + 1, head - leonardo[pshift] - 1, true);
-      trinkle(arr, p, pshift, head - 1, true);
-    }
-    head -= 1;
-  }
-}
-
-var array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56];
+const array = [
+  0, 39, 21, 62, 91, 77, 14, 23,
+  90, 69, 51, 81, 68, 83, 32, 56,
+];
 sort(array);
 console.log("[" + array.join(", ") + "]");

@@ -1,3 +1,10 @@
+def sort(arr)
+  n = arr.length
+  return arr if n < 2
+  bit = most_significant_bit(arr.max)
+  binary_quick_sort_recursive(arr, 0, n - 1, bit)
+end
+
 def most_significant_bit(value)
   return -1 if value == 0
   bit = 0
@@ -29,12 +36,6 @@ def binary_quick_sort_recursive(arr, p, r, bit)
   end
 end
 
-def sort(arr)
-  n = arr.length
-  return arr if n < 2
-  bit = most_significant_bit(arr.max)
-  binary_quick_sort_recursive(arr, 0, n - 1, bit)
-end
 
 array = [0, 39, 21, 62, 91, 77, 14, 23,
   90, 69, 51, 81, 68, 83, 32, 56]

@@ -1,3 +1,8 @@
+def sort(array)
+  cocktail_merge_sort(array)
+  array
+end
+
 def min_run_length(n)
   r = 0
   while n >= 64
@@ -89,10 +94,6 @@ def cocktail_merge_sort(array)
   end
 end
 
-def sort(array)
-  cocktail_merge_sort(array)
-  array
-end
 
 array = [0, 39, 21, 62, 91, 77, 14, 23,
   90, 69, 51, 81, 68, 83, 32, 56]
