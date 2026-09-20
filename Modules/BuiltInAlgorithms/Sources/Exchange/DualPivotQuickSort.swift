@@ -14,10 +14,10 @@ public struct DualPivotQuickSort: SortAlgorithm {
     category: .exchange,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 1490, coefficients: [239771, 297.17, 0.0913771],
+      anchorSize: 1489, coefficients: [239984, 297.286, 0.0913472],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .polynomialIntercept, coefficients: [0.0913771, 24.866, -145.779], rSquared: 0.999642),
+      family: .polynomialIntercept, coefficients: [0.0913472, 25.254, -147.107], rSquared: 0.999642),
     implementationComplexity: 20,
     stable: false,
     timeComplexity: ComplexityBounds(best: "O(n log n)", average: "O(n log n)", worst: "O(n^2)"),
@@ -76,8 +76,8 @@ public struct DualPivotQuickSort: SortAlgorithm {
     // partitioning loop below moves other elements through positions `left`/`right` while
     // `pivot1`/`pivot2` must stay fixed at the values captured here. Same held-value pattern
     // as `CycleSort.swift`'s cached `t`.
-    let pivot1 = engine.values[left]
-    let pivot2 = engine.values[right]
+    let pivot1 = engine.readValue(at: left)
+    let pivot2 = engine.readValue(at: right)
 
     var less = left + 1
     var great = right - 1

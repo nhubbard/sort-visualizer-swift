@@ -16,7 +16,7 @@ public struct FinalMergeShuffle: ShuffleAlgorithm {
     for j in 0..<count {
       var i = j
       while i < n {
-        temp[k] = engine.values[i]
+        temp[k] = engine.readValue(at: i)
         k += 1
         i += count
       }

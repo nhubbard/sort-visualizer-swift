@@ -17,10 +17,10 @@ public struct IndexSort: SortAlgorithm {
     category: .distribution,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 225, coefficients: [239388, 3451.44, 17.2112, 0.0317196],
+      anchorSize: 5762, coefficients: [239964, 78.8994, 0.0064669],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .powerLaw, coefficients: [0.00560557, 3.244], rSquared: 0.344362),
+      family: .polynomialIntercept, coefficients: [0.0064669, 4.3748, 50.803], rSquared: 0.998893),
     implementationComplexity: 7,
     stable: false,
     timeComplexity: ComplexityBounds(best: "O(n)", average: "O(n)", worst: "O(n)"),
@@ -34,15 +34,15 @@ public struct IndexSort: SortAlgorithm {
     let n = engine.count
     guard n > 1 else { return }
 
-    var minValue = engine.values[0]
-    for i in 1..<n where engine.values[i] < minValue {
-      minValue = engine.values[i]
+    var minValue = engine.readValue(at: 0)
+    for i in 1..<n where engine.readValue(at: i) < minValue {
+      minValue = engine.readValue(at: i)
     }
 
     for i in 0..<n {
       var cmpCount = 0
-      while engine.values[i] - minValue != i, cmpCount < n {
-        engine.swap(i, engine.values[i] - minValue)
+      while engine.readValue(at: i) - minValue != i, cmpCount < n {
+        engine.swap(i, engine.readValue(at: i) - minValue)
         cmpCount += 1
       }
       if cmpCount >= n - 1 { break }

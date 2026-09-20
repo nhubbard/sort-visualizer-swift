@@ -17,7 +17,7 @@ public struct OrganShuffle: ShuffleAlgorithm {
     var j = 0
     var i = 0
     while i < n {
-      temp[j] = engine.values[i]
+      temp[j] = engine.readValue(at: i)
       j += 1
       i += 2
     }
@@ -26,7 +26,7 @@ public struct OrganShuffle: ShuffleAlgorithm {
     i = 1
     while i < n {
       j -= 1
-      temp[j] = engine.values[i]
+      temp[j] = engine.readValue(at: i)
       i += 2
     }
 

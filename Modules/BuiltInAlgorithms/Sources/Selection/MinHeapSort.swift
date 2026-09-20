@@ -8,10 +8,10 @@ public struct MinHeapSort: SortAlgorithm {
     category: .selection,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 1373, coefficients: [214009, 191.071, 0.0146267],
+      anchorSize: 1326, coefficients: [214632, 201.197, 0.0172547],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .powerLog, coefficients: [11.4717, 1.08742], rSquared: 0.999419),
+      family: .powerLog, coefficients: [10.6646, 1.10392], rSquared: 0.996909),
     implementationComplexity: 10,
     stable: false,
     timeComplexity: ComplexityBounds(

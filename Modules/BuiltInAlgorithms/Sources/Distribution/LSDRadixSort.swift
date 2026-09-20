@@ -9,10 +9,10 @@ public struct LSDRadixSort: SortAlgorithm {
     category: .distribution,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 4292, coefficients: [239924, 105.28, 0.0115046],
+      anchorSize: 3429, coefficients: [239883, 129.135, 0.0172569],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .polynomialIntercept, coefficients: [0.0115046, 6.52513, -11.2883], rSquared: 0.999346),
+      family: .polynomialIntercept, coefficients: [0.0172569, 10.7877, -14.9324], rSquared: 0.999424),
     implementationComplexity: 10,
     stable: true,
     timeComplexity: ComplexityBounds(
@@ -34,7 +34,7 @@ public struct LSDRadixSort: SortAlgorithm {
 
     var maxValue = 0
     for i in 0..<n {
-      maxValue = max(maxValue, engine.values[i])
+      maxValue = max(maxValue, engine.readValue(at: i))
     }
     var highestPlace = 1
     while Int(pow(Double(radix), Double(highestPlace))) <= maxValue {
@@ -52,7 +52,7 @@ public struct LSDRadixSort: SortAlgorithm {
     for place in 0..<highestPlace {
       var counts = [Int](repeating: 0, count: radix)
       for i in 0..<n {
-        values[i] = engine.values[i]
+        values[i] = engine.readValue(at: i)
       }
       for i in 0..<n {
         counts[getDigit(values[i], place)] += 1

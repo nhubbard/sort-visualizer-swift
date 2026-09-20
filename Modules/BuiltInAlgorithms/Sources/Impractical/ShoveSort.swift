@@ -29,10 +29,10 @@ public struct ShoveSort: SortAlgorithm {
     category: .impractical,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 52, coefficients: [227387, 13239.8, 258.144, 1.70068],
-      measuredSafeCeiling: nil),
+      anchorSize: 19, coefficients: [88.0138, 5.03746, 0.0115944],
+      measuredSafeCeiling: 19),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .powerLaw, coefficients: [1.44926, 3.02775], rSquared: 0.99848),
+      family: .powerLaw, coefficients: [3.58059, 1.08746], rSquared: 0.999995),
     implementationComplexity: 6,
     stable: false,
     timeComplexity: ComplexityBounds(best: "O(n)", average: "O(n^3)", worst: "O(n^3)"),

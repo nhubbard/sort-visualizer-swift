@@ -37,10 +37,10 @@ public struct OptimizedBottomUpMergeSort: SortAlgorithm {
     category: .hybrid,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 2618, coefficients: [239895, 173.45, 0.031255],
+      anchorSize: 2355, coefficients: [239972, 187.584, 0.0364002],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .polynomialIntercept, coefficients: [0.031255, 9.79871, 22.3343], rSquared: 0.998999),
+      family: .polynomialIntercept, coefficients: [0.0364002, 16.1384, 89.8841], rSquared: 0.999372),
     implementationComplexity: 26,
     stable: true,
     // No data-dependent short-circuit anywhere — the doubling merge structure runs the same
@@ -64,12 +64,12 @@ public struct OptimizedBottomUpMergeSort: SortAlgorithm {
     func binaryInsert(_ start: Int, _ end: Int) {
       guard start < end else { return }
       for i in start..<end {
-        let num = engine.values[i]
+        let num = engine.readValue(at: i)
         var lo = start
         var hi = i
         while lo < hi {
           let mid = lo + (hi - lo) / 2
-          if num < engine.values[mid] {
+          if num < engine.readValue(at: mid) {
             hi = mid
           } else {
             lo = mid + 1
@@ -77,7 +77,7 @@ public struct OptimizedBottomUpMergeSort: SortAlgorithm {
         }
         var j = i - 1
         while j >= lo {
-          engine.setValue(j + 1, engine.values[j])
+          engine.setValue(j + 1, engine.readValue(at: j))
           j -= 1
         }
         engine.setValue(lo, num)
@@ -89,7 +89,7 @@ public struct OptimizedBottomUpMergeSort: SortAlgorithm {
     // right primitive per direction; ties favor the left run (`i`), which is what keeps this
     // stable.
     func merge(_ aux: inout AuxBuffer, fromMain: Bool, _ lt: Int, _ md: Int, _ rt: Int) {
-      func sourceValue(_ index: Int) -> Int { fromMain ? engine.values[index] : aux.values[index] }
+      func sourceValue(_ index: Int) -> Int { fromMain ? engine.readValue(at: index) : aux.values[index] }
       func writeDest(_ index: Int, _ value: Int) {
         if fromMain {
           aux.write(&engine, at: index, value: value)
@@ -139,7 +139,7 @@ public struct OptimizedBottomUpMergeSort: SortAlgorithm {
         merge(&aux, fromMain: fromMain, i, i + s - 1, n - 1)
       } else {
         for j in i..<n {
-          let value = fromMain ? engine.values[j] : aux.values[j]
+          let value = fromMain ? engine.readValue(at: j) : aux.values[j]
           if fromMain {
             aux.write(&engine, at: j, value: value)
           } else {

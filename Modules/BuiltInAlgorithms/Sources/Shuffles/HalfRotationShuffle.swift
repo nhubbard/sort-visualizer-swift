@@ -23,11 +23,11 @@ public struct HalfRotationShuffle: ShuffleAlgorithm {
         m += 1
       }
     } else {
-      let carried = engine.values[a]
+      let carried = engine.readValue(at: a)
       while m < n {
-        engine.setValue(a, engine.values[m])
+        engine.setValue(a, engine.readValue(at: m))
         a += 1
-        engine.setValue(m, engine.values[a])
+        engine.setValue(m, engine.readValue(at: a))
         m += 1
       }
       engine.setValue(a, carried)

@@ -21,10 +21,10 @@ public struct AVLTreeSort: SortAlgorithm {
     category: .insertion,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 2633, coefficients: [177828, 81.6697, 0.00303825],
+      anchorSize: 2647, coefficients: [178631, 80.8662, 0.00282379],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .powerLog, coefficients: [4.48604, 1.08227], rSquared: 0.999203),
+      family: .powerLog, coefficients: [4.87729, 1.07141], rSquared: 0.99938),
     implementationComplexity: 29,
     stable: true,
     timeComplexity: ComplexityBounds(best: "O(n log n)", average: "O(n log n)", worst: "O(n log n)"),
@@ -138,7 +138,7 @@ public struct AVLTreeSort: SortAlgorithm {
     func traverse(_ node: Node?) {
       guard let node else { return }
       traverse(node.left)
-      sortedValues.append(engine.values[node.pointer])
+      sortedValues.append(engine.readValue(at: node.pointer))
       traverse(node.right)
     }
     traverse(root)

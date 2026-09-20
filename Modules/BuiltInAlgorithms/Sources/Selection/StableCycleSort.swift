@@ -8,10 +8,10 @@ public struct StableCycleSort: SortAlgorithm {
     category: .selection,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 203, coefficients: [236105, 2592.86, 7.74933],
+      anchorSize: 203, coefficients: [236168, 2594.75, 7.76153],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .powerLog, coefficients: [0.866804, 2.0411], rSquared: 0.992618),
+      family: .powerLog, coefficients: [0.86235, 2.04212], rSquared: 0.992481),
     implementationComplexity: 17,
     stable: true,
     timeComplexity: ComplexityBounds(best: "O(n^2)", average: "O(n^2)", worst: "O(n^2)"),

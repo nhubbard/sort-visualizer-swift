@@ -637,7 +637,7 @@ public final class ReplayEngine {
       if countsTowardStats {
         state.auxWriteCount += 1
       }
-    case .auxRead:
+    case .auxRead, .readValue:
       // Real work (see `isSignificantForPacing`), but a read never changes `state` -- nothing to
       // apply besides consuming its share of the pacing budget, already handled upstream of this
       // switch by `isSignificantForPacing` itself.

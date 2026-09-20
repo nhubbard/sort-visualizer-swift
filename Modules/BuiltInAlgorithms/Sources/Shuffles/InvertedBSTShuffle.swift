@@ -29,7 +29,7 @@ public struct InvertedBSTShuffle: ShuffleAlgorithm {
       queue.append((mid + 1, sub.end))
     }
 
-    let original = engine.values
+    let original = engine.readAllValues()
     for i in 0..<n {
       engine.setValue(visitedIndex[i], original[i])
     }

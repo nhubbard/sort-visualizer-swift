@@ -8,10 +8,10 @@ public struct InsertionSort: SortAlgorithm {
     category: .insertion,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 219, coefficients: [238710, 2185, 5],
+      anchorSize: 52, coefficients: [109542, 25833.7, 3109.11, 253.892, 15.7939, 0.797054],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .polynomialIntercept, coefficients: [5, -5, -1.35917e-10], rSquared: 1),
+      family: .factorial, coefficients: [11.5232, 0.059686], rSquared: 0.999308),
     implementationComplexity: 5,
     stable: true,
     timeComplexity: ComplexityBounds(best: "O(n)", average: "O(n^2)", worst: "O(n^2)"),

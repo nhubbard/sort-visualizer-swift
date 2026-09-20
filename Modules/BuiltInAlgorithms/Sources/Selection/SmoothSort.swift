@@ -37,10 +37,10 @@ public struct SmoothSort: SortAlgorithm {
     category: .selection,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 1647, coefficients: [239913, 270.663, 0.0757706],
+      anchorSize: 1437, coefficients: [206475, 215.205, 0.0363262],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .polynomialIntercept, coefficients: [0.0757706, 21.0747, -333.316], rSquared: 0.999608),
+      family: .powerLog, coefficients: [1.44047, 1.36021], rSquared: 0.989721),
     implementationComplexity: 28,
     stable: false,
     timeComplexity: ComplexityBounds(
@@ -67,17 +67,17 @@ public struct SmoothSort: SortAlgorithm {
     func sift(_ pshiftIn: Int, _ headIn: Int) {
       var pshift = pshiftIn
       var head = headIn
-      let val = engine.values[head]
+      let val = engine.readValue(at: head)
       while pshift > 1 {
         let rt = head - 1
         let lf = head - 1 - lp[pshift - 2]
-        if val >= engine.values[lf] && val >= engine.values[rt] { break }
+        if val >= engine.readValue(at: lf) && val >= engine.readValue(at: rt) { break }
         if engine.compare(lf, rt, by: >=) {
-          engine.setValue(head, engine.values[lf])
+          engine.setValue(head, engine.readValue(at: lf))
           head = lf
           pshift -= 1
         } else {
-          engine.setValue(head, engine.values[rt])
+          engine.setValue(head, engine.readValue(at: rt))
           head = rt
           pshift -= 2
         }
@@ -90,10 +90,10 @@ public struct SmoothSort: SortAlgorithm {
       var pshift = pshiftIn
       var head = headIn
       var isTrusty = isTrustyIn
-      let val = engine.values[head]
+      let val = engine.readValue(at: head)
       while p != 1 {
         let stepson = head - lp[pshift]
-        if engine.values[stepson] <= val { break }
+        if engine.readValue(at: stepson) <= val { break }
         if !isTrusty && pshift > 1 {
           let rt = head - 1
           let lf = head - 1 - lp[pshift - 2]
@@ -101,7 +101,7 @@ public struct SmoothSort: SortAlgorithm {
             break
           }
         }
-        engine.setValue(head, engine.values[stepson])
+        engine.setValue(head, engine.readValue(at: stepson))
         head = stepson
         let trail = (p & ~1).trailingZeroBitCount
         p = p &>> trail

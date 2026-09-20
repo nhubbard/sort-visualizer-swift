@@ -37,10 +37,10 @@ public struct AndreySort: SortAlgorithm {
     category: .merge,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 1378, coefficients: [213948, 189.879, 0.014284],
+      anchorSize: 1391, coefficients: [213214, 188.521, 0.0145277],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .powerLog, coefficients: [11.6503, 1.08463], rSquared: 0.996129),
+      family: .powerLog, coefficients: [10.9021, 1.09174], rSquared: 0.998295),
     implementationComplexity: 43,
     stable: false,
     timeComplexity: ComplexityBounds(

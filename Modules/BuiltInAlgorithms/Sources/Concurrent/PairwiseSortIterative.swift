@@ -21,10 +21,10 @@ public struct PairwiseSortIterative: SortAlgorithm {
     category: .concurrent,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 1018, coefficients: [222310, 294.667, 0.0483229],
+      anchorSize: 1017, coefficients: [222465, 295.422, 0.0486679],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .powerLog, coefficients: [7.62654, 1.20495], rSquared: 0.999518),
+      family: .powerLog, coefficients: [7.58061, 1.20611], rSquared: 0.999485),
     implementationComplexity: 11,
     stable: false,
     timeComplexity: ComplexityBounds(

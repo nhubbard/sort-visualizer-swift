@@ -13,10 +13,10 @@ public struct BingoSort: SortAlgorithm {
     category: .selection,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 218, coefficients: [238671, 2184.84, 4.99964],
+      anchorSize: 271, coefficients: [239758, 1765.49, 3.24996],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .polynomialIntercept, coefficients: [0.00359711, 3.4646, 8.34021], rSquared: 0.996179),
+      family: .polynomialIntercept, coefficients: [3.24996, 4.01626, -10.2321], rSquared: 1),
     implementationComplexity: 12,
     stable: false,
     timeComplexity: ComplexityBounds(
@@ -34,11 +34,11 @@ public struct BingoSort: SortAlgorithm {
     // `next`/`val` are held values, not live indices — same held-value-vs-array-value pattern
     // as CycleSort's cached `t`, so comparisons against them go through `engine.compareValue`
     // rather than `engine.compare` (which only supports index-vs-index).
-    var next = engine.values[maximum]
+    var next = engine.readValue(at: maximum)
     var i = maximum - 1
     while i >= 0 {
       if engine.compareValue(i, against: next, by: >) {
-        next = engine.values[i]
+        next = engine.readValue(at: i)
       }
       i -= 1
     }
@@ -50,7 +50,7 @@ public struct BingoSort: SortAlgorithm {
 
     while maximum > 0 {
       let val = next
-      next = engine.values[maximum]
+      next = engine.readValue(at: maximum)
 
       // `j`'s starting bound is fixed here, before any swaps in this pass can move
       // `maximum` — mirrors ArrayV's `for (int j = maximum - 1; j >= 0; j--)`, whose
@@ -61,7 +61,7 @@ public struct BingoSort: SortAlgorithm {
           engine.swap(j, maximum)
           maximum -= 1
         } else if engine.compareValue(j, against: next, by: >) {
-          next = engine.values[j]
+          next = engine.readValue(at: j)
         }
         j -= 1
       }

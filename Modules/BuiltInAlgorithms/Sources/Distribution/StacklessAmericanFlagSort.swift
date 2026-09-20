@@ -29,10 +29,10 @@ public struct StacklessAmericanFlagSort: SortAlgorithm {
     category: .distribution,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 3270, coefficients: [239941, 132.795, 0.0181722],
+      anchorSize: 2393, coefficients: [239887, 176.369, 0.0318098],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .polynomialIntercept, coefficients: [0.0181722, 13.9485, 16.2217], rSquared: 0.999545),
+      family: .polynomialIntercept, coefficients: [0.0318098, 24.1272, -6.48144], rSquared: 0.999618),
     implementationComplexity: 26,
     stable: false,
     timeComplexity: ComplexityBounds(
@@ -69,7 +69,7 @@ public struct StacklessAmericanFlagSort: SortAlgorithm {
     }
 
     var maxValue = 0
-    for i in 0..<n { maxValue = max(maxValue, engine.values[i]) }
+    for i in 0..<n { maxValue = max(maxValue, engine.readValue(at: i)) }
     var q = 0
     var probe = radix
     while probe <= maxValue {
@@ -101,12 +101,12 @@ public struct StacklessAmericanFlagSort: SortAlgorithm {
       for i in 0..<(radix - 1) {
         let pos = a + offs[i]
         if cnts[i] > offs[i] {
-          var held = engine.values[pos]
+          var held = engine.readValue(at: pos)
           repeat {
             let digit = getDigit(held, place)
             cnts[digit] -= 1
             engine.writeAux(countsHandle, at: digit, value: cnts[digit])
-            let displaced = engine.values[a + cnts[digit]]
+            let displaced = engine.readValue(at: a + cnts[digit])
             engine.setValue(a + cnts[digit], held)
             held = displaced
           } while cnts[i] > offs[i]
@@ -128,7 +128,7 @@ public struct StacklessAmericanFlagSort: SortAlgorithm {
     var b = n
 
     for j in i..<b {
-      bumpCount(getDigit(engine.values[j], q))
+      bumpCount(getDigit(engine.readValue(at: j), q))
     }
 
     while i < n {
@@ -143,15 +143,15 @@ public struct StacklessAmericanFlagSort: SortAlgorithm {
         }
 
         i = b
-        while b < n && shift(engine.values[b], q + 1) == shift(m, q + 1) {
-          bumpCount(getDigit(engine.values[b], q))
+        while b < n && shift(engine.readValue(at: b), q + 1) == shift(m, q + 1) {
+          bumpCount(getDigit(engine.readValue(at: b), q))
           b += 1
         }
       } else {
         b = p
         q -= 1
         for j in i..<b {
-          bumpCount(getDigit(engine.values[j], q))
+          bumpCount(getDigit(engine.readValue(at: j), q))
         }
       }
     }

@@ -30,10 +30,10 @@ public struct OptimizedWeaveMergeSort: SortAlgorithm {
     category: .hybrid,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 951, coefficients: [223834, 345.149, 0.0820103],
+      anchorSize: 694, coefficients: [232920, 533.264, 0.220601],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .powerLog, coefficients: [3.8085, 1.32061], rSquared: 0.999046),
+      family: .powerLog, coefficients: [2.95898, 1.43605], rSquared: 0.997336),
     implementationComplexity: 33,
     stable: true,
     timeComplexity: ComplexityBounds(best: "O(n log n)", average: "O(n log n)", worst: "O(n log n)"),
@@ -50,11 +50,11 @@ public struct OptimizedWeaveMergeSort: SortAlgorithm {
     // ArrayV's `insertTo(array, a, b)`: shift the block `(b, a]` up by one, then drop the
     // element originally at `a` into `b`.
     func insertTo(_ a: Int, _ b: Int) {
-      let temp = engine.values[a]
+      let temp = engine.readValue(at: a)
       var a = a
       while a > b {
         a -= 1
-        engine.setValue(a + 1, engine.values[a])
+        engine.setValue(a + 1, engine.readValue(at: a))
       }
       engine.setValue(b, temp)
     }

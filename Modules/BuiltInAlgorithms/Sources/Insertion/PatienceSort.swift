@@ -23,10 +23,10 @@ public struct PatienceSort: SortAlgorithm {
     category: .insertion,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 3570, coefficients: [239968, 120.471, 0.0149033],
+      anchorSize: 3558, coefficients: [239920, 119.772, 0.014697],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .polynomialIntercept, coefficients: [0.0149033, 14.0609, -171.113], rSquared: 0.999899),
+      family: .polynomialIntercept, coefficients: [0.014697, 15.1886, -174.995], rSquared: 0.999933),
     implementationComplexity: 9,
     stable: true,
     timeComplexity: ComplexityBounds(
@@ -89,7 +89,7 @@ public struct PatienceSort: SortAlgorithm {
     var tops: [Int] = []
 
     for i in 0..<n {
-      let x = engine.values[i]
+      let x = engine.readValue(at: i)
       var lo = 0
       var hi = piles.count
       while lo < hi {

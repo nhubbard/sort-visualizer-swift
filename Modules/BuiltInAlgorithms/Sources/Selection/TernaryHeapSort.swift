@@ -8,10 +8,10 @@ public struct TernaryHeapSort: SortAlgorithm {
     category: .selection,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 1528, coefficients: [212199, 164.079, 0.00889959],
+      anchorSize: 1513, coefficients: [212123, 166.351, 0.00938979],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .powerLog, coefficients: [13.6077, 1.04511], rSquared: 0.99964),
+      family: .powerLog, coefficients: [13.2832, 1.04995], rSquared: 0.99953),
     implementationComplexity: 9,
     stable: false,
     timeComplexity: ComplexityBounds(

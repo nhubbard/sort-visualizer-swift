@@ -26,10 +26,10 @@ public struct OutOfPlaceHeapSort: SortAlgorithm {
     category: .selection,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 1907, coefficients: [202743, 123.564, 0.00476778],
+      anchorSize: 1594, coefficients: [211425, 154.649, 0.00728488],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .powerLog, coefficients: [11.2339, 1.02985], rSquared: 0.999898),
+      family: .powerLog, coefficients: [14.3819, 1.03033], rSquared: 0.999922),
     implementationComplexity: 19,
     stable: false,
     timeComplexity: ComplexityBounds(
@@ -65,11 +65,11 @@ public struct OutOfPlaceHeapSort: SortAlgorithm {
       var i = 0
       var l = 1
       var r = 2
-      while r < size && !(engine.values[l] == -1 && engine.values[r] == -1) {
-        if engine.values[l] == -1 {
+      while r < size && !(engine.readValue(at: l) == -1 && engine.readValue(at: r) == -1) {
+        if engine.readValue(at: l) == -1 {
           engine.swap(i, r)
           i = r
-        } else if engine.values[r] == -1 {
+        } else if engine.readValue(at: r) == -1 {
           engine.swap(i, l)
           i = l
         } else if engine.compare(r, l, by: >) {
@@ -82,7 +82,7 @@ public struct OutOfPlaceHeapSort: SortAlgorithm {
         l = 2 * i + 1
         r = l + 1
       }
-      if l < size && engine.values[l] != -1 {
+      if l < size && engine.readValue(at: l) != -1 {
         engine.swap(i, l)
       }
     }
@@ -99,7 +99,7 @@ public struct OutOfPlaceHeapSort: SortAlgorithm {
 
     i = n - 1
     while i >= 0 {
-      let maxValue = engine.values[0]
+      let maxValue = engine.readValue(at: 0)
       output[i] = maxValue
       engine.writeAux(outHandle, at: i, value: maxValue)
       engine.setValue(0, -1)

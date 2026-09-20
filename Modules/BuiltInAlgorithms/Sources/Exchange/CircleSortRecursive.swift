@@ -19,10 +19,10 @@ public struct CircleSortRecursive: SortAlgorithm {
     category: .exchange,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 739, coefficients: [231890, 439.615, 0.114404],
+      anchorSize: 728, coefficients: [231982, 473.351, 0.152784],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .powerLog, coefficients: [9.13569, 1.2496], rSquared: 0.99562),
+      family: .powerLog, coefficients: [5.36133, 1.33372], rSquared: 0.99732),
     implementationComplexity: 9,
     stable: false,
     timeComplexity: ComplexityBounds(

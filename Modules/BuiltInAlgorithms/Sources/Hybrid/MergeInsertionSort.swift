@@ -35,10 +35,10 @@ public struct MergeInsertionSort: SortAlgorithm {
     category: .hybrid,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 396, coefficients: [239715, 1171.01, 1.3603],
+      anchorSize: 396, coefficients: [239082, 1149.86, 1.29195],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .powerLog, coefficients: [1.02808, 1.76728], rSquared: 0.9987),
+      family: .powerLog, coefficients: [1.22633, 1.73736], rSquared: 0.997999),
     // Confirmed empirically unstable (`mergeInsertionSortIsNotStable`), despite every individual
     // comparison using a strict inequality: the doubling pre-pass and `order`'s block-insert step
     // only ever compare two blocks' *representative* (end) elements, then swap the two blocks'
@@ -103,7 +103,7 @@ public struct MergeInsertionSort: SortAlgorithm {
       var b = b
       while a < b {
         let m = a + (((b - a) / s) / 2) * s
-        if val < engine.values[m] {
+        if val < engine.readValue(at: m) {
           b = m
         } else {
           a = m + s
@@ -158,7 +158,7 @@ public struct MergeInsertionSort: SortAlgorithm {
         i += k * g - k
         var j = i
         while j < i + k * g {
-          blockInsert(j, blockSearch(a, b, k, engine.values[j]), k)
+          blockInsert(j, blockSearch(a, b, k, engine.readValue(at: j)), k)
           j += k
         }
 
@@ -167,7 +167,7 @@ public struct MergeInsertionSort: SortAlgorithm {
         p *= 2
       }
       while i < length {
-        blockInsert(i, blockSearch(a, i, k, engine.values[i]), k)
+        blockInsert(i, blockSearch(a, i, k, engine.readValue(at: i)), k)
         i += 2 * k
       }
 

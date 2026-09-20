@@ -306,7 +306,7 @@ enum UnstableGrailSortingTemplate {
           let leftHead = blockPos + leftIndex * regBlockLen
           let rightHead = blockPos + rightIndex * regBlockLen
           let rightComp = engine.compare(leftHead, rightHead, by: >)
-          let tied = !rightComp && engine.values[leftHead] == engine.values[rightHead]
+          let tied = !rightComp && engine.readValue(at: leftHead) == engine.readValue(at: rightHead)
           let leftTail = blockPos + (leftIndex + 1) * regBlockLen - 1
           let rightTail = blockPos + (rightIndex + 1) * regBlockLen - 1
           if rightComp || (tied && engine.compare(leftTail, rightTail, by: >)) {

@@ -8,10 +8,10 @@ public struct BinaryMergeSort: SortAlgorithm {
     category: .hybrid,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 1064, coefficients: [239809, 428.155, 0.191251],
+      anchorSize: 1043, coefficients: [239909, 435.185, 0.197371],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .polynomialIntercept, coefficients: [0.191251, 21.1737, 766.059], rSquared: 0.986745),
+      family: .polynomialIntercept, coefficients: [0.197371, 23.4703, 720.244], rSquared: 0.988144),
     implementationComplexity: 16,
     stable: true,
     timeComplexity: ComplexityBounds(
@@ -47,19 +47,19 @@ public struct BinaryMergeSort: SortAlgorithm {
       var merged: [Int] = []
       while low < mid && high < end {
         if engine.compare(high, low) {
-          merged.append(engine.values[low])
+          merged.append(engine.readValue(at: low))
           low += 1
         } else {
-          merged.append(engine.values[high])
+          merged.append(engine.readValue(at: high))
           high += 1
         }
       }
       while low < mid {
-        merged.append(engine.values[low])
+        merged.append(engine.readValue(at: low))
         low += 1
       }
       while high < end {
-        merged.append(engine.values[high])
+        merged.append(engine.readValue(at: high))
         high += 1
       }
       for i in 0..<merged.count {

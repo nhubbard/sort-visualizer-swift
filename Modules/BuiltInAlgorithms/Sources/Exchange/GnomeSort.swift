@@ -8,10 +8,10 @@ public struct GnomeSort: SortAlgorithm {
     category: .exchange,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 179, coefficients: [238965, 2677.5, 7.5],
+      anchorSize: 49, coefficients: [101588, 25866.7, 3360.94, 296.308, 19.9002, 1.08428],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .polynomialIntercept, coefficients: [7.5, -7.5, 0], rSquared: 1),
+      family: .factorial, coefficients: [9.56395, 0.0654251], rSquared: 0.999114),
     implementationComplexity: 4,
     stable: true,
     timeComplexity: ComplexityBounds(best: "O(n)", average: "O(n^2)", worst: "O(n^2)"),

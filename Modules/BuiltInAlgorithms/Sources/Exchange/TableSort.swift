@@ -28,10 +28,10 @@ public struct TableSort: SortAlgorithm {
     category: .exchange,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 1082, coefficients: [239639, 408.256, 0.172477],
+      anchorSize: 926, coefficients: [239569, 479.136, 0.237814],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .polynomialIntercept, coefficients: [0.172477, 35.0156, -170.746], rSquared: 0.999979),
+      family: .polynomialIntercept, coefficients: [0.237814, 38.7042, -191.568], rSquared: 0.999987),
     implementationComplexity: 33,
     stable: true,
     timeComplexity: ComplexityBounds(
@@ -61,7 +61,7 @@ public struct TableSort: SortAlgorithm {
       let ta = table[a]
       let tb = table[b]
       if engine.compare(ta, tb, by: >) { return true }
-      return engine.values[ta] == engine.values[tb] && table[a] > table[b]
+      return engine.readValue(at: ta) == engine.readValue(at: tb) && table[a] > table[b]
     }
 
     func swapTable(_ a: Int, _ b: Int) {

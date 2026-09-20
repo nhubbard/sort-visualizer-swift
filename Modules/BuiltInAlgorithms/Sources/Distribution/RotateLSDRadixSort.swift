@@ -19,10 +19,10 @@ public struct RotateLSDRadixSort: SortAlgorithm {
     category: .distribution,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 986, coefficients: [239959, 423.11, 0.181461],
+      anchorSize: 855, coefficients: [239703, 482.457, 0.235305],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .polynomialIntercept, coefficients: [0.181461, 65.2687, -811.591], rSquared: 0.999786),
+      family: .polynomialIntercept, coefficients: [0.235305, 80.0854, -783.171], rSquared: 0.999921),
     implementationComplexity: 21,
     stable: true,
     timeComplexity: ComplexityBounds(
@@ -49,7 +49,7 @@ public struct RotateLSDRadixSort: SortAlgorithm {
     }
 
     var maxValue = 0
-    for i in 0..<n { maxValue = max(maxValue, engine.values[i]) }
+    for i in 0..<n { maxValue = max(maxValue, engine.readValue(at: i)) }
     var maxPlace = 0
     var probe = base
     while probe <= maxValue {
@@ -92,7 +92,7 @@ public struct RotateLSDRadixSort: SortAlgorithm {
       var b = b
       while a < b {
         let mid = (a + b) / 2
-        if getDigit(engine.values[mid], place) >= d {
+        if getDigit(engine.readValue(at: mid), place) >= d {
           b = mid
         } else {
           a = mid + 1

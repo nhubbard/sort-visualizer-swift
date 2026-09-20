@@ -23,10 +23,10 @@ public struct WeaveSortIterative: SortAlgorithm {
     category: .concurrent,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 1031, coefficients: [222245, 288.574, 0.045229],
+      anchorSize: 1008, coefficients: [222711, 301.925, 0.052601],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .powerLog, coefficients: [8.05423, 1.19457], rSquared: 0.999815),
+      family: .powerLog, coefficients: [6.88479, 1.22193], rSquared: 0.9991),
     implementationComplexity: 11,
     stable: true,
     timeComplexity: ComplexityBounds(

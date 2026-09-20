@@ -19,10 +19,10 @@ public struct SlowSort: SortAlgorithm {
     category: .exchange,
     sizeRange: 16...64,
     growthModel: OperationGrowthModel(
-      anchorSize: 45, coefficients: [229877, 40045.9, 3580.68, 217.991, 10.1328, 0.382704],
+      anchorSize: 44, coefficients: [202313, 35622.4, 3220.73, 198.322, 9.32607, 0.3564],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .nToTheNLike, coefficients: [462.64, 0.0362426], rSquared: 0.999605),
+      family: .nToTheNLike, coefficients: [441.242, 0.0368037], rSquared: 0.999612),
     implementationComplexity: 5,
     stable: false,
     timeComplexity: ComplexityBounds(

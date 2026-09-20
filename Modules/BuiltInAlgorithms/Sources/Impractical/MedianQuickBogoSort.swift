@@ -8,10 +8,10 @@ public struct MedianQuickBogoSort: SortAlgorithm {
     category: .impractical,
     sizeRange: 4...6,
     growthModel: OperationGrowthModel(
-      anchorSize: 7, coefficients: [108732, 237680, 268499, 207938, 123755, 60211.4],
+      anchorSize: 7, coefficients: [53395.4, 104753, 106600, 74556.7, 40149.1, 17701],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .factorial, coefficients: [63.9803, 1.12334], rSquared: 0.999863),
+      family: .factorial, coefficients: [67.3496, 1.00819], rSquared: 0.956473),
     implementationComplexity: 15,
     stable: false,
     timeComplexity: ComplexityBounds(

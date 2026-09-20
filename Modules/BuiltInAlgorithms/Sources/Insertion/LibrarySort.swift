@@ -44,10 +44,10 @@ public struct LibrarySort: SortAlgorithm {
     category: .insertion,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 661, coefficients: [239642, 712.391, 0.529187],
+      anchorSize: 660, coefficients: [239592, 712.332, 0.529187],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .polynomialIntercept, coefficients: [0.529187, 12.8053, -35.5912], rSquared: 0.999999),
+      family: .polynomialIntercept, coefficients: [0.529187, 13.8053, -33.5912], rSquared: 0.999999),
     implementationComplexity: 21,
     stable: true,
     timeComplexity: ComplexityBounds(best: "O(n)", average: "O(n log n)", worst: "O(n^2)"),
@@ -173,7 +173,7 @@ public struct LibrarySort: SortAlgorithm {
     }
 
     for i in 0..<n {
-      insert(engine.values[i])
+      insert(engine.readValue(at: i))
     }
 
     for (i, pos) in positions.enumerated() {

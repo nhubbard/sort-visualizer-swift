@@ -9,10 +9,10 @@ public struct IntroSort: SortAlgorithm {
     category: .hybrid,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 935, coefficients: [239868, 423.3, 0.176868],
+      anchorSize: 935, coefficients: [239682, 422.736, 0.176473],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .polynomialIntercept, coefficients: [0.176868, 92.5566, -1295.45], rSquared: 0.999783),
+      family: .polynomialIntercept, coefficients: [0.176473, 92.7304, -1298.23], rSquared: 0.999788),
     implementationComplexity: 28,
     stable: false,
     timeComplexity: ComplexityBounds(
@@ -94,7 +94,7 @@ public struct IntroSort: SortAlgorithm {
         depthLimit -= 1
         let mid = lo + (hi - lo) / 2
         let pivotIndex = medianOf3(lo, mid, hi - 1)
-        let pivotValue = engine.values[pivotIndex]
+        let pivotValue = engine.readValue(at: pivotIndex)
         let p = partition(lo, hi, pivotValue)
         introsortLoop(p, hi, depthLimit)
         hi = p

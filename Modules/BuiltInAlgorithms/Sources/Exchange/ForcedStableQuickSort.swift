@@ -19,10 +19,10 @@ public struct ForcedStableQuickSort: SortAlgorithm {
     category: .exchange,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 1060, coefficients: [239803, 409.245, 0.172442],
+      anchorSize: 910, coefficients: [239738, 480.115, 0.237779],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .polynomialIntercept, coefficients: [0.172442, 43.6682, -241.159], rSquared: 0.99998),
+      family: .polynomialIntercept, coefficients: [0.237779, 47.3568, -261.981], rSquared: 0.999987),
     implementationComplexity: 30,
     stable: true,
     timeComplexity: ComplexityBounds(
@@ -50,7 +50,7 @@ public struct ForcedStableQuickSort: SortAlgorithm {
     // tie-break is bookkeeping, not a user-visible comparison in its own right.
     func stableComp(_ a: Int, _ b: Int) -> Bool {
       if engine.compare(a, b, by: >) { return true }
-      return engine.values[a] == engine.values[b] && key[a] > key[b]
+      return engine.readValue(at: a) == engine.readValue(at: b) && key[a] > key[b]
     }
 
     func stableSwap(_ a: Int, _ b: Int) {

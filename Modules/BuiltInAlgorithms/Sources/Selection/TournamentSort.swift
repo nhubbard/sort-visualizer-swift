@@ -29,10 +29,10 @@ public struct TournamentSort: SortAlgorithm {
     category: .selection,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 2151, coefficients: [195846, 105.921, 0.00366244],
+      anchorSize: 2164, coefficients: [196579, 104.912, 0.00339895],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .powerLog, coefficients: [9.20841, 1.03303], rSquared: 0.999936),
+      family: .powerLog, coefficients: [9.7858, 1.02469], rSquared: 0.999974),
     implementationComplexity: 39,
     stable: false,
     timeComplexity: ComplexityBounds(
@@ -107,7 +107,7 @@ public struct TournamentSort: SortAlgorithm {
     var tourney = knockout(0, n - 1, 3)
 
     func pop() -> Int {
-      let result = engine.values[getPlayer(tourney)]
+      let result = engine.readValue(at: getPlayer(tourney))
       tourney = isPlayer(tourney) ? 0 : rebuild(tourney)
       return result
     }

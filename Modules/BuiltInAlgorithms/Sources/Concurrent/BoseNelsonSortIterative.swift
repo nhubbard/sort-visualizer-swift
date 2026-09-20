@@ -8,10 +8,10 @@ public struct BoseNelsonSortIterative: SortAlgorithm {
     category: .concurrent,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 712, coefficients: [232412, 484.259, 0.159123],
+      anchorSize: 705, coefficients: [239783, 600.784, 0.36737],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .powerLog, coefficients: [5.64094, 1.33129], rSquared: 0.999993),
+      family: .polynomialIntercept, coefficients: [0.36737, 82.7927, -1178.27], rSquared: 0.99996),
     implementationComplexity: 12,
     stable: false,
     timeComplexity: ComplexityBounds(

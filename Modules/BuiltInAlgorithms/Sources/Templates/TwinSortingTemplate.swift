@@ -102,7 +102,7 @@ enum TwinSortingTemplate {
         var c = s
         d = a + block
         while c < cMax {
-          swap[c] = engine.values[d + left]
+          swap[c] = engine.readValue(at: d + left)
           c += 1
           d += 1
         }
@@ -114,12 +114,12 @@ enum TwinSortingTemplate {
         if engine.compare(a + left, a + block + left, by: (<=)) {
           // Left block's head is already <= right block's head: merge from the tail of the
           // LEFT block against the buffered right block.
-          engine.setValue(e + left, engine.values[d + left])
+          engine.setValue(e + left, engine.readValue(at: d + left))
           e -= 1
           d -= 1
           while c >= s {
             while engine.compareValue(d + left, against: swap[c], by: (>)) {
-              engine.setValue(e + left, engine.values[d + left])
+              engine.setValue(e + left, engine.readValue(at: d + left))
               e -= 1
               d -= 1
             }
@@ -129,7 +129,7 @@ enum TwinSortingTemplate {
           }
         } else {
           // Mirror branch: merge from the tail of the buffered right block first.
-          engine.setValue(e + left, engine.values[d + left])
+          engine.setValue(e + left, engine.readValue(at: d + left))
           e -= 1
           d -= 1
           while d >= a {
@@ -138,7 +138,7 @@ enum TwinSortingTemplate {
               e -= 1
               c -= 1
             }
-            engine.setValue(e + left, engine.values[d + left])
+            engine.setValue(e + left, engine.readValue(at: d + left))
             e -= 1
             d -= 1
           }

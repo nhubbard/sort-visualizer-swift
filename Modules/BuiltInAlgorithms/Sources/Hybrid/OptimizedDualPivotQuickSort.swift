@@ -28,10 +28,10 @@ public struct OptimizedDualPivotQuickSort: SortAlgorithm {
     category: .hybrid,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 1293, coefficients: [239931, 338.964, 0.119008],
+      anchorSize: 771, coefficients: [238484, 1773.51, 6.59443, 0.0163467, 3.03909e-05, 4.52009e-08],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .polynomialIntercept, coefficients: [0.119008, 31.2089, 614.358], rSquared: 0.998653),
+      family: .exponential, coefficients: [771.584, 1.00746], rSquared: 0.976984),
     // Confirmed via a direct measurement (not just accepted blindly): the negative R² here isn't
     // a bug — the calibration's sample sizes straddle this algorithm's own insertion-sort cutoff
     // (27) badly, with 4 samples entirely below it (pure O(n) insertion sort) and 4 entirely above
@@ -94,8 +94,8 @@ public struct OptimizedDualPivotQuickSort: SortAlgorithm {
     // partitioning loop below moves other elements through positions `left`/`right` while
     // `pivot1`/`pivot2` must stay fixed at the values captured here. Same held-value pattern as
     // `DualPivotQuickSort.swift`.
-    let pivot1 = engine.values[left]
-    let pivot2 = engine.values[right]
+    let pivot1 = engine.readValue(at: left)
+    let pivot2 = engine.readValue(at: right)
 
     var less = left + 1
     var great = right - 1

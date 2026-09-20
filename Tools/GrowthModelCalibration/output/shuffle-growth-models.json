@@ -3,10 +3,10 @@
     "coefficients" : [
       0.00031939432772188606,
       0.1541678830251063,
-      3.126179760042034
+      1.1261797600420338
     ],
-    "runnerUpFamily" : "exponential",
-    "runnerUpRSquared" : 0.9195587026497789,
+    "runnerUpFamily" : "powerLaw",
+    "runnerUpRSquared" : 0.9342633257644787,
     "safeMaxSizeByCap" : [
       100000,
       15586,
@@ -54,18 +54,18 @@
   },
   {
     "coefficients" : [
-      1,
+      1.9999999999999993,
       1
     ],
     "runnerUpFamily" : "polynomialIntercept",
     "runnerUpRSquared" : 1,
     "safeMaxSizeByCap" : [
       100000,
-      80000,
+      40000,
       300000,
-      240000,
+      120000,
       1000000,
-      800000
+      400000
     ],
     "sampleSizes" : [
       8,
@@ -83,18 +83,18 @@
   },
   {
     "coefficients" : [
-      4.49943163805658,
-      1.0209994912993308
+      4.147242851393682,
+      1.0379272753259206
     ],
     "runnerUpFamily" : "powerLog",
-    "runnerUpRSquared" : 0.9968141485977184,
+    "runnerUpRSquared" : 0.9977664664984971,
     "safeMaxSizeByCap" : [
       100000,
-      14538,
+      13450,
       300000,
-      42641,
+      38763,
       1000000,
-      138660
+      123650
     ],
     "sampleSizes" : [
       8,
@@ -108,16 +108,16 @@
     ],
     "subjectID" : "blockrandomly",
     "winningFamily" : "powerLaw",
-    "winningRSquared" : 0.9998072421657419
+    "winningRSquared" : 0.9996312666594881
   },
   {
     "coefficients" : [
       0.0024129729607318606,
       2.078599178652573,
-      -0.6346691815354197
+      -2.6346691815354197
     ],
     "runnerUpFamily" : "powerLaw",
-    "runnerUpRSquared" : 0.9952239310722883,
+    "runnerUpRSquared" : 0.9973477482575304,
     "safeMaxSizeByCap" : [
       100000,
       5343,
@@ -142,18 +142,18 @@
   },
   {
     "coefficients" : [
-      1,
+      1.9999999999999993,
       1
     ],
     "runnerUpFamily" : "polynomialIntercept",
     "runnerUpRSquared" : 1,
     "safeMaxSizeByCap" : [
       100000,
-      80000,
+      40000,
       300000,
-      240000,
+      120000,
       1000000,
-      800000
+      400000
     ],
     "sampleSizes" : [
       8,
@@ -171,19 +171,19 @@
   },
   {
     "coefficients" : [
-      0.03904659912882026,
-      25.70852980083154,
-      -107.56651376835434
+      0.04007752975856414,
+      25.30129376979279,
+      -103.96958456129227
     ],
     "runnerUpFamily" : "powerLog",
-    "runnerUpRSquared" : 0.9998004965879653,
+    "runnerUpRSquared" : 0.9995131313778037,
     "safeMaxSizeByCap" : [
       100000,
-      1140,
+      1132,
       300000,
-      2172,
+      2152,
       1000000,
-      4209
+      4163
     ],
     "sampleSizes" : [
       8,
@@ -197,22 +197,17 @@
     ],
     "subjectID" : "circle",
     "winningFamily" : "polynomialIntercept",
-    "winningRSquared" : 0.9998863964696607
+    "winningRSquared" : 0.999847511018703
   },
   {
     "coefficients" : [
-      2.2836580360142444,
-      1.0200392224190047
+      1.659691865222658,
+      0.7564082148223655
     ],
-    "runnerUpFamily" : "powerLog",
-    "runnerUpRSquared" : 0.9979571893348061,
+    "runnerUpFamily" : "powerLaw",
+    "runnerUpRSquared" : 0.9986374716292873,
     "safeMaxSizeByCap" : [
-      100000,
-      28522,
-      300000,
-      83739,
-      1000000,
-      272605
+
     ],
     "sampleSizes" : [
       8,
@@ -225,20 +220,20 @@
       176
     ],
     "subjectID" : "descending",
-    "winningFamily" : "powerLaw",
-    "winningRSquared" : 0.9997102339479345
+    "winningFamily" : "powerLog",
+    "winningRSquared" : 0.999344753254714
   },
   {
     "coefficients" : [
       3.178279810627257e-05,
       1.2384079670215027,
-      0.9933364147360028
+      -1.0066635852639974
     ],
-    "runnerUpFamily" : "powerLaw",
-    "runnerUpRSquared" : 0.9996049368185791,
+    "runnerUpFamily" : "powerLog",
+    "runnerUpRSquared" : 0.999298622391548,
     "safeMaxSizeByCap" : [
       100000,
-      34337,
+      34338,
       300000,
       69572,
       1000000,
@@ -260,18 +255,18 @@
   },
   {
     "coefficients" : [
-      3.4695124719100816,
-      1.0027043803027782
+      4.101810186869839,
+      1.0199145690308369
     ],
     "runnerUpFamily" : "powerLog",
-    "runnerUpRSquared" : 0.9968895556069706,
+    "runnerUpRSquared" : 0.9978239543499005,
     "safeMaxSizeByCap" : [
       100000,
-      22441,
+      16082,
       300000,
-      67125,
+      47222,
       1000000,
-      223027
+      153752
     ],
     "sampleSizes" : [
       8,
@@ -285,22 +280,22 @@
     ],
     "subjectID" : "finalbitonic",
     "winningFamily" : "powerLaw",
-    "winningRSquared" : 0.9999570123627971
+    "winningRSquared" : 0.9997979643238415
   },
   {
     "coefficients" : [
-      1,
+      1.9999999999999993,
       1
     ],
     "runnerUpFamily" : "polynomialIntercept",
     "runnerUpRSquared" : 1,
     "safeMaxSizeByCap" : [
       100000,
-      80000,
+      40000,
       300000,
-      240000,
+      120000,
       1000000,
-      800000
+      400000
     ],
     "sampleSizes" : [
       8,
@@ -318,18 +313,18 @@
   },
   {
     "coefficients" : [
-      0.9134632144056981,
+      1.8269264288113956,
       1.0200392224190047
     ],
     "runnerUpFamily" : "powerLog",
     "runnerUpRSquared" : 0.9979571893348061,
     "safeMaxSizeByCap" : [
       100000,
-      70033,
+      35496,
       300000,
-      205613,
+      104216,
       1000000,
-      669356
+      339266
     ],
     "sampleSizes" : [
       8,
@@ -347,19 +342,19 @@
   },
   {
     "coefficients" : [
-      0.16617659768652743,
-      1.2357020831805579,
-      21.491971226568783
+      0.16409843551990544,
+      3.7137180501136515,
+      -1.2147383913786183
     ],
     "runnerUpFamily" : "powerLog",
-    "runnerUpRSquared" : 0.995797513925726,
+    "runnerUpRSquared" : 0.9803742560831921,
     "safeMaxSizeByCap" : [
       100000,
-      690,
+      687,
       300000,
       1198,
       1000000,
-      2190
+      2196
     ],
     "sampleSizes" : [
       8,
@@ -373,16 +368,16 @@
     ],
     "subjectID" : "grailbad",
     "winningFamily" : "polynomialIntercept",
-    "winningRSquared" : 0.997984947076933
+    "winningRSquared" : 0.9980751886975093
   },
   {
     "coefficients" : [
       0.013393233010831321,
       5.853935138683543,
-      -32.64345754788859
+      -34.64345754788859
     ],
     "runnerUpFamily" : "powerLog",
-    "runnerUpRSquared" : 0.9995704063802525,
+    "runnerUpRSquared" : 0.9982875536589734,
     "safeMaxSizeByCap" : [
       100000,
       2235,
@@ -407,18 +402,13 @@
   },
   {
     "coefficients" : [
-      0.9917415724784195,
-      0.8719552385728486
+      1.6313241377203622,
+      0.7600735828660257
     ],
     "runnerUpFamily" : "powerLaw",
-    "runnerUpRSquared" : 0.9806497418778338,
+    "runnerUpRSquared" : 0.9984524913883364,
     "safeMaxSizeByCap" : [
-      100000,
-      13392,
-      300000,
-      26343,
-      1000000,
-      52113
+
     ],
     "sampleSizes" : [
       8,
@@ -432,16 +422,16 @@
     ],
     "subjectID" : "halfrotation",
     "winningFamily" : "powerLog",
-    "winningRSquared" : 0.9935317888825235
+    "winningRSquared" : 0.9994210138326366
   },
   {
     "coefficients" : [
       0.0030438156108949866,
       14.07947923506515,
-      -31.57312115622285
+      -33.573121156222854
     ],
     "runnerUpFamily" : "powerLog",
-    "runnerUpRSquared" : 0.9997017884590828,
+    "runnerUpRSquared" : 0.9998337511090437,
     "safeMaxSizeByCap" : [
       100000,
       3312,
@@ -467,18 +457,18 @@
   {
     "coefficients" : [
       0,
-      1,
+      2,
       -1
     ],
     "runnerUpFamily" : "powerLaw",
-    "runnerUpRSquared" : 0.9994104537468911,
+    "runnerUpRSquared" : 0.999865251779778,
     "safeMaxSizeByCap" : [
       100000,
-      80001,
+      40000,
       300000,
-      240001,
+      120000,
       1000000,
-      800001
+      400000
     ],
     "sampleSizes" : [
       8,
@@ -496,18 +486,18 @@
   },
   {
     "coefficients" : [
-      1,
+      1.9999999999999993,
       1
     ],
     "runnerUpFamily" : "polynomialIntercept",
     "runnerUpRSquared" : 1,
     "safeMaxSizeByCap" : [
       100000,
-      80000,
+      40000,
       300000,
-      240000,
+      120000,
       1000000,
-      800000
+      400000
     ],
     "sampleSizes" : [
       8,
@@ -525,18 +515,18 @@
   },
   {
     "coefficients" : [
-      1,
+      1.9999999999999993,
       1
     ],
     "runnerUpFamily" : "polynomialIntercept",
     "runnerUpRSquared" : 1,
     "safeMaxSizeByCap" : [
       100000,
-      80000,
+      40000,
       300000,
-      240000,
+      120000,
       1000000,
-      800000
+      400000
     ],
     "sampleSizes" : [
       8,
@@ -554,19 +544,19 @@
   },
   {
     "coefficients" : [
-      0.002058149024729795,
-      1.2173833469794055,
-      5.2596743613930546
+      0.00029931118426771043,
+      1.6142626960183397,
+      -1.9027352686208308
     ],
     "runnerUpFamily" : "powerLaw",
-    "runnerUpRSquared" : 0.9886168800625755,
+    "runnerUpRSquared" : 0.9993643467629184,
     "safeMaxSizeByCap" : [
       100000,
-      5945,
+      13873,
       300000,
-      10506,
+      25748,
       1000000,
-      19421
+      49072
     ],
     "sampleSizes" : [
       8,
@@ -580,15 +570,16 @@
     ],
     "subjectID" : "movedelement",
     "winningFamily" : "polynomialIntercept",
-    "winningRSquared" : 0.99838010564262
+    "winningRSquared" : 0.9998433922774025
   },
   {
     "coefficients" : [
-      4.999999999999998,
-      1
+      0,
+      5,
+      -2
     ],
-    "runnerUpFamily" : "polynomialIntercept",
-    "runnerUpRSquared" : 1,
+    "runnerUpFamily" : "powerLaw",
+    "runnerUpRSquared" : 0.9999152453454406,
     "safeMaxSizeByCap" : [
       100000,
       16000,
@@ -608,24 +599,18 @@
       176
     ],
     "subjectID" : "naive",
-    "winningFamily" : "powerLaw",
+    "winningFamily" : "polynomialIntercept",
     "winningRSquared" : 1
   },
   {
     "coefficients" : [
-      0.001010546606843032,
-      9.656997872884686,
-      -3.6215784611069406
+      6.52375815023634,
+      0.7539829330246377
     ],
     "runnerUpFamily" : "powerLaw",
-    "runnerUpRSquared" : 0.9987664363172145,
+    "runnerUpRSquared" : 0.9976122926167614,
     "safeMaxSizeByCap" : [
-      100000,
-      5321,
-      300000,
-      11356,
-      1000000,
-      23761
+
     ],
     "sampleSizes" : [
       8,
@@ -638,23 +623,23 @@
       176
     ],
     "subjectID" : "noisy",
-    "winningFamily" : "polynomialIntercept",
-    "winningRSquared" : 0.9997189667001483
+    "winningFamily" : "powerLog",
+    "winningRSquared" : 0.9997751669150974
   },
   {
     "coefficients" : [
-      1,
+      1.9999999999999993,
       1
     ],
     "runnerUpFamily" : "polynomialIntercept",
     "runnerUpRSquared" : 1,
     "safeMaxSizeByCap" : [
       100000,
-      80000,
+      40000,
       300000,
-      240000,
+      120000,
       1000000,
-      800000
+      400000
     ],
     "sampleSizes" : [
       8,
@@ -672,18 +657,17 @@
   },
   {
     "coefficients" : [
-      8.73151706818184,
-      1.0249715098850718
+      -4.760453887431144e-05,
+      10.763330850931446,
+      -9.220401560698788
     ],
-    "runnerUpFamily" : "powerLog",
-    "runnerUpRSquared" : 0.998200686675444,
+    "runnerUpFamily" : "powerLaw",
+    "runnerUpRSquared" : 0.9996690978774266,
     "safeMaxSizeByCap" : [
       100000,
-      7336,
+      7695,
       300000,
-      21427,
-      1000000,
-      69360
+      25081
     ],
     "sampleSizes" : [
       8,
@@ -696,134 +680,17 @@
       176
     ],
     "subjectID" : "pairwise",
-    "winningFamily" : "powerLaw",
-    "winningRSquared" : 0.999673157111163
-  },
-  {
-    "coefficients" : [
-      4.006655129077461,
-      0.9877357833354548
-    ],
-    "runnerUpFamily" : "polynomialIntercept",
-    "runnerUpRSquared" : 0.9999201614796519,
-    "safeMaxSizeByCap" : [
-      100000,
-      22578,
-      300000,
-      68667,
-      1000000,
-      232337
-    ],
-    "sampleSizes" : [
-      8,
-      9,
-      10,
-      11,
-      22,
-      44,
-      88,
-      176
-    ],
-    "subjectID" : "partialreverse",
-    "winningFamily" : "powerLaw",
-    "winningRSquared" : 0.9999149334343073
-  },
-  {
-    "coefficients" : [
-      6,
-      1
-    ],
-    "runnerUpFamily" : "polynomialIntercept",
-    "runnerUpRSquared" : 1,
-    "safeMaxSizeByCap" : [
-      100000,
-      13333,
-      300000,
-      40000,
-      1000000,
-      133333
-    ],
-    "sampleSizes" : [
-      8,
-      9,
-      10,
-      11,
-      22,
-      44,
-      88,
-      176
-    ],
-    "subjectID" : "partitioned",
-    "winningFamily" : "powerLaw",
-    "winningRSquared" : 1
-  },
-  {
-    "coefficients" : [
-      0.05890652549669141,
-      37.65704863797772,
-      -353.5960182551824
-    ],
-    "runnerUpFamily" : "powerLog",
-    "runnerUpRSquared" : 0.9507760588903078,
-    "safeMaxSizeByCap" : [
-      100000,
-      891,
-      300000,
-      1725,
-      1000000,
-      3380
-    ],
-    "sampleSizes" : [
-      8,
-      9,
-      10,
-      11,
-      22,
-      44,
-      88,
-      176
-    ],
-    "subjectID" : "pdqbad",
     "winningFamily" : "polynomialIntercept",
-    "winningRSquared" : 0.9971453598616036
+    "winningRSquared" : 0.9999536906685615
   },
   {
     "coefficients" : [
-      0.0004497750253967583,
-      4.829744220432918,
-      -3.8767794154289708
+      -9.88733599807945e-05,
+      3.7687145704117637,
+      -0.3478905290207716
     ],
     "runnerUpFamily" : "powerLaw",
-    "runnerUpRSquared" : 0.999882923131639,
-    "safeMaxSizeByCap" : [
-      100000,
-      9008,
-      300000,
-      18346,
-      1000000,
-      37145
-    ],
-    "sampleSizes" : [
-      8,
-      9,
-      10,
-      11,
-      22,
-      44,
-      88,
-      176
-    ],
-    "subjectID" : "poplar",
-    "winningFamily" : "polynomialIntercept",
-    "winningRSquared" : 0.9999863503687372
-  },
-  {
-    "coefficients" : [
-      1.2481677234935382,
-      0.8163413053853793
-    ],
-    "runnerUpFamily" : "powerLaw",
-    "runnerUpRSquared" : 0.9944833379496646,
+    "runnerUpRSquared" : 0.9997801569354902,
     "safeMaxSizeByCap" : [
 
     ],
@@ -837,18 +704,107 @@
       88,
       176
     ],
+    "subjectID" : "partialreverse",
+    "winningFamily" : "polynomialIntercept",
+    "winningRSquared" : 0.9999201614796519
+  },
+  {
+    "coefficients" : [
+      0,
+      8,
+      -2
+    ],
+    "runnerUpFamily" : "powerLaw",
+    "runnerUpRSquared" : 0.9999677328555023,
+    "safeMaxSizeByCap" : [
+      100000,
+      10000,
+      300000,
+      30000,
+      1000000,
+      100000
+    ],
+    "sampleSizes" : [
+      8,
+      9,
+      10,
+      11,
+      22,
+      44,
+      88,
+      176
+    ],
+    "subjectID" : "partitioned",
+    "winningFamily" : "polynomialIntercept",
+    "winningRSquared" : 1
+  },
+  {
+    "coefficients" : [
+      0.06057389137756551,
+      38.6849333465549,
+      -355.65442588118094
+    ],
+    "runnerUpFamily" : "powerLog",
+    "runnerUpRSquared" : 0.9577874037482593,
+    "safeMaxSizeByCap" : [
+      100000,
+      875,
+      300000,
+      1698,
+      1000000,
+      3329
+    ],
+    "sampleSizes" : [
+      8,
+      9,
+      10,
+      11,
+      22,
+      44,
+      88,
+      176
+    ],
+    "subjectID" : "pdqbad",
+    "winningFamily" : "polynomialIntercept",
+    "winningRSquared" : 0.9972549781905856
+  },
+  {
+    "coefficients" : [
+      1.0011956398719073,
+      0.8631222569468002
+    ],
+    "runnerUpFamily" : "powerLaw",
+    "runnerUpRSquared" : 0.988882743354564,
+    "safeMaxSizeByCap" : [
+      100000,
+      15535,
+      300000,
+      31221,
+      1000000,
+      62647
+    ],
+    "sampleSizes" : [
+      8,
+      9,
+      10,
+      11,
+      22,
+      44,
+      88,
+      176
+    ],
     "subjectID" : "qsortbad",
     "winningFamily" : "powerLog",
-    "winningRSquared" : 0.9997935372636454
+    "winningRSquared" : 0.9981512869084623
   },
   {
     "coefficients" : [
       0,
       5,
-      -5
+      -7
     ],
-    "runnerUpFamily" : "powerLaw",
-    "runnerUpRSquared" : 0.9994104537468911,
+    "runnerUpFamily" : "powerLog",
+    "runnerUpRSquared" : 0.999348284163251,
     "safeMaxSizeByCap" : [
       100000,
       16001,
@@ -873,18 +829,19 @@
   },
   {
     "coefficients" : [
-      6,
-      1
+      0,
+      8,
+      -2
     ],
-    "runnerUpFamily" : "polynomialIntercept",
-    "runnerUpRSquared" : 1,
+    "runnerUpFamily" : "powerLaw",
+    "runnerUpRSquared" : 0.9999677328555023,
     "safeMaxSizeByCap" : [
       100000,
-      13333,
+      10000,
       300000,
-      40000,
+      30000,
       1000000,
-      133333
+      100000
     ],
     "sampleSizes" : [
       8,
@@ -897,23 +854,23 @@
       176
     ],
     "subjectID" : "realfinalmerge",
-    "winningFamily" : "powerLaw",
+    "winningFamily" : "polynomialIntercept",
     "winningRSquared" : 1
   },
   {
     "coefficients" : [
-      1,
-      1
+      3.7682905116597794,
+      0.9555488058706969
     ],
-    "runnerUpFamily" : "polynomialIntercept",
-    "runnerUpRSquared" : 1,
+    "runnerUpFamily" : "powerLog",
+    "runnerUpRSquared" : 0.9937200294924701,
     "safeMaxSizeByCap" : [
       100000,
-      80000,
+      33746,
       300000,
-      240000,
+      106548,
       1000000,
-      800000
+      375621
     ],
     "sampleSizes" : [
       8,
@@ -927,22 +884,22 @@
     ],
     "subjectID" : "realfinalradix",
     "winningFamily" : "powerLaw",
-    "winningRSquared" : 1
+    "winningRSquared" : 0.9996112218847212
   },
   {
     "coefficients" : [
-      1.3157838119188794,
+      2.6315676238377614,
       1.0064188873726918
     ],
     "runnerUpFamily" : "polynomialIntercept",
     "runnerUpRSquared" : 0.9998456784843822,
     "safeMaxSizeByCap" : [
       100000,
-      3667,
+      2399,
       300000,
-      6887,
+      4651,
       1000000,
-      13227
+      9118
     ],
     "sampleSizes" : [
       8,
@@ -960,19 +917,18 @@
   },
   {
     "coefficients" : [
-      0.02672479949871282,
-      14.40461564173053,
-      -65.01726051880117
+      3.679068949303986,
+      0.9954078879498224
     ],
-    "runnerUpFamily" : "powerLog",
-    "runnerUpRSquared" : 0.9997930057364356,
+    "runnerUpFamily" : "polynomialIntercept",
+    "runnerUpRSquared" : 0.999861348648782,
     "safeMaxSizeByCap" : [
       100000,
-      1482,
+      2061,
       300000,
-      2739,
+      4080,
       1000000,
-      5208
+      8110
     ],
     "sampleSizes" : [
       8,
@@ -985,23 +941,23 @@
       176
     ],
     "subjectID" : "recursivereversal",
-    "winningFamily" : "polynomialIntercept",
-    "winningRSquared" : 0.999861348648782
+    "winningFamily" : "powerLog",
+    "winningRSquared" : 0.999931048586745
   },
   {
     "coefficients" : [
-      1,
+      1.9999999999999993,
       1
     ],
     "runnerUpFamily" : "polynomialIntercept",
     "runnerUpRSquared" : 1,
     "safeMaxSizeByCap" : [
       100000,
-      80000,
+      40000,
       300000,
-      240000,
+      120000,
       1000000,
-      800000
+      400000
     ],
     "sampleSizes" : [
       8,
@@ -1021,15 +977,15 @@
     "coefficients" : [
       0,
       6,
-      -5
+      -7
     ],
     "runnerUpFamily" : "powerLaw",
-    "runnerUpRSquared" : 0.9996028631458662,
+    "runnerUpRSquared" : 0.9991722935483736,
     "safeMaxSizeByCap" : [
       100000,
       13334,
       300000,
-      40000,
+      40001,
       1000000,
       133334
     ],
@@ -1049,17 +1005,15 @@
   },
   {
     "coefficients" : [
-      -2.6131231617413414e-05,
-      5.506061320678052,
-      -0.26824538875135484
+      -7.839369485224023e-05,
+      6.518183962034157,
+      -2.8047361662540644
     ],
     "runnerUpFamily" : "powerLaw",
-    "runnerUpRSquared" : 0.9999978020807603,
+    "runnerUpRSquared" : 0.9998853233479708,
     "safeMaxSizeByCap" : [
       100000,
-      15699,
-      300000,
-      61592
+      14968
     ],
     "sampleSizes" : [
       8,
@@ -1073,23 +1027,23 @@
     ],
     "subjectID" : "shuffledhalf",
     "winningFamily" : "polynomialIntercept",
-    "winningRSquared" : 0.9999996105175258
+    "winningRSquared" : 0.9999974923185506
   },
   {
     "coefficients" : [
-      0.0011152853674868718,
-      1.7715733184372247,
-      -2.708780691608916
+      0.0022271852557143317,
+      2.5017764249765717,
+      0.4534912658220436
     ],
     "runnerUpFamily" : "powerLaw",
-    "runnerUpRSquared" : 0.9992945329787079,
+    "runnerUpRSquared" : 0.9991088490379273,
     "safeMaxSizeByCap" : [
       100000,
-      7712,
+      5457,
       300000,
-      13896,
+      9834,
       1000000,
-      26000
+      18399
     ],
     "sampleSizes" : [
       8,
@@ -1103,22 +1057,17 @@
     ],
     "subjectID" : "shuffledhead",
     "winningFamily" : "polynomialIntercept",
-    "winningRSquared" : 0.999961185345014
+    "winningRSquared" : 0.9995363713218981
   },
   {
     "coefficients" : [
-      2.2836580360142444,
-      1.0200392224190047
+      1.659691865222658,
+      0.7564082148223655
     ],
-    "runnerUpFamily" : "powerLog",
-    "runnerUpRSquared" : 0.9979571893348061,
+    "runnerUpFamily" : "powerLaw",
+    "runnerUpRSquared" : 0.9986374716292873,
     "safeMaxSizeByCap" : [
-      100000,
-      28522,
-      300000,
-      83739,
-      1000000,
-      272605
+
     ],
     "sampleSizes" : [
       8,
@@ -1131,22 +1080,22 @@
       176
     ],
     "subjectID" : "shuffledodds",
-    "winningFamily" : "powerLaw",
-    "winningRSquared" : 0.9997102339479345
+    "winningFamily" : "powerLog",
+    "winningRSquared" : 0.999344753254714
   },
   {
     "coefficients" : [
       0,
       6,
-      -5
+      -7
     ],
     "runnerUpFamily" : "powerLaw",
-    "runnerUpRSquared" : 0.9996028631458662,
+    "runnerUpRSquared" : 0.9991722935483736,
     "safeMaxSizeByCap" : [
       100000,
       13334,
       300000,
-      40000,
+      40001,
       1000000,
       133334
     ],
@@ -1166,13 +1115,19 @@
   },
   {
     "coefficients" : [
-      1.6219971580555472,
-      0.6947083824875352
+      4.5222078830685444e-05,
+      2.8327907153415337,
+      0.5655042012095318
     ],
     "runnerUpFamily" : "powerLaw",
-    "runnerUpRSquared" : 0.9982534390746696,
+    "runnerUpRSquared" : 0.9998902826825582,
     "safeMaxSizeByCap" : [
-
+      100000,
+      21119,
+      300000,
+      47976,
+      1000000,
+      105322
     ],
     "sampleSizes" : [
       8,
@@ -1185,23 +1140,23 @@
       176
     ],
     "subjectID" : "shuffledtail",
-    "winningFamily" : "powerLog",
-    "winningRSquared" : 0.9991212126822809
+    "winningFamily" : "polynomialIntercept",
+    "winningRSquared" : 0.9999499004946373
   },
   {
     "coefficients" : [
-      1.0387222941320806,
+      2.0774445882641617,
       0.962471995912868
     ],
     "runnerUpFamily" : "polynomialIntercept",
     "runnerUpRSquared" : 0.9999401007102388,
     "safeMaxSizeByCap" : [
       100000,
-      5547,
+      3638,
       300000,
-      10385,
+      7026,
       1000000,
-      19905
+      13735
     ],
     "sampleSizes" : [
       8,
@@ -1219,18 +1174,18 @@
   },
   {
     "coefficients" : [
-      1,
+      1.9999999999999993,
       1
     ],
     "runnerUpFamily" : "polynomialIntercept",
     "runnerUpRSquared" : 1,
     "safeMaxSizeByCap" : [
       100000,
-      80000,
+      40000,
       300000,
-      240000,
+      120000,
       1000000,
-      800000
+      400000
     ],
     "sampleSizes" : [
       8,
@@ -1248,47 +1203,18 @@
   },
   {
     "coefficients" : [
-      0.9871139024374493,
-      1.0071556821859728
-    ],
-    "runnerUpFamily" : "powerLog",
-    "runnerUpRSquared" : 0.9985940193497401,
-    "safeMaxSizeByCap" : [
-      100000,
-      74790,
-      300000,
-      222627,
-      1000000,
-      735770
-    ],
-    "sampleSizes" : [
-      8,
-      9,
-      10,
-      11,
-      22,
-      44,
-      88,
-      176
-    ],
-    "subjectID" : "smooth",
-    "winningFamily" : "powerLaw",
-    "winningRSquared" : 0.9990269080631424
-  },
-  {
-    "coefficients" : [
-      1,
+      1.9999999999999993,
       1
     ],
     "runnerUpFamily" : "polynomialIntercept",
     "runnerUpRSquared" : 1,
     "safeMaxSizeByCap" : [
       100000,
-      80000,
+      40000,
       300000,
-      240000,
+      120000,
       1000000,
-      800000
+      400000
     ],
     "sampleSizes" : [
       8,
@@ -1306,18 +1232,18 @@
   },
   {
     "coefficients" : [
-      3.278639145990378,
-      1.3083743800302192
+      3.1932991964215685,
+      1.3141440037014727
     ],
     "runnerUpFamily" : "polynomialIntercept",
     "runnerUpRSquared" : 0.9997585538033964,
     "safeMaxSizeByCap" : [
       100000,
-      528,
+      525,
       300000,
-      1016,
+      1008,
       1000000,
-      1988
+      1971
     ],
     "sampleSizes" : [
       8,
@@ -1331,6 +1257,6 @@
     ],
     "subjectID" : "triheap",
     "winningFamily" : "powerLog",
-    "winningRSquared" : 0.9997730130264918
+    "winningRSquared" : 0.9998652914431063
   }
 ]

@@ -17,10 +17,10 @@ public struct IntroCircleSortIterative: SortAlgorithm {
     category: .hybrid,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 829, coefficients: [239869, 499.36, 0.251911],
+      anchorSize: 829, coefficients: [239839, 499.178, 0.251744],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .polynomialIntercept, coefficients: [0.251911, 81.6922, -977.171], rSquared: 0.999813),
+      family: .polynomialIntercept, coefficients: [0.251744, 81.7865, -971.005], rSquared: 0.999804),
     implementationComplexity: 15,
     stable: false,
     // Best/average mirror `CircleSortIterative`'s O(n log^2 n). Worst case differs: passes are

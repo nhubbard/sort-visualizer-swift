@@ -8,10 +8,10 @@ public struct RandomGuessSort: SortAlgorithm {
     category: .impractical,
     sizeRange: 4...6,
     growthModel: OperationGrowthModel(
-      anchorSize: 5, coefficients: [24682.1, 64523.3, 86810.2, 79790.1, 56188, 32259],
+      anchorSize: 5, coefficients: [27700.7, 68937.9, 88423.7, 77559.5, 52160.4, 28616.4],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .nToTheNLike, coefficients: [7.7838, 1.00181], rSquared: 0.99824),
+      family: .nToTheNLike, coefficients: [12.8644, 0.953718], rSquared: 0.999976),
     implementationComplexity: 10,
     stable: false,
     timeComplexity: ComplexityBounds(best: "O(n)", average: "O(n^n)", worst: "O(n^n)"),
@@ -50,7 +50,7 @@ public struct RandomGuessSort: SortAlgorithm {
       }
     }
 
-    let mapped = loops.map { engine.values[$0] }
+    let mapped = loops.map { engine.readValue(at: $0) }
     for i in 0..<n {
       engine.setValue(i, mapped[i])
     }

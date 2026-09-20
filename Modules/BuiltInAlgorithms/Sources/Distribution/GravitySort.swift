@@ -18,10 +18,10 @@ public struct GravitySort: SortAlgorithm {
     category: .distribution,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 309, coefficients: [239528, 1549.14, 2.50453],
+      anchorSize: 281, coefficients: [238346, 1693.79, 3.00872],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .polynomialIntercept, coefficients: [2.50453, 1.34498, -22.9079], rSquared: 0.999999),
+      family: .polynomialIntercept, coefficients: [3.00872, 2.8842, -36.1664], rSquared: 0.999996),
     implementationComplexity: 10,
     stable: false,
     timeComplexity: ComplexityBounds(
@@ -40,11 +40,11 @@ public struct GravitySort: SortAlgorithm {
     // `engine.values` and compares against the plain local `min`/`max` variables rather than
     // going through `engine.compare` — the same held-value pattern as `CycleSort`'s `t` and
     // `PigeonholeSort`'s own min/max scan.
-    var minValue = engine.values[0]
-    var maxValue = engine.values[0]
+    var minValue = engine.readValue(at: 0)
+    var maxValue = engine.readValue(at: 0)
     for i in 1..<n {
-      if engine.values[i] < minValue { minValue = engine.values[i] }
-      if engine.values[i] > maxValue { maxValue = engine.values[i] }
+      if engine.readValue(at: i) < minValue { minValue = engine.readValue(at: i) }
+      if engine.readValue(at: i) > maxValue { maxValue = engine.readValue(at: i) }
     }
 
     let mi = minValue
@@ -62,7 +62,7 @@ public struct GravitySort: SortAlgorithm {
     // Save a shifted copy of the input in `x`, and tally the count of each shifted value in
     // `y`.
     for i in 0..<n {
-      let shifted = engine.values[i] - mi
+      let shifted = engine.readValue(at: i) - mi
       x[i] = shifted
       engine.writeAux(xHandle, at: i, value: shifted)
 
@@ -96,7 +96,7 @@ public struct GravitySort: SortAlgorithm {
         // this level (`inc == 0`) -- skipping the write is a genuine no-op (`values[i] + 0 ==
         // values[i]`), not a behavior change, and cuts real, redundant tape volume.
         guard inc != 0 else { continue }
-        engine.setValue(i, engine.values[i] + inc)
+        engine.setValue(i, engine.readValue(at: i) + inc)
       }
     }
 

@@ -32,6 +32,9 @@ public enum SortOperation: Sendable, Codable, Equatable {
   /// A real re-read of a `writeAux`-shadowed buffer for a decision, distinct from the write
   /// itself — see `RecordingEngine.markAuxRead(_:at:)`. `(handle, index)`.
   case auxRead(handle: Int, index: Int)
+  /// A read of a live array value. The recorder returns the value; replay keeps this as a
+  /// separate, structurally inert step so reads are visible in the operation tape.
+  case readValue(Int)
   /// Counted, structurally inert — like `.compare`, never changes `values` on its own. Emitted
   /// once per `RecordingEngine.reversal(_:_:)` call, immediately before the individual `.swap`s
   /// that actually perform the flip, so a whole-range reverse is still visible swap-by-swap
@@ -55,7 +58,7 @@ public enum SortOperation: Sendable, Codable, Equatable {
     switch self {
     case .compare, .compareValue, .swap, .setValue, .auxWrite: true
     case .mark, .unmark, .unmarkAll, .unmarkIndex, .markSorted, .auxCreate, .auxDelete, .reversal,
-      .compareValues, .auxRead:
+      .compareValues, .auxRead, .readValue:
       // `.compareValues` has no live array position to sonify (unlike `.compareValue`, which
       // still has one real index). `.auxRead` risks the same "wall of noise" `.auxWrite` needed
       // throttling for (see `SortSession.makeOnStepClosure`) -- starting silent avoids needing

@@ -25,10 +25,10 @@ public struct BlockSwapMergeSort: SortAlgorithm {
     category: .merge,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 1227, coefficients: [216635, 226.028, 0.024386],
+      anchorSize: 1225, coefficients: [216659, 226.633, 0.0246016],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .powerLog, coefficients: [9.19747, 1.1396], rSquared: 0.999493),
+      family: .powerLog, coefficients: [9.1423, 1.14076], rSquared: 0.99946),
     implementationComplexity: 13,
     stable: true,
     timeComplexity: ComplexityBounds(

@@ -18,10 +18,10 @@ public struct RotateMergeSort: SortAlgorithm {
     category: .merge,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 1335, coefficients: [211292, 209.839, 0.0244619],
+      anchorSize: 1301, coefficients: [212824, 215.199, 0.024872],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .powerLog, coefficients: [5.73099, 1.18686], rSquared: 0.999043),
+      family: .powerLog, coefficients: [6.45459, 1.17606], rSquared: 0.999153),
     implementationComplexity: 21,
     stable: true,
     timeComplexity: ComplexityBounds(
@@ -101,12 +101,12 @@ public struct RotateMergeSort: SortAlgorithm {
       var m2: Int
       if m - a >= b - m {
         m1 = a + (m - a) / 2
-        let value = engine.values[m1]
+        let value = engine.readValue(at: m1)
         m2 = binarySearch(m, b, value, true)
         m3 = m1 + (m2 - m)
       } else {
         m2 = m + (b - m) / 2
-        let value = engine.values[m2]
+        let value = engine.readValue(at: m2)
         m1 = binarySearch(a, m, value, false)
         // Java's `m3 = (m2++)-(m-m1)` post-increment: `m3` is computed from `m2`'s value
         // *before* the increment, and only then does `m2` advance by one for use below.

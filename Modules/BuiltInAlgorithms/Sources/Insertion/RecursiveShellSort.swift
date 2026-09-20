@@ -8,10 +8,10 @@ public struct RecursiveShellSort: SortAlgorithm {
     category: .insertion,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 905, coefficients: [239558, 478.568, 0.235672],
+      anchorSize: 884, coefficients: [239870, 494.655, 0.252006],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .polynomialIntercept, coefficients: [0.235672, 52.0013, -524.469], rSquared: 0.999937),
+      family: .polynomialIntercept, coefficients: [0.252006, 49.1085, -473.459], rSquared: 0.999981),
     implementationComplexity: 8,
     stable: false,
     timeComplexity: ComplexityBounds(

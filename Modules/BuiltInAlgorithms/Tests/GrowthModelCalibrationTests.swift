@@ -191,9 +191,7 @@ struct GrowthModelCalibrationTests {
 
   @Test
   func tapeEstimateFormulaMatchesRealTapeCountAtSmallSizes() {
-    // Validates the `tapeEstimate` reconstruction (5x compare/swap + 1x everything else) against
-    // the real, uncapped `tape.count` -- cheap to materialize at small `n`, where we don't need
-    // the tiny-operationCap trick at all.
+    // Validates that the uncapped operation counter equals a fully retained tape at small sizes.
     for algorithm in AllBuiltInAlgorithms.sorts.prefix(15) {
       let n = max(algorithm.metadata.sizeRange.lowerBound, 8)
       var engine = RecordingEngine(values: Array(1...n).shuffled(), operationCap: 1_000_000)
@@ -202,9 +200,7 @@ struct GrowthModelCalibrationTests {
       #expect(!summary.didExceedCap)
       let estimate = Self.tapeEstimate(summary)
       let real = Double(summary.tape.count)
-      // A handful of ops (unmarkAll, aux create/delete) aren't covered by the estimate formula,
-      // so allow a small fixed slack rather than requiring an exact match.
-      #expect(abs(estimate - real) <= 5, "estimate \(estimate) vs real \(real) for \(algorithm.id.rawValue)")
+      #expect(estimate == real, "estimate \(estimate) vs real \(real) for \(algorithm.id.rawValue)")
     }
   }
 
@@ -245,23 +241,10 @@ struct GrowthModelCalibrationTests {
     return (engine.values, engine.finish())
   }
 
-  /// Approximates real `RecordingEngine.tape.count` from a `RecordingSummary`'s uncapped
-  /// counters, which keep incrementing after `tape` itself stops growing (constructed with
-  /// `operationCap: 1` above) -- see the growth-model calibration plan for the derivation.
-  /// `setValueCount = mainWriteCount - 2*swapCount` since `mainWriteCount` folds both together.
+  /// `RecordingEngine` counts attempted tape entries after its retention cap, so calibration
+  /// can use the exact uncapped operation count rather than reconstructing it from counters.
   private static func tapeEstimate(_ summary: RecordingSummary) -> Double {
-    let setValueCount = summary.mainWriteCount - 2 * summary.swapCount
-    let compareCallCount =
-      summary.compareCount - summary.compareValueCount - summary.compareValuesCount
-    // `compareValue` only ever marks one index (never a secondary), so each call costs fewer
-    // raw tape entries than a real two-index `compare`/`swap` -- empirically closer to 3 than
-    // the full 5x multiplier those get. `compareValues` marks nothing at all (neither side is a
-    // live index), so it costs exactly one raw tape entry per call -- same weight as
-    // `auxReadCount` below, for the same reason (`markAuxRead` also marks nothing).
-    return Double(
-      5 * (compareCallCount + summary.swapCount) + 3 * summary.compareValueCount
-        + summary.compareValuesCount + setValueCount + summary.auxWriteCount
-        + summary.auxReadCount + summary.reversalCount)
+    Double(summary.totalOperationCount)
   }
 
   // MARK: - Size sweep with adaptive sampling and a per-size time budget

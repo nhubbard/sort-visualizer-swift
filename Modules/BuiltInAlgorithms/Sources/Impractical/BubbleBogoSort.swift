@@ -8,10 +8,10 @@ public struct BubbleBogoSort: SortAlgorithm {
     category: .impractical,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 179, coefficients: [238965, 2677.5, 7.5],
+      anchorSize: 53, coefficients: [294461, 76818.7, 10202.7, 917.824, 62.8087, 3.48295],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .polynomialIntercept, coefficients: [7.5, -7.5, 0], rSquared: 1),
+      family: .factorial, coefficients: [9.47655, 0.0657078], rSquared: 0.999103),
     implementationComplexity: 5,
     stable: false,
     timeComplexity: ComplexityBounds(best: "O(n)", average: "O(n^2)", worst: "O(n^2)"),

@@ -23,10 +23,10 @@ public struct FoldSort: SortAlgorithm {
     category: .concurrent,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 959, coefficients: [224752, 313.982, 0.0530243],
+      anchorSize: 928, coefficients: [224934, 342.15, 0.0730787],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .powerLog, coefficients: [9.00412, 1.19409], rSquared: 0.999525),
+      family: .powerLog, coefficients: [5.79128, 1.26524], rSquared: 0.989176),
     implementationComplexity: 11,
     stable: true,
     timeComplexity: ComplexityBounds(

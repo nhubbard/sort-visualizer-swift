@@ -8,10 +8,10 @@ public struct AsynchronousSort: SortAlgorithm {
     category: .selection,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 345, coefficients: [239085, 1383, 2],
+      anchorSize: 345, coefficients: [239434, 1384, 2],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .polynomialIntercept, coefficients: [2, 3, 0], rSquared: 1),
+      family: .polynomialIntercept, coefficients: [2, 4, 4], rSquared: 1),
     implementationComplexity: 8,
     stable: false,
     timeComplexity: ComplexityBounds(
@@ -42,10 +42,10 @@ public struct AsynchronousSort: SortAlgorithm {
 
     let extHandle = engine.createAuxArray(length: n)
     var ext = [Int](repeating: 0, count: n)
-    var minValue = engine.values[0]
-    var maxValue = engine.values[0]
+    var minValue = engine.readValue(at: 0)
+    var maxValue = engine.readValue(at: 0)
     for i in 0..<n {
-      ext[i] = engine.values[i]
+      ext[i] = engine.readValue(at: i)
       engine.writeAux(extHandle, at: i, value: ext[i])
       if ext[i] < minValue { minValue = ext[i] }
       if ext[i] > maxValue { maxValue = ext[i] }

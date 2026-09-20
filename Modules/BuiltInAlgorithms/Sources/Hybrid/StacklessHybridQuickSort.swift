@@ -40,10 +40,10 @@ public struct StacklessHybridQuickSort: SortAlgorithm {
     category: .hybrid,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 703, coefficients: [239698, 643.587, 0.429216],
+      anchorSize: 699, coefficients: [239881, 645.759, 0.431817],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .polynomialIntercept, coefficients: [0.429216, 40.1101, -621.54], rSquared: 0.999815),
+      family: .polynomialIntercept, coefficients: [0.431817, 42.079, -517.861], rSquared: 0.99979),
     implementationComplexity: 40,
     stable: false,
     timeComplexity: ComplexityBounds(best: "O(n log n)", average: "O(n log n)", worst: "O(n^2)"),
@@ -65,10 +65,10 @@ public struct StacklessHybridQuickSort: SortAlgorithm {
 
     // Held-value scan for this range's maximum — `Reads.compareValues`, not `compareIndices`, in
     // the source: no highlight, just a running value.
-    var max = engine.values[a0]
+    var max = engine.readValue(at: a0)
     if a0 + 1 < b {
-      for i in (a0 + 1)..<b where engine.values[i] > max {
-        max = engine.values[i]
+      for i in (a0 + 1)..<b where engine.readValue(at: i) > max {
+        max = engine.readValue(at: i)
       }
     }
 
@@ -77,7 +77,7 @@ public struct StacklessHybridQuickSort: SortAlgorithm {
     // called once, with `a0 == 0`.
     var i = b - 1
     while i >= 0 {
-      if engine.values[i] == max {
+      if engine.readValue(at: i) == max {
         b -= 1
         engine.swap(i, b)
       }
@@ -149,7 +149,7 @@ public struct StacklessHybridQuickSort: SortAlgorithm {
     // Held pivot value: `a` is never written again until the closing swap below (`i` only ever
     // grows past `a`, `j` only ever shrinks below `b`), so it's safe to hold this rather than
     // re-reading `engine.values[a]` on every scan step.
-    let pivot = engine.values[a]
+    let pivot = engine.readValue(at: a)
     var i = a
     var j = b
 
@@ -192,7 +192,7 @@ public struct StacklessHybridQuickSort: SortAlgorithm {
   private func binaryInsert(_ engine: inout RecordingEngine, _ start: Int, _ end: Int) {
     guard start < end else { return }
     for i in start..<end {
-      let num = engine.values[i]
+      let num = engine.readValue(at: i)
       var lo = start
       var hi = i
       while lo < hi {
@@ -205,7 +205,7 @@ public struct StacklessHybridQuickSort: SortAlgorithm {
       }
       var j = i - 1
       while j >= lo {
-        engine.setValue(j + 1, engine.values[j])
+        engine.setValue(j + 1, engine.readValue(at: j))
         j -= 1
       }
       engine.setValue(lo, num)

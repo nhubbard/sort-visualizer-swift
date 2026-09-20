@@ -19,10 +19,10 @@ public struct DoubleInsertionSort: SortAlgorithm {
     category: .insertion,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 487, coefficients: [239509, 978.281, 0.998748],
+      anchorSize: 435, coefficients: [239057, 1092.72, 1.24834],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .polynomialIntercept, coefficients: [0.998748, 5.50024, -41.9973], rSquared: 0.999999),
+      family: .polynomialIntercept, coefficients: [1.24834, 6.66398, -58.4349], rSquared: 0.999999),
     implementationComplexity: 16,
     stable: true,
     timeComplexity: ComplexityBounds(best: "O(n)", average: "O(n^2)", worst: "O(n^2)"),
@@ -55,15 +55,15 @@ public struct DoubleInsertionSort: SortAlgorithm {
         // `leftItem`/`rightItem` are captured *before* either while-loop below writes
         // anything, matching ArrayV's `leftItem = array[right]; rightItem = array[left];`
         // ordering exactly.
-        let leftItem = engine.values[right]
-        let rightItem = engine.values[left]
+        let leftItem = engine.readValue(at: right)
+        let rightItem = engine.readValue(at: left)
 
         var pos = left + 1
         // Reads.compareValues(array[pos], leftItem) <= 0 — non-strict: `leftItem` came
         // from `right` (a larger original index), so it must slide past any elements
         // already equal to it and land *after* them to stay stable.
         while pos <= right && engine.compareValue(pos, against: leftItem, by: (<=)) {
-          engine.setValue(pos - 1, engine.values[pos])
+          engine.setValue(pos - 1, engine.readValue(at: pos))
           pos += 1
         }
         engine.setValue(pos - 1, leftItem)
@@ -73,13 +73,13 @@ public struct DoubleInsertionSort: SortAlgorithm {
         // from `left` (a smaller original index), so it must slide past any elements
         // already equal to it and land *before* them to stay stable.
         while pos >= left && engine.compareValue(pos, against: rightItem, by: (>=)) {
-          engine.setValue(pos + 1, engine.values[pos])
+          engine.setValue(pos + 1, engine.readValue(at: pos))
           pos -= 1
         }
         engine.setValue(pos + 1, rightItem)
       } else {
-        let leftItem = engine.values[left]
-        let rightItem = engine.values[right]
+        let leftItem = engine.readValue(at: left)
+        let rightItem = engine.readValue(at: right)
 
         var pos = left + 1
         // Strict compare (unlike the `if` branch's `<=`): `leftItem` is the smaller-or-equal of
@@ -87,7 +87,7 @@ public struct DoubleInsertionSort: SortAlgorithm {
         // bound check is needed — `rightItem` (>= `leftItem` in this branch) guarantees the scan
         // stops at or before `pos == right`.
         while engine.compareValue(pos, against: leftItem, by: (<)) {
-          engine.setValue(pos - 1, engine.values[pos])
+          engine.setValue(pos - 1, engine.readValue(at: pos))
           pos += 1
         }
         engine.setValue(pos - 1, leftItem)
@@ -96,7 +96,7 @@ public struct DoubleInsertionSort: SortAlgorithm {
         // Reads.compareValues(array[pos], rightItem) > 0 — strict, held value; same
         // "no explicit bound needed" reasoning as above, mirrored for the left edge.
         while engine.compareValue(pos, against: rightItem, by: (>)) {
-          engine.setValue(pos + 1, engine.values[pos])
+          engine.setValue(pos + 1, engine.readValue(at: pos))
           pos -= 1
         }
         engine.setValue(pos + 1, rightItem)
@@ -110,13 +110,13 @@ public struct DoubleInsertionSort: SortAlgorithm {
     // (odd-length ranges "waste" their extra element there).
     if right < end {
       var pos = right - 1
-      let current = engine.values[right]
+      let current = engine.readValue(at: right)
       // Unlike ArrayV's unguarded version, this needs an explicit `pos >= start` bound check:
       // the trailing element can be smaller than every element sorted so far (e.g. reverse-sorted
       // input), which would otherwise walk `pos` past `start` and out of bounds — ArrayV's Java
       // would throw ArrayIndexOutOfBoundsException there; a literal port would trap in Swift.
       while pos >= start && engine.compareValue(pos, against: current, by: (>)) {
-        engine.setValue(pos + 1, engine.values[pos])
+        engine.setValue(pos + 1, engine.readValue(at: pos))
         pos -= 1
       }
       engine.setValue(pos + 1, current)

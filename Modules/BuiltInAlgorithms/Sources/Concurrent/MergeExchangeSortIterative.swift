@@ -9,10 +9,10 @@ public struct MergeExchangeSortIterative: SortAlgorithm {
     category: .concurrent,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 1014, coefficients: [222565, 296.317, 0.0488819],
+      anchorSize: 1013, coefficients: [222718, 297.073, 0.0492297],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .powerLog, coefficients: [7.64469, 1.20554], rSquared: 0.999419),
+      family: .powerLog, coefficients: [7.59878, 1.2067], rSquared: 0.999383),
     implementationComplexity: 9,
     stable: false,
     timeComplexity: ComplexityBounds(

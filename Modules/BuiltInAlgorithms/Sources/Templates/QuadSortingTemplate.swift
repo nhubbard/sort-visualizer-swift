@@ -66,16 +66,16 @@ enum QuadSortingTemplate {
       } else if engine.compare(start + 1, start + 2, by: >) {
         engine.swap(start, start + 2)
       } else {
-        let temp = engine.values[start]
-        engine.setValue(start, engine.values[start + 1])
-        engine.setValue(start + 1, engine.values[start + 2])
+        let temp = engine.readValue(at: start)
+        engine.setValue(start, engine.readValue(at: start + 1))
+        engine.setValue(start + 1, engine.readValue(at: start + 2))
         engine.setValue(start + 2, temp)
       }
     } else if engine.compare(start + 1, start + 2, by: >) {
       if engine.compare(start, start + 2, by: >) {
-        let temp = engine.values[start + 2]
-        engine.setValue(start + 2, engine.values[start + 1])
-        engine.setValue(start + 1, engine.values[start])
+        let temp = engine.readValue(at: start + 2)
+        engine.setValue(start + 2, engine.readValue(at: start + 1))
+        engine.setValue(start + 1, engine.readValue(at: start))
         engine.setValue(start, temp)
       } else {
         engine.swap(start + 2, start + 1)
@@ -95,24 +95,24 @@ enum QuadSortingTemplate {
         if engine.compare(start + 1, start + 3, by: <=) {
           engine.swap(start + 1, start + 2)
         } else {
-          let temp = engine.values[start + 1]
-          engine.setValue(start + 1, engine.values[start + 2])
-          engine.setValue(start + 2, engine.values[start + 3])
+          let temp = engine.readValue(at: start + 1)
+          engine.setValue(start + 1, engine.readValue(at: start + 2))
+          engine.setValue(start + 2, engine.readValue(at: start + 3))
           engine.setValue(start + 3, temp)
         }
       } else if engine.compare(start, start + 3, by: >) {
         engine.swap(start + 1, start + 3)
         engine.swap(start, start + 2)
       } else if engine.compare(start + 1, start + 3, by: <=) {
-        let temp = engine.values[start + 1]
-        engine.setValue(start + 1, engine.values[start])
-        engine.setValue(start, engine.values[start + 2])
+        let temp = engine.readValue(at: start + 1)
+        engine.setValue(start + 1, engine.readValue(at: start))
+        engine.setValue(start, engine.readValue(at: start + 2))
         engine.setValue(start + 2, temp)
       } else {
-        let temp = engine.values[start + 1]
-        engine.setValue(start + 1, engine.values[start])
-        engine.setValue(start, engine.values[start + 2])
-        engine.setValue(start + 2, engine.values[start + 3])
+        let temp = engine.readValue(at: start + 1)
+        engine.setValue(start + 1, engine.readValue(at: start))
+        engine.setValue(start, engine.readValue(at: start + 2))
+        engine.setValue(start + 2, engine.readValue(at: start + 3))
         engine.setValue(start + 3, temp)
       }
     }
@@ -132,22 +132,22 @@ enum QuadSortingTemplate {
     pta -= 1
 
     if engine.compare(pta, ptt, by: >) {
-      let key = engine.values[ptt]
-      engine.setValue(ptt, engine.values[pta])
+      let key = engine.readValue(at: ptt)
+      engine.setValue(ptt, engine.readValue(at: pta))
       ptt -= 1
       pta -= 1
 
-      if pta > start, engine.values[pta - 1] > key {
-        engine.setValue(ptt, engine.values[pta])
+      if pta > start, engine.readValue(at: pta - 1) > key {
+        engine.setValue(ptt, engine.readValue(at: pta))
         ptt -= 1
         pta -= 1
-        engine.setValue(ptt, engine.values[pta])
+        engine.setValue(ptt, engine.readValue(at: pta))
         ptt -= 1
         pta -= 1
       }
 
-      if pta >= start, engine.values[pta] > key {
-        engine.setValue(ptt, engine.values[pta])
+      if pta >= start, engine.readValue(at: pta) > key {
+        engine.setValue(ptt, engine.readValue(at: pta))
         ptt -= 1
         pta -= 1
       }
@@ -167,30 +167,30 @@ enum QuadSortingTemplate {
     pta -= 1
 
     if engine.compare(pta, ptt, by: >) {
-      let key = engine.values[ptt]
-      engine.setValue(ptt, engine.values[pta])
+      let key = engine.readValue(at: ptt)
+      engine.setValue(ptt, engine.readValue(at: pta))
       ptt -= 1
       pta -= 1
 
-      if engine.values[pta - 2] > key {
+      if engine.readValue(at: pta - 2) > key {
         for _ in 0..<3 {
-          engine.setValue(ptt, engine.values[pta])
+          engine.setValue(ptt, engine.readValue(at: pta))
           ptt -= 1
           pta -= 1
         }
       }
 
-      if pta > start, engine.values[pta - 1] > key {
-        engine.setValue(ptt, engine.values[pta])
+      if pta > start, engine.readValue(at: pta - 1) > key {
+        engine.setValue(ptt, engine.readValue(at: pta))
         ptt -= 1
         pta -= 1
-        engine.setValue(ptt, engine.values[pta])
+        engine.setValue(ptt, engine.readValue(at: pta))
         ptt -= 1
         pta -= 1
       }
 
-      if pta >= start, engine.values[pta] > key {
-        engine.setValue(ptt, engine.values[pta])
+      if pta >= start, engine.readValue(at: pta) > key {
+        engine.setValue(ptt, engine.readValue(at: pta))
         ptt -= 1
         pta -= 1
       }
@@ -270,10 +270,10 @@ enum QuadSortingTemplate {
 
       if engine.compare(pta, ptt, by: <=) { continue }
 
-      let temp = engine.values[ptt]
+      let temp = engine.readValue(at: ptt)
       while top > 1 {
         let mid = top / 2
-        if engine.values[pta - mid] > temp {
+        if engine.readValue(at: pta - mid) > temp {
           pta -= mid
         }
         top -= mid
@@ -281,7 +281,7 @@ enum QuadSortingTemplate {
 
       var i = ptt
       while i > pta {
-        engine.setValue(i, engine.values[i - 1])
+        engine.setValue(i, engine.readValue(at: i - 1))
         i -= 1
       }
       engine.setValue(pta, temp)
@@ -301,19 +301,19 @@ enum QuadSortingTemplate {
     var ptr = start + 4
 
     for _ in 0..<3 {
-      if engine.values[ptl] <= engine.values[ptr] {
-        dest.write(&engine, at: auxP, value: engine.values[ptl])
+      if engine.readValue(at: ptl) <= engine.readValue(at: ptr) {
+        dest.write(&engine, at: auxP, value: engine.readValue(at: ptl))
         ptl += 1
       } else {
-        dest.write(&engine, at: auxP, value: engine.values[ptr])
+        dest.write(&engine, at: auxP, value: engine.readValue(at: ptr))
         ptr += 1
       }
       auxP += 1
     }
-    if engine.values[ptl] <= engine.values[ptr] {
-      dest.write(&engine, at: auxP, value: engine.values[ptl])
+    if engine.readValue(at: ptl) <= engine.readValue(at: ptr) {
+      dest.write(&engine, at: auxP, value: engine.readValue(at: ptl))
     } else {
-      dest.write(&engine, at: auxP, value: engine.values[ptr])
+      dest.write(&engine, at: auxP, value: engine.readValue(at: ptr))
     }
 
     ptl = start + 3
@@ -321,19 +321,19 @@ enum QuadSortingTemplate {
     auxP += 4
 
     for _ in 0..<3 {
-      if engine.values[ptl] > engine.values[ptr] {
-        dest.write(&engine, at: auxP, value: engine.values[ptl])
+      if engine.readValue(at: ptl) > engine.readValue(at: ptr) {
+        dest.write(&engine, at: auxP, value: engine.readValue(at: ptl))
         ptl -= 1
       } else {
-        dest.write(&engine, at: auxP, value: engine.values[ptr])
+        dest.write(&engine, at: auxP, value: engine.readValue(at: ptr))
         ptr -= 1
       }
       auxP -= 1
     }
-    if engine.values[ptl] > engine.values[ptr] {
-      dest.write(&engine, at: auxP, value: engine.values[ptl])
+    if engine.readValue(at: ptl) > engine.readValue(at: ptr) {
+      dest.write(&engine, at: auxP, value: engine.readValue(at: ptl))
     } else {
-      dest.write(&engine, at: auxP, value: engine.values[ptr])
+      dest.write(&engine, at: auxP, value: engine.readValue(at: ptr))
     }
   }
 
@@ -417,18 +417,18 @@ enum QuadSortingTemplate {
     while engine.compare(m, e, by: <=) { e -= 1 }
 
     for i in r..<(r + (e - m)) {
-      aux.write(&engine, at: i - r, value: engine.values[i])
+      aux.write(&engine, at: i - r, value: engine.readValue(at: i))
     }
 
     var s = e - r
-    engine.setValue(e, engine.values[m])
+    engine.setValue(e, engine.readValue(at: m))
     e -= 1
     m -= 1
 
-    if engine.values[start] <= aux.values[0] {
+    if engine.readValue(at: start) <= aux.values[0] {
       repeat {
-        while engine.values[m] > aux.values[s] {
-          engine.setValue(e, engine.values[m])
+        while engine.readValue(at: m) > aux.values[s] {
+          engine.setValue(e, engine.readValue(at: m))
           e -= 1
           m -= 1
         }
@@ -438,12 +438,12 @@ enum QuadSortingTemplate {
       } while s >= 0
     } else {
       repeat {
-        while engine.values[m] <= aux.values[s] {
+        while engine.readValue(at: m) <= aux.values[s] {
           engine.setValue(e, aux.values[s])
           e -= 1
           s -= 1
         }
-        engine.setValue(e, engine.values[m])
+        engine.setValue(e, engine.readValue(at: m))
         e -= 1
         m -= 1
       } while m >= start
@@ -497,7 +497,7 @@ enum QuadSortingTemplate {
     _ engine: inout RecordingEngine, _ aux: inout AuxBuffer, _ start: Int, _ auxStart: Int,
     _ block: Int, _ toAux: Bool
   ) {
-    func read(_ i: Int) -> Int { toAux ? engine.values[i] : aux.values[i] }
+    func read(_ i: Int) -> Int { toAux ? engine.readValue(at: i) : aux.values[i] }
     func write(_ i: Int, _ value: Int) {
       if toAux {
         aux.write(&engine, at: i, value: value)
@@ -572,14 +572,14 @@ enum QuadSortingTemplate {
         var pts = 0
         var c = start
         repeat {
-          aux.write(&engine, at: pts, value: engine.values[c])
+          aux.write(&engine, at: pts, value: engine.readValue(at: c))
           c += 1
           pts += 1
         } while c < cMax
 
         cMax = c + blockX2
         repeat {
-          aux.write(&engine, at: pts, value: engine.values[c])
+          aux.write(&engine, at: pts, value: engine.readValue(at: c))
           c += 1
           pts += 1
         } while c < cMax
@@ -592,7 +592,7 @@ enum QuadSortingTemplate {
       var c = start
       cMax = start + blockX2
       repeat {
-        aux.write(&engine, at: pts, value: engine.values[c])
+        aux.write(&engine, at: pts, value: engine.readValue(at: c))
         c += 1
         pts += 1
       } while c < cMax
@@ -667,24 +667,24 @@ enum QuadSortingTemplate {
             if engine.compare(pta + 1, pta + 3, by: <=) {
               engine.swap(pta + 1, pta + 2)
             } else {
-              let temp = engine.values[pta + 1]
-              engine.setValue(pta + 1, engine.values[pta + 2])
-              engine.setValue(pta + 2, engine.values[pta + 3])
+              let temp = engine.readValue(at: pta + 1)
+              engine.setValue(pta + 1, engine.readValue(at: pta + 2))
+              engine.setValue(pta + 2, engine.readValue(at: pta + 3))
               engine.setValue(pta + 3, temp)
             }
           } else if engine.compare(pta, pta + 3, by: >) {
             engine.swap(pta + 1, pta + 3)
             engine.swap(pta, pta + 2)
           } else if engine.compare(pta + 1, pta + 3, by: <=) {
-            let temp = engine.values[pta + 1]
-            engine.setValue(pta + 1, engine.values[pta])
-            engine.setValue(pta, engine.values[pta + 2])
+            let temp = engine.readValue(at: pta + 1)
+            engine.setValue(pta + 1, engine.readValue(at: pta))
+            engine.setValue(pta, engine.readValue(at: pta + 2))
             engine.setValue(pta + 2, temp)
           } else {
-            let temp = engine.values[pta + 1]
-            engine.setValue(pta + 1, engine.values[pta])
-            engine.setValue(pta, engine.values[pta + 2])
-            engine.setValue(pta + 2, engine.values[pta + 3])
+            let temp = engine.readValue(at: pta + 1)
+            engine.setValue(pta + 1, engine.readValue(at: pta))
+            engine.setValue(pta, engine.readValue(at: pta + 2))
+            engine.setValue(pta + 2, engine.readValue(at: pta + 3))
             engine.setValue(pta + 3, temp)
           }
         }
@@ -716,24 +716,24 @@ enum QuadSortingTemplate {
               if engine.compare(pta + 1, pta + 3, by: <=) {
                 engine.swap(pta + 1, pta + 2)
               } else {
-                let temp = engine.values[pta + 1]
-                engine.setValue(pta + 1, engine.values[pta + 2])
-                engine.setValue(pta + 2, engine.values[pta + 3])
+                let temp = engine.readValue(at: pta + 1)
+                engine.setValue(pta + 1, engine.readValue(at: pta + 2))
+                engine.setValue(pta + 2, engine.readValue(at: pta + 3))
                 engine.setValue(pta + 3, temp)
               }
             } else if engine.compare(pta, pta + 3, by: >) {
               engine.swap(pta, pta + 2)
               engine.swap(pta + 1, pta + 3)
             } else if engine.compare(pta + 1, pta + 3, by: <=) {
-              let temp = engine.values[pta]
-              engine.setValue(pta, engine.values[pta + 2])
-              engine.setValue(pta + 2, engine.values[pta + 1])
+              let temp = engine.readValue(at: pta)
+              engine.setValue(pta, engine.readValue(at: pta + 2))
+              engine.setValue(pta + 2, engine.readValue(at: pta + 1))
               engine.setValue(pta + 1, temp)
             } else {
-              let temp = engine.values[pta]
-              engine.setValue(pta, engine.values[pta + 2])
-              engine.setValue(pta + 2, engine.values[pta + 3])
-              engine.setValue(pta + 3, engine.values[pta + 1])
+              let temp = engine.readValue(at: pta)
+              engine.setValue(pta, engine.readValue(at: pta + 2))
+              engine.setValue(pta + 2, engine.readValue(at: pta + 3))
+              engine.setValue(pta + 3, engine.readValue(at: pta + 1))
               engine.setValue(pta + 1, temp)
             }
           }

@@ -16,10 +16,10 @@ public struct MSDRadixSort: SortAlgorithm {
     category: .distribution,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 4292, coefficients: [239924, 105.28, 0.0115046],
+      anchorSize: 2923, coefficients: [239903, 149.445, 0.0230463],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .polynomialIntercept, coefficients: [0.0115046, 6.52513, -11.2883], rSquared: 0.999346),
+      family: .polynomialIntercept, coefficients: [0.0230463, 14.716, -18.4128], rSquared: 0.99943),
     implementationComplexity: 13,
     stable: true,
     timeComplexity: ComplexityBounds(
@@ -50,7 +50,7 @@ public struct MSDRadixSort: SortAlgorithm {
     // sits exactly on a power of `radix` down by one and silently drop a whole digit place).
     var maxValue = 0
     for i in 0..<n {
-      maxValue = max(maxValue, engine.values[i])
+      maxValue = max(maxValue, engine.readValue(at: i))
     }
     var highestPower = 0
     var probe = radix
@@ -65,7 +65,7 @@ public struct MSDRadixSort: SortAlgorithm {
       // One fresh "registers" bucket array per recursion frame, exactly like ArrayV.
       var buckets = [[Int]](repeating: [], count: radix)
       for i in min..<max {
-        buckets[getDigit(engine.values[i], power)].append(engine.values[i])
+        buckets[getDigit(engine.readValue(at: i), power)].append(engine.readValue(at: i))
       }
 
       let handle = engine.createAuxArray(length: max - min)

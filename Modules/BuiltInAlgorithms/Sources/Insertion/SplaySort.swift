@@ -32,10 +32,10 @@ public struct SplaySort: SortAlgorithm {
     category: .insertion,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 4925, coefficients: [134363, 32.8644, 0.000644423],
+      anchorSize: 5149, coefficients: [135462, 30.72, 0.000465243],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .powerLog, coefficients: [1.53133, 1.08701], rSquared: 0.999659),
+      family: .powerLog, coefficients: [1.9962, 1.05068], rSquared: 0.99996),
     implementationComplexity: 36,
     stable: true,
     timeComplexity: ComplexityBounds(best: "O(n)", average: "O(n log n)", worst: "O(n log n)"),
@@ -182,7 +182,7 @@ public struct SplaySort: SortAlgorithm {
 
     var root: Node?
     for i in 0..<n {
-      root = insertRec(root, engine.values[i])
+      root = insertRec(root, engine.readValue(at: i))
     }
 
     var index = 0

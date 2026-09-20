@@ -39,10 +39,10 @@ public struct MatrixSort: SortAlgorithm {
     category: .concurrent,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 1374, coefficients: [239868, 304.591, 0.0942693],
+      anchorSize: 809, coefficients: [239639, 504.254, 0.255142],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .polynomialIntercept, coefficients: [0.0942693, 45.5387, -670.663], rSquared: 0.999969),
+      family: .polynomialIntercept, coefficients: [0.255142, 91.4347, -1317.39], rSquared: 0.999961),
     implementationComplexity: 26,
     stable: true,
     timeComplexity: ComplexityBounds(
@@ -75,10 +75,10 @@ public struct MatrixSort: SortAlgorithm {
     @discardableResult
     func insertLast(_ a: Int, _ b: Int, _ gap: Int, _ dir: Bool) -> Bool {
       var did = false
-      let key = engine.values[b]
+      let key = engine.readValue(at: b)
       var j = b - gap
-      while j >= a, dirCompareVal(key, engine.values[j], dir) < 0 {
-        engine.setValue(j + gap, engine.values[j])
+      while j >= a, dirCompareVal(key, engine.readValue(at: j), dir) < 0 {
+        engine.setValue(j + gap, engine.readValue(at: j))
         did = true
         j -= gap
       }

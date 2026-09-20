@@ -15,7 +15,7 @@ public struct ShuffledTailShuffle: ShuffleAlgorithm {
 
     let auxHandle = engine.createAuxArray(length: n)
     var aux = [Int](repeating: 0, count: n)
-    var values = engine.values
+    var values = engine.readAllValues()
 
     var i = 0
     var j = 0

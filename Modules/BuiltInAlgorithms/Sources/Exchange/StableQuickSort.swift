@@ -22,10 +22,10 @@ public struct StableQuickSort: SortAlgorithm {
     category: .exchange,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 692, coefficients: [239777, 692.5, 0.5],
+      anchorSize: 399, coefficients: [238999, 1197.5, 1.5],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .polynomialIntercept, coefficients: [0.5, 0.5, -1], rSquared: 1),
+      family: .polynomialIntercept, coefficients: [1.5, 0.5, -2], rSquared: 1),
     implementationComplexity: 9,
     stable: true,
     timeComplexity: ComplexityBounds(
@@ -45,16 +45,16 @@ public struct StableQuickSort: SortAlgorithm {
   /// Poor pivot choice (always `array[start]`, matching ArrayV's own comment), returns the
   /// pivot's final resting index.
   private func stablePartition(_ engine: inout RecordingEngine, _ start: Int, _ end: Int) -> Int {
-    let pivotValue = engine.values[start]
+    let pivotValue = engine.readValue(at: start)
 
     var leftList: [Int] = []
     var rightList: [Int] = []
 
     for i in (start + 1)...end {
-      if engine.values[i] < pivotValue {
-        leftList.append(engine.values[i])
+      if engine.readValue(at: i) < pivotValue {
+        leftList.append(engine.readValue(at: i))
       } else {
-        rightList.append(engine.values[i])
+        rightList.append(engine.readValue(at: i))
       }
     }
 

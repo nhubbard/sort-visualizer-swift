@@ -15,10 +15,10 @@ public struct ShatterSort: SortAlgorithm {
     category: .distribution,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 977, coefficients: [239859, 468.347, 0.227713],
+      anchorSize: 958, coefficients: [239949, 474.123, 0.233038],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .polynomialIntercept, coefficients: [0.227713, 23.3957, -357.268], rSquared: 0.995959),
+      family: .polynomialIntercept, coefficients: [0.233038, 27.6225, -387.403], rSquared: 0.995963),
     implementationComplexity: 13,
     stable: true,
     timeComplexity: ComplexityBounds(

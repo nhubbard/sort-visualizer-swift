@@ -8,10 +8,10 @@ public struct ShellSort: SortAlgorithm {
     category: .insertion,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 1379, coefficients: [239961, 296.697, 0.0887158],
+      anchorSize: 1374, coefficients: [239969, 298.068, 0.0895609],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .polynomialIntercept, coefficients: [0.0887158, 52.0191, -478.52], rSquared: 0.999946),
+      family: .polynomialIntercept, coefficients: [0.0895609, 51.9549, -496.608], rSquared: 0.999886),
     implementationComplexity: 6,
     stable: false,
     timeComplexity: ComplexityBounds(

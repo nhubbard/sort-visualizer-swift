@@ -13,10 +13,10 @@ public struct BinaryQuickSortRecursive: SortAlgorithm {
     category: .distribution,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 2823, coefficients: [181627, 73.6464, 0.00170668],
+      anchorSize: 2834, coefficients: [182761, 73.2858],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .powerLog, coefficients: [6.97262, 1.01882], rSquared: 0.997448),
+      family: .powerLog, coefficients: [7.45573, 1.01062], rSquared: 0.99779),
     implementationComplexity: 13,
     stable: false,
     timeComplexity: ComplexityBounds(
@@ -30,7 +30,7 @@ public struct BinaryQuickSortRecursive: SortAlgorithm {
   public func record(into engine: inout RecordingEngine) {
     let n = engine.count
     guard n > 1 else { return }
-    let msb = BinaryQuickSortingTemplate.mostSignificantBit(engine.values)
+    let msb = BinaryQuickSortingTemplate.mostSignificantBit(engine.readAllValues())
     BinaryQuickSortingTemplate.binaryQuickSortRecursive(&engine, 0, n - 1, msb)
   }
 }

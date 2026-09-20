@@ -23,10 +23,10 @@ public struct LRQuickSort: SortAlgorithm {
     category: .exchange,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 555, coefficients: [239548, 849.223, 0.752436],
+      anchorSize: 554, coefficients: [239248, 848.706, 0.752418],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .polynomialIntercept, coefficients: [0.752436, 14.0195, -2.24718], rSquared: 1),
+      family: .polynomialIntercept, coefficients: [0.752418, 15.0267, -5.7948], rSquared: 1),
     implementationComplexity: 11,
     stable: false,
     timeComplexity: ComplexityBounds(best: "O(n log n)", average: "O(n log n)", worst: "O(n^2)"),
@@ -67,7 +67,7 @@ public struct LRQuickSort: SortAlgorithm {
       // Held-value pattern (see the doc comment above): the pivot's own slot is never written to
       // during this partition, so one read up front stands in for every live comparison against
       // it below.
-      let pivotValue = engine.values[pivotIndex]
+      let pivotValue = engine.readValue(at: pivotIndex)
 
       var i = p
       var j = r

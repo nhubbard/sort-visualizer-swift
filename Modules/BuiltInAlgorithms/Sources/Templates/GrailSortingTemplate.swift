@@ -96,7 +96,7 @@ enum GrailSortingTemplate {
 
     while dist < len && foundKeys < numKeys {
       let loc = binSearch(&engine, pos + firstKey, foundKeys, pos + dist, true)
-      if loc == foundKeys || engine.values[pos + dist] != engine.values[pos + (firstKey + loc)] {
+      if loc == foundKeys || engine.readValue(at: pos + dist) != engine.readValue(at: pos + (firstKey + loc)) {
         rotate(&engine, pos + firstKey, foundKeys, dist - (firstKey + foundKeys))
         firstKey = dist - foundKeys
         rotate(&engine, pos + (firstKey + loc), foundKeys - loc, 1)
@@ -431,7 +431,7 @@ enum GrailSortingTemplate {
           let leftHead = blockPos + leftIndex * regBlockLen
           let rightHead = blockPos + rightIndex * regBlockLen
           let rightComp = engine.compare(leftHead, rightHead, by: >)
-          let tied = !rightComp && engine.values[leftHead] == engine.values[rightHead]
+          let tied = !rightComp && engine.readValue(at: leftHead) == engine.readValue(at: rightHead)
           if rightComp || (tied && engine.compare(keyPos + leftIndex, keyPos + rightIndex, by: >)) {
             leftIndex = rightIndex
           }

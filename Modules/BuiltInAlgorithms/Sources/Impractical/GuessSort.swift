@@ -8,10 +8,10 @@ public struct GuessSort: SortAlgorithm {
     category: .impractical,
     sizeRange: 3...4,
     growthModel: OperationGrowthModel(
-      anchorSize: 4, coefficients: [15975.7, 48236.9, 72823.2, 73294, 55326, 33410.2],
+      anchorSize: 4, coefficients: [15984.2, 48256.5, 72843.6, 73305.4, 55327.5, 33407],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .exponential, coefficients: [0.0908296, 20.479], rSquared: 0.997496),
+      family: .exponential, coefficients: [0.0910165, 20.4712], rSquared: 0.997471),
     implementationComplexity: 17,
     stable: false,
     timeComplexity: ComplexityBounds(best: "O(n)", average: "O(n^n)", worst: "O(n^n)"),
@@ -74,7 +74,7 @@ public struct GuessSort: SortAlgorithm {
       if pos == n { break }
     }
 
-    let original = engine.values
+    let original = engine.readAllValues()
     for i in 0..<n {
       engine.setValue(i, original[indexes[i]])
     }

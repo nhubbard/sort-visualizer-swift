@@ -15,14 +15,14 @@ public struct RealFinalRadixShuffle: ShuffleAlgorithm {
 
     var mask = 0
     for i in 0..<n {
-      while mask < engine.values[i] {
+      while mask < engine.readValue(at: i) {
         mask = (mask << 1) + 1
       }
     }
     mask >>= 1
 
     var counts = [Int](repeating: 0, count: mask + 2)
-    let original = engine.values
+    let original = engine.readAllValues()
 
     for i in 0..<n {
       counts[(original[i] & mask) + 1] += 1

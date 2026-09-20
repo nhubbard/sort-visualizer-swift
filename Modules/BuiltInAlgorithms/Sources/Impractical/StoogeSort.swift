@@ -8,10 +8,10 @@ public struct StoogeSort: SortAlgorithm {
     category: .impractical,
     sizeRange: 16...32,
     growthModel: OperationGrowthModel(
-      anchorSize: 38, coefficients: [224731, 17718.9, 100.418],
+      anchorSize: 62, coefficients: [230247, 10821.5, 167.03, 0.82074],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .polynomialIntercept, coefficients: [100.418, 10087.1, -303583], rSquared: 0.994979),
+      family: .powerLaw, coefficients: [1.378, 2.91395], rSquared: 0.993136),
     implementationComplexity: 5,
     stable: false,
     timeComplexity: ComplexityBounds(

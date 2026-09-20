@@ -19,10 +19,10 @@ public struct RedBlackTreeSort: SortAlgorithm {
     category: .insertion,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 2141, coefficients: [187269, 110.438, 0.00642576],
+      anchorSize: 2153, coefficients: [187556, 108.988, 0.0060122],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .powerLog, coefficients: [4.13756, 1.13222], rSquared: 0.998576),
+      family: .powerLog, coefficients: [4.49137, 1.12081], rSquared: 0.998852),
     implementationComplexity: 25,
     stable: true,
     timeComplexity: ComplexityBounds(best: "O(n log n)", average: "O(n log n)", worst: "O(n log n)"),
@@ -122,7 +122,7 @@ public struct RedBlackTreeSort: SortAlgorithm {
     func traverse(_ node: Node?) {
       guard let node else { return }
       traverse(node.left)
-      sortedValues.append(engine.values[node.pointer])
+      sortedValues.append(engine.readValue(at: node.pointer))
       traverse(node.right)
     }
     traverse(root)

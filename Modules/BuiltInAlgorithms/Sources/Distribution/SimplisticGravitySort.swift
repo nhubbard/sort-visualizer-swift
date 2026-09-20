@@ -18,10 +18,10 @@ public struct SimplisticGravitySort: SortAlgorithm {
     category: .distribution,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 346, coefficients: [238740, 1382, 2],
+      anchorSize: 261, coefficients: [238320, 1826.51, 3.49985],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .polynomialIntercept, coefficients: [2, -2, 0], rSquared: 1),
+      family: .polynomialIntercept, coefficients: [3.49985, -0.408521, 13.6668], rSquared: 1),
     implementationComplexity: 11,
     stable: true,
     timeComplexity: ComplexityBounds(
@@ -36,11 +36,11 @@ public struct SimplisticGravitySort: SortAlgorithm {
     let n = engine.count
     guard n > 1 else { return }
 
-    var minValue = engine.values[0]
-    var maxValue = engine.values[0]
+    var minValue = engine.readValue(at: 0)
+    var maxValue = engine.readValue(at: 0)
     for i in 1..<n {
-      if engine.values[i] < minValue { minValue = engine.values[i] }
-      if engine.values[i] > maxValue { maxValue = engine.values[i] }
+      if engine.readValue(at: i) < minValue { minValue = engine.readValue(at: i) }
+      if engine.readValue(at: i) > maxValue { maxValue = engine.readValue(at: i) }
     }
 
     // Sized `max - min` exactly like ArrayV's own `aux` — every position's value can shed at
@@ -53,8 +53,8 @@ public struct SimplisticGravitySort: SortAlgorithm {
 
     func transferTo(_ index: Int) {
       var pointer = 0
-      while engine.values[index] > minValue {
-        engine.setValue(index, engine.values[index] - 1)
+      while engine.readValue(at: index) > minValue {
+        engine.setValue(index, engine.readValue(at: index) - 1)
         aux[pointer] += 1
         engine.writeAux(auxHandle, at: pointer, value: aux[pointer])
         pointer += 1
@@ -64,7 +64,7 @@ public struct SimplisticGravitySort: SortAlgorithm {
     func transferFrom(_ index: Int) {
       var pointer = 0
       while pointer < auxLength, aux[pointer] != 0 {
-        engine.setValue(index, engine.values[index] + 1)
+        engine.setValue(index, engine.readValue(at: index) + 1)
         aux[pointer] -= 1
         engine.writeAux(auxHandle, at: pointer, value: aux[pointer])
         pointer += 1

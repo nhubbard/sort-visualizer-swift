@@ -8,10 +8,10 @@ public struct QuickBogoSort: SortAlgorithm {
     category: .impractical,
     sizeRange: 4...6,
     growthModel: OperationGrowthModel(
-      anchorSize: 7, coefficients: [80426.6, 170544, 187079, 140785, 81461.4, 38549.3],
+      anchorSize: 7, coefficients: [39557.6, 74867.8, 73596.8, 49767.1, 25927.8, 11064.6],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .factorial, coefficients: [59.1261, 1.08972], rSquared: 0.999744),
+      family: .factorial, coefficients: [63.1451, 0.97262], rSquared: 0.947576),
     implementationComplexity: 22,
     stable: false,
     timeComplexity: ComplexityBounds(

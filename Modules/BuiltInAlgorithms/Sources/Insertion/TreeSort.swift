@@ -19,10 +19,10 @@ public struct TreeSort: SortAlgorithm {
     category: .insertion,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 310, coefficients: [239785, 1548.5, 2.5],
+      anchorSize: 309, coefficients: [238546, 1544.5, 2.5],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .polynomialIntercept, coefficients: [2.5, -1.5, -6.79585e-11], rSquared: 1),
+      family: .polynomialIntercept, coefficients: [2.5, -0.5, -2], rSquared: 1),
     implementationComplexity: 19,
     stable: true,
     timeComplexity: ComplexityBounds(best: "O(n log n)", average: "O(n log n)", worst: "O(n^2)"),
@@ -92,7 +92,7 @@ public struct TreeSort: SortAlgorithm {
           current = node.left
         }
         let node = stack.removeLast()
-        sortedValues.append(engine.values[node.pointer])
+        sortedValues.append(engine.readValue(at: node.pointer))
         current = node.right
       }
     }

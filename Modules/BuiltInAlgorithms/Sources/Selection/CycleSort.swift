@@ -8,10 +8,10 @@ public struct CycleSort: SortAlgorithm {
     category: .selection,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 35, coefficients: [131621, 35784, 5008.13, 478.549, 35.0019, 2.08498],
+      anchorSize: 37, coefficients: [117369, 31203.6, 4264.66, 397.58, 28.3511, 1.64557],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .polynomialIntercept, coefficients: [0.000218692, 0.858133, -0.720986], rSquared: 0.999935),
+      family: .factorial, coefficients: [95.6265, 0.0736266], rSquared: 0.554694),
     implementationComplexity: 9,
     stable: false,
     timeComplexity: ComplexityBounds(best: "O(n^2)", average: "O(n^2)", worst: "O(n^2)"),
@@ -42,7 +42,7 @@ public struct CycleSort: SortAlgorithm {
       // Hold the value currently at `i`; position `i` itself is left untouched until the
       // cycle that starts here closes, exactly as ArrayV does (`Writes.write(array, i,
       // t, ...)` only happens once, at the very end of the `if (r != i)` block).
-      var t = engine.values[i]
+      var t = engine.readValue(at: i)
       var r = countLesser(i, n, t)
 
       // `t` is already where it belongs — nothing to rotate for this `i`.
@@ -63,7 +63,7 @@ public struct CycleSort: SortAlgorithm {
         // `Writes.write`, not a swap, for this step, so `setValue` is the matching
         // primitive here — each element is written at most once to its final resting
         // place, which is Cycle Sort's defining minimal-writes property.
-        let t1 = engine.values[r]
+        let t1 = engine.readValue(at: r)
         engine.setValue(r, t)
         t = t1
 

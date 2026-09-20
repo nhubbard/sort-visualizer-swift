@@ -36,10 +36,10 @@ public struct ImprovedBlockSelectionSort: SortAlgorithm {
     category: .hybrid,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 921, coefficients: [225858, 330.766, 0.0597746],
+      anchorSize: 920, coefficients: [225903, 331.444, 0.0601494],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .powerLog, coefficients: [9.0329, 1.20228], rSquared: 0.99526),
+      family: .powerLog, coefficients: [8.98586, 1.20329], rSquared: 0.995165),
     implementationComplexity: 53,
     stable: false,
     timeComplexity: ComplexityBounds(best: "O(n log n)", average: "O(n log n)", worst: "O(n log n)"),

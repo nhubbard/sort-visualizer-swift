@@ -8,10 +8,10 @@ public struct BubbleSort: SortAlgorithm {
     category: .exchange,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 219, coefficients: [238710, 2185, 5],
+      anchorSize: 219, coefficients: [238708, 2185, 5],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .polynomialIntercept, coefficients: [5, -5, -1.35917e-10], rSquared: 1),
+      family: .polynomialIntercept, coefficients: [5, -5, -2], rSquared: 1),
     implementationComplexity: 5,
     stable: true,
     timeComplexity: ComplexityBounds(best: "O(n)", average: "O(n^2)", worst: "O(n^2)"),

@@ -23,10 +23,10 @@ public struct ClassicTreeSort: SortAlgorithm {
     category: .insertion,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 309, coefficients: [238856, 1545.5, 2.5],
+      anchorSize: 309, coefficients: [239169, 1546.5, 2.5],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .polynomialIntercept, coefficients: [0, 3, -1], rSquared: 1),
+      family: .polynomialIntercept, coefficients: [2.5, 1.5, 3], rSquared: 1),
     implementationComplexity: 12,
     stable: true,
     timeComplexity: ComplexityBounds(best: "O(n log n)", average: "O(n log n)", worst: "O(n^2)"),
@@ -79,7 +79,7 @@ public struct ClassicTreeSort: SortAlgorithm {
     let tempHandle = engine.createAuxArray(length: n)
     var idx = 0
     traverse(
-      engine.values, lower, upper, root: 0, into: &temp, at: &idx, engine: &engine,
+      engine.readAllValues(), lower, upper, root: 0, into: &temp, at: &idx, engine: &engine,
       tempHandle: tempHandle)
 
     for i in 0..<n {

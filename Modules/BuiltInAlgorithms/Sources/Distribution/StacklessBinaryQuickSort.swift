@@ -21,10 +21,10 @@ public struct StacklessBinaryQuickSort: SortAlgorithm {
     category: .distribution,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 4823, coefficients: [130922, 35.5342, 0.00109931],
+      anchorSize: 3398, coefficients: [239951, 121.729, 0.015025],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .powerLog, coefficients: [0.632795, 1.19113], rSquared: 0.987733),
+      family: .polynomialIntercept, coefficients: [0.015025, 19.619, -199.602], rSquared: 0.999907),
     implementationComplexity: 19,
     stable: false,
     timeComplexity: ComplexityBounds(
@@ -48,9 +48,9 @@ public struct StacklessBinaryQuickSort: SortAlgorithm {
       var j = b
       while true {
         i += 1
-        while i < j && !getBit(engine.values[i], bit) { i += 1 }
+        while i < j && !getBit(engine.readValue(at: i), bit) { i += 1 }
         j -= 1
-        while j > i && getBit(engine.values[j], bit) { j -= 1 }
+        while j > i && getBit(engine.readValue(at: j), bit) { j -= 1 }
         if i < j {
           engine.swap(i, j)
         } else {
@@ -59,7 +59,7 @@ public struct StacklessBinaryQuickSort: SortAlgorithm {
       }
     }
 
-    var q = BinaryQuickSortingTemplate.mostSignificantBit(engine.values)
+    var q = BinaryQuickSortingTemplate.mostSignificantBit(engine.readAllValues())
     guard q >= 0 else { return }
     var m = 0
     var i = 0
@@ -73,7 +73,7 @@ public struct StacklessBinaryQuickSort: SortAlgorithm {
         while !getBit(m, q + 1) { q += 1 }
 
         i = b
-        while b < n && (engine.values[b] >> (q + 1)) == (m >> (q + 1)) {
+        while b < n && (engine.readValue(at: b) >> (q + 1)) == (m >> (q + 1)) {
           b += 1
         }
       } else {

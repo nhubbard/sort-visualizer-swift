@@ -15,10 +15,10 @@ public struct HybridCombSort: SortAlgorithm {
     category: .hybrid,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 1095, coefficients: [239934, 387.443, 0.153455],
+      anchorSize: 1064, coefficients: [239974, 405.116, 0.168524],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .polynomialIntercept, coefficients: [0.153455, 51.3758, -318.896], rSquared: 0.999988),
+      family: .polynomialIntercept, coefficients: [0.168524, 46.4975, -284.539], rSquared: 0.999999),
     implementationComplexity: 13,
     stable: false,
     timeComplexity: ComplexityBounds(best: "O(n log n)", average: "O(n^2)", worst: "O(n^2)"),

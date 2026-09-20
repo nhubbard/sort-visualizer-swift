@@ -16,10 +16,10 @@ public struct BitonicSortRecursive: SortAlgorithm {
     category: .concurrent,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 940, coefficients: [239944, 372.102, 0.0905988],
+      anchorSize: 938, coefficients: [239642, 372.71, 0.0911615],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .powerLaw, coefficients: [11.119, 1.45774], rSquared: 0.996688),
+      family: .powerLaw, coefficients: [11.0549, 1.45885], rSquared: 0.996604),
     implementationComplexity: 11,
     stable: false,
     timeComplexity: ComplexityBounds(

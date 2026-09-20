@@ -8,10 +8,10 @@ public struct WeakHeapSort: SortAlgorithm {
     category: .selection,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 2213, coefficients: [198458, 101.593],
+      anchorSize: 2190, coefficients: [197065, 103.13, 0.00309257],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .powerLog, coefficients: [11.3751, 1.00303], rSquared: 0.999961),
+      family: .powerLog, coefficients: [10.3378, 1.01608], rSquared: 0.999559),
     implementationComplexity: 10,
     stable: false,
     timeComplexity: ComplexityBounds(

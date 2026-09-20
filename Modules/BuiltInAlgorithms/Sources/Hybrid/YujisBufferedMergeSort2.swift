@@ -27,10 +27,10 @@ public struct YujisBufferedMergeSort2: SortAlgorithm {
     category: .hybrid,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 1369, coefficients: [239787, 307.425, 0.0963836],
+      anchorSize: 1325, coefficients: [239844, 313.243, 0.0995006],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .polynomialIntercept, coefficients: [0.0963836, 43.5268, -440.105], rSquared: 0.998975),
+      family: .polynomialIntercept, coefficients: [0.0995006, 49.5665, -517.077], rSquared: 0.999024),
     implementationComplexity: 62,
     stable: false,
     timeComplexity: ComplexityBounds(best: "O(n log n)", average: "O(n log n)", worst: "O(n log n)"),
@@ -65,11 +65,11 @@ public struct YujisBufferedMergeSort2: SortAlgorithm {
     // element originally at `a` into `b`. Written with a `while` loop, not a `for`/`Range`, since
     // callers can pass `a == b` (a no-op) and a `Range` literal would need extra guarding.
     func insertTo(_ a: Int, _ b: Int) {
-      let temp = engine.values[a]
+      let temp = engine.readValue(at: a)
       var a = a
       while a > b {
         a -= 1
-        engine.setValue(a + 1, engine.values[a])
+        engine.setValue(a + 1, engine.readValue(at: a))
       }
       engine.setValue(b, temp)
     }
@@ -106,7 +106,7 @@ public struct YujisBufferedMergeSort2: SortAlgorithm {
     func binaryInsertion(_ a: Int, _ b: Int) {
       var i = a + 1
       while i < b {
-        let value = engine.values[i]
+        let value = engine.readValue(at: i)
         insertTo(i, binarySearch(a, i, value, left: false))
         i += 1
       }
@@ -160,7 +160,7 @@ public struct YujisBufferedMergeSort2: SortAlgorithm {
       if useBinarySearch {
         while i < m - a && j < b {
           if engine.compare(j, p + i, by: (<)) {
-            let value = engine.values[p + i]
+            let value = engine.readValue(at: p + i)
             let q = binarySearch(j, b, value, left: true)
             while j < q {
               engine.swap(k, j)

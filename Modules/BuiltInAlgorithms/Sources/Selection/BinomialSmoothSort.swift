@@ -8,10 +8,10 @@ public struct BinomialSmoothSort: SortAlgorithm {
     category: .selection,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 753, coefficients: [231631, 498.093, 0.200148],
+      anchorSize: 749, coefficients: [231605, 503.637, 0.206674],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .powerLog, coefficients: [2.08824, 1.46826], rSquared: 0.992037),
+      family: .powerLog, coefficients: [1.97921, 1.47765], rSquared: 0.992168),
     implementationComplexity: 17,
     stable: false,
     timeComplexity: ComplexityBounds(

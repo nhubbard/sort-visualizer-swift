@@ -11,10 +11,10 @@ public struct UnstableGrailSort: SortAlgorithm {
     category: .hybrid,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 1097, coefficients: [219025, 278.045, 0.0478977],
+      anchorSize: 1086, coefficients: [219148, 281.797, 0.0495357],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .powerLog, coefficients: [4.96437, 1.24975], rSquared: 0.990058),
+      family: .powerLog, coefficients: [4.91049, 1.2534], rSquared: 0.987274),
     implementationComplexity: 98,
     stable: false,
     timeComplexity: ComplexityBounds(

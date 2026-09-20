@@ -39,10 +39,10 @@ public struct DropMergeSort: SortAlgorithm {
     category: .hybrid,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 1044, coefficients: [239819, 444.106, 0.205487],
+      anchorSize: 947, coefficients: [239653, 492.552, 0.253193],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .polynomialIntercept, coefficients: [0.205487, 15.0498, 139.87], rSquared: 0.998895),
+      family: .polynomialIntercept, coefficients: [0.253193, 13.0043, 271.861], rSquared: 0.998533),
     // Calibrated against `pdqbad` — the binding (worst-case) shuffle across the whole suite,
     // which reliably triggers the early-out fallback into a plain O(n log n) sort. This is the
     // right shuffle to bind against: growthModel exists to bound the *expensive* case, and an
@@ -88,18 +88,18 @@ public struct DropMergeSort: SortAlgorithm {
 
       if write == 0 || engine.compare(read, write - 1, by: (>=)) {
         // In order — keep it.
-        engine.setValue(write, engine.values[read])
+        engine.setValue(write, engine.readValue(at: read))
         write += 1
         read += 1
         numDroppedInARow = 0
       } else if numDroppedInARow == 0 && write >= 2 && engine.compare(read, write - 2, by: (>=)) {
         // Quick undo: the element two back would have accepted this one just fine, so drop
         // the one immediately before it instead of the new element.
-        dropped.append(engine.values[write - 1])
-        engine.setValue(write - 1, engine.values[read])
+        dropped.append(engine.readValue(at: write - 1))
+        engine.setValue(write - 1, engine.readValue(at: read))
         read += 1
       } else if numDroppedInARow < recency {
-        dropped.append(engine.values[read])
+        dropped.append(engine.readValue(at: read))
         read += 1
         numDroppedInARow += 1
       } else {
@@ -115,8 +115,8 @@ public struct DropMergeSort: SortAlgorithm {
         // See the type-level doc comment: `read` (the index), not `array[read]`, is the
         // faithfully-reproduced seed here.
         var maxOfDropped = read
-        for i in (read + 1)...(read + numDroppedInARow) where engine.values[i] > maxOfDropped {
-          maxOfDropped = engine.values[i]
+        for i in (read + 1)...(read + numDroppedInARow) where engine.readValue(at: i) > maxOfDropped {
+          maxOfDropped = engine.readValue(at: i)
         }
 
         while write >= 1 && engine.compareValue(write - 1, against: maxOfDropped, by: (>)) {
@@ -125,7 +125,7 @@ public struct DropMergeSort: SortAlgorithm {
         }
 
         for i in write..<(write + numBacktracked) {
-          dropped.append(engine.values[i])
+          dropped.append(engine.readValue(at: i))
         }
 
         numDroppedInARow = 0
@@ -144,7 +144,7 @@ public struct DropMergeSort: SortAlgorithm {
     let bufferHandle = engine.createAuxArray(length: dropped.count)
     var buffer = [Int](repeating: 0, count: dropped.count)
     for i in 0..<dropped.count {
-      buffer[i] = engine.values[write + i]
+      buffer[i] = engine.readValue(at: write + i)
       engine.writeAux(bufferHandle, at: i, value: buffer[i])
     }
 
@@ -161,7 +161,7 @@ public struct DropMergeSort: SortAlgorithm {
         k -= 1
         i -= 1
       } else {
-        engine.setValue(k, engine.values[j])
+        engine.setValue(k, engine.readValue(at: j))
         k -= 1
         j -= 1
       }

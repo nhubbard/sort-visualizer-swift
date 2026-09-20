@@ -24,10 +24,10 @@ public struct PDMergeSort: SortAlgorithm {
     category: .merge,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 2523, coefficients: [183052, 86.1501, 0.00296527],
+      anchorSize: 2296, coefficients: [189132, 97.7453, 0.00367241],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .powerLog, coefficients: [5.8005, 1.05975], rSquared: 0.998944),
+      family: .powerLog, coefficients: [6.8274, 1.05738], rSquared: 0.998344),
     implementationComplexity: 28,
     stable: true,
     timeComplexity: ComplexityBounds(
@@ -52,7 +52,7 @@ public struct PDMergeSort: SortAlgorithm {
 
     func mergeUp(_ start: Int, _ mid: Int, _ end: Int) {
       for i in 0..<(mid - start) {
-        writeCopied(i, engine.values[i + start])
+        writeCopied(i, engine.readValue(at: i + start))
       }
       var bufferPointer = 0
       var left = start
@@ -66,7 +66,7 @@ public struct PDMergeSort: SortAlgorithm {
           engine.setValue(left, copied[bufferPointer])
           bufferPointer += 1
         } else {
-          engine.setValue(left, engine.values[right])
+          engine.setValue(left, engine.readValue(at: right))
           right += 1
         }
         left += 1
@@ -80,7 +80,7 @@ public struct PDMergeSort: SortAlgorithm {
 
     func mergeDown(_ start: Int, _ mid: Int, _ end: Int) {
       for i in 0..<(end - mid) {
-        writeCopied(i, engine.values[i + mid])
+        writeCopied(i, engine.readValue(at: i + mid))
       }
       var bufferPointer = end - mid - 1
       var left = mid - 1
@@ -92,7 +92,7 @@ public struct PDMergeSort: SortAlgorithm {
           engine.setValue(right, copied[bufferPointer])
           bufferPointer -= 1
         } else {
-          engine.setValue(right, engine.values[left])
+          engine.setValue(right, engine.readValue(at: left))
           left -= 1
         }
         right -= 1

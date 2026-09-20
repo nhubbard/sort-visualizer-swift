@@ -55,10 +55,10 @@ public struct FluxSort: SortAlgorithm {
     category: .hybrid,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 1898, coefficients: [193845, 157.794, 0.0221831],
+      anchorSize: 1524, coefficients: [207672, 221.765, 0.0448174],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .powerLog, coefficients: [0.601011, 1.41254], rSquared: 0.75106),
+      family: .powerLog, coefficients: [0.508814, 1.49098], rSquared: 0.587417),
     implementationComplexity: 935,
     stable: true,
     // fluxsort is documented worst-case O(n log n), unlike a plain median-of-one quicksort — the
@@ -254,7 +254,7 @@ public struct FluxSort: SortAlgorithm {
       nmemb > 1024
       ? medianOfFifteen(&engine, swap, mainIsSwap, ptxBase, nmemb)
       : medianOfNine(&engine, swap, mainIsSwap, ptxBase, nmemb)
-    let piv = mainIsSwap ? swap.values[medianIndex] : engine.values[medianIndex]
+    let piv = mainIsSwap ? swap.values[medianIndex] : engine.readValue(at: medianIndex)
 
     let pte = ptxBase + nmemb
     var pta = start
@@ -262,7 +262,7 @@ public struct FluxSort: SortAlgorithm {
     var ptx = ptxBase
 
     while ptx < pte {
-      let value = mainIsSwap ? swap.values[ptx] : engine.values[ptx]
+      let value = mainIsSwap ? swap.values[ptx] : engine.readValue(at: ptx)
       let val = value > piv ? 1 : 0
 
       engine.setValue(pta, value)

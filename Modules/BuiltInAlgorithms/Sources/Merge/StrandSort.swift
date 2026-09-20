@@ -8,10 +8,10 @@ public struct StrandSort: SortAlgorithm {
     category: .merge,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 309, coefficients: [239780, 1548.5, 2.5],
+      anchorSize: 277, coefficients: [239719, 2260.37, 6.52735, 0.00457654],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .polynomialIntercept, coefficients: [2.5, 3.5, -4], rSquared: 1),
+      family: .powerLog, coefficients: [0.0483521, 2.4341], rSquared: 0.734795),
     implementationComplexity: 11,
     stable: true,
     timeComplexity: ComplexityBounds(best: "O(n)", average: "O(n log n)", worst: "O(n^2)"),
@@ -51,7 +51,7 @@ public struct StrandSort: SortAlgorithm {
           a += 1
           i += 1
         } else {
-          engine.setValue(a, engine.values[m])
+          engine.setValue(a, engine.readValue(at: m))
           a += 1
           m += 1
         }
@@ -66,7 +66,7 @@ public struct StrandSort: SortAlgorithm {
     var j = n
     var k = j
     while j > 0 {
-      writeSubList(0, engine.values[0])
+      writeSubList(0, engine.readValue(at: 0))
       k -= 1
 
       var i = 0
@@ -76,10 +76,10 @@ public struct StrandSort: SortAlgorithm {
         engine.markAuxRead(subListHandle, at: i)
         if engine.compareValue(m, against: subList[i], by: (>=)) {
           i += 1
-          writeSubList(i, engine.values[m])
+          writeSubList(i, engine.readValue(at: m))
           k -= 1
         } else {
-          engine.setValue(p, engine.values[m])
+          engine.setValue(p, engine.readValue(at: m))
           p += 1
         }
       }

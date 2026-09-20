@@ -20,10 +20,10 @@ public struct ClassicGravitySort: SortAlgorithm {
     category: .distribution,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 309, coefficients: [239166, 1546.5, 2.5],
+      anchorSize: 308, coefficients: [238547, 1544.5, 2.5],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .polynomialIntercept, coefficients: [2.5, 1.5, 0], rSquared: 1),
+      family: .polynomialIntercept, coefficients: [2.5, 4.5, 1], rSquared: 1),
     implementationComplexity: 10,
     stable: true,
     timeComplexity: ComplexityBounds(
@@ -38,16 +38,16 @@ public struct ClassicGravitySort: SortAlgorithm {
     let n = engine.count
     guard n > 1 else { return }
 
-    var maxValue = engine.values[0]
-    for i in 1..<n where engine.values[i] > maxValue {
-      maxValue = engine.values[i]
+    var maxValue = engine.readValue(at: 0)
+    for i in 1..<n where engine.readValue(at: i) > maxValue {
+      maxValue = engine.readValue(at: i)
     }
 
     let transposeHandle = engine.createAuxArray(length: maxValue)
     var transpose = [Int](repeating: 0, count: maxValue)
 
     for i in 0..<n {
-      let value = engine.values[i]
+      let value = engine.readValue(at: i)
       for j in 0..<value {
         transpose[j] += 1
         engine.writeAux(transposeHandle, at: j, value: transpose[j])

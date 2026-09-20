@@ -13,10 +13,10 @@ public struct PigeonholeSort: SortAlgorithm {
     category: .distribution,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 79999, coefficients: [239997, 3],
+      anchorSize: 16654, coefficients: [239994, 23.0084, 0.000516332],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .powerLaw, coefficients: [3, 1], rSquared: 1),
+      family: .polynomialIntercept, coefficients: [0.000516332, 5.81043, 19.6641], rSquared: 0.999954),
     implementationComplexity: 8,
     stable: false,
     timeComplexity: ComplexityBounds(best: "O(n+k)", average: "O(n+k)", worst: "O(n+k)"),
@@ -33,11 +33,11 @@ public struct PigeonholeSort: SortAlgorithm {
     // ArrayV's min/max scan reads values directly (no stat-tracked compares), so this reads
     // `engine.values` and compares against the plain local `min`/`max` variables rather than
     // going through `engine.compare` — the same held-value pattern as `CycleSort`'s `t`.
-    var minValue = engine.values[0]
-    var maxValue = engine.values[0]
+    var minValue = engine.readValue(at: 0)
+    var maxValue = engine.readValue(at: 0)
     for i in 1..<n {
-      if engine.values[i] < minValue { minValue = engine.values[i] }
-      if engine.values[i] > maxValue { maxValue = engine.values[i] }
+      if engine.readValue(at: i) < minValue { minValue = engine.readValue(at: i) }
+      if engine.readValue(at: i) > maxValue { maxValue = engine.readValue(at: i) }
     }
 
     let mi = minValue
@@ -51,7 +51,7 @@ public struct PigeonholeSort: SortAlgorithm {
     var holes = [Int](repeating: 0, count: size)
 
     for x in 0..<n {
-      let value = engine.values[x]
+      let value = engine.readValue(at: x)
       holes[value - mi] += 1
       engine.writeAux(holesHandle, at: value - mi, value: holes[value - mi])
     }

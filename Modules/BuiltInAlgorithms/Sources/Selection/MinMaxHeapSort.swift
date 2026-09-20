@@ -26,10 +26,10 @@ public struct MinMaxHeapSort: SortAlgorithm {
     category: .selection,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 1114, coefficients: [219835, 258.857, 0.0344196],
+      anchorSize: 1104, coefficients: [219986, 262.353, 0.0357823],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .powerLog, coefficients: [8.58215, 1.1692], rSquared: 0.995883),
+      family: .powerLog, coefficients: [8.40894, 1.1739], rSquared: 0.995913),
     implementationComplexity: 31,
     stable: false,
     timeComplexity: ComplexityBounds(

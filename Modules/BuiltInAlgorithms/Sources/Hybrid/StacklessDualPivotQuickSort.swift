@@ -39,10 +39,10 @@ public struct StacklessDualPivotQuickSort: SortAlgorithm {
     category: .hybrid,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 1348, coefficients: [239739, 337.138, 0.118075],
+      anchorSize: 1356, coefficients: [239691, 326.922, 0.110609],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .polynomialIntercept, coefficients: [0.118075, 18.8081, -168.367], rSquared: 0.999151),
+      family: .polynomialIntercept, coefficients: [0.110609, 26.9503, -234.67], rSquared: 0.999149),
     // Sample sizes straddle this algorithm's own insertion-sort cutoff (24) the same way
     // `OptimizedDualPivotQuickSort`'s calibration did: 4 samples (16-19) fall entirely below it,
     // where the whole range goes through one binary-insertion pass whose O(n) shift-per-insert
@@ -75,10 +75,10 @@ public struct StacklessDualPivotQuickSort: SortAlgorithm {
     // the source: no highlight, just a running value, matching this codebase's convention of
     // reading `engine.values` directly (no `engine.compare` call) whenever the source compares a
     // held value rather than two live indices.
-    var max = engine.values[a0]
+    var max = engine.readValue(at: a0)
     if a0 + 1 < b {
-      for i in (a0 + 1)..<b where engine.values[i] > max {
-        max = engine.values[i]
+      for i in (a0 + 1)..<b where engine.readValue(at: i) > max {
+        max = engine.readValue(at: i)
       }
     }
 
@@ -87,7 +87,7 @@ public struct StacklessDualPivotQuickSort: SortAlgorithm {
     // called once, with `a0 == 0`.
     var i = b - 1
     while i >= 0 {
-      if engine.values[i] == max {
+      if engine.readValue(at: i) == max {
         b -= 1
         engine.swap(i, b)
       }
@@ -156,8 +156,8 @@ public struct StacklessDualPivotQuickSort: SortAlgorithm {
     // to snapshot them now rather than re-reading `engine.values[a]`/`[b]` on every loop iteration.
     // Reversed from the usual low/high naming — see the type-level doc comment — `pivotHigh` (at
     // `a`) is the *larger* of the two medians, `pivotLow` (at `b`) the *smaller*.
-    let pivotHigh = engine.values[a]
-    let pivotLow = engine.values[b]
+    let pivotHigh = engine.readValue(at: a)
+    let pivotLow = engine.readValue(at: b)
 
     var k = i + 1
     while k < j {
@@ -182,9 +182,9 @@ public struct StacklessDualPivotQuickSort: SortAlgorithm {
     // Three-way rotation `b <- j <- p <- b`, held-value order matching the source exactly: `t`
     // captures `b`'s value before anything else writes, and every subsequent read's source index
     // hasn't been touched yet by an earlier write in this same sequence.
-    let t = engine.values[b]
-    engine.setValue(b, engine.values[j])
-    engine.setValue(j, engine.values[p])
+    let t = engine.readValue(at: b)
+    engine.setValue(b, engine.readValue(at: j))
+    engine.setValue(j, engine.readValue(at: p))
     engine.setValue(p, t)
 
     return i
@@ -215,7 +215,7 @@ public struct StacklessDualPivotQuickSort: SortAlgorithm {
   private func binaryInsert(_ engine: inout RecordingEngine, _ start: Int, _ end: Int) {
     guard start < end else { return }
     for i in start..<end {
-      let num = engine.values[i]
+      let num = engine.readValue(at: i)
       var lo = start
       var hi = i
       while lo < hi {
@@ -228,7 +228,7 @@ public struct StacklessDualPivotQuickSort: SortAlgorithm {
       }
       var j = i - 1
       while j >= lo {
-        engine.setValue(j + 1, engine.values[j])
+        engine.setValue(j + 1, engine.readValue(at: j))
         j -= 1
       }
       engine.setValue(lo, num)

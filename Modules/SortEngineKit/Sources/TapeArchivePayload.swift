@@ -152,7 +152,7 @@ enum TapeArchivePayload {
   // MARK: - Operations
 
   /// Tag byte per case, in `SortOperation`'s own declaration order — 0 through 11, plus 12
-  /// (`.compareValue`), 13 (`.compareValues`), and 14 (`.auxRead`) appended later, after this
+  /// (`.compareValue`), 13 (`.compareValues`), 14 (`.auxRead`), and 15 (`.readValue`) appended later, after this
   /// format already shipped. Each case's fields are written as plain `Int32`s (0 to 3 of them,
   /// per the case), the same width used for every other count-like field in this format.
   private static func encode(_ operation: SortOperation, into writer: inout TapeArchiveByteWriter) {
@@ -217,6 +217,9 @@ enum TapeArchivePayload {
       writer.writeLittleEndianUInt(14, byteCount: 1)
       writeInt32(handle)
       writeInt32(index)
+    case .readValue(let index):
+      writer.writeLittleEndianUInt(15, byteCount: 1)
+      writeInt32(index)
     }
   }
 
@@ -242,6 +245,7 @@ enum TapeArchivePayload {
     case 13: return .compareValues(try readInt32(from: &reader), try readInt32(from: &reader))
     case 14:
       return .auxRead(handle: try readInt32(from: &reader), index: try readInt32(from: &reader))
+    case 15: return .readValue(try readInt32(from: &reader))
     default: throw TapeArchiveError.unknownOperationTag
     }
   }

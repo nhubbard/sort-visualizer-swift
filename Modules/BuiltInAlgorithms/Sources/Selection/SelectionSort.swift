@@ -8,10 +8,10 @@ public struct SelectionSort: SortAlgorithm {
     category: .selection,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 309, coefficients: [239470, 1547.5, 2.5],
+      anchorSize: 309, coefficients: [239468, 1547.5, 2.5],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .polynomialIntercept, coefficients: [2.5, 2.5, -5], rSquared: 1),
+      family: .polynomialIntercept, coefficients: [2.5, 2.5, -7], rSquared: 1),
     implementationComplexity: 5,
     stable: false,
     timeComplexity: ComplexityBounds(best: "O(n^2)", average: "O(n^2)", worst: "O(n^2)"),

@@ -19,10 +19,10 @@ public struct RotateMSDRadixSort: SortAlgorithm {
     category: .distribution,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 1190, coefficients: [239661, 365.413, 0.137435],
+      anchorSize: 1009, coefficients: [239986, 415.837, 0.175711],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .polynomialIntercept, coefficients: [0.137435, 38.3174, -558.331], rSquared: 0.999615),
+      family: .polynomialIntercept, coefficients: [0.175711, 61.2532, -706.426], rSquared: 0.999926),
     implementationComplexity: 34,
     stable: true,
     timeComplexity: ComplexityBounds(
@@ -88,7 +88,7 @@ public struct RotateMSDRadixSort: SortAlgorithm {
       var b = b
       while a < b {
         let mid = (a + b) / 2
-        if getDigit(engine.values[mid], place) >= d {
+        if getDigit(engine.readValue(at: mid), place) >= d {
           b = mid
         } else {
           a = mid + 1
@@ -124,7 +124,7 @@ public struct RotateMSDRadixSort: SortAlgorithm {
     }
 
     var maxValue = 0
-    for i in 0..<n { maxValue = max(maxValue, engine.values[i]) }
+    for i in 0..<n { maxValue = max(maxValue, engine.readValue(at: i)) }
     var q = 0
     var probe = base
     while probe <= maxValue {
@@ -148,7 +148,7 @@ public struct RotateMSDRadixSort: SortAlgorithm {
         }
 
         i = b
-        while b < n && shift(engine.values[b], q + 1) == shift(m, q + 1) {
+        while b < n && shift(engine.readValue(at: b), q + 1) == shift(m, q + 1) {
           b += 1
         }
       } else {

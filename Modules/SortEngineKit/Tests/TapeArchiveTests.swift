@@ -48,7 +48,8 @@ struct TapeArchiveTests {
     .reversal,
     .compareValue(19, 20),
     .compareValues(21, 22),
-    .auxRead(handle: 23, index: 24)
+    .auxRead(handle: 23, index: 24),
+    .readValue(25)
   ]
 
   @Test

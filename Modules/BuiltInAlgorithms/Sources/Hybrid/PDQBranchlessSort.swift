@@ -11,10 +11,10 @@ public struct PDQBranchlessSort: SortAlgorithm {
     category: .hybrid,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 1117, coefficients: [239906, 344.665, 0.115173],
+      anchorSize: 1117, coefficients: [239807, 344.019, 0.114665],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .polynomialIntercept, coefficients: [0.115173, 87.3693, -1385.17], rSquared: 0.999631),
+      family: .polynomialIntercept, coefficients: [0.114665, 87.8585, -1396.67], rSquared: 0.999646),
     implementationComplexity: 110,
     stable: false,
     timeComplexity: ComplexityBounds(

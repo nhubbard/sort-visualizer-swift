@@ -21,10 +21,10 @@ public struct SimplifiedLibrarySort: SortAlgorithm {
     category: .insertion,
     sizeRange: 32...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 384, coefficients: [239914, 1203.82, 1.5031],
+      anchorSize: 383, coefficients: [239576, 1203.2, 1.50334],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .polynomialIntercept, coefficients: [1.5031, 49.4357, -710.621], rSquared: 1),
+      family: .polynomialIntercept, coefficients: [1.50334, 51.6357, -724.117], rSquared: 1),
     implementationComplexity: 30,
     stable: true,
     timeComplexity: ComplexityBounds(best: "O(n)", average: "O(n log n)", worst: "O(n^2)"),
@@ -144,7 +144,7 @@ public struct SimplifiedLibrarySort: SortAlgorithm {
       for i in m..<b {
         let loc = locsShadow[k]
         let pos = cntsShadow[loc]
-        let value = engine.values[i]
+        let value = engine.readValue(at: i)
         tempShadow[pos] = value
         engine.writeAux(tempHandle, at: pos, value: value)
         cntsShadow[loc] = pos + 1
@@ -156,7 +156,7 @@ public struct SimplifiedLibrarySort: SortAlgorithm {
       // own gap.
       for i in 0..<m {
         let pos = cntsShadow[i]
-        let value = engine.values[i]
+        let value = engine.readValue(at: i)
         tempShadow[pos] = value
         engine.writeAux(tempHandle, at: pos, value: value)
         cntsShadow[i] = pos + 1
@@ -198,7 +198,7 @@ public struct SimplifiedLibrarySort: SortAlgorithm {
 
       // Classify which of the `spineSize + 1` gaps `engine.values[i]` belongs in, and tally
       // it for the upcoming rebalance.
-      let loc = gapSearch(0, spineSize, engine.values[i])
+      let loc = gapSearch(0, spineSize, engine.readValue(at: i))
       let updatedCount = cntsShadow[loc + 1] + 1
       cntsShadow[loc + 1] = updatedCount
       engine.writeAux(cntsHandle, at: loc + 1, value: updatedCount)

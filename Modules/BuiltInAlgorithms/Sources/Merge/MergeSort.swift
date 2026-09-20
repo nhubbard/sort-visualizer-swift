@@ -8,10 +8,10 @@ public struct MergeSort: SortAlgorithm {
     category: .merge,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 2394, coefficients: [187775, 92.2319, 0.0031176],
+      anchorSize: 2181, coefficients: [193734, 104.274, 0.00381206],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .powerLog, coefficients: [6.97323, 1.04737], rSquared: 0.999799),
+      family: .powerLog, coefficients: [8.25135, 1.0438], rSquared: 0.999716),
     implementationComplexity: 12,
     stable: true,
     timeComplexity: ComplexityBounds(
@@ -34,19 +34,19 @@ public struct MergeSort: SortAlgorithm {
       var merged: [Int] = []
       while low < mid && high < end {
         if engine.compare(high, low) {
-          merged.append(engine.values[low])
+          merged.append(engine.readValue(at: low))
           low += 1
         } else {
-          merged.append(engine.values[high])
+          merged.append(engine.readValue(at: high))
           high += 1
         }
       }
       while low < mid {
-        merged.append(engine.values[low])
+        merged.append(engine.readValue(at: low))
         low += 1
       }
       while high < end {
-        merged.append(engine.values[high])
+        merged.append(engine.readValue(at: high))
         high += 1
       }
       for i in 0..<merged.count {

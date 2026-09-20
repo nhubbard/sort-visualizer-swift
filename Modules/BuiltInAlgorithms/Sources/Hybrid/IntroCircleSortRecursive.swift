@@ -18,10 +18,10 @@ public struct IntroCircleSortRecursive: SortAlgorithm {
     category: .hybrid,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 829, coefficients: [239841, 499.178, 0.251744],
+      anchorSize: 829, coefficients: [239839, 499.178, 0.251744],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .polynomialIntercept, coefficients: [0.251744, 81.7865, -969.005], rSquared: 0.999804),
+      family: .polynomialIntercept, coefficients: [0.251744, 81.7865, -971.005], rSquared: 0.999804),
     implementationComplexity: 14,
     stable: false,
     // Best/average mirror CircleSortRecursive's O(n log n)/O(n log^2 n). Worst case differs:

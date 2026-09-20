@@ -45,10 +45,10 @@ public struct PoplarHeapSort: SortAlgorithm {
     category: .selection,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 1158, coefficients: [239862, 359.367, 0.130811],
+      anchorSize: 1121, coefficients: [218183, 267.429, 0.0428535],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .polynomialIntercept, coefficients: [0.130811, 56.4079, -871.979], rSquared: 0.999771),
+      family: .powerLog, coefficients: [5.45036, 1.23161], rSquared: 0.987242),
     implementationComplexity: 46,
     stable: false,
     timeComplexity: ComplexityBounds(
@@ -73,15 +73,15 @@ public struct PoplarHeapSort: SortAlgorithm {
     var cur = first + 1
     while cur != last {
       if engine.compare(cur, cur - 1, by: <) {
-        let tmp = engine.values[cur]
+        let tmp = engine.readValue(at: cur)
         var sift = cur
         var sift1 = cur - 1
         while true {
-          engine.setValue(sift, engine.values[sift1])
+          engine.setValue(sift, engine.readValue(at: sift1))
           sift -= 1
           if sift == first { break }
           sift1 -= 1
-          if tmp >= engine.values[sift1] { break }
+          if tmp >= engine.readValue(at: sift1) { break }
         }
         engine.setValue(sift, tmp)
       }

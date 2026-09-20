@@ -12,10 +12,10 @@ public struct SnuffleSort: SortAlgorithm {
     category: .exchange,
     sizeRange: 16...32,
     growthModel: OperationGrowthModel(
-      anchorSize: 24, coefficients: [167644, 69658.2, 14819.3, 2143.93, 236.657, 21.2186],
+      anchorSize: 24, coefficients: [167481, 69535.1, 14781.6, 2136.85, 235.698, 21.1169],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .nToTheNLike, coefficients: [85.1247, 0.0994513], rSquared: 0.965661),
+      family: .nToTheNLike, coefficients: [85.5553, 0.0993724], rSquared: 0.966231),
     implementationComplexity: 7,
     stable: false,
     timeComplexity: ComplexityBounds(

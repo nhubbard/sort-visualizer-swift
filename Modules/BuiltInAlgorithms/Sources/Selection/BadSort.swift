@@ -31,10 +31,10 @@ public struct BadSort: SortAlgorithm {
     category: .selection,
     sizeRange: 16...128,
     growthModel: OperationGrowthModel(
-      anchorSize: 80, coefficients: [235277, 9309.04, 125.981, 0.611696],
+      anchorSize: 82, coefficients: [237339, 8915.52, 113.091, 0.496632],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .powerLaw, coefficients: [0.222694, 3.16531], rSquared: 0.998283),
+      family: .powerLaw, coefficients: [0.302175, 3.08029], rSquared: 0.998197),
     implementationComplexity: 7,
     stable: false,
     timeComplexity: ComplexityBounds(

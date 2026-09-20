@@ -43,10 +43,10 @@ public struct FunSort: SortAlgorithm {
     category: .exchange,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 147, coefficients: [238858, 3492.7, 13.6561],
+      anchorSize: 135, coefficients: [237576, 3811.56, 16.4586],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .powerLaw, coefficients: [5.24161, 2.14951], rSquared: 0.999985),
+      family: .powerLaw, coefficients: [5.77774, 2.16588], rSquared: 0.999795),
     implementationComplexity: 14,
     stable: true,
     timeComplexity: ComplexityBounds(
@@ -73,7 +73,7 @@ public struct FunSort: SortAlgorithm {
     // matching the tie-break convention `ForcedStableQuickSort`/`TableSort` already established.
     func compositeLess(_ mid: Int, _ i: Int) -> Bool {
       if engine.compare(mid, i, by: <) { return true }
-      return engine.values[mid] == engine.values[i] && key[mid] < key[i]
+      return engine.readValue(at: mid) == engine.readValue(at: i) && key[mid] < key[i]
     }
 
     // Lower-bound binary search across `[0, n - 1)` for where `i`'s element belongs, treating the

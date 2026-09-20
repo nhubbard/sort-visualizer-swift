@@ -48,11 +48,11 @@ enum PDQSortingTemplate {
   private static func insertSort(_ engine: inout RecordingEngine, _ begin: Int, _ end: Int) {
     guard begin != end else { return }
     for cur in (begin + 1)..<end where engine.compare(cur, cur - 1, by: <) {
-      let tmp = engine.values[cur]
+      let tmp = engine.readValue(at: cur)
       var sift = cur
       var siftMinusOne = cur - 1
       repeat {
-        engine.setValue(sift, engine.values[siftMinusOne])
+        engine.setValue(sift, engine.readValue(at: siftMinusOne))
         sift -= 1
         siftMinusOne -= 1
       } while sift != begin && engine.compareValue(siftMinusOne, against: tmp, by: (>))
@@ -66,11 +66,11 @@ enum PDQSortingTemplate {
   private static func unguardInsertSort(_ engine: inout RecordingEngine, _ begin: Int, _ end: Int) {
     guard begin != end else { return }
     for cur in (begin + 1)..<end where engine.compare(cur, cur - 1, by: <) {
-      let tmp = engine.values[cur]
+      let tmp = engine.readValue(at: cur)
       var sift = cur
       var siftMinusOne = cur - 1
       repeat {
-        engine.setValue(sift, engine.values[siftMinusOne])
+        engine.setValue(sift, engine.readValue(at: siftMinusOne))
         sift -= 1
         siftMinusOne -= 1
       } while engine.compareValue(siftMinusOne, against: tmp, by: (>))
@@ -88,11 +88,11 @@ enum PDQSortingTemplate {
     for cur in (begin + 1)..<end {
       if limit > partialInsertSortLimit { return false }
       if engine.compare(cur, cur - 1, by: <) {
-        let tmp = engine.values[cur]
+        let tmp = engine.readValue(at: cur)
         var sift = cur
         var siftMinusOne = cur - 1
         repeat {
-          engine.setValue(sift, engine.values[siftMinusOne])
+          engine.setValue(sift, engine.readValue(at: siftMinusOne))
           sift -= 1
           siftMinusOne -= 1
         } while sift != begin && engine.compareValue(siftMinusOne, against: tmp, by: (>))
@@ -181,8 +181,8 @@ enum PDQSortingTemplate {
     }
 
     let pivotPos = first - 1
-    let pivotValue = engine.values[begin]
-    engine.setValue(begin, engine.values[pivotPos])
+    let pivotValue = engine.readValue(at: begin)
+    engine.setValue(begin, engine.readValue(at: pivotPos))
     engine.setValue(pivotPos, pivotValue)
     return (pivotPos, alreadyParted)
   }
@@ -208,8 +208,8 @@ enum PDQSortingTemplate {
     }
 
     let pivotPos = last
-    let pivotValue = engine.values[begin]
-    engine.setValue(begin, engine.values[pivotPos])
+    let pivotValue = engine.readValue(at: begin)
+    engine.setValue(begin, engine.readValue(at: pivotPos))
     engine.setValue(pivotPos, pivotValue)
     return pivotPos
   }
@@ -232,13 +232,13 @@ enum PDQSortingTemplate {
     } else if num > 0 {
       var left = first + leftOffsets[leftOffsetsPos]
       var right = last - rightOffsets[rightOffsetsPos]
-      let tmp = engine.values[left]
-      engine.setValue(left, engine.values[right])
+      let tmp = engine.readValue(at: left)
+      engine.setValue(left, engine.readValue(at: right))
       for i in 1..<num {
         left = first + leftOffsets[leftOffsetsPos + i]
-        engine.setValue(right, engine.values[left])
+        engine.setValue(right, engine.readValue(at: left))
         right = last - rightOffsets[rightOffsetsPos + i]
-        engine.setValue(left, engine.values[right])
+        engine.setValue(left, engine.readValue(at: right))
       }
       engine.setValue(right, tmp)
     }
@@ -257,7 +257,7 @@ enum PDQSortingTemplate {
   private static func partRightBranchless(
     _ engine: inout RecordingEngine, _ begin: Int, _ end: Int, _ offsets: inout PDQOffsetBuffers
   ) -> (pivotPos: Int, alreadyParted: Bool) {
-    let pivot = engine.values[begin]
+    let pivot = engine.readValue(at: begin)
     var first = begin
     var last = end
 
@@ -382,7 +382,7 @@ enum PDQSortingTemplate {
     }
 
     let pivotPos = first - 1
-    engine.setValue(begin, engine.values[pivotPos])
+    engine.setValue(begin, engine.readValue(at: pivotPos))
     engine.setValue(pivotPos, pivot)
 
     return (pivotPos, alreadyParted)

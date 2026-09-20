@@ -28,10 +28,10 @@ public struct TimeSort: SortAlgorithm {
     category: .distribution,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 11060, coefficients: [161628, 14.4775],
+      anchorSize: 11634, coefficients: [175902, 14.8181],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .powerLog, coefficients: [4.65303, 0.883283], rSquared: 0.999378),
+      family: .powerLog, coefficients: [5.29152, 0.873235], rSquared: 0.99942),
     implementationComplexity: 15,
     stable: true,
     timeComplexity: ComplexityBounds(
@@ -49,7 +49,7 @@ public struct TimeSort: SortAlgorithm {
     let scratchHandle = engine.createAuxArray(length: n)
     var scratch = [Int](repeating: 0, count: n)
     for i in 0..<n {
-      scratch[i] = engine.values[i]
+      scratch[i] = engine.readValue(at: i)
       engine.writeAux(scratchHandle, at: i, value: scratch[i])
     }
 

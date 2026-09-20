@@ -8,10 +8,10 @@ public struct SmartBogoBogoSort: SortAlgorithm {
     category: .impractical,
     sizeRange: 4...8,
     growthModel: OperationGrowthModel(
-      anchorSize: 16, coefficients: [124301, 86878.5, 31340.6, 7737.59, 1465.42, 226.476],
-      measuredSafeCeiling: nil),
+      anchorSize: 14, coefficients: [5356.7, 2321.4, 503.008, 72.662, 7.87229, 0.682315],
+      measuredSafeCeiling: 14),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .factorial, coefficients: [97.5984, 0.252089], rSquared: 0.99214),
+      family: .exponential, coefficients: [12.4161, 1.54244], rSquared: 0.999541),
     implementationComplexity: 5,
     stable: false,
     timeComplexity: ComplexityBounds(

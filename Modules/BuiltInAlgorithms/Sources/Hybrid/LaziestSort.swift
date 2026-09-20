@@ -38,10 +38,10 @@ public struct LaziestSort: SortAlgorithm {
     category: .hybrid,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 1038, coefficients: [225199, 374.24, 0.128523],
+      anchorSize: 1012, coefficients: [222935, 353.088, 0.102889],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .powerLog, coefficients: [0.552509, 1.58098], rSquared: 0.990328),
+      family: .powerLog, coefficients: [1.33543, 1.45831], rSquared: 0.988202),
     implementationComplexity: 29,
     stable: true,
     timeComplexity: ComplexityBounds(
@@ -59,10 +59,10 @@ public struct LaziestSort: SortAlgorithm {
     // Moves the element at `a` down to `b` (`b <= a`), shifting `[b, a)` right by one — ArrayV's
     // `insertTo`.
     func insertTo(_ a: Int, _ b: Int) {
-      let temp = engine.values[a]
+      let temp = engine.readValue(at: a)
       var a = a
       while a > b {
-        engine.setValue(a, engine.values[a - 1])
+        engine.setValue(a, engine.readValue(at: a - 1))
         a -= 1
       }
       engine.setValue(b, temp)
@@ -75,7 +75,7 @@ public struct LaziestSort: SortAlgorithm {
       var b = bIn
       while a < b {
         let mid = a + (b - a) / 2
-        if val < engine.values[mid] {
+        if val < engine.readValue(at: mid) {
           b = mid
         } else {
           a = mid + 1
@@ -90,7 +90,7 @@ public struct LaziestSort: SortAlgorithm {
       var b = bIn
       while a < b {
         let mid = a + (b - a) / 2
-        if val <= engine.values[mid] {
+        if val <= engine.readValue(at: mid) {
           b = mid
         } else {
           a = mid + 1
@@ -106,7 +106,7 @@ public struct LaziestSort: SortAlgorithm {
     // calls this to find where one element from the left run belongs among the right run.
     func leftExpSearch(_ a: Int, _ b: Int, _ val: Int) -> Int {
       var i = 1
-      while a - 1 + i < b && val > engine.values[a - 1 + i] {
+      while a - 1 + i < b && val > engine.readValue(at: a - 1 + i) {
         i *= 2
       }
       return leftBinSearch(a + i / 2, min(b, a - 1 + i), val)
@@ -116,7 +116,7 @@ public struct LaziestSort: SortAlgorithm {
     func binaryInsertion(_ a: Int, _ b: Int) {
       guard a + 1 < b else { return }
       for i in (a + 1)..<b {
-        insertTo(i, rightBinSearch(a, i, engine.values[i]))
+        insertTo(i, rightBinSearch(a, i, engine.readValue(at: i)))
       }
     }
 
@@ -131,7 +131,7 @@ public struct LaziestSort: SortAlgorithm {
       var j = m
       while i < j && j < b {
         if engine.compare(i, j, by: >) {
-          let value = engine.values[i]
+          let value = engine.readValue(at: i)
           let k = leftExpSearch(j + 1, b, value)
           GrailSortingTemplate.rotate(&engine, i, j - i, k - j)
           i += k - j

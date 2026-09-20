@@ -19,6 +19,8 @@ public struct RecordingEngine: Sendable {
 
   public private(set) var values: [Int]
   private var tape: [SortOperation] = []
+  /// Counts every operation even after `operationCap` stops retaining tape entries.
+  private var totalOperationCount = 0
   private let operationCap: Int
   /// Set once `tape.count` reaches `operationCap` — from that point on, `compare`/`swap`/etc.
   /// keep doing real work on `values` (so the algorithm still runs to genuine, correct
@@ -40,6 +42,7 @@ public struct RecordingEngine: Sendable {
   private var compareValuesCount = 0
   private var swapCount = 0
   private var mainWriteCount = 0
+  private var mainReadCount = 0
   private var auxWriteCount = 0
   /// How many times an algorithm re-read a `writeAux`-shadowed local buffer for a real decision,
   /// via `markAuxRead` -- see that method's own doc comment.
@@ -48,15 +51,36 @@ public struct RecordingEngine: Sendable {
   private var nextAuxHandle = 0
   private var primaryIndex: Int?
   private var secondaryIndex: Int?
+  #if DEBUG
+  /// Test-only key projection for tracking original identities through `setValue` moves.
+  /// Release builds keep their original comparison path and cost.
+  private var comparisonKeyForTesting: (@Sendable (Int) -> Int)?
+  #endif
 
   public init(values: [Int], operationCap: Int = RecordingEngine.defaultOperationCap) {
     self.values = values
     self.operationCap = operationCap
+    #if DEBUG
+    comparisonKeyForTesting = nil
+    #endif
   }
+
+  #if DEBUG
+  /// Allows tests to encode `(sort key, original index)` in each integer while algorithms
+  /// compare only the key. No production code should use this initializer.
+  public init(
+    values: [Int], operationCap: Int = RecordingEngine.defaultOperationCap,
+    comparisonKeyForTesting: @escaping @Sendable (Int) -> Int
+  ) {
+    self.init(values: values, operationCap: operationCap)
+    self.comparisonKeyForTesting = comparisonKeyForTesting
+  }
+  #endif
 
   public var count: Int { values.count }
 
   private mutating func appendOp(_ op: SortOperation) {
+    totalOperationCount += 1
     guard !didExceedCap else { return }
     guard tape.count < operationCap else {
       didExceedCap = true
@@ -70,6 +94,11 @@ public struct RecordingEngine: Sendable {
     markPrimarySecondary(i, j)
     appendOp(.compare(i, j))
     compareCount += 1
+    #if DEBUG
+    if let comparisonKeyForTesting {
+      return cmp(comparisonKeyForTesting(values[i]), comparisonKeyForTesting(values[j]))
+    }
+    #endif
     return cmp(values[i], values[j])
   }
 
@@ -122,6 +151,11 @@ public struct RecordingEngine: Sendable {
     appendOp(.compareValue(i, value))
     compareCount += 1
     compareValueCount += 1
+    #if DEBUG
+    if let comparisonKeyForTesting {
+      return cmp(comparisonKeyForTesting(values[i]), comparisonKeyForTesting(value))
+    }
+    #endif
     return cmp(values[i], value)
   }
 
@@ -138,6 +172,11 @@ public struct RecordingEngine: Sendable {
     appendOp(.compareValues(a, b))
     compareCount += 1
     compareValuesCount += 1
+    #if DEBUG
+    if let comparisonKeyForTesting {
+      return cmp(comparisonKeyForTesting(a), comparisonKeyForTesting(b))
+    }
+    #endif
     return cmp(a, b)
   }
 
@@ -145,6 +184,30 @@ public struct RecordingEngine: Sendable {
     appendOp(.setValue(i, value))
     values[i] = value
     mainWriteCount += 1
+  }
+
+  /// Returns a live value and records the read as its own playback step. Algorithms should use
+  /// this for value moves, sentinels, pivot capture, and any other direct read of the main array.
+  public mutating func readValue(at index: Int) -> Int {
+    appendOp(.readValue(index))
+    mainReadCount += 1
+    return values[index]
+  }
+
+  /// Reads the complete live array through the same recorded path, for algorithms that need a
+  /// scratch copy or an initial traversal. The returned array is independent of the engine.
+  public mutating func readAllValues() -> [Int] {
+    var result: [Int] = []
+    result.reserveCapacity(values.count)
+    for index in values.indices { result.append(readValue(at: index)) }
+    return result
+  }
+
+  public mutating func readValues(in range: Range<Int>) -> [Int] {
+    var result: [Int] = []
+    result.reserveCapacity(range.count)
+    for index in range { result.append(readValue(at: index)) }
+    return result
   }
 
   public mutating func mark(_ marker: Int, at index: Int) {
@@ -212,11 +275,13 @@ public struct RecordingEngine: Sendable {
   public func finish() -> RecordingSummary {
     RecordingSummary(
       tape: tape,
+      totalOperationCount: totalOperationCount,
       compareCount: compareCount,
       compareValueCount: compareValueCount,
       compareValuesCount: compareValuesCount,
       swapCount: swapCount,
       mainWriteCount: mainWriteCount,
+      mainReadCount: mainReadCount,
       auxWriteCount: auxWriteCount,
       auxReadCount: auxReadCount,
       reversalCount: reversalCount,
@@ -230,6 +295,7 @@ public struct RecordingEngine: Sendable {
 /// destructuring arity.
 public struct RecordingSummary: Sendable {
   public let tape: [SortOperation]
+  public let totalOperationCount: Int
   public let compareCount: Int
   /// The portion of `compareCount` that came from `compareValue` rather than `compare` -- see
   /// that field's own doc comment on `RecordingEngine`.
@@ -239,6 +305,7 @@ public struct RecordingSummary: Sendable {
   public let compareValuesCount: Int
   public let swapCount: Int
   public let mainWriteCount: Int
+  public let mainReadCount: Int
   public let auxWriteCount: Int
   /// Real re-reads of a `writeAux`-shadowed buffer, recorded via `markAuxRead` -- see that
   /// field's own doc comment on `RecordingEngine`.

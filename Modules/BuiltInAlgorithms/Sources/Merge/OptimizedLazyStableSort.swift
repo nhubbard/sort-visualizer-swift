@@ -23,10 +23,10 @@ public struct OptimizedLazyStableSort: SortAlgorithm {
     category: .merge,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 452, coefficients: [238799, 1028.46, 1.06136],
+      anchorSize: 462, coefficients: [238500, 974.079, 0.92012],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .powerLog, coefficients: [0.720025, 1.7831], rSquared: 0.997836),
+      family: .powerLog, coefficients: [0.990912, 1.72391], rSquared: 0.999811),
     implementationComplexity: 40,
     stable: true,
     timeComplexity: ComplexityBounds(
@@ -62,10 +62,10 @@ public struct OptimizedLazyStableSort: SortAlgorithm {
     }
 
     while i < b {
-      let current = engine.values[i]
+      let current = engine.readValue(at: i)
       var pos = i - 1
       while pos >= a && engine.compareValue(pos, against: current, by: (>)) {
-        engine.setValue(pos + 1, engine.values[pos])
+        engine.setValue(pos + 1, engine.readValue(at: pos))
         pos -= 1
       }
       engine.setValue(pos + 1, current)

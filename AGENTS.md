@@ -14,7 +14,7 @@ This is **Sort Symphony**, a Swift/SwiftUI sorting visualizer for iOS, iPadOS, a
 
 - Build and test Swift with `tuist` or `xcodebuild`, not IntelliJ's Swift build/problem tools. See `README.md` and `Documentation/docs/guides/building.md`.
 - For algorithm ports, use `Documentation/docs/guides/adding-an-algorithm.md` and `Documentation/docs/reference/port-status.md`. Some older Claude notes point to removed `Documentation/ALGORITHM_PORTING_PROCESS.md` and `Documentation/PORT_INVENTORY.md` paths.
-- In `record(into:)`, route real comparisons through `RecordingEngine.compare`, `compareValue`, or `compareValues`; record meaningful auxiliary reads/writes through engine primitives. Repeated raw `engine.values` reads used for decisions hide work from operation counts and growth calibration.
+- In `record(into:)`, route real comparisons through `RecordingEngine.compare`, `compareValue`, or `compareValues`; read live values through `readValue(at:)`, `readValues(in:)`, or `readAllValues()` so every read enters the tape. Record meaningful auxiliary reads/writes through engine primitives. Run `python3 Tools/EngineAccessAudit/audit.py` after editing algorithms.
 - Fuzz ports on random, duplicate-heavy, sorted, and reversed input. Check stability empirically. Source algorithms and their metadata have had real correctness and complexity errors.
 - In unattended automation, skip failures and durably log them without blocking UI; in manual runs, surface errors immediately. Reuse the existing automation state.
 - Treat unexplained working-tree changes as possible user edits. Inspect before modifying or reverting; never discard them on an assumption.

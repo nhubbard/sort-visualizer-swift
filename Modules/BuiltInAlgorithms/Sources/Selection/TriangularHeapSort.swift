@@ -24,10 +24,10 @@ public struct TriangularHeapSort: SortAlgorithm {
     category: .selection,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 499, coefficients: [239242, 768.83, 0.464986],
+      anchorSize: 499, coefficients: [239232, 768.828, 0.465037],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .powerLaw, coefficients: [11.2771, 1.60359], rSquared: 0.998378),
+      family: .powerLaw, coefficients: [11.2719, 1.60366], rSquared: 0.998403),
     implementationComplexity: 24,
     stable: false,
     timeComplexity: ComplexityBounds(
@@ -51,7 +51,7 @@ public struct TriangularHeapSort: SortAlgorithm {
     // The explicit tidy-up `MaxHeapSort` doesn't need — see the doc comment above. ArrayV
     // performs this via the non-marking `Reads.compareValues`, so this reads `engine.values`
     // directly rather than calling `engine.compare`.
-    if engine.values[0] > engine.values[1] {
+    if engine.readValue(at: 0) > engine.readValue(at: 1) {
       engine.swap(0, 1)
     }
   }

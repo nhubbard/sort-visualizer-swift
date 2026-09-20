@@ -22,10 +22,10 @@ public struct CreaseSort: SortAlgorithm {
     category: .concurrent,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 938, coefficients: [224851, 337.832, 0.070983],
+      anchorSize: 936, coefficients: [224685, 338.638, 0.071557],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .powerLog, coefficients: [5.78236, 1.2632], rSquared: 0.996878),
+      family: .powerLog, coefficients: [5.74241, 1.26455], rSquared: 0.996774),
     implementationComplexity: 9,
     stable: true,
     timeComplexity: ComplexityBounds(

@@ -23,10 +23,10 @@ public struct ClassicThreeSmoothCombSort: SortAlgorithm {
     category: .exchange,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
-      anchorSize: 1057, coefficients: [220385, 289.129, 0.0508555],
+      anchorSize: 974, coefficients: [223119, 331.185, 0.0732995],
       measuredSafeCeiling: nil),
     detectedGrowthModel: DetectedGrowthModel(
-      family: .powerLog, coefficients: [5.51005, 1.2431], rSquared: 0.998099),
+      family: .powerLog, coefficients: [4.21165, 1.30043], rSquared: 0.988597),
     implementationComplexity: 10,
     stable: false,
     timeComplexity: ComplexityBounds(
