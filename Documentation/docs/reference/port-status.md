@@ -5,9 +5,6 @@ end date. This page tracks what's shipped and what remains, and the team keeps i
 algorithms move from one list to the other. See
 [Adding a sorting algorithm](../guides/adding-an-algorithm.md) for the porting process.
 
-The [reference fidelity audit](reference-fidelity-audit.md) tracks whether the ten language
-samples for each shipped algorithm reflect the native Swift implementation.
-
 ## Sorting algorithms
 
 ArrayV defines 208 sorting-algorithm classes across nine categories, plus 21 shared template base
