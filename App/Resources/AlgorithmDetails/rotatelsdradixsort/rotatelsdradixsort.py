@@ -1,4 +1,4 @@
-RADIX_BASE = 10
+RADIX_BASE = 4
 
 
 def digit_at(value, place):

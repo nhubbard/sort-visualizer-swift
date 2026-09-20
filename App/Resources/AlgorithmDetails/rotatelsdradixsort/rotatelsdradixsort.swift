@@ -1,7 +1,7 @@
 func sort(_ arr: inout [Int]) {
     let n = arr.count
     guard n >= 2 else { return }
-    let radixBase = 10
+    let radixBase = 4
 
     /// Extracts the digit at `place` (0 = ones place) from `value`, in radixBase.
     func digitAt(_ value: Int, _ place: Int) -> Int {

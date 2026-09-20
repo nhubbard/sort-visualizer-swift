@@ -2,7 +2,7 @@ using System;
 
 public class RotateLsdRadixSort
 {
-  private const int RadixBase = 10;
+  private const int RadixBase = 4;
 
   // Extracts the digit at `place` (0 = ones place) from `value`, in RadixBase.
   private static int DigitAt(int value, int place)

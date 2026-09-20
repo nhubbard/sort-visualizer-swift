@@ -1,7 +1,7 @@
 import java.util.Arrays;
 
 public class rotatelsdradixsort {
-  private static final int RADIX_BASE = 10;
+  private static final int RADIX_BASE = 4;
 
   // Extracts the digit at `place` (0 = ones place) from `value`, in RADIX_BASE.
   private static int digitAt(int value, int place) {

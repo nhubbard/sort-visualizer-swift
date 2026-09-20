@@ -4,7 +4,7 @@ import (
 	"fmt"
 )
 
-const radixBase = 10
+const radixBase = 4
 
 // digitAt extracts the digit at place (0 = ones place) from value, in radixBase.
 func digitAt(value int, place int) int {

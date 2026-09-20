@@ -1,4 +1,4 @@
-const RADIX_BASE = 10;
+const RADIX_BASE = 4;
 
 // Extracts the digit at `place` (0 = ones place) from `value`, in RADIX_BASE.
 function digitAt(value, place) {

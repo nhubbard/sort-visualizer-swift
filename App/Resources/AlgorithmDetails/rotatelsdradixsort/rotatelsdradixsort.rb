@@ -1,4 +1,4 @@
-RADIX_BASE = 10
+RADIX_BASE = 4
 
 # Extracts the digit at `place` (0 = ones place) from `value`, in RADIX_BASE.
 def digit_at(value, place)

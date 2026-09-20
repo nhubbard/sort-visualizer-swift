@@ -1,4 +1,4 @@
-const val RADIX_BASE = 10
+const val RADIX_BASE = 4
 
 // Extracts the digit at `place` (0 = ones place) from `value`, in RADIX_BASE.
 fun digitAt(value: Int, place: Int): Int {

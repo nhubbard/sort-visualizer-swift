@@ -7,8 +7,8 @@ sample follows the same algorithm. This audit compares control flow and data mov
 the app's Swift implementation. Targeted execution remains a separate validation step.
 
 All 169 algorithms outside the 13 Bogo/Bozo-named sorts received a read-only, major-phase and
-complexity review of their ten reference sources. Eight non-Bogo algorithms below were
-verified and corrected; 16 have confirmed differences listed below; the other 145 have no
+complexity review of their ten reference sources. Nine non-Bogo algorithms below were
+verified and corrected; 15 have confirmed differences listed below; the other 145 have no
 confirmed substitution from this structural review. Among those 145, exact equivalence remains
 uncertain for the large GrailSort, PDQBranchedSort, PDQBranchlessSort, QuadSort, and
 NewShuffleMergeSort implementations. The source review did not run all samples on boundary or
@@ -28,6 +28,7 @@ duplicate-heavy inputs and is not a proof of line-by-line equivalence.
 | StablePermutationSort | Linear adjacent-value scan at each permutation leaf | Ten sample tests; 84 targeted Python cases including duplicate-heavy inputs |
 | BitonicSortIterative | Network stages through `k < 2*n`, parity `m`, and guarded partner indices | Ten sample tests; 6,500 seeded Python cases across lengths 0–64 |
 | DiamondSortRecursive | Pads the network length to a power of two and skips virtual elements | Ten sample tests; 6,500 seeded Python cases and 36 non-power-of-two cases each in C, C++, and JavaScript |
+| RotateLSDRadixSort | Base-4 digit passes with in-place digit merges | Ten sample tests; 1,300 seeded Python cases around radix boundaries |
 
 ## Confirmed non-Bogo mismatches (unfixed)
 
@@ -50,7 +51,6 @@ changed as part of this audit.
 | LSDRadixSort | Stable radix-4 counting passes with an `n`-element output buffer | C, C++, C#, Go, Java, Kotlin, and Swift use radix-10 buckets capped at ten entries each; JavaScript loops once per maximum *value* rather than per digit; Python uses floating-point division for pass termination; Ruby uses ordinary decimal counting passes | Several samples change the work bound or fail for valid larger inputs; JavaScript is `O(n·maxValue)` and also returns a new array |
 | MergeSort | Stable left-biased merge with indexed reads and `O(n log n)` work | Python, Go, and JavaScript choose the right run on ties; JavaScript and Ruby remove the first array element repeatedly during merge | Tie-order differs; repeated front removal can add substantial copying, including quadratic work in the Ruby recursive merge |
 | SimplifiedLibrarySort | Uses rebalance factor 4, computes an initial spine below 32 elements, and binary-insertion-sorts arrays shorter than 32 | All ten references use factor 2 and a one-element initial spine | Different rebalance schedule and small-input algorithm |
-| RotateLSDRadixSort | Uses base 4 for digit passes and in-place digit merges | All ten references use base 10 | Different digit-pass count and merge partitions; no overall asymptotic difference established |
 | RotateMSDRadixSort | Splits the zero-digit region with `dist` and iteratively traverses digit buckets | All ten references use a conventional recursive bucket descent after digit sorting | Substantial control-flow difference; no overall asymptotic difference established |
 | UnstableGrailSort | Uses an iterative binary-search-and-rotate merge helper during its Grail phases | All ten references replace that helper with recursive divide-and-rotate merging | Different merge sequence and `O(log n)` helper stack instead of Swift's `O(1)` auxiliary stack |
 
@@ -81,7 +81,7 @@ weave choices; `RandomGuessSort` enumerates guesses with a base-`n` counter; and
 
 The five large implementations named above need detailed control-flow comparison across every
 language. Targeted sample runs, duplicate-heavy inputs, non-power-of-two lengths, and larger
-arrays are needed to validate the 16 findings and look for additional edge-case discrepancies.
+arrays are needed to validate the 15 findings and look for additional edge-case discrepancies.
 In particular, the PDQ samples contain partition, partial-insertion, and heap-fallback machinery;
 the Grail samples contain block-building and combining machinery; and the QuadSort samples retain
 their parity and merge phases. Presence of those phases and source length alone do not prove
