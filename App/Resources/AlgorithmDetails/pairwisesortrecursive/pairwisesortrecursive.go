@@ -47,6 +47,9 @@ func pairwiseRecursive(arr []int, start, end, gap int) {
 }
 
 func sort(arr []int) []int {
+	if len(arr) <= 1 {
+		return arr
+	}
 	pairwiseRecursive(arr, 0, len(arr), 1)
 	return arr
 }

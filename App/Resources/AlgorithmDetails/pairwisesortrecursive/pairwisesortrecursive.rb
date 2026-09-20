@@ -38,6 +38,7 @@ def pairwise_recursive(array, start, fin, gap)
 end
 
 def sort(arr)
+  return arr if arr.length <= 1
   pairwise_recursive(arr, 0, arr.length, 1)
   arr
 end

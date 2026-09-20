@@ -1,4 +1,6 @@
 def sort(arr):
+    if len(arr) <= 1:
+        return arr
     def comp_swap(a, b):
         if arr[a] > arr[b]:
             arr[a], arr[b] = arr[b], arr[a]

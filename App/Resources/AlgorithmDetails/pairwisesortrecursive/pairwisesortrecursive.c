@@ -63,7 +63,10 @@ void pairwiseRecursive(int arr[], int start, int end, int gap) {
   }
 }
 
-void sort(int arr[], int n) { pairwiseRecursive(arr, 0, n, 1); }
+void sort(int arr[], int n) {
+  if (n <= 1) return;
+  pairwiseRecursive(arr, 0, n, 1);
+}
 
 int main(int argc, char *argv[]) {
   int size = sizeof(array) / sizeof(array[0]);

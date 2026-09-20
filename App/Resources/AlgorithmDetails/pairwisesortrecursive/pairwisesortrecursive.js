@@ -1,4 +1,5 @@
 function sort(arr) {
+  if (arr.length <= 1) return arr;
   function compSwap(a, b) {
     if (arr[a] > arr[b]) {
       var temp = arr[a];

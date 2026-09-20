@@ -46,6 +46,7 @@ public class pairwisesortrecursive {
   }
 
   public static void sort(int[] arr) {
+    if (arr.length <= 1) return;
     pairwiseRecursive(arr, 0, arr.length, 1);
   }
 

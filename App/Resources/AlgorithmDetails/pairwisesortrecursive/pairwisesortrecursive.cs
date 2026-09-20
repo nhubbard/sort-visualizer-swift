@@ -57,6 +57,7 @@ public class PairwiseSortRecursive
   public static void Sort(int[] arr)
   {
     int n = arr.Length;
+    if (n <= 1) return;
     PairwiseRecursive(arr, 0, n, 1);
   }
 
