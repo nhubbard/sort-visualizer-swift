@@ -1,0 +1,78 @@
+{
+  "method": "complete Allocations options JSON + nonexistent PID; exit 21 decoded, 57 rejected",
+  "results": {
+    "action=''": {
+      "exitCode": 57,
+      "message": "Failed to load recording options from /tmp/alloc-filter-decode-znhqhi62/options.json: The data couldn\u2019t be read because it isn\u2019t in the correct format."
+    },
+    "action='bogus'": {
+      "exitCode": 57,
+      "message": "Failed to load recording options from /tmp/alloc-filter-decode-znhqhi62/options.json: The data couldn\u2019t be read because it isn\u2019t in the correct format."
+    },
+    "action='exclude'": {
+      "exitCode": 57,
+      "message": "Failed to load recording options from /tmp/alloc-filter-decode-znhqhi62/options.json: The data couldn\u2019t be read because it isn\u2019t in the correct format."
+    },
+    "action='ignore'": {
+      "exitCode": 21,
+      "message": "Cannot find process for provided pid: 99999999"
+    },
+    "action='include'": {
+      "exitCode": 57,
+      "message": "Failed to load recording options from /tmp/alloc-filter-decode-znhqhi62/options.json: The data couldn\u2019t be read because it isn\u2019t in the correct format."
+    },
+    "action='record'": {
+      "exitCode": 21,
+      "message": "Cannot find process for provided pid: 99999999"
+    },
+    "match=''": {
+      "exitCode": 57,
+      "message": "Failed to load recording options from /tmp/alloc-filter-decode-znhqhi62/options.json: The data couldn\u2019t be read because it isn\u2019t in the correct format."
+    },
+    "match='bogus'": {
+      "exitCode": 57,
+      "message": "Failed to load recording options from /tmp/alloc-filter-decode-znhqhi62/options.json: The data couldn\u2019t be read because it isn\u2019t in the correct format."
+    },
+    "match='contains'": {
+      "exitCode": 21,
+      "message": "Cannot find process for provided pid: 99999999"
+    },
+    "match='equals'": {
+      "exitCode": 57,
+      "message": "Failed to load recording options from /tmp/alloc-filter-decode-znhqhi62/options.json: The data couldn\u2019t be read because it isn\u2019t in the correct format."
+    },
+    "match='exact'": {
+      "exitCode": 57,
+      "message": "Failed to load recording options from /tmp/alloc-filter-decode-znhqhi62/options.json: The data couldn\u2019t be read because it isn\u2019t in the correct format."
+    },
+    "match='hasPrefix'": {
+      "exitCode": 21,
+      "message": "Cannot find process for provided pid: 99999999"
+    },
+    "match='regex'": {
+      "exitCode": 57,
+      "message": "Failed to load recording options from /tmp/alloc-filter-decode-znhqhi62/options.json: The data couldn\u2019t be read because it isn\u2019t in the correct format."
+    },
+    "rules=0": {
+      "exitCode": 21,
+      "message": "Cannot find process for provided pid: 99999999"
+    },
+    "rules=2": {
+      "exitCode": 21,
+      "message": "Cannot find process for provided pid: 99999999"
+    },
+    "type=''": {
+      "exitCode": 21,
+      "message": "Cannot find process for provided pid: 99999999"
+    },
+    "type=42": {
+      "exitCode": 57,
+      "message": "Failed to load recording options from /tmp/alloc-filter-decode-znhqhi62/options.json: The data couldn\u2019t be read because it isn\u2019t in the correct format."
+    },
+    "type=None": {
+      "exitCode": 57,
+      "message": "Failed to load recording options from /tmp/alloc-filter-decode-znhqhi62/options.json: The data couldn\u2019t be read because it is missing."
+    }
+  },
+  "xcode": "27.0 (27A266a)"
+}

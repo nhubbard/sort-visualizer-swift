@@ -1,0 +1,762 @@
+{
+  "instruments": {
+    "InstrumentsPlugIn.ProcessorTraceInstrument": {
+      "added": true,
+      "deprecated": "0",
+      "displayName": "Processor Trace",
+      "exitCode": 0,
+      "targetTypeSupport": {
+        "0": false,
+        "1": true,
+        "2": true,
+        "3": false
+      }
+    },
+    "InstrumentsPlugIn.SwiftUIInstrument": {
+      "added": true,
+      "deprecated": "0",
+      "displayName": "SwiftUI",
+      "exitCode": 0,
+      "targetTypeSupport": {
+        "0": true,
+        "1": true,
+        "2": true,
+        "3": false
+      }
+    },
+    "com-apple-hitches": {
+      "added": true,
+      "deprecated": "0",
+      "displayName": "Hitches",
+      "exitCode": 0,
+      "targetTypeSupport": {
+        "0": true,
+        "1": true,
+        "2": true,
+        "3": false
+      }
+    },
+    "com.apple.CFNetwork.http-tracing.instrument": {
+      "added": true,
+      "deprecated": "0",
+      "displayName": "HTTP Traffic",
+      "exitCode": 0,
+      "targetTypeSupport": {
+        "0": true,
+        "1": true,
+        "2": true,
+        "3": false
+      }
+    },
+    "com.apple.CoreAnimation.commit": {
+      "added": true,
+      "deprecated": "0",
+      "displayName": "Core Animation Commits",
+      "exitCode": 0,
+      "targetTypeSupport": {
+        "0": true,
+        "1": true,
+        "2": true,
+        "3": false
+      }
+    },
+    "com.apple.CoreAnimation.detail": {
+      "added": true,
+      "deprecated": "0",
+      "displayName": "Core Animation Activity",
+      "exitCode": 0,
+      "targetTypeSupport": {
+        "0": true,
+        "1": true,
+        "2": true,
+        "3": false
+      }
+    },
+    "com.apple.CoreAnimation.lifetime": {
+      "added": true,
+      "deprecated": "0",
+      "displayName": "Frame Lifetimes",
+      "exitCode": 0,
+      "targetTypeSupport": {
+        "0": true,
+        "1": true,
+        "2": true,
+        "3": false
+      }
+    },
+    "com.apple.CoreAnimation.server": {
+      "added": true,
+      "deprecated": "0",
+      "displayName": "Core Animation Server",
+      "exitCode": 0,
+      "targetTypeSupport": {
+        "0": true,
+        "1": true,
+        "2": true,
+        "3": false
+      }
+    },
+    "com.apple.FoundationModels": {
+      "added": true,
+      "deprecated": "0",
+      "displayName": "Foundation Models",
+      "exitCode": 0,
+      "targetTypeSupport": {
+        "0": true,
+        "1": true,
+        "2": true,
+        "3": false
+      }
+    },
+    "com.apple.SwiftUI.body": {
+      "added": true,
+      "deprecated": "0",
+      "displayName": "View Body (Legacy)",
+      "exitCode": 0,
+      "targetTypeSupport": {
+        "0": true,
+        "1": true,
+        "2": true,
+        "3": false
+      }
+    },
+    "com.apple.SwiftUI.dynamicviewproperty": {
+      "added": true,
+      "deprecated": "0",
+      "displayName": "View Properties (Legacy)",
+      "exitCode": 0,
+      "targetTypeSupport": {
+        "0": true,
+        "1": true,
+        "2": true,
+        "3": false
+      }
+    },
+    "com.apple.ane": {
+      "added": true,
+      "deprecated": "0",
+      "displayName": "Neural Engine",
+      "exitCode": 0,
+      "targetTypeSupport": {
+        "0": true,
+        "1": true,
+        "2": true,
+        "3": false
+      }
+    },
+    "com.apple.audio.audioinstrument.audioclient": {
+      "added": true,
+      "deprecated": "0",
+      "displayName": "Audio Client",
+      "exitCode": 0,
+      "targetTypeSupport": {
+        "0": true,
+        "1": true,
+        "2": true,
+        "3": false
+      }
+    },
+    "com.apple.audio.audioinstrument.audiohal": {
+      "added": true,
+      "deprecated": "0",
+      "displayName": "Audio Server",
+      "exitCode": 0,
+      "targetTypeSupport": {
+        "0": true,
+        "1": true,
+        "2": true,
+        "3": false
+      }
+    },
+    "com.apple.audio.audioinstrument.audiostatistics": {
+      "added": true,
+      "deprecated": "0",
+      "displayName": "Audio Statistics",
+      "exitCode": 0,
+      "targetTypeSupport": {
+        "0": true,
+        "1": true,
+        "2": true,
+        "3": false
+      }
+    },
+    "com.apple.coredata.faults": {
+      "added": true,
+      "deprecated": "0",
+      "displayName": "Data Faults",
+      "exitCode": 0,
+      "targetTypeSupport": {
+        "0": true,
+        "1": true,
+        "2": true,
+        "3": false
+      }
+    },
+    "com.apple.coredata.fetches": {
+      "added": true,
+      "deprecated": "0",
+      "displayName": "Data Fetches",
+      "exitCode": 0,
+      "targetTypeSupport": {
+        "0": true,
+        "1": true,
+        "2": true,
+        "3": false
+      }
+    },
+    "com.apple.coredata.saves": {
+      "added": true,
+      "deprecated": "0",
+      "displayName": "Data Saves",
+      "exitCode": 0,
+      "targetTypeSupport": {
+        "0": true,
+        "1": true,
+        "2": true,
+        "3": false
+      }
+    },
+    "com.apple.darwin.gcd.performance": {
+      "added": true,
+      "deprecated": "0",
+      "displayName": "GCD Performance",
+      "exitCode": 0,
+      "targetTypeSupport": {
+        "0": true,
+        "1": true,
+        "2": true,
+        "3": false
+      }
+    },
+    "com.apple.dt-perfteam.hangs": {
+      "added": true,
+      "deprecated": "0",
+      "displayName": "Hangs",
+      "exitCode": 0,
+      "targetTypeSupport": {
+        "0": true,
+        "1": true,
+        "2": true,
+        "3": false
+      }
+    },
+    "com.apple.dt-perfteam.runloops": {
+      "added": true,
+      "deprecated": "0",
+      "displayName": "Run Loops",
+      "exitCode": 0,
+      "targetTypeSupport": {
+        "0": true,
+        "1": true,
+        "2": true,
+        "3": false
+      }
+    },
+    "com.apple.dt.SceneKit.view": {
+      "added": true,
+      "deprecated": "0",
+      "displayName": "SceneKit Application",
+      "exitCode": 0,
+      "targetTypeSupport": {
+        "0": true,
+        "1": true,
+        "2": true,
+        "3": false
+      }
+    },
+    "com.apple.dt.coreanimation-fps": {
+      "added": true,
+      "deprecated": "0",
+      "displayName": "Core Animation FPS",
+      "exitCode": 0,
+      "targetTypeSupport": {
+        "0": true,
+        "1": true,
+        "2": true,
+        "3": false
+      }
+    },
+    "com.apple.dt.graphicsstatistics": {
+      "added": true,
+      "deprecated": "0",
+      "displayName": "Advanced Graphics Statistics",
+      "exitCode": 0,
+      "targetTypeSupport": {
+        "0": true,
+        "1": true,
+        "2": true,
+        "3": false
+      }
+    },
+    "com.apple.dt.instrument.dyld-activity": {
+      "added": true,
+      "deprecated": "0",
+      "displayName": "dyld Activity",
+      "exitCode": 0,
+      "targetTypeSupport": {
+        "0": true,
+        "1": true,
+        "2": true,
+        "3": false
+      }
+    },
+    "com.apple.dt.instrument.swift-concurrency-actor": {
+      "added": true,
+      "deprecated": "0",
+      "displayName": "Swift Actors",
+      "exitCode": 0,
+      "targetTypeSupport": {
+        "0": true,
+        "1": true,
+        "2": true,
+        "3": false
+      }
+    },
+    "com.apple.dt.instrument.swift-concurrency-execution-domain": {
+      "added": true,
+      "deprecated": "0",
+      "displayName": "Swift Executors",
+      "exitCode": 0,
+      "targetTypeSupport": {
+        "0": true,
+        "1": true,
+        "2": true,
+        "3": false
+      }
+    },
+    "com.apple.dt.instrument.swift-concurrency-task": {
+      "added": true,
+      "deprecated": "0",
+      "displayName": "Swift Tasks",
+      "exitCode": 0,
+      "targetTypeSupport": {
+        "0": true,
+        "1": true,
+        "2": true,
+        "3": false
+      }
+    },
+    "com.apple.dt.instruments.coreai": {
+      "added": true,
+      "deprecated": "0",
+      "displayName": "Core AI",
+      "exitCode": 0,
+      "targetTypeSupport": {
+        "0": true,
+        "1": true,
+        "2": true,
+        "3": false
+      }
+    },
+    "com.apple.dt.instruments.cpu.counters": {
+      "added": true,
+      "deprecated": "0",
+      "displayName": "CPU Counters",
+      "exitCode": 0,
+      "targetTypeSupport": {
+        "0": true,
+        "1": true,
+        "2": true,
+        "3": false
+      }
+    },
+    "com.apple.dt.instruments.diskio-completion-time": {
+      "added": true,
+      "deprecated": "0",
+      "displayName": "Disk I/O Latency",
+      "exitCode": 0,
+      "targetTypeSupport": {
+        "0": true,
+        "1": true,
+        "2": true,
+        "3": false
+      }
+    },
+    "com.apple.dt.instruments.diskusage": {
+      "added": true,
+      "deprecated": "0",
+      "displayName": "Disk Usage",
+      "exitCode": 0,
+      "targetTypeSupport": {
+        "0": true,
+        "1": true,
+        "2": true,
+        "3": false
+      }
+    },
+    "com.apple.dt.instruments.foveatedstreaming": {
+      "added": true,
+      "deprecated": "0",
+      "displayName": "Foveated Streaming Statistics",
+      "exitCode": 0,
+      "targetTypeSupport": {
+        "0": true,
+        "1": true,
+        "2": true,
+        "3": false
+      }
+    },
+    "com.apple.dt.instruments.fs-suggestions": {
+      "added": true,
+      "deprecated": "0",
+      "displayName": "Filesystem Suggestions",
+      "exitCode": 0,
+      "targetTypeSupport": {
+        "0": true,
+        "1": true,
+        "2": true,
+        "3": false
+      }
+    },
+    "com.apple.dt.instruments.fs-syscalls": {
+      "added": true,
+      "deprecated": "0",
+      "displayName": "Filesystem Activity",
+      "exitCode": 0,
+      "targetTypeSupport": {
+        "0": true,
+        "1": true,
+        "2": true,
+        "3": false
+      }
+    },
+    "com.apple.dt.instruments.metal-perf-overview": {
+      "added": true,
+      "deprecated": "0",
+      "displayName": "Metal Performance Overview",
+      "exitCode": 0,
+      "targetTypeSupport": {
+        "0": true,
+        "1": true,
+        "2": true,
+        "3": false
+      }
+    },
+    "com.apple.dt.instruments.power-metrics": {
+      "added": true,
+      "deprecated": "0",
+      "displayName": "Power Profiler",
+      "exitCode": 0,
+      "targetTypeSupport": {
+        "0": true,
+        "1": true,
+        "2": true,
+        "3": false
+      }
+    },
+    "com.apple.dt.instruments.thread-activity": {
+      "added": true,
+      "deprecated": "0",
+      "displayName": "Thread Activity",
+      "exitCode": 0,
+      "targetTypeSupport": {
+        "0": true,
+        "1": true,
+        "2": true,
+        "3": false
+      }
+    },
+    "com.apple.dt.network-connections": {
+      "added": true,
+      "deprecated": "0",
+      "displayName": "Network Connections",
+      "exitCode": 0,
+      "targetTypeSupport": {
+        "0": true,
+        "1": true,
+        "2": true,
+        "3": false
+      }
+    },
+    "com.apple.dt.os-log-instrument": {
+      "added": true,
+      "deprecated": "0",
+      "displayName": "os_log",
+      "exitCode": 0,
+      "targetTypeSupport": {
+        "0": true,
+        "1": true,
+        "2": true,
+        "3": false
+      }
+    },
+    "com.apple.dt.os-log-signpost-instrument": {
+      "added": true,
+      "deprecated": "0",
+      "displayName": "os_signpost",
+      "exitCode": 0,
+      "targetTypeSupport": {
+        "0": true,
+        "1": true,
+        "2": true,
+        "3": false
+      }
+    },
+    "com.apple.dt.process-output-instrument": {
+      "added": true,
+      "deprecated": "0",
+      "displayName": "stdout/stderr",
+      "exitCode": 0,
+      "targetTypeSupport": {
+        "0": false,
+        "1": true,
+        "2": false,
+        "3": false
+      }
+    },
+    "com.apple.dt.userspace-sampler": {
+      "added": true,
+      "deprecated": "0",
+      "displayName": "Sampler",
+      "exitCode": 0,
+      "targetTypeSupport": {
+        "0": false,
+        "1": true,
+        "2": true,
+        "3": false
+      }
+    },
+    "com.apple.tdg.instruments.reality-metrics": {
+      "added": true,
+      "deprecated": "0",
+      "displayName": "RealityKit Metrics",
+      "exitCode": 0,
+      "targetTypeSupport": {
+        "0": true,
+        "1": true,
+        "2": true,
+        "3": false
+      }
+    },
+    "com.apple.tdg.instruments.realityframes": {
+      "added": true,
+      "deprecated": "0",
+      "displayName": "RealityKit Frames",
+      "exitCode": 0,
+      "targetTypeSupport": {
+        "0": true,
+        "1": true,
+        "2": true,
+        "3": false
+      }
+    },
+    "com.apple.xray.instrument-type.activity": {
+      "added": true,
+      "deprecated": "0",
+      "displayName": "Activity Monitor",
+      "exitCode": 0,
+      "targetTypeSupport": {
+        "0": true,
+        "1": true,
+        "2": true,
+        "3": false
+      }
+    },
+    "com.apple.xray.instrument-type.coreml": {
+      "added": true,
+      "deprecated": "0",
+      "displayName": "Core ML",
+      "exitCode": 0,
+      "targetTypeSupport": {
+        "0": true,
+        "1": true,
+        "2": true,
+        "3": false
+      }
+    },
+    "com.apple.xray.instrument-type.coresampler2": {
+      "added": true,
+      "deprecated": "0",
+      "displayName": "Time Profiler",
+      "exitCode": 0,
+      "targetTypeSupport": {
+        "0": true,
+        "1": true,
+        "2": true,
+        "3": false
+      }
+    },
+    "com.apple.xray.instrument-type.cpusampler": {
+      "added": true,
+      "deprecated": "0",
+      "displayName": "CPU Profiler",
+      "exitCode": 0,
+      "targetTypeSupport": {
+        "0": true,
+        "1": true,
+        "2": true,
+        "3": false
+      }
+    },
+    "com.apple.xray.instrument-type.device-thermal-state": {
+      "added": true,
+      "deprecated": "0",
+      "displayName": "Thermal State",
+      "exitCode": 0,
+      "targetTypeSupport": {
+        "0": true,
+        "1": true,
+        "2": true,
+        "3": false
+      }
+    },
+    "com.apple.xray.instrument-type.energy.location": {
+      "added": true,
+      "deprecated": "0",
+      "displayName": "Location Energy Model",
+      "exitCode": 0,
+      "targetTypeSupport": {
+        "0": false,
+        "1": true,
+        "2": true,
+        "3": false
+      }
+    },
+    "com.apple.xray.instrument-type.homeleaks": {
+      "added": true,
+      "deprecated": "0",
+      "displayName": "Leaks",
+      "exitCode": 0,
+      "targetTypeSupport": {
+        "0": false,
+        "1": true,
+        "2": true,
+        "3": false
+      }
+    },
+    "com.apple.xray.instrument-type.kdebug.scheduler": {
+      "added": true,
+      "deprecated": "0",
+      "displayName": "System Load",
+      "exitCode": 0,
+      "targetTypeSupport": {
+        "0": true,
+        "1": true,
+        "2": true,
+        "3": false
+      }
+    },
+    "com.apple.xray.instrument-type.keventsyscall2": {
+      "added": true,
+      "deprecated": "0",
+      "displayName": "System Call Trace",
+      "exitCode": 0,
+      "targetTypeSupport": {
+        "0": true,
+        "1": true,
+        "2": true,
+        "3": false
+      }
+    },
+    "com.apple.xray.instrument-type.keventvm2": {
+      "added": true,
+      "deprecated": "0",
+      "displayName": "Virtual Memory Trace",
+      "exitCode": 0,
+      "targetTypeSupport": {
+        "0": true,
+        "1": true,
+        "2": true,
+        "3": false
+      }
+    },
+    "com.apple.xray.instrument-type.metal-application": {
+      "added": true,
+      "deprecated": "0",
+      "displayName": "Metal Application",
+      "exitCode": 0,
+      "targetTypeSupport": {
+        "0": true,
+        "1": true,
+        "2": true,
+        "3": false
+      }
+    },
+    "com.apple.xray.instrument-type.metal-display": {
+      "added": true,
+      "deprecated": "0",
+      "displayName": "Display",
+      "exitCode": 0,
+      "targetTypeSupport": {
+        "0": true,
+        "1": true,
+        "2": true,
+        "3": false
+      }
+    },
+    "com.apple.xray.instrument-type.metal-gpu": {
+      "added": true,
+      "deprecated": "0",
+      "displayName": "GPU",
+      "exitCode": 0,
+      "targetTypeSupport": {
+        "0": true,
+        "1": true,
+        "2": true,
+        "3": false
+      }
+    },
+    "com.apple.xray.instrument-type.metal-gpu-counters": {
+      "added": true,
+      "deprecated": "0",
+      "displayName": "Metal GPU Counters",
+      "exitCode": 0,
+      "targetTypeSupport": {
+        "0": true,
+        "1": true,
+        "2": true,
+        "3": false
+      }
+    },
+    "com.apple.xray.instrument-type.metal-memory": {
+      "added": true,
+      "deprecated": "0",
+      "displayName": "Metal Resource Events",
+      "exitCode": 0,
+      "targetTypeSupport": {
+        "0": true,
+        "1": true,
+        "2": true,
+        "3": false
+      }
+    },
+    "com.apple.xray.instrument-type.oa": {
+      "added": true,
+      "deprecated": "0",
+      "displayName": "Allocations",
+      "exitCode": 0,
+      "targetTypeSupport": {
+        "0": false,
+        "1": true,
+        "2": true,
+        "3": false
+      }
+    },
+    "com.apple.xray.instrument-type.poi": {
+      "added": true,
+      "deprecated": "0",
+      "displayName": "Points of Interest",
+      "exitCode": 0,
+      "targetTypeSupport": {
+        "0": true,
+        "1": true,
+        "2": true,
+        "3": false
+      }
+    },
+    "com.apple.xray.instrument-type.vmtrack": {
+      "added": true,
+      "deprecated": "0",
+      "displayName": "VM Tracker",
+      "exitCode": 0,
+      "targetTypeSupport": {
+        "0": false,
+        "1": true,
+        "2": true,
+        "3": false
+      }
+    }
+  },
+  "source": "Blank template + one registry type, inspect only; target codes are private enum values",
+  "xcode": "27.0 (27A266a)"
+}

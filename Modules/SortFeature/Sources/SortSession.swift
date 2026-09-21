@@ -50,6 +50,12 @@ public final class SortSession {
 
   public private(set) var phase: Phase = .idle
 
+  #if DEBUG && targetEnvironment(macCatalyst) && LOCAL_INSTRUMENTS_TRACING
+  var debugTraceTemplate: DebugTraceTemplate = .cpuProfiler
+  var debugTraceRepetitions = 1
+  var debugTraceHighFrequency = false
+  #endif
+
   /// The most recent `.replaying`/`.complete` replay this session has shown — unlike `phase`'s
   /// own associated value, this survives the `.recording`/`.ready` gap `start(size:)` passes
   /// through before the next run's replay exists, so `SortView` can keep rendering the previous
@@ -164,11 +170,45 @@ public final class SortSession {
     let algorithm = self.algorithm
     let shuffle = self.shuffle
     let operationCap = settings.recordingOperationCap
+    #if DEBUG && targetEnvironment(macCatalyst) && LOCAL_INSTRUMENTS_TRACING
+    let selectedTraceTemplate = debugTraceTemplate
+    let selectedTraceRepetitions = debugTraceRepetitions
+    let selectedTraceHighFrequency = debugTraceHighFrequency
+    #endif
     do {
-      let tape = try await Task.detached(priority: .userInitiated) {
-        try TapeFactory.makeTape(
-          algorithm: algorithm, shuffle: shuffle, size: clampedSize, operationCap: operationCap)
+      let recording = try await Task.detached(priority: .userInitiated) {
+        #if DEBUG && targetEnvironment(macCatalyst) && LOCAL_INSTRUMENTS_TRACING
+        return try DebugInstrumentsTrace.run(
+          label: "sort-\(algorithm.id.rawValue)", template: selectedTraceTemplate,
+          highFrequency: selectedTraceHighFrequency
+        ) {
+          var tape = try TapeFactory.makeTape(
+            algorithm: algorithm, shuffle: shuffle, size: clampedSize, operationCap: operationCap)
+          for _ in 1..<max(1, selectedTraceRepetitions) {
+            tape = try TapeFactory.makeTape(
+              algorithm: algorithm, shuffle: shuffle, size: clampedSize,
+              operationCap: operationCap)
+          }
+          return tape
+        }
+        #else
+        return (value: try TapeFactory.makeTape(
+          algorithm: algorithm, shuffle: shuffle, size: clampedSize, operationCap: operationCap),
+          traceURL: Optional<URL>.none)
+        #endif
       }.value
+      let tape = recording.value
+      #if DEBUG && targetEnvironment(macCatalyst) && LOCAL_INSTRUMENTS_TRACING
+      if let traceURL = recording.traceURL {
+        DebugTraceHistory.shared.add(DebugTraceRecord(
+          id: traceURL, algorithmName: algorithm.metadata.displayName,
+          profileName: selectedTraceTemplate.rawValue,
+          repetitions: selectedTraceRepetitions,
+          highFrequency: selectedTraceHighFrequency && selectedTraceTemplate.supportsHighFrequency,
+          processID: ProcessInfo.processInfo.processIdentifier,
+          recordedAt: .now))
+      }
+      #endif
       lastRunWasSkipped = false
       phase = .ready(tape)
       startReplay(tape)
