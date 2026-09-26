@@ -41,8 +41,8 @@ public struct BogoBogoSort: SortAlgorithm {
     category: .impractical,
     sizeRange: 3...5,
     growthModel: OperationGrowthModel(
-      anchorSize: 12, coefficients: [3451.29, 1516.82, 333.315, 48.83, 5.36511, 0.471586, 0.0345432],
-      measuredSafeCeiling: 12),
+      anchorSize: 4, coefficients: [102.571, 45.0793, 9.90602, 1.45121, 0.159449, 0.0140154, 0.00102661],
+      measuredSafeCeiling: 4),
     detectedGrowthModel: DetectedGrowthModel(
       family: .exponential, coefficients: [17.6826, 1.55192], rSquared: 0.984783),
     implementationComplexity: 35,

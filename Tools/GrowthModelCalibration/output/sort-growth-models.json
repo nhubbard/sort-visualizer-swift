@@ -590,15 +590,16 @@
       17.68261649618007,
       1.5519207069581928
     ],
+    "measuredSafeCeiling" : 4,
     "runnerUpFamily" : "powerLaw",
     "runnerUpRSquared" : 0.9823180613049705,
     "safeMaxSizeByCap" : [
       100000,
-      12,
+      4,
       300000,
-      12,
+      4,
       1000000,
-      12
+      4
     ],
     "sampleSizes" : [
       3,

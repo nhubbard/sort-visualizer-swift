@@ -203,6 +203,11 @@ def fit_taylor_model(entry: dict) -> tuple[float, list[float], float, bool]:
 
 
 def measured_safe_ceiling(entry: dict) -> int | None:
+    # New reports carry the algorithm-wide minimum across every shuffle, including shuffles that
+    # stopped too early to fit a curve. Keep the derivation below for older checked-in reports so
+    # the application tool remains backward-compatible while they are recalibrated incrementally.
+    if "measuredSafeCeiling" in entry:
+        return entry["measuredSafeCeiling"]
     unsafe_at = entry.get("unsafeAtSize")
     if unsafe_at is None:
         return None
