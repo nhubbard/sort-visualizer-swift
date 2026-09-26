@@ -1587,6 +1587,36 @@
   },
   {
     "coefficients" : [
+      0.04196315921917499,
+      33.24961908482081,
+      -334.49113283580374
+    ],
+    "runnerUpFamily" : "powerLog",
+    "runnerUpRSquared" : 0.9729785904452245,
+    "safeMaxSizeByCap" : [
+      100000,
+      1043,
+      300000,
+      2029,
+      1000000,
+      3988
+    ],
+    "sampleSizes" : [
+      16,
+      17,
+      18,
+      19,
+      38,
+      76,
+      152,
+      304
+    ],
+    "subjectID" : "fifthmergesort+pdqbad",
+    "winningFamily" : "polynomialIntercept",
+    "winningRSquared" : 0.9992865938303847
+  },
+  {
+    "coefficients" : [
       0.06995245595147623,
       52.48615157264901,
       -686.1821570642855

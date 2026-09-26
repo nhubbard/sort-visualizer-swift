@@ -37,7 +37,7 @@ struct Sort2App: App {
       ClassicTournamentSort(), ClassicTreeSort(), CocktailBogoSort(), CocktailMergeSort(), CocktailShakerSort(),
       CombSort(), CompleteGraphSort(), CountingSort(), CreaseSort(), CycleSort(), DeterministicBogoSort(),
       DiamondSortIterative(), DiamondSortRecursive(), DoubleInsertionSort(), DoubleSelectionSort(),
-      DropMergeSort(), DualPivotQuickSort(), ExchangeBogoSort(), FlashSort(), FlippedMinHeapSort(), FlanSort(), FluxSort(),
+      DropMergeSort(), DualPivotQuickSort(), ExchangeBogoSort(), FifthMergeSort(), FlashSort(), FlippedMinHeapSort(), FlanSort(), FluxSort(),
       FoldSort(),
       ForcedStableQuickSort(), FunSort(), GnomeSort(), GrailSort(), GravitySort(), GuessSort(), HanoiSort(),
       HybridCombSort(), ImprovedBlockSelectionSort(), ImprovedInPlaceMergeSort(), IndexSort(),
