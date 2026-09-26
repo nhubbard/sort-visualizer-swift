@@ -1,6 +1,5 @@
-*From Wikipedia, the free encyclopedia*
-
-Pancake sorting is the mathematical problem of sorting a disordered stack of pancakes in order of size when a spatula
+Burnt Pancake Sort is a variant of pancake sorting in which each pancake has an orientation as well as a size. Pancake
+sorting is the mathematical problem of sorting a disordered stack of pancakes in order of size when a spatula
 can be inserted at any point in the stack and used to flip all pancakes above it. A *pancake number* is the minimum
 number of flips required for a given number of pancakes. In this form, the problem was first discussed by American
 geometer [Jacob E. Goodman](https://en.wikipedia.org/wiki/Jacob_E._Goodman). It gained wider attention after computer
@@ -9,10 +8,9 @@ with [Christos Papadimitriou](https://en.wikipedia.org/wiki/Christos_Papadimitri
 strategy that repeatedly brings the largest not-yet-sorted pancake to the top of the stack with one flip, then flips it
 again into its final resting place at the bottom of the unsorted portion.
 
-A well-known variant of the problem concerns *burnt* pancakes. Here, every pancake in the stack has one side that has
-been burnt, and a properly sorted stack must, in addition to being ordered by size, have every pancake's burnt side
+A properly sorted stack of *burnt* pancakes must be ordered by size and have every pancake's burnt side
 facing down. Because a spatula flip both reverses the order of the pancakes above the insertion point *and* turns each
-of those pancakes upside-down, a flip in the burnt variant simultaneously changes relative order and orientation — a
+of those pancakes upside-down, a flip in the burnt variant simultaneously changes relative order and orientation, a
 single move that must be reasoned about on two axes at once, rather than one. This makes the burnt pancake problem
 meaningfully harder to analyze than the ordinary version, and its
 exact [pancake number](https://en.wikipedia.org/wiki/Pancake_sorting) is known only for small stack sizes.

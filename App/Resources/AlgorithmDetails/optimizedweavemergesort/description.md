@@ -1,5 +1,3 @@
-*From Wikipedia, the free encyclopedia*
-
 Optimized Weave Merge Sort is a bottom-up, in-place merge sort. Like any bottom-up merge sort, it
 treats the array as a collection of single-element runs, merges adjacent runs into pairs, then
 repeats on the doubled run size until the whole array is one sorted run. What sets it apart is how

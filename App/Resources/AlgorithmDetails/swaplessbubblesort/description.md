@@ -1,5 +1,3 @@
-*From Wikipedia, the free encyclopedia*
-
 Swapless Bubble Sort is a variant of [Bubble Sort](https://en.wikipedia.org/wiki/Bubble_sort) that produces the exact
 same comparisons and the same final ordering, but never calls a two-element swap. Instead of exchanging array[j] and
 array[j + 1] whenever they are out of order, it carries the larger of the two compared values forward in a single
@@ -15,12 +13,12 @@ whatever value it is still carrying into the newly-shrunk boundary, the same pos
 would have landed after a normal bubble sort pass.
 
 This restructuring matters on systems, cost models, or visualizations where a swap and a write are not equivalent
-operations — a swap is conventionally two writes performed together, while this technique achieves the same
+operations, a swap is conventionally two writes performed together, while this technique achieves the same
 rearrangement using no more than one write per comparison. Since it only ever moves a value when the carried value
 compares strictly greater than the value it is being measured against, equal elements are never reordered relative to
 one another, so the algorithm remains stable, just like the ordinary bubble sort it re-expresses.
 
 Asymptotically, Swapless Bubble Sort behaves identically to Bubble Sort: each pass still shrinks to the position of the
-last shift, giving a best case of O(n) on already-sorted input, and both the average and worst cases remain O(n^2),
+last shift, giving a best case of O(n) on already-sorted input, and both the average and worst cases remain O(n²),
 since the number of out-of-order relationships to resolve in an arbitrary permutation does not change just because the
 underlying primitive changed from a swap to a write.

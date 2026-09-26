@@ -1,5 +1,3 @@
-*From Wikipedia, the free encyclopedia*
-
 Introsort or introspective sort is a hybrid sorting algorithm that provides both fast average performance and an optimal
 worst-case performance. It begins with [quicksort](https://en.wikipedia.org/wiki/Quicksort) and switches
 to [heapsort](https://en.wikipedia.org/wiki/Heapsort) when the recursion depth exceeds a level based on (the logarithm

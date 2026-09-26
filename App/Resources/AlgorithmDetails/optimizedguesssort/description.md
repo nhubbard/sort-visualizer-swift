@@ -2,9 +2,7 @@ Optimized Guess Sort plays the same "guess an index for every output position" g
 the random draw with a deterministic one: the guessed indices are treated as an odometer, a counter in base n with n
 digits, incremented by one every time a guess fails the same non-decreasing-with-a-tie-break check Random Guess Sort
 uses. Where Random Guess Sort might redraw the same bad guess twice by chance, this variant is guaranteed to try every
-one of the n^n possible index sequences exactly once, in a fixed order, before it could ever repeat itself.
+one of the nⁿ possible index sequences exactly once, in a fixed order, before it could ever repeat itself.
 
-That guarantee doesn't make the underlying search any smaller — it's still every possible sequence of index guesses, not
-just the n! permutations — but it does mean the number of steps needed has a hard, computable ceiling instead of being
-an open-ended random variable. In that sense it's less "optimized" in the everyday sense of the word and more "the same
-idea, made to terminate reliably" — a joke already baked into this family of algorithms' own naming.
+The search still covers every possible sequence of index guesses rather than only the n! permutations. Deterministic
+enumeration gives the number of attempts a finite upper bound instead of making it an open-ended random variable.

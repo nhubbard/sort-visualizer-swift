@@ -1,5 +1,3 @@
-*From Wikipedia, the free encyclopedia*
-
 Binary Double Insertion Sort is a variant of [Double Insertion Sort](https://en.wikipedia.org/wiki/Insertion_sort) that
 replaces its linear scan-while-shifting insertion step with
 a [binary search](https://en.wikipedia.org/wiki/Binary_search_algorithm). Like its sibling, it grows a sorted region
@@ -13,7 +11,7 @@ belongs. Binary Double Insertion Sort instead binary-searches the already-sorted
 destination index, then performs a single shift pass that moves every element between the old and new positions over by
 one slot before dropping the new element into the gap. Binary search cuts the number of *comparisons* needed to locate
 each element's destination from linear to logarithmic in the size of the sorted region, but the shifting itself is still
-a linear walk over the displaced elements, so the total number of element moves — and with it the overall running time —
+a linear walk over the displaced elements, so the total number of element moves, and with it the overall running time,
 is unchanged from the non-binary variant.
 
 Two separate binary searches are used, and which one applies to which of the two new elements depends on which side of

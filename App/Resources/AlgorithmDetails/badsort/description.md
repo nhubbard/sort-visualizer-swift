@@ -1,31 +1,16 @@
-*From Wikipedia, the free encyclopedia*
+Bad Sort is a comparison-based sorting algorithm with a worst-case time complexity of *O*(*n³*). James Jensen
+contributed it to a Stack Overflow discussion about sorting algorithms with cubic worst-case behavior.
 
-Bad Sort is a comparison-based sorting algorithm designed specifically to demonstrate a worst-case time complexity of
-*O*(*n³*) — a deliberately inefficient answer to a well-known Stack Overflow discussion asking whether any sorting
-algorithm actually achieves cubic worst-case behavior. It was contributed by James Jensen (username "StriplingWarrior")
-and has since become a stock example cited whenever a genuinely, provably cubic (rather than merely "very slow
-quadratic") comparison sort is wanted for illustration.
+Bad Sort follows selection sort's placement rule: each pass finds the smallest remaining element and swaps it into the
+front of the unsorted region. Instead of retaining a running minimum, it tests each candidate position and scans every
+later element to determine whether a smaller value exists. Both accepted and rejected candidates can therefore require
+a full scan.
 
-Structurally, Bad Sort is an ordinary selection sort in disguise: on each pass it still looks for the smallest remaining
-element and swaps it into place at the front of the unsorted region, exactly as a textbook selection sort does. What
-makes it deliberately wasteful is *how* it decides that a candidate element is the smallest. Rather than tracking a
-running minimum while scanning once through the remaining elements, Bad Sort instead tries each candidate position in
-turn and, for every candidate, exhaustively scans every element after it to prove that no smaller value exists anywhere
-further along. Only once a candidate survives that full gauntlet of comparisons is it accepted as the minimum and
-swapped into place. Every rejected candidate still costs a scan before it can be ruled out, and every accepted candidate
-costs a full scan to be ruled *in* — there is no way to shortcut the proof.
+The additional verification scans increase the worst-case complexity from selection sort's *O*(*n²*) to *O*(*n³*).
+Sorted and reverse-sorted arrays still require *O*(*n²*) work because their verification scans terminate early. The
+cubic case occurs when candidate minima repeatedly require long scans before being rejected.
 
-This "prove there's nothing smaller ahead" strategy is what pushes the complexity from the usual *O*(*n²*) of selection
-sort up to *O*(*n³*) in the worst case: the inefficiency does not come from any single loop running longer than it
-should, but from an entire second dimension of redundant verification work layered on top of an already quadratic
-selection process. Notably, this cubic blow-up is not uniform across all inputs — already-sorted and
-already-reverse-sorted arrays still only cost *O*(*n²*) work, since the verification scans either always succeed
-immediately or always fail after a single comparison. The true cubic cost is reserved for inputs where the array's true
-minimum sits far from where the algorithm expects it, forcing many long, ultimately-failed verification attempts before
-the real minimum is found and confirmed.
-
-Because it is built entirely from element swaps rather than shifts, Bad Sort shares selection sort's well-known
+Because it is built entirely from element swaps rather than shifts, Bad Sort shares selection sort's
 instability: swapping a far-away minimum into place can carry equal-valued elements past one another, so elements that
 compare equal are not guaranteed to retain their original relative order. As with other purpose-built "impractical"
-sorts, Bad Sort has no practical use outside of complexity-theory demonstrations and sorting-algorithm visualizations,
-where its exaggerated worst case makes an instructive counterpoint to ordinary quadratic sorts.
+sorts, Bad Sort is used for complexity demonstrations and sorting-algorithm visualizations.

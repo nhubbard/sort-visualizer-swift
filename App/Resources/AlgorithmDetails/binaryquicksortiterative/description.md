@@ -2,7 +2,7 @@ Binary Quick Sort is a most-significant-bit-first radix sort dressed up as a qui
 comparing whole values against a chosen pivot element, it partitions a range purely on one bit
 position at a time. A Hoare-style partition walks two pointers toward each other from opposite
 ends of the range, skipping past every element whose bit at the current position is already on
-the correct side — clear on the left, set on the right — and swapping the pair of elements it
+the correct side, clear on the left, set on the right, and swapping the pair of elements it
 finds out of place whenever both pointers stop. Every value in the range ends up grouped into a
 "bit clear" half and a "bit set" half, with no other ordering imposed within either half.
 
@@ -18,7 +18,7 @@ This iterative folder drives that process without ever letting the algorithm rec
 partitioning step produces two new sub-ranges, and rather than calling itself on each one, the
 algorithm pushes both onto the back of an explicit first-in-first-out queue of pending (start,
 end, bit) tasks. A single loop repeatedly pulls the next task off the front of that queue,
-partitions it if it still spans more than one element and there's a bit left to test, and pushes
+partitions it if it still spans more than one element and there is a bit left to test, and pushes
 its two children back on, continuing until the queue drains. The result is identical to the
 recursive version, just processed breadth-first through an explicit queue instead of depth-first
 through the call stack, so the algorithm never grows a call stack proportional to the number of

@@ -1,6 +1,4 @@
-*From Wikipedia, the free encyclopedia*
-
-In computer science, heap sort is a [comparison-based](https://en.wikipedia.org/wiki/Comparison_sort) sorting algorithm.
+Heap sort is a [comparison-based](https://en.wikipedia.org/wiki/Comparison_sort) sorting algorithm.
 Heap sort can be thought of as an improved [selection sort](https://en.wikipedia.org/wiki/Selection_sort): like
 selection sort, heap sort divides its input into a sorted and an unsorted region, and it iteratively shrinks the
 unsorted region by extracting the largest element from it and inserting it into the sorted region. Unlike selection

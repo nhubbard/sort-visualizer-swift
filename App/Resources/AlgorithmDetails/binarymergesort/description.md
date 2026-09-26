@@ -1,5 +1,3 @@
-*From Wikipedia, the free encyclopedia*
-
 Binary Merge Sort is a hybrid variant of [Merge Sort](https://en.wikipedia.org/wiki/Merge_sort),
 a [divide-and-conquer algorithm](https://en.wikipedia.org/wiki/Divide-and-conquer_algorithm) invented
 by [John von Neumann](https://en.wikipedia.org/wiki/John_von_Neumann) in 1945. Merge sort works by recursively splitting

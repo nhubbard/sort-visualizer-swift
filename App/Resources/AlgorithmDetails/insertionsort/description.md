@@ -1,5 +1,3 @@
-*From Wikipedia, the free encyclopedia*
-
 Insertion sort is a simple sorting algorithm that builds the final sorted array one item at a time. It is much less
 efficient on large lists than more advanced algorithms such as quicksort, heapsort, or merge sort. Its implementation
 is simple; [Jon Bentley](https://en.wikipedia.org/wiki/Jon_Bentley_(computer_scientist)) has written both a three-line

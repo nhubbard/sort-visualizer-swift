@@ -1,11 +1,9 @@
-*From Wikipedia, the free encyclopedia*
-
 Base-N Max Heap Sort is an ordinary [Heapsort](https://en.wikipedia.org/wiki/Heapsort) generalized so that every node in
 the heap has N children instead of two. This implementation fixes N at 4, so each node sifts down against up to four
 children rather than the usual pair. The two-phase
 structure of binary heap sort carries over unchanged: first build a max-heap over the whole array from the bottom up by
-sifting every node down into place, then repeatedly swap the root — always the current maximum, by the max-heap
-property — out to the end of the still-unsorted region and re-heapify what remains.
+sifting every node down into place, then repeatedly swap the root, always the current maximum, by the max-heap
+property, out to the end of the still-unsorted region and re-heapify what remains.
 
 The only real difference from ordinary binary max heap sort is inside the sift-down step itself. A binary heap's
 sift-down compares a node against exactly two children and descends toward whichever is larger; a base-N heap's

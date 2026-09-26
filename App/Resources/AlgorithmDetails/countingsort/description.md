@@ -1,5 +1,3 @@
-*From Wikipedia, the free encyclopedia*
-
 Counting Sort is an integer sorting algorithm that operates by counting the number of occurrences of each distinct value
 in the input, then using those counts to determine each value's position in the sorted output.
 Unlike [comparison sorts](https://en.wikipedia.org/wiki/Comparison_sort) such as Quick Sort or Merge Sort, Counting Sort
@@ -14,12 +12,12 @@ than or equal to that value. Finally, it scans the input a second time, placing 
 in an output array by consulting and decrementing the cumulative count for its value.
 
 Because Counting Sort's running time is O(n + k), where n is the number of elements and k is the size of the value
-range, it is extremely fast — effectively linear — whenever k is not significantly larger than n. However, its
+range, it is extremely fast, effectively linear, whenever k is not significantly larger than n. However, its
 O(n + k) space requirement makes it impractical for inputs drawn from a very large or sparse range of values, since
 the counting table would dwarf the input itself.
 
 When implemented with the standard cumulative-count technique and a backward scan over the input during the final
 placement pass, Counting Sort is a [stable sort](https://en.wikipedia.org/wiki/Sorting_algorithm#Stability): elements
 with equal values retain their relative order from the input. This stability, combined with its linear-time behavior on
-bounded integer ranges, makes it a common building block for other algorithms, most notably as the stabilizing pass
+bounded integer ranges, makes it a common building block for other algorithms, particularly as the stabilizing pass
 inside [Radix Sort](https://en.wikipedia.org/wiki/Radix_sort).

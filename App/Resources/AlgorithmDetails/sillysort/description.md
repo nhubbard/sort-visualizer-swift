@@ -2,17 +2,17 @@ Silly Sort was written by Tom Duff as an entry in the long-running "algorithms t
 they have any right to be" genre and described in a 2001 note. It
 sorts a range [i, j] by splitting it at the midpoint m, recursively "silly-sorting" both
 halves, comparing only the first elements of the two halves (array[i] and array[m + 1]) and
-swapping them if they're out of order, and then — instead of stopping there — recursively
+swapping them if they are out of order, and then, instead of stopping there, recursively
 silly-sorting almost the *entire* remaining range, [i + 1, j].
 
-That last step is what makes this algorithm interesting rather than just quadratic: two half-size
-recursive calls followed by one call on a range that's only one element smaller than the whole
+The last step makes the running time exceed a quadratic bound: two half-size
+recursive calls followed by one call on a range that is only one element smaller than the whole
 thing is precisely the same recurrence shape as [Slowsort](https://en.wikipedia.org/wiki/Slowsort)'s
-"multiply and surrender" strategy, T(n) = 2T(n/2) + T(n - 1) + O(1). Solving that recurrence gives
-O(n^(log n)), an exponent that keeps growing with the input size rather than staying fixed the
-way a merge sort's or even a Stooge sort's does — the same asymptotically terrible territory
+"multiply and surrender" strategy, T(n) = 2T(n ÷ 2) + T(n − 1) + O(1). Solving that recurrence gives
+O(nˡᵒᵍ ⁿ), an exponent that keeps growing with the input size rather than staying fixed the
+way a merge sort's or even a Stooge sort's does, the same asymptotically terrible territory
 Slowsort occupies, arrived at independently by a different-looking recursive structure.
 
-Because the compare-and-swap step operates on two elements — array[i] and array[m + 1] — that
+Because the compare-and-swap step operates on two elements, array[i] and array[m + 1], that
 are generally far apart in the array rather than adjacent, Silly Sort does not preserve the
 original relative order of equal elements and is not a stable sort.

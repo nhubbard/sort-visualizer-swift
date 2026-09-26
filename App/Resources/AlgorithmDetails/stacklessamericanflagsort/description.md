@@ -17,19 +17,19 @@ bucket's sub-range and unwinding back out again, it walks the same conceptual re
 iteratively using a small amount of state: a pair of numbers tracking the start and end of whatever
 range is currently active, and a running digit place. After distributing a range, the algorithm
 always steps immediately into that range's first bucket next, rather than working through the
-buckets in array order — a preorder, depth-first descent, just with an explicit pair of counters
+buckets in array order, a preorder, depth-first descent, just with an explicit pair of counters
 standing in for the call stack a recursive version would otherwise build up. When a descent finally
-bottoms out because there is no digit place left to test, a separate counter that mirrors how many
+bottoms out because there is no digit place left to test, a separate counter that records how many
 bucket boundaries have already been fully walked is advanced and inspected to find the next sibling
 bucket still waiting to be visited, climbing back up through however many levels have already been
 exhausted before dropping back down into fresh, unvisited territory. A short scan then widens the
 active range to catch every remaining element that belongs to that sibling but was never grouped
 into it when the range was first split.
 
-The net effect is identical to the ordinary recursive in-place radix distribution: every element
+The procedure produces the same in-place radix distribution as the recursive formulation: every element
 ends up sorted by comparing digit by digit from the most significant digit down. The difference is
 that the traversal never grows a call stack proportional to the number of digit places or bucket
-ranges involved — the same stack-free tree-walk trick that lets a most-significant-bit binary
+ranges involved, the same stack-free tree-walk trick that lets a most-significant-bit binary
 partition sort avoid recursion generalizes cleanly here to an arbitrary number of buckets per
 digit, instead of just two.
 

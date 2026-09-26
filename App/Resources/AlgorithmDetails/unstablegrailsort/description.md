@@ -11,7 +11,7 @@ input size.
 This is the "unstable" member of the Grail Sort family. A companion "stable" version exists that
 tags each block with which side of a merge it originally came from and threads that bookkeeping
 through every merge step so that equal elements never cross past each other out of their original
-order — at the cost of noticeably more bookkeeping and a bit more overhead. This version skips all
+order, at the cost of noticeably more bookkeeping and a bit more overhead. This version skips all
 of that: when it needs to decide the relative order of two same-sized blocks during the combine
 phase, it compares only the first element of each block, and if those are equal it falls back to
 comparing the last element of each block. There is no tie-break based on where a block originally
@@ -19,9 +19,9 @@ sat in the array, so whenever two blocks contain equal keys the algorithm is fre
 and it does. The net result sorts correctly but does not preserve the relative order of equal
 elements, which is what earns it the "unstable" name.
 
-Like most block-merge sorts, Grail Sort doesn't fit neatly into a single traditional family — it
+Like most block-merge sorts, Grail Sort does not fit neatly into a single traditional family, it
 borrows the divide-and-conquer merge structure of merge sort, the run-detection and block-building
 ideas common to hybrid sorts like Timsort, and in-place rotation techniques more commonly seen in
-specialized array-rearrangement algorithms. It's best categorized as a hybrid sort: a purpose-built
+specialized array-rearrangement algorithms. It is best categorized as a hybrid sort: a purpose-built
 combination of ideas assembled specifically to get merge sort's guaranteed O(n log n) behavior
 without merge sort's usual O(n) space cost.

@@ -1,5 +1,3 @@
-*From Wikipedia, the free encyclopedia*
-
 Bingo Sort is a variant of [Selection Sort](https://en.wikipedia.org/wiki/Selection_sort) that targets a *value* on each
 pass rather than a single *item*. Where ordinary Selection Sort scans the unsorted region for the maximum element and
 moves exactly one item into place per pass, Bingo Sort scans for the maximum *value* and moves every element that shares
@@ -9,16 +7,16 @@ pass can retire an entire run of ties at once instead of requiring one pass per 
 The algorithm works backward from the end of the array. It first finds the true maximum value present, then repeatedly
 sweeps the remaining unsorted prefix looking for elements equal to the current target value, swapping each match into
 the shrinking unsorted/sorted boundary at the tail. While making that sweep, it simultaneously keeps track of the
-next-highest value seen among the elements that were not a match — that becomes the target for the following pass, so no
+next-highest value seen among the elements that were not a match. That value becomes the target for the following pass, so no
 extra scan is needed to discover it. Once every occurrence of the current target has been moved, the boundary skips past
 any positions that already hold that value before the next pass begins.
 
 Because the number of passes Bingo Sort needs is bounded by the number of *distinct* values rather than the number of
-*elements*, its running time is best expressed as O(n + m^2) in the best case and O(n * m) otherwise, where n is
+*elements*, its running time is best expressed as O(n + m²) in the best case and O(n × m) otherwise, where n is
 the array length and m is the count of unique values. When duplicates are abundant and m is small relative to n,
 Bingo Sort approaches linear behavior, similar in spirit
 to [Counting Sort](https://en.wikipedia.org/wiki/Counting_sort); when every value is distinct (m = n), it degrades to
-the same O(n^2) behavior as plain Selection Sort.
+the same O(n²) behavior as plain Selection Sort.
 
 Like Selection Sort, Bingo Sort sorts in place using only a constant amount of auxiliary storage (O(1) space), and it
 is not a [stable sort](https://en.wikipedia.org/wiki/Sorting_algorithm#Stability): swapping matched values into the tail

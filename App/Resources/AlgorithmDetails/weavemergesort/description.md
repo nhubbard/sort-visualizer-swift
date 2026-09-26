@@ -1,8 +1,6 @@
-*From Wikipedia, the free encyclopedia*
-
 Weave Merge Sort is a divide-and-conquer sorting algorithm with the recursive shape of an
-ordinary [Merge Sort](https://en.wikipedia.org/wiki/Merge_sort) — it splits a run of the array at its midpoint, sorts
-each contiguous half recursively, and then combines the two sorted halves back together — but it combines them in a way
+ordinary [Merge Sort](https://en.wikipedia.org/wiki/Merge_sort), it splits a run of the array at its midpoint, sorts
+each contiguous half recursively, and then combines the two sorted halves back together, but it combines them in a way
 that never compares a single value against another. Instead of merging the two sorted halves by repeatedly picking
 whichever run's front element is smaller, it first *weaves* them together: the two halves are riffled into one
 interleaved sequence, left[0], right[0], left[1], right[1], and so on, purely by shuffling positions, the same way a
@@ -13,7 +11,7 @@ into actual sorted order.
 
 This trade lands Weave Merge Sort in an unusual spot relative to the sorts it resembles. A textbook merge step only ever
 does linear work, because it can exploit the fact that both runs are already sorted: it just walks two cursors forward
-and copies whichever element is smaller. Weaving throws that structure away — riffling two ascending runs together
+and copies whichever element is smaller. Weaving throws that structure away, riffling two ascending runs together
 produces a sequence that is, in general, nowhere close to sorted, so the insertion-sort pass that follows has real work
 to do, and can require quadratic time even when the two input halves are individually sorted from the moment they are
 woven together. The result is an algorithm that keeps the divide step of Merge Sort but loses its combine step's
@@ -28,7 +26,7 @@ same reordering-under-ties can also occur at every deeper level of the recursion
 a [stable sort](https://en.wikipedia.org/wiki/Sorting_algorithm#Stability): equal elements are not guaranteed to keep
 their original relative order in the output.
 
-Weave Merge Sort needs no auxiliary buffer of any kind — the weave step is built entirely from adjacent element swaps,
+Weave Merge Sort needs no auxiliary buffer. The weave step is built entirely from adjacent element swaps,
 and the fix-up insertion sort that follows works in place as well. Its only real memory cost is the recursion's own call
-stack, which grows logarithmically with the input size, the same depth a Quick Sort partition recursion would need,
+stack, which grows logarithmically with the input size. This is the same depth that a Quick Sort partition recursion requires,
 rather than the linear-sized scratch array that a conventional merge sort's combine step requires.

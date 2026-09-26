@@ -1,5 +1,3 @@
-*From Wikipedia, the free encyclopedia*
-
 Quick Sort is an in-place sorting algorithm. Developed by British computer
 scientist [Tony Hoare](https://en.wikipedia.org/wiki/Tony_Hoare) in 1959 and published in 1961, it is still a commonly
 used algorithm for sorting. When implemented well, it can be somewhat faster than Merge Sort and about two or three

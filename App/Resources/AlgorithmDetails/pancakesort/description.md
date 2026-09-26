@@ -1,5 +1,3 @@
-*From Wikipedia, the free encyclopedia*
-
 Pancake sorting is the mathematical problem of sorting a disordered stack of pancakes in order of size when a spatula
 can be inserted at any point in the stack and used to flip all pancakes above it. A *pancake number* is the minimum
 number of flips required for a given number of pancakes. In this form, the problem was first discussed by American
@@ -12,5 +10,5 @@ traditional [sorting problem](https://en.wikipedia.org/wiki/Sorting_problem), th
 the [number of comparisons required to sort a list](https://en.wikipedia.org/wiki/Comparison_sort#Number_of_comparisons_required_to_sort_a_list).
 The number of actual operations, such as swapping two elements, is then irrelevant. For pancake sorting problems, in
 contrast, the aim is to minimize the number of operations, where the only allowed operations are reversals of the
-elements of some [*prefix*](https://en.wikipedia.org/wiki/Prefix_(computer_science)) of the sequence. Now, the number of
+elements of some [*prefix*](https://en.wikipedia.org/wiki/Prefix_(computer_science)) of the sequence. The number of
 comparisons is irrelevant.

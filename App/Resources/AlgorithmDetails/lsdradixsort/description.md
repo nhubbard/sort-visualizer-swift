@@ -1,6 +1,5 @@
-*From Wikipedia, the free encyclopedia*
-
-In computer science, radix sort is a non-[comparative](https://en.wikipedia.org/wiki/Comparison_sort) sorting algorithm.
+Least-significant-digit (LSD) Radix Sort processes keys from the least significant digit to the most significant digit.
+Radix sort is a non-[comparative](https://en.wikipedia.org/wiki/Comparison_sort) sorting algorithm.
 It avoids comparison by creating and distributing elements into buckets according to their radix. For elements with more
 than one [significant digit](https://en.wikipedia.org/wiki/Significant_digit), this bucketing process is repeated for
 each digit, while preserving the ordering of the prior step, until all digits have been considered. For this reason,
@@ -11,8 +10,8 @@ by [Harold H. Seward](https://en.wikipedia.org/wiki/Harold_H._Seward). Computeri
 dismissed as impractical because of the perceived need for variable allocation of buckets of unknown size. Seward's
 innovation was to use a linear scan to determine the required bucket sizes and offsets beforehand, allowing for a single
 static allocation of auxiliary memory. The linear scan is closely related to Seward's other
-algorithm - [counting sort](https://en.wikipedia.org/wiki/Counting_sort).
+algorithm − [counting sort](https://en.wikipedia.org/wiki/Counting_sort).
 
-In the modera era, radix sorts are most commonly applied to collections of binary strings and integers. It has been
+Radix sorts are commonly applied to collections of binary strings and integers. They have been
 shown in some benchmarks to be faster than other more general-purpose sorting algorithms, sometimes 50% to three times
 faster.

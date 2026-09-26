@@ -1,8 +1,8 @@
 Block Insertion Sort is a natural-run-aware variant of insertion sort: rather than always
 inserting one element at a time, it first scans ahead from its current position to find how far
-the array is already ordered. A stretch that's already non-decreasing is taken as-is, while a
+the array is already ordered. A stretch that is already non-decreasing is taken as-is, while a
 strictly decreasing stretch is detected and reversed in place, turning it into a non-decreasing
-run too. Either way, the result is a "natural run" — a maximal already-sorted stretch starting
+run too. Either way, the result is a "natural run", a maximal already-sorted stretch starting
 where the scan began.
 
 What happens next depends on how long that run is. A run of a single element is inserted into the
@@ -18,7 +18,7 @@ been consumed.
 Because runs are merged in using a binary search that always favors the earlier-encountered
 elements when values tie, and because the single/pair insertion routines only ever shift elements
 strictly greater than the one being placed, Block Insertion Sort preserves the original relative
-order of equal elements and is a genuinely stable sort. That claim has been checked in this
+order of equal elements and is a stable sort. That claim has been checked in this
 repository with a from-scratch simulation that tracks a parallel array of original indices
 alongside the values, since this algorithm's move pattern is a mix of shifts, reversals, and
 rotations rather than a purely swap-based scheme, making a simpler swap-counting stability check

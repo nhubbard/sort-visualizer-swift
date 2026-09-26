@@ -1,5 +1,3 @@
-*From Wikipedia, the free encyclopedia*
-
 Snuffle Sort is a recursive sorting algorithm belonging to the "Exchange Sorts" family. Given a range of the array,
 it first looks only at the two endpoints of that range: if the value at the start is greater than the value at the stop,
 it swaps them. This single comparison-and-swap is the algorithm's only direct sorting action; everything else it does is
@@ -15,11 +13,10 @@ That repetition is what separates Snuffle Sort from ordinary recursive sorts. A 
 into independent subproblems of roughly half the size each; it reprocesses two overlapping, already-mostly-sorted
 subranges over and over, with the repeat count itself growing alongside n. Because the amount of redundant,
 overlapping work compounds with every level of recursion instead of shrinking the way it does in a typical
-divide-and-conquer sort, the total work grows dramatically faster than in comparably simple recursive algorithms,
-landing in n^log n territory. Snuffle Sort is deliberately, unreasonably slow, so this implementation caps the array
+divide-and-conquer sort, the total work grows faster than in comparable recursive algorithms,
+reaching nˡᵒᵍ ⁿ order. This implementation therefore caps the array
 sizes it will even attempt to run against.
 
-Despite this catastrophic growth, Snuffle Sort's per-call logic is trivial: one comparison, at most one swap, and two
+Despite this growth, Snuffle Sort's per-call logic consists of one comparison, at most one swap, and two
 recursive calls repeated in a loop. It sorts correctly precisely because the endpoint swap, applied repeatedly across
-shrinking and overlapping subranges, eventually forces every element into its correct position — it is simply an
-extraordinarily wasteful way of getting there.
+shrinking and overlapping subranges, eventually forces every element into its correct position.

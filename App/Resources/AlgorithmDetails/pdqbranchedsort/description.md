@@ -12,7 +12,7 @@ already close to sorted. If a partition turns out to already be correctly split 
 pivot on the very first pass, the algorithm tries a cheap, bounded insertion sort on each side
 instead of recursing further, bailing out immediately if that insertion sort would have to move
 more than a handful of elements. This lets already-sorted or nearly-sorted input finish in
-close to linear time rather than paying for a full recursive partitioning it doesn't need.
+close to linear time rather than paying for a full recursive partitioning it does not need.
 
 A separate fast path watches for ranges containing many elements equal to the pivot. Once the
 algorithm notices that everything to the left of the current range is already known to be no
