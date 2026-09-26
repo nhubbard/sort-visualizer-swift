@@ -1,10 +1,10 @@
 Table Sort is a median-of-three quicksort dressed up so that it never actually moves the array
 being sorted until the very last step. Instead of partitioning and swapping the real elements, it
-builds a separate table of indices — one entry per array position, initialized so `table[i]`
-starts out equal to `i` — and quicksorts that table instead. Every comparison the partitioning
-logic makes looks up `array[table[a]]` and `array[table[b]]` rather than `array[a]` and `array[b]`
+builds a separate table of indices — one entry per array position, initialized so table[i]
+starts out equal to i — and quicksorts that table instead. Every comparison the partitioning
+logic makes looks up array[table[a]] and array[table[b]] rather than array[a] and array[b]
 directly, so all the pivot selection, partitioning, and recursive splitting happens purely in
-terms of index bookkeeping. By the time the recursion bottoms out, `table` holds a permutation
+terms of index bookkeeping. By the time the recursion bottoms out, table holds a permutation
 that, if applied to the original array, would put it in sorted order.
 
 That permutation is applied in a single closing pass rather than through any of the swaps that

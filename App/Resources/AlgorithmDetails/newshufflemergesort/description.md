@@ -3,7 +3,7 @@ adjacent sorted runs with no auxiliary array at all — not even the handful of 
 merge techniques based on rotations or repeated shifting rely on. Instead, it borrows a published technique from
 the study of in-place permutation algorithms: the **perfect shuffle**, also called a riffle or Faro shuffle,
 the same interleaving a card player performs when splitting a deck in half and merging the two halves back
-together one card at a time, alternating sides — `a1, b1, a2, b2, a3, b3, ...`.
+together one card at a time, alternating sides — a1, b1, a2, b2, a3, b3, ....
 
 Interleaving two sorted runs this way turns the hard part of an in-place merge — figuring out which elements are
 already in relative order and which need to move — into a purely local pattern-matching problem. In the shuffled
@@ -33,7 +33,7 @@ stretches — is built entirely out of swaps and cycle-following writes back int
 algorithm needs no auxiliary buffer of any size, only a constant amount of bookkeeping. Locating each chunk that
 needs fixing still costs comparisons proportional to an ordinary merge, and the shuffle/un-shuffle/rotation
 machinery moves each element only a bounded number of times per level of the merge, so the algorithm keeps the
-familiar `O(n log n)` time bound of merge sort while running in genuinely `O(1)` auxiliary space.
+familiar O(n log n) time bound of merge sort while running in genuinely O(1) auxiliary space.
 
 This "shuffle, then locally un-shuffle and rotate" strategy is a real, published technique for merging in place —
 distinct from the more common approach of locating a single split point (by binary search) and rotating the two

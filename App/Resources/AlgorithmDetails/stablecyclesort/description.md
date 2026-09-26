@@ -8,7 +8,7 @@ rotating each cycle into place. That same minimal-writes property is what makes 
 unstable: when several equal elements exist, plain Cycle Sort resolves ties by skipping forward past any array slot that
 already holds the same value, without regard for which occurrence of that value originally came first.
 
-Stable Cycle Sort fixes this by tracking, in a separate `flagged` array parallel to the data being sorted, which
+Stable Cycle Sort fixes this by tracking, in a separate flagged array parallel to the data being sorted, which
 positions have already been settled into their final place by an earlier cycle. When computing the destination for the
 value currently held at the start of a cycle, it counts not only how many elements are strictly smaller (as ordinary
 Cycle Sort does) but also how many equal, not-yet-flagged duplicates lie between the start of the current cycle and the

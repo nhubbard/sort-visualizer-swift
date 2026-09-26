@@ -2,10 +2,10 @@
 
 Less Bogosort is a variant of [Bogosort](https://en.wikipedia.org/wiki/Bogosort) that narrows its randomness down to a
 shrinking suffix of the array instead of repeatedly gambling on the whole thing at once. Starting from the first
-position, it repeatedly applies a Fisher–Yates shuffle to the unsorted range `[i, n)` — the elements from the current
-position to the end of the array — checking after each shuffle whether the element that landed at position `i` happens
-to be the smallest value anywhere in that range. The moment it does, position `i` is locked in as correct and the
-algorithm moves on to `i + 1`, so the region still being shuffled shrinks by one element every time a position is
+position, it repeatedly applies a Fisher–Yates shuffle to the unsorted range [i, n) — the elements from the current
+position to the end of the array — checking after each shuffle whether the element that landed at position i happens
+to be the smallest value anywhere in that range. The moment it does, position i is locked in as correct and the
+algorithm moves on to i + 1, so the region still being shuffled shrinks by one element every time a position is
 settled.
 
 This is a meaningful departure from classic Bogosort, which reshuffles the *entire* array on every failed attempt and

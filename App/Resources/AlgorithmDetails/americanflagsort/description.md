@@ -38,6 +38,6 @@ sorts that redistribute elements into freshly allocated buckets on every pass. T
 following displacement chains touches memory in a much less predictable pattern than copying
 elements into contiguous per-bucket storage, and the order in which a chain revisits equal-valued
 elements bears no particular relationship to their original order, so the algorithm is not stable.
-For an input of `n` elements, `b` buckets, and `d` digit positions, the counting and placement work
+For an input of n elements, b buckets, and d digit positions, the counting and placement work
 at every level of recursion together visit each active element a constant number of times, giving a
-running time of `O(d * (n + b))`.
+running time of O(d * (n + b)).

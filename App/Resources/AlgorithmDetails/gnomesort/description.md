@@ -11,15 +11,8 @@ same [asymptotic runtime](https://en.wikipedia.org/wiki/Asymptotic_run_time) cha
 building a sorted list one element at a time, getting each item to the proper place in a series of swaps. The average
 running time is O(n²) but tends towards O(n) if the list is initially almost sorted.
 
-[Dick Grune](https://en.wikipedia.org/wiki/Dick_Grune) described the sorting method with the following story:
-
-> Gnome Sort is based on the technique used by the standard
-> Dutch [Garden Gnome](https://en.wikipedia.org/wiki/Garden_gnome) (
-> Du.: [tuinkabouter](https://nl.wikipedia.org/wiki/tuinkabouter)).
-
-> Here is how a garden gnome sorts a line of [flower pots](https://en.wikipedia.org/wiki/Flowerpot).
-
-> Basically, he looks at the flower pot next to him and the previous one; if they are in the right order he steps one
-> pot forward, otherwise, he swaps them and steps one pot backward.
-
-> Boundary conditions: if there is no previous pot, he steps forwards; if there is no pot next to him, he is done.
+[Dick Grune](https://en.wikipedia.org/wiki/Dick_Grune) explained the method through the image of a Dutch
+[garden gnome](https://en.wikipedia.org/wiki/Garden_gnome) sorting a line of
+[flower pots](https://en.wikipedia.org/wiki/Flowerpot). The gnome compares the next pot with the previous one. If they
+are in order, the gnome steps forward; otherwise, the pots are swapped and the gnome steps backward. At the beginning
+of the line the gnome can only step forward, and after reaching the end the work is complete.

@@ -22,4 +22,4 @@ Patience sorting is closely related to the problem of finding the longest increa
 a sequence: the number of piles the dealing phase produces equals the length of the longest
 non-increasing subsequence of the input (or, with the opposite tie-breaking convention, the longest
 increasing subsequence), a fact that has made variants of this technique useful well beyond sorting
-itself, including in some implementations of the Unix `diff` utility.
+itself, including in some implementations of the Unix diff utility.

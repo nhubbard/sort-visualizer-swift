@@ -1,14 +1,14 @@
 Optimized Stooge Sort (the "Studio" version, named for the distinction from the similarly
-named `OptimizedStoogeSort`) reworks plain [Stooge Sort](https://en.wikipedia.org/wiki/Stooge_sort)'s
-recursive structure to bring the exponent down from `O(n^2.71)` to a genuine `O(n^2)` worst case,
-with `O(n)` best-case behavior on already-nearly-sorted data — a real complexity improvement, not
+named OptimizedStoogeSort) reworks plain [Stooge Sort](https://en.wikipedia.org/wiki/Stooge_sort)'s
+recursive structure to bring the exponent down from O(n^2.71) to a genuine O(n^2) worst case,
+with O(n) best-case behavior on already-nearly-sorted data — a real complexity improvement, not
 just a constant-factor tweak. It's credited to EilrahcF's original concept, aphitorite's
 sorting-network optimizations, and Anonymous0726's range-flagging refinements.
 
-The recursive routine, `stoogeSort(a, m, b, merge)`, partitions the range `[a, b)` at two points —
-`a2` and `b2`, each roughly a third of the way across — rather than Stooge Sort's simple midpoint
+The recursive routine, stoogeSort(a, m, b, merge), partitions the range [a, b) at two points —
+a2 and b2, each roughly a third of the way across — rather than Stooge Sort's simple midpoint
 split, and tracks whether either partition actually changed anything. That change-tracking is what
-gives the algorithm its `O(n)` best case: if a recursive call reports "nothing moved," the
+gives the algorithm its O(n) best case: if a recursive call reports "nothing moved," the
 optimized version skips a follow-up re-verification pass that plain Stooge Sort would have to
 perform unconditionally, since there's nothing left to settle.
 

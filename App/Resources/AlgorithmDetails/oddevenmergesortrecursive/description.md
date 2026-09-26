@@ -4,7 +4,7 @@ The odd–even mergesort is a [sorting network](https://en.wikipedia.org/wiki/So
 by [Ken Batcher](https://en.wikipedia.org/wiki/Ken_Batcher). It is a comparison-based algorithm, but unlike a
 general-purpose [comparison sort](https://en.wikipedia.org/wiki/Comparison_sort) such
 as [Quick Sort](https://en.wikipedia.org/wiki/Quicksort), the sequence of comparisons it performs is fixed in advance
-and does not depend on the data being sorted — only on the number of elements, `n`. Every input of a given size is run
+and does not depend on the data being sorted — only on the number of elements, n. Every input of a given size is run
 through exactly the same wiring of compare-and-swap operations, called comparators, each of which examines a pair of
 positions and swaps them if they are out of order. Because the schedule of comparisons is data-independent, many
 comparators can be evaluated at the same time, which makes Batcher's network a natural fit for hardware sorting

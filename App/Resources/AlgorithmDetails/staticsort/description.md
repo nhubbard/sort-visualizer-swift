@@ -3,7 +3,7 @@
 Static Sort is a distribution sorting algorithm that classifies every element into one of as many buckets as there are
 elements to sort, using a single linear formula based on where each element's value falls between the smallest and
 largest values present. Unlike [Counting Sort](https://en.wikipedia.org/wiki/Counting_sort), whose bucket count is tied
-to the size of the input's value range, Static Sort always allocates exactly `n` buckets regardless of how wide or
+to the size of the input's value range, Static Sort always allocates exactly n buckets regardless of how wide or
 narrow that range is — hence "static": the bucket layout is fixed by the element count alone, decided once up front
 rather than adapted to the data.
 
@@ -21,7 +21,7 @@ Once every element sits inside its own bucket's contiguous region, the array is 
 overall — the classification formula can only guarantee non-decreasing bucket membership, not that individual elements
 sharing a bucket land in order. A short finishing pass tidies up each bucket's own small amount of leftover disorder:
 buckets small enough that comparison overhead outweighs quadratic cost are finished with Insertion Sort, while larger
-buckets are finished with Heap Sort, whose guaranteed `O(k log k)` behavior on a single oversized bucket prevents a
+buckets are finished with Heap Sort, whose guaranteed O(k log k) behavior on a single oversized bucket prevents a
 skewed input from degrading the whole sort as badly as Insertion Sort alone would.
 
 Because the number of buckets scales with the element count rather than the value range, Static Sort avoids the

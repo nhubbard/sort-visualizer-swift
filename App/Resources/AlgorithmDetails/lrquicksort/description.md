@@ -15,7 +15,7 @@ Because the two pointers only ever swap when they have each independently found 
 relative to the pivot, Hoare partitioning tends to do noticeably fewer swaps in practice than Lomuto partitioning, which
 swaps on every single element found to be less than the pivot as it scans. The tradeoff is that Hoare's scheme is a
 little more subtle to implement correctly: the two pointers can cross each other by exactly one position by the time the
-partitioning pass ends, and the recursive calls have to be made on `[left, right-pointer]` and `[left-pointer, right]`
+partitioning pass ends, and the recursive calls have to be made on [left, right-pointer] and [left-pointer, right]
 rather than around a single clean split index the way Lomuto's scheme naturally produces.
 
 Choosing the pivot from the middle of the range, rather than a fixed end, also changes how the algorithm behaves on

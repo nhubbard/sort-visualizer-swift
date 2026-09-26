@@ -16,8 +16,8 @@ for every range.
 
 This iterative folder drives that process without ever letting the algorithm recurse: each
 partitioning step produces two new sub-ranges, and rather than calling itself on each one, the
-algorithm pushes both onto the back of an explicit first-in-first-out queue of pending `(start,
-end, bit)` tasks. A single loop repeatedly pulls the next task off the front of that queue,
+algorithm pushes both onto the back of an explicit first-in-first-out queue of pending (start,
+end, bit) tasks. A single loop repeatedly pulls the next task off the front of that queue,
 partitions it if it still spans more than one element and there's a bit left to test, and pushes
 its two children back on, continuing until the queue drains. The result is identical to the
 recursive version, just processed breadth-first through an explicit queue instead of depth-first

@@ -14,8 +14,8 @@ between elements are ever made, Pigeonhole Sort is not bound by the same lower b
 constrains [comparison sorts](https://en.wikipedia.org/wiki/Comparison_sort).
 
 Pigeonhole Sort is closely related to [Counting Sort](https://en.wikipedia.org/wiki/Counting_sort), and the two are
-often described together — both allocate one slot per possible value and run in `O(n + k)` time and space, where `n` is
-the number of elements and `k` is the size of the value range. The key difference lies in how the tallies are turned
+often described together — both allocate one slot per possible value and run in O(n + k) time and space, where n is
+the number of elements and k is the size of the value range. The key difference lies in how the tallies are turned
 back into output. Counting Sort's classic formulation converts its tally into a cumulative (prefix-sum) table and scans
 the original input a second time, using each element's own position to look up its exact output slot — a technique that
 happens to preserve the relative order of equal elements. Pigeonhole Sort's classic formulation does not: once an

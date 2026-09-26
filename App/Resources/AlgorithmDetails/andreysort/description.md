@@ -1,5 +1,5 @@
 Andrey Sort, devised by Andrey Astrelin, is one of the earliest widely-circulated demonstrations
-that an in-place merge sort could run in `O(n log n)` time using only `O(1)` extra memory — no
+that an in-place merge sort could run in O(n log n) time using only O(1) extra memory — no
 heap-allocated scratch array, no linked-list tricks, just clever reuse of the array's own trailing
 space as a rotating buffer. For small ranges (below length 12) it simply falls back to an ordinary
 selection sort, repeatedly finding the minimum of the unsorted remainder and swapping it to the
@@ -18,7 +18,7 @@ whole blocks into position, and backward-merges each selected block into the gro
 region behind it. Any leftover elements that don't fit evenly into a block are handled by
 recursing on that remainder and merging it back in at the end.
 
-Complexity-wise, Andrey Sort is `O(n log n)` in the best, average, and worst cases, with `O(1)`
+Complexity-wise, Andrey Sort is O(n log n) in the best, average, and worst cases, with O(1)
 auxiliary space — the same asymptotic guarantees as a textbook merge sort, but without paying for
 a second array. That combination made it historically significant: it's an early, working proof
 of concept for the "block merge sort" family, and it directly influenced the design of later,

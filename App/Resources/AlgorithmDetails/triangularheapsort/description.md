@@ -2,10 +2,10 @@
 
 Triangular Heap Sort is a variant of [Heapsort](https://en.wikipedia.org/wiki/Heapsort) that replaces the ordinary
 binary heap's implicit tree layout with a different one derived from the triangular numbers. An ordinary binary heap
-gives the node at index *i* two disjoint children at indices `2i + 1` and `2i + 2`, so the tree's branching factor is
+gives the node at index *i* two disjoint children at indices 2i + 1 and 2i + 2, so the tree's branching factor is
 fixed at two and its height grows logarithmically with the number of elements. This variant instead imagines the array
 laid out as rows of a triangle: row 0 holds a single element, row 1 holds two, row 2 holds three, and so on, with row
-*r* starting at the triangular number `r(r + 1) / 2` and holding `r + 1` elements. A node's two children sit at the
+*r* starting at the triangular number r(r + 1) / 2 and holding r + 1 elements. A node's two children sit at the
 corresponding pair of positions in the next row down — and because each row is only one element wider than the row above
 it, neighboring nodes end up *sharing* a child with each other, the same overlapping adjacency found between adjacent
 rows of Pascal's triangle.

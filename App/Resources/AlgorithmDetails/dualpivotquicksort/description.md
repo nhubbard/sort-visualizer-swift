@@ -6,10 +6,10 @@ pivot" and "greater than the pivot" — Dual-Pivot Quick Sort splits it into thr
 elements between the two pivots, and elements greater than the larger pivot. Each of the three regions is then sorted
 recursively, in the same divide-and-conquer style as ordinary Quick Sort.
 
-The specific dual-pivot partitioning scheme in common use was devised by Russian programmer Vladimir Yaroslavskiy in
-2009. After extensive empirical testing showed it outperforming both classic single-pivot Quick Sort and the previously
-used variant of Merge Sort, Yaroslavskiy's algorithm was adopted as the sorting method behind Java's `Arrays.sort` for
-arrays of primitive types (`int`, `long`, `double`, and so on) starting with Java 7 — one of the few textbook sorting
+The specific dual-pivot partitioning scheme in common use was devised by Russian programmer Vladimir Yaroslavskiy in 2009.
+After extensive empirical testing showed it outperforming both classic single-pivot Quick Sort and the previously
+used variant of Merge Sort, Yaroslavskiy's algorithm was adopted as the sorting method behind Java's Arrays.sort for
+arrays of primitive types (int, long, double, and so on) starting with Java 7 — one of the few textbook sorting
 algorithms with a direct, attributable lineage into a mainstream language's standard library.
 
 Like single-pivot Quick Sort, Dual-Pivot Quick Sort is an in-place comparison sort: it needs only a small, constant

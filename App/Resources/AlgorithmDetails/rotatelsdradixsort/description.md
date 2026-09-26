@@ -30,9 +30,9 @@ the index range on every call, until a span is trivially small or its digit rang
 value (at which point every element in it already carries that digit, and nothing more needs to move).
 
 Locating each rotation point by binary search rather than a linear scan, and moving elements only via whole-block
-rotations rather than one at a time, keeps a single digit pass to `O(n log n)` work — matching the cost of a full merge
+rotations rather than one at a time, keeps a single digit pass to O(n log n) work — matching the cost of a full merge
 sort over the array for every digit position — while using no auxiliary buffer at all beyond the recursion stack. That
-trade replaces counting sort's `O(n + radix)` per-digit cost and its linear auxiliary space with a `O(n log n)`
+trade replaces counting sort's O(n + radix) per-digit cost and its linear auxiliary space with a O(n log n)
 per-digit cost and constant auxiliary space, which is the entire point of the variant: it is a genuinely in-place LSD
 radix sort, at the cost of an extra logarithmic factor per digit compared to the counting-sort version. Because the
 underlying merge step never reorders equal elements — an element's digit value alone decides which side of a rotation

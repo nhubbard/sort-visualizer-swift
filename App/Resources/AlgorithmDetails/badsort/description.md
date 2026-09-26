@@ -1,10 +1,8 @@
 *From Wikipedia, the free encyclopedia*
 
 Bad Sort is a comparison-based sorting algorithm designed specifically to demonstrate a worst-case time complexity of
-*O*(*n³*) — a deliberately inefficient answer to a well-known StackOverflow question asking whether any sorting
+*O*(*n³*) — a deliberately inefficient answer to a well-known Stack Overflow discussion asking whether any sorting
 algorithm actually achieves cubic worst-case behavior. It was contributed by James Jensen (username "StriplingWarrior")
-in response to ["Is there a sorting algorithm with a worst-case time complexity of *O*(
-*n³*)?"](https://stackoverflow.com/questions/27389344/is-there-a-sorting-algorithm-with-a-worst-case-time-complexity-of-n3),
 and has since become a stock example cited whenever a genuinely, provably cubic (rather than merely "very slow
 quadratic") comparison sort is wanted for illustration.
 

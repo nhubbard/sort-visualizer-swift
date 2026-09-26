@@ -7,7 +7,7 @@ maintain when the input is already close to sorted. Ordinary heapsort's implicit
 a power of two, and every extraction pays a full logarithmic sift back down to a fixed-shape tree no matter how
 orderly the data already was. [Smoothsort](https://en.wikipedia.org/wiki/Smoothsort) instead treats the array as a
 sequence of adjacent sub-heaps whose sizes come from the *Leonardo numbers*, a Fibonacci-like sequence defined by
-`L(0) = L(1) = 1` and `L(k) = L(k - 1) + L(k - 2) + 1`. Each sub-heap is itself shaped like a small binary heap sized
+L(0) = L(1) = 1 and L(k) = L(k - 1) + L(k - 2) + 1. Each sub-heap is itself shaped like a small binary heap sized
 to a Leonardo number, and the run of sub-heaps covering the array so far is tracked with a compact bitmap recording
 which sizes are currently present — the same binary-carry bookkeeping that appears in the bottom-up construction of
 an ordinary heap, just generalized to a variable-width run of differently sized heaps instead of one fixed heap.
@@ -20,8 +20,8 @@ The more distinctive operation is "trinkle," which runs after a value has been s
 during the extraction phase: rather than restoring just one sub-heap, it walks backward across the *entire* remaining
 run of sub-heaps, comparing the displaced value against each sub-heap's root in turn and stopping the moment it finds
 one it doesn't need to disturb. On data that is already sorted or nearly so, that early stop happens almost
-immediately, which is exactly why smoothsort is described as *adaptive*: its best-case running time is `O(n)`, better
-than the `O(n log n)` best case of ordinary heapsort, while its worst case remains `O(n log n)` like any other
+immediately, which is exactly why smoothsort is described as *adaptive*: its best-case running time is O(n), better
+than the O(n log n) best case of ordinary heapsort, while its worst case remains O(n log n) like any other
 comparison sort bounded by that limit.
 
 Smoothsort sorts in place using only a constant amount of extra bookkeeping beyond the array itself — the running

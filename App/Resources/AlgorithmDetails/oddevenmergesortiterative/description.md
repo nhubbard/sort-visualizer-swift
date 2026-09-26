@@ -4,7 +4,7 @@ The odd–even mergesort is a [sorting network](https://en.wikipedia.org/wiki/So
 by [Ken Batcher](https://en.wikipedia.org/wiki/Ken_Batcher). It is a comparison-based algorithm, but unlike a
 general-purpose [comparison sort](https://en.wikipedia.org/wiki/Comparison_sort) such
 as [Quick Sort](https://en.wikipedia.org/wiki/Quicksort), the sequence of comparisons it performs is fixed in advance
-and does not depend on the data being sorted — only on the number of elements, `n`. Every input of a given size is run
+and does not depend on the data being sorted — only on the number of elements, n. Every input of a given size is run
 through exactly the same wiring of compare-and-swap operations, called comparators, each of which examines a pair of
 positions and swaps them if they are out of order. Because the schedule of comparisons is data-independent, many
 comparators can be evaluated at the same time, which makes Batcher's network a natural fit for hardware sorting
@@ -19,11 +19,11 @@ the input and merging them together with this network, in the same divide-and-co
 as [Merge Sort](https://en.wikipedia.org/wiki/Merge_sort).
 
 This **iterative** variant expresses that same fixed network without explicit recursion. The recursive merge-and-split
-structure is unrolled into a small number of nested loops driven by three quantities: `p`, a power of two that tracks
-the size of the sorted blocks currently being merged; `k`, which walks down through the successive merge stages within a
-given `p`; and `j`, which steps across the array selecting which groups of elements a given stage compares. For each
-combination of `p`, `k`, and `j`, an inner loop applies the same boundary test used throughout Batcher's construction —
-comparing `(i + j) / (2p)` against `(i + j + k) / (2p)` — to decide, index by index, exactly which pairs of positions
+structure is unrolled into a small number of nested loops driven by three quantities: p, a power of two that tracks
+the size of the sorted blocks currently being merged; k, which walks down through the successive merge stages within a
+given p; and j, which steps across the array selecting which groups of elements a given stage compares. For each
+combination of p, k, and j, an inner loop applies the same boundary test used throughout Batcher's construction —
+comparing (i + j) / (2p) against (i + j + k) / (2p) — to decide, index by index, exactly which pairs of positions
 belong to this stage's comparator set, and swaps each out-of-order pair it finds.
 
 Because it is built from a fixed collection of pairwise comparators rather than adapting to the data, the odd–even

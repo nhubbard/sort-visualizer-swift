@@ -14,12 +14,12 @@ extra scan is needed to discover it. Once every occurrence of the current target
 any positions that already hold that value before the next pass begins.
 
 Because the number of passes Bingo Sort needs is bounded by the number of *distinct* values rather than the number of
-*elements*, its running time is best expressed as `O(n + m^2)` in the best case and `O(n * m)` otherwise, where `n` is
-the array length and `m` is the count of unique values. When duplicates are abundant and `m` is small relative to `n`,
+*elements*, its running time is best expressed as O(n + m^2) in the best case and O(n * m) otherwise, where n is
+the array length and m is the count of unique values. When duplicates are abundant and m is small relative to n,
 Bingo Sort approaches linear behavior, similar in spirit
-to [Counting Sort](https://en.wikipedia.org/wiki/Counting_sort); when every value is distinct (`m = n`), it degrades to
-the same `O(n^2)` behavior as plain Selection Sort.
+to [Counting Sort](https://en.wikipedia.org/wiki/Counting_sort); when every value is distinct (m = n), it degrades to
+the same O(n^2) behavior as plain Selection Sort.
 
-Like Selection Sort, Bingo Sort sorts in place using only a constant amount of auxiliary storage (`O(1)` space), and it
+Like Selection Sort, Bingo Sort sorts in place using only a constant amount of auxiliary storage (O(1) space), and it
 is not a [stable sort](https://en.wikipedia.org/wiki/Sorting_algorithm#Stability): swapping matched values into the tail
 does not preserve their original relative order.

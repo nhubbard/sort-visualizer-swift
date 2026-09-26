@@ -1,8 +1,8 @@
 *From Wikipedia, the free encyclopedia*
 
 Swapless Bubble Sort is a variant of [Bubble Sort](https://en.wikipedia.org/wiki/Bubble_sort) that produces the exact
-same comparisons and the same final ordering, but never calls a two-element swap. Instead of exchanging `array[j]` and
-`array[j + 1]` whenever they are out of order, it carries the larger of the two compared values forward in a single
+same comparisons and the same final ordering, but never calls a two-element swap. Instead of exchanging array[j] and
+array[j + 1] whenever they are out of order, it carries the larger of the two compared values forward in a single
 local variable and repeatedly overwrites one array slot at a time with whichever value belongs there. By the end of a
 pass, every element that a classic bubble sort would have swapped has instead been moved into place through a chain of
 single-element writes.

@@ -5,15 +5,15 @@ left-half/right-half split. Instead of dividing a run of the array into two cont
 two *interleaved* (or "weaved") sub-sequences: every element at an even offset from the run's start forms one
 sub-sequence, and every element at an odd offset forms the other. Concretely, a sub-problem is described by a starting
 offset ("residue") and a stride ("modulus") into the original array, so it addresses the strided sequence of indices
-`residue, residue + modulus, residue + 2*modulus, ...`. Recursing doubles the modulus and hands the two resulting
-strides — `residue` and `residue + modulus` — to two independent sub-sorts, exactly mirroring how an ordinary merge sort
+residue, residue + modulus, residue + 2*modulus, .... Recursing doubles the modulus and hands the two resulting
+strides — residue and residue + modulus — to two independent sub-sorts, exactly mirroring how an ordinary merge sort
 hands off its left and right halves, except that the "halves" here are combed apart from one another rather than cut in
 two.
 
 Once both interleaved halves are themselves sorted (in place, in their own strided positions), the algorithm merges them
 back together, but it must be careful to merge them at the *original* stride, not the doubled stride used during
-recursion: the two sorted strided sequences are read at intervals of `2 * modulus` and interleaved into a scratch buffer
-at intervals of `modulus`, after which the merged values are copied back over their corresponding strided positions in
+recursion: the two sorted strided sequences are read at intervals of 2 * modulus and interleaved into a scratch buffer
+at intervals of modulus, after which the merged values are copied back over their corresponding strided positions in
 the original array. Because equal elements can arrive at the merge step having originated from different, non-adjacent
 strided sub-sequences, a straightforward "prefer the left run on ties" rule no longer corresponds to preserving input
 order the way it does in a conventional merge sort — a tie between two equal values is instead broken by comparing their

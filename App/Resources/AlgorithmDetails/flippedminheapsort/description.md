@@ -1,5 +1,5 @@
 Flipped Min Heap Sort is an ordinary min-heap sort with a mirror held up to it: every array position the algorithm
-touches is addressed as `length - p` instead of `p`, so the heap is built and repeatedly emptied from the *back* of the
+touches is addressed as length - p instead of p, so the heap is built and repeatedly emptied from the *back* of the
 array toward the front rather than from the front toward the back. The heap logic itself — sift a value down past its
 children until it settles, extract the root, shrink the heap, repeat — is unchanged.
 

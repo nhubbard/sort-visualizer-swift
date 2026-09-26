@@ -7,15 +7,15 @@ never compares two elements against each other, and as a result is not bound by
 the [Ω(n log n)](https://en.wikipedia.org/wiki/Comparison_sort#Number_of_comparisons_required_to_sort_a_list) lower
 bound that applies to comparison-based methods.
 
-The algorithm requires that the range of possible input values, `k`, be known (or reasonably bounded) in advance, since
+The algorithm requires that the range of possible input values, k, be known (or reasonably bounded) in advance, since
 it allocates a counting table with one slot per possible value. It first tallies how many times each value appears, then
 transforms those tallies into a cumulative (prefix-sum) table so that each entry indicates how many elements are less
 than or equal to that value. Finally, it scans the input a second time, placing each element into its correct position
 in an output array by consulting and decrementing the cumulative count for its value.
 
-Because Counting Sort's running time is `O(n + k)`, where `n` is the number of elements and `k` is the size of the value
-range, it is extremely fast — effectively linear — whenever `k` is not significantly larger than `n`. However, its
-`O(n + k)` space requirement makes it impractical for inputs drawn from a very large or sparse range of values, since
+Because Counting Sort's running time is O(n + k), where n is the number of elements and k is the size of the value
+range, it is extremely fast — effectively linear — whenever k is not significantly larger than n. However, its
+O(n + k) space requirement makes it impractical for inputs drawn from a very large or sparse range of values, since
 the counting table would dwarf the input itself.
 
 When implemented with the standard cumulative-count technique and a backward scan over the input during the final

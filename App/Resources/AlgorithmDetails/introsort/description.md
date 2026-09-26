@@ -26,6 +26,6 @@ position.
 
 Because it combines strong average-case speed with a guaranteed O(n log n) worst case and small memory overhead,
 Introsort (or a close variant of it) is used as the sorting algorithm in a number of widely used standard library
-implementations, including the `std::sort` function found
+implementations, including the std::sort function found
 in [SGI's STL](https://en.wikipedia.org/wiki/Standard_Template_Library) and many derived C++ standard library
-implementations, as well as .NET's `Array.Sort` method.
+implementations, as well as .NET's Array.Sort method.

@@ -2,7 +2,7 @@
 
 Bitonic Sort is a comparison-based [sorting network](https://en.wikipedia.org/wiki/Sorting_network) devised
 by [Ken Batcher](https://en.wikipedia.org/wiki/Ken_Batcher). Like other sorting networks, the sequence of comparisons it
-performs is fixed in advance and does not depend on the values being sorted — only on the number of elements, `n`. That
+performs is fixed in advance and does not depend on the values being sorted — only on the number of elements, n. That
 data-independence means many of its compare-and-swap operations, called comparators, can be evaluated at the same time,
 which is what makes bitonic networks attractive for parallel
 hardware, [SIMD](https://en.wikipedia.org/wiki/Single_instruction,_multiple_data) instructions, and GPU sorting kernels.
@@ -15,9 +15,9 @@ two halves that result. Sorting an arbitrary array is then a matter of recursive
 directions — one ascending, one descending — so that concatenating them yields a single bitonic sequence, and merging
 that sequence into order.
 
-This **recursive** variant, adapted from a page by H.W. Lang, expresses that construction directly: `bitonicSort` splits
+This **recursive** variant, adapted from a page by H.W. Lang, expresses that construction directly: bitonicSort splits
 its range in half, sorts the first half ascending and the second half descending (building the bitonic sequence), and
-then calls `bitonicMerge` on the whole range. Where the classic textbook description of Batcher's network only works
+then calls bitonicMerge on the whole range. Where the classic textbook description of Batcher's network only works
 cleanly on inputs whose length is a power of two — with non-power-of-two inputs traditionally handled by padding the
 array out to the next power of two with sentinel values — this formulation instead splits each merge at the *greatest
 power of two strictly less than* the current range's length, and compares only as many pairs across that split as are

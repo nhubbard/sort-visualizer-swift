@@ -8,13 +8,13 @@ parallel. That shared lineage is why Diamond Sort, Bitonic Sort, and Bose-Nelson
 "Concurrent Sorts" category here, even though this visualizer runs each of them sequentially.
 
 The recursive form works over a range described by a starting index and an exclusive stopping index, together with a
-boolean `merge` flag. A range of exactly two elements is resolved with a single comparison. Anything larger is split at
-its midpoint, and also at its one-quarter and three-quarter points; when `merge` is set, the two halves are recursively
-pre-sorted in full before anything else happens — and that recursive pre-sort passes `merge` down as `true` again, so it
+boolean merge flag. A range of exactly two elements is resolved with a single comparison. Anything larger is split at
+its midpoint, and also at its one-quarter and three-quarter points; when merge is set, the two halves are recursively
+pre-sorted in full before anything else happens — and that recursive pre-sort passes merge down as true again, so it
 keeps fully resolving smaller and smaller halves all the way down to the base case. Once a half has actually been
 pre-sorted this way, the rest of the algorithm never needs to sort it again, so every one of the remaining recursive
-calls it makes — the ones that carry out the "diamond" comparison pattern itself — passes `merge` down as `false`, and
-that `false` then propagates through all of *their* nested calls too. In effect, each half of the original range is
+calls it makes — the ones that carry out the "diamond" comparison pattern itself — passes merge down as false, and
+that false then propagates through all of *their* nested calls too. In effect, each half of the original range is
 fully pre-sorted exactly once per call chain, and the flag is what lets the algorithm tell, at any depth, whether it is
 still in that one-time pre-sort or already inside the merge step that follows it. That merge step runs the algorithm's
 namesake "diamond" pattern: the inner quarter-to-three-quarter span, then both halves again, then the

@@ -8,7 +8,7 @@ how many elements at the tail of the left run are out of order relative to the e
 and then exchanges those two equal-length spans directly, one element at a time.
 
 The key observation that makes this work is that exchanging two blocks of the *same* length is already a complete
-rearrangement of those `2m` elements into sorted relative order — no general-purpose rotation machinery is needed,
+rearrangement of those 2m elements into sorted relative order — no general-purpose rotation machinery is needed,
 because the binary search is specifically designed to find a split where both sides being swapped are guaranteed to be
 the same size. After one such block-swap, the newly-relocated elements from the left run are not yet in their final
 position among the rest of the right run, so the algorithm recurses to merge that leftover portion, then shrinks its own

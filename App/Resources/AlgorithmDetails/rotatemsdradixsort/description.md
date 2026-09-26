@@ -9,7 +9,7 @@ runs back together two at a time, using binary search to find where one run's di
 being less than the midpoint digit value and a rotation — swapping two adjacent blocks past each
 other with no auxiliary storage — to interleave the two runs in the correct order. The result is
 an ordinary in-place merge sort whose comparison key is a single digit rather than the whole
-value, so it only ever needs to distinguish `base` possible outcomes at a time instead of the full
+value, so it only ever needs to distinguish base possible outcomes at a time instead of the full
 range of the data.
 
 Because that rotation-based digit-sort works on any contiguous range and any single digit place,
@@ -26,7 +26,7 @@ Because every relocation happens through swaps of one array against itself rathe
 copies into a second array, the whole sort runs in O(1) auxiliary space, matching its LSD
 counterpart. The trade is time: locating each digit boundary costs a binary search, and every
 rotation still has to physically move every element in the smaller of the two blocks being
-swapped, so a single digit-sorting pass over a range of `n` elements costs O(n log n) rather than
-the O(n) a bucket-counting pass would. With `d` digit places to work through, the whole sort costs
+swapped, so a single digit-sorting pass over a range of n elements costs O(n log n) rather than
+the O(n) a bucket-counting pass would. With d digit places to work through, the whole sort costs
 O(d × n log n) time against O(1) extra space, and because the underlying rotations never reorder
 two elements that compare equal on the digit being examined, the sort remains stable.

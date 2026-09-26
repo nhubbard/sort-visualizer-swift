@@ -1,6 +1,6 @@
-Smart Bogo Bogosort is built on an observation about what a sorted array actually needs: if the first `n - 1` elements
+Smart Bogo Bogosort is built on an observation about what a sorted array actually needs: if the first n - 1 elements
 are already sorted, the whole array is sorted the moment the last element is no smaller than the one before it. So this
-algorithm recursively sorts the first `n - 1` elements using this very method, then just checks that one final
+algorithm recursively sorts the first n - 1 elements using this very method, then just checks that one final
 comparison — and if it fails, reshuffles the *entire* range at random and starts the recursive sort of the prefix over
 again from scratch.
 

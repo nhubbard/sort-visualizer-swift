@@ -14,16 +14,11 @@ variant needs only one to three flips per insertion, regardless of how many elem
 The trick that makes this work is letting the sorted prefix change its own orientation. After an
 insertion, the prefix is *not* forced back into ascending order — it is left running in whichever
 direction (ascending or descending) made the fold cheapest, and that direction is recorded for the
-next step. Concretely, each insertion looks at the current direction of the prefix:
-
-- If the new element already continues that direction past the last element, nothing needs to move.
-- If it belongs at the very front, one flip of the previous prefix is enough to reverse it end-to-end
-  and put the new element in place — and this also flips the prefix's running direction for next
-  time.
-- Otherwise, the new element belongs somewhere in the middle. Its insertion point is located, the new
-  element is flipped to the front, and then two more flips — one of the elements that now need to move
-  ahead of it, and one of the whole updated prefix — land everything in its final order, again
-  flipping the tracked direction.
+next step. If the new element already continues that direction past the last element, nothing needs
+to move. If it belongs at the front, one flip of the previous prefix reverses it end to end, puts the
+new element in place, and changes the prefix's direction for the next step. Otherwise, the new element
+belongs in the middle. The algorithm locates its insertion point, flips the new element to the front,
+and uses two more flips to place the displaced elements and the updated prefix in their final order.
 
 Because the prefix is allowed to run backward just as often as forward, the algorithm never needs to
 "undo" its own orientation before the next insertion — it just remembers which way it is currently

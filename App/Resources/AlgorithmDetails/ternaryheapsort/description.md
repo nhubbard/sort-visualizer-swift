@@ -1,5 +1,5 @@
 Ternary Heap Sort is an ordinary extract-max heapsort with one number changed: every node has three children instead of
-two, so a node at position `i` looks after positions `3i + 1`, `3i + 2`, and `3i + 3` instead of the usual pair.
+two, so a node at position i looks after positions 3i + 1, 3i + 2, and 3i + 3 instead of the usual pair.
 Building the heap and repeatedly extracting its root works exactly the same way it does for a binary heap — sift the
 largest child up when it beats its parent, recurse down, then move the root to the end of the shrinking heap and
 re-sift.

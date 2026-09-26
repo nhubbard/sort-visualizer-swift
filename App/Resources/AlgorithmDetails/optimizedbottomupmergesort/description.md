@@ -1,7 +1,7 @@
 *From Wikipedia, the free encyclopedia*
 
 Optimized Bottom-Up Merge Sort is Sartaj Sahni's iterative merge sort, the same style of
-algorithm the C++ standard library's `std::stable_sort` is modeled on. Like plain
+algorithm the C++ standard library's std::stable_sort is modeled on. Like plain
 [bottom-up merge sort](https://en.wikipedia.org/wiki/Merge_sort), it never recurses — it builds
 progressively longer sorted runs by repeatedly merging adjacent pairs of them — but it adds two
 refinements that a textbook bottom-up merge sort skips.

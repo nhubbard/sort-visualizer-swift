@@ -8,10 +8,10 @@ follows the same converging compare-and-swap idea, recursively applied, as its b
 
 Where this variant departs from the ordinary recursive Circle Sort is in how it handles ranges that are not themselves a
 power of two in length. Rather than padding the working range up to the next power of two and guarding every access
-against the true array length, Circloid Sort recurses directly on the real range: given a range `[left, right]`, it
+against the true array length, Circloid Sort recurses directly on the real range: given a range [left, right], it
 splits at the midpoint, recurses into the first half and then the second half — both of which are always real, non-empty
 sub-ranges, never conceptually padded ones — and only once both of those recursive calls return does it perform this
-level's own converging compare-and-swap pass over the *entire* `[left, right]` range. A range with an odd number of
+level's own converging compare-and-swap pass over the *entire* [left, right] range. A range with an odd number of
 elements has its two converging pointers meet at the same middle index; rather than comparing that element against
 itself, the algorithm nudges the trailing pointer one step further so the final comparison in that pass is between the
 middle element and its immediate neighbor. As with the ordinary recursive form, one full top-to-bottom recursive sweep

@@ -8,7 +8,7 @@ the tail end of the algorithm, where the gap has shrunk so small that each remai
 slow, single-pass bubble sort.
 
 Ordinary Comb Sort starts with a gap equal to the length of the array and shrinks it every pass by a fixed factor,
-conventionally about 1.3, comparing and swapping elements that are `gap` positions apart until the gap reaches 1, at
+conventionally about 1.3, comparing and swapping elements that are gap positions apart until the gap reaches 1, at
 which point it continues making adjacent-element passes until an entire pass completes with no swaps. That tail — every
 pass from the point the gap first drops below some small constant onward — contributes very little additional benefit
 over what a plain Insertion Sort would already do given the same partially-ordered array, since by then most

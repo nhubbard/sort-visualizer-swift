@@ -33,7 +33,7 @@ tree is walked — no stack frame, work queue, or heap-allocated list of pending
 with the depth of the recursion, since the counter's own bit pattern carries enough information to
 reconstruct which branch to visit next. Because the number of bits needed is proportional to the
 logarithm of the largest key, and every element is touched a constant number of times at each bit
-level, the running time is `O(n log n)` for keys of a size proportional to the number of elements
+level, the running time is O(n log n) for keys of a size proportional to the number of elements
 being sorted, matching ordinary quicksort's average case, though key distributions where most
 elements share the same leading bits can still leave a level's partition badly unbalanced, the same
 way an ordinary quicksort degrades when its pivot choices are poor. Like other partition-based

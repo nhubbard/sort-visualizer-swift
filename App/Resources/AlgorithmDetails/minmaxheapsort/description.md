@@ -1,7 +1,7 @@
 Min-Max Heap Sort is a heap-based selection sort built on the
 [min-max heap](https://en.wikipedia.org/wiki/Min-max_heap) (Atkinson, Sack, Santoro & Strothotte, 1986), a structure
 that gets both the minimum *and* the maximum out of a single implicit array-backed tree at once. An ordinary binary
-heap only enforces one invariant everywhere — every node is either always `<=` its children or always `>=` them — so
+heap only enforces one invariant everywhere — every node is either never greater than its children or never less than them — so
 it only ever gives up one extreme value for free; finding the other one means a linear scan. A min-max heap instead
 alternates which invariant applies from one level of the tree to the next: the root and every node at an even depth
 must be less than or equal to *every* node beneath it, while every node at an odd depth must be greater than or equal
@@ -25,9 +25,9 @@ there, sorting is just repeated maximum-extraction: read off whichever of the ro
 larger value, swap it out to the current boundary of the shrinking heap, and push whatever landed at the vacated spot
 back down to restore the invariant — extraction and repair together cost time proportional to the height of the tree,
 which grows with the logarithm of the heap's size, the same as it would for an ordinary heap. Doing that once for
-every element leaves the array sorted in ascending order using `O(n log n)` comparisons overall, with `heapify`
-contributing a smaller `O(n)` term to the total, and needs nothing beyond a handful of index variables — no matter
-how large the array gets, so the sort works in `O(1)` additional space, entirely in place.
+every element leaves the array sorted in ascending order using O(n log n) comparisons overall, with heapify
+contributing a smaller O(n) term to the total, and needs nothing beyond a handful of index variables — no matter
+how large the array gets, so the sort works in O(1) additional space, entirely in place.
 
 Because the sort works by repeatedly relocating whichever value currently satisfies "most extreme," rather than by
 tracking where equal values originally sat relative to one another, elements that compare equal can still end up

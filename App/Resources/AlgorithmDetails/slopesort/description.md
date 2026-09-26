@@ -18,7 +18,7 @@ This lack of an early exit is also what makes Slope Sort strictly quadratic in e
 best case comes entirely from that early exit — an already-sorted array lets each outer pass terminate after a single
 comparison. Slope Sort's inner loop always runs the full distance back to the front of the array no matter how the
 elements are arranged, so a fully sorted input costs exactly as many comparisons and potential swaps as a reverse-sorted
-one. Both its best and worst cases are therefore `O(n^2)`, with no data-dependent shortcut available.
+one. Both its best and worst cases are therefore O(n^2), with no data-dependent shortcut available.
 
 Slope Sort belongs to the "Exchange Sorts" family, the group of sorts that make progress purely by swapping pairs
 of adjacent or nearby elements rather than by selecting, merging, or partitioning. Because it only ever swaps two

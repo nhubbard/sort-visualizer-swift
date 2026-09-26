@@ -1,7 +1,7 @@
 *From Wikipedia, the free encyclopedia*
 
 Gravity Sort, also known as Bead Sort, is a natural sorting algorithm that models each value in the input as a row of
-beads hanging on a rack of vertical rods, one rod per position in the array. If a value is `v`, then `v` beads are
+beads hanging on a rack of vertical rods, one rod per position in the array. If a value is v, then v beads are
 threaded onto that row's rods, starting from the first rod. When the whole rack of beads is released and allowed to fall
 under gravity, each bead drops until it lands on top of another bead or the ground below its rod. Reading the number of
 beads resting on each rod from left to right, after everything has settled, yields the input values in ascending order —

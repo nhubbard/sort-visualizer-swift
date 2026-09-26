@@ -18,7 +18,7 @@ This recursive folder drives that process the direct way: after partitioning a r
 current bit, the algorithm calls itself once on the left half and once on the right half, each
 call one bit lower than its parent, and lets the language's own call stack track which sub-ranges
 are still waiting to be split further. That's the opposite of the iterative version of this same
-algorithm, which instead pushes each half's `(start, end, bit)` description onto an explicit
+algorithm, which instead pushes each half's (start, end, bit) description onto an explicit
 first-in-first-out queue and processes that queue in a single loop rather than recursing — the two
 produce identical partitioning decisions and the same sorted output, they just differ in whether
 the pending work lives on the call stack or in an explicit data structure.
