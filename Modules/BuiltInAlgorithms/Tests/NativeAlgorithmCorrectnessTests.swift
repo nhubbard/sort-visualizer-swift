@@ -73,7 +73,8 @@ struct NativeAlgorithmCorrectnessTests {
     BitonicSortIterative(), BitonicSortRecursive(), BlockInsertionSort(), BlockSwapMergeSort(), BogoBogoSort(),
     BogoSort(), BoseNelsonSortIterative(), BoseNelsonSortRecursive(), BottomUpHeapSort(), BottomUpMergeSort(),
     BozoSort(), BubbleBogoSort(), BubbleSort(), BufferedStoogeSort(), BurntPancakeSort(), CircleSortIterative(),
-    CircleSortRecursive(), CircloidSort(), ClassicGravitySort(), ClassicThreeSmoothCombSort(), ClassicTournamentSort(),
+    CircleSortRecursive(), CircloidSort(), CircularGrailSort(), ClassicGravitySort(), ClassicThreeSmoothCombSort(),
+    ClassicTournamentSort(),
     ClassicTreeSort(), CocktailBogoSort(), CocktailMergeSort(), CocktailShakerSort(), CombSort(), CompleteGraphSort(),
     CountingSort(), CreaseSort(), CycleSort(), DeterministicBogoSort(), DiamondSortIterative(), DiamondSortRecursive(),
     DoubleInsertionSort(), DoubleSelectionSort(), DropMergeSort(), DualPivotQuickSort(), ExchangeBogoSort(),
@@ -1703,6 +1704,65 @@ struct NativeAlgorithmCorrectnessTests {
   @Test
   func grailSortIsStable() {
     expectStable(GrailSort(), size: 64)
+  }
+
+  @Test
+  func circularGrailSortHandlesCircularBlockBoundariesAndIsUnstable() {
+    let algorithm = CircularGrailSort()
+    for size in [0, 1, 2, 15, 16, 17, 31, 32, 33, 63, 64, 65, 127, 128, 129, 255, 256, 257, 511] {
+      let cases = [
+        Array(repeating: 3, count: size),
+        Array(0..<size),
+        Array((0..<size).reversed()),
+        (0..<size).map { ($0 * 17) % 7 },
+        (0..<size).map { min($0, max(0, size - 1 - $0)) },
+      ]
+      for input in cases {
+        var engine = RecordingEngine(values: input, operationCap: 2_000_000)
+        algorithm.record(into: &engine)
+        #expect(
+          engine.values == input.sorted(),
+          "Circular Grail failed at size \(size): \(input) -> \(engine.values)"
+        )
+      }
+    }
+
+    for size in [17, 32, 33, 64, 127, 256] {
+      for _ in 0..<100 {
+        let input = (0..<size).map { _ in Int.random(in: 0...3) }
+        var engine = RecordingEngine(values: input, operationCap: 2_000_000)
+        algorithm.record(into: &engine)
+        #expect(
+          engine.values == input.sorted(),
+          "Circular Grail duplicate-heavy fuzz failed at size \(size)"
+        )
+      }
+    }
+
+    let size = 64
+    var sawReordering = false
+    for _ in 0..<100 {
+      let input = (0..<size).map { _ in Int.random(in: 0...3) }
+      var engine = RecordingEngine(values: input, operationCap: 2_000_000)
+      algorithm.record(into: &engine)
+      var shadow = Array(0..<size)
+      for operation in engine.finish().tape {
+        if case .swap(let i, let j) = operation { shadow.swapAt(i, j) }
+      }
+      var originalIndicesByValueInFinalOrder: [Int: [Int]] = [:]
+      for finalPosition in 0..<size {
+        let originalIndex = shadow[finalPosition]
+        originalIndicesByValueInFinalOrder[input[originalIndex], default: []].append(originalIndex)
+      }
+      if originalIndicesByValueInFinalOrder.values.contains(where: { $0 != $0.sorted() }) {
+        sawReordering = true
+        break
+      }
+    }
+    #expect(
+      sawReordering,
+      "expected Circular Grail's whole-block swaps to reorder equal values across block boundaries"
+    )
   }
 
   /// `lazyStableSort` has no small-size special case (just pairwise compare-swap + doubling

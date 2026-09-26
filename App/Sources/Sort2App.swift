@@ -33,7 +33,7 @@ struct Sort2App: App {
       BitonicSortIterative(), BitonicSortRecursive(), BlockInsertionSort(), BlockSwapMergeSort(), BogoBogoSort(),
       BogoSort(), BoseNelsonSortIterative(), BoseNelsonSortRecursive(), BottomUpHeapSort(), BottomUpMergeSort(),
       BozoSort(), BubbleBogoSort(), BubbleSort(), BufferedStoogeSort(), BurntPancakeSort(), CircleSortIterative(),
-      CircleSortRecursive(), CircloidSort(), ClassicGravitySort(), ClassicThreeSmoothCombSort(),
+      CircleSortRecursive(), CircloidSort(), CircularGrailSort(), ClassicGravitySort(), ClassicThreeSmoothCombSort(),
       ClassicTournamentSort(), ClassicTreeSort(), CocktailBogoSort(), CocktailMergeSort(), CocktailShakerSort(),
       CombSort(), CompleteGraphSort(), CountingSort(), CreaseSort(), CycleSort(), DeterministicBogoSort(),
       DiamondSortIterative(), DiamondSortRecursive(), DoubleInsertionSort(), DoubleSelectionSort(),
