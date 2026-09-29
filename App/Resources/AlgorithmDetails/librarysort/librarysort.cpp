@@ -2,8 +2,7 @@
 #include <cstdio>
 #include <vector>
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
-                 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
 
 void printList(int items[], int size) {
   printf("[");
@@ -103,7 +102,7 @@ void sort(int arr[], int n) {
       int shiftCount = (targetPos - 1) - leftGap;
       int i = leftGap;
       while (i < targetPos - 1) {
-        slots[static_cast<size_t>(i)] = slots[static_cast<size_t>(i + 1)];
+        slots[static_cast<size_t>(i)] = slots[static_cast<size_t>(i) + 1];
         i++;
       }
       for (int idx = k - shiftCount; idx < k; idx++) {

@@ -4,7 +4,9 @@ import java.util.List;
 
 public class simpleshattersort {
   public static void sort(int[] arr) {
-    if (arr.length < 2) return;
+    if (arr.length < 2) {
+      return;
+    }
     int n = arr.length;
     int rate = Math.max(2, floorLog2(n) / 2);
     simpleShatterSort(arr, n, 4, rate);

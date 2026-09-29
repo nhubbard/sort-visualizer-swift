@@ -41,7 +41,7 @@ void sort(std::vector<int> &arr) {
   std::vector<int> temp(n);
   idx = 0;
   traverse(arr, temp, lower, upper, 0);
-  arr = temp;
+  arr.swap(temp);
 }
 
 void traverse(const std::vector<int> &arr, std::vector<int> &temp,
@@ -54,8 +54,6 @@ void traverse(const std::vector<int> &arr, std::vector<int> &temp,
     traverse(arr, temp, lower, upper, upper[r]);
   }
 }
-
-
 
 int main() {
   std::vector<int> array = {0,  39, 21, 62, 91, 77, 14, 23,

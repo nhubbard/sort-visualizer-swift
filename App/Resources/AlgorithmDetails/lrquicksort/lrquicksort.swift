@@ -12,8 +12,12 @@ func quickSort(_ array: inout [Int], _ p: Int, _ r: Int) {
         var i = left
         var j = right
         while i <= j {
-            while array[i] < pivot { i += 1 }
-            while array[j] > pivot { j -= 1 }
+            while array[i] < pivot {
+                i += 1
+            }
+            while array[j] > pivot {
+                j -= 1
+            }
             if i <= j {
                 array.swapAt(i, j)
                 i += 1
@@ -21,15 +25,18 @@ func quickSort(_ array: inout [Int], _ p: Int, _ r: Int) {
             }
         }
         if j - left < right - i {
-            if left < j { quickSort(&array, left, j) }
+            if left < j {
+                quickSort(&array, left, j)
+            }
             left = i
         } else {
-            if i < right { quickSort(&array, i, right) }
+            if i < right {
+                quickSort(&array, i, right)
+            }
             right = j
         }
     }
 }
-
 
 var array: [Int] = [
     0, 39, 21, 62, 91, 77, 14, 23,

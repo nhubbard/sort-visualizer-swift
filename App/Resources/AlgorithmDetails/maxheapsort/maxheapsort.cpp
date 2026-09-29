@@ -1,8 +1,7 @@
 #include <cstdio>
 #include <utility>
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
-                 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
 
 void printList(int items[], int size) {
   printf("[");
@@ -32,9 +31,12 @@ void siftDown(int arr[], int root, int size) {
     int largest = root;
     int left = 2 * root + 1;
     int right = left + 1;
-    if (left < size && arr[largest] < arr[left]) largest = left;
-    if (right < size && arr[largest] < arr[right]) largest = right;
-    if (largest == root) break;
+    if (left < size && arr[largest] < arr[left])
+      largest = left;
+    if (right < size && arr[largest] < arr[right])
+      largest = right;
+    if (largest == root)
+      break;
     std::swap(arr[root], arr[largest]);
     root = largest;
   }

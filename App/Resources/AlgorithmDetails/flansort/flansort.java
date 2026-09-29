@@ -1,19 +1,24 @@
 import java.util.Arrays;
 
-public class flansort {
-  private static final int GAP = 14, RATIO = 4;
+public final class flansort {
+  private static final int GAP = 14;
+  private static final int RATIO = 4;
   private final int[] values;
-  private final int[] positions = new int[GAP + 2], heap = new int[GAP + 2];
+  private final int[] positions = new int[GAP + 2];
+  private final int[] heap = new int[GAP + 2];
   private long state = 0x9e3779b97f4a7c15L;
-
-  public static void sort(int[] array) {
-    if (array.length > 1) new flansort(array).execute();
-  }
 
   private flansort(int[] array) {
     values = array;
-    for (int value : values)
+    for (int value : values) {
       state = (state ^ (long) value) * 0xbf58476d1ce4e5b9L + 0x94d049bb133111ebL;
+    }
+  }
+
+  public static void sort(int[] array) {
+    if (array.length > 1) {
+      new flansort(array).execute();
+    }
   }
 
   private int choice(int count) {
@@ -31,10 +36,14 @@ public class flansort {
 
   private int median(int a, int m, int b) {
     if (values[m] > values[a]) {
-      if (values[m] < values[b]) return m;
+      if (values[m] < values[b]) {
+        return m;
+      }
       return values[a] > values[b] ? a : b;
     }
-    if (values[m] > values[b]) return m;
+    if (values[m] > values[b]) {
+      return m;
+    }
     return values[a] < values[b] ? a : b;
   }
 
@@ -55,8 +64,11 @@ public class flansort {
     while (a < b) {
       int middle = a + (b - a) / 2;
       boolean found = backward ? values[middle] < value : values[middle] > value;
-      if (found) b = middle;
-      else a = middle + 1;
+      if (found) {
+        b = middle;
+      } else {
+        a = middle + 1;
+      }
     }
     return a;
   }
@@ -80,14 +92,18 @@ public class flansort {
     while (a < b) {
       int middle = a + ((b - a) / (GAP + 1) / 2) * (GAP + 1);
       boolean found = right ? values[middle] > value : values[middle] >= value;
-      if (found) b = middle;
-      else a = middle + GAP + 1;
+      if (found) {
+        b = middle;
+      } else {
+        a = middle + GAP + 1;
+      }
     }
     return a;
   }
 
   private void retrieve(int end, int scratch, int pEnd, int boundary, boolean backward) {
-    int destination = end - 1, block = pEnd - (GAP + 1);
+    int destination = end - 1;
+    int block = pEnd - (GAP + 1);
     while (block > scratch + GAP) {
       int item = binarySearch(block - GAP, block, boundary, backward) - 1;
       block -= GAP + 1;
@@ -112,18 +128,25 @@ public class flansort {
       return;
     }
     int count = length;
-    while (count >= 32) count = (count - 1) / RATIO + 1;
-    int i = a + count, trigger = a + RATIO * count;
+    while (count >= 32) {
+      count = (count - 1) / RATIO + 1;
+    }
+    int i = a + count;
+    int trigger = a + RATIO * count;
     int pEnd = scratch + (count + 1) * (GAP + 1) + GAP;
     insertion(a, i);
-    for (int k = 0; k < count; k++) swap(a + k, scratch + k * (GAP + 1) + GAP);
+    for (int k = 0; k < count; k++) {
+      swap(a + k, scratch + k * (GAP + 1) + GAP);
+    }
     while (i < b) {
       if (i == trigger) {
         retrieve(i, scratch, pEnd, boundary, backward);
         count = i - a;
         pEnd = scratch + (count + 1) * (GAP + 1) + GAP;
         trigger = a + (trigger - a) * RATIO;
-        for (int k = 0; k < count; k++) swap(a + k, scratch + k * (GAP + 1) + GAP);
+        for (int k = 0; k < count; k++) {
+          swap(a + k, scratch + k * (GAP + 1) + GAP);
+        }
       }
       int value = values[i];
       int block = blockSearch(scratch + GAP, pEnd - (GAP + 1), value, false);
@@ -141,11 +164,14 @@ public class flansort {
           count = i - a;
           pEnd = scratch + (count + 1) * (GAP + 1) + GAP;
           trigger = a + (trigger - a) * RATIO;
-          for (int k = 0; k < count; k++) swap(a + k, scratch + k * (GAP + 1) + GAP);
+          for (int k = 0; k < count; k++) {
+            swap(a + k, scratch + k * (GAP + 1) + GAP);
+          }
         } else {
           int first = binarySearch(block - GAP, block, boundary, backward);
           int distance = block - Math.max(first, block - GAP / 2);
-          int source = block - distance, destination = block;
+          int source = block - distance;
+          int destination = block;
           while (source > loc - distance) {
             source--;
             destination--;
@@ -163,7 +189,8 @@ public class flansort {
   }
 
   private boolean less(int x, int y) {
-    int left = values[positions[x]], right = values[positions[y]];
+    int left = values[positions[x]];
+    int right = values[positions[y]];
     return left < right || (left == right && x < y);
   }
 
@@ -172,7 +199,9 @@ public class flansort {
     while (2 * root + 2 < size) {
       int left = 2 * root + 1;
       int child = less(heap[left], heap[left + 1]) ? left : left + 1;
-      if (!less(heap[child], item)) break;
+      if (!less(heap[child], item)) {
+        break;
+      }
       heap[root] = heap[child];
       root = child;
     }
@@ -186,17 +215,22 @@ public class flansort {
 
   private void merge(int runLength, int end, int destination, int count) {
     if (count < 2) {
-      if (count == 1)
+      if (count == 1) {
         while (positions[0] < end) {
           swap(destination, positions[0]);
           destination++;
           positions[0]++;
         }
+      }
       return;
     }
     int start = positions[0];
-    for (int i = 0; i < count; i++) heap[i] = i;
-    for (int i = (count - 1) / 2; i >= 0; i--) sift(heap[i], i, count);
+    for (int i = 0; i < count; i++) {
+      heap[i] = i;
+    }
+    for (int i = (count - 1) / 2; i >= 0; i--) {
+      sift(heap[i], i, count);
+    }
     int size = count;
     while (size > 0) {
       int run = heap[0];
@@ -206,22 +240,32 @@ public class flansort {
       if (positions[run] == Math.min(start + (run + 1) * runLength, end)) {
         size--;
         sift(heap[size], 0, size);
-      } else sift(heap[0], 0, size);
+      } else {
+        sift(heap[0], 0, size);
+      }
     }
   }
 
   private void execute() {
-    int a = 0, b = values.length;
+    int a = 0;
+    int b = values.length;
     while (b - a >= 32) {
       int pivot = values[pivot(a, b)];
-      int first = a, i = a - 1, j = b, last = b;
+      int first = a;
+      int i = a - 1;
+      int j = b;
+      int last = b;
       while (true) {
         i++;
         while (i < j) {
           if (values[i] == pivot) {
             swap(first, i);
             first++;
-          } else if (values[i] < pivot) break;
+          } else {
+            if (values[i] < pivot) {
+              break;
+            }
+          }
           i++;
         }
         j--;
@@ -229,13 +273,22 @@ public class flansort {
           if (values[j] == pivot) {
             last--;
             swap(last, j);
-          } else if (values[j] > pivot) break;
+          } else {
+            if (values[j] > pivot) {
+              break;
+            }
+          }
           j--;
         }
-        if (i < j) swap(i, j);
-        else {
-          if (first == b) return;
-          if (j < i) j++;
+        if (i < j) {
+          swap(i, j);
+        } else {
+          if (first == b) {
+            return;
+          }
+          if (j < i) {
+            j++;
+          }
           while (first > a) {
             i--;
             first--;
@@ -249,7 +302,9 @@ public class flansort {
           break;
         }
       }
-      int left = i - a, right = b - j, count = 0;
+      int left = i - a;
+      int right = b - j;
+      int count = 0;
       if (left <= right) {
         int move = b - left;
         left = Math.max((right + 1) / (GAP + 1), 16);

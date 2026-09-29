@@ -77,6 +77,7 @@ def sort(arr):
             for j in range(i, b):
                 bump(get_digit(arr[j], q))
 
+
 def get_digit(value, place):
     for _ in range(place):
         value //= RADIX
@@ -89,12 +90,24 @@ def shift(value, places):
     return value
 
 
-
-
 if __name__ == "__main__":
     array = [
-        0, 39, 21, 62, 91, 77, 14, 23,
-        90, 69, 51, 81, 68, 83, 32, 56,
+        0,
+        39,
+        21,
+        62,
+        91,
+        77,
+        14,
+        23,
+        90,
+        69,
+        51,
+        81,
+        68,
+        83,
+        32,
+        56,
     ]
     sort(array)
     print(array)

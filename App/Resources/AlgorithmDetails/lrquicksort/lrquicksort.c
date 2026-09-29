@@ -1,8 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
-                 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
 
 void swap(int *a, int *b) {
   int t = *a;
@@ -23,9 +22,7 @@ void printList(int items[], int size) {
 
 void quickSort(int arr[], int p, int r);
 
-void sort(int arr[], int n) {
-  quickSort(arr, 0, n - 1);
-}
+void sort(int arr[], int n) { quickSort(arr, 0, n - 1); }
 
 void quickSort(int arr[], int p, int r) {
   while (p < r) {
@@ -33,8 +30,10 @@ void quickSort(int arr[], int p, int r) {
     int i = p;
     int j = r;
     while (i <= j) {
-      while (arr[i] < pivot) i++;
-      while (arr[j] > pivot) j--;
+      while (arr[i] < pivot)
+        i++;
+      while (arr[j] > pivot)
+        j--;
       if (i <= j) {
         swap(&arr[i], &arr[j]);
         i++;
@@ -42,10 +41,12 @@ void quickSort(int arr[], int p, int r) {
       }
     }
     if (j - p < r - i) {
-      if (p < j) quickSort(arr, p, j);
+      if (p < j)
+        quickSort(arr, p, j);
       p = i;
     } else {
-      if (i < r) quickSort(arr, i, r);
+      if (i < r)
+        quickSort(arr, i, r);
       r = j;
     }
   }

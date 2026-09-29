@@ -1,8 +1,7 @@
 #include <cstdio>
 #include <utility>
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
-                 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
 
 void printList(int items[], int size) {
   printf("[");
@@ -63,9 +62,7 @@ int mostSignificantBit(int value) {
   return bit;
 }
 
-bool getBit(int value, int bit) {
-  return ((value >> bit) & 1) != 0;
-}
+bool getBit(int value, int bit) { return ((value >> bit) & 1) != 0; }
 
 int partition(int arr[], int lo, int hi, int bit) {
   int i = lo - 1;

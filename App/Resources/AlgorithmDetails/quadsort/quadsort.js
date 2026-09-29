@@ -752,11 +752,8 @@ function quadSwap(arr, start, nmemb) {
 // finishes with tailMerge; 256 and up finishes with the full quadMerge pass instead.
 
 const array = [
-  55, 12, 84, 3, 47, 91, 26, 68,
-  8, 73, 40, 97, 15, 62, 34, 79,
-  21, 88, 5, 51, 66, 29, 44, 12,
-  90, 1, 58, 33, 71, 19, 60, 45,
-  27, 82, 6, 95, 38, 63, 9, 50,
+  55, 12, 84, 3, 47, 91, 26, 68, 8, 73, 40, 97, 15, 62, 34, 79, 21, 88, 5, 51,
+  66, 29, 44, 12, 90, 1, 58, 33, 71, 19, 60, 45, 27, 82, 6, 95, 38, 63, 9, 50,
 ];
 sort(array, array.length);
 console.log("[" + array.join(", ") + "]");

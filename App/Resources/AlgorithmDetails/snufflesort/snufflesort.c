@@ -22,9 +22,7 @@ void printList(int items[], int size) {
 
 void snuffleSort(int arr[], int start, int stop);
 
-void sort(int arr[], int n) {
-  snuffleSort(arr, 0, n - 1);
-}
+void sort(int arr[], int n) { snuffleSort(arr, 0, n - 1); }
 
 void snuffleSort(int arr[], int start, int stop) {
   if (stop - start + 1 >= 2) {

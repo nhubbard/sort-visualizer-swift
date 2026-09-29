@@ -45,43 +45,47 @@ public class dropmergesort {
         write++;
         read++;
         numDroppedInARow = 0;
-      } else if (numDroppedInARow == 0 && write >= 2 && arr[read] >= arr[write - 2]) {
-        // Quick undo: the element two back would have accepted this one just fine, so drop the
-        // one right before it instead of the new element.
-        dropped.add(arr[write - 1]);
-        arr[write - 1] = arr[read];
-        read++;
-      } else if (numDroppedInARow < RECENCY) {
-        dropped.add(arr[read]);
-        read++;
-        numDroppedInARow++;
       } else {
-        // Accepting something `numDroppedInARow` elements back made every subsequent element
-        // drop -- that accept was a mistake. Undo it, and any other recently accepted elements
-        // bigger than the dropped run's maximum.
-        dropped.subList(dropped.size() - numDroppedInARow, dropped.size()).clear();
-        read -= numDroppedInARow;
+        if (numDroppedInARow == 0 && write >= 2 && arr[read] >= arr[write - 2]) {
+          // Quick undo: the element two back would have accepted this one just fine, so drop the
+          // one right before it instead of the new element.
+          dropped.add(arr[write - 1]);
+          arr[write - 1] = arr[read];
+          read++;
+        } else {
+          if (numDroppedInARow < RECENCY) {
+            dropped.add(arr[read]);
+            read++;
+            numDroppedInARow++;
+          } else {
+            // Accepting something `numDroppedInARow` elements back made every subsequent element
+            // drop -- that accept was a mistake. Undo it, and any other recently accepted elements
+            // bigger than the dropped run's maximum.
+            dropped.subList(dropped.size() - numDroppedInARow, dropped.size()).clear();
+            read -= numDroppedInARow;
 
-        int numBacktracked = 1;
-        write--;
+            int numBacktracked = 1;
+            write--;
 
-        int maxOfDropped = read;
-        for (int i = read + 1; i <= read + numDroppedInARow; i++) {
-          if (arr[i] > maxOfDropped) {
-            maxOfDropped = arr[i];
+            int maxOfDropped = read;
+            for (int i = read + 1; i <= read + numDroppedInARow; i++) {
+              if (arr[i] > maxOfDropped) {
+                maxOfDropped = arr[i];
+              }
+            }
+
+            while (write >= 1 && maxOfDropped < arr[write - 1]) {
+              write--;
+              numBacktracked++;
+            }
+
+            for (int i = write; i < write + numBacktracked; i++) {
+              dropped.add(arr[i]);
+            }
+
+            numDroppedInARow = 0;
           }
         }
-
-        while (write >= 1 && maxOfDropped < arr[write - 1]) {
-          write--;
-          numBacktracked++;
-        }
-
-        for (int i = write; i < write + numBacktracked; i++) {
-          dropped.add(arr[i]);
-        }
-
-        numDroppedInARow = 0;
       }
     }
 
@@ -387,7 +391,9 @@ public class dropmergesort {
   }
 
   static void pdqSort(int[] arr, int begin, int end) {
-    if (end - begin > 1) pdqLoop(arr, begin, end, pdqLog(end - begin));
+    if (end - begin > 1) {
+      pdqLoop(arr, begin, end, pdqLog(end - begin));
+    }
   }
 
   public static void main(String[] args) {

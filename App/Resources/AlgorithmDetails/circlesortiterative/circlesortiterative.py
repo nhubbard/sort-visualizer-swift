@@ -10,6 +10,7 @@ def sort(arr):
     while number_of_swaps != 0:
         number_of_swaps = circle_sort_routine(arr, n, end)
 
+
 def circle_sort_routine(array, length, end):
     swap_count = 0
     gap = length // 2
@@ -29,12 +30,24 @@ def circle_sort_routine(array, length, end):
     return swap_count
 
 
-
-
 if __name__ == "__main__":
     array = [
-        0, 39, 21, 62, 91, 77, 14, 23,
-        90, 69, 51, 81, 68, 83, 32, 56,
+        0,
+        39,
+        21,
+        62,
+        91,
+        77,
+        14,
+        23,
+        90,
+        69,
+        51,
+        81,
+        68,
+        83,
+        32,
+        56,
     ]
     sort(array)
     print(array)

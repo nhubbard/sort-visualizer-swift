@@ -18,7 +18,6 @@ def snuffle_sort(arr, start, stop)
   end
 end
 
-
 array = [0, 39, 21, 62, 91, 77, 14, 23]
 sort(array)
 p array

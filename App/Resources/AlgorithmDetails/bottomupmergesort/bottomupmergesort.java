@@ -3,14 +3,18 @@ import java.util.Arrays;
 public class bottomupmergesort {
   public static void sort(int[] arr) {
     int n = arr.length;
-    if (n < 2) return;
+    if (n < 2) {
+      return;
+    }
     int[] scratch = arr.clone();
     int mergeSize = 2;
     while (mergeSize <= n) {
       int copyLength = n;
       for (int index = 0; index < n; index += mergeSize) {
         int stop = merge(arr, scratch, n, index, mergeSize);
-        if (stop >= 0) copyLength = stop;
+        if (stop >= 0) {
+          copyLength = stop;
+        }
       }
       System.arraycopy(scratch, 0, arr, 0, copyLength);
       mergeSize *= 2;
@@ -24,12 +28,21 @@ public class bottomupmergesort {
   private static int merge(int[] arr, int[] scratch, int n, int index, int mergeSize) {
     int mid = index + mergeSize / 2;
     int end = Math.min(n, index + mergeSize);
-    if (mid >= end) return index;
-    int left = index, right = mid, out = index;
-    while (left < mid && right < end)
+    if (mid >= end) {
+      return index;
+    }
+    int left = index;
+    int right = mid;
+    int out = index;
+    while (left < mid && right < end) {
       scratch[out++] = arr[left] <= arr[right] ? arr[left++] : arr[right++];
-    while (left < mid) scratch[out++] = arr[left++];
-    while (right < end) scratch[out++] = arr[right++];
+    }
+    while (left < mid) {
+      scratch[out++] = arr[left++];
+    }
+    while (right < end) {
+      scratch[out++] = arr[right++];
+    }
     return -1;
   }
 

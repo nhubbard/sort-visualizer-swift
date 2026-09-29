@@ -37,6 +37,15 @@ Homebrew provides (`go`, `java`, `node`, `kotlin`, `ruby`, `dotnet`, plus the `s
 It excludes Swift's and C/C++'s own compilers, since Xcode's Command Line Tools already provide
 them and are required to build this repository. The command is safe to re-run.
 
+The C and C++ lint steps resolve the active macOS SDK through `xcrun` and pass it explicitly to
+Homebrew's `clang-tidy`. Homebrew LLVM may otherwise use a generated configuration that names a
+versioned Command Line Tools SDK which is not installed alongside the selected Xcode release.
+The local `.clang-tidy` policy also excludes signed-bitwise diagnostics for the corpus's
+nonnegative integer indexes, lengths, values, and masks; other analyzer, bug-prone, compiler, and
+performance findings remain errors. StandardRB runs without its shared RuboCop result cache so
+parallel workers do not contend for cache files outside the workspace. C# references require a
+final newline through their scoped `.editorconfig` rule, as expected by `dotnet format`.
+
 ## Adding or editing one algorithm's content
 
 ```sh

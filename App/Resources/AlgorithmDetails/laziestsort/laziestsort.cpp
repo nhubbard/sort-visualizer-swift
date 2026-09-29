@@ -121,6 +121,8 @@ void merge(int arr[], int lo, int mid, int hi) {
   int left = lo;
   int right = mid;
   while (left < right && right < hi) {
+    // sort only calls merge with 0 <= lo < mid < hi <= n.
+    // NOLINTNEXTLINE(clang-analyzer-security.ArrayBound)
     if (arr[left] <= arr[right]) {
       left++;
     } else {

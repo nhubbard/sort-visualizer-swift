@@ -41,6 +41,7 @@ def sort(arr):
     if not ascending:
         flip(arr, n - 1)
 
+
 def flip(arr, hi):
     """Reverses arr[0..hi] in place. This "flip" is the only move the algorithm ever performs;
     there is no per-element shift anywhere."""
@@ -97,12 +98,24 @@ def sort_first_three(arr, n):
     return True
 
 
-
-
 if __name__ == "__main__":
     array = [
-        0, 39, 21, 62, 91, 77, 14, 23,
-        90, 69, 51, 81, 68, 83, 32, 56,
+        0,
+        39,
+        21,
+        62,
+        91,
+        77,
+        14,
+        23,
+        90,
+        69,
+        51,
+        81,
+        68,
+        83,
+        32,
+        56,
     ]
     sort(array)
     print(array)

@@ -2,6 +2,7 @@ def sort(arr):
     if len(arr) > 1:
         double_insertion_sort(arr, 0, len(arr))
 
+
 def double_insertion_sort(array, start, end):
     left = start + (end - start) // 2 - 1
     right = left + 1
@@ -54,12 +55,24 @@ def double_insertion_sort(array, start, end):
         array[pos + 1] = current
 
 
-
-
 if __name__ == "__main__":
     array = [
-        0, 39, 21, 62, 91, 77, 14, 23,
-        90, 69, 51, 81, 68, 83, 32, 56,
+        0,
+        39,
+        21,
+        62,
+        91,
+        77,
+        14,
+        23,
+        90,
+        69,
+        51,
+        81,
+        68,
+        83,
+        32,
+        56,
     ]
     sort(array)
     print(array)

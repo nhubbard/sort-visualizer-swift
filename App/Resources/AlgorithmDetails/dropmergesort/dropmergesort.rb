@@ -15,7 +15,7 @@ def sort(array)
   while read < length
     iteration += 1
     if iteration == length / EARLY_OUT_TEST_AT &&
-       dropped.length > read * EARLY_OUT_DISORDER_FRACTION
+        dropped.length > read * EARLY_OUT_DISORDER_FRACTION
       dropped.each do |value|
         array[write] = value
         write += 1
@@ -44,7 +44,7 @@ def sort(array)
       backtracked = 1
       write -= 1
       largest = read
-      (read + 1 .. read + dropped_in_a_row).each do |index|
+      (read + 1..read + dropped_in_a_row).each do |index|
         largest = array[index] if array[index] > largest
       end
 

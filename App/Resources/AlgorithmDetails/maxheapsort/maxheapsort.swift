@@ -19,14 +19,19 @@ func siftDown(_ array: inout [Int], _ rootIn: Int, _ size: Int) {
         var largest = root
         let left = 2 * root + 1
         let right = left + 1
-        if left < size, array[largest] < array[left] { largest = left }
-        if right < size, array[largest] < array[right] { largest = right }
-        if largest == root { break }
+        if left < size, array[largest] < array[left] {
+            largest = left
+        }
+        if right < size, array[largest] < array[right] {
+            largest = right
+        }
+        if largest == root {
+            break
+        }
         array.swapAt(root, largest)
         root = largest
     }
 }
-
 
 var array: [Int] = [
     0, 39, 21, 62, 91, 77, 14, 23,

@@ -28,11 +28,13 @@ int blockSearch(int arr[], int a, int b, int size, int value);
 void orderBlocks(int arr[], int a, int b, int size);
 
 void sort(int arr[], int length) {
-  if (length < 2) return;
+  if (length < 2)
+    return;
   int k = 1;
   while (2 * k <= length) {
     for (int i = 2 * k - 1; i < length; i += 2 * k)
-      if (arr[i - k] > arr[i]) blockSwap(arr, i - k, i, k);
+      if (arr[i - k] > arr[i])
+        blockSwap(arr, i - k, i, k);
     k *= 2;
   }
   while (k > 0) {
@@ -44,7 +46,8 @@ void sort(int arr[], int length) {
       for (int j = i; j < i + k * g; j += k)
         blockInsert(arr, j, blockSearch(arr, a, b, k, arr[j]), k);
       i += k * g + k;
-      g = p - g; p *= 2;
+      g = p - g;
+      p *= 2;
     }
     while (i < length) {
       blockInsert(arr, i, blockSearch(arr, a, i, k, arr[i]), k);
@@ -57,31 +60,46 @@ void sort(int arr[], int length) {
 void blockSwap(int arr[], int a, int b, int size) {
   for (int offset = 0; offset < size; offset++) {
     int x = a - size + 1 + offset, y = b - size + 1 + offset;
-    int tmp = arr[x]; arr[x] = arr[y]; arr[y] = tmp;
+    int tmp = arr[x];
+    arr[x] = arr[y];
+    arr[y] = tmp;
   }
 }
 
 void blockInsert(int arr[], int a, int b, int size) {
-  while (a - size >= b) { blockSwap(arr, a - size, a, size); a -= size; }
+  while (a - size >= b) {
+    blockSwap(arr, a - size, a, size);
+    a -= size;
+  }
 }
 
 void blockReversal(int arr[], int a, int b, int size) {
   b -= size;
-  while (b > a) { blockSwap(arr, a, b, size); a += size; b -= size; }
+  while (b > a) {
+    blockSwap(arr, a, b, size);
+    a += size;
+    b -= size;
+  }
 }
 
 int blockSearch(int arr[], int a, int b, int size, int value) {
   while (a < b) {
     int mid = a + (((b - a) / size) / 2) * size;
-    if (value < arr[mid]) b = mid;
-    else a = mid + size;
+    if (value < arr[mid])
+      b = mid;
+    else
+      a = mid + size;
   }
   return a;
 }
 
 void orderBlocks(int arr[], int a, int b, int size) {
   int i = a, j = i + size;
-  while (j < b) { blockInsert(arr, j, i, size); i += size; j += 2 * size; }
+  while (j < b) {
+    blockInsert(arr, j, i, size);
+    i += size;
+    j += 2 * size;
+  }
   int mid = a + (((b - a) / size) / 2) * size;
   blockReversal(arr, mid, b, size);
 }

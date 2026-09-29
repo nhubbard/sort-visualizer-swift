@@ -6,9 +6,9 @@ func sort(_ array: inout [Int]) {
 
 func insertionSort(_ array: inout [Int], _ start: Int, _ end: Int) {
     guard start + 1 < end else { return }
-    for i in (start + 1)..<end {
+    for i in (start + 1) ..< end {
         var j = i
-        while j > start && array[j] < array[j - 1] {
+        while j > start, array[j] < array[j - 1] {
             array.swapAt(j - 1, j)
             j -= 1
         }
@@ -25,8 +25,12 @@ func optimizedDualPivotQuickSort(_ array: inout [Int], _ left: Int, _ right: Int
     let third = length / divisor
     var med1 = left + third
     var med2 = right - third
-    if med1 <= left { med1 = left + 1 }
-    if med2 >= right { med2 = right - 1 }
+    if med1 <= left {
+        med1 = left + 1
+    }
+    if med2 >= right {
+        med2 = right - 1
+    }
     if array[med1] < array[med2] {
         array.swapAt(med1, left)
         array.swapAt(med2, right)
@@ -42,7 +46,9 @@ func optimizedDualPivotQuickSort(_ array: inout [Int], _ left: Int, _ right: Int
             array.swapAt(k, less)
             less += 1
         } else if array[k] > pivot2 {
-            while k < great && array[great] > pivot2 { great -= 1 }
+            while k < great, array[great] > pivot2 {
+                great -= 1
+            }
             array.swapAt(k, great)
             great -= 1
             if array[k] < pivot1 {
@@ -53,7 +59,9 @@ func optimizedDualPivotQuickSort(_ array: inout [Int], _ left: Int, _ right: Int
         k += 1
     }
     let dist = great - less
-    if dist < 13 { divisor += 1 }
+    if dist < 13 {
+        divisor += 1
+    }
     array.swapAt(less - 1, left)
     array.swapAt(great + 1, right)
     optimizedDualPivotQuickSort(&array, left, less - 2, divisor)
@@ -75,9 +83,10 @@ func optimizedDualPivotQuickSort(_ array: inout [Int], _ left: Int, _ right: Int
             k += 1
         }
     }
-    if pivot1 < pivot2 { optimizedDualPivotQuickSort(&array, less, great, divisor) }
+    if pivot1 < pivot2 {
+        optimizedDualPivotQuickSort(&array, less, great, divisor)
+    }
 }
-
 
 var array: [Int] = [
     55, 12, 84, 3, 47, 91, 26, 68, 8, 73, 40, 97, 15, 62, 34, 79,

@@ -2,8 +2,7 @@
 #include <cstdio>
 #include <utility>
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
-                 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
 
 void printList(int items[], int size) {
   printf("[");
@@ -21,9 +20,7 @@ int binarySearchMid(int arr[], int start, int mid, int end);
 void multiSwapMerge(int arr[], int start, int mid, int end);
 void multiSwapMergeSort(int arr[], int a, int b);
 
-void sort(int arr[], int n) {
-  multiSwapMergeSort(arr, 0, n);
-}
+void sort(int arr[], int n) { multiSwapMergeSort(arr, 0, n); }
 
 void multiSwap(int arr[], int a, int b, int len) {
   for (int i = 0; i < len; i++) {

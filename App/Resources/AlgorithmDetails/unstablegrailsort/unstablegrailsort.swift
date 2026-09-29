@@ -65,16 +65,28 @@ func mergeWithoutBuffer(_ arr: inout [Int], _ start: Int, _ leftLength: Int, _ r
     if len1 < len2 {
         while len1 != 0 {
             let loc = binSearch(arr, pos + len1, len2, pos, true)
-            if loc != 0 { rotate(&arr, pos, len1, loc); pos += loc; len2 -= loc }
-            if len2 == 0 { break }
-            repeat { pos += 1; len1 -= 1 } while len1 != 0 && arr[pos] <= arr[pos + len1]
+            if loc != 0 {
+                rotate(&arr, pos, len1, loc); pos += loc; len2 -= loc
+            }
+            if len2 == 0 {
+                break
+            }
+            repeat {
+                pos += 1; len1 -= 1
+            } while len1 != 0 && arr[pos] <= arr[pos + len1]
         }
     } else {
         while len2 != 0 {
             let loc = binSearch(arr, pos, len1, pos + len1 + len2 - 1, false)
-            if loc != len1 { rotate(&arr, pos + loc, len1 - loc, len2); len1 = loc }
-            if len1 == 0 { break }
-            repeat { len2 -= 1 } while len2 != 0 && arr[pos + len1 - 1] <= arr[pos + len1 + len2 - 1]
+            if loc != len1 {
+                rotate(&arr, pos + loc, len1 - loc, len2); len1 = loc
+            }
+            if len1 == 0 {
+                break
+            }
+            repeat {
+                len2 -= 1
+            } while len2 != 0 && arr[pos + len1 - 1] <= arr[pos + len1 + len2 - 1]
         }
     }
 }
@@ -270,7 +282,6 @@ func commonSort(_ arr: inout [Int], _ pos: Int, _ len: Int) {
     insertSort(&arr, pos, blockLen)
     mergeWithoutBuffer(&arr, pos, blockLen, len - blockLen)
 }
-
 
 var array: [Int] = [
     0, 39, 21, 62, 91, 77, 14, 23,

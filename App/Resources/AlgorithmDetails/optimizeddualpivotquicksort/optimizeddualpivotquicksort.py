@@ -2,6 +2,7 @@ def sort(arr):
     if len(arr) > 1:
         optimized_dual_pivot_quick_sort(arr, 0, len(arr) - 1, 3)
 
+
 def insertion_sort(array, left, right):
     for i in range(left + 1, right + 1):
         j = i
@@ -67,8 +68,6 @@ def optimized_dual_pivot_quick_sort(array, left, right, divisor):
 
     if pivot1 < pivot2:
         optimized_dual_pivot_quick_sort(array, less, great, divisor)
-
-
 
 
 if __name__ == "__main__":

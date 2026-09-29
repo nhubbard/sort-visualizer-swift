@@ -97,6 +97,7 @@ def sort(arr):
             k -= 1
             j -= 1
 
+
 def pdq_log(n):
     log = 0
     while True:

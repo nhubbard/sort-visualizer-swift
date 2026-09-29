@@ -3,7 +3,6 @@
 #include <vector>
 using namespace std;
 
-
 void printList(const std::vector<int> &items) {
   printf("[");
   if (!items.empty()) {

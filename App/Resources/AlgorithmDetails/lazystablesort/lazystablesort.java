@@ -73,7 +73,9 @@ public class lazystablesort {
           pos += loc;
           len2 -= loc;
         }
-        if (len2 == 0) break;
+        if (len2 == 0) {
+          break;
+        }
         do {
           pos++;
           len1--;
@@ -86,7 +88,9 @@ public class lazystablesort {
           rotate(arr, pos + loc, len1 - loc, len2);
           len1 = loc;
         }
-        if (len1 == 0) break;
+        if (len1 == 0) {
+          break;
+        }
         do {
           len2--;
         } while (len2 != 0 && arr[pos + len1 - 1] <= arr[pos + len1 + len2 - 1]);

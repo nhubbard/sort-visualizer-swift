@@ -1,6 +1,7 @@
 def sort(arr):
     quad_stooge(arr, 0, len(arr))
 
+
 def quad_stooge(arr, pos, length):
     if length >= 2 and arr[pos] > arr[pos + length - 1]:
         arr[pos], arr[pos + length - 1] = arr[pos + length - 1], arr[pos]
@@ -20,12 +21,24 @@ def quad_stooge(arr, pos, length):
         quad_stooge(arr, pos + len1 // 2, len3)
 
 
-
-
 if __name__ == "__main__":
     array = [
-        0, 39, 21, 62, 91, 77, 14, 23,
-        90, 69, 51, 81, 68, 83, 32, 56,
+        0,
+        39,
+        21,
+        62,
+        91,
+        77,
+        14,
+        23,
+        90,
+        69,
+        51,
+        81,
+        68,
+        83,
+        32,
+        56,
     ]
     sort(array)
     print(array)

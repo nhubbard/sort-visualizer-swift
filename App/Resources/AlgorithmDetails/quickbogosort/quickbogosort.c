@@ -23,9 +23,7 @@ void printList(int items[], int size) {
 int isPartitioned(int arr[], int start, int end, int pivot);
 void sortRange(int arr[], int start, int end);
 
-void sort(int arr[], int n) {
-  sortRange(arr, 0, n);
-}
+void sort(int arr[], int n) { sortRange(arr, 0, n); }
 
 int isPartitioned(int arr[], int start, int end, int pivot) {
   for (int i = start; i < pivot; i++) {

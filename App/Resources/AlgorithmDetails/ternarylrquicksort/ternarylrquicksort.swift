@@ -104,7 +104,6 @@ func quicksortTernaryLR(_ arr: inout [Int], _ lo: Int, _ hi: Int) {
     quicksortTernaryLR(&arr, hi - numGreater + 1, hi)
 }
 
-
 var array: [Int] = [
     0, 39, 21, 62, 91, 77, 14, 23,
     90, 69, 51, 81, 68, 83, 32, 56,

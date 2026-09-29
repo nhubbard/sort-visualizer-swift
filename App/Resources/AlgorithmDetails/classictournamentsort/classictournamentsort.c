@@ -1,8 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
-                 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
 
 void swap(int *a, int *b) {
   int t = *a;
@@ -36,6 +35,8 @@ void sort(int arr[], int n) {
   }
 
   for (int i = size; i < treeSize - mod; i++) {
+    /* n >= 2 makes size nonnegative, and treeSize - mod equals n + size. */
+    // NOLINTNEXTLINE(clang-analyzer-security.ArrayBound)
     tree[i] = i - size;
   }
 
@@ -55,6 +56,8 @@ void sort(int arr[], int n) {
   }
 
   int *output = malloc(sizeof(int) * n);
+  /* The reduction above initializes tree[0] to one of the n player indexes. */
+  // NOLINTNEXTLINE(clang-analyzer-core.uninitialized.ArraySubscript)
   output[0] = arr[tree[0]];
 
   for (int idx = 1; idx < n; idx++) {

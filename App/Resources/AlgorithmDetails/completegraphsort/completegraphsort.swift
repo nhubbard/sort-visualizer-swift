@@ -2,7 +2,9 @@ import Foundation
 
 func sort(_ arr: inout [Int]) {
     let n = arr.count
-    if n <= 1 { return }
+    if n <= 1 {
+        return
+    }
     var d = 2
     let end = 1 << Int(log(Double(n - 1)) / log(2.0) + 1)
     while d <= end {
@@ -75,7 +77,6 @@ func split(_ arr: inout [Int], _ aIn: Int, _ m: Int, _ bIn: Int) {
         }
     }
 }
-
 
 var array: [Int] = [
     0, 39, 21, 62, 91, 77, 14, 23,

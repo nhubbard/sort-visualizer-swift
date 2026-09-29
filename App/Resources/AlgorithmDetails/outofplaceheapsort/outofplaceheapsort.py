@@ -12,6 +12,7 @@ def sort(array):
         find_next(array, n)
     return output
 
+
 def sift_down(array, root, size):
     index = root
     while 2 * index + 1 < size:
@@ -55,12 +56,24 @@ def find_next(array, size):
         array[hole], array[left] = array[left], array[hole]
 
 
-
-
 if __name__ == "__main__":
     array = [
-        0, 39, 21, 62, 91, 77, 14, 23,
-        90, 69, 51, 81, 68, 83, 32, 56,
+        0,
+        39,
+        21,
+        62,
+        91,
+        77,
+        14,
+        23,
+        90,
+        69,
+        51,
+        81,
+        68,
+        83,
+        32,
+        56,
     ]
     output = sort(array)
     print(output)

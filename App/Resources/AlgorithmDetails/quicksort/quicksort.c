@@ -1,8 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
-                 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
 
 void swap(int *a, int *b) {
   int t = *a;
@@ -34,9 +33,12 @@ void sort(int arr[], int low, int high) {
 int partition(int arr[], int left, int right) {
   int i = left, j = right;
   while (i < j) {
-    while (i < j && arr[i] <= arr[left]) i++;
-    while (arr[j] > arr[left]) j--;
-    if (i < j) swap(&arr[i], &arr[j]);
+    while (i < j && arr[i] <= arr[left])
+      i++;
+    while (arr[j] > arr[left])
+      j--;
+    if (i < j)
+      swap(&arr[i], &arr[j]);
   }
   swap(&arr[left], &arr[j]);
   return j;

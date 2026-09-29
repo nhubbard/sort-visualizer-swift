@@ -2,6 +2,7 @@ def sort(arr):
     n = len(arr)
     merge_sort(arr, 0, n)
 
+
 def push(array, p, a, b):
     if a == b:
         return
@@ -34,12 +35,24 @@ def merge_sort(array, a, b):
     merge(array, a, m, b)
 
 
-
-
 if __name__ == "__main__":
     array = [
-        0, 39, 21, 62, 91, 77, 14, 23,
-        90, 69, 51, 81, 68, 83, 32, 56,
+        0,
+        39,
+        21,
+        62,
+        91,
+        77,
+        14,
+        23,
+        90,
+        69,
+        51,
+        81,
+        68,
+        83,
+        32,
+        56,
     ]
     sort(array)
     print(array)

@@ -15,7 +15,8 @@ void printList(int items[], int size) {
 }
 
 void sort(int arr[], int n) {
-  if (n <= 1) return;
+  if (n <= 1)
+    return;
   int loops[n];
   for (int i = 0; i < n; i++) {
     loops[i] = 0;

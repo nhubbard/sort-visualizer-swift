@@ -2,7 +2,9 @@ import java.util.Arrays;
 
 public class stoogesort {
   public static void sort(int[] arr) {
-    if (arr.length <= 1) return;
+    if (arr.length <= 1) {
+      return;
+    }
     stoogeSort(arr, 0, arr.length - 1);
   }
 

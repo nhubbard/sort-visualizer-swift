@@ -24,7 +24,7 @@ func merge(_ array: inout [Int], _ scratch: inout [Int], _ low: Int, _ mid: Int,
     var left = low
     var right = mid
     var out = low
-    while left < mid && right < high {
+    while left < mid, right < high {
         if array[left] <= array[right] {
             scratch[out] = array[left]
             left += 1
@@ -44,9 +44,10 @@ func merge(_ array: inout [Int], _ scratch: inout [Int], _ low: Int, _ mid: Int,
         right += 1
         out += 1
     }
-    for i in low ..< high { array[i] = scratch[i] }
+    for i in low ..< high {
+        array[i] = scratch[i]
+    }
 }
-
 
 var array: [Int] = [
     0, 39, 21, 62, 91, 77, 14, 23,

@@ -5,12 +5,14 @@ def sort(arr):
     rate = max(2, floor_log2(n) // 2)
     simple_shatter_sort(arr, n, 4, rate)
 
+
 def insertion_sort(arr, start, end):
     for i in range(start + 1, end):
         pos = i
         while pos > start and arr[pos - 1] > arr[pos]:
             arr[pos - 1], arr[pos] = arr[pos], arr[pos - 1]
             pos -= 1
+
 
 def shatter_partition(arr, start, length, num):
     window = arr[start : start + length]
@@ -56,12 +58,24 @@ def simple_shatter_sort(arr, length, num, rate):
             insertion_sort(arr, offsets[k], offsets[k + 1])
 
 
-
-
 if __name__ == "__main__":
     array = [
-        0, 39, 21, 62, 91, 77, 14, 23,
-        90, 69, 51, 81, 68, 83, 32, 56,
+        0,
+        39,
+        21,
+        62,
+        91,
+        77,
+        14,
+        23,
+        90,
+        69,
+        51,
+        81,
+        68,
+        83,
+        32,
+        56,
     ]
     sort(array)
     print(array)

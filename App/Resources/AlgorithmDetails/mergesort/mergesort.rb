@@ -39,7 +39,6 @@ def merge_sort(array, scratch, start, finish)
   merge(array, scratch, start, mid, finish)
 end
 
-
 array = [0, 39, 21, 62, 91, 77, 14, 23,
   90, 69, 51, 81, 68, 83, 32, 56]
 sort(array)

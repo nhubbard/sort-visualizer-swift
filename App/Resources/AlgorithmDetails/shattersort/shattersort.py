@@ -4,12 +4,14 @@ def sort(arr):
     n = len(arr)
     shatter_sort(arr, n, 4)
 
+
 def insertion_sort(arr, start, end):
     for i in range(start + 1, end):
         pos = i
         while pos > start and arr[pos - 1] > arr[pos]:
             arr[pos - 1], arr[pos] = arr[pos], arr[pos - 1]
             pos -= 1
+
 
 def shatter_partition(arr, start, length, num):
     window = arr[start : start + length]
@@ -42,12 +44,24 @@ def shatter_sort(arr, length, num):
             insertion_sort(arr, offsets[i], offsets[i + 1])
 
 
-
-
 if __name__ == "__main__":
     array = [
-        0, 39, 21, 62, 91, 77, 14, 23,
-        90, 69, 51, 81, 68, 83, 32, 56,
+        0,
+        39,
+        21,
+        62,
+        91,
+        77,
+        14,
+        23,
+        90,
+        69,
+        51,
+        81,
+        68,
+        83,
+        32,
+        56,
     ]
     sort(array)
     print(array)

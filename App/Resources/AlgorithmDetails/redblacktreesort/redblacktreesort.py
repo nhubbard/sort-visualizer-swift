@@ -19,6 +19,7 @@ def sort(arr):
         arr[i] = result[i]
     return arr
 
+
 class Node:
     def __init__(self, value):
         self.value = value
@@ -86,12 +87,24 @@ def add(node, value):
         return node, node.is_red and is_red(node.right)
 
 
-
-
 if __name__ == "__main__":
     array = [
-        0, 39, 21, 62, 91, 77, 14, 23,
-        90, 69, 51, 81, 68, 83, 32, 56,
+        0,
+        39,
+        21,
+        62,
+        91,
+        77,
+        14,
+        23,
+        90,
+        69,
+        51,
+        81,
+        68,
+        83,
+        32,
+        56,
     ]
     sort(array)
     print(array)

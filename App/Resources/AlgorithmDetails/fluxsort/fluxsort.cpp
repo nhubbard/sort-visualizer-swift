@@ -37,8 +37,7 @@ static void parityMerge16(int arr[], int start, int aux[]);
 static void partialBackwardMerge(int arr[], int aux[], int start, int nmemb,
                                  int block);
 static void tailMerge(int arr[], int aux[], int start, int nmemb, int block);
-static int forwardMergeRead(const int arr[], const int aux[], int toAux,
-                            int i);
+static int forwardMergeRead(const int arr[], const int aux[], int toAux, int i);
 static void forwardMergeWrite(int arr[], int aux[], int toAux, int i,
                               int value);
 static void forwardMerge(int arr[], int aux[], int start, int auxStart,
@@ -47,8 +46,7 @@ static void quadMergeBlock(int arr[], int start, int aux[], int block);
 static void quadMerge(int arr[], int aux[], int start, int nmemb, int block);
 static int quadSwap(int arr[], int start, int nmemb);
 static void quadSortRange(int arr[], int start, int length);
-static void quadSortRangeUsing(int arr[], int swapBuf[], int start,
-                               int length);
+static void quadSortRangeUsing(int arr[], int swapBuf[], int start, int length);
 static int fluxAnalyze(int arr[], int nmemb);
 static int mainGT(const int arr[], const int swapBuf[], int mainIsSwap, int a,
                   int b);

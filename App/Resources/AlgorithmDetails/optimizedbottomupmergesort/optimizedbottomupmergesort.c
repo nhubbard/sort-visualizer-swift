@@ -76,9 +76,7 @@ void sort(int arr[], int n) {
   free(scratch);
 }
 
-int minInt(int a, int b) {
-  return a < b ? a : b;
-}
+int minInt(int a, int b) { return a < b ? a : b; }
 
 void binaryInsertionSort(int arr[], int lo, int hi) {
   for (int i = lo + 1; i < hi; i++) {

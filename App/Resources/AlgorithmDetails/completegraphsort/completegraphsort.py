@@ -23,6 +23,7 @@ def sort(arr):
             i = k
         d *= 2
 
+
 def comp_swap(arr, a, b):
     if arr[a] > arr[b]:
         arr[a], arr[b] = arr[b], arr[a]
@@ -56,12 +57,24 @@ def split(arr, a, m, b):
                 comp_swap(arr, a + j, c)
 
 
-
-
 if __name__ == "__main__":
     array = [
-        0, 39, 21, 62, 91, 77, 14, 23,
-        90, 69, 51, 81, 68, 83, 32, 56,
+        0,
+        39,
+        21,
+        62,
+        91,
+        77,
+        14,
+        23,
+        90,
+        69,
+        51,
+        81,
+        68,
+        83,
+        32,
+        56,
     ]
     sort(array)
     print(array)

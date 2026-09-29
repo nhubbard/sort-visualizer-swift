@@ -1,9 +1,8 @@
-#include <cstdio>
 #include <algorithm>
+#include <cstdio>
 #include <iostream>
 #include <vector>
 using namespace std;
-
 
 void printList(const std::vector<int> &items) {
   printf("[");

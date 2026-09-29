@@ -1,6 +1,7 @@
 def sort(arr):
     double_selection_sort(arr)
 
+
 def double_selection_sort(array):
     n = len(array)
     if n <= 1:
@@ -30,12 +31,24 @@ def double_selection_sort(array):
         biggest = right
 
 
-
-
 if __name__ == "__main__":
     array = [
-        0, 39, 21, 62, 91, 77, 14, 23,
-        90, 69, 51, 81, 68, 83, 32, 56,
+        0,
+        39,
+        21,
+        62,
+        91,
+        77,
+        14,
+        23,
+        90,
+        69,
+        51,
+        81,
+        68,
+        83,
+        32,
+        56,
     ]
     sort(array)
     print(array)

@@ -19,6 +19,7 @@ def sort(arr):
     )  # an ordinary fast sort for everything past the demonstration slice
     arr[:] = merge_sorted(chaos, rest)
 
+
 def next_permutation(arr):
     """Advances arr to its next lexicographic permutation in place. Returns False (after
     resetting arr to its first, fully ascending permutation) once every arrangement has been
@@ -91,12 +92,24 @@ def merge_sorted(a, b):
     return merged
 
 
-
-
 if __name__ == "__main__":
     array = [
-        0, 39, 21, 62, 91, 77, 14, 23,
-        90, 69, 51, 81, 68, 83, 32, 56,
+        0,
+        39,
+        21,
+        62,
+        91,
+        77,
+        14,
+        23,
+        90,
+        69,
+        51,
+        81,
+        68,
+        83,
+        32,
+        56,
     ]
     sort(array)
     print(array)

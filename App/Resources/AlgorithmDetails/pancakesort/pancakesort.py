@@ -7,6 +7,7 @@ def sort(arr):
             flip(arr, n - 1)
         n -= 1
 
+
 def flip(arr, n):
     left = 0
     while left < n:
@@ -23,12 +24,24 @@ def max_index(arr, n):
     return index
 
 
-
-
 if __name__ == "__main__":
     array = [
-        0, 39, 21, 62, 91, 77, 14, 23,
-        90, 69, 51, 81, 68, 83, 32, 56,
+        0,
+        39,
+        21,
+        62,
+        91,
+        77,
+        14,
+        23,
+        90,
+        69,
+        51,
+        81,
+        68,
+        83,
+        32,
+        56,
     ]
     sort(array)
     print(array)

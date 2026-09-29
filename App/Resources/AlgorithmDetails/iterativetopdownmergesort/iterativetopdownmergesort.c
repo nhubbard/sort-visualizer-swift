@@ -1,8 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
-                 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
 
 void swap(int *a, int *b) {
   int t = *a;
@@ -24,7 +23,8 @@ void printList(int items[], int size) {
 void merge(int arr[], int scratch[], int low, int mid, int high);
 
 void sort(int arr[], int n) {
-  if (n < 2) return;
+  if (n < 2)
+    return;
   int *scratch = malloc(n * sizeof(int));
   int subarrayCount = 1;
   while (subarrayCount < n) {
@@ -48,9 +48,12 @@ void merge(int arr[], int scratch[], int low, int mid, int high) {
   while (left < mid && right < high) {
     scratch[out++] = arr[left] <= arr[right] ? arr[left++] : arr[right++];
   }
-  while (left < mid) scratch[out++] = arr[left++];
-  while (right < high) scratch[out++] = arr[right++];
-  for (int i = low; i < high; i++) arr[i] = scratch[i];
+  while (left < mid)
+    scratch[out++] = arr[left++];
+  while (right < high)
+    scratch[out++] = arr[right++];
+  for (int i = low; i < high; i++)
+    arr[i] = scratch[i];
 }
 
 int main(int argc, char *argv[]) {
