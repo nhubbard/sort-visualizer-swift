@@ -869,6 +869,35 @@
   },
   {
     "coefficients" : [
+      8.063410169912562,
+      1.0786210591781444
+    ],
+    "runnerUpFamily" : "polynomialIntercept",
+    "runnerUpRSquared" : 0.99989446608979,
+    "safeMaxSizeByCap" : [
+      100000,
+      837,
+      300000,
+      1831,
+      1000000,
+      3932
+    ],
+    "sampleSizes" : [
+      16,
+      17,
+      18,
+      19,
+      38,
+      76,
+      152,
+      304
+    ],
+    "subjectID" : "bufferpartitionmergesort+shuffledhalf",
+    "winningFamily" : "powerLog",
+    "winningRSquared" : 0.9982372515961406
+  },
+  {
+    "coefficients" : [
       7.11363772739928,
       -1.6835643213397335,
       -418.2785470279185
