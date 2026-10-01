@@ -1590,6 +1590,36 @@
   },
   {
     "coefficients" : [
+      0.10158274877897613,
+      18.822156079522916,
+      73.70084287195496
+    ],
+    "runnerUpFamily" : "powerLaw",
+    "runnerUpRSquared" : 0.9856047524204514,
+    "safeMaxSizeByCap" : [
+      100000,
+      799,
+      300000,
+      1446,
+      1000000,
+      2715
+    ],
+    "sampleSizes" : [
+      16,
+      17,
+      18,
+      19,
+      38,
+      76,
+      152,
+      304
+    ],
+    "subjectID" : "ectasort+recursivereversal",
+    "winningFamily" : "polynomialIntercept",
+    "winningRSquared" : 0.997670812068615
+  },
+  {
+    "coefficients" : [
       10.422306224357815,
       0.06277832488551466
     ],

@@ -22,7 +22,7 @@ enum AllBuiltInAlgorithms {
     ClassicTournamentSort(),
     ClassicTreeSort(), CocktailBogoSort(), CocktailMergeSort(), CocktailShakerSort(), CombSort(), CompleteGraphSort(),
     CountingSort(), CreaseSort(), CycleSort(), DeterministicBogoSort(), DiamondSortIterative(), DiamondSortRecursive(),
-    DoubleInsertionSort(), DoubleSelectionSort(), DropMergeSort(), DualPivotQuickSort(), ExchangeBogoSort(), FifthMergeSort(),
+    DoubleInsertionSort(), DoubleSelectionSort(), DropMergeSort(), DualPivotQuickSort(), EctaSort(), ExchangeBogoSort(), FifthMergeSort(),
     FlashSort(), FlippedMinHeapSort(), FlanSort(), FluxSort(), FoldSort(), ForcedStableQuickSort(), FunSort(), GnomeSort(),
     GrailSort(), GravitySort(), GuessSort(), HanoiSort(), HybridCombSort(), ImprovedBlockSelectionSort(),
     ImprovedInPlaceMergeSort(), IndexSort(), InPlaceLSDRadixSort(), InPlaceMergeSort(), InsertionSort(),
