@@ -44,7 +44,7 @@ enum AllBuiltInAlgorithms {
     StacklessBinaryQuickSort(), StacklessDualPivotQuickSort(), StacklessHybridQuickSort(), StacklessRotateMergeSort(),
     StaticSort(), StoogeSort(), StrandSort(), SwaplessBubbleSort(), SynchronousSqrtSort(), TableSort(), TernaryHeapSort(),
     TernaryLLQuickSort(), TernaryLRQuickSort(), ThreeSmoothCombSortIterative(), ThreeSmoothCombSortRecursive(),
-    TimeSort(), TournamentSort(), TreeSort(), TriangularHeapSort(), TwinSort(), UnoptimizedBubbleSort(),
+    TimeSort(), TimSort(), TournamentSort(), TreeSort(), TriangularHeapSort(), TwinSort(), UnoptimizedBubbleSort(),
     UnoptimizedCocktailShakerSort(), UnstableGrailSort(), WeakHeapSort(), WeavedMergeSort(), WeaveMergeSort(),
     WeaveSortIterative(), WeaveSortRecursive(), YujisBufferedMergeSort2()
   ]

@@ -5151,6 +5151,35 @@
   },
   {
     "coefficients" : [
+      0.5138586822262933,
+      1.4913981541065504
+    ],
+    "runnerUpFamily" : "powerLaw",
+    "runnerUpRSquared" : 0.38382547811596246,
+    "safeMaxSizeByCap" : [
+      100000,
+      821,
+      300000,
+      1514,
+      1000000,
+      2882
+    ],
+    "sampleSizes" : [
+      16,
+      17,
+      18,
+      19,
+      38,
+      76,
+      152,
+      304
+    ],
+    "subjectID" : "timsort+pdqbad",
+    "winningFamily" : "powerLog",
+    "winningRSquared" : 0.4793138380025618
+  },
+  {
+    "coefficients" : [
       9.785799941111359,
       1.0246872819740258
     ],

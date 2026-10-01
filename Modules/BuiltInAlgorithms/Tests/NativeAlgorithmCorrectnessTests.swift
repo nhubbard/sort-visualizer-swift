@@ -10,6 +10,49 @@ import Testing
 @Suite
 struct NativeAlgorithmCorrectnessTests {
   @Test
+  func timSortHandlesRunStackGallopingAndStableTies() {
+    let algorithm = TimSort()
+    let radix = 8_192
+    for size in [0, 1, 2, 15, 16, 17, 30, 31, 32, 33, 63, 64, 65, 119, 120, 121, 255, 256, 257, 511, 512, 1024, 2048] {
+      for seed in 0..<12 {
+        var state = UInt64(size * 1_009 + seed + 1)
+        let random = (0..<size).map { index in
+          state = state &* 6_364_136_223_846_793_005 &+ 1_442_695_040_888_963_407
+          return Int(state % 17) * radix + index
+        }
+        let unique = (0..<size).map { $0 * radix + $0 }
+        var shuffled = unique
+        if size > 1 {
+          for index in stride(from: size - 1, through: 1, by: -1) {
+            state = state &* 6_364_136_223_846_793_005 &+ 1_442_695_040_888_963_407
+            shuffled.swapAt(index, Int(state % UInt64(index + 1)))
+          }
+        }
+        let ordered = random.sorted { $0 / radix < $1 / radix }
+        var candidates = [random, Array(random.reversed()), ordered, unique, Array(unique.reversed()), shuffled]
+        if size >= 64 {
+          let middle = size / 2
+          candidates.append(Array(unique[middle..<size]) + Array(unique[0..<middle]))
+        }
+        for candidate in candidates {
+          var engine = RecordingEngine(values: candidate, operationCap: 10_000_000, comparisonKeyForTesting: { $0 / radix })
+          algorithm.record(into: &engine)
+          let output = engine.values
+          #expect(output.map { $0 / radix } == candidate.map { $0 / radix }.sorted(), "size=\(size) seed=\(seed)")
+          let positions = Dictionary(uniqueKeysWithValues: candidate.enumerated().map { ($0.element, $0.offset) })
+          for index in 1..<max(1, output.count) where output[index - 1] / radix == output[index] / radix {
+            if let earlier = positions[output[index - 1]], let later = positions[output[index]] {
+              #expect(earlier < later, "size=\(size) seed=\(seed)")
+            } else {
+              Issue.record("Tim Sort changed an input value at size \(size), seed \(seed)")
+            }
+          }
+        }
+      }
+    }
+  }
+
+  @Test
   func adaptiveGrailSortHandlesNaturalRunsAndStableTies() {
     let algorithm = AdaptiveGrailSort()
     let radix = 4_096
@@ -262,7 +305,7 @@ struct NativeAlgorithmCorrectnessTests {
     StableQuickSort(), StableSelectionSort(), StacklessAmericanFlagSort(), StacklessBinaryQuickSort(),
     StacklessDualPivotQuickSort(), StacklessHybridQuickSort(), StacklessRotateMergeSort(), StaticSort(), StoogeSort(),
     StrandSort(), SwaplessBubbleSort(), SynchronousSqrtSort(), TableSort(), TernaryHeapSort(), TernaryLLQuickSort(), TernaryLRQuickSort(),
-    ThreeSmoothCombSortIterative(), ThreeSmoothCombSortRecursive(), TimeSort(), TournamentSort(), TreeSort(),
+    ThreeSmoothCombSortIterative(), ThreeSmoothCombSortRecursive(), TimeSort(), TimSort(), TournamentSort(), TreeSort(),
     TriangularHeapSort(), TwinSort(), UnoptimizedBubbleSort(), UnoptimizedCocktailShakerSort(), UnstableGrailSort(),
     WeakHeapSort(), WeavedMergeSort(), WeaveMergeSort(), WeaveSortIterative(), WeaveSortRecursive(),
     YujisBufferedMergeSort2()
