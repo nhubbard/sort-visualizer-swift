@@ -10,6 +10,50 @@ import Testing
 @Suite
 struct NativeAlgorithmCorrectnessTests {
   @Test
+  func chaliceSortHandlesKeyBitAndFallbackPaths() {
+    let algorithm = ChaliceSort()
+    let radix = 8_192
+    for size in [0, 1, 31, 32, 63, 127, 128, 129, 191, 255, 256, 257, 511, 512, 1024] {
+      for seed in 0..<8 {
+        for keyCount in [1, 2, 3, 7, 8, 16, 64, size] {
+          var state = UInt64(size * 1_009 + seed * 131 + keyCount + 1)
+          let input = (0..<size).map { index in
+            state = state &* 6_364_136_223_846_793_005 &+ 1_442_695_040_888_963_407
+            return Int(state % UInt64(max(1, keyCount))) * radix + index
+          }
+          let ordered = input.sorted { $0 / radix < $1 / radix }
+          var candidates = [input, Array(input.reversed()), ordered]
+          if keyCount == size {
+            let unique = (0..<size).map { $0 * radix + $0 }
+            var shuffled = unique
+            if size > 1 {
+              for index in stride(from: size - 1, through: 1, by: -1) {
+                state = state &* 6_364_136_223_846_793_005 &+ 1_442_695_040_888_963_407
+                shuffled.swapAt(index, Int(state % UInt64(index + 1)))
+              }
+            }
+            candidates += [unique, Array(unique.reversed()), shuffled]
+          }
+          for candidate in candidates {
+            var engine = RecordingEngine(values: candidate, operationCap: 20_000_000, comparisonKeyForTesting: { $0 / radix })
+            algorithm.record(into: &engine)
+            let output = engine.values
+            #expect(output.map { $0 / radix } == candidate.map { $0 / radix }.sorted(), "size=\(size) seed=\(seed) keys=\(keyCount)")
+            let positions = Dictionary(uniqueKeysWithValues: candidate.enumerated().map { ($0.element, $0.offset) })
+            for index in 1..<max(1, output.count) where output[index - 1] / radix == output[index] / radix {
+              if let earlier = positions[output[index - 1]], let later = positions[output[index]] {
+                #expect(earlier < later, "size=\(size) seed=\(seed) keys=\(keyCount)")
+              } else {
+                Issue.record("Chalice Sort changed an input value at size \(size), seed \(seed), keys \(keyCount)")
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  @Test
   func timSortHandlesRunStackGallopingAndStableTies() {
     let algorithm = TimSort()
     let radix = 8_192
@@ -279,7 +323,7 @@ struct NativeAlgorithmCorrectnessTests {
     BinaryQuickSortIterative(), BinaryQuickSortRecursive(), BingoSort(), BinomialHeapSort(), BinomialSmoothSort(),
     BitonicSortIterative(), BitonicSortRecursive(), BlockInsertionSort(), BlockSwapMergeSort(), BogoBogoSort(),
     BogoSort(), BoseNelsonSortIterative(), BoseNelsonSortRecursive(), BottomUpHeapSort(), BottomUpMergeSort(),
-    BozoSort(), BubbleBogoSort(), BubbleSort(), BufferedStoogeSort(), BufferPartitionMergeSort(), BurntPancakeSort(), CircleSortIterative(),
+    BozoSort(), BubbleBogoSort(), BubbleSort(), BufferedStoogeSort(), BufferPartitionMergeSort(), BurntPancakeSort(), ChaliceSort(), CircleSortIterative(),
     CircleSortRecursive(), CircloidSort(), CircularGrailSort(), ClassicGravitySort(), ClassicThreeSmoothCombSort(),
     ClassicTournamentSort(),
     ClassicTreeSort(), CocktailBogoSort(), CocktailMergeSort(), CocktailShakerSort(), CombSort(), CompleteGraphSort(),

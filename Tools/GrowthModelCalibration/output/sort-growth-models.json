@@ -957,6 +957,35 @@
   },
   {
     "coefficients" : [
+      3.686996857177222,
+      1.2149318446984259
+    ],
+    "runnerUpFamily" : "polynomialIntercept",
+    "runnerUpRSquared" : 0.9949345605495812,
+    "safeMaxSizeByCap" : [
+      100000,
+      759,
+      300000,
+      1547,
+      1000000,
+      3155
+    ],
+    "sampleSizes" : [
+      16,
+      17,
+      18,
+      19,
+      38,
+      76,
+      152,
+      304
+    ],
+    "subjectID" : "chalicesort+doublelayered",
+    "winningFamily" : "powerLog",
+    "winningRSquared" : 0.9930027808898314
+  },
+  {
+    "coefficients" : [
       5.568623989299335,
       1.3297120101938211
     ],

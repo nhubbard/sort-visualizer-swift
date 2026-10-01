@@ -18,7 +18,7 @@ sequential version, under a different name. Real thread interleaving has no mean
 single-writer model. Porting these variants would add duplicate content, not new algorithmic
 behavior.
 
-This leaves 196 candidates. 193 are shipped. 3 remain, in one category.
+This leaves 196 candidates. 194 are shipped. 2 remain, in one category.
 
 ### By category
 
@@ -31,7 +31,7 @@ This leaves 196 candidates. 193 are shipped. 3 remain, in one category.
 | Merge (19) | All ported |
 | Miscellaneous (4) | All ported |
 | Concurrent (22) | All ported |
-| Hybrid (41) | 38 ported, 3 remaining |
+| Hybrid (41) | 39 ported, 2 remaining |
 
 ### Remaining work
 
@@ -42,12 +42,12 @@ line count. Inherited template logic is real complexity a port must understand a
 
 **Very Hard** (400+ effective lines, or extending one of the largest remaining templates):
 
-- `ChaliceSort` (767 own lines plus 352 for `BlockMergeSorting`), `WikiSort` (a 75-line wrapper
-  over the 1068-line `WikiSorting` template), and `KotaSort` (a 33-line wrapper over the 1142-line
-  `KotaSorting` template, the largest template in ArrayV's `sorts/` tree).
+- `WikiSort` (a 75-line wrapper over the 1068-line `WikiSorting` template) and `KotaSort` (a
+  33-line wrapper over the 1142-line `KotaSorting` template, the largest template in ArrayV's
+  `sorts/` tree).
 
-`ChaliceSort` extends `BlockMergeSorting` (352 lines). The shared operations used by the shipped
-`SynchronousSqrtSort` are now in `BlockMergeSortingTemplate`; Chalice needs more of that template.
+`ChaliceSort` has shipped using the shared operations in `BlockMergeSortingTemplate` together
+with its own key and bit collection and block merge phases.
 
 The remaining Hybrid algorithms are being ported individually as their implementations and
 reference content are verified.
@@ -91,8 +91,8 @@ hand-transcribed Java-to-pseudocode notes for six templates: `BinaryQuickSorting
 `ShatterSortingTemplate`, `TwinSortingTemplate`, `UnstableGrailSortingTemplate`,
 `PDQSortingTemplate`, and `GrailSortingTemplate`. Every algorithm built on those six templates has
 shipped, so the team retired that document instead of carrying it forward. It does not cover any of
-the templates still needed by pending algorithms (`BlockMergeSorting` beyond the shared
-operations already ported, `TimSorting`, `WikiSorting`, `KotaSorting`) — nor `QuadSorting`, which
+the templates still needed by pending algorithms (`WikiSorting` and `KotaSorting`) — nor
+`QuadSorting`, which
 has since shipped without one. A similar transcription pass is worth doing again before tackling
 the remaining template work, given how dense and index-arithmetic-heavy this style of algorithm
 tends to be.
