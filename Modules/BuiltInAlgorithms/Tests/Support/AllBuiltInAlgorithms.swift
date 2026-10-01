@@ -32,7 +32,7 @@ enum AllBuiltInAlgorithms {
     MergeInsertionSort(), MergeSort(), MinHeapSort(), MinMaxHeapSort(), MSDRadixSort(), NewShuffleMergeSort(),
     OddEvenMergeSortIterative(), OddEvenMergeSortRecursive(), OddEvenSort(), OptimizedBottomUpMergeSort(),
     OptimizedBubbleSort(), OptimizedCocktailShakerSort(), OptimizedDualPivotQuickSort(), OptimizedGnomeSort(),
-    OptimizedGuessSort(), OptimizedLazyStableSort(), OptimizedStoogeSort(), OptimizedStoogeSortStudio(),
+    OptimizedGuessSort(), OptimizedLazyStableSort(), OptimizedRotateMergeSort(), OptimizedStoogeSort(), OptimizedStoogeSortStudio(),
     OptimizedWeaveMergeSort(), OutOfPlaceHeapSort(), PairwiseMergeSortIterative(), PairwiseMergeSortRecursive(),
     PairwiseSortIterative(), PairwiseSortRecursive(), PancakeInsertionSort(), PancakeSort(), PatienceSort(),
     PDMergeSort(), PDQBranchedSort(), PDQBranchlessSort(), PigeonholeSort(), PoplarHeapSort(), QuadSort(),

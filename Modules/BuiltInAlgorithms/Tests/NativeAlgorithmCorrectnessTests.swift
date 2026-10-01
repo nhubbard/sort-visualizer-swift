@@ -10,6 +10,38 @@ import Testing
 @Suite
 struct NativeAlgorithmCorrectnessTests {
   @Test
+  func optimizedRotateMergeSortHandlesBufferBoundaryAndStableTies() {
+    let algorithm = OptimizedRotateMergeSort()
+    let radix = 4_096
+    for size in [0, 1, 2, 31, 32, 33, 63, 64, 65, 127, 128, 129, 255, 256, 257, 511, 512, 513, 1024, 1813, 2048] {
+      for seed in 0..<20 {
+        var state = UInt64(size * 1_009 + seed + 1)
+        let input = (0..<size).map { index in
+          state = state &* 6_364_136_223_846_793_005 &+ 1_442_695_040_888_963_407
+          return Int(state % 9) * radix + index
+        }
+        for candidate in [input, Array(input.reversed()), Array(0..<size), Array((0..<size).reversed())] {
+          var engine = RecordingEngine(
+            values: candidate, operationCap: 4_000_000,
+            comparisonKeyForTesting: { $0 / radix }
+          )
+          algorithm.record(into: &engine)
+          #expect(engine.values.map { $0 / radix } == candidate.map { $0 / radix }.sorted(), "size=\(size) seed=\(seed) input=\(candidate) output=\(engine.values)")
+          let output = engine.values
+          let inputPositions = Dictionary(uniqueKeysWithValues: candidate.enumerated().map { ($0.element, $0.offset) })
+          for index in 1..<max(1, output.count) where output[index - 1] / radix == output[index] / radix {
+            if let earlier = inputPositions[output[index - 1]], let later = inputPositions[output[index]] {
+              #expect(earlier < later, "size=\(size) seed=\(seed) input=\(candidate) output=\(output)")
+            } else {
+              Issue.record("Output contains a value absent from input at size \(size), seed \(seed): \(output)")
+            }
+          }
+        }
+      }
+    }
+  }
+
+  @Test
   func multiWayMergeClusterSortsAndRecordsDeterministically() {
     for algorithm in [RemiSort(), FlanSort()] as [any SortAlgorithm] {
       for size in [2, 15, 16, 31, 32, 33, 63, 64, 127, 128, 256, 512] {
@@ -87,7 +119,7 @@ struct NativeAlgorithmCorrectnessTests {
     MergeSort(), MinHeapSort(), MinMaxHeapSort(), MSDRadixSort(), NewShuffleMergeSort(), OddEvenMergeSortIterative(),
     OddEvenMergeSortRecursive(), OddEvenSort(), OptimizedBottomUpMergeSort(), OptimizedBubbleSort(),
     OptimizedCocktailShakerSort(), OptimizedDualPivotQuickSort(), OptimizedGnomeSort(), OptimizedGuessSort(),
-    OptimizedLazyStableSort(), OptimizedStoogeSort(), OptimizedStoogeSortStudio(), OptimizedWeaveMergeSort(),
+    OptimizedLazyStableSort(), OptimizedRotateMergeSort(), OptimizedStoogeSort(), OptimizedStoogeSortStudio(), OptimizedWeaveMergeSort(),
     OutOfPlaceHeapSort(), PairwiseMergeSortIterative(), PairwiseMergeSortRecursive(), PairwiseSortIterative(),
     PairwiseSortRecursive(), PancakeInsertionSort(), PancakeSort(), PatienceSort(), PDMergeSort(), PDQBranchedSort(),
     PDQBranchlessSort(), PigeonholeSort(), PoplarHeapSort(), QuadSort(), QuadStoogeSort(), QuickBogoSort(), QuickSort(),

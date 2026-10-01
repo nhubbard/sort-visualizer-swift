@@ -50,7 +50,7 @@ struct Sort2App: App {
       OddEvenMergeSortIterative(), OddEvenMergeSortRecursive(), OddEvenSort(),
       OptimizedBottomUpMergeSort(), OptimizedBubbleSort(),
       OptimizedCocktailShakerSort(), OptimizedDualPivotQuickSort(), OptimizedGnomeSort(), OptimizedGuessSort(),
-      OptimizedLazyStableSort(), OptimizedStoogeSort(), OptimizedStoogeSortStudio(),
+      OptimizedLazyStableSort(), OptimizedRotateMergeSort(), OptimizedStoogeSort(), OptimizedStoogeSortStudio(),
       OptimizedWeaveMergeSort(), OutOfPlaceHeapSort(),
       PairwiseMergeSortIterative(), PairwiseMergeSortRecursive(), PairwiseSortIterative(), PairwiseSortRecursive(),
       PancakeInsertionSort(), PancakeSort(), PatienceSort(), PDMergeSort(), PDQBranchedSort(), PDQBranchlessSort(),

@@ -3189,6 +3189,36 @@
   },
   {
     "coefficients" : [
+      0.052132208018707944,
+      38.03862140037017,
+      -378.96804371413083
+    ],
+    "runnerUpFamily" : "powerLog",
+    "runnerUpRSquared" : 0.9957668390593212,
+    "safeMaxSizeByCap" : [
+      100000,
+      929,
+      300000,
+      1813,
+      1000000,
+      3570
+    ],
+    "sampleSizes" : [
+      16,
+      17,
+      18,
+      19,
+      38,
+      76,
+      152,
+      304
+    ],
+    "subjectID" : "optimizedrotatemergesort+shuffledcubic",
+    "winningFamily" : "polynomialIntercept",
+    "winningRSquared" : 0.9999708277093114
+  },
+  {
+    "coefficients" : [
       3.749977381752451,
       -2.4909685235069734,
       -2.684520101031695
