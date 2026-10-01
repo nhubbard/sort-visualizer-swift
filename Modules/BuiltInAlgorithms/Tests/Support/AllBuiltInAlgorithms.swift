@@ -46,7 +46,7 @@ enum AllBuiltInAlgorithms {
     TernaryLLQuickSort(), TernaryLRQuickSort(), ThreeSmoothCombSortIterative(), ThreeSmoothCombSortRecursive(),
     TimeSort(), TimSort(), TournamentSort(), TreeSort(), TriangularHeapSort(), TwinSort(), UnoptimizedBubbleSort(),
     UnoptimizedCocktailShakerSort(), UnstableGrailSort(), WeakHeapSort(), WeavedMergeSort(), WeaveMergeSort(),
-    WeaveSortIterative(), WeaveSortRecursive(), YujisBufferedMergeSort2()
+    WeaveSortIterative(), WeaveSortRecursive(), WikiSort(), YujisBufferedMergeSort2()
   ]
 
   static let shuffles: [any ShuffleAlgorithm] = [

@@ -18,7 +18,7 @@ sequential version, under a different name. Real thread interleaving has no mean
 single-writer model. Porting these variants would add duplicate content, not new algorithmic
 behavior.
 
-This leaves 196 candidates. 194 are shipped. 2 remain, in one category.
+This leaves 196 candidates. 195 are shipped. 1 remains, in one category.
 
 ### By category
 
@@ -31,7 +31,7 @@ This leaves 196 candidates. 194 are shipped. 2 remain, in one category.
 | Merge (19) | All ported |
 | Miscellaneous (4) | All ported |
 | Concurrent (22) | All ported |
-| Hybrid (41) | 39 ported, 2 remaining |
+| Hybrid (41) | 40 ported, 1 remaining |
 
 ### Remaining work
 
@@ -42,12 +42,8 @@ line count. Inherited template logic is real complexity a port must understand a
 
 **Very Hard** (400+ effective lines, or extending one of the largest remaining templates):
 
-- `WikiSort` (a 75-line wrapper over the 1068-line `WikiSorting` template) and `KotaSort` (a
-  33-line wrapper over the 1142-line `KotaSorting` template, the largest template in ArrayV's
-  `sorts/` tree).
-
-`ChaliceSort` has shipped using the shared operations in `BlockMergeSortingTemplate` together
-with its own key and bit collection and block merge phases.
+- `KotaSort` (a 33-line wrapper over the 1142-line `KotaSorting` template, the largest template in
+  ArrayV's `sorts/` tree).
 
 The remaining Hybrid algorithms are being ported individually as their implementations and
 reference content are verified.
@@ -90,10 +86,9 @@ A retired scratch document, previously kept at `Documentation/TEMPLATE_PORT_REFE
 hand-transcribed Java-to-pseudocode notes for six templates: `BinaryQuickSortingTemplate`,
 `ShatterSortingTemplate`, `TwinSortingTemplate`, `UnstableGrailSortingTemplate`,
 `PDQSortingTemplate`, and `GrailSortingTemplate`. Every algorithm built on those six templates has
-shipped, so the team retired that document instead of carrying it forward. It does not cover any of
-the templates still needed by pending algorithms (`WikiSorting` and `KotaSorting`) — nor
-`QuadSorting`, which
-has since shipped without one. A similar transcription pass is worth doing again before tackling
+shipped, so the team retired that document instead of carrying it forward. It does not cover
+`KotaSorting`, the template still needed by the pending algorithm, or `QuadSorting`, which has
+since shipped without one. A similar transcription pass is worth doing again before tackling
 the remaining template work, given how dense and index-arithmetic-heavy this style of algorithm
 tends to be.
 

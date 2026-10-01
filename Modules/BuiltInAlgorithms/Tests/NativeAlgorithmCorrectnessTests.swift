@@ -10,6 +10,47 @@ import Testing
 @Suite
 struct NativeAlgorithmCorrectnessTests {
   @Test
+  func wikiSortHandlesInternalBuffersAndStableFallbacks() {
+    let algorithm = WikiSort()
+    let radix = 8_192
+    for size in [0, 1, 2, 3, 4, 7, 8, 15, 16, 31, 32, 63, 64, 127, 128, 255, 256, 512, 1024] {
+      for seed in 0..<4 {
+        for keyCount in [1, 2, 3, 7, 16, 32, 64, size] {
+          var state = UInt64(size * 1_009 + seed * 131 + keyCount + 1)
+          let input = (0..<size).map { index in
+            state = state &* 6_364_136_223_846_793_005 &+ 1_442_695_040_888_963_407
+            return Int(state % UInt64(max(1, keyCount))) * radix + index
+          }
+          let sorted = input.sorted { $0 / radix < $1 / radix }
+          let unique = (0..<size).map { $0 * radix + $0 }
+          var shuffled = unique
+          if size > 1 {
+            for index in stride(from: size - 1, through: 1, by: -1) {
+              state = state &* 6_364_136_223_846_793_005 &+ 1_442_695_040_888_963_407
+              shuffled.swapAt(index, Int(state % UInt64(index + 1)))
+            }
+          }
+          let candidates = [input, Array(input.reversed()), sorted, unique, Array(unique.reversed()), shuffled]
+          for candidate in candidates {
+            var engine = RecordingEngine(values: candidate, operationCap: 20_000_000, comparisonKeyForTesting: { $0 / radix })
+            algorithm.record(into: &engine)
+            let output = engine.values
+            #expect(output.map { $0 / radix } == candidate.map { $0 / radix }.sorted(), "size=\(size) seed=\(seed) keys=\(keyCount)")
+            let positions = Dictionary(uniqueKeysWithValues: candidate.enumerated().map { ($0.element, $0.offset) })
+            for index in 1..<max(1, output.count) where output[index - 1] / radix == output[index] / radix {
+              if let earlier = positions[output[index - 1]], let later = positions[output[index]] {
+                #expect(earlier < later, "size=\(size) seed=\(seed) keys=\(keyCount)")
+              } else {
+                Issue.record("Wiki Sort changed an input value at size \(size), seed \(seed), keys \(keyCount)")
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  @Test
   func chaliceSortHandlesKeyBitAndFallbackPaths() {
     let algorithm = ChaliceSort()
     let radix = 8_192
@@ -351,7 +392,7 @@ struct NativeAlgorithmCorrectnessTests {
     StrandSort(), SwaplessBubbleSort(), SynchronousSqrtSort(), TableSort(), TernaryHeapSort(), TernaryLLQuickSort(), TernaryLRQuickSort(),
     ThreeSmoothCombSortIterative(), ThreeSmoothCombSortRecursive(), TimeSort(), TimSort(), TournamentSort(), TreeSort(),
     TriangularHeapSort(), TwinSort(), UnoptimizedBubbleSort(), UnoptimizedCocktailShakerSort(), UnstableGrailSort(),
-    WeakHeapSort(), WeavedMergeSort(), WeaveMergeSort(), WeaveSortIterative(), WeaveSortRecursive(),
+    WeakHeapSort(), WeavedMergeSort(), WeaveMergeSort(), WeaveSortIterative(), WeaveSortRecursive(), WikiSort(),
     YujisBufferedMergeSort2()
   ]
 
