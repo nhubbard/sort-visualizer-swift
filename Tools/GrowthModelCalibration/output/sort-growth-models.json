@@ -2394,6 +2394,36 @@
   },
   {
     "coefficients" : [
+      0.24173352243657212,
+      37.51376510160012,
+      -344.68930518572023
+    ],
+    "runnerUpFamily" : "powerLaw",
+    "runnerUpRSquared" : 0.9894468298260679,
+    "safeMaxSizeByCap" : [
+      100000,
+      504,
+      300000,
+      922,
+      1000000,
+      1743
+    ],
+    "sampleSizes" : [
+      16,
+      17,
+      18,
+      19,
+      38,
+      76,
+      152,
+      304
+    ],
+    "subjectID" : "kotasort+finalbitonic",
+    "winningFamily" : "polynomialIntercept",
+    "winningRSquared" : 0.9992274300489106
+  },
+  {
+    "coefficients" : [
       0.17011545336903683,
       67.59153563273587,
       -735.7244448887742

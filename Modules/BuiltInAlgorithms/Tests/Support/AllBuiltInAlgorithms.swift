@@ -26,7 +26,7 @@ enum AllBuiltInAlgorithms {
     FlashSort(), FlippedMinHeapSort(), FlanSort(), FluxSort(), FoldSort(), ForcedStableQuickSort(), FunSort(), GnomeSort(),
     GrailSort(), GravitySort(), GuessSort(), HanoiSort(), HybridCombSort(), ImprovedBlockSelectionSort(),
     ImprovedInPlaceMergeSort(), IndexSort(), InPlaceLSDRadixSort(), InPlaceMergeSort(), InsertionSort(),
-    IntroCircleSortIterative(), IntroCircleSortRecursive(), IntroSort(), IterativeTopDownMergeSort(), LaziestSort(),
+    IntroCircleSortIterative(), IntroCircleSortRecursive(), IntroSort(), IterativeTopDownMergeSort(), KotaSort(), LaziestSort(),
     LazierestSort(), LazyHeapSort(), LazyStableSort(), LessBogoSort(), LibrarySort(), LLQuickSort(), LRQuickSort(), LSDRadixSort(),
     MatrixSort(), MaxHeapSort(), MedianMergeSort(), MedianQuickBogoSort(), MergeBogoSort(), MergeExchangeSortIterative(),
     MergeInsertionSort(), MergeSort(), MinHeapSort(), MinMaxHeapSort(), MSDRadixSort(), NewShuffleMergeSort(),

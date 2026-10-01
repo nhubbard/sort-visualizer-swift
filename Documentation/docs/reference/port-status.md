@@ -1,8 +1,7 @@
 # Port status
 
-Porting content from [ArrayV](https://github.com/gouravkhunger/ArrayV) is ongoing, with no fixed
-end date. This page tracks what's shipped and what remains, and the team keeps it current as
-algorithms move from one list to the other. See
+The sorting algorithm corpus derived from [ArrayV](https://github.com/gouravkhunger/ArrayV) is
+complete. This page records the shipped algorithms and shuffles. See
 [Adding a sorting algorithm](../guides/adding-an-algorithm.md) for the porting process.
 
 ## Sorting algorithms
@@ -18,7 +17,7 @@ sequential version, under a different name. Real thread interleaving has no mean
 single-writer model. Porting these variants would add duplicate content, not new algorithmic
 behavior.
 
-This leaves 196 candidates. 195 are shipped. 1 remains, in one category.
+This leaves 196 candidates. All 196 are shipped.
 
 ### By category
 
@@ -31,22 +30,7 @@ This leaves 196 candidates. 195 are shipped. 1 remains, in one category.
 | Merge (19) | All ported |
 | Miscellaneous (4) | All ported |
 | Concurrent (22) | All ported |
-| Hybrid (41) | 40 ported, 1 remaining |
-
-### Remaining work
-
-The list groups remaining work by how complex the ArrayV Java source is, not by category or
-alphabetical order. The line count cited per algorithm is "effective lines": the algorithm's own
-class, plus, when it extends a shared template rather than the bare base class, that template's
-line count. Inherited template logic is real complexity a port must understand and translate.
-
-**Very Hard** (400+ effective lines, or extending one of the largest remaining templates):
-
-- `KotaSort` (a 33-line wrapper over the 1142-line `KotaSorting` template, the largest template in
-  ArrayV's `sorts/` tree).
-
-The remaining Hybrid algorithms are being ported individually as their implementations and
-reference content are verified.
+| Hybrid (41) | All ported |
 
 ### Completed clusters
 
@@ -81,16 +65,6 @@ port-the-shared-template-once strategy:
   porting it only needed its own 202 lines built on top of the already-shipped, already-tested
   template plus one new template entry point (`sort(_:using:start:length:)`, ArrayV's
   `quadSortSwap`) for reusing a caller-supplied scratch buffer across recursive partition calls.
-
-A retired scratch document, previously kept at `Documentation/TEMPLATE_PORT_REFERENCE.md`, carried
-hand-transcribed Java-to-pseudocode notes for six templates: `BinaryQuickSortingTemplate`,
-`ShatterSortingTemplate`, `TwinSortingTemplate`, `UnstableGrailSortingTemplate`,
-`PDQSortingTemplate`, and `GrailSortingTemplate`. Every algorithm built on those six templates has
-shipped, so the team retired that document instead of carrying it forward. It does not cover
-`KotaSorting`, the template still needed by the pending algorithm, or `QuadSorting`, which has
-since shipped without one. A similar transcription pass is worth doing again before tackling
-the remaining template work, given how dense and index-arithmetic-heavy this style of algorithm
-tends to be.
 
 ## Shuffles
 
