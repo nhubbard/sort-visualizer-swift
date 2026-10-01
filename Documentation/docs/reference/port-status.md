@@ -18,7 +18,7 @@ sequential version, under a different name. Real thread interleaving has no mean
 single-writer model. Porting these variants would add duplicate content, not new algorithmic
 behavior.
 
-This leaves 196 candidates. 189 are shipped. 7 remain, in one category.
+This leaves 196 candidates. 190 are shipped. 6 remain, in one category.
 
 ### By category
 
@@ -31,7 +31,7 @@ This leaves 196 candidates. 189 are shipped. 7 remain, in one category.
 | Merge (19) | All ported |
 | Miscellaneous (4) | All ported |
 | Concurrent (22) | All ported |
-| Hybrid (41) | 34 ported, 7 remaining |
+| Hybrid (41) | 35 ported, 6 remaining |
 
 ### Remaining work
 
@@ -42,7 +42,7 @@ line count. Inherited template logic is real complexity a port must understand a
 
 **Very Hard** (400+ effective lines, or extending one of the largest remaining templates):
 
-- `SqrtSort`, `SynchronousSqrtSort` (190
+- `SynchronousSqrtSort` (190
   own plus 352 for `BlockMergeSorting`), `AdaptiveGrailSort` (915 lines, self-contained despite the
   name), `TimSort` (a 45-line wrapper over the 950-line `TimSorting` template), `ChaliceSort` (767
   own plus 352 for `BlockMergeSorting`), `WikiSort` (a 75-line wrapper over the 1068-line

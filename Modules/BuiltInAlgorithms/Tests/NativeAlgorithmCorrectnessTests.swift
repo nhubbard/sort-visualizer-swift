@@ -10,6 +10,35 @@ import Testing
 @Suite
 struct NativeAlgorithmCorrectnessTests {
   @Test
+  func sqrtSortHandlesBlockBoundariesAndStableTies() {
+    let algorithm = SqrtSort()
+    let radix = 4_096
+    for size in [0, 1, 2, 15, 16, 17, 31, 32, 33, 63, 64, 65, 127, 128, 129, 255, 256, 257, 511, 512, 513, 1024, 1382, 2048] {
+      for seed in 0..<12 {
+        var state = UInt64(size * 1_009 + seed + 1)
+        let input = (0..<size).map { index in
+          state = state &* 6_364_136_223_846_793_005 &+ 1_442_695_040_888_963_407
+          return Int(state % 9) * radix + index
+        }
+        for candidate in [input, Array(input.reversed()), Array(0..<size), Array((0..<size).reversed())] {
+          var engine = RecordingEngine(values: candidate, operationCap: 4_000_000, comparisonKeyForTesting: { $0 / radix })
+          algorithm.record(into: &engine)
+          let output = engine.values
+          #expect(output.map { $0 / radix } == candidate.map { $0 / radix }.sorted(), "size=\(size) seed=\(seed)")
+          let positions = Dictionary(uniqueKeysWithValues: candidate.enumerated().map { ($0.element, $0.offset) })
+          for index in 1..<max(1, output.count) where output[index - 1] / radix == output[index] / radix {
+            if let earlier = positions[output[index - 1]], let later = positions[output[index]] {
+              #expect(earlier < later, "size=\(size) seed=\(seed)")
+            } else {
+              Issue.record("Sqrt Sort changed an input value at size \(size), seed \(seed)")
+            }
+          }
+        }
+      }
+    }
+  }
+
+  @Test
   func ectaSortHandlesBlockBoundariesAndStableTies() {
     let algorithm = EctaSort()
     let radix = 4_096
@@ -158,7 +187,7 @@ struct NativeAlgorithmCorrectnessTests {
     RandomGuessSort(), RemiSort(), RecursiveShellSort(), RedBlackTreeSort(), RotateLSDRadixSort(), RotateMergeSort(),
     RotateMSDRadixSort(), SelectionBogoSort(), SelectionSort(), ShatterSort(), ShellSort(), ShoveSort(), SillySort(),
     SimpleShatterSort(), SimplifiedLibrarySort(), SimplisticGravitySort(), SlopeSort(), SlowSort(), SmartBogoBogoSort(),
-    SmartGuessSort(), SmoothSort(), SnuffleSort(), SplaySort(), StableCycleSort(), StablePermutationSort(),
+    SmartGuessSort(), SmoothSort(), SnuffleSort(), SplaySort(), SqrtSort(), StableCycleSort(), StablePermutationSort(),
     StableQuickSort(), StableSelectionSort(), StacklessAmericanFlagSort(), StacklessBinaryQuickSort(),
     StacklessDualPivotQuickSort(), StacklessHybridQuickSort(), StacklessRotateMergeSort(), StaticSort(), StoogeSort(),
     StrandSort(), SwaplessBubbleSort(), TableSort(), TernaryHeapSort(), TernaryLLQuickSort(), TernaryLRQuickSort(),

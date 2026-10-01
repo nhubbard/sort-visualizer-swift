@@ -39,7 +39,7 @@ enum AllBuiltInAlgorithms {
     QuadStoogeSort(), QuickBogoSort(), QuickSort(), RandomGuessSort(), RemiSort(), RecursiveShellSort(), RedBlackTreeSort(),
     RotateLSDRadixSort(), RotateMergeSort(), RotateMSDRadixSort(), SelectionBogoSort(), SelectionSort(), ShatterSort(),
     ShellSort(), ShoveSort(), SillySort(), SimpleShatterSort(), SimplifiedLibrarySort(), SimplisticGravitySort(),
-    SlopeSort(), SlowSort(), SmartBogoBogoSort(), SmartGuessSort(), SmoothSort(), SnuffleSort(), SplaySort(),
+    SlopeSort(), SlowSort(), SmartBogoBogoSort(), SmartGuessSort(), SmoothSort(), SnuffleSort(), SplaySort(), SqrtSort(),
     StableCycleSort(), StablePermutationSort(), StableQuickSort(), StableSelectionSort(), StacklessAmericanFlagSort(),
     StacklessBinaryQuickSort(), StacklessDualPivotQuickSort(), StacklessHybridQuickSort(), StacklessRotateMergeSort(),
     StaticSort(), StoogeSort(), StrandSort(), SwaplessBubbleSort(), TableSort(), TernaryHeapSort(),
