@@ -61,7 +61,7 @@ struct Sort2App: App {
       SmoothSort(), SnuffleSort(), SplaySort(), SqrtSort(), StableCycleSort(), StablePermutationSort(), StableQuickSort(),
       StableSelectionSort(), StacklessAmericanFlagSort(), StacklessBinaryQuickSort(),
       StacklessDualPivotQuickSort(), StacklessHybridQuickSort(), StacklessRotateMergeSort(),
-      StaticSort(), StoogeSort(), StrandSort(), SwaplessBubbleSort(), TableSort(), TernaryHeapSort(),
+      StaticSort(), StoogeSort(), StrandSort(), SwaplessBubbleSort(), SynchronousSqrtSort(), TableSort(), TernaryHeapSort(),
       TernaryLLQuickSort(), TernaryLRQuickSort(), ThreeSmoothCombSortIterative(), ThreeSmoothCombSortRecursive(),
       TimeSort(), TournamentSort(), TreeSort(), TriangularHeapSort(), TwinSort(), UnoptimizedBubbleSort(),
       UnoptimizedCocktailShakerSort(), UnstableGrailSort(), WeakHeapSort(), WeavedMergeSort(), WeaveMergeSort(),
