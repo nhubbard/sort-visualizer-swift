@@ -27,7 +27,7 @@ struct Sort2App: App {
     // scripting backend (ScriptingKit) was removed entirely after it turned out to reference a
     // private API (`JSContextGroupSetExecutionTimeLimit`), which blocked App Store submission.
     AlgorithmRegistry.shared.builtIns = [
-      AATreeSort(), AVLTreeSort(), AmericanFlagSort(), AndreySort(), AsynchronousSort(), BadSort(), BaseNMaxHeapSort(),
+      AATreeSort(), AdaptiveGrailSort(), AVLTreeSort(), AmericanFlagSort(), AndreySort(), AsynchronousSort(), BadSort(), BaseNMaxHeapSort(),
       BinaryDoubleInsertionSort(), BinaryGnomeSort(), BinaryInsertionSort(), BinaryMergeSort(),
       BinaryQuickSortIterative(), BinaryQuickSortRecursive(), BingoSort(), BinomialHeapSort(), BinomialSmoothSort(),
       BitonicSortIterative(), BitonicSortRecursive(), BlockInsertionSort(), BlockSwapMergeSort(), BogoBogoSort(),

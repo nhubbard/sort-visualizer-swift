@@ -10,6 +10,48 @@ import Testing
 @Suite
 struct NativeAlgorithmCorrectnessTests {
   @Test
+  func adaptiveGrailSortHandlesNaturalRunsAndStableTies() {
+    let algorithm = AdaptiveGrailSort()
+    let radix = 4_096
+    for size in [0, 1, 2, 15, 16, 17, 30, 31, 32, 62, 63, 64, 65, 127, 128, 129, 255, 256, 257, 511, 512, 1024] {
+      for seed in 0..<12 {
+        var state = UInt64(size * 1_009 + seed + 1)
+        let input = (0..<size).map { index in
+          state = state &* 6_364_136_223_846_793_005 &+ 1_442_695_040_888_963_407
+          return Int(state % 9) * radix + index
+        }
+        let fewKeys = input.map { ($0 / radix % 3) * radix + $0 % radix }
+        let manyKeys = input.map { index in
+          state = state &* 6_364_136_223_846_793_005 &+ 1_442_695_040_888_963_407
+          return Int(state % 24) * radix + index % radix
+        }
+        let unique = (0..<size).map { $0 * radix + $0 }
+        var shuffled = unique
+        if size > 1 {
+          for index in stride(from: size - 1, through: 1, by: -1) {
+            state = state &* 6_364_136_223_846_793_005 &+ 1_442_695_040_888_963_407
+            shuffled.swapAt(index, Int(state % UInt64(index + 1)))
+          }
+        }
+        for candidate in [input, Array(input.reversed()), fewKeys, manyKeys, unique, Array(unique.reversed()), shuffled] {
+          var engine = RecordingEngine(values: candidate, operationCap: 4_000_000, comparisonKeyForTesting: { $0 / radix })
+          algorithm.record(into: &engine)
+          let output = engine.values
+          #expect(output.map { $0 / radix } == candidate.map { $0 / radix }.sorted(), "size=\(size) seed=\(seed)")
+          let positions = Dictionary(uniqueKeysWithValues: candidate.enumerated().map { ($0.element, $0.offset) })
+          for index in 1..<max(1, output.count) where output[index - 1] / radix == output[index] / radix {
+            if let earlier = positions[output[index - 1]], let later = positions[output[index]] {
+              #expect(earlier < later, "size=\(size) seed=\(seed)")
+            } else {
+              Issue.record("Adaptive Grail Sort changed an input value at size \(size), seed \(seed)")
+            }
+          }
+        }
+      }
+    }
+  }
+
+  @Test
   func synchronousSqrtSortHandlesBlockBoundariesAndStableTies() {
     let algorithm = SynchronousSqrtSort()
     let radix = 4_096
@@ -189,7 +231,7 @@ struct NativeAlgorithmCorrectnessTests {
   }
 
   private static let algorithms: [any SortAlgorithm] = [
-    AATreeSort(), AVLTreeSort(), AmericanFlagSort(), AsynchronousSort(), BadSort(), BaseNMaxHeapSort(),
+    AATreeSort(), AdaptiveGrailSort(), AVLTreeSort(), AmericanFlagSort(), AsynchronousSort(), BadSort(), BaseNMaxHeapSort(),
     BinaryDoubleInsertionSort(), BinaryGnomeSort(), BinaryInsertionSort(), BinaryMergeSort(),
     BinaryQuickSortIterative(), BinaryQuickSortRecursive(), BingoSort(), BinomialHeapSort(), BinomialSmoothSort(),
     BitonicSortIterative(), BitonicSortRecursive(), BlockInsertionSort(), BlockSwapMergeSort(), BogoBogoSort(),

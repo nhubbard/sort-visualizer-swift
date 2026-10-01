@@ -12,7 +12,7 @@ import AlgorithmKit
 /// could derive from without either target depending on the other.
 enum AllBuiltInAlgorithms {
   static let sorts: [any SortAlgorithm] = [
-    AATreeSort(), AVLTreeSort(), AmericanFlagSort(), AndreySort(), AsynchronousSort(), BadSort(), BaseNMaxHeapSort(),
+    AATreeSort(), AdaptiveGrailSort(), AVLTreeSort(), AmericanFlagSort(), AndreySort(), AsynchronousSort(), BadSort(), BaseNMaxHeapSort(),
     BinaryDoubleInsertionSort(), BinaryGnomeSort(), BinaryInsertionSort(), BinaryMergeSort(),
     BinaryQuickSortIterative(), BinaryQuickSortRecursive(), BingoSort(), BinomialHeapSort(), BinomialSmoothSort(),
     BitonicSortIterative(), BitonicSortRecursive(), BlockInsertionSort(), BlockSwapMergeSort(), BogoBogoSort(),

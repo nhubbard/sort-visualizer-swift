@@ -18,7 +18,7 @@ sequential version, under a different name. Real thread interleaving has no mean
 single-writer model. Porting these variants would add duplicate content, not new algorithmic
 behavior.
 
-This leaves 196 candidates. 191 are shipped. 5 remain, in one category.
+This leaves 196 candidates. 192 are shipped. 4 remain, in one category.
 
 ### By category
 
@@ -31,7 +31,7 @@ This leaves 196 candidates. 191 are shipped. 5 remain, in one category.
 | Merge (19) | All ported |
 | Miscellaneous (4) | All ported |
 | Concurrent (22) | All ported |
-| Hybrid (41) | 36 ported, 5 remaining |
+| Hybrid (41) | 37 ported, 4 remaining |
 
 ### Remaining work
 
@@ -42,9 +42,8 @@ line count. Inherited template logic is real complexity a port must understand a
 
 **Very Hard** (400+ effective lines, or extending one of the largest remaining templates):
 
-- `AdaptiveGrailSort` (915 lines, self-contained despite the name), `TimSort` (a 45-line wrapper
-  over the 950-line `TimSorting` template), `ChaliceSort` (767 own plus 352 for
-  `BlockMergeSorting`), `WikiSort` (a 75-line wrapper over the 1068-line
+- `TimSort` (a 45-line wrapper over the 950-line `TimSorting` template), `ChaliceSort` (767 own
+  plus 352 for `BlockMergeSorting`), `WikiSort` (a 75-line wrapper over the 1068-line
   `WikiSorting` template), and `KotaSort` (a 33-line wrapper over the 1142-line `KotaSorting`
   template, the largest template in ArrayV's `sorts/` tree).
 
