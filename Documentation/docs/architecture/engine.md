@@ -184,8 +184,9 @@ Key implementation details:
 - **Two `OSSignposter` intervals separate tape mutation from dispatch.** `"TickApply"` covers tape
   mutation; `"TickDispatch"` covers fan-out to renderers and audio. These exist because a past
   performance bug was invisible in a generic Instruments trace until traced back to `play()`'s
-  internals by hand. For a replay performance issue, start with a Points of Interest capture using
-  these two spans.
+  internals by hand. They use the `PointsOfInterest` category collected by standard Time Profiler
+  and Metal System Trace templates. A new signposter is constructed for each `play()` call so a
+  trace attached after an earlier run can still see its intervals.
 
 ### `TapeFactory` (in `AlgorithmKit`, but tightly coupled to the above)
 

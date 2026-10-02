@@ -196,6 +196,16 @@ produce samples. Logging and CPU + Signposts dynamically enable the
 signposter. A private CPU + Signposts control exported four raw signpost rows,
 one completed interval, and 4,354 CPU samples from the same recording.
 
+For interactive playback profiling, attach a Time Profiler or Metal System
+Trace recording before pressing Play. `ReplayEngine` emits `Tick` events and
+`TickApply`/`TickDispatch` intervals in the `PointsOfInterest` category. The
+intervals separate tape mutation from renderer and audio callbacks, so inspect
+their durations before changing the playback loop. The signposter is created
+per playback run, allowing a trace attached after an earlier run to capture
+the next one. The in-app trace button above records tape generation only;
+interactive playback needs an attached recording that remains active while the
+tape plays.
+
 The opt-in `DebugInstrumentsTrace.run` function is public from `SortFeature`
 in that Mac Catalyst Debug configuration. An app call site can wrap a single
 synchronous event with a label; it waits for `READY` before running the closure

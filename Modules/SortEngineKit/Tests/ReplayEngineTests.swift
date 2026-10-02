@@ -457,6 +457,79 @@ struct ReplayEngineTests {
   }
 
   @Test
+  func seededMixedTapeSeeksMatchAnIndependentPrefixReducer() {
+    var seed: UInt64 = 0x5eed_cafe
+    func next(_ limit: Int) -> Int {
+      seed = seed &* 6_364_136_223_846_793_005 &+ 1
+      return Int((seed >> 32) % UInt64(limit))
+    }
+
+    let initial = Array(1...8)
+    var operations: [SortOperation] = [.auxCreate(handle: 4, length: 8)]
+    for index in 0..<1_101 {
+      let position = next(8)
+      switch index % 8 {
+      case 0: operations.append(.swap(position, next(8)))
+      case 1: operations.append(.setValue(position, next(100)))
+      case 2: operations.append(.compare(position, next(8)))
+      case 3: operations.append(.auxWrite(handle: 4, index: position, value: next(100)))
+      case 4: operations.append(.readValue(position))
+      case 5: operations.append(.reversal)
+      case 6: operations.append(.compareValue(position, next(100)))
+      default: operations.append(.auxRead(handle: 4, index: position))
+      }
+    }
+    operations.append(.auxDelete(handle: 4))
+    let replay = ReplayEngine(tape: makeTape(initialValues: initial, operations: operations))
+
+    // This reducer deliberately uses plain arrays and counters rather than ReplayEngine or
+    // RecordingEngine internals. It checks arbitrary prefixes on both sides of checkpoints.
+    for prefix in [0, 1, 2, 79, 499, 500, 501, 733, 1_100, operations.count] {
+      var values = initial
+      var aux: [Int: [Int]] = [:]
+      var compares = 0
+      var swaps = 0
+      var mainWrites = 0
+      var auxWrites = 0
+      var reversals = 0
+      for operation in operations.prefix(prefix) {
+        switch operation {
+        case .swap(let a, let b):
+          values.swapAt(a, b)
+          swaps += 1
+          mainWrites += 2
+        case .setValue(let position, let value):
+          values[position] = value
+          mainWrites += 1
+        case .compare, .compareValue, .compareValues:
+          compares += 1
+        case .auxCreate(let handle, let length):
+          aux[handle] = Array(repeating: 0, count: length)
+        case .auxWrite(let handle, let position, let value):
+          aux[handle]?[position] = value
+          auxWrites += 1
+        case .auxDelete(let handle):
+          aux.removeValue(forKey: handle)
+        case .reversal:
+          reversals += 1
+        default:
+          break
+        }
+      }
+
+      replay.seek(to: prefix)
+      #expect(replay.stepIndex == prefix)
+      #expect(replay.frame.map(\.value) == values)
+      #expect(replay.auxArrays == aux)
+      #expect(replay.compareCount == compares)
+      #expect(replay.swapCount == swaps)
+      #expect(replay.mainWriteCount == mainWrites)
+      #expect(replay.auxWriteCount == auxWrites)
+      #expect(replay.reversalCount == reversals)
+    }
+  }
+
+  @Test
   func stepBackwardMatchesReDerivingFromScratch() {
     let operations: [SortOperation] = [
       .compare(0, 1), .swap(0, 1),
