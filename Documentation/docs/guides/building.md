@@ -44,18 +44,64 @@ tuist generate
 ## Coverage
 
 Xcode does not gather code coverage by default; it is a real build-time cost. `Project.swift` opts
-in explicitly (`automaticSchemesOptions: .enabled(codeCoverageEnabled: true)`). The aggregate
-scheme still ignores that option by default. To get a coverage report from a full-suite run:
+in explicitly (`automaticSchemesOptions: .enabled(codeCoverageEnabled: true)`). The generated
+schemes can still ignore that option by default. To gather coverage for one Swift Testing unit
+target:
 
 ```sh
-xcodebuild test -workspace "Sort Symphony.xcworkspace" -scheme "Sort Symphony" \
+xcodebuild test -workspace "Sort Symphony.xcworkspace" -scheme "SortEngineKit" \
   -destination "platform=macOS,variant=Mac Catalyst" \
-  -enableCodeCoverage YES --no-selective-testing
+  -enableCodeCoverage YES
 ```
 
-`--no-selective-testing` is required. Xcode's test-impact-analysis otherwise skips targets it
-determines are unaffected, which under-reports coverage for anything not directly touched by the
-diff under test.
+Repeat with the other unit schemes to cover their modules. `Sort Symphony-Workspace` is the
+aggregate scheme containing every unit and UI target; Xcode builds its UI runner even with
+`-skip-testing`, so it can hit local Catalyst signing restrictions. The UI tests can run
+separately on an iPad simulator. Find a device ID with
+`xcodebuild -showdestinations -workspace "Sort Symphony.xcworkspace" -scheme "Sort SymphonyUITests"`,
+then run:
+
+```sh
+xcodebuild test -workspace "Sort Symphony.xcworkspace" -scheme "Sort SymphonyUITests" \
+  -destination "platform=iOS Simulator,id=<device-uuid>" \
+  -enableCodeCoverage YES
+```
+
+The three `SortCommandsUITests` require a Mac Catalyst menu bar and skip on iPadOS. To run them
+on Mac, use a local Apple Development identity and the test target's name (including its space)
+in the `-only-testing` filter:
+
+```sh
+xcodebuild test -workspace "Sort Symphony.xcworkspace" -scheme "Sort SymphonyUITests" \
+  -destination "platform=macOS,variant=Mac Catalyst" \
+  -only-testing:"Sort SymphonyUITests/SortCommandsUITests" \
+  -enableCodeCoverage YES CODE_SIGNING_ALLOWED=YES \
+  CODE_SIGN_IDENTITY="Apple Development" DEVELOPMENT_TEAM=<your-team-id>
+```
+
+On the first run, macOS may ask you to approve the test runner and a separate UI automation
+permission with Touch ID. The runner can launch but time out while enabling automation until that
+second prompt is approved. `--no-selective-testing` is a Tuist flag, not an `xcodebuild` flag.
+When using `tuist test` for coverage, pass `--no-selective-testing` to Tuist and pass
+`-enableCodeCoverage YES` after `--`.
+
+### App Intents integration tests
+
+The `Sort SymphonyAppIntentsUITests` scheme uses Apple's `AppIntentsTesting` framework to run
+Shortcuts actions through the system service. It runs on an iOS 27 iPad simulator while the app
+itself retains its iOS 18 deployment target. Xcode 27 and an Apple Development signing identity
+are required. Find the simulator ID with `xcrun simctl list devices available` and the identity
+SHA-1 with `security find-identity -v -p codesigning`, then run:
+
+```sh
+Tools/AppIntentsTesting/run.sh <iOS-27-iPad-simulator-ID> <signing-identity-SHA-1>
+```
+
+The script builds the dedicated test scheme, signs the temporary simulator app and runner with
+the same development identity, then runs the test bundle. Xcode's default ad hoc simulator
+signatures cause App Intents' security service to reject these tests, so a plain `xcodebuild test`
+for this scheme does not suffice. The regular `Sort SymphonyUITests` scheme remains available on
+older simulators.
 
 ## Platforms
 

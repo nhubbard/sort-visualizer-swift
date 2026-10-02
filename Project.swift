@@ -49,6 +49,9 @@ let modules: [Target] =
         .target(name: "ToneKitAVFoundation"), .target(name: "ToneKitDSP"),
         .target(name: "SortAudioCore"), .target(name: "SettingsKit"),
         .target(name: "SortAudioBridgeKit", condition: .when([.catalyst])),
+    ], testDependencies: [
+        .target(name: "ToneKitDSP"), .target(name: "SortAudioCore"), .target(name: "SettingsKit"),
+        .target(name: "SortAudioBridgeKit", condition: .when([.catalyst])),
     ]) +
     // Companion-mode bridge (see Documentation/docs/architecture/audio.md): a Unix-domain-socket IPC
     // channel over a shared App Group container between the running standalone app (server) and an
@@ -329,10 +332,40 @@ let appUITests = Target.target(
     settings: .settings(base: Module.baseSettings)
 )
 
+// AppIntentsTesting is available on iOS 27 and runs through the system's App Intents service.
+// Keep it in its own runner so the existing UI suite can continue on older OS releases.
+let appIntentsUITests = Target.target(
+    name: "Sort SymphonyAppIntentsUITests",
+    destinations: [.iPad],
+    product: .uiTests,
+    productName: "SortSymphonyAppIntentsUITests",
+    bundleId: "com.nhubbard.Sort2.mobile.appintentsuitests",
+    deploymentTargets: .iOS("27.0"),
+    sources: ["App/IntentsUITests/**"],
+    dependencies: [
+        .target(name: "SortSymphony"),
+        .sdk(name: "AppIntentsTesting", type: .framework),
+    ],
+    settings: .settings(base: Module.baseSettings)
+)
+
+// Compiles the actual extension UI sources into a host-less Catalyst test bundle so the
+// parameter model and view/controller connection order can be exercised without a DAW.
+let auv3ComponentTests = Target.target(
+    name: "AUv3ExtensionComponentTests",
+    destinations: [.macCatalyst],
+    product: .unitTests,
+    bundleId: "com.nhubbard.Sort2.mobile.auv3componenttests",
+    deploymentTargets: Module.deploymentTargets,
+    sources: ["App/AUv3Extension/Sources/**", "App/AUv3Extension/Tests/**"],
+    dependencies: [.target(name: "SortAudioUnitKit"), .target(name: "SortAudioCore")],
+    settings: .settings(base: Module.baseSettings)
+)
+
 let project = Project(
     name: "Sort Symphony",
     // Xcode doesn't gather coverage by default (it's a real build-time cost) -- opt in explicitly
     // so `tuist test` produces a .xcresult with coverage data we can inspect via `xcrun xccov`.
     options: .options(automaticSchemesOptions: .enabled(codeCoverageEnabled: true)),
-    targets: modules + [app, appUITests, auv3Extension]
+    targets: modules + [app, appUITests, appIntentsUITests, auv3Extension, auv3ComponentTests]
 )
