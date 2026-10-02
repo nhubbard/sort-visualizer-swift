@@ -19,6 +19,6 @@ is pure doubling merge passes, with no partitioning or comparison-based block re
 It preserves the relative order of equal elements throughout, the chunk-level insertion sort never
 reorders equal elements relative to each other, and the shared rotation-based merge always resolves
 ties by keeping the earlier-encountered element first, so it is a stable sort. This property
-has been verified elsewhere in this codebase with a from-scratch simulation that runs the same
+has been verified with a simulation that runs the same
 algorithm shape against a parallel array of original indices and confirms no equal-valued pair ever
 crosses out of its original order.

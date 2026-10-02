@@ -26,6 +26,6 @@ run-detection phase only ever reverses strictly-decreasing runs, a run that incl
 have stopped at the tie, since a tie fails the "descending" test, so reversal never crosses two
 equal elements past each other. The merge phase's tail-inward comparisons consistently favor
 whichever element came from the position that preserves encounter order, so equal elements are
-never swapped out of their original relative order there either. This was confirmed in this
-codebase by simulating the algorithm with a parallel array of original indices carried alongside the
+never swapped out of their original relative order there either. A simulation confirmed this
+behavior by carrying a parallel array of original indices alongside the
 values and checking that indices of equal-valued elements never invert.

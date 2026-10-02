@@ -6,10 +6,10 @@ front until the remaining prefix is small enough for binary insertion sort.
 
 Median-of-three pivot selection handles ordinary partitions. If a split is severely unbalanced,
 the algorithm gathers medians from groups of five before selecting another pivot. The final two
-runs are combined with rotations, so the app implementation allocates no auxiliary array.
+runs are combined with rotations, so the sorting procedure allocates no auxiliary array.
 Partition swaps and buffer exchanges can change the relative order of equal elements.
 
 Buffer partition merge sort takes **O(n log n)** time and uses **O(1)** auxiliary space. The
 reference implementations use short insertion-sorted runs and a conventional merge buffer. They
-retain the partitioned-run schedule while omitting the app implementation's swap-buffer index
+retain the partitioned-run schedule while omitting the swap-buffer index
 management.
