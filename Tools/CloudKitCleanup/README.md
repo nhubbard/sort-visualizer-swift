@@ -44,6 +44,11 @@ record types that no current code path writes to — legacy, out of scope for th
 
 ## Usage
 
+The complete read-only scans from 2026-10-02 are recorded in the
+[Development dry-run review](reports/2026-10-02-development-dry-run.md). They found 262,700
+Big-O and 5,479 cap-exceeded entries above current selectable maxima in Development, and no
+Big-O entries in Production. No records have been deleted.
+
 ```sh
 uv run cleanup_stale_sizes.py --environment development --record-type CD_BigORecord
 ```
