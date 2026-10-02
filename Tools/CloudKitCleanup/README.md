@@ -15,8 +15,10 @@ cleanup in both the Development and Production CloudKit environments.
 Per-algorithm, not a flat cutoff: `cleanup_stale_sizes.py` reads
 `Tools/GrowthModelCalibration/output/sort-growth-models.json` and, for each algorithm, takes its
 `safeMaxSizeByCap` entry at the app's default 300,000-operation cap
-(`RecordingEngine.defaultOperationCap`) as the "any real recording above this is stale" line.
-All 177 algorithms have a computed value at that cap (checked directly — no fallback needed).
+(`RecordingEngine.defaultOperationCap`), then applies the same 8,192-element clamp and
+step-size rounding as `AlgorithmMetadata.effectiveSizeRange(operationCap:)`. This is the actual
+maximum a user can select. All 196 current algorithms have a computed value at that cap; the tool
+refuses to run if calibration or source metadata is missing.
 
 ## Setup (one-time, per machine)
 
@@ -62,8 +64,9 @@ so far. If the script is killed or crashes mid-fetch (114k+ records took a while
 the first time this was tried), just re-invoke it with the same arguments: it resumes from the
 last saved `continuationToken` instead of restarting from page 1. Once a fetch actually finishes
 (`continuationToken` reaches `null`), a later invocation for the same pair skips the network
-entirely and reuses the cached eligible list. Pass `--refresh` to ignore any cached/resumable
-state and force a fully fresh fetch. `--execute` removes each successfully-deleted record from
+entirely and reuses the cached eligible list. A cache made before the current threshold digest
+safeguard, or after any threshold changes, is rejected. Pass `--refresh` to force a fresh fetch.
+`--execute` removes each successfully-deleted record from
 the cache as it goes too, so a delete run that dies partway through can also just be re-invoked —
 it'll only retry the stragglers.
 
