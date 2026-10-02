@@ -44,6 +44,9 @@ public struct RunAutomationIntent: AppIntent {
     guard let realAlgorithm = AlgorithmRegistry.shared.algorithm(id: algorithm.algorithmID) else {
       throw SortSymphonyIntentError.algorithmUnavailable
     }
+    guard AutomationRegistry.shared.automation(id: automation.automationID) != nil else {
+      throw SortSymphonyIntentError.automationUnavailable
+    }
     await SortCoordinator.shared.runAutomation(
       algorithm: realAlgorithm, automationID: automation.automationID)
     return .result()
