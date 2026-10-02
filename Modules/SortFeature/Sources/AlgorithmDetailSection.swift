@@ -8,7 +8,7 @@ import UIKit
 
 /// The `AlgorithmDetailSection(entry:)` Documentation/docs/architecture/features.md describes as sitting below the
 /// live sort — description + complexity (rendered via `LabeledEquationCell`, derived from
-/// `AlgorithmMetadata` directly so all 20 algorithms have it, not just the ones with legacy
+/// `AlgorithmMetadata` directly so every algorithm has it, not just the ones with legacy
 /// content) + a language-picker code sample, when `AlgorithmDetailContent` has any.
 public struct AlgorithmDetailSection: View {
   private let algorithm: any SortAlgorithm
@@ -18,8 +18,10 @@ public struct AlgorithmDetailSection: View {
   /// `complexityColumn` below both use `.frame(maxWidth: .infinity)`, which happily shrinks to
   /// any width, so `ViewThatFits` would never actually detect an overflow to fall back from.
   private let availableWidth: CGFloat
+  private let analyticsRevision: Int
+  private let showImplementations: Bool
   @Environment(AppSettings.self) private var settings
-  @State private var selectedLanguage: CodeLanguage = CodeLanguage.all[0]
+  @State private var selectedLanguage: CodeLanguage = .all[0]
   /// Highlighting a sample re-parses its full source and re-styles every attribute run — cheap
   /// once, but `AttributedCodeView(selected.source, theme:)` used to pay that cost again on every
   /// SwiftUI body evaluation of this view, not just on an actual language switch, causing a
@@ -32,9 +34,14 @@ public struct AlgorithmDetailSection: View {
   /// comfortably under a landscape detail pane's width, comfortably over a narrow portrait one's.
   private static let stackedLayoutThreshold: CGFloat = 700
 
-  public init(algorithm: any SortAlgorithm, availableWidth: CGFloat) {
+  public init(
+    algorithm: any SortAlgorithm, availableWidth: CGFloat, analyticsRevision: Int = 0,
+    showImplementations: Bool = true
+  ) {
     self.algorithm = algorithm
     self.availableWidth = availableWidth
+    self.analyticsRevision = analyticsRevision
+    self.showImplementations = showImplementations
   }
 
   public var body: some View {
@@ -51,63 +58,72 @@ public struct AlgorithmDetailSection: View {
         }
       }
 
-      VStack(alignment: .leading, spacing: 8) {
-        Text("Implementations").font(.title2.bold())
-        if let content, !content.codeSamples.isEmpty {
-          Picker("Language", selection: $selectedLanguage) {
-            ForEach(content.codeSamples, id: \.language) { sample in
-              Text(sample.language.title).tag(sample.language)
-            }
-          }
-          .pickerStyle(.segmented)
-          .accessibilityIdentifier("codeLanguagePicker")
-
-          if content.codeSamples.contains(where: { $0.language == selectedLanguage }) {
-            // AttributedCodeView sizes to its own intrinsic width (`.fixedSize`), so
-            // left inside this leading-aligned VStack it hugs the left edge instead of
-            // sitting under the wider Description/Complexity content above it.
-            HStack {
-              Spacer(minLength: 0)
-              if let styled = highlighted[selectedLanguage] {
-                AttributedCodeView(
-                  attributed: styled, backgroundColor: settings.codeTheme.makeTheme().getBgColor()
-                )
-                .overlay(alignment: .topTrailing) {
-                  if let plain = plainSamples[selectedLanguage] {
-                    Button {
-                      UIPasteboard.general.string = plain
-                    } label: {
-                      Image(systemName: "doc.on.doc")
-                        .padding(8)
-                        .glassOrMaterialBackground()
-                    }
-                    .buttonStyle(.plain)
-                    .offset(x: 8, y: -8)
-                    .accessibilityLabel("Copy Code")
-                  }
-                }
-              } else {
-                ProgressView()
-                  .frame(minWidth: 200, minHeight: 100)
+      if showImplementations {
+        VStack(alignment: .leading, spacing: 8) {
+          Text("Implementations").font(.title2.bold())
+          if let content, !content.codeSamples.isEmpty {
+            Picker("Language", selection: $selectedLanguage) {
+              ForEach(content.codeSamples, id: \.language) { sample in
+                Text(sample.language.title).tag(sample.language)
               }
-              Spacer(minLength: 0)
             }
+            .pickerStyle(.segmented)
+            .accessibilityIdentifier("codeLanguagePicker")
+
+            if content.codeSamples.contains(where: { $0.language == selectedLanguage }) {
+              // AttributedCodeView sizes to its own intrinsic width (`.fixedSize`), so
+              // left inside this leading-aligned VStack it hugs the left edge instead of
+              // sitting under the wider Description/Complexity content above it.
+              HStack {
+                Spacer(minLength: 0)
+                if let styled = highlighted[selectedLanguage] {
+                  AttributedCodeView(
+                    attributed: styled, backgroundColor: settings.codeTheme.makeTheme().getBgColor()
+                  )
+                  .overlay(alignment: .topTrailing) {
+                    if let plain = plainSamples[selectedLanguage] {
+                      Button {
+                        UIPasteboard.general.string = plain
+                      } label: {
+                        Image(systemName: "doc.on.doc")
+                          .padding(8)
+                          .glassOrMaterialBackground()
+                      }
+                      .buttonStyle(.plain)
+                      .offset(x: 8, y: -8)
+                      .accessibilityLabel("Copy Code")
+                    }
+                  }
+                } else {
+                  ProgressView()
+                    .frame(minWidth: 200, minHeight: 100)
+                }
+                Spacer(minLength: 0)
+              }
+            }
+          } else {
+            Text("No code samples available yet.").foregroundStyle(.secondary)
           }
-        } else {
-          Text("No code samples available yet.").foregroundStyle(.secondary)
         }
       }
     }
     .padding(.all, 32)
-    .task {
+    .task(id: algorithm.id) {
+      content = nil
+      highlighted = [:]
+      plainSamples = [:]
       content = await AlgorithmDetailContent.load(for: algorithm.id.rawValue)
       if let firstLanguage = content?.codeSamples.first?.language {
         selectedLanguage = firstLanguage
       }
-      if let content { await highlightAllSamples(content) }
+      if showImplementations, let content {
+        await highlightAllSamples(content)
+      }
     }
     .onChange(of: settings.codeTheme) {
-      if let content { Task { await highlightAllSamples(content) } }
+      if showImplementations, let content {
+        Task { await highlightAllSamples(content) }
+      }
     }
   }
 
@@ -125,7 +141,9 @@ public struct AlgorithmDetailSection: View {
         }
       }
       var styled: [CodeLanguage: AttributedString] = [:]
-      for await (language, attributed) in group { styled[language] = attributed }
+      for await (language, attributed) in group {
+        styled[language] = attributed
+      }
       return styled
     }
     highlighted = styled
@@ -137,6 +155,7 @@ public struct AlgorithmDetailSection: View {
       Text("Description").font(.title2.bold())
       if let description = content?.description {
         Markdown(description).lineSpacing(1.75)
+          .accessibilityIdentifier("algorithmDescriptionText")
       } else {
         Text("No description available yet.").foregroundStyle(.secondary)
       }
@@ -153,7 +172,7 @@ public struct AlgorithmDetailSection: View {
         .padding(.top, 8)
 
       Text("Big-O Correlation").font(.title2.bold()).padding(.top, 8)
-      BigOCorrelationChart(algorithm: algorithm)
+      BigOCorrelationChart(algorithm: algorithm, refreshRevision: analyticsRevision)
     }
     .frame(maxWidth: .infinity, alignment: .leading)
   }
@@ -171,7 +190,9 @@ public struct AlgorithmDetailSection: View {
   /// equation's own (roughly consistent, since none of these have deep subscripts) descent.
   private var complexityGrid: some View {
     let rows = algorithm.metadata.complexityRows
-    func row(_ id: String) -> ComplexityRow { rows.first { $0.id == id } ?? rows[0] }
+    func row(_ id: String) -> ComplexityRow {
+      rows.first { $0.id == id } ?? rows[0]
+    }
     return Grid(alignment: .leading, horizontalSpacing: 16, verticalSpacing: 8) {
       GridRow(alignment: .bottom) {
         LabeledEquationCell(label: row("best").label, equation: row("best").latex)
@@ -198,12 +219,12 @@ public struct AlgorithmDetailSection: View {
   }
 }
 
-extension View {
+private extension View {
   /// Same Liquid Glass convention as `RunControlBar.glassOrMaterialBackground()` — the app
   /// builds against the iOS 26 SDK but ships back to iOS 18.0 (`Module.deploymentTargets`), so
   /// every Liquid Glass site needs this `#available` fallback, not just this one.
   @ViewBuilder
-  fileprivate func glassOrMaterialBackground() -> some View {
+  func glassOrMaterialBackground() -> some View {
     if #available(iOS 26.0, *) {
       glassEffect(.regular.interactive(), in: .circle)
     } else {

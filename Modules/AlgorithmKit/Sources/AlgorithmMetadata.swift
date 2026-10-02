@@ -154,6 +154,33 @@ public struct AlgorithmMetadata: Sendable, Codable, Equatable {
     return sizeRange.lowerBound...steppedMaxSize
   }
 
+  /// Includes the selectable range and one nearby extrapolation. Some calibrated exponential
+  /// families overflow Double long before the global 8,192-element display ceiling.
+  public func growthComparisonDomain(operationCap: Int) -> ClosedRange<Double> {
+    let lower = Swift.max(sizeRange.lowerBound, 1)
+    let cutoff = effectiveSizeRange(operationCap: operationCap).upperBound
+    let desired = Swift.min(Self.maxReasonableArraySize, Swift.max(cutoff * 2, lower + 1))
+    guard let detectedGrowthModel else { return Double(lower)...Double(desired) }
+
+    func isFinite(at size: Int) -> Bool {
+      let value = Double(size)
+      return detectedGrowthModel.predictedOperations(atSize: value).isFinite
+        && growthModel.predictedOperations(atSize: value).isFinite
+    }
+
+    var safe = Swift.max(cutoff, lower + 1)
+    var unsafe = desired + 1
+    while safe + 1 < unsafe {
+      let candidate = safe + (unsafe - safe) / 2
+      if isFinite(at: candidate) {
+        safe = candidate
+      } else {
+        unsafe = candidate
+      }
+    }
+    return Double(lower)...Double(safe)
+  }
+
   /// A "how long will this actually take to run" estimate for ranking algorithms against each
   /// other, evaluated from `detectedGrowthModel` -- NOT `growthModel`. `growthModel` is a Taylor
   /// polynomial expanded around `anchorSize`, which `apply_growth_models.py` picks to hit a

@@ -6,10 +6,8 @@ import SwiftUI
 
 /// The growth family `Tools/GrowthModelCalibration` actually detected for this algorithm,
 /// alongside the Taylor-polynomial curve (`AlgorithmMetadata.growthModel`) the app uses for
-/// sizing — display-only, nothing here feeds back into sizing. Renders nothing when
-/// `algorithm.metadata.detectedGrowthModel` is nil, which is every algorithm
-/// `Tools/GrowthModelCalibration/apply_detected_models.py` hasn't processed yet — so this ships
-/// safely regardless of calibration coverage.
+/// sizing — display-only, nothing here feeds back into sizing. Algorithms without a calibrated
+/// detected model show the fitted model and an explanation instead of silently losing the section.
 struct GrowthModelComparisonSection: View {
   let algorithm: any SortAlgorithm
 
@@ -17,10 +15,8 @@ struct GrowthModelComparisonSection: View {
 
   private var metadata: AlgorithmMetadata { algorithm.metadata }
 
-  /// Same fixed clamp `AlgorithmMetadata.effectiveSizeRange` uses for the sizing UI — keeping the
-  /// comparison chart on the same scale as everywhere else that plots against array size.
   private var domain: ClosedRange<Double> {
-    Double(metadata.sizeRange.lowerBound)...Double(AlgorithmMetadata.maxReasonableArraySize)
+    metadata.growthComparisonDomain(operationCap: settings.recordingOperationCap)
   }
 
   private var cutoffSize: Double {
@@ -28,14 +24,17 @@ struct GrowthModelComparisonSection: View {
   }
 
   var body: some View {
-    if let detected = metadata.detectedGrowthModel {
-      VStack(alignment: .leading, spacing: 8) {
-        Text("Growth Model").font(.title2.bold())
+    VStack(alignment: .leading, spacing: 8) {
+      Text("Growth Model").font(.title2.bold())
+      if let detected = metadata.detectedGrowthModel {
         VStack(alignment: .leading, spacing: 8) {
           LabeledEquationCell(label: "Detected", equation: detected.latex)
           LabeledEquationCell(label: "Fitted (Used by App)", equation: metadata.fittedGrowthModelLatex)
         }
         chart(detected: detected)
+        Text("Dotted line: maximum selectable size (\(Int(cutoffSize))).")
+          .font(.caption2)
+          .foregroundStyle(.secondary)
         if let divergence = averageDivergencePercent(detected: detected) {
           Text(
             "Diverges from the detected curve by an average of "
@@ -46,9 +45,14 @@ struct GrowthModelComparisonSection: View {
           .font(.caption)
           .foregroundStyle(.secondary)
         }
+      } else {
+        LabeledEquationCell(label: "Fitted (Used by App)", equation: metadata.fittedGrowthModelLatex)
+        Text("A measured growth model is not available for this algorithm yet.")
+          .font(.caption)
+          .foregroundStyle(.secondary)
       }
-      .frame(maxWidth: .infinity, alignment: .leading)
     }
+    .frame(maxWidth: .infinity, alignment: .leading)
   }
 
   private func sampledCurve(
@@ -104,13 +108,10 @@ struct GrowthModelComparisonSection: View {
       RuleMark(x: .value("Operation Cap Cutoff", cutoffSize))
         .foregroundStyle(.secondary)
         .lineStyle(StrokeStyle(lineWidth: 1, dash: [2, 2]))
-        .annotation(position: .bottom, alignment: .center) {
-          Text("Cutoff").font(.caption2).foregroundStyle(.secondary)
-        }
     }
     .chartXScale(domain: domain, type: .log)
     .chartXAxis {
-      AxisMarks(values: powerOfTwoAxisValues(in: domain))
+      AxisMarks(values: powerOfTwoAxisValues(in: domain, maximumCount: 6))
     }
     .chartYScale(domain: yDomain)
     .chartXAxisLabel("Array Size")
@@ -123,9 +124,8 @@ struct GrowthModelComparisonSection: View {
   /// The mean absolute gap between the two curves' own *normalized* values (the same 0-1-ish
   /// scale plotted on the chart below), sampled log-spaced across the range a user can actually
   /// reach (`domain.lowerBound...cutoffSize`) — not a single point at the cutoff, and not the
-  /// full chart domain out to `AlgorithmMetadata.maxReasonableArraySize` either. An algorithm
-  /// like Bad Sort can diverge sharply well past `cutoffSize` (the chart plots out to
-  /// `maxReasonableArraySize` purely for visual context), at sizes no user could ever actually
+  /// chart's nearby extrapolation past `cutoffSize` either. An algorithm
+  /// like Bad Sort can diverge sharply beyond the usable range, at sizes no user could actually
   /// reach under the current operation cap, so including them here would report a scarier number
   /// than the one that's actually reachable. Log-spaced, not linear, so the average isn't
   /// dominated by the handful of samples nearest `cutoffSize` — each order of magnitude of array
@@ -141,21 +141,29 @@ struct GrowthModelComparisonSection: View {
   /// chart: an average vertical gap between the two lines, as a percentage of the chart's own
   /// normalized scale.
   private func averageDivergencePercent(detected: DetectedGrowthModel) -> Double? {
-    let lowerBound = domain.lowerBound
-    guard cutoffSize > lowerBound, lowerBound > 0 else { return nil }
-    let scale = normalizer(detected: detected)
-    guard scale > 0 else { return nil }
-
-    let sampleCount = 20
-    let logLowerBound = log(lowerBound)
-    let logUpperBound = log(cutoffSize)
-    let gaps: [Double] = (0..<sampleCount).map { index in
-      let fraction = Double(index) / Double(sampleCount - 1)
-      let size = exp(logLowerBound + fraction * (logUpperBound - logLowerBound))
-      let detectedNormalized = detected.predictedOperations(atSize: size) / scale
-      let fittedNormalized = metadata.growthModel.predictedOperations(atSize: size) / scale
-      return abs(detectedNormalized - fittedNormalized)
-    }
-    return gaps.reduce(0, +) / Double(gaps.count) * 100
+    normalizedGrowthDivergencePercent(
+      fitted: metadata.growthModel, detected: detected, lowerBound: domain.lowerBound,
+      cutoffSize: cutoffSize, scale: normalizer(detected: detected))
   }
+}
+
+/// The caption's percent gap uses the same normalization as the two plotted curves. Kept
+/// independent of SwiftUI so the reachable-range calculation can be checked with known curves.
+func normalizedGrowthDivergencePercent(
+  fitted: OperationGrowthModel, detected: DetectedGrowthModel, lowerBound: Double,
+  cutoffSize: Double, scale: Double
+) -> Double? {
+  guard cutoffSize > lowerBound, lowerBound > 0, scale > 0 else { return nil }
+
+  let sampleCount = 20
+  let logLowerBound = log(lowerBound)
+  let logUpperBound = log(cutoffSize)
+  let gaps: [Double] = (0..<sampleCount).map { index in
+    let fraction = Double(index) / Double(sampleCount - 1)
+    let size = exp(logLowerBound + fraction * (logUpperBound - logLowerBound))
+    let detectedNormalized = detected.predictedOperations(atSize: size) / scale
+    let fittedNormalized = fitted.predictedOperations(atSize: size) / scale
+    return abs(detectedNormalized - fittedNormalized)
+  }
+  return gaps.reduce(0, +) / Double(gaps.count) * 100
 }

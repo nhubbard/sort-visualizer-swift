@@ -36,6 +36,14 @@ public struct BigOChartPoint: Identifiable, Sendable {
   public let size: Int
   public let normalizedValue: Double
   public let kind: Kind
+
+  public init(id: String, series: String, size: Int, normalizedValue: Double, kind: Kind) {
+    self.id = id
+    self.series = series
+    self.size = size
+    self.normalizedValue = normalizedValue
+    self.kind = kind
+  }
 }
 
 /// Resolves a declared complexity string to a value at `n`, going beyond `BigOShape.parse`'s
