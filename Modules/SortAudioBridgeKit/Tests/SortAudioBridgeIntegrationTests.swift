@@ -199,6 +199,39 @@ struct SortAudioBridgeIntegrationTests {
   }
 
   @Test
+  func clientConnectsWhenServerStartsAfterAudioUnit() async throws {
+    let socketPath = makeTempSocketPath()
+    defer { try? FileManager.default.removeItem(atPath: socketPath) }
+
+    let sink = RecordingSink(onReceive: {})
+    let client = SortAudioBridgeClient(socketPath: socketPath, sink: sink)
+    client.start()
+    defer { client.stop() }
+
+    // Let the first attempt reach Network.framework's .waiting state before binding the socket.
+    try await Task.sleep(for: .milliseconds(200))
+    let server = SortAudioBridgeServer()
+    try server.start(socketPath: socketPath)
+    defer { server.stop() }
+
+    let deadline = ContinuousClock.now.advanced(by: .seconds(5))
+    while !server.hasConnectedClients, ContinuousClock.now < deadline {
+      try await Task.sleep(for: .milliseconds(20))
+    }
+    #expect(server.hasConnectedClients)
+
+    let event = SortToneEvent(
+      value: 21, range: 0...255, holdSeconds: 0.1, index: 2, arraySize: 64,
+      operationKind: .compare)
+    server.broadcast(event, noteRange: 48...84)
+    let deliveryDeadline = ContinuousClock.now.advanced(by: .seconds(3))
+    while sink.received.isEmpty, ContinuousClock.now < deliveryDeadline {
+      try await Task.sleep(for: .milliseconds(10))
+    }
+    #expect(sink.received.first?.event == event)
+  }
+
+  @Test
   func oneBroadcastReachesTwoConnectedAudioUnitClients() async throws {
     let socketPath = makeTempSocketPath()
     defer { try? FileManager.default.removeItem(atPath: socketPath) }
