@@ -498,7 +498,7 @@ struct SortSessionTests {
 
     await session.start(size: 12)
     try await waitUntilTerminal(session)
-    guard case .complete = session.phase else {
+    guard case .complete(let replay) = session.phase else {
       Issue.record("expected .complete, got \(session.phase)")
       return
     }
@@ -509,6 +509,13 @@ struct SortSessionTests {
     #expect(playbackDuration > 0)
     #expect(rows[0].playbackSpeed == settings.playbackSpeed)
     #expect(rows[0].recordingDuration >= 0)
+    #expect(rows[0].arraySize == replay.header.initialValues.count)
+    #expect(rows[0].compareCount == replay.header.compareCount)
+    #expect(rows[0].swapCount == replay.header.swapCount)
+    #expect(rows[0].mainWriteCount == replay.header.mainWriteCount)
+    #expect(rows[0].auxWriteCount == replay.header.auxWriteCount)
+    #expect(rows[0].reversalCount == replay.header.reversalCount)
+    #expect(rows[0].uniqueValueCount == replay.header.uniqueValueCount)
   }
 
   @Test
