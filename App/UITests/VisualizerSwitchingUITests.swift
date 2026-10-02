@@ -11,7 +11,7 @@ final class VisualizerSwitchingUITests: XCTestCase {
     // Now that portrait is a genuinely supported orientation (not just coerced to landscape by
     // iOS), the simulator's own default boot orientation (portrait) would otherwise leak into
     // this test unpinned — see `ScreenshotUITests`' identical rationale.
-    XCUIDevice.shared.orientation = .landscapeLeft
+    useLandscapeOrientationForUITest()
   }
 
   func testSwitchingVisualizerMidSortDoesNotDisruptTheRunningSession() throws {
@@ -28,24 +28,26 @@ final class VisualizerSwitchingUITests: XCTestCase {
     let statusLabel = app.staticTexts["sortStatusLabel"]
     XCTAssertTrue(statusLabel.waitForExistence(timeout: 5), "status label never appeared")
 
-    let settingsButton = app.buttons["settingsButton"]
-    XCTAssertTrue(settingsButton.waitForExistence(timeout: 5), "settings button never appeared")
-    settingsButton.tap()
+    app.openSettingsForUITest()
 
     // `.pickerStyle(.menu)` only exposes its options as accessibility elements once its menu
     // is actually open — tapping the picker itself first (by its own identifier) is required
     // before "Rainbow" (or any other option) exists anywhere in the tree to find.
-    app.buttons["visualizerPicker"].tap()
+    app.activateControlForUITest(app.buttons["visualizerPicker"])
 
-    let rainbowOption = app.descendants(matching: .any)
-      .matching(NSPredicate(format: "label == %@", "Rainbow"))
-      .firstMatch
+    #if targetEnvironment(macCatalyst)
+      let rainbowOption = app.menuItems["Rainbow"]
+    #else
+      let rainbowOption = app.descendants(matching: .any)
+        .matching(NSPredicate(format: "label == %@", "Rainbow"))
+        .firstMatch
+    #endif
     XCTAssertTrue(
       rainbowOption.waitForExistence(timeout: 5),
       "visualizer picker option \"Rainbow\" never appeared")
-    rainbowOption.tap()
+    app.activateControlForUITest(rainbowOption)
 
-    app.buttons["Done"].tap()
+    app.activateControlForUITest(app.buttons["Done"])
 
     // Same session, not a fresh one — the canvas and status label must still be the ones
     // driven by the SortSession that was already running before the detour through Settings.

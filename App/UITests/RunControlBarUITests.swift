@@ -11,12 +11,18 @@ final class RunControlBarUITests: XCTestCase {
     // Now that portrait is a genuinely supported orientation (not just coerced to landscape by
     // iOS), the simulator's own default boot orientation (portrait) would otherwise leak into
     // this test unpinned — see `ScreenshotUITests`' identical rationale.
-    XCUIDevice.shared.orientation = .landscapeLeft
+    useLandscapeOrientationForUITest()
   }
 
   func testPauseStepAndResumeReachesSortedState() throws {
     let app = XCUIApplication()
-    app.launchEnvironment = ["UI_TEST_ARRAY_SIZE": "24"]
+    #if targetEnvironment(macCatalyst)
+      // Native Catalyst accessibility actions take longer; keep enough tape to pause before
+      // the sort finishes, then seek to the end after verifying that playback resumes.
+      app.launchEnvironment = ["UI_TEST_ARRAY_SIZE": "128", "UI_TEST_PLAYBACK_SPEED": "30"]
+    #else
+      app.launchEnvironment = ["UI_TEST_ARRAY_SIZE": "24", "UI_TEST_PLAYBACK_SPEED": "30"]
+    #endif
     app.launch()
 
     app.tapSidebarLink("algorithmLink.quicksort")
@@ -38,15 +44,16 @@ final class RunControlBarUITests: XCTestCase {
 
     // Pause almost immediately, then confirm it's genuinely stopped rather than racing to
     // finish anyway — the whole point of this bar existing is that this button does something.
-    playPauseButton.tap()
+    app.activateControlForUITest(playPauseButton)
     Thread.sleep(forTimeInterval: 1.0)
+    XCTAssertEqual(playPauseButton.label, "Play", "the transport did not enter its paused state")
     XCTAssertNotEqual(
       statusLabel.value as? String, "sorted",
       "sort reached 'sorted' immediately after pausing — pause isn't actually stopping playback"
     )
 
     // Stepping forward while paused must not crash and must not resume auto-playback.
-    app.buttons["runControlStepForwardButton"].tap()
+    app.activateControlForUITest(app.buttons["runControlStepForwardButton"])
     Thread.sleep(forTimeInterval: 0.5)
     XCTAssertNotEqual(
       statusLabel.value as? String, "sorted",
@@ -54,7 +61,11 @@ final class RunControlBarUITests: XCTestCase {
     )
 
     // Resume and confirm it actually reaches a correctly-sorted terminal state.
-    playPauseButton.tap()
+    app.activateControlForUITest(playPauseButton)
+    XCTAssertEqual(playPauseButton.label, "Pause", "the transport did not resume playback")
+    #if targetEnvironment(macCatalyst)
+      app.activateControlForUITest(app.buttons["runControlJumpToEndButton"])
+    #endif
 
     // 60s (not 30s): RecordingEngine's primary/secondary auto-retraction (every compare/swap
     // past the first emits 2 extra raw tape entries un-highlighting the previous pair)
@@ -100,23 +111,23 @@ final class RunControlBarUITests: XCTestCase {
     XCTAssertTrue(jumpToEndButton.exists)
 
     // Pause immediately so none of these seeks race against auto-playback.
-    playPauseButton.tap()
+    app.activateControlForUITest(playPauseButton)
 
     // Jump to end: stepping forward/playing further is no longer possible, but stepping back
     // (and jumping to start) still is, since the tape has earlier positions.
-    jumpToEndButton.tap()
-    Thread.sleep(forTimeInterval: 0.3)
-    XCTAssertFalse(
-      jumpToEndButton.isEnabled, "jump-to-end should disable itself once at the last step")
+    app.activateControlForUITest(jumpToEndButton)
+    XCTAssertEqual(XCTWaiter().wait(for: [XCTNSPredicateExpectation(
+      predicate: NSPredicate(format: "isEnabled == false"), object: jumpToEndButton
+    )], timeout: 5), .completed, "jump-to-end should disable itself once at the last step")
     XCTAssertFalse(
       playPauseButton.isEnabled, "play/pause should disable itself once fully finished")
     XCTAssertTrue(jumpToStartButton.isEnabled)
 
     // Jump all the way back to true step 0: nothing left to step/jump back further.
-    jumpToStartButton.tap()
-    Thread.sleep(forTimeInterval: 0.3)
-    XCTAssertFalse(
-      jumpToStartButton.isEnabled, "jump-to-start should disable itself once at step 0")
+    app.activateControlForUITest(jumpToStartButton)
+    XCTAssertEqual(XCTWaiter().wait(for: [XCTNSPredicateExpectation(
+      predicate: NSPredicate(format: "isEnabled == false"), object: jumpToStartButton
+    )], timeout: 5), .completed, "jump-to-start should disable itself once at step 0")
     XCTAssertTrue(jumpToEndButton.isEnabled)
     XCTAssertTrue(playPauseButton.isEnabled)
   }
@@ -129,7 +140,7 @@ final class RunControlBarUITests: XCTestCase {
   /// any transport button's enabled state.
   func testResetButtonStartsAFreshShuffleAndSort() throws {
     let app = XCUIApplication()
-    app.launchEnvironment = ["UI_TEST_ARRAY_SIZE": "24"]
+    app.launchEnvironment = ["UI_TEST_ARRAY_SIZE": "24", "UI_TEST_PLAYBACK_SPEED": "30"]
     app.launch()
 
     app.tapSidebarLink("algorithmLink.quicksort")
@@ -151,7 +162,7 @@ final class RunControlBarUITests: XCTestCase {
     XCTAssertEqual(
       statusLabel.value as? String, "sorted", "the first sort produced an incorrect result")
 
-    app.buttons["runControlResetButton"].tap()
+    app.activateControlForUITest(app.buttons["runControlResetButton"])
 
     // The freshly-shuffled array is vanishingly unlikely to already be sorted at n=24 —
     // leaving "sorted" first is evidence reset genuinely started a new run, not a silent no-op.
@@ -185,15 +196,41 @@ final class RunControlBarUITests: XCTestCase {
 
     let speedButton = app.buttons["runControlSpeedButton"]
     XCTAssertTrue(speedButton.waitForExistence(timeout: 5))
-    speedButton.tap()
+    app.activateControlForUITest(speedButton)
 
     let speedSlider = app.sliders["runControlSpeedSlider"]
     XCTAssertTrue(
       speedSlider.waitForExistence(timeout: 5), "speed row never expanded to reveal its slider")
 
-    speedButton.tap()
+    app.activateControlForUITest(speedButton)
     XCTAssertFalse(
       speedSlider.waitForExistence(timeout: 2), "tapping again should collapse the speed row")
+  }
+
+  func testFixedDurationModeUsesTheLiveDurationSlider() throws {
+    let app = XCUIApplication()
+    app.launchEnvironment = ["UI_TEST_ARRAY_SIZE": "24"]
+    app.launch()
+
+    app.openSettingsForUITest()
+    let pacingPicker = app.segmentedControls["pacingModePicker"]
+    for _ in 0..<5 where !pacingPicker.exists { app.scrollSettingsUpForUITest() }
+    XCTAssertTrue(pacingPicker.waitForExistence(timeout: 5))
+    app.activateControlForUITest(pacingPicker.buttons["Fixed Duration"])
+    app.activateControlForUITest(app.buttons["Done"])
+
+    app.tapSidebarLink("algorithmLink.quicksort")
+    let speedButton = app.buttons["runControlSpeedButton"]
+    XCTAssertTrue(speedButton.waitForExistence(timeout: 5))
+    app.activateControlForUITest(speedButton)
+    XCTAssertTrue(app.sliders["runControlDurationSlider"].waitForExistence(timeout: 5))
+    XCTAssertFalse(app.sliders["runControlSpeedSlider"].exists)
+    XCTAssertTrue(app.staticTexts["runControlSpeedValueLabel"].label.contains("target:"))
+
+    // Global pacing persists between UI tests. Put it back after exercising the live row.
+    app.openSettingsForUITest()
+    for _ in 0..<5 where !pacingPicker.exists { app.scrollSettingsUpForUITest() }
+    app.activateControlForUITest(pacingPicker.buttons["Fixed Rate"])
   }
 
   /// Size deliberately expands inline as a chip row (not a `Stepper`, not a `.popover`) — see
@@ -214,14 +251,14 @@ final class RunControlBarUITests: XCTestCase {
 
     let sizeButton = app.buttons["runControlSizeButton"]
     XCTAssertTrue(sizeButton.waitForExistence(timeout: 5))
-    sizeButton.tap()
+    app.activateControlForUITest(sizeButton)
 
     let chipRow = app.scrollViews["runControlSizeChipRow"]
     XCTAssertTrue(chipRow.waitForExistence(timeout: 5), "size row never expanded to reveal its chips")
 
     let chip = app.buttons["runControlSizeChip-16"]
     XCTAssertTrue(chip.waitForExistence(timeout: 5), "expected a size-16 chip to exist for QuickSort")
-    chip.tap()
+    app.activateControlForUITest(chip)
 
     // `start(size:)` re-records and restarts playback, tearing down and rebuilding this whole
     // row (see `SortView`'s phase-driven `ProgressView` fallback) — so this chip is a fresh
@@ -233,8 +270,30 @@ final class RunControlBarUITests: XCTestCase {
       "tapping a size chip should mark it selected once session.arraySize actually changes"
     )
 
-    sizeButton.tap()
+    app.activateControlForUITest(sizeButton)
     XCTAssertFalse(
       chipRow.waitForExistence(timeout: 2), "tapping again should collapse the size chip row")
   }
+
+  #if !targetEnvironment(macCatalyst)
+  func testSizeSweepShowsProgressAndStopsAfterCurrentPass() {
+    let app = XCUIApplication()
+    app.launchEnvironment = ["UI_TEST_ARRAY_SIZE": "16", "UI_TEST_PLAYBACK_SPEED": "1000"]
+    app.launch()
+    app.tapSidebarLink("algorithmLink.quicksort")
+
+    let status = app.staticTexts["sortStatusLabel"]
+    XCTAssertTrue(status.waitForExistence(timeout: 5))
+    let sorted = XCTNSPredicateExpectation(
+      predicate: NSPredicate(format: "value == %@", "sorted"), object: status)
+    XCTAssertEqual(XCTWaiter().wait(for: [sorted], timeout: 10), .completed)
+
+    app.buttons["runControlAutomatorButton"].tap()
+    app.buttons["automatorMenuItem.sizeSweep"].tap()
+    let progress = app.staticTexts["automationProgressLabel"]
+    XCTAssertTrue(progress.waitForExistence(timeout: 5), "size sweep did not start")
+    app.buttons["automationStopButton"].tap()
+    XCTAssertFalse(progress.waitForExistence(timeout: 5), "size sweep did not stop")
+  }
+  #endif
 }

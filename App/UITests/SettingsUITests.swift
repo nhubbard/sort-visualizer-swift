@@ -10,16 +10,16 @@ final class SettingsUITests: XCTestCase {
     // See `ScreenshotUITests`'/`DefaultPlaybackSpeedUITests`' identical rationale — portrait is
     // a genuinely supported orientation now, so the simulator's own boot orientation would
     // otherwise leak into this test unpinned.
-    XCUIDevice.shared.orientation = .landscapeLeft
+    useLandscapeOrientationForUITest()
   }
 
   func testResetToDefaultsRestoresDefaultArraySize() throws {
     let app = XCUIApplication()
     app.launch()
 
-    app.buttons["settingsButton"].tap()
+    app.openSettingsForUITest()
 
-    let stepper = app.steppers["defaultArraySizeStepper"]
+    let stepper = defaultSizeControl(in: app)
     scrollUntilVisible(stepper, in: app)
     // A SwiftUI `Stepper`'s two sub-buttons are identified as `<identifier>-Increment`/
     // `-Decrement`, not the bare "Increment"/"Decrement" a UIKit `UIStepper` exposes.
@@ -27,32 +27,122 @@ final class SettingsUITests: XCTestCase {
     // (`in: 16...256`), and the default IS 256 — incrementing from an already-maxed stepper
     // is a no-op, which is exactly what a previous test's own reset just left this at.
     let previousLabel = stepper.label
-    app.buttons["defaultArraySizeStepper-Decrement"].tap()
+    changeDefaultSize(in: app, decrement: true)
     XCTAssertNotEqual(stepper.label, previousLabel, "stepper didn't actually move")
 
     let resetButton = app.buttons["resetSettingsButton"]
     scrollUntilVisible(resetButton, in: app)
-    resetButton.tap()
+    app.activateControlForUITest(resetButton)
 
     // `.firstMatch`, not a plain subscript lookup: a `Button` with a custom
     // `.accessibilityIdentifier` inside a `.confirmationDialog` action closure gets wrapped in
     // an extra accessibility container on iPad, and the identifier lands on both the wrapper
     // and the real inner button — two exactly-overlapping matches for the same identifier,
     // deterministically, every time (confirmed via `app.debugDescription`).
-    let confirmButton = app.buttons.matching(identifier: "resetSettingsConfirmButton").firstMatch
+    let confirmButton = resetConfirmationButton(in: app)
     XCTAssertTrue(confirmButton.waitForExistence(timeout: 5))
-    confirmButton.tap()
+    app.activateControlForUITest(confirmButton)
 
-    XCTAssertTrue(
-      stepper.label.hasSuffix(": 256"), "Reset to Defaults should restore the default array size")
+    let restored = XCTNSPredicateExpectation(
+      predicate: NSPredicate(format: "label ENDSWITH %@", ": 256"), object: stepper)
+    XCTAssertEqual(XCTWaiter().wait(for: [restored], timeout: 5), .completed,
+      "Reset to Defaults should restore the default array size")
+  }
+
+  func testFixedDurationPacingShowsItsControlsAndRestoresFixedRate() throws {
+    let app = XCUIApplication()
+    app.launch()
+    app.openSettingsForUITest()
+
+    let pacingPicker = app.segmentedControls["pacingModePicker"]
+    scrollUntilVisible(pacingPicker, in: app)
+    app.activateControlForUITest(pacingPicker.buttons["Fixed Duration"])
+
+    let durationSlider = app.sliders["targetPlaybackDurationSlider"]
+    XCTAssertTrue(durationSlider.waitForExistence(timeout: 5))
+    XCTAssertFalse(app.sliders["playbackSpeedSlider"].exists)
+    XCTAssertTrue(app.staticTexts.matching(
+      NSPredicate(format: "label CONTAINS %@", "per run")
+    ).firstMatch.exists)
+
+    app.activateControlForUITest(pacingPicker.buttons["Fixed Rate"])
+    XCTAssertTrue(app.sliders["playbackSpeedSlider"].waitForExistence(timeout: 5))
+    XCTAssertFalse(durationSlider.exists)
+  }
+
+  func testArraySizeChangePersistsAcrossAppRelaunch() throws {
+    let app = XCUIApplication()
+    app.launch()
+    app.openSettingsForUITest()
+
+    var stepper = defaultSizeControl(in: app)
+    scrollUntilVisible(stepper, in: app)
+    let original = stepper.label
+    changeDefaultSize(in: app, decrement: !stepper.label.hasSuffix(": 16"))
+    let changed = stepper.label
+    XCTAssertNotEqual(changed, original)
+
+    app.terminate()
+    app.launch()
+    app.openSettingsForUITest()
+    stepper = defaultSizeControl(in: app)
+    scrollUntilVisible(stepper, in: app)
+    XCTAssertEqual(stepper.label, changed, "the saved setting did not survive a new process")
+
+    let reset = app.buttons["resetSettingsButton"]
+    scrollUntilVisible(reset, in: app)
+    app.activateControlForUITest(reset)
+    app.activateControlForUITest(resetConfirmationButton(in: app))
+    let restored = NSPredicate(format: "label ENDSWITH %@", ": 256")
+    expectation(for: restored, evaluatedWith: stepper)
+    waitForExpectations(timeout: 5)
   }
 
   /// Mirrors `DefaultPlaybackSpeedUITests`' own helper — the Settings `Form` doesn't put
   /// off-screen rows in the accessibility tree until scrolled into view.
   private func scrollUntilVisible(_ element: XCUIElement, in app: XCUIApplication) {
-    for _ in 0..<5 where !element.exists {
-      app.swipeUp(velocity: .slow)
+    for _ in 0..<8 where !element.exists {
+      app.scrollSettingsUpForUITest()
     }
     XCTAssertTrue(element.waitForExistence(timeout: 5), "\(element) never scrolled into view")
+    #if targetEnvironment(macCatalyst)
+      // The form can materialize a row just behind its fixed navigation bar. Move it down
+      // into the sheet before clicking the native stepper arrows.
+      let top = app.sheets.firstMatch.frame.minY + 100
+      for _ in 0..<3 {
+        guard element.exists, element.frame.midY < top else { break }
+        app.scrollSettingsDownForUITest()
+      }
+    #endif
+  }
+
+  private func defaultSizeControl(in app: XCUIApplication) -> XCUIElement {
+    #if targetEnvironment(macCatalyst)
+      // Catalyst exposes SwiftUI's Stepper as an Other element with its label and value.
+      return app.otherElements["defaultArraySizeStepper"]
+    #else
+      return app.steppers["defaultArraySizeStepper"]
+    #endif
+  }
+
+  private func resetConfirmationButton(in app: XCUIApplication) -> XCUIElement {
+    #if targetEnvironment(macCatalyst)
+      return app.sheets["alert"].buttons["Reset to Defaults"]
+    #else
+      return app.buttons.matching(identifier: "resetSettingsConfirmButton").firstMatch
+    #endif
+  }
+
+  private func changeDefaultSize(in app: XCUIApplication, decrement: Bool) {
+    #if targetEnvironment(macCatalyst)
+      let stepper = defaultSizeControl(in: app)
+      XCTAssertTrue(stepper.exists)
+      // The native stepper's up/down arrows are visually present but absent as separate AX
+      // buttons. Click the trailing upper/lower half of its accessible frame.
+      stepper.coordinate(withNormalizedOffset: CGVector(dx: 0.96, dy: decrement ? 0.75 : 0.25))
+        .click()
+    #else
+      app.buttons["defaultArraySizeStepper-\(decrement ? "Decrement" : "Increment")"].tap()
+    #endif
   }
 }
