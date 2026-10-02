@@ -48,6 +48,11 @@ record types that no current code path writes to — legacy, out of scope for th
 uv run cleanup_stale_sizes.py --environment development --record-type CD_BigORecord
 ```
 
+If `cktool` still reports an expired session after `save-token`, use a fresh CloudKit Console
+CLI user token in a private local file and pass `--token-file .user_token`. The script passes it
+directly to each `cktool` invocation and redacts it from command diagnostics. Keep the file out
+of Git and restrict its permissions (`chmod 600 .user_token`).
+
 Defaults to a dry run: fetches every record of the given type (first run only — see caching
 below), prints a diff-style summary of what would be deleted (grouped by algorithm, with counts
 and the threshold each exceeded), and does **not** delete anything. Review that output. Only then

@@ -22,8 +22,8 @@ skips the network entirely and reuses the cached eligible list -- pass --refresh
 fresh fetch regardless of what's cached. --execute removes each successfully-deleted record from
 the cache as it goes, so a run that fails partway through deleting can also just be re-run.
 
-Requires `xcrun cktool save-token --type user` to already have been run for the iCloud account
-the app syncs analytics under (see README).
+Requires `xcrun cktool save-token --type user` or `--token-file` with a CloudKit Console CLI
+user token for the iCloud account the app syncs analytics under (see README).
 
 Usage (uv run, not plain python3 -- this script declares its own tqdm dependency inline (PEP
 723) and uv installs it into an ephemeral env automatically, no venv/pip setup needed):
@@ -113,17 +113,23 @@ def threshold_digest(thresholds: dict[str, float]) -> str:
     return hashlib.sha256(payload.encode()).hexdigest()
 
 
-def run_cktool(args: list[str]) -> dict:
+def cktool_command(args: list[str], token: str | None) -> list[str]:
+    return ["xcrun", "cktool", args[0], *(["--token", token] if token else []), *args[1:]]
+
+
+def run_cktool(args: list[str], token: str | None = None) -> dict:
     result = subprocess.run(
-        ["xcrun", "cktool", *args], capture_output=True, text=True, check=False
+        cktool_command(args, token), capture_output=True, text=True, check=False
     )
     if result.returncode != 0:
-        print(f"cktool {' '.join(args)} failed:\n{result.stderr}", file=sys.stderr)
+        error = result.stderr.replace(token, "[redacted]") if token else result.stderr
+        print(f"cktool {' '.join(args)} failed:\n{error}", file=sys.stderr)
         sys.exit(1)
     try:
         return json.loads(result.stdout)
     except json.JSONDecodeError:
-        print(f"cktool returned non-JSON output:\n{result.stdout}", file=sys.stderr)
+        output = result.stdout.replace(token, "[redacted]") if token else result.stdout
+        print(f"cktool returned non-JSON output:\n{output}", file=sys.stderr)
         sys.exit(1)
 
 
@@ -175,7 +181,7 @@ def fetch_and_filter(
     *, container_id: str, environment: str, database_type: str, zone_name: str,
     record_type: str, team_id: str | None, thresholds: dict[str, float],
     algorithm_field: str, size_field: str, cache_file: Path, resume_from: dict | None,
-    thresholds_digest: str,
+    thresholds_digest: str, token: str | None,
 ) -> tuple[list[dict], int]:
     """Fetches every page of `record_type`, filtering each record against `thresholds` as it
     arrives, and persists (eligible list + continuationToken) to `cache_file` after every page --
@@ -210,7 +216,7 @@ def fetch_and_filter(
                 args += ["--team-id", team_id]
             if continuation_token:
                 args += ["--continuation-token", continuation_token]
-            response = run_cktool(args)
+            response = run_cktool(args, token)
             page = response.get("records", [])
             continuation_token = response.get("continuationToken")
             total_fetched += len(page)
@@ -276,7 +282,12 @@ def main() -> None:
     parser.add_argument("--team-id", default="676UP3S3AH", help="required by query-records; not by delete-record")
     parser.add_argument("--execute", action="store_true", help="actually delete (default: dry run)")
     parser.add_argument("--refresh", action="store_true", help="ignore any cached/resumable state and start a fully fresh fetch")
+    parser.add_argument("--token-file", type=Path, help="CloudKit Console CLI user token file; avoids stale cktool saved-token lookup")
     args = parser.parse_args()
+
+    token = args.token_file.read_text().strip() if args.token_file else None
+    if args.token_file and not token:
+        parser.error("token file is empty")
 
     thresholds = load_thresholds()
     digest = threshold_digest(thresholds)
@@ -299,7 +310,7 @@ def main() -> None:
             container_id=CONTAINER_ID, environment=args.environment, database_type=args.database_type,
             zone_name=args.zone_name, record_type=args.record_type, team_id=args.team_id,
             thresholds=thresholds, algorithm_field=args.algorithm_field, size_field=args.size_field,
-            cache_file=path, resume_from=existing, thresholds_digest=digest,
+            cache_file=path, resume_from=existing, thresholds_digest=digest, token=token,
         )
         print(f"Cached {len(eligible)} eligible record(s) to {path}.\n", file=sys.stderr)
 
@@ -326,11 +337,12 @@ def main() -> None:
             "--record-name", entry["recordName"],
             "--yes",
         ]
-        result = subprocess.run(["xcrun", "cktool", *delete_args], capture_output=True, text=True)
+        result = subprocess.run(cktool_command(delete_args, token), capture_output=True, text=True)
         if result.returncode != 0:
+            error = result.stderr.replace(token, "[redacted]") if token else result.stderr
             print(
                 f"  FAILED to delete {entry['recordName']} ({entry['algorithmID']}, "
-                f"size {entry['arraySize']}): {result.stderr}", file=sys.stderr,
+                f"size {entry['arraySize']}): {error}", file=sys.stderr,
             )
         else:
             deleted += 1
