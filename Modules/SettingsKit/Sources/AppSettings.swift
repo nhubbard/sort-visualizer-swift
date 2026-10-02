@@ -127,20 +127,33 @@ public final class AppSettings {
       Keys.codeTheme: "monokai",
       Keys.defaultShuffleID: "random"
     ])
-    selectedVisualizerID = VisualizerID(
+    let storedVisualizer = VisualizerID(
       rawValue: store.string(forKey: Keys.selectedVisualizerID) ?? "bargraph")
-    playbackSpeed = store.double(forKey: Keys.playbackSpeed)
+    let visualizers = VisualizerRegistry.shared.visualizers
+    selectedVisualizerID = visualizers.isEmpty || visualizers.contains(where: { $0.id == storedVisualizer })
+      ? storedVisualizer : (visualizers.first?.id ?? VisualizerID(rawValue: "bargraph"))
+    let storedSpeed = store.double(forKey: Keys.playbackSpeed)
+    playbackSpeed = storedSpeed.isFinite && storedSpeed > 0 ? storedSpeed : 30.0
     useFixedDurationPacing = store.bool(forKey: Keys.useFixedDurationPacing)
-    targetPlaybackDuration = store.double(forKey: Keys.targetPlaybackDuration)
+    let storedDuration = store.double(forKey: Keys.targetPlaybackDuration)
+    targetPlaybackDuration = storedDuration.isFinite && storedDuration > 0 ? storedDuration : 10.0
     compactPlaybackForFixedDuration = store.bool(forKey: Keys.compactPlaybackForFixedDuration)
     soundEnabled = store.bool(forKey: Keys.soundEnabled)
     audioUnitBridgeEnabled = store.bool(forKey: Keys.audioUnitBridgeEnabled)
-    synthNoteRange =
-      store.integer(forKey: Keys.synthLowNote)...store.integer(forKey: Keys.synthHighNote)
-    defaultArraySize = store.integer(forKey: Keys.defaultArraySize)
-    recordingOperationCap = store.integer(forKey: Keys.recordingOperationCap)
-    codeTheme = CodeThemeID(rawValue: store.string(forKey: Keys.codeTheme) ?? "monokai")
-    defaultShuffleID = ShuffleID(rawValue: store.string(forKey: Keys.defaultShuffleID) ?? "random")
+    let lowNote = store.integer(forKey: Keys.synthLowNote)
+    let highNote = store.integer(forKey: Keys.synthHighNote)
+    synthNoteRange = (0...127).contains(lowNote) && (0...127).contains(highNote)
+      && lowNote <= highNote ? lowNote...highNote : 36...72
+    let storedSize = store.integer(forKey: Keys.defaultArraySize)
+    defaultArraySize = storedSize > 0 ? storedSize : 256
+    let storedCap = store.integer(forKey: Keys.recordingOperationCap)
+    recordingOperationCap = storedCap > 0 ? storedCap : 300_000
+    let storedTheme = CodeThemeID(rawValue: store.string(forKey: Keys.codeTheme) ?? "monokai")
+    codeTheme = CodeThemeID.knownIDs.contains(storedTheme) ? storedTheme : CodeThemeID(rawValue: "monokai")
+    let storedShuffle = ShuffleID(rawValue: store.string(forKey: Keys.defaultShuffleID) ?? "random")
+    let shuffles = ShuffleRegistry.shared.shuffles
+    defaultShuffleID = shuffles.isEmpty || shuffles.contains(where: { $0.id == storedShuffle })
+      ? storedShuffle : (shuffles.first?.id ?? ShuffleID(rawValue: "random"))
   }
 
   private func persistNoteRange() {
