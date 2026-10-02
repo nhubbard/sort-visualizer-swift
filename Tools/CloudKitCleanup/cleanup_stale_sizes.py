@@ -40,6 +40,7 @@ import json
 import re
 import subprocess
 import sys
+from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -267,8 +268,9 @@ def print_summary(eligible: list[dict], *, executing: bool) -> None:
     for algorithm_id in sorted(by_algorithm):
         entries = by_algorithm[algorithm_id]
         threshold = entries[0]["threshold"]
-        sizes = sorted(e["arraySize"] for e in entries)
-        print(f"  {algorithm_id}: {len(entries)} record(s) above threshold {threshold:g} -- sizes {sizes}")
+        sizes = Counter(e["arraySize"] for e in entries)
+        size_counts = ", ".join(f"{size}×{count}" for size, count in sorted(sizes.items()))
+        print(f"  {algorithm_id}: {len(entries)} record(s) above threshold {threshold:g} -- sizes {size_counts}")
 
 
 def main() -> None:
