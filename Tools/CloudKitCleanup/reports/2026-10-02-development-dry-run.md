@@ -12,6 +12,8 @@ All values below come from complete read-only Development scans. No records were
 
 Every candidate has a unique CloudKit record name within its record type and a size strictly greater than its cached threshold. The private record names remain in the local ignored caches.
 
+Candidate-set SHA-256 fingerprints are `22b4950bc5741cd56934c729a58274aad3efa82d4a485f03d6ba91d9d2232928` for Development Big-O and `9b8046f938707dc771c6922165ff3555fc8f80b7e7f85c760f6a1b4ec1eb19da` for Development cap-exceeded. Each fingerprint hashes newline-separated compact JSON arrays of `[recordType, recordName, algorithmID, arraySize, threshold]`, sorted by record name. This identifies the exact cached candidate sets without publishing private record names.
+
 | Algorithm ID | Current maximum | Big-O candidates | Cap-exceeded candidates | Largest candidate size |
 | --- | ---: | ---: | ---: | ---: |
 | aatreesort | 2272 | 2,605 | 60 | 8,192 |
