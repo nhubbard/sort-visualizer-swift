@@ -1,4 +1,5 @@
 import AlgorithmKit
+import Foundation
 import SortEngineKit
 import Testing
 
@@ -9,23 +10,7 @@ import Testing
 /// all 5 were ported to native Swift.
 @Suite
 struct NativeShuffleCorrectnessTests {
-  private static let shuffles: [any ShuffleAlgorithm] = [
-    AlmostShuffle(), AscendingShuffle(), BitReversalShuffle(), BlockRandomShuffle(),
-    BlockReverseShuffle(), BSTTraversalShuffle(),
-    CircleShuffle(),
-    DescendingShuffle(), DoubleLayeredShuffle(), FinalBitonicShuffle(), FinalMergeShuffle(),
-    FinalRadixShuffle(), GrailsortAdversaryShuffle(), GrayCodeShuffle(), HalfRotationShuffle(),
-    HeapifiedShuffle(),
-    InterlacedShuffle(), InvertedBSTShuffle(), LogarithmicSlopesShuffle(), MovedElementShuffle(),
-    NaiveShuffle(), NoisyShuffle(), OrganShuffle(), PairwiseShuffle(), PartialReverseShuffle(),
-    PartitionedShuffle(), PDQAdversaryShuffle(),
-    QuicksortAdversaryShuffle(), RandomShuffle(), RealFinalMergeShuffle(),
-    RealFinalRadixShuffle(), RecursiveRadixShuffle(), RecursiveReversalShuffle(), SawtoothShuffle(),
-    ShuffleMergeAdversaryShuffle(),
-    ShuffledCubicShuffle(), ShuffledHalfShuffle(), ShuffledHeadShuffle(), ShuffledOddsShuffle(),
-    ShuffledQuinticShuffle(), ShuffledTailShuffle(), SierpinskiShuffle(),
-    TriangularHeapifiedShuffle(), TriangularShuffle()
-  ]
+  private static let shuffles: [any ShuffleAlgorithm] = AllBuiltInAlgorithms.shuffles
 
   /// Unlike the curve shuffles (`ShuffledCubicShuffle`/`ShuffledQuinticShuffle`), these shuffles
   /// only rearrange existing values, so they owe a stronger guarantee than the length-only check
@@ -143,6 +128,33 @@ struct NativeShuffleCorrectnessTests {
           engine.values.allSatisfy { (1...size).contains($0) },
           "\(shuffle.id.rawValue) at size \(size) produced a value outside 1...\(size): \(engine.values)"
         )
+      }
+    }
+  }
+
+  @Test
+  @MainActor
+  func everyShuffleRecordedTapeReplaysItsActualOutput() {
+    // Random shuffles intentionally draw from the system RNG; the recorded tape is the stable
+    // replay artifact. This checks the real recorded outcome, including non-permuting variants.
+    for size in [4, 16, 63] {
+      let initial = Array(1...size)
+      for shuffle in Self.shuffles {
+        var recording = RecordingEngine(values: initial)
+        shuffle.record(into: &recording)
+        let result = recording.finish()
+        #expect(!recording.didExceedCap, "\(shuffle.id.rawValue) exceeded the test tape cap")
+        let tape = Tape(
+          header: TapeHeader(
+            algorithmID: "shuffle-test", initialValues: initial, visualSeed: 0,
+            compareCount: 0, swapCount: 0, recordingDuration: 0,
+            recordedAt: Date(timeIntervalSince1970: 0), shuffleID: shuffle.id.rawValue),
+          operations: result.tape)
+        let replay = ReplayEngine(tape: tape)
+        replay.seek(to: tape.operations.count)
+        #expect(
+          replay.frame.map(\.value) == recording.values,
+          "\(shuffle.id.rawValue) at size \(size) did not replay its recorded output")
       }
     }
   }
