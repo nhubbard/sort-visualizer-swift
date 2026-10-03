@@ -1,124 +1,235 @@
-import java.util.Arrays;
-
+// MIT License
+// Copyright (c) 2014 Andrey Astrelin
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
 public class sqrtsort {
-  private static int blockSize = 1;
-
-  public static void sort(int[] arr) {
-    blockSize = 1;
-    while (blockSize * blockSize < arr.length) {
-      blockSize *= 2;
-    }
-    sqrtSort(arr, 0, arr.length);
+private static class State { int[] a, buffer, tags; }
+private static int readValue(State s, int storage, int index) { return storage != 0 ? s.buffer[index] : s.a[index]; }
+private static void writeValue(State s, int storage, int index, int value) { (storage != 0 ? s.buffer : s.a)[index] = value; }
+private static int compare(State s, int firstStorage, int first, int secondStorage, int second) {
+  int a = readValue(s, firstStorage, first), b = readValue(s, secondStorage, second);
+  return Integer.compare(a, b);
+}
+private static void copyValues(State s, int sourceStorage, int source, int targetStorage, int target, int count) {
+  if (sourceStorage == targetStorage && source < target && target < source + count) {
+    for (int i = count - 1; i >= 0; i--)
+      writeValue(s, targetStorage, target + i, readValue(s, sourceStorage, source + i));
+  } else {
+    for (int i = 0; i < count; i++)
+      writeValue(s, targetStorage, target + i, readValue(s, sourceStorage, source + i));
   }
-
-  private static void multiSwap(int[] arr, int a, int b, int len) {
-    for (int i = 0; i < len; i++) {
-      int t = arr[a + i];
-      arr[a + i] = arr[b + i];
-      arr[b + i] = t;
+}
+private static void swapValues(State s, int storage, int a, int b) {
+  if (a == b) return;
+  int first = readValue(s, storage, a);
+  writeValue(s, storage, a, readValue(s, storage, b));
+  writeValue(s, storage, b, first);
+}
+private static void insertion(State s, int storage, int position, int length) {
+  for (int index = position + 1; index < position + length; index++) {
+    int value = readValue(s, storage, index), cursor = index;
+    while (cursor > position && readValue(s, storage, cursor - 1) > value) {
+      writeValue(s, storage, cursor, readValue(s, storage, cursor - 1));
+      cursor--;
     }
+    writeValue(s, storage, cursor, value);
   }
-
-  private static void rotate(int[] arr, int a, int m, int b) {
-    int l = m - a;
-    int r = b - m;
-    while (l > 0 && r > 0) {
-      if (r < l) {
-        multiSwap(arr, m - r, m, r);
-        b -= r;
-        m -= r;
-        l -= r;
-      } else {
-        multiSwap(arr, a, m, l);
-        a += l;
-        m += l;
-        r -= l;
+}
+private static void mergeRight(State s, int storage, int position, int leftLength, int rightLength, int distance) {
+  int destination = position + leftLength + rightLength + distance - 1;
+  int right = position + leftLength + rightLength - 1, left = position + leftLength - 1;
+  while (left >= position) {
+    if (right < position + leftLength || compare(s, storage, left, storage, right) > 0)
+      writeValue(s, storage, destination, readValue(s, storage, left--));
+    else writeValue(s, storage, destination, readValue(s, storage, right--));
+    destination--;
+  }
+  if (right != destination) while (right >= position + leftLength)
+    writeValue(s, storage, destination--, readValue(s, storage, right--));
+}
+private static void mergeLeft(State s, int storage, int position, int leftLength, int rightLength, int distance) {
+  int left = position, right = position + leftLength, destination = position + distance;
+  int leftEnd = right, rightEnd = right + rightLength;
+  while (right < rightEnd) {
+    if (left == leftEnd || compare(s, storage, left, storage, right) > 0)
+      writeValue(s, storage, destination, readValue(s, storage, right++));
+    else writeValue(s, storage, destination, readValue(s, storage, left++));
+    destination++;
+  }
+  if (destination != left) while (left < leftEnd)
+    writeValue(s, storage, destination++, readValue(s, storage, left++));
+}
+private static void mergeDown(State s, int storage, int position, int prefix, int prefixPosition, int leftLength, int prefixLength) {
+  int left = 0, right = 0, destination = position - prefixLength;
+  while (right < prefixLength) {
+    if (left == leftLength || compare(s, storage, position + left, prefix, prefixPosition + right) >= 0)
+      writeValue(s, storage, destination, readValue(s, prefix, prefixPosition + right++));
+    else writeValue(s, storage, destination, readValue(s, storage, position + left++));
+    destination++;
+  }
+  if (destination != position + left) while (left < leftLength)
+    writeValue(s, storage, destination++, readValue(s, storage, position + left++));
+}
+private static void smartMerge(State s, int storage, int position, int[] prior, int blockLength) {
+  int left = position, right = position + prior[0], destination = position - blockLength;
+  int leftEnd = right, rightEnd = right + blockLength, opposite = 1 - prior[1];
+  while (left < leftEnd && right < rightEnd) {
+    int order = compare(s, storage, left, storage, right);
+    if (order < 0 || (order == 0 && opposite == 1))
+      writeValue(s, storage, destination, readValue(s, storage, left++));
+    else writeValue(s, storage, destination, readValue(s, storage, right++));
+    destination++;
+  }
+  if (left < leftEnd) {
+    int remaining = leftEnd - left;
+    while (left < leftEnd) {
+      leftEnd--; rightEnd--;
+      writeValue(s, storage, rightEnd, readValue(s, storage, leftEnd));
+    }
+    prior[0] = remaining;
+  } else {
+    prior[0] = rightEnd - right;
+    prior[1] = opposite;
+  }
+}
+private static void mergeBuffers(State s, int storage, int position, int middleTag, int blockCount,
+                         int blockLength, int trailingABlocks, int tailLength) {
+  if (blockCount == 0) {
+    mergeLeft(s, storage, position, trailingABlocks * blockLength, tailLength, -blockLength);
+    return;
+  }
+  int priorLength = blockLength, priorFragment = s.tags[0] < middleTag ? 0 : 1;
+  int process = blockLength;
+  for (int tagIndex = 1; tagIndex < blockCount; tagIndex++) {
+    int rest = process - priorLength;
+    int nextFragment = s.tags[tagIndex] < middleTag ? 0 : 1;
+    if (nextFragment == priorFragment) {
+      copyValues(s, storage, position + rest, storage, position + rest - blockLength, priorLength);
+      rest = process;
+      priorLength = blockLength;
+    } else { int[] prior = {priorLength, priorFragment}; smartMerge(s, storage, position + rest, prior, blockLength); priorLength = prior[0]; priorFragment = prior[1]; }
+    process += blockLength;
+  }
+  int rest = process - priorLength;
+  if (tailLength != 0) {
+    if (priorFragment != 0) {
+      copyValues(s, storage, position + rest, storage, position + rest - blockLength, priorLength);
+      rest = process;
+      priorLength = blockLength * trailingABlocks;
+    } else priorLength += blockLength * trailingABlocks;
+    mergeLeft(s, storage, position + rest, priorLength, tailLength, -blockLength);
+  } else copyValues(s, storage, position + rest, storage, position + rest - blockLength, priorLength);
+}
+private static void buildBlocks(State s, int storage, int position, int length, int blockLength) {
+  int pair = 1;
+  while (pair < length) {
+    int lower = compare(s, storage, position + pair - 1, storage, position + pair) > 0 ? 1 : 0;
+    writeValue(s, storage, position + pair - 3, readValue(s, storage, position + pair - 1 + lower));
+    writeValue(s, storage, position + pair - 2, readValue(s, storage, position + pair - lower));
+    pair += 2;
+  }
+  if (length % 2 != 0) writeValue(s, storage, position + length - 3, readValue(s, storage, position + length - 1));
+  position -= 2;
+  int part = 2;
+  while (part < blockLength) {
+    int left = 0, right = length - 2 * part;
+    while (left <= right) { mergeLeft(s, storage, position + left, part, part, -part); left += 2 * part; }
+    int rest = length - left;
+    if (rest > part) mergeLeft(s, storage, position + left, part, rest - part, -part);
+    else while (left < length) {
+      writeValue(s, storage, position + left - part, readValue(s, storage, position + left));
+      left++;
+    }
+    position -= part;
+    part *= 2;
+  }
+  int remainder = length % (2 * blockLength), leftover = length - remainder;
+  if (remainder <= blockLength)
+    copyValues(s, storage, position + leftover, storage, position + leftover + blockLength, remainder);
+  else mergeRight(s, storage, position + leftover, blockLength, remainder - blockLength, blockLength);
+  while (leftover > 0) {
+    leftover -= 2 * blockLength;
+    mergeRight(s, storage, position + leftover, blockLength, blockLength, blockLength);
+  }
+}
+private static void combineBlocks(State s, int storage, int position, int length, int runLength, int blockLength) {
+  int combineCount = length / (2 * runLength), remainder = length % (2 * runLength);
+  if (remainder <= runLength) { length -= remainder; remainder = 0; }
+  for (int group = 0; group <= combineCount; group++) {
+    if (group == combineCount && remainder == 0) break;
+    int groupPosition = position + group * 2 * runLength;
+    int count = (group == combineCount ? remainder : 2 * runLength) / blockLength;
+    int tagEnd = count + (group == combineCount ? 1 : 0);
+    for (int tag = 0; tag <= tagEnd; tag++) s.tags[tag] = tag;
+    int middle = runLength / blockLength;
+    for (int tagIndex = 1; tagIndex < count; tagIndex++) {
+      int selected = tagIndex - 1;
+      for (int candidate = tagIndex; candidate < count; candidate++) {
+        int order = compare(s, storage, groupPosition + selected * blockLength,
+                            storage, groupPosition + candidate * blockLength);
+        if (order > 0 || (order == 0 && s.tags[selected] > s.tags[candidate])) selected = candidate;
+      }
+      if (selected != tagIndex - 1) {
+        for (int offset = 0; offset < blockLength; offset++)
+          swapValues(s, storage, groupPosition + (tagIndex - 1) * blockLength + offset,
+                     groupPosition + selected * blockLength + offset);
+        int firstTag = s.tags[tagIndex - 1];
+        s.tags[tagIndex - 1] = s.tags[selected];
+        s.tags[selected] = firstTag;
       }
     }
+    int trailingA = 0, tail = group == combineCount ? remainder % blockLength : 0;
+    if (tail != 0) while (trailingA < count && compare(s, storage, groupPosition + count * blockLength,
+              storage, groupPosition + (count - trailingA - 1) * blockLength) < 0) trailingA++;
+    mergeBuffers(s, storage, groupPosition, middle, count - trailingA, blockLength, trailingA, tail);
   }
-
-  private static int binarySearch(int[] arr, int a, int b, int value, boolean left) {
-    while (a < b) {
-      int mid = a + (b - a) / 2;
-      boolean comp = left ? value <= arr[mid] : value < arr[mid];
-      if (comp) {
-        b = mid;
-      } else {
-        a = mid + 1;
-      }
-    }
-    return a;
+  if (length > 0) for (int index = length - 1; index >= 0; index--)
+    writeValue(s, storage, position + index, readValue(s, storage, position + index - blockLength));
+}
+private static void commonSort(State s, int storage, int position, int length, int prefix, int prefixPosition) {
+  if (length <= 16) { insertion(s, storage, position, length); return; }
+  int blockLength = 1;
+  while (blockLength * blockLength < length) blockLength *= 2;
+  copyValues(s, storage, position, prefix, prefixPosition, blockLength);
+  commonSort(s, prefix, prefixPosition, blockLength, storage, position);
+  buildBlocks(s, storage, position + blockLength, length - blockLength, blockLength);
+  int runLength = blockLength;
+  while (true) {
+    runLength *= 2;
+    if (length <= runLength) break;
+    combineBlocks(s, storage, position + blockLength, length - blockLength, runLength, blockLength);
   }
-
-  private static void sqrtMerge(int[] arr, int a, int m, int b) {
-    if (m - a <= blockSize && b - m <= blockSize) {
-      int[] temp = Arrays.copyOfRange(arr, a, b);
-      int i = 0;
-      int j = m - a;
-      for (int k = a; k < b; k++) {
-        if (i < m - a && (j == b - a || temp[i] <= temp[j])) {
-          arr[k] = temp[i++];
-        } else {
-          arr[k] = temp[j++];
-        }
-      }
-      return;
-    }
-    int m1;
-    int m2;
-    int m3;
-    if (m - a >= b - m) {
-      m1 = a + (m - a) / 2;
-      int value = arr[m1];
-      m2 = binarySearch(arr, m, b, value, true);
-      m3 = m1 + (m2 - m);
-    } else {
-      m2 = m + (b - m) / 2;
-      int value = arr[m2];
-      m1 = binarySearch(arr, a, m, value, false);
-      m3 = m2 - (m - m1);
-      m2 = m2 + 1;
-    }
-    rotate(arr, m1, m, m2);
-    if (m2 - (m3 + 1) > 0 && b - m2 > 0) {
-      sqrtMerge(arr, m3 + 1, m2, b);
-    }
-    if (m1 - a > 0 && m3 - m1 > 0) {
-      sqrtMerge(arr, a, m1, m3);
-    }
-  }
-
-  private static void sqrtSort(int[] arr, int a, int b) {
-    int len = b - a;
-    for (int start = a; start < b; start += 32) {
-      int end = Math.min(start + 32, b);
-      for (int i = start + 1; i < end; i++) {
-        int value = arr[i];
-        int j = i;
-        while (j > start && arr[j - 1] > value) {
-          arr[j] = arr[j - 1];
-          j--;
-        }
-        arr[j] = value;
-      }
-    }
-    for (int j = 32; j < len; j *= 2) {
-      int i;
-      for (i = a; i + 2 * j <= b; i += 2 * j) {
-        sqrtMerge(arr, i, i + j, i + 2 * j);
-      }
-      if (i + j < b) {
-        sqrtMerge(arr, i, i + j, b);
-      }
-    }
-  }
-
+  mergeDown(s, storage, position + blockLength, prefix, prefixPosition, length - blockLength, blockLength);
+}
+public static void sort(int[] a, int n) {
+  if (n < 2) return;
+  int bufferLength = 1;
+  while (bufferLength * bufferLength < n) bufferLength *= 2;
+  State s = new State();
+  s.a = a;
+  s.buffer = new int[bufferLength];
+  s.tags = new int[(n - 1) / bufferLength + 2];
+  commonSort(s, 0, 0, n, 1, 0);
+}
   public static void main(String[] args) {
-    int[] array = {
-      0, 39, 21, 62, 91, 77, 14, 23,
-      90, 69, 51, 81, 68, 83, 32, 56
-    };
-    sort(array);
-    System.out.println(Arrays.toString(array));
+    int[] array = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+    sort(array, array.length);
+    System.out.println(java.util.Arrays.toString(array));
   }
 }
