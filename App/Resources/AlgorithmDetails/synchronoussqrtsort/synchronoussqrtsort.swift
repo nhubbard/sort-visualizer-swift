@@ -1,5 +1,6 @@
 // MIT License
 // Copyright (c) 2021 The Holy Grail Sort Project, implemented by aphitorite
+// Copyright (c) 2020-2021 aphitorite
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy of this software
 // and associated documentation files (the "Software"), to deal in the Software without
@@ -16,37 +17,15 @@
 // DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-typealias AuxHandle = Int
-
-struct RecordingEngine {
+final class SynchronousSqrtExample {
   var values: [Int]
-  var count: Int { values.count }
-  init(_ values: [Int]) { self.values = values }
-  func readValue(at index: Int) -> Int { values[index] }
-  mutating func setValue(_ index: Int, _ value: Int) { values[index] = value }
-  mutating func swap(_ first: Int, _ second: Int) { values.swapAt(first, second) }
-  func compare(_ first: Int, _ second: Int, by relation: (Int, Int) -> Bool) -> Bool {
-    relation(values[first], values[second])
-  }
-  func compareValue(_ index: Int, against value: Int, by relation: (Int, Int) -> Bool) -> Bool {
-    relation(values[index], value)
-  }
-  mutating func createAuxArray(length: Int) -> AuxHandle { 0 }
-  func markAuxRead(_ handle: AuxHandle, at index: Int) {}
-  func writeAux(_ handle: AuxHandle, at index: Int, value: Int) {}
-  mutating func deleteAuxArray(_ handle: AuxHandle) {}
-}
-
-class BlockMergeSortingTemplate {
-  var engine: RecordingEngine
-
-  init(engine: RecordingEngine) { self.engine = engine }
+  init(_ input: [Int]) { values = input }
 
   func shiftForwardExternal(_ destination: Int, _ source: Int, _ end: Int) {
     var output = destination
     var input = source
     while input < end {
-      engine.setValue(output, engine.readValue(at: input))
+      values[output] = values[input]
       output += 1
       input += 1
     }
@@ -58,7 +37,7 @@ class BlockMergeSortingTemplate {
     while input > start {
       input -= 1
       output -= 1
-      engine.setValue(output, engine.readValue(at: input))
+      values[output] = values[input]
     }
   }
 
@@ -67,7 +46,7 @@ class BlockMergeSortingTemplate {
     var upper = end
     while lower < upper {
       let middle = lower + (upper - lower) / 2
-      if engine.compareValue(middle, against: value, by: (<=)) {
+      if (values[middle] <= value) {
         lower = middle + 1
       } else {
         upper = middle
@@ -79,20 +58,20 @@ class BlockMergeSortingTemplate {
   func binaryInsertion(_ start: Int, _ end: Int) {
     guard end - start > 1 else { return }
     for index in (start + 1)..<end {
-      let value = engine.readValue(at: index)
+      let value = values[index]
       let position = rightBinarySearch(start, index, value)
       var cursor = index
       while cursor > position {
-        engine.setValue(cursor, engine.readValue(at: cursor - 1))
+        values[cursor] = values[cursor - 1]
         cursor -= 1
       }
-      if position != index { engine.setValue(position, value) }
+      if position != index { values[position] = value }
     }
   }
 
   func multiSwap(_ first: Int, _ second: Int, _ length: Int) {
     guard length > 0 else { return }
-    for offset in 0..<length { engine.swap(first + offset, second + offset) }
+    for offset in 0..<length { values.swapAt(first + offset, second + offset) }
   }
 
   func mergeForwardExternal(_ start: Int, _ middle: Int, _ end: Int, _ destination: Int) {
@@ -100,11 +79,11 @@ class BlockMergeSortingTemplate {
     var right = middle
     var output = destination
     while left < middle && right < end {
-      if engine.compare(left, right, by: (<=)) {
-        engine.setValue(output, engine.readValue(at: left))
+      if (values[left] <= values[right]) {
+        values[output] = values[left]
         left += 1
       } else {
-        engine.setValue(output, engine.readValue(at: right))
+        values[output] = values[right]
         right += 1
       }
       output += 1
@@ -119,43 +98,35 @@ class BlockMergeSortingTemplate {
     var output = destinationEnd
     while right >= middle && left >= start {
       output -= 1
-      if engine.compare(right, left, by: (>=)) {
-        engine.setValue(output, engine.readValue(at: right))
+      if (values[right] >= values[left]) {
+        values[output] = values[right]
         right -= 1
       } else {
-        engine.setValue(output, engine.readValue(at: left))
+        values[output] = values[left]
         left -= 1
       }
     }
     if output > right { shiftBackwardExternal(middle, right + 1, output) }
     shiftBackwardExternal(start, left + 1, output)
   }
-}
 
-private final class SynchronousSqrtRecorder: BlockMergeSortingTemplate {
   private var prefix: [Int] = []
   private var tags: [Int] = []
-  private var prefixHandle: AuxHandle?
-  private var tagHandle: AuxHandle?
 
   private func readPrefix(_ index: Int) -> Int {
-    engine.markAuxRead(prefixHandle!, at: index)
     return prefix[index]
   }
 
   private func writePrefix(_ index: Int, _ value: Int) {
     prefix[index] = value
-    engine.writeAux(prefixHandle!, at: index, value: value)
   }
 
   private func readTag(_ index: Int) -> Int {
-    engine.markAuxRead(tagHandle!, at: index)
     return tags[index]
   }
 
   private func writeTag(_ index: Int, _ value: Int) {
     tags[index] = value
-    engine.writeAux(tagHandle!, at: index, value: value)
   }
 
   private func swapTags(_ first: Int, _ second: Int) {
@@ -169,13 +140,13 @@ private final class SynchronousSqrtRecorder: BlockMergeSortingTemplate {
     var right = end - 1
     var output = destinationEnd
     while left >= start && right >= middle {
-      let takeLeft = reversed ? engine.compare(left, right, by: (>=)) : engine.compare(left, right, by: (>))
+      let takeLeft = reversed ? (values[left] >= values[right]) : (values[left] > values[right])
       output -= 1
       if takeLeft {
-        engine.setValue(output, engine.readValue(at: left))
+        values[output] = values[left]
         left -= 1
       } else {
-        engine.setValue(output, engine.readValue(at: right))
+        values[output] = values[right]
         right -= 1
       }
     }
@@ -196,8 +167,8 @@ private final class SynchronousSqrtRecorder: BlockMergeSortingTemplate {
       var candidate = minimum + blockLength
       while candidate < end {
         if candidate != vacant {
-          let order = engine.compare(candidate, minimum, by: (<))
-          let equal = !order && engine.compare(candidate, minimum, by: (==))
+          let order = (values[candidate] < values[minimum])
+          let equal = !order && (values[candidate] == values[minimum])
           if order || (equal && readTag(tagStart + (candidate - start) / blockLength) < readTag(tagStart + (minimum - start) / blockLength)) {
             minimum = candidate
           }
@@ -207,7 +178,7 @@ private final class SynchronousSqrtRecorder: BlockMergeSortingTemplate {
       if minimum > current {
         if vacant == current {
           for offset in 0..<blockLength {
-            engine.setValue(current + offset, engine.readValue(at: minimum + offset))
+            values[current + offset] = values[minimum + offset]
           }
           writeTag(tagStart + (current - start) / blockLength, readTag(tagStart + (minimum - start) / blockLength))
           vacant = minimum
@@ -240,7 +211,7 @@ private final class SynchronousSqrtRecorder: BlockMergeSortingTemplate {
   }
 
   func sort() {
-    let length = engine.count
+    let length = values.count
     if length <= 16 {
       binaryInsertion(0, length)
       return
@@ -254,10 +225,8 @@ private final class SynchronousSqrtRecorder: BlockMergeSortingTemplate {
     var runLength = 1
     prefix = Array(repeating: 0, count: start)
     tags = Array(repeating: 0, count: (length - 1) / blockLength + 1)
-    prefixHandle = engine.createAuxArray(length: prefix.count)
-    tagHandle = engine.createAuxArray(length: tags.count)
     binaryInsertion(0, start)
-    for index in 0..<start { writePrefix(index, engine.readValue(at: index)) }
+    for index in 0..<start { writePrefix(index, values[index]) }
 
     while runLength < blockLength {
       let distance = max(2, runLength)
@@ -330,28 +299,24 @@ private final class SynchronousSqrtRecorder: BlockMergeSortingTemplate {
     var output = 0
     while left < start && right < end {
       let prefixValue = readPrefix(left)
-      if engine.compareValue(right, against: prefixValue, by: (>=)) {
-        engine.setValue(output, prefixValue)
+      if (values[right] >= prefixValue) {
+        values[output] = prefixValue
         left += 1
       } else {
-        engine.setValue(output, engine.readValue(at: right))
+        values[output] = values[right]
         right += 1
       }
       output += 1
     }
     while left < start {
-      engine.setValue(output, readPrefix(left))
+      values[output] = readPrefix(left)
       left += 1
       output += 1
     }
-    engine.deleteAuxArray(tagHandle!)
-    engine.deleteAuxArray(prefixHandle!)
   }
 }
 
-var engine = RecordingEngine([0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81,
-                              68, 83, 32, 56])
-private let worker = SynchronousSqrtRecorder(engine: engine)
-worker.sort()
-engine = worker.engine
-print(engine.values)
+var example = SynchronousSqrtExample([0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81,
+                                      68, 83, 32, 56])
+example.sort()
+print(example.values)
