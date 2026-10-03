@@ -30,7 +30,13 @@ public struct TapeArchiveDocument: Transferable {
 
   public static var transferRepresentation: some TransferRepresentation {
     DataRepresentation(exportedContentType: .tapeArchive) { document in
-      try document.tape.archived()
+      #if DEBUG
+        // UI tests use the normal Files save/import journey to verify corrupt archive recovery.
+        if ProcessInfo.processInfo.environment["UI_TEST_EXPORT_CORRUPT_TAPE"] == "1" {
+          return Data("not a tape archive".utf8)
+        }
+      #endif
+      return try document.tape.archived()
     }
     .suggestedFileName { document in
       document.suggestedFileName

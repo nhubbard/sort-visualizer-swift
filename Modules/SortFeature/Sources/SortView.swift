@@ -237,6 +237,15 @@ public struct SortView: View {
     MetalRendererView(replay: replay, visualizerID: settings.selectedVisualizerID)
       .id(ObjectIdentifier(replay))
       .accessibilityIdentifier("sortVisualizationCanvas")
+      .accessibilityLabel(
+        ProcessInfo.processInfo.environment["UI_TEST_TAPE_METADATA_PROBE"] == "1"
+          ? "\(replay.tape.header.algorithmID)|\(replay.tape.header.shuffleID ?? "")|"
+            + "\(replay.tape.header.visualSeed)|\(replay.tape.header.recordedAt.timeIntervalSince1970)|"
+            + "\(replay.tape.header.compareCount)|\(replay.tape.header.swapCount)|"
+            + "\(replay.tape.header.sortStartIndex)|\(replay.tape.operations.count)|"
+            + replay.tape.header.initialValues.map(String.init).joined(separator: ",")
+          : "Sort visualization"
+      )
       .accessibilityValue(
         ProcessInfo.processInfo.environment["UI_TEST_EXPOSE_FRAME"] == "1"
           ? "\(replay.stepIndex)|\(replay.totalOperationCount)|\(session.arraySize)|\(Int(replay.speed))|"

@@ -1,10 +1,7 @@
 import XCTest
 
-/// Proves the Export/Import Tape buttons (see Documentation/docs/architecture/history.md for the
-/// feature's origin) are actually wired into the running app and reachable — the same
-/// "reachable and functional" bar `RunControlBarUITests` sets for the rest of the run control
-/// bar. Catalyst also exercises the full native save, relaunch, and import flow; iPad tests
-/// verify panel presentation while archive and coordinator tests verify the data path.
+/// Exercises native tape save/import controls and verifies that an imported tape replays the
+/// same recorded run after app relaunch. The engine's archive tests cover exact operation data.
 @MainActor
 final class TapeExportImportUITests: XCTestCase {
   override func setUpWithError() throws {
@@ -111,6 +108,107 @@ final class TapeExportImportUITests: XCTestCase {
     app.typeKey(.escape, modifierFlags: [])
   }
 
+  private var tapeEnvironment: [String: String] {
+    ["UI_TEST_ARRAY_SIZE": "24", "UI_TEST_PLAYBACK_SPEED": "1000",
+      "UI_TEST_DETERMINISTIC_REPLAY": "1", "UI_TEST_EXPOSE_FRAME": "1",
+      "UI_TEST_TAPE_METADATA_PROBE": "1"]
+  }
+
+  private func completedTapeSnapshot(in app: XCUIApplication) -> (metadata: String, frame: String) {
+    let status = app.staticTexts["sortStatusLabel"]
+    let sorted = XCTNSPredicateExpectation(
+      predicate: NSPredicate(format: "value == %@", "sorted"), object: status)
+    XCTAssertEqual(XCTWaiter().wait(for: [sorted], timeout: 60), .completed)
+    let canvas = app.descendants(matching: .any)
+      .matching(identifier: "sortVisualizationCanvas").firstMatch
+    XCTAssertTrue(canvas.waitForExistence(timeout: 5))
+    app.activateControlForUITest(app.buttons["runControlJumpToEndButton"])
+    let value = canvas.value as? String ?? ""
+    XCTAssertTrue(value.contains("|"), "missing replay frame probe")
+    let metadata = canvas.label
+    XCTAssertTrue(metadata.contains("|"), "missing tape metadata probe")
+    return (metadata, value)
+  }
+
+  #if !targetEnvironment(macCatalyst)
+  private func saveTapeToFiles(in app: XCUIApplication, named filename: String) {
+    app.buttons["runControlExportTapeButton"].tap()
+    XCTAssertTrue(app.cells["Save to Files"].waitForExistence(timeout: 5))
+    app.cells["Save to Files"].tap()
+    XCTAssertTrue(app.otherElements["Browse View (Picker)"].waitForExistence(timeout: 10))
+    let name = app.textFields["DOCPicker.filenameTextField"]
+    XCTAssertTrue(name.waitForExistence(timeout: 5))
+    name.tap()
+    name.typeKey("a", modifierFlags: .command)
+    name.typeText(filename)
+    app.buttons["DOCPicker.actionButton"].tap()
+    let picker = app.otherElements["Browse View (Picker)"]
+    let dismissed = XCTNSPredicateExpectation(
+      predicate: NSPredicate(format: "exists == false"), object: picker)
+    XCTAssertEqual(XCTWaiter().wait(for: [dismissed], timeout: 10), .completed)
+  }
+
+  private func importFileFromFiles(in app: XCUIApplication, named filename: String) {
+    app.buttons["importTapeButton"].tap()
+    XCTAssertTrue(app.otherElements["Browse View (Picker)"].waitForExistence(timeout: 10))
+    let file = app.descendants(matching: .any)
+      .matching(NSPredicate(format: "label CONTAINS %@", filename)).firstMatch
+    if !file.waitForExistence(timeout: 10) {
+      let tree = XCTAttachment(string: app.debugDescription)
+      tree.name = "ipad-import-picker-missing-archive"
+      tree.lifetime = .keepAlways
+      add(tree)
+      XCTFail("saved tape missing from iPad import picker")
+      return
+    }
+    file.tap()
+  }
+
+  func testSavedTapeImportsIntoAFreshAppSession() {
+    let app = XCUIApplication()
+    app.launchEnvironment = tapeEnvironment
+    app.launch()
+    app.buttons["algorithmLink.threesmoothcombsortiterative"].tap()
+    let original = completedTapeSnapshot(in: app)
+    let filename = "tap02-\(UUID().uuidString)"
+    saveTapeToFiles(in: app, named: filename)
+
+    app.terminate()
+    app.launch()
+    importFileFromFiles(in: app, named: filename)
+    let imported = completedTapeSnapshot(in: app)
+    XCTAssertEqual(imported.metadata, original.metadata)
+    XCTAssertEqual(imported.frame, original.frame)
+  }
+
+  func testCorruptTapeShowsARecoverableImportError() {
+    let app = XCUIApplication()
+    app.launchEnvironment = tapeEnvironment.merging(["UI_TEST_EXPORT_CORRUPT_TAPE": "1"]) { _, new in new }
+    app.launch()
+    app.buttons["algorithmLink.threesmoothcombsortiterative"].tap()
+    _ = completedTapeSnapshot(in: app)
+    let filename = "tap02-corrupt-\(UUID().uuidString)"
+    saveTapeToFiles(in: app, named: filename)
+
+    app.terminate()
+    app.launchEnvironment = tapeEnvironment
+    app.launch()
+    app.buttons["algorithmLink.threesmoothcombsortiterative"].tap()
+    let original = completedTapeSnapshot(in: app)
+    importFileFromFiles(in: app, named: filename)
+    let alert = app.alerts["Import Failed"]
+    XCTAssertTrue(alert.waitForExistence(timeout: 10), "a corrupt tape must show a visible error")
+    XCTAssertTrue(alert.staticTexts.matching(
+      NSPredicate(format: "label BEGINSWITH %@", "Couldn't import")
+    ).firstMatch.exists)
+    alert.buttons["OK"].tap()
+    XCTAssertFalse(alert.exists)
+    let afterFailure = completedTapeSnapshot(in: app)
+    XCTAssertEqual(afterFailure.metadata, original.metadata)
+    XCTAssertEqual(afterFailure.frame, original.frame)
+  }
+  #endif
+
   #if targetEnvironment(macCatalyst)
     func testSavedTapeImportsIntoAFreshAppSession() throws {
       let folder = FileManager.default.temporaryDirectory
@@ -120,9 +218,10 @@ final class TapeExportImportUITests: XCTestCase {
       let archiveURL = folder.appendingPathComponent("roundtrip.tape")
 
       let app = XCUIApplication()
-      app.launchEnvironment = ["UI_TEST_ARRAY_SIZE": "24", "UI_TEST_PLAYBACK_SPEED": "1000"]
+      app.launchEnvironment = tapeEnvironment
       app.launch()
       app.tapSidebarLink("algorithmLink.quicksort")
+      let original = completedTapeSnapshot(in: app)
 
       let exportButton = app.buttons["runControlExportTapeButton"]
       XCTAssertTrue(exportButton.waitForExistence(timeout: 5))
@@ -162,11 +261,9 @@ final class TapeExportImportUITests: XCTestCase {
       file.click()
       openPanel.buttons["OKButton"].click()
 
-      let status = app.staticTexts["sortStatusLabel"]
-      XCTAssertTrue(status.waitForExistence(timeout: 10))
-      let sorted = XCTNSPredicateExpectation(
-        predicate: NSPredicate(format: "value == %@", "sorted"), object: status)
-      XCTAssertEqual(XCTWaiter().wait(for: [sorted], timeout: 30), .completed)
+      let imported = completedTapeSnapshot(in: app)
+      XCTAssertEqual(imported.metadata, original.metadata)
+      XCTAssertEqual(imported.frame, original.frame)
     }
 
     func testCorruptTapeShowsARecoverableImportError() throws {
@@ -177,7 +274,10 @@ final class TapeExportImportUITests: XCTestCase {
       try Data("not a tape archive".utf8).write(to: folder.appendingPathComponent("corrupt.tape"))
 
       let app = XCUIApplication()
+      app.launchEnvironment = tapeEnvironment
       app.launch()
+      app.tapSidebarLink("algorithmLink.quicksort")
+      let original = completedTapeSnapshot(in: app)
       app.buttons["download"].click()
       let openPanel = app.sheets["open-panel"]
       XCTAssertTrue(openPanel.waitForExistence(timeout: 5))
@@ -199,7 +299,9 @@ final class TapeExportImportUITests: XCTestCase {
       ).firstMatch.exists)
       alert.buttons["OK"].click()
       XCTAssertFalse(alert.exists, "the user must be able to dismiss the import error")
-      XCTAssertFalse(app.staticTexts["sortStatusLabel"].exists)
+      let afterFailure = completedTapeSnapshot(in: app)
+      XCTAssertEqual(afterFailure.metadata, original.metadata)
+      XCTAssertEqual(afterFailure.frame, original.frame)
     }
 
     private func goToFolder(_ folder: URL, in app: XCUIApplication) {
