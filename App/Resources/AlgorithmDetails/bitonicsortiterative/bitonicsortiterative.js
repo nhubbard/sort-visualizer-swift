@@ -7,7 +7,10 @@ function sort(arr) {
         let l = i ^ j;
         if (l > i && l < n) {
           const ascending = ((i & k) === 0) === m;
-          if ((ascending && arr[i] > arr[l]) || (!ascending && arr[i] < arr[l])) {
+          if (
+            (ascending && arr[i] > arr[l]) ||
+            (!ascending && arr[i] < arr[l])
+          ) {
             [arr[i], arr[l]] = [arr[l], arr[i]];
           }
         }
@@ -16,9 +19,6 @@ function sort(arr) {
   }
 }
 
-const array = [
-  0, 39, 21, 62, 91, 77, 14, 23,
-  90, 69, 51, 81, 68, 83, 32, 56,
-];
+const array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56];
 sort(array);
 console.log("[" + array.join(", ") + "]");

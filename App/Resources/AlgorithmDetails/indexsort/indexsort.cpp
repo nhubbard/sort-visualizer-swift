@@ -1,8 +1,7 @@
 #include <cstdio>
 #include <utility>
 
-int array[16] = {7, 3, 14, 0, 9, 5, 12, 1,
-                 15, 4, 10, 2, 13, 6, 11, 8};
+int array[16] = {7, 3, 14, 0, 9, 5, 12, 1, 15, 4, 10, 2, 13, 6, 11, 8};
 
 void printList(int items[], int size) {
   printf("[");

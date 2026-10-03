@@ -1,8 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
-                 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
 
 void swap(int *a, int *b) {
   int t = *a;
@@ -26,9 +25,7 @@ int binarySearchMid(int arr[], int start, int mid, int end);
 void multiSwapMerge(int arr[], int start, int mid, int end);
 void multiSwapMergeSort(int arr[], int a, int b);
 
-void sort(int arr[], int n) {
-  multiSwapMergeSort(arr, 0, n);
-}
+void sort(int arr[], int n) { multiSwapMergeSort(arr, 0, n); }
 
 void multiSwap(int arr[], int a, int b, int len) {
   for (int i = 0; i < len; i++) {

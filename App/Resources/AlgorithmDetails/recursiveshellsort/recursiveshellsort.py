@@ -1,6 +1,7 @@
 def sort(arr):
     recursive_shell_sort(arr, 0, len(arr), 1)
 
+
 def gapped_insertion_sort(array, a, b, gap):
     i = a + gap
     while i < b:
@@ -10,6 +11,7 @@ def gapped_insertion_sort(array, a, b, gap):
             j -= gap
         i += gap
 
+
 def recursive_shell_sort(array, start, end, g):
     if start + g <= end:
         recursive_shell_sort(array, start, end, 3 * g)
@@ -18,12 +20,24 @@ def recursive_shell_sort(array, start, end, g):
         gapped_insertion_sort(array, start, end, g)
 
 
-
-
 if __name__ == "__main__":
     array = [
-        0, 39, 21, 62, 91, 77, 14, 23,
-        90, 69, 51, 81, 68, 83, 32, 56,
+        0,
+        39,
+        21,
+        62,
+        91,
+        77,
+        14,
+        23,
+        90,
+        69,
+        51,
+        81,
+        68,
+        83,
+        32,
+        56,
     ]
     sort(array)
     print(array)

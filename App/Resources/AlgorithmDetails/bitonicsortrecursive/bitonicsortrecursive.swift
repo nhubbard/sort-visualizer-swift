@@ -39,7 +39,6 @@ func bitonicSort(_ array: inout [Int], _ lo: Int, _ n: Int, _ dir: Bool) {
     }
 }
 
-
 var array: [Int] = [
     0, 39, 21, 62, 91, 77, 14, 23,
     90, 69, 51, 81, 68, 83, 32, 56,

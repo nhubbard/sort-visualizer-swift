@@ -14,7 +14,7 @@ final class DefaultPlaybackSpeedUITests: XCTestCase {
     // Now that portrait is a genuinely supported orientation (not just coerced to landscape by
     // iOS), the simulator's own default boot orientation (portrait) would otherwise leak into
     // this test unpinned — see `ScreenshotUITests`' identical rationale.
-    XCUIDevice.shared.orientation = .landscapeLeft
+    useLandscapeOrientationForUITest()
   }
 
   func testChangingDefaultPlaybackSpeedSeedsANewlyOpenedSort() throws {
@@ -25,7 +25,7 @@ final class DefaultPlaybackSpeedUITests: XCTestCase {
     app.tapSidebarLink("algorithmLink.quicksort")
     let speedButton = app.buttons["runControlSpeedButton"]
     XCTAssertTrue(speedButton.waitForExistence(timeout: 5))
-    speedButton.tap()  // expands the inline speed row
+    app.activateControlForUITest(speedButton)  // expands the inline speed row
 
     let speedValueLabel = app.staticTexts["runControlSpeedValueLabel"]
     XCTAssertTrue(speedValueLabel.waitForExistence(timeout: 5))
@@ -36,9 +36,7 @@ final class DefaultPlaybackSpeedUITests: XCTestCase {
 
     // Bonus sanity check in the other direction: the Settings screen's own caption reads the
     // same `AppSettings.playbackSpeed`, so it should reflect the externally-set value too.
-    let settingsButton = app.buttons["settingsButton"]
-    XCTAssertTrue(settingsButton.waitForExistence(timeout: 5))
-    settingsButton.tap()
+    app.openSettingsForUITest()
     let speedSlider = app.sliders["playbackSpeedSlider"]
     scrollUntilVisible(speedSlider, in: app)
     let caption = app.staticTexts.matching(
@@ -62,7 +60,7 @@ final class DefaultPlaybackSpeedUITests: XCTestCase {
   /// entirely.
   private func scrollUntilVisible(_ element: XCUIElement, in app: XCUIApplication) {
     for _ in 0..<5 where !element.exists {
-      app.swipeUp(velocity: .slow)
+      app.scrollSettingsUpForUITest()
     }
     XCTAssertTrue(element.waitForExistence(timeout: 5), "\(element) never scrolled into view")
   }

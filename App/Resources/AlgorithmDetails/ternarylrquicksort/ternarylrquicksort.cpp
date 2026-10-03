@@ -2,8 +2,7 @@
 #include <cstdio>
 #include <utility>
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
-                 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
 
 void printList(int items[], int size) {
   printf("[");
@@ -20,9 +19,7 @@ int compare3(int arr[], int a, int b);
 int selectPivot(int arr[], int lo, int hi);
 void quicksortTernaryLR(int arr[], int lo, int hi);
 
-void sort(int arr[], int n) {
-  quicksortTernaryLR(arr, 0, n - 1);
-}
+void sort(int arr[], int n) { quicksortTernaryLR(arr, 0, n - 1); }
 
 int compare3(int arr[], int a, int b) {
   if (arr[a] == arr[b])

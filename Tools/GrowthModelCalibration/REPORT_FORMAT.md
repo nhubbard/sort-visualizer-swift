@@ -18,17 +18,16 @@ under that cap, but those bounds were originally hand-guessed. This benchmark in
    safety margin baked in (it solves for 80% of the cap, not 100%).
 4. Verifies the answer by evaluating the model back against the cap and backing off if needed.
 
-The "operation count" measured throughout is a **tape-size estimate**, not the raw comparison
-count: `5×(compares + swaps) + setValues + auxWrites + reversals`. The `5×` factor on compares/
-swaps accounts for the marker-highlighting bookkeeping (`RecordingEngine.markPrimarySecondary`)
-that piggybacks on every one of those calls in the real recorded tape.
+The operation count is `RecordingSummary.totalOperationCount`, the exact number of tape entries
+the recording attempted. `RecordingEngine` continues this counter after its retention cap stops
+the tape from growing, so calibration can measure large runs without retaining every operation.
 
 ## Two files, two kinds of subject
 
 - **`sort-growth-models.json`**: one entry per built-in *sort* algorithm. Sorts are profiled
-  against all 38 registered shuffles independently (a sort's real growth can depend heavily on
-  which shuffle produced its input — see `subjectID` below) and only the **binding** (most
-  restrictive) shuffle's result is kept.
+  against every registered shuffle independently (a sort's real growth can depend heavily on
+  which shuffle produced its input — see `subjectID` below). The most restrictive fitted curve
+  is kept, while the measured safety ceiling is aggregated independently across every shuffle.
 - **`shuffle-growth-models.json`**: one entry per built-in *shuffle*. Shuffles are profiled
   standalone, starting from an identity (sorted) array — no sort involved.
 
@@ -47,6 +46,7 @@ ever changes that algorithm's own entry in a diff, never the position of any oth
 | `coefficients` | number array | The winning family's fitted parameters — **what they mean depends on `winningFamily`**, see the table below. |
 | `sampleSizes` | integer array | The actual array sizes (`n`) that were measured (not predicted/skipped) to produce this fit. |
 | `safeMaxSizeByCap` | object (see caveat below) | The computed max safe array size at three reference operation caps: 100,000 / 300,000 / 1,000,000. A cap missing from this map means no positive solution was found — see "No entry for a cap" below. |
+| `measuredSafeCeiling` | integer? | For sort reports, the minimum last-fully-completed size across every shuffle that encountered a hang or erratic jump. This includes shuffles that stopped too early to fit a curve. Every `safeMaxSizeByCap` value is clamped to this algorithm-wide ceiling. Omitted when no shuffle encountered an unsafe size. |
 | `unsafeAtSize` | integer? | Present only if measurement stopped early because of a detected problem at this array size (see `unsafeReason`). Every `safeMaxSizeByCap` value is already clamped below this size — it's kept here so you can see *why* a result looks more conservative than the curve alone would suggest, and to flag algorithms that need a real bug fixed. |
 | `unsafeReason` | string? | `"hang"` — a trial at `unsafeAtSize` genuinely never returned (8× the per-trial time budget elapsed with no result). Very likely a real non-terminating bug in that specific algorithm/shuffle combination, not just slowness. `"erratic jump"` — the measured value at `unsafeAtSize` was 100×+ larger than the established trend from smaller sizes predicted. Not a hang, but a sign of genuinely discontinuous/unpredictable behavior (that data point is excluded from the fit entirely, not just capped around). |
 
@@ -111,14 +111,16 @@ found — everything in these files should already satisfy:
   100× the largest measured sample. A curve that predicts *fewer* operations for a *larger* array
   is rejected outright, however well it scores on the sampled points.
 - **Hang/erratic-jump awareness**: see `unsafeAtSize`/`unsafeReason` above.
+- **Safety evidence survives failed fitting**: an algorithm/shuffle pair that stops too early to
+  fit a curve still constrains `measuredSafeCeiling`. If a shuffle cannot complete the starting
+  size, calibration fails instead of emitting an algorithm report.
 
-## `unsafeReason` flags in this data (as of this run)
+## `unsafeReason` flags in this data
 
-Only one subject in the current data is flagged: `cocktailbogosort+finalradix` (`erratic jump` at
-size 14). That's expected, not a bug — `CocktailBogoSort` is a genuinely `O(n·n!)`-family
-"Impractical Sort" (a deterministic permutation walk), and the real jump between its `n=7` and
-`n=14` measurements reflects true factorial blowup (`14!/7! ≈ 17 million×`) outrunning a curve
-fitted to just 4 small points, not a measurement artifact.
+The current report records each binding curve's own `unsafeReason`; `measuredSafeCeiling` can be
+more restrictive when another shuffle stopped too early to fit a curve. For example,
+`bogobogosort+grailbad` supplies Bogo Bogo Sort's fitted curve, but an erratic jump from another
+shuffle constrains its algorithm-wide ceiling to 4.
 
 Two other classes of finding surfaced and were resolved earlier in this data's history, in case
 you're comparing against an older copy of these files:

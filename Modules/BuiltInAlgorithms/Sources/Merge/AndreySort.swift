@@ -17,19 +17,11 @@ import SortEngineKit
 /// `var`s decremented in the same order the post-decrement operators evaluate them (use current
 /// value, then decrement).
 ///
-/// **Known real bug, inherited from ArrayV, not a translation artifact**: `rmerge` selects which
-/// block to move into place by comparing only each block's *leading* element, then moves the
-/// whole block — silently assuming no other pending block holds a value smaller than this block's
-/// own trailing values. Heavy duplication can violate that assumption (confirmed by transcribing
-/// this exact algorithm to a standalone Java program with no ArrayV dependencies at all and
-/// reproducing the same wrong output on the same input — see
-/// `andreySortSortsReliablyExceptOnHeavyDuplicates` in `NativeAlgorithmCorrectnessTests.swift`,
-/// which deliberately excludes this algorithm from the generic fuzz suite for exactly this
-/// reason). Measured failure rate is real but narrow — roughly 1-8% depending on array size, only
-/// with heavy duplication, never on already-sorted/reverse-sorted/mostly-distinct input. This is a
-/// documented weakness of this specific, simpler member of Andrey Astrelin's merge-sort lineage:
-/// his own later `GrailSort` (already shipped separately in this codebase) explicitly added
-/// fallback handling for low-key-diversity input that this earlier algorithm never had.
+/// ArrayV's original `rmerge` can leave heavy-duplicate inputs out of order because it chooses
+/// blocks by their leading value alone. A final linear, instrumented read checks the result;
+/// when that inherited path fails, `MaxHeapSort` repairs it in place. This keeps the original
+/// block-merge visualization for normal inputs and guarantees a correct, bounded result for all
+/// inputs without allocating a scratch array.
 public struct AndreySort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "andreysort")
   public let metadata = AlgorithmMetadata(
@@ -212,5 +204,14 @@ public struct AndreySort: SortAlgorithm {
     }
 
     msort(0, n)
+    var previous = engine.readValue(at: 0)
+    for index in 1..<n {
+      let current = engine.readValue(at: index)
+      if previous > current {
+        MaxHeapSort().record(into: &engine)
+        break
+      }
+      previous = current
+    }
   }
 }

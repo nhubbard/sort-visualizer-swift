@@ -16,7 +16,6 @@ func isSorted(_ arr: [Int]) -> Bool {
     return true
 }
 
-
 var array: [Int] = [0, 39, 21, 62, 91, 77]
 sort(&array)
 print(array)

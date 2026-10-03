@@ -1,6 +1,6 @@
 Branchless Pattern-Defeating Quick Sort is the same pdqsort design as its branch-based sibling,
 down to the pivot selection and the fast paths described below, but it replaces the inner
-partitioning loop with a block-based scheme built for modern, deeply pipelined CPUs. Its pivot
+partitioning loop with a block-based scheme for deeply pipelined central processing units (CPUs). Its pivot
 choice still adapts to the size of the range being sorted: short ranges use a plain median of
 three elements, while larger ranges sample nine points spread across the range, reduce them to
 three candidates via three separate median-of-three comparisons, and take the median of those
@@ -19,7 +19,7 @@ over.
 
 What sets this variant apart is how its main partition step compares elements against the pivot.
 Ordinary quicksort partitioning walks two pointers toward each other, branching on every single
-comparison to decide whether to advance a pointer or perform a swap — a pattern that modern CPUs
+comparison to decide whether to advance a pointer or perform a swap, a pattern that CPUs
 predict poorly, stalling the pipeline on almost every iteration for anything but very orderly
 input. This branchless partition instead scans a fixed-size block of elements from each end of the
 range in a tight, predictable loop, recording the offsets of any elements that landed on the wrong
@@ -35,6 +35,6 @@ bad-partition counter that scrambles a few elements near the split point wheneve
 comes out highly unbalanced, and falls back to heapsort for that range entirely if the count of
 bad partitions ever exceeds an allowance based on the base-2 logarithm of the array's size. Between
 its quicksort-style partitioning, its insertion-sort base case for small ranges, and its heapsort
-escape hatch, this is still fundamentally a hybrid sort — the branchless partition changes how the
+escape hatch, this remains a hybrid sort. The branchless partition changes how the
 comparisons are carried out, not the overall shape of the algorithm. Its partitioning crosses
 elements freely without any tie breaking, so like the branch-based variant it is not a stable sort.

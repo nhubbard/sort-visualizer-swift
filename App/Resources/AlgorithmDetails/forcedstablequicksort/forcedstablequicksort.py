@@ -3,6 +3,7 @@ def sort(arr):
     key = list(range(n))
     quick_sort(arr, key, 0, n)
 
+
 def stable_comp(arr, key, a, b):
     if arr[a] > arr[b]:
         return True
@@ -57,12 +58,24 @@ def quick_sort(arr, key, a, b):
     quick_sort(arr, key, p + 1, b)
 
 
-
-
 if __name__ == "__main__":
     array = [
-        0, 39, 21, 62, 91, 77, 14, 23,
-        90, 69, 51, 81, 68, 83, 32, 56,
+        0,
+        39,
+        21,
+        62,
+        91,
+        77,
+        14,
+        23,
+        90,
+        69,
+        51,
+        81,
+        68,
+        83,
+        32,
+        56,
     ]
     sort(array)
     print(array)

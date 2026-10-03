@@ -8,15 +8,15 @@ passes sequentially.
 
 Choosing a grid shape for an arbitrary array length is the first wrinkle: the algorithm picks the
 largest divisor of the current length that is no bigger than that length's square root as the row
-width, keeping the grid as close to square as the length allows. Some lengths don't cooperate — a
+width, keeping the grid as close to square as the length allows. Some lengths do not cooperate, a
 prime number's only qualifying divisor is 1, and a length exactly one more than a perfect square
-needs special handling too — and in those cases the algorithm falls back to sorting everything
+needs special handling too, and in those cases the algorithm falls back to sorting everything
 except the last element and then inserting that one leftover element into its correct place with a
 plain insertion step, the same kind of held-key, shift-and-place technique the algorithm also uses
 directly whenever a row or column shrinks to 16 elements or fewer.
 
 The recursive part is what separates this from a textbook ShearSort: a "row" or "column" longer
-than that 16-element floor doesn't get a single linear insertion pass — it gets its own smaller
+than that 16-element floor does not get a single linear insertion pass, it gets its own smaller
 grid, sorted by this same algorithm applied to a narrower stride through the array. Every other row
 is pre-reversed before the row-and-column convergence loop begins (and un-reversed again once it
 finishes), which is what turns a set of independently-sorted alternating-direction rows into one
@@ -27,4 +27,4 @@ strictly less than it, elements that compare equal keep their original relative 
 a stable sort. Its running time depends heavily on how many elements are already in place: an
 already-sorted input converges after one verification pass with almost no data movement, landing
 close to O(n log n), while a more adversarial input needs proportionally more of that grid
-convergence to settle, measuring out to roughly O(n^1.5) for average and worst-case input.
+convergence to settle, measuring out to roughly O(n¹·⁵) for average and worst-case input.

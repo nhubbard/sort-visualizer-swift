@@ -14,20 +14,24 @@ final class QuickSortUITests: XCTestCase {
     // Now that portrait is a genuinely supported orientation (not just coerced to landscape by
     // iOS), the simulator's own default boot orientation (portrait) would otherwise leak into
     // this test unpinned — see `ScreenshotUITests`' identical rationale.
-    XCUIDevice.shared.orientation = .landscapeLeft
+    useLandscapeOrientationForUITest()
   }
 
   func testQuickSortEndToEndProducesACorrectlySortedResult() throws {
     let app = XCUIApplication()
     // Small, fast array size — AppSettings.defaultArraySize's real default (256) is
     // deliberately large and would make even Quick Sort's own timeout unreliable.
-    app.launchEnvironment = ["UI_TEST_ARRAY_SIZE": "24"]
+    app.launchEnvironment = ["UI_TEST_ARRAY_SIZE": "24", "UI_TEST_PLAYBACK_SPEED": "1000"]
     app.launch()
 
     let sidebarLink = app.revealSidebarLink("algorithmLink.quicksort")
     XCTAssertTrue(
       sidebarLink.waitForExistence(timeout: 5), "Quick Sort sidebar link never appeared")
-    sidebarLink.tap()
+    app.activateSidebarLink(sidebarLink)
+    #if targetEnvironment(macCatalyst)
+      // Keep Sort Symphony's window active while checking its timed replay.
+      app.activate()
+    #endif
 
     let canvas = app.descendants(matching: .any).matching(identifier: "sortVisualizationCanvas")
       .firstMatch
@@ -75,7 +79,11 @@ final class QuickSortUITests: XCTestCase {
     app.launchEnvironment = ["UI_TEST_ARRAY_SIZE": "24"]
     app.launch()
 
-    XCTAssertTrue(app.navigationBars["Sort Symphony v2"].waitForExistence(timeout: 5))
+    #if targetEnvironment(macCatalyst)
+      XCTAssertTrue(app.navigationBars["All Algorithms"].waitForExistence(timeout: 5))
+    #else
+      XCTAssertTrue(app.navigationBars["Sort Symphony v2"].waitForExistence(timeout: 5))
+    #endif
     // Proves Phase 9's actual claim: the sidebar is generated from AlgorithmRegistry, not a
     // hand-maintained list — Quick Sort (.quick) and Bubble Sort (.exchange) both being
     // present confirms category sectioning works, not just a single flat list. Checked nearer

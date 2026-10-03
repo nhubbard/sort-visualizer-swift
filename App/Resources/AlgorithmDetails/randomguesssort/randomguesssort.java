@@ -3,7 +3,9 @@ import java.util.Arrays;
 public class randomguesssort {
   public static void sort(int[] arr) {
     int n = arr.length;
-    if (n <= 1) return;
+    if (n <= 1) {
+      return;
+    }
     int[] loops = new int[n];
     while (true) {
       boolean isSorted = true;

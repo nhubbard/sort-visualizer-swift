@@ -7,8 +7,7 @@ Its merges search exponentially outward for the next insertion boundary, then ro
 pieces of the array instead of copying them to an external merge buffer. When the right run is
 shorter, the merge scans backward to reduce the number of rotations. A final fragmented merge
 weaves whole sorted blocks into the suffix before finishing their boundary with an ordinary
-in-place merge. These details make the algorithm considerably more involved than a standard
-merge sort, but allow it to work with **O(1)** auxiliary storage.
+in-place merge. These additional stages allow the algorithm to work with **O(1)** auxiliary storage.
 
 Equal values preserve their order: binary insertion places a new tie after existing ones; a
 forward merge rotates only when its left element is strictly larger; and a backward merge

@@ -7,6 +7,7 @@ def sort(arr):
         return
     quick_sort(arr, 0, n)
 
+
 def binary_insertion_sort(arr, start, end):
     """Sorts arr[start:end] in place using a plain binary-search insertion sort — the base case
     once a segment shrinks small enough that further partitioning isn't worth it."""

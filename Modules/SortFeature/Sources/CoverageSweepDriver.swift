@@ -101,9 +101,9 @@ public final class CoverageSweepDriver {
 
   private static let logger = Logger(subsystem: "com.nhubbard.Sort2.mobile", category: "CoverageSweep")
   /// `category: "PointsOfInterest"` specifically — Instruments' Time Profiler/Metal System Trace
-  /// templates only capture os-signposts from that exact category by default (confirmed the hard
-  /// way: `ReplayEngine`'s own `TickApply`/`TickDispatch` signposts, under category
-  /// `"ReplayEngine"`, never showed up in either template's exported `os-signpost` table at all).
+  /// templates only capture os-signposts from that exact category by default. ReplayEngine's
+  /// `TickApply`/`TickDispatch` signposts use the same category so a standard capture can show
+  /// them alongside the sweep intervals.
   /// Brackets each combo with its full identity, so a future trace's Points of Interest track can
   /// attribute any CPU/GPU timeline anomaly to the exact algorithm/shuffle/visualizer/size running
   /// at that instant — the missing piece investigating a real Hanoi Towers large-array freeze.

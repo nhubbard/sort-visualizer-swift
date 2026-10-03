@@ -3,7 +3,9 @@ import java.util.Arrays;
 public class bottomupheapsort {
   public static void sort(int[] arr) {
     int n = arr.length;
-    if (n < 2) return;
+    if (n < 2) {
+      return;
+    }
     for (int i = (n - 1) / 2; i >= 0; i--) {
       siftDown(arr, i, n);
     }

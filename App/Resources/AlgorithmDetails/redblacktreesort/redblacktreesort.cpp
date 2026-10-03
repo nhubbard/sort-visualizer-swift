@@ -1,8 +1,7 @@
 #include <cstdio>
 #include <vector>
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
-                 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
 
 struct Node {
   int value;
@@ -57,9 +56,7 @@ void sort(int arr[], int n) {
   freeTree(root);
 }
 
-bool isRed(Node *node) {
-  return node != nullptr && node->isRed;
-}
+bool isRed(Node *node) { return node != nullptr && node->isRed; }
 
 Node *singleRotateRight(Node *node) {
   Node *b = node->left;

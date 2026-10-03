@@ -5,15 +5,23 @@ func sort(_ arr: inout [Int]) {
     var divisor = 1
     while true {
         var counts = [Int](repeating: 0, count: 4)
-        for value in arr { counts[(value / divisor) % 4] += 1 }
-        for digit in 1 ..< 4 { counts[digit] += counts[digit - 1] }
+        for value in arr {
+            counts[(value / divisor) % 4] += 1
+        }
+        for digit in 1 ..< 4 {
+            counts[digit] += counts[digit - 1]
+        }
         for i in stride(from: n - 1, through: 0, by: -1) {
             let digit = (arr[i] / divisor) % 4
             counts[digit] -= 1
             output[counts[digit]] = arr[i]
         }
-        for i in 0 ..< n { arr[i] = output[i] }
-        if divisor > maxValue / 4 { break }
+        for i in 0 ..< n {
+            arr[i] = output[i]
+        }
+        if divisor > maxValue / 4 {
+            break
+        }
         divisor *= 4
     }
 }

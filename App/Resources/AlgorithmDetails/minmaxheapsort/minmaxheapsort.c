@@ -1,7 +1,6 @@
 #include <stdio.h>
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
-                 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
 
 void swap(int *a, int *b) {
   int t = *a;
@@ -46,9 +45,7 @@ int bitLength(int value) {
   return length;
 }
 
-int isMinLevel(int index) {
-  return bitLength(index + 1) % 2 == 1;
-}
+int isMinLevel(int index) { return bitLength(index + 1) % 2 == 1; }
 
 int betterThan(int a, int b, int minLevel) {
   return minLevel ? (a < b) : (a > b);

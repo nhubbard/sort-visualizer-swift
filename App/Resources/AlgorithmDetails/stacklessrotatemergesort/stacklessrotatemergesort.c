@@ -1,8 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
-                 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
 
 void swap(int *a, int *b) {
   int t = *a;
@@ -27,9 +26,7 @@ void partitionMerge(int arr[], int a, int m, int b, int c);
 void rotateMerge(int arr[], int a, int b, int c);
 void rotatePartitionMergeSort(int arr[], int n);
 
-void sort(int arr[], int n) {
-  rotatePartitionMergeSort(arr, n);
-}
+void sort(int arr[], int n) { rotatePartitionMergeSort(arr, n); }
 
 void multiSwap(int arr[], int a, int b, int len) {
   for (int i = 0; i < len; i++) {

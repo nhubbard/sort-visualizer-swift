@@ -1,6 +1,4 @@
-*From Wikipedia, the free encyclopedia*
-
-The **Lomuto partition scheme** is one of the two classic ways to implement the partitioning step
+Left–Left (LL) Quick Sort is a quicksort variant that uses the **Lomuto partition scheme**, one of the two common ways to implement the partitioning step
 of [Quick Sort](https://en.wikipedia.org/wiki/Quicksort), alongside
 the [Hoare partition scheme](https://en.wikipedia.org/wiki/Quicksort#Hoare_partition_scheme) that Tony Hoare originally
 described. Named after Nico Lomuto, it always chooses the last element of the current range as the pivot, then makes a
@@ -17,8 +15,8 @@ less than the pivot rather than only when two out-of-place elements are found fr
 
 A more serious drawback is Lomuto's behavior on already-sorted or reverse-sorted input. Because the pivot is always the
 last element of the range with no randomization or median-of-three selection to guard against it, sorted or
-nearly-sorted arrays produce maximally unbalanced partitions on every recursive call — one side of the partition is
-empty and the other holds all the remaining elements — which drives the running time to the algorithm's O(n^2) worst
+nearly-sorted arrays produce maximally unbalanced partitions on every recursive call, one side of the partition is
+empty and the other holds all the remaining elements, which drives the running time to the algorithm's O(n²) worst
 case and, in a naive recursive implementation, to O(n) recursion depth as well. Real-world Quick Sort implementations
 typically guard against this by randomizing the pivot choice or selecting a median-of-three pivot before falling back to
 Lomuto- or Hoare-style partitioning around it.

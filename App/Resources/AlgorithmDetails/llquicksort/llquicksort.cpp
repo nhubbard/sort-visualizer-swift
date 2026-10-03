@@ -1,8 +1,7 @@
 #include <cstdio>
 #include <utility>
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
-                 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
 
 void printList(int items[], int size) {
   printf("[");
@@ -18,9 +17,7 @@ void printList(int items[], int size) {
 int partition(int arr[], int lo, int hi);
 void quickSort(int arr[], int lo, int hi);
 
-void sort(int arr[], int n) {
-  quickSort(arr, 0, n - 1);
-}
+void sort(int arr[], int n) { quickSort(arr, 0, n - 1); }
 
 int partition(int arr[], int lo, int hi) {
   int pivot = arr[hi];

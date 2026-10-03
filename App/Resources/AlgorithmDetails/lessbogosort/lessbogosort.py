@@ -7,6 +7,7 @@ def sort(arr):
         while not is_minimum(arr, i, n):
             shuffle_range(arr, i, n)
 
+
 def is_minimum(arr, start, end):
     for k in range(start + 1, end):
         if arr[start] > arr[k]:
@@ -18,8 +19,6 @@ def shuffle_range(arr, start, end):
     for i in range(start, end - 1):
         j = random.randrange(i, end)
         arr[i], arr[j] = arr[j], arr[i]
-
-
 
 
 if __name__ == "__main__":

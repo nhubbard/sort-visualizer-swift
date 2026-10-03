@@ -1,10 +1,8 @@
-#include <cstdio>
 #include <algorithm>
+#include <cstdio>
 #include <iostream>
 #include <vector>
 using namespace std;
-
-
 
 void printList(const std::vector<int> &items) {
   printf("[");
@@ -29,8 +27,10 @@ void sort(vector<int> &a) {
     else
       lo = mid + 1;
   }
-  const int block = lo, runLength = block * block,
-            runs = (n - 1) / runLength + 1;
+  const int block = lo, runLength = block * block;
+  // n >= 2 makes the cube-root search above produce block >= 2.
+  const int runs =
+      (n - 1) / runLength + 1; // NOLINT(clang-analyzer-core.DivideZero)
   vector<int> keys(runs < 2 ? n : runLength);
   for (int i = 0; i < (int)keys.size(); ++i)
     keys[i] = i;
@@ -169,16 +169,25 @@ void sort(vector<int> &a) {
   for (int i = 0; i < blocks; ++i) {
     if (keys[i] == i)
       continue;
-    copy_n(a.begin() + runLength + i * block, block, buffer.begin());
+    auto sourceOffset = static_cast<vector<int>::difference_type>(runLength) +
+                        static_cast<vector<int>::difference_type>(i) * block;
+    copy_n(a.begin() + sourceOffset, block, buffer.begin());
     int j = i, next = keys[i];
     do {
-      copy_n(a.begin() + runLength + next * block, block,
-             a.begin() + runLength + j * block);
+      auto nextSource = static_cast<vector<int>::difference_type>(runLength) +
+                        static_cast<vector<int>::difference_type>(next) * block;
+      auto destinationOffset =
+          static_cast<vector<int>::difference_type>(runLength) +
+          static_cast<vector<int>::difference_type>(j) * block;
+      copy_n(a.begin() + nextSource, block, a.begin() + destinationOffset);
       keys[j] = j;
       j = next;
       next = keys[next];
     } while (next != i);
-    copy_n(buffer.begin(), block, a.begin() + runLength + j * block);
+    auto destinationOffset =
+        static_cast<vector<int>::difference_type>(runLength) +
+        static_cast<vector<int>::difference_type>(j) * block;
+    copy_n(buffer.begin(), block, a.begin() + destinationOffset);
     keys[j] = j;
   }
 }

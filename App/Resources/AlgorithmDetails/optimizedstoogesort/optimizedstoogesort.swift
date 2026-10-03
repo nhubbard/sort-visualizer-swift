@@ -52,7 +52,6 @@ func exchange(_ arr: inout [Int], _ length: Int) {
     backward(&arr, 1, length - 1)
 }
 
-
 var array: [Int] = [
     0, 39, 21, 62, 91, 77, 14, 23,
     90, 69, 51, 81, 68, 83, 32, 56,

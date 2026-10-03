@@ -66,6 +66,7 @@ def sort(arr):
             trinkle(arr, p, pshift, head - 1, True)
         head -= 1
 
+
 def trailing_zero_count(value):
     mask = value & ~1
     trail = 0
@@ -121,12 +122,24 @@ def trinkle(array, p_in, pshift_in, head_in, is_trusty_in):
         sift(array, pshift, head)
 
 
-
-
 if __name__ == "__main__":
     array = [
-        0, 39, 21, 62, 91, 77, 14, 23,
-        90, 69, 51, 81, 68, 83, 32, 56,
+        0,
+        39,
+        21,
+        62,
+        91,
+        77,
+        14,
+        23,
+        90,
+        69,
+        51,
+        81,
+        68,
+        83,
+        32,
+        56,
     ]
     sort(array)
     print(array)

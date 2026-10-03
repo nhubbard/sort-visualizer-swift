@@ -1,8 +1,7 @@
 #include <stdint.h>
 #include <stdio.h>
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
-                 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
 
 void swap(int *a, int *b) {
   int t = *a;
@@ -23,9 +22,7 @@ void printList(int items[], int size) {
 
 static void flanSort(int *a, int n);
 
-void sort(int *a, int n) {
-  flanSort(a, n);
-}
+void sort(int *a, int n) { flanSort(a, n); }
 
 enum { GAP = 14, RATIO = 4 };
 typedef struct {
@@ -158,12 +155,8 @@ static void flanSort(int *a, int n) {
   insertion(&s, first, finish);
 }
 
-static int minimum(int x, int y) {
-  return x < y ? x : y;
-}
-static int maximum(int x, int y) {
-  return x > y ? x : y;
-}
+static int minimum(int x, int y) { return x < y ? x : y; }
+static int maximum(int x, int y) { return x > y ? x : y; }
 static void exchange(Flan *s, int i, int j) {
   int item = s->a[i];
   s->a[i] = s->a[j];

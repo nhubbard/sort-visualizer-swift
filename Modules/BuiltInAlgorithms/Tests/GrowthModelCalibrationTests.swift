@@ -100,6 +100,11 @@ struct GrowthModelCalibrationTests {
   private final class AlgorithmProgress {
     var received = 0
     var bindingReport: GrowthReport?
+    /// The most restrictive last-known-good size from every shuffle that hit a wall-clock or
+    /// discontinuity guard. Kept separately from `bindingReport`: a shuffle can provide decisive
+    /// safety evidence even when it returned too few samples to fit a curve.
+    var conservativeCeiling: Int?
+    var unsafeAtStartingSizeShuffleIDs: [String] = []
     let start = Date()
   }
 
@@ -131,6 +136,7 @@ struct GrowthModelCalibrationTests {
     let progress: [String: AlgorithmProgress] = Dictionary(
       uniqueKeysWithValues: sorts.map { ($0.id.rawValue, AlgorithmProgress()) })
     var combinationsDone = 0
+    var calibrationFailures: [String] = []
 
     for await (combo, measurement) in Self.parallelMap(combos, workerCount: workerCount, { combo in
       Self.measureGrowth(
@@ -145,6 +151,14 @@ struct GrowthModelCalibrationTests {
       let algorithmID = combo.algorithm.id.rawValue
       let entry = progress[algorithmID]!
 
+      if measurement.unsafeAtSize != nil {
+        if let ceiling = measurement.confirmedSafeCeiling {
+          entry.conservativeCeiling = min(entry.conservativeCeiling ?? ceiling, ceiling)
+        } else {
+          entry.unsafeAtStartingSizeShuffleIDs.append(combo.shuffle.id.rawValue)
+        }
+      }
+
       let declaredShape = BigOShape.parse(combo.algorithm.metadata.timeComplexity.worst)
       if let report = await Self.makeReport(
         subjectID: "\(algorithmID)+\(combo.shuffle.id.rawValue)", measurement: measurement,
@@ -155,23 +169,30 @@ struct GrowthModelCalibrationTests {
         Self.logProgress(
           "  [\(algorithmID)][\(combo.shuffle.id.rawValue)] \(report.winningFamily) R²=\(String(format: "%.4f", report.winningRSquared)) safe@300K=\(Self.formatSafeSize(report, cap: 300_000))\(unsafeNote)"
         )
-        // The binding (smallest) max size across shuffles is what actually matters for this
-        // algorithm -- different shuffles can have entirely different growth exponents, not just
-        // different constants, so each one's own fitted curve has to be solved independently
-        // before taking the minimum.
+        // Choose the most restrictive usable curve independently from the all-shuffle safety
+        // ceiling accumulated above. Different shuffles can have different growth exponents, but
+        // one that stops too early to fit still contributes its last-known-good size.
         if entry.bindingReport == nil
           || (report.safeMaxSizeByCap[Self.referenceCaps[1]] ?? .infinity)
             < (entry.bindingReport!.safeMaxSizeByCap[Self.referenceCaps[1]] ?? .infinity) {
           entry.bindingReport = report
         }
       } else {
-        Self.logProgress("  [\(algorithmID)][\(combo.shuffle.id.rawValue)]: SKIPPED (not enough data)")
+        Self.logProgress(
+          "  [\(algorithmID)][\(combo.shuffle.id.rawValue)]: SKIPPED curve fit (not enough data; safety retained)")
       }
 
       entry.received += 1
       if entry.received == shuffles.count {
-        if let bindingReport = entry.bindingReport {
-          reports.append(bindingReport)
+        if !entry.unsafeAtStartingSizeShuffleIDs.isEmpty {
+          let failedShuffles = entry.unsafeAtStartingSizeShuffleIDs.sorted().joined(separator: ", ")
+          calibrationFailures.append(
+            "\(algorithmID): no confirmed-safe size for shuffle(s): \(failedShuffles)")
+          Self.logProgress("[\(algorithmID)]: FAILED, unsafe at starting size for \(failedShuffles)")
+        } else if let bindingReport = entry.bindingReport {
+          let finalReport = bindingReport.applying(conservativeCeiling: entry.conservativeCeiling)
+          entry.bindingReport = finalReport
+          reports.append(finalReport)
           try Self.writeReport(reports, to: "sort-growth-models.json")
         }
         let elapsed = Date().timeIntervalSince(overallStart)
@@ -187,6 +208,14 @@ struct GrowthModelCalibrationTests {
       "sorts done: \(reports.count) total (\(sorts.count) processed this run) in \(Self.formatDuration(Date().timeIntervalSince(overallStart)))"
     )
     Self.printReport(title: "Sorts (binding shuffle)", reports: reports)
+    if !calibrationFailures.isEmpty {
+      throw CalibrationFailure(messages: calibrationFailures)
+    }
+  }
+
+  private struct CalibrationFailure: Error, CustomStringConvertible {
+    let messages: [String]
+    var description: String { messages.joined(separator: "\n") }
   }
 
   @Test
@@ -278,6 +307,17 @@ struct GrowthModelCalibrationTests {
     let samples: [GrowthSample]
     let unsafeAtSize: Int?
     let unsafeReason: String?
+
+    /// The last size for which every trial returned before this measurement encountered an
+    /// unsafe size. Nil means either no unsafe size was observed or the starting size itself was
+    /// unsafe. In particular, a partial sample retained after a later trial hangs is excluded.
+    var confirmedSafeCeiling: Int? {
+      guard let unsafeAtSize else { return nil }
+      return samples.lazy
+        .filter { $0.n < Double(unsafeAtSize) }
+        .map { Int($0.n) }
+        .max()
+    }
   }
 
   private static func measureGrowth(
@@ -531,12 +571,9 @@ struct GrowthModelCalibrationTests {
     // that size actually returned) can be trusted, no matter what the curve extrapolates --
     // that's what fixed the `mergebogosort+descending` finding, where the fitted curve alone
     // computed a "safe" size of 803, well past the 96 where it actually hangs forever.
-    let confirmedSafeUpToSize: Double
-    if let unsafeAtSize = measurement.unsafeAtSize {
-      confirmedSafeUpToSize = samples.filter { $0.n < Double(unsafeAtSize) }.map(\.n).max() ?? 0
-    } else {
-      confirmedSafeUpToSize = .infinity
-    }
+    let confirmedSafeUpToSize = measurement.unsafeAtSize == nil
+      ? Double.infinity
+      : Double(measurement.confirmedSafeCeiling ?? 0)
 
     var safeMaxSizeByCap: [Double: Double] = [:]
     for cap in referenceCaps {
@@ -570,7 +607,8 @@ struct GrowthModelCalibrationTests {
       subjectID: subjectID, winningFamily: fit.family.rawValue, winningRSquared: fit.rSquared,
       runnerUpFamily: runnerUp?.family.rawValue, runnerUpRSquared: runnerUp?.rSquared,
       coefficients: fit.coefficients, sampleSizes: samples.map { Int($0.n) },
-      safeMaxSizeByCap: safeMaxSizeByCap, unsafeAtSize: measurement.unsafeAtSize,
+      safeMaxSizeByCap: safeMaxSizeByCap, measuredSafeCeiling: measurement.confirmedSafeCeiling,
+      unsafeAtSize: measurement.unsafeAtSize,
       unsafeReason: measurement.unsafeReason)
   }
 
@@ -713,6 +751,10 @@ struct GrowthModelCalibrationTests {
     let coefficients: [Double]
     let sampleSizes: [Int]
     let safeMaxSizeByCap: [Double: Double]
+    /// Minimum last-fully-completed size across every shuffle that encountered an unsafe size.
+    /// Unlike `unsafeAtSize`, this is algorithm-wide and may come from a shuffle that could not
+    /// produce enough samples for curve fitting.
+    let measuredSafeCeiling: Int?
     /// Non-nil means measurement stopped early because of a hang or an erratic/discontinuous
     /// jump at this size (see `unsafeReason`) -- every `safeMaxSizeByCap` value is already
     /// clamped below this, but it's kept here explicitly so a human reviewing the report can see
@@ -726,7 +768,20 @@ struct GrowthModelCalibrationTests {
 
     private enum CodingKeys: String, CodingKey {
       case subjectID, winningFamily, winningRSquared, runnerUpFamily, runnerUpRSquared,
-        coefficients, sampleSizes, safeMaxSizeByCap, unsafeAtSize, unsafeReason
+        coefficients, sampleSizes, safeMaxSizeByCap, measuredSafeCeiling, unsafeAtSize, unsafeReason
+    }
+
+    func applying(conservativeCeiling: Int?) -> GrowthReport {
+      let safeSizes = safeMaxSizeByCap.mapValues { safeSize in
+        guard let conservativeCeiling else { return safeSize }
+        return min(safeSize, Double(conservativeCeiling))
+      }
+      return GrowthReport(
+        subjectID: subjectID, winningFamily: winningFamily, winningRSquared: winningRSquared,
+        runnerUpFamily: runnerUpFamily, runnerUpRSquared: runnerUpRSquared,
+        coefficients: coefficients, sampleSizes: sampleSizes, safeMaxSizeByCap: safeSizes,
+        measuredSafeCeiling: conservativeCeiling, unsafeAtSize: unsafeAtSize,
+        unsafeReason: unsafeReason)
     }
 
     /// Hand-written only for `safeMaxSizeByCap`'s sake -- `Decodable`'s synthesis is left alone
@@ -760,6 +815,7 @@ struct GrowthModelCalibrationTests {
       try container.encode(sampleSizes, forKey: .sampleSizes)
       let sortedPairs = safeMaxSizeByCap.sorted { $0.key < $1.key }.flatMap { [$0.key, $0.value] }
       try container.encode(sortedPairs, forKey: .safeMaxSizeByCap)
+      try container.encodeIfPresent(measuredSafeCeiling, forKey: .measuredSafeCeiling)
       try container.encodeIfPresent(unsafeAtSize, forKey: .unsafeAtSize)
       try container.encodeIfPresent(unsafeReason, forKey: .unsafeReason)
     }
@@ -840,7 +896,8 @@ struct GrowthReportEncodingTests {
     GrowthReport(
       subjectID: "test", winningFamily: "powerLaw", winningRSquared: 1, runnerUpFamily: nil,
       runnerUpRSquared: nil, coefficients: [1, 1], sampleSizes: [16, 32],
-      safeMaxSizeByCap: safeMaxSizeByCap, unsafeAtSize: nil, unsafeReason: nil)
+      safeMaxSizeByCap: safeMaxSizeByCap, measuredSafeCeiling: nil, unsafeAtSize: nil,
+      unsafeReason: nil)
   }
 
   /// `Dictionary`'s iteration order is randomized per-process for a `Double` key (not tied to
@@ -891,8 +948,59 @@ struct GrowthReportEncodingTests {
     let data = try JSONEncoder().encode(report)
     let json = try #require(String(data: data, encoding: .utf8))
 
-    for omittedKey in ["runnerUpFamily", "runnerUpRSquared", "unsafeAtSize", "unsafeReason"] {
+    for omittedKey in [
+      "runnerUpFamily", "runnerUpRSquared", "measuredSafeCeiling", "unsafeAtSize", "unsafeReason",
+    ] {
       #expect(!json.contains("\"\(omittedKey)\""), "expected \(omittedKey) to be omitted, not encoded as null")
     }
+  }
+
+  @Test
+  func conservativeCeilingClampsEveryCapIndependentlyOfBindingFit() {
+    let report = makeReport(safeMaxSizeByCap: [100_000: 8, 300_000: 12, 1_000_000: 20])
+    let clamped = report.applying(conservativeCeiling: 5)
+
+    #expect(clamped.measuredSafeCeiling == 5)
+    #expect(clamped.safeMaxSizeByCap == [100_000: 5, 300_000: 5, 1_000_000: 5])
+  }
+}
+
+@Suite
+struct GrowthMeasurementSafetyTests {
+  typealias GrowthMeasurement = GrowthModelCalibrationTests.GrowthMeasurement
+
+  @Test
+  func insufficientSamplesStillProduceSafetyCeiling() {
+    let measurement = GrowthMeasurement(
+      samples: [GrowthSample(n: 3, value: 10)], unsafeAtSize: 4, unsafeReason: "hang")
+
+    #expect(measurement.confirmedSafeCeiling == 3)
+  }
+
+  @Test
+  func partiallyCompletedUnsafeSizeIsExcluded() {
+    let measurement = GrowthMeasurement(
+      samples: [GrowthSample(n: 3, value: 10), GrowthSample(n: 4, value: 20)],
+      unsafeAtSize: 4, unsafeReason: "hang")
+
+    #expect(measurement.confirmedSafeCeiling == 3)
+  }
+
+  @Test
+  func unsafeStartingSizeHasNoConfirmedCeiling() {
+    let measurement = GrowthMeasurement(samples: [], unsafeAtSize: 3, unsafeReason: "hang")
+
+    #expect(measurement.confirmedSafeCeiling == nil)
+  }
+}
+
+@Suite
+struct GrowthCalibrationRangeRegressionTests {
+  @Test
+  func bogoBogoUsesConservativeAllShuffleCeiling() {
+    let range = BogoBogoSort().metadata.effectiveSizeRange(
+      operationCap: RecordingEngine.defaultOperationCap)
+
+    #expect(range == 3...4)
   }
 }

@@ -41,7 +41,6 @@ func sortRange(_ arr: inout [Int], _ start: Int, _ end: Int) {
     sortRange(&arr, pivot + 1, end)
 }
 
-
 var array: [Int] = [0, 39, 21, 62, 91, 14, 23]
 sort(&array)
 print(array)

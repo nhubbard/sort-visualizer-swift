@@ -2,8 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
-                 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
 
 void swap(int *a, int *b) {
   int t = *a;
@@ -125,17 +124,18 @@ void sort(int *a, int n) {
   for (int i = 0; i < blocks; i++) {
     if (s.keys[i] == i)
       continue;
-    memcpy(s.buffer, a + s.runLength + i * s.block,
+    memcpy(s.buffer, a + (size_t)(s.runLength + i * s.block),
            (size_t)s.block * sizeof(int));
     int j = i, next = s.keys[i];
     do {
-      memmove(a + s.runLength + j * s.block, a + s.runLength + next * s.block,
+      memmove(a + (size_t)(s.runLength + j * s.block),
+              a + (size_t)(s.runLength + next * s.block),
               (size_t)s.block * sizeof(int));
       s.keys[j] = j;
       j = next;
       next = s.keys[next];
     } while (next != i);
-    memcpy(a + s.runLength + j * s.block, s.buffer,
+    memcpy(a + (size_t)(s.runLength + j * s.block), s.buffer,
            (size_t)s.block * sizeof(int));
     s.keys[j] = j;
   }
@@ -146,9 +146,7 @@ void sort(int *a, int n) {
   free(s.destination);
 }
 
-static int minimum(int x, int y) {
-  return x < y ? x : y;
-}
+static int minimum(int x, int y) { return x < y ? x : y; }
 static int greater(Remi *s, int x, int y, int start) {
   int left = s->a[start + x], right = s->a[start + y];
   return left > right || (left == right && x > y);

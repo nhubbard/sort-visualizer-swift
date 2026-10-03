@@ -4,7 +4,9 @@ import java.util.List;
 
 public class shattersort {
   public static void sort(int[] arr) {
-    if (arr.length < 2) return;
+    if (arr.length < 2) {
+      return;
+    }
     int n = arr.length;
     shatterSort(arr, n, 4);
   }

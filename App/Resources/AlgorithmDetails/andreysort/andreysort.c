@@ -1,8 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
-                 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
 
 void swap(int *a, int *b) {
   int t = *a;
@@ -30,9 +29,7 @@ void rmerge(int arr[], int a, int l, int r);
 int rbnd(int len);
 void msort(int arr[], int a, int len);
 
-void sort(int arr[], int n) {
-  msort(arr, 0, n);
-}
+void sort(int arr[], int n) { msort(arr, 0, n); }
 
 void selectionSort(int arr[], int a, int b) {
   while (b > 1) {

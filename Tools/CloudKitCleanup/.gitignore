@@ -1,6 +1,7 @@
 # Secrets and machine-specific config -- never commit these.
 .management-token
 .user-token
+.user_token
 .team-id
 .dev-schema
 .prod-schema

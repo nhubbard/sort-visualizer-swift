@@ -8,13 +8,12 @@ def sort(arr):
         j = random.randrange(n)
         arr[i], arr[j] = arr[j], arr[i]
 
+
 def is_sorted(arr):
     for i in range(1, len(arr)):
         if arr[i - 1] > arr[i]:
             return False
     return True
-
-
 
 
 if __name__ == "__main__":

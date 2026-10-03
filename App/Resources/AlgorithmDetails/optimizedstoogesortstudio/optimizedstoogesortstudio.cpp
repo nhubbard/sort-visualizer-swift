@@ -2,8 +2,7 @@
 #include <cstdio>
 #include <utility>
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
-                 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
 
 void printList(int items[], int size) {
   printf("[");
@@ -20,7 +19,8 @@ bool compSwap(int arr[], int a, int b);
 bool stoogeSort(int arr[], int a, int m, int b, bool merge);
 
 void sort(int arr[], int n) {
-  if (n <= 1) return;
+  if (n <= 1)
+    return;
   stoogeSort(arr, 0, 1, n, false);
 }
 

@@ -1,5 +1,3 @@
-*From Wikipedia, the free encyclopedia*
-
 Odd-even sort or odd-even transposition sort (also known as brick sort or parity sort) is a relatively simple sorting
 algorithm, developed originally for use on parallel processors with local interconnections. It is a comparison sort
 related to bubble sort, with which it shares many characteristics. It functions by comparing all odd/even indexed pairs

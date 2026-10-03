@@ -37,11 +37,38 @@ final class SortAudioUnitParameterModel {
     self.detune = Double(byIdentifier["detune"]?.value ?? 0.0)
     self.gain = Double(byIdentifier["gain"]?.value ?? 1.0)
 
-    observerToken = audioUnit.parameterTree?.token(byAddingParameterObserver: { [weak self] address, value in
-      Task { @MainActor in
-        self?.applyExternalChange(address: address, value: value)
+    connectObserver()
+  }
+
+  private func connectObserver() {
+    guard observerToken == nil else { return }
+    observerToken = audioUnit.parameterTree?.token(byAddingParameterObserver: Self.makeObserver(for: self))
+  }
+
+  /// AUParameter invokes this callback on its own queue. Constructing the closure in a
+  /// nonisolated function prevents it inheriting MainActor isolation before the explicit hop.
+  private nonisolated static func makeObserver(
+    for model: SortAudioUnitParameterModel
+  ) -> AUParameterObserver {
+    { [weak model] address, value in
+      Task { @MainActor [weak model] in
+        model?.applyExternalChange(address: address, value: value)
       }
-    })
+    }
+  }
+
+  func disconnectObserver() {
+    if let observerToken {
+      audioUnit.parameterTree?.removeParameterObserver(observerToken)
+      self.observerToken = nil
+    }
+  }
+
+  func reconnectObserver() {
+    for parameter in parametersByIdentifier.values {
+      applyExternalChange(address: parameter.address, value: parameter.value)
+    }
+    connectObserver()
   }
 
   @MainActor
@@ -59,15 +86,33 @@ final class SortAudioUnitParameterModel {
     }
   }
 
-  func setAttack(_ newValue: Double) { attack = newValue; setParameterValue("attack", newValue) }
-  func setDecay(_ newValue: Double) { decay = newValue; setParameterValue("decay", newValue) }
-  func setSustain(_ newValue: Double) { sustain = newValue; setParameterValue("sustain", newValue) }
-  func setRelease(_ newValue: Double) { release = newValue; setParameterValue("release", newValue) }
-  func setDetune(_ newValue: Double) { detune = newValue; setParameterValue("detune", newValue) }
-  func setGain(_ newValue: Double) { gain = newValue; setParameterValue("gain", newValue) }
+  func setAttack(_ newValue: Double) {
+    attack = setParameterValue("attack", newValue)
+  }
+  func setDecay(_ newValue: Double) {
+    decay = setParameterValue("decay", newValue)
+  }
+  func setSustain(_ newValue: Double) {
+    sustain = setParameterValue("sustain", newValue)
+  }
+  func setRelease(_ newValue: Double) {
+    release = setParameterValue("release", newValue)
+  }
+  func setDetune(_ newValue: Double) {
+    detune = setParameterValue("detune", newValue)
+  }
+  func setGain(_ newValue: Double) {
+    gain = setParameterValue("gain", newValue)
+  }
 
-  private func setParameterValue(_ identifier: String, _ newValue: Double) {
-    parametersByIdentifier[identifier]?.setValue(AUValue(newValue), originator: observerToken)
+  @discardableResult
+  private func setParameterValue(_ identifier: String, _ newValue: Double) -> Double {
+    guard let parameter = parametersByIdentifier[identifier] else { return newValue }
+    let value = newValue.isFinite
+      ? min(max(newValue, Double(parameter.minValue)), Double(parameter.maxValue))
+      : Double(parameter.value)
+    parameter.setValue(AUValue(value), originator: observerToken)
+    return value
   }
 
   func send(_ command: RemoteControlCommand) {
@@ -108,6 +153,8 @@ struct SortAudioUnitParameterView: View {
         toneSlider("Gain", value: model.gain, range: 0...1, unit: "", set: model.setGain)
       }
     }
+    .onAppear { model.reconnectObserver() }
+    .onDisappear { model.disconnectObserver() }
   }
 
   private func transportButton(_ title: String, systemImage: String, action: @escaping () -> Void) -> some View {

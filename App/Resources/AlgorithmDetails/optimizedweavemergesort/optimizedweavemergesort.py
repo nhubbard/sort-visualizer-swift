@@ -23,6 +23,7 @@ def sort(array):
             i = k
         d //= 2
 
+
 def insert_to(array, a, b):
     temp = array[a]
     while a > b:
@@ -119,12 +120,24 @@ def weave_merge(array, a, m_init, b):
     weave_insert(array, a, b, right)
 
 
-
-
 if __name__ == "__main__":
     array = [
-        0, 39, 21, 62, 91, 77, 14, 23,
-        90, 69, 51, 81, 68, 83, 32, 56,
+        0,
+        39,
+        21,
+        62,
+        91,
+        77,
+        14,
+        23,
+        90,
+        69,
+        51,
+        81,
+        68,
+        83,
+        32,
+        56,
     ]
     sort(array)
     print(array)

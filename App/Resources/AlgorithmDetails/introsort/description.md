@@ -1,5 +1,3 @@
-*From Wikipedia, the free encyclopedia*
-
 Introsort or introspective sort is a hybrid sorting algorithm that provides both fast average performance and an optimal
 worst-case performance. It begins with [quicksort](https://en.wikipedia.org/wiki/Quicksort) and switches
 to [heapsort](https://en.wikipedia.org/wiki/Heapsort) when the recursion depth exceeds a level based on (the logarithm
@@ -26,6 +24,6 @@ position.
 
 Because it combines strong average-case speed with a guaranteed O(n log n) worst case and small memory overhead,
 Introsort (or a close variant of it) is used as the sorting algorithm in a number of widely used standard library
-implementations, including the `std::sort` function found
+implementations, including the std::sort function found
 in [SGI's STL](https://en.wikipedia.org/wiki/Standard_Template_Library) and many derived C++ standard library
-implementations, as well as .NET's `Array.Sort` method.
+implementations, as well as .NET's Array.Sort method.

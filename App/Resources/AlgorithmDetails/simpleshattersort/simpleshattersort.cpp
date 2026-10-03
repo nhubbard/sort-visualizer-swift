@@ -3,8 +3,7 @@
 #include <utility>
 #include <vector>
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
-                 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
 
 void printList(int items[], int size) {
   printf("[");
@@ -23,7 +22,8 @@ int floorLog2(int n);
 void simpleShatterSort(int arr[], int length, int num, int rate);
 
 void sort(int arr[], int n) {
-  if (n < 2) return;
+  if (n < 2)
+    return;
   int rate = std::max(2, floorLog2(n) / 2);
   simpleShatterSort(arr, n, 4, rate);
 }

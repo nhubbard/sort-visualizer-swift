@@ -49,12 +49,8 @@ void sort(int arr[], int n) {
   }
 }
 
-int minInt(int a, int b) {
-  return a < b ? a : b;
-}
-int maxInt(int a, int b) {
-  return a > b ? a : b;
-}
+int minInt(int a, int b) { return a < b ? a : b; }
+int maxInt(int a, int b) { return a > b ? a : b; }
 
 void binaryInsertionSort(int arr[], int lo, int hi) {
   for (int i = lo + 1; i < hi; i++) {
@@ -137,6 +133,8 @@ void merge(int arr[], int lo, int mid, int hi) {
   int left = lo;
   int right = mid;
   while (left < right && right < hi) {
+    /* sort only calls merge with 0 <= lo < mid < hi <= n. */
+    // NOLINTNEXTLINE(clang-analyzer-security.ArrayBound)
     if (arr[left] <= arr[right]) {
       left++;
     } else {

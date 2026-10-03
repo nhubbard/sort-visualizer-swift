@@ -1,8 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
-                 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
 
 void swap(int *a, int *b) {
   int t = *a;
@@ -43,13 +42,9 @@ void combineBlocks(int arr[], int keyPos, int pos, int len, int buildLen,
 void lazyStableSort(int arr[], int pos, int len);
 void commonSort(int arr[], int pos, int len);
 
-void sort(int arr[], int n) {
-  commonSort(arr, 0, n);
-}
+void sort(int arr[], int n) { commonSort(arr, 0, n); }
 
-int compareValues(int a, int b) {
-  return (a > b) - (a < b);
-}
+int compareValues(int a, int b) { return (a > b) - (a < b); }
 
 void multiSwap(int arr[], int a, int b, int count) {
   for (int i = 0; i < count; i++)

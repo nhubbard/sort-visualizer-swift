@@ -13,7 +13,9 @@ public class optimizeddualpivotquicksort {
 
   private static void insertionSort(int[] a, int start, int end) {
     for (int i = start + 1; i < end; i++) {
-      for (int j = i; j > start && a[j] < a[j - 1]; j--) swap(a, j - 1, j);
+      for (int j = i; j > start && a[j] < a[j - 1]; j--) {
+        swap(a, j - 1, j);
+      }
     }
   }
 
@@ -24,9 +26,14 @@ public class optimizeddualpivotquicksort {
       return;
     }
     int third = length / divisor;
-    int med1 = left + third, med2 = right - third;
-    if (med1 <= left) med1 = left + 1;
-    if (med2 >= right) med2 = right - 1;
+    int med1 = left + third;
+    int med2 = right - third;
+    if (med1 <= left) {
+      med1 = left + 1;
+    }
+    if (med2 >= right) {
+      med2 = right - 1;
+    }
     if (a[med1] < a[med2]) {
       swap(a, med1, left);
       swap(a, med2, right);
@@ -34,24 +41,32 @@ public class optimizeddualpivotquicksort {
       swap(a, med1, right);
       swap(a, med2, left);
     }
-    int pivot1 = a[left], pivot2 = a[right];
-    int less = left + 1, great = right - 1;
+    int pivot1 = a[left];
+    int pivot2 = a[right];
+    int less = left + 1;
+    int great = right - 1;
     for (int k = less; k <= great; k++) {
       if (a[k] < pivot1) {
         swap(a, k, less);
         less++;
-      } else if (a[k] > pivot2) {
-        while (k < great && a[great] > pivot2) great--;
-        swap(a, k, great);
-        great--;
-        if (a[k] < pivot1) {
-          swap(a, k, less);
-          less++;
+      } else {
+        if (a[k] > pivot2) {
+          while (k < great && a[great] > pivot2) {
+            great--;
+          }
+          swap(a, k, great);
+          great--;
+          if (a[k] < pivot1) {
+            swap(a, k, less);
+            less++;
+          }
         }
       }
     }
     int dist = great - less;
-    if (dist < 13) divisor++;
+    if (dist < 13) {
+      divisor++;
+    }
     swap(a, less - 1, left);
     swap(a, great + 1, right);
     optimizedDualPivotQuickSort(a, left, less - 2, divisor);
@@ -61,17 +76,21 @@ public class optimizeddualpivotquicksort {
         if (a[k] == pivot1) {
           swap(a, k, less);
           less++;
-        } else if (a[k] == pivot2) {
-          swap(a, k, great);
-          great--;
-          if (a[k] == pivot1) {
-            swap(a, k, less);
-            less++;
+        } else {
+          if (a[k] == pivot2) {
+            swap(a, k, great);
+            great--;
+            if (a[k] == pivot1) {
+              swap(a, k, less);
+              less++;
+            }
           }
         }
       }
     }
-    if (pivot1 < pivot2) optimizedDualPivotQuickSort(a, less, great, divisor);
+    if (pivot1 < pivot2) {
+      optimizedDualPivotQuickSort(a, less, great, divisor);
+    }
   }
 
   public static void main(String[] args) {

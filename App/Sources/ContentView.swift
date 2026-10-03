@@ -390,6 +390,12 @@ struct ContentView: View {
     .frame(width: 36, height: 24)
     .accessibilityIdentifier("importTapeButton")
     .help("Import a previously exported .tape file")
+    .fileImporter(isPresented: $isImportingTape, allowedContentTypes: [.tapeArchive]) { result in
+      switch result {
+      case .success(let url): importTape(from: url)
+      case .failure(let error): importErrorMessage = error.localizedDescription
+      }
+    }
   }
 
   /// Reads `url` (a security-scoped URL from `.fileImporter`) and hands its bytes to
@@ -491,12 +497,6 @@ struct ContentView: View {
       }
       ToolbarItem(placement: .topBarTrailing) {
         settingsToolbarButton
-      }
-    }
-    .fileImporter(isPresented: $isImportingTape, allowedContentTypes: [.tapeArchive]) { result in
-      switch result {
-      case .success(let url): importTape(from: url)
-      case .failure(let error): importErrorMessage = error.localizedDescription
       }
     }
     .alert(

@@ -1,13 +1,11 @@
-#include <cstdio>
 #include <cmath>
+#include <cstdio>
 #include <iostream>
 #include <vector>
 
 int triangularRoot(int val);
 void siftDown(std::vector<int> &array, int root, int size);
 void heapify(std::vector<int> &array, int length);
-
-
 
 void printList(const std::vector<int> &items) {
   printf("[");

@@ -1,8 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
-                 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
 
 void swap(int *a, int *b) {
   int t = *a;
@@ -26,9 +25,7 @@ int twinSwap(int arr[], int nmemb);
 void tailMerge(int arr[], int buf[], int nmemb, int block);
 void twinsort(int arr[], int nmemb);
 
-void sort(int arr[], int n) {
-  twinsort(arr, n);
-}
+void sort(int arr[], int n) { twinsort(arr, n); }
 
 void reverseRange(int arr[], int lo, int hi) {
   while (lo < hi) {

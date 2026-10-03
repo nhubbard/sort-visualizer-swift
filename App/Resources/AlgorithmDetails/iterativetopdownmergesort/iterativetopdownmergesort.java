@@ -3,7 +3,9 @@ import java.util.Arrays;
 public class iterativetopdownmergesort {
   public static void sort(int[] arr) {
     int n = arr.length;
-    if (n < 2) return;
+    if (n < 2) {
+      return;
+    }
     int[] scratch = new int[n];
     int subarrayCount = 1;
     while (subarrayCount < n) {

@@ -3,15 +3,25 @@ import java.util.Arrays;
 public class rotatemsdradixsort {
   public static void sort(int[] arr) {
     int n = arr.length;
-    if (n <= 1) return;
-    int base = 4, maxValue = 0;
-    for (int value : arr) if (value > maxValue) maxValue = value;
-    int q = 0, probe = base;
+    if (n <= 1) {
+      return;
+    }
+    int base = 4;
+    int maxValue = 0;
+    for (int value : arr) {
+      if (value > maxValue) {
+        maxValue = value;
+      }
+    }
+    int q = 0;
+    int probe = base;
     while (probe <= maxValue) {
       q++;
       probe *= base;
     }
-    int m = 0, i = 0, b = n;
+    int m = 0;
+    int i = 0;
+    int b = n;
     while (i < n) {
       int p = b - i < 1 ? i : dist(arr, i, b, q, base);
       if (q == 0) {
@@ -22,7 +32,9 @@ public class rotatemsdradixsort {
           q++;
         }
         i = b;
-        while (b < n && shift(arr[b], q + 1, base) == shift(m, q + 1, base)) b++;
+        while (b < n && shift(arr[b], q + 1, base) == shift(m, q + 1, base)) {
+          b++;
+        }
       } else {
         b = p;
         q--;
@@ -109,7 +121,9 @@ public class rotatemsdradixsort {
   // an ordinary MSD radix sort built entirely out of the LSD variant's
   // rotate/binary-search machinery.
   private static int shift(int value, int places, int base) {
-    while (places-- > 0) value /= base;
+    while (places-- > 0) {
+      value /= base;
+    }
     return value;
   }
 

@@ -442,7 +442,6 @@ func commonSort(_ arr: inout [Int], _ pos: Int, _ len: Int) {
     mergeWithoutBuffer(&arr, pos, dist, len - dist)
 }
 
-
 var array: [Int] = [
     0, 39, 21, 62, 91, 77, 14, 23,
     90, 69, 51, 81, 68, 83, 32, 56,

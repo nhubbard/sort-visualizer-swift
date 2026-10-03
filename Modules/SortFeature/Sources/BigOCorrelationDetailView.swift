@@ -16,8 +16,8 @@ struct BigOCorrelationDetailView: View {
   /// Off by default: `.observedTrend` is already the per-size average of the raw `.observedRun`
   /// scatter, so the scatter is redundant data that's also the dominant mark count (one point per
   /// recorded run, uncapped at the source — see `cappedForRendering`'s doc comment). Swift Charts
-  /// re-lays-out every mark on every `.chartScrollableAxes` scroll frame regardless of what's
-  /// visible, so leaving this off is what actually keeps scrolling smooth; it's an opt-in for
+  /// re-lays out every mark as the surrounding scroll view moves, so leaving this off keeps
+  /// scrolling smooth; it's an opt-in for
   /// seeing per-run variance/outliers, not the default view.
   @State private var showsIndividualRuns = false
 
@@ -25,7 +25,8 @@ struct BigOCorrelationDetailView: View {
   /// labels, since `bigOChartPoints` emits `runPoints`/`trendPoints` before `referencePoints`).
   private var allSeries: [String] {
     var seen: Set<String> = []
-    return points.map(\.series).filter { seen.insert($0).inserted }
+    return points.filter { $0.kind != .observedRun }.map(\.series)
+      .filter { seen.insert($0).inserted }
   }
 
   private var visiblePoints: [BigOChartPoint] {
@@ -40,15 +41,12 @@ struct BigOCorrelationDetailView: View {
     points.filter { $0.kind == .observedTrend }.map(\.size).sorted()
   }
 
-  private var shouldScroll: Bool {
-    observedSizes.count > 8
-  }
-
   var body: some View {
     NavigationStack {
       VStack(alignment: .leading, spacing: 16) {
         seriesToggleRow
         chart
+        referenceLegend
         RainbowStatLegend()
         selectionSummary
       }
@@ -67,28 +65,36 @@ struct BigOCorrelationDetailView: View {
         }
       }
     }
-    .frame(minWidth: 900, minHeight: 700)
-    // `.page` expands the sheet to fill most of the presenting window/screen — the deployment
-    // target is iOS 18.0, which already has this (unlike the iOS 26-only Liquid Glass APIs
-    // elsewhere in this module), so no `#available` gate is needed.
+    // Let the host choose a size that fits portrait and split-window layouts. A fixed 900-point
+    // minimum clipped the controls and chart on narrower iPads.
     .presentationSizing(.page)
   }
 
   private var chart: some View {
     let sizeDomain = observedSizes[0]...observedSizes[observedSizes.count - 1]
-    let fullRange = max(observedSizes[observedSizes.count - 1] - observedSizes[0], 1)
-    let visibleLength = shouldScroll ? max(fullRange / 3, 1) : fullRange
-    // `chartXScale`/`chartXVisibleDomain`/`chartXSelection` all stay in plain domain (array-size)
-    // units regardless of scale type -- `.log` only changes how those values are *positioned* on
-    // screen, so none of the scrolling/selection math above needs to change for it.
     let logDomain = Double(sizeDomain.lowerBound)...Double(sizeDomain.upperBound)
+    return GeometryReader { geometry in
+      ScrollView(.horizontal, showsIndicators: true) {
+        chartContent(sizeDomain: sizeDomain, logDomain: logDomain)
+          .frame(
+            width: max(geometry.size.width, CGFloat(observedSizes.count) * 48),
+            height: max(geometry.size.height, 300)
+          )
+      }
+      .accessibilityIdentifier("bigOCorrelationExpandedChart")
+    }
+    .frame(minHeight: 300, maxHeight: 500)
+  }
 
-    return Chart {
+  private func chartContent(
+    sizeDomain: ClosedRange<Int>, logDomain: ClosedRange<Double>
+  ) -> some View {
+    Chart {
       bigOChartMarks(for: visiblePoints)
       // Always present (not conditionally added/removed) — kept off-domain and invisible when
-      // there's no selection, so hovering never changes the Chart's mark structure. Toggling a
+      // there's no selection, so selecting never changes the Chart's mark structure. Toggling a
       // mark in and out was itself part of the resize/flicker loop below: a structural change on
-      // every hover-driven `chartXSelection` update forced a full chart relayout each time.
+      // every selection update forced a full chart relayout each time.
       // `max(..., 1)`, not just `sizeDomain.lowerBound - 1` -- a `.log`-scaled axis can't position
       // a value <= 0 at all, and this needs to stay a valid (if invisible) point even in the
       // pathological case of a size-1 lower bound.
@@ -102,63 +108,95 @@ struct BigOCorrelationDetailView: View {
       // this app's full size range), unlike the old one-tick-per-recorded-size approach this
       // replaced -- dense enough recorded sizes used to need rotated labels just to avoid
       // overlapping; log-spaced power-of-two ticks don't.
-      AxisMarks(values: powerOfTwoAxisValues(in: logDomain))
+      AxisMarks(values: powerOfTwoAxisValues(in: logDomain, maximumCount: 8))
     }
     .chartXAxisLabel("Array Size")
+    .chartYAxis { AxisMarks(position: .leading) }
     .chartYAxisLabel("Normalized Work")
-    .chartLegend(position: .bottom, alignment: .center, spacing: 16)
-    .chartScrollableAxes(shouldScroll ? .horizontal : [])
-    .chartXVisibleDomain(length: visibleLength)
-    .chartXSelection(value: $selectedSize)
-    // `maxHeight: .infinity` lets the chart grow to fill whatever room `.presentationSizing(.page)`
-    // gives the sheet — safe now that `selectionSummary` is always present at a stable size
-    // (see its doc comment): the chart's size is set once by the window's fixed dimensions at
-    // presentation time, not by anything that changes while hovering.
-    .frame(maxWidth: .infinity, minHeight: 300, maxHeight: .infinity)
+    .chartForegroundStyleScale([
+      "Best Case": Color.blue,
+      "Average Case": Color.green,
+      "Worst Case": Color.orange,
+      "Individual Runs": Color.gray,
+    ])
+    // The plot is wider than its viewport when many sizes are recorded. Keep its legend outside
+    // that horizontal scroll view so the rightmost label is never clipped on opening the sheet.
+    .chartLegend(.hidden)
+    .chartOverlay { proxy in
+      GeometryReader { geometry in
+        Rectangle()
+          .fill(.clear)
+          .contentShape(Rectangle())
+          .onTapGesture { location in
+            guard let plotFrame = proxy.plotFrame else { return }
+            let plotX = location.x - geometry[plotFrame].origin.x
+            selectedSize = proxy.value(atX: plotX, as: Int.self)
+          }
+      }
+    }
+  }
+
+  private var referenceLegend: some View {
+    HStack(spacing: 16) {
+      ForEach(["Best Case", "Average Case", "Worst Case"], id: \.self) { series in
+        HStack(spacing: 4) {
+          Capsule()
+            .fill(referenceColor(for: series))
+            .frame(width: 16, height: 2)
+          Text(series)
+            .font(.caption2)
+            .foregroundStyle(.secondary)
+        }
+      }
+    }
+    .accessibilityIdentifier("bigOReferenceLegend")
+  }
+
+  private func referenceColor(for series: String) -> Color {
+    switch series {
+    case "Best Case": .blue
+    case "Average Case": .green
+    default: .orange
+    }
   }
 
   private var seriesToggleRow: some View {
-    HStack(spacing: 8) {
-      ScrollView(.horizontal, showsIndicators: false) {
-        HStack(spacing: 8) {
-          ForEach(allSeries, id: \.self) { series in
-            Toggle(
-              series,
-              isOn: Binding(
-                get: { !hiddenSeries.contains(series) },
-                set: { isOn in
-                  if isOn { hiddenSeries.remove(series) } else { hiddenSeries.insert(series) }
-                }
-              )
+    VStack(alignment: .leading, spacing: 8) {
+      LazyVGrid(columns: [GridItem(.adaptive(minimum: 120), spacing: 8)], alignment: .leading, spacing: 8) {
+        ForEach(allSeries, id: \.self) { series in
+          Toggle(
+            series,
+            isOn: Binding(
+              get: { !hiddenSeries.contains(series) },
+              set: { isOn in
+                if isOn { hiddenSeries.remove(series) } else { hiddenSeries.insert(series) }
+              }
             )
-            .toggleStyle(.button)
-            .controlSize(.small)
-          }
+          )
+          .toggleStyle(.button)
+          .controlSize(.small)
         }
       }
-      Spacer(minLength: 16)
       Toggle("Show Individual Runs", isOn: $showsIndividualRuns)
         .toggleStyle(.button)
         .controlSize(.small)
+        .frame(maxWidth: .infinity, alignment: .trailing)
     }
   }
 
-  /// Always renders the same number of lines (one per currently-visible series) regardless of
-  /// `selectedSize`, with a placeholder space standing in for the value text when there's no
-  /// selection — a previous version only added this view to the layout when `selectedSize` was
-  /// non-nil, which meant every hover-driven `chartXSelection` update changed the sheet's total
-  /// content height. `chartXSelection` fires continuously as the pointer moves (not just on
-  /// drag), so that was a resize-on-every-hover feedback loop, worst right at the chart's edges
-  /// where the hit-test flips in and out most often.
+  /// Tap selection changes at most once per gesture, so the empty state can stay compact instead
+  /// of reserving a tall blank panel for values that have not been requested yet.
   private var selectionSummary: some View {
     let visibleSeries = allSeries.filter { !hiddenSeries.contains($0) }
     return VStack(alignment: .leading, spacing: 4) {
-      Text(selectedSize.map { "Array Size \($0)" } ?? "Hover the chart to see exact values")
+      Text(selectedSize.map { "Array Size \($0)" } ?? "Select a size on the chart to see exact values")
         .font(.headline)
-      ForEach(visibleSeries, id: \.self) { series in
-        Text(selectionText(for: series) ?? " ")
-          .font(.caption)
-          .foregroundStyle(.secondary)
+      if selectedSize != nil {
+        ForEach(visibleSeries, id: \.self) { series in
+          Text(selectionText(for: series) ?? " ")
+            .font(.caption)
+            .foregroundStyle(.secondary)
+        }
       }
     }
     .padding(12)

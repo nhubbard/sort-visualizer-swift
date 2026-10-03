@@ -1,8 +1,7 @@
 #include <cstdio>
 #include <utility>
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
-                 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
 
 void printList(int items[], int size) {
   printf("[");
@@ -41,9 +40,7 @@ int bitLength(int value) {
   return length;
 }
 
-bool isMinLevel(int index) {
-  return bitLength(index + 1) % 2 == 1;
-}
+bool isMinLevel(int index) { return bitLength(index + 1) % 2 == 1; }
 
 bool betterThan(int a, int b, bool minLevel) {
   return minLevel ? (a < b) : (a > b);

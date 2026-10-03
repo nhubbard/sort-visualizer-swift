@@ -1,6 +1,6 @@
-#include <cstdio>
 #include <algorithm>
 #include <cstdint>
+#include <cstdio>
 #include <iostream>
 #include <vector>
 using namespace std;
@@ -18,9 +18,7 @@ void printList(const std::vector<int> &items) {
 
 static void flanSort(vector<int> &values);
 
-void sort(vector<int> &values) {
-  flanSort(values);
-}
+void sort(vector<int> &values) { flanSort(values); }
 
 class Flan {
   static constexpr int gap = 14, ratio = 4;
@@ -32,7 +30,8 @@ class Flan {
     state ^= state >> 12;
     state ^= state << 25;
     state ^= state >> 27;
-    return (state * 0x2545f4914f6cdd1dULL) % count;
+    return static_cast<int>((state * 0x2545f4914f6cdd1dULL) %
+                            static_cast<uint64_t>(count));
   }
   int median(int i, int m, int j) {
     if (a[m] > a[i]) {
@@ -326,7 +325,6 @@ public:
     insertion(first, finish);
   }
 };
-
 
 static void flanSort(vector<int> &values) {
   if (values.size() > 1)

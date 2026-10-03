@@ -27,30 +27,30 @@ struct Sort2App: App {
     // scripting backend (ScriptingKit) was removed entirely after it turned out to reference a
     // private API (`JSContextGroupSetExecutionTimeLimit`), which blocked App Store submission.
     AlgorithmRegistry.shared.builtIns = [
-      AATreeSort(), AVLTreeSort(), AmericanFlagSort(), AndreySort(), AsynchronousSort(), BadSort(), BaseNMaxHeapSort(),
+      AATreeSort(), AdaptiveGrailSort(), AVLTreeSort(), AmericanFlagSort(), AndreySort(), AsynchronousSort(), BadSort(), BaseNMaxHeapSort(),
       BinaryDoubleInsertionSort(), BinaryGnomeSort(), BinaryInsertionSort(), BinaryMergeSort(),
       BinaryQuickSortIterative(), BinaryQuickSortRecursive(), BingoSort(), BinomialHeapSort(), BinomialSmoothSort(),
       BitonicSortIterative(), BitonicSortRecursive(), BlockInsertionSort(), BlockSwapMergeSort(), BogoBogoSort(),
       BogoSort(), BoseNelsonSortIterative(), BoseNelsonSortRecursive(), BottomUpHeapSort(), BottomUpMergeSort(),
-      BozoSort(), BubbleBogoSort(), BubbleSort(), BufferedStoogeSort(), BurntPancakeSort(), CircleSortIterative(),
-      CircleSortRecursive(), CircloidSort(), ClassicGravitySort(), ClassicThreeSmoothCombSort(),
+      BozoSort(), BubbleBogoSort(), BubbleSort(), BufferedStoogeSort(), BufferPartitionMergeSort(), BurntPancakeSort(), ChaliceSort(), CircleSortIterative(),
+      CircleSortRecursive(), CircloidSort(), CircularGrailSort(), ClassicGravitySort(), ClassicThreeSmoothCombSort(),
       ClassicTournamentSort(), ClassicTreeSort(), CocktailBogoSort(), CocktailMergeSort(), CocktailShakerSort(),
       CombSort(), CompleteGraphSort(), CountingSort(), CreaseSort(), CycleSort(), DeterministicBogoSort(),
       DiamondSortIterative(), DiamondSortRecursive(), DoubleInsertionSort(), DoubleSelectionSort(),
-      DropMergeSort(), DualPivotQuickSort(), ExchangeBogoSort(), FlashSort(), FlippedMinHeapSort(), FlanSort(), FluxSort(),
+      DropMergeSort(), DualPivotQuickSort(), EctaSort(), ExchangeBogoSort(), FifthMergeSort(), FlashSort(), FlippedMinHeapSort(), FlanSort(), FluxSort(),
       FoldSort(),
       ForcedStableQuickSort(), FunSort(), GnomeSort(), GrailSort(), GravitySort(), GuessSort(), HanoiSort(),
       HybridCombSort(), ImprovedBlockSelectionSort(), ImprovedInPlaceMergeSort(), IndexSort(),
       InPlaceLSDRadixSort(), InPlaceMergeSort(),
       InsertionSort(), IntroCircleSortIterative(), IntroCircleSortRecursive(), IntroSort(), IterativeTopDownMergeSort(),
-      LaziestSort(), LazierestSort(), LazyHeapSort(), LazyStableSort(), LessBogoSort(), LibrarySort(), LLQuickSort(),
+      KotaSort(), LaziestSort(), LazierestSort(), LazyHeapSort(), LazyStableSort(), LessBogoSort(), LibrarySort(), LLQuickSort(),
       LRQuickSort(), LSDRadixSort(),
       MatrixSort(), MaxHeapSort(), MedianMergeSort(), MedianQuickBogoSort(), MergeBogoSort(), MergeExchangeSortIterative(),
       MergeInsertionSort(), MergeSort(), MinHeapSort(), MinMaxHeapSort(), MSDRadixSort(), NewShuffleMergeSort(),
       OddEvenMergeSortIterative(), OddEvenMergeSortRecursive(), OddEvenSort(),
       OptimizedBottomUpMergeSort(), OptimizedBubbleSort(),
       OptimizedCocktailShakerSort(), OptimizedDualPivotQuickSort(), OptimizedGnomeSort(), OptimizedGuessSort(),
-      OptimizedLazyStableSort(), OptimizedStoogeSort(), OptimizedStoogeSortStudio(),
+      OptimizedLazyStableSort(), OptimizedRotateMergeSort(), OptimizedStoogeSort(), OptimizedStoogeSortStudio(),
       OptimizedWeaveMergeSort(), OutOfPlaceHeapSort(),
       PairwiseMergeSortIterative(), PairwiseMergeSortRecursive(), PairwiseSortIterative(), PairwiseSortRecursive(),
       PancakeInsertionSort(), PancakeSort(), PatienceSort(), PDMergeSort(), PDQBranchedSort(), PDQBranchlessSort(),
@@ -58,14 +58,14 @@ struct Sort2App: App {
       RecursiveShellSort(), RedBlackTreeSort(), RotateLSDRadixSort(), RotateMergeSort(), RotateMSDRadixSort(),
       SelectionBogoSort(), SelectionSort(), ShatterSort(), ShellSort(), ShoveSort(), SillySort(), SimpleShatterSort(),
       SimplifiedLibrarySort(), SimplisticGravitySort(), SlopeSort(), SlowSort(), SmartBogoBogoSort(), SmartGuessSort(),
-      SmoothSort(), SnuffleSort(), SplaySort(), StableCycleSort(), StablePermutationSort(), StableQuickSort(),
+      SmoothSort(), SnuffleSort(), SplaySort(), SqrtSort(), StableCycleSort(), StablePermutationSort(), StableQuickSort(),
       StableSelectionSort(), StacklessAmericanFlagSort(), StacklessBinaryQuickSort(),
       StacklessDualPivotQuickSort(), StacklessHybridQuickSort(), StacklessRotateMergeSort(),
-      StaticSort(), StoogeSort(), StrandSort(), SwaplessBubbleSort(), TableSort(), TernaryHeapSort(),
+      StaticSort(), StoogeSort(), StrandSort(), SwaplessBubbleSort(), SynchronousSqrtSort(), TableSort(), TernaryHeapSort(),
       TernaryLLQuickSort(), TernaryLRQuickSort(), ThreeSmoothCombSortIterative(), ThreeSmoothCombSortRecursive(),
-      TimeSort(), TournamentSort(), TreeSort(), TriangularHeapSort(), TwinSort(), UnoptimizedBubbleSort(),
+      TimeSort(), TimSort(), TournamentSort(), TreeSort(), TriangularHeapSort(), TwinSort(), UnoptimizedBubbleSort(),
       UnoptimizedCocktailShakerSort(), UnstableGrailSort(), WeakHeapSort(), WeavedMergeSort(), WeaveMergeSort(),
-      WeaveSortIterative(), WeaveSortRecursive(), YujisBufferedMergeSort2()
+      WeaveSortIterative(), WeaveSortRecursive(), WikiSort(), YujisBufferedMergeSort2()
     ]
     AlgorithmRegistry.shared.discover()
 
@@ -142,24 +142,29 @@ struct Sort2App: App {
     // dispatch exactly, just triggered from the bridge instead of a keyboard shortcut. A no-op
     // (via `?.`) whenever nothing's actively sorting, same as every other reach-in through
     // `SortCoordinator.shared.activeSortSession`.
-    AudioService.shared.remoteControlHandler = { command in
-      Task { @MainActor in
-        guard let session = SortCoordinator.shared.activeSortSession else { return }
-        switch command {
-        case .togglePlayback:
-          session.togglePlayback()
-        case .restart:
-          session.lastReplay?.seek(to: 0)
-        case .regenerate:
-          Task { await session.start(size: session.arraySize) }
-        case .stepForward:
-          session.lastReplay?.pause()
-          session.lastReplay?.stepForward()
-        case .stepBackward:
-          session.lastReplay?.pause()
-          session.lastReplay?.stepBackward()
-        case .toggleSound:
-          session.soundEnabled.toggle()
+    // The detail-only UI audit never starts a sort or offers audio controls. Avoid initializing
+    // AVAudioEngine for it: a transiently unavailable Catalyst output device can raise an
+    // Objective-C exception during graph construction before a test reaches the detail page.
+    if ProcessInfo.processInfo.environment["UI_TEST_DETAIL_AUDIT"] != "1" {
+      AudioService.shared.remoteControlHandler = { command in
+        Task { @MainActor in
+          guard let session = SortCoordinator.shared.activeSortSession else { return }
+          switch command {
+          case .togglePlayback:
+            session.togglePlayback()
+          case .restart:
+            session.lastReplay?.seek(to: 0)
+          case .regenerate:
+            Task { await session.start(size: session.arraySize) }
+          case .stepForward:
+            session.lastReplay?.pause()
+            session.lastReplay?.stepForward()
+          case .stepBackward:
+            session.lastReplay?.pause()
+            session.lastReplay?.stepBackward()
+          case .toggleSound:
+            session.soundEnabled.toggle()
+          }
         }
       }
     }
@@ -167,8 +172,18 @@ struct Sort2App: App {
 
   var body: some Scene {
     WindowGroup {
+      #if DEBUG
+      if ProcessInfo.processInfo.environment["UI_TEST_DETAIL_AUDIT"] == "1" {
+        AlgorithmDetailAuditView()
+          .environment(AppSettings.shared)
+      } else {
+        ContentView()
+          .environment(AppSettings.shared)
+      }
+      #else
       ContentView()
         .environment(AppSettings.shared)
+      #endif
     }
     .commands {
       SortCommands()

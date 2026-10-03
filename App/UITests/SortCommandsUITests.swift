@@ -16,9 +16,9 @@ import XCTest
 final class SortCommandsUITests: XCTestCase {
   override func setUpWithError() throws {
     continueAfterFailure = false
-    // See `ScreenshotUITests`'s identical rationale — portrait is a genuinely supported
-    // orientation now, so the simulator's own boot orientation would otherwise leak in.
-    XCUIDevice.shared.orientation = .landscapeLeft
+    #if !targetEnvironment(macCatalyst)
+      throw XCTSkip("Sort command menu tests require the Mac Catalyst menu bar")
+    #endif
   }
 
   /// Opens `CommandMenu("Sort")` and clicks `itemTitle` — shared by every test in this file
@@ -32,7 +32,7 @@ final class SortCommandsUITests: XCTestCase {
     let app = XCUIApplication()
     app.launch()
 
-    XCTAssertTrue(app.navigationBars["Sort Symphony v2"].waitForExistence(timeout: 5))
+    XCTAssertTrue(app.menuBarItems["Sort"].waitForExistence(timeout: 5))
 
     clickSortMenuItem("Settings…", in: app)
 
@@ -52,7 +52,9 @@ final class SortCommandsUITests: XCTestCase {
     app.launchEnvironment = ["UI_TEST_ARRAY_SIZE": "24"]
     app.launch()
 
-    app.tapSidebarLink("algorithmLink.quicksort")
+    let algorithmLink = app.buttons["algorithmLink.threesmoothcombsortiterative"]
+    XCTAssertTrue(algorithmLink.waitForExistence(timeout: 5))
+    algorithmLink.click()
     let soundToggle = app.buttons["runControlSoundToggle"]
     XCTAssertTrue(soundToggle.waitForExistence(timeout: 5))
     let before = soundToggle.label
@@ -72,13 +74,26 @@ final class SortCommandsUITests: XCTestCase {
 
   func testSpaceTogglesPlayback() throws {
     let app = XCUIApplication()
-    app.launchEnvironment = ["UI_TEST_ARRAY_SIZE": "24"]
+    app.launchEnvironment = ["UI_TEST_ARRAY_SIZE": "24", "UI_TEST_PLAYBACK_SPEED": "1"]
     app.launch()
 
-    app.tapSidebarLink("algorithmLink.quicksort")
+    clickSortMenuItem("Settings…", in: app)
+    let pacingPicker = app.segmentedControls["pacingModePicker"]
+    XCTAssertTrue(pacingPicker.waitForExistence(timeout: 5))
+    pacingPicker.buttons["Fixed Rate"].click()
+    app.buttons["Done"].click()
+
+    let algorithmLink = app.buttons["algorithmLink.threesmoothcombsortiterative"]
+    XCTAssertTrue(algorithmLink.waitForExistence(timeout: 5))
+    algorithmLink.click()
     let playPauseButton = app.buttons["runControlPlayPauseButton"]
     XCTAssertTrue(playPauseButton.waitForExistence(timeout: 5))
+    // The small test sort may finish before Catalyst finishes its accessibility snapshot.
+    // Rewind to an unambiguous paused state before exercising the menu's resume action.
+    app.buttons["runControlJumpToStartButton"].click()
     let before = playPauseButton.label
+    XCTAssertEqual(before, "Play")
+    XCTAssertTrue(playPauseButton.isEnabled)
 
     clickSortMenuItem("Play/Pause", in: app)
 

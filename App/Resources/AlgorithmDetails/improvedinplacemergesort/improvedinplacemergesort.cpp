@@ -1,7 +1,6 @@
 #include <cstdio>
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
-                 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
 
 void printList(int items[], int size) {
   printf("[");
@@ -18,9 +17,7 @@ static void push(int arr[], int p, int a, int b);
 static void merge(int arr[], int a, int m, int b);
 static void mergeSort(int arr[], int a, int b);
 
-void sort(int arr[], int n) {
-  mergeSort(arr, 0, n);
-}
+void sort(int arr[], int n) { mergeSort(arr, 0, n); }
 
 static void push(int arr[], int p, int a, int b) {
   if (a == b) {

@@ -12,9 +12,6 @@ function isSorted(arr) {
   return true;
 }
 
-
-const array = [
-  0, 39, 21, 62, 91, 77,
-];
+const array = [0, 39, 21, 62, 91, 77];
 sort(array);
 console.log("[" + array.join(", ") + "]");

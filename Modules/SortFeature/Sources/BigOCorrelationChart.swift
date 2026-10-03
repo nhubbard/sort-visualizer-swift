@@ -8,14 +8,16 @@ import SwiftUI
 /// recorded runs.
 ///
 /// Deliberately compact: `.chartXAxis` caps its tick count regardless of how many distinct sizes
-/// have been recorded (unlike `BigOCorrelationDetailView`, which shows every one) — this view sits
+/// have been recorded — this view sits
 /// in a 200pt-tall column, and unbounded ticks become unreadable as an algorithm accumulates
 /// recorded runs at more sizes. `BigOCorrelationDetailView` is the full-screen escape hatch.
 struct BigOCorrelationChart: View {
   let algorithm: any SortAlgorithm
+  let refreshRevision: Int
 
   @State private var points: [BigOChartPoint] = []
   @State private var isLoading = true
+  @State private var loadError: String?
   @State private var isShowingDetail = false
 
   var body: some View {
@@ -23,6 +25,11 @@ struct BigOCorrelationChart: View {
       if isLoading {
         ProgressView()
           .frame(maxWidth: .infinity, minHeight: 120)
+      } else if loadError != nil {
+        ContentUnavailableView(
+          "Recorded Runs Unavailable", systemImage: "exclamationmark.triangle",
+          description: Text("The saved runs could not be loaded. Try opening this algorithm again."))
+        .frame(maxWidth: .infinity, minHeight: 120)
       } else if points.isEmpty {
         ContentUnavailableView(
           "Not Enough Recorded Runs Yet",
@@ -39,27 +46,32 @@ struct BigOCorrelationChart: View {
         // Derived from `.observedTrend` specifically — exactly one per distinct recorded
         // size, unlike the raw scatter which can have several points at the same size.
         let observedSizes = points.filter { $0.kind == .observedTrend }.map(\.size).sorted()
-        // Shows only the rainbow stat point groups, restricted to power-of-two sizes -- no raw
-        // scatter, no trend line, no reference curves. This compact chart has no toggle UI to
+        // Shows only a bounded set of rainbow stat point groups -- no raw
+        // scatter, no connecting trend line, no reference curves. This compact chart has no toggle UI to
         // bring any of that back (that's what the expand button's detail view is for), so keeping
-        // it to one group of five colored points per major tick mark is what actually keeps it
+        // it to at most eight groups of six colored points is what actually keeps it
         // legible and cheap as an algorithm accumulates recorded runs at more sizes; the detail
         // view is the full picture (every recorded size, trend line, reference curves, and an
         // opt-in raw-scatter toggle).
-        let renderedPoints = powerOfTwoSizesOnly(points).filter {
-          switch $0.kind {
-          case .statMin, .statMax, .statMedian, .statStdDevBand: true
-          case .observedRun, .observedTrend, .reference: false
-          }
-        }
+        let renderedPoints = compactChartPoints(points)
         let sizeDomain = Double(observedSizes[0])...Double(observedSizes[observedSizes.count - 1])
         VStack(alignment: .leading, spacing: 4) {
           Chart {
-            bigOChartMarks(for: renderedPoints)
+            ForEach(renderedPoints) { point in
+              if point.kind == .observedTrend {
+                PointMark(
+                  x: .value("Array Size", point.size),
+                  y: .value("Normalized Work", point.normalizedValue)
+                )
+                .foregroundStyle(.blue)
+              } else {
+                bigOChartMark(for: point)
+              }
+            }
           }
           .chartXScale(domain: sizeDomain, type: .log)
           .chartXAxis {
-            AxisMarks(values: powerOfTwoAxisValues(in: sizeDomain))
+            AxisMarks(values: powerOfTwoAxisValues(in: sizeDomain, maximumCount: 6))
           }
           .chartXAxisLabel("Array Size")
           .chartYAxisLabel("Normalized Work")
@@ -84,19 +96,71 @@ struct BigOCorrelationChart: View {
         }
       }
     }
-    .task(id: algorithm.id) {
+    .task(id: "\(algorithm.id.rawValue)-\(refreshRevision)") {
       await load()
     }
   }
 
   private func load() async {
     isLoading = true
-    let summaries =
-      (try? await AnalyticsService.shared.fetchSummaries(algorithmID: algorithm.id)) ?? []
-    points = bigOChartPoints(for: summaries, timeComplexity: algorithm.metadata.timeComplexity)
+    loadError = nil
+    #if DEBUG
+    if ProcessInfo.processInfo.environment["UI_TEST_DETAIL_AUDIT"] == "1" {
+      points = auditBigOChartPoints(algorithm: algorithm)
+      isLoading = false
+      return
+    }
+    #endif
+    do {
+      let summaries = try await AnalyticsService.shared.fetchSummaries(algorithmID: algorithm.id)
+      guard !Task.isCancelled else { return }
+      points = bigOChartPoints(for: summaries, timeComplexity: algorithm.metadata.timeComplexity)
+    } catch {
+      guard !Task.isCancelled else { return }
+      points = []
+      loadError = error.localizedDescription
+    }
     isLoading = false
   }
 }
+
+#if DEBUG
+/// Dense, deterministic history for the all-algorithm visual audit. It never enters persistence.
+private func auditBigOChartPoints(algorithm: any SortAlgorithm) -> [BigOChartPoint] {
+  let domain = algorithm.metadata.growthComparisonDomain(operationCap: 300_000)
+  let lower = max(2, Int(domain.lowerBound.rounded(.up)))
+  let upper = max(lower + 1, Int(domain.upperBound.rounded(.down)))
+  let sizes = Array(Set((0..<24).map { index in
+    let ratio = Double(index) / 23
+    return min(upper, max(lower, Int(exp(log(Double(lower)) + ratio *
+      (log(Double(upper)) - log(Double(lower)))).rounded())))
+  })).sorted()
+  var result: [BigOChartPoint] = []
+  for (index, size) in sizes.enumerated() {
+    let progress = Double(index + 1) / Double(sizes.count)
+    let mean = 0.06 + 0.88 * progress * progress
+    func add(_ suffix: String, _ series: String, _ value: Double, _ kind: BigOChartPoint.Kind) {
+      result.append(BigOChartPoint(
+        id: "audit-\(size)-\(suffix)", series: series, size: size,
+        normalizedValue: value, kind: kind))
+    }
+    add("trend", "Observed", mean, .observedTrend)
+    add("min", "Minimum", mean * 0.85, .statMin)
+    add("max", "Maximum", mean * 1.15, .statMax)
+    add("median", "Median", mean * 0.99, .statMedian)
+    add("sd-low", "Standard Deviation", mean * 0.92, .statStdDevBand)
+    add("sd-high", "Standard Deviation", mean * 1.08, .statStdDevBand)
+    add("reference-best", "Best Case", 0.06 + 0.9 * sqrt(progress), .reference)
+    add("reference-average", "Average Case", 0.06 + 0.9 * progress, .reference)
+    add("reference-worst", "Worst Case", 0.06 + 0.9 * progress * progress, .reference)
+    for run in 0..<16 {
+      let variation = Double((run * 7 + index * 3) % 17 - 8) / 90
+      add("run-\(run)", "Individual Runs", max(0, mean * (1 + variation)), .observedRun)
+    }
+  }
+  return result
+}
+#endif
 
 /// Shared between the compact chart above and `BigOCorrelationDetailView` so both render
 /// identical marks — only axis/interactivity/legend differ between the two.
@@ -173,25 +237,43 @@ private func bigOChartMark(for point: BigOChartPoint) -> some ChartContent {
 /// array sizes commonly span orders of magnitude in one chart, where linear ticks either clump
 /// everything near the small end or land on numbers with no relationship to how these algorithms'
 /// complexity actually scales.
-func powerOfTwoAxisValues(in range: ClosedRange<Double>) -> [Int] {
+func powerOfTwoAxisValues(in range: ClosedRange<Double>, maximumCount: Int = .max) -> [Int] {
   guard range.upperBound >= 1 else { return [] }
   let lowerExponent = max(0, Int(log2(max(range.lowerBound, 1)).rounded(.down)))
   let upperExponent = Int(log2(range.upperBound).rounded(.up))
   guard lowerExponent <= upperExponent else { return [] }
-  return (lowerExponent ... upperExponent).map { 1 << $0 }
+  let exponents = Array(lowerExponent ... upperExponent)
+  guard maximumCount > 1, exponents.count > maximumCount else {
+    return exponents.map { 1 << $0 }
+  }
+  return (0..<maximumCount).map { index in
+    let offset = Double(index) * Double(exponents.count - 1) / Double(maximumCount - 1)
+    return 1 << exponents[Int(offset.rounded())]
+  }
 }
 
-/// Restricts the rainbow stat points (but not the trend line or reference curves) to sizes that
-/// are exact powers of two — the compact chart's own decluttering measure, on top of what
-/// `bigOChartPoints` already computes for every recorded size. `BigOCorrelationDetailView` shows
-/// every size instead, since it's the deliberate full-detail escape hatch.
-func powerOfTwoSizesOnly(_ points: [BigOChartPoint]) -> [BigOChartPoint] {
-  points.filter { point in
-    switch point.kind {
-    case .statMin, .statMax, .statMedian, .statStdDevBand:
-      point.size > 0 && (point.size & (point.size - 1)) == 0
-    case .observedRun, .observedTrend, .reference:
-      true
+/// Keep the compact plot legible even when many distinct sizes were recorded. Selecting from
+/// observed sizes instead of power-of-two sizes also avoids a blank chart when none of the
+/// recorded sizes happen to be powers of two. Endpoints are always retained.
+func representativeSizes(_ sizes: [Int], maximum: Int) -> Set<Int> {
+  let unique = Array(Set(sizes)).sorted()
+  guard maximum > 0 else { return [] }
+  guard unique.count > maximum else { return Set(unique) }
+  guard maximum > 1 else { return [unique[0]] }
+  return Set((0..<maximum).map { index in
+    let offset = Double(index) * Double(unique.count - 1) / Double(maximum - 1)
+    return unique[Int(offset.rounded())]
+  })
+}
+
+func compactChartPoints(_ points: [BigOChartPoint]) -> [BigOChartPoint] {
+  let observedSizes = points.filter { $0.kind == .observedTrend }.map(\.size)
+  let selectedSizes = representativeSizes(observedSizes, maximum: 8)
+  return points.filter { point in
+    guard selectedSizes.contains(point.size) else { return false }
+    return switch point.kind {
+    case .statMin, .statMax, .statMedian, .statStdDevBand, .observedTrend: true
+    case .observedRun, .reference: false
     }
   }
 }
@@ -223,13 +305,24 @@ struct RainbowStatLegend: View {
 /// cost for `BigOCorrelationDetailView`'s `.chartScrollableAxes` drag gesture — this caps scatter
 /// density per distinct size before rendering. `.observedTrend`/`.reference` are untouched: there's
 /// already at most one trend point per size and a fixed 40-sample reference curve.
-func cappedForRendering(_ points: [BigOChartPoint], maxScatterPerSize: Int = 15) -> [BigOChartPoint] {
+func cappedForRendering(
+  _ points: [BigOChartPoint], maxScatterPerSize: Int = 15,
+  maxTotalScatter: Int = 300
+) -> [BigOChartPoint] {
   var seenPerSize: [Int: Int] = [:]
-  return points.filter { point in
+  let perSizeCapped = points.filter { point in
     guard point.kind == .observedRun else { return true }
     seenPerSize[point.size, default: 0] += 1
-    return seenPerSize[point.size]! <= maxScatterPerSize
+    return seenPerSize[point.size, default: 0] <= maxScatterPerSize
   }
+  let scatter = perSizeCapped.filter { $0.kind == .observedRun }
+  guard maxTotalScatter > 0 else {
+    return perSizeCapped.filter { $0.kind != .observedRun }
+  }
+  guard scatter.count > maxTotalScatter else { return perSizeCapped }
+  let stride = Double(scatter.count) / Double(maxTotalScatter)
+  let selectedIDs = Set((0..<maxTotalScatter).map { scatter[Int(Double($0) * stride)].id })
+  return perSizeCapped.filter { $0.kind != .observedRun || selectedIDs.contains($0.id) }
 }
 
 private extension View {

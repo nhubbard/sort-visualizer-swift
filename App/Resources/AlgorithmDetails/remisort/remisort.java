@@ -1,30 +1,42 @@
 import java.util.Arrays;
 
-public class remisort {
+public final class remisort {
   private final int[] a;
-  private final int n, block, runLength, runs;
+  private final int n;
+  private final int block;
+  private final int runLength;
+  private final int runs;
   private final int[] keys;
-  private int[] buffer, heap, position, destination;
+  private int[] buffer;
+  private int[] heap;
+  private int[] position;
+  private int[] destination;
   private int size;
-
-  public static void sort(int[] a) {
-    new remisort(a).execute();
-  }
 
   private remisort(int[] values) {
     a = values;
     n = a.length;
-    int low = 0, high = Math.min(n, 1291);
+    int low = 0;
+    int high = Math.min(n, 1291);
     while (low < high) {
       int middle = (low + high) / 2;
-      if (middle * middle * middle >= n) high = middle;
-      else low = middle + 1;
+      if (middle * middle * middle >= n) {
+        high = middle;
+      } else {
+        low = middle + 1;
+      }
     }
     block = low;
     runLength = block * block;
     runs = n < 2 ? 0 : (n - 1) / runLength + 1;
     keys = new int[runs < 2 ? n : runLength];
-    for (int i = 0; i < keys.length; i++) keys[i] = i;
+    for (int i = 0; i < keys.length; i++) {
+      keys[i] = i;
+    }
+  }
+
+  public static void sort(int[] a) {
+    new remisort(a).execute();
   }
 
   private boolean greater(int x, int y, int start) {
@@ -35,9 +47,13 @@ public class remisort {
     int j = root;
     while (2 * j + 1 < length) {
       j = 2 * j + 1;
-      if (j + 1 < length && greater(keys[j + 1], keys[j], start)) j++;
+      if (j + 1 < length && greater(keys[j + 1], keys[j], start)) {
+        j++;
+      }
     }
-    while (j > root && greater(item, keys[j], start)) j = (j - 1) / 2;
+    while (j > root && greater(item, keys[j], start)) {
+      j = (j - 1) / 2;
+    }
     while (j > root) {
       int old = keys[j];
       keys[j] = item;
@@ -49,16 +65,24 @@ public class remisort {
 
   private void tableSort(int start, int end) {
     int length = end - start;
-    if (length < 2) return;
-    for (int i = (length - 1) / 2; i >= 0; i--) tableSift(i, length, start, keys[i]);
+    if (length < 2) {
+      return;
+    }
+    for (int i = (length - 1) / 2; i >= 0; i--) {
+      tableSift(i, length, start, keys[i]);
+    }
     for (int i = length - 1; i > 0; i--) {
       int item = keys[i];
       keys[i] = keys[0];
       tableSift(0, i, start, item);
     }
     for (int i = 0; i < length; i++) {
-      if (keys[i] == i) continue;
-      int held = a[start + i], j = i, next = keys[i];
+      if (keys[i] == i) {
+        continue;
+      }
+      int held = a[start + i];
+      int j = i;
+      int next = keys[i];
       do {
         a[start + j] = a[start + next];
         keys[j] = j;
@@ -79,7 +103,9 @@ public class remisort {
     while (2 * root + 2 < length) {
       int left = 2 * root + 1;
       int child = less(heap[left], heap[left + 1]) ? left : left + 1;
-      if (!less(heap[child], item)) break;
+      if (!less(heap[child], item)) {
+        break;
+      }
       heap[root] = heap[child];
       root = child;
     }
@@ -96,11 +122,15 @@ public class remisort {
     if (position[run] == Math.min((run + 1) * runLength, n)) {
       size--;
       sift(heap[size], 0, size);
-    } else sift(heap[0], 0, size);
+    } else {
+      sift(heap[0], 0, size);
+    }
   }
 
   private void execute() {
-    if (n < 2) return;
+    if (n < 2) {
+      return;
+    }
     if (runs < 2) {
       tableSort(0, n);
       return;
@@ -113,17 +143,24 @@ public class remisort {
       int start = run * runLength;
       tableSort(start, Math.min(start + runLength, n));
       heap[run] = run;
-      position[run] = destination[run] = start;
+      position[run] = start;
+      destination[run] = start;
     }
     size = runs;
-    for (int i = (runs - 1) / 2; i >= 0; i--) sift(heap[i], i, size);
+    for (int i = (runs - 1) / 2; i >= 0; i--) {
+      sift(heap[i], i, size);
+    }
     for (int i = 0; i < runLength; i++) {
       int run = heap[0];
       buffer[i] = a[position[run]];
       advance(run);
     }
-    int t = 0, count = 0, cursor = 0;
-    while (position[cursor] - destination[cursor] < block) cursor++;
+    int t = 0;
+    int count = 0;
+    int cursor = 0;
+    while (position[cursor] - destination[cursor] < block) {
+      cursor++;
+    }
     do {
       int run = heap[0];
       a[destination[cursor]++] = a[position[run]];
@@ -133,7 +170,9 @@ public class remisort {
         keys[t++] = cursor > 0 ? destination[cursor] / block - block - 1 : -1;
         cursor = 0;
         count = 0;
-        while (position[cursor] - destination[cursor] < block) cursor++;
+        while (position[cursor] - destination[cursor] < block) {
+          cursor++;
+        }
       }
     } while (size > 0);
     int end = n;
@@ -145,13 +184,19 @@ public class remisort {
     position[runs - 1] = end;
     keys[keys.length - 1] = -1;
     t = 0;
-    while (keys[t] != -1) t++;
+    while (keys[t] != -1) {
+      t++;
+    }
     int source = 0;
     for (int run = 1; run < runs && source < destination[0]; run++) {
       while (destination[run] < position[run]) {
         keys[t++] = destination[run] / block - block;
-        while (keys[t] != -1) t++;
-        for (int x = 0; x < block; x++) a[destination[run] + x] = a[source + x];
+        while (keys[t] != -1) {
+          t++;
+        }
+        for (int x = 0; x < block; x++) {
+          a[destination[run] + x] = a[source + x];
+        }
         destination[run] += block;
         source += block;
       }
@@ -159,9 +204,12 @@ public class remisort {
     System.arraycopy(buffer, 0, a, 0, runLength);
     int blocks = (end - runLength) / block;
     for (int i = 0; i < blocks; i++) {
-      if (keys[i] == i) continue;
+      if (keys[i] == i) {
+        continue;
+      }
       System.arraycopy(a, runLength + i * block, buffer, 0, block);
-      int j = i, next = keys[i];
+      int j = i;
+      int next = keys[i];
       do {
         System.arraycopy(a, runLength + next * block, a, runLength + j * block, block);
         keys[j] = j;

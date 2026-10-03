@@ -1,0 +1,85 @@
+{
+  "incompatibleAdditions": {
+    "Animation Hitches": {
+      "com.apple.SwiftUI.dynamicviewproperty": "Instruments scratch grew to 189.2 MiB",
+      "com.apple.dt.instrument.dyld-activity": "Instruments scratch grew to 157.7 MiB",
+      "com.apple.dt.os-log-instrument": "Instruments scratch grew to 174.7 MiB",
+      "com.apple.dt.os-log-signpost-instrument": "Instruments scratch grew to 197.2 MiB",
+      "com.apple.xray.instrument-type.cpusampler": "Unexpected failure: Data source agent failed to setup.; Unsupported configuration of Instruments is being used. Remove Instruments recording CPU Counters from the document.",
+      "com.apple.xray.instrument-type.keventvm2": "Instruments scratch grew to 156.2 MiB"
+    },
+    "Audio System Trace": {
+      "com.apple.SwiftUI.dynamicviewproperty": "Instruments scratch grew to 135.7 MiB"
+    },
+    "CPU Counters": {
+      "com.apple.xray.instrument-type.cpusampler": "Failed binding 'kdebug-counters-with-pmi-sample' table: unable to find matching kpc configuration."
+    },
+    "CPU Profiler": {
+      "InstrumentsPlugIn.ProcessorTraceInstrument": "Unexpected failure: Data source agent failed to setup.; Unsupported configuration of Instruments is being used. Remove Instruments recording CPU Counters from the document.",
+      "InstrumentsPlugIn.SwiftUIInstrument": "Unsupported configuration of Instruments is being used. Remove Instruments recording CPU Counters from the document.; Unexpected failure: Data source agent failed to setup.",
+      "com-apple-hitches": "Unexpected failure: Data source agent failed to setup.; Unsupported configuration of Instruments is being used. Remove Instruments recording CPU Counters from the document.",
+      "com.apple.dt.instruments.metal-perf-overview": "Unexpected failure: Data source agent failed to setup.; Unsupported configuration of Instruments is being used. Remove Instruments recording CPU Counters from the document."
+    },
+    "Game Performance": {
+      "com.apple.SwiftUI.dynamicviewproperty": "Instruments scratch grew to 161.2 MiB",
+      "com.apple.dt.instrument.dyld-activity": "Instruments scratch grew to 130.2 MiB",
+      "com.apple.dt.os-log-instrument": "Instruments scratch grew to 142.7 MiB",
+      "com.apple.dt.os-log-signpost-instrument": "Instruments scratch grew to 143.2 MiB",
+      "com.apple.xray.instrument-type.vmtrack": "Instruments scratch grew to 401.7 MiB"
+    },
+    "Game Performance Overview": {
+      "com.apple.xray.instrument-type.cpusampler": "Unexpected failure: Data source agent failed to setup.; Unsupported configuration of Instruments is being used. Remove Instruments recording CPU Counters from the document."
+    },
+    "Processor Trace": {
+      "com.apple.SwiftUI.body": "Instruments scratch grew to 569.5 MiB",
+      "com.apple.xray.instrument-type.cpusampler": "Unexpected failure: Data source agent failed to setup.; Unsupported configuration of Instruments is being used. Remove Instruments recording CPU Counters from the document."
+    },
+    "SwiftUI": {
+      "com.apple.xray.instrument-type.cpusampler": "Unsupported configuration of Instruments is being used. Remove Instruments recording CPU Counters from the document.; Unexpected failure: Data source agent failed to setup."
+    }
+  },
+  "incompatibleInstrumentPairs": {
+    "InstrumentsPlugIn.SwiftUIInstrument|com.apple.dt.instruments.diskio-completion-time": "Instruments scratch grew to 149.4 MiB",
+    "InstrumentsPlugIn.SwiftUIInstrument|com.apple.dt.instruments.diskusage": "Instruments scratch grew to 148.9 MiB",
+    "InstrumentsPlugIn.SwiftUIInstrument|com.apple.dt.instruments.fs-suggestions": "Instruments scratch grew to 148.1 MiB",
+    "InstrumentsPlugIn.SwiftUIInstrument|com.apple.dt.instruments.fs-syscalls": "Instruments scratch grew to 149.4 MiB",
+    "InstrumentsPlugIn.SwiftUIInstrument|com.apple.xray.instrument-type.cpusampler": "Unexpected failure: Data source agent failed to setup.; Unsupported configuration of Instruments is being used. Remove Instruments recording CPU Counters from the document.",
+    "com-apple-hitches|com.apple.xray.instrument-type.cpusampler": "Unsupported configuration of Instruments is being used. Remove Instruments recording CPU Counters from the document.; Unexpected failure: Data source agent failed to setup.",
+    "com.apple.audio.audioinstrument.audiohal|com.apple.dt.instruments.metal-perf-overview": "Failed to stop recording session: Data Providers emitted errors: Logging ",
+    "com.apple.coredata.faults|com.apple.dt.instruments.thread-activity": "Instruments scratch grew to 164.1 MiB",
+    "com.apple.coredata.faults|com.apple.xray.instrument-type.keventsyscall2": "Instruments scratch grew to 158.1 MiB",
+    "com.apple.coredata.fetches|com.apple.dt.instruments.thread-activity": "Instruments scratch grew to 173.6 MiB",
+    "com.apple.coredata.fetches|com.apple.xray.instrument-type.keventsyscall2": "Instruments scratch grew to 143.2 MiB",
+    "com.apple.coredata.saves|com.apple.dt.instruments.thread-activity": "Instruments scratch grew to 181.7 MiB",
+    "com.apple.coredata.saves|com.apple.xray.instrument-type.keventsyscall2": "Instruments scratch grew to 204.2 MiB",
+    "com.apple.dt.graphicsstatistics|com.apple.dt.instruments.metal-perf-overview": "Failed to stop recording session: Data Providers emitted errors: Logging ",
+    "com.apple.dt.instruments.diskio-completion-time|com.apple.xray.instrument-type.metal-application": "Instruments scratch grew to 149.1 MiB",
+    "com.apple.dt.instruments.metal-perf-overview|com.apple.xray.instrument-type.cpusampler": "Unsupported configuration of Instruments is being used. Remove Instruments recording CPU Counters from the document.; Unexpected failure: Data source agent failed to setup.",
+    "com.apple.dt.instruments.thread-activity|com.apple.xray.instrument-type.metal-application": "Instruments scratch grew to 129.1 MiB",
+    "com.apple.dt.instruments.thread-activity|com.apple.xray.instrument-type.metal-gpu": "Instruments scratch grew to 155.6 MiB",
+    "com.apple.xray.instrument-type.keventsyscall2|com.apple.xray.instrument-type.metal-application": "Instruments scratch grew to 137.7 MiB",
+    "com.apple.xray.instrument-type.keventsyscall2|com.apple.xray.instrument-type.metal-gpu": "Instruments scratch grew to 130.1 MiB"
+  },
+  "instruments": {
+    "com.apple.dt.coreanimation-fps": "Core Animation FPS: Disabled because macOS does not have an FPS metric for Core Animation.",
+    "com.apple.dt.instruments.foveatedstreaming": "The Foveated Streaming Statistics instrument is not supported on macOS. Record on visionOS instead.",
+    "com.apple.dt.instruments.power-metrics": "The Power Profiler instrument is not supported on macOS. Record on iOS or iPadOS instead.",
+    "com.apple.tdg.instruments.reality-metrics": "The RealityKit Metrics instrument is not supported on macOS. Record on visionOS instead.",
+    "com.apple.tdg.instruments.realityframes": "The RealityKit Frames instrument is not supported on macOS. Record on visionOS instead."
+  },
+  "source": "CompatibilityResults.jsonl",
+  "templates": {
+    "Power Profiler": "The Power Profiler instrument is not supported on macOS. Record on iOS or iPadOS instead.",
+    "RealityKit Trace": "The RealityKit Frames instrument is not supported on macOS. Record on visionOS instead.; The RealityKit Metrics instrument is not supported on macOS. Record on visionOS instead."
+  },
+  "windowedAdditions": {
+    "Audio System Trace": {
+      "com.apple.dt.graphicsstatistics": "This instrument doesn't support Windowed Mode.",
+      "com.apple.dt.userspace-sampler": "The sampling service doesn't support Windowed Mode."
+    },
+    "Game Performance": {
+      "com.apple.dt.graphicsstatistics": "This instrument doesn't support Windowed Mode.",
+      "com.apple.dt.userspace-sampler": "The sampling service doesn't support Windowed Mode."
+    }
+  }
+}

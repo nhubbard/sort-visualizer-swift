@@ -11,8 +11,6 @@ void sift(std::vector<int> &array, int pshiftIn, int headIn);
 void trinkle(std::vector<int> &array, long pIn, int pshiftIn, int headIn,
              bool isTrustyIn);
 
-
-
 void printList(const std::vector<int> &items) {
   printf("[");
   if (!items.empty()) {

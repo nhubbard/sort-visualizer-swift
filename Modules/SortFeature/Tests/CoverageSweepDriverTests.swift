@@ -1,17 +1,41 @@
 import AlgorithmKit
 import Foundation
+import SortEngineKit
 import Testing
 import VisualizationKit
 
 @testable import SortFeature
 
-/// Covers `CoverageSweepEnumerator`'s pure logic directly against small synthetic ID lists — not
-/// the real 167 × 46 × 15 registries, and not `CoverageSweepDriver.runLoop`'s actual playback,
-/// which needs a genuinely mounted `ScrollingSortView` to consume `SortCoordinator`'s pending
-/// actions (see `SortCoordinatorTests.swift` for why `runSort` alone just suspends forever without
-/// one). What's tested here is exactly the part that has to survive registry composition changes
-/// across a week-long, many-launches sweep: log parsing, resume, and "what's left."
-@Suite
+/// Uses small synthetic registries to verify enumeration and durable progress. The run-loop test
+/// resolves `SortCoordinator`'s pending actions as a mounted sort view would, so it can exercise
+/// cancellation and resume without waiting for animated playback.
+private struct SweepTestAlgorithm: SortAlgorithm {
+  let id = AlgorithmID(rawValue: "sweep-test-algorithm")
+  var metadata: AlgorithmMetadata {
+    AlgorithmMetadata(
+      displayName: "Sweep Test", category: .exchange, sizeRange: 1...32,
+      growthModel: .unconstrained, implementationComplexity: 0, stable: true,
+      timeComplexity: ComplexityBounds(best: "O(n)", average: "O(n)", worst: "O(n)"),
+      spaceComplexity: "O(1)", iconName: "square")
+  }
+  func record(into engine: inout RecordingEngine) {}
+}
+
+private struct SweepTestShuffle: ShuffleAlgorithm {
+  let id = ShuffleID(rawValue: "sweep-test-shuffle")
+  let metadata = ShuffleMetadata(displayName: "Sweep Test Shuffle")
+  func record(into engine: inout RecordingEngine) {}
+}
+
+private struct SweepTestVisualizer: Visualizer {
+  let id: VisualizerID
+  var metadata: VisualizerMetadata {
+    VisualizerMetadata(displayName: id.rawValue, supportsAuxArrays: false, iconName: "square")
+  }
+  func draw(_ context: VisualizationContext) -> [DrawCommand] { [] }
+}
+
+@Suite(.serialized)
 struct CoverageSweepDriverTests {
   private static let a1 = AlgorithmID(rawValue: "alg1")
   private static let a2 = AlgorithmID(rawValue: "alg2")
@@ -154,5 +178,93 @@ struct CoverageSweepDriverTests {
     #expect(!driver.isRunning)
     #expect(driver.estimatedTimeRemaining() == nil)
     #expect(driver.currentCombo == nil)
+  }
+
+  @MainActor
+  @Test
+  func stoppedSweepLogsFinishedComboAndResumesAtNextVisualizer() async throws {
+    let algorithms = AlgorithmRegistry.shared
+    let shuffles = ShuffleRegistry.shared
+    let visualizers = VisualizerRegistry.shared
+    let restoreAlgorithms = algorithms.builtIns
+    let restoreShuffles = shuffles.builtIns
+    let restoreVisualizers = visualizers.builtIns
+    let coordinator = SortCoordinator.shared
+    let restoreSelection = coordinator.selectedAlgorithmID
+    let url = FileManager.default.temporaryDirectory.appendingPathComponent(
+      "CoverageSweepDriverTests-resume-\(UUID().uuidString).tsv")
+    defer {
+      coordinator.resolveCompletion(token: coordinator.runToken)
+      coordinator.selectedAlgorithmID = restoreSelection
+      algorithms.builtIns = restoreAlgorithms
+      algorithms.discover()
+      shuffles.builtIns = restoreShuffles
+      shuffles.discover()
+      visualizers.builtIns = restoreVisualizers
+      visualizers.discover()
+      try? FileManager.default.removeItem(at: url)
+    }
+    let algorithm = SweepTestAlgorithm()
+    let shuffle = SweepTestShuffle()
+    let firstStyle = SweepTestVisualizer(id: Self.v1)
+    let secondStyle = SweepTestVisualizer(id: Self.v2)
+    algorithms.builtIns = [algorithm]
+    algorithms.discover()
+    shuffles.builtIns = [shuffle]
+    shuffles.discover()
+    visualizers.builtIns = [firstStyle, secondStyle]
+    visualizers.discover()
+
+    let firstDriver = CoverageSweepDriver(logURL: url)
+    #expect(firstDriver.totalCount == 2)
+    firstDriver.start()
+    let firstQueued = await waitUntil {
+      coordinator.pendingActionWillAutomate(for: algorithm.id)
+    }
+    #expect(firstQueued)
+    firstDriver.stop()
+    guard case .run(let firstID, _) = coordinator.consumePendingAction(for: algorithm.id) else {
+      Issue.record("first sweep combination was not queued")
+      return
+    }
+    #expect(firstID == firstStyle.id)
+    coordinator.resolveCompletion(token: coordinator.runToken)
+    #expect(await waitUntil { !firstDriver.isRunning })
+    #expect(firstDriver.completedCount == 1)
+    #expect(firstDriver.estimatedTimeRemaining() != nil)
+
+    let resumedDriver = CoverageSweepDriver(logURL: url)
+    resumedDriver.loadProgress()
+    #expect(resumedDriver.completedCount == 1)
+    resumedDriver.start()
+    let secondQueued = await waitUntil {
+      coordinator.pendingActionWillAutomate(for: algorithm.id)
+    }
+    #expect(secondQueued)
+    guard case .run(let secondID, _) = coordinator.consumePendingAction(for: algorithm.id) else {
+      Issue.record("resumed sweep did not queue the remaining combination")
+      return
+    }
+    #expect(secondID == secondStyle.id)
+    coordinator.resolveCompletion(token: coordinator.runToken)
+    #expect(await waitUntil { !resumedDriver.isRunning })
+    #expect(resumedDriver.completedCount == 2)
+    #expect(resumedDriver.estimatedTimeRemaining() == 0)
+    let logged = try String(contentsOf: url, encoding: .utf8)
+    #expect(CoverageSweepEnumerator.parseLog(logged).count == 2)
+    #expect(logged.components(separatedBy: "\n").filter { !$0.isEmpty } == [
+      "sweep-test-algorithm\tsweep-test-shuffle\tvis1",
+      "sweep-test-algorithm\tsweep-test-shuffle\tvis2"
+    ])
+  }
+
+  @MainActor
+  private func waitUntil(_ condition: @MainActor () -> Bool) async -> Bool {
+    let clock = ContinuousClock()
+    let deadline = clock.now.advanced(by: .seconds(2))
+    while !condition() && clock.now < deadline {
+      try? await Task.sleep(for: .milliseconds(5))
+    }
+    return condition()
   }
 }

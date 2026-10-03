@@ -9,8 +9,12 @@ public class quicksort {
     int i = left;
     int j = right;
     while (i < j) {
-      while (i < j && arr[i] <= arr[left]) i++;
-      while (arr[j] > arr[left]) j--;
+      while (i < j && arr[i] <= arr[left]) {
+        i++;
+      }
+      while (arr[j] > arr[left]) {
+        j--;
+      }
       if (i < j) {
         int temp = arr[i];
         arr[i] = arr[j];

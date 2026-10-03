@@ -1,5 +1,6 @@
 fun sort(arr: Array<Int>) {
   if (arr.size <= 1) return
+
   fun compSwap(a: Int, b: Int) {
     if (arr[a] > arr[b]) {
       val temp = arr[a]

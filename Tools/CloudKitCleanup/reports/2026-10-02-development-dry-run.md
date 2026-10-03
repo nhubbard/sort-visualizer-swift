@@ -1,0 +1,217 @@
+# CloudKit stale-size dry-run review (2026-10-02)
+
+All values below come from complete read-only Development scans made before deletion. After
+explicit approval on 2026-10-02, cleanup began against these exact candidate sets. The
+Development cap-exceeded set has since been verified empty by a fresh complete scan: 819
+records remain, none above the current maximum. A fresh Production Big-O scan found no records.
+Development Big-O cleanup is partly complete and has encountered CloudKit throttling. The
+figures below are the original dry-run counts, not current remaining counts.
+
+| Record type | Scanned | Above current selectable maximum | Algorithms affected |
+| --- | ---: | ---: | ---: |
+| Big-O | 391,120 | 262,700 | 180 |
+| Cap exceeded | 6,298 | 5,479 | 69 |
+| Production Big-O | 0 | 0 | 0 |
+
+**Total Development candidates:** 268,179.
+
+## Execution checkpoint (2026-10-02)
+
+After explicit approval, all 5,479 cap-exceeded candidates were removed. A fresh complete
+Development scan found 819 cap-exceeded records remaining and none above current maxima. A
+fresh Production Big-O scan again found no records.
+
+For Development Big-O, the first 41 algorithm groups in sorted ID order, through
+`classictournamentsort`, were re-queried and found empty. Those groups contained 74,957 of
+the original approved candidates. Other groups may have been partly deleted by CloudKit's
+ambiguous `retry-needed` and `too-many-requests` responses; their remaining count has not
+been established by a complete scan. The live pass stopped at this verified boundary after
+individual groups began taking many minutes despite one-worker execution.
+
+Every candidate has a unique CloudKit record name within its record type and a size strictly greater than its cached threshold. The private record names remain in the local ignored caches.
+
+Candidate-set SHA-256 fingerprints are `22b4950bc5741cd56934c729a58274aad3efa82d4a485f03d6ba91d9d2232928` for Development Big-O and `9b8046f938707dc771c6922165ff3555fc8f80b7e7f85c760f6a1b4ec1eb19da` for Development cap-exceeded. Each fingerprint hashes newline-separated compact JSON arrays of `[recordType, recordName, algorithmID, arraySize, threshold]`, sorted by record name. This identifies the exact cached candidate sets without publishing private record names.
+
+| Algorithm ID | Current maximum | Big-O candidates | Cap-exceeded candidates | Largest candidate size |
+| --- | ---: | ---: | ---: | ---: |
+| aatreesort | 2272 | 2,605 | 60 | 8,192 |
+| adaptivegrailsort | 1152 | 52 | 0 | 1,216 |
+| americanflagsort | 2000 | 2,740 | 60 | 6,896 |
+| andreysort | 1376 | 2,624 | 62 | 5,360 |
+| asynchronoussort | 336 | 2,528 | 167 | 160,000 |
+| avltreesort | 2640 | 2,602 | 61 | 8,192 |
+| badsort | 80 | 735 | 0 | 128 |
+| basenmaxheapsort | 1456 | 2,627 | 62 | 5,872 |
+| binarydoubleinsertionsort | 656 | 2,696 | 0 | 2,176 |
+| binarygnomesort | 288 | 1,331 | 0 | 672 |
+| binaryinsertionsort | 288 | 1,355 | 0 | 672 |
+| binarymergesort | 1040 | 2,747 | 0 | 2,448 |
+| binaryquicksortiterative | 2832 | 2,806 | 167 | 8,192 |
+| binaryquicksortrecursive | 2832 | 2,701 | 166 | 8,192 |
+| bingosort | 256 | 2,509 | 165 | 11,080 |
+| binomialheapsort | 928 | 1,345 | 0 | 2,672 |
+| binomialsmoothsort | 736 | 2,689 | 0 | 2,032 |
+| bitonicsortiterative | 816 | 1,411 | 0 | 2,384 |
+| bitonicsortrecursive | 928 | 1,391 | 0 | 2,720 |
+| blockinsertionsort | 496 | 2,682 | 0 | 1,296 |
+| blockswapmergesort | 1216 | 2,621 | 60 | 6,736 |
+| bogobogosort | 4 | 1,980 | 818 | 6 |
+| bogosort | 7 | 17 | 0 | 8 |
+| bosenelsonsortiterative | 704 | 2,692 | 0 | 2,080 |
+| bosenelsonsortrecursive | 656 | 674 | 0 | 1,568 |
+| bottomupheapsort | 1824 | 2,622 | 61 | 8,016 |
+| bottomupmergesort | 1936 | 2,624 | 61 | 8,192 |
+| bozosort | 7 | 562 | 127 | 8 |
+| bubblebogosort | 48 | 2,812 | 6 | 400 |
+| bubblesort | 208 | 748 | 0 | 480 |
+| bufferedstoogesort | 352 | 678 | 0 | 832 |
+| bufferpartitionmergesort | 1824 | 2 | 0 | 2,112 |
+| burntpancakesort | 176 | 721 | 8 | 400 |
+| chalicesort | 1536 | 2 | 0 | 1,744 |
+| circlesortiterative | 720 | 2,680 | 0 | 2,288 |
+| circlesortrecursive | 720 | 2,676 | 0 | 2,288 |
+| circloidsort | 560 | 692 | 0 | 1,584 |
+| circulargrailsort | 1232 | 3 | 0 | 1,344 |
+| classicgravitysort | 304 | 2,667 | 0 | 880 |
+| classicthreesmoothcombsort | 960 | 2,693 | 0 | 3,440 |
+| classictournamentsort | 2256 | 2,615 | 61 | 8,192 |
+| classictreesort | 304 | 2,472 | 213 | 160,000 |
+| cocktailmergesort | 720 | 2,698 | 0 | 960 |
+| cocktailshakersort | 192 | 2,315 | 0 | 480 |
+| combsort | 1104 | 24 | 0 | 2,688 |
+| completegraphsort | 288 | 2,104 | 0 | 704 |
+| countingsort | 8192 | 0 | 1 | 240,000 |
+| creasesort | 928 | 2,064 | 0 | 2,960 |
+| cyclesort | 32 | 2,011 | 181 | 44,928 |
+| deterministicbogosort | 7 | 21 | 3 | 11 |
+| diamondsortiterative | 176 | 25 | 0 | 416 |
+| diamondsortrecursive | 176 | 94 | 0 | 416 |
+| doubleinsertionsort | 432 | 2,007 | 0 | 2,176 |
+| doubleselectionsort | 304 | 22 | 0 | 688 |
+| dropmergesort | 944 | 1 | 0 | 1,040 |
+| dualpivotquicksort | 1488 | 1,972 | 45 | 6,272 |
+| exchangebogosort | 48 | 2,261 | 0 | 480 |
+| flashsort | 3072 | 1,923 | 183 | 8,192 |
+| flippedminheapsort | 1344 | 1,984 | 45 | 5,168 |
+| fluxsort | 1520 | 646 | 15 | 3,024 |
+| foldsort | 928 | 2,070 | 0 | 3,200 |
+| forcedstablequicksort | 896 | 2,098 | 5 | 2,512 |
+| funsort | 128 | 2,102 | 0 | 304 |
+| gnomesort | 48 | 2,275 | 0 | 400 |
+| grailsort | 1056 | 2,001 | 0 | 2,800 |
+| gravitysort | 272 | 2,025 | 0 | 1,088 |
+| guesssort | 4 | 21 | 1 | 5 |
+| hanoisort | 10 | 2,105 | 0 | 16 |
+| hybridcombsort | 1056 | 2,104 | 0 | 2,624 |
+| improvedblockselectionsort | 912 | 4 | 0 | 960 |
+| improvedinplacemergesort | 464 | 2,102 | 0 | 1,488 |
+| inplacelsdradixsort | 128 | 18 | 0 | 288 |
+| inplacemergesort | 208 | 53 | 0 | 480 |
+| insertionsort | 48 | 2,252 | 0 | 480 |
+| introcirclesortiterative | 816 | 20 | 0 | 2,016 |
+| introcirclesortrecursive | 816 | 2 | 0 | 1,104 |
+| introsort | 928 | 1,963 | 46 | 4,128 |
+| iterativetopdownmergesort | 2000 | 1,961 | 47 | 8,192 |
+| laziestsort | 1008 | 4 | 0 | 1,072 |
+| lazyheapsort | 848 | 2,101 | 0 | 2,064 |
+| lazystablesort | 480 | 16 | 1 | 1,280 |
+| lessbogosort | 7 | 18 | 1 | 8 |
+| librarysort | 656 | 1,994 | 0 | 2,128 |
+| llquicksort | 240 | 2,034 | 0 | 688 |
+| lrquicksort | 544 | 1,958 | 46 | 8,192 |
+| lsdradixsort | 3424 | 2,056 | 45 | 8,192 |
+| matrixsort | 800 | 2,164 | 45 | 3,328 |
+| maxheapsort | 1344 | 1,980 | 45 | 5,184 |
+| medianquickbogosort | 7 | 14 | 1 | 10 |
+| mergebogosort | 7 | 2,105 | 2 | 22 |
+| mergeexchangesortiterative | 1008 | 2,065 | 0 | 3,376 |
+| mergesort | 2176 | 1,966 | 46 | 8,192 |
+| minheapsort | 1312 | 1,963 | 45 | 5,328 |
+| minmaxheapsort | 1104 | 2,013 | 0 | 3,872 |
+| msdradixsort | 2912 | 2,054 | 45 | 8,192 |
+| newshufflemergesort | 592 | 1,900 | 100 | 2,432 |
+| oddevenmergesortiterative | 880 | 2,134 | 0 | 2,592 |
+| oddevenmergesortrecursive | 896 | 2,123 | 0 | 2,352 |
+| oddevensort | 48 | 2,272 | 0 | 480 |
+| optimizedbottomupmergesort | 2352 | 1 | 0 | 2,608 |
+| optimizedbubblesort | 48 | 2,273 | 0 | 480 |
+| optimizedcocktailshakersort | 48 | 2,271 | 0 | 480 |
+| optimizeddualpivotquicksort | 768 | 1 | 0 | 1,280 |
+| optimizedgnomesort | 48 | 2,273 | 0 | 480 |
+| optimizedguesssort | 5 | 16 | 2 | 8 |
+| optimizedlazystablesort | 448 | 17 | 0 | 1,040 |
+| optimizedstoogesort | 240 | 18 | 0 | 560 |
+| optimizedstoogesortstudio | 48 | 2,101 | 0 | 480 |
+| optimizedweavemergesort | 688 | 4 | 0 | 992 |
+| outofplaceheapsort | 1584 | 1,979 | 45 | 8,192 |
+| pairwisemergesortiterative | 928 | 2,014 | 0 | 3,088 |
+| pairwisemergesortrecursive | 928 | 2,006 | 0 | 3,088 |
+| pairwisesortiterative | 1008 | 2,076 | 0 | 3,392 |
+| pairwisesortrecursive | 1008 | 2,015 | 0 | 3,392 |
+| pancakeinsertionsort | 48 | 2,097 | 0 | 608 |
+| pancakesort | 224 | 37 | 0 | 496 |
+| patiencesort | 3552 | 1,832 | 181 | 8,192 |
+| pdmergesort | 2288 | 1,824 | 181 | 8,192 |
+| pdqbranchedsort | 1072 | 2,012 | 90 | 4,176 |
+| pdqbranchlesssort | 1104 | 2,386 | 91 | 8,192 |
+| poplarheapsort | 1120 | 2,099 | 0 | 2,816 |
+| quadsort | 1984 | 641 | 30 | 6,752 |
+| quadstoogesort | 80 | 18 | 0 | 160 |
+| quickbogosort | 7 | 13 | 0 | 8 |
+| quicksort | 304 | 18 | 0 | 688 |
+| randomguesssort | 5 | 19 | 3 | 8 |
+| recursiveshellsort | 880 | 2,100 | 0 | 2,144 |
+| redblacktreesort | 2144 | 1,959 | 45 | 8,192 |
+| remisort | 1584 | 3 | 0 | 1,760 |
+| rotatelsdradixsort | 848 | 2,096 | 0 | 2,384 |
+| rotatemergesort | 1296 | 1,962 | 46 | 4,672 |
+| rotatemsdradixsort | 1008 | 2,096 | 0 | 2,816 |
+| selectionbogosort | 304 | 18 | 0 | 688 |
+| selectionsort | 304 | 16 | 0 | 688 |
+| shattersort | 944 | 2,099 | 0 | 2,240 |
+| shellsort | 1360 | 2,055 | 45 | 3,392 |
+| shovesort | 19 | 2,098 | 0 | 48 |
+| sillysort | 32 | 11 | 0 | 48 |
+| simplifiedlibrarysort | 368 | 2,099 | 0 | 880 |
+| simplisticgravitysort | 256 | 2,097 | 0 | 768 |
+| slopesort | 208 | 54 | 0 | 480 |
+| slowsort | 32 | 40 | 4 | 64 |
+| smartbogobogosort | 14 | 2,098 | 0 | 19 |
+| smartguesssort | 8 | 17 | 1 | 19 |
+| smoothsort | 1424 | 2,052 | 48 | 3,840 |
+| snufflesort | 24 | 34 | 0 | 32 |
+| splaysort | 5136 | 1,819 | 181 | 8,192 |
+| sqrtsort | 1376 | 2 | 0 | 1,520 |
+| stablecyclesort | 192 | 1,878 | 181 | 8,192 |
+| stablepermutationsort | 7 | 14 | 3 | 8 |
+| stablequicksort | 384 | 2,096 | 0 | 1,536 |
+| stableselectionsort | 256 | 2,096 | 0 | 624 |
+| stacklessamericanflagsort | 2384 | 2,049 | 45 | 7,744 |
+| stacklessbinaryquicksort | 3392 | 1,824 | 181 | 8,192 |
+| stacklessrotatemergesort | 784 | 1,988 | 0 | 2,544 |
+| staticsort | 7792 | 1,861 | 182 | 8,192 |
+| stoogesort | 48 | 43 | 5 | 128 |
+| strandsort | 272 | 1,997 | 0 | 1,536 |
+| swaplessbubblesort | 256 | 1,985 | 0 | 1,536 |
+| synchronoussqrtsort | 1776 | 2 | 0 | 2,064 |
+| tablesort | 912 | 2,085 | 8 | 2,528 |
+| ternaryheapsort | 1504 | 1,949 | 45 | 6,304 |
+| ternaryllquicksort | 240 | 34 | 0 | 560 |
+| ternarylrquicksort | 336 | 13 | 0 | 768 |
+| threesmoothcombsortiterative | 928 | 2,065 | 0 | 3,168 |
+| threesmoothcombsortrecursive | 928 | 2,026 | 0 | 3,168 |
+| timsort | 1504 | 2 | 0 | 1,648 |
+| tournamentsort | 2160 | 1,965 | 45 | 8,192 |
+| treesort | 304 | 14 | 0 | 688 |
+| triangularheapsort | 496 | 15 | 0 | 1,216 |
+| twinsort | 1360 | 1,826 | 180 | 8,192 |
+| unoptimizedbubblesort | 48 | 2,235 | 5 | 400 |
+| unoptimizedcocktailshakersort | 208 | 47 | 0 | 480 |
+| unstablegrailsort | 1072 | 2,018 | 0 | 3,568 |
+| weakheapsort | 2176 | 1,972 | 46 | 8,192 |
+| weavedmergesort | 2384 | 1,815 | 181 | 8,192 |
+| weavemergesort | 272 | 2,096 | 0 | 688 |
+| weavesortiterative | 1008 | 2,074 | 0 | 3,472 |
+| weavesortrecursive | 1008 | 2,016 | 0 | 3,472 |
+| wikisort | 992 | 2 | 0 | 1,040 |
+| yujisbufferedmergesort2 | 1312 | 1 | 0 | 1,360 |

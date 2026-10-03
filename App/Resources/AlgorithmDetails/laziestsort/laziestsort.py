@@ -18,6 +18,7 @@ def sort(arr):
         merge(arr, lo - block_size, lo, n)
         lo -= block_size
 
+
 def binary_insertion_sort(arr, lo, hi):
     for i in range(lo + 1, hi):
         key = arr[i]
@@ -93,8 +94,6 @@ def merge(arr, lo, mid, hi):
             rotate(arr, left, right, boundary)
             left += boundary - right
             right = boundary
-
-
 
 
 if __name__ == "__main__":

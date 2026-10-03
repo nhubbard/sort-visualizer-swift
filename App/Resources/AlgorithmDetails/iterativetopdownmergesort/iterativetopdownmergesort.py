@@ -17,6 +17,7 @@ def sort(arr):
             i = i + 2
         subarray_count = subarray_count // 2
 
+
 def merge(array, scratch, low, mid, high):
     left, right, out = low, mid, low
     while left < mid and right < high:
@@ -39,12 +40,24 @@ def merge(array, scratch, low, mid, high):
         array[index] = scratch[index]
 
 
-
-
 if __name__ == "__main__":
     array = [
-        0, 39, 21, 62, 91, 77, 14, 23,
-        90, 69, 51, 81, 68, 83, 32, 56,
+        0,
+        39,
+        21,
+        62,
+        91,
+        77,
+        14,
+        23,
+        90,
+        69,
+        51,
+        81,
+        68,
+        83,
+        32,
+        56,
     ]
     sort(array)
     print(array)

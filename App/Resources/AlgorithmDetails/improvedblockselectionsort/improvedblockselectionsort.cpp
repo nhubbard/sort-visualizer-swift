@@ -2,8 +2,7 @@
 #include <cstdio>
 #include <utility>
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
-                 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
 
 void printList(int items[], int size) {
   printf("[");
@@ -101,10 +100,9 @@ int selectRange(int arr[], int start, int end, int bLen) {
   int minIndex = start;
   int a = start + bLen;
   while (a < end) {
-    if (arr[a] < arr[minIndex]) {
-      minIndex = a;
-    } else if (arr[a] == arr[minIndex] &&
-               arr[a + bLen - 1] < arr[minIndex + bLen - 1]) {
+    if (arr[a] < arr[minIndex] ||
+        (arr[a] == arr[minIndex] &&
+         arr[a + bLen - 1] < arr[minIndex + bLen - 1])) {
       minIndex = a;
     }
     a += bLen;
