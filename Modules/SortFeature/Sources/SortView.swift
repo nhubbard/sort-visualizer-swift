@@ -1,3 +1,4 @@
+import PersistenceKit
 import SettingsKit
 import SortEngineKit
 import SwiftUI
@@ -20,6 +21,9 @@ public struct SortView: View {
   @State private var isSpeedExpanded = false
   @State private var isSizeExpanded = false
   @State private var isVisualizerExpanded = false
+  #if DEBUG
+  @State private var capAuditProbe = "loading"
+  #endif
   #if DEBUG && targetEnvironment(macCatalyst) && LOCAL_INSTRUMENTS_TRACING
   @State private var traceHistory = DebugTraceHistory.shared
   @State private var isTraceHistoryPresented = false
@@ -37,6 +41,25 @@ public struct SortView: View {
       } else {
         statusLabel
       }
+      #if DEBUG
+      if let cap = ProcessInfo.processInfo.environment["UI_TEST_CAP_LOG_PROBE"].flatMap(Int.init) {
+        Text("Cap log probe")
+          .font(.caption2)
+          .accessibilityIdentifier("capExceededLogProbe")
+          .accessibilityValue(capAuditProbe)
+          .task(id: "\(session.isAutomating)-\(session.arraySize)-\(session.analyticsRevision)") {
+            do {
+              let audit = try await AnalyticsService.shared.capExceededAuditForUITesting(
+                algorithmID: session.algorithm.id.rawValue, operationCap: cap)
+              let completed = try await AnalyticsService.shared.fetchSummaries(
+                algorithmID: session.algorithm.id).count
+              capAuditProbe = "\(audit.count)|\(audit.latestSize ?? -1)|\(completed)|\(session.analyticsRevision)"
+            } catch {
+              capAuditProbe = "error: \(error)"
+            }
+          }
+      }
+      #endif
       #if DEBUG && targetEnvironment(macCatalyst) && LOCAL_INSTRUMENTS_TRACING
       if ProcessInfo.processInfo.environment["SORT_SYMPHONY_TRACE"] == "1" {
         traceControls

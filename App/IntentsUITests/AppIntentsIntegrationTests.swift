@@ -205,6 +205,85 @@ final class AppIntentsIntegrationTests: XCTestCase {
       .makeIntent(speed: 30.0).run()
   }
 
+  func testSystemSizeSweepPersistsCapSkipAndContinues() async throws {
+    let app = XCUIApplication()
+    app.launchEnvironment = [
+      "UI_TEST_ARRAY_SIZE": "16",
+      "UI_TEST_PLAYBACK_SPEED": "1000",
+      "UI_TEST_RECORDING_CAP": "5000",
+      "UI_TEST_CAP_SWEEP": "1",
+      "UI_TEST_CAP_LOG_PROBE": "5000",
+      "UI_TEST_DETERMINISTIC_REPLAY": "1",
+    ]
+    app.launch()
+    let algorithmLink = app.buttons["algorithmLink.threesmoothcombsortiterative"]
+    XCTAssertTrue(algorithmLink.waitForExistence(timeout: 5))
+    algorithmLink.tap()
+
+    let probe = app.staticTexts["capExceededLogProbe"]
+    let before = try waitForCapAudit(probe, timeout: 20) { $0.sessionCompletions == 1 }
+    let definitions = IntentDefinitions(bundleIdentifier: "com.nhubbard.Sort2.mobile")
+    let catalog = try await definitions.intents["FindAlgorithmsIntent"].makeIntent().run()
+    let algorithms = try catalog.value.as([AnyAppEntity].self)
+    let algorithm = try XCTUnwrap(
+      algorithms.first { $0.identifier.instanceIdentifier == "threesmoothcombsortiterative" })
+    let options = try await definitions.intents["FindAutomationsIntent"].makeIntent().run()
+    let automations = try options.value.as([AnyAppEntity].self)
+    let sizeSweep = try XCTUnwrap(
+      automations.first { $0.identifier.instanceIdentifier == "sizeSweep" })
+
+    _ = try await definitions.intents["RunAutomationIntent"]
+      .makeIntent(algorithm: algorithm, automation: sizeSweep).run()
+
+    let after = try waitForCapAudit(app.staticTexts["capExceededLogProbe"], timeout: 15) {
+      $0.capCount == before.capCount + 1 && $0.sessionCompletions == 2
+    }
+    XCTAssertEqual(after.latestSkippedSize, 256)
+    XCTAssertEqual(after.completedRecordCount, before.completedRecordCount + 2)
+    XCTAssertEqual(app.staticTexts["sortStatusLabel"].value as? String, "sorted")
+    XCTAssertFalse(app.staticTexts["automationProgressLabel"].exists)
+
+    app.terminate()
+    app.launch()
+    XCTAssertTrue(algorithmLink.waitForExistence(timeout: 5))
+    algorithmLink.tap()
+    let persisted = try waitForCapAudit(app.staticTexts["capExceededLogProbe"], timeout: 15) {
+      $0.capCount == after.capCount && $0.latestSkippedSize == 256
+    }
+    XCTAssertGreaterThanOrEqual(persisted.completedRecordCount, after.completedRecordCount)
+  }
+
+  private struct CapAudit {
+    let capCount: Int
+    let latestSkippedSize: Int
+    let completedRecordCount: Int
+    let sessionCompletions: Int
+  }
+
+  private func parseCapAudit(_ raw: String?) -> CapAudit? {
+    guard let raw else { return nil }
+    let parts = raw.split(separator: "|")
+    guard parts.count == 4,
+      let capCount = Int(parts[0]), let size = Int(parts[1]),
+      let completed = Int(parts[2]), let revision = Int(parts[3]) else { return nil }
+    return CapAudit(
+      capCount: capCount, latestSkippedSize: size,
+      completedRecordCount: completed, sessionCompletions: revision)
+  }
+
+  private func waitForCapAudit(
+    _ probe: XCUIElement, timeout: TimeInterval,
+    matching matches: (CapAudit) -> Bool
+  ) throws -> CapAudit {
+    let deadline = Date().addingTimeInterval(timeout)
+    while Date() < deadline {
+      if let audit = parseCapAudit(probe.value as? String), matches(audit) { return audit }
+      Thread.sleep(forTimeInterval: 0.2)
+    }
+    XCTFail("Cap log probe did not reach the expected persisted state: \(probe.value ?? "missing")")
+    return try XCTUnwrap(parseCapAudit(probe.value as? String))
+  }
+
   func testRunSortRejectsUnknownAlgorithmBeforeChangingTheVisibleSession() async throws {
     let app = XCUIApplication()
     app.launch()

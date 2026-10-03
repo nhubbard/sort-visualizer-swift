@@ -95,11 +95,15 @@ struct Sort2App: App {
     // The two automations formerly hardcoded as `SortSession.toggleAutomation()`/
     // `toggleMaxSizeAutomation()` — the shortcut each one triggers is declared right here,
     // next to what it runs, instead of separately in `ScrollingSortView`'s shortcut buttons.
+    let isCapSweepUITest = ProcessInfo.processInfo.environment["UI_TEST_CAP_SWEEP"] == "1"
     AutomationRegistry.shared.builtIns = [
       Automation(
         id: .sizeSweep, displayName: "Size Sweep", iconName: "arrow.up.right",
-        key: "a", modifiers: [.command, .shift], runsPerSize: 3,
+        key: "a", modifiers: [.command, .shift], runsPerSize: isCapSweepUITest ? 1 : 3,
         sizes: { metadata in
+          if ProcessInfo.processInfo.environment["UI_TEST_CAP_SWEEP"] == "1" {
+            return [16, 256, 16]
+          }
           // `Automation.sizes` is `@Sendable` (no static isolation), but every current caller
           // (`SortSession`, `@MainActor`) only ever invokes it from the main actor.
           let range = MainActor.assumeIsolated {
