@@ -10,6 +10,14 @@ import Testing
 @Suite
 struct NativeAlgorithmCorrectnessTests {
   @Test
+  func kotaSortMergesTheLastRestoredBlock() {
+    let input = (0..<257).map { ($0 * 151) % 251 }.sorted(by: >)
+    var engine = RecordingEngine(values: input, operationCap: 20_000_000)
+    KotaSort().record(into: &engine)
+    #expect(engine.values == input.sorted())
+  }
+
+  @Test
   func kotaSortHandlesInternalKeysAndStableFallbacks() {
     let algorithm = KotaSort()
     let radix = 8_192
