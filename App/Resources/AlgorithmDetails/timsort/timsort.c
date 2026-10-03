@@ -1,137 +1,262 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-typedef struct {
-  int base;
-  int length;
-} Run;
+/* Copyright (C) 2008 The Android Open Source Project
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
-int minRunLength(int value) {
-  int n = value, remainder = 0;
-  while (n >= 32) {
-    remainder |= n & 1;
-    n >>= 1;
-  }
-  return n + remainder;
+typedef struct {
+  int *a, count;
+  int *base, *length, stack_size;
+  int *temp, temp_capacity, min_gallop;
+} Tim;
+
+static int minimum(int a, int b) { return a < b ? a : b; }
+static int maximum(int a, int b) { return a > b ? a : b; }
+
+static void ensure_capacity(Tim *s, int needed) {
+  if (s->temp_capacity >= needed) return;
+  int capacity = maximum(1, s->temp_capacity);
+  while (capacity < needed) capacity *= 2;
+  capacity = minimum(capacity, maximum(1, s->count / 2));
+  int *replacement = realloc(s->temp, (size_t)capacity * sizeof *replacement);
+  if (!replacement) abort();
+  s->temp = replacement;
+  s->temp_capacity = capacity;
 }
 
-int countRun(int values[], int n, int start) {
-  int end = start + 1;
-  if (end == n)
-    return 1;
-  int descending = values[end] < values[start];
-  end++;
-  if (descending) {
-    while (end < n && values[end] < values[end - 1])
-      end++;
-    for (int left = start, right = end - 1; left < right; left++, right--) {
-      int value = values[left];
-      values[left] = values[right];
-      values[right] = value;
+static int min_run_length(int value) {
+  int remainder = 0;
+  while (value >= 32) {
+    remainder |= value & 1;
+    value >>= 1;
+  }
+  return value + remainder;
+}
+
+static int count_run(Tim *s, int first, int end) {
+  if (first + 1 >= end) return 1;
+  int cursor = first + 2;
+  if (s->a[first + 1] < s->a[first]) {
+    while (cursor < end && s->a[cursor] < s->a[cursor - 1]) ++cursor;
+    for (int left = first, right = cursor - 1; left < right; ++left, --right) {
+      int value = s->a[left];
+      s->a[left] = s->a[right];
+      s->a[right] = value;
     }
   } else {
-    while (end < n && values[end] >= values[end - 1])
-      end++;
+    while (cursor < end && s->a[cursor] >= s->a[cursor - 1]) ++cursor;
   }
-  return end - start;
+  return cursor - first;
 }
 
-void binaryInsertion(int values[], int start, int end, int sortedEnd) {
-  for (int index = sortedEnd; index < end; index++) {
-    int pivot = values[index];
-    int low = start, high = index;
+static void binary_insertion(Tim *s, int first, int end, int sorted_end) {
+  int cursor = maximum(first + 1, sorted_end);
+  while (cursor < end) {
+    int pivot = s->a[cursor], low = first, high = cursor;
     while (low < high) {
       int middle = low + (high - low) / 2;
-      if (values[middle] <= pivot)
-        low = middle + 1;
-      else
-        high = middle;
+      if (s->a[middle] <= pivot) low = middle + 1;
+      else high = middle;
     }
-    for (int shift = index; shift > low; shift--)
-      values[shift] = values[shift - 1];
-    values[low] = pivot;
+    for (int shift = cursor; shift > low; --shift) s->a[shift] = s->a[shift - 1];
+    s->a[low] = pivot;
+    ++cursor;
   }
 }
 
-void merge(int values[], Run runs[], int *stackSize, int index) {
-  int start = runs[index].base;
-  int leftLength = runs[index].length;
-  int rightStart = runs[index + 1].base;
-  int rightLength = runs[index + 1].length;
-  int *left = (int *)malloc((size_t)leftLength * sizeof(int));
-  int *right = (int *)malloc((size_t)rightLength * sizeof(int));
-  if (left == NULL || right == NULL) {
-    free(left);
-    free(right);
-    exit(EXIT_FAILURE);
+static int gallop(Tim *s, int first, int end, int key, int upper,
+                  int from_end, int use_temp) {
+  if (first >= end) return first;
+  int low, high;
+  if (from_end) {
+    high = end;
+    low = end - 1;
+    int step = 1;
+    while (!((use_temp ? s->temp[low] : s->a[low]) < key ||
+             (upper && (use_temp ? s->temp[low] : s->a[low]) == key))) {
+      high = low;
+      if (low == first) break;
+      step = minimum(end - first, step * 2);
+      low = maximum(first, end - step);
+    }
+  } else {
+    low = first;
+    high = first + 1;
+    while (((use_temp ? s->temp[high - 1] : s->a[high - 1]) < key ||
+            (upper && (use_temp ? s->temp[high - 1] : s->a[high - 1]) == key)) &&
+           high < end) {
+      low = high;
+      high = minimum(end, first + (high - first) * 2);
+    }
   }
-  for (int i = 0; i < leftLength; i++)
-    left[i] = values[start + i];
-  for (int j = 0; j < rightLength; j++)
-    right[j] = values[rightStart + j];
-  int i = 0, j = 0, destination = start;
-  while (i < leftLength && j < rightLength) {
-    if (left[i] <= right[j])
-      values[destination++] = left[i++];
-    else
-      values[destination++] = right[j++];
+  while (low < high) {
+    int middle = low + (high - low) / 2;
+    int value = use_temp ? s->temp[middle] : s->a[middle];
+    if (value < key || (upper && value == key)) low = middle + 1;
+    else high = middle;
   }
-  while (i < leftLength)
-    values[destination++] = left[i++];
-  while (j < rightLength)
-    values[destination++] = right[j++];
-  free(left);
-  free(right);
-  runs[index].length = leftLength + rightLength;
-  for (int position = index + 1; position + 1 < *stackSize; position++) {
-    runs[position] = runs[position + 1];
-  }
-  (*stackSize)--;
+  return low;
 }
 
-void sort(int values[], int n) {
-  if (n < 2)
-    return;
-  int minimum = minRunLength(n);
-  Run runs[128];
-  int stackSize = 0, cursor = 0;
-  while (cursor < n) {
-    int length = countRun(values, n, cursor);
-    int forced = minimum < n - cursor ? minimum : n - cursor;
-    if (length < forced) {
-      binaryInsertion(values, cursor, cursor + forced, cursor + length);
-      length = forced;
+static void merge_low(Tim *s, int first, int left_length, int right_start,
+                      int right_length) {
+  ensure_capacity(s, left_length);
+  for (int i = 0; i < left_length; ++i) s->temp[i] = s->a[first + i];
+  int left = 0, right = right_start, destination = first;
+  int right_end = right_start + right_length;
+  int left_wins = 0, right_wins = 0, galloped = 0;
+  while (left < left_length && right < right_end) {
+    if (s->a[right] < s->temp[left]) {
+      s->a[destination] = s->a[right++];
+      ++right_wins; left_wins = 0;
+    } else {
+      s->a[destination] = s->temp[left++];
+      ++left_wins; right_wins = 0;
     }
-    runs[stackSize++] = (Run){cursor, length};
-    while (stackSize > 1) {
-      int index = stackSize - 2;
-      if ((index >= 1 && runs[index - 1].length <=
-                             runs[index].length + runs[index + 1].length) ||
-          (index >= 2 && runs[index - 2].length <=
-                             runs[index].length + runs[index - 1].length)) {
-        if (runs[index - 1].length < runs[index + 1].length)
-          index--;
-      } else if (runs[index].length > runs[index + 1].length)
-        break;
-      merge(values, runs, &stackSize, index);
+    ++destination;
+    if (left >= left_length || right >= right_end) break;
+    if (maximum(left_wins, right_wins) < s->min_gallop) continue;
+    galloped = 1;
+    int left_stop = gallop(s, left, left_length, s->a[right], 1, 0, 1);
+    while (left < left_stop) s->a[destination++] = s->temp[left++];
+    if (left == left_length) break;
+    s->a[destination++] = s->a[right++];
+    if (right == right_end) break;
+    int right_stop = gallop(s, right, right_end, s->temp[left], 0, 0, 0);
+    while (right < right_stop) s->a[destination++] = s->a[right++];
+    if (right == right_end) break;
+    s->a[destination++] = s->temp[left++];
+    s->min_gallop = maximum(1, s->min_gallop - 1);
+    left_wins = right_wins = 0;
+  }
+  while (left < left_length) s->a[destination++] = s->temp[left++];
+  if (galloped) s->min_gallop += 2;
+}
+
+static void merge_high(Tim *s, int first, int left_length, int right_start,
+                       int right_length) {
+  (void)left_length;
+  ensure_capacity(s, right_length);
+  for (int i = 0; i < right_length; ++i) s->temp[i] = s->a[right_start + i];
+  int left = right_start - 1, right = right_length - 1;
+  int destination = right_start + right_length - 1;
+  int left_wins = 0, right_wins = 0, galloped = 0;
+  while (left >= first && right >= 0) {
+    if (s->temp[right] < s->a[left]) {
+      s->a[destination] = s->a[left--];
+      ++left_wins; right_wins = 0;
+    } else {
+      s->a[destination] = s->temp[right--];
+      ++right_wins; left_wins = 0;
     }
-    cursor += length;
+    --destination;
+    if (left < first || right < 0) break;
+    if (maximum(left_wins, right_wins) < s->min_gallop) continue;
+    galloped = 1;
+    int left_stop = gallop(s, first, left + 1, s->temp[right], 1, 1, 0);
+    while (left >= left_stop) s->a[destination--] = s->a[left--];
+    if (left < first) break;
+    s->a[destination--] = s->temp[right--];
+    if (right < 0) break;
+    int right_stop = gallop(s, 0, right + 1, s->a[left], 0, 1, 1);
+    while (right >= right_stop) s->a[destination--] = s->temp[right--];
+    if (right < 0) break;
+    s->a[destination--] = s->a[left--];
+    s->min_gallop = maximum(1, s->min_gallop - 1);
+    left_wins = right_wins = 0;
   }
-  while (stackSize > 1) {
-    int index = stackSize - 2;
-    if (index > 0 && runs[index - 1].length < runs[index + 1].length)
-      index--;
-    merge(values, runs, &stackSize, index);
+  while (right >= 0) s->a[destination--] = s->temp[right--];
+  if (galloped) s->min_gallop += 2;
+}
+
+static void merge_at(Tim *s, int index) {
+  int left_start = s->base[index], left_length = s->length[index];
+  int right_start = s->base[index + 1], right_length = s->length[index + 1];
+  s->length[index] = left_length + right_length;
+  if (index == s->stack_size - 3) {
+    s->base[index + 1] = s->base[index + 2];
+    s->length[index + 1] = s->length[index + 2];
   }
+  --s->stack_size;
+  int skipped = gallop(s, left_start, right_start, s->a[right_start], 1, 0, 0);
+  left_length -= skipped - left_start;
+  left_start = skipped;
+  if (left_length == 0) return;
+  right_length = gallop(s, right_start, right_start + right_length,
+                        s->a[right_start - 1], 0, 0, 0) - right_start;
+  if (right_length == 0) return;
+  if (left_length <= right_length)
+    merge_low(s, left_start, left_length, right_start, right_length);
+  else
+    merge_high(s, left_start, left_length, right_start, right_length);
+}
+
+static void collapse(Tim *s) {
+  while (s->stack_size > 1) {
+    int index = s->stack_size - 2;
+    if ((index >= 1 && s->length[index - 1] <= s->length[index] + s->length[index + 1]) ||
+        (index >= 2 && s->length[index - 2] <= s->length[index] + s->length[index - 1])) {
+      if (s->length[index - 1] < s->length[index + 1]) --index;
+    } else if (s->length[index] > s->length[index + 1]) break;
+    merge_at(s, index);
+  }
+}
+
+static void force_collapse(Tim *s) {
+  while (s->stack_size > 1) {
+    int index = s->stack_size - 2;
+    if (index > 0 && s->length[index - 1] < s->length[index + 1]) --index;
+    merge_at(s, index);
+  }
+}
+
+void sort(int a[], int n) {
+  if (n <= 1) return;
+  int stack_capacity = n < 120 ? 5 : n < 1542 ? 10 : n < 119151 ? 19 : 40;
+  Tim s = {a, n, NULL, NULL, 0, NULL, 0, 7};
+  s.base = calloc((size_t)stack_capacity, sizeof *s.base);
+  s.length = calloc((size_t)stack_capacity, sizeof *s.length);
+  if (!s.base || !s.length) abort();
+  if (n < 32) {
+    int run = count_run(&s, 0, n);
+    binary_insertion(&s, 0, n, run);
+  } else {
+    int min_run = min_run_length(n), cursor = 0;
+    while (cursor < n) {
+      int run = count_run(&s, cursor, n);
+      if (run < min_run) {
+        int forced = minimum(min_run, n - cursor);
+        binary_insertion(&s, cursor, cursor + forced, cursor + run);
+        run = forced;
+      }
+      s.base[s.stack_size] = cursor;
+      s.length[s.stack_size] = run;
+      ++s.stack_size;
+      collapse(&s);
+      cursor += run;
+    }
+    force_collapse(&s);
+  }
+  free(s.temp);
+  free(s.base);
+  free(s.length);
 }
 
 int main(void) {
-  int array[] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
-  int n = (int)(sizeof(array) / sizeof(array[0]));
-  sort(array, n);
+  int a[] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+  int n = (int)(sizeof a / sizeof a[0]);
+  sort(a, n);
   printf("[");
-  for (int i = 0; i < n; i++)
-    printf("%s%d", i ? ", " : "", array[i]);
-  printf("]\n");
+  for (int i = 0; i < n; ++i) printf("%s%d", i ? ", " : "", a[i]);
+  puts("]");
   return 0;
 }
