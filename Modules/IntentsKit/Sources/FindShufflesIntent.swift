@@ -18,7 +18,9 @@ public struct FindShufflesIntent: AppIntent {
   @MainActor
   public func perform() async throws -> some IntentResult & ReturnsValue<[ShuffleEntity]> {
     let shuffles = ShuffleRegistry.shared.shuffles
-      .sorted { $0.metadata.displayName < $1.metadata.displayName }
+      .sorted {
+        ($0.metadata.displayName, $0.id.rawValue) < ($1.metadata.displayName, $1.id.rawValue)
+      }
     return .result(value: shuffles.map(ShuffleEntity.init))
   }
 }

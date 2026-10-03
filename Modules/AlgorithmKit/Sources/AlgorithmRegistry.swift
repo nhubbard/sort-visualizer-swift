@@ -26,6 +26,8 @@ public final class AlgorithmRegistry {
   public func algorithms(in category: AlgorithmCategory) -> [any SortAlgorithm] {
     algorithms
       .filter { $0.metadata.category == category }
-      .sorted { $0.metadata.displayName < $1.metadata.displayName }
+      .sorted {
+        ($0.metadata.displayName, $0.id.rawValue) < ($1.metadata.displayName, $1.id.rawValue)
+      }
   }
 }

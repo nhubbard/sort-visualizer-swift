@@ -173,6 +173,7 @@ struct ContentView: View {
         }
       }
     }
+    .accessibilityIdentifier("algorithmCategoryList")
     .navigationTitle("Sort Symphony v2")
     // Blocks manual category switching while Showcase or Full Sweep drives `selection` itself —
     // otherwise a stray tap here would race the automated advance below.
@@ -265,7 +266,7 @@ struct ContentView: View {
     case .none, .some(.all):
       // Same order Showcase mode itself uses — alphabetical, not registration order.
       base = AlgorithmRegistry.shared.algorithms.sorted {
-        $0.metadata.displayName < $1.metadata.displayName
+        ($0.metadata.displayName, $0.id.rawValue) < ($1.metadata.displayName, $1.id.rawValue)
       }
     case .some(.category(let category)):
       base = AlgorithmRegistry.shared.algorithms(in: category)
@@ -582,7 +583,9 @@ struct ContentView: View {
   /// `displayName` too) — alphabetical, not registration order.
   private func startShowcase() {
     showcaseAlgorithmIDs = AlgorithmRegistry.shared.algorithms
-      .sorted { $0.metadata.displayName < $1.metadata.displayName }
+      .sorted {
+        ($0.metadata.displayName, $0.id.rawValue) < ($1.metadata.displayName, $1.id.rawValue)
+      }
       .map(\.id)
     guard !showcaseAlgorithmIDs.isEmpty else { return }
     showcaseIndex = 0

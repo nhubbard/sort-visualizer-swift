@@ -67,6 +67,11 @@ struct Sort2App: App {
       UnoptimizedCocktailShakerSort(), UnstableGrailSort(), WeakHeapSort(), WeavedMergeSort(), WeaveMergeSort(),
       WeaveSortIterative(), WeaveSortRecursive(), WikiSort(), YujisBufferedMergeSort2()
     ]
+    // Exercise catalog removal through the real sidebar in UI tests. Production launches do
+    // not set this variable; filtering happens before discovery and view construction.
+    if let removedID = ProcessInfo.processInfo.environment["UI_TEST_REMOVED_ALGORITHM_ID"] {
+      AlgorithmRegistry.shared.builtIns.removeAll { $0.id.rawValue == removedID }
+    }
     AlgorithmRegistry.shared.discover()
 
     ShuffleRegistry.shared.builtIns = [

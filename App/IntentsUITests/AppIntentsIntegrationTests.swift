@@ -12,7 +12,8 @@ final class AppIntentsIntegrationTests: XCTestCase {
     let definitions = IntentDefinitions(bundleIdentifier: "com.nhubbard.Sort2.mobile")
     let result = try await definitions.intents["FindAlgorithmsIntent"].makeIntent().run()
     let algorithms = try result.value.as([AnyAppEntity].self)
-    XCTAssertGreaterThan(algorithms.count, 50, "the system should see the populated built-in catalog")
+    XCTAssertEqual(algorithms.count, 196)
+    XCTAssertEqual(Set(algorithms.map { $0.identifier.instanceIdentifier }).count, 196)
   }
 
   func testCategoryParameterFiltersThroughSystemResolution() async throws {
@@ -41,7 +42,9 @@ final class AppIntentsIntegrationTests: XCTestCase {
     let visualizers = try visualizerResult.value.as([AnyAppEntity].self)
     let automations = try automationResult.value.as([AnyAppEntity].self)
 
-    XCTAssertGreaterThan(shuffles.count, 1)
+    XCTAssertEqual(shuffles.count, 43)
+    XCTAssertEqual(Set(shuffles.map { $0.identifier.instanceIdentifier }).count, 43)
+    XCTAssertFalse(shuffles.contains { $0.identifier.instanceIdentifier == "naive" })
     XCTAssertGreaterThan(visualizers.count, 1)
     XCTAssertEqual(automations.count, 2)
   }

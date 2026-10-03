@@ -204,7 +204,7 @@ public final class AppSettings {
   /// existing convention here rather than a shared one).
   public func cycleShuffle() {
     let shuffles = ShuffleRegistry.shared.shuffles.sorted {
-      $0.metadata.displayName < $1.metadata.displayName
+      ($0.metadata.displayName, $0.id.rawValue) < ($1.metadata.displayName, $1.id.rawValue)
     }
     guard !shuffles.isEmpty else { return }
     let currentIndex = shuffles.firstIndex { $0.id == defaultShuffleID } ?? -1
