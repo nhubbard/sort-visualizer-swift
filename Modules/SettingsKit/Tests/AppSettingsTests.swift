@@ -91,6 +91,25 @@ struct AppSettingsTests {
     }
   }
 
+  @Test
+  func retiredNaiveShufflePreferenceMigratesToRandom() {
+    let registry = ShuffleRegistry.shared
+    let restoreBuiltIns = registry.builtIns
+    defer {
+      registry.builtIns = restoreBuiltIns
+      registry.discover()
+    }
+    registry.builtIns = ["other", "random"].map(MockShuffle.init)
+    registry.discover()
+
+    let store = makeIsolatedStore()
+    store.set("naive", forKey: "defaultShuffleID")
+    let settings = AppSettings(store: store)
+
+    #expect(settings.defaultShuffleID == ShuffleID(rawValue: "random"))
+    #expect(store.string(forKey: "defaultShuffleID") == "random")
+  }
+
   /// Fully synchronous (no `await` between setup and assertions) so this critical section over
   /// the process-wide `VisualizerRegistry.shared` singleton can't interleave with another
   /// `@MainActor`-isolated test's own mutation of it — see `cycleVisualizer()`'s own doc comment

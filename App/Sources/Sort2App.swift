@@ -74,7 +74,7 @@ struct Sort2App: App {
       BSTTraversalShuffle(), CircleShuffle(), DescendingShuffle(), DoubleLayeredShuffle(), FinalBitonicShuffle(),
       FinalMergeShuffle(), FinalRadixShuffle(), GrailsortAdversaryShuffle(), GrayCodeShuffle(), HalfRotationShuffle(),
       HeapifiedShuffle(), InterlacedShuffle(), InvertedBSTShuffle(), LogarithmicSlopesShuffle(), MovedElementShuffle(),
-      NaiveShuffle(), NoisyShuffle(), OrganShuffle(), PairwiseShuffle(), PartialReverseShuffle(), PartitionedShuffle(),
+      NoisyShuffle(), OrganShuffle(), PairwiseShuffle(), PartialReverseShuffle(), PartitionedShuffle(),
       PDQAdversaryShuffle(), QuicksortAdversaryShuffle(), RandomShuffle(),
       RealFinalMergeShuffle(), RealFinalRadixShuffle(), RecursiveRadixShuffle(), RecursiveReversalShuffle(),
       SawtoothShuffle(), ShuffleMergeAdversaryShuffle(), ShuffledCubicShuffle(), ShuffledHalfShuffle(),

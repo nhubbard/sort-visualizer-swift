@@ -150,10 +150,14 @@ public final class AppSettings {
     recordingOperationCap = storedCap > 0 ? storedCap : 300_000
     let storedTheme = CodeThemeID(rawValue: store.string(forKey: Keys.codeTheme) ?? "monokai")
     codeTheme = CodeThemeID.knownIDs.contains(storedTheme) ? storedTheme : CodeThemeID(rawValue: "monokai")
-    let storedShuffle = ShuffleID(rawValue: store.string(forKey: Keys.defaultShuffleID) ?? "random")
+    let storedShuffleID = store.string(forKey: Keys.defaultShuffleID) ?? "random"
+    let storedShuffle = ShuffleID(rawValue: storedShuffleID == "naive" ? "random" : storedShuffleID)
     let shuffles = ShuffleRegistry.shared.shuffles
     defaultShuffleID = shuffles.isEmpty || shuffles.contains(where: { $0.id == storedShuffle })
       ? storedShuffle : (shuffles.first?.id ?? ShuffleID(rawValue: "random"))
+    if storedShuffleID == "naive" {
+      store.set(defaultShuffleID.rawValue, forKey: Keys.defaultShuffleID)
+    }
   }
 
   private func persistNoteRange() {

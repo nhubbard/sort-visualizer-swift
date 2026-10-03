@@ -26,7 +26,7 @@ struct NativeShuffleCorrectnessTests {
     FinalBitonicShuffle(), FinalMergeShuffle(), FinalRadixShuffle(), GrailsortAdversaryShuffle(),
     GrayCodeShuffle(),
     HalfRotationShuffle(), HeapifiedShuffle(), InterlacedShuffle(), InvertedBSTShuffle(),
-    MovedElementShuffle(), NaiveShuffle(), NoisyShuffle(), OrganShuffle(),
+    MovedElementShuffle(), NoisyShuffle(), OrganShuffle(),
     PairwiseShuffle(), PartialReverseShuffle(), PartitionedShuffle(), PDQAdversaryShuffle(),
     QuicksortAdversaryShuffle(), RandomShuffle(),
     RealFinalMergeShuffle(), RealFinalRadixShuffle(), RecursiveRadixShuffle(),
