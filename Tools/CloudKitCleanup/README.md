@@ -47,7 +47,19 @@ record types that no current code path writes to — legacy, out of scope for th
 The complete read-only scans from 2026-10-02 are recorded in the
 [Development dry-run review](reports/2026-10-02-development-dry-run.md). They found 262,700
 Big-O and 5,479 cap-exceeded entries above current selectable maxima in Development, and no
-Big-O entries in Production. No records have been deleted.
+Big-O entries in Production. After explicit approval, all 69 Development cap-exceeded algorithm
+groups were cleared and verified empty. Development Big-O cleanup is partly complete; CloudKit
+began returning `too-many-requests`, so a fresh final scan is still required.
+
+The approved candidate sets can be resumed with `execute_reviewed_cleanup.py`. It checks the
+frozen cache fingerprint, compares each algorithm's current matching record names to the
+approved set, deletes that group, and re-queries until empty. It is safe to re-run after a
+partial deletion or an ambiguous `retry-needed` response. The runner defaults to one worker
+because CloudKit throttled parallel deletion.
+
+```sh
+uv run execute_reviewed_cleanup.py --record-type CD_BigORecord --token-file .user_token
+```
 
 ```sh
 uv run cleanup_stale_sizes.py --environment development --record-type CD_BigORecord

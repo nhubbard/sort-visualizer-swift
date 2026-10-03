@@ -1,6 +1,10 @@
 # CloudKit stale-size dry-run review (2026-10-02)
 
-All values below come from complete read-only Development scans. No records were deleted.
+All values below come from complete read-only Development scans made before deletion. After
+explicit approval on 2026-10-02, cleanup began against these exact candidate sets. The
+Development cap-exceeded set has since been verified empty by per-algorithm queries. Big-O
+cleanup remains in progress because CloudKit began returning `too-many-requests`; the figures
+below are the original dry-run counts, not current remaining counts.
 
 | Record type | Scanned | Above current selectable maximum | Algorithms affected |
 | --- | ---: | ---: | ---: |
