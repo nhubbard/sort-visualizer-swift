@@ -39,6 +39,11 @@ ZONE = "com.apple.coredata.cloudkit.zone"
 TEAM = "676UP3S3AH"
 
 
+def approved_cache_path(record_type: str) -> Path:
+    original = cache_path("development", record_type)
+    return original.parent / "approved" / original.name
+
+
 def fingerprint(record_type: str, entries: list[dict]) -> str:
     result = hashlib.sha256()
     for entry in sorted(entries, key=lambda item: item["recordName"]):
@@ -144,7 +149,9 @@ def main() -> int:
     token = args.token_file.read_text().strip()
     if not token:
         parser.error("token file is empty")
-    cache = load_cache(cache_path("development", args.record_type))
+    frozen_path = approved_cache_path(args.record_type)
+    source_path = frozen_path if frozen_path.exists() else cache_path("development", args.record_type)
+    cache = load_cache(source_path)
     if cache is None or cache["continuationToken"] is not None:
         parser.error("requires a complete Development scan cache")
     if cache["thresholdsDigest"] != threshold_digest(load_thresholds()):
@@ -153,6 +160,11 @@ def main() -> int:
     count, expected_hash = EXPECTED[args.record_type]
     if len(entries) != count or fingerprint(args.record_type, entries) != expected_hash:
         parser.error("cache differs from the approved candidate set")
+    if not frozen_path.exists():
+        frozen_path.parent.mkdir(exist_ok=True)
+        temporary = frozen_path.with_suffix(".json.tmp")
+        temporary.write_bytes(source_path.read_bytes())
+        temporary.replace(frozen_path)
     groups: dict[str, list[dict]] = defaultdict(list)
     for entry in entries:
         groups[entry["algorithmID"]].append(entry)

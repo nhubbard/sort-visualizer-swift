@@ -53,9 +53,11 @@ began returning `too-many-requests`, so a fresh final scan is still required.
 
 The approved candidate sets can be resumed with `execute_reviewed_cleanup.py`. It checks the
 frozen cache fingerprint, compares each algorithm's current matching record names to the
-approved set, deletes that group, and re-queries until empty. It is safe to re-run after a
-partial deletion or an ambiguous `retry-needed` response. The runner defaults to one worker
-because CloudKit throttled parallel deletion.
+approved set, deletes that group, and re-queries until empty. The first run copies each
+reviewed cache to the ignored `.cache/approved/` directory so a later `--refresh` scan cannot
+erase the approved record-name list. It is safe to re-run after a partial deletion or an
+ambiguous `retry-needed` response. The runner defaults to one worker because CloudKit
+throttled parallel deletion.
 
 ```sh
 uv run execute_reviewed_cleanup.py --record-type CD_BigORecord --token-file .user_token
