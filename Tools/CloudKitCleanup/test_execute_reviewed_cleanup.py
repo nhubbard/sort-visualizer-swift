@@ -1,7 +1,8 @@
 import unittest
+from subprocess import CompletedProcess
 from unittest.mock import patch
 
-from execute_reviewed_cleanup import clean_group
+from execute_reviewed_cleanup import AuthenticationError, clean_group, cktool
 
 
 class ReviewedCleanupTests(unittest.TestCase):
@@ -27,6 +28,12 @@ class ReviewedCleanupTests(unittest.TestCase):
             "execute_reviewed_cleanup.cktool", side_effect=RuntimeError("retry-needed")
         ), patch("execute_reviewed_cleanup.time.sleep"):
             self.assertEqual(clean_group("CD_BigORecord", "example", entries, "token"), ("example", 0))
+
+    def test_expired_token_is_a_fatal_error(self):
+        response = CompletedProcess([], 1, "", "Authentication failed. User token has expired.")
+        with patch("execute_reviewed_cleanup.subprocess.run", return_value=response):
+            with self.assertRaises(AuthenticationError):
+                cktool("query-records", "secret", "--record-type", "CD_BigORecord")
 
 
 if __name__ == "__main__":

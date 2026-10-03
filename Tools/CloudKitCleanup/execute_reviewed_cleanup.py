@@ -20,7 +20,7 @@ import subprocess
 import sys
 import time
 from collections import defaultdict
-from concurrent.futures import ThreadPoolExecutor, as_completed
+from concurrent.futures import FIRST_COMPLETED, ThreadPoolExecutor, wait
 from pathlib import Path
 
 from cleanup_stale_sizes import (
@@ -37,6 +37,10 @@ EXPECTED = {
 }
 ZONE = "com.apple.coredata.cloudkit.zone"
 TEAM = "676UP3S3AH"
+
+
+class AuthenticationError(RuntimeError):
+    """The user token must be refreshed before any more CloudKit work."""
 
 
 def approved_cache_path(record_type: str) -> Path:
@@ -61,6 +65,8 @@ def cktool(subcommand: str, token: str, *args: str) -> str:
             raise RuntimeError(f"cktool {subcommand} timed out") from None
         if not result.returncode:
             return result.stdout.replace(token, "[redacted]")
+        if "Authentication failed" in result.stderr or "Session has expired" in result.stderr:
+            raise AuthenticationError(f"cktool {subcommand} rejected the expired user token")
         if subcommand == "query-records" and "too-many-requests" in result.stderr and attempt < 5:
             time.sleep(min(300, 30 * 2 ** attempt))
             continue
@@ -175,22 +181,37 @@ def main() -> int:
     print(f"Verified frozen {args.record_type} cache: {len(entries)} candidates in {len(groups)} algorithms", flush=True)
     failures: list[str] = []
     deleted = 0
+    ordered_groups = sorted(groups.items())
+    token_expired = False
     with ThreadPoolExecutor(max_workers=args.workers) as executor:
-        futures = {
-            executor.submit(clean_group, args.record_type, algorithm_id, group, token): algorithm_id
-            for algorithm_id, group in sorted(groups.items())
-        }
-        for future in as_completed(futures):
-            algorithm_id = futures[future]
-            try:
-                _, count = future.result()
-                deleted += count
-                print(f"OK {algorithm_id}: {count} deleted in this run", flush=True)
-            except Exception as error:
-                failures.append(algorithm_id)
-                print(f"FAILED {algorithm_id}: {error}", file=sys.stderr, flush=True)
+        futures = {}
+        for algorithm_id, group in ordered_groups[:args.workers]:
+            futures[executor.submit(clean_group, args.record_type, algorithm_id, group, token)] = algorithm_id
+        # Only keep a worker-sized window of groups in flight. An expired token must not
+        # turn into an authentication failure for every remaining algorithm.
+        remaining_groups = iter(ordered_groups[args.workers:])
+        while futures:
+            done, _ = wait(futures, return_when=FIRST_COMPLETED)
+            for future in done:
+                algorithm_id = futures.pop(future)
+                try:
+                    _, count = future.result()
+                    deleted += count
+                    print(f"OK {algorithm_id}: {count} deleted in this run", flush=True)
+                except AuthenticationError as error:
+                    token_expired = True
+                    failures.append(algorithm_id)
+                    print(f"STOPPED {algorithm_id}: {error}", file=sys.stderr, flush=True)
+                except Exception as error:
+                    failures.append(algorithm_id)
+                    print(f"FAILED {algorithm_id}: {error}", file=sys.stderr, flush=True)
+                if not token_expired:
+                    next_group = next(remaining_groups, None)
+                    if next_group:
+                        next_id, entries = next_group
+                        futures[executor.submit(clean_group, args.record_type, next_id, entries, token)] = next_id
     print(f"Run result: {deleted} deleted; {len(failures)} algorithm groups failed", flush=True)
-    return 1 if failures else 0
+    return 1 if failures or token_expired else 0
 
 
 if __name__ == "__main__":
