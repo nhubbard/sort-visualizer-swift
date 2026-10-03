@@ -1,127 +1,287 @@
+// MIT License
+// Copyright (c) 2021 The Holy Grail Sort Project, implemented by aphitorite
+// Copyright (c) 2020-2021 aphitorite
+// Permission is hereby granted, free of charge, to any person obtaining a copy of this software
+// and associated documentation files (the "Software"), to deal in the Software without
+// restriction, including without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the
+// Software is furnished to do so, subject to the following conditions:
+// The above copyright notice and this permission notice shall be included in all copies or
+// substantial portions of the Software.
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING
+// BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+// NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+//
+
 package main
 
-import (
-	"fmt"
-)
+import "fmt"
 
-var blockSize = 1
-
-func sort(arr []int) []int {
-	blockSize = 1
-	for blockSize*blockSize < len(arr) {
-		blockSize *= 2
-	}
-	synchronousSort(arr, 0, len(arr))
-	return arr
+// Synchronous square-root block merge, by aphitorite. The MIT notice from
+// SynchronousSqrtSort.swift and BlockMergeSortingTemplate.swift applies.
+type syncSqrt struct {
+	a, prefix, tags []int
 }
 
-func multiSwap(arr []int, a, b, length int) {
-	for i := 0; i < length; i++ {
-		arr[a+i], arr[b+i] = arr[b+i], arr[a+i]
-	}
-}
-
-func rotate(arr []int, a, m, b int) {
-	l, r := m-a, b-m
-	for l > 0 && r > 0 {
-		if r < l {
-			multiSwap(arr, m-r, m, r)
-			b -= r
-			m -= r
-			l -= r
-		} else {
-			multiSwap(arr, a, m, l)
-			a += l
-			m += l
-			r -= l
-		}
-	}
-}
-
-func binarySearch(arr []int, a, b, value int, left bool) int {
-	for a < b {
-		mid := a + (b-a)/2
-		var comp bool
-		if left {
-			comp = value <= arr[mid]
-		} else {
-			comp = value < arr[mid]
-		}
-		if comp {
-			b = mid
-		} else {
-			a = mid + 1
-		}
-	}
-	return a
-}
-
-func synchronousMerge(arr []int, a, m, b int) {
-	if m-a <= blockSize && b-m <= blockSize {
-		temp := append([]int(nil), arr[a:b]...)
-		i, j := 0, m-a
-		for k := a; k < b; k++ {
-			if i < m-a && (j == b-a || temp[i] <= temp[j]) {
-				arr[k] = temp[i]
-				i++
+func (s *syncSqrt) binaryInsertion(first, end int) {
+	for i := first + 1; i < end; i++ {
+		value, low, high := s.a[i], first, i
+		for low < high {
+			middle := low + (high-low)/2
+			if s.a[middle] <= value {
+				low = middle + 1
 			} else {
-				arr[k] = temp[j]
-				j++
+				high = middle
 			}
 		}
+		for j := i; j > low; j-- {
+			s.a[j] = s.a[j-1]
+		}
+		if low != i {
+			s.a[low] = value
+		}
+	}
+}
+func (s *syncSqrt) shiftForward(destination, source, end int) {
+	for source < end {
+		s.a[destination] = s.a[source]
+		destination++
+		source++
+	}
+}
+func (s *syncSqrt) shiftBackward(first, sourceEnd, destinationEnd int) {
+	for sourceEnd > first {
+		sourceEnd--
+		destinationEnd--
+		s.a[destinationEnd] = s.a[sourceEnd]
+	}
+}
+func (s *syncSqrt) mergeForward(first, middle, end, output int) {
+	left, right := first, middle
+	for left < middle && right < end {
+		if s.a[left] <= s.a[right] {
+			s.a[output] = s.a[left]
+			left++
+		} else {
+			s.a[output] = s.a[right]
+			right++
+		}
+		output++
+	}
+	if left > output {
+		s.shiftForward(output, left, middle)
+	}
+	s.shiftForward(output, right, end)
+}
+func (s *syncSqrt) mergeBackward(first, middle, end, output int) {
+	left, right := middle-1, end-1
+	for right >= middle && left >= first {
+		output--
+		if s.a[right] >= s.a[left] {
+			s.a[output] = s.a[right]
+			right--
+		} else {
+			s.a[output] = s.a[left]
+			left--
+		}
+	}
+	if output > right {
+		s.shiftBackward(middle, right+1, output)
+	}
+	s.shiftBackward(first, left+1, output)
+}
+func (s *syncSqrt) smartMergeBackward(first, middle, end, output int, reversed bool) int {
+	left, right := middle-1, end-1
+	for left >= first && right >= middle {
+		takeLeft := s.a[left] > s.a[right]
+		if reversed {
+			takeLeft = s.a[left] >= s.a[right]
+		}
+		output--
+		if takeLeft {
+			s.a[output] = s.a[left]
+			left--
+		} else {
+			s.a[output] = s.a[right]
+			right--
+		}
+	}
+	return left + 1
+}
+func (s *syncSqrt) blockSelection(first, end, block, tagStart, tagCount int) {
+	available := tagCount + 1
+	if available > len(s.tags)-tagStart {
+		available = len(s.tags) - tagStart
+	}
+	for i := 0; i < available; i++ {
+		s.tags[tagStart+i] = i
+		if i > tagCount/2 {
+			s.tags[tagStart+i] += len(s.tags)
+		}
+	}
+	vacant, current := first, first
+	for current < end-block {
+		minimum := current
+		if vacant == current {
+			minimum += block
+		}
+		for candidate := minimum + block; candidate < end; candidate += block {
+			if candidate != vacant && (s.a[candidate] < s.a[minimum] ||
+				(s.a[candidate] == s.a[minimum] &&
+					s.tags[tagStart+(candidate-first)/block] < s.tags[tagStart+(minimum-first)/block])) {
+				minimum = candidate
+			}
+		}
+		if minimum > current {
+			if vacant == current {
+				copy(s.a[current:current+block], s.a[minimum:minimum+block])
+				s.tags[tagStart+(current-first)/block] = s.tags[tagStart+(minimum-first)/block]
+				vacant = minimum
+			} else {
+				for i := 0; i < block; i++ {
+					s.a[current+i], s.a[minimum+i] = s.a[minimum+i], s.a[current+i]
+				}
+				i, j := tagStart+(current-first)/block, tagStart+(minimum-first)/block
+				s.tags[i], s.tags[j] = s.tags[j], s.tags[i]
+			}
+		}
+		current += block
+	}
+}
+func (s *syncSqrt) mergeBlocksBackward(first, end, firstTag, pastLastTag, block int) {
+	tag := pastLastTag - 1
+	frontier, blockStart := end, end-block
+	reversed := s.tags[tag] < len(s.tags)
+	for {
+		for {
+			tag--
+			blockStart -= block
+			if !(tag >= firstTag && (s.tags[tag] < len(s.tags)) == reversed) {
+				break
+			}
+		}
+		if tag < firstTag {
+			s.shiftBackward(first, frontier, frontier+block)
+			break
+		}
+		frontier = s.smartMergeBackward(blockStart, blockStart+block, frontier, frontier+block, reversed)
+		reversed = !reversed
+	}
+}
+func sort(a []int) {
+	n := len(a)
+	if n <= 1 {
 		return
 	}
-	var m1, m2, m3 int
-	if m-a >= b-m {
-		m1 = a + (m-a)/2
-		value := arr[m1]
-		m2 = binarySearch(arr, m, b, value, true)
-		m3 = m1 + (m2 - m)
+	s := syncSqrt{a: a}
+	if n <= 16 {
+		s.binaryInsertion(0, n)
+		return
+	}
+	block := 1
+	for block*block < n {
+		block *= 2
+	}
+	first, end := block+n%block, n
+	workLength, run := end-first, 1
+	s.prefix = make([]int, first)
+	s.tags = make([]int, (n-1)/block+1)
+	s.binaryInsertion(0, first)
+	copy(s.prefix, a[:first])
+	for run < block {
+		distance := run
+		if distance < 2 {
+			distance = 2
+		}
+		index := first
+		for index+2*run < end {
+			s.mergeForward(index, index+run, index+2*run, index-distance)
+			index += 2 * run
+		}
+		if index+run < end {
+			s.mergeForward(index, index+run, end, index-distance)
+		} else {
+			s.shiftForward(index-distance, index, end)
+		}
+		first -= distance
+		end -= distance
+		run *= 2
+	}
+	fragment := workLength % (2 * run)
+	index := end - fragment
+	if index+run < end {
+		s.mergeBackward(index, index+run, end, end+run)
 	} else {
-		m2 = m + (b-m)/2
-		value := arr[m2]
-		m1 = binarySearch(arr, a, m, value, false)
-		m3 = m2 - (m - m1)
-		m2 = m2 + 1
+		s.shiftBackward(index, end, end+run)
 	}
-	rotate(arr, m1, m, m2)
-	if m2-(m3+1) > 0 && b-m2 > 0 {
-		synchronousMerge(arr, m3+1, m2, b)
+	index -= 2 * run
+	for index >= first {
+		s.mergeBackward(index, index+run, index+2*run, index+3*run)
+		index -= 2 * run
 	}
-	if m1-a > 0 && m3-m1 > 0 {
-		synchronousMerge(arr, a, m1, m3)
+	first += run
+	end += run
+	run *= 2
+	tagCount := 4
+	for run < workLength {
+		index = first
+		tagIndex := 0
+		for index+2*run < end {
+			s.blockSelection(index-block, index+2*run, block, tagIndex, tagCount)
+			index += 2 * run
+			tagIndex += tagCount
+		}
+		hasFragment := index+run < end
+		fragment = (end - index) / block
+		if hasFragment {
+			s.blockSelection(index-block, end, block, tagIndex, tagCount)
+		}
+		first -= block
+		end -= block
+		index -= block
+		if hasFragment {
+			s.mergeBlocksBackward(index, end, tagIndex, tagIndex+fragment, block)
+		}
+		index -= 2 * run
+		tagIndex -= tagCount
+		for index >= first {
+			s.mergeBlocksBackward(index, index+2*run, tagIndex, tagIndex+tagCount, block)
+			index -= 2 * run
+			tagIndex -= tagCount
+		}
+		first += block
+		end += block
+		run *= 2
+		tagCount *= 2
+	}
+	left, right, output := 0, first, 0
+	for left < first && right < end {
+		if s.prefix[left] <= a[right] {
+			a[output] = s.prefix[left]
+			left++
+		} else {
+			a[output] = a[right]
+			right++
+		}
+		output++
+	}
+	for left < first {
+		a[output] = s.prefix[left]
+		left++
+		output++
 	}
 }
-
-func synchronousSort(arr []int, a, b int) {
-	length := b - a
-	for start := a; start < b; start += 16 {
-		end := start + 16
-		if end > b {
-			end = b
-		}
-		for i := start + 1; i < end; i++ {
-			value, j := arr[i], i
-			for j > start && arr[j-1] > value {
-				arr[j] = arr[j-1]
-				j--
-			}
-			arr[j] = value
-		}
-	}
-	for j := 16; j < length; j *= 2 {
-		i := a
-		for ; i+2*j <= b; i += 2 * j {
-			synchronousMerge(arr, i, i+j, i+2*j)
-		}
-		if i+j < b {
-			synchronousMerge(arr, i, i+j, b)
-		}
-	}
-}
-
 func main() {
-	array := []int{0, 39, 21, 62, 91, 77, 14, 23,
-		90, 69, 51, 81, 68, 83, 32, 56}
-	fmt.Println(sort(array))
+	a := []int{0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56}
+	sort(a)
+	fmt.Print("[")
+	for i, v := range a {
+		if i > 0 {
+			fmt.Print(", ")
+		}
+		fmt.Print(v)
+	}
+	fmt.Println("]")
 }
