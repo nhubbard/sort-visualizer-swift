@@ -2,20 +2,23 @@
 // Copyright (c) 2013 Andrey Astrelin
 // Copyright (c) 2020 The Holy Grail Sort Project
 //
-// Permission is hereby granted, free of charge, to any person obtaining a copy of this software
-// and associated documentation files (the "Software"), to deal in the Software without
-// restriction, including without limitation the rights to use, copy, modify, merge, publish,
-// distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the
-// Software is furnished to do so, subject to the following conditions:
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
 //
-// The above copyright notice and this permission notice shall be included in all copies or
-// substantial portions of the Software.
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
 //
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING
-// BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-// NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
-// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
 
 #include <algorithm>
 #include <iostream>
@@ -24,20 +27,17 @@
 
 class AdaptiveGrailExample {
 public:
-  int* values;
+  int *values;
   int minRun;
-  AdaptiveGrailExample(int* input) {
+  AdaptiveGrailExample(int *input) {
     values = input;
     minRun = 16;
   }
-  int read(int index) {
-    return values[index];
-  }
-  void write(int index, int value) {
-    values[index] = value;
-  }
+  int read(int index) { return values[index]; }
+  void write(int index, int value) { values[index] = value; }
   void swap(int first, int second) {
-    std::tie(values[first], values[second]) = std::make_tuple(values[second], values[first]);
+    std::tie(values[first], values[second]) =
+        std::make_tuple(values[second], values[first]);
   }
   int compare(int first, int second) {
     if ((values[first] < values[second])) {
@@ -62,7 +62,8 @@ public:
     left = start;
     right = (end - 1);
     while ((left < right)) {
-      std::tie(values[left], values[right]) = std::make_tuple(values[right], values[left]);
+      std::tie(values[left], values[right]) =
+          std::make_tuple(values[right], values[left]);
       left += 1;
       right -= 1;
     }
@@ -307,7 +308,8 @@ public:
       insertTo(index, rightBinarySearch(start, index, read(index)));
     }
   }
-  void mergeWithBufferRest(int start, int middle, int end, int buffer, int length) {
+  void mergeWithBufferRest(int start, int middle, int end, int buffer,
+                           int length) {
     int left, output, right;
     left = 0;
     right = middle;
@@ -394,9 +396,7 @@ public:
       inPlaceMerge(start, middle, end);
     }
   }
-  bool checkSorted(int middle) {
-    return (compare((middle - 1), middle) > 0);
-  }
+  bool checkSorted(int middle) { return (compare((middle - 1), middle) > 0); }
   bool checkReverseBounds(int start, int middle, int end) {
     if ((compare(start, (end - 1)) > 0)) {
       rotate(start, middle, end);
@@ -410,7 +410,8 @@ public:
   int subarray(int tag, int middleKey) {
     return ((compare(tag, middleKey) < 0) ? 0 : 1);
   }
-  int blockSelectSort(int position, int tags, int offset, int distance, int leftCount, int blockCount, int blockLength) {
+  int blockSelectSort(int position, int tags, int offset, int distance,
+                      int leftCount, int blockCount, int blockLength) {
     int candidate, index, limit, middleKey, minimum, order;
     middleKey = leftCount;
     index = 0;
@@ -419,14 +420,18 @@ public:
       minimum = index;
       candidate = std::max((leftCount - offset), (index + 1));
       while ((candidate < limit)) {
-        order = compare(((position + distance) + (candidate * blockLength)), ((position + distance) + (minimum * blockLength)));
-        if (((order < 0) || ((order == 0) && (compare((tags + candidate), (tags + minimum)) < 0)))) {
+        order = compare(((position + distance) + (candidate * blockLength)),
+                        ((position + distance) + (minimum * blockLength)));
+        if (((order < 0) ||
+             ((order == 0) &&
+              (compare((tags + candidate), (tags + minimum)) < 0)))) {
           minimum = candidate;
         }
         candidate += 1;
       }
       if ((minimum != index)) {
-        multiSwap((position + (index * blockLength)), (position + (minimum * blockLength)), blockLength);
+        multiSwap((position + (index * blockLength)),
+                  (position + (minimum * blockLength)), blockLength);
         swap((tags + index), (tags + minimum));
         if (((limit < blockCount) && (minimum == (limit - 1)))) {
           limit += 1;
@@ -469,7 +474,8 @@ public:
       index += 1;
     }
   }
-  int mergeBlocks(int start, int middle, int end, int destination, int reverseEqual) {
+  int mergeBlocks(int start, int middle, int end, int destination,
+                  int reverseEqual) {
     int left, order, output, right;
     left = start;
     right = middle;
@@ -494,8 +500,10 @@ public:
     }
     return right;
   }
-  void blockMerge(int start, int middle, int end, int tags, int buffer, int blockLength) {
-    int blockCount, fragment, group, key, lastFull, left, leftBlocks, leftCount, middleKey, rightBlocks;
+  void blockMerge(int start, int middle, int end, int tags, int buffer,
+                  int blockLength) {
+    int blockCount, fragment, group, key, lastFull, left, leftBlocks, leftCount,
+        middleKey, rightBlocks;
     lastFull = ((end - (((end - middle) - 1) % blockLength)) - 1);
     left = (start + blockLength);
     group = start;
@@ -506,7 +514,8 @@ public:
     rightBlocks = (leftCount - 1);
     multiTriSwap(buffer, (middle - blockLength), start, blockLength);
     insertToBackward(tags, ((tags + leftCount) - 1));
-    middleKey = blockSelectSort(left, tags, 1, (blockLength - 1), leftCount, blockCount, blockLength);
+    middleKey = blockSelectSort(left, tags, 1, (blockLength - 1), leftCount,
+                                blockCount, blockLength);
     fragment = 0;
     while (((leftBlocks < leftCount) && (rightBlocks < blockCount))) {
       if ((fragment == 0)) {
@@ -514,15 +523,18 @@ public:
           group += blockLength;
           leftBlocks += 1;
           key += 1;
-          if (!(((leftBlocks < leftCount) && (subarray(key, middleKey) == 0)))) {
+          if (!(((leftBlocks < leftCount) &&
+                 (subarray(key, middleKey) == 0)))) {
             break;
           }
         }
         if ((leftBlocks == leftCount)) {
           left = mergeBlocks(left, group, end, (left - blockLength), false);
-          mergeWithBufferRest((left - blockLength), left, end, buffer, blockLength);
+          mergeWithBufferRest((left - blockLength), left, end, buffer,
+                              blockLength);
         } else {
-          left = mergeBlocks(left, group, ((group + blockLength) - 1), (left - blockLength), false);
+          left = mergeBlocks(left, group, ((group + blockLength) - 1),
+                             (left - blockLength), false);
         }
         fragment = 1;
       } else {
@@ -530,7 +542,8 @@ public:
           group += blockLength;
           rightBlocks += 1;
           key += 1;
-          if (!(((rightBlocks < blockCount) && (subarray(key, middleKey) == 1)))) {
+          if (!(((rightBlocks < blockCount) &&
+                 (subarray(key, middleKey) == 1)))) {
             break;
           }
         }
@@ -538,15 +551,19 @@ public:
           shift((left - blockLength), left, end);
           multiSwap(buffer, (end - blockLength), blockLength);
         } else {
-          left = mergeBlocks(left, group, ((group + blockLength) - 1), (left - blockLength), true);
+          left = mergeBlocks(left, group, ((group + blockLength) - 1),
+                             (left - blockLength), true);
         }
         fragment = 0;
       }
     }
     sortKeys((tags + blockCount), buffer, middleKey);
   }
-  void blockMergeWithoutBuffer(int start, int middle, int end, int tags, int blockLength) {
-    int blockCount, end2, firstFull, fragment, group, key, lastFull, left, leftBlocks, leftCount, middle2, middleKey, next, nextPosition, rightBlocks;
+  void blockMergeWithoutBuffer(int start, int middle, int end, int tags,
+                               int blockLength) {
+    int blockCount, end2, firstFull, fragment, group, key, lastFull, left,
+        leftBlocks, leftCount, middle2, middleKey, next, nextPosition,
+        rightBlocks;
     firstFull = (start + ((middle - start) % blockLength));
     lastFull = (end - ((end - middle) % blockLength));
     left = start;
@@ -556,7 +573,8 @@ public:
     blockCount = (((lastFull - group) / blockLength) + 1);
     leftBlocks = 0;
     rightBlocks = leftCount;
-    middleKey = blockSelectSort(group, tags, 0, 0, (leftCount - 1), (blockCount - 1), blockLength);
+    middleKey = blockSelectSort(group, tags, 0, 0, (leftCount - 1),
+                                (blockCount - 1), blockLength);
     fragment = 0;
     while (((leftBlocks < leftCount) && (rightBlocks < blockCount))) {
       next = subarray(key, middleKey);
@@ -630,13 +648,15 @@ public:
       mergeWithBufferBackward(start, middle, trimmed, buffer);
     }
   }
-  void smartBlockMerge(int start, int middle, int end, int tags, int buffer, int blockLength) {
+  void smartBlockMerge(int start, int middle, int end, int tags, int buffer,
+                       int blockLength) {
     int trimmedEnd, trimmedStart;
     if (checkBounds(start, middle, end)) {
       trimmedStart = rightBinarySearch(start, (middle - 1), read(middle));
       trimmedEnd = leftBinarySearch((middle + 1), end, read((middle - 1)));
       if (checkReverseBounds(trimmedStart, middle, trimmedEnd)) {
-        if ((((middle - trimmedStart) <= blockLength) || ((trimmedEnd - middle) <= blockLength))) {
+        if ((((middle - trimmedStart) <= blockLength) ||
+             ((trimmedEnd - middle) <= blockLength))) {
           if (((trimmedEnd - middle) < (middle - trimmedStart))) {
             mergeWithBufferBackward(trimmedStart, middle, trimmedEnd, buffer);
           } else {
@@ -644,12 +664,14 @@ public:
           }
         } else {
           trimmedStart -= ((trimmedStart - start) % blockLength);
-          blockMerge(trimmedStart, middle, trimmedEnd, tags, buffer, blockLength);
+          blockMerge(trimmedStart, middle, trimmedEnd, tags, buffer,
+                     blockLength);
         }
       }
     }
   }
-  void smartBlockMergeWithoutBuffer(int start, int middle, int end, int tags, int blockLength) {
+  void smartBlockMergeWithoutBuffer(int start, int middle, int end, int tags,
+                                    int blockLength) {
     int trimmedStart;
     if (checkBounds(start, middle, end)) {
       trimmedStart = rightBinarySearch(start, (middle - 1), read(middle));
@@ -717,8 +739,10 @@ public:
       run *= 2;
     }
   }
-  void adaptiveSortWithoutBuffer(int startIn, int endIn, int keys, int ideal, int backwardBuffer) {
-    int blockLength, buffer, dataEnd, dataStart, end, index, length, runLength, start, tagLength, tags;
+  void adaptiveSortWithoutBuffer(int startIn, int endIn, int keys, int ideal,
+                                 int backwardBuffer) {
+    int blockLength, buffer, dataEnd, dataStart, end, index, length, runLength,
+        start, tagLength, tags;
     start = startIn;
     end = endIn;
     length = (end - start);
@@ -747,7 +771,8 @@ public:
     while (((runLength <= blockLength) && (runLength < length))) {
       index = dataStart;
       while (((index + (2 * runLength)) <= dataEnd)) {
-        smartMerge(index, (index + runLength), (index + (2 * runLength)), buffer);
+        smartMerge(index, (index + runLength), (index + (2 * runLength)),
+                   buffer);
         index += (2 * runLength);
       }
       if (((index + runLength) < dataEnd)) {
@@ -755,21 +780,25 @@ public:
       }
       runLength *= 2;
     }
-    if ((((blockLength / 2) >= minRun) && ((blockLength / 2) >= ((keys + 1) / 2)))) {
+    if ((((blockLength / 2) >= minRun) &&
+         ((blockLength / 2) >= ((keys + 1) / 2)))) {
       binaryInsertion(buffer, (buffer + blockLength));
       blockLength = (blockLength / 2);
       tagLength = (keys - blockLength);
       buffer += blockLength;
     }
-    while (((tagLength >= (((2 * runLength) / blockLength) - 1)) && (runLength < length))) {
+    while (((tagLength >= (((2 * runLength) / blockLength) - 1)) &&
+            (runLength < length))) {
       index = dataStart;
       while (((index + (2 * runLength)) <= dataEnd)) {
-        smartBlockMerge(index, (index + runLength), (index + (2 * runLength)), tags, buffer, blockLength);
+        smartBlockMerge(index, (index + runLength), (index + (2 * runLength)),
+                        tags, buffer, blockLength);
         index += (2 * runLength);
       }
       if (((index + runLength) < dataEnd)) {
         if (((dataEnd - (index + runLength)) > blockLength)) {
-          smartBlockMerge(index, (index + runLength), dataEnd, tags, buffer, blockLength);
+          smartBlockMerge(index, (index + runLength), dataEnd, tags, buffer,
+                          blockLength);
         } else {
           smartMergeBackward(index, (index + runLength), dataEnd, buffer);
         }
@@ -779,15 +808,18 @@ public:
     binaryInsertion(buffer, (buffer + blockLength));
     tagLength = (keys - (keys % 2));
     while ((runLength < length)) {
-      blockLength = ((2 * runLength) / tagLength);
+      blockLength = ((2 * runLength + tagLength - 1) / tagLength);
       index = dataStart;
       while (((index + (2 * runLength)) <= dataEnd)) {
-        smartBlockMergeWithoutBuffer(index, (index + runLength), (index + (2 * runLength)), tags, blockLength);
+        smartBlockMergeWithoutBuffer(index, (index + runLength),
+                                     (index + (2 * runLength)), tags,
+                                     blockLength);
         index += (2 * runLength);
       }
       if (((index + runLength) < dataEnd)) {
         if (((dataEnd - (index + runLength)) > blockLength)) {
-          smartBlockMergeWithoutBuffer(index, (index + runLength), dataEnd, tags, blockLength);
+          smartBlockMergeWithoutBuffer(index, (index + runLength), dataEnd,
+                                       tags, blockLength);
         } else {
           smartInPlaceMerge(index, (index + runLength), dataEnd);
         }
@@ -811,7 +843,9 @@ public:
     }
   }
   void sort(int startIn, int endIn) {
-    int backwardBuffer, blockLength, buffer, dataEnd, dataStart, end, ideal, index, keys, leftRun, length, middle, rightRun, runLength, start, tagLength, tags;
+    int backwardBuffer, blockLength, buffer, dataEnd, dataStart, end, ideal,
+        index, keys, leftRun, length, middle, rightRun, runLength, start,
+        tagLength, tags;
     start = startIn;
     end = endIn;
     length = (end - start);
@@ -848,10 +882,12 @@ public:
       if ((leftRun == ideal)) {
         backwardBuffer = false;
       } else {
-        backwardBuffer = (((rightRun < 16) && (leftRun < 16)) || (rightRun >= leftRun));
+        backwardBuffer =
+            (((rightRun < 16) && (leftRun < 16)) || (rightRun >= leftRun));
       }
     }
-    keys = (backwardBuffer ? findKeysBackward(start, end, rightRun, ideal) : findKeys(start, end, leftRun, ideal));
+    keys = (backwardBuffer ? findKeysBackward(start, end, rightRun, ideal)
+                           : findKeys(start, end, leftRun, ideal));
     if ((keys < ideal)) {
       if ((keys == 1)) {
         return;
@@ -883,7 +919,8 @@ public:
     while (((runLength <= blockLength) && (runLength < length))) {
       index = dataStart;
       while (((index + (2 * runLength)) <= dataEnd)) {
-        smartMerge(index, (index + runLength), (index + (2 * runLength)), buffer);
+        smartMerge(index, (index + runLength), (index + (2 * runLength)),
+                   buffer);
         index += (2 * runLength);
       }
       if (((index + runLength) < dataEnd)) {
@@ -894,12 +931,14 @@ public:
     while ((runLength < length)) {
       index = dataStart;
       while (((index + (2 * runLength)) <= dataEnd)) {
-        smartBlockMerge(index, (index + runLength), (index + (2 * runLength)), tags, buffer, blockLength);
+        smartBlockMerge(index, (index + runLength), (index + (2 * runLength)),
+                        tags, buffer, blockLength);
         index += (2 * runLength);
       }
       if (((index + runLength) < dataEnd)) {
         if (((dataEnd - (index + runLength)) > blockLength)) {
-          smartBlockMerge(index, (index + runLength), dataEnd, tags, buffer, blockLength);
+          smartBlockMerge(index, (index + runLength), dataEnd, tags, buffer,
+                          blockLength);
         } else {
           smartMergeBackward(index, (index + runLength), dataEnd, buffer);
         }
@@ -917,16 +956,18 @@ public:
   }
 };
 
-void adaptive_grail_sort(int* values, int length) {
+void adaptive_grail_sort(int *values, int length) {
   AdaptiveGrailExample(values).sort(0, length);
 }
 
 int main() {
-  std::vector<int> values = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+  std::vector<int> values = {0,  39, 21, 62, 91, 77, 14, 23,
+                             90, 69, 51, 81, 68, 83, 32, 56};
   adaptive_grail_sort(values.data(), static_cast<int>(values.size()));
   std::cout << "[";
   for (size_t i = 0; i < values.size(); ++i) {
-    if (i) std::cout << ", ";
+    if (i)
+      std::cout << ", ";
     std::cout << values[i];
   }
   std::cout << "]\n";

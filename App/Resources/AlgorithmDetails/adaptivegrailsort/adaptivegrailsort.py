@@ -17,41 +17,57 @@
 # DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+
 class AdaptiveGrailExample:
     minRun = 16
+
     def __init__(self, input):
         self.values = input
         self.minRun = 16
+
     def read(self, index):
         return self.values[index]
+
     def write(self, index, value):
         self.values[index] = value
+
     def swap(self, first, second):
-        self.values[first], self.values[second] = self.values[second], self.values[first]
+        self.values[first], self.values[second] = (
+            self.values[second],
+            self.values[first],
+        )
+
     def compare(self, first, second):
         if self.values[first] < self.values[second]:
             return -1
         if self.values[first] > self.values[second]:
             return 1
         return 0
+
     def compareValue(self, index, value):
         if self.values[index] < value:
             return -1
         if self.values[index] > value:
             return 1
         return 0
+
     def reverse(self, start, end):
         left = start
         right = end - 1
         while left < right:
-            self.values[left], self.values[right] = self.values[right], self.values[left]
+            self.values[left], self.values[right] = (
+                self.values[right],
+                self.values[left],
+            )
             left += 1
             right -= 1
+
     def multiSwap(self, first, second, count):
         if not (count > 0):
             return
         for offset in range(0, count):
             self.swap(first + offset, second + offset)
+
     def multiTriSwap(self, first, second, third, count):
         if not (count > 0):
             return
@@ -60,6 +76,7 @@ class AdaptiveGrailExample:
             self.write(first + offset, self.read(second + offset))
             self.write(second + offset, self.read(third + offset))
             self.write(third + offset, value)
+
     def insertTo(self, source, destination):
         value = self.read(source)
         cursor = source
@@ -67,6 +84,7 @@ class AdaptiveGrailExample:
             self.write(cursor, self.read(cursor - 1))
             cursor -= 1
         self.write(destination, value)
+
     def insertToBackward(self, source, destination):
         value = self.read(source)
         cursor = source
@@ -74,18 +92,20 @@ class AdaptiveGrailExample:
             self.write(cursor, self.read(cursor + 1))
             cursor += 1
         self.write(cursor, value)
+
     def shift(self, destination, source, end):
         if not (source < end):
             return
         for offset in range(0, (end - source)):
             self.swap(destination + offset, source + offset)
+
     def rotate(self, startIn, middleIn, endIn):
         start = startIn
         middle = middleIn
         end = endIn
         left = middle - start
         right = end - middle
-        while left > 1  and  right > 1:
+        while left > 1 and right > 1:
             if right < left:
                 self.multiSwap(middle - right, middle, right)
                 end -= right
@@ -100,6 +120,7 @@ class AdaptiveGrailExample:
             self.insertTo(middle, start)
         elif left == 1:
             self.insertToBackward(start, end - 1)
+
     def leftBinarySearch(self, start, end, value):
         lower = start
         upper = end
@@ -110,6 +131,7 @@ class AdaptiveGrailExample:
             else:
                 lower = middle + 1
         return lower
+
     def rightBinarySearch(self, start, end, value):
         lower = start
         upper = end
@@ -120,6 +142,7 @@ class AdaptiveGrailExample:
             else:
                 lower = middle + 1
         return lower
+
     def buildUniqueRun(self, start, limit):
         count = 1
         index = start + 1
@@ -127,17 +150,18 @@ class AdaptiveGrailExample:
         if order < 0:
             index += 1
             count += 1
-            while count < limit  and  self.compare(index - 1, index) < 0:
+            while count < limit and self.compare(index - 1, index) < 0:
                 index += 1
                 count += 1
         elif order > 0:
             index += 1
             count += 1
-            while count < limit  and  self.compare(index - 1, index) > 0:
+            while count < limit and self.compare(index - 1, index) > 0:
                 index += 1
                 count += 1
             self.reverse(start, index)
         return count
+
     def buildUniqueRunBackward(self, end, limit):
         count = 1
         index = end - 1
@@ -145,26 +169,27 @@ class AdaptiveGrailExample:
         if order < 0:
             index -= 1
             count += 1
-            while count < limit  and  self.compare(index - 1, index) < 0:
+            while count < limit and self.compare(index - 1, index) < 0:
                 index -= 1
                 count += 1
         elif order > 0:
             index -= 1
             count += 1
-            while count < limit  and  self.compare(index - 1, index) > 0:
+            while count < limit and self.compare(index - 1, index) > 0:
                 index -= 1
                 count += 1
             self.reverse(index, end)
         return count
+
     def findKeys(self, start, end, initial, needed):
         count = initial
         keyStart = start
         keyEnd = start + count
         index = keyEnd
-        while index < end  and  count < needed:
+        while index < end and count < needed:
             candidate = self.read(index)
             location = self.leftBinarySearch(keyStart, keyEnd, candidate)
-            if location == keyEnd  or  self.compareValue(location, candidate) != 0:
+            if location == keyEnd or self.compareValue(location, candidate) != 0:
                 self.rotate(keyStart, keyEnd, index)
                 distance = index - keyEnd
                 location += distance
@@ -176,15 +201,16 @@ class AdaptiveGrailExample:
             index += 1
         self.rotate(start, keyStart, keyEnd)
         return count
+
     def findKeysBackward(self, start, end, initial, needed):
         count = initial
         keyStart = end - count
         keyEnd = end
         index = keyStart - 1
-        while index >= start  and  count < needed:
+        while index >= start and count < needed:
             candidate = self.read(index)
             location = self.leftBinarySearch(keyStart, keyEnd, candidate)
-            if location == keyEnd  or  self.compareValue(location, candidate) != 0:
+            if location == keyEnd or self.compareValue(location, candidate) != 0:
                 self.rotate(index + 1, keyStart, keyEnd)
                 distance = keyStart - (index + 1)
                 location -= distance
@@ -195,36 +221,41 @@ class AdaptiveGrailExample:
             index -= 1
         self.rotate(keyStart, keyEnd, end)
         return count
+
     def buildRuns(self, start, end):
         index = start + 1
         runStart = start
         while index < end:
             if self.compare(index - 1, index) > 0:
                 index += 1
-                while index < end  and  self.compare(index - 1, index) > 0:
+                while index < end and self.compare(index - 1, index) > 0:
                     index += 1
                 self.reverse(runStart, index)
             else:
                 index += 1
-                while index < end  and  self.compare(index - 1, index) <= 0:
+                while index < end and self.compare(index - 1, index) <= 0:
                     index += 1
             if index < end:
                 runStart = index - (index - runStart - 1) % self.minRun - 1
-            while index - runStart < self.minRun  and  index < end:
-                self.insertTo(index, self.rightBinarySearch(runStart, index, self.read(index)))
+            while index - runStart < self.minRun and index < end:
+                self.insertTo(
+                    index, self.rightBinarySearch(runStart, index, self.read(index))
+                )
                 index += 1
             runStart = index
             index += 1
+
     def binaryInsertion(self, start, end):
         if not (end - start > 1):
             return
         for index in range((start + 1), end):
             self.insertTo(index, self.rightBinarySearch(start, index, self.read(index)))
+
     def mergeWithBufferRest(self, start, middle, end, buffer, length):
         left = 0
         right = middle
         output = start
-        while left < length  and  right < end:
+        while left < length and right < end:
             if self.compare(buffer + left, right) <= 0:
                 self.swap(output, buffer + left)
                 left += 1
@@ -236,17 +267,19 @@ class AdaptiveGrailExample:
             self.swap(output, buffer + left)
             output += 1
             left += 1
+
     def mergeWithBuffer(self, start, middle, end, buffer):
         length = middle - start
         self.multiSwap(buffer, start, length)
         self.mergeWithBufferRest(start, middle, end, buffer, length)
+
     def mergeWithBufferBackward(self, start, middle, end, buffer):
         length = end - middle
         self.multiSwap(middle, buffer, length)
         left = length - 1
         right = middle - 1
         output = end - 1
-        while left >= 0  and  right >= start:
+        while left >= 0 and right >= start:
             if self.compare(buffer + left, right) >= 0:
                 self.swap(output, buffer + left)
                 left -= 1
@@ -258,10 +291,11 @@ class AdaptiveGrailExample:
             self.swap(output, buffer + left)
             output -= 1
             left -= 1
+
     def inPlaceMerge(self, start, middle, end):
         left = start
         right = middle
-        while left < right  and  right < end:
+        while left < right and right < end:
             if self.compare(left, right) > 0:
                 next = self.leftBinarySearch(right + 1, end, self.read(left))
                 self.rotate(left, right, next)
@@ -269,10 +303,11 @@ class AdaptiveGrailExample:
                 right = next
             else:
                 left += 1
+
     def inPlaceMergeBackward(self, start, middle, end):
         left = middle - 1
         right = end - 1
-        while right > left  and  left >= start:
+        while right > left and left >= start:
             if self.compare(left, right) > 0:
                 next = self.rightBinarySearch(start, left, self.read(right))
                 self.rotate(next, left + 1, right + 1)
@@ -280,23 +315,31 @@ class AdaptiveGrailExample:
                 left = next - 1
             else:
                 right -= 1
+
     def mergeWithoutBuffer(self, start, middle, end):
         if middle - start > end - middle:
             self.inPlaceMergeBackward(start, middle, end)
         else:
             self.inPlaceMerge(start, middle, end)
+
     def checkSorted(self, middle):
         return self.compare(middle - 1, middle) > 0
+
     def checkReverseBounds(self, start, middle, end):
         if self.compare(start, end - 1) > 0:
             self.rotate(start, middle, end)
             return False
         return True
+
     def checkBounds(self, start, middle, end):
         return self.checkSorted(middle) and self.checkReverseBounds(start, middle, end)
+
     def subarray(self, tag, middleKey):
-        return ("left" if self.compare(tag, middleKey) < 0 else "right")
-    def blockSelectSort(self, position, tags, offset, distance, leftCount, blockCount, blockLength):
+        return "left" if self.compare(tag, middleKey) < 0 else "right"
+
+    def blockSelectSort(
+        self, position, tags, offset, distance, leftCount, blockCount, blockLength
+    ):
         middleKey = leftCount
         index = 0
         limit = leftCount + 1
@@ -304,19 +347,29 @@ class AdaptiveGrailExample:
             minimum = index
             candidate = max(leftCount - offset, index + 1)
             while candidate < limit:
-                order = self.compare(position + distance + candidate * blockLength, position + distance + minimum * blockLength)
-                if order < 0  or  (order == 0  and  self.compare(tags + candidate, tags + minimum) < 0):
+                order = self.compare(
+                    position + distance + candidate * blockLength,
+                    position + distance + minimum * blockLength,
+                )
+                if order < 0 or (
+                    order == 0 and self.compare(tags + candidate, tags + minimum) < 0
+                ):
                     minimum = candidate
                 candidate += 1
             if minimum != index:
-                self.multiSwap(position + index * blockLength, position + minimum * blockLength, blockLength)
+                self.multiSwap(
+                    position + index * blockLength,
+                    position + minimum * blockLength,
+                    blockLength,
+                )
                 self.swap(tags + index, tags + minimum)
-                if limit < blockCount  and  minimum == limit - 1:
+                if limit < blockCount and minimum == limit - 1:
                     limit += 1
             if minimum == middleKey:
                 middleKey = index
             index += 1
         return tags + middleKey
+
     def sortKeys(self, end, buffer, middleKey):
         self.swap(buffer, middleKey)
         left = middleKey
@@ -331,6 +384,7 @@ class AdaptiveGrailExample:
                 right += 1
             index += 1
         self.multiSwap(left, buffer, end - left)
+
     def sortKeysWithoutBuffer(self, end, middleKey):
         left = middleKey
         index = left + 1
@@ -339,13 +393,14 @@ class AdaptiveGrailExample:
                 self.insertTo(index, left)
                 left += 1
             index += 1
+
     def mergeBlocks(self, start, middle, end, destination, reverseEqual):
         left = start
         right = middle
         output = destination
-        while left < middle  and  right < end:
+        while left < middle and right < end:
             order = self.compare(left, right)
-            if order < 0  or  (order == 0  and  not reverseEqual):
+            if order < 0 or (order == 0 and not reverseEqual):
                 self.swap(output, left)
                 left += 1
             else:
@@ -358,6 +413,7 @@ class AdaptiveGrailExample:
                 output += 1
                 left += 1
         return right
+
     def blockMerge(self, start, middle, end, tags, buffer, blockLength):
         lastFull = end - (end - middle - 1) % blockLength - 1
         left = start + blockLength
@@ -369,34 +425,51 @@ class AdaptiveGrailExample:
         rightBlocks = leftCount - 1
         self.multiTriSwap(buffer, middle - blockLength, start, blockLength)
         self.insertToBackward(tags, tags + leftCount - 1)
-        middleKey = self.blockSelectSort(left, tags, 1, blockLength - 1, leftCount, blockCount, blockLength)
+        middleKey = self.blockSelectSort(
+            left, tags, 1, blockLength - 1, leftCount, blockCount, blockLength
+        )
         fragment = "left"
-        while leftBlocks < leftCount  and  rightBlocks < blockCount:
+        while leftBlocks < leftCount and rightBlocks < blockCount:
             if fragment == "left":
                 while True:
                     group += blockLength
                     leftBlocks += 1
                     key += 1
-                    if not (leftBlocks < leftCount  and  self.subarray(key, middleKey) == "left"): break
+                    if not (
+                        leftBlocks < leftCount
+                        and self.subarray(key, middleKey) == "left"
+                    ):
+                        break
                 if leftBlocks == leftCount:
                     left = self.mergeBlocks(left, group, end, left - blockLength, False)
-                    self.mergeWithBufferRest(left - blockLength, left, end, buffer, blockLength)
+                    self.mergeWithBufferRest(
+                        left - blockLength, left, end, buffer, blockLength
+                    )
                 else:
-                    left = self.mergeBlocks(left, group, group + blockLength - 1, left - blockLength, False)
+                    left = self.mergeBlocks(
+                        left, group, group + blockLength - 1, left - blockLength, False
+                    )
                 fragment = "right"
             else:
                 while True:
                     group += blockLength
                     rightBlocks += 1
                     key += 1
-                    if not (rightBlocks < blockCount  and  self.subarray(key, middleKey) == "right"): break
+                    if not (
+                        rightBlocks < blockCount
+                        and self.subarray(key, middleKey) == "right"
+                    ):
+                        break
                 if rightBlocks == blockCount:
                     self.shift(left - blockLength, left, end)
                     self.multiSwap(buffer, end - blockLength, blockLength)
                 else:
-                    left = self.mergeBlocks(left, group, group + blockLength - 1, left - blockLength, True)
+                    left = self.mergeBlocks(
+                        left, group, group + blockLength - 1, left - blockLength, True
+                    )
                 fragment = "left"
         self.sortKeys(tags + blockCount, buffer, middleKey)
+
     def blockMergeWithoutBuffer(self, start, middle, end, tags, blockLength):
         firstFull = start + (middle - start) % blockLength
         lastFull = end - (end - middle) % blockLength
@@ -407,9 +480,11 @@ class AdaptiveGrailExample:
         blockCount = (lastFull - group) // blockLength + 1
         leftBlocks = 0
         rightBlocks = leftCount
-        middleKey = self.blockSelectSort(group, tags, 0, 0, leftCount - 1, blockCount - 1, blockLength)
+        middleKey = self.blockSelectSort(
+            group, tags, 0, 0, leftCount - 1, blockCount - 1, blockLength
+        )
         fragment = "left"
-        while leftBlocks < leftCount  and  rightBlocks < blockCount:
+        while leftBlocks < leftCount and rightBlocks < blockCount:
             next = self.subarray(key, middleKey)
             key += 1
             if next == fragment:
@@ -422,18 +497,22 @@ class AdaptiveGrailExample:
                 middle2 = group
                 end2 = group + blockLength
                 if fragment == "left":
-                    while left < middle2  and  middle2 < end2:
+                    while left < middle2 and middle2 < end2:
                         if self.compare(left, middle2) > 0:
-                            nextPosition = self.leftBinarySearch(middle2 + 1, end2, self.read(left))
+                            nextPosition = self.leftBinarySearch(
+                                middle2 + 1, end2, self.read(left)
+                            )
                             self.rotate(left, middle2, nextPosition)
                             left += nextPosition - middle2
                             middle2 = nextPosition
                         else:
                             left += 1
                 else:
-                    while left < middle2  and  middle2 < end2:
+                    while left < middle2 and middle2 < end2:
                         if self.compare(left, middle2) >= 0:
-                            nextPosition = self.rightBinarySearch(middle2 + 1, end2, self.read(left))
+                            nextPosition = self.rightBinarySearch(
+                                middle2 + 1, end2, self.read(left)
+                            )
                             self.rotate(left, middle2, nextPosition)
                             left += nextPosition - middle2
                             middle2 = nextPosition
@@ -454,37 +533,52 @@ class AdaptiveGrailExample:
         if leftBlocks < leftCount:
             self.inPlaceMergeBackward(start, lastFull, end)
         self.sortKeysWithoutBuffer(tags + blockCount - 1, middleKey)
+
     def smartMerge(self, start, middle, end, buffer):
         if self.checkBounds(start, middle, end):
             trimmed = self.rightBinarySearch(start, middle - 1, self.read(middle))
             self.mergeWithBuffer(trimmed, middle, end, buffer)
+
     def smartMergeBackward(self, start, middle, end, buffer):
         if self.checkBounds(start, middle, end):
             trimmed = self.leftBinarySearch(middle + 1, end, self.read(middle - 1))
             self.mergeWithBufferBackward(start, middle, trimmed, buffer)
+
     def smartBlockMerge(self, start, middle, end, tags, buffer, blockLength):
         if self.checkBounds(start, middle, end):
             trimmedStart = self.rightBinarySearch(start, middle - 1, self.read(middle))
             trimmedEnd = self.leftBinarySearch(middle + 1, end, self.read(middle - 1))
             if self.checkReverseBounds(trimmedStart, middle, trimmedEnd):
-                if middle - trimmedStart <= blockLength  or  trimmedEnd - middle <= blockLength:
+                if (
+                    middle - trimmedStart <= blockLength
+                    or trimmedEnd - middle <= blockLength
+                ):
                     if trimmedEnd - middle < middle - trimmedStart:
-                        self.mergeWithBufferBackward(trimmedStart, middle, trimmedEnd, buffer)
+                        self.mergeWithBufferBackward(
+                            trimmedStart, middle, trimmedEnd, buffer
+                        )
                     else:
                         self.mergeWithBuffer(trimmedStart, middle, trimmedEnd, buffer)
                 else:
                     trimmedStart -= (trimmedStart - start) % blockLength
-                    self.blockMerge(trimmedStart, middle, trimmedEnd, tags, buffer, blockLength)
+                    self.blockMerge(
+                        trimmedStart, middle, trimmedEnd, tags, buffer, blockLength
+                    )
+
     def smartBlockMergeWithoutBuffer(self, start, middle, end, tags, blockLength):
         if self.checkBounds(start, middle, end):
             trimmedStart = self.rightBinarySearch(start, middle - 1, self.read(middle))
             if middle - trimmedStart <= blockLength:
                 self.inPlaceMerge(trimmedStart, middle, end)
             else:
-                self.blockMergeWithoutBuffer(trimmedStart, middle, end, tags, blockLength)
+                self.blockMergeWithoutBuffer(
+                    trimmedStart, middle, end, tags, blockLength
+                )
+
     def smartInPlaceMerge(self, start, middle, end):
         if self.checkSorted(middle):
             self.inPlaceMergeBackward(start, middle, end)
+
     def redistributeBuffer(self, startIn, middleIn, end):
         start = startIn
         middle = middleIn
@@ -501,6 +595,7 @@ class AdaptiveGrailExample:
         middle += distance
         self.mergeWithoutBuffer(start, leftMiddle - distance, leftMiddle)
         self.mergeWithoutBuffer(leftMiddle, middle, end)
+
     def redistributeBufferBackward(self, start, middleIn, endIn):
         middle = middleIn
         end = endIn
@@ -517,6 +612,7 @@ class AdaptiveGrailExample:
         middle -= distance
         self.mergeWithoutBuffer(rightMiddle, rightMiddle + distance, end)
         self.mergeWithoutBuffer(start, middle, rightMiddle)
+
     def inPlaceMergeSort(self, start, end):
         self.buildRuns(start, end)
         run = self.minRun
@@ -528,6 +624,7 @@ class AdaptiveGrailExample:
             if index + run < end:
                 self.smartInPlaceMerge(index, index + run, end)
             run *= 2
+
     def adaptiveSortWithoutBuffer(self, startIn, endIn, keys, ideal, backwardBuffer):
         start = startIn
         end = endIn
@@ -552,7 +649,7 @@ class AdaptiveGrailExample:
             dataEnd = end
             tags = start
         self.buildRuns(dataStart, dataEnd)
-        while runLength <= blockLength  and  runLength < length:
+        while runLength <= blockLength and runLength < length:
             index = dataStart
             while index + 2 * runLength <= dataEnd:
                 self.smartMerge(index, index + runLength, index + 2 * runLength, buffer)
@@ -560,33 +657,46 @@ class AdaptiveGrailExample:
             if index + runLength < dataEnd:
                 self.smartMergeBackward(index, index + runLength, dataEnd, buffer)
             runLength *= 2
-        if blockLength // 2 >= self.minRun  and  blockLength // 2 >= (keys + 1) // 2:
+        if blockLength // 2 >= self.minRun and blockLength // 2 >= (keys + 1) // 2:
             self.binaryInsertion(buffer, buffer + blockLength)
             blockLength //= 2
             tagLength = keys - blockLength
             buffer += blockLength
-        while tagLength >= 2 * runLength // blockLength - 1  and  runLength < length:
+        while tagLength >= 2 * runLength // blockLength - 1 and runLength < length:
             index = dataStart
             while index + 2 * runLength <= dataEnd:
-                self.smartBlockMerge(index, index + runLength, index + 2 * runLength, tags, buffer, blockLength)
+                self.smartBlockMerge(
+                    index,
+                    index + runLength,
+                    index + 2 * runLength,
+                    tags,
+                    buffer,
+                    blockLength,
+                )
                 index += 2 * runLength
             if index + runLength < dataEnd:
                 if dataEnd - (index + runLength) > blockLength:
-                    self.smartBlockMerge(index, index + runLength, dataEnd, tags, buffer, blockLength)
+                    self.smartBlockMerge(
+                        index, index + runLength, dataEnd, tags, buffer, blockLength
+                    )
                 else:
                     self.smartMergeBackward(index, index + runLength, dataEnd, buffer)
             runLength *= 2
         self.binaryInsertion(buffer, buffer + blockLength)
         tagLength = keys - keys % 2
         while runLength < length:
-            blockLength = 2 * runLength // tagLength
+            blockLength = (2 * runLength + tagLength - 1) // tagLength
             index = dataStart
             while index + 2 * runLength <= dataEnd:
-                self.smartBlockMergeWithoutBuffer(index, index + runLength, index + 2 * runLength, tags, blockLength)
+                self.smartBlockMergeWithoutBuffer(
+                    index, index + runLength, index + 2 * runLength, tags, blockLength
+                )
                 index += 2 * runLength
             if index + runLength < dataEnd:
                 if dataEnd - (index + runLength) > blockLength:
-                    self.smartBlockMergeWithoutBuffer(index, index + runLength, dataEnd, tags, blockLength)
+                    self.smartBlockMergeWithoutBuffer(
+                        index, index + runLength, dataEnd, tags, blockLength
+                    )
                 else:
                     self.smartInPlaceMerge(index, index + runLength, dataEnd)
             runLength *= 2
@@ -602,6 +712,7 @@ class AdaptiveGrailExample:
                 self.redistributeBuffer(start, dataStart, end)
             else:
                 self.mergeWithoutBuffer(start, dataStart, end)
+
     def sort(self, startIn, endIn):
         start = startIn
         end = endIn
@@ -634,8 +745,12 @@ class AdaptiveGrailExample:
             if leftRun == ideal:
                 backwardBuffer = False
             else:
-                backwardBuffer = (rightRun < 16  and  leftRun < 16)  or  rightRun >= leftRun
-        keys = (self.findKeysBackward(start, end, rightRun, ideal) if backwardBuffer else self.findKeys(start, end, leftRun, ideal))
+                backwardBuffer = (rightRun < 16 and leftRun < 16) or rightRun >= leftRun
+        keys = (
+            self.findKeysBackward(start, end, rightRun, ideal)
+            if backwardBuffer
+            else self.findKeys(start, end, leftRun, ideal)
+        )
         if keys < ideal:
             if keys == 1:
                 return
@@ -660,7 +775,7 @@ class AdaptiveGrailExample:
             tags = start
         self.buildRuns(dataStart, dataEnd)
         runLength = self.minRun
-        while runLength <= blockLength  and  runLength < length:
+        while runLength <= blockLength and runLength < length:
             index = dataStart
             while index + 2 * runLength <= dataEnd:
                 self.smartMerge(index, index + runLength, index + 2 * runLength, buffer)
@@ -671,11 +786,20 @@ class AdaptiveGrailExample:
         while runLength < length:
             index = dataStart
             while index + 2 * runLength <= dataEnd:
-                self.smartBlockMerge(index, index + runLength, index + 2 * runLength, tags, buffer, blockLength)
+                self.smartBlockMerge(
+                    index,
+                    index + runLength,
+                    index + 2 * runLength,
+                    tags,
+                    buffer,
+                    blockLength,
+                )
                 index += 2 * runLength
             if index + runLength < dataEnd:
                 if dataEnd - (index + runLength) > blockLength:
-                    self.smartBlockMerge(index, index + runLength, dataEnd, tags, buffer, blockLength)
+                    self.smartBlockMerge(
+                        index, index + runLength, dataEnd, tags, buffer, blockLength
+                    )
                 else:
                     self.smartMergeBackward(index, index + runLength, dataEnd, buffer)
             runLength *= 2
@@ -687,9 +811,11 @@ class AdaptiveGrailExample:
             end = self.leftBinarySearch(dataStart, end, self.read(dataStart - 1))
             self.redistributeBuffer(start, dataStart, end)
 
+
 def sort(values):
     sorter = AdaptiveGrailExample(values)
     sorter.sort(0, len(values))
+
 
 if __name__ == "__main__":
     array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56]

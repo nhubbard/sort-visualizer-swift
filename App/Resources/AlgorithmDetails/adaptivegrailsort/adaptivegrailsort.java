@@ -20,22 +20,27 @@
 class AdaptiveGrailExample {
   private final int[] values;
   private int minRun;
+
   AdaptiveGrailExample(int[] input) {
     values = input;
     minRun = 16;
   }
+
   int read(int index) {
     return values[index];
   }
+
   void write(int index, int value) {
     values[index] = value;
   }
+
   void swap(int first, int second) {
     int _sim0_0 = values[second];
     int _sim0_1 = values[first];
     values[first] = _sim0_0;
     values[second] = _sim0_1;
   }
+
   int compare(int first, int second) {
     if ((values[first] < values[second])) {
       return -(1);
@@ -45,6 +50,7 @@ class AdaptiveGrailExample {
     }
     return 0;
   }
+
   int compareValue(int index, int value) {
     if ((values[index] < value)) {
       return -(1);
@@ -54,6 +60,7 @@ class AdaptiveGrailExample {
     }
     return 0;
   }
+
   void reverse(int start, int end) {
     int left, right;
     left = start;
@@ -67,6 +74,7 @@ class AdaptiveGrailExample {
       right -= 1;
     }
   }
+
   void multiSwap(int first, int second, int count) {
     int offset;
     if (!((count > 0))) {
@@ -76,6 +84,7 @@ class AdaptiveGrailExample {
       swap((first + offset), (second + offset));
     }
   }
+
   void multiTriSwap(int first, int second, int third, int count) {
     int offset, value;
     if (!((count > 0))) {
@@ -88,6 +97,7 @@ class AdaptiveGrailExample {
       write((third + offset), value);
     }
   }
+
   void insertTo(int source, int destination) {
     int cursor, value;
     value = read(source);
@@ -98,6 +108,7 @@ class AdaptiveGrailExample {
     }
     write(destination, value);
   }
+
   void insertToBackward(int source, int destination) {
     int cursor, value;
     value = read(source);
@@ -108,6 +119,7 @@ class AdaptiveGrailExample {
     }
     write(cursor, value);
   }
+
   void shift(int destination, int source, int end) {
     int offset;
     if (!((source < end))) {
@@ -117,6 +129,7 @@ class AdaptiveGrailExample {
       swap((destination + offset), (source + offset));
     }
   }
+
   void rotate(int startIn, int middleIn, int endIn) {
     int end, left, middle, right, start;
     start = startIn;
@@ -145,6 +158,7 @@ class AdaptiveGrailExample {
       }
     }
   }
+
   int leftBinarySearch(int start, int end, int value) {
     int lower, middle, upper;
     lower = start;
@@ -159,6 +173,7 @@ class AdaptiveGrailExample {
     }
     return lower;
   }
+
   int rightBinarySearch(int start, int end, int value) {
     int lower, middle, upper;
     lower = start;
@@ -173,6 +188,7 @@ class AdaptiveGrailExample {
     }
     return lower;
   }
+
   int buildUniqueRun(int start, int limit) {
     int count, index, order;
     count = 1;
@@ -198,6 +214,7 @@ class AdaptiveGrailExample {
     }
     return count;
   }
+
   int buildUniqueRunBackward(int end, int limit) {
     int count, index, order;
     count = 1;
@@ -223,6 +240,7 @@ class AdaptiveGrailExample {
     }
     return count;
   }
+
   int findKeys(int start, int end, int initial, int needed) {
     int candidate, count, distance, index, keyEnd, keyStart, location;
     count = initial;
@@ -247,6 +265,7 @@ class AdaptiveGrailExample {
     rotate(start, keyStart, keyEnd);
     return count;
   }
+
   int findKeysBackward(int start, int end, int initial, int needed) {
     int candidate, count, distance, index, keyEnd, keyStart, location;
     count = initial;
@@ -270,6 +289,7 @@ class AdaptiveGrailExample {
     rotate(keyStart, keyEnd, end);
     return count;
   }
+
   void buildRuns(int start, int end) {
     int index, runStart;
     index = (start + 1);
@@ -298,6 +318,7 @@ class AdaptiveGrailExample {
       index += 1;
     }
   }
+
   void binaryInsertion(int start, int end) {
     int index;
     if (!(((end - start) > 1))) {
@@ -307,6 +328,7 @@ class AdaptiveGrailExample {
       insertTo(index, rightBinarySearch(start, index, read(index)));
     }
   }
+
   void mergeWithBufferRest(int start, int middle, int end, int buffer, int length) {
     int left, output, right;
     left = 0;
@@ -328,12 +350,14 @@ class AdaptiveGrailExample {
       left += 1;
     }
   }
+
   void mergeWithBuffer(int start, int middle, int end, int buffer) {
     int length;
     length = (middle - start);
     multiSwap(buffer, start, length);
     mergeWithBufferRest(start, middle, end, buffer, length);
   }
+
   void mergeWithBufferBackward(int start, int middle, int end, int buffer) {
     int left, length, output, right;
     length = (end - middle);
@@ -357,6 +381,7 @@ class AdaptiveGrailExample {
       left -= 1;
     }
   }
+
   void inPlaceMerge(int start, int middle, int end) {
     int left, next, right;
     left = start;
@@ -372,6 +397,7 @@ class AdaptiveGrailExample {
       }
     }
   }
+
   void inPlaceMergeBackward(int start, int middle, int end) {
     int left, next, right;
     left = (middle - 1);
@@ -387,6 +413,7 @@ class AdaptiveGrailExample {
       }
     }
   }
+
   void mergeWithoutBuffer(int start, int middle, int end) {
     if (((middle - start) > (end - middle))) {
       inPlaceMergeBackward(start, middle, end);
@@ -394,9 +421,11 @@ class AdaptiveGrailExample {
       inPlaceMerge(start, middle, end);
     }
   }
+
   boolean checkSorted(int middle) {
     return (compare((middle - 1), middle) > 0);
   }
+
   boolean checkReverseBounds(int start, int middle, int end) {
     if ((compare(start, (end - 1)) > 0)) {
       rotate(start, middle, end);
@@ -404,13 +433,23 @@ class AdaptiveGrailExample {
     }
     return true;
   }
+
   boolean checkBounds(int start, int middle, int end) {
     return (checkSorted(middle) && checkReverseBounds(start, middle, end));
   }
+
   int subarray(int tag, int middleKey) {
     return ((compare(tag, middleKey) < 0) ? 0 : 1);
   }
-  int blockSelectSort(int position, int tags, int offset, int distance, int leftCount, int blockCount, int blockLength) {
+
+  int blockSelectSort(
+      int position,
+      int tags,
+      int offset,
+      int distance,
+      int leftCount,
+      int blockCount,
+      int blockLength) {
     int candidate, index, limit, middleKey, minimum, order;
     middleKey = leftCount;
     index = 0;
@@ -419,14 +458,19 @@ class AdaptiveGrailExample {
       minimum = index;
       candidate = Math.max((leftCount - offset), (index + 1));
       while ((candidate < limit)) {
-        order = compare(((position + distance) + (candidate * blockLength)), ((position + distance) + (minimum * blockLength)));
-        if (((order < 0) || ((order == 0) && (compare((tags + candidate), (tags + minimum)) < 0)))) {
+        order =
+            compare(
+                ((position + distance) + (candidate * blockLength)),
+                ((position + distance) + (minimum * blockLength)));
+        if (((order < 0)
+            || ((order == 0) && (compare((tags + candidate), (tags + minimum)) < 0)))) {
           minimum = candidate;
         }
         candidate += 1;
       }
       if ((minimum != index)) {
-        multiSwap((position + (index * blockLength)), (position + (minimum * blockLength)), blockLength);
+        multiSwap(
+            (position + (index * blockLength)), (position + (minimum * blockLength)), blockLength);
         swap((tags + index), (tags + minimum));
         if (((limit < blockCount) && (minimum == (limit - 1)))) {
           limit += 1;
@@ -439,6 +483,7 @@ class AdaptiveGrailExample {
     }
     return (tags + middleKey);
   }
+
   void sortKeys(int end, int buffer, int middleKey) {
     int index, left, right;
     swap(buffer, middleKey);
@@ -457,6 +502,7 @@ class AdaptiveGrailExample {
     }
     multiSwap(left, buffer, (end - left));
   }
+
   void sortKeysWithoutBuffer(int end, int middleKey) {
     int index, left;
     left = middleKey;
@@ -469,6 +515,7 @@ class AdaptiveGrailExample {
       index += 1;
     }
   }
+
   int mergeBlocks(int start, int middle, int end, int destination, boolean reverseEqual) {
     int left, order, output, right;
     left = start;
@@ -494,8 +541,18 @@ class AdaptiveGrailExample {
     }
     return right;
   }
+
   void blockMerge(int start, int middle, int end, int tags, int buffer, int blockLength) {
-    int blockCount, fragment, group, key, lastFull, left, leftBlocks, leftCount, middleKey, rightBlocks;
+    int blockCount,
+        fragment,
+        group,
+        key,
+        lastFull,
+        left,
+        leftBlocks,
+        leftCount,
+        middleKey,
+        rightBlocks;
     lastFull = ((end - (((end - middle) - 1) % blockLength)) - 1);
     left = (start + blockLength);
     group = start;
@@ -506,7 +563,8 @@ class AdaptiveGrailExample {
     rightBlocks = (leftCount - 1);
     multiTriSwap(buffer, (middle - blockLength), start, blockLength);
     insertToBackward(tags, ((tags + leftCount) - 1));
-    middleKey = blockSelectSort(left, tags, 1, (blockLength - 1), leftCount, blockCount, blockLength);
+    middleKey =
+        blockSelectSort(left, tags, 1, (blockLength - 1), leftCount, blockCount, blockLength);
     fragment = 0;
     while (((leftBlocks < leftCount) && (rightBlocks < blockCount))) {
       if ((fragment == 0)) {
@@ -545,8 +603,23 @@ class AdaptiveGrailExample {
     }
     sortKeys((tags + blockCount), buffer, middleKey);
   }
+
   void blockMergeWithoutBuffer(int start, int middle, int end, int tags, int blockLength) {
-    int blockCount, end2, firstFull, fragment, group, key, lastFull, left, leftBlocks, leftCount, middle2, middleKey, next, nextPosition, rightBlocks;
+    int blockCount,
+        end2,
+        firstFull,
+        fragment,
+        group,
+        key,
+        lastFull,
+        left,
+        leftBlocks,
+        leftCount,
+        middle2,
+        middleKey,
+        next,
+        nextPosition,
+        rightBlocks;
     firstFull = (start + ((middle - start) % blockLength));
     lastFull = (end - ((end - middle) % blockLength));
     left = start;
@@ -616,6 +689,7 @@ class AdaptiveGrailExample {
     }
     sortKeysWithoutBuffer(((tags + blockCount) - 1), middleKey);
   }
+
   void smartMerge(int start, int middle, int end, int buffer) {
     int trimmed;
     if (checkBounds(start, middle, end)) {
@@ -623,6 +697,7 @@ class AdaptiveGrailExample {
       mergeWithBuffer(trimmed, middle, end, buffer);
     }
   }
+
   void smartMergeBackward(int start, int middle, int end, int buffer) {
     int trimmed;
     if (checkBounds(start, middle, end)) {
@@ -630,6 +705,7 @@ class AdaptiveGrailExample {
       mergeWithBufferBackward(start, middle, trimmed, buffer);
     }
   }
+
   void smartBlockMerge(int start, int middle, int end, int tags, int buffer, int blockLength) {
     int trimmedEnd, trimmedStart;
     if (checkBounds(start, middle, end)) {
@@ -649,6 +725,7 @@ class AdaptiveGrailExample {
       }
     }
   }
+
   void smartBlockMergeWithoutBuffer(int start, int middle, int end, int tags, int blockLength) {
     int trimmedStart;
     if (checkBounds(start, middle, end)) {
@@ -660,11 +737,13 @@ class AdaptiveGrailExample {
       }
     }
   }
+
   void smartInPlaceMerge(int start, int middle, int end) {
     if (checkSorted(middle)) {
       inPlaceMergeBackward(start, middle, end);
     }
   }
+
   void redistributeBuffer(int startIn, int middleIn, int end) {
     int distance, leftMiddle, middle, right, start;
     start = startIn;
@@ -683,6 +762,7 @@ class AdaptiveGrailExample {
     mergeWithoutBuffer(start, (leftMiddle - distance), leftMiddle);
     mergeWithoutBuffer(leftMiddle, middle, end);
   }
+
   void redistributeBufferBackward(int start, int middleIn, int endIn) {
     int distance, end, middle, right, rightMiddle;
     middle = middleIn;
@@ -701,6 +781,7 @@ class AdaptiveGrailExample {
     mergeWithoutBuffer(rightMiddle, (rightMiddle + distance), end);
     mergeWithoutBuffer(start, middle, rightMiddle);
   }
+
   void inPlaceMergeSort(int start, int end) {
     int index, run;
     buildRuns(start, end);
@@ -717,8 +798,20 @@ class AdaptiveGrailExample {
       run *= 2;
     }
   }
-  void adaptiveSortWithoutBuffer(int startIn, int endIn, int keys, int ideal, boolean backwardBuffer) {
-    int blockLength, buffer, dataEnd, dataStart, end, index, length, runLength, start, tagLength, tags;
+
+  void adaptiveSortWithoutBuffer(
+      int startIn, int endIn, int keys, int ideal, boolean backwardBuffer) {
+    int blockLength,
+        buffer,
+        dataEnd,
+        dataStart,
+        end,
+        index,
+        length,
+        runLength,
+        start,
+        tagLength,
+        tags;
     start = startIn;
     end = endIn;
     length = (end - start);
@@ -764,7 +857,8 @@ class AdaptiveGrailExample {
     while (((tagLength >= (((2 * runLength) / blockLength) - 1)) && (runLength < length))) {
       index = dataStart;
       while (((index + (2 * runLength)) <= dataEnd)) {
-        smartBlockMerge(index, (index + runLength), (index + (2 * runLength)), tags, buffer, blockLength);
+        smartBlockMerge(
+            index, (index + runLength), (index + (2 * runLength)), tags, buffer, blockLength);
         index += (2 * runLength);
       }
       if (((index + runLength) < dataEnd)) {
@@ -779,10 +873,11 @@ class AdaptiveGrailExample {
     binaryInsertion(buffer, (buffer + blockLength));
     tagLength = (keys - (keys % 2));
     while ((runLength < length)) {
-      blockLength = ((2 * runLength) / tagLength);
+      blockLength = ((2 * runLength + tagLength - 1) / tagLength);
       index = dataStart;
       while (((index + (2 * runLength)) <= dataEnd)) {
-        smartBlockMergeWithoutBuffer(index, (index + runLength), (index + (2 * runLength)), tags, blockLength);
+        smartBlockMergeWithoutBuffer(
+            index, (index + runLength), (index + (2 * runLength)), tags, blockLength);
         index += (2 * runLength);
       }
       if (((index + runLength) < dataEnd)) {
@@ -810,9 +905,25 @@ class AdaptiveGrailExample {
       }
     }
   }
+
   void sort(int startIn, int endIn) {
     boolean backwardBuffer;
-    int blockLength, buffer, dataEnd, dataStart, end, ideal, index, keys, leftRun, length, middle, rightRun, runLength, start, tagLength, tags;
+    int blockLength,
+        buffer,
+        dataEnd,
+        dataStart,
+        end,
+        ideal,
+        index,
+        keys,
+        leftRun,
+        length,
+        middle,
+        rightRun,
+        runLength,
+        start,
+        tagLength,
+        tags;
     start = startIn;
     end = endIn;
     length = (end - start);
@@ -852,7 +963,10 @@ class AdaptiveGrailExample {
         backwardBuffer = (((rightRun < 16) && (leftRun < 16)) || (rightRun >= leftRun));
       }
     }
-    keys = (backwardBuffer ? findKeysBackward(start, end, rightRun, ideal) : findKeys(start, end, leftRun, ideal));
+    keys =
+        (backwardBuffer
+            ? findKeysBackward(start, end, rightRun, ideal)
+            : findKeys(start, end, leftRun, ideal));
     if ((keys < ideal)) {
       if ((keys == 1)) {
         return;
@@ -895,7 +1009,8 @@ class AdaptiveGrailExample {
     while ((runLength < length)) {
       index = dataStart;
       while (((index + (2 * runLength)) <= dataEnd)) {
-        smartBlockMerge(index, (index + runLength), (index + (2 * runLength)), tags, buffer, blockLength);
+        smartBlockMerge(
+            index, (index + runLength), (index + (2 * runLength)), tags, buffer, blockLength);
         index += (2 * runLength);
       }
       if (((index + runLength) < dataEnd)) {
@@ -919,7 +1034,10 @@ class AdaptiveGrailExample {
 }
 
 public class adaptivegrailsort {
-  public static void sort(int[] values) { new AdaptiveGrailExample(values).sort(0, values.length); }
+  public static void sort(int[] values) {
+    new AdaptiveGrailExample(values).sort(0, values.length);
+  }
+
   public static void main(String[] args) {
     int[] values = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
     sort(values);

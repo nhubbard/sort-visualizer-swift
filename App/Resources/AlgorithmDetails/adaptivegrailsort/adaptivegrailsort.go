@@ -796,7 +796,7 @@ func adaptiveSortWithoutBuffer(self *AdaptiveGrailExample, startIn int, endIn in
 	binaryInsertion(self, buffer, (buffer + blockLength))
 	tagLength = (keys - (keys % 2))
 	for runLength < length {
-		blockLength = ((2 * runLength) / tagLength)
+		blockLength = ((2*runLength + tagLength - 1) / tagLength)
 		index = dataStart
 		for (index + (2 * runLength)) <= dataEnd {
 			smartBlockMergeWithoutBuffer(self, index, (index + runLength), (index + (2 * runLength)), tags, blockLength)
