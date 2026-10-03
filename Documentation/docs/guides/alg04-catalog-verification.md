@@ -26,7 +26,6 @@ exactly `quicksort`; neither scan contained an extra ID relative to the other. T
 ID set matched the independent UI fixture (FNV-1a 32-bit hash of comma-joined IDs: `1827002513`).
 The visible Quick category contained exactly `ternaryllquicksort` and `ternarylrquicksort`.
 
-When macOS automation access is available to Xcode's Catalyst test runner, run the same checked-in
-UI tests with the `Sort SymphonyUITests` scheme on the Mac Catalyst destination. The direct
-accessibility scan verifies the current Catalyst build, while that repeatable XCTest run will
-provide a result bundle for future changes.
+The signed Mac Catalyst UI runner subsequently worked for ENG-03. Run this checked-in catalog
+suite with that runner for future catalog changes. The direct accessibility scan above verifies
+the ALG-04 Catalyst build tested on this date.

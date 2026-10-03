@@ -214,6 +214,12 @@ public struct SortView: View {
     MetalRendererView(replay: replay, visualizerID: settings.selectedVisualizerID)
       .id(ObjectIdentifier(replay))
       .accessibilityIdentifier("sortVisualizationCanvas")
+      .accessibilityValue(
+        ProcessInfo.processInfo.environment["UI_TEST_EXPOSE_FRAME"] == "1"
+          ? "\(replay.stepIndex)|\(replay.totalOperationCount)|\(session.arraySize)|\(Int(replay.speed))|"
+            + replay.frame.map { String($0.value) }.joined(separator: ",")
+          : ""
+      )
   }
 
   /// Machine-readable phase/correctness signal for UI tests — a `Canvas` has no discrete

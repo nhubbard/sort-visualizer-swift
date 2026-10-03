@@ -87,6 +87,10 @@ struct Sort2App: App {
       SierpinskiShuffle(), TriangularHeapifiedShuffle(), TriangularShuffle()
     ]
     ShuffleRegistry.shared.discover()
+    if ProcessInfo.processInfo.environment["UI_TEST_DETERMINISTIC_REPLAY"] == "1" {
+      AppSettings.shared.defaultShuffleID = ShuffleID(rawValue: "random")
+      AppSettings.shared.useFixedDurationPacing = false
+    }
 
     // The two automations formerly hardcoded as `SortSession.toggleAutomation()`/
     // `toggleMaxSizeAutomation()` — the shortcut each one triggers is declared right here,
