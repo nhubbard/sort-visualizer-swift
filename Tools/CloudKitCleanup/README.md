@@ -50,10 +50,10 @@ The complete read-only scans from 2026-10-02 are recorded in the
 [Development dry-run review](reports/2026-10-02-development-dry-run.md). They found 262,700
 Big-O and 5,479 cap-exceeded entries above current selectable maxima in Development, and no
 Big-O entries in Production. After explicit approval, all 69 Development cap-exceeded algorithm
-groups were cleared and verified empty. Development Big-O cleanup is partly complete; CloudKit
-began returning `too-many-requests` and the CLI user token expired. A fresh token and final
-scan are still required. The older `.user-token` file dated 2026-08-29 is rejected by CloudKit;
-replace it with a newly copied Console CLI User Token before resuming.
+groups were cleared. A fresh complete scan found 819 remaining cap-exceeded records and zero
+above current maxima; a fresh Production Big-O scan found zero records. Development Big-O cleanup
+is partly complete and has encountered `too-many-requests`. Its final full scan is still required.
+Refresh `.user-token` from the Console when CloudKit reports token expiry.
 
 The approved candidate sets can be resumed with `execute_reviewed_cleanup.py`. It checks the
 frozen cache fingerprint, compares each algorithm's current matching record names to the

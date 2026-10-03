@@ -2,9 +2,10 @@
 
 All values below come from complete read-only Development scans made before deletion. After
 explicit approval on 2026-10-02, cleanup began against these exact candidate sets. The
-Development cap-exceeded set has since been verified empty by per-algorithm queries. Big-O
-cleanup is partly complete; CloudKit began returning `too-many-requests`, then the CLI user
-token expired. The figures below are the original dry-run counts, not current remaining counts.
+Development cap-exceeded set has since been verified empty by a fresh complete scan: 819
+records remain, none above the current maximum. A fresh Production Big-O scan found no records.
+Development Big-O cleanup is partly complete and has encountered CloudKit throttling. The
+figures below are the original dry-run counts, not current remaining counts.
 
 | Record type | Scanned | Above current selectable maximum | Algorithms affected |
 | --- | ---: | ---: | ---: |
