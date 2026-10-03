@@ -581,6 +581,8 @@ private final class KotaRecorder {
       inPlaceMerge(0, middle, position)
       // The symmetric final boundary can leave two restored blocks transposed.
       inPlaceMerge2(length - 2 * blockLen, length - blockLen, length)
+      // The preceding tagged block may still cross the restored suffix.
+      inPlaceMerge(0, length - 2 * blockLen, length)
     }
   }
 }

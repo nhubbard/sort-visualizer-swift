@@ -1,512 +1,950 @@
+// MIT License
+// Copyright (c) 2013 Andrey Astrelin
+// Copyright (c) 2020 The Holy Grail Sort Project
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy of this software
+// and associated documentation files (the "Software"), to deal in the Software without
+// restriction, including without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the
+// Software is furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all copies or
+// substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING
+// BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+// NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
 package main
 
-import (
-	"fmt"
-)
+import "fmt"
 
-func sort(arr []int) []int {
-	n := len(arr)
-	if n < 2 {
-		return arr
-	}
-	ascending, descending := true, true
-	for i := 1; i < n; i++ {
-		if arr[i-1] > arr[i] {
-			ascending = false
-		}
-		if arr[i-1] <= arr[i] {
-			descending = false
-		}
-	}
-	if ascending {
-		return arr
-	}
-	if descending {
-		for i := 0; i < n/2; i++ {
-			swap(arr, i, n-1-i)
-		}
-		return arr
-	}
-	commonSort(arr, 0, n)
-	return arr
+type AdaptiveGrailExample struct {
+	values    []int
+	n, minRun int
 }
 
-func swap(arr []int, a int, b int) {
-	arr[a], arr[b] = arr[b], arr[a]
-}
-
-func compareValues(a int, b int) int {
-	if a > b {
-		return 1
-	}
+func min_int(a, b int) int {
 	if a < b {
-		return -1
+		return a
+	}
+	return b
+}
+func max_int(a, b int) int {
+	if a > b {
+		return a
+	}
+	return b
+}
+func read(self *AdaptiveGrailExample, index int) int {
+	return self.values[index]
+}
+func write(self *AdaptiveGrailExample, index int, value int) {
+	self.values[index] = value
+}
+func swap(self *AdaptiveGrailExample, first int, second int) {
+	_sim0_0 := self.values[second]
+	_sim0_1 := self.values[first]
+	self.values[first] = _sim0_0
+	self.values[second] = _sim0_1
+}
+func compare(self *AdaptiveGrailExample, first int, second int) int {
+	if self.values[first] < self.values[second] {
+		return -(1)
+	}
+	if self.values[first] > self.values[second] {
+		return 1
 	}
 	return 0
 }
-
-func multiSwap(arr []int, a int, b int, count int) {
-	for i := 0; i < count; i++ {
-		swap(arr, a+i, b+i)
+func compareValue(self *AdaptiveGrailExample, index int, value int) int {
+	if self.values[index] < value {
+		return -(1)
+	}
+	if self.values[index] > value {
+		return 1
+	}
+	return 0
+}
+func reverse(self *AdaptiveGrailExample, start int, end int) {
+	var left, right int
+	left = start
+	right = (end - 1)
+	for left < right {
+		_sim1_0 := self.values[right]
+		_sim1_1 := self.values[left]
+		self.values[left] = _sim1_0
+		self.values[right] = _sim1_1
+		left += 1
+		right -= 1
 	}
 }
-
-func rotate(arr []int, pos int, lenA int, lenB int) {
-	for lenA != 0 && lenB != 0 {
-		if lenA <= lenB {
-			multiSwap(arr, pos, pos+lenA, lenA)
-			pos += lenA
-			lenB -= lenA
+func multiSwap(self *AdaptiveGrailExample, first int, second int, count int) {
+	var offset int
+	if !(count > 0) {
+		return
+	}
+	for offset = 0; offset < count; offset++ {
+		swap(self, (first + offset), (second + offset))
+	}
+}
+func multiTriSwap(self *AdaptiveGrailExample, first int, second int, third int, count int) {
+	var offset, value int
+	if !(count > 0) {
+		return
+	}
+	for offset = 0; offset < count; offset++ {
+		value = read(self, (first + offset))
+		write(self, (first + offset), read(self, (second+offset)))
+		write(self, (second + offset), read(self, (third+offset)))
+		write(self, (third + offset), value)
+	}
+}
+func insertTo(self *AdaptiveGrailExample, source int, destination int) {
+	var cursor, value int
+	value = read(self, source)
+	cursor = source
+	for cursor > destination {
+		write(self, cursor, read(self, (cursor-1)))
+		cursor -= 1
+	}
+	write(self, destination, value)
+}
+func insertToBackward(self *AdaptiveGrailExample, source int, destination int) {
+	var cursor, value int
+	value = read(self, source)
+	cursor = source
+	for cursor < destination {
+		write(self, cursor, read(self, (cursor+1)))
+		cursor += 1
+	}
+	write(self, cursor, value)
+}
+func shift(self *AdaptiveGrailExample, destination int, source int, end int) {
+	var offset int
+	if !(source < end) {
+		return
+	}
+	for offset = 0; offset < (end - source); offset++ {
+		swap(self, (destination + offset), (source + offset))
+	}
+}
+func rotate(self *AdaptiveGrailExample, startIn int, middleIn int, endIn int) {
+	var end, left, middle, right, start int
+	start = startIn
+	middle = middleIn
+	end = endIn
+	left = (middle - start)
+	right = (end - middle)
+	for (left > 1) && (right > 1) {
+		if right < left {
+			multiSwap(self, (middle - right), middle, right)
+			end -= right
+			middle -= right
+			left -= right
 		} else {
-			multiSwap(arr, pos+(lenA-lenB), pos+lenA, lenB)
-			lenA -= lenB
+			multiSwap(self, start, middle, left)
+			start += left
+			middle += left
+			right -= left
+		}
+	}
+	if right == 1 {
+		insertTo(self, middle, start)
+	} else {
+		if left == 1 {
+			insertToBackward(self, start, (end - 1))
 		}
 	}
 }
-
-func insertSort(arr []int, pos int, length int) {
-	for i := 1; i < length; i++ {
-		j := pos + i
-		for j > pos && arr[j] < arr[j-1] {
-			swap(arr, j, j-1)
-			j--
+func leftBinarySearch(self *AdaptiveGrailExample, start int, end int, value int) int {
+	var lower, middle, upper int
+	lower = start
+	upper = end
+	for lower < upper {
+		middle = (lower + ((upper - lower) / 2))
+		if self.values[middle] >= value {
+			upper = middle
+		} else {
+			lower = (middle + 1)
+		}
+	}
+	return lower
+}
+func rightBinarySearch(self *AdaptiveGrailExample, start int, end int, value int) int {
+	var lower, middle, upper int
+	lower = start
+	upper = end
+	for lower < upper {
+		middle = (lower + ((upper - lower) / 2))
+		if self.values[middle] > value {
+			upper = middle
+		} else {
+			lower = (middle + 1)
+		}
+	}
+	return lower
+}
+func buildUniqueRun(self *AdaptiveGrailExample, start int, limit int) int {
+	var count, index, order int
+	count = 1
+	index = (start + 1)
+	order = compare(self, (index - 1), index)
+	if order < 0 {
+		index += 1
+		count += 1
+		for (count < limit) && (compare(self, (index-1), index) < 0) {
+			index += 1
+			count += 1
+		}
+	} else {
+		if order > 0 {
+			index += 1
+			count += 1
+			for (count < limit) && (compare(self, (index-1), index) > 0) {
+				index += 1
+				count += 1
+			}
+			reverse(self, start, index)
+		}
+	}
+	return count
+}
+func buildUniqueRunBackward(self *AdaptiveGrailExample, end int, limit int) int {
+	var count, index, order int
+	count = 1
+	index = (end - 1)
+	order = compare(self, (index - 1), index)
+	if order < 0 {
+		index -= 1
+		count += 1
+		for (count < limit) && (compare(self, (index-1), index) < 0) {
+			index -= 1
+			count += 1
+		}
+	} else {
+		if order > 0 {
+			index -= 1
+			count += 1
+			for (count < limit) && (compare(self, (index-1), index) > 0) {
+				index -= 1
+				count += 1
+			}
+			reverse(self, index, end)
+		}
+	}
+	return count
+}
+func findKeys(self *AdaptiveGrailExample, start int, end int, initial int, needed int) int {
+	var candidate, count, distance, index, keyEnd, keyStart, location int
+	count = initial
+	keyStart = start
+	keyEnd = (start + count)
+	index = keyEnd
+	for (index < end) && (count < needed) {
+		candidate = read(self, index)
+		location = leftBinarySearch(self, keyStart, keyEnd, candidate)
+		if (location == keyEnd) || (compareValue(self, location, candidate) != 0) {
+			rotate(self, keyStart, keyEnd, index)
+			distance = (index - keyEnd)
+			location += distance
+			keyStart += distance
+			keyEnd += distance
+			insertTo(self, keyEnd, location)
+			count += 1
+			keyEnd += 1
+		}
+		index += 1
+	}
+	rotate(self, start, keyStart, keyEnd)
+	return count
+}
+func findKeysBackward(self *AdaptiveGrailExample, start int, end int, initial int, needed int) int {
+	var candidate, count, distance, index, keyEnd, keyStart, location int
+	count = initial
+	keyStart = (end - count)
+	keyEnd = end
+	index = (keyStart - 1)
+	for (index >= start) && (count < needed) {
+		candidate = read(self, index)
+		location = leftBinarySearch(self, keyStart, keyEnd, candidate)
+		if (location == keyEnd) || (compareValue(self, location, candidate) != 0) {
+			rotate(self, (index + 1), keyStart, keyEnd)
+			distance = (keyStart - (index + 1))
+			location -= distance
+			keyEnd -= distance
+			keyStart -= (distance + 1)
+			count += 1
+			insertToBackward(self, index, (location - 1))
+		}
+		index -= 1
+	}
+	rotate(self, keyStart, keyEnd, end)
+	return count
+}
+func buildRuns(self *AdaptiveGrailExample, start int, end int) {
+	var index, runStart int
+	index = (start + 1)
+	runStart = start
+	for index < end {
+		if compare(self, (index-1), index) > 0 {
+			index += 1
+			for (index < end) && (compare(self, (index-1), index) > 0) {
+				index += 1
+			}
+			reverse(self, runStart, index)
+		} else {
+			index += 1
+			for (index < end) && (compare(self, (index-1), index) <= 0) {
+				index += 1
+			}
+		}
+		if index < end {
+			runStart = ((index - (((index - runStart) - 1) % self.minRun)) - 1)
+		}
+		for ((index - runStart) < self.minRun) && (index < end) {
+			insertTo(self, index, rightBinarySearch(self, runStart, index, read(self, index)))
+			index += 1
+		}
+		runStart = index
+		index += 1
+	}
+}
+func binaryInsertion(self *AdaptiveGrailExample, start int, end int) {
+	var index int
+	if !((end - start) > 1) {
+		return
+	}
+	for index = (start + 1); index < end; index++ {
+		insertTo(self, index, rightBinarySearch(self, start, index, read(self, index)))
+	}
+}
+func mergeWithBufferRest(self *AdaptiveGrailExample, start int, middle int, end int, buffer int, length int) {
+	var left, output, right int
+	left = 0
+	right = middle
+	output = start
+	for (left < length) && (right < end) {
+		if compare(self, (buffer+left), right) <= 0 {
+			swap(self, output, (buffer + left))
+			left += 1
+		} else {
+			swap(self, output, right)
+			right += 1
+		}
+		output += 1
+	}
+	for left < length {
+		swap(self, output, (buffer + left))
+		output += 1
+		left += 1
+	}
+}
+func mergeWithBuffer(self *AdaptiveGrailExample, start int, middle int, end int, buffer int) {
+	var length int
+	length = (middle - start)
+	multiSwap(self, buffer, start, length)
+	mergeWithBufferRest(self, start, middle, end, buffer, length)
+}
+func mergeWithBufferBackward(self *AdaptiveGrailExample, start int, middle int, end int, buffer int) {
+	var left, length, output, right int
+	length = (end - middle)
+	multiSwap(self, middle, buffer, length)
+	left = (length - 1)
+	right = (middle - 1)
+	output = (end - 1)
+	for (left >= 0) && (right >= start) {
+		if compare(self, (buffer+left), right) >= 0 {
+			swap(self, output, (buffer + left))
+			left -= 1
+		} else {
+			swap(self, output, right)
+			right -= 1
+		}
+		output -= 1
+	}
+	for left >= 0 {
+		swap(self, output, (buffer + left))
+		output -= 1
+		left -= 1
+	}
+}
+func inPlaceMerge(self *AdaptiveGrailExample, start int, middle int, end int) {
+	var left, next, right int
+	left = start
+	right = middle
+	for (left < right) && (right < end) {
+		if compare(self, left, right) > 0 {
+			next = leftBinarySearch(self, (right + 1), end, read(self, left))
+			rotate(self, left, right, next)
+			left += (next - right)
+			right = next
+		} else {
+			left += 1
 		}
 	}
 }
-
-func binSearch(arr []int, pos int, length int, keyPos int, isLeft bool) int {
-	left := -1
-	right := length
-	key := arr[keyPos]
-	for left < right-1 {
-		mid := left + (right-left)/2
-		var cond bool
-		if isLeft {
-			cond = arr[pos+mid] >= key
+func inPlaceMergeBackward(self *AdaptiveGrailExample, start int, middle int, end int) {
+	var left, next, right int
+	left = (middle - 1)
+	right = (end - 1)
+	for (right > left) && (left >= start) {
+		if compare(self, left, right) > 0 {
+			next = rightBinarySearch(self, start, left, read(self, right))
+			rotate(self, next, (left + 1), (right + 1))
+			right -= ((left + 1) - next)
+			left = (next - 1)
 		} else {
-			cond = arr[pos+mid] > key
+			right -= 1
 		}
-		if cond {
-			right = mid
+	}
+}
+func mergeWithoutBuffer(self *AdaptiveGrailExample, start int, middle int, end int) {
+	if (middle - start) > (end - middle) {
+		inPlaceMergeBackward(self, start, middle, end)
+	} else {
+		inPlaceMerge(self, start, middle, end)
+	}
+}
+func checkSorted(self *AdaptiveGrailExample, middle int) bool {
+	return (compare(self, (middle-1), middle) > 0)
+}
+func checkReverseBounds(self *AdaptiveGrailExample, start int, middle int, end int) bool {
+	if compare(self, start, (end-1)) > 0 {
+		rotate(self, start, middle, end)
+		return false
+	}
+	return true
+}
+func checkBounds(self *AdaptiveGrailExample, start int, middle int, end int) bool {
+	return (checkSorted(self, middle) && checkReverseBounds(self, start, middle, end))
+}
+func subarray(self *AdaptiveGrailExample, tag int, middleKey int) int {
+	if compare(self, tag, middleKey) < 0 {
+		return 0
+	}
+	return 1
+}
+func blockSelectSort(self *AdaptiveGrailExample, position int, tags int, offset int, distance int, leftCount int, blockCount int, blockLength int) int {
+	var candidate, index, limit, middleKey, minimum, order int
+	middleKey = leftCount
+	index = 0
+	limit = (leftCount + 1)
+	for index < (limit - 1) {
+		minimum = index
+		candidate = max_int((leftCount - offset), (index + 1))
+		for candidate < limit {
+			order = compare(self, ((position + distance) + (candidate * blockLength)), ((position + distance) + (minimum * blockLength)))
+			if (order < 0) || ((order == 0) && (compare(self, (tags+candidate), (tags+minimum)) < 0)) {
+				minimum = candidate
+			}
+			candidate += 1
+		}
+		if minimum != index {
+			multiSwap(self, (position + (index * blockLength)), (position + (minimum * blockLength)), blockLength)
+			swap(self, (tags + index), (tags + minimum))
+			if (limit < blockCount) && (minimum == (limit - 1)) {
+				limit += 1
+			}
+		}
+		if minimum == middleKey {
+			middleKey = index
+		}
+		index += 1
+	}
+	return (tags + middleKey)
+}
+func sortKeys(self *AdaptiveGrailExample, end int, buffer int, middleKey int) {
+	var index, left, right int
+	swap(self, buffer, middleKey)
+	left = middleKey
+	index = (left + 1)
+	right = (buffer + 1)
+	for index < end {
+		if compare(self, index, buffer) < 0 {
+			swap(self, left, index)
+			left += 1
 		} else {
-			left = mid
+			swap(self, right, index)
+			right += 1
+		}
+		index += 1
+	}
+	multiSwap(self, left, buffer, (end - left))
+}
+func sortKeysWithoutBuffer(self *AdaptiveGrailExample, end int, middleKey int) {
+	var index, left int
+	left = middleKey
+	index = (left + 1)
+	for index < end {
+		if compare(self, index, left) < 0 {
+			insertTo(self, index, left)
+			left += 1
+		}
+		index += 1
+	}
+}
+func mergeBlocks(self *AdaptiveGrailExample, start int, middle int, end int, destination int, reverseEqual bool) int {
+	var left, order, output, right int
+	left = start
+	right = middle
+	output = destination
+	for (left < middle) && (right < end) {
+		order = compare(self, left, right)
+		if (order < 0) || ((order == 0) && !(reverseEqual)) {
+			swap(self, output, left)
+			left += 1
+		} else {
+			swap(self, output, right)
+			right += 1
+		}
+		output += 1
+	}
+	if left > output {
+		for left < middle {
+			swap(self, output, left)
+			output += 1
+			left += 1
 		}
 	}
 	return right
 }
-
-func findKeys(arr []int, pos int, length int, numKeys int) int {
-	dist := 1
-	foundKeys := 1
-	firstKey := 0
-	for dist < length && foundKeys < numKeys {
-		loc := binSearch(arr, pos+firstKey, foundKeys, pos+dist, true)
-		if loc == foundKeys || arr[pos+dist] != arr[pos+firstKey+loc] {
-			rotate(arr, pos+firstKey, foundKeys, dist-(firstKey+foundKeys))
-			firstKey = dist - foundKeys
-			rotate(arr, pos+(firstKey+loc), foundKeys-loc, 1)
-			foundKeys++
-		}
-		dist++
-	}
-	rotate(arr, pos, firstKey, foundKeys)
-	return foundKeys
-}
-
-func mergeWithoutBuffer(arr []int, pos int, len1 int, len2 int) {
-	if len1 == 0 || len2 == 0 {
-		return
-	}
-	if len1 < len2 {
-		for len1 != 0 {
-			loc := binSearch(arr, pos+len1, len2, pos, true)
-			if loc != 0 {
-				rotate(arr, pos, len1, loc)
-				pos += loc
-				len2 -= loc
-			}
-			if len2 == 0 {
-				break
-			}
-			for {
-				pos++
-				len1--
-				if !(len1 != 0 && arr[pos] <= arr[pos+len1]) {
+func blockMerge(self *AdaptiveGrailExample, start int, middle int, end int, tags int, buffer int, blockLength int) {
+	var blockCount, fragment, group, key, lastFull, left, leftBlocks, leftCount, middleKey, rightBlocks int
+	lastFull = ((end - (((end - middle) - 1) % blockLength)) - 1)
+	left = (start + blockLength)
+	group = start
+	key = (tags - 1)
+	leftCount = ((middle - left) / blockLength)
+	blockCount = ((lastFull - left) / blockLength)
+	leftBlocks = -(1)
+	rightBlocks = (leftCount - 1)
+	multiTriSwap(self, buffer, (middle - blockLength), start, blockLength)
+	insertToBackward(self, tags, ((tags + leftCount) - 1))
+	middleKey = blockSelectSort(self, left, tags, 1, (blockLength - 1), leftCount, blockCount, blockLength)
+	fragment = 0
+	for (leftBlocks < leftCount) && (rightBlocks < blockCount) {
+		if fragment == 0 {
+			for true {
+				group += blockLength
+				leftBlocks += 1
+				key += 1
+				if !((leftBlocks < leftCount) && (subarray(self, key, middleKey) == 0)) {
 					break
 				}
 			}
-		}
-	} else {
-		for len2 != 0 {
-			loc := binSearch(arr, pos, len1, pos+len1+len2-1, false)
-			if loc != len1 {
-				rotate(arr, pos+loc, len1-loc, len2)
-				len1 = loc
-			}
-			if len1 == 0 {
-				break
-			}
-			for {
-				len2--
-				if !(len2 != 0 && arr[pos+len1-1] <= arr[pos+len1+len2-1]) {
-					break
-				}
-			}
-		}
-	}
-}
-
-func mergeLeft(arr []int, pos int, leftLen int, rightLen int, dist int) {
-	left := 0
-	right := leftLen
-	rightLen += leftLen
-	for right < rightLen {
-		if left == leftLen || arr[pos+left] > arr[pos+right] {
-			swap(arr, pos+dist, pos+right)
-			dist++
-			right++
-		} else {
-			swap(arr, pos+dist, pos+left)
-			dist++
-			left++
-		}
-	}
-	if dist != left {
-		multiSwap(arr, pos+dist, pos+left, leftLen-left)
-	}
-}
-
-func mergeRight(arr []int, pos int, leftLen int, rightLen int, dist int) {
-	mergedPos := leftLen + rightLen + dist - 1
-	right := leftLen + rightLen - 1
-	left := leftLen - 1
-	for left >= 0 {
-		if right < leftLen || arr[pos+left] > arr[pos+right] {
-			swap(arr, pos+mergedPos, pos+left)
-			mergedPos--
-			left--
-		} else {
-			swap(arr, pos+mergedPos, pos+right)
-			mergedPos--
-			right--
-		}
-	}
-	for right != mergedPos && right >= leftLen {
-		swap(arr, pos+mergedPos, pos+right)
-		mergedPos--
-		right--
-	}
-}
-
-func smartMergeWithoutBuffer(arr []int, pos int, leftOverLen int, leftOverFrag int, regBlockLen int) (int, int) {
-	if regBlockLen == 0 {
-		return leftOverLen, leftOverFrag
-	}
-	len1 := leftOverLen
-	len2 := regBlockLen
-	typeFrag := 1 - leftOverFrag
-	if len1 != 0 && (compareValues(arr[pos+len1-1], arr[pos+len1])-typeFrag) >= 0 {
-		for len1 != 0 {
-			isLeft := typeFrag != 0
-			foundLen := binSearch(arr, pos+len1, len2, pos, isLeft)
-			if foundLen != 0 {
-				rotate(arr, pos, len1, foundLen)
-				pos += foundLen
-				len2 -= foundLen
-			}
-			if len2 == 0 {
-				return len1, leftOverFrag
-			}
-			for {
-				pos++
-				len1--
-				if !(len1 != 0 && (compareValues(arr[pos], arr[pos+len1])-typeFrag) < 0) {
-					break
-				}
-			}
-		}
-	}
-	return len2, typeFrag
-}
-
-func smartMergeWithBuffer(arr []int, pos int, leftOverLen int, leftOverFrag int, blockLen int) (int, int) {
-	dist := -blockLen
-	left := 0
-	right := leftOverLen
-	leftEnd := right
-	rightEnd := right + blockLen
-	typeFrag := 1 - leftOverFrag
-	for left < leftEnd && right < rightEnd {
-		if (compareValues(arr[pos+left], arr[pos+right]) - typeFrag) < 0 {
-			swap(arr, pos+dist, pos+left)
-			dist++
-			left++
-		} else {
-			swap(arr, pos+dist, pos+right)
-			dist++
-			right++
-		}
-	}
-	var length int
-	fragment := leftOverFrag
-	if left < leftEnd {
-		length = leftEnd - left
-		for left < leftEnd {
-			leftEnd--
-			rightEnd--
-			swap(arr, pos+leftEnd, pos+rightEnd)
-		}
-	} else {
-		length = rightEnd - right
-		fragment = typeFrag
-	}
-	return length, fragment
-}
-
-func mergeBuffersLeft(arr []int, keysPos int, midkey int, pos int, blockCount int, blockLen int,
-	havebuf bool, aBlockCount int, lastLen int) {
-	if blockCount == 0 {
-		aBlocksLen := aBlockCount * blockLen
-		if havebuf {
-			mergeLeft(arr, pos, aBlocksLen, lastLen, -blockLen)
-		} else {
-			mergeWithoutBuffer(arr, pos, aBlocksLen, lastLen)
-		}
-		return
-	}
-	leftOverLen := blockLen
-	leftOverFrag := 0
-	if arr[keysPos] >= arr[midkey] {
-		leftOverFrag = 1
-	}
-	processIndex := blockLen
-	for keyIndex := 1; keyIndex < blockCount; keyIndex++ {
-		restToProcess := processIndex - leftOverLen
-		nextFrag := 0
-		if arr[keysPos+keyIndex] >= arr[midkey] {
-			nextFrag = 1
-		}
-		if nextFrag == leftOverFrag {
-			if havebuf {
-				multiSwap(arr, pos+restToProcess-blockLen, pos+restToProcess, leftOverLen)
-			}
-			restToProcess = processIndex
-			leftOverLen = blockLen
-		} else {
-			if havebuf {
-				leftOverLen, leftOverFrag = smartMergeWithBuffer(arr, pos+restToProcess, leftOverLen, leftOverFrag, blockLen)
+			if leftBlocks == leftCount {
+				left = mergeBlocks(self, left, group, end, (left - blockLength), false)
+				mergeWithBufferRest(self, (left - blockLength), left, end, buffer, blockLength)
 			} else {
-				leftOverLen, leftOverFrag = smartMergeWithoutBuffer(arr, pos+restToProcess, leftOverLen, leftOverFrag, blockLen)
+				left = mergeBlocks(self, left, group, ((group + blockLength) - 1), (left - blockLength), false)
 			}
-		}
-		processIndex += blockLen
-	}
-	restToProcess := processIndex - leftOverLen
-	if lastLen != 0 {
-		if leftOverFrag != 0 {
-			if havebuf {
-				multiSwap(arr, pos+restToProcess-blockLen, pos+restToProcess, leftOverLen)
-			}
-			restToProcess = processIndex
-			leftOverLen = blockLen * aBlockCount
-			leftOverFrag = 0
+			fragment = 1
 		} else {
-			leftOverLen += blockLen * aBlockCount
-		}
-		if havebuf {
-			mergeLeft(arr, pos+restToProcess, leftOverLen, lastLen, -blockLen)
-		} else {
-			mergeWithoutBuffer(arr, pos+restToProcess, leftOverLen, lastLen)
-		}
-	} else {
-		if havebuf {
-			multiSwap(arr, pos+restToProcess, pos+restToProcess-blockLen, leftOverLen)
-		}
-	}
-}
-
-func buildBlocks(arr []int, pos int, length int, buildLen int) {
-	for dist := 1; dist < length; dist += 2 {
-		extraDist := 0
-		if arr[pos+dist-1] > arr[pos+dist] {
-			extraDist = 1
-		}
-		swap(arr, pos+dist-3, pos+dist-1+extraDist)
-		swap(arr, pos+dist-2, pos+dist-extraDist)
-	}
-	if length%2 == 1 {
-		swap(arr, pos+length-1, pos+length-3)
-	}
-	pos -= 2
-	part := 2
-	for part < buildLen {
-		left := 0
-		right := length - 2*part
-		for left <= right {
-			mergeLeft(arr, pos+left, part, part, -part)
-			left += 2 * part
-		}
-		rest := length - left
-		if rest > part {
-			mergeLeft(arr, pos+left, part, rest-part, -part)
-		} else {
-			rotate(arr, pos+left-part, part, rest)
-		}
-		pos -= part
-		part *= 2
-	}
-	restToBuild := length % (2 * buildLen)
-	leftOverPos := length - restToBuild
-	if restToBuild <= buildLen {
-		rotate(arr, pos+leftOverPos, restToBuild, buildLen)
-	} else {
-		mergeRight(arr, pos+leftOverPos, buildLen, restToBuild-buildLen, buildLen)
-	}
-	for leftOverPos > 0 {
-		leftOverPos -= 2 * buildLen
-		mergeRight(arr, pos+leftOverPos, buildLen, buildLen, buildLen)
-	}
-}
-
-func combineBlocks(arr []int, keyPos int, pos int, length int, buildLen int, regBlockLen int, havebuf bool) {
-	combineLen := length / (2 * buildLen)
-	leftOver := length % (2 * buildLen)
-	if leftOver <= buildLen {
-		length -= leftOver
-		leftOver = 0
-	}
-	for i := 0; i <= combineLen; i++ {
-		if i == combineLen && leftOver == 0 {
-			break
-		}
-		blockPos := pos + i*2*buildLen
-		blockCountSrc := 2 * buildLen
-		extraKey := 0
-		if i == combineLen {
-			blockCountSrc = leftOver
-			extraKey = 1
-		}
-		blockCount := blockCountSrc / regBlockLen
-		insertSort(arr, keyPos, blockCount+extraKey)
-		midkey := buildLen / regBlockLen
-		for index := 1; index < blockCount; index++ {
-			leftIndex := index - 1
-			for rightIndex := index; rightIndex < blockCount; rightIndex++ {
-				a := arr[blockPos+leftIndex*regBlockLen]
-				b := arr[blockPos+rightIndex*regBlockLen]
-				if a > b || (a == b && arr[keyPos+leftIndex] > arr[keyPos+rightIndex]) {
-					leftIndex = rightIndex
+			for true {
+				group += blockLength
+				rightBlocks += 1
+				key += 1
+				if !((rightBlocks < blockCount) && (subarray(self, key, middleKey) == 1)) {
+					break
 				}
 			}
-			if leftIndex != index-1 {
-				multiSwap(arr, blockPos+(index-1)*regBlockLen, blockPos+leftIndex*regBlockLen, regBlockLen)
-				swap(arr, keyPos+(index-1), keyPos+leftIndex)
-				if midkey == index-1 || midkey == leftIndex {
-					midkey ^= (index - 1) ^ leftIndex
+			if rightBlocks == blockCount {
+				shift(self, (left - blockLength), left, end)
+				multiSwap(self, buffer, (end - blockLength), blockLength)
+			} else {
+				left = mergeBlocks(self, left, group, ((group + blockLength) - 1), (left - blockLength), true)
+			}
+			fragment = 0
+		}
+	}
+	sortKeys(self, (tags + blockCount), buffer, middleKey)
+}
+func blockMergeWithoutBuffer(self *AdaptiveGrailExample, start int, middle int, end int, tags int, blockLength int) {
+	var blockCount, end2, firstFull, fragment, group, key, lastFull, left, leftBlocks, leftCount, middle2, middleKey, next, nextPosition, rightBlocks int
+	firstFull = (start + ((middle - start) % blockLength))
+	lastFull = (end - ((end - middle) % blockLength))
+	left = start
+	group = firstFull
+	key = tags
+	leftCount = (((middle - group) / blockLength) + 1)
+	blockCount = (((lastFull - group) / blockLength) + 1)
+	leftBlocks = 0
+	rightBlocks = leftCount
+	middleKey = blockSelectSort(self, group, tags, 0, 0, (leftCount - 1), (blockCount - 1), blockLength)
+	fragment = 0
+	for (leftBlocks < leftCount) && (rightBlocks < blockCount) {
+		next = subarray(self, key, middleKey)
+		key += 1
+		if next == fragment {
+			if fragment == 0 {
+				leftBlocks += 1
+			} else {
+				rightBlocks += 1
+			}
+			left = group
+		} else {
+			middle2 = group
+			end2 = (group + blockLength)
+			if fragment == 0 {
+				for (left < middle2) && (middle2 < end2) {
+					if compare(self, left, middle2) > 0 {
+						nextPosition = leftBinarySearch(self, (middle2 + 1), end2, read(self, left))
+						rotate(self, left, middle2, nextPosition)
+						left += (nextPosition - middle2)
+						middle2 = nextPosition
+					} else {
+						left += 1
+					}
+				}
+			} else {
+				for (left < middle2) && (middle2 < end2) {
+					if compare(self, left, middle2) >= 0 {
+						nextPosition = rightBinarySearch(self, (middle2 + 1), end2, read(self, left))
+						rotate(self, left, middle2, nextPosition)
+						left += (nextPosition - middle2)
+						middle2 = nextPosition
+					} else {
+						left += 1
+					}
 				}
 			}
-		}
-		aBlockCount := 0
-		lastLen := 0
-		if i == combineLen {
-			lastLen = leftOver % regBlockLen
-		}
-		if lastLen != 0 {
-			for aBlockCount < blockCount && arr[blockPos+blockCount*regBlockLen] < arr[blockPos+(blockCount-aBlockCount-1)*regBlockLen] {
-				aBlockCount++
+			if left < middle2 {
+				if next == 0 {
+					leftBlocks += 1
+				} else {
+					rightBlocks += 1
+				}
+			} else {
+				if fragment == 0 {
+					leftBlocks += 1
+				} else {
+					rightBlocks += 1
+				}
+				fragment = next
 			}
 		}
-		mergeBuffersLeft(arr, keyPos, keyPos+midkey, blockPos, blockCount-aBlockCount, regBlockLen, havebuf, aBlockCount, lastLen)
+		group += blockLength
 	}
-	if havebuf {
-		for length > 0 {
-			length--
-			swap(arr, pos+length, pos+length-regBlockLen)
+	if leftBlocks < leftCount {
+		inPlaceMergeBackward(self, start, lastFull, end)
+	}
+	sortKeysWithoutBuffer(self, ((tags + blockCount) - 1), middleKey)
+}
+func smartMerge(self *AdaptiveGrailExample, start int, middle int, end int, buffer int) {
+	var trimmed int
+	if checkBounds(self, start, middle, end) {
+		trimmed = rightBinarySearch(self, start, (middle - 1), read(self, middle))
+		mergeWithBuffer(self, trimmed, middle, end, buffer)
+	}
+}
+func smartMergeBackward(self *AdaptiveGrailExample, start int, middle int, end int, buffer int) {
+	var trimmed int
+	if checkBounds(self, start, middle, end) {
+		trimmed = leftBinarySearch(self, (middle + 1), end, read(self, (middle-1)))
+		mergeWithBufferBackward(self, start, middle, trimmed, buffer)
+	}
+}
+func smartBlockMerge(self *AdaptiveGrailExample, start int, middle int, end int, tags int, buffer int, blockLength int) {
+	var trimmedEnd, trimmedStart int
+	if checkBounds(self, start, middle, end) {
+		trimmedStart = rightBinarySearch(self, start, (middle - 1), read(self, middle))
+		trimmedEnd = leftBinarySearch(self, (middle + 1), end, read(self, (middle-1)))
+		if checkReverseBounds(self, trimmedStart, middle, trimmedEnd) {
+			if ((middle - trimmedStart) <= blockLength) || ((trimmedEnd - middle) <= blockLength) {
+				if (trimmedEnd - middle) < (middle - trimmedStart) {
+					mergeWithBufferBackward(self, trimmedStart, middle, trimmedEnd, buffer)
+				} else {
+					mergeWithBuffer(self, trimmedStart, middle, trimmedEnd, buffer)
+				}
+			} else {
+				trimmedStart -= ((trimmedStart - start) % blockLength)
+				blockMerge(self, trimmedStart, middle, trimmedEnd, tags, buffer, blockLength)
+			}
 		}
 	}
 }
-
-func lazyStableSort(arr []int, pos int, length int) {
-	for dist := 1; dist < length; dist += 2 {
-		if arr[pos+dist-1] > arr[pos+dist] {
-			swap(arr, pos+dist-1, pos+dist)
+func smartBlockMergeWithoutBuffer(self *AdaptiveGrailExample, start int, middle int, end int, tags int, blockLength int) {
+	var trimmedStart int
+	if checkBounds(self, start, middle, end) {
+		trimmedStart = rightBinarySearch(self, start, (middle - 1), read(self, middle))
+		if (middle - trimmedStart) <= blockLength {
+			inPlaceMerge(self, trimmedStart, middle, end)
+		} else {
+			blockMergeWithoutBuffer(self, trimmedStart, middle, end, tags, blockLength)
 		}
-	}
-	part := 2
-	for part < length {
-		left := 0
-		right := length - 2*part
-		for left <= right {
-			mergeWithoutBuffer(arr, pos+left, part, part)
-			left += 2 * part
-		}
-		rest := length - left
-		if rest > part {
-			mergeWithoutBuffer(arr, pos+left, part, rest-part)
-		}
-		part *= 2
 	}
 }
-
-func commonSort(arr []int, pos int, length int) {
-	if length <= 16 {
-		insertSort(arr, pos, length)
+func smartInPlaceMerge(self *AdaptiveGrailExample, start int, middle int, end int) {
+	if checkSorted(self, middle) {
+		inPlaceMergeBackward(self, start, middle, end)
+	}
+}
+func redistributeBuffer(self *AdaptiveGrailExample, startIn int, middleIn int, end int) {
+	var distance, leftMiddle, middle, right, start int
+	start = startIn
+	middle = middleIn
+	right = leftBinarySearch(self, middle, end, read(self, start))
+	rotate(self, start, middle, right)
+	distance = (right - middle)
+	start += distance
+	middle += distance
+	leftMiddle = (start + ((middle - start) / 2))
+	right = leftBinarySearch(self, middle, end, read(self, leftMiddle))
+	rotate(self, leftMiddle, middle, right)
+	distance = (right - middle)
+	leftMiddle += distance
+	middle += distance
+	mergeWithoutBuffer(self, start, (leftMiddle - distance), leftMiddle)
+	mergeWithoutBuffer(self, leftMiddle, middle, end)
+}
+func redistributeBufferBackward(self *AdaptiveGrailExample, start int, middleIn int, endIn int) {
+	var distance, end, middle, right, rightMiddle int
+	middle = middleIn
+	end = endIn
+	right = rightBinarySearch(self, start, middle, read(self, (end-1)))
+	rotate(self, right, middle, end)
+	distance = (middle - right)
+	end -= distance
+	middle -= distance
+	rightMiddle = (middle + ((end - middle) / 2))
+	right = rightBinarySearch(self, start, middle, read(self, (rightMiddle-1)))
+	rotate(self, right, middle, rightMiddle)
+	distance = (middle - right)
+	rightMiddle -= distance
+	middle -= distance
+	mergeWithoutBuffer(self, rightMiddle, (rightMiddle + distance), end)
+	mergeWithoutBuffer(self, start, middle, rightMiddle)
+}
+func inPlaceMergeSort(self *AdaptiveGrailExample, start int, end int) {
+	var index, run int
+	buildRuns(self, start, end)
+	run = self.minRun
+	for run < (end - start) {
+		index = start
+		for (index + (2 * run)) <= end {
+			smartInPlaceMerge(self, index, (index + run), (index + (2 * run)))
+			index += (2 * run)
+		}
+		if (index + run) < end {
+			smartInPlaceMerge(self, index, (index + run), end)
+		}
+		run *= 2
+	}
+}
+func adaptiveSortWithoutBuffer(self *AdaptiveGrailExample, startIn int, endIn int, keys int, ideal int, backwardBuffer bool) {
+	var blockLength, buffer, dataEnd, dataStart, end, index, length, runLength, start, tagLength, tags int
+	start = startIn
+	end = endIn
+	length = (end - start)
+	blockLength = min_int(keys, self.minRun)
+	for (2 * blockLength) <= keys {
+		blockLength *= 2
+	}
+	tagLength = (keys - blockLength)
+	runLength = self.minRun
+	tags = 0
+	buffer = 0
+	dataStart = 0
+	dataEnd = 0
+	if backwardBuffer {
+		buffer = (end - blockLength)
+		dataStart = start
+		dataEnd = (buffer - tagLength)
+		tags = dataEnd
+	} else {
+		buffer = (start + tagLength)
+		dataStart = (buffer + blockLength)
+		dataEnd = end
+		tags = start
+	}
+	buildRuns(self, dataStart, dataEnd)
+	for (runLength <= blockLength) && (runLength < length) {
+		index = dataStart
+		for (index + (2 * runLength)) <= dataEnd {
+			smartMerge(self, index, (index + runLength), (index + (2 * runLength)), buffer)
+			index += (2 * runLength)
+		}
+		if (index + runLength) < dataEnd {
+			smartMergeBackward(self, index, (index + runLength), dataEnd, buffer)
+		}
+		runLength *= 2
+	}
+	if ((blockLength / 2) >= self.minRun) && ((blockLength / 2) >= ((keys + 1) / 2)) {
+		binaryInsertion(self, buffer, (buffer + blockLength))
+		blockLength = (blockLength / 2)
+		tagLength = (keys - blockLength)
+		buffer += blockLength
+	}
+	for (tagLength >= (((2 * runLength) / blockLength) - 1)) && (runLength < length) {
+		index = dataStart
+		for (index + (2 * runLength)) <= dataEnd {
+			smartBlockMerge(self, index, (index + runLength), (index + (2 * runLength)), tags, buffer, blockLength)
+			index += (2 * runLength)
+		}
+		if (index + runLength) < dataEnd {
+			if (dataEnd - (index + runLength)) > blockLength {
+				smartBlockMerge(self, index, (index + runLength), dataEnd, tags, buffer, blockLength)
+			} else {
+				smartMergeBackward(self, index, (index + runLength), dataEnd, buffer)
+			}
+		}
+		runLength *= 2
+	}
+	binaryInsertion(self, buffer, (buffer + blockLength))
+	tagLength = (keys - (keys % 2))
+	for runLength < length {
+		blockLength = ((2*runLength + tagLength - 1) / tagLength)
+		index = dataStart
+		for (index + (2 * runLength)) <= dataEnd {
+			smartBlockMergeWithoutBuffer(self, index, (index + runLength), (index + (2 * runLength)), tags, blockLength)
+			index += (2 * runLength)
+		}
+		if (index + runLength) < dataEnd {
+			if (dataEnd - (index + runLength)) > blockLength {
+				smartBlockMergeWithoutBuffer(self, index, (index + runLength), dataEnd, tags, blockLength)
+			} else {
+				smartInPlaceMerge(self, index, (index + runLength), dataEnd)
+			}
+		}
+		runLength *= 2
+	}
+	if backwardBuffer {
+		start = rightBinarySearch(self, start, dataEnd, read(self, dataEnd))
+		if keys >= (ideal / 2) {
+			redistributeBufferBackward(self, start, dataEnd, end)
+		} else {
+			mergeWithoutBuffer(self, start, dataEnd, end)
+		}
+	} else {
+		end = leftBinarySearch(self, dataStart, end, read(self, (dataStart-1)))
+		if keys >= (ideal / 2) {
+			redistributeBuffer(self, start, dataStart, end)
+		} else {
+			mergeWithoutBuffer(self, start, dataStart, end)
+		}
+	}
+}
+func sort(self *AdaptiveGrailExample, startIn int, endIn int) {
+	var backwardBuffer bool
+	var blockLength, buffer, dataEnd, dataStart, end, ideal, index, keys, leftRun, length, middle, rightRun, runLength, start, tagLength, tags int
+	start = startIn
+	end = endIn
+	length = (end - start)
+	if length < 31 {
+		binaryInsertion(self, start, end)
 		return
 	}
-	blockLen := 1
-	for blockLen*blockLen < length {
-		blockLen *= 2
+	if length < 63 {
+		self.minRun = ((length + 1) / 2)
+		buildRuns(self, start, end)
+		middle = (start + self.minRun)
+		if checkBounds(self, start, middle, end) {
+			redistributeBufferBackward(self, start, middle, end)
+		}
+		return
 	}
-	numKeys := (length-1)/blockLen + 1
-	keysFound := findKeys(arr, pos, length, numKeys+blockLen)
-	bufferEnabled := true
-	if keysFound < numKeys+blockLen {
-		if keysFound < 4 {
-			lazyStableSort(arr, pos, length)
+	self.minRun = length
+	for self.minRun >= 32 {
+		self.minRun = ((self.minRun + 1) / 2)
+	}
+	blockLength = self.minRun
+	for (blockLength * blockLength) < length {
+		blockLength *= 2
+	}
+	tagLength = ((length / blockLength) - 2)
+	ideal = (tagLength + blockLength)
+	rightRun = buildUniqueRunBackward(self, end, ideal)
+	leftRun = 0
+	backwardBuffer = false
+	if rightRun == ideal {
+		backwardBuffer = true
+	} else {
+		leftRun = buildUniqueRun(self, start, ideal)
+		if leftRun == ideal {
+			backwardBuffer = false
+		} else {
+			backwardBuffer = (((rightRun < 16) && (leftRun < 16)) || (rightRun >= leftRun))
+		}
+	}
+	if backwardBuffer {
+		keys = findKeysBackward(self, start, end, rightRun, ideal)
+	} else {
+		keys = findKeys(self, start, end, leftRun, ideal)
+	}
+	if keys < ideal {
+		if keys == 1 {
 			return
 		}
-		numKeys = blockLen
-		for numKeys > keysFound {
-			numKeys /= 2
+		if keys <= 4 {
+			inPlaceMergeSort(self, start, end)
+		} else {
+			adaptiveSortWithoutBuffer(self, start, end, keys, ideal, backwardBuffer)
 		}
-		bufferEnabled = false
-		blockLen = 0
+		return
 	}
-	dist := blockLen + numKeys
-	buildLen := blockLen
-	if !bufferEnabled {
-		buildLen = numKeys
+	buffer = 0
+	dataStart = 0
+	dataEnd = 0
+	tags = 0
+	if backwardBuffer {
+		buffer = (end - blockLength)
+		dataStart = start
+		dataEnd = (buffer - tagLength)
+		tags = dataEnd
+	} else {
+		buffer = (start + tagLength)
+		dataStart = (buffer + blockLength)
+		dataEnd = end
+		tags = start
 	}
-	buildBlocks(arr, pos+dist, length-dist, buildLen)
-	for {
-		buildLen *= 2
-		if length-dist <= buildLen {
-			break
+	buildRuns(self, dataStart, dataEnd)
+	runLength = self.minRun
+	for (runLength <= blockLength) && (runLength < length) {
+		index = dataStart
+		for (index + (2 * runLength)) <= dataEnd {
+			smartMerge(self, index, (index + runLength), (index + (2 * runLength)), buffer)
+			index += (2 * runLength)
 		}
-		regBlockLen := blockLen
-		buildBufEnabled := bufferEnabled
-		if !bufferEnabled {
-			if numKeys > 4 && (numKeys/8)*numKeys >= buildLen {
-				regBlockLen = numKeys / 2
-				buildBufEnabled = true
+		if (index + runLength) < dataEnd {
+			smartMergeBackward(self, index, (index + runLength), dataEnd, buffer)
+		}
+		runLength *= 2
+	}
+	for runLength < length {
+		index = dataStart
+		for (index + (2 * runLength)) <= dataEnd {
+			smartBlockMerge(self, index, (index + runLength), (index + (2 * runLength)), tags, buffer, blockLength)
+			index += (2 * runLength)
+		}
+		if (index + runLength) < dataEnd {
+			if (dataEnd - (index + runLength)) > blockLength {
+				smartBlockMerge(self, index, (index + runLength), dataEnd, tags, buffer, blockLength)
 			} else {
-				calcKeys := 1
-				i := buildLen * keysFound / 2
-				for calcKeys < numKeys && i != 0 {
-					calcKeys *= 2
-					i /= 8
-				}
-				regBlockLen = (2 * buildLen) / calcKeys
+				smartMergeBackward(self, index, (index + runLength), dataEnd, buffer)
 			}
 		}
-		combineBlocks(arr, pos, pos+dist, length-dist, buildLen, regBlockLen, buildBufEnabled)
+		runLength *= 2
 	}
-	insertSort(arr, pos, dist)
-	mergeWithoutBuffer(arr, pos, dist, length-dist)
+	binaryInsertion(self, buffer, (buffer + blockLength))
+	if backwardBuffer {
+		start = rightBinarySearch(self, start, dataEnd, read(self, dataEnd))
+		redistributeBufferBackward(self, start, dataEnd, end)
+	} else {
+		end = leftBinarySearch(self, dataStart, end, read(self, (dataStart-1)))
+		redistributeBuffer(self, start, dataStart, end)
+	}
+}
+
+func adaptiveGrailSort(values []int) {
+	state := AdaptiveGrailExample{values: values, n: len(values), minRun: 16}
+	sort(&state, 0, len(values))
 }
 
 func main() {
-	array := []int{0, 39, 21, 62, 91, 77, 14, 23,
-		90, 69, 51, 81, 68, 83, 32, 56}
-	fmt.Println(sort(array))
+	values := []int{0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56}
+	adaptiveGrailSort(values)
+	fmt.Println(values)
 }

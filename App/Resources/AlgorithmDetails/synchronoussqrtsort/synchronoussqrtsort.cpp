@@ -1,142 +1,231 @@
-#include <cstdio>
-#include <utility>
-#include <vector>
+#include <stdio.h>
+#include <stdlib.h>
 
-static int blockSize = 1;
+/* MIT License
+ * Copyright (c) 2021 The Holy Grail Sort Project, implemented by aphitorite
+ * Copyright (c) 2020-2021 aphitorite
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this software
+ * and associated documentation files (the "Software"), to deal in the Software without
+ * restriction, including without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
+ * The above copyright notice and this permission notice shall be included in all copies or
+ * substantial portions of the Software.
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING
+ * BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+ * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ */
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+typedef struct {
+  int *a, *prefix, *tags;
+  int n, tag_count;
+} SynchronousSqrt;
 
-void printList(int items[], int size) {
-  printf("[");
-  if (size > 0) {
-    printf("%d", items[0]);
-    for (int i = 1; i < size; i++) {
-      printf(", %d", items[i]);
+static void exchange(SynchronousSqrt *s, int i, int j) {
+  int value = s->a[i];
+  s->a[i] = s->a[j];
+  s->a[j] = value;
+}
+
+static void binary_insertion(SynchronousSqrt *s, int first, int end) {
+  for (int i = first + 1; i < end; ++i) {
+    int value = s->a[i], low = first, high = i;
+    while (low < high) {
+      int middle = low + (high - low) / 2;
+      if (s->a[middle] <= value) low = middle + 1;
+      else high = middle;
     }
-  }
-  printf("]");
-}
-
-void multiSwap(int arr[], int a, int b, int len);
-void rotate(int arr[], int a, int m, int b);
-int binarySearch(int arr[], int a, int b, int value, bool left);
-void synchronousMerge(int arr[], int a, int m, int b);
-void synchronousSort(int arr[], int a, int b);
-
-void sort(int arr[], int n) {
-  blockSize = 1;
-  while (blockSize * blockSize < n)
-    blockSize *= 2;
-  synchronousSort(arr, 0, n);
-}
-
-void multiSwap(int arr[], int a, int b, int len) {
-  for (int i = 0; i < len; i++) {
-    std::swap(arr[a + i], arr[b + i]);
+    for (int j = i; j > low; --j) s->a[j] = s->a[j - 1];
+    if (low != i) s->a[low] = value;
   }
 }
 
-void rotate(int arr[], int a, int m, int b) {
-  int l = m - a, r = b - m;
-  while (l > 0 && r > 0) {
-    if (r < l) {
-      multiSwap(arr, m - r, m, r);
-      b -= r;
-      m -= r;
-      l -= r;
-    } else {
-      multiSwap(arr, a, m, l);
-      a += l;
-      m += l;
-      r -= l;
+static void shift_forward(SynchronousSqrt *s, int destination, int source, int end) {
+  while (source < end) s->a[destination++] = s->a[source++];
+}
+
+static void shift_backward(SynchronousSqrt *s, int first, int source_end, int destination_end) {
+  while (source_end > first) s->a[--destination_end] = s->a[--source_end];
+}
+
+static void multi_swap(SynchronousSqrt *s, int first, int second, int length) {
+  for (int i = 0; i < length; ++i) exchange(s, first + i, second + i);
+}
+
+static void merge_forward(SynchronousSqrt *s, int first, int middle, int end, int output) {
+  int left = first, right = middle;
+  while (left < middle && right < end) {
+    if (s->a[left] <= s->a[right]) s->a[output++] = s->a[left++];
+    else s->a[output++] = s->a[right++];
+  }
+  if (left > output) shift_forward(s, output, left, middle);
+  shift_forward(s, output, right, end);
+}
+
+static void merge_backward(SynchronousSqrt *s, int first, int middle, int end, int output) {
+  int left = middle - 1, right = end - 1;
+  while (right >= middle && left >= first) {
+    --output;
+    if (s->a[right] >= s->a[left]) s->a[output] = s->a[right--];
+    else s->a[output] = s->a[left--];
+  }
+  if (output > right) shift_backward(s, middle, right + 1, output);
+  shift_backward(s, first, left + 1, output);
+}
+
+static int smart_merge_backward(SynchronousSqrt *s, int first, int middle,
+                                int end, int output, int reversed) {
+  int left = middle - 1, right = end - 1;
+  while (left >= first && right >= middle) {
+    int take_left = reversed ? s->a[left] >= s->a[right] : s->a[left] > s->a[right];
+    --output;
+    if (take_left) s->a[output] = s->a[left--];
+    else s->a[output] = s->a[right--];
+  }
+  return left + 1;
+}
+
+static void block_selection(SynchronousSqrt *s, int first, int end, int block,
+                            int tag_start, int tag_count) {
+  int available = tag_count + 1;
+  if (available > s->tag_count - tag_start) available = s->tag_count - tag_start;
+  for (int i = 0; i < available; ++i)
+    s->tags[tag_start + i] = i + (i <= tag_count / 2 ? 0 : s->tag_count);
+  int vacant = first;
+  int current = first;
+  while (current < end - block) {
+    int minimum = vacant == current ? current + block : current;
+    for (int candidate = minimum + block; candidate < end; candidate += block) {
+      if (candidate != vacant &&
+          (s->a[candidate] < s->a[minimum] ||
+           (s->a[candidate] == s->a[minimum] &&
+            s->tags[tag_start + (candidate - first) / block] <
+            s->tags[tag_start + (minimum - first) / block])))
+        minimum = candidate;
     }
-  }
-}
-
-int binarySearch(int arr[], int a, int b, int value, bool left) {
-  while (a < b) {
-    int mid = a + (b - a) / 2;
-    bool comp = left ? (value <= arr[mid]) : (value < arr[mid]);
-    if (comp) {
-      b = mid;
-    } else {
-      a = mid + 1;
-    }
-  }
-  return a;
-}
-
-void synchronousMerge(int arr[], int a, int m, int b) {
-  if (a >= m || m >= b)
-    return;
-  if (m - a <= blockSize && b - m <= blockSize) {
-    std::vector<int> temp(b - a, 0);
-    for (int i = a; i < b; i++)
-      temp[i - a] = arr[i];
-    int i = 0, j = m - a, k = a;
-    while (i < m - a && j < b - a) {
-      if (temp[i] <= temp[j])
-        arr[k++] = temp[i++];
-      else
-        arr[k++] = temp[j++];
-    }
-    while (i < m - a)
-      arr[k++] = temp[i++];
-    while (j < b - a)
-      arr[k++] = temp[j++];
-    return;
-  }
-  int m1, m2, m3;
-  if (m - a >= b - m) {
-    m1 = a + (m - a) / 2;
-    int value = arr[m1];
-    m2 = binarySearch(arr, m, b, value, true);
-    m3 = m1 + (m2 - m);
-  } else {
-    m2 = m + (b - m) / 2;
-    int value = arr[m2];
-    m1 = binarySearch(arr, a, m, value, false);
-    m3 = m2 - (m - m1);
-    m2 = m2 + 1;
-  }
-  rotate(arr, m1, m, m2);
-  if (m2 - (m3 + 1) > 0 && b - m2 > 0) {
-    synchronousMerge(arr, m3 + 1, m2, b);
-  }
-  if (m1 - a > 0 && m3 - m1 > 0) {
-    synchronousMerge(arr, a, m1, m3);
-  }
-}
-
-void synchronousSort(int arr[], int a, int b) {
-  int len = b - a;
-  for (int start = a; start < b; start += 16) {
-    int end = start + 16 < b ? start + 16 : b;
-    for (int i = start + 1; i < end; i++) {
-      int value = arr[i], j = i;
-      while (j > start && arr[j - 1] > value) {
-        arr[j] = arr[j - 1];
-        j--;
+    if (minimum > current) {
+      if (vacant == current) {
+        for (int i = 0; i < block; ++i) s->a[current + i] = s->a[minimum + i];
+        s->tags[tag_start + (current - first) / block] =
+          s->tags[tag_start + (minimum - first) / block];
+        vacant = minimum;
+      } else {
+        multi_swap(s, current, minimum, block);
+        int current_tag = tag_start + (current - first) / block;
+        int minimum_tag = tag_start + (minimum - first) / block;
+        int value = s->tags[current_tag];
+        s->tags[current_tag] = s->tags[minimum_tag];
+        s->tags[minimum_tag] = value;
       }
-      arr[j] = value;
     }
-  }
-  int j = 16;
-  while (j < len) {
-    int i;
-    for (i = a; i + 2 * j <= b; i += 2 * j) {
-      synchronousMerge(arr, i, i + j, i + 2 * j);
-    }
-    if (i + j < b) {
-      synchronousMerge(arr, i, i + j, b);
-    }
-    j *= 2;
+    current += block;
   }
 }
 
-int main(int argc, char *argv[]) {
-  int size = sizeof(array) / sizeof(array[0]);
-  sort(array, size);
-  printList(array, size);
+static void merge_blocks_backward(SynchronousSqrt *s, int first, int end,
+                                  int first_tag, int past_last_tag, int block) {
+  int tag = past_last_tag - 1;
+  int frontier = end, block_start = frontier - block;
+  int reversed = s->tags[tag] < s->tag_count;
+  for (;;) {
+    do { --tag; block_start -= block; }
+    while (tag >= first_tag && ((s->tags[tag] < s->tag_count) == reversed));
+    if (tag < first_tag) {
+      shift_backward(s, first, frontier, frontier + block);
+      break;
+    }
+    frontier = smart_merge_backward(s, block_start, block_start + block,
+                                    frontier, frontier + block, reversed);
+    reversed = !reversed;
+  }
+}
+
+void sort(int a[], int n) {
+  if (n <= 1) return;
+  SynchronousSqrt s = {a, NULL, NULL, n, 0};
+  if (n <= 16) { binary_insertion(&s, 0, n); return; }
+  int block = 1;
+  while (block * block < n) block *= 2;
+  int remainder = n % block;
+  int first = block + remainder, end = n;
+  int work_length = end - first, run = 1;
+  s.tag_count = (n - 1) / block + 1;
+  s.prefix = (int *)malloc((size_t)first * sizeof *s.prefix);
+  s.tags = (int *)malloc((size_t)s.tag_count * sizeof *s.tags);
+  if (!s.prefix || !s.tags) { free(s.prefix); free(s.tags); return; }
+  binary_insertion(&s, 0, first);
+  for (int i = 0; i < first; ++i) s.prefix[i] = a[i];
+
+  while (run < block) {
+    int distance = run < 2 ? 2 : run;
+    int index = first;
+    while (index + 2 * run < end) {
+      merge_forward(&s, index, index + run, index + 2 * run, index - distance);
+      index += 2 * run;
+    }
+    if (index + run < end) merge_forward(&s, index, index + run, end, index - distance);
+    else shift_forward(&s, index - distance, index, end);
+    first -= distance;
+    end -= distance;
+    run *= 2;
+  }
+
+  int fragment = work_length % (2 * run);
+  int index = end - fragment;
+  if (index + run < end) merge_backward(&s, index, index + run, end, end + run);
+  else shift_backward(&s, index, end, end + run);
+  index -= 2 * run;
+  while (index >= first) {
+    merge_backward(&s, index, index + run, index + 2 * run, index + 3 * run);
+    index -= 2 * run;
+  }
+  first += run; end += run; run *= 2;
+
+  int tag_count = 4;
+  while (run < work_length) {
+    index = first;
+    int tag_index = 0;
+    while (index + 2 * run < end) {
+      block_selection(&s, index - block, index + 2 * run, block, tag_index, tag_count);
+      index += 2 * run;
+      tag_index += tag_count;
+    }
+    int has_fragment = index + run < end;
+    fragment = (end - index) / block;
+    if (has_fragment)
+      block_selection(&s, index - block, end, block, tag_index, tag_count);
+    first -= block; end -= block; index -= block;
+    if (has_fragment)
+      merge_blocks_backward(&s, index, end, tag_index, tag_index + fragment, block);
+    index -= 2 * run;
+    tag_index -= tag_count;
+    while (index >= first) {
+      merge_blocks_backward(&s, index, index + 2 * run, tag_index,
+                            tag_index + tag_count, block);
+      index -= 2 * run;
+      tag_index -= tag_count;
+    }
+    first += block; end += block; run *= 2; tag_count *= 2;
+  }
+
+  int left = 0, right = first, output = 0;
+  while (left < first && right < end) {
+    if (s.prefix[left] <= a[right]) a[output++] = s.prefix[left++];
+    else a[output++] = a[right++];
+  }
+  while (left < first) a[output++] = s.prefix[left++];
+  free(s.tags);
+  free(s.prefix);
+}
+
+int main(void) {
+  int a[] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+  int n = (int)(sizeof a / sizeof a[0]);
+  sort(a, n);
+  printf("[");
+  for (int i = 0; i < n; ++i) printf("%s%d", i ? ", " : "", a[i]);
+  puts("]");
   return 0;
 }

@@ -1,102 +1,149 @@
 #include <stdio.h>
-#include <stdlib.h>
 
-int array[24] = {0,  39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81,
-                 68, 83, 32, 56, 10, 2,  95, 46, 21, 74, 6,  38};
-
-void swap(int *a, int *b) {
-  int t = *a;
-  *a = *b;
-  *b = t;
+/* ArrayV's median-merge hybrid. The larger partition is an in-array swap
+   buffer while the smaller partition is merge-sorted. No heap buffer is used. */
+static void exchange(int a[], int i, int j) {
+  int value = a[i];
+  a[i] = a[j];
+  a[j] = value;
 }
 
-void printList(int items[], int size) {
-  printf("[");
-  if (size > 0) {
-    printf("%d", items[0]);
-    for (int i = 1; i < size; i++) {
-      printf(", %d", items[i]);
+static void insertion(int a[], int first, int end) {
+  for (int i = first + 1; i < end; ++i)
+    for (int j = i; j > first && a[j - 1] > a[j]; --j)
+      exchange(a, j - 1, j);
+}
+
+static void binary_insertion(int a[], int first, int end) {
+  for (int i = first + 1; i < end; ++i) {
+    int value = a[i], low = first, high = i;
+    while (low < high) {
+      int middle = low + (high - low) / 2;
+      if (value < a[middle]) high = middle;
+      else low = middle + 1;
     }
+    for (int j = i; j > low; --j) a[j] = a[j - 1];
+    a[low] = value;
   }
-  printf("]");
 }
 
-void mergeSort(int arr[], int scratch[], int start, int end) {
-  if (end - start < 2)
-    return;
-  int middle = (start + end) / 2;
-  mergeSort(arr, scratch, start, middle);
-  mergeSort(arr, scratch, middle, end);
-  int left = start, right = middle, dest = start;
-  while (left < middle && right < end) {
-    if (arr[left] <= arr[right])
-      scratch[dest++] = arr[left++];
-    else
-      scratch[dest++] = arr[right++];
+static void median_three(int a[], int first, int end) {
+  int middle = first + (end - 1 - first) / 2;
+  if (a[first] > a[middle]) exchange(a, first, middle);
+  if (a[middle] > a[end - 1]) {
+    exchange(a, middle, end - 1);
+    if (a[first] > a[middle]) return;
   }
-  while (left < middle)
-    scratch[dest++] = arr[left++];
-  while (right < end)
-    scratch[dest++] = arr[right++];
-  for (int i = start; i < end; i++)
-    arr[i] = scratch[i];
+  exchange(a, first, middle);
 }
 
-int medianOfThree(int x, int y, int z) {
-  if (x > y)
-    swap(&x, &y);
-  if (y > z)
-    swap(&y, &z);
-  if (x > y)
-    swap(&x, &y);
-  return y;
+static void median_medians(int a[], int first, int end) {
+  int alternate = 1;
+  while (end - first > 1) {
+    int write = first, i = first;
+    while (i + 10 <= end) {
+      insertion(a, i, i + 5);
+      exchange(a, write++, i + 2);
+      i += 5;
+    }
+    if (i < end) {
+      insertion(a, i, end);
+      exchange(a, write++, i + (end - alternate - i) / 2);
+      if ((end - i) % 2 == 0) alternate = !alternate;
+    }
+    end = write;
+  }
 }
 
-void sort(int arr[], int n) {
-  int *scratch = malloc((size_t)n * sizeof(int));
-  if (!scratch && n > 0)
-    return;
-  int start = 0, end = n;
-  while (end - start > 16) {
-    int pivot =
-        medianOfThree(arr[start], arr[(start + end - 1) / 2], arr[end - 1]);
-    int left = start, right = end - 1;
-    while (left <= right) {
-      while (left <= right && arr[left] < pivot)
-        left++;
-      while (left <= right && arr[right] > pivot)
-        right--;
-      if (left <= right) {
-        swap(&arr[left++], &arr[right--]);
-      }
+static int partition(int a[], int first, int end, int pivot) {
+  int i = first - 1, j = end;
+  for (;;) {
+    do { ++i; } while (i < j && a[i] < a[pivot]);
+    do { --j; } while (j >= i && a[j] > a[pivot]);
+    if (i >= j) return j;
+    exchange(a, i, j);
+  }
+}
+
+/* The destination contains displaced values, restored on the return pass. */
+static void merge(int a[], int first, int middle, int end, int destination) {
+  int i = first, j = middle;
+  while (i < middle && j < end) {
+    if (a[i] <= a[j]) exchange(a, destination++, i++);
+    else exchange(a, destination++, j++);
+  }
+  while (i < middle) exchange(a, destination++, i++);
+  while (j < end) exchange(a, destination++, j++);
+}
+
+static void merge_sort(int a[], int first, int end, int buffer) {
+  int length = end - first;
+  if (length <= 1) return;
+  int width = length;
+  while (width >= 32) width = (width + 3) / 4;
+  int i = first;
+  while (i + width <= end) {
+    binary_insertion(a, i, i + width);
+    i += width;
+  }
+  binary_insertion(a, i, end);
+  while (width < length) {
+    int destination = buffer;
+    i = first;
+    while (i + 2 * width <= end) {
+      merge(a, i, i + width, i + 2 * width, destination);
+      i += 2 * width;
+      destination += 2 * width;
     }
-    if (left == start || left == end) {
-      mergeSort(arr, scratch, start, end);
-      free(scratch);
-      return;
+    if (i + width < end) merge(a, i, i + width, end, destination);
+    else while (i < end) exchange(a, i++, destination++);
+    width *= 2;
+
+    destination = first;
+    i = buffer;
+    while (i + 2 * width <= buffer + length) {
+      merge(a, i, i + width, i + 2 * width, destination);
+      i += 2 * width;
+      destination += 2 * width;
     }
-    if (left - start <= end - left) {
-      mergeSort(arr, scratch, start, left);
-      start = left;
+    if (i + width < buffer + length)
+      merge(a, i, i + width, buffer + length, destination);
+    else while (i < buffer + length) exchange(a, i++, destination++);
+    width *= 2;
+  }
+}
+
+void sort(int a[], int n) {
+  int first = 0, end = n, bad_split = 0, used_medians = 0;
+  while (end - first > 16) {
+    if (bad_split) {
+      median_medians(a, first, end);
+      used_medians = 1;
+    } else median_three(a, first, end);
+    int pivot = partition(a, first + 1, end, first);
+    exchange(a, first, pivot);
+    int left = pivot - first, right = end - pivot - 1;
+    bad_split = !used_medians &&
+      (left == 0 || right == 0 ||
+       (left > 0 && right > 0 && (left / right >= 16 || right / left >= 16)));
+    if (left <= right) {
+      merge_sort(a, first, pivot, pivot + 1);
+      first = pivot + 1;
     } else {
-      mergeSort(arr, scratch, left, end);
-      end = left;
+      merge_sort(a, pivot + 1, end, 2 * pivot + 1 - end);
+      end = pivot;
     }
   }
-  for (int i = start + 1; i < end; i++) {
-    int value = arr[i], j = i;
-    while (j > start && arr[j - 1] > value) {
-      arr[j] = arr[j - 1];
-      j--;
-    }
-    arr[j] = value;
-  }
-  free(scratch);
+  binary_insertion(a, first, end);
 }
 
-int main(int argc, char *argv[]) {
-  int size = sizeof(array) / sizeof(array[0]);
-  sort(array, size);
-  printList(array, size);
+int main(void) {
+  int a[] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81,
+             68, 83, 32, 56, 10, 2, 95, 46, 21, 74, 6, 38};
+  int n = (int)(sizeof a / sizeof a[0]);
+  sort(a, n);
+  printf("[");
+  for (int i = 0; i < n; ++i) printf("%s%d", i ? ", " : "", a[i]);
+  puts("]");
   return 0;
 }

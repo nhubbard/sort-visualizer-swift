@@ -10,6 +10,14 @@ import Testing
 @Suite
 struct NativeAlgorithmCorrectnessTests {
   @Test
+  func kotaSortMergesTheLastRestoredBlock() {
+    let input = (0..<257).map { ($0 * 151) % 251 }.sorted(by: >)
+    var engine = RecordingEngine(values: input, operationCap: 20_000_000)
+    KotaSort().record(into: &engine)
+    #expect(engine.values == input.sorted())
+  }
+
+  @Test
   func kotaSortHandlesInternalKeysAndStableFallbacks() {
     let algorithm = KotaSort()
     let radix = 8_192
@@ -194,6 +202,10 @@ struct NativeAlgorithmCorrectnessTests {
           state = state &* 6_364_136_223_846_793_005 &+ 1_442_695_040_888_963_407
           return Int(state % 24) * radix + index % radix
         }
+        let mediumKeys = input.map { index in
+          state = state &* 6_364_136_223_846_793_005 &+ 1_442_695_040_888_963_407
+          return Int(state % 12) * radix + index % radix
+        }
         let unique = (0..<size).map { $0 * radix + $0 }
         var shuffled = unique
         if size > 1 {
@@ -202,7 +214,7 @@ struct NativeAlgorithmCorrectnessTests {
             shuffled.swapAt(index, Int(state % UInt64(index + 1)))
           }
         }
-        for candidate in [input, Array(input.reversed()), fewKeys, manyKeys, unique, Array(unique.reversed()), shuffled] {
+        for candidate in [input, Array(input.reversed()), fewKeys, mediumKeys, manyKeys, unique, Array(unique.reversed()), shuffled] {
           var engine = RecordingEngine(values: candidate, operationCap: 4_000_000, comparisonKeyForTesting: { $0 / radix })
           algorithm.record(into: &engine)
           let output = engine.values
