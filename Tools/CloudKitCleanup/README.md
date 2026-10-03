@@ -22,9 +22,11 @@ refuses to run if calibration or source metadata is missing.
 
 ## Setup (one-time, per machine)
 
-Already done on this machine — `.management-token`/`.user-token` (save-token output, keychain-
-backed) and `.team-id`/`.dev-schema`/`.prod-schema` (reference dotfiles) sit alongside this
-script, all git-ignored (see `.gitignore` here — never commit these). On a fresh machine:
+Local management-token and schema reference files sit alongside this script and are git-ignored
+(see `.gitignore` here). A private-database CLI user token expires and must be refreshed from
+CloudKit Console's Settings > Tokens > User Token. Save the freshly copied value in `.user-token`
+and run `chmod 600 .user-token`; never commit it. On a fresh machine, `cktool` can alternatively
+save tokens in the keychain:
 
 ```sh
 xcrun cktool save-token --type management   # CloudKit Console > your team > API Access
@@ -62,17 +64,16 @@ ambiguous `retry-needed` response. The runner defaults to one worker because Clo
 throttled parallel deletion.
 
 ```sh
-uv run execute_reviewed_cleanup.py --record-type CD_BigORecord --token-file .user_token
+uv run execute_reviewed_cleanup.py --record-type CD_BigORecord --token-file .user-token
 ```
 
 ```sh
 uv run cleanup_stale_sizes.py --environment development --record-type CD_BigORecord
 ```
 
-If `cktool` still reports an expired session after `save-token`, use a fresh CloudKit Console
-CLI user token in a private local file and pass `--token-file .user_token`. The script passes it
-directly to each `cktool` invocation and redacts it from command diagnostics. Keep the file out
-of Git and restrict its permissions (`chmod 600 .user_token`).
+If `cktool` still reports an expired session after `save-token`, pass the fresh CLI user token
+through `--token-file .user-token`. The script passes it directly to each `cktool` invocation
+and redacts it from command diagnostics.
 
 Defaults to a dry run: fetches every record of the given type (first run only — see caching
 below), prints a diff-style summary of what would be deleted (grouped by algorithm, with counts
@@ -96,11 +97,13 @@ safeguard, or after any threshold changes, is rejected. Pass `--refresh` to forc
 the cache as it goes too, so a delete run that dies partway through can also just be re-invoked —
 it'll only retry the stragglers.
 
-Three invocations total, development first (`CD_RecordingCapExceededRecord` doesn't exist in
-production — see above):
+For final verification, refresh the two Development scans and the Production Big-O scan after
+the reviewed cleanup finishes. The `--execute` option on `cleanup_stale_sizes.py` is a slower
+one-record-at-a-time fallback; use the fingerprint-checked runner above for the approved
+Development candidate sets.
 
 ```sh
-uv run cleanup_stale_sizes.py --environment development --record-type CD_BigORecord --execute
-uv run cleanup_stale_sizes.py --environment development --record-type CD_RecordingCapExceededRecord --execute
-uv run cleanup_stale_sizes.py --environment production --record-type CD_BigORecord --execute
+uv run cleanup_stale_sizes.py --environment development --record-type CD_BigORecord --token-file .user-token --refresh
+uv run cleanup_stale_sizes.py --environment development --record-type CD_RecordingCapExceededRecord --token-file .user-token --refresh
+uv run cleanup_stale_sizes.py --environment production --record-type CD_BigORecord --token-file .user-token --refresh
 ```
