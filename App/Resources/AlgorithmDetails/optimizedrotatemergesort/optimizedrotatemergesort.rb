@@ -1,111 +1,147 @@
-def sort(array)
-  rotate_merge_sort(array, 0, array.length)
-  array
-end
-
-def multi_swap(array, a, b, len)
-  len.times do |i|
-    array[a + i], array[b + i] = array[b + i], array[a + i]
+class OptimizedRotateMergeExample
+  def initialize(values)
+    @values = values
+    @buffer = Array.new(64, 0)
   end
-end
 
-def rotate(array, a, m, b)
-  l = m - a
-  r = b - m
-  while l > 0 && r > 0
-    if r < l
-      multi_swap(array, m - r, m, r)
-      b -= r
-      m -= r
-      l -= r
-    else
-      multi_swap(array, a, m, l)
-      a += l
-      m += l
-      r -= l
+  def lower_bound(start, finish, value)
+    while start < finish
+      middle = (start + finish) / 2
+      if @values[middle] < value then start = middle + 1 else finish = middle end
+    end
+    start
+  end
+
+  def upper_bound(start, finish, value)
+    while start < finish
+      middle = (start + finish) / 2
+      if @values[middle] <= value then start = middle + 1 else finish = middle end
+    end
+    start
+  end
+
+  def reverse(start, finish)
+    finish -= 1
+    while start < finish
+      @values[start], @values[finish] = @values[finish], @values[start]
+      start += 1
+      finish -= 1
     end
   end
-end
 
-def binary_search(array, a, b, value, left)
-  while a < b
-    mid = a + (b - a) / 2
-    comp = left ? value <= array[mid] : value < array[mid]
-    if comp
-      b = mid
+  def rotate(start, middle, finish)
+    return if start >= middle || middle >= finish
+    left = middle - start
+    right = finish - middle
+    if left <= 64
+      left.times { |i| @buffer[i] = @values[start + i] }
+      (middle...finish).each { |i| @values[i - left] = @values[i] }
+      left.times { |i| @values[finish - left + i] = @buffer[i] }
+    elsif right <= 64
+      right.times { |i| @buffer[i] = @values[middle + i] }
+      (middle - 1).downto(start) { |i| @values[i + right] = @values[i] }
+      right.times { |i| @values[start + i] = @buffer[i] }
     else
-      a = mid + 1
+      reverse(start, middle)
+      reverse(middle, finish)
+      reverse(start, finish)
     end
   end
-  a
-end
 
-def rotate_merge(array, a, m, b)
-  if m - a <= 64 && b - m <= 64
-    temp = array[a...b]
-    i = 0
-    j = m - a
-    (a...b).each do |k|
-      if i < m - a && (j == b - a || temp[i] <= temp[j])
-        array[k] = temp[i]
-        i += 1
-      else
-        array[k] = temp[j]
-        j += 1
+  def buffered_merge(start, middle, finish)
+    left_length = middle - start
+    right_length = finish - middle
+    if left_length <= right_length
+      left_length.times { |i| @buffer[i] = @values[start + i] }
+      left, right, destination = 0, middle, start
+      while left < left_length && right < finish
+        if @values[right] < @buffer[left]
+          @values[destination] = @values[right]
+          right += 1
+        else
+          @values[destination] = @buffer[left]
+          left += 1
+        end
+        destination += 1
+      end
+      while left < left_length
+        @values[destination] = @buffer[left]
+        left += 1
+        destination += 1
+      end
+    else
+      right_length.times { |i| @buffer[i] = @values[middle + i] }
+      left, right, destination = middle - 1, right_length - 1, finish - 1
+      while left >= start && right >= 0
+        if @values[left] > @buffer[right]
+          @values[destination] = @values[left]
+          left -= 1
+        else
+          @values[destination] = @buffer[right]
+          right -= 1
+        end
+        destination -= 1
+      end
+      while right >= 0
+        @values[destination] = @buffer[right]
+        right -= 1
+        destination -= 1
       end
     end
-    return
   end
-  if m - a >= b - m
-    m1 = a + (m - a) / 2
-    value = array[m1]
-    m2 = binary_search(array, m, b, value, true)
-    m3 = m1 + (m2 - m)
-  else
-    m2 = m + (b - m) / 2
-    value = array[m2]
-    m1 = binary_search(array, a, m, value, false)
-    m3 = m2 - (m - m1)
-    m2 += 1
-  end
-  rotate(array, m1, m, m2)
-  if m2 - (m3 + 1) > 0 && b - m2 > 0
-    rotate_merge(array, m3 + 1, m2, b)
-  end
-  if m1 - a > 0 && m3 - m1 > 0
-    rotate_merge(array, a, m1, m3)
-  end
-end
 
-def rotate_merge_sort(array, a, b)
-  len = b - a
-  (a...b).step(32) do |start|
-    finish = [start + 32, b].min
-    ((start + 1)...finish).each do |i|
-      value = array[i]
-      cursor = i
-      while cursor > start && array[cursor - 1] > value
-        array[cursor] = array[cursor - 1]
-        cursor -= 1
+  def merge(start, middle, finish)
+    return if start >= middle || middle >= finish || @values[middle - 1] <= @values[middle]
+    if [middle - start, finish - middle].min <= 64
+      buffered_merge(start, middle, finish)
+      return
+    end
+    if middle - start >= finish - middle
+      left_split = start + (middle - start) / 2
+      right_split = lower_bound(middle, finish, @values[left_split])
+    else
+      right_split = middle + (finish - middle) / 2
+      left_split = upper_bound(start, middle, @values[right_split])
+    end
+    rotate(left_split, middle, right_split)
+    new_middle = left_split + right_split - middle
+    merge(start, left_split, new_middle)
+    merge(new_middle, right_split, finish)
+  end
+
+  def insertion(start, finish)
+    (start + 1...finish).each do |index|
+      value = @values[index]
+      destination = upper_bound(start, index, value)
+      index.downto(destination + 1) { |cursor| @values[cursor] = @values[cursor - 1] }
+      @values[destination] = value
+    end
+  end
+
+  def sort
+    count = @values.length
+    return if count < 2
+    start = 0
+    while start < count
+      insertion(start, [start + 32, count].min)
+      start += 32
+    end
+    run = 32
+    while run < count
+      start = 0
+      while start + run < count
+        merge(start, start + run, [start + 2 * run, count].min)
+        start += 2 * run
       end
-      array[cursor] = value
+      run *= 2
     end
-  end
-  j = 32
-  while j < len
-    i = a
-    while i + 2 * j <= b
-      rotate_merge(array, i, i + j, i + 2 * j)
-      i += 2 * j
-    end
-    if i + j < b
-      rotate_merge(array, i, i + j, b)
-    end
-    j *= 2
   end
 end
 
-array = [0, 39, 21, 62, 91, 77, 14, 23,
-  90, 69, 51, 81, 68, 83, 32, 56]
+def sort(values)
+  OptimizedRotateMergeExample.new(values).sort
+end
+
+array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56]
 sort(array)
-p array
+puts array.inspect

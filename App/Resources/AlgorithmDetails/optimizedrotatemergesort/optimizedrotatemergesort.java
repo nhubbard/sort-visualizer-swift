@@ -1,118 +1,113 @@
-import java.util.Arrays;
-
 public class optimizedrotatemergesort {
-  public static void sort(int[] arr) {
-    rotateMergeSort(arr, 0, arr.length);
+private static class State { int[] values; int[] buffer = new int[64]; State(int[] a) { values = a; } }
+private static int lowerBound(State s, int start, int end, int value) {
+  while (start < end) {
+    int middle = start + (end - start) / 2;
+    if (s.values[middle] < value) start = middle + 1;
+    else end = middle;
   }
-
-  private static void multiSwap(int[] arr, int a, int b, int len) {
-    for (int i = 0; i < len; i++) {
-      int t = arr[a + i];
-      arr[a + i] = arr[b + i];
-      arr[b + i] = t;
-    }
+  return start;
+}
+private static int upperBound(State s, int start, int end, int value) {
+  while (start < end) {
+    int middle = start + (end - start) / 2;
+    if (s.values[middle] <= value) start = middle + 1;
+    else end = middle;
   }
-
-  private static void rotate(int[] arr, int a, int m, int b) {
-    int l = m - a;
-    int r = b - m;
-    while (l > 0 && r > 0) {
-      if (r < l) {
-        multiSwap(arr, m - r, m, r);
-        b -= r;
-        m -= r;
-        l -= r;
-      } else {
-        multiSwap(arr, a, m, l);
-        a += l;
-        m += l;
-        r -= l;
-      }
-    }
+  return start;
+}
+private static void reverse(State s, int start, int end) {
+  end--;
+  while (start < end) {
+    int value = s.values[start];
+    s.values[start++] = s.values[end];
+    s.values[end--] = value;
   }
-
-  private static int binarySearch(int[] arr, int a, int b, int value, boolean left) {
-    while (a < b) {
-      int mid = a + (b - a) / 2;
-      boolean comp = left ? value <= arr[mid] : value < arr[mid];
-      if (comp) {
-        b = mid;
-      } else {
-        a = mid + 1;
-      }
-    }
-    return a;
+}
+private static void rotate(State s, int start, int middle, int end) {
+  if (start >= middle || middle >= end) return;
+  int left = middle - start, right = end - middle;
+  if (left <= 64) {
+    for (int i = 0; i < left; i++) s.buffer[i] = s.values[start + i];
+    for (int i = middle; i < end; i++) s.values[i - left] = s.values[i];
+    for (int i = 0; i < left; i++) s.values[end - left + i] = s.buffer[i];
+  } else if (right <= 64) {
+    for (int i = 0; i < right; i++) s.buffer[i] = s.values[middle + i];
+    for (int i = middle - 1; i >= start; i--) s.values[i + right] = s.values[i];
+    for (int i = 0; i < right; i++) s.values[start + i] = s.buffer[i];
+  } else {
+    reverse(s, start, middle);
+    reverse(s, middle, end);
+    reverse(s, start, end);
   }
-
-  private static void rotateMerge(int[] arr, int a, int m, int b) {
-    if (m - a <= 64 && b - m <= 64) {
-      int[] temp = Arrays.copyOfRange(arr, a, b);
-      int i = 0;
-      int j = m - a;
-      for (int k = a; k < b; k++) {
-        if (i < m - a && (j == b - a || temp[i] <= temp[j])) {
-          arr[k] = temp[i++];
-        } else {
-          arr[k] = temp[j++];
-        }
-      }
-      return;
+}
+private static void bufferedMerge(State s, int start, int middle, int end) {
+  int leftLength = middle - start, rightLength = end - middle;
+  if (leftLength <= rightLength) {
+    for (int i = 0; i < leftLength; i++) s.buffer[i] = s.values[start + i];
+    int left = 0, right = middle, destination = start;
+    while (left < leftLength && right < end) {
+      if (s.values[right] < s.buffer[left]) s.values[destination] = s.values[right++];
+      else s.values[destination] = s.buffer[left++];
+      destination++;
     }
-    int m1;
-    int m2;
-    int m3;
-    if (m - a >= b - m) {
-      m1 = a + (m - a) / 2;
-      int value = arr[m1];
-      m2 = binarySearch(arr, m, b, value, true);
-      m3 = m1 + (m2 - m);
-    } else {
-      m2 = m + (b - m) / 2;
-      int value = arr[m2];
-      m1 = binarySearch(arr, a, m, value, false);
-      m3 = m2 - (m - m1);
-      m2 = m2 + 1;
+    while (left < leftLength) s.values[destination++] = s.buffer[left++];
+  } else {
+    for (int i = 0; i < rightLength; i++) s.buffer[i] = s.values[middle + i];
+    int left = middle - 1, right = rightLength - 1, destination = end - 1;
+    while (left >= start && right >= 0) {
+      if (s.values[left] > s.buffer[right]) s.values[destination] = s.values[left--];
+      else s.values[destination] = s.buffer[right--];
+      destination--;
     }
-    rotate(arr, m1, m, m2);
-    if (m2 - (m3 + 1) > 0 && b - m2 > 0) {
-      rotateMerge(arr, m3 + 1, m2, b);
-    }
-    if (m1 - a > 0 && m3 - m1 > 0) {
-      rotateMerge(arr, a, m1, m3);
-    }
+    while (right >= 0) s.values[destination--] = s.buffer[right--];
   }
-
-  private static void rotateMergeSort(int[] arr, int a, int b) {
-    int len = b - a;
-    for (int start = a; start < b; start += 32) {
-      int end = Math.min(start + 32, b);
-      for (int i = start + 1; i < end; i++) {
-        int value = arr[i];
-        int j = i;
-        while (j > start && arr[j - 1] > value) {
-          arr[j] = arr[j - 1];
-          j--;
-        }
-        arr[j] = value;
-      }
-    }
-    for (int j = 32; j < len; j *= 2) {
-      int i;
-      for (i = a; i + 2 * j <= b; i += 2 * j) {
-        rotateMerge(arr, i, i + j, i + 2 * j);
-      }
-      if (i + j < b) {
-        rotateMerge(arr, i, i + j, b);
-      }
-    }
+}
+private static void merge(State s, int start, int middle, int end) {
+  if (start >= middle || middle >= end || s.values[middle - 1] <= s.values[middle]) return;
+  int leftLength = middle - start, rightLength = end - middle;
+  if ((leftLength < rightLength ? leftLength : rightLength) <= 64) {
+    bufferedMerge(s, start, middle, end);
+    return;
   }
-
+  int leftSplit, rightSplit;
+  if (leftLength >= rightLength) {
+    leftSplit = start + leftLength / 2;
+    rightSplit = lowerBound(s, middle, end, s.values[leftSplit]);
+  } else {
+    rightSplit = middle + rightLength / 2;
+    leftSplit = upperBound(s, start, middle, s.values[rightSplit]);
+  }
+  rotate(s, leftSplit, middle, rightSplit);
+  int newMiddle = leftSplit + rightSplit - middle;
+  merge(s, start, leftSplit, newMiddle);
+  merge(s, newMiddle, rightSplit, end);
+}
+private static void insertion(State s, int start, int end) {
+  for (int index = start + 1; index < end; index++) {
+    int value = s.values[index];
+    int destination = upperBound(s, start, index, value);
+    for (int cursor = index; cursor > destination; cursor--)
+      s.values[cursor] = s.values[cursor - 1];
+    s.values[destination] = value;
+  }
+}
+public static void sort(int[] values, int count) {
+  if (count < 2) return;
+  State s = new State(values);
+  for (int start = 0; start < count; start += 32) {
+    int end = start + 32 < count ? start + 32 : count;
+    insertion(s, start, end);
+  }
+  for (int run = 32; run < count; run *= 2)
+    for (int start = 0; start + run < count; start += 2 * run) {
+      int end = start + 2 * run < count ? start + 2 * run : count;
+      merge(s, start, start + run, end);
+    }
+}
   public static void main(String[] args) {
-    int[] array = {
-      0, 39, 21, 62, 91, 77, 14, 23,
-      90, 69, 51, 81, 68, 83, 32, 56
-    };
-    sort(array);
-    System.out.println(Arrays.toString(array));
+    int[] array = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+    sort(array, array.length);
+    System.out.println(java.util.Arrays.toString(array));
   }
 }

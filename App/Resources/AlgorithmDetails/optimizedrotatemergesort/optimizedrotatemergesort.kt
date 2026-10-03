@@ -1,121 +1,108 @@
-fun sort(arr: Array<Int>) {
-  rotateMergeSort(arr, 0, arr.size)
-}
-
-fun multiSwap(arr: Array<Int>, a: Int, b: Int, len: Int) {
-  for (i in 0 until len) {
-    val t = arr[a + i]
-    arr[a + i] = arr[b + i]
-    arr[b + i] = t
+private class OptimizedRotateMergeExample(private val values: Array<Int>) {
+  private val buffer = Array(64) { 0 }
+  private fun lowerBound(startIn: Int, endIn: Int, value: Int): Int {
+    var start = startIn; var end = endIn
+    while (start < end) {
+      val middle = start + (end - start) / 2
+      if (values[middle] < value) start = middle + 1 else end = middle
+    }
+    return start
   }
-}
-
-fun rotate(arr: Array<Int>, a0: Int, m0: Int, b0: Int) {
-  var a = a0
-  var m = m0
-  var b = b0
-  var l = m - a
-  var r = b - m
-  while (l > 0 && r > 0) {
-    if (r < l) {
-      multiSwap(arr, m - r, m, r)
-      b -= r
-      m -= r
-      l -= r
+  private fun upperBound(startIn: Int, endIn: Int, value: Int): Int {
+    var start = startIn; var end = endIn
+    while (start < end) {
+      val middle = start + (end - start) / 2
+      if (values[middle] <= value) start = middle + 1 else end = middle
+    }
+    return start
+  }
+  private fun reverse(startIn: Int, endIn: Int) {
+    var start = startIn; var end = endIn - 1
+    while (start < end) {
+      val value = values[start]; values[start++] = values[end]; values[end--] = value
+    }
+  }
+  private fun rotate(start: Int, middle: Int, end: Int) {
+    if (start >= middle || middle >= end) return
+    val left = middle - start; val right = end - middle
+    if (left <= 64) {
+      for (i in 0 until left) buffer[i] = values[start + i]
+      for (i in middle until end) values[i - left] = values[i]
+      for (i in 0 until left) values[end - left + i] = buffer[i]
+    } else if (right <= 64) {
+      for (i in 0 until right) buffer[i] = values[middle + i]
+      for (i in middle - 1 downTo start) values[i + right] = values[i]
+      for (i in 0 until right) values[start + i] = buffer[i]
     } else {
-      multiSwap(arr, a, m, l)
-      a += l
-      m += l
-      r -= l
+      reverse(start, middle); reverse(middle, end); reverse(start, end)
     }
   }
-}
-
-fun binarySearch(arr: Array<Int>, a0: Int, b0: Int, value: Int, left: Boolean): Int {
-  var a = a0
-  var b = b0
-  while (a < b) {
-    val mid = a + (b - a) / 2
-    val comp = if (left) value <= arr[mid] else value < arr[mid]
-    if (comp) {
-      b = mid
-    } else {
-      a = mid + 1
-    }
-  }
-  return a
-}
-
-fun rotateMerge(arr: Array<Int>, a: Int, m: Int, b: Int) {
-  if (m - a <= 64 && b - m <= 64) {
-    val temp = arr.sliceArray(a until b)
-    var i = 0
-    var j = m - a
-    for (k in a until b) {
-      if (i < m - a && (j == b - a || temp[i] <= temp[j])) arr[k] = temp[i++]
-      else arr[k] = temp[j++]
-    }
-    return
-  }
-  val m1: Int
-  val m3: Int
-  var m2: Int
-  if (m - a >= b - m) {
-    m1 = a + (m - a) / 2
-    val value = arr[m1]
-    m2 = binarySearch(arr, m, b, value, true)
-    m3 = m1 + (m2 - m)
-  } else {
-    m2 = m + (b - m) / 2
-    val value = arr[m2]
-    m1 = binarySearch(arr, a, m, value, false)
-    m3 = m2 - (m - m1)
-    m2 += 1
-  }
-  rotate(arr, m1, m, m2)
-  if (m2 - (m3 + 1) > 0 && b - m2 > 0) {
-    rotateMerge(arr, m3 + 1, m2, b)
-  }
-  if (m1 - a > 0 && m3 - m1 > 0) {
-    rotateMerge(arr, a, m1, m3)
-  }
-}
-
-fun rotateMergeSort(arr: Array<Int>, a: Int, b: Int) {
-  val len = b - a
-  var start = a
-  while (start < b) {
-    val end = minOf(start + 32, b)
-    for (i in start + 1 until end) {
-      val value = arr[i]
-      var cursor = i
-      while (cursor > start && arr[cursor - 1] > value) {
-        arr[cursor] = arr[cursor - 1]
-        cursor--
+  private fun bufferedMerge(start: Int, middle: Int, end: Int) {
+    val leftLength = middle - start; val rightLength = end - middle
+    if (leftLength <= rightLength) {
+      for (i in 0 until leftLength) buffer[i] = values[start + i]
+      var left = 0; var right = middle; var destination = start
+      while (left < leftLength && right < end) {
+        if (values[right] < buffer[left]) values[destination] = values[right++]
+        else values[destination] = buffer[left++]
+        destination++
       }
-      arr[cursor] = value
+      while (left < leftLength) values[destination++] = buffer[left++]
+    } else {
+      for (i in 0 until rightLength) buffer[i] = values[middle + i]
+      var left = middle - 1; var right = rightLength - 1; var destination = end - 1
+      while (left >= start && right >= 0) {
+        if (values[left] > buffer[right]) values[destination] = values[left--]
+        else values[destination] = buffer[right--]
+        destination--
+      }
+      while (right >= 0) values[destination--] = buffer[right--]
     }
-    start += 32
   }
-  var j = 32
-  while (j < len) {
-    var i = a
-    while (i + 2 * j <= b) {
-      rotateMerge(arr, i, i + j, i + 2 * j)
-      i += 2 * j
+  private fun merge(start: Int, middle: Int, end: Int) {
+    if (start >= middle || middle >= end || values[middle - 1] <= values[middle]) return
+    val leftLength = middle - start; val rightLength = end - middle
+    if (minOf(leftLength, rightLength) <= 64) { bufferedMerge(start, middle, end); return }
+    val leftSplit: Int; val rightSplit: Int
+    if (leftLength >= rightLength) {
+      leftSplit = start + leftLength / 2
+      rightSplit = lowerBound(middle, end, values[leftSplit])
+    } else {
+      rightSplit = middle + rightLength / 2
+      leftSplit = upperBound(start, middle, values[rightSplit])
     }
-    if (i + j < b) {
-      rotateMerge(arr, i, i + j, b)
+    rotate(leftSplit, middle, rightSplit)
+    val newMiddle = leftSplit + rightSplit - middle
+    merge(start, leftSplit, newMiddle)
+    merge(newMiddle, rightSplit, end)
+  }
+  private fun insertion(start: Int, end: Int) {
+    for (index in start + 1 until end) {
+      val value = values[index]
+      val destination = upperBound(start, index, value)
+      for (cursor in index downTo destination + 1) values[cursor] = values[cursor - 1]
+      values[destination] = value
     }
-    j *= 2
+  }
+  fun sort() {
+    val count = values.size
+    if (count < 2) return
+    var start = 0
+    while (start < count) { insertion(start, minOf(start + 32, count)); start += 32 }
+    var run = 32
+    while (run < count) {
+      start = 0
+      while (start + run < count) {
+        merge(start, start + run, minOf(start + 2 * run, count))
+        start += 2 * run
+      }
+      run *= 2
+    }
   }
 }
-
+fun sort(values: Array<Int>) { OptimizedRotateMergeExample(values).sort() }
 fun main() {
-  var array = arrayOf<Int>(
-    0, 39, 21, 62, 91, 77, 14, 23,
-    90, 69, 51, 81, 68, 83, 32, 56,
-  )
+  val array = arrayOf(0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56)
   sort(array)
-  println("[%s]".format(array.joinToString(", ")))
+  println("[${array.joinToString(", ")}]")
 }

@@ -1,126 +1,121 @@
-import Foundation
+final class OptimizedRotateMergeExample {
+  var values: [Int]
+  private var buffer = Array(repeating: 0, count: 64)
+  init(_ input: [Int]) { values = input }
 
-func sort(_ array: inout [Int]) {
-    rotateMergeSort(&array, 0, array.count)
-}
-
-func multiSwap(_ array: inout [Int], _ a: Int, _ b: Int, _ len: Int) {
-    for i in 0 ..< len {
-        array.swapAt(a + i, b + i)
+  private func lowerBound(_ start: Int, _ end: Int, _ value: Int) -> Int {
+    var low = start, high = end
+    while low < high {
+      let middle = low + (high - low) / 2
+      if values[middle] < value { low = middle + 1 } else { high = middle }
     }
-}
+    return low
+  }
 
-func rotate(_ array: inout [Int], _ a: Int, _ m: Int, _ b: Int) {
-    var a = a
-    var m = m
-    var b = b
-    var l = m - a
-    var r = b - m
-    while l > 0, r > 0 {
-        if r < l {
-            multiSwap(&array, m - r, m, r)
-            b -= r
-            m -= r
-            l -= r
-        } else {
-            multiSwap(&array, a, m, l)
-            a += l
-            m += l
-            r -= l
-        }
+  private func upperBound(_ start: Int, _ end: Int, _ value: Int) -> Int {
+    var low = start, high = end
+    while low < high {
+      let middle = low + (high - low) / 2
+      if values[middle] <= value { low = middle + 1 } else { high = middle }
     }
-}
+    return low
+  }
 
-func binarySearch(_ array: [Int], _ a: Int, _ b: Int, _ value: Int, _ left: Bool) -> Int {
-    var a = a
-    var b = b
-    while a < b {
-        let mid = a + (b - a) / 2
-        let comp = left ? value <= array[mid] : value < array[mid]
-        if comp {
-            b = mid
-        } else {
-            a = mid + 1
-        }
-    }
-    return a
-}
+  private func reverse(_ start: Int, _ end: Int) {
+    var left = start, right = end - 1
+    while left < right { values.swapAt(left, right); left += 1; right -= 1 }
+  }
 
-func rotateMerge(_ array: inout [Int], _ a: Int, _ m: Int, _ b: Int) {
-    if m - a <= 64, b - m <= 64 {
-        let temp = Array(array[a ..< b])
-        var i = 0
-        var j = m - a
-        for k in a ..< b {
-            if i < m - a, j == b - a || temp[i] <= temp[j] {
-                array[k] = temp[i]
-                i += 1
-            } else {
-                array[k] = temp[j]
-                j += 1
-            }
-        }
-        return
-    }
-    let m1: Int
-    let m3: Int
-    var m2: Int
-    if m - a >= b - m {
-        m1 = a + (m - a) / 2
-        let value = array[m1]
-        m2 = binarySearch(array, m, b, value, true)
-        m3 = m1 + (m2 - m)
+  private func rotate(_ start: Int, _ middle: Int, _ end: Int) {
+    guard start < middle && middle < end else { return }
+    let left = middle - start, right = end - middle
+    if left <= buffer.count {
+      for i in 0..<left { buffer[i] = values[start + i] }
+      for i in middle..<end { values[i - left] = values[i] }
+      for i in 0..<left { values[end - left + i] = buffer[i] }
+    } else if right <= buffer.count {
+      for i in 0..<right { buffer[i] = values[middle + i] }
+      for i in stride(from: middle - 1, through: start, by: -1) { values[i + right] = values[i] }
+      for i in 0..<right { values[start + i] = buffer[i] }
     } else {
-        m2 = m + (b - m) / 2
-        let value = array[m2]
-        m1 = binarySearch(array, a, m, value, false)
-        m3 = m2 - (m - m1)
-        m2 += 1
+      reverse(start, middle)
+      reverse(middle, end)
+      reverse(start, end)
     }
-    rotate(&array, m1, m, m2)
-    if m2 - (m3 + 1) > 0, b - m2 > 0 {
-        rotateMerge(&array, m3 + 1, m2, b)
-    }
-    if m1 - a > 0, m3 - m1 > 0 {
-        rotateMerge(&array, a, m1, m3)
-    }
-}
+  }
 
-func rotateMergeSort(_ array: inout [Int], _ a: Int, _ b: Int) {
-    let len = b - a
-    var start = a
-    while start < b {
-        let end = min(start + 32, b)
-        if start + 1 < end {
-            for i in (start + 1) ..< end {
-                let value = array[i]
-                var cursor = i
-                while cursor > start, array[cursor - 1] > value {
-                    array[cursor] = array[cursor - 1]
-                    cursor -= 1
-                }
-                array[cursor] = value
-            }
-        }
-        start += 32
+  private func bufferedMerge(_ start: Int, _ middle: Int, _ end: Int) {
+    let leftLength = middle - start, rightLength = end - middle
+    if leftLength <= rightLength {
+      for i in 0..<leftLength { buffer[i] = values[start + i] }
+      var left = 0, right = middle, destination = start
+      while left < leftLength && right < end {
+        if values[right] < buffer[left] { values[destination] = values[right]; right += 1 }
+        else { values[destination] = buffer[left]; left += 1 }
+        destination += 1
+      }
+      while left < leftLength { values[destination] = buffer[left]; left += 1; destination += 1 }
+    } else {
+      for i in 0..<rightLength { buffer[i] = values[middle + i] }
+      var left = middle - 1, right = rightLength - 1, destination = end - 1
+      while left >= start && right >= 0 {
+        if values[left] > buffer[right] { values[destination] = values[left]; left -= 1 }
+        else { values[destination] = buffer[right]; right -= 1 }
+        destination -= 1
+      }
+      while right >= 0 { values[destination] = buffer[right]; right -= 1; destination -= 1 }
     }
-    var j = 32
-    while j < len {
-        var i = a
-        while i + 2 * j <= b {
-            rotateMerge(&array, i, i + j, i + 2 * j)
-            i += 2 * j
-        }
-        if i + j < b {
-            rotateMerge(&array, i, i + j, b)
-        }
-        j *= 2
-    }
-}
+  }
 
-var array: [Int] = [
-    0, 39, 21, 62, 91, 77, 14, 23,
-    90, 69, 51, 81, 68, 83, 32, 56,
-]
-sort(&array)
+  private func merge(_ start: Int, _ middle: Int, _ end: Int) {
+    guard start < middle && middle < end && values[middle - 1] > values[middle] else { return }
+    if min(middle - start, end - middle) <= buffer.count {
+      bufferedMerge(start, middle, end)
+      return
+    }
+    let leftSplit: Int, rightSplit: Int
+    if middle - start >= end - middle {
+      leftSplit = start + (middle - start) / 2
+      rightSplit = lowerBound(middle, end, values[leftSplit])
+    } else {
+      rightSplit = middle + (end - middle) / 2
+      leftSplit = upperBound(start, middle, values[rightSplit])
+    }
+    rotate(leftSplit, middle, rightSplit)
+    let newMiddle = leftSplit + rightSplit - middle
+    merge(start, leftSplit, newMiddle)
+    merge(newMiddle, rightSplit, end)
+  }
+
+  private func insertion(_ start: Int, _ end: Int) {
+    guard end - start > 1 else { return }
+    for index in (start + 1)..<end {
+      let value = values[index]
+      let destination = upperBound(start, index, value)
+      var cursor = index
+      while cursor > destination { values[cursor] = values[cursor - 1]; cursor -= 1 }
+      values[destination] = value
+    }
+  }
+
+  func sort() {
+    let count = values.count
+    guard count > 1 else { return }
+    var start = 0
+    while start < count { insertion(start, min(start + 32, count)); start += 32 }
+    var run = 32
+    while run < count {
+      var lower = 0
+      while lower + run < count {
+        merge(lower, lower + run, min(lower + 2 * run, count))
+        lower += 2 * run
+      }
+      run *= 2
+    }
+  }
+}
+var array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56]
+let sorter = OptimizedRotateMergeExample(array)
+sorter.sort()
+array = sorter.values
 print(array)
