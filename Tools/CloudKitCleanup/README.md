@@ -52,8 +52,11 @@ Big-O and 5,479 cap-exceeded entries above current selectable maxima in Developm
 Big-O entries in Production. After explicit approval, all 69 Development cap-exceeded algorithm
 groups were cleared. A fresh complete scan found 819 remaining cap-exceeded records and zero
 above current maxima; a fresh Production Big-O scan found zero records. Development Big-O cleanup
-is partly complete and has encountered `too-many-requests`. Its final full scan is still required.
-Refresh `.user-token` from the Console when CloudKit reports token expiry.
+is partly complete: the first 41 algorithm groups were re-queried empty, representing at least
+74,957 original candidates removed. CloudKit repeatedly returned `too-many-requests`, and
+single-group calls began taking many minutes, so the remaining total has not yet been verified.
+Its final full scan is still required. Refresh `.user-token` from the Console when CloudKit
+reports token expiry.
 
 The approved candidate sets can be resumed with `execute_reviewed_cleanup.py`. It checks the
 frozen cache fingerprint, compares each algorithm's current matching record names to the

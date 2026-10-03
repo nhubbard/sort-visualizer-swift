@@ -15,6 +15,19 @@ figures below are the original dry-run counts, not current remaining counts.
 
 **Total Development candidates:** 268,179.
 
+## Execution checkpoint (2026-10-02)
+
+After explicit approval, all 5,479 cap-exceeded candidates were removed. A fresh complete
+Development scan found 819 cap-exceeded records remaining and none above current maxima. A
+fresh Production Big-O scan again found no records.
+
+For Development Big-O, the first 41 algorithm groups in sorted ID order, through
+`classictournamentsort`, were re-queried and found empty. Those groups contained 74,957 of
+the original approved candidates. Other groups may have been partly deleted by CloudKit's
+ambiguous `retry-needed` and `too-many-requests` responses; their remaining count has not
+been established by a complete scan. The live pass stopped at this verified boundary after
+individual groups began taking many minutes despite one-worker execution.
+
 Every candidate has a unique CloudKit record name within its record type and a size strictly greater than its cached threshold. The private record names remain in the local ignored caches.
 
 Candidate-set SHA-256 fingerprints are `22b4950bc5741cd56934c729a58274aad3efa82d4a485f03d6ba91d9d2232928` for Development Big-O and `9b8046f938707dc771c6922165ff3555fc8f80b7e7f85c760f6a1b4ec1eb19da` for Development cap-exceeded. Each fingerprint hashes newline-separated compact JSON arrays of `[recordType, recordName, algorithmID, arraySize, threshold]`, sorted by record name. This identifies the exact cached candidate sets without publishing private record names.
