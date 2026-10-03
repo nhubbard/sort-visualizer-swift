@@ -12,7 +12,7 @@ public struct ShuffledOddsShuffle: ShuffleAlgorithm {
     let n = engine.count
     var i = 1
     while i < n {
-      let randomIndex = (Int.random(in: 0..<(n - i)) / 2) * 2 + i
+      let randomIndex = (engine.randomIndex(in: 0..<(n - i)) / 2) * 2 + i
       engine.swap(i, randomIndex)
       i += 2
     }

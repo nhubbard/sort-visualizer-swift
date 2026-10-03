@@ -27,11 +27,13 @@ public enum TapeFactory {
   /// concatenating both into one continuous `Tape` — from `ReplayEngine`'s point of view a
   /// shuffle-then-sort is just one longer tape (see Documentation/docs/architecture/content.md's "Shuffles are tapes too").
   public static func makeTape(
-    algorithm: any SortAlgorithm, shuffle: any ShuffleAlgorithm, size: Int, operationCap: Int
+    algorithm: any SortAlgorithm, shuffle: any ShuffleAlgorithm, size: Int, operationCap: Int,
+    randomSeed: UInt64 = UInt64.random(in: .min ... .max)
   ) throws -> Tape {
     let identity = Array(1...size)
 
-    var shuffleEngine = RecordingEngine(values: identity, operationCap: operationCap)
+    var shuffleEngine = RecordingEngine(
+      values: identity, operationCap: operationCap, randomSeed: randomSeed)
     shuffle.record(into: &shuffleEngine)
     let uniqueValueCount = Set(shuffleEngine.values).count
     // `compare`/`swap`'s auto-retraction (`markPrimarySecondary`) only clears the *previous*
@@ -78,7 +80,7 @@ public enum TapeFactory {
       header: TapeHeader(
         algorithmID: algorithm.id.rawValue,
         initialValues: identity,
-        visualSeed: UInt64.random(in: .min ... .max),
+        visualSeed: randomSeed,
         compareCount: sortSummary.compareCount,
         swapCount: sortSummary.swapCount,
         mainWriteCount: sortSummary.mainWriteCount,

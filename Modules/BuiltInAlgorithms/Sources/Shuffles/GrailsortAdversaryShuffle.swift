@@ -40,7 +40,7 @@ public struct GrailsortAdversaryShuffle: ShuffleAlgorithm {
 
   private func forwardShuffle(_ engine: inout RecordingEngine, _ start: Int, _ end: Int) {
     for i in start..<end {
-      let randomIndex = Int.random(in: i..<end)
+      let randomIndex = engine.randomIndex(in: i..<end)
       engine.swap(i, randomIndex)
     }
   }

@@ -13,7 +13,7 @@ public struct NaiveShuffle: ShuffleAlgorithm {
     let n = engine.count
     guard n > 0 else { return }
     for i in 0..<n {
-      engine.swap(i, Int.random(in: 0..<n))
+      engine.swap(i, engine.randomIndex(in: 0..<n))
     }
   }
 }

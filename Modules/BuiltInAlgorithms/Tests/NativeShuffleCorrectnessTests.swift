@@ -21,15 +21,14 @@ struct NativeShuffleCorrectnessTests {
   /// 1), producing duplicate values and dropping others — a real property of the formula itself,
   /// not an artifact of this app's 1-indexed values.
   private static let permutingShuffles: [any ShuffleAlgorithm] = [
-    AlmostShuffle(), BitReversalShuffle(), BlockRandomShuffle(), BlockReverseShuffle(),
-    BSTTraversalShuffle(), CircleShuffle(),
-    DoubleLayeredShuffle(),
+    AlmostShuffle(), AscendingShuffle(), BitReversalShuffle(), BlockRandomShuffle(), BlockReverseShuffle(),
+    BSTTraversalShuffle(), CircleShuffle(), DescendingShuffle(), DoubleLayeredShuffle(),
     FinalBitonicShuffle(), FinalMergeShuffle(), FinalRadixShuffle(), GrailsortAdversaryShuffle(),
     GrayCodeShuffle(),
     HalfRotationShuffle(), HeapifiedShuffle(), InterlacedShuffle(), InvertedBSTShuffle(),
     MovedElementShuffle(), NaiveShuffle(), NoisyShuffle(), OrganShuffle(),
     PairwiseShuffle(), PartialReverseShuffle(), PartitionedShuffle(), PDQAdversaryShuffle(),
-    QuicksortAdversaryShuffle(),
+    QuicksortAdversaryShuffle(), RandomShuffle(),
     RealFinalMergeShuffle(), RealFinalRadixShuffle(), RecursiveRadixShuffle(),
     RecursiveReversalShuffle(),
     SawtoothShuffle(), ShuffleMergeAdversaryShuffle(), ShuffledHalfShuffle(), ShuffledHeadShuffle(),
@@ -37,6 +36,88 @@ struct NativeShuffleCorrectnessTests {
     ShuffledTailShuffle(), SierpinskiShuffle(),
     TriangularHeapifiedShuffle(), TriangularShuffle()
   ]
+
+  private static let exceptionalShuffleIDs: Set<ShuffleID> = [
+    LogarithmicSlopesShuffle().id, ShuffledCubicShuffle().id, ShuffledQuinticShuffle().id
+  ]
+
+  @Test
+  func everyShuffleHasAnExplicitOutputClassification() {
+    let classified = Set(Self.permutingShuffles.map(\.id)).union(Self.exceptionalShuffleIDs)
+    #expect(classified == Set(Self.shuffles.map(\.id)))
+  }
+
+  @Test
+  func everyShuffleReproducesValuesAndOperationsForASeedAtBoundarySizes() {
+    // The app's smallest selectable algorithm size is 4. Exercise both sides of power-of-two
+    // boundaries and an odd larger size; fixed seeds include zero and the maximum UInt64.
+    for size in [4, 7, 8, 9, 31, 32, 33, 127, 128, 129] {
+      let initial = Array(1...size)
+      for shuffle in Self.shuffles {
+        for seed in [UInt64(0), 0xDEAD_BEEF_1234_5678, .max] {
+          var first = RecordingEngine(values: initial, randomSeed: seed)
+          var second = RecordingEngine(values: initial, randomSeed: seed)
+          shuffle.record(into: &first)
+          shuffle.record(into: &second)
+          #expect(first.values == second.values, "\(shuffle.id.rawValue), size \(size), seed \(seed)")
+          #expect(first.finish().tape == second.finish().tape,
+                  "\(shuffle.id.rawValue) recorded different operations for seed \(seed)")
+          #expect(!first.didExceedCap, "\(shuffle.id.rawValue) exceeded the test tape cap")
+
+          if Self.exceptionalShuffleIDs.contains(shuffle.id) {
+            #expect(first.values.count == size)
+            #expect(first.values.allSatisfy { (1...size).contains($0) })
+          } else {
+            #expect(first.values.sorted() == initial,
+                    "\(shuffle.id.rawValue) lost values at size \(size)")
+          }
+        }
+      }
+    }
+  }
+
+  @Test
+  func randomShuffleUsesTheSuppliedSeed() {
+    let initial = Array(1...128)
+    var first = RecordingEngine(values: initial, randomSeed: 1)
+    var second = RecordingEngine(values: initial, randomSeed: 2)
+    RandomShuffle().record(into: &first)
+    RandomShuffle().record(into: &second)
+    #expect(first.values != second.values)
+  }
+
+  @Test
+  func nonPermutationVariantsMatchTheirDocumentedDistributions() {
+    let expectedCurves: [(Int, [Int], [Int])] = [
+      (4, [2, 3, 4, 4], [2, 3, 4, 4]),
+      (5, [2, 3, 4, 4, 5], [2, 4, 4, 4, 4]),
+      (8, [2, 4, 5, 5, 6, 6, 6, 7], [2, 5, 5, 5, 6, 6, 6, 6])
+    ]
+    for (size, cubicValues, quinticValues) in expectedCurves {
+      for (shuffle, expected) in [
+        (ShuffledCubicShuffle() as any ShuffleAlgorithm, cubicValues),
+        (ShuffledQuinticShuffle() as any ShuffleAlgorithm, quinticValues)
+      ] {
+        var engine = RecordingEngine(values: Array(1...size), randomSeed: 7)
+        shuffle.record(into: &engine)
+        #expect(engine.values.sorted() == expected,
+                "\(shuffle.id.rawValue) changed its curve distribution at size \(size)")
+      }
+    }
+
+    for size in [4, 5, 8, 9, 32, 33, 128, 129] {
+      let initial = Array(1...size)
+      var expected = [1]
+      for index in 1..<size {
+        var power = 1
+        while power <= index / 2 { power *= 2 }
+        expected.append(initial[2 * (index - power) + 1])
+      }
+      var engine = RecordingEngine(values: initial, randomSeed: 7)
+      LogarithmicSlopesShuffle().record(into: &engine)
+      #expect(engine.values == expected)
+    }
+  }
 
   @Test
   func everyShuffleHasAUniqueID() {
@@ -135,8 +216,8 @@ struct NativeShuffleCorrectnessTests {
   @Test
   @MainActor
   func everyShuffleRecordedTapeReplaysItsActualOutput() {
-    // Random shuffles intentionally draw from the system RNG; the recorded tape is the stable
-    // replay artifact. This checks the real recorded outcome, including non-permuting variants.
+    // The recorded tape is the replay artifact. This checks the actual outcome, including
+    // non-permuting variants, independently of re-recording with the same seed.
     for size in [4, 16, 63] {
       let initial = Array(1...size)
       for shuffle in Self.shuffles {

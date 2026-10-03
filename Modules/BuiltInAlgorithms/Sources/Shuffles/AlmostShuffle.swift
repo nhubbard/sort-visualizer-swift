@@ -12,7 +12,7 @@ public struct AlmostShuffle: ShuffleAlgorithm {
     let n = engine.count
     guard n > 0 else { return }
     for _ in 0..<max(n / 20, 1) {
-      engine.swap(Int.random(in: 0..<n), Int.random(in: 0..<n))
+      engine.swap(engine.randomIndex(in: 0..<n), engine.randomIndex(in: 0..<n))
     }
   }
 }

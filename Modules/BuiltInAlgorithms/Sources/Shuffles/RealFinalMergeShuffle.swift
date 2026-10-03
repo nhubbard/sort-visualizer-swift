@@ -18,7 +18,7 @@ public struct RealFinalMergeShuffle: ShuffleAlgorithm {
 
   private func shuffleRange(_ engine: inout RecordingEngine, from start: Int, to end: Int) {
     for i in start..<end {
-      engine.swap(i, Int.random(in: i..<end))
+      engine.swap(i, engine.randomIndex(in: i..<end))
     }
   }
 

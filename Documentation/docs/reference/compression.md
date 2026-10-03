@@ -191,7 +191,7 @@ the `operations` array. Field widths are fixed except where a field is itself va
 |---|---|---|
 | `algorithmID` | `UInt16` length + UTF-8 bytes | The recorded algorithm's raw ID string |
 | `initialValues` | `UInt32` count + that many `Int32` elements | The array's values before the shuffle ran |
-| `visualSeed` | `UInt64` | Raw seed for deterministic per-run color choices |
+| `visualSeed` | `UInt64` | Raw seed for deterministic shuffle decisions and per-run color choices |
 | `compareCount` | `Int32` | ArrayV-parity counter |
 | `swapCount` | `Int32` | ArrayV-parity counter |
 | `mainWriteCount` | `Int32` | ArrayV-parity counter |

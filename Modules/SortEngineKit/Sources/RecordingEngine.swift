@@ -22,6 +22,7 @@ public struct RecordingEngine: Sendable {
   /// Counts every operation even after `operationCap` stops retaining tape entries.
   private var totalOperationCount = 0
   private let operationCap: Int
+  private var randomGenerator: ShuffleRandomGenerator
   /// Set once `tape.count` reaches `operationCap` — from that point on, `compare`/`swap`/etc.
   /// keep doing real work on `values` (so the algorithm still runs to genuine, correct
   /// completion) but stop growing `tape`, capping this run's RAM footprint and guaranteeing
@@ -57,9 +58,13 @@ public struct RecordingEngine: Sendable {
   private var comparisonKeyForTesting: (@Sendable (Int) -> Int)?
   #endif
 
-  public init(values: [Int], operationCap: Int = RecordingEngine.defaultOperationCap) {
+  public init(
+    values: [Int], operationCap: Int = RecordingEngine.defaultOperationCap,
+    randomSeed: UInt64 = UInt64.random(in: .min ... .max)
+  ) {
     self.values = values
     self.operationCap = operationCap
+    randomGenerator = ShuffleRandomGenerator(seed: randomSeed)
     #if DEBUG
     comparisonKeyForTesting = nil
     #endif
@@ -78,6 +83,20 @@ public struct RecordingEngine: Sendable {
   #endif
 
   public var count: Int { values.count }
+
+  /// A reproducible random choice for shuffles. The seed belongs to the recording, so random
+  /// decisions can be regenerated without relying on process-global random state.
+  public mutating func randomIndex(in range: Range<Int>) -> Int {
+    Int.random(in: range, using: &randomGenerator)
+  }
+
+  public mutating func randomIndex(in range: ClosedRange<Int>) -> Int {
+    Int.random(in: range, using: &randomGenerator)
+  }
+
+  public mutating func randomUnitDouble() -> Double {
+    Double.random(in: 0..<1, using: &randomGenerator)
+  }
 
   private mutating func appendOp(_ op: SortOperation) {
     totalOperationCount += 1
