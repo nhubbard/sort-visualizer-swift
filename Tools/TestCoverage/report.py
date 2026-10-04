@@ -34,6 +34,17 @@ def production_target(relative: str) -> str | None:
     return None
 
 
+def valid_coverage_target(relative: str, actual: str) -> bool:
+    expected = production_target(relative)
+    if expected is None:
+        return False
+    if actual == expected or actual.startswith(expected + "."):
+        return True
+    # The hostless component suite compiles the actual extension UI sources into its test
+    # bundle. Count only those two production paths under that exact test target.
+    return expected == "AUv3Extension" and actual == "AUv3ExtensionComponentTests.xctest"
+
+
 def source_files() -> dict[str, str]:
     paths = list((ROOT / "App/Sources").rglob("*.swift"))
     paths += list((ROOT / "App/AUv3Extension/Sources").rglob("*.swift"))
@@ -270,9 +281,8 @@ def report(args: argparse.Namespace) -> None:
                 raise RuntimeError(f"coverage source no longer exists: {relative}")
             if absolute not in file_to_target:
                 raise RuntimeError(f"archive file is absent from report target mapping: {relative}")
-            expected = production_target(relative)
             actual = file_to_target[absolute]
-            if not actual.startswith(expected + ".") and actual != expected:
+            if not valid_coverage_target(relative, actual):
                 raise RuntimeError(f"unexpected target for {relative}: {actual}")
             for row in records:
                 if row.get("isExecutable"):

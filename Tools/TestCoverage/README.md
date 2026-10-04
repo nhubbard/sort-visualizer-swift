@@ -49,5 +49,6 @@ conditional code at the same line may compile differently on iOS and Catalyst.
 `unmeasuredSources` lists production Swift files with no coverage records, including a platform
 extension that has not yet been exercised by a host test.
 
-The [2026-10-02 baseline](baselines/2026-10-02/README.md) records a source-verified run and
-the current measurement limits.
+The [2026-10-04 baseline](baselines/2026-10-04/README.md) records the latest source-verified
+measurement and its lane limits. The [2026-10-02 baseline](baselines/2026-10-02/README.md)
+retains the earlier full UI and App Intents run for comparison.
