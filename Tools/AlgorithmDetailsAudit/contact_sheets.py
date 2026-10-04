@@ -29,11 +29,13 @@ def main() -> None:
                         help="review 360-point Growth Model captures instead of full detail pages")
     parser.add_argument("--compact-bigo", action="store_true",
                         help="review 360-point compact Big-O captures instead of full detail pages")
+    parser.add_argument("--narrow", action="store_true",
+                        help="review 360-point full-detail captures instead of 900-point pages")
     parser.add_argument("--additional-export", action="append", type=Path, default=[],
                         help="merge a second result export when corpus shards ran separately")
     args = parser.parse_args()
-    if args.growth and args.compact_bigo:
-        parser.error("--growth and --compact-bigo are mutually exclusive")
+    if sum((args.growth, args.compact_bigo, args.narrow)) > 1:
+        parser.error("--growth, --compact-bigo, and --narrow are mutually exclusive")
     if args.expected_count < 1:
         parser.error("--expected-count must be positive")
     args.output.mkdir(parents=True, exist_ok=True)
@@ -42,14 +44,15 @@ def main() -> None:
 
     by_kind: dict[str, list[tuple[int, Path]]] = defaultdict(list)
     captured: dict[str, dict[int, str]] = defaultdict(dict)
-    records: list[tuple[int, str, str, Path]] = []
+    records: list[tuple[int, str, str, Path, bool]] = []
     for exported in [args.exported, *args.additional_export]:
         for test in json.loads((exported / "manifest.json").read_text()):
             for attachment in test["attachments"]:
                 name = attachment["suggestedHumanReadableName"]
                 pattern = (r"growth-360-(\d{3})-(.+)_\d+_[A-Fa-f0-9-]+\.png$" if args.growth
                            else r"compact-bigo-360-(\d{3})-(.+)_\d+_[A-Fa-f0-9-]+\.png$"
-                           if args.compact_bigo else r"(\d{3})-(.+)-(top|charts|expanded)_")
+                           if args.compact_bigo else r"narrow-(\d{3})-(.+)-(top|charts|expanded)_"
+                           if args.narrow else r"(\d{3})-(.+)-(top|charts|expanded)_")
                 match = re.match(pattern, name)
                 if not match:
                     continue
@@ -63,7 +66,8 @@ def main() -> None:
                     raise ValueError(f"duplicate {kind} screenshot for page {page}")
                 captured[kind][page] = algorithm_id
                 source = exported / attachment["exportedFileName"]
-                records.append((page, algorithm_id, kind, source))
+                records.append((page, algorithm_id, kind, source,
+                                attachment.get("deviceName") == "My Mac"))
 
     expected_pages = set(range(1, args.expected_count + 1))
     expected_kinds = ({"growth"} if args.growth else {"compact-bigo"}
@@ -81,10 +85,14 @@ def main() -> None:
         if len(set(pages.values())) != args.expected_count:
             raise ValueError(f"{kind}: algorithm IDs are repeated across pages")
 
-    for page, algorithm_id, kind, source in records:
+    for page, algorithm_id, kind, source, is_catalyst in records:
         tile = tiles / f"{page:03d}-{algorithm_id}-{kind}.png"
-        crop = (["-gravity", "north", "-crop", "850x1100+0+0", "+repage"]
-                if args.growth or args.compact_bigo else [])
+        if args.narrow and kind == "expanded" and is_catalyst:
+            crop = ["-gravity", "north", "-crop", "1400x2000+0+0", "+repage"]
+        elif args.growth or args.compact_bigo or (args.narrow and kind != "expanded"):
+            crop = ["-gravity", "north", "-crop", "850x1100+0+0", "+repage"]
+        else:
+            crop = []
         subprocess.run(
             ["magick", str(source), "-auto-orient", *crop, "-resize", "300x430",
              "-background", "white", "-gravity", "center", "-extent", "300x430",

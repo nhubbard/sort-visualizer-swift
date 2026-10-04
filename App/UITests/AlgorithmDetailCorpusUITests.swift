@@ -13,6 +13,15 @@ final class AlgorithmDetailCorpusUITests: XCTestCase {
   func testPages124Through147() { audit(123..<147) }
   func testPages148Through172() { audit(147..<172) }
   func testPages173Through196() { audit(172..<196) }
+  func testNarrowSmoke() { audit(0..<2, width: 360, prefix: "narrow-") }
+  func testNarrowPages001Through025() { audit(0..<25, width: 360, prefix: "narrow-") }
+  func testNarrowPages026Through049() { audit(25..<49, width: 360, prefix: "narrow-") }
+  func testNarrowPages050Through074() { audit(49..<74, width: 360, prefix: "narrow-") }
+  func testNarrowPages075Through098() { audit(74..<98, width: 360, prefix: "narrow-") }
+  func testNarrowPages099Through123() { audit(98..<123, width: 360, prefix: "narrow-") }
+  func testNarrowPages124Through147() { audit(123..<147, width: 360, prefix: "narrow-") }
+  func testNarrowPages148Through172() { audit(147..<172, width: 360, prefix: "narrow-") }
+  func testNarrowPages173Through196() { audit(172..<196, width: 360, prefix: "narrow-") }
 
   func testDenseExpandedChartScrollsAndChangesSeriesState() {
     continueAfterFailure = false
@@ -52,10 +61,18 @@ final class AlgorithmDetailCorpusUITests: XCTestCase {
   }
 
   func testLongFittedEquationCanBeScrolled() {
+    assertLongFittedEquationCanBeScrolled(width: 900)
+  }
+
+  func testLongFittedEquationCanBeScrolledAtNarrowWidth() {
+    assertLongFittedEquationCanBeScrolled(width: 360)
+  }
+
+  private func assertLongFittedEquationCanBeScrolled(width: Int) {
     let app = XCUIApplication()
     app.launchEnvironment = [
       "UI_TEST_DETAIL_AUDIT": "1", "UI_TEST_DETAIL_AUDIT_START": "79",
-      "UI_TEST_DETAIL_AUDIT_WIDTH": "900"
+      "UI_TEST_DETAIL_AUDIT_WIDTH": String(width)
     ]
     app.launch()
     XCTAssertEqual(app.staticTexts["auditAlgorithmID"].label, "introcirclesortrecursive")
@@ -64,13 +81,20 @@ final class AlgorithmDetailCorpusUITests: XCTestCase {
     XCTAssertTrue(description.waitForExistence(timeout: 10), "detail content did not finish loading")
     let equation = app.scrollViews["equationScroll-Fitted (Used by App)"]
     XCTAssertTrue(equation.waitForExistence(timeout: 5))
+    if width == 360 {
+      let detailScroll = app.scrollViews["auditDetailScrollView"]
+      for _ in 0..<20 where !equation.isHittable {
+        detailScroll.swipeUp(velocity: .slow)
+      }
+      XCTAssertTrue(equation.isHittable, "The fitted equation did not enter the narrow viewport")
+    }
     let before = equation.screenshot().pngRepresentation
     equation.swipeLeft(velocity: .slow)
     XCTAssertNotEqual(equation.screenshot().pngRepresentation, before,
                       "The long fitted equation did not reveal its remaining terms")
   }
 
-  private func audit(_ range: Range<Int>) {
+  private func audit(_ range: Range<Int>, width: Int = 900, prefix: String = "") {
     continueAfterFailure = false
     #if !targetEnvironment(macCatalyst)
     XCUIDevice.shared.orientation = .portrait
@@ -79,7 +103,8 @@ final class AlgorithmDetailCorpusUITests: XCTestCase {
     app.launchEnvironment = [
       "UI_TEST_DETAIL_AUDIT": "1",
       "UI_TEST_DETAIL_AUDIT_START": String(range.lowerBound),
-      "UI_TEST_DETAIL_AUDIT_WIDTH": "900"
+      "UI_TEST_DETAIL_AUDIT_WIDTH": String(width),
+      "UI_TEST_EXPANDED_WIDTH": width == 360 ? "360" : ""
     ]
     app.launch()
     let scroll = app.scrollViews["auditDetailScrollView"]
@@ -97,6 +122,15 @@ final class AlgorithmDetailCorpusUITests: XCTestCase {
         let description = app.descendants(matching: .any)
           .matching(identifier: "algorithmDescriptionText").firstMatch
         XCTAssertTrue(description.waitForExistence(timeout: 10), "Missing description for \(algorithmID)")
+        if width == 360 {
+          XCTAssertLessThanOrEqual(description.frame.maxX, scroll.frame.maxX + 1,
+                                   "Description clips the narrow pane for \(algorithmID)")
+          let grid = app.descendants(matching: .any)
+            .matching(identifier: "complexityEquationGrid").firstMatch
+          XCTAssertTrue(grid.exists)
+          XCTAssertLessThanOrEqual(grid.frame.maxX, scroll.frame.maxX + 1,
+                                   "Complexity equations clip the narrow pane for \(algorithmID)")
+        }
         XCTAssertTrue(app.staticTexts["Description"].isHittable,
                       "Detail page did not reset to the top for \(algorithmID)")
         for label in ["Best Case", "Average Complexity", "Worst Case", "Space Complexity", "Implementation Complexity",
@@ -104,7 +138,7 @@ final class AlgorithmDetailCorpusUITests: XCTestCase {
           XCTAssertTrue(app.staticTexts[label].exists, "Missing \(label) for \(algorithmID)")
         }
         let top = XCTAttachment(screenshot: app.screenshot())
-        top.name = "\(String(format: "%03d", offset + 1))-\(algorithmID)-top"
+        top.name = "\(prefix)\(String(format: "%03d", offset + 1))-\(algorithmID)-top"
         top.lifetime = .keepAlways
         activity.add(top)
 
@@ -119,15 +153,23 @@ final class AlgorithmDetailCorpusUITests: XCTestCase {
                       "Populated Big-O chart is missing for \(algorithmID)")
 
         let expandButton = app.buttons["Expand Chart"]
-        // Catalyst's swipe can jump past the button on long descriptions. Move toward its
-        // accessibility frame in measured steps, leaving room around it for a reliable click.
+        // Catalyst's wheel event path can trap with repeated narrow-pane scrolls. Use a drag
+        // there; retain measured wheel steps for the wider layout where they are reliable.
         for _ in 0..<30 {
           if expandButton.isHittable,
              expandButton.frame.minY >= scroll.frame.minY + 24,
              expandButton.frame.maxY <= scroll.frame.maxY - 24 { break }
           #if targetEnvironment(macCatalyst)
-          let delta = expandButton.frame.maxY > scroll.frame.maxY - 24 ? -150.0 : 150.0
-          scroll.scroll(byDeltaX: 0, deltaY: delta)
+          if width == 360 {
+            if expandButton.frame.maxY > scroll.frame.maxY - 24 {
+              scroll.swipeUp(velocity: .slow)
+            } else {
+              scroll.swipeDown(velocity: .slow)
+            }
+          } else {
+            let delta = expandButton.frame.maxY > scroll.frame.maxY - 24 ? -150.0 : 150.0
+            scroll.scroll(byDeltaX: 0, deltaY: delta)
+          }
           #else
           if expandButton.frame.maxY > scroll.frame.maxY - 24 {
             scroll.swipeUp(velocity: .slow)
@@ -140,7 +182,7 @@ final class AlgorithmDetailCorpusUITests: XCTestCase {
         XCTAssertGreaterThanOrEqual(expandButton.frame.minY, scroll.frame.minY + 24)
         XCTAssertLessThanOrEqual(expandButton.frame.maxY, scroll.frame.maxY - 24)
         let bottom = XCTAttachment(screenshot: app.screenshot())
-        bottom.name = "\(String(format: "%03d", offset + 1))-\(algorithmID)-charts"
+        bottom.name = "\(prefix)\(String(format: "%03d", offset + 1))-\(algorithmID)-charts"
         bottom.lifetime = .keepAlways
         activity.add(bottom)
 
@@ -162,7 +204,7 @@ final class AlgorithmDetailCorpusUITests: XCTestCase {
         XCTAssertTrue(app.switches["Show Individual Runs"].exists)
         #endif
         let large = XCTAttachment(screenshot: app.screenshot())
-        large.name = "\(String(format: "%03d", offset + 1))-\(algorithmID)-expanded"
+        large.name = "\(prefix)\(String(format: "%03d", offset + 1))-\(algorithmID)-expanded"
         large.lifetime = .keepAlways
         activity.add(large)
         app.activateControlForUITest(app.buttons["Done"])
