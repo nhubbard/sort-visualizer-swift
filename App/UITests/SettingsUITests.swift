@@ -98,6 +98,49 @@ final class SettingsUITests: XCTestCase {
     waitForExpectations(timeout: 5)
   }
 
+  func testFreshLaunchRecoversMalformedSettingsAndResetPersistsEveryDefault() {
+    let app = XCUIApplication()
+    let expected = "bargraph|30.0|false|10.0|false|false|false|36-72|256|300000|monokai|random"
+    app.launchEnvironment = ["UI_TEST_FRESH_SETTINGS": "1", "UI_TEST_SETTINGS_AUDIT": "1"]
+    app.launch()
+    app.openSettingsForUITest()
+    let audit = app.staticTexts["settingsAuditProbe"]
+    XCTAssertTrue(audit.waitForExistence(timeout: 5))
+    XCTAssertEqual(audit.value as? String, expected)
+
+    let pacing = app.segmentedControls["pacingModePicker"]
+    scrollUntilVisible(pacing, in: app)
+    app.activateControlForUITest(pacing.buttons["Fixed Duration"])
+    let modified = expected.replacingOccurrences(of: "|false|10.0|", with: "|true|10.0|")
+    XCTAssertEqual(audit.value as? String, modified)
+
+    app.terminate()
+    app.launchEnvironment = ["UI_TEST_SETTINGS_AUDIT": "1"]
+    app.launch()
+    app.openSettingsForUITest()
+    XCTAssertEqual(audit.value as? String, modified, "the changed pacing mode should survive relaunch")
+
+    app.terminate()
+    app.launchEnvironment = ["UI_TEST_SETTINGS_AUDIT": "1", "UI_TEST_CORRUPT_SETTINGS": "1"]
+    app.launch()
+    app.openSettingsForUITest()
+    XCTAssertEqual(audit.value as? String, expected, "malformed saved values should recover in a fresh UI")
+    XCTAssertTrue(app.sliders["playbackSpeedSlider"].exists)
+    let size = defaultSizeControl(in: app)
+    scrollUntilVisible(size, in: app)
+    XCTAssertTrue(size.label.hasSuffix(": 256"))
+
+    let reset = app.buttons["resetSettingsButton"]
+    scrollUntilVisible(reset, in: app)
+    app.activateControlForUITest(reset)
+    app.activateControlForUITest(resetConfirmationButton(in: app))
+    app.terminate()
+    app.launchEnvironment = ["UI_TEST_SETTINGS_AUDIT": "1"]
+    app.launch()
+    app.openSettingsForUITest()
+    XCTAssertEqual(audit.value as? String, expected, "reset should persist every default field")
+  }
+
   /// Mirrors `DefaultPlaybackSpeedUITests`' own helper — the Settings `Form` doesn't put
   /// off-screen rows in the accessibility tree until scrolled into view.
   private func scrollUntilVisible(_ element: XCUIElement, in app: XCUIApplication) {

@@ -12,6 +12,29 @@ import VisualizationKit
 @MainActor
 struct Sort2App: App {
   init() {
+    #if DEBUG
+      let environment = ProcessInfo.processInfo.environment
+      let preferences = UserDefaults.standard
+      if environment["UI_TEST_FRESH_SETTINGS"] == "1",
+        let domain = Bundle.main.bundleIdentifier {
+        preferences.removePersistentDomain(forName: domain)
+      }
+      if environment["UI_TEST_CORRUPT_SETTINGS"] == "1" {
+        preferences.set("missing-visualizer", forKey: "selectedVisualizerID")
+        preferences.set(Double.nan, forKey: "playbackSpeed")
+        preferences.set(false, forKey: "useFixedDurationPacing")
+        preferences.set(-4.0, forKey: "targetPlaybackDuration")
+        preferences.set(false, forKey: "compactPlaybackForFixedDuration")
+        preferences.set(false, forKey: "soundEnabled")
+        preferences.set(false, forKey: "audioUnitBridgeEnabled")
+        preferences.set(96, forKey: "synthLowNote")
+        preferences.set(24, forKey: "synthHighNote")
+        preferences.set(-1, forKey: "defaultArraySize")
+        preferences.set(0, forKey: "recordingOperationCap")
+        preferences.set("missing-theme", forKey: "codeTheme")
+        preferences.set("missing-shuffle", forKey: "defaultShuffleID")
+      }
+    #endif
     // Composition root (§4.1): AppSettings.shared and registries are wired once, here, rather
     // than re-declared per view. Full data-driven navigation off AlgorithmRegistry is Phase 9
     // — this phase's debug entry point just looks algorithms/shuffles up by id.

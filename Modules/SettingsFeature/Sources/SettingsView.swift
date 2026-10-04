@@ -14,6 +14,21 @@ public struct SettingsView: View {
   public var body: some View {
     @Bindable var settings = settings
     Form {
+      #if DEBUG
+        if ProcessInfo.processInfo.environment["UI_TEST_SETTINGS_AUDIT"] == "1" {
+          Text("Settings audit probe")
+            .accessibilityIdentifier("settingsAuditProbe")
+            .accessibilityValue(
+              "\(settings.selectedVisualizerID.rawValue)|\(settings.playbackSpeed)|"
+                + "\(settings.useFixedDurationPacing)|\(settings.targetPlaybackDuration)|"
+                + "\(settings.compactPlaybackForFixedDuration)|\(settings.soundEnabled)|"
+                + "\(settings.audioUnitBridgeEnabled)|"
+                + "\(settings.synthNoteRange.lowerBound)-\(settings.synthNoteRange.upperBound)|"
+                + "\(settings.defaultArraySize)|\(settings.recordingOperationCap)|"
+                + "\(settings.codeTheme.rawValue)|\(settings.defaultShuffleID.rawValue)"
+            )
+        }
+      #endif
       Section("Sorting") {
         Picker("Visualizer", selection: $settings.selectedVisualizerID) {
           ForEach(VisualizerRegistry.shared.visualizers, id: \.id) { visualizer in

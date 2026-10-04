@@ -130,8 +130,10 @@ public final class AppSettings {
     let storedVisualizer = VisualizerID(
       rawValue: store.string(forKey: Keys.selectedVisualizerID) ?? "bargraph")
     let visualizers = VisualizerRegistry.shared.visualizers
+    let defaultVisualizer = VisualizerID(rawValue: "bargraph")
     selectedVisualizerID = visualizers.isEmpty || visualizers.contains(where: { $0.id == storedVisualizer })
-      ? storedVisualizer : (visualizers.first?.id ?? VisualizerID(rawValue: "bargraph"))
+      ? storedVisualizer : (visualizers.first(where: { $0.id == defaultVisualizer })?.id
+        ?? visualizers.first?.id ?? defaultVisualizer)
     let storedSpeed = store.double(forKey: Keys.playbackSpeed)
     playbackSpeed = storedSpeed.isFinite && storedSpeed > 0 ? storedSpeed : 30.0
     useFixedDurationPacing = store.bool(forKey: Keys.useFixedDurationPacing)
@@ -153,8 +155,10 @@ public final class AppSettings {
     let storedShuffleID = store.string(forKey: Keys.defaultShuffleID) ?? "random"
     let storedShuffle = ShuffleID(rawValue: storedShuffleID == "naive" ? "random" : storedShuffleID)
     let shuffles = ShuffleRegistry.shared.shuffles
+    let defaultShuffle = ShuffleID(rawValue: "random")
     defaultShuffleID = shuffles.isEmpty || shuffles.contains(where: { $0.id == storedShuffle })
-      ? storedShuffle : (shuffles.first?.id ?? ShuffleID(rawValue: "random"))
+      ? storedShuffle : (shuffles.first(where: { $0.id == defaultShuffle })?.id
+        ?? shuffles.first?.id ?? defaultShuffle)
     if storedShuffleID == "naive" {
       store.set(defaultShuffleID.rawValue, forKey: Keys.defaultShuffleID)
     }
