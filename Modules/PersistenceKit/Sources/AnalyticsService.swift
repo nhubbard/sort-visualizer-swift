@@ -95,6 +95,26 @@ public actor AnalyticsService {
   }
 
   #if DEBUG
+  /// Two-device HIS-02 canary. The marker is a synthetic algorithm ID, so its record cannot
+  /// appear in a real algorithm chart. Read directly from SwiftData on every poll: the normal
+  /// chart cache deliberately avoids repeated fetches during Full Sweep.
+  public func syncCanaryCountForUITesting(marker: String) throws -> Int {
+    guard marker.hasPrefix("his02-canary-") else { return 0 }
+    let descriptor = FetchDescriptor<BigORecord>(
+      predicate: #Predicate { $0.algorithmID == marker })
+    // A new context avoids a long-lived query snapshot masking background CloudKit imports.
+    return try ModelContext(modelContext.container).fetchCount(descriptor)
+  }
+
+  public func deleteSyncCanaryForUITesting(marker: String) throws {
+    guard marker.hasPrefix("his02-canary-") else { return }
+    let descriptor = FetchDescriptor<BigORecord>(
+      predicate: #Predicate { $0.algorithmID == marker })
+    for record in try modelContext.fetch(descriptor) { modelContext.delete(record) }
+    try modelContext.save()
+    summariesCache[marker] = nil
+  }
+
   /// UI-test probe for the actual saved store, including after an app relaunch.
   public func capExceededAuditForUITesting(
     algorithmID: String, operationCap: Int

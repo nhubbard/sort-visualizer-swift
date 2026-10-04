@@ -247,6 +247,38 @@ struct AnalyticsServiceTests {
   }
 
   @Test
+  func localFallbackRetainsHistoryAcrossContainerRecreation() async throws {
+    let schema = Schema([BigORecord.self, RecordingCapExceededRecord.self])
+    let directory = FileManager.default.temporaryDirectory
+      .appendingPathComponent("sort-symphony-fallback-\(UUID().uuidString)")
+    try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+    defer { try? FileManager.default.removeItem(at: directory) }
+    let storeURL = directory.appendingPathComponent("history.sqlite")
+    let brokenPrimary = ModelConfiguration(
+      schema: schema,
+      url: URL(fileURLWithPath: "/nonexistent-\(UUID().uuidString)/db.sqlite"))
+    let localFallback = ModelConfiguration(
+      schema: schema, url: storeURL, cloudKitDatabase: .none)
+    let container = AnalyticsService.makeContainer(
+      schema: schema, primary: brokenPrimary, fallback: localFallback)
+    let service = AnalyticsService(modelContainer: container)
+    let recordedAt = Date(timeIntervalSince1970: 2_000)
+    try await service.record(
+      TapeHeader(
+        algorithmID: "quicksort", initialValues: [3, 1, 2], visualSeed: 0,
+        compareCount: 2, swapCount: 1, recordingDuration: 0.01, recordedAt: recordedAt),
+      algorithmID: AlgorithmID(rawValue: "quicksort"))
+
+    let reopened = try ModelContainer(for: schema, configurations: [localFallback])
+    let reopenedService = AnalyticsService(modelContainer: reopened)
+    let rows = try await reopenedService.fetchSummaries(
+      algorithmID: AlgorithmID(rawValue: "quicksort"))
+    #expect(rows.count == 1)
+    #expect(rows.first?.recordedAt == recordedAt)
+    #expect(rows.first?.arraySize == 3)
+  }
+
+  @Test
   func recordCapExceededAccumulatesRatherThanOverwriting() async throws {
     let service = try makeInMemoryService()
 

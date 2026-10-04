@@ -480,6 +480,10 @@ struct ContentView: View {
     .safeAreaInset(edge: .top) {
       VStack(spacing: 0) {
         #if DEBUG
+          if let marker = ProcessInfo.processInfo.environment["UI_TEST_CLOUDKIT_CANARY_ID"],
+            marker.hasPrefix("his02-canary-") {
+            CloudKitCanaryControls(marker: marker)
+          }
           if ProcessInfo.processInfo.environment["UI_TEST_AUTOMATION_AUDIT"] == "1" {
             Text("Showcase audit probe")
               .font(.caption2)
