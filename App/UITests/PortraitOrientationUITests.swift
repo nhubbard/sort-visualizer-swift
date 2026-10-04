@@ -67,6 +67,12 @@ final class PortraitOrientationUITests: XCTestCase {
     XCTAssertTrue(
       descriptionHeading.exists,
       "AlgorithmDetailSection's Description heading never became reachable in portrait")
+    let description = app.descendants(matching: .any)
+      .matching(identifier: "algorithmDescriptionText").firstMatch
+    XCTAssertTrue(description.waitForExistence(timeout: 10),
+                  "The selected algorithm's description did not load in portrait")
+    XCTAssertGreaterThan(description.label.count, 80,
+                         "Portrait detail shows a heading without substantive description content")
 
     app.terminate()
     app.launchEnvironment = ["UI_TEST_ARRAY_SIZE": "256", "UI_TEST_PLAYBACK_SPEED": "30"]

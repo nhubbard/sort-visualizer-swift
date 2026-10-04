@@ -215,6 +215,18 @@ struct ContentView: View {
     // Lets UI tests target this specific list once there are two on screen (the category
     // sidebar is the other) — see `App/UITests/SidebarNavigation.swift`.
     .accessibilityIdentifier("algorithmContentList")
+    .overlay {
+      if contentAlgorithms.isEmpty {
+        ContentUnavailableView(
+          searchText.isEmpty ? "No Algorithms Available" : "No Matching Algorithms",
+          systemImage: "magnifyingglass",
+          description: Text(searchText.isEmpty
+            ? "Choose another category."
+            : "Try another name or category.")
+        )
+        .accessibilityIdentifier("algorithmEmptyState")
+      }
+    }
     .searchable(text: $searchText, prompt: "Search Algorithms")
     .disabled(showcaseIndex != nil || sweepDriver.isRunning)
     .navigationTitle(contentTitle)
