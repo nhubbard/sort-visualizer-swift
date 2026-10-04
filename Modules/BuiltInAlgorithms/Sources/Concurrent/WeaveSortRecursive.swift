@@ -16,9 +16,8 @@ import SortEngineKit
 /// `n log^2 n` converges to a near-constant ~0.27–0.31 across sizes 16 through 2048, identical at
 /// every tested size to `WeaveSortIterative`'s and `CreaseSort`'s own measured counts, confirming
 /// this recursive form produces the exact same network as its iterative sibling despite the very
-/// different code shape). Every comparator only ever swaps on strict `>`, and fuzzing across
-/// randomized duplicate-heavy trials found no case where two equal elements crossed paths,
-/// confirming this network is stable.
+/// different code shape). Comparators swap only on strict `>`, but identity-tracking duplicate
+/// trials show that equal elements can cross indirectly, making the network unstable.
 public struct WeaveSortRecursive: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "weavesortrecursive")
   public let metadata = AlgorithmMetadata(
@@ -31,7 +30,7 @@ public struct WeaveSortRecursive: SortAlgorithm {
     detectedGrowthModel: DetectedGrowthModel(
       family: .powerLog, coefficients: [6.88479, 1.22193], rSquared: 0.9991),
     implementationComplexity: 12,
-    stable: true,
+    stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n log^2 n)", average: "O(n log^2 n)", worst: "O(n log^2 n)"),
     spaceComplexity: "O(log n)",

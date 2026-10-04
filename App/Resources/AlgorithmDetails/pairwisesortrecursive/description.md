@@ -17,6 +17,5 @@ Like other fixed comparator networks, this one's total comparator count depends 
 of the input, so its best-case, average-case, and worst-case running times are identical, landing
 at O(n log²n). Measurements across a wide range of array sizes show the same comparator total as
 the Pairwise Merge Sort variants, despite their different constructions. Every comparator
-only ever swaps on a strict "greater than" test, and this particular construction never lets two
-equal elements cross paths without an intervening comparison establishing their order. Unlike
-iterative Pairwise Sort, this variant is stable.
+only ever swaps on a strict "greater than" test, but nonadjacent exchanges can reverse the
+relative order of equal elements. This recursive variant is unstable.
