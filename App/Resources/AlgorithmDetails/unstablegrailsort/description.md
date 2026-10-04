@@ -1,4 +1,4 @@
-Grail Sort, devised by Andrey Astrelin, is an in-place merge sort that achieves O(n log n) worst-case
+Unstable Grail Sort is a variant of Andrey Astrelin's in-place merge sort that achieves O(n log n) worst-case
 time while using only O(1) extra memory, no matter how large the input gets. It gets there with a
 "block merge" technique: the array is first chopped up and locally sorted into small fixed-size
 blocks, those blocks are rearranged by repeatedly swapping small chunks of the array into place

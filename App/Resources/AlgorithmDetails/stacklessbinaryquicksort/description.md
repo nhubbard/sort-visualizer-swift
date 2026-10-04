@@ -1,4 +1,4 @@
-Binary quicksort is a variant of quicksort that partitions elements according to the bits of their
+Stackless Binary Quick Sort is a variant of quicksort that partitions elements according to the bits of their
 keys rather than by comparing them against a chosen pivot value. Starting from the most significant
 bit that any key in the array needs, every element is routed to one side of a partition or
 the other depending on whether that bit is clear or set, elements with the bit clear move to the

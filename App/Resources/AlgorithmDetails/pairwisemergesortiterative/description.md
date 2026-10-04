@@ -1,4 +1,4 @@
-Pairwise Merge Sort is a [sorting network](https://en.wikipedia.org/wiki/Sorting_network), a
+Iterative Pairwise Merge Sort is a [sorting network](https://en.wikipedia.org/wiki/Sorting_network), a
 comparator-based sort whose sequence of compare-and-swap operations is fixed in advance and never
 depends on the data being sorted, only on how many elements there are. It has no dedicated
 Wikipedia article of its own under this exact name; it belongs to the same broad family as

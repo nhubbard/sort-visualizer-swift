@@ -1,5 +1,5 @@
-Shell Sort is an in-place comparison sort named after its
-inventor, [Donald Shell](https://en.wikipedia.org/wiki/Donald_Shell), who published it in 1959. It is a generalization
+Recursive Shell Sort is a recursive form of the in-place comparison sort named after
+[Donald Shell](https://en.wikipedia.org/wiki/Donald_Shell), who published it in 1959. It is a generalization
 of [Insertion Sort](https://en.wikipedia.org/wiki/Insertion_sort) that allows the exchange of items that are far apart.
 The idea is to arrange the list of elements so that, starting anywhere, taking every h'th element produces a sorted
 sublist, a technique that lets far-flung out-of-place elements travel toward their final position in large jumps rather

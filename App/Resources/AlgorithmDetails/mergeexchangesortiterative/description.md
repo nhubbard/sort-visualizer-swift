@@ -1,5 +1,5 @@
-Batcher's Merge-Exchange Sort, also called Batcher's odd-even mergesort, is
-a [sorting network](https://en.wikipedia.org/wiki/Sorting_network): a fixed sequence of compare-and-swap operations
+Iterative Merge-Exchange Sort is a loop-based form of Batcher's odd-even mergesort. It is a
+[sorting network](https://en.wikipedia.org/wiki/Sorting_network): a fixed sequence of compare-and-swap operations
 between predetermined pairs of positions, applied in the same order regardless of the values being sorted. It was
 introduced by Ken Batcher in 1968, alongside the related bitonic mergesort network, and was one of the first known
 sorting methods to achieve O(n log² n) comparisons using only a data-independent wiring of comparators, which made it

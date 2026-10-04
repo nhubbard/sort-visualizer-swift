@@ -1,4 +1,4 @@
-Weave Sort is a [sorting network](https://en.wikipedia.org/wiki/Sorting_network), a comparator-based
+Iterative Weave Sort is a [sorting network](https://en.wikipedia.org/wiki/Sorting_network), a comparator-based
 sort whose sequence of compare-and-swap operations is fixed in advance and never depends on the data
 being sorted, only on how many elements there are. It has no dedicated Wikipedia article of its own;
 it originates as a community-contributed sorting-visualizer network rather than a textbook

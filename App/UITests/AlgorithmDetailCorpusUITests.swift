@@ -23,6 +23,47 @@ final class AlgorithmDetailCorpusUITests: XCTestCase {
   func testNarrowPages148Through172() { audit(147..<172, width: 360, prefix: "narrow-") }
   func testNarrowPages173Through196() { audit(172..<196, width: 360, prefix: "narrow-") }
 
+  func testLongestDescriptionsReachTheirEndingAtNarrowWidth() {
+    continueAfterFailure = false
+    let fixtures: [(index: Int, id: String, ending: String)] = [
+      (79, "introcirclesortrecursive", "using no auxiliary array of its own."),
+      (91, "laziestsort", "Most merge sort variants trade rotations for a full-sized scratch buffer."),
+      (169, "stacklessrotatemergesort", "so is the sort as a whole.")
+    ]
+    for fixture in fixtures {
+      let app = XCUIApplication()
+      app.launchEnvironment = [
+        "UI_TEST_DETAIL_AUDIT": "1",
+        "UI_TEST_DETAIL_AUDIT_START": String(fixture.index),
+        "UI_TEST_DETAIL_AUDIT_WIDTH": "360"
+      ]
+      app.launch()
+      XCTAssertEqual(app.staticTexts["auditAlgorithmID"].label, fixture.id)
+      let description = app.descendants(matching: .any)
+        .matching(identifier: "algorithmDescriptionText").firstMatch
+      XCTAssertTrue(description.waitForExistence(timeout: 10))
+      let scroll = app.scrollViews["auditDetailScrollView"]
+      XCTAssertLessThanOrEqual(description.frame.maxX, scroll.frame.maxX + 1,
+                               "The long prose clips the narrow detail pane")
+      let complexity = app.staticTexts["Complexity"]
+      for _ in 0..<30 where !complexity.isHittable {
+        scroll.swipeUp(velocity: .fast)
+      }
+      XCTAssertTrue(complexity.isHittable,
+                    "Cannot scroll past the complete description for \(fixture.id)")
+      let ending = app.staticTexts.matching(NSPredicate(
+        format: "label CONTAINS %@", fixture.ending
+      )).firstMatch
+      XCTAssertTrue(ending.exists,
+                    "The end of \(fixture.id)'s description is missing from the rendered page")
+      let capture = XCTAttachment(screenshot: app.screenshot())
+      capture.name = "long-description-end-\(fixture.id)"
+      capture.lifetime = .keepAlways
+      add(capture)
+      app.terminate()
+    }
+  }
+
   func testDenseExpandedChartScrollsAndChangesSeriesState() {
     continueAfterFailure = false
     let app = XCUIApplication()
