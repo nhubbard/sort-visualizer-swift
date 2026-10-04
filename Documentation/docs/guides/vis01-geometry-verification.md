@@ -29,5 +29,7 @@ Passing local runs:
 | SortFeature, Catalyst | `/private/tmp/vis01-parity.xcresult` | 32 Metal layout, buffer, and color cases passed |
 
 The Metal device available to both Catalyst and the iPad simulators is the host Mac's Apple M5
-Pro. Simulator model names do not establish another physical GPU family. A run on a second
-physical Metal GPU family is still needed for the cross-family part of this contract.
+Pro. Simulator model names do not establish another physical GPU family. On 2026-10-04, the
+user accepted this hardware coverage as sufficient to close VIS-01 because these renderers do
+not depend on specialized Metal features. A run on another physical family remains useful
+release confidence, but is not evidence claimed by this verification.
