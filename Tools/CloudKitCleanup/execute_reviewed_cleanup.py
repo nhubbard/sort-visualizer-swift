@@ -149,9 +149,12 @@ def main() -> int:
     parser.add_argument("--token-file", required=True, type=Path)
     parser.add_argument("--workers", type=int, default=1)
     parser.add_argument("--algorithm-id", help="run one reviewed algorithm group")
+    parser.add_argument("--start-at", help="resume at this algorithm after verifying earlier groups empty")
     args = parser.parse_args()
     if not 1 <= args.workers <= 2:
         parser.error("workers must be one or two to avoid CloudKit throttling")
+    if args.algorithm_id and args.start_at:
+        parser.error("--algorithm-id and --start-at are mutually exclusive")
     token = args.token_file.read_text().strip()
     if not token:
         parser.error("token file is empty")
@@ -178,6 +181,11 @@ def main() -> int:
         if args.algorithm_id not in groups:
             parser.error("algorithm is not in the approved candidate set")
         groups = {args.algorithm_id: groups[args.algorithm_id]}
+    if args.start_at:
+        if args.start_at not in groups:
+            parser.error("start algorithm is not in the approved candidate set")
+        groups = {algorithm_id: group for algorithm_id, group in groups.items()
+                  if algorithm_id >= args.start_at}
     print(f"Verified frozen {args.record_type} cache: {len(entries)} candidates in {len(groups)} algorithms", flush=True)
     failures: list[str] = []
     deleted = 0
