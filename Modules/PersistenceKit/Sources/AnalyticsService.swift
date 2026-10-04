@@ -13,6 +13,7 @@ import os
 public actor AnalyticsService {
   public static let shared = AnalyticsService()
 
+  private let modelContainer: ModelContainer
   private let modelContext: ModelContext
 
   /// `fetchSummaries(algorithmID:)` results, keyed by `algorithmID.rawValue` — invalidated in
@@ -26,7 +27,9 @@ public actor AnalyticsService {
   /// Tests inject an `isStoredInMemoryOnly: true` container instead of touching CloudKit/disk —
   /// the real app never passes this parameter, so it always gets the CloudKit-backed default.
   public init(modelContainer: ModelContainer? = nil) {
-    self.modelContext = ModelContext(modelContainer ?? Self.makeDefaultContainer())
+    let container = modelContainer ?? Self.makeDefaultContainer()
+    self.modelContainer = container
+    self.modelContext = ModelContext(container)
   }
 
   /// `playbackDuration`/`playbackSpeed` aren't on `TapeHeader` itself: `TapeHeader`/`Tape` are
@@ -95,6 +98,15 @@ public actor AnalyticsService {
   }
 
   #if DEBUG
+  public static func makeLocalFixtureForUITesting() throws -> AnalyticsService {
+    let schema = Schema([BigORecord.self, RecordingCapExceededRecord.self])
+    let storeURL = FileManager.default.temporaryDirectory.appendingPathComponent(
+      "his03-history-\(UUID().uuidString).store")
+    let configuration = ModelConfiguration(schema: schema, url: storeURL, cloudKitDatabase: .none)
+    return AnalyticsService(modelContainer: try ModelContainer(
+      for: schema, configurations: [configuration]))
+  }
+
   /// Two-device HIS-02 canary. The marker is a synthetic algorithm ID, so its record cannot
   /// appear in a real algorithm chart. Read directly from SwiftData on every poll: the normal
   /// chart cache deliberately avoids repeated fetches during Full Sweep.

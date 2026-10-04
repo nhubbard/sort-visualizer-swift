@@ -189,19 +189,48 @@ struct BigOCorrelationDetailView: View {
   private var selectionSummary: some View {
     let visibleSeries = allSeries.filter { !hiddenSeries.contains($0) }
     return VStack(alignment: .leading, spacing: 4) {
-      Text(selectedSize.map { "Array Size \($0)" } ?? "Select a size on the chart to see exact values")
-        .font(.headline)
+      HStack {
+        Text(selectedSize.map { "Array Size \($0)" } ?? "Select a size on the chart to see exact values")
+          .font(.headline)
+          .accessibilityIdentifier("bigOSelectedSize")
+        Spacer()
+        Button {
+          selectRecordedSize(offset: -1)
+        } label: {
+          Image(systemName: "chevron.left")
+        }
+        .accessibilityLabel("Previous Recorded Size")
+        .disabled(selectedSize == observedSizes.first)
+        Button {
+          selectRecordedSize(offset: 1)
+        } label: {
+          Image(systemName: "chevron.right")
+        }
+        .accessibilityLabel("Next Recorded Size")
+        .disabled(selectedSize == observedSizes.last)
+      }
       if selectedSize != nil {
         ForEach(visibleSeries, id: \.self) { series in
           Text(selectionText(for: series) ?? " ")
             .font(.caption)
             .foregroundStyle(.secondary)
+            .accessibilityIdentifier("bigOSelection.\(series)")
         }
       }
     }
     .padding(12)
     .frame(maxWidth: .infinity, alignment: .leading)
     .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 8))
+  }
+
+  private func selectRecordedSize(offset: Int) {
+    guard !observedSizes.isEmpty else { return }
+    let index = selectedSize.flatMap { selected in
+      observedSizes.enumerated().min {
+        abs($0.element - selected) < abs($1.element - selected)
+      }?.offset
+    } ?? (offset > 0 ? -1 : observedSizes.count)
+    selectedSize = observedSizes[min(max(index + offset, 0), observedSizes.count - 1)]
   }
 
   /// The single trend/reference point nearest the selected x-position for one series —

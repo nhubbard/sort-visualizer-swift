@@ -1,6 +1,7 @@
 import AlgorithmKit
 import Charts
 import PersistenceKit
+import SortEngineKit
 import SwiftUI
 
 /// `AnalyticsService`-backed data charted against that same algorithm's own best/average/worst-case
@@ -112,7 +113,7 @@ struct BigOCorrelationChart: View {
     }
     #endif
     do {
-      let summaries = try await AnalyticsService.shared.fetchSummaries(algorithmID: algorithm.id)
+      let summaries = try await loadSummaries()
       guard !Task.isCancelled else { return }
       points = bigOChartPoints(for: summaries, timeComplexity: algorithm.metadata.timeComplexity)
     } catch {
@@ -121,6 +122,33 @@ struct BigOCorrelationChart: View {
       loadError = error.localizedDescription
     }
     isLoading = false
+  }
+
+  private func loadSummaries() async throws -> [BigORecordSnapshot] {
+    #if DEBUG
+    if let scenario = ProcessInfo.processInfo.environment["UI_TEST_HISTORY_SCENARIO"] {
+      if scenario == "error" { throw CocoaError(.fileReadNoSuchFile) }
+      if ["empty", "sparse", "populated"].contains(scenario) {
+        let service = try AnalyticsService.makeLocalFixtureForUITesting()
+        let samples: [(size: Int, comparisons: Int)] = switch scenario {
+        case "sparse": [(16, 16), (16, 24)]
+        case "populated": [(16, 16), (32, 64), (64, 256)]
+        default: []
+        }
+        for sample in samples {
+          try await service.record(
+            TapeHeader(
+              algorithmID: algorithm.id.rawValue,
+              initialValues: Array(repeating: 0, count: sample.size),
+              visualSeed: 0, compareCount: sample.comparisons, swapCount: 0,
+              recordingDuration: 0, recordedAt: Date()),
+            algorithmID: algorithm.id)
+        }
+        return try await service.fetchSummaries(algorithmID: algorithm.id)
+      }
+    }
+    #endif
+    return try await AnalyticsService.shared.fetchSummaries(algorithmID: algorithm.id)
   }
 }
 
