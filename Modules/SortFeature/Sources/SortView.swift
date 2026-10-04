@@ -1,3 +1,4 @@
+import AlgorithmKit
 import PersistenceKit
 import SettingsKit
 import SortEngineKit
@@ -43,6 +44,16 @@ public struct SortView: View {
         statusLabel
       }
       #if DEBUG
+      if ProcessInfo.processInfo.environment["UI_TEST_INT03_SWEEP"] == "1" {
+        Button("Start test size sweep") {
+          let automation = Automation(
+            id: AutomationID(rawValue: "int03-stop-canary"), displayName: "Stop Canary",
+            iconName: "stop", key: "t", modifiers: [], runsPerSize: 1,
+            sizes: { _ in [32, 64] })
+          session.runAutomation(automation)
+        }
+        .accessibilityIdentifier("startINT03SweepButton")
+      }
       if ProcessInfo.processInfo.environment["UI_TEST_AUTOMATION_AUDIT"] == "1" {
         Text("Automation audit probe")
           .font(.caption2)

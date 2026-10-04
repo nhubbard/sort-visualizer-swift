@@ -534,4 +534,50 @@ final class AppIntentsIntegrationTests: XCTestCase {
     _ = try await definitions.intents["SetPlaybackSpeedIntent"]
       .makeIntent(speed: 30.0).run()
   }
+
+  func testSystemStopFinishesOnlyTheActivePassOfAVisibleSizeSweep() async throws {
+    let app = XCUIApplication()
+    app.launchEnvironment = [
+      "UI_TEST_ARRAY_SIZE": "32", "UI_TEST_PLAYBACK_SPEED": "100000",
+      "UI_TEST_INT03_SWEEP": "1", "UI_TEST_AUTOMATION_AUDIT": "1",
+    ]
+    app.launch()
+    app.buttons["algorithmLink.threesmoothcombsortiterative"].tap()
+    let status = app.staticTexts["sortStatusLabel"]
+    XCTAssertTrue(status.waitForExistence(timeout: 10))
+    XCTAssertEqual(status.value as? String, "sorted")
+
+    let audit = app.staticTexts["automationAuditProbe"]
+    XCTAssertTrue(audit.waitForExistence(timeout: 5))
+    func recordedSizes() -> (count: Int, sizes: [String])? {
+      guard let raw = audit.value as? String else { return nil }
+      let fields = raw.components(separatedBy: "|")
+      guard fields.count == 2, let count = Int(fields[0]) else { return nil }
+      return (count, fields[1].isEmpty ? [] : fields[1].components(separatedBy: ","))
+    }
+    let baseline = try XCTUnwrap(recordedSizes()).count
+    let definitions = IntentDefinitions(bundleIdentifier: "com.nhubbard.Sort2.mobile")
+    _ = try await definitions.intents["SetPlaybackSpeedIntent"]
+      .makeIntent(speed: 10.0).run()
+    app.buttons["startINT03SweepButton"].tap()
+    let progress = app.staticTexts["automationProgressLabel"]
+    XCTAssertTrue(progress.waitForExistence(timeout: 5))
+    _ = try await definitions.intents["StopIntent"].makeIntent().run()
+
+    let deadline = Date().addingTimeInterval(60)
+    while Date() < deadline {
+      if !progress.exists, let result = recordedSizes(), result.count >= baseline + 1 {
+        break
+      }
+      try await Task.sleep(for: .milliseconds(200))
+    }
+    XCTAssertFalse(progress.exists, "the system Stop request should end the size sweep")
+    let final = try XCTUnwrap(recordedSizes())
+    XCTAssertEqual(final.count, baseline + 1,
+      "Stop should finish the active pass without starting the next size")
+    XCTAssertEqual(final.sizes.first, "32")
+    XCTAssertEqual(status.value as? String, "sorted")
+    _ = try await definitions.intents["SetPlaybackSpeedIntent"]
+      .makeIntent(speed: 30.0).run()
+  }
 }
