@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Make reviewable contact sheets from detail corpus and narrow Growth Model UI audits.
+"""Make reviewable contact sheets from detail corpus and narrow chart UI audits.
 
 Export first with ``xcrun xcresulttool export attachments --path RESULT.xcresult
 --output-path EXPORTED``. Then run this script with EXPORTED and an output directory.
@@ -27,9 +27,13 @@ def main() -> None:
                         help="number of algorithm pages required in each screenshot state")
     parser.add_argument("--growth", action="store_true",
                         help="review 360-point Growth Model captures instead of full detail pages")
+    parser.add_argument("--compact-bigo", action="store_true",
+                        help="review 360-point compact Big-O captures instead of full detail pages")
     parser.add_argument("--additional-export", action="append", type=Path, default=[],
                         help="merge a second result export when corpus shards ran separately")
     args = parser.parse_args()
+    if args.growth and args.compact_bigo:
+        parser.error("--growth and --compact-bigo are mutually exclusive")
     if args.expected_count < 1:
         parser.error("--expected-count must be positive")
     args.output.mkdir(parents=True, exist_ok=True)
@@ -44,13 +48,14 @@ def main() -> None:
             for attachment in test["attachments"]:
                 name = attachment["suggestedHumanReadableName"]
                 pattern = (r"growth-360-(\d{3})-(.+)_\d+_[A-Fa-f0-9-]+\.png$" if args.growth
-                           else r"(\d{3})-(.+)-(top|charts|expanded)_")
+                           else r"compact-bigo-360-(\d{3})-(.+)_\d+_[A-Fa-f0-9-]+\.png$"
+                           if args.compact_bigo else r"(\d{3})-(.+)-(top|charts|expanded)_")
                 match = re.match(pattern, name)
                 if not match:
                     continue
-                if args.growth:
+                if args.growth or args.compact_bigo:
                     number, algorithm_id = match.groups()
-                    kind = "growth"
+                    kind = "growth" if args.growth else "compact-bigo"
                 else:
                     number, algorithm_id, kind = match.groups()
                 page = int(number)
@@ -61,7 +66,8 @@ def main() -> None:
                 records.append((page, algorithm_id, kind, source))
 
     expected_pages = set(range(1, args.expected_count + 1))
-    expected_kinds = {"growth"} if args.growth else {"top", "charts", "expanded"}
+    expected_kinds = ({"growth"} if args.growth else {"compact-bigo"}
+                      if args.compact_bigo else {"top", "charts", "expanded"})
     if set(captured) != expected_kinds:
         raise ValueError(f"missing screenshot states: {set(captured)}")
     for kind, pages in captured.items():
@@ -70,7 +76,7 @@ def main() -> None:
                 f"{kind}: missing {sorted(expected_pages - set(pages))}; "
                 f"unexpected {sorted(set(pages) - expected_pages)}"
             )
-        if not args.growth and pages != captured["top"]:
+        if not args.growth and not args.compact_bigo and pages != captured["top"]:
             raise ValueError(f"{kind}: algorithm IDs do not match top screenshots")
         if len(set(pages.values())) != args.expected_count:
             raise ValueError(f"{kind}: algorithm IDs are repeated across pages")
@@ -78,7 +84,7 @@ def main() -> None:
     for page, algorithm_id, kind, source in records:
         tile = tiles / f"{page:03d}-{algorithm_id}-{kind}.png"
         crop = (["-gravity", "north", "-crop", "850x1100+0+0", "+repage"]
-                if args.growth else [])
+                if args.growth or args.compact_bigo else [])
         subprocess.run(
             ["magick", str(source), "-auto-orient", *crop, "-resize", "300x430",
              "-background", "white", "-gravity", "center", "-extent", "300x430",

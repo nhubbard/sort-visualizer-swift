@@ -57,6 +57,18 @@ struct BigOCorrelationChart: View {
         let renderedPoints = compactChartPoints(points)
         let sizeDomain = Double(observedSizes[0])...Double(observedSizes[observedSizes.count - 1])
         VStack(alignment: .leading, spacing: 4) {
+          HStack {
+            Spacer()
+            Button {
+              isShowingDetail = true
+            } label: {
+              Image(systemName: "arrow.up.left.and.arrow.down.right")
+                .padding(8)
+                .glassOrMaterialBackground()
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("Expand Chart")
+          }
           Chart {
             ForEach(renderedPoints) { point in
               if point.kind == .observedTrend {
@@ -79,18 +91,6 @@ struct BigOCorrelationChart: View {
           .frame(maxWidth: .infinity, minHeight: 200)
           .accessibilityIdentifier("bigOCorrelationChart")
           RainbowStatLegend()
-        }
-        .overlay(alignment: .topTrailing) {
-          Button {
-            isShowingDetail = true
-          } label: {
-            Image(systemName: "arrow.up.left.and.arrow.down.right")
-              .padding(8)
-              .glassOrMaterialBackground()
-          }
-          .buttonStyle(.plain)
-          .offset(x: 8, y: -8)
-          .accessibilityLabel("Expand Chart")
         }
         .sheet(isPresented: $isShowingDetail) {
           BigOCorrelationDetailView(algorithm: algorithm, points: points)
@@ -151,6 +151,24 @@ struct BigOCorrelationChart: View {
     return try await AnalyticsService.shared.fetchSummaries(algorithmID: algorithm.id)
   }
 }
+
+#if DEBUG
+/// The shipping compact panel in isolation for the all-algorithm, narrow-width UI audit.
+public struct CompactBigOAuditContent: View {
+  private let algorithm: any SortAlgorithm
+
+  public init(algorithm: any SortAlgorithm) {
+    self.algorithm = algorithm
+  }
+
+  public var body: some View {
+    VStack(alignment: .leading, spacing: 8) {
+      Text("Big-O Correlation").font(.title2.bold())
+      BigOCorrelationChart(algorithm: algorithm, refreshRevision: 0)
+    }
+  }
+}
+#endif
 
 #if DEBUG
 /// Dense, deterministic history for the all-algorithm visual audit. It never enters persistence.
@@ -323,6 +341,7 @@ struct RainbowStatLegend: View {
         }
       }
     }
+    .accessibilityIdentifier("bigOCompactLegend")
   }
 }
 
