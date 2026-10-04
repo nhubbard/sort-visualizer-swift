@@ -23,6 +23,7 @@ public struct SortView: View {
   @State private var isVisualizerExpanded = false
   #if DEBUG
   @State private var capAuditProbe = "loading"
+  @State private var automationAuditProbe = "loading"
   #endif
   #if DEBUG && targetEnvironment(macCatalyst) && LOCAL_INSTRUMENTS_TRACING
   @State private var traceHistory = DebugTraceHistory.shared
@@ -42,6 +43,22 @@ public struct SortView: View {
         statusLabel
       }
       #if DEBUG
+      if ProcessInfo.processInfo.environment["UI_TEST_AUTOMATION_AUDIT"] == "1" {
+        Text("Automation audit probe")
+          .font(.caption2)
+          .accessibilityIdentifier("automationAuditProbe")
+          .accessibilityValue(automationAuditProbe)
+          .task(id: session.analyticsRevision) {
+            do {
+              let records = try await AnalyticsService.shared.fetchSummaries(
+                algorithmID: session.algorithm.id)
+              automationAuditProbe = "\(records.count)|"
+                + records.prefix(5).map { String($0.arraySize) }.joined(separator: ",")
+            } catch {
+              automationAuditProbe = "error: \(error)"
+            }
+          }
+      }
       if let cap = ProcessInfo.processInfo.environment["UI_TEST_CAP_LOG_PROBE"].flatMap(Int.init) {
         Text("Cap log probe")
           .font(.caption2)

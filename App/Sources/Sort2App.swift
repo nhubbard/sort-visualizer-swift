@@ -21,6 +21,12 @@ struct Sort2App: App {
       DisparityBarGraphVisualizer(), DisparityCircleVisualizer(), DisparityChordsVisualizer(),
       DisparityDotsVisualizer(), HanoiTowersVisualizer()
     ]
+    #if DEBUG
+      if let raw = ProcessInfo.processInfo.environment["UI_TEST_AUTOMATION_VISUALIZERS"] {
+        let ids = Set(raw.split(separator: ",").map(String.init))
+        VisualizerRegistry.shared.builtIns.removeAll { !ids.contains($0.id.rawValue) }
+      }
+    #endif
     VisualizerRegistry.shared.discover()
 
     // Native Swift is the target for every algorithm and shuffle now — the JavaScriptCore
@@ -72,6 +78,12 @@ struct Sort2App: App {
     if let removedID = ProcessInfo.processInfo.environment["UI_TEST_REMOVED_ALGORITHM_ID"] {
       AlgorithmRegistry.shared.builtIns.removeAll { $0.id.rawValue == removedID }
     }
+    #if DEBUG
+      if let raw = ProcessInfo.processInfo.environment["UI_TEST_AUTOMATION_ALGORITHMS"] {
+        let ids = Set(raw.split(separator: ",").map(String.init))
+        AlgorithmRegistry.shared.builtIns.removeAll { !ids.contains($0.id.rawValue) }
+      }
+    #endif
     AlgorithmRegistry.shared.discover()
 
     ShuffleRegistry.shared.builtIns = [
@@ -86,6 +98,12 @@ struct Sort2App: App {
       ShuffledHeadShuffle(), ShuffledOddsShuffle(), ShuffledQuinticShuffle(), ShuffledTailShuffle(),
       SierpinskiShuffle(), TriangularHeapifiedShuffle(), TriangularShuffle()
     ]
+    #if DEBUG
+      if let raw = ProcessInfo.processInfo.environment["UI_TEST_AUTOMATION_SHUFFLES"] {
+        let ids = Set(raw.split(separator: ",").map(String.init))
+        ShuffleRegistry.shared.builtIns.removeAll { !ids.contains($0.id.rawValue) }
+      }
+    #endif
     ShuffleRegistry.shared.discover()
     if ProcessInfo.processInfo.environment["UI_TEST_DETERMINISTIC_REPLAY"] == "1" {
       AppSettings.shared.defaultShuffleID = ShuffleID(rawValue: "random")
@@ -96,11 +114,15 @@ struct Sort2App: App {
     // `toggleMaxSizeAutomation()` — the shortcut each one triggers is declared right here,
     // next to what it runs, instead of separately in `ScrollingSortView`'s shortcut buttons.
     let isCapSweepUITest = ProcessInfo.processInfo.environment["UI_TEST_CAP_SWEEP"] == "1"
+    let isShortSweepUITest = ProcessInfo.processInfo.environment["UI_TEST_SHORT_SIZE_SWEEP"] == "1"
     AutomationRegistry.shared.builtIns = [
       Automation(
         id: .sizeSweep, displayName: "Size Sweep", iconName: "arrow.up.right",
-        key: "a", modifiers: [.command, .shift], runsPerSize: isCapSweepUITest ? 1 : 3,
+        key: "a", modifiers: [.command, .shift], runsPerSize: isCapSweepUITest || isShortSweepUITest ? 1 : 3,
         sizes: { metadata in
+          if ProcessInfo.processInfo.environment["UI_TEST_SHORT_SIZE_SWEEP"] == "1" {
+            return [32, 64]
+          }
           if ProcessInfo.processInfo.environment["UI_TEST_CAP_SWEEP"] == "1" {
             return [16, 256, 16]
           }

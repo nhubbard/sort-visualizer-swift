@@ -435,7 +435,13 @@ public final class SortSession {
   public func runShowcasePass() async {
     let effectiveSizeRange = algorithm.metadata.effectiveSizeRange(
       operationCap: settings.recordingOperationCap)
-    await runSinglePass(size: effectiveSizeRange.upperBound)
+    #if DEBUG
+      let size = ProcessInfo.processInfo.environment["UI_TEST_SHOWCASE_SIZE"].flatMap(Int.init)
+        ?? effectiveSizeRange.upperBound
+    #else
+      let size = effectiveSizeRange.upperBound
+    #endif
+    await runSinglePass(size: size)
   }
 
   /// Awaits genuine completion (or an early stop via `stopAutomation()`) of a sweep — the

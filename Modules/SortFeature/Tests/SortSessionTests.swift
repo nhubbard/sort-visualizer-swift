@@ -639,6 +639,46 @@ struct SortSessionTests {
   // MARK: - Recording size cap
 
   @Test
+  func stoppingSizeSweepFinishesCurrentPassWithoutStartingNextSize() async throws {
+    let analytics = try makeInMemoryAnalytics()
+    let driver = ManualTickDriver()
+    let session = SortSession(
+      algorithm: FakeAlgorithm(), shuffle: FakeReverseShuffle(),
+      analytics: analytics, settings: makeFastSettings(),
+      replayEngineFactory: { ReplayEngine(tape: $0, displayLinkFactory: { driver }) }
+    )
+    let automation = Automation(
+      id: AutomationID(rawValue: "stop-after-current"), displayName: "Stop Test", iconName: "gearshape",
+      key: "t", modifiers: [], runsPerSize: 1, sizes: { _ in [4, 8] }
+    )
+    session.runAutomation(automation)
+    let startedDeadline = ContinuousClock.now + .seconds(3)
+    while ContinuousClock.now < startedDeadline {
+      if case .replaying = session.phase, session.isAutomating { break }
+      try await Task.sleep(for: .milliseconds(5))
+    }
+    guard case .replaying(let replay) = session.phase else {
+      Issue.record("first size never reached playback")
+      return
+    }
+    #expect(session.arraySize == 4)
+    #expect(replay.stepIndex < replay.totalOperationCount)
+    session.stopAutomation()
+    #expect(session.isAutomating, "Stop waits for the current pass")
+    driver.fireTick(elapsed: 0)
+    let completionDeadline = ContinuousClock.now + .seconds(3)
+    while ContinuousClock.now < completionDeadline, session.isAutomating {
+      driver.fireTick(elapsed: 1)
+      try await Task.sleep(for: .milliseconds(5))
+    }
+    #expect(!session.isAutomating)
+    #expect(session.arraySize == 4)
+    let records = try await analytics.fetchSummaries(algorithmID: FakeAlgorithm().id)
+    #expect(records.count == 1)
+    #expect(records.first?.arraySize == 4)
+  }
+
+  @Test
   func manualStartWithATinyOperationCapEndsInFailedInsteadOfReplaying() async throws {
     let settings = makeFastSettings()
     settings.recordingOperationCap = 5

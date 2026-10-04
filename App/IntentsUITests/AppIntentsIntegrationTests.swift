@@ -205,6 +205,56 @@ final class AppIntentsIntegrationTests: XCTestCase {
       .makeIntent(speed: 30.0).run()
   }
 
+  func testSystemSizeSweepRecordsBothRequestedSizes() async throws {
+    let app = XCUIApplication()
+    app.launchEnvironment = [
+      "UI_TEST_ARRAY_SIZE": "32", "UI_TEST_PLAYBACK_SPEED": "1000",
+      "UI_TEST_DETERMINISTIC_REPLAY": "1", "UI_TEST_SHORT_SIZE_SWEEP": "1",
+      "UI_TEST_AUTOMATION_AUDIT": "1",
+    ]
+    app.launch()
+    app.buttons["algorithmLink.threesmoothcombsortiterative"].tap()
+    let status = app.staticTexts["sortStatusLabel"]
+    XCTAssertEqual(XCTWaiter().wait(for: [XCTNSPredicateExpectation(
+      predicate: NSPredicate(format: "value == %@", "sorted"), object: status
+    )], timeout: 20), .completed)
+    let probe = app.staticTexts["automationAuditProbe"]
+    func audit() -> (count: Int, sizes: String)? {
+      guard let raw = probe.value as? String else { return nil }
+      let fields = raw.components(separatedBy: "|")
+      guard fields.count == 2, let count = Int(fields[0]) else { return nil }
+      return (count, fields[1])
+    }
+    let initialDeadline = Date().addingTimeInterval(20)
+    while audit() == nil && Date() < initialDeadline {
+      try await Task.sleep(for: .milliseconds(200))
+    }
+    let before = try XCTUnwrap(audit()).count
+
+    let definitions = IntentDefinitions(bundleIdentifier: "com.nhubbard.Sort2.mobile")
+    let catalog = try await definitions.intents["FindAlgorithmsIntent"].makeIntent().run()
+    let algorithms = try catalog.value.as([AnyAppEntity].self)
+    let algorithm = try XCTUnwrap(
+      algorithms.first { $0.identifier.instanceIdentifier == "threesmoothcombsortiterative" })
+    let options = try await definitions.intents["FindAutomationsIntent"].makeIntent().run()
+    let automations = try options.value.as([AnyAppEntity].self)
+    let sizeSweep = try XCTUnwrap(
+      automations.first { $0.identifier.instanceIdentifier == "sizeSweep" })
+    _ = try await definitions.intents["RunAutomationIntent"]
+      .makeIntent(algorithm: algorithm, automation: sizeSweep).run()
+
+    let completedDeadline = Date().addingTimeInterval(20)
+    while Date() < completedDeadline {
+      if let result = audit(), result.count == before + 2,
+        result.sizes.hasPrefix("64,32") { break }
+      try await Task.sleep(for: .milliseconds(200))
+    }
+    let completed = try XCTUnwrap(audit())
+    XCTAssertEqual(completed.count, before + 2)
+    XCTAssertTrue(completed.sizes.hasPrefix("64,32"), "completed sizes: \(completed.sizes)")
+    XCTAssertFalse(app.staticTexts["automationProgressLabel"].exists)
+  }
+
   func testSystemSizeSweepPersistsCapSkipAndContinues() async throws {
     let app = XCUIApplication()
     app.launchEnvironment = [
