@@ -14,6 +14,7 @@ struct AlgorithmDetailAuditView: View {
     .flatMap(Double.init)
   private let requestedStart = ProcessInfo.processInfo.environment["UI_TEST_DETAIL_AUDIT_START"]
     .flatMap(Int.init) ?? 0
+  private let growthOnly = ProcessInfo.processInfo.environment["UI_TEST_GROWTH_ONLY"] == "1"
   @State private var index = 0
 
   var body: some View {
@@ -38,9 +39,18 @@ struct AlgorithmDetailAuditView: View {
           geometry.size.width, requestedWidth.map { CGFloat($0) } ?? geometry.size.width
         )
         ScrollView {
-          AlgorithmDetailSection(
-            algorithm: algorithm, availableWidth: width, showImplementations: false
-          )
+          Group {
+            if growthOnly {
+              GrowthModelAuditContent(algorithm: algorithm)
+                // AlgorithmDetailSection applies this inset around its complexity column.
+                // Preserve the shipping chart width inside a narrow detail pane.
+                .padding(.all, 32)
+            } else {
+              AlgorithmDetailSection(
+                algorithm: algorithm, availableWidth: width, showImplementations: false
+              )
+            }
+          }
             .frame(width: width)
         }
         .id(algorithm.id)

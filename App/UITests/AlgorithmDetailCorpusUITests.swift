@@ -174,3 +174,65 @@ final class AlgorithmDetailCorpusUITests: XCTestCase {
     XCTAssertEqual(seen.count, range.count)
   }
 }
+
+/// The regular corpus audit covers wide pages. This renders the same shipping Growth Model
+/// section at an iPad split-window width and retains every full-resolution capture for review.
+@MainActor
+final class GrowthModelNarrowCorpusUITests: XCTestCase {
+  func testPages001Through025() { audit(0..<25) }
+  func testPages026Through049() { audit(25..<49) }
+  func testPages050Through074() { audit(49..<74) }
+  func testPages075Through098() { audit(74..<98) }
+  func testPages099Through123() { audit(98..<123) }
+  func testPages124Through147() { audit(123..<147) }
+  func testPages148Through172() { audit(147..<172) }
+  func testPages173Through196() { audit(172..<196) }
+
+  private func audit(_ range: Range<Int>) {
+    continueAfterFailure = false
+    #if !targetEnvironment(macCatalyst)
+    XCUIDevice.shared.orientation = .portrait
+    #endif
+    let app = XCUIApplication()
+    app.launchEnvironment = [
+      "UI_TEST_DETAIL_AUDIT": "1",
+      "UI_TEST_DETAIL_AUDIT_START": String(range.lowerBound),
+      "UI_TEST_DETAIL_AUDIT_WIDTH": "360",
+      "UI_TEST_GROWTH_ONLY": "1"
+    ]
+    app.launch()
+    let scroll = app.scrollViews["auditDetailScrollView"]
+    XCTAssertTrue(scroll.waitForExistence(timeout: 10))
+
+    var seen = Set<String>()
+    for offset in range {
+      let id = app.staticTexts["auditAlgorithmID"]
+      let position = app.staticTexts["auditIndexLabel"]
+      XCTAssertTrue(id.waitForExistence(timeout: 5))
+      XCTAssertEqual(position.label, "\(offset + 1) of 196")
+      let algorithmID = id.label
+      XCTAssertTrue(seen.insert(algorithmID).inserted, "Duplicate page \(algorithmID)")
+      let growth = app.descendants(matching: .any)
+        .matching(identifier: "growthModelComparisonChart").firstMatch
+      XCTAssertTrue(growth.waitForExistence(timeout: 10), "Missing Growth Model for \(algorithmID)")
+      XCTAssertGreaterThan(growth.frame.width, 200, "Chart is too narrow for \(algorithmID)")
+      XCTAssertLessThanOrEqual(growth.frame.width, 297,
+                               "Chart exceeds its padded 296-point column for \(algorithmID)")
+      XCTAssertGreaterThanOrEqual(growth.frame.minX, scroll.frame.minX - 1)
+      XCTAssertLessThanOrEqual(growth.frame.maxX, scroll.frame.maxX + 1)
+      XCTAssertTrue(app.staticTexts.matching(
+        NSPredicate(format: "label BEGINSWITH %@", "Dotted line: maximum selectable size (")
+      ).firstMatch.exists, "Missing cutoff explanation for \(algorithmID)")
+      XCTContext.runActivity(named: "\(offset + 1) \(algorithmID)") { activity in
+        let capture = XCTAttachment(screenshot: app.screenshot())
+        capture.name = "growth-360-\(String(format: "%03d", offset + 1))-\(algorithmID)"
+        capture.lifetime = .keepAlways
+        activity.add(capture)
+      }
+      if offset < range.upperBound - 1 {
+        app.activateControlForUITest(app.buttons["auditNextButton"])
+      }
+    }
+    XCTAssertEqual(seen.count, range.count)
+  }
+}
