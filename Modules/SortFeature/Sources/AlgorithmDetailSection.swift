@@ -29,6 +29,9 @@ public struct AlgorithmDetailSection: View {
   /// `content`/theme change in `highlightAllSamples`, off the main actor, instead.
   @State private var highlighted: [CodeLanguage: AttributedString] = [:]
   @State private var plainSamples: [CodeLanguage: String] = [:]
+  #if DEBUG
+  @State private var appliedThemeID: CodeThemeID?
+  #endif
 
   /// Below this, `descriptionColumn`/`complexityColumn` stack instead of sitting side by side —
   /// comfortably under a landscape detail pane's width, comfortably over a narrow portrait one's.
@@ -46,6 +49,14 @@ public struct AlgorithmDetailSection: View {
 
   public var body: some View {
     VStack(alignment: .leading, spacing: 24) {
+      #if DEBUG
+        if ProcessInfo.processInfo.environment["UI_TEST_ACTIVE_SETTINGS_AUDIT"] == "1" {
+          Text("Code theme applied probe")
+            .font(.caption2)
+            .accessibilityIdentifier("codeThemeAppliedProbe")
+            .accessibilityValue("\(appliedThemeID?.rawValue ?? "loading")|\(highlighted.count)")
+        }
+      #endif
       if availableWidth < Self.stackedLayoutThreshold {
         VStack(alignment: .leading, spacing: 24) {
           descriptionColumn
@@ -112,6 +123,9 @@ public struct AlgorithmDetailSection: View {
       content = nil
       highlighted = [:]
       plainSamples = [:]
+      #if DEBUG
+        appliedThemeID = nil
+      #endif
       content = await AlgorithmDetailContent.load(for: algorithm.id.rawValue)
       if let firstLanguage = content?.codeSamples.first?.language {
         selectedLanguage = firstLanguage
@@ -148,6 +162,9 @@ public struct AlgorithmDetailSection: View {
     }
     highlighted = styled
     plainSamples = styled.mapValues { String($0.characters) }
+    #if DEBUG
+      appliedThemeID = themeID
+    #endif
   }
 
   private var descriptionColumn: some View {

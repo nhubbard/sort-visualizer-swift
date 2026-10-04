@@ -169,6 +169,20 @@ struct Sort2App: App {
     ]
     AutomationRegistry.shared.discover()
 
+    #if DEBUG
+      if ProcessInfo.processInfo.environment["UI_TEST_SET02_PRESET"] == "1" {
+        let settings = AppSettings.shared
+        settings.selectedVisualizerID = VisualizerID(rawValue: "rainbow")
+        settings.playbackSpeed = 195
+        settings.useFixedDurationPacing = true
+        settings.targetPlaybackDuration = 1
+        settings.soundEnabled = true
+        settings.defaultArraySize = 32
+        settings.defaultShuffleID = ShuffleID(rawValue: "descending")
+        settings.codeTheme = CodeThemeID(rawValue: "dracula")
+      }
+    #endif
+
     // UI-test-only override (never set by a real launch): AppSettings.defaultArraySize's real
     // default (256) is deliberately large, and a quadratic/factorial algorithm at that size can
     // take minutes to visually finish — correct, pedagogically-honest behavior in the running

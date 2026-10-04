@@ -59,6 +59,17 @@ public struct SortView: View {
             }
           }
       }
+      if ProcessInfo.processInfo.environment["UI_TEST_ACTIVE_SETTINGS_AUDIT"] == "1",
+        let replay = session.lastReplay {
+        Text("Active settings probe")
+          .font(.caption2)
+          .accessibilityIdentifier("activeSettingsProbe")
+          .accessibilityValue(
+            "\(session.soundEnabled)|\(session.arraySize)|\(replay.speed)|"
+              + "\(replay.useFixedDurationPacing)|\(replay.targetDuration)|"
+              + "\(replay.header.shuffleID ?? "")|\(settings.selectedVisualizerID.rawValue)"
+          )
+      }
       if let cap = ProcessInfo.processInfo.environment["UI_TEST_CAP_LOG_PROBE"].flatMap(Int.init) {
         Text("Cap log probe")
           .font(.caption2)
