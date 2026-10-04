@@ -79,9 +79,9 @@ func resolveShapeGeometry(
 
   case .scatterPlot:
     let columnWidth = viewportSize.x / arrayCount
-    let dotDiameter = Float(6) * scale
+    let dotDiameter = min(Float(6) * scale, viewportSize.x, viewportSize.y)
     let radius = dotDiameter / 2
-    let centerX = index * columnWidth + columnWidth / 2
+    let centerX = min(max(index * columnWidth + columnWidth / 2, radius), viewportSize.x - radius)
     let centerY = radius + (viewportSize.y - 2 * radius) * (1 - normalized)
     return (
       SIMD2(centerX - radius, centerY - radius), SIMD2(dotDiameter, dotDiameter)
@@ -89,11 +89,11 @@ func resolveShapeGeometry(
 
   case .waveDots:
     let columnWidth = viewportSize.x / arrayCount
-    let dotDiameter = Float(6) * scale
+    let dotDiameter = min(Float(6) * scale, viewportSize.x, viewportSize.y)
     let radius = dotDiameter / 2
     let verticalCenter = viewportSize.y / 2
     let amplitude = viewportSize.y / 2 - radius
-    let centerX = index * columnWidth + columnWidth / 2
+    let centerX = min(max(index * columnWidth + columnWidth / 2, radius), viewportSize.x - radius)
     let centerY = verticalCenter + amplitude * sin(2 * .pi * normalized)
     return (
       SIMD2(centerX - radius, centerY - radius), SIMD2(dotDiameter, dotDiameter)
@@ -116,7 +116,8 @@ func resolveShapeGeometry(
     let disp = (1 + cos(.pi * (value - index) / (arrayCount * 0.5))) * 0.5
     let theta: Float = .pi * (2 * index / arrayCount - 0.5)
     let centerPoint = SIMD2(
-      center.x + disp * radius * cos(theta), center.y + disp * radius * sin(theta))
+      center.x + disp * radius * cos(theta), center.y + disp * radius * sin(theta)
+    )
     return (centerPoint - dotRadius, SIMD2(dotDiameter, dotDiameter))
 
   case .hoopStack:
@@ -125,8 +126,8 @@ func resolveShapeGeometry(
     let baseRadiusY = viewportSize.y / 18
     let y: Float =
       arrayCount > 1
-      ? baseRadiusY + (viewportSize.y - 2 * baseRadiusY) * index / (arrayCount - 1)
-      : viewportSize.y / 2
+        ? baseRadiusY + (viewportSize.y - 2 * baseRadiusY) * index / (arrayCount - 1)
+        : viewportSize.y / 2
     let scaleFactor = 0.2 + 0.8 * normalized
     let radiusX = scaleFactor * baseRadiusX
     let radiusY = scaleFactor * baseRadiusY
@@ -166,8 +167,12 @@ func resolveTriangleGeometry(
   let previousIndex = (index - 1 + arrayCount).truncatingRemainder(dividingBy: arrayCount)
   let center = SIMD2(viewportSize.x / 2, viewportSize.y / 2)
 
-  func angle(_ position: Float) -> Float { .pi * (2 * position / arrayCount - 0.5) }
-  func unitVector(_ theta: Float) -> SIMD2<Float> { SIMD2(cos(theta), sin(theta)) }
+  func angle(_ position: Float) -> Float {
+    .pi * (2 * position / arrayCount - 0.5)
+  }
+  func unitVector(_ theta: Float) -> SIMD2<Float> {
+    SIMD2(cos(theta), sin(theta))
+  }
   func normalize(_ v: Float) -> Float {
     valueRangeSpan > 0 ? (v - valueRangeLowerBound) / valueRangeSpan : 1
   }
@@ -193,7 +198,9 @@ func resolveTriangleGeometry(
 
   case .spiral:
     let radius = min(viewportSize.x, viewportSize.y) / 2.5
-    func mult(_ n: Float) -> Float { 1 - (1 - n) * (1 - n) }
+    func mult(_ n: Float) -> Float {
+      1 - (1 - n) * (1 - n)
+    }
     p1 = center + mult(normalize(previousValue)) * radius * unitVector(angle(previousIndex))
     p2 = center + mult(normalize(value)) * radius * unitVector(angle(index))
   }
@@ -212,7 +219,9 @@ func resolveChordGeometry(
 ) -> (start: SIMD2<Float>, end: SIMD2<Float>) {
   let center = SIMD2(viewportSize.x / 2, viewportSize.y / 2)
   let radius = min(viewportSize.x, viewportSize.y) / 2.5
-  func angle(_ position: Float) -> Float { .pi * (2 * position / arrayCount - 0.5) }
+  func angle(_ position: Float) -> Float {
+    .pi * (2 * position / arrayCount - 0.5)
+  }
   let fromAngle = angle(Float(index))
   let toAngle = angle(value)
   let start = center + radius * SIMD2(cos(fromAngle), sin(fromAngle))

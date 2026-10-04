@@ -1,11 +1,10 @@
 import CryptoKit
 import Foundation
 import Metal
-import Testing
-import VisualizationKit
-
 @testable import SortEngineKit
 @testable import SortFeature
+import Testing
+import VisualizationKit
 
 /// Loads `Fixtures/MetalRendererGeometryBaseline.json` via a `#filePath`-relative walk-up rather
 /// than a Tuist `testResources`/bundle declaration — same technique
@@ -15,7 +14,7 @@ import VisualizationKit
 private enum GeometryBaselineFixture {
   static var url: URL {
     URL(fileURLWithPath: #filePath)
-      .deletingLastPathComponent()  // Tests/
+      .deletingLastPathComponent() // Tests/
       .appendingPathComponent("Fixtures/MetalRendererGeometryBaseline.json")
   }
 
@@ -52,18 +51,17 @@ private enum GeometryBaselineFixture {
 /// is unchanged (a real geometry bug would change it) and every OTHER visualizer's hash is ALSO
 /// unchanged (confirms the port didn't leak into shared code paths like `AnimatedField.h` or
 /// `MetalAnimationUniforms`).
-@Suite
 struct MetalRendererGeometryBaselineTests {
   private static let width = 400
   private static let height = 300
   private static let scale: CGFloat = 2
   private static let count = 64
-  // A fixed multiplicative permutation of 1...64 (17 is coprime with 64, so this is a genuine
-  // bijection) — exercises every layout's real index/value math across the whole range, unlike
-  // an already-sorted or simply-reversed array, which some layouts special-case away accidentally.
-  private static let values: [Int] = (0..<count).map { ($0 * 17) % count + 1 }
-  // A couple of marked indices exercise `MetalShapeColor.markerKind`'s primary/secondary path
-  // too, not just the unmarked hue-ramp/neutral path every slot would otherwise take.
+  /// A fixed multiplicative permutation of 1...64 (17 is coprime with 64, so this is a genuine
+  /// bijection) — exercises every layout's real index/value math across the whole range, unlike
+  /// an already-sorted or simply-reversed array, which some layouts special-case away accidentally.
+  private static let values: [Int] = (0 ..< count).map { ($0 * 17) % count + 1 }
+  /// A couple of marked indices exercise `MetalShapeColor.markerKind`'s primary/secondary path
+  /// too, not just the unmarked hue-ramp/neutral path every slot would otherwise take.
   private static let markers: [Int: Set<Int>] = [
     5: [Marker.primary], 40: [Marker.secondary],
   ]
@@ -84,15 +82,19 @@ struct MetalRendererGeometryBaselineTests {
     let device = try #require(MTLCreateSystemDefaultDevice())
     let renderer = try #require(
       MetalRendererFactory.makeRenderer(
-        for: VisualizerID(rawValue: visualizerID), device: device, sampleCount: 1),
-      "no renderer registered for \(visualizerID) — factory/this list have drifted apart")
+        for: VisualizerID(rawValue: visualizerID), device: device, sampleCount: 1
+      ),
+      "no renderer registered for \(visualizerID) — factory/this list have drifted apart"
+    )
     let encodable = try #require(
       renderer as? OffscreenEncodable,
-      "\(type(of: renderer)) must conform to OffscreenEncodable for this harness to render it")
+      "\(type(of: renderer)) must conform to OffscreenEncodable for this harness to render it"
+    )
 
     renderer.reset(
-      values: Self.values, valueRange: 1...Self.count, markers: Self.markers,
-      canvasSize: CGSize(width: Self.width, height: Self.height), scale: Self.scale)
+      values: Self.values, valueRange: 1 ... Self.count, markers: Self.markers,
+      canvasSize: CGSize(width: Self.width, height: Self.height), scale: Self.scale
+    )
 
     let pixels = try render(encodable, device: device)
     let digest = SHA256.hash(data: Data(pixels))
@@ -116,7 +118,70 @@ struct MetalRendererGeometryBaselineTests {
       A correct geometry-layout port must produce byte-identical settled pixels to before the \
       port — see this file's own doc comment. If this change is actually intended (a real bug \
       fix, not the port), update Fixtures/MetalRendererGeometryBaseline.json deliberately.
-      """)
+      """
+    )
+  }
+
+  @MainActor
+  @Test(arguments: visualizerIDs, [256, 1024])
+  func transitionFramesRemainVisibleForDuplicateHeavyInput(visualizerID: String, count: Int) throws {
+    let device = try #require(MTLCreateSystemDefaultDevice())
+    let renderer = try #require(MetalRendererFactory.makeRenderer(
+      for: VisualizerID(rawValue: visualizerID), device: device, sampleCount: 1
+    ))
+    let timed = try #require(renderer as? TimedOffscreenEncodable)
+    let values = (0 ..< count).map { $0 % 8 + 1 }
+    renderer.reset(values: values, valueRange: 1 ... 8,
+                   markers: [:], canvasSize: CGSize(width: Self.width, height: Self.height),
+                   scale: Self.scale)
+    var changed = values
+    changed[0] = 8
+    renderer.apply(.setValue(0, 8), values: changed, valueRange: 1 ... 8,
+                   markers: [0: [Marker.primary]])
+
+    let before = try render(timed, device: device, at: 0)
+    let halfway = try render(timed, device: device, at: 0.06)
+    let settled = try render(timed, device: device, at: 10)
+    for pixels in [before, halfway, settled] {
+      #expect(Swift.stride(from: 3, to: pixels.count, by: 4).contains { pixels[$0] > 0 },
+              "\(visualizerID) rendered an empty transition frame at \(count) on \(device.name)")
+    }
+    // At 1,024 elements, some one-pixel-wide changes are hidden behind overlapping dots or
+    // chords. The smaller case must show the change; the large case still validates all frames.
+    if count == 256 {
+      #expect(before != settled, "\(visualizerID) ignored the changed value on \(device.name)")
+    }
+    print("TRANSITION visualizerID=\(visualizerID) count=\(count) device=\(device.name) "
+      + "before=\(SHA256.hash(data: Data(before))) "
+      + "mid=\(SHA256.hash(data: Data(halfway))) "
+      + "settled=\(SHA256.hash(data: Data(settled)))")
+  }
+
+  @MainActor
+  @Test
+  func crowdedEdgeDotsStayInsideMetalViewport() throws {
+    let device = try #require(MTLCreateSystemDefaultDevice())
+    let scatter = try #require(MetalShapeRenderer<ScatterPlotMetalLayout>(device: device))
+    let wave = try #require(MetalShapeRenderer<WaveDotsMetalLayout>(device: device))
+    let values = (0 ..< 1024).map { $0 % 8 + 1 }
+    checkCrowdedDots(scatter, values: values)
+    checkCrowdedDots(wave, values: values)
+  }
+
+  @MainActor
+  private func checkCrowdedDots<Layout: MetalShapeLayout>(
+    _ renderer: MetalShapeRenderer<Layout>, values: [Int]
+  ) {
+    renderer.reset(values: values, valueRange: 1 ... 8, markers: [:],
+                   canvasSize: CGSize(width: Self.width, height: Self.height), scale: Self.scale)
+    let instances = renderer.resolvedInstances(at: 10)
+    #expect(instances.count == values.count)
+    for index in [0, 1, 1022, 1023] {
+      let shape = instances[index]
+      #expect(shape.origin.x >= 0 && shape.origin.y >= 0)
+      #expect(shape.origin.x + shape.size.x <= Float(Self.width * 2) + 0.001)
+      #expect(shape.origin.y + shape.size.y <= Float(Self.height * 2) + 0.001)
+    }
   }
 
   @MainActor
@@ -124,7 +189,8 @@ struct MetalRendererGeometryBaselineTests {
     let pixelWidth = Int(Double(Self.width) * Self.scale)
     let pixelHeight = Int(Double(Self.height) * Self.scale)
     let descriptor = MTLTextureDescriptor.texture2DDescriptor(
-      pixelFormat: .bgra8Unorm, width: pixelWidth, height: pixelHeight, mipmapped: false)
+      pixelFormat: .bgra8Unorm, width: pixelWidth, height: pixelHeight, mipmapped: false
+    )
     descriptor.usage = [.renderTarget, .shaderRead]
     descriptor.storageMode = .shared
     let texture = try #require(device.makeTexture(descriptor: descriptor))
@@ -146,10 +212,52 @@ struct MetalRendererGeometryBaselineTests {
     var pixels = [UInt8](repeating: 0, count: bytesPerRow * pixelHeight)
     texture.getBytes(
       &pixels, bytesPerRow: bytesPerRow, from: MTLRegionMake2D(0, 0, pixelWidth, pixelHeight),
-      mipmapLevel: 0)
+      mipmapLevel: 0
+    )
+    return pixels
+  }
+
+  @MainActor
+  private func render(_ renderer: some TimedOffscreenEncodable, device: MTLDevice,
+                      at time: Float) throws -> [UInt8]
+  {
+    let pixelWidth = Int(Double(Self.width) * Self.scale)
+    let pixelHeight = Int(Double(Self.height) * Self.scale)
+    let descriptor = MTLTextureDescriptor.texture2DDescriptor(
+      pixelFormat: .bgra8Unorm, width: pixelWidth, height: pixelHeight, mipmapped: false
+    )
+    descriptor.usage = [.renderTarget, .shaderRead]
+    descriptor.storageMode = .shared
+    let texture = try #require(device.makeTexture(descriptor: descriptor))
+    let pass = MTLRenderPassDescriptor()
+    pass.colorAttachments[0].texture = texture
+    pass.colorAttachments[0].loadAction = .clear
+    pass.colorAttachments[0].clearColor = MTLClearColor(red: 0, green: 0, blue: 0, alpha: 0)
+    pass.colorAttachments[0].storeAction = .store
+    let queue = try #require(device.makeCommandQueue())
+    let command = try #require(queue.makeCommandBuffer())
+    renderer.encodeDraw(into: pass, commandBuffer: command, currentTime: time)
+    command.commit()
+    command.waitUntilCompleted()
+    #expect(command.error == nil)
+    var pixels = [UInt8](repeating: 0, count: pixelWidth * pixelHeight * 4)
+    texture.getBytes(&pixels, bytesPerRow: pixelWidth * 4,
+                     from: MTLRegionMake2D(0, 0, pixelWidth, pixelHeight), mipmapLevel: 0)
     return pixels
   }
 }
+
+@MainActor
+private protocol TimedOffscreenEncodable {
+  func encodeDraw(into passDescriptor: MTLRenderPassDescriptor, commandBuffer: MTLCommandBuffer,
+                  currentTime: Float)
+}
+
+extension MetalBarRenderer: TimedOffscreenEncodable {}
+extension MetalShapeRenderer: TimedOffscreenEncodable {}
+extension MetalTriangleRenderer: TimedOffscreenEncodable {}
+extension MetalDisparityChordsRenderer: TimedOffscreenEncodable {}
+extension MetalHanoiTowersRenderer: TimedOffscreenEncodable {}
 
 // `MetalPolygonRendererTests.swift` already declares `OffscreenEncodable` and conforms
 // `MetalTriangleRenderer`/`MetalDisparityChordsRenderer` to it — extend the remaining 3 concrete
