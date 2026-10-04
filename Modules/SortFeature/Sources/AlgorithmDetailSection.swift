@@ -13,6 +13,8 @@ import UIKit
 public struct AlgorithmDetailSection: View {
   private let algorithm: any SortAlgorithm
   @State private var content: AlgorithmDetailContent?
+  @State private var contentLoading = true
+  @State private var contentUnavailable = false
   /// `ScrollingSortView.body`'s own top-level `GeometryReader` (otherwise only used to size
   /// `SortView`'s frame) passed straight through — not `ViewThatFits`: `descriptionColumn`/
   /// `complexityColumn` below both use `.frame(maxWidth: .infinity)`, which happily shrinks to
@@ -57,6 +59,15 @@ public struct AlgorithmDetailSection: View {
             .accessibilityValue("\(appliedThemeID?.rawValue ?? "loading")|\(highlighted.count)")
         }
       #endif
+      if contentUnavailable {
+        ContentUnavailableView(
+          "Reference content unavailable", systemImage: "doc.questionmark",
+          description: Text(
+            "The bundled algorithm details could not be loaded. Reinstall the app to restore descriptions and code examples."
+          )
+        )
+        .accessibilityIdentifier("algorithmDetailsLoadError")
+      }
       if availableWidth < Self.stackedLayoutThreshold {
         VStack(alignment: .leading, spacing: 24) {
           descriptionColumn
@@ -69,10 +80,12 @@ public struct AlgorithmDetailSection: View {
         }
       }
 
-      if showImplementations {
+      if showImplementations && !contentUnavailable {
         VStack(alignment: .leading, spacing: 8) {
           Text("Implementations").font(.title2.bold())
-          if let content, !content.codeSamples.isEmpty {
+          if contentLoading {
+            ProgressView("Loading code examples…")
+          } else if let content, !content.codeSamples.isEmpty {
             Picker("Language", selection: $selectedLanguage) {
               ForEach(content.codeSamples, id: \.language) { sample in
                 Text(sample.language.title).tag(sample.language)
@@ -91,6 +104,7 @@ public struct AlgorithmDetailSection: View {
                   AttributedCodeView(
                     attributed: styled, backgroundColor: settings.codeTheme.makeTheme().getBgColor()
                   )
+                  .accessibilityIdentifier("algorithmCodeSample")
                   .overlay(alignment: .topTrailing) {
                     if let plain = plainSamples[selectedLanguage] {
                       Button {
@@ -121,12 +135,18 @@ public struct AlgorithmDetailSection: View {
     .padding(.all, 32)
     .task(id: algorithm.id) {
       content = nil
+      contentLoading = true
+      contentUnavailable = false
       highlighted = [:]
       plainSamples = [:]
       #if DEBUG
         appliedThemeID = nil
       #endif
-      content = await AlgorithmDetailContent.load(for: algorithm.id.rawValue)
+      switch await AlgorithmDetailStore.shared.loadState(for: algorithm.id.rawValue) {
+      case .loaded(let loaded): content = loaded
+      case .unavailable: contentUnavailable = true
+      }
+      contentLoading = false
       if let firstLanguage = content?.codeSamples.first?.language {
         selectedLanguage = firstLanguage
       }
@@ -170,10 +190,12 @@ public struct AlgorithmDetailSection: View {
   private var descriptionColumn: some View {
     VStack(alignment: .leading, spacing: 16) {
       Text("Description").font(.title2.bold())
-      if let description = content?.description {
+      if contentLoading {
+        ProgressView("Loading description…")
+      } else if let description = content?.description {
         Markdown(description).lineSpacing(1.75)
           .accessibilityIdentifier("algorithmDescriptionText")
-      } else {
+      } else if !contentUnavailable {
         Text("No description available yet.").foregroundStyle(.secondary)
       }
     }

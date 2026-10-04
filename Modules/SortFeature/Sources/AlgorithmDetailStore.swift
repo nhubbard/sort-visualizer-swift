@@ -19,6 +19,11 @@ public func prewarmAlgorithmDetails() {
 }
 
 actor AlgorithmDetailStore {
+  enum LoadState: Sendable {
+    case loaded(AlgorithmDetailContent?)
+    case unavailable
+  }
+
   static let shared = AlgorithmDetailStore()
 
   private let bundle: Bundle
@@ -37,14 +42,21 @@ actor AlgorithmDetailStore {
   }
 
   func content(for algorithmID: String) async -> AlgorithmDetailContent? {
+    switch await loadState(for: algorithmID) {
+    case .loaded(let content): content
+    case .unavailable: nil
+    }
+  }
+
+  func loadState(for algorithmID: String) async -> LoadState {
     do {
       let all = try await load()
-      return all[algorithmID]
+      return .loaded(all[algorithmID])
     } catch {
       Self.logger.error(
         "AlgorithmDetailStore failed to load AlgorithmDetails.algz: \(String(describing: error), privacy: .public)"
       )
-      return nil
+      return .unavailable
     }
   }
 
@@ -62,6 +74,13 @@ actor AlgorithmDetailStore {
   private static let logger = Logger(subsystem: "com.nhubbard.Sort2.mobile", category: "AlgorithmDetailStore")
 
   private static func decodeArchive(bundle: Bundle) throws -> [String: AlgorithmDetailContent] {
+    #if DEBUG
+      // UI tests exercise the same missing-resource error as a damaged app bundle without
+      // modifying the signed archive on disk. Each UI test launches a fresh process.
+      if ProcessInfo.processInfo.environment["UI_TEST_MISSING_ALGORITHM_DETAILS"] == "1" {
+        throw AlgorithmDetailsArchiveError.archiveResourceNotFound
+      }
+    #endif
     guard let url = bundle.url(forResource: "AlgorithmDetails", withExtension: "algz") else {
       throw AlgorithmDetailsArchiveError.archiveResourceNotFound
     }
