@@ -1,6 +1,7 @@
 import AlgorithmKit
 import AppIntents
 import SortFeature
+import VisualizationKit
 
 /// Opens Sort Symphony, selects `algorithm` exactly the way a sidebar tap would, and awaits one
 /// fully-animated pass before returning — the same "await genuine completion" contract Showcase
@@ -58,6 +59,14 @@ public struct RunSortIntent: AppIntent {
   public func perform() async throws -> some IntentResult {
     guard let realAlgorithm = AlgorithmRegistry.shared.algorithm(id: algorithm.algorithmID) else {
       throw SortSymphonyIntentError.algorithmUnavailable
+    }
+    if let visualizer,
+      VisualizerRegistry.shared.visualizer(id: visualizer.visualizerID) == nil {
+      throw SortSymphonyIntentError.requestedVisualizerUnavailable
+    }
+    if let shuffle,
+      ShuffleRegistry.shared.shuffle(id: shuffle.shuffleID) == nil {
+      throw SortSymphonyIntentError.requestedShuffleUnavailable
     }
     await SortCoordinator.shared.runSort(
       algorithm: realAlgorithm,

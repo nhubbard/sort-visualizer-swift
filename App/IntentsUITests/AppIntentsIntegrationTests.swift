@@ -421,8 +421,53 @@ final class AppIntentsIntegrationTests: XCTestCase {
     let secondChip = app.buttons["runControlSizeChip-\(second)"]
     XCTAssertTrue(secondChip.waitForExistence(timeout: 5))
     XCTAssertTrue(secondChip.isSelected, "the second request should replace the first session")
+    _ = try await definitions.intents["RunSortIntent"]
+      .makeIntent(algorithm: quickSort, size: Int.max).run()
+    XCTAssertEqual(status.value as? String, "sorted")
+    app.buttons["runControlSizeButton"].tap()
+    let maximum = try XCTUnwrap(sizes.last)
+    let maximumChip = app.buttons["runControlSizeChip-\(maximum)"]
+    XCTAssertTrue(maximumChip.waitForExistence(timeout: 5))
+    XCTAssertTrue(maximumChip.isSelected, "an oversized request should clamp to the reachable maximum")
     _ = try await definitions.intents["SetPlaybackSpeedIntent"]
       .makeIntent(speed: 30.0).run()
+  }
+
+  func testSystemRunSortReplacesBusyManualRunAfterInvalidEntityIsRejected() async throws {
+    let app = XCUIApplication()
+    app.launchEnvironment = ["UI_TEST_ARRAY_SIZE": "256"]
+    app.launch()
+    let definitions = IntentDefinitions(bundleIdentifier: "com.nhubbard.Sort2.mobile")
+    let catalog = try await definitions.intents["FindAlgorithmsIntent"].makeIntent().run()
+    let algorithms = try catalog.value.as([AnyAppEntity].self)
+    let quickSort = try XCTUnwrap(
+      algorithms.first { $0.identifier.instanceIdentifier == "quicksort" })
+
+    app.buttons["algorithmLink.threesmoothcombsortiterative"].tap()
+    let status = app.staticTexts["sortStatusLabel"]
+    XCTAssertTrue(status.waitForExistence(timeout: 10))
+    XCTAssertEqual(status.value as? String, "sorting")
+
+    var invalid = quickSort
+    invalid.identifier = .init(
+      entityType: quickSort.identifier.entityType,
+      instanceIdentifier: "not-a-bundled-algorithm")
+    do {
+      _ = try await definitions.intents["RunSortIntent"]
+        .makeIntent(algorithm: invalid, size: 16).run()
+      XCTFail("the system accepted an unavailable algorithm while a run was active")
+    } catch {
+      XCTAssertEqual(status.value as? String, "sorting",
+        "a rejected request must leave the active session alone")
+    }
+
+    _ = try await definitions.intents["RunSortIntent"]
+      .makeIntent(algorithm: quickSort, size: 16).run()
+    XCTAssertEqual(status.value as? String, "sorted")
+    app.buttons["runControlSizeButton"].tap()
+    let replacementSize = app.buttons["runControlSizeChip-16"]
+    XCTAssertTrue(replacementSize.waitForExistence(timeout: 5))
+    XCTAssertTrue(replacementSize.isSelected)
   }
 
   func testSystemPlaybackSpeedActionUpdatesTheOpenReplay() async throws {
