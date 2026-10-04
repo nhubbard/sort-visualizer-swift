@@ -16,6 +16,7 @@ struct AlgorithmDetailAuditView: View {
     .flatMap(Int.init) ?? 0
   private let growthOnly = ProcessInfo.processInfo.environment["UI_TEST_GROWTH_ONLY"] == "1"
   private let compactBigOOnly = ProcessInfo.processInfo.environment["UI_TEST_COMPACT_BIGO_ONLY"] == "1"
+  private let equationsOnly = ProcessInfo.processInfo.environment["UI_TEST_EQUATIONS_ONLY"] == "1"
   @State private var index = 0
 
   var body: some View {
@@ -51,7 +52,8 @@ struct AlgorithmDetailAuditView: View {
                 .padding(.all, 32)
             } else {
               AlgorithmDetailSection(
-                algorithm: algorithm, availableWidth: width, showImplementations: false
+                algorithm: algorithm, availableWidth: width, showImplementations: false,
+                showDescription: !equationsOnly
               )
             }
           }
