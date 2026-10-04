@@ -20,6 +20,10 @@ struct BigOCorrelationDetailView: View {
   /// scrolling smooth; it's an opt-in for
   /// seeing per-run variance/outliers, not the default view.
   @State private var showsIndividualRuns = false
+  #if DEBUG
+  private let auditContentWidth = ProcessInfo.processInfo.environment["UI_TEST_EXPANDED_WIDTH"]
+    .flatMap(Double.init).map { CGFloat($0) - 48 }
+  #endif
 
   /// Distinct series names in first-appearance order (`"Observed"` before the reference-curve
   /// labels, since `bigOChartPoints` emits `runPoints`/`trendPoints` before `referencePoints`).
@@ -50,6 +54,9 @@ struct BigOCorrelationDetailView: View {
         RainbowStatLegend()
         selectionSummary
       }
+      #if DEBUG
+      .frame(maxWidth: auditContentWidth ?? .infinity, alignment: .leading)
+      #endif
       .padding(24)
       .frame(maxHeight: .infinity, alignment: .topLeading)
       .navigationTitle(algorithm.metadata.displayName)
@@ -175,6 +182,7 @@ struct BigOCorrelationDetailView: View {
           )
           .toggleStyle(.button)
           .controlSize(.small)
+          .accessibilityIdentifier("bigOSeriesToggle.\(series)")
         }
       }
       Toggle("Show Individual Runs", isOn: $showsIndividualRuns)

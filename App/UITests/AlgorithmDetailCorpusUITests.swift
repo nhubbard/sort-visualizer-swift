@@ -303,3 +303,74 @@ final class CompactBigONarrowCorpusUITests: XCTestCase {
     XCTAssertEqual(seen.count, range.count)
   }
 }
+
+@MainActor
+final class ExpandedBigONarrowInteractionUITests: XCTestCase {
+  func testDenseChartScrollsSelectsAndTogglesAtNarrowWidth() {
+    continueAfterFailure = false
+    #if !targetEnvironment(macCatalyst)
+    XCUIDevice.shared.orientation = .portrait
+    #endif
+    let app = XCUIApplication()
+    app.launchEnvironment = [
+      "UI_TEST_DETAIL_AUDIT": "1",
+      "UI_TEST_DETAIL_AUDIT_WIDTH": "360",
+      "UI_TEST_COMPACT_BIGO_ONLY": "1",
+      "UI_TEST_EXPANDED_WIDTH": "360"
+    ]
+    app.launch()
+    let compact = app.descendants(matching: .any)
+      .matching(identifier: "bigOCorrelationChart").firstMatch
+    XCTAssertTrue(compact.waitForExistence(timeout: 10))
+    app.activateControlForUITest(app.buttons["Expand Chart"])
+    let expanded = app.descendants(matching: .any)
+      .matching(identifier: "bigOCorrelationExpandedChart").firstMatch
+    XCTAssertTrue(expanded.waitForExistence(timeout: 10))
+    XCTAssertGreaterThan(expanded.frame.width, 250)
+    XCTAssertLessThanOrEqual(expanded.frame.width, 313)
+    #if !targetEnvironment(macCatalyst)
+    XCTAssertGreaterThanOrEqual(expanded.frame.minX, app.frame.minX)
+    XCTAssertLessThanOrEqual(expanded.frame.maxX, app.frame.maxX)
+    #endif
+    let legend = app.descendants(matching: .any)
+      .matching(identifier: "bigOReferenceLegend").firstMatch
+    XCTAssertTrue(legend.exists)
+    XCTAssertGreaterThanOrEqual(legend.frame.minX, expanded.frame.minX - 1)
+    XCTAssertLessThanOrEqual(legend.frame.maxX, expanded.frame.maxX + 1)
+    let individual = app.descendants(matching: .any)
+      .matching(identifier: "Show Individual Runs").firstMatch
+    XCTAssertTrue(individual.exists)
+    XCTAssertLessThanOrEqual(individual.frame.maxX, expanded.frame.maxX + 1)
+
+    let before = app.screenshot().pngRepresentation
+    #if targetEnvironment(macCatalyst)
+    expanded.scroll(byDeltaX: 300, deltaY: 0)
+    if app.screenshot().pngRepresentation == before {
+      expanded.scroll(byDeltaX: -600, deltaY: 0)
+    }
+    #else
+    expanded.swipeLeft(velocity: .slow)
+    #endif
+    XCTAssertNotEqual(app.screenshot().pngRepresentation, before,
+                      "Dense expanded chart did not scroll horizontally")
+
+    let selected = app.staticTexts["bigOSelectedSize"]
+    app.activateControlForUITest(app.buttons["Next Recorded Size"])
+    XCTAssertTrue(selected.label.hasPrefix("Array Size "))
+    let observed = app.staticTexts["bigOSelection.Observed"]
+    XCTAssertTrue(observed.exists)
+    let toggle = app.descendants(matching: .any)
+      .matching(identifier: "bigOSeriesToggle.Observed").firstMatch
+    XCTAssertTrue(toggle.exists)
+    app.activateControlForUITest(toggle)
+    XCTAssertFalse(observed.exists, "Hidden observed series remained in the selection")
+    app.activateControlForUITest(toggle)
+    XCTAssertTrue(observed.exists)
+    app.activateControlForUITest(individual)
+    XCTAssertTrue(expanded.exists)
+    let capture = XCTAttachment(screenshot: app.screenshot())
+    capture.name = "expanded-bigo-narrow-interactions"
+    capture.lifetime = .keepAlways
+    add(capture)
+  }
+}

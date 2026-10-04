@@ -67,6 +67,20 @@ final class ComplexityChartsUITests: XCTestCase {
     XCTAssertEqual(selected.label, "Array Size 16")
     app.activateControlForUITest(next)
     XCTAssertEqual(selected.label, "Array Size 32")
+    let observed = app.staticTexts["bigOSelection.Observed"]
+    XCTAssertTrue(observed.exists)
+    let toggle = app.descendants(matching: .any)
+      .matching(identifier: "bigOSeriesToggle.Observed").firstMatch
+    XCTAssertTrue(toggle.exists)
+    app.activateControlForUITest(toggle)
+    XCTAssertFalse(observed.exists)
+    app.activateControlForUITest(toggle)
+    XCTAssertTrue(observed.exists)
+    let individual = app.descendants(matching: .any)
+      .matching(identifier: "Show Individual Runs").firstMatch
+    XCTAssertTrue(individual.exists)
+    app.activateControlForUITest(individual)
+    XCTAssertTrue(expanded.exists)
     app.activateControlForUITest(app.buttons["Done"])
   }
 
