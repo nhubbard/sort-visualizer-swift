@@ -226,6 +226,49 @@ struct NoOpAudioServiceTests {
   }
 
   @Test
+  func bridgeDisconnectRestoresRenderedLocalAudio() async {
+    let suiteName = "AudioServiceFallbackTests.\(UUID().uuidString)"
+    let store = UserDefaults(suiteName: suiteName)!
+    defer { store.removePersistentDomain(forName: suiteName) }
+    let settings = AppSettings(store: store)
+    settings.audioUnitBridgeEnabled = true
+    let renderer = AudioServiceDependencies.makeRenderer()
+    renderer.prepare(maxFrameCount: 4096)
+    let bridge = TestAudioBridge()
+    let service = AudioService(settings: settings, dependencies: AudioServiceDependencies(
+      engine: TestAudioEngine(), renderer: renderer, sink: LocalToneEventSink(renderer: renderer),
+      bridgeServer: bridge, socketPath: { "/tmp/audio-service-fallback-test.sock" }))
+
+    bridge.hasConnectedClients = true
+    service.play(
+      value: 5, in: 0...10, holdSeconds: 1, index: 2, arraySize: 10,
+      operationKind: .compare)
+    #expect(bridge.broadcasts.count == 1)
+    #expect(renderedPeak(renderer) == 0, "connected playback must not leak into the local voice")
+
+    bridge.hasConnectedClients = false
+    bridge.onConnectedClientsChanged?(false)
+    for _ in 0..<100 where service.bridgeStatus != .listening { await Task.yield() }
+    #expect(service.bridgeStatus == .listening)
+    service.play(
+      value: 6, in: 0...10, holdSeconds: 1, index: 3, arraySize: 10,
+      operationKind: .swap)
+    #expect(bridge.broadcasts.count == 1)
+    #expect(renderedPeak(renderer) > 0.01, "a disconnected bridge must render a local tone")
+  }
+
+  private func renderedPeak(_ renderer: ToneRenderer) -> Float {
+    var left = [Float](repeating: 0, count: 4096)
+    var right = [Float](repeating: 0, count: 4096)
+    left.withUnsafeMutableBufferPointer { l in
+      right.withUnsafeMutableBufferPointer { r in
+        renderer.render(left: l, right: r, sampleRate: 48000)
+      }
+    }
+    return max(left.map(abs).max() ?? 0, right.map(abs).max() ?? 0)
+  }
+
+  @Test
   func bridgeStartupFailureReportsUnavailableWithoutStartingHardware() {
     let suiteName = "AudioServiceBridgeFailureTests.\(UUID().uuidString)"
     let store = UserDefaults(suiteName: suiteName)!
