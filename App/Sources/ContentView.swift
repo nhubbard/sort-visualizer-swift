@@ -31,6 +31,7 @@ struct ContentView: View {
   @Bindable private var coordinator = SortCoordinator.shared
   @Bindable private var sweepDriver = CoverageSweepDriver.shared
   @Environment(AppSettings.self) private var settings
+  @Environment(\.accessibilityReduceMotion) private var reduceMotion
   // Search text is deliberately not persisted — it's a one-off filter for the current session,
   // not a setting.
   @State private var searchText = ""
@@ -115,8 +116,9 @@ struct ContentView: View {
     } message: {
       Text(
         """
-        Runs every algorithm once, in order, with the current visualizer. The visualizer \
-        can still be changed with ⌘⇧V, but other controls are locked until it finishes.
+        Runs every algorithm once, in order, cycling shuffles and visualizers. With Reduce \
+        Motion on, Showcase skips Hanoi Towers; you can still choose it in the Visualizer \
+        picker. Other controls are locked until it finishes.
         """)
     }
     .confirmationDialog(
@@ -674,7 +676,7 @@ struct ContentView: View {
     // `selectedVisualizerID` pick this up automatically once `selectAlgorithmForFreshView` below
     // tears down and rebuilds the session.
     AppSettings.shared.cycleShuffle()
-    AppSettings.shared.cycleVisualizer()
+    cycleShowcaseVisualizer()
     coordinator.selectAlgorithmForFreshView(showcaseAlgorithmIDs[0])
   }
 
@@ -697,8 +699,18 @@ struct ContentView: View {
     }
     self.showcaseIndex = nextIndex
     AppSettings.shared.cycleShuffle()
-    AppSettings.shared.cycleVisualizer()
+    cycleShowcaseVisualizer()
     coordinator.selectAlgorithmForFreshView(showcaseAlgorithmIDs[nextIndex])
+  }
+
+  /// Showcase chooses visualizers automatically. Hanoi Towers' lift-and-carry choreography can
+  /// still move many blocks at once even at a low replay rate, so leave it to the explicit
+  /// Visualizer picker when Reduce Motion is enabled. Full Sweep remains exhaustive.
+  private func cycleShowcaseVisualizer() {
+    settings.cycleVisualizer()
+    if reduceMotion && settings.selectedVisualizerID.rawValue == "hanoitowers" {
+      settings.cycleVisualizer()
+    }
   }
 
   /// Also the target of a mid-run Stop tap. Clearing the selection (not leaving it on the
