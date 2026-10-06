@@ -633,7 +633,7 @@ private struct SizeChip: View {
 }
 
 /// Lists every registered `Automation` (see `AutomationRegistry`) — the same entries `⌘⇧A`/`⌘⌥⇧A`
-/// trigger, so the shortcut and this menu share one source of truth.
+/// trigger, so the shortcut and this action chooser share one source of truth.
 ///
 /// A genuine `View`, not a computed property on `RunControlBar`: `@Environment(\.isEnabled)` only
 /// sees ancestors of where it's read, and `RunControlBar.body`'s `.disabled(session.isAutomating)`
@@ -646,25 +646,11 @@ private struct SizeChip: View {
 private struct AutomatorMenuButton: View {
   let session: SortSession
   @Environment(\.isEnabled) private var isEnabled
+  @State private var isShowingAutomations = false
 
   var body: some View {
-    Menu {
-      ForEach(AutomationRegistry.shared.automations) { automation in
-        Button {
-          session.runAutomation(automation)
-        } label: {
-          if session.runningAutomationID == automation.id {
-            Label(
-              "\(automation.displayName) (\(automation.shortcutDisplayString)) — Running",
-              systemImage: "checkmark")
-          } else {
-            Label(
-              "\(automation.displayName) (\(automation.shortcutDisplayString))",
-              systemImage: automation.iconName)
-          }
-        }
-        .accessibilityIdentifier("automatorMenuItem.\(automation.id.rawValue)")
-      }
+    Button {
+      isShowingAutomations = true
     } label: {
       Image(systemName: "gearshape.2.fill")
         // `isEnabled`, not `session.isAutomating` directly, so this tracks whatever actually
@@ -676,7 +662,18 @@ private struct AutomatorMenuButton: View {
     .buttonStyle(.plain)
     .accessibilityIdentifier("runControlAutomatorButton")
     .accessibilityLabel("Automations")
+    .accessibilityValue(
+      session.runningAutomationID.flatMap { AutomationRegistry.shared.automation(id: $0)?.displayName }
+        .map { "\($0) running" } ?? "Idle")
     .help("Run a size-sweep or max-size automation")
+    .confirmationDialog("Automations", isPresented: $isShowingAutomations) {
+      ForEach(AutomationRegistry.shared.automations) { automation in
+        Button("\(automation.displayName) (\(automation.shortcutDisplayString))") {
+          session.runAutomation(automation)
+        }
+        .accessibilityIdentifier("automatorMenuItem.\(automation.id.rawValue)")
+      }
+    }
   }
 }
 

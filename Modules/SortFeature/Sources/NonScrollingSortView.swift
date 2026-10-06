@@ -28,19 +28,17 @@ public struct NonScrollingSortView: View {
   let algorithm: any SortAlgorithm
   let arraySize: Int
   let showcaseCompletion: (() -> Void)?
-  let showcaseStop: (() -> Void)?
   @State private var session: SortSession
   @Environment(AppSettings.self) private var settings
 
   @MainActor
   public init(
     algorithm: any SortAlgorithm, shuffle: any ShuffleAlgorithm, arraySize: Int = 48,
-    showcaseCompletion: (() -> Void)? = nil, showcaseStop: (() -> Void)? = nil
+    showcaseCompletion: (() -> Void)? = nil
   ) {
     self.algorithm = algorithm
     self.arraySize = arraySize
     self.showcaseCompletion = showcaseCompletion
-    self.showcaseStop = showcaseStop
     // Always true in practice — `ContentView` only ever constructs this view once it's already
     // determined the mount will automate — but computed the same defensive way
     // `ScrollingSortView.init` does rather than hardcoded, in case a future caller constructs
@@ -55,7 +53,7 @@ public struct NonScrollingSortView: View {
   }
 
   public var body: some View {
-    SortView(session: session, showcaseStop: showcaseStop)
+    SortView(session: session)
       .frame(maxWidth: .infinity, maxHeight: .infinity)
       .navigationTitle(algorithm.metadata.displayName)
       // See `ScrollingSortView`'s identical modifiers / `runSortViewLifecycle`'s doc comment —

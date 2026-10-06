@@ -29,8 +29,9 @@ extension XCUIApplication {
 
   func openSettingsForUITest() {
     #if targetEnvironment(macCatalyst)
-      // SwiftUI's identifier is dropped when the button becomes an NSToolbar item.
-      let button = buttons["Gear shape"]
+      // SwiftUI's identifier is dropped when the button becomes an NSToolbar item, but its
+      // semantic Label title remains available as the button's accessible name.
+      let button = buttons["Settings"]
       XCTAssertTrue(button.waitForExistence(timeout: 5), "settings toolbar button is missing")
       button.click()
     #else

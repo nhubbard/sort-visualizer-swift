@@ -639,7 +639,7 @@ struct SortSessionTests {
   // MARK: - Recording size cap
 
   @Test
-  func stoppingSizeSweepFinishesCurrentPassWithoutStartingNextSize() async throws {
+  func stoppingSizeSweepPausesCurrentPassWithoutRecordingOrStartingNextSize() async throws {
     let analytics = try makeInMemoryAnalytics()
     let driver = ManualTickDriver()
     let session = SortSession(
@@ -664,18 +664,11 @@ struct SortSessionTests {
     #expect(session.arraySize == 4)
     #expect(replay.stepIndex < replay.totalOperationCount)
     session.stopAutomation()
-    #expect(session.isAutomating, "Stop waits for the current pass")
-    driver.fireTick(elapsed: 0)
-    let completionDeadline = ContinuousClock.now + .seconds(3)
-    while ContinuousClock.now < completionDeadline, session.isAutomating {
-      driver.fireTick(elapsed: 1)
-      try await Task.sleep(for: .milliseconds(5))
-    }
     #expect(!session.isAutomating)
+    #expect(!replay.isPlaying)
     #expect(session.arraySize == 4)
     let records = try await analytics.fetchSummaries(algorithmID: FakeAlgorithm().id)
-    #expect(records.count == 1)
-    #expect(records.first?.arraySize == 4)
+    #expect(records.isEmpty)
   }
 
   @Test

@@ -285,9 +285,13 @@ final class RunControlBarUITests: XCTestCase {
   }
 
   #if !targetEnvironment(macCatalyst)
-  func testSizeSweepShowsProgressAndStopsAfterCurrentPass() {
+  func testSizeSweepShowsOneBannerAndStopsCurrentPass() {
     let app = XCUIApplication()
-    app.launchEnvironment = ["UI_TEST_ARRAY_SIZE": "16", "UI_TEST_PLAYBACK_SPEED": "1000"]
+    app.launchEnvironment = [
+      "UI_TEST_ARRAY_SIZE": "16", "UI_TEST_PLAYBACK_SPEED": "30",
+      "UI_TEST_SHORT_SIZE_SWEEP": "1",
+      "UI_TEST_AUTOMATION_ALGORITHMS": "quicksort",
+    ]
     app.launch()
     app.tapSidebarLink("algorithmLink.quicksort")
 
@@ -298,9 +302,14 @@ final class RunControlBarUITests: XCTestCase {
     XCTAssertEqual(XCTWaiter().wait(for: [sorted], timeout: 10), .completed)
 
     app.buttons["runControlAutomatorButton"].tap()
-    app.buttons["automatorMenuItem.sizeSweep"].tap()
+    app.buttons.matching(identifier: "automatorMenuItem.sizeSweep").firstMatch.tap()
+    let automator = app.buttons["runControlAutomatorButton"]
+    let running = XCTNSPredicateExpectation(
+      predicate: NSPredicate(format: "value == %@", "Size Sweep running"), object: automator)
+    XCTAssertEqual(XCTWaiter().wait(for: [running], timeout: 5), .completed)
     let progress = app.staticTexts["automationProgressLabel"]
     XCTAssertTrue(progress.waitForExistence(timeout: 5), "size sweep did not start")
+    XCTAssertEqual(app.buttons.matching(identifier: "automationStopButton").count, 1)
     app.buttons["automationStopButton"].tap()
     XCTAssertFalse(progress.waitForExistence(timeout: 5), "size sweep did not stop")
   }

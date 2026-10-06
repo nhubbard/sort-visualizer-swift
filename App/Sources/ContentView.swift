@@ -158,6 +158,9 @@ struct ContentView: View {
     .onChange(of: coordinator.selectedAlgorithmID) { _, newValue in
       syncSidebarCategory(for: newValue)
     }
+    .onChange(of: coordinator.stopRequestID) { _, _ in
+      if showcaseIndex != nil { stopShowcase() }
+    }
   }
 
   private var categorySidebar: some View {
@@ -206,12 +209,14 @@ struct ContentView: View {
                 algorithm: algorithm, automationID: .sizeSweep)
             }
           }
+          .accessibilityIdentifier("algorithmSizeSweep.\(algorithm.id.rawValue)")
           Button("Run Max Size Only") {
             Task {
               await SortCoordinator.shared.runAutomation(
                 algorithm: algorithm, automationID: .maxSizeOnly)
             }
           }
+          .accessibilityIdentifier("algorithmMaxSizeOnly.\(algorithm.id.rawValue)")
         }
       }
     }
@@ -351,10 +356,14 @@ struct ContentView: View {
         stopShowcase()
       }
     } label: {
-      Image(systemName: showcaseIndex == nil ? "sparkles.tv.fill" : "stop.fill")
+      Label(showcaseIndex == nil ? "Start Showcase" : "Stop Showcase",
+        systemImage: showcaseIndex == nil ? "sparkles.tv.fill" : "stop.fill")
+        .labelStyle(.iconOnly)
     }
     .buttonBorderShape(.circle)
     .frame(width: 36, height: 24)
+    .accessibilityLabel(showcaseIndex == nil ? "Start Showcase" : "Stop Showcase")
+    .help(showcaseIndex == nil ? "Run every algorithm once" : "Stop Showcase")
     .accessibilityIdentifier("showcaseButton")
     // Starting Showcase while a Full Sweep is running would race it for `selectedAlgorithmID` —
     // stopping is always allowed regardless (mirrors `fullSweepToolbarButton`'s own guard below).
@@ -374,10 +383,14 @@ struct ContentView: View {
         isShowingFullSweepConfirmation = true
       }
     } label: {
-      Image(systemName: sweepDriver.isRunning ? "stop.fill" : "checklist")
+      Label(sweepDriver.isRunning ? "Stop Full Sweep" : "Start Full Sweep",
+        systemImage: sweepDriver.isRunning ? "stop.fill" : "checklist")
+        .labelStyle(.iconOnly)
     }
     .buttonBorderShape(.circle)
     .frame(width: 36, height: 24)
+    .accessibilityLabel(sweepDriver.isRunning ? "Stop Full Sweep" : "Start Full Sweep")
+    .help(sweepDriver.isRunning ? "Stop Full Sweep" : "Run every algorithm, shuffle, and visualizer")
     .accessibilityIdentifier("fullSweepButton")
     .disabled(!sweepDriver.isRunning && showcaseIndex != nil)
   }
@@ -392,10 +405,13 @@ struct ContentView: View {
     Button {
       coordinator.isSettingsRequested = true
     } label: {
-      Image(systemName: "gearshape")
+      Label("Settings", systemImage: "gearshape")
+        .labelStyle(.iconOnly)
     }
     .buttonBorderShape(.circle)
     .frame(width: 36, height: 24)
+    .accessibilityLabel("Settings")
+    .help("Settings")
     .accessibilityIdentifier("settingsButton")
   }
 
@@ -403,10 +419,12 @@ struct ContentView: View {
     Button {
       isImportingTape = true
     } label: {
-      Image(systemName: "square.and.arrow.down")
+      Label("Import Tape", systemImage: "square.and.arrow.down")
+        .labelStyle(.iconOnly)
     }
     .buttonBorderShape(.circle)
     .frame(width: 36, height: 24)
+    .accessibilityLabel("Import Tape")
     .accessibilityIdentifier("importTapeButton")
     .help("Import a previously exported .tape file")
     .fileImporter(isPresented: $isImportingTape, allowedContentTypes: [.tapeArchive]) { result in
@@ -447,16 +465,6 @@ struct ContentView: View {
     return advanceShowcase
   }
 
-  /// Distinct from `showcaseCompletionHandler`: that fires when the current algorithm's pass
-  /// finishes on its own; this fires when the user stops early via `SortView`'s automation banner
-  /// Stop button. That button calls this rather than `session.stopAutomation()`, which would be a
-  /// no-op here since Showcase never goes through `SortSession.automationTask` (see
-  /// `runShowcasePass()`).
-  private var showcaseStopHandler: (() -> Void)? {
-    guard showcaseIndex != nil else { return nil }
-    return stopShowcase
-  }
-
   private var detailContent: some View {
     Group {
       if let selection = coordinator.selectedAlgorithmID,
@@ -473,7 +481,7 @@ struct ContentView: View {
         if showcaseCompletionHandler != nil || coordinator.currentSelectionWillAutomate {
           NonScrollingSortView(
             algorithm: algorithm, shuffle: effectiveShuffle(for: selection), arraySize: arraySize,
-            showcaseCompletion: showcaseCompletionHandler, showcaseStop: showcaseStopHandler
+            showcaseCompletion: showcaseCompletionHandler
           )
           // Folds in `coordinator.runToken` (bumped on every intent-triggered run, and by
           // `selectAlgorithmForFreshView` — see `startShowcase`/`advanceShowcase`) alongside
@@ -484,7 +492,7 @@ struct ContentView: View {
         } else {
           ScrollingSortView(
             algorithm: algorithm, shuffle: effectiveShuffle(for: selection), arraySize: arraySize,
-            showcaseCompletion: showcaseCompletionHandler, showcaseStop: showcaseStopHandler
+            showcaseCompletion: showcaseCompletionHandler
           )
           .id("\(selection.rawValue)-\(coordinator.runToken)")
         }
@@ -513,11 +521,7 @@ struct ContentView: View {
               .task { sweepDriver.loadProgress() }
           }
         #endif
-        if showcaseIndex != nil {
-          showcaseBanner
-        } else if sweepDriver.isRunning {
-          fullSweepBanner
-        }
+        activeAutomationBanner
       }
     }
     // On the detail column, not the sidebar: the sidebar is narrow enough that two icon
@@ -549,18 +553,65 @@ struct ContentView: View {
     }
   }
 
-  private var showcaseBanner: some View {
+  /// Exactly one banner owns automation status and Stop, regardless of whether the run came
+  /// from Showcase, Full Sweep, a registered in-app automation, or Shortcuts.
+  @ViewBuilder
+  private var activeAutomationBanner: some View {
+    if showcaseIndex != nil {
+      automationBanner(
+        title: showcaseProgressText, progress: nil,
+        progressID: "showcaseProgressLabel", stopID: "showcaseStopButton",
+        stopLabel: "Stop Showcase", stop: stopShowcase)
+    } else if sweepDriver.isRunning {
+      automationBanner(
+        title: fullSweepProgressText,
+        progress: (sweepDriver.completedCount, sweepDriver.totalCount),
+        progressID: "fullSweepProgressLabel", stopID: "fullSweepStopButton",
+        stopLabel: "Stop Full Sweep", stop: sweepDriver.stop)
+    } else if let session = coordinator.activeSortSession, session.isAutomating {
+      automationBanner(
+        title: sessionAutomationProgressText(session), progress: nil,
+        progressID: "automationProgressLabel", stopID: "automationStopButton",
+        stopLabel: "Stop Automation", stop: coordinator.stop)
+    }
+  }
+
+  private func automationBanner(
+    title: String, progress: (completed: Int, total: Int)?, progressID: String,
+    stopID: String, stopLabel: String, stop: @escaping () -> Void
+  ) -> some View {
     HStack(spacing: 8) {
-      ProgressView()
-        .controlSize(.small)
-      Text(showcaseProgressText)
+      if let progress {
+        ProgressView(value: Double(progress.completed), total: Double(progress.total))
+          .frame(maxWidth: 120)
+      } else {
+        ProgressView()
+          .controlSize(.small)
+      }
+      Text(title)
         .font(.caption)
-        .accessibilityIdentifier("showcaseProgressLabel")
+        .accessibilityIdentifier(progressID)
       Spacer()
+      Button("Stop", action: stop)
+        .accessibilityLabel(stopLabel)
+        .accessibilityIdentifier(stopID)
     }
     .padding(.horizontal)
     .padding(.vertical, 6)
     .background(.bar)
+  }
+
+  private func sessionAutomationProgressText(_ session: SortSession) -> String {
+    let name = session.runningAutomationID
+      .flatMap { AutomationRegistry.shared.automation(id: $0)?.displayName }
+      ?? "Sort Run"
+    let source = coordinator.currentSelectionWillAutomate ? "Shortcuts: " : ""
+    guard let progress = session.automationProgress else {
+      return "\(source)\(name): \(session.algorithm.metadata.displayName)"
+    }
+    return "\(source)\(name): \(session.algorithm.metadata.displayName) · size \(session.arraySize) "
+      + "(\(progress.sizeIndex + 1)/\(progress.sizeCount)) · run "
+      + "\(progress.runIndex + 1)/\(progress.runCount)"
   }
 
   private var showcaseProgressText: String {
@@ -571,25 +622,6 @@ struct ContentView: View {
     }
     return
       "Showcase: \(algorithm.metadata.displayName) (\(showcaseIndex + 1)/\(showcaseAlgorithmIDs.count))"
-  }
-
-  /// The first determinate `ProgressView` in this app (Showcase/Automation are both open-ended
-  /// enough that only an indeterminate spinner made sense) — a real fraction is meaningful here
-  /// since `sweepDriver.totalCount` is a fixed, known denominator.
-  private var fullSweepBanner: some View {
-    HStack(spacing: 8) {
-      ProgressView(value: Double(sweepDriver.completedCount), total: Double(sweepDriver.totalCount))
-        .frame(maxWidth: 120)
-      Text(fullSweepProgressText)
-        .font(.caption)
-        .accessibilityIdentifier("fullSweepProgressLabel")
-      Spacer()
-      Button("Stop") { sweepDriver.stop() }
-        .accessibilityIdentifier("fullSweepStopButton")
-    }
-    .padding(.horizontal)
-    .padding(.vertical, 6)
-    .background(.bar)
   }
 
   private var fullSweepProgressText: String {
@@ -673,6 +705,7 @@ struct ContentView: View {
   /// `.task` only restarts on identity change, not on a plain property change, so anything short
   /// of this risks a pass that keeps running invisibly after Stop is tapped.
   private func stopShowcase() {
+    coordinator.stopActiveRun()
     if let showcaseSignpostState {
       // `showcaseIndex` is still whatever was on screen when this was called — the last valid
       // index (a natural, ran-every-algorithm finish via `advanceShowcase()`) or wherever a

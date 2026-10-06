@@ -182,7 +182,7 @@ struct CoverageSweepDriverTests {
 
   @MainActor
   @Test
-  func stoppedSweepLogsFinishedComboAndResumesAtNextVisualizer() async throws {
+  func stoppedSweepRetriesInterruptedComboBeforeNextVisualizer() async throws {
     let algorithms = AlgorithmRegistry.shared
     let shuffles = ShuffleRegistry.shared
     let visualizers = VisualizerRegistry.shared
@@ -223,20 +223,25 @@ struct CoverageSweepDriverTests {
     }
     #expect(firstQueued)
     firstDriver.stop()
+    #expect(await waitUntil { !firstDriver.isRunning })
+    #expect(firstDriver.completedCount == 0)
+    #expect(firstDriver.estimatedTimeRemaining() == nil)
+
+    let resumedDriver = CoverageSweepDriver(logURL: url)
+    resumedDriver.loadProgress()
+    #expect(resumedDriver.completedCount == 0)
+    resumedDriver.start()
+    let firstResumed = await waitUntil {
+      coordinator.pendingActionWillAutomate(for: algorithm.id)
+    }
+    #expect(firstResumed)
     guard case .run(let firstID, _) = coordinator.consumePendingAction(for: algorithm.id) else {
-      Issue.record("first sweep combination was not queued")
+      Issue.record("resumed sweep did not retry the interrupted combination")
       return
     }
     #expect(firstID == firstStyle.id)
     coordinator.resolveCompletion(token: coordinator.runToken)
-    #expect(await waitUntil { !firstDriver.isRunning })
-    #expect(firstDriver.completedCount == 1)
-    #expect(firstDriver.estimatedTimeRemaining() != nil)
-
-    let resumedDriver = CoverageSweepDriver(logURL: url)
-    resumedDriver.loadProgress()
-    #expect(resumedDriver.completedCount == 1)
-    resumedDriver.start()
+    #expect(await waitUntil { resumedDriver.completedCount == 1 })
     let secondQueued = await waitUntil {
       coordinator.pendingActionWillAutomate(for: algorithm.id)
     }

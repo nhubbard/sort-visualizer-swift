@@ -75,4 +75,13 @@ final class NavigationAccessibilityUITests: XCTestCase {
     XCTAssertTrue(app.sliders["runControlScrubSlider"].waitForExistence(timeout: 10))
     try app.performAccessibilityAudit(for: .dynamicType)
   }
+
+  func testSortControlsHaveUsableHitRegions() throws {
+    let app = XCUIApplication()
+    app.launchEnvironment = ["UI_TEST_ARRAY_SIZE": "24", "UI_TEST_PLAYBACK_SPEED": "1"]
+    app.launch()
+    app.tapSidebarLink("algorithmLink.quicksort")
+    XCTAssertTrue(app.buttons["runControlPlayPauseButton"].waitForExistence(timeout: 10))
+    try app.performAccessibilityAudit(for: .hitRegion)
+  }
 }
