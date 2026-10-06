@@ -219,8 +219,8 @@ struct BigOCorrelationDetailView: View {
           Label("Previous", systemImage: "chevron.left")
         }
         .buttonStyle(.bordered)
-        .keyboardShortcut(.leftArrow, modifiers: [.option])
-        .help("Previous recorded size (⌥←)")
+        .keyboardShortcut("p", modifiers: [.command, .option])
+        .help("Previous recorded size (⌘⌥P)")
         .accessibilityLabel("Previous Recorded Size")
         .accessibilityIdentifier("bigOPreviousRecordedSize")
         .focusable()
@@ -231,8 +231,8 @@ struct BigOCorrelationDetailView: View {
           Label("Next", systemImage: "chevron.right")
         }
         .buttonStyle(.bordered)
-        .keyboardShortcut(.rightArrow, modifiers: [.option])
-        .help("Next recorded size (⌥→)")
+        .keyboardShortcut("n", modifiers: [.command, .option])
+        .help("Next recorded size (⌘⌥N)")
         .accessibilityLabel("Next Recorded Size")
         .accessibilityIdentifier("bigONextRecordedSize")
         .focusable()

@@ -528,9 +528,9 @@ final class ExpandedBigONarrowInteractionUITests: XCTestCase {
     app.activateControlForUITest(app.buttons["Next Recorded Size"])
     XCTAssertTrue(selected.label.hasPrefix("Array Size "))
     let firstSelectedSize = selected.label
-    app.typeKey(XCUIKeyboardKey.rightArrow, modifierFlags: .option)
+    app.typeKey("n", modifierFlags: [.command, .option])
     XCTAssertNotEqual(selected.label, firstSelectedSize,
-      "Option-Right should inspect the next recorded size while the chart is open")
+      "Command-Option-N should inspect the next recorded size while the chart is open")
     let observed = app.staticTexts["bigOSelection.Observed"]
     XCTAssertTrue(observed.exists)
     XCTAssertTrue(app.staticTexts.matching(
