@@ -33,6 +33,12 @@ struct BigOCorrelationDetailView: View {
       .filter { seen.insert($0).inserted }
   }
 
+  private var referenceSeries: [String] {
+    var seen: Set<String> = []
+    return points.filter { $0.kind == .reference }.map(\.series)
+      .filter { seen.insert($0).inserted }
+  }
+
   private var visiblePoints: [BigOChartPoint] {
     let filtered = points.filter { !hiddenSeries.contains($0.series) }
     let scatterFiltered = showsIndividualRuns ? filtered : filtered.filter { $0.kind != .observedRun }
@@ -47,18 +53,26 @@ struct BigOCorrelationDetailView: View {
 
   var body: some View {
     NavigationStack {
-      VStack(alignment: .leading, spacing: 16) {
-        seriesToggleRow
-        chart
-        referenceLegend
-        RainbowStatLegend()
-        selectionSummary
+      ScrollView {
+        VStack(alignment: .leading, spacing: 16) {
+          seriesToggleRow
+          chart
+          referenceLegend
+          RainbowStatLegend()
+          if showsIndividualRuns {
+            Label("Individual runs (asterisks)", systemImage: "asterisk")
+              .font(.caption)
+              .foregroundStyle(.secondary)
+              .accessibilityIdentifier("bigOScatterLegend")
+          }
+          selectionSummary
+        }
+        #if DEBUG
+        .frame(maxWidth: auditContentWidth ?? .infinity, alignment: .leading)
+        #endif
+        .padding(24)
+        .frame(maxWidth: .infinity, alignment: .leading)
       }
-      #if DEBUG
-      .frame(maxWidth: auditContentWidth ?? .infinity, alignment: .leading)
-      #endif
-      .padding(24)
-      .frame(maxHeight: .infinity, alignment: .topLeading)
       .navigationTitle(algorithm.metadata.displayName)
       .toolbar {
         ToolbarItem(placement: .cancellationAction) {
@@ -85,6 +99,10 @@ struct BigOCorrelationDetailView: View {
       .accessibilityElement(children: .ignore)
       .accessibilityLabel("Recorded runs chart")
       .accessibilityValue(recordedRunSummary(points)
+        + " Solid line with circles: Observed mean. Dashed reference curves: "
+        + referenceSeries.joined(separator: ", ") + ". Shaped points: observed minimum, square; "
+        + "maximum, triangle; median, diamond; mean plus or minus one standard deviation, plus marks."
+        + (showsIndividualRuns ? " Asterisks show individual runs." : "")
         + " Use Previous Recorded Size and Next Recorded Size below the chart for exact values.")
       .accessibilityIdentifier("bigOCorrelationExpandedChart")
   }
@@ -117,10 +135,13 @@ struct BigOCorrelationDetailView: View {
       "Best Case": Color.blue,
       "Average Case": Color.green,
       "Worst Case": Color.orange,
-      "Individual Runs": Color.gray,
+      "Best & Average Case": Color.blue,
+      "Best & Worst Case": Color.blue,
+      "Average & Worst Case": Color.green,
+      "Best & Average & Worst Case": Color.blue,
+      "Observed": Color.gray,
     ])
-    // The plot is wider than its viewport when many sizes are recorded. Keep its legend outside
-    // that horizontal scroll view so the rightmost label is never clipped on opening the sheet.
+    // Keep legend entries below the plot so every name remains visible at the sheet's width.
     .chartLegend(.hidden)
     .chartOverlay { proxy in
       GeometryReader { geometry in
@@ -137,32 +158,28 @@ struct BigOCorrelationDetailView: View {
   }
 
   private var referenceLegend: some View {
-    HStack(spacing: 16) {
-      ForEach(["Best Case", "Average Case", "Worst Case"], id: \.self) { series in
+    LazyVGrid(columns: [GridItem(.adaptive(minimum: 125), alignment: .leading)], alignment: .leading, spacing: 8) {
+      ForEach(referenceSeries, id: \.self) { series in
         HStack(spacing: 4) {
-          Capsule()
-            .fill(referenceColor(for: series))
-            .frame(width: 16, height: 2)
+          Path { path in
+            path.move(to: CGPoint(x: 0, y: 5))
+            path.addLine(to: CGPoint(x: 30, y: 5))
+          }
+          .stroke(referenceColor(for: series), style: referenceLineStyle(for: series))
+          .frame(width: 30, height: 10)
+          .accessibilityHidden(true)
           Text(series)
-            .font(.caption2)
-            .foregroundStyle(.secondary)
+            .font(.caption)
         }
+        .accessibilityElement(children: .combine)
       }
     }
     .accessibilityIdentifier("bigOReferenceLegend")
   }
 
-  private func referenceColor(for series: String) -> Color {
-    switch series {
-    case "Best Case": .blue
-    case "Average Case": .green
-    default: .orange
-    }
-  }
-
   private var seriesToggleRow: some View {
     VStack(alignment: .leading, spacing: 8) {
-      LazyVGrid(columns: [GridItem(.adaptive(minimum: 120), spacing: 8)], alignment: .leading, spacing: 8) {
+      LazyVGrid(columns: [GridItem(.adaptive(minimum: 140), spacing: 8)], alignment: .leading, spacing: 8) {
         ForEach(allSeries, id: \.self) { series in
           Toggle(
             series,
@@ -194,23 +211,33 @@ struct BigOCorrelationDetailView: View {
         Text(selectedSize.map { "Array Size \($0)" } ?? "Select a size on the chart to see exact values")
           .font(.headline)
           .accessibilityIdentifier("bigOSelectedSize")
-        Spacer()
+      }
+      HStack(spacing: 8) {
         Button {
           selectRecordedSize(offset: -1)
         } label: {
-          Image(systemName: "chevron.left")
+          Label("Previous", systemImage: "chevron.left")
         }
+        .buttonStyle(.bordered)
+        .keyboardShortcut(.leftArrow, modifiers: [.option])
+        .help("Previous recorded size (⌥←)")
         .accessibilityLabel("Previous Recorded Size")
         .accessibilityIdentifier("bigOPreviousRecordedSize")
+        .focusable()
         .disabled(selectedSize == observedSizes.first)
         Button {
           selectRecordedSize(offset: 1)
         } label: {
-          Image(systemName: "chevron.right")
+          Label("Next", systemImage: "chevron.right")
         }
+        .buttonStyle(.bordered)
+        .keyboardShortcut(.rightArrow, modifiers: [.option])
+        .help("Next recorded size (⌥→)")
         .accessibilityLabel("Next Recorded Size")
         .accessibilityIdentifier("bigONextRecordedSize")
+        .focusable()
         .disabled(selectedSize == observedSizes.last)
+        Spacer(minLength: 0)
       }
       if selectedSize != nil {
         ForEach(visibleSeries, id: \.self) { series in
@@ -218,6 +245,13 @@ struct BigOCorrelationDetailView: View {
             .font(.caption)
             .foregroundStyle(.secondary)
             .accessibilityIdentifier("bigOSelection.\(series)")
+        }
+        if visibleSeries.contains("Observed") {
+          ForEach(observedStatisticTexts(), id: \.self) { value in
+            Text(value)
+              .font(.caption)
+              .foregroundStyle(.secondary)
+          }
         }
       }
     }
@@ -243,10 +277,34 @@ struct BigOCorrelationDetailView: View {
     guard let selectedSize else { return nil }
     guard
       let point = points
-        .filter({ $0.series == series && $0.kind != .observedRun })
+        .filter({ $0.series == series &&
+          (series == "Observed" ? $0.kind == .observedTrend : $0.kind == .reference) })
         .min(by: { abs($0.size - selectedSize) < abs($1.size - selectedSize) })
     else { return nil }
-    return "\(series): \(point.normalizedValue.formatted(.number.precision(.fractionLength(3))))"
+    let name = series == "Observed" ? "Observed mean" : series
+    return "\(name): \(point.normalizedValue.formatted(.number.precision(.fractionLength(3))))"
+  }
+
+  private func observedStatisticTexts() -> [String] {
+    guard let selectedSize else { return [] }
+    let atSize = points.filter { $0.size == selectedSize }
+    func value(_ kind: BigOChartPoint.Kind) -> String? {
+      atSize.first { $0.kind == kind }?.normalizedValue
+        .formatted(.number.precision(.fractionLength(3)))
+    }
+    var result: [String] = []
+    if let minimum = value(.statMin) { result.append("Observed minimum: \(minimum)") }
+    if let maximum = value(.statMax) { result.append("Observed maximum: \(maximum)") }
+    if let median = value(.statMedian) { result.append("Observed median: \(median)") }
+    let standardDeviation = atSize.filter { $0.kind == .statStdDevBand }
+      .map(\.normalizedValue).sorted()
+    if let lower = standardDeviation.first, let upper = standardDeviation.last,
+       standardDeviation.count == 2 {
+      result.append("Mean ±1 standard deviation: "
+        + "\(lower.formatted(.number.precision(.fractionLength(3))))–"
+        + "\(upper.formatted(.number.precision(.fractionLength(3))))")
+    }
+    return result
   }
 }
 

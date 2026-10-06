@@ -484,7 +484,7 @@ final class CompactBigONarrowCorpusUITests: XCTestCase {
 
 @MainActor
 final class ExpandedBigONarrowInteractionUITests: XCTestCase {
-  func testDenseChartScrollsSelectsAndTogglesAtNarrowWidth() {
+  func testDenseChartFitsSelectsAndTogglesAtNarrowWidth() {
     continueAfterFailure = false
     #if !targetEnvironment(macCatalyst)
     XCUIDevice.shared.orientation = .portrait
@@ -520,23 +520,21 @@ final class ExpandedBigONarrowInteractionUITests: XCTestCase {
     XCTAssertTrue(individual.exists)
     XCTAssertLessThanOrEqual(individual.frame.maxX, expanded.frame.maxX + 1)
 
-    let before = app.screenshot().pngRepresentation
-    #if targetEnvironment(macCatalyst)
-    expanded.scroll(byDeltaX: 300, deltaY: 0)
-    if app.screenshot().pngRepresentation == before {
-      expanded.scroll(byDeltaX: -600, deltaY: 0)
-    }
-    #else
-    expanded.swipeLeft(velocity: .slow)
-    #endif
-    XCTAssertNotEqual(app.screenshot().pngRepresentation, before,
-                      "Dense expanded chart did not scroll horizontally")
+    XCTAssertGreaterThanOrEqual(expanded.frame.minX, app.frame.minX)
+    XCTAssertLessThanOrEqual(expanded.frame.maxX, app.frame.maxX + 1)
+    XCTAssertTrue(String(describing: expanded.value ?? "").contains("Observed mean"))
 
     let selected = app.staticTexts["bigOSelectedSize"]
     app.activateControlForUITest(app.buttons["Next Recorded Size"])
     XCTAssertTrue(selected.label.hasPrefix("Array Size "))
     let observed = app.staticTexts["bigOSelection.Observed"]
     XCTAssertTrue(observed.exists)
+    XCTAssertTrue(app.staticTexts.matching(
+      NSPredicate(format: "label BEGINSWITH %@", "Observed minimum:"))
+      .firstMatch.exists)
+    XCTAssertTrue(app.staticTexts.matching(
+      NSPredicate(format: "label BEGINSWITH %@", "Observed maximum:"))
+      .firstMatch.exists)
     let toggle = app.descendants(matching: .any)
       .matching(identifier: "bigOSeriesToggle.Observed").firstMatch
     XCTAssertTrue(toggle.exists)
@@ -546,6 +544,9 @@ final class ExpandedBigONarrowInteractionUITests: XCTestCase {
     XCTAssertTrue(observed.exists)
     app.activateControlForUITest(individual)
     XCTAssertTrue(expanded.exists)
+    XCTAssertTrue(app.descendants(matching: .any)
+      .matching(identifier: "bigOScatterLegend").firstMatch.exists)
+    XCTAssertTrue(String(describing: expanded.value ?? "").contains("individual runs"))
     let capture = XCTAttachment(screenshot: app.screenshot())
     capture.name = "expanded-bigo-narrow-interactions"
     capture.lifetime = .keepAlways
