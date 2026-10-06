@@ -170,6 +170,9 @@ public struct SortView: View {
             Text("In marker-aware views, coral marks the first active array position and blue marks the second. These positions can be compared or swapped; the colors do not name the operation. Rainbow colors items by value and does not show marker highlights. Pause and step to inspect an operation.")
             Text("With Reduce Motion on, Showcase skips Hanoi Towers because its blocks travel between towers. You can still choose Hanoi Towers from the Visualizer picker.")
           }
+          Section("Color and Appearance") {
+            Text("Color Circle and Pixel Mesh encode values by hue alone. For a view where height or position also shows each value, choose Bar Graph, Rainbow, or Scatter Plot. The first and second active-position markers use color in marker-aware views.")
+          }
           Section("Learn More") {
             Text("Scroll below the visualization for the algorithm explanation, growth charts, and code examples.")
           }
