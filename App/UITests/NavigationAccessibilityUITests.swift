@@ -62,4 +62,17 @@ final class NavigationAccessibilityUITests: XCTestCase {
     app.activateControlForUITest(sound)
     XCTAssertNotEqual(sound.label, oldSoundLabel)
   }
+
+  func testHomeAndSortSupportDynamicType() throws {
+    let app = XCUIApplication()
+    app.launchEnvironment = ["UI_TEST_ARRAY_SIZE": "24"]
+    app.launch()
+
+    XCTAssertTrue(app.buttons["SORT SYMPHONY"].waitForExistence(timeout: 5))
+    try app.performAccessibilityAudit(for: .dynamicType)
+
+    app.tapSidebarLink("algorithmLink.quicksort")
+    XCTAssertTrue(app.sliders["runControlScrubSlider"].waitForExistence(timeout: 10))
+    try app.performAccessibilityAudit(for: .dynamicType)
+  }
 }

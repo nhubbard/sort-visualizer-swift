@@ -201,6 +201,10 @@ final class RunControlBarUITests: XCTestCase {
     let speedSlider = app.sliders["runControlSpeedSlider"]
     XCTAssertTrue(
       speedSlider.waitForExistence(timeout: 5), "speed row never expanded to reveal its slider")
+    XCTAssertEqual(speedSlider.label, "Playback speed")
+    #if !targetEnvironment(macCatalyst)
+    XCTAssertTrue((speedSlider.value as? String)?.contains("operations per second") == true)
+    #endif
 
     app.activateControlForUITest(speedButton)
     XCTAssertFalse(
@@ -223,7 +227,12 @@ final class RunControlBarUITests: XCTestCase {
     let speedButton = app.buttons["runControlSpeedButton"]
     XCTAssertTrue(speedButton.waitForExistence(timeout: 5))
     app.activateControlForUITest(speedButton)
-    XCTAssertTrue(app.sliders["runControlDurationSlider"].waitForExistence(timeout: 5))
+    let durationSlider = app.sliders["runControlDurationSlider"]
+    XCTAssertTrue(durationSlider.waitForExistence(timeout: 5))
+    XCTAssertEqual(durationSlider.label, "Target duration")
+    #if !targetEnvironment(macCatalyst)
+    XCTAssertTrue((durationSlider.value as? String)?.contains("seconds") == true)
+    #endif
     XCTAssertFalse(app.sliders["runControlSpeedSlider"].exists)
     XCTAssertTrue(app.staticTexts["runControlSpeedValueLabel"].label.contains("target:"))
 

@@ -12,7 +12,7 @@ final class NavigationContentUITests: XCTestCase {
     app.launchEnvironment = ["UI_TEST_ARRAY_SIZE": "24"]
     app.launch()
 
-    let search = app.searchFields["Search Algorithms"]
+    let search = app.searchFields["Search"]
     XCTAssertTrue(search.waitForExistence(timeout: 5))
     app.activateControlForUITest(search)
     search.typeText("no algorithm has this name 476829")

@@ -2,6 +2,7 @@ import AlgorithmKit
 import SettingsKit
 import SortEngineKit
 import SwiftUI
+import UIKit
 import VisualizationKit
 
 /// Docked below the sort visualization via `.safeAreaInset(edge: .bottom)`, reserving real layout
@@ -110,6 +111,8 @@ struct RunControlBar: View {
           .foregroundStyle(.secondary)
         Slider(value: $replay.targetDuration, in: 1...120, step: 1)
           .accessibilityIdentifier("runControlDurationSlider")
+          .accessibilityLabel("Target duration")
+          .accessibilityValue("\(Int(replay.targetDuration)) seconds")
         Text("120s")
           .font(.caption)
           .foregroundStyle(.secondary)
@@ -126,6 +129,8 @@ struct RunControlBar: View {
           .foregroundStyle(.secondary)
         Slider(value: $replay.speed, in: 1...1000, step: 1)
           .accessibilityIdentifier("runControlSpeedSlider")
+          .accessibilityLabel("Playback speed")
+          .accessibilityValue("\(Int(replay.speed)) operations per second")
         Text("Fast")
           .font(.caption)
           .foregroundStyle(.secondary)
@@ -319,11 +324,13 @@ private struct DisplayedStats: Equatable {
 private struct PlaybackTransportButtons: View {
   let session: SortSession
   let replay: ReplayEngine
+  @Environment(\.accessibilityVoiceOverEnabled) private var voiceOverEnabled
 
   var body: some View {
     HStack(spacing: 20) {
       Button {
         replay.seek(to: 0)
+        announce("At the beginning of the recording")
       } label: {
         Image(systemName: "backward.end.fill")
       }
@@ -335,6 +342,7 @@ private struct PlaybackTransportButtons: View {
       Button {
         replay.pause()
         replay.stepBackward()
+        announce("Back to operation \(replay.stepIndex) of \(replay.totalOperationCount)")
       } label: {
         Image(systemName: "backward.frame.fill")
       }
@@ -357,7 +365,9 @@ private struct PlaybackTransportButtons: View {
 
       Button {
         replay.pause()
+        let nextOperation = replay.tape.operations[replay.stepIndex]
         replay.stepForward()
+        announce(accessibilityDescription(for: nextOperation))
       } label: {
         Image(systemName: "forward.frame.fill")
       }
@@ -368,6 +378,7 @@ private struct PlaybackTransportButtons: View {
 
       Button {
         replay.seek(to: replay.totalOperationCount)
+        announce("At the sorted end of the recording")
       } label: {
         Image(systemName: "forward.end.fill")
       }
@@ -380,6 +391,47 @@ private struct PlaybackTransportButtons: View {
 
   private var isFinished: Bool {
     replay.stepIndex >= replay.totalOperationCount
+  }
+
+  private func announce(_ message: String) {
+    guard voiceOverEnabled else { return }
+    UIAccessibility.post(notification: .announcement, argument: message)
+  }
+}
+
+/// Spoken only after a user-requested step, so long tapes never queue thousands of announcements.
+func accessibilityDescription(for operation: SortOperation) -> String {
+  switch operation {
+  case .swap(let first, let second):
+    "Swapped positions \(first + 1) and \(second + 1)"
+  case .setValue(let index, let value):
+    "Set position \(index + 1) to \(value)"
+  case .compare(let first, let second):
+    "Compared positions \(first + 1) and \(second + 1)"
+  case .compareValue(let index, let value):
+    "Compared position \(index + 1) with value \(value)"
+  case .compareValues(let first, let second):
+    "Compared values \(first) and \(second)"
+  case .mark(_, let index):
+    "Highlighted position \(index + 1)"
+  case .unmark, .unmarkAll:
+    "Cleared a highlight"
+  case .unmarkIndex(_, let index):
+    "Cleared the highlight at position \(index + 1)"
+  case .markSorted(let index):
+    "Position \(index + 1) is sorted"
+  case .auxCreate(_, let length):
+    "Created a temporary array of \(length) items"
+  case .auxWrite(_, let index, let value):
+    "Wrote \(value) to temporary position \(index + 1)"
+  case .auxDelete:
+    "Removed a temporary array"
+  case .auxRead(_, let index):
+    "Read temporary position \(index + 1)"
+  case .readValue(let index):
+    "Read position \(index + 1)"
+  case .reversal:
+    "Started reversing a range"
   }
 }
 

@@ -61,6 +61,6 @@ public struct HomeView: View {
 
     Sorting algorithms can be difficult to understand, and it's easy to get confused. This app aims to \
     help you understand sorting algorithms by showing their actions in real time. Without further ado, \
-    let's get started -- choose an algorithm from the sidebar on the left!
+    let's get started -- choose an algorithm from the catalog!
     """
 }

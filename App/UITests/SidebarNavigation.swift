@@ -77,7 +77,7 @@ extension XCUIApplication {
         "algorithmLink.selectionsort": "Selection Sort",
       ]
       if !link.exists, let term = searchTerms[identifier] {
-        let search = searchFields["Search Algorithms"]
+        let search = searchFields["Search"]
         if search.waitForExistence(timeout: 5) {
           search.click()
           search.typeKey("a", modifierFlags: .command)

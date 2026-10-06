@@ -16,6 +16,11 @@ struct MetalRendererView: UIViewRepresentable {
 
   func makeUIView(context: Context) -> MTKView {
     let view = MTKView()
+    // MetalKit's drawing surface is otherwise absent from Catalyst's accessibility tree.
+    // SortView supplies the spoken label and value on the SwiftUI wrapper.
+    view.isAccessibilityElement = true
+    view.accessibilityTraits = .image
+    view.accessibilityLabel = "Sort visualization"
     // Always opaque, never transparent — the visualization plane paints its own backdrop
     // rather than showing whatever's behind it through. Which color that backdrop actually is
     // (and the "no marker" default item color that has to stay visible against it) flips with

@@ -163,15 +163,18 @@ struct ContentView: View {
   private var categorySidebar: some View {
     List(selection: $selectedSidebarCategory) {
       NavigationLink(value: SidebarCategory.all) {
-        Label("All Algorithms", systemImage: "square.grid.2x2")
+        Label("All", systemImage: "square.grid.2x2")
       }
+      .accessibilityLabel("All Algorithms")
       .accessibilityIdentifier("sidebarCategory.all")
 
       Section("Categories") {
         ForEach(AlgorithmCategory.allCases) { category in
           NavigationLink(value: SidebarCategory.category(category)) {
-            Label(category.displayName, systemImage: "folder")
+            Label(category.displayName.replacingOccurrences(of: " Sorts", with: ""),
+              systemImage: "folder")
           }
+          .accessibilityLabel(category.displayName)
           .accessibilityIdentifier("sidebarCategory.\(category.rawValue)")
         }
       }
@@ -227,7 +230,7 @@ struct ContentView: View {
         .accessibilityIdentifier("algorithmEmptyState")
       }
     }
-    .searchable(text: $searchText, prompt: "Search Algorithms")
+    .searchable(text: $searchText, prompt: "Search")
     .disabled(showcaseIndex != nil || sweepDriver.isRunning)
     .navigationTitle(contentTitle)
     .toolbar {

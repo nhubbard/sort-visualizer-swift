@@ -3,6 +3,7 @@ import PersistenceKit
 import SettingsKit
 import SortEngineKit
 import SwiftUI
+import VisualizationKit
 
 public struct SortView: View {
   @Bindable var session: SortSession
@@ -276,21 +277,30 @@ public struct SortView: View {
     MetalRendererView(replay: replay, visualizerID: settings.selectedVisualizerID)
       .id(ObjectIdentifier(replay))
       .accessibilityIdentifier("sortVisualizationCanvas")
-      .accessibilityLabel(
-        ProcessInfo.processInfo.environment["UI_TEST_TAPE_METADATA_PROBE"] == "1"
-          ? "\(replay.tape.header.algorithmID)|\(replay.tape.header.shuffleID ?? "")|"
-            + "\(replay.tape.header.visualSeed)|\(replay.tape.header.recordedAt.timeIntervalSince1970)|"
-            + "\(replay.tape.header.compareCount)|\(replay.tape.header.swapCount)|"
-            + "\(replay.tape.header.sortStartIndex)|\(replay.tape.operations.count)|"
-            + replay.tape.header.initialValues.map(String.init).joined(separator: ",")
-          : "Sort visualization"
-      )
-      .accessibilityValue(
-        ProcessInfo.processInfo.environment["UI_TEST_EXPOSE_FRAME"] == "1"
-          ? "\(replay.stepIndex)|\(replay.totalOperationCount)|\(session.arraySize)|\(Int(replay.speed))|"
-            + replay.frame.map { String($0.value) }.joined(separator: ",")
-          : ""
-      )
+      .accessibilityLabel(canvasAccessibilityLabel(for: replay))
+      .accessibilityValue(canvasAccessibilityValue(for: replay))
+      .accessibilityHint("Pause playback and use the step controls to hear individual operations")
+  }
+
+  private func canvasAccessibilityLabel(for replay: ReplayEngine) -> String {
+    guard ProcessInfo.processInfo.environment["UI_TEST_TAPE_METADATA_PROBE"] == "1" else {
+      return "Sort visualization"
+    }
+    let header = replay.tape.header
+    return "\(header.algorithmID)|\(header.shuffleID ?? "")|\(header.visualSeed)|"
+      + "\(header.recordedAt.timeIntervalSince1970)|\(header.compareCount)|\(header.swapCount)|"
+      + "\(header.sortStartIndex)|\(replay.tape.operations.count)|"
+      + header.initialValues.map(String.init).joined(separator: ",")
+  }
+
+  private func canvasAccessibilityValue(for replay: ReplayEngine) -> String {
+    if ProcessInfo.processInfo.environment["UI_TEST_EXPOSE_FRAME"] == "1" {
+      return "\(replay.stepIndex)|\(replay.totalOperationCount)|\(session.arraySize)|\(Int(replay.speed))|"
+        + replay.frame.map { String($0.value) }.joined(separator: ",")
+    }
+    let visualizer = VisualizerRegistry.shared.visualizer(id: settings.selectedVisualizerID)?
+      .metadata.displayName ?? "visualization"
+    return "\(session.arraySize) items, \(visualizer)"
   }
 
   /// Machine-readable phase/correctness signal for UI tests — a `Canvas` has no discrete
