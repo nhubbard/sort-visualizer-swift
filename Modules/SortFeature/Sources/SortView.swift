@@ -296,7 +296,10 @@ public struct SortView: View {
   }
 
   private func canvasWithControls(for replay: ReplayEngine) -> some View {
-    canvas(for: replay)
+    AccessibleSortCanvas(
+      replay: replay, visualizerID: settings.selectedVisualizerID,
+      algorithmName: session.algorithm.metadata.displayName, arraySize: session.arraySize,
+      status: statusText)
       .safeAreaInset(edge: .bottom) {
         RunControlBar(
           session: session,
@@ -307,43 +310,6 @@ public struct SortView: View {
           isVisualizerExpanded: $isVisualizerExpanded
         )
       }
-  }
-
-  /// `.id(ObjectIdentifier(replay))` forces SwiftUI to treat each new run as a genuinely new
-  /// view — see `MetalRendererView`'s own doc comment for why its `Coordinator` tracking needs
-  /// that reset rather than carrying over stale bookkeeping from whatever ran before.
-  ///
-  /// Metal is the only renderer — every built-in `Visualizer` has a working
-  /// `MetalRendererFactory` path as of the wedge/chord batch (`MetalTriangleRenderer`/
-  /// `MetalDisparityChordsRenderer`), so there's no fallback branch left to take.
-  private func canvas(for replay: ReplayEngine) -> some View {
-    MetalRendererView(replay: replay, visualizerID: settings.selectedVisualizerID)
-      .id(ObjectIdentifier(replay))
-      .accessibilityIdentifier("sortVisualizationCanvas")
-      .accessibilityLabel(canvasAccessibilityLabel(for: replay))
-      .accessibilityValue(canvasAccessibilityValue(for: replay))
-      .accessibilityHint("Pause playback and use the step controls to hear individual operations")
-  }
-
-  private func canvasAccessibilityLabel(for replay: ReplayEngine) -> String {
-    guard ProcessInfo.processInfo.environment["UI_TEST_TAPE_METADATA_PROBE"] == "1" else {
-      return "Sort visualization"
-    }
-    let header = replay.tape.header
-    return "\(header.algorithmID)|\(header.shuffleID ?? "")|\(header.visualSeed)|"
-      + "\(header.recordedAt.timeIntervalSince1970)|\(header.compareCount)|\(header.swapCount)|"
-      + "\(header.sortStartIndex)|\(replay.tape.operations.count)|"
-      + header.initialValues.map(String.init).joined(separator: ",")
-  }
-
-  private func canvasAccessibilityValue(for replay: ReplayEngine) -> String {
-    if ProcessInfo.processInfo.environment["UI_TEST_EXPOSE_FRAME"] == "1" {
-      return "\(replay.stepIndex)|\(replay.totalOperationCount)|\(session.arraySize)|\(Int(replay.speed))|"
-        + replay.frame.map { String($0.value) }.joined(separator: ",")
-    }
-    let visualizer = VisualizerRegistry.shared.visualizer(id: settings.selectedVisualizerID)?
-      .metadata.displayName ?? "visualization"
-    return "\(session.arraySize) items, \(visualizer)"
   }
 
   /// Machine-readable phase/correctness signal for UI tests — a `Canvas` has no discrete
@@ -382,6 +348,47 @@ public struct SortView: View {
     guard case .complete(let replay) = session.phase else { return false }
     let values = replay.frame.map(\.value)
     return values == values.sorted()
+  }
+}
+
+/// Isolates the frequently changing position value from `SortView`'s body. The Metal host and
+/// accessibility value can update each replay tick without rebuilding the surrounding controls.
+private struct AccessibleSortCanvas: View {
+  let replay: ReplayEngine
+  let visualizerID: VisualizerID
+  let algorithmName: String
+  let arraySize: Int
+  let status: String
+
+  var body: some View {
+    MetalRendererView(replay: replay, visualizerID: visualizerID)
+      .id(ObjectIdentifier(replay))
+      .accessibilityIdentifier("sortVisualizationCanvas")
+      .accessibilityLabel(accessibilityLabel)
+      .accessibilityValue(accessibilityValue)
+      .accessibilityHint("Pause playback and use the step controls to hear individual operations")
+  }
+
+  private var accessibilityLabel: String {
+    guard ProcessInfo.processInfo.environment["UI_TEST_TAPE_METADATA_PROBE"] == "1" else {
+      return "Sort visualization"
+    }
+    let header = replay.tape.header
+    return "\(header.algorithmID)|\(header.shuffleID ?? "")|\(header.visualSeed)|"
+      + "\(header.recordedAt.timeIntervalSince1970)|\(header.compareCount)|\(header.swapCount)|"
+      + "\(header.sortStartIndex)|\(replay.tape.operations.count)|"
+      + header.initialValues.map(String.init).joined(separator: ",")
+  }
+
+  private var accessibilityValue: String {
+    if ProcessInfo.processInfo.environment["UI_TEST_EXPOSE_FRAME"] == "1" {
+      return "\(replay.stepIndex)|\(replay.totalOperationCount)|\(arraySize)|\(Int(replay.speed))|"
+        + replay.frame.map { String($0.value) }.joined(separator: ",")
+    }
+    let visualizer = VisualizerRegistry.shared.visualizer(id: visualizerID)?
+      .metadata.displayName ?? "visualization"
+    return "\(algorithmName), \(arraySize) items, \(visualizer). "
+      + "Operation \(replay.stepIndex) of \(replay.totalOperationCount). \(status)"
   }
 }
 

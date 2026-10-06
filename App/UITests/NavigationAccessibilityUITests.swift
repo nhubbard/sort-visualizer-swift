@@ -47,8 +47,15 @@ final class NavigationAccessibilityUITests: XCTestCase {
     let speed = app.buttons["runControlSpeedButton"]
     XCTAssertEqual(speed.label, "Playback Speed")
     XCTAssertEqual(speed.value as? String, "1 ops per second")
+    let canvas = app.descendants(matching: .any)
+      .matching(identifier: "sortVisualizationCanvas").firstMatch
+    XCTAssertEqual(canvas.label, "Sort visualization")
+    let initialCanvasValue = canvas.value as? String ?? ""
+    XCTAssertTrue(initialCanvasValue.contains("Quick Sort, 24 items"))
+    XCTAssertTrue(initialCanvasValue.contains("Operation 0 of "))
 
     app.activateControlForUITest(app.buttons["runControlStepForwardButton"])
+    XCTAssertTrue((canvas.value as? String)?.contains("Operation 1 of ") == true)
     #if !targetEnvironment(macCatalyst)
       XCTAssertTrue((scrub.value as? String)?.hasPrefix("Operation 1 of ") == true)
     #endif
