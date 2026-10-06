@@ -86,6 +86,17 @@ struct BigOCorrelationDetailView: View {
         }
       }
     }
+    .onKeyPress(phases: .down) { press in
+      // Catalyst does not always send sheet-local keyboard shortcuts through the scroll view.
+      // Keep exact-value navigation available while a series toggle has keyboard focus.
+      guard press.modifiers.isEmpty else { return .ignored }
+      switch press.characters.lowercased() {
+      case "p": selectRecordedSize(offset: -1)
+      case "n": selectRecordedSize(offset: 1)
+      default: return .ignored
+      }
+      return .handled
+    }
     // Let the host choose a size that fits portrait and split-window layouts. A fixed 900-point
     // minimum clipped the controls and chart on narrower iPads.
     .presentationSizing(.page)
@@ -220,7 +231,7 @@ struct BigOCorrelationDetailView: View {
         }
         .buttonStyle(.bordered)
         .keyboardShortcut("p", modifiers: [.command, .option])
-        .help("Previous recorded size (⌘⌥P)")
+        .help("Previous recorded size (P or ⌘⌥P)")
         .accessibilityLabel("Previous Recorded Size")
         .accessibilityIdentifier("bigOPreviousRecordedSize")
         .focusable()
@@ -232,7 +243,7 @@ struct BigOCorrelationDetailView: View {
         }
         .buttonStyle(.bordered)
         .keyboardShortcut("n", modifiers: [.command, .option])
-        .help("Next recorded size (⌘⌥N)")
+        .help("Next recorded size (N or ⌘⌥N)")
         .accessibilityLabel("Next Recorded Size")
         .accessibilityIdentifier("bigONextRecordedSize")
         .focusable()
