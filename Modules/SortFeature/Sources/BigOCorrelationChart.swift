@@ -57,17 +57,19 @@ struct BigOCorrelationChart: View {
         let renderedPoints = compactChartPoints(points)
         let sizeDomain = Double(observedSizes[0])...Double(observedSizes[observedSizes.count - 1])
         VStack(alignment: .leading, spacing: 4) {
+          Text(recordedRunSummary(points))
+            .font(.caption)
+            .foregroundStyle(.secondary)
+            .accessibilityIdentifier("bigORecordedSummary")
           HStack {
             Spacer()
             Button {
               isShowingDetail = true
             } label: {
-              Image(systemName: "arrow.up.left.and.arrow.down.right")
-                .padding(8)
-                .glassOrMaterialBackground()
+              Label("Expand Chart", systemImage: "arrow.up.left.and.arrow.down.right")
             }
-            .buttonStyle(.plain)
-            .accessibilityLabel("Expand Chart")
+            .buttonStyle(.bordered)
+            .accessibilityIdentifier("bigOExpandChartButton")
           }
           Chart {
             ForEach(renderedPoints) { point in
@@ -150,6 +152,18 @@ struct BigOCorrelationChart: View {
     #endif
     return try await AnalyticsService.shared.fetchSummaries(algorithmID: algorithm.id)
   }
+}
+
+/// A compact takeaway from the full recorded-run dataset, independent of the marks retained for
+/// a legible compact plot. No intermediate-size behavior is inferred from endpoint values.
+func recordedRunSummary(_ points: [BigOChartPoint]) -> String {
+  let means = points.filter { $0.kind == .observedTrend }.sorted { $0.size < $1.size }
+  guard let first = means.first, let last = means.last else { return "No recorded trend available." }
+  let runCount = points.filter { $0.kind == .observedRun }.count
+  return "\(runCount) recorded runs across \(means.count) array sizes "
+    + "(\(first.size)–\(last.size) items). The observed mean normalized work is "
+    + "\(first.normalizedValue.formatted(.number.precision(.fractionLength(3)))) at the smallest "
+    + "size and \(last.normalizedValue.formatted(.number.precision(.fractionLength(3)))) at the largest."
 }
 
 #if DEBUG

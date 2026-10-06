@@ -193,4 +193,36 @@ struct GrowthModelComparisonTests {
     #expect(normalizedGrowthDivergencePercent(
       fitted: fitted, detected: detected, lowerBound: 2, cutoffSize: 8, scale: 0) == nil)
   }
+
+  @Test
+  func summaryUsesChartScaleAndSelectableCutoffAcrossCurveShapes() {
+    let linear = growthModelSummary(
+      fitted: OperationGrowthModel(anchorSize: 0, coefficients: [0, 2]),
+      detected: detected, domain: 2...16, cutoffSize: 8, scale: 32,
+      divergencePercent: 0)
+    #expect(linear.contains("Detected (solid line) changes from 0.12 to 0.50"))
+    #expect(linear.contains("Fitted (Used by App, dashed line) changes from 0.12 to 0.50"))
+
+    let logarithmic = growthModelSummary(
+      fitted: OperationGrowthModel(anchorSize: 0, coefficients: [1]),
+      detected: DetectedGrowthModel(family: .powerLog, coefficients: [1, 0], rSquared: 1),
+      domain: 2...16, cutoffSize: 8, scale: log(16), divergencePercent: nil)
+    #expect(logarithmic.contains("Detected (solid line) changes from 0.25 to 0.75"))
+    #expect(!logarithmic.contains("average separation"))
+
+    let quadratic = growthModelSummary(
+      fitted: OperationGrowthModel(anchorSize: 0, coefficients: [0, 0, 1]),
+      detected: DetectedGrowthModel(
+        family: .polynomialIntercept, coefficients: [1, 0, 0], rSquared: 1),
+      domain: 2...16, cutoffSize: 8, scale: 256, divergencePercent: 0)
+    #expect(quadratic.contains("Detected (solid line) changes from 0.02 to 0.25"))
+
+    let capped = growthModelSummary(
+      fitted: OperationGrowthModel(anchorSize: 0, coefficients: [0, 1]),
+      detected: detected, domain: 2...32, cutoffSize: 8, scale: 64,
+      divergencePercent: 10)
+    #expect(capped.contains("array size from 2 to 32 items"))
+    #expect(capped.contains("maximum selectable size, 8 items"))
+    #expect(capped.contains("Detected (solid line) changes from 0.06 to 0.25"))
+  }
 }

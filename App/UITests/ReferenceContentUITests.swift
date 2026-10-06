@@ -33,11 +33,21 @@ final class ReferenceContentUITests: XCTestCase {
 
     let code = app.descendants(matching: .any)
       .matching(identifier: "algorithmCodeSample").firstMatch
+    let summary = app.staticTexts["algorithmCodeSummary"]
+    XCTAssertTrue(summary.waitForExistence(timeout: 10))
+    XCTAssertTrue(summary.label.contains("Python implementation"))
+    XCTAssertFalse(code.exists, "The long listing should be disclosed on request")
+    XCTAssertTrue(app.buttons["copyAlgorithmCode"].exists)
+    let disclosure = app.buttons["toggleFullAlgorithmCode"]
+    app.activateControlForUITest(disclosure)
     XCTAssertTrue(code.waitForExistence(timeout: 10), "Python reference code did not render")
     XCTAssertTrue(code.label.contains("def sort("), "Wrong Python reference code: \(code.label)")
     XCTAssertTrue(code.label.contains("quick_sort"))
 
     app.activateControlForUITest(picker.buttons["Swift"])
+    XCTAssertFalse(code.exists, "Changing languages should return to the short summary")
+    XCTAssertTrue(summary.label.contains("Swift implementation"))
+    app.activateControlForUITest(disclosure)
     let swiftCode = XCTNSPredicateExpectation(
       predicate: NSPredicate(format: "label CONTAINS %@", "func sort("), object: code)
     XCTAssertEqual(XCTWaiter().wait(for: [swiftCode], timeout: 10), .completed,

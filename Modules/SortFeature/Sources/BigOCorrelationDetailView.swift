@@ -80,17 +80,13 @@ struct BigOCorrelationDetailView: View {
   private var chart: some View {
     let sizeDomain = observedSizes[0]...observedSizes[observedSizes.count - 1]
     let logDomain = Double(sizeDomain.lowerBound)...Double(sizeDomain.upperBound)
-    return GeometryReader { geometry in
-      ScrollView(.horizontal, showsIndicators: true) {
-        chartContent(sizeDomain: sizeDomain, logDomain: logDomain)
-          .frame(
-            width: max(geometry.size.width, CGFloat(observedSizes.count) * 48),
-            height: max(geometry.size.height, 300)
-          )
-      }
+    return chartContent(sizeDomain: sizeDomain, logDomain: logDomain)
+      .frame(maxWidth: .infinity, minHeight: 300, maxHeight: 500)
+      .accessibilityElement(children: .ignore)
+      .accessibilityLabel("Recorded runs chart")
+      .accessibilityValue(recordedRunSummary(points)
+        + " Use Previous Recorded Size and Next Recorded Size below the chart for exact values.")
       .accessibilityIdentifier("bigOCorrelationExpandedChart")
-    }
-    .frame(minHeight: 300, maxHeight: 500)
   }
 
   private func chartContent(
@@ -111,11 +107,8 @@ struct BigOCorrelationDetailView: View {
     }
     .chartXScale(domain: sizeDomain, type: .log)
     .chartXAxis {
-      // Bounded by the number of powers of two in range (rarely more than a dozen even across
-      // this app's full size range), unlike the old one-tick-per-recorded-size approach this
-      // replaced -- dense enough recorded sizes used to need rotated labels just to avoid
-      // overlapping; log-spaced power-of-two ticks don't.
-      AxisMarks(values: powerOfTwoAxisValues(in: logDomain, maximumCount: 8))
+      // Keep labels readable in the current sheet width, including a narrow split view.
+      AxisMarks(values: powerOfTwoAxisValues(in: logDomain, maximumCount: 5))
     }
     .chartXAxisLabel("Array Size")
     .chartYAxis { AxisMarks(position: .leading) }
@@ -208,6 +201,7 @@ struct BigOCorrelationDetailView: View {
           Image(systemName: "chevron.left")
         }
         .accessibilityLabel("Previous Recorded Size")
+        .accessibilityIdentifier("bigOPreviousRecordedSize")
         .disabled(selectedSize == observedSizes.first)
         Button {
           selectRecordedSize(offset: 1)
@@ -215,6 +209,7 @@ struct BigOCorrelationDetailView: View {
           Image(systemName: "chevron.right")
         }
         .accessibilityLabel("Next Recorded Size")
+        .accessibilityIdentifier("bigONextRecordedSize")
         .disabled(selectedSize == observedSizes.last)
       }
       if selectedSize != nil {

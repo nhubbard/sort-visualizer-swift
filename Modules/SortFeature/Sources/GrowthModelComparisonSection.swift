@@ -27,24 +27,20 @@ struct GrowthModelComparisonSection: View {
     VStack(alignment: .leading, spacing: 8) {
       Text("Growth Model").font(.title2.bold())
       if let detected = metadata.detectedGrowthModel {
+        let scale = normalizer(detected: detected)
+        let summary = growthModelSummary(
+          fitted: metadata.growthModel, detected: detected, domain: domain,
+          cutoffSize: cutoffSize, scale: scale,
+          divergencePercent: averageDivergencePercent(detected: detected))
         VStack(alignment: .leading, spacing: 8) {
           LabeledEquationCell(label: "Detected", equation: detected.latex)
           LabeledEquationCell(label: "Fitted (Used by App)", equation: metadata.fittedGrowthModelLatex)
         }
-        chart(detected: detected)
-        Text("Dotted line: maximum selectable size (\(Int(cutoffSize))).")
-          .font(.caption2)
-          .foregroundStyle(.secondary)
-        if let divergence = averageDivergencePercent(detected: detected) {
-          Text(
-            "Diverges from the detected curve by an average of "
-              + "\(divergence.formatted(.number.precision(.fractionLength(1))))% of normalized "
-              + "work across sizes this algorithm can actually run at. This comparison is "
-              + "approximate, not an exact measurement."
-          )
+        chart(detected: detected, scale: scale)
+        Text(summary)
           .font(.caption)
           .foregroundStyle(.secondary)
-        }
+          .accessibilityIdentifier("growthModelSummary")
       } else {
         LabeledEquationCell(label: "Fitted (Used by App)", equation: metadata.fittedGrowthModelLatex)
         Text("A measured growth model is not available for this algorithm yet.")
@@ -77,11 +73,10 @@ struct GrowthModelComparisonSection: View {
     )
   }
 
-  private func chart(detected: DetectedGrowthModel) -> some View {
-    let normalizer = normalizer(detected: detected)
+  private func chart(detected: DetectedGrowthModel, scale: Double) -> some View {
     let detectedCurve = sampledCurve(predict: detected.predictedOperations(atSize:))
     let fittedCurve = sampledCurve(predict: metadata.growthModel.predictedOperations(atSize:))
-    let normalizedValues = (detectedCurve + fittedCurve).map { $0.value / normalizer }
+    let normalizedValues = (detectedCurve + fittedCurve).map { $0.value / scale }
     // Without an explicit domain, Swift Charts' automatic "nice round number" y-axis picked
     // something like -1...2 for data that's actually within a hair of 0...1 -- a detected curve
     // can dip slightly negative at small sizes (e.g. a polynomialIntercept fit with a small
@@ -93,14 +88,14 @@ struct GrowthModelComparisonSection: View {
       ForEach(Array(detectedCurve.enumerated()), id: \.offset) { _, point in
         LineMark(
           x: .value("Array Size", point.size),
-          y: .value("Predicted Work", point.value / normalizer)
+          y: .value("Predicted Work", point.value / scale)
         )
         .foregroundStyle(by: .value("Series", "Detected"))
       }
       ForEach(Array(fittedCurve.enumerated()), id: \.offset) { _, point in
         LineMark(
           x: .value("Array Size", point.size),
-          y: .value("Predicted Work", point.value / normalizer)
+          y: .value("Predicted Work", point.value / scale)
         )
         .foregroundStyle(by: .value("Series", "Fitted (Used by App)"))
         .lineStyle(StrokeStyle(dash: [4, 4]))
@@ -118,6 +113,11 @@ struct GrowthModelComparisonSection: View {
     .chartYAxisLabel("Predicted Work (Normalized)")
     .chartLegend(position: .bottom, alignment: .center, spacing: 16)
     .frame(maxWidth: .infinity, minHeight: 160)
+    .accessibilityElement(children: .ignore)
+    .accessibilityLabel("Growth model comparison")
+    .accessibilityValue(
+      "Detected, solid line. Fitted (Used by App), dashed line. "
+        + "Dotted line: maximum selectable size, \(Int(cutoffSize)) items.")
     .accessibilityIdentifier("growthModelComparisonChart")
   }
 
@@ -181,4 +181,34 @@ func normalizedGrowthDivergencePercent(
     return abs(detectedNormalized - fittedNormalized)
   }
   return gaps.reduce(0, +) / Double(gaps.count) * 100
+}
+
+/// Uses the chart's exact model inputs, upper-domain normalizer, and reachable cutoff. Endpoint
+/// values describe the overall change without assigning a growth family to a polynomial fit.
+func growthModelSummary(
+  fitted: OperationGrowthModel, detected: DetectedGrowthModel,
+  domain: ClosedRange<Double>, cutoffSize: Double, scale: Double,
+  divergencePercent: Double?
+) -> String {
+  let lower = domain.lowerBound
+  let upper = domain.upperBound
+  func value(_ prediction: Double) -> String {
+    (prediction / scale).formatted(.number.precision(.fractionLength(2)))
+  }
+
+  var summary = "Horizontal axis: array size from \(Int(lower)) to \(Int(upper)) items. "
+    + "Vertical axis: predicted operations on a shared scale set at \(Int(upper)) "
+    + "items, without units. Across selectable sizes \(Int(lower)) to \(Int(cutoffSize)), "
+    + "Detected (solid line) changes from \(value(detected.predictedOperations(atSize: lower))) "
+    + "to \(value(detected.predictedOperations(atSize: cutoffSize))); "
+    + "Fitted (Used by App, dashed line) changes from "
+    + "\(value(fitted.predictedOperations(atSize: lower))) to "
+    + "\(value(fitted.predictedOperations(atSize: cutoffSize))). "
+    + "The dotted line marks the maximum selectable size, \(Int(cutoffSize)) items."
+  if let divergencePercent {
+    summary += " Their average separation across selectable sizes is "
+      + "\(divergencePercent.formatted(.number.precision(.fractionLength(1))))% "
+      + "of the normalized work scale; this is an approximation."
+  }
+  return summary
 }
