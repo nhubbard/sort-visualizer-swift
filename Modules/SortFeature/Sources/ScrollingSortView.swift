@@ -16,6 +16,15 @@ public struct ScrollingSortView: View {
   let showcaseCompletion: (() -> Void)?
   @State private var session: SortSession
   @Environment(AppSettings.self) private var settings
+  @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+  private var reduceMotionActive: Bool {
+    #if DEBUG
+    reduceMotion || ProcessInfo.processInfo.environment["UI_TEST_REDUCE_MOTION"] == "1"
+    #else
+    reduceMotion
+    #endif
+  }
 
   @MainActor
   public init(
@@ -91,7 +100,11 @@ public struct ScrollingSortView: View {
     .onDisappear {
       SortCoordinator.shared.unregisterActiveSession(for: algorithm.id)
     }
+    .onChange(of: reduceMotion) { _, _ in
+      session.setReduceMotionEnabled(reduceMotionActive)
+    }
     .task {
+      session.setReduceMotionEnabled(reduceMotionActive)
       await runSortViewLifecycle(
         session: session, algorithm: algorithm, arraySize: arraySize,
         showcaseCompletion: showcaseCompletion, settings: settings)

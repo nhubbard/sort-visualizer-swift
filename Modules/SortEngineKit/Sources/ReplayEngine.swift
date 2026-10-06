@@ -157,6 +157,12 @@ public final class ReplayEngine {
   /// `useFixedDurationPacing` is `false`.
   public var speed: Double = 30.0
 
+  /// An optional ceiling for timed playback only. The configured speed and target duration stay
+  /// intact so turning Reduce Motion off restores the user's pacing without changing settings.
+  /// Manual steps and seeks never consult this limit.
+  public var automaticSpeedLimit: Double?
+  public private(set) var wasAutomaticallyLimited = false
+
   /// Mode switch, live like `speed` — when `true`, `play()` paces against `targetDuration`
   /// instead of a flat `speed`, recomputing the required rate every tick from how much
   /// significant work and wall-clock time actually remain (see `play()`'s tick loop), so a run's
@@ -168,9 +174,9 @@ public final class ReplayEngine {
   /// is `true`.
   public var targetDuration: Double = 10.0
 
-  /// The rate actually being applied as of the most recent tick — equal to `speed` in the flat
-  /// mode, but the freshly recomputed deadline rate in fixed-duration mode (where `speed` itself
-  /// stays an unrelated stored value). Updated once per tick (not per operation), so callers that
+  /// The rate actually being applied as of the most recent tick — equal to `speed` in ordinary
+  /// flat mode, bounded by `automaticSpeedLimit` when present, and otherwise recomputed against
+  /// the deadline in fixed-duration mode. Updated once per tick (not per operation), so callers that
   /// need "the current cadence" for something other than the tick loop itself — e.g. sizing an
   /// audio note's hold duration in `SortSession.makeOnStepClosure` — read the real rate regardless
   /// of pacing mode, instead of `speed`, which is meaningless while fixed-duration pacing is on.
@@ -479,7 +485,10 @@ public final class ReplayEngine {
           effectiveSpeed = rawPacingRate
           previousSmoothedRate = nil
         }
-        self.currentPacingRate = effectiveSpeed
+        let playbackRate = self.automaticSpeedLimit.map { min(effectiveSpeed, $0) }
+          ?? effectiveSpeed
+        if playbackRate < effectiveSpeed { self.wasAutomaticallyLimited = true }
+        self.currentPacingRate = playbackRate
         // See `effectiveSpeed`'s and this method's own doc comments: a `0` rate (only possible
         // in fixed-duration mode, once no significant work remains) can never clear the
         // cosmetic-only remainder through the normal accumulator math, so flush it directly.
@@ -487,7 +496,7 @@ public final class ReplayEngine {
           self.useFixedDurationPacing && remainingSignificantOperationCount == 0
           ? remaining
           : Self.opsToApply(
-            elapsed: elapsed, speed: effectiveSpeed, accumulator: &accumulator,
+            elapsed: elapsed, speed: playbackRate, accumulator: &accumulator,
             remaining: remaining
           )
         // See `replaySignposter`'s own doc comment: unlike "TickApply" below, this fires on

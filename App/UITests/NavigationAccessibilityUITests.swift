@@ -70,6 +70,29 @@ final class NavigationAccessibilityUITests: XCTestCase {
     XCTAssertNotEqual(sound.label, oldSoundLabel)
   }
 
+  func testReducedMotionCapsAutomaticPlaybackAndKeepsManualSteps() throws {
+    let app = XCUIApplication()
+    app.launchEnvironment = [
+      "UI_TEST_ARRAY_SIZE": "24", "UI_TEST_PLAYBACK_SPEED": "1000",
+      "UI_TEST_REDUCE_MOTION": "1"
+    ]
+    app.launch()
+    app.tapSidebarLink("algorithmLink.quicksort")
+
+    XCTAssertTrue(app.staticTexts["reducedMotionPlaybackNotice"].waitForExistence(timeout: 10))
+    let probe = app.staticTexts["reducedMotionPlaybackProbe"]
+    XCTAssertTrue(probe.waitForExistence(timeout: 10))
+    let limitText = probe.value as? String ?? ""
+    XCTAssertEqual(Double(limitText.split(separator: "|").first ?? ""), 15,
+      "Expected the active replay's 15 ops/sec limit, got: \(limitText)")
+
+    let pause = app.buttons["runControlPlayPauseButton"]
+    if pause.label == "Pause" { app.activateControlForUITest(pause) }
+    app.activateControlForUITest(app.buttons["runControlJumpToStartButton"])
+    app.activateControlForUITest(app.buttons["runControlStepForwardButton"])
+    XCTAssertTrue((probe.value as? String)?.hasSuffix("|1") == true)
+  }
+
   func testHomeAndSortSupportDynamicType() throws {
     let app = XCUIApplication()
     app.launchEnvironment = ["UI_TEST_ARRAY_SIZE": "24"]

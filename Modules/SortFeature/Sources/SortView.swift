@@ -10,6 +10,15 @@ public struct SortView: View {
   @Bindable var session: SortSession
   @Environment(AppSettings.self) private var settings
   @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+  @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+  private var reduceMotionActive: Bool {
+    #if DEBUG
+    reduceMotion || ProcessInfo.processInfo.environment["UI_TEST_REDUCE_MOTION"] == "1"
+    #else
+    reduceMotion
+    #endif
+  }
 
   // Owned here, not by `RunControlBar` itself: `start(size:)` (the size stepper's own action)
   // routes `session.phase` through `.recording`/`.ready` before landing back on `.replaying`,
@@ -68,6 +77,13 @@ public struct SortView: View {
           }
         }
         .padding(.horizontal)
+        if reduceMotionActive {
+          Text("Reduce Motion is on. Automatic playback is limited to 15 operations per second; manual steps are unchanged. A target-duration run may take longer.")
+            .font(.caption)
+            .foregroundStyle(.secondary)
+            .padding(.horizontal)
+            .accessibilityIdentifier("reducedMotionPlaybackNotice")
+        }
         discoveryTip
       }
       #if DEBUG
@@ -108,6 +124,14 @@ public struct SortView: View {
               + "\(replay.header.shuffleID ?? "")|\(settings.selectedVisualizerID.rawValue)"
           )
       }
+      if ProcessInfo.processInfo.environment["UI_TEST_REDUCE_MOTION"] == "1",
+        let replay = session.lastReplay {
+        Text("Reduce Motion playback probe")
+          .font(.caption2)
+          .accessibilityIdentifier("reducedMotionPlaybackProbe")
+          .accessibilityValue(
+            "\(replay.automaticSpeedLimit ?? -1)|\(replay.currentPacingRate)|\(replay.stepIndex)")
+      }
       if let cap = ProcessInfo.processInfo.environment["UI_TEST_CAP_LOG_PROBE"].flatMap(Int.init) {
         Text("Cap log probe")
           .font(.caption2)
@@ -141,6 +165,9 @@ public struct SortView: View {
           }
           Section("Presentation") {
             Text("Array Size changes the number of items in a new run. Visualizer changes how the current run is drawn.")
+          }
+          Section("Visualization Markers") {
+            Text("In marker-aware views, coral marks the first active array position and blue marks the second. These positions can be compared or swapped; the colors do not name the operation. Rainbow colors items by value and does not show marker highlights. Pause and step to inspect an operation.")
           }
           Section("Learn More") {
             Text("Scroll below the visualization for the algorithm explanation, growth charts, and code examples.")

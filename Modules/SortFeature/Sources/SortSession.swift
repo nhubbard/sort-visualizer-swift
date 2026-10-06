@@ -99,6 +99,15 @@ public final class SortSession {
   private let audio: any AudioPlaying
   private let analytics: AnalyticsService
   private let settings: AppSettings
+  /// This applies to the active replay and every new run, including automation-created runs.
+  /// It does not rewrite the user's stored speed or target duration.
+  private var reduceMotionEnabled = false
+  public static let reducedMotionSpeedLimit = 15.0
+
+  public func setReduceMotionEnabled(_ enabled: Bool) {
+    reduceMotionEnabled = enabled
+    lastReplay?.automaticSpeedLimit = enabled ? Self.reducedMotionSpeedLimit : nil
+  }
   /// Not a public init parameter: the only override this session ever needs is a test injecting
   /// a deterministic tick driver in place of `ReplayEngine`'s real `CADisplayLink` (see
   /// `ReplayEngine`'s own non-public `displayLinkFactory` seam, kept internal for the same
@@ -285,6 +294,7 @@ public final class SortSession {
       ? tape.compactedForFastPlayback() : tape
     let replay = replayEngineFactory(playbackTape)
     replay.speed = settings.playbackSpeed
+    replay.automaticSpeedLimit = reduceMotionEnabled ? Self.reducedMotionSpeedLimit : nil
     replay.useFixedDurationPacing = settings.useFixedDurationPacing
     replay.targetDuration = settings.targetPlaybackDuration
     phase = .replaying(replay)
@@ -317,14 +327,13 @@ public final class SortSession {
       // cached from an earlier tick — so this reflects the real elapsed wall-clock up to
       // this instant regardless of anything else that might read `elapsedPlaybackDuration`
       // afterward (e.g. `RunControlBar`, still displaying `.complete` state).
-      // `replay.speed` is the exact value the user configured and is what fixed-rate mode
-      // actually paces against, so it stays the recorded number there — same as before this
-      // feature. In fixed-duration mode `speed` is inert (see `ReplayEngine.currentPacingRate`'s
-      // doc comment), so record the true achieved average instead
+      // In ordinary fixed-rate mode `replay.speed` is the configured and applied value. With
+      // Reduce Motion, the applied rate can be lower; fixed-duration mode also varies it live.
+      // Record the true achieved average in either of those modes
       // (`significantOperationCount / elapsedPlaybackDuration`, matching what `RunControlBar`'s
       // own "ops/sec" stat already computes) rather than a meaningless stored number.
       let recordedSpeed: Double
-      if replay.useFixedDurationPacing {
+      if replay.useFixedDurationPacing || replay.wasAutomaticallyLimited {
         recordedSpeed =
           replay.elapsedPlaybackDuration > 0
           ? Double(replay.significantOperationCount) / replay.elapsedPlaybackDuration

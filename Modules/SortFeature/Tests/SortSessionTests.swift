@@ -206,6 +206,24 @@ private func makeInMemoryAnalytics() throws -> AnalyticsService {
 @MainActor
 @Suite
 struct SortSessionTests {
+  @Test
+  func reduceMotionLimitCarriesIntoNewReplaysAndUpdatesTheActiveReplay() throws {
+    let algorithm = FakeAlgorithm()
+    let session = SortSession(
+      algorithm: algorithm, shuffle: FakeIdentityShuffle(),
+      analytics: try makeInMemoryAnalytics(), settings: makeFastSettings())
+    session.setReduceMotionEnabled(true)
+    let tape = try TapeFactory.makeTape(
+      algorithm: algorithm, shuffle: FakeIdentityShuffle(), size: 9,
+      operationCap: 100_000)
+    session.loadImportedTape(tape)
+    #expect(session.lastReplay?.automaticSpeedLimit == SortSession.reducedMotionSpeedLimit)
+
+    session.setReduceMotionEnabled(false)
+    #expect(session.lastReplay?.automaticSpeedLimit == nil)
+    session.lastReplay?.pause()
+  }
+
   /// Regression guard for a real, measured mount-race: without `startsAutomating`, a freshly
   /// constructed session always began `isAutomating == false` until its own `.task` actually
   /// reached `runSinglePass`/`runAutomationAndWait` — a window `ScrollingSortView` could render

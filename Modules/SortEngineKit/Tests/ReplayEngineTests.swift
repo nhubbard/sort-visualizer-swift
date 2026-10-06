@@ -188,6 +188,39 @@ struct ReplayEngineTests {
     engine.pause()
   }
 
+  @Test
+  func automaticLimitSlowsTimedPlaybackWithoutChangingManualStepsOrStoredSpeed() async {
+    let tape = makeTape(
+      initialValues: [1, 2], operations: (0..<100).map { _ in .compare(0, 1) })
+    let driver = ManualTickDriver()
+    let engine = ReplayEngine(tape: tape, displayLinkFactory: { driver })
+    engine.speed = 200
+    engine.automaticSpeedLimit = 15
+
+    _ = engine.play()
+    driver.fireTick(elapsed: 0)
+    for _ in 0..<60 { driver.fireTick(elapsed: 1.0 / 60.0) }
+    try? await Task.sleep(for: .milliseconds(50))
+    #expect((14...16).contains(engine.stepIndex))
+    #expect(engine.speed == 200)
+    #expect(engine.currentPacingRate == 15)
+    #expect(engine.wasAutomaticallyLimited)
+
+    engine.pause()
+    let beforeStep = engine.stepIndex
+    engine.stepForward()
+    #expect(engine.stepIndex == beforeStep + 1)
+
+    engine.automaticSpeedLimit = nil
+    _ = engine.play()
+    driver.fireTick(elapsed: 0)
+    driver.fireTick(elapsed: 0.25)
+    try? await Task.sleep(for: .milliseconds(50))
+    #expect(engine.currentPacingRate == 200)
+    #expect(engine.stepIndex > beforeStep + 1)
+    engine.pause()
+  }
+
   /// Direct regression test for the marker-bookkeeping throughput bug: `RecordingEngine`'s
   /// auto mark/unmark bookkeeping around every `.compare`/`.swap` must not eat into the pacing
   /// budget — a tape mixing bookkeeping with significant operations must play through its
