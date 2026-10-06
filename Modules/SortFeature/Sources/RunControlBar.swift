@@ -2,6 +2,7 @@ import AlgorithmKit
 import SettingsKit
 import SortEngineKit
 import SwiftUI
+import TipKit
 import UIKit
 import VisualizationKit
 
@@ -354,6 +355,8 @@ private struct PlaybackTransportButtons: View {
       Button {
         session.togglePlayback()
         SortHaptics.playPauseToggled()
+        PlaybackDiscoveryTip.hasUsedPlayback = true
+        PlaybackDiscoveryTip().invalidate(reason: .actionPerformed)
       } label: {
         Image(systemName: replay.isPlaying ? "pause.fill" : "play.fill")
           .font(.title2)
@@ -368,6 +371,8 @@ private struct PlaybackTransportButtons: View {
         let nextOperation = replay.tape.operations[replay.stepIndex]
         replay.stepForward()
         announce(accessibilityDescription(for: nextOperation))
+        PlaybackDiscoveryTip.hasUsedPlayback = true
+        PlaybackDiscoveryTip().invalidate(reason: .actionPerformed)
       } label: {
         Image(systemName: "forward.frame.fill")
       }
@@ -526,6 +531,8 @@ private struct UtilityButtons: View {
 
       Button {
         isSizeExpanded.toggle()
+        PresentationDiscoveryTip.hasAdjustedPresentation = true
+        PresentationDiscoveryTip().invalidate(reason: .actionPerformed)
       } label: {
         Text("n=\(session.arraySize)")
           .font(.footnote.monospacedDigit())
@@ -537,6 +544,8 @@ private struct UtilityButtons: View {
 
       Button {
         isVisualizerExpanded.toggle()
+        PresentationDiscoveryTip.hasAdjustedPresentation = true
+        PresentationDiscoveryTip().invalidate(reason: .actionPerformed)
       } label: {
         Image(systemName: "eye.fill")
       }

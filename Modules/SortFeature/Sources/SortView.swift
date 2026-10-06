@@ -3,11 +3,13 @@ import PersistenceKit
 import SettingsKit
 import SortEngineKit
 import SwiftUI
+import TipKit
 import VisualizationKit
 
 public struct SortView: View {
   @Bindable var session: SortSession
   @Environment(AppSettings.self) private var settings
+  @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
   // Owned here, not by `RunControlBar` itself: `start(size:)` (the size stepper's own action)
   // routes `session.phase` through `.recording`/`.ready` before landing back on `.replaying`,
@@ -19,6 +21,7 @@ public struct SortView: View {
   @State private var isSpeedExpanded = false
   @State private var isSizeExpanded = false
   @State private var isVisualizerExpanded = false
+  @State private var isShowingHelp = false
   #if DEBUG
   @State private var capAuditProbe = "loading"
   @State private var automationAuditProbe = "loading"
@@ -35,7 +38,37 @@ public struct SortView: View {
   public var body: some View {
     VStack(spacing: 12) {
       if !session.isAutomating {
-        statusLabel
+        Group {
+          if dynamicTypeSize.isAccessibilitySize {
+            VStack(alignment: .leading, spacing: 4) {
+              HStack {
+                statusLabel
+                Spacer(minLength: 8)
+                helpButton
+              }
+              detailsScrollCue
+            }
+          } else {
+            ViewThatFits(in: .horizontal) {
+              HStack(alignment: .firstTextBaseline) {
+                statusLabel
+                Spacer(minLength: 8)
+                detailsScrollCue
+                helpButton
+              }
+              VStack(alignment: .leading, spacing: 4) {
+                HStack {
+                  statusLabel
+                  Spacer(minLength: 8)
+                  helpButton
+                }
+                detailsScrollCue
+              }
+            }
+          }
+        }
+        .padding(.horizontal)
+        discoveryTip
       }
       #if DEBUG
       if ProcessInfo.processInfo.environment["UI_TEST_INT03_SWEEP"] == "1" {
@@ -99,6 +132,55 @@ public struct SortView: View {
       }
       #endif
       content
+    }
+    .sheet(isPresented: $isShowingHelp) {
+      NavigationStack {
+        List {
+          Section("Playback") {
+            Text("Use Play to watch the recording. Pause and use Step Forward or Step Back to inspect one operation at a time.")
+          }
+          Section("Presentation") {
+            Text("Array Size changes the number of items in a new run. Visualizer changes how the current run is drawn.")
+          }
+          Section("Learn More") {
+            Text("Scroll below the visualization for the algorithm explanation, growth charts, and code examples.")
+          }
+        }
+        .navigationTitle("How to Use")
+        .toolbar {
+          ToolbarItem(placement: .confirmationAction) {
+            Button("Done") { isShowingHelp = false }
+              .accessibilityIdentifier("sortHelpDoneButton")
+          }
+        }
+      }
+    }
+  }
+
+  private var detailsScrollCue: some View {
+    Text("Scroll for details")
+      .font(.caption)
+      .foregroundStyle(.secondary)
+      .accessibilityIdentifier("sortDetailsScrollCue")
+  }
+
+  private var helpButton: some View {
+    Button("How to Use") { isShowingHelp = true }
+      .font(.caption)
+      .accessibilityIdentifier("sortHelpButton")
+  }
+
+  @ViewBuilder
+  private var discoveryTip: some View {
+    if case .replaying = session.phase {
+      VStack(spacing: 4) {
+        TipView(PlaybackDiscoveryTip())
+          .accessibilityIdentifier("sortPlaybackTip")
+        TipView(PresentationDiscoveryTip())
+          .accessibilityIdentifier("sortPresentationTip")
+      }
+      .frame(maxWidth: 480)
+      .padding(.horizontal)
     }
   }
 
@@ -300,5 +382,35 @@ public struct SortView: View {
     guard case .complete(let replay) = session.phase else { return false }
     let values = replay.frame.map(\.value)
     return values == values.sorted()
+  }
+}
+
+struct PlaybackDiscoveryTip: Tip {
+  @Parameter static var hasUsedPlayback: Bool = false
+
+  var title: Text { Text("Explore one step at a time") }
+  var message: Text? {
+    Text("Pause playback, then use Step Forward or Step Back to hear and inspect an operation.")
+  }
+  var rules: [Rule] {
+    #Rule(Self.$hasUsedPlayback) { $0 == false }
+  }
+  var options: [any Option] { MaxDisplayCount(2) }
+}
+
+struct PresentationDiscoveryTip: Tip {
+  @Parameter static var hasAdjustedPresentation: Bool = false
+
+  var title: Text { Text("Change the view") }
+  var message: Text? {
+    Text("Array Size sets the next run's item count. Visualizer changes the drawing of this run.")
+  }
+  var rules: [Rule] {
+    #Rule(PlaybackDiscoveryTip.$hasUsedPlayback) { $0 == true }
+    #Rule(Self.$hasAdjustedPresentation) { $0 == false }
+  }
+  var options: [any Option] {
+    MaxDisplayCount(2)
+    IgnoresDisplayFrequency(true)
   }
 }

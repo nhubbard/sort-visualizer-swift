@@ -497,7 +497,9 @@ struct ContentView: View {
           .id("\(selection.rawValue)-\(coordinator.runToken)")
         }
       } else {
-        HomeView()
+        HomeView {
+          coordinator.selectedAlgorithmID = AlgorithmID(rawValue: "quicksort")
+        }
       }
     }
     .safeAreaInset(edge: .top) {

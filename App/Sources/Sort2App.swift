@@ -6,12 +6,19 @@ import Foundation
 import SettingsKit
 import SortFeature
 import SwiftUI
+import TipKit
 import VisualizationKit
 
 @main
 @MainActor
 struct Sort2App: App {
   init() {
+    #if DEBUG
+      if ProcessInfo.processInfo.environment["UI_TEST_DISCOVERY_TIPS"] == "1" {
+        try? Tips.resetDatastore()
+      }
+    #endif
+    try? Tips.configure([.displayFrequency(.daily)])
     #if DEBUG
       let environment = ProcessInfo.processInfo.environment
       let preferences = UserDefaults.standard
