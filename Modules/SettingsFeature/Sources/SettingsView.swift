@@ -203,9 +203,9 @@ func recordingCapEstimateText(
   playbackSpeed: Double
 ) -> String {
   if useFixedDurationPacing {
-    return "≈ \(Int(targetPlaybackDuration))s per run at the fixed-duration target"
+    return String(localized: "≈ \(Int(targetPlaybackDuration))s per run at the fixed-duration target", bundle: .module)
   }
   let minutes = Double(recordingOperationCap) / playbackSpeed / 60
-  return "≈ " + minutes.formatted(.number.precision(.fractionLength(1)))
-    + " min at the current playback speed"
+  let formattedMinutes = minutes.formatted(.number.precision(.fractionLength(1)))
+  return String(localized: "≈ \(formattedMinutes) min at the current playback speed", bundle: .module)
 }

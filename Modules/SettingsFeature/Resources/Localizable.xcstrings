@@ -87,6 +87,12 @@
     },
     "Visualizer" : {
 
+    },
+    "≈ %@ min at the current playback speed" : {
+
+    },
+    "≈ %llds per run at the fixed-duration target" : {
+
     }
   },
   "version" : "1.0"

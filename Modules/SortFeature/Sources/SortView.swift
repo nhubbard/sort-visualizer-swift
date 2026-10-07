@@ -355,12 +355,15 @@ public struct SortView: View {
 
   private var statusText: String {
     switch session.phase {
-    case .idle: "Idle"
-    case .recording: "Recording…"
-    case .ready: "Ready"
-    case .replaying: "Sorting…"
-    case .complete: isReplayCorrectlySorted ? "Sorted ✓" : "Sort verification failed"
-    case .failed: "Failed"
+    case .idle: String(localized: "Idle", bundle: .module)
+    case .recording: String(localized: "Recording…", bundle: .module)
+    case .ready: String(localized: "Ready", bundle: .module)
+    case .replaying: String(localized: "Sorting…", bundle: .module)
+    case .complete:
+      isReplayCorrectlySorted
+        ? String(localized: "Sorted ✓", bundle: .module)
+        : String(localized: "Sort verification failed", bundle: .module)
+    case .failed: String(localized: "Failed", bundle: .module)
     }
   }
 

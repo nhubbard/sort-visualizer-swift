@@ -152,6 +152,9 @@
     "Export this run's recorded tape as a .tape file" : {
 
     },
+    "Failed" : {
+
+    },
     "Fast" : {
 
     },
@@ -332,6 +335,9 @@
     "Read Full Code" : {
 
     },
+    "Ready" : {
+
+    },
     "Recorded runs chart" : {
 
     },
@@ -339,6 +345,9 @@
 
     },
     "Recorded work" : {
+
+    },
+    "Recording…" : {
 
     },
     "Reduce Motion is on. Automatic playback is limited to 15 operations per second; manual steps are unchanged. A target-duration run may take longer." : {
@@ -399,6 +408,15 @@
 
     },
     "Sort Skipped" : {
+
+    },
+    "Sort verification failed" : {
+
+    },
+    "Sorted ✓" : {
+
+    },
+    "Sorting…" : {
 
     },
     "Statistics: %lld compares, %lld swaps" : {

@@ -126,7 +126,7 @@ public struct AlgorithmDetailSection: View {
               .sheet(isPresented: $isSelectableCodePresented) {
                 NavigationStack {
                   SelectableCodeTextView(source: plain)
-                    .navigationTitle("\(selectedLanguage.title) source")
+                    .navigationTitle(Text("\(selectedLanguage.title) source"))
                     .toolbar {
                       ToolbarItem(placement: .cancellationAction) {
                         Button("Done") { isSelectableCodePresented = false }

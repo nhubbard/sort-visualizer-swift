@@ -262,15 +262,21 @@ struct BigOCorrelationDetailView: View {
     let visibleSeries = allSeries.filter { !hiddenSeries.contains($0) }
     return VStack(alignment: .leading, spacing: 4) {
       HStack {
-        Text(selectedSize.map { "Array Size \($0)" } ?? "Select a size on the chart to see exact values")
-          .font(.headline)
-          .accessibilityIdentifier("bigOSelectedSize")
+        Group {
+          if let selectedSize {
+            Text("Array Size \(selectedSize)")
+          } else {
+            Text("Select a size on the chart to see exact values")
+          }
+        }
+        .font(.headline)
+        .accessibilityIdentifier("bigOSelectedSize")
       }
       HStack(spacing: 8) {
         Button {
           selectRecordedSize(offset: -1)
         } label: {
-          Label("Previous", systemImage: "chevron.left")
+          Label("Previous", systemImage: "chevron.backward")
         }
         .buttonStyle(.bordered)
         .keyboardShortcut("p", modifiers: [.command, .option])
@@ -282,7 +288,7 @@ struct BigOCorrelationDetailView: View {
         Button {
           selectRecordedSize(offset: 1)
         } label: {
-          Label("Next", systemImage: "chevron.right")
+          Label("Next", systemImage: "chevron.forward")
         }
         .buttonStyle(.bordered)
         .keyboardShortcut("n", modifiers: [.command, .option])
