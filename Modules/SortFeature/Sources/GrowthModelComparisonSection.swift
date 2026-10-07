@@ -196,19 +196,21 @@ func growthModelSummary(
     (prediction / scale).formatted(.number.precision(.fractionLength(2)))
   }
 
-  var summary = "Horizontal axis: array size from \(Int(lower)) to \(Int(upper)) items. "
-    + "Vertical axis: predicted operations on a shared scale set at \(Int(upper)) "
-    + "items, without units. Across selectable sizes \(Int(lower)) to \(Int(cutoffSize)), "
-    + "Detected (solid line) changes from \(value(detected.predictedOperations(atSize: lower))) "
-    + "to \(value(detected.predictedOperations(atSize: cutoffSize))); "
-    + "Fitted (Used by App, dashed line) changes from "
-    + "\(value(fitted.predictedOperations(atSize: lower))) to "
-    + "\(value(fitted.predictedOperations(atSize: cutoffSize))). "
-    + "The dotted line marks the maximum selectable size, \(Int(cutoffSize)) items."
+  let lowerSize = Int(lower)
+  let upperSize = Int(upper)
+  let maximumSize = Int(cutoffSize)
+  let detectedStart = value(detected.predictedOperations(atSize: lower))
+  let detectedEnd = value(detected.predictedOperations(atSize: cutoffSize))
+  let fittedStart = value(fitted.predictedOperations(atSize: lower))
+  let fittedEnd = value(fitted.predictedOperations(atSize: cutoffSize))
+  var summary = String(localized:
+    "Horizontal axis: array size from \(lowerSize) to \(upperSize) items. Vertical axis: predicted operations on a shared scale set at \(upperSize) items, without units. Across selectable sizes \(lowerSize) to \(maximumSize), Detected (solid line) changes from \(detectedStart) to \(detectedEnd); Fitted (Used by App, dashed line) changes from \(fittedStart) to \(fittedEnd). The dotted line marks the maximum selectable size, \(maximumSize) items.",
+    bundle: .module)
   if let divergencePercent {
-    summary += " Their average separation across selectable sizes is "
-      + "\(divergencePercent.formatted(.number.precision(.fractionLength(1))))% "
-      + "of the normalized work scale; this is an approximation."
+    let percent = divergencePercent.formatted(.number.precision(.fractionLength(1)))
+    summary += String(localized:
+      " Their average separation across selectable sizes is \(percent)% of the normalized work scale; this is an approximation.",
+      bundle: .module)
   }
   return summary
 }

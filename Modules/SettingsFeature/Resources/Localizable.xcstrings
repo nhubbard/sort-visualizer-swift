@@ -1,0 +1,93 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "%lld operations/second" : {
+
+    },
+    "%llds per run" : {
+
+    },
+    "1s" : {
+
+    },
+    "120s" : {
+
+    },
+    "Array Size" : {
+
+    },
+    "Audio Unit Bridge" : {
+
+    },
+    "Code" : {
+
+    },
+    "Code Sample Theme" : {
+
+    },
+    "Compact for Fast Playback" : {
+
+    },
+    "Default Playback Speed" : {
+
+    },
+    "Default Size: %lld" : {
+
+    },
+    "Duration" : {
+
+    },
+    "Fast" : {
+
+    },
+    "Fixed Duration" : {
+
+    },
+    "Fixed Rate" : {
+
+    },
+    "Max Operations: %lld" : {
+
+    },
+    "Pacing Mode" : {
+
+    },
+    "Recording Limit" : {
+
+    },
+    "Reset all settings to their defaults?" : {
+
+    },
+    "Reset to Defaults" : {
+
+    },
+    "Settings" : {
+
+    },
+    "Shuffle Method" : {
+
+    },
+    "Slow" : {
+
+    },
+    "Sorting" : {
+
+    },
+    "Sound" : {
+
+    },
+    "Sound Effects" : {
+
+    },
+    "Speed" : {
+
+    },
+    "Status" : {
+
+    },
+    "Visualizer" : {
+
+    }
+  },
+  "version" : "1.0"
+}

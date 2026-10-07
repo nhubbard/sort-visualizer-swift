@@ -109,6 +109,8 @@ public enum Module {
         "SWIFT_VERSION": "6.0",
         "SWIFT_STRICT_CONCURRENCY": "complete",
         "ENABLE_USER_SCRIPT_SANDBOXING": "YES",
+        "SWIFT_EMIT_LOC_STRINGS": "YES",
+        "LOCALIZATION_PREFERS_STRING_CATALOGS": "YES",
         "STRING_CATALOG_GENERATE_SYMBOLS": "YES"
     ]
 

@@ -165,12 +165,15 @@ struct BigOCorrelationChart: View {
 /// a legible compact plot. No intermediate-size behavior is inferred from endpoint values.
 func recordedRunSummary(_ points: [BigOChartPoint]) -> String {
   let means = points.filter { $0.kind == .observedTrend }.sorted { $0.size < $1.size }
-  guard let first = means.first, let last = means.last else { return "No recorded trend available." }
+  guard let first = means.first, let last = means.last else {
+    return String(localized: "No recorded trend available.", bundle: .module)
+  }
   let runCount = points.filter { $0.kind == .observedRun }.count
-  return "\(runCount) recorded runs across \(means.count) array sizes "
-    + "(\(first.size)–\(last.size) items). The observed mean normalized work is "
-    + "\(first.normalizedValue.formatted(.number.precision(.fractionLength(3)))) at the smallest "
-    + "size and \(last.normalizedValue.formatted(.number.precision(.fractionLength(3)))) at the largest."
+  let firstValue = first.normalizedValue.formatted(.number.precision(.fractionLength(3)))
+  let lastValue = last.normalizedValue.formatted(.number.precision(.fractionLength(3)))
+  return String(localized:
+    "\(runCount) recorded runs across \(means.count) array sizes (\(first.size)–\(last.size) items). The observed mean normalized work is \(firstValue) at the smallest size and \(lastValue) at the largest.",
+    bundle: .module)
 }
 
 #if DEBUG
