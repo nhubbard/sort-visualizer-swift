@@ -127,9 +127,10 @@ final class ComplexityChartsUITests: XCTestCase {
       XCTAssertTrue(expand.exists)
       app.activateControlForUITest(expand)
       #if targetEnvironment(macCatalyst)
-      let individualRuns = app.buttons["Show Individual Runs"]
+      let individualRuns = app.descendants(matching: .any)
+        .matching(identifier: "Show Individual Runs").firstMatch
       XCTAssertTrue(individualRuns.waitForExistence(timeout: 5))
-      individualRuns.click()
+      app.activateControlForUITest(individualRuns)
       XCTAssertTrue(app.descendants(matching: .any).matching(
         NSPredicate(format: "label == %@ AND value == %@", "Show Individual Runs", "1")
       ).firstMatch.exists)

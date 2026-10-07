@@ -54,24 +54,41 @@ struct BigOCorrelationDetailView: View {
   var body: some View {
     NavigationStack {
       ScrollView {
-        VStack(alignment: .leading, spacing: 16) {
-          seriesToggleRow
-          chart
-          referenceLegend
-          RainbowStatLegend()
-          if showsIndividualRuns {
-            Label("Individual runs (asterisks)", systemImage: "asterisk")
-              .font(.caption)
+        VStack(alignment: .leading, spacing: 20) {
+          VStack(alignment: .leading, spacing: 6) {
+            Text("Recorded work")
+              .font(.title2.bold())
+            Text(recordedRunSummary(points))
+              .font(.subheadline)
               .foregroundStyle(.secondary)
-              .accessibilityIdentifier("bigOScatterLegend")
           }
+          seriesToggleRow
+          VStack(alignment: .leading, spacing: 16) {
+            chart
+            if !hiddenSeries.contains("Observed") {
+              Divider()
+              Text("Point symbols")
+                .font(.headline)
+              RainbowStatLegend()
+              if showsIndividualRuns {
+                Label("Individual runs (asterisks)", systemImage: "asterisk")
+                  .font(.caption)
+                  .foregroundStyle(.secondary)
+                  .accessibilityIdentifier("bigOScatterLegend")
+              }
+            }
+          }
+          .padding(20)
+          .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 16))
           selectionSummary
         }
         #if DEBUG
-        .frame(maxWidth: auditContentWidth ?? .infinity, alignment: .leading)
+        .frame(maxWidth: auditContentWidth ?? 960, alignment: .leading)
+        #else
+        .frame(maxWidth: 960, alignment: .leading)
         #endif
         .padding(24)
-        .frame(maxWidth: .infinity, alignment: .leading)
+        .frame(maxWidth: .infinity, alignment: .center)
       }
       .navigationTitle(algorithm.metadata.displayName)
       .toolbar {
@@ -106,14 +123,18 @@ struct BigOCorrelationDetailView: View {
     let sizeDomain = observedSizes[0]...observedSizes[observedSizes.count - 1]
     let logDomain = Double(sizeDomain.lowerBound)...Double(sizeDomain.upperBound)
     return chartContent(sizeDomain: sizeDomain, logDomain: logDomain)
-      .frame(maxWidth: .infinity, minHeight: 300, maxHeight: 500)
+      .frame(maxWidth: .infinity, minHeight: 300, maxHeight: 420)
       .accessibilityElement(children: .ignore)
       .accessibilityLabel("Recorded runs chart")
       .accessibilityValue(recordedRunSummary(points)
-        + " Solid line with circles: Observed mean. Dashed reference curves: "
-        + referenceSeries.joined(separator: ", ") + ". Shaped points: observed minimum, square; "
-        + "maximum, triangle; median, diamond; mean plus or minus one standard deviation, plus marks."
-        + (showsIndividualRuns ? " Asterisks show individual runs." : "")
+        + (hiddenSeries.contains("Observed") ? "" : " Solid line with circles: Observed mean. "
+          + "Shaped points: observed minimum, square; maximum, triangle; median, diamond; "
+          + "mean plus or minus one standard deviation, plus marks.")
+        + (referenceSeries.filter { !hiddenSeries.contains($0) }.isEmpty ? "" :
+          " Dashed reference curves: "
+          + referenceSeries.filter { !hiddenSeries.contains($0) }.joined(separator: ", ") + ".")
+        + (showsIndividualRuns && !hiddenSeries.contains("Observed")
+          ? " Asterisks show individual runs." : "")
         + " Use Previous Recorded Size and Next Recorded Size below the chart for exact values.")
       .accessibilityIdentifier("bigOCorrelationExpandedChart")
   }
@@ -168,49 +189,64 @@ struct BigOCorrelationDetailView: View {
     }
   }
 
-  private var referenceLegend: some View {
-    LazyVGrid(columns: [GridItem(.adaptive(minimum: 125), alignment: .leading)], alignment: .leading, spacing: 8) {
-      ForEach(referenceSeries, id: \.self) { series in
-        HStack(spacing: 4) {
-          Path { path in
-            path.move(to: CGPoint(x: 0, y: 5))
-            path.addLine(to: CGPoint(x: 30, y: 5))
-          }
-          .stroke(referenceColor(for: series), style: referenceLineStyle(for: series))
-          .frame(width: 30, height: 10)
-          .accessibilityHidden(true)
-          Text(series)
-            .font(.caption)
-        }
-        .accessibilityElement(children: .combine)
-      }
-    }
-    .accessibilityIdentifier("bigOReferenceLegend")
-  }
-
   private var seriesToggleRow: some View {
-    VStack(alignment: .leading, spacing: 8) {
-      LazyVGrid(columns: [GridItem(.adaptive(minimum: 140), spacing: 8)], alignment: .leading, spacing: 8) {
+    VStack(alignment: .leading, spacing: 14) {
+      VStack(alignment: .leading, spacing: 4) {
+        Text("Show on chart")
+          .font(.headline)
+        Text("Switch curves on or off to compare them.")
+          .font(.subheadline)
+          .foregroundStyle(.secondary)
+      }
+      LazyVGrid(columns: [GridItem(.adaptive(minimum: 250), spacing: 12)], alignment: .leading, spacing: 12) {
         ForEach(allSeries, id: \.self) { series in
-          Toggle(
-            series,
-            isOn: Binding(
+          Toggle(isOn: Binding(
               get: { !hiddenSeries.contains(series) },
               set: { isOn in
                 if isOn { hiddenSeries.remove(series) } else { hiddenSeries.insert(series) }
               }
-            )
-          )
-          .toggleStyle(.button)
-          .controlSize(.small)
+            )) {
+              HStack(spacing: 10) {
+                seriesSample(for: series)
+                Text(series)
+                  .font(.subheadline)
+                Spacer(minLength: 8)
+              }
+            }
+          .toggleStyle(.switch)
+          .tint(.accentColor)
           .accessibilityIdentifier("bigOSeriesToggle.\(series)")
         }
       }
-      Toggle("Show Individual Runs", isOn: $showsIndividualRuns)
-        .toggleStyle(.button)
-        .controlSize(.small)
-        .frame(maxWidth: .infinity, alignment: .trailing)
+      Divider()
+      Toggle(isOn: $showsIndividualRuns) {
+        Label("Show Individual Runs", systemImage: "asterisk")
+          .font(.subheadline)
+      }
+      .toggleStyle(.switch)
+      .tint(.accentColor)
+      .accessibilityIdentifier("Show Individual Runs")
     }
+    .padding(16)
+    .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 16))
+  }
+
+  private func seriesSample(for series: String) -> some View {
+    Path { path in
+      path.move(to: CGPoint(x: 0, y: 8))
+      path.addLine(to: CGPoint(x: 34, y: 8))
+    }
+    .stroke(series == "Observed" ? Color.blue : referenceColor(for: series),
+            style: series == "Observed" ? StrokeStyle(lineWidth: 2) : referenceLineStyle(for: series))
+    .frame(width: 34, height: 16)
+    .overlay {
+      if series == "Observed" {
+        Circle()
+          .fill(.blue)
+          .frame(width: 7, height: 7)
+      }
+    }
+    .accessibilityHidden(true)
   }
 
   /// Tap selection changes at most once per gesture, so the empty state can stay compact instead
