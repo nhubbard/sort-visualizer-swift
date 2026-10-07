@@ -11,6 +11,7 @@ struct BigOCorrelationDetailView: View {
   let points: [BigOChartPoint]
 
   @Environment(\.dismiss) private var dismiss
+  @Environment(\.dynamicTypeSize) private var dynamicTypeSize
   @State private var selectedSize: Int?
   @State private var hiddenSeries: Set<String> = []
   /// Off by default: `.observedTrend` is already the per-size average of the raw `.observedRun`
@@ -198,7 +199,13 @@ struct BigOCorrelationDetailView: View {
           .font(.subheadline)
           .foregroundStyle(.secondary)
       }
-      LazyVGrid(columns: [GridItem(.adaptive(minimum: 250), spacing: 12)], alignment: .leading, spacing: 12) {
+      LazyVGrid(
+        columns: dynamicTypeSize.isAccessibilitySize
+          ? [GridItem(.flexible())]
+          : [GridItem(.adaptive(minimum: 250), spacing: 12)],
+        alignment: .leading,
+        spacing: 12
+      ) {
         ForEach(allSeries, id: \.self) { series in
           Toggle(isOn: Binding(
               get: { !hiddenSeries.contains(series) },
@@ -208,7 +215,7 @@ struct BigOCorrelationDetailView: View {
             )) {
               HStack(spacing: 10) {
                 seriesSample(for: series)
-                Text(series)
+                Text(seriesDisplayName(series))
                   .font(.subheadline)
                 Spacer(minLength: 8)
               }
@@ -328,8 +335,11 @@ struct BigOCorrelationDetailView: View {
           (series == "Observed" ? $0.kind == .observedTrend : $0.kind == .reference) })
         .min(by: { abs($0.size - selectedSize) < abs($1.size - selectedSize) })
     else { return nil }
-    let name = series == "Observed" ? "Observed mean" : series
-    return "\(name): \(point.normalizedValue.formatted(.number.precision(.fractionLength(3))))"
+    let name = series == "Observed"
+      ? String(localized: "Observed mean", bundle: .module)
+      : seriesDisplayName(series)
+    let value = point.normalizedValue.formatted(.number.precision(.fractionLength(3)))
+    return String(localized: "\(name): \(value)", bundle: .module)
   }
 
   private func observedStatisticTexts() -> [String] {
@@ -340,18 +350,38 @@ struct BigOCorrelationDetailView: View {
         .formatted(.number.precision(.fractionLength(3)))
     }
     var result: [String] = []
-    if let minimum = value(.statMin) { result.append("Observed minimum: \(minimum)") }
-    if let maximum = value(.statMax) { result.append("Observed maximum: \(maximum)") }
-    if let median = value(.statMedian) { result.append("Observed median: \(median)") }
+    if let minimum = value(.statMin) {
+      result.append(String(localized: "Observed minimum: \(minimum)", bundle: .module))
+    }
+    if let maximum = value(.statMax) {
+      result.append(String(localized: "Observed maximum: \(maximum)", bundle: .module))
+    }
+    if let median = value(.statMedian) {
+      result.append(String(localized: "Observed median: \(median)", bundle: .module))
+    }
     let standardDeviation = atSize.filter { $0.kind == .statStdDevBand }
       .map(\.normalizedValue).sorted()
     if let lower = standardDeviation.first, let upper = standardDeviation.last,
        standardDeviation.count == 2 {
-      result.append("Mean ±1 standard deviation: "
-        + "\(lower.formatted(.number.precision(.fractionLength(3))))–"
-        + "\(upper.formatted(.number.precision(.fractionLength(3))))")
+      let lowerValue = lower.formatted(.number.precision(.fractionLength(3)))
+      let upperValue = upper.formatted(.number.precision(.fractionLength(3)))
+      result.append(String(localized: "Mean ±1 standard deviation: \(lowerValue)–\(upperValue)", bundle: .module))
     }
     return result
+  }
+
+  private func seriesDisplayName(_ series: String) -> String {
+    switch series {
+    case "Observed": String(localized: "Observed", bundle: .module)
+    case "Best Case": String(localized: "Best Case", bundle: .module)
+    case "Average Case": String(localized: "Average Case", bundle: .module)
+    case "Worst Case": String(localized: "Worst Case", bundle: .module)
+    case "Best & Average Case": String(localized: "Best & Average Case", bundle: .module)
+    case "Best & Worst Case": String(localized: "Best & Worst Case", bundle: .module)
+    case "Average & Worst Case": String(localized: "Average & Worst Case", bundle: .module)
+    case "Best & Average & Worst Case": String(localized: "Best & Average & Worst Case", bundle: .module)
+    default: series
+    }
   }
 }
 

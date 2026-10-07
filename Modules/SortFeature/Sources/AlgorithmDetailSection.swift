@@ -33,6 +33,7 @@ public struct AlgorithmDetailSection: View {
   @State private var highlighted: [CodeLanguage: AttributedString] = [:]
   @State private var plainSamples: [CodeLanguage: String] = [:]
   @State private var isFullCodeVisible = false
+  @State private var isSelectableCodePresented = false
   #if DEBUG
   @State private var appliedThemeID: CodeThemeID?
   #endif
@@ -96,11 +97,13 @@ public struct AlgorithmDetailSection: View {
             }
             .pickerStyle(.segmented)
             .accessibilityIdentifier("codeLanguagePicker")
-            .onChange(of: selectedLanguage) { isFullCodeVisible = false }
+            .onChange(of: selectedLanguage) {
+              isFullCodeVisible = false
+              isSelectableCodePresented = false
+            }
 
             if let plain = plainSamples[selectedLanguage] {
-              Text("\(selectedLanguage.title) implementation, \(codeLineCount(plain)) lines. "
-                + "Copy Code or choose Read Full Code to inspect the source.")
+              Text("\(selectedLanguage.title) implementation, \(codeLineCount(plain)) lines. Copy Code or choose Read Full Code to inspect the source.")
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
                 .accessibilityIdentifier("algorithmCodeSummary")
@@ -115,6 +118,21 @@ public struct AlgorithmDetailSection: View {
                   isFullCodeVisible.toggle()
                 }
                 .accessibilityIdentifier("toggleFullAlgorithmCode")
+                if isFullCodeVisible {
+                  Button("Select Text") { isSelectableCodePresented = true }
+                    .accessibilityIdentifier("selectAlgorithmCodeText")
+                }
+              }
+              .sheet(isPresented: $isSelectableCodePresented) {
+                NavigationStack {
+                  SelectableCodeTextView(source: plain)
+                    .navigationTitle("\(selectedLanguage.title) source")
+                    .toolbar {
+                      ToolbarItem(placement: .cancellationAction) {
+                        Button("Done") { isSelectableCodePresented = false }
+                      }
+                    }
+                }
               }
             }
 
@@ -150,6 +168,7 @@ public struct AlgorithmDetailSection: View {
       highlighted = [:]
       plainSamples = [:]
       isFullCodeVisible = false
+      isSelectableCodePresented = false
       #if DEBUG
         appliedThemeID = nil
       #endif
@@ -280,6 +299,33 @@ public struct AlgorithmDetailSection: View {
   private func complexityRow(_ id: String) -> ComplexityRow {
     let rows = algorithm.metadata.complexityRows
     return rows.first { $0.id == id } ?? rows[0]
+  }
+}
+
+/// A deliberate plain-text route for keyboard and VoiceOver selection. The highlighted SwiftUI
+/// `Text` remains the reading view; `UITextView` exposes a native selected-text range when a
+/// reader wants to copy only part of a sample.
+private struct SelectableCodeTextView: UIViewRepresentable {
+  let source: String
+
+  func makeUIView(context: Context) -> UITextView {
+    let view = UITextView()
+    view.isEditable = false
+    view.isSelectable = true
+    view.isScrollEnabled = true
+    view.backgroundColor = .clear
+    view.textContainerInset = UIEdgeInsets(top: 20, left: 20, bottom: 20, right: 20)
+    view.textContainer.lineFragmentPadding = 0
+    view.adjustsFontForContentSizeCategory = true
+    view.accessibilityIdentifier = "selectableAlgorithmCodeText"
+    return view
+  }
+
+  func updateUIView(_ view: UITextView, context: Context) {
+    if view.text != source { view.text = source }
+    let font = UIFont.monospacedSystemFont(ofSize: 16, weight: .regular)
+    view.font = UIFontMetrics(forTextStyle: .body).scaledFont(for: font)
+    view.textColor = .label
   }
 }
 
