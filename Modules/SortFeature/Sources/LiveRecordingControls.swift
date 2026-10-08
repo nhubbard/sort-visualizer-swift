@@ -2,7 +2,7 @@ import AVKit
 import SwiftUI
 
 @MainActor
-private enum LiveRecordingBackend {
+enum LiveRecordingBackend {
   static func make() -> any LiveRecordingCapturing {
     #if targetEnvironment(macCatalyst)
     if #available(macCatalyst 18.2, *) { return ScreenCaptureKitLiveRecordingCapture() }
@@ -15,7 +15,7 @@ private enum LiveRecordingBackend {
 
 @MainActor
 struct LiveRecordingControls: View {
-  @State private var model = LiveRecordingModel(capture: LiveRecordingBackend.make())
+  let model: LiveRecordingModel
   @State private var isPreviewPresented = false
 
   var body: some View {
@@ -70,7 +70,6 @@ struct LiveRecordingControls: View {
     }
     .buttonStyle(.bordered)
     .font(.caption)
-    .padding(.horizontal)
     .sheet(isPresented: $isPreviewPresented) {
       if case .ready(let url) = model.phase {
         NavigationStack {
@@ -84,9 +83,6 @@ struct LiveRecordingControls: View {
             }
         }
       }
-    }
-    .onDisappear {
-      Task { await model.cancel() }
     }
   }
 }

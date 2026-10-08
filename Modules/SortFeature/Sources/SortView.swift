@@ -30,6 +30,8 @@ public struct SortView: View {
   @State private var isSpeedExpanded = false
   @State private var isSizeExpanded = false
   @State private var isVisualizerExpanded = false
+  @State private var isVideoExpanded = false
+  @State private var liveRecordingModel = LiveRecordingModel(capture: LiveRecordingBackend.make())
   @State private var isShowingHelp = false
   #if DEBUG
   @State private var capAuditProbe = "loading"
@@ -50,11 +52,7 @@ public struct SortView: View {
         Group {
           if dynamicTypeSize.isAccessibilitySize {
             VStack(alignment: .leading, spacing: 4) {
-              HStack {
-                statusLabel
-                Spacer(minLength: 8)
-                helpButton
-              }
+              statusLabel
               detailsScrollCue
             }
           } else {
@@ -63,21 +61,15 @@ public struct SortView: View {
                 statusLabel
                 Spacer(minLength: 8)
                 detailsScrollCue
-                helpButton
               }
               VStack(alignment: .leading, spacing: 4) {
-                HStack {
-                  statusLabel
-                  Spacer(minLength: 8)
-                  helpButton
-                }
+                statusLabel
                 detailsScrollCue
               }
             }
           }
         }
         .padding(.horizontal)
-        LiveRecordingControls()
         if reduceMotionActive {
           Text("Reduce Motion is on. Automatic playback is limited to 15 operations per second; manual steps are unchanged. A target-duration run may take longer.")
             .font(.caption)
@@ -158,6 +150,14 @@ public struct SortView: View {
       #endif
       content
     }
+    .toolbar {
+      ToolbarItem(placement: .topBarTrailing) {
+        helpButton
+      }
+    }
+    .onDisappear {
+      Task { await liveRecordingModel.cancel() }
+    }
     .sheet(isPresented: $isShowingHelp) {
       NavigationStack {
         List {
@@ -211,9 +211,15 @@ public struct SortView: View {
   }
 
   private var helpButton: some View {
-    Button("How to Use") { isShowingHelp = true }
-      .font(.caption)
-      .accessibilityIdentifier("sortHelpButton")
+    Button { isShowingHelp = true } label: {
+      Label("How to Use", systemImage: "questionmark.circle")
+        .labelStyle(.iconOnly)
+    }
+    .buttonBorderShape(.circle)
+    .frame(width: 36, height: 24)
+    .accessibilityLabel("How to Use")
+    .help("How to Use")
+    .accessibilityIdentifier("sortHelpButton")
   }
 
   @ViewBuilder
@@ -355,7 +361,9 @@ public struct SortView: View {
           algorithm: session.algorithm,
           isSpeedExpanded: $isSpeedExpanded,
           isSizeExpanded: $isSizeExpanded,
-          isVisualizerExpanded: $isVisualizerExpanded
+          isVisualizerExpanded: $isVisualizerExpanded,
+          isVideoExpanded: $isVideoExpanded,
+          liveRecordingModel: liveRecordingModel
         )
       }
   }

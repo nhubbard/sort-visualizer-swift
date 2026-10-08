@@ -26,6 +26,8 @@ struct RunControlBar: View {
   @Binding var isSpeedExpanded: Bool
   @Binding var isSizeExpanded: Bool
   @Binding var isVisualizerExpanded: Bool
+  @Binding var isVideoExpanded: Bool
+  let liveRecordingModel: LiveRecordingModel
 
   var body: some View {
     VStack(spacing: 8) {
@@ -41,6 +43,9 @@ struct RunControlBar: View {
       if isVisualizerExpanded {
         visualizerRow
       }
+      if isVideoExpanded {
+        LiveRecordingControls(model: liveRecordingModel)
+      }
     }
     .padding(12)
     .glassOrMaterialBackground()
@@ -48,6 +53,7 @@ struct RunControlBar: View {
     .animation(.easeInOut(duration: 0.2), value: isSpeedExpanded)
     .animation(.easeInOut(duration: 0.2), value: isSizeExpanded)
     .animation(.easeInOut(duration: 0.2), value: isVisualizerExpanded)
+    .animation(.easeInOut(duration: 0.2), value: isVideoExpanded)
     // Manual scrubbing/resizing would otherwise collide with the automation loop's own
     // repeated `start(size:)` calls — this bar goes fully inert while it's running.
     .disabled(session.isAutomating)
@@ -93,14 +99,16 @@ struct RunControlBar: View {
         UtilityButtons(
           session: session, replay: replay, algorithm: algorithm,
           isSpeedExpanded: $isSpeedExpanded, isSizeExpanded: $isSizeExpanded,
-          isVisualizerExpanded: $isVisualizerExpanded)
+          isVisualizerExpanded: $isVisualizerExpanded,
+          isVideoExpanded: $isVideoExpanded)
       }
       VStack(spacing: 8) {
         PlaybackTransportButtons(session: session, replay: replay)
         UtilityButtons(
           session: session, replay: replay, algorithm: algorithm,
           isSpeedExpanded: $isSpeedExpanded, isSizeExpanded: $isSizeExpanded,
-          isVisualizerExpanded: $isVisualizerExpanded)
+          isVisualizerExpanded: $isVisualizerExpanded,
+          isVideoExpanded: $isVideoExpanded)
       }
     }
     .buttonStyle(.borderless)
@@ -460,6 +468,7 @@ private struct UtilityButtons: View {
   @Binding var isSpeedExpanded: Bool
   @Binding var isSizeExpanded: Bool
   @Binding var isVisualizerExpanded: Bool
+  @Binding var isVideoExpanded: Bool
 
   #if targetEnvironment(macCatalyst)
     // Catalyst's `ShareLink` bridges to `NSSharingServicePicker`, which has nothing to show for
@@ -516,6 +525,16 @@ private struct UtilityButtons: View {
           ? "Turn off sort sound effects (⌥⌘A)" : "Turn on sort sound effects (⌥⌘A)")
 
       AutomatorMenuButton(session: session)
+
+      Button {
+        isVideoExpanded.toggle()
+      } label: {
+        Image(systemName: "record.circle")
+      }
+      .accessibilityIdentifier("runControlVideoButton")
+      .accessibilityLabel("Video Recording")
+      .accessibilityValue(isVideoExpanded ? "Expanded" : "Collapsed")
+      .help("Show or hide video recording controls")
 
       Button {
         isSpeedExpanded.toggle()
