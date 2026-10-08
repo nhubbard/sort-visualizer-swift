@@ -46,6 +46,8 @@ Updated 2026-10-08. This list reflects the discussion after completing the nativ
 
 ## 4. Interactive teaching graph (original teaching-mode roadmap item)
 
+**Status:** Quick Sort and Merge Sort pilot implemented. See [the teaching graph record](Documentation/docs/guides/teaching-graph-pilot-2026-10-08.md). Extending the semantic model to more algorithms and evaluating side-by-side comparison remain later work.
+
 **Why:** A graph of decisions, movements, and dependencies could explain behavior more effectively than generic captions. The existing tape has operations and index markers, but no graph nodes, edges, or semantic relationships. This is a new teaching model, not a styling change.
 
 **Scope:** define what nodes and edges mean for a small pilot covering contrasting algorithms, such as a quicksort partition and a merge. Link graph events to tape positions so stepping and seeking produce the same graph. Prototype a separate graph-event stream before changing `SortOperation` or the binary tape archive; consider how fast-playback compaction remaps event positions. Render readable focus and connection states, cap graph density, and provide an accessible textual account of each meaningful transition. Decide whether side-by-side comparison adds enough value after the pilot.
@@ -76,7 +78,7 @@ Updated 2026-10-08. This list reflects the discussion after completing the nativ
 
 ## Suggested order
 
-The accessibility/design audit is nearing completion, and contextual onboarding is implemented. Performance profiling is deferred. Prototype the teaching graph and image chunks before committing to broad content or UI changes. Treat live recording as an independent sharing feature.
+The accessibility/design audit is nearing completion, contextual onboarding is implemented, and the teaching graph pilot is in place. Performance profiling is deferred. Prototype image chunks before committing to broad visualizer changes. Treat live recording as an independent sharing feature.
 
 ## References
 
