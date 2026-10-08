@@ -488,6 +488,48 @@
     },
     "Worst Case" : {
 
+    },
+    "Revisit any operation" : {
+
+    },
+    "Drag Playback Position or use the jump buttons to review the recording at your own pace." : {
+
+    },
+    "Explore the implementation" : {
+
+    },
+    "Choose a language, then read or copy the reference code below the explanation." : {
+
+    },
+    "Compare your recorded runs" : {
+
+    },
+    "Expand Chart to compare sizes and inspect the exact values from completed runs." : {
+
+    },
+    "Find an Algorithm" : {
+
+    },
+    "Browse the catalog by category or search for a name. Choose an algorithm to start a run." : {
+
+    },
+    "Drag Playback Position to revisit any operation. The jump buttons go to the beginning or the sorted end." : {
+
+    },
+    "Playback Speed changes the current run. Settings controls the defaults used when you open another sort." : {
+
+    },
+    "Complete the same algorithm at different sizes to unlock its recorded-runs chart. Expand the chart to inspect exact values." : {
+
+    },
+    "Choose a language, then use Read Full Code or Copy Code to explore its reference implementation." : {
+
+    },
+    "Save and Reopen" : {
+
+    },
+    "Export Tape saves the current recording. Import Tape opens a previously saved recording from the toolbar." : {
+
     }
   },
   "version" : "1.0"

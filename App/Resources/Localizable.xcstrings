@@ -144,6 +144,12 @@
     },
     "Try another name or category." : {
 
+    },
+    "Find an algorithm" : {
+
+    },
+    "Browse categories or search by name, then choose a sort to watch it run." : {
+
     }
   },
   "version" : "1.0"

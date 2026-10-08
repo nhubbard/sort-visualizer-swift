@@ -57,7 +57,11 @@ struct RunControlBar: View {
     Slider(
       value: Binding(
         get: { Double(replay.stepIndex) },
-        set: { replay.seek(to: Int($0.rounded())) }
+        set: {
+          replay.seek(to: Int($0.rounded()))
+          SeekingDiscoveryTip.hasSeeked = true
+          SeekingDiscoveryTip().invalidate(reason: .actionPerformed)
+        }
       ),
       in: 0...Double(max(replay.totalOperationCount, 1))
     )
@@ -331,6 +335,8 @@ private struct PlaybackTransportButtons: View {
     HStack(spacing: 20) {
       Button {
         replay.seek(to: 0)
+        SeekingDiscoveryTip.hasSeeked = true
+        SeekingDiscoveryTip().invalidate(reason: .actionPerformed)
         announce("At the beginning of the recording")
       } label: {
         Image(systemName: "backward.end.fill")
@@ -383,6 +389,8 @@ private struct PlaybackTransportButtons: View {
 
       Button {
         replay.seek(to: replay.totalOperationCount)
+        SeekingDiscoveryTip.hasSeeked = true
+        SeekingDiscoveryTip().invalidate(reason: .actionPerformed)
         announce("At the sorted end of the recording")
       } label: {
         Image(systemName: "forward.end.fill")

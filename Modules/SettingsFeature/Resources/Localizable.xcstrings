@@ -93,6 +93,12 @@
     },
     "≈ %llds per run at the fixed-duration target" : {
 
+    },
+    "Set defaults for future sorts" : {
+
+    },
+    "Choose a visualizer, shuffle, size, and playback pace here. The sort controls change the current run." : {
+
     }
   },
   "version" : "1.0"

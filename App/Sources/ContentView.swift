@@ -5,6 +5,7 @@ import SettingsFeature
 import SettingsKit
 import SortFeature
 import SwiftUI
+import TipKit
 import UniformTypeIdentifiers
 import VisualizationKit
 import os
@@ -158,7 +159,15 @@ struct ContentView: View {
     // same class of case a manual tap already handles for free just by being inside whichever
     // category is currently selected.
     .onChange(of: coordinator.selectedAlgorithmID) { _, newValue in
+      if newValue != nil {
+        CatalogDiscoveryTip.hasBrowsedCatalog = true
+        CatalogDiscoveryTip().invalidate(reason: .actionPerformed)
+      }
       syncSidebarCategory(for: newValue)
+    }
+    .onChange(of: selectedSidebarCategory) { _, _ in
+      CatalogDiscoveryTip.hasBrowsedCatalog = true
+      CatalogDiscoveryTip().invalidate(reason: .actionPerformed)
     }
     .onChange(of: coordinator.stopRequestID) { _, _ in
       if showcaseIndex != nil { stopShowcase() }
@@ -238,6 +247,21 @@ struct ContentView: View {
       }
     }
     .searchable(text: $searchText, prompt: "Search")
+    .onChange(of: searchText) { _, newValue in
+      if !newValue.isEmpty {
+        CatalogDiscoveryTip.hasBrowsedCatalog = true
+        CatalogDiscoveryTip().invalidate(reason: .actionPerformed)
+      }
+    }
+    .safeAreaInset(edge: .top) {
+      if coordinator.selectedAlgorithmID == nil && showcaseIndex == nil
+          && !sweepDriver.isRunning && searchText.isEmpty {
+        TipView(CatalogDiscoveryTip())
+          .accessibilityIdentifier("catalogDiscoveryTip")
+          .frame(maxWidth: 480)
+          .padding(.horizontal)
+      }
+    }
     .disabled(showcaseIndex != nil || sweepDriver.isRunning)
     .navigationTitle(contentTitle)
     .toolbar {
@@ -760,6 +784,19 @@ struct ContentView: View {
     }
     return shuffle
   }
+}
+
+private struct CatalogDiscoveryTip: Tip {
+  @Parameter static var hasBrowsedCatalog: Bool = false
+
+  var title: Text { Text("Find an algorithm") }
+  var message: Text? {
+    Text("Browse categories or search by name, then choose a sort to watch it run.")
+  }
+  var rules: [Rule] {
+    #Rule(Self.$hasBrowsedCatalog) { $0 == false }
+  }
+  var options: [any Option] { MaxDisplayCount(2) }
 }
 
 extension View {

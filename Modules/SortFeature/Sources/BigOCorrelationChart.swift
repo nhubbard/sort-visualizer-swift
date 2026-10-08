@@ -3,6 +3,7 @@ import Charts
 import PersistenceKit
 import SortEngineKit
 import SwiftUI
+import TipKit
 
 /// `AnalyticsService`-backed data charted against that same algorithm's own best/average/worst-case
 /// curves (`BigOCorrelation.bigOChartPoints`) — the real, observed operation-count growth over
@@ -57,6 +58,8 @@ struct BigOCorrelationChart: View {
         let renderedPoints = compactChartPoints(points)
         let sizeDomain = Double(observedSizes[0])...Double(observedSizes[observedSizes.count - 1])
         VStack(alignment: .leading, spacing: 4) {
+          TipView(RecordedChartDiscoveryTip())
+            .accessibilityIdentifier("sortRecordedChartTip")
           Text(recordedRunSummary(points))
             .font(.caption)
             .foregroundStyle(.secondary)
@@ -65,6 +68,8 @@ struct BigOCorrelationChart: View {
             Spacer()
             Button {
               isShowingDetail = true
+              RecordedChartDiscoveryTip.hasExpandedChart = true
+              RecordedChartDiscoveryTip().invalidate(reason: .actionPerformed)
             } label: {
               Label("Expand Chart", systemImage: "arrow.up.left.and.arrow.down.right")
             }
@@ -158,6 +163,22 @@ struct BigOCorrelationChart: View {
     }
     #endif
     return try await AnalyticsService.shared.fetchSummaries(algorithmID: algorithm.id)
+  }
+}
+
+struct RecordedChartDiscoveryTip: Tip {
+  @Parameter static var hasExpandedChart: Bool = false
+
+  var title: Text { Text("Compare your recorded runs") }
+  var message: Text? {
+    Text("Expand Chart to compare sizes and inspect the exact values from completed runs.")
+  }
+  var rules: [Rule] {
+    #Rule(Self.$hasExpandedChart) { $0 == false }
+  }
+  var options: [any Option] {
+    MaxDisplayCount(2)
+    IgnoresDisplayFrequency(true)
   }
 }
 

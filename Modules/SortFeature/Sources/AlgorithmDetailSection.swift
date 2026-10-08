@@ -4,6 +4,7 @@ import MarkdownUI
 import MathRenderingKit
 import SettingsKit
 import SwiftUI
+import TipKit
 import UIKit
 
 /// The `AlgorithmDetailSection(entry:)` Documentation/docs/architecture/features.md describes as sitting below the
@@ -90,6 +91,8 @@ public struct AlgorithmDetailSection: View {
           if contentLoading {
             ProgressView("Loading code examples…")
           } else if let content, !content.codeSamples.isEmpty {
+            TipView(CodeDiscoveryTip())
+              .accessibilityIdentifier("sortCodeTip")
             Picker("Language", selection: $selectedLanguage) {
               ForEach(content.codeSamples, id: \.language) { sample in
                 Text(sample.language.title).tag(sample.language)
@@ -98,6 +101,8 @@ public struct AlgorithmDetailSection: View {
             .pickerStyle(.segmented)
             .accessibilityIdentifier("codeLanguagePicker")
             .onChange(of: selectedLanguage) {
+              CodeDiscoveryTip.hasExploredCode = true
+              CodeDiscoveryTip().invalidate(reason: .actionPerformed)
               isFullCodeVisible = false
               isSelectableCodePresented = false
             }
@@ -110,12 +115,16 @@ public struct AlgorithmDetailSection: View {
               HStack {
                 Button {
                   UIPasteboard.general.string = plain
+                  CodeDiscoveryTip.hasExploredCode = true
+                  CodeDiscoveryTip().invalidate(reason: .actionPerformed)
                 } label: {
                   Label("Copy Code", systemImage: "doc.on.doc")
                 }
                 .accessibilityIdentifier("copyAlgorithmCode")
                 Button(isFullCodeVisible ? "Hide Full Code" : "Read Full Code") {
                   isFullCodeVisible.toggle()
+                  CodeDiscoveryTip.hasExploredCode = true
+                  CodeDiscoveryTip().invalidate(reason: .actionPerformed)
                 }
                 .accessibilityIdentifier("toggleFullAlgorithmCode")
                 if isFullCodeVisible {
@@ -299,6 +308,22 @@ public struct AlgorithmDetailSection: View {
   private func complexityRow(_ id: String) -> ComplexityRow {
     let rows = algorithm.metadata.complexityRows
     return rows.first { $0.id == id } ?? rows[0]
+  }
+}
+
+struct CodeDiscoveryTip: Tip {
+  @Parameter static var hasExploredCode: Bool = false
+
+  var title: Text { Text("Explore the implementation") }
+  var message: Text? {
+    Text("Choose a language, then read or copy the reference code below the explanation.")
+  }
+  var rules: [Rule] {
+    #Rule(Self.$hasExploredCode) { $0 == false }
+  }
+  var options: [any Option] {
+    MaxDisplayCount(2)
+    IgnoresDisplayFrequency(true)
   }
 }
 

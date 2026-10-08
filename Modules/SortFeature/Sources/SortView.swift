@@ -160,11 +160,16 @@ public struct SortView: View {
     .sheet(isPresented: $isShowingHelp) {
       NavigationStack {
         List {
+          Section("Find an Algorithm") {
+            Text("Browse the catalog by category or search for a name. Choose an algorithm to start a run.")
+          }
           Section("Playback") {
             Text("Use Play to watch the recording. Pause and use Step Forward or Step Back to inspect one operation at a time.")
+            Text("Drag Playback Position to revisit any operation. The jump buttons go to the beginning or the sorted end.")
           }
           Section("Presentation") {
             Text("Array Size changes the number of items in a new run. Visualizer changes how the current run is drawn.")
+            Text("Playback Speed changes the current run. Settings controls the defaults used when you open another sort.")
           }
           Section("Visualization Markers") {
             Text("In marker-aware views, coral marks the first active array position and blue marks the second. These positions can be compared or swapped; the colors do not name the operation. Rainbow colors items by value and does not show marker highlights. Pause and step to inspect an operation.")
@@ -175,6 +180,11 @@ public struct SortView: View {
           }
           Section("Learn More") {
             Text("Scroll below the visualization for the algorithm explanation, growth charts, and code examples.")
+            Text("Complete the same algorithm at different sizes to unlock its recorded-runs chart. Expand the chart to inspect exact values.")
+            Text("Choose a language, then use Read Full Code or Copy Code to explore its reference implementation.")
+          }
+          Section("Save and Reopen") {
+            Text("Export Tape saves the current recording. Import Tape opens a previously saved recording from the toolbar.")
           }
         }
         .navigationTitle("How to Use")
@@ -209,6 +219,8 @@ public struct SortView: View {
           .accessibilityIdentifier("sortPlaybackTip")
         TipView(PresentationDiscoveryTip())
           .accessibilityIdentifier("sortPresentationTip")
+        TipView(SeekingDiscoveryTip())
+          .accessibilityIdentifier("sortSeekingTip")
       }
       .frame(maxWidth: 480)
       .padding(.horizontal)
@@ -436,7 +448,10 @@ struct PlaybackDiscoveryTip: Tip {
   var rules: [Rule] {
     #Rule(Self.$hasUsedPlayback) { $0 == false }
   }
-  var options: [any Option] { MaxDisplayCount(2) }
+  var options: [any Option] {
+    MaxDisplayCount(2)
+    IgnoresDisplayFrequency(true)
+  }
 }
 
 struct PresentationDiscoveryTip: Tip {
@@ -449,6 +464,23 @@ struct PresentationDiscoveryTip: Tip {
   var rules: [Rule] {
     #Rule(PlaybackDiscoveryTip.$hasUsedPlayback) { $0 == true }
     #Rule(Self.$hasAdjustedPresentation) { $0 == false }
+  }
+  var options: [any Option] {
+    MaxDisplayCount(2)
+    IgnoresDisplayFrequency(true)
+  }
+}
+
+struct SeekingDiscoveryTip: Tip {
+  @Parameter static var hasSeeked: Bool = false
+
+  var title: Text { Text("Revisit any operation") }
+  var message: Text? {
+    Text("Drag Playback Position or use the jump buttons to review the recording at your own pace.")
+  }
+  var rules: [Rule] {
+    #Rule(PresentationDiscoveryTip.$hasAdjustedPresentation) { $0 == true }
+    #Rule(Self.$hasSeeked) { $0 == false }
   }
   var options: [any Option] {
     MaxDisplayCount(2)
