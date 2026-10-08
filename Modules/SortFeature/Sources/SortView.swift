@@ -183,6 +183,9 @@ public struct SortView: View {
             Text("Complete the same algorithm at different sizes to unlock its recorded-runs chart. Expand the chart to inspect exact values.")
             Text("Choose a language, then use Read Full Code or Copy Code to explore its reference implementation.")
           }
+          Section("Teaching Graph") {
+            Text("On Quick Sort and Merge Sort, expand Teaching Graph below the visualization. Use Previous Graph Event and Next Graph Event to follow decisions and movements while the playback position stays in sync.")
+          }
           Section("Save and Reopen") {
             Text("Export Tape saves the current recording. Import Tape opens a previously saved recording from the toolbar.")
           }
@@ -371,10 +374,14 @@ public struct SortView: View {
     case .recording: String(localized: "Recording…", bundle: .module)
     case .ready: String(localized: "Ready", bundle: .module)
     case .replaying: String(localized: "Sorting…", bundle: .module)
-    case .complete:
-      isReplayCorrectlySorted
-        ? String(localized: "Sorted ✓", bundle: .module)
-        : String(localized: "Sort verification failed", bundle: .module)
+    case .complete(let replay):
+      if replay.stepIndex < replay.tape.operations.count {
+        String(localized: "Reviewing…", bundle: .module)
+      } else {
+        isReplayCorrectlySorted
+          ? String(localized: "Sorted ✓", bundle: .module)
+          : String(localized: "Sort verification failed", bundle: .module)
+      }
     case .failed: String(localized: "Failed", bundle: .module)
     }
   }
@@ -385,7 +392,9 @@ public struct SortView: View {
     case .recording: "recording"
     case .ready: "ready"
     case .replaying: "sorting"
-    case .complete: isReplayCorrectlySorted ? "sorted" : "sort-failed"
+    case .complete(let replay):
+      if replay.stepIndex < replay.tape.operations.count { "reviewing" }
+      else { isReplayCorrectlySorted ? "sorted" : "sort-failed" }
     case .failed: "failed"
     }
   }

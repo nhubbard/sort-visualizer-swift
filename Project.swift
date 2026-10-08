@@ -109,7 +109,7 @@ let modules: [Target] =
         ],
         resources: [.glob(pattern: "Modules/SortFeature/Resources/**")],
         testResources: [.glob(pattern: "App/Resources/AlgorithmDetails/AlgorithmDetails.algz")],
-        testDependencies: [.target(name: "ZstdKit")]
+        testDependencies: [.target(name: "ZstdKit"), .target(name: "BuiltInAlgorithms")]
     ) +
     Module.framework(name: "SettingsFeature", dependencies: [
         .target(name: "SettingsKit"), .target(name: "VisualizationKit"), .target(name: "AlgorithmKit"),
