@@ -77,6 +77,7 @@ public struct SortView: View {
           }
         }
         .padding(.horizontal)
+        LiveRecordingControls()
         if reduceMotionActive {
           Text("Reduce Motion is on. Automatic playback is limited to 15 operations per second; manual steps are unchanged. A target-duration run may take longer.")
             .font(.caption)
@@ -188,6 +189,7 @@ public struct SortView: View {
           }
           Section("Save and Reopen") {
             Text("Export Tape saves the current recording. Import Tape opens a previously saved recording from the toolbar.")
+            Text("Record Video captures a live run and its sound. On Mac, choose a window in the system picker or use Record App Instead. Stop Recording creates a video you can preview or share.")
           }
         }
         .navigationTitle("How to Use")

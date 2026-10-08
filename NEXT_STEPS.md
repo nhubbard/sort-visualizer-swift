@@ -58,6 +58,8 @@ Updated 2026-10-08. This list reflects the discussion after completing the nativ
 
 ## 5. Live recording through ScreenCaptureKit (original video/GIF roadmap item, revised)
 
+**Status (2026-10-08):** implemented live MP4 recording controls and backends. Catalyst 18.2+ uses ScreenCaptureKit's single-window picker with a ReplayKit fallback; iPadOS and older Catalyst use ReplayKit because the ScreenCaptureKit module is unavailable to the current iOS Simulator SDK. Preview, sharing, cancellation, errors, and interruption recovery are in place. Focused model tests compile; manual end-to-end capture and sharing on a signed device/host remain to verify. See [live recording verification](Documentation/docs/guides/live-recording-2026-10-08.md).
+
 **Why:** Capturing actual playback may satisfy the sharing goal without building a separate off-screen renderer and fixed-frame-rate tape exporter. Apple's current framework is named **ScreenCaptureKit**.
 
 **Scope:** verify the supported capture and save flow on the app's iPadOS and Mac Catalyst targets, including permission, picker, audio, stopping, and sharing. Decide whether to capture the full window or a selected app surface. Give the user clear recording state and recovery from denied permission or interruption. This produces a live recording; deterministic, arbitrarily paced export remains a different feature.
