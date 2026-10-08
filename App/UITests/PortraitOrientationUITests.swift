@@ -38,9 +38,8 @@ final class PortraitOrientationUITests: XCTestCase {
     XCTAssertTrue(
       statusLabel.waitForExistence(timeout: 5), "status label never appeared in portrait")
 
-    // RunControlBar's transportRow/statsCaption both fall back to a stacked ViewThatFits
-    // candidate under narrow width — confirms the fallback still surfaces every control
-    // (not just that *something* renders) rather than silently clipping them.
+    // The transport and secondary controls occupy separate rows in portrait, while the stats
+    // caption can stack. Confirm the controls remain reachable at this width.
     let playPauseButton = app.buttons["runControlPlayPauseButton"]
     XCTAssertTrue(
       playPauseButton.waitForExistence(timeout: 5), "play/pause button not reachable in portrait")

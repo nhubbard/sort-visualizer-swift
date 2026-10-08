@@ -36,11 +36,10 @@ final class ReferenceContentUITests: XCTestCase {
     let summary = app.staticTexts["algorithmCodeSummary"]
     XCTAssertTrue(summary.waitForExistence(timeout: 10))
     XCTAssertTrue(summary.label.contains("Python implementation"))
-    XCTAssertFalse(code.exists, "The long listing should be disclosed on request")
+    XCTAssertTrue(code.waitForExistence(timeout: 10), "Python reference code should be visible by default")
     XCTAssertTrue(app.buttons["copyAlgorithmCode"].exists)
     let disclosure = app.buttons["toggleFullAlgorithmCode"]
-    app.activateControlForUITest(disclosure)
-    XCTAssertTrue(code.waitForExistence(timeout: 10), "Python reference code did not render")
+    XCTAssertEqual(disclosure.label, "Hide Full Code")
     XCTAssertTrue(code.label.contains("def sort("), "Wrong Python reference code: \(code.label)")
     XCTAssertTrue(code.label.contains("quick_sort"))
     app.activateControlForUITest(app.buttons["selectAlgorithmCodeText"])
@@ -50,14 +49,19 @@ final class ReferenceContentUITests: XCTestCase {
     app.activateControlForUITest(app.buttons["Done"])
 
     app.activateControlForUITest(picker.buttons["Swift"])
-    XCTAssertFalse(code.exists, "Changing languages should return to the short summary")
+    XCTAssertTrue(code.exists, "Changing languages should keep the listing visible")
     XCTAssertTrue(summary.label.contains("Swift implementation"))
-    app.activateControlForUITest(disclosure)
     let swiftCode = XCTNSPredicateExpectation(
       predicate: NSPredicate(format: "label CONTAINS %@", "func sort("), object: code)
     XCTAssertEqual(XCTWaiter().wait(for: [swiftCode], timeout: 10), .completed,
       "Swift selection did not replace the rendered reference code")
     XCTAssertTrue(code.label.contains("quickSort"))
+
+    app.activateControlForUITest(disclosure)
+    XCTAssertFalse(code.exists, "Hide Full Code should collapse the listing")
+    XCTAssertEqual(disclosure.label, "Read Full Code")
+    app.activateControlForUITest(disclosure)
+    XCTAssertTrue(code.waitForExistence(timeout: 10), "Read Full Code should restore the listing")
   }
 
   func testMissingBundledDetailsShowActionableError() {

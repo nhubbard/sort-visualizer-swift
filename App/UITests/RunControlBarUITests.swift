@@ -14,6 +14,26 @@ final class RunControlBarUITests: XCTestCase {
     useLandscapeOrientationForUITest()
   }
 
+  func testSecondaryControlsAreCenteredBelowTransport() {
+    let app = XCUIApplication()
+    app.launchEnvironment = ["UI_TEST_ARRAY_SIZE": "24"]
+    app.launch()
+    app.tapSidebarLink("algorithmLink.quicksort")
+
+    let first = app.buttons["runControlResetButton"]
+    let last = app.buttons["runControlVisualizerButton"]
+    let transport = app.buttons["runControlPlayPauseButton"]
+    let scrubber = app.sliders["runControlScrubSlider"]
+    XCTAssertTrue(first.waitForExistence(timeout: 5))
+    XCTAssertTrue(last.exists)
+    XCTAssertTrue(transport.exists)
+    XCTAssertTrue(scrubber.exists)
+
+    let secondaryCenter = (first.frame.minX + last.frame.maxX) / 2
+    XCTAssertEqual(secondaryCenter, scrubber.frame.midX, accuracy: 12)
+    XCTAssertGreaterThan(first.frame.midY, transport.frame.midY)
+  }
+
   func testPauseStepAndResumeReachesSortedState() throws {
     let app = XCUIApplication()
     #if targetEnvironment(macCatalyst)

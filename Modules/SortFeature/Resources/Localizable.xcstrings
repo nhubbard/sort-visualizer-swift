@@ -14,12 +14,12 @@
         }
       }
     },
-    "%@ implementation, %lld lines. Copy Code or choose Read Full Code to inspect the source." : {
+    "%@ implementation, %lld lines." : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "%1$@ implementation, %2$lld lines. Copy Code or choose Read Full Code to inspect the source."
+            "value" : "%1$@ implementation, %2$lld lines."
           }
         }
       }
@@ -522,7 +522,7 @@
     "Complete the same algorithm at different sizes to unlock its recorded-runs chart. Expand the chart to inspect exact values." : {
 
     },
-    "Choose a language, then use Read Full Code or Copy Code to explore its reference implementation." : {
+    "Choose a language to read its reference implementation, then use Copy Code or Select Text as needed." : {
 
     },
     "Save and Reopen" : {

@@ -11,9 +11,8 @@ import VisualizationKit
 /// caption, then transport buttons. Speed/size/visualizer rows expand inline below the transport
 /// row on tap instead of using a `.popover`, so no `UIPopoverPresentationController` is involved.
 ///
-/// `transportRow`/`statsCaption` each offer a stacked-two-row `ViewThatFits` fallback — both rows
-/// are built from fixed-intrinsic-width buttons/stat cells (no flexible `.frame(maxWidth:
-/// .infinity)` content), so `ViewThatFits` can actually detect overflow and fall back.
+/// The transport buttons and centered secondary controls occupy separate rows. The statistics
+/// caption retains its `ViewThatFits` fallback for narrower widths.
 struct RunControlBar: View {
   @Bindable var session: SortSession
   @Bindable var replay: ReplayEngine
@@ -76,40 +75,26 @@ struct RunControlBar: View {
     .accessibilityValue("Operation \(replay.stepIndex) of \(replay.totalOperationCount)")
   }
 
-  /// `ViewThatFits` between one full-width row and two rows (playback transport, then
-  /// utilities) — both built from the same two extracted button-group views, so whichever
-  /// arrangement fits, every button (and its accessibility identifier) is still there for UI
-  /// tests to find. `PlaybackTransportButtons`/`UtilityButtons` are genuine child `View`s, not
-  /// computed properties on `RunControlBar` itself (like `AutomatorMenuButton` already is, for a
+  /// Playback transport stays on the first row, while the secondary controls occupy a centered
+  /// row across the full bar width. `PlaybackTransportButtons` and `UtilityButtons` are child
+  /// views, not computed properties on `RunControlBar` itself (like `AutomatorMenuButton` is, for a
   /// different reason) — `@Observable`'s dependency tracking is per-view-instance, so inlining
   /// them as computed properties meant *every* button got reconstructed on every tick just
   /// because `statsCaption` elsewhere in this same `body` reads `replay`'s per-tick-changing
   /// counters. `UtilityButtons` in particular reads none of those counters, so as a real child
-  /// view it now only re-renders when something it actually displays changes (speed/size/sound
+  /// view it only re-renders when something it actually displays changes (speed/size/sound
   /// toggle state) — found via a Full Sweep profiling round that also fixed `CodeHighlighter` and
-  /// `AnalyticsService.fetchSummaries`. Each extracted view supplies its own `spacing: 20` rather
-  /// than relying on `HStack` flattening a nested view's multi-button body — this reproduces the
-  /// original uniform 20pt rhythm by direct structural correspondence instead of depending on
-  /// that flattening behavior working the same one level deeper.
+  /// `AnalyticsService.fetchSummaries`.
   private var transportRow: some View {
-    ViewThatFits(in: .horizontal) {
-      HStack(spacing: 20) {
-        PlaybackTransportButtons(session: session, replay: replay)
-        Spacer()
-        UtilityButtons(
-          session: session, replay: replay, algorithm: algorithm,
-          isSpeedExpanded: $isSpeedExpanded, isSizeExpanded: $isSizeExpanded,
-          isVisualizerExpanded: $isVisualizerExpanded,
-          isVideoExpanded: $isVideoExpanded)
-      }
-      VStack(spacing: 8) {
-        PlaybackTransportButtons(session: session, replay: replay)
-        UtilityButtons(
-          session: session, replay: replay, algorithm: algorithm,
-          isSpeedExpanded: $isSpeedExpanded, isSizeExpanded: $isSizeExpanded,
-          isVisualizerExpanded: $isVisualizerExpanded,
-          isVideoExpanded: $isVideoExpanded)
-      }
+    VStack(spacing: 8) {
+      PlaybackTransportButtons(session: session, replay: replay)
+        .frame(maxWidth: .infinity, alignment: .leading)
+      UtilityButtons(
+        session: session, replay: replay, algorithm: algorithm,
+        isSpeedExpanded: $isSpeedExpanded, isSizeExpanded: $isSizeExpanded,
+        isVisualizerExpanded: $isVisualizerExpanded,
+        isVideoExpanded: $isVideoExpanded)
+        .frame(maxWidth: .infinity)
     }
     .buttonStyle(.borderless)
     .controlSize(.large)
