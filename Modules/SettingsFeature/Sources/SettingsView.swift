@@ -190,7 +190,11 @@ public struct SettingsView: View {
     .onChange(of: settings.playbackSpeed) { _, _ in completeSettingsTip() }
     .onChange(of: settings.targetPlaybackDuration) { _, _ in completeSettingsTip() }
     .onChange(of: settings.selectedVisualizerID) { _, _ in completeSettingsTip() }
+    .onChange(of: settings.defaultShuffleID) { _, _ in completeSettingsTip() }
     .onChange(of: settings.defaultArraySize) { _, _ in completeSettingsTip() }
+    .onChange(of: settings.soundEnabled) { _, _ in completeSettingsTip() }
+    .onChange(of: settings.recordingOperationCap) { _, _ in completeSettingsTip() }
+    .onChange(of: settings.codeTheme) { _, _ in completeSettingsTip() }
     .confirmationDialog(
       "Reset all settings to their defaults?", isPresented: $isShowingResetConfirmation,
       titleVisibility: .visible
