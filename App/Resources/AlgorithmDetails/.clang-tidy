@@ -13,6 +13,11 @@
 #   positive, this time on a global `std::mt19937 rng(std::random_device{}())` — its constructor
 #   can theoretically throw on some restricted platforms, but not in the environment this runs in,
 #   and there's no sensible fallback to add for a demo script's RNG.
+# - bugprone-signed-bitwise: the integer domains in these examples are nonnegative array values,
+#   indexes, lengths, and bit masks. C and C++ sorting implementations conventionally use signed
+#   `int` for those values, and converting every bitwise expression and its surrounding arithmetic
+#   to unsigned types would obscure the algorithms without finding a defect. LLVM 23 began
+#   reporting this check across dozens of previously clean references.
 #
 # Real findings from the other bugprone checks were fixed directly rather than suppressed: a
 # genuine realloc-without-null-check leak (bugprone-suspicious-realloc-usage), missing explicit
@@ -41,4 +46,4 @@
 #
 # Left every other bugprone/clang-diagnostic/clang-analyzer/performance check enabled as a safety
 # net for future files.
-Checks: 'clang-diagnostic-*,clang-analyzer-*,bugprone-*,performance-*,-bugprone-easily-swappable-parameters,-bugprone-exception-escape,-bugprone-throwing-static-initialization,-clang-analyzer-security.insecureAPI.rand,-clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling'
+Checks: 'clang-diagnostic-*,clang-analyzer-*,bugprone-*,performance-*,-bugprone-easily-swappable-parameters,-bugprone-exception-escape,-bugprone-signed-bitwise,-bugprone-throwing-static-initialization,-clang-analyzer-security.insecureAPI.rand,-clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling'

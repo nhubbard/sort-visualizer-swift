@@ -11,8 +11,12 @@ public class lrquicksort {
       int i = p;
       int j = r;
       while (i <= j) {
-        while (arr[i] < pivot) i++;
-        while (arr[j] > pivot) j--;
+        while (arr[i] < pivot) {
+          i++;
+        }
+        while (arr[j] > pivot) {
+          j--;
+        }
         if (i <= j) {
           int temp = arr[i];
           arr[i] = arr[j];
@@ -22,10 +26,14 @@ public class lrquicksort {
         }
       }
       if (j - p < r - i) {
-        if (p < j) quickSort(arr, p, j);
+        if (p < j) {
+          quickSort(arr, p, j);
+        }
         p = i;
       } else {
-        if (i < r) quickSort(arr, i, r);
+        if (i < r) {
+          quickSort(arr, i, r);
+        }
         r = j;
       }
     }

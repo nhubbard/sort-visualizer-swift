@@ -6,7 +6,10 @@ fun sort(arr: IntArray) {
   for (value in arr) if (value > maxValue) maxValue = value
   var q = 0
   var probe = base
-  while (probe <= maxValue) { q++; probe *= base }
+  while (probe <= maxValue) {
+    q++
+    probe *= base
+  }
   var m = 0
   var i = 0
   var b = n
@@ -15,10 +18,16 @@ fun sort(arr: IntArray) {
     if (q == 0) {
       m += base
       var t = m / base
-      while (t % base == 0) { t /= base; q++ }
+      while (t % base == 0) {
+        t /= base
+        q++
+      }
       i = b
       while (b < n && shift(arr[b], q + 1, base) == shift(m, q + 1, base)) b++
-    } else { b = p; q-- }
+    } else {
+      b = p
+      q--
+    }
   }
 }
 
@@ -105,7 +114,10 @@ fun mergeSortDigit(array: IntArray, a: Int, b: Int, place: Int, base: Int) {
 fun shift(value: Int, places: Int, base: Int): Int {
   var value = value
   var places = places
-  while (places > 0) { value /= base; places-- }
+  while (places > 0) {
+    value /= base
+    places--
+  }
   return value
 }
 
