@@ -23,9 +23,7 @@ void printList(int items[], int size) {
 void shuffleRange(int arr[], int end);
 void sortLen(int arr[], int length);
 
-void sort(int arr[], int n) {
-  sortLen(arr, n);
-}
+void sort(int arr[], int n) { sortLen(arr, n); }
 
 void shuffleRange(int arr[], int end) {
   for (int i = end - 1; i > 0; i--) {

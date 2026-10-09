@@ -1,8 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int array[16] = {7, 3, 14, 0, 9, 5, 12, 1,
-                 15, 4, 10, 2, 13, 6, 11, 8};
+int array[16] = {7, 3, 14, 0, 9, 5, 12, 1, 15, 4, 10, 2, 13, 6, 11, 8};
 
 void swap(int *a, int *b) {
   int t = *a;

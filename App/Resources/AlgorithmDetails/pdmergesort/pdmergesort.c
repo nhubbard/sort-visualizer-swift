@@ -1,8 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
-                 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
 
 void swap(int *a, int *b) {
   int t = *a;
@@ -129,6 +128,8 @@ void mergeDown(int arr[], int start, int mid, int end, int *buffer) {
   int left = mid - 1;
   int right = end - 1;
   while (right > left && left >= start) {
+    /* right > left guarantees an unconsumed copied-right-run element. */
+    // NOLINTNEXTLINE(clang-analyzer-security.ArrayBound)
     if (buffer[bufferPointer] >= arr[left]) {
       arr[right] = buffer[bufferPointer];
       bufferPointer--;
@@ -139,6 +140,9 @@ void mergeDown(int arr[], int start, int mid, int end, int *buffer) {
     right--;
   }
   while (right > left) {
+    /* Once the left run is exhausted, every remaining output consumes one
+     * of the remaining copied-right-run elements. */
+    // NOLINTNEXTLINE(clang-analyzer-security.ArrayBound)
     arr[right] = buffer[bufferPointer];
     bufferPointer--;
     right--;

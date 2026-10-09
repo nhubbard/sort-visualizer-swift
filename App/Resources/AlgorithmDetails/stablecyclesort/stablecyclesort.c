@@ -1,7 +1,6 @@
 #include <stdio.h>
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
-                 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
 
 void swap(int *a, int *b) {
   int t = *a;
@@ -23,9 +22,7 @@ void printList(int items[], int size) {
 int destination(int arr[], int flagged[], int a, int b1, int b);
 void stableCycleSort(int arr[], int n);
 
-void sort(int arr[], int n) {
-  stableCycleSort(arr, n);
-}
+void sort(int arr[], int n) { stableCycleSort(arr, n); }
 
 int destination(int arr[], int flagged[], int a, int b1, int b) {
   int heldValue = arr[a];

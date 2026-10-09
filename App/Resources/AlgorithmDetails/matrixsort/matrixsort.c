@@ -33,9 +33,7 @@ int insertLast(int arr[], int a, int b, int gap, int dir);
 MatrixShape getMatrixDims(int length);
 int matrixSort(int arr[], int start, int end, int gap, int dir);
 
-void sort(int arr[], int n) {
-  matrixSort(arr, 0, n, 1, 1);
-}
+void sort(int arr[], int n) { matrixSort(arr, 0, n, 1, 1); }
 
 int dirCompareVal(int left, int right, int dir) {
   int res;

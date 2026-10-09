@@ -1,7 +1,6 @@
 #include <stdio.h>
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
-                 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
 int output[16];
 
 void swap(int *a, int *b) {
@@ -70,19 +69,9 @@ void findNext(int arr[], int size) {
   int left = 1;
   int right = 2;
   while (right < size && !(arr[left] == -1 && arr[right] == -1)) {
-    if (arr[left] == -1) {
-      swap(&arr[hole], &arr[right]);
-      hole = right;
-    } else if (arr[right] == -1) {
-      swap(&arr[hole], &arr[left]);
-      hole = left;
-    } else if (arr[right] > arr[left]) {
-      swap(&arr[hole], &arr[right]);
-      hole = right;
-    } else {
-      swap(&arr[hole], &arr[left]);
-      hole = left;
-    }
+    int child = arr[left] == -1 || arr[right] > arr[left] ? right : left;
+    swap(&arr[hole], &arr[child]);
+    hole = child;
     left = 2 * hole + 1;
     right = left + 1;
   }

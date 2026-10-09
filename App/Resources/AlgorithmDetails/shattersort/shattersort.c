@@ -1,8 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
-                 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
 
 void swap(int *a, int *b) {
   int t = *a;
@@ -27,7 +26,10 @@ int *shatterPartition(int arr[], int start, int length, int num,
 void shatterSort(int arr[], int length, int num);
 
 void sort(int arr[], int n) {
-  if (n < 2) return; shatterSort(arr, n, 4); }
+  if (n < 2)
+    return;
+  shatterSort(arr, n, 4);
+}
 
 void insertionSort(int arr[], int start, int end) {
   for (int i = start + 1; i < end; i++) {

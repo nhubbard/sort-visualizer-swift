@@ -1,8 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
-                 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
 
 typedef struct {
   int first;
@@ -31,9 +30,7 @@ int selectPivot(int arr[], int lo, int hi);
 PartitionResult partitionTernaryLL(int arr[], int lo, int hi);
 void quicksortTernaryLL(int arr[], int lo, int hi);
 
-void sort(int arr[], int n) {
-  quicksortTernaryLL(arr, 0, n);
-}
+void sort(int arr[], int n) { quicksortTernaryLL(arr, 0, n); }
 
 int compare3(int arr[], int a, int b) {
   if (arr[a] == arr[b])
