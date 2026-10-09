@@ -29,13 +29,15 @@ def main() -> None:
                         help="review 360-point Growth Model captures instead of full detail pages")
     parser.add_argument("--compact-bigo", action="store_true",
                         help="review 360-point compact Big-O captures instead of full detail pages")
+    parser.add_argument("--equations", action="store_true",
+                        help="review 320-point equation captures instead of full detail pages")
     parser.add_argument("--narrow", action="store_true",
                         help="review 360-point full-detail captures instead of 900-point pages")
     parser.add_argument("--additional-export", action="append", type=Path, default=[],
                         help="merge a second result export when corpus shards ran separately")
     args = parser.parse_args()
-    if sum((args.growth, args.compact_bigo, args.narrow)) > 1:
-        parser.error("--growth, --compact-bigo, and --narrow are mutually exclusive")
+    if sum((args.growth, args.compact_bigo, args.equations, args.narrow)) > 1:
+        parser.error("--growth, --compact-bigo, --equations, and --narrow are mutually exclusive")
     if args.expected_count < 1:
         parser.error("--expected-count must be positive")
     args.output.mkdir(parents=True, exist_ok=True)
@@ -47,18 +49,28 @@ def main() -> None:
     records: list[tuple[int, str, str, Path, bool]] = []
     for exported in [args.exported, *args.additional_export]:
         for test in json.loads((exported / "manifest.json").read_text()):
+            # Full class runs may include the two-page smoke case as well as the eight
+            # exhaustive shards. Keep exactly one capture for each corpus page.
+            if test.get("testIdentifier", "").endswith("/testSmoke()"):
+                continue
             for attachment in test["attachments"]:
                 name = attachment["suggestedHumanReadableName"]
-                pattern = (r"growth-360-(\d{3})-(.+)_\d+_[A-Fa-f0-9-]+\.png$" if args.growth
-                           else r"compact-bigo-360-(\d{3})-(.+)_\d+_[A-Fa-f0-9-]+\.png$"
-                           if args.compact_bigo else r"narrow-(\d{3})-(.+)-(top|charts|expanded)_"
-                           if args.narrow else r"(\d{3})-(.+)-(top|charts|expanded)_")
+                if args.growth:
+                    pattern = r"growth-360-(\d{3})-(.+)_\d+_[A-Fa-f0-9-]+\.png$"
+                elif args.compact_bigo:
+                    pattern = r"compact-bigo-360-(\d{3})-(.+)_\d+_[A-Fa-f0-9-]+\.png$"
+                elif args.equations:
+                    pattern = r"equations-320-(\d{3})-(.+)_\d+_[A-Fa-f0-9-]+\.png$"
+                elif args.narrow:
+                    pattern = r"narrow-(\d{3})-(.+)-(top|charts|expanded)_"
+                else:
+                    pattern = r"(\d{3})-(.+)-(top|charts|expanded)_"
                 match = re.match(pattern, name)
                 if not match:
                     continue
-                if args.growth or args.compact_bigo:
+                if args.growth or args.compact_bigo or args.equations:
                     number, algorithm_id = match.groups()
-                    kind = "growth" if args.growth else "compact-bigo"
+                    kind = "growth" if args.growth else "compact-bigo" if args.compact_bigo else "equations"
                 else:
                     number, algorithm_id, kind = match.groups()
                 page = int(number)
@@ -71,7 +83,8 @@ def main() -> None:
 
     expected_pages = set(range(1, args.expected_count + 1))
     expected_kinds = ({"growth"} if args.growth else {"compact-bigo"}
-                      if args.compact_bigo else {"top", "charts", "expanded"})
+                      if args.compact_bigo else {"equations"}
+                      if args.equations else {"top", "charts", "expanded"})
     if set(captured) != expected_kinds:
         raise ValueError(f"missing screenshot states: {set(captured)}")
     for kind, pages in captured.items():
@@ -80,7 +93,7 @@ def main() -> None:
                 f"{kind}: missing {sorted(expected_pages - set(pages))}; "
                 f"unexpected {sorted(set(pages) - expected_pages)}"
             )
-        if not args.growth and not args.compact_bigo and pages != captured["top"]:
+        if not args.growth and not args.compact_bigo and not args.equations and pages != captured["top"]:
             raise ValueError(f"{kind}: algorithm IDs do not match top screenshots")
         if len(set(pages.values())) != args.expected_count:
             raise ValueError(f"{kind}: algorithm IDs are repeated across pages")
@@ -89,13 +102,16 @@ def main() -> None:
         tile = tiles / f"{page:03d}-{algorithm_id}-{kind}.png"
         if args.narrow and kind == "expanded" and is_catalyst:
             crop = ["-gravity", "north", "-crop", "1400x2000+0+0", "+repage"]
+        elif args.equations:
+            crop = ["-gravity", "north", "-crop", "850x1500+0+0", "+repage"]
         elif args.growth or args.compact_bigo or (args.narrow and kind != "expanded"):
             crop = ["-gravity", "north", "-crop", "850x1100+0+0", "+repage"]
         else:
             crop = []
+        tile_size = "300x530" if args.equations else "300x430"
         subprocess.run(
-            ["magick", str(source), "-auto-orient", *crop, "-resize", "300x430",
-             "-background", "white", "-gravity", "center", "-extent", "300x430",
+            ["magick", str(source), "-auto-orient", *crop, "-resize", tile_size,
+             "-background", "white", "-gravity", "center", "-extent", tile_size,
              "-gravity", "south", "-splice", "0x24", "-fill", "black",
              "-font", "/System/Library/Fonts/Supplemental/Arial.ttf",
              "-pointsize", "12", "-annotate", "+0+4",

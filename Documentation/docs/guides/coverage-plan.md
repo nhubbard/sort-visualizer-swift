@@ -15,27 +15,22 @@ target; the App Intents system tests can continue running on an iOS 27 simulator
 
 ## Current evidence and measurement limits
 
-- The existing corpus contains Swift Testing suites across the engine, algorithms, visualizers,
-  services, audio, and features, plus XCTest UI suites. Algorithm correctness and stability,
-  replay, archive, audio, persistence, and Metal renderer behavior already have focused tests.
-- The [2026-10-02 source-verified baseline](../../../Tools/TestCoverage/baselines/2026-10-02/README.md)
-  combines 19 passing Mac Catalyst module suites, the passing iPad UI suite, the passing iOS 27
-  App Intents suite, and the passing Mac Catalyst UI suite: 34,995/36,785 measured app-owned
-  source lines (95.13%). The 22 bundles contain 755 passing tests and 11 platform skips. Of 63
-  changed executable lines relative to `HEAD`, 58 are covered (92.06%).
-  Sixteen production Swift files have no coverage record, including both AUv3 extension UI files;
-  the measured aggregate is therefore not a claim of complete extension coverage.
-- The App Intents system suite has thirteen passing tests for registration, queries, settings,
-  stopping while idle, a complete visible sort, both automation modes, a live sound-setting
-  change, default size changes, and rejection of an unknown algorithm and idle size cycling.
-  Other error paths still need system-level coverage.
-- The full Mac Catalyst UI suite passes 23 tests with two platform skips. It includes native
-  settings persistence, transport and keyboard controls, visualizer switching, a real tape save
-  and import after relaunch, and a corrupt-tape error that can be dismissed. Xcode omits
-  `Metadata.plist` from the Catalyst UI coverage archive, so this suite is behavioral evidence
-  without attributable line coverage. Its import callback is the five-line changed-code gap.
-- iPad UI tests prove native export/import panel presentation; the archive and coordinator suites
-  prove the data path. A complete native iPad save/import round trip remains untested.
+- The [2026-10-04 source-verified baseline](../../../Tools/TestCoverage/baselines/2026-10-04/README.md)
+  measures 35,641/37,779 app-owned executable lines (94.34%) across 24 passing bundles: 19
+  Catalyst module suites, the AUv3 extension component suite, two focused iPad UI bundles, and
+  two focused iOS 27 App Intents bundles. They report 759 passing tests and six skips. All
+  production source hashes and result summaries were verified. The AUv3 UI sources now have
+  coverage records; 14 other production Swift files do not.
+- The [2026-10-02 baseline](../../../Tools/TestCoverage/baselines/2026-10-02/README.md)
+  includes a broader iPad UI and App Intents selection and a passing Catalyst UI suite. The
+  current run's narrower UI selection and larger source tree make the aggregate percentages
+  unsuitable for a direct regression comparison. The new Catalyst UI attempt timed out before
+  tests launched, and full iPad UI and App Intents attempts did not finalize readable result
+  bundles. Their passing test logs remain separate behavioral evidence, not measured coverage.
+- The [functional contract matrix](functional-contract-matrix.md) records 35 complete contracts,
+  including native tape import, CloudKit sync, AUv3 host interaction, and accessibility journeys.
+  Its historical result bundles provide the journey evidence; this new coverage baseline answers
+  which source lines were instrumented in the focused lanes.
 - The settled-pixel baseline covers all 15 current Metal visualizers in one deterministic scene.
   It does not cover the visual input matrix or the animation path.
 
@@ -43,21 +38,23 @@ Do not add percentages from different test runs or count third-party targets in 
 
 ## Workstreams 1 and 3 implementation status
 
-The runner and report generator under `Tools/TestCoverage/` now create a source hash snapshot,
+The runner and report generator under `Tools/TestCoverage/` create a source hash snapshot,
 retain each result bundle, verify passed test summaries, merge covered source-line identities, and
 publish per-platform, per-target, per-file, changed-line, and unmeasured-source views. The report
 rejects a missing coverage archive unless the lane is explicitly declared behavioral-only. Its
-merger has fixture tests for line union, platform separation, stale sources, and invalid bundles.
+merger has fixture tests for line union, platform separation, stale sources, invalid bundles, and
+the hostless AUv3 component suite's production-source mapping.
 
-The highest-risk journeys now have a Catalyst tape save/import/replay test, a visible corrupt-file
-error test, a tape archive/session replay integration test, thirteen iOS 27 App Intents system
-tests, and a passing full Catalyst UI suite. Settings persistence and reset, run controls,
-keyboard commands, and visualizer switching run on Catalyst as well as their applicable iPad
-checks. The remaining Workstream 3 gaps are a complete native iPad tape round trip; additional
-system-intent error/busy cases; a host test for the AUv3 parameter view and controller; and
-signed-in CloudKit and external AU host canaries. The current combined line coverage exceeds its
-90% floor, but SortFeature (87.85%), IntentsKit (61.91%), and the app target (77.53%) remain
-below the per-target floor, while the AUv3 UI sources remain unmeasured.
+The functional contract matrix's 35 journeys are complete. The latest baseline exceeds the 90%
+combined line floor, while IntentsKit (60.88%), the app target (64.90%), the AUv3 extension
+(63.52%), SettingsFeature (74.74%), SortFeature (82.60%), and PersistenceKit (86.56%) remain
+below the per-target floor. The focused current lanes cover 860/1,262 changed executable lines
+since the previous baseline revision (68.15%); this is a gap-finding signal, not a complete
+platform verdict. The next measurement priority is a stable full iPad UI, App Intents, and
+Catalyst UI run on the current source snapshot. Then add outcome-focused tests for genuinely
+uncovered branches, especially app navigation and commands, intent error paths, AUv3 parameter
+view actions, run controls, and settings and persistence failures. Keep the 35 completed contract
+outcomes as the behavioral gate while this measurement work proceeds.
 
 ## Definition of done
 

@@ -23,6 +23,9 @@ SELF_REFERENCE = re.compile(
 CONTRACTION = re.compile(r"\b(?:it's|doesn't|can't|won't|isn't|aren't|didn't|wouldn't|shouldn't)\b", re.IGNORECASE)
 BLOCK_MARKUP = re.compile(r"(?m)^\s*(?:#{1,6}\s|[-*+]\s|\d+\.\s|>\s|```|~~~|---+$)")
 PROGRAMMING_OPERATOR = re.compile(r"\b[nmkd]\s*(?:\^|\*|/)\s*(?:[nmkd]|\d)")
+CONVERSATIONAL_PROMPT = re.compile(r"\b(?:picture a|to see how|think of each)\b", re.IGNORECASE)
+VARIANT_QUALIFIERS = ("unoptimized", "optimized", "iterative", "recursive",
+                      "stackless", "unstable", "simplified")
 
 
 def algorithm_ids() -> set[str]:
@@ -43,6 +46,14 @@ def check_description(path: Path, *, scaffold: bool) -> list[str]:
         problems.append("empty description")
     if not scaffold and len(re.findall(r"\b[\w-]+\b", text)) < 100:
         problems.append("fewer than 100 words")
+    if not scaffold:
+        qualifier = next((word for word in VARIANT_QUALIFIERS
+                          if word in path.parent.name), None)
+        # The opening must identify the selected variant before explaining its family.
+        # This catches generic leads that make an iterative, recursive, or other variant
+        # appear to be the base algorithm when selected in the app.
+        if qualifier and qualifier not in text[:150].lower():
+            problems.append(f"opening omits {qualifier} variant")
     if BLOCK_MARKUP.search(text):
         problems.append("block Markdown")
     if re.search(r"<[^>]+>|!\[|\]\[|`", text):
@@ -51,6 +62,8 @@ def check_description(path: Path, *, scaffold: bool) -> list[str]:
         problems.append("em dash")
     if "?" in text:
         problems.append("question mark")
+    if CONVERSATIONAL_PROMPT.search(text):
+        problems.append("conversational prompt")
     if any(line.rstrip() != line for line in text.splitlines()):
         problems.append("trailing whitespace")
     for name, expression in (("prohibited wording", BAD_WORDS),
@@ -84,6 +97,14 @@ def main() -> int:
     for name, path in sorted(descriptions.items()):
         for problem in check_description(path, scaffold=name == "template"):
             errors.append(f"{name}: {problem}")
+    normalized: dict[str, str] = {}
+    for name, path in sorted(descriptions.items()):
+        if name == "template":
+            continue
+        prose = re.sub(r"\s+", " ", path.read_text().strip()).casefold()
+        if prose in normalized:
+            errors.append(f"{name}: duplicate description of {normalized[prose]}")
+        normalized[prose] = name
     print(f"Checked {len(ids)} algorithms and {len(descriptions)} descriptions")
     for error in errors:
         print(error)

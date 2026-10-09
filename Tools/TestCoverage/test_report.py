@@ -9,6 +9,18 @@ import report as coverage
 
 
 class CoverageReportTests(unittest.TestCase):
+    def test_only_extension_sources_accept_hostless_component_test_target(self):
+        component = "AUv3ExtensionComponentTests.xctest"
+        self.assertTrue(coverage.valid_coverage_target(
+            "App/AUv3Extension/Sources/SortAudioUnitParameterView.swift", component
+        ))
+        self.assertFalse(coverage.valid_coverage_target(
+            "App/Sources/ContentView.swift", component
+        ))
+        self.assertFalse(coverage.valid_coverage_target(
+            "App/AUv3Extension/Sources/SortAudioUnitParameterView.swift", "OtherTests.xctest"
+        ))
+
     def test_changed_production_source_rejects_snapshot(self):
         with tempfile.TemporaryDirectory() as temporary:
             folder = Path(temporary)

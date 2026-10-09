@@ -1,6 +1,6 @@
-Circle Sort is a comparison-based sorting algorithm that repeatedly compares elements in symmetric pairs drawn from
-opposite ends of shrinking sub-ranges of the array, swapping any pair found out of order. Picture a range of the array
-bent into a circle: its first and last element sit at opposite ends of a diameter. The algorithm compares that outermost
+Iterative Circle Sort is a comparison-based sorting algorithm that repeatedly compares elements in symmetric pairs drawn from
+opposite ends of shrinking sub-ranges of the array, swapping any pair found out of order. A range can be pictured as a
+circle, with its first and last elements at opposite ends of a diameter. The algorithm compares that outermost
 pair, then steps one position inward along the circle to compare the next pair, and so on until its two pointers meet or
 cross at the circle's center. Applying this fold-inward comparison to shrinking ranges, and repeating the whole process
 until an entire pass produces no swaps, is enough to fully sort the array.

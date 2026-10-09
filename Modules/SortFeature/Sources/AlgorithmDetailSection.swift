@@ -13,6 +13,8 @@ import UIKit
 public struct AlgorithmDetailSection: View {
   private let algorithm: any SortAlgorithm
   @State private var content: AlgorithmDetailContent?
+  @State private var contentLoading = true
+  @State private var contentUnavailable = false
   /// `ScrollingSortView.body`'s own top-level `GeometryReader` (otherwise only used to size
   /// `SortView`'s frame) passed straight through — not `ViewThatFits`: `descriptionColumn`/
   /// `complexityColumn` below both use `.frame(maxWidth: .infinity)`, which happily shrinks to
@@ -20,6 +22,7 @@ public struct AlgorithmDetailSection: View {
   private let availableWidth: CGFloat
   private let analyticsRevision: Int
   private let showImplementations: Bool
+  private let showDescription: Bool
   @Environment(AppSettings.self) private var settings
   @State private var selectedLanguage: CodeLanguage = .all[0]
   /// Highlighting a sample re-parses its full source and re-styles every attribute run — cheap
@@ -39,12 +42,13 @@ public struct AlgorithmDetailSection: View {
 
   public init(
     algorithm: any SortAlgorithm, availableWidth: CGFloat, analyticsRevision: Int = 0,
-    showImplementations: Bool = true
+    showImplementations: Bool = true, showDescription: Bool = true
   ) {
     self.algorithm = algorithm
     self.availableWidth = availableWidth
     self.analyticsRevision = analyticsRevision
     self.showImplementations = showImplementations
+    self.showDescription = showDescription
   }
 
   public var body: some View {
@@ -57,22 +61,33 @@ public struct AlgorithmDetailSection: View {
             .accessibilityValue("\(appliedThemeID?.rawValue ?? "loading")|\(highlighted.count)")
         }
       #endif
+      if contentUnavailable {
+        ContentUnavailableView(
+          "Reference content unavailable", systemImage: "doc.questionmark",
+          description: Text(
+            "The bundled algorithm details could not be loaded. Reinstall the app to restore descriptions and code examples."
+          )
+        )
+        .accessibilityIdentifier("algorithmDetailsLoadError")
+      }
       if availableWidth < Self.stackedLayoutThreshold {
         VStack(alignment: .leading, spacing: 24) {
-          descriptionColumn
+          if showDescription { descriptionColumn }
           complexityColumn
         }
       } else {
         HStack(alignment: .top, spacing: 16) {
-          descriptionColumn
+          if showDescription { descriptionColumn }
           complexityColumn
         }
       }
 
-      if showImplementations {
+      if showImplementations && !contentUnavailable {
         VStack(alignment: .leading, spacing: 8) {
           Text("Implementations").font(.title2.bold())
-          if let content, !content.codeSamples.isEmpty {
+          if contentLoading {
+            ProgressView("Loading code examples…")
+          } else if let content, !content.codeSamples.isEmpty {
             Picker("Language", selection: $selectedLanguage) {
               ForEach(content.codeSamples, id: \.language) { sample in
                 Text(sample.language.title).tag(sample.language)
@@ -91,6 +106,7 @@ public struct AlgorithmDetailSection: View {
                   AttributedCodeView(
                     attributed: styled, backgroundColor: settings.codeTheme.makeTheme().getBgColor()
                   )
+                  .accessibilityIdentifier("algorithmCodeSample")
                   .overlay(alignment: .topTrailing) {
                     if let plain = plainSamples[selectedLanguage] {
                       Button {
@@ -121,12 +137,18 @@ public struct AlgorithmDetailSection: View {
     .padding(.all, 32)
     .task(id: algorithm.id) {
       content = nil
+      contentLoading = true
+      contentUnavailable = false
       highlighted = [:]
       plainSamples = [:]
       #if DEBUG
         appliedThemeID = nil
       #endif
-      content = await AlgorithmDetailContent.load(for: algorithm.id.rawValue)
+      switch await AlgorithmDetailStore.shared.loadState(for: algorithm.id.rawValue) {
+      case .loaded(let loaded): content = loaded
+      case .unavailable: contentUnavailable = true
+      }
+      contentLoading = false
       if let firstLanguage = content?.codeSamples.first?.language {
         selectedLanguage = firstLanguage
       }
@@ -170,10 +192,12 @@ public struct AlgorithmDetailSection: View {
   private var descriptionColumn: some View {
     VStack(alignment: .leading, spacing: 16) {
       Text("Description").font(.title2.bold())
-      if let description = content?.description {
+      if contentLoading {
+        ProgressView("Loading description…")
+      } else if let description = content?.description {
         Markdown(description).lineSpacing(1.75)
           .accessibilityIdentifier("algorithmDescriptionText")
-      } else {
+      } else if !contentUnavailable {
         Text("No description available yet.").foregroundStyle(.secondary)
       }
     }
@@ -194,10 +218,8 @@ public struct AlgorithmDetailSection: View {
     .frame(maxWidth: .infinity, alignment: .leading)
   }
 
-  /// 2x2 (best/average over worst/space), not a single column of four full-width
-  /// `LabeledEquationCell`s -- each cell's own label is small and secondary-styled instead of a
-  /// full label column, which keeps this section compact instead of stacking four full-width rows
-  /// underneath "Complexity".
+  /// Use one column in a narrow detail pane so common bounds fit without horizontal scrolling.
+  /// Wider panes retain the compact 2x2 layout (best/average over worst/space).
   ///
   /// Each `GridRow` uses `alignment: .bottom`, not the Grid default `.center` -- two equations of
   /// different rendered heights in the same row (e.g. "O(n log² n)"'s superscript-tall box next to
@@ -205,35 +227,45 @@ public struct AlgorithmDetailSection: View {
   /// centering a short box inside the row's full height sits its glyphs at a different vertical
   /// offset than a tall box's glyphs at that same center. Bottom-aligning instead lines up each
   /// equation's own (roughly consistent, since none of these have deep subscripts) descent.
+  @ViewBuilder
   private var complexityGrid: some View {
-    let rows = algorithm.metadata.complexityRows
-    func row(_ id: String) -> ComplexityRow {
-      rows.first { $0.id == id } ?? rows[0]
-    }
-    return Grid(alignment: .leading, horizontalSpacing: 16, verticalSpacing: 8) {
-      GridRow(alignment: .bottom) {
-        LabeledEquationCell(label: row("best").label, equation: row("best").latex)
-        LabeledEquationCell(label: row("average").label, equation: row("average").latex)
-      }
-      GridRow(alignment: .bottom) {
-        LabeledEquationCell(label: row("worst").label, equation: row("worst").latex)
-        LabeledEquationCell(label: row("space").label, equation: row("space").latex)
-      }
-      // Not another equation -- a plain integer, rendered through the same cell anyway (a bare
-      // number is valid LaTeX) so it lines up visually with best/average/worst/space instead of
-      // introducing a differently-styled row. Spans both columns: there's no natural second stat
-      // to pair it with. The actual point of showing this next to Big-O: a higher score here
-      // doesn't imply a worse growth curve above -- e.g. Quadsort's port is one of the most
-      // complex in the app but among the fastest in practice.
-      GridRow(alignment: .bottom) {
+    if availableWidth < 500 {
+      VStack(alignment: .leading, spacing: 8) {
+        ForEach(["best", "average", "worst", "space"], id: \.self) { id in
+          LabeledEquationCell(label: complexityRow(id).label, equation: complexityRow(id).latex)
+        }
         LabeledEquationCell(
           label: "Implementation Complexity",
           equation: "\(algorithm.metadata.implementationComplexity)"
         )
-        .gridCellColumns(2)
       }
+      .accessibilityIdentifier("complexityEquationGrid")
+    } else {
+      Grid(alignment: .leading, horizontalSpacing: 16, verticalSpacing: 8) {
+        GridRow(alignment: .bottom) {
+          LabeledEquationCell(label: complexityRow("best").label, equation: complexityRow("best").latex)
+          LabeledEquationCell(label: complexityRow("average").label, equation: complexityRow("average").latex)
+        }
+        GridRow(alignment: .bottom) {
+          LabeledEquationCell(label: complexityRow("worst").label, equation: complexityRow("worst").latex)
+          LabeledEquationCell(label: complexityRow("space").label, equation: complexityRow("space").latex)
+        }
+        // The implementation score spans both columns in the wider layout.
+        GridRow(alignment: .bottom) {
+          LabeledEquationCell(
+            label: "Implementation Complexity",
+            equation: "\(algorithm.metadata.implementationComplexity)"
+          )
+          .gridCellColumns(2)
+        }
+      }
+      .accessibilityIdentifier("complexityEquationGrid")
     }
-    .accessibilityIdentifier("complexityEquationGrid")
+  }
+
+  private func complexityRow(_ id: String) -> ComplexityRow {
+    let rows = algorithm.metadata.complexityRows
+    return rows.first { $0.id == id } ?? rows[0]
   }
 }
 

@@ -1,4 +1,4 @@
-Library Sort, also called gapped insertion sort, is a [comparison sort](https://en.wikipedia.org/wiki/Comparison_sort)
+Simplified Library Sort is a variant of library sort, also called gapped insertion sort. It is a [comparison sort](https://en.wikipedia.org/wiki/Comparison_sort)
 that takes its name from the way librarians shelve books: rather than packing volumes together with no room to spare, a
 librarian leaves empty gaps along the shelf so that a newly-acquired book can usually slot into the right place without
 having to shift every book that follows it. The algorithm was formally analyzed by Michael A. Bender, Martín

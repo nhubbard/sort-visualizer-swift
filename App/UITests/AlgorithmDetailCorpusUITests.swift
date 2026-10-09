@@ -23,6 +23,47 @@ final class AlgorithmDetailCorpusUITests: XCTestCase {
   func testNarrowPages148Through172() { audit(147..<172, width: 360, prefix: "narrow-") }
   func testNarrowPages173Through196() { audit(172..<196, width: 360, prefix: "narrow-") }
 
+  func testLongestDescriptionsReachTheirEndingAtNarrowWidth() {
+    continueAfterFailure = false
+    let fixtures: [(index: Int, id: String, ending: String)] = [
+      (79, "introcirclesortrecursive", "using no auxiliary array of its own."),
+      (91, "laziestsort", "Most merge sort variants trade rotations for a full-sized scratch buffer."),
+      (169, "stacklessrotatemergesort", "so is the sort as a whole.")
+    ]
+    for fixture in fixtures {
+      let app = XCUIApplication()
+      app.launchEnvironment = [
+        "UI_TEST_DETAIL_AUDIT": "1",
+        "UI_TEST_DETAIL_AUDIT_START": String(fixture.index),
+        "UI_TEST_DETAIL_AUDIT_WIDTH": "360"
+      ]
+      app.launch()
+      XCTAssertEqual(app.staticTexts["auditAlgorithmID"].label, fixture.id)
+      let description = app.descendants(matching: .any)
+        .matching(identifier: "algorithmDescriptionText").firstMatch
+      XCTAssertTrue(description.waitForExistence(timeout: 10))
+      let scroll = app.scrollViews["auditDetailScrollView"]
+      XCTAssertLessThanOrEqual(description.frame.maxX, scroll.frame.maxX + 1,
+                               "The long prose clips the narrow detail pane")
+      let complexity = app.staticTexts["Complexity"]
+      for _ in 0..<30 where !complexity.isHittable {
+        scroll.swipeUp(velocity: .fast)
+      }
+      XCTAssertTrue(complexity.isHittable,
+                    "Cannot scroll past the complete description for \(fixture.id)")
+      let ending = app.staticTexts.matching(NSPredicate(
+        format: "label CONTAINS %@", fixture.ending
+      )).firstMatch
+      XCTAssertTrue(ending.exists,
+                    "The end of \(fixture.id)'s description is missing from the rendered page")
+      let capture = XCTAttachment(screenshot: app.screenshot())
+      capture.name = "long-description-end-\(fixture.id)"
+      capture.lifetime = .keepAlways
+      add(capture)
+      app.terminate()
+    }
+  }
+
   func testDenseExpandedChartScrollsAndChangesSeriesState() {
     continueAfterFailure = false
     let app = XCUIApplication()
@@ -68,6 +109,34 @@ final class AlgorithmDetailCorpusUITests: XCTestCase {
     assertLongFittedEquationCanBeScrolled(width: 360)
   }
 
+  func testLongFittedEquationCanBeScrolledAtSmallestWidth() {
+    assertLongFittedEquationCanBeScrolled(width: 320)
+  }
+
+  func testLongDetectedEquationCanBeScrolledAtSmallestWidth() {
+    let app = XCUIApplication()
+    app.launchEnvironment = [
+      "UI_TEST_DETAIL_AUDIT": "1", "UI_TEST_DETAIL_AUDIT_START": "22",
+      "UI_TEST_DETAIL_AUDIT_WIDTH": "320", "UI_TEST_EQUATIONS_ONLY": "1"
+    ]
+    app.launch()
+    XCTAssertEqual(app.staticTexts["auditAlgorithmID"].label, "bogosort")
+    let equation = app.scrollViews["equationScroll-Detected"]
+    XCTAssertTrue(equation.waitForExistence(timeout: 10))
+    let before = equation.screenshot().pngRepresentation
+    let initial = XCTAttachment(screenshot: app.screenshot())
+    initial.name = "detected-equation-320-before"
+    initial.lifetime = .keepAlways
+    add(initial)
+    equation.swipeLeft(velocity: .slow)
+    XCTAssertNotEqual(equation.screenshot().pngRepresentation, before,
+                      "The long detected equation did not reveal its remaining terms")
+    let scrolled = XCTAttachment(screenshot: app.screenshot())
+    scrolled.name = "detected-equation-320-after"
+    scrolled.lifetime = .keepAlways
+    add(scrolled)
+  }
+
   private func assertLongFittedEquationCanBeScrolled(width: Int) {
     let app = XCUIApplication()
     app.launchEnvironment = [
@@ -81,7 +150,7 @@ final class AlgorithmDetailCorpusUITests: XCTestCase {
     XCTAssertTrue(description.waitForExistence(timeout: 10), "detail content did not finish loading")
     let equation = app.scrollViews["equationScroll-Fitted (Used by App)"]
     XCTAssertTrue(equation.waitForExistence(timeout: 5))
-    if width == 360 {
+    if width <= 360 {
       let detailScroll = app.scrollViews["auditDetailScrollView"]
       for _ in 0..<20 where !equation.isHittable {
         detailScroll.swipeUp(velocity: .slow)
@@ -89,9 +158,17 @@ final class AlgorithmDetailCorpusUITests: XCTestCase {
       XCTAssertTrue(equation.isHittable, "The fitted equation did not enter the narrow viewport")
     }
     let before = equation.screenshot().pngRepresentation
+    let initial = XCTAttachment(screenshot: app.screenshot())
+    initial.name = "fitted-equation-\(width)-before"
+    initial.lifetime = .keepAlways
+    add(initial)
     equation.swipeLeft(velocity: .slow)
     XCTAssertNotEqual(equation.screenshot().pngRepresentation, before,
                       "The long fitted equation did not reveal its remaining terms")
+    let scrolled = XCTAttachment(screenshot: app.screenshot())
+    scrolled.name = "fitted-equation-\(width)-after"
+    scrolled.lifetime = .keepAlways
+    add(scrolled)
   }
 
   private func audit(_ range: Range<Int>, width: Int = 900, prefix: String = "") {
@@ -209,6 +286,65 @@ final class AlgorithmDetailCorpusUITests: XCTestCase {
         activity.add(large)
         app.activateControlForUITest(app.buttons["Done"])
       }
+      if offset < range.upperBound - 1 {
+        app.activateControlForUITest(app.buttons["auditNextButton"])
+      }
+    }
+    XCTAssertEqual(seen.count, range.count)
+  }
+}
+
+/// Renders the shipping equation cells at a 320-point detail width. Omitting description prose
+/// keeps all six equations in the first viewport, so every algorithm can be captured and reviewed.
+@MainActor
+final class AlgorithmEquationCorpusUITests: XCTestCase {
+  func testSmoke() { audit(0..<2) }
+  func testPages001Through025() { audit(0..<25) }
+  func testPages026Through049() { audit(25..<49) }
+  func testPages050Through074() { audit(49..<74) }
+  func testPages075Through098() { audit(74..<98) }
+  func testPages099Through123() { audit(98..<123) }
+  func testPages124Through147() { audit(123..<147) }
+  func testPages148Through172() { audit(147..<172) }
+  func testPages173Through196() { audit(172..<196) }
+
+  private func audit(_ range: Range<Int>) {
+    continueAfterFailure = false
+    #if !targetEnvironment(macCatalyst)
+    XCUIDevice.shared.orientation = .portrait
+    #endif
+    let app = XCUIApplication()
+    app.launchEnvironment = [
+      "UI_TEST_DETAIL_AUDIT": "1",
+      "UI_TEST_DETAIL_AUDIT_START": String(range.lowerBound),
+      "UI_TEST_DETAIL_AUDIT_WIDTH": "320",
+      "UI_TEST_EQUATIONS_ONLY": "1"
+    ]
+    app.launch()
+    let scroll = app.scrollViews["auditDetailScrollView"]
+    XCTAssertTrue(scroll.waitForExistence(timeout: 10))
+
+    var seen = Set<String>()
+    for offset in range {
+      let id = app.staticTexts["auditAlgorithmID"]
+      XCTAssertEqual(app.staticTexts["auditIndexLabel"].label, "\(offset + 1) of 196")
+      let algorithmID = id.label
+      XCTAssertTrue(seen.insert(algorithmID).inserted)
+      let grid = app.descendants(matching: .any)
+        .matching(identifier: "complexityEquationGrid").firstMatch
+      XCTAssertTrue(grid.waitForExistence(timeout: 10), "Missing complexity grid for \(algorithmID)")
+      XCTAssertGreaterThanOrEqual(grid.frame.minX, scroll.frame.minX - 1)
+      XCTAssertLessThanOrEqual(grid.frame.maxX, scroll.frame.maxX + 1,
+                               "Complexity grid clips the 320-point pane for \(algorithmID)")
+      for label in ["Best Case", "Average Complexity", "Worst Case", "Space Complexity",
+                    "Detected", "Fitted (Used by App)"] {
+        XCTAssertTrue(app.staticTexts[label].exists, "Missing \(label) equation for \(algorithmID)")
+      }
+      XCTAssertTrue(app.staticTexts["Complexity"].isHittable)
+      let capture = XCTAttachment(screenshot: app.screenshot())
+      capture.name = "equations-320-\(String(format: "%03d", offset + 1))-\(algorithmID)"
+      capture.lifetime = .keepAlways
+      add(capture)
       if offset < range.upperBound - 1 {
         app.activateControlForUITest(app.buttons["auditNextButton"])
       }

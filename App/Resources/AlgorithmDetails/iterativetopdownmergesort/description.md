@@ -8,9 +8,9 @@ length zero or one, which are trivially already in order.
 
 The algorithm walks the recursion tree level by level using arithmetic in place of function calls.
 
-To see how, first notice how many leaves the top-down tree would have if it kept splitting all the way down to
-length-one ranges: it is the smallest power of two that is at least as large as the array's length, n. Call that
-count subarrayCount. Every level of the tree, from the leaves back up to the root, has a number of slices that is
+If the top-down tree keeps splitting down to length-one ranges, its leaf count is the smallest power of two
+at least as large as the array's length, n. The algorithm calls that count subarrayCount. Every level of the tree,
+from the leaves back up to the root, has a number of slices that is
 itself a power of two: subarrayCount, then subarrayCount ÷ 2, then subarrayCount ÷ 4, and so on down to 1 at
 the root.
 

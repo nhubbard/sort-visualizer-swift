@@ -60,6 +60,8 @@ struct RunControlBar: View {
       in: 0...Double(max(replay.totalOperationCount, 1))
     )
     .accessibilityIdentifier("runControlScrubSlider")
+    .accessibilityLabel("Playback position")
+    .accessibilityValue("Operation \(replay.stepIndex) of \(replay.totalOperationCount)")
   }
 
   /// `ViewThatFits` between one full-width row and two rows (playback transport, then
@@ -461,6 +463,10 @@ private struct UtilityButtons: View {
       }
       .accessibilityIdentifier("runControlSpeedButton")
       .accessibilityLabel(replay.useFixedDurationPacing ? "Target Duration" : "Playback Speed")
+      .accessibilityValue(
+        replay.useFixedDurationPacing
+          ? "\(Int(replay.targetDuration)) seconds"
+          : "\(Int(replay.speed)) ops per second")
       .help(
         replay.useFixedDurationPacing
           ? "Show or hide the target duration slider"
@@ -474,6 +480,7 @@ private struct UtilityButtons: View {
       }
       .accessibilityIdentifier("runControlSizeButton")
       .accessibilityLabel("Array Size")
+      .accessibilityValue("\(session.arraySize) items")
       .help("Show or hide the array size picker (⌘S cycles to the next size)")
 
       Button {

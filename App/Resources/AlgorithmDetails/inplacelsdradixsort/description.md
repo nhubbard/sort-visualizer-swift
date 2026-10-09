@@ -5,9 +5,9 @@ digit value and using those counts to copy every element into its correct positi
 output array. That output array is what this variant does away with, at the cost of doing
 noticeably more element movement to make up for it.
 
-For each digit place, this algorithm keeps one small counter per possible nonzero digit value,
-each starting at the last index of the array and only ever moving inward, think of each counter
-as reserving a landing spot for its digit, counted in from the end. A single left-to-right scan
+For each digit place, this algorithm keeps one small counter per possible nonzero digit value.
+Each counter starts at the last index of the array and moves inward, reserving a landing spot
+for its digit counted from the end. A single left-to-right scan
 then does the whole pass: whenever the current position holds a value whose digit is zero, it is
 already correctly grouped ahead of every nonzero digit for this pass, so the scan simply moves on.
 Anything else gets walked all the way out to its own counter's reserved spot via a chain of

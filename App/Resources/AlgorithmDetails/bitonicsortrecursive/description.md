@@ -1,4 +1,4 @@
-Bitonic Sort is a comparison-based [sorting network](https://en.wikipedia.org/wiki/Sorting_network) devised
+Recursive Bitonic Sort is a comparison-based [sorting network](https://en.wikipedia.org/wiki/Sorting_network) devised
 by [Ken Batcher](https://en.wikipedia.org/wiki/Ken_Batcher). Like other sorting networks, the sequence of comparisons it
 performs is fixed in advance and does not depend on the values being sorted, only on the number of elements, n. That
 data-independence means many of its compare-and-swap operations, called comparators, can be evaluated at the same time,

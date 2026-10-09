@@ -1,4 +1,4 @@
-Diamond Sort is a [comparator network](https://en.wikipedia.org/wiki/Sorting_network) in the same
+Iterative Diamond Sort is a [comparator network](https://en.wikipedia.org/wiki/Sorting_network) in the same
 broad family as Batcher's Bitonic Sort and the Bose-Nelson sort: algorithms whose sequence of
 compare-and-swap operations is fixed in advance rather than adapted to the data being sorted, and
 which were originally designed with the expectation that their comparisons could run independently

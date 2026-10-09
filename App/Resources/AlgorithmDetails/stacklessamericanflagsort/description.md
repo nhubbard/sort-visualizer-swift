@@ -1,4 +1,4 @@
-American flag sort is a most-significant-digit radix sort that distributes elements into their
+Stackless American Flag Sort is a most-significant-digit radix sort that distributes elements into their
 buckets in place, without allocating a separate output array the way a typical bucket-based radix
 pass does. A single counting pass tallies how many elements fall into each digit bucket for the
 current digit position, and those counts are turned into a starting offset for each bucket within

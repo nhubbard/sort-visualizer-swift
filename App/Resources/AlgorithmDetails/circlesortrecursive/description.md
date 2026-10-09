@@ -1,4 +1,4 @@
-Circle Sort is a comparison-based sorting algorithm built around a simple symmetric idea: compare the first element of a
+Recursive Circle Sort is a comparison-based sorting algorithm built around a simple symmetric idea: compare the first element of a
 range against the last, the second against the second-to-last, and so on, swapping any out-of-order pair as the two
 pointers converge toward the middle. A single such pass never fully sorts the array on its own, but repeating it enough
 times drives every element into place, in the same spirit as [Bubble Sort](https://en.wikipedia.org/wiki/Bubble_sort)

@@ -1,4 +1,4 @@
-Binary Quick Sort is a most-significant-bit-first radix sort dressed up as a quicksort: instead of
+Recursive Binary Quick Sort is a most-significant-bit-first radix sort dressed up as a quicksort: instead of
 comparing whole values against a chosen pivot element, it partitions a range purely on one bit
 position at a time. A Hoare-style partition walks two pointers toward each other from opposite
 ends of the range, skipping past every element whose bit at the current position is already on
