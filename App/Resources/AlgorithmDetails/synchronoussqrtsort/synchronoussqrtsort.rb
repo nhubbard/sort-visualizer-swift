@@ -1,113 +1,282 @@
-def sort(array)
-  synchronous_sort(array, 0, array.length)
-  array
-end
+# MIT License
+# Copyright (c) 2021 The Holy Grail Sort Project, implemented by aphitorite
+# Copyright (c) 2020-2021 aphitorite
+# Permission is hereby granted, free of charge, to any person obtaining a copy of this software
+# and associated documentation files (the "Software"), to deal in the Software without
+# restriction, including without limitation the rights to use, copy, modify, merge, publish,
+# distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the
+# Software is furnished to do so, subject to the following conditions:
+# The above copyright notice and this permission notice shall be included in all copies or
+# substantial portions of the Software.
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING
+# BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+# NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+# DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+#
 
-def multi_swap(array, a, b, len)
-  len.times do |i|
-    array[a + i], array[b + i] = array[b + i], array[a + i]
+# Synchronous square-root block merge by aphitorite. MIT license; see the
+# complete notice carried by the native SynchronousSqrtSort.swift source.
+class SynchronousSqrt
+  def initialize(values)
+    @a = values
+    @n = values.length
   end
-end
 
-def rotate(array, a, m, b)
-  l = m - a
-  r = b - m
-  while l > 0 && r > 0
-    if r < l
-      multi_swap(array, m - r, m, r)
-      b -= r
-      m -= r
-      l -= r
-    else
-      multi_swap(array, a, m, l)
-      a += l
-      m += l
-      r -= l
+  def binary_insertion(first, last)
+    (first + 1...last).each do |i|
+      value = @a[i]
+      low = first
+      high = i
+      while low < high
+        middle = low + (high - low) / 2
+        if @a[middle] <= value
+          low = middle + 1
+        else
+          high = middle
+        end
+      end
+      j = i
+      while j > low
+        @a[j] = @a[j - 1]
+        j -= 1
+      end
+      @a[low] = value if low != i
     end
   end
-end
 
-def binary_search(array, a, b, value, left)
-  while a < b
-    mid = a + (b - a) / 2
-    comp = left ? value <= array[mid] : value < array[mid]
-    if comp
-      b = mid
-    else
-      a = mid + 1
+  def shift_forward(destination, source, last)
+    while source < last
+      @a[destination] = @a[source]
+      destination += 1
+      source += 1
     end
   end
-  a
-end
 
-def synchronous_merge(array, a, m, b)
-  block_size = 1
-  block_size *= 2 while block_size * block_size < array.length
-  if m - a <= block_size && b - m <= block_size
-    temp = array[a...b]
-    i = 0
-    j = m - a
-    (a...b).each do |k|
-      if i < m - a && (j == b - a || temp[i] <= temp[j])
-        array[k] = temp[i]
-        i += 1
+  def shift_backward(first, source_end, destination_end)
+    while source_end > first
+      source_end -= 1
+      destination_end -= 1
+      @a[destination_end] = @a[source_end]
+    end
+  end
+
+  def merge_forward(first, middle, last, output)
+    left = first
+    right = middle
+    while left < middle && right < last
+      if @a[left] <= @a[right]
+        @a[output] = @a[left]
+        left += 1
       else
-        array[k] = temp[j]
-        j += 1
+        @a[output] = @a[right]
+        right += 1
+      end
+      output += 1
+    end
+    shift_forward(output, left, middle) if left > output
+    shift_forward(output, right, last)
+  end
+
+  def merge_backward(first, middle, last, output)
+    left = middle - 1
+    right = last - 1
+    while right >= middle && left >= first
+      output -= 1
+      if @a[right] >= @a[left]
+        @a[output] = @a[right]
+        right -= 1
+      else
+        @a[output] = @a[left]
+        left -= 1
       end
     end
-    return
+    shift_backward(middle, right + 1, output) if output > right
+    shift_backward(first, left + 1, output)
   end
-  if m - a >= b - m
-    m1 = a + (m - a) / 2
-    value = array[m1]
-    m2 = binary_search(array, m, b, value, true)
-    m3 = m1 + (m2 - m)
-  else
-    m2 = m + (b - m) / 2
-    value = array[m2]
-    m1 = binary_search(array, a, m, value, false)
-    m3 = m2 - (m - m1)
-    m2 += 1
+
+  def smart_merge_backward(first, middle, last, output, reversed)
+    left = middle - 1
+    right = last - 1
+    while left >= first && right >= middle
+      take_left = reversed ? @a[left] >= @a[right] : @a[left] > @a[right]
+      output -= 1
+      if take_left
+        @a[output] = @a[left]
+        left -= 1
+      else
+        @a[output] = @a[right]
+        right -= 1
+      end
+    end
+    left + 1
   end
-  rotate(array, m1, m, m2)
-  if m2 - (m3 + 1) > 0 && b - m2 > 0
-    synchronous_merge(array, m3 + 1, m2, b)
+
+  def block_selection(first, last, block, tag_start, tag_count)
+    available = [tag_count + 1, @tags.length - tag_start].min
+    available.times do |i|
+      @tags[tag_start + i] = i + (i <= tag_count / 2 ? 0 : @tags.length)
+    end
+    vacant = first
+    current = first
+    while current < last - block
+      minimum = vacant == current ? current + block : current
+      candidate = minimum + block
+      while candidate < last
+        if candidate != vacant &&
+           (@a[candidate] < @a[minimum] ||
+            (@a[candidate] == @a[minimum] &&
+             @tags[tag_start + (candidate - first) / block] <
+             @tags[tag_start + (minimum - first) / block]))
+          minimum = candidate
+        end
+        candidate += block
+      end
+      if minimum > current
+        if vacant == current
+          block.times { |i| @a[current + i] = @a[minimum + i] }
+          @tags[tag_start + (current - first) / block] =
+            @tags[tag_start + (minimum - first) / block]
+          vacant = minimum
+        else
+          block.times do |i|
+            @a[current + i], @a[minimum + i] = @a[minimum + i], @a[current + i]
+          end
+          i = tag_start + (current - first) / block
+          j = tag_start + (minimum - first) / block
+          @tags[i], @tags[j] = @tags[j], @tags[i]
+        end
+      end
+      current += block
+    end
   end
-  if m1 - a > 0 && m3 - m1 > 0
-    synchronous_merge(array, a, m1, m3)
+
+  def merge_blocks_backward(first, last, first_tag, past_last_tag, block)
+    tag = past_last_tag - 1
+    frontier = last
+    block_start = frontier - block
+    reversed = @tags[tag] < @tags.length
+    loop do
+      begin
+        tag -= 1
+        block_start -= block
+      end while tag >= first_tag && ((@tags[tag] < @tags.length) == reversed)
+      if tag < first_tag
+        shift_backward(first, frontier, frontier + block)
+        break
+      end
+      frontier = smart_merge_backward(block_start, block_start + block,
+                                      frontier, frontier + block, reversed)
+      reversed = !reversed
+    end
+  end
+
+  def sort
+    if @n <= 16
+      binary_insertion(0, @n)
+      return
+    end
+    block = 1
+    block *= 2 while block * block < @n
+    first = block + @n % block
+    last = @n
+    work_length = last - first
+    run = 1
+    @prefix = Array.new(first, 0)
+    @tags = Array.new((@n - 1) / block + 1, 0)
+    binary_insertion(0, first)
+    first.times { |i| @prefix[i] = @a[i] }
+
+    while run < block
+      distance = [2, run].max
+      index = first
+      while index + 2 * run < last
+        merge_forward(index, index + run, index + 2 * run, index - distance)
+        index += 2 * run
+      end
+      if index + run < last
+        merge_forward(index, index + run, last, index - distance)
+      else
+        shift_forward(index - distance, index, last)
+      end
+      first -= distance
+      last -= distance
+      run *= 2
+    end
+
+    fragment = work_length % (2 * run)
+    index = last - fragment
+    if index + run < last
+      merge_backward(index, index + run, last, last + run)
+    else
+      shift_backward(index, last, last + run)
+    end
+    index -= 2 * run
+    while index >= first
+      merge_backward(index, index + run, index + 2 * run, index + 3 * run)
+      index -= 2 * run
+    end
+    first += run
+    last += run
+    run *= 2
+
+    tag_count = 4
+    while run < work_length
+      index = first
+      tag_index = 0
+      while index + 2 * run < last
+        block_selection(index - block, index + 2 * run, block, tag_index, tag_count)
+        index += 2 * run
+        tag_index += tag_count
+      end
+      has_fragment = index + run < last
+      fragment = (last - index) / block
+      block_selection(index - block, last, block, tag_index, tag_count) if has_fragment
+      first -= block
+      last -= block
+      index -= block
+      merge_blocks_backward(index, last, tag_index, tag_index + fragment, block) if has_fragment
+      index -= 2 * run
+      tag_index -= tag_count
+      while index >= first
+        merge_blocks_backward(index, index + 2 * run, tag_index,
+                              tag_index + tag_count, block)
+        index -= 2 * run
+        tag_index -= tag_count
+      end
+      first += block
+      last += block
+      run *= 2
+      tag_count *= 2
+    end
+
+    left = 0
+    right = first
+    output = 0
+    while left < first && right < last
+      if @prefix[left] <= @a[right]
+        @a[output] = @prefix[left]
+        left += 1
+      else
+        @a[output] = @a[right]
+        right += 1
+      end
+      output += 1
+    end
+    while left < first
+      @a[output] = @prefix[left]
+      output += 1
+      left += 1
+    end
   end
 end
 
-def synchronous_sort(array, a, b)
-  len = b - a
-  (a...b).step(16) do |start|
-    finish = [start + 16, b].min
-    ((start + 1)...finish).each do |i|
-      value = array[i]
-      cursor = i
-      while cursor > start && array[cursor - 1] > value
-        array[cursor] = array[cursor - 1]
-        cursor -= 1
-      end
-      array[cursor] = value
-    end
-  end
-  j = 16
-  while j < len
-    i = a
-    while i + 2 * j <= b
-      synchronous_merge(array, i, i + j, i + 2 * j)
-      i += 2 * j
-    end
-    if i + j < b
-      synchronous_merge(array, i, i + j, b)
-    end
-    j *= 2
-  end
+def sort(values)
+  SynchronousSqrt.new(values).sort
 end
 
-array = [0, 39, 21, 62, 91, 77, 14, 23,
-  90, 69, 51, 81, 68, 83, 32, 56]
-sort(array)
-p array
+if __FILE__ == $PROGRAM_NAME
+  array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56]
+  sort(array)
+  puts array.inspect
+end

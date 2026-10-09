@@ -1,145 +1,226 @@
 using System;
 
-public class SynchronousSqrtSort
-{
-  private static int blockSize = 1;
-  public static int[] Sort(int[] array)
-  {
-    blockSize = 1;
-    while (blockSize * blockSize < array.Length) blockSize *= 2;
-    SynchronousSqrtSortRange(array, 0, array.Length);
-    return array;
+/* MIT License
+ * Copyright (c) 2021 The Holy Grail Sort Project, implemented by aphitorite
+ * Copyright (c) 2020-2021 aphitorite
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this software
+ * and associated documentation files (the "Software"), to deal in the Software without
+ * restriction, including without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
+ * The above copyright notice and this permission notice shall be included in all copies or
+ * substantial portions of the Software.
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING
+ * BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+ * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ */
+
+class SynchronousSqrtSort {
+  class SynchronousSqrt {
+    public int[] a, prefix = Array.Empty<int>(), tags = Array.Empty<int>();
+    public int n, tag_count;
+    public SynchronousSqrt(int[] a, int n) { this.a = a; this.n = n; }
+  }
+static void exchange(SynchronousSqrt s, int i, int j) {
+  int value = s.a[i];
+  s.a[i] = s.a[j];
+  s.a[j] = value;
+}
+
+static void binary_insertion(SynchronousSqrt s, int first, int end) {
+  for (int i = first + 1; i < end; ++i) {
+    int value = s.a[i], low = first, high = i;
+    while (low < high) {
+      int middle = low + (high - low) / 2;
+      if (s.a[middle] <= value) low = middle + 1;
+      else high = middle;
+    }
+    for (int j = i; j > low; --j) s.a[j] = s.a[j - 1];
+    if (low != i) s.a[low] = value;
+  }
+}
+
+static void shift_forward(SynchronousSqrt s, int destination, int source, int end) {
+  while (source < end) s.a[destination++] = s.a[source++];
+}
+
+static void shift_backward(SynchronousSqrt s, int first, int source_end, int destination_end) {
+  while (source_end > first) s.a[--destination_end] = s.a[--source_end];
+}
+
+static void multi_swap(SynchronousSqrt s, int first, int second, int length) {
+  for (int i = 0; i < length; ++i) exchange(s, first + i, second + i);
+}
+
+static void merge_forward(SynchronousSqrt s, int first, int middle, int end, int output) {
+  int left = first, right = middle;
+  while (left < middle && right < end) {
+    if (s.a[left] <= s.a[right]) s.a[output++] = s.a[left++];
+    else s.a[output++] = s.a[right++];
+  }
+  if (left > output) shift_forward(s, output, left, middle);
+  shift_forward(s, output, right, end);
+}
+
+static void merge_backward(SynchronousSqrt s, int first, int middle, int end, int output) {
+  int left = middle - 1, right = end - 1;
+  while (right >= middle && left >= first) {
+    --output;
+    if (s.a[right] >= s.a[left]) s.a[output] = s.a[right--];
+    else s.a[output] = s.a[left--];
+  }
+  if (output > right) shift_backward(s, middle, right + 1, output);
+  shift_backward(s, first, left + 1, output);
+}
+
+static int smart_merge_backward(SynchronousSqrt s, int first, int middle,
+                                int end, int output, bool reversed) {
+  int left = middle - 1, right = end - 1;
+  while (left >= first && right >= middle) {
+    bool take_left = reversed ? s.a[left] >= s.a[right] : s.a[left] > s.a[right];
+    --output;
+    if (take_left) s.a[output] = s.a[left--];
+    else s.a[output] = s.a[right--];
+  }
+  return left + 1;
+}
+
+static void block_selection(SynchronousSqrt s, int first, int end, int block,
+                            int tag_start, int tag_count) {
+  int available = tag_count + 1;
+  if (available > s.tag_count - tag_start) available = s.tag_count - tag_start;
+  for (int i = 0; i < available; ++i)
+    s.tags[tag_start + i] = i + (i <= tag_count / 2 ? 0 : s.tag_count);
+  int vacant = first;
+  int current = first;
+  while (current < end - block) {
+    int minimum = vacant == current ? current + block : current;
+    for (int candidate = minimum + block; candidate < end; candidate += block) {
+      if (candidate != vacant &&
+          (s.a[candidate] < s.a[minimum] ||
+           (s.a[candidate] == s.a[minimum] &&
+            s.tags[tag_start + (candidate - first) / block] <
+            s.tags[tag_start + (minimum - first) / block])))
+        minimum = candidate;
+    }
+    if (minimum > current) {
+      if (vacant == current) {
+        for (int i = 0; i < block; ++i) s.a[current + i] = s.a[minimum + i];
+        s.tags[tag_start + (current - first) / block] =
+          s.tags[tag_start + (minimum - first) / block];
+        vacant = minimum;
+      } else {
+        multi_swap(s, current, minimum, block);
+        int current_tag = tag_start + (current - first) / block;
+        int minimum_tag = tag_start + (minimum - first) / block;
+        int value = s.tags[current_tag];
+        s.tags[current_tag] = s.tags[minimum_tag];
+        s.tags[minimum_tag] = value;
+      }
+    }
+    current += block;
+  }
+}
+
+static void merge_blocks_backward(SynchronousSqrt s, int first, int end,
+                                  int first_tag, int past_last_tag, int block) {
+  int tag = past_last_tag - 1;
+  int frontier = end, block_start = frontier - block;
+  bool reversed = s.tags[tag] < s.tag_count;
+  for (;;) {
+    do { --tag; block_start -= block; }
+    while (tag >= first_tag && ((s.tags[tag] < s.tag_count) == reversed));
+    if (tag < first_tag) {
+      shift_backward(s, first, frontier, frontier + block);
+      break;
+    }
+    frontier = smart_merge_backward(s, block_start, block_start + block,
+                                    frontier, frontier + block, reversed);
+    reversed = !reversed;
+  }
+}
+
+static void sort(int[] a, int n) {
+  if (n <= 1) return;
+  SynchronousSqrt s = new SynchronousSqrt(a, n);
+  if (n <= 16) { binary_insertion(s, 0, n); return; }
+  int block = 1;
+  while (block * block < n) block *= 2;
+  int remainder = n % block;
+  int first = block + remainder, end = n;
+  int work_length = end - first, run = 1;
+  s.tag_count = (n - 1) / block + 1;
+  s.prefix = new int[first];
+  s.tags = new int[s.tag_count];
+  binary_insertion(s, 0, first);
+  for (int i = 0; i < first; ++i) s.prefix[i] = a[i];
+
+  int index;
+  while (run < block) {
+    int distance = run < 2 ? 2 : run;
+    index = first;
+    while (index + 2 * run < end) {
+      merge_forward(s, index, index + run, index + 2 * run, index - distance);
+      index += 2 * run;
+    }
+    if (index + run < end) merge_forward(s, index, index + run, end, index - distance);
+    else shift_forward(s, index - distance, index, end);
+    first -= distance;
+    end -= distance;
+    run *= 2;
   }
 
-  private static void MultiSwap(int[] arr, int a, int b, int len)
-  {
-    for (int i = 0; i < len; i++)
-    {
-      int t = arr[a + i];
-      arr[a + i] = arr[b + i];
-      arr[b + i] = t;
+  int fragment = work_length % (2 * run);
+  index = end - fragment;
+  if (index + run < end) merge_backward(s, index, index + run, end, end + run);
+  else shift_backward(s, index, end, end + run);
+  index -= 2 * run;
+  while (index >= first) {
+    merge_backward(s, index, index + run, index + 2 * run, index + 3 * run);
+    index -= 2 * run;
+  }
+  first += run; end += run; run *= 2;
+
+  int tag_count = 4;
+  while (run < work_length) {
+    index = first;
+    int tag_index = 0;
+    while (index + 2 * run < end) {
+      block_selection(s, index - block, index + 2 * run, block, tag_index, tag_count);
+      index += 2 * run;
+      tag_index += tag_count;
     }
+    bool has_fragment = index + run < end;
+    fragment = (end - index) / block;
+    if (has_fragment)
+      block_selection(s, index - block, end, block, tag_index, tag_count);
+    first -= block; end -= block; index -= block;
+    if (has_fragment)
+      merge_blocks_backward(s, index, end, tag_index, tag_index + fragment, block);
+    index -= 2 * run;
+    tag_index -= tag_count;
+    while (index >= first) {
+      merge_blocks_backward(s, index, index + 2 * run, tag_index,
+                            tag_index + tag_count, block);
+      index -= 2 * run;
+      tag_index -= tag_count;
+    }
+    first += block; end += block; run *= 2; tag_count *= 2;
   }
 
-  private static void Rotate(int[] arr, int a, int m, int b)
-  {
-    int l = m - a,
-      r = b - m;
-    while (l > 0 && r > 0)
-    {
-      if (r < l)
-      {
-        MultiSwap(arr, m - r, m, r);
-        b -= r;
-        m -= r;
-        l -= r;
-      }
-      else
-      {
-        MultiSwap(arr, a, m, l);
-        a += l;
-        m += l;
-        r -= l;
-      }
-    }
+  int left = 0, right = first, output = 0;
+  while (left < first && right < end) {
+    if (s.prefix[left] <= a[right]) a[output++] = s.prefix[left++];
+    else a[output++] = a[right++];
   }
+  while (left < first) a[output++] = s.prefix[left++];
+}
 
-  private static int BinarySearch(int[] arr, int a, int b, int value, bool left)
-  {
-    while (a < b)
-    {
-      int mid = a + (b - a) / 2;
-      bool comp = left ? value <= arr[mid] : value < arr[mid];
-      if (comp)
-      {
-        b = mid;
-      }
-      else
-      {
-        a = mid + 1;
-      }
-    }
-    return a;
-  }
-
-  private static void SqrtMerge(int[] arr, int a, int m, int b)
-  {
-    if (m - a <= blockSize && b - m <= blockSize)
-    {
-      int[] temp = new int[b - a];
-      Array.Copy(arr, a, temp, 0, b - a);
-      int i = 0, j = m - a;
-      for (int k = a; k < b; k++)
-      {
-        if (i < m - a && (j == b - a || temp[i] <= temp[j])) arr[k] = temp[i++];
-        else arr[k] = temp[j++];
-      }
-      return;
-    }
-    int m1,
-      m2,
-      m3;
-    if (m - a >= b - m)
-    {
-      m1 = a + (m - a) / 2;
-      int value = arr[m1];
-      m2 = BinarySearch(arr, m, b, value, true);
-      m3 = m1 + (m2 - m);
-    }
-    else
-    {
-      m2 = m + (b - m) / 2;
-      int value = arr[m2];
-      m1 = BinarySearch(arr, a, m, value, false);
-      m3 = m2 - (m - m1);
-      m2 = m2 + 1;
-    }
-    Rotate(arr, m1, m, m2);
-    if (m2 - (m3 + 1) > 0 && b - m2 > 0)
-    {
-      SqrtMerge(arr, m3 + 1, m2, b);
-    }
-    if (m1 - a > 0 && m3 - m1 > 0)
-    {
-      SqrtMerge(arr, a, m1, m3);
-    }
-  }
-
-  private static void SynchronousSqrtSortRange(int[] arr, int a, int b)
-  {
-    int len = b - a;
-    for (int start = a; start < b; start += 16)
-    {
-      int end = Math.Min(start + 16, b);
-      for (int i = start + 1; i < end; i++)
-      {
-        int value = arr[i], j = i;
-        while (j > start && arr[j - 1] > value) { arr[j] = arr[j - 1]; j--; }
-        arr[j] = value;
-      }
-    }
-    for (int j = 16; j < len; j *= 2)
-    {
-      int i;
-      for (i = a; i + 2 * j <= b; i += 2 * j)
-      {
-        SqrtMerge(arr, i, i + j, i + 2 * j);
-      }
-      if (i + j < b)
-      {
-        SqrtMerge(arr, i, i + j, b);
-      }
-    }
-  }
-
-  public static void Main(String[] args)
-  {
-    int[] array = {
-      0, 39, 21, 62, 91, 77, 14, 23,
-      90, 69, 51, 81, 68, 83, 32, 56
-    };
-    Sort(array);
-    string result = "[" + String.Join(", ", array) + "]";
-    Console.WriteLine(result);
+  static void Main() {
+    int[] a = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
+    sort(a, a.Length);
+    Console.WriteLine("[" + string.Join(", ", a) + "]");
   }
 }
