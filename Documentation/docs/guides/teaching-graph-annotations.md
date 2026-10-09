@@ -1,10 +1,11 @@
 # Teaching graph annotations
 
-**Status:** Quick Sort and Merge Sort annotation pilot implemented on 2026-10-08. Both algorithms
-now record why a comparison chose its branch. The tape carries a versioned, optional annotation
-sidecar through export, import, and fast-playback compaction. The Teaching Graph uses authored
-decision explanations where available and retains operation-derived explanations for older tapes.
-The fixed flowchart and catalog-wide definitions remain future work.
+**Status:** All 196 built-in sorts now author decision or placement explanations at their recording
+sites. Shared templates supply context to variants that delegate their sorting logic. The tape
+carries a versioned, optional annotation sidecar through export, import, and fast-playback
+compaction. The Teaching Graph renders that sidecar for every annotated algorithm and retains
+operation-derived explanations for older Quick Sort and Merge Sort tapes. A fixed flowchart remains
+future work.
 
 ## Goal
 
@@ -14,9 +15,9 @@ which side of a pivot an item belongs on. In Merge Sort, a comparison chooses th
 item. An annotation should capture that decision and its result while the algorithm still knows
 the relevant pivot, run boundaries, branch, and destination.
 
-The same annotation can supply a short spoken explanation, a caption beside the existing graph,
+The same annotation can supply a caption beside the existing graph,
 and the active stage or branch in a future fixed flowchart. The graph remains useful without
-annotations: older imported tapes and algorithms not yet annotated keep their current behavior.
+annotations: older imported tapes keep their current behavior.
 
 ## Shape of an annotation
 
@@ -31,13 +32,13 @@ produce sound, or advance playback on their own. Each record has:
 | `decisionID` | Stable identifier for the question within that stage, if there is one. |
 | `outcome` | A stable result identifier such as `left`, `right`, `advance`, or `stop`, interpreted by that algorithm's teaching definition. |
 | `roles` | Named, typed references to live array positions, auxiliary-buffer positions, values, or ranges. These can drive graph focus and caption parameters. |
-| `explanationKey` | A stable explanation identifier. The graph resolves it with `roles` and `outcome`; the tape does not store English prose. Localized templates can replace the pilot text later. |
+| `explanationKey` | A stable explanation identifier for future localized templates. |
+| `explanation` | Optional readable text for the exact recorded decision. Older archives omit it. |
 
 The identifiers belong to a versioned **teaching definition** for an algorithm or a closely
-related variant. That definition supplies localized templates, stage labels, optional flowchart
-nodes and branches, and validation rules for its roles. Sharing a definition across a family is
-appropriate only when its decisions actually have the same meaning. An algorithm with no
-definition can still use the ordinary tape and any existing generic operation display.
+related variant. Today the graph uses the embedded explanation. The stable identifiers can later
+support localized text, stage labels, and optional flowchart branches. Sharing identifiers across
+a family is appropriate only when its decisions actually have the same meaning.
 
 The implementation keeps the schema small. Its shape is:
 
@@ -50,6 +51,7 @@ struct TeachingAnnotation: Sendable, Codable {
   let outcome: String
   let roles: [String: TeachingReference]
   let explanationKey: String
+  let explanation: String?
 }
 
 enum TeachingReference: Sendable, Codable {
@@ -60,9 +62,10 @@ enum TeachingReference: Sendable, Codable {
 }
 ```
 
-Small typed helpers for a particular teaching definition can build these records and check required
-roles at compile time or in tests. Stored IDs remain stable so archived annotations can be
-decoded without loading the original algorithm implementation.
+The built-in comparison helpers attach the result and its explanation immediately after the real
+comparison. Stored IDs remain stable so archived annotations can be decoded without loading the
+original algorithm implementation. Readable text travels with the tape until localized templates
+are available.
 
 ## Recording at the decision site
 
@@ -93,10 +96,9 @@ Merge Sort, the annotation can say which run supplied the next value and why the
 on equality. A separate annotation on the buffer write can identify the destination. Tests
 should prove the annotated version records the same operations and sort result as before.
 
-Annotations should mark *meaningful transitions*, not every primitive. Useful categories for
-the first two definitions are partition start, pivot-side decision, swap/placement, merge start,
-run choice, buffer write, and write-back. Avoid one English sentence per marker or auxiliary read;
-that would overwhelm the graph and enlarge tapes without explaining a decision.
+Annotations mark *meaningful transitions*, not cosmetic markers. The recorder retains at most
+2,048 annotations and increases its sampling stride for long recordings. This bounds sidecar
+storage while keeping explanations distributed through a run.
 
 ## Replay, seeking, and fast playback
 
@@ -108,8 +110,7 @@ the combined tape. Every annotation must then satisfy
 `ReplayEngine.stepIndex` counts applied operations. At any position, the current graph event is
 the last event whose `step <= stepIndex`. The existing trace binary search keeps seeking
 independent of re-running algorithm code. Multiple annotations on one operation retain recording
-order in the tape; the pilot graph uses the latest one for that event. The
-visible graph may keep a short recent window while text and event navigation cover the complete
+order in the tape. The visible graph keeps a short recent window while text and event navigation cover the complete
 annotation stream.
 
 `Tape.compactedForFastPlayback()` drops cosmetic markers. The annotation API anchors only to
@@ -154,8 +155,9 @@ not tape data; they do not change replay or annotation indices.
 
 The optional archive trailer has an `ANNO` marker and schema version. Archives without the trailer
 still decode; a future unknown trailer version is skipped after its bounded length is read.
-Unknown definition versions, explanation keys, or outcomes fall back to operation-derived text
-and leave replay intact. The current format tests cover round trips with and without annotations.
+Older Quick Sort and Merge Sort annotations without embedded text use their key-based explanation
+resolver. Other unknown keys use a plain stage-and-outcome caption and leave replay intact. The
+current format tests cover round trips with and without annotations.
 Imported old tapes continue using the existing Quick Sort and Merge Sort trace reconstruction.
 
 The UI should show one concise decision explanation and, when useful, its consequence. VoiceOver
@@ -164,29 +166,15 @@ and edges. A fixed flowchart can use `stageID`, `decisionID`, and `outcome` to h
 and branch without replacing the replay-linked graph. Both views consume the same annotation
 stream; no algorithm should have to maintain separate teaching data for each view.
 
-For an algorithm without authored annotations, do not invent a cause from a generic `.compare`.
-Show the ordinary visualization and reference explanation. The existing two trace adapters can
-remain as a compatibility path until authored annotations replace them and equivalence tests
-confirm that no meaningful pilot events were lost.
+For an imported tape without authored annotations, do not invent a cause from a generic
+`.compare`. Show the ordinary visualization and reference explanation; the Quick Sort and Merge
+Sort trace adapters remain for older imported tapes.
 
-## Rollout and verification
+## Verification
 
-1. Define the annotation value types, validator, and an in-memory recorder sidecar. Add focused
-   tests for operation anchors, recording caps, zero annotations, and multiple annotations on one
-   operation.
-2. Annotate the built-in Quick Sort and Merge Sort at their decision sites. Compare operation
-   tapes and sorted outputs before and after; verify sorted, reversed, and duplicate-heavy input.
-   Check equality branches explicitly.
-3. Add replay lookup and compaction remapping. Test every replay position, backward/forward
-   seeking, shuffle boundaries, imported old tapes, and unsupported definitions.
-4. Render the authored explanations through the current Teaching Graph, including VoiceOver.
-   Validate explanation, highlighted positions, and next/previous event navigation together.
-   Test fast-playback pinning, slow-playback dwell, pause/completion catch-up, manual seek/step,
-   live speed changes, fixed-duration pacing, and the transition around the reading threshold.
-5. Version and archive the optional sidecar, then add definitions by algorithm family only where
-   the same decision vocabulary is accurate. Measure annotation volume and recording overhead
-   before expanding across the catalog.
-
-The pilot milestone covers authored Quick Sort and Merge Sort branch explanations, replay and
-archive synchronization, and fast-playback pinning. A fixed flowchart and catalog-wide coverage
-are subsequent content work, not automatic results of adding the sidecar.
+The catalog coverage test records all 196 built-in sorts on reversed and duplicate-heavy inputs
+at representative reachable sizes. It checks sorting, valid annotation anchors, and readable
+explanations. Engine tests cover optional archive decoding, index shifting, compaction, recording
+caps, and the annotation storage bound. Teaching Graph tests cover replay positions, navigation,
+held-value nodes, and fast-playback pinning. Run the engine access audit after editing algorithms
+to ensure live reads and comparisons still enter the tape.

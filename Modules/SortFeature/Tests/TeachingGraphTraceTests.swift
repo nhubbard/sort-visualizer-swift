@@ -110,13 +110,54 @@ struct TeachingGraphTraceTests {
   }
 
   @Test
-  func unrelatedAlgorithmsDoNotProduceTeachingEvents() {
+  func unannotatedAlgorithmsDoNotProduceTeachingEvents() {
     let tape = Tape(
       header: TapeHeader(
         algorithmID: "bubblesort", initialValues: [2, 1], visualSeed: 1,
         compareCount: 1, swapCount: 1, recordingDuration: 0, recordedAt: .distantPast),
       operations: [.compare(0, 1), .swap(0, 1)])
     #expect(TeachingGraphTrace(tape: tape) == nil)
+  }
+
+  @Test
+  func annotationsProduceGraphEventsForAnyAlgorithmAndPreserveHeldValues() throws {
+    let annotations = [
+      TeachingAnnotation(operationIndex: 0, stageID: "patience.choosePile",
+        outcome: "left", roles: ["held": .value(7), "target": .arrayIndex(1)],
+        explanationKey: "patience.choosePile",
+        explanation: "Place held value 7 in the first pile whose top is at least 7."),
+      TeachingAnnotation(operationIndex: 1, stageID: "patience.place",
+        outcome: "placed", roles: ["source": .value(7), "destination": .arrayIndex(1)],
+        explanationKey: "patience.place", explanation: "Write the chosen value to position 2."),
+    ]
+    let tape = Tape(
+      header: TapeHeader(algorithmID: "patiencesort", initialValues: [2, 7],
+        visualSeed: 1, compareCount: 1, swapCount: 0,
+        recordingDuration: 0, recordedAt: .distantPast),
+      operations: [.compareValue(1, 7), .setValue(1, 7)],
+      teachingAnnotations: annotations)
+    let trace = try #require(TeachingGraphTrace(tape: tape))
+    #expect(trace.variant == .annotated)
+    #expect(trace.events.count == 2)
+    #expect(trace.events[0].kind == .decision)
+    #expect(trace.events[0].explanation == annotations[0].explanation)
+    #expect(trace.events[0].source.location == .value
+      || trace.events[0].target.location == .value)
+    #expect(trace.events[1].kind == .movement)
+    assertAllReplayPositions(trace, tape: tape)
+  }
+
+  @Test
+  func realExchangeAndDistributionSortsUseTheUniversalGraph() throws {
+    for algorithm in [BubbleSort() as any SortAlgorithm, LSDRadixSort()] {
+      let tape = makeTape(algorithm, values: [4, 1, 3, 2])
+      let trace = try #require(TeachingGraphTrace(tape: tape))
+      #expect(trace.variant == .annotated)
+      #expect(!trace.events.isEmpty)
+      #expect(trace.events.allSatisfy { !$0.explanation.isEmpty })
+      #expect(trace.events.count <= tape.teachingAnnotations.count)
+      assertAllReplayPositions(trace, tape: tape)
+    }
   }
 
   @Test

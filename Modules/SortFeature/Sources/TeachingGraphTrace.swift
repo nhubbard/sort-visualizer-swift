@@ -2,18 +2,20 @@ import SortEngineKit
 
 /// A read-only teaching stream derived from the tape that ReplayEngine actually plays. The
 /// positions therefore remain correct for imported tapes and fast-playback-compacted tapes.
-/// The optional annotation sidecar supplies authored decision explanations when present;
-/// older tapes still use the operation-derived pilot text.
+/// The optional annotation sidecar supplies authored decision explanations. Older pilot tapes
+/// still use operation-derived text for Quick Sort and Merge Sort.
 struct TeachingGraphTrace {
   enum Variant: Equatable {
     case quickSort
     case mergeSort
+    case annotated
   }
 
   struct Node: Hashable, Comparable {
     enum Location: Int, Hashable {
       case array
       case buffer
+      case value
     }
 
     let location: Location
@@ -28,6 +30,10 @@ struct TeachingGraphTrace {
       Node(location: .buffer, index: index, handle: handle)
     }
 
+    static func value(_ value: Int) -> Node {
+      Node(location: .value, index: value, handle: 0)
+    }
+
     static func < (lhs: Node, rhs: Node) -> Bool {
       if lhs.location != rhs.location { return lhs.location.rawValue < rhs.location.rawValue }
       if lhs.handle != rhs.handle { return lhs.handle < rhs.handle }
@@ -38,6 +44,7 @@ struct TeachingGraphTrace {
       switch location {
       case .array: "\(index + 1)"
       case .buffer: "B\(index + 1)"
+      case .value: "V\(index)"
       }
     }
   }
@@ -81,9 +88,12 @@ struct TeachingGraphTrace {
     switch tape.header.algorithmID {
     case "quicksort": variant = .quickSort
     case "mergesort": variant = .mergeSort
-    default: return nil
+    default:
+      guard !tape.teachingAnnotations.isEmpty else { return nil }
+      variant = .annotated
     }
-    sortStartIndex = tape.header.sortStartIndex
+    let startIndex = tape.header.sortStartIndex
+    sortStartIndex = startIndex
 
     var built: [Event] = []
     built.reserveCapacity(tape.operations.count / 3)
@@ -92,9 +102,11 @@ struct TeachingGraphTrace {
     var nextSource = 0
     var bufferHandle: Int?
 
-    for (index, operation) in tape.operations.enumerated() where index >= sortStartIndex {
+    for (index, operation) in tape.operations.enumerated() where index >= startIndex {
       let step = index + 1
       switch variant {
+      case .annotated:
+        break
       case .quickSort:
         switch operation {
         case .compare(let first, let second):
@@ -150,6 +162,27 @@ struct TeachingGraphTrace {
         }
       }
     }
+    if variant == .annotated {
+      built = tape.teachingAnnotations.compactMap { annotation in
+        guard annotation.operationIndex >= startIndex,
+          tape.operations.indices.contains(annotation.operationIndex),
+          let endpoints = Self.endpoints(for: annotation) else { return nil }
+        let operation = tape.operations[annotation.operationIndex]
+        let kind: Event.Kind
+        switch operation {
+        case .compare, .compareValue, .compareValues: kind = .decision
+        case .auxWrite: kind = .bufferWrite
+        case .setValue, .swap, .reversal: kind = .movement
+        default: kind = .decision
+        }
+        return Event(step: annotation.operationIndex + 1,
+          source: endpoints.0, target: endpoints.1, kind: kind,
+          explanation: Self.explanation(for: annotation)
+            ?? Self.fallbackExplanation(for: annotation))
+      }.sorted { $0.step < $1.step }
+      events = built
+      return
+    }
     let decisions = Dictionary(
       tape.teachingAnnotations.map { ($0.operationIndex + 1, $0) },
       uniquingKeysWith: { _, latest in latest })
@@ -164,6 +197,9 @@ struct TeachingGraphTrace {
 
   private static func explanation(for annotation: TeachingAnnotation) -> String? {
     guard annotation.definitionVersion == 1 else { return nil }
+    if let explanation = annotation.explanation, !explanation.isEmpty {
+      return explanation
+    }
     switch annotation.explanationKey {
     case "quick.pivotSide":
       guard let pivot = annotation.roles["pivot"]?.arrayIndex,
@@ -193,6 +229,31 @@ struct TeachingGraphTrace {
       }
     default: return nil
     }
+  }
+
+  private static func endpoints(for annotation: TeachingAnnotation) -> (Node, Node)? {
+    let preferred = ["pivot", "left", "source", "current", "candidate", "right", "target", "destination"]
+    let keys = preferred.filter { annotation.roles[$0] != nil }
+      + annotation.roles.keys.filter { !preferred.contains($0) }.sorted()
+    let nodes = keys.flatMap { key -> [Node] in
+      switch annotation.roles[key] {
+      case .arrayIndex(let index): return [.array(index)]
+      case .auxiliaryIndex(let handle, let index): return [.buffer(handle, index)]
+      case .value(let value): return [.value(value)]
+      case .range(let range):
+        guard !range.isEmpty else { return [] }
+        return [.array(range.lowerBound), .array(range.upperBound - 1)]
+      default: return []
+      }
+    }
+    guard let first = nodes.first else { return nil }
+    return (first, nodes.dropFirst().first ?? first)
+  }
+
+  private static func fallbackExplanation(for annotation: TeachingAnnotation) -> String {
+    let stage = annotation.stageID.replacingOccurrences(of: ".", with: " ")
+    let outcome = annotation.outcome.replacingOccurrences(of: ".", with: " ")
+    return "\(stage): \(outcome)."
   }
 
   /// Index of the last event applied at `step`, or nil before the first graph event.
