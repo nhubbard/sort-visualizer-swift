@@ -4,41 +4,36 @@ import UniformTypeIdentifiers
 
 /// The same image choice controls appear beside the live visualizer picker and in Settings.
 public struct CustomImagePickerControls: View {
+  public enum Presentation {
+    case form
+    case inline
+  }
+
   @State private var store = CustomImageStore.shared
   @State private var selectedPhoto: PhotosPickerItem?
   @State private var isFileImporterPresented = false
+  private let presentation: Presentation
 
-  public init() {}
+  public init(presentation: Presentation = .form) {
+    self.presentation = presentation
+  }
 
   public var body: some View {
-    VStack(alignment: .leading, spacing: 8) {
-      HStack(spacing: 12) {
-        PhotosPicker(selection: $selectedPhoto, matching: .images) {
-          Label("Choose Photo", systemImage: "photo.on.rectangle")
+    Group {
+      switch presentation {
+      case .form:
+        photoButton
+        fileButton
+        if store.isUsingCustomImage { sampleButton }
+        LabeledContent("Source") { sourceStatus }
+      case .inline:
+        HStack(spacing: 8) {
+          photoButton
+          fileButton
+          if store.isUsingCustomImage { sampleButton }
+          sourceStatus
         }
-        .accessibilityIdentifier("customImageChoosePhoto")
-
-        Button {
-          isFileImporterPresented = true
-        } label: {
-          Label("Choose File", systemImage: "folder")
-        }
-        .accessibilityIdentifier("customImageChooseFile")
-
-        if store.isUsingCustomImage {
-          Button("Use Sample Image") { store.useSampleImage() }
-            .accessibilityIdentifier("customImageUseSample")
-        }
-      }
-      .buttonStyle(.bordered)
-
-      if store.isLoading {
-        ProgressView("Preparing image…")
-      } else {
-        Text(store.isUsingCustomImage ? "Using your image" : "Using sample image")
-          .font(.caption)
-          .foregroundStyle(.secondary)
-          .accessibilityIdentifier("customImageSourceStatus")
+        .buttonStyle(.bordered)
       }
     }
     .onChange(of: selectedPhoto) { _, photo in
@@ -58,6 +53,39 @@ public struct CustomImagePickerControls: View {
       Button("OK") { store.errorMessage = nil }
     } message: {
       Text(store.errorMessage ?? "Choose another image.")
+    }
+  }
+
+  private var photoButton: some View {
+    PhotosPicker(selection: $selectedPhoto, matching: .images) {
+      Label("Choose Photo", systemImage: "photo.on.rectangle")
+    }
+    .accessibilityIdentifier("customImageChoosePhoto")
+  }
+
+  private var fileButton: some View {
+    Button {
+      isFileImporterPresented = true
+    } label: {
+      Label("Choose File", systemImage: "folder")
+    }
+    .accessibilityIdentifier("customImageChooseFile")
+  }
+
+  private var sampleButton: some View {
+    Button("Use Sample Image") { store.useSampleImage() }
+      .accessibilityIdentifier("customImageUseSample")
+  }
+
+  @ViewBuilder
+  private var sourceStatus: some View {
+    if store.isLoading {
+      ProgressView("Preparing image…")
+    } else {
+      Text(store.isUsingCustomImage ? "Using your image" : "Using sample image")
+        .font(.caption)
+        .foregroundStyle(.secondary)
+        .accessibilityIdentifier("customImageSourceStatus")
     }
   }
 }

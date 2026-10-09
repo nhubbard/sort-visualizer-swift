@@ -41,10 +41,6 @@ public struct SettingsView: View {
         .pickerStyle(.menu)
         .accessibilityIdentifier("visualizerPicker")
 
-        if settings.selectedVisualizerID.rawValue == "customimage" {
-          CustomImagePickerControls()
-        }
-
         Picker("Shuffle Method", selection: $settings.defaultShuffleID) {
           ForEach(ShuffleRegistry.shared.shuffles, id: \.id) { shuffle in
             Text(shuffle.metadata.displayName).tag(shuffle.id)
@@ -52,6 +48,9 @@ public struct SettingsView: View {
         }
         .pickerStyle(.menu)
         .accessibilityIdentifier("shufflePicker")
+      }
+      if settings.selectedVisualizerID.rawValue == "customimage" {
+        customImageSection
       }
       Section {
         Picker("Pacing Mode", selection: $settings.useFixedDurationPacing) {
@@ -136,14 +135,8 @@ public struct SettingsView: View {
           )
         }
       }
-      Section("Array Size") {
-        Stepper(
-          "Default Size: \(settings.defaultArraySize)",
-          value: $settings.defaultArraySize,
-          in: 16...256,
-          step: 16
-        )
-        .accessibilityIdentifier("defaultArraySizeStepper")
+      if settings.selectedVisualizerID.rawValue != "customimage" {
+        arraySizeSection
       }
       Section {
         Stepper(
@@ -207,6 +200,37 @@ public struct SettingsView: View {
         settings.resetToDefaults()
       }
       .accessibilityIdentifier("resetSettingsConfirmButton")
+    }
+  }
+
+  private var customImageSection: some View {
+    @Bindable var settings = settings
+    return Section {
+      CustomImagePickerControls()
+      Stepper(
+        "Default Tiles: \(settings.defaultArraySize)",
+        value: $settings.defaultArraySize,
+        in: 16...256,
+        step: 16
+      )
+      .accessibilityIdentifier("defaultArraySizeStepper")
+    } header: {
+      Text("Custom Image")
+    } footer: {
+      Text("Tile count follows array size. This default applies to newly opened sorts; change tiles during a run from its visualizer controls.")
+    }
+  }
+
+  private var arraySizeSection: some View {
+    @Bindable var settings = settings
+    return Section("Array Size") {
+      Stepper(
+        "Default Size: \(settings.defaultArraySize)",
+        value: $settings.defaultArraySize,
+        in: 16...256,
+        step: 16
+      )
+      .accessibilityIdentifier("defaultArraySizeStepper")
     }
   }
 

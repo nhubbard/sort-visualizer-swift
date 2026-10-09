@@ -37,6 +37,8 @@ final class ReferenceContentUITests: XCTestCase {
     XCTAssertTrue(summary.waitForExistence(timeout: 10))
     XCTAssertTrue(summary.label.contains("Python implementation"))
     XCTAssertTrue(code.waitForExistence(timeout: 10), "Python reference code should be visible by default")
+    XCTAssertGreaterThanOrEqual(summary.frame.minY, code.frame.maxY,
+                                "The language and line count belong below the code block")
     let copyButton = app.buttons["copyAlgorithmCode"]
     XCTAssertTrue(copyButton.exists)
     XCTAssertEqual(copyButton.label, "Copy Code")

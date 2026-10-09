@@ -104,10 +104,6 @@ public struct AlgorithmDetailSection: View {
             }
 
             if let plain = plainSamples[selectedLanguage] {
-              Text("\(selectedLanguage.title) implementation, \(codeLineCount(plain)) lines.")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-                .accessibilityIdentifier("algorithmCodeSummary")
               Button {
                 UIPasteboard.general.string = plain
                 CodeDiscoveryTip.hasExploredCode = true
@@ -136,6 +132,13 @@ public struct AlgorithmDetailSection: View {
                 }
                 Spacer(minLength: 0)
               }
+            }
+            if let plain = plainSamples[selectedLanguage] {
+              Text("\(selectedLanguage.title) implementation, \(codeLineCount(plain)) lines.")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+                .frame(maxWidth: .infinity, alignment: .center)
+                .accessibilityIdentifier("algorithmCodeSummary")
             }
           } else {
             Text("No code samples available yet.").foregroundStyle(.secondary)
