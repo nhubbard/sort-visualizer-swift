@@ -49,7 +49,7 @@ struct Sort2App: App {
       BarGraphVisualizer(), RainbowVisualizer(), ScatterPlotVisualizer(), SineWaveVisualizer(), ColorCircleVisualizer(),
       SpiralVisualizer(), SpiralDotsVisualizer(), WaveDotsVisualizer(), PixelMeshVisualizer(), HoopStackVisualizer(),
       DisparityBarGraphVisualizer(), DisparityCircleVisualizer(), DisparityChordsVisualizer(),
-      DisparityDotsVisualizer(), HanoiTowersVisualizer()
+      DisparityDotsVisualizer(), HanoiTowersVisualizer(), CustomImageVisualizer()
     ]
     #if DEBUG
       if let raw = ProcessInfo.processInfo.environment["UI_TEST_AUTOMATION_VISUALIZERS"] {

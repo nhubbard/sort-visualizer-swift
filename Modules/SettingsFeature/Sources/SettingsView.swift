@@ -41,6 +41,10 @@ public struct SettingsView: View {
         .pickerStyle(.menu)
         .accessibilityIdentifier("visualizerPicker")
 
+        if settings.selectedVisualizerID.rawValue == "customimage" {
+          CustomImagePickerControls()
+        }
+
         Picker("Shuffle Method", selection: $settings.defaultShuffleID) {
           ForEach(ShuffleRegistry.shared.shuffles, id: \.id) { shuffle in
             Text(shuffle.metadata.displayName).tag(shuffle.id)

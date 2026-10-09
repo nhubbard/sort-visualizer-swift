@@ -180,18 +180,23 @@ struct RunControlBar: View {
   /// `⌘⇧V`/`AppSettings.cycleVisualizer()` already changes, not a second mechanism.
   private var visualizerRow: some View {
     @Bindable var settings = settings
-    return HStack(spacing: 8) {
-      Text("Visualizer")
-        .font(.caption)
-        .foregroundStyle(.secondary)
-      Picker("Visualizer", selection: $settings.selectedVisualizerID) {
-        ForEach(VisualizerRegistry.shared.visualizers, id: \.id) { visualizer in
-          Text(visualizer.metadata.displayName).tag(visualizer.id)
+    return VStack(alignment: .leading, spacing: 8) {
+      HStack(spacing: 8) {
+        Text("Visualizer")
+          .font(.caption)
+          .foregroundStyle(.secondary)
+        Picker("Visualizer", selection: $settings.selectedVisualizerID) {
+          ForEach(VisualizerRegistry.shared.visualizers, id: \.id) { visualizer in
+            Text(visualizer.metadata.displayName).tag(visualizer.id)
+          }
         }
+        .pickerStyle(.menu)
+        .labelsHidden()
+        .accessibilityIdentifier("runControlVisualizerPicker")
       }
-      .pickerStyle(.menu)
-      .labelsHidden()
-      .accessibilityIdentifier("runControlVisualizerPicker")
+      if settings.selectedVisualizerID.rawValue == "customimage" {
+        CustomImagePickerControls()
+      }
     }
   }
 

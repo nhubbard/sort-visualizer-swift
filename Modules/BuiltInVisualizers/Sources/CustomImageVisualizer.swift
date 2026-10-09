@@ -14,7 +14,8 @@ public struct CustomImageVisualizer: Visualizer {
     else { return [] }
     let layout = ImageTileLayout(
       count: context.values.count,
-      aspectRatio: Double(context.canvasSize.width / context.canvasSize.height))
+      aspectRatio: context.imageAspectRatio
+        ?? Double(context.canvasSize.width / context.canvasSize.height))
     return (0..<layout.cellCount).map { slot in
       let rect = layout.rect(for: slot, in: context.canvasSize)
       let marker = slot < layout.movingCount ? context.markers[slot] ?? [] : []

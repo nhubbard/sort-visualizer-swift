@@ -66,8 +66,8 @@ public enum CoverageSweepEnumerator {
 }
 
 /// Drives "Full Sweep": runs every registered algorithm against every shuffle *and* every
-/// visualizer at least once (the full cross product — 115,230 combinations at today's registry
-/// sizes), with real animated playback, resumable across app launches.
+/// visualizer at least once (the full cross product — currently 134,848 combinations), with real
+/// animated playback, resumable across app launches.
 ///
 /// Coverage is tracked by an append-only local text file, not `PersistenceKit.AnalyticsService`'s
 /// CloudKit-synced SwiftData store — bookkeeping at this scale/frequency (potentially one write
