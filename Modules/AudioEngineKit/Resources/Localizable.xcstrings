@@ -1,24 +1,66 @@
 {
-  "sourceLanguage" : "en",
-  "strings" : {
-    "Connected" : {
-
+  "sourceLanguage": "en",
+  "strings": {
+    "Connected": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Conectado"
+          }
+        }
+      }
     },
-    "Disabled" : {
-
+    "Disabled": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Desactivado"
+          }
+        }
+      }
     },
-    "Not Available on This Platform" : {
-
+    "Not Available on This Platform": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No disponible en esta plataforma"
+          }
+        }
+      }
     },
-    "Not Started Yet" : {
-
+    "Not Started Yet": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aún no se ha iniciado"
+          }
+        }
+      }
     },
-    "Unavailable" : {
-
+    "Unavailable": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No disponible"
+          }
+        }
+      }
     },
-    "Waiting for Connection" : {
-
+    "Waiting for Connection": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Esperando conexión"
+          }
+        }
+      }
     }
   },
-  "version" : "1.0"
+  "version": "1.0"
 }

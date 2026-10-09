@@ -1,438 +1,746 @@
 {
-  "sourceLanguage" : "en",
-  "strings" : {
-    "%@: %@" : {
-
-    },
-    "%@: %@ · size %lld (%lld/%lld) · run %lld/%lld" : {
-
-    },
-    "All" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "machine_translated",
-            "value" : "Todos"
+  "sourceLanguage": "en",
+  "strings": {
+    "%@: %@": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@: %@"
           }
         }
       }
     },
-    "All Algorithms" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "machine_translated",
-            "value" : "Todos los algoritmos"
+    "%@: %@ · size %lld (%lld/%lld) · run %lld/%lld": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@: %@ · tamaño %lld (%lld/%lld) · ejecución %lld/%lld"
           }
         }
       }
     },
-    "Browse categories or search by name, then choose a sort to watch it run." : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "machine_translated",
-            "value" : "Explora las categorías o busca por nombre. Después, elige un algoritmo de ordenación para verlo en acción."
+    "All": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Todos"
           }
         }
       }
     },
-    "Categories" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "machine_translated",
-            "value" : "Categorías"
+    "All Algorithms": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Todos los algoritmos"
           }
         }
       }
     },
-    "Choose another category." : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "machine_translated",
-            "value" : "Elige otra categoría."
+    "Browse categories or search by name, then choose a sort to watch it run.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Explora las categorías o busca por nombre. Después, elige un algoritmo de ordenación para verlo en acción."
           }
         }
       }
     },
-    "Complexity: %lld" : {
-
-    },
-    "Couldn't import this tape: %@" : {
-
-    },
-    "Couldn't read this file: %@" : {
-
-    },
-    "Cycle Array Size" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "machine_translated",
-            "value" : "Cambiar tamaño del arreglo"
+    "Categories": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Categorías"
           }
         }
       }
     },
-    "Cycle Visualizer" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "machine_translated",
-            "value" : "Cambiar visualizador"
+    "Choose another category.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Elige otra categoría."
           }
         }
       }
     },
-    "Decrease Duration" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "machine_translated",
-            "value" : "Reducir duración"
+    "Complexity: %lld": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Complejidad: %lld"
           }
         }
       }
     },
-    "Decrease Duration ×10" : {
-
-    },
-    "Decrease Speed" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "machine_translated",
-            "value" : "Reducir velocidad"
+    "Couldn't import this tape: %@": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se pudo importar esta grabación: %@"
           }
         }
       }
     },
-    "Decrease Speed ×10" : {
-
-    },
-    "Done" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "machine_translated",
-            "value" : "Cerrar"
+    "Couldn't read this file: %@": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se pudo leer este archivo: %@"
           }
         }
       }
     },
-    "Estimated Speed" : {
-
-    },
-    "Find an algorithm" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "machine_translated",
-            "value" : "Encuentra un algoritmo"
+    "Cycle Array Size": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Cambiar tamaño del arreglo"
           }
         }
       }
     },
-    "Full Sweep: %@" : {
-
-    },
-    "Full Sweep: %@ · %@ + %@ + %@" : {
-
-    },
-    "Full Sweep: %@ · %@ + %@ + %@ · ~%@ remaining" : {
-
-    },
-    "Implementation Complexity" : {
-
-    },
-    "Import Failed" : {
-
-    },
-    "Import Tape" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "machine_translated",
-            "value" : "Importar cinta"
+    "Cycle Visualizer": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Cambiar visualizador"
           }
         }
       }
     },
-    "Import a previously exported .tape file" : {
-
-    },
-    "Increase Duration" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "machine_translated",
-            "value" : "Aumentar duración"
+    "Decrease Duration": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Reducir duración"
           }
         }
       }
     },
-    "Increase Duration ×10" : {
-
-    },
-    "Increase Speed" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "machine_translated",
-            "value" : "Aumentar velocidad"
+    "Decrease Duration ×10": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reducir la duración ×10"
           }
         }
       }
     },
-    "Increase Speed ×10" : {
-
-    },
-    "Jump to End" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "machine_translated",
-            "value" : "Ir al final"
+    "Decrease Speed": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Reducir velocidad"
           }
         }
       }
     },
-    "Jump to Start" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "machine_translated",
-            "value" : "Ir al principio"
+    "Decrease Speed ×10": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reducir la velocidad ×10"
           }
         }
       }
     },
-    "Max Size Only" : {
-
-    },
-    "N/A above n=%lld" : {
-
-    },
-    "Name" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "machine_translated",
-            "value" : "Nombre"
+    "Done": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Cerrar"
           }
         }
       }
     },
-    "No Algorithms Available" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "machine_translated",
-            "value" : "No hay algoritmos disponibles"
+    "Estimated Speed": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Velocidad estimada"
           }
         }
       }
     },
-    "No Matching Algorithms" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "machine_translated",
-            "value" : "No se han encontrado algoritmos"
+    "Find an algorithm": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Encuentra un algoritmo"
           }
         }
       }
     },
-    "OK" : {
-
-    },
-    "Play/Pause" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "machine_translated",
-            "value" : "Reproducir/pausar"
+    "Full Sweep: %@": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Barrido completo: %@"
           }
         }
       }
     },
-    "Restart" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "machine_translated",
-            "value" : "Reiniciar"
+    "Full Sweep: %@ · %@ + %@ + %@": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Barrido completo: %@ · %@ + %@ + %@"
           }
         }
       }
     },
-    "Resume Full Sweep" : {
-
-    },
-    "Resume Full Sweep? (%@/%@ done)" : {
-
-    },
-    "Run Max Size Only" : {
-
-    },
-    "Run Size Sweep" : {
-
-    },
-    "Run every algorithm once" : {
-
-    },
-    "Run every algorithm, shuffle, and visualizer" : {
-
-    },
-    "Runs every algorithm against every shuffle and every visualizer — %@ combinations, likely several days. Progress is saved and resumes automatically across launches. Other controls are locked until it finishes or is stopped." : {
-
-    },
-    "Runs every algorithm once, in order, cycling shuffles and visualizers. With Reduce Motion on, Showcase skips Hanoi Towers; you can still choose it in the Visualizer picker. Other controls are locked until it finishes." : {
-
-    },
-    "Search" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "machine_translated",
-            "value" : "Buscar"
+    "Full Sweep: %@ · %@ + %@ + %@ · ~%@ remaining": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Barrido completo: %@ · %@ + %@ + %@ · quedan aprox. %@"
           }
         }
       }
     },
-    "Settings" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "machine_translated",
-            "value" : "Ajustes"
+    "Implementation Complexity": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Complejidad de la implementación"
           }
         }
       }
     },
-    "Settings…" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "machine_translated",
-            "value" : "Ajustes…"
+    "Import Failed": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Error al importar"
           }
         }
       }
     },
-    "Shortcuts: %@: %@" : {
-
-    },
-    "Shortcuts: %@: %@ · size %lld (%lld/%lld) · run %lld/%lld" : {
-
-    },
-    "Showcase" : {
-
-    },
-    "Showcase: %@ (%lld/%lld)" : {
-
-    },
-    "Size Sweep" : {
-
-    },
-    "Sort" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "machine_translated",
-            "value" : "Ordenación"
+    "Import Tape": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Importar cinta"
           }
         }
       }
     },
-    "Sort By" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "machine_translated",
-            "value" : "Ordenar por"
+    "Import a previously exported .tape file": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Importar un archivo .tape exportado anteriormente"
           }
         }
       }
     },
-    "Sort Run" : {
-
-    },
-    "Sort Symphony v2" : {
-
-    },
-    "Start Full Sweep" : {
-
-    },
-    "Start Full Sweep?" : {
-
-    },
-    "Start Showcase" : {
-
-    },
-    "Start Showcase?" : {
-
-    },
-    "Step Backward" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "machine_translated",
-            "value" : "Retroceder un paso"
+    "Increase Duration": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Aumentar duración"
           }
         }
       }
     },
-    "Step Forward" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "machine_translated",
-            "value" : "Avanzar un paso"
+    "Increase Duration ×10": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aumentar la duración ×10"
           }
         }
       }
     },
-    "Stop" : {
-
-    },
-    "Stop Automation" : {
-
-    },
-    "Stop Full Sweep" : {
-
-    },
-    "Stop Showcase" : {
-
-    },
-    "This tape was recorded with an algorithm (\"%@\") this build doesn't recognize." : {
-
-    },
-    "Toggle Sound" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "machine_translated",
-            "value" : "Activar/desactivar el sonido"
+    "Increase Speed": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Aumentar velocidad"
           }
         }
       }
     },
-    "Try another name or category." : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "machine_translated",
-            "value" : "Prueba con otro nombre o categoría."
+    "Increase Speed ×10": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aumentar la velocidad ×10"
           }
         }
       }
     },
-    "~%@ ops at n=%lld" : {
-
+    "Jump to End": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Ir al final"
+          }
+        }
+      }
+    },
+    "Jump to Start": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Ir al principio"
+          }
+        }
+      }
+    },
+    "Max Size Only": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Solo tamaño máximo"
+          }
+        }
+      }
+    },
+    "N/A above n=%lld": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No disponible para n > %lld"
+          }
+        }
+      }
+    },
+    "Name": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Nombre"
+          }
+        }
+      }
+    },
+    "No Algorithms Available": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "No hay algoritmos disponibles"
+          }
+        }
+      }
+    },
+    "No Matching Algorithms": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "No se han encontrado algoritmos"
+          }
+        }
+      }
+    },
+    "OK": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aceptar"
+          }
+        }
+      }
+    },
+    "Play/Pause": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Reproducir/pausar"
+          }
+        }
+      }
+    },
+    "Restart": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Reiniciar"
+          }
+        }
+      }
+    },
+    "Resume Full Sweep": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reanudar el barrido completo"
+          }
+        }
+      }
+    },
+    "Resume Full Sweep? (%@/%@ done)": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "¿Reanudar el barrido completo? (%@/%@ completados)"
+          }
+        }
+      }
+    },
+    "Run Max Size Only": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ejecutar solo el tamaño máximo"
+          }
+        }
+      }
+    },
+    "Run Size Sweep": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ejecutar el barrido de tamaños"
+          }
+        }
+      }
+    },
+    "Run every algorithm once": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ejecutar cada algoritmo una vez"
+          }
+        }
+      }
+    },
+    "Run every algorithm, shuffle, and visualizer": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Probar cada algoritmo, mezcla y visualizador"
+          }
+        }
+      }
+    },
+    "Runs every algorithm against every shuffle and every visualizer — %@ combinations, likely several days. Progress is saved and resumes automatically across launches. Other controls are locked until it finishes or is stopped.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ejecuta cada algoritmo con cada mezcla y cada visualizador: %@ combinaciones que probablemente tardarán varios días. El progreso se guarda y se reanuda automáticamente al volver a abrir la app. Los demás controles permanecen bloqueados hasta que termine o se detenga."
+          }
+        }
+      }
+    },
+    "Runs every algorithm once, in order, cycling shuffles and visualizers. With Reduce Motion on, Showcase skips Hanoi Towers; you can still choose it in the Visualizer picker. Other controls are locked until it finishes.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ejecuta cada algoritmo una vez, en orden, alternando mezclas y visualizadores. Con Reducir movimiento activado, la demostración omite Torres de Hanói; puedes seleccionarlo desde el selector de visualizador. Los demás controles permanecen bloqueados hasta que termine."
+          }
+        }
+      }
+    },
+    "Search": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Buscar"
+          }
+        }
+      }
+    },
+    "Settings": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Ajustes"
+          }
+        }
+      }
+    },
+    "Settings…": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Ajustes…"
+          }
+        }
+      }
+    },
+    "Shortcuts: %@: %@": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Atajos: %@: %@"
+          }
+        }
+      }
+    },
+    "Shortcuts: %@: %@ · size %lld (%lld/%lld) · run %lld/%lld": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Atajos: %@: %@ · tamaño %lld (%lld/%lld) · ejecución %lld/%lld"
+          }
+        }
+      }
+    },
+    "Showcase": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Demostración"
+          }
+        }
+      }
+    },
+    "Showcase: %@ (%lld/%lld)": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Demostración: %@ (%lld/%lld)"
+          }
+        }
+      }
+    },
+    "Size Sweep": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Barrido de tamaños"
+          }
+        }
+      }
+    },
+    "Sort": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Ordenación"
+          }
+        }
+      }
+    },
+    "Sort By": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Ordenar por"
+          }
+        }
+      }
+    },
+    "Sort Run": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ejecución de ordenación"
+          }
+        }
+      }
+    },
+    "Sort Symphony v2": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sort Symphony v2"
+          }
+        }
+      }
+    },
+    "Start Full Sweep": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Iniciar barrido completo"
+          }
+        }
+      }
+    },
+    "Start Full Sweep?": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "¿Iniciar el barrido completo?"
+          }
+        }
+      }
+    },
+    "Start Showcase": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Iniciar demostración"
+          }
+        }
+      }
+    },
+    "Start Showcase?": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "¿Iniciar la demostración?"
+          }
+        }
+      }
+    },
+    "Step Backward": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Retroceder un paso"
+          }
+        }
+      }
+    },
+    "Step Forward": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Avanzar un paso"
+          }
+        }
+      }
+    },
+    "Stop": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Detener"
+          }
+        }
+      }
+    },
+    "Stop Automation": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Detener automatización"
+          }
+        }
+      }
+    },
+    "Stop Full Sweep": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Detener barrido completo"
+          }
+        }
+      }
+    },
+    "Stop Showcase": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Detener demostración"
+          }
+        }
+      }
+    },
+    "This tape was recorded with an algorithm (\"%@\") this build doesn't recognize.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Esta grabación se hizo con un algoritmo (\"%@\") que esta versión no reconoce."
+          }
+        }
+      }
+    },
+    "Toggle Sound": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Activar/desactivar el sonido"
+          }
+        }
+      }
+    },
+    "Try another name or category.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Prueba con otro nombre o categoría."
+          }
+        }
+      }
+    },
+    "~%@ ops at n=%lld": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aprox. %@ operaciones con n = %lld"
+          }
+        }
+      }
     }
   },
-  "version" : "1.3"
+  "version": "1.3"
 }
