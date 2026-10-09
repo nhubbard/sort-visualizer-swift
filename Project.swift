@@ -283,8 +283,8 @@ let app = Target.target(
     ],
     settings: .settings(base: [
         "CODE_SIGN_ENTITLEMENTS": "App/Resources/SortSymphony.entitlements",
-        "MARKETING_VERSION": "2.0.0",
-        "CURRENT_PROJECT_VERSION": "35",
+        "MARKETING_VERSION": "3.0.0",
+        "CURRENT_PROJECT_VERSION": "36",
         "SWIFT_VERSION": "6.0",
         "SWIFT_STRICT_CONCURRENCY": "complete",
         "CODE_SIGN_STYLE": "Automatic",
@@ -349,8 +349,8 @@ let auv3Extension = Module.appExtension(
     ]),
     entitlements: .file(path: "App/AUv3Extension/Resources/AUv3Extension.entitlements"),
     extraSettings: [
-        "MARKETING_VERSION": "2.0.0",
-        "CURRENT_PROJECT_VERSION": "35",
+        "MARKETING_VERSION": "3.0.0",
+        "CURRENT_PROJECT_VERSION": "36",
         // Needed now that this target also builds for .macCatalyst (Phase 4 spike) — without an
         // explicit DEVELOPMENT_TEAM, Xcode fails Catalyst builds specifically with "Signing ...
         // requires a development team" (the .iPad-only Simulator build never hit this; Mac
