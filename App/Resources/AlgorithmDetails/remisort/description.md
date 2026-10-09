@@ -1,5 +1,5 @@
 Remi Sort is a stable multiway merge sort that uses cube-root-sized blocks. It first divides the
-input into runs of roughly n^(2/3) elements. Each run is sorted through a table of original
+input into runs of roughly n²⁄³ elements. Each run is sorted through a table of original
 positions: a heap orders the positions by their values, breaking ties by original position, and
 the resulting permutation is applied in cycles. Equal elements therefore stay in their original
 order within each run.
@@ -11,5 +11,5 @@ set of block-permutation cycles restores the displaced blocks, then the saved fi
 back. This avoids allocating a full-size merge buffer.
 
 The algorithm uses O(n log n) comparisons in the worst case. Its auxiliary keys and saved block
-occupy O(n^(2/3)) space. Stability depends on both tie-breakers: original position in each run
+occupy O(n²⁄³) space. Stability depends on both tie-breakers: original position in each run
 and run number across the multiway merge.

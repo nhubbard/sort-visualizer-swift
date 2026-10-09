@@ -1,6 +1,4 @@
-*From Wikipedia, the free encyclopedia*
-
-In computer science, bogosort (also known as permutation sort, stupid sort, or slowsort) is a sorting algorithm based on
+Bogosort (also known as permutation sort, stupid sort, or slowsort) is a sorting algorithm based on
 the [generate and test](https://en.wikipedia.org/wiki/Generate_and_test) paradigm. The function successively
 generates [permutations](https://en.wikipedia.org/wiki/Permutation) of its input until it finds one that is sorted. It
 is not considered useful for sorting, but may be used for educational purposes, to contrast it with more efficient

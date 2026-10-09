@@ -10,7 +10,7 @@ one place. A small heap then merges the sorted runs into the available destinati
 is pseudorandom but seeded from the input, so recording the same input always produces the same
 sequence of operations.
 
-The average comparison count is O(n log n), while unfavorable layouts can require O(n^2) work
+The average comparison count is O(n log n), while unfavorable layouts can require O(n²) work
 without the initial shuffle normally used to protect this family of algorithms. Apart from a
 fixed number of run-head and heap entries, it uses the input array as its workspace. Its swaps,
 partitioning, and gap insertion do not preserve the input order of equal values, so it is not

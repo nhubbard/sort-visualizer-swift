@@ -9,8 +9,8 @@ The app's implementation is in-place: the larger, not-yet-sorted partition tempo
 values displaced by a swap-based merge of the smaller one. A second merge pass swaps those values
 back, so no separate merge buffer is needed. If a split is extremely uneven, it gathers medians
 of small groups before choosing the next pivot. The reference examples below keep the same
-partition-and-sort-the-smaller-side structure, but use a conventional scratch array for merge
-sort to make the central idea easier to read across languages.
+partition-and-sort-the-smaller-side structure, but use a conventional scratch array to keep the
+merge implementations shorter across languages.
 
 The partition swaps can change the relative order of equal elements, so the sort is not stable.
 Balanced partitions take **O(n log n)** time. A long sequence of highly uneven partitions can

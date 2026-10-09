@@ -1,9 +1,9 @@
 Lazy Stable Sort is a simple in-place merge sort that skips the elaborate block-tagging and
 key-collection machinery a full Grail Sort needs to run in constant extra space. It does its work
-in two passes: first it walks the array in adjacent pairs, swapping any pair that's out of order
+in two passes: first it walks the array in adjacent pairs, swapping any pair that is out of order
 so the whole array becomes a sequence of sorted runs of length two. Then it repeatedly doubles the
-size of the sorted runs it's working with — merging pairs of length-two runs into length-four
-runs, then pairs of length-four runs into length-eight runs, and so on — until a single pass
+size of the sorted runs it is working with, merging pairs of length-two runs into length-four
+runs, then pairs of length-four runs into length-eight runs, and so on, until a single pass
 covers the whole array.
 
 Each of those merges is done by a binary-search-and-rotate routine that needs no scratch buffer

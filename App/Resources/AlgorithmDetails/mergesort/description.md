@@ -1,7 +1,5 @@
-*From Wikipedia, the free encyclopedia*
-
-In computer science, merge sort (also commonly spelled as mergesort) is an efficient, general-purpose,
-and [comparison-based](https://en.wikipedia.org/wiki/Comparison_sort) sorting algorithm.
+Merge sort (also spelled mergesort) is a general-purpose
+[comparison-based](https://en.wikipedia.org/wiki/Comparison_sort) sorting algorithm.
 
 Most implementations produce a [stable sort](https://en.wikipedia.org/wiki/Sorting_algorithm#Stability), which means
 that the order of equal elements is the same in the input and output.

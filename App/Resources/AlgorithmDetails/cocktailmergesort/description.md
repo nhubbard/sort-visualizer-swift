@@ -1,10 +1,8 @@
-*From Wikipedia, the free encyclopedia*
-
 Cocktail Merge Sort is a hybrid sorting algorithm that
 combines [Cocktail Shaker Sort](https://en.wikipedia.org/wiki/Cocktail_shaker_sort) with the run-merging strategy
 popularized by [Timsort](https://en.wikipedia.org/wiki/Timsort). Rather than sorting the entire array with one
-technique, it splits the array into small fixed-length chunks — sized using Timsort's standard "minimum run length"
-calculation — and sorts each chunk in place with Cocktail Shaker Sort. Once every chunk is individually sorted, the
+technique, it splits the array into small fixed-length chunks, sized using Timsort's standard "minimum run length"
+calculation, and sorts each chunk in place with Cocktail Shaker Sort. Once every chunk is individually sorted, the
 algorithm repeatedly merges adjacent sorted runs together, doubling the merged run length on each pass, until the whole
 array is one sorted run.
 
@@ -21,6 +19,6 @@ The combination is nonetheless illustrative: it shows how an exchange sort and a
 size scales, with the exchange sort acting as a "base case" specialist and the merge acting as the algorithm's
 asymptotic backbone.
 
-Because both of its component techniques are stable — Cocktail Shaker Sort never reorders equal adjacent elements it
+Because both of its component techniques are stable, Cocktail Shaker Sort never reorders equal adjacent elements it
 does not need to move, and the merge step always prefers an element from the earlier run when two elements compare
-equal — the composed algorithm preserves the relative order of equal elements as well.
+equal, the composed algorithm preserves the relative order of equal elements as well.

@@ -1,11 +1,10 @@
-The recursive form of Pairwise Merge Sort — see this codebase's iterative version for the general
-background on [sorting networks](https://en.wikipedia.org/wiki/Sorting_network) this algorithm
-belongs to. The recursive construction splits into two cooperating functions. One recurses into
+Recursive Pairwise Merge Sort is a recursive [sorting network](https://en.wikipedia.org/wiki/Sorting_network).
+Its construction splits into two cooperating functions. One recurses into
 its two halves, runs a single comparator pass across the midpoint separating them, and then hands
-off to the second function to reconcile the two now-independently-sorted halves. That second
+off to the second function to reconcile the two independently sorted halves. The second
 function does its own comparator work inline, using a bit-doubling stride pattern that halves a gap
 value while a cursor walks backward by the freshly-halved amount, and recurses only into its own
-second half to finish the job — the first half's comparator work is already complete by the time
+second half to finish the job. The first half's comparator work is already complete by the time
 that recursive call happens.
 
 Like its iterative counterpart, this recursive form conceptually pads the real array length up to

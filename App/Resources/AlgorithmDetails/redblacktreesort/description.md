@@ -1,15 +1,12 @@
-*From Wikipedia, the free encyclopedia*
-
-A red-black tree is a self-balancing binary search tree that keeps its height bounded by attaching
-one extra bit of information — a color, red or black — to every node, along with a small set of
+Red-Black Tree Sort inserts the input into a red-black tree and retrieves the values through an in-order traversal. A red-black tree is a self-balancing binary search tree that keeps its height bounded by attaching
+one extra bit of information, a color, red or black, to every node, along with a small set of
 rules those colors must satisfy. The root is always black. A red node may never have a red child,
 so no two reds ever appear consecutively along any path. And every path from a given node down to
 any of its empty (null) descendants passes through the same number of black nodes, a quantity
 called that node's black-height. Together, these rules bound the tree's height at roughly twice the
 minimum possible for a binary tree holding that many nodes, since the longest possible root-to-leaf
-path — alternating red and black — can be at most twice as long as the shortest, all-black one.
-That guarantee is what makes a red-black tree sort behave predictably no matter what order its
-input arrives in.
+path, alternating red and black, can be at most twice as long as the shortest, all-black one.
+The height bound gives the sort a predictable running time for any input order.
 
 Building the tree top-down, one insertion at a time, is what keeps these invariants intact without
 ever needing a separate pass to repair them afterward. Each newly inserted node starts out red,
@@ -17,8 +14,8 @@ since attaching a red leaf can only ever create a red-red violation, never distu
 black-height. As the insertion recurses downward looking for where the new value belongs, it
 performs an eager recolor at any node it passes through that is itself black but has two red
 children: that node flips to red, and both of its children flip to black. This looks like it
-manufactures exactly the violation the algorithm is trying to avoid, but it's actually a
-self-contained fix — flipping a black node with two red children preserves every path's
+manufactures exactly the violation the algorithm is trying to avoid, but it is a
+self-contained fix, flipping a black node with two red children preserves every path's
 black-height while trading one potential violation higher up, at that node's own parent, for none
 at all further down, and there is never more than one such pending repair at a time. If a red-red
 violation does reach a node's own child on the way back up out of the recursion, one or two tree
