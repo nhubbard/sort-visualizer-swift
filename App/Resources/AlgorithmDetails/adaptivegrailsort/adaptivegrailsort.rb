@@ -1,431 +1,883 @@
-def sort(arr)
-  n = arr.length
-  return if n < 2
+# MIT License
+# Copyright (c) 2013 Andrey Astrelin
+# Copyright (c) 2020 The Holy Grail Sort Project
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy of this software
+# and associated documentation files (the "Software"), to deal in the Software without
+# restriction, including without limitation the rights to use, copy, modify, merge, publish,
+# distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the
+# Software is furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all copies or
+# substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING
+# BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+# NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+# DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-  ascending = (1...n).all? { |i| arr[i - 1] <= arr[i] }
-  return if ascending
 
-  descending = (1...n).all? { |i| arr[i - 1] > arr[i] }
-  if descending
-    arr.reverse!
-    return
+class AdaptiveGrailExample
+  def initialize(input)
+    @values = input
+    @minRun = 16
   end
-
-  common_sort(arr, 0, n)
-end
-
-def swap(arr, a, b)
-  arr[a], arr[b] = arr[b], arr[a]
-end
-
-def compare_values(a, b)
-  a <=> b
-end
-
-def multi_swap(arr, a, b, count)
-  count.times { |i| swap(arr, a + i, b + i) }
-end
-
-def rotate(arr, pos, len_a, len_b)
-  while len_a != 0 && len_b != 0
-    if len_a <= len_b
-      multi_swap(arr, pos, pos + len_a, len_a)
-      pos += len_a
-      len_b -= len_a
-    else
-      multi_swap(arr, pos + (len_a - len_b), pos + len_a, len_b)
-      len_a -= len_b
-    end
+  def read(index)
+    return @values[index]
   end
-end
-
-def insert_sort(arr, pos, len)
-  (1...len).each do |i|
-    j = pos + i
-    while j > pos && arr[j] < arr[j - 1]
-      swap(arr, j, j - 1)
-      j -= 1
-    end
+  def write(index, value)
+    @values[index] = value
   end
-end
-
-def bin_search(arr, pos, len, key_pos, is_left)
-  left = -1
-  right = len
-  key = arr[key_pos]
-  while left < right - 1
-    mid = left + (right - left) / 2
-    cond = is_left ? (arr[pos + mid] >= key) : (arr[pos + mid] > key)
-    if cond
-      right = mid
-    else
-      left = mid
-    end
+  def swap(first, second)
+    @values[first], @values[second] = @values[second], @values[first]
   end
-  right
-end
-
-def find_keys(arr, pos, len, num_keys)
-  dist = 1
-  found_keys = 1
-  first_key = 0
-  while dist < len && found_keys < num_keys
-    loc = bin_search(arr, pos + first_key, found_keys, pos + dist, true)
-    if loc == found_keys || arr[pos + dist] != arr[pos + first_key + loc]
-      rotate(arr, pos + first_key, found_keys, dist - (first_key + found_keys))
-      first_key = dist - found_keys
-      rotate(arr, pos + (first_key + loc), found_keys - loc, 1)
-      found_keys += 1
+  def compare(first, second)
+    if (@values[first] < @values[second])
+      return -(1)
     end
-    dist += 1
+    if (@values[first] > @values[second])
+      return 1
+    end
+    return 0
   end
-  rotate(arr, pos, first_key, found_keys)
-  found_keys
-end
-
-def merge_without_buffer(arr, pos, len1, len2)
-  return if len1 == 0 || len2 == 0
-  if len1 < len2
-    while len1 != 0
-      loc = bin_search(arr, pos + len1, len2, pos, true)
-      if loc != 0
-        rotate(arr, pos, len1, loc)
-        pos += loc
-        len2 -= loc
-      end
-      break if len2 == 0
-
-      loop do
-        pos += 1
-        len1 -= 1
-        break unless len1 != 0 && arr[pos] <= arr[pos + len1]
-      end
+  def compareValue(index, value)
+    if (@values[index] < value)
+      return -(1)
     end
-  else
-    while len2 != 0
-      loc = bin_search(arr, pos, len1, pos + len1 + len2 - 1, false)
-      if loc != len1
-        rotate(arr, pos + loc, len1 - loc, len2)
-        len1 = loc
-      end
-      break if len1 == 0
-
-      loop do
-        len2 -= 1
-        break unless len2 != 0 && arr[pos + len1 - 1] <= arr[pos + len1 + len2 - 1]
-      end
+    if (@values[index] > value)
+      return 1
     end
+    return 0
   end
-end
-
-def merge_left(arr, pos, left_len, right_len, dist)
-  left = 0
-  right = left_len
-  right_len += left_len
-  while right < right_len
-    if left == left_len || arr[pos + left] > arr[pos + right]
-      swap(arr, pos + dist, pos + right)
-      dist += 1
-      right += 1
-    else
-      swap(arr, pos + dist, pos + left)
-      dist += 1
+  def reverse(start, finish)
+    left = start
+    right = (finish - 1)
+    while (left < right)
+      @values[left], @values[right] = @values[right], @values[left]
       left += 1
-    end
-  end
-  multi_swap(arr, pos + dist, pos + left, left_len - left) if dist != left
-end
-
-def merge_right(arr, pos, left_len, right_len, dist)
-  merged_pos = left_len + right_len + dist - 1
-  right = left_len + right_len - 1
-  left = left_len - 1
-  while left >= 0
-    if right < left_len || arr[pos + left] > arr[pos + right]
-      swap(arr, pos + merged_pos, pos + left)
-      merged_pos -= 1
-      left -= 1
-    else
-      swap(arr, pos + merged_pos, pos + right)
-      merged_pos -= 1
       right -= 1
     end
   end
-  while right != merged_pos && right >= left_len
-    swap(arr, pos + merged_pos, pos + right)
-    merged_pos -= 1
-    right -= 1
-  end
-end
-
-def smart_merge_without_buffer(arr, pos, left_over_len, left_over_frag, reg_block_len)
-  return [left_over_len, left_over_frag] if reg_block_len == 0
-
-  len1 = left_over_len
-  len2 = reg_block_len
-  type_frag = 1 - left_over_frag
-  if len1 != 0 && (compare_values(arr[pos + len1 - 1], arr[pos + len1]) - type_frag) >= 0
-    while len1 != 0
-      found_len = bin_search(arr, pos + len1, len2, pos, type_frag != 0)
-      if found_len != 0
-        rotate(arr, pos, len1, found_len)
-        pos += found_len
-        len2 -= found_len
-      end
-      return [len1, left_over_frag] if len2 == 0
-
-      loop do
-        pos += 1
-        len1 -= 1
-        break unless len1 != 0 && (compare_values(arr[pos], arr[pos + len1]) - type_frag) < 0
-      end
-    end
-  end
-  [len2, type_frag]
-end
-
-def smart_merge_with_buffer(arr, pos, left_over_len, left_over_frag, block_len)
-  dist = -block_len
-  left = 0
-  right = left_over_len
-  left_end = right
-  right_end = right + block_len
-  type_frag = 1 - left_over_frag
-  while left < left_end && right < right_end
-    if (compare_values(arr[pos + left], arr[pos + right]) - type_frag) < 0
-      swap(arr, pos + dist, pos + left)
-      dist += 1
-      left += 1
-    else
-      swap(arr, pos + dist, pos + right)
-      dist += 1
-      right += 1
-    end
-  end
-  fragment = left_over_frag
-  if left < left_end
-    length = left_end - left
-    while left < left_end
-      left_end -= 1
-      right_end -= 1
-      swap(arr, pos + left_end, pos + right_end)
-    end
-  else
-    length = right_end - right
-    fragment = type_frag
-  end
-  [length, fragment]
-end
-
-def merge_buffers_left(arr, keys_pos, midkey, pos, block_count, block_len, havebuf, a_block_count, last_len)
-  if block_count == 0
-    a_blocks_len = a_block_count * block_len
-    if havebuf
-      merge_left(arr, pos, a_blocks_len, last_len, -block_len)
-    else
-      merge_without_buffer(arr, pos, a_blocks_len, last_len)
-    end
-    return
-  end
-  left_over_len = block_len
-  left_over_frag = (arr[keys_pos] < arr[midkey]) ? 0 : 1
-  process_index = block_len
-  (1...block_count).each do |key_index|
-    rest_to_process = process_index - left_over_len
-    next_frag = (arr[keys_pos + key_index] < arr[midkey]) ? 0 : 1
-    if next_frag == left_over_frag
-      multi_swap(arr, pos + rest_to_process - block_len, pos + rest_to_process, left_over_len) if havebuf
-      left_over_len = block_len
-    else
-      left_over_len, left_over_frag = if havebuf
-        smart_merge_with_buffer(arr, pos + rest_to_process, left_over_len, left_over_frag, block_len)
-      else
-        smart_merge_without_buffer(arr, pos + rest_to_process, left_over_len, left_over_frag, block_len)
-      end
-    end
-    process_index += block_len
-  end
-  rest_to_process = process_index - left_over_len
-  if last_len != 0
-    if left_over_frag != 0
-      multi_swap(arr, pos + rest_to_process - block_len, pos + rest_to_process, left_over_len) if havebuf
-      rest_to_process = process_index
-      left_over_len = block_len * a_block_count
-      left_over_frag = 0
-    else
-      left_over_len += block_len * a_block_count
-    end
-    if havebuf
-      merge_left(arr, pos + rest_to_process, left_over_len, last_len, -block_len)
-    else
-      merge_without_buffer(arr, pos + rest_to_process, left_over_len, last_len)
-    end
-  elsif havebuf
-    multi_swap(arr, pos + rest_to_process, pos + rest_to_process - block_len, left_over_len)
-  end
-end
-
-def build_blocks(arr, pos, length, build_len)
-  dist = 1
-  while dist < length
-    extra_dist = (arr[pos + dist - 1] > arr[pos + dist]) ? 1 : 0
-    swap(arr, pos + dist - 3, pos + dist - 1 + extra_dist)
-    swap(arr, pos + dist - 2, pos + dist - extra_dist)
-    dist += 2
-  end
-  swap(arr, pos + length - 1, pos + length - 3) if length.odd?
-  pos -= 2
-  part = 2
-  while part < build_len
-    left = 0
-    right = length - 2 * part
-    while left <= right
-      merge_left(arr, pos + left, part, part, -part)
-      left += 2 * part
-    end
-    rest = length - left
-    if rest > part
-      merge_left(arr, pos + left, part, rest - part, -part)
-    else
-      rotate(arr, pos + left - part, part, rest)
-    end
-    pos -= part
-    part *= 2
-  end
-  rest_to_build = length % (2 * build_len)
-  left_over_pos = length - rest_to_build
-  if rest_to_build <= build_len
-    rotate(arr, pos + left_over_pos, rest_to_build, build_len)
-  else
-    merge_right(arr, pos + left_over_pos, build_len, rest_to_build - build_len, build_len)
-  end
-  while left_over_pos > 0
-    left_over_pos -= 2 * build_len
-    merge_right(arr, pos + left_over_pos, build_len, build_len, build_len)
-  end
-end
-
-def combine_blocks(arr, key_pos, pos, length, build_len, reg_block_len, havebuf)
-  combine_len = length / (2 * build_len)
-  left_over = length % (2 * build_len)
-  if left_over <= build_len
-    length -= left_over
-    left_over = 0
-  end
-  i = 0
-  while i <= combine_len
-    break if i == combine_len && left_over == 0
-
-    block_pos = pos + i * 2 * build_len
-    block_count = ((i == combine_len) ? left_over : 2 * build_len) / reg_block_len
-    insert_sort(arr, key_pos, block_count + ((i == combine_len) ? 1 : 0))
-    midkey = build_len / reg_block_len
-    (1...block_count).each do |index|
-      left_index = index - 1
-      (index...block_count).each do |right_index|
-        a = arr[block_pos + left_index * reg_block_len]
-        b = arr[block_pos + right_index * reg_block_len]
-        if a > b || (a == b && arr[key_pos + left_index] > arr[key_pos + right_index])
-          left_index = right_index
-        end
-      end
-      if left_index != index - 1
-        multi_swap(arr, block_pos + (index - 1) * reg_block_len, block_pos + left_index * reg_block_len, reg_block_len)
-        swap(arr, key_pos + (index - 1), key_pos + left_index)
-        midkey ^= (index - 1) ^ left_index if midkey == index - 1 || midkey == left_index
-      end
-    end
-    a_block_count = 0
-    last_len = (i == combine_len) ? (left_over % reg_block_len) : 0
-    if last_len != 0
-      while a_block_count < block_count && arr[block_pos + block_count * reg_block_len] < arr[
-        block_pos + (block_count - a_block_count - 1) * reg_block_len
-      ]
-        a_block_count += 1
-      end
-    end
-    merge_buffers_left(arr, key_pos, key_pos + midkey, block_pos, block_count - a_block_count,
-      reg_block_len, havebuf, a_block_count, last_len)
-    i += 1
-  end
-  if havebuf
-    while length > 0
-      length -= 1
-      swap(arr, pos + length, pos + length - reg_block_len)
-    end
-  end
-end
-
-def lazy_stable_sort(arr, pos, length)
-  dist = 1
-  while dist < length
-    swap(arr, pos + dist - 1, pos + dist) if arr[pos + dist - 1] > arr[pos + dist]
-    dist += 2
-  end
-  part = 2
-  while part < length
-    left = 0
-    right = length - 2 * part
-    while left <= right
-      merge_without_buffer(arr, pos + left, part, part)
-      left += 2 * part
-    end
-    rest = length - left
-    merge_without_buffer(arr, pos + left, part, rest - part) if rest > part
-    part *= 2
-  end
-end
-
-def common_sort(arr, pos, length)
-  if length <= 16
-    insert_sort(arr, pos, length)
-    return
-  end
-  block_len = 1
-  block_len *= 2 while block_len * block_len < length
-  num_keys = (length - 1) / block_len + 1
-  keys_found = find_keys(arr, pos, length, num_keys + block_len)
-  buffer_enabled = true
-  if keys_found < num_keys + block_len
-    if keys_found < 4
-      lazy_stable_sort(arr, pos, length)
+  def multiSwap(first, second, count)
+    if !((count > 0))
       return
     end
-    num_keys = block_len
-    num_keys /= 2 while num_keys > keys_found
-    buffer_enabled = false
-    block_len = 0
+    (0...count).each do |offset|
+      swap((first + offset), (second + offset))
+    end
   end
-  dist = block_len + num_keys
-  build_len = buffer_enabled ? block_len : num_keys
-  build_blocks(arr, pos + dist, length - dist, build_len)
-  loop do
-    build_len *= 2
-    break if length - dist <= build_len
-
-    reg_block_len = block_len
-    build_buf_enabled = buffer_enabled
-    unless buffer_enabled
-      if num_keys > 4 && (num_keys / 8) * num_keys >= build_len
-        reg_block_len = num_keys / 2
-        build_buf_enabled = true
+  def multiTriSwap(first, second, third, count)
+    if !((count > 0))
+      return
+    end
+    (0...count).each do |offset|
+      value = read((first + offset))
+      write((first + offset), read((second + offset)))
+      write((second + offset), read((third + offset)))
+      write((third + offset), value)
+    end
+  end
+  def insertTo(source, destination)
+    value = read(source)
+    cursor = source
+    while (cursor > destination)
+      write(cursor, read((cursor - 1)))
+      cursor -= 1
+    end
+    write(destination, value)
+  end
+  def insertToBackward(source, destination)
+    value = read(source)
+    cursor = source
+    while (cursor < destination)
+      write(cursor, read((cursor + 1)))
+      cursor += 1
+    end
+    write(cursor, value)
+  end
+  def shift(destination, source, finish)
+    if !((source < finish))
+      return
+    end
+    (0...(finish - source)).each do |offset|
+      swap((destination + offset), (source + offset))
+    end
+  end
+  def rotate(startIn, middleIn, endIn)
+    start = startIn
+    middle = middleIn
+    finish = endIn
+    left = (middle - start)
+    right = (finish - middle)
+    while ((left > 1) && (right > 1))
+      if (right < left)
+        multiSwap((middle - right), middle, right)
+        finish -= right
+        middle -= right
+        left -= right
       else
-        calc_keys = 1
-        i = build_len * keys_found / 2
-        while calc_keys < num_keys && i != 0
-          calc_keys *= 2
-          i /= 8
-        end
-        reg_block_len = (2 * build_len) / calc_keys
+        multiSwap(start, middle, left)
+        start += left
+        middle += left
+        right -= left
       end
     end
-    combine_blocks(arr, pos, pos + dist, length - dist, build_len, reg_block_len, build_buf_enabled)
+    if (right == 1)
+      insertTo(middle, start)
+    else
+      if (left == 1)
+        insertToBackward(start, (finish - 1))
+      end
+    end
   end
-  insert_sort(arr, pos, dist)
-  merge_without_buffer(arr, pos, dist, length - dist)
+  def leftBinarySearch(start, finish, value)
+    lower = start
+    upper = finish
+    while (lower < upper)
+      middle = (lower + ((upper - lower) / 2))
+      if (@values[middle] >= value)
+        upper = middle
+      else
+        lower = (middle + 1)
+      end
+    end
+    return lower
+  end
+  def rightBinarySearch(start, finish, value)
+    lower = start
+    upper = finish
+    while (lower < upper)
+      middle = (lower + ((upper - lower) / 2))
+      if (@values[middle] > value)
+        upper = middle
+      else
+        lower = (middle + 1)
+      end
+    end
+    return lower
+  end
+  def buildUniqueRun(start, limit)
+    count = 1
+    index = (start + 1)
+    order = compare((index - 1), index)
+    if (order < 0)
+      index += 1
+      count += 1
+      while ((count < limit) && (compare((index - 1), index) < 0))
+        index += 1
+        count += 1
+      end
+    else
+      if (order > 0)
+        index += 1
+        count += 1
+        while ((count < limit) && (compare((index - 1), index) > 0))
+          index += 1
+          count += 1
+        end
+        reverse(start, index)
+      end
+    end
+    return count
+  end
+  def buildUniqueRunBackward(finish, limit)
+    count = 1
+    index = (finish - 1)
+    order = compare((index - 1), index)
+    if (order < 0)
+      index -= 1
+      count += 1
+      while ((count < limit) && (compare((index - 1), index) < 0))
+        index -= 1
+        count += 1
+      end
+    else
+      if (order > 0)
+        index -= 1
+        count += 1
+        while ((count < limit) && (compare((index - 1), index) > 0))
+          index -= 1
+          count += 1
+        end
+        reverse(index, finish)
+      end
+    end
+    return count
+  end
+  def findKeys(start, finish, initial, needed)
+    count = initial
+    keyStart = start
+    keyEnd = (start + count)
+    index = keyEnd
+    while ((index < finish) && (count < needed))
+      candidate = read(index)
+      location = leftBinarySearch(keyStart, keyEnd, candidate)
+      if ((location == keyEnd) || (compareValue(location, candidate) != 0))
+        rotate(keyStart, keyEnd, index)
+        distance = (index - keyEnd)
+        location += distance
+        keyStart += distance
+        keyEnd += distance
+        insertTo(keyEnd, location)
+        count += 1
+        keyEnd += 1
+      end
+      index += 1
+    end
+    rotate(start, keyStart, keyEnd)
+    return count
+  end
+  def findKeysBackward(start, finish, initial, needed)
+    count = initial
+    keyStart = (finish - count)
+    keyEnd = finish
+    index = (keyStart - 1)
+    while ((index >= start) && (count < needed))
+      candidate = read(index)
+      location = leftBinarySearch(keyStart, keyEnd, candidate)
+      if ((location == keyEnd) || (compareValue(location, candidate) != 0))
+        rotate((index + 1), keyStart, keyEnd)
+        distance = (keyStart - (index + 1))
+        location -= distance
+        keyEnd -= distance
+        keyStart -= (distance + 1)
+        count += 1
+        insertToBackward(index, (location - 1))
+      end
+      index -= 1
+    end
+    rotate(keyStart, keyEnd, finish)
+    return count
+  end
+  def buildRuns(start, finish)
+    index = (start + 1)
+    runStart = start
+    while (index < finish)
+      if (compare((index - 1), index) > 0)
+        index += 1
+        while ((index < finish) && (compare((index - 1), index) > 0))
+          index += 1
+        end
+        reverse(runStart, index)
+      else
+        index += 1
+        while ((index < finish) && (compare((index - 1), index) <= 0))
+          index += 1
+        end
+      end
+      if (index < finish)
+        runStart = ((index - (((index - runStart) - 1) % @minRun)) - 1)
+      end
+      while (((index - runStart) < @minRun) && (index < finish))
+        insertTo(index, rightBinarySearch(runStart, index, read(index)))
+        index += 1
+      end
+      runStart = index
+      index += 1
+    end
+  end
+  def binaryInsertion(start, finish)
+    if !(((finish - start) > 1))
+      return
+    end
+    ((start + 1)...finish).each do |index|
+      insertTo(index, rightBinarySearch(start, index, read(index)))
+    end
+  end
+  def mergeWithBufferRest(start, middle, finish, buffer, length)
+    left = 0
+    right = middle
+    output = start
+    while ((left < length) && (right < finish))
+      if (compare((buffer + left), right) <= 0)
+        swap(output, (buffer + left))
+        left += 1
+      else
+        swap(output, right)
+        right += 1
+      end
+      output += 1
+    end
+    while (left < length)
+      swap(output, (buffer + left))
+      output += 1
+      left += 1
+    end
+  end
+  def mergeWithBuffer(start, middle, finish, buffer)
+    length = (middle - start)
+    multiSwap(buffer, start, length)
+    mergeWithBufferRest(start, middle, finish, buffer, length)
+  end
+  def mergeWithBufferBackward(start, middle, finish, buffer)
+    length = (finish - middle)
+    multiSwap(middle, buffer, length)
+    left = (length - 1)
+    right = (middle - 1)
+    output = (finish - 1)
+    while ((left >= 0) && (right >= start))
+      if (compare((buffer + left), right) >= 0)
+        swap(output, (buffer + left))
+        left -= 1
+      else
+        swap(output, right)
+        right -= 1
+      end
+      output -= 1
+    end
+    while (left >= 0)
+      swap(output, (buffer + left))
+      output -= 1
+      left -= 1
+    end
+  end
+  def inPlaceMerge(start, middle, finish)
+    left = start
+    right = middle
+    while ((left < right) && (right < finish))
+      if (compare(left, right) > 0)
+        next_value = leftBinarySearch((right + 1), finish, read(left))
+        rotate(left, right, next_value)
+        left += (next_value - right)
+        right = next_value
+      else
+        left += 1
+      end
+    end
+  end
+  def inPlaceMergeBackward(start, middle, finish)
+    left = (middle - 1)
+    right = (finish - 1)
+    while ((right > left) && (left >= start))
+      if (compare(left, right) > 0)
+        next_value = rightBinarySearch(start, left, read(right))
+        rotate(next_value, (left + 1), (right + 1))
+        right -= ((left + 1) - next_value)
+        left = (next_value - 1)
+      else
+        right -= 1
+      end
+    end
+  end
+  def mergeWithoutBuffer(start, middle, finish)
+    if ((middle - start) > (finish - middle))
+      inPlaceMergeBackward(start, middle, finish)
+    else
+      inPlaceMerge(start, middle, finish)
+    end
+  end
+  def checkSorted(middle)
+    return (compare((middle - 1), middle) > 0)
+  end
+  def checkReverseBounds(start, middle, finish)
+    if (compare(start, (finish - 1)) > 0)
+      rotate(start, middle, finish)
+      return false
+    end
+    return true
+  end
+  def checkBounds(start, middle, finish)
+    return (checkSorted(middle) && checkReverseBounds(start, middle, finish))
+  end
+  def subarray(tag, middleKey)
+    return ((compare(tag, middleKey) < 0) ? 'left' : 'right')
+  end
+  def blockSelectSort(position, tags, offset, distance, leftCount, blockCount, blockLength)
+    middleKey = leftCount
+    index = 0
+    limit = (leftCount + 1)
+    while (index < (limit - 1))
+      minimum = index
+      candidate = [(leftCount - offset), (index + 1)].max
+      while (candidate < limit)
+        order = compare(((position + distance) + (candidate * blockLength)), ((position + distance) + (minimum * blockLength)))
+        if ((order < 0) || ((order == 0) && (compare((tags + candidate), (tags + minimum)) < 0)))
+          minimum = candidate
+        end
+        candidate += 1
+      end
+      if (minimum != index)
+        multiSwap((position + (index * blockLength)), (position + (minimum * blockLength)), blockLength)
+        swap((tags + index), (tags + minimum))
+        if ((limit < blockCount) && (minimum == (limit - 1)))
+          limit += 1
+        end
+      end
+      if (minimum == middleKey)
+        middleKey = index
+      end
+      index += 1
+    end
+    return (tags + middleKey)
+  end
+  def sortKeys(finish, buffer, middleKey)
+    swap(buffer, middleKey)
+    left = middleKey
+    index = (left + 1)
+    right = (buffer + 1)
+    while (index < finish)
+      if (compare(index, buffer) < 0)
+        swap(left, index)
+        left += 1
+      else
+        swap(right, index)
+        right += 1
+      end
+      index += 1
+    end
+    multiSwap(left, buffer, (finish - left))
+  end
+  def sortKeysWithoutBuffer(finish, middleKey)
+    left = middleKey
+    index = (left + 1)
+    while (index < finish)
+      if (compare(index, left) < 0)
+        insertTo(index, left)
+        left += 1
+      end
+      index += 1
+    end
+  end
+  def mergeBlocks(start, middle, finish, destination, reverseEqual)
+    left = start
+    right = middle
+    output = destination
+    while ((left < middle) && (right < finish))
+      order = compare(left, right)
+      if ((order < 0) || ((order == 0) && !(reverseEqual)))
+        swap(output, left)
+        left += 1
+      else
+        swap(output, right)
+        right += 1
+      end
+      output += 1
+    end
+    if (left > output)
+      while (left < middle)
+        swap(output, left)
+        output += 1
+        left += 1
+      end
+    end
+    return right
+  end
+  def blockMerge(start, middle, finish, tags, buffer, blockLength)
+    lastFull = ((finish - (((finish - middle) - 1) % blockLength)) - 1)
+    left = (start + blockLength)
+    group = start
+    key = (tags - 1)
+    leftCount = ((middle - left) / blockLength)
+    blockCount = ((lastFull - left) / blockLength)
+    leftBlocks = -(1)
+    rightBlocks = (leftCount - 1)
+    multiTriSwap(buffer, (middle - blockLength), start, blockLength)
+    insertToBackward(tags, ((tags + leftCount) - 1))
+    middleKey = blockSelectSort(left, tags, 1, (blockLength - 1), leftCount, blockCount, blockLength)
+    fragment = 'left'
+    while ((leftBlocks < leftCount) && (rightBlocks < blockCount))
+      if (fragment == 'left')
+        while true
+          group += blockLength
+          leftBlocks += 1
+          key += 1
+          if !(((leftBlocks < leftCount) && (subarray(key, middleKey) == 'left')))
+            break
+          end
+        end
+        if (leftBlocks == leftCount)
+          left = mergeBlocks(left, group, finish, (left - blockLength), false)
+          mergeWithBufferRest((left - blockLength), left, finish, buffer, blockLength)
+        else
+          left = mergeBlocks(left, group, ((group + blockLength) - 1), (left - blockLength), false)
+        end
+        fragment = 'right'
+      else
+        while true
+          group += blockLength
+          rightBlocks += 1
+          key += 1
+          if !(((rightBlocks < blockCount) && (subarray(key, middleKey) == 'right')))
+            break
+          end
+        end
+        if (rightBlocks == blockCount)
+          shift((left - blockLength), left, finish)
+          multiSwap(buffer, (finish - blockLength), blockLength)
+        else
+          left = mergeBlocks(left, group, ((group + blockLength) - 1), (left - blockLength), true)
+        end
+        fragment = 'left'
+      end
+    end
+    sortKeys((tags + blockCount), buffer, middleKey)
+  end
+  def blockMergeWithoutBuffer(start, middle, finish, tags, blockLength)
+    firstFull = (start + ((middle - start) % blockLength))
+    lastFull = (finish - ((finish - middle) % blockLength))
+    left = start
+    group = firstFull
+    key = tags
+    leftCount = (((middle - group) / blockLength) + 1)
+    blockCount = (((lastFull - group) / blockLength) + 1)
+    leftBlocks = 0
+    rightBlocks = leftCount
+    middleKey = blockSelectSort(group, tags, 0, 0, (leftCount - 1), (blockCount - 1), blockLength)
+    fragment = 'left'
+    while ((leftBlocks < leftCount) && (rightBlocks < blockCount))
+      next_value = subarray(key, middleKey)
+      key += 1
+      if (next_value == fragment)
+        if (fragment == 'left')
+          leftBlocks += 1
+        else
+          rightBlocks += 1
+        end
+        left = group
+      else
+        middle2 = group
+        end2 = (group + blockLength)
+        if (fragment == 'left')
+          while ((left < middle2) && (middle2 < end2))
+            if (compare(left, middle2) > 0)
+              nextPosition = leftBinarySearch((middle2 + 1), end2, read(left))
+              rotate(left, middle2, nextPosition)
+              left += (nextPosition - middle2)
+              middle2 = nextPosition
+            else
+              left += 1
+            end
+          end
+        else
+          while ((left < middle2) && (middle2 < end2))
+            if (compare(left, middle2) >= 0)
+              nextPosition = rightBinarySearch((middle2 + 1), end2, read(left))
+              rotate(left, middle2, nextPosition)
+              left += (nextPosition - middle2)
+              middle2 = nextPosition
+            else
+              left += 1
+            end
+          end
+        end
+        if (left < middle2)
+          if (next_value == 'left')
+            leftBlocks += 1
+          else
+            rightBlocks += 1
+          end
+        else
+          if (fragment == 'left')
+            leftBlocks += 1
+          else
+            rightBlocks += 1
+          end
+          fragment = next_value
+        end
+      end
+      group += blockLength
+    end
+    if (leftBlocks < leftCount)
+      inPlaceMergeBackward(start, lastFull, finish)
+    end
+    sortKeysWithoutBuffer(((tags + blockCount) - 1), middleKey)
+  end
+  def smartMerge(start, middle, finish, buffer)
+    if checkBounds(start, middle, finish)
+      trimmed = rightBinarySearch(start, (middle - 1), read(middle))
+      mergeWithBuffer(trimmed, middle, finish, buffer)
+    end
+  end
+  def smartMergeBackward(start, middle, finish, buffer)
+    if checkBounds(start, middle, finish)
+      trimmed = leftBinarySearch((middle + 1), finish, read((middle - 1)))
+      mergeWithBufferBackward(start, middle, trimmed, buffer)
+    end
+  end
+  def smartBlockMerge(start, middle, finish, tags, buffer, blockLength)
+    if checkBounds(start, middle, finish)
+      trimmedStart = rightBinarySearch(start, (middle - 1), read(middle))
+      trimmedEnd = leftBinarySearch((middle + 1), finish, read((middle - 1)))
+      if checkReverseBounds(trimmedStart, middle, trimmedEnd)
+        if (((middle - trimmedStart) <= blockLength) || ((trimmedEnd - middle) <= blockLength))
+          if ((trimmedEnd - middle) < (middle - trimmedStart))
+            mergeWithBufferBackward(trimmedStart, middle, trimmedEnd, buffer)
+          else
+            mergeWithBuffer(trimmedStart, middle, trimmedEnd, buffer)
+          end
+        else
+          trimmedStart -= ((trimmedStart - start) % blockLength)
+          blockMerge(trimmedStart, middle, trimmedEnd, tags, buffer, blockLength)
+        end
+      end
+    end
+  end
+  def smartBlockMergeWithoutBuffer(start, middle, finish, tags, blockLength)
+    if checkBounds(start, middle, finish)
+      trimmedStart = rightBinarySearch(start, (middle - 1), read(middle))
+      if ((middle - trimmedStart) <= blockLength)
+        inPlaceMerge(trimmedStart, middle, finish)
+      else
+        blockMergeWithoutBuffer(trimmedStart, middle, finish, tags, blockLength)
+      end
+    end
+  end
+  def smartInPlaceMerge(start, middle, finish)
+    if checkSorted(middle)
+      inPlaceMergeBackward(start, middle, finish)
+    end
+  end
+  def redistributeBuffer(startIn, middleIn, finish)
+    start = startIn
+    middle = middleIn
+    right = leftBinarySearch(middle, finish, read(start))
+    rotate(start, middle, right)
+    distance = (right - middle)
+    start += distance
+    middle += distance
+    leftMiddle = (start + ((middle - start) / 2))
+    right = leftBinarySearch(middle, finish, read(leftMiddle))
+    rotate(leftMiddle, middle, right)
+    distance = (right - middle)
+    leftMiddle += distance
+    middle += distance
+    mergeWithoutBuffer(start, (leftMiddle - distance), leftMiddle)
+    mergeWithoutBuffer(leftMiddle, middle, finish)
+  end
+  def redistributeBufferBackward(start, middleIn, endIn)
+    middle = middleIn
+    finish = endIn
+    right = rightBinarySearch(start, middle, read((finish - 1)))
+    rotate(right, middle, finish)
+    distance = (middle - right)
+    finish -= distance
+    middle -= distance
+    rightMiddle = (middle + ((finish - middle) / 2))
+    right = rightBinarySearch(start, middle, read((rightMiddle - 1)))
+    rotate(right, middle, rightMiddle)
+    distance = (middle - right)
+    rightMiddle -= distance
+    middle -= distance
+    mergeWithoutBuffer(rightMiddle, (rightMiddle + distance), finish)
+    mergeWithoutBuffer(start, middle, rightMiddle)
+  end
+  def inPlaceMergeSort(start, finish)
+    buildRuns(start, finish)
+    run = @minRun
+    while (run < (finish - start))
+      index = start
+      while ((index + (2 * run)) <= finish)
+        smartInPlaceMerge(index, (index + run), (index + (2 * run)))
+        index += (2 * run)
+      end
+      if ((index + run) < finish)
+        smartInPlaceMerge(index, (index + run), finish)
+      end
+      run *= 2
+    end
+  end
+  def adaptiveSortWithoutBuffer(startIn, endIn, keys, ideal, backwardBuffer)
+    start = startIn
+    finish = endIn
+    length = (finish - start)
+    blockLength = [keys, @minRun].min
+    while ((2 * blockLength) <= keys)
+      blockLength *= 2
+    end
+    tagLength = (keys - blockLength)
+    runLength = @minRun
+    tags = nil
+    buffer = nil
+    dataStart = nil
+    dataEnd = nil
+    if backwardBuffer
+      buffer = (finish - blockLength)
+      dataStart = start
+      dataEnd = (buffer - tagLength)
+      tags = dataEnd
+    else
+      buffer = (start + tagLength)
+      dataStart = (buffer + blockLength)
+      dataEnd = finish
+      tags = start
+    end
+    buildRuns(dataStart, dataEnd)
+    while ((runLength <= blockLength) && (runLength < length))
+      index = dataStart
+      while ((index + (2 * runLength)) <= dataEnd)
+        smartMerge(index, (index + runLength), (index + (2 * runLength)), buffer)
+        index += (2 * runLength)
+      end
+      if ((index + runLength) < dataEnd)
+        smartMergeBackward(index, (index + runLength), dataEnd, buffer)
+      end
+      runLength *= 2
+    end
+    if (((blockLength / 2) >= @minRun) && ((blockLength / 2) >= ((keys + 1) / 2)))
+      binaryInsertion(buffer, (buffer + blockLength))
+      blockLength /= 2
+      tagLength = (keys - blockLength)
+      buffer += blockLength
+    end
+    while ((tagLength >= (((2 * runLength) / blockLength) - 1)) && (runLength < length))
+      index = dataStart
+      while ((index + (2 * runLength)) <= dataEnd)
+        smartBlockMerge(index, (index + runLength), (index + (2 * runLength)), tags, buffer, blockLength)
+        index += (2 * runLength)
+      end
+      if ((index + runLength) < dataEnd)
+        if ((dataEnd - (index + runLength)) > blockLength)
+          smartBlockMerge(index, (index + runLength), dataEnd, tags, buffer, blockLength)
+        else
+          smartMergeBackward(index, (index + runLength), dataEnd, buffer)
+        end
+      end
+      runLength *= 2
+    end
+    binaryInsertion(buffer, (buffer + blockLength))
+    tagLength = (keys - (keys % 2))
+    while (runLength < length)
+      blockLength = ((2 * runLength) / tagLength)
+      index = dataStart
+      while ((index + (2 * runLength)) <= dataEnd)
+        smartBlockMergeWithoutBuffer(index, (index + runLength), (index + (2 * runLength)), tags, blockLength)
+        index += (2 * runLength)
+      end
+      if ((index + runLength) < dataEnd)
+        if ((dataEnd - (index + runLength)) > blockLength)
+          smartBlockMergeWithoutBuffer(index, (index + runLength), dataEnd, tags, blockLength)
+        else
+          smartInPlaceMerge(index, (index + runLength), dataEnd)
+        end
+      end
+      runLength *= 2
+    end
+    if backwardBuffer
+      start = rightBinarySearch(start, dataEnd, read(dataEnd))
+      if (keys >= (ideal / 2))
+        redistributeBufferBackward(start, dataEnd, finish)
+      else
+        mergeWithoutBuffer(start, dataEnd, finish)
+      end
+    else
+      finish = leftBinarySearch(dataStart, finish, read((dataStart - 1)))
+      if (keys >= (ideal / 2))
+        redistributeBuffer(start, dataStart, finish)
+      else
+        mergeWithoutBuffer(start, dataStart, finish)
+      end
+    end
+  end
+  def sort(startIn, endIn)
+    start = startIn
+    finish = endIn
+    length = (finish - start)
+    if (length < 31)
+      binaryInsertion(start, finish)
+      return
+    end
+    if (length < 63)
+      @minRun = ((length + 1) / 2)
+      buildRuns(start, finish)
+      middle = (start + @minRun)
+      if checkBounds(start, middle, finish)
+        redistributeBufferBackward(start, middle, finish)
+      end
+      return
+    end
+    @minRun = length
+    while (@minRun >= 32)
+      @minRun = ((@minRun + 1) / 2)
+    end
+    blockLength = @minRun
+    while ((blockLength * blockLength) < length)
+      blockLength *= 2
+    end
+    tagLength = ((length / blockLength) - 2)
+    ideal = (tagLength + blockLength)
+    rightRun = buildUniqueRunBackward(finish, ideal)
+    leftRun = 0
+    backwardBuffer = nil
+    if (rightRun == ideal)
+      backwardBuffer = true
+    else
+      leftRun = buildUniqueRun(start, ideal)
+      if (leftRun == ideal)
+        backwardBuffer = false
+      else
+        backwardBuffer = (((rightRun < 16) && (leftRun < 16)) || (rightRun >= leftRun))
+      end
+    end
+    keys = (backwardBuffer ? findKeysBackward(start, finish, rightRun, ideal) : findKeys(start, finish, leftRun, ideal))
+    if (keys < ideal)
+      if (keys == 1)
+        return
+      end
+      if (keys <= 4)
+        inPlaceMergeSort(start, finish)
+      else
+        adaptiveSortWithoutBuffer(start, finish, keys, ideal, backwardBuffer)
+      end
+      return
+    end
+    buffer = nil
+    dataStart = nil
+    dataEnd = nil
+    tags = nil
+    if backwardBuffer
+      buffer = (finish - blockLength)
+      dataStart = start
+      dataEnd = (buffer - tagLength)
+      tags = dataEnd
+    else
+      buffer = (start + tagLength)
+      dataStart = (buffer + blockLength)
+      dataEnd = finish
+      tags = start
+    end
+    buildRuns(dataStart, dataEnd)
+    runLength = @minRun
+    while ((runLength <= blockLength) && (runLength < length))
+      index = dataStart
+      while ((index + (2 * runLength)) <= dataEnd)
+        smartMerge(index, (index + runLength), (index + (2 * runLength)), buffer)
+        index += (2 * runLength)
+      end
+      if ((index + runLength) < dataEnd)
+        smartMergeBackward(index, (index + runLength), dataEnd, buffer)
+      end
+      runLength *= 2
+    end
+    while (runLength < length)
+      index = dataStart
+      while ((index + (2 * runLength)) <= dataEnd)
+        smartBlockMerge(index, (index + runLength), (index + (2 * runLength)), tags, buffer, blockLength)
+        index += (2 * runLength)
+      end
+      if ((index + runLength) < dataEnd)
+        if ((dataEnd - (index + runLength)) > blockLength)
+          smartBlockMerge(index, (index + runLength), dataEnd, tags, buffer, blockLength)
+        else
+          smartMergeBackward(index, (index + runLength), dataEnd, buffer)
+        end
+      end
+      runLength *= 2
+    end
+    binaryInsertion(buffer, (buffer + blockLength))
+    if backwardBuffer
+      start = rightBinarySearch(start, dataEnd, read(dataEnd))
+      redistributeBufferBackward(start, dataEnd, finish)
+    else
+      finish = leftBinarySearch(dataStart, finish, read((dataStart - 1)))
+      redistributeBuffer(start, dataStart, finish)
+    end
+  end
 end
-
-array = [0, 39, 21, 62, 91, 77, 14, 23,
-  90, 69, 51, 81, 68, 83, 32, 56]
+def sort(values)
+  sorter = AdaptiveGrailExample.new(values)
+  sorter.sort(0, values.length)
+end
+array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56]
 sort(array)
-p array
+puts array.inspect
