@@ -22,9 +22,11 @@ refuses to run if calibration or source metadata is missing.
 
 ## Setup (one-time, per machine)
 
-Already done on this machine — `.management-token`/`.user-token` (save-token output, keychain-
-backed) and `.team-id`/`.dev-schema`/`.prod-schema` (reference dotfiles) sit alongside this
-script, all git-ignored (see `.gitignore` here — never commit these). On a fresh machine:
+Local management-token and schema reference files sit alongside this script and are git-ignored
+(see `.gitignore` here). A private-database CLI user token expires and must be refreshed from
+CloudKit Console's Settings > Tokens > User Token. Save the freshly copied value in `.user-token`
+and run `chmod 600 .user-token`; never commit it. On a fresh machine, `cktool` can alternatively
+save tokens in the keychain:
 
 ```sh
 xcrun cktool save-token --type management   # CloudKit Console > your team > API Access
@@ -44,9 +46,37 @@ record types that no current code path writes to — legacy, out of scope for th
 
 ## Usage
 
+The complete read-only scans from 2026-10-02 are recorded in the
+[Development dry-run review](reports/2026-10-02-development-dry-run.md). They found 262,700
+Big-O and 5,479 cap-exceeded entries above current selectable maxima in Development, and no
+Big-O entries in Production. After explicit approval, all 69 Development cap-exceeded algorithm
+groups were cleared. A fresh complete scan found 819 remaining cap-exceeded records and zero
+above current maxima; a fresh Production Big-O scan found zero records. Development Big-O cleanup
+is partly complete: the first 41 algorithm groups were re-queried empty, representing at least
+74,957 original candidates removed. CloudKit repeatedly returned `too-many-requests`, and
+single-group calls began taking many minutes, so the remaining total has not yet been verified.
+Its final full scan is still required. Refresh `.user-token` from the Console when CloudKit
+reports token expiry.
+
+The approved candidate sets can be resumed with `execute_reviewed_cleanup.py`. It checks the
+frozen cache fingerprint, compares each algorithm's current matching record names to the
+approved set, deletes that group, and re-queries until empty. The first run copies each
+reviewed cache to the ignored `.cache/approved/` directory so a later `--refresh` scan cannot
+erase the approved record-name list. It is safe to re-run after a partial deletion or an
+ambiguous `retry-needed` response. The runner defaults to one worker because CloudKit
+throttled parallel deletion.
+
+```sh
+uv run execute_reviewed_cleanup.py --record-type CD_BigORecord --token-file .user-token
+```
+
 ```sh
 uv run cleanup_stale_sizes.py --environment development --record-type CD_BigORecord
 ```
+
+If `cktool` still reports an expired session after `save-token`, pass the fresh CLI user token
+through `--token-file .user-token`. The script passes it directly to each `cktool` invocation
+and redacts it from command diagnostics.
 
 Defaults to a dry run: fetches every record of the given type (first run only — see caching
 below), prints a diff-style summary of what would be deleted (grouped by algorithm, with counts
@@ -70,11 +100,13 @@ safeguard, or after any threshold changes, is rejected. Pass `--refresh` to forc
 the cache as it goes too, so a delete run that dies partway through can also just be re-invoked —
 it'll only retry the stragglers.
 
-Three invocations total, development first (`CD_RecordingCapExceededRecord` doesn't exist in
-production — see above):
+For final verification, refresh the two Development scans and the Production Big-O scan after
+the reviewed cleanup finishes. The `--execute` option on `cleanup_stale_sizes.py` is a slower
+one-record-at-a-time fallback; use the fingerprint-checked runner above for the approved
+Development candidate sets.
 
 ```sh
-uv run cleanup_stale_sizes.py --environment development --record-type CD_BigORecord --execute
-uv run cleanup_stale_sizes.py --environment development --record-type CD_RecordingCapExceededRecord --execute
-uv run cleanup_stale_sizes.py --environment production --record-type CD_BigORecord --execute
+uv run cleanup_stale_sizes.py --environment development --record-type CD_BigORecord --token-file .user-token --refresh
+uv run cleanup_stale_sizes.py --environment development --record-type CD_RecordingCapExceededRecord --token-file .user-token --refresh
+uv run cleanup_stale_sizes.py --environment production --record-type CD_BigORecord --token-file .user-token --refresh
 ```
