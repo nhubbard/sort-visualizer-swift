@@ -103,59 +103,65 @@ struct BigOCorrelationChart: View {
 @ChartContentBuilder
 func bigOChartMarks(for points: [BigOChartPoint]) -> some ChartContent {
   ForEach(points) { point in
-    switch point.kind {
-    case .observedRun:
-      PointMark(
-        x: .value("Array Size", point.size),
-        y: .value("Normalized Work", point.normalizedValue)
-      )
-      .foregroundStyle(by: .value("Series", point.series))
-    case .observedTrend:
-      // Fixed blue, not `by: .value("Series", ...)` like `.reference` below -- this is the one
-      // color in `RainbowStatLegend`'s manual caption, not part of the reference curves' own
-      // auto-generated best/average/worst-case legend. `.symbol(.circle)` doubles this line's own
-      // vertices as the "mean" rainbow point, rather than emitting a separate, redundant mean
-      // point mark at the exact same coordinates.
-      LineMark(
-        x: .value("Array Size", point.size),
-        y: .value("Normalized Work", point.normalizedValue)
-      )
-      .foregroundStyle(.blue)
-      .lineStyle(StrokeStyle())
-      .symbol(.circle)
-    case .reference:
-      LineMark(
-        x: .value("Array Size", point.size),
-        y: .value("Normalized Work", point.normalizedValue)
-      )
-      .foregroundStyle(by: .value("Series", point.series))
-      .lineStyle(StrokeStyle(dash: [4, 4]))
-    case .statMin:
-      PointMark(
-        x: .value("Array Size", point.size),
-        y: .value("Normalized Work", point.normalizedValue)
-      )
-      .foregroundStyle(.green)
-    case .statMax:
-      PointMark(
-        x: .value("Array Size", point.size),
-        y: .value("Normalized Work", point.normalizedValue)
-      )
-      .foregroundStyle(.red)
-    case .statMedian:
-      PointMark(
-        x: .value("Array Size", point.size),
-        y: .value("Normalized Work", point.normalizedValue)
-      )
-      .foregroundStyle(.orange)
-    case .statStdDevBand:
-      PointMark(
-        x: .value("Array Size", point.size),
-        y: .value("Normalized Work", point.normalizedValue)
-      )
-      .symbolSize(30)
-      .foregroundStyle(.purple)
-    }
+    bigOChartMark(for: point)
+  }
+}
+
+/// Isolating each mark keeps the chart builder's type-checking work bounded as cases are added.
+@ChartContentBuilder
+private func bigOChartMark(for point: BigOChartPoint) -> some ChartContent {
+  switch point.kind {
+  case .observedRun:
+    PointMark(
+      x: .value("Array Size", point.size),
+      y: .value("Normalized Work", point.normalizedValue)
+    )
+    .foregroundStyle(by: .value("Series", point.series))
+  case .observedTrend:
+    // Fixed blue, not `by: .value("Series", ...)` like `.reference` below -- this is the one
+    // color in `RainbowStatLegend`'s manual caption, not part of the reference curves' own
+    // auto-generated best/average/worst-case legend. `.symbol(.circle)` doubles this line's own
+    // vertices as the "mean" rainbow point, rather than emitting a separate, redundant mean
+    // point mark at the exact same coordinates.
+    LineMark(
+      x: .value("Array Size", point.size),
+      y: .value("Normalized Work", point.normalizedValue)
+    )
+    .foregroundStyle(.blue)
+    .lineStyle(StrokeStyle())
+    .symbol(.circle)
+  case .reference:
+    LineMark(
+      x: .value("Array Size", point.size),
+      y: .value("Normalized Work", point.normalizedValue)
+    )
+    .foregroundStyle(by: .value("Series", point.series))
+    .lineStyle(StrokeStyle(dash: [4, 4]))
+  case .statMin:
+    PointMark(
+      x: .value("Array Size", point.size),
+      y: .value("Normalized Work", point.normalizedValue)
+    )
+    .foregroundStyle(.green)
+  case .statMax:
+    PointMark(
+      x: .value("Array Size", point.size),
+      y: .value("Normalized Work", point.normalizedValue)
+    )
+    .foregroundStyle(.red)
+  case .statMedian:
+    PointMark(
+      x: .value("Array Size", point.size),
+      y: .value("Normalized Work", point.normalizedValue)
+    )
+    .foregroundStyle(.orange)
+  case .statStdDevBand:
+    PointMark(
+      x: .value("Array Size", point.size),
+      y: .value("Normalized Work", point.normalizedValue)
+    )
+    .symbolSize(30)
+    .foregroundStyle(.purple)
   }
 }
 
@@ -172,7 +178,7 @@ func powerOfTwoAxisValues(in range: ClosedRange<Double>) -> [Int] {
   let lowerExponent = max(0, Int(log2(max(range.lowerBound, 1)).rounded(.down)))
   let upperExponent = Int(log2(range.upperBound).rounded(.up))
   guard lowerExponent <= upperExponent else { return [] }
-  return (lowerExponent...upperExponent).map { 1 << $0 }
+  return (lowerExponent ... upperExponent).map { 1 << $0 }
 }
 
 /// Restricts the rainbow stat points (but not the trend line or reference curves) to sizes that
@@ -183,9 +189,9 @@ func powerOfTwoSizesOnly(_ points: [BigOChartPoint]) -> [BigOChartPoint] {
   points.filter { point in
     switch point.kind {
     case .statMin, .statMax, .statMedian, .statStdDevBand:
-      return point.size > 0 && (point.size & (point.size - 1)) == 0
+      point.size > 0 && (point.size & (point.size - 1)) == 0
     case .observedRun, .observedTrend, .reference:
-      return true
+      true
     }
   }
 }
@@ -195,7 +201,7 @@ func powerOfTwoSizesOnly(_ points: [BigOChartPoint]) -> [BigOChartPoint] {
 /// series-based legend the way the reference curves do, and need this instead.
 struct RainbowStatLegend: View {
   private static let entries: [(label: String, color: Color)] = [
-    ("Max", .red), ("Median", .orange), ("Mean", .blue), ("Min", .green), ("±1σ", .purple)
+    ("Max", .red), ("Median", .orange), ("Mean", .blue), ("Min", .green), ("±1σ", .purple),
   ]
 
   var body: some View {
@@ -226,12 +232,12 @@ func cappedForRendering(_ points: [BigOChartPoint], maxScatterPerSize: Int = 15)
   }
 }
 
-extension View {
+private extension View {
   /// Same Liquid Glass convention as `AlgorithmDetailSection.glassOrMaterialBackground()` — each
   /// site keeps its own `fileprivate` copy rather than sharing one, since a module-wide version
   /// collides with `RunControlBar`'s differently-styled one of the same name.
   @ViewBuilder
-  fileprivate func glassOrMaterialBackground() -> some View {
+  func glassOrMaterialBackground() -> some View {
     if #available(iOS 26.0, *) {
       glassEffect(.regular.interactive(), in: .circle)
     } else {
