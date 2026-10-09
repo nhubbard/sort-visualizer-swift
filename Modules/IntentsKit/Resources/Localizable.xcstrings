@@ -1,0 +1,468 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "%@" : {
+
+    },
+    "Advances Sort Symphony to the next visualizer." : {
+
+    },
+    "Advances Sort Symphony's default shuffle by one step and returns it — chain with Run Sort to cycle through every shuffle over a long run." : {
+
+    },
+    "Advances Sort Symphony's visualizer by one step and returns it — chain with Run Sort to cycle through every visualizer over a long run." : {
+
+    },
+    "Advances the array size of whichever sort is currently open in Sort Symphony." : {
+
+    },
+    "Algorithm" : {
+
+    },
+    "Algorithm Categories" : {
+
+    },
+    "Algorithm Category" : {
+
+    },
+    "Algorithms" : {
+
+    },
+    "All Algorithms" : {
+
+    },
+    "All Categories" : {
+
+    },
+    "Array Size" : {
+
+    },
+    "Array Sizes" : {
+
+    },
+    "Audio" : {
+
+    },
+    "Automation" : {
+
+    },
+    "Automations" : {
+
+    },
+    "Bigger Array" : {
+
+    },
+    "Cancel" : {
+
+    },
+    "Categories" : {
+
+    },
+    "Category" : {
+
+    },
+    "Change Visualizer" : {
+
+    },
+    "Changes how fast Sort Symphony plays back a sort, in operations per second." : {
+
+    },
+    "Changes the default array size Sort Symphony sorts — takes effect on the next run, not one already on screen." : {
+
+    },
+    "Changes the default shuffle Sort Symphony scrambles the array with — takes effect on the next run, not one already on screen." : {
+
+    },
+    "Changes which visualizer Sort Symphony draws sorts with." : {
+
+    },
+    "Concurrent Sorts" : {
+
+    },
+    "Cycle Array Size" : {
+
+    },
+    "Cycle Shuffle" : {
+
+    },
+    "Cycle Visualizer" : {
+
+    },
+    "Default Shuffle" : {
+
+    },
+    "Default Size" : {
+
+    },
+    "Defaults to the app's configured default shuffle." : {
+
+    },
+    "Defaults to the app's configured default size, clamped to the algorithm's own range." : {
+
+    },
+    "Defaults to whichever visualizer is already selected." : {
+
+    },
+    "Demo" : {
+
+    },
+    "Distribution Sorts" : {
+
+    },
+    "Enabled" : {
+
+    },
+    "Every Algorithm" : {
+
+    },
+    "Every Visualizer" : {
+
+    },
+    "Exchange Sorts" : {
+
+    },
+    "Faster" : {
+
+    },
+    "Filters to one category, or leave as All Categories to list every algorithm." : {
+
+    },
+    "Find Algorithms" : {
+
+    },
+    "Find algorithms in ${category}" : {
+
+    },
+    "Find Array Sizes" : {
+
+    },
+    "Find array sizes for ${algorithm}" : {
+
+    },
+    "Find Automations" : {
+
+    },
+    "Find Categories" : {
+
+    },
+    "Find Maximum Array Size" : {
+
+    },
+    "Find maximum array size for ${algorithm}" : {
+
+    },
+    "Find Shuffles" : {
+
+    },
+    "Find Visualizers" : {
+
+    },
+    "Finds the largest array size one algorithm supports." : {
+
+    },
+    "Full Size Sweep" : {
+
+    },
+    "Full Sweep" : {
+
+    },
+    "Get Next Shuffle" : {
+
+    },
+    "Get Next Visualizer" : {
+
+    },
+    "Halt" : {
+
+    },
+    "How many sort operations to play back per second — higher is faster." : {
+
+    },
+    "Hybrid Sorts" : {
+
+    },
+    "Impractical Sorts" : {
+
+    },
+    "Increase Size" : {
+
+    },
+    "Insertion Sorts" : {
+
+    },
+    "Largest Size" : {
+
+    },
+    "List Algorithms" : {
+
+    },
+    "Lists every array size one algorithm supports, the same sizes a Size Sweep automation runs through." : {
+
+    },
+    "Lists every shuffle Sort Symphony ships." : {
+
+    },
+    "Lists every visualizer Sort Symphony ships." : {
+
+    },
+    "Lists Sort Symphony's algorithm categories." : {
+
+    },
+    "Lists Sort Symphony's registered size-sweep automations." : {
+
+    },
+    "Lists Sort Symphony's sorting algorithms, optionally filtered to one category." : {
+
+    },
+    "Max Size" : {
+
+    },
+    "Max Size Only" : {
+
+    },
+    "Maximum Array Size" : {
+
+    },
+    "Maximum Size" : {
+
+    },
+    "Merge Sorts" : {
+
+    },
+    "Miscellaneous Sorts" : {
+
+    },
+    "Mute" : {
+
+    },
+    "Next Shuffle" : {
+
+    },
+    "Next Size" : {
+
+    },
+    "Next Visualizer" : {
+
+    },
+    "No shuffles are currently available." : {
+
+    },
+    "No sort is currently open in Sort Symphony." : {
+
+    },
+    "No visualizers are currently available." : {
+
+    },
+    "Play Sort" : {
+
+    },
+    "Playback Speed" : {
+
+    },
+    "Quick Sorts" : {
+
+    },
+    "Run ${algorithm}" : {
+
+    },
+    "Run ${automation} for ${algorithm}" : {
+
+    },
+    "Run Algorithm" : {
+
+    },
+    "Run Automation" : {
+
+    },
+    "Run Full Size Sweep" : {
+
+    },
+    "Run Showcase" : {
+
+    },
+    "Run Sort" : {
+
+    },
+    "Run Visualizer Showcase" : {
+
+    },
+    "Run visualizer showcase for ${algorithm}" : {
+
+    },
+    "Runs a size sweep (every supported size, three times each) for every algorithm, in alphabetical order." : {
+
+    },
+    "Runs a Sort Symphony automation sweep (like Size Sweep or Max Size Only) for one algorithm and waits for it to finish." : {
+
+    },
+    "Runs every algorithm once, in alphabetical order, at its own maximum size, cycling through every shuffle and visualizer along the way." : {
+
+    },
+    "Runs one algorithm at its maximum size once per visualizer, switching visualizers only between runs." : {
+
+    },
+    "Runs one sorting algorithm in Sort Symphony and waits for the full animated pass to finish." : {
+
+    },
+    "Scramble" : {
+
+    },
+    "Selection Sorts" : {
+
+    },
+    "Set Default Array Size" : {
+
+    },
+    "Set default array size to ${size}" : {
+
+    },
+    "Set Default Shuffle" : {
+
+    },
+    "Set default shuffle to ${shuffle}" : {
+
+    },
+    "Set Playback Speed" : {
+
+    },
+    "Set playback speed to ${speed} operations per second" : {
+
+    },
+    "Set Sound" : {
+
+    },
+    "Set sound ${enabled}" : {
+
+    },
+    "Set Visualizer" : {
+
+    },
+    "Set visualizer to ${visualizer}" : {
+
+    },
+    "Showcase" : {
+
+    },
+    "Shuffle" : {
+
+    },
+    "Shuffles" : {
+
+    },
+    "Size" : {
+
+    },
+    "Size Sweep" : {
+
+    },
+    "Sizes" : {
+
+    },
+    "Slower" : {
+
+    },
+    "Sort" : {
+
+    },
+    "Sort Categories" : {
+
+    },
+    "Sort Symphony" : {
+
+    },
+    "Sorting Algorithm" : {
+
+    },
+    "Sorting Algorithms" : {
+
+    },
+    "Sound" : {
+
+    },
+    "Speed" : {
+
+    },
+    "Speed (ops/sec)" : {
+
+    },
+    "Stop" : {
+
+    },
+    "Stop Sort" : {
+
+    },
+    "Stops whichever run or automation sweep is currently in progress in Sort Symphony." : {
+
+    },
+    "Supported Sizes" : {
+
+    },
+    "That algorithm isn't available anymore." : {
+
+    },
+    "That automation isn't available anymore." : {
+
+    },
+    "That shuffle isn't available anymore." : {
+
+    },
+    "That visualizer isn't available anymore." : {
+
+    },
+    "The algorithm to run the automation on." : {
+
+    },
+    "The algorithm to run, selected exactly as if tapped in the sidebar." : {
+
+    },
+    "The algorithm to showcase, run once per visualizer at its own maximum size." : {
+
+    },
+    "The algorithm whose maximum array size to look up." : {
+
+    },
+    "The algorithm whose supported array sizes to list." : {
+
+    },
+    "The default array size for future runs, clamped to whichever algorithm's own range when a run starts." : {
+
+    },
+    "The default shuffle for future runs." : {
+
+    },
+    "Turns Sort Symphony's sort playback sound on or off." : {
+
+    },
+    "Unmute" : {
+
+    },
+    "Upper Bound" : {
+
+    },
+    "Visualization" : {
+
+    },
+    "Visualizations" : {
+
+    },
+    "Visualizer" : {
+
+    },
+    "Visualizer Showcase" : {
+
+    },
+    "Visualizers" : {
+
+    },
+    "Whether sort playback sound should be on." : {
+
+    },
+    "Which registered automation sweep to run." : {
+
+    },
+    "Which visualizer to draw sorts with." : {
+
+    }
+  },
+  "version" : "1.0"
+}

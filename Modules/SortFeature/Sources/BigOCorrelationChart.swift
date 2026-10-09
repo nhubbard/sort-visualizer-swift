@@ -3,6 +3,7 @@ import Charts
 import PersistenceKit
 import SortEngineKit
 import SwiftUI
+import TipKit
 
 /// `AnalyticsService`-backed data charted against that same algorithm's own best/average/worst-case
 /// curves (`BigOCorrelation.bigOChartPoints`) — the real, observed operation-count growth over
@@ -57,6 +58,8 @@ struct BigOCorrelationChart: View {
         let renderedPoints = compactChartPoints(points)
         let sizeDomain = Double(observedSizes[0])...Double(observedSizes[observedSizes.count - 1])
         VStack(alignment: .leading, spacing: 4) {
+          TipView(RecordedChartDiscoveryTip())
+            .accessibilityIdentifier("sortRecordedChartTip")
           Text(recordedRunSummary(points))
             .font(.caption)
             .foregroundStyle(.secondary)
@@ -65,6 +68,8 @@ struct BigOCorrelationChart: View {
             Spacer()
             Button {
               isShowingDetail = true
+              RecordedChartDiscoveryTip.hasExpandedChart = true
+              RecordedChartDiscoveryTip().invalidate(reason: .actionPerformed)
             } label: {
               Label("Expand Chart", systemImage: "arrow.up.left.and.arrow.down.right")
             }
@@ -161,16 +166,35 @@ struct BigOCorrelationChart: View {
   }
 }
 
+struct RecordedChartDiscoveryTip: Tip {
+  @Parameter static var hasExpandedChart: Bool = false
+
+  var title: Text { Text("Compare your recorded runs") }
+  var message: Text? {
+    Text("Expand Chart to compare sizes and inspect the exact values from completed runs.")
+  }
+  var rules: [Rule] {
+    #Rule(Self.$hasExpandedChart) { $0 == false }
+  }
+  var options: [any Option] {
+    MaxDisplayCount(2)
+    IgnoresDisplayFrequency(true)
+  }
+}
+
 /// A compact takeaway from the full recorded-run dataset, independent of the marks retained for
 /// a legible compact plot. No intermediate-size behavior is inferred from endpoint values.
 func recordedRunSummary(_ points: [BigOChartPoint]) -> String {
   let means = points.filter { $0.kind == .observedTrend }.sorted { $0.size < $1.size }
-  guard let first = means.first, let last = means.last else { return "No recorded trend available." }
+  guard let first = means.first, let last = means.last else {
+    return String(localized: "No recorded trend available.", bundle: .module)
+  }
   let runCount = points.filter { $0.kind == .observedRun }.count
-  return "\(runCount) recorded runs across \(means.count) array sizes "
-    + "(\(first.size)–\(last.size) items). The observed mean normalized work is "
-    + "\(first.normalizedValue.formatted(.number.precision(.fractionLength(3)))) at the smallest "
-    + "size and \(last.normalizedValue.formatted(.number.precision(.fractionLength(3)))) at the largest."
+  let firstValue = first.normalizedValue.formatted(.number.precision(.fractionLength(3)))
+  let lastValue = last.normalizedValue.formatted(.number.precision(.fractionLength(3)))
+  return String(localized:
+    "\(runCount) recorded runs across \(means.count) array sizes (\(first.size)–\(last.size) items). The observed mean normalized work is \(firstValue) at the smallest size and \(lastValue) at the largest.",
+    bundle: .module)
 }
 
 #if DEBUG

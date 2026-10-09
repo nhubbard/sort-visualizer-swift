@@ -1,0 +1,156 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "All" : {
+
+    },
+    "All Algorithms" : {
+
+    },
+    "Categories" : {
+
+    },
+    "Choose another category." : {
+
+    },
+    "Cycle Array Size" : {
+
+    },
+    "Cycle Visualizer" : {
+
+    },
+    "Decrease Duration" : {
+
+    },
+    "Decrease Duration ×10" : {
+
+    },
+    "Decrease Speed" : {
+
+    },
+    "Decrease Speed ×10" : {
+
+    },
+    "Done" : {
+
+    },
+    "Import a previously exported .tape file" : {
+
+    },
+    "Import Failed" : {
+
+    },
+    "Import Tape" : {
+
+    },
+    "Increase Duration" : {
+
+    },
+    "Increase Duration ×10" : {
+
+    },
+    "Increase Speed" : {
+
+    },
+    "Increase Speed ×10" : {
+
+    },
+    "Jump to End" : {
+
+    },
+    "Jump to Start" : {
+
+    },
+    "No Algorithms Available" : {
+
+    },
+    "No Matching Algorithms" : {
+
+    },
+    "OK" : {
+
+    },
+    "Play/Pause" : {
+
+    },
+    "Restart" : {
+
+    },
+    "Resume Full Sweep" : {
+
+    },
+    "Run every algorithm once" : {
+
+    },
+    "Run every algorithm, shuffle, and visualizer" : {
+
+    },
+    "Run Max Size Only" : {
+
+    },
+    "Run Size Sweep" : {
+
+    },
+    "Runs every algorithm against every shuffle and every visualizer — %@ combinations, likely several days. Progress is saved and resumes automatically across launches. Other controls are locked until it finishes or is stopped." : {
+
+    },
+    "Runs every algorithm once, in order, cycling shuffles and visualizers. With Reduce Motion on, Showcase skips Hanoi Towers; you can still choose it in the Visualizer picker. Other controls are locked until it finishes." : {
+
+    },
+    "Search" : {
+
+    },
+    "Settings" : {
+
+    },
+    "Settings…" : {
+
+    },
+    "Sort" : {
+
+    },
+    "Sort By" : {
+
+    },
+    "Sort Symphony v2" : {
+
+    },
+    "Start Full Sweep" : {
+
+    },
+    "Start Showcase" : {
+
+    },
+    "Start Showcase?" : {
+
+    },
+    "Step Backward" : {
+
+    },
+    "Step Forward" : {
+
+    },
+    "Stop" : {
+
+    },
+    "Stop Full Sweep" : {
+
+    },
+    "Stop Showcase" : {
+
+    },
+    "Toggle Sound" : {
+
+    },
+    "Try another name or category." : {
+
+    },
+    "Find an algorithm" : {
+
+    },
+    "Browse categories or search by name, then choose a sort to watch it run." : {
+
+    }
+  },
+  "version" : "1.0"
+}

@@ -16,7 +16,8 @@ let modules: [Target] =
     Module.framework(name: "VisualizationKit", dependencies: [.target(name: "SortEngineKit")]) +
     Module.framework(name: "BuiltInAlgorithms", dependencies: [.target(name: "AlgorithmKit")]) +
     Module.framework(name: "BuiltInVisualizers", dependencies: [.target(name: "VisualizationKit")]) +
-    Module.framework(name: "SettingsKit", dependencies: [.target(name: "VisualizationKit"), .target(name: "AlgorithmKit")]) +
+    Module.framework(name: "SettingsKit", dependencies: [.target(name: "VisualizationKit"), .target(name: "AlgorithmKit")],
+                     resources: [.glob(pattern: "Modules/SettingsKit/Resources/**")]) +
     // ToneKit (see NOTICE.md in each) reimplements just the AudioKit/AudioKitEX/SoundpipeAudioKit
     // subset AudioEngineKit actually needs directly on AVAudioEngine, so AudioEngineKit needs no
     // external audio package at all. Split (see Documentation/docs/architecture/audio.md) into a host-independent DSP
@@ -86,7 +87,7 @@ let modules: [Target] =
     ]) +
     Module.framework(name: "DesignSystemKit", dependencies: [
         .target(name: "SettingsKit"),
-    ]) +
+    ], resources: [.glob(pattern: "Modules/DesignSystemKit/Resources/**")]) +
     Module.framework(name: "MathRenderingKit", dependencies: [
         .external(name: "SwiftMath"), .target(name: "AlgorithmKit"),
     ]) +
@@ -106,23 +107,24 @@ let modules: [Target] =
             .target(name: "SortAudioCore"),
             .external(name: "MarkdownUI"),
         ],
+        resources: [.glob(pattern: "Modules/SortFeature/Resources/**")],
         testResources: [.glob(pattern: "App/Resources/AlgorithmDetails/AlgorithmDetails.algz")],
         testDependencies: [.target(name: "ZstdKit")]
     ) +
     Module.framework(name: "SettingsFeature", dependencies: [
         .target(name: "SettingsKit"), .target(name: "VisualizationKit"), .target(name: "AlgorithmKit"),
         .target(name: "AudioEngineKit"), .target(name: "DesignSystemKit"),
-    ]) +
+    ], resources: [.glob(pattern: "Modules/SettingsFeature/Resources/**")]) +
     Module.framework(name: "HomeFeature", dependencies: [
         .target(name: "DesignSystemKit"), .external(name: "MarkdownUI"),
-    ]) +
+    ], resources: [.glob(pattern: "Modules/HomeFeature/Resources/**")]) +
     // App Intents surface: entities/queries wrapping AlgorithmRegistry/VisualizerRegistry/
     // ShuffleRegistry/AutomationRegistry, a SortCoordinator bridging intents into the live
     // SwiftUI selection/session state, and the intents/AppShortcutsProvider themselves.
     Module.framework(name: "IntentsKit", dependencies: [
         .target(name: "AlgorithmKit"), .target(name: "VisualizationKit"),
         .target(name: "SortFeature"), .target(name: "SettingsKit"),
-    ])
+    ], resources: [.glob(pattern: "Modules/IntentsKit/Resources/**")])
 
 let app = Target.target(
     // Not "Sort Symphony" (with the space `productName` below deliberately avoids): Xcode's
@@ -258,6 +260,8 @@ let app = Target.target(
         "CODE_SIGN_IDENTITY[sdk=macosx*]": "Apple Development",
         "ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS": "YES",
         "ENABLE_USER_SCRIPT_SANDBOXING": "YES",
+        "SWIFT_EMIT_LOC_STRINGS": "YES",
+        "LOCALIZATION_PREFERS_STRING_CATALOGS": "YES",
         "STRING_CATALOG_GENERATE_SYMBOLS": "YES",
     ])
 )

@@ -1,0 +1,536 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    " Their average separation across selectable sizes is %@%% of the normalized work scale; this is an approximation." : {
+
+    },
+    "%@ (%@)" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ (%2$@)"
+          }
+        }
+      }
+    },
+    "%@ implementation, %lld lines. Copy Code or choose Read Full Code to inspect the source." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ implementation, %2$lld lines. Copy Code or choose Read Full Code to inspect the source."
+          }
+        }
+      }
+    },
+    "%@ running" : {
+
+    },
+    "%@ source" : {
+
+    },
+    "%@: %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@: %2$@"
+          }
+        }
+      }
+    },
+    "%lld" : {
+
+    },
+    "%lld items" : {
+
+    },
+    "%lld operations per second" : {
+
+    },
+    "%lld ops per second" : {
+
+    },
+    "%lld recorded runs across %lld array sizes (%lld–%lld items). The observed mean normalized work is %@ at the smallest size and %@ at the largest." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lld recorded runs across %2$lld array sizes (%3$lld–%4$lld items). The observed mean normalized work is %5$@ at the smallest size and %6$@ at the largest."
+          }
+        }
+      }
+    },
+    "%lld seconds" : {
+
+    },
+    "%lld/s" : {
+
+    },
+    "%llds" : {
+
+    },
+    "1s" : {
+
+    },
+    "120s" : {
+
+    },
+    "A measured growth model is not available for this algorithm yet." : {
+
+    },
+    "Array Size" : {
+
+    },
+    "Array Size %lld" : {
+
+    },
+    "Array Size changes the number of items in a new run. Visualizer changes how the current run is drawn." : {
+
+    },
+    "Array Size sets the next run's item count. Visualizer changes the drawing of this run." : {
+
+    },
+    "Automations" : {
+
+    },
+    "Average & Worst Case" : {
+
+    },
+    "Average Case" : {
+
+    },
+    "Best & Average & Worst Case" : {
+
+    },
+    "Best & Average Case" : {
+
+    },
+    "Best & Worst Case" : {
+
+    },
+    "Best Case" : {
+
+    },
+    "Big-O Correlation" : {
+
+    },
+    "Change the view" : {
+
+    },
+    "Color and Appearance" : {
+
+    },
+    "Color Circle and Pixel Mesh encode values by hue alone. For a view where height or position also shows each value, choose Bar Graph, Rainbow, or Scatter Plot. The first and second active-position markers use color in marker-aware views." : {
+
+    },
+    "Complexity" : {
+
+    },
+    "Copy Code" : {
+
+    },
+    "Description" : {
+
+    },
+    "Details hidden during automation" : {
+
+    },
+    "Done" : {
+
+    },
+    "Expand Chart" : {
+
+    },
+    "Explore one step at a time" : {
+
+    },
+    "Export Tape" : {
+
+    },
+    "Export this run's recorded tape as a .tape file" : {
+
+    },
+    "Failed" : {
+
+    },
+    "Fast" : {
+
+    },
+    "Growth Model" : {
+
+    },
+    "Growth model comparison" : {
+
+    },
+    "Hide Full Code" : {
+
+    },
+    "Horizontal axis: array size from %lld to %lld items. Vertical axis: predicted operations on a shared scale set at %lld items, without units. Across selectable sizes %lld to %lld, Detected (solid line) changes from %@ to %@; Fitted (Used by App, dashed line) changes from %@ to %@. The dotted line marks the maximum selectable size, %lld items." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Horizontal axis: array size from %1$lld to %2$lld items. Vertical axis: predicted operations on a shared scale set at %3$lld items, without units. Across selectable sizes %4$lld to %5$lld, Detected (solid line) changes from %6$@ to %7$@; Fitted (Used by App, dashed line) changes from %8$@ to %9$@. The dotted line marks the maximum selectable size, %10$lld items."
+          }
+        }
+      }
+    },
+    "How to Use" : {
+
+    },
+    "Idle" : {
+
+    },
+    "Implementations" : {
+
+    },
+    "In marker-aware views, coral marks the first active array position and blue marks the second. These positions can be compared or swapped; the colors do not name the operation. Rainbow colors items by value and does not show marker highlights. Pause and step to inspect an operation." : {
+
+    },
+    "Individual runs (asterisks)" : {
+
+    },
+    "Jump to End" : {
+
+    },
+    "Jump to Start" : {
+
+    },
+    "Jump to the fully sorted end of the recording (⌘⌥→)" : {
+
+    },
+    "Jump to the very beginning of the recording, before shuffling (⌘⌥←)" : {
+
+    },
+    "Language" : {
+
+    },
+    "Learn More" : {
+
+    },
+    "Loading code examples…" : {
+
+    },
+    "Loading description…" : {
+
+    },
+    "Mean ±1 standard deviation: %@–%@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Mean ±1 standard deviation: %1$@–%2$@"
+          }
+        }
+      }
+    },
+    "Mute" : {
+
+    },
+    "n=%lld" : {
+
+    },
+    "Next" : {
+
+    },
+    "Next Recorded Size" : {
+
+    },
+    "Next recorded size (N or ⌘⌥N)" : {
+
+    },
+    "No code samples available yet." : {
+
+    },
+    "No description available yet." : {
+
+    },
+    "No recorded trend available." : {
+
+    },
+    "Normalized Work" : {
+
+    },
+    "Not Enough Recorded Runs Yet" : {
+
+    },
+    "Observed" : {
+
+    },
+    "Observed maximum: %@" : {
+
+    },
+    "Observed mean" : {
+
+    },
+    "Observed median: %@" : {
+
+    },
+    "Observed minimum: %@" : {
+
+    },
+    "Operation %lld of %lld" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Operation %1$lld of %2$lld"
+          }
+        }
+      }
+    },
+    "Operation Cap Cutoff" : {
+
+    },
+    "Pause" : {
+
+    },
+    "Pause playback (Space)" : {
+
+    },
+    "Pause playback and use the step controls to hear individual operations" : {
+
+    },
+    "Pause playback, then use Step Forward or Step Back to hear and inspect an operation." : {
+
+    },
+    "Play" : {
+
+    },
+    "Playback" : {
+
+    },
+    "Playback position" : {
+
+    },
+    "Playback speed" : {
+
+    },
+    "Playback Speed" : {
+
+    },
+    "Point symbols" : {
+
+    },
+    "Predicted Work" : {
+
+    },
+    "Predicted Work (Normalized)" : {
+
+    },
+    "Presentation" : {
+
+    },
+    "Previous" : {
+
+    },
+    "Previous Recorded Size" : {
+
+    },
+    "Previous recorded size (P or ⌘⌥P)" : {
+
+    },
+    "Read Full Code" : {
+
+    },
+    "Ready" : {
+
+    },
+    "Recorded runs chart" : {
+
+    },
+    "Recorded Runs Unavailable" : {
+
+    },
+    "Recorded work" : {
+
+    },
+    "Recording…" : {
+
+    },
+    "Reduce Motion is on. Automatic playback is limited to 15 operations per second; manual steps are unchanged. A target-duration run may take longer." : {
+
+    },
+    "Reference content unavailable" : {
+
+    },
+    "Reset and Reshuffle" : {
+
+    },
+    "Resume playback (Space)" : {
+
+    },
+    "Run a size-sweep or max-size automation" : {
+
+    },
+    "Scroll below the visualization for the algorithm explanation, growth charts, and code examples." : {
+
+    },
+    "Scroll for details" : {
+
+    },
+    "Select a size on the chart to see exact values" : {
+
+    },
+    "Select Text" : {
+
+    },
+    "Selected" : {
+
+    },
+    "Series" : {
+
+    },
+    "Show Individual Runs" : {
+
+    },
+    "Show on chart" : {
+
+    },
+    "Show or hide the array size picker (⌘S cycles to the next size)" : {
+
+    },
+    "Show or hide the playback speed slider (⌘⇧+/− by 1, ⌘⌥+/− by 10)" : {
+
+    },
+    "Show or hide the target duration slider" : {
+
+    },
+    "Show or hide the visualizer picker (⌘⇧V cycles to the next visualizer)" : {
+
+    },
+    "Size" : {
+
+    },
+    "Slow" : {
+
+    },
+    "Sort Skipped" : {
+
+    },
+    "Sort verification failed" : {
+
+    },
+    "Sorted ✓" : {
+
+    },
+    "Sorting…" : {
+
+    },
+    "Statistics: %lld compares, %lld swaps" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Statistics: %1$lld compares, %2$lld swaps"
+          }
+        }
+      }
+    },
+    "Step Back" : {
+
+    },
+    "Step back one operation (⌥←)" : {
+
+    },
+    "Step Forward" : {
+
+    },
+    "Step forward one operation (⌥→)" : {
+
+    },
+    "Stop the current sort, shuffle a fresh array at this size, and sort it again (⌘R)" : {
+
+    },
+    "Switch curves on or off to compare them." : {
+
+    },
+    "Target duration" : {
+
+    },
+    "Target Duration" : {
+
+    },
+    "target: %lld ops/sec" : {
+
+    },
+    "target: %llds" : {
+
+    },
+    "The bundled algorithm details could not be loaded. Reinstall the app to restore descriptions and code examples." : {
+
+    },
+    "The saved runs could not be loaded. Try opening this algorithm again." : {
+
+    },
+    "Turn off sort sound effects (⌥⌘A)" : {
+
+    },
+    "Turn on sort sound effects (⌥⌘A)" : {
+
+    },
+    "Unmute" : {
+
+    },
+    "Use Play to watch the recording. Pause and use Step Forward or Step Back to inspect one operation at a time." : {
+
+    },
+    "Visualization Markers" : {
+
+    },
+    "Visualizer" : {
+
+    },
+    "With Reduce Motion on, Showcase skips Hanoi Towers because its blocks travel between towers. You can still choose Hanoi Towers from the Visualizer picker." : {
+
+    },
+    "Worst Case" : {
+
+    },
+    "Revisit any operation" : {
+
+    },
+    "Drag Playback Position or use the jump buttons to review the recording at your own pace." : {
+
+    },
+    "Explore the implementation" : {
+
+    },
+    "Choose a language, then read or copy the reference code below the explanation." : {
+
+    },
+    "Compare your recorded runs" : {
+
+    },
+    "Expand Chart to compare sizes and inspect the exact values from completed runs." : {
+
+    },
+    "Find an Algorithm" : {
+
+    },
+    "Browse the catalog by category or search for a name. Choose an algorithm to start a run." : {
+
+    },
+    "Drag Playback Position to revisit any operation. The jump buttons go to the beginning or the sorted end." : {
+
+    },
+    "Playback Speed changes the current run. Settings controls the defaults used when you open another sort." : {
+
+    },
+    "Complete the same algorithm at different sizes to unlock its recorded-runs chart. Expand the chart to inspect exact values." : {
+
+    },
+    "Choose a language, then use Read Full Code or Copy Code to explore its reference implementation." : {
+
+    },
+    "Save and Reopen" : {
+
+    },
+    "Export Tape saves the current recording. Import Tape opens a previously saved recording from the toolbar." : {
+
+    }
+  },
+  "version" : "1.0"
+}

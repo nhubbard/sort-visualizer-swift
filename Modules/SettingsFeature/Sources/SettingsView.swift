@@ -2,6 +2,7 @@ import AlgorithmKit
 import AudioEngineKit
 import SettingsKit
 import SwiftUI
+import TipKit
 import VisualizationKit
 
 public struct SettingsView: View {
@@ -14,6 +15,8 @@ public struct SettingsView: View {
   public var body: some View {
     @Bindable var settings = settings
     Form {
+      TipView(SettingsDiscoveryTip())
+        .accessibilityIdentifier("settingsDiscoveryTip")
       #if DEBUG
         if ProcessInfo.processInfo.environment["UI_TEST_SETTINGS_AUDIT"] == "1" {
           Text("Settings audit probe")
@@ -183,6 +186,15 @@ public struct SettingsView: View {
       }
     }
     .navigationTitle("Settings")
+    .onChange(of: settings.useFixedDurationPacing) { _, _ in completeSettingsTip() }
+    .onChange(of: settings.playbackSpeed) { _, _ in completeSettingsTip() }
+    .onChange(of: settings.targetPlaybackDuration) { _, _ in completeSettingsTip() }
+    .onChange(of: settings.selectedVisualizerID) { _, _ in completeSettingsTip() }
+    .onChange(of: settings.defaultShuffleID) { _, _ in completeSettingsTip() }
+    .onChange(of: settings.defaultArraySize) { _, _ in completeSettingsTip() }
+    .onChange(of: settings.soundEnabled) { _, _ in completeSettingsTip() }
+    .onChange(of: settings.recordingOperationCap) { _, _ in completeSettingsTip() }
+    .onChange(of: settings.codeTheme) { _, _ in completeSettingsTip() }
     .confirmationDialog(
       "Reset all settings to their defaults?", isPresented: $isShowingResetConfirmation,
       titleVisibility: .visible
@@ -192,6 +204,27 @@ public struct SettingsView: View {
       }
       .accessibilityIdentifier("resetSettingsConfirmButton")
     }
+  }
+
+  private func completeSettingsTip() {
+    SettingsDiscoveryTip.hasChangedDefaults = true
+    SettingsDiscoveryTip().invalidate(reason: .actionPerformed)
+  }
+}
+
+struct SettingsDiscoveryTip: Tip {
+  @Parameter static var hasChangedDefaults: Bool = false
+
+  var title: Text { Text("Set defaults for future sorts") }
+  var message: Text? {
+    Text("Choose a visualizer, shuffle, size, and playback pace here. The sort controls change the current run.")
+  }
+  var rules: [Rule] {
+    #Rule(Self.$hasChangedDefaults) { $0 == false }
+  }
+  var options: [any Option] {
+    MaxDisplayCount(2)
+    IgnoresDisplayFrequency(true)
   }
 }
 
@@ -203,9 +236,9 @@ func recordingCapEstimateText(
   playbackSpeed: Double
 ) -> String {
   if useFixedDurationPacing {
-    return "≈ \(Int(targetPlaybackDuration))s per run at the fixed-duration target"
+    return String(localized: "≈ \(Int(targetPlaybackDuration))s per run at the fixed-duration target", bundle: .module)
   }
   let minutes = Double(recordingOperationCap) / playbackSpeed / 60
-  return "≈ " + minutes.formatted(.number.precision(.fractionLength(1)))
-    + " min at the current playback speed"
+  let formattedMinutes = minutes.formatted(.number.precision(.fractionLength(1)))
+  return String(localized: "≈ \(formattedMinutes) min at the current playback speed", bundle: .module)
 }

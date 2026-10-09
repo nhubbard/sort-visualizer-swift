@@ -1,6 +1,6 @@
 # Sort Symphony: focused next steps
 
-Updated 2026-10-06. This list reflects the discussion after completing the native algorithm catalog and raising functional test coverage. The estimates describe engineering effort and review scope, not elapsed calendar time or a delivery commitment. They exclude waiting for other people or for a system reboot. Findings can change the implementation portion of an audit estimate.
+Updated 2026-10-08. This list reflects the discussion after completing the native algorithm catalog and raising functional test coverage. The estimates describe engineering effort and review scope, not elapsed calendar time or a delivery commitment. They exclude waiting for other people or for a system reboot. Findings can change the implementation portion of an audit estimate.
 
 ## 1. Accessibility and Apple design-guidelines audit
 
@@ -22,6 +22,8 @@ Updated 2026-10-06. This list reflects the discussion after completing the nativ
 
 ## 2. Refresh performance profiling, then use short InstrumentsKit traces
 
+**Status:** Deferred at the owner's direction. Current performance is sufficient for this roadmap pass.
+
 **Why:** Recent product and test changes justify a fresh representative trace. A broad trace can identify hot spots; the existing debug-only InstrumentsKit prototype can then capture very short, fast-to-analyze intervals. Avoid returning to hours of large trace analysis for every hypothesis.
 
 **Scope:** capture a repeatable run that includes recording, playback, scrubbing, switching visualizers, and a large practical array. Compare main-thread and rendering behavior with earlier findings. After the user reboots into the permissive mode, use targeted micro-traces around identified hot spots; add signposts or a focused trigger only where the trace cannot isolate an interval. Verify each optimization with the same workload and a visual/playback sanity check. Keep InstrumentsKit isolated from ordinary app builds.
@@ -39,6 +41,8 @@ Updated 2026-10-06. This list reflects the discussion after completing the nativ
 **Estimate:** content and eligibility design 4–8 hours; integration 1–2 days; accessibility, state, and UI verification 1 day; polish after the design audit as needed.
 
 **Done when:** tips appear only in their intended contexts, can be dismissed, do not obscure the task, and remain understandable without seeing the tip.
+
+**Current progress:** Implemented across catalog discovery, playback, presentation, seeking, reference code, recorded charts, and Settings. The persistent How to Use sheet covers the same journeys. Focused iPad UI tests pass; see [the onboarding record](Documentation/docs/guides/tipkit-onboarding-2026-10-08.md).
 
 ## 4. Interactive teaching graph (original teaching-mode roadmap item)
 
@@ -72,7 +76,7 @@ Updated 2026-10-06. This list reflects the discussion after completing the nativ
 
 ## Suggested order
 
-Start the combined accessibility/design audit now. Refresh performance measurements next, using InstrumentsKit micro-traces after the permissive-mode reboot. Prototype the teaching graph and image chunks before committing to broad content or UI changes. Let the audit shape TipKit. Treat live recording as an independent sharing feature.
+The accessibility/design audit is nearing completion, and contextual onboarding is implemented. Performance profiling is deferred. Prototype the teaching graph and image chunks before committing to broad content or UI changes. Treat live recording as an independent sharing feature.
 
 ## References
 
