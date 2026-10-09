@@ -135,9 +135,7 @@ public struct SettingsView: View {
           )
         }
       }
-      if settings.selectedVisualizerID.rawValue != "customimage" {
-        arraySizeSection
-      }
+      arraySizeSection
       Section {
         Stepper(
           "Max Operations: \(settings.recordingOperationCap)",
@@ -204,20 +202,12 @@ public struct SettingsView: View {
   }
 
   private var customImageSection: some View {
-    @Bindable var settings = settings
     return Section {
       CustomImagePickerControls()
-      Stepper(
-        "Default Tiles: \(settings.defaultArraySize)",
-        value: $settings.defaultArraySize,
-        in: 16...256,
-        step: 16
-      )
-      .accessibilityIdentifier("defaultArraySizeStepper")
     } header: {
       Text("Custom Image")
     } footer: {
-      Text("Tile count follows array size. This default applies to newly opened sorts; change tiles during a run from its visualizer controls.")
+      Text("The number of moving image tiles follows the array size.")
     }
   }
 

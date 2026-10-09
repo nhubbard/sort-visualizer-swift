@@ -35,7 +35,9 @@ final class CustomImageVisualizerUITests: XCTestCase {
                          settingsPicker.frame.maxY)
     XCTAssertGreaterThan(app.buttons["customImageChooseFile"].frame.minY,
                          app.buttons["customImageChoosePhoto"].frame.minY)
-    XCTAssertTrue(app.steppers["defaultArraySizeStepper"].exists)
+    let defaultSize = app.steppers["defaultArraySizeStepper"]
+    for _ in 0..<5 where !defaultSize.exists { app.scrollSettingsUpForUITest() }
+    XCTAssertTrue(defaultSize.exists)
     app.activateControlForUITest(app.buttons["Done"])
 
     let canvas = app.descendants(matching: .any)
@@ -45,18 +47,22 @@ final class CustomImageVisualizerUITests: XCTestCase {
     app.activateControlForUITest(app.buttons["runControlVisualizerButton"])
     let runPicker = app.descendants(matching: .any)
       .matching(identifier: "runControlVisualizerPicker").firstMatch
-    let tilePicker = app.descendants(matching: .any)
-      .matching(identifier: "customImageTileCountPicker").firstMatch
     XCTAssertTrue(app.buttons["customImageChoosePhoto"].waitForExistence(timeout: 5))
     XCTAssertTrue(app.buttons["customImageChooseFile"].exists)
-    XCTAssertTrue(tilePicker.exists)
-    XCTAssertGreaterThan(tilePicker.frame.minX, runPicker.frame.minX)
-    XCTAssertLessThan(abs(tilePicker.frame.midY - runPicker.frame.midY), 24)
+    XCTAssertFalse(app.descendants(matching: .any)
+      .matching(identifier: "customImageTileCountPicker").firstMatch.exists)
     XCTAssertGreaterThan(app.buttons["customImageChoosePhoto"].frame.minX,
-                         tilePicker.frame.minX)
-    app.activateControlForUITest(tilePicker)
-    let thirtyTwo = app.descendants(matching: .any)
-      .matching(NSPredicate(format: "label == %@", "32")).firstMatch
+                         runPicker.frame.minX)
+    XCTAssertLessThan(abs(app.buttons["customImageChoosePhoto"].frame.midY
+      - runPicker.frame.midY), 24)
+    let rowStart = app.staticTexts["runControlVisualizerLabel"].frame.minX
+    let rowEnd = app.staticTexts["customImageSourceStatus"].frame.maxX
+    let barCenter = app.scrollViews["runControlVisualizerRowScroll"].frame.midX
+    XCTAssertLessThan(abs((rowStart + rowEnd) / 2 - barCenter), 24,
+                      "Expanded visualizer controls should be centered in the bar")
+    let sizeButton = app.buttons["runControlSizeButton"]
+    app.activateControlForUITest(sizeButton)
+    let thirtyTwo = app.buttons["runControlSizeChip-32"]
     XCTAssertTrue(thirtyTwo.waitForExistence(timeout: 5))
     app.activateControlForUITest(thirtyTwo)
     let resized = XCTNSPredicateExpectation(

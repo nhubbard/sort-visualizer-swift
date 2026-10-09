@@ -180,44 +180,31 @@ struct RunControlBar: View {
   /// `⌘⇧V`/`AppSettings.cycleVisualizer()` already changes, not a second mechanism.
   private var visualizerRow: some View {
     @Bindable var settings = settings
-    let effectiveSizeRange = algorithm.metadata.effectiveSizeRange(
-      operationCap: settings.recordingOperationCap)
-    let sizes = Array(Set(effectiveSizeRange.steppedValues(
-      by: effectiveSizeRange.steppedSizeStep) + [session.arraySize])).sorted()
-    return ScrollView(.horizontal, showsIndicators: false) {
-      HStack(spacing: 12) {
-        Text("Visualizer")
-          .font(.caption)
-          .foregroundStyle(.secondary)
-        Picker("Visualizer", selection: $settings.selectedVisualizerID) {
-          ForEach(VisualizerRegistry.shared.visualizers, id: \.id) { visualizer in
-            Text(visualizer.metadata.displayName).tag(visualizer.id)
-          }
-        }
-        .pickerStyle(.menu)
-        .labelsHidden()
-        .accessibilityIdentifier("runControlVisualizerPicker")
-        if settings.selectedVisualizerID.rawValue == "customimage" {
-          Text("Tiles")
+    return GeometryReader { geometry in
+      ScrollView(.horizontal, showsIndicators: false) {
+        HStack(spacing: 12) {
+          Text("Visualizer")
             .font(.caption)
             .foregroundStyle(.secondary)
-          Picker("Tiles", selection: Binding(
-            get: { session.arraySize },
-            set: { newSize in Task { await session.start(size: newSize) } }
-          )) {
-            ForEach(sizes, id: \.self) { size in
-              Text("\(size)").tag(size)
+            .accessibilityIdentifier("runControlVisualizerLabel")
+          Picker("Visualizer", selection: $settings.selectedVisualizerID) {
+            ForEach(VisualizerRegistry.shared.visualizers, id: \.id) { visualizer in
+              Text(visualizer.metadata.displayName).tag(visualizer.id)
             }
           }
           .pickerStyle(.menu)
           .labelsHidden()
-          .accessibilityLabel("Moving image tiles")
-          .accessibilityValue("\(session.arraySize) tiles")
-          .accessibilityIdentifier("customImageTileCountPicker")
-          CustomImagePickerControls(presentation: .inline)
+          .accessibilityIdentifier("runControlVisualizerPicker")
+          if settings.selectedVisualizerID.rawValue == "customimage" {
+            CustomImagePickerControls(presentation: .inline)
+          }
         }
+        .fixedSize(horizontal: true, vertical: false)
+        .frame(minWidth: geometry.size.width, alignment: .center)
       }
+      .accessibilityIdentifier("runControlVisualizerRowScroll")
     }
+    .frame(height: 44)
   }
 
 }
