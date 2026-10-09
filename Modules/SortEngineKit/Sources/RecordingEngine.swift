@@ -328,12 +328,33 @@ public struct RecordingEngine: Sendable {
   /// `reversalCount`, a distinct ArrayV stat (an operation, not an element-move count). Pancake-
   /// family algorithms (`PancakeSort`/`BurntPancakeSort`) use this instead of a manual swap loop.
   public mutating func reversal(_ start: Int, _ end: Int) {
+    reverse(start, end, teaching: nil)
+  }
+
+  /// Gives every swap in a reversal its algorithm-specific reason without adding tape operations.
+  public mutating func teachingReversal(
+    _ start: Int, _ end: Int, stageID: String, explanation: String
+  ) {
+    reverse(start, end, teaching: (stageID, explanation))
+  }
+
+  private mutating func reverse(
+    _ start: Int, _ end: Int, teaching: (stageID: String, explanation: String)?
+  ) {
     appendOp(.reversal)
     reversalCount += 1
     var low = start
     var high = end
     while low < high {
       swap(low, high)
+      if let teaching, shouldAnnotateCurrentOperation {
+        annotateLastOperation(
+          stageID: teaching.stageID, outcome: "reverse",
+          roles: ["left": .arrayIndex(low), "right": .arrayIndex(high),
+            "range": .range(start..<(end + 1))],
+          explanationKey: teaching.stageID,
+          explanation: "\(teaching.explanation) Swap positions \(low + 1) and \(high + 1).")
+      }
       low += 1
       high -= 1
     }
