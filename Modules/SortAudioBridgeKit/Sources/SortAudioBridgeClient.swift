@@ -23,6 +23,7 @@ public final class SortAudioBridgeClient: @unchecked Sendable {
   private let sink: any SortAudioEventSink
   private var connection: NWConnection?
   private var isStopped = false
+  private var retryScheduled = false
   private static let reconnectInterval: TimeInterval = 1.0
 
   public init(socketPath: String, sink: any SortAudioEventSink) {
@@ -68,10 +69,14 @@ public final class SortAudioBridgeClient: @unchecked Sendable {
 
     connection.stateUpdateHandler = { [weak self] state in
       guard let self else { return }
+      guard self.connection === connection else { return }
       switch state {
       case .ready:
         logger.info("connected to bridge server")
         receiveNext(on: connection)
+      case .waiting(let error):
+        logger.notice("connection waiting: \(String(describing: error), privacy: .public) — retrying in \(Self.reconnectInterval, privacy: .public)s")
+        scheduleReconnect()
       case .failed(let error):
         logger.notice("connection attempt failed: \(String(describing: error), privacy: .public) — retrying in \(Self.reconnectInterval, privacy: .public)s")
         scheduleReconnect()
@@ -85,8 +90,12 @@ public final class SortAudioBridgeClient: @unchecked Sendable {
   }
 
   private func scheduleReconnect() {
-    guard !isStopped else { return }
+    guard !isStopped, !retryScheduled else { return }
+    retryScheduled = true
+    connection?.cancel()
+    connection = nil
     queue.asyncAfter(deadline: .now() + Self.reconnectInterval) { [weak self] in
+      self?.retryScheduled = false
       self?.connect()
     }
   }

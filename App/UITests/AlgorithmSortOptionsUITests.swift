@@ -47,7 +47,7 @@ final class AlgorithmSortOptionsUITests: XCTestCase {
 
 @MainActor
 final class FullSweepConfirmationUITests: XCTestCase {
-  func testFullSweepDoesNotStartBeforeConfirmation() {
+  func testFullSweepCancelAndConfirmGateTheRun() {
     continueAfterFailure = false
     useLandscapeOrientationForUITest()
     let app = XCUIApplication()
@@ -69,5 +69,35 @@ final class FullSweepConfirmationUITests: XCTestCase {
       XCTAssertTrue(confirmation.waitForExistence(timeout: 5))
     #endif
     XCTAssertFalse(app.staticTexts["fullSweepProgressLabel"].exists)
+
+    app.typeKey(.escape, modifierFlags: [])
+    XCTAssertFalse(app.staticTexts["fullSweepProgressLabel"].exists)
+
+    app.terminate()
+    app.launch()
+    XCTAssertFalse(app.staticTexts["fullSweepProgressLabel"].exists)
+    #if targetEnvironment(macCatalyst)
+      let confirmTrigger = app.buttons["Checklist with checkmarks"]
+    #else
+      let confirmTrigger = app.buttons["fullSweepButton"]
+    #endif
+    XCTAssertTrue(confirmTrigger.waitForExistence(timeout: 5))
+    app.activateControlForUITest(confirmTrigger)
+    #if targetEnvironment(macCatalyst)
+      // The native sheet is outside XCTest's app button tree and initially focuses Cancel.
+      // Tab moves focus to Start/Resume Full Sweep; Space activates that focused action.
+      app.typeKey(.tab, modifierFlags: [])
+      app.typeKey(.space, modifierFlags: [])
+    #else
+      let confirm = app.buttons.matching(identifier: "fullSweepConfirmButton").firstMatch
+      XCTAssertTrue(confirm.waitForExistence(timeout: 5))
+      confirm.tap()
+    #endif
+    let progress = app.staticTexts["fullSweepProgressLabel"]
+    XCTAssertTrue(progress.waitForExistence(timeout: 10), "confirming should start the sweep")
+    let stop = app.buttons["fullSweepStopButton"]
+    XCTAssertTrue(stop.waitForExistence(timeout: 5))
+    app.activateControlForUITest(stop)
+    app.terminate()
   }
 }
