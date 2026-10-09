@@ -72,12 +72,12 @@ struct NativeAlgorithmCorrectnessTests {
     BinaryQuickSortIterative(), BinaryQuickSortRecursive(), BingoSort(), BinomialHeapSort(), BinomialSmoothSort(),
     BitonicSortIterative(), BitonicSortRecursive(), BlockInsertionSort(), BlockSwapMergeSort(), BogoBogoSort(),
     BogoSort(), BoseNelsonSortIterative(), BoseNelsonSortRecursive(), BottomUpHeapSort(), BottomUpMergeSort(),
-    BozoSort(), BubbleBogoSort(), BubbleSort(), BufferedStoogeSort(), BurntPancakeSort(), CircleSortIterative(),
+    BozoSort(), BubbleBogoSort(), BubbleSort(), BufferedStoogeSort(), BufferPartitionMergeSort(), BurntPancakeSort(), CircleSortIterative(),
     CircleSortRecursive(), CircloidSort(), CircularGrailSort(), ClassicGravitySort(), ClassicThreeSmoothCombSort(),
     ClassicTournamentSort(),
     ClassicTreeSort(), CocktailBogoSort(), CocktailMergeSort(), CocktailShakerSort(), CombSort(), CompleteGraphSort(),
     CountingSort(), CreaseSort(), CycleSort(), DeterministicBogoSort(), DiamondSortIterative(), DiamondSortRecursive(),
-    DoubleInsertionSort(), DoubleSelectionSort(), DropMergeSort(), DualPivotQuickSort(), ExchangeBogoSort(),
+    DoubleInsertionSort(), DoubleSelectionSort(), DropMergeSort(), DualPivotQuickSort(), ExchangeBogoSort(), FifthMergeSort(),
     FlashSort(), FlippedMinHeapSort(), FlanSort(), FluxSort(), FoldSort(), ForcedStableQuickSort(), FunSort(), GnomeSort(),
     GrailSort(), GravitySort(), GuessSort(), HanoiSort(), HybridCombSort(), ImprovedBlockSelectionSort(),
     ImprovedInPlaceMergeSort(), InPlaceLSDRadixSort(), InPlaceMergeSort(), InsertionSort(), IntroCircleSortIterative(),
@@ -135,6 +135,113 @@ struct NativeAlgorithmCorrectnessTests {
         #expect(engine.values == input.sorted(), "Median Merge failed duplicate-heavy fuzz at size \(size)")
       }
     }
+  }
+
+  @Test
+  func fifthMergeSortHandlesFifthAndPingPongBoundaries() {
+    let sort = FifthMergeSort()
+    let sizes = [0, 1, 2, 4, 5, 6, 7, 8, 9, 15, 16, 17, 31, 32, 39, 40, 41, 63, 64, 65, 127, 128, 129, 255, 256, 257, 511]
+    for size in sizes {
+      var state = UInt64(size * 7_919 + 1)
+      let random = (0..<size).map { _ in
+        state = state &* 6_364_136_223_846_793_005 &+ 1_442_695_040_888_963_407
+        return Int(state % 31) - 15
+      }
+      let inputs = [
+        random,
+        Array(repeating: 3, count: size),
+        Array(0..<size),
+        Array((0..<size).reversed()),
+        (0..<size).map { ($0 * 17) % 7 }
+      ]
+      for input in inputs {
+        var engine = RecordingEngine(values: input, operationCap: 2_000_000)
+        sort.record(into: &engine)
+        #expect(engine.values == input.sorted(), "Fifth Merge failed size \(size): \(input) -> \(engine.values)")
+      }
+    }
+  }
+
+  @Test
+  func fifthMergeSortIsStable() {
+    let sort = FifthMergeSort()
+    let radix = 4_096
+    for size in [5, 8, 9, 16, 31, 32, 40, 41, 64, 127, 256] {
+      for seed in 0..<40 {
+        var state = UInt64(size * 12_289 + seed + 1)
+        let input = (0..<size).map { index in
+          state = state &* 6_364_136_223_846_793_005 &+ 1_442_695_040_888_963_407
+          return Int(state % 5) * radix + index
+        }
+        var engine = RecordingEngine(
+          values: input,
+          operationCap: 2_000_000,
+          comparisonKeyForTesting: { $0 / radix }
+        )
+        sort.record(into: &engine)
+        let output = engine.values
+        #expect(output.map { $0 / radix } == input.map { $0 / radix }.sorted())
+        for i in 1..<size where output[i - 1] / radix == output[i] / radix {
+          #expect(
+            output[i - 1] % radix < output[i] % radix,
+            "Fifth Merge reordered equal values at size \(size), seed \(seed)"
+          )
+        }
+      }
+    }
+  }
+
+  @Test
+  func bufferPartitionMergeSortHandlesBufferBoundariesAndIsUnstable() {
+    let sort = BufferPartitionMergeSort()
+    let sizes = [0, 1, 2, 3, 4, 5, 7, 8, 15, 16, 17, 31, 32, 33, 63, 64, 65, 127, 128, 129, 255, 256, 257, 511]
+    for size in sizes {
+      var state = UInt64(size * 15487 + 3)
+      let random = (0..<size).map { _ in
+        state = state &* 6_364_136_223_846_793_005 &+ 1_442_695_040_888_963_407
+        return Int(state % 41) - 20
+      }
+      let inputs = [
+        random,
+        Array(repeating: 4, count: size),
+        Array(0..<size),
+        Array((0..<size).reversed()),
+        (0..<size).map { ($0 * 23) % 9 },
+        (0..<size).map { min($0, size - 1 - $0) },
+      ]
+      for input in inputs {
+        var engine = RecordingEngine(values: input, operationCap: 2_000_000)
+        sort.record(into: &engine)
+        #expect(
+          engine.values == input.sorted(),
+          "Buffer Partition Merge failed size \(size): \(input) -> \(engine.values)"
+        )
+      }
+    }
+
+    let radix = 4096
+    var foundReordering = false
+    for size in [17, 31, 32, 33, 64, 127] where !foundReordering {
+      for seed in 0..<40 where !foundReordering {
+        var state = UInt64(size * 32771 + seed + 1)
+        let input = (0..<size).map { index in
+          state = state &* 6_364_136_223_846_793_005 &+ 1_442_695_040_888_963_407
+          return Int(state % 5) * radix + index
+        }
+        var engine = RecordingEngine(
+          values: input,
+          operationCap: 2_000_000,
+          comparisonKeyForTesting: { $0 / radix }
+        )
+        sort.record(into: &engine)
+        let output = engine.values
+        #expect(output.map { $0 / radix } == input.map { $0 / radix }.sorted())
+        foundReordering = zip(output, output.dropFirst()).contains { left, right in
+          left / radix == right / radix && left % radix > right % radix
+        }
+      }
+    }
+    #expect(foundReordering, "expected buffer partitioning to reorder at least one equal-key pair")
   }
 
   @Test

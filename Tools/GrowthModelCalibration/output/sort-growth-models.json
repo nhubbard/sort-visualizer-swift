@@ -590,15 +590,16 @@
       17.68261649618007,
       1.5519207069581928
     ],
+    "measuredSafeCeiling" : 4,
     "runnerUpFamily" : "powerLaw",
     "runnerUpRSquared" : 0.9823180613049705,
     "safeMaxSizeByCap" : [
       100000,
-      12,
+      4,
       300000,
-      12,
+      4,
       1000000,
-      12
+      4
     ],
     "sampleSizes" : [
       3,
@@ -865,6 +866,35 @@
     "subjectID" : "bufferedstoogesort+ascending",
     "winningFamily" : "polynomialIntercept",
     "winningRSquared" : 0.9999906902367978
+  },
+  {
+    "coefficients" : [
+      8.063410169912562,
+      1.0786210591781444
+    ],
+    "runnerUpFamily" : "polynomialIntercept",
+    "runnerUpRSquared" : 0.99989446608979,
+    "safeMaxSizeByCap" : [
+      100000,
+      837,
+      300000,
+      1831,
+      1000000,
+      3932
+    ],
+    "sampleSizes" : [
+      16,
+      17,
+      18,
+      19,
+      38,
+      76,
+      152,
+      304
+    ],
+    "subjectID" : "bufferpartitionmergesort+shuffledhalf",
+    "winningFamily" : "powerLog",
+    "winningRSquared" : 0.9982372515961406
   },
   {
     "coefficients" : [
@@ -1583,6 +1613,36 @@
     "subjectID" : "exchangebogosort+pdqbad",
     "winningFamily" : "factorial",
     "winningRSquared" : 0.9992073973004224
+  },
+  {
+    "coefficients" : [
+      0.04196315921917499,
+      33.24961908482081,
+      -334.49113283580374
+    ],
+    "runnerUpFamily" : "powerLog",
+    "runnerUpRSquared" : 0.9729785904452245,
+    "safeMaxSizeByCap" : [
+      100000,
+      1043,
+      300000,
+      2029,
+      1000000,
+      3988
+    ],
+    "sampleSizes" : [
+      16,
+      17,
+      18,
+      19,
+      38,
+      76,
+      152,
+      304
+    ],
+    "subjectID" : "fifthmergesort+pdqbad",
+    "winningFamily" : "polynomialIntercept",
+    "winningRSquared" : 0.9992865938303847
   },
   {
     "coefficients" : [

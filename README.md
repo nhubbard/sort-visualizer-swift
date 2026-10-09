@@ -7,7 +7,7 @@ Apple devices in Swift and SwiftUI.
 
 ## Features
 
-- **185 sorting algorithms** and **44 shuffles**, spanning ArrayV's category taxonomy (exchange,
+- **187 sorting algorithms** and **44 shuffles**, spanning ArrayV's category taxonomy (exchange,
   hybrid, insertion, selection, merge, distribution, concurrent-simulated, and the deliberately
   impractical Bogo/Stooge/Slow family) — every one a native Swift implementation, not an
   interpreted script.
