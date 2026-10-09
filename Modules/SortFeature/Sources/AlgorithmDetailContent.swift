@@ -8,6 +8,16 @@ import Foundation
 struct AlgorithmDetailContent: Sendable {
   let description: String?
   let codeSamples: [(language: CodeLanguage, source: String)]
+  let localizedDescriptions: [String: String]
+
+  init(
+    description: String?, codeSamples: [(language: CodeLanguage, source: String)],
+    localizedDescriptions: [String: String] = [:]
+  ) {
+    self.description = description
+    self.codeSamples = codeSamples
+    self.localizedDescriptions = localizedDescriptions
+  }
 
   static func load(for algorithmID: String) async -> AlgorithmDetailContent? {
     await AlgorithmDetailStore.shared.content(for: algorithmID)

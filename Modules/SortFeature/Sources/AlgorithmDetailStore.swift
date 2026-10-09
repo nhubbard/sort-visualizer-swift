@@ -51,7 +51,12 @@ actor AlgorithmDetailStore {
   func loadState(for algorithmID: String) async -> LoadState {
     do {
       let all = try await load()
-      return .loaded(all[algorithmID])
+      guard let content = all[algorithmID] else { return .loaded(nil) }
+      let localizedDescription = Self.preferredDescription(
+        content, languages: bundle.preferredLocalizations)
+      return .loaded(AlgorithmDetailContent(
+        description: localizedDescription, codeSamples: content.codeSamples,
+        localizedDescriptions: content.localizedDescriptions))
     } catch {
       Self.logger.error(
         "AlgorithmDetailStore failed to load AlgorithmDetails.algz: \(String(describing: error), privacy: .public)"
@@ -72,6 +77,23 @@ actor AlgorithmDetailStore {
   }
 
   private static let logger = Logger(subsystem: "com.nhubbard.Sort2.mobile", category: "AlgorithmDetailStore")
+
+  static func preferredDescription(
+    _ content: AlgorithmDetailContent, languages: [String]
+  ) -> String? {
+    var translations: [String: String] = [:]
+    for (locale, description) in content.localizedDescriptions.sorted(by: { $0.key < $1.key }) {
+      translations[locale.replacingOccurrences(of: "_", with: "-").lowercased()] = description
+    }
+    for language in languages {
+      let normalized = language.replacingOccurrences(of: "_", with: "-").lowercased()
+      if normalized == "en" || normalized.hasPrefix("en-") { return content.description }
+      if let exact = translations[normalized] { return exact }
+      if let base = normalized.split(separator: "-").first,
+        let generic = translations[String(base)] { return generic }
+    }
+    return content.description
+  }
 
   private static func decodeArchive(bundle: Bundle) throws -> [String: AlgorithmDetailContent] {
     #if DEBUG

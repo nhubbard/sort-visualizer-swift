@@ -11,6 +11,7 @@ from __future__ import annotations
 import ast
 import functools
 import hashlib
+import json
 import logging
 import os
 import re
@@ -1072,13 +1073,18 @@ FLAG_DICTIONARY_FORMATTED = 1 << 1
 FLAG_SHA256_PRESENT = 1 << 2
 
 CONTENT_KIND_DESCRIPTION = 0
+CONTENT_KIND_LOCALIZED_DESCRIPTIONS = 11
 CONTENT_KIND_BY_EXTENSION = {
     ext: index + 1 for index, ext in enumerate(LANGUAGE_EXTENSIONS)
 }
 EXTENSION_BY_CONTENT_KIND = {
     kind: ext for ext, kind in CONTENT_KIND_BY_EXTENSION.items()
 }
-KIND_LABELS = {CONTENT_KIND_DESCRIPTION: "description", **EXTENSION_BY_CONTENT_KIND}
+KIND_LABELS = {
+    CONTENT_KIND_DESCRIPTION: "description",
+    CONTENT_KIND_LOCALIZED_DESCRIPTIONS: "localized descriptions",
+    **EXTENSION_BY_CONTENT_KIND,
+}
 
 
 class PackError(AlgorithmContentError):
@@ -1100,13 +1106,50 @@ def _read_utf8_optional(path: Path) -> bytes | None:
     return data
 
 
+def _translated_descriptions() -> dict[str, dict[str, str]]:
+    """Read optional `descriptions.<locale>.json` files keyed by algorithm ID."""
+    translations: dict[str, dict[str, str]] = {}
+    for path in sorted(ROOT.glob("descriptions.*.json")):
+        locale = path.name.removeprefix("descriptions.").removesuffix(".json")
+        if locale == "en" or not re.fullmatch(r"[a-z]{2,3}(?:-[A-Za-z0-9]{2,8})*", locale):
+            raise PackError(f"invalid description locale in {path.name!r}")
+        try:
+            entries = json.loads(path.read_text(encoding="utf-8"))
+        except (UnicodeError, json.JSONDecodeError) as error:
+            raise PackError(f"invalid UTF-8 JSON in {path}") from error
+        if not isinstance(entries, dict):
+            raise PackError(f"{path} must contain an algorithm-ID-to-Markdown object")
+        for algorithm, markdown in entries.items():
+            if not isinstance(algorithm, str) or not (ROOT / algorithm / "description.md").is_file():
+                raise PackError(f"{path}: unknown description ID {algorithm!r}")
+            if not isinstance(markdown, str) or not markdown.strip():
+                raise PackError(f"{path}: empty or non-text description for {algorithm!r}")
+        translations[locale] = entries
+    return translations
+
+
+def _localized_description_bytes(
+    algorithm: str, translations: dict[str, dict[str, str]]
+) -> bytes | None:
+    descriptions = {
+        locale: entries[algorithm]
+        for locale, entries in translations.items()
+        if algorithm in entries
+    }
+    if not descriptions:
+        return None
+    return json.dumps(descriptions, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
+
+
 @dataclass(frozen=True)
 class ContentEntry:
     kind: int
     data: bytes
 
 
-def _algorithm_entries(algorithm: str) -> list[ContentEntry]:
+def _algorithm_entries(
+    algorithm: str, translations: dict[str, dict[str, str]]
+) -> list[ContentEntry]:
     algo_dir = ROOT / algorithm
     entries = []
     description = _read_utf8_optional(algo_dir / "description.md")
@@ -1116,10 +1159,14 @@ def _algorithm_entries(algorithm: str) -> list[ContentEntry]:
         data = _read_utf8_optional(algo_dir / f"{ext}.md")
         if data is not None:
             entries.append(ContentEntry(CONTENT_KIND_BY_EXTENSION[ext], data))
+    localized = _localized_description_bytes(algorithm, translations)
+    if localized is not None:
+        entries.append(ContentEntry(CONTENT_KIND_LOCALIZED_DESCRIPTIONS, localized))
     return entries
 
 
 def _build_payload(algorithms: Sequence[str]) -> tuple[bytes, list[str]]:
+    translations = _translated_descriptions()
     directory = bytearray()
     content = bytearray()
     packed_ids: list[str] = []
@@ -1131,7 +1178,7 @@ def _build_payload(algorithms: Sequence[str]) -> tuple[bytes, list[str]]:
         if not id_bytes or len(id_bytes) > 0xFFFF:
             raise PackError(f"invalid algorithm ID {algorithm!r}")
 
-        entries = _algorithm_entries(algorithm)
+        entries = _algorithm_entries(algorithm, translations)
         if not entries:
             logger.warning(
                 f"skipping {algorithm}: no description.md or highlighted content found"
@@ -1158,7 +1205,7 @@ def _build_payload(algorithms: Sequence[str]) -> tuple[bytes, list[str]]:
         _INNER_HEADER_FORMAT,
         MAGIC_ADTL,
         1,
-        0,
+        1 if translations else 0,
         INNER_HEADER_SIZE,
         0,
         len(packed_ids),
@@ -1402,9 +1449,16 @@ def parse_archive(path: Path) -> ParsedArchive:
     return ParsedArchive(envelope, header, payload, records)
 
 
-def _expected_content_bytes(algorithm: str, kind: int) -> bytes:
+def _expected_content_bytes(
+    algorithm: str, kind: int, translations: dict[str, dict[str, str]]
+) -> bytes:
     if kind == CONTENT_KIND_DESCRIPTION:
         return (ROOT / algorithm / "description.md").read_bytes()
+    if kind == CONTENT_KIND_LOCALIZED_DESCRIPTIONS:
+        localized = _localized_description_bytes(algorithm, translations)
+        if localized is None:
+            raise ArchiveFormatError(f"unexpected translations for {algorithm!r}")
+        return localized
     ext = EXTENSION_BY_CONTENT_KIND.get(kind)
     if ext is None:
         raise ArchiveFormatError(f"unknown content kind {kind}")
@@ -1422,6 +1476,8 @@ def verify_archive(path: Path, expected_algorithms: Sequence[str]) -> None:
     if archive.header.algorithm_count != len(seen_ids):
         raise ArchiveFormatError("declared algorithm count doesn't match the directory")
 
+    translations = _translated_descriptions()
+
     for record in archive.records:
         seen_kinds: set[int] = set()
         for entry in record.entries:
@@ -1431,11 +1487,18 @@ def verify_archive(path: Path, expected_algorithms: Sequence[str]) -> None:
                 )
             seen_kinds.add(entry.kind)
             actual = archive.content_bytes(entry)
-            expected = _expected_content_bytes(record.algorithm_id, entry.kind)
+            expected = _expected_content_bytes(record.algorithm_id, entry.kind, translations)
             if actual != expected:
                 raise ArchiveFormatError(
                     f"content kind {entry.kind} for {record.algorithm_id!r} doesn't match source"
                 )
+        expected_kinds = {
+            entry.kind for entry in _algorithm_entries(record.algorithm_id, translations)
+        }
+        if seen_kinds != expected_kinds:
+            raise ArchiveFormatError(
+                f"content kinds for {record.algorithm_id!r} don't match source"
+            )
 
 
 def preview_line(data: bytes, limit: int) -> str:

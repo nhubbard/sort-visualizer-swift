@@ -66,6 +66,16 @@ private enum LegacyLoader {
 struct AlgorithmDetailStoreTests {
   private static var testBundle: Bundle { Bundle(for: StoreTestBundleMarker.self) }
 
+  @Test func localizedDescriptionUsesRegionalFallbackAndEnglishBase() {
+    let content = AlgorithmDetailContent(
+      description: "English", codeSamples: [],
+      localizedDescriptions: ["es": "Español", "fr-CA": "Français canadien"])
+    #expect(AlgorithmDetailStore.preferredDescription(content, languages: ["es-MX"]) == "Español")
+    #expect(AlgorithmDetailStore.preferredDescription(content, languages: ["fr-CA"]) == "Français canadien")
+    #expect(AlgorithmDetailStore.preferredDescription(content, languages: ["de-DE"]) == "English")
+    #expect(AlgorithmDetailStore.preferredDescription(content, languages: ["en", "es"]) == "English")
+  }
+
   @Test func everyAlgorithmMatchesTheLegacyLoaderByteForByte() async throws {
     let store = AlgorithmDetailStore(bundle: Self.testBundle)
     let algorithmIDs = try LegacyLoader.discoverAlgorithmIDs()
