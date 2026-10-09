@@ -251,7 +251,7 @@ public struct AlgorithmDetailSection: View {
           LabeledEquationCell(label: complexityRow(id).label, equation: complexityRow(id).latex)
         }
         LabeledEquationCell(
-          label: "Implementation Complexity",
+          label: String(localized: "Implementation Complexity", bundle: .module),
           equation: "\(algorithm.metadata.implementationComplexity)"
         )
       }
@@ -269,7 +269,7 @@ public struct AlgorithmDetailSection: View {
         // The implementation score spans both columns in the wider layout.
         GridRow(alignment: .bottom) {
           LabeledEquationCell(
-            label: "Implementation Complexity",
+            label: String(localized: "Implementation Complexity", bundle: .module),
             equation: "\(algorithm.metadata.implementationComplexity)"
           )
           .gridCellColumns(2)

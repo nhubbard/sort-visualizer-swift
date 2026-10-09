@@ -84,6 +84,8 @@ struct GrowthModelComparisonSection: View {
     // negative constant term), and the auto-scaler over-corrects for that sliver by rounding out
     // to whole numbers instead of the tight range the data actually occupies.
     let yDomain = min(0, normalizedValues.min() ?? 0)...max(1, normalizedValues.max() ?? 1)
+    let detectedLabel = String(localized: "Detected", bundle: .module)
+    let fittedLabel = String(localized: "Fitted (Used by App)", bundle: .module)
 
     return Chart {
       ForEach(Array(detectedCurve.enumerated()), id: \.offset) { _, point in
@@ -91,14 +93,14 @@ struct GrowthModelComparisonSection: View {
           x: .value("Array Size", point.size),
           y: .value("Predicted Work", point.value / scale)
         )
-        .foregroundStyle(by: .value("Series", "Detected"))
+        .foregroundStyle(by: .value("Series", detectedLabel))
       }
       ForEach(Array(fittedCurve.enumerated()), id: \.offset) { _, point in
         LineMark(
           x: .value("Array Size", point.size),
           y: .value("Predicted Work", point.value / scale)
         )
-        .foregroundStyle(by: .value("Series", "Fitted (Used by App)"))
+        .foregroundStyle(by: .value("Series", fittedLabel))
         .lineStyle(StrokeStyle(dash: [4, 4]))
       }
       RuleMark(x: .value("Operation Cap Cutoff", cutoffSize))

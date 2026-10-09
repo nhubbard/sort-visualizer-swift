@@ -581,7 +581,8 @@ private struct UtilityButtons: View {
         : String(localized: "Unmute", bundle: .module))
       .help(
         session.soundEnabled
-          ? "Turn off sort sound effects (⌥⌘A)" : "Turn on sort sound effects (⌥⌘A)")
+          ? String(localized: "Turn off sort sound effects (⌥⌘A)", bundle: .module)
+          : String(localized: "Turn on sort sound effects (⌥⌘A)", bundle: .module))
 
       AutomatorMenuButton(session: session)
 
@@ -592,7 +593,9 @@ private struct UtilityButtons: View {
       }
       .accessibilityIdentifier("runControlVideoButton")
       .accessibilityLabel(String(localized: "Video Recording", bundle: .module))
-      .accessibilityValue(isVideoExpanded ? "Expanded" : "Collapsed")
+      .accessibilityValue(isVideoExpanded
+        ? String(localized: "Expanded", bundle: .module)
+        : String(localized: "Collapsed", bundle: .module))
       .help(String(localized: "Show or hide video recording controls", bundle: .module))
     }
   }
@@ -614,12 +617,12 @@ private struct UtilityButtons: View {
         : String(localized: "Playback Speed", bundle: .module))
       .accessibilityValue(
         replay.useFixedDurationPacing
-          ? "\(Int(replay.targetDuration)) seconds"
-          : "\(Int(replay.speed)) ops per second")
+          ? String(localized: "\(Int(replay.targetDuration)) seconds", bundle: .module)
+          : String(localized: "\(Int(replay.speed)) ops per second", bundle: .module))
       .help(
         replay.useFixedDurationPacing
-          ? "Show or hide the target duration slider"
-          : "Show or hide the playback speed slider (⌘⇧+/− by 1, ⌘⌥+/− by 10)")
+          ? String(localized: "Show or hide the target duration slider", bundle: .module)
+          : String(localized: "Show or hide the playback speed slider (⌘⇧+/− by 1, ⌘⌥+/− by 10)", bundle: .module))
 
       Button {
         isSizeExpanded.toggle()
@@ -765,7 +768,8 @@ private struct AutomatorMenuButton: View {
     .accessibilityLabel(String(localized: "Automations", bundle: .module))
     .accessibilityValue(
       session.runningAutomationID.flatMap { AutomationRegistry.shared.automation(id: $0)?.displayName }
-        .map { "\($0) running" } ?? "Idle")
+        .map { String(localized: "\($0) running", bundle: .module) }
+        ?? String(localized: "Idle", bundle: .module))
     .help(String(localized: "Run a size-sweep or max-size automation", bundle: .module))
     .confirmationDialog(String(localized: "Automations", bundle: .module), isPresented: $isShowingAutomations) {
       ForEach(AutomationRegistry.shared.automations) { automation in

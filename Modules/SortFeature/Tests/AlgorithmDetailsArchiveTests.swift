@@ -50,6 +50,12 @@ struct AlgorithmDetailsArchiveTests {
     let quickSort = try #require(contentByID["quicksort"])
     #expect(quickSort.localizedDescriptions["es"]?.hasPrefix("Quick Sort es") == true)
     #expect(quickSort.description?.hasPrefix("Quick Sort") == true)
+    for (algorithmID, content) in contentByID {
+      #expect(
+        content.localizedDescriptions["es"]?.isEmpty == false,
+        "\(algorithmID): missing Spanish description"
+      )
+    }
   }
 
   @Test func legacyManifestWithoutTranslationsStillLoads() throws {
