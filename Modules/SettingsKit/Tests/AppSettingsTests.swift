@@ -34,6 +34,20 @@ struct AppSettingsTests {
   }
 
   @Test
+  func outOfRangeStoredSpeedRecoversAndTestOverrideDoesNotPersist() {
+    let store = makeIsolatedStore()
+    store.set(100_000.0, forKey: "playbackSpeed")
+    let settings = AppSettings(store: store)
+    #expect(settings.playbackSpeed == 30.0)
+    #expect(store.double(forKey: "playbackSpeed") == 30.0)
+
+    settings.setTransientPlaybackSpeedForTesting(100_000.0)
+    #expect(settings.playbackSpeed == 100_000.0)
+    #expect(store.double(forKey: "playbackSpeed") == 30.0)
+    #expect(AppSettings(store: store).playbackSpeed == 30.0)
+  }
+
+  @Test
   func mutationsPersistAcrossInstancesSharingTheSameStore() {
     let store = makeIsolatedStore()
     let first = AppSettings(store: store)

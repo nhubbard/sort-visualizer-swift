@@ -202,12 +202,11 @@ struct Sort2App: App {
     // Same rationale, for `playbackSpeed`: a UI test asserting an exact seeded speed value
     // needs to SET that value exactly, not approximate it via `XCUIElement.adjust(
     // toNormalizedSliderPosition:)`'s coordinate-based drag gesture, which lands at a
-    // different actual value nearly every run (a real, observed source of test flakiness —
-    // not a hypothetical one). This mutates the same `UserDefaults.standard`-backed setting a
-    // real Settings-screen drag would, just precisely and deterministically.
+    // different actual value nearly every run. Keep this launch-only: some tests use
+    // 100_000 ops/sec, beyond the Settings slider's 1...1000 range.
     if let overrideValue = ProcessInfo.processInfo.environment["UI_TEST_PLAYBACK_SPEED"],
       let overrideSpeed = Double(overrideValue) {
-      AppSettings.shared.playbackSpeed = overrideSpeed
+      AppSettings.shared.setTransientPlaybackSpeedForTesting(overrideSpeed)
     }
 
     // Kicks off AlgorithmDetails.algz's decode as early as possible so it's likely already warm

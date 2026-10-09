@@ -18,7 +18,7 @@ public final class AppSettings {
   }
 
   public var playbackSpeed: Double {
-    didSet { store.set(playbackSpeed, forKey: Keys.playbackSpeed) }
+    didSet { if !isApplyingTransientPlaybackSpeed { store.set(playbackSpeed, forKey: Keys.playbackSpeed) } }
   }
 
   /// Mode switch: `false` (default) keeps `playbackSpeed`'s flat ops/sec behavior exactly as
@@ -100,6 +100,15 @@ public final class AppSettings {
   }
 
   private let store: UserDefaults
+  private var isApplyingTransientPlaybackSpeed = false
+
+  /// Launch-only speed for UI tests that need to finish recordings quickly.
+  /// The Settings slider and the saved user preference remain capped at 1...1000.
+  public func setTransientPlaybackSpeedForTesting(_ speed: Double) {
+    isApplyingTransientPlaybackSpeed = true
+    playbackSpeed = speed
+    isApplyingTransientPlaybackSpeed = false
+  }
 
   public init(store: UserDefaults = .standard) {
     self.store = store
@@ -135,7 +144,10 @@ public final class AppSettings {
       ? storedVisualizer : (visualizers.first(where: { $0.id == defaultVisualizer })?.id
         ?? visualizers.first?.id ?? defaultVisualizer)
     let storedSpeed = store.double(forKey: Keys.playbackSpeed)
-    playbackSpeed = storedSpeed.isFinite && storedSpeed > 0 ? storedSpeed : 30.0
+    let validStoredSpeed = storedSpeed.isFinite && (1...1000).contains(storedSpeed)
+    let resolvedSpeed = validStoredSpeed ? storedSpeed : 30.0
+    playbackSpeed = resolvedSpeed
+    if !validStoredSpeed { store.set(resolvedSpeed, forKey: Keys.playbackSpeed) }
     useFixedDurationPacing = store.bool(forKey: Keys.useFixedDurationPacing)
     let storedDuration = store.double(forKey: Keys.targetPlaybackDuration)
     targetPlaybackDuration = storedDuration.isFinite && storedDuration > 0 ? storedDuration : 10.0
