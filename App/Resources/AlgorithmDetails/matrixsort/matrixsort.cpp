@@ -27,9 +27,7 @@ bool insertLast(int arr[], int a, int b, int gap, bool dir);
 MatrixShape getMatrixDims(int length);
 bool matrixSort(int arr[], int start, int end, int gap, bool dir);
 
-void sort(int arr[], int n) {
-  matrixSort(arr, 0, n, 1, true);
-}
+void sort(int arr[], int n) { matrixSort(arr, 0, n, 1, true); }
 
 int dirCompareVal(int left, int right, bool dir) {
   int res;

@@ -1,8 +1,7 @@
 #include <cstdio>
 #include <utility>
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
-                 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
 
 void printList(int items[], int size) {
   printf("[");
@@ -21,9 +20,7 @@ int binarySearch(int arr[], int a, int b, int value, bool left);
 void rotateMerge(int arr[], int a, int m, int b);
 void rotateMergeSort(int arr[], int a, int b);
 
-void sort(int arr[], int n) {
-  rotateMergeSort(arr, 0, n);
-}
+void sort(int arr[], int n) { rotateMergeSort(arr, 0, n); }
 
 void multiSwap(int arr[], int a, int b, int len) {
   for (int i = 0; i < len; i++) {

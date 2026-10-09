@@ -1,11 +1,11 @@
+#include <cstdint>
 #include <cstdio>
 #include <stdexcept>
 #include <vector>
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
-                 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
 
-enum class StackId { Two, Three };
+enum class StackId : std::uint8_t { Two, Three };
 
 void printList(int items[], int size) {
   printf("[");

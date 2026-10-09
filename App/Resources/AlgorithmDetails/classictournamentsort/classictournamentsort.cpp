@@ -4,8 +4,6 @@
 
 int ceilPow2(int value);
 
-
-
 void printList(const std::vector<int> &items) {
   printf("[");
   if (!items.empty()) {
@@ -88,7 +86,7 @@ void sort(std::vector<int> &array) {
   for (int i = 1; i < n; i++) {
     output[i] = findNext();
   }
-  array = output;
+  array.swap(output);
 }
 
 int ceilPow2(int value) {

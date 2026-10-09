@@ -1,7 +1,6 @@
 #include <cstdio>
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
-                 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
 
 void printList(int items[], int size) {
   printf("[");
@@ -15,7 +14,8 @@ void printList(int items[], int size) {
 }
 
 void sort(int arr[], int n) {
-  if (n == 0) return;
+  if (n == 0)
+    return;
   int ext[n];
   int minValue = arr[0];
   int maxValue = arr[0];

@@ -1,8 +1,7 @@
 #include <cstdio>
 #include <vector>
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
-                 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
 
 struct Node {
   int value;
@@ -48,9 +47,7 @@ void sort(int arr[], int n) {
   freeTree(root);
 }
 
-int nodeLevel(Node *node) {
-  return node == nullptr ? -1 : node->level;
-}
+int nodeLevel(Node *node) { return node == nullptr ? -1 : node->level; }
 
 Node *skew(Node *node) {
   if (node->left == nullptr) {

@@ -1,8 +1,7 @@
 #include <cstdio>
 #include <utility>
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
-                 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
 
 void printList(int items[], int size) {
   printf("[");
@@ -27,21 +26,35 @@ int shiftValue(int value, int places, int base);
 int dist(int arr[], int a, int b, int place, int base);
 
 void sort(int arr[], int n) {
-  if (n <= 1) return;
+  if (n <= 1)
+    return;
   int base = 4, maxValue = 0;
-  for (int j = 0; j < n; j++) if (arr[j] > maxValue) maxValue = arr[j];
+  for (int j = 0; j < n; j++)
+    if (arr[j] > maxValue)
+      maxValue = arr[j];
   int q = 0, probe = base;
-  while (probe <= maxValue) { q++; probe *= base; }
+  while (probe <= maxValue) {
+    q++;
+    probe *= base;
+  }
   int m = 0, i = 0, b = n;
   while (i < n) {
     int p = b - i < 1 ? i : dist(arr, i, b, q, base);
     if (q == 0) {
       m += base;
       int t = m / base;
-      while (t % base == 0) { t /= base; q++; }
+      while (t % base == 0) {
+        t /= base;
+        q++;
+      }
       i = b;
-      while (b < n && shiftValue(arr[b], q + 1, base) == shiftValue(m, q + 1, base)) b++;
-    } else { b = p; q--; }
+      while (b < n &&
+             shiftValue(arr[b], q + 1, base) == shiftValue(m, q + 1, base))
+        b++;
+    } else {
+      b = p;
+      q--;
+    }
   }
 }
 
@@ -122,7 +135,8 @@ void mergeSortDigit(int arr[], int a, int b, int place, int base) {
 // an ordinary MSD radix sort built entirely out of the LSD variant's
 // rotate/binary-search machinery.
 int shiftValue(int value, int places, int base) {
-  while (places-- > 0) value /= base;
+  while (places-- > 0)
+    value /= base;
   return value;
 }
 

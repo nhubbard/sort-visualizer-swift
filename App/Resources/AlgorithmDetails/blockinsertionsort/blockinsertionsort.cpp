@@ -1,8 +1,7 @@
 #include <cstdio>
 #include <utility>
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
-                 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
 
 void printList(int items[], int size) {
   printf("[");
@@ -24,7 +23,8 @@ void insert1(int arr[], int a, int l);
 void insert2(int arr[], int a, int l, int r);
 
 void sort(int arr[], int n) {
-  if (n < 2) return;
+  if (n < 2)
+    return;
   int i = findRun(arr, 0, n);
   while (i < n) {
     int j = findRun(arr, i, n);
@@ -75,16 +75,34 @@ void mergeWithoutBuffer(int arr[], int pos, int len1, int len2) {
   if (len1 < len2) {
     while (len1 != 0) {
       int loc = binSearch(arr, pos + len1, len2, pos, true);
-      if (loc != 0) { rotate(arr, pos, len1, loc); pos += loc; len2 -= loc; }
-      if (len2 == 0) break;
-      do { pos++; len1--; } while (len1 != 0 && arr[pos] <= arr[pos + len1]);
+      if (loc != 0) {
+        rotate(arr, pos, len1, loc);
+        pos += loc;
+        len2 -= loc;
+      }
+      if (len2 == 0)
+        break;
+      // pos + len1 remains the fixed boundary between the two in-range runs.
+      do {
+        pos++;
+        len1--;
+      } while (
+          len1 != 0 &&
+          arr[pos] <=
+              arr[pos + len1]); // NOLINT(clang-analyzer-security.ArrayBound)
     }
   } else {
     while (len2 != 0) {
       int loc = binSearch(arr, pos, len1, pos + len1 + len2 - 1, false);
-      if (loc != len1) { rotate(arr, pos + loc, len1 - loc, len2); len1 = loc; }
-      if (len1 == 0) break;
-      do { len2--; } while (len2 != 0 && arr[pos + len1 - 1] <= arr[pos + len1 + len2 - 1]);
+      if (loc != len1) {
+        rotate(arr, pos + loc, len1 - loc, len2);
+        len1 = loc;
+      }
+      if (len1 == 0)
+        break;
+      do {
+        len2--;
+      } while (len2 != 0 && arr[pos + len1 - 1] <= arr[pos + len1 + len2 - 1]);
     }
   }
 }

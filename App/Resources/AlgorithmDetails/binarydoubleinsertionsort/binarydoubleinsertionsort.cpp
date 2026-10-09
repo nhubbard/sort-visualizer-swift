@@ -8,8 +8,6 @@ void insertToLeft(std::vector<int> &array, int a, int b, int temp);
 void insertToRight(std::vector<int> &array, int a, int b, int temp);
 void doubleInsertion(std::vector<int> &array, int a, int b);
 
-
-
 void printList(const std::vector<int> &items) {
   printf("[");
   if (!items.empty()) {

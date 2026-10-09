@@ -17,9 +17,7 @@ void printList(int items[], int size) {
 bool isSorted(int arr[], int n);
 bool permutationSort(int arr[], int n, int depth);
 
-void sort(int arr[], int n) {
-  permutationSort(arr, n, 0);
-}
+void sort(int arr[], int n) { permutationSort(arr, n, 0); }
 
 bool isSorted(int arr[], int n) {
   for (int i = 1; i < n; i++) {

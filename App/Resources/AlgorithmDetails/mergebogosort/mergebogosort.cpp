@@ -19,9 +19,7 @@ void printList(int items[], int size) {
 bool isSortedRange(int arr[], int start, int end);
 void sortRange(int arr[], int start, int end);
 
-void sort(int arr[], int n) {
-  sortRange(arr, 0, n);
-}
+void sort(int arr[], int n) { sortRange(arr, 0, n); }
 
 bool isSortedRange(int arr[], int start, int end) {
   for (int i = start; i < end - 1; i++) {

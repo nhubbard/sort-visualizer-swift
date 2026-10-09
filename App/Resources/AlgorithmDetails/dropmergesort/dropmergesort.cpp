@@ -380,7 +380,8 @@ void pdqLoop(int arr[], int begin, int end, int badAllowed) {
 }
 
 void pdqSort(int arr[], int begin, int end) {
-  if (end - begin > 1) pdqLoop(arr, begin, end, pdqLog(end - begin));
+  if (end - begin > 1)
+    pdqLoop(arr, begin, end, pdqLog(end - begin));
 }
 
 int main(int argc, char *argv[]) {
