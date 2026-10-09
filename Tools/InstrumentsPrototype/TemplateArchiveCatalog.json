@@ -1,0 +1,884 @@
+{
+  "archives": {
+    "Frameworks/InstrumentsPlugIn.framework/Resources/Foundation Models.tracetemplate": {
+      "commandSwitchStates": [
+        {
+          "contextSwitchSampling": false,
+          "detectPriorityInversions": false,
+          "hangsThreshold": 2,
+          "highFreqSampling": false,
+          "highFrequency": false,
+          "recordKernelStack": false,
+          "recordKernelStacks": false,
+          "recordWaitingThreads": false,
+          "sampleExpensiveCACommits": 0
+        }
+      ],
+      "recordingModes": [
+        {
+          "recordingMode": 2,
+          "supportsDeferredMode": true,
+          "supportsImmediateMode": true,
+          "supportsWindowedMode": true,
+          "timeLimit": 0,
+          "windowLimit": 0
+        }
+      ]
+    },
+    "Frameworks/InstrumentsPlugIn.framework/Versions/A/Resources/Foundation Models.tracetemplate": {
+      "commandSwitchStates": [
+        {
+          "contextSwitchSampling": false,
+          "detectPriorityInversions": false,
+          "hangsThreshold": 2,
+          "highFreqSampling": false,
+          "highFrequency": false,
+          "recordKernelStack": false,
+          "recordKernelStacks": false,
+          "recordWaitingThreads": false,
+          "sampleExpensiveCACommits": 0
+        }
+      ],
+      "recordingModes": [
+        {
+          "recordingMode": 2,
+          "supportsDeferredMode": true,
+          "supportsImmediateMode": true,
+          "supportsWindowedMode": true,
+          "timeLimit": 0,
+          "windowLimit": 0
+        }
+      ]
+    },
+    "Frameworks/InstrumentsPlugIn.framework/Versions/Current/Resources/Foundation Models.tracetemplate": {
+      "commandSwitchStates": [
+        {
+          "contextSwitchSampling": false,
+          "detectPriorityInversions": false,
+          "hangsThreshold": 2,
+          "highFreqSampling": false,
+          "highFrequency": false,
+          "recordKernelStack": false,
+          "recordKernelStacks": false,
+          "recordWaitingThreads": false,
+          "sampleExpensiveCACommits": 0
+        }
+      ],
+      "recordingModes": [
+        {
+          "recordingMode": 2,
+          "supportsDeferredMode": true,
+          "supportsImmediateMode": true,
+          "supportsWindowedMode": true,
+          "timeLimit": 0,
+          "windowLimit": 0
+        }
+      ]
+    },
+    "Packages/ActivityMonitor.instrdst/Contents/Templates/Activity Monitor.tracetemplate": {
+      "commandSwitchStates": [
+        {
+          "counterprofile": 0,
+          "counterprofileinternal": 0,
+          "highFreqSampling": false,
+          "recordKernelStacks": false,
+          "recordWaitingThreads": false,
+          "sampleExpensiveCACommits": 0,
+          "shaderprofiler": false
+        }
+      ],
+      "recordingModes": [
+        {
+          "recordingMode": 1,
+          "supportsDeferredMode": true,
+          "supportsImmediateMode": true,
+          "supportsWindowedMode": true,
+          "timeLimit": 43200000000000,
+          "windowLimit": 0
+        }
+      ]
+    },
+    "Packages/Apps.instrdst/Contents/Templates/App Launch.tracetemplate": {
+      "commandSwitchStates": [
+        {
+          "contextSwitchSampling": true,
+          "counterdevice": 0,
+          "counterdeviceinternal": 0,
+          "counterprofile": 0,
+          "counterprofileinternal": 0,
+          "counterscounterdevice": 0,
+          "counterscounterprofile": 0,
+          "countersshaderprofiler": false,
+          "dataLoggingScope": 0,
+          "detectPriorityInversions": false,
+          "hangsThreshold": 0,
+          "highFreqSampling": false,
+          "highFrequency": false,
+          "recordKernelStack": false,
+          "recordKernelStacks": false,
+          "recordWaitingThreads": true,
+          "sampleExpensiveCACommits": 0,
+          "shaderprofiler": false,
+          "shaderprofilerinternal": false
+        }
+      ],
+      "recordingModes": [
+        {
+          "recordingMode": 2,
+          "supportsDeferredMode": true,
+          "supportsImmediateMode": false,
+          "supportsWindowedMode": true,
+          "timeLimit": 20000000000,
+          "windowLimit": 0
+        }
+      ]
+    },
+    "Packages/Audio.instrdst/Contents/Templates/Audio System Trace.tracetemplate": {
+      "commandSwitchStates": [
+        {
+          "contextSwitchSampling": false,
+          "counterdevice": 0,
+          "counterdeviceinternal": 0,
+          "counterprofile": 0,
+          "counterprofileinternal": 0,
+          "counterscounterdevice": 0,
+          "counterscounterprofile": 0,
+          "countersshaderprofiler": false,
+          "detectPriorityInversions": false,
+          "hangsThreshold": 2,
+          "highFreqSampling": false,
+          "highFrequency": false,
+          "recordKernelStack": false,
+          "recordKernelStacks": false,
+          "recordWaitingThreads": false,
+          "sampleExpensiveCACommits": 0,
+          "shaderprofiler": false,
+          "shaderprofilerinternal": false
+        }
+      ],
+      "recordingModes": [
+        {
+          "recordingMode": 2,
+          "supportsDeferredMode": true,
+          "supportsImmediateMode": false,
+          "supportsWindowedMode": true,
+          "timeLimit": 0,
+          "windowLimit": 5000000000
+        }
+      ]
+    },
+    "Packages/Base.instrdst/Contents/Templates/Blank.tracetemplate": {
+      "commandSwitchStates": [
+        {
+          "contextSwitchSampling": false,
+          "detectPriorityInversions": false,
+          "hangsThreshold": 2,
+          "highFreqSampling": false,
+          "highFrequency": false,
+          "recordKernelStack": false,
+          "recordKernelStacks": false,
+          "recordWaitingThreads": false,
+          "sampleExpensiveCACommits": 0
+        }
+      ],
+      "recordingModes": [
+        {
+          "recordingMode": 2,
+          "supportsDeferredMode": true,
+          "supportsImmediateMode": true,
+          "supportsWindowedMode": true,
+          "timeLimit": 0,
+          "windowLimit": 0
+        }
+      ]
+    },
+    "Packages/CPU Profiler.instrdst/Contents/Templates/CPU Profiler.tracetemplate": {
+      "commandSwitchStates": [
+        {
+          "contextSwitchSampling": false,
+          "detectPriorityInversions": false,
+          "hangsThreshold": 1,
+          "highFreqSampling": false,
+          "highFrequency": false,
+          "recordKernelStack": false,
+          "recordKernelStacks": false,
+          "recordWaitingThreads": false,
+          "sampleExpensiveCACommits": 0
+        }
+      ],
+      "recordingModes": [
+        {
+          "recordingMode": 1,
+          "supportsDeferredMode": true,
+          "supportsImmediateMode": true,
+          "supportsWindowedMode": true,
+          "timeLimit": 43200000000000,
+          "windowLimit": 0
+        }
+      ]
+    },
+    "Packages/DataPersistence.instrdst/Contents/Templates/Data Persistence.tracetemplate": {
+      "commandSwitchStates": [
+        {
+          "contextSwitchSampling": false,
+          "counterprofile": 0,
+          "counterprofileinternal": 0,
+          "detectPriorityInversions": false,
+          "hangsThreshold": 2,
+          "highFreqSampling": false,
+          "highFrequency": false,
+          "recordKernelStack": false,
+          "recordKernelStacks": false,
+          "recordWaitingThreads": false,
+          "sampleExpensiveCACommits": 0,
+          "shaderprofiler": false,
+          "shaderprofilerinternal": false
+        }
+      ],
+      "recordingModes": [
+        {
+          "recordingMode": 1,
+          "supportsDeferredMode": true,
+          "supportsImmediateMode": true,
+          "supportsWindowedMode": true,
+          "timeLimit": 43200000000000,
+          "windowLimit": 0
+        }
+      ]
+    },
+    "Packages/GPU.instrdst/Contents/Templates/Game Memory.tracetemplate": {
+      "commandSwitchStates": [
+        {
+          "contextSwitchSampling": false,
+          "counterdevice": 4294968227,
+          "counterprofile": 0,
+          "detectPriorityInversions": false,
+          "gpuperformancestate": 0,
+          "hangsThreshold": 0,
+          "highFreqSampling": false,
+          "highFrequency": false,
+          "productionTrace": false,
+          "recordKernelStack": false,
+          "recordKernelStacks": false,
+          "recordWaitingThreads": false,
+          "sampleExpensiveCACommits": 0,
+          "shaderprofiler": false,
+          "traceRecordingMode": 0
+        }
+      ],
+      "recordingModes": [
+        {
+          "recordingMode": 2,
+          "supportsDeferredMode": true,
+          "supportsImmediateMode": true,
+          "supportsWindowedMode": false,
+          "timeLimit": 43200000000000,
+          "windowLimit": 0
+        }
+      ]
+    },
+    "Packages/GPU.instrdst/Contents/Templates/Game Performance Overview.tracetemplate": {
+      "commandSwitchStates": [
+        {
+          "contextSwitchSampling": false,
+          "detectPriorityInversions": false,
+          "hangsThreshold": 2,
+          "highFreqSampling": false,
+          "highFrequency": false,
+          "recordKernelStack": false,
+          "recordKernelStacks": false,
+          "recordWaitingThreads": false,
+          "sampleExpensiveCACommits": 0
+        }
+      ],
+      "recordingModes": [
+        {
+          "recordingMode": 2,
+          "supportsDeferredMode": true,
+          "supportsImmediateMode": false,
+          "supportsWindowedMode": true,
+          "timeLimit": 43200000000000,
+          "windowLimit": 0
+        }
+      ]
+    },
+    "Packages/GPU.instrdst/Contents/Templates/Game Performance.tracetemplate": {
+      "commandSwitchStates": [
+        {
+          "contextSwitchSampling": false,
+          "counterdevice": 4294968739,
+          "counterprofile": 0,
+          "counterprofileinternal": 0,
+          "detectPriorityInversions": false,
+          "gpuperformancestate": 0,
+          "hangsThreshold": 2,
+          "highFreqSampling": false,
+          "highFrequency": false,
+          "recordKernelStack": false,
+          "recordKernelStacks": false,
+          "recordWaitingThreads": false,
+          "sampleExpensiveCACommits": 0,
+          "shaderprofiler": false,
+          "shaderprofilerinternal": false
+        }
+      ],
+      "recordingModes": [
+        {
+          "recordingMode": 2,
+          "supportsDeferredMode": true,
+          "supportsImmediateMode": false,
+          "supportsWindowedMode": true,
+          "timeLimit": 43200000000000,
+          "windowLimit": 5000000000
+        }
+      ]
+    },
+    "Packages/GPU.instrdst/Contents/Templates/Metal System Trace.tracetemplate": {
+      "commandSwitchStates": [
+        {
+          "contextSwitchSampling": false,
+          "counterdevice": 0,
+          "counterdeviceinternal": 4294969679,
+          "counterprofile": 0,
+          "counterprofileinternal": 0,
+          "detectPriorityInversions": false,
+          "gpuperformancestate": 0,
+          "gpuperformancestateinternal": 0,
+          "hangsThreshold": 2,
+          "highFreqSampling": false,
+          "highFrequency": false,
+          "recordKernelStack": false,
+          "recordKernelStacks": false,
+          "recordWaitingThreads": false,
+          "sampleExpensiveCACommits": 0,
+          "shaderprofiler": false,
+          "shaderprofilerinternal": false
+        }
+      ],
+      "recordingModes": [
+        {
+          "recordingMode": 2,
+          "supportsDeferredMode": true,
+          "supportsImmediateMode": true,
+          "supportsWindowedMode": true,
+          "timeLimit": 43200000000000,
+          "windowLimit": 0
+        }
+      ]
+    },
+    "Packages/Hitches.instrdst/Contents/Templates/Animation Hitches.tracetemplate": {
+      "commandSwitchStates": [
+        {
+          "contextSwitchSampling": false,
+          "counterdevice": 0,
+          "counterdeviceinternal": 0,
+          "counterprofile": 0,
+          "counterprofileinternal": 0,
+          "counterscounterdevice": 0,
+          "counterscounterprofile": 0,
+          "countersshaderprofiler": false,
+          "detectPriorityInversions": false,
+          "hangsThreshold": 3,
+          "highFreqSampling": false,
+          "highFrequency": false,
+          "recordKernelStack": false,
+          "recordKernelStacks": false,
+          "recordWaitingThreads": false,
+          "sampleExpensiveCACommits": 0,
+          "shaderprofiler": false,
+          "shaderprofilerinternal": false
+        }
+      ],
+      "recordingModes": [
+        {
+          "recordingMode": 2,
+          "supportsDeferredMode": true,
+          "supportsImmediateMode": false,
+          "supportsWindowedMode": false,
+          "timeLimit": 43200000000000,
+          "windowLimit": 0
+        }
+      ]
+    },
+    "Packages/Narrative.instrdst/Contents/Templates/Logging.tracetemplate": {
+      "commandSwitchStates": [
+        {
+          "contextSwitchSampling": false,
+          "counterdevice": 0,
+          "counterdeviceinternal": 0,
+          "counterprofile": 0,
+          "counterprofileinternal": 0,
+          "counterscounterdevice": 0,
+          "counterscounterprofile": 0,
+          "countersshaderprofiler": false,
+          "hangsThreshold": 0,
+          "highFreqSampling": false,
+          "highFrequency": false,
+          "recordKernelStack": false,
+          "recordKernelStacks": false,
+          "recordWaitingThreads": false,
+          "sampleExpensiveCACommits": 0,
+          "shaderprofiler": false,
+          "shaderprofilerinternal": false
+        }
+      ],
+      "recordingModes": [
+        {
+          "recordingMode": 1,
+          "supportsDeferredMode": true,
+          "supportsImmediateMode": true,
+          "supportsWindowedMode": true,
+          "timeLimit": 43200000000000,
+          "windowLimit": 0
+        }
+      ]
+    },
+    "Packages/RealityKit.instrdst/Contents/Templates/RealityKit Trace.tracetemplate": {
+      "commandSwitchStates": [
+        {
+          "contextSwitchSampling": false,
+          "counterdevice": 4294970338,
+          "counterprofile": 0,
+          "decodeOnDevice": false,
+          "detectPriorityInversions": false,
+          "gpuperformancestate": 0,
+          "hangsThreshold": 3,
+          "highFreqSampling": false,
+          "highFrequency": false,
+          "productionTrace": false,
+          "recordKernelStack": false,
+          "recordKernelStacks": false,
+          "recordWaitingThreads": false,
+          "sampleExpensiveCACommits": 0,
+          "shaderprofiler": false,
+          "traceRecordingMode": 0
+        }
+      ],
+      "recordingModes": [
+        {
+          "recordingMode": 2,
+          "supportsDeferredMode": true,
+          "supportsImmediateMode": true,
+          "supportsWindowedMode": true,
+          "timeLimit": 43200000000000,
+          "windowLimit": 0
+        }
+      ]
+    },
+    "Packages/Sampling.instrdst/Contents/Templates/Time Profiler.tracetemplate": {
+      "commandSwitchStates": [
+        {
+          "contextSwitchSampling": false,
+          "counterprofile": 0,
+          "counterprofileinternal": 0,
+          "detectPriorityInversions": false,
+          "hangsThreshold": 1,
+          "highFreqSampling": false,
+          "highFrequency": false,
+          "recordKernelStack": false,
+          "recordKernelStacks": false,
+          "recordWaitingThreads": false,
+          "sampleExpensiveCACommits": 0,
+          "shaderprofiler": false
+        }
+      ],
+      "recordingModes": [
+        {
+          "recordingMode": 1,
+          "supportsDeferredMode": true,
+          "supportsImmediateMode": true,
+          "supportsWindowedMode": true,
+          "timeLimit": 43200000000000,
+          "windowLimit": 0
+        }
+      ]
+    },
+    "Packages/SystemTrace.instrdst/Contents/Templates/System Trace.tracetemplate": {
+      "commandSwitchStates": [
+        {
+          "contextSwitchSampling": false,
+          "counterprofile": 0,
+          "counterprofileinternal": 0,
+          "detectPriorityInversions": false,
+          "hangsThreshold": 1,
+          "highFreqSampling": false,
+          "highFrequency": false,
+          "recordKernelStack": false,
+          "recordKernelStacks": false,
+          "recordWaitingThreads": false,
+          "sampleExpensiveCACommits": 0,
+          "shaderprofiler": false,
+          "shaderprofilerinternal": false
+        }
+      ],
+      "recordingModes": [
+        {
+          "recordingMode": 2,
+          "supportsDeferredMode": true,
+          "supportsImmediateMode": false,
+          "supportsWindowedMode": true,
+          "timeLimit": 0,
+          "windowLimit": 0
+        }
+      ]
+    },
+    "Resources/Network.tracetemplate": {
+      "commandSwitchStates": [
+        {
+          "contextSwitchSampling": false,
+          "counterdevice": 0,
+          "counterdeviceinternal": 0,
+          "counterprofile": 0,
+          "counterprofileinternal": 0,
+          "counterscounterdevice": 0,
+          "counterscounterprofile": 0,
+          "countersshaderprofiler": false,
+          "dataLoggingScope": 0,
+          "hangsThreshold": 0,
+          "highFreqSampling": false,
+          "highFrequency": false,
+          "recordKernelStack": false,
+          "recordKernelStacks": false,
+          "recordWaitingThreads": false,
+          "sampleExpensiveCACommits": 0,
+          "shaderprofiler": false,
+          "shaderprofilerinternal": false
+        }
+      ],
+      "recordingModes": [
+        {
+          "recordingMode": 1,
+          "supportsDeferredMode": true,
+          "supportsImmediateMode": true,
+          "supportsWindowedMode": true,
+          "timeLimit": 43200000000000,
+          "windowLimit": 0
+        }
+      ]
+    },
+    "Resources/Power Profiler.tracetemplate": {
+      "commandSwitchStates": [
+        {
+          "contextSwitchSampling": false,
+          "detectPriorityInversions": false,
+          "hangsThreshold": 2,
+          "highFreqSampling": false,
+          "highFrequency": false,
+          "recordKernelStack": false,
+          "recordKernelStacks": false,
+          "recordWaitingThreads": false,
+          "sampleExpensiveCACommits": 0
+        }
+      ],
+      "recordingModes": [
+        {
+          "recordingMode": 2,
+          "supportsDeferredMode": true,
+          "supportsImmediateMode": false,
+          "supportsWindowedMode": true,
+          "timeLimit": 43200000000000,
+          "windowLimit": 0
+        }
+      ]
+    },
+    "Resources/templates/Allocations.tracetemplate": {
+      "commandSwitchStates": [
+        {
+          "contextSwitchSampling": false,
+          "counterprofile": 0,
+          "counterprofileinternal": 0,
+          "decodeOnDevice": false,
+          "detectPriorityInversions": false,
+          "hangsThreshold": 2,
+          "highFreqSampling": false,
+          "highFrequency": false,
+          "productionTrace": false,
+          "recordKernelStack": false,
+          "recordKernelStacks": false,
+          "recordWaitingThreads": false,
+          "sampleExpensiveCACommits": 0,
+          "shaderprofiler": false,
+          "shaderprofilerinternal": false,
+          "traceRecordingMode": 0
+        }
+      ],
+      "recordingModes": [
+        {
+          "recordingMode": 2,
+          "supportsDeferredMode": true,
+          "supportsImmediateMode": true,
+          "supportsWindowedMode": false,
+          "timeLimit": 43200000000000,
+          "windowLimit": 0
+        }
+      ]
+    },
+    "Resources/templates/CPU Counters.tracetemplate": {
+      "commandSwitchStates": [
+        {
+          "contextSwitchSampling": false,
+          "detectPriorityInversions": false,
+          "hangsThreshold": 2,
+          "highFreqSampling": false,
+          "highFrequency": false,
+          "recordKernelStack": false,
+          "recordKernelStacks": false,
+          "recordWaitingThreads": false,
+          "sampleExpensiveCACommits": 0
+        }
+      ],
+      "recordingModes": [
+        {
+          "recordingMode": 2,
+          "supportsDeferredMode": true,
+          "supportsImmediateMode": false,
+          "supportsWindowedMode": true,
+          "timeLimit": 43200000000000,
+          "windowLimit": 0
+        }
+      ]
+    },
+    "Resources/templates/Core AI.tracetemplate": {
+      "commandSwitchStates": [
+        {
+          "contextSwitchSampling": false,
+          "detectPriorityInversions": false,
+          "hangsThreshold": 2,
+          "highFreqSampling": false,
+          "highFrequency": false,
+          "recordKernelStack": false,
+          "recordKernelStacks": false,
+          "recordWaitingThreads": false,
+          "sampleExpensiveCACommits": 0
+        }
+      ],
+      "recordingModes": [
+        {
+          "recordingMode": 1,
+          "supportsDeferredMode": true,
+          "supportsImmediateMode": true,
+          "supportsWindowedMode": true,
+          "timeLimit": 0,
+          "windowLimit": 0
+        }
+      ]
+    },
+    "Resources/templates/File Activity.tracetemplate": {
+      "commandSwitchStates": [
+        {
+          "counterprofile": 0,
+          "highFreqSampling": false,
+          "recordKernelStacks": false,
+          "recordWaitingThreads": false,
+          "sampleExpensiveCACommits": 0
+        }
+      ],
+      "recordingModes": [
+        {
+          "recordingMode": 2,
+          "supportsDeferredMode": true,
+          "supportsImmediateMode": false,
+          "supportsWindowedMode": true,
+          "timeLimit": 43200000000000,
+          "windowLimit": 0
+        }
+      ]
+    },
+    "Resources/templates/Foundation Models.tracetemplate": {
+      "commandSwitchStates": [
+        {
+          "contextSwitchSampling": false,
+          "detectPriorityInversions": false,
+          "hangsThreshold": 2,
+          "highFreqSampling": false,
+          "highFrequency": false,
+          "recordKernelStack": false,
+          "recordKernelStacks": false,
+          "recordWaitingThreads": false,
+          "sampleExpensiveCACommits": 0
+        }
+      ],
+      "recordingModes": [
+        {
+          "recordingMode": 2,
+          "supportsDeferredMode": true,
+          "supportsImmediateMode": true,
+          "supportsWindowedMode": true,
+          "timeLimit": 0,
+          "windowLimit": 0
+        }
+      ]
+    },
+    "Resources/templates/Leaks.tracetemplate": {
+      "commandSwitchStates": [
+        {
+          "contextSwitchSampling": false,
+          "counterprofile": 0,
+          "counterprofileinternal": 0,
+          "decodeOnDevice": false,
+          "detectPriorityInversions": false,
+          "hangsThreshold": 2,
+          "highFreqSampling": false,
+          "highFrequency": false,
+          "productionTrace": false,
+          "recordKernelStack": false,
+          "recordKernelStacks": false,
+          "recordWaitingThreads": false,
+          "sampleExpensiveCACommits": 0,
+          "shaderprofiler": false,
+          "shaderprofilerinternal": false,
+          "traceRecordingMode": 0
+        }
+      ],
+      "recordingModes": [
+        {
+          "recordingMode": 2,
+          "supportsDeferredMode": true,
+          "supportsImmediateMode": true,
+          "supportsWindowedMode": false,
+          "timeLimit": 43200000000000,
+          "windowLimit": 0
+        }
+      ]
+    },
+    "Resources/templates/Network.tracetemplate": {
+      "commandSwitchStates": [
+        {
+          "contextSwitchSampling": false,
+          "counterdevice": 0,
+          "counterdeviceinternal": 0,
+          "counterprofile": 0,
+          "counterprofileinternal": 0,
+          "counterscounterdevice": 0,
+          "counterscounterprofile": 0,
+          "countersshaderprofiler": false,
+          "dataLoggingScope": 0,
+          "hangsThreshold": 0,
+          "highFreqSampling": false,
+          "highFrequency": false,
+          "recordKernelStack": false,
+          "recordKernelStacks": false,
+          "recordWaitingThreads": false,
+          "sampleExpensiveCACommits": 0,
+          "shaderprofiler": false,
+          "shaderprofilerinternal": false
+        }
+      ],
+      "recordingModes": [
+        {
+          "recordingMode": 1,
+          "supportsDeferredMode": true,
+          "supportsImmediateMode": true,
+          "supportsWindowedMode": true,
+          "timeLimit": 43200000000000,
+          "windowLimit": 0
+        }
+      ]
+    },
+    "Resources/templates/Power Profiler.tracetemplate": {
+      "commandSwitchStates": [
+        {
+          "contextSwitchSampling": false,
+          "detectPriorityInversions": false,
+          "hangsThreshold": 2,
+          "highFreqSampling": false,
+          "highFrequency": false,
+          "recordKernelStack": false,
+          "recordKernelStacks": false,
+          "recordWaitingThreads": false,
+          "sampleExpensiveCACommits": 0
+        }
+      ],
+      "recordingModes": [
+        {
+          "recordingMode": 2,
+          "supportsDeferredMode": true,
+          "supportsImmediateMode": false,
+          "supportsWindowedMode": true,
+          "timeLimit": 43200000000000,
+          "windowLimit": 0
+        }
+      ]
+    },
+    "Resources/templates/Processor Trace.tracetemplate": {
+      "commandSwitchStates": [
+        {
+          "contextSwitchSampling": false,
+          "detectPriorityInversions": false,
+          "hangsThreshold": 2,
+          "highFreqSampling": false,
+          "highFrequency": false,
+          "recordKernelStack": false,
+          "recordKernelStacks": false,
+          "recordWaitingThreads": false,
+          "sampleExpensiveCACommits": 0
+        }
+      ],
+      "recordingModes": [
+        {
+          "recordingMode": 2,
+          "supportsDeferredMode": true,
+          "supportsImmediateMode": false,
+          "supportsWindowedMode": false,
+          "timeLimit": 1000000000,
+          "windowLimit": 5000000000
+        }
+      ]
+    },
+    "Resources/templates/Swift Concurrency.tracetemplate": {
+      "commandSwitchStates": [
+        {
+          "contextSwitchSampling": false,
+          "detectPriorityInversions": false,
+          "hangsThreshold": 1,
+          "highFreqSampling": false,
+          "highFrequency": false,
+          "recordKernelStack": false,
+          "recordKernelStacks": false,
+          "recordWaitingThreads": false,
+          "sampleExpensiveCACommits": 0
+        }
+      ],
+      "recordingModes": [
+        {
+          "recordingMode": 2,
+          "supportsDeferredMode": true,
+          "supportsImmediateMode": true,
+          "supportsWindowedMode": true,
+          "timeLimit": 43200000000000,
+          "windowLimit": 0
+        }
+      ]
+    },
+    "Resources/templates/SwiftUI.tracetemplate": {
+      "commandSwitchStates": [
+        {
+          "contextSwitchSampling": false,
+          "counterprofile": 0,
+          "counterprofileinternal": 0,
+          "detectPriorityInversions": false,
+          "hangsThreshold": 1,
+          "highFreqSampling": true,
+          "highFrequency": false,
+          "recordKernelStack": false,
+          "recordKernelStacks": false,
+          "recordWaitingThreads": false,
+          "sampleExpensiveCACommits": 0,
+          "shaderprofiler": false
+        }
+      ],
+      "recordingModes": [
+        {
+          "recordingMode": 2,
+          "supportsDeferredMode": true,
+          "supportsImmediateMode": false,
+          "supportsWindowedMode": false,
+          "timeLimit": 43200000000000,
+          "windowLimit": 0
+        }
+      ]
+    }
+  },
+  "source": "NSKeyedArchiver $objects in installed .tracetemplate files",
+  "xcode": "27.0 (27A266a)"
+}

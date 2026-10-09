@@ -20,6 +20,10 @@ public struct SortView: View {
   @State private var isSpeedExpanded = false
   @State private var isSizeExpanded = false
   @State private var isVisualizerExpanded = false
+  #if DEBUG && targetEnvironment(macCatalyst) && LOCAL_INSTRUMENTS_TRACING
+  @State private var traceHistory = DebugTraceHistory.shared
+  @State private var isTraceHistoryPresented = false
+  #endif
 
   public init(session: SortSession, showcaseStop: (() -> Void)? = nil) {
     self.session = session
@@ -33,9 +37,99 @@ public struct SortView: View {
       } else {
         statusLabel
       }
+      #if DEBUG && targetEnvironment(macCatalyst) && LOCAL_INSTRUMENTS_TRACING
+      if ProcessInfo.processInfo.environment["SORT_SYMPHONY_TRACE"] == "1" {
+        traceControls
+      }
+      #endif
       content
     }
   }
+
+  #if DEBUG && targetEnvironment(macCatalyst) && LOCAL_INSTRUMENTS_TRACING
+  private var traceControls: some View {
+    VStack(alignment: .leading, spacing: 4) {
+      HStack {
+        Text("Instruments traces: \(traceHistory.records.count)")
+          .font(.caption.monospacedDigit())
+          .accessibilityIdentifier("instrumentsTraceCount")
+        Spacer()
+        Picker("Profile", selection: $session.debugTraceTemplate) {
+          ForEach(DebugTraceTemplate.allCases) { template in
+            Text(template.rawValue).tag(template)
+          }
+        }
+        .fixedSize()
+        .accessibilityIdentifier("instrumentsProfilePicker")
+        Picker("Runs", selection: $session.debugTraceRepetitions) {
+          ForEach([1, 10, 50, 100], id: \.self) { count in
+            Text("\(count)").tag(count)
+          }
+        }
+        .fixedSize()
+        .accessibilityIdentifier("instrumentsTraceRepetitionsPicker")
+        if session.debugTraceTemplate.supportsHighFrequency {
+          Toggle("High Frequency", isOn: $session.debugTraceHighFrequency)
+            .fixedSize()
+            .accessibilityIdentifier("instrumentsHighFrequencyToggle")
+        }
+        Button("Record another trace") {
+          Task { await session.start(size: session.arraySize) }
+        }
+        .disabled(session.isAutomating || traceIsRecording)
+        .accessibilityIdentifier("instrumentsRecordAgainButton")
+        Button("All traces") { isTraceHistoryPresented = true }
+          .disabled(traceHistory.records.isEmpty)
+          .accessibilityIdentifier("instrumentsAllTracesButton")
+      }
+      ForEach(traceHistory.records.prefix(3)) { trace in
+        Link(destination: trace.url) {
+          Text(
+            "\(trace.algorithmName) · \(trace.profileName)"
+              + (trace.highFrequency == true ? " · High Frequency" : "")
+              + (trace.processID.map { " · PID \($0)" } ?? "")
+              + " · \(trace.repetitions) runs"
+              + " · \(trace.recordedAt.formatted(date: .omitted, time: .standard))"
+          )
+            .font(.caption2)
+            .lineLimit(1)
+        }
+        .accessibilityIdentifier("instrumentsTraceLink")
+      }
+    }
+    .padding(.horizontal)
+    .sheet(isPresented: $isTraceHistoryPresented) {
+      NavigationStack {
+        List(traceHistory.records) { trace in
+          Link(destination: trace.url) {
+            VStack(alignment: .leading, spacing: 2) {
+              Text("\(trace.algorithmName) · \(trace.profileName)")
+              Text(
+                "\(trace.recordedAt.formatted(date: .abbreviated, time: .standard))"
+                  + (trace.processID.map { " · PID \($0)" } ?? "")
+                  + " · \(trace.repetitions) runs"
+              )
+              .font(.caption)
+              .foregroundStyle(.secondary)
+            }
+          }
+        }
+        .navigationTitle("Instruments traces")
+        .toolbar {
+          ToolbarItem(placement: .confirmationAction) {
+            Button("Done") { isTraceHistoryPresented = false }
+          }
+        }
+      }
+      .frame(minWidth: 620, minHeight: 400)
+    }
+  }
+
+  private var traceIsRecording: Bool {
+    if case .recording = session.phase { return true }
+    return false
+  }
+  #endif
 
   /// Shown instead of the normal status label while a registered `Automation` is driving this
   /// session — same "machine-readable via accessibilityIdentifier" shape as `statusLabel`, plus
