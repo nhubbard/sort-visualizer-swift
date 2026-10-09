@@ -60,8 +60,22 @@ private final class AdaptiveGrailRecorder {
   init(engine: RecordingEngine) { self.engine = engine }
 
   private func read(_ index: Int) -> Int { engine.readValue(at: index) }
-  private func write(_ index: Int, _ value: Int) { engine.setValue(index, value) }
-  private func swap(_ first: Int, _ second: Int) { engine.swap(first, second) }
+  private func write(_ index: Int, _ value: Int) {
+    engine.setValue(index, value)
+    engine.annotateLastOperation(
+      stageID: "adaptiveGrail.place", decisionID: "adaptiveGrail.place", outcome: "placed",
+      roles: ["destination": .arrayIndex(index), "value": .value(value)],
+      explanationKey: "adaptiveGrail.place",
+      explanation: "Adaptive Grail places the selected value while forming or merging its runs.")
+  }
+  private func swap(_ first: Int, _ second: Int) {
+    engine.swap(first, second)
+    engine.annotateLastOperation(
+      stageID: "adaptiveGrail.blockExchange", decisionID: "adaptiveGrail.blockExchange",
+      outcome: "exchange", roles: ["first": .arrayIndex(first), "second": .arrayIndex(second)],
+      explanationKey: "adaptiveGrail.blockExchange",
+      explanation: "Adaptive Grail exchanges these positions to rotate a run or its block buffer.")
+  }
 
   private func compare(_ first: Int, _ second: Int) -> Int {
     if engine.teachingCompare(

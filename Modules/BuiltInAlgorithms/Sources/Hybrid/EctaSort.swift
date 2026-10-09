@@ -49,6 +49,15 @@ public struct EctaSort: SortAlgorithm {
     let length = engine.count
     guard length > 1 else { return }
 
+    func place(_ destination: Int, _ value: Int) {
+      engine.setValue(destination, value)
+      engine.annotateLastOperation(
+        stageID: "ecta.place", decisionID: "ecta.place", outcome: "placed",
+        roles: ["destination": .arrayIndex(destination), "value": .value(value)],
+        explanationKey: "ecta.place",
+        explanation: "Ecta places the next selected run value in its merge destination.")
+    }
+
     func minRun(_ n: Int) -> Int {
       var run = n
       while run >= 32 { run = (run + 1) / 2 }
@@ -76,10 +85,10 @@ public struct EctaSort: SortAlgorithm {
         }
         var cursor = index
         while cursor > low {
-          engine.setValue(cursor, engine.readValue(at: cursor - 1))
+          place(cursor, engine.readValue(at: cursor - 1))
           cursor -= 1
         }
-        if low != index { engine.setValue(low, value) }
+        if low != index { place(low, value) }
       }
     }
 
@@ -124,7 +133,7 @@ public struct EctaSort: SortAlgorithm {
     func copyMain(_ source: Int, _ destination: Int, _ count: Int) {
       guard count > 0 else { return }
       let values = engine.readValues(in: source..<(source + count))
-      for offset in 0..<count { engine.setValue(destination + offset, values[offset]) }
+      for offset in 0..<count { place(destination + offset, values[offset]) }
     }
     func copyMainToBuffer(_ source: Int, _ destination: Int, _ count: Int) {
       for offset in 0..<count {
@@ -132,12 +141,12 @@ public struct EctaSort: SortAlgorithm {
       }
     }
     func copyBufferToMain(_ source: Int, _ destination: Int, _ count: Int) {
-      for offset in 0..<count { engine.setValue(destination + offset, readBuffer(source + offset)) }
+      for offset in 0..<count { place(destination + offset, readBuffer(source + offset)) }
     }
     func shift(_ a: Int, _ middle: Int, _ end: Int) {
       var destination = a
       for source in middle..<end {
-        engine.setValue(destination, engine.readValue(at: source))
+        place(destination, engine.readValue(at: source))
         destination += 1
       }
     }
@@ -145,7 +154,7 @@ public struct EctaSort: SortAlgorithm {
       var destination = end
       for source in stride(from: middle - 1, through: a, by: -1) {
         destination -= 1
-        engine.setValue(destination, engine.readValue(at: source))
+        place(destination, engine.readValue(at: source))
       }
     }
     func mergeTo(_ a: Int, _ middle: Int, _ end: Int, _ destination: Int) {
@@ -153,22 +162,27 @@ public struct EctaSort: SortAlgorithm {
       var right = middle
       var output = destination
       while left < middle && right < end {
-        if engine.compare(left, right, by: (<=)) {
-          engine.setValue(output, engine.readValue(at: left))
+        if engine.teachingCompare(
+          left, right, by: (<=),
+          stageID: "ecta.mergeForward",
+          whenTrue: "The left run value is no greater, so Ecta writes it next.",
+          whenFalse: "The right run value is smaller, so Ecta writes it next."
+        ) {
+          place(output, engine.readValue(at: left))
           left += 1
         } else {
-          engine.setValue(output, engine.readValue(at: right))
+          place(output, engine.readValue(at: right))
           right += 1
         }
         output += 1
       }
       while left < middle {
-        engine.setValue(output, engine.readValue(at: left))
+        place(output, engine.readValue(at: left))
         left += 1
         output += 1
       }
       while right < end {
-        engine.setValue(output, engine.readValue(at: right))
+        place(output, engine.readValue(at: right))
         right += 1
         output += 1
       }
@@ -187,17 +201,22 @@ public struct EctaSort: SortAlgorithm {
       var output = end
       while left >= a && right >= workspace {
         output -= 1
-        if engine.compare(left, right, by: (>)) {
-          engine.setValue(output, engine.readValue(at: left))
+        if engine.teachingCompare(
+          left, right, by: (>),
+          stageID: "ecta.mergeBackward",
+          whenTrue: "The left tail is larger, so Ecta writes it next from the back.",
+          whenFalse: "The right tail is at least as large, so Ecta writes it next."
+        ) {
+          place(output, engine.readValue(at: left))
           left -= 1
         } else {
-          engine.setValue(output, engine.readValue(at: right))
+          place(output, engine.readValue(at: right))
           right -= 1
         }
       }
       while right >= workspace {
         output -= 1
-        engine.setValue(output, engine.readValue(at: right))
+        place(output, engine.readValue(at: right))
         right -= 1
       }
     }
@@ -207,17 +226,22 @@ public struct EctaSort: SortAlgorithm {
       var output = start
       while index < count && right < end {
         let held = readBuffer(index)
-        if engine.compareValue(right, against: held, by: (>=)) {
-          engine.setValue(output, held)
+        if engine.teachingCompareValue(
+          right, against: held, by: (>=),
+          stageID: "ecta.bufferMerge",
+          whenTrue: "This run value is at least the held buffer value, so Ecta writes the buffer value.",
+          whenFalse: "This run value is smaller, so Ecta writes it before the buffer value."
+        ) {
+          place(output, held)
           index += 1
         } else {
-          engine.setValue(output, engine.readValue(at: right))
+          place(output, engine.readValue(at: right))
           right += 1
         }
         output += 1
       }
       while index < count {
-        engine.setValue(output, readBuffer(index))
+        place(output, readBuffer(index))
         index += 1
         output += 1
       }
@@ -232,18 +256,23 @@ public struct EctaSort: SortAlgorithm {
       while index >= split && left >= first {
         output -= 1
         let held = readBuffer(index)
-        if engine.compareValue(left, against: held, by: (<)) {
-          engine.setValue(output, held)
+        if engine.teachingCompareValue(
+          left, against: held, by: (<),
+          stageID: "ecta.bufferMerge",
+          whenTrue: "This run value is below the held buffer value, so Ecta writes the buffer value from the back.",
+          whenFalse: "This run value is at least as large, so Ecta writes it next."
+        ) {
+          place(output, held)
           index -= 1
         } else {
-          engine.setValue(output, engine.readValue(at: left))
+          place(output, engine.readValue(at: left))
           left -= 1
         }
       }
       if left < first {
         while index >= 0 {
           output -= 1
-          engine.setValue(output, readBuffer(index))
+          place(output, readBuffer(index))
           index -= 1
         }
       } else {
@@ -331,21 +360,26 @@ public struct EctaSort: SortAlgorithm {
         for offset in 0..<block {
           let destination = (choice == 0 ? savedPosition : otherPosition) + offset
           if left < middle && right < end {
-            if engine.compare(left, right, by: (<=)) {
-              engine.setValue(destination, engine.readValue(at: left))
+            if engine.teachingCompare(
+              left, right, by: (<=),
+              stageID: "ecta.mergeForward",
+              whenTrue: "The left run value is no greater, so Ecta writes it next.",
+              whenFalse: "The right run value is smaller, so Ecta writes it next."
+            ) {
+              place(destination, engine.readValue(at: left))
               left += 1
               saved += 1
             } else {
-              engine.setValue(destination, engine.readValue(at: right))
+              place(destination, engine.readValue(at: right))
               right += 1
               other += 1
             }
           } else if left < middle {
-            engine.setValue(destination, engine.readValue(at: left))
+            place(destination, engine.readValue(at: left))
             left += 1
             saved += 1
           } else {
-            engine.setValue(destination, engine.readValue(at: right))
+            place(destination, engine.readValue(at: right))
             right += 1
             other += 1
           }
@@ -384,21 +418,26 @@ public struct EctaSort: SortAlgorithm {
         for offset in 1...block {
           let destination = (choice == 0 ? savedPosition : otherPosition) - offset
           if right >= middle && left >= start {
-            if engine.compare(right, left, by: (>=)) {
-              engine.setValue(destination, engine.readValue(at: right))
+            if engine.teachingCompare(
+              right, left, by: (>=),
+              stageID: "ecta.blockMerge",
+              whenTrue: "The right tail is at least as large, so the block merge writes it next.",
+              whenFalse: "The left tail is larger, so the block merge writes it next."
+            ) {
+              place(destination, engine.readValue(at: right))
               right -= 1
               saved += 1
             } else {
-              engine.setValue(destination, engine.readValue(at: left))
+              place(destination, engine.readValue(at: left))
               left -= 1
               other += 1
             }
           } else if right >= middle {
-            engine.setValue(destination, engine.readValue(at: right))
+            place(destination, engine.readValue(at: right))
             right -= 1
             saved += 1
           } else {
-            engine.setValue(destination, engine.readValue(at: left))
+            place(destination, engine.readValue(at: left))
             left -= 1
             other += 1
           }

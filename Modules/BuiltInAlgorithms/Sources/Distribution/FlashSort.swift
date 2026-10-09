@@ -58,7 +58,16 @@ public struct FlashSort: SortAlgorithm {
       let small: Int
       let big: Int
       let bigIndex: Int
-      if engine.compare(i, i + 1, by: (<)) {
+      let firstIsSmaller = engine.compare(i, i + 1, by: (<))
+      engine.annotateLastOperation(
+        stageID: "rangeScan", decisionID: "flashsort.pairOrder",
+        outcome: firstIsSmaller ? "firstIsSmaller" : "secondIsSmaller",
+        roles: ["first": .arrayIndex(i), "second": .arrayIndex(i + 1)],
+        explanationKey: "flashsort.pairOrder",
+        explanation: firstIsSmaller
+          ? "The first value is smaller, so use it for the minimum check and the second for the maximum."
+          : "The second value is no larger, so use it for the minimum check and the first for the maximum.")
+      if firstIsSmaller {
         small = engine.readValue(at: i)
         big = engine.readValue(at: i + 1)
         bigIndex = i + 1
@@ -100,6 +109,12 @@ public struct FlashSort: SortAlgorithm {
     var L = [Int](repeating: 0, count: m + 1)
     for t in 1...m {
       engine.writeAux(auxHandle, at: t, value: 0)
+      engine.annotateLastOperation(
+        stageID: "scratchUpdate", decisionID: "flashsort.scratchUpdate",
+        outcome: "update",
+        roles: ["scratch": .auxiliaryIndex(handle: auxHandle.rawValue, index: t)],
+        explanationKey: "flashsort.scratchUpdate",
+        explanation: "Update this class count or boundary as the class permutation advances.")
     }
 
     // K(x) = 1 + floor((m-1)(x-min)/(max-min)). `c` is the precomputed `(m-1)/(max-min)`
@@ -114,11 +129,23 @@ public struct FlashSort: SortAlgorithm {
       let k = classOf(engine.readValue(at: h))
       L[k] += 1
       engine.writeAux(auxHandle, at: k, value: L[k])
+      engine.annotateLastOperation(
+        stageID: "scratchUpdate", decisionID: "flashsort.scratchUpdate",
+        outcome: "update",
+        roles: ["scratch": .auxiliaryIndex(handle: auxHandle.rawValue, index: k)],
+        explanationKey: "flashsort.scratchUpdate",
+        explanation: "Update this class count or boundary as the class permutation advances.")
     }
 
     for k in 2...m {
       L[k] += L[k - 1]
       engine.writeAux(auxHandle, at: k, value: L[k])
+      engine.annotateLastOperation(
+        stageID: "scratchUpdate", decisionID: "flashsort.scratchUpdate",
+        outcome: "update",
+        roles: ["scratch": .auxiliaryIndex(handle: auxHandle.rawValue, index: k)],
+        explanationKey: "flashsort.scratchUpdate",
+        explanation: "Update this class count or boundary as the class permutation advances.")
     }
 
     // -------PERMUTATION-------
@@ -169,6 +196,12 @@ public struct FlashSort: SortAlgorithm {
         evicted = temp
         L[k] -= 1
         engine.writeAux(auxHandle, at: k, value: L[k])
+        engine.annotateLastOperation(
+          stageID: "scratchUpdate", decisionID: "flashsort.scratchUpdate",
+          outcome: "update",
+          roles: ["scratch": .auxiliaryIndex(handle: auxHandle.rawValue, index: k)],
+          explanationKey: "flashsort.scratchUpdate",
+          explanation: "Update this class count or boundary as the class permutation advances.")
         numMoves += 1
       }
     }

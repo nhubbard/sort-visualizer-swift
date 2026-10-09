@@ -30,6 +30,11 @@ class BlockMergeSortingTemplate {
     var input = source
     while input < end {
       engine.setValue(output, engine.readValue(at: input))
+      engine.annotateLastOperation(
+        stageID: "blockMerge.shiftForward", decisionID: "blockMerge.shiftForward", outcome: "shift",
+        roles: ["source": .arrayIndex(input), "destination": .arrayIndex(output)],
+        explanationKey: "blockMerge.shiftForward",
+        explanation: "The unconsumed run shifts into the open merge destination.")
       output += 1
       input += 1
     }
@@ -42,6 +47,11 @@ class BlockMergeSortingTemplate {
       input -= 1
       output -= 1
       engine.setValue(output, engine.readValue(at: input))
+      engine.annotateLastOperation(
+        stageID: "blockMerge.shiftBackward", decisionID: "blockMerge.shiftBackward", outcome: "shift",
+        roles: ["source": .arrayIndex(input), "destination": .arrayIndex(output)],
+        explanationKey: "blockMerge.shiftBackward",
+        explanation: "The unconsumed run shifts backward into the open merge destination.")
     }
   }
 
@@ -80,7 +90,14 @@ class BlockMergeSortingTemplate {
 
   func multiSwap(_ first: Int, _ second: Int, _ length: Int) {
     guard length > 0 else { return }
-    for offset in 0..<length { engine.swap(first + offset, second + offset) }
+    for offset in 0..<length {
+      engine.swap(first + offset, second + offset)
+      engine.annotateLastOperation(
+        stageID: "blockMerge.exchange", decisionID: "blockMerge.exchange", outcome: "exchange",
+        roles: ["first": .arrayIndex(first + offset), "second": .arrayIndex(second + offset)],
+        explanationKey: "blockMerge.exchange",
+        explanation: "The block merge exchanges these positions to move an ordered block into place.")
+    }
   }
 
   func mergeForwardExternal(_ start: Int, _ middle: Int, _ end: Int, _ destination: Int) {
@@ -88,7 +105,10 @@ class BlockMergeSortingTemplate {
     var right = middle
     var output = destination
     while left < middle && right < end {
-      if engine.compare(left, right, by: (<=)) {
+      if engine.teachingCompare(
+        left, right, by: (<=), stageID: "blockMerge.forwardChoice",
+        whenTrue: "The left run value is no greater, so the forward merge takes it next.",
+        whenFalse: "The right run value is smaller, so the forward merge takes it next.") {
         engine.setValue(output, engine.readValue(at: left))
         left += 1
       } else {
@@ -107,7 +127,10 @@ class BlockMergeSortingTemplate {
     var output = destinationEnd
     while right >= middle && left >= start {
       output -= 1
-      if engine.compare(right, left, by: (>=)) {
+      if engine.teachingCompare(
+        right, left, by: (>=), stageID: "blockMerge.backwardChoice",
+        whenTrue: "The right run value is at least as large, so the backward merge takes it next.",
+        whenFalse: "The left run value is larger, so the backward merge takes it next.") {
         engine.setValue(output, engine.readValue(at: right))
         right -= 1
       } else {

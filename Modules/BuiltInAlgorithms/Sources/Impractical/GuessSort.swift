@@ -51,6 +51,16 @@ public struct GuessSort: SortAlgorithm {
           } else {
             isInversion = false
           }
+          if i != j {
+            engine.annotateLastOperation(
+              stageID: "candidateCheck", decisionID: "guesssort.pairInversion",
+              outcome: isInversion ? "countInversion" : "keepCount",
+              roles: ["left": .arrayIndex(loops[i]), "right": .arrayIndex(loops[j])],
+              explanationKey: "guesssort.pairInversion",
+              explanation: isInversion
+                ? "This mapped pair is inverted, so count it against the candidate."
+                : "This mapped pair is ordered, so the inversion count stays unchanged.")
+          }
           if isInversion { total += 1 }
         }
       }

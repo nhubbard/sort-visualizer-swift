@@ -50,7 +50,11 @@ public struct BingoSort: SortAlgorithm {
     }
     // Skip past any elements at the tail that already equal the true maximum — nothing to do
     // for them yet.
-    while maximum > 0 && engine.compareValue(maximum, against: next, by: ==) {
+    while maximum > 0 && engine.teachingCompareValue(
+      maximum, against: next, by: ==, stageID: "BingoSort.skipPlacedMaximum",
+      whenTrue: "This tail item equals the current maximum, so leave it in its final position.",
+      whenFalse: "This tail item differs from the maximum, so begin another placement round."
+    ) {
       maximum -= 1
     }
 
@@ -63,15 +67,27 @@ public struct BingoSort: SortAlgorithm {
       // initializer runs exactly once even though the loop body mutates `maximum`.
       var j = maximum - 1
       while j >= 0 {
-        if engine.compareValue(j, against: val, by: ==) {
+        if engine.teachingCompareValue(
+          j, against: val, by: ==, stageID: "BingoSort.placeCurrentValue",
+          whenTrue: "This item matches the current bingo value, so place it at the right boundary.",
+          whenFalse: "This item has a different value; check whether it becomes the next target."
+        ) {
           engine.swap(j, maximum)
           maximum -= 1
-        } else if engine.compareValue(j, against: next, by: >) {
+        } else if engine.teachingCompareValue(
+          j, against: next, by: >, stageID: "BingoSort.findNextValue",
+          whenTrue: "This item is larger than the next target, so use it for the next bingo round.",
+          whenFalse: "The next bingo target remains the better candidate."
+        ) {
           next = engine.readValue(at: j)
         }
         j -= 1
       }
-      while maximum > 0 && engine.compareValue(maximum, against: next, by: ==) {
+      while maximum > 0 && engine.teachingCompareValue(
+        maximum, against: next, by: ==, stageID: "BingoSort.skipPlacedTail",
+        whenTrue: "This tail item already matches the next target, so shrink the unsorted boundary.",
+        whenFalse: "The remaining tail needs another bingo placement round."
+      ) {
         maximum -= 1
       }
     }

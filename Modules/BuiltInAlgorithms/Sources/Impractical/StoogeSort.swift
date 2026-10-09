@@ -34,7 +34,16 @@ public struct StoogeSort: SortAlgorithm {
   /// 5-element range, `t` is 1, leaving a 4-element first/third sub-range — `ceil(2/3 * 5)`, not
   /// `floor`) exactly as the algorithm requires to fully sort every input.
   private func stoogeSort(_ engine: inout RecordingEngine, _ i: Int, _ j: Int) {
-    if engine.compare(i, j, by: >) {
+    let inverted = engine.compare(i, j, by: >)
+    engine.annotateLastOperation(
+      stageID: "recursiveRange", decisionID: "stoogesort.endpointOrder",
+      outcome: inverted ? "exchange" : "keep",
+      roles: ["first": .arrayIndex(i), "last": .arrayIndex(j)],
+      explanationKey: "stoogesort.endpointOrder",
+      explanation: inverted
+        ? "The range endpoints are inverted, so exchange them before recursing."
+        : "The range endpoints are ordered, so recurse without exchanging them.")
+    if inverted {
       engine.swap(i, j)
       engine.annotateLastOperation(
         stageID: "candidateExchange", decisionID: "stoogesort.candidateExchange",

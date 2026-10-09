@@ -130,10 +130,22 @@ private final class TimSortRecorder {
       whenTrue: "The run begins in descending order, so TimSort scans and reverses it.",
       whenFalse: "The run begins in nondecreasing order, so TimSort extends it forward."
     ) {
-      while cursor < end && engine.compare(cursor, cursor - 1, by: (<)) { cursor += 1 }
-      engine.reversal(start, cursor - 1)
+      while cursor < end && engine.teachingCompare(
+        cursor, cursor - 1, by: (<),
+        stageID: "TimSort.run.descending",
+        whenTrue: "The run keeps descending, so extend it before reversing.",
+        whenFalse: "The descending run ends here."
+      ) { cursor += 1 }
+      engine.teachingReversal(start, cursor - 1,
+        stageID: "TimSort.run.reverse",
+        explanation: "Reverse the descending run to make it ascending.")
     } else {
-      while cursor < end && engine.compare(cursor, cursor - 1, by: (>=)) { cursor += 1 }
+      while cursor < end && engine.teachingCompare(
+        cursor, cursor - 1, by: (>=),
+        stageID: "TimSort.run.ascending",
+        whenTrue: "The run keeps ascending, so extend it.",
+        whenFalse: "The ascending run ends here."
+      ) { cursor += 1 }
     }
     return cursor - start
   }
@@ -146,7 +158,12 @@ private final class TimSortRecorder {
       var high = cursor
       while low < high {
         let middle = low + (high - low) / 2
-        if engine.compareValue(middle, against: pivot, by: (<=)) { low = middle + 1 }
+        if engine.teachingCompareValue(
+          middle, against: pivot, by: (<=),
+          stageID: "TimSort.run.extend",
+          whenTrue: "The prefix value is no greater than the held value, so search right.",
+          whenFalse: "The prefix value is larger, so search left for insertion."
+        ) { low = middle + 1 }
         else { high = middle }
       }
       var shift = cursor
@@ -195,7 +212,12 @@ private final class TimSortRecorder {
     guard start < end else { return start }
     func beforeInsertion(_ index: Int) -> Bool {
       let value = valueAt(index)
-      return engine.compareValues(value, key, by: upper ? (<=) : (<))
+      return engine.teachingCompareValues(
+        value, key, by: upper ? (<=) : (<),
+        stageID: "TimSort.merge.gallop",
+        whenTrue: "This run value belongs before the insertion boundary, so continue galloping.",
+        whenFalse: "This run value reaches the insertion boundary, so stop the gallop."
+      )
     }
     var low: Int
     var high: Int
@@ -270,7 +292,12 @@ private final class TimSortRecorder {
     var rightWins = 0
     var galloped = false
     while left < leftLength && right < rightEnd {
-      if engine.compareValues(engine.readValue(at: right), load(left), by: (<)) {
+      if engine.teachingCompareValues(
+        engine.readValue(at: right), load(left), by: (<),
+        stageID: "TimSort.merge.lowChoice",
+        whenTrue: "The right run has the smaller value, so write it next.",
+        whenFalse: "The left run wins or ties, so write its value next."
+      ) {
         engine.setValue(destination, engine.readValue(at: right))
         right += 1
         rightWins += 1
@@ -330,7 +357,12 @@ private final class TimSortRecorder {
     var rightWins = 0
     var galloped = false
     while left >= leftStart && right >= 0 {
-      if engine.compareValues(load(right), engine.readValue(at: left), by: (<)) {
+      if engine.teachingCompareValues(
+        load(right), engine.readValue(at: left), by: (<),
+        stageID: "TimSort.merge.highChoice",
+        whenTrue: "The left run has the larger value, so write it at the high end.",
+        whenFalse: "The right run wins or ties, so write it at the high end."
+      ) {
         engine.setValue(destination, engine.readValue(at: left))
         left -= 1
         leftWins += 1

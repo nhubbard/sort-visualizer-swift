@@ -69,7 +69,19 @@ public struct StacklessAmericanFlagSort: SortAlgorithm {
     }
 
     var maxValue = 0
-    for i in 0..<n { maxValue = max(maxValue, engine.readValue(at: i)) }
+    for i in 0..<n {
+      let candidate = engine.readValue(at: i)
+      let newMaximum = candidate > maxValue
+      engine.annotateLastOperation(
+        stageID: "digitRange", decisionID: "stacklessamericanflagsort.maximum",
+        outcome: newMaximum ? "extendRange" : "keepRange",
+        roles: ["candidate": .arrayIndex(i), "maximum": .value(maxValue)],
+        explanationKey: "stacklessamericanflagsort.maximum",
+        explanation: newMaximum
+          ? "This value raises the most significant digit place to process."
+          : "This value fits within the digit places already required.")
+      maxValue = max(maxValue, candidate)
+    }
     var q = 0
     var probe = radix
     while probe <= maxValue {
@@ -85,6 +97,12 @@ public struct StacklessAmericanFlagSort: SortAlgorithm {
     func bumpCount(_ digit: Int) {
       cnts[digit] += 1
       engine.writeAux(countsHandle, at: digit, value: cnts[digit])
+      engine.annotateLastOperation(
+        stageID: "scratchUpdate", decisionID: "stacklessamericanflagsort.scratchUpdate",
+        outcome: "update",
+        roles: ["scratch": .auxiliaryIndex(handle: countsHandle.rawValue, index: digit)],
+        explanationKey: "stacklessamericanflagsort.scratchUpdate",
+        explanation: "Update this digit bucket’s count or next free offset.")
     }
 
     // Digit-sorts `[a, b)` by `place` via counting + cycle-follow (assuming `cnts` already
@@ -95,7 +113,19 @@ public struct StacklessAmericanFlagSort: SortAlgorithm {
         cnts[i] += cnts[i - 1]
         offs[i] = cnts[i - 1]
         engine.writeAux(countsHandle, at: i, value: cnts[i])
+        engine.annotateLastOperation(
+          stageID: "scratchUpdate", decisionID: "stacklessamericanflagsort.scratchUpdate",
+          outcome: "update",
+          roles: ["scratch": .auxiliaryIndex(handle: countsHandle.rawValue, index: i)],
+          explanationKey: "stacklessamericanflagsort.scratchUpdate",
+          explanation: "Update this digit bucket’s count or next free offset.")
         engine.writeAux(offsHandle, at: i, value: offs[i])
+        engine.annotateLastOperation(
+          stageID: "scratchUpdate", decisionID: "stacklessamericanflagsort.scratchUpdate",
+          outcome: "update",
+          roles: ["scratch": .auxiliaryIndex(handle: offsHandle.rawValue, index: i)],
+          explanationKey: "stacklessamericanflagsort.scratchUpdate",
+          explanation: "Update this digit bucket’s count or next free offset.")
       }
 
       for i in 0..<(radix - 1) {
@@ -106,6 +136,12 @@ public struct StacklessAmericanFlagSort: SortAlgorithm {
             let digit = getDigit(held, place)
             cnts[digit] -= 1
             engine.writeAux(countsHandle, at: digit, value: cnts[digit])
+            engine.annotateLastOperation(
+              stageID: "scratchUpdate", decisionID: "stacklessamericanflagsort.scratchUpdate",
+              outcome: "update",
+              roles: ["scratch": .auxiliaryIndex(handle: countsHandle.rawValue, index: digit)],
+              explanationKey: "stacklessamericanflagsort.scratchUpdate",
+              explanation: "Update this digit bucket’s count or next free offset.")
             let displaced = engine.readValue(at: a + cnts[digit])
             engine.setValue(a + cnts[digit], held)
             engine.annotateLastOperation(
@@ -123,7 +159,19 @@ public struct StacklessAmericanFlagSort: SortAlgorithm {
         cnts[i] = 0
         offs[i] = 0
         engine.writeAux(countsHandle, at: i, value: 0)
+        engine.annotateLastOperation(
+          stageID: "scratchUpdate", decisionID: "stacklessamericanflagsort.scratchUpdate",
+          outcome: "update",
+          roles: ["scratch": .auxiliaryIndex(handle: countsHandle.rawValue, index: i)],
+          explanationKey: "stacklessamericanflagsort.scratchUpdate",
+          explanation: "Update this digit bucket’s count or next free offset.")
         engine.writeAux(offsHandle, at: i, value: 0)
+        engine.annotateLastOperation(
+          stageID: "scratchUpdate", decisionID: "stacklessamericanflagsort.scratchUpdate",
+          outcome: "update",
+          roles: ["scratch": .auxiliaryIndex(handle: offsHandle.rawValue, index: i)],
+          explanationKey: "stacklessamericanflagsort.scratchUpdate",
+          explanation: "Update this digit bucket’s count or next free offset.")
       }
       return split
     }

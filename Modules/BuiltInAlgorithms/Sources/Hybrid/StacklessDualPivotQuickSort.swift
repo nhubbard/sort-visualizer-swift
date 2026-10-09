@@ -71,14 +71,20 @@ public struct StacklessDualPivotQuickSort: SortAlgorithm {
   private func quickSort(_ engine: inout RecordingEngine, _ a0: Int, _ bIn: Int) {
     var b = bIn
 
-    // Held-value scan for this range's maximum — `Reads.compareValues`, not `compareIndices`, in
-    // the source: no highlight, just a running value, matching this codebase's convention of
-    // reading `engine.values` directly (no `engine.compare` call) whenever the source compares a
-    // held value rather than two live indices.
+    // Held-value scan for this range's maximum. Both sides are held values, so the decision
+    // uses compareValues rather than a live-index comparison.
     var max = engine.readValue(at: a0)
     if a0 + 1 < b {
-      for i in (a0 + 1)..<b where engine.readValue(at: i) > max {
-        max = engine.readValue(at: i)
+      for i in (a0 + 1)..<b {
+        let candidate = engine.readValue(at: i)
+        if engine.teachingCompareValues(
+          candidate, max, by: (>),
+          stageID: "StacklessDualPivotQuickSort.maximum.scan",
+          whenTrue: "This value exceeds the current maximum, so it becomes the new tail target.",
+          whenFalse: "This value does not exceed the current maximum."
+        ) {
+          max = engine.readValue(at: i)
+        }
       }
     }
 
@@ -87,7 +93,13 @@ public struct StacklessDualPivotQuickSort: SortAlgorithm {
     // called once, with `a0 == 0`.
     var i = b - 1
     while i >= 0 {
-      if engine.readValue(at: i) == max {
+      let candidate = engine.readValue(at: i)
+      if engine.teachingCompareValues(
+        candidate, max, by: (==),
+        stageID: "StacklessDualPivotQuickSort.maximum.place",
+        whenTrue: "This value matches the maximum, so move it into the tail.",
+        whenFalse: "This value is not the maximum and stays in the unsorted range."
+      ) {
         b -= 1
         engine.swap(i, b)
       }
@@ -166,16 +178,36 @@ public struct StacklessDualPivotQuickSort: SortAlgorithm {
 
     var k = i + 1
     while k < j {
-      if engine.compareValue(k, against: pivotLow, by: (<)) {
+      if engine.teachingCompareValue(
+        k, against: pivotLow, by: (<),
+        stageID: "StacklessDualPivotQuickSort.partition.low",
+        whenTrue: "This value is below the low pivot, so move it left.",
+        whenFalse: "This value is not below the low pivot; check the high pivot."
+      ) {
         i += 1
         engine.swap(k, i)
-      } else if engine.compareValue(k, against: pivotHigh, by: (>=)) {
+      } else if engine.teachingCompareValue(
+        k, against: pivotHigh, by: (>=),
+        stageID: "StacklessDualPivotQuickSort.partition.high",
+        whenTrue: "This value reaches the high pivot, so move it toward the right partition.",
+        whenFalse: "This value lies between the pivots and stays in the middle."
+      ) {
         repeat {
           j -= 1
-        } while j > k && engine.compareValue(j, against: pivotHigh, by: (>=))
+        } while j > k && engine.teachingCompareValue(
+          j, against: pivotHigh, by: (>=),
+          stageID: "StacklessDualPivotQuickSort.partition.rightScan",
+          whenTrue: "This right-side value belongs beyond the high pivot, so scan left.",
+          whenFalse: "This right-side value can exchange with the candidate."
+        )
         engine.swap(k, j)
 
-        if engine.compareValue(k, against: pivotLow, by: (<)) {
+        if engine.teachingCompareValue(
+          k, against: pivotLow, by: (<),
+          stageID: "StacklessDualPivotQuickSort.partition.recheckLow",
+          whenTrue: "After the exchange, this value belongs below the low pivot.",
+          whenFalse: "After the exchange, this value stays between the pivots."
+        ) {
           i += 1
           engine.swap(k, i)
         }
@@ -203,7 +235,12 @@ public struct StacklessDualPivotQuickSort: SortAlgorithm {
     var b = bIn
     while a < b {
       let m = a + (b - a) / 2
-      if engine.compare(p, m, by: (<=)) {
+      if engine.teachingCompare(
+        p, m, by: (<=),
+        stageID: "StacklessDualPivotQuickSort.insertion.bound",
+        whenTrue: "The pivot value belongs at or before this midpoint, so search left.",
+        whenFalse: "The pivot value belongs after this midpoint, so search right."
+      ) {
         b = m
       } else {
         a = m + 1
@@ -225,7 +262,12 @@ public struct StacklessDualPivotQuickSort: SortAlgorithm {
       var hi = i
       while lo < hi {
         let mid = lo + (hi - lo) / 2
-        if engine.compareValue(mid, against: num, by: (>)) {
+        if engine.teachingCompareValue(
+          mid, against: num, by: (>),
+          stageID: "StacklessDualPivotQuickSort.insertion.place",
+          whenTrue: "The prefix value exceeds the held value, so its insertion point is left.",
+          whenFalse: "The prefix value is no larger, so its insertion point is right."
+        ) {
           hi = mid
         } else {
           lo = mid + 1

@@ -70,7 +70,12 @@ enum PDQSortingTemplate {
   /// left-edge check.
   private static func unguardInsertSort(_ engine: inout RecordingEngine, _ begin: Int, _ end: Int) {
     guard begin != end else { return }
-    for cur in (begin + 1)..<end where engine.compare(cur, cur - 1, by: <) {
+    for cur in (begin + 1)..<end where engine.teachingCompare(
+      cur, cur - 1, by: <,
+      stageID: "pdq.insertionDecision",
+      whenTrue: "This adjacent pair descends, so insertion shifts the current value left.",
+      whenFalse: "This pair is ordered, so insertion leaves it in place."
+    ) {
       let tmp = engine.readValue(at: cur)
       var sift = cur
       var siftMinusOne = cur - 1
@@ -92,7 +97,12 @@ enum PDQSortingTemplate {
     var limit = 0
     for cur in (begin + 1)..<end {
       if limit > partialInsertSortLimit { return false }
-      if engine.compare(cur, cur - 1, by: <) {
+      if engine.teachingCompare(
+        cur, cur - 1, by: <,
+        stageID: "pdq.insertionDecision",
+        whenTrue: "This adjacent pair descends, so insertion shifts the current value left.",
+        whenFalse: "This pair is ordered, so insertion leaves it in place."
+      ) {
         let tmp = engine.readValue(at: cur)
         var sift = cur
         var siftMinusOne = cur - 1
@@ -111,7 +121,12 @@ enum PDQSortingTemplate {
   // MARK: - Pivot selection
 
   private static func sortTwo(_ engine: inout RecordingEngine, _ a: Int, _ b: Int) {
-    if engine.compare(b, a, by: <) {
+    if engine.teachingCompare(
+      b, a, by: <,
+      stageID: "pdq.pivotOrder",
+      whenTrue: "The second pivot candidate is smaller, so median setup swaps this pair.",
+      whenFalse: "The pivot candidates are ordered, so median setup keeps this pair."
+    ) {
       engine.swap(a, b)
     }
   }
@@ -170,19 +185,44 @@ enum PDQSortingTemplate {
     var first = begin
     var last = end
 
-    repeat { first += 1 } while engine.compare(first, begin, by: <)
+    repeat { first += 1 } while engine.teachingCompare(
+      first, begin, by: <,
+      stageID: "pdq.partitionLeft",
+      whenTrue: "This item is below the pivot, so the left partition scan advances.",
+      whenFalse: "This item reaches the other partition, so the left scan stops."
+    )
 
     if first - 1 == begin {
-      repeat { last -= 1 } while first < last && !engine.compare(last, begin, by: <)
+      repeat { last -= 1 } while first < last && !engine.teachingCompare(
+        last, begin, by: <,
+        stageID: "pdq.partitionRight",
+        whenTrue: "This item is below the pivot, so the right scan stops to exchange it.",
+        whenFalse: "This item stays above the pivot, so the right scan advances."
+      )
     } else {
-      repeat { last -= 1 } while !engine.compare(last, begin, by: <)
+      repeat { last -= 1 } while !engine.teachingCompare(
+        last, begin, by: <,
+        stageID: "pdq.partitionRight",
+        whenTrue: "This item is below the pivot, so the right scan stops to exchange it.",
+        whenFalse: "This item stays above the pivot, so the right scan advances."
+      )
     }
 
     let alreadyParted = first >= last
     while first < last {
       engine.swap(first, last)
-      repeat { first += 1 } while engine.compare(first, begin, by: <)
-      repeat { last -= 1 } while !engine.compare(last, begin, by: <)
+      repeat { first += 1 } while engine.teachingCompare(
+        first, begin, by: <,
+        stageID: "pdq.partitionLeft",
+        whenTrue: "This item is below the pivot, so the left partition scan advances.",
+        whenFalse: "This item reaches the other partition, so the left scan stops."
+      )
+      repeat { last -= 1 } while !engine.teachingCompare(
+        last, begin, by: <,
+        stageID: "pdq.partitionRight",
+        whenTrue: "This item is below the pivot, so the right scan stops to exchange it.",
+        whenFalse: "This item stays above the pivot, so the right scan advances."
+      )
     }
 
     let pivotPos = first - 1
@@ -198,18 +238,43 @@ enum PDQSortingTemplate {
     var first = begin
     var last = end
 
-    repeat { last -= 1 } while engine.compare(begin, last, by: <)
+    repeat { last -= 1 } while engine.teachingCompare(
+      begin, last, by: <,
+      stageID: "pdq.equalPartitionRight",
+      whenTrue: "The pivot is below this item, so the right scan advances through larger values.",
+      whenFalse: "This item belongs with pivot-equal values, so the right scan stops."
+    )
 
     if last + 1 == end {
-      repeat { first += 1 } while first < last && !engine.compare(begin, first, by: <)
+      repeat { first += 1 } while first < last && !engine.teachingCompare(
+        begin, first, by: <,
+        stageID: "pdq.equalPartitionLeft",
+        whenTrue: "The pivot is below this item, so the left scan stops at a larger value.",
+        whenFalse: "This item belongs with pivot-equal values, so the left scan advances."
+      )
     } else {
-      repeat { first += 1 } while !engine.compare(begin, first, by: <)
+      repeat { first += 1 } while !engine.teachingCompare(
+        begin, first, by: <,
+        stageID: "pdq.equalPartitionLeft",
+        whenTrue: "The pivot is below this item, so the left scan stops at a larger value.",
+        whenFalse: "This item belongs with pivot-equal values, so the left scan advances."
+      )
     }
 
     while first < last {
       engine.swap(first, last)
-      repeat { last -= 1 } while engine.compare(begin, last, by: <)
-      repeat { first += 1 } while !engine.compare(begin, first, by: <)
+      repeat { last -= 1 } while engine.teachingCompare(
+        begin, last, by: <,
+        stageID: "pdq.equalPartitionRight",
+        whenTrue: "The pivot is below this item, so the right scan advances through larger values.",
+        whenFalse: "This item belongs with pivot-equal values, so the right scan stops."
+      )
+      repeat { first += 1 } while !engine.teachingCompare(
+        begin, first, by: <,
+        stageID: "pdq.equalPartitionLeft",
+        whenTrue: "The pivot is below this item, so the left scan stops at a larger value.",
+        whenFalse: "This item belongs with pivot-equal values, so the left scan advances."
+      )
     }
 
     let pivotPos = last
@@ -266,12 +331,27 @@ enum PDQSortingTemplate {
     var first = begin
     var last = end
 
-    repeat { first += 1 } while engine.compareValue(first, against: pivot, by: (<))
+    repeat { first += 1 } while engine.teachingCompareValue(
+      first, against: pivot, by: (<),
+      stageID: "pdq.blockPartitionLeft",
+      whenTrue: "This item is below the held pivot, so it belongs in the left block.",
+      whenFalse: "This item is at least the held pivot, so the left scan stops."
+    )
 
     if first - 1 == begin {
-      repeat { last -= 1 } while first < last && !engine.compareValue(last, against: pivot, by: (<))
+      repeat { last -= 1 } while first < last && !engine.teachingCompareValue(
+        last, against: pivot, by: (<),
+        stageID: "pdq.blockPartitionRight",
+        whenTrue: "This item is below the held pivot, so the right scan stops to exchange it.",
+        whenFalse: "This item is at least the held pivot, so the right scan advances."
+      )
     } else {
-      repeat { last -= 1 } while !engine.compareValue(last, against: pivot, by: (<))
+      repeat { last -= 1 } while !engine.teachingCompareValue(
+        last, against: pivot, by: (<),
+        stageID: "pdq.blockPartitionRight",
+        whenTrue: "This item is below the held pivot, so the right scan stops to exchange it.",
+        whenFalse: "This item is at least the held pivot, so the right scan advances."
+      )
     }
 
     let alreadyParted = first >= last
@@ -291,7 +371,12 @@ enum PDQSortingTemplate {
         var it = first
         for i in 0..<blockSize {
           offsets.left[leftNum] = i
-          if !engine.compareValue(it, against: pivot, by: (<)) { leftNum += 1 }
+          if !engine.teachingCompareValue(
+            it, against: pivot, by: (<),
+            stageID: "pdq.blockClassification",
+            whenTrue: "This block item is below the pivot, so it belongs on the left.",
+            whenFalse: "This block item is at least the pivot, so it belongs on the right."
+          ) { leftNum += 1 }
           it += 1
         }
       }
@@ -303,7 +388,12 @@ enum PDQSortingTemplate {
           i += 1
           offsets.right[rightNum] = i
           it -= 1
-          if engine.compareValue(it, against: pivot, by: (<)) { rightNum += 1 }
+          if engine.teachingCompareValue(
+            it, against: pivot, by: (<),
+            stageID: "pdq.blockClassification",
+            whenTrue: "This block item is below the pivot, so it belongs on the left.",
+            whenFalse: "This block item is at least the pivot, so it belongs on the right."
+          ) { rightNum += 1 }
         }
       }
 
@@ -338,7 +428,12 @@ enum PDQSortingTemplate {
       var it = first
       for i in 0..<leftSize {
         offsets.left[leftNum] = i
-        if !engine.compareValue(it, against: pivot, by: (<)) { leftNum += 1 }
+        if !engine.teachingCompareValue(
+          it, against: pivot, by: (<),
+          stageID: "pdq.blockClassification",
+          whenTrue: "This block item is below the pivot, so it belongs on the left.",
+          whenFalse: "This block item is at least the pivot, so it belongs on the right."
+        ) { leftNum += 1 }
         it += 1
       }
     }
@@ -350,7 +445,12 @@ enum PDQSortingTemplate {
         i += 1
         offsets.right[rightNum] = i
         it -= 1
-        if engine.compareValue(it, against: pivot, by: (<)) { rightNum += 1 }
+        if engine.teachingCompareValue(
+          it, against: pivot, by: (<),
+          stageID: "pdq.blockClassification",
+          whenTrue: "This block item is below the pivot, so it belongs on the left.",
+          whenFalse: "This block item is at least the pivot, so it belongs on the right."
+        ) { rightNum += 1 }
       }
     }
 

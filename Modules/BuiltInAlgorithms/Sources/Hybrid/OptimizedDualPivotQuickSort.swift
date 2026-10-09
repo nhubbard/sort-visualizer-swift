@@ -86,7 +86,12 @@ public struct OptimizedDualPivotQuickSort: SortAlgorithm {
     if med1 <= left { med1 = left + 1 }
     if med2 >= right { med2 = right - 1 }
 
-    if engine.compare(med1, med2, by: (<)) {
+    if engine.teachingCompare(
+      med1, med2, by: (<),
+      stageID: "OptimizedDualPivotQuickSort.pivot.order",
+      whenTrue: "The first sample is smaller, so it becomes the low pivot.",
+      whenFalse: "The second sample is no larger, so it becomes the low pivot."
+    ) {
       engine.swap(med1, left)
       engine.swap(med2, right)
     } else {
@@ -107,16 +112,36 @@ public struct OptimizedDualPivotQuickSort: SortAlgorithm {
 
     var k = less
     while k <= great {
-      if engine.compareValue(k, against: pivot1, by: (<)) {
+      if engine.teachingCompareValue(
+        k, against: pivot1, by: (<),
+        stageID: "OptimizedDualPivotQuickSort.partition.low",
+        whenTrue: "This value is below the low pivot, so move it into the left partition.",
+        whenFalse: "This value is not below the low pivot; check the high pivot."
+      ) {
         engine.swap(k, less)
         less += 1
-      } else if engine.compareValue(k, against: pivot2, by: (>)) {
-        while k < great && engine.compareValue(great, against: pivot2, by: (>)) {
+      } else if engine.teachingCompareValue(
+        k, against: pivot2, by: (>),
+        stageID: "OptimizedDualPivotQuickSort.partition.high",
+        whenTrue: "This value exceeds the high pivot, so exchange it toward the right partition.",
+        whenFalse: "This value lies between the pivots and stays in the middle partition."
+      ) {
+        while k < great && engine.teachingCompareValue(
+          great, against: pivot2, by: (>),
+          stageID: "OptimizedDualPivotQuickSort.partition.rightScan",
+          whenTrue: "This right-side value already exceeds the high pivot, so scan left.",
+          whenFalse: "This right-side value can be exchanged with the candidate."
+        ) {
           great -= 1
         }
         engine.swap(k, great)
         great -= 1
-        if engine.compareValue(k, against: pivot1, by: (<)) {
+        if engine.teachingCompareValue(
+          k, against: pivot1, by: (<),
+          stageID: "OptimizedDualPivotQuickSort.partition.recheckLow",
+          whenTrue: "After the exchange, this value is below the low pivot and moves left.",
+          whenFalse: "After the exchange, this value remains in the middle partition."
+        ) {
           engine.swap(k, less)
           less += 1
         }
@@ -141,13 +166,28 @@ public struct OptimizedDualPivotQuickSort: SortAlgorithm {
     if dist > length - 13 && engine.compareValues(pivot1, pivot2, by: (!=)) {
       var k = less
       while k <= great {
-        if engine.compareValue(k, against: pivot1, by: (==)) {
+        if engine.teachingCompareValue(
+          k, against: pivot1, by: (==),
+          stageID: "OptimizedDualPivotQuickSort.equalPivots.low",
+          whenTrue: "This value equals the low pivot, so group it beside that pivot.",
+          whenFalse: "This value differs from the low pivot; check the high pivot."
+        ) {
           engine.swap(k, less)
           less += 1
-        } else if engine.compareValue(k, against: pivot2, by: (==)) {
+        } else if engine.teachingCompareValue(
+          k, against: pivot2, by: (==),
+          stageID: "OptimizedDualPivotQuickSort.equalPivots.high",
+          whenTrue: "This value equals the high pivot, so group it beside that pivot.",
+          whenFalse: "This value matches neither pivot and stays in the middle."
+        ) {
           engine.swap(k, great)
           great -= 1
-          if engine.compareValue(k, against: pivot1, by: (==)) {
+          if engine.teachingCompareValue(
+            k, against: pivot1, by: (==),
+            stageID: "OptimizedDualPivotQuickSort.equalPivots.recheckLow",
+            whenTrue: "The exchanged value equals the low pivot, so group it on the left.",
+            whenFalse: "The exchanged value does not equal the low pivot."
+          ) {
             engine.swap(k, less)
             less += 1
           }

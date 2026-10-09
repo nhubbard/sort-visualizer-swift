@@ -124,15 +124,26 @@ public struct PDMergeSort: SortAlgorithm {
       guard indexIn < maxIndex else { return -1 }
       let startIndex = indexIn
       var index = indexIn
-      let ascending = engine.compare(index, index + 1, by: (<=))
+      let ascending = engine.teachingCompare(
+        index, index + 1, by: (<=), stageID: "pdMerge.runDirection",
+        whenTrue: "This pair begins an ascending run, so run detection scans forward.",
+        whenFalse: "This pair begins a descending run, so run detection will reverse it.")
       index += 1
       while index < maxIndex {
-        let stepAscending = engine.compare(index, index + 1, by: (<=))
+        let stepAscending = engine.teachingCompare(
+          index, index + 1, by: (<=), stageID: "pdMerge.runScan",
+          whenTrue: "This pair ascends, so it can extend an ascending run.",
+          whenFalse: "This pair descends, so it can extend a descending run.")
         if stepAscending != ascending { break }
         index += 1
       }
       if !ascending {
         engine.reversal(startIndex, index)
+        engine.annotateLastOperation(
+          stageID: "pdMerge.reverseRun", decisionID: "pdMerge.reverseRun", outcome: "reversed",
+          roles: ["first": .arrayIndex(startIndex), "last": .arrayIndex(index)],
+          explanationKey: "pdMerge.reverseRun",
+          explanation: "This descending run reverses into ascending order before merging.")
       }
       return index >= maxIndex ? -1 : index + 1
     }

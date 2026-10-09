@@ -32,7 +32,18 @@ public struct LessBogoSort: SortAlgorithm {
     guard n > 1 else { return }
 
     func isFrontMinimum(_ start: Int, _ end: Int) -> Bool {
-      for i in (start + 1)..<end where engine.compare(start, i, by: (>)) { return false }
+      for i in (start + 1)..<end {
+        let frontIsLarger = engine.compare(start, i, by: (>))
+        engine.annotateLastOperation(
+          stageID: "candidateCheck", decisionID: "lessbogosort.frontMinimum",
+          outcome: frontIsLarger ? "reject" : "continue",
+          roles: ["front": .arrayIndex(start), "candidate": .arrayIndex(i)],
+          explanationKey: "lessbogosort.frontMinimum",
+          explanation: frontIsLarger
+            ? "A smaller value exists in this window, so the front is not its minimum."
+            : "The front is no larger than this value, so continue checking the window.")
+        if frontIsLarger { return false }
+      }
       return true
     }
 
@@ -55,6 +66,12 @@ public struct LessBogoSort: SortAlgorithm {
         explanationKey: "lessbogosort.candidateExchange",
         explanation: "The next permutation exchanges its pivot with a successor in the active range.")
       engine.reversal(i + 1, end - 1)
+      engine.annotateLastOperation(
+        stageID: "candidateWrap", decisionID: "lessbogosort.reverseSuffix",
+        outcome: "reverse",
+        roles: ["first": .arrayIndex(i + 1), "last": .arrayIndex(end - 1)],
+        explanationKey: "lessbogosort.reverseSuffix",
+        explanation: "Reverse this descending range to advance to the next candidate permutation.")
       return true
     }
 
@@ -64,6 +81,12 @@ public struct LessBogoSort: SortAlgorithm {
           // Fully descending range, still not front-minimum (only possible when
           // n - i > 1) — wrap straight to fully ascending, which trivially is.
           engine.reversal(i, n - 1)
+          engine.annotateLastOperation(
+            stageID: "candidateWrap", decisionID: "lessbogosort.reverseSuffix",
+            outcome: "reverse",
+            roles: ["first": .arrayIndex(i), "last": .arrayIndex(n - 1)],
+            explanationKey: "lessbogosort.reverseSuffix",
+            explanation: "Reverse this descending range to advance to the next candidate permutation.")
         }
       }
     }

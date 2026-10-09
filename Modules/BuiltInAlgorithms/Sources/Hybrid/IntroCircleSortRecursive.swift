@@ -102,7 +102,12 @@ public struct IntroCircleSortRecursive: SortAlgorithm {
           var hi = i
           while lo < hi {
             let mid = lo + (hi - lo) / 2
-            if engine.compare(i, mid, by: <) {
+            if engine.teachingCompare(
+              i, mid, by: (<),
+              stageID: "IntroCircleSortRecursive.fallback.insert",
+              whenTrue: "The current value precedes the middle of the sorted prefix, so search left.",
+              whenFalse: "The current value follows or ties the middle, so search right."
+            ) {
               hi = mid
             } else {
               lo = mid + 1

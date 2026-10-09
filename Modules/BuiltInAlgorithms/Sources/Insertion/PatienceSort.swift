@@ -77,10 +77,20 @@ public struct PatienceSort: SortAlgorithm {
           let left = 2 * i + 1
           let right = 2 * i + 2
           var smallest = i
-          if left < storage.count, engine.compareValues(storage[left].top, storage[smallest].top, by: (<)) {
+          if left < storage.count, engine.teachingCompareValues(
+            storage[left].top, storage[smallest].top, by: <,
+            stageID: "PatienceSort.extractLeftPile",
+            whenTrue: "The left pile top is smaller, so select it for the next output value.",
+            whenFalse: "The current pile top remains the smaller extraction candidate."
+          ) {
             smallest = left
           }
-          if right < storage.count, engine.compareValues(storage[right].top, storage[smallest].top, by: (<)) {
+          if right < storage.count, engine.teachingCompareValues(
+            storage[right].top, storage[smallest].top, by: <,
+            stageID: "PatienceSort.extractRightPile",
+            whenTrue: "The right pile top is smaller, so select it for the next output value.",
+            whenFalse: "The current pile top remains the smaller extraction candidate."
+          ) {
             smallest = right
           }
           if smallest == i { break }
@@ -100,7 +110,11 @@ public struct PatienceSort: SortAlgorithm {
       var hi = piles.count
       while lo < hi {
         let mid = (lo + hi) / 2
-        if engine.compareValues(tops[mid], x, by: (>=)) {
+        if engine.teachingCompareValues(
+          tops[mid], x, by: >=, stageID: "PatienceSort.choosePile",
+          whenTrue: "This pile top is at least the new value, so search earlier eligible piles.",
+          whenFalse: "This pile top is smaller, so search later piles."
+        ) {
           hi = mid
         } else {
           lo = mid + 1
@@ -124,6 +138,13 @@ public struct PatienceSort: SortAlgorithm {
       let entry = heap.popMin(&engine)
       let value = piles[entry.pileIndex].removeLast()
       engine.setValue(c, value)
+      if engine.shouldAnnotateCurrentOperation {
+        engine.annotateLastOperation(
+          stageID: "PatienceSort.emitPileTop", outcome: "placed",
+          roles: ["output": .arrayIndex(c), "pileTop": .value(value)],
+          explanationKey: "PatienceSort.emitPileTop",
+          explanation: "Write the smallest remaining pile top into the next sorted output slot.")
+      }
       if let newTop = piles[entry.pileIndex].last {
         heap.push(&engine, HeapEntry(top: newTop, pileIndex: entry.pileIndex))
       }

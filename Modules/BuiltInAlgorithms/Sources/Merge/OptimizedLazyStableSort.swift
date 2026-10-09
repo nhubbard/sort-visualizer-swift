@@ -59,17 +59,28 @@ public struct OptimizedLazyStableSort: SortAlgorithm {
       whenFalse: "The first pair is nondecreasing, so the sort scans it forward."
     ) {
       i += 1
-      while i < b && engine.compare(i - 1, i, by: >) { i += 1 }
-      engine.reversal(a, i - 1)
+      while i < b && engine.teachingCompare(
+        i - 1, i, by: >, stageID: "optimizedLazy.runDescending",
+        whenTrue: "This pair keeps descending, so the run extends before reversal.",
+        whenFalse: "The descending run ends at this pair.") { i += 1 }
+      engine.teachingReversal(a, i - 1,
+        stageID: "optimizedLazy.reverseRun",
+        explanation: "Reverse the descending run so it can be merged in ascending order.")
     } else {
       i += 1
-      while i < b && engine.compare(i - 1, i, by: <=) { i += 1 }
+      while i < b && engine.teachingCompare(
+        i - 1, i, by: <=, stageID: "optimizedLazy.runAscending",
+        whenTrue: "This pair keeps ascending, so the natural run extends.",
+        whenFalse: "The ascending run ends at this pair.") { i += 1 }
     }
 
     while i < b {
       let current = engine.readValue(at: i)
       var pos = i - 1
-      while pos >= a && engine.compareValue(pos, against: current, by: (>)) {
+      while pos >= a && engine.teachingCompareValue(
+        pos, against: current, by: (>), stageID: "optimizedLazy.insert",
+        whenTrue: "This run value exceeds the held value, so insertion shifts it right.",
+        whenFalse: "This run value is no greater, so insertion stops here.") {
         engine.setValue(pos + 1, engine.readValue(at: pos))
         pos -= 1
       }

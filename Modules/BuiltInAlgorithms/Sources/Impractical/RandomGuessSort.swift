@@ -32,8 +32,27 @@ public struct RandomGuessSort: SortAlgorithm {
 
     func isValidMapping() -> Bool {
       for i in 0..<(n - 1) {
-        if engine.compare(loops[i], loops[i + 1], by: (<)) { continue }
-        if engine.compare(loops[i], loops[i + 1], by: (==)), loops[i] < loops[i + 1] { continue }
+        let increasing = engine.compare(loops[i], loops[i + 1], by: (<))
+        engine.annotateLastOperation(
+          stageID: "candidateCheck", decisionID: "randomguesssort.strictOrder",
+          outcome: increasing ? "acceptPair" : "checkTie",
+          roles: ["left": .arrayIndex(loops[i]), "right": .arrayIndex(loops[i + 1])],
+          explanationKey: "randomguesssort.strictOrder",
+          explanation: increasing
+            ? "This mapped pair increases, so keep checking the candidate."
+            : "This mapped pair does not increase, so check whether its values tie.")
+        if increasing { continue }
+        let equal = engine.compare(loops[i], loops[i + 1], by: (==))
+        let stableTie = equal && loops[i] < loops[i + 1]
+        engine.annotateLastOperation(
+          stageID: "candidateCheck", decisionID: "randomguesssort.stableTie",
+          outcome: stableTie ? "acceptPair" : "rejectCandidate",
+          roles: ["left": .arrayIndex(loops[i]), "right": .arrayIndex(loops[i + 1])],
+          explanationKey: "randomguesssort.stableTie",
+          explanation: stableTie
+            ? "Equal values retain their source order, so this mapped pair is valid."
+            : "The mapped pair is descending or breaks stable tie order, so reject this candidate.")
+        if stableTie { continue }
         return false
       }
       return true

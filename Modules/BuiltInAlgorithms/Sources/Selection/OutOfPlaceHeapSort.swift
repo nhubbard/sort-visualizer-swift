@@ -58,7 +58,11 @@ public struct OutOfPlaceHeapSort: SortAlgorithm {
           j = 2 * j + 1
         }
       }
-      while engine.compare(root, j, by: >) {
+      while engine.teachingCompare(
+        root, j, by: >, stageID: "OutOfPlaceHeapSort.siftPosition",
+        whenTrue: "The root is larger than this descendant, so move the landing point upward.",
+        whenFalse: "The descendant can hold the root value at this heap position."
+      ) {
         j = (j - 1) / 2
       }
       while j > root {
@@ -78,7 +82,11 @@ public struct OutOfPlaceHeapSort: SortAlgorithm {
         } else if engine.readValue(at: r) == -1 {
           engine.swap(i, l)
           i = l
-        } else if engine.compare(r, l, by: >) {
+        } else if engine.teachingCompare(
+          r, l, by: >, stageID: "OutOfPlaceHeapSort.nextLiveChild",
+          whenTrue: "The right live child is larger, so follow it to the next heap maximum.",
+          whenFalse: "The left live child is at least as large, so follow it."
+        ) {
           engine.swap(i, r)
           i = r
         } else {
@@ -108,6 +116,14 @@ public struct OutOfPlaceHeapSort: SortAlgorithm {
       let maxValue = engine.readValue(at: 0)
       output[i] = maxValue
       engine.writeAux(outHandle, at: i, value: maxValue)
+      if engine.shouldAnnotateCurrentOperation {
+        engine.annotateLastOperation(
+          stageID: "OutOfPlaceHeapSort.extractToBuffer", outcome: "saved",
+          roles: ["buffer": .auxiliaryIndex(handle: outHandle.rawValue, index: i),
+            "maximum": .value(maxValue)],
+          explanationKey: "OutOfPlaceHeapSort.extractToBuffer",
+          explanation: "Save the current heap maximum in its final buffered position.")
+      }
       engine.setValue(0, -1)
       findNext(n)
       i -= 1
@@ -115,6 +131,13 @@ public struct OutOfPlaceHeapSort: SortAlgorithm {
 
     for idx in 0..<n {
       engine.setValue(idx, output[idx])
+      if engine.shouldAnnotateCurrentOperation {
+        engine.annotateLastOperation(
+          stageID: "OutOfPlaceHeapSort.restoreOutput", outcome: "placed",
+          roles: ["output": .arrayIndex(idx), "bufferedValue": .value(output[idx])],
+          explanationKey: "OutOfPlaceHeapSort.restoreOutput",
+          explanation: "Copy this buffered value into its final sorted array position.")
+      }
     }
     engine.deleteAuxArray(outHandle)
   }

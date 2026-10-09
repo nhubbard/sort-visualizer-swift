@@ -74,6 +74,11 @@ public struct AndreySort: SortAlgorithm {
       var l = lIn
       while l > 0 {
         engine.swap(arr1, arr2)
+        engine.annotateLastOperation(
+          stageID: "andrey.blockExchange", decisionID: "andrey.blockExchange",
+          outcome: "exchange", roles: ["first": .arrayIndex(arr1), "second": .arrayIndex(arr2)],
+          explanationKey: "andrey.blockExchange",
+          explanation: "Andrey exchanges these block positions to place the selected block beside its merge partner.")
         arr1 += 1
         arr2 += 1
         l -= 1
@@ -90,7 +95,10 @@ public struct AndreySort: SortAlgorithm {
       var l2 = l2In
       var arr0 = arr2 + l1
       while true {
-        if engine.compare(arr1, arr2, by: (>)) {
+        if engine.teachingCompare(
+          arr1, arr2, by: (>), stageID: "andrey.backwardMerge",
+          whenTrue: "The left tail is larger, so backward merge places it in the trailing buffer.",
+          whenFalse: "The right tail is at least as large, so backward merge places it next.") {
           engine.swap(arr1, arr0)
           arr1 -= 1
           arr0 -= 1
@@ -122,7 +130,10 @@ public struct AndreySort: SortAlgorithm {
         var q = i
         var j = i + r
         while j < l {
-          if engine.compare(a + q, a + j, by: (>)) { q = j }
+          if engine.teachingCompare(
+            a + q, a + j, by: (>), stageID: "andrey.blockLeader",
+            whenTrue: "This block leader is smaller, so Andrey selects its block for the next merge.",
+            whenFalse: "This block leader is not smaller, so the selected block stays.") { q = j }
           j += r
         }
         if q != i { aswap(a + i, a + q, r) }
@@ -159,7 +170,10 @@ public struct AndreySort: SortAlgorithm {
 
       var p = 2
       while p <= lr {
-        if engine.compare(a + (p - 2), a + (p - 1), by: (>)) {
+        if engine.teachingCompare(
+          a + (p - 2), a + (p - 1), by: (>), stageID: "andrey.pairPresort",
+          whenTrue: "This starting pair descends, so Andrey swaps it before block merging.",
+          whenFalse: "This starting pair is ordered, so Andrey keeps it.") {
           engine.swap(a + (p - 2), a + (p - 1))
         }
         if (p & 2) != 0 {
@@ -212,7 +226,16 @@ public struct AndreySort: SortAlgorithm {
     var previous = engine.readValue(at: 0)
     for index in 1..<n {
       let current = engine.readValue(at: index)
-      if previous > current {
+      let needsRepair = previous > current
+      engine.annotateLastOperation(
+        stageID: "andrey.verifyOrder", decisionID: "andrey.verifyOrder",
+        outcome: needsRepair ? "repair" : "continue",
+        roles: ["candidate": .arrayIndex(index), "previous": .arrayIndex(index - 1)],
+        explanationKey: "andrey.verifyOrder",
+        explanation: needsRepair
+          ? "This adjacent pair is still reversed, so heap repair completes the sort."
+          : "This adjacent pair is ordered, so verification continues.")
+      if needsRepair {
         MaxHeapSort().record(into: &engine)
         break
       }

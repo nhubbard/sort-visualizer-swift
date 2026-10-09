@@ -76,7 +76,11 @@ public struct HybridCombSort: SortAlgorithm {
     guard n > 1 else { return }
     for i in 1..<n {
       var j = i
-      while j > 0 && !engine.compare(j, j - 1) {
+      while j > 0 && !engine.teachingCompare(
+        j, j - 1,
+        stageID: "HybridCombSort.finishInsertion",
+        whenTrue: "This pair is ordered, so the insertion finish stops shifting.",
+        whenFalse: "The current value is smaller, so the insertion finish shifts it left.") {
         engine.swap(j - 1, j)
         j -= 1
       }

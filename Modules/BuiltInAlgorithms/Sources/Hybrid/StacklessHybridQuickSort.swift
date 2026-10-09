@@ -67,8 +67,16 @@ public struct StacklessHybridQuickSort: SortAlgorithm {
     // the source: no highlight, just a running value.
     var max = engine.readValue(at: a0)
     if a0 + 1 < b {
-      for i in (a0 + 1)..<b where engine.readValue(at: i) > max {
-        max = engine.readValue(at: i)
+      for i in (a0 + 1)..<b {
+        let candidate = engine.readValue(at: i)
+        if engine.teachingCompareValues(
+          candidate, max, by: (>),
+          stageID: "StacklessHybridQuickSort.maximum.scan",
+          whenTrue: "This value exceeds the current maximum, so it becomes the new tail target.",
+          whenFalse: "This value does not exceed the current maximum."
+        ) {
+          max = engine.readValue(at: i)
+        }
       }
     }
 
@@ -77,7 +85,13 @@ public struct StacklessHybridQuickSort: SortAlgorithm {
     // called once, with `a0 == 0`.
     var i = b - 1
     while i >= 0 {
-      if engine.readValue(at: i) == max {
+      let candidate = engine.readValue(at: i)
+      if engine.teachingCompareValues(
+        candidate, max, by: (==),
+        stageID: "StacklessHybridQuickSort.maximum.place",
+        whenTrue: "This value matches the maximum, so move it into the tail.",
+        whenFalse: "This value is not the maximum and stays in the unsorted range."
+      ) {
         b -= 1
         engine.swap(i, b)
       }
@@ -161,10 +175,20 @@ public struct StacklessHybridQuickSort: SortAlgorithm {
     while true {
       repeat {
         i += 1
-      } while i < j && engine.compareValue(i, against: pivot, by: (<))
+      } while i < j && engine.teachingCompareValue(
+        i, against: pivot, by: (<),
+        stageID: "StacklessHybridQuickSort.partition.leftScan",
+        whenTrue: "This value is below the pivot, so the left scan advances.",
+        whenFalse: "This value reaches the pivot side, so the left scan stops."
+      )
       repeat {
         j -= 1
-      } while j >= i && engine.compareValue(j, against: pivot, by: (>=))
+      } while j >= i && engine.teachingCompareValue(
+        j, against: pivot, by: (>=),
+        stageID: "StacklessHybridQuickSort.partition.rightScan",
+        whenTrue: "This value belongs on the pivot's right side, so the right scan retreats.",
+        whenFalse: "This value belongs on the left side, so the right scan stops."
+      )
 
       if i < j {
         engine.swap(i, j)
@@ -183,7 +207,12 @@ public struct StacklessHybridQuickSort: SortAlgorithm {
     var b = bIn
     while a < b {
       let m = a + (b - a) / 2
-      if engine.compare(p, m, by: (<=)) {
+      if engine.teachingCompare(
+        p, m, by: (<=),
+        stageID: "StacklessHybridQuickSort.insertion.bound",
+        whenTrue: "The pivot value belongs at or before this midpoint, so search left.",
+        whenFalse: "The pivot value belongs after this midpoint, so search right."
+      ) {
         b = m
       } else {
         a = m + 1
@@ -202,7 +231,12 @@ public struct StacklessHybridQuickSort: SortAlgorithm {
       var hi = i
       while lo < hi {
         let mid = lo + (hi - lo) / 2
-        if engine.compareValue(mid, against: num, by: (>)) {
+        if engine.teachingCompareValue(
+          mid, against: num, by: (>),
+          stageID: "StacklessHybridQuickSort.insertion.place",
+          whenTrue: "The prefix value exceeds the held value, so its insertion point is left.",
+          whenFalse: "The prefix value is no larger, so its insertion point is right."
+        ) {
           hi = mid
         } else {
           lo = mid + 1

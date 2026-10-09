@@ -46,6 +46,14 @@ public struct FlanSort: SortAlgorithm {
     let heapHandle = engine.createAuxArray(length: gap + 2)
     var pa = [Int](repeating: 0, count: gap + 2)
     var heap = [Int](repeating: 0, count: gap + 2)
+    func exchange(_ first: Int, _ second: Int) {
+      engine.swap(first, second)
+      engine.annotateLastOperation(
+        stageID: "flan.exchange", decisionID: "flan.exchange", outcome: "moved",
+        roles: ["first": .arrayIndex(first), "second": .arrayIndex(second)],
+        explanationKey: "flan.exchange",
+        explanation: "Flan exchanges these positions while grouping pivot partitions or merging runs.")
+    }
     func writePA(_ i: Int, _ value: Int) { pa[i] = value; engine.writeAux(paHandle, at: i, value: value) }
     var randomState: UInt64 = 0x9e3779b97f4a7c15
     for value in engine.readAllValues() { randomState = (randomState ^ UInt64(bitPattern: Int64(value))) &* 0xbf58476d1ce4e5b9 &+ 0x94d049bb133111eb }
@@ -83,7 +91,17 @@ public struct FlanSort: SortAlgorithm {
       var a = a, b = b
       while a < b {
         let m = a + (b - a) / 2
-        let matches = backward ? engine.compareValue(m, against: val, by: <) : engine.compareValue(m, against: val, by: >)
+        let matches = backward
+          ? engine.teachingCompareValue(
+            m, against: val, by: <,
+            stageID: "flan.binaryBoundary",
+            whenTrue: "This run item is smaller, so the boundary search advances.",
+            whenFalse: "This run item is at least as large, so the search narrows left.")
+          : engine.teachingCompareValue(
+            m, against: val, by: >,
+            stageID: "flan.binaryBoundary",
+            whenTrue: "This run item is larger, so the boundary search narrows left.",
+            whenFalse: "This run item is no greater, so the search advances.")
         if matches { b = m } else { a = m + 1 }
       }
       return a
@@ -107,7 +125,12 @@ public struct FlanSort: SortAlgorithm {
       var a = a, b = b
       while a < b {
         let m = a + (((b - a) / (gap + 1)) / 2) * (gap + 1)
-        let found = engine.compareValue(m, against: val, by: right ? (>) : (>=))
+        let found = engine.teachingCompareValue(
+          m, against: val, by: right ? (>) : (>=),
+          stageID: "flan.binaryInsert",
+          whenTrue: "This run item crosses the insertion boundary, so search narrows toward it.",
+          whenFalse: "This run item stays before the boundary, so search advances."
+        )
         if found { b = m } else { a = m + gap + 1 }
       }
       return a
@@ -118,10 +141,10 @@ public struct FlanSort: SortAlgorithm {
       while k > p + gap {
         var m = binSearch(k - gap, k, bsv, backward: backward) - 1
         k -= gap + 1
-        while m >= k { engine.swap(j, m); j -= 1; m -= 1 }
+        while m >= k { exchange(j, m); j -= 1; m -= 1 }
       }
       var m = binSearch(p, p + gap, bsv, backward: backward) - 1
-      while m >= p { engine.swap(j, m); j -= 1; m -= 1 }
+      while m >= p { exchange(j, m); j -= 1; m -= 1 }
     }
     func librarySort(_ a: Int, _ b: Int, _ p: Int, _ bsv: Int, backward: Bool) {
       let len = b - a
@@ -130,14 +153,14 @@ public struct FlanSort: SortAlgorithm {
       while s >= 32 { s = (s - 1) / ratio + 1 }
       var i = a + s, j = a + ratio * s, pEnd = p + (s + 1) * (gap + 1) + gap
       binaryInsertion(a, i)
-      for k in 0..<s { engine.swap(a + k, p + k * (gap + 1) + gap) }
+      for k in 0..<s { exchange(a + k, p + k * (gap + 1) + gap) }
       while i < b {
         if i == j {
           retrieve(i, p, pEnd, bsv, backward: backward)
           s = i - a
           pEnd = p + (s + 1) * (gap + 1) + gap
           j = a + (j - a) * ratio
-          for k in 0..<s { engine.swap(a + k, p + k * (gap + 1) + gap) }
+          for k in 0..<s { exchange(a + k, p + k * (gap + 1) + gap) }
         }
         let value = engine.readValue(at: i)
         var bLoc = blockSearch(p + gap, pEnd - (gap + 1), value, right: false)
@@ -154,12 +177,12 @@ public struct FlanSort: SortAlgorithm {
             s = i - a
             pEnd = p + (s + 1) * (gap + 1) + gap
             j = a + (j - a) * ratio
-            for k in 0..<s { engine.swap(a + k, p + k * (gap + 1) + gap) }
+            for k in 0..<s { exchange(a + k, p + k * (gap + 1) + gap) }
           } else {
             let rotP = binSearch(bLoc - gap, bLoc, bsv, backward: backward)
             let rotS = bLoc - max(rotP, bLoc - gap / 2)
             var m = bLoc - rotS, end = bLoc
-            while m > loc - rotS { m -= 1; end -= 1; engine.swap(end, m) }
+            while m > loc - rotS { m -= 1; end -= 1; exchange(end, m) }
           }
         } else {
           let displaced = engine.readValue(at: loc)
@@ -175,7 +198,7 @@ public struct FlanSort: SortAlgorithm {
       if runCount < 2 {
         if runCount == 1 {
           var p = destination
-          while readPA(0) < b { engine.swap(p, pa[0]); p += 1; writePA(0, pa[0] + 1) }
+          while readPA(0) < b { exchange(p, pa[0]); p += 1; writePA(0, pa[0] + 1) }
         }
         return
       }
@@ -189,7 +212,7 @@ public struct FlanSort: SortAlgorithm {
       var size = runCount, p = destination
       while size > 0 {
         let run = heap[0]
-        engine.swap(p, pa[run]); p += 1
+        exchange(p, pa[run]); p += 1
         writePA(run, pa[run] + 1)
         if readPA(run) == min(a + (run + 1) * runLength, b) {
           size -= 1
@@ -204,22 +227,42 @@ public struct FlanSort: SortAlgorithm {
       while true {
         i += 1
         while i < j {
-          if engine.compareValue(i, against: pivot, by: ==) { engine.swap(i1, i); i1 += 1 }
-          else if engine.compareValue(i, against: pivot, by: <) { break }
+          if engine.teachingCompareValue(
+            i, against: pivot, by: ==,
+            stageID: "flan.equalPivotLeft",
+            whenTrue: "This item equals the pivot, so it joins the central equal-value group.",
+            whenFalse: "This item differs from the pivot, so partition scanning continues."
+          ) { exchange(i1, i); i1 += 1 }
+          else if engine.teachingCompareValue(
+            i, against: pivot, by: <,
+            stageID: "flan.partitionLeft",
+            whenTrue: "This item is below the pivot, so the left scan stops to exchange it.",
+            whenFalse: "This item is at least the pivot, so the left scan advances."
+          ) { break }
           i += 1
         }
         j -= 1
         while j > i {
-          if engine.compareValue(j, against: pivot, by: ==) { j1 -= 1; engine.swap(j1, j) }
-          else if engine.compareValue(j, against: pivot, by: >) { break }
+          if engine.teachingCompareValue(
+            j, against: pivot, by: ==,
+            stageID: "flan.equalPivotRight",
+            whenTrue: "This item equals the pivot, so it joins the central equal-value group.",
+            whenFalse: "This item differs from the pivot, so partition scanning continues."
+          ) { j1 -= 1; exchange(j1, j) }
+          else if engine.teachingCompareValue(
+            j, against: pivot, by: >,
+            stageID: "flan.partitionRight",
+            whenTrue: "This item exceeds the pivot, so the right scan stops to exchange it.",
+            whenFalse: "This item is at most the pivot, so the right scan advances."
+          ) { break }
           j -= 1
         }
-        if i < j { engine.swap(i, j) }
+        if i < j { exchange(i, j) }
         else {
           if i1 == b { engine.deleteAuxArray(paHandle); engine.deleteAuxArray(heapHandle); return }
           if j < i { j += 1 }
-          while i1 > a { i -= 1; i1 -= 1; engine.swap(i, i1) }
-          while j1 < b { engine.swap(j, j1); j += 1; j1 += 1 }
+          while i1 > a { i -= 1; i1 -= 1; exchange(i, i1) }
+          while j1 < b { exchange(j, j1); j += 1; j1 += 1 }
           break
         }
       }
@@ -234,10 +277,10 @@ public struct FlanSort: SortAlgorithm {
         }
         kWayMerge(left, i, m, runCount)
         if j - i < m - j {
-          while i < j { m -= 1; engine.swap(i, m); i += 1 }
+          while i < j { m -= 1; exchange(i, m); i += 1 }
           b = m
         } else {
-          while m > j { m -= 1; engine.swap(i, m); i += 1 }
+          while m > j { m -= 1; exchange(i, m); i += 1 }
           b = i
         }
       } else {
@@ -250,10 +293,10 @@ public struct FlanSort: SortAlgorithm {
         }
         kWayMerge(right, b, a, runCount)
         if i - m < j - i {
-          while m < i { j -= 1; engine.swap(m, j); m += 1 }
+          while m < i { j -= 1; exchange(m, j); m += 1 }
           a = j
         } else {
-          while j > i { j -= 1; engine.swap(m, j); m += 1 }
+          while j > i { j -= 1; exchange(m, j); m += 1 }
           a = m
         }
       }

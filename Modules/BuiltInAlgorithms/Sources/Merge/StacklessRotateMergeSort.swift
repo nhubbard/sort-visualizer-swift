@@ -109,7 +109,10 @@ public struct StacklessRotateMergeSort: SortAlgorithm {
         var r2 = min(cIn, lenA)
         while r1 < r2 {
           let ml = (r1 + r2) / 2
-          if engine.compare(a + ml, m + (cIn - ml) - 1, by: (>)) {
+          if engine.teachingCompare(
+            a + ml, m + (cIn - ml) - 1, by: (>), stageID: "stacklessRotate.mergeBoundary",
+            whenTrue: "This left candidate exceeds the right candidate, so the merge boundary moves left.",
+            whenFalse: "These candidates are ordered, so the merge boundary moves right.") {
             r2 = ml
           } else {
             r1 = ml + 1
@@ -124,7 +127,10 @@ public struct StacklessRotateMergeSort: SortAlgorithm {
     // one ascending run.
     func rotateMerge(_ a: Int, _ b: Int, _ c: Int) {
       var i = a + 1
-      while i < b, !engine.compare(i - 1, i, by: (>)) { i += 1 }
+      while i < b, !engine.teachingCompare(
+        i - 1, i, by: (>), stageID: "stacklessRotate.findSeam",
+        whenTrue: "This pair descends, marking the seam between two runs.",
+        whenFalse: "This pair is ordered, so the run scan continues.") { i += 1 }
       if i < b { partitionMerge(a, i, b, c) }
     }
 
@@ -133,7 +139,10 @@ public struct StacklessRotateMergeSort: SortAlgorithm {
 
       var i = a + 1
       while i < b {
-        if engine.compare(i - 1, i, by: (>)) { engine.swap(i - 1, i) }
+        if engine.teachingCompare(
+          i - 1, i, by: (>), stageID: "stacklessRotate.pairPresort",
+          whenTrue: "This starting pair descends, so the pair presort swaps it.",
+          whenFalse: "This starting pair is ordered, so the pair presort keeps it.") { engine.swap(i - 1, i) }
         i += 2
       }
 
@@ -159,7 +168,10 @@ public struct StacklessRotateMergeSort: SortAlgorithm {
 
         var m = a + 1
         while m < b1 {
-          if engine.compare(m - 1, m, by: (>)) { engine.swap(m - 1, m) }
+          if engine.teachingCompare(
+            m - 1, m, by: (>), stageID: "stacklessRotate.finishPair",
+            whenTrue: "This pair is reversed after rotation, so the finishing pass swaps it.",
+            whenFalse: "This pair is ordered after rotation, so the finishing pass keeps it.") { engine.swap(m - 1, m) }
           m += 2
         }
 

@@ -77,6 +77,10 @@ Existing `compare`, `compareValue`, and `compareValues` calls still perform the 
 and `readValue`/`readValues` still record live reads. An annotation is never a substitute for
 those calls.
 
+`teachingReversal` records the same reversal and internal swaps as `reversal`, while attaching a
+reason to each retained swap. Use it when a long reversed run would otherwise leave the Teaching
+Graph silent through much of the replay.
+
 For example, a Quick Sort partition can record the comparison result and then annotate the
 branch using its known pivot and scan position:
 
@@ -173,8 +177,10 @@ Sort trace adapters remain for older imported tapes.
 ## Verification
 
 The catalog coverage test records all 196 built-in sorts on reversed and duplicate-heavy inputs
-at representative reachable sizes. It checks sorting, valid annotation anchors, and readable
-explanations. Engine tests cover optional archive decoding, index shifting, compaction, recording
-caps, and the annotation storage bound. Teaching Graph tests cover replay positions, navigation,
-held-value nodes, and fast-playback pinning. Run the engine access audit after editing algorithms
+at representative reachable sizes. It checks sorting, valid annotation anchors, readable
+explanations, and event distribution across all four replay quartiles. A second pass exercises
+practical sorts at their reachable size up to the app's 256-item default; a dedicated Bingo Sort
+case checks a 128-item replay. Engine tests cover optional archive decoding, index shifting,
+compaction, recording caps, and the annotation storage bound. Teaching Graph tests cover replay
+positions, navigation, held-value nodes, and fast-playback pinning. Run the engine access audit after editing algorithms
 to ensure live reads and comparisons still enter the tape.

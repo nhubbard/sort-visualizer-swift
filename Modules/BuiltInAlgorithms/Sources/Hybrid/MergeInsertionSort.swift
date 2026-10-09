@@ -70,7 +70,14 @@ public struct MergeInsertionSort: SortAlgorithm {
     // `[b-s+1, b]` — elementwise.
     func blockSwap(_ a: Int, _ b: Int, _ s: Int) {
       for i in 0..<s {
-        engine.swap(a - s + 1 + i, b - s + 1 + i)
+        let left = a - s + 1 + i
+        let right = b - s + 1 + i
+        engine.swap(left, right)
+        engine.annotateLastOperation(
+          stageID: "mergeInsertion.blockMove", decisionID: "mergeInsertion.blockMove",
+          outcome: "exchange", roles: ["left": .arrayIndex(left), "right": .arrayIndex(right)],
+          explanationKey: "mergeInsertion.blockMove",
+          explanation: "The chosen block shifts across the main chain one block at a time.")
       }
     }
 
@@ -103,7 +110,16 @@ public struct MergeInsertionSort: SortAlgorithm {
       var b = b
       while a < b {
         let m = a + (((b - a) / s) / 2) * s
-        if val < engine.readValue(at: m) {
+        let insertBefore = val < engine.readValue(at: m)
+        engine.annotateLastOperation(
+          stageID: "mergeInsertion.blockSearch", decisionID: "mergeInsertion.blockSearch",
+          outcome: insertBefore ? "left" : "right",
+          roles: ["candidate": .arrayIndex(m), "heldValue": .value(val)],
+          explanationKey: "mergeInsertion.blockSearch",
+          explanation: insertBefore
+            ? "The pending block key is smaller, so its insertion search moves left."
+            : "The pending block key is at least this key, so its search moves right.")
+        if insertBefore {
           b = m
         } else {
           a = m + s

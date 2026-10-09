@@ -49,9 +49,19 @@ public struct IntroSort: SortAlgorithm {
       var i = lo
       var j = hi
       while true {
-        while engine.compareValue(i, against: pivotValue, by: (<)) { i += 1 }
+        while engine.teachingCompareValue(
+          i, against: pivotValue, by: (<),
+          stageID: "IntroSort.partition.leftScan",
+          whenTrue: "This value belongs below the pivot, so the left scan advances.",
+          whenFalse: "This value reaches the pivot side, so the left scan stops."
+        ) { i += 1 }
         j -= 1
-        while engine.compareValue(j, against: pivotValue, by: (>)) { j -= 1 }
+        while engine.teachingCompareValue(
+          j, against: pivotValue, by: (>),
+          stageID: "IntroSort.partition.rightScan",
+          whenTrue: "This value belongs above the pivot, so the right scan retreats.",
+          whenFalse: "This value reaches the pivot side, so the right scan stops."
+        ) { j -= 1 }
         if !(i < j) { return i }
         engine.swap(i, j)
         i += 1
@@ -110,7 +120,12 @@ public struct IntroSort: SortAlgorithm {
       var i = start + 1
       while i < end {
         var j = i
-        while j > start && !engine.compare(j, j - 1) {
+        while j > start && !engine.teachingCompare(
+          j, j - 1,
+          stageID: "IntroSort.finalInsertion.order",
+          whenTrue: "The current value is at least its predecessor, so insertion stops.",
+          whenFalse: "The current value is smaller, so insertion moves it left."
+        ) {
           engine.swap(j - 1, j)
           j -= 1
         }

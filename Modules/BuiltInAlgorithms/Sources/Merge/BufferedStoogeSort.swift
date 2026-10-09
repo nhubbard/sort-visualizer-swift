@@ -84,7 +84,10 @@ public struct BufferedStoogeSort: SortAlgorithm {
       var right = twoThird
       var bufferStart = start
       while left < twoThird, right < stop {
-        if engine.compare(left, right, by: >) {
+        if engine.teachingCompare(
+          left, right, by: >, stageID: "bufferedStooge.mergeChoice",
+          whenTrue: "The left item is larger, so the buffered merge takes the right item.",
+          whenFalse: "The left item is no greater, so the buffered merge takes it first.") {
           engine.swap(bufferStart, right)
           right += 1
         } else {
@@ -104,7 +107,10 @@ public struct BufferedStoogeSort: SortAlgorithm {
       left = twoThird - 1
       right = stop - 1
       while right > left, left >= start {
-        if engine.compare(left, right, by: >) {
+        if engine.teachingCompare(
+          left, right, by: >, stageID: "bufferedStooge.finalPass",
+          whenTrue: "This pair is reversed, so the final stooge pass shifts the left item right.",
+          whenFalse: "This pair is ordered, so the final pass advances without shifting.") {
           for i in left..<right {
             engine.swap(i, i + 1)
           }

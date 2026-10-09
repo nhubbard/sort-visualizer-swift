@@ -161,6 +161,19 @@ struct TeachingGraphTraceTests {
   }
 
   @Test
+  func bingoSortGraphKeepsEventsAcrossTheReplay() throws {
+    let tape = makeTape(BingoSort(), values: Array((0..<128).reversed()))
+    let trace = try #require(TeachingGraphTrace(tape: tape))
+    #expect(trace.variant == .annotated)
+    var quartiles = [0, 0, 0, 0]
+    for event in trace.events {
+      quartiles[min(3, (event.step - 1) * 4 / tape.operations.count)] += 1
+    }
+    #expect(quartiles.allSatisfy { $0 > 0 },
+      "The visible Bingo Sort graph misses a replay quartile: \(quartiles)")
+  }
+
+  @Test
   func teachingExplanationsPinDuringFastPlaybackAndCatchUpOnPause() {
     let now = Date(timeIntervalSince1970: 100)
     #expect(TeachingGraphPlaybackPolicy.shouldPin(isPlaying: true, pacingRate: 30))

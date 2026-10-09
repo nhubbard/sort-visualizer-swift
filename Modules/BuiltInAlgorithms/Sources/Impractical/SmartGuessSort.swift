@@ -34,9 +34,27 @@ public struct SmartGuessSort: SortAlgorithm {
     var loops = [Int](repeating: 0, count: n)
 
     func isPairOK(_ i: Int) -> Bool {
-      if engine.compare(loops[i], loops[i + 1], by: (<)) { return true }
-      if engine.compare(loops[i], loops[i + 1], by: (==)), loops[i] < loops[i + 1] { return true }
-      return false
+      let increasing = engine.compare(loops[i], loops[i + 1], by: (<))
+      engine.annotateLastOperation(
+        stageID: "candidateCheck", decisionID: "smartguesssort.strictOrder",
+        outcome: increasing ? "acceptPair" : "checkTie",
+        roles: ["left": .arrayIndex(loops[i]), "right": .arrayIndex(loops[i + 1])],
+        explanationKey: "smartguesssort.strictOrder",
+        explanation: increasing
+          ? "This mapped pair increases, so the candidate suffix remains valid."
+          : "This mapped pair does not increase, so check whether its values tie.")
+      if increasing { return true }
+      let equal = engine.compare(loops[i], loops[i + 1], by: (==))
+      let stableTie = equal && loops[i] < loops[i + 1]
+      engine.annotateLastOperation(
+        stageID: "candidateCheck", decisionID: "smartguesssort.stableTie",
+        outcome: stableTie ? "acceptPair" : "rejectCandidate",
+        roles: ["left": .arrayIndex(loops[i]), "right": .arrayIndex(loops[i + 1])],
+        explanationKey: "smartguesssort.stableTie",
+        explanation: stableTie
+          ? "Equal values retain their source order, so this suffix pair is valid."
+          : "This pair is descending or breaks stable tie order, so advance the candidate mapping.")
+      return stableTie
     }
 
     /// -1 once every adjacent pair is OK; otherwise the position of the first pair (scanning

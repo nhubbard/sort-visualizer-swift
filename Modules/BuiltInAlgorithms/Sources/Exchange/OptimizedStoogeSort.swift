@@ -64,7 +64,11 @@ public struct OptimizedStoogeSort: SortAlgorithm {
     while left < right {
       var index = right
       while left < index {
-        if engine.compare(left, index, by: >) {
+        if engine.teachingCompare(
+          left, index, by: >, stageID: "OptimizedStoogeSort.forwardRange",
+          whenTrue: "The left item is larger, so exchange it across the forward shrinking range.",
+          whenFalse: "This forward range pair is ordered."
+        ) {
           engine.swap(left, index)
         }
         left += 1
@@ -82,7 +86,11 @@ public struct OptimizedStoogeSort: SortAlgorithm {
     while left < right {
       var index = left
       while index < right {
-        if engine.compare(index, right, by: >) {
+        if engine.teachingCompare(
+          index, right, by: >, stageID: "OptimizedStoogeSort.backwardRange",
+          whenTrue: "The left item is larger, so exchange it across the backward shrinking range.",
+          whenFalse: "This backward range pair is ordered."
+        ) {
           engine.swap(index, right)
         }
         index += 1

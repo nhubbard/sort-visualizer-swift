@@ -43,6 +43,15 @@ public struct FifthMergeSort: SortAlgorithm {
     let handle = engine.createAuxArray(length: bufferLength)
     var buffer = AuxBuffer(handle: handle, length: bufferLength)
 
+    func place(_ destination: Int, _ value: Int) {
+      engine.setValue(destination, value)
+      engine.annotateLastOperation(
+        stageID: "fifth.place", decisionID: "fifth.place", outcome: "placed",
+        roles: ["destination": .arrayIndex(destination), "value": .value(value)],
+        explanationKey: "fifth.place",
+        explanation: "Fifth Merge places the selected run value at its destination.")
+    }
+
     func readAux(_ index: Int) -> Int {
       engine.markAuxRead(handle, at: index)
       return buffer.values[index]
@@ -69,10 +78,10 @@ public struct FifthMergeSort: SortAlgorithm {
         }
         var j = i
         while j > low {
-          engine.setValue(j, engine.readValue(at: j - 1))
+          place(j, engine.readValue(at: j - 1))
           j -= 1
         }
-        engine.setValue(low, value)
+        place(low, value)
       }
     }
 
@@ -98,7 +107,7 @@ public struct FifthMergeSort: SortAlgorithm {
 
       func writeDestination(_ value: Int) {
         if fromBuffer {
-          engine.setValue(destination, value)
+          place(destination, value)
         } else {
           buffer.write(&engine, at: destination, value: value)
         }
@@ -154,7 +163,7 @@ public struct FifthMergeSort: SortAlgorithm {
           )
         } else if fromBuffer {
           for index in i..<end {
-            engine.setValue(index, readAux(index - start))
+            place(index, readAux(index - start))
           }
         } else {
           for index in i..<end {
@@ -167,7 +176,7 @@ public struct FifthMergeSort: SortAlgorithm {
 
       if fromBuffer {
         for offset in 0..<length {
-          engine.setValue(start + offset, readAux(offset))
+          place(start + offset, readAux(offset))
         }
       }
     }
@@ -178,21 +187,21 @@ public struct FifthMergeSort: SortAlgorithm {
       var right = middle
       while left < middle && right < end {
         if engine.compare(left, right, by: <=) {
-          engine.setValue(destination, engine.readValue(at: left))
+          place(destination, engine.readValue(at: left))
           left += 1
         } else {
-          engine.setValue(destination, engine.readValue(at: right))
+          place(destination, engine.readValue(at: right))
           right += 1
         }
         destination += 1
       }
       while left < middle {
-        engine.setValue(destination, engine.readValue(at: left))
+        place(destination, engine.readValue(at: left))
         left += 1
         destination += 1
       }
       while right < end {
-        engine.setValue(destination, engine.readValue(at: right))
+        place(destination, engine.readValue(at: right))
         right += 1
         destination += 1
       }
@@ -204,29 +213,29 @@ public struct FifthMergeSort: SortAlgorithm {
       var right = end - 1
       while destination > right && right >= middle && left >= 0 {
         if engine.compare(left, right, by: >) {
-          engine.setValue(destination, engine.readValue(at: left))
+          place(destination, engine.readValue(at: left))
           left -= 1
         } else {
-          engine.setValue(destination, engine.readValue(at: right))
+          place(destination, engine.readValue(at: right))
           right -= 1
         }
         destination -= 1
       }
       if left < 0 {
         while right >= middle {
-          engine.setValue(destination, engine.readValue(at: right))
+          place(destination, engine.readValue(at: right))
           right -= 1
           destination -= 1
         }
       } else if right == left {
         while right >= 0 {
-          engine.setValue(destination, engine.readValue(at: right))
+          place(destination, engine.readValue(at: right))
           right -= 1
           destination -= 1
         }
       } else if right < middle {
         while left >= 0 {
-          engine.setValue(destination, engine.readValue(at: left))
+          place(destination, engine.readValue(at: left))
           left -= 1
           destination -= 1
         }
@@ -242,16 +251,16 @@ public struct FifthMergeSort: SortAlgorithm {
       var right = middle
       while left < leftEnd && right < end {
         if engine.compare(left, right, by: <=) {
-          engine.setValue(destination, engine.readValue(at: left))
+          place(destination, engine.readValue(at: left))
           left += 1
         } else {
-          engine.setValue(destination, engine.readValue(at: right))
+          place(destination, engine.readValue(at: right))
           right += 1
         }
         destination += 1
       }
       while left < leftEnd {
-        engine.setValue(destination, engine.readValue(at: left))
+        place(destination, engine.readValue(at: left))
         left += 1
         destination += 1
       }
@@ -266,16 +275,16 @@ public struct FifthMergeSort: SortAlgorithm {
         if engine.compareValue(right, against: leftValue, by: { rightValue, bufferedValue in
           bufferedValue <= rightValue
         }) {
-          engine.setValue(destination, readAux(left))
+          place(destination, readAux(left))
           left += 1
         } else {
-          engine.setValue(destination, engine.readValue(at: right))
+          place(destination, engine.readValue(at: right))
           right += 1
         }
         destination += 1
       }
       while left < bufferLength {
-        engine.setValue(destination, readAux(left))
+        place(destination, readAux(left))
         left += 1
         destination += 1
       }

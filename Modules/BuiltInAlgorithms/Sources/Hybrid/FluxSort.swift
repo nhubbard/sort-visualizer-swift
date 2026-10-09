@@ -120,6 +120,11 @@ public struct FluxSort: SortAlgorithm {
 
     if balance == nmemb - 1 {
       engine.reversal(0, nmemb - 1)
+      engine.annotateLastOperation(
+        stageID: "flux.reverseRun", decisionID: "flux.reverseRun", outcome: "reversed",
+        roles: ["first": .arrayIndex(0), "last": .arrayIndex(nmemb - 1)],
+        explanationKey: "flux.reverseRun",
+        explanation: "Every adjacent pair descends, so one reversal completes the sort.")
       return false
     }
 
@@ -141,7 +146,10 @@ public struct FluxSort: SortAlgorithm {
     if mainIsSwap {
       return swap.values[a] > swap.values[b] ? 1 : 0
     }
-    return engine.compare(a, b, by: >) ? 1 : 0
+    return engine.teachingCompare(
+      a, b, by: >, stageID: "flux.pivotTournament",
+      whenTrue: "The first sample is greater, so the pivot tournament advances it.",
+      whenFalse: "The second sample is at least as large, so the pivot tournament advances it.") ? 1 : 0
   }
 
   /// Median-of-3 index tournament — verbatim translation of ArrayV's `medianOfThree`, substituting
@@ -271,6 +279,16 @@ public struct FluxSort: SortAlgorithm {
       let val = value > piv ? 1 : 0
 
       engine.setValue(pta, value)
+      engine.annotateLastOperation(
+        stageID: "flux.partition", decisionID: "flux.partition",
+        outcome: val == 0 ? "low" : "high",
+        roles: ["source": mainIsSwap
+          ? .auxiliaryIndex(handle: swap.handle.rawValue, index: ptx) : .arrayIndex(ptx),
+          "destination": .arrayIndex(pta)],
+        explanationKey: "flux.partition",
+        explanation: val == 0
+          ? "This value is no greater than the pivot, so the low partition advances."
+          : "This value exceeds the pivot, so it remains for the high partition.")
       pta += 1 - val
 
       swap.write(&engine, at: pts, value: value)

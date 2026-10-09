@@ -30,8 +30,30 @@ public struct QuickBogoSort: SortAlgorithm {
     guard n > 1 else { return }
 
     func isRangePartitioned(_ start: Int, _ pivot: Int, _ end: Int) -> Bool {
-      for i in start..<pivot where engine.compare(i, pivot, by: (>)) { return false }
-      for i in (pivot + 1)..<end where engine.compare(pivot, i, by: (>)) { return false }
+      for i in start..<pivot {
+        let leftIsLarger = engine.compare(i, pivot, by: (>))
+        engine.annotateLastOperation(
+          stageID: "partitionCheck", decisionID: "quickbogosort.leftOfPivot",
+          outcome: leftIsLarger ? "reject" : "continue",
+          roles: ["candidate": .arrayIndex(i), "pivot": .arrayIndex(pivot)],
+          explanationKey: "quickbogosort.leftOfPivot",
+          explanation: leftIsLarger
+            ? "A value left of the pivot is larger, so this candidate partition fails."
+            : "This left-side value does not exceed the pivot, so keep checking.")
+        if leftIsLarger { return false }
+      }
+      for i in (pivot + 1)..<end {
+        let pivotIsLarger = engine.compare(pivot, i, by: (>))
+        engine.annotateLastOperation(
+          stageID: "partitionCheck", decisionID: "quickbogosort.rightOfPivot",
+          outcome: pivotIsLarger ? "reject" : "continue",
+          roles: ["pivot": .arrayIndex(pivot), "candidate": .arrayIndex(i)],
+          explanationKey: "quickbogosort.rightOfPivot",
+          explanation: pivotIsLarger
+            ? "A value right of the pivot is smaller, so this candidate partition fails."
+            : "This right-side value is no smaller than the pivot, so keep checking.")
+        if pivotIsLarger { return false }
+      }
       return true
     }
 
@@ -51,6 +73,11 @@ public struct QuickBogoSort: SortAlgorithm {
 
       func trackedReversal(_ lo: Int, _ hi: Int) {
         engine.reversal(lo, hi)
+        engine.annotateLastOperation(
+          stageID: "candidateWrap", decisionID: "quickbogosort.reverseSuffix",
+          outcome: "reverse", roles: ["first": .arrayIndex(lo), "last": .arrayIndex(hi)],
+          explanationKey: "quickbogosort.reverseSuffix",
+          explanation: "Reverse this descending range to advance the candidate permutation.")
         if pivot >= lo, pivot <= hi { pivot = lo + hi - pivot }
       }
 

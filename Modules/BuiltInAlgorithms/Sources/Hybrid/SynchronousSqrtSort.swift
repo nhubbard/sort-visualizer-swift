@@ -127,7 +127,10 @@ private final class SynchronousSqrtRecorder: BlockMergeSortingTemplate {
       var candidate = minimum + blockLength
       while candidate < end {
         if candidate != vacant {
-          let order = engine.compare(candidate, minimum, by: (<))
+          let order = engine.teachingCompare(
+            candidate, minimum, by: (<), stageID: "synchronousSqrt.blockMinimum",
+            whenTrue: "This block leader is smaller, so it becomes the next selected block.",
+            whenFalse: "This block leader is not smaller, so the selected block remains.")
           let equal = !order && engine.compare(candidate, minimum, by: (==))
           if order || (equal && readTag(tagStart + (candidate - start) / blockLength) < readTag(tagStart + (minimum - start) / blockLength)) {
             minimum = candidate
@@ -261,7 +264,10 @@ private final class SynchronousSqrtRecorder: BlockMergeSortingTemplate {
     var output = 0
     while left < start && right < end {
       let prefixValue = readPrefix(left)
-      if engine.compareValue(right, against: prefixValue, by: (>=)) {
+      if engine.teachingCompareValue(
+        right, against: prefixValue, by: (>=), stageID: "synchronousSqrt.finalMerge",
+        whenTrue: "The main run value is at least the prefix value, so final merge takes the prefix.",
+        whenFalse: "The main run value is smaller, so final merge takes it first.") {
         engine.setValue(output, prefixValue)
         left += 1
       } else {

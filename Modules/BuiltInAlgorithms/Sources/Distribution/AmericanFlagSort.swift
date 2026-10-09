@@ -65,13 +65,31 @@ public struct AmericanFlagSort: SortAlgorithm {
         let digit = getDigit(engine.readValue(at: i), divisor)
         count[digit] += 1
         engine.writeAux(countHandle, at: digit, value: count[digit])
+        engine.annotateLastOperation(
+          stageID: "scratchUpdate", decisionID: "americanflagsort.scratchUpdate",
+          outcome: "update",
+          roles: ["scratch": .auxiliaryIndex(handle: countHandle.rawValue, index: digit)],
+          explanationKey: "americanflagsort.scratchUpdate",
+          explanation: "Update this digit bucket’s count or next free offset before placing the next value.")
       }
 
       offset[0] = start
       engine.writeAux(offsetHandle, at: 0, value: offset[0])
+      engine.annotateLastOperation(
+        stageID: "scratchUpdate", decisionID: "americanflagsort.scratchUpdate",
+        outcome: "update",
+        roles: ["scratch": .auxiliaryIndex(handle: offsetHandle.rawValue, index: 0)],
+        explanationKey: "americanflagsort.scratchUpdate",
+        explanation: "Update this digit bucket’s count or next free offset before placing the next value.")
       for i in 1..<radix {
         offset[i] = count[i - 1] + offset[i - 1]
         engine.writeAux(offsetHandle, at: i, value: offset[i])
+        engine.annotateLastOperation(
+          stageID: "scratchUpdate", decisionID: "americanflagsort.scratchUpdate",
+          outcome: "update",
+          roles: ["scratch": .auxiliaryIndex(handle: offsetHandle.rawValue, index: i)],
+          explanationKey: "americanflagsort.scratchUpdate",
+          explanation: "Update this digit bucket’s count or next free offset before placing the next value.")
       }
 
       for b in 0..<radix {
@@ -84,8 +102,20 @@ public struct AmericanFlagSort: SortAlgorithm {
             let to = offset[digit]
             offset[digit] += 1
             engine.writeAux(offsetHandle, at: digit, value: offset[digit])
+            engine.annotateLastOperation(
+              stageID: "scratchUpdate", decisionID: "americanflagsort.scratchUpdate",
+              outcome: "update",
+              roles: ["scratch": .auxiliaryIndex(handle: offsetHandle.rawValue, index: digit)],
+              explanationKey: "americanflagsort.scratchUpdate",
+              explanation: "Update this digit bucket’s count or next free offset before placing the next value.")
             count[digit] -= 1
             engine.writeAux(countHandle, at: digit, value: count[digit])
+            engine.annotateLastOperation(
+              stageID: "scratchUpdate", decisionID: "americanflagsort.scratchUpdate",
+              outcome: "update",
+              roles: ["scratch": .auxiliaryIndex(handle: countHandle.rawValue, index: digit)],
+              explanationKey: "americanflagsort.scratchUpdate",
+              explanation: "Update this digit bucket’s count or next free offset before placing the next value.")
 
             let displaced = engine.readValue(at: to)
             engine.setValue(to, num)
@@ -115,7 +145,19 @@ public struct AmericanFlagSort: SortAlgorithm {
     }
 
     var maxValue = 0
-    for i in 0..<n { maxValue = max(maxValue, engine.readValue(at: i)) }
+    for i in 0..<n {
+      let candidate = engine.readValue(at: i)
+      let newMaximum = candidate > maxValue
+      engine.annotateLastOperation(
+        stageID: "digitRange", decisionID: "americanflagsort.maximum",
+        outcome: newMaximum ? "extendRange" : "keepRange",
+        roles: ["candidate": .arrayIndex(i), "maximum": .value(maxValue)],
+        explanationKey: "americanflagsort.maximum",
+        explanation: newMaximum
+          ? "This value raises the most significant digit place to process."
+          : "This value fits within the digit places already required.")
+      maxValue = max(maxValue, candidate)
+    }
     var numberOfDigits = 1
     var probe = radix
     while probe <= maxValue {

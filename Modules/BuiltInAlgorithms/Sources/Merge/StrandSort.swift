@@ -79,7 +79,10 @@ public struct StrandSort: SortAlgorithm {
       for m in 1..<j {
         // Same `markAuxRead` + `engine.compareValue` pairing as `mergeTo` above.
         engine.markAuxRead(subListHandle, at: i)
-        if engine.compareValue(m, against: subList[i], by: (>=)) {
+        if engine.teachingCompareValue(
+          m, against: subList[i], by: (>=), stageID: "strand.extract",
+          whenTrue: "This value extends the nondecreasing strand, so it joins the extracted run.",
+          whenFalse: "This value is smaller than the strand tail, so it remains for a later strand.") {
           i += 1
           writeSubList(i, engine.readValue(at: m))
           k -= 1
