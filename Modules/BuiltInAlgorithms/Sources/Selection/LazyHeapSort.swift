@@ -41,7 +41,13 @@ public struct LazyHeapSort: SortAlgorithm {
       var max = a
       var i = a + 1
       while i < b {
-        if engine.compare(i, max, by: (>)) {
+        if engine.teachingCompare(
+          i, max,
+          by: (>),
+          stageID: "LazyHeapSort.maximumCandidate",
+          whenTrue: "This item is larger, so update the lazy heap maximum.",
+          whenFalse: "The current maximum candidate remains."
+        ) {
           max = i
         }
         i += 1

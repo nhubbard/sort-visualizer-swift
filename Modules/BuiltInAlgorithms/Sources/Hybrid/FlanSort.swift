@@ -56,7 +56,12 @@ public struct FlanSort: SortAlgorithm {
       return Int((randomState &* 0x2545f4914f6cdd1d) % UInt64(count))
     }
     func median(_ a: Int, _ m: Int, _ b: Int) -> Int {
-      if engine.compare(m, a, by: >) {
+      if engine.teachingCompare(
+        m, a, by: >,
+        stageID: "FlanSort.pivot.median",
+        whenTrue: "The middle candidate exceeds the first, so median selection checks the upper side.",
+        whenFalse: "The middle candidate does not exceed the first, so median selection checks the lower side."
+      ) {
         if engine.compare(m, b, by: <) { return m }
         return engine.compare(a, b, by: >) ? a : b
       }

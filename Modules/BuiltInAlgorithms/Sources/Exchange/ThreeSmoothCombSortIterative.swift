@@ -58,7 +58,13 @@ public struct ThreeSmoothCombSortIterative: SortAlgorithm {
 
         var i = 0
         while i + gap < n {
-          if engine.compare(i, i + gap, by: (>)) {
+          if engine.teachingCompare(
+            i, i + gap,
+            by: (>),
+            stageID: "ThreeSmoothCombSortIterative.gapOrder",
+            whenTrue: "The left gap endpoint is larger, so exchange the pair.",
+            whenFalse: "The gap-separated pair is ordered."
+          ) {
             engine.swap(i, i + gap)
           }
           i += 1

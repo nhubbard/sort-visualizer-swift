@@ -54,6 +54,11 @@ public struct CocktailBogoSort: SortAlgorithm {
       while !engine.compare(j, i, by: (>)) { j -= 1 }
 
       engine.swap(i, j)
+      engine.annotateLastOperation(
+        stageID: "candidateExchange", decisionID: "cocktailbogosort.candidateExchange",
+        outcome: "exchange", roles: ["left": .arrayIndex(i), "right": .arrayIndex(j)],
+        explanationKey: "cocktailbogosort.candidateExchange",
+        explanation: "The next permutation exchanges a pivot and successor within the active range.")
       engine.reversal(i + 1, end - 1)
       return true
     }

@@ -62,6 +62,11 @@ public struct PigeonholeSort: SortAlgorithm {
         holes[count] -= 1
         engine.writeAux(holesHandle, at: count, value: holes[count])
         engine.setValue(j, count + mi)
+        engine.annotateLastOperation(
+          stageID: "bucketPlacement", decisionID: "pigeonholesort.bucketPlacement",
+          outcome: "place", roles: ["destination": .arrayIndex(j)],
+          explanationKey: "pigeonholesort.bucketPlacement",
+          explanation: "Pigeonhole \(count) contains another value \(count + mi), so place it next.")
         j += 1
       }
     }

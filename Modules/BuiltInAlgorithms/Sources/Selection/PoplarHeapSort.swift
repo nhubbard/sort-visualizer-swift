@@ -72,7 +72,13 @@ public struct PoplarHeapSort: SortAlgorithm {
   private func uncheckedInsertionSort(_ engine: inout RecordingEngine, _ first: Int, _ last: Int) {
     var cur = first + 1
     while cur != last {
-      if engine.compare(cur, cur - 1, by: <) {
+      if engine.teachingCompare(
+        cur, cur - 1,
+        by: <,
+        stageID: "PoplarHeapSort.adjacentOrder",
+        whenTrue: "This item is smaller than its predecessor, so it needs a poplar-heap insertion.",
+        whenFalse: "This neighboring pair keeps its poplar-heap order."
+      ) {
         let tmp = engine.readValue(at: cur)
         var sift = cur
         var sift1 = cur - 1

@@ -112,6 +112,7 @@ public struct TapeHeader: Sendable, Codable, Equatable {
 public struct Tape: Sendable, Codable, Equatable {
   public let header: TapeHeader
   public let operations: [SortOperation]
+  public let teachingAnnotations: [TeachingAnnotation]
 }
 ```
 
@@ -125,6 +126,12 @@ public struct Tape: Sendable, Codable, Equatable {
 
 `Tape` and its contents are `Codable`. This makes binary tape export and import possible with no
 additional plumbing; see [Compression formats](../reference/compression.md).
+`teachingAnnotations` is an optional, ordered side stream whose indices point at meaningful sort
+operations. Algorithm code emits these after a decision through `RecordingEngine`; they never
+advance replay or change counters. `TapeFactory` offsets them past the shuffle phase, and archive
+payloads store them in a versioned optional trailer. Old tapes decode with an empty side stream.
+The [teaching annotation guide](../guides/teaching-graph-annotations.md) describes the pilot and
+its reading-speed behavior.
 `Tape.compactedForFastPlayback()` produces a replay-only copy with cosmetic marker bookkeeping
 removed, used by fixed-duration pacing mode. `header`'s recorded stats are always copied verbatim,
 never recomputed, so this method cannot change the reported operation counts. It changes only how

@@ -66,7 +66,12 @@ public struct IntroCircleSortRecursive: SortAlgorithm {
       var hi = hi
       var swapCount = 0
       while lo < hi {
-        if hi < end, engine.compare(lo, hi, by: (>)) {
+        if hi < end, engine.teachingCompare(
+          lo, hi, by: (>),
+          stageID: "IntroCircleSortRecursive.circle.pair",
+          whenTrue: "The mirrored pair is reversed, so the circle pass swaps it.",
+          whenFalse: "The mirrored pair is ordered, so the circle pass leaves it."
+        ) {
           engine.swap(lo, hi)
           swapCount += 1
         }

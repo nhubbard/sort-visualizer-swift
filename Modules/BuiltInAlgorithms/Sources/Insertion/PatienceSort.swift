@@ -56,7 +56,13 @@ public struct PatienceSort: SortAlgorithm {
         var i = storage.count - 1
         while i > 0 {
           let parent = (i - 1) / 2
-          if engine.compareValues(storage[parent].top, storage[i].top, by: (<=)) { break }
+          if engine.teachingCompareValues(
+            storage[parent].top, storage[i].top,
+            by: (<=),
+            stageID: "PatienceSort.pileOrder",
+            whenTrue: "The parent pile top is no larger, so heap order holds.",
+            whenFalse: "The child pile top is smaller, so restore heap order."
+          ) { break }
           storage.swapAt(parent, i)
           i = parent
         }

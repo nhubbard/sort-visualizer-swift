@@ -28,7 +28,12 @@ public struct IntroSort: SortAlgorithm {
     let sizeThreshold = 16
 
     func medianOf3(_ left: Int, _ mid: Int, _ right: Int) -> Int {
-      if !engine.compare(right, left) {
+      if !engine.teachingCompare(
+        right, left,
+        stageID: "IntroSort.pivot.median",
+        whenTrue: "The right endpoint is at least the left, so median setup leaves this pair in place.",
+        whenFalse: "The right endpoint is smaller, so median setup swaps the endpoints."
+      ) {
         engine.swap(left, right)
       }
       if !engine.compare(mid, left) {

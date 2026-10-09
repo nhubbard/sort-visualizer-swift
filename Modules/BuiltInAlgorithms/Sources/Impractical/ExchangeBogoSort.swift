@@ -31,7 +31,18 @@ public struct ExchangeBogoSort: SortAlgorithm {
     guard n > 1 else { return }
 
     func isSorted() -> Bool {
-      for i in 1..<n where engine.compare(i, i - 1, by: (<)) { return false }
+      for i in 1..<n {
+        let inOrder = !engine.compare(i, i - 1, by: (<))
+        engine.annotateLastOperation(
+          stageID: "sortednessCheck", decisionID: "exchangebogosort.adjacentOrder",
+          outcome: inOrder ? "continue" : "reject",
+          roles: ["previous": .arrayIndex(i - 1), "current": .arrayIndex(i)],
+          explanationKey: "exchangebogosort.adjacentOrder",
+          explanation: inOrder
+            ? "This adjacent pair is ordered, so keep checking the candidate."
+            : "This adjacent pair is inverted, so reject this candidate permutation.")
+        if !inOrder { return false }
+      }
       return true
     }
 
@@ -40,6 +51,11 @@ public struct ExchangeBogoSort: SortAlgorithm {
     for i in 0..<(n - 1) {
       for j in (i + 1)..<n where engine.compare(j, i, by: (<)) {
         engine.swap(i, j)
+        engine.annotateLastOperation(
+          stageID: "candidateExchange", decisionID: "exchangebogosort.candidateExchange",
+          outcome: "exchange", roles: ["left": .arrayIndex(i), "right": .arrayIndex(j)],
+          explanationKey: "exchangebogosort.candidateExchange",
+          explanation: "The chosen pair is inverted, so exchange it before testing another pair.")
       }
     }
   }

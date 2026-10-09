@@ -15,9 +15,15 @@ The graph displays at most ten recent events and twelve positions. Its text and 
 
 The graph is available during manual playback. Automated showcase and size-sweep runs retain their compact detail placeholder. Other algorithms do not yet have semantic graph models. Side-by-side algorithm comparison remains a separate design decision; this pilot establishes the meaning and replay behavior of one graph first.
 
-[Teaching graph annotations](teaching-graph-annotations.md) proposes how algorithms can record the
-reason for a decision alongside the replay tape. It also defines how those explanations could
-drive this graph and a fixed flowchart without guessing intent from a generic operation.
+[Teaching graph annotations](teaching-graph-annotations.md) describes how the two pilot algorithms
+record the reason for a decision alongside the replay tape. The same annotation fields can later
+drive a fixed flowchart without guessing intent from a generic operation.
+
+The first annotation implementation now covers branch decisions in Quick Sort and Merge Sort.
+During playback faster than one significant operation per second, the teaching explanation and
+graph focus stay pinned while the main sort continues. Pausing, stepping, seeking, or returning
+to the reading pace brings the graph to the corresponding event. Older tapes retain the original
+operation-derived explanations.
 
 ## Verification
 

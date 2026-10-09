@@ -45,7 +45,16 @@ public struct PairwiseSortIterative: SortAlgorithm {
       var b = a
       var c = 0
       while b < length {
-        if engine.compare(b - a, b, by: (>)) {
+        let shouldSwap = engine.compare(b - a, b, by: (>))
+        engine.annotateLastOperation(
+          stageID: "networkPass", decisionID: "pairwisesortiterative.compareExchange",
+          outcome: shouldSwap ? "exchange" : "keep",
+          roles: ["left": .arrayIndex(b - a), "right": .arrayIndex(b)],
+          explanationKey: "pairwisesortiterative.compareExchange",
+          explanation: shouldSwap
+            ? "This network pair is out of order, so exchange the values."
+            : "This network pair is in order, so keep the values.")
+        if shouldSwap {
           engine.swap(b - a, b)
         }
         c = (c + 1) % a
@@ -68,7 +77,16 @@ public struct PairwiseSortIterative: SortAlgorithm {
         var b = (d + 1) * a
         var c = 0
         while b < length {
-          if engine.compare(b - (d * a), b, by: (>)) {
+          let shouldSwap = engine.compare(b - (d * a), b, by: (>))
+          engine.annotateLastOperation(
+            stageID: "networkPass", decisionID: "pairwisesortiterative.compareExchange",
+            outcome: shouldSwap ? "exchange" : "keep",
+            roles: ["left": .arrayIndex(b - (d * a)), "right": .arrayIndex(b)],
+            explanationKey: "pairwisesortiterative.compareExchange",
+            explanation: shouldSwap
+              ? "This network pair is out of order, so exchange the values."
+              : "This network pair is in order, so keep the values.")
+          if shouldSwap {
             engine.swap(b - (d * a), b)
           }
           c = (c + 1) % a

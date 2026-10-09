@@ -38,7 +38,12 @@ public struct CombSort: SortAlgorithm {
         // Strict "values[i] > values[i+gap]": engine.compare is always >=, and using it
         // as-is here would swap equal adjacent elements forever once gap settles at 1.
         // a > b  <=>  !(b >= a), i.e. !engine.compare(i + gap, i).
-        if !engine.compare(gapInt + i, i) {
+        if !engine.teachingCompare(
+          gapInt + i, i,
+          stageID: "CombSort.gapOrder",
+          whenTrue: "The item across the gap is ordered, so no exchange is needed.",
+          whenFalse: "The gap-separated items are reversed, so exchange them."
+        ) {
           engine.swap(i, gapInt + i)
           swapped = true
         }

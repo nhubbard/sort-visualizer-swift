@@ -124,7 +124,12 @@ private final class TimSortRecorder {
   private func countRun(_ start: Int, _ end: Int) -> Int {
     guard start + 1 < end else { return 1 }
     var cursor = start + 2
-    if engine.compare(start + 1, start, by: (<)) {
+    if engine.teachingCompare(
+      start + 1, start, by: (<),
+      stageID: "TimSort.run.direction",
+      whenTrue: "The run begins in descending order, so TimSort scans and reverses it.",
+      whenFalse: "The run begins in nondecreasing order, so TimSort extends it forward."
+    ) {
       while cursor < end && engine.compare(cursor, cursor - 1, by: (<)) { cursor += 1 }
       engine.reversal(start, cursor - 1)
     } else {

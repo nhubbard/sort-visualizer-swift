@@ -50,6 +50,11 @@ public struct ShoveSort: SortAlgorithm {
       if engine.compare(i, i + 1, by: >) {
         for f in i..<(end - 1) {
           engine.swap(f, f + 1)
+          engine.annotateLastOperation(
+            stageID: "candidateExchange", decisionID: "shovesort.candidateExchange",
+            outcome: "exchange", roles: ["left": .arrayIndex(f), "right": .arrayIndex(f + 1)],
+            explanationKey: "shovesort.candidateExchange",
+            explanation: "The detected inversion is shifted right by exchanging adjacent values.")
         }
         if i > 0 {
           i -= 1

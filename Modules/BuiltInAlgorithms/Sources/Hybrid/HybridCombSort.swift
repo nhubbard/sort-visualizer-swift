@@ -54,7 +54,12 @@ public struct HybridCombSort: SortAlgorithm {
         // Strict "values[i] > values[i+gap]": engine.compare is always >=, and using it
         // as-is here would swap equal adjacent elements forever once gap settles at 1.
         // a > b  <=>  !(b >= a), i.e. !engine.compare(i + gap, i).
-        if !engine.compare(gapInt + i, i) {
+        if !engine.teachingCompare(
+          gapInt + i, i,
+          stageID: "HybridCombSort.comb.gap",
+          whenTrue: "The later value is at least the earlier value, so this gap pair stays in place.",
+          whenFalse: "The later value is smaller, so Comb Sort swaps this gap pair."
+        ) {
           engine.swap(i, gapInt + i)
           swapped = true
         }

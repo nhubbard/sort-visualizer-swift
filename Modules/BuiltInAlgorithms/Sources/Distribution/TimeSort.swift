@@ -60,6 +60,11 @@ public struct TimeSort: SortAlgorithm {
 
     for i in 0..<n {
       engine.setValue(i, scratch[i])
+      engine.annotateLastOperation(
+        stageID: "bucketPlacement", decisionID: "timesort.bucketPlacement",
+        outcome: "place", roles: ["destination": .arrayIndex(i)],
+        explanationKey: "timesort.bucketPlacement",
+        explanation: "The scheduled merge has produced value \(scratch[i]) for this output position.")
     }
     engine.deleteAuxArray(scratchHandle)
 
@@ -69,6 +74,11 @@ public struct TimeSort: SortAlgorithm {
       var j = i
       while j > 0 && engine.compare(j - 1, j, by: (>)) {
         engine.swap(j - 1, j)
+        engine.annotateLastOperation(
+          stageID: "bucketExchange", decisionID: "timesort.bucketExchange",
+          outcome: "exchange", roles: ["left": .arrayIndex(j - 1), "right": .arrayIndex(j)],
+          explanationKey: "timesort.bucketExchange",
+          explanation: "These adjacent values are inverted, so the final insertion pass exchanges them.")
         j -= 1
       }
     }

@@ -14,6 +14,8 @@ struct TeachingGraphTraceTests {
     let trace = try #require(TeachingGraphTrace(tape: tape))
     #expect(trace.variant == .quickSort)
     #expect(trace.events.contains { $0.kind == .decision })
+    #expect(tape.teachingAnnotations.contains { $0.stageID == "quick.partition.scanLeft" })
+    #expect(trace.events.contains { $0.explanation.contains("pivot's left side") })
     #expect(trace.events.contains { $0.kind == .pivotPlacement })
     #expect(trace.events.filter { $0.kind == .decision }.allSatisfy { $0.source != $0.target })
     #expect((trace.events.last?.step ?? 0) <= tape.operations.count)
@@ -33,6 +35,8 @@ struct TeachingGraphTraceTests {
     #expect(trace.events.filter { $0.kind == .bufferWrite }.count == mainWrites)
     #expect(trace.events.filter { $0.kind == .mergeWrite }.count == mainWrites)
     #expect(trace.events.contains { $0.kind == .decision })
+    #expect(tape.teachingAnnotations.contains { $0.stageID == "merge.chooseNext" })
+    #expect(trace.events.contains { $0.explanation.contains("left run") })
     #expect(trace.events.filter { $0.kind == .mergeWrite }.allSatisfy {
       $0.source.location == .buffer && $0.target.location == .array
     })
@@ -115,17 +119,75 @@ struct TeachingGraphTraceTests {
     #expect(TeachingGraphTrace(tape: tape) == nil)
   }
 
+  @Test
+  func teachingExplanationsPinDuringFastPlaybackAndCatchUpOnPause() {
+    let now = Date(timeIntervalSince1970: 100)
+    #expect(TeachingGraphPlaybackPolicy.shouldPin(isPlaying: true, pacingRate: 30))
+    #expect(!TeachingGraphPlaybackPolicy.shouldPin(isPlaying: true, pacingRate: 1))
+    #expect(!TeachingGraphPlaybackPolicy.shouldPin(isPlaying: false, pacingRate: 30))
+    #expect(!TeachingGraphPlaybackPolicy.shouldUpdate(
+      isPlaying: true, isPinned: true, now: now, lastUpdate: .distantPast))
+    #expect(!TeachingGraphPlaybackPolicy.shouldUpdate(
+      isPlaying: true, isPinned: false, now: now,
+      lastUpdate: now.addingTimeInterval(-2)))
+    #expect(TeachingGraphPlaybackPolicy.shouldUpdate(
+      isPlaying: true, isPinned: false, now: now,
+      lastUpdate: now.addingTimeInterval(-3)))
+    #expect(TeachingGraphPlaybackPolicy.shouldUpdate(
+      isPlaying: false, isPinned: false, now: now, lastUpdate: now))
+  }
+
+  @Test
+  func annotatedAlgorithmsSortRandomAndDuplicateHeavyInputs() {
+    var seed: UInt64 = 0xA11C_E123
+    func nextValue() -> Int {
+      seed = seed &* 2_862_933_555_777_941_757 &+ 3_037_000_493
+      return Int((seed >> 32) % 9)
+    }
+    for size in [2, 8, 16, 32] {
+      for _ in 0..<20 {
+        let values = (0..<size).map { _ in nextValue() }
+        for algorithm in [QuickSort() as any SortAlgorithm, MergeSort()] {
+          var engine = RecordingEngine(values: values)
+          algorithm.record(into: &engine)
+          #expect(engine.values == values.sorted())
+          let summary = engine.finish()
+          #expect(summary.teachingAnnotations.allSatisfy {
+            $0.operationIndex >= 0 && $0.operationIndex < summary.tape.count
+          })
+        }
+      }
+    }
+  }
+
+  @Test
+  func mergeSortKeepsEqualKeysInTheirOriginalOrderWithAnnotations() {
+    let keys = [2, 1, 2, 1, 2, 1, 2, 1]
+    let encoded = keys.enumerated().map { $0.element * 100 + $0.offset }
+    var engine = RecordingEngine(values: encoded, comparisonKeyForTesting: { $0 / 100 })
+    MergeSort().record(into: &engine)
+    #expect(engine.values.map { $0 / 100 } == keys.sorted())
+    for key in [1, 2] {
+      let originalIDs = encoded.filter { $0 / 100 == key }.map { $0 % 100 }
+      let sortedIDs = engine.values.filter { $0 / 100 == key }.map { $0 % 100 }
+      #expect(sortedIDs == originalIDs)
+    }
+    #expect(!engine.finish().teachingAnnotations.isEmpty)
+  }
+
   private func makeTape(_ algorithm: any SortAlgorithm, values: [Int]) -> Tape {
     var engine = RecordingEngine(values: values)
     algorithm.record(into: &engine)
     let result = engine.finish()
+    #expect(engine.values == values.sorted())
     return Tape(
       header: TapeHeader(
         algorithmID: algorithm.id.rawValue, initialValues: values, visualSeed: 1,
         compareCount: result.compareCount, swapCount: result.swapCount,
         mainWriteCount: result.mainWriteCount, auxWriteCount: result.auxWriteCount,
         recordingDuration: 0, recordedAt: .distantPast),
-      operations: result.tape)
+      operations: result.tape,
+      teachingAnnotations: result.teachingAnnotations)
   }
 
   private func assertAllReplayPositions(_ trace: TeachingGraphTrace, tape: Tape) {

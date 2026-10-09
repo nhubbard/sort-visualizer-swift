@@ -72,7 +72,13 @@ public struct SmoothSort: SortAlgorithm {
         let rt = head - 1
         let lf = head - 1 - lp[pshift - 2]
         if val >= engine.readValue(at: lf) && val >= engine.readValue(at: rt) { break }
-        if engine.compare(lf, rt, by: >=) {
+        if engine.teachingCompare(
+          lf, rt,
+          by: >=,
+          stageID: "SmoothSort.childChoice",
+          whenTrue: "The left Leonardo child is at least as large, so move through it.",
+          whenFalse: "The right Leonardo child is larger, so move through it."
+        ) {
           engine.setValue(head, engine.readValue(at: lf))
           head = lf
           pshift -= 1

@@ -34,7 +34,13 @@ public struct SlopeSort: SortAlgorithm {
       while k >= 0 {
         // Strict `<` (not the default `>=`) matches ArrayV's `Reads.compareIndices(...,
         // true) < 0` — ties never swap, which is what keeps this stable.
-        if engine.compare(i, k, by: (<)) {
+        if engine.teachingCompare(
+          i, k,
+          by: (<),
+          stageID: "SlopeSort.candidateOrder",
+          whenTrue: "This candidate is smaller, so move it toward its sorted slope.",
+          whenFalse: "This candidate does not precede the current slope item."
+        ) {
           engine.swap(i, k)
         }
         k -= 1

@@ -72,7 +72,13 @@ public struct FunSort: SortAlgorithm {
     // ArrayV's own `Reads.compareValues` call inside `binarySearch`); the key half is a raw read,
     // matching the tie-break convention `ForcedStableQuickSort`/`TableSort` already established.
     func compositeLess(_ mid: Int, _ i: Int) -> Bool {
-      if engine.compare(mid, i, by: <) { return true }
+      if engine.teachingCompare(
+        mid, i,
+        by: <,
+        stageID: "FunSort.partitionCandidate",
+        whenTrue: "The midpoint value is smaller than this item, so the composite-order search passes it.",
+        whenFalse: "The midpoint value is not smaller; check the tie-breaking key."
+      ) { return true }
       return engine.readValue(at: mid) == engine.readValue(at: i) && key[mid] < key[i]
     }
 

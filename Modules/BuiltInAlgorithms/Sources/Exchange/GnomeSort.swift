@@ -23,7 +23,12 @@ public struct GnomeSort: SortAlgorithm {
     let n = engine.count
     var i = 1
     while i < n {
-      if engine.compare(i, i - 1) {
+      if engine.teachingCompare(
+        i, i - 1,
+        stageID: "GnomeSort.backtrack",
+        whenTrue: "The current item is ordered after its neighbor, so advance.",
+        whenFalse: "The current item belongs before its neighbor, so swap and step back."
+      ) {
         i += 1
       } else {
         engine.swap(i, i - 1)

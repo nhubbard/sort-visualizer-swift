@@ -68,6 +68,11 @@ public struct LSDRadixSort: SortAlgorithm {
       }
       for i in 0..<n {
         engine.setValue(i, output[i])
+        engine.annotateLastOperation(
+          stageID: "bucketPlacement", decisionID: "lsdradixsort.bucketPlacement",
+          outcome: "place", roles: ["destination": .arrayIndex(i)],
+          explanationKey: "lsdradixsort.bucketPlacement",
+          explanation: "Digit place \(place + 1) from the right determines this value’s counted output position.")
       }
     }
 

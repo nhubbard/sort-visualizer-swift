@@ -51,7 +51,13 @@ public struct CircleSortIterative: SortAlgorithm {
           var high = start + 2 * gap - 1
           while low < high {
             if high < end {
-              if engine.compare(low, high, by: (>)) {
+              if engine.teachingCompare(
+                low, high,
+                by: (>),
+                stageID: "CircleSortIterative.oppositeEnds",
+                whenTrue: "The left endpoint is larger, so exchange the pair across the circle.",
+                whenFalse: "The opposite endpoints are already ordered."
+              ) {
                 engine.swap(low, high)
                 swapCount += 1
               }

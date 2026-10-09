@@ -24,7 +24,12 @@ public struct InsertionSort: SortAlgorithm {
     guard n > 1 else { return }
     for i in 1..<n {
       var j = i
-      while j > 0 && !engine.compare(j, j - 1) {
+      while j > 0 && !engine.teachingCompare(
+        j, j - 1,
+        stageID: "InsertionSort.insertionPosition",
+        whenTrue: "The current item is at least its neighbor, so it has reached its insertion position.",
+        whenFalse: "The current item is smaller than its neighbor, so swap it left."
+      ) {
         engine.swap(j - 1, j)
         j -= 1
       }

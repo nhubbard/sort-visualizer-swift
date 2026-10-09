@@ -47,7 +47,13 @@ public struct SlowSort: SortAlgorithm {
     let m = i + (j - i) / 2
     slowSort(&engine, i, m)
     slowSort(&engine, m + 1, j)
-    if engine.compare(m, j, by: (>)) {
+    if engine.teachingCompare(
+      m, j,
+      by: (>),
+      stageID: "SlowSort.halfMaximum",
+      whenTrue: "The left half maximum is larger, so exchange it with the range end.",
+      whenFalse: "The range end already holds the larger candidate."
+    ) {
       engine.swap(m, j)
     }
     slowSort(&engine, i, j - 1)

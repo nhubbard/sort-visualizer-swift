@@ -38,7 +38,12 @@ enum UnstableGrailSortingTemplate {
     guard len > 1 else { return }
     for i in 1..<len {
       var p = pos + i
-      while p > pos && engine.compare(p - 1, p, by: >) {
+      while p > pos && engine.teachingCompare(
+        p - 1, p, by: >,
+        stageID: "unstableGrail.smallRun",
+        whenTrue: "This adjacent pair is reversed, so the insertion pass shifts it.",
+        whenFalse: "This adjacent pair is ordered, so the insertion pass leaves it."
+      ) {
         engine.swap(p - 1, p)
         p -= 1
       }

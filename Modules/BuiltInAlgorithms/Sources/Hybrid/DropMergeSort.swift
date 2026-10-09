@@ -86,7 +86,12 @@ public struct DropMergeSort: SortAlgorithm {
         return
       }
 
-      if write == 0 || engine.compare(read, write - 1, by: (>=)) {
+      if write == 0 || engine.teachingCompare(
+        read, write - 1, by: (>=),
+        stageID: "DropMergeSort.drop.keep",
+        whenTrue: "This item follows the kept prefix in order, so it stays in the main run.",
+        whenFalse: "This item breaks the kept run, so Drop Merge considers dropping it."
+      ) {
         // In order — keep it.
         engine.setValue(write, engine.readValue(at: read))
         write += 1

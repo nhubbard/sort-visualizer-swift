@@ -54,7 +54,12 @@ enum QuadSortingTemplate {
   // MARK: - Fixed-size sorting networks (QuadSortBase in the original)
 
   private static func swapTwo(_ engine: inout RecordingEngine, _ start: Int) {
-    if engine.compare(start, start + 1, by: >) {
+    if engine.teachingCompare(
+      start, start + 1, by: >,
+      stageID: "quad.smallRun",
+      whenTrue: "The first pair descends, so Quad Sort rearranges it before merging.",
+      whenFalse: "The first pair is ordered, so Quad Sort keeps its order."
+    ) {
       engine.swap(start, start + 1)
     }
   }
@@ -648,7 +653,12 @@ enum QuadSortingTemplate {
       count -= 1
 
       innerA: while true {
-        if engine.compare(pta, pta + 1, by: >) {
+        if engine.teachingCompare(
+          pta, pta + 1, by: >,
+          stageID: "quad.presort",
+          whenTrue: "This adjacent pair descends, so Quad Sort starts a descending-run or swap path.",
+          whenFalse: "This adjacent pair is ordered, so Quad Sort continues its four-item presort."
+        ) {
           if engine.compare(pta + 2, pta + 3, by: >) {
             if engine.compare(pta + 1, pta + 2, by: >) {
               pts = pta

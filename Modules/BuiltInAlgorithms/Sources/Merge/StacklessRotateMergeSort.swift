@@ -92,7 +92,12 @@ public struct StacklessRotateMergeSort: SortAlgorithm {
         var r2 = min(c, lenB)
         while r1 < r2 {
           let ml = (r1 + r2) / 2
-          if engine.compare(m - (c - ml), b - ml - 1, by: (>)) {
+          if engine.teachingCompare(
+            m - (c - ml), b - ml - 1, by: (>),
+            stageID: "StacklessRotateMergeSort.merge.boundary",
+            whenTrue: "The left range endpoint exceeds the right endpoint, so the binary boundary moves left.",
+            whenFalse: "The endpoints are ordered, so the binary boundary moves right."
+          ) {
             r2 = ml
           } else {
             r1 = ml + 1

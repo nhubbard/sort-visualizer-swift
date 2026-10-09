@@ -53,7 +53,12 @@ enum GrailSortingTemplate {
     guard len > 1 else { return }
     for i in 1..<len {
       var p = pos + i
-      while p > pos && engine.compare(p - 1, p, by: >) {
+      while p > pos && engine.teachingCompare(
+        p - 1, p, by: >,
+        stageID: "grail.smallRun",
+        whenTrue: "This adjacent pair is reversed, so Grail shifts the current key toward its ordered position.",
+        whenFalse: "This adjacent pair is ordered, so Grail stops shifting this key."
+      ) {
         engine.swap(p - 1, p)
         p -= 1
       }
@@ -476,7 +481,12 @@ enum GrailSortingTemplate {
   static func lazyStableSort(_ engine: inout RecordingEngine, _ pos: Int, _ len: Int) {
     var dist = 1
     while dist < len {
-      if engine.compare(pos + dist - 1, pos + dist, by: >) {
+      if engine.teachingCompare(
+        pos + dist - 1, pos + dist, by: >,
+        stageID: "lazyStable.basePair",
+        whenTrue: "This starting pair is reversed, so Lazy Stable swaps it before merging.",
+        whenFalse: "This starting pair is ordered, so Lazy Stable keeps it before merging."
+      ) {
         engine.swap(pos + dist - 1, pos + dist)
       }
       dist += 2

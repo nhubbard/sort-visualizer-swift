@@ -64,6 +64,11 @@ public struct CountingSort: SortAlgorithm {
     // visual array, mirroring ArrayV's own comment/structure in `CountingSort.runSort`.
     for i in 0..<n {
       engine.setValue(i, output[i])
+      engine.annotateLastOperation(
+        stageID: "bucketPlacement", decisionID: "countingsort.bucketPlacement",
+        outcome: "place", roles: ["destination": .arrayIndex(i)],
+        explanationKey: "countingsort.bucketPlacement",
+        explanation: "The cumulative count places value \(output[i]) at stable output position \(i).")
     }
 
     engine.deleteAuxArray(outputHandle)

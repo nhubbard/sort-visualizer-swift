@@ -30,7 +30,12 @@ public struct PancakeSort: SortAlgorithm {
       var maxIndex = 0
       var i = 1
       while i <= end {
-        if !engine.compare(maxIndex, i) {
+        if !engine.teachingCompare(
+          maxIndex, i,
+          stageID: "PancakeSort.prefix.maximum",
+          whenTrue: "The current maximum is below this candidate, so Pancake Sort selects the candidate.",
+          whenFalse: "The current maximum is at least this candidate, so its selection remains."
+        ) {
           maxIndex = i
         }
         i += 1

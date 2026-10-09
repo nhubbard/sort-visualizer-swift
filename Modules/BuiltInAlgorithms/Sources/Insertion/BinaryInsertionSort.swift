@@ -37,7 +37,13 @@ public struct BinaryInsertionSort: SortAlgorithm {
 
         // Do NOT move equal elements to the right of the inserted element;
         // this maintains stability.
-        if engine.compare(i, mid, by: <) {
+        if engine.teachingCompare(
+          i, mid,
+          by: <,
+          stageID: "BinaryInsertionSort.binaryPosition",
+          whenTrue: "The item is smaller than this midpoint, so search the lower half.",
+          whenFalse: "The item belongs after this midpoint."
+        ) {
           hi = mid
         } else {
           lo = mid + 1

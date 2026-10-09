@@ -123,7 +123,12 @@ public struct StacklessDualPivotQuickSort: SortAlgorithm {
       engine.swap(a - 1, b)
 
       med = true
-      while a < b1 && engine.compare(a - 1, a, by: (==)) {
+      while a < b1 && engine.teachingCompare(
+        a - 1, a, by: (==),
+        stageID: "StacklessDualPivotQuickSort.pivot.equalRun",
+        whenTrue: "These adjacent values are equal, so the equal-value run extends.",
+        whenFalse: "These adjacent values differ, ending this equal-value run."
+      ) {
         med = false
         a += 1
       }

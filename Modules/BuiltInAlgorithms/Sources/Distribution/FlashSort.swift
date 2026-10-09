@@ -125,6 +125,11 @@ public struct FlashSort: SortAlgorithm {
 
     // Swap the max value into the front of the array first, exactly like ArrayV.
     engine.swap(maxIndex, 0)
+    engine.annotateLastOperation(
+      stageID: "bucketExchange", decisionID: "flashsort.bucketExchange",
+      outcome: "exchange", roles: ["left": .arrayIndex(maxIndex), "right": .arrayIndex(0)],
+      explanationKey: "flashsort.bucketExchange",
+      explanation: "The maximum value moves to the front to seed the class permutation.")
 
     // `j` is the cycle leader: the lowest index that starts a class boundary still missing
     // elements. `k` is the class currently being filled. `evicted` (introduced inside the
@@ -156,6 +161,11 @@ public struct FlashSort: SortAlgorithm {
         let location = L[k] - 1
         let temp = engine.readValue(at: location)
         engine.setValue(location, evicted)
+        engine.annotateLastOperation(
+          stageID: "bucketPlacement", decisionID: "flashsort.bucketPlacement",
+          outcome: "place", roles: ["destination": .arrayIndex(location)],
+          explanationKey: "flashsort.bucketPlacement",
+          explanation: "The current class has an open slot here, so place the evicted value and continue the cycle.")
         evicted = temp
         L[k] -= 1
         engine.writeAux(auxHandle, at: k, value: L[k])
@@ -185,9 +195,19 @@ public struct FlashSort: SortAlgorithm {
       var pos = i - 1
       while pos >= 0 && engine.readValue(at: pos) > current {
         engine.setValue(pos + 1, engine.readValue(at: pos))
+        engine.annotateLastOperation(
+          stageID: "bucketPlacement", decisionID: "flashsort.bucketPlacement",
+          outcome: "place", roles: ["destination": .arrayIndex(pos + 1)],
+          explanationKey: "flashsort.bucketPlacement",
+          explanation: "The held value precedes this value, so shift the latter one position right.")
         pos -= 1
       }
       engine.setValue(pos + 1, current)
+      engine.annotateLastOperation(
+        stageID: "bucketPlacement", decisionID: "flashsort.bucketPlacement",
+        outcome: "place", roles: ["destination": .arrayIndex(pos + 1)],
+        explanationKey: "flashsort.bucketPlacement",
+        explanation: "The preceding values have shifted right, leaving this position for the held value.")
     }
   }
 }

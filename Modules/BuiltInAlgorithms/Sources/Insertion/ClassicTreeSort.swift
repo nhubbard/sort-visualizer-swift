@@ -54,7 +54,13 @@ public struct ClassicTreeSort: SortAlgorithm {
         // (nothing writes to `values` until the final reconstruction loop below), so this is a
         // real `engine.compare` — routing it through raw `engine.values` reads made this
         // algorithm's true O(n^2) worst-case cost invisible to the growth model that sizes it.
-        let goLower = engine.compare(i, c, by: <)
+        let goLower = engine.teachingCompare(
+          i, c,
+          by: <,
+          stageID: "ClassicTreeSort.treeBranch",
+          whenTrue: "The inserted value is smaller, so descend into the left tree branch.",
+          whenFalse: "The inserted value belongs in the right tree branch."
+        )
         if goLower {
           if lower[c] == 0 {
             lower[c] = i

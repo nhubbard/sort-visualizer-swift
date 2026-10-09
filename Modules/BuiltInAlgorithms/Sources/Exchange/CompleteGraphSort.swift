@@ -76,7 +76,13 @@ public struct CompleteGraphSort: SortAlgorithm {
   }
 
   private func compSwap(_ engine: inout RecordingEngine, _ a: Int, _ b: Int) {
-    if engine.compare(a, b, by: >) {
+    if engine.teachingCompare(
+      a, b,
+      by: >,
+      stageID: "CompleteGraphSort.graphEdge",
+      whenTrue: "The first endpoint is larger, so exchange this graph edge.",
+      whenFalse: "This graph edge is already ordered."
+    ) {
       engine.swap(a, b)
     }
   }

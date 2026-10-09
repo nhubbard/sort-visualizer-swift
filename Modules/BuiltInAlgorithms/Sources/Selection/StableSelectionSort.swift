@@ -24,7 +24,13 @@ public struct StableSelectionSort: SortAlgorithm {
     guard n > 1 else { return }
     for i in 0..<(n - 1) {
       var min = i
-      for j in (i + 1)..<n where engine.compare(j, min, by: (<)) {
+      for j in (i + 1)..<n where engine.teachingCompare(
+        j, min,
+        by: (<),
+        stageID: "StableSelectionSort.minimumCandidate",
+        whenTrue: "This item is smaller, so update the stable selection minimum.",
+        whenFalse: "The current stable selection minimum remains."
+      ) {
         min = j
       }
       let tmp = engine.readValue(at: min)

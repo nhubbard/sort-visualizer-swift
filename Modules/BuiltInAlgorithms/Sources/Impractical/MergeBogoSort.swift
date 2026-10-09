@@ -58,10 +58,20 @@ public struct MergeBogoSort: SortAlgorithm {
         let pullFromHigh = nextHighIndex < highOffsets.count && highOffsets[nextHighIndex] == offset
         if pullFromHigh {
           engine.setValue(start + offset, tmp[high])
+          engine.annotateLastOperation(
+            stageID: "candidatePlacement", decisionID: "mergebogosort.candidatePlacement",
+            outcome: "place", roles: ["destination": .arrayIndex(start + offset)],
+            explanationKey: "mergebogosort.candidatePlacement",
+            explanation: "The chosen merge candidate places this value at its next output position.")
           high += 1
           nextHighIndex += 1
         } else {
           engine.setValue(start + offset, tmp[low])
+          engine.annotateLastOperation(
+            stageID: "candidatePlacement", decisionID: "mergebogosort.candidatePlacement",
+            outcome: "place", roles: ["destination": .arrayIndex(start + offset)],
+            explanationKey: "mergebogosort.candidatePlacement",
+            explanation: "The chosen merge candidate places this value at its next output position.")
           low += 1
         }
       }

@@ -64,6 +64,14 @@ public struct WeavedMergeSort: SortAlgorithm {
         let takeHigh =
           engine.readValue(at: low) > engine.readValue(at: high)
           || (engine.readValue(at: low) == engine.readValue(at: high) && low > high)
+        engine.annotateLastOperation(
+          stageID: "weaved.mergeChoose", decisionID: "weaved.mergeChoose",
+          outcome: takeHigh ? "right" : "left",
+          roles: ["left": .arrayIndex(low), "right": .arrayIndex(high)],
+          explanationKey: "weaved.mergeChoose",
+          explanation: takeHigh
+            ? "The right residue supplies the smaller value, so the weave takes it next."
+            : "The left residue supplies the smaller or equal value, so the weave takes it next.")
         if takeHigh {
           tmp[nxt] = engine.readValue(at: high)
           engine.writeAux(tempHandle, at: nxt, value: engine.readValue(at: high))

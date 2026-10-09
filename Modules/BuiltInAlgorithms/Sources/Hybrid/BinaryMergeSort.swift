@@ -33,7 +33,12 @@ public struct BinaryMergeSort: SortAlgorithm {
       var i = start + 1
       while i < end {
         var j = i
-        while j > start && !engine.compare(j, j - 1) {
+        while j > start && !engine.teachingCompare(
+          j, j - 1,
+          stageID: "BinaryMergeSort.smallRun.insert",
+          whenTrue: "The current value is at least its predecessor, so this insertion scan can stop.",
+          whenFalse: "The current value is smaller than its predecessor, so insertion shifts it left."
+        ) {
           engine.swap(j - 1, j)
           j -= 1
         }

@@ -42,7 +42,16 @@ public struct WeaveSortIterative: SortAlgorithm {
 
     func compSwap(_ a: Int, _ b: Int) {
       guard b < end else { return }
-      if engine.compare(a, b, by: >) {
+      let shouldSwap = engine.compare(a, b, by: >)
+      engine.annotateLastOperation(
+        stageID: "compareExchange", decisionID: "weavesortiterative.networkComparator",
+        outcome: shouldSwap ? "exchange" : "keep",
+        roles: ["left": .arrayIndex(a), "right": .arrayIndex(b)],
+        explanationKey: "weavesortiterative.compareExchange",
+        explanation: shouldSwap
+          ? "The left value exceeds the right value, so this comparator exchanges them."
+          : "These values satisfy this comparator, so they stay in place.")
+      if shouldSwap {
         engine.swap(a, b)
       }
     }

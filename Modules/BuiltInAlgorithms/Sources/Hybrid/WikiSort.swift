@@ -87,7 +87,13 @@ private final class WikiRecorder {
   init(engine: RecordingEngine) { self.engine = engine }
 
   private func read(_ index: Int) -> Int { engine.readValue(at: index) }
-  private func less(_ left: Int, _ right: Int) -> Bool { engine.compare(left, right, by: (<)) }
+  private func less(_ left: Int, _ right: Int) -> Bool {
+    engine.teachingCompare(
+      left, right, by: (<),
+      stageID: "WikiSort.key.order",
+      whenTrue: "The first key is smaller, so WikiSort orders it before the second.",
+      whenFalse: "The first key is not smaller, so WikiSort checks another ordering.")
+  }
   private func lessValues(_ left: Int, _ right: Int) -> Bool { engine.compareValues(left, right, by: (<)) }
   private func greaterValues(_ left: Int, _ right: Int) -> Bool { engine.compareValues(left, right, by: (>)) }
   private func swap(_ left: Int, _ right: Int) { engine.swap(left, right) }

@@ -54,7 +54,13 @@ public struct StableCycleSort: SortAlgorithm {
       var d = a
       var e = 0
       for i in (a + 1)..<b {
-        if engine.compare(i, a, by: <) {
+        if engine.teachingCompare(
+          i, a,
+          by: <,
+          stageID: "StableCycleSort.destinationRank",
+          whenTrue: "This item is smaller than the cycle value, so advance its stable destination.",
+          whenFalse: "This item does not advance the cycle value’s destination."
+        ) {
           d += 1
         } else if i < b1 && !getBit(i) && engine.compare(i, a, by: ==) {
           e += 1

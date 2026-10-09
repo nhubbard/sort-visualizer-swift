@@ -64,7 +64,12 @@ private final class AdaptiveGrailRecorder {
   private func swap(_ first: Int, _ second: Int) { engine.swap(first, second) }
 
   private func compare(_ first: Int, _ second: Int) -> Int {
-    if engine.compare(first, second, by: (<)) { return -1 }
+    if engine.teachingCompare(
+      first, second, by: (<),
+      stageID: "AdaptiveGrailSort.key.order",
+      whenTrue: "The first key is smaller, so Grail keeps it before the second key.",
+      whenFalse: "The first key is not smaller, so Grail checks the other ordering or equality."
+    ) { return -1 }
     if engine.compare(first, second, by: (>)) { return 1 }
     return 0
   }

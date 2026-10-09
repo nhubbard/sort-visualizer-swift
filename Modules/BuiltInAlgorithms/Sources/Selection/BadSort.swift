@@ -59,7 +59,13 @@ public struct BadSort: SortAlgorithm {
           // Reads.compareValues(array[j], array[k]) == 1 — strict greater-than, both
           // live indices (see the doc comment above for why this still goes through
           // `engine.compare` despite ArrayV routing it through `compareValues`).
-          if engine.compare(index2, index2p, by: (>)) {
+          if engine.teachingCompare(
+            index2, index2p,
+            by: (>),
+            stageID: "BadSort.candidateOrder",
+            whenTrue: "This candidate is larger, so exchange the compared positions.",
+            whenFalse: "The candidate ordering does not trigger an exchange."
+          ) {
             isShortest = false
             break
           }

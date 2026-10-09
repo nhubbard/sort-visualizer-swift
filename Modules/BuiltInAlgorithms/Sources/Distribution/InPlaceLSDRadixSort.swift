@@ -84,9 +84,23 @@ public struct InPlaceLSDRadixSort: SortAlgorithm {
         } else {
           let to = vregs[digit - 1]
           if to > pos {
-            for k in pos..<to { engine.swap(k, k + 1) }
+            for k in pos..<to {
+              engine.swap(k, k + 1)
+              engine.annotateLastOperation(
+                stageID: "digitRotation", decisionID: "inplacelsdradixsort.digitRotation",
+                outcome: "exchange", roles: ["left": .arrayIndex(k), "right": .arrayIndex(k + 1)],
+                explanationKey: "inplacelsdradixsort.digitRotation",
+                explanation: "This adjacent exchange rotates a value toward its current digit bucket.")
+            }
           } else if to < pos {
-            for k in stride(from: pos, to: to, by: -1) { engine.swap(k, k - 1) }
+            for k in stride(from: pos, to: to, by: -1) {
+              engine.swap(k, k - 1)
+              engine.annotateLastOperation(
+                stageID: "digitRotation", decisionID: "inplacelsdradixsort.digitRotation",
+                outcome: "exchange", roles: ["left": .arrayIndex(k), "right": .arrayIndex(k - 1)],
+                explanationKey: "inplacelsdradixsort.digitRotation",
+                explanation: "This adjacent exchange rotates a value toward its current digit bucket.")
+            }
           }
           for j in stride(from: digit - 1, to: 0, by: -1) {
             vregs[j - 1] -= 1

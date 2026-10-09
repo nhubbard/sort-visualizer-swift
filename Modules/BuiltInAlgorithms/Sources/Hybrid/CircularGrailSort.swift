@@ -47,7 +47,12 @@ public struct CircularGrailSort: SortAlgorithm {
     }
 
     func circularCompare(_ a: Int, _ b: Int, by predicate: (Int, Int) -> Bool) -> Bool {
-      engine.compare(physicalIndex(a), physicalIndex(b), by: predicate)
+      engine.teachingCompare(
+        physicalIndex(a), physicalIndex(b), by: predicate,
+        stageID: "CircularGrailSort.ring.order",
+        whenTrue: "The requested comparison succeeds for these physical positions in the ring.",
+        whenFalse: "The requested comparison fails for these physical positions in the ring."
+      )
     }
 
     func shiftForward(_ aIn: Int, _ middleIn: Int, _ b: Int) {

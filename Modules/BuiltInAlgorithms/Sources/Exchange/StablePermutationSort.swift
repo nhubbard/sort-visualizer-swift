@@ -33,7 +33,12 @@ public struct StablePermutationSort: SortAlgorithm {
     guard n > 1 else { return }
 
     func isSorted() -> Bool {
-      for i in 1..<n where !engine.compare(i, i - 1) { return false }
+      for i in 1..<n where !engine.teachingCompare(
+        i, i - 1,
+        stageID: "StablePermutationSort.permutationOrder",
+        whenTrue: "This neighboring pair is ordered in the permutation check.",
+        whenFalse: "This neighboring pair breaks sorted order, so reject this permutation."
+      ) { return false }
       return true
     }
 

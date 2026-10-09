@@ -157,7 +157,22 @@ public struct BogoBogoSort: SortAlgorithm {
         localBogoBogo(idx, n - 1)
       }
 
-      for i in 0..<n where engine.readValue(at: i) != tmp[idx][i] { return false }
+      for i in 0..<n {
+        let candidate = engine.readValue(at: i)
+        let matches = candidate == tmp[idx][i]
+        engine.annotateLastOperation(
+          stageID: "candidateCheck", decisionID: "bogobogosort.recursiveCandidateCheck",
+          outcome: matches ? "continue" : "reject",
+          roles: [
+            "candidate": .arrayIndex(i),
+            "sortedScratch": .auxiliaryIndex(handle: tmpHandles[idx].rawValue, index: i),
+          ],
+          explanationKey: "bogobogosort.recursiveCandidateCheck",
+          explanation: matches
+            ? "This candidate value matches the recursively sorted scratch copy, so continue checking."
+            : "This value differs from the recursively sorted scratch copy, so reject the candidate.")
+        if !matches { return false }
+      }
       return true
     }
 
@@ -170,6 +185,11 @@ public struct BogoBogoSort: SortAlgorithm {
       var j = n - 1
       while !engine.compare(j, i, by: (>)) { j -= 1 }
       engine.swap(i, j)
+      engine.annotateLastOperation(
+        stageID: "candidateExchange", decisionID: "bogobogosort.candidateExchange",
+        outcome: "exchange", roles: ["left": .arrayIndex(i), "right": .arrayIndex(j)],
+        explanationKey: "bogobogosort.candidateExchange",
+        explanation: "The next permutation exchanges its pivot with a larger successor before reversing the suffix.")
       engine.reversal(i + 1, n - 1)
       return true
     }
@@ -177,6 +197,12 @@ public struct BogoBogoSort: SortAlgorithm {
     while !topIsSorted() {
       if !advanceMainPermutation() {
         engine.reversal(0, n - 1)
+        engine.annotateLastOperation(
+          stageID: "candidateWrap", decisionID: "bogobogosort.permutationWrap",
+          outcome: "reverse",
+          roles: ["first": .arrayIndex(0), "last": .arrayIndex(n - 1)],
+          explanationKey: "bogobogosort.permutationWrap",
+          explanation: "The descending candidate is the final permutation, so reverse it to wrap to sorted order.")
       }
     }
 

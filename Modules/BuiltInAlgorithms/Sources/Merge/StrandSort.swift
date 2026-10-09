@@ -46,7 +46,12 @@ public struct StrandSort: SortAlgorithm {
         // `subList[i]` is a real re-read of the `subListHandle`-shadowed buffer, marked via
         // `markAuxRead`, then compared against the live `m` index via `engine.compareValue`.
         engine.markAuxRead(subListHandle, at: i)
-        if engine.compareValue(m, against: subList[i], by: (>)) {
+        if engine.teachingCompareValue(
+          m, against: subList[i], by: (>),
+          stageID: "StrandSort.strand.merge",
+          whenTrue: "The main-array item exceeds the strand value, so the strand value is written next.",
+          whenFalse: "The main-array item is no greater, so the merge keeps it ahead of the strand."
+        ) {
           engine.setValue(a, subList[i])
           a += 1
           i += 1

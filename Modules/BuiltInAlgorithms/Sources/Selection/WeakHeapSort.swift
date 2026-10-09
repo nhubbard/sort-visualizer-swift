@@ -33,7 +33,13 @@ public struct WeakHeapSort: SortAlgorithm {
     var flags = [Bool](repeating: false, count: n)
 
     func weakHeapMerge(_ i: Int, _ j: Int) {
-      if engine.compare(i, j, by: (<)) {
+      if engine.teachingCompare(
+        i, j,
+        by: (<),
+        stageID: "WeakHeapSort.weakHeapOrder",
+        whenTrue: "The first node is smaller, so exchange it to restore weak-heap order.",
+        whenFalse: "The weak-heap pair keeps its order."
+      ) {
         flags[j].toggle()
         engine.swap(i, j)
       }

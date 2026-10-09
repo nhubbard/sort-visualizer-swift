@@ -69,7 +69,12 @@ private final class ChaliceRecorder: BlockMergeSortingTemplate {
   private func write(_ index: Int, _ value: Int) { engine.setValue(index, value) }
   private func swap(_ first: Int, _ second: Int) { engine.swap(first, second) }
   private func compare(_ first: Int, _ second: Int, by predicate: (Int, Int) -> Bool) -> Bool {
-    engine.compare(first, second, by: predicate)
+    engine.teachingCompare(
+      first, second, by: predicate,
+      stageID: "ChaliceSort.block.order",
+      whenTrue: "The requested block-order test succeeds, so Chalice follows that ordering branch.",
+      whenFalse: "The requested block-order test fails, so Chalice follows the alternative branch."
+    )
   }
   private func compareValues(_ first: Int, _ second: Int, by predicate: (Int, Int) -> Bool) -> Bool {
     engine.compareValues(first, second, by: predicate)

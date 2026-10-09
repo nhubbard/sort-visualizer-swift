@@ -108,7 +108,13 @@ public struct SplaySort: SortAlgorithm {
           baseResult = nil
           break descend
         }
-        if engine.compareValues(root.key, key, by: (>)) {
+        if engine.teachingCompareValues(
+          root.key, key,
+          by: (>),
+          stageID: "SplaySort.splayDirection",
+          whenTrue: "The sought key is smaller, so rotate or descend toward the left subtree.",
+          whenFalse: "The sought key does not belong to the left subtree."
+        ) {
           guard let left = root.left else {
             baseResult = root
             break descend

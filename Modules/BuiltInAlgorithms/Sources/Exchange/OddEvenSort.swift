@@ -31,7 +31,13 @@ public struct OddEvenSort: SortAlgorithm {
 
       var i = 1
       while i < n - 1 {
-        if engine.compare(i, i + 1, by: >) {
+        if engine.teachingCompare(
+          i, i + 1,
+          by: >,
+          stageID: "OddEvenSort.phasePair",
+          whenTrue: "The left item is larger, so exchange this pair in the current phase.",
+          whenFalse: "This phase leaves the pair in place."
+        ) {
           engine.swap(i, i + 1)
           sorted = false
         }

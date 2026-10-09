@@ -42,7 +42,13 @@ public struct IndexSort: SortAlgorithm {
     for i in 0..<n {
       var cmpCount = 0
       while engine.readValue(at: i) - minValue != i, cmpCount < n {
-        engine.swap(i, engine.readValue(at: i) - minValue)
+        let target = engine.readValue(at: i) - minValue
+        engine.swap(i, target)
+        engine.annotateLastOperation(
+          stageID: "bucketExchange", decisionID: "indexsort.bucketExchange",
+          outcome: "exchange", roles: ["left": .arrayIndex(i), "right": .arrayIndex(target)],
+          explanationKey: "indexsort.bucketExchange",
+          explanation: "The value’s offset from the minimum identifies index \(target), so exchange it into place.")
         cmpCount += 1
       }
       if cmpCount >= n - 1 { break }

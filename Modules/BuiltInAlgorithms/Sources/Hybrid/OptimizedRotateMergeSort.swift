@@ -49,7 +49,12 @@ public struct OptimizedRotateMergeSort: SortAlgorithm {
       var high = end
       while low < high {
         let middle = low + (high - low) / 2
-        if engine.compareValue(middle, against: value, by: (<)) {
+        if engine.teachingCompareValue(
+          middle, against: value, by: (<),
+          stageID: "OptimizedRotateMergeSort.merge.boundary",
+          whenTrue: "This run value is below the held value, so the boundary search advances.",
+          whenFalse: "This run value is at least the held value, so the boundary search moves left."
+        ) {
           low = middle + 1
         } else {
           high = middle
@@ -63,7 +68,12 @@ public struct OptimizedRotateMergeSort: SortAlgorithm {
       var high = end
       while low < high {
         let middle = low + (high - low) / 2
-        if engine.compareValue(middle, against: value, by: (<=)) {
+        if engine.teachingCompareValue(
+          middle, against: value, by: (<=),
+          stageID: "OptimizedRotateMergeSort.upperBound",
+          whenTrue: "This value is no greater than the held item, so insertion searches farther right.",
+          whenFalse: "This value is greater, so insertion narrows the boundary to the left."
+        ) {
           low = middle + 1
         } else {
           high = middle

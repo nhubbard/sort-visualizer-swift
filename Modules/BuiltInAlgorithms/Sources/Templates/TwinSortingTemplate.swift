@@ -18,7 +18,12 @@ enum TwinSortingTemplate {
     var end = nmemb - 2
 
     while index <= end {
-      if engine.compare(index + left, index + 1 + left, by: (<=)) {
+      if engine.teachingCompare(
+        index + left, index + 1 + left, by: (<=),
+        stageID: "twin.run",
+        whenTrue: "This adjacent pair is nondecreasing, so Twin Sort extends the ascending run.",
+        whenFalse: "This adjacent pair descends, so Twin Sort switches to a descending-run path."
+      ) {
         index += 2
         continue
       }

@@ -56,7 +56,12 @@ public struct FifthMergeSort: SortAlgorithm {
         var high = i
         while low < high {
           let middle = low + (high - low) / 2
-          if engine.compareValue(middle, against: value, by: >) {
+          if engine.teachingCompareValue(
+            middle, against: value, by: >,
+            stageID: "FifthMergeSort.binary.search",
+            whenTrue: "This run value exceeds the held value, so the insertion point lies to the left.",
+            whenFalse: "This run value does not exceed the held value, so the search moves right."
+          ) {
             high = middle
           } else {
             low = middle + 1

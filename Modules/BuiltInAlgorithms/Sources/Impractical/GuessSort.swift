@@ -77,6 +77,11 @@ public struct GuessSort: SortAlgorithm {
     let original = engine.readAllValues()
     for i in 0..<n {
       engine.setValue(i, original[indexes[i]])
+      engine.annotateLastOperation(
+        stageID: "candidatePlacement", decisionID: "guesssort.candidatePlacement",
+        outcome: "place", roles: ["destination": .arrayIndex(i)],
+        explanationKey: "guesssort.candidatePlacement",
+        explanation: "This candidate permutation has passed its order check and is written to the array.")
     }
   }
 }

@@ -52,7 +52,12 @@ public struct PancakeInsertionSort: SortAlgorithm {
       var top = end - start
       while top > 1 {
         let mid = top / 2
-        if !engine.compare(valueIndex, end - mid, by: (>)) { end -= mid }
+        if !engine.teachingCompare(
+          valueIndex, end - mid, by: (>),
+          stageID: "PancakeInsertionSort.binary.insert",
+          whenTrue: "The held value is greater than this prefix item, so insertion scans farther through the prefix.",
+          whenFalse: "The held value is no greater than this prefix item, so insertion narrows toward it."
+        ) { end -= mid }
         top -= mid
       }
       if !engine.compare(valueIndex, end - 1, by: (>)) { return end - 1 }

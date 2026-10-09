@@ -94,7 +94,12 @@ public struct TriangularHeapSort: SortAlgorithm {
       if left >= size { break }
       let right = left + 1
       var largest = root
-      if !engine.compare(largest, left) {
+      if !engine.teachingCompare(
+        largest, left,
+        stageID: "TriangularHeapSort.childCandidate",
+        whenTrue: "The current heap candidate is at least as large, so keep it.",
+        whenFalse: "The child is larger, so promote it."
+      ) {
         largest = left
       }
       if right < size && !engine.compare(largest, right) {

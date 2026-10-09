@@ -106,7 +106,20 @@ public struct LibrarySort: SortAlgorithm {
       var hi = positions.count
       while lo < hi {
         let mid = (lo + hi) / 2
-        if auxRead(at: positions[mid]) > value {
+        let probe = auxRead(at: positions[mid])
+        let searchLower = probe > value
+        if engine.shouldAnnotateCurrentOperation {
+          engine.annotateLastOperation(
+            stageID: "LibrarySort.gappedBinarySearch", decisionID: "LibrarySort.gappedBinarySearch",
+            outcome: searchLower ? "lower" : "upper",
+            roles: ["slot": .auxiliaryIndex(handle: handle.rawValue, index: positions[mid]),
+              "heldValue": .value(value)],
+            explanationKey: "LibrarySort.gappedBinarySearch",
+            explanation: searchLower
+              ? "The library slot is greater than the new value, so search earlier slots."
+              : "The library slot is no greater, so search later slots to preserve tie order.")
+        }
+        if searchLower {
           hi = mid
         } else {
           lo = mid + 1

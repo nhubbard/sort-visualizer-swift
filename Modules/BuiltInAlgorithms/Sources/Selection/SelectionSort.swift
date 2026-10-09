@@ -24,7 +24,12 @@ public struct SelectionSort: SortAlgorithm {
     guard n > 1 else { return }
     for i in 0..<(n - 1) {
       var lowestIndex = i
-      for j in (i + 1)..<n where !engine.compare(j, lowestIndex) {
+      for j in (i + 1)..<n where !engine.teachingCompare(
+        j, lowestIndex,
+        stageID: "SelectionSort.minimumCandidate",
+        whenTrue: "This item is at least the current minimum, so keep the current candidate.",
+        whenFalse: "This item is smaller, so update the minimum candidate."
+      ) {
         lowestIndex = j
       }
       engine.swap(i, lowestIndex)

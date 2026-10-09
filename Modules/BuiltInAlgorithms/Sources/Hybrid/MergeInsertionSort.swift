@@ -134,7 +134,12 @@ public struct MergeInsertionSort: SortAlgorithm {
     while 2 * k <= length {
       var i = 2 * k - 1
       while i < length {
-        if engine.compare(i - k, i, by: >) {
+        if engine.teachingCompare(
+          i - k, i, by: >,
+          stageID: "MergeInsertionSort.block.order",
+          whenTrue: "The left block starts above the right block, so Merge Insertion swaps the blocks.",
+          whenFalse: "The two block starts are ordered, so these blocks stay in place."
+        ) {
           blockSwap(i - k, i, k)
         }
         i += 2 * k

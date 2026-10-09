@@ -33,7 +33,17 @@ public struct MergeSort: SortAlgorithm {
       var high = mid
       var merged: [Int] = []
       while low < mid && high < end {
-        if engine.compare(high, low) {
+        let chooseLeft = engine.compare(high, low)
+        engine.annotateLastOperation(
+          stageID: "merge.chooseNext",
+          decisionID: "merge.runChoice",
+          outcome: chooseLeft ? "left" : "right",
+          roles: ["left": .arrayIndex(low), "right": .arrayIndex(high)],
+          explanationKey: "merge.runChoice",
+          explanation: chooseLeft
+            ? "The left run has the smaller or equal value, so merge takes it next."
+            : "The right run has the smaller value, so merge takes it next.")
+        if chooseLeft {
           merged.append(engine.readValue(at: low))
           low += 1
         } else {

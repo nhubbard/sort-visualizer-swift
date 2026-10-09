@@ -35,7 +35,12 @@ public struct RecursiveShellSort: SortAlgorithm {
       var i = a + gap
       while i < b {
         var j = i
-        while j - gap >= a && !engine.compare(j, j - gap) {
+        while j - gap >= a && !engine.teachingCompare(
+          j, j - gap,
+          stageID: "RecursiveShellSort.gapPosition",
+          whenTrue: "The current item is at least its gap neighbor, so stop moving across this gap.",
+          whenFalse: "The current item is smaller than its gap neighbor, so move it left."
+        ) {
           engine.swap(j, j - gap)
           j -= gap
         }

@@ -35,6 +35,11 @@ public struct SelectionBogoSort: SortAlgorithm {
       }
       if minIndex != i {
         engine.swap(i, minIndex)
+        engine.annotateLastOperation(
+          stageID: "candidateExchange", decisionID: "selectionbogosort.candidateExchange",
+          outcome: "exchange", roles: ["left": .arrayIndex(i), "right": .arrayIndex(minIndex)],
+          explanationKey: "selectionbogosort.candidateExchange",
+          explanation: "A smaller value was found for the current selection position, so exchange it.")
       }
     }
   }

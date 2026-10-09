@@ -36,6 +36,11 @@ public struct StoogeSort: SortAlgorithm {
   private func stoogeSort(_ engine: inout RecordingEngine, _ i: Int, _ j: Int) {
     if engine.compare(i, j, by: >) {
       engine.swap(i, j)
+      engine.annotateLastOperation(
+        stageID: "candidateExchange", decisionID: "stoogesort.candidateExchange",
+        outcome: "exchange", roles: ["left": .arrayIndex(i), "right": .arrayIndex(j)],
+        explanationKey: "stoogesort.candidateExchange",
+        explanation: "The endpoints of this recursive range are inverted, so exchange them.")
     }
     if j - i + 1 >= 3 {
       let t = (j - i + 1) / 3

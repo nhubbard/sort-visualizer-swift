@@ -65,8 +65,31 @@ private struct FakeSeededShuffle: ShuffleAlgorithm {
   }
 }
 
+private struct FakeAnnotatedAlgorithm: SortAlgorithm {
+  let id = AlgorithmID(rawValue: "fake-annotated")
+  let metadata = FakeAlgorithm().metadata
+
+  func record(into engine: inout RecordingEngine) {
+    _ = engine.compare(0, 1)
+    engine.annotateLastOperation(
+      stageID: "fake.choose", decisionID: "fake.side", outcome: "left",
+      roles: ["left": .arrayIndex(0)], explanationKey: "fake.choice")
+  }
+}
+
 @Suite
 struct TapeFactoryTests {
+  @Test
+  func sortAnnotationsAreOffsetPastTheShuffle() throws {
+    let tape = try TapeFactory.makeTape(
+      algorithm: FakeAnnotatedAlgorithm(), shuffle: FakeReverseShuffle(), size: 2,
+      operationCap: RecordingEngine.defaultOperationCap)
+    #expect(tape.teachingAnnotations.count == 1)
+    let index = tape.teachingAnnotations[0].operationIndex
+    #expect(index >= tape.header.sortStartIndex)
+    #expect(tape.operations[index] == .compare(0, 1))
+  }
+
   @Test
   func suppliedSeedReproducesTheShufflePhaseAndIsStoredInTheTape() throws {
     let seed: UInt64 = 0xDEAD_BEEF_1234_5678

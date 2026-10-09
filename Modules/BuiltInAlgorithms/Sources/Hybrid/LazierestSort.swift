@@ -65,7 +65,12 @@ public struct LazierestSort: SortAlgorithm {
       var b = bIn
       while a < b {
         let mid = a + (b - a) / 2
-        if engine.compareValue(mid, against: value, by: >=) { b = mid } else { a = mid + 1 }
+        if engine.teachingCompareValue(
+          mid, against: value, by: >=,
+          stageID: "LazierestSort.binary.search",
+          whenTrue: "This position is at least the held value, so the insertion point is at or before it.",
+          whenFalse: "This position is smaller than the held value, so the insertion search advances."
+        ) { b = mid } else { a = mid + 1 }
       }
       return a
     }

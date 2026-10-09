@@ -62,7 +62,12 @@ public struct PDMergeSort: SortAlgorithm {
         // (marked via `markAuxRead`), then compared against the live `right` index via
         // `engine.compareValue` — the aux-held value plays the "held value" role.
         engine.markAuxRead(copiedHandle, at: bufferPointer)
-        if engine.compareValue(right, against: copied[bufferPointer], by: (>=)) {
+        if engine.teachingCompareValue(
+          right, against: copied[bufferPointer], by: (>=),
+          stageID: "PDMergeSort.merge.choose",
+          whenTrue: "The main-array item is at least the buffered item, so the merge writes the buffered value.",
+          whenFalse: "The main-array item is smaller, so the merge keeps it ahead of the buffered value."
+        ) {
           engine.setValue(left, copied[bufferPointer])
           bufferPointer += 1
         } else {

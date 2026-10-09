@@ -56,7 +56,13 @@ public struct ClassicThreeSmoothCombSort: SortAlgorithm {
       if is3Smooth(g) {
         var i = g
         while i < length {
-          if engine.compare(i - g, i, by: (>)) {
+          if engine.teachingCompare(
+            i - g, i,
+            by: (>),
+            stageID: "ClassicThreeSmoothCombSort.gapOrder",
+            whenTrue: "The left item is larger across this three-smooth gap, so exchange the pair.",
+            whenFalse: "This gap-separated pair is ordered."
+          ) {
             engine.swap(i - g, i)
           }
           i += 1

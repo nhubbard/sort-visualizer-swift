@@ -2,7 +2,8 @@ import SortEngineKit
 
 /// A read-only teaching stream derived from the tape that ReplayEngine actually plays. The
 /// positions therefore remain correct for imported tapes and fast-playback-compacted tapes.
-/// Nothing here changes SortOperation or the archived tape format.
+/// The optional annotation sidecar supplies authored decision explanations when present;
+/// older tapes still use the operation-derived pilot text.
 struct TeachingGraphTrace {
   enum Variant: Equatable {
     case quickSort
@@ -149,7 +150,49 @@ struct TeachingGraphTrace {
         }
       }
     }
-    events = built
+    let decisions = Dictionary(
+      tape.teachingAnnotations.map { ($0.operationIndex + 1, $0) },
+      uniquingKeysWith: { _, latest in latest })
+    events = built.map { event in
+      guard event.kind == .decision,
+        let annotation = decisions[event.step],
+        let explanation = Self.explanation(for: annotation) else { return event }
+      return Event(step: event.step, source: event.source, target: event.target,
+        kind: event.kind, explanation: explanation)
+    }
+  }
+
+  private static func explanation(for annotation: TeachingAnnotation) -> String? {
+    guard annotation.definitionVersion == 1 else { return nil }
+    switch annotation.explanationKey {
+    case "quick.pivotSide":
+      guard let pivot = annotation.roles["pivot"]?.arrayIndex,
+        let candidate = annotation.roles["candidate"]?.arrayIndex else { return nil }
+      switch annotation.outcome {
+      case "advance":
+        return "Position \(candidate + 1) is on the pivot's left side; advance the scan from pivot \(pivot + 1)."
+      case "oppositeSide":
+        return "Position \(candidate + 1) belongs on the other side of pivot \(pivot + 1); stop this scan."
+      case "boundary":
+        return "The scan reached the partition boundary at position \(candidate + 1)."
+      case "retreat":
+        return "Position \(candidate + 1) is beyond pivot \(pivot + 1); move the right scan back."
+      case "stop":
+        return "Position \(candidate + 1) is no greater than pivot \(pivot + 1); stop the right scan."
+      default: return nil
+      }
+    case "merge.runChoice":
+      guard let left = annotation.roles["left"]?.arrayIndex,
+        let right = annotation.roles["right"]?.arrayIndex else { return nil }
+      switch annotation.outcome {
+      case "left":
+        return "Choose position \(left + 1) from the left run; its value is no greater than position \(right + 1)."
+      case "right":
+        return "Choose position \(right + 1) from the right run; its value is smaller than position \(left + 1)."
+      default: return nil
+      }
+    default: return nil
+    }
   }
 
   /// Index of the last event applied at `step`, or nil before the first graph event.

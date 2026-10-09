@@ -53,6 +53,11 @@ public struct RandomGuessSort: SortAlgorithm {
     let mapped = loops.map { engine.readValue(at: $0) }
     for i in 0..<n {
       engine.setValue(i, mapped[i])
+      engine.annotateLastOperation(
+        stageID: "candidatePlacement", decisionID: "randomguesssort.candidatePlacement",
+        outcome: "place", roles: ["destination": .arrayIndex(i)],
+        explanationKey: "randomguesssort.candidatePlacement",
+        explanation: "This candidate permutation satisfies the ordering check and is placed here.")
     }
   }
 }

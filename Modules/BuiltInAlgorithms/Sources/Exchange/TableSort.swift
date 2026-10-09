@@ -60,7 +60,13 @@ public struct TableSort: SortAlgorithm {
     func stableComp(_ a: Int, _ b: Int) -> Bool {
       let ta = table[a]
       let tb = table[b]
-      if engine.compare(ta, tb, by: >) { return true }
+      if engine.teachingCompare(
+        ta, tb,
+        by: >,
+        stageID: "TableSort.tableOrder",
+        whenTrue: "The first indexed value is greater, so the stable table comparison ranks it later.",
+        whenFalse: "The first indexed value is no greater; a tie falls back to original index order."
+      ) { return true }
       return engine.readValue(at: ta) == engine.readValue(at: tb) && table[a] > table[b]
     }
 

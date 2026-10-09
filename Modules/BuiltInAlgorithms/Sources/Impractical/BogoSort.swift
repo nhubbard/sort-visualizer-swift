@@ -32,7 +32,18 @@ public struct BogoSort: SortAlgorithm {
     guard n > 1 else { return }
 
     func isSorted() -> Bool {
-      for i in 1..<n where !engine.compare(i, i - 1) { return false }
+      for i in 1..<n {
+        let inOrder = engine.compare(i, i - 1)
+        engine.annotateLastOperation(
+          stageID: "sortednessCheck", decisionID: "bogosort.adjacentOrder",
+          outcome: inOrder ? "continue" : "reject",
+          roles: ["previous": .arrayIndex(i - 1), "current": .arrayIndex(i)],
+          explanationKey: "bogosort.adjacentOrder",
+          explanation: inOrder
+            ? "This adjacent pair is ordered, so keep checking the candidate."
+            : "This adjacent pair is inverted, so reject this candidate permutation.")
+        if !inOrder { return false }
+      }
       return true
     }
 
@@ -47,6 +58,11 @@ public struct BogoSort: SortAlgorithm {
       while !engine.compare(j, i, by: (>)) { j -= 1 }
 
       engine.swap(i, j)
+      engine.annotateLastOperation(
+        stageID: "candidateExchange", decisionID: "bogosort.candidateExchange",
+        outcome: "exchange", roles: ["left": .arrayIndex(i), "right": .arrayIndex(j)],
+        explanationKey: "bogosort.candidateExchange",
+        explanation: "The next candidate permutation exchanges its pivot with a larger successor.")
       engine.reversal(i + 1, n - 1)
       return true
     }

@@ -67,6 +67,12 @@ public struct MatrixSort: SortAlgorithm {
       var j = end
       while i < j {
         engine.swap(i, j - gap)
+        engine.annotateLastOperation(
+          stageID: "matrixReverse", decisionID: "matrixsort.directionalReverse",
+          outcome: "exchange",
+          roles: ["left": .arrayIndex(i), "right": .arrayIndex(j - gap)],
+          explanationKey: "matrixsort.directionalReverse",
+          explanation: "This row reverses direction before the next matrix merge pass.")
         i += gap
         j -= gap
       }
@@ -79,10 +85,20 @@ public struct MatrixSort: SortAlgorithm {
       var j = b - gap
       while j >= a, dirCompareVal(key, engine.readValue(at: j), dir) < 0 {
         engine.setValue(j + gap, engine.readValue(at: j))
+        engine.annotateLastOperation(
+          stageID: "matrixInsertion", decisionID: "matrixsort.shiftForKey",
+          outcome: "shift", roles: ["destination": .arrayIndex(j + gap), "source": .arrayIndex(j)],
+          explanationKey: "matrixsort.shiftForKey",
+          explanation: "The held key precedes this value in the current direction, so shift the value by one gap.")
         did = true
         j -= gap
       }
       engine.setValue(j + gap, key)
+      engine.annotateLastOperation(
+        stageID: "matrixInsertion", decisionID: "matrixsort.placeKey",
+        outcome: "place", roles: ["destination": .arrayIndex(j + gap), "held": .value(key)],
+        explanationKey: "matrixsort.placeKey",
+        explanation: "The shift stops here, so place the held key in this open position.")
       return did
     }
 

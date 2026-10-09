@@ -26,7 +26,13 @@ public struct OptimizedBubbleSort: SortAlgorithm {
     while i > 0 {
       var consecSorted = 1
       for j in 0..<i {
-        if engine.compare(j, j + 1, by: (>)) {
+        if engine.teachingCompare(
+          j, j + 1,
+          by: (>),
+          stageID: "OptimizedBubbleSort.adjacentOrder",
+          whenTrue: "The left neighbor is larger, so exchange it and remember the last swap.",
+          whenFalse: "This pair is ordered; the last-swap boundary does not move."
+        ) {
           engine.swap(j, j + 1)
           consecSorted = 1
         } else {

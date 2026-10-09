@@ -49,6 +49,11 @@ public struct LessBogoSort: SortAlgorithm {
       while !engine.compare(j, i, by: (>)) { j -= 1 }
 
       engine.swap(i, j)
+      engine.annotateLastOperation(
+        stageID: "candidateExchange", decisionID: "lessbogosort.candidateExchange",
+        outcome: "exchange", roles: ["left": .arrayIndex(i), "right": .arrayIndex(j)],
+        explanationKey: "lessbogosort.candidateExchange",
+        explanation: "The next permutation exchanges its pivot with a successor in the active range.")
       engine.reversal(i + 1, end - 1)
       return true
     }

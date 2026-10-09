@@ -52,7 +52,12 @@ public struct OptimizedLazyStableSort: SortAlgorithm {
   private func insertionSort(_ engine: inout RecordingEngine, _ a: Int, _ b: Int) {
     guard b - a > 1 else { return }
     var i = a + 1
-    if engine.compare(i - 1, i, by: >) {
+    if engine.teachingCompare(
+      i - 1, i, by: >,
+      stageID: "OptimizedLazyStableSort.run.direction",
+      whenTrue: "The first pair descends, so the sort scans and reverses this run.",
+      whenFalse: "The first pair is nondecreasing, so the sort scans it forward."
+    ) {
       i += 1
       while i < b && engine.compare(i - 1, i, by: >) { i += 1 }
       engine.reversal(a, i - 1)

@@ -87,7 +87,13 @@ public struct RedBlackTreeSort: SortAlgorithm {
         node.right!.isRed = false
       }
 
-      if engine.compare(addPointer, node.pointer, by: <) {
+      if engine.teachingCompare(
+        addPointer, node.pointer,
+        by: <,
+        stageID: "RedBlackTreeSort.treeBranch",
+        whenTrue: "The inserted value is smaller, so descend into the left red-black branch.",
+        whenFalse: "The inserted value belongs in the other red-black branch."
+      ) {
         let result = add(node.left, addPointer)
         node.left = result.node
         if result.needsFix {

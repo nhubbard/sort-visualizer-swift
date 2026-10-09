@@ -63,7 +63,12 @@ public struct ImprovedInPlaceMergeSort: SortAlgorithm {
       var i = a
       var j = m
       while i < m, j < b {
-        if engine.compare(i, j, by: >) {
+        if engine.teachingCompare(
+          i, j, by: >,
+          stageID: "ImprovedInPlaceMergeSort.merge.scan",
+          whenTrue: "The left item exceeds the right, so the merge advances to find its destination.",
+          whenFalse: "The left item is no greater, so the merge rotates the pending range."
+        ) {
           j += 1
         } else {
           push(i, m, j)

@@ -56,7 +56,13 @@ public struct CircleSortRecursive: SortAlgorithm {
       var hi = hi
       var swapCount = 0
       while lo < hi {
-        if hi < end, engine.compare(lo, hi, by: (>)) {
+        if hi < end, engine.teachingCompare(
+          lo, hi,
+          by: (>),
+          stageID: "CircleSortRecursive.oppositeEnds",
+          whenTrue: "The left endpoint is larger, so exchange the pair before recursing.",
+          whenFalse: "The opposite endpoints stay in place."
+        ) {
           engine.swap(lo, hi)
           swapCount += 1
         }

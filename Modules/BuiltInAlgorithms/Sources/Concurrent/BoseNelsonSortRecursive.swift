@@ -45,7 +45,16 @@ public struct BoseNelsonSortRecursive: SortAlgorithm {
     guard n > 1 else { return }
 
     func compareSwap(_ start: Int, _ end: Int) {
-      if engine.compare(start, end, by: >) {
+      let shouldSwap = engine.compare(start, end, by: >)
+      engine.annotateLastOperation(
+        stageID: "compareExchange", decisionID: "bosenelsonsortrecursive.networkComparator",
+        outcome: shouldSwap ? "exchange" : "keep",
+        roles: ["left": .arrayIndex(start), "right": .arrayIndex(end)],
+        explanationKey: "bosenelsonsortrecursive.compareExchange",
+        explanation: shouldSwap
+          ? "The left value exceeds the right value, so this comparator exchanges them."
+          : "These values satisfy this comparator, so they stay in place.")
+      if shouldSwap {
         engine.swap(start, end)
       }
     }

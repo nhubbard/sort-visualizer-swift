@@ -45,7 +45,12 @@ public struct SillySort: SortAlgorithm {
     sillySort(&engine, i, m)
     sillySort(&engine, m + 1, j)
     // Engine's default comparator is `>=`, matching ArrayV's `compareValues(...) >= 0`.
-    if engine.compare(i, m + 1) {
+    if engine.teachingCompare(
+      i, m + 1,
+      stageID: "SillySort.middlePair",
+      whenTrue: "The first item is at least the next half item, so this step exchanges the pair.",
+      whenFalse: "The recursive pair is ordered at this stage."
+    ) {
       engine.swap(i, m + 1)
     }
     sillySort(&engine, i + 1, j)

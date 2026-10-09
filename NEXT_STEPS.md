@@ -48,7 +48,7 @@ Updated 2026-10-08. This list reflects the discussion after completing the nativ
 
 ## 4. Interactive teaching graph (original teaching-mode roadmap item)
 
-**Status:** Quick Sort and Merge Sort pilot implemented. See [the teaching graph record](Documentation/docs/guides/teaching-graph-pilot-2026-10-08.md). Extending the semantic model to more algorithms and evaluating side-by-side comparison remain later work.
+**Status:** Quick Sort and Merge Sort pilot and algorithm-authored decision annotations implemented. See [the teaching graph record](Documentation/docs/guides/teaching-graph-pilot-2026-10-08.md) and [annotation design](Documentation/docs/guides/teaching-graph-annotations.md). Extending definitions to more algorithms, a fixed flowchart, and side-by-side comparison remain later work.
 
 **Why:** A graph of decisions, movements, and dependencies could explain behavior more effectively than generic captions. The existing tape has operations and index markers, but no graph nodes, edges, or semantic relationships. This is a new teaching model, not a styling change.
 

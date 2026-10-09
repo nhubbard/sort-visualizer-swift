@@ -80,7 +80,12 @@ private struct SqrtSortRecorder {
 
   private mutating func compare(_ storage: Storage, _ a: Int, _ b: Int) -> Int {
     if storage == .main {
-      if engine.compare(a, b, by: (<)) { return -1 }
+      if engine.teachingCompare(
+        a, b, by: (<),
+        stageID: "SqrtSort.key.order",
+        whenTrue: "The first key is smaller, so square-root sorting places it earlier.",
+        whenFalse: "The first key is not smaller, so the next ordering case applies."
+      ) { return -1 }
       if engine.compare(a, b, by: (>)) { return 1 }
       return 0
     }
