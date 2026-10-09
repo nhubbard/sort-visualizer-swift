@@ -173,6 +173,17 @@ private func waitUntilTerminal(_ session: SortSession, timeout: Duration = .seco
   throw TimedOut()
 }
 
+@MainActor
+private func waitForAnalyticsRevision(_ expected: Int, in session: SortSession) async throws {
+  let deadline = ContinuousClock.now + .seconds(5)
+  while ContinuousClock.now < deadline {
+    if session.analyticsRevision == expected { return }
+    try await Task.sleep(for: .milliseconds(5))
+  }
+  struct TimedOut: Error {}
+  throw TimedOut()
+}
+
 /// Very fast playback so tests don't spend real wall-clock time watching bars animate.
 @MainActor
 private func makeFastSettings() -> AppSettings {
@@ -229,6 +240,50 @@ struct SortSessionTests {
       return
     }
     #expect(replay.frame.map(\.value) == Array(1...size))
+  }
+
+  /// Exercises the import boundary beyond Tape's codec: a saved recording must become a new
+  /// session's actual replay, with the original header and operations rather than a fresh sort.
+  @Test
+  func archivedTapeLoadsIntoFreshSessionAndReplaysToTheOriginalResult() async throws {
+    let algorithm = FakeAlgorithm()
+    let shuffle = FakeReverseShuffle()
+    let original = try TapeFactory.makeTape(
+      algorithm: algorithm, shuffle: shuffle, size: 9, operationCap: 100_000)
+    let imported = try Tape(archivedData: original.archived())
+    let session = SortSession(
+      algorithm: algorithm, shuffle: FakeIdentityShuffle(),
+      analytics: try makeInMemoryAnalytics(), settings: makeFastSettings())
+
+    session.loadImportedTape(imported)
+    #expect(session.arraySize == 9)
+    #expect(session.lastReplay?.tape == imported)
+    #expect(imported.operations == original.operations)
+    #expect(imported.header.algorithmID == original.header.algorithmID)
+    #expect(imported.header.initialValues == original.header.initialValues)
+    #expect(imported.header.visualSeed == original.header.visualSeed)
+    #expect(imported.header.compareCount == original.header.compareCount)
+    #expect(imported.header.swapCount == original.header.swapCount)
+    #expect(imported.header.mainWriteCount == original.header.mainWriteCount)
+    #expect(imported.header.auxWriteCount == original.header.auxWriteCount)
+    #expect(imported.header.reversalCount == original.header.reversalCount)
+    #expect(imported.header.shuffleID == original.header.shuffleID)
+    #expect(imported.header.sortStartIndex == original.header.sortStartIndex)
+    #expect(imported.header.uniqueValueCount == original.header.uniqueValueCount)
+    #expect(imported.header.recordingDuration == original.header.recordingDuration)
+    // The archive writes a Unix-epoch Double. Converting Date's reference-epoch Double to and
+    // from that representation can round sub-microsecond bits on current calendar dates.
+    #expect(abs(imported.header.recordedAt.timeIntervalSince(original.header.recordedAt)) < 0.000001)
+    try await waitUntilTerminal(session)
+
+    guard case .complete(let replay) = session.phase else {
+      Issue.record("expected an imported tape to finish replaying, got \(session.phase)")
+      return
+    }
+    #expect(replay.tape.header.shuffleID == shuffle.id.rawValue)
+    #expect(replay.totalOperationCount == original.operations.count)
+    #expect(replay.frame.map(\.value) == Array(1...9))
+    #expect(replay.frame.allSatisfy { $0.markers.isEmpty })
   }
 
   /// Regression test for the reported bug: `FakeAlgorithm` (a bubble-sort shape) always ends on
@@ -454,6 +509,89 @@ struct SortSessionTests {
     #expect(playbackDuration > 0)
     #expect(rows[0].playbackSpeed == settings.playbackSpeed)
     #expect(rows[0].recordingDuration >= 0)
+  }
+
+  @Test
+  func pausingAndReplayingTheSameRunNeverInsertAnotherAnalyticsRecord() async throws {
+    let analytics = try makeInMemoryAnalytics()
+    let driver = ManualTickDriver()
+    let session = SortSession(
+      algorithm: FakeAlgorithm(), shuffle: FakeReverseShuffle(),
+      analytics: analytics, settings: makeFastSettings(),
+      replayEngineFactory: { ReplayEngine(tape: $0, displayLinkFactory: { driver }) }
+    )
+
+    await session.start(size: 12)
+    guard case .replaying(let replay) = session.phase else {
+      Issue.record("expected a replay after recording")
+      return
+    }
+    replay.speed = 20
+    driver.fireTick(elapsed: 0)
+    driver.fireTick(elapsed: 1)
+    try await Task.sleep(for: .milliseconds(20))
+    session.togglePlayback()
+    #expect(replay.stepIndex > 0 && replay.stepIndex < replay.totalOperationCount)
+    #expect(try await analytics.fetchSummaries(algorithmID: FakeAlgorithm().id).isEmpty)
+
+    replay.speed = 100_000
+    session.togglePlayback()
+    driver.fireTick(elapsed: 0)
+    driver.fireTick(elapsed: 1)
+    try await waitUntilTerminal(session)
+    try await waitForAnalyticsRevision(1, in: session)
+    #expect(try await analytics.fetchSummaries(algorithmID: FakeAlgorithm().id).count == 1)
+    #expect(session.analyticsRevision == 1)
+
+    replay.seek(to: replay.header.sortStartIndex)
+    session.togglePlayback()
+    driver.fireTick(elapsed: 0)
+    driver.fireTick(elapsed: 1)
+    try await waitUntilTerminal(session)
+    try await waitForAnalyticsRevision(1, in: session)
+    #expect(try await analytics.fetchSummaries(algorithmID: FakeAlgorithm().id).count == 1)
+    #expect(session.analyticsRevision == 1)
+
+    session.togglePlayback() // already at the end: no new run and no new record
+    #expect(try await analytics.fetchSummaries(algorithmID: FakeAlgorithm().id).count == 1)
+  }
+
+  @Test
+  func replacingAnInterruptedRunRecordsOnlyTheNewCompletion() async throws {
+    let analytics = try makeInMemoryAnalytics()
+    let driver = ManualTickDriver()
+    let session = SortSession(
+      algorithm: FakeAlgorithm(), shuffle: FakeReverseShuffle(),
+      analytics: analytics, settings: makeFastSettings(),
+      replayEngineFactory: { ReplayEngine(tape: $0, displayLinkFactory: { driver }) }
+    )
+
+    await session.start(size: 12)
+    guard case .replaying(let interrupted) = session.phase else {
+      Issue.record("expected the first replay")
+      return
+    }
+    interrupted.speed = 20
+    driver.fireTick(elapsed: 0)
+    driver.fireTick(elapsed: 1)
+    try await Task.sleep(for: .milliseconds(20))
+    #expect(interrupted.stepIndex > 0 && interrupted.stepIndex < interrupted.totalOperationCount)
+    #expect(session.analyticsRevision == 0)
+
+    await session.start(size: 8)
+    #expect(!interrupted.isPlaying)
+    guard case .replaying(let replacement) = session.phase else {
+      Issue.record("expected a replacement replay")
+      return
+    }
+    driver.fireTick(elapsed: 0)
+    driver.fireTick(elapsed: 1)
+    try await waitUntilTerminal(session)
+    try await waitForAnalyticsRevision(1, in: session)
+    let rows = try await analytics.fetchSummaries(algorithmID: FakeAlgorithm().id)
+    #expect(rows.count == 1)
+    #expect(rows.first?.arraySize == 8)
+    #expect(session.analyticsRevision == 1)
   }
 
   @Test

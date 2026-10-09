@@ -3,22 +3,6 @@ import Observation
 import QuartzCore
 import os
 
-/// Labels `play()`'s per-tick batch-apply interval for a manual Instruments capture — the exact
-/// mechanism behind a past perf bug (see `state`'s doc comment) was invisible in a generic Time
-/// Profiler trace until it was traced back to this call by hand; a signpost interval here means a
-/// future trace shows "TickApply" spans directly, with the batch size as its message, instead of
-/// requiring that same manual detective work again.
-///
-/// Also emits a "Tick" point event once per tick (see `play()`), before "TickApply"'s interval
-/// even exists for a given chunk — "TickApply" only fires when a tick actually has ops to apply,
-/// so a tick skipped by `opsToApply <= 0` (nothing due yet) is otherwise invisible in a trace.
-/// "Tick" carries the raw and smoothed pacing rate plus `opsToApply`, so a fixed-duration
-/// smoothness complaint can be diagnosed directly from a Points of Interest capture — rate spikes,
-/// oscillation, or a skipped run of ticks all show up as the event's message — without needing to
-/// reproduce a specific "it looks laggy" report by eye first.
-private let replaySignposter = OSSignposter(
-  subsystem: "com.nhubbard.Sort2.SortEngineKit", category: "ReplayEngine")
-
 /// Abstracts the redraw clock so `ReplayEngine` doesn't require a live display link to be
 /// testable. `onTick` fires once per frame with the elapsed time since the previous tick (0 for
 /// the very first tick after `start`).
@@ -443,6 +427,14 @@ public final class ReplayEngine {
   public func play(onStep: ((SortOperation) -> Void)? = nil) -> Task<Void, Never> {
     isPlaying = true
     currentSegmentStart = Date()
+
+    // Standard Time Profiler and Metal System Trace templates collect the PointsOfInterest
+    // category. Construct this after tracing starts for this playback: unified logging may cache
+    // whether a signposter is enabled, so a process-wide instance made during an earlier run can
+    // miss a trace attached later. TickApply isolates tape mutation; TickDispatch isolates audio
+    // and renderer callbacks. Tick events also reveal frames where no operations were due.
+    let replaySignposter = OSSignposter(
+      subsystem: "com.nhubbard.Sort2.SortEngineKit", category: "PointsOfInterest")
 
     // Computed once per `play()` call (not per tick — this scans the whole tape) so the
     // fixed-duration branch below only ever needs an O(1) subtraction against the live

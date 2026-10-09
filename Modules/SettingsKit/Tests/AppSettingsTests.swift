@@ -63,6 +63,34 @@ struct AppSettingsTests {
     #expect(second.recordingOperationCap == 1_000_000)
   }
 
+  @Test
+  func malformedPersistedValuesRecoverBeforeViewsOrPlaybackUseThem() {
+    let store = makeIsolatedStore()
+    store.set("unknown-visualizer", forKey: "selectedVisualizerID")
+    store.set(Double.nan, forKey: "playbackSpeed")
+    store.set(-4.0, forKey: "targetPlaybackDuration")
+    store.set(96, forKey: "synthLowNote")
+    store.set(24, forKey: "synthHighNote")
+    store.set(-1, forKey: "defaultArraySize")
+    store.set(0, forKey: "recordingOperationCap")
+    store.set("missing-theme", forKey: "codeTheme")
+    store.set("unknown-shuffle", forKey: "defaultShuffleID")
+
+    let settings = AppSettings(store: store)
+    #expect(settings.playbackSpeed == 30.0)
+    #expect(settings.targetPlaybackDuration == 10.0)
+    #expect(settings.synthNoteRange == 36...72)
+    #expect(settings.defaultArraySize == 256)
+    #expect(settings.recordingOperationCap == 300_000)
+    #expect(settings.codeTheme == CodeThemeID(rawValue: "monokai"))
+    if !VisualizerRegistry.shared.visualizers.isEmpty {
+      #expect(VisualizerRegistry.shared.visualizers.contains { $0.id == settings.selectedVisualizerID })
+    }
+    if !ShuffleRegistry.shared.shuffles.isEmpty {
+      #expect(ShuffleRegistry.shared.shuffles.contains { $0.id == settings.defaultShuffleID })
+    }
+  }
+
   /// Fully synchronous (no `await` between setup and assertions) so this critical section over
   /// the process-wide `VisualizerRegistry.shared` singleton can't interleave with another
   /// `@MainActor`-isolated test's own mutation of it — see `cycleVisualizer()`'s own doc comment

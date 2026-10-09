@@ -79,10 +79,13 @@ public struct ScrollingSortView: View {
               .padding()
               .accessibilityIdentifier("algorithmDetailAutomationPlaceholder")
           } else {
-            AlgorithmDetailSection(algorithm: algorithm, availableWidth: geometry.size.width)
+            AlgorithmDetailSection(
+              algorithm: algorithm, availableWidth: geometry.size.width,
+              analyticsRevision: session.analyticsRevision)
           }
         }
       }
+      .accessibilityIdentifier("algorithmDetailScrollView")
     }
     .navigationTitle(algorithm.metadata.displayName)
     // Tied to this view's own presence, not to `runSortViewLifecycle`'s return — that function

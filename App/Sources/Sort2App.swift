@@ -142,24 +142,29 @@ struct Sort2App: App {
     // dispatch exactly, just triggered from the bridge instead of a keyboard shortcut. A no-op
     // (via `?.`) whenever nothing's actively sorting, same as every other reach-in through
     // `SortCoordinator.shared.activeSortSession`.
-    AudioService.shared.remoteControlHandler = { command in
-      Task { @MainActor in
-        guard let session = SortCoordinator.shared.activeSortSession else { return }
-        switch command {
-        case .togglePlayback:
-          session.togglePlayback()
-        case .restart:
-          session.lastReplay?.seek(to: 0)
-        case .regenerate:
-          Task { await session.start(size: session.arraySize) }
-        case .stepForward:
-          session.lastReplay?.pause()
-          session.lastReplay?.stepForward()
-        case .stepBackward:
-          session.lastReplay?.pause()
-          session.lastReplay?.stepBackward()
-        case .toggleSound:
-          session.soundEnabled.toggle()
+    // The detail-only UI audit never starts a sort or offers audio controls. Avoid initializing
+    // AVAudioEngine for it: a transiently unavailable Catalyst output device can raise an
+    // Objective-C exception during graph construction before a test reaches the detail page.
+    if ProcessInfo.processInfo.environment["UI_TEST_DETAIL_AUDIT"] != "1" {
+      AudioService.shared.remoteControlHandler = { command in
+        Task { @MainActor in
+          guard let session = SortCoordinator.shared.activeSortSession else { return }
+          switch command {
+          case .togglePlayback:
+            session.togglePlayback()
+          case .restart:
+            session.lastReplay?.seek(to: 0)
+          case .regenerate:
+            Task { await session.start(size: session.arraySize) }
+          case .stepForward:
+            session.lastReplay?.pause()
+            session.lastReplay?.stepForward()
+          case .stepBackward:
+            session.lastReplay?.pause()
+            session.lastReplay?.stepBackward()
+          case .toggleSound:
+            session.soundEnabled.toggle()
+          }
         }
       }
     }
@@ -167,8 +172,18 @@ struct Sort2App: App {
 
   var body: some Scene {
     WindowGroup {
+      #if DEBUG
+      if ProcessInfo.processInfo.environment["UI_TEST_DETAIL_AUDIT"] == "1" {
+        AlgorithmDetailAuditView()
+          .environment(AppSettings.shared)
+      } else {
+        ContentView()
+          .environment(AppSettings.shared)
+      }
+      #else
       ContentView()
         .environment(AppSettings.shared)
+      #endif
     }
     .commands {
       SortCommands()

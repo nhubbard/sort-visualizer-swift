@@ -49,6 +49,9 @@ public final class SortSession {
   }
 
   public private(set) var phase: Phase = .idle
+  /// Changes only after a completed run has been saved, so a visible history chart can reload
+  /// without racing the write or polling SwiftData on every playback frame.
+  public private(set) var analyticsRevision = 0
 
   #if DEBUG && targetEnvironment(macCatalyst) && LOCAL_INSTRUMENTS_TRACING
   var debugTraceTemplate: DebugTraceTemplate = .cpuProfiler
@@ -102,6 +105,9 @@ public final class SortSession {
   /// reason) — `@testable import`ing tests are the only callers.
   private let replayEngineFactory: (Tape) -> ReplayEngine
   private var monitorTask: Task<Void, Never>?
+  /// A replay can be scrubbed backward after completion and played to the end again. That is
+  /// still the same run, so analytics must be inserted only on its first completion.
+  private var hasRecordedCurrentReplay = false
   private var automationTask: Task<Void, Never>?
   /// Set by `start(size:)` whenever the most recent call skipped a capped recording instead of
   /// starting a replay — `runAutomation(sizes:runsPerSize:)` checks this right after `start
@@ -169,7 +175,14 @@ public final class SortSession {
 
     let algorithm = self.algorithm
     let shuffle = self.shuffle
+    #if DEBUG
+    // A launch-scoped UI-test override exercises the real error view without persisting a tiny
+    // cap into UserDefaults and contaminating the following UI tests.
+    let operationCap = ProcessInfo.processInfo.environment["UI_TEST_RECORDING_CAP"]
+      .flatMap(Int.init).flatMap { $0 > 0 ? $0 : nil } ?? settings.recordingOperationCap
+    #else
     let operationCap = settings.recordingOperationCap
+    #endif
     #if DEBUG && targetEnvironment(macCatalyst) && LOCAL_INSTRUMENTS_TRACING
     let selectedTraceTemplate = debugTraceTemplate
     let selectedTraceRepetitions = debugTraceRepetitions
@@ -253,6 +266,7 @@ public final class SortSession {
   }
 
   private func startReplay(_ tape: Tape) {
+    hasRecordedCurrentReplay = false
     // Automation, Showcase, and manual runs all funnel through this one method, so reading the
     // pacing mode from `settings` unconditionally (no `isAutomating` branch) applies it uniformly
     // to all three, as intended — see Documentation/docs/architecture/history.md.
@@ -285,7 +299,8 @@ public final class SortSession {
     // of waiting on it to resolve on its own.
     monitorTask = Task { [weak self, weak replay] in
       await playbackTask.value
-      guard let self, let replay, replay.stepIndex >= replay.totalOperationCount else { return }
+      guard let self, let replay, self.lastReplay === replay,
+        replay.stepIndex >= replay.totalOperationCount else { return }
       self.phase = .complete(replay)
       Self.exportTapeForAuditIfRequested(replay.tape)
       // Read here, at the exact moment genuine completion is observed — not later, and not
@@ -307,10 +322,18 @@ public final class SortSession {
       } else {
         recordedSpeed = replay.speed
       }
-      try? await self.analytics.record(
-        replay.header, algorithmID: self.algorithm.id,
-        playbackDuration: replay.elapsedPlaybackDuration, playbackSpeed: recordedSpeed
-      )
+      if !self.hasRecordedCurrentReplay {
+        self.hasRecordedCurrentReplay = true
+        do {
+          try await self.analytics.record(
+            replay.header, algorithmID: self.algorithm.id,
+            playbackDuration: replay.elapsedPlaybackDuration, playbackSpeed: recordedSpeed
+          )
+          self.analyticsRevision += 1
+        } catch {
+          // Playback remains usable when history storage is unavailable.
+        }
+      }
       let continuations = self.completionContinuations
       self.completionContinuations = []
       for continuation in continuations { continuation.resume() }
