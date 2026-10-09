@@ -12,12 +12,12 @@ import AlgorithmKit
 /// could derive from without either target depending on the other.
 enum AllBuiltInAlgorithms {
   static let sorts: [any SortAlgorithm] = [
-    AATreeSort(), AVLTreeSort(), AmericanFlagSort(), AndreySort(), AsynchronousSort(), BadSort(), BaseNMaxHeapSort(),
+    AATreeSort(), AdaptiveGrailSort(), AVLTreeSort(), AmericanFlagSort(), AndreySort(), AsynchronousSort(), BadSort(), BaseNMaxHeapSort(),
     BinaryDoubleInsertionSort(), BinaryGnomeSort(), BinaryInsertionSort(), BinaryMergeSort(),
     BinaryQuickSortIterative(), BinaryQuickSortRecursive(), BingoSort(), BinomialHeapSort(), BinomialSmoothSort(),
     BitonicSortIterative(), BitonicSortRecursive(), BlockInsertionSort(), BlockSwapMergeSort(), BogoBogoSort(),
     BogoSort(), BoseNelsonSortIterative(), BoseNelsonSortRecursive(), BottomUpHeapSort(), BottomUpMergeSort(),
-    BozoSort(), BubbleBogoSort(), BubbleSort(), BufferedStoogeSort(), BufferPartitionMergeSort(), BurntPancakeSort(), CircleSortIterative(),
+    BozoSort(), BubbleBogoSort(), BubbleSort(), BufferedStoogeSort(), BufferPartitionMergeSort(), BurntPancakeSort(), ChaliceSort(), CircleSortIterative(),
     CircleSortRecursive(), CircloidSort(), CircularGrailSort(), ClassicGravitySort(), ClassicThreeSmoothCombSort(),
     ClassicTournamentSort(),
     ClassicTreeSort(), CocktailBogoSort(), CocktailMergeSort(), CocktailShakerSort(), CombSort(), CompleteGraphSort(),
@@ -26,7 +26,7 @@ enum AllBuiltInAlgorithms {
     FlashSort(), FlippedMinHeapSort(), FlanSort(), FluxSort(), FoldSort(), ForcedStableQuickSort(), FunSort(), GnomeSort(),
     GrailSort(), GravitySort(), GuessSort(), HanoiSort(), HybridCombSort(), ImprovedBlockSelectionSort(),
     ImprovedInPlaceMergeSort(), IndexSort(), InPlaceLSDRadixSort(), InPlaceMergeSort(), InsertionSort(),
-    IntroCircleSortIterative(), IntroCircleSortRecursive(), IntroSort(), IterativeTopDownMergeSort(), LaziestSort(),
+    IntroCircleSortIterative(), IntroCircleSortRecursive(), IntroSort(), IterativeTopDownMergeSort(), KotaSort(), LaziestSort(),
     LazierestSort(), LazyHeapSort(), LazyStableSort(), LessBogoSort(), LibrarySort(), LLQuickSort(), LRQuickSort(), LSDRadixSort(),
     MatrixSort(), MaxHeapSort(), MedianMergeSort(), MedianQuickBogoSort(), MergeBogoSort(), MergeExchangeSortIterative(),
     MergeInsertionSort(), MergeSort(), MinHeapSort(), MinMaxHeapSort(), MSDRadixSort(), NewShuffleMergeSort(),
@@ -44,9 +44,9 @@ enum AllBuiltInAlgorithms {
     StacklessBinaryQuickSort(), StacklessDualPivotQuickSort(), StacklessHybridQuickSort(), StacklessRotateMergeSort(),
     StaticSort(), StoogeSort(), StrandSort(), SwaplessBubbleSort(), SynchronousSqrtSort(), TableSort(), TernaryHeapSort(),
     TernaryLLQuickSort(), TernaryLRQuickSort(), ThreeSmoothCombSortIterative(), ThreeSmoothCombSortRecursive(),
-    TimeSort(), TournamentSort(), TreeSort(), TriangularHeapSort(), TwinSort(), UnoptimizedBubbleSort(),
+    TimeSort(), TimSort(), TournamentSort(), TreeSort(), TriangularHeapSort(), TwinSort(), UnoptimizedBubbleSort(),
     UnoptimizedCocktailShakerSort(), UnstableGrailSort(), WeakHeapSort(), WeavedMergeSort(), WeaveMergeSort(),
-    WeaveSortIterative(), WeaveSortRecursive(), YujisBufferedMergeSort2()
+    WeaveSortIterative(), WeaveSortRecursive(), WikiSort(), YujisBufferedMergeSort2()
   ]
 
   static let shuffles: [any ShuffleAlgorithm] = [
