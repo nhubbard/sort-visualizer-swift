@@ -1107,24 +1107,22 @@ def _read_utf8_optional(path: Path) -> bytes | None:
 
 
 def _translated_descriptions() -> dict[str, dict[str, str]]:
-    """Read optional `descriptions.<locale>.json` files keyed by algorithm ID."""
+    """Read optional `description.<locale>.md` files beside English descriptions."""
     translations: dict[str, dict[str, str]] = {}
-    for path in sorted(ROOT.glob("descriptions.*.json")):
-        locale = path.name.removeprefix("descriptions.").removesuffix(".json")
+    for path in sorted(ROOT.glob("*/description.*.md")):
+        locale = path.name.removeprefix("description.").removesuffix(".md")
         if locale == "en" or not re.fullmatch(r"[a-z]{2,3}(?:-[A-Za-z0-9]{2,8})*", locale):
             raise PackError(f"invalid description locale in {path.name!r}")
+        algorithm = path.parent.name
+        if not (path.parent / "description.md").is_file():
+            raise PackError(f"{path}: missing English description.md")
         try:
-            entries = json.loads(path.read_text(encoding="utf-8"))
-        except (UnicodeError, json.JSONDecodeError) as error:
-            raise PackError(f"invalid UTF-8 JSON in {path}") from error
-        if not isinstance(entries, dict):
-            raise PackError(f"{path} must contain an algorithm-ID-to-Markdown object")
-        for algorithm, markdown in entries.items():
-            if not isinstance(algorithm, str) or not (ROOT / algorithm / "description.md").is_file():
-                raise PackError(f"{path}: unknown description ID {algorithm!r}")
-            if not isinstance(markdown, str) or not markdown.strip():
-                raise PackError(f"{path}: empty or non-text description for {algorithm!r}")
-        translations[locale] = entries
+            markdown = path.read_text(encoding="utf-8")
+        except UnicodeError as error:
+            raise PackError(f"invalid UTF-8 Markdown in {path}") from error
+        if not markdown.strip():
+            raise PackError(f"{path}: empty description")
+        translations.setdefault(locale, {})[algorithm] = markdown
     return translations
 
 

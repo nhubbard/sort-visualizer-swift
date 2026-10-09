@@ -28,12 +28,16 @@ for root in localizationRoots {
     }
 }
 // Description translations live in the content archive rather than an Xcode catalog. Include
-// their locales too, so a new descriptions.<locale>.json can be added without editing this file.
+// their locales too, so a new description.<locale>.md can be added without editing this file.
 let detailsRoot = projectRoot.appendingPathComponent("App/Resources/AlgorithmDetails")
-if let files = try? FileManager.default.contentsOfDirectory(at: detailsRoot, includingPropertiesForKeys: nil) {
-    for file in files where file.lastPathComponent.hasPrefix("descriptions.") && file.pathExtension == "json" {
-        let locale = file.deletingPathExtension().lastPathComponent.replacingOccurrences(of: "descriptions.", with: "")
-        if !locale.isEmpty { localizationRegions.insert(locale) }
+if let algorithms = try? FileManager.default.contentsOfDirectory(at: detailsRoot, includingPropertiesForKeys: nil) {
+    for algorithm in algorithms {
+        guard let files = try? FileManager.default.contentsOfDirectory(at: algorithm, includingPropertiesForKeys: nil) else { continue }
+        for file in files where file.lastPathComponent.hasPrefix("description.")
+            && file.lastPathComponent != "description.md" && file.pathExtension == "md" {
+            let locale = file.deletingPathExtension().lastPathComponent.replacingOccurrences(of: "description.", with: "")
+            if !locale.isEmpty { localizationRegions.insert(locale) }
+        }
     }
 }
 

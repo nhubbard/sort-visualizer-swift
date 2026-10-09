@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-"""Import one locale JSON file into Xcode catalogs and the algorithm archive sources.
+"""Import one locale JSON file into Xcode catalogs.
 
 Usage: python3 Tools/LocalizationAudit/import_locale.py Translations/es.json
-The input is {"locale": "es", "catalogs": {"SortFeature": {"Key": "Value"}},
-"descriptions": {"algorithm-id": "Markdown"}}. Existing translations must match.
+The input is {"locale": "es", "catalogs": {"SortFeature": {"Key": "Value"}}}.
+Algorithm descriptions live beside their English source as description.<locale>.md.
+Existing translations must match.
 """
 
 from __future__ import annotations
@@ -25,9 +26,10 @@ def import_locale(path: Path, *, check: bool, require_complete: bool = False) ->
     if not isinstance(locale, str) or not re.fullmatch(r"[a-z]{2,3}(?:-[A-Za-z0-9]{2,8})*", locale) or locale == "en":
         raise ValueError("locale must be a non-English language tag such as es or fr-CA")
     catalogs = source.get("catalogs", {})
-    descriptions = source.get("descriptions", {})
-    if not isinstance(catalogs, dict) or not isinstance(descriptions, dict):
-        raise ValueError("catalogs and descriptions must be objects")
+    if not isinstance(catalogs, dict):
+        raise ValueError("catalogs must be an object")
+    if "descriptions" in source:
+        raise ValueError("put translated descriptions beside each description.md as description.<locale>.md")
     if require_complete:
         missing_targets = set(CATALOGS) - set(catalogs)
         if missing_targets:
@@ -37,7 +39,11 @@ def import_locale(path: Path, *, check: bool, require_complete: bool = False) ->
             entry.parent.name for entry in details_root.glob("*/description.md")
             if entry.parent.name != "template"
         }
-        missing_descriptions = algorithm_ids - set(descriptions)
+        translated_ids = {
+            entry.parent.name for entry in details_root.glob(f"*/description.{locale}.md")
+            if entry.read_text(encoding="utf-8").strip()
+        }
+        missing_descriptions = algorithm_ids - translated_ids
         if missing_descriptions:
             raise ValueError(
                 f"missing {len(missing_descriptions)} algorithm descriptions: "
@@ -75,25 +81,7 @@ def import_locale(path: Path, *, check: bool, require_complete: bool = False) ->
         if changed:
             catalog_path.write_text(json.dumps(catalog, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
-    details_root = ROOT / "App/Resources/AlgorithmDetails"
-    output = details_root / f"descriptions.{locale}.json"
-    existing_descriptions = json.loads(output.read_text(encoding="utf-8")) if output.exists() else {}
-    descriptions_changed = False
-    for algorithm_id, markdown in descriptions.items():
-        if not isinstance(algorithm_id, str) or not (details_root / algorithm_id / "description.md").is_file():
-            raise ValueError(f"unknown algorithm description ID: {algorithm_id!r}")
-        if not isinstance(markdown, str) or not markdown.strip():
-            raise ValueError(f"empty description for {algorithm_id!r}")
-        if algorithm_id in existing_descriptions and existing_descriptions[algorithm_id] != markdown:
-            raise ValueError(f"conflicting {locale} description for {algorithm_id!r}")
-        if algorithm_id not in existing_descriptions and check:
-            raise ValueError(f"missing {locale} description for {algorithm_id!r}")
-        if algorithm_id not in existing_descriptions:
-            descriptions_changed = True
-        existing_descriptions[algorithm_id] = markdown
-    if descriptions_changed:
-        output.write_text(json.dumps(existing_descriptions, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    print(f"{locale}: {sum(map(len, catalogs.values()))} catalog strings, {len(descriptions)} descriptions verified")
+    print(f"{locale}: {sum(map(len, catalogs.values()))} catalog strings verified")
 
 
 def main() -> None:

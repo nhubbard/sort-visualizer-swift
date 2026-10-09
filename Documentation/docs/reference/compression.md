@@ -136,7 +136,9 @@ Content-kind values are stable once assigned:
 Kinds `1`–`10` match `CodeLanguage.all`'s index order exactly (kind `k` corresponds to
 `CodeLanguage.all[k-1]`). A language an algorithm doesn't have simply has no content entry for
 that kind; the manifest never stores a zero-length placeholder. Kind `11` is present only for
-algorithms with translations. It has no required flag, so older readers skip it. Older archives
+algorithms with translations. The packer builds this JSON from `description.<locale>.md` files
+beside each algorithm's English `description.md`; the JSON is an archive payload, not an authoring
+file. It has no required flag, so older readers skip it. Older archives
 without kind `11` still load; readers use kind `0` as the English fallback. The inner schema
 minor version is `1` when translation files are present and `0` for legacy archives. The outer
 envelope remains version `1.0`.
