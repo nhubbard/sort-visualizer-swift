@@ -1,106 +1,109 @@
-function sort(arr) {
-  rotateMergeSort(arr, 0, arr.length);
-  return arr;
+function lowerBound(s, start, end, value) {
+  while (start < end) {
+    let middle = start + Math.floor((end - start) / 2);
+    if (s.values[middle] < value) start = middle + 1;
+    else end = middle;
+  }
+  return start;
 }
-
-function multiSwap(array, a, b, len) {
-  for (var i = 0; i < len; i++) {
-    var t = array[a + i];
-    array[a + i] = array[b + i];
-    array[b + i] = t;
+function upperBound(s, start, end, value) {
+  while (start < end) {
+    let middle = start + Math.floor((end - start) / 2);
+    if (s.values[middle] <= value) start = middle + 1;
+    else end = middle;
+  }
+  return start;
+}
+function reverse(s, start, end) {
+  end--;
+  while (start < end) {
+    let value = s.values[start];
+    s.values[start++] = s.values[end];
+    s.values[end--] = value;
   }
 }
-
-function rotate(array, a, m, b) {
-  var l = m - a,
-    r = b - m;
-  while (l > 0 && r > 0) {
-    if (r < l) {
-      multiSwap(array, m - r, m, r);
-      b -= r;
-      m -= r;
-      l -= r;
-    } else {
-      multiSwap(array, a, m, l);
-      a += l;
-      m += l;
-      r -= l;
-    }
+function rotate(s, start, middle, end) {
+  if (start >= middle || middle >= end) return;
+  let left = middle - start, right = end - middle;
+  if (left <= 64) {
+    for (let i = 0; i < left; i++) s.buffer[i] = s.values[start + i];
+    for (let i = middle; i < end; i++) s.values[i - left] = s.values[i];
+    for (let i = 0; i < left; i++) s.values[end - left + i] = s.buffer[i];
+  } else if (right <= 64) {
+    for (let i = 0; i < right; i++) s.buffer[i] = s.values[middle + i];
+    for (let i = middle - 1; i >= start; i--) s.values[i + right] = s.values[i];
+    for (let i = 0; i < right; i++) s.values[start + i] = s.buffer[i];
+  } else {
+    reverse(s, start, middle);
+    reverse(s, middle, end);
+    reverse(s, start, end);
   }
 }
-
-function binarySearch(array, a, b, value, left) {
-  while (a < b) {
-    var mid = a + Math.floor((b - a) / 2);
-    var comp = left ? value <= array[mid] : value < array[mid];
-    if (comp) {
-      b = mid;
-    } else {
-      a = mid + 1;
+function bufferedMerge(s, start, middle, end) {
+  let leftLength = middle - start, rightLength = end - middle;
+  if (leftLength <= rightLength) {
+    for (let i = 0; i < leftLength; i++) s.buffer[i] = s.values[start + i];
+    let left = 0, right = middle, destination = start;
+    while (left < leftLength && right < end) {
+      if (s.values[right] < s.buffer[left]) s.values[destination] = s.values[right++];
+      else s.values[destination] = s.buffer[left++];
+      destination++;
     }
+    while (left < leftLength) s.values[destination++] = s.buffer[left++];
+  } else {
+    for (let i = 0; i < rightLength; i++) s.buffer[i] = s.values[middle + i];
+    let left = middle - 1, right = rightLength - 1, destination = end - 1;
+    while (left >= start && right >= 0) {
+      if (s.values[left] > s.buffer[right]) s.values[destination] = s.values[left--];
+      else s.values[destination] = s.buffer[right--];
+      destination--;
+    }
+    while (right >= 0) s.values[destination--] = s.buffer[right--];
   }
-  return a;
 }
-
-function rotateMerge(array, a, m, b) {
-  if (m - a <= 64 && b - m <= 64) {
-    const temp = array.slice(a, b);
-    let i = 0,
-      j = m - a;
-    for (let k = a; k < b; k++) {
-      if (i < m - a && (j === b - a || temp[i] <= temp[j]))
-        array[k] = temp[i++];
-      else array[k] = temp[j++];
-    }
+function merge(s, start, middle, end) {
+  if (start >= middle || middle >= end || s.values[middle - 1] <= s.values[middle]) return;
+  let leftLength = middle - start, rightLength = end - middle;
+  if ((leftLength < rightLength ? leftLength : rightLength) <= 64) {
+    bufferedMerge(s, start, middle, end);
     return;
   }
-  var m1, m2, m3, value;
-  if (m - a >= b - m) {
-    m1 = a + Math.floor((m - a) / 2);
-    value = array[m1];
-    m2 = binarySearch(array, m, b, value, true);
-    m3 = m1 + (m2 - m);
+  let leftSplit, rightSplit;
+  if (leftLength >= rightLength) {
+    leftSplit = start + Math.floor(leftLength / 2);
+    rightSplit = lowerBound(s, middle, end, s.values[leftSplit]);
   } else {
-    m2 = m + Math.floor((b - m) / 2);
-    value = array[m2];
-    m1 = binarySearch(array, a, m, value, false);
-    m3 = m2 - (m - m1);
-    m2 = m2 + 1;
+    rightSplit = middle + Math.floor(rightLength / 2);
+    leftSplit = upperBound(s, start, middle, s.values[rightSplit]);
   }
-  rotate(array, m1, m, m2);
-  if (m2 - (m3 + 1) > 0 && b - m2 > 0) {
-    rotateMerge(array, m3 + 1, m2, b);
-  }
-  if (m1 - a > 0 && m3 - m1 > 0) {
-    rotateMerge(array, a, m1, m3);
+  rotate(s, leftSplit, middle, rightSplit);
+  let newMiddle = leftSplit + rightSplit - middle;
+  merge(s, start, leftSplit, newMiddle);
+  merge(s, newMiddle, rightSplit, end);
+}
+function insertion(s, start, end) {
+  for (let index = start + 1; index < end; index++) {
+    let value = s.values[index];
+    let destination = upperBound(s, start, index, value);
+    for (let cursor = index; cursor > destination; cursor--)
+      s.values[cursor] = s.values[cursor - 1];
+    s.values[destination] = value;
   }
 }
-
-function rotateMergeSort(array, a, b) {
-  var len = b - a;
-  for (let start = a; start < b; start += 32) {
-    const end = Math.min(start + 32, b);
-    for (let i = start + 1; i < end; i++) {
-      const value = array[i];
-      let j = i;
-      while (j > start && array[j - 1] > value) {
-        array[j] = array[j - 1];
-        j--;
-      }
-      array[j] = value;
-    }
+function sort(values, count) {
+  if (count < 2) return;
+  let s = {values: values, buffer: new Array(64).fill(0)};
+  for (let start = 0; start < count; start += 32) {
+    let end = start + 32 < count ? start + 32 : count;
+    insertion(s, start, end);
   }
-  for (var j = 32; j < len; j *= 2) {
-    var i;
-    for (i = a; i + 2 * j <= b; i += 2 * j) {
-      rotateMerge(array, i, i + j, i + 2 * j);
+  for (let run = 32; run < count; run *= 2)
+    for (let start = 0; start + run < count; start += 2 * run) {
+      let end = start + 2 * run < count ? start + 2 * run : count;
+      merge(s, start, start + run, end);
     }
-    if (i + j < b) {
-      rotateMerge(array, i, i + j, b);
-    }
-  }
 }
 
 const array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56];
-sort(array);
+sort(array, array.length);
 console.log("[" + array.join(", ") + "]");

@@ -1,121 +1,181 @@
 package main
 
-import (
-	"fmt"
-)
+import "fmt"
 
-func sort(arr []int) []int {
-	rotateMergeSort(arr, 0, len(arr))
-	return arr
+type rotateSorter struct {
+	values []int
+	buffer [64]int
 }
 
-func multiSwap(arr []int, a, b, length int) {
-	for i := 0; i < length; i++ {
-		arr[a+i], arr[b+i] = arr[b+i], arr[a+i]
-	}
-}
-
-func rotate(arr []int, a, m, b int) {
-	l, r := m-a, b-m
-	for l > 0 && r > 0 {
-		if r < l {
-			multiSwap(arr, m-r, m, r)
-			b -= r
-			m -= r
-			l -= r
+func (s *rotateSorter) lowerBound(start, end, value int) int {
+	for start < end {
+		middle := start + (end-start)/2
+		if s.values[middle] < value {
+			start = middle + 1
 		} else {
-			multiSwap(arr, a, m, l)
-			a += l
-			m += l
-			r -= l
+			end = middle
 		}
 	}
+	return start
 }
-
-func binarySearch(arr []int, a, b, value int, left bool) int {
-	for a < b {
-		mid := a + (b-a)/2
-		var comp bool
-		if left {
-			comp = value <= arr[mid]
+func (s *rotateSorter) upperBound(start, end, value int) int {
+	for start < end {
+		middle := start + (end-start)/2
+		if s.values[middle] <= value {
+			start = middle + 1
 		} else {
-			comp = value < arr[mid]
-		}
-		if comp {
-			b = mid
-		} else {
-			a = mid + 1
+			end = middle
 		}
 	}
-	return a
+	return start
 }
-
-func rotateMerge(arr []int, a, m, b int) {
-	if m-a <= 64 && b-m <= 64 {
-		temp := append([]int(nil), arr[a:b]...)
-		i, j := 0, m-a
-		for k := a; k < b; k++ {
-			if i < m-a && (j == b-a || temp[i] <= temp[j]) {
-				arr[k] = temp[i]
-				i++
-			} else {
-				arr[k] = temp[j]
-				j++
-			}
-		}
+func (s *rotateSorter) reverse(start, end int) {
+	end--
+	for start < end {
+		s.values[start], s.values[end] = s.values[end], s.values[start]
+		start++
+		end--
+	}
+}
+func (s *rotateSorter) rotate(start, middle, end int) {
+	if start >= middle || middle >= end {
 		return
 	}
-	var m1, m2, m3 int
-	if m-a >= b-m {
-		m1 = a + (m-a)/2
-		value := arr[m1]
-		m2 = binarySearch(arr, m, b, value, true)
-		m3 = m1 + (m2 - m)
+	left, right := middle-start, end-middle
+	if left <= 64 {
+		for i := 0; i < left; i++ {
+			s.buffer[i] = s.values[start+i]
+		}
+		for i := middle; i < end; i++ {
+			s.values[i-left] = s.values[i]
+		}
+		for i := 0; i < left; i++ {
+			s.values[end-left+i] = s.buffer[i]
+		}
+	} else if right <= 64 {
+		for i := 0; i < right; i++ {
+			s.buffer[i] = s.values[middle+i]
+		}
+		for i := middle - 1; i >= start; i-- {
+			s.values[i+right] = s.values[i]
+		}
+		for i := 0; i < right; i++ {
+			s.values[start+i] = s.buffer[i]
+		}
 	} else {
-		m2 = m + (b-m)/2
-		value := arr[m2]
-		m1 = binarySearch(arr, a, m, value, false)
-		m3 = m2 - (m - m1)
-		m2 = m2 + 1
-	}
-	rotate(arr, m1, m, m2)
-	if m2-(m3+1) > 0 && b-m2 > 0 {
-		rotateMerge(arr, m3+1, m2, b)
-	}
-	if m1-a > 0 && m3-m1 > 0 {
-		rotateMerge(arr, a, m1, m3)
+		s.reverse(start, middle)
+		s.reverse(middle, end)
+		s.reverse(start, end)
 	}
 }
-
-func rotateMergeSort(arr []int, a, b int) {
-	length := b - a
-	for start := a; start < b; start += 32 {
-		end := start + 32
-		if end > b {
-			end = b
+func (s *rotateSorter) bufferedMerge(start, middle, end int) {
+	leftLength, rightLength := middle-start, end-middle
+	if leftLength <= rightLength {
+		for i := 0; i < leftLength; i++ {
+			s.buffer[i] = s.values[start+i]
 		}
-		for i := start + 1; i < end; i++ {
-			value, j := arr[i], i
-			for j > start && arr[j-1] > value {
-				arr[j] = arr[j-1]
-				j--
+		left, right, destination := 0, middle, start
+		for left < leftLength && right < end {
+			if s.values[right] < s.buffer[left] {
+				s.values[destination] = s.values[right]
+				right++
+			} else {
+				s.values[destination] = s.buffer[left]
+				left++
 			}
-			arr[j] = value
+			destination++
 		}
-	}
-	for j := 32; j < length; j *= 2 {
-		i := a
-		for ; i+2*j <= b; i += 2 * j {
-			rotateMerge(arr, i, i+j, i+2*j)
+		for left < leftLength {
+			s.values[destination] = s.buffer[left]
+			left++
+			destination++
 		}
-		if i+j < b {
-			rotateMerge(arr, i, i+j, b)
+	} else {
+		for i := 0; i < rightLength; i++ {
+			s.buffer[i] = s.values[middle+i]
+		}
+		left, right, destination := middle-1, rightLength-1, end-1
+		for left >= start && right >= 0 {
+			if s.values[left] > s.buffer[right] {
+				s.values[destination] = s.values[left]
+				left--
+			} else {
+				s.values[destination] = s.buffer[right]
+				right--
+			}
+			destination--
+		}
+		for right >= 0 {
+			s.values[destination] = s.buffer[right]
+			right--
+			destination--
 		}
 	}
 }
-
+func (s *rotateSorter) merge(start, middle, end int) {
+	if start >= middle || middle >= end || s.values[middle-1] <= s.values[middle] {
+		return
+	}
+	leftLength, rightLength := middle-start, end-middle
+	if leftLength <= 64 || rightLength <= 64 {
+		s.bufferedMerge(start, middle, end)
+		return
+	}
+	var leftSplit, rightSplit int
+	if leftLength >= rightLength {
+		leftSplit = start + leftLength/2
+		rightSplit = s.lowerBound(middle, end, s.values[leftSplit])
+	} else {
+		rightSplit = middle + rightLength/2
+		leftSplit = s.upperBound(start, middle, s.values[rightSplit])
+	}
+	s.rotate(leftSplit, middle, rightSplit)
+	newMiddle := leftSplit + rightSplit - middle
+	s.merge(start, leftSplit, newMiddle)
+	s.merge(newMiddle, rightSplit, end)
+}
+func (s *rotateSorter) insertion(start, end int) {
+	for index := start + 1; index < end; index++ {
+		value := s.values[index]
+		destination := s.upperBound(start, index, value)
+		for cursor := index; cursor > destination; cursor-- {
+			s.values[cursor] = s.values[cursor-1]
+		}
+		s.values[destination] = value
+	}
+}
+func sort(values []int) {
+	count := len(values)
+	if count < 2 {
+		return
+	}
+	s := rotateSorter{values: values}
+	for start := 0; start < count; start += 32 {
+		end := start + 32
+		if end > count {
+			end = count
+		}
+		s.insertion(start, end)
+	}
+	for run := 32; run < count; run *= 2 {
+		for start := 0; start+run < count; start += 2 * run {
+			end := start + 2*run
+			if end > count {
+				end = count
+			}
+			s.merge(start, start+run, end)
+		}
+	}
+}
 func main() {
-	array := []int{0, 39, 21, 62, 91, 77, 14, 23,
-		90, 69, 51, 81, 68, 83, 32, 56}
-	fmt.Println(sort(array))
+	a := []int{0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56}
+	sort(a)
+	fmt.Print("[")
+	for i, v := range a {
+		if i > 0 {
+			fmt.Print(", ")
+		}
+		fmt.Print(v)
+	}
+	fmt.Println("]")
 }

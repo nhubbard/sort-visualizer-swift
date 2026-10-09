@@ -1,132 +1,373 @@
-import Foundation
+// MIT License
+// Copyright (c) 2014 Andrey Astrelin
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy of this software
+// and associated documentation files (the "Software"), to deal in the Software without
+// restriction, including without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the
+// Software is furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all copies or
+// substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING
+// BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+// NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-private var blockSize = 1
+final class SqrtSortExample {
+  enum Storage: Equatable { case main, buffer }
 
-func sort(_ array: inout [Int]) {
-    blockSize = 1
-    while blockSize * blockSize < array.count {
-        blockSize *= 2
+  var values: [Int]
+  init(_ input: [Int]) { values = input }
+  private var buffer: [Int] = []
+  private var tags: [Int] = []
+
+  private func read(_ storage: Storage, _ index: Int) -> Int {
+    switch storage {
+    case .main: return values[index]
+    case .buffer:
+      return buffer[index]
     }
-    sqrtSort(&array, 0, array.count)
-}
+  }
 
-func multiSwap(_ array: inout [Int], _ a: Int, _ b: Int, _ len: Int) {
-    for i in 0 ..< len {
-        array.swapAt(a + i, b + i)
+  private func write(_ storage: Storage, _ index: Int, _ value: Int) {
+    switch storage {
+    case .main: values[index] = value
+    case .buffer:
+      buffer[index] = value
     }
-}
+  }
 
-func rotate(_ array: inout [Int], _ a: Int, _ m: Int, _ b: Int) {
-    var a = a
-    var m = m
-    var b = b
-    var l = m - a
-    var r = b - m
-    while l > 0, r > 0 {
-        if r < l {
-            multiSwap(&array, m - r, m, r)
-            b -= r
-            m -= r
-            l -= r
-        } else {
-            multiSwap(&array, a, m, l)
-            a += l
-            m += l
-            r -= l
-        }
+  private func compare(_ storage: Storage, _ a: Int, _ b: Int) -> Int {
+    if storage == .main {
+      if values[a] < values[b] { return -1 }
+      if values[a] > values[b] { return 1 }
+      return 0
     }
-}
+    let left = read(storage, a)
+    let right = read(storage, b)
+    if left < right { return -1 }
+    if left > right { return 1 }
+    return 0
+  }
 
-func binarySearch(_ array: [Int], _ a: Int, _ b: Int, _ value: Int, _ left: Bool) -> Int {
-    var a = a
-    var b = b
-    while a < b {
-        let mid = a + (b - a) / 2
-        let comp = left ? value <= array[mid] : value < array[mid]
-        if comp {
-            b = mid
-        } else {
-            a = mid + 1
-        }
-    }
-    return a
-}
+  private func compare(_ aStorage: Storage, _ a: Int, _ bStorage: Storage, _ b: Int) -> Int {
+    if aStorage == bStorage { return compare(aStorage, a, b) }
+    let left = read(aStorage, a)
+    let right = read(bStorage, b)
+    if left < right { return -1 }
+    if left > right { return 1 }
+    return 0
+  }
 
-func sqrtMerge(_ array: inout [Int], _ a: Int, _ m: Int, _ b: Int) {
-    if m - a <= blockSize, b - m <= blockSize {
-        let temp = Array(array[a ..< b])
-        var i = 0
-        var j = m - a
-        for k in a ..< b {
-            if i < m - a, j == b - a || temp[i] <= temp[j] {
-                array[k] = temp[i]
-                i += 1
-            } else {
-                array[k] = temp[j]
-                j += 1
-            }
-        }
-        return
-    }
-    let m1: Int
-    let m3: Int
-    var m2: Int
-    if m - a >= b - m {
-        m1 = a + (m - a) / 2
-        let value = array[m1]
-        m2 = binarySearch(array, m, b, value, true)
-        m3 = m1 + (m2 - m)
+  private func copy(_ sourceStorage: Storage, _ source: Int, _ destinationStorage: Storage, _ destination: Int, _ count: Int) {
+    guard count > 0 else { return }
+    if sourceStorage == destinationStorage && destination > source && destination < source + count {
+      for offset in stride(from: count - 1, through: 0, by: -1) {
+        write(destinationStorage, destination + offset, read(sourceStorage, source + offset))
+      }
     } else {
-        m2 = m + (b - m) / 2
-        let value = array[m2]
-        m1 = binarySearch(array, a, m, value, false)
-        m3 = m2 - (m - m1)
-        m2 += 1
+      for offset in 0..<count {
+        write(destinationStorage, destination + offset, read(sourceStorage, source + offset))
+      }
     }
-    rotate(&array, m1, m, m2)
-    if m2 - (m3 + 1) > 0, b - m2 > 0 {
-        sqrtMerge(&array, m3 + 1, m2, b)
-    }
-    if m1 - a > 0, m3 - m1 > 0 {
-        sqrtMerge(&array, a, m1, m3)
-    }
-}
+  }
 
-func sqrtSort(_ array: inout [Int], _ a: Int, _ b: Int) {
-    let len = b - a
-    var start = a
-    while start < b {
-        let end = min(start + 32, b)
-        if start + 1 < end {
-            for i in (start + 1) ..< end {
-                let value = array[i]
-                var cursor = i
-                while cursor > start, array[cursor - 1] > value {
-                    array[cursor] = array[cursor - 1]
-                    cursor -= 1
-                }
-                array[cursor] = value
+  private func swap(_ storage: Storage, _ a: Int, _ b: Int) {
+    guard a != b else { return }
+    let left = read(storage, a)
+    let right = read(storage, b)
+    write(storage, a, right)
+    write(storage, b, left)
+  }
+
+  private func insertion(_ storage: Storage, _ position: Int, _ length: Int) {
+    guard length > 1 else { return }
+    for index in (position + 1)..<(position + length) {
+      let value = read(storage, index)
+      var cursor = index
+      while cursor > position {
+        let previous = read(storage, cursor - 1)
+        if previous <= value { break }
+        write(storage, cursor, previous)
+        cursor -= 1
+      }
+      if cursor != index { write(storage, cursor, value) }
+    }
+  }
+
+  private func mergeRight(_ storage: Storage, _ position: Int, _ leftLength: Int, _ rightLength: Int, _ distance: Int) {
+    var destination = position + leftLength + rightLength + distance - 1
+    var right = position + leftLength + rightLength - 1
+    var left = position + leftLength - 1
+    while left >= position {
+      if right < position + leftLength || compare(storage, left, right) > 0 {
+        write(storage, destination, read(storage, left))
+        left -= 1
+      } else {
+        write(storage, destination, read(storage, right))
+        right -= 1
+      }
+      destination -= 1
+    }
+    if right != destination {
+      while right >= position + leftLength {
+        write(storage, destination, read(storage, right))
+        right -= 1
+        destination -= 1
+      }
+    }
+  }
+
+  private func mergeLeft(_ storage: Storage, _ position: Int, _ leftLength: Int, _ rightLength: Int, _ distance: Int) {
+    var left = position
+    var right = position + leftLength
+    var destination = position + distance
+    let leftEnd = right
+    let rightEnd = right + rightLength
+    while right < rightEnd {
+      if left == leftEnd || compare(storage, left, right) > 0 {
+        write(storage, destination, read(storage, right))
+        right += 1
+      } else {
+        write(storage, destination, read(storage, left))
+        left += 1
+      }
+      destination += 1
+    }
+    if destination != left {
+      while left < leftEnd {
+        write(storage, destination, read(storage, left))
+        left += 1
+        destination += 1
+      }
+    }
+  }
+
+  private func mergeDown(_ storage: Storage, _ position: Int, _ prefix: Storage, _ prefixPosition: Int, _ leftLength: Int, _ prefixLength: Int) {
+    var left = 0
+    var right = 0
+    var destination = position - prefixLength
+    while right < prefixLength {
+      if left == leftLength || compare(storage, position + left, prefix, prefixPosition + right) >= 0 {
+        write(storage, destination, read(prefix, prefixPosition + right))
+        right += 1
+      } else {
+        write(storage, destination, read(storage, position + left))
+        left += 1
+      }
+      destination += 1
+    }
+    if destination != position + left {
+      while left < leftLength {
+        write(storage, destination, read(storage, position + left))
+        left += 1
+        destination += 1
+      }
+    }
+  }
+
+  private func smartMerge(_ storage: Storage, _ position: Int, _ priorLength: Int, _ priorFragment: Int, _ blockLength: Int) -> (Int, Int) {
+    var left = position
+    var right = position + priorLength
+    var destination = position - blockLength
+    var leftEnd = right
+    var rightEnd = right + blockLength
+    let opposite = 1 - priorFragment
+    while left < leftEnd && right < rightEnd {
+      let order = compare(storage, left, right)
+      if order < 0 || (order == 0 && opposite == 1) {
+        write(storage, destination, read(storage, left))
+        left += 1
+      } else {
+        write(storage, destination, read(storage, right))
+        right += 1
+      }
+      destination += 1
+    }
+    if left < leftEnd {
+      let remaining = leftEnd - left
+      while left < leftEnd {
+        leftEnd -= 1
+        rightEnd -= 1
+        write(storage, rightEnd, read(storage, leftEnd))
+      }
+      return (remaining, priorFragment)
+    }
+    return (rightEnd - right, opposite)
+  }
+
+  private func writeTag(_ index: Int, _ value: Int) {
+    tags[index] = value
+  }
+
+  private func readTag(_ index: Int) -> Int {
+    return tags[index]
+  }
+
+  private func mergeBuffers(_ storage: Storage, _ position: Int, _ middleTag: Int, _ blockCount: Int, _ blockLength: Int, _ trailingABlocks: Int, _ tailLength: Int) {
+    if blockCount == 0 {
+      mergeLeft(storage, position, trailingABlocks * blockLength, tailLength, -blockLength)
+      return
+    }
+    var priorLength = blockLength
+    var priorFragment = readTag(0) < middleTag ? 0 : 1
+    var process = blockLength
+    if blockCount > 1 {
+      for tagIndex in 1..<blockCount {
+        var rest = process - priorLength
+        let nextFragment = readTag(tagIndex) < middleTag ? 0 : 1
+        if nextFragment == priorFragment {
+          copy(storage, position + rest, storage, position + rest - blockLength, priorLength)
+          rest = process
+          priorLength = blockLength
+        } else {
+          (priorLength, priorFragment) = smartMerge(storage, position + rest, priorLength, priorFragment, blockLength)
+        }
+        process += blockLength
+      }
+    }
+    var rest = process - priorLength
+    if tailLength != 0 {
+      if priorFragment != 0 {
+        copy(storage, position + rest, storage, position + rest - blockLength, priorLength)
+        rest = process
+        priorLength = blockLength * trailingABlocks
+      } else {
+        priorLength += blockLength * trailingABlocks
+      }
+      mergeLeft(storage, position + rest, priorLength, tailLength, -blockLength)
+    } else {
+      copy(storage, position + rest, storage, position + rest - blockLength, priorLength)
+    }
+  }
+
+  private func buildBlocks(_ storage: Storage, _ position: Int, _ length: Int, _ blockLength: Int) {
+    var position = position
+    var pair = 1
+    while pair < length {
+      let lower = compare(storage, position + pair - 1, position + pair) > 0 ? 1 : 0
+      write(storage, position + pair - 3, read(storage, position + pair - 1 + lower))
+      write(storage, position + pair - 2, read(storage, position + pair - lower))
+      pair += 2
+    }
+    if length % 2 != 0 { write(storage, position + length - 3, read(storage, position + length - 1)) }
+    position -= 2
+    var part = 2
+    while part < blockLength {
+      var left = 0
+      let right = length - 2 * part
+      while left <= right {
+        mergeLeft(storage, position + left, part, part, -part)
+        left += 2 * part
+      }
+      let rest = length - left
+      if rest > part {
+        mergeLeft(storage, position + left, part, rest - part, -part)
+      } else {
+        while left < length {
+          write(storage, position + left - part, read(storage, position + left))
+          left += 1
+        }
+      }
+      position -= part
+      part *= 2
+    }
+    let remainder = length % (2 * blockLength)
+    var leftover = length - remainder
+    if remainder <= blockLength {
+      copy(storage, position + leftover, storage, position + leftover + blockLength, remainder)
+    } else {
+      mergeRight(storage, position + leftover, blockLength, remainder - blockLength, blockLength)
+    }
+    while leftover > 0 {
+      leftover -= 2 * blockLength
+      mergeRight(storage, position + leftover, blockLength, blockLength, blockLength)
+    }
+  }
+
+  private func combineBlocks(_ storage: Storage, _ position: Int, _ length: Int, _ runLength: Int, _ blockLength: Int) {
+    let combineCount = length / (2 * runLength)
+    var remainder = length % (2 * runLength)
+    var length = length
+    if remainder <= runLength {
+      length -= remainder
+      remainder = 0
+    }
+    for group in 0...combineCount {
+      if group == combineCount && remainder == 0 { break }
+      let groupPosition = position + group * 2 * runLength
+      let count = (group == combineCount ? remainder : 2 * runLength) / blockLength
+      let tagEnd = count + (group == combineCount ? 1 : 0)
+      for tag in 0...tagEnd { writeTag(tag, tag) }
+      let middle = runLength / blockLength
+      if count > 1 {
+        for tagIndex in 1..<count {
+          var selected = tagIndex - 1
+          for candidate in tagIndex..<count {
+            let order = compare(storage, groupPosition + selected * blockLength, groupPosition + candidate * blockLength)
+            if order > 0 || (order == 0 && readTag(selected) > readTag(candidate)) { selected = candidate }
+          }
+          if selected != tagIndex - 1 {
+            for offset in 0..<blockLength {
+              swap(storage, groupPosition + (tagIndex - 1) * blockLength + offset, groupPosition + selected * blockLength + offset)
             }
+            let firstTag = readTag(tagIndex - 1)
+            let selectedTag = readTag(selected)
+            writeTag(tagIndex - 1, selectedTag)
+            writeTag(selected, firstTag)
+          }
         }
-        start += 32
+      }
+      var trailingA = 0
+      let tail = group == combineCount ? remainder % blockLength : 0
+      if tail != 0 {
+        while trailingA < count && compare(storage, groupPosition + count * blockLength, groupPosition + (count - trailingA - 1) * blockLength) < 0 {
+          trailingA += 1
+        }
+      }
+      mergeBuffers(storage, groupPosition, middle, count - trailingA, blockLength, trailingA, tail)
     }
-    var j = 32
-    while j < len {
-        var i = a
-        while i + 2 * j <= b {
-            sqrtMerge(&array, i, i + j, i + 2 * j)
-            i += 2 * j
-        }
-        if i + j < b {
-            sqrtMerge(&array, i, i + j, b)
-        }
-        j *= 2
+    if length > 0 {
+      for index in stride(from: length - 1, through: 0, by: -1) {
+        write(storage, position + index, read(storage, position + index - blockLength))
+      }
     }
+  }
+
+  private func commonSort(_ storage: Storage, _ position: Int, _ length: Int, _ prefix: Storage, _ prefixPosition: Int) {
+    if length <= 16 {
+      insertion(storage, position, length)
+      return
+    }
+    var blockLength = 1
+    while blockLength * blockLength < length { blockLength *= 2 }
+    copy(storage, position, prefix, prefixPosition, blockLength)
+    commonSort(prefix, prefixPosition, blockLength, storage, position)
+    buildBlocks(storage, position + blockLength, length - blockLength, blockLength)
+    var runLength = blockLength
+    while true {
+      runLength *= 2
+      if length <= runLength { break }
+      combineBlocks(storage, position + blockLength, length - blockLength, runLength, blockLength)
+    }
+    mergeDown(storage, position + blockLength, prefix, prefixPosition, length - blockLength, blockLength)
+  }
+
+  func sort() {
+    let length = values.count
+    var bufferLength = 1
+    while bufferLength * bufferLength < length { bufferLength *= 2 }
+    buffer = Array(repeating: 0, count: bufferLength)
+    tags = Array(repeating: 0, count: (length - 1) / bufferLength + 2)
+    commonSort(.main, 0, length, .buffer, 0)
+  }
 }
 
-var array: [Int] = [
-    0, 39, 21, 62, 91, 77, 14, 23,
-    90, 69, 51, 81, 68, 83, 32, 56,
-]
-sort(&array)
+var array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56]
+let sorter = SqrtSortExample(array)
+sorter.sort()
+array = sorter.values
 print(array)
