@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -13,7 +14,7 @@ import SortEngineKit
 /// `temp`.
 public struct ShuffleMergeAdversaryShuffle: ShuffleAlgorithm {
   public let id = ShuffleID(rawValue: "shufmergebad")
-  public let metadata = ShuffleMetadata(displayName: "Shuffle Merge Adversary")
+  public let metadata = ShuffleMetadata(displayName: String(localized: "Shuffle Merge Adversary", bundle: .module))
   public init() {}
 
   private func nextPowerOfTwoAtOrAbove(_ value: Int) -> Int {

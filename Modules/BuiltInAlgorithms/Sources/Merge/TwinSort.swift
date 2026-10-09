@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -17,7 +18,7 @@ import SortEngineKit
 public struct TwinSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "twinsort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Twin Sort",
+    displayName: String(localized: "Twin Sort", bundle: .module),
     category: .merge,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(

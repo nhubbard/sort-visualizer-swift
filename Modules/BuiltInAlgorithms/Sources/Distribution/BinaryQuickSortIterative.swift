@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -7,7 +8,7 @@ import SortEngineKit
 public struct BinaryQuickSortIterative: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "binaryquicksortiterative")
   public let metadata = AlgorithmMetadata(
-    displayName: "Binary Quick Sort (Iterative)",
+    displayName: String(localized: "Binary Quick Sort (Iterative)", bundle: .module),
     category: .distribution,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(

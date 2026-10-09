@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -9,7 +10,7 @@ import SortEngineKit
 public struct BinaryGnomeSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "binarygnomesort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Binary Gnome Sort",
+    displayName: String(localized: "Binary Gnome Sort", bundle: .module),
     category: .exchange,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -46,8 +47,8 @@ public struct BinaryGnomeSort: SortAlgorithm {
           i, mid,
           by: <,
           stageID: "BinaryGnomeSort.binaryPosition",
-          whenTrue: "The item precedes this midpoint, so search the lower half.",
-          whenFalse: "The item follows this midpoint, so search the upper half."
+          whenTrue: String(localized: "The item precedes this midpoint, so search the lower half.", bundle: .module),
+          whenFalse: String(localized: "The item follows this midpoint, so search the upper half.", bundle: .module)
         ) {
           hi = mid
         } else {

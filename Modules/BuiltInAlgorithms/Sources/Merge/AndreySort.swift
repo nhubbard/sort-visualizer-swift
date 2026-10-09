@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -25,7 +26,7 @@ import SortEngineKit
 public struct AndreySort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "andreysort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Andrey Sort",
+    displayName: String(localized: "Andrey Sort", bundle: .module),
     category: .merge,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -56,8 +57,8 @@ public struct AndreySort: SortAlgorithm {
         for i in 1..<b where engine.teachingCompare(
           a + k, a + i, by: (>),
           stageID: "AndreySort.key.selection",
-          whenTrue: "This candidate is below the current key, so Andrey selects it as the new minimum.",
-          whenFalse: "This candidate is not below the current key, so the selected minimum remains."
+          whenTrue: String(localized: "This candidate is below the current key, so Andrey selects it as the new minimum.", bundle: .module),
+          whenFalse: String(localized: "This candidate is not below the current key, so the selected minimum remains.", bundle: .module)
         ) {
           k = i
         }
@@ -78,7 +79,7 @@ public struct AndreySort: SortAlgorithm {
           stageID: "andrey.blockExchange", decisionID: "andrey.blockExchange",
           outcome: "exchange", roles: ["first": .arrayIndex(arr1), "second": .arrayIndex(arr2)],
           explanationKey: "andrey.blockExchange",
-          explanation: "Andrey exchanges these block positions to place the selected block beside its merge partner.")
+          explanation: String(localized: "Andrey exchanges these block positions to place the selected block beside its merge partner.", bundle: .module))
         arr1 += 1
         arr2 += 1
         l -= 1
@@ -97,8 +98,8 @@ public struct AndreySort: SortAlgorithm {
       while true {
         if engine.teachingCompare(
           arr1, arr2, by: (>), stageID: "andrey.backwardMerge",
-          whenTrue: "The left tail is larger, so backward merge places it in the trailing buffer.",
-          whenFalse: "The right tail is at least as large, so backward merge places it next.") {
+          whenTrue: String(localized: "The left tail is larger, so backward merge places it in the trailing buffer.", bundle: .module),
+          whenFalse: String(localized: "The right tail is at least as large, so backward merge places it next.", bundle: .module)) {
           engine.swap(arr1, arr0)
           arr1 -= 1
           arr0 -= 1
@@ -132,8 +133,8 @@ public struct AndreySort: SortAlgorithm {
         while j < l {
           if engine.teachingCompare(
             a + q, a + j, by: (>), stageID: "andrey.blockLeader",
-            whenTrue: "This block leader is smaller, so Andrey selects its block for the next merge.",
-            whenFalse: "This block leader is not smaller, so the selected block stays.") { q = j }
+            whenTrue: String(localized: "This block leader is smaller, so Andrey selects its block for the next merge.", bundle: .module),
+            whenFalse: String(localized: "This block leader is not smaller, so the selected block stays.", bundle: .module)) { q = j }
           j += r
         }
         if q != i { aswap(a + i, a + q, r) }
@@ -172,8 +173,8 @@ public struct AndreySort: SortAlgorithm {
       while p <= lr {
         if engine.teachingCompare(
           a + (p - 2), a + (p - 1), by: (>), stageID: "andrey.pairPresort",
-          whenTrue: "This starting pair descends, so Andrey swaps it before block merging.",
-          whenFalse: "This starting pair is ordered, so Andrey keeps it.") {
+          whenTrue: String(localized: "This starting pair descends, so Andrey swaps it before block merging.", bundle: .module),
+          whenFalse: String(localized: "This starting pair is ordered, so Andrey keeps it.", bundle: .module)) {
           engine.swap(a + (p - 2), a + (p - 1))
         }
         if (p & 2) != 0 {
@@ -233,8 +234,8 @@ public struct AndreySort: SortAlgorithm {
         roles: ["candidate": .arrayIndex(index), "previous": .arrayIndex(index - 1)],
         explanationKey: "andrey.verifyOrder",
         explanation: needsRepair
-          ? "This adjacent pair is still reversed, so heap repair completes the sort."
-          : "This adjacent pair is ordered, so verification continues.")
+          ? String(localized: "This adjacent pair is still reversed, so heap repair completes the sort.", bundle: .module)
+          : String(localized: "This adjacent pair is ordered, so verification continues.", bundle: .module))
       if needsRepair {
         MaxHeapSort().record(into: &engine)
         break

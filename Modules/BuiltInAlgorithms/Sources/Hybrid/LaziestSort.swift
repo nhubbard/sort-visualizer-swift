@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -34,7 +35,7 @@ import SortEngineKit
 public struct LaziestSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "laziestsort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Laziest Stable",
+    displayName: String(localized: "Laziest Stable", bundle: .module),
     category: .hybrid,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -82,8 +83,8 @@ public struct LaziestSort: SortAlgorithm {
           roles: ["candidate": .arrayIndex(mid), "heldValue": .value(val)],
           explanationKey: "laziest.rightBound",
           explanation: insertBefore
-            ? "The held value is smaller, so the rightmost insertion search narrows left."
-            : "The held value is at least this item, so the search advances right.")
+            ? String(localized: "The held value is smaller, so the rightmost insertion search narrows left.", bundle: .module)
+            : String(localized: "The held value is at least this item, so the search advances right.", bundle: .module))
         if insertBefore {
           b = mid
         } else {
@@ -106,8 +107,8 @@ public struct LaziestSort: SortAlgorithm {
           roles: ["candidate": .arrayIndex(mid), "heldValue": .value(val)],
           explanationKey: "laziest.leftBound",
           explanation: insertBefore
-            ? "The held value is no greater, so the leftmost insertion search narrows left."
-            : "The held value is greater, so the search advances right.")
+            ? String(localized: "The held value is no greater, so the leftmost insertion search narrows left.", bundle: .module)
+            : String(localized: "The held value is greater, so the search advances right.", bundle: .module))
         if insertBefore {
           b = mid
         } else {
@@ -151,8 +152,8 @@ public struct LaziestSort: SortAlgorithm {
         if engine.teachingCompare(
           i, j, by: >,
           stageID: "LaziestSort.merge.boundary",
-          whenTrue: "The left item exceeds the right item, so the next rotation must move right-side values ahead.",
-          whenFalse: "The two items are ordered, so the merge advances without that rotation."
+          whenTrue: String(localized: "The left item exceeds the right item, so the next rotation must move right-side values ahead.", bundle: .module),
+          whenFalse: String(localized: "The two items are ordered, so the merge advances without that rotation.", bundle: .module)
         ) {
           let value = engine.readValue(at: i)
           let k = leftExpSearch(j + 1, b, value)

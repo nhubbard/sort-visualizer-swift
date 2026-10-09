@@ -1,10 +1,11 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
 public struct BozoSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "bozosort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Bozo Sort",
+    displayName: String(localized: "Bozo Sort", bundle: .module),
     category: .impractical,
     sizeRange: 4...7,
     growthModel: OperationGrowthModel(
@@ -38,8 +39,8 @@ public struct BozoSort: SortAlgorithm {
           roles: ["previous": .arrayIndex(i - 1), "current": .arrayIndex(i)],
           explanationKey: "bozosort.adjacentOrder",
           explanation: inOrder
-            ? "This adjacent pair is ordered, so keep checking the candidate."
-            : "This adjacent pair is inverted, so reject this candidate permutation.")
+            ? String(localized: "This adjacent pair is ordered, so keep checking the candidate.", bundle: .module)
+            : String(localized: "This adjacent pair is inverted, so reject this candidate permutation.", bundle: .module))
         if !inOrder { return false }
       }
       return true
@@ -61,7 +62,7 @@ public struct BozoSort: SortAlgorithm {
           stageID: "candidateExchange", decisionID: "bozosort.candidateExchange",
           outcome: "exchange", roles: ["left": .arrayIndex(k.isMultiple(of: 2) ? i : 0), "right": .arrayIndex(k - 1)],
           explanationKey: "bozosort.candidateExchange",
-          explanation: "Heap’s permutation step exchanges these positions before the next sortedness check.")
+          explanation: String(localized: "Heap’s permutation step exchanges these positions before the next sortedness check.", bundle: .module))
       }
       heap(k - 1)
     }

@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -9,7 +10,7 @@ import SortEngineKit
 public struct PigeonholeSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "pigeonholesort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Pigeonhole Sort",
+    displayName: String(localized: "Pigeonhole Sort", bundle: .module),
     category: .distribution,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -44,8 +45,8 @@ public struct PigeonholeSort: SortAlgorithm {
         roles: ["candidate": .arrayIndex(i), "minimum": .value(minValue)],
         explanationKey: "pigeonholesort.minimum",
         explanation: newMinimum
-          ? "This value extends the pigeonhole range downward."
-          : "The current minimum still bounds the pigeonhole range.")
+          ? String(localized: "This value extends the pigeonhole range downward.", bundle: .module)
+          : String(localized: "The current minimum still bounds the pigeonhole range.", bundle: .module))
       if newMinimum { minValue = engine.readValue(at: i) }
       let maximumCandidate = engine.readValue(at: i)
       let newMaximum = maximumCandidate > maxValue
@@ -55,8 +56,8 @@ public struct PigeonholeSort: SortAlgorithm {
         roles: ["candidate": .arrayIndex(i), "maximum": .value(maxValue)],
         explanationKey: "pigeonholesort.maximum",
         explanation: newMaximum
-          ? "This value extends the pigeonhole range upward."
-          : "The current maximum still bounds the pigeonhole range.")
+          ? String(localized: "This value extends the pigeonhole range upward.", bundle: .module)
+          : String(localized: "The current maximum still bounds the pigeonhole range.", bundle: .module))
       if newMaximum { maxValue = engine.readValue(at: i) }
     }
 
@@ -79,7 +80,7 @@ public struct PigeonholeSort: SortAlgorithm {
         outcome: "update",
         roles: ["scratch": .auxiliaryIndex(handle: holesHandle.rawValue, index: value - mi)],
         explanationKey: "pigeonholesort.scratchUpdate",
-        explanation: "Update the count for this value’s pigeonhole.")
+        explanation: String(localized: "Update the count for this value’s pigeonhole.", bundle: .module))
     }
 
     var j = 0
@@ -92,13 +93,13 @@ public struct PigeonholeSort: SortAlgorithm {
           outcome: "update",
           roles: ["scratch": .auxiliaryIndex(handle: holesHandle.rawValue, index: count)],
           explanationKey: "pigeonholesort.scratchUpdate",
-          explanation: "Update the count for this value’s pigeonhole.")
+          explanation: String(localized: "Update the count for this value’s pigeonhole.", bundle: .module))
         engine.setValue(j, count + mi)
         engine.annotateLastOperation(
           stageID: "bucketPlacement", decisionID: "pigeonholesort.bucketPlacement",
           outcome: "place", roles: ["destination": .arrayIndex(j)],
           explanationKey: "pigeonholesort.bucketPlacement",
-          explanation: "Pigeonhole \(count) contains another value \(count + mi), so place it next.")
+          explanation: String(localized: "Pigeonhole \(count) contains another value \(count + mi), so place it next.", bundle: .module))
         j += 1
       }
     }

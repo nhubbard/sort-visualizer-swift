@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -9,7 +10,7 @@ import SortEngineKit
 public struct OptimizedCocktailShakerSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "optimizedcocktailshakersort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Optimized Cocktail Shaker Sort",
+    displayName: String(localized: "Optimized Cocktail Shaker Sort", bundle: .module),
     category: .exchange,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -41,8 +42,8 @@ public struct OptimizedCocktailShakerSort: SortAlgorithm {
           i, i + 1,
           by: (>),
           stageID: "OptimizedCocktailShakerSort.forwardPass",
-          whenTrue: "The left item is larger, so exchange it and update the pass boundary.",
-          whenFalse: "The forward pass leaves this pair in place."
+          whenTrue: String(localized: "The left item is larger, so exchange it and update the pass boundary.", bundle: .module),
+          whenFalse: String(localized: "The forward pass leaves this pair in place.", bundle: .module)
         ) {
           engine.swap(i, i + 1)
           consecSorted = 1

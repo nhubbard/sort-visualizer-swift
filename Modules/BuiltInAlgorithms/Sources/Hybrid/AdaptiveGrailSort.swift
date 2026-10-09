@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -27,7 +28,7 @@ import SortEngineKit
 public struct AdaptiveGrailSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "adaptivegrailsort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Adaptive Grail Sort",
+    displayName: String(localized: "Adaptive Grail Sort", bundle: .module),
     category: .hybrid,
     sizeRange: 16...1155,
     growthModel: OperationGrowthModel(
@@ -66,7 +67,7 @@ private final class AdaptiveGrailRecorder {
       stageID: "adaptiveGrail.place", decisionID: "adaptiveGrail.place", outcome: "placed",
       roles: ["destination": .arrayIndex(index), "value": .value(value)],
       explanationKey: "adaptiveGrail.place",
-      explanation: "Adaptive Grail places the selected value while forming or merging its runs.")
+      explanation: String(localized: "Adaptive Grail places the selected value while forming or merging its runs.", bundle: .module))
   }
   private func swap(_ first: Int, _ second: Int) {
     engine.swap(first, second)
@@ -74,15 +75,15 @@ private final class AdaptiveGrailRecorder {
       stageID: "adaptiveGrail.blockExchange", decisionID: "adaptiveGrail.blockExchange",
       outcome: "exchange", roles: ["first": .arrayIndex(first), "second": .arrayIndex(second)],
       explanationKey: "adaptiveGrail.blockExchange",
-      explanation: "Adaptive Grail exchanges these positions to rotate a run or its block buffer.")
+      explanation: String(localized: "Adaptive Grail exchanges these positions to rotate a run or its block buffer.", bundle: .module))
   }
 
   private func compare(_ first: Int, _ second: Int) -> Int {
     if engine.teachingCompare(
       first, second, by: (<),
       stageID: "AdaptiveGrailSort.key.order",
-      whenTrue: "The first key is smaller, so Grail keeps it before the second key.",
-      whenFalse: "The first key is not smaller, so Grail checks the other ordering or equality."
+      whenTrue: String(localized: "The first key is smaller, so Grail keeps it before the second key.", bundle: .module),
+      whenFalse: String(localized: "The first key is not smaller, so Grail checks the other ordering or equality.", bundle: .module)
     ) { return -1 }
     if engine.compare(first, second, by: (>)) { return 1 }
     return 0

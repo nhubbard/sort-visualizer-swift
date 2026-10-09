@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -7,7 +8,7 @@ import SortEngineKit
 /// prefix — that appended tail is then Fisher-Yates shuffled among itself.
 public struct ShuffledTailShuffle: ShuffleAlgorithm {
   public let id = ShuffleID(rawValue: "shuffledtail")
-  public let metadata = ShuffleMetadata(displayName: "Scrambled Tail")
+  public let metadata = ShuffleMetadata(displayName: String(localized: "Scrambled Tail", bundle: .module))
   public init() {}
   public func record(into engine: inout RecordingEngine) {
     let n = engine.count

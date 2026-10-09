@@ -5,7 +5,7 @@ import SortEngineKit
 public struct CountingSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "countingsort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Counting Sort",
+    displayName: String(localized: "Counting Sort", bundle: .module),
     category: .distribution,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -38,8 +38,8 @@ public struct CountingSort: SortAlgorithm {
         roles: ["candidate": .arrayIndex(i), "maximum": .value(maxValue)],
         explanationKey: "countingsort.maximum",
         explanation: newMaximum
-          ? "This value extends the counting range, so raise the maximum."
-          : "This value fits within the counting range found so far.")
+          ? String(localized: "This value extends the counting range, so raise the maximum.", bundle: .module)
+          : String(localized: "This value fits within the counting range found so far.", bundle: .module))
       if newMaximum { maxValue = engine.readValue(at: i) }
     }
 
@@ -51,7 +51,7 @@ public struct CountingSort: SortAlgorithm {
         stageID: "frequencyScan", decisionID: "countingsort.collectValue",
         outcome: "collect", roles: ["source": .arrayIndex(i)],
         explanationKey: "countingsort.collectValue",
-        explanation: "Collect this value so its frequency can determine a stable output position.")
+        explanation: String(localized: "Collect this value so its frequency can determine a stable output position.", bundle: .module))
     }
 
     // ArrayV's per-value `counts` table is bookkeeping the visualizer never renders as a bar
@@ -78,7 +78,7 @@ public struct CountingSort: SortAlgorithm {
         outcome: "update",
         roles: ["scratch": .auxiliaryIndex(handle: outputHandle.rawValue, index: counts[value])],
         explanationKey: "countingsort.scratchUpdate",
-        explanation: "The cumulative count reserves this stable scratch position for the value.")
+        explanation: String(localized: "The cumulative count reserves this stable scratch position for the value.", bundle: .module))
     }
 
     // Extra loop to simulate the results from the "output" array being written back to the
@@ -89,7 +89,7 @@ public struct CountingSort: SortAlgorithm {
         stageID: "bucketPlacement", decisionID: "countingsort.bucketPlacement",
         outcome: "place", roles: ["destination": .arrayIndex(i)],
         explanationKey: "countingsort.bucketPlacement",
-        explanation: "The cumulative count places value \(output[i]) at stable output position \(i).")
+        explanation: String(localized: "The cumulative count places value \(output[i]) at stable output position \(i).", bundle: .module))
     }
 
     engine.deleteAuxArray(outputHandle)

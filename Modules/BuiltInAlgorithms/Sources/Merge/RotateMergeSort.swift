@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -14,7 +15,7 @@ import SortEngineKit
 public struct RotateMergeSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "rotatemergesort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Rotate Merge Sort",
+    displayName: String(localized: "Rotate Merge Sort", bundle: .module),
     category: .merge,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -84,14 +85,14 @@ public struct RotateMergeSort: SortAlgorithm {
           ? engine.teachingCompareValue(
             mid, against: value, by: (>=),
             stageID: "RotateMergeSort.merge.boundary",
-            whenTrue: "The candidate crosses the held value, so the rotation boundary moves left.",
-            whenFalse: "The candidate stays before the boundary, so the search moves right."
+            whenTrue: String(localized: "The candidate crosses the held value, so the rotation boundary moves left.", bundle: .module),
+            whenFalse: String(localized: "The candidate stays before the boundary, so the search moves right.", bundle: .module)
           )
           : engine.teachingCompareValue(
             mid, against: value, by: (>),
             stageID: "RotateMergeSort.merge.boundaryRight",
-            whenTrue: "The candidate exceeds the held value, so the right rotation boundary moves left.",
-            whenFalse: "The candidate is no greater, so the right rotation boundary moves forward."
+            whenTrue: String(localized: "The candidate exceeds the held value, so the right rotation boundary moves left.", bundle: .module),
+            whenFalse: String(localized: "The candidate is no greater, so the right rotation boundary moves forward.", bundle: .module)
           )
         if comp {
           b = mid

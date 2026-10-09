@@ -1,10 +1,11 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
 public struct OptimizedBubbleSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "optimizedbubblesort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Optimized Bubble Sort",
+    displayName: String(localized: "Optimized Bubble Sort", bundle: .module),
     category: .exchange,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -30,8 +31,8 @@ public struct OptimizedBubbleSort: SortAlgorithm {
           j, j + 1,
           by: (>),
           stageID: "OptimizedBubbleSort.adjacentOrder",
-          whenTrue: "The left neighbor is larger, so exchange it and remember the last swap.",
-          whenFalse: "This pair is ordered; the last-swap boundary does not move."
+          whenTrue: String(localized: "The left neighbor is larger, so exchange it and remember the last swap.", bundle: .module),
+          whenFalse: String(localized: "This pair is ordered; the last-swap boundary does not move.", bundle: .module)
         ) {
           engine.swap(j, j + 1)
           consecSorted = 1

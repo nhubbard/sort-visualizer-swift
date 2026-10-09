@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -7,7 +8,7 @@ import SortEngineKit
 /// random array, hence "first" circle pass.
 public struct CircleShuffle: ShuffleAlgorithm {
   public let id = ShuffleID(rawValue: "circle")
-  public let metadata = ShuffleMetadata(displayName: "First Circle Pass")
+  public let metadata = ShuffleMetadata(displayName: String(localized: "First Circle Pass", bundle: .module))
   public init() {}
 
   public func record(into engine: inout RecordingEngine) {

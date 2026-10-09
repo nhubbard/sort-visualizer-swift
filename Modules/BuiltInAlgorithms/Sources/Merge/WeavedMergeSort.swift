@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -16,7 +17,7 @@ import SortEngineKit
 public struct WeavedMergeSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "weavedmergesort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Weaved Merge Sort",
+    displayName: String(localized: "Weaved Merge Sort", bundle: .module),
     category: .merge,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -70,8 +71,8 @@ public struct WeavedMergeSort: SortAlgorithm {
           roles: ["left": .arrayIndex(low), "right": .arrayIndex(high)],
           explanationKey: "weaved.mergeChoose",
           explanation: takeHigh
-            ? "The right residue supplies the smaller value, so the weave takes it next."
-            : "The left residue supplies the smaller or equal value, so the weave takes it next.")
+            ? String(localized: "The right residue supplies the smaller value, so the weave takes it next.", bundle: .module)
+            : String(localized: "The left residue supplies the smaller or equal value, so the weave takes it next.", bundle: .module))
         if takeHigh {
           tmp[nxt] = engine.readValue(at: high)
           engine.writeAux(tempHandle, at: nxt, value: engine.readValue(at: high))

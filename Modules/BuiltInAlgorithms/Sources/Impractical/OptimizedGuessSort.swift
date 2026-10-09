@@ -1,10 +1,11 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
 public struct OptimizedGuessSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "optimizedguesssort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Optimized Guess Sort",
+    displayName: String(localized: "Optimized Guess Sort", bundle: .module),
     category: .impractical,
     sizeRange: 3...4,
     growthModel: OperationGrowthModel(
@@ -44,8 +45,8 @@ public struct OptimizedGuessSort: SortAlgorithm {
           roles: ["left": .arrayIndex(loops[i]), "right": .arrayIndex(loops[i + 1])],
           explanationKey: "optimizedguesssort.strictOrder",
           explanation: increasing
-            ? "This mapped pair increases, so keep checking the candidate."
-            : "This mapped pair does not increase, so check whether its values tie.")
+            ? String(localized: "This mapped pair increases, so keep checking the candidate.", bundle: .module)
+            : String(localized: "This mapped pair does not increase, so check whether its values tie.", bundle: .module))
         if increasing { continue }
         let equal = engine.compare(loops[i], loops[i + 1], by: (==))
         let stableTie = equal && loops[i] < loops[i + 1]
@@ -55,8 +56,8 @@ public struct OptimizedGuessSort: SortAlgorithm {
           roles: ["left": .arrayIndex(loops[i]), "right": .arrayIndex(loops[i + 1])],
           explanationKey: "optimizedguesssort.stableTie",
           explanation: stableTie
-            ? "Equal values retain their source order, so this mapped pair is valid."
-            : "The mapped pair is descending or breaks stable tie order, so reject this candidate.")
+            ? String(localized: "Equal values retain their source order, so this mapped pair is valid.", bundle: .module)
+            : String(localized: "The mapped pair is descending or breaks stable tie order, so reject this candidate.", bundle: .module))
         if stableTie { continue }
         return false
       }
@@ -81,7 +82,7 @@ public struct OptimizedGuessSort: SortAlgorithm {
         stageID: "candidatePlacement", decisionID: "optimizedguesssort.candidatePlacement",
         outcome: "place", roles: ["destination": .arrayIndex(i)],
         explanationKey: "optimizedguesssort.candidatePlacement",
-        explanation: "This candidate permutation satisfies the ordering check and is placed here.")
+        explanation: String(localized: "This candidate permutation satisfies the ordering check and is placed here.", bundle: .module))
     }
   }
 }

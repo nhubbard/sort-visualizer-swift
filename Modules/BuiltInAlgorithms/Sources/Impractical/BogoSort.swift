@@ -1,10 +1,11 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
 public struct BogoSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "bogosort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Bogo Sort",
+    displayName: String(localized: "Bogo Sort", bundle: .module),
     category: .impractical,
     sizeRange: 4...7,
     growthModel: OperationGrowthModel(
@@ -40,8 +41,8 @@ public struct BogoSort: SortAlgorithm {
           roles: ["previous": .arrayIndex(i - 1), "current": .arrayIndex(i)],
           explanationKey: "bogosort.adjacentOrder",
           explanation: inOrder
-            ? "This adjacent pair is ordered, so keep checking the candidate."
-            : "This adjacent pair is inverted, so reject this candidate permutation.")
+            ? String(localized: "This adjacent pair is ordered, so keep checking the candidate.", bundle: .module)
+            : String(localized: "This adjacent pair is inverted, so reject this candidate permutation.", bundle: .module))
         if !inOrder { return false }
       }
       return true
@@ -62,7 +63,7 @@ public struct BogoSort: SortAlgorithm {
         stageID: "candidateExchange", decisionID: "bogosort.candidateExchange",
         outcome: "exchange", roles: ["left": .arrayIndex(i), "right": .arrayIndex(j)],
         explanationKey: "bogosort.candidateExchange",
-        explanation: "The next candidate permutation exchanges its pivot with a larger successor.")
+        explanation: String(localized: "The next candidate permutation exchanges its pivot with a larger successor.", bundle: .module))
       engine.reversal(i + 1, n - 1)
       return true
     }

@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -15,7 +16,7 @@ import SortEngineKit
 public struct LazierestSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "lazierestsort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Lazierest Stable",
+    displayName: String(localized: "Lazierest Stable", bundle: .module),
     category: .hybrid,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -62,7 +63,7 @@ public struct LazierestSort: SortAlgorithm {
         stageID: "lazierest.insert", decisionID: "lazierest.insert",
         outcome: "placed", roles: ["source": .arrayIndex(source), "destination": .arrayIndex(destination)],
         explanationKey: "lazierest.insert",
-        explanation: "Lazierest places the held item at the boundary found for this run.")
+        explanation: String(localized: "Lazierest places the held item at the boundary found for this run.", bundle: .module))
     }
 
     func leftBinSearch(_ aIn: Int, _ bIn: Int, _ value: Int) -> Int {
@@ -73,8 +74,8 @@ public struct LazierestSort: SortAlgorithm {
         if engine.teachingCompareValue(
           mid, against: value, by: >=,
           stageID: "LazierestSort.binary.search",
-          whenTrue: "This position is at least the held value, so the insertion point is at or before it.",
-          whenFalse: "This position is smaller than the held value, so the insertion search advances."
+          whenTrue: String(localized: "This position is at least the held value, so the insertion point is at or before it.", bundle: .module),
+          whenFalse: String(localized: "This position is smaller than the held value, so the insertion search advances.", bundle: .module)
         ) { b = mid } else { a = mid + 1 }
       }
       return a

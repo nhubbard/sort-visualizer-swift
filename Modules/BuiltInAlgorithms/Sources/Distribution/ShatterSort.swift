@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -11,7 +12,7 @@ import SortEngineKit
 public struct ShatterSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "shattersort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Shatter Sort",
+    displayName: String(localized: "Shatter Sort", bundle: .module),
     category: .distribution,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(

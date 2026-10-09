@@ -1,3 +1,4 @@
+import Foundation
 import SortEngineKit
 
 /// Ported from ArrayV's `sorts/templates/ShatterSorting` — a shared base class two concrete
@@ -62,8 +63,8 @@ enum ShatterSortingTemplate {
         roles: ["item": .arrayIndex(index), "minimum": .value(minValue)],
         explanationKey: "shatter.scanMinimum",
         explanation: newMinimum
-          ? "This value lowers the range minimum used to size Shatter's buckets."
-          : "This value does not lower the range minimum, so the scan continues.")
+          ? String(localized: "This value lowers the range minimum used to size Shatter's buckets.", bundle: .module)
+          : String(localized: "This value does not lower the range minimum, so the scan continues.", bundle: .module))
     }
     var maxValue = Int.min
     for index in window {
@@ -76,8 +77,8 @@ enum ShatterSortingTemplate {
         roles: ["item": .arrayIndex(index), "maximum": .value(maxValue)],
         explanationKey: "shatter.scanMaximum",
         explanation: newMaximum
-          ? "This value raises the range maximum used to size Shatter's buckets."
-          : "This value does not raise the range maximum, so the scan continues.")
+          ? String(localized: "This value raises the range maximum used to size Shatter's buckets.", bundle: .module)
+          : String(localized: "This value does not raise the range maximum, so the scan continues.", bundle: .module))
     }
     let valueRange = maxValue - minValue + 1
     let shatters = (length + num - 1) / num
@@ -91,7 +92,7 @@ enum ShatterSortingTemplate {
         outcome: "bucket-\(idx)",
         roles: ["item": .arrayIndex(i), "bucket": .value(idx)],
         explanationKey: "shatter.bucket",
-        explanation: "This value maps to bucket \(idx + 1) of \(shatters), so Shatter places it with values from the same range.")
+        explanation: String(localized: "This value maps to bucket \(idx + 1) of \(shatters), so Shatter places it with values from the same range.", bundle: .module))
       buckets[idx].append(value)
     }
 
@@ -106,7 +107,7 @@ enum ShatterSortingTemplate {
           outcome: "bucket-\(bucketIndex)",
           roles: ["destination": .arrayIndex(writeIndex), "bucket": .value(bucketIndex)],
           explanationKey: "shatter.flattenBucket",
-          explanation: "Bucket \(bucketIndex + 1) writes its next value back in bucket order.")
+          explanation: String(localized: "Bucket \(bucketIndex + 1) writes its next value back in bucket order.", bundle: .module))
         writeIndex += 1
       }
     }
@@ -122,8 +123,8 @@ enum ShatterSortingTemplate {
       while pos > start && engine.teachingCompare(
         pos - 1, pos, by: >,
         stageID: "shatter.bucketInsertion",
-        whenTrue: "This pair is reversed within a bucket, so insertion swaps it.",
-        whenFalse: "This pair is ordered, so insertion leaves it in place.") {
+        whenTrue: String(localized: "This pair is reversed within a bucket, so insertion swaps it.", bundle: .module),
+        whenFalse: String(localized: "This pair is ordered, so insertion leaves it in place.", bundle: .module)) {
         engine.swap(pos - 1, pos)
         pos -= 1
       }

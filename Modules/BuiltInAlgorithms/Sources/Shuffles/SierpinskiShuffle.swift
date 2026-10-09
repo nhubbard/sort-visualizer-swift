@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -7,7 +8,7 @@ import SortEngineKit
 /// that produces a Sierpinski triangle — then gathers the array's values through that permutation.
 public struct SierpinskiShuffle: ShuffleAlgorithm {
   public let id = ShuffleID(rawValue: "sierpinski")
-  public let metadata = ShuffleMetadata(displayName: "Sierpinski Triangle")
+  public let metadata = ShuffleMetadata(displayName: String(localized: "Sierpinski Triangle", bundle: .module))
   public init() {}
   public func record(into engine: inout RecordingEngine) {
     let n = engine.count

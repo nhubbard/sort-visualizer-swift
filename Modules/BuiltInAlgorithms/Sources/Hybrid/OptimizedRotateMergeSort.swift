@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -9,7 +10,7 @@ import SortEngineKit
 public struct OptimizedRotateMergeSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "optimizedrotatemergesort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Optimized Rotate Merge",
+    displayName: String(localized: "Optimized Rotate Merge", bundle: .module),
     category: .hybrid,
     sizeRange: 16...1813,
     growthModel: OperationGrowthModel(
@@ -52,8 +53,8 @@ public struct OptimizedRotateMergeSort: SortAlgorithm {
         if engine.teachingCompareValue(
           middle, against: value, by: (<),
           stageID: "OptimizedRotateMergeSort.merge.boundary",
-          whenTrue: "This run value is below the held value, so the boundary search advances.",
-          whenFalse: "This run value is at least the held value, so the boundary search moves left."
+          whenTrue: String(localized: "This run value is below the held value, so the boundary search advances.", bundle: .module),
+          whenFalse: String(localized: "This run value is at least the held value, so the boundary search moves left.", bundle: .module)
         ) {
           low = middle + 1
         } else {
@@ -71,8 +72,8 @@ public struct OptimizedRotateMergeSort: SortAlgorithm {
         if engine.teachingCompareValue(
           middle, against: value, by: (<=),
           stageID: "OptimizedRotateMergeSort.upperBound",
-          whenTrue: "This value is no greater than the held item, so insertion searches farther right.",
-          whenFalse: "This value is greater, so insertion narrows the boundary to the left."
+          whenTrue: String(localized: "This value is no greater than the held item, so insertion searches farther right.", bundle: .module),
+          whenFalse: String(localized: "This value is greater, so insertion narrows the boundary to the left.", bundle: .module)
         ) {
           low = middle + 1
         } else {

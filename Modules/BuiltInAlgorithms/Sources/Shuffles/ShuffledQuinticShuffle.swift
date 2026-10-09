@@ -7,7 +7,7 @@ import SortEngineKit
 /// Fisher-Yates shuffles the result.
 public struct ShuffledQuinticShuffle: ShuffleAlgorithm {
   public let id = ShuffleID(rawValue: "shuffledquintic")
-  public let metadata = ShuffleMetadata(displayName: "Shuffled quintic")
+  public let metadata = ShuffleMetadata(displayName: String(localized: "Shuffled quintic", bundle: .module))
   public init() {}
   public func record(into engine: inout RecordingEngine) {
     let n = engine.count

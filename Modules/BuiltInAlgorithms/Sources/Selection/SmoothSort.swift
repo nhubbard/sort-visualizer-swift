@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -33,7 +34,7 @@ import SortEngineKit
 public struct SmoothSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "smoothsort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Smooth Sort",
+    displayName: String(localized: "Smooth Sort", bundle: .module),
     category: .selection,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -76,8 +77,8 @@ public struct SmoothSort: SortAlgorithm {
           lf, rt,
           by: >=,
           stageID: "SmoothSort.childChoice",
-          whenTrue: "The left Leonardo child is at least as large, so move through it.",
-          whenFalse: "The right Leonardo child is larger, so move through it."
+          whenTrue: String(localized: "The left Leonardo child is at least as large, so move through it.", bundle: .module),
+          whenFalse: String(localized: "The right Leonardo child is larger, so move through it.", bundle: .module)
         ) {
           engine.setValue(head, engine.readValue(at: lf))
           head = lf

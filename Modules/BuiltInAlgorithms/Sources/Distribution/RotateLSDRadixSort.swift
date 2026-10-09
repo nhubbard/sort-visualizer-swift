@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -15,7 +16,7 @@ import SortEngineKit
 public struct RotateLSDRadixSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "rotatelsdradixsort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Rotate LSD Radix Sort",
+    displayName: String(localized: "Rotate LSD Radix Sort", bundle: .module),
     category: .distribution,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -65,7 +66,7 @@ public struct RotateLSDRadixSort: SortAlgorithm {
           stageID: "digitRotation", decisionID: "rotatelsdradixsort.digitRotation",
           outcome: "exchange", roles: ["left": .arrayIndex(a + i), "right": .arrayIndex(b + i)],
           explanationKey: "rotatelsdradixsort.digitRotation",
-          explanation: "This block exchange rotates values into the bucket selected by the current digit.")
+          explanation: String(localized: "This block exchange rotates values into the bucket selected by the current digit.", bundle: .module))
       }
     }
 

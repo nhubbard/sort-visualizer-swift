@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -15,7 +16,7 @@ import SortEngineKit
 public struct DoubleInsertionSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "doubleinsertionsort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Double Insertion Sort",
+    displayName: String(localized: "Double Insertion Sort", bundle: .module),
     category: .insertion,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -47,8 +48,8 @@ public struct DoubleInsertionSort: SortAlgorithm {
       left, right,
       by: (>),
       stageID: "DoubleInsertionSort.endCandidates",
-      whenTrue: "The left candidate is larger, so the two insertion directions must exchange.",
-      whenFalse: "The end candidates can keep their insertion directions."
+      whenTrue: String(localized: "The left candidate is larger, so the two insertion directions must exchange.", bundle: .module),
+      whenFalse: String(localized: "The end candidates can keep their insertion directions.", bundle: .module)
     ) {
       engine.swap(left, right)
     }
@@ -59,8 +60,8 @@ public struct DoubleInsertionSort: SortAlgorithm {
       // Reads.compareIndices(array, left, right, ..., true) > 0 — strict, both indices live.
       if engine.teachingCompare(
         left, right, by: >, stageID: "DoubleInsertionSort.pairOrder",
-        whenTrue: "The left new value is larger, so insert the pair in crossed order.",
-        whenFalse: "The pair is ordered, so insert each value from its own side."
+        whenTrue: String(localized: "The left new value is larger, so insert the pair in crossed order.", bundle: .module),
+        whenFalse: String(localized: "The pair is ordered, so insert each value from its own side.", bundle: .module)
       ) {
         // `leftItem`/`rightItem` are captured *before* either while-loop below writes
         // anything, matching ArrayV's `leftItem = array[right]; rightItem = array[left];`
@@ -74,8 +75,8 @@ public struct DoubleInsertionSort: SortAlgorithm {
         // already equal to it and land *after* them to stay stable.
         while pos <= right && engine.teachingCompareValue(
           pos, against: leftItem, by: <=, stageID: "DoubleInsertionSort.leftCrossedShift",
-          whenTrue: "This value is no larger than the held left item, so shift it left and keep scanning.",
-          whenFalse: "The held left item has reached its stable insertion boundary."
+          whenTrue: String(localized: "This value is no larger than the held left item, so shift it left and keep scanning.", bundle: .module),
+          whenFalse: String(localized: "The held left item has reached its stable insertion boundary.", bundle: .module)
         ) {
           engine.setValue(pos - 1, engine.readValue(at: pos))
           pos += 1
@@ -88,8 +89,8 @@ public struct DoubleInsertionSort: SortAlgorithm {
         // already equal to it and land *before* them to stay stable.
         while pos >= left && engine.teachingCompareValue(
           pos, against: rightItem, by: >=, stageID: "DoubleInsertionSort.rightCrossedShift",
-          whenTrue: "This value is at least the held right item, so shift it right and keep scanning.",
-          whenFalse: "The held right item has reached its stable insertion boundary."
+          whenTrue: String(localized: "This value is at least the held right item, so shift it right and keep scanning.", bundle: .module),
+          whenFalse: String(localized: "The held right item has reached its stable insertion boundary.", bundle: .module)
         ) {
           engine.setValue(pos + 1, engine.readValue(at: pos))
           pos -= 1
@@ -106,8 +107,8 @@ public struct DoubleInsertionSort: SortAlgorithm {
         // stops at or before `pos == right`.
         while engine.teachingCompareValue(
           pos, against: leftItem, by: <, stageID: "DoubleInsertionSort.leftOrderedShift",
-          whenTrue: "This value is smaller than the held left item, so shift it left.",
-          whenFalse: "The held left item has reached its insertion position."
+          whenTrue: String(localized: "This value is smaller than the held left item, so shift it left.", bundle: .module),
+          whenFalse: String(localized: "The held left item has reached its insertion position.", bundle: .module)
         ) {
           engine.setValue(pos - 1, engine.readValue(at: pos))
           pos += 1
@@ -119,8 +120,8 @@ public struct DoubleInsertionSort: SortAlgorithm {
         // "no explicit bound needed" reasoning as above, mirrored for the left edge.
         while engine.teachingCompareValue(
           pos, against: rightItem, by: >, stageID: "DoubleInsertionSort.rightOrderedShift",
-          whenTrue: "This value is larger than the held right item, so shift it right.",
-          whenFalse: "The held right item has reached its insertion position."
+          whenTrue: String(localized: "This value is larger than the held right item, so shift it right.", bundle: .module),
+          whenFalse: String(localized: "The held right item has reached its insertion position.", bundle: .module)
         ) {
           engine.setValue(pos + 1, engine.readValue(at: pos))
           pos -= 1
@@ -143,8 +144,8 @@ public struct DoubleInsertionSort: SortAlgorithm {
       // would throw ArrayIndexOutOfBoundsException there; a literal port would trap in Swift.
       while pos >= start && engine.teachingCompareValue(
         pos, against: current, by: >, stageID: "DoubleInsertionSort.trailingItem",
-        whenTrue: "This value is larger than the trailing item, so shift it right.",
-        whenFalse: "The trailing item has reached its insertion position."
+        whenTrue: String(localized: "This value is larger than the trailing item, so shift it right.", bundle: .module),
+        whenFalse: String(localized: "The trailing item has reached its insertion position.", bundle: .module)
       ) {
         engine.setValue(pos + 1, engine.readValue(at: pos))
         pos -= 1

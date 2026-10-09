@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -6,7 +7,7 @@ import SortEngineKit
 /// bitonic merge would need to finish sorting a fully bitonic sequence.
 public struct FinalBitonicShuffle: ShuffleAlgorithm {
   public let id = ShuffleID(rawValue: "finalbitonic")
-  public let metadata = ShuffleMetadata(displayName: "Final Bitonic Pass")
+  public let metadata = ShuffleMetadata(displayName: String(localized: "Final Bitonic Pass", bundle: .module))
   public init() {}
   public func record(into engine: inout RecordingEngine) {
     let n = engine.count

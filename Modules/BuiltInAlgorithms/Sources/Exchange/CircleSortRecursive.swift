@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -15,7 +16,7 @@ import SortEngineKit
 public struct CircleSortRecursive: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "circlesortrecursive")
   public let metadata = AlgorithmMetadata(
-    displayName: "Circle Sort (Recursive)",
+    displayName: String(localized: "Circle Sort (Recursive)", bundle: .module),
     category: .exchange,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -60,8 +61,8 @@ public struct CircleSortRecursive: SortAlgorithm {
           lo, hi,
           by: (>),
           stageID: "CircleSortRecursive.oppositeEnds",
-          whenTrue: "The left endpoint is larger, so exchange the pair before recursing.",
-          whenFalse: "The opposite endpoints stay in place."
+          whenTrue: String(localized: "The left endpoint is larger, so exchange the pair before recursing.", bundle: .module),
+          whenFalse: String(localized: "The opposite endpoints stay in place.", bundle: .module)
         ) {
           engine.swap(lo, hi)
           swapCount += 1

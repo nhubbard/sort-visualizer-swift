@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -17,7 +18,7 @@ import SortEngineKit
 public struct SimplifiedLibrarySort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "simplifiedlibrarysort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Simplified Library Sort",
+    displayName: String(localized: "Simplified Library Sort", bundle: .module),
     category: .insertion,
     sizeRange: 32...256,
     growthModel: OperationGrowthModel(
@@ -61,8 +62,8 @@ public struct SimplifiedLibrarySort: SortAlgorithm {
             i, mid,
             by: <,
             stageID: "SimplifiedLibrarySort.binaryGap",
-            whenTrue: "The new value is smaller than the midpoint, so search earlier library slots.",
-            whenFalse: "The new value belongs after this library midpoint."
+            whenTrue: String(localized: "The new value is smaller than the midpoint, so search earlier library slots.", bundle: .module),
+            whenFalse: String(localized: "The new value belongs after this library midpoint.", bundle: .module)
           ) {
             hi = mid
           } else {
@@ -93,8 +94,8 @@ public struct SimplifiedLibrarySort: SortAlgorithm {
         if n < 128 || sourceIndex.isMultiple(of: 4) {
           searchEarlier = engine.teachingCompareValue(
             mid, against: val, by: >, stageID: "SimplifiedLibrarySort.chooseGap",
-            whenTrue: "The spine value is larger, so search an earlier library gap.",
-            whenFalse: "The new value belongs after this spine value.")
+            whenTrue: String(localized: "The spine value is larger, so search an earlier library gap.", bundle: .module),
+            whenFalse: String(localized: "The new value belongs after this spine value.", bundle: .module))
         } else {
           searchEarlier = engine.compareValue(mid, against: val, by: >)
         }
@@ -170,7 +171,7 @@ public struct SimplifiedLibrarySort: SortAlgorithm {
             roles: ["source": .arrayIndex(i),
               "gap": .auxiliaryIndex(handle: tempHandle.rawValue, index: pos)],
             explanationKey: "SimplifiedLibrarySort.placeBatchInGap",
-            explanation: "Place this classified batch value in its assigned library gap.")
+            explanation: String(localized: "Place this classified batch value in its assigned library gap.", bundle: .module))
         }
         cntsShadow[loc] = pos + 1
         engine.writeAux(cntsHandle, at: loc, value: pos + 1)
@@ -190,7 +191,7 @@ public struct SimplifiedLibrarySort: SortAlgorithm {
             roles: ["source": .arrayIndex(i),
               "spine": .auxiliaryIndex(handle: tempHandle.rawValue, index: pos)],
             explanationKey: "SimplifiedLibrarySort.placeSpine",
-            explanation: "Place this sorted spine value after the batch values in its gap.")
+            explanation: String(localized: "Place this sorted spine value after the batch values in its gap.", bundle: .module))
         }
         cntsShadow[i] = pos + 1
         engine.writeAux(cntsHandle, at: i, value: pos + 1)
@@ -205,7 +206,7 @@ public struct SimplifiedLibrarySort: SortAlgorithm {
             stageID: "SimplifiedLibrarySort.rebuildArray", outcome: "placed",
             roles: ["output": .arrayIndex(i), "value": .value(tempShadow[i])],
             explanationKey: "SimplifiedLibrarySort.rebuildArray",
-            explanation: "Copy the rebalanced library layout into the live array.")
+            explanation: String(localized: "Copy the rebalanced library layout into the live array.", bundle: .module))
         }
       }
 

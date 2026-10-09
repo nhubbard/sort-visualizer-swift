@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -22,7 +23,7 @@ import SortEngineKit
 public struct BoseNelsonSortRecursive: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "bosenelsonsortrecursive")
   public let metadata = AlgorithmMetadata(
-    displayName: "Recursive Bose-Nelson Sort",
+    displayName: String(localized: "Recursive Bose-Nelson Sort", bundle: .module),
     category: .concurrent,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -52,8 +53,8 @@ public struct BoseNelsonSortRecursive: SortAlgorithm {
         roles: ["left": .arrayIndex(start), "right": .arrayIndex(end)],
         explanationKey: "bosenelsonsortrecursive.compareExchange",
         explanation: shouldSwap
-          ? "The left value exceeds the right value, so this comparator exchanges them."
-          : "These values satisfy this comparator, so they stay in place.")
+          ? String(localized: "The left value exceeds the right value, so this comparator exchanges them.", bundle: .module)
+          : String(localized: "These values satisfy this comparator, so they stay in place.", bundle: .module))
       if shouldSwap {
         engine.swap(start, end)
       }

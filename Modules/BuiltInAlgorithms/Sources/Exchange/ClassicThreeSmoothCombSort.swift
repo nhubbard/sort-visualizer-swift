@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -19,7 +20,7 @@ import SortEngineKit
 public struct ClassicThreeSmoothCombSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "classicthreesmoothcombsort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Classic 3-Smooth Comb Sort",
+    displayName: String(localized: "Classic 3-Smooth Comb Sort", bundle: .module),
     category: .exchange,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -60,8 +61,8 @@ public struct ClassicThreeSmoothCombSort: SortAlgorithm {
             i - g, i,
             by: (>),
             stageID: "ClassicThreeSmoothCombSort.gapOrder",
-            whenTrue: "The left item is larger across this three-smooth gap, so exchange the pair.",
-            whenFalse: "This gap-separated pair is ordered."
+            whenTrue: String(localized: "The left item is larger across this three-smooth gap, so exchange the pair.", bundle: .module),
+            whenFalse: String(localized: "This gap-separated pair is ordered.", bundle: .module)
           ) {
             engine.swap(i - g, i)
           }

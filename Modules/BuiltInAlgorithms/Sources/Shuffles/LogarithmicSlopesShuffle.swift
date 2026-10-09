@@ -14,7 +14,7 @@ import SortEngineKit
 /// shuffles.
 public struct LogarithmicSlopesShuffle: ShuffleAlgorithm {
   public let id = ShuffleID(rawValue: "logslopes")
-  public let metadata = ShuffleMetadata(displayName: "Logarithmic Slopes")
+  public let metadata = ShuffleMetadata(displayName: String(localized: "Logarithmic Slopes", bundle: .module))
   public init() {}
   public func record(into engine: inout RecordingEngine) {
     let n = engine.count

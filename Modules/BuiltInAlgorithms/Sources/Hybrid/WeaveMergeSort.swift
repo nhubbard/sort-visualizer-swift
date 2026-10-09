@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -20,7 +21,7 @@ import SortEngineKit
 public struct WeaveMergeSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "weavemergesort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Weave Merge Sort",
+    displayName: String(localized: "Weave Merge Sort", bundle: .module),
     category: .hybrid,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -63,8 +64,8 @@ public struct WeaveMergeSort: SortAlgorithm {
         roles: ["left": .arrayIndex(min), "right": .arrayIndex(max)],
         explanationKey: "weave.basePair",
         explanation: reversePair
-          ? "This two-element range is reversed, so Weave Merge swaps the pair."
-          : "This two-element range is ordered, so Weave Merge keeps the pair.")
+          ? String(localized: "This two-element range is reversed, so Weave Merge swaps the pair.", bundle: .module)
+          : String(localized: "This two-element range is ordered, so Weave Merge keeps the pair.", bundle: .module))
       if reversePair {
         engine.swap(min, max)
       }
@@ -128,8 +129,8 @@ public struct WeaveMergeSort: SortAlgorithm {
           roles: ["current": .arrayIndex(pos), "previous": .arrayIndex(pos - 1)],
           explanationKey: "weave.insert",
           explanation: moveLeft
-            ? "The current value is no greater, so the woven run moves it left."
-            : "The current value is greater, so this insertion scan stops.")
+            ? String(localized: "The current value is no greater, so the woven run moves it left.", bundle: .module)
+            : String(localized: "The current value is greater, so this insertion scan stops.", bundle: .module))
         if !moveLeft { break }
         engine.swap(pos, pos - 1)
         pos -= 1

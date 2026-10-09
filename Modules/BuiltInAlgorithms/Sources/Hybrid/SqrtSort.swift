@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -26,7 +27,7 @@ import SortEngineKit
 public struct SqrtSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "sqrtsort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Sqrt Sort",
+    displayName: String(localized: "Sqrt Sort", bundle: .module),
     category: .hybrid,
     sizeRange: 16...1382,
     growthModel: OperationGrowthModel(
@@ -83,8 +84,8 @@ private struct SqrtSortRecorder {
       if engine.teachingCompare(
         a, b, by: (<),
         stageID: "SqrtSort.key.order",
-        whenTrue: "The first key is smaller, so square-root sorting places it earlier.",
-        whenFalse: "The first key is not smaller, so the next ordering case applies."
+        whenTrue: String(localized: "The first key is smaller, so square-root sorting places it earlier.", bundle: .module),
+        whenFalse: String(localized: "The first key is not smaller, so the next ordering case applies.", bundle: .module)
       ) { return -1 }
       if engine.compare(a, b, by: (>)) { return 1 }
       return 0

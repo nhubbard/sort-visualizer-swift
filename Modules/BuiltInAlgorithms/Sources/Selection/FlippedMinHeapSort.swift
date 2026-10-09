@@ -1,10 +1,11 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
 public struct FlippedMinHeapSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "flippedminheapsort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Flipped Min Heap Sort",
+    displayName: String(localized: "Flipped Min Heap Sort", bundle: .module),
     category: .selection,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -40,8 +41,8 @@ public struct FlippedMinHeapSort: SortAlgorithm {
           idx(leaf), idx(leaf + 1),
           by: (>),
           stageID: "FlippedMinHeapSort.childChoice",
-          whenTrue: "The first child is larger, so choose the other child for the minimum heap.",
-          whenFalse: "The first child remains the minimum-heap choice."
+          whenTrue: String(localized: "The first child is larger, so choose the other child for the minimum heap.", bundle: .module),
+          whenFalse: String(localized: "The first child remains the minimum-heap choice.", bundle: .module)
         ) {
           leaf += 1
         }

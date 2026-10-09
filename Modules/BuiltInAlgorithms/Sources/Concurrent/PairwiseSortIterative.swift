@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -17,7 +18,7 @@ import SortEngineKit
 public struct PairwiseSortIterative: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "pairwisesortiterative")
   public let metadata = AlgorithmMetadata(
-    displayName: "Iterative Pairwise Sort",
+    displayName: String(localized: "Iterative Pairwise Sort", bundle: .module),
     category: .concurrent,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -52,8 +53,8 @@ public struct PairwiseSortIterative: SortAlgorithm {
           roles: ["left": .arrayIndex(b - a), "right": .arrayIndex(b)],
           explanationKey: "pairwisesortiterative.compareExchange",
           explanation: shouldSwap
-            ? "This network pair is out of order, so exchange the values."
-            : "This network pair is in order, so keep the values.")
+            ? String(localized: "This network pair is out of order, so exchange the values.", bundle: .module)
+            : String(localized: "This network pair is in order, so keep the values.", bundle: .module))
         if shouldSwap {
           engine.swap(b - a, b)
         }
@@ -84,8 +85,8 @@ public struct PairwiseSortIterative: SortAlgorithm {
             roles: ["left": .arrayIndex(b - (d * a)), "right": .arrayIndex(b)],
             explanationKey: "pairwisesortiterative.compareExchange",
             explanation: shouldSwap
-              ? "This network pair is out of order, so exchange the values."
-              : "This network pair is in order, so keep the values.")
+              ? String(localized: "This network pair is out of order, so exchange the values.", bundle: .module)
+              : String(localized: "This network pair is in order, so keep the values.", bundle: .module))
           if shouldSwap {
             engine.swap(b - (d * a), b)
           }

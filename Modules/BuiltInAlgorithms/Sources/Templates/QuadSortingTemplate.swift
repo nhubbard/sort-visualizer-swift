@@ -1,3 +1,4 @@
+import Foundation
 import SortEngineKit
 
 /// Bundles a `RecordingEngine` aux-array handle with the real backing storage `engine.writeAux`
@@ -57,8 +58,8 @@ enum QuadSortingTemplate {
     if engine.teachingCompare(
       start, start + 1, by: >,
       stageID: "quad.smallRun",
-      whenTrue: "The first pair descends, so Quad Sort rearranges it before merging.",
-      whenFalse: "The first pair is ordered, so Quad Sort keeps its order."
+      whenTrue: String(localized: "The first pair descends, so Quad Sort rearranges it before merging.", bundle: .module),
+      whenFalse: String(localized: "The first pair is ordered, so Quad Sort keeps its order.", bundle: .module)
     ) {
       engine.swap(start, start + 1)
     }
@@ -313,7 +314,7 @@ enum QuadSortingTemplate {
           roles: ["source": .arrayIndex(ptl),
             "destination": .auxiliaryIndex(handle: dest.handle.rawValue, index: auxP)],
           explanationKey: "quad.parityToBuffer",
-          explanation: "The parity merge takes the next ordered value from this run into its buffer.")
+          explanation: String(localized: "The parity merge takes the next ordered value from this run into its buffer.", bundle: .module))
         ptl += 1
       } else {
         dest.write(&engine, at: auxP, value: engine.readValue(at: ptr))
@@ -322,7 +323,7 @@ enum QuadSortingTemplate {
           roles: ["source": .arrayIndex(ptr),
             "destination": .auxiliaryIndex(handle: dest.handle.rawValue, index: auxP)],
           explanationKey: "quad.parityToBuffer",
-          explanation: "The parity merge takes the next ordered value from this run into its buffer.")
+          explanation: String(localized: "The parity merge takes the next ordered value from this run into its buffer.", bundle: .module))
         ptr += 1
       }
       auxP += 1
@@ -334,7 +335,7 @@ enum QuadSortingTemplate {
           roles: ["source": .arrayIndex(ptl),
             "destination": .auxiliaryIndex(handle: dest.handle.rawValue, index: auxP)],
           explanationKey: "quad.parityToBuffer",
-          explanation: "The parity merge takes the next ordered value from this run into its buffer.")
+          explanation: String(localized: "The parity merge takes the next ordered value from this run into its buffer.", bundle: .module))
     } else {
       dest.write(&engine, at: auxP, value: engine.readValue(at: ptr))
       engine.annotateLastOperation(
@@ -342,7 +343,7 @@ enum QuadSortingTemplate {
           roles: ["source": .arrayIndex(ptr),
             "destination": .auxiliaryIndex(handle: dest.handle.rawValue, index: auxP)],
           explanationKey: "quad.parityToBuffer",
-          explanation: "The parity merge takes the next ordered value from this run into its buffer.")
+          explanation: String(localized: "The parity merge takes the next ordered value from this run into its buffer.", bundle: .module))
     }
 
     ptl = start + 3
@@ -357,7 +358,7 @@ enum QuadSortingTemplate {
           roles: ["source": .arrayIndex(ptl),
             "destination": .auxiliaryIndex(handle: dest.handle.rawValue, index: auxP)],
           explanationKey: "quad.parityToBuffer",
-          explanation: "The parity merge takes the next ordered value from this run into its buffer.")
+          explanation: String(localized: "The parity merge takes the next ordered value from this run into its buffer.", bundle: .module))
         ptl -= 1
       } else {
         dest.write(&engine, at: auxP, value: engine.readValue(at: ptr))
@@ -366,7 +367,7 @@ enum QuadSortingTemplate {
           roles: ["source": .arrayIndex(ptr),
             "destination": .auxiliaryIndex(handle: dest.handle.rawValue, index: auxP)],
           explanationKey: "quad.parityToBuffer",
-          explanation: "The parity merge takes the next ordered value from this run into its buffer.")
+          explanation: String(localized: "The parity merge takes the next ordered value from this run into its buffer.", bundle: .module))
         ptr -= 1
       }
       auxP -= 1
@@ -378,7 +379,7 @@ enum QuadSortingTemplate {
           roles: ["source": .arrayIndex(ptl),
             "destination": .auxiliaryIndex(handle: dest.handle.rawValue, index: auxP)],
           explanationKey: "quad.parityToBuffer",
-          explanation: "The parity merge takes the next ordered value from this run into its buffer.")
+          explanation: String(localized: "The parity merge takes the next ordered value from this run into its buffer.", bundle: .module))
     } else {
       dest.write(&engine, at: auxP, value: engine.readValue(at: ptr))
       engine.annotateLastOperation(
@@ -386,7 +387,7 @@ enum QuadSortingTemplate {
           roles: ["source": .arrayIndex(ptr),
             "destination": .auxiliaryIndex(handle: dest.handle.rawValue, index: auxP)],
           explanationKey: "quad.parityToBuffer",
-          explanation: "The parity merge takes the next ordered value from this run into its buffer.")
+          explanation: String(localized: "The parity merge takes the next ordered value from this run into its buffer.", bundle: .module))
     }
   }
 
@@ -400,7 +401,7 @@ enum QuadSortingTemplate {
         stageID: "quad.parityFromBuffer", decisionID: "quad.parityFromBuffer", outcome: "placed",
         roles: ["destination": .arrayIndex(destination), "value": .value(value)],
         explanationKey: "quad.parityFromBuffer",
-        explanation: "The parity merge writes the next ordered buffered value into the main run.")
+        explanation: String(localized: "The parity merge writes the next ordered buffered value into the main run.", bundle: .module))
     }
     var mainP = start
     var ptl = 0
@@ -475,7 +476,7 @@ enum QuadSortingTemplate {
         stageID: "quad.backwardPlace", decisionID: "quad.backwardPlace", outcome: "placed",
         roles: ["destination": .arrayIndex(destination), "value": .value(value)],
         explanationKey: "quad.backwardPlace",
-        explanation: "Quad Sort writes the next selected value from its backward merge.")
+        explanation: String(localized: "Quad Sort writes the next selected value from its backward merge.", bundle: .module))
     }
     var m = start + block
     var e = start + nmemb - 1
@@ -485,14 +486,14 @@ enum QuadSortingTemplate {
     if engine.teachingCompare(
       m, r, by: <=,
       stageID: "quad.mergeBoundary",
-      whenTrue: "These adjacent runs are ordered, so Quad Sort skips this merge.",
-      whenFalse: "The right run begins below the left tail, so Quad Sort merges them."
+      whenTrue: String(localized: "These adjacent runs are ordered, so Quad Sort skips this merge.", bundle: .module),
+      whenFalse: String(localized: "The right run begins below the left tail, so Quad Sort merges them.", bundle: .module)
     ) { return }
     while engine.teachingCompare(
       m, e, by: <=,
       stageID: "quad.trimTail",
-      whenTrue: "This right tail is already above the left tail, so the merge can skip it.",
-      whenFalse: "This tail still crosses the merge boundary, so merge starts here."
+      whenTrue: String(localized: "This right tail is already above the left tail, so the merge can skip it.", bundle: .module),
+      whenFalse: String(localized: "This tail still crosses the merge boundary, so merge starts here.", bundle: .module)
     ) { e -= 1 }
 
     for i in r..<(r + (e - m)) {
@@ -730,20 +731,20 @@ enum QuadSortingTemplate {
         if engine.teachingCompare(
           pta, pta + 1, by: >,
           stageID: "quad.presort",
-          whenTrue: "This adjacent pair descends, so Quad Sort starts a descending-run or swap path.",
-          whenFalse: "This adjacent pair is ordered, so Quad Sort continues its four-item presort."
+          whenTrue: String(localized: "This adjacent pair descends, so Quad Sort starts a descending-run or swap path.", bundle: .module),
+          whenFalse: String(localized: "This adjacent pair is ordered, so Quad Sort continues its four-item presort.", bundle: .module)
         ) {
           if engine.teachingCompare(
             pta + 2, pta + 3, by: >,
             stageID: "quad.presortDecision",
-            whenTrue: "This pair descends, so the four-item presort follows its rearrangement branch.",
-            whenFalse: "This pair is ordered, so the presort keeps scanning."
+            whenTrue: String(localized: "This pair descends, so the four-item presort follows its rearrangement branch.", bundle: .module),
+            whenFalse: String(localized: "This pair is ordered, so the presort keeps scanning.", bundle: .module)
           ) {
             if engine.teachingCompare(
               pta + 1, pta + 2, by: >,
               stageID: "quad.presortDecision",
-              whenTrue: "This pair descends, so the four-item presort follows its rearrangement branch.",
-              whenFalse: "This pair is ordered, so the presort keeps scanning."
+              whenTrue: String(localized: "This pair descends, so the four-item presort follows its rearrangement branch.", bundle: .module),
+              whenFalse: String(localized: "This pair is ordered, so the presort keeps scanning.", bundle: .module)
             ) {
               pts = pta
               pta += 4
@@ -755,8 +756,8 @@ enum QuadSortingTemplate {
         } else if engine.teachingCompare(
           pta + 2, pta + 3, by: >,
           stageID: "quad.presortDecision",
-          whenTrue: "This pair descends, so the four-item presort follows its rearrangement branch.",
-          whenFalse: "This pair is ordered, so the presort keeps scanning."
+          whenTrue: String(localized: "This pair descends, so the four-item presort follows its rearrangement branch.", bundle: .module),
+          whenFalse: String(localized: "This pair is ordered, so the presort keeps scanning.", bundle: .module)
         ) {
           engine.swap(pta + 2, pta + 3)
         }
@@ -764,20 +765,20 @@ enum QuadSortingTemplate {
         if engine.teachingCompare(
           pta + 1, pta + 2, by: >,
           stageID: "quad.presortDecision",
-          whenTrue: "This pair descends, so the four-item presort follows its rearrangement branch.",
-          whenFalse: "This pair is ordered, so the presort keeps scanning."
+          whenTrue: String(localized: "This pair descends, so the four-item presort follows its rearrangement branch.", bundle: .module),
+          whenFalse: String(localized: "This pair is ordered, so the presort keeps scanning.", bundle: .module)
         ) {
           if engine.teachingCompare(
             pta, pta + 2, by: <=,
             stageID: "quad.presortDecision",
-            whenTrue: "This pair is ordered, so the presort can preserve its relative order.",
-            whenFalse: "This pair descends, so the presort follows its rearrangement branch."
+            whenTrue: String(localized: "This pair is ordered, so the presort can preserve its relative order.", bundle: .module),
+            whenFalse: String(localized: "This pair descends, so the presort follows its rearrangement branch.", bundle: .module)
           ) {
             if engine.teachingCompare(
               pta + 1, pta + 3, by: <=,
               stageID: "quad.presortDecision",
-              whenTrue: "This pair is ordered, so the presort can preserve its relative order.",
-              whenFalse: "This pair descends, so the presort follows its rearrangement branch."
+              whenTrue: String(localized: "This pair is ordered, so the presort can preserve its relative order.", bundle: .module),
+              whenFalse: String(localized: "This pair descends, so the presort follows its rearrangement branch.", bundle: .module)
             ) {
               engine.swap(pta + 1, pta + 2)
             } else {
@@ -789,16 +790,16 @@ enum QuadSortingTemplate {
           } else if engine.teachingCompare(
             pta, pta + 3, by: >,
             stageID: "quad.presortDecision",
-            whenTrue: "This pair descends, so the four-item presort follows its rearrangement branch.",
-            whenFalse: "This pair is ordered, so the presort keeps scanning."
+            whenTrue: String(localized: "This pair descends, so the four-item presort follows its rearrangement branch.", bundle: .module),
+            whenFalse: String(localized: "This pair is ordered, so the presort keeps scanning.", bundle: .module)
           ) {
             engine.swap(pta + 1, pta + 3)
             engine.swap(pta, pta + 2)
           } else if engine.teachingCompare(
             pta + 1, pta + 3, by: <=,
             stageID: "quad.presortDecision",
-            whenTrue: "This pair is ordered, so the presort can preserve its relative order.",
-            whenFalse: "This pair descends, so the presort follows its rearrangement branch."
+            whenTrue: String(localized: "This pair is ordered, so the presort can preserve its relative order.", bundle: .module),
+            whenFalse: String(localized: "This pair descends, so the presort follows its rearrangement branch.", bundle: .module)
           ) {
             let temp = engine.readValue(at: pta + 1)
             engine.setValue(pta + 1, engine.readValue(at: pta))
@@ -823,26 +824,26 @@ enum QuadSortingTemplate {
           if engine.teachingCompare(
             pta, pta + 1, by: >,
             stageID: "quad.presortDecision",
-            whenTrue: "This pair descends, so the four-item presort follows its rearrangement branch.",
-            whenFalse: "This pair is ordered, so the presort keeps scanning."
+            whenTrue: String(localized: "This pair descends, so the four-item presort follows its rearrangement branch.", bundle: .module),
+            whenFalse: String(localized: "This pair is ordered, so the presort keeps scanning.", bundle: .module)
           ) {
             if engine.teachingCompare(
               pta + 2, pta + 3, by: >,
               stageID: "quad.presortDecision",
-              whenTrue: "This pair descends, so the four-item presort follows its rearrangement branch.",
-              whenFalse: "This pair is ordered, so the presort keeps scanning."
+              whenTrue: String(localized: "This pair descends, so the four-item presort follows its rearrangement branch.", bundle: .module),
+              whenFalse: String(localized: "This pair is ordered, so the presort keeps scanning.", bundle: .module)
             ) {
               if engine.teachingCompare(
                 pta + 1, pta + 2, by: >,
                 stageID: "quad.presortDecision",
-                whenTrue: "This pair descends, so the four-item presort follows its rearrangement branch.",
-                whenFalse: "This pair is ordered, so the presort keeps scanning."
+                whenTrue: String(localized: "This pair descends, so the four-item presort follows its rearrangement branch.", bundle: .module),
+                whenFalse: String(localized: "This pair is ordered, so the presort keeps scanning.", bundle: .module)
               ) {
                 if engine.teachingCompare(
                   pta - 1, pta, by: >,
                   stageID: "quad.presortDecision",
-                  whenTrue: "This pair descends, so the four-item presort follows its rearrangement branch.",
-                  whenFalse: "This pair is ordered, so the presort keeps scanning."
+                  whenTrue: String(localized: "This pair descends, so the four-item presort follows its rearrangement branch.", bundle: .module),
+                  whenFalse: String(localized: "This pair is ordered, so the presort keeps scanning.", bundle: .module)
                 ) {
                   pta += 4
                   continue innerB
@@ -854,8 +855,8 @@ enum QuadSortingTemplate {
           } else if engine.teachingCompare(
             pta + 2, pta + 3, by: >,
             stageID: "quad.presortDecision",
-            whenTrue: "This pair descends, so the four-item presort follows its rearrangement branch.",
-            whenFalse: "This pair is ordered, so the presort keeps scanning."
+            whenTrue: String(localized: "This pair descends, so the four-item presort follows its rearrangement branch.", bundle: .module),
+            whenFalse: String(localized: "This pair is ordered, so the presort keeps scanning.", bundle: .module)
           ) {
             engine.swap(pta + 2, pta + 3)
           }
@@ -863,20 +864,20 @@ enum QuadSortingTemplate {
           if engine.teachingCompare(
             pta + 1, pta + 2, by: >,
             stageID: "quad.presortDecision",
-            whenTrue: "This pair descends, so the four-item presort follows its rearrangement branch.",
-            whenFalse: "This pair is ordered, so the presort keeps scanning."
+            whenTrue: String(localized: "This pair descends, so the four-item presort follows its rearrangement branch.", bundle: .module),
+            whenFalse: String(localized: "This pair is ordered, so the presort keeps scanning.", bundle: .module)
           ) {
             if engine.teachingCompare(
               pta, pta + 2, by: <=,
               stageID: "quad.presortDecision",
-              whenTrue: "This pair is ordered, so the presort can preserve its relative order.",
-              whenFalse: "This pair descends, so the presort follows its rearrangement branch."
+              whenTrue: String(localized: "This pair is ordered, so the presort can preserve its relative order.", bundle: .module),
+              whenFalse: String(localized: "This pair descends, so the presort follows its rearrangement branch.", bundle: .module)
             ) {
               if engine.teachingCompare(
                 pta + 1, pta + 3, by: <=,
                 stageID: "quad.presortDecision",
-                whenTrue: "This pair is ordered, so the presort can preserve its relative order.",
-                whenFalse: "This pair descends, so the presort follows its rearrangement branch."
+                whenTrue: String(localized: "This pair is ordered, so the presort can preserve its relative order.", bundle: .module),
+                whenFalse: String(localized: "This pair descends, so the presort follows its rearrangement branch.", bundle: .module)
               ) {
                 engine.swap(pta + 1, pta + 2)
               } else {
@@ -888,16 +889,16 @@ enum QuadSortingTemplate {
             } else if engine.teachingCompare(
               pta, pta + 3, by: >,
               stageID: "quad.presortDecision",
-              whenTrue: "This pair descends, so the four-item presort follows its rearrangement branch.",
-              whenFalse: "This pair is ordered, so the presort keeps scanning."
+              whenTrue: String(localized: "This pair descends, so the four-item presort follows its rearrangement branch.", bundle: .module),
+              whenFalse: String(localized: "This pair is ordered, so the presort keeps scanning.", bundle: .module)
             ) {
               engine.swap(pta, pta + 2)
               engine.swap(pta + 1, pta + 3)
             } else if engine.teachingCompare(
               pta + 1, pta + 3, by: <=,
               stageID: "quad.presortDecision",
-              whenTrue: "This pair is ordered, so the presort can preserve its relative order.",
-              whenFalse: "This pair descends, so the presort follows its rearrangement branch."
+              whenTrue: String(localized: "This pair is ordered, so the presort can preserve its relative order.", bundle: .module),
+              whenFalse: String(localized: "This pair descends, so the presort follows its rearrangement branch.", bundle: .module)
             ) {
               let temp = engine.readValue(at: pta)
               engine.setValue(pta, engine.readValue(at: pta + 2))
@@ -912,7 +913,7 @@ enum QuadSortingTemplate {
             }
           }
 
-          engine.teachingReversal(pts, pta - 1, stageID: "quad.reverseRun", explanation: "Reverse the descending presorted run.")
+          engine.teachingReversal(pts, pta - 1, stageID: "quad.reverseRun", explanation: String(localized: "Reverse the descending presorted run.", bundle: .module))
           pta += 4
           continue swapper
         }
@@ -923,28 +924,28 @@ enum QuadSortingTemplate {
             if engine.teachingCompare(
               pta + 1, pta + 2, by: <=,
               stageID: "quad.presortDecision",
-              whenTrue: "This pair is ordered, so the presort can preserve its relative order.",
-              whenFalse: "This pair descends, so the presort follows its rearrangement branch."
+              whenTrue: String(localized: "This pair is ordered, so the presort can preserve its relative order.", bundle: .module),
+              whenFalse: String(localized: "This pair descends, so the presort follows its rearrangement branch.", bundle: .module)
             ) { break }
             fallthrough
           case 2:
             if engine.teachingCompare(
               pta, pta + 1, by: <=,
               stageID: "quad.presortDecision",
-              whenTrue: "This pair is ordered, so the presort can preserve its relative order.",
-              whenFalse: "This pair descends, so the presort follows its rearrangement branch."
+              whenTrue: String(localized: "This pair is ordered, so the presort can preserve its relative order.", bundle: .module),
+              whenFalse: String(localized: "This pair descends, so the presort follows its rearrangement branch.", bundle: .module)
             ) { break }
             fallthrough
           case 1:
             if engine.teachingCompare(
               pta - 1, pta, by: <=,
               stageID: "quad.presortDecision",
-              whenTrue: "This pair is ordered, so the presort can preserve its relative order.",
-              whenFalse: "This pair descends, so the presort follows its rearrangement branch."
+              whenTrue: String(localized: "This pair is ordered, so the presort can preserve its relative order.", bundle: .module),
+              whenFalse: String(localized: "This pair descends, so the presort follows its rearrangement branch.", bundle: .module)
             ) { break }
             fallthrough
           case 0:
-            engine.teachingReversal(pts, pts + nmemb - 1, stageID: "quad.reverseWholeRun", explanation: "The entire range descends, so reversing it completes the sort.")
+            engine.teachingReversal(pts, pts + nmemb - 1, stageID: "quad.reverseWholeRun", explanation: String(localized: "The entire range descends, so reversing it completes the sort.", bundle: .module))
             engine.deleteAuxArray(swapHandle)
             return 1
           default:
@@ -952,7 +953,7 @@ enum QuadSortingTemplate {
           }
         }
 
-        engine.teachingReversal(pts, pta - 1, stageID: "quad.reverseRun", explanation: "Reverse the descending presorted run.")
+        engine.teachingReversal(pts, pta - 1, stageID: "quad.reverseRun", explanation: String(localized: "Reverse the descending presorted run.", bundle: .module))
         break swapper
       }
     }

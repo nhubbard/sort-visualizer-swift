@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -23,7 +24,7 @@ import SortEngineKit
 public struct YujisBufferedMergeSort2: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "yujisbufferedmergesort2")
   public let metadata = AlgorithmMetadata(
-    displayName: "Yuji's Buffered Merge Sort 2",
+    displayName: String(localized: "Yuji's Buffered Merge Sort 2", bundle: .module),
     category: .hybrid,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -90,15 +91,15 @@ public struct YujisBufferedMergeSort2: SortAlgorithm {
           comp = engine.teachingCompareValue(
             m, against: value, by: (>=),
             stageID: "YujisBufferedMergeSort2.merge.boundary",
-            whenTrue: "This run value crosses the held value, narrowing the insertion boundary leftward.",
-            whenFalse: "This run value stays on the near side, so the boundary search advances."
+            whenTrue: String(localized: "This run value crosses the held value, narrowing the insertion boundary leftward.", bundle: .module),
+            whenFalse: String(localized: "This run value stays on the near side, so the boundary search advances.", bundle: .module)
           )
         } else {
           comp = engine.teachingCompareValue(
             m, against: value, by: (>),
             stageID: "YujisBufferedMergeSort2.merge.boundaryRight",
-            whenTrue: "This run value exceeds the held value, so the right boundary narrows leftward.",
-            whenFalse: "This run value does not exceed the held value, so the right boundary advances."
+            whenTrue: String(localized: "This run value exceeds the held value, so the right boundary narrows leftward.", bundle: .module),
+            whenFalse: String(localized: "This run value does not exceed the held value, so the right boundary advances.", bundle: .module)
           )
         }
         if comp {

@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -19,7 +20,7 @@ import SortEngineKit
 public struct PatienceSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "patiencesort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Patience Sort",
+    displayName: String(localized: "Patience Sort", bundle: .module),
     category: .insertion,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -60,8 +61,8 @@ public struct PatienceSort: SortAlgorithm {
             storage[parent].top, storage[i].top,
             by: (<=),
             stageID: "PatienceSort.pileOrder",
-            whenTrue: "The parent pile top is no larger, so heap order holds.",
-            whenFalse: "The child pile top is smaller, so restore heap order."
+            whenTrue: String(localized: "The parent pile top is no larger, so heap order holds.", bundle: .module),
+            whenFalse: String(localized: "The child pile top is smaller, so restore heap order.", bundle: .module)
           ) { break }
           storage.swapAt(parent, i)
           i = parent
@@ -80,16 +81,16 @@ public struct PatienceSort: SortAlgorithm {
           if left < storage.count, engine.teachingCompareValues(
             storage[left].top, storage[smallest].top, by: <,
             stageID: "PatienceSort.extractLeftPile",
-            whenTrue: "The left pile top is smaller, so select it for the next output value.",
-            whenFalse: "The current pile top remains the smaller extraction candidate."
+            whenTrue: String(localized: "The left pile top is smaller, so select it for the next output value.", bundle: .module),
+            whenFalse: String(localized: "The current pile top remains the smaller extraction candidate.", bundle: .module)
           ) {
             smallest = left
           }
           if right < storage.count, engine.teachingCompareValues(
             storage[right].top, storage[smallest].top, by: <,
             stageID: "PatienceSort.extractRightPile",
-            whenTrue: "The right pile top is smaller, so select it for the next output value.",
-            whenFalse: "The current pile top remains the smaller extraction candidate."
+            whenTrue: String(localized: "The right pile top is smaller, so select it for the next output value.", bundle: .module),
+            whenFalse: String(localized: "The current pile top remains the smaller extraction candidate.", bundle: .module)
           ) {
             smallest = right
           }
@@ -112,8 +113,8 @@ public struct PatienceSort: SortAlgorithm {
         let mid = (lo + hi) / 2
         if engine.teachingCompareValues(
           tops[mid], x, by: >=, stageID: "PatienceSort.choosePile",
-          whenTrue: "This pile top is at least the new value, so search earlier eligible piles.",
-          whenFalse: "This pile top is smaller, so search later piles."
+          whenTrue: String(localized: "This pile top is at least the new value, so search earlier eligible piles.", bundle: .module),
+          whenFalse: String(localized: "This pile top is smaller, so search later piles.", bundle: .module)
         ) {
           hi = mid
         } else {
@@ -143,7 +144,7 @@ public struct PatienceSort: SortAlgorithm {
           stageID: "PatienceSort.emitPileTop", outcome: "placed",
           roles: ["output": .arrayIndex(c), "pileTop": .value(value)],
           explanationKey: "PatienceSort.emitPileTop",
-          explanation: "Write the smallest remaining pile top into the next sorted output slot.")
+          explanation: String(localized: "Write the smallest remaining pile top into the next sorted output slot.", bundle: .module))
       }
       if let newTop = piles[entry.pileIndex].last {
         heap.push(&engine, HeapEntry(top: newTop, pileIndex: entry.pileIndex))

@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -6,7 +7,7 @@ import SortEngineKit
 /// once, nested inside the reversal of every range that contains it.
 public struct RecursiveReversalShuffle: ShuffleAlgorithm {
   public let id = ShuffleID(rawValue: "recursivereversal")
-  public let metadata = ShuffleMetadata(displayName: "Recursive Reversal")
+  public let metadata = ShuffleMetadata(displayName: String(localized: "Recursive Reversal", bundle: .module))
   public init() {}
   public func record(into engine: inout RecordingEngine) {
     reversalRec(&engine, a: 0, b: engine.count)

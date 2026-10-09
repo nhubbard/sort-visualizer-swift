@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -6,7 +7,7 @@ import SortEngineKit
 /// offsets 0, 1, 2, 3, concatenated in that order.
 public struct SawtoothShuffle: ShuffleAlgorithm {
   public let id = ShuffleID(rawValue: "sawtooth")
-  public let metadata = ShuffleMetadata(displayName: "Sawtooth")
+  public let metadata = ShuffleMetadata(displayName: String(localized: "Sawtooth", bundle: .module))
   public init() {}
   public func record(into engine: inout RecordingEngine) {
     let n = engine.count

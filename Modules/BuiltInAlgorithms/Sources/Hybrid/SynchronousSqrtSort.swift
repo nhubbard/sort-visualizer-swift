@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -26,7 +27,7 @@ import SortEngineKit
 public struct SynchronousSqrtSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "synchronoussqrtsort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Synchronous Sqrt Sort",
+    displayName: String(localized: "Synchronous Sqrt Sort", bundle: .module),
     category: .hybrid,
     sizeRange: 16...1780,
     growthModel: OperationGrowthModel(
@@ -92,14 +93,14 @@ private final class SynchronousSqrtRecorder: BlockMergeSortingTemplate {
         ? engine.teachingCompare(
           left, right, by: (>=),
           stageID: "SynchronousSqrtSort.merge.chooseReversed",
-          whenTrue: "The left item is at least the right, so the reversed merge takes it next.",
-          whenFalse: "The right item is larger, so the reversed merge takes it next."
+          whenTrue: String(localized: "The left item is at least the right, so the reversed merge takes it next.", bundle: .module),
+          whenFalse: String(localized: "The right item is larger, so the reversed merge takes it next.", bundle: .module)
         )
         : engine.teachingCompare(
           left, right, by: (>),
           stageID: "SynchronousSqrtSort.merge.choose",
-          whenTrue: "The left item is larger, so the backward merge takes it next.",
-          whenFalse: "The right item is at least as large, so the backward merge takes it next."
+          whenTrue: String(localized: "The left item is larger, so the backward merge takes it next.", bundle: .module),
+          whenFalse: String(localized: "The right item is at least as large, so the backward merge takes it next.", bundle: .module)
         )
       output -= 1
       if takeLeft {
@@ -129,8 +130,8 @@ private final class SynchronousSqrtRecorder: BlockMergeSortingTemplate {
         if candidate != vacant {
           let order = engine.teachingCompare(
             candidate, minimum, by: (<), stageID: "synchronousSqrt.blockMinimum",
-            whenTrue: "This block leader is smaller, so it becomes the next selected block.",
-            whenFalse: "This block leader is not smaller, so the selected block remains.")
+            whenTrue: String(localized: "This block leader is smaller, so it becomes the next selected block.", bundle: .module),
+            whenFalse: String(localized: "This block leader is not smaller, so the selected block remains.", bundle: .module))
           let equal = !order && engine.compare(candidate, minimum, by: (==))
           if order || (equal && readTag(tagStart + (candidate - start) / blockLength) < readTag(tagStart + (minimum - start) / blockLength)) {
             minimum = candidate
@@ -266,8 +267,8 @@ private final class SynchronousSqrtRecorder: BlockMergeSortingTemplate {
       let prefixValue = readPrefix(left)
       if engine.teachingCompareValue(
         right, against: prefixValue, by: (>=), stageID: "synchronousSqrt.finalMerge",
-        whenTrue: "The main run value is at least the prefix value, so final merge takes the prefix.",
-        whenFalse: "The main run value is smaller, so final merge takes it first.") {
+        whenTrue: String(localized: "The main run value is at least the prefix value, so final merge takes the prefix.", bundle: .module),
+        whenFalse: String(localized: "The main run value is smaller, so final merge takes it first.", bundle: .module)) {
         engine.setValue(output, prefixValue)
         left += 1
       } else {

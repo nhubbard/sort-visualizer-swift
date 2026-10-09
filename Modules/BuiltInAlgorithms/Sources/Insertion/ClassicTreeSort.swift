@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -19,7 +20,7 @@ import SortEngineKit
 public struct ClassicTreeSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "classictreesort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Classic Tree Sort",
+    displayName: String(localized: "Classic Tree Sort", bundle: .module),
     category: .insertion,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -58,8 +59,8 @@ public struct ClassicTreeSort: SortAlgorithm {
           i, c,
           by: <,
           stageID: "ClassicTreeSort.treeBranch",
-          whenTrue: "The inserted value is smaller, so descend into the left tree branch.",
-          whenFalse: "The inserted value belongs in the right tree branch."
+          whenTrue: String(localized: "The inserted value is smaller, so descend into the left tree branch.", bundle: .module),
+          whenFalse: String(localized: "The inserted value belongs in the right tree branch.", bundle: .module)
         )
         if goLower {
           if lower[c] == 0 {

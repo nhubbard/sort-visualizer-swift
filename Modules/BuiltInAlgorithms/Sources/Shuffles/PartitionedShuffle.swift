@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -7,7 +8,7 @@ import SortEngineKit
 /// neither half is internally ordered anymore.
 public struct PartitionedShuffle: ShuffleAlgorithm {
   public let id = ShuffleID(rawValue: "partitioned")
-  public let metadata = ShuffleMetadata(displayName: "Partitioned")
+  public let metadata = ShuffleMetadata(displayName: String(localized: "Partitioned", bundle: .module))
   public init() {}
   public func record(into engine: inout RecordingEngine) {
     let n = engine.count

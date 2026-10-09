@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -17,7 +18,7 @@ import SortEngineKit
 public struct AATreeSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "aatreesort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Tree Sort (AA Balanced)",
+    displayName: String(localized: "Tree Sort (AA Balanced)", bundle: .module),
     category: .insertion,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -70,8 +71,8 @@ public struct AATreeSort: SortAlgorithm {
         addPointer, node.pointer,
         by: <,
         stageID: "AATreeSort.treeBranch",
-        whenTrue: "The inserted value is smaller, so descend into the left AA-tree branch.",
-        whenFalse: "The inserted value belongs in the other AA-tree branch."
+        whenTrue: String(localized: "The inserted value is smaller, so descend into the left AA-tree branch.", bundle: .module),
+        whenFalse: String(localized: "The inserted value belongs in the other AA-tree branch.", bundle: .module)
       ) {
         node.left = add(node.left, addPointer)
         if level(node.left) == node.level {

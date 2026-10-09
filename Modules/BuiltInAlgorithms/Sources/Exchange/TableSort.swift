@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -24,7 +25,7 @@ import SortEngineKit
 public struct TableSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "tablesort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Table Sort",
+    displayName: String(localized: "Table Sort", bundle: .module),
     category: .exchange,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -64,8 +65,8 @@ public struct TableSort: SortAlgorithm {
         ta, tb,
         by: >,
         stageID: "TableSort.tableOrder",
-        whenTrue: "The first indexed value is greater, so the stable table comparison ranks it later.",
-        whenFalse: "The first indexed value is no greater; a tie falls back to original index order."
+        whenTrue: String(localized: "The first indexed value is greater, so the stable table comparison ranks it later.", bundle: .module),
+        whenFalse: String(localized: "The first indexed value is no greater; a tie falls back to original index order.", bundle: .module)
       ) { return true }
       return engine.readValue(at: ta) == engine.readValue(at: tb) && table[a] > table[b]
     }

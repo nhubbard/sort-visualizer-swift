@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -28,7 +29,7 @@ import SortEngineKit
 public struct AmericanFlagSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "americanflagsort")
   public let metadata = AlgorithmMetadata(
-    displayName: "American Flag Sort",
+    displayName: String(localized: "American Flag Sort", bundle: .module),
     category: .distribution,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -70,7 +71,7 @@ public struct AmericanFlagSort: SortAlgorithm {
           outcome: "update",
           roles: ["scratch": .auxiliaryIndex(handle: countHandle.rawValue, index: digit)],
           explanationKey: "americanflagsort.scratchUpdate",
-          explanation: "Update this digit bucket’s count or next free offset before placing the next value.")
+          explanation: String(localized: "Update this digit bucket’s count or next free offset before placing the next value.", bundle: .module))
       }
 
       offset[0] = start
@@ -80,7 +81,7 @@ public struct AmericanFlagSort: SortAlgorithm {
         outcome: "update",
         roles: ["scratch": .auxiliaryIndex(handle: offsetHandle.rawValue, index: 0)],
         explanationKey: "americanflagsort.scratchUpdate",
-        explanation: "Update this digit bucket’s count or next free offset before placing the next value.")
+        explanation: String(localized: "Update this digit bucket’s count or next free offset before placing the next value.", bundle: .module))
       for i in 1..<radix {
         offset[i] = count[i - 1] + offset[i - 1]
         engine.writeAux(offsetHandle, at: i, value: offset[i])
@@ -89,7 +90,7 @@ public struct AmericanFlagSort: SortAlgorithm {
           outcome: "update",
           roles: ["scratch": .auxiliaryIndex(handle: offsetHandle.rawValue, index: i)],
           explanationKey: "americanflagsort.scratchUpdate",
-          explanation: "Update this digit bucket’s count or next free offset before placing the next value.")
+          explanation: String(localized: "Update this digit bucket’s count or next free offset before placing the next value.", bundle: .module))
       }
 
       for b in 0..<radix {
@@ -107,7 +108,7 @@ public struct AmericanFlagSort: SortAlgorithm {
               outcome: "update",
               roles: ["scratch": .auxiliaryIndex(handle: offsetHandle.rawValue, index: digit)],
               explanationKey: "americanflagsort.scratchUpdate",
-              explanation: "Update this digit bucket’s count or next free offset before placing the next value.")
+              explanation: String(localized: "Update this digit bucket’s count or next free offset before placing the next value.", bundle: .module))
             count[digit] -= 1
             engine.writeAux(countHandle, at: digit, value: count[digit])
             engine.annotateLastOperation(
@@ -115,7 +116,7 @@ public struct AmericanFlagSort: SortAlgorithm {
               outcome: "update",
               roles: ["scratch": .auxiliaryIndex(handle: countHandle.rawValue, index: digit)],
               explanationKey: "americanflagsort.scratchUpdate",
-              explanation: "Update this digit bucket’s count or next free offset before placing the next value.")
+              explanation: String(localized: "Update this digit bucket’s count or next free offset before placing the next value.", bundle: .module))
 
             let displaced = engine.readValue(at: to)
             engine.setValue(to, num)
@@ -123,7 +124,7 @@ public struct AmericanFlagSort: SortAlgorithm {
               stageID: "bucketPlacement", decisionID: "americanflagsort.bucketPlacement",
               outcome: "place", roles: ["destination": .arrayIndex(to)],
               explanationKey: "americanflagsort.bucketPlacement",
-              explanation: "Digit \(digit) selects this bucket position for the held value, displacing its previous occupant.")
+              explanation: String(localized: "Digit \(digit) selects this bucket position for the held value, displacing its previous occupant.", bundle: .module))
             num = displaced
             from = to
           } while from != origin
@@ -154,8 +155,8 @@ public struct AmericanFlagSort: SortAlgorithm {
         roles: ["candidate": .arrayIndex(i), "maximum": .value(maxValue)],
         explanationKey: "americanflagsort.maximum",
         explanation: newMaximum
-          ? "This value raises the most significant digit place to process."
-          : "This value fits within the digit places already required.")
+          ? String(localized: "This value raises the most significant digit place to process.", bundle: .module)
+          : String(localized: "This value fits within the digit places already required.", bundle: .module))
       maxValue = max(maxValue, candidate)
     }
     var numberOfDigits = 1

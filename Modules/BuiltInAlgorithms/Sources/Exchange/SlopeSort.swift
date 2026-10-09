@@ -1,10 +1,11 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
 public struct SlopeSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "slopesort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Slope Sort",
+    displayName: String(localized: "Slope Sort", bundle: .module),
     category: .exchange,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -38,8 +39,8 @@ public struct SlopeSort: SortAlgorithm {
           i, k,
           by: (<),
           stageID: "SlopeSort.candidateOrder",
-          whenTrue: "This candidate is smaller, so move it toward its sorted slope.",
-          whenFalse: "This candidate does not precede the current slope item."
+          whenTrue: String(localized: "This candidate is smaller, so move it toward its sorted slope.", bundle: .module),
+          whenFalse: String(localized: "This candidate does not precede the current slope item.", bundle: .module)
         ) {
           engine.swap(i, k)
         }

@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -15,7 +16,7 @@ public struct SlowSort: SortAlgorithm {
   /// Stable: `false` — the recursive "tournament of maxima" shuffles equal-valued elements past
   /// each other before the final strict `>` compare ever sees them.
   public let metadata = AlgorithmMetadata(
-    displayName: "Slow Sort",
+    displayName: String(localized: "Slow Sort", bundle: .module),
     category: .exchange,
     sizeRange: 16...64,
     growthModel: OperationGrowthModel(
@@ -51,8 +52,8 @@ public struct SlowSort: SortAlgorithm {
       m, j,
       by: (>),
       stageID: "SlowSort.halfMaximum",
-      whenTrue: "The left half maximum is larger, so exchange it with the range end.",
-      whenFalse: "The range end already holds the larger candidate."
+      whenTrue: String(localized: "The left half maximum is larger, so exchange it with the range end.", bundle: .module),
+      whenFalse: String(localized: "The range end already holds the larger candidate.", bundle: .module)
     ) {
       engine.swap(m, j)
     }

@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -20,7 +21,7 @@ import SortEngineKit
 public struct PDMergeSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "pdmergesort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Pattern-Defeating Merge Sort",
+    displayName: String(localized: "Pattern-Defeating Merge Sort", bundle: .module),
     category: .merge,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -65,8 +66,8 @@ public struct PDMergeSort: SortAlgorithm {
         if engine.teachingCompareValue(
           right, against: copied[bufferPointer], by: (>=),
           stageID: "PDMergeSort.merge.choose",
-          whenTrue: "The main-array item is at least the buffered item, so the merge writes the buffered value.",
-          whenFalse: "The main-array item is smaller, so the merge keeps it ahead of the buffered value."
+          whenTrue: String(localized: "The main-array item is at least the buffered item, so the merge writes the buffered value.", bundle: .module),
+          whenFalse: String(localized: "The main-array item is smaller, so the merge keeps it ahead of the buffered value.", bundle: .module)
         ) {
           engine.setValue(left, copied[bufferPointer])
           bufferPointer += 1
@@ -126,14 +127,14 @@ public struct PDMergeSort: SortAlgorithm {
       var index = indexIn
       let ascending = engine.teachingCompare(
         index, index + 1, by: (<=), stageID: "pdMerge.runDirection",
-        whenTrue: "This pair begins an ascending run, so run detection scans forward.",
-        whenFalse: "This pair begins a descending run, so run detection will reverse it.")
+        whenTrue: String(localized: "This pair begins an ascending run, so run detection scans forward.", bundle: .module),
+        whenFalse: String(localized: "This pair begins a descending run, so run detection will reverse it.", bundle: .module))
       index += 1
       while index < maxIndex {
         let stepAscending = engine.teachingCompare(
           index, index + 1, by: (<=), stageID: "pdMerge.runScan",
-          whenTrue: "This pair ascends, so it can extend an ascending run.",
-          whenFalse: "This pair descends, so it can extend a descending run.")
+          whenTrue: String(localized: "This pair ascends, so it can extend an ascending run.", bundle: .module),
+          whenFalse: String(localized: "This pair descends, so it can extend a descending run.", bundle: .module))
         if stepAscending != ascending { break }
         index += 1
       }
@@ -143,7 +144,7 @@ public struct PDMergeSort: SortAlgorithm {
           stageID: "pdMerge.reverseRun", decisionID: "pdMerge.reverseRun", outcome: "reversed",
           roles: ["first": .arrayIndex(startIndex), "last": .arrayIndex(index)],
           explanationKey: "pdMerge.reverseRun",
-          explanation: "This descending run reverses into ascending order before merging.")
+          explanation: String(localized: "This descending run reverses into ascending order before merging.", bundle: .module))
       }
       return index >= maxIndex ? -1 : index + 1
     }

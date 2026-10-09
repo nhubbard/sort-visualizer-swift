@@ -1,10 +1,11 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
 public struct SmartBogoBogoSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "smartbogobogosort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Smart Bogo Bogo Sort",
+    displayName: String(localized: "Smart Bogo Bogo Sort", bundle: .module),
     category: .impractical,
     sizeRange: 4...8,
     growthModel: OperationGrowthModel(
@@ -69,7 +70,7 @@ public struct SmartBogoBogoSort: SortAlgorithm {
           stageID: "candidateExchange", decisionID: "smartbogobogosort.candidateExchange",
           outcome: "exchange", roles: ["left": .arrayIndex(candidate), "right": .arrayIndex(length - 1)],
           explanationKey: "smartbogobogosort.candidateExchange",
-          explanation: "The last value is still smaller than the sorted prefix’s maximum, so try another candidate in the last slot.")
+          explanation: String(localized: "The last value is still smaller than the sorted prefix’s maximum, so try another candidate in the last slot.", bundle: .module))
         candidate += 1
         smartBogoBogo(length - 1)
       }

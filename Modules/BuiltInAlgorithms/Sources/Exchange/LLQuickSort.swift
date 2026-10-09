@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -10,7 +11,7 @@ import SortEngineKit
 public struct LLQuickSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "llquicksort")
   public let metadata = AlgorithmMetadata(
-    displayName: "LL Quick Sort",
+    displayName: String(localized: "LL Quick Sort", bundle: .module),
     category: .exchange,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -47,8 +48,8 @@ public struct LLQuickSort: SortAlgorithm {
         j, against: pivot,
         by: (<),
         stageID: "LLQuickSort.pivotSide",
-        whenTrue: "This item is less than the pivot, so move it into the left partition.",
-        whenFalse: "This item stays on or to the right of the pivot."
+        whenTrue: String(localized: "This item is less than the pivot, so move it into the left partition.", bundle: .module),
+        whenFalse: String(localized: "This item stays on or to the right of the pivot.", bundle: .module)
       ) {
         engine.swap(i, j)
         i += 1

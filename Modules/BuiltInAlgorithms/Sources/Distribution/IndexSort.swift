@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -13,7 +14,7 @@ import SortEngineKit
 public struct IndexSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "indexsort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Index Sort",
+    displayName: String(localized: "Index Sort", bundle: .module),
     category: .distribution,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -44,8 +45,8 @@ public struct IndexSort: SortAlgorithm {
         roles: ["candidate": .arrayIndex(i), "minimum": .value(minValue)],
         explanationKey: "indexsort.minimumScan",
         explanation: newMinimum
-          ? "This value is lower than the current minimum, so use it as the index offset."
-          : "The current minimum remains the offset for index placement.")
+          ? String(localized: "This value is lower than the current minimum, so use it as the index offset.", bundle: .module)
+          : String(localized: "The current minimum remains the offset for index placement.", bundle: .module))
       if newMinimum { minValue = engine.readValue(at: i) }
     }
 
@@ -58,7 +59,7 @@ public struct IndexSort: SortAlgorithm {
           stageID: "bucketExchange", decisionID: "indexsort.bucketExchange",
           outcome: "exchange", roles: ["left": .arrayIndex(i), "right": .arrayIndex(target)],
           explanationKey: "indexsort.bucketExchange",
-          explanation: "The value’s offset from the minimum identifies index \(target), so exchange it into place.")
+          explanation: String(localized: "The value’s offset from the minimum identifies index \(target), so exchange it into place.", bundle: .module))
         cmpCount += 1
       }
       if cmpCount >= n - 1 { break }

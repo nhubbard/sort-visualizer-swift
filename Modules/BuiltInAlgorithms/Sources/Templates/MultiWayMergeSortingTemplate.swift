@@ -1,3 +1,4 @@
+import Foundation
 import SortEngineKit
 
 /*
@@ -31,8 +32,8 @@ enum MultiWayMergeSortingTemplate {
       comparison = left < right ? -1 : (left > right ? 1 : 0)
       return comparison < 0
     }, stageID: "multiway.runChoice",
-      whenTrue: "The first run candidate wins this ordering comparison, so the multiway merge favors it.",
-      whenFalse: "The first candidate is not smaller; equal keys use run order to decide.")
+      whenTrue: String(localized: "The first run candidate wins this ordering comparison, so the multiway merge favors it.", bundle: .module),
+      whenFalse: String(localized: "The first candidate is not smaller; equal keys use run order to decide.", bundle: .module))
     return comparison < 0 || (comparison == 0 && a < b)
   }
 

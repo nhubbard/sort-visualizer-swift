@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -12,7 +13,7 @@ import SortEngineKit
 /// rather than to sort.
 public struct GrailsortAdversaryShuffle: ShuffleAlgorithm {
   public let id = ShuffleID(rawValue: "grailbad")
-  public let metadata = ShuffleMetadata(displayName: "Grailsort Adversary")
+  public let metadata = ShuffleMetadata(displayName: String(localized: "Grailsort Adversary", bundle: .module))
   public init() {}
 
   public func record(into engine: inout RecordingEngine) {

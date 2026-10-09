@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -21,7 +22,7 @@ import SortEngineKit
 public struct ClassicTournamentSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "classictournamentsort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Classic Tournament Sort",
+    displayName: String(localized: "Classic Tournament Sort", bundle: .module),
     category: .selection,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -68,8 +69,8 @@ public struct ClassicTournamentSort: SortAlgorithm {
         tree[a], tree[b],
         by: <=,
         stageID: "ClassicTournamentSort.matchWinner",
-        whenTrue: "The first contestant is no larger, so it advances in the tournament.",
-        whenFalse: "The second contestant advances in the tournament."
+        whenTrue: String(localized: "The first contestant is no larger, so it advances in the tournament.", bundle: .module),
+        whenFalse: String(localized: "The second contestant advances in the tournament.", bundle: .module)
       )
     }
 

@@ -1,9 +1,10 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
 public struct DescendingShuffle: ShuffleAlgorithm {
   public let id = ShuffleID(rawValue: "descending")
-  public let metadata = ShuffleMetadata(displayName: "Descending")
+  public let metadata = ShuffleMetadata(displayName: String(localized: "Descending", bundle: .module))
   public init() {}
   public func record(into engine: inout RecordingEngine) {
     let n = engine.count

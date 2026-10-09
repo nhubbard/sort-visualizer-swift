@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -6,7 +7,7 @@ import SortEngineKit
 /// a bottom-up merge would need to fully re-interleave two runs back together.
 public struct FinalMergeShuffle: ShuffleAlgorithm {
   public let id = ShuffleID(rawValue: "finalmerge")
-  public let metadata = ShuffleMetadata(displayName: "Final Merge Pass")
+  public let metadata = ShuffleMetadata(displayName: String(localized: "Final Merge Pass", bundle: .module))
   public init() {}
   public func record(into engine: inout RecordingEngine) {
     let n = engine.count

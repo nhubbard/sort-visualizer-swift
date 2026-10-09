@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -11,7 +12,7 @@ import SortEngineKit
 public struct OptimizedGnomeSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "optimizedgnomesort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Optimized Gnome Sort",
+    displayName: String(localized: "Optimized Gnome Sort", bundle: .module),
     category: .exchange,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -39,8 +40,8 @@ public struct OptimizedGnomeSort: SortAlgorithm {
         pos - 1, pos,
         by: (>),
         stageID: "OptimizedGnomeSort.backtrack",
-        whenTrue: "The previous item is larger, so swap and backtrack.",
-        whenFalse: "The current item has reached its ordered position."
+        whenTrue: String(localized: "The previous item is larger, so swap and backtrack.", bundle: .module),
+        whenFalse: String(localized: "The current item has reached its ordered position.", bundle: .module)
       ) {
         engine.swap(pos - 1, pos)
         pos -= 1

@@ -5,7 +5,7 @@ import SortEngineKit
 public struct MergeExchangeSortIterative: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "mergeexchangesortiterative")
   public let metadata = AlgorithmMetadata(
-    displayName: "Iterative Merge-Exchange Sort",
+    displayName: String(localized: "Iterative Merge-Exchange Sort", bundle: .module),
     category: .concurrent,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -45,8 +45,8 @@ public struct MergeExchangeSortIterative: SortAlgorithm {
               roles: ["left": .arrayIndex(i + d), "right": .arrayIndex(i)],
               explanationKey: "mergeexchangesortiterative.compareExchange",
               explanation: shouldSwap
-                ? "This network pair is out of order, so exchange the values."
-                : "This network pair is in order, so keep the values.")
+                ? String(localized: "This network pair is out of order, so exchange the values.", bundle: .module)
+                : String(localized: "This network pair is in order, so keep the values.", bundle: .module))
             if shouldSwap {
               engine.swap(i, i + d)
             }

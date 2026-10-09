@@ -1,10 +1,11 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
 public struct WeakHeapSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "weakheapsort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Weak Heap Sort",
+    displayName: String(localized: "Weak Heap Sort", bundle: .module),
     category: .selection,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -37,8 +38,8 @@ public struct WeakHeapSort: SortAlgorithm {
         i, j,
         by: (<),
         stageID: "WeakHeapSort.weakHeapOrder",
-        whenTrue: "The first node is smaller, so exchange it to restore weak-heap order.",
-        whenFalse: "The weak-heap pair keeps its order."
+        whenTrue: String(localized: "The first node is smaller, so exchange it to restore weak-heap order.", bundle: .module),
+        whenFalse: String(localized: "The weak-heap pair keeps its order.", bundle: .module)
       ) {
         flags[j].toggle()
         engine.swap(i, j)

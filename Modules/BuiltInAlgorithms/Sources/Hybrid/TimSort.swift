@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -23,7 +24,7 @@ import SortEngineKit
 public struct TimSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "timsort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Tim Sort",
+    displayName: String(localized: "Tim Sort", bundle: .module),
     category: .hybrid,
     sizeRange: 16...1514,
     growthModel: OperationGrowthModel(
@@ -127,24 +128,24 @@ private final class TimSortRecorder {
     if engine.teachingCompare(
       start + 1, start, by: (<),
       stageID: "TimSort.run.direction",
-      whenTrue: "The run begins in descending order, so TimSort scans and reverses it.",
-      whenFalse: "The run begins in nondecreasing order, so TimSort extends it forward."
+      whenTrue: String(localized: "The run begins in descending order, so TimSort scans and reverses it.", bundle: .module),
+      whenFalse: String(localized: "The run begins in nondecreasing order, so TimSort extends it forward.", bundle: .module)
     ) {
       while cursor < end && engine.teachingCompare(
         cursor, cursor - 1, by: (<),
         stageID: "TimSort.run.descending",
-        whenTrue: "The run keeps descending, so extend it before reversing.",
-        whenFalse: "The descending run ends here."
+        whenTrue: String(localized: "The run keeps descending, so extend it before reversing.", bundle: .module),
+        whenFalse: String(localized: "The descending run ends here.", bundle: .module)
       ) { cursor += 1 }
       engine.teachingReversal(start, cursor - 1,
         stageID: "TimSort.run.reverse",
-        explanation: "Reverse the descending run to make it ascending.")
+        explanation: String(localized: "Reverse the descending run to make it ascending.", bundle: .module))
     } else {
       while cursor < end && engine.teachingCompare(
         cursor, cursor - 1, by: (>=),
         stageID: "TimSort.run.ascending",
-        whenTrue: "The run keeps ascending, so extend it.",
-        whenFalse: "The ascending run ends here."
+        whenTrue: String(localized: "The run keeps ascending, so extend it.", bundle: .module),
+        whenFalse: String(localized: "The ascending run ends here.", bundle: .module)
       ) { cursor += 1 }
     }
     return cursor - start
@@ -161,8 +162,8 @@ private final class TimSortRecorder {
         if engine.teachingCompareValue(
           middle, against: pivot, by: (<=),
           stageID: "TimSort.run.extend",
-          whenTrue: "The prefix value is no greater than the held value, so search right.",
-          whenFalse: "The prefix value is larger, so search left for insertion."
+          whenTrue: String(localized: "The prefix value is no greater than the held value, so search right.", bundle: .module),
+          whenFalse: String(localized: "The prefix value is larger, so search left for insertion.", bundle: .module)
         ) { low = middle + 1 }
         else { high = middle }
       }
@@ -215,8 +216,8 @@ private final class TimSortRecorder {
       return engine.teachingCompareValues(
         value, key, by: upper ? (<=) : (<),
         stageID: "TimSort.merge.gallop",
-        whenTrue: "This run value belongs before the insertion boundary, so continue galloping.",
-        whenFalse: "This run value reaches the insertion boundary, so stop the gallop."
+        whenTrue: String(localized: "This run value belongs before the insertion boundary, so continue galloping.", bundle: .module),
+        whenFalse: String(localized: "This run value reaches the insertion boundary, so stop the gallop.", bundle: .module)
       )
     }
     var low: Int
@@ -295,8 +296,8 @@ private final class TimSortRecorder {
       if engine.teachingCompareValues(
         engine.readValue(at: right), load(left), by: (<),
         stageID: "TimSort.merge.lowChoice",
-        whenTrue: "The right run has the smaller value, so write it next.",
-        whenFalse: "The left run wins or ties, so write its value next."
+        whenTrue: String(localized: "The right run has the smaller value, so write it next.", bundle: .module),
+        whenFalse: String(localized: "The left run wins or ties, so write its value next.", bundle: .module)
       ) {
         engine.setValue(destination, engine.readValue(at: right))
         right += 1
@@ -360,8 +361,8 @@ private final class TimSortRecorder {
       if engine.teachingCompareValues(
         load(right), engine.readValue(at: left), by: (<),
         stageID: "TimSort.merge.highChoice",
-        whenTrue: "The left run has the larger value, so write it at the high end.",
-        whenFalse: "The right run wins or ties, so write it at the high end."
+        whenTrue: String(localized: "The left run has the larger value, so write it at the high end.", bundle: .module),
+        whenFalse: String(localized: "The right run wins or ties, so write it at the high end.", bundle: .module)
       ) {
         engine.setValue(destination, engine.readValue(at: left))
         left -= 1

@@ -1,10 +1,11 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
 public struct CircleSortIterative: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "circlesortiterative")
   public let metadata = AlgorithmMetadata(
-    displayName: "Circle Sort (Iterative)",
+    displayName: String(localized: "Circle Sort (Iterative)", bundle: .module),
     category: .exchange,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -55,8 +56,8 @@ public struct CircleSortIterative: SortAlgorithm {
                 low, high,
                 by: (>),
                 stageID: "CircleSortIterative.oppositeEnds",
-                whenTrue: "The left endpoint is larger, so exchange the pair across the circle.",
-                whenFalse: "The opposite endpoints are already ordered."
+                whenTrue: String(localized: "The left endpoint is larger, so exchange the pair across the circle.", bundle: .module),
+                whenFalse: String(localized: "The opposite endpoints are already ordered.", bundle: .module)
               ) {
                 engine.swap(low, high)
                 swapCount += 1

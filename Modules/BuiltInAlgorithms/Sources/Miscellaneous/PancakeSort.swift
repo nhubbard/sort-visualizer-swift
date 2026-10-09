@@ -1,10 +1,11 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
 public struct PancakeSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "pancakesort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Pancake Sort",
+    displayName: String(localized: "Pancake Sort", bundle: .module),
     category: .miscellaneous,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -33,8 +34,8 @@ public struct PancakeSort: SortAlgorithm {
         if !engine.teachingCompare(
           maxIndex, i,
           stageID: "PancakeSort.prefix.maximum",
-          whenTrue: "The current maximum is below this candidate, so Pancake Sort selects the candidate.",
-          whenFalse: "The current maximum is at least this candidate, so its selection remains."
+          whenTrue: String(localized: "The current maximum is below this candidate, so Pancake Sort selects the candidate.", bundle: .module),
+          whenFalse: String(localized: "The current maximum is at least this candidate, so its selection remains.", bundle: .module)
         ) {
           maxIndex = i
         }

@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -7,7 +8,7 @@ import SortEngineKit
 /// carried aside and reinserted once every other element has shifted.
 public struct HalfRotationShuffle: ShuffleAlgorithm {
   public let id = ShuffleID(rawValue: "halfrotation")
-  public let metadata = ShuffleMetadata(displayName: "Half Rotation")
+  public let metadata = ShuffleMetadata(displayName: String(localized: "Half Rotation", bundle: .module))
   public init() {}
   public func record(into engine: inout RecordingEngine) {
     let n = engine.count

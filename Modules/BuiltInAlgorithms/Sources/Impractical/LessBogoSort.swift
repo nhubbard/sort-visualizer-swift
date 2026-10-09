@@ -1,10 +1,11 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
 public struct LessBogoSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "lessbogosort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Less Bogo Sort",
+    displayName: String(localized: "Less Bogo Sort", bundle: .module),
     category: .impractical,
     sizeRange: 4...7,
     growthModel: OperationGrowthModel(
@@ -40,8 +41,8 @@ public struct LessBogoSort: SortAlgorithm {
           roles: ["front": .arrayIndex(start), "candidate": .arrayIndex(i)],
           explanationKey: "lessbogosort.frontMinimum",
           explanation: frontIsLarger
-            ? "A smaller value exists in this window, so the front is not its minimum."
-            : "The front is no larger than this value, so continue checking the window.")
+            ? String(localized: "A smaller value exists in this window, so the front is not its minimum.", bundle: .module)
+            : String(localized: "The front is no larger than this value, so continue checking the window.", bundle: .module))
         if frontIsLarger { return false }
       }
       return true
@@ -64,14 +65,14 @@ public struct LessBogoSort: SortAlgorithm {
         stageID: "candidateExchange", decisionID: "lessbogosort.candidateExchange",
         outcome: "exchange", roles: ["left": .arrayIndex(i), "right": .arrayIndex(j)],
         explanationKey: "lessbogosort.candidateExchange",
-        explanation: "The next permutation exchanges its pivot with a successor in the active range.")
+        explanation: String(localized: "The next permutation exchanges its pivot with a successor in the active range.", bundle: .module))
       engine.reversal(i + 1, end - 1)
       engine.annotateLastOperation(
         stageID: "candidateWrap", decisionID: "lessbogosort.reverseSuffix",
         outcome: "reverse",
         roles: ["first": .arrayIndex(i + 1), "last": .arrayIndex(end - 1)],
         explanationKey: "lessbogosort.reverseSuffix",
-        explanation: "Reverse this descending range to advance to the next candidate permutation.")
+        explanation: String(localized: "Reverse this descending range to advance to the next candidate permutation.", bundle: .module))
       return true
     }
 
@@ -86,7 +87,7 @@ public struct LessBogoSort: SortAlgorithm {
             outcome: "reverse",
             roles: ["first": .arrayIndex(i), "last": .arrayIndex(n - 1)],
             explanationKey: "lessbogosort.reverseSuffix",
-            explanation: "Reverse this descending range to advance to the next candidate permutation.")
+            explanation: String(localized: "Reverse this descending range to advance to the next candidate permutation.", bundle: .module))
         }
       }
     }
