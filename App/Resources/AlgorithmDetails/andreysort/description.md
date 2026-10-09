@@ -24,8 +24,7 @@ a second array. That combination made it historically significant: it is an earl
 of concept for the "block merge sort" family, and it directly influenced the design of later,
 more refined in-place merge sorts that built on the same backward-merge and block-selection ideas.
 
-This version has a limitation on inputs containing many duplicate values. The block-selection step
-chooses which block to move by comparing only the first element of each block. Two blocks can share
-a first value while requiring different interleaving based on later values, and the algorithm has
-no fallback for that case. Later block merge sorts avoid this ambiguity by extracting distinct key
-values from the array before comparing blocks.
+The original block-selection step can leave inputs with many duplicate values out of order because
+it compares only the first element of each block. This variant checks the final order and repairs
+such a result with an in-place heap sort. The check adds linear work, while the recovery keeps the
+worst-case time bound at O(n log n) and uses constant auxiliary space.

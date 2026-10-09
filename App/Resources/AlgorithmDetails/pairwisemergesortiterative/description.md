@@ -16,7 +16,7 @@ toward the full padded length.
 Like other fixed comparator networks, this one's total comparator count depends only on the
 (padded) length of the input, so its best-case, average-case, and worst-case running times are
 identical, landing at O(n log²n), measuring the number of comparisons this network performs across
-a wide range of array sizes shows it uses exactly the same total as this codebase's recursive
+a wide range of array sizes shows it uses exactly the same total as the recursive
 Pairwise Merge Sort and Pairwise Sort implementations, despite each using a different loop or
 recursion shape to get there. Every comparator only ever swaps on a strict "greater than" test, and
 this network never lets two equal elements cross paths without an intervening comparison

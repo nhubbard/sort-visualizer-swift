@@ -19,7 +19,7 @@ The specific partitioning method implemented here is the **left–right (LR) two
 by [Jon Bentley](https://en.wikipedia.org/wiki/Jon_Bentley_(computer_scientist))
 and [M. Douglas McIlroy](https://en.wikipedia.org/wiki/Douglas_McIlroy) in their widely cited 1993 paper *Engineering a
 Sort Function*, which scans inward from both ends of the array with a pair of indices, swapping pivot-equal elements out
-to the flanks as it goes before folding them back alongside the pivot once the scan completes. This app also includes a
-sibling **left–left (LL)** variant, which achieves the same three-way partitioning outcome using a different single-pass,
+to the flanks as it goes before folding them back alongside the pivot once the scan completes. A
+sibling **left–left (LL)** variant achieves the same three-way partitioning outcome using a different single-pass,
 two-pointer bookkeeping scheme. Both variants are unstable, in-place, comparison-based sorts with the same theoretical
 complexity as ordinary Quick Sort, differing only in how the middle "equal" region is carved out during partitioning.

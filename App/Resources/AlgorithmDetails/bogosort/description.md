@@ -10,7 +10,7 @@ analogy for the working of the latter version is to sort a deck of cards by thro
 cards up at random, and repeating the process until the deck is sorted. Its name is
 a [portmanteau](https://en.wikipedia.org/wiki/Portmanteau) of the words *bogus* and *sort*.
 
-This app uses the deterministic version. It walks lexicographic permutations until reaching the
+The recorded variant uses a deterministic procedure. It walks lexicographic permutations until reaching the
 fully descending permutation, then reverses that permutation to obtain ascending order. This
 finite walk keeps the recording bounded and repeatable; the reference samples follow the same
 steps.

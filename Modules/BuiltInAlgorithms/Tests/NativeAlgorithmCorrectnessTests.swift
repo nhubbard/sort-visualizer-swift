@@ -399,47 +399,16 @@ struct NativeAlgorithmCorrectnessTests {
     #expect(sawFlanReorder, "expected to witness Flan Sort's claimed instability")
   }
 
-  private static let algorithms: [any SortAlgorithm] = [
-    AATreeSort(), AdaptiveGrailSort(), AVLTreeSort(), AmericanFlagSort(), AsynchronousSort(), BadSort(), BaseNMaxHeapSort(),
-    BinaryDoubleInsertionSort(), BinaryGnomeSort(), BinaryInsertionSort(), BinaryMergeSort(),
-    BinaryQuickSortIterative(), BinaryQuickSortRecursive(), BingoSort(), BinomialHeapSort(), BinomialSmoothSort(),
-    BitonicSortIterative(), BitonicSortRecursive(), BlockInsertionSort(), BlockSwapMergeSort(), BogoBogoSort(),
-    BogoSort(), BoseNelsonSortIterative(), BoseNelsonSortRecursive(), BottomUpHeapSort(), BottomUpMergeSort(),
-    BozoSort(), BubbleBogoSort(), BubbleSort(), BufferedStoogeSort(), BufferPartitionMergeSort(), BurntPancakeSort(), ChaliceSort(), CircleSortIterative(),
-    CircleSortRecursive(), CircloidSort(), CircularGrailSort(), ClassicGravitySort(), ClassicThreeSmoothCombSort(),
-    ClassicTournamentSort(),
-    ClassicTreeSort(), CocktailBogoSort(), CocktailMergeSort(), CocktailShakerSort(), CombSort(), CompleteGraphSort(),
-    CountingSort(), CreaseSort(), CycleSort(), DeterministicBogoSort(), DiamondSortIterative(), DiamondSortRecursive(),
-    DoubleInsertionSort(), DoubleSelectionSort(), DropMergeSort(), DualPivotQuickSort(), EctaSort(), ExchangeBogoSort(), FifthMergeSort(),
-    FlashSort(), FlippedMinHeapSort(), FlanSort(), FluxSort(), FoldSort(), ForcedStableQuickSort(), FunSort(), GnomeSort(),
-    GrailSort(), GravitySort(), GuessSort(), HanoiSort(), HybridCombSort(), ImprovedBlockSelectionSort(),
-    ImprovedInPlaceMergeSort(), InPlaceLSDRadixSort(), InPlaceMergeSort(), InsertionSort(), IntroCircleSortIterative(),
-    IntroCircleSortRecursive(), IntroSort(), IterativeTopDownMergeSort(), KotaSort(), LaziestSort(), LazierestSort(), LazyHeapSort(),
-    LazyStableSort(), LessBogoSort(), LibrarySort(), LLQuickSort(), LRQuickSort(), LSDRadixSort(), MatrixSort(),
-    MaxHeapSort(), MedianMergeSort(), MedianQuickBogoSort(), MergeBogoSort(), MergeExchangeSortIterative(), MergeInsertionSort(),
-    MergeSort(), MinHeapSort(), MinMaxHeapSort(), MSDRadixSort(), NewShuffleMergeSort(), OddEvenMergeSortIterative(),
-    OddEvenMergeSortRecursive(), OddEvenSort(), OptimizedBottomUpMergeSort(), OptimizedBubbleSort(),
-    OptimizedCocktailShakerSort(), OptimizedDualPivotQuickSort(), OptimizedGnomeSort(), OptimizedGuessSort(),
-    OptimizedLazyStableSort(), OptimizedRotateMergeSort(), OptimizedStoogeSort(), OptimizedStoogeSortStudio(), OptimizedWeaveMergeSort(),
-    OutOfPlaceHeapSort(), PairwiseMergeSortIterative(), PairwiseMergeSortRecursive(), PairwiseSortIterative(),
-    PairwiseSortRecursive(), PancakeInsertionSort(), PancakeSort(), PatienceSort(), PDMergeSort(), PDQBranchedSort(),
-    PDQBranchlessSort(), PigeonholeSort(), PoplarHeapSort(), QuadSort(), QuadStoogeSort(), QuickBogoSort(), QuickSort(),
-    RandomGuessSort(), RemiSort(), RecursiveShellSort(), RedBlackTreeSort(), RotateLSDRadixSort(), RotateMergeSort(),
-    RotateMSDRadixSort(), SelectionBogoSort(), SelectionSort(), ShatterSort(), ShellSort(), ShoveSort(), SillySort(),
-    SimpleShatterSort(), SimplifiedLibrarySort(), SimplisticGravitySort(), SlopeSort(), SlowSort(), SmartBogoBogoSort(),
-    SmartGuessSort(), SmoothSort(), SnuffleSort(), SplaySort(), SqrtSort(), StableCycleSort(), StablePermutationSort(),
-    StableQuickSort(), StableSelectionSort(), StacklessAmericanFlagSort(), StacklessBinaryQuickSort(),
-    StacklessDualPivotQuickSort(), StacklessHybridQuickSort(), StacklessRotateMergeSort(), StaticSort(), StoogeSort(),
-    StrandSort(), SwaplessBubbleSort(), SynchronousSqrtSort(), TableSort(), TernaryHeapSort(), TernaryLLQuickSort(), TernaryLRQuickSort(),
-    ThreeSmoothCombSortIterative(), ThreeSmoothCombSortRecursive(), TimeSort(), TimSort(), TournamentSort(), TreeSort(),
-    TriangularHeapSort(), TwinSort(), UnoptimizedBubbleSort(), UnoptimizedCocktailShakerSort(), UnstableGrailSort(),
-    WeakHeapSort(), WeavedMergeSort(), WeaveMergeSort(), WeaveSortIterative(), WeaveSortRecursive(), WikiSort(),
-    YujisBufferedMergeSort2()
-  ]
+  // Derive the universal correctness corpus from the same fixture used by calibration and
+  // performance tests. Only Index Sort (permutation-only input) needs a dedicated input
+  // contract below; Andrey Sort's duplicate-heavy fallback must pass this universal corpus.
+  private static let algorithms: [any SortAlgorithm] = AllBuiltInAlgorithms.sorts.filter {
+    !($0 is IndexSort)
+  }
 
   @Test
-  func everyAlgorithmHasAUniqueID() {
-    let ids = Self.algorithms.map(\.id)
+  func everyShippedAlgorithmHasAUniqueID() {
+    let ids = AllBuiltInAlgorithms.sorts.map(\.id)
     #expect(Set(ids).count == ids.count, "duplicate AlgorithmID across native algorithms")
   }
 
@@ -670,6 +639,108 @@ struct NativeAlgorithmCorrectnessTests {
         \(input) -> \(engine.values)
         """
       )
+    }
+  }
+
+  /// The universal checks above use each algorithm's minimum size. Exercise a second,
+  /// app-reachable size for practical algorithms so a new port cannot pass only its smallest
+  /// case while failing once its loops or buffers have more than one block to process.
+  @Test
+  func practicalAlgorithmsSortAtASecondReachableSize() {
+    var exercised = 0
+    for algorithm in Self.algorithms where algorithm.metadata.category != .impractical {
+      let range = algorithm.metadata.effectiveSizeRange(
+        operationCap: RecordingEngine.defaultOperationCap)
+      guard range.upperBound > range.lowerBound else { continue }
+      let size = min(max(range.lowerBound + 1, 32), range.upperBound)
+      var state = UInt64(size * 1_009 + algorithm.id.rawValue.utf8.reduce(0) { $0 + Int($1) })
+      let input = (0..<size).map { _ in
+        state = state &* 6_364_136_223_846_793_005 &+ 1_442_695_040_888_963_407
+        return Int(state % 17)
+      }
+      var engine = RecordingEngine(values: input)
+      algorithm.record(into: &engine)
+      exercised += 1
+      #expect(
+        engine.values == input.sorted(),
+        "\(algorithm.id.rawValue) failed at reachable size \(size): \(input) -> \(engine.values)"
+      )
+    }
+    #expect(exercised > 100, "the second-size check covered too few practical algorithms")
+  }
+
+  /// These implementations have distinct merge/partition paths above their minimum run size.
+  /// The universal corpus's 16- or 32-element inputs do not enter those paths.
+  @Test
+  func largerMergeAndPartitionPathsSortDifferentInputShapes() {
+    let algorithms: [any SortAlgorithm] = [
+      CocktailMergeSort(), IntroSort(), BinaryMergeSort(), StaticSort(),
+    ]
+    for algorithm in algorithms {
+      for size in [64, 128, 257] {
+        var state = UInt64(size * 1_009 + algorithm.id.rawValue.utf8.reduce(0) { $0 + Int($1) })
+        let duplicates = (0..<size).map { _ in
+          state = state &* 6_364_136_223_846_793_005 &+ 1_442_695_040_888_963_407
+          return Int(state % 17) - 8
+        }
+        let ascending = Array(0..<size)
+        for input in [duplicates, ascending, Array(ascending.reversed())] {
+          var engine = RecordingEngine(values: input, operationCap: 2_000_000)
+          algorithm.record(into: &engine)
+          #expect(engine.values == input.sorted(), "\(algorithm.id.rawValue) failed at size \(size)")
+        }
+      }
+    }
+  }
+
+  /// Both algorithms promise stability, including when a run boundary splits equal keys.
+  /// The low bits preserve each element's original identity while comparisons use only the key.
+  @Test
+  func mergeVariantsPreserveEqualKeyOrderAcrossRunBoundaries() {
+    let radix = 1_024
+    for algorithm in [CocktailMergeSort() as any SortAlgorithm, BinaryMergeSort()] {
+      for size in [33, 64, 127, 256] {
+        var state = UInt64(size * 1_009 + 17)
+        let input = (0..<size).map { index in
+          state = state &* 6_364_136_223_846_793_005 &+ 1_442_695_040_888_963_407
+          return Int(state % 7) * radix + index
+        }
+        let expected = input.sorted { $0 / radix < $1 / radix }
+        var engine = RecordingEngine(
+          values: input, operationCap: 2_000_000,
+          comparisonKeyForTesting: { $0 / radix })
+        algorithm.record(into: &engine)
+        #expect(engine.values == expected, "\(algorithm.id.rawValue) lost stability at size \(size)")
+      }
+    }
+  }
+
+  /// A single large bucket must reach Static Sort's heap finishing path, while a broad value
+  /// range keeps its cycle-placement path active on a second pass.
+  @Test
+  func staticSortHandlesLargeEqualBucketsAndWideValues() {
+    for input in [
+      Array(repeating: 7, count: 64),
+      (0..<64).map { $0.isMultiple(of: 2) ? -10_000 + $0 : 10_000 - $0 },
+    ] {
+      var engine = RecordingEngine(values: input, operationCap: 2_000_000)
+      StaticSort().record(into: &engine)
+      #expect(engine.values == input.sorted())
+    }
+  }
+
+  @Test
+  func introSortHandlesAdversarialMedianOfThreePatternsAtItsMaximumSize() {
+    let size = IntroSort().metadata.sizeRange.upperBound
+    let patterns = [
+      (0..<size).map { min($0, size - 1 - $0) },
+      Array(stride(from: 0, to: size, by: 2)) + Array(stride(from: 1, to: size, by: 2)),
+      (0..<size).map { $0 % 7 },
+    ]
+    for input in patterns {
+      var engine = RecordingEngine(values: input, operationCap: 2_000_000)
+      IntroSort().record(into: &engine)
+      #expect(engine.values == input.sorted())
     }
   }
 
@@ -2272,28 +2343,11 @@ struct NativeAlgorithmCorrectnessTests {
     }
   }
 
-  /// `AndreySort` is deliberately NOT in `Self.algorithms` above: it has a real, confirmed bug
-  /// inherited from ArrayV's own Java (not a translation artifact — verified by transcribing
-  /// `sort`/`aswap`/`backmerge`/`rmerge`/`rbnd`/`msort` to a standalone Java program with no
-  /// ArrayV dependencies and reproducing the same wrong output on the same input), specific to
-  /// heavy-duplicate arrays: `rmerge`'s block-selection picks the block with the smallest
-  /// *leading* element and moves the whole block into place, which silently assumes no other
-  /// pending block can contain a value smaller than this block's own trailing values — an
-  /// assumption duplicates can violate. Measured failure rate ~1-8% depending on size, using
-  /// random 3-value duplicate-heavy input across sizes 12-256 (a real but narrow defect, not
-  /// "usually wrong" the way `FunSort` was before it got replaced). This is a known, documented
-  /// weakness of this specific (earlier, simpler) member of Andrey Astrelin's merge-sort lineage —
-  /// his own later, more robust `GrailSort` (already shipped separately in this codebase)
-  /// explicitly added fallback handling for exactly this "not enough unique keys" scenario, which
-  /// this simpler algorithm never had. Kept and shipped (unlike `FunSort`) because the failure
-  /// rate is low and confined to heavy-duplicate input, but excluded from the generic suite's
-  /// `Self.algorithms` so its rare failures don't make this whole test suite flaky. This dedicated
-  /// test instead confirms it sorts reliably on every OTHER input shape (already-sorted,
-  /// reverse-sorted, and randomized inputs without heavy duplication) across a wide size range,
-  /// and separately measures the duplicate-heavy failure rate stays low rather than silently
-  /// regressing further.
+  /// ArrayV's block merge can leave duplicate-heavy values unsorted. This regression runs the
+  /// in-place repair path over many reproducible low-diversity inputs; the universal suite above
+  /// also includes Andrey Sort on all ordinary shapes now.
   @Test
-  func andreySortSortsReliablyExceptOnHeavyDuplicates() {
+  func andreySortRepairsHeavyDuplicateFailures() {
     let algorithm = AndreySort()
     for size in [
       algorithm.metadata.sizeRange.lowerBound, 12, 13, 17, 20, 24, 32, 63, 64, 100, 200, 256
@@ -2314,19 +2368,18 @@ struct NativeAlgorithmCorrectnessTests {
       }
     }
 
-    var failures = 0
     let trials = 300
-    for _ in 0..<trials {
+    var seed: UInt64 = 0xa11d_0e
+    for trial in 0..<trials {
       let size = 100
-      let input = (0..<size).map { _ in Int.random(in: 0...2) }
+      let input = (0..<size).map { _ in
+        seed = seed &* 6_364_136_223_846_793_005 &+ 1
+        return Int((seed >> 32) % 3)
+      }
       var engine = RecordingEngine(values: input)
       algorithm.record(into: &engine)
-      if engine.values != input.sorted() { failures += 1 }
+      #expect(engine.values == input.sorted(), "Andrey Sort failed duplicate trial \(trial)")
     }
-    #expect(
-      failures < trials / 10,
-      "expected andreysort's known duplicate-heavy failure rate to stay under 10%, saw \(failures)/\(trials)"
-    )
   }
 
   /// Extra scrutiny for the 5 newly-ported `sorts/insert/` Hard-tier algorithms, matching the

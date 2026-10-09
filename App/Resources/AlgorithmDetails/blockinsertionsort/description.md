@@ -9,8 +9,7 @@ What happens next depends on how long that run is. A run of a single element is 
 already-sorted prefix with a classic one-at-a-time shift. A run of exactly two elements is
 inserted with a small hand-unrolled routine that shifts both elements into place in one pass
 instead of scanning the prefix twice. Runs of three or more elements are folded into the sorted
-prefix using the same binary-search-and-rotate merge technique used elsewhere in this codebase's
-family of in-place merge sorts: it binary-searches for where the run's elements belong relative to
+prefix using a binary-search-and-rotate merge: it binary-searches for where the run's elements belong relative to
 the existing prefix and rotates them into position, without needing any scratch buffer. The scan
 then continues from the end of that run to find the next one, repeating until the whole array has
 been consumed.

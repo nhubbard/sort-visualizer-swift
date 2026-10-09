@@ -14,7 +14,7 @@ public struct BubbleSort: SortAlgorithm {
       family: .polynomialIntercept, coefficients: [5, -5, -2], rSquared: 1),
     implementationComplexity: 5,
     stable: true,
-    timeComplexity: ComplexityBounds(best: "O(n)", average: "O(n^2)", worst: "O(n^2)"),
+    timeComplexity: ComplexityBounds(best: "O(n^2)", average: "O(n^2)", worst: "O(n^2)"),
     spaceComplexity: "O(1)",
     iconName: "circle.grid.2x2.fill"
   )

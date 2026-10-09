@@ -25,10 +25,9 @@ Batcher's more familiar recursive-merge presentation.
 This iterative implementation is known for working correctly at any array length, not merely at exact powers of two.
 Sorting-network constructions are ordinarily defined only for power-of-two input sizes, and porting a fixed network to
 an arbitrary size typically means conceptually building the network over the next power of two above the real length and
-discarding every comparator that would touch an out-of-range index, the same technique this codebase's Bose-Nelson port
-uses. Here, by contrast, every loop bound in both phases is already written in terms of the real length directly, so no
-separate padding step or out-of-range guard is needed at all, the loop conditions that advance the comparator cursor
-are themselves what keeps every comparison in bounds.
+discarding every comparator that would touch an out-of-range index, as in Bose-Nelson Sort.
+Here, every loop bound in both phases uses the real length directly, so the comparator cursor
+remains within bounds without a separate padding step or out-of-range guard.
 
 As with other fixed comparator networks, the total comparator count depends only on the input's length, never on the
 values themselves, so best-case, average-case, and worst-case running time are identical. Comparators only ever swap on
