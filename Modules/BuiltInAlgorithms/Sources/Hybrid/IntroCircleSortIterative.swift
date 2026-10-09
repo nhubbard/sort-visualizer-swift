@@ -62,7 +62,12 @@ public struct IntroCircleSortIterative: SortAlgorithm {
           var high = start + 2 * gap - 1
           while low < high {
             if high < end {
-              if engine.compare(low, high, by: (>)) {
+              if engine.teachingCompare(
+                low, high, by: (>),
+                stageID: "IntroCircleSortIterative.circle.pair",
+                whenTrue: "The mirrored pair is reversed, so the circle pass swaps it.",
+                whenFalse: "The mirrored pair is ordered, so the circle pass leaves it."
+              ) {
                 engine.swap(low, high)
                 swapCount += 1
               }

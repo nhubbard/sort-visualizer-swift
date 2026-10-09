@@ -113,9 +113,19 @@ public struct HanoiSort: SortAlgorithm {
     func moveToMain(_ id: StackID) {
       sp -= 1
       engine.setValue(sp, pop(id))
+      engine.annotateLastOperation(
+        stageID: "candidatePlacement", decisionID: "hanoisort.candidatePlacement",
+        outcome: "place", roles: ["destination": .arrayIndex(sp)],
+        explanationKey: "hanoisort.candidatePlacement",
+        explanation: "The next value is taken from a working stack and placed at this array position.")
       while !isEmpty(id), peek(id) == engine.readValue(at: sp) {
         sp -= 1
         engine.setValue(sp, pop(id))
+        engine.annotateLastOperation(
+          stageID: "candidatePlacement", decisionID: "hanoisort.candidatePlacement",
+          outcome: "place", roles: ["destination": .arrayIndex(sp)],
+          explanationKey: "hanoisort.candidatePlacement",
+          explanation: "The next value is taken from a working stack and placed at this array position.")
       }
     }
 

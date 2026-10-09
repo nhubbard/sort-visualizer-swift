@@ -25,7 +25,13 @@ public struct UnoptimizedBubbleSort: SortAlgorithm {
     var sorted = false
     while !sorted {
       sorted = true
-      for i in 0..<(n - 1) where engine.compare(i, i + 1, by: (>)) {
+      for i in 0..<(n - 1) where engine.teachingCompare(
+        i, i + 1,
+        by: (>),
+        stageID: "UnoptimizedBubbleSort.adjacentOrder",
+        whenTrue: "The left neighbor is larger, so exchange this pair.",
+        whenFalse: "This adjacent pair needs no exchange."
+      ) {
         engine.swap(i, i + 1)
         sorted = false
       }

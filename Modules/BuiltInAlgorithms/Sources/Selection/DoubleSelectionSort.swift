@@ -43,7 +43,13 @@ public struct DoubleSelectionSort: SortAlgorithm {
       for i in left...right {
         // Reads.compareValues(array[i], array[biggest]) == 1 — strict greater-than,
         // both live indices.
-        if engine.compare(i, biggest, by: (>)) {
+        if engine.teachingCompare(
+          i, biggest,
+          by: (>),
+          stageID: "DoubleSelectionSort.maximumCandidate",
+          whenTrue: "This item is larger, so update the maximum for the right end.",
+          whenFalse: "The current maximum candidate remains."
+        ) {
           biggest = i
         }
         // Reads.compareValues(array[i], array[smallest]) == -1 — strict less-than,

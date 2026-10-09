@@ -183,7 +183,12 @@ public struct NewShuffleMergeSort: SortAlgorithm {
     // (greater). Records exactly one comparison op, inferring equality from the values already
     // read rather than issuing a second one.
     func compare3(_ i: Int, _ j: Int) -> Int {
-      if engine.compare(i, j, by: (<)) { return -1 }
+      if engine.teachingCompare(
+        i, j, by: (<),
+        stageID: "NewShuffleMergeSort.key.order",
+        whenTrue: "The first candidate is smaller, so the shuffle merge ranks it first.",
+        whenFalse: "The first candidate is not smaller, so the merge checks equality or the reverse order."
+      ) { return -1 }
       return engine.readValue(at: i) == engine.readValue(at: j) ? 0 : 1
     }
 

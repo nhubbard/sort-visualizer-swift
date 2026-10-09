@@ -98,7 +98,12 @@ public struct OptimizedBottomUpMergeSort: SortAlgorithm {
         }
       }
       func lessOrEqual(_ a: Int, _ b: Int) -> Bool {
-        fromMain ? engine.compare(a, b, by: <=) : aux.values[a] <= aux.values[b]
+        fromMain ? engine.teachingCompare(
+          a, b, by: <=,
+          stageID: "OptimizedBottomUpMergeSort.merge.choose",
+          whenTrue: "The main-array left value is no greater, so this merge takes from the left run.",
+          whenFalse: "The main-array right value is smaller, so this merge takes from the right run."
+        ) : aux.values[a] <= aux.values[b]
       }
 
       var i = lt

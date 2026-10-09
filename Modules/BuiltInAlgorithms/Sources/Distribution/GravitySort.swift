@@ -97,6 +97,11 @@ public struct GravitySort: SortAlgorithm {
         // values[i]`), not a behavior change, and cuts real, redundant tape volume.
         guard inc != 0 else { continue }
         engine.setValue(i, engine.readValue(at: i) + inc)
+        engine.annotateLastOperation(
+          stageID: "bucketPlacement", decisionID: "gravitysort.bucketPlacement",
+          outcome: "place", roles: ["destination": .arrayIndex(i)],
+          explanationKey: "gravitysort.bucketPlacement",
+          explanation: "This column receives the number of beads counted at the current height.")
       }
     }
 

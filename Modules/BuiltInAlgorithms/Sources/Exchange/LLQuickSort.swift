@@ -43,7 +43,13 @@ public struct LLQuickSort: SortAlgorithm {
     let pivot = engine.readValue(at: hi)
     var i = lo
     for j in lo..<hi {
-      if engine.compareValue(j, against: pivot, by: (<)) {
+      if engine.teachingCompareValue(
+        j, against: pivot,
+        by: (<),
+        stageID: "LLQuickSort.pivotSide",
+        whenTrue: "This item is less than the pivot, so move it into the left partition.",
+        whenFalse: "This item stays on or to the right of the pivot."
+      ) {
         engine.swap(i, j)
         i += 1
       }

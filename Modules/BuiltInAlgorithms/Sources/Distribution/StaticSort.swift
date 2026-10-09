@@ -109,6 +109,11 @@ public struct StaticSort: SortAlgorithm {
         // `-1` is never a valid value here (shuffles are always `Array(1...size)`), so this
         // is bookkeeping only — immediately overwritten before the cycle closes.
         engine.setValue(from, -1)
+        engine.annotateLastOperation(
+          stageID: "bucketPlacement", decisionID: "staticsort.bucketPlacement",
+          outcome: "place", roles: ["destination": .arrayIndex(from)],
+          explanationKey: "staticsort.bucketPlacement",
+          explanation: "This bucket cycle temporarily opens the source slot before placing its displaced value.")
 
         repeat {
           let idx = classify(num)
@@ -120,6 +125,11 @@ public struct StaticSort: SortAlgorithm {
 
           let temp = engine.readValue(at: to)
           engine.setValue(to, num)
+          engine.annotateLastOperation(
+            stageID: "bucketPlacement", decisionID: "staticsort.bucketPlacement",
+            outcome: "place", roles: ["destination": .arrayIndex(to)],
+            explanationKey: "staticsort.bucketPlacement",
+            explanation: "The current bucket or fallback sort step determines this destination.")
           num = temp
           from = to
         } while from != origin
@@ -151,6 +161,11 @@ public struct StaticSort: SortAlgorithm {
       var j = i
       while j > s && !engine.compare(j, j - 1) {
         engine.swap(j - 1, j)
+        engine.annotateLastOperation(
+          stageID: "bucketExchange", decisionID: "staticsort.bucketExchange",
+          outcome: "exchange", roles: ["left": .arrayIndex(j - 1), "right": .arrayIndex(j)],
+          explanationKey: "staticsort.bucketExchange",
+          explanation: "The current bucket or fallback sort step determines this destination.")
         j -= 1
       }
     }
@@ -178,6 +193,11 @@ public struct StaticSort: SortAlgorithm {
         }
         if largest == root { break }
         engine.swap(s + root, s + largest)
+        engine.annotateLastOperation(
+          stageID: "bucketExchange", decisionID: "staticsort.bucketExchange",
+          outcome: "exchange", roles: ["left": .arrayIndex(s + root), "right": .arrayIndex(s + largest)],
+          explanationKey: "staticsort.bucketExchange",
+          explanation: "The current bucket or fallback sort step determines this destination.")
         root = largest
       }
     }
@@ -190,6 +210,11 @@ public struct StaticSort: SortAlgorithm {
     var end = size - 1
     while end > 0 {
       engine.swap(s, s + end)
+      engine.annotateLastOperation(
+        stageID: "bucketExchange", decisionID: "staticsort.bucketExchange",
+        outcome: "exchange", roles: ["left": .arrayIndex(s), "right": .arrayIndex(s + end)],
+        explanationKey: "staticsort.bucketExchange",
+        explanation: "The current bucket or fallback sort step determines this destination.")
       siftDown(0, end)
       end -= 1
     }

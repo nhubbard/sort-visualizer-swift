@@ -50,6 +50,11 @@ public struct MedianQuickBogoSort: SortAlgorithm {
       while !engine.compare(j, i, by: (>)) { j -= 1 }
 
       engine.swap(i, j)
+      engine.annotateLastOperation(
+        stageID: "candidateExchange", decisionID: "medianquickbogosort.candidateExchange",
+        outcome: "exchange", roles: ["left": .arrayIndex(i), "right": .arrayIndex(j)],
+        explanationKey: "medianquickbogosort.candidateExchange",
+        explanation: "The next candidate permutation exchanges its pivot with a larger successor.")
       engine.reversal(i + 1, end - 1)
       return true
     }

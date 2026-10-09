@@ -34,7 +34,13 @@ public struct CocktailShakerSort: SortAlgorithm {
       // flip their relative order.
       var j = i
       while j < n - i - 1 {
-        if engine.compare(j, j + 1, by: (>)) {
+        if engine.teachingCompare(
+          j, j + 1,
+          by: (>),
+          stageID: "CocktailShakerSort.forwardPass",
+          whenTrue: "The left neighbor is larger, so exchange them during the forward pass.",
+          whenFalse: "The forward pass leaves this pair in place."
+        ) {
           engine.swap(j, j + 1)
           sorted = false
         }

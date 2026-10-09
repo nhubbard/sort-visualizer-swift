@@ -75,6 +75,11 @@ public struct MSDRadixSort: SortAlgorithm {
         for value in bucket {
           engine.writeAux(handle, at: auxIndex, value: value)
           engine.setValue(writeIndex, value)
+          engine.annotateLastOperation(
+            stageID: "bucketPlacement", decisionID: "msdradixsort.bucketPlacement",
+            outcome: "place", roles: ["destination": .arrayIndex(writeIndex)],
+            explanationKey: "msdradixsort.bucketPlacement",
+            explanation: "Digit place \(power + 1) from the right selects this value’s bucket segment.")
           writeIndex += 1
           auxIndex += 1
         }

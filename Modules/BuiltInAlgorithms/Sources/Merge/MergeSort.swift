@@ -39,7 +39,10 @@ public struct MergeSort: SortAlgorithm {
           decisionID: "merge.runChoice",
           outcome: chooseLeft ? "left" : "right",
           roles: ["left": .arrayIndex(low), "right": .arrayIndex(high)],
-          explanationKey: "merge.runChoice")
+          explanationKey: "merge.runChoice",
+          explanation: chooseLeft
+            ? "The left run has the smaller or equal value, so merge takes it next."
+            : "The right run has the smaller value, so merge takes it next.")
         if chooseLeft {
           merged.append(engine.readValue(at: low))
           low += 1

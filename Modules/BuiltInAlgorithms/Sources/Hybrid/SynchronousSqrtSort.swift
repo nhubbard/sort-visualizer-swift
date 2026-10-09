@@ -88,7 +88,19 @@ private final class SynchronousSqrtRecorder: BlockMergeSortingTemplate {
     var right = end - 1
     var output = destinationEnd
     while left >= start && right >= middle {
-      let takeLeft = reversed ? engine.compare(left, right, by: (>=)) : engine.compare(left, right, by: (>))
+      let takeLeft = reversed
+        ? engine.teachingCompare(
+          left, right, by: (>=),
+          stageID: "SynchronousSqrtSort.merge.chooseReversed",
+          whenTrue: "The left item is at least the right, so the reversed merge takes it next.",
+          whenFalse: "The right item is larger, so the reversed merge takes it next."
+        )
+        : engine.teachingCompare(
+          left, right, by: (>),
+          stageID: "SynchronousSqrtSort.merge.choose",
+          whenTrue: "The left item is larger, so the backward merge takes it next.",
+          whenFalse: "The right item is at least as large, so the backward merge takes it next."
+        )
       output -= 1
       if takeLeft {
         engine.setValue(output, engine.readValue(at: left))

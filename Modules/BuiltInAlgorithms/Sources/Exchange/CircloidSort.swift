@@ -49,7 +49,13 @@ public struct CircloidSort: SortAlgorithm {
       var b = right
       var swapped = false
       while a < b {
-        if engine.compare(a, b, by: (>)) {
+        if engine.teachingCompare(
+          a, b,
+          by: (>),
+          stageID: "CircloidSort.pairOrder",
+          whenTrue: "The earlier item is larger, so exchange the circloid pair.",
+          whenFalse: "The circloid pair is already ordered."
+        ) {
           engine.swap(a, b)
           swapped = true
         }

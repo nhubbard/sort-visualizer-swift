@@ -87,9 +87,19 @@ public struct YujisBufferedMergeSort2: SortAlgorithm {
         let m = a + (b - a) / 2
         let comp: Bool
         if left {
-          comp = engine.compareValue(m, against: value, by: (>=))
+          comp = engine.teachingCompareValue(
+            m, against: value, by: (>=),
+            stageID: "YujisBufferedMergeSort2.merge.boundary",
+            whenTrue: "This run value crosses the held value, narrowing the insertion boundary leftward.",
+            whenFalse: "This run value stays on the near side, so the boundary search advances."
+          )
         } else {
-          comp = engine.compareValue(m, against: value, by: (>))
+          comp = engine.teachingCompareValue(
+            m, against: value, by: (>),
+            stageID: "YujisBufferedMergeSort2.merge.boundaryRight",
+            whenTrue: "This run value exceeds the held value, so the right boundary narrows leftward.",
+            whenFalse: "This run value does not exceed the held value, so the right boundary advances."
+          )
         }
         if comp {
           b = m
@@ -228,12 +238,12 @@ public struct YujisBufferedMergeSort2: SortAlgorithm {
 
         i = pos
         while i + 2 * j <= pos + length {
-          merge(i, i + j, i + 2 * j, posNext)
+          _ = merge(i, i + j, i + 2 * j, posNext)
           i += 2 * j
           posNext += 2 * j
         }
         if i + j < pos + length {
-          merge(i, i + j, pos + length, posNext)
+          _ = merge(i, i + j, pos + length, posNext)
         } else {
           while i < pos + length {
             engine.swap(i, posNext)

@@ -64,7 +64,13 @@ public struct ClassicTournamentSort: SortAlgorithm {
 
     // `array[tree[a]] <= array[tree[b]]` — the smaller value wins, matching ascending output.
     func treeCompare(_ a: Int, _ b: Int) -> Bool {
-      engine.compare(tree[a], tree[b], by: <=)
+      engine.teachingCompare(
+        tree[a], tree[b],
+        by: <=,
+        stageID: "ClassicTournamentSort.matchWinner",
+        whenTrue: "The first contestant is no larger, so it advances in the tournament.",
+        whenFalse: "The second contestant advances in the tournament."
+      )
     }
 
     for i in 0..<treeSize {

@@ -33,7 +33,12 @@ public struct BurntPancakeSort: SortAlgorithm {
       var max = 0
       var j = max + 1
       while j <= i {
-        if engine.compare(j, max) {
+        if engine.teachingCompare(
+          j, max,
+          stageID: "BurntPancakeSort.prefix.maximum",
+          whenTrue: "This candidate is at least the current maximum, so it becomes the new prefix maximum.",
+          whenFalse: "This candidate is smaller, so the current prefix maximum remains."
+        ) {
           max = j
         }
         j += 1

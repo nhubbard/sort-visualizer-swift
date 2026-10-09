@@ -53,7 +53,13 @@ public struct BlockInsertionSort: SortAlgorithm {
     func findRun(_ a: Int, _ b: Int) -> Int {
       var i = a + 1
       guard i != b else { return i }
-      if engine.compare(i - 1, i, by: >) {
+      if engine.teachingCompare(
+        i - 1, i,
+        by: >,
+        stageID: "BlockInsertionSort.blockBoundary",
+        whenTrue: "The previous item is larger, so this pair starts a block insertion.",
+        whenFalse: "This neighboring pair does not need block insertion."
+      ) {
         i += 1
         while i < b && engine.compare(i - 1, i, by: >) { i += 1 }
         engine.reversal(a, i - 1)

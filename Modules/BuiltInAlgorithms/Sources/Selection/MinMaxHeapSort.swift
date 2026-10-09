@@ -55,7 +55,13 @@ public struct MinMaxHeapSort: SortAlgorithm {
       var i = start
       let isGt = !isMinLevel(i)
       func beats(_ a: Int, _ b: Int) -> Bool {
-        isGt ? engine.compare(a, b, by: >) : engine.compare(a, b, by: <)
+        isGt ? engine.teachingCompare(
+          a, b,
+          by: >,
+          stageID: "MinMaxHeapSort.levelOrder",
+          whenTrue: "The first node outranks the second for this heap level.",
+          whenFalse: "The second node outranks the first for this heap level."
+        ) : engine.compare(a, b, by: <)
       }
 
       var left = 2 * i + 1

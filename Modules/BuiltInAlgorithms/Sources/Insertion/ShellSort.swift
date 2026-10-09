@@ -29,7 +29,12 @@ public struct ShellSort: SortAlgorithm {
     for gap in gaps where gap < n {
       for i in gap..<n {
         var j = i
-        while j >= gap && !engine.compare(j, j - gap) {
+        while j >= gap && !engine.teachingCompare(
+          j, j - gap,
+          stageID: "ShellSort.gapPosition",
+          whenTrue: "The current item is at least its gap neighbor, so it is placed for this gap.",
+          whenFalse: "The current item is smaller than its gap neighbor, so swap across the gap."
+        ) {
           engine.swap(j, j - gap)
           j -= gap
         }

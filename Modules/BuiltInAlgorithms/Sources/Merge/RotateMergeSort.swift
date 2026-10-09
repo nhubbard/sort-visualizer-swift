@@ -81,8 +81,18 @@ public struct RotateMergeSort: SortAlgorithm {
         let mid = a + (b - a) / 2
         let comp =
           left
-          ? engine.compareValue(mid, against: value, by: (>=))
-          : engine.compareValue(mid, against: value, by: (>))
+          ? engine.teachingCompareValue(
+            mid, against: value, by: (>=),
+            stageID: "RotateMergeSort.merge.boundary",
+            whenTrue: "The candidate crosses the held value, so the rotation boundary moves left.",
+            whenFalse: "The candidate stays before the boundary, so the search moves right."
+          )
+          : engine.teachingCompareValue(
+            mid, against: value, by: (>),
+            stageID: "RotateMergeSort.merge.boundaryRight",
+            whenTrue: "The candidate exceeds the held value, so the right rotation boundary moves left.",
+            whenFalse: "The candidate is no greater, so the right rotation boundary moves forward."
+          )
         if comp {
           b = mid
         } else {

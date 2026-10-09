@@ -30,7 +30,18 @@ public struct BozoSort: SortAlgorithm {
     guard n > 1 else { return }
 
     func isSorted() -> Bool {
-      for i in 1..<n where !engine.compare(i, i - 1) { return false }
+      for i in 1..<n {
+        let inOrder = engine.compare(i, i - 1)
+        engine.annotateLastOperation(
+          stageID: "sortednessCheck", decisionID: "bozosort.adjacentOrder",
+          outcome: inOrder ? "continue" : "reject",
+          roles: ["previous": .arrayIndex(i - 1), "current": .arrayIndex(i)],
+          explanationKey: "bozosort.adjacentOrder",
+          explanation: inOrder
+            ? "This adjacent pair is ordered, so keep checking the candidate."
+            : "This adjacent pair is inverted, so reject this candidate permutation.")
+        if !inOrder { return false }
+      }
       return true
     }
 
@@ -46,6 +57,11 @@ public struct BozoSort: SortAlgorithm {
         heap(k - 1)
         guard !done else { return }
         engine.swap(k.isMultiple(of: 2) ? i : 0, k - 1)
+        engine.annotateLastOperation(
+          stageID: "candidateExchange", decisionID: "bozosort.candidateExchange",
+          outcome: "exchange", roles: ["left": .arrayIndex(k.isMultiple(of: 2) ? i : 0), "right": .arrayIndex(k - 1)],
+          explanationKey: "bozosort.candidateExchange",
+          explanation: "Heap’s permutation step exchanges these positions before the next sortedness check.")
       }
       heap(k - 1)
     }

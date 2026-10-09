@@ -53,6 +53,11 @@ public struct StacklessBinaryQuickSort: SortAlgorithm {
         while j > i && getBit(engine.readValue(at: j), bit) { j -= 1 }
         if i < j {
           engine.swap(i, j)
+          engine.annotateLastOperation(
+            stageID: "bucketExchange", decisionID: "stacklessbinaryquicksort.bucketExchange",
+            outcome: "exchange", roles: ["left": .arrayIndex(i), "right": .arrayIndex(j)],
+            explanationKey: "stacklessbinaryquicksort.bucketExchange",
+            explanation: "These values have opposite bits from their current partition sides, so exchange them.")
         } else {
           return i
         }

@@ -60,9 +60,21 @@ private final class KotaRecorder {
 
   private func read(_ index: Int) -> Int { engine.readValue(at: index) }
   private func swap(_ left: Int, _ right: Int) { engine.swap(left, right) }
-  private func less(_ left: Int, _ right: Int) -> Bool { engine.compare(left, right, by: (<)) }
+  private func less(_ left: Int, _ right: Int) -> Bool {
+    engine.teachingCompare(
+      left, right, by: (<),
+      stageID: "KotaSort.key.order",
+      whenTrue: "The first key is smaller, so Kota treats it as preceding the second.",
+      whenFalse: "The first key is not smaller, so Kota checks the alternative placement.")
+  }
   private func greater(_ left: Int, _ right: Int) -> Bool { engine.compare(left, right, by: (>)) }
-  private func atMost(_ left: Int, _ right: Int) -> Bool { engine.compare(left, right, by: (<=)) }
+  private func atMost(_ left: Int, _ right: Int) -> Bool {
+    engine.teachingCompare(
+      left, right, by: (<=),
+      stageID: "KotaSort.merge.boundary",
+      whenTrue: "The left run endpoint is no greater, so Kota can keep this merge boundary.",
+      whenFalse: "The left endpoint exceeds the right, so Kota must move values across the boundary.")
+  }
   private func atLeast(_ left: Int, _ right: Int) -> Bool { engine.compare(left, right, by: (>=)) }
   private func equalValues(_ left: Int, _ right: Int) -> Bool { engine.compareValues(left, right, by: (==)) }
 

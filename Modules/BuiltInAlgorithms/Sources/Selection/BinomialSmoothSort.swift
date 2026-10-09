@@ -45,7 +45,13 @@ public struct BinomialSmoothSort: SortAlgorithm {
       var choice = height(node) - (isRoot ? 0 : 1)
       if parentFlag {
         for child in stride(from: choice - 1, through: 0, by: -1)
-        where !engine.compare(node - (1 << choice), node - (1 << child), by: (>)) {
+        where !engine.teachingCompare(
+          node - (1 << choice), node - (1 << child),
+          by: (>),
+          stageID: "BinomialSmoothSort.childChoice",
+          whenTrue: "The selected child is larger, so keep following that binomial branch.",
+          whenFalse: "The other child is at least as large, so follow it instead."
+        ) {
           choice = child
         }
       }

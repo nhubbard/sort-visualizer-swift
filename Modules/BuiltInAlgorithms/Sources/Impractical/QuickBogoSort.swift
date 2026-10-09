@@ -41,6 +41,11 @@ public struct QuickBogoSort: SortAlgorithm {
 
       func trackedSwap(_ i: Int, _ j: Int) {
         engine.swap(i, j)
+        engine.annotateLastOperation(
+          stageID: "candidateExchange", decisionID: "quickbogosort.candidateExchange",
+          outcome: "exchange", roles: ["left": .arrayIndex(i), "right": .arrayIndex(j)],
+          explanationKey: "quickbogosort.candidateExchange",
+          explanation: "The next candidate permutation exchanges its pivot with a successor while tracking the partition pivot.")
         if pivot == i { pivot = j } else if pivot == j { pivot = i }
       }
 

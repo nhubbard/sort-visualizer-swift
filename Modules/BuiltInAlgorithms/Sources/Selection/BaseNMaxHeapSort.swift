@@ -39,7 +39,13 @@ public struct BaseNMaxHeapSort: SortAlgorithm {
       var maxIndex = left
       var i = left + 1
       while i < left + base && i < stop {
-        if engine.compare(maxIndex, i, by: (<)) {
+        if engine.teachingCompare(
+          maxIndex, i,
+          by: (<),
+          stageID: "BaseNMaxHeapSort.heapCandidate",
+          whenTrue: "This child is larger, so promote it as the base-N heap candidate.",
+          whenFalse: "The current heap candidate remains larger."
+        ) {
           maxIndex = i
         }
         i += 1

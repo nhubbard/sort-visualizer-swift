@@ -108,7 +108,12 @@ public struct FluxSort: SortAlgorithm {
       if cnt <= 0 { break }
       let left = pta
       pta += 1
-      if engine.compare(left, pta, by: >) { balance += 1 }
+      if engine.teachingCompare(
+        left, pta, by: >,
+        stageID: "FluxSort.run.balance",
+        whenTrue: "This adjacent pair descends, contributing to the run-order balance.",
+        whenFalse: "This adjacent pair does not descend, leaving the balance unchanged."
+      ) { balance += 1 }
     }
 
     if balance == 0 { return false }

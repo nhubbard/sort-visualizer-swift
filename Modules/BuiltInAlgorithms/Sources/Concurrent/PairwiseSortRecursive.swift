@@ -43,7 +43,16 @@ public struct PairwiseSortRecursive: SortAlgorithm {
     guard n > 1 else { return }
 
     func compSwap(_ a: Int, _ b: Int) {
-      if engine.compare(a, b, by: >) {
+      let shouldSwap = engine.compare(a, b, by: >)
+      engine.annotateLastOperation(
+        stageID: "compareExchange", decisionID: "pairwisesortrecursive.networkComparator",
+        outcome: shouldSwap ? "exchange" : "keep",
+        roles: ["left": .arrayIndex(a), "right": .arrayIndex(b)],
+        explanationKey: "pairwisesortrecursive.compareExchange",
+        explanation: shouldSwap
+          ? "The left value exceeds the right value, so this comparator exchanges them."
+          : "These values satisfy this comparator, so they stay in place.")
+      if shouldSwap {
         engine.swap(a, b)
       }
     }

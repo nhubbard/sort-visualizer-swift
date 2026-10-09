@@ -59,7 +59,12 @@ public struct OptimizedDualPivotQuickSort: SortAlgorithm {
     guard start + 1 < end else { return }
     for i in (start + 1)..<end {
       var j = i
-      while j > start && !engine.compare(j, j - 1) {
+      while j > start && !engine.teachingCompare(
+        j, j - 1,
+        stageID: "OptimizedDualPivotQuickSort.smallRun.insert",
+        whenTrue: "The current value is at least its predecessor, so insertion scanning can stop.",
+        whenFalse: "The current value is smaller, so insertion moves it left."
+      ) {
         engine.swap(j - 1, j)
         j -= 1
       }

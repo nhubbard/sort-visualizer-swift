@@ -59,7 +59,14 @@ public struct RotateMSDRadixSort: SortAlgorithm {
     }
 
     func multiSwap(_ a: Int, _ b: Int, _ len: Int) {
-      for i in 0..<len { engine.swap(a + i, b + i) }
+      for i in 0..<len {
+        engine.swap(a + i, b + i)
+        engine.annotateLastOperation(
+          stageID: "digitRotation", decisionID: "rotatemsdradixsort.digitRotation",
+          outcome: "exchange", roles: ["left": .arrayIndex(a + i), "right": .arrayIndex(b + i)],
+          explanationKey: "rotatemsdradixsort.digitRotation",
+          explanation: "This block exchange rotates values into the bucket selected by the leading digit.")
+      }
     }
 
     func rotate(_ a: Int, _ m: Int, _ b: Int) {

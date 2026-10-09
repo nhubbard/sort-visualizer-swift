@@ -44,7 +44,13 @@ public struct BinomialHeapSort: SortAlgorithm {
         focus = maxNode
         var depth = 1
         while (focus & depth) == 0 {
-          if engine.compare(focus - depth - 1, maxNode - 1, by: (>)) {
+          if engine.teachingCompare(
+            focus - depth - 1, maxNode - 1,
+            by: (>),
+            stageID: "BinomialHeapSort.heapRoot",
+            whenTrue: "The new node is larger, so promote it within the binomial heap.",
+            whenFalse: "The current binomial heap maximum remains."
+          ) {
             maxNode = focus - depth
           }
           depth *= 2

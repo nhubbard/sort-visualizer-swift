@@ -41,7 +41,12 @@ public struct DualPivotQuickSort: SortAlgorithm {
     guard start + 1 < end else { return }
     for i in (start + 1)..<end {
       var j = i
-      while j > start && !engine.compare(j, j - 1) {
+      while j > start && !engine.teachingCompare(
+        j, j - 1,
+        stageID: "DualPivotQuickSort.pivotPreparation",
+        whenTrue: "The current item is at least its neighbor, so the insertion scan stops.",
+        whenFalse: "The current item is smaller, so swap it left while preparing the pivots."
+      ) {
         engine.swap(j - 1, j)
         j -= 1
       }
@@ -63,7 +68,11 @@ public struct DualPivotQuickSort: SortAlgorithm {
     if med1 <= left { med1 = left + 1 }
     if med2 >= right { med2 = right - 1 }
 
-    if engine.compare(med1, med2, by: (<)) {
+    if engine.teachingCompare(
+      med1, med2, by: <, stageID: "DualPivotQuickSort.pivotOrder",
+      whenTrue: "The first sample is smaller, so place it as the lower pivot.",
+      whenFalse: "The second sample is smaller, so place it as the lower pivot."
+    ) {
       engine.swap(med1, left)
       engine.swap(med2, right)
     } else {
@@ -84,10 +93,18 @@ public struct DualPivotQuickSort: SortAlgorithm {
 
     var k = less
     while k <= great {
-      if engine.compareValue(k, against: pivot1, by: (<)) {
+      if engine.teachingCompareValue(
+        k, against: pivot1, by: <, stageID: "DualPivotQuickSort.lowerPartition",
+        whenTrue: "This item is below the lower pivot, so move it into the left partition.",
+        whenFalse: "This item is at least the lower pivot, so check the upper partition."
+      ) {
         engine.swap(k, less)
         less += 1
-      } else if engine.compareValue(k, against: pivot2, by: (>)) {
+      } else if engine.teachingCompareValue(
+        k, against: pivot2, by: >, stageID: "DualPivotQuickSort.upperPartition",
+        whenTrue: "This item exceeds the upper pivot, so move it into the right partition.",
+        whenFalse: "This item lies between the pivots, so leave it in the middle partition."
+      ) {
         while k < great && engine.compareValue(great, against: pivot2, by: (>)) {
           great -= 1
         }

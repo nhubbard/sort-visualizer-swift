@@ -47,7 +47,12 @@ enum PDQSortingTemplate {
 
   private static func insertSort(_ engine: inout RecordingEngine, _ begin: Int, _ end: Int) {
     guard begin != end else { return }
-    for cur in (begin + 1)..<end where engine.compare(cur, cur - 1, by: <) {
+    for cur in (begin + 1)..<end where engine.teachingCompare(
+      cur, cur - 1, by: <,
+      stageID: "pdq.smallRun",
+      whenTrue: "This adjacent pair descends, so the insertion fallback shifts the item left.",
+      whenFalse: "This adjacent pair is ordered, so the insertion fallback leaves it."
+    ) {
       let tmp = engine.readValue(at: cur)
       var sift = cur
       var siftMinusOne = cur - 1

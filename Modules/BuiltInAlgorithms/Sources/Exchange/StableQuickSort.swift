@@ -51,7 +51,11 @@ public struct StableQuickSort: SortAlgorithm {
     var rightList: [Int] = []
 
     for i in (start + 1)...end {
-      if engine.readValue(at: i) < pivotValue {
+      if engine.teachingCompareValue(
+        i, against: pivotValue, by: <, stageID: "StableQuickSort.stablePartition",
+        whenTrue: "This item is smaller than the pivot, so append it to the stable left partition.",
+        whenFalse: "This item is at least the pivot, so append it to the stable right partition."
+      ) {
         leftList.append(engine.readValue(at: i))
       } else {
         rightList.append(engine.readValue(at: i))

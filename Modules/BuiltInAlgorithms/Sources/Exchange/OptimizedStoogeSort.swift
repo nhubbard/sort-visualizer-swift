@@ -42,7 +42,13 @@ public struct OptimizedStoogeSort: SortAlgorithm {
     var left = 0
     var right = length - 1
     while left < right {
-      if engine.compare(left, right, by: >) {
+      if engine.teachingCompare(
+        left, right,
+        by: >,
+        stageID: "OptimizedStoogeSort.endpointOrder",
+        whenTrue: "The left endpoint is larger, so exchange the ends before reducing the range.",
+        whenFalse: "The endpoints are ordered before the recursive range checks."
+      ) {
         engine.swap(left, right)
       }
       left += 1

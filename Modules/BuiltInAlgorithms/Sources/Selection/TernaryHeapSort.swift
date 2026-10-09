@@ -38,7 +38,13 @@ public struct TernaryHeapSort: SortAlgorithm {
       let rightChild = 3 * i + 3
 
       var largest = i
-      if leftChild <= heapSize, engine.compare(leftChild, largest, by: (>)) {
+      if leftChild <= heapSize, engine.teachingCompare(
+        leftChild, largest,
+        by: (>),
+        stageID: "TernaryHeapSort.leftChild",
+        whenTrue: "The left child is larger, so promote it as heap maximum.",
+        whenFalse: "The current heap maximum remains."
+      ) {
         largest = leftChild
       }
       if rightChild <= heapSize, engine.compare(rightChild, largest, by: (>)) {

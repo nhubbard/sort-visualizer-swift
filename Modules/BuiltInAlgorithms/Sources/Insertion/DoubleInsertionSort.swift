@@ -43,7 +43,13 @@ public struct DoubleInsertionSort: SortAlgorithm {
     var right = left + 1
 
     // Reads.compareIndices(array, left, right, ..., true) > 0 — strict, both indices live.
-    if engine.compare(left, right, by: (>)) {
+    if engine.teachingCompare(
+      left, right,
+      by: (>),
+      stageID: "DoubleInsertionSort.endCandidates",
+      whenTrue: "The left candidate is larger, so the two insertion directions must exchange.",
+      whenFalse: "The end candidates can keep their insertion directions."
+    ) {
       engine.swap(left, right)
     }
     left -= 1

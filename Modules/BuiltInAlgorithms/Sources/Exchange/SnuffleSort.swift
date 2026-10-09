@@ -41,7 +41,13 @@ public struct SnuffleSort: SortAlgorithm {
   private func snuffleSort(_ engine: inout RecordingEngine, _ start: Int, _ stop: Int) {
     guard stop - start + 1 >= 2 else { return }
 
-    if engine.compare(start, stop, by: (>)) {
+    if engine.teachingCompare(
+      start, stop,
+      by: (>),
+      stageID: "SnuffleSort.endpointOrder",
+      whenTrue: "The first endpoint is larger, so exchange the two ends.",
+      whenFalse: "The recursive range endpoints are ordered."
+    ) {
       engine.swap(start, stop)
     }
 

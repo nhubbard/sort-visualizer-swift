@@ -49,7 +49,16 @@ public struct BitonicSortRecursive: SortAlgorithm {
 
   private func compare(_ engine: inout RecordingEngine, _ i: Int, _ j: Int, _ dir: Bool) {
     let isGreater = engine.compare(i, j, by: (>))
-    if dir == isGreater {
+    let shouldSwap = dir == isGreater
+    engine.annotateLastOperation(
+      stageID: "bitonicMerge", decisionID: "bitonicsortrecursive.directionalComparator",
+      outcome: shouldSwap ? "exchange" : "keep",
+      roles: ["left": .arrayIndex(i), "right": .arrayIndex(j)],
+      explanationKey: "bitonicsortrecursive.directionalComparator",
+      explanation: shouldSwap
+        ? "These values oppose the current bitonic merge direction, so exchange them."
+        : "These values fit the current bitonic merge direction, so keep them.")
+    if shouldSwap {
       engine.swap(i, j)
     }
   }

@@ -59,7 +59,14 @@ public struct RotateLSDRadixSort: SortAlgorithm {
 
     // Block-swaps the two equal-length adjacent ranges `[a, a+len)` and `[b, b+len)`.
     func multiSwap(_ a: Int, _ b: Int, _ len: Int) {
-      for i in 0..<len { engine.swap(a + i, b + i) }
+      for i in 0..<len {
+        engine.swap(a + i, b + i)
+        engine.annotateLastOperation(
+          stageID: "digitRotation", decisionID: "rotatelsdradixsort.digitRotation",
+          outcome: "exchange", roles: ["left": .arrayIndex(a + i), "right": .arrayIndex(b + i)],
+          explanationKey: "rotatelsdradixsort.digitRotation",
+          explanation: "This block exchange rotates values into the bucket selected by the current digit.")
+      }
     }
 
     // Rotates the two adjacent blocks `[a, m)` and `[m, b)` so their relative order swaps, with

@@ -50,7 +50,12 @@ class BlockMergeSortingTemplate {
     var upper = end
     while lower < upper {
       let middle = lower + (upper - lower) / 2
-      if engine.compareValue(middle, against: value, by: (<=)) {
+      if engine.teachingCompareValue(
+        middle, against: value, by: (<=),
+        stageID: "block.mergeSearch",
+        whenTrue: "The candidate is no greater than the held value, so the block search advances.",
+        whenFalse: "The candidate exceeds the held value, so the block search narrows leftward."
+      ) {
         lower = middle + 1
       } else {
         upper = middle

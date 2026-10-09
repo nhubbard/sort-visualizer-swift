@@ -38,7 +38,16 @@ public struct MergeExchangeSortIterative: SortAlgorithm {
       while true {
         if n - d > 0 {
           for i in 0..<(n - d) where (i & p) == r {
-            if !engine.compare(i + d, i) {
+            let shouldSwap = !engine.compare(i + d, i)
+            engine.annotateLastOperation(
+              stageID: "networkPass", decisionID: "mergeexchangesortiterative.compareExchange",
+              outcome: shouldSwap ? "exchange" : "keep",
+              roles: ["left": .arrayIndex(i + d), "right": .arrayIndex(i)],
+              explanationKey: "mergeexchangesortiterative.compareExchange",
+              explanation: shouldSwap
+                ? "This network pair is out of order, so exchange the values."
+                : "This network pair is in order, so keep the values.")
+            if shouldSwap {
               engine.swap(i, i + d)
             }
           }

@@ -57,7 +57,13 @@ public struct SimplifiedLibrarySort: SortAlgorithm {
           let mid = lo + (hi - lo) / 2
           // Do NOT move equal elements to the right of the inserted element; this
           // maintains stability.
-          if engine.compare(i, mid, by: <) {
+          if engine.teachingCompare(
+            i, mid,
+            by: <,
+            stageID: "SimplifiedLibrarySort.binaryGap",
+            whenTrue: "The new value is smaller than the midpoint, so search earlier library slots.",
+            whenFalse: "The new value belongs after this library midpoint."
+          ) {
             hi = mid
           } else {
             lo = mid + 1

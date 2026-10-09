@@ -35,7 +35,13 @@ public struct OptimizedGnomeSort: SortAlgorithm {
       var pos = i
       // Strict `>` (not the default `>=`): ties never trigger a swap, matching ArrayV's
       // `Reads.compareValues(...) == 1` and keeping the sort stable.
-      while pos > 0 && engine.compare(pos - 1, pos, by: (>)) {
+      while pos > 0 && engine.teachingCompare(
+        pos - 1, pos,
+        by: (>),
+        stageID: "OptimizedGnomeSort.backtrack",
+        whenTrue: "The previous item is larger, so swap and backtrack.",
+        whenFalse: "The current item has reached its ordered position."
+      ) {
         engine.swap(pos - 1, pos)
         pos -= 1
       }

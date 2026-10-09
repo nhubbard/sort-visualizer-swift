@@ -47,7 +47,13 @@ public struct OutOfPlaceHeapSort: SortAlgorithm {
       var j = root
       while 2 * j + 1 < size {
         if 2 * j + 2 < size {
-          j = engine.compare(2 * j + 2, 2 * j + 1, by: >) ? 2 * j + 2 : 2 * j + 1
+          j = engine.teachingCompare(
+            2 * j + 2, 2 * j + 1,
+            by: >,
+            stageID: "OutOfPlaceHeapSort.childChoice",
+            whenTrue: "The right child is larger, so follow it in the heap.",
+            whenFalse: "The left child is at least as large, so follow it."
+          ) ? 2 * j + 2 : 2 * j + 1
         } else {
           j = 2 * j + 1
         }

@@ -36,6 +36,11 @@ public struct BubbleBogoSort: SortAlgorithm {
       swapped = false
       for i in 0..<(n - 1) where engine.compare(i, i + 1, by: (>)) {
         engine.swap(i, i + 1)
+        engine.annotateLastOperation(
+          stageID: "candidateExchange", decisionID: "bubblebogosort.candidateExchange",
+          outcome: "exchange", roles: ["left": .arrayIndex(i), "right": .arrayIndex(i + 1)],
+          explanationKey: "bubblebogosort.candidateExchange",
+          explanation: "This adjacent inversion is exchanged during the current bubble pass.")
         swapped = true
       }
     }

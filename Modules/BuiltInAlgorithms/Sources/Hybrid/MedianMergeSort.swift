@@ -37,7 +37,12 @@ public struct MedianMergeSort: SortAlgorithm {
     guard b - a > 1 else { return }
     for i in (a + 1)..<b {
       var j = i
-      while j > a && engine.compare(j - 1, j, by: >) {
+      while j > a && engine.teachingCompare(
+        j - 1, j, by: >,
+        stageID: "MedianMergeSort.smallRun.insert",
+        whenTrue: "The adjacent pair is reversed, so insertion swaps it.",
+        whenFalse: "The adjacent pair is ordered, so insertion stops moving this value."
+      ) {
         engine.swap(j - 1, j)
         j -= 1
       }
@@ -52,7 +57,16 @@ public struct MedianMergeSort: SortAlgorithm {
       var high = i
       while low < high {
         let mid = low + (high - low) / 2
-        if value < engine.readValue(at: mid) { high = mid } else { low = mid + 1 }
+        let insertBefore = value < engine.readValue(at: mid)
+        engine.annotateLastOperation(
+          stageID: "medianMerge.binaryInsert", decisionID: "medianMerge.binaryInsert",
+          outcome: insertBefore ? "left" : "right",
+          roles: ["candidate": .arrayIndex(mid), "heldValue": .value(value)],
+          explanationKey: "medianMerge.binaryInsert",
+          explanation: insertBefore
+            ? "The held item is smaller, so insertion searches the left half of this run."
+            : "The held item is at least this value, so insertion searches the right half.")
+        if insertBefore { high = mid } else { low = mid + 1 }
       }
       var j = i
       while j > low {

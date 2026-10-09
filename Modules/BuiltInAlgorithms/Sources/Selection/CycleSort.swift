@@ -32,7 +32,13 @@ public struct CycleSort: SortAlgorithm {
     // `partition` uses for its cached `pivotValue`.
     func countLesser(_ a: Int, _ b: Int, _ t: Int) -> Int {
       var r = a
-      for i in (a + 1)..<b where engine.compareValue(i, against: t, by: <) {
+      for i in (a + 1)..<b where engine.teachingCompareValue(
+        i, against: t,
+        by: <,
+        stageID: "CycleSort.destinationRank",
+        whenTrue: "This array item is smaller than the held value, so move the destination right.",
+        whenFalse: "This item does not move the held value’s destination."
+      ) {
         r += 1
       }
       return r

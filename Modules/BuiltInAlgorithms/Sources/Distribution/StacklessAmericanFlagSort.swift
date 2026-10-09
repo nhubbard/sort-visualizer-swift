@@ -108,6 +108,11 @@ public struct StacklessAmericanFlagSort: SortAlgorithm {
             engine.writeAux(countsHandle, at: digit, value: cnts[digit])
             let displaced = engine.readValue(at: a + cnts[digit])
             engine.setValue(a + cnts[digit], held)
+            engine.annotateLastOperation(
+              stageID: "bucketPlacement", decisionID: "stacklessamericanflagsort.bucketPlacement",
+              outcome: "place", roles: ["destination": .arrayIndex(a + cnts[digit])],
+              explanationKey: "stacklessamericanflagsort.bucketPlacement",
+              explanation: "The active digit selects this in-place bucket destination.")
             held = displaced
           } while cnts[i] > offs[i]
         }

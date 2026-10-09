@@ -37,7 +37,13 @@ public struct BingoSort: SortAlgorithm {
     var next = engine.readValue(at: maximum)
     var i = maximum - 1
     while i >= 0 {
-      if engine.compareValue(i, against: next, by: >) {
+      if engine.teachingCompareValue(
+        i, against: next,
+        by: >,
+        stageID: "BingoSort.nextDistinctValue",
+        whenTrue: "This value is larger than the current next value, so choose a new distinct target.",
+        whenFalse: "This value does not replace the next distinct target."
+      ) {
         next = engine.readValue(at: i)
       }
       i -= 1

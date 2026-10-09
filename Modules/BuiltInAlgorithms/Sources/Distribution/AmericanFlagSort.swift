@@ -89,6 +89,11 @@ public struct AmericanFlagSort: SortAlgorithm {
 
             let displaced = engine.readValue(at: to)
             engine.setValue(to, num)
+            engine.annotateLastOperation(
+              stageID: "bucketPlacement", decisionID: "americanflagsort.bucketPlacement",
+              outcome: "place", roles: ["destination": .arrayIndex(to)],
+              explanationKey: "americanflagsort.bucketPlacement",
+              explanation: "Digit \(digit) selects this bucket position for the held value, displacing its previous occupant.")
             num = displaced
             from = to
           } while from != origin

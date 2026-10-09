@@ -56,7 +56,12 @@ public struct BottomUpMergeSort: SortAlgorithm {
       var scratchIndex = index
 
       while left < mid && right < end {
-        if engine.compare(right, left) {
+        if engine.teachingCompare(
+          right, left,
+          stageID: "BottomUpMergeSort.merge.choose",
+          whenTrue: "The right run value is at least the left, so the merge takes from the left run.",
+          whenFalse: "The right run value is smaller, so the merge takes from the right run."
+        ) {
           scratch[scratchIndex] = engine.readValue(at: left)
           engine.writeAux(tempHandle, at: scratchIndex, value: engine.readValue(at: left))
           left += 1

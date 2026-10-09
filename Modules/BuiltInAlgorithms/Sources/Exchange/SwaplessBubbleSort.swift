@@ -43,7 +43,13 @@ public struct SwaplessBubbleSort: SortAlgorithm {
 
       for j in 1..<i {
         let arrJ = engine.readValue(at: j)
-        if engine.compareValue(j, against: comp, by: (<)) {
+        if engine.teachingCompareValue(
+          j, against: comp,
+          by: (<),
+          stageID: "SwaplessBubbleSort.heldItemPosition",
+          whenTrue: "This item belongs before the held value, so shift it into the open position.",
+          whenFalse: "The held value has reached its insertion boundary."
+        ) {
           // `comp` is the larger of the two: the lesser value (`array[j]`) shifts one
           // slot left, `comp` keeps being carried rightward, and `last` remembers this
           // as the rightmost point where a "swap-like" shift happened.

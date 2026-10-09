@@ -61,10 +61,12 @@ public struct RemiSort: SortAlgorithm {
     func readKeys(_ index: Int) -> Int { engine.markAuxRead(keysHandle, at: index); return keys[index] }
     func keyGreater(_ a: Int, _ b: Int, base: Int) -> Bool {
       var comparison = 0
-      _ = engine.compare(base + a, base + b, by: { left, right in
+      _ = engine.teachingCompare(base + a, base + b, by: { left, right in
         comparison = left < right ? -1 : (left > right ? 1 : 0)
         return comparison > 0
-      })
+      }, stageID: "RemiSort.key.order",
+        whenTrue: "The first key ranks above the second, so Remi follows the greater-key branch.",
+        whenFalse: "The first key does not rank above the second; equal keys use their positions to decide.")
       return comparison > 0 || (comparison == 0 && a > b)
     }
     func tableSift(_ root: Int, _ len: Int, _ base: Int, _ item: Int) {

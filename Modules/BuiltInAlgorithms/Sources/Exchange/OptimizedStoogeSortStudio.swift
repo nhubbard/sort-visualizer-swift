@@ -39,7 +39,13 @@ public struct OptimizedStoogeSortStudio: SortAlgorithm {
 
   @discardableResult
   private func compSwap(_ engine: inout RecordingEngine, _ a: Int, _ b: Int) -> Bool {
-    if engine.compare(a, b, by: >) {
+    if engine.teachingCompare(
+      a, b,
+      by: >,
+      stageID: "OptimizedStoogeSortStudio.endpointOrder",
+      whenTrue: "The left endpoint is larger, so exchange the ends before reducing the range.",
+      whenFalse: "The endpoints are ordered before the recursive range checks."
+    ) {
       engine.swap(a, b)
       return true
     }

@@ -38,7 +38,16 @@ public struct DiamondSortRecursive: SortAlgorithm {
 
     func compareAndSwap(_ i: Int, _ j: Int) {
       guard i < n, j < n else { return }
-      if engine.compare(i, j, by: (>)) {
+      let shouldSwap = engine.compare(i, j, by: (>))
+      engine.annotateLastOperation(
+        stageID: "compareExchange", decisionID: "diamondsortrecursive.networkComparator",
+        outcome: shouldSwap ? "exchange" : "keep",
+        roles: ["left": .arrayIndex(i), "right": .arrayIndex(j)],
+        explanationKey: "diamondsortrecursive.compareExchange",
+        explanation: shouldSwap
+          ? "The left value exceeds the right value, so this comparator exchanges them."
+          : "These values satisfy this comparator, so they stay in place.")
+      if shouldSwap {
         engine.swap(i, j)
       }
     }

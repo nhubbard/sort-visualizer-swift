@@ -72,7 +72,13 @@ public struct LRQuickSort: SortAlgorithm {
       var i = p
       var j = r
       while i <= j {
-        while engine.compareValue(i, against: pivotValue, by: (<)) {
+        while engine.teachingCompareValue(
+          i, against: pivotValue,
+          by: (<),
+          stageID: "LRQuickSort.leftScan",
+          whenTrue: "This item is less than the pivot, so the left scan advances.",
+          whenFalse: "The left scan stops at an item that belongs on the other side."
+        ) {
           i += 1
         }
         while engine.compareValue(j, against: pivotValue, by: (>)) {

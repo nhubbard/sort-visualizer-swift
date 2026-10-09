@@ -63,7 +63,12 @@ public struct EctaSort: SortAlgorithm {
         var high = index
         while low < high {
           let mid = low + (high - low) / 2
-          if engine.compareValue(mid, against: value, by: (>)) {
+          if engine.teachingCompareValue(
+            mid, against: value, by: (>),
+            stageID: "EctaSort.binary.search",
+            whenTrue: "This run value exceeds the held value, so the insertion point lies to the left.",
+            whenFalse: "This run value does not exceed the held value, so the search moves right."
+          ) {
             high = mid
           } else {
             low = mid + 1

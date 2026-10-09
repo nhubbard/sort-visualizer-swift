@@ -33,7 +33,16 @@ public struct OddEvenMergeSortIterative: SortAlgorithm {
         while j + k < n {
           for i in 0..<k where (i + j) / (p + p) == (i + j + k) / (p + p) {
             if i + j + k < n {
-              if !engine.compare(i + j + k, i + j) {
+              let shouldSwap = !engine.compare(i + j + k, i + j)
+              engine.annotateLastOperation(
+                stageID: "networkPass", decisionID: "oddevenmergesortiterative.compareExchange",
+                outcome: shouldSwap ? "exchange" : "keep",
+                roles: ["left": .arrayIndex(i + j + k), "right": .arrayIndex(i + j)],
+                explanationKey: "oddevenmergesortiterative.compareExchange",
+                explanation: shouldSwap
+                  ? "This network pair is out of order, so exchange the values."
+                  : "This network pair is in order, so keep the values.")
+              if shouldSwap {
                 engine.swap(i + j, i + j + k)
               }
             }

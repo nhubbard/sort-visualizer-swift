@@ -34,7 +34,13 @@ public struct BottomUpHeapSort: SortAlgorithm {
       var j = i
       while 2 * j + 1 < b {
         if 2 * j + 2 < b {
-          j = engine.compare(2 * j + 2, 2 * j + 1, by: (>)) ? 2 * j + 2 : 2 * j + 1
+          j = engine.teachingCompare(
+            2 * j + 2, 2 * j + 1,
+            by: (>),
+            stageID: "BottomUpHeapSort.childChoice",
+            whenTrue: "The right child is larger, so descend through it.",
+            whenFalse: "The left child is at least as large, so descend through it."
+          ) ? 2 * j + 2 : 2 * j + 1
         } else {
           j = 2 * j + 1
         }

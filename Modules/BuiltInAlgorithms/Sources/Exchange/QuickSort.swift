@@ -35,23 +35,34 @@ public struct QuickSort: SortAlgorithm {
     while i < j {
       while true {
         let isOnLeft = engine.compare(pivot, i)
-        engine.annotateLastOperation(
-          stageID: "quick.partition.scanLeft",
-          decisionID: "quick.pivotSide",
-          outcome: !isOnLeft ? "oppositeSide" : (i < j ? "advance" : "boundary"),
-          roles: ["pivot": .arrayIndex(pivot), "candidate": .arrayIndex(i)],
-          explanationKey: "quick.pivotSide")
+        if engine.shouldAnnotateCurrentOperation {
+          engine.annotateLastOperation(
+            stageID: "quick.partition.scanLeft",
+            decisionID: "quick.pivotSide",
+            outcome: !isOnLeft ? "oppositeSide" : (i < j ? "advance" : "boundary"),
+            roles: ["pivot": .arrayIndex(pivot), "candidate": .arrayIndex(i)],
+            explanationKey: "quick.pivotSide",
+            explanation: !isOnLeft
+              ? "This item is larger than the pivot, so the left scan stops to exchange it."
+              : (i < j ? "This item stays on the pivot's left side; advance the scan."
+                : "The left scan reached the partition boundary."))
+        }
         guard isOnLeft && i < j else { break }
         i += 1
       }
       while true {
         let isOnLeft = engine.compare(pivot, j)
-        engine.annotateLastOperation(
-          stageID: "quick.partition.scanRight",
-          decisionID: "quick.pivotSide",
-          outcome: isOnLeft ? "stop" : "retreat",
-          roles: ["pivot": .arrayIndex(pivot), "candidate": .arrayIndex(j)],
-          explanationKey: "quick.pivotSide")
+        if engine.shouldAnnotateCurrentOperation {
+          engine.annotateLastOperation(
+            stageID: "quick.partition.scanRight",
+            decisionID: "quick.pivotSide",
+            outcome: isOnLeft ? "stop" : "retreat",
+            roles: ["pivot": .arrayIndex(pivot), "candidate": .arrayIndex(j)],
+            explanationKey: "quick.pivotSide",
+            explanation: isOnLeft
+              ? "This item belongs on or before the pivot, so the right scan stops."
+              : "This item is larger than the pivot; retreat through the right partition.")
+        }
         guard !isOnLeft else { break }
         j -= 1
       }

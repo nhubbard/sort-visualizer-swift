@@ -42,7 +42,13 @@ public struct BinaryGnomeSort: SortAlgorithm {
 
         // Do NOT move equal elements to the right of the inserted element;
         // this maintains stability.
-        if engine.compare(i, mid, by: <) {
+        if engine.teachingCompare(
+          i, mid,
+          by: <,
+          stageID: "BinaryGnomeSort.binaryPosition",
+          whenTrue: "The item precedes this midpoint, so search the lower half.",
+          whenFalse: "The item follows this midpoint, so search the upper half."
+        ) {
           hi = mid
         } else {
           lo = mid + 1

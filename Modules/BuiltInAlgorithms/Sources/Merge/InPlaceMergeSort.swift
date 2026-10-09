@@ -45,7 +45,12 @@ public struct InPlaceMergeSort: SortAlgorithm {
     func push(_ low: Int, _ high: Int) {
       var i = low
       while i < high {
-        if engine.compare(i, i + 1, by: >) {
+        if engine.teachingCompare(
+          i, i + 1, by: >,
+          stageID: "InPlaceMergeSort.local.order",
+          whenTrue: "This adjacent pair is reversed, so the local merge swaps it.",
+          whenFalse: "This adjacent pair is ordered, so the local merge leaves it."
+        ) {
           engine.swap(i, i + 1)
         }
         i += 1

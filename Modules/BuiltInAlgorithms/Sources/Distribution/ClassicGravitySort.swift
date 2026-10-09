@@ -67,6 +67,11 @@ public struct ClassicGravitySort: SortAlgorithm {
         }
       }
       engine.setValue(n - i - 1, sum)
+      engine.annotateLastOperation(
+        stageID: "bucketPlacement", decisionID: "classicgravitysort.bucketPlacement",
+        outcome: "place", roles: ["destination": .arrayIndex(n - i - 1)],
+        explanationKey: "classicgravitysort.bucketPlacement",
+        explanation: "The bead count at this height determines the reconstructed output value.")
       for j in 0..<maxValue {
         transpose[j] -= 1
         engine.writeAux(transposeHandle, at: j, value: transpose[j])

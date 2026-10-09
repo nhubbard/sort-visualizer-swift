@@ -66,7 +66,13 @@ public struct AATreeSort: SortAlgorithm {
     func add(_ node: Node?, _ addPointer: Int) -> Node {
       guard let node else { return Node(addPointer) }
 
-      if engine.compare(addPointer, node.pointer, by: <) {
+      if engine.teachingCompare(
+        addPointer, node.pointer,
+        by: <,
+        stageID: "AATreeSort.treeBranch",
+        whenTrue: "The inserted value is smaller, so descend into the left AA-tree branch.",
+        whenFalse: "The inserted value belongs in the other AA-tree branch."
+      ) {
         node.left = add(node.left, addPointer)
         if level(node.left) == node.level {
           if node.level != level(node.right) {

@@ -36,7 +36,13 @@ public struct FlippedMinHeapSort: SortAlgorithm {
       var root = root
       while root <= dist / 2 {
         var leaf = 2 * root
-        if leaf < dist, engine.compare(idx(leaf), idx(leaf + 1), by: (>)) {
+        if leaf < dist, engine.teachingCompare(
+          idx(leaf), idx(leaf + 1),
+          by: (>),
+          stageID: "FlippedMinHeapSort.childChoice",
+          whenTrue: "The first child is larger, so choose the other child for the minimum heap.",
+          whenFalse: "The first child remains the minimum-heap choice."
+        ) {
           leaf += 1
         }
         if engine.compare(idx(root), idx(leaf), by: (>)) {

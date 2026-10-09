@@ -75,7 +75,16 @@ public struct LaziestSort: SortAlgorithm {
       var b = bIn
       while a < b {
         let mid = a + (b - a) / 2
-        if val < engine.readValue(at: mid) {
+        let insertBefore = val < engine.readValue(at: mid)
+        engine.annotateLastOperation(
+          stageID: "laziest.rightBound", decisionID: "laziest.rightBound",
+          outcome: insertBefore ? "left" : "right",
+          roles: ["candidate": .arrayIndex(mid), "heldValue": .value(val)],
+          explanationKey: "laziest.rightBound",
+          explanation: insertBefore
+            ? "The held value is smaller, so the rightmost insertion search narrows left."
+            : "The held value is at least this item, so the search advances right.")
+        if insertBefore {
           b = mid
         } else {
           a = mid + 1
@@ -90,7 +99,16 @@ public struct LaziestSort: SortAlgorithm {
       var b = bIn
       while a < b {
         let mid = a + (b - a) / 2
-        if val <= engine.readValue(at: mid) {
+        let insertBefore = val <= engine.readValue(at: mid)
+        engine.annotateLastOperation(
+          stageID: "laziest.leftBound", decisionID: "laziest.leftBound",
+          outcome: insertBefore ? "left" : "right",
+          roles: ["candidate": .arrayIndex(mid), "heldValue": .value(val)],
+          explanationKey: "laziest.leftBound",
+          explanation: insertBefore
+            ? "The held value is no greater, so the leftmost insertion search narrows left."
+            : "The held value is greater, so the search advances right.")
+        if insertBefore {
           b = mid
         } else {
           a = mid + 1
@@ -130,7 +148,12 @@ public struct LaziestSort: SortAlgorithm {
       var i = a
       var j = m
       while i < j && j < b {
-        if engine.compare(i, j, by: >) {
+        if engine.teachingCompare(
+          i, j, by: >,
+          stageID: "LaziestSort.merge.boundary",
+          whenTrue: "The left item exceeds the right item, so the next rotation must move right-side values ahead.",
+          whenFalse: "The two items are ordered, so the merge advances without that rotation."
+        ) {
           let value = engine.readValue(at: i)
           let k = leftExpSearch(j + 1, b, value)
           GrailSortingTemplate.rotate(&engine, i, j - i, k - j)

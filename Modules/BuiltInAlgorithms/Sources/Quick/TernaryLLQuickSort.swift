@@ -23,7 +23,12 @@ public struct TernaryLLQuickSort: SortAlgorithm {
 
   public func record(into engine: inout RecordingEngine) {
     func compare3(_ a: Int, _ b: Int) -> Int {
-      let geAB = engine.compare(a, b)
+      let geAB = engine.teachingCompare(
+        a, b,
+        stageID: "TernaryLLQuickSort.threeWayOrder",
+        whenTrue: "The first item is at least as large as the second; this guides the three-way partition.",
+        whenFalse: "The first item is smaller, so it belongs before the second."
+      )
       let geBA = engine.compare(b, a)
       if geAB && geBA { return 0 }
       return geAB ? 1 : -1

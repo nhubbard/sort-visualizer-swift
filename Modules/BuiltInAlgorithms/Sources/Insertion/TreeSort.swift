@@ -52,7 +52,13 @@ public struct TreeSort: SortAlgorithm {
       guard let node else { return Node(addPointer) }
       var current = node
       while true {
-        if engine.compare(addPointer, current.pointer, by: <) {
+        if engine.teachingCompare(
+          addPointer, current.pointer,
+          by: <,
+          stageID: "TreeSort.treeBranch",
+          whenTrue: "The inserted value is smaller, so descend into the left tree branch.",
+          whenFalse: "The inserted value belongs in the other tree branch."
+        ) {
           guard let left = current.left else {
             current.left = Node(addPointer)
             break

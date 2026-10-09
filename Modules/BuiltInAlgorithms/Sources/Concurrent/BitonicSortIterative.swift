@@ -34,10 +34,17 @@ public struct BitonicSortIterative: SortAlgorithm {
         for i in 0..<n {
           let ij = i ^ j
           if ij > i && ij < n {
-            if ((i & k) == 0) == m && !engine.compare(ij, i) {
-              engine.swap(i, ij)
-            }
-            if ((i & k) != 0) == m && !engine.compare(i, ij) {
+            let ascending = ((i & k) == 0) == m
+            let ordered = ascending ? engine.compare(ij, i) : engine.compare(i, ij)
+            engine.annotateLastOperation(
+              stageID: "bitonicMerge", decisionID: "bitonicsortiterative.directionalComparator",
+              outcome: ordered ? "keep" : "exchange",
+              roles: ["left": .arrayIndex(i), "right": .arrayIndex(ij)],
+              explanationKey: "bitonicsortiterative.directionalComparator",
+              explanation: ordered
+                ? "This pair fits the current bitonic merge direction, so keep it."
+                : "This pair opposes the current bitonic merge direction, so exchange it.")
+            if !ordered {
               engine.swap(i, ij)
             }
           }

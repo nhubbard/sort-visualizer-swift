@@ -62,7 +62,12 @@ public struct BlockSwapMergeSort: SortAlgorithm {
       var b = min(mid - start, end - mid)
       var m = a + (b - a) / 2
       while b > a {
-        if engine.compare(mid - m - 1, mid + m, by: (>)) {
+        if engine.teachingCompare(
+          mid - m - 1, mid + m, by: (>),
+          stageID: "BlockSwapMergeSort.merge.boundary",
+          whenTrue: "The left block endpoint exceeds the right block start, so the merge boundary shifts right.",
+          whenFalse: "The block endpoints are ordered, so the boundary search shifts left."
+        ) {
           a = m + 1
         } else {
           b = m

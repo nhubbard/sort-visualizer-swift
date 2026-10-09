@@ -56,7 +56,12 @@ public struct BufferedStoogeSort: SortAlgorithm {
     func wrapper(_ start: Int, _ stop: Int) {
       guard stop - start > 1 else { return }
 
-      if stop - start == 2, engine.compare(start, stop - 1, by: >) {
+      if stop - start == 2, engine.teachingCompare(
+        start, stop - 1, by: >,
+        stageID: "BufferedStoogeSort.base.pair",
+        whenTrue: "This two-element range is reversed, so the base case swaps it.",
+        whenFalse: "This two-element range is ordered, so the base case leaves it."
+      ) {
         engine.swap(start, stop - 1)
       }
 

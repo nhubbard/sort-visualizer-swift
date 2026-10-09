@@ -41,6 +41,11 @@ public struct QuadStoogeSort: SortAlgorithm {
   private func quadStooge(_ engine: inout RecordingEngine, _ pos: Int, _ len: Int) {
     if len >= 2 && engine.compare(pos, pos + len - 1, by: >) {
       engine.swap(pos, pos + len - 1)
+      engine.annotateLastOperation(
+        stageID: "candidateExchange", decisionID: "quadstoogesort.candidateExchange",
+        outcome: "exchange", roles: ["left": .arrayIndex(pos), "right": .arrayIndex(pos + len - 1)],
+        explanationKey: "quadstoogesort.candidateExchange",
+        explanation: "The endpoints of this active range are inverted, so exchange them.")
     }
     guard len > 2 else { return }
 

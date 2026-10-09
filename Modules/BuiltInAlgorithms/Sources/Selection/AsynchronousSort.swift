@@ -57,7 +57,13 @@ public struct AsynchronousSort: SortAlgorithm {
     while i < n {
       for j in 0..<n {
         engine.markAuxRead(extHandle, at: j)
-        if engine.compareValues(ext[j], cur, by: (<=)) {
+        if engine.teachingCompareValues(
+          ext[j], cur,
+          by: (<=),
+          stageID: "AsynchronousSort.threshold",
+          whenTrue: "This saved value has reached the threshold, so write it to the next output slot.",
+          whenFalse: "This saved value is above the threshold; revisit it as the threshold rises."
+        ) {
           engine.setValue(i, ext[j])
           ext[j] = maxValue
           engine.writeAux(extHandle, at: j, value: maxValue)

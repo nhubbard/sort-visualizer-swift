@@ -43,7 +43,13 @@ public struct BinaryDoubleInsertionSort: SortAlgorithm {
       var hi = b
       while lo < hi {
         let mid = lo + (hi - lo) / 2
-        if engine.compareValue(mid, against: val, by: (>=)) {
+        if engine.teachingCompareValue(
+          mid, against: val,
+          by: (>=),
+          stageID: "BinaryDoubleInsertionSort.leftBinarySearch",
+          whenTrue: "The midpoint is at least the held value, so continue in the lower half.",
+          whenFalse: "The held value belongs past this midpoint."
+        ) {
           hi = mid
         } else {
           lo = mid + 1

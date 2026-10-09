@@ -37,7 +37,13 @@ public struct OptimizedCocktailShakerSort: SortAlgorithm {
       while i < end {
         // Strict `>` (not the default `>=`): ties never trigger a swap, keeping the sort
         // stable, same as `OptimizedBubbleSort`/`CocktailShakerSort`.
-        if engine.compare(i, i + 1, by: (>)) {
+        if engine.teachingCompare(
+          i, i + 1,
+          by: (>),
+          stageID: "OptimizedCocktailShakerSort.forwardPass",
+          whenTrue: "The left item is larger, so exchange it and update the pass boundary.",
+          whenFalse: "The forward pass leaves this pair in place."
+        ) {
           engine.swap(i, i + 1)
           consecSorted = 1
         } else {

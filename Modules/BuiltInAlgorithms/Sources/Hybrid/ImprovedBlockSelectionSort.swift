@@ -101,7 +101,12 @@ public struct ImprovedBlockSelectionSort: SortAlgorithm {
       var minIndex = start
       var a = start + bLen
       while a < end {
-        if engine.compare(a, minIndex, by: (<)) {
+        if engine.teachingCompare(
+          a, minIndex, by: (<),
+          stageID: "ImprovedBlockSelectionSort.block.minimum",
+          whenTrue: "This block candidate is smaller than the current minimum, so it becomes the new minimum.",
+          whenFalse: "This candidate is not smaller, so the current block minimum remains."
+        ) {
           minIndex = a
         } else if engine.compare(a, minIndex, by: (==))
           && engine.compare(a + bLen - 1, minIndex + bLen - 1, by: (<))
@@ -155,7 +160,12 @@ public struct ImprovedBlockSelectionSort: SortAlgorithm {
       var i = a
       var j = m
       while i < j && j < b {
-        if engine.compare(i, j, by: (>)) {
+        if engine.teachingCompare(
+          i, j, by: (>),
+          stageID: "ImprovedBlockSelectionSort.merge.rotate",
+          whenTrue: "The left run item exceeds the right run item, so the in-place merge rotates the right span ahead.",
+          whenFalse: "These run items are ordered, so the merge advances in the left run."
+        ) {
           var k = j + 1
           while k < b && engine.compare(i, k, by: (>)) {
             k += 1

@@ -41,7 +41,12 @@ public struct BufferPartitionMergeSort: SortAlgorithm {
     guard end - start > 1 else { return }
     for i in (start + 1)..<end {
       var j = i
-      while j > start && engine.compare(j - 1, j, by: >) {
+      while j > start && engine.teachingCompare(
+        j - 1, j, by: >,
+        stageID: "BufferPartitionMergeSort.smallRun.insert",
+        whenTrue: "The preceding value is larger, so insertion swaps the adjacent pair.",
+        whenFalse: "The pair is ordered, so this insertion scan can stop."
+      ) {
         engine.swap(j - 1, j)
         j -= 1
       }
@@ -56,7 +61,12 @@ public struct BufferPartitionMergeSort: SortAlgorithm {
       var high = i
       while low < high {
         let middle = low + (high - low) / 2
-        if engine.compareValue(middle, against: value, by: >) {
+        if engine.teachingCompareValue(
+          middle, against: value, by: >,
+          stageID: "BufferPartitionMergeSort.binaryInsert",
+          whenTrue: "This run value exceeds the held item, so binary insertion searches the left half.",
+          whenFalse: "This run value is no greater, so binary insertion searches the right half."
+        ) {
           high = middle
         } else {
           low = middle + 1

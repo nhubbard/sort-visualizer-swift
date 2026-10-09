@@ -65,6 +65,11 @@ public struct SmartBogoBogoSort: SortAlgorithm {
       var candidate = 0
       while engine.compare(length - 2, length - 1, by: (>)) {
         engine.swap(candidate, length - 1)
+        engine.annotateLastOperation(
+          stageID: "candidateExchange", decisionID: "smartbogobogosort.candidateExchange",
+          outcome: "exchange", roles: ["left": .arrayIndex(candidate), "right": .arrayIndex(length - 1)],
+          explanationKey: "smartbogobogosort.candidateExchange",
+          explanation: "The last value is still smaller than the sorted prefix’s maximum, so try another candidate in the last slot.")
         candidate += 1
         smartBogoBogo(length - 1)
       }

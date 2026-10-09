@@ -29,7 +29,12 @@ public struct MaxHeapSort: SortAlgorithm {
         var largest = root
         let left = 2 * root + 1
         let right = 2 * root + 2
-        if left < size && !engine.compare(largest, left) {
+        if left < size && !engine.teachingCompare(
+          largest, left,
+          stageID: "MaxHeapSort.leftChild",
+          whenTrue: "The left child is no larger, so keep the current heap maximum.",
+          whenFalse: "The left child is larger, so promote it as heap maximum."
+        ) {
           largest = left
         }
         if right < size && !engine.compare(largest, right) {

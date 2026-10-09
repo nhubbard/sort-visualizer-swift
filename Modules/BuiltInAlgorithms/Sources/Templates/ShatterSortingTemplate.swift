@@ -60,6 +60,12 @@ enum ShatterSortingTemplate {
     for i in window {
       let value = engine.readValue(at: i)
       let idx = min(shatters - 1, (value - minValue) * shatters / valueRange)
+      engine.annotateLastOperation(
+        stageID: "shatter.bucket", decisionID: "shatter.bucketForValue",
+        outcome: "bucket-\(idx)",
+        roles: ["item": .arrayIndex(i), "bucket": .value(idx)],
+        explanationKey: "shatter.bucket",
+        explanation: "This value maps to bucket \(idx + 1) of \(shatters), so Shatter places it with values from the same range.")
       buckets[idx].append(value)
     }
 

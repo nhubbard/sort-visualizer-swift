@@ -66,7 +66,12 @@ public struct CocktailMergeSort: SortAlgorithm {
         // condition, which never swaps on a tie; see `CocktailShakerSort.swift`.
         var j = i
         while j < length - i - 1 {
-          if engine.compare(start + j, start + j + 1, by: (>)) {
+          if engine.teachingCompare(
+            start + j, start + j + 1, by: (>),
+            stageID: "CocktailMergeSort.cocktail.forward",
+            whenTrue: "This adjacent pair is reversed, so the forward pass swaps it.",
+            whenFalse: "This adjacent pair is ordered, so the forward pass leaves it in place."
+          ) {
             engine.swap(start + j, start + j + 1)
             sorted = false
           }

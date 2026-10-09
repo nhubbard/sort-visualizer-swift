@@ -57,7 +57,12 @@ public struct IterativeTopDownMergeSort: SortAlgorithm {
       }
 
       while low < mid && high < end {
-        if engine.compare(low, high, by: (>)) {
+        if engine.teachingCompare(
+          low, high, by: (>),
+          stageID: "IterativeTopDownMergeSort.merge.choose",
+          whenTrue: "The left run value exceeds the right, so the merge takes from the right run.",
+          whenFalse: "The left run value is no greater, so the merge takes from the left run."
+        ) {
           take(from: high)
           high += 1
         } else {

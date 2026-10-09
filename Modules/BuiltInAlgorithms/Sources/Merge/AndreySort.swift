@@ -53,7 +53,12 @@ public struct AndreySort: SortAlgorithm {
       var b = bIn
       while b > 1 {
         var k = 0
-        for i in 1..<b where engine.compare(a + k, a + i, by: (>)) {
+        for i in 1..<b where engine.teachingCompare(
+          a + k, a + i, by: (>),
+          stageID: "AndreySort.key.selection",
+          whenTrue: "This candidate is below the current key, so Andrey selects it as the new minimum.",
+          whenFalse: "This candidate is not below the current key, so the selected minimum remains."
+        ) {
           k = i
         }
         engine.swap(a, a + k)

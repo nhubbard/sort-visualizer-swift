@@ -72,7 +72,13 @@ public struct TournamentSort: SortAlgorithm {
     func makeMatch(_ top: Int, _ bot: Int, _ root: Int) -> Int {
       let topWinner = getPlayer(top)
       let botWinner = getPlayer(bot)
-      if engine.compare(topWinner, botWinner, by: <=) {
+      if engine.teachingCompare(
+        topWinner, botWinner,
+        by: <=,
+        stageID: "TournamentSort.matchWinner",
+        whenTrue: "The first contestant is no larger, so it advances in the tournament.",
+        whenFalse: "The second contestant advances in the tournament."
+      ) {
         setMatch(root, topWinner, top, bot)
       } else {
         setMatch(root, botWinner, bot, top)
