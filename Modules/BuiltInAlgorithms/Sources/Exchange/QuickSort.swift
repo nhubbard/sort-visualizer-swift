@@ -1,10 +1,11 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
 public struct QuickSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "quicksort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Quick Sort",
+    displayName: String(localized: "Quick Sort", bundle: .module),
     category: .exchange,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -43,9 +44,9 @@ public struct QuickSort: SortAlgorithm {
             roles: ["pivot": .arrayIndex(pivot), "candidate": .arrayIndex(i)],
             explanationKey: "quick.pivotSide",
             explanation: !isOnLeft
-              ? "This item is larger than the pivot, so the left scan stops to exchange it."
-              : (i < j ? "This item stays on the pivot's left side; advance the scan."
-                : "The left scan reached the partition boundary."))
+              ? String(localized: "This item is larger than the pivot, so the left scan stops to exchange it.", bundle: .module)
+              : (i < j ? String(localized: "This item stays on the pivot's left side; advance the scan.", bundle: .module)
+                : String(localized: "The left scan reached the partition boundary.", bundle: .module)))
         }
         guard isOnLeft && i < j else { break }
         i += 1
@@ -60,8 +61,8 @@ public struct QuickSort: SortAlgorithm {
             roles: ["pivot": .arrayIndex(pivot), "candidate": .arrayIndex(j)],
             explanationKey: "quick.pivotSide",
             explanation: isOnLeft
-              ? "This item belongs on or before the pivot, so the right scan stops."
-              : "This item is larger than the pivot; retreat through the right partition.")
+              ? String(localized: "This item belongs on or before the pivot, so the right scan stops.", bundle: .module)
+              : String(localized: "This item is larger than the pivot; retreat through the right partition.", bundle: .module))
         }
         guard !isOnLeft else { break }
         j -= 1

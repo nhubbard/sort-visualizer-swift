@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -13,7 +14,7 @@ import SortEngineKit
 public struct IntroCircleSortIterative: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "introcirclesortiterative")
   public let metadata = AlgorithmMetadata(
-    displayName: "Intro Circle (Iterative)",
+    displayName: String(localized: "Intro Circle (Iterative)", bundle: .module),
     category: .hybrid,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -65,8 +66,8 @@ public struct IntroCircleSortIterative: SortAlgorithm {
               if engine.teachingCompare(
                 low, high, by: (>),
                 stageID: "IntroCircleSortIterative.circle.pair",
-                whenTrue: "The mirrored pair is reversed, so the circle pass swaps it.",
-                whenFalse: "The mirrored pair is ordered, so the circle pass leaves it."
+                whenTrue: String(localized: "The mirrored pair is reversed, so the circle pass swaps it.", bundle: .module),
+                whenFalse: String(localized: "The mirrored pair is ordered, so the circle pass leaves it.", bundle: .module)
               ) {
                 engine.swap(low, high)
                 swapCount += 1
@@ -100,8 +101,8 @@ public struct IntroCircleSortIterative: SortAlgorithm {
             if engine.teachingCompare(
               i, mid, by: (<),
               stageID: "IntroCircleSortIterative.fallback.insert",
-              whenTrue: "The current value precedes the middle of the sorted prefix, so search left.",
-              whenFalse: "The current value follows or ties the middle, so search right."
+              whenTrue: String(localized: "The current value precedes the middle of the sorted prefix, so search left.", bundle: .module),
+              whenFalse: String(localized: "The current value follows or ties the middle, so search right.", bundle: .module)
             ) {
               hi = mid
             } else {

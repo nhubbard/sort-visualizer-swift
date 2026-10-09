@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import AudioEngineKit
 import SettingsKit
@@ -75,7 +76,7 @@ public struct ScrollingSortView: View {
           // via the same Full Sweep profiling round that fixed `CodeTheme`'s hex parsing and
           // `AnalyticsService.fetchSummaries`'s cache-defeating write/read cycle.
           if session.isAutomating {
-            Text("Details hidden during automation")
+            Text(String(localized: "Details hidden during automation", bundle: .module))
               .font(.callout)
               .foregroundStyle(.secondary)
               .padding()

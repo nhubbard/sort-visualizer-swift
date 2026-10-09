@@ -1,10 +1,11 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
 public struct SmartGuessSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "smartguesssort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Smart Guess Sort",
+    displayName: String(localized: "Smart Guess Sort", bundle: .module),
     category: .impractical,
     sizeRange: 4...8,
     growthModel: OperationGrowthModel(
@@ -41,8 +42,8 @@ public struct SmartGuessSort: SortAlgorithm {
         roles: ["left": .arrayIndex(loops[i]), "right": .arrayIndex(loops[i + 1])],
         explanationKey: "smartguesssort.strictOrder",
         explanation: increasing
-          ? "This mapped pair increases, so the candidate suffix remains valid."
-          : "This mapped pair does not increase, so check whether its values tie.")
+          ? String(localized: "This mapped pair increases, so the candidate suffix remains valid.", bundle: .module)
+          : String(localized: "This mapped pair does not increase, so check whether its values tie.", bundle: .module))
       if increasing { return true }
       let equal = engine.compare(loops[i], loops[i + 1], by: (==))
       let stableTie = equal && loops[i] < loops[i + 1]
@@ -52,8 +53,8 @@ public struct SmartGuessSort: SortAlgorithm {
         roles: ["left": .arrayIndex(loops[i]), "right": .arrayIndex(loops[i + 1])],
         explanationKey: "smartguesssort.stableTie",
         explanation: stableTie
-          ? "Equal values retain their source order, so this suffix pair is valid."
-          : "This pair is descending or breaks stable tie order, so advance the candidate mapping.")
+          ? String(localized: "Equal values retain their source order, so this suffix pair is valid.", bundle: .module)
+          : String(localized: "This pair is descending or breaks stable tie order, so advance the candidate mapping.", bundle: .module))
       return stableTie
     }
 
@@ -87,7 +88,7 @@ public struct SmartGuessSort: SortAlgorithm {
         stageID: "candidatePlacement", decisionID: "smartguesssort.candidatePlacement",
         outcome: "place", roles: ["destination": .arrayIndex(i)],
         explanationKey: "smartguesssort.candidatePlacement",
-        explanation: "This candidate permutation satisfies the ordering check and is placed here.")
+        explanation: String(localized: "This candidate permutation satisfies the ordering check and is placed here.", bundle: .module))
     }
   }
 }

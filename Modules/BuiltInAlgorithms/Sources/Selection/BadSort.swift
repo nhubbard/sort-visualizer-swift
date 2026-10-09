@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -27,7 +28,7 @@ import SortEngineKit
 public struct BadSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "badsort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Bad Sort",
+    displayName: String(localized: "Bad Sort", bundle: .module),
     category: .selection,
     sizeRange: 16...128,
     growthModel: OperationGrowthModel(
@@ -63,8 +64,8 @@ public struct BadSort: SortAlgorithm {
             index2, index2p,
             by: (>),
             stageID: "BadSort.candidateOrder",
-            whenTrue: "This candidate is larger, so exchange the compared positions.",
-            whenFalse: "The candidate ordering does not trigger an exchange."
+            whenTrue: String(localized: "This candidate is larger, so exchange the compared positions.", bundle: .module),
+            whenFalse: String(localized: "The candidate ordering does not trigger an exchange.", bundle: .module)
           ) {
             isShortest = false
             break

@@ -1,10 +1,11 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
 public struct CombSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "combsort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Comb Sort",
+    displayName: String(localized: "Comb Sort", bundle: .module),
     category: .exchange,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -41,8 +42,8 @@ public struct CombSort: SortAlgorithm {
         if !engine.teachingCompare(
           gapInt + i, i,
           stageID: "CombSort.gapOrder",
-          whenTrue: "The item across the gap is ordered, so no exchange is needed.",
-          whenFalse: "The gap-separated items are reversed, so exchange them."
+          whenTrue: String(localized: "The item across the gap is ordered, so no exchange is needed.", bundle: .module),
+          whenFalse: String(localized: "The gap-separated items are reversed, so exchange them.", bundle: .module)
         ) {
           engine.swap(i, gapInt + i)
           swapped = true

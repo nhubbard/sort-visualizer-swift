@@ -1,10 +1,11 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
 public struct StoogeSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "stoogesort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Stooge Sort",
+    displayName: String(localized: "Stooge Sort", bundle: .module),
     category: .impractical,
     sizeRange: 16...32,
     growthModel: OperationGrowthModel(
@@ -41,15 +42,15 @@ public struct StoogeSort: SortAlgorithm {
       roles: ["first": .arrayIndex(i), "last": .arrayIndex(j)],
       explanationKey: "stoogesort.endpointOrder",
       explanation: inverted
-        ? "The range endpoints are inverted, so exchange them before recursing."
-        : "The range endpoints are ordered, so recurse without exchanging them.")
+        ? String(localized: "The range endpoints are inverted, so exchange them before recursing.", bundle: .module)
+        : String(localized: "The range endpoints are ordered, so recurse without exchanging them.", bundle: .module))
     if inverted {
       engine.swap(i, j)
       engine.annotateLastOperation(
         stageID: "candidateExchange", decisionID: "stoogesort.candidateExchange",
         outcome: "exchange", roles: ["left": .arrayIndex(i), "right": .arrayIndex(j)],
         explanationKey: "stoogesort.candidateExchange",
-        explanation: "The endpoints of this recursive range are inverted, so exchange them.")
+        explanation: String(localized: "The endpoints of this recursive range are inverted, so exchange them.", bundle: .module))
     }
     if j - i + 1 >= 3 {
       let t = (j - i + 1) / 3

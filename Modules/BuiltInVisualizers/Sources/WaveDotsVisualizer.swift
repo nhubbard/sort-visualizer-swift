@@ -10,7 +10,7 @@ import VisualizationKit
 public struct WaveDotsVisualizer: Visualizer {
   public let id = VisualizerID(rawValue: "wavedots")
   public let metadata = VisualizerMetadata(
-    displayName: "Wave Dots",
+    displayName: String(localized: "Wave Dots", bundle: .module),
     supportsAuxArrays: false,
     iconName: "water.waves"
   )

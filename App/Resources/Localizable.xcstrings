@@ -1,94 +1,289 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "All" : {
+    "%@: %@" : {
 
+    },
+    "%@: %@ · size %lld (%lld/%lld) · run %lld/%lld" : {
+
+    },
+    "All" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Todos"
+          }
+        }
+      }
     },
     "All Algorithms" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Todos los algoritmos"
+          }
+        }
+      }
+    },
+    "Browse categories or search by name, then choose a sort to watch it run." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Explora las categorías o busca por nombre. Después, elige un algoritmo de ordenación para verlo en acción."
+          }
+        }
+      }
     },
     "Categories" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Categorías"
+          }
+        }
+      }
     },
     "Choose another category." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Elige otra categoría."
+          }
+        }
+      }
+    },
+    "Complexity: %lld" : {
+
+    },
+    "Couldn't import this tape: %@" : {
+
+    },
+    "Couldn't read this file: %@" : {
 
     },
     "Cycle Array Size" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Cambiar tamaño del arreglo"
+          }
+        }
+      }
     },
     "Cycle Visualizer" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Cambiar visualizador"
+          }
+        }
+      }
     },
     "Decrease Duration" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Reducir duración"
+          }
+        }
+      }
     },
     "Decrease Duration ×10" : {
 
     },
     "Decrease Speed" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Reducir velocidad"
+          }
+        }
+      }
     },
     "Decrease Speed ×10" : {
 
     },
     "Done" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Cerrar"
+          }
+        }
+      }
+    },
+    "Estimated Speed" : {
 
     },
-    "Import a previously exported .tape file" : {
+    "Find an algorithm" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Encuentra un algoritmo"
+          }
+        }
+      }
+    },
+    "Full Sweep: %@" : {
+
+    },
+    "Full Sweep: %@ · %@ + %@ + %@" : {
+
+    },
+    "Full Sweep: %@ · %@ + %@ + %@ · ~%@ remaining" : {
+
+    },
+    "Implementation Complexity" : {
 
     },
     "Import Failed" : {
 
     },
     "Import Tape" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Importar cinta"
+          }
+        }
+      }
+    },
+    "Import a previously exported .tape file" : {
 
     },
     "Increase Duration" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Aumentar duración"
+          }
+        }
+      }
     },
     "Increase Duration ×10" : {
 
     },
     "Increase Speed" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Aumentar velocidad"
+          }
+        }
+      }
     },
     "Increase Speed ×10" : {
 
     },
     "Jump to End" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Ir al final"
+          }
+        }
+      }
     },
     "Jump to Start" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Ir al principio"
+          }
+        }
+      }
+    },
+    "Max Size Only" : {
 
+    },
+    "N/A above n=%lld" : {
+
+    },
+    "Name" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Nombre"
+          }
+        }
+      }
     },
     "No Algorithms Available" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "No hay algoritmos disponibles"
+          }
+        }
+      }
     },
     "No Matching Algorithms" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "No se han encontrado algoritmos"
+          }
+        }
+      }
     },
     "OK" : {
 
     },
     "Play/Pause" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Reproducir/pausar"
+          }
+        }
+      }
     },
     "Restart" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Reiniciar"
+          }
+        }
+      }
     },
     "Resume Full Sweep" : {
 
     },
-    "Run every algorithm once" : {
-
-    },
-    "Run every algorithm, shuffle, and visualizer" : {
+    "Resume Full Sweep? (%@/%@ done)" : {
 
     },
     "Run Max Size Only" : {
 
     },
     "Run Size Sweep" : {
+
+    },
+    "Run every algorithm once" : {
+
+    },
+    "Run every algorithm, shuffle, and visualizer" : {
 
     },
     "Runs every algorithm against every shuffle and every visualizer — %@ combinations, likely several days. Progress is saved and resumes automatically across launches. Other controls are locked until it finishes or is stopped." : {
@@ -98,24 +293,80 @@
 
     },
     "Search" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Buscar"
+          }
+        }
+      }
     },
     "Settings" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Ajustes"
+          }
+        }
+      }
     },
     "Settings…" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Ajustes…"
+          }
+        }
+      }
+    },
+    "Shortcuts: %@: %@" : {
+
+    },
+    "Shortcuts: %@: %@ · size %lld (%lld/%lld) · run %lld/%lld" : {
+
+    },
+    "Showcase" : {
+
+    },
+    "Showcase: %@ (%lld/%lld)" : {
+
+    },
+    "Size Sweep" : {
 
     },
     "Sort" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Ordenación"
+          }
+        }
+      }
     },
     "Sort By" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Ordenar por"
+          }
+        }
+      }
+    },
+    "Sort Run" : {
 
     },
     "Sort Symphony v2" : {
 
     },
     "Start Full Sweep" : {
+
+    },
+    "Start Full Sweep?" : {
 
     },
     "Start Showcase" : {
@@ -125,12 +376,29 @@
 
     },
     "Step Backward" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Retroceder un paso"
+          }
+        }
+      }
     },
     "Step Forward" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Avanzar un paso"
+          }
+        }
+      }
     },
     "Stop" : {
+
+    },
+    "Stop Automation" : {
 
     },
     "Stop Full Sweep" : {
@@ -139,18 +407,32 @@
     "Stop Showcase" : {
 
     },
-    "Toggle Sound" : {
+    "This tape was recorded with an algorithm (\"%@\") this build doesn't recognize." : {
 
+    },
+    "Toggle Sound" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Activar/desactivar el sonido"
+          }
+        }
+      }
     },
     "Try another name or category." : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Prueba con otro nombre o categoría."
+          }
+        }
+      }
     },
-    "Find an algorithm" : {
-
-    },
-    "Browse categories or search by name, then choose a sort to watch it run." : {
+    "~%@ ops at n=%lld" : {
 
     }
   },
-  "version" : "1.0"
+  "version" : "1.3"
 }

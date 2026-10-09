@@ -12,7 +12,7 @@ import VisualizationKit
 public struct DisparityChordsVisualizer: Visualizer {
   public let id = VisualizerID(rawValue: "disparitychords")
   public let metadata = VisualizerMetadata(
-    displayName: "Disparity Chords",
+    displayName: String(localized: "Disparity Chords", bundle: .module),
     supportsAuxArrays: false,
     iconName: "link.circle.fill"
   )

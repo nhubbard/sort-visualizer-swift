@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -19,7 +20,7 @@ import SortEngineKit
 public struct PancakeInsertionSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "pancakeinsertionsort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Pancake Insertion Sort",
+    displayName: String(localized: "Pancake Insertion Sort", bundle: .module),
     category: .miscellaneous,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -41,7 +42,7 @@ public struct PancakeInsertionSort: SortAlgorithm {
     let n = engine.count
     guard n >= 2 else { return }
 
-    func flip(_ i: Int, reason: String = "Flip the prefix to place the current value.") {
+    func flip(_ i: Int, reason: String = String(localized: "Flip the prefix to place the current value.", bundle: .module)) {
       engine.teachingReversal(0, i,
         stageID: "PancakeInsertionSort.prefixFlip", explanation: reason)
     }
@@ -56,8 +57,8 @@ public struct PancakeInsertionSort: SortAlgorithm {
         if !engine.teachingCompare(
           valueIndex, end - mid, by: (>),
           stageID: "PancakeInsertionSort.binary.insert",
-          whenTrue: "The held value is greater than this prefix item, so insertion scans farther through the prefix.",
-          whenFalse: "The held value is no greater than this prefix item, so insertion narrows toward it."
+          whenTrue: String(localized: "The held value is greater than this prefix item, so insertion scans farther through the prefix.", bundle: .module),
+          whenFalse: String(localized: "The held value is no greater than this prefix item, so insertion narrows toward it.", bundle: .module)
         ) { end -= mid }
         top -= mid
       }
@@ -75,8 +76,8 @@ public struct PancakeInsertionSort: SortAlgorithm {
         if engine.teachingCompare(
           start + mid, valueIndex, by: (>),
           stageID: "PancakeInsertionSort.descending.bound",
-          whenTrue: "The prefix item is larger, so the descending insertion point lies farther right.",
-          whenFalse: "The prefix item is no larger, so the descending insertion point stays left."
+          whenTrue: String(localized: "The prefix item is larger, so the descending insertion point lies farther right.", bundle: .module),
+          whenFalse: String(localized: "The prefix item is no larger, so the descending insertion point stays left.", bundle: .module)
         ) { start += mid }
         top -= mid
       }
@@ -113,15 +114,15 @@ public struct PancakeInsertionSort: SortAlgorithm {
         if engine.teachingCompare(
           i - 1, i, by: (<=),
           stageID: "PancakeInsertionSort.ascending.extend",
-          whenTrue: "The new value follows the ascending prefix, so no flip is needed.",
-          whenFalse: "The new value precedes the prefix end, so it needs insertion."
+          whenTrue: String(localized: "The new value follows the ascending prefix, so no flip is needed.", bundle: .module),
+          whenFalse: String(localized: "The new value precedes the prefix end, so it needs insertion.", bundle: .module)
         ) {
           // Already in place; the ascending prefix already ends <= the new element.
         } else if engine.teachingCompare(
           0, i, by: (>),
           stageID: "PancakeInsertionSort.ascending.front",
-          whenTrue: "The new value belongs before the prefix, so flip the previous prefix.",
-          whenFalse: "The new value belongs inside the prefix, so search for its place."
+          whenTrue: String(localized: "The new value belongs before the prefix, so flip the previous prefix.", bundle: .module),
+          whenFalse: String(localized: "The new value belongs inside the prefix, so search for its place.", bundle: .module)
         ) {
           flip(i - 1)
           dir.toggle()
@@ -137,15 +138,15 @@ public struct PancakeInsertionSort: SortAlgorithm {
         if engine.teachingCompare(
           i - 1, i, by: (>),
           stageID: "PancakeInsertionSort.descending.extend",
-          whenTrue: "The new value follows the descending prefix, so no flip is needed.",
-          whenFalse: "The new value interrupts the descending prefix and needs insertion."
+          whenTrue: String(localized: "The new value follows the descending prefix, so no flip is needed.", bundle: .module),
+          whenFalse: String(localized: "The new value interrupts the descending prefix and needs insertion.", bundle: .module)
         ) {
           // Already in place; the descending prefix already ends >= the new element.
         } else if engine.teachingCompare(
           0, i, by: (<=),
           stageID: "PancakeInsertionSort.descending.front",
-          whenTrue: "The new value belongs before the descending prefix, so flip it.",
-          whenFalse: "The new value belongs inside the descending prefix, so search for its place."
+          whenTrue: String(localized: "The new value belongs before the descending prefix, so flip it.", bundle: .module),
+          whenFalse: String(localized: "The new value belongs inside the descending prefix, so search for its place.", bundle: .module)
         ) {
           flip(i - 1)
           dir.toggle()
@@ -162,7 +163,7 @@ public struct PancakeInsertionSort: SortAlgorithm {
     }
 
     if !dir {
-      flip(n - 1, reason: "The prefix is descending, so reverse it to finish in ascending order.")
+      flip(n - 1, reason: String(localized: "The prefix is descending, so reverse it to finish in ascending order.", bundle: .module))
     }
   }
 }

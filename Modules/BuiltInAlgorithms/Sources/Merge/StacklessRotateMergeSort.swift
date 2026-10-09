@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -28,7 +29,7 @@ import SortEngineKit
 public struct StacklessRotateMergeSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "stacklessrotatemergesort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Stackless Rotate Merge Sort",
+    displayName: String(localized: "Stackless Rotate Merge Sort", bundle: .module),
     category: .merge,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -95,8 +96,8 @@ public struct StacklessRotateMergeSort: SortAlgorithm {
           if engine.teachingCompare(
             m - (c - ml), b - ml - 1, by: (>),
             stageID: "StacklessRotateMergeSort.merge.boundary",
-            whenTrue: "The left range endpoint exceeds the right endpoint, so the binary boundary moves left.",
-            whenFalse: "The endpoints are ordered, so the binary boundary moves right."
+            whenTrue: String(localized: "The left range endpoint exceeds the right endpoint, so the binary boundary moves left.", bundle: .module),
+            whenFalse: String(localized: "The endpoints are ordered, so the binary boundary moves right.", bundle: .module)
           ) {
             r2 = ml
           } else {
@@ -111,8 +112,8 @@ public struct StacklessRotateMergeSort: SortAlgorithm {
           let ml = (r1 + r2) / 2
           if engine.teachingCompare(
             a + ml, m + (cIn - ml) - 1, by: (>), stageID: "stacklessRotate.mergeBoundary",
-            whenTrue: "This left candidate exceeds the right candidate, so the merge boundary moves left.",
-            whenFalse: "These candidates are ordered, so the merge boundary moves right.") {
+            whenTrue: String(localized: "This left candidate exceeds the right candidate, so the merge boundary moves left.", bundle: .module),
+            whenFalse: String(localized: "These candidates are ordered, so the merge boundary moves right.", bundle: .module)) {
             r2 = ml
           } else {
             r1 = ml + 1
@@ -129,8 +130,8 @@ public struct StacklessRotateMergeSort: SortAlgorithm {
       var i = a + 1
       while i < b, !engine.teachingCompare(
         i - 1, i, by: (>), stageID: "stacklessRotate.findSeam",
-        whenTrue: "This pair descends, marking the seam between two runs.",
-        whenFalse: "This pair is ordered, so the run scan continues.") { i += 1 }
+        whenTrue: String(localized: "This pair descends, marking the seam between two runs.", bundle: .module),
+        whenFalse: String(localized: "This pair is ordered, so the run scan continues.", bundle: .module)) { i += 1 }
       if i < b { partitionMerge(a, i, b, c) }
     }
 
@@ -141,8 +142,8 @@ public struct StacklessRotateMergeSort: SortAlgorithm {
       while i < b {
         if engine.teachingCompare(
           i - 1, i, by: (>), stageID: "stacklessRotate.pairPresort",
-          whenTrue: "This starting pair descends, so the pair presort swaps it.",
-          whenFalse: "This starting pair is ordered, so the pair presort keeps it.") { engine.swap(i - 1, i) }
+          whenTrue: String(localized: "This starting pair descends, so the pair presort swaps it.", bundle: .module),
+          whenFalse: String(localized: "This starting pair is ordered, so the pair presort keeps it.", bundle: .module)) { engine.swap(i - 1, i) }
         i += 2
       }
 
@@ -170,8 +171,8 @@ public struct StacklessRotateMergeSort: SortAlgorithm {
         while m < b1 {
           if engine.teachingCompare(
             m - 1, m, by: (>), stageID: "stacklessRotate.finishPair",
-            whenTrue: "This pair is reversed after rotation, so the finishing pass swaps it.",
-            whenFalse: "This pair is ordered after rotation, so the finishing pass keeps it.") { engine.swap(m - 1, m) }
+            whenTrue: String(localized: "This pair is reversed after rotation, so the finishing pass swaps it.", bundle: .module),
+            whenFalse: String(localized: "This pair is ordered after rotation, so the finishing pass keeps it.", bundle: .module)) { engine.swap(m - 1, m) }
           m += 2
         }
 

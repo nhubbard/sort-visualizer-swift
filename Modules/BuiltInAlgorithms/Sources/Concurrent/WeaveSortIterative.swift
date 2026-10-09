@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -18,7 +19,7 @@ import SortEngineKit
 public struct WeaveSortIterative: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "weavesortiterative")
   public let metadata = AlgorithmMetadata(
-    displayName: "Iterative Weave Sort",
+    displayName: String(localized: "Iterative Weave Sort", bundle: .module),
     category: .concurrent,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -49,8 +50,8 @@ public struct WeaveSortIterative: SortAlgorithm {
         roles: ["left": .arrayIndex(a), "right": .arrayIndex(b)],
         explanationKey: "weavesortiterative.compareExchange",
         explanation: shouldSwap
-          ? "The left value exceeds the right value, so this comparator exchanges them."
-          : "These values satisfy this comparator, so they stay in place.")
+          ? String(localized: "The left value exceeds the right value, so this comparator exchanges them.", bundle: .module)
+          : String(localized: "These values satisfy this comparator, so they stay in place.", bundle: .module))
       if shouldSwap {
         engine.swap(a, b)
       }

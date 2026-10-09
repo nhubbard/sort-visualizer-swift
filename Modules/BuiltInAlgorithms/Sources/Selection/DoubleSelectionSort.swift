@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -14,7 +15,7 @@ import SortEngineKit
 public struct DoubleSelectionSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "doubleselectionsort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Double Selection Sort",
+    displayName: String(localized: "Double Selection Sort", bundle: .module),
     category: .selection,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -47,8 +48,8 @@ public struct DoubleSelectionSort: SortAlgorithm {
           i, biggest,
           by: (>),
           stageID: "DoubleSelectionSort.maximumCandidate",
-          whenTrue: "This item is larger, so update the maximum for the right end.",
-          whenFalse: "The current maximum candidate remains."
+          whenTrue: String(localized: "This item is larger, so update the maximum for the right end.", bundle: .module),
+          whenFalse: String(localized: "The current maximum candidate remains.", bundle: .module)
         ) {
           biggest = i
         }

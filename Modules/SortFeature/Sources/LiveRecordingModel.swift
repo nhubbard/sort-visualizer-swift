@@ -17,9 +17,12 @@ enum LiveRecordingError: LocalizedError {
 
   var errorDescription: String? {
     switch self {
-    case .unavailable: "Screen recording is unavailable on this device right now."
-    case .emptyFile: "The recording did not produce a video. Please try again."
-    case .startTimedOut: "Screen recording did not start. Check system recording permissions and try again."
+    case .unavailable:
+      String(localized: "Screen recording is unavailable on this device right now.", bundle: .module)
+    case .emptyFile:
+      String(localized: "The recording did not produce a video. Please try again.", bundle: .module)
+    case .startTimedOut:
+      String(localized: "Screen recording did not start. Check system recording permissions and try again.", bundle: .module)
     }
   }
 }

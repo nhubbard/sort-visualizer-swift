@@ -17,12 +17,14 @@ public struct HomeView: View {
   public var body: some View {
     ScrollView {
       VStack(spacing: 2) {
-        Text("Welcome to").bold()
+        Text(String(localized: "Welcome to", bundle: Self.localizationBundle)).bold()
         RandomizingHeader(text: "SORT SYMPHONY")
-        Button("Try Quick Sort", action: onTryQuickSort)
+        Button(action: onTryQuickSort) {
+          Text(String(localized: "Try Quick Sort", bundle: Self.localizationBundle))
+        }
           .buttonStyle(.bordered)
           .accessibilityIdentifier("homeTryQuickSortButton")
-          .accessibilityHint("Opens a Quick Sort example from the algorithm catalog")
+          .accessibilityHint(String(localized: "Opens a Quick Sort example from the algorithm catalog", bundle: Self.localizationBundle))
           .padding(.top, 12)
         Markdown(Self.welcomeCopy)
           .markdownTextStyle {
@@ -35,10 +37,14 @@ public struct HomeView: View {
       }
     }
     .padding()
-    .navigationTitle("Home")
+    .navigationTitle(String(localized: "Home", bundle: Self.localizationBundle))
+  }
+
+  private static var localizationBundle: Bundle {
+    Bundle(for: HomeLocalizationBundle.self)
   }
 
   private static var welcomeCopy: String {
-    String(localized: "home.welcomeCopy", bundle: Bundle(for: HomeLocalizationBundle.self))
+    String(localized: "home.welcomeCopy", bundle: localizationBundle)
   }
 }

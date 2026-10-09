@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -9,7 +10,7 @@ import SortEngineKit
 public struct WikiSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "wikisort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Wiki Sort",
+    displayName: String(localized: "Wiki Sort", bundle: .module),
     category: .hybrid,
     sizeRange: 16...994,
     growthModel: OperationGrowthModel(
@@ -91,8 +92,8 @@ private final class WikiRecorder {
     engine.teachingCompare(
       left, right, by: (<),
       stageID: "WikiSort.key.order",
-      whenTrue: "The first key is smaller, so WikiSort orders it before the second.",
-      whenFalse: "The first key is not smaller, so WikiSort checks another ordering.")
+      whenTrue: String(localized: "The first key is smaller, so WikiSort orders it before the second.", bundle: .module),
+      whenFalse: String(localized: "The first key is not smaller, so WikiSort checks another ordering.", bundle: .module))
   }
   private func lessValues(_ left: Int, _ right: Int) -> Bool { engine.compareValues(left, right, by: (<)) }
   private func greaterValues(_ left: Int, _ right: Int) -> Bool { engine.compareValues(left, right, by: (>)) }

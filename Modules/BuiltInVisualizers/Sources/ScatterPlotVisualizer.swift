@@ -1,3 +1,4 @@
+import Foundation
 import SortEngineKit
 import VisualizationKit
 
@@ -6,7 +7,7 @@ import VisualizationKit
 public struct ScatterPlotVisualizer: Visualizer {
   public let id = VisualizerID(rawValue: "scatterplot")
   public let metadata = VisualizerMetadata(
-    displayName: "Scatter Plot",
+    displayName: String(localized: "Scatter Plot", bundle: .module),
     supportsAuxArrays: false,
     iconName: "circle.grid.3x3.fill"
   )

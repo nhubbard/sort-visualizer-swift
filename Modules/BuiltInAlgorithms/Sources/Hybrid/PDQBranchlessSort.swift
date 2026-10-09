@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -7,7 +8,7 @@ import SortEngineKit
 public struct PDQBranchlessSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "pdqbranchlesssort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Branchless Pattern-Defeating Quick Sort",
+    displayName: String(localized: "Branchless Pattern-Defeating Quick Sort", bundle: .module),
     category: .hybrid,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(

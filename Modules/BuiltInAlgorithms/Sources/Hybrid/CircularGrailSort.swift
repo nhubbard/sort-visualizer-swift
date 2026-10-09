@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -13,7 +14,7 @@ import SortEngineKit
 public struct CircularGrailSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "circulargrailsort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Circular Grail Sort",
+    displayName: String(localized: "Circular Grail Sort", bundle: .module),
     category: .hybrid,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -50,8 +51,8 @@ public struct CircularGrailSort: SortAlgorithm {
       engine.teachingCompare(
         physicalIndex(a), physicalIndex(b), by: predicate,
         stageID: "CircularGrailSort.ring.order",
-        whenTrue: "The requested comparison succeeds for these physical positions in the ring.",
-        whenFalse: "The requested comparison fails for these physical positions in the ring."
+        whenTrue: String(localized: "The requested comparison succeeds for these physical positions in the ring.", bundle: .module),
+        whenFalse: String(localized: "The requested comparison fails for these physical positions in the ring.", bundle: .module)
       )
     }
 

@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -7,7 +8,7 @@ import SortEngineKit
 /// via a stable counting sort over the levels, then gathers the array's values through it.
 public struct TriangularShuffle: ShuffleAlgorithm {
   public let id = ShuffleID(rawValue: "triangular")
-  public let metadata = ShuffleMetadata(displayName: "Triangular")
+  public let metadata = ShuffleMetadata(displayName: String(localized: "Triangular", bundle: .module))
   public init() {}
   public func record(into engine: inout RecordingEngine) {
     let n = engine.count

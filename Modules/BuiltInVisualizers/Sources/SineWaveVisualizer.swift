@@ -10,7 +10,7 @@ import VisualizationKit
 public struct SineWaveVisualizer: Visualizer {
   public let id = VisualizerID(rawValue: "sinewave")
   public let metadata = VisualizerMetadata(
-    displayName: "Sine Wave",
+    displayName: String(localized: "Sine Wave", bundle: .module),
     supportsAuxArrays: false,
     iconName: "waveform.path"
   )

@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -11,7 +12,7 @@ import SortEngineKit
 public struct HybridCombSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "hybridcombsort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Hybrid Comb Sort",
+    displayName: String(localized: "Hybrid Comb Sort", bundle: .module),
     category: .hybrid,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -57,8 +58,8 @@ public struct HybridCombSort: SortAlgorithm {
         if !engine.teachingCompare(
           gapInt + i, i,
           stageID: "HybridCombSort.comb.gap",
-          whenTrue: "The later value is at least the earlier value, so this gap pair stays in place.",
-          whenFalse: "The later value is smaller, so Comb Sort swaps this gap pair."
+          whenTrue: String(localized: "The later value is at least the earlier value, so this gap pair stays in place.", bundle: .module),
+          whenFalse: String(localized: "The later value is smaller, so Comb Sort swaps this gap pair.", bundle: .module)
         ) {
           engine.swap(i, gapInt + i)
           swapped = true
@@ -79,8 +80,8 @@ public struct HybridCombSort: SortAlgorithm {
       while j > 0 && !engine.teachingCompare(
         j, j - 1,
         stageID: "HybridCombSort.finishInsertion",
-        whenTrue: "This pair is ordered, so the insertion finish stops shifting.",
-        whenFalse: "The current value is smaller, so the insertion finish shifts it left.") {
+        whenTrue: String(localized: "This pair is ordered, so the insertion finish stops shifting.", bundle: .module),
+        whenFalse: String(localized: "The current value is smaller, so the insertion finish shifts it left.", bundle: .module)) {
         engine.swap(j - 1, j)
         j -= 1
       }

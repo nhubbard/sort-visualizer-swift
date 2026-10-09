@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -16,7 +17,7 @@ import SortEngineKit
 public struct SillySort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "sillysort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Silly Sort",
+    displayName: String(localized: "Silly Sort", bundle: .module),
     category: .exchange,
     sizeRange: 16...64,
     growthModel: OperationGrowthModel(
@@ -48,8 +49,8 @@ public struct SillySort: SortAlgorithm {
     if engine.teachingCompare(
       i, m + 1,
       stageID: "SillySort.middlePair",
-      whenTrue: "The first item is at least the next half item, so this step exchanges the pair.",
-      whenFalse: "The recursive pair is ordered at this stage."
+      whenTrue: String(localized: "The first item is at least the next half item, so this step exchanges the pair.", bundle: .module),
+      whenFalse: String(localized: "The recursive pair is ordered at this stage.", bundle: .module)
     ) {
       engine.swap(i, m + 1)
     }

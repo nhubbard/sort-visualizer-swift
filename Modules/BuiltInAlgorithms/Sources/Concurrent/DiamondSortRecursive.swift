@@ -1,10 +1,11 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
 public struct DiamondSortRecursive: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "diamondsortrecursive")
   public let metadata = AlgorithmMetadata(
-    displayName: "Diamond Sort (Recursive)",
+    displayName: String(localized: "Diamond Sort (Recursive)", bundle: .module),
     category: .concurrent,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -45,8 +46,8 @@ public struct DiamondSortRecursive: SortAlgorithm {
         roles: ["left": .arrayIndex(i), "right": .arrayIndex(j)],
         explanationKey: "diamondsortrecursive.compareExchange",
         explanation: shouldSwap
-          ? "The left value exceeds the right value, so this comparator exchanges them."
-          : "These values satisfy this comparator, so they stay in place.")
+          ? String(localized: "The left value exceeds the right value, so this comparator exchanges them.", bundle: .module)
+          : String(localized: "These values satisfy this comparator, so they stay in place.", bundle: .module))
       if shouldSwap {
         engine.swap(i, j)
       }

@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -7,7 +8,7 @@ import SortEngineKit
 public struct LazyStableSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "lazystablesort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Lazy Stable Sort",
+    displayName: String(localized: "Lazy Stable Sort", bundle: .module),
     category: .merge,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(

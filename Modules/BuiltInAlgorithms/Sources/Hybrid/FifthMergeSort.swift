@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -15,7 +16,7 @@ import SortEngineKit
 public struct FifthMergeSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "fifthmergesort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Fifth Merge Sort",
+    displayName: String(localized: "Fifth Merge Sort", bundle: .module),
     category: .hybrid,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -49,7 +50,7 @@ public struct FifthMergeSort: SortAlgorithm {
         stageID: "fifth.place", decisionID: "fifth.place", outcome: "placed",
         roles: ["destination": .arrayIndex(destination), "value": .value(value)],
         explanationKey: "fifth.place",
-        explanation: "Fifth Merge places the selected run value at its destination.")
+        explanation: String(localized: "Fifth Merge places the selected run value at its destination.", bundle: .module))
     }
 
     func readAux(_ index: Int) -> Int {
@@ -68,8 +69,8 @@ public struct FifthMergeSort: SortAlgorithm {
           if engine.teachingCompareValue(
             middle, against: value, by: >,
             stageID: "FifthMergeSort.binary.search",
-            whenTrue: "This run value exceeds the held value, so the insertion point lies to the left.",
-            whenFalse: "This run value does not exceed the held value, so the search moves right."
+            whenTrue: String(localized: "This run value exceeds the held value, so the insertion point lies to the left.", bundle: .module),
+            whenFalse: String(localized: "This run value does not exceed the held value, so the search moves right.", bundle: .module)
           ) {
             high = middle
           } else {

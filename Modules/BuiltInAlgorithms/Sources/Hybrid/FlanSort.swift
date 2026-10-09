@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -23,7 +24,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 public struct FlanSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "flansort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Flan Sort",
+    displayName: String(localized: "Flan Sort", bundle: .module),
     category: .hybrid,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -52,7 +53,7 @@ public struct FlanSort: SortAlgorithm {
         stageID: "flan.exchange", decisionID: "flan.exchange", outcome: "moved",
         roles: ["first": .arrayIndex(first), "second": .arrayIndex(second)],
         explanationKey: "flan.exchange",
-        explanation: "Flan exchanges these positions while grouping pivot partitions or merging runs.")
+        explanation: String(localized: "Flan exchanges these positions while grouping pivot partitions or merging runs.", bundle: .module))
     }
     func writePA(_ i: Int, _ value: Int) { pa[i] = value; engine.writeAux(paHandle, at: i, value: value) }
     var randomState: UInt64 = 0x9e3779b97f4a7c15
@@ -67,8 +68,8 @@ public struct FlanSort: SortAlgorithm {
       if engine.teachingCompare(
         m, a, by: >,
         stageID: "FlanSort.pivot.median",
-        whenTrue: "The middle candidate exceeds the first, so median selection checks the upper side.",
-        whenFalse: "The middle candidate does not exceed the first, so median selection checks the lower side."
+        whenTrue: String(localized: "The middle candidate exceeds the first, so median selection checks the upper side.", bundle: .module),
+        whenFalse: String(localized: "The middle candidate does not exceed the first, so median selection checks the lower side.", bundle: .module)
       ) {
         if engine.compare(m, b, by: <) { return m }
         return engine.compare(a, b, by: >) ? a : b
@@ -95,13 +96,13 @@ public struct FlanSort: SortAlgorithm {
           ? engine.teachingCompareValue(
             m, against: val, by: <,
             stageID: "flan.binaryBoundary",
-            whenTrue: "This run item is smaller, so the boundary search advances.",
-            whenFalse: "This run item is at least as large, so the search narrows left.")
+            whenTrue: String(localized: "This run item is smaller, so the boundary search advances.", bundle: .module),
+            whenFalse: String(localized: "This run item is at least as large, so the search narrows left.", bundle: .module))
           : engine.teachingCompareValue(
             m, against: val, by: >,
             stageID: "flan.binaryBoundary",
-            whenTrue: "This run item is larger, so the boundary search narrows left.",
-            whenFalse: "This run item is no greater, so the search advances.")
+            whenTrue: String(localized: "This run item is larger, so the boundary search narrows left.", bundle: .module),
+            whenFalse: String(localized: "This run item is no greater, so the search advances.", bundle: .module))
         if matches { b = m } else { a = m + 1 }
       }
       return a
@@ -128,8 +129,8 @@ public struct FlanSort: SortAlgorithm {
         let found = engine.teachingCompareValue(
           m, against: val, by: right ? (>) : (>=),
           stageID: "flan.binaryInsert",
-          whenTrue: "This run item crosses the insertion boundary, so search narrows toward it.",
-          whenFalse: "This run item stays before the boundary, so search advances."
+          whenTrue: String(localized: "This run item crosses the insertion boundary, so search narrows toward it.", bundle: .module),
+          whenFalse: String(localized: "This run item stays before the boundary, so search advances.", bundle: .module)
         )
         if found { b = m } else { a = m + gap + 1 }
       }
@@ -230,14 +231,14 @@ public struct FlanSort: SortAlgorithm {
           if engine.teachingCompareValue(
             i, against: pivot, by: ==,
             stageID: "flan.equalPivotLeft",
-            whenTrue: "This item equals the pivot, so it joins the central equal-value group.",
-            whenFalse: "This item differs from the pivot, so partition scanning continues."
+            whenTrue: String(localized: "This item equals the pivot, so it joins the central equal-value group.", bundle: .module),
+            whenFalse: String(localized: "This item differs from the pivot, so partition scanning continues.", bundle: .module)
           ) { exchange(i1, i); i1 += 1 }
           else if engine.teachingCompareValue(
             i, against: pivot, by: <,
             stageID: "flan.partitionLeft",
-            whenTrue: "This item is below the pivot, so the left scan stops to exchange it.",
-            whenFalse: "This item is at least the pivot, so the left scan advances."
+            whenTrue: String(localized: "This item is below the pivot, so the left scan stops to exchange it.", bundle: .module),
+            whenFalse: String(localized: "This item is at least the pivot, so the left scan advances.", bundle: .module)
           ) { break }
           i += 1
         }
@@ -246,14 +247,14 @@ public struct FlanSort: SortAlgorithm {
           if engine.teachingCompareValue(
             j, against: pivot, by: ==,
             stageID: "flan.equalPivotRight",
-            whenTrue: "This item equals the pivot, so it joins the central equal-value group.",
-            whenFalse: "This item differs from the pivot, so partition scanning continues."
+            whenTrue: String(localized: "This item equals the pivot, so it joins the central equal-value group.", bundle: .module),
+            whenFalse: String(localized: "This item differs from the pivot, so partition scanning continues.", bundle: .module)
           ) { j1 -= 1; exchange(j1, j) }
           else if engine.teachingCompareValue(
             j, against: pivot, by: >,
             stageID: "flan.partitionRight",
-            whenTrue: "This item exceeds the pivot, so the right scan stops to exchange it.",
-            whenFalse: "This item is at most the pivot, so the right scan advances."
+            whenTrue: String(localized: "This item exceeds the pivot, so the right scan stops to exchange it.", bundle: .module),
+            whenFalse: String(localized: "This item is at most the pivot, so the right scan advances.", bundle: .module)
           ) { break }
           j -= 1
         }

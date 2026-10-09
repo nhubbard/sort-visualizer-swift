@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -31,7 +32,7 @@ import SortEngineKit
 public struct MergeInsertionSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "mergeinsertionsort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Merge-Insertion",
+    displayName: String(localized: "Merge-Insertion", bundle: .module),
     category: .hybrid,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -77,7 +78,7 @@ public struct MergeInsertionSort: SortAlgorithm {
           stageID: "mergeInsertion.blockMove", decisionID: "mergeInsertion.blockMove",
           outcome: "exchange", roles: ["left": .arrayIndex(left), "right": .arrayIndex(right)],
           explanationKey: "mergeInsertion.blockMove",
-          explanation: "The chosen block shifts across the main chain one block at a time.")
+          explanation: String(localized: "The chosen block shifts across the main chain one block at a time.", bundle: .module))
       }
     }
 
@@ -117,8 +118,8 @@ public struct MergeInsertionSort: SortAlgorithm {
           roles: ["candidate": .arrayIndex(m), "heldValue": .value(val)],
           explanationKey: "mergeInsertion.blockSearch",
           explanation: insertBefore
-            ? "The pending block key is smaller, so its insertion search moves left."
-            : "The pending block key is at least this key, so its search moves right.")
+            ? String(localized: "The pending block key is smaller, so its insertion search moves left.", bundle: .module)
+            : String(localized: "The pending block key is at least this key, so its search moves right.", bundle: .module))
         if insertBefore {
           b = m
         } else {
@@ -153,8 +154,8 @@ public struct MergeInsertionSort: SortAlgorithm {
         if engine.teachingCompare(
           i - k, i, by: >,
           stageID: "MergeInsertionSort.block.order",
-          whenTrue: "The left block starts above the right block, so Merge Insertion swaps the blocks.",
-          whenFalse: "The two block starts are ordered, so these blocks stay in place."
+          whenTrue: String(localized: "The left block starts above the right block, so Merge Insertion swaps the blocks.", bundle: .module),
+          whenFalse: String(localized: "The two block starts are ordered, so these blocks stay in place.", bundle: .module)
         ) {
           blockSwap(i - k, i, k)
         }

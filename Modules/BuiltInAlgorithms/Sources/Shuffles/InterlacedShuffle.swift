@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -6,7 +7,7 @@ import SortEngineKit
 /// (1, 3, 5, ...) from the back, working inward from both ends at once.
 public struct InterlacedShuffle: ShuffleAlgorithm {
   public let id = ShuffleID(rawValue: "interlaced")
-  public let metadata = ShuffleMetadata(displayName: "Interlaced")
+  public let metadata = ShuffleMetadata(displayName: String(localized: "Interlaced", bundle: .module))
   public init() {}
   public func record(into engine: inout RecordingEngine) {
     let n = engine.count

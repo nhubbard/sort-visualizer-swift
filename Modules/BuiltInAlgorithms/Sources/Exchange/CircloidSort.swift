@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -20,7 +21,7 @@ import SortEngineKit
 public struct CircloidSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "circloidsort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Circloid Sort",
+    displayName: String(localized: "Circloid Sort", bundle: .module),
     category: .exchange,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -53,8 +54,8 @@ public struct CircloidSort: SortAlgorithm {
           a, b,
           by: (>),
           stageID: "CircloidSort.pairOrder",
-          whenTrue: "The earlier item is larger, so exchange the circloid pair.",
-          whenFalse: "The circloid pair is already ordered."
+          whenTrue: String(localized: "The earlier item is larger, so exchange the circloid pair.", bundle: .module),
+          whenFalse: String(localized: "The circloid pair is already ordered.", bundle: .module)
         ) {
           engine.swap(a, b)
           swapped = true

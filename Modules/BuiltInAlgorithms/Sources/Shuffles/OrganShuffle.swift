@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -7,7 +8,7 @@ import SortEngineKit
 /// back down.
 public struct OrganShuffle: ShuffleAlgorithm {
   public let id = ShuffleID(rawValue: "organ")
-  public let metadata = ShuffleMetadata(displayName: "Pipe Organ")
+  public let metadata = ShuffleMetadata(displayName: String(localized: "Pipe Organ", bundle: .module))
   public init() {}
   public func record(into engine: inout RecordingEngine) {
     let n = engine.count

@@ -10,7 +10,7 @@ import VisualizationKit
 public struct SpiralDotsVisualizer: Visualizer {
   public let id = VisualizerID(rawValue: "spiraldots")
   public let metadata = VisualizerMetadata(
-    displayName: "Spiral Dots",
+    displayName: String(localized: "Spiral Dots", bundle: .module),
     supportsAuxArrays: false,
     iconName: "circles.hexagongrid"
   )

@@ -1,10 +1,11 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
 public struct MaxHeapSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "maxheapsort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Max Heap Sort",
+    displayName: String(localized: "Max Heap Sort", bundle: .module),
     category: .selection,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -32,15 +33,15 @@ public struct MaxHeapSort: SortAlgorithm {
         if left < size && !engine.teachingCompare(
           largest, left,
           stageID: "MaxHeapSort.leftChild",
-          whenTrue: "The left child is no larger, so keep the current heap maximum.",
-          whenFalse: "The left child is larger, so promote it as heap maximum."
+          whenTrue: String(localized: "The left child is no larger, so keep the current heap maximum.", bundle: .module),
+          whenFalse: String(localized: "The left child is larger, so promote it as heap maximum.", bundle: .module)
         ) {
           largest = left
         }
         if right < size && !engine.teachingCompare(
           largest, right, stageID: "MaxHeapSort.rightChild",
-          whenTrue: "The current candidate is at least the right child, so keep it.",
-          whenFalse: "The right child is larger, so promote it as heap maximum."
+          whenTrue: String(localized: "The current candidate is at least the right child, so keep it.", bundle: .module),
+          whenFalse: String(localized: "The right child is larger, so promote it as heap maximum.", bundle: .module)
         ) {
           largest = right
         }
@@ -63,7 +64,7 @@ public struct MaxHeapSort: SortAlgorithm {
           stageID: "MaxHeapSort.extractMaximum", outcome: "placed",
           roles: ["heapRoot": .arrayIndex(0), "sortedEnd": .arrayIndex(end)],
           explanationKey: "MaxHeapSort.extractMaximum",
-          explanation: "Exchange the heap maximum with the end of the unsorted range.")
+          explanation: String(localized: "Exchange the heap maximum with the end of the unsorted range.", bundle: .module))
       }
       siftDown(0, end)
       end -= 1

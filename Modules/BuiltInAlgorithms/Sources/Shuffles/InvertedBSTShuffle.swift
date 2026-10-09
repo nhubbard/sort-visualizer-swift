@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -8,7 +9,7 @@ import SortEngineKit
 /// the inverse permutation of `BSTTraversalShuffle`.
 public struct InvertedBSTShuffle: ShuffleAlgorithm {
   public let id = ShuffleID(rawValue: "invertedbst")
-  public let metadata = ShuffleMetadata(displayName: "Inverted BST")
+  public let metadata = ShuffleMetadata(displayName: String(localized: "Inverted BST", bundle: .module))
   public init() {}
   public func record(into engine: inout RecordingEngine) {
     let n = engine.count

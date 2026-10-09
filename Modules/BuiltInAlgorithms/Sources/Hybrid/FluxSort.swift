@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -51,7 +52,7 @@ import SortEngineKit
 public struct FluxSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "fluxsort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Flux",
+    displayName: String(localized: "Flux", bundle: .module),
     category: .hybrid,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -111,8 +112,8 @@ public struct FluxSort: SortAlgorithm {
       if engine.teachingCompare(
         left, pta, by: >,
         stageID: "FluxSort.run.balance",
-        whenTrue: "This adjacent pair descends, contributing to the run-order balance.",
-        whenFalse: "This adjacent pair does not descend, leaving the balance unchanged."
+        whenTrue: String(localized: "This adjacent pair descends, contributing to the run-order balance.", bundle: .module),
+        whenFalse: String(localized: "This adjacent pair does not descend, leaving the balance unchanged.", bundle: .module)
       ) { balance += 1 }
     }
 
@@ -124,7 +125,7 @@ public struct FluxSort: SortAlgorithm {
         stageID: "flux.reverseRun", decisionID: "flux.reverseRun", outcome: "reversed",
         roles: ["first": .arrayIndex(0), "last": .arrayIndex(nmemb - 1)],
         explanationKey: "flux.reverseRun",
-        explanation: "Every adjacent pair descends, so one reversal completes the sort.")
+        explanation: String(localized: "Every adjacent pair descends, so one reversal completes the sort.", bundle: .module))
       return false
     }
 
@@ -148,8 +149,8 @@ public struct FluxSort: SortAlgorithm {
     }
     return engine.teachingCompare(
       a, b, by: >, stageID: "flux.pivotTournament",
-      whenTrue: "The first sample is greater, so the pivot tournament advances it.",
-      whenFalse: "The second sample is at least as large, so the pivot tournament advances it.") ? 1 : 0
+      whenTrue: String(localized: "The first sample is greater, so the pivot tournament advances it.", bundle: .module),
+      whenFalse: String(localized: "The second sample is at least as large, so the pivot tournament advances it.", bundle: .module)) ? 1 : 0
   }
 
   /// Median-of-3 index tournament — verbatim translation of ArrayV's `medianOfThree`, substituting
@@ -287,8 +288,8 @@ public struct FluxSort: SortAlgorithm {
           "destination": .arrayIndex(pta)],
         explanationKey: "flux.partition",
         explanation: val == 0
-          ? "This value is no greater than the pivot, so the low partition advances."
-          : "This value exceeds the pivot, so it remains for the high partition.")
+          ? String(localized: "This value is no greater than the pivot, so the low partition advances.", bundle: .module)
+          : String(localized: "This value exceeds the pivot, so it remains for the high partition.", bundle: .module))
       pta += 1 - val
 
       swap.write(&engine, at: pts, value: value)

@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -20,7 +21,7 @@ import SortEngineKit
 public struct ThreeSmoothCombSortRecursive: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "threesmoothcombsortrecursive")
   public let metadata = AlgorithmMetadata(
-    displayName: "3-Smooth Comb Sort (Recursive)",
+    displayName: String(localized: "3-Smooth Comb Sort (Recursive)", bundle: .module),
     category: .exchange,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -57,8 +58,8 @@ public struct ThreeSmoothCombSortRecursive: SortAlgorithm {
           i, i + gap,
           by: (>),
           stageID: "ThreeSmoothCombSortRecursive.gapOrder",
-          whenTrue: "The left gap endpoint is larger, so exchange the pair.",
-          whenFalse: "The gap-separated pair is ordered."
+          whenTrue: String(localized: "The left gap endpoint is larger, so exchange the pair.", bundle: .module),
+          whenFalse: String(localized: "The gap-separated pair is ordered.", bundle: .module)
         ) {
           engine.swap(i, i + gap)
         }

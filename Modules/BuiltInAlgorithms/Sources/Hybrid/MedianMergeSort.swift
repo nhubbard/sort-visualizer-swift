@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -10,7 +11,7 @@ import SortEngineKit
 public struct MedianMergeSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "medianmergesort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Median Merge",
+    displayName: String(localized: "Median Merge", bundle: .module),
     category: .hybrid,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -40,8 +41,8 @@ public struct MedianMergeSort: SortAlgorithm {
       while j > a && engine.teachingCompare(
         j - 1, j, by: >,
         stageID: "MedianMergeSort.smallRun.insert",
-        whenTrue: "The adjacent pair is reversed, so insertion swaps it.",
-        whenFalse: "The adjacent pair is ordered, so insertion stops moving this value."
+        whenTrue: String(localized: "The adjacent pair is reversed, so insertion swaps it.", bundle: .module),
+        whenFalse: String(localized: "The adjacent pair is ordered, so insertion stops moving this value.", bundle: .module)
       ) {
         engine.swap(j - 1, j)
         j -= 1
@@ -64,8 +65,8 @@ public struct MedianMergeSort: SortAlgorithm {
           roles: ["candidate": .arrayIndex(mid), "heldValue": .value(value)],
           explanationKey: "medianMerge.binaryInsert",
           explanation: insertBefore
-            ? "The held item is smaller, so insertion searches the left half of this run."
-            : "The held item is at least this value, so insertion searches the right half.")
+            ? String(localized: "The held item is smaller, so insertion searches the left half of this run.", bundle: .module)
+            : String(localized: "The held item is at least this value, so insertion searches the right half.", bundle: .module))
         if insertBefore { high = mid } else { low = mid + 1 }
       }
       var j = i
@@ -81,12 +82,12 @@ public struct MedianMergeSort: SortAlgorithm {
     let m = a + (b - 1 - a) / 2
     if engine.teachingCompare(
       a, m, by: >, stageID: "medianMerge.pivotOrder",
-      whenTrue: "The first pivot sample exceeds the middle one, so median setup swaps them.",
-      whenFalse: "The first pivot sample is no greater, so median setup keeps them.") { engine.swap(a, m) }
+      whenTrue: String(localized: "The first pivot sample exceeds the middle one, so median setup swaps them.", bundle: .module),
+      whenFalse: String(localized: "The first pivot sample is no greater, so median setup keeps them.", bundle: .module)) { engine.swap(a, m) }
     if engine.teachingCompare(
       m, b - 1, by: >, stageID: "medianMerge.pivotOrder",
-      whenTrue: "The middle pivot sample exceeds the last one, so median setup swaps them.",
-      whenFalse: "The middle pivot sample is no greater, so median setup keeps them.") {
+      whenTrue: String(localized: "The middle pivot sample exceeds the last one, so median setup swaps them.", bundle: .module),
+      whenFalse: String(localized: "The middle pivot sample is no greater, so median setup keeps them.", bundle: .module)) {
       engine.swap(m, b - 1)
       if engine.compare(a, m, by: >) { return }
     }
@@ -122,12 +123,12 @@ public struct MedianMergeSort: SortAlgorithm {
     while true {
       repeat { i += 1 } while i < j && engine.teachingCompare(
         i, pivot, by: <, stageID: "medianMerge.partitionLeft",
-        whenTrue: "This item is below the pivot, so the left partition scan advances.",
-        whenFalse: "This item meets the pivot boundary, so the left scan stops.")
+        whenTrue: String(localized: "This item is below the pivot, so the left partition scan advances.", bundle: .module),
+        whenFalse: String(localized: "This item meets the pivot boundary, so the left scan stops.", bundle: .module))
       repeat { j -= 1 } while j >= i && engine.teachingCompare(
         j, pivot, by: >, stageID: "medianMerge.partitionRight",
-        whenTrue: "This item exceeds the pivot, so the right partition scan advances.",
-        whenFalse: "This item meets the pivot boundary, so the right scan stops.")
+        whenTrue: String(localized: "This item exceeds the pivot, so the right partition scan advances.", bundle: .module),
+        whenFalse: String(localized: "This item meets the pivot boundary, so the right scan stops.", bundle: .module))
       if i >= j { return j }
       engine.swap(i, j)
     }

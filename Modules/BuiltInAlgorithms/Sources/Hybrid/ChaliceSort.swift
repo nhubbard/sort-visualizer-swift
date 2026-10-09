@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -26,7 +27,7 @@ import SortEngineKit
 public struct ChaliceSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "chalicesort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Chalice Sort",
+    displayName: String(localized: "Chalice Sort", bundle: .module),
     category: .hybrid,
     sizeRange: 16...1547,
     growthModel: OperationGrowthModel(
@@ -72,8 +73,8 @@ private final class ChaliceRecorder: BlockMergeSortingTemplate {
     engine.teachingCompare(
       first, second, by: predicate,
       stageID: "ChaliceSort.block.order",
-      whenTrue: "The requested block-order test succeeds, so Chalice follows that ordering branch.",
-      whenFalse: "The requested block-order test fails, so Chalice follows the alternative branch."
+      whenTrue: String(localized: "The requested block-order test succeeds, so Chalice follows that ordering branch.", bundle: .module),
+      whenFalse: String(localized: "The requested block-order test fails, so Chalice follows the alternative branch.", bundle: .module)
     )
   }
   private func compareValues(_ first: Int, _ second: Int, by predicate: (Int, Int) -> Bool) -> Bool {

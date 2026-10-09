@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -22,7 +23,7 @@ import SortEngineKit
 public struct OutOfPlaceHeapSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "outofplaceheapsort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Out-of-Place Heap Sort",
+    displayName: String(localized: "Out-of-Place Heap Sort", bundle: .module),
     category: .selection,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -51,8 +52,8 @@ public struct OutOfPlaceHeapSort: SortAlgorithm {
             2 * j + 2, 2 * j + 1,
             by: >,
             stageID: "OutOfPlaceHeapSort.childChoice",
-            whenTrue: "The right child is larger, so follow it in the heap.",
-            whenFalse: "The left child is at least as large, so follow it."
+            whenTrue: String(localized: "The right child is larger, so follow it in the heap.", bundle: .module),
+            whenFalse: String(localized: "The left child is at least as large, so follow it.", bundle: .module)
           ) ? 2 * j + 2 : 2 * j + 1
         } else {
           j = 2 * j + 1
@@ -60,8 +61,8 @@ public struct OutOfPlaceHeapSort: SortAlgorithm {
       }
       while engine.teachingCompare(
         root, j, by: >, stageID: "OutOfPlaceHeapSort.siftPosition",
-        whenTrue: "The root is larger than this descendant, so move the landing point upward.",
-        whenFalse: "The descendant can hold the root value at this heap position."
+        whenTrue: String(localized: "The root is larger than this descendant, so move the landing point upward.", bundle: .module),
+        whenFalse: String(localized: "The descendant can hold the root value at this heap position.", bundle: .module)
       ) {
         j = (j - 1) / 2
       }
@@ -84,8 +85,8 @@ public struct OutOfPlaceHeapSort: SortAlgorithm {
           i = l
         } else if engine.teachingCompare(
           r, l, by: >, stageID: "OutOfPlaceHeapSort.nextLiveChild",
-          whenTrue: "The right live child is larger, so follow it to the next heap maximum.",
-          whenFalse: "The left live child is at least as large, so follow it."
+          whenTrue: String(localized: "The right live child is larger, so follow it to the next heap maximum.", bundle: .module),
+          whenFalse: String(localized: "The left live child is at least as large, so follow it.", bundle: .module)
         ) {
           engine.swap(i, r)
           i = r
@@ -122,7 +123,7 @@ public struct OutOfPlaceHeapSort: SortAlgorithm {
           roles: ["buffer": .auxiliaryIndex(handle: outHandle.rawValue, index: i),
             "maximum": .value(maxValue)],
           explanationKey: "OutOfPlaceHeapSort.extractToBuffer",
-          explanation: "Save the current heap maximum in its final buffered position.")
+          explanation: String(localized: "Save the current heap maximum in its final buffered position.", bundle: .module))
       }
       engine.setValue(0, -1)
       findNext(n)
@@ -136,7 +137,7 @@ public struct OutOfPlaceHeapSort: SortAlgorithm {
           stageID: "OutOfPlaceHeapSort.restoreOutput", outcome: "placed",
           roles: ["output": .arrayIndex(idx), "bufferedValue": .value(output[idx])],
           explanationKey: "OutOfPlaceHeapSort.restoreOutput",
-          explanation: "Copy this buffered value into its final sorted array position.")
+          explanation: String(localized: "Copy this buffered value into its final sorted array position.", bundle: .module))
       }
     }
     engine.deleteAuxArray(outHandle)

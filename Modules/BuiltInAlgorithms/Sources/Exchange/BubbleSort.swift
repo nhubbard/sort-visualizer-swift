@@ -1,10 +1,11 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
 public struct BubbleSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "bubblesort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Bubble Sort",
+    displayName: String(localized: "Bubble Sort", bundle: .module),
     category: .exchange,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -27,8 +28,8 @@ public struct BubbleSort: SortAlgorithm {
         j, j + 1,
         by: >,
         stageID: "BubbleSort.adjacentOrder",
-        whenTrue: "The left neighbor is larger, so swap this adjacent pair.",
-        whenFalse: "This adjacent pair is already in order."
+        whenTrue: String(localized: "The left neighbor is larger, so swap this adjacent pair.", bundle: .module),
+        whenFalse: String(localized: "This adjacent pair is already in order.", bundle: .module)
       ) {
         engine.swap(j, j + 1)
       }

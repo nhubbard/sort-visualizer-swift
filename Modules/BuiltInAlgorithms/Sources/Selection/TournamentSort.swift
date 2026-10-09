@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -25,7 +26,7 @@ import SortEngineKit
 public struct TournamentSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "tournamentsort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Tournament Sort",
+    displayName: String(localized: "Tournament Sort", bundle: .module),
     category: .selection,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -76,8 +77,8 @@ public struct TournamentSort: SortAlgorithm {
         topWinner, botWinner,
         by: <=,
         stageID: "TournamentSort.matchWinner",
-        whenTrue: "The first contestant is no larger, so it advances in the tournament.",
-        whenFalse: "The second contestant advances in the tournament."
+        whenTrue: String(localized: "The first contestant is no larger, so it advances in the tournament.", bundle: .module),
+        whenFalse: String(localized: "The second contestant advances in the tournament.", bundle: .module)
       ) {
         setMatch(root, topWinner, top, bot)
       } else {
@@ -102,8 +103,8 @@ public struct TournamentSort: SortAlgorithm {
       if engine.teachingCompare(
         getPlayer(getLosers(root)), getPlayer(getWinners(root)), by: <,
         stageID: "TournamentSort.rebuildMatch",
-        whenTrue: "The returning loser is smaller, so it wins this rebuilt match.",
-        whenFalse: "The surviving winner stays smaller in the rebuilt match."
+        whenTrue: String(localized: "The returning loser is smaller, so it wins this rebuilt match.", bundle: .module),
+        whenFalse: String(localized: "The surviving winner stays smaller in the rebuilt match.", bundle: .module)
       ) {
         setWinner(root, getPlayer(getLosers(root)))
         let previousLosers = getLosers(root)
@@ -134,7 +135,7 @@ public struct TournamentSort: SortAlgorithm {
           roles: ["buffer": .auxiliaryIndex(handle: outHandle.rawValue, index: i),
             "winner": .value(output[i])],
           explanationKey: "TournamentSort.recordWinner",
-          explanation: "Save the tournament winner as the next value in sorted output.")
+          explanation: String(localized: "Save the tournament winner as the next value in sorted output.", bundle: .module))
       }
     }
 
@@ -145,7 +146,7 @@ public struct TournamentSort: SortAlgorithm {
           stageID: "TournamentSort.restoreOutput", outcome: "placed",
           roles: ["output": .arrayIndex(i), "winner": .value(output[i])],
           explanationKey: "TournamentSort.restoreOutput",
-          explanation: "Place this tournament winner in its final sorted array position.")
+          explanation: String(localized: "Place this tournament winner in its final sorted array position.", bundle: .module))
       }
     }
     engine.deleteAuxArray(matchesHandle)

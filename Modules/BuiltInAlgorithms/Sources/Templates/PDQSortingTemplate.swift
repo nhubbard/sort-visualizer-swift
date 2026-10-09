@@ -1,3 +1,4 @@
+import Foundation
 import SortEngineKit
 
 /// Scratch offset buffers `PDQSortingTemplate.partRightBranchless` needs, allocated once per
@@ -50,8 +51,8 @@ enum PDQSortingTemplate {
     for cur in (begin + 1)..<end where engine.teachingCompare(
       cur, cur - 1, by: <,
       stageID: "pdq.smallRun",
-      whenTrue: "This adjacent pair descends, so the insertion fallback shifts the item left.",
-      whenFalse: "This adjacent pair is ordered, so the insertion fallback leaves it."
+      whenTrue: String(localized: "This adjacent pair descends, so the insertion fallback shifts the item left.", bundle: .module),
+      whenFalse: String(localized: "This adjacent pair is ordered, so the insertion fallback leaves it.", bundle: .module)
     ) {
       let tmp = engine.readValue(at: cur)
       var sift = cur
@@ -73,8 +74,8 @@ enum PDQSortingTemplate {
     for cur in (begin + 1)..<end where engine.teachingCompare(
       cur, cur - 1, by: <,
       stageID: "pdq.insertionDecision",
-      whenTrue: "This adjacent pair descends, so insertion shifts the current value left.",
-      whenFalse: "This pair is ordered, so insertion leaves it in place."
+      whenTrue: String(localized: "This adjacent pair descends, so insertion shifts the current value left.", bundle: .module),
+      whenFalse: String(localized: "This pair is ordered, so insertion leaves it in place.", bundle: .module)
     ) {
       let tmp = engine.readValue(at: cur)
       var sift = cur
@@ -100,8 +101,8 @@ enum PDQSortingTemplate {
       if engine.teachingCompare(
         cur, cur - 1, by: <,
         stageID: "pdq.insertionDecision",
-        whenTrue: "This adjacent pair descends, so insertion shifts the current value left.",
-        whenFalse: "This pair is ordered, so insertion leaves it in place."
+        whenTrue: String(localized: "This adjacent pair descends, so insertion shifts the current value left.", bundle: .module),
+        whenFalse: String(localized: "This pair is ordered, so insertion leaves it in place.", bundle: .module)
       ) {
         let tmp = engine.readValue(at: cur)
         var sift = cur
@@ -124,8 +125,8 @@ enum PDQSortingTemplate {
     if engine.teachingCompare(
       b, a, by: <,
       stageID: "pdq.pivotOrder",
-      whenTrue: "The second pivot candidate is smaller, so median setup swaps this pair.",
-      whenFalse: "The pivot candidates are ordered, so median setup keeps this pair."
+      whenTrue: String(localized: "The second pivot candidate is smaller, so median setup swaps this pair.", bundle: .module),
+      whenFalse: String(localized: "The pivot candidates are ordered, so median setup keeps this pair.", bundle: .module)
     ) {
       engine.swap(a, b)
     }
@@ -188,23 +189,23 @@ enum PDQSortingTemplate {
     repeat { first += 1 } while engine.teachingCompare(
       first, begin, by: <,
       stageID: "pdq.partitionLeft",
-      whenTrue: "This item is below the pivot, so the left partition scan advances.",
-      whenFalse: "This item reaches the other partition, so the left scan stops."
+      whenTrue: String(localized: "This item is below the pivot, so the left partition scan advances.", bundle: .module),
+      whenFalse: String(localized: "This item reaches the other partition, so the left scan stops.", bundle: .module)
     )
 
     if first - 1 == begin {
       repeat { last -= 1 } while first < last && !engine.teachingCompare(
         last, begin, by: <,
         stageID: "pdq.partitionRight",
-        whenTrue: "This item is below the pivot, so the right scan stops to exchange it.",
-        whenFalse: "This item stays above the pivot, so the right scan advances."
+        whenTrue: String(localized: "This item is below the pivot, so the right scan stops to exchange it.", bundle: .module),
+        whenFalse: String(localized: "This item stays above the pivot, so the right scan advances.", bundle: .module)
       )
     } else {
       repeat { last -= 1 } while !engine.teachingCompare(
         last, begin, by: <,
         stageID: "pdq.partitionRight",
-        whenTrue: "This item is below the pivot, so the right scan stops to exchange it.",
-        whenFalse: "This item stays above the pivot, so the right scan advances."
+        whenTrue: String(localized: "This item is below the pivot, so the right scan stops to exchange it.", bundle: .module),
+        whenFalse: String(localized: "This item stays above the pivot, so the right scan advances.", bundle: .module)
       )
     }
 
@@ -214,14 +215,14 @@ enum PDQSortingTemplate {
       repeat { first += 1 } while engine.teachingCompare(
         first, begin, by: <,
         stageID: "pdq.partitionLeft",
-        whenTrue: "This item is below the pivot, so the left partition scan advances.",
-        whenFalse: "This item reaches the other partition, so the left scan stops."
+        whenTrue: String(localized: "This item is below the pivot, so the left partition scan advances.", bundle: .module),
+        whenFalse: String(localized: "This item reaches the other partition, so the left scan stops.", bundle: .module)
       )
       repeat { last -= 1 } while !engine.teachingCompare(
         last, begin, by: <,
         stageID: "pdq.partitionRight",
-        whenTrue: "This item is below the pivot, so the right scan stops to exchange it.",
-        whenFalse: "This item stays above the pivot, so the right scan advances."
+        whenTrue: String(localized: "This item is below the pivot, so the right scan stops to exchange it.", bundle: .module),
+        whenFalse: String(localized: "This item stays above the pivot, so the right scan advances.", bundle: .module)
       )
     }
 
@@ -241,23 +242,23 @@ enum PDQSortingTemplate {
     repeat { last -= 1 } while engine.teachingCompare(
       begin, last, by: <,
       stageID: "pdq.equalPartitionRight",
-      whenTrue: "The pivot is below this item, so the right scan advances through larger values.",
-      whenFalse: "This item belongs with pivot-equal values, so the right scan stops."
+      whenTrue: String(localized: "The pivot is below this item, so the right scan advances through larger values.", bundle: .module),
+      whenFalse: String(localized: "This item belongs with pivot-equal values, so the right scan stops.", bundle: .module)
     )
 
     if last + 1 == end {
       repeat { first += 1 } while first < last && !engine.teachingCompare(
         begin, first, by: <,
         stageID: "pdq.equalPartitionLeft",
-        whenTrue: "The pivot is below this item, so the left scan stops at a larger value.",
-        whenFalse: "This item belongs with pivot-equal values, so the left scan advances."
+        whenTrue: String(localized: "The pivot is below this item, so the left scan stops at a larger value.", bundle: .module),
+        whenFalse: String(localized: "This item belongs with pivot-equal values, so the left scan advances.", bundle: .module)
       )
     } else {
       repeat { first += 1 } while !engine.teachingCompare(
         begin, first, by: <,
         stageID: "pdq.equalPartitionLeft",
-        whenTrue: "The pivot is below this item, so the left scan stops at a larger value.",
-        whenFalse: "This item belongs with pivot-equal values, so the left scan advances."
+        whenTrue: String(localized: "The pivot is below this item, so the left scan stops at a larger value.", bundle: .module),
+        whenFalse: String(localized: "This item belongs with pivot-equal values, so the left scan advances.", bundle: .module)
       )
     }
 
@@ -266,14 +267,14 @@ enum PDQSortingTemplate {
       repeat { last -= 1 } while engine.teachingCompare(
         begin, last, by: <,
         stageID: "pdq.equalPartitionRight",
-        whenTrue: "The pivot is below this item, so the right scan advances through larger values.",
-        whenFalse: "This item belongs with pivot-equal values, so the right scan stops."
+        whenTrue: String(localized: "The pivot is below this item, so the right scan advances through larger values.", bundle: .module),
+        whenFalse: String(localized: "This item belongs with pivot-equal values, so the right scan stops.", bundle: .module)
       )
       repeat { first += 1 } while !engine.teachingCompare(
         begin, first, by: <,
         stageID: "pdq.equalPartitionLeft",
-        whenTrue: "The pivot is below this item, so the left scan stops at a larger value.",
-        whenFalse: "This item belongs with pivot-equal values, so the left scan advances."
+        whenTrue: String(localized: "The pivot is below this item, so the left scan stops at a larger value.", bundle: .module),
+        whenFalse: String(localized: "This item belongs with pivot-equal values, so the left scan advances.", bundle: .module)
       )
     }
 
@@ -334,23 +335,23 @@ enum PDQSortingTemplate {
     repeat { first += 1 } while engine.teachingCompareValue(
       first, against: pivot, by: (<),
       stageID: "pdq.blockPartitionLeft",
-      whenTrue: "This item is below the held pivot, so it belongs in the left block.",
-      whenFalse: "This item is at least the held pivot, so the left scan stops."
+      whenTrue: String(localized: "This item is below the held pivot, so it belongs in the left block.", bundle: .module),
+      whenFalse: String(localized: "This item is at least the held pivot, so the left scan stops.", bundle: .module)
     )
 
     if first - 1 == begin {
       repeat { last -= 1 } while first < last && !engine.teachingCompareValue(
         last, against: pivot, by: (<),
         stageID: "pdq.blockPartitionRight",
-        whenTrue: "This item is below the held pivot, so the right scan stops to exchange it.",
-        whenFalse: "This item is at least the held pivot, so the right scan advances."
+        whenTrue: String(localized: "This item is below the held pivot, so the right scan stops to exchange it.", bundle: .module),
+        whenFalse: String(localized: "This item is at least the held pivot, so the right scan advances.", bundle: .module)
       )
     } else {
       repeat { last -= 1 } while !engine.teachingCompareValue(
         last, against: pivot, by: (<),
         stageID: "pdq.blockPartitionRight",
-        whenTrue: "This item is below the held pivot, so the right scan stops to exchange it.",
-        whenFalse: "This item is at least the held pivot, so the right scan advances."
+        whenTrue: String(localized: "This item is below the held pivot, so the right scan stops to exchange it.", bundle: .module),
+        whenFalse: String(localized: "This item is at least the held pivot, so the right scan advances.", bundle: .module)
       )
     }
 
@@ -374,8 +375,8 @@ enum PDQSortingTemplate {
           if !engine.teachingCompareValue(
             it, against: pivot, by: (<),
             stageID: "pdq.blockClassification",
-            whenTrue: "This block item is below the pivot, so it belongs on the left.",
-            whenFalse: "This block item is at least the pivot, so it belongs on the right."
+            whenTrue: String(localized: "This block item is below the pivot, so it belongs on the left.", bundle: .module),
+            whenFalse: String(localized: "This block item is at least the pivot, so it belongs on the right.", bundle: .module)
           ) { leftNum += 1 }
           it += 1
         }
@@ -391,8 +392,8 @@ enum PDQSortingTemplate {
           if engine.teachingCompareValue(
             it, against: pivot, by: (<),
             stageID: "pdq.blockClassification",
-            whenTrue: "This block item is below the pivot, so it belongs on the left.",
-            whenFalse: "This block item is at least the pivot, so it belongs on the right."
+            whenTrue: String(localized: "This block item is below the pivot, so it belongs on the left.", bundle: .module),
+            whenFalse: String(localized: "This block item is at least the pivot, so it belongs on the right.", bundle: .module)
           ) { rightNum += 1 }
         }
       }
@@ -431,8 +432,8 @@ enum PDQSortingTemplate {
         if !engine.teachingCompareValue(
           it, against: pivot, by: (<),
           stageID: "pdq.blockClassification",
-          whenTrue: "This block item is below the pivot, so it belongs on the left.",
-          whenFalse: "This block item is at least the pivot, so it belongs on the right."
+          whenTrue: String(localized: "This block item is below the pivot, so it belongs on the left.", bundle: .module),
+          whenFalse: String(localized: "This block item is at least the pivot, so it belongs on the right.", bundle: .module)
         ) { leftNum += 1 }
         it += 1
       }
@@ -448,8 +449,8 @@ enum PDQSortingTemplate {
         if engine.teachingCompareValue(
           it, against: pivot, by: (<),
           stageID: "pdq.blockClassification",
-          whenTrue: "This block item is below the pivot, so it belongs on the left.",
-          whenFalse: "This block item is at least the pivot, so it belongs on the right."
+          whenTrue: String(localized: "This block item is below the pivot, so it belongs on the left.", bundle: .module),
+          whenFalse: String(localized: "This block item is at least the pivot, so it belongs on the right.", bundle: .module)
         ) { rightNum += 1 }
       }
     }

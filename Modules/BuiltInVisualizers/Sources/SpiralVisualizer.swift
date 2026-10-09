@@ -13,7 +13,7 @@ import VisualizationKit
 public struct SpiralVisualizer: Visualizer {
   public let id = VisualizerID(rawValue: "spiral")
   public let metadata = VisualizerMetadata(
-    displayName: "Spiral",
+    displayName: String(localized: "Spiral", bundle: .module),
     supportsAuxArrays: false,
     iconName: "tornado"
   )

@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -16,7 +17,7 @@ import SortEngineKit
 public struct OptimizedStoogeSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "optimizedstoogesort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Optimized Stooge Sort",
+    displayName: String(localized: "Optimized Stooge Sort", bundle: .module),
     category: .exchange,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -46,8 +47,8 @@ public struct OptimizedStoogeSort: SortAlgorithm {
         left, right,
         by: >,
         stageID: "OptimizedStoogeSort.endpointOrder",
-        whenTrue: "The left endpoint is larger, so exchange the ends before reducing the range.",
-        whenFalse: "The endpoints are ordered before the recursive range checks."
+        whenTrue: String(localized: "The left endpoint is larger, so exchange the ends before reducing the range.", bundle: .module),
+        whenFalse: String(localized: "The endpoints are ordered before the recursive range checks.", bundle: .module)
       ) {
         engine.swap(left, right)
       }
@@ -66,8 +67,8 @@ public struct OptimizedStoogeSort: SortAlgorithm {
       while left < index {
         if engine.teachingCompare(
           left, index, by: >, stageID: "OptimizedStoogeSort.forwardRange",
-          whenTrue: "The left item is larger, so exchange it across the forward shrinking range.",
-          whenFalse: "This forward range pair is ordered."
+          whenTrue: String(localized: "The left item is larger, so exchange it across the forward shrinking range.", bundle: .module),
+          whenFalse: String(localized: "This forward range pair is ordered.", bundle: .module)
         ) {
           engine.swap(left, index)
         }
@@ -88,8 +89,8 @@ public struct OptimizedStoogeSort: SortAlgorithm {
       while index < right {
         if engine.teachingCompare(
           index, right, by: >, stageID: "OptimizedStoogeSort.backwardRange",
-          whenTrue: "The left item is larger, so exchange it across the backward shrinking range.",
-          whenFalse: "This backward range pair is ordered."
+          whenTrue: String(localized: "The left item is larger, so exchange it across the backward shrinking range.", bundle: .module),
+          whenFalse: String(localized: "This backward range pair is ordered.", bundle: .module)
         ) {
           engine.swap(index, right)
         }

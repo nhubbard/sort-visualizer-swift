@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -25,7 +26,7 @@ import SortEngineKit
 public struct StacklessAmericanFlagSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "stacklessamericanflagsort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Stackless American Flag Sort",
+    displayName: String(localized: "Stackless American Flag Sort", bundle: .module),
     category: .distribution,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -78,8 +79,8 @@ public struct StacklessAmericanFlagSort: SortAlgorithm {
         roles: ["candidate": .arrayIndex(i), "maximum": .value(maxValue)],
         explanationKey: "stacklessamericanflagsort.maximum",
         explanation: newMaximum
-          ? "This value raises the most significant digit place to process."
-          : "This value fits within the digit places already required.")
+          ? String(localized: "This value raises the most significant digit place to process.", bundle: .module)
+          : String(localized: "This value fits within the digit places already required.", bundle: .module))
       maxValue = max(maxValue, candidate)
     }
     var q = 0
@@ -102,7 +103,7 @@ public struct StacklessAmericanFlagSort: SortAlgorithm {
         outcome: "update",
         roles: ["scratch": .auxiliaryIndex(handle: countsHandle.rawValue, index: digit)],
         explanationKey: "stacklessamericanflagsort.scratchUpdate",
-        explanation: "Update this digit bucket’s count or next free offset.")
+        explanation: String(localized: "Update this digit bucket’s count or next free offset.", bundle: .module))
     }
 
     // Digit-sorts `[a, b)` by `place` via counting + cycle-follow (assuming `cnts` already
@@ -118,14 +119,14 @@ public struct StacklessAmericanFlagSort: SortAlgorithm {
           outcome: "update",
           roles: ["scratch": .auxiliaryIndex(handle: countsHandle.rawValue, index: i)],
           explanationKey: "stacklessamericanflagsort.scratchUpdate",
-          explanation: "Update this digit bucket’s count or next free offset.")
+          explanation: String(localized: "Update this digit bucket’s count or next free offset.", bundle: .module))
         engine.writeAux(offsHandle, at: i, value: offs[i])
         engine.annotateLastOperation(
           stageID: "scratchUpdate", decisionID: "stacklessamericanflagsort.scratchUpdate",
           outcome: "update",
           roles: ["scratch": .auxiliaryIndex(handle: offsHandle.rawValue, index: i)],
           explanationKey: "stacklessamericanflagsort.scratchUpdate",
-          explanation: "Update this digit bucket’s count or next free offset.")
+          explanation: String(localized: "Update this digit bucket’s count or next free offset.", bundle: .module))
       }
 
       for i in 0..<(radix - 1) {
@@ -141,14 +142,14 @@ public struct StacklessAmericanFlagSort: SortAlgorithm {
               outcome: "update",
               roles: ["scratch": .auxiliaryIndex(handle: countsHandle.rawValue, index: digit)],
               explanationKey: "stacklessamericanflagsort.scratchUpdate",
-              explanation: "Update this digit bucket’s count or next free offset.")
+              explanation: String(localized: "Update this digit bucket’s count or next free offset.", bundle: .module))
             let displaced = engine.readValue(at: a + cnts[digit])
             engine.setValue(a + cnts[digit], held)
             engine.annotateLastOperation(
               stageID: "bucketPlacement", decisionID: "stacklessamericanflagsort.bucketPlacement",
               outcome: "place", roles: ["destination": .arrayIndex(a + cnts[digit])],
               explanationKey: "stacklessamericanflagsort.bucketPlacement",
-              explanation: "The active digit selects this in-place bucket destination.")
+              explanation: String(localized: "The active digit selects this in-place bucket destination.", bundle: .module))
             held = displaced
           } while cnts[i] > offs[i]
         }
@@ -164,14 +165,14 @@ public struct StacklessAmericanFlagSort: SortAlgorithm {
           outcome: "update",
           roles: ["scratch": .auxiliaryIndex(handle: countsHandle.rawValue, index: i)],
           explanationKey: "stacklessamericanflagsort.scratchUpdate",
-          explanation: "Update this digit bucket’s count or next free offset.")
+          explanation: String(localized: "Update this digit bucket’s count or next free offset.", bundle: .module))
         engine.writeAux(offsHandle, at: i, value: 0)
         engine.annotateLastOperation(
           stageID: "scratchUpdate", decisionID: "stacklessamericanflagsort.scratchUpdate",
           outcome: "update",
           roles: ["scratch": .auxiliaryIndex(handle: offsHandle.rawValue, index: i)],
           explanationKey: "stacklessamericanflagsort.scratchUpdate",
-          explanation: "Update this digit bucket’s count or next free offset.")
+          explanation: String(localized: "Update this digit bucket’s count or next free offset.", bundle: .module))
       }
       return split
     }

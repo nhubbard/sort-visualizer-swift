@@ -1,10 +1,11 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
 public struct BinomialHeapSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "binomialheapsort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Binomial Heap Sort",
+    displayName: String(localized: "Binomial Heap Sort", bundle: .module),
     category: .selection,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -48,8 +49,8 @@ public struct BinomialHeapSort: SortAlgorithm {
             focus - depth - 1, maxNode - 1,
             by: (>),
             stageID: "BinomialHeapSort.heapRoot",
-            whenTrue: "The new node is larger, so promote it within the binomial heap.",
-            whenFalse: "The current binomial heap maximum remains."
+            whenTrue: String(localized: "The new node is larger, so promote it within the binomial heap.", bundle: .module),
+            whenFalse: String(localized: "The current binomial heap maximum remains.", bundle: .module)
           ) {
             maxNode = focus - depth
           }
@@ -71,8 +72,8 @@ public struct BinomialHeapSort: SortAlgorithm {
         if (focus & depth) != 0 {
           if engine.teachingCompare(
             focus - 1, maxNode - 1, by: >, stageID: "BinomialHeapSort.extractMaximum",
-            whenTrue: "This heap root is larger, so select it for the next extraction.",
-            whenFalse: "The current root remains the maximum extraction candidate."
+            whenTrue: String(localized: "This heap root is larger, so select it for the next extraction.", bundle: .module),
+            whenFalse: String(localized: "The current root remains the maximum extraction candidate.", bundle: .module)
           ) {
             maxNode = focus
           }
@@ -91,8 +92,8 @@ public struct BinomialHeapSort: SortAlgorithm {
             if engine.teachingCompare(
               focus - innerDepth - 1, maxNode - 1, by: >,
               stageID: "BinomialHeapSort.restoreAfterExtraction",
-              whenTrue: "This child is larger, so promote it while restoring the heap.",
-              whenFalse: "The selected node remains the larger restoration candidate."
+              whenTrue: String(localized: "This child is larger, so promote it while restoring the heap.", bundle: .module),
+              whenFalse: String(localized: "The selected node remains the larger restoration candidate.", bundle: .module)
             ) {
               maxNode = focus - innerDepth
             }

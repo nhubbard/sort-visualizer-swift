@@ -1,3 +1,4 @@
+import Foundation
 import SortEngineKit
 
 // MIT License
@@ -34,7 +35,7 @@ class BlockMergeSortingTemplate {
         stageID: "blockMerge.shiftForward", decisionID: "blockMerge.shiftForward", outcome: "shift",
         roles: ["source": .arrayIndex(input), "destination": .arrayIndex(output)],
         explanationKey: "blockMerge.shiftForward",
-        explanation: "The unconsumed run shifts into the open merge destination.")
+        explanation: String(localized: "The unconsumed run shifts into the open merge destination.", bundle: .module))
       output += 1
       input += 1
     }
@@ -51,7 +52,7 @@ class BlockMergeSortingTemplate {
         stageID: "blockMerge.shiftBackward", decisionID: "blockMerge.shiftBackward", outcome: "shift",
         roles: ["source": .arrayIndex(input), "destination": .arrayIndex(output)],
         explanationKey: "blockMerge.shiftBackward",
-        explanation: "The unconsumed run shifts backward into the open merge destination.")
+        explanation: String(localized: "The unconsumed run shifts backward into the open merge destination.", bundle: .module))
     }
   }
 
@@ -63,8 +64,8 @@ class BlockMergeSortingTemplate {
       if engine.teachingCompareValue(
         middle, against: value, by: (<=),
         stageID: "block.mergeSearch",
-        whenTrue: "The candidate is no greater than the held value, so the block search advances.",
-        whenFalse: "The candidate exceeds the held value, so the block search narrows leftward."
+        whenTrue: String(localized: "The candidate is no greater than the held value, so the block search advances.", bundle: .module),
+        whenFalse: String(localized: "The candidate exceeds the held value, so the block search narrows leftward.", bundle: .module)
       ) {
         lower = middle + 1
       } else {
@@ -96,7 +97,7 @@ class BlockMergeSortingTemplate {
         stageID: "blockMerge.exchange", decisionID: "blockMerge.exchange", outcome: "exchange",
         roles: ["first": .arrayIndex(first + offset), "second": .arrayIndex(second + offset)],
         explanationKey: "blockMerge.exchange",
-        explanation: "The block merge exchanges these positions to move an ordered block into place.")
+        explanation: String(localized: "The block merge exchanges these positions to move an ordered block into place.", bundle: .module))
     }
   }
 
@@ -107,8 +108,8 @@ class BlockMergeSortingTemplate {
     while left < middle && right < end {
       if engine.teachingCompare(
         left, right, by: (<=), stageID: "blockMerge.forwardChoice",
-        whenTrue: "The left run value is no greater, so the forward merge takes it next.",
-        whenFalse: "The right run value is smaller, so the forward merge takes it next.") {
+        whenTrue: String(localized: "The left run value is no greater, so the forward merge takes it next.", bundle: .module),
+        whenFalse: String(localized: "The right run value is smaller, so the forward merge takes it next.", bundle: .module)) {
         engine.setValue(output, engine.readValue(at: left))
         left += 1
       } else {
@@ -129,8 +130,8 @@ class BlockMergeSortingTemplate {
       output -= 1
       if engine.teachingCompare(
         right, left, by: (>=), stageID: "blockMerge.backwardChoice",
-        whenTrue: "The right run value is at least as large, so the backward merge takes it next.",
-        whenFalse: "The left run value is larger, so the backward merge takes it next.") {
+        whenTrue: String(localized: "The right run value is at least as large, so the backward merge takes it next.", bundle: .module),
+        whenFalse: String(localized: "The left run value is larger, so the backward merge takes it next.", bundle: .module)) {
         engine.setValue(output, engine.readValue(at: right))
         right -= 1
       } else {

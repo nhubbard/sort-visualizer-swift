@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -25,7 +26,7 @@ import SortEngineKit
 public struct KotaSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "kotasort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Kota Sort",
+    displayName: String(localized: "Kota Sort", bundle: .module),
     category: .hybrid,
     sizeRange: 16...922,
     growthModel: OperationGrowthModel(
@@ -64,16 +65,16 @@ private final class KotaRecorder {
     engine.teachingCompare(
       left, right, by: (<),
       stageID: "KotaSort.key.order",
-      whenTrue: "The first key is smaller, so Kota treats it as preceding the second.",
-      whenFalse: "The first key is not smaller, so Kota checks the alternative placement.")
+      whenTrue: String(localized: "The first key is smaller, so Kota treats it as preceding the second.", bundle: .module),
+      whenFalse: String(localized: "The first key is not smaller, so Kota checks the alternative placement.", bundle: .module))
   }
   private func greater(_ left: Int, _ right: Int) -> Bool { engine.compare(left, right, by: (>)) }
   private func atMost(_ left: Int, _ right: Int) -> Bool {
     engine.teachingCompare(
       left, right, by: (<=),
       stageID: "KotaSort.merge.boundary",
-      whenTrue: "The left run endpoint is no greater, so Kota can keep this merge boundary.",
-      whenFalse: "The left endpoint exceeds the right, so Kota must move values across the boundary.")
+      whenTrue: String(localized: "The left run endpoint is no greater, so Kota can keep this merge boundary.", bundle: .module),
+      whenFalse: String(localized: "The left endpoint exceeds the right, so Kota must move values across the boundary.", bundle: .module))
   }
   private func atLeast(_ left: Int, _ right: Int) -> Bool { engine.compare(left, right, by: (>=)) }
   private func equalValues(_ left: Int, _ right: Int) -> Bool { engine.compareValues(left, right, by: (==)) }

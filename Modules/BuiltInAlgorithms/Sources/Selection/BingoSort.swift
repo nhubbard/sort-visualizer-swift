@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -9,7 +10,7 @@ import SortEngineKit
 public struct BingoSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "bingosort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Bingo Sort",
+    displayName: String(localized: "Bingo Sort", bundle: .module),
     category: .selection,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -41,8 +42,8 @@ public struct BingoSort: SortAlgorithm {
         i, against: next,
         by: >,
         stageID: "BingoSort.nextDistinctValue",
-        whenTrue: "This value is larger than the current next value, so choose a new distinct target.",
-        whenFalse: "This value does not replace the next distinct target."
+        whenTrue: String(localized: "This value is larger than the current next value, so choose a new distinct target.", bundle: .module),
+        whenFalse: String(localized: "This value does not replace the next distinct target.", bundle: .module)
       ) {
         next = engine.readValue(at: i)
       }
@@ -52,8 +53,8 @@ public struct BingoSort: SortAlgorithm {
     // for them yet.
     while maximum > 0 && engine.teachingCompareValue(
       maximum, against: next, by: ==, stageID: "BingoSort.skipPlacedMaximum",
-      whenTrue: "This tail item equals the current maximum, so leave it in its final position.",
-      whenFalse: "This tail item differs from the maximum, so begin another placement round."
+      whenTrue: String(localized: "This tail item equals the current maximum, so leave it in its final position.", bundle: .module),
+      whenFalse: String(localized: "This tail item differs from the maximum, so begin another placement round.", bundle: .module)
     ) {
       maximum -= 1
     }
@@ -69,15 +70,15 @@ public struct BingoSort: SortAlgorithm {
       while j >= 0 {
         if engine.teachingCompareValue(
           j, against: val, by: ==, stageID: "BingoSort.placeCurrentValue",
-          whenTrue: "This item matches the current bingo value, so place it at the right boundary.",
-          whenFalse: "This item has a different value; check whether it becomes the next target."
+          whenTrue: String(localized: "This item matches the current bingo value, so place it at the right boundary.", bundle: .module),
+          whenFalse: String(localized: "This item has a different value; check whether it becomes the next target.", bundle: .module)
         ) {
           engine.swap(j, maximum)
           maximum -= 1
         } else if engine.teachingCompareValue(
           j, against: next, by: >, stageID: "BingoSort.findNextValue",
-          whenTrue: "This item is larger than the next target, so use it for the next bingo round.",
-          whenFalse: "The next bingo target remains the better candidate."
+          whenTrue: String(localized: "This item is larger than the next target, so use it for the next bingo round.", bundle: .module),
+          whenFalse: String(localized: "The next bingo target remains the better candidate.", bundle: .module)
         ) {
           next = engine.readValue(at: j)
         }
@@ -85,8 +86,8 @@ public struct BingoSort: SortAlgorithm {
       }
       while maximum > 0 && engine.teachingCompareValue(
         maximum, against: next, by: ==, stageID: "BingoSort.skipPlacedTail",
-        whenTrue: "This tail item already matches the next target, so shrink the unsorted boundary.",
-        whenFalse: "The remaining tail needs another bingo placement round."
+        whenTrue: String(localized: "This tail item already matches the next target, so shrink the unsorted boundary.", bundle: .module),
+        whenFalse: String(localized: "The remaining tail needs another bingo placement round.", bundle: .module)
       ) {
         maximum -= 1
       }

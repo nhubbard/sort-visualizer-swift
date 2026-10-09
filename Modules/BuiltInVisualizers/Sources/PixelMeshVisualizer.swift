@@ -1,3 +1,4 @@
+import Foundation
 import SortEngineKit
 import VisualizationKit
 
@@ -8,7 +9,7 @@ import VisualizationKit
 public struct PixelMeshVisualizer: Visualizer {
   public let id = VisualizerID(rawValue: "pixelmesh")
   public let metadata = VisualizerMetadata(
-    displayName: "Pixel Mesh",
+    displayName: String(localized: "Pixel Mesh", bundle: .module),
     supportsAuxArrays: false,
     iconName: "square.grid.3x3.fill"
   )

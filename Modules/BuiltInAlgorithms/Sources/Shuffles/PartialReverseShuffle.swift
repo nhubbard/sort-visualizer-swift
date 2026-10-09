@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -6,7 +7,7 @@ import SortEngineKit
 /// while the middle half ends up back in its original order.
 public struct PartialReverseShuffle: ShuffleAlgorithm {
   public let id = ShuffleID(rawValue: "partialreverse")
-  public let metadata = ShuffleMetadata(displayName: "Half Reversed")
+  public let metadata = ShuffleMetadata(displayName: String(localized: "Half Reversed", bundle: .module))
   public init() {}
   public func record(into engine: inout RecordingEngine) {
     let n = engine.count

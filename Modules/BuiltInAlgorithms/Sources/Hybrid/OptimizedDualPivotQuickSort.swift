@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -24,7 +25,7 @@ import SortEngineKit
 public struct OptimizedDualPivotQuickSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "optimizeddualpivotquicksort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Optimized Dual-Pivot Quick",
+    displayName: String(localized: "Optimized Dual-Pivot Quick", bundle: .module),
     category: .hybrid,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -62,8 +63,8 @@ public struct OptimizedDualPivotQuickSort: SortAlgorithm {
       while j > start && !engine.teachingCompare(
         j, j - 1,
         stageID: "OptimizedDualPivotQuickSort.smallRun.insert",
-        whenTrue: "The current value is at least its predecessor, so insertion scanning can stop.",
-        whenFalse: "The current value is smaller, so insertion moves it left."
+        whenTrue: String(localized: "The current value is at least its predecessor, so insertion scanning can stop.", bundle: .module),
+        whenFalse: String(localized: "The current value is smaller, so insertion moves it left.", bundle: .module)
       ) {
         engine.swap(j - 1, j)
         j -= 1
@@ -89,8 +90,8 @@ public struct OptimizedDualPivotQuickSort: SortAlgorithm {
     if engine.teachingCompare(
       med1, med2, by: (<),
       stageID: "OptimizedDualPivotQuickSort.pivot.order",
-      whenTrue: "The first sample is smaller, so it becomes the low pivot.",
-      whenFalse: "The second sample is no larger, so it becomes the low pivot."
+      whenTrue: String(localized: "The first sample is smaller, so it becomes the low pivot.", bundle: .module),
+      whenFalse: String(localized: "The second sample is no larger, so it becomes the low pivot.", bundle: .module)
     ) {
       engine.swap(med1, left)
       engine.swap(med2, right)
@@ -115,22 +116,22 @@ public struct OptimizedDualPivotQuickSort: SortAlgorithm {
       if engine.teachingCompareValue(
         k, against: pivot1, by: (<),
         stageID: "OptimizedDualPivotQuickSort.partition.low",
-        whenTrue: "This value is below the low pivot, so move it into the left partition.",
-        whenFalse: "This value is not below the low pivot; check the high pivot."
+        whenTrue: String(localized: "This value is below the low pivot, so move it into the left partition.", bundle: .module),
+        whenFalse: String(localized: "This value is not below the low pivot; check the high pivot.", bundle: .module)
       ) {
         engine.swap(k, less)
         less += 1
       } else if engine.teachingCompareValue(
         k, against: pivot2, by: (>),
         stageID: "OptimizedDualPivotQuickSort.partition.high",
-        whenTrue: "This value exceeds the high pivot, so exchange it toward the right partition.",
-        whenFalse: "This value lies between the pivots and stays in the middle partition."
+        whenTrue: String(localized: "This value exceeds the high pivot, so exchange it toward the right partition.", bundle: .module),
+        whenFalse: String(localized: "This value lies between the pivots and stays in the middle partition.", bundle: .module)
       ) {
         while k < great && engine.teachingCompareValue(
           great, against: pivot2, by: (>),
           stageID: "OptimizedDualPivotQuickSort.partition.rightScan",
-          whenTrue: "This right-side value already exceeds the high pivot, so scan left.",
-          whenFalse: "This right-side value can be exchanged with the candidate."
+          whenTrue: String(localized: "This right-side value already exceeds the high pivot, so scan left.", bundle: .module),
+          whenFalse: String(localized: "This right-side value can be exchanged with the candidate.", bundle: .module)
         ) {
           great -= 1
         }
@@ -139,8 +140,8 @@ public struct OptimizedDualPivotQuickSort: SortAlgorithm {
         if engine.teachingCompareValue(
           k, against: pivot1, by: (<),
           stageID: "OptimizedDualPivotQuickSort.partition.recheckLow",
-          whenTrue: "After the exchange, this value is below the low pivot and moves left.",
-          whenFalse: "After the exchange, this value remains in the middle partition."
+          whenTrue: String(localized: "After the exchange, this value is below the low pivot and moves left.", bundle: .module),
+          whenFalse: String(localized: "After the exchange, this value remains in the middle partition.", bundle: .module)
         ) {
           engine.swap(k, less)
           less += 1
@@ -169,24 +170,24 @@ public struct OptimizedDualPivotQuickSort: SortAlgorithm {
         if engine.teachingCompareValue(
           k, against: pivot1, by: (==),
           stageID: "OptimizedDualPivotQuickSort.equalPivots.low",
-          whenTrue: "This value equals the low pivot, so group it beside that pivot.",
-          whenFalse: "This value differs from the low pivot; check the high pivot."
+          whenTrue: String(localized: "This value equals the low pivot, so group it beside that pivot.", bundle: .module),
+          whenFalse: String(localized: "This value differs from the low pivot; check the high pivot.", bundle: .module)
         ) {
           engine.swap(k, less)
           less += 1
         } else if engine.teachingCompareValue(
           k, against: pivot2, by: (==),
           stageID: "OptimizedDualPivotQuickSort.equalPivots.high",
-          whenTrue: "This value equals the high pivot, so group it beside that pivot.",
-          whenFalse: "This value matches neither pivot and stays in the middle."
+          whenTrue: String(localized: "This value equals the high pivot, so group it beside that pivot.", bundle: .module),
+          whenFalse: String(localized: "This value matches neither pivot and stays in the middle.", bundle: .module)
         ) {
           engine.swap(k, great)
           great -= 1
           if engine.teachingCompareValue(
             k, against: pivot1, by: (==),
             stageID: "OptimizedDualPivotQuickSort.equalPivots.recheckLow",
-            whenTrue: "The exchanged value equals the low pivot, so group it on the left.",
-            whenFalse: "The exchanged value does not equal the low pivot."
+            whenTrue: String(localized: "The exchanged value equals the low pivot, so group it on the left.", bundle: .module),
+            whenFalse: String(localized: "The exchanged value does not equal the low pivot.", bundle: .module)
           ) {
             engine.swap(k, less)
             less += 1

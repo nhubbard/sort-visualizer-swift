@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -40,7 +41,7 @@ import SortEngineKit
 public struct LibrarySort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "librarysort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Library Sort",
+    displayName: String(localized: "Library Sort", bundle: .module),
     category: .insertion,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -116,8 +117,8 @@ public struct LibrarySort: SortAlgorithm {
               "heldValue": .value(value)],
             explanationKey: "LibrarySort.gappedBinarySearch",
             explanation: searchLower
-              ? "The library slot is greater than the new value, so search earlier slots."
-              : "The library slot is no greater, so search later slots to preserve tie order.")
+              ? String(localized: "The library slot is greater than the new value, so search earlier slots.", bundle: .module)
+              : String(localized: "The library slot is no greater, so search later slots to preserve tie order.", bundle: .module))
         }
         if searchLower {
           hi = mid

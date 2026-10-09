@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -6,7 +7,7 @@ import SortEngineKit
 /// trades places with its mirror, leaving the rest untouched.
 public struct DoubleLayeredShuffle: ShuffleAlgorithm {
   public let id = ShuffleID(rawValue: "doublelayered")
-  public let metadata = ShuffleMetadata(displayName: "Double Layered")
+  public let metadata = ShuffleMetadata(displayName: String(localized: "Double Layered", bundle: .module))
   public init() {}
   public func record(into engine: inout RecordingEngine) {
     let n = engine.count

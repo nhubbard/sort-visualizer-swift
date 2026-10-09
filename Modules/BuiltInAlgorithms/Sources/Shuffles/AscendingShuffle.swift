@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -6,7 +7,7 @@ import SortEngineKit
 /// special-cased "no shuffle" option, so it shows up in the picker like any other choice.
 public struct AscendingShuffle: ShuffleAlgorithm {
   public let id = ShuffleID(rawValue: "ascending")
-  public let metadata = ShuffleMetadata(displayName: "Ascending")
+  public let metadata = ShuffleMetadata(displayName: String(localized: "Ascending", bundle: .module))
   public init() {}
   public func record(into engine: inout RecordingEngine) {}
 }

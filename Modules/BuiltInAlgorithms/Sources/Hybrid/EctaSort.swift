@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -27,7 +28,7 @@ import SortEngineKit
 public struct EctaSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "ectasort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Ecta Sort",
+    displayName: String(localized: "Ecta Sort", bundle: .module),
     category: .hybrid,
     sizeRange: 16...1446,
     growthModel: OperationGrowthModel(
@@ -55,7 +56,7 @@ public struct EctaSort: SortAlgorithm {
         stageID: "ecta.place", decisionID: "ecta.place", outcome: "placed",
         roles: ["destination": .arrayIndex(destination), "value": .value(value)],
         explanationKey: "ecta.place",
-        explanation: "Ecta places the next selected run value in its merge destination.")
+        explanation: String(localized: "Ecta places the next selected run value in its merge destination.", bundle: .module))
     }
 
     func minRun(_ n: Int) -> Int {
@@ -75,8 +76,8 @@ public struct EctaSort: SortAlgorithm {
           if engine.teachingCompareValue(
             mid, against: value, by: (>),
             stageID: "EctaSort.binary.search",
-            whenTrue: "This run value exceeds the held value, so the insertion point lies to the left.",
-            whenFalse: "This run value does not exceed the held value, so the search moves right."
+            whenTrue: String(localized: "This run value exceeds the held value, so the insertion point lies to the left.", bundle: .module),
+            whenFalse: String(localized: "This run value does not exceed the held value, so the search moves right.", bundle: .module)
           ) {
             high = mid
           } else {
@@ -165,8 +166,8 @@ public struct EctaSort: SortAlgorithm {
         if engine.teachingCompare(
           left, right, by: (<=),
           stageID: "ecta.mergeForward",
-          whenTrue: "The left run value is no greater, so Ecta writes it next.",
-          whenFalse: "The right run value is smaller, so Ecta writes it next."
+          whenTrue: String(localized: "The left run value is no greater, so Ecta writes it next.", bundle: .module),
+          whenFalse: String(localized: "The right run value is smaller, so Ecta writes it next.", bundle: .module)
         ) {
           place(output, engine.readValue(at: left))
           left += 1
@@ -204,8 +205,8 @@ public struct EctaSort: SortAlgorithm {
         if engine.teachingCompare(
           left, right, by: (>),
           stageID: "ecta.mergeBackward",
-          whenTrue: "The left tail is larger, so Ecta writes it next from the back.",
-          whenFalse: "The right tail is at least as large, so Ecta writes it next."
+          whenTrue: String(localized: "The left tail is larger, so Ecta writes it next from the back.", bundle: .module),
+          whenFalse: String(localized: "The right tail is at least as large, so Ecta writes it next.", bundle: .module)
         ) {
           place(output, engine.readValue(at: left))
           left -= 1
@@ -229,8 +230,8 @@ public struct EctaSort: SortAlgorithm {
         if engine.teachingCompareValue(
           right, against: held, by: (>=),
           stageID: "ecta.bufferMerge",
-          whenTrue: "This run value is at least the held buffer value, so Ecta writes the buffer value.",
-          whenFalse: "This run value is smaller, so Ecta writes it before the buffer value."
+          whenTrue: String(localized: "This run value is at least the held buffer value, so Ecta writes the buffer value.", bundle: .module),
+          whenFalse: String(localized: "This run value is smaller, so Ecta writes it before the buffer value.", bundle: .module)
         ) {
           place(output, held)
           index += 1
@@ -259,8 +260,8 @@ public struct EctaSort: SortAlgorithm {
         if engine.teachingCompareValue(
           left, against: held, by: (<),
           stageID: "ecta.bufferMerge",
-          whenTrue: "This run value is below the held buffer value, so Ecta writes the buffer value from the back.",
-          whenFalse: "This run value is at least as large, so Ecta writes it next."
+          whenTrue: String(localized: "This run value is below the held buffer value, so Ecta writes the buffer value from the back.", bundle: .module),
+          whenFalse: String(localized: "This run value is at least as large, so Ecta writes it next.", bundle: .module)
         ) {
           place(output, held)
           index -= 1
@@ -363,8 +364,8 @@ public struct EctaSort: SortAlgorithm {
             if engine.teachingCompare(
               left, right, by: (<=),
               stageID: "ecta.mergeForward",
-              whenTrue: "The left run value is no greater, so Ecta writes it next.",
-              whenFalse: "The right run value is smaller, so Ecta writes it next."
+              whenTrue: String(localized: "The left run value is no greater, so Ecta writes it next.", bundle: .module),
+              whenFalse: String(localized: "The right run value is smaller, so Ecta writes it next.", bundle: .module)
             ) {
               place(destination, engine.readValue(at: left))
               left += 1
@@ -421,8 +422,8 @@ public struct EctaSort: SortAlgorithm {
             if engine.teachingCompare(
               right, left, by: (>=),
               stageID: "ecta.blockMerge",
-              whenTrue: "The right tail is at least as large, so the block merge writes it next.",
-              whenFalse: "The left tail is larger, so the block merge writes it next."
+              whenTrue: String(localized: "The right tail is at least as large, so the block merge writes it next.", bundle: .module),
+              whenFalse: String(localized: "The left tail is larger, so the block merge writes it next.", bundle: .module)
             ) {
               place(destination, engine.readValue(at: right))
               right -= 1

@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -20,7 +21,7 @@ import SortEngineKit
 public struct StaticSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "staticsort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Static Sort",
+    displayName: String(localized: "Static Sort", bundle: .module),
     category: .distribution,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -91,7 +92,7 @@ public struct StaticSort: SortAlgorithm {
         outcome: "update",
         roles: ["scratch": .auxiliaryIndex(handle: countHandle.rawValue, index: idx)],
         explanationKey: "staticsort.scratchUpdate",
-        explanation: "Update the count or next free offset for this value’s class.")
+        explanation: String(localized: "Update the count or next free offset for this value’s class.", bundle: .module))
     }
 
     offset[0] = a
@@ -101,7 +102,7 @@ public struct StaticSort: SortAlgorithm {
       outcome: "update",
       roles: ["scratch": .auxiliaryIndex(handle: offsetHandle.rawValue, index: 0)],
       explanationKey: "staticsort.scratchUpdate",
-      explanation: "Update the count or next free offset for this value’s class.")
+      explanation: String(localized: "Update the count or next free offset for this value’s class.", bundle: .module))
     for i in 1..<auxLen {
       offset[i] = count[i - 1] + offset[i - 1]
       engine.writeAux(offsetHandle, at: i, value: offset[i])
@@ -110,7 +111,7 @@ public struct StaticSort: SortAlgorithm {
         outcome: "update",
         roles: ["scratch": .auxiliaryIndex(handle: offsetHandle.rawValue, index: i)],
         explanationKey: "staticsort.scratchUpdate",
-        explanation: "Update the count or next free offset for this value’s class.")
+        explanation: String(localized: "Update the count or next free offset for this value’s class.", bundle: .module))
     }
 
     // -------CYCLE-PERMUTE INTO BUCKET REGIONS-------
@@ -131,7 +132,7 @@ public struct StaticSort: SortAlgorithm {
           stageID: "bucketPlacement", decisionID: "staticsort.bucketPlacement",
           outcome: "place", roles: ["destination": .arrayIndex(from)],
           explanationKey: "staticsort.bucketPlacement",
-          explanation: "This bucket cycle temporarily opens the source slot before placing its displaced value.")
+          explanation: String(localized: "This bucket cycle temporarily opens the source slot before placing its displaced value.", bundle: .module))
 
         repeat {
           let idx = classify(num)
@@ -143,7 +144,7 @@ public struct StaticSort: SortAlgorithm {
             outcome: "update",
             roles: ["scratch": .auxiliaryIndex(handle: offsetHandle.rawValue, index: idx)],
             explanationKey: "staticsort.scratchUpdate",
-            explanation: "Update the count or next free offset for this value’s class.")
+            explanation: String(localized: "Update the count or next free offset for this value’s class.", bundle: .module))
           count[idx] -= 1
           engine.writeAux(countHandle, at: idx, value: count[idx])
           engine.annotateLastOperation(
@@ -151,7 +152,7 @@ public struct StaticSort: SortAlgorithm {
             outcome: "update",
             roles: ["scratch": .auxiliaryIndex(handle: countHandle.rawValue, index: idx)],
             explanationKey: "staticsort.scratchUpdate",
-            explanation: "Update the count or next free offset for this value’s class.")
+            explanation: String(localized: "Update the count or next free offset for this value’s class.", bundle: .module))
 
           let temp = engine.readValue(at: to)
           engine.setValue(to, num)
@@ -159,7 +160,7 @@ public struct StaticSort: SortAlgorithm {
             stageID: "bucketPlacement", decisionID: "staticsort.bucketPlacement",
             outcome: "place", roles: ["destination": .arrayIndex(to)],
             explanationKey: "staticsort.bucketPlacement",
-            explanation: "The current bucket or fallback sort step determines this destination.")
+            explanation: String(localized: "The current bucket or fallback sort step determines this destination.", bundle: .module))
           num = temp
           from = to
         } while from != origin
@@ -197,15 +198,15 @@ public struct StaticSort: SortAlgorithm {
           roles: ["left": .arrayIndex(j - 1), "right": .arrayIndex(j)],
           explanationKey: "staticsort.adjacentOrder",
           explanation: inOrder
-            ? "This pair is ordered within its bucket, so stop moving left."
-            : "This pair is inverted within its bucket, so move the smaller value left.")
+            ? String(localized: "This pair is ordered within its bucket, so stop moving left.", bundle: .module)
+            : String(localized: "This pair is inverted within its bucket, so move the smaller value left.", bundle: .module))
         if inOrder { break }
         engine.swap(j - 1, j)
         engine.annotateLastOperation(
           stageID: "bucketExchange", decisionID: "staticsort.bucketExchange",
           outcome: "exchange", roles: ["left": .arrayIndex(j - 1), "right": .arrayIndex(j)],
           explanationKey: "staticsort.bucketExchange",
-          explanation: "This adjacent pair is inverted within its bucket, so exchange it.")
+          explanation: String(localized: "This adjacent pair is inverted within its bucket, so exchange it.", bundle: .module))
         j -= 1
       }
     }
@@ -233,8 +234,8 @@ public struct StaticSort: SortAlgorithm {
             roles: ["current": .arrayIndex(s + largest), "child": .arrayIndex(s + left)],
             explanationKey: "staticsort.leftChild",
             explanation: childIsLarger
-              ? "The left child is larger, so make it the heap candidate."
-              : "The current heap candidate is no smaller than its left child.")
+              ? String(localized: "The left child is larger, so make it the heap candidate.", bundle: .module)
+              : String(localized: "The current heap candidate is no smaller than its left child.", bundle: .module))
           if childIsLarger { largest = left }
         }
         if right < size {
@@ -245,8 +246,8 @@ public struct StaticSort: SortAlgorithm {
             roles: ["current": .arrayIndex(s + largest), "child": .arrayIndex(s + right)],
             explanationKey: "staticsort.rightChild",
             explanation: childIsLarger
-              ? "The right child is larger, so make it the heap candidate."
-              : "The current heap candidate is no smaller than its right child.")
+              ? String(localized: "The right child is larger, so make it the heap candidate.", bundle: .module)
+              : String(localized: "The current heap candidate is no smaller than its right child.", bundle: .module))
           if childIsLarger { largest = right }
         }
         if largest == root { break }
@@ -255,7 +256,7 @@ public struct StaticSort: SortAlgorithm {
           stageID: "bucketExchange", decisionID: "staticsort.bucketExchange",
           outcome: "exchange", roles: ["left": .arrayIndex(s + root), "right": .arrayIndex(s + largest)],
           explanationKey: "staticsort.bucketExchange",
-          explanation: "The larger child rises to restore this bucket’s max heap.")
+          explanation: String(localized: "The larger child rises to restore this bucket’s max heap.", bundle: .module))
         root = largest
       }
     }
@@ -272,7 +273,7 @@ public struct StaticSort: SortAlgorithm {
         stageID: "bucketExchange", decisionID: "staticsort.bucketExchange",
         outcome: "exchange", roles: ["left": .arrayIndex(s), "right": .arrayIndex(s + end)],
         explanationKey: "staticsort.bucketExchange",
-        explanation: "The heap maximum moves to the end of this bucket’s remaining range.")
+        explanation: String(localized: "The heap maximum moves to the end of this bucket’s remaining range.", bundle: .module))
       siftDown(0, end)
       end -= 1
     }

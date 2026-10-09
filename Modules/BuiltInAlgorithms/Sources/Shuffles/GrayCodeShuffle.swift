@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -8,7 +9,7 @@ import SortEngineKit
 /// pattern that produces a Gray code sequence.
 public struct GrayCodeShuffle: ShuffleAlgorithm {
   public let id = ShuffleID(rawValue: "graycode")
-  public let metadata = ShuffleMetadata(displayName: "Gray Code Fractal")
+  public let metadata = ShuffleMetadata(displayName: String(localized: "Gray Code Fractal", bundle: .module))
   public init() {}
   public func record(into engine: inout RecordingEngine) {
     reversalRec(&engine, a: 0, b: engine.count, reverseLeft: false)

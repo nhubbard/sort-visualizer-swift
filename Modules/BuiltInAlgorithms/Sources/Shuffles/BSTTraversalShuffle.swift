@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -7,7 +8,7 @@ import SortEngineKit
 /// tree, level by level.
 public struct BSTTraversalShuffle: ShuffleAlgorithm {
   public let id = ShuffleID(rawValue: "bsttraversal")
-  public let metadata = ShuffleMetadata(displayName: "BST Traversal")
+  public let metadata = ShuffleMetadata(displayName: String(localized: "BST Traversal", bundle: .module))
   public init() {}
   public func record(into engine: inout RecordingEngine) {
     let n = engine.count

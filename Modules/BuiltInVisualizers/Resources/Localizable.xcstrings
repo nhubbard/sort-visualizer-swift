@@ -1,0 +1,166 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "Bar Graph" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Gráfico de barras"
+          }
+        }
+      }
+    },
+    "Color Circle" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Círculo de colores"
+          }
+        }
+      }
+    },
+    "Custom Image" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Imagen personalizada"
+          }
+        }
+      }
+    },
+    "Disparity Bar Graph" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Gráfico de barras de disparidad"
+          }
+        }
+      }
+    },
+    "Disparity Chords" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Cuerdas de disparidad"
+          }
+        }
+      }
+    },
+    "Disparity Circle" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Círculo de disparidad"
+          }
+        }
+      }
+    },
+    "Disparity Dots" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Puntos de disparidad"
+          }
+        }
+      }
+    },
+    "Hanoi Towers" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Torres de Hanói"
+          }
+        }
+      }
+    },
+    "Hoop Stack" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Pila de aros"
+          }
+        }
+      }
+    },
+    "Pixel Mesh" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Malla de píxeles"
+          }
+        }
+      }
+    },
+    "Rainbow" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Arcoíris"
+          }
+        }
+      }
+    },
+    "Scatter Plot" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Diagrama de dispersión"
+          }
+        }
+      }
+    },
+    "Sine Wave" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Onda sinusoidal"
+          }
+        }
+      }
+    },
+    "Spiral" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Espiral"
+          }
+        }
+      }
+    },
+    "Spiral Dots" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Puntos en espiral"
+          }
+        }
+      }
+    },
+    "Wave Dots" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Puntos en forma de onda"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.3"
+}

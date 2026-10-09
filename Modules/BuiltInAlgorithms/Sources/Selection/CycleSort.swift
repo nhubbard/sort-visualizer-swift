@@ -1,10 +1,11 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
 public struct CycleSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "cyclesort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Cycle Sort",
+    displayName: String(localized: "Cycle Sort", bundle: .module),
     category: .selection,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -36,8 +37,8 @@ public struct CycleSort: SortAlgorithm {
         i, against: t,
         by: <,
         stageID: "CycleSort.destinationRank",
-        whenTrue: "This array item is smaller than the held value, so move the destination right.",
-        whenFalse: "This item does not move the held value’s destination."
+        whenTrue: String(localized: "This array item is smaller than the held value, so move the destination right.", bundle: .module),
+        whenFalse: String(localized: "This item does not move the held value’s destination.", bundle: .module)
       ) {
         r += 1
       }

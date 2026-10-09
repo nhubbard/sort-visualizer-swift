@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -17,7 +18,7 @@ import SortEngineKit
 public struct StacklessBinaryQuickSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "stacklessbinaryquicksort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Stackless Binary Quick Sort",
+    displayName: String(localized: "Stackless Binary Quick Sort", bundle: .module),
     category: .distribution,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -56,8 +57,8 @@ public struct StacklessBinaryQuickSort: SortAlgorithm {
             roles: ["candidate": .arrayIndex(i)],
             explanationKey: "stacklessbinaryquicksort.scanLeft",
             explanation: isHighBit
-              ? "This value has a one in the active bit, so it belongs on the right side."
-              : "This value has a zero in the active bit, so continue scanning the left side.")
+              ? String(localized: "This value has a one in the active bit, so it belongs on the right side.", bundle: .module)
+              : String(localized: "This value has a zero in the active bit, so continue scanning the left side.", bundle: .module))
           if isHighBit { break }
           i += 1
         }
@@ -70,8 +71,8 @@ public struct StacklessBinaryQuickSort: SortAlgorithm {
             roles: ["candidate": .arrayIndex(j)],
             explanationKey: "stacklessbinaryquicksort.scanRight",
             explanation: isHighBit
-              ? "This value has a one in the active bit, so continue scanning the right side."
-              : "This value has a zero in the active bit, so it belongs on the left side.")
+              ? String(localized: "This value has a one in the active bit, so continue scanning the right side.", bundle: .module)
+              : String(localized: "This value has a zero in the active bit, so it belongs on the left side.", bundle: .module))
           if !isHighBit { break }
           j -= 1
         }
@@ -81,7 +82,7 @@ public struct StacklessBinaryQuickSort: SortAlgorithm {
             stageID: "bucketExchange", decisionID: "stacklessbinaryquicksort.bucketExchange",
             outcome: "exchange", roles: ["left": .arrayIndex(i), "right": .arrayIndex(j)],
             explanationKey: "stacklessbinaryquicksort.bucketExchange",
-            explanation: "These values have opposite bits from their current partition sides, so exchange them.")
+            explanation: String(localized: "These values have opposite bits from their current partition sides, so exchange them.", bundle: .module))
         } else {
           return i
         }
@@ -110,8 +111,8 @@ public struct StacklessBinaryQuickSort: SortAlgorithm {
             roles: ["candidate": .arrayIndex(b)],
             explanationKey: "stacklessbinaryquicksort.groupBoundary",
             explanation: samePrefix
-              ? "This value shares the higher-bit prefix, so keep it in the current group."
-              : "This value has a different higher-bit prefix, so the current group ends here.")
+              ? String(localized: "This value shares the higher-bit prefix, so keep it in the current group.", bundle: .module)
+              : String(localized: "This value has a different higher-bit prefix, so the current group ends here.", bundle: .module))
           if !samePrefix { break }
           b += 1
         }

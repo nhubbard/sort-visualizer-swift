@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import DesignSystemKit
 import MarkdownUI
@@ -64,10 +65,8 @@ public struct AlgorithmDetailSection: View {
       #endif
       if contentUnavailable {
         ContentUnavailableView(
-          "Reference content unavailable", systemImage: "doc.questionmark",
-          description: Text(
-            "The bundled algorithm details could not be loaded. Reinstall the app to restore descriptions and code examples."
-          )
+          String(localized: "Reference content unavailable", bundle: .module), systemImage: "doc.questionmark",
+          description: Text(String(localized: "The bundled algorithm details could not be loaded. Reinstall the app to restore descriptions and code examples.", bundle: .module))
         )
         .accessibilityIdentifier("algorithmDetailsLoadError")
       }
@@ -85,13 +84,13 @@ public struct AlgorithmDetailSection: View {
 
       if showImplementations && !contentUnavailable {
         VStack(alignment: .leading, spacing: 8) {
-          Text("Implementations").font(.title2.bold())
+          Text(String(localized: "Implementations", bundle: .module)).font(.title2.bold())
           if contentLoading {
-            ProgressView("Loading code examples…")
+            ProgressView(String(localized: "Loading code examples…", bundle: .module))
           } else if let content, !content.codeSamples.isEmpty {
             TipView(CodeDiscoveryTip())
               .accessibilityIdentifier("sortCodeTip")
-            Picker("Language", selection: $selectedLanguage) {
+            Picker(String(localized: "Language", bundle: .module), selection: $selectedLanguage) {
               ForEach(content.codeSamples, id: \.language) { sample in
                 Text(sample.language.title).tag(sample.language)
               }
@@ -109,7 +108,7 @@ public struct AlgorithmDetailSection: View {
                 CodeDiscoveryTip.hasExploredCode = true
                 CodeDiscoveryTip().invalidate(reason: .actionPerformed)
               } label: {
-                Label("Copy Code", systemImage: "doc.on.doc")
+                Label(String(localized: "Copy Code", bundle: .module), systemImage: "doc.on.doc")
               }
               .accessibilityIdentifier("copyAlgorithmCode")
               .frame(maxWidth: .infinity)
@@ -134,14 +133,14 @@ public struct AlgorithmDetailSection: View {
               }
             }
             if let plain = plainSamples[selectedLanguage] {
-              Text("\(selectedLanguage.title) implementation, \(codeLineCount(plain)) lines.")
+              Text(String(localized: "\(selectedLanguage.title) implementation, \(codeLineCount(plain)) lines.", bundle: .module))
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
                 .frame(maxWidth: .infinity, alignment: .center)
                 .accessibilityIdentifier("algorithmCodeSummary")
             }
           } else {
-            Text("No code samples available yet.").foregroundStyle(.secondary)
+            Text(String(localized: "No code samples available yet.", bundle: .module)).foregroundStyle(.secondary)
           }
         }
       }
@@ -208,14 +207,14 @@ public struct AlgorithmDetailSection: View {
 
   private var descriptionColumn: some View {
     VStack(alignment: .leading, spacing: 16) {
-      Text("Description").font(.title2.bold())
+      Text(String(localized: "Description", bundle: .module)).font(.title2.bold())
       if contentLoading {
-        ProgressView("Loading description…")
+        ProgressView(String(localized: "Loading description…", bundle: .module))
       } else if let description = content?.description {
         Markdown(description).lineSpacing(1.75)
           .accessibilityIdentifier("algorithmDescriptionText")
       } else if !contentUnavailable {
-        Text("No description available yet.").foregroundStyle(.secondary)
+        Text(String(localized: "No description available yet.", bundle: .module)).foregroundStyle(.secondary)
       }
     }
     .frame(maxWidth: .infinity, alignment: .leading)
@@ -223,13 +222,13 @@ public struct AlgorithmDetailSection: View {
 
   private var complexityColumn: some View {
     VStack(alignment: .leading, spacing: 8) {
-      Text("Complexity").font(.title2.bold())
+      Text(String(localized: "Complexity", bundle: .module)).font(.title2.bold())
       complexityGrid
 
       GrowthModelComparisonSection(algorithm: algorithm)
         .padding(.top, 8)
 
-      Text("Big-O Correlation").font(.title2.bold()).padding(.top, 8)
+      Text(String(localized: "Big-O Correlation", bundle: .module)).font(.title2.bold()).padding(.top, 8)
       BigOCorrelationChart(algorithm: algorithm, refreshRevision: analyticsRevision)
     }
     .frame(maxWidth: .infinity, alignment: .leading)
@@ -289,9 +288,9 @@ public struct AlgorithmDetailSection: View {
 struct CodeDiscoveryTip: Tip {
   @Parameter static var hasExploredCode: Bool = false
 
-  var title: Text { Text("Explore the implementation") }
+  var title: Text { Text(String(localized: "Explore the implementation", bundle: .module)) }
   var message: Text? {
-    Text("Choose a language to read its reference code, or copy the full sample with Copy Code.")
+    Text(String(localized: "Choose a language to read its reference code, or copy the full sample with Copy Code.", bundle: .module))
   }
   var rules: [Rule] {
     #Rule(Self.$hasExploredCode) { $0 == false }

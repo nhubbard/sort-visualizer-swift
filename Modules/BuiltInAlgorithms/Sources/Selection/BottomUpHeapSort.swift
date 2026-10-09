@@ -1,10 +1,11 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
 public struct BottomUpHeapSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "bottomupheapsort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Bottom-up Heap Sort",
+    displayName: String(localized: "Bottom-up Heap Sort", bundle: .module),
     category: .selection,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -38,8 +39,8 @@ public struct BottomUpHeapSort: SortAlgorithm {
             2 * j + 2, 2 * j + 1,
             by: (>),
             stageID: "BottomUpHeapSort.childChoice",
-            whenTrue: "The right child is larger, so descend through it.",
-            whenFalse: "The left child is at least as large, so descend through it."
+            whenTrue: String(localized: "The right child is larger, so descend through it.", bundle: .module),
+            whenFalse: String(localized: "The left child is at least as large, so descend through it.", bundle: .module)
           ) ? 2 * j + 2 : 2 * j + 1
         } else {
           j = 2 * j + 1

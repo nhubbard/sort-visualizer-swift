@@ -1,10 +1,11 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
 public struct MedianQuickBogoSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "medianquickbogosort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Median Quick Bogo Sort",
+    displayName: String(localized: "Median Quick Bogo Sort", bundle: .module),
     category: .impractical,
     sizeRange: 4...6,
     growthModel: OperationGrowthModel(
@@ -54,7 +55,7 @@ public struct MedianQuickBogoSort: SortAlgorithm {
         stageID: "candidateExchange", decisionID: "medianquickbogosort.candidateExchange",
         outcome: "exchange", roles: ["left": .arrayIndex(i), "right": .arrayIndex(j)],
         explanationKey: "medianquickbogosort.candidateExchange",
-        explanation: "The next candidate permutation exchanges its pivot with a larger successor.")
+        explanation: String(localized: "The next candidate permutation exchanges its pivot with a larger successor.", bundle: .module))
       engine.reversal(i + 1, end - 1)
       return true
     }

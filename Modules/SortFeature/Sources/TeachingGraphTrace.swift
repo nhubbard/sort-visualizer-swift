@@ -1,3 +1,4 @@
+import Foundation
 import SortEngineKit
 
 /// A read-only teaching stream derived from the tape that ReplayEngine actually plays. The
@@ -116,20 +117,20 @@ struct TeachingGraphTrace {
           guard first != second else { break }
           built.append(Event(
             step: step, source: .array(first), target: .array(second), kind: .decision,
-            explanation: "Compare pivot at position \(first + 1) with position \(second + 1)."))
+            explanation: String(localized: "Compare pivot at position \(first + 1) with position \(second + 1).", bundle: .module)))
         case .swap(let first, let second):
           if first == pivot {
             built.append(Event(
               step: step, source: .array(first), target: .array(second),
               kind: .pivotPlacement,
               explanation: first == second
-                ? "Keep the pivot at position \(first + 1); this partition is complete."
-                : "Place the pivot from position \(first + 1) at position \(second + 1)."))
+                ? String(localized: "Keep the pivot at position \(first + 1); this partition is complete.", bundle: .module)
+                : String(localized: "Place the pivot from position \(first + 1) at position \(second + 1).", bundle: .module)))
             pivot = nil
           } else {
             built.append(Event(
               step: step, source: .array(first), target: .array(second), kind: .movement,
-              explanation: "Swap positions \(first + 1) and \(second + 1) within the partition."))
+              explanation: String(localized: "Swap positions \(first + 1) and \(second + 1) within the partition.", bundle: .module)))
           }
         default: break
         }
@@ -140,7 +141,7 @@ struct TeachingGraphTrace {
         case .compare(let first, let second):
           built.append(Event(
             step: step, source: .array(first), target: .array(second), kind: .decision,
-            explanation: "Compare positions \(first + 1) and \(second + 1) for the merge."))
+            explanation: String(localized: "Compare positions \(first + 1) and \(second + 1) for the merge.", bundle: .module)))
         case .readValue(let source):
           sources.append(source)
         case .auxWrite(let handle, let destination, let value):
@@ -151,13 +152,13 @@ struct TeachingGraphTrace {
           built.append(Event(
             step: step, source: .array(source), target: .buffer(handle, destination),
             kind: .bufferWrite,
-            explanation: "Move value \(value) from position \(source + 1) into buffer position \(destination + 1)."))
+            explanation: String(localized: "Move value \(value) from position \(source + 1) into buffer position \(destination + 1).", bundle: .module)))
         case .setValue(let destination, let value):
           guard let bufferHandle else { break }
           built.append(Event(
             step: step, source: .buffer(bufferHandle, destination), target: .array(destination),
             kind: .mergeWrite,
-            explanation: "Write value \(value) from buffer position \(destination + 1) to array position \(destination + 1)."))
+            explanation: String(localized: "Write value \(value) from buffer position \(destination + 1) to array position \(destination + 1).", bundle: .module)))
         default: break
         }
       }
@@ -197,38 +198,40 @@ struct TeachingGraphTrace {
 
   private static func explanation(for annotation: TeachingAnnotation) -> String? {
     guard annotation.definitionVersion == 1 else { return nil }
-    if let explanation = annotation.explanation, !explanation.isEmpty {
-      return explanation
-    }
     switch annotation.explanationKey {
     case "quick.pivotSide":
       guard let pivot = annotation.roles["pivot"]?.arrayIndex,
-        let candidate = annotation.roles["candidate"]?.arrayIndex else { return nil }
+        let candidate = annotation.roles["candidate"]?.arrayIndex else {
+        return annotation.explanation
+      }
       switch annotation.outcome {
       case "advance":
-        return "Position \(candidate + 1) is on the pivot's left side; advance the scan from pivot \(pivot + 1)."
+        return String(localized: "Position \(candidate + 1) is on the pivot's left side; advance the scan from pivot \(pivot + 1).", bundle: .module)
       case "oppositeSide":
-        return "Position \(candidate + 1) belongs on the other side of pivot \(pivot + 1); stop this scan."
+        return String(localized: "Position \(candidate + 1) belongs on the other side of pivot \(pivot + 1); stop this scan.", bundle: .module)
       case "boundary":
-        return "The scan reached the partition boundary at position \(candidate + 1)."
+        return String(localized: "The scan reached the partition boundary at position \(candidate + 1).", bundle: .module)
       case "retreat":
-        return "Position \(candidate + 1) is beyond pivot \(pivot + 1); move the right scan back."
+        return String(localized: "Position \(candidate + 1) is beyond pivot \(pivot + 1); move the right scan back.", bundle: .module)
       case "stop":
-        return "Position \(candidate + 1) is no greater than pivot \(pivot + 1); stop the right scan."
-      default: return nil
+        return String(localized: "Position \(candidate + 1) is no greater than pivot \(pivot + 1); stop the right scan.", bundle: .module)
+      default: break
       }
     case "merge.runChoice":
       guard let left = annotation.roles["left"]?.arrayIndex,
-        let right = annotation.roles["right"]?.arrayIndex else { return nil }
+        let right = annotation.roles["right"]?.arrayIndex else {
+        return annotation.explanation
+      }
       switch annotation.outcome {
       case "left":
-        return "Choose position \(left + 1) from the left run; its value is no greater than position \(right + 1)."
+        return String(localized: "Choose position \(left + 1) from the left run; its value is no greater than position \(right + 1).", bundle: .module)
       case "right":
-        return "Choose position \(right + 1) from the right run; its value is smaller than position \(left + 1)."
-      default: return nil
+        return String(localized: "Choose position \(right + 1) from the right run; its value is smaller than position \(left + 1).", bundle: .module)
+      default: break
       }
-    default: return nil
+    default: break
     }
+    return annotation.explanation?.isEmpty == false ? annotation.explanation : nil
   }
 
   private static func endpoints(for annotation: TeachingAnnotation) -> (Node, Node)? {

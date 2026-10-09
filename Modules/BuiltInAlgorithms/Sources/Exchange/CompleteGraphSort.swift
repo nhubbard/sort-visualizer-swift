@@ -18,7 +18,7 @@ import SortEngineKit
 public struct CompleteGraphSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "completegraphsort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Complete Graph Sort",
+    displayName: String(localized: "Complete Graph Sort", bundle: .module),
     category: .exchange,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -80,8 +80,8 @@ public struct CompleteGraphSort: SortAlgorithm {
       a, b,
       by: >,
       stageID: "CompleteGraphSort.graphEdge",
-      whenTrue: "The first endpoint is larger, so exchange this graph edge.",
-      whenFalse: "This graph edge is already ordered."
+      whenTrue: String(localized: "The first endpoint is larger, so exchange this graph edge.", bundle: .module),
+      whenFalse: String(localized: "This graph edge is already ordered.", bundle: .module)
     ) {
       engine.swap(a, b)
     }

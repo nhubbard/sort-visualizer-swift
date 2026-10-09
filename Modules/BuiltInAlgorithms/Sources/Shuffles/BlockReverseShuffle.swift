@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -7,7 +8,7 @@ import SortEngineKit
 /// random partner for each.
 public struct BlockReverseShuffle: ShuffleAlgorithm {
   public let id = ShuffleID(rawValue: "blockreverse")
-  public let metadata = ShuffleMetadata(displayName: "Block Reverse")
+  public let metadata = ShuffleMetadata(displayName: String(localized: "Block Reverse", bundle: .module))
   public init() {}
 
   private func greatestPowerOfTwoAtOrBelow(_ value: Int) -> Int {

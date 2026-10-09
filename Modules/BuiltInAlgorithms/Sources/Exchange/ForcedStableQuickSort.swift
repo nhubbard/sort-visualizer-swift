@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -15,7 +16,7 @@ import SortEngineKit
 public struct ForcedStableQuickSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "forcedstablequicksort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Forced Stable Quick Sort",
+    displayName: String(localized: "Forced Stable Quick Sort", bundle: .module),
     category: .exchange,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -53,8 +54,8 @@ public struct ForcedStableQuickSort: SortAlgorithm {
         a, b,
         by: >,
         stageID: "ForcedStableQuickSort.stableOrder",
-        whenTrue: "The first value is greater, so this stable comparison ranks it later.",
-        whenFalse: "The first value is no greater; a tie falls back to original order."
+        whenTrue: String(localized: "The first value is greater, so this stable comparison ranks it later.", bundle: .module),
+        whenFalse: String(localized: "The first value is no greater; a tie falls back to original order.", bundle: .module)
       ) { return true }
       return engine.readValue(at: a) == engine.readValue(at: b) && key[a] > key[b]
     }

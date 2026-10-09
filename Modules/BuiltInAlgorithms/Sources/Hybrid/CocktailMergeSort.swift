@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -16,7 +17,7 @@ import SortEngineKit
 public struct CocktailMergeSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "cocktailmergesort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Cocktail Merge Sort",
+    displayName: String(localized: "Cocktail Merge Sort", bundle: .module),
     category: .hybrid,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -69,8 +70,8 @@ public struct CocktailMergeSort: SortAlgorithm {
           if engine.teachingCompare(
             start + j, start + j + 1, by: (>),
             stageID: "CocktailMergeSort.cocktail.forward",
-            whenTrue: "This adjacent pair is reversed, so the forward pass swaps it.",
-            whenFalse: "This adjacent pair is ordered, so the forward pass leaves it in place."
+            whenTrue: String(localized: "This adjacent pair is reversed, so the forward pass swaps it.", bundle: .module),
+            whenFalse: String(localized: "This adjacent pair is ordered, so the forward pass leaves it in place.", bundle: .module)
           ) {
             engine.swap(start + j, start + j + 1)
             sorted = false

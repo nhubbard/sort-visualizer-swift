@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -7,7 +8,7 @@ import SortEngineKit
 /// radix sort would need to finish.
 public struct RealFinalRadixShuffle: ShuffleAlgorithm {
   public let id = ShuffleID(rawValue: "realfinalradix")
-  public let metadata = ShuffleMetadata(displayName: "Real Final Radix")
+  public let metadata = ShuffleMetadata(displayName: String(localized: "Real Final Radix", bundle: .module))
   public init() {}
   public func record(into engine: inout RecordingEngine) {
     let n = engine.count

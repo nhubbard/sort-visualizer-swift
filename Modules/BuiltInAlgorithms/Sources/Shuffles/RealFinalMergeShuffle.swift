@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -6,7 +7,7 @@ import SortEngineKit
 /// fully combine its two (already individually sorted) halves.
 public struct RealFinalMergeShuffle: ShuffleAlgorithm {
   public let id = ShuffleID(rawValue: "realfinalmerge")
-  public let metadata = ShuffleMetadata(displayName: "Shuffled Final Merge")
+  public let metadata = ShuffleMetadata(displayName: String(localized: "Shuffled Final Merge", bundle: .module))
   public init() {}
   public func record(into engine: inout RecordingEngine) {
     let n = engine.count

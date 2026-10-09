@@ -1,10 +1,11 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
 public struct QuickBogoSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "quickbogosort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Quick Bogo Sort",
+    displayName: String(localized: "Quick Bogo Sort", bundle: .module),
     category: .impractical,
     sizeRange: 4...6,
     growthModel: OperationGrowthModel(
@@ -38,8 +39,8 @@ public struct QuickBogoSort: SortAlgorithm {
           roles: ["candidate": .arrayIndex(i), "pivot": .arrayIndex(pivot)],
           explanationKey: "quickbogosort.leftOfPivot",
           explanation: leftIsLarger
-            ? "A value left of the pivot is larger, so this candidate partition fails."
-            : "This left-side value does not exceed the pivot, so keep checking.")
+            ? String(localized: "A value left of the pivot is larger, so this candidate partition fails.", bundle: .module)
+            : String(localized: "This left-side value does not exceed the pivot, so keep checking.", bundle: .module))
         if leftIsLarger { return false }
       }
       for i in (pivot + 1)..<end {
@@ -50,8 +51,8 @@ public struct QuickBogoSort: SortAlgorithm {
           roles: ["pivot": .arrayIndex(pivot), "candidate": .arrayIndex(i)],
           explanationKey: "quickbogosort.rightOfPivot",
           explanation: pivotIsLarger
-            ? "A value right of the pivot is smaller, so this candidate partition fails."
-            : "This right-side value is no smaller than the pivot, so keep checking.")
+            ? String(localized: "A value right of the pivot is smaller, so this candidate partition fails.", bundle: .module)
+            : String(localized: "This right-side value is no smaller than the pivot, so keep checking.", bundle: .module))
         if pivotIsLarger { return false }
       }
       return true
@@ -67,7 +68,7 @@ public struct QuickBogoSort: SortAlgorithm {
           stageID: "candidateExchange", decisionID: "quickbogosort.candidateExchange",
           outcome: "exchange", roles: ["left": .arrayIndex(i), "right": .arrayIndex(j)],
           explanationKey: "quickbogosort.candidateExchange",
-          explanation: "The next candidate permutation exchanges its pivot with a successor while tracking the partition pivot.")
+          explanation: String(localized: "The next candidate permutation exchanges its pivot with a successor while tracking the partition pivot.", bundle: .module))
         if pivot == i { pivot = j } else if pivot == j { pivot = i }
       }
 
@@ -77,7 +78,7 @@ public struct QuickBogoSort: SortAlgorithm {
           stageID: "candidateWrap", decisionID: "quickbogosort.reverseSuffix",
           outcome: "reverse", roles: ["first": .arrayIndex(lo), "last": .arrayIndex(hi)],
           explanationKey: "quickbogosort.reverseSuffix",
-          explanation: "Reverse this descending range to advance the candidate permutation.")
+          explanation: String(localized: "Reverse this descending range to advance the candidate permutation.", bundle: .module))
         if pivot >= lo, pivot <= hi { pivot = lo + hi - pivot }
       }
 

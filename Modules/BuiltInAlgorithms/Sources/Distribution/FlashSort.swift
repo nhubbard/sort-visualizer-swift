@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -18,7 +19,7 @@ import SortEngineKit
 public struct FlashSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "flashsort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Flash Sort",
+    displayName: String(localized: "Flash Sort", bundle: .module),
     category: .distribution,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -65,8 +66,8 @@ public struct FlashSort: SortAlgorithm {
         roles: ["first": .arrayIndex(i), "second": .arrayIndex(i + 1)],
         explanationKey: "flashsort.pairOrder",
         explanation: firstIsSmaller
-          ? "The first value is smaller, so use it for the minimum check and the second for the maximum."
-          : "The second value is no larger, so use it for the minimum check and the first for the maximum.")
+          ? String(localized: "The first value is smaller, so use it for the minimum check and the second for the maximum.", bundle: .module)
+          : String(localized: "The second value is no larger, so use it for the minimum check and the first for the maximum.", bundle: .module))
       if firstIsSmaller {
         small = engine.readValue(at: i)
         big = engine.readValue(at: i + 1)
@@ -114,7 +115,7 @@ public struct FlashSort: SortAlgorithm {
         outcome: "update",
         roles: ["scratch": .auxiliaryIndex(handle: auxHandle.rawValue, index: t)],
         explanationKey: "flashsort.scratchUpdate",
-        explanation: "Update this class count or boundary as the class permutation advances.")
+        explanation: String(localized: "Update this class count or boundary as the class permutation advances.", bundle: .module))
     }
 
     // K(x) = 1 + floor((m-1)(x-min)/(max-min)). `c` is the precomputed `(m-1)/(max-min)`
@@ -134,7 +135,7 @@ public struct FlashSort: SortAlgorithm {
         outcome: "update",
         roles: ["scratch": .auxiliaryIndex(handle: auxHandle.rawValue, index: k)],
         explanationKey: "flashsort.scratchUpdate",
-        explanation: "Update this class count or boundary as the class permutation advances.")
+        explanation: String(localized: "Update this class count or boundary as the class permutation advances.", bundle: .module))
     }
 
     for k in 2...m {
@@ -145,7 +146,7 @@ public struct FlashSort: SortAlgorithm {
         outcome: "update",
         roles: ["scratch": .auxiliaryIndex(handle: auxHandle.rawValue, index: k)],
         explanationKey: "flashsort.scratchUpdate",
-        explanation: "Update this class count or boundary as the class permutation advances.")
+        explanation: String(localized: "Update this class count or boundary as the class permutation advances.", bundle: .module))
     }
 
     // -------PERMUTATION-------
@@ -156,7 +157,7 @@ public struct FlashSort: SortAlgorithm {
       stageID: "bucketExchange", decisionID: "flashsort.bucketExchange",
       outcome: "exchange", roles: ["left": .arrayIndex(maxIndex), "right": .arrayIndex(0)],
       explanationKey: "flashsort.bucketExchange",
-      explanation: "The maximum value moves to the front to seed the class permutation.")
+      explanation: String(localized: "The maximum value moves to the front to seed the class permutation.", bundle: .module))
 
     // `j` is the cycle leader: the lowest index that starts a class boundary still missing
     // elements. `k` is the class currently being filled. `evicted` (introduced inside the
@@ -192,7 +193,7 @@ public struct FlashSort: SortAlgorithm {
           stageID: "bucketPlacement", decisionID: "flashsort.bucketPlacement",
           outcome: "place", roles: ["destination": .arrayIndex(location)],
           explanationKey: "flashsort.bucketPlacement",
-          explanation: "The current class has an open slot here, so place the evicted value and continue the cycle.")
+          explanation: String(localized: "The current class has an open slot here, so place the evicted value and continue the cycle.", bundle: .module))
         evicted = temp
         L[k] -= 1
         engine.writeAux(auxHandle, at: k, value: L[k])
@@ -201,7 +202,7 @@ public struct FlashSort: SortAlgorithm {
           outcome: "update",
           roles: ["scratch": .auxiliaryIndex(handle: auxHandle.rawValue, index: k)],
           explanationKey: "flashsort.scratchUpdate",
-          explanation: "Update this class count or boundary as the class permutation advances.")
+          explanation: String(localized: "Update this class count or boundary as the class permutation advances.", bundle: .module))
         numMoves += 1
       }
     }
@@ -232,7 +233,7 @@ public struct FlashSort: SortAlgorithm {
           stageID: "bucketPlacement", decisionID: "flashsort.bucketPlacement",
           outcome: "place", roles: ["destination": .arrayIndex(pos + 1)],
           explanationKey: "flashsort.bucketPlacement",
-          explanation: "The held value precedes this value, so shift the latter one position right.")
+          explanation: String(localized: "The held value precedes this value, so shift the latter one position right.", bundle: .module))
         pos -= 1
       }
       engine.setValue(pos + 1, current)
@@ -240,7 +241,7 @@ public struct FlashSort: SortAlgorithm {
         stageID: "bucketPlacement", decisionID: "flashsort.bucketPlacement",
         outcome: "place", roles: ["destination": .arrayIndex(pos + 1)],
         explanationKey: "flashsort.bucketPlacement",
-        explanation: "The preceding values have shifted right, leaving this position for the held value.")
+        explanation: String(localized: "The preceding values have shifted right, leaving this position for the held value.", bundle: .module))
     }
   }
 }

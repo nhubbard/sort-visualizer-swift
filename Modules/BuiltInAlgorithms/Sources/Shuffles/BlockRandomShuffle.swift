@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -7,7 +8,7 @@ import SortEngineKit
 /// internal order while scrambling block positions.
 public struct BlockRandomShuffle: ShuffleAlgorithm {
   public let id = ShuffleID(rawValue: "blockrandomly")
-  public let metadata = ShuffleMetadata(displayName: "Randomly w/ Blocks")
+  public let metadata = ShuffleMetadata(displayName: String(localized: "Randomly w/ Blocks", bundle: .module))
   public init() {}
 
   private func greatestPowerOfTwoAtOrBelow(_ value: Int) -> Int {

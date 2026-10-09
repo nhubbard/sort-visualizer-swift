@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -20,7 +21,7 @@ import SortEngineKit
 public struct PairwiseSortRecursive: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "pairwisesortrecursive")
   public let metadata = AlgorithmMetadata(
-    displayName: "Recursive Pairwise Sort",
+    displayName: String(localized: "Recursive Pairwise Sort", bundle: .module),
     category: .concurrent,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -50,8 +51,8 @@ public struct PairwiseSortRecursive: SortAlgorithm {
         roles: ["left": .arrayIndex(a), "right": .arrayIndex(b)],
         explanationKey: "pairwisesortrecursive.compareExchange",
         explanation: shouldSwap
-          ? "The left value exceeds the right value, so this comparator exchanges them."
-          : "These values satisfy this comparator, so they stay in place.")
+          ? String(localized: "The left value exceeds the right value, so this comparator exchanges them.", bundle: .module)
+          : String(localized: "These values satisfy this comparator, so they stay in place.", bundle: .module))
       if shouldSwap {
         engine.swap(a, b)
       }

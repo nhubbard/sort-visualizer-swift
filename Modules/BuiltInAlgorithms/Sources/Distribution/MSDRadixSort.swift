@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -12,7 +13,7 @@ import SortEngineKit
 public struct MSDRadixSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "msdradixsort")
   public let metadata = AlgorithmMetadata(
-    displayName: "MSD Radix Sort",
+    displayName: String(localized: "MSD Radix Sort", bundle: .module),
     category: .distribution,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -58,8 +59,8 @@ public struct MSDRadixSort: SortAlgorithm {
         roles: ["candidate": .arrayIndex(i), "maximum": .value(maxValue)],
         explanationKey: "msdradixsort.maximum",
         explanation: newMaximum
-          ? "This value raises the most significant digit place to inspect."
-          : "This value fits within the digit places already required.")
+          ? String(localized: "This value raises the most significant digit place to inspect.", bundle: .module)
+          : String(localized: "This value fits within the digit places already required.", bundle: .module))
       maxValue = max(maxValue, candidate)
     }
     var highestPower = 0
@@ -80,7 +81,7 @@ public struct MSDRadixSort: SortAlgorithm {
           stageID: "digitScan", decisionID: "msdradixsort.classifyDigit",
           outcome: "bucket\(digit)", roles: ["source": .arrayIndex(i)],
           explanationKey: "msdradixsort.classifyDigit",
-          explanation: "Digit \(digit) at this place sends the value to bucket \(digit).")
+          explanation: String(localized: "Digit \(digit) at this place sends the value to bucket \(digit).", bundle: .module))
         buckets[digit].append(engine.readValue(at: i))
       }
 
@@ -95,13 +96,13 @@ public struct MSDRadixSort: SortAlgorithm {
             outcome: "update",
             roles: ["scratch": .auxiliaryIndex(handle: handle.rawValue, index: auxIndex)],
             explanationKey: "msdradixsort.scratchUpdate",
-            explanation: "Copy this value into the scratch segment for its current leading digit.")
+            explanation: String(localized: "Copy this value into the scratch segment for its current leading digit.", bundle: .module))
           engine.setValue(writeIndex, value)
           engine.annotateLastOperation(
             stageID: "bucketPlacement", decisionID: "msdradixsort.bucketPlacement",
             outcome: "place", roles: ["destination": .arrayIndex(writeIndex)],
             explanationKey: "msdradixsort.bucketPlacement",
-            explanation: "Digit place \(power + 1) from the right selects this value’s bucket segment.")
+            explanation: String(localized: "Digit place \(power + 1) from the right selects this value’s bucket segment.", bundle: .module))
           writeIndex += 1
           auxIndex += 1
         }

@@ -1,10 +1,11 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
 public struct GuessSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "guesssort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Guess Sort",
+    displayName: String(localized: "Guess Sort", bundle: .module),
     category: .impractical,
     sizeRange: 3...4,
     growthModel: OperationGrowthModel(
@@ -58,8 +59,8 @@ public struct GuessSort: SortAlgorithm {
               roles: ["left": .arrayIndex(loops[i]), "right": .arrayIndex(loops[j])],
               explanationKey: "guesssort.pairInversion",
               explanation: isInversion
-                ? "This mapped pair is inverted, so count it against the candidate."
-                : "This mapped pair is ordered, so the inversion count stays unchanged.")
+                ? String(localized: "This mapped pair is inverted, so count it against the candidate.", bundle: .module)
+                : String(localized: "This mapped pair is ordered, so the inversion count stays unchanged.", bundle: .module))
           }
           if isInversion { total += 1 }
         }
@@ -91,7 +92,7 @@ public struct GuessSort: SortAlgorithm {
         stageID: "candidatePlacement", decisionID: "guesssort.candidatePlacement",
         outcome: "place", roles: ["destination": .arrayIndex(i)],
         explanationKey: "guesssort.candidatePlacement",
-        explanation: "This candidate permutation has passed its order check and is written to the array.")
+        explanation: String(localized: "This candidate permutation has passed its order check and is written to the array.", bundle: .module))
     }
   }
 }

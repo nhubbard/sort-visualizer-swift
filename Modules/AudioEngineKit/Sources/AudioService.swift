@@ -119,12 +119,12 @@ public enum BridgeConnectionStatus: Sendable, Equatable {
 
   public var displayText: String {
     switch self {
-    case .disabledByUser: "Disabled"
-    case .notStarted: "Not Started Yet"
-    case .unsupportedPlatform: "Not Available on This Platform"
-    case .unavailable: "Unavailable"
-    case .listening: "Waiting for Connection"
-    case .connected: "Connected"
+    case .disabledByUser: String(localized: "Disabled", bundle: .module)
+    case .notStarted: String(localized: "Not Started Yet", bundle: .module)
+    case .unsupportedPlatform: String(localized: "Not Available on This Platform", bundle: .module)
+    case .unavailable: String(localized: "Unavailable", bundle: .module)
+    case .listening: String(localized: "Waiting for Connection", bundle: .module)
+    case .connected: String(localized: "Connected", bundle: .module)
     }
   }
 }

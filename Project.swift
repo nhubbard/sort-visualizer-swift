@@ -1,5 +1,41 @@
+import Foundation
 import ProjectDescription
 import ProjectDescriptionHelpers
+
+// Derive Xcode's language list from checked-in catalogs. Adding a translation to a catalog
+// must survive `tuist generate` without a matching manifest edit.
+let projectRoot = URL(fileURLWithPath: #filePath).deletingLastPathComponent()
+let localizationRoots = ["App/Resources", "Modules"].map {
+    projectRoot.appendingPathComponent($0)
+}
+var localizationRegions: Set<String> = ["en"]
+for root in localizationRoots {
+    guard let files = FileManager.default.enumerator(at: root, includingPropertiesForKeys: nil) else {
+        continue
+    }
+    for case let file as URL in files where file.pathExtension == "xcstrings" {
+        guard let data = try? Data(contentsOf: file),
+              let catalog = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+              let strings = catalog["strings"] as? [String: [String: Any]] else {
+            continue
+        }
+        if let source = catalog["sourceLanguage"] as? String { localizationRegions.insert(source) }
+        for entry in strings.values {
+            if let languages = entry["localizations"] as? [String: Any] {
+                localizationRegions.formUnion(languages.keys)
+            }
+        }
+    }
+}
+// Description translations live in the content archive rather than an Xcode catalog. Include
+// their locales too, so a new descriptions.<locale>.json can be added without editing this file.
+let detailsRoot = projectRoot.appendingPathComponent("App/Resources/AlgorithmDetails")
+if let files = try? FileManager.default.contentsOfDirectory(at: detailsRoot, includingPropertiesForKeys: nil) {
+    for file in files where file.lastPathComponent.hasPrefix("descriptions.") && file.pathExtension == "json" {
+        let locale = file.deletingPathExtension().lastPathComponent.replacingOccurrences(of: "descriptions.", with: "")
+        if !locale.isEmpty { localizationRegions.insert(locale) }
+    }
+}
 
 let modules: [Target] =
     // Depends on ZstdKit for Tape.archived()/Tape(archivedData:)'s binary tape export format.
@@ -12,10 +48,13 @@ let modules: [Target] =
         name: "ZstdKit",
         testResources: [.glob(pattern: "Modules/ZstdKit/Tests/Fixtures/**")]
     ) +
-    Module.framework(name: "AlgorithmKit", dependencies: [.target(name: "SortEngineKit")]) +
+    Module.framework(name: "AlgorithmKit", dependencies: [.target(name: "SortEngineKit")],
+                     resources: [.glob(pattern: "Modules/AlgorithmKit/Resources/**")]) +
     Module.framework(name: "VisualizationKit", dependencies: [.target(name: "SortEngineKit")]) +
-    Module.framework(name: "BuiltInAlgorithms", dependencies: [.target(name: "AlgorithmKit")]) +
-    Module.framework(name: "BuiltInVisualizers", dependencies: [.target(name: "VisualizationKit")]) +
+    Module.framework(name: "BuiltInAlgorithms", dependencies: [.target(name: "AlgorithmKit")],
+                     resources: [.glob(pattern: "Modules/BuiltInAlgorithms/Resources/**")]) +
+    Module.framework(name: "BuiltInVisualizers", dependencies: [.target(name: "VisualizationKit")],
+                     resources: [.glob(pattern: "Modules/BuiltInVisualizers/Resources/**")]) +
     Module.framework(name: "SettingsKit", dependencies: [.target(name: "VisualizationKit"), .target(name: "AlgorithmKit")],
                      resources: [.glob(pattern: "Modules/SettingsKit/Resources/**")]) +
     // ToneKit (see NOTICE.md in each) reimplements just the AudioKit/AudioKitEX/SoundpipeAudioKit
@@ -50,7 +89,7 @@ let modules: [Target] =
         .target(name: "ToneKitAVFoundation"), .target(name: "ToneKitDSP"),
         .target(name: "SortAudioCore"), .target(name: "SettingsKit"),
         .target(name: "SortAudioBridgeKit", condition: .when([.catalyst])),
-    ], testDependencies: [
+    ], resources: [.glob(pattern: "Modules/AudioEngineKit/Resources/**")], testDependencies: [
         .target(name: "ToneKitDSP"), .target(name: "SortAudioCore"), .target(name: "SettingsKit"),
         .target(name: "SortAudioBridgeKit", condition: .when([.catalyst])),
     ]) +
@@ -90,7 +129,7 @@ let modules: [Target] =
     ], resources: [.glob(pattern: "Modules/DesignSystemKit/Resources/**")]) +
     Module.framework(name: "MathRenderingKit", dependencies: [
         .external(name: "SwiftMath"), .target(name: "AlgorithmKit"),
-    ]) +
+    ], resources: [.glob(pattern: "Modules/MathRenderingKit/Resources/**")]) +
     // `AlgorithmDetailStore` decodes `AlgorithmDetails.algz` via ZstdKit; its equivalence tests
     // need the real archive bundled into SortFeatureTests too (mirroring ZstdKit's own
     // `testResources` glob for its binary fixtures), and need `import ZstdKit` directly (module
@@ -370,6 +409,7 @@ let project = Project(
     name: "Sort Symphony",
     // Xcode doesn't gather coverage by default (it's a real build-time cost) -- opt in explicitly
     // so `tuist test` produces a .xcresult with coverage data we can inspect via `xcrun xccov`.
-    options: .options(automaticSchemesOptions: .enabled(codeCoverageEnabled: true)),
+    options: .options(automaticSchemesOptions: .enabled(codeCoverageEnabled: true),
+                      defaultKnownRegions: localizationRegions.sorted(), developmentRegion: "en"),
     targets: modules + [app, appUITests, appIntentsUITests, auv3Extension, auv3ComponentTests]
 )

@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -35,7 +36,7 @@ import SortEngineKit
 public struct DropMergeSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "dropmergesort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Drop Merge",
+    displayName: String(localized: "Drop Merge", bundle: .module),
     category: .hybrid,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -89,8 +90,8 @@ public struct DropMergeSort: SortAlgorithm {
       if write == 0 || engine.teachingCompare(
         read, write - 1, by: (>=),
         stageID: "DropMergeSort.drop.keep",
-        whenTrue: "This item follows the kept prefix in order, so it stays in the main run.",
-        whenFalse: "This item breaks the kept run, so Drop Merge considers dropping it."
+        whenTrue: String(localized: "This item follows the kept prefix in order, so it stays in the main run.", bundle: .module),
+        whenFalse: String(localized: "This item breaks the kept run, so Drop Merge considers dropping it.", bundle: .module)
       ) {
         // In order — keep it.
         engine.setValue(write, engine.readValue(at: read))
@@ -99,8 +100,8 @@ public struct DropMergeSort: SortAlgorithm {
         numDroppedInARow = 0
       } else if numDroppedInARow == 0 && write >= 2 && engine.teachingCompare(
         read, write - 2, by: (>=), stageID: "drop.replaceLast",
-        whenTrue: "This item fits before the most recently kept item, so Drop Merge replaces that item.",
-        whenFalse: "This item also conflicts with the earlier kept value, so Drop Merge drops it.") {
+        whenTrue: String(localized: "This item fits before the most recently kept item, so Drop Merge replaces that item.", bundle: .module),
+        whenFalse: String(localized: "This item also conflicts with the earlier kept value, so Drop Merge drops it.", bundle: .module)) {
         // Quick undo: the element two back would have accepted this one just fine, so drop
         // the one immediately before it instead of the new element.
         dropped.append(engine.readValue(at: write - 1))
@@ -129,8 +130,8 @@ public struct DropMergeSort: SortAlgorithm {
 
         while write >= 1 && engine.teachingCompareValue(
           write - 1, against: maxOfDropped, by: (>), stageID: "drop.backtrack",
-          whenTrue: "This kept item exceeds the dropped run maximum, so Drop Merge backtracks over it.",
-          whenFalse: "This kept item is no greater, so backtracking stops here.") {
+          whenTrue: String(localized: "This kept item exceeds the dropped run maximum, so Drop Merge backtracks over it.", bundle: .module),
+          whenFalse: String(localized: "This kept item is no greater, so backtracking stops here.", bundle: .module)) {
           write -= 1
           numBacktracked += 1
         }
@@ -169,8 +170,8 @@ public struct DropMergeSort: SortAlgorithm {
       engine.markAuxRead(bufferHandle, at: i)
       if j < 0 || engine.teachingCompareValue(
         j, against: buffer[i], by: (<), stageID: "drop.finalMerge",
-        whenTrue: "This kept item is smaller, so the backward merge places the dropped item at the end.",
-        whenFalse: "This kept item is at least as large, so the backward merge places it next.") {
+        whenTrue: String(localized: "This kept item is smaller, so the backward merge places the dropped item at the end.", bundle: .module),
+        whenFalse: String(localized: "This kept item is at least as large, so the backward merge places it next.", bundle: .module)) {
         engine.setValue(k, buffer[i])
         k -= 1
         i -= 1

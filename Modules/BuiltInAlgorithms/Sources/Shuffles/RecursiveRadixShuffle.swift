@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -8,7 +9,7 @@ import SortEngineKit
 /// just the last one.
 public struct RecursiveRadixShuffle: ShuffleAlgorithm {
   public let id = ShuffleID(rawValue: "recradix")
-  public let metadata = ShuffleMetadata(displayName: "Recursive Final Radix")
+  public let metadata = ShuffleMetadata(displayName: String(localized: "Recursive Final Radix", bundle: .module))
   public init() {}
   public func record(into engine: inout RecordingEngine) {
     weaveRec(&engine, pos: 0, length: engine.count, gap: 1)

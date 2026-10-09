@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -21,7 +22,7 @@ import SortEngineKit
 public struct QuadSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "quadsort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Quadsort",
+    displayName: String(localized: "Quadsort", bundle: .module),
     category: .merge,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(

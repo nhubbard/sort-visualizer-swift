@@ -1,10 +1,11 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
 public struct StableCycleSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "stablecyclesort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Stable Cycle Sort",
+    displayName: String(localized: "Stable Cycle Sort", bundle: .module),
     category: .selection,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -58,8 +59,8 @@ public struct StableCycleSort: SortAlgorithm {
           i, a,
           by: <,
           stageID: "StableCycleSort.destinationRank",
-          whenTrue: "This item is smaller than the cycle value, so advance its stable destination.",
-          whenFalse: "This item does not advance the cycle value’s destination."
+          whenTrue: String(localized: "This item is smaller than the cycle value, so advance its stable destination.", bundle: .module),
+          whenFalse: String(localized: "This item does not advance the cycle value’s destination.", bundle: .module)
         ) {
           d += 1
         } else if i < b1 && !getBit(i) && engine.compare(i, a, by: ==) {

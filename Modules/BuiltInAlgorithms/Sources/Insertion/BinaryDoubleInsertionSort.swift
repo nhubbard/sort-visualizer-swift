@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -17,7 +18,7 @@ import SortEngineKit
 public struct BinaryDoubleInsertionSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "binarydoubleinsertionsort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Binary Double Insertion Sort",
+    displayName: String(localized: "Binary Double Insertion Sort", bundle: .module),
     category: .insertion,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -47,8 +48,8 @@ public struct BinaryDoubleInsertionSort: SortAlgorithm {
           mid, against: val,
           by: (>=),
           stageID: "BinaryDoubleInsertionSort.leftBinarySearch",
-          whenTrue: "The midpoint is at least the held value, so continue in the lower half.",
-          whenFalse: "The held value belongs past this midpoint."
+          whenTrue: String(localized: "The midpoint is at least the held value, so continue in the lower half.", bundle: .module),
+          whenFalse: String(localized: "The held value belongs past this midpoint.", bundle: .module)
         ) {
           hi = mid
         } else {

@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -15,7 +16,7 @@ import SortEngineKit
 public struct OptimizedStoogeSortStudio: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "optimizedstoogesortstudio")
   public let metadata = AlgorithmMetadata(
-    displayName: "Optimized Stooge Sort (Studio)",
+    displayName: String(localized: "Optimized Stooge Sort (Studio)", bundle: .module),
     category: .exchange,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -43,8 +44,8 @@ public struct OptimizedStoogeSortStudio: SortAlgorithm {
       a, b,
       by: >,
       stageID: "OptimizedStoogeSortStudio.endpointOrder",
-      whenTrue: "The left endpoint is larger, so exchange the ends before reducing the range.",
-      whenFalse: "The endpoints are ordered before the recursive range checks."
+      whenTrue: String(localized: "The left endpoint is larger, so exchange the ends before reducing the range.", bundle: .module),
+      whenFalse: String(localized: "The endpoints are ordered before the recursive range checks.", bundle: .module)
     ) {
       engine.swap(a, b)
       return true

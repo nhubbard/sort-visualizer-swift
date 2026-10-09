@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -7,7 +8,7 @@ import SortEngineKit
 /// alongside `SmoothSort.smoothHeapify`/`PoplarHeapSort.poplarHeapify`.
 public struct TriangularHeapifiedShuffle: ShuffleAlgorithm {
   public let id = ShuffleID(rawValue: "triheap")
-  public let metadata = ShuffleMetadata(displayName: "Triangular Heapified")
+  public let metadata = ShuffleMetadata(displayName: String(localized: "Triangular Heapified", bundle: .module))
   public init() {}
   public func record(into engine: inout RecordingEngine) {
     TriangularHeapSort().triangularHeapify(into: &engine)

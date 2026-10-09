@@ -1,10 +1,11 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
 public struct ShellSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "shellsort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Shell Sort",
+    displayName: String(localized: "Shell Sort", bundle: .module),
     category: .insertion,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -32,8 +33,8 @@ public struct ShellSort: SortAlgorithm {
         while j >= gap && !engine.teachingCompare(
           j, j - gap,
           stageID: "ShellSort.gapPosition",
-          whenTrue: "The current item is at least its gap neighbor, so it is placed for this gap.",
-          whenFalse: "The current item is smaller than its gap neighbor, so swap across the gap."
+          whenTrue: String(localized: "The current item is at least its gap neighbor, so it is placed for this gap.", bundle: .module),
+          whenFalse: String(localized: "The current item is smaller than its gap neighbor, so swap across the gap.", bundle: .module)
         ) {
           engine.swap(j, j - gap)
           j -= gap

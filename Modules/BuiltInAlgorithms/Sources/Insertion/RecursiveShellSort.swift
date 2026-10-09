@@ -1,10 +1,11 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
 public struct RecursiveShellSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "recursiveshellsort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Recursive Shell Sort",
+    displayName: String(localized: "Recursive Shell Sort", bundle: .module),
     category: .insertion,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -38,8 +39,8 @@ public struct RecursiveShellSort: SortAlgorithm {
         while j - gap >= a && !engine.teachingCompare(
           j, j - gap,
           stageID: "RecursiveShellSort.gapPosition",
-          whenTrue: "The current item is at least its gap neighbor, so stop moving across this gap.",
-          whenFalse: "The current item is smaller than its gap neighbor, so move it left."
+          whenTrue: String(localized: "The current item is at least its gap neighbor, so stop moving across this gap.", bundle: .module),
+          whenFalse: String(localized: "The current item is smaller than its gap neighbor, so move it left.", bundle: .module)
         ) {
           engine.swap(j, j - gap)
           j -= gap

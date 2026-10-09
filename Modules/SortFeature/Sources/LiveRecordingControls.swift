@@ -1,3 +1,4 @@
+import Foundation
 import AVKit
 import SwiftUI
 
@@ -25,38 +26,40 @@ struct LiveRecordingControls: View {
         Button {
           Task { await model.start() }
         } label: {
-          Label("Record Video", systemImage: "record.circle")
+          Label(String(localized: "Record Video", bundle: .module), systemImage: "record.circle")
         }
         .accessibilityIdentifier("liveRecordingStartButton")
       case .choosing:
-        ProgressView(model.isUsingFallback ? "Starting app recording…" : "Starting window recording…")
+        ProgressView(model.isUsingFallback
+          ? String(localized: "Starting app recording…", bundle: .module)
+          : String(localized: "Starting window recording…", bundle: .module))
           .accessibilityIdentifier("liveRecordingChoosingStatus")
-        Button("Cancel") { Task { await model.cancel() } }
+        Button(String(localized: "Cancel", bundle: .module)) { Task { await model.cancel() } }
           .accessibilityIdentifier("liveRecordingCancelButton")
         #if targetEnvironment(macCatalyst)
         if #available(macCatalyst 18.2, *), !model.isUsingFallback {
-          Button("Record App Instead") {
+          Button(String(localized: "Record App Instead", bundle: .module)) {
             Task { await model.startUsing(ReplayKitLiveRecordingCapture()) }
           }
           .accessibilityIdentifier("liveRecordingFallbackButton")
         }
         #endif
       case .recording:
-        Label("Recording", systemImage: "record.circle.fill")
+        Label(String(localized: "Recording", bundle: .module), systemImage: "record.circle.fill")
           .foregroundStyle(.red)
           .accessibilityIdentifier("liveRecordingActiveStatus")
-        Button("Stop Recording") { Task { await model.stop() } }
+        Button(String(localized: "Stop Recording", bundle: .module)) { Task { await model.stop() } }
           .accessibilityIdentifier("liveRecordingStopButton")
       case .saving:
-        ProgressView("Saving video…")
+        ProgressView(String(localized: "Saving video…", bundle: .module))
           .accessibilityIdentifier("liveRecordingSavingStatus")
       }
 
       if case .ready(let url) = model.phase {
-        Button("Preview Video") { isPreviewPresented = true }
+        Button(String(localized: "Preview Video", bundle: .module)) { isPreviewPresented = true }
           .accessibilityIdentifier("liveRecordingPreviewButton")
         ShareLink(item: url) {
-          Label("Share Video", systemImage: "square.and.arrow.up")
+          Label(String(localized: "Share Video", bundle: .module), systemImage: "square.and.arrow.up")
         }
         .accessibilityIdentifier("liveRecordingShareButton")
       }
@@ -75,10 +78,10 @@ struct LiveRecordingControls: View {
         NavigationStack {
           VideoPlayer(player: AVPlayer(url: url))
             .frame(minWidth: 320, minHeight: 240)
-            .navigationTitle("Video Preview")
+            .navigationTitle(String(localized: "Video Preview", bundle: .module))
             .toolbar {
               ToolbarItem(placement: .confirmationAction) {
-                Button("Done") { isPreviewPresented = false }
+                Button(String(localized: "Done", bundle: .module)) { isPreviewPresented = false }
               }
             }
         }

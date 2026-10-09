@@ -1,10 +1,11 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
 public struct TernaryHeapSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "ternaryheapsort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Ternary Heap Sort",
+    displayName: String(localized: "Ternary Heap Sort", bundle: .module),
     category: .selection,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -42,8 +43,8 @@ public struct TernaryHeapSort: SortAlgorithm {
         leftChild, largest,
         by: (>),
         stageID: "TernaryHeapSort.leftChild",
-        whenTrue: "The left child is larger, so promote it as heap maximum.",
-        whenFalse: "The current heap maximum remains."
+        whenTrue: String(localized: "The left child is larger, so promote it as heap maximum.", bundle: .module),
+        whenFalse: String(localized: "The current heap maximum remains.", bundle: .module)
       ) {
         largest = leftChild
       }

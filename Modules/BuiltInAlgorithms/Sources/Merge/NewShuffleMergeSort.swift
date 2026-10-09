@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -34,7 +35,7 @@ import SortEngineKit
 public struct NewShuffleMergeSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "newshufflemergesort")
   public let metadata = AlgorithmMetadata(
-    displayName: "New Shuffle Merge Sort",
+    displayName: String(localized: "New Shuffle Merge Sort", bundle: .module),
     category: .merge,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -186,8 +187,8 @@ public struct NewShuffleMergeSort: SortAlgorithm {
       if engine.teachingCompare(
         i, j, by: (<),
         stageID: "NewShuffleMergeSort.key.order",
-        whenTrue: "The first candidate is smaller, so the shuffle merge ranks it first.",
-        whenFalse: "The first candidate is not smaller, so the merge checks equality or the reverse order."
+        whenTrue: String(localized: "The first candidate is smaller, so the shuffle merge ranks it first.", bundle: .module),
+        whenFalse: String(localized: "The first candidate is not smaller, so the merge checks equality or the reverse order.", bundle: .module)
       ) { return -1 }
       return engine.readValue(at: i) == engine.readValue(at: j) ? 0 : 1
     }

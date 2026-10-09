@@ -13,7 +13,7 @@ import SortEngineKit
 public struct BufferPartitionMergeSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "bufferpartitionmergesort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Buffer Partition Merge Sort",
+    displayName: String(localized: "Buffer Partition Merge Sort", bundle: .module),
     category: .hybrid,
     sizeRange: 16...1831,
     growthModel: OperationGrowthModel(
@@ -44,8 +44,8 @@ public struct BufferPartitionMergeSort: SortAlgorithm {
       while j > start && engine.teachingCompare(
         j - 1, j, by: >,
         stageID: "BufferPartitionMergeSort.smallRun.insert",
-        whenTrue: "The preceding value is larger, so insertion swaps the adjacent pair.",
-        whenFalse: "The pair is ordered, so this insertion scan can stop."
+        whenTrue: String(localized: "The preceding value is larger, so insertion swaps the adjacent pair.", bundle: .module),
+        whenFalse: String(localized: "The pair is ordered, so this insertion scan can stop.", bundle: .module)
       ) {
         engine.swap(j - 1, j)
         j -= 1
@@ -64,8 +64,8 @@ public struct BufferPartitionMergeSort: SortAlgorithm {
         if engine.teachingCompareValue(
           middle, against: value, by: >,
           stageID: "BufferPartitionMergeSort.binaryInsert",
-          whenTrue: "This run value exceeds the held item, so binary insertion searches the left half.",
-          whenFalse: "This run value is no greater, so binary insertion searches the right half."
+          whenTrue: String(localized: "This run value exceeds the held item, so binary insertion searches the left half.", bundle: .module),
+          whenFalse: String(localized: "This run value is no greater, so binary insertion searches the right half.", bundle: .module)
         ) {
           high = middle
         } else {

@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -21,7 +22,7 @@ import SortEngineKit
 public struct IterativeTopDownMergeSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "iterativetopdownmergesort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Iterative Top-Down Merge Sort",
+    displayName: String(localized: "Iterative Top-Down Merge Sort", bundle: .module),
     category: .merge,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -60,8 +61,8 @@ public struct IterativeTopDownMergeSort: SortAlgorithm {
         if engine.teachingCompare(
           low, high, by: (>),
           stageID: "IterativeTopDownMergeSort.merge.choose",
-          whenTrue: "The left run value exceeds the right, so the merge takes from the right run.",
-          whenFalse: "The left run value is no greater, so the merge takes from the left run."
+          whenTrue: String(localized: "The left run value exceeds the right, so the merge takes from the right run.", bundle: .module),
+          whenFalse: String(localized: "The left run value is no greater, so the merge takes from the left run.", bundle: .module)
         ) {
           take(from: high)
           high += 1

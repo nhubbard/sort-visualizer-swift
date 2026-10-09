@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -37,7 +38,7 @@ import SortEngineKit
 public struct BogoBogoSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "bogobogosort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Bogo Bogo Sort",
+    displayName: String(localized: "Bogo Bogo Sort", bundle: .module),
     category: .impractical,
     sizeRange: 3...5,
     growthModel: OperationGrowthModel(
@@ -169,8 +170,8 @@ public struct BogoBogoSort: SortAlgorithm {
           ],
           explanationKey: "bogobogosort.recursiveCandidateCheck",
           explanation: matches
-            ? "This candidate value matches the recursively sorted scratch copy, so continue checking."
-            : "This value differs from the recursively sorted scratch copy, so reject the candidate.")
+            ? String(localized: "This candidate value matches the recursively sorted scratch copy, so continue checking.", bundle: .module)
+            : String(localized: "This value differs from the recursively sorted scratch copy, so reject the candidate.", bundle: .module))
         if !matches { return false }
       }
       return true
@@ -189,7 +190,7 @@ public struct BogoBogoSort: SortAlgorithm {
         stageID: "candidateExchange", decisionID: "bogobogosort.candidateExchange",
         outcome: "exchange", roles: ["left": .arrayIndex(i), "right": .arrayIndex(j)],
         explanationKey: "bogobogosort.candidateExchange",
-        explanation: "The next permutation exchanges its pivot with a larger successor before reversing the suffix.")
+        explanation: String(localized: "The next permutation exchanges its pivot with a larger successor before reversing the suffix.", bundle: .module))
       engine.reversal(i + 1, n - 1)
       return true
     }
@@ -202,7 +203,7 @@ public struct BogoBogoSort: SortAlgorithm {
           outcome: "reverse",
           roles: ["first": .arrayIndex(0), "last": .arrayIndex(n - 1)],
           explanationKey: "bogobogosort.permutationWrap",
-          explanation: "The descending candidate is the final permutation, so reverse it to wrap to sorted order.")
+          explanation: String(localized: "The descending candidate is the final permutation, so reverse it to wrap to sorted order.", bundle: .module))
       }
     }
 

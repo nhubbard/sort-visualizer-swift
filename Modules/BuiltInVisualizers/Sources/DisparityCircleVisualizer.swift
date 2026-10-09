@@ -12,7 +12,7 @@ import VisualizationKit
 public struct DisparityCircleVisualizer: Visualizer {
   public let id = VisualizerID(rawValue: "disparitycircle")
   public let metadata = VisualizerMetadata(
-    displayName: "Disparity Circle",
+    displayName: String(localized: "Disparity Circle", bundle: .module),
     supportsAuxArrays: false,
     iconName: "triangle.circle.fill"
   )

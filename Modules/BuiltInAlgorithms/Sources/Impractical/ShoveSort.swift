@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -25,7 +26,7 @@ import SortEngineKit
 public struct ShoveSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "shovesort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Shove Sort",
+    displayName: String(localized: "Shove Sort", bundle: .module),
     category: .impractical,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -54,7 +55,7 @@ public struct ShoveSort: SortAlgorithm {
             stageID: "candidateExchange", decisionID: "shovesort.candidateExchange",
             outcome: "exchange", roles: ["left": .arrayIndex(f), "right": .arrayIndex(f + 1)],
             explanationKey: "shovesort.candidateExchange",
-            explanation: "The detected inversion is shifted right by exchanging adjacent values.")
+            explanation: String(localized: "The detected inversion is shifted right by exchanging adjacent values.", bundle: .module))
         }
         if i > 0 {
           i -= 1

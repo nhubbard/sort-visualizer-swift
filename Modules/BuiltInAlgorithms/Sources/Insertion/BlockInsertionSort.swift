@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -26,7 +27,7 @@ import SortEngineKit
 public struct BlockInsertionSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "blockinsertionsort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Block Insertion Sort",
+    displayName: String(localized: "Block Insertion Sort", bundle: .module),
     category: .insertion,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -57,24 +58,24 @@ public struct BlockInsertionSort: SortAlgorithm {
         i - 1, i,
         by: >,
         stageID: "BlockInsertionSort.blockBoundary",
-        whenTrue: "The previous item is larger, so this pair starts a block insertion.",
-        whenFalse: "This neighboring pair does not need block insertion."
+        whenTrue: String(localized: "The previous item is larger, so this pair starts a block insertion.", bundle: .module),
+        whenFalse: String(localized: "This neighboring pair does not need block insertion.", bundle: .module)
       ) {
         i += 1
         while i < b && engine.teachingCompare(
           i - 1, i, by: >, stageID: "BlockInsertionSort.descendingRun",
-          whenTrue: "This pair continues the descending run, so include it before reversing.",
-          whenFalse: "The descending run ends here; reverse the run to make it ascending."
+          whenTrue: String(localized: "This pair continues the descending run, so include it before reversing.", bundle: .module),
+          whenFalse: String(localized: "The descending run ends here; reverse the run to make it ascending.", bundle: .module)
         ) { i += 1 }
         engine.teachingReversal(
           a, i - 1, stageID: "BlockInsertionSort.reverseDescendingRun",
-          explanation: "Reverse the descending run to make it an ascending block.")
+          explanation: String(localized: "Reverse the descending run to make it an ascending block.", bundle: .module))
       } else {
         i += 1
         while i < b && engine.teachingCompare(
           i - 1, i, by: <=, stageID: "BlockInsertionSort.ascendingRun",
-          whenTrue: "This pair continues the ascending run, so leave it in place.",
-          whenFalse: "The ascending run ends here; insert the next block."
+          whenTrue: String(localized: "This pair continues the ascending run, so leave it in place.", bundle: .module),
+          whenFalse: String(localized: "The ascending run ends here; insert the next block.", bundle: .module)
         ) { i += 1 }
       }
       return i
@@ -86,8 +87,8 @@ public struct BlockInsertionSort: SortAlgorithm {
       var l = l - 1
       while l >= a && engine.teachingCompareValue(
         l, against: tmp, by: >, stageID: "BlockInsertionSort.singleShift",
-        whenTrue: "This item is larger than the held value, so shift it right.",
-        whenFalse: "The held value has reached its insertion position."
+        whenTrue: String(localized: "This item is larger than the held value, so shift it right.", bundle: .module),
+        whenFalse: String(localized: "The held value has reached its insertion position.", bundle: .module)
       ) {
         engine.setValue(l + 1, engine.readValue(at: l))
         l -= 1
@@ -103,8 +104,8 @@ public struct BlockInsertionSort: SortAlgorithm {
       var l = l - 1
       while l >= a && engine.teachingCompareValue(
         l, against: tmpR, by: >, stageID: "BlockInsertionSort.pairRightShift",
-        whenTrue: "This item is larger than the right held value, so shift it two places.",
-        whenFalse: "The right held value has reached its insertion boundary."
+        whenTrue: String(localized: "This item is larger than the right held value, so shift it two places.", bundle: .module),
+        whenFalse: String(localized: "The right held value has reached its insertion boundary.", bundle: .module)
       ) {
         engine.setValue(l + 2, engine.readValue(at: l))
         l -= 1
@@ -112,8 +113,8 @@ public struct BlockInsertionSort: SortAlgorithm {
       engine.setValue(l + 2, tmpR)
       while l >= a && engine.teachingCompareValue(
         l, against: tmpL, by: >, stageID: "BlockInsertionSort.pairLeftShift",
-        whenTrue: "This item is larger than the left held value, so shift it right.",
-        whenFalse: "The left held value has reached its insertion boundary."
+        whenTrue: String(localized: "This item is larger than the left held value, so shift it right.", bundle: .module),
+        whenFalse: String(localized: "The left held value has reached its insertion boundary.", bundle: .module)
       ) {
         engine.setValue(l + 1, engine.readValue(at: l))
         l -= 1

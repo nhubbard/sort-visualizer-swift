@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -32,7 +33,7 @@ import SortEngineKit
 public struct ImprovedBlockSelectionSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "improvedblockselectionsort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Improved Block Selection Merge Sort",
+    displayName: String(localized: "Improved Block Selection Merge Sort", bundle: .module),
     category: .hybrid,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -104,8 +105,8 @@ public struct ImprovedBlockSelectionSort: SortAlgorithm {
         if engine.teachingCompare(
           a, minIndex, by: (<),
           stageID: "ImprovedBlockSelectionSort.block.minimum",
-          whenTrue: "This block candidate is smaller than the current minimum, so it becomes the new minimum.",
-          whenFalse: "This candidate is not smaller, so the current block minimum remains."
+          whenTrue: String(localized: "This block candidate is smaller than the current minimum, so it becomes the new minimum.", bundle: .module),
+          whenFalse: String(localized: "This candidate is not smaller, so the current block minimum remains.", bundle: .module)
         ) {
           minIndex = a
         } else if engine.compare(a, minIndex, by: (==))
@@ -163,8 +164,8 @@ public struct ImprovedBlockSelectionSort: SortAlgorithm {
         if engine.teachingCompare(
           i, j, by: (>),
           stageID: "ImprovedBlockSelectionSort.merge.rotate",
-          whenTrue: "The left run item exceeds the right run item, so the in-place merge rotates the right span ahead.",
-          whenFalse: "These run items are ordered, so the merge advances in the left run."
+          whenTrue: String(localized: "The left run item exceeds the right run item, so the in-place merge rotates the right span ahead.", bundle: .module),
+          whenFalse: String(localized: "These run items are ordered, so the merge advances in the left run.", bundle: .module)
         ) {
           var k = j + 1
           while k < b && engine.compare(i, k, by: (>)) {

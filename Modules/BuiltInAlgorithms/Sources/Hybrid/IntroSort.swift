@@ -5,7 +5,7 @@ import SortEngineKit
 public struct IntroSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "introsort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Intro Sort",
+    displayName: String(localized: "Intro Sort", bundle: .module),
     category: .hybrid,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -31,8 +31,8 @@ public struct IntroSort: SortAlgorithm {
       if !engine.teachingCompare(
         right, left,
         stageID: "IntroSort.pivot.median",
-        whenTrue: "The right endpoint is at least the left, so median setup leaves this pair in place.",
-        whenFalse: "The right endpoint is smaller, so median setup swaps the endpoints."
+        whenTrue: String(localized: "The right endpoint is at least the left, so median setup leaves this pair in place.", bundle: .module),
+        whenFalse: String(localized: "The right endpoint is smaller, so median setup swaps the endpoints.", bundle: .module)
       ) {
         engine.swap(left, right)
       }
@@ -52,15 +52,15 @@ public struct IntroSort: SortAlgorithm {
         while engine.teachingCompareValue(
           i, against: pivotValue, by: (<),
           stageID: "IntroSort.partition.leftScan",
-          whenTrue: "This value belongs below the pivot, so the left scan advances.",
-          whenFalse: "This value reaches the pivot side, so the left scan stops."
+          whenTrue: String(localized: "This value belongs below the pivot, so the left scan advances.", bundle: .module),
+          whenFalse: String(localized: "This value reaches the pivot side, so the left scan stops.", bundle: .module)
         ) { i += 1 }
         j -= 1
         while engine.teachingCompareValue(
           j, against: pivotValue, by: (>),
           stageID: "IntroSort.partition.rightScan",
-          whenTrue: "This value belongs above the pivot, so the right scan retreats.",
-          whenFalse: "This value reaches the pivot side, so the right scan stops."
+          whenTrue: String(localized: "This value belongs above the pivot, so the right scan retreats.", bundle: .module),
+          whenFalse: String(localized: "This value reaches the pivot side, so the right scan stops.", bundle: .module)
         ) { j -= 1 }
         if !(i < j) { return i }
         engine.swap(i, j)
@@ -123,8 +123,8 @@ public struct IntroSort: SortAlgorithm {
         while j > start && !engine.teachingCompare(
           j, j - 1,
           stageID: "IntroSort.finalInsertion.order",
-          whenTrue: "The current value is at least its predecessor, so insertion stops.",
-          whenFalse: "The current value is smaller, so insertion moves it left."
+          whenTrue: String(localized: "The current value is at least its predecessor, so insertion stops.", bundle: .module),
+          whenFalse: String(localized: "The current value is smaller, so insertion moves it left.", bundle: .module)
         ) {
           engine.swap(j - 1, j)
           j -= 1

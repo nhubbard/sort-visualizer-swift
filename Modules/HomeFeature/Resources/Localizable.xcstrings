@@ -1,21 +1,63 @@
 {
-  "sourceLanguage": "en",
-  "strings": {
-    "Home": {},
-    "Opens a Quick Sort example from the algorithm catalog": {},
-    "Try Quick Sort": {},
-    "Welcome to": {},
-    "home.welcomeCopy": {
-      "comment": "Home introduction shown as Markdown; algorithm names and mathematical notation remain content terms.",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Sorting algorithms are used to sort a data structure according to a specific order relationship, such as numerical order or lexicographical order.\n\nThis operation is one of the most important and widespread in computer science. For a long time, new methods have been developed to make this procedure faster and faster.\n\nThere are hundreds of different sorting algorithms available, each with their own characteristics. They are classified according to two metrics: space complexity and time complexity.\n\nThose two kinds of complexity are represented with asymptotic notations, mainly with the symbols O, Θ, and Ω, which represent the upper bound, the tight bound, and the lower bound of an algorithm's complexity. The numeric value of these bounds is specified in parentheses in terms of the number *n*, which is the number of elements in the data structure.\n\nThis app organizes its algorithms into ten families, grouped by how they work rather than how fast they run: **Concurrent**, **Distribution**, **Exchange**, **Hybrid**, **Impractical**, **Insertion**, **Merge**, **Miscellaneous**, **Quick**, and **Selection** sorts. A family shares a common strategy: selection sorts repeatedly find the smallest remaining element, for instance, while merge sorts split the data apart and merge it back together in order.\n\nComplexity still varies within every family. **Quick Sort**, for example, is typically efficient, with a time complexity of O(*n* log *n*). **Bubble Sort**, on the other hand, is quadratic, with a time complexity of O(*n*²). The **Impractical** family is reserved for algorithms that are correct but absurd -- sorts that work by brute force, accident, or joke, and are difficult to compare to anything else.\n\nSpace and time complexity can also be further subdivided into 3 different cases: best case, average case, and worst case.\n\nSorting algorithms can be difficult to understand, and it's easy to get confused. This app aims to help you understand sorting algorithms by showing their actions in real time. Without further ado, let's get started -- choose an algorithm from the catalog!\n"
+  "sourceLanguage" : "en",
+  "strings" : {
+    "Home" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Inicio"
+          }
+        }
+      }
+    },
+    "Opens a Quick Sort example from the algorithm catalog" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Abre un ejemplo de Quick Sort del catálogo de algoritmos"
+          }
+        }
+      }
+    },
+    "Try Quick Sort" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Probar Quick Sort"
+          }
+        }
+      }
+    },
+    "Welcome to" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Te damos la bienvenida a"
+          }
+        }
+      }
+    },
+    "home.welcomeCopy" : {
+      "comment" : "Home introduction shown as Markdown; algorithm names and mathematical notation remain content terms.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sorting algorithms are used to sort a data structure according to a specific order relationship, such as numerical order or lexicographical order.\n\nThis operation is one of the most important and widespread in computer science. For a long time, new methods have been developed to make this procedure faster and faster.\n\nThere are hundreds of different sorting algorithms available, each with their own characteristics. They are classified according to two metrics: space complexity and time complexity.\n\nThose two kinds of complexity are represented with asymptotic notations, mainly with the symbols O, Θ, and Ω, which represent the upper bound, the tight bound, and the lower bound of an algorithm's complexity. The numeric value of these bounds is specified in parentheses in terms of the number *n*, which is the number of elements in the data structure.\n\nThis app organizes its algorithms into ten families, grouped by how they work rather than how fast they run: **Concurrent**, **Distribution**, **Exchange**, **Hybrid**, **Impractical**, **Insertion**, **Merge**, **Miscellaneous**, **Quick**, and **Selection** sorts. A family shares a common strategy: selection sorts repeatedly find the smallest remaining element, for instance, while merge sorts split the data apart and merge it back together in order.\n\nComplexity still varies within every family. **Quick Sort**, for example, is typically efficient, with a time complexity of O(*n* log *n*). **Bubble Sort**, on the other hand, is quadratic, with a time complexity of O(*n*²). The **Impractical** family is reserved for algorithms that are correct but absurd -- sorts that work by brute force, accident, or joke, and are difficult to compare to anything else.\n\nSpace and time complexity can also be further subdivided into 3 different cases: best case, average case, and worst case.\n\nSorting algorithms can be difficult to understand, and it's easy to get confused. This app aims to help you understand sorting algorithms by showing their actions in real time. Without further ado, let's get started -- choose an algorithm from the catalog!\n"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Los algoritmos de ordenación organizan los elementos de una estructura de datos según una relación de orden determinada, como el orden numérico o el lexicográfico.\n\nLa ordenación es una de las operaciones más importantes y habituales de la informática. Durante mucho tiempo se han desarrollado nuevos métodos para hacerla cada vez más rápida.\n\nExisten cientos de algoritmos de ordenación, cada uno con sus propias características. Se clasifican según dos medidas: la complejidad espacial y la complejidad temporal.\n\nAmbas se expresan mediante notaciones asintóticas, principalmente con los símbolos O, Θ y Ω, que representan, respectivamente, la cota superior, la cota ajustada y la cota inferior de la complejidad de un algoritmo. Estas cotas se indican entre paréntesis en función de *n*, el número de elementos de la estructura de datos.\n\nLa aplicación organiza los algoritmos en diez familias según su funcionamiento, no según su velocidad: **Concurrentes**, **Por distribución**, **Por intercambio**, **Híbridos**, **Imprácticos**, **Por inserción**, **Por mezcla**, **Misceláneos**, **Quick** y **Por selección**. Los algoritmos de una misma familia comparten una estrategia. Por ejemplo, los de selección buscan repetidamente el menor elemento restante, mientras que los de mezcla dividen los datos y vuelven a unirlos en orden.\n\nLa complejidad también varía dentro de cada familia. **Quick Sort**, por ejemplo, suele ser eficiente, con una complejidad temporal de O(*n* log *n*). **Bubble Sort**, en cambio, tiene una complejidad temporal cuadrática de O(*n*²). La familia **Imprácticos** reúne algoritmos correctos pero absurdos, que ordenan por fuerza bruta, por casualidad o como broma y son difíciles de comparar con los demás.\n\nLa complejidad espacial y la temporal también pueden analizarse en tres casos: el mejor, el promedio y el peor.\n\nLos algoritmos de ordenación pueden resultar difíciles de entender. Para facilitar su comprensión, la aplicación muestra sus operaciones en tiempo real. Elige un algoritmo del catálogo para empezar.\n"
           }
         }
       }
     }
   },
-  "version": "1.0"
+  "version" : "1.3"
 }

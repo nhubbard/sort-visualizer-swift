@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import PersistenceKit
 import SettingsKit
@@ -71,7 +72,7 @@ public struct SortView: View {
         }
         .padding(.horizontal)
         if reduceMotionActive {
-          Text("Reduce Motion is on. Automatic playback is limited to 15 operations per second; manual steps are unchanged. A target-duration run may take longer.")
+          Text(String(localized: "Reduce Motion is on. Automatic playback is limited to 15 operations per second; manual steps are unchanged. A target-duration run may take longer.", bundle: .module))
             .font(.caption)
             .foregroundStyle(.secondary)
             .padding(.horizontal)
@@ -81,7 +82,7 @@ public struct SortView: View {
       }
       #if DEBUG
       if ProcessInfo.processInfo.environment["UI_TEST_INT03_SWEEP"] == "1" {
-        Button("Start test size sweep") {
+        Button(String(localized: "Start test size sweep", bundle: .module)) {
           let automation = Automation(
             id: AutomationID(rawValue: "int03-stop-canary"), displayName: "Stop Canary",
             iconName: "stop", key: "t", modifiers: [], runsPerSize: 1,
@@ -161,41 +162,41 @@ public struct SortView: View {
     .sheet(isPresented: $isShowingHelp) {
       NavigationStack {
         List {
-          Section("Find an Algorithm") {
-            Text("Browse the catalog by category or search for a name. Choose an algorithm to start a run.")
+          Section(String(localized: "Find an Algorithm", bundle: .module)) {
+            Text(String(localized: "Browse the catalog by category or search for a name. Choose an algorithm to start a run.", bundle: .module))
           }
-          Section("Playback") {
-            Text("Use Play to watch the recording. Pause and use Step Forward or Step Back to inspect one operation at a time.")
-            Text("Drag Playback Position to revisit any operation. The jump buttons go to the beginning or the sorted end.")
+          Section(String(localized: "Playback", bundle: .module)) {
+            Text(String(localized: "Use Play to watch the recording. Pause and use Step Forward or Step Back to inspect one operation at a time.", bundle: .module))
+            Text(String(localized: "Drag Playback Position to revisit any operation. The jump buttons go to the beginning or the sorted end.", bundle: .module))
           }
-          Section("Presentation") {
-            Text("Array Size changes the number of items in a new run. Visualizer changes how the current run is drawn.")
-            Text("Playback Speed changes the current run. Settings controls the defaults used when you open another sort.")
+          Section(String(localized: "Presentation", bundle: .module)) {
+            Text(String(localized: "Array Size changes the number of items in a new run. Visualizer changes how the current run is drawn.", bundle: .module))
+            Text(String(localized: "Playback Speed changes the current run. Settings controls the defaults used when you open another sort.", bundle: .module))
           }
-          Section("Visualization Markers") {
-            Text("In marker-aware views, coral marks the first active array position and blue marks the second. These positions can be compared or swapped; the colors do not name the operation. Rainbow colors items by value and does not show marker highlights. Pause and step to inspect an operation.")
-            Text("With Reduce Motion on, Showcase skips Hanoi Towers because its blocks travel between towers. You can still choose Hanoi Towers from the Visualizer picker.")
+          Section(String(localized: "Visualization Markers", bundle: .module)) {
+            Text(String(localized: "In marker-aware views, coral marks the first active array position and blue marks the second. These positions can be compared or swapped; the colors do not name the operation. Rainbow colors items by value and does not show marker highlights. Pause and step to inspect an operation.", bundle: .module))
+            Text(String(localized: "With Reduce Motion on, Showcase skips Hanoi Towers because its blocks travel between towers. You can still choose Hanoi Towers from the Visualizer picker.", bundle: .module))
           }
-          Section("Color and Appearance") {
-            Text("Color Circle and Pixel Mesh encode values by hue alone. For a view where height or position also shows each value, choose Bar Graph, Rainbow, or Scatter Plot. The first and second active-position markers use color in marker-aware views.")
+          Section(String(localized: "Color and Appearance", bundle: .module)) {
+            Text(String(localized: "Color Circle and Pixel Mesh encode values by hue alone. For a view where height or position also shows each value, choose Bar Graph, Rainbow, or Scatter Plot. The first and second active-position markers use color in marker-aware views.", bundle: .module))
           }
-          Section("Learn More") {
-            Text("Scroll below the visualization for the algorithm explanation, growth charts, and code examples.")
-            Text("Complete the same algorithm at different sizes to unlock its recorded-runs chart. Expand the chart to inspect exact values.")
-            Text("Choose a language to read its full reference implementation, then use Copy Code to copy the sample.")
+          Section(String(localized: "Learn More", bundle: .module)) {
+            Text(String(localized: "Scroll below the visualization for the algorithm explanation, growth charts, and code examples.", bundle: .module))
+            Text(String(localized: "Complete the same algorithm at different sizes to unlock its recorded-runs chart. Expand the chart to inspect exact values.", bundle: .module))
+            Text(String(localized: "Choose a language to read its full reference implementation, then use Copy Code to copy the sample.", bundle: .module))
           }
-          Section("Teaching Graph") {
-            Text("On Quick Sort and Merge Sort, expand Teaching Graph below the visualization. Use Previous Graph Event and Next Graph Event to follow decisions and movements while the playback position stays in sync.")
+          Section(String(localized: "Teaching Graph", bundle: .module)) {
+            Text(String(localized: "On Quick Sort and Merge Sort, expand Teaching Graph below the visualization. Use Previous Graph Event and Next Graph Event to follow decisions and movements while the playback position stays in sync.", bundle: .module))
           }
-          Section("Save and Reopen") {
-            Text("Export Tape saves the current recording. Import Tape opens a previously saved recording from the toolbar.")
-            Text("Record Video captures a live run and its sound. On Mac, choose a window in the system picker or use Record App Instead. Stop Recording creates a video you can preview or share.")
+          Section(String(localized: "Save and Reopen", bundle: .module)) {
+            Text(String(localized: "Export Tape saves the current recording. Import Tape opens a previously saved recording from the toolbar.", bundle: .module))
+            Text(String(localized: "Record Video captures a live run and its sound. On Mac, choose a window in the system picker or use Record App Instead. Stop Recording creates a video you can preview or share.", bundle: .module))
           }
         }
-        .navigationTitle("How to Use")
+        .navigationTitle(String(localized: "How to Use", bundle: .module))
         .toolbar {
           ToolbarItem(placement: .confirmationAction) {
-            Button("Done") { isShowingHelp = false }
+            Button(String(localized: "Done", bundle: .module)) { isShowingHelp = false }
               .accessibilityIdentifier("sortHelpDoneButton")
           }
         }
@@ -204,7 +205,7 @@ public struct SortView: View {
   }
 
   private var detailsScrollCue: some View {
-    Text("Scroll for details")
+    Text(String(localized: "Scroll for details", bundle: .module))
       .font(.caption)
       .foregroundStyle(.secondary)
       .accessibilityIdentifier("sortDetailsScrollCue")
@@ -212,13 +213,13 @@ public struct SortView: View {
 
   private var helpButton: some View {
     Button { isShowingHelp = true } label: {
-      Label("How to Use", systemImage: "questionmark.circle")
+      Label(String(localized: "How to Use", bundle: .module), systemImage: "questionmark.circle")
         .labelStyle(.iconOnly)
     }
     .buttonBorderShape(.circle)
     .frame(width: 36, height: 24)
-    .accessibilityLabel("How to Use")
-    .help("How to Use")
+    .accessibilityLabel(String(localized: "How to Use", bundle: .module))
+    .help(String(localized: "How to Use", bundle: .module))
     .accessibilityIdentifier("sortHelpButton")
   }
 
@@ -242,35 +243,35 @@ public struct SortView: View {
   private var traceControls: some View {
     VStack(alignment: .leading, spacing: 4) {
       HStack {
-        Text("Instruments traces: \(traceHistory.records.count)")
+        Text(String(localized: "Instruments traces: \(traceHistory.records.count)", bundle: .module))
           .font(.caption.monospacedDigit())
           .accessibilityIdentifier("instrumentsTraceCount")
         Spacer()
-        Picker("Profile", selection: $session.debugTraceTemplate) {
+        Picker(String(localized: "Profile", bundle: .module), selection: $session.debugTraceTemplate) {
           ForEach(DebugTraceTemplate.allCases) { template in
             Text(template.rawValue).tag(template)
           }
         }
         .fixedSize()
         .accessibilityIdentifier("instrumentsProfilePicker")
-        Picker("Runs", selection: $session.debugTraceRepetitions) {
+        Picker(String(localized: "Runs", bundle: .module), selection: $session.debugTraceRepetitions) {
           ForEach([1, 10, 50, 100], id: \.self) { count in
-            Text("\(count)").tag(count)
+            Text(String(localized: "\(count)", bundle: .module)).tag(count)
           }
         }
         .fixedSize()
         .accessibilityIdentifier("instrumentsTraceRepetitionsPicker")
         if session.debugTraceTemplate.supportsHighFrequency {
-          Toggle("High Frequency", isOn: $session.debugTraceHighFrequency)
+          Toggle(String(localized: "High Frequency", bundle: .module), isOn: $session.debugTraceHighFrequency)
             .fixedSize()
             .accessibilityIdentifier("instrumentsHighFrequencyToggle")
         }
-        Button("Record another trace") {
+        Button(String(localized: "Record another trace", bundle: .module)) {
           Task { await session.start(size: session.arraySize) }
         }
         .disabled(session.isAutomating || traceIsRecording)
         .accessibilityIdentifier("instrumentsRecordAgainButton")
-        Button("All traces") { isTraceHistoryPresented = true }
+        Button(String(localized: "All traces", bundle: .module)) { isTraceHistoryPresented = true }
           .disabled(traceHistory.records.isEmpty)
           .accessibilityIdentifier("instrumentsAllTracesButton")
       }
@@ -295,7 +296,7 @@ public struct SortView: View {
         List(traceHistory.records) { trace in
           Link(destination: trace.url) {
             VStack(alignment: .leading, spacing: 2) {
-              Text("\(trace.algorithmName) · \(trace.profileName)")
+              Text(String(localized: "\(trace.algorithmName) · \(trace.profileName)", bundle: .module))
               Text(
                 "\(trace.recordedAt.formatted(date: .abbreviated, time: .standard))"
                   + (trace.processID.map { " · PID \($0)" } ?? "")
@@ -306,10 +307,10 @@ public struct SortView: View {
             }
           }
         }
-        .navigationTitle("Instruments traces")
+        .navigationTitle(String(localized: "Instruments traces", bundle: .module))
         .toolbar {
           ToolbarItem(placement: .confirmationAction) {
-            Button("Done") { isTraceHistoryPresented = false }
+            Button(String(localized: "Done", bundle: .module)) { isTraceHistoryPresented = false }
           }
         }
       }
@@ -343,7 +344,7 @@ public struct SortView: View {
       canvasWithControls(for: replay)
     case .failed(let error):
       ContentUnavailableView(
-        "Sort Skipped", systemImage: "clock.badge.exclamationmark",
+        String(localized: "Sort Skipped", bundle: .module), systemImage: "clock.badge.exclamationmark",
         description: Text(error.localizedDescription)
       )
     }
@@ -433,12 +434,12 @@ private struct AccessibleSortCanvas: View {
       .accessibilityIdentifier("sortVisualizationCanvas")
       .accessibilityLabel(accessibilityLabel)
       .accessibilityValue(accessibilityValue)
-      .accessibilityHint("Pause playback and use the step controls to hear individual operations")
+      .accessibilityHint(String(localized: "Pause playback and use the step controls to hear individual operations", bundle: .module))
   }
 
   private var accessibilityLabel: String {
     guard ProcessInfo.processInfo.environment["UI_TEST_TAPE_METADATA_PROBE"] == "1" else {
-      return "Sort visualization"
+      return String(localized: "Sort visualization", bundle: .module)
     }
     let header = replay.tape.header
     return "\(header.algorithmID)|\(header.shuffleID ?? "")|\(header.visualSeed)|"
@@ -453,18 +454,19 @@ private struct AccessibleSortCanvas: View {
         + replay.frame.map { String($0.value) }.joined(separator: ",")
     }
     let visualizer = VisualizerRegistry.shared.visualizer(id: visualizerID)?
-      .metadata.displayName ?? "visualization"
-    return "\(algorithmName), \(arraySize) items, \(visualizer). "
-      + "Operation \(replay.stepIndex) of \(replay.totalOperationCount). \(status)"
+      .metadata.displayName ?? String(localized: "visualization", bundle: .module)
+    return String(localized:
+      "\(algorithmName), \(arraySize) items, \(visualizer). Operation \(replay.stepIndex) of \(replay.totalOperationCount). \(status)",
+      bundle: .module)
   }
 }
 
 struct PlaybackDiscoveryTip: Tip {
   @Parameter static var hasUsedPlayback: Bool = false
 
-  var title: Text { Text("Explore one step at a time") }
+  var title: Text { Text(String(localized: "Explore one step at a time", bundle: .module)) }
   var message: Text? {
-    Text("Pause playback, then use Step Forward or Step Back to hear and inspect an operation.")
+    Text(String(localized: "Pause playback, then use Step Forward or Step Back to hear and inspect an operation.", bundle: .module))
   }
   var rules: [Rule] {
     #Rule(Self.$hasUsedPlayback) { $0 == false }
@@ -478,9 +480,9 @@ struct PlaybackDiscoveryTip: Tip {
 struct PresentationDiscoveryTip: Tip {
   @Parameter static var hasAdjustedPresentation: Bool = false
 
-  var title: Text { Text("Change the view") }
+  var title: Text { Text(String(localized: "Change the view", bundle: .module)) }
   var message: Text? {
-    Text("Array Size sets the next run's item count. Visualizer changes the drawing of this run.")
+    Text(String(localized: "Array Size sets the next run's item count. Visualizer changes the drawing of this run.", bundle: .module))
   }
   var rules: [Rule] {
     #Rule(PlaybackDiscoveryTip.$hasUsedPlayback) { $0 == true }
@@ -495,9 +497,9 @@ struct PresentationDiscoveryTip: Tip {
 struct SeekingDiscoveryTip: Tip {
   @Parameter static var hasSeeked: Bool = false
 
-  var title: Text { Text("Revisit any operation") }
+  var title: Text { Text(String(localized: "Revisit any operation", bundle: .module)) }
   var message: Text? {
-    Text("Drag Playback Position or use the jump buttons to review the recording at your own pace.")
+    Text(String(localized: "Drag Playback Position or use the jump buttons to review the recording at your own pace.", bundle: .module))
   }
   var rules: [Rule] {
     #Rule(PresentationDiscoveryTip.$hasAdjustedPresentation) { $0 == true }

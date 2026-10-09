@@ -1,0 +1,24 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "Connected" : {
+
+    },
+    "Disabled" : {
+
+    },
+    "Not Available on This Platform" : {
+
+    },
+    "Not Started Yet" : {
+
+    },
+    "Unavailable" : {
+
+    },
+    "Waiting for Connection" : {
+
+    }
+  },
+  "version" : "1.0"
+}
