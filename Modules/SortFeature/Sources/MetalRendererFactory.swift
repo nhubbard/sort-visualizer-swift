@@ -19,6 +19,7 @@ enum MetalRendererFactory {
       MetalShapeRenderer<DisparityBarGraphMetalLayout>(device: device, sampleCount: sampleCount)
     case "pixelmesh":
       MetalShapeRenderer<PixelMeshMetalLayout>(device: device, sampleCount: sampleCount)
+    case "customimage": MetalImageTileRenderer(device: device, sampleCount: sampleCount)
     case "rainbow": MetalShapeRenderer<RainbowMetalLayout>(device: device, sampleCount: sampleCount)
     case "sinewave":
       MetalShapeRenderer<SineWaveMetalLayout>(device: device, sampleCount: sampleCount)

@@ -17,16 +17,41 @@ final class ScreenCaptureKitLiveRecordingCapture: NSObject, LiveRecordingCapturi
 
   func start() async throws {
     guard stream == nil, startContinuation == nil else { return }
+    try await withCheckedThrowingContinuation { continuation in
+      startContinuation = continuation
+      Task {
+        let filter = await currentWindowFilter()
+        guard startContinuation != nil else { return }
+        if let filter {
+          await beginStream(with: filter)
+        } else {
+          presentWindowPicker()
+        }
+      }
+    }
+  }
+
+  /// A single normal window owned by this process is unambiguous. If the app has multiple
+  /// windows, let the system picker identify the one the person meant to record.
+  private func currentWindowFilter() async -> SCContentFilter? {
+    guard let content = try? await SCShareableContent.currentProcess else { return nil }
+    let ownWindows = content.windows.filter { window in
+      window.owningApplication?.processID == ProcessInfo.processInfo.processIdentifier
+        && window.isOnScreen && window.windowLayer == 0
+        && window.frame.width > 0 && window.frame.height > 0
+    }
+    guard ownWindows.count == 1, let window = ownWindows.first else { return nil }
+    return SCContentFilter(desktopIndependentWindow: window)
+  }
+
+  private func presentWindowPicker() {
     let picker = SCContentSharingPicker.shared
     picker.add(self)
     var pickerConfiguration = SCContentSharingPickerConfiguration()
     pickerConfiguration.allowedPickerModes = .singleWindow
     picker.defaultConfiguration = pickerConfiguration
     picker.isActive = true
-    try await withCheckedThrowingContinuation { continuation in
-      startContinuation = continuation
-      picker.present(using: .window)
-    }
+    picker.present(using: .window)
   }
 
   func stop() async throws -> URL {

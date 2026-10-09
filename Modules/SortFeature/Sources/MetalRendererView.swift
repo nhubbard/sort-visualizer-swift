@@ -11,6 +11,7 @@ import VisualizationKit
 struct MetalRendererView: UIViewRepresentable {
   let replay: ReplayEngine
   let visualizerID: VisualizerID
+  let imageRevision: Int
 
   @Environment(\.colorScheme) private var colorScheme
 
@@ -59,7 +60,8 @@ struct MetalRendererView: UIViewRepresentable {
     // renderer to the view as its delegate — eliminates any chance of the view's very first
     // layout firing `drawableSizeWillChange` before anything is listening for it.
     context.coordinator.setUp(
-      replay: replay, renderer: renderer, view: view, visualizerID: visualizerID)
+      replay: replay, renderer: renderer, view: view, visualizerID: visualizerID,
+      imageRevision: imageRevision)
     view.delegate = renderer
     return view
   }
@@ -75,7 +77,8 @@ struct MetalRendererView: UIViewRepresentable {
     // about it. Must run before `reconcileStepIndexIfNeeded()`: that call is a no-op unless
     // `stepIndex` itself moved, which switching visualizers alone doesn't change, but the new
     // renderer's buffer still needs its own first full seed.
-    context.coordinator.switchVisualizerIfNeeded(to: visualizerID, view: view)
+    context.coordinator.switchVisualizerIfNeeded(
+      to: visualizerID, imageRevision: imageRevision, view: view)
     // Catches a scrub/seek (`stepIndex` changing without `onOperationApplied` firing, by
     // `ReplayEngine`'s design) — a no-op during normal playback since `trackedStepIndex` already
     // matches. Resize is handled separately by `onDrawableSizeChange`: `view.drawableSize` can
@@ -99,6 +102,7 @@ struct MetalRendererView: UIViewRepresentable {
     private var view: MTKView?
     private var trackedStepIndex = -1
     private var visualizerID: VisualizerID?
+    private var imageRevision = 0
 
     /// Incremental mirror of `replay.frame`, maintained by `onOperationApplied` instead of being
     /// rebuilt from scratch on every operation -- `values`/`markers` used to be a fresh O(N)
@@ -166,12 +170,13 @@ struct MetalRendererView: UIViewRepresentable {
 
     func setUp(
       replay: ReplayEngine, renderer: any MetalIncrementalRenderer, view: MTKView,
-      visualizerID: VisualizerID
+      visualizerID: VisualizerID, imageRevision: Int = 0
     ) {
       self.replay = replay
       self.renderer = renderer
       self.view = view
       self.visualizerID = visualizerID
+      self.imageRevision = imageRevision
       trackedStepIndex = -1
 
       replay.onOperationApplied = { [weak self, weak replay, weak renderer] operation, isFinalOperation in
@@ -216,14 +221,19 @@ struct MetalRendererView: UIViewRepresentable {
     /// genuinely new `replay` tears them down). Reuses `view.device`/`view.sampleCount` (both
     /// already set once in `makeUIView`) so the new pipeline's `rasterSampleCount` still
     /// matches what this view actually renders into.
-    func switchVisualizerIfNeeded(to newVisualizerID: VisualizerID, view: MTKView) {
+    func switchVisualizerIfNeeded(
+      to newVisualizerID: VisualizerID, imageRevision newImageRevision: Int = 0, view: MTKView
+    ) {
       guard
-        newVisualizerID != visualizerID, let replay, let device = view.device,
+        newVisualizerID != visualizerID
+          || (newVisualizerID.rawValue == "customimage" && newImageRevision != imageRevision),
+        let replay, let device = view.device,
         let newRenderer = MetalRendererFactory.makeRenderer(
           for: newVisualizerID, device: device, sampleCount: view.sampleCount)
       else { return }
 
-      setUp(replay: replay, renderer: newRenderer, view: view, visualizerID: newVisualizerID)
+      setUp(replay: replay, renderer: newRenderer, view: view,
+            visualizerID: newVisualizerID, imageRevision: newImageRevision)
       view.delegate = newRenderer
       // `onDrawableSizeChange` won't fire again on its own here — that callback only fires
       // on a REAL drawable-size change, and swapping the delegate isn't one. The new

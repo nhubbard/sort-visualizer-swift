@@ -14,6 +14,7 @@ struct VisualizerGeometryCorpusTests {
     PixelMeshVisualizer(), HoopStackVisualizer(), DisparityBarGraphVisualizer(),
     DisparityCircleVisualizer(), DisparityChordsVisualizer(), DisparityDotsVisualizer(),
     HanoiTowersVisualizer(),
+    CustomImageVisualizer(),
   ]
 
   @Test(arguments: [16, 256, 1024])
@@ -83,6 +84,10 @@ struct VisualizerGeometryCorpusTests {
       return !points.isEmpty && points.allSatisfy { point($0.x, $0.y) } && color(c)
     case let .text(x, y, _, c):
       return point(x, y) && color(c)
+    case let .imageTile(x, y, w, h, sourceSlot, marker):
+      return w.isFinite && h.isFinite && w >= 0 && h >= 0
+        && point(x, y) && point(x + w, y + h)
+        && sourceSlot >= 0 && (0...2).contains(marker)
     }
   }
 }

@@ -122,5 +122,5 @@ elsewhere in the codebase.
   clamping in `SortSession.start(size:)`. If an algorithm should not run at a given size, its
   `sizeRange` excludes that size. Settings has no opt-in or opt-out toggle for this behavior.
 
-For open work items (a CustomImage visualizer, video export, teaching-mode step annotations), see
+For the status of the original roadmap items (Custom Image, recording, and teaching annotations), see
 [History](history.md).

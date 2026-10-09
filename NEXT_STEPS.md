@@ -1,6 +1,6 @@
 # Sort Symphony: focused next steps
 
-Updated 2026-10-08. This list reflects the discussion after completing the native algorithm catalog and raising functional test coverage. The estimates describe engineering effort and review scope, not elapsed calendar time or a delivery commitment. They exclude waiting for other people or for a system reboot. Findings can change the implementation portion of an audit estimate.
+Updated 2026-10-09. This list reflects the discussion after completing the native algorithm catalog and raising functional test coverage. The estimates describe engineering effort and review scope, not elapsed calendar time or a delivery commitment. They exclude waiting for other people or for a system reboot. Findings can change the implementation portion of an audit estimate.
 
 ## 1. Accessibility and Apple design-guidelines audit
 
@@ -72,6 +72,12 @@ Updated 2026-10-08. This list reflects the discussion after completing the nativ
 
 ## 6. CustomImage visualizer using image chunks (original roadmap item)
 
+**Status:** Implemented as Custom Image with a dedicated Metal texture renderer, Photos and Files
+pickers, locally saved downsampled images, and a built-in sample. Equal values repeat a tile; spare
+grid cells stay fixed so the sorted picture has no blank corner. Focused geometry, image loading,
+Metal pixel, renderer switching, and iPad UI tests pass. A real photo/file selection on a signed
+device remains a manual follow-up.
+
 **Why:** A chosen image would make the existing permutation visualizer concept more personal. The 8,192 limit bounds sortable array items; it need not reject a source image with more than 8,192 pixels.
 
 **Scope:** load and scale the source into a texture, then partition it into at most one chunk per sortable item. At each array position, display the chunk associated with that item's value. Specify the grid and any partial row so the sorted view reads as a coherent image. Define duplicate-value behavior explicitly: repeated values repeat a chunk unless item identity is added to the tape. Add picker, fallback, memory limits, and GPU texture-coordinate handling. Verify image orientation, aspect ratio, appearance, and switching during playback.
@@ -82,7 +88,10 @@ Updated 2026-10-08. This list reflects the discussion after completing the nativ
 
 ## Suggested order
 
-The accessibility/design audit is nearing completion, contextual onboarding is implemented, and the teaching graph pilot is in place. Performance profiling is deferred. Prototype image chunks before committing to broad visualizer changes. Treat live recording as an independent sharing feature.
+The accessibility/design audit is nearing completion, contextual onboarding and the teaching graph
+are implemented, and Custom Image is available. Performance profiling remains deferred. Manual
+capture and image-picker verification on signed devices are the main platform checks left from this
+list.
 
 ## References
 

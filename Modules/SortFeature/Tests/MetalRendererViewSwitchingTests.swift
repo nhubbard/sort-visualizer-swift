@@ -88,4 +88,32 @@ struct MetalRendererViewSwitchingTests {
     let (_, renderer) = coordinator.debugState()
     #expect(renderer as? MetalBarRenderer === initialRenderer)
   }
+
+  @MainActor
+  @Test
+  func replacingTheImageRebuildsTheActiveMosaicRenderer() throws {
+    let tape = Tape(
+      header: TapeHeader(
+        algorithmID: "test", initialValues: [1, 2, 3, 4], visualSeed: 0,
+        compareCount: 0, swapCount: 0, recordingDuration: 0, recordedAt: Date()),
+      operations: [])
+    let replay = ReplayEngine(tape: tape)
+    let device = try #require(MTLCreateSystemDefaultDevice())
+    let view = MTKView(frame: CGRect(x: 0, y: 0, width: 200, height: 200), device: device)
+    view.sampleCount = 1
+    let id = VisualizerID(rawValue: "customimage")
+    let initialRenderer = try #require(MetalImageTileRenderer(device: device))
+    let coordinator = MetalRendererView.Coordinator()
+    coordinator.setUp(replay: replay, renderer: initialRenderer, view: view,
+                      visualizerID: id, imageRevision: 1)
+    view.delegate = initialRenderer
+
+    coordinator.switchVisualizerIfNeeded(to: id, imageRevision: 1, view: view)
+    #expect(coordinator.debugState().renderer as? MetalImageTileRenderer === initialRenderer)
+
+    coordinator.switchVisualizerIfNeeded(to: id, imageRevision: 2, view: view)
+    let updated = try #require(coordinator.debugState().renderer as? MetalImageTileRenderer)
+    #expect(updated !== initialRenderer)
+    #expect(updated.debugSourceSlots().count == 4)
+  }
 }

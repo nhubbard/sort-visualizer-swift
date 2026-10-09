@@ -426,7 +426,9 @@ private struct AccessibleSortCanvas: View {
   let status: String
 
   var body: some View {
-    MetalRendererView(replay: replay, visualizerID: visualizerID)
+    MetalRendererView(replay: replay, visualizerID: visualizerID,
+                      imageRevision: visualizerID.rawValue == "customimage"
+                        ? CustomImageStore.shared.revision : 0)
       .id(ObjectIdentifier(replay))
       .accessibilityIdentifier("sortVisualizationCanvas")
       .accessibilityLabel(accessibilityLabel)

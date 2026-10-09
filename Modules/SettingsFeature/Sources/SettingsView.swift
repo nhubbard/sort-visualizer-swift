@@ -49,6 +49,9 @@ public struct SettingsView: View {
         .pickerStyle(.menu)
         .accessibilityIdentifier("shufflePicker")
       }
+      if settings.selectedVisualizerID.rawValue == "customimage" {
+        customImageSection
+      }
       Section {
         Picker("Pacing Mode", selection: $settings.useFixedDurationPacing) {
           Text("Fixed Rate").tag(false)
@@ -132,15 +135,7 @@ public struct SettingsView: View {
           )
         }
       }
-      Section("Array Size") {
-        Stepper(
-          "Default Size: \(settings.defaultArraySize)",
-          value: $settings.defaultArraySize,
-          in: 16...256,
-          step: 16
-        )
-        .accessibilityIdentifier("defaultArraySizeStepper")
-      }
+      arraySizeSection
       Section {
         Stepper(
           "Max Operations: \(settings.recordingOperationCap)",
@@ -203,6 +198,29 @@ public struct SettingsView: View {
         settings.resetToDefaults()
       }
       .accessibilityIdentifier("resetSettingsConfirmButton")
+    }
+  }
+
+  private var customImageSection: some View {
+    return Section {
+      CustomImagePickerControls()
+    } header: {
+      Text("Custom Image")
+    } footer: {
+      Text("The number of moving image tiles follows the array size.")
+    }
+  }
+
+  private var arraySizeSection: some View {
+    @Bindable var settings = settings
+    return Section("Array Size") {
+      Stepper(
+        "Default Size: \(settings.defaultArraySize)",
+        value: $settings.defaultArraySize,
+        in: 16...256,
+        step: 16
+      )
+      .accessibilityIdentifier("defaultArraySizeStepper")
     }
   }
 

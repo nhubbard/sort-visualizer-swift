@@ -15,6 +15,8 @@ public struct VisualizationContext: Sendable {
   public let canvasSize: CGSize
   /// `TapeHeader.visualSeed`, for deterministic per-run color choices.
   public let colorSeed: UInt64
+  /// Optional source-image aspect ratio for image-based visualizers.
+  public let imageAspectRatio: Double?
 
   public init(
     values: [Int],
@@ -22,7 +24,8 @@ public struct VisualizationContext: Sendable {
     markers: [Int: Set<Int>],
     auxArrays: [Int: [Int]],
     canvasSize: CGSize,
-    colorSeed: UInt64
+    colorSeed: UInt64,
+    imageAspectRatio: Double? = nil
   ) {
     self.values = values
     self.valueRange = valueRange
@@ -30,5 +33,6 @@ public struct VisualizationContext: Sendable {
     self.auxArrays = auxArrays
     self.canvasSize = canvasSize
     self.colorSeed = colorSeed
+    self.imageAspectRatio = imageAspectRatio
   }
 }

@@ -98,9 +98,7 @@ Notes on specific shuffles:
 
 ## Visualizers
 
-This app ships 15 visualizers. 14 are direct ports of ArrayV styles. The 15th,
-`HanoiTowersVisualizer`, is this project's own addition: a dramatized, index-based layout inspired
-by the idea of Hanoi towers, not a literal port of any specific ArrayV visualizer (see
-[Content layer](../architecture/content.md#the-one-style-that-hasnt-been-built)). ArrayV's own
-CustomImage style — a user-supplied image remapped per array permutation — is the one ArrayV style
-with no counterpart here. See [History](../architecture/history.md#whats-still-open).
+This app ships 16 visualizers. Fourteen are direct ports of ArrayV styles. `HanoiTowersVisualizer`
+is this project's index-based tower layout. `CustomImageVisualizer` is an image mosaic inspired by
+ArrayV's CustomImage style, with a local image picker, a built-in sample, and a dedicated Metal
+texture renderer. See [Content layer](../architecture/content.md#custom-image).

@@ -8,4 +8,6 @@ public enum DrawCommand: Sendable, Codable, Equatable {
   case line(x1: Double, y1: Double, x2: Double, y2: Double, color: RGBAColor, lineWidth: Double)
   case polygon(points: [SIMD2<Double>], color: RGBAColor)
   case text(x: Double, y: Double, string: String, color: RGBAColor)
+  /// A source image fragment in a destination cell. The image itself belongs to the renderer.
+  case imageTile(x: Double, y: Double, width: Double, height: Double, sourceSlot: Int, marker: Int)
 }

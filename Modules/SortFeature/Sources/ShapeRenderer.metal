@@ -2,6 +2,76 @@
 #include "AnimatedField.h"
 using namespace metal;
 
+struct ImageTileInstance {
+    uint sourceSlot;
+    uint marker;
+};
+
+struct ImageTileUniforms {
+    float2 viewportSize;
+    float2 contentOrigin;
+    float2 contentSize;
+    uint columns;
+    uint rows;
+    float edgeFraction;
+};
+
+struct RasterizedImageTile {
+    float4 position [[position]];
+    float2 sourceUV;
+    float2 sourceMin;
+    float2 sourceMax;
+    float2 localUV;
+    uint marker;
+    float edgeFraction;
+};
+
+vertex RasterizedImageTile image_tile_vertex(
+    uint vertexID [[vertex_id]], uint instanceID [[instance_id]],
+    constant ImageTileInstance *instances [[buffer(0)]],
+    constant ImageTileUniforms &uniforms [[buffer(1)]]
+) {
+    float2 corner = float2(float(vertexID & 1), float(vertexID >> 1));
+    float2 gridSize = float2(float(uniforms.columns), float(uniforms.rows));
+    float2 destinationCell = float2(float(instanceID % uniforms.columns),
+                                    float(instanceID / uniforms.columns));
+    float2 pixel = uniforms.contentOrigin
+        + (destinationCell + corner) * (uniforms.contentSize / gridSize);
+    float2 ndc = float2(pixel.x / uniforms.viewportSize.x * 2.0 - 1.0,
+                        1.0 - pixel.y / uniforms.viewportSize.y * 2.0);
+    uint sourceSlot = instances[instanceID].sourceSlot;
+    float2 sourceCell = float2(float(sourceSlot % uniforms.columns),
+                               float(sourceSlot / uniforms.columns));
+    RasterizedImageTile out;
+    out.position = float4(ndc, 0, 1);
+    out.sourceMin = sourceCell / gridSize;
+    out.sourceMax = (sourceCell + 1.0) / gridSize;
+    out.sourceUV = (sourceCell + corner) / gridSize;
+    out.localUV = corner;
+    out.marker = instances[instanceID].marker;
+    out.edgeFraction = uniforms.edgeFraction;
+    return out;
+}
+
+fragment float4 image_tile_fragment(
+    RasterizedImageTile in [[stage_in]], texture2d<float> image [[texture(0)]]
+) {
+    constexpr sampler linearSampler(filter::linear, address::clamp_to_edge);
+    float2 halfTexel = 0.5 / float2(float(image.get_width()), float(image.get_height()));
+    float2 margin = min(halfTexel, (in.sourceMax - in.sourceMin) * 0.5);
+    float2 uv = clamp(in.sourceUV, in.sourceMin + margin,
+                      in.sourceMax - margin);
+    float4 sampled = image.sample(linearSampler, uv);
+    float distanceToEdge = min(min(in.localUV.x, 1.0 - in.localUV.x),
+                               min(in.localUV.y, 1.0 - in.localUV.y));
+    if (in.marker != 0 && distanceToEdge < in.edgeFraction) {
+        float3 outline = in.marker == 1 ? float3(0.95, 0.38, 0.38)
+                                       : float3(0.38, 0.58, 0.95);
+        sampled.rgb = mix(sampled.rgb, outline, 0.88);
+    }
+    return sampled;
+}
+
 /// One shape's raw underlying VALUE + color, each animated field an unresolved
 /// `(from, to, startTime)` triple — layout must match `MetalShapeGPUInstance` exactly. Reused for
 /// both `.rect` and `.ellipse` `MetalShapeLayout`s: `resolveShapeGeometry` computes the correct

@@ -180,19 +180,31 @@ struct RunControlBar: View {
   /// `⌘⇧V`/`AppSettings.cycleVisualizer()` already changes, not a second mechanism.
   private var visualizerRow: some View {
     @Bindable var settings = settings
-    return HStack(spacing: 8) {
-      Text("Visualizer")
-        .font(.caption)
-        .foregroundStyle(.secondary)
-      Picker("Visualizer", selection: $settings.selectedVisualizerID) {
-        ForEach(VisualizerRegistry.shared.visualizers, id: \.id) { visualizer in
-          Text(visualizer.metadata.displayName).tag(visualizer.id)
+    return GeometryReader { geometry in
+      ScrollView(.horizontal, showsIndicators: false) {
+        HStack(spacing: 12) {
+          Text("Visualizer")
+            .font(.caption)
+            .foregroundStyle(.secondary)
+            .accessibilityIdentifier("runControlVisualizerLabel")
+          Picker("Visualizer", selection: $settings.selectedVisualizerID) {
+            ForEach(VisualizerRegistry.shared.visualizers, id: \.id) { visualizer in
+              Text(visualizer.metadata.displayName).tag(visualizer.id)
+            }
+          }
+          .pickerStyle(.menu)
+          .labelsHidden()
+          .accessibilityIdentifier("runControlVisualizerPicker")
+          if settings.selectedVisualizerID.rawValue == "customimage" {
+            CustomImagePickerControls(presentation: .inline)
+          }
         }
+        .fixedSize(horizontal: true, vertical: false)
+        .frame(minWidth: geometry.size.width, alignment: .center)
       }
-      .pickerStyle(.menu)
-      .labelsHidden()
-      .accessibilityIdentifier("runControlVisualizerPicker")
+      .accessibilityIdentifier("runControlVisualizerRowScroll")
     }
+    .frame(height: 44)
   }
 
 }
