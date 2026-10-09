@@ -58,6 +58,11 @@ public struct LazierestSort: SortAlgorithm {
         index -= 1
       }
       engine.setValue(destination, value)
+      engine.annotateLastOperation(
+        stageID: "lazierest.insert", decisionID: "lazierest.insert",
+        outcome: "placed", roles: ["source": .arrayIndex(source), "destination": .arrayIndex(destination)],
+        explanationKey: "lazierest.insert",
+        explanation: "Lazierest places the held item at the boundary found for this run.")
     }
 
     func leftBinSearch(_ aIn: Int, _ bIn: Int, _ value: Int) -> Int {

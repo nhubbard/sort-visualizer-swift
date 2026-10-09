@@ -41,8 +41,9 @@ public struct PancakeInsertionSort: SortAlgorithm {
     let n = engine.count
     guard n >= 2 else { return }
 
-    func flip(_ i: Int) {
-      engine.reversal(0, i)
+    func flip(_ i: Int, reason: String = "Flip the prefix to place the current value.") {
+      engine.teachingReversal(0, i,
+        stageID: "PancakeInsertionSort.prefixFlip", explanation: reason)
     }
 
     // Monobound binary search for where `engine.values[valueIndex]` inserts into the ascending
@@ -71,7 +72,12 @@ public struct PancakeInsertionSort: SortAlgorithm {
       var top = end - start
       while top > 1 {
         let mid = top / 2
-        if engine.compare(start + mid, valueIndex, by: (>)) { start += mid }
+        if engine.teachingCompare(
+          start + mid, valueIndex, by: (>),
+          stageID: "PancakeInsertionSort.descending.bound",
+          whenTrue: "The prefix item is larger, so the descending insertion point lies farther right.",
+          whenFalse: "The prefix item is no larger, so the descending insertion point stays left."
+        ) { start += mid }
         top -= mid
       }
       if engine.compare(start, valueIndex, by: (>)) { return start + 1 }
@@ -104,9 +110,19 @@ public struct PancakeInsertionSort: SortAlgorithm {
     var i = 3
     while i < n {
       if dir {
-        if engine.compare(i - 1, i, by: (<=)) {
+        if engine.teachingCompare(
+          i - 1, i, by: (<=),
+          stageID: "PancakeInsertionSort.ascending.extend",
+          whenTrue: "The new value follows the ascending prefix, so no flip is needed.",
+          whenFalse: "The new value precedes the prefix end, so it needs insertion."
+        ) {
           // Already in place; the ascending prefix already ends <= the new element.
-        } else if engine.compare(0, i, by: (>)) {
+        } else if engine.teachingCompare(
+          0, i, by: (>),
+          stageID: "PancakeInsertionSort.ascending.front",
+          whenTrue: "The new value belongs before the prefix, so flip the previous prefix.",
+          whenFalse: "The new value belongs inside the prefix, so search for its place."
+        ) {
           flip(i - 1)
           dir.toggle()
         } else {
@@ -118,9 +134,19 @@ public struct PancakeInsertionSort: SortAlgorithm {
           dir.toggle()
         }
       } else {
-        if engine.compare(i - 1, i, by: (>)) {
+        if engine.teachingCompare(
+          i - 1, i, by: (>),
+          stageID: "PancakeInsertionSort.descending.extend",
+          whenTrue: "The new value follows the descending prefix, so no flip is needed.",
+          whenFalse: "The new value interrupts the descending prefix and needs insertion."
+        ) {
           // Already in place; the descending prefix already ends >= the new element.
-        } else if engine.compare(0, i, by: (<=)) {
+        } else if engine.teachingCompare(
+          0, i, by: (<=),
+          stageID: "PancakeInsertionSort.descending.front",
+          whenTrue: "The new value belongs before the descending prefix, so flip it.",
+          whenFalse: "The new value belongs inside the descending prefix, so search for its place."
+        ) {
           flip(i - 1)
           dir.toggle()
         } else {
@@ -136,7 +162,7 @@ public struct PancakeInsertionSort: SortAlgorithm {
     }
 
     if !dir {
-      flip(n - 1)
+      flip(n - 1, reason: "The prefix is descending, so reverse it to finish in ascending order.")
     }
   }
 }

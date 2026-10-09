@@ -99,7 +99,12 @@ public struct TournamentSort: SortAlgorithm {
         return getLosers(root)
       }
       setWinners(root, rebuild(getWinners(root)))
-      if engine.compare(getPlayer(getLosers(root)), getPlayer(getWinners(root)), by: <) {
+      if engine.teachingCompare(
+        getPlayer(getLosers(root)), getPlayer(getWinners(root)), by: <,
+        stageID: "TournamentSort.rebuildMatch",
+        whenTrue: "The returning loser is smaller, so it wins this rebuilt match.",
+        whenFalse: "The surviving winner stays smaller in the rebuilt match."
+      ) {
         setWinner(root, getPlayer(getLosers(root)))
         let previousLosers = getLosers(root)
         setLosers(root, getWinners(root))
@@ -123,10 +128,25 @@ public struct TournamentSort: SortAlgorithm {
     for i in 0..<n {
       output[i] = pop()
       engine.writeAux(outHandle, at: i, value: output[i])
+      if engine.shouldAnnotateCurrentOperation {
+        engine.annotateLastOperation(
+          stageID: "TournamentSort.recordWinner", outcome: "saved",
+          roles: ["buffer": .auxiliaryIndex(handle: outHandle.rawValue, index: i),
+            "winner": .value(output[i])],
+          explanationKey: "TournamentSort.recordWinner",
+          explanation: "Save the tournament winner as the next value in sorted output.")
+      }
     }
 
     for i in 0..<n {
       engine.setValue(i, output[i])
+      if engine.shouldAnnotateCurrentOperation {
+        engine.annotateLastOperation(
+          stageID: "TournamentSort.restoreOutput", outcome: "placed",
+          roles: ["output": .arrayIndex(i), "winner": .value(output[i])],
+          explanationKey: "TournamentSort.restoreOutput",
+          explanation: "Place this tournament winner in its final sorted array position.")
+      }
     }
     engine.deleteAuxArray(matchesHandle)
     engine.deleteAuxArray(outHandle)

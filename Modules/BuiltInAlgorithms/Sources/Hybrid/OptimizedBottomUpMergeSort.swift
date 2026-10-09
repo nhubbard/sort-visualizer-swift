@@ -69,7 +69,16 @@ public struct OptimizedBottomUpMergeSort: SortAlgorithm {
         var hi = i
         while lo < hi {
           let mid = lo + (hi - lo) / 2
-          if num < engine.readValue(at: mid) {
+          let insertBefore = num < engine.readValue(at: mid)
+          engine.annotateLastOperation(
+            stageID: "optimizedBottomUp.binaryInsert", decisionID: "optimizedBottomUp.binaryInsert",
+            outcome: insertBefore ? "left" : "right",
+            roles: ["candidate": .arrayIndex(mid), "heldValue": .value(num)],
+            explanationKey: "optimizedBottomUp.binaryInsert",
+            explanation: insertBefore
+              ? "The held item is smaller, so insertion searches the left half of this run."
+              : "The held item is at least this value, so insertion searches the right half.")
+          if insertBefore {
             hi = mid
           } else {
             lo = mid + 1
@@ -78,6 +87,11 @@ public struct OptimizedBottomUpMergeSort: SortAlgorithm {
         var j = i - 1
         while j >= lo {
           engine.setValue(j + 1, engine.readValue(at: j))
+          engine.annotateLastOperation(
+            stageID: "optimizedBottomUp.shift", decisionID: "optimizedBottomUp.shift",
+            outcome: "shift", roles: ["source": .arrayIndex(j), "destination": .arrayIndex(j + 1)],
+            explanationKey: "optimizedBottomUp.shift",
+            explanation: "This value shifts right to make room at the binary insertion point.")
           j -= 1
         }
         engine.setValue(lo, num)

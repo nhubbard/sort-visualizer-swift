@@ -34,7 +34,17 @@ public struct LSDRadixSort: SortAlgorithm {
 
     var maxValue = 0
     for i in 0..<n {
-      maxValue = max(maxValue, engine.readValue(at: i))
+      let candidate = engine.readValue(at: i)
+      let newMaximum = candidate > maxValue
+      engine.annotateLastOperation(
+        stageID: "digitRange", decisionID: "lsdradixsort.maximum",
+        outcome: newMaximum ? "extendRange" : "keepRange",
+        roles: ["candidate": .arrayIndex(i), "maximum": .value(maxValue)],
+        explanationKey: "lsdradixsort.maximum",
+        explanation: newMaximum
+          ? "This value adds a higher digit place, so extend the radix pass range."
+          : "This value fits within the digit places already required.")
+      maxValue = max(maxValue, candidate)
     }
     var highestPlace = 1
     while Int(pow(Double(radix), Double(highestPlace))) <= maxValue {
@@ -53,6 +63,11 @@ public struct LSDRadixSort: SortAlgorithm {
       var counts = [Int](repeating: 0, count: radix)
       for i in 0..<n {
         values[i] = engine.readValue(at: i)
+        engine.annotateLastOperation(
+          stageID: "digitScan", decisionID: "lsdradixsort.readDigit",
+          outcome: "classify", roles: ["source": .arrayIndex(i)],
+          explanationKey: "lsdradixsort.readDigit",
+          explanation: "Read digit place \(place + 1) from the right to count this value’s bucket.")
       }
       for i in 0..<n {
         counts[getDigit(values[i], place)] += 1
@@ -65,6 +80,12 @@ public struct LSDRadixSort: SortAlgorithm {
         counts[digit] -= 1
         output[counts[digit]] = values[i]
         engine.writeAux(outputHandle, at: counts[digit], value: values[i])
+        engine.annotateLastOperation(
+          stageID: "scratchUpdate", decisionID: "lsdradixsort.scratchUpdate",
+          outcome: "update",
+          roles: ["scratch": .auxiliaryIndex(handle: outputHandle.rawValue, index: counts[digit])],
+          explanationKey: "lsdradixsort.scratchUpdate",
+          explanation: "The current digit and cumulative count reserve this scratch output position.")
       }
       for i in 0..<n {
         engine.setValue(i, output[i])

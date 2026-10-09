@@ -82,12 +82,23 @@ public struct SimplifiedLibrarySort: SortAlgorithm {
     // `engine.values[i]` for an `i` *outside* `[a, b)` (a not-yet-classified batch element), so
     // it's a held value compared against a live spine index — `engine.compareValue`, the same
     // pattern `IntroSort`'s cached pivot uses, not `engine.compare`'s two-live-index shape.
-    func gapSearch(_ a: Int, _ b: Int, _ val: Int) -> Int {
+    func gapSearch(_ a: Int, _ b: Int, _ val: Int, sourceIndex: Int) -> Int {
       var lo = a
       var hi = b
       while lo < hi {
         let mid = lo + (hi - lo) / 2
-        if engine.compareValue(mid, against: val, by: (>)) {
+        // Large runs repeat this binary decision for every classified item. Keep the full
+        // comparison tape while showing representative decisions across the batch.
+        let searchEarlier: Bool
+        if n < 128 || sourceIndex.isMultiple(of: 4) {
+          searchEarlier = engine.teachingCompareValue(
+            mid, against: val, by: >, stageID: "SimplifiedLibrarySort.chooseGap",
+            whenTrue: "The spine value is larger, so search an earlier library gap.",
+            whenFalse: "The new value belongs after this spine value.")
+        } else {
+          searchEarlier = engine.compareValue(mid, against: val, by: >)
+        }
+        if searchEarlier {
           hi = mid
         } else {
           lo = mid + 1
@@ -153,6 +164,14 @@ public struct SimplifiedLibrarySort: SortAlgorithm {
         let value = engine.readValue(at: i)
         tempShadow[pos] = value
         engine.writeAux(tempHandle, at: pos, value: value)
+        if engine.shouldAnnotateCurrentOperation {
+          engine.annotateLastOperation(
+            stageID: "SimplifiedLibrarySort.placeBatchInGap", outcome: "buffered",
+            roles: ["source": .arrayIndex(i),
+              "gap": .auxiliaryIndex(handle: tempHandle.rawValue, index: pos)],
+            explanationKey: "SimplifiedLibrarySort.placeBatchInGap",
+            explanation: "Place this classified batch value in its assigned library gap.")
+        }
         cntsShadow[loc] = pos + 1
         engine.writeAux(cntsHandle, at: loc, value: pos + 1)
         k += 1
@@ -165,6 +184,14 @@ public struct SimplifiedLibrarySort: SortAlgorithm {
         let value = engine.readValue(at: i)
         tempShadow[pos] = value
         engine.writeAux(tempHandle, at: pos, value: value)
+        if engine.shouldAnnotateCurrentOperation {
+          engine.annotateLastOperation(
+            stageID: "SimplifiedLibrarySort.placeSpine", outcome: "buffered",
+            roles: ["source": .arrayIndex(i),
+              "spine": .auxiliaryIndex(handle: tempHandle.rawValue, index: pos)],
+            explanationKey: "SimplifiedLibrarySort.placeSpine",
+            explanation: "Place this sorted spine value after the batch values in its gap.")
+        }
         cntsShadow[i] = pos + 1
         engine.writeAux(cntsHandle, at: i, value: pos + 1)
       }
@@ -173,6 +200,13 @@ public struct SimplifiedLibrarySort: SortAlgorithm {
       // `Writes.arraycopy(temp, 0, array, 0, b, ...)`.
       for i in 0..<b {
         engine.setValue(i, tempShadow[i])
+        if engine.shouldAnnotateCurrentOperation {
+          engine.annotateLastOperation(
+            stageID: "SimplifiedLibrarySort.rebuildArray", outcome: "placed",
+            roles: ["output": .arrayIndex(i), "value": .value(tempShadow[i])],
+            explanationKey: "SimplifiedLibrarySort.rebuildArray",
+            explanation: "Copy the rebalanced library layout into the live array.")
+        }
       }
 
       // Locally sort each gap's run of batch elements. `cntsShadow[g]` (post-placement) now
@@ -204,7 +238,7 @@ public struct SimplifiedLibrarySort: SortAlgorithm {
 
       // Classify which of the `spineSize + 1` gaps `engine.values[i]` belongs in, and tally
       // it for the upcoming rebalance.
-      let loc = gapSearch(0, spineSize, engine.readValue(at: i))
+      let loc = gapSearch(0, spineSize, engine.readValue(at: i), sourceIndex: i)
       let updatedCount = cntsShadow[loc + 1] + 1
       cntsShadow[loc + 1] = updatedCount
       engine.writeAux(cntsHandle, at: loc + 1, value: updatedCount)

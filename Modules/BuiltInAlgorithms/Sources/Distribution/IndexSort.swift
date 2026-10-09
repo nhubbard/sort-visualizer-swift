@@ -35,8 +35,18 @@ public struct IndexSort: SortAlgorithm {
     guard n > 1 else { return }
 
     var minValue = engine.readValue(at: 0)
-    for i in 1..<n where engine.readValue(at: i) < minValue {
-      minValue = engine.readValue(at: i)
+    for i in 1..<n {
+      let candidate = engine.readValue(at: i)
+      let newMinimum = candidate < minValue
+      engine.annotateLastOperation(
+        stageID: "minimumScan", decisionID: "indexsort.minimumScan",
+        outcome: newMinimum ? "updateMinimum" : "keepMinimum",
+        roles: ["candidate": .arrayIndex(i), "minimum": .value(minValue)],
+        explanationKey: "indexsort.minimumScan",
+        explanation: newMinimum
+          ? "This value is lower than the current minimum, so use it as the index offset."
+          : "The current minimum remains the offset for index placement.")
+      if newMinimum { minValue = engine.readValue(at: i) }
     }
 
     for i in 0..<n {

@@ -33,8 +33,6 @@ public struct AlgorithmDetailSection: View {
   /// `content`/theme change in `highlightAllSamples`, off the main actor, instead.
   @State private var highlighted: [CodeLanguage: AttributedString] = [:]
   @State private var plainSamples: [CodeLanguage: String] = [:]
-  @State private var isFullCodeVisible = true
-  @State private var isSelectableCodePresented = false
   #if DEBUG
   @State private var appliedThemeID: CodeThemeID?
   #endif
@@ -103,7 +101,6 @@ public struct AlgorithmDetailSection: View {
             .onChange(of: selectedLanguage) {
               CodeDiscoveryTip.hasExploredCode = true
               CodeDiscoveryTip().invalidate(reason: .actionPerformed)
-              isSelectableCodePresented = false
             }
 
             if let plain = plainSamples[selectedLanguage] {
@@ -111,41 +108,18 @@ public struct AlgorithmDetailSection: View {
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
                 .accessibilityIdentifier("algorithmCodeSummary")
-              HStack {
-                Button {
-                  UIPasteboard.general.string = plain
-                  CodeDiscoveryTip.hasExploredCode = true
-                  CodeDiscoveryTip().invalidate(reason: .actionPerformed)
-                } label: {
-                  Label("Copy Code", systemImage: "doc.on.doc")
-                }
-                .accessibilityIdentifier("copyAlgorithmCode")
-                Button(isFullCodeVisible ? "Hide Full Code" : "Read Full Code") {
-                  isFullCodeVisible.toggle()
-                  CodeDiscoveryTip.hasExploredCode = true
-                  CodeDiscoveryTip().invalidate(reason: .actionPerformed)
-                }
-                .accessibilityIdentifier("toggleFullAlgorithmCode")
-                if isFullCodeVisible {
-                  Button("Select Text") { isSelectableCodePresented = true }
-                    .accessibilityIdentifier("selectAlgorithmCodeText")
-                }
+              Button {
+                UIPasteboard.general.string = plain
+                CodeDiscoveryTip.hasExploredCode = true
+                CodeDiscoveryTip().invalidate(reason: .actionPerformed)
+              } label: {
+                Label("Copy Code", systemImage: "doc.on.doc")
               }
+              .accessibilityIdentifier("copyAlgorithmCode")
               .frame(maxWidth: .infinity)
-              .sheet(isPresented: $isSelectableCodePresented) {
-                NavigationStack {
-                  SelectableCodeTextView(source: plain)
-                    .navigationTitle(Text("\(selectedLanguage.title) source"))
-                    .toolbar {
-                      ToolbarItem(placement: .cancellationAction) {
-                        Button("Done") { isSelectableCodePresented = false }
-                      }
-                    }
-                }
-              }
             }
 
-            if isFullCodeVisible && content.codeSamples.contains(where: { $0.language == selectedLanguage }) {
+            if content.codeSamples.contains(where: { $0.language == selectedLanguage }) {
               // AttributedCodeView sizes to its own intrinsic width (`.fixedSize`), so
               // left inside this leading-aligned VStack it hugs the left edge instead of
               // sitting under the wider Description/Complexity content above it.
@@ -176,8 +150,6 @@ public struct AlgorithmDetailSection: View {
       contentUnavailable = false
       highlighted = [:]
       plainSamples = [:]
-      isFullCodeVisible = true
-      isSelectableCodePresented = false
       #if DEBUG
         appliedThemeID = nil
       #endif
@@ -316,7 +288,7 @@ struct CodeDiscoveryTip: Tip {
 
   var title: Text { Text("Explore the implementation") }
   var message: Text? {
-    Text("Choose a language, then read or copy the reference code below the explanation.")
+    Text("Choose a language to read its reference code, or copy the full sample with Copy Code.")
   }
   var rules: [Rule] {
     #Rule(Self.$hasExploredCode) { $0 == false }
@@ -324,33 +296,6 @@ struct CodeDiscoveryTip: Tip {
   var options: [any Option] {
     MaxDisplayCount(2)
     IgnoresDisplayFrequency(true)
-  }
-}
-
-/// A deliberate plain-text route for keyboard and VoiceOver selection. The highlighted SwiftUI
-/// `Text` remains the reading view; `UITextView` exposes a native selected-text range when a
-/// reader wants to copy only part of a sample.
-private struct SelectableCodeTextView: UIViewRepresentable {
-  let source: String
-
-  func makeUIView(context: Context) -> UITextView {
-    let view = UITextView()
-    view.isEditable = false
-    view.isSelectable = true
-    view.isScrollEnabled = true
-    view.backgroundColor = .clear
-    view.textContainerInset = UIEdgeInsets(top: 20, left: 20, bottom: 20, right: 20)
-    view.textContainer.lineFragmentPadding = 0
-    view.adjustsFontForContentSizeCategory = true
-    view.accessibilityIdentifier = "selectableAlgorithmCodeText"
-    return view
-  }
-
-  func updateUIView(_ view: UITextView, context: Context) {
-    if view.text != source { view.text = source }
-    let font = UIFont.monospacedSystemFont(ofSize: 16, weight: .regular)
-    view.font = UIFontMetrics(forTextStyle: .body).scaledFont(for: font)
-    view.textColor = .label
   }
 }
 

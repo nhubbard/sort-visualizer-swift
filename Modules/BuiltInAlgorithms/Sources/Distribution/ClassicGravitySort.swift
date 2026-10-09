@@ -39,8 +39,18 @@ public struct ClassicGravitySort: SortAlgorithm {
     guard n > 1 else { return }
 
     var maxValue = engine.readValue(at: 0)
-    for i in 1..<n where engine.readValue(at: i) > maxValue {
-      maxValue = engine.readValue(at: i)
+    for i in 1..<n {
+      let candidate = engine.readValue(at: i)
+      let newMaximum = candidate > maxValue
+      engine.annotateLastOperation(
+        stageID: "heightScan", decisionID: "classicgravitysort.maximumHeight",
+        outcome: newMaximum ? "extendHeight" : "keepHeight",
+        roles: ["column": .arrayIndex(i), "height": .value(maxValue)],
+        explanationKey: "classicgravitysort.maximumHeight",
+        explanation: newMaximum
+          ? "This column is taller, so include its height in the bead transpose."
+          : "This column fits within the bead height already found.")
+      if newMaximum { maxValue = engine.readValue(at: i) }
     }
 
     let transposeHandle = engine.createAuxArray(length: maxValue)
@@ -51,6 +61,12 @@ public struct ClassicGravitySort: SortAlgorithm {
       for j in 0..<value {
         transpose[j] += 1
         engine.writeAux(transposeHandle, at: j, value: transpose[j])
+        engine.annotateLastOperation(
+          stageID: "scratchUpdate", decisionID: "classicgravitysort.scratchUpdate",
+          outcome: "update",
+          roles: ["scratch": .auxiliaryIndex(handle: transposeHandle.rawValue, index: j)],
+          explanationKey: "classicgravitysort.scratchUpdate",
+          explanation: "Update the transposed bead column before reconstructing the sorted heights.")
       }
     }
 
@@ -75,6 +91,12 @@ public struct ClassicGravitySort: SortAlgorithm {
       for j in 0..<maxValue {
         transpose[j] -= 1
         engine.writeAux(transposeHandle, at: j, value: transpose[j])
+        engine.annotateLastOperation(
+          stageID: "scratchUpdate", decisionID: "classicgravitysort.scratchUpdate",
+          outcome: "update",
+          roles: ["scratch": .auxiliaryIndex(handle: transposeHandle.rawValue, index: j)],
+          explanationKey: "classicgravitysort.scratchUpdate",
+          explanation: "Update the transposed bead column before reconstructing the sorted heights.")
       }
     }
 

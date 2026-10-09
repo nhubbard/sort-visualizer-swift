@@ -69,7 +69,11 @@ public struct BinomialHeapSort: SortAlgorithm {
       var depth = 1
       while focus != 0 {
         if (focus & depth) != 0 {
-          if engine.compare(focus - 1, maxNode - 1, by: (>)) {
+          if engine.teachingCompare(
+            focus - 1, maxNode - 1, by: >, stageID: "BinomialHeapSort.extractMaximum",
+            whenTrue: "This heap root is larger, so select it for the next extraction.",
+            whenFalse: "The current root remains the maximum extraction candidate."
+          ) {
             maxNode = focus
           }
           focus -= depth
@@ -84,7 +88,12 @@ public struct BinomialHeapSort: SortAlgorithm {
           focus = maxNode
           var innerDepth = 1
           while (focus & innerDepth) == 0 {
-            if engine.compare(focus - innerDepth - 1, maxNode - 1, by: (>)) {
+            if engine.teachingCompare(
+              focus - innerDepth - 1, maxNode - 1, by: >,
+              stageID: "BinomialHeapSort.restoreAfterExtraction",
+              whenTrue: "This child is larger, so promote it while restoring the heap.",
+              whenFalse: "The selected node remains the larger restoration candidate."
+            ) {
               maxNode = focus - innerDepth
             }
             innerDepth *= 2

@@ -37,7 +37,11 @@ public struct MaxHeapSort: SortAlgorithm {
         ) {
           largest = left
         }
-        if right < size && !engine.compare(largest, right) {
+        if right < size && !engine.teachingCompare(
+          largest, right, stageID: "MaxHeapSort.rightChild",
+          whenTrue: "The current candidate is at least the right child, so keep it.",
+          whenFalse: "The right child is larger, so promote it as heap maximum."
+        ) {
           largest = right
         }
         if largest == root { break }
@@ -54,6 +58,13 @@ public struct MaxHeapSort: SortAlgorithm {
     var end = n - 1
     while end > 0 {
       engine.swap(0, end)
+      if engine.shouldAnnotateCurrentOperation {
+        engine.annotateLastOperation(
+          stageID: "MaxHeapSort.extractMaximum", outcome: "placed",
+          roles: ["heapRoot": .arrayIndex(0), "sortedEnd": .arrayIndex(end)],
+          explanationKey: "MaxHeapSort.extractMaximum",
+          explanation: "Exchange the heap maximum with the end of the unsorted range.")
+      }
       siftDown(0, end)
       end -= 1
     }

@@ -10,6 +10,11 @@ enum UnstableGrailSortingTemplate {
   private static func multiSwap(_ engine: inout RecordingEngine, _ a: Int, _ b: Int, _ count: Int) {
     for i in 0..<count {
       engine.swap(a + i, b + i)
+      engine.annotateLastOperation(
+        stageID: "unstableGrail.blockExchange", decisionID: "unstableGrail.blockExchange",
+        outcome: "exchange", roles: ["left": .arrayIndex(a + i), "right": .arrayIndex(b + i)],
+        explanationKey: "unstableGrail.blockExchange",
+        explanation: "Unstable Grail exchanges these block positions to rotate or merge the current runs.")
     }
   }
 
@@ -60,13 +65,23 @@ enum UnstableGrailSortingTemplate {
     while left < right - 1 {
       let mid = left + (right - left) / 2
       if isLeft {
-        if engine.compare(pos + mid, keyPos, by: >=) {
+        if engine.teachingCompare(
+          pos + mid, keyPos, by: >=,
+          stageID: "unstableGrail.lowerBound",
+          whenTrue: "This run key is at least the held key, so the lower-bound search narrows left.",
+          whenFalse: "This run key is smaller, so the lower-bound search moves right."
+        ) {
           right = mid
         } else {
           left = mid
         }
       } else {
-        if engine.compare(pos + mid, keyPos, by: >) {
+        if engine.teachingCompare(
+          pos + mid, keyPos, by: >,
+          stageID: "unstableGrail.upperBound",
+          whenTrue: "This run key exceeds the held key, so the upper-bound search narrows left.",
+          whenFalse: "This run key is no greater, so the upper-bound search moves right."
+        ) {
           right = mid
         } else {
           left = mid
@@ -94,7 +109,12 @@ enum UnstableGrailSortingTemplate {
         repeat {
           pos += 1
           len1 -= 1
-        } while len1 != 0 && engine.compare(pos, pos + len1, by: <=)
+        } while len1 != 0 && engine.teachingCompare(
+          pos, pos + len1, by: <=,
+          stageID: "unstableGrail.mergeAdvance",
+          whenTrue: "The left item is no greater, so the in-place merge advances past it.",
+          whenFalse: "The right item is smaller, so the merge must rotate it ahead."
+        )
       }
     } else {
       while len2 != 0 {
@@ -106,7 +126,12 @@ enum UnstableGrailSortingTemplate {
         if len1 == 0 { break }
         repeat {
           len2 -= 1
-        } while len2 != 0 && engine.compare(pos + len1 - 1, pos + len1 + len2 - 1, by: <=)
+        } while len2 != 0 && engine.teachingCompare(
+          pos + len1 - 1, pos + len1 + len2 - 1, by: <=,
+          stageID: "unstableGrail.mergeAdvanceBack",
+          whenTrue: "The left tail is no greater, so the backward merge advances past the right tail.",
+          whenFalse: "The right tail is smaller, so the merge rotates it ahead."
+        )
       }
     }
   }
@@ -121,7 +146,12 @@ enum UnstableGrailSortingTemplate {
     var dist = dist
     let rightEnd = rightLen + leftLen
     while right < rightEnd {
-      if left == leftLen || engine.compare(pos + left, pos + right, by: >) {
+      if left == leftLen || engine.teachingCompare(
+        pos + left, pos + right, by: >,
+        stageID: "unstableGrail.bufferedMergeChoice",
+        whenTrue: "The left run item is larger, so the buffered merge takes the right item.",
+        whenFalse: "The left run item is no greater, so the buffered merge takes it first."
+      ) {
         engine.swap(pos + dist, pos + right)
         dist += 1
         right += 1
@@ -144,7 +174,12 @@ enum UnstableGrailSortingTemplate {
     var right = leftLen + rightLen - 1
     var left = leftLen - 1
     while left >= 0 {
-      if right < leftLen || engine.compare(pos + left, pos + right, by: >) {
+      if right < leftLen || engine.teachingCompare(
+        pos + left, pos + right, by: >,
+        stageID: "unstableGrail.bufferedMergeChoice",
+        whenTrue: "The left run item is larger, so the buffered merge takes the right item.",
+        whenFalse: "The left run item is no greater, so the buffered merge takes it first."
+      ) {
         engine.swap(pos + mergedPos, pos + left)
         mergedPos -= 1
         left -= 1

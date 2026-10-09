@@ -57,6 +57,11 @@ public struct ImprovedInPlaceMergeSort: SortAlgorithm {
         engine.setValue(i - 1, engine.readValue(at: i))
       }
       engine.setValue(b - 1, temp)
+      engine.annotateLastOperation(
+        stageID: "improvedInPlace.rotate", decisionID: "improvedInPlace.rotate",
+        outcome: "placed", roles: ["source": .arrayIndex(p), "destination": .arrayIndex(b - 1)],
+        explanationKey: "improvedInPlace.rotate",
+        explanation: "This rotation places the held item at the end of its merged span.")
     }
 
     func merge(_ a: Int, _ m: Int, _ b: Int) {

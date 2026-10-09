@@ -108,8 +108,16 @@ public struct PoplarHeapSort: SortAlgorithm {
     var childRoot2 = firstIn + (size / 2 - 1)
     while true {
       var maxRoot = root
-      if engine.compare(maxRoot, childRoot1, by: <) { maxRoot = childRoot1 }
-      if engine.compare(maxRoot, childRoot2, by: <) { maxRoot = childRoot2 }
+      if engine.teachingCompare(
+        maxRoot, childRoot1, by: <, stageID: "PoplarHeapSort.firstChild",
+        whenTrue: "The first child is larger, so make it the poplar root candidate.",
+        whenFalse: "The current root remains the larger candidate than the first child."
+      ) { maxRoot = childRoot1 }
+      if engine.teachingCompare(
+        maxRoot, childRoot2, by: <, stageID: "PoplarHeapSort.secondChild",
+        whenTrue: "The second child is larger, so make it the poplar root candidate.",
+        whenFalse: "The current root candidate remains larger than the second child."
+      ) { maxRoot = childRoot2 }
       if maxRoot == root { return }
       engine.swap(root, maxRoot)
       size /= 2
@@ -131,7 +139,11 @@ public struct PoplarHeapSort: SortAlgorithm {
     while true {
       let root = it + poplarSize - 1
       if root == lastRoot { break }
-      if engine.compare(bigger, root, by: <) {
+      if engine.teachingCompare(
+        bigger, root, by: <, stageID: "PoplarHeapSort.selectNextRoot",
+        whenTrue: "This poplar root is larger, so choose it for the next extraction.",
+        whenFalse: "The selected poplar root remains the larger extraction candidate."
+      ) {
         bigger = root
         biggerSize = poplarSize
       }

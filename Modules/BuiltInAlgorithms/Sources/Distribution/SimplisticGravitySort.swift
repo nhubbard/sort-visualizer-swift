@@ -62,6 +62,12 @@ public struct SimplisticGravitySort: SortAlgorithm {
           explanation: "This bead transfer changes the column height toward the sorted arrangement.")
         aux[pointer] += 1
         engine.writeAux(auxHandle, at: pointer, value: aux[pointer])
+        engine.annotateLastOperation(
+          stageID: "scratchUpdate", decisionID: "simplisticgravitysort.scratchUpdate",
+          outcome: "update",
+          roles: ["scratch": .auxiliaryIndex(handle: auxHandle.rawValue, index: pointer)],
+          explanationKey: "simplisticgravitysort.scratchUpdate",
+          explanation: "Update this bead column before rebuilding the output heights.")
         pointer += 1
       }
     }
@@ -77,6 +83,12 @@ public struct SimplisticGravitySort: SortAlgorithm {
           explanation: "This bead transfer changes the column height toward the sorted arrangement.")
         aux[pointer] -= 1
         engine.writeAux(auxHandle, at: pointer, value: aux[pointer])
+        engine.annotateLastOperation(
+          stageID: "scratchUpdate", decisionID: "simplisticgravitysort.scratchUpdate",
+          outcome: "update",
+          roles: ["scratch": .auxiliaryIndex(handle: auxHandle.rawValue, index: pointer)],
+          explanationKey: "simplisticgravitysort.scratchUpdate",
+          explanation: "Update this bead column before rebuilding the output heights.")
         pointer += 1
       }
     }

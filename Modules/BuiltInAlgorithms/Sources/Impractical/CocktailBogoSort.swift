@@ -33,12 +33,34 @@ public struct CocktailBogoSort: SortAlgorithm {
     guard n > 1 else { return }
 
     func isFrontMinimum(_ start: Int, _ end: Int) -> Bool {
-      for i in (start + 1)..<end where engine.compare(start, i, by: (>)) { return false }
+      for i in (start + 1)..<end {
+        let frontIsLarger = engine.compare(start, i, by: (>))
+        engine.annotateLastOperation(
+          stageID: "candidateCheck", decisionID: "cocktailbogosort.frontMinimum",
+          outcome: frontIsLarger ? "reject" : "continue",
+          roles: ["front": .arrayIndex(start), "candidate": .arrayIndex(i)],
+          explanationKey: "cocktailbogosort.frontMinimum",
+          explanation: frontIsLarger
+            ? "A smaller value exists in this window, so the front is not its minimum."
+            : "The front is no larger than this value, so continue checking the window.")
+        if frontIsLarger { return false }
+      }
       return true
     }
 
     func isBackMaximum(_ start: Int, _ end: Int) -> Bool {
-      for i in start..<(end - 1) where engine.compare(i, end - 1, by: (>)) { return false }
+      for i in start..<(end - 1) {
+        let earlierIsLarger = engine.compare(i, end - 1, by: (>))
+        engine.annotateLastOperation(
+          stageID: "candidateCheck", decisionID: "cocktailbogosort.backMaximum",
+          outcome: earlierIsLarger ? "reject" : "continue",
+          roles: ["candidate": .arrayIndex(i), "back": .arrayIndex(end - 1)],
+          explanationKey: "cocktailbogosort.backMaximum",
+          explanation: earlierIsLarger
+            ? "A larger value exists in this window, so the back is not its maximum."
+            : "The back is no smaller than this value, so continue checking the window.")
+        if earlierIsLarger { return false }
+      }
       return true
     }
 
@@ -60,6 +82,12 @@ public struct CocktailBogoSort: SortAlgorithm {
         explanationKey: "cocktailbogosort.candidateExchange",
         explanation: "The next permutation exchanges a pivot and successor within the active range.")
       engine.reversal(i + 1, end - 1)
+      engine.annotateLastOperation(
+        stageID: "candidateWrap", decisionID: "cocktailbogosort.reverseSuffix",
+        outcome: "reverse",
+        roles: ["first": .arrayIndex(i + 1), "last": .arrayIndex(end - 1)],
+        explanationKey: "cocktailbogosort.reverseSuffix",
+        explanation: "Reverse this descending range to advance to the next candidate permutation.")
       return true
     }
 
@@ -77,6 +105,12 @@ public struct CocktailBogoSort: SortAlgorithm {
       }
       if !nextPermutation(minIndex, maxIndex) {
         engine.reversal(minIndex, maxIndex - 1)
+        engine.annotateLastOperation(
+          stageID: "candidateWrap", decisionID: "cocktailbogosort.reverseSuffix",
+          outcome: "reverse",
+          roles: ["first": .arrayIndex(minIndex), "last": .arrayIndex(maxIndex - 1)],
+          explanationKey: "cocktailbogosort.reverseSuffix",
+          explanation: "Reverse this descending range to advance to the next candidate permutation.")
       }
     }
   }

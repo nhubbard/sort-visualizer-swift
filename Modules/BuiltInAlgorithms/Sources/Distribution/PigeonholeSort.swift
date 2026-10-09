@@ -36,8 +36,28 @@ public struct PigeonholeSort: SortAlgorithm {
     var minValue = engine.readValue(at: 0)
     var maxValue = engine.readValue(at: 0)
     for i in 1..<n {
-      if engine.readValue(at: i) < minValue { minValue = engine.readValue(at: i) }
-      if engine.readValue(at: i) > maxValue { maxValue = engine.readValue(at: i) }
+      let minimumCandidate = engine.readValue(at: i)
+      let newMinimum = minimumCandidate < minValue
+      engine.annotateLastOperation(
+        stageID: "rangeScan", decisionID: "pigeonholesort.minimum",
+        outcome: newMinimum ? "updateMinimum" : "keepMinimum",
+        roles: ["candidate": .arrayIndex(i), "minimum": .value(minValue)],
+        explanationKey: "pigeonholesort.minimum",
+        explanation: newMinimum
+          ? "This value extends the pigeonhole range downward."
+          : "The current minimum still bounds the pigeonhole range.")
+      if newMinimum { minValue = engine.readValue(at: i) }
+      let maximumCandidate = engine.readValue(at: i)
+      let newMaximum = maximumCandidate > maxValue
+      engine.annotateLastOperation(
+        stageID: "rangeScan", decisionID: "pigeonholesort.maximum",
+        outcome: newMaximum ? "updateMaximum" : "keepMaximum",
+        roles: ["candidate": .arrayIndex(i), "maximum": .value(maxValue)],
+        explanationKey: "pigeonholesort.maximum",
+        explanation: newMaximum
+          ? "This value extends the pigeonhole range upward."
+          : "The current maximum still bounds the pigeonhole range.")
+      if newMaximum { maxValue = engine.readValue(at: i) }
     }
 
     let mi = minValue
@@ -54,6 +74,12 @@ public struct PigeonholeSort: SortAlgorithm {
       let value = engine.readValue(at: x)
       holes[value - mi] += 1
       engine.writeAux(holesHandle, at: value - mi, value: holes[value - mi])
+      engine.annotateLastOperation(
+        stageID: "scratchUpdate", decisionID: "pigeonholesort.scratchUpdate",
+        outcome: "update",
+        roles: ["scratch": .auxiliaryIndex(handle: holesHandle.rawValue, index: value - mi)],
+        explanationKey: "pigeonholesort.scratchUpdate",
+        explanation: "Update the count for this value’s pigeonhole.")
     }
 
     var j = 0
@@ -61,6 +87,12 @@ public struct PigeonholeSort: SortAlgorithm {
       while holes[count] > 0 {
         holes[count] -= 1
         engine.writeAux(holesHandle, at: count, value: holes[count])
+        engine.annotateLastOperation(
+          stageID: "scratchUpdate", decisionID: "pigeonholesort.scratchUpdate",
+          outcome: "update",
+          roles: ["scratch": .auxiliaryIndex(handle: holesHandle.rawValue, index: count)],
+          explanationKey: "pigeonholesort.scratchUpdate",
+          explanation: "Update the count for this value’s pigeonhole.")
         engine.setValue(j, count + mi)
         engine.annotateLastOperation(
           stageID: "bucketPlacement", decisionID: "pigeonholesort.bucketPlacement",

@@ -61,11 +61,21 @@ public struct BlockInsertionSort: SortAlgorithm {
         whenFalse: "This neighboring pair does not need block insertion."
       ) {
         i += 1
-        while i < b && engine.compare(i - 1, i, by: >) { i += 1 }
-        engine.reversal(a, i - 1)
+        while i < b && engine.teachingCompare(
+          i - 1, i, by: >, stageID: "BlockInsertionSort.descendingRun",
+          whenTrue: "This pair continues the descending run, so include it before reversing.",
+          whenFalse: "The descending run ends here; reverse the run to make it ascending."
+        ) { i += 1 }
+        engine.teachingReversal(
+          a, i - 1, stageID: "BlockInsertionSort.reverseDescendingRun",
+          explanation: "Reverse the descending run to make it an ascending block.")
       } else {
         i += 1
-        while i < b && engine.compare(i - 1, i, by: <=) { i += 1 }
+        while i < b && engine.teachingCompare(
+          i - 1, i, by: <=, stageID: "BlockInsertionSort.ascendingRun",
+          whenTrue: "This pair continues the ascending run, so leave it in place.",
+          whenFalse: "The ascending run ends here; insert the next block."
+        ) { i += 1 }
       }
       return i
     }
@@ -74,7 +84,11 @@ public struct BlockInsertionSort: SortAlgorithm {
     func insert1(_ a: Int, _ l: Int) {
       let tmp = engine.readValue(at: l)
       var l = l - 1
-      while l >= a && engine.compareValue(l, against: tmp, by: (>)) {
+      while l >= a && engine.teachingCompareValue(
+        l, against: tmp, by: >, stageID: "BlockInsertionSort.singleShift",
+        whenTrue: "This item is larger than the held value, so shift it right.",
+        whenFalse: "The held value has reached its insertion position."
+      ) {
         engine.setValue(l + 1, engine.readValue(at: l))
         l -= 1
       }
@@ -87,12 +101,20 @@ public struct BlockInsertionSort: SortAlgorithm {
       let tmpL = engine.readValue(at: l)
       let tmpR = engine.readValue(at: r)
       var l = l - 1
-      while l >= a && engine.compareValue(l, against: tmpR, by: (>)) {
+      while l >= a && engine.teachingCompareValue(
+        l, against: tmpR, by: >, stageID: "BlockInsertionSort.pairRightShift",
+        whenTrue: "This item is larger than the right held value, so shift it two places.",
+        whenFalse: "The right held value has reached its insertion boundary."
+      ) {
         engine.setValue(l + 2, engine.readValue(at: l))
         l -= 1
       }
       engine.setValue(l + 2, tmpR)
-      while l >= a && engine.compareValue(l, against: tmpL, by: (>)) {
+      while l >= a && engine.teachingCompareValue(
+        l, against: tmpL, by: >, stageID: "BlockInsertionSort.pairLeftShift",
+        whenTrue: "This item is larger than the left held value, so shift it right.",
+        whenFalse: "The left held value has reached its insertion boundary."
+      ) {
         engine.setValue(l + 1, engine.readValue(at: l))
         l -= 1
       }

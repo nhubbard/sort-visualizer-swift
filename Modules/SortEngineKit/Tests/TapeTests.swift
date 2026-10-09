@@ -117,6 +117,25 @@ struct TapeTests {
     #expect(annotated.values == plain.values)
   }
 
+  @Test
+  func teachingReversalExplainsInternalSwapsWithoutChangingTheTape() {
+    var plain = RecordingEngine(values: [4, 3, 2, 1])
+    var taught = RecordingEngine(values: [4, 3, 2, 1])
+    plain.reversal(0, 3)
+    taught.teachingReversal(0, 3, stageID: "test.reverse",
+      explanation: "Reverse the descending run.")
+    let plainResult = plain.finish()
+    let taughtResult = taught.finish()
+    #expect(taughtResult.tape == plainResult.tape)
+    #expect(taughtResult.reversalCount == plainResult.reversalCount)
+    #expect(taughtResult.swapCount == plainResult.swapCount)
+    #expect(taughtResult.teachingAnnotations.count == 2)
+    #expect(taughtResult.teachingAnnotations.allSatisfy {
+      if case .swap = taughtResult.tape[$0.operationIndex] { return true }
+      return false
+    })
+  }
+
   private func makeTape(
     operations: [SortOperation], sortStartIndex: Int = 0,
     compareCount: Int = 3, swapCount: Int = 2

@@ -74,6 +74,12 @@ public struct InPlaceLSDRadixSort: SortAlgorithm {
       for i in 0..<vregs.count {
         vregs[i] = n - 1
         engine.writeAux(vregHandle, at: i, value: vregs[i])
+        engine.annotateLastOperation(
+          stageID: "scratchUpdate", decisionID: "inplacelsdradixsort.scratchUpdate",
+          outcome: "update",
+          roles: ["scratch": .auxiliaryIndex(handle: vregHandle.rawValue, index: i)],
+          explanationKey: "inplacelsdradixsort.scratchUpdate",
+          explanation: "Update the next free position for this digit bucket.")
       }
 
       var pos = 0
@@ -105,6 +111,12 @@ public struct InPlaceLSDRadixSort: SortAlgorithm {
           for j in stride(from: digit - 1, to: 0, by: -1) {
             vregs[j - 1] -= 1
             engine.writeAux(vregHandle, at: j - 1, value: vregs[j - 1])
+            engine.annotateLastOperation(
+              stageID: "scratchUpdate", decisionID: "inplacelsdradixsort.scratchUpdate",
+              outcome: "update",
+              roles: ["scratch": .auxiliaryIndex(handle: vregHandle.rawValue, index: j - 1)],
+              explanationKey: "inplacelsdradixsort.scratchUpdate",
+              explanation: "Update the next free position for this digit bucket.")
           }
         }
       }

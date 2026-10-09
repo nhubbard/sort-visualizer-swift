@@ -174,7 +174,11 @@ public struct SplaySort: SortAlgorithm {
         return Node(key)
       }
       let inserted = Node(key)
-      if splayed.key > key {
+      if engine.teachingCompareValues(
+        splayed.key, key, by: >, stageID: "SplaySort.insertSide",
+        whenTrue: "The new key is smaller than the splayed root, so attach the root on its right.",
+        whenFalse: "The new key is at least the splayed root, so attach the root on its left."
+      ) {
         inserted.right = splayed
         inserted.left = splayed.left
         splayed.left = nil
@@ -211,6 +215,13 @@ public struct SplaySort: SortAlgorithm {
         }
         let node = stack.removeLast()
         engine.setValue(index, node.key)
+        if engine.shouldAnnotateCurrentOperation {
+          engine.annotateLastOperation(
+            stageID: "SplaySort.inOrderOutput", outcome: "placed",
+            roles: ["output": .arrayIndex(index), "treeValue": .value(node.key)],
+            explanationKey: "SplaySort.inOrderOutput",
+            explanation: "An in-order tree visit yields the next smallest value for this output slot.")
+        }
         index += 1
         current = node.right
       }

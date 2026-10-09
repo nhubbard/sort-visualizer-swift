@@ -51,8 +51,34 @@ enum ShatterSortingTemplate {
   static func shatterPartition(_ engine: inout RecordingEngine, _ start: Int, _ length: Int, _ num: Int)
     -> [Int] {
     let window = start..<(start + length)
-    let minValue = window.map { engine.readValue(at: $0) }.min()!
-    let maxValue = window.map { engine.readValue(at: $0) }.max()!
+    var minValue = Int.max
+    for index in window {
+      let value = engine.readValue(at: index)
+      let newMinimum = value < minValue
+      if newMinimum { minValue = value }
+      engine.annotateLastOperation(
+        stageID: "shatter.scanMinimum", decisionID: "shatter.scanMinimum",
+        outcome: newMinimum ? "minimum" : "continue",
+        roles: ["item": .arrayIndex(index), "minimum": .value(minValue)],
+        explanationKey: "shatter.scanMinimum",
+        explanation: newMinimum
+          ? "This value lowers the range minimum used to size Shatter's buckets."
+          : "This value does not lower the range minimum, so the scan continues.")
+    }
+    var maxValue = Int.min
+    for index in window {
+      let value = engine.readValue(at: index)
+      let newMaximum = value > maxValue
+      if newMaximum { maxValue = value }
+      engine.annotateLastOperation(
+        stageID: "shatter.scanMaximum", decisionID: "shatter.scanMaximum",
+        outcome: newMaximum ? "maximum" : "continue",
+        roles: ["item": .arrayIndex(index), "maximum": .value(maxValue)],
+        explanationKey: "shatter.scanMaximum",
+        explanation: newMaximum
+          ? "This value raises the range maximum used to size Shatter's buckets."
+          : "This value does not raise the range maximum, so the scan continues.")
+    }
     let valueRange = maxValue - minValue + 1
     let shatters = (length + num - 1) / num
 
@@ -75,6 +101,12 @@ enum ShatterSortingTemplate {
       offsets[bucketIndex] = writeIndex - start
       for value in bucket {
         engine.setValue(writeIndex, value)
+        engine.annotateLastOperation(
+          stageID: "shatter.flattenBucket", decisionID: "shatter.flattenBucket",
+          outcome: "bucket-\(bucketIndex)",
+          roles: ["destination": .arrayIndex(writeIndex), "bucket": .value(bucketIndex)],
+          explanationKey: "shatter.flattenBucket",
+          explanation: "Bucket \(bucketIndex + 1) writes its next value back in bucket order.")
         writeIndex += 1
       }
     }
@@ -87,7 +119,11 @@ enum ShatterSortingTemplate {
     guard end - start > 1 else { return }
     for i in (start + 1)..<end {
       var pos = i
-      while pos > start && engine.compare(pos - 1, pos, by: >) {
+      while pos > start && engine.teachingCompare(
+        pos - 1, pos, by: >,
+        stageID: "shatter.bucketInsertion",
+        whenTrue: "This pair is reversed within a bucket, so insertion swaps it.",
+        whenFalse: "This pair is ordered, so insertion leaves it in place.") {
         engine.swap(pos - 1, pos)
         pos -= 1
       }

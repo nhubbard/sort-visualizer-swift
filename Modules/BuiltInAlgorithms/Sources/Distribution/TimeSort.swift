@@ -51,6 +51,12 @@ public struct TimeSort: SortAlgorithm {
     for i in 0..<n {
       scratch[i] = engine.readValue(at: i)
       engine.writeAux(scratchHandle, at: i, value: scratch[i])
+      engine.annotateLastOperation(
+        stageID: "scratchUpdate", decisionID: "timesort.scratchUpdate",
+        outcome: "update",
+        roles: ["scratch": .auxiliaryIndex(handle: scratchHandle.rawValue, index: i)],
+        explanationKey: "timesort.scratchUpdate",
+        explanation: "Copy this array value into merge scratch space before sorting it.")
     }
 
     // `buffer` is pure merge-sort bookkeeping, never mirrored into a visualized aux array — same
@@ -72,7 +78,17 @@ public struct TimeSort: SortAlgorithm {
     // kept so correctness doesn't quietly depend on that.
     for i in 1..<n {
       var j = i
-      while j > 0 && engine.compare(j - 1, j, by: (>)) {
+      while j > 0 {
+        let inverted = engine.compare(j - 1, j, by: (>))
+        engine.annotateLastOperation(
+          stageID: "finalCheck", decisionID: "timesort.adjacentOrder",
+          outcome: inverted ? "exchange" : "keep",
+          roles: ["left": .arrayIndex(j - 1), "right": .arrayIndex(j)],
+          explanationKey: "timesort.adjacentOrder",
+          explanation: inverted
+            ? "These adjacent values are inverted, so the final pass exchanges them."
+            : "These adjacent values are ordered, so the final pass leaves them in place.")
+        if !inverted { break }
         engine.swap(j - 1, j)
         engine.annotateLastOperation(
           stageID: "bucketExchange", decisionID: "timesort.bucketExchange",
@@ -101,7 +117,16 @@ public struct TimeSort: SortAlgorithm {
     var j = mid
     var k = lo
     while i < mid && j < hi {
-      if engine.compareValues(array[i], array[j], by: (<=)) {
+      let takeLeft = engine.compareValues(array[i], array[j], by: (<=))
+      engine.annotateLastOperation(
+        stageID: "mergeDecision", decisionID: "timesort.takeFromHalf",
+        outcome: takeLeft ? "takeLeft" : "takeRight",
+        roles: ["destination": .arrayIndex(k), "leftValue": .value(array[i]), "rightValue": .value(array[j])],
+        explanationKey: "timesort.takeFromHalf",
+        explanation: takeLeft
+          ? "The left value is no greater, so take it first and preserve equal-value order."
+          : "The right value is smaller, so take it for this merged position.")
+      if takeLeft {
         buffer[k] = array[i]
         i += 1
       } else {

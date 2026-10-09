@@ -79,8 +79,14 @@ public struct MedianMergeSort: SortAlgorithm {
 
   private static func medianOfThree(_ engine: inout RecordingEngine, _ a: Int, _ b: Int) {
     let m = a + (b - 1 - a) / 2
-    if engine.compare(a, m, by: >) { engine.swap(a, m) }
-    if engine.compare(m, b - 1, by: >) {
+    if engine.teachingCompare(
+      a, m, by: >, stageID: "medianMerge.pivotOrder",
+      whenTrue: "The first pivot sample exceeds the middle one, so median setup swaps them.",
+      whenFalse: "The first pivot sample is no greater, so median setup keeps them.") { engine.swap(a, m) }
+    if engine.teachingCompare(
+      m, b - 1, by: >, stageID: "medianMerge.pivotOrder",
+      whenTrue: "The middle pivot sample exceeds the last one, so median setup swaps them.",
+      whenFalse: "The middle pivot sample is no greater, so median setup keeps them.") {
       engine.swap(m, b - 1)
       if engine.compare(a, m, by: >) { return }
     }
@@ -114,8 +120,14 @@ public struct MedianMergeSort: SortAlgorithm {
     var i = a - 1
     var j = b
     while true {
-      repeat { i += 1 } while i < j && engine.compare(i, pivot, by: <)
-      repeat { j -= 1 } while j >= i && engine.compare(j, pivot, by: >)
+      repeat { i += 1 } while i < j && engine.teachingCompare(
+        i, pivot, by: <, stageID: "medianMerge.partitionLeft",
+        whenTrue: "This item is below the pivot, so the left partition scan advances.",
+        whenFalse: "This item meets the pivot boundary, so the left scan stops.")
+      repeat { j -= 1 } while j >= i && engine.teachingCompare(
+        j, pivot, by: >, stageID: "medianMerge.partitionRight",
+        whenTrue: "This item exceeds the pivot, so the right partition scan advances.",
+        whenFalse: "This item meets the pivot boundary, so the right scan stops.")
       if i >= j { return j }
       engine.swap(i, j)
     }

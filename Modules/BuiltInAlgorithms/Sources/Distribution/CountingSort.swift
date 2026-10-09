@@ -29,14 +29,29 @@ public struct CountingSort: SortAlgorithm {
     // ArrayV's `Reads.analyzeMax` reads values directly (no stat-tracked compares), so the
     // scan for the maximum here does the same via `engine.values` rather than `engine.compare`.
     var maxValue = engine.readValue(at: 0)
-    for i in 1..<n where engine.readValue(at: i) > maxValue {
-      maxValue = engine.readValue(at: i)
+    for i in 1..<n {
+      let candidate = engine.readValue(at: i)
+      let newMaximum = candidate > maxValue
+      engine.annotateLastOperation(
+        stageID: "rangeScan", decisionID: "countingsort.maximum",
+        outcome: newMaximum ? "updateMaximum" : "keepMaximum",
+        roles: ["candidate": .arrayIndex(i), "maximum": .value(maxValue)],
+        explanationKey: "countingsort.maximum",
+        explanation: newMaximum
+          ? "This value extends the counting range, so raise the maximum."
+          : "This value fits within the counting range found so far.")
+      if newMaximum { maxValue = engine.readValue(at: i) }
     }
 
     var values = [Int]()
     values.reserveCapacity(n)
     for i in 0..<n {
       values.append(engine.readValue(at: i))
+      engine.annotateLastOperation(
+        stageID: "frequencyScan", decisionID: "countingsort.collectValue",
+        outcome: "collect", roles: ["source": .arrayIndex(i)],
+        explanationKey: "countingsort.collectValue",
+        explanation: "Collect this value so its frequency can determine a stable output position.")
     }
 
     // ArrayV's per-value `counts` table is bookkeeping the visualizer never renders as a bar
@@ -58,6 +73,12 @@ public struct CountingSort: SortAlgorithm {
       counts[value] -= 1
       output[counts[value]] = value
       engine.writeAux(outputHandle, at: counts[value], value: value)
+      engine.annotateLastOperation(
+        stageID: "scratchUpdate", decisionID: "countingsort.scratchUpdate",
+        outcome: "update",
+        roles: ["scratch": .auxiliaryIndex(handle: outputHandle.rawValue, index: counts[value])],
+        explanationKey: "countingsort.scratchUpdate",
+        explanation: "The cumulative count reserves this stable scratch position for the value.")
     }
 
     // Extra loop to simulate the results from the "output" array being written back to the
