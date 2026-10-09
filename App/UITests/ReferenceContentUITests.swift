@@ -43,6 +43,11 @@ final class ReferenceContentUITests: XCTestCase {
     XCTAssertTrue(code.waitForExistence(timeout: 10), "Python reference code did not render")
     XCTAssertTrue(code.label.contains("def sort("), "Wrong Python reference code: \(code.label)")
     XCTAssertTrue(code.label.contains("quick_sort"))
+    app.activateControlForUITest(app.buttons["selectAlgorithmCodeText"])
+    let selectableCode = app.textViews["selectableAlgorithmCodeText"]
+    XCTAssertTrue(selectableCode.waitForExistence(timeout: 10))
+    XCTAssertTrue(selectableCode.value.debugDescription.contains("def sort("))
+    app.activateControlForUITest(app.buttons["Done"])
 
     app.activateControlForUITest(picker.buttons["Swift"])
     XCTAssertFalse(code.exists, "Changing languages should return to the short summary")

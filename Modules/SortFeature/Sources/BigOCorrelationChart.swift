@@ -79,6 +79,7 @@ struct BigOCorrelationChart: View {
                   y: .value("Normalized Work", point.normalizedValue)
                 )
                 .foregroundStyle(.blue)
+                .symbol(.circle)
               } else {
                 bigOChartMark(for: point)
               }
@@ -91,6 +92,12 @@ struct BigOCorrelationChart: View {
           .chartXAxisLabel("Array Size")
           .chartYAxisLabel("Normalized Work")
           .frame(maxWidth: .infinity, minHeight: 200)
+          .accessibilityElement(children: .ignore)
+          .accessibilityLabel("Recorded runs chart")
+          .accessibilityValue(
+            "Observed mean, circle. Minimum, square. Maximum, triangle. Median, diamond. "
+              + "Mean plus or minus one standard deviation, plus marks. "
+              + recordedRunSummary(points) + " Expand Chart for exact values.")
           .accessibilityIdentifier("bigOCorrelationChart")
           RainbowStatLegend()
         }
@@ -205,11 +212,11 @@ private func auditBigOChartPoints(algorithm: any SortAlgorithm) -> [BigOChartPoi
         normalizedValue: value, kind: kind))
     }
     add("trend", "Observed", mean, .observedTrend)
-    add("min", "Minimum", mean * 0.85, .statMin)
-    add("max", "Maximum", mean * 1.15, .statMax)
-    add("median", "Median", mean * 0.99, .statMedian)
-    add("sd-low", "Standard Deviation", mean * 0.92, .statStdDevBand)
-    add("sd-high", "Standard Deviation", mean * 1.08, .statStdDevBand)
+    add("min", "Observed", mean * 0.85, .statMin)
+    add("max", "Observed", mean * 1.15, .statMax)
+    add("median", "Observed", mean * 0.99, .statMedian)
+    add("sd-low", "Observed", mean * 0.92, .statStdDevBand)
+    add("sd-high", "Observed", mean * 1.08, .statStdDevBand)
     add("reference-best", "Best Case", 0.06 + 0.9 * sqrt(progress), .reference)
     add("reference-average", "Average Case", 0.06 + 0.9 * progress, .reference)
     add("reference-worst", "Worst Case", 0.06 + 0.9 * progress * progress, .reference)
@@ -241,6 +248,7 @@ private func bigOChartMark(for point: BigOChartPoint) -> some ChartContent {
       y: .value("Normalized Work", point.normalizedValue)
     )
     .foregroundStyle(by: .value("Series", point.series))
+    .symbol(.asterisk)
   case .observedTrend:
     // Fixed blue, not `by: .value("Series", ...)` like `.reference` below -- this is the one
     // color in `RainbowStatLegend`'s manual caption, not part of the reference curves' own
@@ -260,33 +268,51 @@ private func bigOChartMark(for point: BigOChartPoint) -> some ChartContent {
       y: .value("Normalized Work", point.normalizedValue)
     )
     .foregroundStyle(by: .value("Series", point.series))
-    .lineStyle(StrokeStyle(dash: [4, 4]))
+    .lineStyle(referenceLineStyle(for: point.series))
   case .statMin:
     PointMark(
       x: .value("Array Size", point.size),
       y: .value("Normalized Work", point.normalizedValue)
     )
     .foregroundStyle(.green)
+    .symbol(.square)
   case .statMax:
     PointMark(
       x: .value("Array Size", point.size),
       y: .value("Normalized Work", point.normalizedValue)
     )
     .foregroundStyle(.red)
+    .symbol(.triangle)
   case .statMedian:
     PointMark(
       x: .value("Array Size", point.size),
       y: .value("Normalized Work", point.normalizedValue)
     )
     .foregroundStyle(.orange)
+    .symbol(.diamond)
   case .statStdDevBand:
     PointMark(
       x: .value("Array Size", point.size),
       y: .value("Normalized Work", point.normalizedValue)
     )
-    .symbolSize(30)
+    .symbol(.plus)
+    .symbolSize(45)
     .foregroundStyle(.purple)
   }
+}
+
+func referenceLineStyle(for series: String) -> StrokeStyle {
+  switch series {
+  case let label where label.contains("Best"): StrokeStyle(lineWidth: 2, dash: [2, 3])
+  case let label where label.contains("Average"): StrokeStyle(lineWidth: 2, dash: [7, 3])
+  default: StrokeStyle(lineWidth: 2, dash: [10, 3, 2, 3])
+  }
+}
+
+func referenceColor(for series: String) -> Color {
+  if series.contains("Best") { return .blue }
+  if series.contains("Average") { return .green }
+  return .orange
 }
 
 /// Powers of two spanning `range` (the nearest one at or below the lower bound through the
@@ -342,17 +368,25 @@ func compactChartPoints(_ points: [BigOChartPoint]) -> [BigOChartPoint] {
 /// rather than `foregroundStyle(by:)`, so they don't participate in `Chart`'s own automatic
 /// series-based legend the way the reference curves do, and need this instead.
 struct RainbowStatLegend: View {
-  private static let entries: [(label: String, color: Color)] = [
-    ("Max", .red), ("Median", .orange), ("Mean", .blue), ("Min", .green), ("±1σ", .purple),
+  private static let entries: [(label: String, color: Color, symbol: String)] = [
+    ("Observed maximum", .red, "triangle.fill"),
+    ("Observed median", .orange, "diamond.fill"),
+    ("Observed mean", .blue, "circle.fill"),
+    ("Observed minimum", .green, "square.fill"),
+    ("Mean ±1 standard deviation", .purple, "plus"),
   ]
 
   var body: some View {
-    HStack(spacing: 12) {
+    LazyVGrid(columns: [GridItem(.adaptive(minimum: 130), alignment: .leading)], alignment: .leading, spacing: 6) {
       ForEach(Self.entries, id: \.label) { entry in
         HStack(spacing: 4) {
-          Circle().fill(entry.color).frame(width: 8, height: 8)
-          Text(entry.label).font(.caption2).foregroundStyle(.secondary)
+          Image(systemName: entry.symbol)
+            .foregroundStyle(entry.color)
+            .frame(width: 12)
+            .accessibilityHidden(true)
+          Text(entry.label).font(.caption)
         }
+        .accessibilityElement(children: .combine)
       }
     }
     .accessibilityIdentifier("bigOCompactLegend")
