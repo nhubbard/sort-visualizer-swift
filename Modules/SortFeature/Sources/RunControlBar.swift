@@ -18,6 +18,7 @@ struct RunControlBar: View {
   @Bindable var replay: ReplayEngine
   let algorithm: any SortAlgorithm
   @Environment(AppSettings.self) private var settings
+  @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
   // Bindings, not local `@State` — owned by `SortView`, which survives the phase churn
   // `session.start(size:)` (the size stepper's own action) drives this view through. See
@@ -88,7 +89,10 @@ struct RunControlBar: View {
   private var transportRow: some View {
     VStack(spacing: 8) {
       PlaybackTransportButtons(session: session, replay: replay)
-        .frame(maxWidth: .infinity, alignment: .leading)
+        .frame(
+          maxWidth: .infinity,
+          alignment: dynamicTypeSize.isAccessibilitySize ? .center : .leading
+        )
       UtilityButtons(
         session: session, replay: replay, algorithm: algorithm,
         isSpeedExpanded: $isSpeedExpanded, isSizeExpanded: $isSizeExpanded,
@@ -199,21 +203,39 @@ struct RunControlBar: View {
 private struct RunControlStatsCaption: View {
   let replay: ReplayEngine
   @State private var displayed = DisplayedStats()
+  @State private var isExpanded = false
+  @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
   private static let refreshInterval = Duration.milliseconds(33)
 
   var body: some View {
-    ViewThatFits(in: .horizontal) {
-      HStack(spacing: 12) { statCells }
-      VStack(spacing: 4) {
-        HStack(spacing: 12) { firstHalfStatCells }
-        HStack(spacing: 12) { secondHalfStatCells }
+    Group {
+      if dynamicTypeSize.isAccessibilitySize {
+        DisclosureGroup(isExpanded: $isExpanded) {
+          LazyVGrid(
+            columns: [GridItem(.flexible()), GridItem(.flexible())],
+            alignment: .leading, spacing: 8
+          ) {
+            statCells
+          }
+        } label: {
+          Text("Statistics: \(displayed.compareCount) compares, \(displayed.swapCount) swaps")
+        }
+        .accessibilityIdentifier("runControlStatsCaption")
+      } else {
+        ViewThatFits(in: .horizontal) {
+          HStack(spacing: 12) { statCells }
+          VStack(spacing: 4) {
+            HStack(spacing: 12) { firstHalfStatCells }
+            HStack(spacing: 12) { secondHalfStatCells }
+          }
+        }
+        .accessibilityElement(children: .combine)
+        .accessibilityIdentifier("runControlStatsCaption")
       }
     }
     .font(.caption)
     .foregroundStyle(.secondary)
-    .accessibilityElement(children: .combine)
-    .accessibilityIdentifier("runControlStatsCaption")
     .task {
       while !Task.isCancelled {
         let next = DisplayedStats(replay: replay)
@@ -261,9 +283,18 @@ private struct RunControlStatsCaption: View {
   /// a single unit — the looser `spacing: 12` between cells above is what visually separates one
   /// cell from the next now that there's no `·` glyph doing that job.
   private func statCell(_ value: Int, digits: Int, label: String) -> some View {
-    HStack(spacing: 4) {
-      statSlot(value, digits: digits)
-      Text(label)
+    Group {
+      if dynamicTypeSize.isAccessibilitySize {
+        VStack(alignment: .leading, spacing: 0) {
+          statSlot(value, digits: digits)
+          Text(label)
+        }
+      } else {
+        HStack(spacing: 4) {
+          statSlot(value, digits: digits)
+          Text(label)
+        }
+      }
     }
   }
 
@@ -454,6 +485,7 @@ private struct UtilityButtons: View {
   @Binding var isSizeExpanded: Bool
   @Binding var isVisualizerExpanded: Bool
   @Binding var isVideoExpanded: Bool
+  @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
   #if targetEnvironment(macCatalyst)
     // Catalyst's `ShareLink` bridges to `NSSharingServicePicker`, which has nothing to show for
@@ -463,6 +495,22 @@ private struct UtilityButtons: View {
   #endif
 
   var body: some View {
+    Group {
+      if dynamicTypeSize.isAccessibilitySize {
+        VStack(spacing: 8) {
+          firstRow
+          secondRow
+        }
+      } else {
+        HStack(spacing: 20) {
+          firstRow
+          secondRow
+        }
+      }
+    }
+  }
+
+  private var firstRow: some View {
     HStack(spacing: 20) {
       Button {
         Task { await session.start(size: session.arraySize) }
@@ -520,7 +568,11 @@ private struct UtilityButtons: View {
       .accessibilityLabel("Video Recording")
       .accessibilityValue(isVideoExpanded ? "Expanded" : "Collapsed")
       .help("Show or hide video recording controls")
+    }
+  }
 
+  private var secondRow: some View {
+    HStack(spacing: 20) {
       Button {
         isSpeedExpanded.toggle()
       } label: {

@@ -32,6 +32,8 @@ Updated 2026-10-08. This list reflects the discussion after completing the nativ
 
 **Done when:** the current baseline and top hot spots are recorded, and each changed path has before/after evidence. The existing prototype documents its current tape-generation trigger and the attached recording needed for interactive playback.
 
+**Current baseline:** Four single-instrument traces, each under 30 seconds, are summarized in [the short-trace findings](Documentation/docs/guides/performance-traces-2026-10-06.md). The existing parent tape-generation wrapper is ready for focused InstrumentsKit runs after the permissive-mode reboot.
+
 ## 3. Contextual onboarding and discovery with TipKit
 
 **Why:** Search, categories, and sorting already exist, but a new user still has to discover how to step, scrub, switch visualizers, and find a useful next algorithm. Contextual tips can explain an action at the moment it becomes relevant without adding a long mandatory tutorial.
