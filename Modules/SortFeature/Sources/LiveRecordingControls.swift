@@ -29,7 +29,7 @@ struct LiveRecordingControls: View {
         }
         .accessibilityIdentifier("liveRecordingStartButton")
       case .choosing:
-        ProgressView(model.isUsingFallback ? "Starting app recording…" : "Choose a window to record…")
+        ProgressView(model.isUsingFallback ? "Starting app recording…" : "Starting window recording…")
           .accessibilityIdentifier("liveRecordingChoosingStatus")
         Button("Cancel") { Task { await model.cancel() } }
           .accessibilityIdentifier("liveRecordingCancelButton")
