@@ -66,8 +66,8 @@ struct LiveRecordingControls: View {
           .foregroundStyle(.red)
           .accessibilityIdentifier("liveRecordingError")
       }
-      Spacer(minLength: 0)
     }
+    .frame(maxWidth: .infinity)
     .buttonStyle(.bordered)
     .font(.caption)
     .sheet(isPresented: $isPreviewPresented) {

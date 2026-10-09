@@ -11,8 +11,8 @@ import VisualizationKit
 /// caption, then transport buttons. Speed/size/visualizer rows expand inline below the transport
 /// row on tap instead of using a `.popover`, so no `UIPopoverPresentationController` is involved.
 ///
-/// The transport buttons and centered secondary controls occupy separate rows. The statistics
-/// caption retains its `ViewThatFits` fallback for narrower widths.
+/// The transport and utility icons share a row when space allows, with a stacked fallback for
+/// narrower widths. Expanded controls appear below that row.
 struct RunControlBar: View {
   @Bindable var session: SortSession
   @Bindable var replay: ReplayEngine
@@ -76,32 +76,39 @@ struct RunControlBar: View {
     .accessibilityValue("Operation \(replay.stepIndex) of \(replay.totalOperationCount)")
   }
 
-  /// Playback transport stays on the first row, while the secondary controls occupy a centered
-  /// row across the full bar width. `PlaybackTransportButtons` and `UtilityButtons` are child
-  /// views, not computed properties on `RunControlBar` itself (like `AutomatorMenuButton` is, for a
-  /// different reason) — `@Observable`'s dependency tracking is per-view-instance, so inlining
-  /// them as computed properties meant *every* button got reconstructed on every tick just
-  /// because `statsCaption` elsewhere in this same `body` reads `replay`'s per-tick-changing
-  /// counters. `UtilityButtons` in particular reads none of those counters, so as a real child
-  /// view it only re-renders when something it actually displays changes (speed/size/sound
-  /// toggle state) — found via a Full Sweep profiling round that also fixed `CodeHighlighter` and
-  /// `AnalyticsService.fetchSummaries`.
+  /// Keep the original inline icon layout on wide windows. At accessibility text sizes the
+  /// transport and utility groups stack, allowing UtilityButtons to split into two rows.
   private var transportRow: some View {
-    VStack(spacing: 8) {
-      PlaybackTransportButtons(session: session, replay: replay)
-        .frame(
-          maxWidth: .infinity,
-          alignment: dynamicTypeSize.isAccessibilitySize ? .center : .leading
-        )
-      UtilityButtons(
-        session: session, replay: replay, algorithm: algorithm,
-        isSpeedExpanded: $isSpeedExpanded, isSizeExpanded: $isSizeExpanded,
-        isVisualizerExpanded: $isVisualizerExpanded,
-        isVideoExpanded: $isVideoExpanded)
-        .frame(maxWidth: .infinity)
+    Group {
+      if dynamicTypeSize.isAccessibilitySize {
+        VStack(spacing: 8) {
+          PlaybackTransportButtons(session: session, replay: replay)
+          utilityButtons
+        }
+      } else {
+        ViewThatFits(in: .horizontal) {
+          HStack(spacing: 20) {
+            PlaybackTransportButtons(session: session, replay: replay)
+            Spacer()
+            utilityButtons
+          }
+          VStack(spacing: 8) {
+            PlaybackTransportButtons(session: session, replay: replay)
+            utilityButtons
+          }
+        }
+      }
     }
     .buttonStyle(.borderless)
     .controlSize(.large)
+  }
+
+  private var utilityButtons: some View {
+    UtilityButtons(
+      session: session, replay: replay, algorithm: algorithm,
+      isSpeedExpanded: $isSpeedExpanded, isSizeExpanded: $isSizeExpanded,
+      isVisualizerExpanded: $isVisualizerExpanded,
+      isVideoExpanded: $isVideoExpanded)
   }
 
   @ViewBuilder
