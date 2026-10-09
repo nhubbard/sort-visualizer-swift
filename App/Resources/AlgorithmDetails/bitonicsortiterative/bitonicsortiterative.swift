@@ -8,7 +8,7 @@ func sort(_ arr: inout [Int]) {
             var i = 0
             while i < n {
                 let l = i ^ j
-                if l > i && l < n {
+                if l > i, l < n {
                     let ascending = ((i & k) == 0) == m
                     if (ascending && arr[i] > arr[l]) || (!ascending && arr[i] < arr[l]) {
                         arr.swapAt(i, l)

@@ -89,7 +89,6 @@ def digit_merge_sort(arr, a, b, place)
   merge_by_digit(arr, a, mid, b, 0, RADIX_BASE, place)
 end
 
-
 array = [0, 39, 21, 62, 91, 77, 14, 23,
   90, 69, 51, 81, 68, 83, 32, 56]
 sort(array)

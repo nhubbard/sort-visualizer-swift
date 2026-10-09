@@ -12,7 +12,6 @@ def sorted?(arr)
   (1...arr.length).all? { |i| arr[i - 1] <= arr[i] }
 end
 
-
 array = [0, 39, 21, 62, 91, 77]
 array = sort(array)
 p array

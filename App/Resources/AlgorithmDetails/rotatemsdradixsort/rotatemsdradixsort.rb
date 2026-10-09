@@ -13,7 +13,7 @@ def sort(arr)
   i = 0
   b = n
   while i < n
-    p = b - i < 1 ? i : dist(arr, i, b, q, base)
+    p = (b - i < 1) ? i : dist(arr, i, b, q, base)
     if q == 0
       m += base
       t = m / base
@@ -114,7 +114,6 @@ def dist(arr, a, b, place, base)
   merge_sort_digit(arr, a, b, place, base)
   bin_search_digit(arr, a, b, 1, place, base)
 end
-
 
 array = [0, 39, 21, 62, 91, 77, 14, 23,
   90, 69, 51, 81, 68, 83, 32, 56]

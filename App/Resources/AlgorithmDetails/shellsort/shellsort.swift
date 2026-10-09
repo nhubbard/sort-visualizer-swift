@@ -4,7 +4,7 @@ func sort(_ arr: inout [Int]) {
     for gap in gaps where gap < n {
         for i in gap ..< n {
             var j = i
-            while j >= gap && arr[j] < arr[j - gap] {
+            while j >= gap, arr[j] < arr[j - gap] {
                 arr.swapAt(j, j - gap)
                 j -= gap
             }

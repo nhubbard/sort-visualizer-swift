@@ -8,7 +8,7 @@ func gappedInsertionSort(_ array: inout [Int], _ a: Int, _ b: Int, _ gap: Int) {
     var i = a + gap
     while i < b {
         var j = i
-        while j - gap >= a && array[j] < array[j - gap] {
+        while j - gap >= a, array[j] < array[j - gap] {
             array.swapAt(j, j - gap)
             j -= gap
         }
@@ -24,7 +24,6 @@ func recursiveShellSort(_ array: inout [Int], _ start: Int, _ end: Int, _ g: Int
         gappedInsertionSort(&array, start, end, g)
     }
 }
-
 
 var array: [Int] = [
     0, 39, 21, 62, 91, 77, 14, 23,
