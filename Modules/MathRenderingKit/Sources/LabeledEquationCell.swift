@@ -1,3 +1,4 @@
+import Foundation
 import SwiftUI
 
 /// A small, secondary-styled label stacked above its equation — one column, two rows, rather
@@ -20,7 +21,7 @@ public struct LabeledEquationCell: View {
         Text(label)
         if equation.count > 24 {
           Image(systemName: "arrow.left.and.right")
-            .accessibilityLabel("Equation scrolls horizontally")
+            .accessibilityLabel(String(localized: "Equation scrolls horizontally", bundle: .module))
         }
       }
       .font(.caption)

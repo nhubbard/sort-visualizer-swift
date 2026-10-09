@@ -1,0 +1,206 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "Concurrent" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Concurrentes"
+          }
+        }
+      }
+    },
+    "Concurrent Sorts" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Algoritmos de ordenación concurrentes"
+          }
+        }
+      }
+    },
+    "Distribution" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Por distribución"
+          }
+        }
+      }
+    },
+    "Distribution Sorts" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Algoritmos de ordenación por distribución"
+          }
+        }
+      }
+    },
+    "Exchange" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Por intercambio"
+          }
+        }
+      }
+    },
+    "Exchange Sorts" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Algoritmos de ordenación por intercambio"
+          }
+        }
+      }
+    },
+    "Hybrid" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Híbridos"
+          }
+        }
+      }
+    },
+    "Hybrid Sorts" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Algoritmos de ordenación híbridos"
+          }
+        }
+      }
+    },
+    "Impractical" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Imprácticos"
+          }
+        }
+      }
+    },
+    "Impractical Sorts" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Algoritmos de ordenación imprácticos"
+          }
+        }
+      }
+    },
+    "Insertion" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Por inserción"
+          }
+        }
+      }
+    },
+    "Insertion Sorts" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Algoritmos de ordenación por inserción"
+          }
+        }
+      }
+    },
+    "Merge" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Por mezcla"
+          }
+        }
+      }
+    },
+    "Merge Sorts" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Algoritmos de ordenación por mezcla"
+          }
+        }
+      }
+    },
+    "Miscellaneous" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Misceláneos"
+          }
+        }
+      }
+    },
+    "Miscellaneous Sorts" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Algoritmos de ordenación misceláneos"
+          }
+        }
+      }
+    },
+    "Quick" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Quick"
+          }
+        }
+      }
+    },
+    "Quick Sorts" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Algoritmos de ordenación rápida"
+          }
+        }
+      }
+    },
+    "Selection" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Por selección"
+          }
+        }
+      }
+    },
+    "Selection Sorts" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Algoritmos de ordenación por selección"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.3"
+}

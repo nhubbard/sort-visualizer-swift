@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import Charts
 import PersistenceKit
@@ -57,7 +58,7 @@ struct BigOCorrelationDetailView: View {
       ScrollView {
         VStack(alignment: .leading, spacing: 20) {
           VStack(alignment: .leading, spacing: 6) {
-            Text("Recorded work")
+            Text(String(localized: "Recorded work", bundle: .module))
               .font(.title2.bold())
             Text(recordedRunSummary(points))
               .font(.subheadline)
@@ -68,11 +69,11 @@ struct BigOCorrelationDetailView: View {
             chart
             if !hiddenSeries.contains("Observed") {
               Divider()
-              Text("Point symbols")
+              Text(String(localized: "Point symbols", bundle: .module))
                 .font(.headline)
               RainbowStatLegend()
               if showsIndividualRuns {
-                Label("Individual runs (asterisks)", systemImage: "asterisk")
+                Label(String(localized: "Individual runs (asterisks)", bundle: .module), systemImage: "asterisk")
                   .font(.caption)
                   .foregroundStyle(.secondary)
                   .accessibilityIdentifier("bigOScatterLegend")
@@ -97,7 +98,7 @@ struct BigOCorrelationDetailView: View {
           Button {
             dismiss()
           } label: {
-            Text("Done").fixedSize(horizontal: true, vertical: false)
+            Text(String(localized: "Done", bundle: .module)).fixedSize(horizontal: true, vertical: false)
           }
           .frame(width: 48)
           .flexibleButtonSizingIfAvailable()
@@ -126,18 +127,26 @@ struct BigOCorrelationDetailView: View {
     return chartContent(sizeDomain: sizeDomain, logDomain: logDomain)
       .frame(maxWidth: .infinity, minHeight: 300, maxHeight: 420)
       .accessibilityElement(children: .ignore)
-      .accessibilityLabel("Recorded runs chart")
-      .accessibilityValue(recordedRunSummary(points)
-        + (hiddenSeries.contains("Observed") ? "" : " Solid line with circles: Observed mean. "
-          + "Shaped points: observed minimum, square; maximum, triangle; median, diamond; "
-          + "mean plus or minus one standard deviation, plus marks.")
-        + (referenceSeries.filter { !hiddenSeries.contains($0) }.isEmpty ? "" :
-          " Dashed reference curves: "
-          + referenceSeries.filter { !hiddenSeries.contains($0) }.joined(separator: ", ") + ".")
-        + (showsIndividualRuns && !hiddenSeries.contains("Observed")
-          ? " Asterisks show individual runs." : "")
-        + " Use Previous Recorded Size and Next Recorded Size below the chart for exact values.")
+      .accessibilityLabel(String(localized: "Recorded runs chart", bundle: .module))
+      .accessibilityValue(expandedChartAccessibilityValue)
       .accessibilityIdentifier("bigOCorrelationExpandedChart")
+  }
+
+  private var expandedChartAccessibilityValue: String {
+    var sentences = [recordedRunSummary(points)]
+    if !hiddenSeries.contains("Observed") {
+      sentences.append(String(localized: "Solid line with circles: Observed mean. Shaped points: observed minimum, square; maximum, triangle; median, diamond; mean plus or minus one standard deviation, plus marks.", bundle: .module))
+    }
+    let visibleReferences = referenceSeries.filter { !hiddenSeries.contains($0) }
+    if !visibleReferences.isEmpty {
+      let names = visibleReferences.map(seriesDisplayName).joined(separator: ", ")
+      sentences.append(String(localized: "Dashed reference curves: \(names).", bundle: .module))
+    }
+    if showsIndividualRuns && !hiddenSeries.contains("Observed") {
+      sentences.append(String(localized: "Asterisks show individual runs.", bundle: .module))
+    }
+    sentences.append(String(localized: "Use Previous Recorded Size and Next Recorded Size below the chart for exact values.", bundle: .module))
+    return sentences.joined(separator: " ")
   }
 
   private func chartContent(
@@ -161,9 +170,9 @@ struct BigOCorrelationDetailView: View {
       // Keep labels readable in the current sheet width, including a narrow split view.
       AxisMarks(values: powerOfTwoAxisValues(in: logDomain, maximumCount: 5))
     }
-    .chartXAxisLabel("Array Size")
+    .chartXAxisLabel(String(localized: "Array Size", bundle: .module))
     .chartYAxis { AxisMarks(position: .leading) }
-    .chartYAxisLabel("Normalized Work")
+    .chartYAxisLabel(String(localized: "Normalized Work", bundle: .module))
     .chartForegroundStyleScale([
       "Best Case": Color.blue,
       "Average Case": Color.green,
@@ -193,9 +202,9 @@ struct BigOCorrelationDetailView: View {
   private var seriesToggleRow: some View {
     VStack(alignment: .leading, spacing: 14) {
       VStack(alignment: .leading, spacing: 4) {
-        Text("Show on chart")
+        Text(String(localized: "Show on chart", bundle: .module))
           .font(.headline)
-        Text("Switch curves on or off to compare them.")
+        Text(String(localized: "Switch curves on or off to compare them.", bundle: .module))
           .font(.subheadline)
           .foregroundStyle(.secondary)
       }
@@ -227,7 +236,7 @@ struct BigOCorrelationDetailView: View {
       }
       Divider()
       Toggle(isOn: $showsIndividualRuns) {
-        Label("Show Individual Runs", systemImage: "asterisk")
+        Label(String(localized: "Show Individual Runs", bundle: .module), systemImage: "asterisk")
           .font(.subheadline)
       }
       .toggleStyle(.switch)
@@ -264,9 +273,9 @@ struct BigOCorrelationDetailView: View {
       HStack {
         Group {
           if let selectedSize {
-            Text("Array Size \(selectedSize)")
+            Text(String(localized: "Array Size \(selectedSize)", bundle: .module))
           } else {
-            Text("Select a size on the chart to see exact values")
+            Text(String(localized: "Select a size on the chart to see exact values", bundle: .module))
           }
         }
         .font(.headline)
@@ -276,24 +285,24 @@ struct BigOCorrelationDetailView: View {
         Button {
           selectRecordedSize(offset: -1)
         } label: {
-          Label("Previous", systemImage: "chevron.backward")
+          Label(String(localized: "Previous", bundle: .module), systemImage: "chevron.backward")
         }
         .buttonStyle(.bordered)
         .keyboardShortcut("p", modifiers: [.command, .option])
-        .help("Previous recorded size (P or ⌘⌥P)")
-        .accessibilityLabel("Previous Recorded Size")
+        .help(String(localized: "Previous recorded size (P or ⌘⌥P)", bundle: .module))
+        .accessibilityLabel(String(localized: "Previous Recorded Size", bundle: .module))
         .accessibilityIdentifier("bigOPreviousRecordedSize")
         .focusable()
         .disabled(selectedSize == observedSizes.first)
         Button {
           selectRecordedSize(offset: 1)
         } label: {
-          Label("Next", systemImage: "chevron.forward")
+          Label(String(localized: "Next", bundle: .module), systemImage: "chevron.forward")
         }
         .buttonStyle(.bordered)
         .keyboardShortcut("n", modifiers: [.command, .option])
-        .help("Next recorded size (N or ⌘⌥N)")
-        .accessibilityLabel("Next Recorded Size")
+        .help(String(localized: "Next recorded size (N or ⌘⌥N)", bundle: .module))
+        .accessibilityLabel(String(localized: "Next Recorded Size", bundle: .module))
         .accessibilityIdentifier("bigONextRecordedSize")
         .focusable()
         .disabled(selectedSize == observedSizes.last)

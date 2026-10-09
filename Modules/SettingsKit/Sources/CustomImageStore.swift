@@ -14,9 +14,12 @@ enum CustomImageError: LocalizedError {
 
   var errorDescription: String? {
     switch self {
-    case .tooLarge: "Choose an image smaller than 100 MB."
-    case .unreadable: "This image could not be opened. Choose another image."
-    case .unableToSave: "The selected image could not be saved on this device."
+    case .tooLarge:
+      String(localized: "Choose an image smaller than 100 MB.", bundle: .module)
+    case .unreadable:
+      String(localized: "This image could not be opened. Choose another image.", bundle: .module)
+    case .unableToSave:
+      String(localized: "The selected image could not be saved on this device.", bundle: .module)
     }
   }
 }

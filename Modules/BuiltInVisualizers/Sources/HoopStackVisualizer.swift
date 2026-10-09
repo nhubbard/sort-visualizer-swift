@@ -1,3 +1,4 @@
+import Foundation
 import SortEngineKit
 import VisualizationKit
 
@@ -11,7 +12,7 @@ import VisualizationKit
 public struct HoopStackVisualizer: Visualizer {
   public let id = VisualizerID(rawValue: "hoopstack")
   public let metadata = VisualizerMetadata(
-    displayName: "Hoop Stack",
+    displayName: String(localized: "Hoop Stack", bundle: .module),
     supportsAuxArrays: false,
     iconName: "circle.dashed"
   )

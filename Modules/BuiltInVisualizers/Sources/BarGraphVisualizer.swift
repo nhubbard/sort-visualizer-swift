@@ -1,3 +1,4 @@
+import Foundation
 import SortEngineKit
 import VisualizationKit
 
@@ -7,7 +8,7 @@ import VisualizationKit
 public struct BarGraphVisualizer: Visualizer {
   public let id = VisualizerID(rawValue: "bargraph")
   public let metadata = VisualizerMetadata(
-    displayName: "Bar Graph",
+    displayName: String(localized: "Bar Graph", bundle: .module),
     supportsAuxArrays: true,
     iconName: "chart.bar.fill"
   )

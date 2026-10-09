@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import Charts
 import PersistenceKit
@@ -29,17 +30,14 @@ struct BigOCorrelationChart: View {
           .frame(maxWidth: .infinity, minHeight: 120)
       } else if loadError != nil {
         ContentUnavailableView(
-          "Recorded Runs Unavailable", systemImage: "exclamationmark.triangle",
-          description: Text("The saved runs could not be loaded. Try opening this algorithm again."))
+          String(localized: "Recorded Runs Unavailable", bundle: .module), systemImage: "exclamationmark.triangle",
+          description: Text(String(localized: "The saved runs could not be loaded. Try opening this algorithm again.", bundle: .module)))
         .frame(maxWidth: .infinity, minHeight: 120)
       } else if points.isEmpty {
         ContentUnavailableView(
-          "Not Enough Recorded Runs Yet",
+          String(localized: "Not Enough Recorded Runs Yet", bundle: .module),
           systemImage: "chart.xyaxis.line",
-          description: Text(
-            "Complete a \(algorithm.metadata.displayName) sort at a couple of different array sizes "
-              + "to chart it here."
-          )
+          description: Text(String(localized: "Complete a \(algorithm.metadata.displayName) sort at a couple of different array sizes to chart it here.", bundle: .module))
         )
         .frame(maxWidth: .infinity, minHeight: 120)
       } else {
@@ -71,7 +69,7 @@ struct BigOCorrelationChart: View {
               RecordedChartDiscoveryTip.hasExpandedChart = true
               RecordedChartDiscoveryTip().invalidate(reason: .actionPerformed)
             } label: {
-              Label("Expand Chart", systemImage: "arrow.up.left.and.arrow.down.right")
+              Label(String(localized: "Expand Chart", bundle: .module), systemImage: "arrow.up.left.and.arrow.down.right")
             }
             .buttonStyle(.bordered)
             .accessibilityIdentifier("bigOExpandChartButton")
@@ -94,15 +92,12 @@ struct BigOCorrelationChart: View {
           .chartXAxis {
             AxisMarks(values: powerOfTwoAxisValues(in: sizeDomain, maximumCount: 6))
           }
-          .chartXAxisLabel("Array Size")
-          .chartYAxisLabel("Normalized Work")
+          .chartXAxisLabel(String(localized: "Array Size", bundle: .module))
+          .chartYAxisLabel(String(localized: "Normalized Work", bundle: .module))
           .frame(maxWidth: .infinity, minHeight: 200)
           .accessibilityElement(children: .ignore)
-          .accessibilityLabel("Recorded runs chart")
-          .accessibilityValue(
-            "Observed mean, circle. Minimum, square. Maximum, triangle. Median, diamond. "
-              + "Mean plus or minus one standard deviation, plus marks. "
-              + recordedRunSummary(points) + " Expand Chart for exact values.")
+          .accessibilityLabel(String(localized: "Recorded runs chart", bundle: .module))
+          .accessibilityValue(compactChartAccessibilityValue)
           .accessibilityIdentifier("bigOCorrelationChart")
           RainbowStatLegend()
         }
@@ -114,6 +109,11 @@ struct BigOCorrelationChart: View {
     .task(id: "\(algorithm.id.rawValue)-\(refreshRevision)") {
       await load()
     }
+  }
+
+  private var compactChartAccessibilityValue: String {
+    let summary = recordedRunSummary(points)
+    return String(localized: "Observed mean, circle. Minimum, square. Maximum, triangle. Median, diamond. Mean plus or minus one standard deviation, plus marks. \(summary) Expand Chart for exact values.", bundle: .module)
   }
 
   private func load() async {
@@ -169,9 +169,9 @@ struct BigOCorrelationChart: View {
 struct RecordedChartDiscoveryTip: Tip {
   @Parameter static var hasExpandedChart: Bool = false
 
-  var title: Text { Text("Compare your recorded runs") }
+  var title: Text { Text(String(localized: "Compare your recorded runs", bundle: .module)) }
   var message: Text? {
-    Text("Expand Chart to compare sizes and inspect the exact values from completed runs.")
+    Text(String(localized: "Expand Chart to compare sizes and inspect the exact values from completed runs.", bundle: .module))
   }
   var rules: [Rule] {
     #Rule(Self.$hasExpandedChart) { $0 == false }
@@ -208,7 +208,7 @@ public struct CompactBigOAuditContent: View {
 
   public var body: some View {
     VStack(alignment: .leading, spacing: 8) {
-      Text("Big-O Correlation").font(.title2.bold())
+      Text(String(localized: "Big-O Correlation", bundle: .module)).font(.title2.bold())
       BigOCorrelationChart(algorithm: algorithm, refreshRevision: 0)
     }
   }

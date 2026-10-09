@@ -147,7 +147,7 @@ struct Sort2App: App {
     let isShortSweepUITest = ProcessInfo.processInfo.environment["UI_TEST_SHORT_SIZE_SWEEP"] == "1"
     AutomationRegistry.shared.builtIns = [
       Automation(
-        id: .sizeSweep, displayName: "Size Sweep", iconName: "arrow.up.right",
+        id: .sizeSweep, displayName: String(localized: "Size Sweep"), iconName: "arrow.up.right",
         key: "a", modifiers: [.command, .shift], runsPerSize: isCapSweepUITest || isShortSweepUITest ? 1 : 3,
         sizes: { metadata in
           if ProcessInfo.processInfo.environment["UI_TEST_SHORT_SIZE_SWEEP"] == "1" {
@@ -165,7 +165,7 @@ struct Sort2App: App {
         }
       ),
       Automation(
-        id: .maxSizeOnly, displayName: "Max Size Only", iconName: "arrow.up.to.line",
+        id: .maxSizeOnly, displayName: String(localized: "Max Size Only"), iconName: "arrow.up.to.line",
         key: "a", modifiers: [.command, .option, .shift], runsPerSize: 3,
         sizes: { metadata in
           MainActor.assumeIsolated {

@@ -1,3 +1,4 @@
+import Foundation
 import SortEngineKit
 import VisualizationKit
 
@@ -5,7 +6,8 @@ import VisualizationKit
 public struct CustomImageVisualizer: Visualizer {
   public let id = VisualizerID(rawValue: "customimage")
   public let metadata = VisualizerMetadata(
-    displayName: "Custom Image", supportsAuxArrays: false, iconName: "photo.on.rectangle.angled")
+    displayName: String(localized: "Custom Image", bundle: .module),
+    supportsAuxArrays: false, iconName: "photo.on.rectangle.angled")
 
   public init() {}
 

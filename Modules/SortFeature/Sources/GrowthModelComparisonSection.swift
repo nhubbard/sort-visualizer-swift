@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import Charts
 import MathRenderingKit
@@ -25,7 +26,7 @@ struct GrowthModelComparisonSection: View {
 
   var body: some View {
     VStack(alignment: .leading, spacing: 8) {
-      Text("Growth Model").font(.title2.bold())
+      Text(String(localized: "Growth Model", bundle: .module)).font(.title2.bold())
       if let detected = metadata.detectedGrowthModel {
         let scale = normalizer(detected: detected)
         let summary = growthModelSummary(
@@ -33,8 +34,8 @@ struct GrowthModelComparisonSection: View {
           cutoffSize: cutoffSize, scale: scale,
           divergencePercent: averageDivergencePercent(detected: detected))
         VStack(alignment: .leading, spacing: 8) {
-          LabeledEquationCell(label: "Detected", equation: detected.latex)
-          LabeledEquationCell(label: "Fitted (Used by App)", equation: metadata.fittedGrowthModelLatex)
+          LabeledEquationCell(label: String(localized: "Detected", bundle: .module), equation: detected.latex)
+          LabeledEquationCell(label: String(localized: "Fitted (Used by App)", bundle: .module), equation: metadata.fittedGrowthModelLatex)
         }
         chart(detected: detected, scale: scale)
         Text(summary)
@@ -42,8 +43,8 @@ struct GrowthModelComparisonSection: View {
           .foregroundStyle(.secondary)
           .accessibilityIdentifier("growthModelSummary")
       } else {
-        LabeledEquationCell(label: "Fitted (Used by App)", equation: metadata.fittedGrowthModelLatex)
-        Text("A measured growth model is not available for this algorithm yet.")
+        LabeledEquationCell(label: String(localized: "Fitted (Used by App)", bundle: .module), equation: metadata.fittedGrowthModelLatex)
+        Text(String(localized: "A measured growth model is not available for this algorithm yet.", bundle: .module))
           .font(.caption)
           .foregroundStyle(.secondary)
       }
@@ -109,15 +110,15 @@ struct GrowthModelComparisonSection: View {
       AxisMarks(values: powerOfTwoAxisValues(in: domain, maximumCount: 6))
     }
     .chartYScale(domain: yDomain)
-    .chartXAxisLabel("Array Size")
-    .chartYAxisLabel("Predicted Work (Normalized)")
+    .chartXAxisLabel(String(localized: "Array Size", bundle: .module))
+    .chartYAxisLabel(String(localized: "Predicted Work (Normalized)", bundle: .module))
     .chartLegend(position: .bottom, alignment: .center, spacing: 16)
     .frame(maxWidth: .infinity, minHeight: 160)
     .accessibilityElement(children: .ignore)
-    .accessibilityLabel("Growth model comparison")
-    .accessibilityValue(
-      "Detected, solid line. Fitted (Used by App), dashed line. "
-        + "Dotted line: maximum selectable size, \(Int(cutoffSize)) items.")
+    .accessibilityLabel(String(localized: "Growth model comparison", bundle: .module))
+    .accessibilityValue(String(localized:
+      "Detected, solid line. Fitted (Used by App), dashed line. Dotted line: maximum selectable size, \(Int(cutoffSize)) items.",
+      bundle: .module))
     .accessibilityIdentifier("growthModelComparisonChart")
   }
 

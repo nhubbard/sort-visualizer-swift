@@ -1,3 +1,4 @@
+import Foundation
 import SwiftUI
 import UIKit
 
@@ -41,7 +42,7 @@ public struct RandomizingHeader: View {
     }
     .buttonStyle(.plain)
     .accessibilityLabel(text)
-    .accessibilityHint("Shuffle once, then sort the title with Quick Sort")
+    .accessibilityHint(String(localized: "Shuffle once, then sort the title with Quick Sort", bundle: .module))
     .onAppear(perform: startSort)
     .onDisappear {
       sortTask?.cancel()

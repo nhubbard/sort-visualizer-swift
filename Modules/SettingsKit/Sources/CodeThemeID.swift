@@ -1,3 +1,4 @@
+import Foundation
 /// An ID only, mirroring `VisualizerID`'s shape — real theme rendering (colors, syntax rules)
 /// stays deferred to whenever `DesignSystemKit` gets real content; no phase currently owns that
 /// work, so `SettingsKit` shouldn't depend on it just to persist a chosen theme's name.
@@ -67,55 +68,55 @@ extension CodeThemeID {
 
   public var displayName: String {
     switch rawValue {
-    case "monokai": "Monokai"
-    case "pygments": "Pygments"
-    case "arduino": "Arduino"
-    case "colorful": "Colorful"
-    case "dracula": "Dracula"
-    case "emacs": "Emacs"
-    case "abap": "ABAP"
-    case "algol": "Algol"
-    case "algol_nu": "Algol Nu"
-    case "autumn": "Autumn"
-    case "borland": "Borland"
-    case "bw": "BW"
-    case "coffee": "Coffee"
-    case "friendly": "Friendly"
-    case "friendly_grayscale": "Friendly Grayscale"
-    case "fruity": "Fruity"
-    case "github-dark": "GitHub Dark"
-    case "gruvbox-dark": "Gruvbox Dark"
-    case "gruvbox-light": "Gruvbox Light"
-    case "igor": "Igor"
-    case "inkpot": "Inkpot"
-    case "lightbulb": "Lightbulb"
-    case "lilypond": "Lilypond"
-    case "lovelace": "Lovelace"
-    case "manni": "Manni"
-    case "material": "Material"
-    case "murphy": "Murphy"
-    case "native": "Native"
-    case "nord": "Nord"
-    case "nord-darker": "Nord Darker"
-    case "one-dark": "One Dark"
-    case "paraiso-dark": "Paraiso Dark"
-    case "paraiso-light": "Paraiso Light"
-    case "pastie": "Pastie"
-    case "perldoc": "Perldoc"
-    case "rainbow_dash": "Rainbow Dash"
-    case "rrt": "RRT"
-    case "sas": "SAS"
-    case "solarized-dark": "Solarized Dark"
-    case "solarized-light": "Solarized Light"
-    case "staroffice": "StarOffice"
-    case "stata-dark": "Stata Dark"
-    case "stata-light": "Stata Light"
-    case "tango": "Tango"
-    case "trac": "Trac"
-    case "vim": "Vim"
-    case "vs": "Visual Studio"
-    case "xcode": "Xcode"
-    case "zenburn": "Zenburn"
+    case "monokai": String(localized: "Monokai", bundle: .module)
+    case "pygments": String(localized: "Pygments", bundle: .module)
+    case "arduino": String(localized: "Arduino", bundle: .module)
+    case "colorful": String(localized: "Colorful", bundle: .module)
+    case "dracula": String(localized: "Dracula", bundle: .module)
+    case "emacs": String(localized: "Emacs", bundle: .module)
+    case "abap": String(localized: "ABAP", bundle: .module)
+    case "algol": String(localized: "Algol", bundle: .module)
+    case "algol_nu": String(localized: "Algol Nu", bundle: .module)
+    case "autumn": String(localized: "Autumn", bundle: .module)
+    case "borland": String(localized: "Borland", bundle: .module)
+    case "bw": String(localized: "BW", bundle: .module)
+    case "coffee": String(localized: "Coffee", bundle: .module)
+    case "friendly": String(localized: "Friendly", bundle: .module)
+    case "friendly_grayscale": String(localized: "Friendly Grayscale", bundle: .module)
+    case "fruity": String(localized: "Fruity", bundle: .module)
+    case "github-dark": String(localized: "GitHub Dark", bundle: .module)
+    case "gruvbox-dark": String(localized: "Gruvbox Dark", bundle: .module)
+    case "gruvbox-light": String(localized: "Gruvbox Light", bundle: .module)
+    case "igor": String(localized: "Igor", bundle: .module)
+    case "inkpot": String(localized: "Inkpot", bundle: .module)
+    case "lightbulb": String(localized: "Lightbulb", bundle: .module)
+    case "lilypond": String(localized: "Lilypond", bundle: .module)
+    case "lovelace": String(localized: "Lovelace", bundle: .module)
+    case "manni": String(localized: "Manni", bundle: .module)
+    case "material": String(localized: "Material", bundle: .module)
+    case "murphy": String(localized: "Murphy", bundle: .module)
+    case "native": String(localized: "Native", bundle: .module)
+    case "nord": String(localized: "Nord", bundle: .module)
+    case "nord-darker": String(localized: "Nord Darker", bundle: .module)
+    case "one-dark": String(localized: "One Dark", bundle: .module)
+    case "paraiso-dark": String(localized: "Paraiso Dark", bundle: .module)
+    case "paraiso-light": String(localized: "Paraiso Light", bundle: .module)
+    case "pastie": String(localized: "Pastie", bundle: .module)
+    case "perldoc": String(localized: "Perldoc", bundle: .module)
+    case "rainbow_dash": String(localized: "Rainbow Dash", bundle: .module)
+    case "rrt": String(localized: "RRT", bundle: .module)
+    case "sas": String(localized: "SAS", bundle: .module)
+    case "solarized-dark": String(localized: "Solarized Dark", bundle: .module)
+    case "solarized-light": String(localized: "Solarized Light", bundle: .module)
+    case "staroffice": String(localized: "StarOffice", bundle: .module)
+    case "stata-dark": String(localized: "Stata Dark", bundle: .module)
+    case "stata-light": String(localized: "Stata Light", bundle: .module)
+    case "tango": String(localized: "Tango", bundle: .module)
+    case "trac": String(localized: "Trac", bundle: .module)
+    case "vim": String(localized: "Vim", bundle: .module)
+    case "vs": String(localized: "Visual Studio", bundle: .module)
+    case "xcode": String(localized: "Xcode", bundle: .module)
+    case "zenburn": String(localized: "Zenburn", bundle: .module)
     default: rawValue.capitalized
     }
   }

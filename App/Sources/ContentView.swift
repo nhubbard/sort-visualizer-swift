@@ -90,9 +90,9 @@ struct ContentView: View {
 
     var displayName: String {
       switch self {
-      case .name: "Name"
-      case .complexity: "Implementation Complexity"
-      case .estimatedSpeed: "Estimated Speed"
+      case .name: String(localized: "Name")
+      case .complexity: String(localized: "Implementation Complexity")
+      case .estimatedSpeed: String(localized: "Estimated Speed")
       }
     }
   }
@@ -186,7 +186,7 @@ struct ContentView: View {
         ForEach(AlgorithmCategory.allCases) { category in
           NavigationLink(value: SidebarCategory.category(category)) {
             Label {
-              Text(category.displayName.replacingOccurrences(of: " Sorts", with: ""))
+              Text(category.shortDisplayName)
                 .lineLimit(1)
             } icon: {
               Image(systemName: "folder")
@@ -295,20 +295,20 @@ struct ContentView: View {
     case .name:
       return nil
     case .complexity:
-      return "Complexity: \(algorithm.metadata.implementationComplexity)"
+      return String(localized: "Complexity: \(algorithm.metadata.implementationComplexity)")
     case .estimatedSpeed:
       let referenceSize = settings.defaultArraySize
       guard let ops = algorithm.metadata.estimatedOperations(atSize: referenceSize) else {
-        return "N/A above n=\(algorithm.metadata.sizeRange.upperBound)"
+        return String(localized: "N/A above n=\(algorithm.metadata.sizeRange.upperBound)")
       }
       let opsText = ops.rounded().formatted(.number.notation(.compactName))
-      return "~\(opsText) ops at n=\(referenceSize)"
+      return String(localized: "~\(opsText) ops at n=\(referenceSize)")
     }
   }
 
   private var contentTitle: String {
     switch selectedSidebarCategory {
-    case .none, .some(.all): "All Algorithms"
+    case .none, .some(.all): String(localized: "All Algorithms")
     case .some(.category(let category)): category.displayName
     }
   }
@@ -427,8 +427,8 @@ struct ContentView: View {
 
   private var fullSweepConfirmationTitle: String {
     sweepDriver.completedCount > 0
-      ? "Resume Full Sweep? (\(sweepDriver.completedCount.formatted())/\(sweepDriver.totalCount.formatted()) done)"
-      : "Start Full Sweep?"
+      ? String(localized: "Resume Full Sweep? (\(sweepDriver.completedCount.formatted())/\(sweepDriver.totalCount.formatted()) done)")
+      : String(localized: "Start Full Sweep?")
   }
 
   private var settingsToolbarButton: some View {
@@ -481,12 +481,12 @@ struct ContentView: View {
         break
       case .unrecognizedAlgorithm(let algorithmID):
         importErrorMessage =
-          "This tape was recorded with an algorithm (\"\(algorithmID)\") this build doesn't recognize."
+          String(localized: "This tape was recorded with an algorithm (\"\(algorithmID)\") this build doesn't recognize.")
       case .decodeFailed(let reason):
-        importErrorMessage = "Couldn't import this tape: \(reason)"
+        importErrorMessage = String(localized: "Couldn't import this tape: \(reason)")
       }
     } catch {
-      importErrorMessage = "Couldn't read this file: \(error.localizedDescription)"
+      importErrorMessage = String(localized: "Couldn't read this file: \(error.localizedDescription)")
     }
   }
 
@@ -593,18 +593,18 @@ struct ContentView: View {
       automationBanner(
         title: showcaseProgressText, progress: nil,
         progressID: "showcaseProgressLabel", stopID: "showcaseStopButton",
-        stopLabel: "Stop Showcase", stop: stopShowcase)
+        stopLabel: String(localized: "Stop Showcase"), stop: stopShowcase)
     } else if sweepDriver.isRunning {
       automationBanner(
         title: fullSweepProgressText,
         progress: (sweepDriver.completedCount, sweepDriver.totalCount),
         progressID: "fullSweepProgressLabel", stopID: "fullSweepStopButton",
-        stopLabel: "Stop Full Sweep", stop: sweepDriver.stop)
+        stopLabel: String(localized: "Stop Full Sweep"), stop: sweepDriver.stop)
     } else if let session = coordinator.activeSortSession, session.isAutomating {
       automationBanner(
         title: sessionAutomationProgressText(session), progress: nil,
         progressID: "automationProgressLabel", stopID: "automationStopButton",
-        stopLabel: "Stop Automation", stop: coordinator.stop)
+        stopLabel: String(localized: "Stop Automation"), stop: coordinator.stop)
     }
   }
 
@@ -636,24 +636,33 @@ struct ContentView: View {
   private func sessionAutomationProgressText(_ session: SortSession) -> String {
     let name = session.runningAutomationID
       .flatMap { AutomationRegistry.shared.automation(id: $0)?.displayName }
-      ?? "Sort Run"
-    let source = coordinator.currentSelectionWillAutomate ? "Shortcuts: " : ""
+      ?? String(localized: "Sort Run")
+    let algorithm = session.algorithm.metadata.displayName
     guard let progress = session.automationProgress else {
-      return "\(source)\(name): \(session.algorithm.metadata.displayName)"
+      return coordinator.currentSelectionWillAutomate
+        ? String(localized: "Shortcuts: \(name): \(algorithm)")
+        : String(localized: "\(name): \(algorithm)")
     }
-    return "\(source)\(name): \(session.algorithm.metadata.displayName) · size \(session.arraySize) "
-      + "(\(progress.sizeIndex + 1)/\(progress.sizeCount)) · run "
-      + "\(progress.runIndex + 1)/\(progress.runCount)"
+    let size = session.arraySize
+    let sizeIndex = progress.sizeIndex + 1
+    let sizeCount = progress.sizeCount
+    let runIndex = progress.runIndex + 1
+    let runCount = progress.runCount
+    return coordinator.currentSelectionWillAutomate
+      ? String(localized: "Shortcuts: \(name): \(algorithm) · size \(size) (\(sizeIndex)/\(sizeCount)) · run \(runIndex)/\(runCount)")
+      : String(localized: "\(name): \(algorithm) · size \(size) (\(sizeIndex)/\(sizeCount)) · run \(runIndex)/\(runCount)")
   }
 
   private var showcaseProgressText: String {
     guard let showcaseIndex,
       let algorithm = AlgorithmRegistry.shared.algorithm(id: showcaseAlgorithmIDs[showcaseIndex])
     else {
-      return "Showcase"
+      return String(localized: "Showcase")
     }
-    return
-      "Showcase: \(algorithm.metadata.displayName) (\(showcaseIndex + 1)/\(showcaseAlgorithmIDs.count))"
+    let name = algorithm.metadata.displayName
+    let position = showcaseIndex + 1
+    let count = showcaseAlgorithmIDs.count
+    return String(localized: "Showcase: \(name) (\(position)/\(count))")
   }
 
   private var fullSweepProgressText: String {
@@ -663,15 +672,16 @@ struct ContentView: View {
       let shuffle = ShuffleRegistry.shared.shuffle(id: combo.shuffleID),
       let visualizer = VisualizerRegistry.shared.visualizer(id: combo.visualizerID)
     else {
-      return "Full Sweep: \(progress)"
+      return String(localized: "Full Sweep: \(progress)")
     }
-    var text =
-      "Full Sweep: \(progress) · \(algorithm.metadata.displayName) + \(shuffle.metadata.displayName) + \(visualizer.metadata.displayName)"
+    let algorithmName = algorithm.metadata.displayName
+    let shuffleName = shuffle.metadata.displayName
+    let visualizerName = visualizer.metadata.displayName
     if let remaining = sweepDriver.estimatedTimeRemaining(),
       let formatted = Self.fullSweepETAFormatter.string(from: remaining) {
-      text += " · ~\(formatted) remaining"
+      return String(localized: "Full Sweep: \(progress) · \(algorithmName) + \(shuffleName) + \(visualizerName) · ~\(formatted) remaining")
     }
-    return text
+    return String(localized: "Full Sweep: \(progress) · \(algorithmName) + \(shuffleName) + \(visualizerName)")
   }
 
   private static let fullSweepETAFormatter: DateComponentsFormatter = {

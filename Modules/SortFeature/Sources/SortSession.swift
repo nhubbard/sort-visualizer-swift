@@ -25,9 +25,9 @@ extension SortSessionError: LocalizedError {
     case .recordingFailed(let message):
       message
     case .recordingTooLarge(let operationCount, let cap, _, _, _, _):
-      "This sort would take an unusually long time to finish (over \(operationCount.formatted()) "
-        + "operations, past the \(cap.formatted())-operation limit) at the current settings, "
-        + "so it was skipped."
+      String(localized:
+        "This sort would take an unusually long time to finish (over \(operationCount.formatted()) operations, past the \(cap.formatted())-operation limit) at the current settings, so it was skipped.",
+        bundle: .module)
     }
   }
 }

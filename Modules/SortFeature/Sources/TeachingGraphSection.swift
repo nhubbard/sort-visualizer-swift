@@ -1,3 +1,4 @@
+import Foundation
 import SortEngineKit
 import SwiftUI
 
@@ -57,13 +58,13 @@ private struct TeachingGraphView: View {
             .font(.subheadline)
             .foregroundStyle(.secondary)
           if isPinned {
-            Text("Pinned while playback is fast")
+            Text(String(localized: "Pinned while playback is fast", bundle: .module))
               .font(.caption)
               .foregroundStyle(.secondary)
               .accessibilityIdentifier("teachingGraphPinnedStatus")
           }
           if let event = snapshot.current {
-            Text("Graph event \(snapshot.currentNumber) of \(trace.events.count)")
+            Text(String(localized: "Graph event \(snapshot.currentNumber) of \(trace.events.count)", bundle: .module))
               .font(.caption.monospacedDigit())
               .foregroundStyle(.secondary)
             Text(event.explanation)
@@ -75,7 +76,7 @@ private struct TeachingGraphView: View {
             Text(legend(for: snapshot))
               .font(.caption)
               .foregroundStyle(.secondary)
-            Text("Showing up to \(TeachingGraphTrace.maximumVisibleEvents) recent events and \(TeachingGraphTrace.maximumVisibleNodes) items.")
+            Text(String(localized: "Showing up to \(TeachingGraphTrace.maximumVisibleEvents) recent events and \(TeachingGraphTrace.maximumVisibleNodes) items.", bundle: .module))
               .font(.caption)
               .foregroundStyle(.secondary)
           } else {
@@ -87,12 +88,12 @@ private struct TeachingGraphView: View {
               .accessibilityIdentifier("teachingGraphExplanation")
           }
           HStack {
-            Button("Previous Graph Event") {
+            Button(String(localized: "Previous Graph Event", bundle: .module)) {
               if let target = trace.previousStep(before: step) { replay.seek(to: target) }
             }
             .disabled(trace.previousStep(before: step) == nil)
             .accessibilityIdentifier("teachingGraphPreviousButton")
-            Button("Next Graph Event") {
+            Button(String(localized: "Next Graph Event", bundle: .module)) {
               if let target = trace.nextStep(after: step) { replay.seek(to: target) }
             }
             .disabled(trace.nextStep(after: step) == nil)
@@ -103,7 +104,7 @@ private struct TeachingGraphView: View {
         .padding(.top, 10)
       }
     } label: {
-      Label("Teaching Graph", systemImage: "point.3.connected.trianglepath.dotted")
+      Label(String(localized: "Teaching Graph", bundle: .module), systemImage: "point.3.connected.trianglepath.dotted")
         .font(.title2.bold())
         .accessibilityIdentifier("teachingGraphDisclosure")
     }
@@ -129,23 +130,27 @@ private struct TeachingGraphView: View {
   private var introduction: String {
     switch trace.variant {
     case .quickSort:
-      "Quick Sort compares each partition's pivot with other positions, moves values within the partition, then places the pivot."
+      String(localized: "Quick Sort compares each partition's pivot with other positions, moves values within the partition, then places the pivot.", bundle: .module)
     case .mergeSort:
-      "Merge Sort compares two runs, moves chosen values into a temporary buffer, then writes them back to the array."
+      String(localized: "Merge Sort compares two runs, moves chosen values into a temporary buffer, then writes them back to the array.", bundle: .module)
     case .annotated:
-      "Follow the algorithm's recorded decisions and movements. Each explanation describes the reason for a marked step."
+      String(localized: "Follow the algorithm's recorded decisions and movements. Each explanation describes the reason for a marked step.", bundle: .module)
     }
   }
 
   private func legend(for snapshot: TeachingGraphTrace.Snapshot) -> String {
-    var legend = "Dashed connections show decisions; solid connections show movement."
-    if snapshot.nodes.contains(where: { $0.location == .buffer }) {
-      legend += " B marks a temporary buffer position."
+    let hasBuffer = snapshot.nodes.contains { $0.location == .buffer }
+    let hasValue = snapshot.nodes.contains { $0.location == .value }
+    switch (hasBuffer, hasValue) {
+    case (true, true):
+      return String(localized: "Dashed connections show decisions; solid connections show movement. B marks a temporary buffer position. V marks a held value.", bundle: .module)
+    case (true, false):
+      return String(localized: "Dashed connections show decisions; solid connections show movement. B marks a temporary buffer position.", bundle: .module)
+    case (false, true):
+      return String(localized: "Dashed connections show decisions; solid connections show movement. V marks a held value.", bundle: .module)
+    case (false, false):
+      return String(localized: "Dashed connections show decisions; solid connections show movement.", bundle: .module)
     }
-    if snapshot.nodes.contains(where: { $0.location == .value }) {
-      legend += " V marks a held value."
-    }
-    return legend
   }
 }
 

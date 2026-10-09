@@ -148,6 +148,23 @@ struct TeachingGraphTraceTests {
   }
 
   @Test
+  func knownAnnotationKeyUsesLocalizableTemplateInsteadOfRecordedEnglish() throws {
+    let annotation = TeachingAnnotation(
+      operationIndex: 0, stageID: "quick.partition.scanLeft", outcome: "advance",
+      roles: ["pivot": .arrayIndex(0), "candidate": .arrayIndex(1)],
+      explanationKey: "quick.pivotSide", explanation: "Recorded English text")
+    let tape = Tape(
+      header: TapeHeader(
+        algorithmID: "quicksort", initialValues: [2, 1], visualSeed: 1,
+        compareCount: 1, swapCount: 0, recordingDuration: 0, recordedAt: .distantPast),
+      operations: [.compare(0, 1)], teachingAnnotations: [annotation])
+
+    let trace = try #require(TeachingGraphTrace(tape: tape))
+    #expect(trace.events[0].explanation ==
+      "Position 2 is on the pivot's left side; advance the scan from pivot 1.")
+  }
+
+  @Test
   func realExchangeAndDistributionSortsUseTheUniversalGraph() throws {
     for algorithm in [BubbleSort() as any SortAlgorithm, LSDRadixSort()] {
       let tape = makeTape(algorithm, values: [4, 1, 3, 2])

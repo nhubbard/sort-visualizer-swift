@@ -1,3 +1,4 @@
+import Foundation
 #if DEBUG
 import AlgorithmKit
 import PersistenceKit
@@ -14,19 +15,19 @@ public struct CloudKitCanaryControls: View {
 
   public var body: some View {
     HStack {
-      Button("Write sync canary") {
+      Button(String(localized: "Write sync canary", bundle: .module)) {
         Task { await writeCanary() }
       }
       .accessibilityIdentifier("cloudKitCanaryWriteButton")
-      Button("Refresh sync canary") {
+      Button(String(localized: "Refresh sync canary", bundle: .module)) {
         Task { await refreshCanary() }
       }
       .accessibilityIdentifier("cloudKitCanaryRefreshButton")
-      Button("Delete sync canary") {
+      Button(String(localized: "Delete sync canary", bundle: .module)) {
         Task { await deleteCanary() }
       }
       .accessibilityIdentifier("cloudKitCanaryDeleteButton")
-      Text("CloudKit canary")
+      Text(String(localized: "CloudKit canary", bundle: .module))
         .accessibilityIdentifier("cloudKitCanaryProbe")
         .accessibilityValue(status)
     }

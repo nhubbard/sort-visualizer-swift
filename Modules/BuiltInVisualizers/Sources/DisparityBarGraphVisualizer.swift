@@ -11,7 +11,7 @@ import VisualizationKit
 public struct DisparityBarGraphVisualizer: Visualizer {
   public let id = VisualizerID(rawValue: "disparitybargraph")
   public let metadata = VisualizerMetadata(
-    displayName: "Disparity Bar Graph",
+    displayName: String(localized: "Disparity Bar Graph", bundle: .module),
     supportsAuxArrays: false,
     iconName: "chart.bar.xaxis"
   )

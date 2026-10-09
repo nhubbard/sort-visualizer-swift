@@ -130,13 +130,7 @@
     "Find Algorithms" : {
 
     },
-    "Find algorithms in ${category}" : {
-
-    },
     "Find Array Sizes" : {
-
-    },
-    "Find array sizes for ${algorithm}" : {
 
     },
     "Find Automations" : {
@@ -148,13 +142,19 @@
     "Find Maximum Array Size" : {
 
     },
-    "Find maximum array size for ${algorithm}" : {
-
-    },
     "Find Shuffles" : {
 
     },
     "Find Visualizers" : {
+
+    },
+    "Find algorithms in ${category}" : {
+
+    },
+    "Find array sizes for ${algorithm}" : {
+
+    },
+    "Find maximum array size for ${algorithm}" : {
 
     },
     "Finds the largest array size one algorithm supports." : {
@@ -196,15 +196,6 @@
     "List Algorithms" : {
 
     },
-    "Lists every array size one algorithm supports, the same sizes a Size Sweep automation runs through." : {
-
-    },
-    "Lists every shuffle Sort Symphony ships." : {
-
-    },
-    "Lists every visualizer Sort Symphony ships." : {
-
-    },
     "Lists Sort Symphony's algorithm categories." : {
 
     },
@@ -212,6 +203,15 @@
 
     },
     "Lists Sort Symphony's sorting algorithms, optionally filtered to one category." : {
+
+    },
+    "Lists every array size one algorithm supports, the same sizes a Size Sweep automation runs through." : {
+
+    },
+    "Lists every shuffle Sort Symphony ships." : {
+
+    },
+    "Lists every visualizer Sort Symphony ships." : {
 
     },
     "Max Size" : {
@@ -289,10 +289,10 @@
     "Run visualizer showcase for ${algorithm}" : {
 
     },
-    "Runs a size sweep (every supported size, three times each) for every algorithm, in alphabetical order." : {
+    "Runs a Sort Symphony automation sweep (like Size Sweep or Max Size Only) for one algorithm and waits for it to finish." : {
 
     },
-    "Runs a Sort Symphony automation sweep (like Size Sweep or Max Size Only) for one algorithm and waits for it to finish." : {
+    "Runs a size sweep (every supported size, three times each) for every algorithm, in alphabetical order." : {
 
     },
     "Runs every algorithm once, in alphabetical order, at its own maximum size, cycling through every shuffle and visualizer along the way." : {
@@ -313,28 +313,28 @@
     "Set Default Array Size" : {
 
     },
-    "Set default array size to ${size}" : {
-
-    },
     "Set Default Shuffle" : {
-
-    },
-    "Set default shuffle to ${shuffle}" : {
 
     },
     "Set Playback Speed" : {
 
     },
-    "Set playback speed to ${speed} operations per second" : {
-
-    },
     "Set Sound" : {
 
     },
-    "Set sound ${enabled}" : {
+    "Set Visualizer" : {
 
     },
-    "Set Visualizer" : {
+    "Set default array size to ${size}" : {
+
+    },
+    "Set default shuffle to ${shuffle}" : {
+
+    },
+    "Set playback speed to ${speed} operations per second" : {
+
+    },
+    "Set sound ${enabled}" : {
 
     },
     "Set visualizer to ${visualizer}" : {
