@@ -21,11 +21,14 @@ public struct TeachingAnnotation: Sendable, Codable, Equatable {
   public let outcome: String
   public let roles: [String: TeachingReference]
   public let explanationKey: String
+  /// A readable explanation for the exact recorded decision. Older tapes may omit it.
+  public let explanation: String?
 
   public init(
     operationIndex: Int, definitionVersion: Int = 1, stageID: String,
     decisionID: String? = nil, outcome: String,
-    roles: [String: TeachingReference], explanationKey: String
+    roles: [String: TeachingReference], explanationKey: String,
+    explanation: String? = nil
   ) {
     self.operationIndex = operationIndex
     self.definitionVersion = definitionVersion
@@ -34,12 +37,14 @@ public struct TeachingAnnotation: Sendable, Codable, Equatable {
     self.outcome = outcome
     self.roles = roles
     self.explanationKey = explanationKey
+    self.explanation = explanation
   }
 
   public func shifted(by offset: Int) -> Self {
     Self(operationIndex: operationIndex + offset, definitionVersion: definitionVersion,
       stageID: stageID, decisionID: decisionID,
-      outcome: outcome, roles: roles, explanationKey: explanationKey)
+      outcome: outcome, roles: roles, explanationKey: explanationKey,
+      explanation: explanation)
   }
 }
 
@@ -182,7 +187,8 @@ public struct Tape: Sendable, Codable, Equatable {
             operationIndex: kept.count, definitionVersion: annotation.definitionVersion,
             stageID: annotation.stageID, decisionID: annotation.decisionID,
             outcome: annotation.outcome, roles: annotation.roles,
-            explanationKey: annotation.explanationKey))
+            explanationKey: annotation.explanationKey,
+            explanation: annotation.explanation))
           annotationIndex += 1
         }
         if index < header.sortStartIndex {

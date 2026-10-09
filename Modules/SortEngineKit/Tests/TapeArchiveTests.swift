@@ -92,7 +92,7 @@ struct TapeArchiveTests {
     let annotation = TeachingAnnotation(
       operationIndex: 2, stageID: "test.choose", outcome: "left",
       roles: ["left": .arrayIndex(0), "right": .arrayIndex(1)],
-      explanationKey: "test.choice")
+      explanationKey: "test.choice", explanation: "Choose the left position.")
     let annotated = Tape(
       header: oldTape.header, operations: oldTape.operations,
       teachingAnnotations: [annotation])

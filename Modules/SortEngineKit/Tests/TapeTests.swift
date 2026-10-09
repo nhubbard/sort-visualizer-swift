@@ -30,6 +30,63 @@ struct TapeTests {
   }
 
   @Test
+  func authoredExplanationSurvivesCodableAndOffset() throws {
+    let annotation = TeachingAnnotation(operationIndex: 2,
+      stageID: "test.choose", outcome: "smaller",
+      roles: ["candidate": .arrayIndex(1)],
+      explanationKey: "test.choose",
+      explanation: "Choose position 2 because it is smaller.")
+    let decoded = try JSONDecoder().decode(TeachingAnnotation.self,
+      from: JSONEncoder().encode(annotation))
+    #expect(decoded == annotation)
+    #expect(annotation.shifted(by: 3).explanation == annotation.explanation)
+
+    // Annotations written before explanations were added must remain readable.
+    let legacy = """
+      {"operationIndex":2,"definitionVersion":1,"stageID":"test.choose",
+       "decisionID":null,"outcome":"smaller","roles":{},"explanationKey":"test.choose"}
+      """.data(using: .utf8)!
+    #expect(try JSONDecoder().decode(TeachingAnnotation.self, from: legacy).explanation == nil)
+  }
+
+  @Test
+  func teachingAnnotationsStayBoundedAndCoverLongRecordings() {
+    var engine = RecordingEngine(values: [1], operationCap: 20_000)
+    for index in 0..<10_000 {
+      _ = engine.compareValues(index, index + 1)
+      if engine.shouldAnnotateCurrentOperation {
+        engine.annotateLastOperation(stageID: "test.sequence", outcome: "next",
+          roles: ["value": .value(index)], explanationKey: "test.sequence",
+          explanation: "Advance to the next comparison.")
+      }
+    }
+    let summary = engine.finish()
+    #expect(summary.teachingAnnotations.count <= 2_048)
+    #expect(summary.teachingAnnotations.first?.operationIndex == 0)
+    #expect((summary.teachingAnnotations.last?.operationIndex ?? 0) >= 9_900)
+    #expect(summary.tape.count == 10_000)
+  }
+
+  @Test
+  func teachingSamplingKeepsARepeatingOddOperationPosition() {
+    var engine = RecordingEngine(values: [1], operationCap: 25_000)
+    _ = engine.readValue(at: 0)
+    for index in 0..<10_000 {
+      _ = engine.compareValues(index, index + 1)
+      if engine.shouldAnnotateCurrentOperation {
+        engine.annotateLastOperation(stageID: "test.odd", outcome: "next",
+          roles: ["value": .value(index)], explanationKey: "test.odd",
+          explanation: "Compare the next held value.")
+      }
+      _ = engine.readValue(at: 0)
+    }
+    let annotations = engine.finish().teachingAnnotations
+    #expect(!annotations.isEmpty)
+    #expect(annotations.count <= 2_048)
+    #expect((annotations.last?.operationIndex ?? 0) >= 19_800)
+  }
+
+  @Test
   func cappedRecordingDoesNotRetainPartialAnnotations() {
     var engine = RecordingEngine(values: [2, 1], operationCap: 1)
     _ = engine.compare(0, 1)

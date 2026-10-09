@@ -20,6 +20,11 @@ public struct RecordingEngine: Sendable {
   public private(set) var values: [Int]
   private var tape: [SortOperation] = []
   private var teachingAnnotations: [TeachingAnnotation] = []
+  /// Keeps authored explanations distributed through long recordings without letting their
+  /// storage grow in proportion to every comparison on the tape.
+  private static let maximumTeachingAnnotations = 2_048
+  private var teachingAnnotationStride = 1
+  private var teachingAnnotationResidue = 0
   /// Counts every operation even after `operationCap` stops retaining tape entries.
   private var totalOperationCount = 0
   private let operationCap: Int
@@ -109,18 +114,46 @@ public struct RecordingEngine: Sendable {
     tape.append(op)
   }
 
+  /// Whether this point in the tape is selected for a teaching annotation.
+  public var shouldAnnotateCurrentOperation: Bool {
+    !didExceedCap && tape.last?.isSignificantForPacing == true
+      && (tape.count - 1) % teachingAnnotationStride == teachingAnnotationResidue
+  }
+
   /// Attach the algorithm's reason for its most recent real operation. Call immediately after
   /// the comparison or write whose result is being explained.
   public mutating func annotateLastOperation(
     stageID: String, decisionID: String? = nil, outcome: String,
-    roles: [String: TeachingReference], explanationKey: String
+    roles: [String: TeachingReference], explanationKey: String,
+    explanation: String? = nil
   ) {
-    guard !didExceedCap, let operation = tape.last,
-      operation.isSignificantForPacing else { return }
+    guard shouldAnnotateCurrentOperation else { return }
     teachingAnnotations.append(TeachingAnnotation(
       operationIndex: tape.count - 1, stageID: stageID, decisionID: decisionID,
       outcome: outcome,
-      roles: roles, explanationKey: explanationKey))
+      roles: roles, explanationKey: explanationKey, explanation: explanation))
+    while teachingAnnotations.count >= Self.maximumTeachingAnnotations {
+      let nextStride = teachingAnnotationStride * 2
+      let upperResidue = teachingAnnotationResidue + teachingAnnotationStride
+      let lowerCount = teachingAnnotations.count {
+        $0.operationIndex % nextStride == teachingAnnotationResidue
+      }
+      teachingAnnotationResidue = lowerCount >= teachingAnnotations.count - lowerCount
+        ? teachingAnnotationResidue : upperResidue
+      teachingAnnotationStride = nextStride
+      let stride = nextStride
+      let residue = teachingAnnotationResidue
+      teachingAnnotations.removeAll {
+        $0.operationIndex % stride != residue
+      }
+      if teachingAnnotations.count >= Self.maximumTeachingAnnotations,
+        stride > tape.count {
+        teachingAnnotations = teachingAnnotations.enumerated().compactMap {
+          $0.offset.isMultiple(of: 2) ? $0.element : nil
+        }
+        break
+      }
+    }
   }
 
   @discardableResult
