@@ -15,6 +15,10 @@ The graph displays at most ten recent events and twelve positions. Its text and 
 
 The graph is available during manual playback. Automated showcase and size-sweep runs retain their compact detail placeholder. Other algorithms do not yet have semantic graph models. Side-by-side algorithm comparison remains a separate design decision; this pilot establishes the meaning and replay behavior of one graph first.
 
+[Teaching graph annotations](teaching-graph-annotations.md) proposes how algorithms can record the
+reason for a decision alongside the replay tape. It also defines how those explanations could
+drive this graph and a fixed flowchart without guessing intent from a generic operation.
+
 ## Verification
 
 `TeachingGraphTraceTests` covers complete Quick Sort and Merge Sort tapes, sorted/reversed/duplicate-heavy inputs, every replay position, forward and backward event navigation, the shuffle boundary, visible-density caps, unsupported algorithms, and fast-playback compaction. `TeachingGraphUITests` covers opening each pilot graph, event navigation, buffer explanation, and the playback status when reviewing an earlier operation. Catalyst was also inspected manually for distinct accessibility controls and synchronized replay positions.
