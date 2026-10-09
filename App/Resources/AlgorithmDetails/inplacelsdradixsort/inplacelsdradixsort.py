@@ -29,6 +29,7 @@ def sort(arr):
                     vregs[j - 1] -= 1
     return arr
 
+
 def int_pow(base, exponent):
     result = 1
     for _ in range(exponent):
@@ -49,12 +50,24 @@ def multi_swap(arr, pos, to):
             arr[k], arr[k - 1] = arr[k - 1], arr[k]
 
 
-
-
 if __name__ == "__main__":
     array = [
-        0, 39, 21, 62, 91, 77, 14, 23,
-        90, 69, 51, 81, 68, 83, 32, 56,
+        0,
+        39,
+        21,
+        62,
+        91,
+        77,
+        14,
+        23,
+        90,
+        69,
+        51,
+        81,
+        68,
+        83,
+        32,
+        56,
     ]
     sort(array)
     print(array)

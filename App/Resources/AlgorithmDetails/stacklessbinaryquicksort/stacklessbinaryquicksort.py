@@ -25,6 +25,7 @@ def sort(arr):
             b = p
             q -= 1
 
+
 def most_significant_bit(value):
     if value == 0:
         return -1
@@ -54,12 +55,24 @@ def partition(arr, lo, hi, bit):
             return i
 
 
-
-
 if __name__ == "__main__":
     array = [
-        0, 39, 21, 62, 91, 77, 14, 23,
-        90, 69, 51, 81, 68, 83, 32, 56,
+        0,
+        39,
+        21,
+        62,
+        91,
+        77,
+        14,
+        23,
+        90,
+        69,
+        51,
+        81,
+        68,
+        83,
+        32,
+        56,
     ]
     sort(array)
     print(array)

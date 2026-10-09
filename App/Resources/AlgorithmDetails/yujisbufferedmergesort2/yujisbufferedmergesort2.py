@@ -4,6 +4,7 @@ def sort(arr):
         return
     buffered_merge(arr, 0, n)
 
+
 def ceil_log(n):
     i = 0
     while (1 << i) < n:
@@ -162,12 +163,24 @@ def buffered_merge(array, a, b):
     buffered_merge(array, b - (m - a) - s, b)
 
 
-
-
 if __name__ == "__main__":
     array = [
-        0, 39, 21, 62, 91, 77, 14, 23,
-        90, 69, 51, 81, 68, 83, 32, 56,
+        0,
+        39,
+        21,
+        62,
+        91,
+        77,
+        14,
+        23,
+        90,
+        69,
+        51,
+        81,
+        68,
+        83,
+        32,
+        56,
     ]
     sort(array)
     print(array)

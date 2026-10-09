@@ -10,6 +10,7 @@ def sort(arr):
         probe *= radix
     radix_msd(arr, 0, len(arr), radix, highest_power)
 
+
 def int_pow(base, exponent):
     result = 1
     for _ in range(exponent):
@@ -41,12 +42,24 @@ def radix_msd(array, low, high, radix, power):
         start += len(bucket)
 
 
-
-
 if __name__ == "__main__":
     array = [
-        0, 39, 21, 62, 91, 77, 14, 23,
-        90, 69, 51, 81, 68, 83, 32, 56,
+        0,
+        39,
+        21,
+        62,
+        91,
+        77,
+        14,
+        23,
+        90,
+        69,
+        51,
+        81,
+        68,
+        83,
+        32,
+        56,
     ]
     sort(array)
     print(array)

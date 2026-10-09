@@ -63,6 +63,7 @@ def sort(array):
         output[i] = find_next()
     array[:] = output
 
+
 def ceil_pow2(value):
     r = 1
     while r < value:
@@ -70,12 +71,24 @@ def ceil_pow2(value):
     return r
 
 
-
-
 if __name__ == "__main__":
     array = [
-        0, 39, 21, 62, 91, 77, 14, 23,
-        90, 69, 51, 81, 68, 83, 32, 56,
+        0,
+        39,
+        21,
+        62,
+        91,
+        77,
+        14,
+        23,
+        90,
+        69,
+        51,
+        81,
+        68,
+        83,
+        32,
+        56,
     ]
     sort(array)
     print(array)

@@ -14,6 +14,7 @@ def sort(arr):
             merge_without_buffer(arr, 0, i, length)
         i = j
 
+
 def multi_swap(arr, a, b, count):
     for i in range(count):
         arr[a + i], arr[b + i] = arr[b + i], arr[a + i]
@@ -116,12 +117,24 @@ def insert2(arr, a, l, r):
     arr[l + 1] = tmp_l
 
 
-
-
 if __name__ == "__main__":
     array = [
-        0, 39, 21, 62, 91, 77, 14, 23,
-        90, 69, 51, 81, 68, 83, 32, 56,
+        0,
+        39,
+        21,
+        62,
+        91,
+        77,
+        14,
+        23,
+        90,
+        69,
+        51,
+        81,
+        68,
+        83,
+        32,
+        56,
     ]
     sort(array)
     print(array)

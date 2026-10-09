@@ -1,6 +1,7 @@
 def sort(arr):
     return gravity_sort(arr)
 
+
 def gravity_sort(arr):
     n = len(arr)
     if n == 0:
@@ -28,12 +29,24 @@ def gravity_sort(arr):
     return arr
 
 
-
-
 if __name__ == "__main__":
     array = [
-        0, 39, 21, 62, 91, 77, 14, 23,
-        90, 69, 51, 81, 68, 83, 32, 56,
+        0,
+        39,
+        21,
+        62,
+        91,
+        77,
+        14,
+        23,
+        90,
+        69,
+        51,
+        81,
+        68,
+        83,
+        32,
+        56,
     ]
     sort(array)
     print(array)

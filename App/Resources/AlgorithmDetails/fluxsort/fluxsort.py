@@ -15,6 +15,7 @@ def sort(arr):
     swap_buf = [0] * n
     flux_partition(arr, swap_buf, False, 0, n)
 
+
 def swap2(arr, i, j):
     arr[i], arr[j] = arr[j], arr[i]
 
@@ -905,8 +906,6 @@ def flux_partition(arr, swap_buf, main_is_swap, start, nmemb):
 
 
 # -- Entry point ---------------------------------------------------------------------------------
-
-
 
 
 if __name__ == "__main__":

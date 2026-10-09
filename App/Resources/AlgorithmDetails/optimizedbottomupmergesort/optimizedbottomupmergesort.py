@@ -36,6 +36,7 @@ def sort(arr):
     if passes % 2 == 1:
         arr[:] = src
 
+
 def binary_insertion_sort(arr, lo, hi):
     for i in range(lo + 1, hi):
         key = arr[i]
@@ -71,8 +72,6 @@ def merge(src, dst, low, mid, high):
         dst[k] = src[j]
         j += 1
         k += 1
-
-
 
 
 if __name__ == "__main__":

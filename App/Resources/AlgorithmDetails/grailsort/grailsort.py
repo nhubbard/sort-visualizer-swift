@@ -2,6 +2,7 @@ def sort(arr):
     n = len(arr)
     common_sort(arr, 0, n)
 
+
 def compare(a, b):
     return (a > b) - (a < b)
 
@@ -418,12 +419,24 @@ def common_sort(arr, pos, length):
     merge_without_buffer(arr, pos, dist, length - dist)
 
 
-
-
 if __name__ == "__main__":
     array = [
-        0, 39, 21, 62, 91, 77, 14, 23,
-        90, 69, 51, 81, 68, 83, 32, 56,
+        0,
+        39,
+        21,
+        62,
+        91,
+        77,
+        14,
+        23,
+        90,
+        69,
+        51,
+        81,
+        68,
+        83,
+        32,
+        56,
     ]
     sort(array)
     print(array)

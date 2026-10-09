@@ -14,6 +14,7 @@ def sort(arr):
             buffer = [0] * (n // 2)
             quad_merge(arr, buffer, 0, n, 16)
 
+
 def swap2(arr, i, j):
     arr[i], arr[j] = arr[j], arr[i]
 
@@ -670,8 +671,6 @@ def quad_swap(arr, start, nmemb):
 
 
 # -- Entry point -----------------------------------------------------------------------------
-
-
 
 
 if __name__ == "__main__":
