@@ -17,281 +17,295 @@
 # DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-
 class AdaptiveGrailExample
   def initialize(input)
     @values = input
-    @minRun = 16
+    @min_run = 16
   end
+
   def read(index)
-    return @values[index]
+    @values[index]
   end
+
   def write(index, value)
     @values[index] = value
   end
+
   def swap(first, second)
     @values[first], @values[second] = @values[second], @values[first]
   end
+
   def compare(first, second)
-    if (@values[first] < @values[second])
-      return -(1)
+    if @values[first] < @values[second]
+      return -1
     end
-    if (@values[first] > @values[second])
+    if @values[first] > @values[second]
       return 1
     end
-    return 0
+    0
   end
-  def compareValue(index, value)
-    if (@values[index] < value)
-      return -(1)
+
+  def compare_value(index, value)
+    if @values[index] < value
+      return -1
     end
-    if (@values[index] > value)
+    if @values[index] > value
       return 1
     end
-    return 0
+    0
   end
+
   def reverse(start, finish)
     left = start
     right = (finish - 1)
-    while (left < right)
+    while left < right
       @values[left], @values[right] = @values[right], @values[left]
       left += 1
       right -= 1
     end
   end
-  def multiSwap(first, second, count)
-    if !((count > 0))
+
+  def multi_swap(first, second, count)
+    if !(count > 0)
       return
     end
     (0...count).each do |offset|
-      swap((first + offset), (second + offset))
+      swap(first + offset, second + offset)
     end
   end
-  def multiTriSwap(first, second, third, count)
-    if !((count > 0))
+
+  def multi_tri_swap(first, second, third, count)
+    if !(count > 0)
       return
     end
     (0...count).each do |offset|
-      value = read((first + offset))
-      write((first + offset), read((second + offset)))
-      write((second + offset), read((third + offset)))
-      write((third + offset), value)
+      value = read(first + offset)
+      write(first + offset, read(second + offset))
+      write(second + offset, read(third + offset))
+      write(third + offset, value)
     end
   end
-  def insertTo(source, destination)
+
+  def insert_to(source, destination)
     value = read(source)
     cursor = source
-    while (cursor > destination)
-      write(cursor, read((cursor - 1)))
+    while cursor > destination
+      write(cursor, read(cursor - 1))
       cursor -= 1
     end
     write(destination, value)
   end
-  def insertToBackward(source, destination)
+
+  def insert_to_backward(source, destination)
     value = read(source)
     cursor = source
-    while (cursor < destination)
-      write(cursor, read((cursor + 1)))
+    while cursor < destination
+      write(cursor, read(cursor + 1))
       cursor += 1
     end
     write(cursor, value)
   end
+
   def shift(destination, source, finish)
-    if !((source < finish))
+    if !(source < finish)
       return
     end
     (0...(finish - source)).each do |offset|
-      swap((destination + offset), (source + offset))
+      swap(destination + offset, source + offset)
     end
   end
-  def rotate(startIn, middleIn, endIn)
-    start = startIn
-    middle = middleIn
-    finish = endIn
+
+  def rotate(start_in, middle_in, end_in)
+    start = start_in
+    middle = middle_in
+    finish = end_in
     left = (middle - start)
     right = (finish - middle)
-    while ((left > 1) && (right > 1))
-      if (right < left)
-        multiSwap((middle - right), middle, right)
+    while (left > 1) && (right > 1)
+      if right < left
+        multi_swap(middle - right, middle, right)
         finish -= right
         middle -= right
         left -= right
       else
-        multiSwap(start, middle, left)
+        multi_swap(start, middle, left)
         start += left
         middle += left
         right -= left
       end
     end
-    if (right == 1)
-      insertTo(middle, start)
-    else
-      if (left == 1)
-        insertToBackward(start, (finish - 1))
-      end
+    if right == 1
+      insert_to(middle, start)
+    elsif left == 1
+      insert_to_backward(start, finish - 1)
     end
   end
-  def leftBinarySearch(start, finish, value)
+
+  def left_binary_search(start, finish, value)
     lower = start
     upper = finish
-    while (lower < upper)
+    while lower < upper
       middle = (lower + ((upper - lower) / 2))
-      if (@values[middle] >= value)
+      if @values[middle] >= value
         upper = middle
       else
         lower = (middle + 1)
       end
     end
-    return lower
+    lower
   end
-  def rightBinarySearch(start, finish, value)
+
+  def right_binary_search(start, finish, value)
     lower = start
     upper = finish
-    while (lower < upper)
+    while lower < upper
       middle = (lower + ((upper - lower) / 2))
-      if (@values[middle] > value)
+      if @values[middle] > value
         upper = middle
       else
         lower = (middle + 1)
       end
     end
-    return lower
+    lower
   end
-  def buildUniqueRun(start, limit)
+
+  def build_unique_run(start, limit)
     count = 1
     index = (start + 1)
-    order = compare((index - 1), index)
-    if (order < 0)
+    order = compare(index - 1, index)
+    if order < 0
       index += 1
       count += 1
-      while ((count < limit) && (compare((index - 1), index) < 0))
+      while (count < limit) && (compare(index - 1, index) < 0)
         index += 1
         count += 1
       end
-    else
-      if (order > 0)
+    elsif order > 0
+      index += 1
+      count += 1
+      while (count < limit) && (compare(index - 1, index) > 0)
         index += 1
         count += 1
-        while ((count < limit) && (compare((index - 1), index) > 0))
-          index += 1
-          count += 1
-        end
-        reverse(start, index)
       end
+      reverse(start, index)
     end
-    return count
+    count
   end
-  def buildUniqueRunBackward(finish, limit)
+
+  def build_unique_run_backward(finish, limit)
     count = 1
     index = (finish - 1)
-    order = compare((index - 1), index)
-    if (order < 0)
+    order = compare(index - 1, index)
+    if order < 0
       index -= 1
       count += 1
-      while ((count < limit) && (compare((index - 1), index) < 0))
+      while (count < limit) && (compare(index - 1, index) < 0)
         index -= 1
         count += 1
       end
-    else
-      if (order > 0)
+    elsif order > 0
+      index -= 1
+      count += 1
+      while (count < limit) && (compare(index - 1, index) > 0)
         index -= 1
         count += 1
-        while ((count < limit) && (compare((index - 1), index) > 0))
-          index -= 1
-          count += 1
-        end
-        reverse(index, finish)
       end
+      reverse(index, finish)
     end
-    return count
+    count
   end
-  def findKeys(start, finish, initial, needed)
+
+  def find_keys(start, finish, initial, needed)
     count = initial
-    keyStart = start
-    keyEnd = (start + count)
-    index = keyEnd
-    while ((index < finish) && (count < needed))
+    key_start = start
+    key_end = (start + count)
+    index = key_end
+    while (index < finish) && (count < needed)
       candidate = read(index)
-      location = leftBinarySearch(keyStart, keyEnd, candidate)
-      if ((location == keyEnd) || (compareValue(location, candidate) != 0))
-        rotate(keyStart, keyEnd, index)
-        distance = (index - keyEnd)
+      location = left_binary_search(key_start, key_end, candidate)
+      if (location == key_end) || (compare_value(location, candidate) != 0)
+        rotate(key_start, key_end, index)
+        distance = (index - key_end)
         location += distance
-        keyStart += distance
-        keyEnd += distance
-        insertTo(keyEnd, location)
+        key_start += distance
+        key_end += distance
+        insert_to(key_end, location)
         count += 1
-        keyEnd += 1
+        key_end += 1
       end
       index += 1
     end
-    rotate(start, keyStart, keyEnd)
-    return count
+    rotate(start, key_start, key_end)
+    count
   end
-  def findKeysBackward(start, finish, initial, needed)
+
+  def find_keys_backward(start, finish, initial, needed)
     count = initial
-    keyStart = (finish - count)
-    keyEnd = finish
-    index = (keyStart - 1)
-    while ((index >= start) && (count < needed))
+    key_start = (finish - count)
+    key_end = finish
+    index = (key_start - 1)
+    while (index >= start) && (count < needed)
       candidate = read(index)
-      location = leftBinarySearch(keyStart, keyEnd, candidate)
-      if ((location == keyEnd) || (compareValue(location, candidate) != 0))
-        rotate((index + 1), keyStart, keyEnd)
-        distance = (keyStart - (index + 1))
+      location = left_binary_search(key_start, key_end, candidate)
+      if (location == key_end) || (compare_value(location, candidate) != 0)
+        rotate(index + 1, key_start, key_end)
+        distance = (key_start - (index + 1))
         location -= distance
-        keyEnd -= distance
-        keyStart -= (distance + 1)
+        key_end -= distance
+        key_start -= (distance + 1)
         count += 1
-        insertToBackward(index, (location - 1))
+        insert_to_backward(index, location - 1)
       end
       index -= 1
     end
-    rotate(keyStart, keyEnd, finish)
-    return count
+    rotate(key_start, key_end, finish)
+    count
   end
-  def buildRuns(start, finish)
+
+  def build_runs(start, finish)
     index = (start + 1)
-    runStart = start
-    while (index < finish)
-      if (compare((index - 1), index) > 0)
-        index += 1
-        while ((index < finish) && (compare((index - 1), index) > 0))
+    run_start = start
+    while index < finish
+      descending = compare(index - 1, index) > 0
+      index += 1
+      if descending
+        while (index < finish) && (compare(index - 1, index) > 0)
           index += 1
         end
-        reverse(runStart, index)
+        reverse(run_start, index)
       else
-        index += 1
-        while ((index < finish) && (compare((index - 1), index) <= 0))
+        while (index < finish) && (compare(index - 1, index) <= 0)
           index += 1
         end
       end
-      if (index < finish)
-        runStart = ((index - (((index - runStart) - 1) % @minRun)) - 1)
+      if index < finish
+        run_start = ((index - (((index - run_start) - 1) % @min_run)) - 1)
       end
-      while (((index - runStart) < @minRun) && (index < finish))
-        insertTo(index, rightBinarySearch(runStart, index, read(index)))
+      while ((index - run_start) < @min_run) && (index < finish)
+        insert_to(index, right_binary_search(run_start, index, read(index)))
         index += 1
       end
-      runStart = index
+      run_start = index
       index += 1
     end
   end
-  def binaryInsertion(start, finish)
-    if !(((finish - start) > 1))
+
+  def binary_insertion(start, finish)
+    if !((finish - start) > 1)
       return
     end
     ((start + 1)...finish).each do |index|
-      insertTo(index, rightBinarySearch(start, index, read(index)))
+      insert_to(index, right_binary_search(start, index, read(index)))
     end
   end
-  def mergeWithBufferRest(start, middle, finish, buffer, length)
+
+  def merge_with_buffer_rest(start, middle, finish, buffer, length)
     left = 0
     right = middle
     output = start
-    while ((left < length) && (right < finish))
-      if (compare((buffer + left), right) <= 0)
-        swap(output, (buffer + left))
+    while (left < length) && (right < finish)
+      if compare(buffer + left, right) <= 0
+        swap(output, buffer + left)
         left += 1
       else
         swap(output, right)
@@ -299,26 +313,28 @@ class AdaptiveGrailExample
       end
       output += 1
     end
-    while (left < length)
-      swap(output, (buffer + left))
+    while left < length
+      swap(output, buffer + left)
       output += 1
       left += 1
     end
   end
-  def mergeWithBuffer(start, middle, finish, buffer)
+
+  def merge_with_buffer(start, middle, finish, buffer)
     length = (middle - start)
-    multiSwap(buffer, start, length)
-    mergeWithBufferRest(start, middle, finish, buffer, length)
+    multi_swap(buffer, start, length)
+    merge_with_buffer_rest(start, middle, finish, buffer, length)
   end
-  def mergeWithBufferBackward(start, middle, finish, buffer)
+
+  def merge_with_buffer_backward(start, middle, finish, buffer)
     length = (finish - middle)
-    multiSwap(middle, buffer, length)
+    multi_swap(middle, buffer, length)
     left = (length - 1)
     right = (middle - 1)
     output = (finish - 1)
-    while ((left >= 0) && (right >= start))
-      if (compare((buffer + left), right) >= 0)
-        swap(output, (buffer + left))
+    while (left >= 0) && (right >= start)
+      if compare(buffer + left, right) >= 0
+        swap(output, buffer + left)
         left -= 1
       else
         swap(output, right)
@@ -326,18 +342,19 @@ class AdaptiveGrailExample
       end
       output -= 1
     end
-    while (left >= 0)
-      swap(output, (buffer + left))
+    while left >= 0
+      swap(output, buffer + left)
       output -= 1
       left -= 1
     end
   end
-  def inPlaceMerge(start, middle, finish)
+
+  def in_place_merge(start, middle, finish)
     left = start
     right = middle
-    while ((left < right) && (right < finish))
-      if (compare(left, right) > 0)
-        next_value = leftBinarySearch((right + 1), finish, read(left))
+    while (left < right) && (right < finish)
+      if compare(left, right) > 0
+        next_value = left_binary_search(right + 1, finish, read(left))
         rotate(left, right, next_value)
         left += (next_value - right)
         right = next_value
@@ -346,13 +363,14 @@ class AdaptiveGrailExample
       end
     end
   end
-  def inPlaceMergeBackward(start, middle, finish)
+
+  def in_place_merge_backward(start, middle, finish)
     left = (middle - 1)
     right = (finish - 1)
-    while ((right > left) && (left >= start))
-      if (compare(left, right) > 0)
-        next_value = rightBinarySearch(start, left, read(right))
-        rotate(next_value, (left + 1), (right + 1))
+    while (right > left) && (left >= start)
+      if compare(left, right) > 0
+        next_value = right_binary_search(start, left, read(right))
+        rotate(next_value, left + 1, right + 1)
         right -= ((left + 1) - next_value)
         left = (next_value - 1)
       else
@@ -360,64 +378,71 @@ class AdaptiveGrailExample
       end
     end
   end
-  def mergeWithoutBuffer(start, middle, finish)
-    if ((middle - start) > (finish - middle))
-      inPlaceMergeBackward(start, middle, finish)
+
+  def merge_without_buffer(start, middle, finish)
+    if (middle - start) > (finish - middle)
+      in_place_merge_backward(start, middle, finish)
     else
-      inPlaceMerge(start, middle, finish)
+      in_place_merge(start, middle, finish)
     end
   end
-  def checkSorted(middle)
-    return (compare((middle - 1), middle) > 0)
+
+  def check_sorted(middle)
+    compare(middle - 1, middle) > 0
   end
-  def checkReverseBounds(start, middle, finish)
-    if (compare(start, (finish - 1)) > 0)
+
+  def check_reverse_bounds(start, middle, finish)
+    if compare(start, finish - 1) > 0
       rotate(start, middle, finish)
       return false
     end
-    return true
+    true
   end
-  def checkBounds(start, middle, finish)
-    return (checkSorted(middle) && checkReverseBounds(start, middle, finish))
+
+  def check_bounds(start, middle, finish)
+    check_sorted(middle) && check_reverse_bounds(start, middle, finish)
   end
-  def subarray(tag, middleKey)
-    return ((compare(tag, middleKey) < 0) ? 'left' : 'right')
+
+  def subarray(tag, middle_key)
+    ((compare(tag, middle_key) < 0) ? "left" : "right")
   end
-  def blockSelectSort(position, tags, offset, distance, leftCount, blockCount, blockLength)
-    middleKey = leftCount
+
+  def block_select_sort(position, tags, offset, distance, left_count, block_count, block_length)
+    middle_key = left_count
     index = 0
-    limit = (leftCount + 1)
-    while (index < (limit - 1))
+    limit = (left_count + 1)
+    while index < (limit - 1)
       minimum = index
-      candidate = [(leftCount - offset), (index + 1)].max
-      while (candidate < limit)
-        order = compare(((position + distance) + (candidate * blockLength)), ((position + distance) + (minimum * blockLength)))
-        if ((order < 0) || ((order == 0) && (compare((tags + candidate), (tags + minimum)) < 0)))
+      candidate = [(left_count - offset), (index + 1)].max
+      while candidate < limit
+        order = compare((position + distance) + (candidate * block_length), (position + distance) + (minimum * block_length))
+        if (order < 0) || ((order == 0) && (compare(tags + candidate, tags + minimum) < 0))
           minimum = candidate
         end
         candidate += 1
       end
-      if (minimum != index)
-        multiSwap((position + (index * blockLength)), (position + (minimum * blockLength)), blockLength)
-        swap((tags + index), (tags + minimum))
-        if ((limit < blockCount) && (minimum == (limit - 1)))
+      if minimum != index
+        multi_swap(position + (index * block_length), position + (minimum * block_length), block_length)
+        swap(tags + index, tags + minimum)
+        if (limit < block_count) && (minimum == (limit - 1))
           limit += 1
         end
       end
-      if (minimum == middleKey)
-        middleKey = index
+      if minimum == middle_key
+        middle_key = index
       end
       index += 1
     end
-    return (tags + middleKey)
+    tags + middle_key
   end
-  def sortKeys(finish, buffer, middleKey)
-    swap(buffer, middleKey)
-    left = middleKey
+
+  def sort_keys(finish, buffer, middle_key)
+    swap(buffer, middle_key)
+    left = middle_key
     index = (left + 1)
     right = (buffer + 1)
-    while (index < finish)
-      if (compare(index, buffer) < 0)
+    while index < finish
+      if compare(index, buffer) < 0
         swap(left, index)
         left += 1
       else
@@ -426,26 +451,28 @@ class AdaptiveGrailExample
       end
       index += 1
     end
-    multiSwap(left, buffer, (finish - left))
+    multi_swap(left, buffer, finish - left)
   end
-  def sortKeysWithoutBuffer(finish, middleKey)
-    left = middleKey
+
+  def sort_keys_without_buffer(finish, middle_key)
+    left = middle_key
     index = (left + 1)
-    while (index < finish)
-      if (compare(index, left) < 0)
-        insertTo(index, left)
+    while index < finish
+      if compare(index, left) < 0
+        insert_to(index, left)
         left += 1
       end
       index += 1
     end
   end
-  def mergeBlocks(start, middle, finish, destination, reverseEqual)
+
+  def merge_blocks(start, middle, finish, destination, reverse_equal)
     left = start
     right = middle
     output = destination
-    while ((left < middle) && (right < finish))
+    while (left < middle) && (right < finish)
       order = compare(left, right)
-      if ((order < 0) || ((order == 0) && !(reverseEqual)))
+      if (order < 0) || ((order == 0) && !reverse_equal)
         swap(output, left)
         left += 1
       else
@@ -454,426 +481,439 @@ class AdaptiveGrailExample
       end
       output += 1
     end
-    if (left > output)
-      while (left < middle)
+    if left > output
+      while left < middle
         swap(output, left)
         output += 1
         left += 1
       end
     end
-    return right
+    right
   end
-  def blockMerge(start, middle, finish, tags, buffer, blockLength)
-    lastFull = ((finish - (((finish - middle) - 1) % blockLength)) - 1)
-    left = (start + blockLength)
+
+  def block_merge(start, middle, finish, tags, buffer, block_length)
+    last_full = ((finish - (((finish - middle) - 1) % block_length)) - 1)
+    left = (start + block_length)
     group = start
     key = (tags - 1)
-    leftCount = ((middle - left) / blockLength)
-    blockCount = ((lastFull - left) / blockLength)
-    leftBlocks = -(1)
-    rightBlocks = (leftCount - 1)
-    multiTriSwap(buffer, (middle - blockLength), start, blockLength)
-    insertToBackward(tags, ((tags + leftCount) - 1))
-    middleKey = blockSelectSort(left, tags, 1, (blockLength - 1), leftCount, blockCount, blockLength)
-    fragment = 'left'
-    while ((leftBlocks < leftCount) && (rightBlocks < blockCount))
-      if (fragment == 'left')
-        while true
-          group += blockLength
-          leftBlocks += 1
+    left_count = ((middle - left) / block_length)
+    block_count = ((last_full - left) / block_length)
+    left_blocks = -1
+    right_blocks = (left_count - 1)
+    multi_tri_swap(buffer, middle - block_length, start, block_length)
+    insert_to_backward(tags, (tags + left_count) - 1)
+    middle_key = block_select_sort(left, tags, 1, block_length - 1, left_count, block_count, block_length)
+    fragment = "left"
+    while (left_blocks < left_count) && (right_blocks < block_count)
+      if fragment == "left"
+        loop do
+          group += block_length
+          left_blocks += 1
           key += 1
-          if !(((leftBlocks < leftCount) && (subarray(key, middleKey) == 'left')))
+          if !((left_blocks < left_count) && (subarray(key, middle_key) == "left"))
             break
           end
         end
-        if (leftBlocks == leftCount)
-          left = mergeBlocks(left, group, finish, (left - blockLength), false)
-          mergeWithBufferRest((left - blockLength), left, finish, buffer, blockLength)
+        if left_blocks == left_count
+          left = merge_blocks(left, group, finish, left - block_length, false)
+          merge_with_buffer_rest(left - block_length, left, finish, buffer, block_length)
         else
-          left = mergeBlocks(left, group, ((group + blockLength) - 1), (left - blockLength), false)
+          left = merge_blocks(left, group, (group + block_length) - 1, left - block_length, false)
         end
-        fragment = 'right'
+        fragment = "right"
       else
-        while true
-          group += blockLength
-          rightBlocks += 1
+        loop do
+          group += block_length
+          right_blocks += 1
           key += 1
-          if !(((rightBlocks < blockCount) && (subarray(key, middleKey) == 'right')))
+          if !((right_blocks < block_count) && (subarray(key, middle_key) == "right"))
             break
           end
         end
-        if (rightBlocks == blockCount)
-          shift((left - blockLength), left, finish)
-          multiSwap(buffer, (finish - blockLength), blockLength)
+        if right_blocks == block_count
+          shift(left - block_length, left, finish)
+          multi_swap(buffer, finish - block_length, block_length)
         else
-          left = mergeBlocks(left, group, ((group + blockLength) - 1), (left - blockLength), true)
+          left = merge_blocks(left, group, (group + block_length) - 1, left - block_length, true)
         end
-        fragment = 'left'
+        fragment = "left"
       end
     end
-    sortKeys((tags + blockCount), buffer, middleKey)
+    sort_keys(tags + block_count, buffer, middle_key)
   end
-  def blockMergeWithoutBuffer(start, middle, finish, tags, blockLength)
-    firstFull = (start + ((middle - start) % blockLength))
-    lastFull = (finish - ((finish - middle) % blockLength))
+
+  def block_merge_without_buffer(start, middle, finish, tags, block_length)
+    first_full = (start + ((middle - start) % block_length))
+    last_full = (finish - ((finish - middle) % block_length))
     left = start
-    group = firstFull
+    group = first_full
     key = tags
-    leftCount = (((middle - group) / blockLength) + 1)
-    blockCount = (((lastFull - group) / blockLength) + 1)
-    leftBlocks = 0
-    rightBlocks = leftCount
-    middleKey = blockSelectSort(group, tags, 0, 0, (leftCount - 1), (blockCount - 1), blockLength)
-    fragment = 'left'
-    while ((leftBlocks < leftCount) && (rightBlocks < blockCount))
-      next_value = subarray(key, middleKey)
+    left_count = (((middle - group) / block_length) + 1)
+    block_count = (((last_full - group) / block_length) + 1)
+    left_blocks = 0
+    right_blocks = left_count
+    middle_key = block_select_sort(group, tags, 0, 0, left_count - 1, block_count - 1, block_length)
+    fragment = "left"
+    while (left_blocks < left_count) && (right_blocks < block_count)
+      next_value = subarray(key, middle_key)
       key += 1
-      if (next_value == fragment)
-        if (fragment == 'left')
-          leftBlocks += 1
+      if next_value == fragment
+        if fragment == "left"
+          left_blocks += 1
         else
-          rightBlocks += 1
+          right_blocks += 1
         end
         left = group
       else
         middle2 = group
-        end2 = (group + blockLength)
-        if (fragment == 'left')
-          while ((left < middle2) && (middle2 < end2))
-            if (compare(left, middle2) > 0)
-              nextPosition = leftBinarySearch((middle2 + 1), end2, read(left))
-              rotate(left, middle2, nextPosition)
-              left += (nextPosition - middle2)
-              middle2 = nextPosition
+        end2 = (group + block_length)
+        if fragment == "left"
+          while (left < middle2) && (middle2 < end2)
+            if compare(left, middle2) > 0
+              next_position = left_binary_search(middle2 + 1, end2, read(left))
+              rotate(left, middle2, next_position)
+              left += (next_position - middle2)
+              middle2 = next_position
             else
               left += 1
             end
           end
         else
-          while ((left < middle2) && (middle2 < end2))
-            if (compare(left, middle2) >= 0)
-              nextPosition = rightBinarySearch((middle2 + 1), end2, read(left))
-              rotate(left, middle2, nextPosition)
-              left += (nextPosition - middle2)
-              middle2 = nextPosition
+          while (left < middle2) && (middle2 < end2)
+            if compare(left, middle2) >= 0
+              next_position = right_binary_search(middle2 + 1, end2, read(left))
+              rotate(left, middle2, next_position)
+              left += (next_position - middle2)
+              middle2 = next_position
             else
               left += 1
             end
           end
         end
-        if (left < middle2)
-          if (next_value == 'left')
-            leftBlocks += 1
+        if left < middle2
+          if next_value == "left"
+            left_blocks += 1
           else
-            rightBlocks += 1
+            right_blocks += 1
           end
         else
-          if (fragment == 'left')
-            leftBlocks += 1
+          if fragment == "left"
+            left_blocks += 1
           else
-            rightBlocks += 1
+            right_blocks += 1
           end
           fragment = next_value
         end
       end
-      group += blockLength
+      group += block_length
     end
-    if (leftBlocks < leftCount)
-      inPlaceMergeBackward(start, lastFull, finish)
+    if left_blocks < left_count
+      in_place_merge_backward(start, last_full, finish)
     end
-    sortKeysWithoutBuffer(((tags + blockCount) - 1), middleKey)
+    sort_keys_without_buffer((tags + block_count) - 1, middle_key)
   end
-  def smartMerge(start, middle, finish, buffer)
-    if checkBounds(start, middle, finish)
-      trimmed = rightBinarySearch(start, (middle - 1), read(middle))
-      mergeWithBuffer(trimmed, middle, finish, buffer)
-    end
-  end
-  def smartMergeBackward(start, middle, finish, buffer)
-    if checkBounds(start, middle, finish)
-      trimmed = leftBinarySearch((middle + 1), finish, read((middle - 1)))
-      mergeWithBufferBackward(start, middle, trimmed, buffer)
+
+  def smart_merge(start, middle, finish, buffer)
+    if check_bounds(start, middle, finish)
+      trimmed = right_binary_search(start, middle - 1, read(middle))
+      merge_with_buffer(trimmed, middle, finish, buffer)
     end
   end
-  def smartBlockMerge(start, middle, finish, tags, buffer, blockLength)
-    if checkBounds(start, middle, finish)
-      trimmedStart = rightBinarySearch(start, (middle - 1), read(middle))
-      trimmedEnd = leftBinarySearch((middle + 1), finish, read((middle - 1)))
-      if checkReverseBounds(trimmedStart, middle, trimmedEnd)
-        if (((middle - trimmedStart) <= blockLength) || ((trimmedEnd - middle) <= blockLength))
-          if ((trimmedEnd - middle) < (middle - trimmedStart))
-            mergeWithBufferBackward(trimmedStart, middle, trimmedEnd, buffer)
+
+  def smart_merge_backward(start, middle, finish, buffer)
+    if check_bounds(start, middle, finish)
+      trimmed = left_binary_search(middle + 1, finish, read(middle - 1))
+      merge_with_buffer_backward(start, middle, trimmed, buffer)
+    end
+  end
+
+  def smart_block_merge(start, middle, finish, tags, buffer, block_length)
+    if check_bounds(start, middle, finish)
+      trimmed_start = right_binary_search(start, middle - 1, read(middle))
+      trimmed_end = left_binary_search(middle + 1, finish, read(middle - 1))
+      if check_reverse_bounds(trimmed_start, middle, trimmed_end)
+        if ((middle - trimmed_start) <= block_length) || ((trimmed_end - middle) <= block_length)
+          if (trimmed_end - middle) < (middle - trimmed_start)
+            merge_with_buffer_backward(trimmed_start, middle, trimmed_end, buffer)
           else
-            mergeWithBuffer(trimmedStart, middle, trimmedEnd, buffer)
+            merge_with_buffer(trimmed_start, middle, trimmed_end, buffer)
           end
         else
-          trimmedStart -= ((trimmedStart - start) % blockLength)
-          blockMerge(trimmedStart, middle, trimmedEnd, tags, buffer, blockLength)
+          trimmed_start -= ((trimmed_start - start) % block_length)
+          block_merge(trimmed_start, middle, trimmed_end, tags, buffer, block_length)
         end
       end
     end
   end
-  def smartBlockMergeWithoutBuffer(start, middle, finish, tags, blockLength)
-    if checkBounds(start, middle, finish)
-      trimmedStart = rightBinarySearch(start, (middle - 1), read(middle))
-      if ((middle - trimmedStart) <= blockLength)
-        inPlaceMerge(trimmedStart, middle, finish)
+
+  def smart_block_merge_without_buffer(start, middle, finish, tags, block_length)
+    if check_bounds(start, middle, finish)
+      trimmed_start = right_binary_search(start, middle - 1, read(middle))
+      if (middle - trimmed_start) <= block_length
+        in_place_merge(trimmed_start, middle, finish)
       else
-        blockMergeWithoutBuffer(trimmedStart, middle, finish, tags, blockLength)
+        block_merge_without_buffer(trimmed_start, middle, finish, tags, block_length)
       end
     end
   end
-  def smartInPlaceMerge(start, middle, finish)
-    if checkSorted(middle)
-      inPlaceMergeBackward(start, middle, finish)
+
+  def smart_in_place_merge(start, middle, finish)
+    if check_sorted(middle)
+      in_place_merge_backward(start, middle, finish)
     end
   end
-  def redistributeBuffer(startIn, middleIn, finish)
-    start = startIn
-    middle = middleIn
-    right = leftBinarySearch(middle, finish, read(start))
+
+  def redistribute_buffer(start_in, middle_in, finish)
+    start = start_in
+    middle = middle_in
+    right = left_binary_search(middle, finish, read(start))
     rotate(start, middle, right)
     distance = (right - middle)
     start += distance
     middle += distance
-    leftMiddle = (start + ((middle - start) / 2))
-    right = leftBinarySearch(middle, finish, read(leftMiddle))
-    rotate(leftMiddle, middle, right)
+    left_middle = (start + ((middle - start) / 2))
+    right = left_binary_search(middle, finish, read(left_middle))
+    rotate(left_middle, middle, right)
     distance = (right - middle)
-    leftMiddle += distance
+    left_middle += distance
     middle += distance
-    mergeWithoutBuffer(start, (leftMiddle - distance), leftMiddle)
-    mergeWithoutBuffer(leftMiddle, middle, finish)
+    merge_without_buffer(start, left_middle - distance, left_middle)
+    merge_without_buffer(left_middle, middle, finish)
   end
-  def redistributeBufferBackward(start, middleIn, endIn)
-    middle = middleIn
-    finish = endIn
-    right = rightBinarySearch(start, middle, read((finish - 1)))
+
+  def redistribute_buffer_backward(start, middle_in, end_in)
+    middle = middle_in
+    finish = end_in
+    right = right_binary_search(start, middle, read(finish - 1))
     rotate(right, middle, finish)
     distance = (middle - right)
     finish -= distance
     middle -= distance
-    rightMiddle = (middle + ((finish - middle) / 2))
-    right = rightBinarySearch(start, middle, read((rightMiddle - 1)))
-    rotate(right, middle, rightMiddle)
+    right_middle = (middle + ((finish - middle) / 2))
+    right = right_binary_search(start, middle, read(right_middle - 1))
+    rotate(right, middle, right_middle)
     distance = (middle - right)
-    rightMiddle -= distance
+    right_middle -= distance
     middle -= distance
-    mergeWithoutBuffer(rightMiddle, (rightMiddle + distance), finish)
-    mergeWithoutBuffer(start, middle, rightMiddle)
+    merge_without_buffer(right_middle, right_middle + distance, finish)
+    merge_without_buffer(start, middle, right_middle)
   end
-  def inPlaceMergeSort(start, finish)
-    buildRuns(start, finish)
-    run = @minRun
-    while (run < (finish - start))
+
+  def in_place_merge_sort(start, finish)
+    build_runs(start, finish)
+    run = @min_run
+    while run < (finish - start)
       index = start
-      while ((index + (2 * run)) <= finish)
-        smartInPlaceMerge(index, (index + run), (index + (2 * run)))
+      while (index + (2 * run)) <= finish
+        smart_in_place_merge(index, index + run, index + (2 * run))
         index += (2 * run)
       end
-      if ((index + run) < finish)
-        smartInPlaceMerge(index, (index + run), finish)
+      if (index + run) < finish
+        smart_in_place_merge(index, index + run, finish)
       end
       run *= 2
     end
   end
-  def adaptiveSortWithoutBuffer(startIn, endIn, keys, ideal, backwardBuffer)
-    start = startIn
-    finish = endIn
+
+  def adaptive_sort_without_buffer(start_in, end_in, keys, ideal, backward_buffer)
+    start = start_in
+    finish = end_in
     length = (finish - start)
-    blockLength = [keys, @minRun].min
-    while ((2 * blockLength) <= keys)
-      blockLength *= 2
+    block_length = [keys, @min_run].min
+    while (2 * block_length) <= keys
+      block_length *= 2
     end
-    tagLength = (keys - blockLength)
-    runLength = @minRun
+    tag_length = (keys - block_length)
+    run_length = @min_run
     tags = nil
     buffer = nil
-    dataStart = nil
-    dataEnd = nil
-    if backwardBuffer
-      buffer = (finish - blockLength)
-      dataStart = start
-      dataEnd = (buffer - tagLength)
-      tags = dataEnd
+    data_start = nil
+    data_end = nil
+    if backward_buffer
+      buffer = (finish - block_length)
+      data_start = start
+      data_end = (buffer - tag_length)
+      tags = data_end
     else
-      buffer = (start + tagLength)
-      dataStart = (buffer + blockLength)
-      dataEnd = finish
+      buffer = (start + tag_length)
+      data_start = (buffer + block_length)
+      data_end = finish
       tags = start
     end
-    buildRuns(dataStart, dataEnd)
-    while ((runLength <= blockLength) && (runLength < length))
-      index = dataStart
-      while ((index + (2 * runLength)) <= dataEnd)
-        smartMerge(index, (index + runLength), (index + (2 * runLength)), buffer)
-        index += (2 * runLength)
+    build_runs(data_start, data_end)
+    while (run_length <= block_length) && (run_length < length)
+      index = data_start
+      while (index + (2 * run_length)) <= data_end
+        smart_merge(index, index + run_length, index + (2 * run_length), buffer)
+        index += (2 * run_length)
       end
-      if ((index + runLength) < dataEnd)
-        smartMergeBackward(index, (index + runLength), dataEnd, buffer)
+      if (index + run_length) < data_end
+        smart_merge_backward(index, index + run_length, data_end, buffer)
       end
-      runLength *= 2
+      run_length *= 2
     end
-    if (((blockLength / 2) >= @minRun) && ((blockLength / 2) >= ((keys + 1) / 2)))
-      binaryInsertion(buffer, (buffer + blockLength))
-      blockLength /= 2
-      tagLength = (keys - blockLength)
-      buffer += blockLength
+    if ((block_length / 2) >= @min_run) && ((block_length / 2) >= ((keys + 1) / 2))
+      binary_insertion(buffer, buffer + block_length)
+      block_length /= 2
+      tag_length = (keys - block_length)
+      buffer += block_length
     end
-    while ((tagLength >= (((2 * runLength) / blockLength) - 1)) && (runLength < length))
-      index = dataStart
-      while ((index + (2 * runLength)) <= dataEnd)
-        smartBlockMerge(index, (index + runLength), (index + (2 * runLength)), tags, buffer, blockLength)
-        index += (2 * runLength)
+    while (tag_length >= (((2 * run_length) / block_length) - 1)) && (run_length < length)
+      index = data_start
+      while (index + (2 * run_length)) <= data_end
+        smart_block_merge(index, index + run_length, index + (2 * run_length), tags, buffer, block_length)
+        index += (2 * run_length)
       end
-      if ((index + runLength) < dataEnd)
-        if ((dataEnd - (index + runLength)) > blockLength)
-          smartBlockMerge(index, (index + runLength), dataEnd, tags, buffer, blockLength)
+      if (index + run_length) < data_end
+        if (data_end - (index + run_length)) > block_length
+          smart_block_merge(index, index + run_length, data_end, tags, buffer, block_length)
         else
-          smartMergeBackward(index, (index + runLength), dataEnd, buffer)
+          smart_merge_backward(index, index + run_length, data_end, buffer)
         end
       end
-      runLength *= 2
+      run_length *= 2
     end
-    binaryInsertion(buffer, (buffer + blockLength))
-    tagLength = (keys - (keys % 2))
-    while (runLength < length)
-      blockLength = ((2 * runLength) / tagLength)
-      index = dataStart
-      while ((index + (2 * runLength)) <= dataEnd)
-        smartBlockMergeWithoutBuffer(index, (index + runLength), (index + (2 * runLength)), tags, blockLength)
-        index += (2 * runLength)
+    binary_insertion(buffer, buffer + block_length)
+    tag_length = (keys - (keys % 2))
+    while run_length < length
+      block_length = ((2 * run_length + tag_length - 1) / tag_length)
+      index = data_start
+      while (index + (2 * run_length)) <= data_end
+        smart_block_merge_without_buffer(index, index + run_length, index + (2 * run_length), tags, block_length)
+        index += (2 * run_length)
       end
-      if ((index + runLength) < dataEnd)
-        if ((dataEnd - (index + runLength)) > blockLength)
-          smartBlockMergeWithoutBuffer(index, (index + runLength), dataEnd, tags, blockLength)
+      if (index + run_length) < data_end
+        if (data_end - (index + run_length)) > block_length
+          smart_block_merge_without_buffer(index, index + run_length, data_end, tags, block_length)
         else
-          smartInPlaceMerge(index, (index + runLength), dataEnd)
+          smart_in_place_merge(index, index + run_length, data_end)
         end
       end
-      runLength *= 2
+      run_length *= 2
     end
-    if backwardBuffer
-      start = rightBinarySearch(start, dataEnd, read(dataEnd))
-      if (keys >= (ideal / 2))
-        redistributeBufferBackward(start, dataEnd, finish)
+    if backward_buffer
+      start = right_binary_search(start, data_end, read(data_end))
+      if keys >= (ideal / 2)
+        redistribute_buffer_backward(start, data_end, finish)
       else
-        mergeWithoutBuffer(start, dataEnd, finish)
+        merge_without_buffer(start, data_end, finish)
       end
     else
-      finish = leftBinarySearch(dataStart, finish, read((dataStart - 1)))
-      if (keys >= (ideal / 2))
-        redistributeBuffer(start, dataStart, finish)
+      finish = left_binary_search(data_start, finish, read(data_start - 1))
+      if keys >= (ideal / 2)
+        redistribute_buffer(start, data_start, finish)
       else
-        mergeWithoutBuffer(start, dataStart, finish)
+        merge_without_buffer(start, data_start, finish)
       end
     end
   end
-  def sort(startIn, endIn)
-    start = startIn
-    finish = endIn
+
+  def sort(start_in, end_in)
+    start = start_in
+    finish = end_in
     length = (finish - start)
-    if (length < 31)
-      binaryInsertion(start, finish)
+    if length < 31
+      binary_insertion(start, finish)
       return
     end
-    if (length < 63)
-      @minRun = ((length + 1) / 2)
-      buildRuns(start, finish)
-      middle = (start + @minRun)
-      if checkBounds(start, middle, finish)
-        redistributeBufferBackward(start, middle, finish)
+    if length < 63
+      @min_run = ((length + 1) / 2)
+      build_runs(start, finish)
+      middle = (start + @min_run)
+      if check_bounds(start, middle, finish)
+        redistribute_buffer_backward(start, middle, finish)
       end
       return
     end
-    @minRun = length
-    while (@minRun >= 32)
-      @minRun = ((@minRun + 1) / 2)
+    @min_run = length
+    while @min_run >= 32
+      @min_run = ((@min_run + 1) / 2)
     end
-    blockLength = @minRun
-    while ((blockLength * blockLength) < length)
-      blockLength *= 2
+    block_length = @min_run
+    while (block_length * block_length) < length
+      block_length *= 2
     end
-    tagLength = ((length / blockLength) - 2)
-    ideal = (tagLength + blockLength)
-    rightRun = buildUniqueRunBackward(finish, ideal)
-    leftRun = 0
-    backwardBuffer = nil
-    if (rightRun == ideal)
-      backwardBuffer = true
+    tag_length = ((length / block_length) - 2)
+    ideal = (tag_length + block_length)
+    right_run = build_unique_run_backward(finish, ideal)
+    left_run = 0
+    backward_buffer = nil
+    if right_run == ideal
+      backward_buffer = true
     else
-      leftRun = buildUniqueRun(start, ideal)
-      if (leftRun == ideal)
-        backwardBuffer = false
+      left_run = build_unique_run(start, ideal)
+      backward_buffer = if left_run == ideal
+        false
       else
-        backwardBuffer = (((rightRun < 16) && (leftRun < 16)) || (rightRun >= leftRun))
+        ((right_run < 16) && (left_run < 16)) || (right_run >= left_run)
       end
     end
-    keys = (backwardBuffer ? findKeysBackward(start, finish, rightRun, ideal) : findKeys(start, finish, leftRun, ideal))
-    if (keys < ideal)
-      if (keys == 1)
+    keys = (backward_buffer ? find_keys_backward(start, finish, right_run, ideal) : find_keys(start, finish, left_run, ideal))
+    if keys < ideal
+      if keys == 1
         return
       end
-      if (keys <= 4)
-        inPlaceMergeSort(start, finish)
+      if keys <= 4
+        in_place_merge_sort(start, finish)
       else
-        adaptiveSortWithoutBuffer(start, finish, keys, ideal, backwardBuffer)
+        adaptive_sort_without_buffer(start, finish, keys, ideal, backward_buffer)
       end
       return
     end
     buffer = nil
-    dataStart = nil
-    dataEnd = nil
+    data_start = nil
+    data_end = nil
     tags = nil
-    if backwardBuffer
-      buffer = (finish - blockLength)
-      dataStart = start
-      dataEnd = (buffer - tagLength)
-      tags = dataEnd
+    if backward_buffer
+      buffer = (finish - block_length)
+      data_start = start
+      data_end = (buffer - tag_length)
+      tags = data_end
     else
-      buffer = (start + tagLength)
-      dataStart = (buffer + blockLength)
-      dataEnd = finish
+      buffer = (start + tag_length)
+      data_start = (buffer + block_length)
+      data_end = finish
       tags = start
     end
-    buildRuns(dataStart, dataEnd)
-    runLength = @minRun
-    while ((runLength <= blockLength) && (runLength < length))
-      index = dataStart
-      while ((index + (2 * runLength)) <= dataEnd)
-        smartMerge(index, (index + runLength), (index + (2 * runLength)), buffer)
-        index += (2 * runLength)
+    build_runs(data_start, data_end)
+    run_length = @min_run
+    while (run_length <= block_length) && (run_length < length)
+      index = data_start
+      while (index + (2 * run_length)) <= data_end
+        smart_merge(index, index + run_length, index + (2 * run_length), buffer)
+        index += (2 * run_length)
       end
-      if ((index + runLength) < dataEnd)
-        smartMergeBackward(index, (index + runLength), dataEnd, buffer)
+      if (index + run_length) < data_end
+        smart_merge_backward(index, index + run_length, data_end, buffer)
       end
-      runLength *= 2
+      run_length *= 2
     end
-    while (runLength < length)
-      index = dataStart
-      while ((index + (2 * runLength)) <= dataEnd)
-        smartBlockMerge(index, (index + runLength), (index + (2 * runLength)), tags, buffer, blockLength)
-        index += (2 * runLength)
+    while run_length < length
+      index = data_start
+      while (index + (2 * run_length)) <= data_end
+        smart_block_merge(index, index + run_length, index + (2 * run_length), tags, buffer, block_length)
+        index += (2 * run_length)
       end
-      if ((index + runLength) < dataEnd)
-        if ((dataEnd - (index + runLength)) > blockLength)
-          smartBlockMerge(index, (index + runLength), dataEnd, tags, buffer, blockLength)
+      if (index + run_length) < data_end
+        if (data_end - (index + run_length)) > block_length
+          smart_block_merge(index, index + run_length, data_end, tags, buffer, block_length)
         else
-          smartMergeBackward(index, (index + runLength), dataEnd, buffer)
+          smart_merge_backward(index, index + run_length, data_end, buffer)
         end
       end
-      runLength *= 2
+      run_length *= 2
     end
-    binaryInsertion(buffer, (buffer + blockLength))
-    if backwardBuffer
-      start = rightBinarySearch(start, dataEnd, read(dataEnd))
-      redistributeBufferBackward(start, dataEnd, finish)
+    binary_insertion(buffer, buffer + block_length)
+    if backward_buffer
+      start = right_binary_search(start, data_end, read(data_end))
+      redistribute_buffer_backward(start, data_end, finish)
     else
-      finish = leftBinarySearch(dataStart, finish, read((dataStart - 1)))
-      redistributeBuffer(start, dataStart, finish)
+      finish = left_binary_search(data_start, finish, read(data_start - 1))
+      redistribute_buffer(start, data_start, finish)
     end
   end
 end
+
 def sort(values)
   sorter = AdaptiveGrailExample.new(values)
   sorter.sort(0, values.length)

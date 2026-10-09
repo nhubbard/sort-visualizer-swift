@@ -670,7 +670,7 @@ private final class AdaptiveGrailRecorder {
     binaryInsertion(buffer, buffer + blockLength)
     tagLength = keys - keys % 2
     while runLength < length {
-      blockLength = 2 * runLength / tagLength
+      blockLength = (2 * runLength + tagLength - 1) / tagLength
       var index = dataStart
       while index + 2 * runLength <= dataEnd {
         smartBlockMergeWithoutBuffer(index, index + runLength, index + 2 * runLength, tags, blockLength)
