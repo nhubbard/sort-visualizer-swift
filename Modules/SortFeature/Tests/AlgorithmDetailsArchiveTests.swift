@@ -47,6 +47,45 @@ struct AlgorithmDetailsArchiveTests {
     let contentByID = try manifest.buildContentDictionary(payload: payload)
     #expect(!contentByID.isEmpty)
     #expect(contentByID.count == manifest.directoryRecords.count)
+    let quickSort = try #require(contentByID["quicksort"])
+    #expect(quickSort.localizedDescriptions["es"]?.hasPrefix("Quick Sort es") == true)
+    #expect(quickSort.description?.hasPrefix("Quick Sort") == true)
+  }
+
+  @Test func legacyManifestWithoutTranslationsStillLoads() throws {
+    var payload = AlgorithmDetailsManifest.magic
+    func append<T: FixedWidthInteger>(_ value: T) {
+      let littleEndian = value.littleEndian
+      withUnsafeBytes(of: littleEndian) { payload.append(contentsOf: $0) }
+    }
+    let algorithmID = Array("legacy".utf8)
+    let description = Array("English description".utf8)
+    let directoryLength = 12 + algorithmID.count + 24
+    append(UInt16(1)) // schema major
+    append(UInt16(0)) // legacy schema minor
+    append(UInt32(56)) // header length
+    append(UInt32(0)) // flags
+    append(UInt32(1)) // algorithm count
+    append(UInt64(56)) // directory offset
+    append(UInt64(directoryLength))
+    append(UInt64(56 + directoryLength)) // content offset
+    append(UInt64(description.count))
+    append(UInt32(directoryLength)) // record length
+    append(UInt16(algorithmID.count))
+    append(UInt16(1)) // entry count
+    append(UInt32(0)) // algorithm flags
+    payload.append(contentsOf: algorithmID)
+    append(UInt16(0)) // English description kind
+    append(UInt16(0)) // entry flags
+    append(UInt64(0)) // relative offset
+    append(UInt64(description.count))
+    append(UInt32(0)) // reserved
+    payload.append(contentsOf: description)
+
+    let manifest = try AlgorithmDetailsManifest.parse(payload)
+    let content = try #require(manifest.buildContentDictionary(payload: payload)["legacy"])
+    #expect(content.description == "English description")
+    #expect(content.localizedDescriptions.isEmpty)
   }
 
   @Test func flippedMagicByteThrowsInvalidMagic() throws {
