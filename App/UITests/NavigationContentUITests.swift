@@ -135,7 +135,7 @@ final class NavigationContentUITests: XCTestCase {
     for _ in 0..<12 where !codeTip.isHittable { scroll.swipeUp(velocity: .slow) }
     XCTAssertTrue(codeTip.isHittable)
     XCTAssertTrue(app.staticTexts["Explore the implementation"].exists)
-    app.activateControlForUITest(app.buttons["toggleFullAlgorithmCode"])
+    app.activateControlForUITest(app.buttons["copyAlgorithmCode"])
     assertDisappears(codeTip)
   }
 

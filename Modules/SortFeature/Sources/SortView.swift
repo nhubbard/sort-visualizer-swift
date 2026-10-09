@@ -182,7 +182,7 @@ public struct SortView: View {
           Section("Learn More") {
             Text("Scroll below the visualization for the algorithm explanation, growth charts, and code examples.")
             Text("Complete the same algorithm at different sizes to unlock its recorded-runs chart. Expand the chart to inspect exact values.")
-            Text("Choose a language to read its reference implementation, then use Copy Code or Select Text as needed.")
+            Text("Choose a language to read its full reference implementation, then use Copy Code to copy the sample.")
           }
           Section("Teaching Graph") {
             Text("On Quick Sort and Merge Sort, expand Teaching Graph below the visualization. Use Previous Graph Event and Next Graph Event to follow decisions and movements while the playback position stays in sync.")

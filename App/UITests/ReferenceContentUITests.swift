@@ -37,16 +37,15 @@ final class ReferenceContentUITests: XCTestCase {
     XCTAssertTrue(summary.waitForExistence(timeout: 10))
     XCTAssertTrue(summary.label.contains("Python implementation"))
     XCTAssertTrue(code.waitForExistence(timeout: 10), "Python reference code should be visible by default")
-    XCTAssertTrue(app.buttons["copyAlgorithmCode"].exists)
-    let disclosure = app.buttons["toggleFullAlgorithmCode"]
-    XCTAssertEqual(disclosure.label, "Hide Full Code")
+    let copyButton = app.buttons["copyAlgorithmCode"]
+    XCTAssertTrue(copyButton.exists)
+    XCTAssertEqual(copyButton.label, "Copy Code")
+    XCTAssertFalse(app.buttons["toggleFullAlgorithmCode"].exists)
+    XCTAssertFalse(app.buttons["selectAlgorithmCodeText"].exists)
     XCTAssertTrue(code.label.contains("def sort("), "Wrong Python reference code: \(code.label)")
     XCTAssertTrue(code.label.contains("quick_sort"))
-    app.activateControlForUITest(app.buttons["selectAlgorithmCodeText"])
-    let selectableCode = app.textViews["selectableAlgorithmCodeText"]
-    XCTAssertTrue(selectableCode.waitForExistence(timeout: 10))
-    XCTAssertTrue(selectableCode.value.debugDescription.contains("def sort("))
-    app.activateControlForUITest(app.buttons["Done"])
+    app.activateControlForUITest(copyButton)
+    XCTAssertTrue(code.exists, "Copying should leave the full listing visible")
 
     app.activateControlForUITest(picker.buttons["Swift"])
     XCTAssertTrue(code.exists, "Changing languages should keep the listing visible")
@@ -56,12 +55,7 @@ final class ReferenceContentUITests: XCTestCase {
     XCTAssertEqual(XCTWaiter().wait(for: [swiftCode], timeout: 10), .completed,
       "Swift selection did not replace the rendered reference code")
     XCTAssertTrue(code.label.contains("quickSort"))
-
-    app.activateControlForUITest(disclosure)
-    XCTAssertFalse(code.exists, "Hide Full Code should collapse the listing")
-    XCTAssertEqual(disclosure.label, "Read Full Code")
-    app.activateControlForUITest(disclosure)
-    XCTAssertTrue(code.waitForExistence(timeout: 10), "Read Full Code should restore the listing")
+    XCTAssertTrue(copyButton.exists, "Copy Code should remain available after changing languages")
   }
 
   func testMissingBundledDetailsShowActionableError() {
