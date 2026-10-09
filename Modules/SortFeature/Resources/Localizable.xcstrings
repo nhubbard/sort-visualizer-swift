@@ -372,6 +372,12 @@
     "Pause playback, then use Step Forward or Step Back to hear and inspect an operation." : {
 
     },
+    "Pause or slow playback to read decisions." : {
+
+    },
+    "Pinned while playback is fast" : {
+
+    },
     "Play" : {
 
     },

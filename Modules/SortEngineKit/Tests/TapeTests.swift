@@ -5,6 +5,61 @@ import Testing
 
 @Suite
 struct TapeTests {
+  @Test
+  func annotationAnchorsSurviveCosmeticCompaction() {
+    var engine = RecordingEngine(values: [2, 1])
+    _ = engine.compare(0, 1)
+    engine.annotateLastOperation(
+      stageID: "test.compare", outcome: "left", roles: ["left": .arrayIndex(0)],
+      explanationKey: "test.choice")
+    engine.swap(0, 1)
+    let summary = engine.finish()
+    #expect(summary.teachingAnnotations.count == 1)
+    let annotation = summary.teachingAnnotations[0]
+    #expect(summary.tape[annotation.operationIndex] == .compare(0, 1))
+    let tape = Tape(
+      header: TapeHeader(
+        algorithmID: "test", initialValues: [2, 1], visualSeed: 1,
+        compareCount: 1, swapCount: 1, recordingDuration: 0,
+        recordedAt: .distantPast),
+      operations: summary.tape, teachingAnnotations: summary.teachingAnnotations)
+    let compacted = tape.compactedForFastPlayback()
+    #expect(compacted.teachingAnnotations.count == 1)
+    #expect(compacted.operations[compacted.teachingAnnotations[0].operationIndex] == .compare(0, 1))
+    #expect(compacted.teachingAnnotations[0].operationIndex < annotation.operationIndex)
+  }
+
+  @Test
+  func cappedRecordingDoesNotRetainPartialAnnotations() {
+    var engine = RecordingEngine(values: [2, 1], operationCap: 1)
+    _ = engine.compare(0, 1)
+    engine.annotateLastOperation(
+      stageID: "test.compare", outcome: "left", roles: [:],
+      explanationKey: "test.choice")
+    let summary = engine.finish()
+    #expect(summary.didExceedCap)
+    #expect(summary.teachingAnnotations.isEmpty)
+  }
+
+  @Test
+  func annotationsDoNotChangeOperationsOrCounters() {
+    var plain = RecordingEngine(values: [2, 1])
+    var annotated = RecordingEngine(values: [2, 1])
+    _ = plain.compare(0, 1)
+    plain.swap(0, 1)
+    _ = annotated.compare(0, 1)
+    annotated.annotateLastOperation(
+      stageID: "test.compare", outcome: "right", roles: [:],
+      explanationKey: "test.choice")
+    annotated.swap(0, 1)
+    let plainSummary = plain.finish()
+    let annotatedSummary = annotated.finish()
+    #expect(annotatedSummary.tape == plainSummary.tape)
+    #expect(annotatedSummary.compareCount == plainSummary.compareCount)
+    #expect(annotatedSummary.swapCount == plainSummary.swapCount)
+    #expect(annotated.values == plain.values)
+  }
+
   private func makeTape(
     operations: [SortOperation], sortStartIndex: Int = 0,
     compareCount: Int = 3, swapCount: Int = 2

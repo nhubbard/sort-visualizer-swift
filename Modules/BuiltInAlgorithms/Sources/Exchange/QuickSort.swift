@@ -33,10 +33,26 @@ public struct QuickSort: SortAlgorithm {
     var i = left
     var j = right
     while i < j {
-      while engine.compare(pivot, i) && i < j {
+      while true {
+        let isOnLeft = engine.compare(pivot, i)
+        engine.annotateLastOperation(
+          stageID: "quick.partition.scanLeft",
+          decisionID: "quick.pivotSide",
+          outcome: !isOnLeft ? "oppositeSide" : (i < j ? "advance" : "boundary"),
+          roles: ["pivot": .arrayIndex(pivot), "candidate": .arrayIndex(i)],
+          explanationKey: "quick.pivotSide")
+        guard isOnLeft && i < j else { break }
         i += 1
       }
-      while !engine.compare(pivot, j) {
+      while true {
+        let isOnLeft = engine.compare(pivot, j)
+        engine.annotateLastOperation(
+          stageID: "quick.partition.scanRight",
+          decisionID: "quick.pivotSide",
+          outcome: isOnLeft ? "stop" : "retreat",
+          roles: ["pivot": .arrayIndex(pivot), "candidate": .arrayIndex(j)],
+          explanationKey: "quick.pivotSide")
+        guard !isOnLeft else { break }
         j -= 1
       }
       if i < j {

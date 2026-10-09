@@ -1,5 +1,48 @@
 import Foundation
 
+public enum TeachingReference: Sendable, Codable, Equatable {
+  case arrayIndex(Int)
+  case auxiliaryIndex(handle: Int, index: Int)
+  case value(Int)
+  case range(Range<Int>)
+
+  public var arrayIndex: Int? {
+    if case .arrayIndex(let index) = self { return index }
+    return nil
+  }
+}
+
+/// Teaching metadata attached to a real operation. It never advances replay or changes counts.
+public struct TeachingAnnotation: Sendable, Codable, Equatable {
+  public let operationIndex: Int
+  public let definitionVersion: Int
+  public let stageID: String
+  public let decisionID: String?
+  public let outcome: String
+  public let roles: [String: TeachingReference]
+  public let explanationKey: String
+
+  public init(
+    operationIndex: Int, definitionVersion: Int = 1, stageID: String,
+    decisionID: String? = nil, outcome: String,
+    roles: [String: TeachingReference], explanationKey: String
+  ) {
+    self.operationIndex = operationIndex
+    self.definitionVersion = definitionVersion
+    self.stageID = stageID
+    self.decisionID = decisionID
+    self.outcome = outcome
+    self.roles = roles
+    self.explanationKey = explanationKey
+  }
+
+  public func shifted(by offset: Int) -> Self {
+    Self(operationIndex: operationIndex + offset, definitionVersion: definitionVersion,
+      stageID: stageID, decisionID: decisionID,
+      outcome: outcome, roles: roles, explanationKey: explanationKey)
+  }
+}
+
 /// Handle for one of an algorithm's scratch buffers (merge sort's temp array, bucket sort's
 /// buckets, LSD Radix's digit registers). Only ever produced by `RecordingEngine.createAuxArray`.
 public struct AuxHandle: Hashable, Sendable, Codable {
@@ -81,10 +124,25 @@ public struct TapeHeader: Sendable, Codable, Equatable {
 public struct Tape: Sendable, Codable, Equatable {
   public let header: TapeHeader
   public let operations: [SortOperation]
+  public let teachingAnnotations: [TeachingAnnotation]
 
-  public init(header: TapeHeader, operations: [SortOperation]) {
+  public init(
+    header: TapeHeader, operations: [SortOperation],
+    teachingAnnotations: [TeachingAnnotation] = []
+  ) {
     self.header = header
     self.operations = operations
+    self.teachingAnnotations = teachingAnnotations
+  }
+
+  private enum CodingKeys: String, CodingKey { case header, operations, teachingAnnotations }
+
+  public init(from decoder: any Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    header = try container.decode(TapeHeader.self, forKey: .header)
+    operations = try container.decode([SortOperation].self, forKey: .operations)
+    teachingAnnotations = try container.decodeIfPresent(
+      [TeachingAnnotation].self, forKey: .teachingAnnotations) ?? []
   }
 
   /// How many operations in `operations` are real algorithmic work rather than highlight
@@ -109,12 +167,24 @@ public struct Tape: Sendable, Codable, Equatable {
   public func compactedForFastPlayback() -> Tape {
     var keptBeforeSortStart = 0
     var kept: [SortOperation] = []
+    var remapped: [TeachingAnnotation] = []
+    var annotationIndex = 0
     kept.reserveCapacity(operations.count)
     for (index, operation) in operations.enumerated() {
       switch operation {
       case .mark, .unmark, .unmarkAll, .unmarkIndex:
         continue
       default:
+        while annotationIndex < teachingAnnotations.count,
+          teachingAnnotations[annotationIndex].operationIndex == index {
+          let annotation = teachingAnnotations[annotationIndex]
+          remapped.append(TeachingAnnotation(
+            operationIndex: kept.count, definitionVersion: annotation.definitionVersion,
+            stageID: annotation.stageID, decisionID: annotation.decisionID,
+            outcome: annotation.outcome, roles: annotation.roles,
+            explanationKey: annotation.explanationKey))
+          annotationIndex += 1
+        }
         if index < header.sortStartIndex {
           keptBeforeSortStart += 1
         }
@@ -136,6 +206,6 @@ public struct Tape: Sendable, Codable, Equatable {
       sortStartIndex: keptBeforeSortStart,
       uniqueValueCount: header.uniqueValueCount
     )
-    return Tape(header: newHeader, operations: kept)
+    return Tape(header: newHeader, operations: kept, teachingAnnotations: remapped)
   }
 }

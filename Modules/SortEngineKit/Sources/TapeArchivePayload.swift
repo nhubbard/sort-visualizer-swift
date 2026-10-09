@@ -2,8 +2,9 @@ import Foundation
 
 /// The decompressed inner payload of a tape archive: a "TAPE"-magic header, `TapeHeader`'s 13
 /// fields at fixed widths, then `operations` as a tag-byte-per-case mirror of `SortOperation`'s
-/// 14 cases — more compact than a fixed-max-width record, and a direct structural mirror of the
-/// enum itself.
+/// operation cases — more compact than a fixed-max-width record, and a direct structural mirror
+/// of the enum itself. An optional versioned `ANNO` trailer carries teaching annotations; an old
+/// payload ends immediately after the operation list.
 enum TapeArchivePayload {
   private static let magic: [UInt8] = [0x54, 0x41, 0x50, 0x45]  // "TAPE"
 
@@ -47,6 +48,14 @@ enum TapeArchivePayload {
     writer.writeLittleEndianUInt(UInt64(tape.operations.count), byteCount: 4)
     for operation in tape.operations {
       encode(operation, into: &writer)
+    }
+
+    if !tape.teachingAnnotations.isEmpty {
+      let encoded = try! JSONEncoder().encode(tape.teachingAnnotations)
+      writer.writeBytes([0x41, 0x4E, 0x4E, 0x4F])  // optional "ANNO" trailer
+      writer.writeLittleEndianUInt(1, byteCount: 2)  // annotation schema version
+      writer.writeLittleEndianUInt(UInt64(encoded.count), byteCount: 4)
+      writer.writeBytes(encoded)
     }
 
     return writer.bytes
@@ -121,9 +130,34 @@ enum TapeArchivePayload {
       operations.append(try decodeOperation(from: &reader))
     }
 
+    var annotations: [TeachingAnnotation] = []
+    if reader.remaining > 0 {
+      let marker = try reader.readBytes(4)
+      guard Array(marker) == [0x41, 0x4E, 0x4E, 0x4F] else {
+        throw TapeArchiveError.invalidHeader
+      }
+      let version = try reader.readLittleEndianUInt(byteCount: 2)
+      let length = try reader.readLittleEndianUInt(byteCount: 4)
+      guard let count = Int(exactly: length) else { throw TapeArchiveError.invalidHeader }
+      let encoded = try reader.readBytes(count)
+      if version == 1 {
+        guard let decoded = try? JSONDecoder().decode([TeachingAnnotation].self, from: Data(encoded))
+        else { throw TapeArchiveError.invalidHeader }
+        var previous = -1
+        for annotation in decoded {
+          guard annotation.operationIndex >= sortStartIndex,
+            annotation.operationIndex < operations.count,
+            annotation.operationIndex >= previous,
+            operations[annotation.operationIndex].isSignificantForPacing
+          else { throw TapeArchiveError.invalidHeader }
+          previous = annotation.operationIndex
+        }
+        annotations = decoded
+      }
+    }
     guard reader.remaining == 0 else { throw TapeArchiveError.truncatedOperationList }
 
-    return Tape(header: header, operations: operations)
+    return Tape(header: header, operations: operations, teachingAnnotations: annotations)
   }
 
   // MARK: - Strings

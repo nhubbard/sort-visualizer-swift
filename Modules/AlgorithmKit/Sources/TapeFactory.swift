@@ -92,7 +92,10 @@ public enum TapeFactory {
         sortStartIndex: shuffleSummary.tape.count,
         uniqueValueCount: uniqueValueCount
       ),
-      operations: shuffleSummary.tape + sortSummary.tape
+      operations: shuffleSummary.tape + sortSummary.tape,
+      teachingAnnotations: sortSummary.teachingAnnotations.map {
+        $0.shifted(by: shuffleSummary.tape.count)
+      }
     )
   }
 }

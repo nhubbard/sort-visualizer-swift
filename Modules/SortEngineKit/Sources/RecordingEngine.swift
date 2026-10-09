@@ -19,6 +19,7 @@ public struct RecordingEngine: Sendable {
 
   public private(set) var values: [Int]
   private var tape: [SortOperation] = []
+  private var teachingAnnotations: [TeachingAnnotation] = []
   /// Counts every operation even after `operationCap` stops retaining tape entries.
   private var totalOperationCount = 0
   private let operationCap: Int
@@ -106,6 +107,20 @@ public struct RecordingEngine: Sendable {
       return
     }
     tape.append(op)
+  }
+
+  /// Attach the algorithm's reason for its most recent real operation. Call immediately after
+  /// the comparison or write whose result is being explained.
+  public mutating func annotateLastOperation(
+    stageID: String, decisionID: String? = nil, outcome: String,
+    roles: [String: TeachingReference], explanationKey: String
+  ) {
+    guard !didExceedCap, let operation = tape.last,
+      operation.isSignificantForPacing else { return }
+    teachingAnnotations.append(TeachingAnnotation(
+      operationIndex: tape.count - 1, stageID: stageID, decisionID: decisionID,
+      outcome: outcome,
+      roles: roles, explanationKey: explanationKey))
   }
 
   @discardableResult
@@ -294,6 +309,7 @@ public struct RecordingEngine: Sendable {
   public func finish() -> RecordingSummary {
     RecordingSummary(
       tape: tape,
+      teachingAnnotations: teachingAnnotations,
       totalOperationCount: totalOperationCount,
       compareCount: compareCount,
       compareValueCount: compareValueCount,
@@ -314,6 +330,7 @@ public struct RecordingEngine: Sendable {
 /// destructuring arity.
 public struct RecordingSummary: Sendable {
   public let tape: [SortOperation]
+  public let teachingAnnotations: [TeachingAnnotation]
   public let totalOperationCount: Int
   public let compareCount: Int
   /// The portion of `compareCount` that came from `compareValue` rather than `compare` -- see

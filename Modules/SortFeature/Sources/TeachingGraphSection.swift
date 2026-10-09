@@ -1,6 +1,21 @@
 import SortEngineKit
 import SwiftUI
 
+enum TeachingGraphPlaybackPolicy {
+  static let readingRate = 1.0
+  static let minimumReadingTime: TimeInterval = 3
+
+  static func shouldPin(isPlaying: Bool, pacingRate: Double) -> Bool {
+    isPlaying && pacingRate > readingRate
+  }
+
+  static func shouldUpdate(
+    isPlaying: Bool, isPinned: Bool, now: Date, lastUpdate: Date
+  ) -> Bool {
+    !isPinned && (!isPlaying || now.timeIntervalSince(lastUpdate) >= minimumReadingTime)
+  }
+}
+
 /// The graph follows the same ReplayEngine as the Metal canvas. Only the pilot algorithms
 /// expose it; other sorts keep their existing detail layout.
 struct TeachingGraphSection: View {
@@ -22,21 +37,31 @@ private struct TeachingGraphView: View {
   let replay: ReplayEngine
   @State private var trace: TeachingGraphTrace
   @State private var isExpanded = false
+  @State private var displayedStep: Int
+  @State private var isPinned = false
+  @State private var lastAutomaticUpdate = Date.distantPast
 
   init(replay: ReplayEngine) {
     self.replay = replay
     _trace = State(initialValue: TeachingGraphTrace(tape: replay.tape)!)
+    _displayedStep = State(initialValue: replay.stepIndex)
   }
 
   var body: some View {
     DisclosureGroup(isExpanded: $isExpanded) {
       if isExpanded {
-        let step = replay.stepIndex
+        let step = displayedStep
         let snapshot = trace.snapshot(at: step)
         VStack(alignment: .leading, spacing: 12) {
           Text(introduction)
             .font(.subheadline)
             .foregroundStyle(.secondary)
+          if isPinned {
+            Text("Pinned while playback is fast")
+              .font(.caption)
+              .foregroundStyle(.secondary)
+              .accessibilityIdentifier("teachingGraphPinnedStatus")
+          }
           if let event = snapshot.current {
             Text("Graph event \(snapshot.currentNumber) of \(trace.events.count)")
               .font(.caption.monospacedDigit())
@@ -56,9 +81,11 @@ private struct TeachingGraphView: View {
               .font(.caption)
               .foregroundStyle(.secondary)
           } else {
-            Text(step < trace.sortStartIndex
-              ? "The graph begins after the shuffle."
-              : "Use Next Graph Event to reach the first decision.")
+            Text(isPinned
+              ? "Pause or slow playback to read decisions."
+              : (step < trace.sortStartIndex
+                ? "The graph begins after the shuffle."
+                : "Use Next Graph Event to reach the first decision."))
               .accessibilityIdentifier("teachingGraphExplanation")
           }
           HStack {
@@ -81,6 +108,23 @@ private struct TeachingGraphView: View {
       Label("Teaching Graph", systemImage: "point.3.connected.trianglepath.dotted")
         .font(.title2.bold())
         .accessibilityIdentifier("teachingGraphDisclosure")
+    }
+    .task(id: isExpanded) {
+      guard isExpanded else { return }
+      while !Task.isCancelled {
+        let playing = replay.isPlaying
+        let fast = TeachingGraphPlaybackPolicy.shouldPin(
+          isPlaying: playing, pacingRate: replay.currentPacingRate)
+        if isPinned != fast { isPinned = fast }
+        let now = Date()
+        if TeachingGraphPlaybackPolicy.shouldUpdate(
+          isPlaying: playing, isPinned: fast, now: now,
+          lastUpdate: lastAutomaticUpdate), displayedStep != replay.stepIndex {
+          displayedStep = replay.stepIndex
+          lastAutomaticUpdate = now
+        }
+        try? await Task.sleep(for: .milliseconds(100))
+      }
     }
   }
 

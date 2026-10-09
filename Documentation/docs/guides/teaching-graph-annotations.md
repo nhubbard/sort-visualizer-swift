@@ -1,8 +1,10 @@
-# Teaching graph annotations: proposed design
+# Teaching graph annotations
 
-**Status:** design proposal. The shipped Teaching Graph still derives events from Quick Sort and
-Merge Sort tapes. This document defines a path for adding explanations supplied by the algorithm
-itself. It does not describe an implemented tape format or a catalog-wide graph.
+**Status:** Quick Sort and Merge Sort annotation pilot implemented on 2026-10-08. Both algorithms
+now record why a comparison chose its branch. The tape carries a versioned, optional annotation
+sidecar through export, import, and fast-playback compaction. The Teaching Graph uses authored
+decision explanations where available and retains operation-derived explanations for older tapes.
+The fixed flowchart and catalog-wide definitions remain future work.
 
 ## Goal
 
@@ -27,9 +29,9 @@ produce sound, or advance playback on their own. Each record has:
 | `operationIndex` | Zero-based index of the meaningful tape operation whose result this explains. The explanation becomes current after that operation is applied, at `stepIndex == operationIndex + 1`. |
 | `stageID` | Stable identifier for a broad algorithm stage, such as `partition.scanRight` or `merge.chooseNext`. A static flowchart may highlight this stage. |
 | `decisionID` | Stable identifier for the question within that stage, if there is one. |
-| `outcome` | A typed result such as `left`, `right`, `equal`, `continue`, or `complete`, interpreted by that algorithm's teaching definition. |
+| `outcome` | A stable result identifier such as `left`, `right`, `advance`, or `stop`, interpreted by that algorithm's teaching definition. |
 | `roles` | Named, typed references to live array positions, auxiliary-buffer positions, values, or ranges. These can drive graph focus and caption parameters. |
-| `explanationKey` | A stable localization key for the explanation. Renderers fill its parameters from `roles` and `outcome`; the tape does not need to store English prose. |
+| `explanationKey` | A stable explanation identifier. The graph resolves it with `roles` and `outcome`; the tape does not store English prose. Localized templates can replace the pilot text later. |
 
 The identifiers belong to a versioned **teaching definition** for an algorithm or a closely
 related variant. That definition supplies localized templates, stage labels, optional flowchart
@@ -37,7 +39,7 @@ nodes and branches, and validation rules for its roles. Sharing a definition acr
 appropriate only when its decisions actually have the same meaning. An algorithm with no
 definition can still use the ordinary tape and any existing generic operation display.
 
-The first implementation should keep the schema small. A Swift sketch of the boundary is:
+The implementation keeps the schema small. Its shape is:
 
 ```swift
 struct TeachingAnnotation: Sendable, Codable {
@@ -45,7 +47,7 @@ struct TeachingAnnotation: Sendable, Codable {
   let definitionVersion: Int
   let stageID: String
   let decisionID: String?
-  let outcome: String?
+  let outcome: String
   let roles: [String: TeachingReference]
   let explanationKey: String
 }
@@ -58,14 +60,13 @@ enum TeachingReference: Sendable, Codable {
 }
 ```
 
-This is a sketch, not a requirement to expose stringly typed IDs in every algorithm. Small
-typed helpers for a particular teaching definition can build these records and check required
+Small typed helpers for a particular teaching definition can build these records and check required
 roles at compile time or in tests. Stored IDs remain stable so archived annotations can be
 decoded without loading the original algorithm implementation.
 
 ## Recording at the decision site
 
-`RecordingEngine` is the only interface an algorithm uses to record work. Add a narrow optional
+`RecordingEngine` is the only interface an algorithm uses to record work. It now has a narrow
 method that attaches an annotation to the **last retained meaningful operation**. The algorithm
 calls it immediately after the comparison, read, swap, or write whose result it explains. The
 method must reject an absent or cosmetic-marker anchor; it must not append a `SortOperation`.
@@ -79,11 +80,12 @@ branch using its known pivot and scan position:
 ```swift
 let belongsOnLeft = engine.compare(pivot, scan)
 engine.annotateLastOperation(
-  stage: .partitionScan,
-  decision: .pivotSide,
-  outcome: belongsOnLeft ? .advanceScan : .stopScan,
-  roles: [.pivot: .arrayIndex(pivot), .candidate: .arrayIndex(scan)])
-if belongsOnLeft { scan += 1 }
+  stageID: "quick.partition.scanLeft",
+  decisionID: "quick.pivotSide",
+  outcome: !belongsOnLeft ? "oppositeSide" : (scan < boundary ? "advance" : "boundary"),
+  roles: ["pivot": .arrayIndex(pivot), "candidate": .arrayIndex(scan)],
+  explanationKey: "quick.pivotSide")
+if belongsOnLeft && scan < boundary { scan += 1 }
 ```
 
 The exact comparison direction and wording must match the particular Quick Sort variant. For
@@ -103,10 +105,10 @@ shuffle and sort operations; it adds `sortStartIndex` to each sort annotation's 
 the combined tape. Every annotation must then satisfy
 `sortStartIndex <= operationIndex < operations.count` and point to the expected operation kind.
 
-`ReplayEngine.stepIndex` counts applied operations. At any position, the current annotation is
-the last record whose `operationIndex + 1 <= stepIndex`. Use a binary search, as the current
-teaching trace does, so seeking backward or forward reconstructs the same explanation without
-re-running algorithm code. Multiple annotations on one operation retain recording order. The
+`ReplayEngine.stepIndex` counts applied operations. At any position, the current graph event is
+the last event whose `step <= stepIndex`. The existing trace binary search keeps seeking
+independent of re-running algorithm code. Multiple annotations on one operation retain recording
+order in the tape; the pilot graph uses the latest one for that event. The
 visible graph may keep a short recent window while text and event navigation cover the complete
 annotation stream.
 
@@ -137,27 +139,24 @@ When playback pauses, completes, or drops to the reading threshold, set `display
 current replay position and show the matching annotation. A deliberate step or seek updates the
 teaching view immediately even if the speed setting remains high. If automatic slow playback
 would still change annotations too quickly, hold each explanation for at least three seconds and
-skip intermediate automatic updates; manual navigation continues to reach every event. Avoid
-automatic VoiceOver announcements for every replay event. Announce deliberate navigation and
-the change into or out of the pinned state once.
+skip intermediate automatic updates; manual navigation continues to reach every event. The pilot
+does not post automatic VoiceOver announcements for replay events. A hands-on assistive-technology
+pass should determine whether deliberate navigation or pin-state changes need a single announcement.
 
-The threshold must use the **actual** pacing rate. In flat-rate mode, account for any automatic
-speed limit; in fixed-duration mode, use the rate the replay loop currently applies, which
-changes during the run. `ReplayEngine` already calculates that rate, but does not expose it to
-the teaching view. Add a low-frequency pace classification or callback rather than a new
-per-tick observable property, so the teaching UI does not recompose on every display-link tick.
-Use a small hysteresis band around the threshold to avoid alternating rapidly between pinned
-and live states. The exact threshold and dwell time are presentation constants, not tape data;
-they must not change replay or annotation indices.
+The threshold uses the **actual** pacing rate. In flat-rate mode this accounts for an automatic
+speed limit; in fixed-duration mode it follows the changing rate applied by the replay loop.
+The teaching view samples `ReplayEngine.currentPacingRate` every 100 milliseconds in its own task,
+without adding a new per-tick observable property. A hysteresis band may help if hands-on tests
+find rapid switching near the threshold. The threshold and dwell time are presentation constants,
+not tape data; they do not change replay or annotation indices.
 
 ## Compatibility and presentation
 
-Introduce annotation storage as an optional, versioned tape sidecar with archive decoding that
-continues to accept existing tapes. The archive migration needs its own format tests before any
-new writer ships. Unknown definition versions or unknown IDs should hide that annotation and
-leave replay, sorting, and tape import intact. Until archive support lands, an in-memory sidecar
-can validate the model on fresh recordings; imported tapes can continue using the existing
-Quick Sort and Merge Sort trace reconstruction.
+The optional archive trailer has an `ANNO` marker and schema version. Archives without the trailer
+still decode; a future unknown trailer version is skipped after its bounded length is read.
+Unknown definition versions, explanation keys, or outcomes fall back to operation-derived text
+and leave replay intact. The current format tests cover round trips with and without annotations.
+Imported old tapes continue using the existing Quick Sort and Merge Sort trace reconstruction.
 
 The UI should show one concise decision explanation and, when useful, its consequence. VoiceOver
 reads the same text. The current dynamic graph may use `roles` to focus the corresponding nodes
@@ -188,7 +187,6 @@ confirm that no meaningful pilot events were lost.
    the same decision vocabulary is accurate. Measure annotation volume and recording overhead
    before expanding across the catalog.
 
-The first milestone is complete when Quick Sort and Merge Sort explain **why** each chosen
-branch occurred, the explanations stay synchronized through seeking and fast playback, and old
-tapes still replay correctly. Catalog-wide coverage is subsequent content work, not an automatic
-result of adding the sidecar.
+The pilot milestone covers authored Quick Sort and Merge Sort branch explanations, replay and
+archive synchronization, and fast-playback pinning. A fixed flowchart and catalog-wide coverage
+are subsequent content work, not automatic results of adding the sidecar.
