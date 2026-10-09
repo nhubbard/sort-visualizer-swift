@@ -49,16 +49,28 @@ function mergeWithoutBuffer(arr, pos, len1, len2) {
   if (len1 < len2) {
     while (len1 !== 0) {
       const loc = binSearch(arr, pos + len1, len2, pos, true);
-      if (loc !== 0) { rotate(arr, pos, len1, loc); pos += loc; len2 -= loc; }
+      if (loc !== 0) {
+        rotate(arr, pos, len1, loc);
+        pos += loc;
+        len2 -= loc;
+      }
       if (len2 === 0) break;
-      do { pos++; len1--; } while (len1 !== 0 && arr[pos] <= arr[pos + len1]);
+      do {
+        pos++;
+        len1--;
+      } while (len1 !== 0 && arr[pos] <= arr[pos + len1]);
     }
   } else {
     while (len2 !== 0) {
       const loc = binSearch(arr, pos, len1, pos + len1 + len2 - 1, false);
-      if (loc !== len1) { rotate(arr, pos + loc, len1 - loc, len2); len1 = loc; }
+      if (loc !== len1) {
+        rotate(arr, pos + loc, len1 - loc, len2);
+        len1 = loc;
+      }
       if (len1 === 0) break;
-      do { len2--; } while (len2 !== 0 && arr[pos + len1 - 1] <= arr[pos + len1 + len2 - 1]);
+      do {
+        len2--;
+      } while (len2 !== 0 && arr[pos + len1 - 1] <= arr[pos + len1 + len2 - 1]);
     }
   }
 }
@@ -109,10 +121,6 @@ function insert2(arr, a, l, r) {
   arr[l + 1] = tmpL;
 }
 
-
-const array = [
-  0, 39, 21, 62, 91, 77, 14, 23,
-  90, 69, 51, 81, 68, 83, 32, 56,
-];
+const array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56];
 sort(array);
 console.log("[" + array.join(", ") + "]");

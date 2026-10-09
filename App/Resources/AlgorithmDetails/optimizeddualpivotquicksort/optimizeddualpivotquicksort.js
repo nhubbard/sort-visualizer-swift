@@ -12,9 +12,13 @@ function insertionSort(a, start, end) {
 
 function optimizedDualPivotQuickSort(a, left, right, divisor) {
   const length = right - left;
-  if (length < 27) { insertionSort(a, left, right + 1); return; }
+  if (length < 27) {
+    insertionSort(a, left, right + 1);
+    return;
+  }
   const third = Math.floor(length / divisor);
-  let med1 = left + third, med2 = right - third;
+  let med1 = left + third,
+    med2 = right - third;
   if (med1 <= left) med1 = left + 1;
   if (med2 >= right) med2 = right - 1;
   if (a[med1] < a[med2]) {
@@ -24,14 +28,22 @@ function optimizedDualPivotQuickSort(a, left, right, divisor) {
     [a[med1], a[right]] = [a[right], a[med1]];
     [a[med2], a[left]] = [a[left], a[med2]];
   }
-  const pivot1 = a[left], pivot2 = a[right];
-  let less = left + 1, great = right - 1;
+  const pivot1 = a[left],
+    pivot2 = a[right];
+  let less = left + 1,
+    great = right - 1;
   for (let k = less; k <= great; k++) {
-    if (a[k] < pivot1) { [a[k], a[less]] = [a[less], a[k]]; less++; }
-    else if (a[k] > pivot2) {
+    if (a[k] < pivot1) {
+      [a[k], a[less]] = [a[less], a[k]];
+      less++;
+    } else if (a[k] > pivot2) {
       while (k < great && a[great] > pivot2) great--;
-      [a[k], a[great]] = [a[great], a[k]]; great--;
-      if (a[k] < pivot1) { [a[k], a[less]] = [a[less], a[k]]; less++; }
+      [a[k], a[great]] = [a[great], a[k]];
+      great--;
+      if (a[k] < pivot1) {
+        [a[k], a[less]] = [a[less], a[k]];
+        less++;
+      }
     }
   }
   const dist = great - less;
@@ -42,22 +54,25 @@ function optimizedDualPivotQuickSort(a, left, right, divisor) {
   optimizedDualPivotQuickSort(a, great + 2, right, divisor);
   if (dist > length - 13 && pivot1 !== pivot2) {
     for (let k = less; k <= great; k++) {
-      if (a[k] === pivot1) { [a[k], a[less]] = [a[less], a[k]]; less++; }
-      else if (a[k] === pivot2) {
-        [a[k], a[great]] = [a[great], a[k]]; great--;
-        if (a[k] === pivot1) { [a[k], a[less]] = [a[less], a[k]]; less++; }
+      if (a[k] === pivot1) {
+        [a[k], a[less]] = [a[less], a[k]];
+        less++;
+      } else if (a[k] === pivot2) {
+        [a[k], a[great]] = [a[great], a[k]];
+        great--;
+        if (a[k] === pivot1) {
+          [a[k], a[less]] = [a[less], a[k]];
+          less++;
+        }
       }
     }
   }
   if (pivot1 < pivot2) optimizedDualPivotQuickSort(a, less, great, divisor);
 }
 
-
 const array = [
-  55, 12, 84, 3, 47, 91, 26, 68,
-  8, 73, 40, 97, 15, 62, 34, 79,
-  21, 88, 5, 51, 66, 29, 44, 12,
-  78, 33, 91, 6, 58, 12,
+  55, 12, 84, 3, 47, 91, 26, 68, 8, 73, 40, 97, 15, 62, 34, 79, 21, 88, 5, 51,
+  66, 29, 44, 12, 78, 33, 91, 6, 58, 12,
 ];
 sort(array);
 console.log("[" + array.join(", ") + "]");
