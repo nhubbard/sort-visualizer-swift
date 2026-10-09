@@ -1,0 +1,5 @@
+Sqrt Sort is a stable [merge sort](https://en.wikipedia.org/wiki/Merge_sort) that uses auxiliary storage proportional to the square root of the input length. It first saves a short prefix in an external buffer. The vacated positions become workspace for building sorted runs from the remaining values.
+
+The algorithm repeatedly combines adjacent runs by ordering fixed-length blocks according to their first values. Tags retain the half from which each block came, so comparisons of equal values can preserve their original order. After the blocks are merged, the saved prefix is merged into the front. The block size is the smallest power of two whose square is at least the input length. This gives O(√n) auxiliary space and O(n log n) worst-case time.
+
+The code examples use a simpler stable square-root-buffer merge variant. They sort short runs by insertion, merge a pair directly when it fits in the bounded buffer, and otherwise split and rotate the runs before merging the smaller regions recursively. This keeps the same O(√n) auxiliary-space bound while using a different merge schedule.

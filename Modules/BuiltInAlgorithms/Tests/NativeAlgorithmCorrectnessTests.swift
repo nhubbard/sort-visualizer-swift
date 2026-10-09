@@ -10,6 +10,128 @@ import Testing
 @Suite
 struct NativeAlgorithmCorrectnessTests {
   @Test
+  func synchronousSqrtSortHandlesBlockBoundariesAndStableTies() {
+    let algorithm = SynchronousSqrtSort()
+    let radix = 4_096
+    for size in [0, 1, 2, 15, 16, 17, 24, 31, 32, 33, 63, 64, 65, 127, 128, 129, 255, 256, 257, 511, 512, 513, 1024, 1780, 2048] {
+      for seed in 0..<12 {
+        var state = UInt64(size * 1_009 + seed + 1)
+        let input = (0..<size).map { index in
+          state = state &* 6_364_136_223_846_793_005 &+ 1_442_695_040_888_963_407
+          return Int(state % 9) * radix + index
+        }
+        for candidate in [input, Array(input.reversed()), Array(0..<size), Array((0..<size).reversed())] {
+          var engine = RecordingEngine(values: candidate, operationCap: 4_000_000, comparisonKeyForTesting: { $0 / radix })
+          algorithm.record(into: &engine)
+          let output = engine.values
+          #expect(output.map { $0 / radix } == candidate.map { $0 / radix }.sorted(), "size=\(size) seed=\(seed)")
+          let positions = Dictionary(uniqueKeysWithValues: candidate.enumerated().map { ($0.element, $0.offset) })
+          for index in 1..<max(1, output.count) where output[index - 1] / radix == output[index] / radix {
+            if let earlier = positions[output[index - 1]], let later = positions[output[index]] {
+              #expect(earlier < later, "size=\(size) seed=\(seed)")
+            } else {
+              Issue.record("Synchronous Sqrt Sort changed an input value at size \(size), seed \(seed)")
+            }
+          }
+        }
+      }
+    }
+  }
+
+  @Test
+  func sqrtSortHandlesBlockBoundariesAndStableTies() {
+    let algorithm = SqrtSort()
+    let radix = 4_096
+    for size in [0, 1, 2, 15, 16, 17, 31, 32, 33, 63, 64, 65, 127, 128, 129, 255, 256, 257, 511, 512, 513, 1024, 1382, 2048] {
+      for seed in 0..<12 {
+        var state = UInt64(size * 1_009 + seed + 1)
+        let input = (0..<size).map { index in
+          state = state &* 6_364_136_223_846_793_005 &+ 1_442_695_040_888_963_407
+          return Int(state % 9) * radix + index
+        }
+        for candidate in [input, Array(input.reversed()), Array(0..<size), Array((0..<size).reversed())] {
+          var engine = RecordingEngine(values: candidate, operationCap: 4_000_000, comparisonKeyForTesting: { $0 / radix })
+          algorithm.record(into: &engine)
+          let output = engine.values
+          #expect(output.map { $0 / radix } == candidate.map { $0 / radix }.sorted(), "size=\(size) seed=\(seed)")
+          let positions = Dictionary(uniqueKeysWithValues: candidate.enumerated().map { ($0.element, $0.offset) })
+          for index in 1..<max(1, output.count) where output[index - 1] / radix == output[index] / radix {
+            if let earlier = positions[output[index - 1]], let later = positions[output[index]] {
+              #expect(earlier < later, "size=\(size) seed=\(seed)")
+            } else {
+              Issue.record("Sqrt Sort changed an input value at size \(size), seed \(seed)")
+            }
+          }
+        }
+      }
+    }
+  }
+
+  @Test
+  func ectaSortHandlesBlockBoundariesAndStableTies() {
+    let algorithm = EctaSort()
+    let radix = 4_096
+    for size in [0, 1, 2, 31, 32, 33, 63, 64, 65, 127, 128, 129, 255, 256, 257, 511, 512, 513, 1024, 1446, 2048] {
+      for seed in 0..<20 {
+        var state = UInt64(size * 1_009 + seed + 1)
+        let input = (0..<size).map { index in
+          state = state &* 6_364_136_223_846_793_005 &+ 1_442_695_040_888_963_407
+          return Int(state % 9) * radix + index
+        }
+        for candidate in [input, Array(input.reversed()), Array(0..<size), Array((0..<size).reversed())] {
+          var engine = RecordingEngine(
+            values: candidate, operationCap: 4_000_000,
+            comparisonKeyForTesting: { $0 / radix }
+          )
+          algorithm.record(into: &engine)
+          let output = engine.values
+          #expect(output.map { $0 / radix } == candidate.map { $0 / radix }.sorted(), "size=\(size) seed=\(seed)")
+          let positions = Dictionary(uniqueKeysWithValues: candidate.enumerated().map { ($0.element, $0.offset) })
+          for index in 1..<max(1, output.count) where output[index - 1] / radix == output[index] / radix {
+            if let earlier = positions[output[index - 1]], let later = positions[output[index]] {
+              #expect(earlier < later, "size=\(size) seed=\(seed)")
+            } else {
+              Issue.record("Ecta Sort changed an input value at size \(size), seed \(seed)")
+            }
+          }
+        }
+      }
+    }
+  }
+
+  @Test
+  func optimizedRotateMergeSortHandlesBufferBoundaryAndStableTies() {
+    let algorithm = OptimizedRotateMergeSort()
+    let radix = 4_096
+    for size in [0, 1, 2, 31, 32, 33, 63, 64, 65, 127, 128, 129, 255, 256, 257, 511, 512, 513, 1024, 1813, 2048] {
+      for seed in 0..<20 {
+        var state = UInt64(size * 1_009 + seed + 1)
+        let input = (0..<size).map { index in
+          state = state &* 6_364_136_223_846_793_005 &+ 1_442_695_040_888_963_407
+          return Int(state % 9) * radix + index
+        }
+        for candidate in [input, Array(input.reversed()), Array(0..<size), Array((0..<size).reversed())] {
+          var engine = RecordingEngine(
+            values: candidate, operationCap: 4_000_000,
+            comparisonKeyForTesting: { $0 / radix }
+          )
+          algorithm.record(into: &engine)
+          #expect(engine.values.map { $0 / radix } == candidate.map { $0 / radix }.sorted(), "size=\(size) seed=\(seed) input=\(candidate) output=\(engine.values)")
+          let output = engine.values
+          let inputPositions = Dictionary(uniqueKeysWithValues: candidate.enumerated().map { ($0.element, $0.offset) })
+          for index in 1..<max(1, output.count) where output[index - 1] / radix == output[index] / radix {
+            if let earlier = inputPositions[output[index - 1]], let later = inputPositions[output[index]] {
+              #expect(earlier < later, "size=\(size) seed=\(seed) input=\(candidate) output=\(output)")
+            } else {
+              Issue.record("Output contains a value absent from input at size \(size), seed \(seed): \(output)")
+            }
+          }
+        }
+      }
+    }
+  }
+
+  @Test
   func multiWayMergeClusterSortsAndRecordsDeterministically() {
     for algorithm in [RemiSort(), FlanSort()] as [any SortAlgorithm] {
       for size in [2, 15, 16, 31, 32, 33, 63, 64, 127, 128, 256, 512] {
@@ -77,7 +199,7 @@ struct NativeAlgorithmCorrectnessTests {
     ClassicTournamentSort(),
     ClassicTreeSort(), CocktailBogoSort(), CocktailMergeSort(), CocktailShakerSort(), CombSort(), CompleteGraphSort(),
     CountingSort(), CreaseSort(), CycleSort(), DeterministicBogoSort(), DiamondSortIterative(), DiamondSortRecursive(),
-    DoubleInsertionSort(), DoubleSelectionSort(), DropMergeSort(), DualPivotQuickSort(), ExchangeBogoSort(), FifthMergeSort(),
+    DoubleInsertionSort(), DoubleSelectionSort(), DropMergeSort(), DualPivotQuickSort(), EctaSort(), ExchangeBogoSort(), FifthMergeSort(),
     FlashSort(), FlippedMinHeapSort(), FlanSort(), FluxSort(), FoldSort(), ForcedStableQuickSort(), FunSort(), GnomeSort(),
     GrailSort(), GravitySort(), GuessSort(), HanoiSort(), HybridCombSort(), ImprovedBlockSelectionSort(),
     ImprovedInPlaceMergeSort(), InPlaceLSDRadixSort(), InPlaceMergeSort(), InsertionSort(), IntroCircleSortIterative(),
@@ -87,17 +209,17 @@ struct NativeAlgorithmCorrectnessTests {
     MergeSort(), MinHeapSort(), MinMaxHeapSort(), MSDRadixSort(), NewShuffleMergeSort(), OddEvenMergeSortIterative(),
     OddEvenMergeSortRecursive(), OddEvenSort(), OptimizedBottomUpMergeSort(), OptimizedBubbleSort(),
     OptimizedCocktailShakerSort(), OptimizedDualPivotQuickSort(), OptimizedGnomeSort(), OptimizedGuessSort(),
-    OptimizedLazyStableSort(), OptimizedStoogeSort(), OptimizedStoogeSortStudio(), OptimizedWeaveMergeSort(),
+    OptimizedLazyStableSort(), OptimizedRotateMergeSort(), OptimizedStoogeSort(), OptimizedStoogeSortStudio(), OptimizedWeaveMergeSort(),
     OutOfPlaceHeapSort(), PairwiseMergeSortIterative(), PairwiseMergeSortRecursive(), PairwiseSortIterative(),
     PairwiseSortRecursive(), PancakeInsertionSort(), PancakeSort(), PatienceSort(), PDMergeSort(), PDQBranchedSort(),
     PDQBranchlessSort(), PigeonholeSort(), PoplarHeapSort(), QuadSort(), QuadStoogeSort(), QuickBogoSort(), QuickSort(),
     RandomGuessSort(), RemiSort(), RecursiveShellSort(), RedBlackTreeSort(), RotateLSDRadixSort(), RotateMergeSort(),
     RotateMSDRadixSort(), SelectionBogoSort(), SelectionSort(), ShatterSort(), ShellSort(), ShoveSort(), SillySort(),
     SimpleShatterSort(), SimplifiedLibrarySort(), SimplisticGravitySort(), SlopeSort(), SlowSort(), SmartBogoBogoSort(),
-    SmartGuessSort(), SmoothSort(), SnuffleSort(), SplaySort(), StableCycleSort(), StablePermutationSort(),
+    SmartGuessSort(), SmoothSort(), SnuffleSort(), SplaySort(), SqrtSort(), StableCycleSort(), StablePermutationSort(),
     StableQuickSort(), StableSelectionSort(), StacklessAmericanFlagSort(), StacklessBinaryQuickSort(),
     StacklessDualPivotQuickSort(), StacklessHybridQuickSort(), StacklessRotateMergeSort(), StaticSort(), StoogeSort(),
-    StrandSort(), SwaplessBubbleSort(), TableSort(), TernaryHeapSort(), TernaryLLQuickSort(), TernaryLRQuickSort(),
+    StrandSort(), SwaplessBubbleSort(), SynchronousSqrtSort(), TableSort(), TernaryHeapSort(), TernaryLLQuickSort(), TernaryLRQuickSort(),
     ThreeSmoothCombSortIterative(), ThreeSmoothCombSortRecursive(), TimeSort(), TournamentSort(), TreeSort(),
     TriangularHeapSort(), TwinSort(), UnoptimizedBubbleSort(), UnoptimizedCocktailShakerSort(), UnstableGrailSort(),
     WeakHeapSort(), WeavedMergeSort(), WeaveMergeSort(), WeaveSortIterative(), WeaveSortRecursive(),

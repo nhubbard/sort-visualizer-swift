@@ -18,7 +18,7 @@ sequential version, under a different name. Real thread interleaving has no mean
 single-writer model. Porting these variants would add duplicate content, not new algorithmic
 behavior.
 
-This leaves 196 candidates. 187 are shipped. 9 remain, in one category.
+This leaves 196 candidates. 191 are shipped. 5 remain, in one category.
 
 ### By category
 
@@ -31,7 +31,7 @@ This leaves 196 candidates. 187 are shipped. 9 remain, in one category.
 | Merge (19) | All ported |
 | Miscellaneous (4) | All ported |
 | Concurrent (22) | All ported |
-| Hybrid (41) | 32 ported, 9 remaining |
+| Hybrid (41) | 36 ported, 5 remaining |
 
 ### Remaining work
 
@@ -40,27 +40,19 @@ alphabetical order. The line count cited per algorithm is "effective lines": the
 class, plus, when it extends a shared template rather than the bare base class, that template's
 line count. Inherited template logic is real complexity a port must understand and translate.
 
-**Hard** (201–400 effective lines, or a same-category prerequisite not yet ported):
-
-- `OptimizedRotateMergeSort`, `EctaSort`.
-
 **Very Hard** (400+ effective lines, or extending one of the largest remaining templates):
 
-- `SqrtSort`, `SynchronousSqrtSort` (190
-  own plus 352 for `BlockMergeSorting`), `AdaptiveGrailSort` (915 lines, self-contained despite the
-  name), `TimSort` (a 45-line wrapper over the 950-line `TimSorting` template), `ChaliceSort` (767
-  own plus 352 for `BlockMergeSorting`), `WikiSort` (a 75-line wrapper over the 1068-line
+- `AdaptiveGrailSort` (915 lines, self-contained despite the name), `TimSort` (a 45-line wrapper
+  over the 950-line `TimSorting` template), `ChaliceSort` (767 own plus 352 for
+  `BlockMergeSorting`), `WikiSort` (a 75-line wrapper over the 1068-line
   `WikiSorting` template), and `KotaSort` (a 33-line wrapper over the 1142-line `KotaSorting`
   template, the largest template in ArrayV's `sorts/` tree).
 
-Several of these algorithms share one large template or one unported prerequisite. Porting the
-shared piece once reduces the cost of every sibling in that cluster:
+`ChaliceSort` extends `BlockMergeSorting` (352 lines). The shared operations used by the shipped
+`SynchronousSqrtSort` are now in `BlockMergeSortingTemplate`; Chalice needs more of that template.
 
-- **BlockMerge cluster**: `ChaliceSort` and `SynchronousSqrtSort` (both Hybrid) both extend
-  `BlockMergeSorting` (352 lines).
-
-The rest of the Hybrid backlog is deferred as a policy, not scheduled piecemeal, earmarked for a
-future batch covering the largest remaining sorts across every category.
+The remaining Hybrid algorithms are being ported individually as their implementations and
+reference content are verified.
 
 ### Completed clusters
 
@@ -101,10 +93,11 @@ hand-transcribed Java-to-pseudocode notes for six templates: `BinaryQuickSorting
 `ShatterSortingTemplate`, `TwinSortingTemplate`, `UnstableGrailSortingTemplate`,
 `PDQSortingTemplate`, and `GrailSortingTemplate`. Every algorithm built on those six templates has
 shipped, so the team retired that document instead of carrying it forward. It does not cover any of
-the templates listed above as still open (`BlockMergeSorting`,
-`TimSorting`, `WikiSorting`, `KotaSorting`) — nor `QuadSorting`, which has since shipped without
-one. A similar transcription pass is worth doing again before tackling the remaining open
-templates, given how dense and index-arithmetic-heavy this style of algorithm tends to be.
+the templates still needed by pending algorithms (`BlockMergeSorting` beyond the shared
+operations already ported, `TimSorting`, `WikiSorting`, `KotaSorting`) — nor `QuadSorting`, which
+has since shipped without one. A similar transcription pass is worth doing again before tackling
+the remaining template work, given how dense and index-arithmetic-heavy this style of algorithm
+tends to be.
 
 ## Shuffles
 

@@ -1,0 +1,110 @@
+let blockSize = 1;
+
+function sort(arr) {
+  blockSize = 1;
+  while (blockSize * blockSize < arr.length) blockSize *= 2;
+  synchronousSort(arr, 0, arr.length);
+  return arr;
+}
+
+function multiSwap(array, a, b, len) {
+  for (var i = 0; i < len; i++) {
+    var t = array[a + i];
+    array[a + i] = array[b + i];
+    array[b + i] = t;
+  }
+}
+
+function rotate(array, a, m, b) {
+  var l = m - a,
+    r = b - m;
+  while (l > 0 && r > 0) {
+    if (r < l) {
+      multiSwap(array, m - r, m, r);
+      b -= r;
+      m -= r;
+      l -= r;
+    } else {
+      multiSwap(array, a, m, l);
+      a += l;
+      m += l;
+      r -= l;
+    }
+  }
+}
+
+function binarySearch(array, a, b, value, left) {
+  while (a < b) {
+    var mid = a + Math.floor((b - a) / 2);
+    var comp = left ? value <= array[mid] : value < array[mid];
+    if (comp) {
+      b = mid;
+    } else {
+      a = mid + 1;
+    }
+  }
+  return a;
+}
+
+function synchronousMerge(array, a, m, b) {
+  if (m - a <= blockSize && b - m <= blockSize) {
+    const temp = array.slice(a, b);
+    let i = 0,
+      j = m - a;
+    for (let k = a; k < b; k++) {
+      if (i < m - a && (j === b - a || temp[i] <= temp[j]))
+        array[k] = temp[i++];
+      else array[k] = temp[j++];
+    }
+    return;
+  }
+  var m1, m2, m3, value;
+  if (m - a >= b - m) {
+    m1 = a + Math.floor((m - a) / 2);
+    value = array[m1];
+    m2 = binarySearch(array, m, b, value, true);
+    m3 = m1 + (m2 - m);
+  } else {
+    m2 = m + Math.floor((b - m) / 2);
+    value = array[m2];
+    m1 = binarySearch(array, a, m, value, false);
+    m3 = m2 - (m - m1);
+    m2 = m2 + 1;
+  }
+  rotate(array, m1, m, m2);
+  if (m2 - (m3 + 1) > 0 && b - m2 > 0) {
+    synchronousMerge(array, m3 + 1, m2, b);
+  }
+  if (m1 - a > 0 && m3 - m1 > 0) {
+    synchronousMerge(array, a, m1, m3);
+  }
+}
+
+function synchronousSort(array, a, b) {
+  var len = b - a;
+  for (let start = a; start < b; start += 16) {
+    const end = Math.min(start + 16, b);
+    for (let i = start + 1; i < end; i++) {
+      const value = array[i];
+      let j = i;
+      while (j > start && array[j - 1] > value) {
+        array[j] = array[j - 1];
+        j--;
+      }
+      array[j] = value;
+    }
+  }
+  for (var j = 16; j < len; j *= 2) {
+    var i;
+    for (i = a; i + 2 * j <= b; i += 2 * j) {
+      synchronousMerge(array, i, i + j, i + 2 * j);
+    }
+    if (i + j < b) {
+      synchronousMerge(array, i, i + j, b);
+    }
+  }
+}
+
+const array = [0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56];
+sort(array);
+console.log("[" + array.join(", ") + "]");
