@@ -33,7 +33,7 @@ public struct AlgorithmDetailSection: View {
   /// `content`/theme change in `highlightAllSamples`, off the main actor, instead.
   @State private var highlighted: [CodeLanguage: AttributedString] = [:]
   @State private var plainSamples: [CodeLanguage: String] = [:]
-  @State private var isFullCodeVisible = false
+  @State private var isFullCodeVisible = true
   @State private var isSelectableCodePresented = false
   #if DEBUG
   @State private var appliedThemeID: CodeThemeID?
@@ -103,12 +103,11 @@ public struct AlgorithmDetailSection: View {
             .onChange(of: selectedLanguage) {
               CodeDiscoveryTip.hasExploredCode = true
               CodeDiscoveryTip().invalidate(reason: .actionPerformed)
-              isFullCodeVisible = false
               isSelectableCodePresented = false
             }
 
             if let plain = plainSamples[selectedLanguage] {
-              Text("\(selectedLanguage.title) implementation, \(codeLineCount(plain)) lines. Copy Code or choose Read Full Code to inspect the source.")
+              Text("\(selectedLanguage.title) implementation, \(codeLineCount(plain)) lines.")
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
                 .accessibilityIdentifier("algorithmCodeSummary")
@@ -132,6 +131,7 @@ public struct AlgorithmDetailSection: View {
                     .accessibilityIdentifier("selectAlgorithmCodeText")
                 }
               }
+              .frame(maxWidth: .infinity)
               .sheet(isPresented: $isSelectableCodePresented) {
                 NavigationStack {
                   SelectableCodeTextView(source: plain)
@@ -176,7 +176,7 @@ public struct AlgorithmDetailSection: View {
       contentUnavailable = false
       highlighted = [:]
       plainSamples = [:]
-      isFullCodeVisible = false
+      isFullCodeVisible = true
       isSelectableCodePresented = false
       #if DEBUG
         appliedThemeID = nil

@@ -14,6 +14,33 @@ final class RunControlBarUITests: XCTestCase {
     useLandscapeOrientationForUITest()
   }
 
+  func testExpandedRecordingControlIsCenteredWithoutMovingIconButtons() {
+    let app = XCUIApplication()
+    app.launchEnvironment = ["UI_TEST_ARRAY_SIZE": "24"]
+    app.launch()
+    app.tapSidebarLink("algorithmLink.quicksort")
+
+    let first = app.buttons["runControlResetButton"]
+    let transport = app.buttons["runControlPlayPauseButton"]
+    let scrubber = app.sliders["runControlScrubSlider"]
+    let video = app.buttons["runControlVideoButton"]
+    XCTAssertTrue(first.waitForExistence(timeout: 5))
+    XCTAssertTrue(transport.exists)
+    XCTAssertTrue(scrubber.exists)
+    XCTAssertTrue(video.exists)
+
+    let iconPosition = first.frame
+    if abs(first.frame.midY - transport.frame.midY) < 12 {
+      XCTAssertGreaterThan(first.frame.midX, transport.frame.midX,
+        "Utility icons should stay to the right of transport on a wide bar")
+    }
+    app.activateControlForUITest(video)
+    let record = app.buttons["liveRecordingStartButton"]
+    XCTAssertTrue(record.waitForExistence(timeout: 5))
+    XCTAssertEqual(record.frame.midX, scrubber.frame.midX, accuracy: 12)
+    XCTAssertEqual(first.frame.midX, iconPosition.midX, accuracy: 2)
+  }
+
   func testPauseStepAndResumeReachesSortedState() throws {
     let app = XCUIApplication()
     #if targetEnvironment(macCatalyst)

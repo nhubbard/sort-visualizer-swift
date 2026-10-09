@@ -81,6 +81,7 @@ public struct ScrollingSortView: View {
               .padding()
               .accessibilityIdentifier("algorithmDetailAutomationPlaceholder")
           } else {
+            TeachingGraphSection(session: session)
             AlgorithmDetailSection(
               algorithm: algorithm, availableWidth: geometry.size.width,
               analyticsRevision: session.analyticsRevision)

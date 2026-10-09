@@ -8,7 +8,7 @@ Implemented 2026-10-08. Performance profiling was deferred at the owner's direct
 | Sort playback | Explore one step at a time | A manual recording is ready and playback has not been used | Play, Pause, or Step Forward |
 | Sort presentation | Change the view | Playback has been used and presentation has not been adjusted | Opening Array Size or Visualizer |
 | Sort navigation | Revisit any operation | Presentation has been adjusted and the recording has not been sought | Dragging Playback Position or using either jump button |
-| Reference code | Explore the implementation | Code examples have loaded and the user has not explored one | Changing language, reading full code, or copying code |
+| Reference code | Explore the implementation | Code examples have loaded and the user has not explored one | Changing language, toggling the full listing, or copying code |
 | Recorded runs | Compare your recorded runs | At least two recorded array sizes produce a chart | Opening the expanded chart |
 | Settings | Set defaults for future sorts | Settings is open and the user has not changed a default | Changing a playback, visualizer, shuffle, size, sound, recording-limit, or code-theme default |
 

@@ -185,8 +185,12 @@ struct ContentView: View {
       Section("Categories") {
         ForEach(AlgorithmCategory.allCases) { category in
           NavigationLink(value: SidebarCategory.category(category)) {
-            Label(category.displayName.replacingOccurrences(of: " Sorts", with: ""),
-              systemImage: "folder")
+            Label {
+              Text(category.displayName.replacingOccurrences(of: " Sorts", with: ""))
+                .lineLimit(1)
+            } icon: {
+              Image(systemName: "folder")
+            }
           }
           .accessibilityLabel(category.displayName)
           .accessibilityIdentifier("sidebarCategory.\(category.rawValue)")

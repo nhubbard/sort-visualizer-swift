@@ -32,6 +32,8 @@ Updated 2026-10-08. This list reflects the discussion after completing the nativ
 
 **Done when:** the current baseline and top hot spots are recorded, and each changed path has before/after evidence. The existing prototype documents its current tape-generation trigger and the attached recording needed for interactive playback.
 
+**Current baseline:** Four single-instrument traces, each under 30 seconds, are summarized in [the short-trace findings](Documentation/docs/guides/performance-traces-2026-10-06.md). The existing parent tape-generation wrapper is ready for focused InstrumentsKit runs after the permissive-mode reboot.
+
 ## 3. Contextual onboarding and discovery with TipKit
 
 **Why:** Search, categories, and sorting already exist, but a new user still has to discover how to step, scrub, switch visualizers, and find a useful next algorithm. Contextual tips can explain an action at the moment it becomes relevant without adding a long mandatory tutorial.
@@ -46,6 +48,8 @@ Updated 2026-10-08. This list reflects the discussion after completing the nativ
 
 ## 4. Interactive teaching graph (original teaching-mode roadmap item)
 
+**Status:** Quick Sort and Merge Sort pilot implemented. See [the teaching graph record](Documentation/docs/guides/teaching-graph-pilot-2026-10-08.md). Extending the semantic model to more algorithms and evaluating side-by-side comparison remain later work.
+
 **Why:** A graph of decisions, movements, and dependencies could explain behavior more effectively than generic captions. The existing tape has operations and index markers, but no graph nodes, edges, or semantic relationships. This is a new teaching model, not a styling change.
 
 **Scope:** define what nodes and edges mean for a small pilot covering contrasting algorithms, such as a quicksort partition and a merge. Link graph events to tape positions so stepping and seeking produce the same graph. Prototype a separate graph-event stream before changing `SortOperation` or the binary tape archive; consider how fast-playback compaction remaps event positions. Render readable focus and connection states, cap graph density, and provide an accessible textual account of each meaningful transition. Decide whether side-by-side comparison adds enough value after the pilot.
@@ -55,6 +59,8 @@ Updated 2026-10-08. This list reflects the discussion after completing the nativ
 **Done when:** the pilot explains a complete run for each chosen algorithm, seeking reconstructs the correct graph, and a nonvisual user can follow the same meaningful transitions.
 
 ## 5. Live recording through ScreenCaptureKit (original video/GIF roadmap item, revised)
+
+**Status (2026-10-08):** implemented live MP4 recording controls and backends. Catalyst 18.2+ uses ScreenCaptureKit's single-window picker with a ReplayKit fallback; iPadOS and older Catalyst use ReplayKit because the ScreenCaptureKit module is unavailable to the current iOS Simulator SDK. Preview, sharing, cancellation, errors, and interruption recovery are in place. Focused model tests compile; manual end-to-end capture and sharing on a signed device/host remain to verify. See [live recording verification](Documentation/docs/guides/live-recording-2026-10-08.md).
 
 **Why:** Capturing actual playback may satisfy the sharing goal without building a separate off-screen renderer and fixed-frame-rate tape exporter. Apple's current framework is named **ScreenCaptureKit**.
 
@@ -76,7 +82,7 @@ Updated 2026-10-08. This list reflects the discussion after completing the nativ
 
 ## Suggested order
 
-The accessibility/design audit is nearing completion, and contextual onboarding is implemented. Performance profiling is deferred. Prototype the teaching graph and image chunks before committing to broad content or UI changes. Treat live recording as an independent sharing feature.
+The accessibility/design audit is nearing completion, contextual onboarding is implemented, and the teaching graph pilot is in place. Performance profiling is deferred. Prototype image chunks before committing to broad visualizer changes. Treat live recording as an independent sharing feature.
 
 ## References
 

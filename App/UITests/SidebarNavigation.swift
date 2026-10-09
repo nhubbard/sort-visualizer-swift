@@ -73,6 +73,7 @@ extension XCUIApplication {
       // available in its navigation bar and narrows the real registry-backed list instead.
       let searchTerms = [
         "algorithmLink.quicksort": "Quick Sort",
+        "algorithmLink.mergesort": "Merge Sort",
         "algorithmLink.bubblesort": "Bubble Sort",
         "algorithmLink.gnomesort": "Gnome Sort",
         "algorithmLink.selectionsort": "Selection Sort",

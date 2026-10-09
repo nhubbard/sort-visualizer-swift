@@ -27,7 +27,7 @@ final class NavigationContentUITests: XCTestCase {
       .matching(identifier: "sortPlaybackTip").firstMatch
     XCTAssertTrue(playbackTip.waitForExistence(timeout: 5))
     XCTAssertTrue(app.staticTexts["Explore one step at a time"].exists)
-    let help = app.buttons["sortHelpButton"]
+    let help = app.buttons["How to Use"]
     XCTAssertEqual(help.label, "How to Use")
     app.activateControlForUITest(help)
     XCTAssertTrue(app.staticTexts["Use Play to watch the recording. Pause and use Step Forward or Step Back to inspect one operation at a time."].waitForExistence(timeout: 5))
@@ -56,6 +56,31 @@ final class NavigationContentUITests: XCTestCase {
     XCTAssertFalse(app.staticTexts["Explore one step at a time"].exists)
     XCTAssertFalse(app.staticTexts["Change the view"].exists)
     XCTAssertFalse(app.staticTexts["Revisit any operation"].exists)
+  }
+
+  func testVideoControlsExpandInRunBarWithoutMovingStatusOrHelp() {
+    let app = XCUIApplication()
+    app.launchEnvironment = ["UI_TEST_ARRAY_SIZE": "24", "UI_TEST_PLAYBACK_SPEED": "1"]
+    app.launch()
+    app.activateControlForUITest(app.buttons["homeTryQuickSortButton"])
+
+    let status = app.staticTexts["sortStatusLabel"]
+    let cue = app.staticTexts["sortDetailsScrollCue"]
+    let help = app.buttons["How to Use"]
+    let video = app.buttons["runControlVideoButton"]
+    XCTAssertTrue(status.waitForExistence(timeout: 10))
+    XCTAssertTrue(cue.exists)
+    XCTAssertEqual(help.label, "How to Use")
+    XCTAssertTrue(video.exists)
+    XCTAssertFalse(app.buttons["liveRecordingStartButton"].exists)
+
+    app.activateControlForUITest(video)
+    XCTAssertTrue(app.buttons["liveRecordingStartButton"].waitForExistence(timeout: 5))
+    XCTAssertTrue(status.exists)
+    XCTAssertTrue(cue.exists)
+    XCTAssertTrue(help.exists)
+    app.activateControlForUITest(video)
+    XCTAssertFalse(app.buttons["liveRecordingStartButton"].exists)
   }
 
   func testCatalogTipAppearsBeforeSelectionAndDismissesAfterBrowsing() {

@@ -11,14 +11,14 @@ import VisualizationKit
 /// caption, then transport buttons. Speed/size/visualizer rows expand inline below the transport
 /// row on tap instead of using a `.popover`, so no `UIPopoverPresentationController` is involved.
 ///
-/// `transportRow`/`statsCaption` each offer a stacked-two-row `ViewThatFits` fallback — both rows
-/// are built from fixed-intrinsic-width buttons/stat cells (no flexible `.frame(maxWidth:
-/// .infinity)` content), so `ViewThatFits` can actually detect overflow and fall back.
+/// The transport and utility icons share a row when space allows, with a stacked fallback for
+/// narrower widths. Expanded controls appear below that row.
 struct RunControlBar: View {
   @Bindable var session: SortSession
   @Bindable var replay: ReplayEngine
   let algorithm: any SortAlgorithm
   @Environment(AppSettings.self) private var settings
+  @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
   // Bindings, not local `@State` — owned by `SortView`, which survives the phase churn
   // `session.start(size:)` (the size stepper's own action) drives this view through. See
@@ -26,6 +26,8 @@ struct RunControlBar: View {
   @Binding var isSpeedExpanded: Bool
   @Binding var isSizeExpanded: Bool
   @Binding var isVisualizerExpanded: Bool
+  @Binding var isVideoExpanded: Bool
+  let liveRecordingModel: LiveRecordingModel
 
   var body: some View {
     VStack(spacing: 8) {
@@ -41,6 +43,9 @@ struct RunControlBar: View {
       if isVisualizerExpanded {
         visualizerRow
       }
+      if isVideoExpanded {
+        LiveRecordingControls(model: liveRecordingModel)
+      }
     }
     .padding(12)
     .glassOrMaterialBackground()
@@ -48,6 +53,7 @@ struct RunControlBar: View {
     .animation(.easeInOut(duration: 0.2), value: isSpeedExpanded)
     .animation(.easeInOut(duration: 0.2), value: isSizeExpanded)
     .animation(.easeInOut(duration: 0.2), value: isVisualizerExpanded)
+    .animation(.easeInOut(duration: 0.2), value: isVideoExpanded)
     // Manual scrubbing/resizing would otherwise collide with the automation loop's own
     // repeated `start(size:)` calls — this bar goes fully inert while it's running.
     .disabled(session.isAutomating)
@@ -70,41 +76,39 @@ struct RunControlBar: View {
     .accessibilityValue("Operation \(replay.stepIndex) of \(replay.totalOperationCount)")
   }
 
-  /// `ViewThatFits` between one full-width row and two rows (playback transport, then
-  /// utilities) — both built from the same two extracted button-group views, so whichever
-  /// arrangement fits, every button (and its accessibility identifier) is still there for UI
-  /// tests to find. `PlaybackTransportButtons`/`UtilityButtons` are genuine child `View`s, not
-  /// computed properties on `RunControlBar` itself (like `AutomatorMenuButton` already is, for a
-  /// different reason) — `@Observable`'s dependency tracking is per-view-instance, so inlining
-  /// them as computed properties meant *every* button got reconstructed on every tick just
-  /// because `statsCaption` elsewhere in this same `body` reads `replay`'s per-tick-changing
-  /// counters. `UtilityButtons` in particular reads none of those counters, so as a real child
-  /// view it now only re-renders when something it actually displays changes (speed/size/sound
-  /// toggle state) — found via a Full Sweep profiling round that also fixed `CodeHighlighter` and
-  /// `AnalyticsService.fetchSummaries`. Each extracted view supplies its own `spacing: 20` rather
-  /// than relying on `HStack` flattening a nested view's multi-button body — this reproduces the
-  /// original uniform 20pt rhythm by direct structural correspondence instead of depending on
-  /// that flattening behavior working the same one level deeper.
+  /// Keep the original inline icon layout on wide windows. At accessibility text sizes the
+  /// transport and utility groups stack, allowing UtilityButtons to split into two rows.
   private var transportRow: some View {
-    ViewThatFits(in: .horizontal) {
-      HStack(spacing: 20) {
-        PlaybackTransportButtons(session: session, replay: replay)
-        Spacer()
-        UtilityButtons(
-          session: session, replay: replay, algorithm: algorithm,
-          isSpeedExpanded: $isSpeedExpanded, isSizeExpanded: $isSizeExpanded,
-          isVisualizerExpanded: $isVisualizerExpanded)
-      }
-      VStack(spacing: 8) {
-        PlaybackTransportButtons(session: session, replay: replay)
-        UtilityButtons(
-          session: session, replay: replay, algorithm: algorithm,
-          isSpeedExpanded: $isSpeedExpanded, isSizeExpanded: $isSizeExpanded,
-          isVisualizerExpanded: $isVisualizerExpanded)
+    Group {
+      if dynamicTypeSize.isAccessibilitySize {
+        VStack(spacing: 8) {
+          PlaybackTransportButtons(session: session, replay: replay)
+          utilityButtons
+        }
+      } else {
+        ViewThatFits(in: .horizontal) {
+          HStack(spacing: 20) {
+            PlaybackTransportButtons(session: session, replay: replay)
+            Spacer()
+            utilityButtons
+          }
+          VStack(spacing: 8) {
+            PlaybackTransportButtons(session: session, replay: replay)
+            utilityButtons
+          }
+        }
       }
     }
     .buttonStyle(.borderless)
     .controlSize(.large)
+  }
+
+  private var utilityButtons: some View {
+    UtilityButtons(
+      session: session, replay: replay, algorithm: algorithm,
+      isSpeedExpanded: $isSpeedExpanded, isSizeExpanded: $isSizeExpanded,
+      isVisualizerExpanded: $isVisualizerExpanded,
+      isVideoExpanded: $isVideoExpanded)
   }
 
   @ViewBuilder
@@ -206,21 +210,39 @@ struct RunControlBar: View {
 private struct RunControlStatsCaption: View {
   let replay: ReplayEngine
   @State private var displayed = DisplayedStats()
+  @State private var isExpanded = false
+  @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
   private static let refreshInterval = Duration.milliseconds(33)
 
   var body: some View {
-    ViewThatFits(in: .horizontal) {
-      HStack(spacing: 12) { statCells }
-      VStack(spacing: 4) {
-        HStack(spacing: 12) { firstHalfStatCells }
-        HStack(spacing: 12) { secondHalfStatCells }
+    Group {
+      if dynamicTypeSize.isAccessibilitySize {
+        DisclosureGroup(isExpanded: $isExpanded) {
+          LazyVGrid(
+            columns: [GridItem(.flexible()), GridItem(.flexible())],
+            alignment: .leading, spacing: 8
+          ) {
+            statCells
+          }
+        } label: {
+          Text("Statistics: \(displayed.compareCount) compares, \(displayed.swapCount) swaps")
+        }
+        .accessibilityIdentifier("runControlStatsCaption")
+      } else {
+        ViewThatFits(in: .horizontal) {
+          HStack(spacing: 12) { statCells }
+          VStack(spacing: 4) {
+            HStack(spacing: 12) { firstHalfStatCells }
+            HStack(spacing: 12) { secondHalfStatCells }
+          }
+        }
+        .accessibilityElement(children: .combine)
+        .accessibilityIdentifier("runControlStatsCaption")
       }
     }
     .font(.caption)
     .foregroundStyle(.secondary)
-    .accessibilityElement(children: .combine)
-    .accessibilityIdentifier("runControlStatsCaption")
     .task {
       while !Task.isCancelled {
         let next = DisplayedStats(replay: replay)
@@ -268,9 +290,18 @@ private struct RunControlStatsCaption: View {
   /// a single unit — the looser `spacing: 12` between cells above is what visually separates one
   /// cell from the next now that there's no `·` glyph doing that job.
   private func statCell(_ value: Int, digits: Int, label: String) -> some View {
-    HStack(spacing: 4) {
-      statSlot(value, digits: digits)
-      Text(label)
+    Group {
+      if dynamicTypeSize.isAccessibilitySize {
+        VStack(alignment: .leading, spacing: 0) {
+          statSlot(value, digits: digits)
+          Text(label)
+        }
+      } else {
+        HStack(spacing: 4) {
+          statSlot(value, digits: digits)
+          Text(label)
+        }
+      }
     }
   }
 
@@ -460,6 +491,8 @@ private struct UtilityButtons: View {
   @Binding var isSpeedExpanded: Bool
   @Binding var isSizeExpanded: Bool
   @Binding var isVisualizerExpanded: Bool
+  @Binding var isVideoExpanded: Bool
+  @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
   #if targetEnvironment(macCatalyst)
     // Catalyst's `ShareLink` bridges to `NSSharingServicePicker`, which has nothing to show for
@@ -469,6 +502,22 @@ private struct UtilityButtons: View {
   #endif
 
   var body: some View {
+    Group {
+      if dynamicTypeSize.isAccessibilitySize {
+        VStack(spacing: 8) {
+          firstRow
+          secondRow
+        }
+      } else {
+        HStack(spacing: 20) {
+          firstRow
+          secondRow
+        }
+      }
+    }
+  }
+
+  private var firstRow: some View {
     HStack(spacing: 20) {
       Button {
         Task { await session.start(size: session.arraySize) }
@@ -517,6 +566,20 @@ private struct UtilityButtons: View {
 
       AutomatorMenuButton(session: session)
 
+      Button {
+        isVideoExpanded.toggle()
+      } label: {
+        Image(systemName: "record.circle")
+      }
+      .accessibilityIdentifier("runControlVideoButton")
+      .accessibilityLabel("Video Recording")
+      .accessibilityValue(isVideoExpanded ? "Expanded" : "Collapsed")
+      .help("Show or hide video recording controls")
+    }
+  }
+
+  private var secondRow: some View {
+    HStack(spacing: 20) {
       Button {
         isSpeedExpanded.toggle()
       } label: {

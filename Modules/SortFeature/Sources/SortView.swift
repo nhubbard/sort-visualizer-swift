@@ -30,6 +30,8 @@ public struct SortView: View {
   @State private var isSpeedExpanded = false
   @State private var isSizeExpanded = false
   @State private var isVisualizerExpanded = false
+  @State private var isVideoExpanded = false
+  @State private var liveRecordingModel = LiveRecordingModel(capture: LiveRecordingBackend.make())
   @State private var isShowingHelp = false
   #if DEBUG
   @State private var capAuditProbe = "loading"
@@ -50,11 +52,7 @@ public struct SortView: View {
         Group {
           if dynamicTypeSize.isAccessibilitySize {
             VStack(alignment: .leading, spacing: 4) {
-              HStack {
-                statusLabel
-                Spacer(minLength: 8)
-                helpButton
-              }
+              statusLabel
               detailsScrollCue
             }
           } else {
@@ -63,14 +61,9 @@ public struct SortView: View {
                 statusLabel
                 Spacer(minLength: 8)
                 detailsScrollCue
-                helpButton
               }
               VStack(alignment: .leading, spacing: 4) {
-                HStack {
-                  statusLabel
-                  Spacer(minLength: 8)
-                  helpButton
-                }
+                statusLabel
                 detailsScrollCue
               }
             }
@@ -157,6 +150,14 @@ public struct SortView: View {
       #endif
       content
     }
+    .toolbar {
+      ToolbarItem(placement: .topBarTrailing) {
+        helpButton
+      }
+    }
+    .onDisappear {
+      Task { await liveRecordingModel.cancel() }
+    }
     .sheet(isPresented: $isShowingHelp) {
       NavigationStack {
         List {
@@ -181,10 +182,14 @@ public struct SortView: View {
           Section("Learn More") {
             Text("Scroll below the visualization for the algorithm explanation, growth charts, and code examples.")
             Text("Complete the same algorithm at different sizes to unlock its recorded-runs chart. Expand the chart to inspect exact values.")
-            Text("Choose a language, then use Read Full Code or Copy Code to explore its reference implementation.")
+            Text("Choose a language to read its reference implementation, then use Copy Code or Select Text as needed.")
+          }
+          Section("Teaching Graph") {
+            Text("On Quick Sort and Merge Sort, expand Teaching Graph below the visualization. Use Previous Graph Event and Next Graph Event to follow decisions and movements while the playback position stays in sync.")
           }
           Section("Save and Reopen") {
             Text("Export Tape saves the current recording. Import Tape opens a previously saved recording from the toolbar.")
+            Text("Record Video captures a live run and its sound. On Mac, choose a window in the system picker or use Record App Instead. Stop Recording creates a video you can preview or share.")
           }
         }
         .navigationTitle("How to Use")
@@ -206,9 +211,15 @@ public struct SortView: View {
   }
 
   private var helpButton: some View {
-    Button("How to Use") { isShowingHelp = true }
-      .font(.caption)
-      .accessibilityIdentifier("sortHelpButton")
+    Button { isShowingHelp = true } label: {
+      Label("How to Use", systemImage: "questionmark.circle")
+        .labelStyle(.iconOnly)
+    }
+    .buttonBorderShape(.circle)
+    .frame(width: 36, height: 24)
+    .accessibilityLabel("How to Use")
+    .help("How to Use")
+    .accessibilityIdentifier("sortHelpButton")
   }
 
   @ViewBuilder
@@ -350,7 +361,9 @@ public struct SortView: View {
           algorithm: session.algorithm,
           isSpeedExpanded: $isSpeedExpanded,
           isSizeExpanded: $isSizeExpanded,
-          isVisualizerExpanded: $isVisualizerExpanded
+          isVisualizerExpanded: $isVisualizerExpanded,
+          isVideoExpanded: $isVideoExpanded,
+          liveRecordingModel: liveRecordingModel
         )
       }
   }
@@ -371,10 +384,14 @@ public struct SortView: View {
     case .recording: String(localized: "Recording…", bundle: .module)
     case .ready: String(localized: "Ready", bundle: .module)
     case .replaying: String(localized: "Sorting…", bundle: .module)
-    case .complete:
-      isReplayCorrectlySorted
-        ? String(localized: "Sorted ✓", bundle: .module)
-        : String(localized: "Sort verification failed", bundle: .module)
+    case .complete(let replay):
+      if replay.stepIndex < replay.tape.operations.count {
+        String(localized: "Reviewing…", bundle: .module)
+      } else {
+        isReplayCorrectlySorted
+          ? String(localized: "Sorted ✓", bundle: .module)
+          : String(localized: "Sort verification failed", bundle: .module)
+      }
     case .failed: String(localized: "Failed", bundle: .module)
     }
   }
@@ -385,7 +402,9 @@ public struct SortView: View {
     case .recording: "recording"
     case .ready: "ready"
     case .replaying: "sorting"
-    case .complete: isReplayCorrectlySorted ? "sorted" : "sort-failed"
+    case .complete(let replay):
+      if replay.stepIndex < replay.tape.operations.count { "reviewing" }
+      else { isReplayCorrectlySorted ? "sorted" : "sort-failed" }
     case .failed: "failed"
     }
   }
