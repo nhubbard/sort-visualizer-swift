@@ -3,14 +3,22 @@ import PersistenceKit
 import SettingsKit
 import SortEngineKit
 import SwiftUI
+import TipKit
+import VisualizationKit
 
 public struct SortView: View {
   @Bindable var session: SortSession
-  /// Non-`nil` only when this session is one step of Showcase mode — see
-  /// `ScrollingSortView.showcaseStop`'s doc comment for why `automationBanner`'s Stop button
-  /// needs a different action in that case instead of `session.stopAutomation()`.
-  let showcaseStop: (() -> Void)?
   @Environment(AppSettings.self) private var settings
+  @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+  @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+  private var reduceMotionActive: Bool {
+    #if DEBUG
+    reduceMotion || ProcessInfo.processInfo.environment["UI_TEST_REDUCE_MOTION"] == "1"
+    #else
+    reduceMotion
+    #endif
+  }
 
   // Owned here, not by `RunControlBar` itself: `start(size:)` (the size stepper's own action)
   // routes `session.phase` through `.recording`/`.ready` before landing back on `.replaying`,
@@ -22,6 +30,7 @@ public struct SortView: View {
   @State private var isSpeedExpanded = false
   @State private var isSizeExpanded = false
   @State private var isVisualizerExpanded = false
+  @State private var isShowingHelp = false
   #if DEBUG
   @State private var capAuditProbe = "loading"
   @State private var automationAuditProbe = "loading"
@@ -31,17 +40,51 @@ public struct SortView: View {
   @State private var isTraceHistoryPresented = false
   #endif
 
-  public init(session: SortSession, showcaseStop: (() -> Void)? = nil) {
+  public init(session: SortSession) {
     self.session = session
-    self.showcaseStop = showcaseStop
   }
 
   public var body: some View {
     VStack(spacing: 12) {
-      if session.isAutomating {
-        automationBanner
-      } else {
-        statusLabel
+      if !session.isAutomating {
+        Group {
+          if dynamicTypeSize.isAccessibilitySize {
+            VStack(alignment: .leading, spacing: 4) {
+              HStack {
+                statusLabel
+                Spacer(minLength: 8)
+                helpButton
+              }
+              detailsScrollCue
+            }
+          } else {
+            ViewThatFits(in: .horizontal) {
+              HStack(alignment: .firstTextBaseline) {
+                statusLabel
+                Spacer(minLength: 8)
+                detailsScrollCue
+                helpButton
+              }
+              VStack(alignment: .leading, spacing: 4) {
+                HStack {
+                  statusLabel
+                  Spacer(minLength: 8)
+                  helpButton
+                }
+                detailsScrollCue
+              }
+            }
+          }
+        }
+        .padding(.horizontal)
+        if reduceMotionActive {
+          Text("Reduce Motion is on. Automatic playback is limited to 15 operations per second; manual steps are unchanged. A target-duration run may take longer.")
+            .font(.caption)
+            .foregroundStyle(.secondary)
+            .padding(.horizontal)
+            .accessibilityIdentifier("reducedMotionPlaybackNotice")
+        }
+        discoveryTip
       }
       #if DEBUG
       if ProcessInfo.processInfo.environment["UI_TEST_INT03_SWEEP"] == "1" {
@@ -81,6 +124,14 @@ public struct SortView: View {
               + "\(replay.header.shuffleID ?? "")|\(settings.selectedVisualizerID.rawValue)"
           )
       }
+      if ProcessInfo.processInfo.environment["UI_TEST_REDUCE_MOTION"] == "1",
+        let replay = session.lastReplay {
+        Text("Reduce Motion playback probe")
+          .font(.caption2)
+          .accessibilityIdentifier("reducedMotionPlaybackProbe")
+          .accessibilityValue(
+            "\(replay.automaticSpeedLimit ?? -1)|\(replay.currentPacingRate)|\(replay.stepIndex)")
+      }
       if let cap = ProcessInfo.processInfo.environment["UI_TEST_CAP_LOG_PROBE"].flatMap(Int.init) {
         Text("Cap log probe")
           .font(.caption2)
@@ -105,6 +156,62 @@ public struct SortView: View {
       }
       #endif
       content
+    }
+    .sheet(isPresented: $isShowingHelp) {
+      NavigationStack {
+        List {
+          Section("Playback") {
+            Text("Use Play to watch the recording. Pause and use Step Forward or Step Back to inspect one operation at a time.")
+          }
+          Section("Presentation") {
+            Text("Array Size changes the number of items in a new run. Visualizer changes how the current run is drawn.")
+          }
+          Section("Visualization Markers") {
+            Text("In marker-aware views, coral marks the first active array position and blue marks the second. These positions can be compared or swapped; the colors do not name the operation. Rainbow colors items by value and does not show marker highlights. Pause and step to inspect an operation.")
+            Text("With Reduce Motion on, Showcase skips Hanoi Towers because its blocks travel between towers. You can still choose Hanoi Towers from the Visualizer picker.")
+          }
+          Section("Color and Appearance") {
+            Text("Color Circle and Pixel Mesh encode values by hue alone. For a view where height or position also shows each value, choose Bar Graph, Rainbow, or Scatter Plot. The first and second active-position markers use color in marker-aware views.")
+          }
+          Section("Learn More") {
+            Text("Scroll below the visualization for the algorithm explanation, growth charts, and code examples.")
+          }
+        }
+        .navigationTitle("How to Use")
+        .toolbar {
+          ToolbarItem(placement: .confirmationAction) {
+            Button("Done") { isShowingHelp = false }
+              .accessibilityIdentifier("sortHelpDoneButton")
+          }
+        }
+      }
+    }
+  }
+
+  private var detailsScrollCue: some View {
+    Text("Scroll for details")
+      .font(.caption)
+      .foregroundStyle(.secondary)
+      .accessibilityIdentifier("sortDetailsScrollCue")
+  }
+
+  private var helpButton: some View {
+    Button("How to Use") { isShowingHelp = true }
+      .font(.caption)
+      .accessibilityIdentifier("sortHelpButton")
+  }
+
+  @ViewBuilder
+  private var discoveryTip: some View {
+    if case .replaying = session.phase {
+      VStack(spacing: 4) {
+        TipView(PlaybackDiscoveryTip())
+          .accessibilityIdentifier("sortPlaybackTip")
+        TipView(PresentationDiscoveryTip())
+          .accessibilityIdentifier("sortPresentationTip")
+      }
+      .frame(maxWidth: 480)
+      .padding(.horizontal)
     }
   }
 
@@ -193,38 +300,6 @@ public struct SortView: View {
   }
   #endif
 
-  /// Shown instead of the normal status label while a registered `Automation` is driving this
-  /// session — same "machine-readable via accessibilityIdentifier" shape as `statusLabel`, plus
-  /// a way to stop the loop without needing to remember the keyboard shortcut that started it.
-  /// `session.isAutomating` is also `true` during a Showcase pass (both go through
-  /// `SortSession.runAutomation(sizes:runsPerSize:)`), so this same banner appears either way —
-  /// but stopping them means two different things, hence `showcaseStop` taking priority when set.
-  private var automationBanner: some View {
-    HStack(spacing: 8) {
-      ProgressView()
-        .controlSize(.small)
-      Text(automationProgressText)
-        .font(.caption)
-        .accessibilityIdentifier("automationProgressLabel")
-      Button("Stop") {
-        if let showcaseStop {
-          showcaseStop()
-        } else {
-          session.stopAutomation()
-        }
-      }
-      .font(.caption)
-      .accessibilityIdentifier("automationStopButton")
-    }
-  }
-
-  private var automationProgressText: String {
-    guard let progress = session.automationProgress else { return "Automating…" }
-    // swiftlint:disable:next line_length
-    return
-      "Automating: size \(session.arraySize) (\(progress.sizeIndex + 1)/\(progress.sizeCount)) · run \(progress.runIndex + 1)/\(progress.runCount)"
-  }
-
   /// `.idle`/`.recording`/`.ready` fall back to `session.lastReplay` (the previous run's frozen
   /// final frame) instead of unconditionally showing `ProgressView()`, so the canvas stays
   /// mounted through the gap `start(size:)` passes through on every run after the first —
@@ -252,7 +327,10 @@ public struct SortView: View {
   }
 
   private func canvasWithControls(for replay: ReplayEngine) -> some View {
-    canvas(for: replay)
+    AccessibleSortCanvas(
+      replay: replay, visualizerID: settings.selectedVisualizerID,
+      algorithmName: session.algorithm.metadata.displayName, arraySize: session.arraySize,
+      status: statusText)
       .safeAreaInset(edge: .bottom) {
         RunControlBar(
           session: session,
@@ -263,34 +341,6 @@ public struct SortView: View {
           isVisualizerExpanded: $isVisualizerExpanded
         )
       }
-  }
-
-  /// `.id(ObjectIdentifier(replay))` forces SwiftUI to treat each new run as a genuinely new
-  /// view — see `MetalRendererView`'s own doc comment for why its `Coordinator` tracking needs
-  /// that reset rather than carrying over stale bookkeeping from whatever ran before.
-  ///
-  /// Metal is the only renderer — every built-in `Visualizer` has a working
-  /// `MetalRendererFactory` path as of the wedge/chord batch (`MetalTriangleRenderer`/
-  /// `MetalDisparityChordsRenderer`), so there's no fallback branch left to take.
-  private func canvas(for replay: ReplayEngine) -> some View {
-    MetalRendererView(replay: replay, visualizerID: settings.selectedVisualizerID)
-      .id(ObjectIdentifier(replay))
-      .accessibilityIdentifier("sortVisualizationCanvas")
-      .accessibilityLabel(
-        ProcessInfo.processInfo.environment["UI_TEST_TAPE_METADATA_PROBE"] == "1"
-          ? "\(replay.tape.header.algorithmID)|\(replay.tape.header.shuffleID ?? "")|"
-            + "\(replay.tape.header.visualSeed)|\(replay.tape.header.recordedAt.timeIntervalSince1970)|"
-            + "\(replay.tape.header.compareCount)|\(replay.tape.header.swapCount)|"
-            + "\(replay.tape.header.sortStartIndex)|\(replay.tape.operations.count)|"
-            + replay.tape.header.initialValues.map(String.init).joined(separator: ",")
-          : "Sort visualization"
-      )
-      .accessibilityValue(
-        ProcessInfo.processInfo.environment["UI_TEST_EXPOSE_FRAME"] == "1"
-          ? "\(replay.stepIndex)|\(replay.totalOperationCount)|\(session.arraySize)|\(Int(replay.speed))|"
-            + replay.frame.map { String($0.value) }.joined(separator: ",")
-          : ""
-      )
   }
 
   /// Machine-readable phase/correctness signal for UI tests — a `Canvas` has no discrete
@@ -329,5 +379,76 @@ public struct SortView: View {
     guard case .complete(let replay) = session.phase else { return false }
     let values = replay.frame.map(\.value)
     return values == values.sorted()
+  }
+}
+
+/// Isolates the frequently changing position value from `SortView`'s body. The Metal host and
+/// accessibility value can update each replay tick without rebuilding the surrounding controls.
+private struct AccessibleSortCanvas: View {
+  let replay: ReplayEngine
+  let visualizerID: VisualizerID
+  let algorithmName: String
+  let arraySize: Int
+  let status: String
+
+  var body: some View {
+    MetalRendererView(replay: replay, visualizerID: visualizerID)
+      .id(ObjectIdentifier(replay))
+      .accessibilityIdentifier("sortVisualizationCanvas")
+      .accessibilityLabel(accessibilityLabel)
+      .accessibilityValue(accessibilityValue)
+      .accessibilityHint("Pause playback and use the step controls to hear individual operations")
+  }
+
+  private var accessibilityLabel: String {
+    guard ProcessInfo.processInfo.environment["UI_TEST_TAPE_METADATA_PROBE"] == "1" else {
+      return "Sort visualization"
+    }
+    let header = replay.tape.header
+    return "\(header.algorithmID)|\(header.shuffleID ?? "")|\(header.visualSeed)|"
+      + "\(header.recordedAt.timeIntervalSince1970)|\(header.compareCount)|\(header.swapCount)|"
+      + "\(header.sortStartIndex)|\(replay.tape.operations.count)|"
+      + header.initialValues.map(String.init).joined(separator: ",")
+  }
+
+  private var accessibilityValue: String {
+    if ProcessInfo.processInfo.environment["UI_TEST_EXPOSE_FRAME"] == "1" {
+      return "\(replay.stepIndex)|\(replay.totalOperationCount)|\(arraySize)|\(Int(replay.speed))|"
+        + replay.frame.map { String($0.value) }.joined(separator: ",")
+    }
+    let visualizer = VisualizerRegistry.shared.visualizer(id: visualizerID)?
+      .metadata.displayName ?? "visualization"
+    return "\(algorithmName), \(arraySize) items, \(visualizer). "
+      + "Operation \(replay.stepIndex) of \(replay.totalOperationCount). \(status)"
+  }
+}
+
+struct PlaybackDiscoveryTip: Tip {
+  @Parameter static var hasUsedPlayback: Bool = false
+
+  var title: Text { Text("Explore one step at a time") }
+  var message: Text? {
+    Text("Pause playback, then use Step Forward or Step Back to hear and inspect an operation.")
+  }
+  var rules: [Rule] {
+    #Rule(Self.$hasUsedPlayback) { $0 == false }
+  }
+  var options: [any Option] { MaxDisplayCount(2) }
+}
+
+struct PresentationDiscoveryTip: Tip {
+  @Parameter static var hasAdjustedPresentation: Bool = false
+
+  var title: Text { Text("Change the view") }
+  var message: Text? {
+    Text("Array Size sets the next run's item count. Visualizer changes the drawing of this run.")
+  }
+  var rules: [Rule] {
+    #Rule(PlaybackDiscoveryTip.$hasUsedPlayback) { $0 == true }
+    #Rule(Self.$hasAdjustedPresentation) { $0 == false }
+  }
+  var options: [any Option] {
+    MaxDisplayCount(2)
+    IgnoresDisplayFrequency(true)
   }
 }

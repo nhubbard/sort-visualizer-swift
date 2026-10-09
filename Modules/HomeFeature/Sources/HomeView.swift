@@ -8,13 +8,22 @@ import SwiftUI
 /// which never matched this codebase's sidebar. Inlined here rather than round-tripped through a
 /// `String(localized:)` lookup key, since this module owns no localization catalog of its own yet.
 public struct HomeView: View {
-  public init() {}
+  private let onTryQuickSort: () -> Void
+
+  public init(onTryQuickSort: @escaping () -> Void) {
+    self.onTryQuickSort = onTryQuickSort
+  }
 
   public var body: some View {
     ScrollView {
       VStack(spacing: 2) {
         Text("Welcome to").bold()
         RandomizingHeader(text: "SORT SYMPHONY")
+        Button("Try Quick Sort", action: onTryQuickSort)
+          .buttonStyle(.bordered)
+          .accessibilityIdentifier("homeTryQuickSortButton")
+          .accessibilityHint("Opens a Quick Sort example from the algorithm catalog")
+          .padding(.top, 12)
         Markdown(Self.welcomeCopy)
           .markdownTextStyle {
             FontFamilyVariant(.normal)
@@ -61,6 +70,6 @@ public struct HomeView: View {
 
     Sorting algorithms can be difficult to understand, and it's easy to get confused. This app aims to \
     help you understand sorting algorithms by showing their actions in real time. Without further ado, \
-    let's get started -- choose an algorithm from the sidebar on the left!
+    let's get started -- choose an algorithm from the catalog!
     """
 }

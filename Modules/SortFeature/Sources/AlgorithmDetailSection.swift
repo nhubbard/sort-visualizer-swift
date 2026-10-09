@@ -32,6 +32,7 @@ public struct AlgorithmDetailSection: View {
   /// `content`/theme change in `highlightAllSamples`, off the main actor, instead.
   @State private var highlighted: [CodeLanguage: AttributedString] = [:]
   @State private var plainSamples: [CodeLanguage: String] = [:]
+  @State private var isFullCodeVisible = false
   #if DEBUG
   @State private var appliedThemeID: CodeThemeID?
   #endif
@@ -95,8 +96,29 @@ public struct AlgorithmDetailSection: View {
             }
             .pickerStyle(.segmented)
             .accessibilityIdentifier("codeLanguagePicker")
+            .onChange(of: selectedLanguage) { isFullCodeVisible = false }
 
-            if content.codeSamples.contains(where: { $0.language == selectedLanguage }) {
+            if let plain = plainSamples[selectedLanguage] {
+              Text("\(selectedLanguage.title) implementation, \(codeLineCount(plain)) lines. "
+                + "Copy Code or choose Read Full Code to inspect the source.")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+                .accessibilityIdentifier("algorithmCodeSummary")
+              HStack {
+                Button {
+                  UIPasteboard.general.string = plain
+                } label: {
+                  Label("Copy Code", systemImage: "doc.on.doc")
+                }
+                .accessibilityIdentifier("copyAlgorithmCode")
+                Button(isFullCodeVisible ? "Hide Full Code" : "Read Full Code") {
+                  isFullCodeVisible.toggle()
+                }
+                .accessibilityIdentifier("toggleFullAlgorithmCode")
+              }
+            }
+
+            if isFullCodeVisible && content.codeSamples.contains(where: { $0.language == selectedLanguage }) {
               // AttributedCodeView sizes to its own intrinsic width (`.fixedSize`), so
               // left inside this leading-aligned VStack it hugs the left edge instead of
               // sitting under the wider Description/Complexity content above it.
@@ -107,20 +129,6 @@ public struct AlgorithmDetailSection: View {
                     attributed: styled, backgroundColor: settings.codeTheme.makeTheme().getBgColor()
                   )
                   .accessibilityIdentifier("algorithmCodeSample")
-                  .overlay(alignment: .topTrailing) {
-                    if let plain = plainSamples[selectedLanguage] {
-                      Button {
-                        UIPasteboard.general.string = plain
-                      } label: {
-                        Image(systemName: "doc.on.doc")
-                          .padding(8)
-                          .glassOrMaterialBackground()
-                      }
-                      .buttonStyle(.plain)
-                      .offset(x: 8, y: -8)
-                      .accessibilityLabel("Copy Code")
-                    }
-                  }
                 } else {
                   ProgressView()
                     .frame(minWidth: 200, minHeight: 100)
@@ -141,6 +149,7 @@ public struct AlgorithmDetailSection: View {
       contentUnavailable = false
       highlighted = [:]
       plainSamples = [:]
+      isFullCodeVisible = false
       #if DEBUG
         appliedThemeID = nil
       #endif
@@ -161,6 +170,11 @@ public struct AlgorithmDetailSection: View {
         Task { await highlightAllSamples(content) }
       }
     }
+  }
+
+  private func codeLineCount(_ source: String) -> Int {
+    source.split(separator: "\n", omittingEmptySubsequences: false).count
+      - (source.hasSuffix("\n") ? 1 : 0)
   }
 
   private func highlightAllSamples(_ content: AlgorithmDetailContent) async {

@@ -47,8 +47,15 @@ final class NavigationAccessibilityUITests: XCTestCase {
     let speed = app.buttons["runControlSpeedButton"]
     XCTAssertEqual(speed.label, "Playback Speed")
     XCTAssertEqual(speed.value as? String, "1 ops per second")
+    let canvas = app.descendants(matching: .any)
+      .matching(identifier: "sortVisualizationCanvas").firstMatch
+    XCTAssertEqual(canvas.label, "Sort visualization")
+    let initialCanvasValue = canvas.value as? String ?? ""
+    XCTAssertTrue(initialCanvasValue.contains("Quick Sort, 24 items"))
+    XCTAssertTrue(initialCanvasValue.contains("Operation 0 of "))
 
     app.activateControlForUITest(app.buttons["runControlStepForwardButton"])
+    XCTAssertTrue((canvas.value as? String)?.contains("Operation 1 of ") == true)
     #if !targetEnvironment(macCatalyst)
       XCTAssertTrue((scrub.value as? String)?.hasPrefix("Operation 1 of ") == true)
     #endif
@@ -61,5 +68,50 @@ final class NavigationAccessibilityUITests: XCTestCase {
     XCTAssertTrue(["Mute", "Unmute"].contains(oldSoundLabel))
     app.activateControlForUITest(sound)
     XCTAssertNotEqual(sound.label, oldSoundLabel)
+  }
+
+  func testReducedMotionCapsAutomaticPlaybackAndKeepsManualSteps() throws {
+    let app = XCUIApplication()
+    app.launchEnvironment = [
+      "UI_TEST_ARRAY_SIZE": "24", "UI_TEST_PLAYBACK_SPEED": "1000",
+      "UI_TEST_REDUCE_MOTION": "1"
+    ]
+    app.launch()
+    app.tapSidebarLink("algorithmLink.quicksort")
+
+    XCTAssertTrue(app.staticTexts["reducedMotionPlaybackNotice"].waitForExistence(timeout: 10))
+    let probe = app.staticTexts["reducedMotionPlaybackProbe"]
+    XCTAssertTrue(probe.waitForExistence(timeout: 10))
+    let limitText = probe.value as? String ?? ""
+    XCTAssertEqual(Double(limitText.split(separator: "|").first ?? ""), 15,
+      "Expected the active replay's 15 ops/sec limit, got: \(limitText)")
+
+    let pause = app.buttons["runControlPlayPauseButton"]
+    if pause.label == "Pause" { app.activateControlForUITest(pause) }
+    app.activateControlForUITest(app.buttons["runControlJumpToStartButton"])
+    app.activateControlForUITest(app.buttons["runControlStepForwardButton"])
+    XCTAssertTrue((probe.value as? String)?.hasSuffix("|1") == true)
+  }
+
+  func testHomeAndSortSupportDynamicType() throws {
+    let app = XCUIApplication()
+    app.launchEnvironment = ["UI_TEST_ARRAY_SIZE": "24"]
+    app.launch()
+
+    XCTAssertTrue(app.buttons["SORT SYMPHONY"].waitForExistence(timeout: 5))
+    try app.performAccessibilityAudit(for: .dynamicType)
+
+    app.tapSidebarLink("algorithmLink.quicksort")
+    XCTAssertTrue(app.sliders["runControlScrubSlider"].waitForExistence(timeout: 10))
+    try app.performAccessibilityAudit(for: .dynamicType)
+  }
+
+  func testSortControlsHaveUsableHitRegions() throws {
+    let app = XCUIApplication()
+    app.launchEnvironment = ["UI_TEST_ARRAY_SIZE": "24", "UI_TEST_PLAYBACK_SPEED": "1"]
+    app.launch()
+    app.tapSidebarLink("algorithmLink.quicksort")
+    XCTAssertTrue(app.buttons["runControlPlayPauseButton"].waitForExistence(timeout: 10))
+    try app.performAccessibilityAudit(for: .hitRegion)
   }
 }

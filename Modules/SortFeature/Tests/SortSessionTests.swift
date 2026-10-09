@@ -206,6 +206,24 @@ private func makeInMemoryAnalytics() throws -> AnalyticsService {
 @MainActor
 @Suite
 struct SortSessionTests {
+  @Test
+  func reduceMotionLimitCarriesIntoNewReplaysAndUpdatesTheActiveReplay() throws {
+    let algorithm = FakeAlgorithm()
+    let session = SortSession(
+      algorithm: algorithm, shuffle: FakeIdentityShuffle(),
+      analytics: try makeInMemoryAnalytics(), settings: makeFastSettings())
+    session.setReduceMotionEnabled(true)
+    let tape = try TapeFactory.makeTape(
+      algorithm: algorithm, shuffle: FakeIdentityShuffle(), size: 9,
+      operationCap: 100_000)
+    session.loadImportedTape(tape)
+    #expect(session.lastReplay?.automaticSpeedLimit == SortSession.reducedMotionSpeedLimit)
+
+    session.setReduceMotionEnabled(false)
+    #expect(session.lastReplay?.automaticSpeedLimit == nil)
+    session.lastReplay?.pause()
+  }
+
   /// Regression guard for a real, measured mount-race: without `startsAutomating`, a freshly
   /// constructed session always began `isAutomating == false` until its own `.task` actually
   /// reached `runSinglePass`/`runAutomationAndWait` — a window `ScrollingSortView` could render
@@ -639,7 +657,7 @@ struct SortSessionTests {
   // MARK: - Recording size cap
 
   @Test
-  func stoppingSizeSweepFinishesCurrentPassWithoutStartingNextSize() async throws {
+  func stoppingSizeSweepPausesCurrentPassWithoutRecordingOrStartingNextSize() async throws {
     let analytics = try makeInMemoryAnalytics()
     let driver = ManualTickDriver()
     let session = SortSession(
@@ -664,18 +682,11 @@ struct SortSessionTests {
     #expect(session.arraySize == 4)
     #expect(replay.stepIndex < replay.totalOperationCount)
     session.stopAutomation()
-    #expect(session.isAutomating, "Stop waits for the current pass")
-    driver.fireTick(elapsed: 0)
-    let completionDeadline = ContinuousClock.now + .seconds(3)
-    while ContinuousClock.now < completionDeadline, session.isAutomating {
-      driver.fireTick(elapsed: 1)
-      try await Task.sleep(for: .milliseconds(5))
-    }
     #expect(!session.isAutomating)
+    #expect(!replay.isPlaying)
     #expect(session.arraySize == 4)
     let records = try await analytics.fetchSummaries(algorithmID: FakeAlgorithm().id)
-    #expect(records.count == 1)
-    #expect(records.first?.arraySize == 4)
+    #expect(records.isEmpty)
   }
 
   @Test

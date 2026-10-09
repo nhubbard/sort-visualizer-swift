@@ -2,6 +2,8 @@ import AlgorithmKit
 import SettingsKit
 import SortEngineKit
 import SwiftUI
+import TipKit
+import UIKit
 import VisualizationKit
 
 /// Docked below the sort visualization via `.safeAreaInset(edge: .bottom)`, reserving real layout
@@ -110,6 +112,8 @@ struct RunControlBar: View {
           .foregroundStyle(.secondary)
         Slider(value: $replay.targetDuration, in: 1...120, step: 1)
           .accessibilityIdentifier("runControlDurationSlider")
+          .accessibilityLabel("Target duration")
+          .accessibilityValue("\(Int(replay.targetDuration)) seconds")
         Text("120s")
           .font(.caption)
           .foregroundStyle(.secondary)
@@ -126,6 +130,8 @@ struct RunControlBar: View {
           .foregroundStyle(.secondary)
         Slider(value: $replay.speed, in: 1...1000, step: 1)
           .accessibilityIdentifier("runControlSpeedSlider")
+          .accessibilityLabel("Playback speed")
+          .accessibilityValue("\(Int(replay.speed)) operations per second")
         Text("Fast")
           .font(.caption)
           .foregroundStyle(.secondary)
@@ -319,11 +325,13 @@ private struct DisplayedStats: Equatable {
 private struct PlaybackTransportButtons: View {
   let session: SortSession
   let replay: ReplayEngine
+  @Environment(\.accessibilityVoiceOverEnabled) private var voiceOverEnabled
 
   var body: some View {
     HStack(spacing: 20) {
       Button {
         replay.seek(to: 0)
+        announce("At the beginning of the recording")
       } label: {
         Image(systemName: "backward.end.fill")
       }
@@ -335,6 +343,7 @@ private struct PlaybackTransportButtons: View {
       Button {
         replay.pause()
         replay.stepBackward()
+        announce("Back to operation \(replay.stepIndex) of \(replay.totalOperationCount)")
       } label: {
         Image(systemName: "backward.frame.fill")
       }
@@ -346,6 +355,8 @@ private struct PlaybackTransportButtons: View {
       Button {
         session.togglePlayback()
         SortHaptics.playPauseToggled()
+        PlaybackDiscoveryTip.hasUsedPlayback = true
+        PlaybackDiscoveryTip().invalidate(reason: .actionPerformed)
       } label: {
         Image(systemName: replay.isPlaying ? "pause.fill" : "play.fill")
           .font(.title2)
@@ -357,7 +368,11 @@ private struct PlaybackTransportButtons: View {
 
       Button {
         replay.pause()
+        let nextOperation = replay.tape.operations[replay.stepIndex]
         replay.stepForward()
+        announce(accessibilityDescription(for: nextOperation))
+        PlaybackDiscoveryTip.hasUsedPlayback = true
+        PlaybackDiscoveryTip().invalidate(reason: .actionPerformed)
       } label: {
         Image(systemName: "forward.frame.fill")
       }
@@ -368,6 +383,7 @@ private struct PlaybackTransportButtons: View {
 
       Button {
         replay.seek(to: replay.totalOperationCount)
+        announce("At the sorted end of the recording")
       } label: {
         Image(systemName: "forward.end.fill")
       }
@@ -380,6 +396,47 @@ private struct PlaybackTransportButtons: View {
 
   private var isFinished: Bool {
     replay.stepIndex >= replay.totalOperationCount
+  }
+
+  private func announce(_ message: String) {
+    guard voiceOverEnabled else { return }
+    UIAccessibility.post(notification: .announcement, argument: message)
+  }
+}
+
+/// Spoken only after a user-requested step, so long tapes never queue thousands of announcements.
+func accessibilityDescription(for operation: SortOperation) -> String {
+  switch operation {
+  case .swap(let first, let second):
+    "Swapped positions \(first + 1) and \(second + 1)"
+  case .setValue(let index, let value):
+    "Set position \(index + 1) to \(value)"
+  case .compare(let first, let second):
+    "Compared positions \(first + 1) and \(second + 1)"
+  case .compareValue(let index, let value):
+    "Compared position \(index + 1) with value \(value)"
+  case .compareValues(let first, let second):
+    "Compared values \(first) and \(second)"
+  case .mark(_, let index):
+    "Highlighted position \(index + 1)"
+  case .unmark, .unmarkAll:
+    "Cleared a highlight"
+  case .unmarkIndex(_, let index):
+    "Cleared the highlight at position \(index + 1)"
+  case .markSorted(let index):
+    "Position \(index + 1) is sorted"
+  case .auxCreate(_, let length):
+    "Created a temporary array of \(length) items"
+  case .auxWrite(_, let index, let value):
+    "Wrote \(value) to temporary position \(index + 1)"
+  case .auxDelete:
+    "Removed a temporary array"
+  case .auxRead(_, let index):
+    "Read temporary position \(index + 1)"
+  case .readValue(let index):
+    "Read position \(index + 1)"
+  case .reversal:
+    "Started reversing a range"
   }
 }
 
@@ -474,6 +531,8 @@ private struct UtilityButtons: View {
 
       Button {
         isSizeExpanded.toggle()
+        PresentationDiscoveryTip.hasAdjustedPresentation = true
+        PresentationDiscoveryTip().invalidate(reason: .actionPerformed)
       } label: {
         Text("n=\(session.arraySize)")
           .font(.footnote.monospacedDigit())
@@ -485,6 +544,8 @@ private struct UtilityButtons: View {
 
       Button {
         isVisualizerExpanded.toggle()
+        PresentationDiscoveryTip.hasAdjustedPresentation = true
+        PresentationDiscoveryTip().invalidate(reason: .actionPerformed)
       } label: {
         Image(systemName: "eye.fill")
       }
@@ -581,7 +642,7 @@ private struct SizeChip: View {
 }
 
 /// Lists every registered `Automation` (see `AutomationRegistry`) — the same entries `⌘⇧A`/`⌘⌥⇧A`
-/// trigger, so the shortcut and this menu share one source of truth.
+/// trigger, so the shortcut and this action chooser share one source of truth.
 ///
 /// A genuine `View`, not a computed property on `RunControlBar`: `@Environment(\.isEnabled)` only
 /// sees ancestors of where it's read, and `RunControlBar.body`'s `.disabled(session.isAutomating)`
@@ -594,25 +655,11 @@ private struct SizeChip: View {
 private struct AutomatorMenuButton: View {
   let session: SortSession
   @Environment(\.isEnabled) private var isEnabled
+  @State private var isShowingAutomations = false
 
   var body: some View {
-    Menu {
-      ForEach(AutomationRegistry.shared.automations) { automation in
-        Button {
-          session.runAutomation(automation)
-        } label: {
-          if session.runningAutomationID == automation.id {
-            Label(
-              "\(automation.displayName) (\(automation.shortcutDisplayString)) — Running",
-              systemImage: "checkmark")
-          } else {
-            Label(
-              "\(automation.displayName) (\(automation.shortcutDisplayString))",
-              systemImage: automation.iconName)
-          }
-        }
-        .accessibilityIdentifier("automatorMenuItem.\(automation.id.rawValue)")
-      }
+    Button {
+      isShowingAutomations = true
     } label: {
       Image(systemName: "gearshape.2.fill")
         // `isEnabled`, not `session.isAutomating` directly, so this tracks whatever actually
@@ -624,7 +671,18 @@ private struct AutomatorMenuButton: View {
     .buttonStyle(.plain)
     .accessibilityIdentifier("runControlAutomatorButton")
     .accessibilityLabel("Automations")
+    .accessibilityValue(
+      session.runningAutomationID.flatMap { AutomationRegistry.shared.automation(id: $0)?.displayName }
+        .map { "\($0) running" } ?? "Idle")
     .help("Run a size-sweep or max-size automation")
+    .confirmationDialog("Automations", isPresented: $isShowingAutomations) {
+      ForEach(AutomationRegistry.shared.automations) { automation in
+        Button("\(automation.displayName) (\(automation.shortcutDisplayString))") {
+          session.runAutomation(automation)
+        }
+        .accessibilityIdentifier("automatorMenuItem.\(automation.id.rawValue)")
+      }
+    }
   }
 }
 

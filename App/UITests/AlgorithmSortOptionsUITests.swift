@@ -8,6 +8,12 @@ final class AlgorithmSortOptionsUITests: XCTestCase {
     let app = XCUIApplication()
     app.launch()
 
+    // The SF Symbol varies by algorithm, but the row's accessible name is the algorithm name.
+    // A separate icon announcement would add noise without conveying another property.
+    let firstAlgorithm = app.buttons["algorithmLink.threesmoothcombsortiterative"]
+    XCTAssertTrue(firstAlgorithm.waitForExistence(timeout: 5))
+    XCTAssertEqual(firstAlgorithm.label, "3-Smooth Comb Sort (Iterative)")
+
     #if targetEnvironment(macCatalyst)
       let menu = app.menuButtons["Sort"]
     #else
@@ -54,7 +60,7 @@ final class FullSweepConfirmationUITests: XCTestCase {
     app.launch()
 
     #if targetEnvironment(macCatalyst)
-      let sweepButton = app.buttons["Checklist with checkmarks"]
+      let sweepButton = app.buttons["Start Full Sweep"]
     #else
       let sweepButton = app.buttons["fullSweepButton"]
     #endif
@@ -77,7 +83,7 @@ final class FullSweepConfirmationUITests: XCTestCase {
     app.launch()
     XCTAssertFalse(app.staticTexts["fullSweepProgressLabel"].exists)
     #if targetEnvironment(macCatalyst)
-      let confirmTrigger = app.buttons["Checklist with checkmarks"]
+      let confirmTrigger = app.buttons["Start Full Sweep"]
     #else
       let confirmTrigger = app.buttons["fullSweepButton"]
     #endif
@@ -95,6 +101,12 @@ final class FullSweepConfirmationUITests: XCTestCase {
     #endif
     let progress = app.staticTexts["fullSweepProgressLabel"]
     XCTAssertTrue(progress.waitForExistence(timeout: 10), "confirming should start the sweep")
+    XCTAssertFalse(app.buttons["automationStopButton"].exists)
+    #if targetEnvironment(macCatalyst)
+      XCTAssertTrue(app.buttons["Stop Full Sweep"].exists)
+    #else
+      XCTAssertEqual(app.buttons["fullSweepButton"].label, "Stop Full Sweep")
+    #endif
     let stop = app.buttons["fullSweepStopButton"]
     XCTAssertTrue(stop.waitForExistence(timeout: 5))
     app.activateControlForUITest(stop)
@@ -137,7 +149,7 @@ final class FullSweepPersistenceUITests: XCTestCase {
 
   private func startSweep(in app: XCUIApplication) {
     #if targetEnvironment(macCatalyst)
-      app.buttons["Checklist with checkmarks"].click()
+      app.buttons["Start Full Sweep"].click()
       app.typeKey(.tab, modifierFlags: [])
       app.typeKey(.space, modifierFlags: [])
     #else
@@ -158,7 +170,7 @@ final class FullSweepPersistenceUITests: XCTestCase {
       "UI_TEST_FULL_SWEEP_LOG_NAME": UUID().uuidString,
       "UI_TEST_ARRAY_SIZE": "32",
     ]
-    app.launchEnvironment = common.merging(["UI_TEST_PLAYBACK_SPEED": "30"]) { _, new in new }
+    app.launchEnvironment = common.merging(["UI_TEST_PLAYBACK_SPEED": "1"]) { _, new in new }
     app.launch()
     let probe = app.staticTexts["coverageSweepLogProbe"]
     XCTAssertNotNil(waitForAudit(probe, matching: { !$0.running && $0.total == 4 && $0.rows.isEmpty }))
@@ -166,14 +178,16 @@ final class FullSweepPersistenceUITests: XCTestCase {
     XCTAssertNotNil(waitForAudit(probe, matching: { $0.running && !$0.current.isEmpty }))
     let stop = app.buttons["fullSweepStopButton"]
     XCTAssertTrue(stop.waitForExistence(timeout: 5))
+    XCTAssertEqual(app.buttons.matching(identifier: "fullSweepStopButton").count, 1)
+    XCTAssertFalse(app.buttons["automationStopButton"].exists)
     app.activateControlForUITest(stop)
-    let stopped = waitForAudit(probe, matching: { !$0.running && $0.completed == 1 })
-    XCTAssertEqual(stopped?.rows.count, 1)
+    let stopped = waitForAudit(probe, matching: { !$0.running && $0.completed == 0 })
+    XCTAssertTrue(stopped?.rows.isEmpty ?? false)
 
     app.terminate()
     app.launchEnvironment = common.merging(["UI_TEST_PLAYBACK_SPEED": "1000"]) { _, new in new }
     app.launch()
-    let restored = waitForAudit(probe, matching: { !$0.running && $0.completed == 1 })
+    let restored = waitForAudit(probe, matching: { !$0.running && $0.completed == 0 })
     XCTAssertEqual(restored?.rows, stopped?.rows)
     startSweep(in: app)
     let finished = waitForAudit(probe, timeout: 90, matching: { !$0.running && $0.completed == 4 })
@@ -229,9 +243,15 @@ final class AutomationJourneyUITests: XCTestCase {
     app.buttons.matching(identifier: "showcaseConfirmButton").firstMatch.tap()
     let probe = app.staticTexts["showcaseAuditProbe"]
     XCTAssertNotNil(waitForValue(probe, matching: { $0 == "true|" }))
-    app.activateControlForUITest(showcase)
+    XCTAssertEqual(showcase.label, "Stop Showcase")
+    XCTAssertTrue(app.buttons["showcaseStopButton"].exists)
+    XCTAssertFalse(app.buttons["automationStopButton"].exists)
+    XCTAssertFalse(app.buttons["sidebarCategory.all"].isEnabled)
+    XCTAssertFalse(app.buttons["algorithmLink.threesmoothcombsortiterative"].isEnabled)
+    app.activateControlForUITest(app.buttons["showcaseStopButton"])
     XCTAssertNotNil(waitForValue(probe, matching: { $0 == "false|" }))
     XCTAssertFalse(app.staticTexts["showcaseProgressLabel"].exists)
+    XCTAssertTrue(app.buttons["sidebarCategory.all"].isEnabled)
 
     app.terminate()
     app.launchEnvironment = common.merging([

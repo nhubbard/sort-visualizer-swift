@@ -80,9 +80,9 @@ final class TapeExportImportUITests: XCTestCase {
     app.launch()
 
     #if targetEnvironment(macCatalyst)
-      // SwiftUI identifiers are not forwarded into Catalyst's native NSToolbar. Its import
-      // button is exposed to accessibility by the SF Symbol name instead.
-      let importButton = app.buttons["download"]
+      // SwiftUI identifiers are not forwarded into Catalyst's native NSToolbar, but the
+      // semantic Label title remains available as the button's accessible name.
+      let importButton = app.buttons["Import Tape"]
     #else
       let importButton = app.buttons["importTapeButton"]
     #endif
@@ -243,7 +243,7 @@ final class TapeExportImportUITests: XCTestCase {
 
       app.terminate()
       app.launch()
-      app.buttons["download"].click()
+      app.buttons["Import Tape"].click()
       let openPanel = app.sheets["open-panel"]
       XCTAssertTrue(openPanel.waitForExistence(timeout: 5))
       goToFolder(folder, in: app)
@@ -278,7 +278,7 @@ final class TapeExportImportUITests: XCTestCase {
       app.launch()
       app.tapSidebarLink("algorithmLink.quicksort")
       let original = completedTapeSnapshot(in: app)
-      app.buttons["download"].click()
+      app.buttons["Import Tape"].click()
       let openPanel = app.sheets["open-panel"]
       XCTAssertTrue(openPanel.waitForExistence(timeout: 5))
       goToFolder(folder, in: app)

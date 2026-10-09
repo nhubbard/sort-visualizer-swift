@@ -78,4 +78,29 @@ final class PortraitOrientationUITests: XCTestCase {
     app.launchEnvironment = ["UI_TEST_ARRAY_SIZE": "256", "UI_TEST_PLAYBACK_SPEED": "30"]
     app.launch()
   }
+
+  func testCatalogBadgesRemainUnderstandableInPortrait() {
+    let app = XCUIApplication()
+    app.launchEnvironment = ["UI_TEST_ARRAY_SIZE": "24"]
+    app.launch()
+
+    let menu = app.buttons["algorithmSortMenu"]
+    XCTAssertTrue(menu.waitForExistence(timeout: 5))
+    menu.tap()
+    app.buttons["Estimated Speed"].tap()
+
+    let algorithm = app.buttons.matching(
+      NSPredicate(format: "identifier BEGINSWITH %@", "algorithmLink.")
+    ).firstMatch
+    XCTAssertTrue(algorithm.waitForExistence(timeout: 5))
+    XCTAssertFalse(algorithm.label.isEmpty)
+    let estimate = algorithm.value as? String ?? ""
+    XCTAssertTrue(estimate.contains("ops at n=") || estimate.contains("N/A above n="),
+      "The badge should remain available as an accessibility value: \(estimate)")
+
+    let screenshot = XCTAttachment(screenshot: app.screenshot())
+    screenshot.name = "portrait-estimated-speed-catalog"
+    screenshot.lifetime = .keepAlways
+    add(screenshot)
+  }
 }

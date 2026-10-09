@@ -29,8 +29,9 @@ extension XCUIApplication {
 
   func openSettingsForUITest() {
     #if targetEnvironment(macCatalyst)
-      // SwiftUI's identifier is dropped when the button becomes an NSToolbar item.
-      let button = buttons["Gear shape"]
+      // SwiftUI's identifier is dropped when the button becomes an NSToolbar item, but its
+      // semantic Label title remains available as the button's accessible name.
+      let button = buttons["Settings"]
       XCTAssertTrue(button.waitForExistence(timeout: 5), "settings toolbar button is missing")
       button.click()
     #else
@@ -77,7 +78,7 @@ extension XCUIApplication {
         "algorithmLink.selectionsort": "Selection Sort",
       ]
       if !link.exists, let term = searchTerms[identifier] {
-        let search = searchFields["Search Algorithms"]
+        let search = searchFields["Search"]
         if search.waitForExistence(timeout: 5) {
           search.click()
           search.typeKey("a", modifierFlags: .command)

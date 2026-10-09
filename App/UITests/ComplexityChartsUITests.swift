@@ -32,6 +32,10 @@ final class ComplexityChartsUITests: XCTestCase {
     for _ in 0..<12 where !chart.exists { detail.swipeUp(velocity: .slow) }
     XCTAssertTrue(chart.waitForExistence(timeout: 20),
                   "The second completed run did not refresh the visible chart")
+    let summary = app.staticTexts["bigORecordedSummary"]
+    XCTAssertTrue(summary.exists)
+    XCTAssertTrue(summary.label.contains("2 recorded runs across 2 array sizes"))
+    XCTAssertTrue(summary.label.contains("16–32 items"))
     assertSavedSizes(in: app)
 
     app.terminate()
@@ -60,6 +64,7 @@ final class ComplexityChartsUITests: XCTestCase {
     let expanded = app.descendants(matching: .any)
       .matching(identifier: "bigOCorrelationExpandedChart").firstMatch
     XCTAssertTrue(expanded.waitForExistence(timeout: 10))
+    XCTAssertTrue((expanded.value as? String)?.contains("Previous Recorded Size") == true)
     let selected = app.staticTexts["bigOSelectedSize"]
     let next = app.buttons["Next Recorded Size"]
     XCTAssertTrue(next.waitForExistence(timeout: 5))
@@ -101,6 +106,12 @@ final class ComplexityChartsUITests: XCTestCase {
     XCTAssertTrue(app.staticTexts["Detected"].exists)
     XCTAssertTrue(app.staticTexts["Fitted (Used by App)"].exists)
     XCTAssertTrue(growth.exists, "Quick Sort's calibrated Growth Model chart is missing")
+    let summary = app.staticTexts["growthModelSummary"]
+    XCTAssertTrue(summary.exists)
+    XCTAssertTrue(summary.label.contains("Horizontal axis: array size"))
+    XCTAssertTrue(summary.label.contains("Detected (solid line)"))
+    XCTAssertTrue(summary.label.contains("Fitted (Used by App, dashed line)"))
+    XCTAssertTrue((growth.value as? String)?.contains("maximum selectable size") == true)
 
     let correlation = app.staticTexts["Big-O Correlation"]
     for _ in 0..<8 where !correlation.exists { detail.swipeUp(velocity: .slow) }
@@ -163,6 +174,11 @@ final class ComplexityChartsUITests: XCTestCase {
     for _ in 0..<12 where !chart.exists { detail.swipeUp(velocity: .slow) }
     XCTAssertTrue(chart.waitForExistence(timeout: 15))
     app.buttons["Expand Chart"].tap()
+    let expanded = app.descendants(matching: .any)
+      .matching(identifier: "bigOCorrelationExpandedChart").firstMatch
+    XCTAssertTrue(expanded.waitForExistence(timeout: 5))
+    XCTAssertGreaterThanOrEqual(expanded.frame.minX, app.frame.minX)
+    XCTAssertLessThanOrEqual(expanded.frame.maxX, app.frame.maxX)
     let control = app.switches["Show Individual Runs"]
     XCTAssertTrue(control.waitForExistence(timeout: 5))
     XCTAssertGreaterThanOrEqual(control.frame.minX, app.frame.minX)

@@ -133,11 +133,12 @@ public final class CoverageSweepDriver {
     }
   }
 
-  /// Cooperative, same shape as `SortSession.runAutomation`'s cancellation: the combo currently
-  /// playing always finishes cleanly, `runLoop`'s own `Task.isCancelled` check (only reached
-  /// between combos) is what actually stops the sweep.
+  /// Stop the current replay as well as the sweep loop. An interrupted combo is not logged as
+  /// covered, so a later resume starts it again.
   public func stop() {
-    task?.cancel()
+    guard let task else { return }
+    task.cancel()
+    SortCoordinator.shared.stopActiveRun()
   }
 
   /// `elapsed / completedCount * remaining` — the simplest possible estimate, recomputed from
@@ -192,10 +193,15 @@ public final class CoverageSweepDriver {
         "FullSweepCombo", id: Self.signposter.makeSignpostID(),
         "\(combo.algorithmID.rawValue) \(combo.shuffleID.rawValue) \(combo.visualizerID.rawValue) n=\(runSize)"
       )
+      guard !Task.isCancelled else {
+        Self.signposter.endInterval("FullSweepCombo", comboInterval)
+        break
+      }
       await SortCoordinator.shared.runSort(
         algorithm: algorithm, visualizerID: combo.visualizerID, shuffleID: combo.shuffleID,
         size: runSize)
       Self.signposter.endInterval("FullSweepCombo", comboInterval)
+      guard !Task.isCancelled else { break }
 
       Self.appendToLog(combo, at: logURL)
       completedKeys.insert(CoverageSweepEnumerator.key(for: combo))

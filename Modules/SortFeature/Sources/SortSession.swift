@@ -99,6 +99,15 @@ public final class SortSession {
   private let audio: any AudioPlaying
   private let analytics: AnalyticsService
   private let settings: AppSettings
+  /// This applies to the active replay and every new run, including automation-created runs.
+  /// It does not rewrite the user's stored speed or target duration.
+  private var reduceMotionEnabled = false
+  public static let reducedMotionSpeedLimit = 15.0
+
+  public func setReduceMotionEnabled(_ enabled: Bool) {
+    reduceMotionEnabled = enabled
+    lastReplay?.automaticSpeedLimit = enabled ? Self.reducedMotionSpeedLimit : nil
+  }
   /// Not a public init parameter: the only override this session ever needs is a test injecting
   /// a deterministic tick driver in place of `ReplayEngine`'s real `CADisplayLink` (see
   /// `ReplayEngine`'s own non-public `displayLinkFactory` seam, kept internal for the same
@@ -109,6 +118,12 @@ public final class SortSession {
   /// still the same run, so analytics must be inserted only on its first completion.
   private var hasRecordedCurrentReplay = false
   private var automationTask: Task<Void, Never>?
+  /// Invalidates an in-flight pass even when its caller is an App Intent or Full Sweep rather
+  /// than a locally owned `automationTask`.
+  private var automationRunID = 0
+  private var automationStopRequested = false
+  /// Discards a tape that finishes recording after Stop or a newer start.
+  private var recordingGeneration = 0
   /// Set by `start(size:)` whenever the most recent call skipped a capped recording instead of
   /// starting a replay — `runAutomation(sizes:runsPerSize:)` checks this right after `start
   /// (size:)` returns to decide whether to `waitUntilComplete()` (a skipped run never starts a
@@ -156,6 +171,8 @@ public final class SortSession {
   /// threshold, not a user-toggleable confirmation dialog), enforced here so every caller gets
   /// it, not just whichever view happens to clamp its own slider (see Documentation/docs/architecture/overview.md).
   public func start(size: Int) async {
+    recordingGeneration += 1
+    let generation = recordingGeneration
     // Stops the current sort's sound/visuals immediately instead of leaving them running
     // until the orphaned `ReplayEngine` self-terminates on its own — see the size stepper and
     // automation loop, both of which call this repeatedly on an already-running session.
@@ -210,6 +227,7 @@ public final class SortSession {
           traceURL: Optional<URL>.none)
         #endif
       }.value
+      guard generation == recordingGeneration else { return }
       let tape = recording.value
       #if DEBUG && targetEnvironment(macCatalyst) && LOCAL_INSTRUMENTS_TRACING
       if let traceURL = recording.traceURL {
@@ -226,6 +244,7 @@ public final class SortSession {
       phase = .ready(tape)
       startReplay(tape)
     } catch {
+      guard generation == recordingGeneration else { return }
       let sessionError: SortSessionError
       if case .tooLarge(
         let operationCount, let cap, let compareCount, let swapCount, let mainWriteCount,
@@ -275,6 +294,7 @@ public final class SortSession {
       ? tape.compactedForFastPlayback() : tape
     let replay = replayEngineFactory(playbackTape)
     replay.speed = settings.playbackSpeed
+    replay.automaticSpeedLimit = reduceMotionEnabled ? Self.reducedMotionSpeedLimit : nil
     replay.useFixedDurationPacing = settings.useFixedDurationPacing
     replay.targetDuration = settings.targetPlaybackDuration
     phase = .replaying(replay)
@@ -307,14 +327,13 @@ public final class SortSession {
       // cached from an earlier tick — so this reflects the real elapsed wall-clock up to
       // this instant regardless of anything else that might read `elapsedPlaybackDuration`
       // afterward (e.g. `RunControlBar`, still displaying `.complete` state).
-      // `replay.speed` is the exact value the user configured and is what fixed-rate mode
-      // actually paces against, so it stays the recorded number there — same as before this
-      // feature. In fixed-duration mode `speed` is inert (see `ReplayEngine.currentPacingRate`'s
-      // doc comment), so record the true achieved average instead
+      // In ordinary fixed-rate mode `replay.speed` is the configured and applied value. With
+      // Reduce Motion, the applied rate can be lower; fixed-duration mode also varies it live.
+      // Record the true achieved average in either of those modes
       // (`significantOperationCount / elapsedPlaybackDuration`, matching what `RunControlBar`'s
       // own "ops/sec" stat already computes) rather than a meaningless stored number.
       let recordedSpeed: Double
-      if replay.useFixedDurationPacing {
+      if replay.useFixedDurationPacing || replay.wasAutomaticallyLimited {
         recordedSpeed =
           replay.elapsedPlaybackDuration > 0
           ? Double(replay.significantOperationCount) / replay.elapsedPlaybackDuration
@@ -398,28 +417,41 @@ public final class SortSession {
   /// Starts a registered `Automation`, or stops it if it's the one already running — tapping a
   /// *different* automation while one is running cancels the old one and starts the new one in
   /// the same call, no second tap needed. Each entry supplies its own sizes (a size sweep or a
-  /// single max-size run) and `runsPerSize`; see `AutomationRegistry`. Cancelling mid-run takes
-  /// effect once the in-flight sort finishes playing, rather than yanking the tape out from
-  /// under `ReplayEngine` mid-playback.
+  /// single max-size run) and `runsPerSize`; see `AutomationRegistry`. Stopping pauses the
+  /// current replay and releases the automation's completion wait immediately.
   public func runAutomation(_ automation: Automation) {
     if runningAutomationID == automation.id {
       stopAutomation()
       return
     }
-    automationTask?.cancel()
+    if automationTask != nil || runningAutomationID != nil { stopAutomation() }
+    automationRunID += 1
+    automationStopRequested = false
+    let runID = automationRunID
     runningAutomationID = automation.id
     automationTask = Task {
       await runAutomation(
-        sizes: automation.sizes(algorithm.metadata), runsPerSize: automation.runsPerSize)
+        sizes: automation.sizes(algorithm.metadata), runsPerSize: automation.runsPerSize,
+        runID: runID)
     }
   }
 
-  /// Cancels whichever automation is currently running, if any — the automation banner's "Stop"
-  /// button calls this directly rather than looking up which `Automation` is running just to
-  /// hand it back to `runAutomation(_:)`.
+  /// Stops the current pass without waiting for its remaining playback. Releasing the completion
+  /// continuation also lets a Shortcuts caller or Full Sweep return from its awaited run.
   public func stopAutomation() {
+    automationRunID += 1
+    automationStopRequested = true
+    recordingGeneration += 1
     automationTask?.cancel()
+    automationTask = nil
     runningAutomationID = nil
+    automationProgress = nil
+    isAutomating = false
+    if case .replaying(let replay) = phase { replay.pause() }
+    if case .recording = phase { phase = .idle }
+    let continuations = completionContinuations
+    completionContinuations = []
+    for continuation in continuations { continuation.resume() }
   }
 
   /// Runs exactly one full pass at `size`, awaiting genuine completion — the primitive behind
@@ -427,7 +459,9 @@ public final class SortSession {
   /// "run this once and report back" request, neither of which can just fire-and-forget the way
   /// the keyboard-shortcut/Automator-menu callers of `runAutomation(_:)` do.
   public func runSinglePass(size: Int) async {
-    await runAutomation(sizes: [size], runsPerSize: 1)
+    automationRunID += 1
+    let runID = automationRunID
+    await runAutomation(sizes: [size], runsPerSize: 1, runID: runID)
   }
 
   /// Runs this algorithm once, at its own `sizeRange.upperBound` — the per-algorithm unit of work
@@ -456,11 +490,15 @@ public final class SortSession {
   /// observes the pre-Task default (`false`) and returns immediately. Awaiting the spawned
   /// `Task`'s own `.value` instead has no such gap.
   public func runAutomationAndWait(_ automation: Automation) async {
-    automationTask?.cancel()
+    if automationTask != nil || runningAutomationID != nil { stopAutomation() }
+    automationRunID += 1
+    automationStopRequested = false
+    let runID = automationRunID
     runningAutomationID = automation.id
     let task = Task {
       await runAutomation(
-        sizes: automation.sizes(algorithm.metadata), runsPerSize: automation.runsPerSize)
+        sizes: automation.sizes(algorithm.metadata), runsPerSize: automation.runsPerSize,
+        runID: runID)
     }
     automationTask = task
     await task.value
@@ -479,21 +517,29 @@ public final class SortSession {
     await start(size: sizes[nextIndex])
   }
 
-  private func runAutomation(sizes: [Int], runsPerSize: Int) async {
+  private func runAutomation(sizes: [Int], runsPerSize: Int, runID: Int) async {
+    guard runID == automationRunID, !automationStopRequested, !Task.isCancelled else { return }
     isAutomating = true
     defer {
-      isAutomating = false
-      automationProgress = nil
-      automationTask = nil
-      runningAutomationID = nil
+      if runID == automationRunID {
+        isAutomating = false
+        automationProgress = nil
+        automationTask = nil
+        runningAutomationID = nil
+      }
     }
     for (sizeIndex, size) in sizes.enumerated() {
       for runIndex in 0..<runsPerSize {
-        guard !Task.isCancelled else { return }
+        guard runID == automationRunID, !automationStopRequested, !Task.isCancelled else { return }
         automationProgress = (sizeIndex, sizes.count, runIndex, runsPerSize)
         await start(size: size)
+        guard runID == automationRunID, !automationStopRequested, !Task.isCancelled else {
+          if case .replaying(let replay) = phase { replay.pause() }
+          return
+        }
         if lastRunWasSkipped { continue }
         await waitUntilComplete()
+        guard runID == automationRunID, !automationStopRequested, !Task.isCancelled else { return }
       }
     }
   }

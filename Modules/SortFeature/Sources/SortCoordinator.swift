@@ -61,10 +61,14 @@ public final class SortCoordinator {
   /// re-running the *same* algorithm from a Shortcut always mounts a genuinely fresh
   /// `SortSession` instead of silently no-op'ing against one that already reached `.complete`.
   public private(set) var runToken = 0
+  /// Lets the app's Showcase owner react to a Stop intent without storing a view closure in this
+  /// singleton. The other modes stop through their drivers or the active session directly.
+  public private(set) var stopRequestID = 0
 
   private var pendingActions: [AlgorithmID: PendingAction] = [:]
   private var pendingShuffleOverrides: [AlgorithmID: ShuffleID] = [:]
   private var completions: [Int: CheckedContinuation<Void, Never>] = [:]
+  private var stoppedRunToken: Int?
 
   /// The one `SortSession` currently on screen, if any — `weak` because `ScrollingSortView`'s own
   /// `@State` is the sole rightful owner; registering here must never be what keeps a finished or
@@ -116,6 +120,9 @@ public final class SortCoordinator {
   public func registerActiveSession(_ session: SortSession, for algorithmID: AlgorithmID) {
     activeSession = session
     activeSessionAlgorithmID = algorithmID
+    if algorithmID == selectedAlgorithmID, shouldSkipRun(token: runToken) {
+      session.stopAutomation()
+    }
   }
 
   public func unregisterActiveSession(for algorithmID: AlgorithmID) {
@@ -129,6 +136,12 @@ public final class SortCoordinator {
   /// the moment the app merely opens to the right screen.
   public func resolveCompletion(token: Int) {
     completions.removeValue(forKey: token)?.resume()
+  }
+
+  /// A Stop can arrive after selection changes but before the new view consumes its action.
+  /// Keep that mount from treating a cleared pending action as an ordinary manual sort.
+  public func shouldSkipRun(token: Int) -> Bool {
+    currentSelectionWillAutomate && stoppedRunToken == token
   }
 
   // MARK: - Live-session hooks (for intents that only make sense against an open sort)
@@ -148,6 +161,7 @@ public final class SortCoordinator {
   public func runSort(
     algorithm: any SortAlgorithm, visualizerID: VisualizerID?, shuffleID: ShuffleID?, size: Int?
   ) async {
+    guard !Task.isCancelled else { return }
     let token = beginRun(
       algorithm: algorithm.id, shuffleID: shuffleID,
       action: .run(visualizerID: visualizerID, size: size))
@@ -159,15 +173,30 @@ public final class SortCoordinator {
   /// *reachability* without touching the `SortSession.runAutomation(_:)` engine underneath either
   /// of them.
   public func runAutomation(algorithm: any SortAlgorithm, automationID: AutomationID) async {
+    guard !Task.isCancelled else { return }
     let token = beginRun(algorithm: algorithm.id, shuffleID: nil, action: .automation(automationID))
     await withCheckedContinuation { completions[token] = $0 }
   }
 
-  /// Stops whatever the currently-open session is running — `StopIntent`'s entire body. A no-op
-  /// if nothing is open or nothing is running, same as tapping the automation banner's Stop
-  /// button when it isn't shown.
+  /// Stops the current automation, including app-owned modes driven outside SortSession.
   public func stop() {
+    if CoverageSweepDriver.shared.isRunning {
+      CoverageSweepDriver.shared.stop()
+      return
+    }
+    stopActiveRun()
+    stopRequestID += 1
+  }
+
+  /// Used by the app's own mode drivers after they have cancelled their outer loops.
+  public func stopActiveRun() {
     activeSession?.stopAutomation()
+    if currentSelectionWillAutomate { stoppedRunToken = runToken }
+    pendingActions.removeAll()
+    pendingShuffleOverrides.removeAll()
+    let waiting = completions
+    completions.removeAll()
+    for continuation in waiting.values { continuation.resume() }
   }
 
   /// Selects `algorithm` and routes `tape` to whichever `ScrollingSortView.task` mounts for it
