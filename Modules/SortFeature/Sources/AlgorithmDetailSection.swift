@@ -233,6 +233,7 @@ public struct AlgorithmDetailSection: View {
         .gridCellColumns(2)
       }
     }
+    .accessibilityIdentifier("complexityEquationGrid")
   }
 }
 

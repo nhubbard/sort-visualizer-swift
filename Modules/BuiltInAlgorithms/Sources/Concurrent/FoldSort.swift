@@ -13,9 +13,8 @@ import SortEngineKit
 /// `O(n log^2 n)` comparators, following directly from the triple-nested loop shape (`O(log n)` ×
 /// `O(log n)` × `O(n)`) shared with other classic bitonic-merge networks — the same asymptotic
 /// class `WeaveSort*`/`CreaseSort`/`PairwiseMergeSort*` were independently confirmed to have via
-/// direct measurement. Every comparator only ever swaps on strict `>`, and fuzzing across
-/// randomized duplicate-heavy trials found no case where two equal elements crossed paths,
-/// confirming this network is stable.
+/// direct measurement. Strict `>` comparators still permit indirect crossing of equal elements;
+/// identity-tracking duplicate trials confirm this network is unstable.
 public struct FoldSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "foldsort")
   public let metadata = AlgorithmMetadata(
@@ -28,7 +27,7 @@ public struct FoldSort: SortAlgorithm {
     detectedGrowthModel: DetectedGrowthModel(
       family: .powerLog, coefficients: [5.79128, 1.26524], rSquared: 0.989176),
     implementationComplexity: 11,
-    stable: true,
+    stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n log^2 n)", average: "O(n log^2 n)", worst: "O(n log^2 n)"),
     spaceComplexity: "O(1)",

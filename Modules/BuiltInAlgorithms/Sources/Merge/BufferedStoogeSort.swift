@@ -41,7 +41,7 @@ public struct BufferedStoogeSort: SortAlgorithm {
     detectedGrowthModel: DetectedGrowthModel(
       family: .polynomialIntercept, coefficients: [1.69591, 31.0706, -193.548], rSquared: 0.999991),
     implementationComplexity: 14,
-    stable: true,
+    stable: false,
     timeComplexity: ComplexityBounds(best: "O(n^2)", average: "O(n^2)", worst: "O(n^2)"),
     spaceComplexity: "O(log n)",
     iconName: "theatermasks.fill"

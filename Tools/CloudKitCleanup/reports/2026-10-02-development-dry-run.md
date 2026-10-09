@@ -28,6 +28,28 @@ ambiguous `retry-needed` and `too-many-requests` responses; their remaining coun
 been established by a complete scan. The live pass stopped at this verified boundary after
 individual groups began taking many minutes despite one-worker execution.
 
+## Execution checkpoint (2026-10-04)
+
+A later single-worker pass verified a contiguous prefix of 137 Development Big-O groups,
+through `sillysort`, empty. Those groups account for 208,285 names in the original frozen
+candidate set. The pass deleted 49,904 records during that run and stopped when its user token
+expired at `simplifiedlibrarysort`. Before that token expired, a read-only query found 299
+matching `simplifiedlibrarysort` records and no names outside the approved set. A subsequent
+attempt with the expired token deleted zero records. After another token refresh, the remaining
+43 groups were re-queried empty; that pass deleted 40,813 records and reported zero failed
+groups. A complete fresh Development Big-O scan fetched 128,457 records and found one
+above-maximum `adaptivegrailsort` record (size 1,216; current default-cap maximum 1,152).
+Its name was outside the frozen approved candidate set. CloudKit created it on 2026-10-04
+02:58 UTC from a recording dated 2026-10-02 21:30 UTC, consistent with a delayed upload of
+local history. After separate approval, its exact live name, type, algorithm, size, and threshold
+were checked, then that one record was deleted and re-queried absent. A normal Catalyst app
+launch passed `/private/tmp/his04-catalyst-relaunch.xcresult`. A second complete Development
+Big-O scan fetched 128,456 records and found zero above maximum; a later targeted query still
+found zero above-maximum `adaptivegrailsort` records. The fresh Development cap-exceeded scan
+found 819 records and zero above maximum; Production Big-O had zero records, and Production has
+no cap-exceeded record type in its schema. One `fake` algorithm ID has no current algorithm or
+threshold and was left untouched by the size audit.
+
 Every candidate has a unique CloudKit record name within its record type and a size strictly greater than its cached threshold. The private record names remain in the local ignored caches.
 
 Candidate-set SHA-256 fingerprints are `22b4950bc5741cd56934c729a58274aad3efa82d4a485f03d6ba91d9d2232928` for Development Big-O and `9b8046f938707dc771c6922165ff3555fc8f80b7e7f85c760f6a1b4ec1eb19da` for Development cap-exceeded. Each fingerprint hashes newline-separated compact JSON arrays of `[recordType, recordName, algorithmID, arraySize, threshold]`, sorted by record name. This identifies the exact cached candidate sets without publishing private record names.

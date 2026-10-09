@@ -11,8 +11,17 @@ import os
 /// `cloudKitDatabase: .automatic` uses whichever CloudKit container the entitlements declare
 /// (`iCloud.com.nhubbard.Sort2.mobile`) with no manual container/encoder code at all.
 public actor AnalyticsService {
-  public static let shared = AnalyticsService()
+  public static let shared: AnalyticsService = {
+    #if DEBUG
+    if let storeName = ProcessInfo.processInfo.environment["UI_TEST_LOCAL_ANALYTICS_STORE"] {
+      do { return try makeLocalFixtureForUITesting(storeName: storeName) }
+      catch { fatalError("Could not open UI-test analytics store: \(error)") }
+    }
+    #endif
+    return AnalyticsService()
+  }()
 
+  private let modelContainer: ModelContainer
   private let modelContext: ModelContext
 
   /// `fetchSummaries(algorithmID:)` results, keyed by `algorithmID.rawValue` — invalidated in
@@ -26,7 +35,9 @@ public actor AnalyticsService {
   /// Tests inject an `isStoredInMemoryOnly: true` container instead of touching CloudKit/disk —
   /// the real app never passes this parameter, so it always gets the CloudKit-backed default.
   public init(modelContainer: ModelContainer? = nil) {
-    self.modelContext = ModelContext(modelContainer ?? Self.makeDefaultContainer())
+    let container = modelContainer ?? Self.makeDefaultContainer()
+    self.modelContainer = container
+    self.modelContext = ModelContext(container)
   }
 
   /// `playbackDuration`/`playbackSpeed` aren't on `TapeHeader` itself: `TapeHeader`/`Tape` are
@@ -95,6 +106,49 @@ public actor AnalyticsService {
   }
 
   #if DEBUG
+  public static func makeLocalFixtureForUITesting() throws -> AnalyticsService {
+    let schema = Schema([BigORecord.self, RecordingCapExceededRecord.self])
+    let storeURL = FileManager.default.temporaryDirectory.appendingPathComponent(
+      "his03-history-\(UUID().uuidString).store")
+    let configuration = ModelConfiguration(schema: schema, url: storeURL, cloudKitDatabase: .none)
+    return AnalyticsService(modelContainer: try ModelContainer(
+      for: schema, configurations: [configuration]))
+  }
+
+  /// An isolated, file-backed store shared by successive launches of one UI test. Both the
+  /// real SortSession recording path and the visible chart use `shared`, so a refresh/relaunch
+  /// test can exercise production wiring without writing synthetic runs to CloudKit.
+  private static func makeLocalFixtureForUITesting(storeName: String) throws -> AnalyticsService {
+    guard storeName.hasPrefix("cht02-"), !storeName.contains("/"), !storeName.contains("..") else {
+      throw CocoaError(.fileReadInvalidFileName)
+    }
+    let schema = Schema([BigORecord.self, RecordingCapExceededRecord.self])
+    let storeURL = FileManager.default.temporaryDirectory.appendingPathComponent("\(storeName).store")
+    let configuration = ModelConfiguration(schema: schema, url: storeURL, cloudKitDatabase: .none)
+    return AnalyticsService(modelContainer: try ModelContainer(
+      for: schema, configurations: [configuration]))
+  }
+
+  /// Two-device HIS-02 canary. The marker is a synthetic algorithm ID, so its record cannot
+  /// appear in a real algorithm chart. Read directly from SwiftData on every poll: the normal
+  /// chart cache deliberately avoids repeated fetches during Full Sweep.
+  public func syncCanaryCountForUITesting(marker: String) throws -> Int {
+    guard marker.hasPrefix("his02-canary-") else { return 0 }
+    let descriptor = FetchDescriptor<BigORecord>(
+      predicate: #Predicate { $0.algorithmID == marker })
+    // A new context avoids a long-lived query snapshot masking background CloudKit imports.
+    return try ModelContext(modelContext.container).fetchCount(descriptor)
+  }
+
+  public func deleteSyncCanaryForUITesting(marker: String) throws {
+    guard marker.hasPrefix("his02-canary-") else { return }
+    let descriptor = FetchDescriptor<BigORecord>(
+      predicate: #Predicate { $0.algorithmID == marker })
+    for record in try modelContext.fetch(descriptor) { modelContext.delete(record) }
+    try modelContext.save()
+    summariesCache[marker] = nil
+  }
+
   /// UI-test probe for the actual saved store, including after an app relaunch.
   public func capExceededAuditForUITesting(
     algorithmID: String, operationCap: Int

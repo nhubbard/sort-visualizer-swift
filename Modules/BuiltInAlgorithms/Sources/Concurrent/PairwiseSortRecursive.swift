@@ -15,8 +15,8 @@ import SortEngineKit
 /// `n log^2 n` converges to a near-constant ~0.23–0.25 across sizes 16 through 2048, identical at
 /// every tested size to both `PairwiseMergeSortIterative`'s and `PairwiseMergeSortRecursive`'s own
 /// measured counts, despite this being a structurally distinct construction from either). Every
-/// comparator only ever swaps on strict `>`, and fuzzing across randomized duplicate-heavy trials
-/// found no case where two equal elements crossed paths, confirming this network is stable.
+/// comparator swaps only on strict `>`, but identity-tracking duplicate trials show that equal
+/// elements can cross indirectly. This recursive network is unstable.
 public struct PairwiseSortRecursive: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "pairwisesortrecursive")
   public let metadata = AlgorithmMetadata(
@@ -29,7 +29,7 @@ public struct PairwiseSortRecursive: SortAlgorithm {
     detectedGrowthModel: DetectedGrowthModel(
       family: .powerLog, coefficients: [7.58061, 1.20611], rSquared: 0.999485),
     implementationComplexity: 12,
-    stable: true,
+    stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n log^2 n)", average: "O(n log^2 n)", worst: "O(n log^2 n)"),
     spaceComplexity: "O(log n)",

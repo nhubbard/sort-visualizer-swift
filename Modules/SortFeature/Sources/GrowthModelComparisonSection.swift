@@ -147,6 +147,21 @@ struct GrowthModelComparisonSection: View {
   }
 }
 
+#if DEBUG
+/// Renders the shipping growth section in isolation for the all-algorithm narrow-width UI audit.
+public struct GrowthModelAuditContent: View {
+  private let algorithm: any SortAlgorithm
+
+  public init(algorithm: any SortAlgorithm) {
+    self.algorithm = algorithm
+  }
+
+  public var body: some View {
+    GrowthModelComparisonSection(algorithm: algorithm)
+  }
+}
+#endif
+
 /// The caption's percent gap uses the same normalization as the two plotted curves. Kept
 /// independent of SwiftUI so the reachable-range calculation can be checked with known curves.
 func normalizedGrowthDivergencePercent(

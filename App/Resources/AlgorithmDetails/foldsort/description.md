@@ -17,5 +17,5 @@ That triple-nested loop shape, a doubling/halving pass nested inside another dou
 pass, both wrapped around a linear sweep, is what gives this network its O(n log²n) best-case,
 average-case, and worst-case running time, all identical since the comparator schedule depends only
 on the (padded) length of the input. Every comparator only ever swaps on a strict "greater than"
-test, and this network never lets two equal elements cross paths without an intervening comparison
-establishing their order, so it is a stable sort.
+test, but nonadjacent exchanges can reverse the relative order of equal elements. The network is
+unstable.

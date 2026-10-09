@@ -18,6 +18,5 @@ Like other fixed comparator networks, this one's total comparator count depends 
 identical, landing at O(n log²n), measuring the number of comparisons this network performs across
 a wide range of array sizes shows it uses exactly the same total as the recursive
 Pairwise Merge Sort and Pairwise Sort implementations, despite each using a different loop or
-recursion shape to get there. Every comparator only ever swaps on a strict "greater than" test, and
-this network never lets two equal elements cross paths without an intervening comparison
-establishing their order, so it is a stable sort.
+recursion shape to get there. Every comparator only ever swaps on a strict "greater than" test, but
+nonadjacent exchanges can reverse the relative order of equal elements. The network is unstable.

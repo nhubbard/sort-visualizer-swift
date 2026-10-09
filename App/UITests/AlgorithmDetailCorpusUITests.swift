@@ -13,6 +13,15 @@ final class AlgorithmDetailCorpusUITests: XCTestCase {
   func testPages124Through147() { audit(123..<147) }
   func testPages148Through172() { audit(147..<172) }
   func testPages173Through196() { audit(172..<196) }
+  func testNarrowSmoke() { audit(0..<2, width: 360, prefix: "narrow-") }
+  func testNarrowPages001Through025() { audit(0..<25, width: 360, prefix: "narrow-") }
+  func testNarrowPages026Through049() { audit(25..<49, width: 360, prefix: "narrow-") }
+  func testNarrowPages050Through074() { audit(49..<74, width: 360, prefix: "narrow-") }
+  func testNarrowPages075Through098() { audit(74..<98, width: 360, prefix: "narrow-") }
+  func testNarrowPages099Through123() { audit(98..<123, width: 360, prefix: "narrow-") }
+  func testNarrowPages124Through147() { audit(123..<147, width: 360, prefix: "narrow-") }
+  func testNarrowPages148Through172() { audit(147..<172, width: 360, prefix: "narrow-") }
+  func testNarrowPages173Through196() { audit(172..<196, width: 360, prefix: "narrow-") }
 
   func testDenseExpandedChartScrollsAndChangesSeriesState() {
     continueAfterFailure = false
@@ -52,10 +61,18 @@ final class AlgorithmDetailCorpusUITests: XCTestCase {
   }
 
   func testLongFittedEquationCanBeScrolled() {
+    assertLongFittedEquationCanBeScrolled(width: 900)
+  }
+
+  func testLongFittedEquationCanBeScrolledAtNarrowWidth() {
+    assertLongFittedEquationCanBeScrolled(width: 360)
+  }
+
+  private func assertLongFittedEquationCanBeScrolled(width: Int) {
     let app = XCUIApplication()
     app.launchEnvironment = [
       "UI_TEST_DETAIL_AUDIT": "1", "UI_TEST_DETAIL_AUDIT_START": "79",
-      "UI_TEST_DETAIL_AUDIT_WIDTH": "900"
+      "UI_TEST_DETAIL_AUDIT_WIDTH": String(width)
     ]
     app.launch()
     XCTAssertEqual(app.staticTexts["auditAlgorithmID"].label, "introcirclesortrecursive")
@@ -64,13 +81,20 @@ final class AlgorithmDetailCorpusUITests: XCTestCase {
     XCTAssertTrue(description.waitForExistence(timeout: 10), "detail content did not finish loading")
     let equation = app.scrollViews["equationScroll-Fitted (Used by App)"]
     XCTAssertTrue(equation.waitForExistence(timeout: 5))
+    if width == 360 {
+      let detailScroll = app.scrollViews["auditDetailScrollView"]
+      for _ in 0..<20 where !equation.isHittable {
+        detailScroll.swipeUp(velocity: .slow)
+      }
+      XCTAssertTrue(equation.isHittable, "The fitted equation did not enter the narrow viewport")
+    }
     let before = equation.screenshot().pngRepresentation
     equation.swipeLeft(velocity: .slow)
     XCTAssertNotEqual(equation.screenshot().pngRepresentation, before,
                       "The long fitted equation did not reveal its remaining terms")
   }
 
-  private func audit(_ range: Range<Int>) {
+  private func audit(_ range: Range<Int>, width: Int = 900, prefix: String = "") {
     continueAfterFailure = false
     #if !targetEnvironment(macCatalyst)
     XCUIDevice.shared.orientation = .portrait
@@ -79,7 +103,8 @@ final class AlgorithmDetailCorpusUITests: XCTestCase {
     app.launchEnvironment = [
       "UI_TEST_DETAIL_AUDIT": "1",
       "UI_TEST_DETAIL_AUDIT_START": String(range.lowerBound),
-      "UI_TEST_DETAIL_AUDIT_WIDTH": "900"
+      "UI_TEST_DETAIL_AUDIT_WIDTH": String(width),
+      "UI_TEST_EXPANDED_WIDTH": width == 360 ? "360" : ""
     ]
     app.launch()
     let scroll = app.scrollViews["auditDetailScrollView"]
@@ -97,6 +122,15 @@ final class AlgorithmDetailCorpusUITests: XCTestCase {
         let description = app.descendants(matching: .any)
           .matching(identifier: "algorithmDescriptionText").firstMatch
         XCTAssertTrue(description.waitForExistence(timeout: 10), "Missing description for \(algorithmID)")
+        if width == 360 {
+          XCTAssertLessThanOrEqual(description.frame.maxX, scroll.frame.maxX + 1,
+                                   "Description clips the narrow pane for \(algorithmID)")
+          let grid = app.descendants(matching: .any)
+            .matching(identifier: "complexityEquationGrid").firstMatch
+          XCTAssertTrue(grid.exists)
+          XCTAssertLessThanOrEqual(grid.frame.maxX, scroll.frame.maxX + 1,
+                                   "Complexity equations clip the narrow pane for \(algorithmID)")
+        }
         XCTAssertTrue(app.staticTexts["Description"].isHittable,
                       "Detail page did not reset to the top for \(algorithmID)")
         for label in ["Best Case", "Average Complexity", "Worst Case", "Space Complexity", "Implementation Complexity",
@@ -104,7 +138,7 @@ final class AlgorithmDetailCorpusUITests: XCTestCase {
           XCTAssertTrue(app.staticTexts[label].exists, "Missing \(label) for \(algorithmID)")
         }
         let top = XCTAttachment(screenshot: app.screenshot())
-        top.name = "\(String(format: "%03d", offset + 1))-\(algorithmID)-top"
+        top.name = "\(prefix)\(String(format: "%03d", offset + 1))-\(algorithmID)-top"
         top.lifetime = .keepAlways
         activity.add(top)
 
@@ -119,15 +153,23 @@ final class AlgorithmDetailCorpusUITests: XCTestCase {
                       "Populated Big-O chart is missing for \(algorithmID)")
 
         let expandButton = app.buttons["Expand Chart"]
-        // Catalyst's swipe can jump past the button on long descriptions. Move toward its
-        // accessibility frame in measured steps, leaving room around it for a reliable click.
+        // Catalyst's wheel event path can trap with repeated narrow-pane scrolls. Use a drag
+        // there; retain measured wheel steps for the wider layout where they are reliable.
         for _ in 0..<30 {
           if expandButton.isHittable,
              expandButton.frame.minY >= scroll.frame.minY + 24,
              expandButton.frame.maxY <= scroll.frame.maxY - 24 { break }
           #if targetEnvironment(macCatalyst)
-          let delta = expandButton.frame.maxY > scroll.frame.maxY - 24 ? -150.0 : 150.0
-          scroll.scroll(byDeltaX: 0, deltaY: delta)
+          if width == 360 {
+            if expandButton.frame.maxY > scroll.frame.maxY - 24 {
+              scroll.swipeUp(velocity: .slow)
+            } else {
+              scroll.swipeDown(velocity: .slow)
+            }
+          } else {
+            let delta = expandButton.frame.maxY > scroll.frame.maxY - 24 ? -150.0 : 150.0
+            scroll.scroll(byDeltaX: 0, deltaY: delta)
+          }
           #else
           if expandButton.frame.maxY > scroll.frame.maxY - 24 {
             scroll.swipeUp(velocity: .slow)
@@ -140,7 +182,7 @@ final class AlgorithmDetailCorpusUITests: XCTestCase {
         XCTAssertGreaterThanOrEqual(expandButton.frame.minY, scroll.frame.minY + 24)
         XCTAssertLessThanOrEqual(expandButton.frame.maxY, scroll.frame.maxY - 24)
         let bottom = XCTAttachment(screenshot: app.screenshot())
-        bottom.name = "\(String(format: "%03d", offset + 1))-\(algorithmID)-charts"
+        bottom.name = "\(prefix)\(String(format: "%03d", offset + 1))-\(algorithmID)-charts"
         bottom.lifetime = .keepAlways
         activity.add(bottom)
 
@@ -162,7 +204,7 @@ final class AlgorithmDetailCorpusUITests: XCTestCase {
         XCTAssertTrue(app.switches["Show Individual Runs"].exists)
         #endif
         let large = XCTAttachment(screenshot: app.screenshot())
-        large.name = "\(String(format: "%03d", offset + 1))-\(algorithmID)-expanded"
+        large.name = "\(prefix)\(String(format: "%03d", offset + 1))-\(algorithmID)-expanded"
         large.lifetime = .keepAlways
         activity.add(large)
         app.activateControlForUITest(app.buttons["Done"])
@@ -172,5 +214,205 @@ final class AlgorithmDetailCorpusUITests: XCTestCase {
       }
     }
     XCTAssertEqual(seen.count, range.count)
+  }
+}
+
+/// The regular corpus audit covers wide pages. This renders the same shipping Growth Model
+/// section at an iPad split-window width and retains every full-resolution capture for review.
+@MainActor
+final class GrowthModelNarrowCorpusUITests: XCTestCase {
+  func testPages001Through025() { audit(0..<25) }
+  func testPages026Through049() { audit(25..<49) }
+  func testPages050Through074() { audit(49..<74) }
+  func testPages075Through098() { audit(74..<98) }
+  func testPages099Through123() { audit(98..<123) }
+  func testPages124Through147() { audit(123..<147) }
+  func testPages148Through172() { audit(147..<172) }
+  func testPages173Through196() { audit(172..<196) }
+
+  private func audit(_ range: Range<Int>) {
+    continueAfterFailure = false
+    #if !targetEnvironment(macCatalyst)
+    XCUIDevice.shared.orientation = .portrait
+    #endif
+    let app = XCUIApplication()
+    app.launchEnvironment = [
+      "UI_TEST_DETAIL_AUDIT": "1",
+      "UI_TEST_DETAIL_AUDIT_START": String(range.lowerBound),
+      "UI_TEST_DETAIL_AUDIT_WIDTH": "360",
+      "UI_TEST_GROWTH_ONLY": "1"
+    ]
+    app.launch()
+    let scroll = app.scrollViews["auditDetailScrollView"]
+    XCTAssertTrue(scroll.waitForExistence(timeout: 10))
+
+    var seen = Set<String>()
+    for offset in range {
+      let id = app.staticTexts["auditAlgorithmID"]
+      let position = app.staticTexts["auditIndexLabel"]
+      XCTAssertTrue(id.waitForExistence(timeout: 5))
+      XCTAssertEqual(position.label, "\(offset + 1) of 196")
+      let algorithmID = id.label
+      XCTAssertTrue(seen.insert(algorithmID).inserted, "Duplicate page \(algorithmID)")
+      let growth = app.descendants(matching: .any)
+        .matching(identifier: "growthModelComparisonChart").firstMatch
+      XCTAssertTrue(growth.waitForExistence(timeout: 10), "Missing Growth Model for \(algorithmID)")
+      XCTAssertGreaterThan(growth.frame.width, 200, "Chart is too narrow for \(algorithmID)")
+      XCTAssertLessThanOrEqual(growth.frame.width, 297,
+                               "Chart exceeds its padded 296-point column for \(algorithmID)")
+      XCTAssertGreaterThanOrEqual(growth.frame.minX, scroll.frame.minX - 1)
+      XCTAssertLessThanOrEqual(growth.frame.maxX, scroll.frame.maxX + 1)
+      XCTAssertTrue(app.staticTexts.matching(
+        NSPredicate(format: "label BEGINSWITH %@", "Dotted line: maximum selectable size (")
+      ).firstMatch.exists, "Missing cutoff explanation for \(algorithmID)")
+      XCTContext.runActivity(named: "\(offset + 1) \(algorithmID)") { activity in
+        let capture = XCTAttachment(screenshot: app.screenshot())
+        capture.name = "growth-360-\(String(format: "%03d", offset + 1))-\(algorithmID)"
+        capture.lifetime = .keepAlways
+        activity.add(capture)
+      }
+      if offset < range.upperBound - 1 {
+        app.activateControlForUITest(app.buttons["auditNextButton"])
+      }
+    }
+    XCTAssertEqual(seen.count, range.count)
+  }
+}
+
+/// Audits the shipping compact Big-O panel at its narrowest supported detail width.
+@MainActor
+final class CompactBigONarrowCorpusUITests: XCTestCase {
+  func testPages001Through025() { audit(0..<25) }
+  func testPages026Through049() { audit(25..<49) }
+  func testPages050Through074() { audit(49..<74) }
+  func testPages075Through098() { audit(74..<98) }
+  func testPages099Through123() { audit(98..<123) }
+  func testPages124Through147() { audit(123..<147) }
+  func testPages148Through172() { audit(147..<172) }
+  func testPages173Through196() { audit(172..<196) }
+
+  private func audit(_ range: Range<Int>) {
+    continueAfterFailure = false
+    #if !targetEnvironment(macCatalyst)
+    XCUIDevice.shared.orientation = .portrait
+    #endif
+    let app = XCUIApplication()
+    app.launchEnvironment = [
+      "UI_TEST_DETAIL_AUDIT": "1",
+      "UI_TEST_DETAIL_AUDIT_START": String(range.lowerBound),
+      "UI_TEST_DETAIL_AUDIT_WIDTH": "360",
+      "UI_TEST_COMPACT_BIGO_ONLY": "1"
+    ]
+    app.launch()
+    let scroll = app.scrollViews["auditDetailScrollView"]
+    XCTAssertTrue(scroll.waitForExistence(timeout: 10))
+
+    var seen = Set<String>()
+    for offset in range {
+      let id = app.staticTexts["auditAlgorithmID"]
+      let position = app.staticTexts["auditIndexLabel"]
+      XCTAssertTrue(id.waitForExistence(timeout: 5))
+      XCTAssertEqual(position.label, "\(offset + 1) of 196")
+      let algorithmID = id.label
+      XCTAssertTrue(seen.insert(algorithmID).inserted, "Duplicate page \(algorithmID)")
+      let chart = app.descendants(matching: .any)
+        .matching(identifier: "bigOCorrelationChart").firstMatch
+      XCTAssertTrue(chart.waitForExistence(timeout: 10), "Missing compact Big-O chart for \(algorithmID)")
+      XCTAssertGreaterThan(chart.frame.width, 200, "Chart is too narrow for \(algorithmID)")
+      XCTAssertLessThanOrEqual(chart.frame.width, 297,
+                               "Chart exceeds its padded 296-point column for \(algorithmID)")
+      XCTAssertGreaterThanOrEqual(chart.frame.minX, scroll.frame.minX - 1)
+      XCTAssertLessThanOrEqual(chart.frame.maxX, scroll.frame.maxX + 1)
+      let legend = app.descendants(matching: .any)
+        .matching(identifier: "bigOCompactLegend").firstMatch
+      XCTAssertTrue(legend.exists, "Missing compact legend for \(algorithmID)")
+      XCTAssertLessThanOrEqual(legend.frame.maxX, scroll.frame.maxX + 1,
+                               "Legend clipped for \(algorithmID)")
+      let expand = app.buttons["Expand Chart"]
+      XCTAssertTrue(expand.exists, "Missing expanded-chart control for \(algorithmID)")
+      XCTAssertLessThanOrEqual(expand.frame.maxX, scroll.frame.maxX + 9,
+                               "Expanded-chart control clipped for \(algorithmID)")
+      XCTContext.runActivity(named: "\(offset + 1) \(algorithmID)") { activity in
+        let capture = XCTAttachment(screenshot: app.screenshot())
+        capture.name = "compact-bigo-360-\(String(format: "%03d", offset + 1))-\(algorithmID)"
+        capture.lifetime = .keepAlways
+        activity.add(capture)
+      }
+      if offset < range.upperBound - 1 {
+        app.activateControlForUITest(app.buttons["auditNextButton"])
+      }
+    }
+    XCTAssertEqual(seen.count, range.count)
+  }
+}
+
+@MainActor
+final class ExpandedBigONarrowInteractionUITests: XCTestCase {
+  func testDenseChartScrollsSelectsAndTogglesAtNarrowWidth() {
+    continueAfterFailure = false
+    #if !targetEnvironment(macCatalyst)
+    XCUIDevice.shared.orientation = .portrait
+    #endif
+    let app = XCUIApplication()
+    app.launchEnvironment = [
+      "UI_TEST_DETAIL_AUDIT": "1",
+      "UI_TEST_DETAIL_AUDIT_WIDTH": "360",
+      "UI_TEST_COMPACT_BIGO_ONLY": "1",
+      "UI_TEST_EXPANDED_WIDTH": "360"
+    ]
+    app.launch()
+    let compact = app.descendants(matching: .any)
+      .matching(identifier: "bigOCorrelationChart").firstMatch
+    XCTAssertTrue(compact.waitForExistence(timeout: 10))
+    app.activateControlForUITest(app.buttons["Expand Chart"])
+    let expanded = app.descendants(matching: .any)
+      .matching(identifier: "bigOCorrelationExpandedChart").firstMatch
+    XCTAssertTrue(expanded.waitForExistence(timeout: 10))
+    XCTAssertGreaterThan(expanded.frame.width, 250)
+    XCTAssertLessThanOrEqual(expanded.frame.width, 313)
+    #if !targetEnvironment(macCatalyst)
+    XCTAssertGreaterThanOrEqual(expanded.frame.minX, app.frame.minX)
+    XCTAssertLessThanOrEqual(expanded.frame.maxX, app.frame.maxX)
+    #endif
+    let legend = app.descendants(matching: .any)
+      .matching(identifier: "bigOReferenceLegend").firstMatch
+    XCTAssertTrue(legend.exists)
+    XCTAssertGreaterThanOrEqual(legend.frame.minX, expanded.frame.minX - 1)
+    XCTAssertLessThanOrEqual(legend.frame.maxX, expanded.frame.maxX + 1)
+    let individual = app.descendants(matching: .any)
+      .matching(identifier: "Show Individual Runs").firstMatch
+    XCTAssertTrue(individual.exists)
+    XCTAssertLessThanOrEqual(individual.frame.maxX, expanded.frame.maxX + 1)
+
+    let before = app.screenshot().pngRepresentation
+    #if targetEnvironment(macCatalyst)
+    expanded.scroll(byDeltaX: 300, deltaY: 0)
+    if app.screenshot().pngRepresentation == before {
+      expanded.scroll(byDeltaX: -600, deltaY: 0)
+    }
+    #else
+    expanded.swipeLeft(velocity: .slow)
+    #endif
+    XCTAssertNotEqual(app.screenshot().pngRepresentation, before,
+                      "Dense expanded chart did not scroll horizontally")
+
+    let selected = app.staticTexts["bigOSelectedSize"]
+    app.activateControlForUITest(app.buttons["Next Recorded Size"])
+    XCTAssertTrue(selected.label.hasPrefix("Array Size "))
+    let observed = app.staticTexts["bigOSelection.Observed"]
+    XCTAssertTrue(observed.exists)
+    let toggle = app.descendants(matching: .any)
+      .matching(identifier: "bigOSeriesToggle.Observed").firstMatch
+    XCTAssertTrue(toggle.exists)
+    app.activateControlForUITest(toggle)
+    XCTAssertFalse(observed.exists, "Hidden observed series remained in the selection")
+    app.activateControlForUITest(toggle)
+    XCTAssertTrue(observed.exists)
+    app.activateControlForUITest(individual)
+    XCTAssertTrue(expanded.exists)
+    let capture = XCTAttachment(screenshot: app.screenshot())
+    capture.name = "expanded-bigo-narrow-interactions"
+    capture.lifetime = .keepAlways
+    add(capture)
   }
 }

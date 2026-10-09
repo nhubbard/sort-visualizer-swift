@@ -24,6 +24,5 @@ of the three-way recursive merge above), fewer than the roughly n log²n compara
 network needs for large inputs, though still more than an asymptotically optimal O(n log n) network
 would use. Like other fixed comparator networks, its comparator count depends only on the input's
 length, so best-case, average-case, and worst-case running time are identical. Every comparator
-only ever swaps on a strict "greater than" test, and unlike some other networks in this family, no
-two equal elements are ever left to cross paths indirectly through a shared comparator partner, so
-this construction is a stable sort.
+only ever swaps on a strict "greater than" test, but nonadjacent exchanges can reverse the
+relative order of equal elements. The construction is therefore unstable.

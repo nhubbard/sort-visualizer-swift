@@ -20,10 +20,8 @@ sequence.
 Getting the exact split points requires rounding one-third and two-thirds of the range's width
 *upward*, the same subtlety plain Stooge sort's own two-thirds split depends on, an off-by-one
 here can misdivide the recursion on certain range widths without necessarily producing an
-incorrect result. Every comparison in this algorithm only ever decides which of two elements
-gets copied next, never allowing one to jump over an equal element without displacing it in a way
-that would change their relative order, so equal elements keep their original order and the sort is
-stable. Its unusual recursive shape, recursing into a two-thirds-sized range twice (once via the
+incorrect result. Its swap-based merge can move equal elements past one another, so the sort is
+unstable. Its unusual recursive shape, recursing into a two-thirds-sized range twice (once via the
 merge, once via the direct re-sort) alongside a one-third-sized range once, lands on the same O(n²)
 growth as an ordinary quadratic sort, despite superficially resembling the much worse O(n²·⁷¹) of
 plain Stooge sort.

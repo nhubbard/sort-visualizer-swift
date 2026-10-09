@@ -135,21 +135,28 @@ public func bigOChartPoints(
   // means a stray bad record degrades gracefully -- either ignored outright, or (if it was one of
   // only two distinct sizes) correctly falling through to the existing "not enough data" empty
   // state below -- rather than distorting the chart for every real point alongside it.
+  // Ignore malformed rows before grouping so they cannot skew either observed or reference data.
   let summaries = summaries.filter {
     $0.arraySize > 0 && $0.arraySize <= AlgorithmMetadata.maxReasonableArraySize
+      && $0.compareCount >= 0 && $0.swapCount >= 0 && $0.mainWriteCount >= 0
+      && $0.auxWriteCount >= 0 && $0.reversalCount >= 0
   }
 
-  var totalsBySize: [Int: [Int]] = [:]
+  var totalsBySize: [Int: [Double]] = [:]
   for summary in summaries {
+    // Convert each counter before adding; historical rows can exceed Int's combined range.
     let total =
-      summary.compareCount + summary.swapCount + summary.mainWriteCount
-      + summary.auxWriteCount + summary.reversalCount
+      Double(summary.compareCount) + Double(summary.swapCount)
+      + Double(summary.mainWriteCount) + Double(summary.auxWriteCount)
+      + Double(summary.reversalCount)
     totalsBySize[summary.arraySize, default: []].append(total)
   }
 
   guard totalsBySize.keys.count >= 2 else { return [] }
 
-  let maxObservedValue = totalsBySize.values.flatMap { $0 }.map(Double.init).max() ?? 1
+  guard let maxObservedValue = totalsBySize.values.flatMap({ $0 }).max(),
+    maxObservedValue > 0, maxObservedValue.isFinite
+  else { return [] }
 
   let runPoints = totalsBySize.flatMap { size, totals in
     totals.enumerated().map { index, total in
@@ -157,7 +164,7 @@ public func bigOChartPoints(
         id: "observed-run-\(size)-\(index)",
         series: "Observed",
         size: size,
-        normalizedValue: Double(total) / maxObservedValue,
+        normalizedValue: total / maxObservedValue,
         kind: .observedRun
       )
     }
@@ -166,7 +173,7 @@ public func bigOChartPoints(
   let distinctSizes = totalsBySize.keys.sorted()
   let trendPoints = distinctSizes.map { size -> BigOChartPoint in
     let totals = totalsBySize[size] ?? []
-    let average = Double(totals.reduce(0, +)) / Double(totals.count)
+    let average = totals.reduce(0, +) / Double(totals.count)
     return BigOChartPoint(
       id: "observed-trend-\(size)",
       series: "Observed",
@@ -206,7 +213,9 @@ public func bigOChartPoints(
   }
 
   let uniqueValueRatioSamples = summaries.compactMap { summary -> Double? in
-    guard let uniqueValueCount = summary.uniqueValueCount, summary.arraySize > 0 else { return nil }
+    guard let uniqueValueCount = summary.uniqueValueCount,
+      uniqueValueCount > 0, uniqueValueCount <= summary.arraySize
+    else { return nil }
     return Double(uniqueValueCount) / Double(summary.arraySize)
   }
   let uniqueValueRatio =
@@ -222,14 +231,15 @@ public func bigOChartPoints(
     guard
       let valueAtMaxSize = resolvedComplexityValue(
         complexity, n: maxSize, uniqueValueRatio: uniqueValueRatio),
-      valueAtMaxSize != 0
+      valueAtMaxSize > 0, valueAtMaxSize.isFinite
     else { return nil }
-    return (0..<sampleCount).map { index in
+    let points = (0..<sampleCount).compactMap { index -> BigOChartPoint? in
       let fraction = Double(index) / Double(sampleCount - 1)
       let size = minSize + fraction * (maxSize - minSize)
-      let value =
-        resolvedComplexityValue(complexity, n: max(size, 1), uniqueValueRatio: uniqueValueRatio)
-        ?? 0
+      guard let value = resolvedComplexityValue(
+        complexity, n: max(size, 1), uniqueValueRatio: uniqueValueRatio),
+        value >= 0, value.isFinite
+      else { return nil }
       return BigOChartPoint(
         id: "\(label)-\(index)",
         series: label,
@@ -238,6 +248,7 @@ public func bigOChartPoints(
         kind: .reference
       )
     }
+    return points.count == sampleCount ? points : nil
   }.flatMap { $0 }
 
   return runPoints + trendPoints + statPoints + referencePoints
@@ -248,22 +259,22 @@ public func bigOChartPoints(
 /// `Statistics.swift`/Welford helper -- that solves a different problem (an online running
 /// estimate during adaptive calibration sampling); here every total for a size is already fully
 /// materialized in memory, so a plain batch computation is simpler and just as correct.
-private func runStatistics(for totals: [Int]) -> (
+private func runStatistics(for totals: [Double]) -> (
   min: Double, max: Double, median: Double, mean: Double, standardDeviation: Double
 ) {
   let sorted = totals.sorted()
   let count = Double(sorted.count)
-  let mean = Double(sorted.reduce(0, +)) / count
+  let mean = sorted.reduce(0, +) / count
   let median: Double =
     sorted.count % 2 == 0
-    ? Double(sorted[sorted.count / 2 - 1] + sorted[sorted.count / 2]) / 2
-    : Double(sorted[sorted.count / 2])
+    ? (sorted[sorted.count / 2 - 1] + sorted[sorted.count / 2]) / 2
+    : sorted[sorted.count / 2]
   let standardDeviation: Double =
     sorted.count > 1
-    ? (sorted.reduce(0.0) { $0 + pow(Double($1) - mean, 2) } / (count - 1)).squareRoot()
+    ? (sorted.reduce(0.0) { $0 + pow($1 - mean, 2) } / (count - 1)).squareRoot()
     : 0
   return (
-    min: Double(sorted[0]), max: Double(sorted[sorted.count - 1]), median: median, mean: mean,
+    min: sorted[0], max: sorted[sorted.count - 1], median: median, mean: mean,
     standardDeviation: standardDeviation
   )
 }

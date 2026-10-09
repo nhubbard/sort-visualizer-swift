@@ -12,10 +12,9 @@ import SortEngineKit
 ///
 /// `O(n log^2 n)` comparators — confirmed empirically (the ratio of measured comparisons to
 /// `n log^2 n` converges to a near-constant ~0.27–0.31 across sizes 16 through 2048, unlike the
-/// steadily-growing ratio a plain `n log n` or `n^2` count would show). Every comparator only ever
-/// swaps on strict `>`, and fuzzing across randomized duplicate-heavy trials found no case where
-/// two equal elements crossed paths, confirming this network is stable rather than merely assuming
-/// it from the swap-on-strict-`>` rule alone.
+/// steadily-growing ratio a plain `n log n` or `n^2` count would show). Comparators swap only on
+/// strict `>`, but identity-tracking duplicate trials show that equal elements can cross
+/// indirectly, making the network unstable.
 public struct WeaveSortIterative: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "weavesortiterative")
   public let metadata = AlgorithmMetadata(
@@ -28,7 +27,7 @@ public struct WeaveSortIterative: SortAlgorithm {
     detectedGrowthModel: DetectedGrowthModel(
       family: .powerLog, coefficients: [6.88479, 1.22193], rSquared: 0.9991),
     implementationComplexity: 11,
-    stable: true,
+    stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n log^2 n)", average: "O(n log^2 n)", worst: "O(n log^2 n)"),
     spaceComplexity: "O(1)",

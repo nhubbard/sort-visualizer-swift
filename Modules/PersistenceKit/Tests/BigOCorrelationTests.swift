@@ -50,6 +50,44 @@ struct BigOCorrelationTests {
   }
 
   @Test
+  func negativeCountersAreIgnoredWithoutDistortingTheRemainingSizes() async throws {
+    let service = try makeInMemoryService()
+    try await record(service, size: 16, total: -100)
+    try await record(service, size: 16, total: 10)
+    try await record(service, size: 32, total: 20)
+
+    let summaries = try await service.fetchAllForTesting()
+    let points = bigOChartPoints(for: summaries, timeComplexity: quicksortComplexity)
+    let trend = points.filter { $0.kind == .observedTrend }.sorted { $0.size < $1.size }
+    #expect(trend.map(\.size) == [16, 32])
+    #expect(abs(trend[0].normalizedValue - 0.5) < 0.0001)
+    #expect(abs(trend[1].normalizedValue - 1.0) < 0.0001)
+  }
+
+  @Test
+  func allZeroCountersProduceAnEmptyStateInsteadOfNonfinitePoints() async throws {
+    let service = try makeInMemoryService()
+    try await record(service, size: 16, total: 0)
+    try await record(service, size: 32, total: 0)
+
+    let summaries = try await service.fetchAllForTesting()
+    #expect(bigOChartPoints(for: summaries, timeComplexity: quicksortComplexity).isEmpty)
+  }
+
+  @Test
+  func largeCountersDoNotOverflowWhileAggregatingRuns() async throws {
+    let service = try makeInMemoryService()
+    try await record(service, size: 16, total: Int.max)
+    try await record(service, size: 16, total: Int.max)
+    try await record(service, size: 32, total: Int.max)
+
+    let summaries = try await service.fetchAllForTesting()
+    let points = bigOChartPoints(for: summaries, timeComplexity: quicksortComplexity)
+    #expect(!points.isEmpty)
+    #expect(points.allSatisfy { $0.normalizedValue.isFinite })
+  }
+
+  @Test
   func averagesMultipleRunsAtTheSameSize() async throws {
     let service = try makeInMemoryService()
     try await record(service, size: 10, total: 4)

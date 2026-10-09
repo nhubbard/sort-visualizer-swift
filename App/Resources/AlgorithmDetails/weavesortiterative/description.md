@@ -16,6 +16,5 @@ level, weaving together comparator pairs at growing strides. This interleaving g
 Like other fixed comparator networks, this one's total comparator count depends only on the
 (padded) length of the input, so its best-case, average-case, and worst-case running times are
 identical, landing at O(n log²n), the same asymptotic class as Batcher's own constructions. Every
-comparator only ever swaps on a strict "greater than" test, and this particular network never lets
-two equal elements cross paths without an intervening comparison establishing their order, so it is
-a stable sort.
+comparator only ever swaps on a strict "greater than" test, but nonadjacent exchanges can reverse
+the relative order of equal elements. The network is unstable.
