@@ -183,13 +183,18 @@ public final class CoverageSweepDriver {
       let size = algorithm.metadata.effectiveSizeRange(
         operationCap: AppSettings.shared.recordingOperationCap
       ).upperBound
+      #if DEBUG
+        let runSize = ProcessInfo.processInfo.environment["UI_TEST_FULL_SWEEP_SIZE"].flatMap(Int.init) ?? size
+      #else
+        let runSize = size
+      #endif
       let comboInterval = Self.signposter.beginInterval(
         "FullSweepCombo", id: Self.signposter.makeSignpostID(),
-        "\(combo.algorithmID.rawValue) \(combo.shuffleID.rawValue) \(combo.visualizerID.rawValue) n=\(size)"
+        "\(combo.algorithmID.rawValue) \(combo.shuffleID.rawValue) \(combo.visualizerID.rawValue) n=\(runSize)"
       )
       await SortCoordinator.shared.runSort(
         algorithm: algorithm, visualizerID: combo.visualizerID, shuffleID: combo.shuffleID,
-        size: size)
+        size: runSize)
       Self.signposter.endInterval("FullSweepCombo", comboInterval)
 
       Self.appendToLog(combo, at: logURL)
@@ -202,8 +207,28 @@ public final class CoverageSweepDriver {
     let directory =
       FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
     try? FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+    #if DEBUG
+      if let name = ProcessInfo.processInfo.environment["UI_TEST_FULL_SWEEP_LOG_NAME"],
+        UUID(uuidString: name) != nil {
+        return directory.appendingPathComponent("full-sweep-coverage-\(name).tsv")
+      }
+    #endif
     return directory.appendingPathComponent("full-sweep-coverage.tsv")
   }
+
+  #if DEBUG
+    /// Raw rows retain duplicates, so the UI test can prove restart did not append a combo twice.
+    public var logAuditForUITesting: String {
+      let raw = (try? String(contentsOf: logURL, encoding: .utf8)) ?? ""
+      let rows = raw.split(separator: "\n").map {
+        String($0).replacingOccurrences(of: "\t", with: ",")
+      }.joined(separator: ";")
+      let current = currentCombo.map {
+        "\($0.algorithmID.rawValue),\($0.shuffleID.rawValue),\($0.visualizerID.rawValue)"
+      } ?? ""
+      return "\(isRunning)|\(completedCount)|\(totalCount)|\(current)|\(rows)"
+    }
+  #endif
 
   private static func readLog(at url: URL) -> Set<String> {
     guard let contents = try? String(contentsOf: url, encoding: .utf8) else { return [] }

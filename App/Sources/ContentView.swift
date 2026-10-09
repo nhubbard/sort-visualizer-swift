@@ -41,6 +41,9 @@ struct ContentView: View {
   // what's actually on screen (the bug this replaced).
   @State private var showcaseIndex: Int?
   @State private var showcaseAlgorithmIDs: [AlgorithmID] = []
+  #if DEBUG
+  @State private var showcaseCompletedCombos: [String] = []
+  #endif
   @State private var isShowingShowcaseConfirmation = false
   // Carries `showcaseSignposter`'s begin-interval token from `startShowcase()` across to whichever
   // of `advanceShowcase()`/`stopShowcase()` ends up closing it — `OSSignposter.endInterval`
@@ -173,6 +176,7 @@ struct ContentView: View {
         }
       }
     }
+    .accessibilityIdentifier("algorithmCategoryList")
     .navigationTitle("Sort Symphony v2")
     // Blocks manual category switching while Showcase or Full Sweep drives `selection` itself —
     // otherwise a stray tap here would race the automated advance below.
@@ -265,7 +269,7 @@ struct ContentView: View {
     case .none, .some(.all):
       // Same order Showcase mode itself uses — alphabetical, not registration order.
       base = AlgorithmRegistry.shared.algorithms.sorted {
-        $0.metadata.displayName < $1.metadata.displayName
+        ($0.metadata.displayName, $0.id.rawValue) < ($1.metadata.displayName, $1.id.rawValue)
       }
     case .some(.category(let category)):
       base = AlgorithmRegistry.shared.algorithms(in: category)
@@ -474,10 +478,27 @@ struct ContentView: View {
       }
     }
     .safeAreaInset(edge: .top) {
-      if showcaseIndex != nil {
-        showcaseBanner
-      } else if sweepDriver.isRunning {
-        fullSweepBanner
+      VStack(spacing: 0) {
+        #if DEBUG
+          if ProcessInfo.processInfo.environment["UI_TEST_AUTOMATION_AUDIT"] == "1" {
+            Text("Showcase audit probe")
+              .font(.caption2)
+              .accessibilityIdentifier("showcaseAuditProbe")
+              .accessibilityValue("\(showcaseIndex != nil)|\(showcaseCompletedCombos.joined(separator: ";"))")
+          }
+          if ProcessInfo.processInfo.environment["UI_TEST_FULL_SWEEP_LOG_NAME"] != nil {
+            Text("Coverage log probe")
+              .font(.caption2)
+              .accessibilityIdentifier("coverageSweepLogProbe")
+              .accessibilityValue(sweepDriver.logAuditForUITesting)
+              .task { sweepDriver.loadProgress() }
+          }
+        #endif
+        if showcaseIndex != nil {
+          showcaseBanner
+        } else if sweepDriver.isRunning {
+          fullSweepBanner
+        }
       }
     }
     // On the detail column, not the sidebar: the sidebar is narrow enough that two icon
@@ -581,8 +602,13 @@ struct ContentView: View {
   /// Same order the content column itself uses (`AlgorithmRegistry.shared.algorithms` sorted by
   /// `displayName` too) — alphabetical, not registration order.
   private func startShowcase() {
+    #if DEBUG
+      showcaseCompletedCombos = []
+    #endif
     showcaseAlgorithmIDs = AlgorithmRegistry.shared.algorithms
-      .sorted { $0.metadata.displayName < $1.metadata.displayName }
+      .sorted {
+        ($0.metadata.displayName, $0.id.rawValue) < ($1.metadata.displayName, $1.id.rawValue)
+      }
       .map(\.id)
     guard !showcaseAlgorithmIDs.isEmpty else { return }
     showcaseIndex = 0
@@ -605,6 +631,12 @@ struct ContentView: View {
   /// starts the next one fresh; past the last algorithm, ends the same way `stopShowcase()` does.
   private func advanceShowcase() {
     guard let showcaseIndex else { return }
+    #if DEBUG
+      showcaseCompletedCombos.append(
+        "\(showcaseAlgorithmIDs[showcaseIndex].rawValue),"
+          + "\(AppSettings.shared.defaultShuffleID.rawValue),"
+          + "\(AppSettings.shared.selectedVisualizerID.rawValue)")
+    #endif
     let nextIndex = showcaseIndex + 1
     guard nextIndex < showcaseAlgorithmIDs.count else {
       stopShowcase()

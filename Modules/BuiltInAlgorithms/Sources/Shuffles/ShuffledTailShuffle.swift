@@ -21,7 +21,7 @@ public struct ShuffledTailShuffle: ShuffleAlgorithm {
     var j = 0
     var k = 0
     while i < n {
-      if Double.random(in: 0..<1) < 1.0 / 7.0 {
+      if engine.randomUnitDouble() < 1.0 / 7.0 {
         aux[k] = values[i]
         engine.writeAux(auxHandle, at: k, value: values[i])
         k += 1
@@ -40,7 +40,7 @@ public struct ShuffledTailShuffle: ShuffleAlgorithm {
     engine.deleteAuxArray(auxHandle)
 
     for pos in j..<n {
-      engine.swap(pos, Int.random(in: pos..<n))
+      engine.swap(pos, engine.randomIndex(in: pos..<n))
     }
   }
 }

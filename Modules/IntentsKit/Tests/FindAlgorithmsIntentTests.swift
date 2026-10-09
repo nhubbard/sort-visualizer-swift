@@ -53,11 +53,66 @@ struct FindAlgorithmsIntentTests {
       .noActiveSession,
       .shuffleUnavailable,
       .visualizerUnavailable,
+      .requestedShuffleUnavailable,
+      .requestedVisualizerUnavailable,
     ].map { String(localized: $0.localizedStringResource) }
-    #expect(messages.count == 5)
+    #expect(messages.count == 7)
     #expect(messages.allSatisfy { !$0.isEmpty })
     #expect(messages[2].contains("No sort"))
     #expect(Set(messages).count == messages.count)
+  }
+
+  @Test
+  func runSortRejectsRemovedOptionalEntitiesBeforeChangingCoordinator() async throws {
+    let algorithms = AlgorithmRegistry.shared
+    let shuffles = ShuffleRegistry.shared
+    let visualizers = VisualizerRegistry.shared
+    let restoreAlgorithms = algorithms.builtIns
+    let restoreShuffles = shuffles.builtIns
+    let restoreVisualizers = visualizers.builtIns
+    defer {
+      algorithms.builtIns = restoreAlgorithms
+      algorithms.discover()
+      shuffles.builtIns = restoreShuffles
+      shuffles.discover()
+      visualizers.builtIns = restoreVisualizers
+      visualizers.discover()
+    }
+
+    let algorithm = FakeAlgorithm(
+      id: AlgorithmID(rawValue: "run-sort-entity-test"), category: .quick)
+    let shuffle = FakeShuffle(id: "removed-shuffle")
+    let visualizer = FakeVisualizer(id: VisualizerID(rawValue: "removed-visualizer"))
+    algorithms.builtIns = [algorithm]
+    algorithms.discover()
+    shuffles.builtIns = [shuffle]
+    shuffles.discover()
+    visualizers.builtIns = [visualizer]
+    visualizers.discover()
+    let algorithmEntity = AlgorithmEntity(algorithm: algorithm)
+    let shuffleEntity = ShuffleEntity(shuffle: shuffle)
+    let visualizerEntity = VisualizerEntity(visualizer: visualizer)
+    let initialToken = SortCoordinator.shared.runToken
+
+    visualizers.builtIns = []
+    visualizers.discover()
+    do {
+      _ = try await RunSortIntent(
+        algorithm: algorithmEntity, visualizer: visualizerEntity).perform()
+      Issue.record("Run Sort accepted a removed visualizer")
+    } catch SortSymphonyIntentError.requestedVisualizerUnavailable {
+    }
+    #expect(SortCoordinator.shared.runToken == initialToken)
+
+    shuffles.builtIns = []
+    shuffles.discover()
+    do {
+      _ = try await RunSortIntent(
+        algorithm: algorithmEntity, shuffle: shuffleEntity).perform()
+      Issue.record("Run Sort accepted a removed shuffle")
+    } catch SortSymphonyIntentError.requestedShuffleUnavailable {
+    }
+    #expect(SortCoordinator.shared.runToken == initialToken)
   }
 
   @Test
@@ -568,17 +623,29 @@ struct FindAlgorithmsIntentTests {
   @Test
   func runSortRoutesOverridesAndRejectsAnUnavailableAlgorithm() async throws {
     let registry = AlgorithmRegistry.shared
+    let shuffleRegistry = ShuffleRegistry.shared
+    let visualizerRegistry = VisualizerRegistry.shared
     let restoreBuiltIns = registry.builtIns
+    let restoreShuffles = shuffleRegistry.builtIns
+    let restoreVisualizers = visualizerRegistry.builtIns
     let coordinator = SortCoordinator.shared
     let restoreSelection = coordinator.selectedAlgorithmID
     defer {
       registry.builtIns = restoreBuiltIns
       registry.discover()
+      shuffleRegistry.builtIns = restoreShuffles
+      shuffleRegistry.discover()
+      visualizerRegistry.builtIns = restoreVisualizers
+      visualizerRegistry.discover()
       coordinator.selectedAlgorithmID = restoreSelection
     }
     let algorithm = FakeAlgorithm(id: AlgorithmID(rawValue: "override-sort"), category: .quick)
     let shuffle = FakeShuffle(id: "override-shuffle")
     let style = FakeVisualizer(id: VisualizerID(rawValue: "override-style"))
+    shuffleRegistry.builtIns = [shuffle]
+    shuffleRegistry.discover()
+    visualizerRegistry.builtIns = [style]
+    visualizerRegistry.discover()
     let intent = RunSortIntent(
       algorithm: AlgorithmEntity(algorithm: algorithm),
       visualizer: VisualizerEntity(visualizer: style), shuffle: ShuffleEntity(shuffle: shuffle),

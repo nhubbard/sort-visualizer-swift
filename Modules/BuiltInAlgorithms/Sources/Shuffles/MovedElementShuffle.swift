@@ -13,8 +13,8 @@ public struct MovedElementShuffle: ShuffleAlgorithm {
   public func record(into engine: inout RecordingEngine) {
     let n = engine.count
     guard n > 0 else { return }
-    let start = Int.random(in: 0..<n)
-    let dest = Int.random(in: 0..<n)
+    let start = engine.randomIndex(in: 0..<n)
+    let dest = engine.randomIndex(in: 0..<n)
     if dest < start {
       for i in stride(from: start, to: dest, by: -1) {
         engine.swap(i, i - 1)

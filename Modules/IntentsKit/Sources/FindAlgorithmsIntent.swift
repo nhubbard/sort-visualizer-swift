@@ -42,7 +42,9 @@ public struct FindAlgorithmsIntent: AppIntent {
       algorithms = AlgorithmRegistry.shared.algorithms(in: realCategory)
     } else {
       algorithms = AlgorithmRegistry.shared.algorithms
-        .sorted { $0.metadata.displayName < $1.metadata.displayName }
+        .sorted {
+          ($0.metadata.displayName, $0.id.rawValue) < ($1.metadata.displayName, $1.id.rawValue)
+        }
     }
     return .result(value: algorithms.map(AlgorithmEntity.init))
   }

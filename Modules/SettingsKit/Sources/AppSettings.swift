@@ -130,8 +130,10 @@ public final class AppSettings {
     let storedVisualizer = VisualizerID(
       rawValue: store.string(forKey: Keys.selectedVisualizerID) ?? "bargraph")
     let visualizers = VisualizerRegistry.shared.visualizers
+    let defaultVisualizer = VisualizerID(rawValue: "bargraph")
     selectedVisualizerID = visualizers.isEmpty || visualizers.contains(where: { $0.id == storedVisualizer })
-      ? storedVisualizer : (visualizers.first?.id ?? VisualizerID(rawValue: "bargraph"))
+      ? storedVisualizer : (visualizers.first(where: { $0.id == defaultVisualizer })?.id
+        ?? visualizers.first?.id ?? defaultVisualizer)
     let storedSpeed = store.double(forKey: Keys.playbackSpeed)
     playbackSpeed = storedSpeed.isFinite && storedSpeed > 0 ? storedSpeed : 30.0
     useFixedDurationPacing = store.bool(forKey: Keys.useFixedDurationPacing)
@@ -150,10 +152,16 @@ public final class AppSettings {
     recordingOperationCap = storedCap > 0 ? storedCap : 300_000
     let storedTheme = CodeThemeID(rawValue: store.string(forKey: Keys.codeTheme) ?? "monokai")
     codeTheme = CodeThemeID.knownIDs.contains(storedTheme) ? storedTheme : CodeThemeID(rawValue: "monokai")
-    let storedShuffle = ShuffleID(rawValue: store.string(forKey: Keys.defaultShuffleID) ?? "random")
+    let storedShuffleID = store.string(forKey: Keys.defaultShuffleID) ?? "random"
+    let storedShuffle = ShuffleID(rawValue: storedShuffleID == "naive" ? "random" : storedShuffleID)
     let shuffles = ShuffleRegistry.shared.shuffles
+    let defaultShuffle = ShuffleID(rawValue: "random")
     defaultShuffleID = shuffles.isEmpty || shuffles.contains(where: { $0.id == storedShuffle })
-      ? storedShuffle : (shuffles.first?.id ?? ShuffleID(rawValue: "random"))
+      ? storedShuffle : (shuffles.first(where: { $0.id == defaultShuffle })?.id
+        ?? shuffles.first?.id ?? defaultShuffle)
+    if storedShuffleID == "naive" {
+      store.set(defaultShuffleID.rawValue, forKey: Keys.defaultShuffleID)
+    }
   }
 
   private func persistNoteRange() {
@@ -200,7 +208,7 @@ public final class AppSettings {
   /// existing convention here rather than a shared one).
   public func cycleShuffle() {
     let shuffles = ShuffleRegistry.shared.shuffles.sorted {
-      $0.metadata.displayName < $1.metadata.displayName
+      ($0.metadata.displayName, $0.id.rawValue) < ($1.metadata.displayName, $1.id.rawValue)
     }
     guard !shuffles.isEmpty else { return }
     let currentIndex = shuffles.firstIndex { $0.id == defaultShuffleID } ?? -1

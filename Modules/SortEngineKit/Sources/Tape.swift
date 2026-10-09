@@ -13,7 +13,7 @@ public struct AuxHandle: Hashable, Sendable, Codable {
 public struct TapeHeader: Sendable, Codable, Equatable {
   public let algorithmID: String
   public let initialValues: [Int]
-  /// Seeds e.g. Radix's shuffled bucket→color map, deterministically.
+  /// Seeds shuffle decisions and visual choices such as Radix's bucket-to-color map.
   public let visualSeed: UInt64
   public let compareCount: Int
   public let swapCount: Int

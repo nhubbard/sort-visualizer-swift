@@ -101,3 +101,154 @@ final class FullSweepConfirmationUITests: XCTestCase {
     app.terminate()
   }
 }
+
+@MainActor
+final class FullSweepPersistenceUITests: XCTestCase {
+  private struct Audit {
+    let running: Bool
+    let completed: Int
+    let total: Int
+    let current: String
+    let rows: [String]
+  }
+
+  private func audit(_ element: XCUIElement) -> Audit? {
+    guard let raw = element.value as? String else { return nil }
+    let fields = raw.components(separatedBy: "|")
+    guard fields.count == 5, let completed = Int(fields[1]), let total = Int(fields[2]) else {
+      return nil
+    }
+    return Audit(
+      running: fields[0] == "true", completed: completed, total: total, current: fields[3],
+      rows: fields[4].isEmpty ? [] : fields[4].components(separatedBy: ";"))
+  }
+
+  private func waitForAudit(
+    _ element: XCUIElement, timeout: TimeInterval = 60, matching predicate: (Audit) -> Bool
+  ) -> Audit? {
+    let deadline = Date().addingTimeInterval(timeout)
+    while Date() < deadline {
+      if let state = audit(element), predicate(state) { return state }
+      Thread.sleep(forTimeInterval: 0.2)
+    }
+    XCTFail("Coverage log never reached expected state: \(element.value ?? "missing")")
+    return nil
+  }
+
+  private func startSweep(in app: XCUIApplication) {
+    #if targetEnvironment(macCatalyst)
+      app.buttons["Checklist with checkmarks"].click()
+      app.typeKey(.tab, modifierFlags: [])
+      app.typeKey(.space, modifierFlags: [])
+    #else
+      app.buttons["fullSweepButton"].tap()
+      app.buttons.matching(identifier: "fullSweepConfirmButton").firstMatch.tap()
+    #endif
+  }
+
+  func testFullSweepStopsPersistsAndResumesEveryCombinationExactlyOnce() {
+    continueAfterFailure = false
+    useLandscapeOrientationForUITest()
+    let app = XCUIApplication()
+    let common = [
+      "UI_TEST_AUTOMATION_ALGORITHMS": "threesmoothcombsortiterative",
+      "UI_TEST_AUTOMATION_SHUFFLES": "ascending,random",
+      "UI_TEST_AUTOMATION_VISUALIZERS": "bargraph,rainbow",
+      "UI_TEST_FULL_SWEEP_SIZE": "32",
+      "UI_TEST_FULL_SWEEP_LOG_NAME": UUID().uuidString,
+      "UI_TEST_ARRAY_SIZE": "32",
+    ]
+    app.launchEnvironment = common.merging(["UI_TEST_PLAYBACK_SPEED": "30"]) { _, new in new }
+    app.launch()
+    let probe = app.staticTexts["coverageSweepLogProbe"]
+    XCTAssertNotNil(waitForAudit(probe, matching: { !$0.running && $0.total == 4 && $0.rows.isEmpty }))
+    startSweep(in: app)
+    XCTAssertNotNil(waitForAudit(probe, matching: { $0.running && !$0.current.isEmpty }))
+    let stop = app.buttons["fullSweepStopButton"]
+    XCTAssertTrue(stop.waitForExistence(timeout: 5))
+    app.activateControlForUITest(stop)
+    let stopped = waitForAudit(probe, matching: { !$0.running && $0.completed == 1 })
+    XCTAssertEqual(stopped?.rows.count, 1)
+
+    app.terminate()
+    app.launchEnvironment = common.merging(["UI_TEST_PLAYBACK_SPEED": "1000"]) { _, new in new }
+    app.launch()
+    let restored = waitForAudit(probe, matching: { !$0.running && $0.completed == 1 })
+    XCTAssertEqual(restored?.rows, stopped?.rows)
+    startSweep(in: app)
+    let finished = waitForAudit(probe, timeout: 90, matching: { !$0.running && $0.completed == 4 })
+    let expected: Set<String> = [
+      "threesmoothcombsortiterative,ascending,bargraph",
+      "threesmoothcombsortiterative,ascending,rainbow",
+      "threesmoothcombsortiterative,random,bargraph",
+      "threesmoothcombsortiterative,random,rainbow",
+    ]
+    XCTAssertEqual(finished?.total, 4)
+    XCTAssertEqual(finished?.rows.count, 4, "the append-only log must contain no duplicate rows")
+    XCTAssertEqual(Set(finished?.rows ?? []), expected)
+    XCTAssertFalse(app.staticTexts["fullSweepProgressLabel"].exists)
+  }
+}
+
+@MainActor
+final class AutomationJourneyUITests: XCTestCase {
+  override func setUpWithError() throws {
+    continueAfterFailure = false
+    useLandscapeOrientationForUITest()
+  }
+
+  private func waitForValue(
+    _ element: XCUIElement, timeout: TimeInterval = 60,
+    matching predicate: (String) -> Bool
+  ) -> String? {
+    let deadline = Date().addingTimeInterval(timeout)
+    while Date() < deadline {
+      if let value = element.value as? String, predicate(value) { return value }
+      Thread.sleep(forTimeInterval: 0.2)
+    }
+    XCTFail("Automation probe never reached expected state: \(element.value ?? "missing")")
+    return nil
+  }
+
+  #if !targetEnvironment(macCatalyst)
+  func testShowcaseStopsAndThenTraversesAlphabeticalAlgorithms() {
+    let app = XCUIApplication()
+    let common = [
+      "UI_TEST_AUTOMATION_ALGORITHMS": "quicksort,threesmoothcombsortiterative",
+      "UI_TEST_AUTOMATION_SHUFFLES": "ascending,random",
+      "UI_TEST_AUTOMATION_VISUALIZERS": "bargraph,rainbow",
+      "UI_TEST_AUTOMATION_AUDIT": "1",
+      "UI_TEST_DETERMINISTIC_REPLAY": "1",
+    ]
+    app.launchEnvironment = common.merging([
+      "UI_TEST_SHOWCASE_SIZE": "128", "UI_TEST_PLAYBACK_SPEED": "30",
+    ]) { _, new in new }
+    app.launch()
+    let showcase = app.buttons["showcaseButton"]
+    app.activateControlForUITest(showcase)
+    app.buttons.matching(identifier: "showcaseConfirmButton").firstMatch.tap()
+    let probe = app.staticTexts["showcaseAuditProbe"]
+    XCTAssertNotNil(waitForValue(probe, matching: { $0 == "true|" }))
+    app.activateControlForUITest(showcase)
+    XCTAssertNotNil(waitForValue(probe, matching: { $0 == "false|" }))
+    XCTAssertFalse(app.staticTexts["showcaseProgressLabel"].exists)
+
+    app.terminate()
+    app.launchEnvironment = common.merging([
+      "UI_TEST_SHOWCASE_SIZE": "16", "UI_TEST_PLAYBACK_SPEED": "1000",
+    ]) { _, new in new }
+    app.launch()
+    app.activateControlForUITest(showcase)
+    app.buttons.matching(identifier: "showcaseConfirmButton").firstMatch.tap()
+    let completed = waitForValue(probe, matching: {
+      $0.hasPrefix("false|") && $0.components(separatedBy: ";").count == 2
+    })
+    let rows = completed?.components(separatedBy: "|").last?
+      .components(separatedBy: ";").map { $0.components(separatedBy: ",") } ?? []
+    XCTAssertEqual(rows.map { $0.first ?? "" }, ["threesmoothcombsortiterative", "quicksort"])
+    XCTAssertEqual(Set(rows.compactMap { $0.count == 3 ? $0[1] : nil }), ["ascending", "random"])
+    XCTAssertEqual(Set(rows.compactMap { $0.count == 3 ? $0[2] : nil }), ["bargraph", "rainbow"])
+    XCTAssertFalse(app.staticTexts["showcaseProgressLabel"].exists)
+  }
+  #endif
+}

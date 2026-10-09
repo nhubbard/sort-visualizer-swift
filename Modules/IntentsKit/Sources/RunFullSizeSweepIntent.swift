@@ -23,7 +23,9 @@ public struct RunFullSizeSweepIntent: AppIntent {
   @MainActor
   public func perform() async throws -> some IntentResult {
     let algorithms = AlgorithmRegistry.shared.algorithms
-      .sorted { $0.metadata.displayName < $1.metadata.displayName }
+      .sorted {
+        ($0.metadata.displayName, $0.id.rawValue) < ($1.metadata.displayName, $1.id.rawValue)
+      }
     for algorithm in algorithms {
       await SortCoordinator.shared.runAutomation(algorithm: algorithm, automationID: .sizeSweep)
     }

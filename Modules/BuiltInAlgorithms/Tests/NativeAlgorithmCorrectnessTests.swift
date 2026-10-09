@@ -10,6 +10,18 @@ import Testing
 @Suite
 struct NativeAlgorithmCorrectnessTests {
   @Test
+  func builtInCatalogHasUniqueIDsAndEveryCategory() {
+    let algorithms = AllBuiltInAlgorithms.sorts
+    let shuffles = AllBuiltInAlgorithms.shuffles
+    #expect(algorithms.count == 196)
+    #expect(Set(algorithms.map(\.id)).count == algorithms.count)
+    #expect(Set(algorithms.map { $0.metadata.category }) == Set(AlgorithmCategory.allCases))
+    #expect(shuffles.count == 43)
+    #expect(Set(shuffles.map(\.id)).count == shuffles.count)
+    #expect(!shuffles.contains { $0.id.rawValue == "naive" })
+  }
+
+  @Test
   func kotaSortMergesTheLastRestoredBlock() {
     let input = (0..<257).map { ($0 * 151) % 251 }.sorted(by: >)
     var engine = RecordingEngine(values: input, operationCap: 20_000_000)

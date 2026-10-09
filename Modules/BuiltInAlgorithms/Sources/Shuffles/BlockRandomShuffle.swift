@@ -25,7 +25,7 @@ public struct BlockRandomShuffle: ShuffleAlgorithm {
 
     var i = 0
     while i < usableLength {
-      let randomIndex = Int.random(in: 0..<((usableLength - i) / blockSize)) * blockSize + i
+      let randomIndex = engine.randomIndex(in: 0..<((usableLength - i) / blockSize)) * blockSize + i
       for offset in 0..<blockSize {
         engine.swap(i + offset, randomIndex + offset)
       }

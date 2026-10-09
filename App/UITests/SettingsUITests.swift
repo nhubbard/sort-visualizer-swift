@@ -98,6 +98,117 @@ final class SettingsUITests: XCTestCase {
     waitForExpectations(timeout: 5)
   }
 
+  func testFreshLaunchRecoversMalformedSettingsAndResetPersistsEveryDefault() {
+    let app = XCUIApplication()
+    let expected = "bargraph|30.0|false|10.0|false|false|false|36-72|256|300000|monokai|random"
+    app.launchEnvironment = ["UI_TEST_FRESH_SETTINGS": "1", "UI_TEST_SETTINGS_AUDIT": "1"]
+    app.launch()
+    app.openSettingsForUITest()
+    let audit = app.staticTexts["settingsAuditProbe"]
+    XCTAssertTrue(audit.waitForExistence(timeout: 5))
+    XCTAssertEqual(audit.value as? String, expected)
+
+    let pacing = app.segmentedControls["pacingModePicker"]
+    scrollUntilVisible(pacing, in: app)
+    app.activateControlForUITest(pacing.buttons["Fixed Duration"])
+    let modified = expected.replacingOccurrences(of: "|false|10.0|", with: "|true|10.0|")
+    XCTAssertEqual(audit.value as? String, modified)
+
+    app.terminate()
+    app.launchEnvironment = ["UI_TEST_SETTINGS_AUDIT": "1"]
+    app.launch()
+    app.openSettingsForUITest()
+    XCTAssertEqual(audit.value as? String, modified, "the changed pacing mode should survive relaunch")
+
+    app.terminate()
+    app.launchEnvironment = ["UI_TEST_SETTINGS_AUDIT": "1", "UI_TEST_CORRUPT_SETTINGS": "1"]
+    app.launch()
+    app.openSettingsForUITest()
+    XCTAssertEqual(audit.value as? String, expected, "malformed saved values should recover in a fresh UI")
+    XCTAssertTrue(app.sliders["playbackSpeedSlider"].exists)
+    let size = defaultSizeControl(in: app)
+    scrollUntilVisible(size, in: app)
+    XCTAssertTrue(size.label.hasSuffix(": 256"))
+
+    let reset = app.buttons["resetSettingsButton"]
+    scrollUntilVisible(reset, in: app)
+    app.activateControlForUITest(reset)
+    app.activateControlForUITest(resetConfirmationButton(in: app))
+    app.terminate()
+    app.launchEnvironment = ["UI_TEST_SETTINGS_AUDIT": "1"]
+    app.launch()
+    app.openSettingsForUITest()
+    XCTAssertEqual(audit.value as? String, expected, "reset should persist every default field")
+  }
+
+  func testSavedSettingsReachNewRunAndActiveControlsAfterRelaunch() {
+    let app = XCUIApplication()
+    let expectedSettings =
+      "rainbow|195.0|true|1.0|false|true|false|36-72|32|300000|dracula|descending"
+    let expectedRun = "true|32|195.0|true|1.0|descending|rainbow"
+    app.launchEnvironment = [
+      "UI_TEST_FRESH_SETTINGS": "1", "UI_TEST_SET02_PRESET": "1",
+      "UI_TEST_SETTINGS_AUDIT": "1", "UI_TEST_ACTIVE_SETTINGS_AUDIT": "1",
+    ]
+    app.launch()
+    app.openSettingsForUITest()
+    let settingsProbe = app.staticTexts["settingsAuditProbe"]
+    XCTAssertTrue(settingsProbe.waitForExistence(timeout: 5))
+    XCTAssertEqual(settingsProbe.value as? String, expectedSettings)
+
+    app.terminate()
+    app.launchEnvironment = [
+      "UI_TEST_SETTINGS_AUDIT": "1", "UI_TEST_ACTIVE_SETTINGS_AUDIT": "1",
+    ]
+    app.launch()
+    app.openSettingsForUITest()
+    XCTAssertEqual(settingsProbe.value as? String, expectedSettings)
+    XCTAssertTrue(app.sliders["targetPlaybackDurationSlider"].exists)
+    app.activateControlForUITest(app.buttons["Done"])
+
+    app.tapSidebarLink("algorithmLink.quicksort")
+    let active = app.staticTexts["activeSettingsProbe"]
+    XCTAssertTrue(active.waitForExistence(timeout: 10))
+    XCTAssertEqual(active.value as? String, expectedRun)
+    XCTAssertEqual(app.buttons["runControlSoundToggle"].label, "Mute")
+    let theme = app.staticTexts["codeThemeAppliedProbe"]
+    XCTAssertTrue(theme.waitForExistence(timeout: 15))
+    let applied = theme.value as? String ?? ""
+    XCTAssertTrue(applied.hasPrefix("dracula|"), "code theme was not applied: \(applied)")
+    XCTAssertGreaterThan(Int(applied.split(separator: "|").last ?? "0") ?? 0, 0)
+
+    app.activateControlForUITest(app.buttons["runControlSoundToggle"])
+    XCTAssertEqual(active.value as? String,
+      "false|32|195.0|true|1.0|descending|rainbow")
+    app.openSettingsForUITest()
+    XCTAssertEqual(settingsProbe.value as? String, expectedSettings,
+      "the active sound toggle must not overwrite the saved default")
+    app.activateControlForUITest(app.buttons["Done"])
+
+    app.tapSidebarLink("algorithmLink.selectionsort")
+    XCTAssertEqual(active.value as? String, expectedRun,
+      "a new session should seed sound and all run settings from persisted defaults")
+
+    app.openSettingsForUITest()
+    app.activateControlForUITest(app.buttons["visualizerPicker"])
+    #if targetEnvironment(macCatalyst)
+      let barGraph = app.menuItems["Bar Graph"]
+    #else
+      let barGraph = app.descendants(matching: .any)
+        .matching(NSPredicate(format: "label == %@", "Bar Graph")).firstMatch
+    #endif
+    XCTAssertTrue(barGraph.waitForExistence(timeout: 5))
+    app.activateControlForUITest(barGraph)
+    app.activateControlForUITest(app.buttons["Done"])
+    XCTAssertEqual(active.value as? String, "true|32|195.0|true|1.0|descending|bargraph")
+
+    app.openSettingsForUITest()
+    let reset = app.buttons["resetSettingsButton"]
+    scrollUntilVisible(reset, in: app)
+    app.activateControlForUITest(reset)
+    app.activateControlForUITest(resetConfirmationButton(in: app))
+  }
+
   /// Mirrors `DefaultPlaybackSpeedUITests`' own helper — the Settings `Form` doesn't put
   /// off-screen rows in the accessibility tree until scrolled into view.
   private func scrollUntilVisible(_ element: XCUIElement, in app: XCUIApplication) {

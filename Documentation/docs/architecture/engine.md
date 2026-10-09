@@ -61,6 +61,8 @@ public struct RecordingEngine: Sendable {
   public mutating func createAuxArray(length: Int) -> AuxHandle
   public mutating func writeAux(_ handle: AuxHandle, at index: Int, value: Int)
   public mutating func reversal(_ start: Int, _ end: Int)
+  public mutating func randomIndex(in range: Range<Int>) -> Int
+  public mutating func randomUnitDouble() -> Double
   public func finish() -> RecordingSummary
 }
 ```
@@ -75,6 +77,11 @@ algorithm's own choice. The algorithm controls when to retract it.
 LSD Radix's per-digit registers, bucket sort's buckets. Routing these writes through the engine,
 instead of using a plain Swift array, makes `auxWriteCount` and the visualizer's rendering of aux
 arrays possible.
+
+Shuffle randomness comes from the engine's seeded generator. `TapeFactory` chooses one seed before
+recording, passes it to the shuffle engine, and stores it as `TapeHeader.visualSeed`. Supplying the
+same seed reproduces the shuffle's values and operations; the stored tape remains the playback
+artifact.
 
 `RecordingEngine` enforces a hard operation cap (`RecordingEngine.defaultOperationCap`, 300,000).
 `SortSession` always passes the live, user-tunable `AppSettings.recordingOperationCap` instead of

@@ -18,7 +18,7 @@ public struct PairwiseShuffle: ShuffleAlgorithm {
 
     var i = n - 1
     while i > 0 {
-      let j = Int.random(in: 0...i)
+      let j = engine.randomIndex(in: 0...i)
       engine.swap(i, j)
       i -= 1
     }

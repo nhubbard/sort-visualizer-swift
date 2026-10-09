@@ -65,6 +65,21 @@ struct AppSettingsTests {
 
   @Test
   func malformedPersistedValuesRecoverBeforeViewsOrPlaybackUseThem() {
+    let visualizers = VisualizerRegistry.shared
+    let shuffles = ShuffleRegistry.shared
+    let previousVisualizers = visualizers.builtIns
+    let previousShuffles = shuffles.builtIns
+    defer {
+      visualizers.builtIns = previousVisualizers
+      visualizers.discover()
+      shuffles.builtIns = previousShuffles
+      shuffles.discover()
+    }
+    visualizers.builtIns = ["rainbow", "bargraph"].map(MockVisualizer.init)
+    visualizers.discover()
+    shuffles.builtIns = ["almost", "random"].map(MockShuffle.init)
+    shuffles.discover()
+
     let store = makeIsolatedStore()
     store.set("unknown-visualizer", forKey: "selectedVisualizerID")
     store.set(Double.nan, forKey: "playbackSpeed")
@@ -83,12 +98,27 @@ struct AppSettingsTests {
     #expect(settings.defaultArraySize == 256)
     #expect(settings.recordingOperationCap == 300_000)
     #expect(settings.codeTheme == CodeThemeID(rawValue: "monokai"))
-    if !VisualizerRegistry.shared.visualizers.isEmpty {
-      #expect(VisualizerRegistry.shared.visualizers.contains { $0.id == settings.selectedVisualizerID })
+    #expect(settings.selectedVisualizerID == VisualizerID(rawValue: "bargraph"))
+    #expect(settings.defaultShuffleID == ShuffleID(rawValue: "random"))
+  }
+
+  @Test
+  func retiredNaiveShufflePreferenceMigratesToRandom() {
+    let registry = ShuffleRegistry.shared
+    let restoreBuiltIns = registry.builtIns
+    defer {
+      registry.builtIns = restoreBuiltIns
+      registry.discover()
     }
-    if !ShuffleRegistry.shared.shuffles.isEmpty {
-      #expect(ShuffleRegistry.shared.shuffles.contains { $0.id == settings.defaultShuffleID })
-    }
+    registry.builtIns = ["other", "random"].map(MockShuffle.init)
+    registry.discover()
+
+    let store = makeIsolatedStore()
+    store.set("naive", forKey: "defaultShuffleID")
+    let settings = AppSettings(store: store)
+
+    #expect(settings.defaultShuffleID == ShuffleID(rawValue: "random"))
+    #expect(store.string(forKey: "defaultShuffleID") == "random")
   }
 
   /// Fully synchronous (no `await` between setup and assertions) so this critical section over

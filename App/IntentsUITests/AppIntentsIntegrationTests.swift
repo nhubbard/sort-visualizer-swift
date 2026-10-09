@@ -12,7 +12,8 @@ final class AppIntentsIntegrationTests: XCTestCase {
     let definitions = IntentDefinitions(bundleIdentifier: "com.nhubbard.Sort2.mobile")
     let result = try await definitions.intents["FindAlgorithmsIntent"].makeIntent().run()
     let algorithms = try result.value.as([AnyAppEntity].self)
-    XCTAssertGreaterThan(algorithms.count, 50, "the system should see the populated built-in catalog")
+    XCTAssertEqual(algorithms.count, 196)
+    XCTAssertEqual(Set(algorithms.map { $0.identifier.instanceIdentifier }).count, 196)
   }
 
   func testCategoryParameterFiltersThroughSystemResolution() async throws {
@@ -41,7 +42,9 @@ final class AppIntentsIntegrationTests: XCTestCase {
     let visualizers = try visualizerResult.value.as([AnyAppEntity].self)
     let automations = try automationResult.value.as([AnyAppEntity].self)
 
-    XCTAssertGreaterThan(shuffles.count, 1)
+    XCTAssertEqual(shuffles.count, 43)
+    XCTAssertEqual(Set(shuffles.map { $0.identifier.instanceIdentifier }).count, 43)
+    XCTAssertFalse(shuffles.contains { $0.identifier.instanceIdentifier == "naive" })
     XCTAssertGreaterThan(visualizers.count, 1)
     XCTAssertEqual(automations.count, 2)
   }
@@ -202,6 +205,135 @@ final class AppIntentsIntegrationTests: XCTestCase {
       .makeIntent(speed: 30.0).run()
   }
 
+  func testSystemSizeSweepRecordsBothRequestedSizes() async throws {
+    let app = XCUIApplication()
+    app.launchEnvironment = [
+      "UI_TEST_ARRAY_SIZE": "32", "UI_TEST_PLAYBACK_SPEED": "1000",
+      "UI_TEST_DETERMINISTIC_REPLAY": "1", "UI_TEST_SHORT_SIZE_SWEEP": "1",
+      "UI_TEST_AUTOMATION_AUDIT": "1",
+    ]
+    app.launch()
+    app.buttons["algorithmLink.threesmoothcombsortiterative"].tap()
+    let status = app.staticTexts["sortStatusLabel"]
+    XCTAssertEqual(XCTWaiter().wait(for: [XCTNSPredicateExpectation(
+      predicate: NSPredicate(format: "value == %@", "sorted"), object: status
+    )], timeout: 20), .completed)
+    let probe = app.staticTexts["automationAuditProbe"]
+    func audit() -> (count: Int, sizes: String)? {
+      guard let raw = probe.value as? String else { return nil }
+      let fields = raw.components(separatedBy: "|")
+      guard fields.count == 2, let count = Int(fields[0]) else { return nil }
+      return (count, fields[1])
+    }
+    let initialDeadline = Date().addingTimeInterval(20)
+    while audit() == nil && Date() < initialDeadline {
+      try await Task.sleep(for: .milliseconds(200))
+    }
+    let before = try XCTUnwrap(audit()).count
+
+    let definitions = IntentDefinitions(bundleIdentifier: "com.nhubbard.Sort2.mobile")
+    let catalog = try await definitions.intents["FindAlgorithmsIntent"].makeIntent().run()
+    let algorithms = try catalog.value.as([AnyAppEntity].self)
+    let algorithm = try XCTUnwrap(
+      algorithms.first { $0.identifier.instanceIdentifier == "threesmoothcombsortiterative" })
+    let options = try await definitions.intents["FindAutomationsIntent"].makeIntent().run()
+    let automations = try options.value.as([AnyAppEntity].self)
+    let sizeSweep = try XCTUnwrap(
+      automations.first { $0.identifier.instanceIdentifier == "sizeSweep" })
+    _ = try await definitions.intents["RunAutomationIntent"]
+      .makeIntent(algorithm: algorithm, automation: sizeSweep).run()
+
+    let completedDeadline = Date().addingTimeInterval(20)
+    while Date() < completedDeadline {
+      if let result = audit(), result.count == before + 2,
+        result.sizes.hasPrefix("64,32") { break }
+      try await Task.sleep(for: .milliseconds(200))
+    }
+    let completed = try XCTUnwrap(audit())
+    XCTAssertEqual(completed.count, before + 2)
+    XCTAssertTrue(completed.sizes.hasPrefix("64,32"), "completed sizes: \(completed.sizes)")
+    XCTAssertFalse(app.staticTexts["automationProgressLabel"].exists)
+  }
+
+  func testSystemSizeSweepPersistsCapSkipAndContinues() async throws {
+    let app = XCUIApplication()
+    app.launchEnvironment = [
+      "UI_TEST_ARRAY_SIZE": "16",
+      "UI_TEST_PLAYBACK_SPEED": "1000",
+      "UI_TEST_RECORDING_CAP": "5000",
+      "UI_TEST_CAP_SWEEP": "1",
+      "UI_TEST_CAP_LOG_PROBE": "5000",
+      "UI_TEST_DETERMINISTIC_REPLAY": "1",
+    ]
+    app.launch()
+    let algorithmLink = app.buttons["algorithmLink.threesmoothcombsortiterative"]
+    XCTAssertTrue(algorithmLink.waitForExistence(timeout: 5))
+    algorithmLink.tap()
+
+    let probe = app.staticTexts["capExceededLogProbe"]
+    let before = try waitForCapAudit(probe, timeout: 20) { $0.sessionCompletions == 1 }
+    let definitions = IntentDefinitions(bundleIdentifier: "com.nhubbard.Sort2.mobile")
+    let catalog = try await definitions.intents["FindAlgorithmsIntent"].makeIntent().run()
+    let algorithms = try catalog.value.as([AnyAppEntity].self)
+    let algorithm = try XCTUnwrap(
+      algorithms.first { $0.identifier.instanceIdentifier == "threesmoothcombsortiterative" })
+    let options = try await definitions.intents["FindAutomationsIntent"].makeIntent().run()
+    let automations = try options.value.as([AnyAppEntity].self)
+    let sizeSweep = try XCTUnwrap(
+      automations.first { $0.identifier.instanceIdentifier == "sizeSweep" })
+
+    _ = try await definitions.intents["RunAutomationIntent"]
+      .makeIntent(algorithm: algorithm, automation: sizeSweep).run()
+
+    let after = try waitForCapAudit(app.staticTexts["capExceededLogProbe"], timeout: 15) {
+      $0.capCount == before.capCount + 1 && $0.sessionCompletions == 2
+    }
+    XCTAssertEqual(after.latestSkippedSize, 256)
+    XCTAssertEqual(after.completedRecordCount, before.completedRecordCount + 2)
+    XCTAssertEqual(app.staticTexts["sortStatusLabel"].value as? String, "sorted")
+    XCTAssertFalse(app.staticTexts["automationProgressLabel"].exists)
+
+    app.terminate()
+    app.launch()
+    XCTAssertTrue(algorithmLink.waitForExistence(timeout: 5))
+    algorithmLink.tap()
+    let persisted = try waitForCapAudit(app.staticTexts["capExceededLogProbe"], timeout: 15) {
+      $0.capCount == after.capCount && $0.latestSkippedSize == 256
+    }
+    XCTAssertGreaterThanOrEqual(persisted.completedRecordCount, after.completedRecordCount)
+  }
+
+  private struct CapAudit {
+    let capCount: Int
+    let latestSkippedSize: Int
+    let completedRecordCount: Int
+    let sessionCompletions: Int
+  }
+
+  private func parseCapAudit(_ raw: String?) -> CapAudit? {
+    guard let raw else { return nil }
+    let parts = raw.split(separator: "|")
+    guard parts.count == 4,
+      let capCount = Int(parts[0]), let size = Int(parts[1]),
+      let completed = Int(parts[2]), let revision = Int(parts[3]) else { return nil }
+    return CapAudit(
+      capCount: capCount, latestSkippedSize: size,
+      completedRecordCount: completed, sessionCompletions: revision)
+  }
+
+  private func waitForCapAudit(
+    _ probe: XCUIElement, timeout: TimeInterval,
+    matching matches: (CapAudit) -> Bool
+  ) throws -> CapAudit {
+    let deadline = Date().addingTimeInterval(timeout)
+    while Date() < deadline {
+      if let audit = parseCapAudit(probe.value as? String), matches(audit) { return audit }
+      Thread.sleep(forTimeInterval: 0.2)
+    }
+    XCTFail("Cap log probe did not reach the expected persisted state: \(probe.value ?? "missing")")
+    return try XCTUnwrap(parseCapAudit(probe.value as? String))
+  }
+
   func testRunSortRejectsUnknownAlgorithmBeforeChangingTheVisibleSession() async throws {
     let app = XCUIApplication()
     app.launch()
@@ -289,8 +421,53 @@ final class AppIntentsIntegrationTests: XCTestCase {
     let secondChip = app.buttons["runControlSizeChip-\(second)"]
     XCTAssertTrue(secondChip.waitForExistence(timeout: 5))
     XCTAssertTrue(secondChip.isSelected, "the second request should replace the first session")
+    _ = try await definitions.intents["RunSortIntent"]
+      .makeIntent(algorithm: quickSort, size: Int.max).run()
+    XCTAssertEqual(status.value as? String, "sorted")
+    app.buttons["runControlSizeButton"].tap()
+    let maximum = try XCTUnwrap(sizes.last)
+    let maximumChip = app.buttons["runControlSizeChip-\(maximum)"]
+    XCTAssertTrue(maximumChip.waitForExistence(timeout: 5))
+    XCTAssertTrue(maximumChip.isSelected, "an oversized request should clamp to the reachable maximum")
     _ = try await definitions.intents["SetPlaybackSpeedIntent"]
       .makeIntent(speed: 30.0).run()
+  }
+
+  func testSystemRunSortReplacesBusyManualRunAfterInvalidEntityIsRejected() async throws {
+    let app = XCUIApplication()
+    app.launchEnvironment = ["UI_TEST_ARRAY_SIZE": "256"]
+    app.launch()
+    let definitions = IntentDefinitions(bundleIdentifier: "com.nhubbard.Sort2.mobile")
+    let catalog = try await definitions.intents["FindAlgorithmsIntent"].makeIntent().run()
+    let algorithms = try catalog.value.as([AnyAppEntity].self)
+    let quickSort = try XCTUnwrap(
+      algorithms.first { $0.identifier.instanceIdentifier == "quicksort" })
+
+    app.buttons["algorithmLink.threesmoothcombsortiterative"].tap()
+    let status = app.staticTexts["sortStatusLabel"]
+    XCTAssertTrue(status.waitForExistence(timeout: 10))
+    XCTAssertEqual(status.value as? String, "sorting")
+
+    var invalid = quickSort
+    invalid.identifier = .init(
+      entityType: quickSort.identifier.entityType,
+      instanceIdentifier: "not-a-bundled-algorithm")
+    do {
+      _ = try await definitions.intents["RunSortIntent"]
+        .makeIntent(algorithm: invalid, size: 16).run()
+      XCTFail("the system accepted an unavailable algorithm while a run was active")
+    } catch {
+      XCTAssertEqual(status.value as? String, "sorting",
+        "a rejected request must leave the active session alone")
+    }
+
+    _ = try await definitions.intents["RunSortIntent"]
+      .makeIntent(algorithm: quickSort, size: 16).run()
+    XCTAssertEqual(status.value as? String, "sorted")
+    app.buttons["runControlSizeButton"].tap()
+    let replacementSize = app.buttons["runControlSizeChip-16"]
+    XCTAssertTrue(replacementSize.waitForExistence(timeout: 5))
+    XCTAssertTrue(replacementSize.isSelected)
   }
 
   func testSystemPlaybackSpeedActionUpdatesTheOpenReplay() async throws {
@@ -354,6 +531,52 @@ final class AppIntentsIntegrationTests: XCTestCase {
     XCTAssertFalse(app.staticTexts["automationProgressLabel"].exists,
                    "Stop should clear automation progress after the active pass")
     XCTAssertEqual(app.staticTexts["sortStatusLabel"].value as? String, "sorted")
+    _ = try await definitions.intents["SetPlaybackSpeedIntent"]
+      .makeIntent(speed: 30.0).run()
+  }
+
+  func testSystemStopFinishesOnlyTheActivePassOfAVisibleSizeSweep() async throws {
+    let app = XCUIApplication()
+    app.launchEnvironment = [
+      "UI_TEST_ARRAY_SIZE": "32", "UI_TEST_PLAYBACK_SPEED": "100000",
+      "UI_TEST_INT03_SWEEP": "1", "UI_TEST_AUTOMATION_AUDIT": "1",
+    ]
+    app.launch()
+    app.buttons["algorithmLink.threesmoothcombsortiterative"].tap()
+    let status = app.staticTexts["sortStatusLabel"]
+    XCTAssertTrue(status.waitForExistence(timeout: 10))
+    XCTAssertEqual(status.value as? String, "sorted")
+
+    let audit = app.staticTexts["automationAuditProbe"]
+    XCTAssertTrue(audit.waitForExistence(timeout: 5))
+    func recordedSizes() -> (count: Int, sizes: [String])? {
+      guard let raw = audit.value as? String else { return nil }
+      let fields = raw.components(separatedBy: "|")
+      guard fields.count == 2, let count = Int(fields[0]) else { return nil }
+      return (count, fields[1].isEmpty ? [] : fields[1].components(separatedBy: ","))
+    }
+    let baseline = try XCTUnwrap(recordedSizes()).count
+    let definitions = IntentDefinitions(bundleIdentifier: "com.nhubbard.Sort2.mobile")
+    _ = try await definitions.intents["SetPlaybackSpeedIntent"]
+      .makeIntent(speed: 10.0).run()
+    app.buttons["startINT03SweepButton"].tap()
+    let progress = app.staticTexts["automationProgressLabel"]
+    XCTAssertTrue(progress.waitForExistence(timeout: 5))
+    _ = try await definitions.intents["StopIntent"].makeIntent().run()
+
+    let deadline = Date().addingTimeInterval(60)
+    while Date() < deadline {
+      if !progress.exists, let result = recordedSizes(), result.count >= baseline + 1 {
+        break
+      }
+      try await Task.sleep(for: .milliseconds(200))
+    }
+    XCTAssertFalse(progress.exists, "the system Stop request should end the size sweep")
+    let final = try XCTUnwrap(recordedSizes())
+    XCTAssertEqual(final.count, baseline + 1,
+      "Stop should finish the active pass without starting the next size")
+    XCTAssertEqual(final.sizes.first, "32")
+    XCTAssertEqual(status.value as? String, "sorted")
     _ = try await definitions.intents["SetPlaybackSpeedIntent"]
       .makeIntent(speed: 30.0).run()
   }

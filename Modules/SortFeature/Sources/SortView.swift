@@ -1,3 +1,5 @@
+import AlgorithmKit
+import PersistenceKit
 import SettingsKit
 import SortEngineKit
 import SwiftUI
@@ -20,6 +22,10 @@ public struct SortView: View {
   @State private var isSpeedExpanded = false
   @State private var isSizeExpanded = false
   @State private var isVisualizerExpanded = false
+  #if DEBUG
+  @State private var capAuditProbe = "loading"
+  @State private var automationAuditProbe = "loading"
+  #endif
   #if DEBUG && targetEnvironment(macCatalyst) && LOCAL_INSTRUMENTS_TRACING
   @State private var traceHistory = DebugTraceHistory.shared
   @State private var isTraceHistoryPresented = false
@@ -37,6 +43,62 @@ public struct SortView: View {
       } else {
         statusLabel
       }
+      #if DEBUG
+      if ProcessInfo.processInfo.environment["UI_TEST_INT03_SWEEP"] == "1" {
+        Button("Start test size sweep") {
+          let automation = Automation(
+            id: AutomationID(rawValue: "int03-stop-canary"), displayName: "Stop Canary",
+            iconName: "stop", key: "t", modifiers: [], runsPerSize: 1,
+            sizes: { _ in [32, 64] })
+          session.runAutomation(automation)
+        }
+        .accessibilityIdentifier("startINT03SweepButton")
+      }
+      if ProcessInfo.processInfo.environment["UI_TEST_AUTOMATION_AUDIT"] == "1" {
+        Text("Automation audit probe")
+          .font(.caption2)
+          .accessibilityIdentifier("automationAuditProbe")
+          .accessibilityValue(automationAuditProbe)
+          .task(id: session.analyticsRevision) {
+            do {
+              let records = try await AnalyticsService.shared.fetchSummaries(
+                algorithmID: session.algorithm.id)
+              automationAuditProbe = "\(records.count)|"
+                + records.prefix(5).map { String($0.arraySize) }.joined(separator: ",")
+            } catch {
+              automationAuditProbe = "error: \(error)"
+            }
+          }
+      }
+      if ProcessInfo.processInfo.environment["UI_TEST_ACTIVE_SETTINGS_AUDIT"] == "1",
+        let replay = session.lastReplay {
+        Text("Active settings probe")
+          .font(.caption2)
+          .accessibilityIdentifier("activeSettingsProbe")
+          .accessibilityValue(
+            "\(session.soundEnabled)|\(session.arraySize)|\(replay.speed)|"
+              + "\(replay.useFixedDurationPacing)|\(replay.targetDuration)|"
+              + "\(replay.header.shuffleID ?? "")|\(settings.selectedVisualizerID.rawValue)"
+          )
+      }
+      if let cap = ProcessInfo.processInfo.environment["UI_TEST_CAP_LOG_PROBE"].flatMap(Int.init) {
+        Text("Cap log probe")
+          .font(.caption2)
+          .accessibilityIdentifier("capExceededLogProbe")
+          .accessibilityValue(capAuditProbe)
+          .task(id: "\(session.isAutomating)-\(session.arraySize)-\(session.analyticsRevision)") {
+            do {
+              let audit = try await AnalyticsService.shared.capExceededAuditForUITesting(
+                algorithmID: session.algorithm.id.rawValue, operationCap: cap)
+              let completed = try await AnalyticsService.shared.fetchSummaries(
+                algorithmID: session.algorithm.id).count
+              capAuditProbe = "\(audit.count)|\(audit.latestSize ?? -1)|\(completed)|\(session.analyticsRevision)"
+            } catch {
+              capAuditProbe = "error: \(error)"
+            }
+          }
+      }
+      #endif
       #if DEBUG && targetEnvironment(macCatalyst) && LOCAL_INSTRUMENTS_TRACING
       if ProcessInfo.processInfo.environment["SORT_SYMPHONY_TRACE"] == "1" {
         traceControls
@@ -214,6 +276,21 @@ public struct SortView: View {
     MetalRendererView(replay: replay, visualizerID: settings.selectedVisualizerID)
       .id(ObjectIdentifier(replay))
       .accessibilityIdentifier("sortVisualizationCanvas")
+      .accessibilityLabel(
+        ProcessInfo.processInfo.environment["UI_TEST_TAPE_METADATA_PROBE"] == "1"
+          ? "\(replay.tape.header.algorithmID)|\(replay.tape.header.shuffleID ?? "")|"
+            + "\(replay.tape.header.visualSeed)|\(replay.tape.header.recordedAt.timeIntervalSince1970)|"
+            + "\(replay.tape.header.compareCount)|\(replay.tape.header.swapCount)|"
+            + "\(replay.tape.header.sortStartIndex)|\(replay.tape.operations.count)|"
+            + replay.tape.header.initialValues.map(String.init).joined(separator: ",")
+          : "Sort visualization"
+      )
+      .accessibilityValue(
+        ProcessInfo.processInfo.environment["UI_TEST_EXPOSE_FRAME"] == "1"
+          ? "\(replay.stepIndex)|\(replay.totalOperationCount)|\(session.arraySize)|\(Int(replay.speed))|"
+            + replay.frame.map { String($0.value) }.joined(separator: ",")
+          : ""
+      )
   }
 
   /// Machine-readable phase/correctness signal for UI tests — a `Canvas` has no discrete

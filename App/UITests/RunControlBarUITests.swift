@@ -296,4 +296,130 @@ final class RunControlBarUITests: XCTestCase {
     XCTAssertFalse(progress.waitForExistence(timeout: 5), "size sweep did not stop")
   }
   #endif
+
+  func testLargeReplayJourneyChecksEveryFinalFrame() throws {
+    try runLargeReplayJourney(initialSize: 240, nextSize: 256)
+  }
+
+  #if !targetEnvironment(macCatalyst)
+  func testPortraitReplayJourneyChecksEveryFinalFrame() throws {
+    XCUIDevice.shared.orientation = .portrait
+    try runLargeReplayJourney(initialSize: 128, nextSize: 144)
+  }
+  #endif
+
+  private func runLargeReplayJourney(initialSize: Int, nextSize: Int) throws {
+    let app = XCUIApplication()
+    app.launchEnvironment = [
+      "UI_TEST_ARRAY_SIZE": String(initialSize),
+      "UI_TEST_PLAYBACK_SPEED": "30",
+      "UI_TEST_DETERMINISTIC_REPLAY": "1",
+      "UI_TEST_EXPOSE_FRAME": "1",
+    ]
+    app.launch()
+    app.tapSidebarLink("algorithmLink.threesmoothcombsortiterative")
+
+    let canvas = app.descendants(matching: .any)
+      .matching(identifier: "sortVisualizationCanvas").firstMatch
+    let playPause = app.buttons["runControlPlayPauseButton"]
+    XCTAssertTrue(canvas.waitForExistence(timeout: 10))
+    XCTAssertTrue(playPause.waitForExistence(timeout: 10))
+    app.activateControlForUITest(playPause)
+    XCTAssertEqual(playPause.label, "Play")
+
+    let paused = try readReplayProbe(canvas)
+    XCTAssertEqual(paused.size, initialSize)
+    Thread.sleep(forTimeInterval: 0.5)
+    XCTAssertEqual(try readReplayProbe(canvas).step, paused.step)
+
+    app.activateControlForUITest(app.buttons["runControlStepForwardButton"])
+    XCTAssertEqual(try waitForReplayProbe(canvas, matching: { $0.step == paused.step + 1 }).step, paused.step + 1)
+    app.activateControlForUITest(app.buttons["runControlStepBackButton"])
+    XCTAssertEqual(try waitForReplayProbe(canvas, matching: { $0.step == paused.step }).step, paused.step)
+
+    app.activateControlForUITest(app.buttons["runControlSpeedButton"])
+    let speedSlider = app.sliders["runControlSpeedSlider"]
+    XCTAssertTrue(speedSlider.waitForExistence(timeout: 5))
+    speedSlider.adjust(toNormalizedSliderPosition: 0.9)
+    XCTAssertGreaterThan(try waitForReplayProbe(canvas, matching: { $0.speed > 30 }).speed, 30)
+    app.activateControlForUITest(app.buttons["runControlSpeedButton"])
+
+    app.activateControlForUITest(playPause)
+    let completed = try waitForReplayProbe(canvas, timeout: 60, matching: { $0.step == $0.total })
+    assertFinalFrame(completed, size: initialSize)
+    XCTAssertEqual(app.staticTexts["sortStatusLabel"].value as? String, "sorted")
+
+    app.activateControlForUITest(app.buttons["runControlJumpToStartButton"])
+    let start = try waitForReplayProbe(canvas, matching: { $0.step == 0 })
+    XCTAssertEqual(start.values, Array(1...initialSize))
+
+    app.sliders["runControlScrubSlider"].adjust(toNormalizedSliderPosition: 0.5)
+    let middle = try waitForReplayProbe(canvas, matching: { $0.step > 0 && $0.step < $0.total })
+    XCTAssertEqual(middle.size, initialSize)
+    app.activateControlForUITest(app.buttons["runControlJumpToEndButton"])
+    assertFinalFrame(try waitForReplayProbe(canvas, matching: { $0.step == $0.total }), size: initialSize)
+
+    app.activateControlForUITest(app.buttons["runControlSizeButton"])
+    let sizeChip = app.buttons["runControlSizeChip-\(nextSize)"]
+    XCTAssertTrue(sizeChip.waitForExistence(timeout: 5))
+    app.activateControlForUITest(sizeChip)
+    _ = try waitForReplayProbe(canvas, timeout: 20, matching: { $0.size == nextSize })
+    app.activateControlForUITest(app.buttons["runControlJumpToEndButton"])
+    assertFinalFrame(
+      try waitForReplayProbe(canvas, matching: { $0.size == nextSize && $0.step == $0.total }),
+      size: nextSize)
+
+    app.activateControlForUITest(app.buttons["runControlResetButton"])
+    _ = try waitForReplayProbe(canvas, timeout: 20, matching: {
+      $0.size == nextSize && $0.step < $0.total
+    })
+    app.activateControlForUITest(app.buttons["runControlJumpToEndButton"])
+    assertFinalFrame(
+      try waitForReplayProbe(canvas, matching: { $0.size == nextSize && $0.step == $0.total }),
+      size: nextSize)
+  }
+
+  private struct ReplayProbe {
+    let step: Int
+    let total: Int
+    let size: Int
+    let speed: Int
+    let values: [Int]
+  }
+
+  private func readReplayProbe(_ canvas: XCUIElement) throws -> ReplayProbe {
+    try XCTUnwrap(parseReplayProbe(canvas.value as? String), "Missing replay frame accessibility value")
+  }
+
+  private func parseReplayProbe(_ raw: String?) -> ReplayProbe? {
+    guard let raw else { return nil }
+    let parts = raw.split(separator: "|", omittingEmptySubsequences: false)
+    guard parts.count == 5,
+      let step = Int(parts[0]), let total = Int(parts[1]),
+      let size = Int(parts[2]), let speed = Int(parts[3]) else { return nil }
+    let values = parts[4].split(separator: ",").compactMap { Int($0) }
+    guard values.count == size else { return nil }
+    return ReplayProbe(
+      step: step, total: total, size: size, speed: speed, values: values
+    )
+  }
+
+  private func waitForReplayProbe(
+    _ canvas: XCUIElement, timeout: TimeInterval = 10,
+    matching matches: (ReplayProbe) -> Bool
+  ) throws -> ReplayProbe {
+    let deadline = Date().addingTimeInterval(timeout)
+    while Date() < deadline {
+      if let probe = parseReplayProbe(canvas.value as? String), matches(probe) { return probe }
+      Thread.sleep(forTimeInterval: 0.2)
+    }
+    XCTFail("Replay probe did not reach the expected state")
+    return try readReplayProbe(canvas)
+  }
+
+  private func assertFinalFrame(_ probe: ReplayProbe, size: Int) {
+    XCTAssertEqual(probe.step, probe.total)
+    XCTAssertEqual(probe.size, size)
+    XCTAssertEqual(probe.values, Array(1...size))
+  }
 }

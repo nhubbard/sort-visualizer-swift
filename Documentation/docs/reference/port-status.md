@@ -68,9 +68,11 @@ port-the-shared-template-once strategy:
 
 ## Shuffles
 
-ArrayV's `Shuffles.java` enum lists 45 cases, flat with no subdirectories. This app ships 44
-shuffles today, all complete. This project's original set of 5 shuffles did not map one-to-one
-onto ArrayV's list when shuffles were first ported, which accounts for the difference.
+ArrayV's `Shuffles.java` enum lists 45 cases, flat with no subdirectories. This app ships 43
+shuffles today. This project's original set of 5 shuffles did not map one-to-one onto ArrayV's
+list when shuffles were first ported. `NaiveShuffle` was subsequently removed after a Swift
+comparison of input structure and sorting traces found it practically redundant with the
+unbiased `RandomShuffle`.
 
 Notes on specific shuffles:
 

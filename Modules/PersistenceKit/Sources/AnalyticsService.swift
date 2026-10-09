@@ -94,6 +94,22 @@ public actor AnalyticsService {
       RecordingCapExceededSnapshot.init)
   }
 
+  #if DEBUG
+  /// UI-test probe for the actual saved store, including after an app relaunch.
+  public func capExceededAuditForUITesting(
+    algorithmID: String, operationCap: Int
+  ) throws -> (count: Int, latestSize: Int?) {
+    let descriptor = FetchDescriptor<RecordingCapExceededRecord>(
+      predicate: #Predicate {
+        $0.algorithmID == algorithmID && $0.operationCap == operationCap
+      },
+      sortBy: [SortDescriptor(\.recordedAt, order: .reverse)]
+    )
+    let records = try modelContext.fetch(descriptor)
+    return (records.count, records.first?.arraySize)
+  }
+  #endif
+
   /// Every recorded run for one algorithm, across every device that's ever completed a sort
   /// while signed into the same iCloud account — the real-world data `BigOCorrelation` charts
   /// against the classic Big-O reference curves. Sorted newest-first, matching the "most recent

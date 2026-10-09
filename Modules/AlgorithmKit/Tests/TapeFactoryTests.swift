@@ -54,8 +54,35 @@ private struct FakeRotateShuffle: ShuffleAlgorithm {
   }
 }
 
+private struct FakeSeededShuffle: ShuffleAlgorithm {
+  let id = ShuffleID(rawValue: "fake-seeded")
+  let metadata = ShuffleMetadata(displayName: "Fake Seeded")
+  func record(into engine: inout RecordingEngine) {
+    for i in stride(from: engine.count - 1, to: 0, by: -1) {
+      let partner = engine.randomIndex(in: 0...i)
+      engine.swap(i, partner)
+    }
+  }
+}
+
 @Suite
 struct TapeFactoryTests {
+  @Test
+  func suppliedSeedReproducesTheShufflePhaseAndIsStoredInTheTape() throws {
+    let seed: UInt64 = 0xDEAD_BEEF_1234_5678
+    let first = try TapeFactory.makeTape(
+      algorithm: FakeAlgorithm(), shuffle: FakeSeededShuffle(), size: 64,
+      operationCap: RecordingEngine.defaultOperationCap, randomSeed: seed)
+    let second = try TapeFactory.makeTape(
+      algorithm: FakeAlgorithm(), shuffle: FakeSeededShuffle(), size: 64,
+      operationCap: RecordingEngine.defaultOperationCap, randomSeed: seed)
+    #expect(first.header.visualSeed == seed)
+    #expect(second.header.visualSeed == seed)
+    #expect(first.header.sortStartIndex == second.header.sortStartIndex)
+    #expect(Array(first.operations.prefix(first.header.sortStartIndex)) ==
+            Array(second.operations.prefix(second.header.sortStartIndex)))
+  }
+
   @Test
   func concatenatedTapeOperationCountEqualsShuffleLengthPlusSortLength() throws {
     let size = 20

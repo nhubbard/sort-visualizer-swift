@@ -74,6 +74,7 @@ extension XCUIApplication {
         "algorithmLink.quicksort": "Quick Sort",
         "algorithmLink.bubblesort": "Bubble Sort",
         "algorithmLink.gnomesort": "Gnome Sort",
+        "algorithmLink.selectionsort": "Selection Sort",
       ]
       if !link.exists, let term = searchTerms[identifier] {
         let search = searchFields["Search Algorithms"]
