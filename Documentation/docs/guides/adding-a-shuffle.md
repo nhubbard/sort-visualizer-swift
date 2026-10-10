@@ -31,9 +31,10 @@ existing shuffle with a similar shape. Structured shuffles (radix, bitonic, merg
 Sierpinski) differ meaningfully from a plain randomized shuffle; pick a real precedent rather than
 starting blank.
 
-The deterministic-recording constraint from the algorithm guide applies here too. A
-`RecordingEngine` records one deterministic tape, so unbounded randomness has no meaning. Every
-built-in shuffle resolves this with a seeded or otherwise deterministic approach. Check
+The deterministic-recording constraint from the algorithm guide applies here too. Use
+`engine.randomIndex(in:)` and `engine.randomUnitDouble()` for random choices; the engine owns a
+seeded generator, and `TapeFactory` stores that seed in the tape header's `visualSeed`. Direct
+`Int.random` and `Double.random` calls cannot reproduce a shuffle from its seed. Check
 `RandomShuffle.swift` and a structured shuffle such as `RecursiveRadixShuffle.swift` for the two
 ends of that spectrum.
 
@@ -54,8 +55,9 @@ Shuffles do not need the dedicated-correctness-list distinction algorithms have,
 
 ## 3. Correctness testing has two tiers
 
-`Modules/BuiltInAlgorithms/Tests/NativeShuffleCorrectnessTests.swift` checks two properties. Which
-list your shuffle belongs in depends on what it guarantees:
+`Modules/BuiltInAlgorithms/Tests/NativeShuffleCorrectnessTests.swift` checks length, seeded
+reproduction, boundary sizes, and the promised output distribution. Which list your shuffle
+belongs in depends on what it guarantees:
 
 - **Every shuffle** belongs in the length-preservation check. This check is inexpensive.
 - **Shuffles that only rearrange existing values** — most of them — also belong in

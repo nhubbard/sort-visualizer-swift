@@ -1,10 +1,11 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
 public struct CocktailShakerSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "cocktailshakersort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Cocktail Shaker Sort",
+    displayName: String(localized: "Cocktail Shaker Sort", bundle: .module),
     category: .exchange,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -34,7 +35,13 @@ public struct CocktailShakerSort: SortAlgorithm {
       // flip their relative order.
       var j = i
       while j < n - i - 1 {
-        if engine.compare(j, j + 1, by: (>)) {
+        if engine.teachingCompare(
+          j, j + 1,
+          by: (>),
+          stageID: "CocktailShakerSort.forwardPass",
+          whenTrue: String(localized: "The left neighbor is larger, so exchange them during the forward pass.", bundle: .module),
+          whenFalse: String(localized: "The forward pass leaves this pair in place.", bundle: .module)
+        ) {
           engine.swap(j, j + 1)
           sorted = false
         }

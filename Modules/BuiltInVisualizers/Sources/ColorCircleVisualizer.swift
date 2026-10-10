@@ -9,7 +9,7 @@ import VisualizationKit
 public struct ColorCircleVisualizer: Visualizer {
   public let id = VisualizerID(rawValue: "colorcircle")
   public let metadata = VisualizerMetadata(
-    displayName: "Color Circle",
+    displayName: String(localized: "Color Circle", bundle: .module),
     supportsAuxArrays: false,
     iconName: "circle.hexagongrid.fill"
   )

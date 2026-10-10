@@ -10,7 +10,7 @@ import VisualizationKit
 public struct WaveDotsVisualizer: Visualizer {
   public let id = VisualizerID(rawValue: "wavedots")
   public let metadata = VisualizerMetadata(
-    displayName: "Wave Dots",
+    displayName: String(localized: "Wave Dots", bundle: .module),
     supportsAuxArrays: false,
     iconName: "water.waves"
   )
@@ -31,7 +31,8 @@ public struct WaveDotsVisualizer: Visualizer {
     let count = context.values.count
     let columnWidth = context.canvasSize.width / Double(count)
     let spanLength = Double(context.valueRange.upperBound - context.valueRange.lowerBound)
-    let radius = Self.dotDiameter / 2
+    let dotDiameter = min(Self.dotDiameter, context.canvasSize.width, context.canvasSize.height)
+    let radius = dotDiameter / 2
     let verticalCenter = context.canvasSize.height / 2
     // Sized so the wave's extremes (sin = ±1) land exactly at the canvas edge minus the dot's
     // own radius, rather than a fixed fraction of the height that only happens to leave enough
@@ -41,15 +42,16 @@ public struct WaveDotsVisualizer: Visualizer {
     return context.values.enumerated().map { index, value in
       let normalized =
         spanLength > 0
-        ? Double(value - context.valueRange.lowerBound) / spanLength
-        : 1.0
-      let centerX = Double(index) * columnWidth + columnWidth / 2
+          ? Double(value - context.valueRange.lowerBound) / spanLength
+          : 1.0
+      let centerX = min(max(Double(index) * columnWidth + columnWidth / 2, radius),
+                        context.canvasSize.width - radius)
       let centerY = verticalCenter + amplitude * sin(2 * Double.pi * normalized)
       return .ellipse(
         x: centerX - radius,
         y: centerY - radius,
-        width: Self.dotDiameter,
-        height: Self.dotDiameter,
+        width: dotDiameter,
+        height: dotDiameter,
         color: color(forIndex: index, in: context)
       )
     }

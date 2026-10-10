@@ -1,0 +1,355 @@
+{
+  "method": "complete xctrace options JSON + nonexistent PID; exit 21 means decoded and target absent, exit 57 means options rejected",
+  "note": "Integer 1 and string \"1\" have distinct labels; initial matrix output collision corrected by separate integer runs.",
+  "results": {
+    "Blank+Core Animation Commits/Core Animation Commits/expensiveCommitSampling": {
+      "float:1.5": {
+        "exitCode": 57,
+        "message": "Failed to load recording options from /tmp/animation-options-ls1nutch/options.json: The data couldn\u2019t be read because it isn\u2019t in the correct format."
+      },
+      "integer:-1": {
+        "exitCode": 57,
+        "message": "Failed to load recording options from /tmp/animation-options-ls1nutch/options.json: The data couldn\u2019t be read because it isn\u2019t in the correct format."
+      },
+      "integer:0": {
+        "exitCode": 21,
+        "message": "Cannot find process for provided pid: 99999999"
+      },
+      "integer:1": {
+        "exitCode": 21,
+        "message": "Cannot find process for provided pid: 99999999"
+      },
+      "integer:2": {
+        "exitCode": 21,
+        "message": "Cannot find process for provided pid: 99999999"
+      },
+      "string:1": {
+        "exitCode": 57,
+        "message": "Failed to load recording options from /tmp/animation-options-ls1nutch/options.json: The data couldn\u2019t be read because it isn\u2019t in the correct format."
+      }
+    },
+    "CPU Counters/CPU Counters/pmiThreshold": {
+      "-1": {
+        "exitCode": 57,
+        "message": "Failed to load recording options from /tmp/numeric-matrix-v1ek0drq/options.json: The data couldn\u2019t be read because it isn\u2019t in the correct format."
+      },
+      "0": {
+        "exitCode": 21,
+        "message": "Cannot find process for provided pid: 99999999"
+      },
+      "1.5": {
+        "exitCode": 57,
+        "message": "Failed to load recording options from /tmp/numeric-matrix-v1ek0drq/options.json: The data couldn\u2019t be read because it isn\u2019t in the correct format."
+      },
+      "18446744073709551615": {
+        "exitCode": 21,
+        "message": "Cannot find process for provided pid: 99999999"
+      },
+      "2": {
+        "exitCode": 21,
+        "message": "Cannot find process for provided pid: 99999999"
+      },
+      "2147483647": {
+        "exitCode": 21,
+        "message": "Cannot find process for provided pid: 99999999"
+      },
+      "251": {
+        "exitCode": 21,
+        "message": "Cannot find process for provided pid: 99999999"
+      },
+      "4294967296": {
+        "exitCode": 21,
+        "message": "Cannot find process for provided pid: 99999999"
+      },
+      "9223372036854775807": {
+        "exitCode": 21,
+        "message": "Cannot find process for provided pid: 99999999"
+      },
+      "integer:1": {
+        "exitCode": 21,
+        "message": "Cannot find process for provided pid: 99999999"
+      },
+      "string:1": {
+        "exitCode": 57,
+        "message": "Failed to load recording options from /tmp/numeric-matrix-v1ek0drq/options.json: The data couldn\u2019t be read because it isn\u2019t in the correct format."
+      }
+    },
+    "CPU Counters/CPU Counters/processBucketSize": {
+      "-1": {
+        "exitCode": 57,
+        "message": "Failed to load recording options from /tmp/numeric-matrix-v1ek0drq/options.json: The data couldn\u2019t be read because it isn\u2019t in the correct format."
+      },
+      "0": {
+        "exitCode": 21,
+        "message": "Cannot find process for provided pid: 99999999"
+      },
+      "1.5": {
+        "exitCode": 57,
+        "message": "Failed to load recording options from /tmp/numeric-matrix-v1ek0drq/options.json: The data couldn\u2019t be read because it isn\u2019t in the correct format."
+      },
+      "18446744073709551615": {
+        "exitCode": 21,
+        "message": "Cannot find process for provided pid: 99999999"
+      },
+      "2": {
+        "exitCode": 21,
+        "message": "Cannot find process for provided pid: 99999999"
+      },
+      "2147483647": {
+        "exitCode": 21,
+        "message": "Cannot find process for provided pid: 99999999"
+      },
+      "251": {
+        "exitCode": 21,
+        "message": "Cannot find process for provided pid: 99999999"
+      },
+      "4294967296": {
+        "exitCode": 21,
+        "message": "Cannot find process for provided pid: 99999999"
+      },
+      "9223372036854775807": {
+        "exitCode": 21,
+        "message": "Cannot find process for provided pid: 99999999"
+      },
+      "integer:1": {
+        "exitCode": 21,
+        "message": "Cannot find process for provided pid: 99999999"
+      },
+      "string:1": {
+        "exitCode": 57,
+        "message": "Failed to load recording options from /tmp/numeric-matrix-v1ek0drq/options.json: The data couldn\u2019t be read because it isn\u2019t in the correct format."
+      }
+    },
+    "Game Memory/VM Tracker/snapshotIntervalInSeconds": {
+      "-1": {
+        "exitCode": 21,
+        "message": "Cannot find process for provided pid: 99999999"
+      },
+      "0": {
+        "exitCode": 21,
+        "message": "Cannot find process for provided pid: 99999999"
+      },
+      "1.5": {
+        "exitCode": 57,
+        "message": "Failed to load recording options from /tmp/numeric-matrix-v1ek0drq/options.json: The data couldn\u2019t be read because it isn\u2019t in the correct format."
+      },
+      "18446744073709551615": {
+        "exitCode": 57,
+        "message": "Failed to load recording options from /tmp/numeric-matrix-v1ek0drq/options.json: The data couldn\u2019t be read because it isn\u2019t in the correct format."
+      },
+      "2": {
+        "exitCode": 21,
+        "message": "Cannot find process for provided pid: 99999999"
+      },
+      "2147483647": {
+        "exitCode": 21,
+        "message": "Cannot find process for provided pid: 99999999"
+      },
+      "251": {
+        "exitCode": 21,
+        "message": "Cannot find process for provided pid: 99999999"
+      },
+      "4294967296": {
+        "exitCode": 21,
+        "message": "Cannot find process for provided pid: 99999999"
+      },
+      "9223372036854775807": {
+        "exitCode": 21,
+        "message": "Cannot find process for provided pid: 99999999"
+      },
+      "integer:1": {
+        "exitCode": 21,
+        "message": "Cannot find process for provided pid: 99999999"
+      },
+      "string:1": {
+        "exitCode": 57,
+        "message": "Failed to load recording options from /tmp/numeric-matrix-v1ek0drq/options.json: The data couldn\u2019t be read because it isn\u2019t in the correct format."
+      }
+    },
+    "Leaks/Leaks/snapshotIntervalInSeconds": {
+      "-1": {
+        "exitCode": 21,
+        "message": "Cannot find process for provided pid: 99999999"
+      },
+      "0": {
+        "exitCode": 21,
+        "message": "Cannot find process for provided pid: 99999999"
+      },
+      "1.5": {
+        "exitCode": 57,
+        "message": "Failed to load recording options from /tmp/numeric-matrix-v1ek0drq/options.json: The data couldn\u2019t be read because it isn\u2019t in the correct format."
+      },
+      "18446744073709551615": {
+        "exitCode": 57,
+        "message": "Failed to load recording options from /tmp/numeric-matrix-v1ek0drq/options.json: The data couldn\u2019t be read because it isn\u2019t in the correct format."
+      },
+      "2": {
+        "exitCode": 21,
+        "message": "Cannot find process for provided pid: 99999999"
+      },
+      "2147483647": {
+        "exitCode": 21,
+        "message": "Cannot find process for provided pid: 99999999"
+      },
+      "251": {
+        "exitCode": 21,
+        "message": "Cannot find process for provided pid: 99999999"
+      },
+      "4294967296": {
+        "exitCode": 21,
+        "message": "Cannot find process for provided pid: 99999999"
+      },
+      "9223372036854775807": {
+        "exitCode": 21,
+        "message": "Cannot find process for provided pid: 99999999"
+      },
+      "integer:1": {
+        "exitCode": 21,
+        "message": "Cannot find process for provided pid: 99999999"
+      },
+      "string:1": {
+        "exitCode": 57,
+        "message": "Failed to load recording options from /tmp/numeric-matrix-v1ek0drq/options.json: The data couldn\u2019t be read because it isn\u2019t in the correct format."
+      }
+    },
+    "Processor Trace/Processor Trace/bufferSizeFill": {
+      "-1": {
+        "exitCode": 21,
+        "message": "Cannot find process for provided pid: 99999999"
+      },
+      "0": {
+        "exitCode": 21,
+        "message": "Cannot find process for provided pid: 99999999"
+      },
+      "1.5": {
+        "exitCode": 21,
+        "message": "Cannot find process for provided pid: 99999999"
+      },
+      "18446744073709551615": {
+        "exitCode": 21,
+        "message": "Cannot find process for provided pid: 99999999"
+      },
+      "2": {
+        "exitCode": 21,
+        "message": "Cannot find process for provided pid: 99999999"
+      },
+      "2147483647": {
+        "exitCode": 21,
+        "message": "Cannot find process for provided pid: 99999999"
+      },
+      "251": {
+        "exitCode": 21,
+        "message": "Cannot find process for provided pid: 99999999"
+      },
+      "4294967296": {
+        "exitCode": 21,
+        "message": "Cannot find process for provided pid: 99999999"
+      },
+      "9223372036854775807": {
+        "exitCode": 21,
+        "message": "Cannot find process for provided pid: 99999999"
+      },
+      "integer:1": {
+        "exitCode": 21,
+        "message": "Cannot find process for provided pid: 99999999"
+      },
+      "string:1": {
+        "exitCode": 57,
+        "message": "Failed to load recording options from /tmp/numeric-matrix-v1ek0drq/options.json: The data couldn\u2019t be read because it isn\u2019t in the correct format."
+      }
+    },
+    "Processor Trace/Processor Trace/bufferSizeWrap": {
+      "-1": {
+        "exitCode": 21,
+        "message": "Cannot find process for provided pid: 99999999"
+      },
+      "0": {
+        "exitCode": 21,
+        "message": "Cannot find process for provided pid: 99999999"
+      },
+      "1.5": {
+        "exitCode": 21,
+        "message": "Cannot find process for provided pid: 99999999"
+      },
+      "18446744073709551615": {
+        "exitCode": 21,
+        "message": "Cannot find process for provided pid: 99999999"
+      },
+      "2": {
+        "exitCode": 21,
+        "message": "Cannot find process for provided pid: 99999999"
+      },
+      "2147483647": {
+        "exitCode": 21,
+        "message": "Cannot find process for provided pid: 99999999"
+      },
+      "251": {
+        "exitCode": 21,
+        "message": "Cannot find process for provided pid: 99999999"
+      },
+      "4294967296": {
+        "exitCode": 21,
+        "message": "Cannot find process for provided pid: 99999999"
+      },
+      "9223372036854775807": {
+        "exitCode": 21,
+        "message": "Cannot find process for provided pid: 99999999"
+      },
+      "integer:1": {
+        "exitCode": 21,
+        "message": "Cannot find process for provided pid: 99999999"
+      },
+      "string:1": {
+        "exitCode": 57,
+        "message": "Failed to load recording options from /tmp/numeric-matrix-v1ek0drq/options.json: The data couldn\u2019t be read because it isn\u2019t in the correct format."
+      }
+    },
+    "Time Profiler/Hangs/hangsThreshold": {
+      "-1": {
+        "exitCode": 57,
+        "message": "Failed to load recording options from /tmp/numeric-matrix-v1ek0drq/options.json: The data couldn\u2019t be read because it isn\u2019t in the correct format."
+      },
+      "0": {
+        "exitCode": 21,
+        "message": "Cannot find process for provided pid: 99999999"
+      },
+      "1.5": {
+        "exitCode": 57,
+        "message": "Failed to load recording options from /tmp/numeric-matrix-v1ek0drq/options.json: The data couldn\u2019t be read because it isn\u2019t in the correct format."
+      },
+      "18446744073709551615": {
+        "exitCode": 21,
+        "message": "Cannot find process for provided pid: 99999999"
+      },
+      "2": {
+        "exitCode": 21,
+        "message": "Cannot find process for provided pid: 99999999"
+      },
+      "2147483647": {
+        "exitCode": 21,
+        "message": "Cannot find process for provided pid: 99999999"
+      },
+      "251": {
+        "exitCode": 21,
+        "message": "Cannot find process for provided pid: 99999999"
+      },
+      "4294967296": {
+        "exitCode": 21,
+        "message": "Cannot find process for provided pid: 99999999"
+      },
+      "9223372036854775807": {
+        "exitCode": 21,
+        "message": "Cannot find process for provided pid: 99999999"
+      },
+      "integer:1": {
+        "exitCode": 21,
+        "message": "Cannot find process for provided pid: 99999999"
+      },
+      "string:1": {
+        "exitCode": 57,
+        "message": "Failed to load recording options from /tmp/numeric-matrix-v1ek0drq/options.json: The data couldn\u2019t be read because it isn\u2019t in the correct format."
+      }
+    }
+  },
+  "xcode": "27.0 (27A266a)"
+}

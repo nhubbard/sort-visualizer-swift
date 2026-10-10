@@ -1,10 +1,11 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
 public struct MergeSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "mergesort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Merge Sort",
+    displayName: String(localized: "Merge Sort", bundle: .module),
     category: .merge,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -33,7 +34,17 @@ public struct MergeSort: SortAlgorithm {
       var high = mid
       var merged: [Int] = []
       while low < mid && high < end {
-        if engine.compare(high, low) {
+        let chooseLeft = engine.compare(high, low)
+        engine.annotateLastOperation(
+          stageID: "merge.chooseNext",
+          decisionID: "merge.runChoice",
+          outcome: chooseLeft ? "left" : "right",
+          roles: ["left": .arrayIndex(low), "right": .arrayIndex(high)],
+          explanationKey: "merge.runChoice",
+          explanation: chooseLeft
+            ? String(localized: "The left run has the smaller or equal value, so merge takes it next.", bundle: .module)
+            : String(localized: "The right run has the smaller value, so merge takes it next.", bundle: .module))
+        if chooseLeft {
           merged.append(engine.readValue(at: low))
           low += 1
         } else {

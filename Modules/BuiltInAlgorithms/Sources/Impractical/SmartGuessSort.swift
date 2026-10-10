@@ -1,10 +1,11 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
 public struct SmartGuessSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "smartguesssort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Smart Guess Sort",
+    displayName: String(localized: "Smart Guess Sort", bundle: .module),
     category: .impractical,
     sizeRange: 4...8,
     growthModel: OperationGrowthModel(
@@ -34,9 +35,27 @@ public struct SmartGuessSort: SortAlgorithm {
     var loops = [Int](repeating: 0, count: n)
 
     func isPairOK(_ i: Int) -> Bool {
-      if engine.compare(loops[i], loops[i + 1], by: (<)) { return true }
-      if engine.compare(loops[i], loops[i + 1], by: (==)), loops[i] < loops[i + 1] { return true }
-      return false
+      let increasing = engine.compare(loops[i], loops[i + 1], by: (<))
+      engine.annotateLastOperation(
+        stageID: "candidateCheck", decisionID: "smartguesssort.strictOrder",
+        outcome: increasing ? "acceptPair" : "checkTie",
+        roles: ["left": .arrayIndex(loops[i]), "right": .arrayIndex(loops[i + 1])],
+        explanationKey: "smartguesssort.strictOrder",
+        explanation: increasing
+          ? String(localized: "This mapped pair increases, so the candidate suffix remains valid.", bundle: .module)
+          : String(localized: "This mapped pair does not increase, so check whether its values tie.", bundle: .module))
+      if increasing { return true }
+      let equal = engine.compare(loops[i], loops[i + 1], by: (==))
+      let stableTie = equal && loops[i] < loops[i + 1]
+      engine.annotateLastOperation(
+        stageID: "candidateCheck", decisionID: "smartguesssort.stableTie",
+        outcome: stableTie ? "acceptPair" : "rejectCandidate",
+        roles: ["left": .arrayIndex(loops[i]), "right": .arrayIndex(loops[i + 1])],
+        explanationKey: "smartguesssort.stableTie",
+        explanation: stableTie
+          ? String(localized: "Equal values retain their source order, so this suffix pair is valid.", bundle: .module)
+          : String(localized: "This pair is descending or breaks stable tie order, so advance the candidate mapping.", bundle: .module))
+      return stableTie
     }
 
     /// -1 once every adjacent pair is OK; otherwise the position of the first pair (scanning
@@ -65,6 +84,11 @@ public struct SmartGuessSort: SortAlgorithm {
     let mapped = loops.map { engine.readValue(at: $0) }
     for i in 0..<n {
       engine.setValue(i, mapped[i])
+      engine.annotateLastOperation(
+        stageID: "candidatePlacement", decisionID: "smartguesssort.candidatePlacement",
+        outcome: "place", roles: ["destination": .arrayIndex(i)],
+        explanationKey: "smartguesssort.candidatePlacement",
+        explanation: String(localized: "This candidate permutation satisfies the ordering check and is placed here.", bundle: .module))
     }
   }
 }

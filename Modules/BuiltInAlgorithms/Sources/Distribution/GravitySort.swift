@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -14,7 +15,7 @@ import SortEngineKit
 public struct GravitySort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "gravitysort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Gravity (Bead) Sort",
+    displayName: String(localized: "Gravity (Bead) Sort", bundle: .module),
     category: .distribution,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -43,8 +44,28 @@ public struct GravitySort: SortAlgorithm {
     var minValue = engine.readValue(at: 0)
     var maxValue = engine.readValue(at: 0)
     for i in 1..<n {
-      if engine.readValue(at: i) < minValue { minValue = engine.readValue(at: i) }
-      if engine.readValue(at: i) > maxValue { maxValue = engine.readValue(at: i) }
+      let minimumCandidate = engine.readValue(at: i)
+      let newMinimum = minimumCandidate < minValue
+      engine.annotateLastOperation(
+        stageID: "heightScan", decisionID: "gravitysort.minimumHeight",
+        outcome: newMinimum ? "lowerBase" : "keepBase",
+        roles: ["column": .arrayIndex(i), "minimum": .value(minValue)],
+        explanationKey: "gravitysort.minimumHeight",
+        explanation: newMinimum
+          ? String(localized: "This shorter column lowers the base height for counting beads.", bundle: .module)
+          : String(localized: "The current base height remains the minimum.", bundle: .module))
+      if newMinimum { minValue = engine.readValue(at: i) }
+      let maximumCandidate = engine.readValue(at: i)
+      let newMaximum = maximumCandidate > maxValue
+      engine.annotateLastOperation(
+        stageID: "heightScan", decisionID: "gravitysort.maximumHeight",
+        outcome: newMaximum ? "raiseHeight" : "keepHeight",
+        roles: ["column": .arrayIndex(i), "maximum": .value(maxValue)],
+        explanationKey: "gravitysort.maximumHeight",
+        explanation: newMaximum
+          ? String(localized: "This taller column extends the bead height to reconstruct.", bundle: .module)
+          : String(localized: "The current maximum already covers this column.", bundle: .module))
+      if newMaximum { maxValue = engine.readValue(at: i) }
     }
 
     let mi = minValue
@@ -65,9 +86,21 @@ public struct GravitySort: SortAlgorithm {
       let shifted = engine.readValue(at: i) - mi
       x[i] = shifted
       engine.writeAux(xHandle, at: i, value: shifted)
+      engine.annotateLastOperation(
+        stageID: "scratchUpdate", decisionID: "gravitysort.scratchUpdate",
+        outcome: "update",
+        roles: ["scratch": .auxiliaryIndex(handle: xHandle.rawValue, index: i)],
+        explanationKey: "gravitysort.scratchUpdate",
+        explanation: String(localized: "Update the bead column or row count used to reconstruct the sorted values.", bundle: .module))
 
       y[shifted] += 1
       engine.writeAux(yHandle, at: shifted, value: y[shifted])
+      engine.annotateLastOperation(
+        stageID: "scratchUpdate", decisionID: "gravitysort.scratchUpdate",
+        outcome: "update",
+        roles: ["scratch": .auxiliaryIndex(handle: yHandle.rawValue, index: shifted)],
+        explanationKey: "gravitysort.scratchUpdate",
+        explanation: String(localized: "Update the bead column or row count used to reconstruct the sorted values.", bundle: .module))
     }
 
     // A backward partial sum turns "count of elements with this exact shifted value" into
@@ -75,6 +108,12 @@ public struct GravitySort: SortAlgorithm {
     for i in stride(from: ySize - 1, to: 0, by: -1) {
       y[i - 1] += y[i]
       engine.writeAux(yHandle, at: i - 1, value: y[i - 1])
+      engine.annotateLastOperation(
+        stageID: "scratchUpdate", decisionID: "gravitysort.scratchUpdate",
+        outcome: "update",
+        roles: ["scratch": .auxiliaryIndex(handle: yHandle.rawValue, index: i - 1)],
+        explanationKey: "gravitysort.scratchUpdate",
+        explanation: String(localized: "Update the bead column or row count used to reconstruct the sorted values.", bundle: .module))
     }
 
     // Walk every possible shifted value from highest to lowest, updating every array position
@@ -97,6 +136,11 @@ public struct GravitySort: SortAlgorithm {
         // values[i]`), not a behavior change, and cuts real, redundant tape volume.
         guard inc != 0 else { continue }
         engine.setValue(i, engine.readValue(at: i) + inc)
+        engine.annotateLastOperation(
+          stageID: "bucketPlacement", decisionID: "gravitysort.bucketPlacement",
+          outcome: "place", roles: ["destination": .arrayIndex(i)],
+          explanationKey: "gravitysort.bucketPlacement",
+          explanation: String(localized: "This column receives the number of beads counted at the current height.", bundle: .module))
       }
     }
 

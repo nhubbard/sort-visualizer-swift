@@ -1,10 +1,11 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
 public struct MergeBogoSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "mergebogosort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Merge Bogo Sort",
+    displayName: String(localized: "Merge Bogo Sort", bundle: .module),
     category: .impractical,
     sizeRange: 4...10,
     growthModel: OperationGrowthModel(
@@ -58,10 +59,20 @@ public struct MergeBogoSort: SortAlgorithm {
         let pullFromHigh = nextHighIndex < highOffsets.count && highOffsets[nextHighIndex] == offset
         if pullFromHigh {
           engine.setValue(start + offset, tmp[high])
+          engine.annotateLastOperation(
+            stageID: "candidatePlacement", decisionID: "mergebogosort.candidatePlacement",
+            outcome: "place", roles: ["destination": .arrayIndex(start + offset)],
+            explanationKey: "mergebogosort.candidatePlacement",
+            explanation: String(localized: "The chosen merge candidate places this value at its next output position.", bundle: .module))
           high += 1
           nextHighIndex += 1
         } else {
           engine.setValue(start + offset, tmp[low])
+          engine.annotateLastOperation(
+            stageID: "candidatePlacement", decisionID: "mergebogosort.candidatePlacement",
+            outcome: "place", roles: ["destination": .arrayIndex(start + offset)],
+            explanationKey: "mergebogosort.candidatePlacement",
+            explanation: String(localized: "The chosen merge candidate places this value at its next output position.", bundle: .module))
           low += 1
         }
       }

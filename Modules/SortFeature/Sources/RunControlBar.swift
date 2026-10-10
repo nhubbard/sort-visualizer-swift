@@ -1,7 +1,10 @@
+import Foundation
 import AlgorithmKit
 import SettingsKit
 import SortEngineKit
 import SwiftUI
+import TipKit
+import UIKit
 import VisualizationKit
 
 /// Docked below the sort visualization via `.safeAreaInset(edge: .bottom)`, reserving real layout
@@ -9,14 +12,14 @@ import VisualizationKit
 /// caption, then transport buttons. Speed/size/visualizer rows expand inline below the transport
 /// row on tap instead of using a `.popover`, so no `UIPopoverPresentationController` is involved.
 ///
-/// `transportRow`/`statsCaption` each offer a stacked-two-row `ViewThatFits` fallback — both rows
-/// are built from fixed-intrinsic-width buttons/stat cells (no flexible `.frame(maxWidth:
-/// .infinity)` content), so `ViewThatFits` can actually detect overflow and fall back.
+/// The transport and utility icons share a row when space allows, with a stacked fallback for
+/// narrower widths. Expanded controls appear below that row.
 struct RunControlBar: View {
   @Bindable var session: SortSession
   @Bindable var replay: ReplayEngine
   let algorithm: any SortAlgorithm
   @Environment(AppSettings.self) private var settings
+  @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
   // Bindings, not local `@State` — owned by `SortView`, which survives the phase churn
   // `session.start(size:)` (the size stepper's own action) drives this view through. See
@@ -24,6 +27,8 @@ struct RunControlBar: View {
   @Binding var isSpeedExpanded: Bool
   @Binding var isSizeExpanded: Bool
   @Binding var isVisualizerExpanded: Bool
+  @Binding var isVideoExpanded: Bool
+  let liveRecordingModel: LiveRecordingModel
 
   var body: some View {
     VStack(spacing: 8) {
@@ -39,6 +44,9 @@ struct RunControlBar: View {
       if isVisualizerExpanded {
         visualizerRow
       }
+      if isVideoExpanded {
+        LiveRecordingControls(model: liveRecordingModel)
+      }
     }
     .padding(12)
     .glassOrMaterialBackground()
@@ -46,6 +54,7 @@ struct RunControlBar: View {
     .animation(.easeInOut(duration: 0.2), value: isSpeedExpanded)
     .animation(.easeInOut(duration: 0.2), value: isSizeExpanded)
     .animation(.easeInOut(duration: 0.2), value: isVisualizerExpanded)
+    .animation(.easeInOut(duration: 0.2), value: isVideoExpanded)
     // Manual scrubbing/resizing would otherwise collide with the automation loop's own
     // repeated `start(size:)` calls — this bar goes fully inert while it's running.
     .disabled(session.isAutomating)
@@ -55,63 +64,69 @@ struct RunControlBar: View {
     Slider(
       value: Binding(
         get: { Double(replay.stepIndex) },
-        set: { replay.seek(to: Int($0.rounded())) }
+        set: {
+          replay.seek(to: Int($0.rounded()))
+          SeekingDiscoveryTip.hasSeeked = true
+          SeekingDiscoveryTip().invalidate(reason: .actionPerformed)
+        }
       ),
       in: 0...Double(max(replay.totalOperationCount, 1))
     )
     .accessibilityIdentifier("runControlScrubSlider")
+    .accessibilityLabel(String(localized: "Playback position", bundle: .module))
+    .accessibilityValue(String(localized: "Operation \(replay.stepIndex) of \(replay.totalOperationCount)", bundle: .module))
   }
 
-  /// `ViewThatFits` between one full-width row and two rows (playback transport, then
-  /// utilities) — both built from the same two extracted button-group views, so whichever
-  /// arrangement fits, every button (and its accessibility identifier) is still there for UI
-  /// tests to find. `PlaybackTransportButtons`/`UtilityButtons` are genuine child `View`s, not
-  /// computed properties on `RunControlBar` itself (like `AutomatorMenuButton` already is, for a
-  /// different reason) — `@Observable`'s dependency tracking is per-view-instance, so inlining
-  /// them as computed properties meant *every* button got reconstructed on every tick just
-  /// because `statsCaption` elsewhere in this same `body` reads `replay`'s per-tick-changing
-  /// counters. `UtilityButtons` in particular reads none of those counters, so as a real child
-  /// view it now only re-renders when something it actually displays changes (speed/size/sound
-  /// toggle state) — found via a Full Sweep profiling round that also fixed `CodeHighlighter` and
-  /// `AnalyticsService.fetchSummaries`. Each extracted view supplies its own `spacing: 20` rather
-  /// than relying on `HStack` flattening a nested view's multi-button body — this reproduces the
-  /// original uniform 20pt rhythm by direct structural correspondence instead of depending on
-  /// that flattening behavior working the same one level deeper.
+  /// Keep the original inline icon layout on wide windows. At accessibility text sizes the
+  /// transport and utility groups stack, allowing UtilityButtons to split into two rows.
   private var transportRow: some View {
-    ViewThatFits(in: .horizontal) {
-      HStack(spacing: 20) {
-        PlaybackTransportButtons(session: session, replay: replay)
-        Spacer()
-        UtilityButtons(
-          session: session, replay: replay, algorithm: algorithm,
-          isSpeedExpanded: $isSpeedExpanded, isSizeExpanded: $isSizeExpanded,
-          isVisualizerExpanded: $isVisualizerExpanded)
-      }
-      VStack(spacing: 8) {
-        PlaybackTransportButtons(session: session, replay: replay)
-        UtilityButtons(
-          session: session, replay: replay, algorithm: algorithm,
-          isSpeedExpanded: $isSpeedExpanded, isSizeExpanded: $isSizeExpanded,
-          isVisualizerExpanded: $isVisualizerExpanded)
+    Group {
+      if dynamicTypeSize.isAccessibilitySize {
+        VStack(spacing: 8) {
+          PlaybackTransportButtons(session: session, replay: replay)
+          utilityButtons
+        }
+      } else {
+        ViewThatFits(in: .horizontal) {
+          HStack(spacing: 20) {
+            PlaybackTransportButtons(session: session, replay: replay)
+            Spacer()
+            utilityButtons
+          }
+          VStack(spacing: 8) {
+            PlaybackTransportButtons(session: session, replay: replay)
+            utilityButtons
+          }
+        }
       }
     }
     .buttonStyle(.borderless)
     .controlSize(.large)
   }
 
+  private var utilityButtons: some View {
+    UtilityButtons(
+      session: session, replay: replay, algorithm: algorithm,
+      isSpeedExpanded: $isSpeedExpanded, isSizeExpanded: $isSizeExpanded,
+      isVisualizerExpanded: $isVisualizerExpanded,
+      isVideoExpanded: $isVideoExpanded)
+  }
+
   @ViewBuilder
   private var speedRow: some View {
     if replay.useFixedDurationPacing {
       HStack(spacing: 8) {
-        Text("1s")
+        Text(String(localized: "1s", bundle: .module))
           .font(.caption)
           .foregroundStyle(.secondary)
         Slider(value: $replay.targetDuration, in: 1...120, step: 1)
           .accessibilityIdentifier("runControlDurationSlider")
-        Text("120s")
+          .accessibilityLabel(String(localized: "Target duration", bundle: .module))
+          .accessibilityValue(String(localized: "\(Int(replay.targetDuration)) seconds", bundle: .module))
+        Text(String(localized: "120s", bundle: .module))
           .font(.caption)
           .foregroundStyle(.secondary)
-        Text("target: \(Int(replay.targetDuration))s")
+        Text(String(localized: "target: \(Int(replay.targetDuration))s", bundle: .module))
           .font(.caption.monospacedDigit())
           .foregroundStyle(.secondary)
           .frame(minWidth: 120, alignment: .trailing)
@@ -119,15 +134,17 @@ struct RunControlBar: View {
       }
     } else {
       HStack(spacing: 8) {
-        Text("Slow")
+        Text(String(localized: "Slow", bundle: .module))
           .font(.caption)
           .foregroundStyle(.secondary)
         Slider(value: $replay.speed, in: 1...1000, step: 1)
           .accessibilityIdentifier("runControlSpeedSlider")
-        Text("Fast")
+          .accessibilityLabel(String(localized: "Playback speed", bundle: .module))
+          .accessibilityValue(String(localized: "\(Int(replay.speed)) operations per second", bundle: .module))
+        Text(String(localized: "Fast", bundle: .module))
           .font(.caption)
           .foregroundStyle(.secondary)
-        Text("target: \(Int(replay.speed)) ops/sec")
+        Text(String(localized: "target: \(Int(replay.speed)) ops/sec", bundle: .module))
           .font(.caption.monospacedDigit())
           .foregroundStyle(.secondary)
           .frame(minWidth: 120, alignment: .trailing)
@@ -147,7 +164,7 @@ struct RunControlBar: View {
       operationCap: settings.recordingOperationCap)
     let sizes = effectiveSizeRange.steppedValues(by: effectiveSizeRange.steppedSizeStep)
     return HStack(spacing: 8) {
-      Text("Size")
+      Text(String(localized: "Size", bundle: .module))
         .font(.caption)
         .foregroundStyle(.secondary)
       SizeChipRow(
@@ -164,19 +181,31 @@ struct RunControlBar: View {
   /// `⌘⇧V`/`AppSettings.cycleVisualizer()` already changes, not a second mechanism.
   private var visualizerRow: some View {
     @Bindable var settings = settings
-    return HStack(spacing: 8) {
-      Text("Visualizer")
-        .font(.caption)
-        .foregroundStyle(.secondary)
-      Picker("Visualizer", selection: $settings.selectedVisualizerID) {
-        ForEach(VisualizerRegistry.shared.visualizers, id: \.id) { visualizer in
-          Text(visualizer.metadata.displayName).tag(visualizer.id)
+    return GeometryReader { geometry in
+      ScrollView(.horizontal, showsIndicators: false) {
+        HStack(spacing: 12) {
+          Text(String(localized: "Visualizer", bundle: .module))
+            .font(.caption)
+            .foregroundStyle(.secondary)
+            .accessibilityIdentifier("runControlVisualizerLabel")
+          Picker(String(localized: "Visualizer", bundle: .module), selection: $settings.selectedVisualizerID) {
+            ForEach(VisualizerRegistry.shared.visualizers, id: \.id) { visualizer in
+              Text(visualizer.metadata.displayName).tag(visualizer.id)
+            }
+          }
+          .pickerStyle(.menu)
+          .labelsHidden()
+          .accessibilityIdentifier("runControlVisualizerPicker")
+          if settings.selectedVisualizerID.rawValue == "customimage" {
+            CustomImagePickerControls(presentation: .inline)
+          }
         }
+        .fixedSize(horizontal: true, vertical: false)
+        .frame(minWidth: geometry.size.width, alignment: .center)
       }
-      .pickerStyle(.menu)
-      .labelsHidden()
-      .accessibilityIdentifier("runControlVisualizerPicker")
+      .accessibilityIdentifier("runControlVisualizerRowScroll")
     }
+    .frame(height: 44)
   }
 
 }
@@ -194,21 +223,39 @@ struct RunControlBar: View {
 private struct RunControlStatsCaption: View {
   let replay: ReplayEngine
   @State private var displayed = DisplayedStats()
+  @State private var isExpanded = false
+  @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
   private static let refreshInterval = Duration.milliseconds(33)
 
   var body: some View {
-    ViewThatFits(in: .horizontal) {
-      HStack(spacing: 12) { statCells }
-      VStack(spacing: 4) {
-        HStack(spacing: 12) { firstHalfStatCells }
-        HStack(spacing: 12) { secondHalfStatCells }
+    Group {
+      if dynamicTypeSize.isAccessibilitySize {
+        DisclosureGroup(isExpanded: $isExpanded) {
+          LazyVGrid(
+            columns: [GridItem(.flexible()), GridItem(.flexible())],
+            alignment: .leading, spacing: 8
+          ) {
+            statCells
+          }
+        } label: {
+          Text(String(localized: "Statistics: \(displayed.compareCount) compares, \(displayed.swapCount) swaps", bundle: .module))
+        }
+        .accessibilityIdentifier("runControlStatsCaption")
+      } else {
+        ViewThatFits(in: .horizontal) {
+          HStack(spacing: 12) { statCells }
+          VStack(spacing: 4) {
+            HStack(spacing: 12) { firstHalfStatCells }
+            HStack(spacing: 12) { secondHalfStatCells }
+          }
+        }
+        .accessibilityElement(children: .combine)
+        .accessibilityIdentifier("runControlStatsCaption")
       }
     }
     .font(.caption)
     .foregroundStyle(.secondary)
-    .accessibilityElement(children: .combine)
-    .accessibilityIdentifier("runControlStatsCaption")
     .task {
       while !Task.isCancelled {
         let next = DisplayedStats(replay: replay)
@@ -224,17 +271,19 @@ private struct RunControlStatsCaption: View {
   // `ViewThatFits` candidate above can lay them out as two rows of four.
   @ViewBuilder
   private var firstHalfStatCells: some View {
-    statCell(displayed.compareCount, digits: 6, label: "compares")
-    statCell(displayed.swapCount, digits: 6, label: "swaps")
-    statCell(displayed.reversalCount, digits: 4, label: "reversals")
-    statCell(displayed.mainWriteCount, digits: 6, label: "writes")
+    statCell(displayed.compareCount, digits: 6, label: String(localized: "compares", bundle: .module))
+    statCell(displayed.swapCount, digits: 6, label: String(localized: "swaps", bundle: .module))
+    statCell(displayed.reversalCount, digits: 4, label: String(localized: "reversals", bundle: .module))
+    statCell(displayed.mainWriteCount, digits: 6, label: String(localized: "writes", bundle: .module))
   }
 
   @ViewBuilder
   private var secondHalfStatCells: some View {
-    statCell(displayed.auxWriteCount, digits: 6, label: "aux writes")
-    statCell(displayed.externalArrayItemCount, digits: 5, label: "in external arrays")
-    statSlot(String(format: "%.1fs", displayed.elapsedPlaybackDuration), digits: 6)
+    statCell(displayed.auxWriteCount, digits: 6, label: String(localized: "aux writes", bundle: .module))
+    statCell(displayed.externalArrayItemCount, digits: 5, label: String(localized: "in external arrays", bundle: .module))
+    let duration = displayed.elapsedPlaybackDuration.formatted(
+      .number.precision(.fractionLength(1)))
+    statSlot(String(localized: "\(duration)s", bundle: .module), digits: 6)
     // Number and unit are separate `Text`s, not one formatted string — folding " ops/sec" into
     // the same string let the whole string's width shift whenever the number crossed a digit
     // boundary (e.g. 3->4 digits near 1000 ops/sec), causing visible reflow during fast playback.
@@ -243,7 +292,7 @@ private struct RunControlStatsCaption: View {
         opsPerSecond(
           significantOperationCount: displayed.significantOperationCount,
           elapsedPlaybackDuration: displayed.elapsedPlaybackDuration)),
-      digits: 4, label: "ops/sec")
+      digits: 4, label: String(localized: "ops/sec", bundle: .module))
   }
 
   @ViewBuilder
@@ -256,14 +305,23 @@ private struct RunControlStatsCaption: View {
   /// a single unit — the looser `spacing: 12` between cells above is what visually separates one
   /// cell from the next now that there's no `·` glyph doing that job.
   private func statCell(_ value: Int, digits: Int, label: String) -> some View {
-    HStack(spacing: 4) {
-      statSlot(value, digits: digits)
-      Text(label)
+    Group {
+      if dynamicTypeSize.isAccessibilitySize {
+        VStack(alignment: .leading, spacing: 0) {
+          statSlot(value, digits: digits)
+          Text(verbatim: label)
+        }
+      } else {
+        HStack(spacing: 4) {
+          statSlot(value, digits: digits)
+          Text(verbatim: label)
+        }
+      }
     }
   }
 
   private func statSlot(_ value: Int, digits: Int) -> some View {
-    Text("\(value)")
+    Text(String(localized: "\(value)", bundle: .module))
       .monospacedDigit()
       .contentTransition(.numericText(value: Double(value)))
       .animation(.snappy(duration: 0.15), value: value)
@@ -317,67 +375,124 @@ private struct DisplayedStats: Equatable {
 private struct PlaybackTransportButtons: View {
   let session: SortSession
   let replay: ReplayEngine
+  @Environment(\.accessibilityVoiceOverEnabled) private var voiceOverEnabled
 
   var body: some View {
     HStack(spacing: 20) {
       Button {
         replay.seek(to: 0)
+        SeekingDiscoveryTip.hasSeeked = true
+        SeekingDiscoveryTip().invalidate(reason: .actionPerformed)
+        announce("At the beginning of the recording")
       } label: {
         Image(systemName: "backward.end.fill")
       }
       .accessibilityIdentifier("runControlJumpToStartButton")
-      .accessibilityLabel("Jump to Start")
-      .help("Jump to the very beginning of the recording, before shuffling (⌘⌥←)")
+      .accessibilityLabel(String(localized: "Jump to Start", bundle: .module))
+      .help(String(localized: "Jump to the very beginning of the recording, before shuffling (⌘⌥←)", bundle: .module))
       .disabled(replay.stepIndex <= 0)
 
       Button {
         replay.pause()
         replay.stepBackward()
+        announce("Back to operation \(replay.stepIndex) of \(replay.totalOperationCount)")
       } label: {
         Image(systemName: "backward.frame.fill")
       }
       .accessibilityIdentifier("runControlStepBackButton")
-      .accessibilityLabel("Step Back")
-      .help("Step back one operation (⌥←)")
+      .accessibilityLabel(String(localized: "Step Back", bundle: .module))
+      .help(String(localized: "Step back one operation (⌥←)", bundle: .module))
       .disabled(replay.stepIndex <= 0)
 
       Button {
         session.togglePlayback()
         SortHaptics.playPauseToggled()
+        PlaybackDiscoveryTip.hasUsedPlayback = true
+        PlaybackDiscoveryTip().invalidate(reason: .actionPerformed)
       } label: {
         Image(systemName: replay.isPlaying ? "pause.fill" : "play.fill")
           .font(.title2)
       }
       .accessibilityIdentifier("runControlPlayPauseButton")
-      .accessibilityLabel(replay.isPlaying ? "Pause" : "Play")
+      .accessibilityLabel(replay.isPlaying
+        ? String(localized: "Pause", bundle: .module)
+        : String(localized: "Play", bundle: .module))
       .help(replay.isPlaying ? "Pause playback (Space)" : "Resume playback (Space)")
       .disabled(isFinished)
 
       Button {
         replay.pause()
+        let nextOperation = replay.tape.operations[replay.stepIndex]
         replay.stepForward()
+        announce(accessibilityDescription(for: nextOperation))
+        PlaybackDiscoveryTip.hasUsedPlayback = true
+        PlaybackDiscoveryTip().invalidate(reason: .actionPerformed)
       } label: {
         Image(systemName: "forward.frame.fill")
       }
       .accessibilityIdentifier("runControlStepForwardButton")
-      .accessibilityLabel("Step Forward")
-      .help("Step forward one operation (⌥→)")
+      .accessibilityLabel(String(localized: "Step Forward", bundle: .module))
+      .help(String(localized: "Step forward one operation (⌥→)", bundle: .module))
       .disabled(isFinished)
 
       Button {
         replay.seek(to: replay.totalOperationCount)
+        SeekingDiscoveryTip.hasSeeked = true
+        SeekingDiscoveryTip().invalidate(reason: .actionPerformed)
+        announce("At the sorted end of the recording")
       } label: {
         Image(systemName: "forward.end.fill")
       }
       .accessibilityIdentifier("runControlJumpToEndButton")
-      .accessibilityLabel("Jump to End")
-      .help("Jump to the fully sorted end of the recording (⌘⌥→)")
+      .accessibilityLabel(String(localized: "Jump to End", bundle: .module))
+      .help(String(localized: "Jump to the fully sorted end of the recording (⌘⌥→)", bundle: .module))
       .disabled(isFinished)
     }
   }
 
   private var isFinished: Bool {
     replay.stepIndex >= replay.totalOperationCount
+  }
+
+  private func announce(_ message: String) {
+    guard voiceOverEnabled else { return }
+    UIAccessibility.post(notification: .announcement, argument: message)
+  }
+}
+
+/// Spoken only after a user-requested step, so long tapes never queue thousands of announcements.
+func accessibilityDescription(for operation: SortOperation) -> String {
+  switch operation {
+  case .swap(let first, let second):
+    "Swapped positions \(first + 1) and \(second + 1)"
+  case .setValue(let index, let value):
+    "Set position \(index + 1) to \(value)"
+  case .compare(let first, let second):
+    "Compared positions \(first + 1) and \(second + 1)"
+  case .compareValue(let index, let value):
+    "Compared position \(index + 1) with value \(value)"
+  case .compareValues(let first, let second):
+    "Compared values \(first) and \(second)"
+  case .mark(_, let index):
+    "Highlighted position \(index + 1)"
+  case .unmark, .unmarkAll:
+    "Cleared a highlight"
+  case .unmarkIndex(_, let index):
+    "Cleared the highlight at position \(index + 1)"
+  case .markSorted(let index):
+    "Position \(index + 1) is sorted"
+  case .auxCreate(_, let length):
+    "Created a temporary array of \(length) items"
+  case .auxWrite(_, let index, let value):
+    "Wrote \(value) to temporary position \(index + 1)"
+  case .auxDelete:
+    "Removed a temporary array"
+  case .auxRead(_, let index):
+    "Read temporary position \(index + 1)"
+  case .readValue(let index):
+    "Read position \(index + 1)"
+  case .reversal:
+    "Started reversing a range"
   }
 }
 
@@ -393,6 +508,8 @@ private struct UtilityButtons: View {
   @Binding var isSpeedExpanded: Bool
   @Binding var isSizeExpanded: Bool
   @Binding var isVisualizerExpanded: Bool
+  @Binding var isVideoExpanded: Bool
+  @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
   #if targetEnvironment(macCatalyst)
     // Catalyst's `ShareLink` bridges to `NSSharingServicePicker`, which has nothing to show for
@@ -402,6 +519,22 @@ private struct UtilityButtons: View {
   #endif
 
   var body: some View {
+    Group {
+      if dynamicTypeSize.isAccessibilitySize {
+        VStack(spacing: 8) {
+          firstRow
+          secondRow
+        }
+      } else {
+        HStack(spacing: 20) {
+          firstRow
+          secondRow
+        }
+      }
+    }
+  }
+
+  private var firstRow: some View {
     HStack(spacing: 20) {
       Button {
         Task { await session.start(size: session.arraySize) }
@@ -410,8 +543,8 @@ private struct UtilityButtons: View {
         Image(systemName: "arrow.counterclockwise")
       }
       .accessibilityIdentifier("runControlResetButton")
-      .accessibilityLabel("Reset and Reshuffle")
-      .help("Stop the current sort, shuffle a fresh array at this size, and sort it again (⌘R)")
+      .accessibilityLabel(String(localized: "Reset and Reshuffle", bundle: .module))
+      .help(String(localized: "Stop the current sort, shuffle a fresh array at this size, and sort it again (⌘R)", bundle: .module))
 
       #if targetEnvironment(macCatalyst)
         Button {
@@ -420,8 +553,8 @@ private struct UtilityButtons: View {
           Image(systemName: "square.and.arrow.up")
         }
         .accessibilityIdentifier("runControlExportTapeButton")
-        .accessibilityLabel("Export Tape")
-        .help("Export this run's recorded tape as a .tape file")
+        .accessibilityLabel(String(localized: "Export Tape", bundle: .module))
+        .help(String(localized: "Export this run's recorded tape as a .tape file", bundle: .module))
         .fileExporter(
           isPresented: $isExportingTape,
           document: TapeExportFileDocument(tape: replay.tape),
@@ -433,8 +566,8 @@ private struct UtilityButtons: View {
           Image(systemName: "square.and.arrow.up")
         }
         .accessibilityIdentifier("runControlExportTapeButton")
-        .accessibilityLabel("Export Tape")
-        .help("Export this run's recorded tape as a .tape file")
+        .accessibilityLabel(String(localized: "Export Tape", bundle: .module))
+        .help(String(localized: "Export this run's recorded tape as a .tape file", bundle: .module))
       #endif
 
       Button {
@@ -443,13 +576,32 @@ private struct UtilityButtons: View {
         Image(systemName: session.soundEnabled ? "speaker.wave.2.fill" : "speaker.slash.fill")
       }
       .accessibilityIdentifier("runControlSoundToggle")
-      .accessibilityLabel(session.soundEnabled ? "Mute" : "Unmute")
+      .accessibilityLabel(session.soundEnabled
+        ? String(localized: "Mute", bundle: .module)
+        : String(localized: "Unmute", bundle: .module))
       .help(
         session.soundEnabled
-          ? "Turn off sort sound effects (⌥⌘A)" : "Turn on sort sound effects (⌥⌘A)")
+          ? String(localized: "Turn off sort sound effects (⌥⌘A)", bundle: .module)
+          : String(localized: "Turn on sort sound effects (⌥⌘A)", bundle: .module))
 
       AutomatorMenuButton(session: session)
 
+      Button {
+        isVideoExpanded.toggle()
+      } label: {
+        Image(systemName: "record.circle")
+      }
+      .accessibilityIdentifier("runControlVideoButton")
+      .accessibilityLabel(String(localized: "Video Recording", bundle: .module))
+      .accessibilityValue(isVideoExpanded
+        ? String(localized: "Expanded", bundle: .module)
+        : String(localized: "Collapsed", bundle: .module))
+      .help(String(localized: "Show or hide video recording controls", bundle: .module))
+    }
+  }
+
+  private var secondRow: some View {
+    HStack(spacing: 20) {
       Button {
         isSpeedExpanded.toggle()
       } label: {
@@ -460,30 +612,41 @@ private struct UtilityButtons: View {
         .font(.footnote.monospacedDigit())
       }
       .accessibilityIdentifier("runControlSpeedButton")
-      .accessibilityLabel(replay.useFixedDurationPacing ? "Target Duration" : "Playback Speed")
+      .accessibilityLabel(replay.useFixedDurationPacing
+        ? String(localized: "Target Duration", bundle: .module)
+        : String(localized: "Playback Speed", bundle: .module))
+      .accessibilityValue(
+        replay.useFixedDurationPacing
+          ? String(localized: "\(Int(replay.targetDuration)) seconds", bundle: .module)
+          : String(localized: "\(Int(replay.speed)) ops per second", bundle: .module))
       .help(
         replay.useFixedDurationPacing
-          ? "Show or hide the target duration slider"
-          : "Show or hide the playback speed slider (⌘⇧+/− by 1, ⌘⌥+/− by 10)")
+          ? String(localized: "Show or hide the target duration slider", bundle: .module)
+          : String(localized: "Show or hide the playback speed slider (⌘⇧+/− by 1, ⌘⌥+/− by 10)", bundle: .module))
 
       Button {
         isSizeExpanded.toggle()
+        PresentationDiscoveryTip.hasAdjustedPresentation = true
+        PresentationDiscoveryTip().invalidate(reason: .actionPerformed)
       } label: {
-        Text("n=\(session.arraySize)")
+        Text(String(localized: "n=\(session.arraySize)", bundle: .module))
           .font(.footnote.monospacedDigit())
       }
       .accessibilityIdentifier("runControlSizeButton")
-      .accessibilityLabel("Array Size")
-      .help("Show or hide the array size picker (⌘S cycles to the next size)")
+      .accessibilityLabel(String(localized: "Array Size", bundle: .module))
+      .accessibilityValue(String(localized: "\(session.arraySize) items", bundle: .module))
+      .help(String(localized: "Show or hide the array size picker (⌘S cycles to the next size)", bundle: .module))
 
       Button {
         isVisualizerExpanded.toggle()
+        PresentationDiscoveryTip.hasAdjustedPresentation = true
+        PresentationDiscoveryTip().invalidate(reason: .actionPerformed)
       } label: {
         Image(systemName: "eye.fill")
       }
       .accessibilityIdentifier("runControlVisualizerButton")
-      .accessibilityLabel("Visualizer")
-      .help("Show or hide the visualizer picker (⌘⇧V cycles to the next visualizer)")
+      .accessibilityLabel(String(localized: "Visualizer", bundle: .module))
+      .help(String(localized: "Show or hide the visualizer picker (⌘⇧V cycles to the next visualizer)", bundle: .module))
     }
   }
 
@@ -554,7 +717,7 @@ private struct SizeChip: View {
 
   var body: some View {
     Button(action: action) {
-      Text("\(size)")
+      Text(String(localized: "\(size)", bundle: .module))
         .font(.callout.monospacedDigit())
         .fontWeight(isSelected ? .semibold : .regular)
         .padding(.horizontal, 14)
@@ -574,7 +737,7 @@ private struct SizeChip: View {
 }
 
 /// Lists every registered `Automation` (see `AutomationRegistry`) — the same entries `⌘⇧A`/`⌘⌥⇧A`
-/// trigger, so the shortcut and this menu share one source of truth.
+/// trigger, so the shortcut and this action chooser share one source of truth.
 ///
 /// A genuine `View`, not a computed property on `RunControlBar`: `@Environment(\.isEnabled)` only
 /// sees ancestors of where it's read, and `RunControlBar.body`'s `.disabled(session.isAutomating)`
@@ -587,25 +750,11 @@ private struct SizeChip: View {
 private struct AutomatorMenuButton: View {
   let session: SortSession
   @Environment(\.isEnabled) private var isEnabled
+  @State private var isShowingAutomations = false
 
   var body: some View {
-    Menu {
-      ForEach(AutomationRegistry.shared.automations) { automation in
-        Button {
-          session.runAutomation(automation)
-        } label: {
-          if session.runningAutomationID == automation.id {
-            Label(
-              "\(automation.displayName) (\(automation.shortcutDisplayString)) — Running",
-              systemImage: "checkmark")
-          } else {
-            Label(
-              "\(automation.displayName) (\(automation.shortcutDisplayString))",
-              systemImage: automation.iconName)
-          }
-        }
-        .accessibilityIdentifier("automatorMenuItem.\(automation.id.rawValue)")
-      }
+    Button {
+      isShowingAutomations = true
     } label: {
       Image(systemName: "gearshape.2.fill")
         // `isEnabled`, not `session.isAutomating` directly, so this tracks whatever actually
@@ -616,8 +765,20 @@ private struct AutomatorMenuButton: View {
     }
     .buttonStyle(.plain)
     .accessibilityIdentifier("runControlAutomatorButton")
-    .accessibilityLabel("Automations")
-    .help("Run a size-sweep or max-size automation")
+    .accessibilityLabel(String(localized: "Automations", bundle: .module))
+    .accessibilityValue(
+      session.runningAutomationID.flatMap { AutomationRegistry.shared.automation(id: $0)?.displayName }
+        .map { String(localized: "\($0) running", bundle: .module) }
+        ?? String(localized: "Idle", bundle: .module))
+    .help(String(localized: "Run a size-sweep or max-size automation", bundle: .module))
+    .confirmationDialog(String(localized: "Automations", bundle: .module), isPresented: $isShowingAutomations) {
+      ForEach(AutomationRegistry.shared.automations) { automation in
+        Button(String(localized: "\(automation.displayName) (\(automation.shortcutDisplayString))", bundle: .module)) {
+          session.runAutomation(automation)
+        }
+        .accessibilityIdentifier("automatorMenuItem.\(automation.id.rawValue)")
+      }
+    }
   }
 }
 

@@ -1,8 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
-                 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
 
 void swap(int *a, int *b) {
   int t = *a;
@@ -35,9 +34,7 @@ void buildBlocks(int arr[], int pos, int len, int buildLen);
 void combineBlocks(int arr[], int pos, int len, int buildLen, int regBlockLen);
 void commonSort(int arr[], int pos, int len);
 
-void sort(int arr[], int n) {
-  commonSort(arr, 0, n);
-}
+void sort(int arr[], int n) { commonSort(arr, 0, n); }
 
 void multiSwap(int arr[], int a, int b, int count) {
   for (int i = 0; i < count; i++)
@@ -86,16 +83,30 @@ void mergeWithoutBuffer(int arr[], int pos, int len1, int len2) {
   if (len1 < len2) {
     while (len1 != 0) {
       int loc = binSearch(arr, pos + len1, len2, pos, 1);
-      if (loc != 0) { rotate(arr, pos, len1, loc); pos += loc; len2 -= loc; }
-      if (len2 == 0) break;
-      do { pos++; len1--; } while (len1 != 0 && arr[pos] <= arr[pos + len1]);
+      if (loc != 0) {
+        rotate(arr, pos, len1, loc);
+        pos += loc;
+        len2 -= loc;
+      }
+      if (len2 == 0)
+        break;
+      do {
+        pos++;
+        len1--;
+      } while (len1 != 0 && arr[pos] <= arr[pos + len1]);
     }
   } else {
     while (len2 != 0) {
       int loc = binSearch(arr, pos, len1, pos + len1 + len2 - 1, 0);
-      if (loc != len1) { rotate(arr, pos + loc, len1 - loc, len2); len1 = loc; }
-      if (len1 == 0) break;
-      do { len2--; } while (len2 != 0 && arr[pos + len1 - 1] <= arr[pos + len1 + len2 - 1]);
+      if (loc != len1) {
+        rotate(arr, pos + loc, len1 - loc, len2);
+        len1 = loc;
+      }
+      if (len1 == 0)
+        break;
+      do {
+        len2--;
+      } while (len2 != 0 && arr[pos + len1 - 1] <= arr[pos + len1 + len2 - 1]);
     }
   }
 }

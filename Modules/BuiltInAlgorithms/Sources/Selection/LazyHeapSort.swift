@@ -1,10 +1,11 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
 public struct LazyHeapSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "lazyheapsort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Lazy Heap Sort",
+    displayName: String(localized: "Lazy Heap Sort", bundle: .module),
     category: .selection,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -41,7 +42,13 @@ public struct LazyHeapSort: SortAlgorithm {
       var max = a
       var i = a + 1
       while i < b {
-        if engine.compare(i, max, by: (>)) {
+        if engine.teachingCompare(
+          i, max,
+          by: (>),
+          stageID: "LazyHeapSort.maximumCandidate",
+          whenTrue: String(localized: "This item is larger, so update the lazy heap maximum.", bundle: .module),
+          whenFalse: String(localized: "The current maximum candidate remains.", bundle: .module)
+        ) {
           max = i
         }
         i += 1

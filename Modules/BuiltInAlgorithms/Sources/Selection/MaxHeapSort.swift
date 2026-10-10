@@ -1,10 +1,11 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
 public struct MaxHeapSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "maxheapsort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Max Heap Sort",
+    displayName: String(localized: "Max Heap Sort", bundle: .module),
     category: .selection,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -29,10 +30,19 @@ public struct MaxHeapSort: SortAlgorithm {
         var largest = root
         let left = 2 * root + 1
         let right = 2 * root + 2
-        if left < size && !engine.compare(largest, left) {
+        if left < size && !engine.teachingCompare(
+          largest, left,
+          stageID: "MaxHeapSort.leftChild",
+          whenTrue: String(localized: "The left child is no larger, so keep the current heap maximum.", bundle: .module),
+          whenFalse: String(localized: "The left child is larger, so promote it as heap maximum.", bundle: .module)
+        ) {
           largest = left
         }
-        if right < size && !engine.compare(largest, right) {
+        if right < size && !engine.teachingCompare(
+          largest, right, stageID: "MaxHeapSort.rightChild",
+          whenTrue: String(localized: "The current candidate is at least the right child, so keep it.", bundle: .module),
+          whenFalse: String(localized: "The right child is larger, so promote it as heap maximum.", bundle: .module)
+        ) {
           largest = right
         }
         if largest == root { break }
@@ -49,6 +59,13 @@ public struct MaxHeapSort: SortAlgorithm {
     var end = n - 1
     while end > 0 {
       engine.swap(0, end)
+      if engine.shouldAnnotateCurrentOperation {
+        engine.annotateLastOperation(
+          stageID: "MaxHeapSort.extractMaximum", outcome: "placed",
+          roles: ["heapRoot": .arrayIndex(0), "sortedEnd": .arrayIndex(end)],
+          explanationKey: "MaxHeapSort.extractMaximum",
+          explanation: String(localized: "Exchange the heap maximum with the end of the unsorted range.", bundle: .module))
+      }
       siftDown(0, end)
       end -= 1
     }

@@ -1,8 +1,7 @@
 #include <cstdio>
 #include <vector>
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
-                 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
 
 void printList(int items[], int size) {
   printf("[");
@@ -21,9 +20,7 @@ void rebalance(int arr[], std::vector<int> &temp, std::vector<int> &counts,
                std::vector<int> &locations, int spineSize, int batchEnd);
 void librarySort(int arr[], int n);
 
-void sort(int arr[], int n) {
-  librarySort(arr, n);
-}
+void sort(int arr[], int n) { librarySort(arr, n); }
 
 int binarySearch(int arr[], int item, int start, int end) {
   int lo = start;

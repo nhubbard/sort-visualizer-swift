@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -16,14 +17,13 @@ import SortEngineKit
 /// `O(n^1.585)` comparators, confirmed here via a log-log fit of measured comparison counts against
 /// array size (slope ≈1.62, close to log₂3 ≈1.585) rather than assumed from the name alone — better
 /// than an `O(n log^2 n)` network for large `n`, though not as good as an optimal `O(n log n)`
-/// network. Every comparison only ever swaps on strict `>`, and this exact recursive split never
-/// lets two equal elements cross without a direct or transitively-ordered comparison between them,
-/// so the result is stable (confirmed by fuzzing, not just by the swap-on-strict-`>` rule alone —
-/// see `CompleteGraphSort`'s own doc comment for why that rule alone isn't sufficient in general).
+/// network. Comparators swap only on strict `>`, but long-range swaps can still reverse the
+/// relative order of equal elements. An identity-tracking duplicate corpus confirms this network
+/// is unstable.
 public struct BoseNelsonSortRecursive: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "bosenelsonsortrecursive")
   public let metadata = AlgorithmMetadata(
-    displayName: "Recursive Bose-Nelson Sort",
+    displayName: String(localized: "Recursive Bose-Nelson Sort", bundle: .module),
     category: .concurrent,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -32,7 +32,7 @@ public struct BoseNelsonSortRecursive: SortAlgorithm {
     detectedGrowthModel: DetectedGrowthModel(
       family: .powerLaw, coefficients: [5.74859, 1.63909], rSquared: 0.99464),
     implementationComplexity: 10,
-    stable: true,
+    stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n^{1.585})", average: "O(n^{1.585})", worst: "O(n^{1.585})"),
     spaceComplexity: "O(log n)",
@@ -46,7 +46,16 @@ public struct BoseNelsonSortRecursive: SortAlgorithm {
     guard n > 1 else { return }
 
     func compareSwap(_ start: Int, _ end: Int) {
-      if engine.compare(start, end, by: >) {
+      let shouldSwap = engine.compare(start, end, by: >)
+      engine.annotateLastOperation(
+        stageID: "compareExchange", decisionID: "bosenelsonsortrecursive.networkComparator",
+        outcome: shouldSwap ? "exchange" : "keep",
+        roles: ["left": .arrayIndex(start), "right": .arrayIndex(end)],
+        explanationKey: "bosenelsonsortrecursive.compareExchange",
+        explanation: shouldSwap
+          ? String(localized: "The left value exceeds the right value, so this comparator exchanges them.", bundle: .module)
+          : String(localized: "These values satisfy this comparator, so they stay in place.", bundle: .module))
+      if shouldSwap {
         engine.swap(start, end)
       }
     }

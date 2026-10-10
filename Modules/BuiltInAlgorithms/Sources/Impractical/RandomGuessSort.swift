@@ -1,10 +1,11 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
 public struct RandomGuessSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "randomguesssort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Random Guess Sort",
+    displayName: String(localized: "Random Guess Sort", bundle: .module),
     category: .impractical,
     sizeRange: 4...6,
     growthModel: OperationGrowthModel(
@@ -32,8 +33,27 @@ public struct RandomGuessSort: SortAlgorithm {
 
     func isValidMapping() -> Bool {
       for i in 0..<(n - 1) {
-        if engine.compare(loops[i], loops[i + 1], by: (<)) { continue }
-        if engine.compare(loops[i], loops[i + 1], by: (==)), loops[i] < loops[i + 1] { continue }
+        let increasing = engine.compare(loops[i], loops[i + 1], by: (<))
+        engine.annotateLastOperation(
+          stageID: "candidateCheck", decisionID: "randomguesssort.strictOrder",
+          outcome: increasing ? "acceptPair" : "checkTie",
+          roles: ["left": .arrayIndex(loops[i]), "right": .arrayIndex(loops[i + 1])],
+          explanationKey: "randomguesssort.strictOrder",
+          explanation: increasing
+            ? String(localized: "This mapped pair increases, so keep checking the candidate.", bundle: .module)
+            : String(localized: "This mapped pair does not increase, so check whether its values tie.", bundle: .module))
+        if increasing { continue }
+        let equal = engine.compare(loops[i], loops[i + 1], by: (==))
+        let stableTie = equal && loops[i] < loops[i + 1]
+        engine.annotateLastOperation(
+          stageID: "candidateCheck", decisionID: "randomguesssort.stableTie",
+          outcome: stableTie ? "acceptPair" : "rejectCandidate",
+          roles: ["left": .arrayIndex(loops[i]), "right": .arrayIndex(loops[i + 1])],
+          explanationKey: "randomguesssort.stableTie",
+          explanation: stableTie
+            ? String(localized: "Equal values retain their source order, so this mapped pair is valid.", bundle: .module)
+            : String(localized: "The mapped pair is descending or breaks stable tie order, so reject this candidate.", bundle: .module))
+        if stableTie { continue }
         return false
       }
       return true
@@ -53,6 +73,11 @@ public struct RandomGuessSort: SortAlgorithm {
     let mapped = loops.map { engine.readValue(at: $0) }
     for i in 0..<n {
       engine.setValue(i, mapped[i])
+      engine.annotateLastOperation(
+        stageID: "candidatePlacement", decisionID: "randomguesssort.candidatePlacement",
+        outcome: "place", roles: ["destination": .arrayIndex(i)],
+        explanationKey: "randomguesssort.candidatePlacement",
+        explanation: String(localized: "This candidate permutation satisfies the ordering check and is placed here.", bundle: .module))
     }
   }
 }

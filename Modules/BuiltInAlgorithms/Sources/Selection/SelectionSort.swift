@@ -1,10 +1,11 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
 public struct SelectionSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "selectionsort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Selection Sort",
+    displayName: String(localized: "Selection Sort", bundle: .module),
     category: .selection,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -24,7 +25,12 @@ public struct SelectionSort: SortAlgorithm {
     guard n > 1 else { return }
     for i in 0..<(n - 1) {
       var lowestIndex = i
-      for j in (i + 1)..<n where !engine.compare(j, lowestIndex) {
+      for j in (i + 1)..<n where !engine.teachingCompare(
+        j, lowestIndex,
+        stageID: "SelectionSort.minimumCandidate",
+        whenTrue: String(localized: "This item is at least the current minimum, so keep the current candidate.", bundle: .module),
+        whenFalse: String(localized: "This item is smaller, so update the minimum candidate.", bundle: .module)
+      ) {
         lowestIndex = j
       }
       engine.swap(i, lowestIndex)

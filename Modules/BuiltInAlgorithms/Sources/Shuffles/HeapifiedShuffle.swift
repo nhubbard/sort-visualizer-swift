@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -7,7 +8,7 @@ import SortEngineKit
 /// second, sorting phase), leaving the array as a valid max-heap rather than fully sorted.
 public struct HeapifiedShuffle: ShuffleAlgorithm {
   public let id = ShuffleID(rawValue: "heapified")
-  public let metadata = ShuffleMetadata(displayName: "Heapified")
+  public let metadata = ShuffleMetadata(displayName: String(localized: "Heapified", bundle: .module))
   public init() {}
   public func record(into engine: inout RecordingEngine) {
     let n = engine.count

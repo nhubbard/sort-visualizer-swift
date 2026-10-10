@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -5,7 +6,7 @@ import SortEngineKit
 /// only the first half back into order, leaving the second half fully scrambled.
 public struct ShuffledHalfShuffle: ShuffleAlgorithm {
   public let id = ShuffleID(rawValue: "shuffledhalf")
-  public let metadata = ShuffleMetadata(displayName: "Shuffled Half")
+  public let metadata = ShuffleMetadata(displayName: String(localized: "Shuffled Half", bundle: .module))
   public init() {}
   public func record(into engine: inout RecordingEngine) {
     let n = engine.count
@@ -16,7 +17,7 @@ public struct ShuffledHalfShuffle: ShuffleAlgorithm {
 
   private func shuffleRange(_ engine: inout RecordingEngine, from start: Int, to end: Int) {
     for i in start..<end {
-      engine.swap(i, Int.random(in: i..<end))
+      engine.swap(i, engine.randomIndex(in: i..<end))
     }
   }
 

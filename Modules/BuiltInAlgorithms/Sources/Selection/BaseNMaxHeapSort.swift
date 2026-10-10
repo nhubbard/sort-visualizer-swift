@@ -1,10 +1,11 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
 public struct BaseNMaxHeapSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "basenmaxheapsort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Base-N Max Heap Sort",
+    displayName: String(localized: "Base-N Max Heap Sort", bundle: .module),
     category: .selection,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -39,7 +40,13 @@ public struct BaseNMaxHeapSort: SortAlgorithm {
       var maxIndex = left
       var i = left + 1
       while i < left + base && i < stop {
-        if engine.compare(maxIndex, i, by: (<)) {
+        if engine.teachingCompare(
+          maxIndex, i,
+          by: (<),
+          stageID: "BaseNMaxHeapSort.heapCandidate",
+          whenTrue: String(localized: "This child is larger, so promote it as the base-N heap candidate.", bundle: .module),
+          whenFalse: String(localized: "The current heap candidate remains larger.", bundle: .module)
+        ) {
           maxIndex = i
         }
         i += 1

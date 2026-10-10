@@ -289,6 +289,24 @@ struct SortCoordinatorTests {
     #expect(!session.isAutomating)
   }
 
+  @Test
+  func stopReleasesPendingShortcutAndSkipsItsLateViewMount() async {
+    let coordinator = SortCoordinator()
+    let algorithm = FakeAlgorithm()
+    let runTask = Task {
+      await coordinator.runSort(algorithm: algorithm, visualizerID: nil, shuffleID: nil, size: 12)
+    }
+    await Task.yield()
+    #expect(coordinator.pendingActionWillAutomate(for: algorithm.id))
+    let token = coordinator.runToken
+
+    coordinator.stop()
+    await runTask.value
+    #expect(coordinator.stopRequestID == 1)
+    #expect(coordinator.shouldSkipRun(token: token))
+    #expect(coordinator.consumePendingAction(for: algorithm.id) == nil)
+  }
+
   /// Regression test: `runAutomationAndWait` used to call the fire-and-forget
   /// `runAutomation(_:)` (which only *spawns* a `Task` doing the real work) and then immediately
   /// `guard isAutomating else { return }` with no intervening `await` — a freshly spawned

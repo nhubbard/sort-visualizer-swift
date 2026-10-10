@@ -1,6 +1,7 @@
 def sort(arr):
     rotate_merge_sort(arr, 0, len(arr))
 
+
 def multi_swap(array, a, b, length):
     for i in range(length):
         array[a + i], array[b + i] = array[b + i], array[a + i]
@@ -64,12 +65,24 @@ def rotate_merge_sort(array, a, b):
         j *= 2
 
 
-
-
 if __name__ == "__main__":
     array = [
-        0, 39, 21, 62, 91, 77, 14, 23,
-        90, 69, 51, 81, 68, 83, 32, 56,
+        0,
+        39,
+        21,
+        62,
+        91,
+        77,
+        14,
+        23,
+        90,
+        69,
+        51,
+        81,
+        68,
+        83,
+        32,
+        56,
     ]
     sort(array)
     print(array)

@@ -7,12 +7,12 @@ Apple devices in Swift and SwiftUI.
 
 ## Features
 
-- **182 sorting algorithms** and **44 shuffles**, spanning ArrayV's category taxonomy (exchange,
+- **196 sorting algorithms** and **43 shuffles**, spanning ArrayV's category taxonomy (exchange,
   hybrid, insertion, selection, merge, distribution, concurrent-simulated, and the deliberately
   impractical Bogo/Stooge/Slow family) — every one a native Swift implementation, not an
   interpreted script.
-- **15 visualizer styles** (bar graph, rainbow, disparity family, circular/spiral/scatter/dot
-  layouts, hoop stack, pixel mesh, and more), switchable live, mid-sort, with zero engine changes —
+- **16 visualizer styles** (bar graph, rainbow, disparity family, circular/spiral/scatter/dot
+  layouts, hoop stack, pixel mesh, custom image, and more), switchable live, mid-sort, with zero engine changes —
   the algorithm has no idea which style is currently drawing it.
 - **GPU-rendered visuals** via a Metal renderer, with optional reduced-flashing/reduced-motion
   easing for photosensitivity.

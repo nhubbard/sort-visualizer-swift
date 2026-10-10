@@ -1,10 +1,11 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
 public struct StablePermutationSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "stablepermutationsort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Stable Permutation Sort",
+    displayName: String(localized: "Stable Permutation Sort", bundle: .module),
     category: .exchange,
     sizeRange: 4...8,
     growthModel: OperationGrowthModel(
@@ -33,7 +34,12 @@ public struct StablePermutationSort: SortAlgorithm {
     guard n > 1 else { return }
 
     func isSorted() -> Bool {
-      for i in 1..<n where !engine.compare(i, i - 1) { return false }
+      for i in 1..<n where !engine.teachingCompare(
+        i, i - 1,
+        stageID: "StablePermutationSort.permutationOrder",
+        whenTrue: String(localized: "This neighboring pair is ordered in the permutation check.", bundle: .module),
+        whenFalse: String(localized: "This neighboring pair breaks sorted order, so reject this permutation.", bundle: .module)
+      ) { return false }
       return true
     }
 

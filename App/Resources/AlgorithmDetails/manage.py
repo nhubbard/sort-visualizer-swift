@@ -11,6 +11,7 @@ from __future__ import annotations
 import ast
 import functools
 import hashlib
+import json
 import logging
 import os
 import re
@@ -430,7 +431,7 @@ def _find_brew_tool(name: str, formula: str) -> str | None:
             check=True,
             timeout=15,
         ).stdout.strip()
-    except (subprocess.CalledProcessError, FileNotFoundError, subprocess.TimeoutExpired):
+    except subprocess.CalledProcessError, FileNotFoundError, subprocess.TimeoutExpired:
         return None
     candidate = Path(prefix) / "bin" / name
     return str(candidate) if candidate.exists() else None
@@ -469,6 +470,64 @@ def _resolve_standardrb() -> str:
             "'standardrb' not found. Run 'uv run manage.py setup' to install it."
         )
     return found
+
+
+@functools.cache
+def _resolve_macos_sdk_path() -> str:
+    """Returns the active Xcode macOS SDK for Homebrew clang tooling.
+
+    Homebrew LLVM's generated Darwin configuration points at a versioned Command Line Tools SDK.
+    That path can lag the installed OS and need not exist when full Xcode is selected. SDKROOT does
+    not override the generated configuration, so clang-tidy needs an explicit, later -isysroot.
+    """
+    try:
+        sdk_path = subprocess.run(
+            ["xcrun", "--sdk", "macosx", "--show-sdk-path"],
+            capture_output=True,
+            text=True,
+            check=True,
+            timeout=15,
+        ).stdout.strip()
+    except (
+        subprocess.CalledProcessError,
+        FileNotFoundError,
+        subprocess.TimeoutExpired,
+    ) as e:
+        raise AlgorithmContentError(
+            "Could not resolve the active macOS SDK with xcrun. Select a complete Xcode "
+            "installation with xcode-select before linting C or C++."
+        ) from e
+    if not sdk_path or not Path(sdk_path).is_dir():
+        raise AlgorithmContentError(
+            f"xcrun returned a macOS SDK path that does not exist: {sdk_path!r}"
+        )
+    return sdk_path
+
+
+def _clang_tidy_command(basename: str, *, fix: bool) -> list[str]:
+    command = [_resolve_brew_tool("clang-tidy")]
+    if fix:
+        command.append("-fix")
+    else:
+        command.append("--warnings-as-errors=*")
+    return [
+        *command,
+        basename,
+        "--",
+        "-isysroot",
+        _resolve_macos_sdk_path(),
+    ]
+
+
+def _standardrb_command(basename: str, *, fix: bool) -> list[str]:
+    # The corpus runner starts several StandardRB processes concurrently. Its RuboCop result
+    # cache provides little value for these small one-file invocations, can contend between
+    # workers, and may live outside a restricted workspace, so keep each run self-contained.
+    command = [RUBY_BIN, _resolve_standardrb(), "--cache", "false"]
+    if fix:
+        command.append("--fix")
+    command.append(basename)
+    return command
 
 
 def _find_brew_cask(name: str) -> str | None:
@@ -566,22 +625,12 @@ class LanguageFormat:
 
 LANGUAGE_LINTS: dict[str, LanguageLint] = {
     "c": LanguageLint(
-        check=lambda d, b: [
-            _resolve_brew_tool("clang-tidy"),
-            "--warnings-as-errors=*",
-            b,
-            "--",
-        ],
-        fix=lambda d, b: [_resolve_brew_tool("clang-tidy"), "-fix", b, "--"],
+        check=lambda d, b: _clang_tidy_command(b, fix=False),
+        fix=lambda d, b: _clang_tidy_command(b, fix=True),
     ),
     "cpp": LanguageLint(
-        check=lambda d, b: [
-            _resolve_brew_tool("clang-tidy"),
-            "--warnings-as-errors=*",
-            b,
-            "--",
-        ],
-        fix=lambda d, b: [_resolve_brew_tool("clang-tidy"), "-fix", b, "--"],
+        check=lambda d, b: _clang_tidy_command(b, fix=False),
+        fix=lambda d, b: _clang_tidy_command(b, fix=True),
     ),
     "go": LanguageLint(check=lambda d, b: ["go", "vet", b]),  # no autofix
     "java": LanguageLint(
@@ -619,8 +668,8 @@ LANGUAGE_LINTS: dict[str, LanguageLint] = {
         fix=lambda d, b: ["ruff", "check", "--fix", b],
     ),
     "rb": LanguageLint(
-        check=lambda d, b: [RUBY_BIN, _resolve_standardrb(), b],
-        fix=lambda d, b: [RUBY_BIN, _resolve_standardrb(), "--fix", b],
+        check=lambda d, b: _standardrb_command(b, fix=False),
+        fix=lambda d, b: _standardrb_command(b, fix=True),
     ),
     "swift": LanguageLint(
         check=lambda d, b: [_resolve_brew_tool("swiftlint"), "lint", b],
@@ -658,8 +707,8 @@ LANGUAGE_FORMATS: dict[str, LanguageFormat] = {
         apply=lambda d, b: ["ruff", "format", b],
     ),
     "rb": LanguageFormat(
-        check=lambda d, b: [RUBY_BIN, _resolve_standardrb(), b],
-        apply=lambda d, b: [RUBY_BIN, _resolve_standardrb(), "--fix", b],
+        check=lambda d, b: _standardrb_command(b, fix=False),
+        apply=lambda d, b: _standardrb_command(b, fix=True),
     ),
 }
 
@@ -1024,13 +1073,18 @@ FLAG_DICTIONARY_FORMATTED = 1 << 1
 FLAG_SHA256_PRESENT = 1 << 2
 
 CONTENT_KIND_DESCRIPTION = 0
+CONTENT_KIND_LOCALIZED_DESCRIPTIONS = 11
 CONTENT_KIND_BY_EXTENSION = {
     ext: index + 1 for index, ext in enumerate(LANGUAGE_EXTENSIONS)
 }
 EXTENSION_BY_CONTENT_KIND = {
     kind: ext for ext, kind in CONTENT_KIND_BY_EXTENSION.items()
 }
-KIND_LABELS = {CONTENT_KIND_DESCRIPTION: "description", **EXTENSION_BY_CONTENT_KIND}
+KIND_LABELS = {
+    CONTENT_KIND_DESCRIPTION: "description",
+    CONTENT_KIND_LOCALIZED_DESCRIPTIONS: "localized descriptions",
+    **EXTENSION_BY_CONTENT_KIND,
+}
 
 
 class PackError(AlgorithmContentError):
@@ -1052,13 +1106,48 @@ def _read_utf8_optional(path: Path) -> bytes | None:
     return data
 
 
+def _translated_descriptions() -> dict[str, dict[str, str]]:
+    """Read optional `description.<locale>.md` files beside English descriptions."""
+    translations: dict[str, dict[str, str]] = {}
+    for path in sorted(ROOT.glob("*/description.*.md")):
+        locale = path.name.removeprefix("description.").removesuffix(".md")
+        if locale == "en" or not re.fullmatch(r"[a-z]{2,3}(?:-[A-Za-z0-9]{2,8})*", locale):
+            raise PackError(f"invalid description locale in {path.name!r}")
+        algorithm = path.parent.name
+        if not (path.parent / "description.md").is_file():
+            raise PackError(f"{path}: missing English description.md")
+        try:
+            markdown = path.read_text(encoding="utf-8")
+        except UnicodeError as error:
+            raise PackError(f"invalid UTF-8 Markdown in {path}") from error
+        if not markdown.strip():
+            raise PackError(f"{path}: empty description")
+        translations.setdefault(locale, {})[algorithm] = markdown
+    return translations
+
+
+def _localized_description_bytes(
+    algorithm: str, translations: dict[str, dict[str, str]]
+) -> bytes | None:
+    descriptions = {
+        locale: entries[algorithm]
+        for locale, entries in translations.items()
+        if algorithm in entries
+    }
+    if not descriptions:
+        return None
+    return json.dumps(descriptions, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
+
+
 @dataclass(frozen=True)
 class ContentEntry:
     kind: int
     data: bytes
 
 
-def _algorithm_entries(algorithm: str) -> list[ContentEntry]:
+def _algorithm_entries(
+    algorithm: str, translations: dict[str, dict[str, str]]
+) -> list[ContentEntry]:
     algo_dir = ROOT / algorithm
     entries = []
     description = _read_utf8_optional(algo_dir / "description.md")
@@ -1068,10 +1157,14 @@ def _algorithm_entries(algorithm: str) -> list[ContentEntry]:
         data = _read_utf8_optional(algo_dir / f"{ext}.md")
         if data is not None:
             entries.append(ContentEntry(CONTENT_KIND_BY_EXTENSION[ext], data))
+    localized = _localized_description_bytes(algorithm, translations)
+    if localized is not None:
+        entries.append(ContentEntry(CONTENT_KIND_LOCALIZED_DESCRIPTIONS, localized))
     return entries
 
 
 def _build_payload(algorithms: Sequence[str]) -> tuple[bytes, list[str]]:
+    translations = _translated_descriptions()
     directory = bytearray()
     content = bytearray()
     packed_ids: list[str] = []
@@ -1083,7 +1176,7 @@ def _build_payload(algorithms: Sequence[str]) -> tuple[bytes, list[str]]:
         if not id_bytes or len(id_bytes) > 0xFFFF:
             raise PackError(f"invalid algorithm ID {algorithm!r}")
 
-        entries = _algorithm_entries(algorithm)
+        entries = _algorithm_entries(algorithm, translations)
         if not entries:
             logger.warning(
                 f"skipping {algorithm}: no description.md or highlighted content found"
@@ -1110,7 +1203,7 @@ def _build_payload(algorithms: Sequence[str]) -> tuple[bytes, list[str]]:
         _INNER_HEADER_FORMAT,
         MAGIC_ADTL,
         1,
-        0,
+        1 if translations else 0,
         INNER_HEADER_SIZE,
         0,
         len(packed_ids),
@@ -1354,9 +1447,16 @@ def parse_archive(path: Path) -> ParsedArchive:
     return ParsedArchive(envelope, header, payload, records)
 
 
-def _expected_content_bytes(algorithm: str, kind: int) -> bytes:
+def _expected_content_bytes(
+    algorithm: str, kind: int, translations: dict[str, dict[str, str]]
+) -> bytes:
     if kind == CONTENT_KIND_DESCRIPTION:
         return (ROOT / algorithm / "description.md").read_bytes()
+    if kind == CONTENT_KIND_LOCALIZED_DESCRIPTIONS:
+        localized = _localized_description_bytes(algorithm, translations)
+        if localized is None:
+            raise ArchiveFormatError(f"unexpected translations for {algorithm!r}")
+        return localized
     ext = EXTENSION_BY_CONTENT_KIND.get(kind)
     if ext is None:
         raise ArchiveFormatError(f"unknown content kind {kind}")
@@ -1374,6 +1474,8 @@ def verify_archive(path: Path, expected_algorithms: Sequence[str]) -> None:
     if archive.header.algorithm_count != len(seen_ids):
         raise ArchiveFormatError("declared algorithm count doesn't match the directory")
 
+    translations = _translated_descriptions()
+
     for record in archive.records:
         seen_kinds: set[int] = set()
         for entry in record.entries:
@@ -1383,11 +1485,18 @@ def verify_archive(path: Path, expected_algorithms: Sequence[str]) -> None:
                 )
             seen_kinds.add(entry.kind)
             actual = archive.content_bytes(entry)
-            expected = _expected_content_bytes(record.algorithm_id, entry.kind)
+            expected = _expected_content_bytes(record.algorithm_id, entry.kind, translations)
             if actual != expected:
                 raise ArchiveFormatError(
                     f"content kind {entry.kind} for {record.algorithm_id!r} doesn't match source"
                 )
+        expected_kinds = {
+            entry.kind for entry in _algorithm_entries(record.algorithm_id, translations)
+        }
+        if seen_kinds != expected_kinds:
+            raise ArchiveFormatError(
+                f"content kinds for {record.algorithm_id!r} don't match source"
+            )
 
 
 def preview_line(data: bytes, limit: int) -> str:

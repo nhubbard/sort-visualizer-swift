@@ -1,10 +1,11 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
 public struct QuickBogoSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "quickbogosort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Quick Bogo Sort",
+    displayName: String(localized: "Quick Bogo Sort", bundle: .module),
     category: .impractical,
     sizeRange: 4...6,
     growthModel: OperationGrowthModel(
@@ -30,8 +31,30 @@ public struct QuickBogoSort: SortAlgorithm {
     guard n > 1 else { return }
 
     func isRangePartitioned(_ start: Int, _ pivot: Int, _ end: Int) -> Bool {
-      for i in start..<pivot where engine.compare(i, pivot, by: (>)) { return false }
-      for i in (pivot + 1)..<end where engine.compare(pivot, i, by: (>)) { return false }
+      for i in start..<pivot {
+        let leftIsLarger = engine.compare(i, pivot, by: (>))
+        engine.annotateLastOperation(
+          stageID: "partitionCheck", decisionID: "quickbogosort.leftOfPivot",
+          outcome: leftIsLarger ? "reject" : "continue",
+          roles: ["candidate": .arrayIndex(i), "pivot": .arrayIndex(pivot)],
+          explanationKey: "quickbogosort.leftOfPivot",
+          explanation: leftIsLarger
+            ? String(localized: "A value left of the pivot is larger, so this candidate partition fails.", bundle: .module)
+            : String(localized: "This left-side value does not exceed the pivot, so keep checking.", bundle: .module))
+        if leftIsLarger { return false }
+      }
+      for i in (pivot + 1)..<end {
+        let pivotIsLarger = engine.compare(pivot, i, by: (>))
+        engine.annotateLastOperation(
+          stageID: "partitionCheck", decisionID: "quickbogosort.rightOfPivot",
+          outcome: pivotIsLarger ? "reject" : "continue",
+          roles: ["pivot": .arrayIndex(pivot), "candidate": .arrayIndex(i)],
+          explanationKey: "quickbogosort.rightOfPivot",
+          explanation: pivotIsLarger
+            ? String(localized: "A value right of the pivot is smaller, so this candidate partition fails.", bundle: .module)
+            : String(localized: "This right-side value is no smaller than the pivot, so keep checking.", bundle: .module))
+        if pivotIsLarger { return false }
+      }
       return true
     }
 
@@ -41,11 +64,21 @@ public struct QuickBogoSort: SortAlgorithm {
 
       func trackedSwap(_ i: Int, _ j: Int) {
         engine.swap(i, j)
+        engine.annotateLastOperation(
+          stageID: "candidateExchange", decisionID: "quickbogosort.candidateExchange",
+          outcome: "exchange", roles: ["left": .arrayIndex(i), "right": .arrayIndex(j)],
+          explanationKey: "quickbogosort.candidateExchange",
+          explanation: String(localized: "The next candidate permutation exchanges its pivot with a successor while tracking the partition pivot.", bundle: .module))
         if pivot == i { pivot = j } else if pivot == j { pivot = i }
       }
 
       func trackedReversal(_ lo: Int, _ hi: Int) {
         engine.reversal(lo, hi)
+        engine.annotateLastOperation(
+          stageID: "candidateWrap", decisionID: "quickbogosort.reverseSuffix",
+          outcome: "reverse", roles: ["first": .arrayIndex(lo), "last": .arrayIndex(hi)],
+          explanationKey: "quickbogosort.reverseSuffix",
+          explanation: String(localized: "Reverse this descending range to advance the candidate permutation.", bundle: .module))
         if pivot >= lo, pivot <= hi { pivot = lo + hi - pivot }
       }
 

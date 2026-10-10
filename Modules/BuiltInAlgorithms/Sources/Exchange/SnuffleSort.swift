@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -8,7 +9,7 @@ public struct SnuffleSort: SortAlgorithm {
   /// recursion — growth reaches ~3.4M ops by 64 and ~436M by 128 (ArrayV itself flags this
   /// `unreasonablySlow` with a limit of 100).
   public let metadata = AlgorithmMetadata(
-    displayName: "Snuffle Sort",
+    displayName: String(localized: "Snuffle Sort", bundle: .module),
     category: .exchange,
     sizeRange: 16...32,
     growthModel: OperationGrowthModel(
@@ -41,7 +42,13 @@ public struct SnuffleSort: SortAlgorithm {
   private func snuffleSort(_ engine: inout RecordingEngine, _ start: Int, _ stop: Int) {
     guard stop - start + 1 >= 2 else { return }
 
-    if engine.compare(start, stop, by: (>)) {
+    if engine.teachingCompare(
+      start, stop,
+      by: (>),
+      stageID: "SnuffleSort.endpointOrder",
+      whenTrue: String(localized: "The first endpoint is larger, so exchange the two ends.", bundle: .module),
+      whenFalse: String(localized: "The recursive range endpoints are ordered.", bundle: .module)
+    ) {
       engine.swap(start, stop)
     }
 

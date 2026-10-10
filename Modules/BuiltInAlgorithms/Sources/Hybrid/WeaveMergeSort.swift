@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -20,7 +21,7 @@ import SortEngineKit
 public struct WeaveMergeSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "weavemergesort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Weave Merge Sort",
+    displayName: String(localized: "Weave Merge Sort", bundle: .module),
     category: .hybrid,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -57,7 +58,15 @@ public struct WeaveMergeSort: SortAlgorithm {
       // than going through `engine.compare` — the same convention `DoubleInsertionSort`/
       // `WeavedMergeSort` already use for comparisons ArrayV itself performs via
       // `compareValues` rather than `compareIndices`. Ties are left untouched.
-      if engine.readValue(at: min) > engine.readValue(at: max) {
+      let reversePair = engine.readValue(at: min) > engine.readValue(at: max)
+      engine.annotateLastOperation(
+        stageID: "weave.basePair", decisionID: "weave.basePair", outcome: reversePair ? "swap" : "keep",
+        roles: ["left": .arrayIndex(min), "right": .arrayIndex(max)],
+        explanationKey: "weave.basePair",
+        explanation: reversePair
+          ? String(localized: "This two-element range is reversed, so Weave Merge swaps the pair.", bundle: .module)
+          : String(localized: "This two-element range is ordered, so Weave Merge keeps the pair.", bundle: .module))
+      if reversePair {
         engine.swap(min, max)
       }
     } else {
@@ -113,7 +122,16 @@ public struct WeaveMergeSort: SortAlgorithm {
     guard start < end else { return }
     for j in start..<end {
       var pos = j
-      while pos > start && engine.readValue(at: pos) <= engine.readValue(at: pos - 1) {
+      while pos > start {
+        let moveLeft = engine.readValue(at: pos) <= engine.readValue(at: pos - 1)
+        engine.annotateLastOperation(
+          stageID: "weave.insert", decisionID: "weave.insert", outcome: moveLeft ? "shift" : "stop",
+          roles: ["current": .arrayIndex(pos), "previous": .arrayIndex(pos - 1)],
+          explanationKey: "weave.insert",
+          explanation: moveLeft
+            ? String(localized: "The current value is no greater, so the woven run moves it left.", bundle: .module)
+            : String(localized: "The current value is greater, so this insertion scan stops.", bundle: .module))
+        if !moveLeft { break }
         engine.swap(pos, pos - 1)
         pos -= 1
       }

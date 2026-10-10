@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -6,7 +7,7 @@ import SortEngineKit
 /// just constructs the specific pattern that trips up that partition scheme.
 public struct QuicksortAdversaryShuffle: ShuffleAlgorithm {
   public let id = ShuffleID(rawValue: "qsortbad")
-  public let metadata = ShuffleMetadata(displayName: "Quicksort Adversary")
+  public let metadata = ShuffleMetadata(displayName: String(localized: "Quicksort Adversary", bundle: .module))
   public init() {}
   public func record(into engine: inout RecordingEngine) {
     let n = engine.count

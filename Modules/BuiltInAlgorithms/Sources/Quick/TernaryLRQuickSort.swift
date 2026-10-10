@@ -1,10 +1,11 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
 public struct TernaryLRQuickSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "ternarylrquicksort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Ternary Quick Sort (LR)",
+    displayName: String(localized: "Ternary Quick Sort (LR)", bundle: .module),
     category: .quick,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -23,7 +24,12 @@ public struct TernaryLRQuickSort: SortAlgorithm {
 
   public func record(into engine: inout RecordingEngine) {
     func compare3(_ a: Int, _ b: Int) -> Int {
-      let geAB = engine.compare(a, b)
+      let geAB = engine.teachingCompare(
+        a, b,
+        stageID: "TernaryLRQuickSort.threeWayOrder",
+        whenTrue: String(localized: "The first item is at least as large as the second; this guides the three-way partition.", bundle: .module),
+        whenFalse: String(localized: "The first item is smaller, so it belongs before the second.", bundle: .module)
+      )
       let geBA = engine.compare(b, a)
       if geAB && geBA { return 0 }
       return geAB ? 1 : -1

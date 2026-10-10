@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -14,7 +15,7 @@ import SortEngineKit
 public struct IntroCircleSortRecursive: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "introcirclesortrecursive")
   public let metadata = AlgorithmMetadata(
-    displayName: "Intro Circle (Recursive)",
+    displayName: String(localized: "Intro Circle (Recursive)", bundle: .module),
     category: .hybrid,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -66,7 +67,12 @@ public struct IntroCircleSortRecursive: SortAlgorithm {
       var hi = hi
       var swapCount = 0
       while lo < hi {
-        if hi < end, engine.compare(lo, hi, by: (>)) {
+        if hi < end, engine.teachingCompare(
+          lo, hi, by: (>),
+          stageID: "IntroCircleSortRecursive.circle.pair",
+          whenTrue: String(localized: "The mirrored pair is reversed, so the circle pass swaps it.", bundle: .module),
+          whenFalse: String(localized: "The mirrored pair is ordered, so the circle pass leaves it.", bundle: .module)
+        ) {
           engine.swap(lo, hi)
           swapCount += 1
         }
@@ -97,7 +103,12 @@ public struct IntroCircleSortRecursive: SortAlgorithm {
           var hi = i
           while lo < hi {
             let mid = lo + (hi - lo) / 2
-            if engine.compare(i, mid, by: <) {
+            if engine.teachingCompare(
+              i, mid, by: (<),
+              stageID: "IntroCircleSortRecursive.fallback.insert",
+              whenTrue: String(localized: "The current value precedes the middle of the sorted prefix, so search left.", bundle: .module),
+              whenFalse: String(localized: "The current value follows or ties the middle, so search right.", bundle: .module)
+            ) {
               hi = mid
             } else {
               lo = mid + 1

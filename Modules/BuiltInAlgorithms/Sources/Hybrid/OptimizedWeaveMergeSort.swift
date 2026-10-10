@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -26,7 +27,7 @@ import SortEngineKit
 public struct OptimizedWeaveMergeSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "optimizedweavemergesort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Optimized Weave Merge Sort",
+    displayName: String(localized: "Optimized Weave Merge Sort", bundle: .module),
     category: .hybrid,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -126,7 +127,12 @@ public struct OptimizedWeaveMergeSort: SortAlgorithm {
       var j = a + 1
       while j < b {
         if right {
-          while i < j && engine.compare(i, j, by: (<=)) { i += 1 }
+          while i < j && engine.teachingCompare(
+            i, j, by: (<=),
+            stageID: "OptimizedWeaveMergeSort.weave.scan",
+            whenTrue: String(localized: "The left item is no greater, so the weave scan advances across the ordered prefix.", bundle: .module),
+            whenFalse: String(localized: "The left item exceeds the right, so the weave scan found a misplaced value.", bundle: .module)
+          ) { i += 1 }
         } else {
           while i < j && engine.compare(i, j, by: (<)) { i += 1 }
         }

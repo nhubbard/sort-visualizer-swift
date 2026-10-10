@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -17,7 +18,7 @@ import SortEngineKit
 public struct SimplifiedLibrarySort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "simplifiedlibrarysort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Simplified Library Sort",
+    displayName: String(localized: "Simplified Library Sort", bundle: .module),
     category: .insertion,
     sizeRange: 32...256,
     growthModel: OperationGrowthModel(
@@ -57,7 +58,13 @@ public struct SimplifiedLibrarySort: SortAlgorithm {
           let mid = lo + (hi - lo) / 2
           // Do NOT move equal elements to the right of the inserted element; this
           // maintains stability.
-          if engine.compare(i, mid, by: <) {
+          if engine.teachingCompare(
+            i, mid,
+            by: <,
+            stageID: "SimplifiedLibrarySort.binaryGap",
+            whenTrue: String(localized: "The new value is smaller than the midpoint, so search earlier library slots.", bundle: .module),
+            whenFalse: String(localized: "The new value belongs after this library midpoint.", bundle: .module)
+          ) {
             hi = mid
           } else {
             lo = mid + 1
@@ -76,12 +83,23 @@ public struct SimplifiedLibrarySort: SortAlgorithm {
     // `engine.values[i]` for an `i` *outside* `[a, b)` (a not-yet-classified batch element), so
     // it's a held value compared against a live spine index — `engine.compareValue`, the same
     // pattern `IntroSort`'s cached pivot uses, not `engine.compare`'s two-live-index shape.
-    func gapSearch(_ a: Int, _ b: Int, _ val: Int) -> Int {
+    func gapSearch(_ a: Int, _ b: Int, _ val: Int, sourceIndex: Int) -> Int {
       var lo = a
       var hi = b
       while lo < hi {
         let mid = lo + (hi - lo) / 2
-        if engine.compareValue(mid, against: val, by: (>)) {
+        // Large runs repeat this binary decision for every classified item. Keep the full
+        // comparison tape while showing representative decisions across the batch.
+        let searchEarlier: Bool
+        if n < 128 || sourceIndex.isMultiple(of: 4) {
+          searchEarlier = engine.teachingCompareValue(
+            mid, against: val, by: >, stageID: "SimplifiedLibrarySort.chooseGap",
+            whenTrue: String(localized: "The spine value is larger, so search an earlier library gap.", bundle: .module),
+            whenFalse: String(localized: "The new value belongs after this spine value.", bundle: .module))
+        } else {
+          searchEarlier = engine.compareValue(mid, against: val, by: >)
+        }
+        if searchEarlier {
           hi = mid
         } else {
           lo = mid + 1
@@ -147,6 +165,14 @@ public struct SimplifiedLibrarySort: SortAlgorithm {
         let value = engine.readValue(at: i)
         tempShadow[pos] = value
         engine.writeAux(tempHandle, at: pos, value: value)
+        if engine.shouldAnnotateCurrentOperation {
+          engine.annotateLastOperation(
+            stageID: "SimplifiedLibrarySort.placeBatchInGap", outcome: "buffered",
+            roles: ["source": .arrayIndex(i),
+              "gap": .auxiliaryIndex(handle: tempHandle.rawValue, index: pos)],
+            explanationKey: "SimplifiedLibrarySort.placeBatchInGap",
+            explanation: String(localized: "Place this classified batch value in its assigned library gap.", bundle: .module))
+        }
         cntsShadow[loc] = pos + 1
         engine.writeAux(cntsHandle, at: loc, value: pos + 1)
         k += 1
@@ -159,6 +185,14 @@ public struct SimplifiedLibrarySort: SortAlgorithm {
         let value = engine.readValue(at: i)
         tempShadow[pos] = value
         engine.writeAux(tempHandle, at: pos, value: value)
+        if engine.shouldAnnotateCurrentOperation {
+          engine.annotateLastOperation(
+            stageID: "SimplifiedLibrarySort.placeSpine", outcome: "buffered",
+            roles: ["source": .arrayIndex(i),
+              "spine": .auxiliaryIndex(handle: tempHandle.rawValue, index: pos)],
+            explanationKey: "SimplifiedLibrarySort.placeSpine",
+            explanation: String(localized: "Place this sorted spine value after the batch values in its gap.", bundle: .module))
+        }
         cntsShadow[i] = pos + 1
         engine.writeAux(cntsHandle, at: i, value: pos + 1)
       }
@@ -167,6 +201,13 @@ public struct SimplifiedLibrarySort: SortAlgorithm {
       // `Writes.arraycopy(temp, 0, array, 0, b, ...)`.
       for i in 0..<b {
         engine.setValue(i, tempShadow[i])
+        if engine.shouldAnnotateCurrentOperation {
+          engine.annotateLastOperation(
+            stageID: "SimplifiedLibrarySort.rebuildArray", outcome: "placed",
+            roles: ["output": .arrayIndex(i), "value": .value(tempShadow[i])],
+            explanationKey: "SimplifiedLibrarySort.rebuildArray",
+            explanation: String(localized: "Copy the rebalanced library layout into the live array.", bundle: .module))
+        }
       }
 
       // Locally sort each gap's run of batch elements. `cntsShadow[g]` (post-placement) now
@@ -198,7 +239,7 @@ public struct SimplifiedLibrarySort: SortAlgorithm {
 
       // Classify which of the `spineSize + 1` gaps `engine.values[i]` belongs in, and tally
       // it for the upcoming rebalance.
-      let loc = gapSearch(0, spineSize, engine.readValue(at: i))
+      let loc = gapSearch(0, spineSize, engine.readValue(at: i), sourceIndex: i)
       let updatedCount = cntsShadow[loc + 1] + 1
       cntsShadow[loc + 1] = updatedCount
       engine.writeAux(cntsHandle, at: loc + 1, value: updatedCount)

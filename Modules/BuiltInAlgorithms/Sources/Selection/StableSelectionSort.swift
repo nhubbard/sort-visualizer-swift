@@ -1,10 +1,11 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
 public struct StableSelectionSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "stableselectionsort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Stable Selection Sort",
+    displayName: String(localized: "Stable Selection Sort", bundle: .module),
     category: .selection,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -24,7 +25,13 @@ public struct StableSelectionSort: SortAlgorithm {
     guard n > 1 else { return }
     for i in 0..<(n - 1) {
       var min = i
-      for j in (i + 1)..<n where engine.compare(j, min, by: (<)) {
+      for j in (i + 1)..<n where engine.teachingCompare(
+        j, min,
+        by: (<),
+        stageID: "StableSelectionSort.minimumCandidate",
+        whenTrue: String(localized: "This item is smaller, so update the stable selection minimum.", bundle: .module),
+        whenFalse: String(localized: "The current stable selection minimum remains.", bundle: .module)
+      ) {
         min = j
       }
       let tmp = engine.readValue(at: min)

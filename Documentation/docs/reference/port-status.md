@@ -1,8 +1,7 @@
 # Port status
 
-Porting content from [ArrayV](https://github.com/gouravkhunger/ArrayV) is ongoing, with no fixed
-end date. This page tracks what's shipped and what remains, and the team keeps it current as
-algorithms move from one list to the other. See
+The sorting algorithm corpus derived from [ArrayV](https://github.com/gouravkhunger/ArrayV) is
+complete. This page records the shipped algorithms and shuffles. See
 [Adding a sorting algorithm](../guides/adding-an-algorithm.md) for the porting process.
 
 ## Sorting algorithms
@@ -18,7 +17,7 @@ sequential version, under a different name. Real thread interleaving has no mean
 single-writer model. Porting these variants would add duplicate content, not new algorithmic
 behavior.
 
-This leaves 196 candidates. 182 are shipped. 14 remain, in one category.
+This leaves 196 candidates. All 196 are shipped.
 
 ### By category
 
@@ -31,38 +30,7 @@ This leaves 196 candidates. 182 are shipped. 14 remain, in one category.
 | Merge (19) | All ported |
 | Miscellaneous (4) | All ported |
 | Concurrent (22) | All ported |
-| Hybrid (41) | 27 ported, 14 remaining |
-
-### Remaining work
-
-The list groups remaining work by how complex the ArrayV Java source is, not by category or
-alphabetical order. The line count cited per algorithm is "effective lines": the algorithm's own
-class, plus, when it extends a shared template rather than the bare base class, that template's
-line count. Inherited template logic is real complexity a port must understand and translate.
-
-**Hard** (201–400 effective lines, or a same-category prerequisite not yet ported):
-
-- `MedianMergeSort`, `LazierestSort`, `CircularGrailSort`
-  (self-contained despite the name; it does not extend `GrailSorting`), `FifthMergeSort`,
-  `BufferPartitionMergeSort`, `OptimizedRotateMergeSort`, `EctaSort`.
-
-**Very Hard** (400+ effective lines, or extending one of the largest remaining templates):
-
-- `SqrtSort`, `SynchronousSqrtSort` (190
-  own plus 352 for `BlockMergeSorting`), `AdaptiveGrailSort` (915 lines, self-contained despite the
-  name), `TimSort` (a 45-line wrapper over the 950-line `TimSorting` template), `ChaliceSort` (767
-  own plus 352 for `BlockMergeSorting`), `WikiSort` (a 75-line wrapper over the 1068-line
-  `WikiSorting` template), and `KotaSort` (a 33-line wrapper over the 1142-line `KotaSorting`
-  template, the largest template in ArrayV's `sorts/` tree).
-
-Several of these algorithms share one large template or one unported prerequisite. Porting the
-shared piece once reduces the cost of every sibling in that cluster:
-
-- **BlockMerge cluster**: `ChaliceSort` and `SynchronousSqrtSort` (both Hybrid) both extend
-  `BlockMergeSorting` (352 lines).
-
-The rest of the Hybrid backlog is deferred as a policy, not scheduled piecemeal, earmarked for a
-future batch covering the largest remaining sorts across every category.
+| Hybrid (41) | All ported |
 
 ### Completed clusters
 
@@ -98,21 +66,13 @@ port-the-shared-template-once strategy:
   template plus one new template entry point (`sort(_:using:start:length:)`, ArrayV's
   `quadSortSwap`) for reusing a caller-supplied scratch buffer across recursive partition calls.
 
-A retired scratch document, previously kept at `Documentation/TEMPLATE_PORT_REFERENCE.md`, carried
-hand-transcribed Java-to-pseudocode notes for six templates: `BinaryQuickSortingTemplate`,
-`ShatterSortingTemplate`, `TwinSortingTemplate`, `UnstableGrailSortingTemplate`,
-`PDQSortingTemplate`, and `GrailSortingTemplate`. Every algorithm built on those six templates has
-shipped, so the team retired that document instead of carrying it forward. It does not cover any of
-the templates listed above as still open (`BlockMergeSorting`,
-`TimSorting`, `WikiSorting`, `KotaSorting`) — nor `QuadSorting`, which has since shipped without
-one. A similar transcription pass is worth doing again before tackling the remaining open
-templates, given how dense and index-arithmetic-heavy this style of algorithm tends to be.
-
 ## Shuffles
 
-ArrayV's `Shuffles.java` enum lists 45 cases, flat with no subdirectories. This app ships 44
-shuffles today, all complete. This project's original set of 5 shuffles did not map one-to-one
-onto ArrayV's list when shuffles were first ported, which accounts for the difference.
+ArrayV's `Shuffles.java` enum lists 45 cases, flat with no subdirectories. This app ships 43
+shuffles today. This project's original set of 5 shuffles did not map one-to-one onto ArrayV's
+list when shuffles were first ported. `NaiveShuffle` was subsequently removed after a Swift
+comparison of input structure and sorting traces found it practically redundant with the
+unbiased `RandomShuffle`.
 
 Notes on specific shuffles:
 
@@ -138,9 +98,7 @@ Notes on specific shuffles:
 
 ## Visualizers
 
-This app ships 15 visualizers. 14 are direct ports of ArrayV styles. The 15th,
-`HanoiTowersVisualizer`, is this project's own addition: a dramatized, index-based layout inspired
-by the idea of Hanoi towers, not a literal port of any specific ArrayV visualizer (see
-[Content layer](../architecture/content.md#the-one-style-that-hasnt-been-built)). ArrayV's own
-CustomImage style — a user-supplied image remapped per array permutation — is the one ArrayV style
-with no counterpart here. See [History](../architecture/history.md#whats-still-open).
+This app ships 16 visualizers. Fourteen are direct ports of ArrayV styles. `HanoiTowersVisualizer`
+is this project's index-based tower layout. `CustomImageVisualizer` is an image mosaic inspired by
+ArrayV's CustomImage style, with a local image picker, a built-in sample, and a dedicated Metal
+texture renderer. See [Content layer](../architecture/content.md#custom-image).

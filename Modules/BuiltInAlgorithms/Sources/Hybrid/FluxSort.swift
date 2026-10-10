@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -51,7 +52,7 @@ import SortEngineKit
 public struct FluxSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "fluxsort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Flux",
+    displayName: String(localized: "Flux", bundle: .module),
     category: .hybrid,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -108,13 +109,23 @@ public struct FluxSort: SortAlgorithm {
       if cnt <= 0 { break }
       let left = pta
       pta += 1
-      if engine.compare(left, pta, by: >) { balance += 1 }
+      if engine.teachingCompare(
+        left, pta, by: >,
+        stageID: "FluxSort.run.balance",
+        whenTrue: String(localized: "This adjacent pair descends, contributing to the run-order balance.", bundle: .module),
+        whenFalse: String(localized: "This adjacent pair does not descend, leaving the balance unchanged.", bundle: .module)
+      ) { balance += 1 }
     }
 
     if balance == 0 { return false }
 
     if balance == nmemb - 1 {
       engine.reversal(0, nmemb - 1)
+      engine.annotateLastOperation(
+        stageID: "flux.reverseRun", decisionID: "flux.reverseRun", outcome: "reversed",
+        roles: ["first": .arrayIndex(0), "last": .arrayIndex(nmemb - 1)],
+        explanationKey: "flux.reverseRun",
+        explanation: String(localized: "Every adjacent pair descends, so one reversal completes the sort.", bundle: .module))
       return false
     }
 
@@ -136,7 +147,10 @@ public struct FluxSort: SortAlgorithm {
     if mainIsSwap {
       return swap.values[a] > swap.values[b] ? 1 : 0
     }
-    return engine.compare(a, b, by: >) ? 1 : 0
+    return engine.teachingCompare(
+      a, b, by: >, stageID: "flux.pivotTournament",
+      whenTrue: String(localized: "The first sample is greater, so the pivot tournament advances it.", bundle: .module),
+      whenFalse: String(localized: "The second sample is at least as large, so the pivot tournament advances it.", bundle: .module)) ? 1 : 0
   }
 
   /// Median-of-3 index tournament — verbatim translation of ArrayV's `medianOfThree`, substituting
@@ -266,6 +280,16 @@ public struct FluxSort: SortAlgorithm {
       let val = value > piv ? 1 : 0
 
       engine.setValue(pta, value)
+      engine.annotateLastOperation(
+        stageID: "flux.partition", decisionID: "flux.partition",
+        outcome: val == 0 ? "low" : "high",
+        roles: ["source": mainIsSwap
+          ? .auxiliaryIndex(handle: swap.handle.rawValue, index: ptx) : .arrayIndex(ptx),
+          "destination": .arrayIndex(pta)],
+        explanationKey: "flux.partition",
+        explanation: val == 0
+          ? String(localized: "This value is no greater than the pivot, so the low partition advances.", bundle: .module)
+          : String(localized: "This value exceeds the pivot, so it remains for the high partition.", bundle: .module))
       pta += 1 - val
 
       swap.write(&engine, at: pts, value: value)

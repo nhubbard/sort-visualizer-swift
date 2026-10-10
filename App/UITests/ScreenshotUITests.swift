@@ -7,12 +7,15 @@ import XCTest
 final class ScreenshotUITests: XCTestCase {
   override func setUpWithError() throws {
     continueAfterFailure = false
+    #if targetEnvironment(macCatalyst)
+      throw XCTSkip("The App Store screenshot sequence targets the iPad simulator")
+    #endif
   }
 
   func testCaptureAppStoreScreenshots() throws {
     // The simulator itself boots portrait regardless of the app's own Info.plist orientation
     // restriction — has to be rotated explicitly, or `snapshot()` captures a portrait frame.
-    XCUIDevice.shared.orientation = .landscapeLeft
+    useLandscapeOrientationForUITest()
 
     let app = XCUIApplication()
     setupSnapshot(app)

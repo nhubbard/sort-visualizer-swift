@@ -1,6 +1,7 @@
 def sort(arr):
     silly_sort(arr, 0, len(arr) - 1)
 
+
 def silly_sort(arr, i, j):
     if i < j:
         m = i + (j - i) // 2
@@ -11,12 +12,24 @@ def silly_sort(arr, i, j):
         silly_sort(arr, i + 1, j)
 
 
-
-
 if __name__ == "__main__":
     array = [
-        0, 39, 21, 62, 91, 77, 14, 23,
-        90, 69, 51, 81, 68, 83, 32, 56,
+        0,
+        39,
+        21,
+        62,
+        91,
+        77,
+        14,
+        23,
+        90,
+        69,
+        51,
+        81,
+        68,
+        83,
+        32,
+        56,
     ]
     sort(array)
     print(array)

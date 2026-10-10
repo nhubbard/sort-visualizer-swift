@@ -131,10 +131,17 @@ Content-kind values are stable once assigned:
 | `8` | Highlighted Markdown, Ruby |
 | `9` | Highlighted Markdown, Kotlin |
 | `10` | Highlighted Markdown, Swift |
+| `11` | Optional UTF-8 JSON object mapping locale tags to translated description Markdown |
 
 Kinds `1`–`10` match `CodeLanguage.all`'s index order exactly (kind `k` corresponds to
 `CodeLanguage.all[k-1]`). A language an algorithm doesn't have simply has no content entry for
-that kind; the manifest never stores a zero-length placeholder.
+that kind; the manifest never stores a zero-length placeholder. Kind `11` is present only for
+algorithms with translations. The packer builds this JSON from `description.<locale>.md` files
+beside each algorithm's English `description.md`; the JSON is an archive payload, not an authoring
+file. It has no required flag, so older readers skip it. Older archives
+without kind `11` still load; readers use kind `0` as the English fallback. The inner schema
+minor version is `1` when translation files are present and `0` for legacy archives. The outer
+envelope remains version `1.0`.
 
 **Content section**: the exact concatenation of every entry's UTF-8 bytes, in one fixed order:
 
@@ -143,6 +150,7 @@ that kind; the manifest never stores a zero-length placeholder.
 | 1. Algorithm order | Algorithms appear in the same sorted order as their directory records |
 | 2. Within one algorithm | The description (kind `0`) comes first, if present |
 | 3. Remaining content | Languages follow, sorted by content-kind ID (`1` through `10`) |
+| 4. Optional translations | Kind `11` follows the code samples; its JSON keys are locale tags such as `es` or `es-MX` |
 
 All content-entry offsets in the manifest are relative to the start of this section, not to the
 start of the file or the decompressed payload.
@@ -191,7 +199,7 @@ the `operations` array. Field widths are fixed except where a field is itself va
 |---|---|---|
 | `algorithmID` | `UInt16` length + UTF-8 bytes | The recorded algorithm's raw ID string |
 | `initialValues` | `UInt32` count + that many `Int32` elements | The array's values before the shuffle ran |
-| `visualSeed` | `UInt64` | Raw seed for deterministic per-run color choices |
+| `visualSeed` | `UInt64` | Raw seed for deterministic shuffle decisions and per-run color choices |
 | `compareCount` | `Int32` | ArrayV-parity counter |
 | `swapCount` | `Int32` | ArrayV-parity counter |
 | `mainWriteCount` | `Int32` | ArrayV-parity counter |

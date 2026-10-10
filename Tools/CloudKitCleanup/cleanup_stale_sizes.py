@@ -22,8 +22,8 @@ skips the network entirely and reuses the cached eligible list -- pass --refresh
 fresh fetch regardless of what's cached. --execute removes each successfully-deleted record from
 the cache as it goes, so a run that fails partway through deleting can also just be re-run.
 
-Requires `xcrun cktool save-token --type user` to already have been run for the iCloud account
-the app syncs analytics under (see README).
+Requires `xcrun cktool save-token --type user` or `--token-file` with a CloudKit Console CLI
+user token for the iCloud account the app syncs analytics under (see README).
 
 Usage (uv run, not plain python3 -- this script declares its own tqdm dependency inline (PEP
 723) and uv installs it into an ephemeral env automatically, no venv/pip setup needed):
@@ -35,9 +35,12 @@ Usage (uv run, not plain python3 -- this script declares its own tqdm dependency
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
+import re
 import subprocess
 import sys
+from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -50,14 +53,36 @@ GROWTH_MODEL_REPORT = (
 CACHE_DIR = Path(__file__).resolve().parent / ".cache"
 CONTAINER_ID = "iCloud.com.nhubbard.Sort2.mobile"
 DEFAULT_OPERATION_CAP = 300_000.0
+ALGORITHM_SOURCES = REPO_ROOT / "Modules" / "BuiltInAlgorithms" / "Sources"
+METADATA_SOURCE = REPO_ROOT / "Modules" / "AlgorithmKit" / "Sources" / "AlgorithmMetadata.swift"
 
 
 def load_thresholds() -> dict[str, float]:
-    """algorithmID -> safe max array size at the 300,000-op cap, per the most recent growth-model
-    calibration. Every algorithm currently has a value at this cap (checked directly when this
-    script was written); if a future re-calibration ever leaves one without one, it's skipped
-    with a warning rather than guessed at -- better to under-delete than to invent a threshold."""
+    """algorithmID -> actual selectable maximum at the 300,000-operation cap.
+
+    Mirror AlgorithmMetadata.effectiveSizeRange: clamp the calibrated safe maximum to 8192,
+    then round down to a size the stepper can reach from the algorithm's lower bound. Refuse
+    incomplete calibration rather than silently leaving algorithms unchecked.
+    """
     entries = json.loads(GROWTH_MODEL_REPORT.read_text())
+    reasonable_limit = re.search(
+        r"maxReasonableArraySize\s*=\s*(\d+)", METADATA_SOURCE.read_text()
+    )
+    if not reasonable_limit:
+        raise ValueError("cannot read maxReasonableArraySize from AlgorithmMetadata")
+    max_reasonable_array_size = int(reasonable_limit.group(1))
+    lower_bounds: dict[str, int] = {}
+    for path in ALGORITHM_SOURCES.rglob("*.swift"):
+        if "Shuffles" in path.parts or "Templates" in path.parts:
+            continue
+        source = path.read_text()
+        identifier = re.search(r'AlgorithmID\(rawValue:\s*"([^"]+)"\)', source)
+        if not identifier:
+            continue
+        bounds = re.search(r"sizeRange:\s*(\d+)\s*\.\.\.\s*(\d+)", source)
+        if not bounds:
+            raise ValueError(f"cannot find size range for {identifier.group(1)} in {path}")
+        lower_bounds[identifier.group(1)] = int(bounds.group(1))
     thresholds: dict[str, float] = {}
     missing: list[str] = []
     for entry in entries:
@@ -71,27 +96,41 @@ def load_thresholds() -> dict[str, float]:
         if value is None:
             missing.append(algorithm_id)
         else:
-            thresholds[algorithm_id] = value
+            if algorithm_id not in lower_bounds:
+                raise ValueError(f"calibration has no current algorithm source: {algorithm_id}")
+            lower = lower_bounds[algorithm_id]
+            raw_max = max(lower, min(int(value), max_reasonable_array_size))
+            step = 16 if raw_max - lower >= 16 else max(1, raw_max - lower)
+            thresholds[algorithm_id] = lower + step * ((raw_max - lower) // step)
     if missing:
-        print(
-            f"warning: {len(missing)} algorithm(s) have no safe-max at the 300,000 cap, "
-            f"skipping (their records won't be touched): {', '.join(sorted(missing))}",
-            file=sys.stderr,
-        )
+        raise ValueError(f"missing 300,000-operation calibration: {', '.join(sorted(missing))}")
+    if set(thresholds) != set(lower_bounds):
+        raise ValueError(f"missing algorithms in calibration: {', '.join(sorted(set(lower_bounds) - set(thresholds)))}")
     return thresholds
 
 
-def run_cktool(args: list[str]) -> dict:
+def threshold_digest(thresholds: dict[str, float]) -> str:
+    payload = json.dumps(thresholds, sort_keys=True, separators=(",", ":"))
+    return hashlib.sha256(payload.encode()).hexdigest()
+
+
+def cktool_command(args: list[str], token: str | None) -> list[str]:
+    return ["xcrun", "cktool", args[0], *(["--token", token] if token else []), *args[1:]]
+
+
+def run_cktool(args: list[str], token: str | None = None) -> dict:
     result = subprocess.run(
-        ["xcrun", "cktool", *args], capture_output=True, text=True, check=False
+        cktool_command(args, token), capture_output=True, text=True, check=False
     )
     if result.returncode != 0:
-        print(f"cktool {' '.join(args)} failed:\n{result.stderr}", file=sys.stderr)
+        error = result.stderr.replace(token, "[redacted]") if token else result.stderr
+        print(f"cktool {' '.join(args)} failed:\n{error}", file=sys.stderr)
         sys.exit(1)
     try:
         return json.loads(result.stdout)
     except json.JSONDecodeError:
-        print(f"cktool returned non-JSON output:\n{result.stdout}", file=sys.stderr)
+        output = result.stdout.replace(token, "[redacted]") if token else result.stdout
+        print(f"cktool returned non-JSON output:\n{output}", file=sys.stderr)
         sys.exit(1)
 
 
@@ -119,7 +158,7 @@ def load_cache(path: Path) -> dict | None:
 
 def save_cache(
     path: Path, *, environment: str, record_type: str, eligible: list[dict],
-    continuation_token: str | None, total_fetched: int,
+    continuation_token: str | None, total_fetched: int, thresholds_digest: str,
 ) -> None:
     """Atomic write (temp file + rename) so a crash mid-write can never leave a half-written,
     unparseable cache file behind -- important here since this is called after every single page
@@ -132,6 +171,7 @@ def save_cache(
         "continuationToken": continuation_token,
         "totalFetched": total_fetched,
         "eligible": eligible,
+        "thresholdsDigest": thresholds_digest,
     }
     tmp_path = path.with_suffix(".json.tmp")
     tmp_path.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n")
@@ -142,6 +182,7 @@ def fetch_and_filter(
     *, container_id: str, environment: str, database_type: str, zone_name: str,
     record_type: str, team_id: str | None, thresholds: dict[str, float],
     algorithm_field: str, size_field: str, cache_file: Path, resume_from: dict | None,
+    thresholds_digest: str, token: str | None,
 ) -> tuple[list[dict], int]:
     """Fetches every page of `record_type`, filtering each record against `thresholds` as it
     arrives, and persists (eligible list + continuationToken) to `cache_file` after every page --
@@ -176,7 +217,7 @@ def fetch_and_filter(
                 args += ["--team-id", team_id]
             if continuation_token:
                 args += ["--continuation-token", continuation_token]
-            response = run_cktool(args)
+            response = run_cktool(args, token)
             page = response.get("records", [])
             continuation_token = response.get("continuationToken")
             total_fetched += len(page)
@@ -203,6 +244,7 @@ def fetch_and_filter(
             save_cache(
                 cache_file, environment=environment, record_type=record_type, eligible=eligible,
                 continuation_token=continuation_token, total_fetched=total_fetched,
+                thresholds_digest=thresholds_digest,
             )
             if not continuation_token:
                 break
@@ -226,8 +268,9 @@ def print_summary(eligible: list[dict], *, executing: bool) -> None:
     for algorithm_id in sorted(by_algorithm):
         entries = by_algorithm[algorithm_id]
         threshold = entries[0]["threshold"]
-        sizes = sorted(e["arraySize"] for e in entries)
-        print(f"  {algorithm_id}: {len(entries)} record(s) above threshold {threshold:g} -- sizes {sizes}")
+        sizes = Counter(e["arraySize"] for e in entries)
+        size_counts = ", ".join(f"{size}×{count}" for size, count in sorted(sizes.items()))
+        print(f"  {algorithm_id}: {len(entries)} record(s) above threshold {threshold:g} -- sizes {size_counts}")
 
 
 def main() -> None:
@@ -241,10 +284,19 @@ def main() -> None:
     parser.add_argument("--team-id", default="676UP3S3AH", help="required by query-records; not by delete-record")
     parser.add_argument("--execute", action="store_true", help="actually delete (default: dry run)")
     parser.add_argument("--refresh", action="store_true", help="ignore any cached/resumable state and start a fully fresh fetch")
+    parser.add_argument("--token-file", type=Path, help="CloudKit Console CLI user token file; avoids stale cktool saved-token lookup")
     args = parser.parse_args()
 
+    token = args.token_file.read_text().strip() if args.token_file else None
+    if args.token_file and not token:
+        parser.error("token file is empty")
+
+    thresholds = load_thresholds()
+    digest = threshold_digest(thresholds)
     path = cache_path(args.environment, args.record_type)
     existing = None if args.refresh else load_cache(path)
+    if existing is not None and existing.get("thresholdsDigest") != digest:
+        parser.error("cached thresholds are stale; rerun with --refresh before reviewing or deleting records")
 
     if existing is not None and existing["continuationToken"] is None:
         print(f"Using cached eligible-list from {path} (pass --refresh to re-fetch from CloudKit).\n", file=sys.stderr)
@@ -256,12 +308,11 @@ def main() -> None:
                 f"Resuming interrupted fetch from {path} "
                 f"({existing['totalFetched']} record(s) already fetched)...\n", file=sys.stderr,
             )
-        thresholds = load_thresholds()
         eligible, total_fetched = fetch_and_filter(
             container_id=CONTAINER_ID, environment=args.environment, database_type=args.database_type,
             zone_name=args.zone_name, record_type=args.record_type, team_id=args.team_id,
             thresholds=thresholds, algorithm_field=args.algorithm_field, size_field=args.size_field,
-            cache_file=path, resume_from=existing,
+            cache_file=path, resume_from=existing, thresholds_digest=digest, token=token,
         )
         print(f"Cached {len(eligible)} eligible record(s) to {path}.\n", file=sys.stderr)
 
@@ -288,11 +339,12 @@ def main() -> None:
             "--record-name", entry["recordName"],
             "--yes",
         ]
-        result = subprocess.run(["xcrun", "cktool", *delete_args], capture_output=True, text=True)
+        result = subprocess.run(cktool_command(delete_args, token), capture_output=True, text=True)
         if result.returncode != 0:
+            error = result.stderr.replace(token, "[redacted]") if token else result.stderr
             print(
                 f"  FAILED to delete {entry['recordName']} ({entry['algorithmID']}, "
-                f"size {entry['arraySize']}): {result.stderr}", file=sys.stderr,
+                f"size {entry['arraySize']}): {error}", file=sys.stderr,
             )
         else:
             deleted += 1
@@ -304,6 +356,7 @@ def main() -> None:
             save_cache(
                 path, environment=args.environment, record_type=args.record_type,
                 eligible=remaining, continuation_token=None, total_fetched=total_fetched,
+                thresholds_digest=digest,
             )
 
     print(f"Deleted {deleted}/{len(eligible)} record(s).")

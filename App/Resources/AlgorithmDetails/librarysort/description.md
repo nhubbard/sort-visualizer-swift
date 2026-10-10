@@ -1,5 +1,3 @@
-*From Wikipedia, the free encyclopedia*
-
 Library sort takes its name from a librarian shelving books: rather than packing already-sorted
 books edge to edge, a librarian leaves a little empty space after each one, so a newly acquired
 book can usually just slide into the gap right after its correct neighbor instead of forcing every
@@ -10,8 +8,8 @@ search over the already-placed elements locates where the new value belongs, and
 immediately following its predecessor happens to be empty, the value drops in directly with no
 shifting at all.
 
-Gaps don't last forever. Insertions gradually consume the empty slots near a busy region, and
-eventually a new value's target slot turns out to already be occupied by another element — or, at
+Gaps do not last forever. Insertions gradually consume the empty slots near a busy region, and
+eventually a new value's target slot turns out to already be occupied by another element, or, at
 the high end, to sit just past the last slot the structure currently has room for. When that
 happens, the nearest empty slot is located by scanning outward in both directions from the target,
 and every element between the target and whichever gap turns out closer is shifted over by one to

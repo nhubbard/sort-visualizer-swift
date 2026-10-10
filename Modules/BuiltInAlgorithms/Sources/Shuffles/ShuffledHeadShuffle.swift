@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -11,7 +12,7 @@ import SortEngineKit
 /// as-is.
 public struct ShuffledHeadShuffle: ShuffleAlgorithm {
   public let id = ShuffleID(rawValue: "shuffledhead")
-  public let metadata = ShuffleMetadata(displayName: "Scrambled Head")
+  public let metadata = ShuffleMetadata(displayName: String(localized: "Scrambled Head", bundle: .module))
   public init() {}
   public func record(into engine: inout RecordingEngine) {
     let n = engine.count
@@ -25,7 +26,7 @@ public struct ShuffledHeadShuffle: ShuffleAlgorithm {
     var j = n - 1
     var k = 0
     while i >= 0 {
-      if Double.random(in: 0..<1) < 1.0 / 7.0 {
+      if engine.randomUnitDouble() < 1.0 / 7.0 {
         aux[k] = values[i]
         engine.writeAux(auxHandle, at: k, value: values[i])
         k += 1
@@ -45,7 +46,7 @@ public struct ShuffledHeadShuffle: ShuffleAlgorithm {
 
     if j > 0 {
       for pos in 0..<j {
-        engine.swap(pos, Int.random(in: pos..<j))
+        engine.swap(pos, engine.randomIndex(in: pos..<j))
       }
     }
   }

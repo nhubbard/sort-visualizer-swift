@@ -24,9 +24,7 @@ int isSplit(int arr[], int start, int mid, int end);
 void shuffleRange(int arr[], int start, int end);
 void sortRange(int arr[], int start, int end);
 
-void sort(int arr[], int n) {
-  sortRange(arr, 0, n);
-}
+void sort(int arr[], int n) { sortRange(arr, 0, n); }
 
 int isSplit(int arr[], int start, int mid, int end) {
   int lowMax = arr[start];

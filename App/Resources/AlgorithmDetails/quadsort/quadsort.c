@@ -43,8 +43,7 @@ static void parityMerge16(int arr[], int start, int aux[]);
 static void partialBackwardMerge(int arr[], int aux[], int start, int nmemb,
                                  int block);
 static void tailMerge(int arr[], int aux[], int start, int nmemb, int block);
-static int forwardMergeRead(const int arr[], const int aux[], int toAux,
-                            int i);
+static int forwardMergeRead(const int arr[], const int aux[], int toAux, int i);
 static void forwardMergeWrite(int arr[], int aux[], int toAux, int i,
                               int value);
 static void forwardMerge(int arr[], int aux[], int start, int auxStart,

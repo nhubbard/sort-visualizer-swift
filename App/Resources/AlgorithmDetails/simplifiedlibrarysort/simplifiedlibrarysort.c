@@ -1,8 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
-                 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
 
 void swap(int *a, int *b) {
   int t = *a;
@@ -27,9 +26,7 @@ void rebalance(int arr[], int temp[], int counts[], int locations[],
                int spineSize, int batchEnd);
 void librarySort(int arr[], int n);
 
-void sort(int arr[], int n) {
-  librarySort(arr, n);
-}
+void sort(int arr[], int n) { librarySort(arr, n); }
 
 int binarySearch(int arr[], int item, int start, int end) {
   int lo = start;

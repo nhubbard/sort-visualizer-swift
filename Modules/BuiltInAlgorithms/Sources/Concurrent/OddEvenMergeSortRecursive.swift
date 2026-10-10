@@ -1,10 +1,11 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
 public struct OddEvenMergeSortRecursive: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "oddevenmergesortrecursive")
   public let metadata = AlgorithmMetadata(
-    displayName: "Odd-Even Merge Sort (Recursive)",
+    displayName: String(localized: "Odd-Even Merge Sort (Recursive)", bundle: .module),
     category: .concurrent,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -33,7 +34,16 @@ public struct OddEvenMergeSortRecursive: SortAlgorithm {
     // ArrayV's `oddEvenMergeCompare`: the only place values are ever read — everything else in
     // this algorithm is pure recursive index/size arithmetic.
     func oddEvenMergeCompare(_ i: Int, _ j: Int) {
-      if engine.compare(i, j, by: (>)) {
+      let shouldSwap = engine.compare(i, j, by: (>))
+      engine.annotateLastOperation(
+        stageID: "compareExchange", decisionID: "oddevenmergesortrecursive.networkComparator",
+        outcome: shouldSwap ? "exchange" : "keep",
+        roles: ["left": .arrayIndex(i), "right": .arrayIndex(j)],
+        explanationKey: "oddevenmergesortrecursive.compareExchange",
+        explanation: shouldSwap
+          ? String(localized: "The left value exceeds the right value, so this comparator exchanges them.", bundle: .module)
+          : String(localized: "These values satisfy this comparator, so they stay in place.", bundle: .module))
+      if shouldSwap {
         engine.swap(i, j)
       }
     }

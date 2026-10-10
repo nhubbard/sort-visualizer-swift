@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -9,7 +10,7 @@ import SortEngineKit
 public struct BinaryGnomeSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "binarygnomesort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Binary Gnome Sort",
+    displayName: String(localized: "Binary Gnome Sort", bundle: .module),
     category: .exchange,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -42,7 +43,13 @@ public struct BinaryGnomeSort: SortAlgorithm {
 
         // Do NOT move equal elements to the right of the inserted element;
         // this maintains stability.
-        if engine.compare(i, mid, by: <) {
+        if engine.teachingCompare(
+          i, mid,
+          by: <,
+          stageID: "BinaryGnomeSort.binaryPosition",
+          whenTrue: String(localized: "The item precedes this midpoint, so search the lower half.", bundle: .module),
+          whenFalse: String(localized: "The item follows this midpoint, so search the upper half.", bundle: .module)
+        ) {
           hi = mid
         } else {
           lo = mid + 1

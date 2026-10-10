@@ -26,6 +26,7 @@ def sort(arr):
             b = p
             q -= 1
 
+
 def int_pow(base, exponent):
     result = 1
     for _ in range(exponent):
@@ -101,12 +102,24 @@ def dist(arr, a, b, place, base):
     return bin_search_digit(arr, a, b, 1, place, base)
 
 
-
-
 if __name__ == "__main__":
     array = [
-        0, 39, 21, 62, 91, 77, 14, 23,
-        90, 69, 51, 81, 68, 83, 32, 56,
+        0,
+        39,
+        21,
+        62,
+        91,
+        77,
+        14,
+        23,
+        90,
+        69,
+        51,
+        81,
+        68,
+        83,
+        32,
+        56,
     ]
     sort(array)
     print(array)

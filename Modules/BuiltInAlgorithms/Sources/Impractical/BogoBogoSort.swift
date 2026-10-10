@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -37,12 +38,12 @@ import SortEngineKit
 public struct BogoBogoSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "bogobogosort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Bogo Bogo Sort",
+    displayName: String(localized: "Bogo Bogo Sort", bundle: .module),
     category: .impractical,
     sizeRange: 3...5,
     growthModel: OperationGrowthModel(
-      anchorSize: 12, coefficients: [3451.29, 1516.82, 333.315, 48.83, 5.36511, 0.471586, 0.0345432],
-      measuredSafeCeiling: 12),
+      anchorSize: 4, coefficients: [102.571, 45.0793, 9.90602, 1.45121, 0.159449, 0.0140154, 0.00102661],
+      measuredSafeCeiling: 4),
     detectedGrowthModel: DetectedGrowthModel(
       family: .exponential, coefficients: [17.6826, 1.55192], rSquared: 0.984783),
     implementationComplexity: 35,
@@ -157,7 +158,22 @@ public struct BogoBogoSort: SortAlgorithm {
         localBogoBogo(idx, n - 1)
       }
 
-      for i in 0..<n where engine.readValue(at: i) != tmp[idx][i] { return false }
+      for i in 0..<n {
+        let candidate = engine.readValue(at: i)
+        let matches = candidate == tmp[idx][i]
+        engine.annotateLastOperation(
+          stageID: "candidateCheck", decisionID: "bogobogosort.recursiveCandidateCheck",
+          outcome: matches ? "continue" : "reject",
+          roles: [
+            "candidate": .arrayIndex(i),
+            "sortedScratch": .auxiliaryIndex(handle: tmpHandles[idx].rawValue, index: i),
+          ],
+          explanationKey: "bogobogosort.recursiveCandidateCheck",
+          explanation: matches
+            ? String(localized: "This candidate value matches the recursively sorted scratch copy, so continue checking.", bundle: .module)
+            : String(localized: "This value differs from the recursively sorted scratch copy, so reject the candidate.", bundle: .module))
+        if !matches { return false }
+      }
       return true
     }
 
@@ -170,6 +186,11 @@ public struct BogoBogoSort: SortAlgorithm {
       var j = n - 1
       while !engine.compare(j, i, by: (>)) { j -= 1 }
       engine.swap(i, j)
+      engine.annotateLastOperation(
+        stageID: "candidateExchange", decisionID: "bogobogosort.candidateExchange",
+        outcome: "exchange", roles: ["left": .arrayIndex(i), "right": .arrayIndex(j)],
+        explanationKey: "bogobogosort.candidateExchange",
+        explanation: String(localized: "The next permutation exchanges its pivot with a larger successor before reversing the suffix.", bundle: .module))
       engine.reversal(i + 1, n - 1)
       return true
     }
@@ -177,6 +198,12 @@ public struct BogoBogoSort: SortAlgorithm {
     while !topIsSorted() {
       if !advanceMainPermutation() {
         engine.reversal(0, n - 1)
+        engine.annotateLastOperation(
+          stageID: "candidateWrap", decisionID: "bogobogosort.permutationWrap",
+          outcome: "reverse",
+          roles: ["first": .arrayIndex(0), "last": .arrayIndex(n - 1)],
+          explanationKey: "bogobogosort.permutationWrap",
+          explanation: String(localized: "The descending candidate is the final permutation, so reverse it to wrap to sorted order.", bundle: .module))
       }
     }
 

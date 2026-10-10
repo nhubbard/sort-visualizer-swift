@@ -1,10 +1,11 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
 public struct TernaryHeapSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "ternaryheapsort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Ternary Heap Sort",
+    displayName: String(localized: "Ternary Heap Sort", bundle: .module),
     category: .selection,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -38,7 +39,13 @@ public struct TernaryHeapSort: SortAlgorithm {
       let rightChild = 3 * i + 3
 
       var largest = i
-      if leftChild <= heapSize, engine.compare(leftChild, largest, by: (>)) {
+      if leftChild <= heapSize, engine.teachingCompare(
+        leftChild, largest,
+        by: (>),
+        stageID: "TernaryHeapSort.leftChild",
+        whenTrue: String(localized: "The left child is larger, so promote it as heap maximum.", bundle: .module),
+        whenFalse: String(localized: "The current heap maximum remains.", bundle: .module)
+      ) {
         largest = leftChild
       }
       if rightChild <= heapSize, engine.compare(rightChild, largest, by: (>)) {

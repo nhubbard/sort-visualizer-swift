@@ -7,6 +7,7 @@ def sort(arr):
         return
     quick_sort(arr, 0, n)
 
+
 def median_of_three(arr, start, end):
     """Arranges arr[start], arr[mid], arr[end - 1] so the median of the three ends up at
     `start`, ready to serve as partition's pivot."""

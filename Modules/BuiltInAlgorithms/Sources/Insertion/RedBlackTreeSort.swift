@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -15,7 +16,7 @@ import SortEngineKit
 public struct RedBlackTreeSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "redblacktreesort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Tree Sort (Red-Black Balanced)",
+    displayName: String(localized: "Tree Sort (Red-Black Balanced)", bundle: .module),
     category: .insertion,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -87,7 +88,13 @@ public struct RedBlackTreeSort: SortAlgorithm {
         node.right!.isRed = false
       }
 
-      if engine.compare(addPointer, node.pointer, by: <) {
+      if engine.teachingCompare(
+        addPointer, node.pointer,
+        by: <,
+        stageID: "RedBlackTreeSort.treeBranch",
+        whenTrue: String(localized: "The inserted value is smaller, so descend into the left red-black branch.", bundle: .module),
+        whenFalse: String(localized: "The inserted value belongs in the other red-black branch.", bundle: .module)
+      ) {
         let result = add(node.left, addPointer)
         node.left = result.node
         if result.needsFix {

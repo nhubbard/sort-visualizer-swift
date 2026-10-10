@@ -1,8 +1,6 @@
-*From Wikipedia, the free encyclopedia*
-
-Circle Sort is a comparison-based sorting algorithm that repeatedly compares elements in symmetric pairs drawn from
-opposite ends of shrinking sub-ranges of the array, swapping any pair found out of order. Picture a range of the array
-bent into a circle: its first and last element sit at opposite ends of a diameter. The algorithm compares that outermost
+Iterative Circle Sort is a comparison-based sorting algorithm that repeatedly compares elements in symmetric pairs drawn from
+opposite ends of shrinking sub-ranges of the array, swapping any pair found out of order. A range can be pictured as a
+circle, with its first and last elements at opposite ends of a diameter. The algorithm compares that outermost
 pair, then steps one position inward along the circle to compare the next pair, and so on until its two pointers meet or
 cross at the circle's center. Applying this fold-inward comparison to shrinking ranges, and repeating the whole process
 until an entire pass produces no swaps, is enough to fully sort the array.
@@ -13,11 +11,11 @@ of pointers folds inward from its two edges toward its center, comparing and swa
 times a window can be evenly halved depends on the array being some power of two in length, the algorithm conceptually
 pads its working size up to the next power of two at or above the array's real length before deriving gaps and windows
 from it; every index computed from that padded size is still checked against the array's true length before it is ever
-read or written, so no access actually reaches past the end of the real array.
+read or written, so no access reaches past the end of the real array.
 
 A single sweep through every gap and every window is one routine pass. Because a badly placed element can take more than
 one pass to travel from one side of a window to the other, the algorithm keeps invoking the routine, one full pass at a
-time, until a pass completes having made no swaps at all — at which point the array is guaranteed to be sorted.
+time, until a pass completes having made no swaps at all, at which point the array is guaranteed to be sorted.
 
 Circle Sort is not a stable sort, since equal elements found in opposite positions within a window may still be swapped
 past one another. It sorts in place, using only a constant amount of extra bookkeeping beyond the array itself.

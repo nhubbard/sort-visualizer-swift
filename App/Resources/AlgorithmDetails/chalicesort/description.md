@@ -1,0 +1,3 @@
+Chalice Sort is a stable block-merge sorting algorithm that uses a temporary buffer whose size grows with the cube root of the input length. It first gathers distinct keys and ordered comparison pairs from the input. These internal buffers label blocks during merging, while the external buffer holds a small displaced block.
+
+The algorithm builds short sorted runs, merges groups of blocks, and restores the saved keys and pairs afterward. It permutes internal keys and comparison bits to track blocks during these merges. When there are too few distinct keys or usable pairs, it switches to stable in-place merges. Its block-merge path has O(n log n) worst-case time and O(∛n) auxiliary space.

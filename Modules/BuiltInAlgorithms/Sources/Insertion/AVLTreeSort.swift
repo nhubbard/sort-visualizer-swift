@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -17,7 +18,7 @@ import SortEngineKit
 public struct AVLTreeSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "avltreesort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Tree Sort (AVL Balanced)",
+    displayName: String(localized: "Tree Sort (AVL Balanced)", bundle: .module),
     category: .insertion,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -111,7 +112,13 @@ public struct AVLTreeSort: SortAlgorithm {
         return AddResult(node: Node(addPointer), heightChanged: true)
       }
 
-      if engine.compare(addPointer, node.pointer, by: <) {
+      if engine.teachingCompare(
+        addPointer, node.pointer,
+        by: <,
+        stageID: "AVLTreeSort.treeBranch",
+        whenTrue: String(localized: "The inserted value is smaller, so descend into the left AVL branch.", bundle: .module),
+        whenFalse: String(localized: "The inserted value belongs in the other AVL branch.", bundle: .module)
+      ) {
         let result = add(node.left, addPointer)
         node.left = result.node
         if result.heightChanged {

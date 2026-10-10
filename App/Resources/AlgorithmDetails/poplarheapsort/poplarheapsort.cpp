@@ -10,8 +10,6 @@ void popHeapWithSize(std::vector<int> &array, int first, int last, int sizeIn);
 void makeHeap(std::vector<int> &array, int first, int last);
 void sortHeap(std::vector<int> &array, int first, int lastIn);
 
-
-
 void printList(const std::vector<int> &items) {
   printf("[");
   if (!items.empty()) {

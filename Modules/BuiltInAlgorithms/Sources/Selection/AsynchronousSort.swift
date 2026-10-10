@@ -1,10 +1,11 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
 public struct AsynchronousSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "asynchronoussort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Asynchronous Sort",
+    displayName: String(localized: "Asynchronous Sort", bundle: .module),
     category: .selection,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -57,7 +58,13 @@ public struct AsynchronousSort: SortAlgorithm {
     while i < n {
       for j in 0..<n {
         engine.markAuxRead(extHandle, at: j)
-        if engine.compareValues(ext[j], cur, by: (<=)) {
+        if engine.teachingCompareValues(
+          ext[j], cur,
+          by: (<=),
+          stageID: "AsynchronousSort.threshold",
+          whenTrue: String(localized: "This saved value has reached the threshold, so write it to the next output slot.", bundle: .module),
+          whenFalse: String(localized: "This saved value is above the threshold; revisit it as the threshold rises.", bundle: .module)
+        ) {
           engine.setValue(i, ext[j])
           ext[j] = maxValue
           engine.writeAux(extHandle, at: j, value: maxValue)

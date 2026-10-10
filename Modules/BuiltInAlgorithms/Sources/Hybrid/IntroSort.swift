@@ -5,7 +5,7 @@ import SortEngineKit
 public struct IntroSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "introsort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Intro Sort",
+    displayName: String(localized: "Intro Sort", bundle: .module),
     category: .hybrid,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -28,7 +28,12 @@ public struct IntroSort: SortAlgorithm {
     let sizeThreshold = 16
 
     func medianOf3(_ left: Int, _ mid: Int, _ right: Int) -> Int {
-      if !engine.compare(right, left) {
+      if !engine.teachingCompare(
+        right, left,
+        stageID: "IntroSort.pivot.median",
+        whenTrue: String(localized: "The right endpoint is at least the left, so median setup leaves this pair in place.", bundle: .module),
+        whenFalse: String(localized: "The right endpoint is smaller, so median setup swaps the endpoints.", bundle: .module)
+      ) {
         engine.swap(left, right)
       }
       if !engine.compare(mid, left) {
@@ -44,9 +49,19 @@ public struct IntroSort: SortAlgorithm {
       var i = lo
       var j = hi
       while true {
-        while engine.compareValue(i, against: pivotValue, by: (<)) { i += 1 }
+        while engine.teachingCompareValue(
+          i, against: pivotValue, by: (<),
+          stageID: "IntroSort.partition.leftScan",
+          whenTrue: String(localized: "This value belongs below the pivot, so the left scan advances.", bundle: .module),
+          whenFalse: String(localized: "This value reaches the pivot side, so the left scan stops.", bundle: .module)
+        ) { i += 1 }
         j -= 1
-        while engine.compareValue(j, against: pivotValue, by: (>)) { j -= 1 }
+        while engine.teachingCompareValue(
+          j, against: pivotValue, by: (>),
+          stageID: "IntroSort.partition.rightScan",
+          whenTrue: String(localized: "This value belongs above the pivot, so the right scan retreats.", bundle: .module),
+          whenFalse: String(localized: "This value reaches the pivot side, so the right scan stops.", bundle: .module)
+        ) { j -= 1 }
         if !(i < j) { return i }
         engine.swap(i, j)
         i += 1
@@ -105,7 +120,12 @@ public struct IntroSort: SortAlgorithm {
       var i = start + 1
       while i < end {
         var j = i
-        while j > start && !engine.compare(j, j - 1) {
+        while j > start && !engine.teachingCompare(
+          j, j - 1,
+          stageID: "IntroSort.finalInsertion.order",
+          whenTrue: String(localized: "The current value is at least its predecessor, so insertion stops.", bundle: .module),
+          whenFalse: String(localized: "The current value is smaller, so insertion moves it left.", bundle: .module)
+        ) {
           engine.swap(j - 1, j)
           j -= 1
         }

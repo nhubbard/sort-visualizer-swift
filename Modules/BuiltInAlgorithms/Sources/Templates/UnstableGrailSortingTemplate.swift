@@ -1,3 +1,4 @@
+import Foundation
 import SortEngineKit
 
 /// Ported from ArrayV's `sorts/templates/UnstableGrailSorting` — Andrey Astrelin's classic
@@ -10,6 +11,11 @@ enum UnstableGrailSortingTemplate {
   private static func multiSwap(_ engine: inout RecordingEngine, _ a: Int, _ b: Int, _ count: Int) {
     for i in 0..<count {
       engine.swap(a + i, b + i)
+      engine.annotateLastOperation(
+        stageID: "unstableGrail.blockExchange", decisionID: "unstableGrail.blockExchange",
+        outcome: "exchange", roles: ["left": .arrayIndex(a + i), "right": .arrayIndex(b + i)],
+        explanationKey: "unstableGrail.blockExchange",
+        explanation: String(localized: "Unstable Grail exchanges these block positions to rotate or merge the current runs.", bundle: .module))
     }
   }
 
@@ -38,7 +44,12 @@ enum UnstableGrailSortingTemplate {
     guard len > 1 else { return }
     for i in 1..<len {
       var p = pos + i
-      while p > pos && engine.compare(p - 1, p, by: >) {
+      while p > pos && engine.teachingCompare(
+        p - 1, p, by: >,
+        stageID: "unstableGrail.smallRun",
+        whenTrue: String(localized: "This adjacent pair is reversed, so the insertion pass shifts it.", bundle: .module),
+        whenFalse: String(localized: "This adjacent pair is ordered, so the insertion pass leaves it.", bundle: .module)
+      ) {
         engine.swap(p - 1, p)
         p -= 1
       }
@@ -55,13 +66,23 @@ enum UnstableGrailSortingTemplate {
     while left < right - 1 {
       let mid = left + (right - left) / 2
       if isLeft {
-        if engine.compare(pos + mid, keyPos, by: >=) {
+        if engine.teachingCompare(
+          pos + mid, keyPos, by: >=,
+          stageID: "unstableGrail.lowerBound",
+          whenTrue: String(localized: "This run key is at least the held key, so the lower-bound search narrows left.", bundle: .module),
+          whenFalse: String(localized: "This run key is smaller, so the lower-bound search moves right.", bundle: .module)
+        ) {
           right = mid
         } else {
           left = mid
         }
       } else {
-        if engine.compare(pos + mid, keyPos, by: >) {
+        if engine.teachingCompare(
+          pos + mid, keyPos, by: >,
+          stageID: "unstableGrail.upperBound",
+          whenTrue: String(localized: "This run key exceeds the held key, so the upper-bound search narrows left.", bundle: .module),
+          whenFalse: String(localized: "This run key is no greater, so the upper-bound search moves right.", bundle: .module)
+        ) {
           right = mid
         } else {
           left = mid
@@ -89,7 +110,12 @@ enum UnstableGrailSortingTemplate {
         repeat {
           pos += 1
           len1 -= 1
-        } while len1 != 0 && engine.compare(pos, pos + len1, by: <=)
+        } while len1 != 0 && engine.teachingCompare(
+          pos, pos + len1, by: <=,
+          stageID: "unstableGrail.mergeAdvance",
+          whenTrue: String(localized: "The left item is no greater, so the in-place merge advances past it.", bundle: .module),
+          whenFalse: String(localized: "The right item is smaller, so the merge must rotate it ahead.", bundle: .module)
+        )
       }
     } else {
       while len2 != 0 {
@@ -101,7 +127,12 @@ enum UnstableGrailSortingTemplate {
         if len1 == 0 { break }
         repeat {
           len2 -= 1
-        } while len2 != 0 && engine.compare(pos + len1 - 1, pos + len1 + len2 - 1, by: <=)
+        } while len2 != 0 && engine.teachingCompare(
+          pos + len1 - 1, pos + len1 + len2 - 1, by: <=,
+          stageID: "unstableGrail.mergeAdvanceBack",
+          whenTrue: String(localized: "The left tail is no greater, so the backward merge advances past the right tail.", bundle: .module),
+          whenFalse: String(localized: "The right tail is smaller, so the merge rotates it ahead.", bundle: .module)
+        )
       }
     }
   }
@@ -116,7 +147,12 @@ enum UnstableGrailSortingTemplate {
     var dist = dist
     let rightEnd = rightLen + leftLen
     while right < rightEnd {
-      if left == leftLen || engine.compare(pos + left, pos + right, by: >) {
+      if left == leftLen || engine.teachingCompare(
+        pos + left, pos + right, by: >,
+        stageID: "unstableGrail.bufferedMergeChoice",
+        whenTrue: String(localized: "The left run item is larger, so the buffered merge takes the right item.", bundle: .module),
+        whenFalse: String(localized: "The left run item is no greater, so the buffered merge takes it first.", bundle: .module)
+      ) {
         engine.swap(pos + dist, pos + right)
         dist += 1
         right += 1
@@ -139,7 +175,12 @@ enum UnstableGrailSortingTemplate {
     var right = leftLen + rightLen - 1
     var left = leftLen - 1
     while left >= 0 {
-      if right < leftLen || engine.compare(pos + left, pos + right, by: >) {
+      if right < leftLen || engine.teachingCompare(
+        pos + left, pos + right, by: >,
+        stageID: "unstableGrail.bufferedMergeChoice",
+        whenTrue: String(localized: "The left run item is larger, so the buffered merge takes the right item.", bundle: .module),
+        whenFalse: String(localized: "The left run item is no greater, so the buffered merge takes it first.", bundle: .module)
+      ) {
         engine.swap(pos + mergedPos, pos + left)
         mergedPos -= 1
         left -= 1

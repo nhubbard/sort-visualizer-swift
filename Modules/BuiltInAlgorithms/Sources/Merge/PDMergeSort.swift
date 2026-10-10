@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -20,7 +21,7 @@ import SortEngineKit
 public struct PDMergeSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "pdmergesort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Pattern-Defeating Merge Sort",
+    displayName: String(localized: "Pattern-Defeating Merge Sort", bundle: .module),
     category: .merge,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -62,7 +63,12 @@ public struct PDMergeSort: SortAlgorithm {
         // (marked via `markAuxRead`), then compared against the live `right` index via
         // `engine.compareValue` — the aux-held value plays the "held value" role.
         engine.markAuxRead(copiedHandle, at: bufferPointer)
-        if engine.compareValue(right, against: copied[bufferPointer], by: (>=)) {
+        if engine.teachingCompareValue(
+          right, against: copied[bufferPointer], by: (>=),
+          stageID: "PDMergeSort.merge.choose",
+          whenTrue: String(localized: "The main-array item is at least the buffered item, so the merge writes the buffered value.", bundle: .module),
+          whenFalse: String(localized: "The main-array item is smaller, so the merge keeps it ahead of the buffered value.", bundle: .module)
+        ) {
           engine.setValue(left, copied[bufferPointer])
           bufferPointer += 1
         } else {
@@ -119,15 +125,26 @@ public struct PDMergeSort: SortAlgorithm {
       guard indexIn < maxIndex else { return -1 }
       let startIndex = indexIn
       var index = indexIn
-      let ascending = engine.compare(index, index + 1, by: (<=))
+      let ascending = engine.teachingCompare(
+        index, index + 1, by: (<=), stageID: "pdMerge.runDirection",
+        whenTrue: String(localized: "This pair begins an ascending run, so run detection scans forward.", bundle: .module),
+        whenFalse: String(localized: "This pair begins a descending run, so run detection will reverse it.", bundle: .module))
       index += 1
       while index < maxIndex {
-        let stepAscending = engine.compare(index, index + 1, by: (<=))
+        let stepAscending = engine.teachingCompare(
+          index, index + 1, by: (<=), stageID: "pdMerge.runScan",
+          whenTrue: String(localized: "This pair ascends, so it can extend an ascending run.", bundle: .module),
+          whenFalse: String(localized: "This pair descends, so it can extend a descending run.", bundle: .module))
         if stepAscending != ascending { break }
         index += 1
       }
       if !ascending {
         engine.reversal(startIndex, index)
+        engine.annotateLastOperation(
+          stageID: "pdMerge.reverseRun", decisionID: "pdMerge.reverseRun", outcome: "reversed",
+          roles: ["first": .arrayIndex(startIndex), "last": .arrayIndex(index)],
+          explanationKey: "pdMerge.reverseRun",
+          explanation: String(localized: "This descending run reverses into ascending order before merging.", bundle: .module))
       }
       return index >= maxIndex ? -1 : index + 1
     }

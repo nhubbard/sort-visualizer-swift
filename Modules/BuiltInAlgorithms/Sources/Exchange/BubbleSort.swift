@@ -1,10 +1,11 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
 public struct BubbleSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "bubblesort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Bubble Sort",
+    displayName: String(localized: "Bubble Sort", bundle: .module),
     category: .exchange,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -14,7 +15,7 @@ public struct BubbleSort: SortAlgorithm {
       family: .polynomialIntercept, coefficients: [5, -5, -2], rSquared: 1),
     implementationComplexity: 5,
     stable: true,
-    timeComplexity: ComplexityBounds(best: "O(n)", average: "O(n^2)", worst: "O(n^2)"),
+    timeComplexity: ComplexityBounds(best: "O(n^2)", average: "O(n^2)", worst: "O(n^2)"),
     spaceComplexity: "O(1)",
     iconName: "circle.grid.2x2.fill"
   )
@@ -23,7 +24,13 @@ public struct BubbleSort: SortAlgorithm {
     let n = engine.count
     guard n > 1 else { return }
     for i in 1..<n {
-      for j in 0..<(n - i) where engine.compare(j, j + 1) {
+      for j in 0..<(n - i) where engine.teachingCompare(
+        j, j + 1,
+        by: >,
+        stageID: "BubbleSort.adjacentOrder",
+        whenTrue: String(localized: "The left neighbor is larger, so swap this adjacent pair.", bundle: .module),
+        whenFalse: String(localized: "This adjacent pair is already in order.", bundle: .module)
+      ) {
         engine.swap(j, j + 1)
       }
     }

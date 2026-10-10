@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -28,7 +29,7 @@ import SortEngineKit
 public struct ImprovedInPlaceMergeSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "improvedinplacemergesort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Improved In-Place Merge Sort",
+    displayName: String(localized: "Improved In-Place Merge Sort", bundle: .module),
     category: .merge,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -57,13 +58,23 @@ public struct ImprovedInPlaceMergeSort: SortAlgorithm {
         engine.setValue(i - 1, engine.readValue(at: i))
       }
       engine.setValue(b - 1, temp)
+      engine.annotateLastOperation(
+        stageID: "improvedInPlace.rotate", decisionID: "improvedInPlace.rotate",
+        outcome: "placed", roles: ["source": .arrayIndex(p), "destination": .arrayIndex(b - 1)],
+        explanationKey: "improvedInPlace.rotate",
+        explanation: String(localized: "This rotation places the held item at the end of its merged span.", bundle: .module))
     }
 
     func merge(_ a: Int, _ m: Int, _ b: Int) {
       var i = a
       var j = m
       while i < m, j < b {
-        if engine.compare(i, j, by: >) {
+        if engine.teachingCompare(
+          i, j, by: >,
+          stageID: "ImprovedInPlaceMergeSort.merge.scan",
+          whenTrue: String(localized: "The left item exceeds the right, so the merge advances to find its destination.", bundle: .module),
+          whenFalse: String(localized: "The left item is no greater, so the merge rotates the pending range.", bundle: .module)
+        ) {
           j += 1
         } else {
           push(i, m, j)

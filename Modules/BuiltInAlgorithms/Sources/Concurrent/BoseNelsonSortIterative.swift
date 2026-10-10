@@ -1,10 +1,11 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
 public struct BoseNelsonSortIterative: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "bosenelsonsortiterative")
   public let metadata = AlgorithmMetadata(
-    displayName: "Iterative Bose-Nelson Sort",
+    displayName: String(localized: "Iterative Bose-Nelson Sort", bundle: .module),
     category: .concurrent,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -33,7 +34,16 @@ public struct BoseNelsonSortIterative: SortAlgorithm {
 
     func compSwap(_ a: Int, _ b: Int) {
       guard b < end else { return }
-      if engine.compare(a, b, by: (>)) {
+      let shouldSwap = engine.compare(a, b, by: (>))
+      engine.annotateLastOperation(
+        stageID: "compareExchange", decisionID: "bosenelsonsortiterative.networkComparator",
+        outcome: shouldSwap ? "exchange" : "keep",
+        roles: ["left": .arrayIndex(a), "right": .arrayIndex(b)],
+        explanationKey: "bosenelsonsortiterative.compareExchange",
+        explanation: shouldSwap
+          ? String(localized: "The left value exceeds the right value, so this comparator exchanges them.", bundle: .module)
+          : String(localized: "These values satisfy this comparator, so they stay in place.", bundle: .module))
+      if shouldSwap {
         engine.swap(a, b)
       }
     }

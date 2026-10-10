@@ -1,10 +1,11 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
 public struct SlopeSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "slopesort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Slope Sort",
+    displayName: String(localized: "Slope Sort", bundle: .module),
     category: .exchange,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -34,7 +35,13 @@ public struct SlopeSort: SortAlgorithm {
       while k >= 0 {
         // Strict `<` (not the default `>=`) matches ArrayV's `Reads.compareIndices(...,
         // true) < 0` — ties never swap, which is what keeps this stable.
-        if engine.compare(i, k, by: (<)) {
+        if engine.teachingCompare(
+          i, k,
+          by: (<),
+          stageID: "SlopeSort.candidateOrder",
+          whenTrue: String(localized: "This candidate is smaller, so move it toward its sorted slope.", bundle: .module),
+          whenFalse: String(localized: "This candidate does not precede the current slope item.", bundle: .module)
+        ) {
           engine.swap(i, k)
         }
         k -= 1

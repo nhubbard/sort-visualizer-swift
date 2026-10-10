@@ -1,3 +1,4 @@
+import Foundation
 import VisualizationKit
 
 /// Trivial — same bar layout as `BarGraphVisualizer`, color purely from value via
@@ -6,7 +7,7 @@ import VisualizationKit
 public struct RainbowVisualizer: Visualizer {
   public let id = VisualizerID(rawValue: "rainbow")
   public let metadata = VisualizerMetadata(
-    displayName: "Rainbow",
+    displayName: String(localized: "Rainbow", bundle: .module),
     supportsAuxArrays: true,
     iconName: "paintpalette.fill"
   )

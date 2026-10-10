@@ -1,3 +1,4 @@
+import Foundation
 import SortEngineKit
 
 /*
@@ -27,10 +28,12 @@ enum MultiWayMergeSortingTemplate {
     engine.markAuxRead(positionsHandle, at: b)
     let ai = positions[a], bi = positions[b]
     var comparison = 0
-    _ = engine.compare(ai, bi, by: { left, right in
+    _ = engine.teachingCompare(ai, bi, by: { left, right in
       comparison = left < right ? -1 : (left > right ? 1 : 0)
       return comparison < 0
-    })
+    }, stageID: "multiway.runChoice",
+      whenTrue: String(localized: "The first run candidate wins this ordering comparison, so the multiway merge favors it.", bundle: .module),
+      whenFalse: String(localized: "The first candidate is not smaller; equal keys use run order to decide.", bundle: .module))
     return comparison < 0 || (comparison == 0 && a < b)
   }
 

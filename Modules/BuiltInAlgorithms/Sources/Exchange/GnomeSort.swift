@@ -1,10 +1,11 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
 public struct GnomeSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "gnomesort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Gnome Sort",
+    displayName: String(localized: "Gnome Sort", bundle: .module),
     category: .exchange,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -23,7 +24,12 @@ public struct GnomeSort: SortAlgorithm {
     let n = engine.count
     var i = 1
     while i < n {
-      if engine.compare(i, i - 1) {
+      if engine.teachingCompare(
+        i, i - 1,
+        stageID: "GnomeSort.backtrack",
+        whenTrue: String(localized: "The current item is ordered after its neighbor, so advance.", bundle: .module),
+        whenFalse: String(localized: "The current item belongs before its neighbor, so swap and step back.", bundle: .module)
+      ) {
         i += 1
       } else {
         engine.swap(i, i - 1)

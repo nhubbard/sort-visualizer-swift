@@ -1,3 +1,4 @@
+import Foundation
 import SortEngineKit
 
 /// Ported from ArrayV's `sorts/templates/GrailSorting` — Andrey Astrelin's classic in-place
@@ -28,6 +29,11 @@ enum GrailSortingTemplate {
   private static func multiSwap(_ engine: inout RecordingEngine, _ a: Int, _ b: Int, _ count: Int) {
     for i in 0..<count {
       engine.swap(a + i, b + i)
+      engine.annotateLastOperation(
+        stageID: "grail.blockExchange", decisionID: "grail.blockExchange",
+        outcome: "exchange", roles: ["left": .arrayIndex(a + i), "right": .arrayIndex(b + i)],
+        explanationKey: "grail.blockExchange",
+        explanation: String(localized: "Grail exchanges these block positions to rotate or merge the current runs.", bundle: .module))
     }
   }
 
@@ -53,7 +59,12 @@ enum GrailSortingTemplate {
     guard len > 1 else { return }
     for i in 1..<len {
       var p = pos + i
-      while p > pos && engine.compare(p - 1, p, by: >) {
+      while p > pos && engine.teachingCompare(
+        p - 1, p, by: >,
+        stageID: "grail.smallRun",
+        whenTrue: String(localized: "This adjacent pair is reversed, so Grail shifts the current key toward its ordered position.", bundle: .module),
+        whenFalse: String(localized: "This adjacent pair is ordered, so Grail stops shifting this key.", bundle: .module)
+      ) {
         engine.swap(p - 1, p)
         p -= 1
       }
@@ -68,13 +79,23 @@ enum GrailSortingTemplate {
     while left < right - 1 {
       let mid = left + (right - left) / 2
       if isLeft {
-        if engine.compare(pos + mid, keyPos, by: >=) {
+        if engine.teachingCompare(
+          pos + mid, keyPos, by: >=,
+          stageID: "grail.lowerBound",
+          whenTrue: String(localized: "This run key is at least the held key, so the lower-bound search narrows left.", bundle: .module),
+          whenFalse: String(localized: "This run key is smaller, so the lower-bound search moves right.", bundle: .module)
+        ) {
           right = mid
         } else {
           left = mid
         }
       } else {
-        if engine.compare(pos + mid, keyPos, by: >) {
+        if engine.teachingCompare(
+          pos + mid, keyPos, by: >,
+          stageID: "grail.upperBound",
+          whenTrue: String(localized: "This run key exceeds the held key, so the upper-bound search narrows left.", bundle: .module),
+          whenFalse: String(localized: "This run key is no greater, so the upper-bound search moves right.", bundle: .module)
+        ) {
           right = mid
         } else {
           left = mid
@@ -126,7 +147,12 @@ enum GrailSortingTemplate {
         repeat {
           pos += 1
           len1 -= 1
-        } while len1 != 0 && engine.compare(pos, pos + len1, by: <=)
+        } while len1 != 0 && engine.teachingCompare(
+          pos, pos + len1, by: <=,
+          stageID: "grail.mergeAdvance",
+          whenTrue: String(localized: "The left item is no greater, so the in-place merge advances past it.", bundle: .module),
+          whenFalse: String(localized: "The right item is smaller, so the merge must rotate it ahead.", bundle: .module)
+        )
       }
     } else {
       while len2 != 0 {
@@ -138,7 +164,12 @@ enum GrailSortingTemplate {
         if len1 == 0 { break }
         repeat {
           len2 -= 1
-        } while len2 != 0 && engine.compare(pos + len1 - 1, pos + len1 + len2 - 1, by: <=)
+        } while len2 != 0 && engine.teachingCompare(
+          pos + len1 - 1, pos + len1 + len2 - 1, by: <=,
+          stageID: "grail.mergeAdvanceBack",
+          whenTrue: String(localized: "The left tail is no greater, so the backward merge advances past the right tail.", bundle: .module),
+          whenFalse: String(localized: "The right tail is smaller, so the merge rotates it ahead.", bundle: .module)
+        )
       }
     }
   }
@@ -153,7 +184,12 @@ enum GrailSortingTemplate {
     var dist = dist
     let rightEnd = rightLen + leftLen
     while right < rightEnd {
-      if left == leftLen || engine.compare(pos + left, pos + right, by: >) {
+      if left == leftLen || engine.teachingCompare(
+        pos + left, pos + right, by: >,
+        stageID: "grail.bufferedMergeChoice",
+        whenTrue: String(localized: "The left run item is larger, so the buffered merge takes the right item.", bundle: .module),
+        whenFalse: String(localized: "The left run item is no greater, so the buffered merge takes it first.", bundle: .module)
+      ) {
         engine.swap(pos + dist, pos + right)
         dist += 1
         right += 1
@@ -176,7 +212,12 @@ enum GrailSortingTemplate {
     var right = leftLen + rightLen - 1
     var left = leftLen - 1
     while left >= 0 {
-      if right < leftLen || engine.compare(pos + left, pos + right, by: >) {
+      if right < leftLen || engine.teachingCompare(
+        pos + left, pos + right, by: >,
+        stageID: "grail.bufferedMergeChoice",
+        whenTrue: String(localized: "The left run item is larger, so the buffered merge takes the right item.", bundle: .module),
+        whenFalse: String(localized: "The left run item is no greater, so the buffered merge takes it first.", bundle: .module)
+      ) {
         engine.swap(pos + mergedPos, pos + left)
         mergedPos -= 1
         left -= 1
@@ -476,7 +517,12 @@ enum GrailSortingTemplate {
   static func lazyStableSort(_ engine: inout RecordingEngine, _ pos: Int, _ len: Int) {
     var dist = 1
     while dist < len {
-      if engine.compare(pos + dist - 1, pos + dist, by: >) {
+      if engine.teachingCompare(
+        pos + dist - 1, pos + dist, by: >,
+        stageID: "lazyStable.basePair",
+        whenTrue: String(localized: "This starting pair is reversed, so Lazy Stable swaps it before merging.", bundle: .module),
+        whenFalse: String(localized: "This starting pair is ordered, so Lazy Stable keeps it before merging.", bundle: .module)
+      ) {
         engine.swap(pos + dist - 1, pos + dist)
       }
       dist += 2

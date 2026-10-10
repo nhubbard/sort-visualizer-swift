@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -14,7 +15,7 @@ import SortEngineKit
 public struct SimplisticGravitySort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "simplisticgravitysort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Simplistic Gravity Sort",
+    displayName: String(localized: "Simplistic Gravity Sort", bundle: .module),
     category: .distribution,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -55,8 +56,19 @@ public struct SimplisticGravitySort: SortAlgorithm {
       var pointer = 0
       while engine.readValue(at: index) > minValue {
         engine.setValue(index, engine.readValue(at: index) - 1)
+        engine.annotateLastOperation(
+          stageID: "bucketPlacement", decisionID: "simplisticgravitysort.bucketPlacement",
+          outcome: "place", roles: ["destination": .arrayIndex(index)],
+          explanationKey: "simplisticgravitysort.bucketPlacement",
+          explanation: String(localized: "This bead transfer changes the column height toward the sorted arrangement.", bundle: .module))
         aux[pointer] += 1
         engine.writeAux(auxHandle, at: pointer, value: aux[pointer])
+        engine.annotateLastOperation(
+          stageID: "scratchUpdate", decisionID: "simplisticgravitysort.scratchUpdate",
+          outcome: "update",
+          roles: ["scratch": .auxiliaryIndex(handle: auxHandle.rawValue, index: pointer)],
+          explanationKey: "simplisticgravitysort.scratchUpdate",
+          explanation: String(localized: "Update this bead column before rebuilding the output heights.", bundle: .module))
         pointer += 1
       }
     }
@@ -65,8 +77,19 @@ public struct SimplisticGravitySort: SortAlgorithm {
       var pointer = 0
       while pointer < auxLength, aux[pointer] != 0 {
         engine.setValue(index, engine.readValue(at: index) + 1)
+        engine.annotateLastOperation(
+          stageID: "bucketPlacement", decisionID: "simplisticgravitysort.bucketPlacement",
+          outcome: "place", roles: ["destination": .arrayIndex(index)],
+          explanationKey: "simplisticgravitysort.bucketPlacement",
+          explanation: String(localized: "This bead transfer changes the column height toward the sorted arrangement.", bundle: .module))
         aux[pointer] -= 1
         engine.writeAux(auxHandle, at: pointer, value: aux[pointer])
+        engine.annotateLastOperation(
+          stageID: "scratchUpdate", decisionID: "simplisticgravitysort.scratchUpdate",
+          outcome: "update",
+          roles: ["scratch": .auxiliaryIndex(handle: auxHandle.rawValue, index: pointer)],
+          explanationKey: "simplisticgravitysort.scratchUpdate",
+          explanation: String(localized: "Update this bead column before rebuilding the output heights.", bundle: .module))
         pointer += 1
       }
     }

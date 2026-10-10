@@ -1,7 +1,9 @@
 import DesignSystemKit
+import Foundation
 
-/// One content entry inside a directory record: `kind` 0 = description, 1...10 = a `CodeLanguage`
-/// (index `kind - 1` into `CodeLanguage.all`) — see Documentation/docs/reference/compression.md's
+/// One content entry inside a directory record: `kind` 0 = description, 1...10 = a `CodeLanguage`,
+/// 11 = optional localized descriptions (index `kind - 1` into `CodeLanguage.all` for 1...10).
+/// See Documentation/docs/reference/compression.md's
 /// content-kind table. `range` is content-section-relative, matching how the format stores it.
 struct AlgorithmDetailsContentEntryRecord {
   let kind: UInt16
@@ -165,16 +167,18 @@ struct AlgorithmDetailsManifest {
 
     for record in directoryRecords {
       var description: String?
-      // Entries appear in the file in ascending content-kind order (the packer emits description
-      // first, then languages in `CodeLanguage.all`'s order) — preserved here by iterating in file
+      var localizedDescriptions: [String: String] = [:]
+      // Entries appear in ascending content-kind order (description, languages, translations).
+      // Preserve that order by iterating in file
       // order rather than re-sorting.
       var codeSamples: [(language: CodeLanguage, source: String)] = []
 
       for entry in record.entries {
         let languageIndex = Int(entry.kind) - 1
         let isDescription = entry.kind == 0
+        let isLocalizedDescriptions = entry.kind == 11
         let isKnownLanguage = languageIndex >= 0 && languageIndex < CodeLanguage.all.count
-        guard isDescription || isKnownLanguage else {
+        guard isDescription || isKnownLanguage || isLocalizedDescriptions else {
           // Forward-compatible: an unrecognized content kind is skippable unless the entry itself
           // says it's required.
           if entry.flags & Self.requiredEntryFlag != 0 {
@@ -190,12 +194,20 @@ struct AlgorithmDetailsManifest {
 
         if isDescription {
           description = text
+        } else if isLocalizedDescriptions {
+          guard let translations = try? JSONDecoder().decode([String: String].self, from: Data(text.utf8)),
+            translations.allSatisfy({ !$0.key.isEmpty && !$0.value.isEmpty }) else {
+            throw AlgorithmDetailsArchiveError.invalidManifest
+          }
+          localizedDescriptions = translations
         } else {
           codeSamples.append((language: CodeLanguage.all[languageIndex], source: text))
         }
       }
 
-      result[record.algorithmID] = AlgorithmDetailContent(description: description, codeSamples: codeSamples)
+      result[record.algorithmID] = AlgorithmDetailContent(
+        description: description, codeSamples: codeSamples,
+        localizedDescriptions: localizedDescriptions)
     }
 
     return result

@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -10,7 +11,7 @@ import SortEngineKit
 public struct InPlaceMergeSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "inplacemergesort")
   public let metadata = AlgorithmMetadata(
-    displayName: "In-Place Merge Sort",
+    displayName: String(localized: "In-Place Merge Sort", bundle: .module),
     category: .merge,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -45,7 +46,12 @@ public struct InPlaceMergeSort: SortAlgorithm {
     func push(_ low: Int, _ high: Int) {
       var i = low
       while i < high {
-        if engine.compare(i, i + 1, by: >) {
+        if engine.teachingCompare(
+          i, i + 1, by: >,
+          stageID: "InPlaceMergeSort.local.order",
+          whenTrue: String(localized: "This adjacent pair is reversed, so the local merge swaps it.", bundle: .module),
+          whenFalse: String(localized: "This adjacent pair is ordered, so the local merge leaves it.", bundle: .module)
+        ) {
           engine.swap(i, i + 1)
         }
         i += 1

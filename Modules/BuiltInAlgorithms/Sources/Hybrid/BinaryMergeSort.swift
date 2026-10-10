@@ -1,10 +1,11 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
 public struct BinaryMergeSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "binarymergesort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Binary Merge Sort",
+    displayName: String(localized: "Binary Merge Sort", bundle: .module),
     category: .hybrid,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -33,7 +34,12 @@ public struct BinaryMergeSort: SortAlgorithm {
       var i = start + 1
       while i < end {
         var j = i
-        while j > start && !engine.compare(j, j - 1) {
+        while j > start && !engine.teachingCompare(
+          j, j - 1,
+          stageID: "BinaryMergeSort.smallRun.insert",
+          whenTrue: String(localized: "The current value is at least its predecessor, so this insertion scan can stop.", bundle: .module),
+          whenFalse: String(localized: "The current value is smaller than its predecessor, so insertion shifts it left.", bundle: .module)
+        ) {
           engine.swap(j - 1, j)
           j -= 1
         }

@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -12,14 +13,13 @@ import SortEngineKit
 ///
 /// `O(n log^2 n)` comparators — confirmed empirically (the ratio of measured comparisons to
 /// `n log^2 n` converges to a near-constant ~0.27–0.31 across sizes 16 through 2048, unlike the
-/// steadily-growing ratio a plain `n log n` or `n^2` count would show). Every comparator only ever
-/// swaps on strict `>`, and fuzzing across randomized duplicate-heavy trials found no case where
-/// two equal elements crossed paths, confirming this network is stable rather than merely assuming
-/// it from the swap-on-strict-`>` rule alone.
+/// steadily-growing ratio a plain `n log n` or `n^2` count would show). Comparators swap only on
+/// strict `>`, but identity-tracking duplicate trials show that equal elements can cross
+/// indirectly, making the network unstable.
 public struct WeaveSortIterative: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "weavesortiterative")
   public let metadata = AlgorithmMetadata(
-    displayName: "Iterative Weave Sort",
+    displayName: String(localized: "Iterative Weave Sort", bundle: .module),
     category: .concurrent,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -28,7 +28,7 @@ public struct WeaveSortIterative: SortAlgorithm {
     detectedGrowthModel: DetectedGrowthModel(
       family: .powerLog, coefficients: [6.88479, 1.22193], rSquared: 0.9991),
     implementationComplexity: 11,
-    stable: true,
+    stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n log^2 n)", average: "O(n log^2 n)", worst: "O(n log^2 n)"),
     spaceComplexity: "O(1)",
@@ -43,7 +43,16 @@ public struct WeaveSortIterative: SortAlgorithm {
 
     func compSwap(_ a: Int, _ b: Int) {
       guard b < end else { return }
-      if engine.compare(a, b, by: >) {
+      let shouldSwap = engine.compare(a, b, by: >)
+      engine.annotateLastOperation(
+        stageID: "compareExchange", decisionID: "weavesortiterative.networkComparator",
+        outcome: shouldSwap ? "exchange" : "keep",
+        roles: ["left": .arrayIndex(a), "right": .arrayIndex(b)],
+        explanationKey: "weavesortiterative.compareExchange",
+        explanation: shouldSwap
+          ? String(localized: "The left value exceeds the right value, so this comparator exchanges them.", bundle: .module)
+          : String(localized: "These values satisfy this comparator, so they stay in place.", bundle: .module))
+      if shouldSwap {
         engine.swap(a, b)
       }
     }

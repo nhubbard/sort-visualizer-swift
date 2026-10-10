@@ -1,5 +1,45 @@
+import Foundation
 import ProjectDescription
 import ProjectDescriptionHelpers
+
+// Derive Xcode's language list from checked-in catalogs. Adding a translation to a catalog
+// must survive `tuist generate` without a matching manifest edit.
+let projectRoot = URL(fileURLWithPath: #filePath).deletingLastPathComponent()
+let localizationRoots = ["App/Resources", "Modules"].map {
+    projectRoot.appendingPathComponent($0)
+}
+var localizationRegions: Set<String> = ["en"]
+for root in localizationRoots {
+    guard let files = FileManager.default.enumerator(at: root, includingPropertiesForKeys: nil) else {
+        continue
+    }
+    for case let file as URL in files where file.pathExtension == "xcstrings" {
+        guard let data = try? Data(contentsOf: file),
+              let catalog = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+              let strings = catalog["strings"] as? [String: [String: Any]] else {
+            continue
+        }
+        if let source = catalog["sourceLanguage"] as? String { localizationRegions.insert(source) }
+        for entry in strings.values {
+            if let languages = entry["localizations"] as? [String: Any] {
+                localizationRegions.formUnion(languages.keys)
+            }
+        }
+    }
+}
+// Description translations live in the content archive rather than an Xcode catalog. Include
+// their locales too, so a new description.<locale>.md can be added without editing this file.
+let detailsRoot = projectRoot.appendingPathComponent("App/Resources/AlgorithmDetails")
+if let algorithms = try? FileManager.default.contentsOfDirectory(at: detailsRoot, includingPropertiesForKeys: nil) {
+    for algorithm in algorithms {
+        guard let files = try? FileManager.default.contentsOfDirectory(at: algorithm, includingPropertiesForKeys: nil) else { continue }
+        for file in files where file.lastPathComponent.hasPrefix("description.")
+            && file.lastPathComponent != "description.md" && file.pathExtension == "md" {
+            let locale = file.deletingPathExtension().lastPathComponent.replacingOccurrences(of: "description.", with: "")
+            if !locale.isEmpty { localizationRegions.insert(locale) }
+        }
+    }
+}
 
 let modules: [Target] =
     // Depends on ZstdKit for Tape.archived()/Tape(archivedData:)'s binary tape export format.
@@ -12,11 +52,15 @@ let modules: [Target] =
         name: "ZstdKit",
         testResources: [.glob(pattern: "Modules/ZstdKit/Tests/Fixtures/**")]
     ) +
-    Module.framework(name: "AlgorithmKit", dependencies: [.target(name: "SortEngineKit")]) +
+    Module.framework(name: "AlgorithmKit", dependencies: [.target(name: "SortEngineKit")],
+                     resources: [.glob(pattern: "Modules/AlgorithmKit/Resources/**")]) +
     Module.framework(name: "VisualizationKit", dependencies: [.target(name: "SortEngineKit")]) +
-    Module.framework(name: "BuiltInAlgorithms", dependencies: [.target(name: "AlgorithmKit")]) +
-    Module.framework(name: "BuiltInVisualizers", dependencies: [.target(name: "VisualizationKit")]) +
-    Module.framework(name: "SettingsKit", dependencies: [.target(name: "VisualizationKit"), .target(name: "AlgorithmKit")]) +
+    Module.framework(name: "BuiltInAlgorithms", dependencies: [.target(name: "AlgorithmKit")],
+                     resources: [.glob(pattern: "Modules/BuiltInAlgorithms/Resources/**")]) +
+    Module.framework(name: "BuiltInVisualizers", dependencies: [.target(name: "VisualizationKit")],
+                     resources: [.glob(pattern: "Modules/BuiltInVisualizers/Resources/**")]) +
+    Module.framework(name: "SettingsKit", dependencies: [.target(name: "VisualizationKit"), .target(name: "AlgorithmKit")],
+                     resources: [.glob(pattern: "Modules/SettingsKit/Resources/**")]) +
     // ToneKit (see NOTICE.md in each) reimplements just the AudioKit/AudioKitEX/SoundpipeAudioKit
     // subset AudioEngineKit actually needs directly on AVAudioEngine, so AudioEngineKit needs no
     // external audio package at all. Split (see Documentation/docs/architecture/audio.md) into a host-independent DSP
@@ -48,6 +92,9 @@ let modules: [Target] =
     Module.framework(name: "AudioEngineKit", dependencies: [
         .target(name: "ToneKitAVFoundation"), .target(name: "ToneKitDSP"),
         .target(name: "SortAudioCore"), .target(name: "SettingsKit"),
+        .target(name: "SortAudioBridgeKit", condition: .when([.catalyst])),
+    ], resources: [.glob(pattern: "Modules/AudioEngineKit/Resources/**")], testDependencies: [
+        .target(name: "ToneKitDSP"), .target(name: "SortAudioCore"), .target(name: "SettingsKit"),
         .target(name: "SortAudioBridgeKit", condition: .when([.catalyst])),
     ]) +
     // Companion-mode bridge (see Documentation/docs/architecture/audio.md): a Unix-domain-socket IPC
@@ -83,10 +130,10 @@ let modules: [Target] =
     ]) +
     Module.framework(name: "DesignSystemKit", dependencies: [
         .target(name: "SettingsKit"),
-    ]) +
+    ], resources: [.glob(pattern: "Modules/DesignSystemKit/Resources/**")]) +
     Module.framework(name: "MathRenderingKit", dependencies: [
         .external(name: "SwiftMath"), .target(name: "AlgorithmKit"),
-    ]) +
+    ], resources: [.glob(pattern: "Modules/MathRenderingKit/Resources/**")]) +
     // `AlgorithmDetailStore` decodes `AlgorithmDetails.algz` via ZstdKit; its equivalence tests
     // need the real archive bundled into SortFeatureTests too (mirroring ZstdKit's own
     // `testResources` glob for its binary fixtures), and need `import ZstdKit` directly (module
@@ -103,23 +150,24 @@ let modules: [Target] =
             .target(name: "SortAudioCore"),
             .external(name: "MarkdownUI"),
         ],
+        resources: [.glob(pattern: "Modules/SortFeature/Resources/**")],
         testResources: [.glob(pattern: "App/Resources/AlgorithmDetails/AlgorithmDetails.algz")],
-        testDependencies: [.target(name: "ZstdKit")]
+        testDependencies: [.target(name: "ZstdKit"), .target(name: "BuiltInAlgorithms")]
     ) +
     Module.framework(name: "SettingsFeature", dependencies: [
         .target(name: "SettingsKit"), .target(name: "VisualizationKit"), .target(name: "AlgorithmKit"),
         .target(name: "AudioEngineKit"), .target(name: "DesignSystemKit"),
-    ]) +
+    ], resources: [.glob(pattern: "Modules/SettingsFeature/Resources/**")]) +
     Module.framework(name: "HomeFeature", dependencies: [
         .target(name: "DesignSystemKit"), .external(name: "MarkdownUI"),
-    ]) +
+    ], resources: [.glob(pattern: "Modules/HomeFeature/Resources/**")]) +
     // App Intents surface: entities/queries wrapping AlgorithmRegistry/VisualizerRegistry/
     // ShuffleRegistry/AutomationRegistry, a SortCoordinator bridging intents into the live
     // SwiftUI selection/session state, and the intents/AppShortcutsProvider themselves.
     Module.framework(name: "IntentsKit", dependencies: [
         .target(name: "AlgorithmKit"), .target(name: "VisualizationKit"),
         .target(name: "SortFeature"), .target(name: "SettingsKit"),
-    ])
+    ], resources: [.glob(pattern: "Modules/IntentsKit/Resources/**")])
 
 let app = Target.target(
     // Not "Sort Symphony" (with the space `productName` below deliberately avoids): Xcode's
@@ -239,8 +287,8 @@ let app = Target.target(
     ],
     settings: .settings(base: [
         "CODE_SIGN_ENTITLEMENTS": "App/Resources/SortSymphony.entitlements",
-        "MARKETING_VERSION": "2.0.0",
-        "CURRENT_PROJECT_VERSION": "35",
+        "MARKETING_VERSION": "3.0.0",
+        "CURRENT_PROJECT_VERSION": "36",
         "SWIFT_VERSION": "6.0",
         "SWIFT_STRICT_CONCURRENCY": "complete",
         "CODE_SIGN_STYLE": "Automatic",
@@ -255,6 +303,8 @@ let app = Target.target(
         "CODE_SIGN_IDENTITY[sdk=macosx*]": "Apple Development",
         "ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS": "YES",
         "ENABLE_USER_SCRIPT_SANDBOXING": "YES",
+        "SWIFT_EMIT_LOC_STRINGS": "YES",
+        "LOCALIZATION_PREFERS_STRING_CATALOGS": "YES",
         "STRING_CATALOG_GENERATE_SYMBOLS": "YES",
     ])
 )
@@ -303,8 +353,8 @@ let auv3Extension = Module.appExtension(
     ]),
     entitlements: .file(path: "App/AUv3Extension/Resources/AUv3Extension.entitlements"),
     extraSettings: [
-        "MARKETING_VERSION": "2.0.0",
-        "CURRENT_PROJECT_VERSION": "35",
+        "MARKETING_VERSION": "3.0.0",
+        "CURRENT_PROJECT_VERSION": "36",
         // Needed now that this target also builds for .macCatalyst (Phase 4 spike) — without an
         // explicit DEVELOPMENT_TEAM, Xcode fails Catalyst builds specifically with "Signing ...
         // requires a development team" (the .iPad-only Simulator build never hit this; Mac
@@ -329,10 +379,41 @@ let appUITests = Target.target(
     settings: .settings(base: Module.baseSettings)
 )
 
+// AppIntentsTesting is available on iOS 27 and runs through the system's App Intents service.
+// Keep it in its own runner so the existing UI suite can continue on older OS releases.
+let appIntentsUITests = Target.target(
+    name: "Sort SymphonyAppIntentsUITests",
+    destinations: [.iPad],
+    product: .uiTests,
+    productName: "SortSymphonyAppIntentsUITests",
+    bundleId: "com.nhubbard.Sort2.mobile.appintentsuitests",
+    deploymentTargets: .iOS("27.0"),
+    sources: ["App/IntentsUITests/**"],
+    dependencies: [
+        .target(name: "SortSymphony"),
+        .sdk(name: "AppIntentsTesting", type: .framework),
+    ],
+    settings: .settings(base: Module.baseSettings)
+)
+
+// Compiles the actual extension UI sources into a host-less Catalyst test bundle so the
+// parameter model and view/controller connection order can be exercised without a DAW.
+let auv3ComponentTests = Target.target(
+    name: "AUv3ExtensionComponentTests",
+    destinations: [.macCatalyst],
+    product: .unitTests,
+    bundleId: "com.nhubbard.Sort2.mobile.auv3componenttests",
+    deploymentTargets: Module.deploymentTargets,
+    sources: ["App/AUv3Extension/Sources/**", "App/AUv3Extension/Tests/**"],
+    dependencies: [.target(name: "SortAudioUnitKit"), .target(name: "SortAudioCore")],
+    settings: .settings(base: Module.baseSettings)
+)
+
 let project = Project(
     name: "Sort Symphony",
     // Xcode doesn't gather coverage by default (it's a real build-time cost) -- opt in explicitly
     // so `tuist test` produces a .xcresult with coverage data we can inspect via `xcrun xccov`.
-    options: .options(automaticSchemesOptions: .enabled(codeCoverageEnabled: true)),
-    targets: modules + [app, appUITests, auv3Extension]
+    options: .options(automaticSchemesOptions: .enabled(codeCoverageEnabled: true),
+                      defaultKnownRegions: localizationRegions.sorted(), developmentRegion: "en"),
+    targets: modules + [app, appUITests, appIntentsUITests, auv3Extension, auv3ComponentTests]
 )

@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -13,7 +14,7 @@ import SortEngineKit
 public struct IndexSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "indexsort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Index Sort",
+    displayName: String(localized: "Index Sort", bundle: .module),
     category: .distribution,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -35,14 +36,30 @@ public struct IndexSort: SortAlgorithm {
     guard n > 1 else { return }
 
     var minValue = engine.readValue(at: 0)
-    for i in 1..<n where engine.readValue(at: i) < minValue {
-      minValue = engine.readValue(at: i)
+    for i in 1..<n {
+      let candidate = engine.readValue(at: i)
+      let newMinimum = candidate < minValue
+      engine.annotateLastOperation(
+        stageID: "minimumScan", decisionID: "indexsort.minimumScan",
+        outcome: newMinimum ? "updateMinimum" : "keepMinimum",
+        roles: ["candidate": .arrayIndex(i), "minimum": .value(minValue)],
+        explanationKey: "indexsort.minimumScan",
+        explanation: newMinimum
+          ? String(localized: "This value is lower than the current minimum, so use it as the index offset.", bundle: .module)
+          : String(localized: "The current minimum remains the offset for index placement.", bundle: .module))
+      if newMinimum { minValue = engine.readValue(at: i) }
     }
 
     for i in 0..<n {
       var cmpCount = 0
       while engine.readValue(at: i) - minValue != i, cmpCount < n {
-        engine.swap(i, engine.readValue(at: i) - minValue)
+        let target = engine.readValue(at: i) - minValue
+        engine.swap(i, target)
+        engine.annotateLastOperation(
+          stageID: "bucketExchange", decisionID: "indexsort.bucketExchange",
+          outcome: "exchange", roles: ["left": .arrayIndex(i), "right": .arrayIndex(target)],
+          explanationKey: "indexsort.bucketExchange",
+          explanation: String(localized: "The value’s offset from the minimum identifies index \(target), so exchange it into place.", bundle: .module))
         cmpCount += 1
       }
       if cmpCount >= n - 1 { break }

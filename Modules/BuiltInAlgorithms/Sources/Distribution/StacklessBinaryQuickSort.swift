@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -17,7 +18,7 @@ import SortEngineKit
 public struct StacklessBinaryQuickSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "stacklessbinaryquicksort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Stackless Binary Quick Sort",
+    displayName: String(localized: "Stackless Binary Quick Sort", bundle: .module),
     category: .distribution,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -48,11 +49,40 @@ public struct StacklessBinaryQuickSort: SortAlgorithm {
       var j = b
       while true {
         i += 1
-        while i < j && !getBit(engine.readValue(at: i), bit) { i += 1 }
+        while i < j {
+          let isHighBit = getBit(engine.readValue(at: i), bit)
+          engine.annotateLastOperation(
+            stageID: "bitPartition", decisionID: "stacklessbinaryquicksort.scanLeft",
+            outcome: isHighBit ? "stop" : "advance",
+            roles: ["candidate": .arrayIndex(i)],
+            explanationKey: "stacklessbinaryquicksort.scanLeft",
+            explanation: isHighBit
+              ? String(localized: "This value has a one in the active bit, so it belongs on the right side.", bundle: .module)
+              : String(localized: "This value has a zero in the active bit, so continue scanning the left side.", bundle: .module))
+          if isHighBit { break }
+          i += 1
+        }
         j -= 1
-        while j > i && getBit(engine.readValue(at: j), bit) { j -= 1 }
+        while j > i {
+          let isHighBit = getBit(engine.readValue(at: j), bit)
+          engine.annotateLastOperation(
+            stageID: "bitPartition", decisionID: "stacklessbinaryquicksort.scanRight",
+            outcome: isHighBit ? "advance" : "stop",
+            roles: ["candidate": .arrayIndex(j)],
+            explanationKey: "stacklessbinaryquicksort.scanRight",
+            explanation: isHighBit
+              ? String(localized: "This value has a one in the active bit, so continue scanning the right side.", bundle: .module)
+              : String(localized: "This value has a zero in the active bit, so it belongs on the left side.", bundle: .module))
+          if !isHighBit { break }
+          j -= 1
+        }
         if i < j {
           engine.swap(i, j)
+          engine.annotateLastOperation(
+            stageID: "bucketExchange", decisionID: "stacklessbinaryquicksort.bucketExchange",
+            outcome: "exchange", roles: ["left": .arrayIndex(i), "right": .arrayIndex(j)],
+            explanationKey: "stacklessbinaryquicksort.bucketExchange",
+            explanation: String(localized: "These values have opposite bits from their current partition sides, so exchange them.", bundle: .module))
         } else {
           return i
         }
@@ -73,7 +103,17 @@ public struct StacklessBinaryQuickSort: SortAlgorithm {
         while !getBit(m, q + 1) { q += 1 }
 
         i = b
-        while b < n && (engine.readValue(at: b) >> (q + 1)) == (m >> (q + 1)) {
+        while b < n {
+          let samePrefix = (engine.readValue(at: b) >> (q + 1)) == (m >> (q + 1))
+          engine.annotateLastOperation(
+            stageID: "bitGroup", decisionID: "stacklessbinaryquicksort.groupBoundary",
+            outcome: samePrefix ? "continue" : "boundary",
+            roles: ["candidate": .arrayIndex(b)],
+            explanationKey: "stacklessbinaryquicksort.groupBoundary",
+            explanation: samePrefix
+              ? String(localized: "This value shares the higher-bit prefix, so keep it in the current group.", bundle: .module)
+              : String(localized: "This value has a different higher-bit prefix, so the current group ends here.", bundle: .module))
+          if !samePrefix { break }
           b += 1
         }
       } else {

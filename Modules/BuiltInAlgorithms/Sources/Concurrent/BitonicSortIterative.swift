@@ -1,10 +1,11 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
 public struct BitonicSortIterative: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "bitonicsortiterative")
   public let metadata = AlgorithmMetadata(
-    displayName: "Bitonic Sort (Iterative)",
+    displayName: String(localized: "Bitonic Sort (Iterative)", bundle: .module),
     category: .concurrent,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -34,10 +35,17 @@ public struct BitonicSortIterative: SortAlgorithm {
         for i in 0..<n {
           let ij = i ^ j
           if ij > i && ij < n {
-            if ((i & k) == 0) == m && !engine.compare(ij, i) {
-              engine.swap(i, ij)
-            }
-            if ((i & k) != 0) == m && !engine.compare(i, ij) {
+            let ascending = ((i & k) == 0) == m
+            let ordered = ascending ? engine.compare(ij, i) : engine.compare(i, ij)
+            engine.annotateLastOperation(
+              stageID: "bitonicMerge", decisionID: "bitonicsortiterative.directionalComparator",
+              outcome: ordered ? "keep" : "exchange",
+              roles: ["left": .arrayIndex(i), "right": .arrayIndex(ij)],
+              explanationKey: "bitonicsortiterative.directionalComparator",
+              explanation: ordered
+                ? String(localized: "This pair fits the current bitonic merge direction, so keep it.", bundle: .module)
+                : String(localized: "This pair opposes the current bitonic merge direction, so exchange it.", bundle: .module))
+            if !ordered {
               engine.swap(i, ij)
             }
           }

@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -39,7 +40,7 @@ import SortEngineKit
 public struct FunSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "funsort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Fun Sort",
+    displayName: String(localized: "Fun Sort", bundle: .module),
     category: .exchange,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -72,7 +73,13 @@ public struct FunSort: SortAlgorithm {
     // ArrayV's own `Reads.compareValues` call inside `binarySearch`); the key half is a raw read,
     // matching the tie-break convention `ForcedStableQuickSort`/`TableSort` already established.
     func compositeLess(_ mid: Int, _ i: Int) -> Bool {
-      if engine.compare(mid, i, by: <) { return true }
+      if engine.teachingCompare(
+        mid, i,
+        by: <,
+        stageID: "FunSort.partitionCandidate",
+        whenTrue: String(localized: "The midpoint value is smaller than this item, so the composite-order search passes it.", bundle: .module),
+        whenFalse: String(localized: "The midpoint value is not smaller; check the tie-breaking key.", bundle: .module)
+      ) { return true }
       return engine.readValue(at: mid) == engine.readValue(at: i) && key[mid] < key[i]
     }
 

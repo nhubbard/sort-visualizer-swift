@@ -13,12 +13,12 @@ This site documents the app's architecture and extension points. For the app its
 
 ## Capabilities
 
-- **182 sorting algorithms** and **44 shuffles**, covering
+- **196 sorting algorithms** and **43 shuffles**, covering
   [ArrayV](https://github.com/gouravkhunger/ArrayV)'s category taxonomy: exchange, hybrid,
   insertion, selection, merge, distribution, concurrent-simulated, and the intentionally
   impractical Bogo/Stooge/Slow family. Every algorithm is native Swift, not an interpreted script.
-- **15 visualizer styles**, from a bar graph to disparity plots, spirals, scatter and dot layouts,
-  a hoop stack, a pixel mesh, and a Hanoi-towers layout. The app switches styles live, mid-sort,
+- **16 visualizer styles**, from a bar graph to disparity plots, spirals, scatter and dot layouts,
+  a hoop stack, a pixel mesh, a custom image mosaic, and a Hanoi-towers layout. The app switches styles live, mid-sort,
   with no engine changes, because the algorithm has no visibility into which visualizer is active.
 - A Metal renderer with optional reduced-flashing and reduced-motion easing for photosensitivity.
 - Step, scrub, and seek controls for any recorded sort, plus adjustable playback speed. The app

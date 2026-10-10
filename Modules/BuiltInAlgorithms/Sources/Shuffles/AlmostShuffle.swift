@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -6,13 +7,13 @@ import SortEngineKit
 /// leaving most of the array's original order intact.
 public struct AlmostShuffle: ShuffleAlgorithm {
   public let id = ShuffleID(rawValue: "almost")
-  public let metadata = ShuffleMetadata(displayName: "Slight Shuffle")
+  public let metadata = ShuffleMetadata(displayName: String(localized: "Slight Shuffle", bundle: .module))
   public init() {}
   public func record(into engine: inout RecordingEngine) {
     let n = engine.count
     guard n > 0 else { return }
     for _ in 0..<max(n / 20, 1) {
-      engine.swap(Int.random(in: 0..<n), Int.random(in: 0..<n))
+      engine.swap(engine.randomIndex(in: 0..<n), engine.randomIndex(in: 0..<n))
     }
   }
 }

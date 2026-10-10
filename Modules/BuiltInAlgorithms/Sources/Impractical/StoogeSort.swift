@@ -1,10 +1,11 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
 public struct StoogeSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "stoogesort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Stooge Sort",
+    displayName: String(localized: "Stooge Sort", bundle: .module),
     category: .impractical,
     sizeRange: 16...32,
     growthModel: OperationGrowthModel(
@@ -34,8 +35,22 @@ public struct StoogeSort: SortAlgorithm {
   /// 5-element range, `t` is 1, leaving a 4-element first/third sub-range — `ceil(2/3 * 5)`, not
   /// `floor`) exactly as the algorithm requires to fully sort every input.
   private func stoogeSort(_ engine: inout RecordingEngine, _ i: Int, _ j: Int) {
-    if engine.compare(i, j, by: >) {
+    let inverted = engine.compare(i, j, by: >)
+    engine.annotateLastOperation(
+      stageID: "recursiveRange", decisionID: "stoogesort.endpointOrder",
+      outcome: inverted ? "exchange" : "keep",
+      roles: ["first": .arrayIndex(i), "last": .arrayIndex(j)],
+      explanationKey: "stoogesort.endpointOrder",
+      explanation: inverted
+        ? String(localized: "The range endpoints are inverted, so exchange them before recursing.", bundle: .module)
+        : String(localized: "The range endpoints are ordered, so recurse without exchanging them.", bundle: .module))
+    if inverted {
       engine.swap(i, j)
+      engine.annotateLastOperation(
+        stageID: "candidateExchange", decisionID: "stoogesort.candidateExchange",
+        outcome: "exchange", roles: ["left": .arrayIndex(i), "right": .arrayIndex(j)],
+        explanationKey: "stoogesort.candidateExchange",
+        explanation: String(localized: "The endpoints of this recursive range are inverted, so exchange them.", bundle: .module))
     }
     if j - i + 1 >= 3 {
       let t = (j - i + 1) / 3

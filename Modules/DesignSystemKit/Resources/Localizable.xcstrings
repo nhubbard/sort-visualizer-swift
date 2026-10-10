@@ -1,0 +1,16 @@
+{
+  "sourceLanguage": "en",
+  "strings": {
+    "Shuffle once, then sort the title with Quick Sort": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mezclar una vez y después ordenar el título con ordenación rápida"
+          }
+        }
+      }
+    }
+  },
+  "version": "1.0"
+}

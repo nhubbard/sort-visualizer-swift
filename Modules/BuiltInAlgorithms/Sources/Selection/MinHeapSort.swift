@@ -1,10 +1,11 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
 public struct MinHeapSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "minheapsort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Min Heap Sort",
+    displayName: String(localized: "Min Heap Sort", bundle: .module),
     category: .selection,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -32,7 +33,13 @@ public struct MinHeapSort: SortAlgorithm {
         var smallest = root
         let left = 2 * root + 1
         let right = 2 * root + 2
-        if left < size && !engine.compare(smallest, left, by: (<=)) {
+        if left < size && !engine.teachingCompare(
+          smallest, left,
+          by: (<=),
+          stageID: "MinHeapSort.leftChild",
+          whenTrue: String(localized: "The current heap candidate is no larger than the left child, so keep it.", bundle: .module),
+          whenFalse: String(localized: "The left child is smaller, so promote it as heap minimum.", bundle: .module)
+        ) {
           smallest = left
         }
         if right < size && !engine.compare(smallest, right, by: (<=)) {

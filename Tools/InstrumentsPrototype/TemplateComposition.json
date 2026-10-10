@@ -1,0 +1,1031 @@
+{
+  "source": "XRTrace loadTemplate + instrumentsForNextRun, inspect only",
+  "templates": {
+    "Activity Monitor": {
+      "errorLines": [
+        "hub binary: /Applications/Xcode.app/Contents/SharedFrameworks/DVTInstrumentsFoundation.framework/Resources/DTServiceHub connection: <DTXConnection 0x74fd821300 : x1> error: (null)",
+        "loaded: 1 outputURL: file:///.file/id=6571367.42012180/ error: (null)"
+      ],
+      "exitCode": 0,
+      "instruments": [
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.xray.instrument-type.activity",
+          "name": "Activity Monitor"
+        },
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.xray.instrument-type.device-thermal-state",
+          "name": "Thermal State"
+        }
+      ],
+      "targetTypeSupport": {
+        "0": true,
+        "1": true,
+        "2": true,
+        "3": false
+      },
+      "templatePath": "/Applications/Xcode.app/Contents/Applications/Instruments.app/Contents/Packages/ActivityMonitor.instrdst/Contents/Templates/Activity Monitor.tracetemplate"
+    },
+    "Allocations": {
+      "errorLines": [
+        "hub binary: /Applications/Xcode.app/Contents/SharedFrameworks/DVTInstrumentsFoundation.framework/Resources/DTServiceHub connection: <DTXConnection 0x7cdf829400 : x2> error: (null)",
+        "loaded: 1 outputURL: file:///.file/id=6571367.42012211/ error: (null)"
+      ],
+      "exitCode": 0,
+      "instruments": [
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.xray.instrument-type.oa",
+          "name": "Allocations"
+        },
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.xray.instrument-type.vmtrack",
+          "name": "VM Tracker"
+        },
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.xray.instrument-type.poi",
+          "name": "Points of Interest"
+        }
+      ],
+      "targetTypeSupport": {
+        "0": false,
+        "1": true,
+        "2": true,
+        "3": false
+      },
+      "templatePath": "/Applications/Xcode.app/Contents/Applications/Instruments.app/Contents/Resources/templates/Allocations.tracetemplate"
+    },
+    "Animation Hitches": {
+      "errorLines": [
+        "hub binary: /Applications/Xcode.app/Contents/SharedFrameworks/DVTInstrumentsFoundation.framework/Resources/DTServiceHub connection: <DTXConnection 0x75ca276c00 : x2> error: (null)",
+        "loaded: 1 outputURL: file:///.file/id=6571367.42012249/ error: (null)"
+      ],
+      "exitCode": 0,
+      "instruments": [
+        {
+          "deprecated": "0",
+          "identifier": "com-apple-hitches",
+          "name": "Hitches"
+        },
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.xray.instrument-type.metal-display",
+          "name": "Display"
+        },
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.xray.instrument-type.coresampler2",
+          "name": "Time Profiler"
+        },
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.dt.instruments.thread-activity",
+          "name": "Thread Activity"
+        },
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.xray.instrument-type.device-thermal-state",
+          "name": "Thermal State"
+        },
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.dt-perfteam.hangs",
+          "name": "Hangs"
+        }
+      ],
+      "targetTypeSupport": {
+        "0": true,
+        "1": true,
+        "2": true,
+        "3": false
+      },
+      "templatePath": "/Applications/Xcode.app/Contents/Applications/Instruments.app/Contents/Packages/Hitches.instrdst/Contents/Templates/Animation Hitches.tracetemplate"
+    },
+    "App Launch": {
+      "errorLines": [
+        "hub binary: /Applications/Xcode.app/Contents/SharedFrameworks/DVTInstrumentsFoundation.framework/Resources/DTServiceHub connection: <DTXConnection 0x7ccd815300 : x1> error: (null)",
+        "loaded: 1 outputURL: file:///.file/id=6571367.42012283/ error: (null)"
+      ],
+      "exitCode": 0,
+      "instruments": [
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.dt.instruments.thread-activity",
+          "name": "Thread Activity"
+        },
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.xray.instrument-type.coresampler2",
+          "name": "Time Profiler"
+        },
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.dt.instrument.dyld-activity",
+          "name": "dyld Activity"
+        },
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.dt.instruments.fs-syscalls",
+          "name": "Filesystem Activity"
+        },
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.dt.instruments.fs-suggestions",
+          "name": "Filesystem Suggestions"
+        },
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.dt.instruments.diskio-completion-time",
+          "name": "Disk I/O Latency"
+        },
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.dt.instruments.diskusage",
+          "name": "Disk Usage"
+        }
+      ],
+      "targetTypeSupport": {
+        "0": true,
+        "1": true,
+        "2": true,
+        "3": false
+      },
+      "templatePath": "/Applications/Xcode.app/Contents/Applications/Instruments.app/Contents/Packages/Apps.instrdst/Contents/Templates/App Launch.tracetemplate"
+    },
+    "Audio System Trace": {
+      "errorLines": [
+        "hub binary: /Applications/Xcode.app/Contents/SharedFrameworks/DVTInstrumentsFoundation.framework/Resources/DTServiceHub connection: <DTXConnection 0x786581d400 : x2> error: (null)",
+        "loaded: 1 outputURL: file:///.file/id=6571367.42012318/ error: (null)"
+      ],
+      "exitCode": 0,
+      "instruments": [
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.xray.instrument-type.poi",
+          "name": "Points of Interest"
+        },
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.xray.instrument-type.kdebug.scheduler",
+          "name": "System Load"
+        },
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.dt.instruments.thread-activity",
+          "name": "Thread Activity"
+        },
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.xray.instrument-type.keventvm2",
+          "name": "Virtual Memory Trace"
+        },
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.xray.instrument-type.keventsyscall2",
+          "name": "System Call Trace"
+        },
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.xray.instrument-type.device-thermal-state",
+          "name": "Thermal State"
+        },
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.audio.audioinstrument.audioclient",
+          "name": "Audio Client"
+        },
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.audio.audioinstrument.audiostatistics",
+          "name": "Audio Statistics"
+        },
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.audio.audioinstrument.audiohal",
+          "name": "Audio Server"
+        },
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.dt-perfteam.hangs",
+          "name": "Hangs"
+        }
+      ],
+      "targetTypeSupport": {
+        "0": true,
+        "1": true,
+        "2": true,
+        "3": false
+      },
+      "templatePath": "/Applications/Xcode.app/Contents/Applications/Instruments.app/Contents/Packages/Audio.instrdst/Contents/Templates/Audio System Trace.tracetemplate"
+    },
+    "CPU Counters": {
+      "errorLines": [
+        "hub binary: /Applications/Xcode.app/Contents/SharedFrameworks/DVTInstrumentsFoundation.framework/Resources/DTServiceHub connection: <DTXConnection 0x7531829300 : x1> error: (null)",
+        "loaded: 1 outputURL: file:///.file/id=6571367.42012347/ error: (null)"
+      ],
+      "exitCode": 0,
+      "instruments": [
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.dt.instruments.cpu.counters",
+          "name": "CPU Counters"
+        },
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.xray.instrument-type.coresampler2",
+          "name": "Time Profiler"
+        },
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.dt.instruments.thread-activity",
+          "name": "Thread Activity"
+        },
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.xray.instrument-type.poi",
+          "name": "Points of Interest"
+        }
+      ],
+      "targetTypeSupport": {
+        "0": true,
+        "1": true,
+        "2": true,
+        "3": false
+      },
+      "templatePath": "/Applications/Xcode.app/Contents/Applications/Instruments.app/Contents/Resources/templates/CPU Counters.tracetemplate"
+    },
+    "CPU Profiler": {
+      "errorLines": [
+        "hub binary: /Applications/Xcode.app/Contents/SharedFrameworks/DVTInstrumentsFoundation.framework/Resources/DTServiceHub connection: <DTXConnection 0x76b4676b00 : x1> error: (null)",
+        "loaded: 1 outputURL: file:///.file/id=6571367.42012377/ error: (null)"
+      ],
+      "exitCode": 0,
+      "instruments": [
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.xray.instrument-type.cpusampler",
+          "name": "CPU Profiler"
+        },
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.xray.instrument-type.poi",
+          "name": "Points of Interest"
+        },
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.xray.instrument-type.device-thermal-state",
+          "name": "Thermal State"
+        },
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.dt-perfteam.hangs",
+          "name": "Hangs"
+        }
+      ],
+      "targetTypeSupport": {
+        "0": true,
+        "1": true,
+        "2": true,
+        "3": false
+      },
+      "templatePath": "/Applications/Xcode.app/Contents/Applications/Instruments.app/Contents/Packages/CPU Profiler.instrdst/Contents/Templates/CPU Profiler.tracetemplate"
+    },
+    "Core AI": {
+      "errorLines": [
+        "hub binary: /Applications/Xcode.app/Contents/SharedFrameworks/DVTInstrumentsFoundation.framework/Resources/DTServiceHub connection: <DTXConnection 0x779d825300 : x1> error: (null)",
+        "loaded: 1 outputURL: file:///.file/id=6571367.42012415/ error: (null)"
+      ],
+      "exitCode": 0,
+      "instruments": [
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.dt.instruments.coreai",
+          "name": "Core AI"
+        },
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.ane",
+          "name": "Neural Engine"
+        },
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.xray.instrument-type.metal-gpu",
+          "name": "GPU"
+        },
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.xray.instrument-type.coresampler2",
+          "name": "Time Profiler"
+        }
+      ],
+      "targetTypeSupport": {
+        "0": true,
+        "1": true,
+        "2": true,
+        "3": false
+      },
+      "templatePath": "/Applications/Xcode.app/Contents/Applications/Instruments.app/Contents/Resources/templates/Core AI.tracetemplate"
+    },
+    "Data Persistence": {
+      "errorLines": [
+        "hub binary: /Applications/Xcode.app/Contents/SharedFrameworks/DVTInstrumentsFoundation.framework/Resources/DTServiceHub connection: <DTXConnection 0x7a3827ec00 : x2> error: (null)",
+        "loaded: 1 outputURL: file:///.file/id=6571367.42012443/ error: (null)"
+      ],
+      "exitCode": 0,
+      "instruments": [
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.coredata.faults",
+          "name": "Data Faults"
+        },
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.coredata.fetches",
+          "name": "Data Fetches"
+        },
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.coredata.saves",
+          "name": "Data Saves"
+        }
+      ],
+      "targetTypeSupport": {
+        "0": true,
+        "1": true,
+        "2": true,
+        "3": false
+      },
+      "templatePath": "/Applications/Xcode.app/Contents/Applications/Instruments.app/Contents/Packages/DataPersistence.instrdst/Contents/Templates/Data Persistence.tracetemplate"
+    },
+    "File Activity": {
+      "errorLines": [
+        "hub binary: /Applications/Xcode.app/Contents/SharedFrameworks/DVTInstrumentsFoundation.framework/Resources/DTServiceHub connection: <DTXConnection 0x77c983d300 : x1> error: (null)",
+        "loaded: 1 outputURL: file:///.file/id=6571367.42012482/ error: (null)"
+      ],
+      "exitCode": 0,
+      "instruments": [
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.dt.instruments.fs-suggestions",
+          "name": "Filesystem Suggestions"
+        },
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.dt.instruments.fs-syscalls",
+          "name": "Filesystem Activity"
+        },
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.dt.instruments.diskusage",
+          "name": "Disk Usage"
+        },
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.dt.instruments.diskio-completion-time",
+          "name": "Disk I/O Latency"
+        }
+      ],
+      "targetTypeSupport": {
+        "0": true,
+        "1": true,
+        "2": true,
+        "3": false
+      },
+      "templatePath": "/Applications/Xcode.app/Contents/Applications/Instruments.app/Contents/Resources/templates/File Activity.tracetemplate"
+    },
+    "Foundation Models": {
+      "errorLines": [
+        "hub binary: /Applications/Xcode.app/Contents/SharedFrameworks/DVTInstrumentsFoundation.framework/Resources/DTServiceHub connection: <DTXConnection 0x77c3811300 : x1> error: (null)",
+        "loaded: 1 outputURL: file:///.file/id=6571367.42012516/ error: (null)"
+      ],
+      "exitCode": 0,
+      "instruments": [
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.FoundationModels",
+          "name": "Foundation Models"
+        }
+      ],
+      "targetTypeSupport": {
+        "0": true,
+        "1": true,
+        "2": true,
+        "3": false
+      },
+      "templatePath": "/Applications/Xcode.app/Contents/Applications/Instruments.app/Contents/Resources/templates/Foundation Models.tracetemplate"
+    },
+    "Game Memory": {
+      "errorLines": [
+        "hub binary: /Applications/Xcode.app/Contents/SharedFrameworks/DVTInstrumentsFoundation.framework/Resources/DTServiceHub connection: <DTXConnection 0x74ff815300 : x1> error: (null)",
+        "loaded: 1 outputURL: file:///.file/id=6571367.42012552/ error: (null)"
+      ],
+      "exitCode": 0,
+      "instruments": [
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.xray.instrument-type.oa",
+          "name": "Allocations"
+        },
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.xray.instrument-type.metal-memory",
+          "name": "Metal Resource Events"
+        },
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.xray.instrument-type.vmtrack",
+          "name": "VM Tracker"
+        },
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.xray.instrument-type.keventvm2",
+          "name": "Virtual Memory Trace"
+        },
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.xray.instrument-type.metal-application",
+          "name": "Metal Application"
+        },
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.xray.instrument-type.metal-gpu",
+          "name": "GPU"
+        }
+      ],
+      "targetTypeSupport": {
+        "0": false,
+        "1": true,
+        "2": true,
+        "3": false
+      },
+      "templatePath": "/Applications/Xcode.app/Contents/Applications/Instruments.app/Contents/Packages/GPU.instrdst/Contents/Templates/Game Memory.tracetemplate"
+    },
+    "Game Performance": {
+      "errorLines": [
+        "hub binary: /Applications/Xcode.app/Contents/SharedFrameworks/DVTInstrumentsFoundation.framework/Resources/DTServiceHub connection: <DTXConnection 0x7b4f819200 : x1> error: (null)",
+        "loaded: 1 outputURL: file:///.file/id=6571367.42012591/ error: (null)"
+      ],
+      "exitCode": 0,
+      "instruments": [
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.xray.instrument-type.poi",
+          "name": "Points of Interest"
+        },
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.xray.instrument-type.kdebug.scheduler",
+          "name": "System Load"
+        },
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.dt.instruments.thread-activity",
+          "name": "Thread Activity"
+        },
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.xray.instrument-type.keventsyscall2",
+          "name": "System Call Trace"
+        },
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.xray.instrument-type.keventvm2",
+          "name": "Virtual Memory Trace"
+        },
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.xray.instrument-type.coresampler2",
+          "name": "Time Profiler"
+        },
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.xray.instrument-type.device-thermal-state",
+          "name": "Thermal State"
+        },
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.xray.instrument-type.metal-memory",
+          "name": "Metal Resource Events"
+        },
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.xray.instrument-type.metal-application",
+          "name": "Metal Application"
+        },
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.xray.instrument-type.metal-gpu",
+          "name": "GPU"
+        },
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.xray.instrument-type.metal-display",
+          "name": "Display"
+        },
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.dt-perfteam.hangs",
+          "name": "Hangs"
+        }
+      ],
+      "targetTypeSupport": {
+        "0": true,
+        "1": true,
+        "2": true,
+        "3": false
+      },
+      "templatePath": "/Applications/Xcode.app/Contents/Applications/Instruments.app/Contents/Packages/GPU.instrdst/Contents/Templates/Game Performance.tracetemplate"
+    },
+    "Game Performance Overview": {
+      "errorLines": [
+        "hub binary: /Applications/Xcode.app/Contents/SharedFrameworks/DVTInstrumentsFoundation.framework/Resources/DTServiceHub connection: <DTXConnection 0x75ab821400 : x2> error: (null)",
+        "loaded: 1 outputURL: file:///.file/id=6571367.42012629/ error: (null)"
+      ],
+      "exitCode": 0,
+      "instruments": [
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.dt.instruments.metal-perf-overview",
+          "name": "Metal Performance Overview"
+        },
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.xray.instrument-type.coresampler2",
+          "name": "Time Profiler"
+        },
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.xray.instrument-type.device-thermal-state",
+          "name": "Thermal State"
+        }
+      ],
+      "targetTypeSupport": {
+        "0": true,
+        "1": true,
+        "2": true,
+        "3": false
+      },
+      "templatePath": "/Applications/Xcode.app/Contents/Applications/Instruments.app/Contents/Packages/GPU.instrdst/Contents/Templates/Game Performance Overview.tracetemplate"
+    },
+    "Leaks": {
+      "errorLines": [
+        "hub binary: /Applications/Xcode.app/Contents/SharedFrameworks/DVTInstrumentsFoundation.framework/Resources/DTServiceHub connection: <DTXConnection 0x74d1e72900 : x1> error: (null)",
+        "loaded: 1 outputURL: file:///.file/id=6571367.42012660/ error: (null)"
+      ],
+      "exitCode": 0,
+      "instruments": [
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.xray.instrument-type.oa",
+          "name": "Allocations"
+        },
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.xray.instrument-type.homeleaks",
+          "name": "Leaks"
+        },
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.xray.instrument-type.poi",
+          "name": "Points of Interest"
+        }
+      ],
+      "targetTypeSupport": {
+        "0": false,
+        "1": true,
+        "2": true,
+        "3": false
+      },
+      "templatePath": "/Applications/Xcode.app/Contents/Applications/Instruments.app/Contents/Resources/templates/Leaks.tracetemplate"
+    },
+    "Logging": {
+      "errorLines": [
+        "hub binary: /Applications/Xcode.app/Contents/SharedFrameworks/DVTInstrumentsFoundation.framework/Resources/DTServiceHub connection: <DTXConnection 0x79edc25400 : x2> error: (null)",
+        "loaded: 1 outputURL: file:///.file/id=6571367.42012758/ error: (null)"
+      ],
+      "exitCode": 0,
+      "instruments": [
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.dt.os-log-instrument",
+          "name": "os_log"
+        },
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.dt.os-log-signpost-instrument",
+          "name": "os_signpost"
+        }
+      ],
+      "targetTypeSupport": {
+        "0": true,
+        "1": true,
+        "2": true,
+        "3": false
+      },
+      "templatePath": "/Applications/Xcode.app/Contents/Applications/Instruments.app/Contents/Packages/Narrative.instrdst/Contents/Templates/Logging.tracetemplate"
+    },
+    "Metal System Trace": {
+      "errorLines": [
+        "hub binary: /Applications/Xcode.app/Contents/SharedFrameworks/DVTInstrumentsFoundation.framework/Resources/DTServiceHub connection: <DTXConnection 0x78e3831300 : x1> error: (null)",
+        "loaded: 1 outputURL: file:///.file/id=6571367.42012792/ error: (null)"
+      ],
+      "exitCode": 0,
+      "instruments": [
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.xray.instrument-type.metal-application",
+          "name": "Metal Application"
+        },
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.xray.instrument-type.metal-gpu",
+          "name": "GPU"
+        },
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.xray.instrument-type.metal-display",
+          "name": "Display"
+        },
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.xray.instrument-type.metal-memory",
+          "name": "Metal Resource Events"
+        },
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.xray.instrument-type.device-thermal-state",
+          "name": "Thermal State"
+        },
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.xray.instrument-type.coresampler2",
+          "name": "Time Profiler"
+        },
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.dt-perfteam.hangs",
+          "name": "Hangs"
+        }
+      ],
+      "targetTypeSupport": {
+        "0": true,
+        "1": true,
+        "2": true,
+        "3": false
+      },
+      "templatePath": "/Applications/Xcode.app/Contents/Applications/Instruments.app/Contents/Packages/GPU.instrdst/Contents/Templates/Metal System Trace.tracetemplate"
+    },
+    "Network": {
+      "errorLines": [
+        "hub binary: /Applications/Xcode.app/Contents/SharedFrameworks/DVTInstrumentsFoundation.framework/Resources/DTServiceHub connection: <DTXConnection 0x7a8f819400 : x2> error: (null)",
+        "loaded: 1 outputURL: file:///.file/id=6571367.42012828/ error: (null)"
+      ],
+      "exitCode": 0,
+      "instruments": [
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.CFNetwork.http-tracing.instrument",
+          "name": "HTTP Traffic"
+        },
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.dt.network-connections",
+          "name": "Network Connections"
+        },
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.xray.instrument-type.poi",
+          "name": "Points of Interest"
+        }
+      ],
+      "targetTypeSupport": {
+        "0": true,
+        "1": true,
+        "2": true,
+        "3": false
+      },
+      "templatePath": "/Applications/Xcode.app/Contents/Applications/Instruments.app/Contents/Resources/templates/Network.tracetemplate"
+    },
+    "Power Profiler": {
+      "errorLines": [
+        "hub binary: /Applications/Xcode.app/Contents/SharedFrameworks/DVTInstrumentsFoundation.framework/Resources/DTServiceHub connection: <DTXConnection 0x7691809400 : x2> error: (null)",
+        "loaded: 1 outputURL: file:///.file/id=6571367.42012876/ error: (null)"
+      ],
+      "exitCode": 0,
+      "instruments": [
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.dt.instruments.power-metrics",
+          "name": "Power Profiler"
+        },
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.xray.instrument-type.device-thermal-state",
+          "name": "Thermal State"
+        },
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.xray.instrument-type.coresampler2",
+          "name": "Time Profiler"
+        },
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.dt.network-connections",
+          "name": "Network Connections"
+        },
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.dt.instruments.metal-perf-overview",
+          "name": "Metal Performance Overview"
+        },
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.xray.instrument-type.energy.location",
+          "name": "Location Energy Model"
+        }
+      ],
+      "targetTypeSupport": {
+        "0": false,
+        "1": true,
+        "2": true,
+        "3": false
+      },
+      "templatePath": "/Applications/Xcode.app/Contents/Applications/Instruments.app/Contents/Resources/templates/Power Profiler.tracetemplate"
+    },
+    "Processor Trace": {
+      "errorLines": [
+        "hub binary: /Applications/Xcode.app/Contents/SharedFrameworks/DVTInstrumentsFoundation.framework/Resources/DTServiceHub connection: <DTXConnection 0x7bb627ac00 : x2> error: (null)",
+        "loaded: 1 outputURL: file:///.file/id=6571367.42012904/ error: (null)"
+      ],
+      "exitCode": 0,
+      "instruments": [
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.xray.instrument-type.poi",
+          "name": "Points of Interest"
+        },
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.dt.instruments.thread-activity",
+          "name": "Thread Activity"
+        },
+        {
+          "deprecated": "0",
+          "identifier": "InstrumentsPlugIn.ProcessorTraceInstrument",
+          "name": "Processor Trace"
+        }
+      ],
+      "targetTypeSupport": {
+        "0": false,
+        "1": true,
+        "2": true,
+        "3": false
+      },
+      "templatePath": "/Applications/Xcode.app/Contents/Applications/Instruments.app/Contents/Resources/templates/Processor Trace.tracetemplate"
+    },
+    "RealityKit Trace": {
+      "errorLines": [
+        "hub binary: /Applications/Xcode.app/Contents/SharedFrameworks/DVTInstrumentsFoundation.framework/Resources/DTServiceHub connection: <DTXConnection 0x7b49835300 : x1> error: (null)",
+        "loaded: 1 outputURL: file:///.file/id=6571367.42012943/ error: (null)"
+      ],
+      "exitCode": 0,
+      "instruments": [
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.tdg.instruments.realityframes",
+          "name": "RealityKit Frames"
+        },
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.tdg.instruments.reality-metrics",
+          "name": "RealityKit Metrics"
+        },
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.dt-perfteam.runloops",
+          "name": "Run Loops"
+        },
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.xray.instrument-type.coresampler2",
+          "name": "Time Profiler"
+        },
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.dt-perfteam.hangs",
+          "name": "Hangs"
+        },
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.xray.instrument-type.metal-application",
+          "name": "Metal Application"
+        },
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.xray.instrument-type.metal-gpu",
+          "name": "GPU"
+        }
+      ],
+      "targetTypeSupport": {
+        "0": true,
+        "1": true,
+        "2": true,
+        "3": false
+      },
+      "templatePath": "/Applications/Xcode.app/Contents/Applications/Instruments.app/Contents/Packages/RealityKit.instrdst/Contents/Templates/RealityKit Trace.tracetemplate"
+    },
+    "Swift Concurrency": {
+      "errorLines": [
+        "hub binary: /Applications/Xcode.app/Contents/SharedFrameworks/DVTInstrumentsFoundation.framework/Resources/DTServiceHub connection: <DTXConnection 0x7993829300 : x1> error: (null)",
+        "loaded: 1 outputURL: file:///.file/id=6571367.42012977/ error: (null)"
+      ],
+      "exitCode": 0,
+      "instruments": [
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.dt.instrument.swift-concurrency-task",
+          "name": "Swift Tasks"
+        },
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.dt.instrument.swift-concurrency-actor",
+          "name": "Swift Actors"
+        },
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.dt.instrument.swift-concurrency-execution-domain",
+          "name": "Swift Executors"
+        },
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.xray.instrument-type.coresampler2",
+          "name": "Time Profiler"
+        },
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.dt-perfteam.hangs",
+          "name": "Hangs"
+        },
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.xray.instrument-type.poi",
+          "name": "Points of Interest"
+        }
+      ],
+      "targetTypeSupport": {
+        "0": true,
+        "1": true,
+        "2": true,
+        "3": false
+      },
+      "templatePath": "/Applications/Xcode.app/Contents/Applications/Instruments.app/Contents/Resources/templates/Swift Concurrency.tracetemplate"
+    },
+    "SwiftUI": {
+      "errorLines": [
+        "hub binary: /Applications/Xcode.app/Contents/SharedFrameworks/DVTInstrumentsFoundation.framework/Resources/DTServiceHub connection: <DTXConnection 0x7b55ff9400 : x2> error: (null)",
+        "loaded: 1 outputURL: file:///.file/id=6571367.42013013/ error: (null)"
+      ],
+      "exitCode": 0,
+      "instruments": [
+        {
+          "deprecated": "0",
+          "identifier": "InstrumentsPlugIn.SwiftUIInstrument",
+          "name": "SwiftUI"
+        },
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.xray.instrument-type.coresampler2",
+          "name": "Time Profiler"
+        },
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.dt-perfteam.hangs",
+          "name": "Hangs"
+        },
+        {
+          "deprecated": "0",
+          "identifier": "com-apple-hitches",
+          "name": "Hitches"
+        }
+      ],
+      "targetTypeSupport": {
+        "0": true,
+        "1": true,
+        "2": true,
+        "3": false
+      },
+      "templatePath": "/Applications/Xcode.app/Contents/Applications/Instruments.app/Contents/Resources/templates/SwiftUI.tracetemplate"
+    },
+    "System Trace": {
+      "errorLines": [
+        "hub binary: /Applications/Xcode.app/Contents/SharedFrameworks/DVTInstrumentsFoundation.framework/Resources/DTServiceHub connection: <DTXConnection 0x74cde8eb00 : x1> error: (null)",
+        "loaded: 1 outputURL: file:///.file/id=6571367.42013039/ error: (null)"
+      ],
+      "exitCode": 0,
+      "instruments": [
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.xray.instrument-type.poi",
+          "name": "Points of Interest"
+        },
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.xray.instrument-type.kdebug.scheduler",
+          "name": "System Load"
+        },
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.dt.instruments.thread-activity",
+          "name": "Thread Activity"
+        },
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.xray.instrument-type.keventvm2",
+          "name": "Virtual Memory Trace"
+        },
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.xray.instrument-type.keventsyscall2",
+          "name": "System Call Trace"
+        },
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.xray.instrument-type.device-thermal-state",
+          "name": "Thermal State"
+        },
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.xray.instrument-type.coresampler2",
+          "name": "Time Profiler"
+        },
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.dt-perfteam.hangs",
+          "name": "Hangs"
+        },
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.dt.instruments.diskusage",
+          "name": "Disk Usage"
+        },
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.dt.instruments.diskio-completion-time",
+          "name": "Disk I/O Latency"
+        },
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.dt.instruments.fs-syscalls",
+          "name": "Filesystem Activity"
+        }
+      ],
+      "targetTypeSupport": {
+        "0": true,
+        "1": true,
+        "2": true,
+        "3": false
+      },
+      "templatePath": "/Applications/Xcode.app/Contents/Applications/Instruments.app/Contents/Packages/SystemTrace.instrdst/Contents/Templates/System Trace.tracetemplate"
+    },
+    "Time Profiler": {
+      "errorLines": [
+        "hub binary: /Applications/Xcode.app/Contents/SharedFrameworks/DVTInstrumentsFoundation.framework/Resources/DTServiceHub connection: <DTXConnection 0x784b831400 : x2> error: (null)",
+        "loaded: 1 outputURL: file:///.file/id=6571367.42013078/ error: (null)"
+      ],
+      "exitCode": 0,
+      "instruments": [
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.xray.instrument-type.coresampler2",
+          "name": "Time Profiler"
+        },
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.xray.instrument-type.poi",
+          "name": "Points of Interest"
+        },
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.xray.instrument-type.device-thermal-state",
+          "name": "Thermal State"
+        },
+        {
+          "deprecated": "0",
+          "identifier": "com.apple.dt-perfteam.hangs",
+          "name": "Hangs"
+        }
+      ],
+      "targetTypeSupport": {
+        "0": true,
+        "1": true,
+        "2": true,
+        "3": false
+      },
+      "templatePath": "/Applications/Xcode.app/Contents/Applications/Instruments.app/Contents/Packages/Sampling.instrdst/Contents/Templates/Time Profiler.tracetemplate"
+    }
+  },
+  "xcode": "27.0 (27A266a)"
+}

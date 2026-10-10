@@ -11,7 +11,7 @@ what already exists.
 ## `BuiltInAlgorithms`
 
 `BuiltInAlgorithms` depends only on `AlgorithmKit`. It ships 167 `SortAlgorithm` conformances and
-44 `ShuffleAlgorithm` conformances, organized under `Modules/BuiltInAlgorithms/Sources/` by
+43 `ShuffleAlgorithm` conformances, organized under `Modules/BuiltInAlgorithms/Sources/` by
 `AlgorithmCategory`.
 
 | Category | Count | Contents |
@@ -36,7 +36,7 @@ Porting from ArrayV is ongoing. Not every ArrayV algorithm has a Swift counterpa
 
 ### Shuffles are tapes too
 
-Every shuffle in `Shuffles/` (44 total, ranging from naive random shuffles to structured ones like
+Every shuffle in `Shuffles/` (43 total, ranging from Fisher–Yates random shuffles to structured ones like
 radix, bitonic, merge, BST-traversal, and Sierpinski-curve shuffles) is a `ShuffleAlgorithm` that
 records against the same `RecordingEngine` a sort uses, starting from a sorted identity array. No
 separate shuffle engine exists. This is why "watch a fractal shuffle un-scramble the array" works
@@ -69,12 +69,12 @@ ArrayV. See [Adding a sorting algorithm](../guides/adding-an-algorithm.md) for t
 
 ## `BuiltInVisualizers`
 
-`BuiltInVisualizers` depends only on `VisualizationKit`. It ships 15 `Visualizer` conformances,
+`BuiltInVisualizers` depends only on `VisualizationKit`. It ships 16 `Visualizer` conformances,
 each a pure function from `VisualizationContext` to `[DrawCommand]`:
 
 `BarGraphVisualizer`, `RainbowVisualizer`, `ScatterPlotVisualizer`, `SineWaveVisualizer`,
 `ColorCircleVisualizer`, `SpiralVisualizer`, `SpiralDotsVisualizer`, `WaveDotsVisualizer`,
-`PixelMeshVisualizer`, `HoopStackVisualizer`, `HanoiTowersVisualizer`, and the four-member
+`PixelMeshVisualizer`, `CustomImageVisualizer`, `HoopStackVisualizer`, `HanoiTowersVisualizer`, and the four-member
 Disparity family (`DisparityBarGraphVisualizer`, `DisparityCircleVisualizer`,
 `DisparityChordsVisualizer`, `DisparityDotsVisualizer`).
 
@@ -95,12 +95,13 @@ design questions about this family were resolved by reading ArrayV's source:
   (`MetalHanoiTowersRenderer`; see [Features & app target](features.md)), driven by the same raw
   `SortOperation`s every other visualizer's renderer receives.
 
-### The one style that hasn't been built
+### Custom Image
 
-ArrayV includes a 15th style, CustomImage, which remaps a user-supplied image per array
-permutation. This app has not built it. Its UI and remapping cost were judged disproportionate to
-its value relative to the other 15 styles. See
-[History](../architecture/history.md#whats-still-open).
+`CustomImageVisualizer` describes one moving image tile per array item. A separate Metal renderer
+samples the selected image texture; spare grid cells retain their original fragments. Images are
+downsampled to a maximum 2,048-pixel edge and stored locally after selection. Equal values repeat
+the same fragment, matching the engine's value-based replay model. The app supplies a built-in
+sample image until the user chooses a photo or file.
 
 ## Categories come from ArrayV's own declarations
 

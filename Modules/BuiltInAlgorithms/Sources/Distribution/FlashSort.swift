@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -18,7 +19,7 @@ import SortEngineKit
 public struct FlashSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "flashsort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Flash Sort",
+    displayName: String(localized: "Flash Sort", bundle: .module),
     category: .distribution,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -58,7 +59,16 @@ public struct FlashSort: SortAlgorithm {
       let small: Int
       let big: Int
       let bigIndex: Int
-      if engine.compare(i, i + 1, by: (<)) {
+      let firstIsSmaller = engine.compare(i, i + 1, by: (<))
+      engine.annotateLastOperation(
+        stageID: "rangeScan", decisionID: "flashsort.pairOrder",
+        outcome: firstIsSmaller ? "firstIsSmaller" : "secondIsSmaller",
+        roles: ["first": .arrayIndex(i), "second": .arrayIndex(i + 1)],
+        explanationKey: "flashsort.pairOrder",
+        explanation: firstIsSmaller
+          ? String(localized: "The first value is smaller, so use it for the minimum check and the second for the maximum.", bundle: .module)
+          : String(localized: "The second value is no larger, so use it for the minimum check and the first for the maximum.", bundle: .module))
+      if firstIsSmaller {
         small = engine.readValue(at: i)
         big = engine.readValue(at: i + 1)
         bigIndex = i + 1
@@ -100,6 +110,12 @@ public struct FlashSort: SortAlgorithm {
     var L = [Int](repeating: 0, count: m + 1)
     for t in 1...m {
       engine.writeAux(auxHandle, at: t, value: 0)
+      engine.annotateLastOperation(
+        stageID: "scratchUpdate", decisionID: "flashsort.scratchUpdate",
+        outcome: "update",
+        roles: ["scratch": .auxiliaryIndex(handle: auxHandle.rawValue, index: t)],
+        explanationKey: "flashsort.scratchUpdate",
+        explanation: String(localized: "Update this class count or boundary as the class permutation advances.", bundle: .module))
     }
 
     // K(x) = 1 + floor((m-1)(x-min)/(max-min)). `c` is the precomputed `(m-1)/(max-min)`
@@ -114,17 +130,34 @@ public struct FlashSort: SortAlgorithm {
       let k = classOf(engine.readValue(at: h))
       L[k] += 1
       engine.writeAux(auxHandle, at: k, value: L[k])
+      engine.annotateLastOperation(
+        stageID: "scratchUpdate", decisionID: "flashsort.scratchUpdate",
+        outcome: "update",
+        roles: ["scratch": .auxiliaryIndex(handle: auxHandle.rawValue, index: k)],
+        explanationKey: "flashsort.scratchUpdate",
+        explanation: String(localized: "Update this class count or boundary as the class permutation advances.", bundle: .module))
     }
 
     for k in 2...m {
       L[k] += L[k - 1]
       engine.writeAux(auxHandle, at: k, value: L[k])
+      engine.annotateLastOperation(
+        stageID: "scratchUpdate", decisionID: "flashsort.scratchUpdate",
+        outcome: "update",
+        roles: ["scratch": .auxiliaryIndex(handle: auxHandle.rawValue, index: k)],
+        explanationKey: "flashsort.scratchUpdate",
+        explanation: String(localized: "Update this class count or boundary as the class permutation advances.", bundle: .module))
     }
 
     // -------PERMUTATION-------
 
     // Swap the max value into the front of the array first, exactly like ArrayV.
     engine.swap(maxIndex, 0)
+    engine.annotateLastOperation(
+      stageID: "bucketExchange", decisionID: "flashsort.bucketExchange",
+      outcome: "exchange", roles: ["left": .arrayIndex(maxIndex), "right": .arrayIndex(0)],
+      explanationKey: "flashsort.bucketExchange",
+      explanation: String(localized: "The maximum value moves to the front to seed the class permutation.", bundle: .module))
 
     // `j` is the cycle leader: the lowest index that starts a class boundary still missing
     // elements. `k` is the class currently being filled. `evicted` (introduced inside the
@@ -156,9 +189,20 @@ public struct FlashSort: SortAlgorithm {
         let location = L[k] - 1
         let temp = engine.readValue(at: location)
         engine.setValue(location, evicted)
+        engine.annotateLastOperation(
+          stageID: "bucketPlacement", decisionID: "flashsort.bucketPlacement",
+          outcome: "place", roles: ["destination": .arrayIndex(location)],
+          explanationKey: "flashsort.bucketPlacement",
+          explanation: String(localized: "The current class has an open slot here, so place the evicted value and continue the cycle.", bundle: .module))
         evicted = temp
         L[k] -= 1
         engine.writeAux(auxHandle, at: k, value: L[k])
+        engine.annotateLastOperation(
+          stageID: "scratchUpdate", decisionID: "flashsort.scratchUpdate",
+          outcome: "update",
+          roles: ["scratch": .auxiliaryIndex(handle: auxHandle.rawValue, index: k)],
+          explanationKey: "flashsort.scratchUpdate",
+          explanation: String(localized: "Update this class count or boundary as the class permutation advances.", bundle: .module))
         numMoves += 1
       }
     }
@@ -185,9 +229,19 @@ public struct FlashSort: SortAlgorithm {
       var pos = i - 1
       while pos >= 0 && engine.readValue(at: pos) > current {
         engine.setValue(pos + 1, engine.readValue(at: pos))
+        engine.annotateLastOperation(
+          stageID: "bucketPlacement", decisionID: "flashsort.bucketPlacement",
+          outcome: "place", roles: ["destination": .arrayIndex(pos + 1)],
+          explanationKey: "flashsort.bucketPlacement",
+          explanation: String(localized: "The held value precedes this value, so shift the latter one position right.", bundle: .module))
         pos -= 1
       }
       engine.setValue(pos + 1, current)
+      engine.annotateLastOperation(
+        stageID: "bucketPlacement", decisionID: "flashsort.bucketPlacement",
+        outcome: "place", roles: ["destination": .arrayIndex(pos + 1)],
+        explanationKey: "flashsort.bucketPlacement",
+        explanation: String(localized: "The preceding values have shifted right, leaving this position for the held value.", bundle: .module))
     }
   }
 }

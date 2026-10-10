@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -32,7 +33,7 @@ import SortEngineKit
 public struct BufferedStoogeSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "bufferedstoogesort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Buffered Stooge Sort",
+    displayName: String(localized: "Buffered Stooge Sort", bundle: .module),
     category: .merge,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -41,7 +42,7 @@ public struct BufferedStoogeSort: SortAlgorithm {
     detectedGrowthModel: DetectedGrowthModel(
       family: .polynomialIntercept, coefficients: [1.69591, 31.0706, -193.548], rSquared: 0.999991),
     implementationComplexity: 14,
-    stable: true,
+    stable: false,
     timeComplexity: ComplexityBounds(best: "O(n^2)", average: "O(n^2)", worst: "O(n^2)"),
     spaceComplexity: "O(log n)",
     iconName: "theatermasks.fill"
@@ -56,7 +57,12 @@ public struct BufferedStoogeSort: SortAlgorithm {
     func wrapper(_ start: Int, _ stop: Int) {
       guard stop - start > 1 else { return }
 
-      if stop - start == 2, engine.compare(start, stop - 1, by: >) {
+      if stop - start == 2, engine.teachingCompare(
+        start, stop - 1, by: >,
+        stageID: "BufferedStoogeSort.base.pair",
+        whenTrue: String(localized: "This two-element range is reversed, so the base case swaps it.", bundle: .module),
+        whenFalse: String(localized: "This two-element range is ordered, so the base case leaves it.", bundle: .module)
+      ) {
         engine.swap(start, stop - 1)
       }
 
@@ -79,7 +85,10 @@ public struct BufferedStoogeSort: SortAlgorithm {
       var right = twoThird
       var bufferStart = start
       while left < twoThird, right < stop {
-        if engine.compare(left, right, by: >) {
+        if engine.teachingCompare(
+          left, right, by: >, stageID: "bufferedStooge.mergeChoice",
+          whenTrue: String(localized: "The left item is larger, so the buffered merge takes the right item.", bundle: .module),
+          whenFalse: String(localized: "The left item is no greater, so the buffered merge takes it first.", bundle: .module)) {
           engine.swap(bufferStart, right)
           right += 1
         } else {
@@ -99,7 +108,10 @@ public struct BufferedStoogeSort: SortAlgorithm {
       left = twoThird - 1
       right = stop - 1
       while right > left, left >= start {
-        if engine.compare(left, right, by: >) {
+        if engine.teachingCompare(
+          left, right, by: >, stageID: "bufferedStooge.finalPass",
+          whenTrue: String(localized: "This pair is reversed, so the final stooge pass shifts the left item right.", bundle: .module),
+          whenFalse: String(localized: "This pair is ordered, so the final pass advances without shifting.", bundle: .module)) {
           for i in left..<right {
             engine.swap(i, i + 1)
           }

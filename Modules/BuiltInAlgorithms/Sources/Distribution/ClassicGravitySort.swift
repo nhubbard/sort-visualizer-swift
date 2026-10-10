@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -16,7 +17,7 @@ import SortEngineKit
 public struct ClassicGravitySort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "classicgravitysort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Classic Gravity Sort",
+    displayName: String(localized: "Classic Gravity Sort", bundle: .module),
     category: .distribution,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -39,8 +40,18 @@ public struct ClassicGravitySort: SortAlgorithm {
     guard n > 1 else { return }
 
     var maxValue = engine.readValue(at: 0)
-    for i in 1..<n where engine.readValue(at: i) > maxValue {
-      maxValue = engine.readValue(at: i)
+    for i in 1..<n {
+      let candidate = engine.readValue(at: i)
+      let newMaximum = candidate > maxValue
+      engine.annotateLastOperation(
+        stageID: "heightScan", decisionID: "classicgravitysort.maximumHeight",
+        outcome: newMaximum ? "extendHeight" : "keepHeight",
+        roles: ["column": .arrayIndex(i), "height": .value(maxValue)],
+        explanationKey: "classicgravitysort.maximumHeight",
+        explanation: newMaximum
+          ? String(localized: "This column is taller, so include its height in the bead transpose.", bundle: .module)
+          : String(localized: "This column fits within the bead height already found.", bundle: .module))
+      if newMaximum { maxValue = engine.readValue(at: i) }
     }
 
     let transposeHandle = engine.createAuxArray(length: maxValue)
@@ -51,6 +62,12 @@ public struct ClassicGravitySort: SortAlgorithm {
       for j in 0..<value {
         transpose[j] += 1
         engine.writeAux(transposeHandle, at: j, value: transpose[j])
+        engine.annotateLastOperation(
+          stageID: "scratchUpdate", decisionID: "classicgravitysort.scratchUpdate",
+          outcome: "update",
+          roles: ["scratch": .auxiliaryIndex(handle: transposeHandle.rawValue, index: j)],
+          explanationKey: "classicgravitysort.scratchUpdate",
+          explanation: String(localized: "Update the transposed bead column before reconstructing the sorted heights.", bundle: .module))
       }
     }
 
@@ -67,9 +84,20 @@ public struct ClassicGravitySort: SortAlgorithm {
         }
       }
       engine.setValue(n - i - 1, sum)
+      engine.annotateLastOperation(
+        stageID: "bucketPlacement", decisionID: "classicgravitysort.bucketPlacement",
+        outcome: "place", roles: ["destination": .arrayIndex(n - i - 1)],
+        explanationKey: "classicgravitysort.bucketPlacement",
+        explanation: String(localized: "The bead count at this height determines the reconstructed output value.", bundle: .module))
       for j in 0..<maxValue {
         transpose[j] -= 1
         engine.writeAux(transposeHandle, at: j, value: transpose[j])
+        engine.annotateLastOperation(
+          stageID: "scratchUpdate", decisionID: "classicgravitysort.scratchUpdate",
+          outcome: "update",
+          roles: ["scratch": .auxiliaryIndex(handle: transposeHandle.rawValue, index: j)],
+          explanationKey: "classicgravitysort.scratchUpdate",
+          explanation: String(localized: "Update the transposed bead column before reconstructing the sorted heights.", bundle: .module))
       }
     }
 

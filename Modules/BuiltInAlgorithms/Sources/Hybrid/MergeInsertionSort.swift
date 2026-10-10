@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -31,7 +32,7 @@ import SortEngineKit
 public struct MergeInsertionSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "mergeinsertionsort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Merge-Insertion",
+    displayName: String(localized: "Merge-Insertion", bundle: .module),
     category: .hybrid,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -70,7 +71,14 @@ public struct MergeInsertionSort: SortAlgorithm {
     // `[b-s+1, b]` — elementwise.
     func blockSwap(_ a: Int, _ b: Int, _ s: Int) {
       for i in 0..<s {
-        engine.swap(a - s + 1 + i, b - s + 1 + i)
+        let left = a - s + 1 + i
+        let right = b - s + 1 + i
+        engine.swap(left, right)
+        engine.annotateLastOperation(
+          stageID: "mergeInsertion.blockMove", decisionID: "mergeInsertion.blockMove",
+          outcome: "exchange", roles: ["left": .arrayIndex(left), "right": .arrayIndex(right)],
+          explanationKey: "mergeInsertion.blockMove",
+          explanation: String(localized: "The chosen block shifts across the main chain one block at a time.", bundle: .module))
       }
     }
 
@@ -103,7 +111,16 @@ public struct MergeInsertionSort: SortAlgorithm {
       var b = b
       while a < b {
         let m = a + (((b - a) / s) / 2) * s
-        if val < engine.readValue(at: m) {
+        let insertBefore = val < engine.readValue(at: m)
+        engine.annotateLastOperation(
+          stageID: "mergeInsertion.blockSearch", decisionID: "mergeInsertion.blockSearch",
+          outcome: insertBefore ? "left" : "right",
+          roles: ["candidate": .arrayIndex(m), "heldValue": .value(val)],
+          explanationKey: "mergeInsertion.blockSearch",
+          explanation: insertBefore
+            ? String(localized: "The pending block key is smaller, so its insertion search moves left.", bundle: .module)
+            : String(localized: "The pending block key is at least this key, so its search moves right.", bundle: .module))
+        if insertBefore {
           b = m
         } else {
           a = m + s
@@ -134,7 +151,12 @@ public struct MergeInsertionSort: SortAlgorithm {
     while 2 * k <= length {
       var i = 2 * k - 1
       while i < length {
-        if engine.compare(i - k, i, by: >) {
+        if engine.teachingCompare(
+          i - k, i, by: >,
+          stageID: "MergeInsertionSort.block.order",
+          whenTrue: String(localized: "The left block starts above the right block, so Merge Insertion swaps the blocks.", bundle: .module),
+          whenFalse: String(localized: "The two block starts are ordered, so these blocks stay in place.", bundle: .module)
+        ) {
           blockSwap(i - k, i, k)
         }
         i += 2 * k

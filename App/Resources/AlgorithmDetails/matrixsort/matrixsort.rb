@@ -106,7 +106,6 @@ def matrix_sort(array, start, fin, gap, dir)
   end
 end
 
-
 array = [15, 3, 22, 8, 19, 1, 24, 11, 6, 20,
   9, 17, 2, 14, 23, 5, 18, 0, 12, 21,
   7, 16, 4, 13, 10]

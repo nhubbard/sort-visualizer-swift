@@ -34,6 +34,20 @@ struct AppSettingsTests {
   }
 
   @Test
+  func outOfRangeStoredSpeedRecoversAndTestOverrideDoesNotPersist() {
+    let store = makeIsolatedStore()
+    store.set(100_000.0, forKey: "playbackSpeed")
+    let settings = AppSettings(store: store)
+    #expect(settings.playbackSpeed == 30.0)
+    #expect(store.double(forKey: "playbackSpeed") == 30.0)
+
+    settings.setTransientPlaybackSpeedForTesting(100_000.0)
+    #expect(settings.playbackSpeed == 100_000.0)
+    #expect(store.double(forKey: "playbackSpeed") == 30.0)
+    #expect(AppSettings(store: store).playbackSpeed == 30.0)
+  }
+
+  @Test
   func mutationsPersistAcrossInstancesSharingTheSameStore() {
     let store = makeIsolatedStore()
     let first = AppSettings(store: store)
@@ -61,6 +75,64 @@ struct AppSettingsTests {
     #expect(second.codeTheme == CodeThemeID(rawValue: "dracula"))
     #expect(second.defaultShuffleID == ShuffleID(rawValue: "shuffledcubic"))
     #expect(second.recordingOperationCap == 1_000_000)
+  }
+
+  @Test
+  func malformedPersistedValuesRecoverBeforeViewsOrPlaybackUseThem() {
+    let visualizers = VisualizerRegistry.shared
+    let shuffles = ShuffleRegistry.shared
+    let previousVisualizers = visualizers.builtIns
+    let previousShuffles = shuffles.builtIns
+    defer {
+      visualizers.builtIns = previousVisualizers
+      visualizers.discover()
+      shuffles.builtIns = previousShuffles
+      shuffles.discover()
+    }
+    visualizers.builtIns = ["rainbow", "bargraph"].map(MockVisualizer.init)
+    visualizers.discover()
+    shuffles.builtIns = ["almost", "random"].map(MockShuffle.init)
+    shuffles.discover()
+
+    let store = makeIsolatedStore()
+    store.set("unknown-visualizer", forKey: "selectedVisualizerID")
+    store.set(Double.nan, forKey: "playbackSpeed")
+    store.set(-4.0, forKey: "targetPlaybackDuration")
+    store.set(96, forKey: "synthLowNote")
+    store.set(24, forKey: "synthHighNote")
+    store.set(-1, forKey: "defaultArraySize")
+    store.set(0, forKey: "recordingOperationCap")
+    store.set("missing-theme", forKey: "codeTheme")
+    store.set("unknown-shuffle", forKey: "defaultShuffleID")
+
+    let settings = AppSettings(store: store)
+    #expect(settings.playbackSpeed == 30.0)
+    #expect(settings.targetPlaybackDuration == 10.0)
+    #expect(settings.synthNoteRange == 36...72)
+    #expect(settings.defaultArraySize == 256)
+    #expect(settings.recordingOperationCap == 300_000)
+    #expect(settings.codeTheme == CodeThemeID(rawValue: "monokai"))
+    #expect(settings.selectedVisualizerID == VisualizerID(rawValue: "bargraph"))
+    #expect(settings.defaultShuffleID == ShuffleID(rawValue: "random"))
+  }
+
+  @Test
+  func retiredNaiveShufflePreferenceMigratesToRandom() {
+    let registry = ShuffleRegistry.shared
+    let restoreBuiltIns = registry.builtIns
+    defer {
+      registry.builtIns = restoreBuiltIns
+      registry.discover()
+    }
+    registry.builtIns = ["other", "random"].map(MockShuffle.init)
+    registry.discover()
+
+    let store = makeIsolatedStore()
+    store.set("naive", forKey: "defaultShuffleID")
+    let settings = AppSettings(store: store)
+
+    #expect(settings.defaultShuffleID == ShuffleID(rawValue: "random"))
+    #expect(store.string(forKey: "defaultShuffleID") == "random")
   }
 
   /// Fully synchronous (no `await` between setup and assertions) so this critical section over

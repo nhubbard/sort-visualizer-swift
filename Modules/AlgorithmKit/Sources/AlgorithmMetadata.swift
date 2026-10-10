@@ -1,3 +1,4 @@
+import Foundation
 import SortEngineKit
 
 /// Mirrors ArrayV's own taxonomy (`Sort.setCategory(...)`/`@SortMeta`/`@SortPackageMeta` in
@@ -27,16 +28,31 @@ public enum AlgorithmCategory: String, Sendable, Codable, CaseIterable, Identifi
 
   public var displayName: String {
     switch self {
-    case .concurrent: "Concurrent Sorts"
-    case .distribution: "Distribution Sorts"
-    case .exchange: "Exchange Sorts"
-    case .hybrid: "Hybrid Sorts"
-    case .impractical: "Impractical Sorts"
-    case .insertion: "Insertion Sorts"
-    case .merge: "Merge Sorts"
-    case .miscellaneous: "Miscellaneous Sorts"
-    case .quick: "Quick Sorts"
-    case .selection: "Selection Sorts"
+    case .concurrent: String(localized: "Concurrent Sorts", bundle: .module)
+    case .distribution: String(localized: "Distribution Sorts", bundle: .module)
+    case .exchange: String(localized: "Exchange Sorts", bundle: .module)
+    case .hybrid: String(localized: "Hybrid Sorts", bundle: .module)
+    case .impractical: String(localized: "Impractical Sorts", bundle: .module)
+    case .insertion: String(localized: "Insertion Sorts", bundle: .module)
+    case .merge: String(localized: "Merge Sorts", bundle: .module)
+    case .miscellaneous: String(localized: "Miscellaneous Sorts", bundle: .module)
+    case .quick: String(localized: "Quick Sorts", bundle: .module)
+    case .selection: String(localized: "Selection Sorts", bundle: .module)
+    }
+  }
+
+  public var shortDisplayName: String {
+    switch self {
+    case .concurrent: String(localized: "Concurrent", bundle: .module)
+    case .distribution: String(localized: "Distribution", bundle: .module)
+    case .exchange: String(localized: "Exchange", bundle: .module)
+    case .hybrid: String(localized: "Hybrid", bundle: .module)
+    case .impractical: String(localized: "Impractical", bundle: .module)
+    case .insertion: String(localized: "Insertion", bundle: .module)
+    case .merge: String(localized: "Merge", bundle: .module)
+    case .miscellaneous: String(localized: "Miscellaneous", bundle: .module)
+    case .quick: String(localized: "Quick", bundle: .module)
+    case .selection: String(localized: "Selection", bundle: .module)
     }
   }
 }
@@ -152,6 +168,33 @@ public struct AlgorithmMetadata: Sendable, Codable, Equatable {
     let step = (sizeRange.lowerBound...rawMaxSize).steppedSizeStep
     let steppedMaxSize = sizeRange.lowerBound + step * ((rawMaxSize - sizeRange.lowerBound) / step)
     return sizeRange.lowerBound...steppedMaxSize
+  }
+
+  /// Includes the selectable range and one nearby extrapolation. Some calibrated exponential
+  /// families overflow Double long before the global 8,192-element display ceiling.
+  public func growthComparisonDomain(operationCap: Int) -> ClosedRange<Double> {
+    let lower = Swift.max(sizeRange.lowerBound, 1)
+    let cutoff = effectiveSizeRange(operationCap: operationCap).upperBound
+    let desired = Swift.min(Self.maxReasonableArraySize, Swift.max(cutoff * 2, lower + 1))
+    guard let detectedGrowthModel else { return Double(lower)...Double(desired) }
+
+    func isFinite(at size: Int) -> Bool {
+      let value = Double(size)
+      return detectedGrowthModel.predictedOperations(atSize: value).isFinite
+        && growthModel.predictedOperations(atSize: value).isFinite
+    }
+
+    var safe = Swift.max(cutoff, lower + 1)
+    var unsafe = desired + 1
+    while safe + 1 < unsafe {
+      let candidate = safe + (unsafe - safe) / 2
+      if isFinite(at: candidate) {
+        safe = candidate
+      } else {
+        unsafe = candidate
+      }
+    }
+    return Double(lower)...Double(safe)
   }
 
   /// A "how long will this actually take to run" estimate for ranking algorithms against each

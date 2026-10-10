@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -13,13 +14,12 @@ import SortEngineKit
 /// `O(n log^2 n)` comparators, following directly from the triple-nested loop shape (`O(log n)` ×
 /// `O(log n)` × `O(n)`) shared with other classic bitonic-merge networks — the same asymptotic
 /// class `WeaveSort*`/`CreaseSort`/`PairwiseMergeSort*` were independently confirmed to have via
-/// direct measurement. Every comparator only ever swaps on strict `>`, and fuzzing across
-/// randomized duplicate-heavy trials found no case where two equal elements crossed paths,
-/// confirming this network is stable.
+/// direct measurement. Strict `>` comparators still permit indirect crossing of equal elements;
+/// identity-tracking duplicate trials confirm this network is unstable.
 public struct FoldSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "foldsort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Fold Sort",
+    displayName: String(localized: "Fold Sort", bundle: .module),
     category: .concurrent,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -28,7 +28,7 @@ public struct FoldSort: SortAlgorithm {
     detectedGrowthModel: DetectedGrowthModel(
       family: .powerLog, coefficients: [5.79128, 1.26524], rSquared: 0.989176),
     implementationComplexity: 11,
-    stable: true,
+    stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n log^2 n)", average: "O(n log^2 n)", worst: "O(n log^2 n)"),
     spaceComplexity: "O(1)",
@@ -43,7 +43,16 @@ public struct FoldSort: SortAlgorithm {
 
     func compSwap(_ a: Int, _ b: Int) {
       guard b < end else { return }
-      if engine.compare(a, b, by: >) {
+      let shouldSwap = engine.compare(a, b, by: >)
+      engine.annotateLastOperation(
+        stageID: "compareExchange", decisionID: "foldsort.networkComparator",
+        outcome: shouldSwap ? "exchange" : "keep",
+        roles: ["left": .arrayIndex(a), "right": .arrayIndex(b)],
+        explanationKey: "foldsort.compareExchange",
+        explanation: shouldSwap
+          ? String(localized: "The left value exceeds the right value, so this comparator exchanges them.", bundle: .module)
+          : String(localized: "These values satisfy this comparator, so they stay in place.", bundle: .module))
+      if shouldSwap {
         engine.swap(a, b)
       }
     }

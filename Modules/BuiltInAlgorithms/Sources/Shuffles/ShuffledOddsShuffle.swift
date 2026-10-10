@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -6,13 +7,13 @@ import SortEngineKit
 /// halving then doubling a random offset forces it to land on the same parity `i` already has.
 public struct ShuffledOddsShuffle: ShuffleAlgorithm {
   public let id = ShuffleID(rawValue: "shuffledodds")
-  public let metadata = ShuffleMetadata(displayName: "Scrambled Odds")
+  public let metadata = ShuffleMetadata(displayName: String(localized: "Scrambled Odds", bundle: .module))
   public init() {}
   public func record(into engine: inout RecordingEngine) {
     let n = engine.count
     var i = 1
     while i < n {
-      let randomIndex = (Int.random(in: 0..<(n - i)) / 2) * 2 + i
+      let randomIndex = (engine.randomIndex(in: 0..<(n - i)) / 2) * 2 + i
       engine.swap(i, randomIndex)
       i += 2
     }

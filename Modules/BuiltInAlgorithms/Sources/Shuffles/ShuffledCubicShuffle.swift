@@ -7,7 +7,7 @@ import SortEngineKit
 /// Fisher-Yates shuffles the result.
 public struct ShuffledCubicShuffle: ShuffleAlgorithm {
   public let id = ShuffleID(rawValue: "shuffledcubic")
-  public let metadata = ShuffleMetadata(displayName: "Shuffled cubic")
+  public let metadata = ShuffleMetadata(displayName: String(localized: "Shuffled cubic", bundle: .module))
   public init() {}
   public func record(into engine: inout RecordingEngine) {
     let n = engine.count
@@ -19,7 +19,7 @@ public struct ShuffledCubicShuffle: ShuffleAlgorithm {
     }
     guard n > 1 else { return }
     for i in stride(from: n - 1, to: 0, by: -1) {
-      let j = Int.random(in: 0...i)
+      let j = engine.randomIndex(in: 0...i)
       engine.swap(i, j)
     }
   }

@@ -10,7 +10,7 @@ final class GnomeSortUITests: XCTestCase {
     // Now that portrait is a genuinely supported orientation (not just coerced to landscape by
     // iOS), the simulator's own default boot orientation (portrait) would otherwise leak into
     // this test unpinned — see `ScreenshotUITests`' identical rationale.
-    XCUIDevice.shared.orientation = .landscapeLeft
+    useLandscapeOrientationForUITest()
   }
 
   func testGnomeSortEndToEndProducesACorrectlySortedResult() throws {
@@ -24,7 +24,7 @@ final class GnomeSortUITests: XCTestCase {
     let sidebarLink = app.revealSidebarLink("algorithmLink.gnomesort")
     XCTAssertTrue(
       sidebarLink.waitForExistence(timeout: 5), "Gnome Sort sidebar link never appeared")
-    sidebarLink.tap()
+    app.activateSidebarLink(sidebarLink)
 
     let canvas = app.descendants(matching: .any).matching(identifier: "sortVisualizationCanvas")
       .firstMatch

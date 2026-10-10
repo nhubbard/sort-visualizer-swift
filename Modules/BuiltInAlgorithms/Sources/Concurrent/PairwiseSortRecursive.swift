@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -15,12 +16,12 @@ import SortEngineKit
 /// `n log^2 n` converges to a near-constant ~0.23–0.25 across sizes 16 through 2048, identical at
 /// every tested size to both `PairwiseMergeSortIterative`'s and `PairwiseMergeSortRecursive`'s own
 /// measured counts, despite this being a structurally distinct construction from either). Every
-/// comparator only ever swaps on strict `>`, and fuzzing across randomized duplicate-heavy trials
-/// found no case where two equal elements crossed paths, confirming this network is stable.
+/// comparator swaps only on strict `>`, but identity-tracking duplicate trials show that equal
+/// elements can cross indirectly. This recursive network is unstable.
 public struct PairwiseSortRecursive: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "pairwisesortrecursive")
   public let metadata = AlgorithmMetadata(
-    displayName: "Recursive Pairwise Sort",
+    displayName: String(localized: "Recursive Pairwise Sort", bundle: .module),
     category: .concurrent,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -29,7 +30,7 @@ public struct PairwiseSortRecursive: SortAlgorithm {
     detectedGrowthModel: DetectedGrowthModel(
       family: .powerLog, coefficients: [7.58061, 1.20611], rSquared: 0.999485),
     implementationComplexity: 12,
-    stable: true,
+    stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n log^2 n)", average: "O(n log^2 n)", worst: "O(n log^2 n)"),
     spaceComplexity: "O(log n)",
@@ -43,7 +44,16 @@ public struct PairwiseSortRecursive: SortAlgorithm {
     guard n > 1 else { return }
 
     func compSwap(_ a: Int, _ b: Int) {
-      if engine.compare(a, b, by: >) {
+      let shouldSwap = engine.compare(a, b, by: >)
+      engine.annotateLastOperation(
+        stageID: "compareExchange", decisionID: "pairwisesortrecursive.networkComparator",
+        outcome: shouldSwap ? "exchange" : "keep",
+        roles: ["left": .arrayIndex(a), "right": .arrayIndex(b)],
+        explanationKey: "pairwisesortrecursive.compareExchange",
+        explanation: shouldSwap
+          ? String(localized: "The left value exceeds the right value, so this comparator exchanges them.", bundle: .module)
+          : String(localized: "These values satisfy this comparator, so they stay in place.", bundle: .module))
+      if shouldSwap {
         engine.swap(a, b)
       }
     }

@@ -1,3 +1,4 @@
+import Foundation
 import SortEngineKit
 import VisualizationKit
 
@@ -6,7 +7,7 @@ import VisualizationKit
 public struct ScatterPlotVisualizer: Visualizer {
   public let id = VisualizerID(rawValue: "scatterplot")
   public let metadata = VisualizerMetadata(
-    displayName: "Scatter Plot",
+    displayName: String(localized: "Scatter Plot", bundle: .module),
     supportsAuxArrays: false,
     iconName: "circle.grid.3x3.fill"
   )
@@ -27,14 +28,16 @@ public struct ScatterPlotVisualizer: Visualizer {
     let count = context.values.count
     let columnWidth = context.canvasSize.width / Double(count)
     let spanLength = Double(context.valueRange.upperBound - context.valueRange.lowerBound)
-    let radius = Self.dotDiameter / 2
+    let dotDiameter = min(Self.dotDiameter, context.canvasSize.width, context.canvasSize.height)
+    let radius = dotDiameter / 2
 
     return context.values.enumerated().map { index, value in
       let normalized =
         spanLength > 0
-        ? Double(value - context.valueRange.lowerBound) / spanLength
-        : 1.0
-      let centerX = Double(index) * columnWidth + columnWidth / 2
+          ? Double(value - context.valueRange.lowerBound) / spanLength
+          : 1.0
+      let centerX = min(max(Double(index) * columnWidth + columnWidth / 2, radius),
+                        context.canvasSize.width - radius)
       // Inset by the dot's own radius so a value at either extreme (0 or 1) centers its dot
       // fully inside the canvas instead of on the literal edge, where half of it would hang
       // off and get clipped.
@@ -42,8 +45,8 @@ public struct ScatterPlotVisualizer: Visualizer {
       return .ellipse(
         x: centerX - radius,
         y: centerY - radius,
-        width: Self.dotDiameter,
-        height: Self.dotDiameter,
+        width: dotDiameter,
+        height: dotDiameter,
         color: color(forIndex: index, in: context)
       )
     }

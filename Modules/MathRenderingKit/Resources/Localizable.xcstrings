@@ -1,0 +1,56 @@
+{
+  "sourceLanguage": "en",
+  "strings": {
+    "Equation scrolls horizontally": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La ecuación se desplaza horizontalmente"
+          }
+        }
+      }
+    },
+    "Average Complexity": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Complejidad media"
+          }
+        }
+      }
+    },
+    "Best Case": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mejor caso"
+          }
+        }
+      }
+    },
+    "Space Complexity": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Complejidad espacial"
+          }
+        }
+      }
+    },
+    "Worst Case": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Peor caso"
+          }
+        }
+      }
+    }
+  },
+  "version": "1.0"
+}

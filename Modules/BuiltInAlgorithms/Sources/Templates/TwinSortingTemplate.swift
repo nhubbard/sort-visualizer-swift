@@ -1,3 +1,4 @@
+import Foundation
 import SortEngineKit
 
 /// Ported from ArrayV's `sorts/templates/TwinSorting` — Igor van den Hoven's adaptive bottom-up
@@ -18,7 +19,12 @@ enum TwinSortingTemplate {
     var end = nmemb - 2
 
     while index <= end {
-      if engine.compare(index + left, index + 1 + left, by: (<=)) {
+      if engine.teachingCompare(
+        index + left, index + 1 + left, by: (<=),
+        stageID: "twin.run",
+        whenTrue: String(localized: "This adjacent pair is nondecreasing, so Twin Sort extends the ascending run.", bundle: .module),
+        whenFalse: String(localized: "This adjacent pair descends, so Twin Sort switches to a descending-run path.", bundle: .module)
+      ) {
         index += 2
         continue
       }
@@ -29,16 +35,31 @@ enum TwinSortingTemplate {
       outer: while true {
         if index > end {
           if start == 0
-            && (nmemb % 2 == 0 || engine.compare(index - 1 + left, index + left, by: (>))) {
+            && (nmemb % 2 == 0 || engine.teachingCompare(
+              index - 1 + left, index + left, by: (>),
+              stageID: "twin.runTail",
+              whenTrue: String(localized: "The final pair descends, so the whole run can reverse.", bundle: .module),
+              whenFalse: String(localized: "The final pair breaks the descending run.", bundle: .module)
+            )) {
             // The whole range is one descending run -- reverse it all and stop.
             end = nmemb - 1
-            engine.reversal(start + left, end + left)
+            engine.teachingReversal(start + left, end + left, stageID: "twin.reverseRun", explanation: String(localized: "Reverse this descending run into ascending order.", bundle: .module))
             return 1
           }
           break outer
         }
-        if engine.compare(index + left, index + 1 + left, by: (>)) {
-          if engine.compare(index - 1 + left, index + left, by: (>)) {
+        if engine.teachingCompare(
+          index + left, index + 1 + left, by: (>),
+          stageID: "twin.descendingRun",
+          whenTrue: String(localized: "This pair descends, so Twin Sort extends its descending run.", bundle: .module),
+          whenFalse: String(localized: "This pair ends the descending run.", bundle: .module)
+        ) {
+          if engine.teachingCompare(
+            index - 1 + left, index + left, by: (>),
+            stageID: "twin.runTail",
+            whenTrue: String(localized: "The final pair descends, so the whole run can reverse.", bundle: .module),
+            whenFalse: String(localized: "The final pair breaks the descending run.", bundle: .module)
+          ) {
             index += 2
             continue
           }
@@ -48,7 +69,7 @@ enum TwinSortingTemplate {
       }
 
       end = index - 1
-      engine.reversal(start + left, end + left)
+      engine.teachingReversal(start + left, end + left, stageID: "twin.reverseRun", explanation: String(localized: "Reverse this descending run into ascending order.", bundle: .module))
       end = nmemb - 2
       index += 2
     }
@@ -73,7 +94,12 @@ enum TwinSortingTemplate {
         let a = offset
         let e0 = a + block - 1
 
-        if engine.compare(e0 + left, e0 + 1 + left, by: (<=)) {
+        if engine.teachingCompare(
+          e0 + left, e0 + 1 + left, by: (<=),
+          stageID: "twin.mergeBoundary",
+          whenTrue: String(localized: "These adjacent runs are already ordered, so this merge is skipped.", bundle: .module),
+          whenFalse: String(localized: "The run boundary is reversed, so Twin Sort merges them.", bundle: .module)
+        ) {
           // This adjacent pair of blocks is already in order -- skip the merge.
           offset += block * 2
           continue
@@ -92,7 +118,12 @@ enum TwinSortingTemplate {
         // Shrink the merge if the tail of the right block is already >= the tail of the left
         // block (an early-exit for a partially-already-merged tail).
         var d = dMax - 1
-        while engine.compare(e0 + left, d + left, by: (<=)) {
+        while engine.teachingCompare(
+          e0 + left, d + left, by: (<=),
+          stageID: "twin.trimTail",
+          whenTrue: String(localized: "This right tail is already above the left tail, so it needs no merge work.", bundle: .module),
+          whenFalse: String(localized: "This tail still crosses the merge boundary, so merging begins here.", bundle: .module)
+        ) {
           dMax -= 1
           d -= 1
           cMax -= 1
@@ -111,14 +142,24 @@ enum TwinSortingTemplate {
         d = a + block - 1
         var e = dMax - 1
 
-        if engine.compare(a + left, a + block + left, by: (<=)) {
+        if engine.teachingCompare(
+          a + left, a + block + left, by: (<=),
+          stageID: "twin.mergeDirection",
+          whenTrue: String(localized: "The left run begins no greater, so merge starts from the left tail.", bundle: .module),
+          whenFalse: String(localized: "The right run begins smaller, so merge starts from the buffered right tail.", bundle: .module)
+        ) {
           // Left block's head is already <= right block's head: merge from the tail of the
           // LEFT block against the buffered right block.
           engine.setValue(e + left, engine.readValue(at: d + left))
           e -= 1
           d -= 1
           while c >= s {
-            while engine.compareValue(d + left, against: swap[c], by: (>)) {
+            while engine.teachingCompareValue(
+              d + left, against: swap[c], by: (>),
+              stageID: "twin.mergeChoice",
+              whenTrue: String(localized: "The left tail is larger, so the backward merge writes it next.", bundle: .module),
+              whenFalse: String(localized: "The buffered right tail is at least as large, so merge takes it next.", bundle: .module)
+            ) {
               engine.setValue(e + left, engine.readValue(at: d + left))
               e -= 1
               d -= 1
@@ -133,7 +174,12 @@ enum TwinSortingTemplate {
           e -= 1
           d -= 1
           while d >= a {
-            while engine.compareValue(d + left, against: swap[c], by: (<=)) {
+            while engine.teachingCompareValue(
+              d + left, against: swap[c], by: (<=),
+              stageID: "twin.mergeChoice",
+              whenTrue: String(localized: "The left tail is no greater, so the backward merge writes the buffered right tail.", bundle: .module),
+              whenFalse: String(localized: "The left tail is larger, so merge writes it next.", bundle: .module)
+            ) {
               engine.setValue(e + left, swap[c])
               e -= 1
               c -= 1

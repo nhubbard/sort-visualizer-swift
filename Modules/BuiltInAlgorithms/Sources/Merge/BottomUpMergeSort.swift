@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -13,7 +14,7 @@ import SortEngineKit
 public struct BottomUpMergeSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "bottomupmergesort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Bottom-up Merge Sort",
+    displayName: String(localized: "Bottom-up Merge Sort", bundle: .module),
     category: .merge,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -56,7 +57,12 @@ public struct BottomUpMergeSort: SortAlgorithm {
       var scratchIndex = index
 
       while left < mid && right < end {
-        if engine.compare(right, left) {
+        if engine.teachingCompare(
+          right, left,
+          stageID: "BottomUpMergeSort.merge.choose",
+          whenTrue: String(localized: "The right run value is at least the left, so the merge takes from the left run.", bundle: .module),
+          whenFalse: String(localized: "The right run value is smaller, so the merge takes from the right run.", bundle: .module)
+        ) {
           scratch[scratchIndex] = engine.readValue(at: left)
           engine.writeAux(tempHandle, at: scratchIndex, value: engine.readValue(at: left))
           left += 1

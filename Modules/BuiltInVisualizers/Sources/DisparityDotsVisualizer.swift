@@ -10,7 +10,7 @@ import VisualizationKit
 public struct DisparityDotsVisualizer: Visualizer {
   public let id = VisualizerID(rawValue: "disparitydots")
   public let metadata = VisualizerMetadata(
-    displayName: "Disparity Dots",
+    displayName: String(localized: "Disparity Dots", bundle: .module),
     supportsAuxArrays: false,
     iconName: "circle.grid.2x2.fill"
   )

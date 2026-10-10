@@ -2,8 +2,7 @@
 #include <utility>
 #include <vector>
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
-                 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
 
 void printList(int items[], int size) {
   printf("[");
@@ -21,9 +20,7 @@ void cocktailShakerSort(int arr[], int start, int end);
 void merge(int arr[], int start, int mid, int end);
 void cocktailMergeSort(int arr[], int n);
 
-void sort(int arr[], int n) {
-  cocktailMergeSort(arr, n);
-}
+void sort(int arr[], int n) { cocktailMergeSort(arr, n); }
 
 int minRunLength(int n) {
   int r = 0;

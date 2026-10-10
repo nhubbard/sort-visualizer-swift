@@ -15,6 +15,8 @@ enum SortSymphonyIntentError: Error, CustomLocalizedStringResourceConvertible {
   /// `.algorithmUnavailable`'s own doc comment. Kept as a real guard rather than force-unwrapping.
   case shuffleUnavailable
   case visualizerUnavailable
+  case requestedShuffleUnavailable
+  case requestedVisualizerUnavailable
 
   var localizedStringResource: LocalizedStringResource {
     switch self {
@@ -23,6 +25,8 @@ enum SortSymphonyIntentError: Error, CustomLocalizedStringResourceConvertible {
     case .noActiveSession: "No sort is currently open in Sort Symphony."
     case .shuffleUnavailable: "No shuffles are currently available."
     case .visualizerUnavailable: "No visualizers are currently available."
+    case .requestedShuffleUnavailable: "That shuffle isn't available anymore."
+    case .requestedVisualizerUnavailable: "That visualizer isn't available anymore."
     }
   }
 }

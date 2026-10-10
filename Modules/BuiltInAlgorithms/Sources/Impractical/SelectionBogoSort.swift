@@ -1,10 +1,11 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
 public struct SelectionBogoSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "selectionbogosort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Selection Bogo Sort",
+    displayName: String(localized: "Selection Bogo Sort", bundle: .module),
     category: .impractical,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -35,6 +36,11 @@ public struct SelectionBogoSort: SortAlgorithm {
       }
       if minIndex != i {
         engine.swap(i, minIndex)
+        engine.annotateLastOperation(
+          stageID: "candidateExchange", decisionID: "selectionbogosort.candidateExchange",
+          outcome: "exchange", roles: ["left": .arrayIndex(i), "right": .arrayIndex(minIndex)],
+          explanationKey: "selectionbogosort.candidateExchange",
+          explanation: String(localized: "A smaller value was found for the current selection position, so exchange it.", bundle: .module))
       }
     }
   }

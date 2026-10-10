@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -10,7 +11,7 @@ import SortEngineKit
 /// indices are `value - 1` and reconstructed values are `bucket + 1`.
 public struct PairwiseShuffle: ShuffleAlgorithm {
   public let id = ShuffleID(rawValue: "pairwise")
-  public let metadata = ShuffleMetadata(displayName: "Final Pairwise Pass")
+  public let metadata = ShuffleMetadata(displayName: String(localized: "Final Pairwise Pass", bundle: .module))
   public init() {}
   public func record(into engine: inout RecordingEngine) {
     let n = engine.count
@@ -18,7 +19,7 @@ public struct PairwiseShuffle: ShuffleAlgorithm {
 
     var i = n - 1
     while i > 0 {
-      let j = Int.random(in: 0...i)
+      let j = engine.randomIndex(in: 0...i)
       engine.swap(i, j)
       i -= 1
     }

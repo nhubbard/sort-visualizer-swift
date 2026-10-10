@@ -1,12 +1,10 @@
-#include <cstdio>
 #include <algorithm>
+#include <cstdio>
 #include <iostream>
 #include <vector>
 using namespace std;
 static void mergeSort(vector<int> &scratch, vector<int> &buffer, int lo,
                       int hi);
-
-
 
 void printList(const std::vector<int> &items) {
   printf("[");

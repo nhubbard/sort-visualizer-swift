@@ -5,6 +5,7 @@ def sort(arr):
     while circle_pass(arr, 0, n - 1):
         pass
 
+
 def circle(array, left, right):
     a = left
     b = right
@@ -29,12 +30,24 @@ def circle_pass(array, left, right):
     return circle(array, left, right) or l or r
 
 
-
-
 if __name__ == "__main__":
     array = [
-        0, 39, 21, 62, 91, 77, 14, 23,
-        90, 69, 51, 81, 68, 83, 32, 56,
+        0,
+        39,
+        21,
+        62,
+        91,
+        77,
+        14,
+        23,
+        90,
+        69,
+        51,
+        81,
+        68,
+        83,
+        32,
+        56,
     ]
     sort(array)
     print(array)

@@ -10,19 +10,24 @@ import XCTest
 final class PortraitOrientationUITests: XCTestCase {
   override func setUpWithError() throws {
     continueAfterFailure = false
-    XCUIDevice.shared.orientation = .portrait
+    #if targetEnvironment(macCatalyst)
+      throw XCTSkip("Portrait device orientation does not apply to Mac Catalyst")
+    #else
+      XCUIDevice.shared.orientation = .portrait
+    #endif
   }
 
   func testSortingAlgorithmIsFullyUsableInPortrait() throws {
     let app = XCUIApplication()
-    app.launchEnvironment = ["UI_TEST_ARRAY_SIZE": "24"]
+    app.launchEnvironment = ["UI_TEST_ARRAY_SIZE": "24", "UI_TEST_PLAYBACK_SPEED": "1000"]
     app.launch()
 
-    // Same navigation path every other functional UI test uses — if `NavigationSplitView`
-    // collapses to one column at this width, this call (and the sidebar link it looks for)
-    // failing here is exactly the empirical signal `SidebarNavigation.swift`'s helpers would
-    // need a reveal-the-sidebar step added for.
-    app.tapSidebarLink("algorithmLink.quicksort")
+    // The portrait check is about layout and navigation, not any specific algorithm. Pick a
+    // visible first-row algorithm: swiping the long content list to Quick Sort can jump past its
+    // virtualized row at this width and fail before the portrait layout is actually exercised.
+    let firstAlgorithm = app.buttons["algorithmLink.threesmoothcombsortiterative"]
+    XCTAssertTrue(firstAlgorithm.waitForExistence(timeout: 5))
+    firstAlgorithm.tap()
 
     let canvas = app.descendants(matching: .any).matching(identifier: "sortVisualizationCanvas")
       .firstMatch
@@ -33,9 +38,8 @@ final class PortraitOrientationUITests: XCTestCase {
     XCTAssertTrue(
       statusLabel.waitForExistence(timeout: 5), "status label never appeared in portrait")
 
-    // RunControlBar's transportRow/statsCaption both fall back to a stacked ViewThatFits
-    // candidate under narrow width — confirms the fallback still surfaces every control
-    // (not just that *something* renders) rather than silently clipping them.
+    // The transport and secondary controls occupy separate rows in portrait, while the stats
+    // caption can stack. Confirm the controls remain reachable at this width.
     let playPauseButton = app.buttons["runControlPlayPauseButton"]
     XCTAssertTrue(
       playPauseButton.waitForExistence(timeout: 5), "play/pause button not reachable in portrait")
@@ -62,5 +66,40 @@ final class PortraitOrientationUITests: XCTestCase {
     XCTAssertTrue(
       descriptionHeading.exists,
       "AlgorithmDetailSection's Description heading never became reachable in portrait")
+    let description = app.descendants(matching: .any)
+      .matching(identifier: "algorithmDescriptionText").firstMatch
+    XCTAssertTrue(description.waitForExistence(timeout: 10),
+                  "The selected algorithm's description did not load in portrait")
+    XCTAssertGreaterThan(description.label.count, 80,
+                         "Portrait detail shows a heading without substantive description content")
+
+    app.terminate()
+    app.launchEnvironment = ["UI_TEST_ARRAY_SIZE": "256", "UI_TEST_PLAYBACK_SPEED": "30"]
+    app.launch()
+  }
+
+  func testCatalogBadgesRemainUnderstandableInPortrait() {
+    let app = XCUIApplication()
+    app.launchEnvironment = ["UI_TEST_ARRAY_SIZE": "24"]
+    app.launch()
+
+    let menu = app.buttons["algorithmSortMenu"]
+    XCTAssertTrue(menu.waitForExistence(timeout: 5))
+    menu.tap()
+    app.buttons["Estimated Speed"].tap()
+
+    let algorithm = app.buttons.matching(
+      NSPredicate(format: "identifier BEGINSWITH %@", "algorithmLink.")
+    ).firstMatch
+    XCTAssertTrue(algorithm.waitForExistence(timeout: 5))
+    XCTAssertFalse(algorithm.label.isEmpty)
+    let estimate = algorithm.value as? String ?? ""
+    XCTAssertTrue(estimate.contains("ops at n=") || estimate.contains("N/A above n="),
+      "The badge should remain available as an accessibility value: \(estimate)")
+
+    let screenshot = XCTAttachment(screenshot: app.screenshot())
+    screenshot.name = "portrait-estimated-speed-catalog"
+    screenshot.lifetime = .keepAlways
+    add(screenshot)
   }
 }

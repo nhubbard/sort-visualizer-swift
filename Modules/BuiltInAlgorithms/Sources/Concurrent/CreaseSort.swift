@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -12,13 +13,12 @@ import SortEngineKit
 /// `O(n log^2 n)` comparators — confirmed empirically (the ratio of measured comparisons to
 /// `n log^2 n` converges to a near-constant ~0.27–0.31 across sizes 16 through 2048, identical to
 /// `WeaveSortIterative`'s own measured counts at every tested size despite the very different loop
-/// structure here). Every comparator only ever swaps on strict `>`, and fuzzing across randomized
-/// duplicate-heavy trials found no case where two equal elements crossed paths, confirming this
-/// network is stable rather than merely assuming it from the swap-on-strict-`>` rule alone.
+/// structure here). Although each comparator swaps only on strict `>`, long-range swaps can
+/// reverse equal elements. Identity-tracking duplicate trials confirm the network is unstable.
 public struct CreaseSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "creasesort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Crease Sort",
+    displayName: String(localized: "Crease Sort", bundle: .module),
     category: .concurrent,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -27,7 +27,7 @@ public struct CreaseSort: SortAlgorithm {
     detectedGrowthModel: DetectedGrowthModel(
       family: .powerLog, coefficients: [5.74241, 1.26455], rSquared: 0.996774),
     implementationComplexity: 9,
-    stable: true,
+    stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n log^2 n)", average: "O(n log^2 n)", worst: "O(n log^2 n)"),
     spaceComplexity: "O(1)",
@@ -41,7 +41,16 @@ public struct CreaseSort: SortAlgorithm {
     guard length > 1 else { return }
 
     func compSwap(_ a: Int, _ b: Int) {
-      if engine.compare(a, b, by: >) {
+      let shouldSwap = engine.compare(a, b, by: >)
+      engine.annotateLastOperation(
+        stageID: "compareExchange", decisionID: "creasesort.networkComparator",
+        outcome: shouldSwap ? "exchange" : "keep",
+        roles: ["left": .arrayIndex(a), "right": .arrayIndex(b)],
+        explanationKey: "creasesort.compareExchange",
+        explanation: shouldSwap
+          ? String(localized: "The left value exceeds the right value, so this comparator exchanges them.", bundle: .module)
+          : String(localized: "These values satisfy this comparator, so they stay in place.", bundle: .module))
+      if shouldSwap {
         engine.swap(a, b)
       }
     }

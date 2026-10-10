@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -28,7 +29,7 @@ import SortEngineKit
 public struct SplaySort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "splaysort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Splay Sort",
+    displayName: String(localized: "Splay Sort", bundle: .module),
     category: .insertion,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -108,7 +109,13 @@ public struct SplaySort: SortAlgorithm {
           baseResult = nil
           break descend
         }
-        if engine.compareValues(root.key, key, by: (>)) {
+        if engine.teachingCompareValues(
+          root.key, key,
+          by: (>),
+          stageID: "SplaySort.splayDirection",
+          whenTrue: String(localized: "The sought key is smaller, so rotate or descend toward the left subtree.", bundle: .module),
+          whenFalse: String(localized: "The sought key does not belong to the left subtree.", bundle: .module)
+        ) {
           guard let left = root.left else {
             baseResult = root
             break descend
@@ -168,7 +175,11 @@ public struct SplaySort: SortAlgorithm {
         return Node(key)
       }
       let inserted = Node(key)
-      if splayed.key > key {
+      if engine.teachingCompareValues(
+        splayed.key, key, by: >, stageID: "SplaySort.insertSide",
+        whenTrue: String(localized: "The new key is smaller than the splayed root, so attach the root on its right.", bundle: .module),
+        whenFalse: String(localized: "The new key is at least the splayed root, so attach the root on its left.", bundle: .module)
+      ) {
         inserted.right = splayed
         inserted.left = splayed.left
         splayed.left = nil
@@ -205,6 +216,13 @@ public struct SplaySort: SortAlgorithm {
         }
         let node = stack.removeLast()
         engine.setValue(index, node.key)
+        if engine.shouldAnnotateCurrentOperation {
+          engine.annotateLastOperation(
+            stageID: "SplaySort.inOrderOutput", outcome: "placed",
+            roles: ["output": .arrayIndex(index), "treeValue": .value(node.key)],
+            explanationKey: "SplaySort.inOrderOutput",
+            explanation: String(localized: "An in-order tree visit yields the next smallest value for this output slot.", bundle: .module))
+        }
         index += 1
         current = node.right
       }

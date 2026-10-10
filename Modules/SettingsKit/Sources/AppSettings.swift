@@ -18,7 +18,7 @@ public final class AppSettings {
   }
 
   public var playbackSpeed: Double {
-    didSet { store.set(playbackSpeed, forKey: Keys.playbackSpeed) }
+    didSet { if !isApplyingTransientPlaybackSpeed { store.set(playbackSpeed, forKey: Keys.playbackSpeed) } }
   }
 
   /// Mode switch: `false` (default) keeps `playbackSpeed`'s flat ops/sec behavior exactly as
@@ -100,6 +100,15 @@ public final class AppSettings {
   }
 
   private let store: UserDefaults
+  private var isApplyingTransientPlaybackSpeed = false
+
+  /// Launch-only speed for UI tests that need to finish recordings quickly.
+  /// The Settings slider and the saved user preference remain capped at 1...1000.
+  public func setTransientPlaybackSpeedForTesting(_ speed: Double) {
+    isApplyingTransientPlaybackSpeed = true
+    playbackSpeed = speed
+    isApplyingTransientPlaybackSpeed = false
+  }
 
   public init(store: UserDefaults = .standard) {
     self.store = store
@@ -127,20 +136,44 @@ public final class AppSettings {
       Keys.codeTheme: "monokai",
       Keys.defaultShuffleID: "random"
     ])
-    selectedVisualizerID = VisualizerID(
+    let storedVisualizer = VisualizerID(
       rawValue: store.string(forKey: Keys.selectedVisualizerID) ?? "bargraph")
-    playbackSpeed = store.double(forKey: Keys.playbackSpeed)
+    let visualizers = VisualizerRegistry.shared.visualizers
+    let defaultVisualizer = VisualizerID(rawValue: "bargraph")
+    selectedVisualizerID = visualizers.isEmpty || visualizers.contains(where: { $0.id == storedVisualizer })
+      ? storedVisualizer : (visualizers.first(where: { $0.id == defaultVisualizer })?.id
+        ?? visualizers.first?.id ?? defaultVisualizer)
+    let storedSpeed = store.double(forKey: Keys.playbackSpeed)
+    let validStoredSpeed = storedSpeed.isFinite && (1...1000).contains(storedSpeed)
+    let resolvedSpeed = validStoredSpeed ? storedSpeed : 30.0
+    playbackSpeed = resolvedSpeed
+    if !validStoredSpeed { store.set(resolvedSpeed, forKey: Keys.playbackSpeed) }
     useFixedDurationPacing = store.bool(forKey: Keys.useFixedDurationPacing)
-    targetPlaybackDuration = store.double(forKey: Keys.targetPlaybackDuration)
+    let storedDuration = store.double(forKey: Keys.targetPlaybackDuration)
+    targetPlaybackDuration = storedDuration.isFinite && storedDuration > 0 ? storedDuration : 10.0
     compactPlaybackForFixedDuration = store.bool(forKey: Keys.compactPlaybackForFixedDuration)
     soundEnabled = store.bool(forKey: Keys.soundEnabled)
     audioUnitBridgeEnabled = store.bool(forKey: Keys.audioUnitBridgeEnabled)
-    synthNoteRange =
-      store.integer(forKey: Keys.synthLowNote)...store.integer(forKey: Keys.synthHighNote)
-    defaultArraySize = store.integer(forKey: Keys.defaultArraySize)
-    recordingOperationCap = store.integer(forKey: Keys.recordingOperationCap)
-    codeTheme = CodeThemeID(rawValue: store.string(forKey: Keys.codeTheme) ?? "monokai")
-    defaultShuffleID = ShuffleID(rawValue: store.string(forKey: Keys.defaultShuffleID) ?? "random")
+    let lowNote = store.integer(forKey: Keys.synthLowNote)
+    let highNote = store.integer(forKey: Keys.synthHighNote)
+    synthNoteRange = (0...127).contains(lowNote) && (0...127).contains(highNote)
+      && lowNote <= highNote ? lowNote...highNote : 36...72
+    let storedSize = store.integer(forKey: Keys.defaultArraySize)
+    defaultArraySize = storedSize > 0 ? storedSize : 256
+    let storedCap = store.integer(forKey: Keys.recordingOperationCap)
+    recordingOperationCap = storedCap > 0 ? storedCap : 300_000
+    let storedTheme = CodeThemeID(rawValue: store.string(forKey: Keys.codeTheme) ?? "monokai")
+    codeTheme = CodeThemeID.knownIDs.contains(storedTheme) ? storedTheme : CodeThemeID(rawValue: "monokai")
+    let storedShuffleID = store.string(forKey: Keys.defaultShuffleID) ?? "random"
+    let storedShuffle = ShuffleID(rawValue: storedShuffleID == "naive" ? "random" : storedShuffleID)
+    let shuffles = ShuffleRegistry.shared.shuffles
+    let defaultShuffle = ShuffleID(rawValue: "random")
+    defaultShuffleID = shuffles.isEmpty || shuffles.contains(where: { $0.id == storedShuffle })
+      ? storedShuffle : (shuffles.first(where: { $0.id == defaultShuffle })?.id
+        ?? shuffles.first?.id ?? defaultShuffle)
+    if storedShuffleID == "naive" {
+      store.set(defaultShuffleID.rawValue, forKey: Keys.defaultShuffleID)
+    }
   }
 
   private func persistNoteRange() {
@@ -187,7 +220,7 @@ public final class AppSettings {
   /// existing convention here rather than a shared one).
   public func cycleShuffle() {
     let shuffles = ShuffleRegistry.shared.shuffles.sorted {
-      $0.metadata.displayName < $1.metadata.displayName
+      ($0.metadata.displayName, $0.id.rawValue) < ($1.metadata.displayName, $1.id.rawValue)
     }
     guard !shuffles.isEmpty else { return }
     let currentIndex = shuffles.firstIndex { $0.id == defaultShuffleID } ?? -1

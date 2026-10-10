@@ -1,10 +1,11 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
 public struct GuessSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "guesssort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Guess Sort",
+    displayName: String(localized: "Guess Sort", bundle: .module),
     category: .impractical,
     sizeRange: 3...4,
     growthModel: OperationGrowthModel(
@@ -51,6 +52,16 @@ public struct GuessSort: SortAlgorithm {
           } else {
             isInversion = false
           }
+          if i != j {
+            engine.annotateLastOperation(
+              stageID: "candidateCheck", decisionID: "guesssort.pairInversion",
+              outcome: isInversion ? "countInversion" : "keepCount",
+              roles: ["left": .arrayIndex(loops[i]), "right": .arrayIndex(loops[j])],
+              explanationKey: "guesssort.pairInversion",
+              explanation: isInversion
+                ? String(localized: "This mapped pair is inverted, so count it against the candidate.", bundle: .module)
+                : String(localized: "This mapped pair is ordered, so the inversion count stays unchanged.", bundle: .module))
+          }
           if isInversion { total += 1 }
         }
       }
@@ -77,6 +88,11 @@ public struct GuessSort: SortAlgorithm {
     let original = engine.readAllValues()
     for i in 0..<n {
       engine.setValue(i, original[indexes[i]])
+      engine.annotateLastOperation(
+        stageID: "candidatePlacement", decisionID: "guesssort.candidatePlacement",
+        outcome: "place", roles: ["destination": .arrayIndex(i)],
+        explanationKey: "guesssort.candidatePlacement",
+        explanation: String(localized: "This candidate permutation has passed its order check and is written to the array.", bundle: .module))
     }
   }
 }

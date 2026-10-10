@@ -1,10 +1,11 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
 public struct BinomialSmoothSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "binomialsmoothsort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Binomial Smooth Sort",
+    displayName: String(localized: "Binomial Smooth Sort", bundle: .module),
     category: .selection,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -45,7 +46,13 @@ public struct BinomialSmoothSort: SortAlgorithm {
       var choice = height(node) - (isRoot ? 0 : 1)
       if parentFlag {
         for child in stride(from: choice - 1, through: 0, by: -1)
-        where !engine.compare(node - (1 << choice), node - (1 << child), by: (>)) {
+        where !engine.teachingCompare(
+          node - (1 << choice), node - (1 << child),
+          by: (>),
+          stageID: "BinomialSmoothSort.childChoice",
+          whenTrue: String(localized: "The selected child is larger, so keep following that binomial branch.", bundle: .module),
+          whenFalse: String(localized: "The other child is at least as large, so follow it instead.", bundle: .module)
+        ) {
           choice = child
         }
       }

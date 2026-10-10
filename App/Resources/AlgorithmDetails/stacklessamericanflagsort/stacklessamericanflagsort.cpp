@@ -3,8 +3,7 @@
 
 const int RADIX = 4;
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
-                 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
 
 static int counts[RADIX];
 static int offsets[RADIX];
@@ -100,9 +99,7 @@ int shiftValue(int value, int places) {
   return value;
 }
 
-void bump(int digit) {
-  counts[digit]++;
-}
+void bump(int digit) { counts[digit]++; }
 
 // Turns the raw per-bucket counts already accumulated in `counts` into
 // starting offsets, then places every element in [start, end) by

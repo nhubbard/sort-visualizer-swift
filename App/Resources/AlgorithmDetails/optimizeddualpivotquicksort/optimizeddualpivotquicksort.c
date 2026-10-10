@@ -25,7 +25,8 @@ void insertionSort(int arr[], int left, int right);
 void dualPivot(int arr[], int left, int right, int divisor);
 
 void sort(int arr[], int n) {
-  if (n > 1) dualPivot(arr, 0, n - 1, 3);
+  if (n > 1)
+    dualPivot(arr, 0, n - 1, 3);
 }
 
 void insertionSort(int arr[], int left, int right) {
@@ -46,8 +47,10 @@ void dualPivot(int arr[], int left, int right, int divisor) {
   }
   int third = length / divisor;
   int med1 = left + third, med2 = right - third;
-  if (med1 <= left) med1 = left + 1;
-  if (med2 >= right) med2 = right - 1;
+  if (med1 <= left)
+    med1 = left + 1;
+  if (med2 >= right)
+    med2 = right - 1;
   if (arr[med1] < arr[med2]) {
     swap(&arr[med1], &arr[left]);
     swap(&arr[med2], &arr[right]);
@@ -61,27 +64,33 @@ void dualPivot(int arr[], int left, int right, int divisor) {
     if (arr[k] < pivot1) {
       swap(&arr[k], &arr[less++]);
     } else if (arr[k] > pivot2) {
-      while (k < great && arr[great] > pivot2) great--;
+      while (k < great && arr[great] > pivot2)
+        great--;
       swap(&arr[k], &arr[great--]);
-      if (arr[k] < pivot1) swap(&arr[k], &arr[less++]);
+      if (arr[k] < pivot1)
+        swap(&arr[k], &arr[less++]);
     }
   }
   int dist = great - less;
-  if (dist < 13) divisor++;
+  if (dist < 13)
+    divisor++;
   swap(&arr[less - 1], &arr[left]);
   swap(&arr[great + 1], &arr[right]);
   dualPivot(arr, left, less - 2, divisor);
   dualPivot(arr, great + 2, right, divisor);
   if (dist > length - 13 && pivot1 != pivot2) {
     for (int k = less; k <= great; k++) {
-      if (arr[k] == pivot1) swap(&arr[k], &arr[less++]);
+      if (arr[k] == pivot1)
+        swap(&arr[k], &arr[less++]);
       else if (arr[k] == pivot2) {
         swap(&arr[k], &arr[great--]);
-        if (arr[k] == pivot1) swap(&arr[k], &arr[less++]);
+        if (arr[k] == pivot1)
+          swap(&arr[k], &arr[less++]);
       }
     }
   }
-  if (pivot1 < pivot2) dualPivot(arr, less, great, divisor);
+  if (pivot1 < pivot2)
+    dualPivot(arr, less, great, divisor);
 }
 
 int main(int argc, char *argv[]) {

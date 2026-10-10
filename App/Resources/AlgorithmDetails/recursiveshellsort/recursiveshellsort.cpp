@@ -1,7 +1,6 @@
 #include <cstdio>
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
-                 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
 
 void printList(int items[], int size) {
   printf("[");
@@ -17,9 +16,7 @@ void printList(int items[], int size) {
 void gappedInsertionSort(int arr[], int a, int b, int gap);
 void recursiveShellSort(int arr[], int start, int end, int g);
 
-void sort(int arr[], int length) {
-  recursiveShellSort(arr, 0, length, 1);
-}
+void sort(int arr[], int length) { recursiveShellSort(arr, 0, length, 1); }
 
 void gappedInsertionSort(int arr[], int a, int b, int gap) {
   for (int i = a + gap; i < b; i += gap) {

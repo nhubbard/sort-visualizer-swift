@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -33,7 +34,7 @@ import SortEngineKit
 public struct HanoiSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "hanoisort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Hanoi Sort",
+    displayName: String(localized: "Hanoi Sort", bundle: .module),
     category: .impractical,
     sizeRange: 4...16,
     growthModel: OperationGrowthModel(
@@ -113,9 +114,19 @@ public struct HanoiSort: SortAlgorithm {
     func moveToMain(_ id: StackID) {
       sp -= 1
       engine.setValue(sp, pop(id))
+      engine.annotateLastOperation(
+        stageID: "candidatePlacement", decisionID: "hanoisort.candidatePlacement",
+        outcome: "place", roles: ["destination": .arrayIndex(sp)],
+        explanationKey: "hanoisort.candidatePlacement",
+        explanation: String(localized: "The next value is taken from a working stack and placed at this array position.", bundle: .module))
       while !isEmpty(id), peek(id) == engine.readValue(at: sp) {
         sp -= 1
         engine.setValue(sp, pop(id))
+        engine.annotateLastOperation(
+          stageID: "candidatePlacement", decisionID: "hanoisort.candidatePlacement",
+          outcome: "place", roles: ["destination": .arrayIndex(sp)],
+          explanationKey: "hanoisort.candidatePlacement",
+          explanation: String(localized: "The next value is taken from a working stack and placed at this array position.", bundle: .module))
       }
     }
 

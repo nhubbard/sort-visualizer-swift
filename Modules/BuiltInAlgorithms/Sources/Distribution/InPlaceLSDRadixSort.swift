@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -25,7 +26,7 @@ import SortEngineKit
 public struct InPlaceLSDRadixSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "inplacelsdradixsort")
   public let metadata = AlgorithmMetadata(
-    displayName: "In-Place LSD Radix Sort",
+    displayName: String(localized: "In-Place LSD Radix Sort", bundle: .module),
     category: .distribution,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -74,6 +75,12 @@ public struct InPlaceLSDRadixSort: SortAlgorithm {
       for i in 0..<vregs.count {
         vregs[i] = n - 1
         engine.writeAux(vregHandle, at: i, value: vregs[i])
+        engine.annotateLastOperation(
+          stageID: "scratchUpdate", decisionID: "inplacelsdradixsort.scratchUpdate",
+          outcome: "update",
+          roles: ["scratch": .auxiliaryIndex(handle: vregHandle.rawValue, index: i)],
+          explanationKey: "inplacelsdradixsort.scratchUpdate",
+          explanation: String(localized: "Update the next free position for this digit bucket.", bundle: .module))
       }
 
       var pos = 0
@@ -84,13 +91,33 @@ public struct InPlaceLSDRadixSort: SortAlgorithm {
         } else {
           let to = vregs[digit - 1]
           if to > pos {
-            for k in pos..<to { engine.swap(k, k + 1) }
+            for k in pos..<to {
+              engine.swap(k, k + 1)
+              engine.annotateLastOperation(
+                stageID: "digitRotation", decisionID: "inplacelsdradixsort.digitRotation",
+                outcome: "exchange", roles: ["left": .arrayIndex(k), "right": .arrayIndex(k + 1)],
+                explanationKey: "inplacelsdradixsort.digitRotation",
+                explanation: String(localized: "This adjacent exchange rotates a value toward its current digit bucket.", bundle: .module))
+            }
           } else if to < pos {
-            for k in stride(from: pos, to: to, by: -1) { engine.swap(k, k - 1) }
+            for k in stride(from: pos, to: to, by: -1) {
+              engine.swap(k, k - 1)
+              engine.annotateLastOperation(
+                stageID: "digitRotation", decisionID: "inplacelsdradixsort.digitRotation",
+                outcome: "exchange", roles: ["left": .arrayIndex(k), "right": .arrayIndex(k - 1)],
+                explanationKey: "inplacelsdradixsort.digitRotation",
+                explanation: String(localized: "This adjacent exchange rotates a value toward its current digit bucket.", bundle: .module))
+            }
           }
           for j in stride(from: digit - 1, to: 0, by: -1) {
             vregs[j - 1] -= 1
             engine.writeAux(vregHandle, at: j - 1, value: vregs[j - 1])
+            engine.annotateLastOperation(
+              stageID: "scratchUpdate", decisionID: "inplacelsdradixsort.scratchUpdate",
+              outcome: "update",
+              roles: ["scratch": .auxiliaryIndex(handle: vregHandle.rawValue, index: j - 1)],
+              explanationKey: "inplacelsdradixsort.scratchUpdate",
+              explanation: String(localized: "Update the next free position for this digit bucket.", bundle: .module))
           }
         }
       }

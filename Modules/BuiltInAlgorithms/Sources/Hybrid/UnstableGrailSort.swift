@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -7,7 +8,7 @@ import SortEngineKit
 public struct UnstableGrailSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "unstablegrailsort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Unstable Grail Sort",
+    displayName: String(localized: "Unstable Grail Sort", bundle: .module),
     category: .hybrid,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(

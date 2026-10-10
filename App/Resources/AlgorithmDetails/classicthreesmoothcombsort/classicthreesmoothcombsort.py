@@ -7,6 +7,7 @@ def sort(array):
                     array[i - g], array[i] = array[i], array[i - g]
     return array
 
+
 def is_3_smooth(n):
     while n % 6 == 0:
         n //= 6
@@ -17,12 +18,24 @@ def is_3_smooth(n):
     return n == 1
 
 
-
-
 if __name__ == "__main__":
     array = [
-        0, 39, 21, 62, 91, 77, 14, 23,
-        90, 69, 51, 81, 68, 83, 32, 56,
+        0,
+        39,
+        21,
+        62,
+        91,
+        77,
+        14,
+        23,
+        90,
+        69,
+        51,
+        81,
+        68,
+        83,
+        32,
+        56,
     ]
     sort(array)
     print(array)

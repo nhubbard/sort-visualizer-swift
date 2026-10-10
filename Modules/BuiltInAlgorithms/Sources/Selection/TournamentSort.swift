@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -25,7 +26,7 @@ import SortEngineKit
 public struct TournamentSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "tournamentsort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Tournament Sort",
+    displayName: String(localized: "Tournament Sort", bundle: .module),
     category: .selection,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -72,7 +73,13 @@ public struct TournamentSort: SortAlgorithm {
     func makeMatch(_ top: Int, _ bot: Int, _ root: Int) -> Int {
       let topWinner = getPlayer(top)
       let botWinner = getPlayer(bot)
-      if engine.compare(topWinner, botWinner, by: <=) {
+      if engine.teachingCompare(
+        topWinner, botWinner,
+        by: <=,
+        stageID: "TournamentSort.matchWinner",
+        whenTrue: String(localized: "The first contestant is no larger, so it advances in the tournament.", bundle: .module),
+        whenFalse: String(localized: "The second contestant advances in the tournament.", bundle: .module)
+      ) {
         setMatch(root, topWinner, top, bot)
       } else {
         setMatch(root, botWinner, bot, top)
@@ -93,7 +100,12 @@ public struct TournamentSort: SortAlgorithm {
         return getLosers(root)
       }
       setWinners(root, rebuild(getWinners(root)))
-      if engine.compare(getPlayer(getLosers(root)), getPlayer(getWinners(root)), by: <) {
+      if engine.teachingCompare(
+        getPlayer(getLosers(root)), getPlayer(getWinners(root)), by: <,
+        stageID: "TournamentSort.rebuildMatch",
+        whenTrue: String(localized: "The returning loser is smaller, so it wins this rebuilt match.", bundle: .module),
+        whenFalse: String(localized: "The surviving winner stays smaller in the rebuilt match.", bundle: .module)
+      ) {
         setWinner(root, getPlayer(getLosers(root)))
         let previousLosers = getLosers(root)
         setLosers(root, getWinners(root))
@@ -117,10 +129,25 @@ public struct TournamentSort: SortAlgorithm {
     for i in 0..<n {
       output[i] = pop()
       engine.writeAux(outHandle, at: i, value: output[i])
+      if engine.shouldAnnotateCurrentOperation {
+        engine.annotateLastOperation(
+          stageID: "TournamentSort.recordWinner", outcome: "saved",
+          roles: ["buffer": .auxiliaryIndex(handle: outHandle.rawValue, index: i),
+            "winner": .value(output[i])],
+          explanationKey: "TournamentSort.recordWinner",
+          explanation: String(localized: "Save the tournament winner as the next value in sorted output.", bundle: .module))
+      }
     }
 
     for i in 0..<n {
       engine.setValue(i, output[i])
+      if engine.shouldAnnotateCurrentOperation {
+        engine.annotateLastOperation(
+          stageID: "TournamentSort.restoreOutput", outcome: "placed",
+          roles: ["output": .arrayIndex(i), "winner": .value(output[i])],
+          explanationKey: "TournamentSort.restoreOutput",
+          explanation: String(localized: "Place this tournament winner in its final sorted array position.", bundle: .module))
+      }
     }
     engine.deleteAuxArray(matchesHandle)
     engine.deleteAuxArray(outHandle)

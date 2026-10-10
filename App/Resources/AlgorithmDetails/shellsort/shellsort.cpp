@@ -1,8 +1,7 @@
 #include <cstdio>
 #include <utility>
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
-                 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
 
 void printList(int items[], int size) {
   printf("[");
@@ -18,7 +17,8 @@ void printList(int items[], int size) {
 void sort(int arr[], int n) {
   const int gaps[] = {8861, 3938, 1750, 701, 301, 132, 57, 23, 10, 4, 1};
   for (int gap : gaps) {
-    if (gap >= n) continue;
+    if (gap >= n)
+      continue;
     for (int i = gap; i < n; i++) {
       int j = i;
       while (j >= gap && arr[j] < arr[j - gap]) {

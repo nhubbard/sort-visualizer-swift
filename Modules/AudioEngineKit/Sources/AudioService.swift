@@ -8,6 +8,90 @@ import ToneKitDSP
 import SortAudioBridgeKit
 #endif
 
+@MainActor
+protocol AudioEngineControlling {
+  func start() throws
+  func stop()
+}
+
+extension AudioEngine: AudioEngineControlling {}
+
+/// Construct the hardware graph when sound is first requested. AVAudioEngine can throw an
+/// Objective-C exception while resolving a temporarily missing Catalyst output device, so
+/// constructing it during app launch makes even silent screens fail to open.
+@MainActor
+private final class LazyLiveAudioEngine: AudioEngineControlling {
+  private let renderer: ToneRenderer
+  private var engine: AudioEngine?
+
+  init(renderer: ToneRenderer) {
+    self.renderer = renderer
+  }
+
+  func start() throws {
+    if engine == nil {
+      let newEngine = AudioEngine()
+      newEngine.output = ToneVoice(renderer: renderer)
+      engine = newEngine
+    }
+    try engine?.start()
+  }
+
+  func stop() {
+    engine?.stop()
+  }
+}
+
+#if targetEnvironment(macCatalyst)
+protocol AudioBridgeServing: AnyObject, Sendable {
+  var hasConnectedClients: Bool { get }
+  var onConnectedClientsChanged: (@Sendable (Bool) -> Void)? { get set }
+  var onListenerStateChanged: (@Sendable (SortAudioBridgeServer.ListenerState) -> Void)? { get set }
+  var onRemoteControlCommandReceived: (@Sendable (RemoteControlCommand) -> Void)? { get set }
+  func start(socketPath: String) throws
+  func stop()
+  func broadcast(_ event: SortToneEvent, noteRange: ClosedRange<Int>)
+}
+
+extension SortAudioBridgeServer: AudioBridgeServing {}
+#endif
+
+/// The service's hardware and IPC edges. Tests replace these while exercising the same routing
+/// and lifecycle code the live app uses; the production factory retains the existing synth graph.
+@MainActor
+struct AudioServiceDependencies {
+  let engine: any AudioEngineControlling
+  let renderer: ToneRenderer
+  let sink: any SortAudioEventSink
+  #if targetEnvironment(macCatalyst)
+  let bridgeServer: any AudioBridgeServing
+  let socketPath: () -> String?
+  #endif
+
+  static func makeRenderer() -> ToneRenderer {
+    ToneRenderer(
+      oscillator: OscillatorDSP(
+        frequency: 440.0, amplitude: 1.0, detuningOffset: 0.0, detuningMultiplier: 1.0
+      ),
+      envelope: EnvelopeDSP(
+        attackDuration: 0.1, decayDuration: 0.1, sustainLevel: 1.0, releaseDuration: 0.1
+      )
+    )
+  }
+
+  static func live() -> Self {
+    let renderer = makeRenderer()
+    let engine = LazyLiveAudioEngine(renderer: renderer)
+    #if targetEnvironment(macCatalyst)
+    return Self(
+      engine: engine, renderer: renderer, sink: LocalToneEventSink(renderer: renderer),
+      bridgeServer: SortAudioBridgeServer(), socketPath: { SortAudioBridgePath.socketPath() })
+    #else
+    return Self(engine: engine, renderer: renderer, sink: LocalToneEventSink(renderer: renderer))
+    #endif
+  }
+}
+
 /// A UI-facing summary of the companion-mode bridge's state — deliberately more granular than a
 /// single bool, since "never started" (no sort has played yet), "bound but nothing's connected
 /// yet," and "failed to bind at all" (e.g. an App Group/entitlement problem) are different
@@ -35,12 +119,12 @@ public enum BridgeConnectionStatus: Sendable, Equatable {
 
   public var displayText: String {
     switch self {
-    case .disabledByUser: "Disabled"
-    case .notStarted: "Not Started Yet"
-    case .unsupportedPlatform: "Not Available on This Platform"
-    case .unavailable: "Unavailable"
-    case .listening: "Waiting for Connection"
-    case .connected: "Connected"
+    case .disabledByUser: String(localized: "Disabled", bundle: .module)
+    case .notStarted: String(localized: "Not Started Yet", bundle: .module)
+    case .unsupportedPlatform: String(localized: "Not Available on This Platform", bundle: .module)
+    case .unavailable: String(localized: "Unavailable", bundle: .module)
+    case .listening: String(localized: "Waiting for Connection", bundle: .module)
+    case .connected: String(localized: "Connected", bundle: .module)
     }
   }
 }
@@ -73,12 +157,12 @@ public enum BridgeConnectionStatus: Sendable, Equatable {
 public final class AudioService: AudioPlaying {
   public static let shared = AudioService()
 
-  private let engine = AudioEngine()
+  private let engine: any AudioEngineControlling
   /// Kept as a property (not just handed off to `sink`/`engine.output` and discarded) so the bridge
   /// handoff below can reach in and silence it directly — see `startBridgeServerIfNeeded()`'s
   /// `onConnectedClientsChanged` handler.
   private let renderer: ToneRenderer
-  private let sink: LocalToneEventSink
+  private let sink: any SortAudioEventSink
   private let settings: AppSettings
   private var isStarted = false
   /// Fires when the AU-hosted remote (Documentation/docs/architecture/audio.md) sends a sort-transport command —
@@ -87,27 +171,26 @@ public final class AudioService: AudioPlaying {
   /// both platforms; on iPad it's simply never invoked, since no bridge exists there to receive from.
   public var remoteControlHandler: (@Sendable (RemoteControlCommand) -> Void)?
   #if targetEnvironment(macCatalyst)
-  private let bridgeServer = SortAudioBridgeServer()
+  private let bridgeServer: any AudioBridgeServing
+  private let socketPath: () -> String?
   private var bridgeStarted = false
   public private(set) var bridgeStatus: BridgeConnectionStatus = .disabledByUser
   #else
   public let bridgeStatus: BridgeConnectionStatus = .unsupportedPlatform
   #endif
 
-  public init(settings: AppSettings = .shared) {
+  public convenience init(settings: AppSettings = .shared) {
+    self.init(settings: settings, dependencies: .live())
+  }
+
+  init(settings: AppSettings, dependencies: AudioServiceDependencies) {
     self.settings = settings
-    let renderer = ToneRenderer(
-      oscillator: OscillatorDSP(
-        frequency: 440.0, amplitude: 1.0, detuningOffset: 0.0, detuningMultiplier: 1.0
-      ),
-      envelope: EnvelopeDSP(
-        attackDuration: 0.1, decayDuration: 0.1, sustainLevel: 1.0, releaseDuration: 0.1
-      )
-    )
-    self.renderer = renderer
-    self.sink = LocalToneEventSink(renderer: renderer)
-    engine.output = ToneVoice(renderer: renderer)
+    engine = dependencies.engine
+    renderer = dependencies.renderer
+    sink = dependencies.sink
     #if targetEnvironment(macCatalyst)
+    bridgeServer = dependencies.bridgeServer
+    socketPath = dependencies.socketPath
     bridgeStatus = settings.audioUnitBridgeEnabled ? .notStarted : .disabledByUser
     #endif
   }
@@ -183,7 +266,7 @@ public final class AudioService: AudioPlaying {
     guard !bridgeStarted, settings.audioUnitBridgeEnabled else { return }
     bridgeStarted = true
 
-    guard let socketPath = SortAudioBridgePath.socketPath() else {
+    guard let socketPath = socketPath() else {
       bridgeStatus = .unavailable
       return
     }

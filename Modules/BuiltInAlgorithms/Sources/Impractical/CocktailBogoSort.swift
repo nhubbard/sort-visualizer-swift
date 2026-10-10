@@ -1,10 +1,11 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
 public struct CocktailBogoSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "cocktailbogosort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Cocktail Bogo Sort",
+    displayName: String(localized: "Cocktail Bogo Sort", bundle: .module),
     category: .impractical,
     sizeRange: 4...7,
     growthModel: OperationGrowthModel(
@@ -33,12 +34,34 @@ public struct CocktailBogoSort: SortAlgorithm {
     guard n > 1 else { return }
 
     func isFrontMinimum(_ start: Int, _ end: Int) -> Bool {
-      for i in (start + 1)..<end where engine.compare(start, i, by: (>)) { return false }
+      for i in (start + 1)..<end {
+        let frontIsLarger = engine.compare(start, i, by: (>))
+        engine.annotateLastOperation(
+          stageID: "candidateCheck", decisionID: "cocktailbogosort.frontMinimum",
+          outcome: frontIsLarger ? "reject" : "continue",
+          roles: ["front": .arrayIndex(start), "candidate": .arrayIndex(i)],
+          explanationKey: "cocktailbogosort.frontMinimum",
+          explanation: frontIsLarger
+            ? String(localized: "A smaller value exists in this window, so the front is not its minimum.", bundle: .module)
+            : String(localized: "The front is no larger than this value, so continue checking the window.", bundle: .module))
+        if frontIsLarger { return false }
+      }
       return true
     }
 
     func isBackMaximum(_ start: Int, _ end: Int) -> Bool {
-      for i in start..<(end - 1) where engine.compare(i, end - 1, by: (>)) { return false }
+      for i in start..<(end - 1) {
+        let earlierIsLarger = engine.compare(i, end - 1, by: (>))
+        engine.annotateLastOperation(
+          stageID: "candidateCheck", decisionID: "cocktailbogosort.backMaximum",
+          outcome: earlierIsLarger ? "reject" : "continue",
+          roles: ["candidate": .arrayIndex(i), "back": .arrayIndex(end - 1)],
+          explanationKey: "cocktailbogosort.backMaximum",
+          explanation: earlierIsLarger
+            ? String(localized: "A larger value exists in this window, so the back is not its maximum.", bundle: .module)
+            : String(localized: "The back is no smaller than this value, so continue checking the window.", bundle: .module))
+        if earlierIsLarger { return false }
+      }
       return true
     }
 
@@ -54,7 +77,18 @@ public struct CocktailBogoSort: SortAlgorithm {
       while !engine.compare(j, i, by: (>)) { j -= 1 }
 
       engine.swap(i, j)
+      engine.annotateLastOperation(
+        stageID: "candidateExchange", decisionID: "cocktailbogosort.candidateExchange",
+        outcome: "exchange", roles: ["left": .arrayIndex(i), "right": .arrayIndex(j)],
+        explanationKey: "cocktailbogosort.candidateExchange",
+        explanation: String(localized: "The next permutation exchanges a pivot and successor within the active range.", bundle: .module))
       engine.reversal(i + 1, end - 1)
+      engine.annotateLastOperation(
+        stageID: "candidateWrap", decisionID: "cocktailbogosort.reverseSuffix",
+        outcome: "reverse",
+        roles: ["first": .arrayIndex(i + 1), "last": .arrayIndex(end - 1)],
+        explanationKey: "cocktailbogosort.reverseSuffix",
+        explanation: String(localized: "Reverse this descending range to advance to the next candidate permutation.", bundle: .module))
       return true
     }
 
@@ -72,6 +106,12 @@ public struct CocktailBogoSort: SortAlgorithm {
       }
       if !nextPermutation(minIndex, maxIndex) {
         engine.reversal(minIndex, maxIndex - 1)
+        engine.annotateLastOperation(
+          stageID: "candidateWrap", decisionID: "cocktailbogosort.reverseSuffix",
+          outcome: "reverse",
+          roles: ["first": .arrayIndex(minIndex), "last": .arrayIndex(maxIndex - 1)],
+          explanationKey: "cocktailbogosort.reverseSuffix",
+          explanation: String(localized: "Reverse this descending range to advance to the next candidate permutation.", bundle: .module))
       }
     }
   }

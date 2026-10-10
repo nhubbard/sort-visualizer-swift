@@ -15,14 +15,18 @@ cleanup in both the Development and Production CloudKit environments.
 Per-algorithm, not a flat cutoff: `cleanup_stale_sizes.py` reads
 `Tools/GrowthModelCalibration/output/sort-growth-models.json` and, for each algorithm, takes its
 `safeMaxSizeByCap` entry at the app's default 300,000-operation cap
-(`RecordingEngine.defaultOperationCap`) as the "any real recording above this is stale" line.
-All 177 algorithms have a computed value at that cap (checked directly — no fallback needed).
+(`RecordingEngine.defaultOperationCap`), then applies the same 8,192-element clamp and
+step-size rounding as `AlgorithmMetadata.effectiveSizeRange(operationCap:)`. This is the actual
+maximum a user can select. All 196 current algorithms have a computed value at that cap; the tool
+refuses to run if calibration or source metadata is missing.
 
 ## Setup (one-time, per machine)
 
-Already done on this machine — `.management-token`/`.user-token` (save-token output, keychain-
-backed) and `.team-id`/`.dev-schema`/`.prod-schema` (reference dotfiles) sit alongside this
-script, all git-ignored (see `.gitignore` here — never commit these). On a fresh machine:
+Local management-token and schema reference files sit alongside this script and are git-ignored
+(see `.gitignore` here). A private-database CLI user token expires and must be refreshed from
+CloudKit Console's Settings > Tokens > User Token. Save the freshly copied value in `.user-token`
+and run `chmod 600 .user-token`; never commit it. On a fresh machine, `cktool` can alternatively
+save tokens in the keychain:
 
 ```sh
 xcrun cktool save-token --type management   # CloudKit Console > your team > API Access
@@ -42,9 +46,51 @@ record types that no current code path writes to — legacy, out of scope for th
 
 ## Usage
 
+The complete read-only scans from 2026-10-02 are recorded in the
+[Development dry-run review](reports/2026-10-02-development-dry-run.md). They found 262,700
+Big-O and 5,479 cap-exceeded entries above current selectable maxima in Development, and no
+Big-O entries in Production. After explicit approval, all 69 Development cap-exceeded algorithm
+groups were cleared. A fresh complete scan found 819 remaining cap-exceeded records and zero
+above current maxima; a fresh Production Big-O scan found zero records. All 180 approved
+Development Big-O groups were re-queried empty. The subsequent full scan fetched 128,457
+records and found one new above-maximum `adaptivegrailsort` record outside the frozen approved
+set, apparently uploaded later from old local history. After separate approval, that exact
+record was deleted. A normal Catalyst relaunch and a second complete scan found 128,456 Big-O
+records with zero above maximum; a delayed-upload query remained empty. The fresh Development
+cap-exceeded scan found 819 records with zero above maximum, and Production Big-O had zero
+records. See the dated review for the record's timestamps and verification details. Refresh
+`.user-token` from the Console when CloudKit reports token expiry.
+
+The approved candidate sets can be resumed with `execute_reviewed_cleanup.py`. It checks the
+frozen cache fingerprint, compares each algorithm's current matching record names to the
+approved set, deletes that group, and re-queries until empty. The first run copies each
+reviewed cache to the ignored `.cache/approved/` directory so a later `--refresh` scan cannot
+erase the approved record-name list. It is safe to re-run after a partial deletion or an
+ambiguous `retry-needed` response. The runner defaults to one worker because CloudKit
+throttled parallel deletion.
+
+The durable log in `.cache/development-bigo-cleanup.log` verifies the first 137 groups as a
+contiguous successful prefix and the subsequent 43 groups as a successful resumed pass.
+`--start-at` avoids spending a refreshed token's lifetime rechecking that prefix. A full fresh
+scan still covers every algorithm after deletion.
+
+```sh
+uv run execute_reviewed_cleanup.py --record-type CD_BigORecord --token-file .user-token
+```
+
+The 2026-10-04 resumed pass used the verified 137-group prefix:
+
+```sh
+uv run execute_reviewed_cleanup.py --record-type CD_BigORecord --token-file .user-token --start-at simplifiedlibrarysort
+```
+
 ```sh
 uv run cleanup_stale_sizes.py --environment development --record-type CD_BigORecord
 ```
+
+If `cktool` still reports an expired session after `save-token`, pass the fresh CLI user token
+through `--token-file .user-token`. The script passes it directly to each `cktool` invocation
+and redacts it from command diagnostics.
 
 Defaults to a dry run: fetches every record of the given type (first run only — see caching
 below), prints a diff-style summary of what would be deleted (grouped by algorithm, with counts
@@ -62,16 +108,19 @@ so far. If the script is killed or crashes mid-fetch (114k+ records took a while
 the first time this was tried), just re-invoke it with the same arguments: it resumes from the
 last saved `continuationToken` instead of restarting from page 1. Once a fetch actually finishes
 (`continuationToken` reaches `null`), a later invocation for the same pair skips the network
-entirely and reuses the cached eligible list. Pass `--refresh` to ignore any cached/resumable
-state and force a fully fresh fetch. `--execute` removes each successfully-deleted record from
+entirely and reuses the cached eligible list. A cache made before the current threshold digest
+safeguard, or after any threshold changes, is rejected. Pass `--refresh` to force a fresh fetch.
+`--execute` removes each successfully-deleted record from
 the cache as it goes too, so a delete run that dies partway through can also just be re-invoked —
 it'll only retry the stragglers.
 
-Three invocations total, development first (`CD_RecordingCapExceededRecord` doesn't exist in
-production — see above):
+For final verification, refresh the two Development scans and the Production Big-O scan after
+the reviewed cleanup finishes. The `--execute` option on `cleanup_stale_sizes.py` is a slower
+one-record-at-a-time fallback; use the fingerprint-checked runner above for the approved
+Development candidate sets.
 
 ```sh
-uv run cleanup_stale_sizes.py --environment development --record-type CD_BigORecord --execute
-uv run cleanup_stale_sizes.py --environment development --record-type CD_RecordingCapExceededRecord --execute
-uv run cleanup_stale_sizes.py --environment production --record-type CD_BigORecord --execute
+uv run cleanup_stale_sizes.py --environment development --record-type CD_BigORecord --token-file .user-token --refresh
+uv run cleanup_stale_sizes.py --environment development --record-type CD_RecordingCapExceededRecord --token-file .user-token --refresh
+uv run cleanup_stale_sizes.py --environment production --record-type CD_BigORecord --token-file .user-token --refresh
 ```

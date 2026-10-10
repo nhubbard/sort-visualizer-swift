@@ -3,22 +3,6 @@ import Observation
 import QuartzCore
 import os
 
-/// Labels `play()`'s per-tick batch-apply interval for a manual Instruments capture — the exact
-/// mechanism behind a past perf bug (see `state`'s doc comment) was invisible in a generic Time
-/// Profiler trace until it was traced back to this call by hand; a signpost interval here means a
-/// future trace shows "TickApply" spans directly, with the batch size as its message, instead of
-/// requiring that same manual detective work again.
-///
-/// Also emits a "Tick" point event once per tick (see `play()`), before "TickApply"'s interval
-/// even exists for a given chunk — "TickApply" only fires when a tick actually has ops to apply,
-/// so a tick skipped by `opsToApply <= 0` (nothing due yet) is otherwise invisible in a trace.
-/// "Tick" carries the raw and smoothed pacing rate plus `opsToApply`, so a fixed-duration
-/// smoothness complaint can be diagnosed directly from a Points of Interest capture — rate spikes,
-/// oscillation, or a skipped run of ticks all show up as the event's message — without needing to
-/// reproduce a specific "it looks laggy" report by eye first.
-private let replaySignposter = OSSignposter(
-  subsystem: "com.nhubbard.Sort2.SortEngineKit", category: "ReplayEngine")
-
 /// Abstracts the redraw clock so `ReplayEngine` doesn't require a live display link to be
 /// testable. `onTick` fires once per frame with the elapsed time since the previous tick (0 for
 /// the very first tick after `start`).
@@ -173,6 +157,12 @@ public final class ReplayEngine {
   /// `useFixedDurationPacing` is `false`.
   public var speed: Double = 30.0
 
+  /// An optional ceiling for timed playback only. The configured speed and target duration stay
+  /// intact so turning Reduce Motion off restores the user's pacing without changing settings.
+  /// Manual steps and seeks never consult this limit.
+  public var automaticSpeedLimit: Double?
+  public private(set) var wasAutomaticallyLimited = false
+
   /// Mode switch, live like `speed` — when `true`, `play()` paces against `targetDuration`
   /// instead of a flat `speed`, recomputing the required rate every tick from how much
   /// significant work and wall-clock time actually remain (see `play()`'s tick loop), so a run's
@@ -184,9 +174,9 @@ public final class ReplayEngine {
   /// is `true`.
   public var targetDuration: Double = 10.0
 
-  /// The rate actually being applied as of the most recent tick — equal to `speed` in the flat
-  /// mode, but the freshly recomputed deadline rate in fixed-duration mode (where `speed` itself
-  /// stays an unrelated stored value). Updated once per tick (not per operation), so callers that
+  /// The rate actually being applied as of the most recent tick — equal to `speed` in ordinary
+  /// flat mode, bounded by `automaticSpeedLimit` when present, and otherwise recomputed against
+  /// the deadline in fixed-duration mode. Updated once per tick (not per operation), so callers that
   /// need "the current cadence" for something other than the tick loop itself — e.g. sizing an
   /// audio note's hold duration in `SortSession.makeOnStepClosure` — read the real rate regardless
   /// of pacing mode, instead of `speed`, which is meaningless while fixed-duration pacing is on.
@@ -444,6 +434,14 @@ public final class ReplayEngine {
     isPlaying = true
     currentSegmentStart = Date()
 
+    // Standard Time Profiler and Metal System Trace templates collect the PointsOfInterest
+    // category. Construct this after tracing starts for this playback: unified logging may cache
+    // whether a signposter is enabled, so a process-wide instance made during an earlier run can
+    // miss a trace attached later. TickApply isolates tape mutation; TickDispatch isolates audio
+    // and renderer callbacks. Tick events also reveal frames where no operations were due.
+    let replaySignposter = OSSignposter(
+      subsystem: "com.nhubbard.Sort2.SortEngineKit", category: "PointsOfInterest")
+
     // Computed once per `play()` call (not per tick — this scans the whole tape) so the
     // fixed-duration branch below only ever needs an O(1) subtraction against the live
     // `state.significantOperationCount` counter to know how much work remains.
@@ -487,7 +485,10 @@ public final class ReplayEngine {
           effectiveSpeed = rawPacingRate
           previousSmoothedRate = nil
         }
-        self.currentPacingRate = effectiveSpeed
+        let playbackRate = self.automaticSpeedLimit.map { min(effectiveSpeed, $0) }
+          ?? effectiveSpeed
+        if playbackRate < effectiveSpeed { self.wasAutomaticallyLimited = true }
+        self.currentPacingRate = playbackRate
         // See `effectiveSpeed`'s and this method's own doc comments: a `0` rate (only possible
         // in fixed-duration mode, once no significant work remains) can never clear the
         // cosmetic-only remainder through the normal accumulator math, so flush it directly.
@@ -495,7 +496,7 @@ public final class ReplayEngine {
           self.useFixedDurationPacing && remainingSignificantOperationCount == 0
           ? remaining
           : Self.opsToApply(
-            elapsed: elapsed, speed: effectiveSpeed, accumulator: &accumulator,
+            elapsed: elapsed, speed: playbackRate, accumulator: &accumulator,
             remaining: remaining
           )
         // See `replaySignposter`'s own doc comment: unlike "TickApply" below, this fires on

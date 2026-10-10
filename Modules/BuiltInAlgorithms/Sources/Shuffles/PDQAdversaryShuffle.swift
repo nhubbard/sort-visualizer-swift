@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -28,7 +29,7 @@ import SortEngineKit
 /// held-value comparisons (an intentionally uncounted comparison, not a new departure).
 public struct PDQAdversaryShuffle: ShuffleAlgorithm {
   public let id = ShuffleID(rawValue: "pdqbad")
-  public let metadata = ShuffleMetadata(displayName: "PDQ Adversary")
+  public let metadata = ShuffleMetadata(displayName: String(localized: "PDQ Adversary", bundle: .module))
   public init() {}
 
   private static let insertSortThreshold = 24

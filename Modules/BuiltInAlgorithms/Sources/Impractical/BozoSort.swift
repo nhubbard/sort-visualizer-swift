@@ -1,10 +1,11 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
 public struct BozoSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "bozosort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Bozo Sort",
+    displayName: String(localized: "Bozo Sort", bundle: .module),
     category: .impractical,
     sizeRange: 4...7,
     growthModel: OperationGrowthModel(
@@ -30,7 +31,18 @@ public struct BozoSort: SortAlgorithm {
     guard n > 1 else { return }
 
     func isSorted() -> Bool {
-      for i in 1..<n where !engine.compare(i, i - 1) { return false }
+      for i in 1..<n {
+        let inOrder = engine.compare(i, i - 1)
+        engine.annotateLastOperation(
+          stageID: "sortednessCheck", decisionID: "bozosort.adjacentOrder",
+          outcome: inOrder ? "continue" : "reject",
+          roles: ["previous": .arrayIndex(i - 1), "current": .arrayIndex(i)],
+          explanationKey: "bozosort.adjacentOrder",
+          explanation: inOrder
+            ? String(localized: "This adjacent pair is ordered, so keep checking the candidate.", bundle: .module)
+            : String(localized: "This adjacent pair is inverted, so reject this candidate permutation.", bundle: .module))
+        if !inOrder { return false }
+      }
       return true
     }
 
@@ -46,6 +58,11 @@ public struct BozoSort: SortAlgorithm {
         heap(k - 1)
         guard !done else { return }
         engine.swap(k.isMultiple(of: 2) ? i : 0, k - 1)
+        engine.annotateLastOperation(
+          stageID: "candidateExchange", decisionID: "bozosort.candidateExchange",
+          outcome: "exchange", roles: ["left": .arrayIndex(k.isMultiple(of: 2) ? i : 0), "right": .arrayIndex(k - 1)],
+          explanationKey: "bozosort.candidateExchange",
+          explanation: String(localized: "Heap’s permutation step exchanges these positions before the next sortedness check.", bundle: .module))
       }
       heap(k - 1)
     }

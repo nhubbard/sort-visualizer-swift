@@ -33,6 +33,7 @@ def sort(array):
         in_place_merge_bw(array, n - n % (2 * j), b, n)
         j *= 2
 
+
 def block_root(n):
     i = 1
     while i * i < n:
@@ -140,12 +141,24 @@ def in_place_merge_bw(array, a, m, b):
             j -= 1
 
 
-
-
 if __name__ == "__main__":
     array = [
-        0, 39, 21, 62, 91, 77, 14, 23,
-        90, 69, 51, 81, 68, 83, 32, 56,
+        0,
+        39,
+        21,
+        62,
+        91,
+        77,
+        14,
+        23,
+        90,
+        69,
+        51,
+        81,
+        68,
+        83,
+        32,
+        56,
     ]
     sort(array)
     print(array)

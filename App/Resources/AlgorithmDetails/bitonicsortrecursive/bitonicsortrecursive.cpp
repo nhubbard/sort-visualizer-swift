@@ -17,9 +17,7 @@ void printList(int items[], int size) {
   printf("]");
 }
 
-void sort(int arr[], int n) {
-  bitonicSort(arr, 0, n, true);
-}
+void sort(int arr[], int n) { bitonicSort(arr, 0, n, true); }
 
 int greatestPowerOfTwoLessThan(int n) {
   int k = 1;
@@ -56,10 +54,7 @@ void bitonicSort(int arr[], int lo, int n, bool dir) {
   }
 }
 
-
-
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
-                 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
 
 int main(int argc, char *argv[]) {
   int size = sizeof(array) / sizeof(array[0]);

@@ -1,3 +1,4 @@
+import Foundation
 import SwiftUI
 
 /// A small, secondary-styled label stacked above its equation — one column, two rows, rather
@@ -16,17 +17,24 @@ public struct LabeledEquationCell: View {
 
   public var body: some View {
     VStack(alignment: .leading, spacing: 2) {
-      Text(label)
-        .font(.caption)
-        .foregroundStyle(.secondary)
+      HStack(spacing: 4) {
+        Text(label)
+        if equation.count > 24 {
+          Image(systemName: "arrow.left.and.right")
+            .accessibilityLabel(String(localized: "Equation scrolls horizontally", bundle: .module))
+        }
+      }
+      .font(.caption)
+      .foregroundStyle(.secondary)
       // A multi-term fitted polynomial can render very wide at a fixed font size -- SwiftMath has
       // no line-wrapping, so a bare `SwiftMathView` here would report that full width as its ideal
       // size and force this cell (and whatever `Grid`/`HStack` contains it) wider to match.
       // `ScrollView(.horizontal)` decouples this cell's layout footprint from the equation's
       // actual rendered width along the scrolling axis; a long equation scrolls instead.
-      ScrollView(.horizontal, showsIndicators: false) {
+      ScrollView(.horizontal, showsIndicators: true) {
         SwiftMathView(equation: equation, textAlignment: .left)
       }
+      .accessibilityIdentifier("equationScroll-\(label)")
     }
     .frame(maxWidth: .infinity, alignment: .leading)
   }

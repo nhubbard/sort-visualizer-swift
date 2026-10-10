@@ -1,10 +1,11 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
 public struct ExchangeBogoSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "exchangebogosort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Exchange Bogo Sort",
+    displayName: String(localized: "Exchange Bogo Sort", bundle: .module),
     category: .impractical,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -31,7 +32,18 @@ public struct ExchangeBogoSort: SortAlgorithm {
     guard n > 1 else { return }
 
     func isSorted() -> Bool {
-      for i in 1..<n where engine.compare(i, i - 1, by: (<)) { return false }
+      for i in 1..<n {
+        let inOrder = !engine.compare(i, i - 1, by: (<))
+        engine.annotateLastOperation(
+          stageID: "sortednessCheck", decisionID: "exchangebogosort.adjacentOrder",
+          outcome: inOrder ? "continue" : "reject",
+          roles: ["previous": .arrayIndex(i - 1), "current": .arrayIndex(i)],
+          explanationKey: "exchangebogosort.adjacentOrder",
+          explanation: inOrder
+            ? String(localized: "This adjacent pair is ordered, so keep checking the candidate.", bundle: .module)
+            : String(localized: "This adjacent pair is inverted, so reject this candidate permutation.", bundle: .module))
+        if !inOrder { return false }
+      }
       return true
     }
 
@@ -40,6 +52,11 @@ public struct ExchangeBogoSort: SortAlgorithm {
     for i in 0..<(n - 1) {
       for j in (i + 1)..<n where engine.compare(j, i, by: (<)) {
         engine.swap(i, j)
+        engine.annotateLastOperation(
+          stageID: "candidateExchange", decisionID: "exchangebogosort.candidateExchange",
+          outcome: "exchange", roles: ["left": .arrayIndex(i), "right": .arrayIndex(j)],
+          explanationKey: "exchangebogosort.candidateExchange",
+          explanation: String(localized: "The chosen pair is inverted, so exchange it before testing another pair.", bundle: .module))
       }
     }
   }

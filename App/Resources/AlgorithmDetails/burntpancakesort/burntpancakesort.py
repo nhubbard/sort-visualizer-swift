@@ -11,6 +11,7 @@ def sort(arr):
             flip(arr, i - 1)
             flip(arr, max_index - 1)
 
+
 def flip(arr, end):
     start = 0
     while start < end:
@@ -19,12 +20,24 @@ def flip(arr, end):
         end -= 1
 
 
-
-
 if __name__ == "__main__":
     array = [
-        0, 39, 21, 62, 91, 77, 14, 23,
-        90, 69, 51, 81, 68, 83, 32, 56,
+        0,
+        39,
+        21,
+        62,
+        91,
+        77,
+        14,
+        23,
+        90,
+        69,
+        51,
+        81,
+        68,
+        83,
+        32,
+        56,
     ]
     sort(array)
     print(array)

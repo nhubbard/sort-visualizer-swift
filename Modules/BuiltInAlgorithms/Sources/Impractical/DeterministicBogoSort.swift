@@ -1,10 +1,11 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
 public struct DeterministicBogoSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "deterministicbogosort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Deterministic Bogo Sort",
+    displayName: String(localized: "Deterministic Bogo Sort", bundle: .module),
     category: .impractical,
     sizeRange: 4...8,
     growthModel: OperationGrowthModel(
@@ -30,7 +31,18 @@ public struct DeterministicBogoSort: SortAlgorithm {
     guard n > 1 else { return }
 
     func isSorted() -> Bool {
-      for i in 1..<n where !engine.compare(i, i - 1) { return false }
+      for i in 1..<n {
+        let inOrder = engine.compare(i, i - 1)
+        engine.annotateLastOperation(
+          stageID: "sortednessCheck", decisionID: "deterministicbogosort.adjacentOrder",
+          outcome: inOrder ? "continue" : "reject",
+          roles: ["previous": .arrayIndex(i - 1), "current": .arrayIndex(i)],
+          explanationKey: "deterministicbogosort.adjacentOrder",
+          explanation: inOrder
+            ? String(localized: "This adjacent pair is ordered, so keep checking the candidate.", bundle: .module)
+            : String(localized: "This adjacent pair is inverted, so reject this candidate permutation.", bundle: .module))
+        if !inOrder { return false }
+      }
       return true
     }
 
@@ -42,8 +54,18 @@ public struct DeterministicBogoSort: SortAlgorithm {
         if permutationSort(depth + 1) { return true }
         if (n - depth).isMultiple(of: 2) {
           engine.swap(depth, i)
+          engine.annotateLastOperation(
+            stageID: "candidateExchange", decisionID: "deterministicbogosort.candidateExchange",
+            outcome: "exchange", roles: ["left": .arrayIndex(depth), "right": .arrayIndex(i)],
+            explanationKey: "deterministicbogosort.candidateExchange",
+            explanation: String(localized: "Heap’s permutation step exchanges these positions before checking the next candidate.", bundle: .module))
         } else {
           engine.swap(depth, n - 1)
+          engine.annotateLastOperation(
+            stageID: "candidateExchange", decisionID: "deterministicbogosort.candidateExchange",
+            outcome: "exchange", roles: ["left": .arrayIndex(depth), "right": .arrayIndex(n - 1)],
+            explanationKey: "deterministicbogosort.candidateExchange",
+            explanation: String(localized: "Heap’s permutation step exchanges these positions before checking the next candidate.", bundle: .module))
         }
       }
       return permutationSort(depth + 1)

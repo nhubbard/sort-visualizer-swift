@@ -1,10 +1,11 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
 public struct BinaryInsertionSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "binaryinsertionsort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Binary Insertion Sort",
+    displayName: String(localized: "Binary Insertion Sort", bundle: .module),
     category: .insertion,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -37,7 +38,13 @@ public struct BinaryInsertionSort: SortAlgorithm {
 
         // Do NOT move equal elements to the right of the inserted element;
         // this maintains stability.
-        if engine.compare(i, mid, by: <) {
+        if engine.teachingCompare(
+          i, mid,
+          by: <,
+          stageID: "BinaryInsertionSort.binaryPosition",
+          whenTrue: String(localized: "The item is smaller than this midpoint, so search the lower half.", bundle: .module),
+          whenFalse: String(localized: "The item belongs after this midpoint.", bundle: .module)
+        ) {
           hi = mid
         } else {
           lo = mid + 1

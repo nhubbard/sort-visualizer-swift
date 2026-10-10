@@ -1,8 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
-                 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
 
 void swap(int *a, int *b) {
   int t = *a;
@@ -38,7 +37,7 @@ void sort(int arr[], int n) {
   if (n <= 1)
     return;
 
-  int *matches = calloc(6 * n, sizeof(int));
+  int *matches = calloc((size_t)n * 6, sizeof(int));
   int tourney = knockout(arr, matches, 0, n - 1, 3);
 
   int *output = malloc(n * sizeof(int));
@@ -54,22 +53,12 @@ void sort(int arr[], int n) {
   free(matches);
 }
 
-int isPlayer(int ref) {
-  return ref <= 0;
-}
-int makePlayer(int index) {
-  return -index;
-}
+int isPlayer(int ref) { return ref <= 0; }
+int makePlayer(int index) { return -index; }
 
-int getWinner(int *matches, int root) {
-  return matches[root];
-}
-int getWinners(int *matches, int root) {
-  return matches[root + 1];
-}
-int getLosers(int *matches, int root) {
-  return matches[root + 2];
-}
+int getWinner(int *matches, int root) { return matches[root]; }
+int getWinners(int *matches, int root) { return matches[root + 1]; }
+int getLosers(int *matches, int root) { return matches[root + 2]; }
 
 void setMatch(int *matches, int root, int winner, int winners, int losers) {
   matches[root] = winner;
@@ -117,8 +106,6 @@ int rebuild(int *arr, int *matches, int root) {
   }
   return root;
 }
-
-
 
 int main(int argc, char *argv[]) {
   int size = sizeof(array) / sizeof(array[0]);

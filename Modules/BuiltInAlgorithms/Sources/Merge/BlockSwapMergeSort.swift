@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -21,7 +22,7 @@ import SortEngineKit
 public struct BlockSwapMergeSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "blockswapmergesort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Block-Swap Merge Sort",
+    displayName: String(localized: "Block-Swap Merge Sort", bundle: .module),
     category: .merge,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -62,7 +63,12 @@ public struct BlockSwapMergeSort: SortAlgorithm {
       var b = min(mid - start, end - mid)
       var m = a + (b - a) / 2
       while b > a {
-        if engine.compare(mid - m - 1, mid + m, by: (>)) {
+        if engine.teachingCompare(
+          mid - m - 1, mid + m, by: (>),
+          stageID: "BlockSwapMergeSort.merge.boundary",
+          whenTrue: String(localized: "The left block endpoint exceeds the right block start, so the merge boundary shifts right.", bundle: .module),
+          whenFalse: String(localized: "The block endpoints are ordered, so the boundary search shifts left.", bundle: .module)
+        ) {
           a = m + 1
         } else {
           b = m

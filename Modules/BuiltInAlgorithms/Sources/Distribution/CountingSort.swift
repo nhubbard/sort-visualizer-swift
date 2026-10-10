@@ -5,7 +5,7 @@ import SortEngineKit
 public struct CountingSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "countingsort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Counting Sort",
+    displayName: String(localized: "Counting Sort", bundle: .module),
     category: .distribution,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -29,14 +29,29 @@ public struct CountingSort: SortAlgorithm {
     // ArrayV's `Reads.analyzeMax` reads values directly (no stat-tracked compares), so the
     // scan for the maximum here does the same via `engine.values` rather than `engine.compare`.
     var maxValue = engine.readValue(at: 0)
-    for i in 1..<n where engine.readValue(at: i) > maxValue {
-      maxValue = engine.readValue(at: i)
+    for i in 1..<n {
+      let candidate = engine.readValue(at: i)
+      let newMaximum = candidate > maxValue
+      engine.annotateLastOperation(
+        stageID: "rangeScan", decisionID: "countingsort.maximum",
+        outcome: newMaximum ? "updateMaximum" : "keepMaximum",
+        roles: ["candidate": .arrayIndex(i), "maximum": .value(maxValue)],
+        explanationKey: "countingsort.maximum",
+        explanation: newMaximum
+          ? String(localized: "This value extends the counting range, so raise the maximum.", bundle: .module)
+          : String(localized: "This value fits within the counting range found so far.", bundle: .module))
+      if newMaximum { maxValue = engine.readValue(at: i) }
     }
 
     var values = [Int]()
     values.reserveCapacity(n)
     for i in 0..<n {
       values.append(engine.readValue(at: i))
+      engine.annotateLastOperation(
+        stageID: "frequencyScan", decisionID: "countingsort.collectValue",
+        outcome: "collect", roles: ["source": .arrayIndex(i)],
+        explanationKey: "countingsort.collectValue",
+        explanation: String(localized: "Collect this value so its frequency can determine a stable output position.", bundle: .module))
     }
 
     // ArrayV's per-value `counts` table is bookkeeping the visualizer never renders as a bar
@@ -58,12 +73,23 @@ public struct CountingSort: SortAlgorithm {
       counts[value] -= 1
       output[counts[value]] = value
       engine.writeAux(outputHandle, at: counts[value], value: value)
+      engine.annotateLastOperation(
+        stageID: "scratchUpdate", decisionID: "countingsort.scratchUpdate",
+        outcome: "update",
+        roles: ["scratch": .auxiliaryIndex(handle: outputHandle.rawValue, index: counts[value])],
+        explanationKey: "countingsort.scratchUpdate",
+        explanation: String(localized: "The cumulative count reserves this stable scratch position for the value.", bundle: .module))
     }
 
     // Extra loop to simulate the results from the "output" array being written back to the
     // visual array, mirroring ArrayV's own comment/structure in `CountingSort.runSort`.
     for i in 0..<n {
       engine.setValue(i, output[i])
+      engine.annotateLastOperation(
+        stageID: "bucketPlacement", decisionID: "countingsort.bucketPlacement",
+        outcome: "place", roles: ["destination": .arrayIndex(i)],
+        explanationKey: "countingsort.bucketPlacement",
+        explanation: String(localized: "The cumulative count places value \(output[i]) at stable output position \(i).", bundle: .module))
     }
 
     engine.deleteAuxArray(outputHandle)

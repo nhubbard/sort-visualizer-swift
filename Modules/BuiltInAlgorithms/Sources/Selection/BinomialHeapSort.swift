@@ -1,10 +1,11 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
 public struct BinomialHeapSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "binomialheapsort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Binomial Heap Sort",
+    displayName: String(localized: "Binomial Heap Sort", bundle: .module),
     category: .selection,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -44,7 +45,13 @@ public struct BinomialHeapSort: SortAlgorithm {
         focus = maxNode
         var depth = 1
         while (focus & depth) == 0 {
-          if engine.compare(focus - depth - 1, maxNode - 1, by: (>)) {
+          if engine.teachingCompare(
+            focus - depth - 1, maxNode - 1,
+            by: (>),
+            stageID: "BinomialHeapSort.heapRoot",
+            whenTrue: String(localized: "The new node is larger, so promote it within the binomial heap.", bundle: .module),
+            whenFalse: String(localized: "The current binomial heap maximum remains.", bundle: .module)
+          ) {
             maxNode = focus - depth
           }
           depth *= 2
@@ -63,7 +70,11 @@ public struct BinomialHeapSort: SortAlgorithm {
       var depth = 1
       while focus != 0 {
         if (focus & depth) != 0 {
-          if engine.compare(focus - 1, maxNode - 1, by: (>)) {
+          if engine.teachingCompare(
+            focus - 1, maxNode - 1, by: >, stageID: "BinomialHeapSort.extractMaximum",
+            whenTrue: String(localized: "This heap root is larger, so select it for the next extraction.", bundle: .module),
+            whenFalse: String(localized: "The current root remains the maximum extraction candidate.", bundle: .module)
+          ) {
             maxNode = focus
           }
           focus -= depth
@@ -78,7 +89,12 @@ public struct BinomialHeapSort: SortAlgorithm {
           focus = maxNode
           var innerDepth = 1
           while (focus & innerDepth) == 0 {
-            if engine.compare(focus - innerDepth - 1, maxNode - 1, by: (>)) {
+            if engine.teachingCompare(
+              focus - innerDepth - 1, maxNode - 1, by: >,
+              stageID: "BinomialHeapSort.restoreAfterExtraction",
+              whenTrue: String(localized: "This child is larger, so promote it while restoring the heap.", bundle: .module),
+              whenFalse: String(localized: "The selected node remains the larger restoration candidate.", bundle: .module)
+            ) {
               maxNode = focus - innerDepth
             }
             innerDepth *= 2

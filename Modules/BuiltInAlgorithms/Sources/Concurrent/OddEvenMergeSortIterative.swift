@@ -1,10 +1,11 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
 public struct OddEvenMergeSortIterative: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "oddevenmergesortiterative")
   public let metadata = AlgorithmMetadata(
-    displayName: "Odd-Even Merge Sort (Iterative)",
+    displayName: String(localized: "Odd-Even Merge Sort (Iterative)", bundle: .module),
     category: .concurrent,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -33,7 +34,16 @@ public struct OddEvenMergeSortIterative: SortAlgorithm {
         while j + k < n {
           for i in 0..<k where (i + j) / (p + p) == (i + j + k) / (p + p) {
             if i + j + k < n {
-              if !engine.compare(i + j + k, i + j) {
+              let shouldSwap = !engine.compare(i + j + k, i + j)
+              engine.annotateLastOperation(
+                stageID: "networkPass", decisionID: "oddevenmergesortiterative.compareExchange",
+                outcome: shouldSwap ? "exchange" : "keep",
+                roles: ["left": .arrayIndex(i + j + k), "right": .arrayIndex(i + j)],
+                explanationKey: "oddevenmergesortiterative.compareExchange",
+                explanation: shouldSwap
+                  ? String(localized: "This network pair is out of order, so exchange the values.", bundle: .module)
+                  : String(localized: "This network pair is in order, so keep the values.", bundle: .module))
+              if shouldSwap {
                 engine.swap(i + j, i + j + k)
               }
             }

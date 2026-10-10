@@ -343,8 +343,6 @@ fun pdqSort(arr: MutableList<Int>, begin: Int, end: Int) {
   }
 }
 
-
-
 fun main() {
   val array =
     mutableListOf(

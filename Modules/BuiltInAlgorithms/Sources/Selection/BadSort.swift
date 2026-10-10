@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -27,7 +28,7 @@ import SortEngineKit
 public struct BadSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "badsort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Bad Sort",
+    displayName: String(localized: "Bad Sort", bundle: .module),
     category: .selection,
     sizeRange: 16...128,
     growthModel: OperationGrowthModel(
@@ -59,7 +60,13 @@ public struct BadSort: SortAlgorithm {
           // Reads.compareValues(array[j], array[k]) == 1 — strict greater-than, both
           // live indices (see the doc comment above for why this still goes through
           // `engine.compare` despite ArrayV routing it through `compareValues`).
-          if engine.compare(index2, index2p, by: (>)) {
+          if engine.teachingCompare(
+            index2, index2p,
+            by: (>),
+            stageID: "BadSort.candidateOrder",
+            whenTrue: String(localized: "This candidate is larger, so exchange the compared positions.", bundle: .module),
+            whenFalse: String(localized: "The candidate ordering does not trigger an exchange.", bundle: .module)
+          ) {
             isShortest = false
             break
           }

@@ -1,10 +1,11 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
 public struct StrandSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "strandsort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Strand Sort",
+    displayName: String(localized: "Strand Sort", bundle: .module),
     category: .merge,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -46,7 +47,12 @@ public struct StrandSort: SortAlgorithm {
         // `subList[i]` is a real re-read of the `subListHandle`-shadowed buffer, marked via
         // `markAuxRead`, then compared against the live `m` index via `engine.compareValue`.
         engine.markAuxRead(subListHandle, at: i)
-        if engine.compareValue(m, against: subList[i], by: (>)) {
+        if engine.teachingCompareValue(
+          m, against: subList[i], by: (>),
+          stageID: "StrandSort.strand.merge",
+          whenTrue: String(localized: "The main-array item exceeds the strand value, so the strand value is written next.", bundle: .module),
+          whenFalse: String(localized: "The main-array item is no greater, so the merge keeps it ahead of the strand.", bundle: .module)
+        ) {
           engine.setValue(a, subList[i])
           a += 1
           i += 1
@@ -74,7 +80,10 @@ public struct StrandSort: SortAlgorithm {
       for m in 1..<j {
         // Same `markAuxRead` + `engine.compareValue` pairing as `mergeTo` above.
         engine.markAuxRead(subListHandle, at: i)
-        if engine.compareValue(m, against: subList[i], by: (>=)) {
+        if engine.teachingCompareValue(
+          m, against: subList[i], by: (>=), stageID: "strand.extract",
+          whenTrue: String(localized: "This value extends the nondecreasing strand, so it joins the extracted run.", bundle: .module),
+          whenFalse: String(localized: "This value is smaller than the strand tail, so it remains for a later strand.", bundle: .module)) {
           i += 1
           writeSubList(i, engine.readValue(at: m))
           k -= 1

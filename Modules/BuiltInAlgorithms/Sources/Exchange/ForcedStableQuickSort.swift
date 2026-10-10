@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -15,7 +16,7 @@ import SortEngineKit
 public struct ForcedStableQuickSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "forcedstablequicksort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Forced Stable Quick Sort",
+    displayName: String(localized: "Forced Stable Quick Sort", bundle: .module),
     category: .exchange,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -49,7 +50,13 @@ public struct ForcedStableQuickSort: SortAlgorithm {
     // check reads `engine.values` directly rather than issuing a second compare op, since the
     // tie-break is bookkeeping, not a user-visible comparison in its own right.
     func stableComp(_ a: Int, _ b: Int) -> Bool {
-      if engine.compare(a, b, by: >) { return true }
+      if engine.teachingCompare(
+        a, b,
+        by: >,
+        stageID: "ForcedStableQuickSort.stableOrder",
+        whenTrue: String(localized: "The first value is greater, so this stable comparison ranks it later.", bundle: .module),
+        whenFalse: String(localized: "The first value is no greater; a tie falls back to original order.", bundle: .module)
+      ) { return true }
       return engine.readValue(at: a) == engine.readValue(at: b) && key[a] > key[b]
     }
 

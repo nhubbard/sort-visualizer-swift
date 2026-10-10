@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -12,7 +13,7 @@ import SortEngineKit
 public struct BitonicSortRecursive: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "bitonicsortrecursive")
   public let metadata = AlgorithmMetadata(
-    displayName: "Bitonic Sort (Recursive)",
+    displayName: String(localized: "Bitonic Sort (Recursive)", bundle: .module),
     category: .concurrent,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -49,7 +50,16 @@ public struct BitonicSortRecursive: SortAlgorithm {
 
   private func compare(_ engine: inout RecordingEngine, _ i: Int, _ j: Int, _ dir: Bool) {
     let isGreater = engine.compare(i, j, by: (>))
-    if dir == isGreater {
+    let shouldSwap = dir == isGreater
+    engine.annotateLastOperation(
+      stageID: "bitonicMerge", decisionID: "bitonicsortrecursive.directionalComparator",
+      outcome: shouldSwap ? "exchange" : "keep",
+      roles: ["left": .arrayIndex(i), "right": .arrayIndex(j)],
+      explanationKey: "bitonicsortrecursive.directionalComparator",
+      explanation: shouldSwap
+        ? String(localized: "These values oppose the current bitonic merge direction, so exchange them.", bundle: .module)
+        : String(localized: "These values fit the current bitonic merge direction, so keep them.", bundle: .module))
+    if shouldSwap {
       engine.swap(i, j)
     }
   }

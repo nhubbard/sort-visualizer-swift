@@ -1,10 +1,11 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
 public struct QuickSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "quicksort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Quick Sort",
+    displayName: String(localized: "Quick Sort", bundle: .module),
     category: .exchange,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -33,10 +34,37 @@ public struct QuickSort: SortAlgorithm {
     var i = left
     var j = right
     while i < j {
-      while engine.compare(pivot, i) && i < j {
+      while true {
+        let isOnLeft = engine.compare(pivot, i)
+        if engine.shouldAnnotateCurrentOperation {
+          engine.annotateLastOperation(
+            stageID: "quick.partition.scanLeft",
+            decisionID: "quick.pivotSide",
+            outcome: !isOnLeft ? "oppositeSide" : (i < j ? "advance" : "boundary"),
+            roles: ["pivot": .arrayIndex(pivot), "candidate": .arrayIndex(i)],
+            explanationKey: "quick.pivotSide",
+            explanation: !isOnLeft
+              ? String(localized: "This item is larger than the pivot, so the left scan stops to exchange it.", bundle: .module)
+              : (i < j ? String(localized: "This item stays on the pivot's left side; advance the scan.", bundle: .module)
+                : String(localized: "The left scan reached the partition boundary.", bundle: .module)))
+        }
+        guard isOnLeft && i < j else { break }
         i += 1
       }
-      while !engine.compare(pivot, j) {
+      while true {
+        let isOnLeft = engine.compare(pivot, j)
+        if engine.shouldAnnotateCurrentOperation {
+          engine.annotateLastOperation(
+            stageID: "quick.partition.scanRight",
+            decisionID: "quick.pivotSide",
+            outcome: isOnLeft ? "stop" : "retreat",
+            roles: ["pivot": .arrayIndex(pivot), "candidate": .arrayIndex(j)],
+            explanationKey: "quick.pivotSide",
+            explanation: isOnLeft
+              ? String(localized: "This item belongs on or before the pivot, so the right scan stops.", bundle: .module)
+              : String(localized: "This item is larger than the pivot; retreat through the right partition.", bundle: .module))
+        }
+        guard !isOnLeft else { break }
         j -= 1
       }
       if i < j {

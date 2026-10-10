@@ -10,6 +10,363 @@ import Testing
 @Suite
 struct NativeAlgorithmCorrectnessTests {
   @Test
+  func builtInCatalogHasUniqueIDsAndEveryCategory() {
+    let algorithms = AllBuiltInAlgorithms.sorts
+    let shuffles = AllBuiltInAlgorithms.shuffles
+    #expect(algorithms.count == 196)
+    #expect(Set(algorithms.map(\.id)).count == algorithms.count)
+    #expect(Set(algorithms.map { $0.metadata.category }) == Set(AlgorithmCategory.allCases))
+    #expect(shuffles.count == 43)
+    #expect(Set(shuffles.map(\.id)).count == shuffles.count)
+    #expect(!shuffles.contains { $0.id.rawValue == "naive" })
+  }
+
+  @Test
+  func kotaSortMergesTheLastRestoredBlock() {
+    let input = (0..<257).map { ($0 * 151) % 251 }.sorted(by: >)
+    var engine = RecordingEngine(values: input, operationCap: 20_000_000)
+    KotaSort().record(into: &engine)
+    #expect(engine.values == input.sorted())
+  }
+
+  @Test
+  func kotaSortHandlesInternalKeysAndStableFallbacks() {
+    let algorithm = KotaSort()
+    let radix = 8_192
+    for size in [0, 1, 2, 3, 4, 15, 16, 31, 32, 63, 64, 127, 128, 129, 191, 255, 256, 257, 511, 512, 1024] {
+      for seed in 0..<4 {
+        for keyCount in [1, 2, 3, 7, 16, 32, 64, size] {
+          var state = UInt64(size * 1_009 + seed * 131 + keyCount + 1)
+          let input = (0..<size).map { index in
+            state = state &* 6_364_136_223_846_793_005 &+ 1_442_695_040_888_963_407
+            return Int(state % UInt64(max(1, keyCount))) * radix + index
+          }
+          let ordered = input.sorted { $0 / radix < $1 / radix }
+          let unique = (0..<size).map { $0 * radix + $0 }
+          var shuffled = unique
+          if size > 1 {
+            for index in stride(from: size - 1, through: 1, by: -1) {
+              state = state &* 6_364_136_223_846_793_005 &+ 1_442_695_040_888_963_407
+              shuffled.swapAt(index, Int(state % UInt64(index + 1)))
+            }
+          }
+          let candidates = [input, Array(input.reversed()), ordered, unique, Array(unique.reversed()), shuffled]
+          for candidate in candidates {
+            var engine = RecordingEngine(values: candidate, operationCap: 20_000_000, comparisonKeyForTesting: { $0 / radix })
+            algorithm.record(into: &engine)
+            let output = engine.values
+            #expect(output.map { $0 / radix } == candidate.map { $0 / radix }.sorted(), "size=\(size) seed=\(seed) keys=\(keyCount)")
+            let positions = Dictionary(uniqueKeysWithValues: candidate.enumerated().map { ($0.element, $0.offset) })
+            for index in 1..<max(1, output.count) where output[index - 1] / radix == output[index] / radix {
+              if let earlier = positions[output[index - 1]], let later = positions[output[index]] {
+                #expect(earlier < later, "size=\(size) seed=\(seed) keys=\(keyCount)")
+              } else {
+                Issue.record("Kota Sort changed an input value at size \(size), seed \(seed), keys \(keyCount)")
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  @Test
+  func wikiSortHandlesInternalBuffersAndStableFallbacks() {
+    let algorithm = WikiSort()
+    let radix = 8_192
+    for size in [0, 1, 2, 3, 4, 7, 8, 15, 16, 31, 32, 63, 64, 127, 128, 255, 256, 512, 1024] {
+      for seed in 0..<4 {
+        for keyCount in [1, 2, 3, 7, 16, 32, 64, size] {
+          var state = UInt64(size * 1_009 + seed * 131 + keyCount + 1)
+          let input = (0..<size).map { index in
+            state = state &* 6_364_136_223_846_793_005 &+ 1_442_695_040_888_963_407
+            return Int(state % UInt64(max(1, keyCount))) * radix + index
+          }
+          let sorted = input.sorted { $0 / radix < $1 / radix }
+          let unique = (0..<size).map { $0 * radix + $0 }
+          var shuffled = unique
+          if size > 1 {
+            for index in stride(from: size - 1, through: 1, by: -1) {
+              state = state &* 6_364_136_223_846_793_005 &+ 1_442_695_040_888_963_407
+              shuffled.swapAt(index, Int(state % UInt64(index + 1)))
+            }
+          }
+          let candidates = [input, Array(input.reversed()), sorted, unique, Array(unique.reversed()), shuffled]
+          for candidate in candidates {
+            var engine = RecordingEngine(values: candidate, operationCap: 20_000_000, comparisonKeyForTesting: { $0 / radix })
+            algorithm.record(into: &engine)
+            let output = engine.values
+            #expect(output.map { $0 / radix } == candidate.map { $0 / radix }.sorted(), "size=\(size) seed=\(seed) keys=\(keyCount)")
+            let positions = Dictionary(uniqueKeysWithValues: candidate.enumerated().map { ($0.element, $0.offset) })
+            for index in 1..<max(1, output.count) where output[index - 1] / radix == output[index] / radix {
+              if let earlier = positions[output[index - 1]], let later = positions[output[index]] {
+                #expect(earlier < later, "size=\(size) seed=\(seed) keys=\(keyCount)")
+              } else {
+                Issue.record("Wiki Sort changed an input value at size \(size), seed \(seed), keys \(keyCount)")
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  @Test
+  func chaliceSortHandlesKeyBitAndFallbackPaths() {
+    let algorithm = ChaliceSort()
+    let radix = 8_192
+    for size in [0, 1, 31, 32, 63, 127, 128, 129, 191, 255, 256, 257, 511, 512, 1024] {
+      for seed in 0..<8 {
+        for keyCount in [1, 2, 3, 7, 8, 16, 64, size] {
+          var state = UInt64(size * 1_009 + seed * 131 + keyCount + 1)
+          let input = (0..<size).map { index in
+            state = state &* 6_364_136_223_846_793_005 &+ 1_442_695_040_888_963_407
+            return Int(state % UInt64(max(1, keyCount))) * radix + index
+          }
+          let ordered = input.sorted { $0 / radix < $1 / radix }
+          var candidates = [input, Array(input.reversed()), ordered]
+          if keyCount == size {
+            let unique = (0..<size).map { $0 * radix + $0 }
+            var shuffled = unique
+            if size > 1 {
+              for index in stride(from: size - 1, through: 1, by: -1) {
+                state = state &* 6_364_136_223_846_793_005 &+ 1_442_695_040_888_963_407
+                shuffled.swapAt(index, Int(state % UInt64(index + 1)))
+              }
+            }
+            candidates += [unique, Array(unique.reversed()), shuffled]
+          }
+          for candidate in candidates {
+            var engine = RecordingEngine(values: candidate, operationCap: 20_000_000, comparisonKeyForTesting: { $0 / radix })
+            algorithm.record(into: &engine)
+            let output = engine.values
+            #expect(output.map { $0 / radix } == candidate.map { $0 / radix }.sorted(), "size=\(size) seed=\(seed) keys=\(keyCount)")
+            let positions = Dictionary(uniqueKeysWithValues: candidate.enumerated().map { ($0.element, $0.offset) })
+            for index in 1..<max(1, output.count) where output[index - 1] / radix == output[index] / radix {
+              if let earlier = positions[output[index - 1]], let later = positions[output[index]] {
+                #expect(earlier < later, "size=\(size) seed=\(seed) keys=\(keyCount)")
+              } else {
+                Issue.record("Chalice Sort changed an input value at size \(size), seed \(seed), keys \(keyCount)")
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  @Test
+  func timSortHandlesRunStackGallopingAndStableTies() {
+    let algorithm = TimSort()
+    let radix = 8_192
+    for size in [0, 1, 2, 15, 16, 17, 30, 31, 32, 33, 63, 64, 65, 119, 120, 121, 255, 256, 257, 511, 512, 1024, 2048] {
+      for seed in 0..<12 {
+        var state = UInt64(size * 1_009 + seed + 1)
+        let random = (0..<size).map { index in
+          state = state &* 6_364_136_223_846_793_005 &+ 1_442_695_040_888_963_407
+          return Int(state % 17) * radix + index
+        }
+        let unique = (0..<size).map { $0 * radix + $0 }
+        var shuffled = unique
+        if size > 1 {
+          for index in stride(from: size - 1, through: 1, by: -1) {
+            state = state &* 6_364_136_223_846_793_005 &+ 1_442_695_040_888_963_407
+            shuffled.swapAt(index, Int(state % UInt64(index + 1)))
+          }
+        }
+        let ordered = random.sorted { $0 / radix < $1 / radix }
+        var candidates = [random, Array(random.reversed()), ordered, unique, Array(unique.reversed()), shuffled]
+        if size >= 64 {
+          let middle = size / 2
+          candidates.append(Array(unique[middle..<size]) + Array(unique[0..<middle]))
+        }
+        for candidate in candidates {
+          var engine = RecordingEngine(values: candidate, operationCap: 10_000_000, comparisonKeyForTesting: { $0 / radix })
+          algorithm.record(into: &engine)
+          let output = engine.values
+          #expect(output.map { $0 / radix } == candidate.map { $0 / radix }.sorted(), "size=\(size) seed=\(seed)")
+          let positions = Dictionary(uniqueKeysWithValues: candidate.enumerated().map { ($0.element, $0.offset) })
+          for index in 1..<max(1, output.count) where output[index - 1] / radix == output[index] / radix {
+            if let earlier = positions[output[index - 1]], let later = positions[output[index]] {
+              #expect(earlier < later, "size=\(size) seed=\(seed)")
+            } else {
+              Issue.record("Tim Sort changed an input value at size \(size), seed \(seed)")
+            }
+          }
+        }
+      }
+    }
+  }
+
+  @Test
+  func adaptiveGrailSortHandlesNaturalRunsAndStableTies() {
+    let algorithm = AdaptiveGrailSort()
+    let radix = 4_096
+    for size in [0, 1, 2, 15, 16, 17, 30, 31, 32, 62, 63, 64, 65, 127, 128, 129, 255, 256, 257, 511, 512, 1024] {
+      for seed in 0..<12 {
+        var state = UInt64(size * 1_009 + seed + 1)
+        let input = (0..<size).map { index in
+          state = state &* 6_364_136_223_846_793_005 &+ 1_442_695_040_888_963_407
+          return Int(state % 9) * radix + index
+        }
+        let fewKeys = input.map { ($0 / radix % 3) * radix + $0 % radix }
+        let manyKeys = input.map { index in
+          state = state &* 6_364_136_223_846_793_005 &+ 1_442_695_040_888_963_407
+          return Int(state % 24) * radix + index % radix
+        }
+        let mediumKeys = input.map { index in
+          state = state &* 6_364_136_223_846_793_005 &+ 1_442_695_040_888_963_407
+          return Int(state % 12) * radix + index % radix
+        }
+        let unique = (0..<size).map { $0 * radix + $0 }
+        var shuffled = unique
+        if size > 1 {
+          for index in stride(from: size - 1, through: 1, by: -1) {
+            state = state &* 6_364_136_223_846_793_005 &+ 1_442_695_040_888_963_407
+            shuffled.swapAt(index, Int(state % UInt64(index + 1)))
+          }
+        }
+        for candidate in [input, Array(input.reversed()), fewKeys, mediumKeys, manyKeys, unique, Array(unique.reversed()), shuffled] {
+          var engine = RecordingEngine(values: candidate, operationCap: 4_000_000, comparisonKeyForTesting: { $0 / radix })
+          algorithm.record(into: &engine)
+          let output = engine.values
+          #expect(output.map { $0 / radix } == candidate.map { $0 / radix }.sorted(), "size=\(size) seed=\(seed)")
+          let positions = Dictionary(uniqueKeysWithValues: candidate.enumerated().map { ($0.element, $0.offset) })
+          for index in 1..<max(1, output.count) where output[index - 1] / radix == output[index] / radix {
+            if let earlier = positions[output[index - 1]], let later = positions[output[index]] {
+              #expect(earlier < later, "size=\(size) seed=\(seed)")
+            } else {
+              Issue.record("Adaptive Grail Sort changed an input value at size \(size), seed \(seed)")
+            }
+          }
+        }
+      }
+    }
+  }
+
+  @Test
+  func synchronousSqrtSortHandlesBlockBoundariesAndStableTies() {
+    let algorithm = SynchronousSqrtSort()
+    let radix = 4_096
+    for size in [0, 1, 2, 15, 16, 17, 24, 31, 32, 33, 63, 64, 65, 127, 128, 129, 255, 256, 257, 511, 512, 513, 1024, 1780, 2048] {
+      for seed in 0..<12 {
+        var state = UInt64(size * 1_009 + seed + 1)
+        let input = (0..<size).map { index in
+          state = state &* 6_364_136_223_846_793_005 &+ 1_442_695_040_888_963_407
+          return Int(state % 9) * radix + index
+        }
+        for candidate in [input, Array(input.reversed()), Array(0..<size), Array((0..<size).reversed())] {
+          var engine = RecordingEngine(values: candidate, operationCap: 4_000_000, comparisonKeyForTesting: { $0 / radix })
+          algorithm.record(into: &engine)
+          let output = engine.values
+          #expect(output.map { $0 / radix } == candidate.map { $0 / radix }.sorted(), "size=\(size) seed=\(seed)")
+          let positions = Dictionary(uniqueKeysWithValues: candidate.enumerated().map { ($0.element, $0.offset) })
+          for index in 1..<max(1, output.count) where output[index - 1] / radix == output[index] / radix {
+            if let earlier = positions[output[index - 1]], let later = positions[output[index]] {
+              #expect(earlier < later, "size=\(size) seed=\(seed)")
+            } else {
+              Issue.record("Synchronous Sqrt Sort changed an input value at size \(size), seed \(seed)")
+            }
+          }
+        }
+      }
+    }
+  }
+
+  @Test
+  func sqrtSortHandlesBlockBoundariesAndStableTies() {
+    let algorithm = SqrtSort()
+    let radix = 4_096
+    for size in [0, 1, 2, 15, 16, 17, 31, 32, 33, 63, 64, 65, 127, 128, 129, 255, 256, 257, 511, 512, 513, 1024, 1382, 2048] {
+      for seed in 0..<12 {
+        var state = UInt64(size * 1_009 + seed + 1)
+        let input = (0..<size).map { index in
+          state = state &* 6_364_136_223_846_793_005 &+ 1_442_695_040_888_963_407
+          return Int(state % 9) * radix + index
+        }
+        for candidate in [input, Array(input.reversed()), Array(0..<size), Array((0..<size).reversed())] {
+          var engine = RecordingEngine(values: candidate, operationCap: 4_000_000, comparisonKeyForTesting: { $0 / radix })
+          algorithm.record(into: &engine)
+          let output = engine.values
+          #expect(output.map { $0 / radix } == candidate.map { $0 / radix }.sorted(), "size=\(size) seed=\(seed)")
+          let positions = Dictionary(uniqueKeysWithValues: candidate.enumerated().map { ($0.element, $0.offset) })
+          for index in 1..<max(1, output.count) where output[index - 1] / radix == output[index] / radix {
+            if let earlier = positions[output[index - 1]], let later = positions[output[index]] {
+              #expect(earlier < later, "size=\(size) seed=\(seed)")
+            } else {
+              Issue.record("Sqrt Sort changed an input value at size \(size), seed \(seed)")
+            }
+          }
+        }
+      }
+    }
+  }
+
+  @Test
+  func ectaSortHandlesBlockBoundariesAndStableTies() {
+    let algorithm = EctaSort()
+    let radix = 4_096
+    for size in [0, 1, 2, 31, 32, 33, 63, 64, 65, 127, 128, 129, 255, 256, 257, 511, 512, 513, 1024, 1446, 2048] {
+      for seed in 0..<20 {
+        var state = UInt64(size * 1_009 + seed + 1)
+        let input = (0..<size).map { index in
+          state = state &* 6_364_136_223_846_793_005 &+ 1_442_695_040_888_963_407
+          return Int(state % 9) * radix + index
+        }
+        for candidate in [input, Array(input.reversed()), Array(0..<size), Array((0..<size).reversed())] {
+          var engine = RecordingEngine(
+            values: candidate, operationCap: 4_000_000,
+            comparisonKeyForTesting: { $0 / radix }
+          )
+          algorithm.record(into: &engine)
+          let output = engine.values
+          #expect(output.map { $0 / radix } == candidate.map { $0 / radix }.sorted(), "size=\(size) seed=\(seed)")
+          let positions = Dictionary(uniqueKeysWithValues: candidate.enumerated().map { ($0.element, $0.offset) })
+          for index in 1..<max(1, output.count) where output[index - 1] / radix == output[index] / radix {
+            if let earlier = positions[output[index - 1]], let later = positions[output[index]] {
+              #expect(earlier < later, "size=\(size) seed=\(seed)")
+            } else {
+              Issue.record("Ecta Sort changed an input value at size \(size), seed \(seed)")
+            }
+          }
+        }
+      }
+    }
+  }
+
+  @Test
+  func optimizedRotateMergeSortHandlesBufferBoundaryAndStableTies() {
+    let algorithm = OptimizedRotateMergeSort()
+    let radix = 4_096
+    for size in [0, 1, 2, 31, 32, 33, 63, 64, 65, 127, 128, 129, 255, 256, 257, 511, 512, 513, 1024, 1813, 2048] {
+      for seed in 0..<20 {
+        var state = UInt64(size * 1_009 + seed + 1)
+        let input = (0..<size).map { index in
+          state = state &* 6_364_136_223_846_793_005 &+ 1_442_695_040_888_963_407
+          return Int(state % 9) * radix + index
+        }
+        for candidate in [input, Array(input.reversed()), Array(0..<size), Array((0..<size).reversed())] {
+          var engine = RecordingEngine(
+            values: candidate, operationCap: 4_000_000,
+            comparisonKeyForTesting: { $0 / radix }
+          )
+          algorithm.record(into: &engine)
+          #expect(engine.values.map { $0 / radix } == candidate.map { $0 / radix }.sorted(), "size=\(size) seed=\(seed) input=\(candidate) output=\(engine.values)")
+          let output = engine.values
+          let inputPositions = Dictionary(uniqueKeysWithValues: candidate.enumerated().map { ($0.element, $0.offset) })
+          for index in 1..<max(1, output.count) where output[index - 1] / radix == output[index] / radix {
+            if let earlier = inputPositions[output[index - 1]], let later = inputPositions[output[index]] {
+              #expect(earlier < later, "size=\(size) seed=\(seed) input=\(candidate) output=\(output)")
+            } else {
+              Issue.record("Output contains a value absent from input at size \(size), seed \(seed): \(output)")
+            }
+          }
+        }
+      }
+    }
+  }
+
+  @Test
   func multiWayMergeClusterSortsAndRecordsDeterministically() {
     for algorithm in [RemiSort(), FlanSort()] as [any SortAlgorithm] {
       for size in [2, 15, 16, 31, 32, 33, 63, 64, 127, 128, 256, 512] {
@@ -66,47 +423,176 @@ struct NativeAlgorithmCorrectnessTests {
     #expect(sawFlanReorder, "expected to witness Flan Sort's claimed instability")
   }
 
-  private static let algorithms: [any SortAlgorithm] = [
-    AATreeSort(), AVLTreeSort(), AmericanFlagSort(), AsynchronousSort(), BadSort(), BaseNMaxHeapSort(),
-    BinaryDoubleInsertionSort(), BinaryGnomeSort(), BinaryInsertionSort(), BinaryMergeSort(),
-    BinaryQuickSortIterative(), BinaryQuickSortRecursive(), BingoSort(), BinomialHeapSort(), BinomialSmoothSort(),
-    BitonicSortIterative(), BitonicSortRecursive(), BlockInsertionSort(), BlockSwapMergeSort(), BogoBogoSort(),
-    BogoSort(), BoseNelsonSortIterative(), BoseNelsonSortRecursive(), BottomUpHeapSort(), BottomUpMergeSort(),
-    BozoSort(), BubbleBogoSort(), BubbleSort(), BufferedStoogeSort(), BurntPancakeSort(), CircleSortIterative(),
-    CircleSortRecursive(), CircloidSort(), ClassicGravitySort(), ClassicThreeSmoothCombSort(), ClassicTournamentSort(),
-    ClassicTreeSort(), CocktailBogoSort(), CocktailMergeSort(), CocktailShakerSort(), CombSort(), CompleteGraphSort(),
-    CountingSort(), CreaseSort(), CycleSort(), DeterministicBogoSort(), DiamondSortIterative(), DiamondSortRecursive(),
-    DoubleInsertionSort(), DoubleSelectionSort(), DropMergeSort(), DualPivotQuickSort(), ExchangeBogoSort(),
-    FlashSort(), FlippedMinHeapSort(), FlanSort(), FluxSort(), FoldSort(), ForcedStableQuickSort(), FunSort(), GnomeSort(),
-    GrailSort(), GravitySort(), GuessSort(), HanoiSort(), HybridCombSort(), ImprovedBlockSelectionSort(),
-    ImprovedInPlaceMergeSort(), InPlaceLSDRadixSort(), InPlaceMergeSort(), InsertionSort(), IntroCircleSortIterative(),
-    IntroCircleSortRecursive(), IntroSort(), IterativeTopDownMergeSort(), LaziestSort(), LazyHeapSort(),
-    LazyStableSort(), LessBogoSort(), LibrarySort(), LLQuickSort(), LRQuickSort(), LSDRadixSort(), MatrixSort(),
-    MaxHeapSort(), MedianQuickBogoSort(), MergeBogoSort(), MergeExchangeSortIterative(), MergeInsertionSort(),
-    MergeSort(), MinHeapSort(), MinMaxHeapSort(), MSDRadixSort(), NewShuffleMergeSort(), OddEvenMergeSortIterative(),
-    OddEvenMergeSortRecursive(), OddEvenSort(), OptimizedBottomUpMergeSort(), OptimizedBubbleSort(),
-    OptimizedCocktailShakerSort(), OptimizedDualPivotQuickSort(), OptimizedGnomeSort(), OptimizedGuessSort(),
-    OptimizedLazyStableSort(), OptimizedStoogeSort(), OptimizedStoogeSortStudio(), OptimizedWeaveMergeSort(),
-    OutOfPlaceHeapSort(), PairwiseMergeSortIterative(), PairwiseMergeSortRecursive(), PairwiseSortIterative(),
-    PairwiseSortRecursive(), PancakeInsertionSort(), PancakeSort(), PatienceSort(), PDMergeSort(), PDQBranchedSort(),
-    PDQBranchlessSort(), PigeonholeSort(), PoplarHeapSort(), QuadSort(), QuadStoogeSort(), QuickBogoSort(), QuickSort(),
-    RandomGuessSort(), RemiSort(), RecursiveShellSort(), RedBlackTreeSort(), RotateLSDRadixSort(), RotateMergeSort(),
-    RotateMSDRadixSort(), SelectionBogoSort(), SelectionSort(), ShatterSort(), ShellSort(), ShoveSort(), SillySort(),
-    SimpleShatterSort(), SimplifiedLibrarySort(), SimplisticGravitySort(), SlopeSort(), SlowSort(), SmartBogoBogoSort(),
-    SmartGuessSort(), SmoothSort(), SnuffleSort(), SplaySort(), StableCycleSort(), StablePermutationSort(),
-    StableQuickSort(), StableSelectionSort(), StacklessAmericanFlagSort(), StacklessBinaryQuickSort(),
-    StacklessDualPivotQuickSort(), StacklessHybridQuickSort(), StacklessRotateMergeSort(), StaticSort(), StoogeSort(),
-    StrandSort(), SwaplessBubbleSort(), TableSort(), TernaryHeapSort(), TernaryLLQuickSort(), TernaryLRQuickSort(),
-    ThreeSmoothCombSortIterative(), ThreeSmoothCombSortRecursive(), TimeSort(), TournamentSort(), TreeSort(),
-    TriangularHeapSort(), TwinSort(), UnoptimizedBubbleSort(), UnoptimizedCocktailShakerSort(), UnstableGrailSort(),
-    WeakHeapSort(), WeavedMergeSort(), WeaveMergeSort(), WeaveSortIterative(), WeaveSortRecursive(),
-    YujisBufferedMergeSort2()
-  ]
+  // Derive the universal correctness corpus from the same fixture used by calibration and
+  // performance tests. Only Index Sort (permutation-only input) needs a dedicated input
+  // contract below; Andrey Sort's duplicate-heavy fallback must pass this universal corpus.
+  private static let algorithms: [any SortAlgorithm] = AllBuiltInAlgorithms.sorts.filter {
+    !($0 is IndexSort)
+  }
 
   @Test
-  func everyAlgorithmHasAUniqueID() {
-    let ids = Self.algorithms.map(\.id)
+  func everyShippedAlgorithmHasAUniqueID() {
+    let ids = AllBuiltInAlgorithms.sorts.map(\.id)
     #expect(Set(ids).count == ids.count, "duplicate AlgorithmID across native algorithms")
+  }
+
+  @Test
+  func medianMergeSortHandlesPartitionsAndDuplicates() {
+    let sort = MedianMergeSort()
+    for size in [0, 1, 2, 15, 16, 17, 31, 32, 63, 64, 127, 256, 511] {
+      let inputs = [
+        Array(repeating: 7, count: size),
+        Array(0..<size),
+        Array((0..<size).reversed()),
+        (0..<size).map { ($0 * 17) % 9 },
+        (0..<size).map { _ in Int.random(in: -size...size) },
+        (0..<size).map { min($0, size - 1 - $0) },
+        (0..<size).map { $0.isMultiple(of: 3) ? 0 : $0 }
+      ]
+      for input in inputs {
+        var engine = RecordingEngine(values: input)
+        sort.record(into: &engine)
+        #expect(engine.values == input.sorted(), "Median Merge failed size \(size): \(input) -> \(engine.values)")
+      }
+      for _ in 0..<50 where size > 16 {
+        let input = (0..<size).map { _ in Int.random(in: -8...8) }
+        var engine = RecordingEngine(values: input)
+        sort.record(into: &engine)
+        #expect(engine.values == input.sorted(), "Median Merge failed duplicate-heavy fuzz at size \(size)")
+      }
+    }
+  }
+
+  @Test
+  func fifthMergeSortHandlesFifthAndPingPongBoundaries() {
+    let sort = FifthMergeSort()
+    let sizes = [0, 1, 2, 4, 5, 6, 7, 8, 9, 15, 16, 17, 31, 32, 39, 40, 41, 63, 64, 65, 127, 128, 129, 255, 256, 257, 511]
+    for size in sizes {
+      var state = UInt64(size * 7_919 + 1)
+      let random = (0..<size).map { _ in
+        state = state &* 6_364_136_223_846_793_005 &+ 1_442_695_040_888_963_407
+        return Int(state % 31) - 15
+      }
+      let inputs = [
+        random,
+        Array(repeating: 3, count: size),
+        Array(0..<size),
+        Array((0..<size).reversed()),
+        (0..<size).map { ($0 * 17) % 7 }
+      ]
+      for input in inputs {
+        var engine = RecordingEngine(values: input, operationCap: 2_000_000)
+        sort.record(into: &engine)
+        #expect(engine.values == input.sorted(), "Fifth Merge failed size \(size): \(input) -> \(engine.values)")
+      }
+    }
+  }
+
+  @Test
+  func fifthMergeSortIsStable() {
+    let sort = FifthMergeSort()
+    let radix = 4_096
+    for size in [5, 8, 9, 16, 31, 32, 40, 41, 64, 127, 256] {
+      for seed in 0..<40 {
+        var state = UInt64(size * 12_289 + seed + 1)
+        let input = (0..<size).map { index in
+          state = state &* 6_364_136_223_846_793_005 &+ 1_442_695_040_888_963_407
+          return Int(state % 5) * radix + index
+        }
+        var engine = RecordingEngine(
+          values: input,
+          operationCap: 2_000_000,
+          comparisonKeyForTesting: { $0 / radix }
+        )
+        sort.record(into: &engine)
+        let output = engine.values
+        #expect(output.map { $0 / radix } == input.map { $0 / radix }.sorted())
+        for i in 1..<size where output[i - 1] / radix == output[i] / radix {
+          #expect(
+            output[i - 1] % radix < output[i] % radix,
+            "Fifth Merge reordered equal values at size \(size), seed \(seed)"
+          )
+        }
+      }
+    }
+  }
+
+  @Test
+  func bufferPartitionMergeSortHandlesBufferBoundariesAndIsUnstable() {
+    let sort = BufferPartitionMergeSort()
+    let sizes = [0, 1, 2, 3, 4, 5, 7, 8, 15, 16, 17, 31, 32, 33, 63, 64, 65, 127, 128, 129, 255, 256, 257, 511]
+    for size in sizes {
+      var state = UInt64(size * 15487 + 3)
+      let random = (0..<size).map { _ in
+        state = state &* 6_364_136_223_846_793_005 &+ 1_442_695_040_888_963_407
+        return Int(state % 41) - 20
+      }
+      let inputs = [
+        random,
+        Array(repeating: 4, count: size),
+        Array(0..<size),
+        Array((0..<size).reversed()),
+        (0..<size).map { ($0 * 23) % 9 },
+        (0..<size).map { min($0, size - 1 - $0) },
+      ]
+      for input in inputs {
+        var engine = RecordingEngine(values: input, operationCap: 2_000_000)
+        sort.record(into: &engine)
+        #expect(
+          engine.values == input.sorted(),
+          "Buffer Partition Merge failed size \(size): \(input) -> \(engine.values)"
+        )
+      }
+    }
+
+    let radix = 4096
+    var foundReordering = false
+    for size in [17, 31, 32, 33, 64, 127] where !foundReordering {
+      for seed in 0..<40 where !foundReordering {
+        var state = UInt64(size * 32771 + seed + 1)
+        let input = (0..<size).map { index in
+          state = state &* 6_364_136_223_846_793_005 &+ 1_442_695_040_888_963_407
+          return Int(state % 5) * radix + index
+        }
+        var engine = RecordingEngine(
+          values: input,
+          operationCap: 2_000_000,
+          comparisonKeyForTesting: { $0 / radix }
+        )
+        sort.record(into: &engine)
+        let output = engine.values
+        #expect(output.map { $0 / radix } == input.map { $0 / radix }.sorted())
+        foundReordering = zip(output, output.dropFirst()).contains { left, right in
+          left / radix == right / radix && left % radix > right % radix
+        }
+      }
+    }
+    #expect(foundReordering, "expected buffer partitioning to reorder at least one equal-key pair")
+  }
+
+  @Test
+  func lazierestSortHandlesCubeRootBlockBoundaries() {
+    let sort = LazierestSort()
+    for size in [0, 1, 2, 16, 17, 26, 27, 28, 63, 64, 65, 124, 125, 126, 255, 256, 257, 512] {
+      let cases = [
+        Array(repeating: 3, count: size),
+        Array(0..<size),
+        Array((0..<size).reversed()),
+        (0..<size).map { ($0 * 19) % 11 },
+        (0..<size).map { min($0, size - 1 - $0) }
+      ]
+      for input in cases {
+        var engine = RecordingEngine(values: input)
+        sort.record(into: &engine)
+        #expect(engine.values == input.sorted(), "Lazierest failed size \(size): \(input) -> \(engine.values)")
+      }
+      for _ in 0..<30 where size > 16 {
+        let input = (0..<size).map { _ in Int.random(in: -8...8) }
+        var engine = RecordingEngine(values: input)
+        sort.record(into: &engine)
+        #expect(engine.values == input.sorted(), "Lazierest duplicate fuzz failed at size \(size)")
+      }
+    }
   }
 
   @Test
@@ -177,6 +663,108 @@ struct NativeAlgorithmCorrectnessTests {
         \(input) -> \(engine.values)
         """
       )
+    }
+  }
+
+  /// The universal checks above use each algorithm's minimum size. Exercise a second,
+  /// app-reachable size for practical algorithms so a new port cannot pass only its smallest
+  /// case while failing once its loops or buffers have more than one block to process.
+  @Test
+  func practicalAlgorithmsSortAtASecondReachableSize() {
+    var exercised = 0
+    for algorithm in Self.algorithms where algorithm.metadata.category != .impractical {
+      let range = algorithm.metadata.effectiveSizeRange(
+        operationCap: RecordingEngine.defaultOperationCap)
+      guard range.upperBound > range.lowerBound else { continue }
+      let size = min(max(range.lowerBound + 1, 32), range.upperBound)
+      var state = UInt64(size * 1_009 + algorithm.id.rawValue.utf8.reduce(0) { $0 + Int($1) })
+      let input = (0..<size).map { _ in
+        state = state &* 6_364_136_223_846_793_005 &+ 1_442_695_040_888_963_407
+        return Int(state % 17)
+      }
+      var engine = RecordingEngine(values: input)
+      algorithm.record(into: &engine)
+      exercised += 1
+      #expect(
+        engine.values == input.sorted(),
+        "\(algorithm.id.rawValue) failed at reachable size \(size): \(input) -> \(engine.values)"
+      )
+    }
+    #expect(exercised > 100, "the second-size check covered too few practical algorithms")
+  }
+
+  /// These implementations have distinct merge/partition paths above their minimum run size.
+  /// The universal corpus's 16- or 32-element inputs do not enter those paths.
+  @Test
+  func largerMergeAndPartitionPathsSortDifferentInputShapes() {
+    let algorithms: [any SortAlgorithm] = [
+      CocktailMergeSort(), IntroSort(), BinaryMergeSort(), StaticSort(),
+    ]
+    for algorithm in algorithms {
+      for size in [64, 128, 257] {
+        var state = UInt64(size * 1_009 + algorithm.id.rawValue.utf8.reduce(0) { $0 + Int($1) })
+        let duplicates = (0..<size).map { _ in
+          state = state &* 6_364_136_223_846_793_005 &+ 1_442_695_040_888_963_407
+          return Int(state % 17) - 8
+        }
+        let ascending = Array(0..<size)
+        for input in [duplicates, ascending, Array(ascending.reversed())] {
+          var engine = RecordingEngine(values: input, operationCap: 2_000_000)
+          algorithm.record(into: &engine)
+          #expect(engine.values == input.sorted(), "\(algorithm.id.rawValue) failed at size \(size)")
+        }
+      }
+    }
+  }
+
+  /// Both algorithms promise stability, including when a run boundary splits equal keys.
+  /// The low bits preserve each element's original identity while comparisons use only the key.
+  @Test
+  func mergeVariantsPreserveEqualKeyOrderAcrossRunBoundaries() {
+    let radix = 1_024
+    for algorithm in [CocktailMergeSort() as any SortAlgorithm, BinaryMergeSort()] {
+      for size in [33, 64, 127, 256] {
+        var state = UInt64(size * 1_009 + 17)
+        let input = (0..<size).map { index in
+          state = state &* 6_364_136_223_846_793_005 &+ 1_442_695_040_888_963_407
+          return Int(state % 7) * radix + index
+        }
+        let expected = input.sorted { $0 / radix < $1 / radix }
+        var engine = RecordingEngine(
+          values: input, operationCap: 2_000_000,
+          comparisonKeyForTesting: { $0 / radix })
+        algorithm.record(into: &engine)
+        #expect(engine.values == expected, "\(algorithm.id.rawValue) lost stability at size \(size)")
+      }
+    }
+  }
+
+  /// A single large bucket must reach Static Sort's heap finishing path, while a broad value
+  /// range keeps its cycle-placement path active on a second pass.
+  @Test
+  func staticSortHandlesLargeEqualBucketsAndWideValues() {
+    for input in [
+      Array(repeating: 7, count: 64),
+      (0..<64).map { $0.isMultiple(of: 2) ? -10_000 + $0 : 10_000 - $0 },
+    ] {
+      var engine = RecordingEngine(values: input, operationCap: 2_000_000)
+      StaticSort().record(into: &engine)
+      #expect(engine.values == input.sorted())
+    }
+  }
+
+  @Test
+  func introSortHandlesAdversarialMedianOfThreePatternsAtItsMaximumSize() {
+    let size = IntroSort().metadata.sizeRange.upperBound
+    let patterns = [
+      (0..<size).map { min($0, size - 1 - $0) },
+      Array(stride(from: 0, to: size, by: 2)) + Array(stride(from: 1, to: size, by: 2)),
+      (0..<size).map { $0 % 7 },
+    ]
+    for input in patterns {
+      var engine = RecordingEngine(values: input, operationCap: 2_000_000)
+      IntroSort().record(into: &engine)
+      #expect(engine.values == input.sorted())
     }
   }
 
@@ -1653,6 +2241,65 @@ struct NativeAlgorithmCorrectnessTests {
     expectStable(GrailSort(), size: 64)
   }
 
+  @Test
+  func circularGrailSortHandlesCircularBlockBoundariesAndIsUnstable() {
+    let algorithm = CircularGrailSort()
+    for size in [0, 1, 2, 15, 16, 17, 31, 32, 33, 63, 64, 65, 127, 128, 129, 255, 256, 257, 511] {
+      let cases = [
+        Array(repeating: 3, count: size),
+        Array(0..<size),
+        Array((0..<size).reversed()),
+        (0..<size).map { ($0 * 17) % 7 },
+        (0..<size).map { min($0, max(0, size - 1 - $0)) },
+      ]
+      for input in cases {
+        var engine = RecordingEngine(values: input, operationCap: 2_000_000)
+        algorithm.record(into: &engine)
+        #expect(
+          engine.values == input.sorted(),
+          "Circular Grail failed at size \(size): \(input) -> \(engine.values)"
+        )
+      }
+    }
+
+    for size in [17, 32, 33, 64, 127, 256] {
+      for _ in 0..<100 {
+        let input = (0..<size).map { _ in Int.random(in: 0...3) }
+        var engine = RecordingEngine(values: input, operationCap: 2_000_000)
+        algorithm.record(into: &engine)
+        #expect(
+          engine.values == input.sorted(),
+          "Circular Grail duplicate-heavy fuzz failed at size \(size)"
+        )
+      }
+    }
+
+    let size = 64
+    var sawReordering = false
+    for _ in 0..<100 {
+      let input = (0..<size).map { _ in Int.random(in: 0...3) }
+      var engine = RecordingEngine(values: input, operationCap: 2_000_000)
+      algorithm.record(into: &engine)
+      var shadow = Array(0..<size)
+      for operation in engine.finish().tape {
+        if case .swap(let i, let j) = operation { shadow.swapAt(i, j) }
+      }
+      var originalIndicesByValueInFinalOrder: [Int: [Int]] = [:]
+      for finalPosition in 0..<size {
+        let originalIndex = shadow[finalPosition]
+        originalIndicesByValueInFinalOrder[input[originalIndex], default: []].append(originalIndex)
+      }
+      if originalIndicesByValueInFinalOrder.values.contains(where: { $0 != $0.sorted() }) {
+        sawReordering = true
+        break
+      }
+    }
+    #expect(
+      sawReordering,
+      "expected Circular Grail's whole-block swaps to reorder equal values across block boundaries"
+    )
+  }
+
   /// `lazyStableSort` has no small-size special case (just pairwise compare-swap + doubling
   /// merge), so `sizeRange.lowerBound` already exercises the real logic.
   @Test
@@ -1720,28 +2367,11 @@ struct NativeAlgorithmCorrectnessTests {
     }
   }
 
-  /// `AndreySort` is deliberately NOT in `Self.algorithms` above: it has a real, confirmed bug
-  /// inherited from ArrayV's own Java (not a translation artifact — verified by transcribing
-  /// `sort`/`aswap`/`backmerge`/`rmerge`/`rbnd`/`msort` to a standalone Java program with no
-  /// ArrayV dependencies and reproducing the same wrong output on the same input), specific to
-  /// heavy-duplicate arrays: `rmerge`'s block-selection picks the block with the smallest
-  /// *leading* element and moves the whole block into place, which silently assumes no other
-  /// pending block can contain a value smaller than this block's own trailing values — an
-  /// assumption duplicates can violate. Measured failure rate ~1-8% depending on size, using
-  /// random 3-value duplicate-heavy input across sizes 12-256 (a real but narrow defect, not
-  /// "usually wrong" the way `FunSort` was before it got replaced). This is a known, documented
-  /// weakness of this specific (earlier, simpler) member of Andrey Astrelin's merge-sort lineage —
-  /// his own later, more robust `GrailSort` (already shipped separately in this codebase)
-  /// explicitly added fallback handling for exactly this "not enough unique keys" scenario, which
-  /// this simpler algorithm never had. Kept and shipped (unlike `FunSort`) because the failure
-  /// rate is low and confined to heavy-duplicate input, but excluded from the generic suite's
-  /// `Self.algorithms` so its rare failures don't make this whole test suite flaky. This dedicated
-  /// test instead confirms it sorts reliably on every OTHER input shape (already-sorted,
-  /// reverse-sorted, and randomized inputs without heavy duplication) across a wide size range,
-  /// and separately measures the duplicate-heavy failure rate stays low rather than silently
-  /// regressing further.
+  /// ArrayV's block merge can leave duplicate-heavy values unsorted. This regression runs the
+  /// in-place repair path over many reproducible low-diversity inputs; the universal suite above
+  /// also includes Andrey Sort on all ordinary shapes now.
   @Test
-  func andreySortSortsReliablyExceptOnHeavyDuplicates() {
+  func andreySortRepairsHeavyDuplicateFailures() {
     let algorithm = AndreySort()
     for size in [
       algorithm.metadata.sizeRange.lowerBound, 12, 13, 17, 20, 24, 32, 63, 64, 100, 200, 256
@@ -1762,19 +2392,18 @@ struct NativeAlgorithmCorrectnessTests {
       }
     }
 
-    var failures = 0
     let trials = 300
-    for _ in 0..<trials {
+    var seed: UInt64 = 0xa11d_0e
+    for trial in 0..<trials {
       let size = 100
-      let input = (0..<size).map { _ in Int.random(in: 0...2) }
+      let input = (0..<size).map { _ in
+        seed = seed &* 6_364_136_223_846_793_005 &+ 1
+        return Int((seed >> 32) % 3)
+      }
       var engine = RecordingEngine(values: input)
       algorithm.record(into: &engine)
-      if engine.values != input.sorted() { failures += 1 }
+      #expect(engine.values == input.sorted(), "Andrey Sort failed duplicate trial \(trial)")
     }
-    #expect(
-      failures < trials / 10,
-      "expected andreysort's known duplicate-heavy failure rate to stay under 10%, saw \(failures)/\(trials)"
-    )
   }
 
   /// Extra scrutiny for the 5 newly-ported `sorts/insert/` Hard-tier algorithms, matching the

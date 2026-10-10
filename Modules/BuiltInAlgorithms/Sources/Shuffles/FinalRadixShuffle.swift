@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -7,7 +8,7 @@ import SortEngineKit
 /// a 2-bucket LSD radix sort would need to finish.
 public struct FinalRadixShuffle: ShuffleAlgorithm {
   public let id = ShuffleID(rawValue: "finalradix")
-  public let metadata = ShuffleMetadata(displayName: "Final Radix")
+  public let metadata = ShuffleMetadata(displayName: String(localized: "Final Radix", bundle: .module))
   public init() {}
   public func record(into engine: inout RecordingEngine) {
     let evenLength = engine.count - engine.count % 2

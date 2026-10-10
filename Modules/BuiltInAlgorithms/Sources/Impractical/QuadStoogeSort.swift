@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -15,7 +16,7 @@ import SortEngineKit
 public struct QuadStoogeSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "quadstoogesort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Quad Stooge Sort",
+    displayName: String(localized: "Quad Stooge Sort", bundle: .module),
     category: .impractical,
     sizeRange: 16...48,
     growthModel: OperationGrowthModel(
@@ -41,6 +42,11 @@ public struct QuadStoogeSort: SortAlgorithm {
   private func quadStooge(_ engine: inout RecordingEngine, _ pos: Int, _ len: Int) {
     if len >= 2 && engine.compare(pos, pos + len - 1, by: >) {
       engine.swap(pos, pos + len - 1)
+      engine.annotateLastOperation(
+        stageID: "candidateExchange", decisionID: "quadstoogesort.candidateExchange",
+        outcome: "exchange", roles: ["left": .arrayIndex(pos), "right": .arrayIndex(pos + len - 1)],
+        explanationKey: "quadstoogesort.candidateExchange",
+        explanation: String(localized: "The endpoints of this active range are inverted, so exchange them.", bundle: .module))
     }
     guard len > 2 else { return }
 

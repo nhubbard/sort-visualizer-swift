@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -18,7 +19,7 @@ import SortEngineKit
 public struct StableQuickSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "stablequicksort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Stable Quick Sort",
+    displayName: String(localized: "Stable Quick Sort", bundle: .module),
     category: .exchange,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -51,7 +52,11 @@ public struct StableQuickSort: SortAlgorithm {
     var rightList: [Int] = []
 
     for i in (start + 1)...end {
-      if engine.readValue(at: i) < pivotValue {
+      if engine.teachingCompareValue(
+        i, against: pivotValue, by: <, stageID: "StableQuickSort.stablePartition",
+        whenTrue: String(localized: "This item is smaller than the pivot, so append it to the stable left partition.", bundle: .module),
+        whenFalse: String(localized: "This item is at least the pivot, so append it to the stable right partition.", bundle: .module)
+      ) {
         leftList.append(engine.readValue(at: i))
       } else {
         rightList.append(engine.readValue(at: i))

@@ -12,6 +12,7 @@ def sort(arr):
 
     flag_sort(arr, 0, n, divisor, radix)
 
+
 def digit_at(value, divisor, radix):
     return (value // divisor) % radix
 
@@ -57,12 +58,24 @@ def flag_sort(arr, low, high, divisor, radix):
                 flag_sort(arr, begin, end, divisor // radix, radix)
 
 
-
-
 if __name__ == "__main__":
     array = [
-        0, 39, 21, 62, 91, 77, 14, 23,
-        90, 69, 51, 81, 68, 83, 32, 56,
+        0,
+        39,
+        21,
+        62,
+        91,
+        77,
+        14,
+        23,
+        90,
+        69,
+        51,
+        81,
+        68,
+        83,
+        32,
+        56,
     ]
     sort(array)
     print(array)

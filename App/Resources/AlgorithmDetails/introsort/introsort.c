@@ -2,8 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
-                 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
 
 void swap(int *a, int *b) {
   int t = *a;
@@ -99,9 +98,7 @@ void insertionSort(int arr[], int start, int end) {
   }
 }
 
-int floorLog2(int a) {
-  return (int)floor(log((double)a) / log(2.0));
-}
+int floorLog2(int a) { return (int)floor(log((double)a) / log(2.0)); }
 
 void introsortLoop(int arr[], int lo, int hi, int depthLimit) {
   while (hi - lo > 16) {

@@ -1,8 +1,7 @@
 #include <cstdio>
 #include <vector>
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
-                 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
 
 void printList(int items[], int size) {
   printf("[");
@@ -15,10 +14,11 @@ void printList(int items[], int size) {
   printf("]");
 }
 
-void merge(int arr[], std::vector<int>& scratch, int low, int mid, int high);
+void merge(int arr[], std::vector<int> &scratch, int low, int mid, int high);
 
 void sort(int arr[], int n) {
-  if (n < 2) return;
+  if (n < 2)
+    return;
   std::vector<int> scratch(n);
   int subarrayCount = 1;
   while (subarrayCount < n) {
@@ -36,14 +36,17 @@ void sort(int arr[], int n) {
   }
 }
 
-void merge(int arr[], std::vector<int>& scratch, int low, int mid, int high) {
+void merge(int arr[], std::vector<int> &scratch, int low, int mid, int high) {
   int left = low, right = mid, out = low;
   while (left < mid && right < high) {
     scratch[out++] = arr[left] <= arr[right] ? arr[left++] : arr[right++];
   }
-  while (left < mid) scratch[out++] = arr[left++];
-  while (right < high) scratch[out++] = arr[right++];
-  for (int i = low; i < high; i++) arr[i] = scratch[i];
+  while (left < mid)
+    scratch[out++] = arr[left++];
+  while (right < high)
+    scratch[out++] = arr[right++];
+  for (int i = low; i < high; i++)
+    arr[i] = scratch[i];
 }
 
 int main(int argc, char *argv[]) {

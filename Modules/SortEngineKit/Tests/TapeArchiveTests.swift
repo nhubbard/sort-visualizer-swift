@@ -86,6 +86,20 @@ struct TapeArchiveTests {
   }
 
   @Test
+  func roundTripsTeachingAnnotationsAndKeepsOldPayloadsReadable() throws {
+    let oldTape = makeTape(operations: [.swap(0, 1), .swap(0, 1), .compare(0, 1)])
+    #expect(try Tape(archivedData: oldTape.archived()).teachingAnnotations.isEmpty)
+    let annotation = TeachingAnnotation(
+      operationIndex: 2, stageID: "test.choose", outcome: "left",
+      roles: ["left": .arrayIndex(0), "right": .arrayIndex(1)],
+      explanationKey: "test.choice", explanation: "Choose the left position.")
+    let annotated = Tape(
+      header: oldTape.header, operations: oldTape.operations,
+      teachingAnnotations: [annotation])
+    #expect(try Tape(archivedData: annotated.archived()) == annotated)
+  }
+
+  @Test
   func flippedMagicByteThrowsInvalidMagic() throws {
     let tape = makeTape(operations: [.compare(0, 1)])
     var archived = [UInt8](try tape.archived())

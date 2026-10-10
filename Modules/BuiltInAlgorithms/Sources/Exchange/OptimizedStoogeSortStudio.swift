@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -15,7 +16,7 @@ import SortEngineKit
 public struct OptimizedStoogeSortStudio: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "optimizedstoogesortstudio")
   public let metadata = AlgorithmMetadata(
-    displayName: "Optimized Stooge Sort (Studio)",
+    displayName: String(localized: "Optimized Stooge Sort (Studio)", bundle: .module),
     category: .exchange,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -39,7 +40,13 @@ public struct OptimizedStoogeSortStudio: SortAlgorithm {
 
   @discardableResult
   private func compSwap(_ engine: inout RecordingEngine, _ a: Int, _ b: Int) -> Bool {
-    if engine.compare(a, b, by: >) {
+    if engine.teachingCompare(
+      a, b,
+      by: >,
+      stageID: "OptimizedStoogeSortStudio.endpointOrder",
+      whenTrue: String(localized: "The left endpoint is larger, so exchange the ends before reducing the range.", bundle: .module),
+      whenFalse: String(localized: "The endpoints are ordered before the recursive range checks.", bundle: .module)
+    ) {
       engine.swap(a, b)
       return true
     }

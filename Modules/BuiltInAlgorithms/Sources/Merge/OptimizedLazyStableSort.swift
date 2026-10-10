@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -19,7 +20,7 @@ import SortEngineKit
 public struct OptimizedLazyStableSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "optimizedlazystablesort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Optimized Lazy Stable Sort",
+    displayName: String(localized: "Optimized Lazy Stable Sort", bundle: .module),
     category: .merge,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -52,19 +53,35 @@ public struct OptimizedLazyStableSort: SortAlgorithm {
   private func insertionSort(_ engine: inout RecordingEngine, _ a: Int, _ b: Int) {
     guard b - a > 1 else { return }
     var i = a + 1
-    if engine.compare(i - 1, i, by: >) {
+    if engine.teachingCompare(
+      i - 1, i, by: >,
+      stageID: "OptimizedLazyStableSort.run.direction",
+      whenTrue: String(localized: "The first pair descends, so the sort scans and reverses this run.", bundle: .module),
+      whenFalse: String(localized: "The first pair is nondecreasing, so the sort scans it forward.", bundle: .module)
+    ) {
       i += 1
-      while i < b && engine.compare(i - 1, i, by: >) { i += 1 }
-      engine.reversal(a, i - 1)
+      while i < b && engine.teachingCompare(
+        i - 1, i, by: >, stageID: "optimizedLazy.runDescending",
+        whenTrue: String(localized: "This pair keeps descending, so the run extends before reversal.", bundle: .module),
+        whenFalse: String(localized: "The descending run ends at this pair.", bundle: .module)) { i += 1 }
+      engine.teachingReversal(a, i - 1,
+        stageID: "optimizedLazy.reverseRun",
+        explanation: String(localized: "Reverse the descending run so it can be merged in ascending order.", bundle: .module))
     } else {
       i += 1
-      while i < b && engine.compare(i - 1, i, by: <=) { i += 1 }
+      while i < b && engine.teachingCompare(
+        i - 1, i, by: <=, stageID: "optimizedLazy.runAscending",
+        whenTrue: String(localized: "This pair keeps ascending, so the natural run extends.", bundle: .module),
+        whenFalse: String(localized: "The ascending run ends at this pair.", bundle: .module)) { i += 1 }
     }
 
     while i < b {
       let current = engine.readValue(at: i)
       var pos = i - 1
-      while pos >= a && engine.compareValue(pos, against: current, by: (>)) {
+      while pos >= a && engine.teachingCompareValue(
+        pos, against: current, by: (>), stageID: "optimizedLazy.insert",
+        whenTrue: String(localized: "This run value exceeds the held value, so insertion shifts it right.", bundle: .module),
+        whenFalse: String(localized: "This run value is no greater, so insertion stops here.", bundle: .module)) {
         engine.setValue(pos + 1, engine.readValue(at: pos))
         pos -= 1
       }

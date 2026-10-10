@@ -6,6 +6,7 @@ def sort(arr):
         arr[i], arr[0] = arr[0], arr[i]
         sift_down(arr, 0, i)
 
+
 def sift_down(arr, root, size):
     while True:
         largest = root
@@ -21,12 +22,24 @@ def sift_down(arr, root, size):
         root = largest
 
 
-
-
 if __name__ == "__main__":
     array = [
-        0, 39, 21, 62, 91, 77, 14, 23,
-        90, 69, 51, 81, 68, 83, 32, 56,
+        0,
+        39,
+        21,
+        62,
+        91,
+        77,
+        14,
+        23,
+        90,
+        69,
+        51,
+        81,
+        68,
+        83,
+        32,
+        56,
     ]
     sort(array)
     print(array)

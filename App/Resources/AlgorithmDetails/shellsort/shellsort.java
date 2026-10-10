@@ -5,7 +5,9 @@ public class shellsort {
     int n = arr.length;
     int[] gaps = {8861, 3938, 1750, 701, 301, 132, 57, 23, 10, 4, 1};
     for (int gap : gaps) {
-      if (gap >= n) continue;
+      if (gap >= n) {
+        continue;
+      }
       for (int i = gap; i < n; i++) {
         for (int j = i; j >= gap && arr[j] < arr[j - gap]; j -= gap) {
           int temp = arr[j];

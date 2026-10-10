@@ -1,3 +1,4 @@
+import Foundation
 import SortEngineKit
 import VisualizationKit
 
@@ -12,7 +13,7 @@ import VisualizationKit
 public struct HanoiTowersVisualizer: Visualizer {
   public let id = VisualizerID(rawValue: "hanoitowers")
   public let metadata = VisualizerMetadata(
-    displayName: "Hanoi Towers",
+    displayName: String(localized: "Hanoi Towers", bundle: .module),
     supportsAuxArrays: false,
     iconName: "square.stack.3d.up.fill"
   )

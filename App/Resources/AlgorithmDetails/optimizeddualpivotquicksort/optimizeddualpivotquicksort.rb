@@ -56,11 +56,14 @@ def optimized_dual_pivot_quick_sort(a, left, right, divisor)
     k = less
     while k <= great
       if a[k] == pivot1
-        a[k], a[less] = a[less], a[k]; less += 1
+        a[k], a[less] = a[less], a[k]
+        less += 1
       elsif a[k] == pivot2
-        a[k], a[great] = a[great], a[k]; great -= 1
+        a[k], a[great] = a[great], a[k]
+        great -= 1
         if a[k] == pivot1
-          a[k], a[less] = a[less], a[k]; less += 1
+          a[k], a[less] = a[less], a[k]
+          less += 1
         end
       end
       k += 1
@@ -68,7 +71,6 @@ def optimized_dual_pivot_quick_sort(a, left, right, divisor)
   end
   optimized_dual_pivot_quick_sort(a, less, great, divisor) if pivot1 < pivot2
 end
-
 
 array = [
   55, 12, 84, 3, 47, 91, 26, 68, 8, 73, 40, 97, 15, 62, 34, 79,

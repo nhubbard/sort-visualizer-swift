@@ -1,10 +1,11 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
 public struct OddEvenSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "oddevensort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Odd-Even Sort",
+    displayName: String(localized: "Odd-Even Sort", bundle: .module),
     category: .exchange,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -31,7 +32,13 @@ public struct OddEvenSort: SortAlgorithm {
 
       var i = 1
       while i < n - 1 {
-        if engine.compare(i, i + 1, by: >) {
+        if engine.teachingCompare(
+          i, i + 1,
+          by: >,
+          stageID: "OddEvenSort.phasePair",
+          whenTrue: String(localized: "The left item is larger, so exchange this pair in the current phase.", bundle: .module),
+          whenFalse: String(localized: "This phase leaves the pair in place.", bundle: .module)
+        ) {
           engine.swap(i, i + 1)
           sorted = false
         }

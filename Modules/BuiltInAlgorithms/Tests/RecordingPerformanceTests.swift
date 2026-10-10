@@ -26,7 +26,7 @@ import Testing
 /// RecordingPerformanceTests`. Narrow a run first with `TEST_RUNNER_RECORDING_PERFORMANCE_ALGORITHM_FILTER`/
 /// `TEST_RUNNER_RECORDING_PERFORMANCE_SHUFFLE_FILTER` (substring match against the algorithm/
 /// shuffle's `AlgorithmID`/`ShuffleID` raw value) to sanity-check timing/output shape before a
-/// full, long-running unfiltered sweep across all 177 sorts x 44 shuffles.
+/// full, long-running unfiltered sweep across all 196 sorts x 43 shuffles.
 ///
 /// The `TEST_RUNNER_` prefix on every one of these env vars is not optional decoration --
 /// `xcodebuild test` only forwards a shell environment variable through to the actual test host

@@ -1,3 +1,4 @@
+import Foundation
 import SortEngineKit
 
 /// Ported from ArrayV's `sorts/templates/BinaryQuickSorting` — a shared base class two concrete
@@ -31,8 +32,18 @@ enum BinaryQuickSortingTemplate {
     var i = p - 1
     var j = r + 1
     while true {
-      repeat { i += 1 } while i <= r && !engine.compareValue(i, against: bitIndex, by: isBitSet)
-      repeat { j -= 1 } while j >= p && engine.compareValue(j, against: bitIndex, by: isBitSet)
+      repeat { i += 1 } while i <= r && !engine.teachingCompareValue(
+        i, against: bitIndex, by: isBitSet,
+        stageID: "binaryQuick.bitPartition",
+        whenTrue: String(localized: "This bit is set, so the left scan stops at an item for the right partition.", bundle: .module),
+        whenFalse: String(localized: "This bit is clear, so the left scan advances past an item for the left partition.", bundle: .module)
+      )
+      repeat { j -= 1 } while j >= p && engine.teachingCompareValue(
+        j, against: bitIndex, by: isBitSet,
+        stageID: "binaryQuick.bitPartition",
+        whenTrue: String(localized: "This bit is set, so the right scan advances past an item for the right partition.", bundle: .module),
+        whenFalse: String(localized: "This bit is clear, so the right scan stops at an item for the left partition.", bundle: .module)
+      )
       if i < j {
         engine.swap(i, j)
       } else {

@@ -20,8 +20,6 @@ int knockout(std::vector<int> &array, std::vector<int> &matches, int i, int k,
              int root);
 int rebuild(std::vector<int> &array, std::vector<int> &matches, int root);
 
-
-
 void printList(const std::vector<int> &items) {
   printf("[");
   if (!items.empty()) {
@@ -38,7 +36,7 @@ void sort(std::vector<int> &array) {
   if (n <= 1)
     return;
 
-  std::vector<int> matches(6 * n, 0);
+  std::vector<int> matches(static_cast<size_t>(n) * 6, 0);
   int tourney = knockout(array, matches, 0, n - 1, 3);
 
   std::vector<int> output(n);
@@ -46,15 +44,11 @@ void sort(std::vector<int> &array) {
     output[i] = array[getPlayer(array, matches, tourney)];
     tourney = isPlayer(tourney) ? 0 : rebuild(array, matches, tourney);
   }
-  array = output;
+  array.swap(output);
 }
 
-bool isPlayer(int ref) {
-  return ref <= 0;
-}
-int makePlayer(int index) {
-  return -index;
-}
+bool isPlayer(int ref) { return ref <= 0; }
+int makePlayer(int index) { return -index; }
 
 int getWinner(const std::vector<int> &matches, int root) {
   return matches[root];

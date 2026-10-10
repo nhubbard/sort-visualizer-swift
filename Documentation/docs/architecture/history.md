@@ -30,39 +30,29 @@ the resulting design. This page covers how the app got there.
 | 2 | Build `AlgorithmKit` and one native algorithm (Quick Sort), proving record-then-replay end to end. | Done. |
 | 3 | Build a JavaScript scripting bridge for algorithms, proven with Bubble Sort. | Done, later removed entirely. Every algorithm and shuffle is native Swift, with no scripting layer. |
 | 4 | Build `VisualizationKit` and a first native visualizer (Bar Graph); build the first real sort screen. | Done. Rendering has since moved from `Canvas` to Metal; see [Architecture overview](overview.md#rendering-metal-not-canvas). |
-| 5 | Add a second and third visualizer, proving the visualization axis is independent of the algorithm. | Done. 15 visualizer styles ship today. |
-| 6 | Make shuffles into tapes: `ShuffleAlgorithm`, concatenated shuffle-and-sort recording. | Done. 44 shuffles ship today. |
+| 5 | Add a second and third visualizer, proving the visualization axis is independent of the algorithm. | Done. 16 visualizer styles ship today, including Custom Image. |
+| 6 | Make shuffles into tapes: `ShuffleAlgorithm`, concatenated shuffle-and-sort recording. | Done. 43 shuffles ship today. |
 | 7 | Port ArrayV content at scale. | Ongoing. See [Port status](../reference/port-status.md) for current progress. |
 | 8 | Decompose services: `AudioService`, `AnalyticsService` (CloudKit), `AppSettings`. | Done. `AudioService` uses a local synth built on `AVAudioEngine`, not a third-party audio package. |
 | 9 | Build a data-driven `ContentView` and real `SettingsFeature`/`HomeFeature` views. | Done. |
 | 10 | Finalize persistence and complexity views. | Done, with one scope change: the Big-O correlation chart shipped inside `SortFeature`/`PersistenceKit`, not as its own module. The team dropped a separate device-to-device comparison view as a goal (see [Architecture overview](overview.md#platform-and-scope-decisions)). |
 | 11 | Clean up: remove the archived pre-rewrite source. | Done. The repository contains only the rewritten module tree. |
 
-## What's still open
+## Later additions
 
-Three items from the original design remain unbuilt, ordered from least to most effort:
+Three items from the original design have since taken shape:
 
-- **A CustomImage visualizer.** ArrayV's "custom image" style remaps a user-supplied image per
-  array permutation. It requires an image picker and a per-pixel remap design. The Metal shape
-  renderer already generalizes across the other 15 visualizer styles, so this would follow an
-  established pattern rather than requiring new rendering infrastructure. It is deferred, not
-  blocked: the team will build it once the existing styles feel complete and this specific
-  visualizer seems worth the cost.
-- **Video or GIF export.** The design: iterate a tape's operations off-screen at a fixed frame
-  rate through the selected visualizer, reusing the same `VisualizationContext`/`draw(_:)` call the
-  live UI uses, driven by a loop instead of a display link, into `ImageRenderer` and then
-  `AVAssetWriter`. None of this exists yet: the off-screen drive loop, frame-rate math for large
-  tapes, and `AVAssetWriter` plumbing are all unbuilt.
-- **Teaching-mode step annotations.** This feature would show what a step means — for example,
-  "this compare decided the pivot side" or "this write advances the merge's output pointer" — not
-  just that a step happened. This is the one item where the blocker is design work, not code. The
-  engineering seam is small: an optional annotation riding alongside `SortOperation`, surfaced by
-  opt-in visualizers as text captions. The actual cost is designing a vocabulary of step intents
-  that means something across 167 different algorithms, since a compare in quicksort and a compare
-  in radix sort mean different things. This vocabulary does not exist yet, and designing it is
-  comparable in scope to the original rewrite.
+- **Custom Image** now uses a dedicated Metal texture renderer and image tiles linked to array
+  values. Users can choose a photo or file, or try a built-in sample. The chosen image is saved
+  locally and downsampled before texture creation. See [Content](content.md).
+- **Live video recording** captures actual playback through ScreenCaptureKit on supported Mac
+  Catalyst versions, with ReplayKit on iPadOS and as a fallback. Deterministic off-screen export
+  remains a separate possibility. See the [recording guide](../guides/live-recording-2026-10-08.md).
+- **Teaching graph and annotations** link algorithm-authored decisions to replay positions. The
+  graph and explanations can be inspected while stepping and seeking. See the
+  [teaching graph guide](../guides/teaching-graph-annotations.md).
 
-Two items that were previously on this list have shipped:
+Two other items from the original list have shipped:
 
 - **Fixed-duration playback pacing** shipped as a pacing mode alongside the default
   ops-per-second mode. `ReplayEngine` includes an adaptive controller that recomputes the required

@@ -54,8 +54,58 @@ private struct FakeRotateShuffle: ShuffleAlgorithm {
   }
 }
 
+private struct FakeSeededShuffle: ShuffleAlgorithm {
+  let id = ShuffleID(rawValue: "fake-seeded")
+  let metadata = ShuffleMetadata(displayName: "Fake Seeded")
+  func record(into engine: inout RecordingEngine) {
+    for i in stride(from: engine.count - 1, to: 0, by: -1) {
+      let partner = engine.randomIndex(in: 0...i)
+      engine.swap(i, partner)
+    }
+  }
+}
+
+private struct FakeAnnotatedAlgorithm: SortAlgorithm {
+  let id = AlgorithmID(rawValue: "fake-annotated")
+  let metadata = FakeAlgorithm().metadata
+
+  func record(into engine: inout RecordingEngine) {
+    _ = engine.compare(0, 1)
+    engine.annotateLastOperation(
+      stageID: "fake.choose", decisionID: "fake.side", outcome: "left",
+      roles: ["left": .arrayIndex(0)], explanationKey: "fake.choice")
+  }
+}
+
 @Suite
 struct TapeFactoryTests {
+  @Test
+  func sortAnnotationsAreOffsetPastTheShuffle() throws {
+    let tape = try TapeFactory.makeTape(
+      algorithm: FakeAnnotatedAlgorithm(), shuffle: FakeReverseShuffle(), size: 2,
+      operationCap: RecordingEngine.defaultOperationCap)
+    #expect(tape.teachingAnnotations.count == 1)
+    let index = tape.teachingAnnotations[0].operationIndex
+    #expect(index >= tape.header.sortStartIndex)
+    #expect(tape.operations[index] == .compare(0, 1))
+  }
+
+  @Test
+  func suppliedSeedReproducesTheShufflePhaseAndIsStoredInTheTape() throws {
+    let seed: UInt64 = 0xDEAD_BEEF_1234_5678
+    let first = try TapeFactory.makeTape(
+      algorithm: FakeAlgorithm(), shuffle: FakeSeededShuffle(), size: 64,
+      operationCap: RecordingEngine.defaultOperationCap, randomSeed: seed)
+    let second = try TapeFactory.makeTape(
+      algorithm: FakeAlgorithm(), shuffle: FakeSeededShuffle(), size: 64,
+      operationCap: RecordingEngine.defaultOperationCap, randomSeed: seed)
+    #expect(first.header.visualSeed == seed)
+    #expect(second.header.visualSeed == seed)
+    #expect(first.header.sortStartIndex == second.header.sortStartIndex)
+    #expect(Array(first.operations.prefix(first.header.sortStartIndex)) ==
+            Array(second.operations.prefix(second.header.sortStartIndex)))
+  }
+
   @Test
   func concatenatedTapeOperationCountEqualsShuffleLengthPlusSortLength() throws {
     let size = 20

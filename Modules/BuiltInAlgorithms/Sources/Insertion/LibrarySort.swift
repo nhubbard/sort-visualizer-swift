@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -40,7 +41,7 @@ import SortEngineKit
 public struct LibrarySort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "librarysort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Library Sort",
+    displayName: String(localized: "Library Sort", bundle: .module),
     category: .insertion,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -106,7 +107,20 @@ public struct LibrarySort: SortAlgorithm {
       var hi = positions.count
       while lo < hi {
         let mid = (lo + hi) / 2
-        if auxRead(at: positions[mid]) > value {
+        let probe = auxRead(at: positions[mid])
+        let searchLower = probe > value
+        if engine.shouldAnnotateCurrentOperation {
+          engine.annotateLastOperation(
+            stageID: "LibrarySort.gappedBinarySearch", decisionID: "LibrarySort.gappedBinarySearch",
+            outcome: searchLower ? "lower" : "upper",
+            roles: ["slot": .auxiliaryIndex(handle: handle.rawValue, index: positions[mid]),
+              "heldValue": .value(value)],
+            explanationKey: "LibrarySort.gappedBinarySearch",
+            explanation: searchLower
+              ? String(localized: "The library slot is greater than the new value, so search earlier slots.", bundle: .module)
+              : String(localized: "The library slot is no greater, so search later slots to preserve tie order.", bundle: .module))
+        }
+        if searchLower {
           hi = mid
         } else {
           lo = mid + 1

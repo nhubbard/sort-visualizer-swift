@@ -5,7 +5,7 @@ import SortEngineKit
 public struct LSDRadixSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "lsdradixsort")
   public let metadata = AlgorithmMetadata(
-    displayName: "LSD Radix Sort",
+    displayName: String(localized: "LSD Radix Sort", bundle: .module),
     category: .distribution,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -34,7 +34,17 @@ public struct LSDRadixSort: SortAlgorithm {
 
     var maxValue = 0
     for i in 0..<n {
-      maxValue = max(maxValue, engine.readValue(at: i))
+      let candidate = engine.readValue(at: i)
+      let newMaximum = candidate > maxValue
+      engine.annotateLastOperation(
+        stageID: "digitRange", decisionID: "lsdradixsort.maximum",
+        outcome: newMaximum ? "extendRange" : "keepRange",
+        roles: ["candidate": .arrayIndex(i), "maximum": .value(maxValue)],
+        explanationKey: "lsdradixsort.maximum",
+        explanation: newMaximum
+          ? String(localized: "This value adds a higher digit place, so extend the radix pass range.", bundle: .module)
+          : String(localized: "This value fits within the digit places already required.", bundle: .module))
+      maxValue = max(maxValue, candidate)
     }
     var highestPlace = 1
     while Int(pow(Double(radix), Double(highestPlace))) <= maxValue {
@@ -53,6 +63,11 @@ public struct LSDRadixSort: SortAlgorithm {
       var counts = [Int](repeating: 0, count: radix)
       for i in 0..<n {
         values[i] = engine.readValue(at: i)
+        engine.annotateLastOperation(
+          stageID: "digitScan", decisionID: "lsdradixsort.readDigit",
+          outcome: "classify", roles: ["source": .arrayIndex(i)],
+          explanationKey: "lsdradixsort.readDigit",
+          explanation: String(localized: "Read digit place \(place + 1) from the right to count this value’s bucket.", bundle: .module))
       }
       for i in 0..<n {
         counts[getDigit(values[i], place)] += 1
@@ -65,9 +80,20 @@ public struct LSDRadixSort: SortAlgorithm {
         counts[digit] -= 1
         output[counts[digit]] = values[i]
         engine.writeAux(outputHandle, at: counts[digit], value: values[i])
+        engine.annotateLastOperation(
+          stageID: "scratchUpdate", decisionID: "lsdradixsort.scratchUpdate",
+          outcome: "update",
+          roles: ["scratch": .auxiliaryIndex(handle: outputHandle.rawValue, index: counts[digit])],
+          explanationKey: "lsdradixsort.scratchUpdate",
+          explanation: String(localized: "The current digit and cumulative count reserve this scratch output position.", bundle: .module))
       }
       for i in 0..<n {
         engine.setValue(i, output[i])
+        engine.annotateLastOperation(
+          stageID: "bucketPlacement", decisionID: "lsdradixsort.bucketPlacement",
+          outcome: "place", roles: ["destination": .arrayIndex(i)],
+          explanationKey: "lsdradixsort.bucketPlacement",
+          explanation: String(localized: "Digit place \(place + 1) from the right determines this value’s counted output position.", bundle: .module))
       }
     }
 

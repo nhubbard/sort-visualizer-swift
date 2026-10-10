@@ -1,4 +1,4 @@
-Pairwise Merge Sort is a [sorting network](https://en.wikipedia.org/wiki/Sorting_network) — a
+Iterative Pairwise Merge Sort is a [sorting network](https://en.wikipedia.org/wiki/Sorting_network), a
 comparator-based sort whose sequence of compare-and-swap operations is fixed in advance and never
 depends on the data being sorted, only on how many elements there are. It has no dedicated
 Wikipedia article of its own under this exact name; it belongs to the same broad family as
@@ -15,9 +15,8 @@ toward the full padded length.
 
 Like other fixed comparator networks, this one's total comparator count depends only on the
 (padded) length of the input, so its best-case, average-case, and worst-case running times are
-identical, landing at O(n log²n) — measuring the number of comparisons this network performs across
-a wide range of array sizes shows it uses exactly the same total as this codebase's recursive
+identical, landing at O(n log²n), measuring the number of comparisons this network performs across
+a wide range of array sizes shows it uses exactly the same total as the recursive
 Pairwise Merge Sort and Pairwise Sort implementations, despite each using a different loop or
-recursion shape to get there. Every comparator only ever swaps on a strict "greater than" test, and
-this network never lets two equal elements cross paths without an intervening comparison
-establishing their order, so it is a stable sort.
+recursion shape to get there. Every comparator only ever swaps on a strict "greater than" test, but
+nonadjacent exchanges can reverse the relative order of equal elements. The network is unstable.

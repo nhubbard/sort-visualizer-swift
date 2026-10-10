@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -16,7 +17,7 @@ import SortEngineKit
 public struct UnoptimizedCocktailShakerSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "unoptimizedcocktailshakersort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Unoptimized Cocktail Shaker Sort",
+    displayName: String(localized: "Unoptimized Cocktail Shaker Sort", bundle: .module),
     category: .exchange,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -44,7 +45,13 @@ public struct UnoptimizedCocktailShakerSort: SortAlgorithm {
       // equal-valued elements never cross past each other.
       var j = i
       while j < n - i - 1 {
-        if engine.compare(j, j + 1, by: (>)) {
+        if engine.teachingCompare(
+          j, j + 1,
+          by: (>),
+          stageID: "UnoptimizedCocktailShakerSort.forwardPass",
+          whenTrue: String(localized: "The left neighbor is larger, so exchange it in the forward pass.", bundle: .module),
+          whenFalse: String(localized: "The forward pass leaves this pair in place.", bundle: .module)
+        ) {
           engine.swap(j, j + 1)
         }
         j += 1

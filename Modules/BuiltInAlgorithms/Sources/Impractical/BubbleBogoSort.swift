@@ -1,10 +1,11 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
 public struct BubbleBogoSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "bubblebogosort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Bubble Bogo Sort",
+    displayName: String(localized: "Bubble Bogo Sort", bundle: .module),
     category: .impractical,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -36,6 +37,11 @@ public struct BubbleBogoSort: SortAlgorithm {
       swapped = false
       for i in 0..<(n - 1) where engine.compare(i, i + 1, by: (>)) {
         engine.swap(i, i + 1)
+        engine.annotateLastOperation(
+          stageID: "candidateExchange", decisionID: "bubblebogosort.candidateExchange",
+          outcome: "exchange", roles: ["left": .arrayIndex(i), "right": .arrayIndex(i + 1)],
+          explanationKey: "bubblebogosort.candidateExchange",
+          explanation: String(localized: "This adjacent inversion is exchanged during the current bubble pass.", bundle: .module))
         swapped = true
       }
     }

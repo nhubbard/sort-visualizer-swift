@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -17,7 +18,7 @@ import SortEngineKit
 /// that failure mode.
 public struct BitReversalShuffle: ShuffleAlgorithm {
   public let id = ShuffleID(rawValue: "bitreverse")
-  public let metadata = ShuffleMetadata(displayName: "Bit Reversal")
+  public let metadata = ShuffleMetadata(displayName: String(localized: "Bit Reversal", bundle: .module))
   public init() {}
 
   private func greatestPowerOfTwoAtOrBelow(_ value: Int) -> Int {

@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -35,7 +36,7 @@ import SortEngineKit
 public struct StacklessDualPivotQuickSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "stacklessdualpivotquicksort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Stackless Dual-Pivot Quick",
+    displayName: String(localized: "Stackless Dual-Pivot Quick", bundle: .module),
     category: .hybrid,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -71,14 +72,20 @@ public struct StacklessDualPivotQuickSort: SortAlgorithm {
   private func quickSort(_ engine: inout RecordingEngine, _ a0: Int, _ bIn: Int) {
     var b = bIn
 
-    // Held-value scan for this range's maximum — `Reads.compareValues`, not `compareIndices`, in
-    // the source: no highlight, just a running value, matching this codebase's convention of
-    // reading `engine.values` directly (no `engine.compare` call) whenever the source compares a
-    // held value rather than two live indices.
+    // Held-value scan for this range's maximum. Both sides are held values, so the decision
+    // uses compareValues rather than a live-index comparison.
     var max = engine.readValue(at: a0)
     if a0 + 1 < b {
-      for i in (a0 + 1)..<b where engine.readValue(at: i) > max {
-        max = engine.readValue(at: i)
+      for i in (a0 + 1)..<b {
+        let candidate = engine.readValue(at: i)
+        if engine.teachingCompareValues(
+          candidate, max, by: (>),
+          stageID: "StacklessDualPivotQuickSort.maximum.scan",
+          whenTrue: String(localized: "This value exceeds the current maximum, so it becomes the new tail target.", bundle: .module),
+          whenFalse: String(localized: "This value does not exceed the current maximum.", bundle: .module)
+        ) {
+          max = engine.readValue(at: i)
+        }
       }
     }
 
@@ -87,7 +94,13 @@ public struct StacklessDualPivotQuickSort: SortAlgorithm {
     // called once, with `a0 == 0`.
     var i = b - 1
     while i >= 0 {
-      if engine.readValue(at: i) == max {
+      let candidate = engine.readValue(at: i)
+      if engine.teachingCompareValues(
+        candidate, max, by: (==),
+        stageID: "StacklessDualPivotQuickSort.maximum.place",
+        whenTrue: String(localized: "This value matches the maximum, so move it into the tail.", bundle: .module),
+        whenFalse: String(localized: "This value is not the maximum and stays in the unsorted range.", bundle: .module)
+      ) {
         b -= 1
         engine.swap(i, b)
       }
@@ -123,7 +136,12 @@ public struct StacklessDualPivotQuickSort: SortAlgorithm {
       engine.swap(a - 1, b)
 
       med = true
-      while a < b1 && engine.compare(a - 1, a, by: (==)) {
+      while a < b1 && engine.teachingCompare(
+        a - 1, a, by: (==),
+        stageID: "StacklessDualPivotQuickSort.pivot.equalRun",
+        whenTrue: String(localized: "These adjacent values are equal, so the equal-value run extends.", bundle: .module),
+        whenFalse: String(localized: "These adjacent values differ, ending this equal-value run.", bundle: .module)
+      ) {
         med = false
         a += 1
       }
@@ -161,16 +179,36 @@ public struct StacklessDualPivotQuickSort: SortAlgorithm {
 
     var k = i + 1
     while k < j {
-      if engine.compareValue(k, against: pivotLow, by: (<)) {
+      if engine.teachingCompareValue(
+        k, against: pivotLow, by: (<),
+        stageID: "StacklessDualPivotQuickSort.partition.low",
+        whenTrue: String(localized: "This value is below the low pivot, so move it left.", bundle: .module),
+        whenFalse: String(localized: "This value is not below the low pivot; check the high pivot.", bundle: .module)
+      ) {
         i += 1
         engine.swap(k, i)
-      } else if engine.compareValue(k, against: pivotHigh, by: (>=)) {
+      } else if engine.teachingCompareValue(
+        k, against: pivotHigh, by: (>=),
+        stageID: "StacklessDualPivotQuickSort.partition.high",
+        whenTrue: String(localized: "This value reaches the high pivot, so move it toward the right partition.", bundle: .module),
+        whenFalse: String(localized: "This value lies between the pivots and stays in the middle.", bundle: .module)
+      ) {
         repeat {
           j -= 1
-        } while j > k && engine.compareValue(j, against: pivotHigh, by: (>=))
+        } while j > k && engine.teachingCompareValue(
+          j, against: pivotHigh, by: (>=),
+          stageID: "StacklessDualPivotQuickSort.partition.rightScan",
+          whenTrue: String(localized: "This right-side value belongs beyond the high pivot, so scan left.", bundle: .module),
+          whenFalse: String(localized: "This right-side value can exchange with the candidate.", bundle: .module)
+        )
         engine.swap(k, j)
 
-        if engine.compareValue(k, against: pivotLow, by: (<)) {
+        if engine.teachingCompareValue(
+          k, against: pivotLow, by: (<),
+          stageID: "StacklessDualPivotQuickSort.partition.recheckLow",
+          whenTrue: String(localized: "After the exchange, this value belongs below the low pivot.", bundle: .module),
+          whenFalse: String(localized: "After the exchange, this value stays between the pivots.", bundle: .module)
+        ) {
           i += 1
           engine.swap(k, i)
         }
@@ -198,7 +236,12 @@ public struct StacklessDualPivotQuickSort: SortAlgorithm {
     var b = bIn
     while a < b {
       let m = a + (b - a) / 2
-      if engine.compare(p, m, by: (<=)) {
+      if engine.teachingCompare(
+        p, m, by: (<=),
+        stageID: "StacklessDualPivotQuickSort.insertion.bound",
+        whenTrue: String(localized: "The pivot value belongs at or before this midpoint, so search left.", bundle: .module),
+        whenFalse: String(localized: "The pivot value belongs after this midpoint, so search right.", bundle: .module)
+      ) {
         b = m
       } else {
         a = m + 1
@@ -220,7 +263,12 @@ public struct StacklessDualPivotQuickSort: SortAlgorithm {
       var hi = i
       while lo < hi {
         let mid = lo + (hi - lo) / 2
-        if engine.compareValue(mid, against: num, by: (>)) {
+        if engine.teachingCompareValue(
+          mid, against: num, by: (>),
+          stageID: "StacklessDualPivotQuickSort.insertion.place",
+          whenTrue: String(localized: "The prefix value exceeds the held value, so its insertion point is left.", bundle: .module),
+          whenFalse: String(localized: "The prefix value is no larger, so its insertion point is right.", bundle: .module)
+        ) {
           hi = mid
         } else {
           lo = mid + 1

@@ -1,4 +1,5 @@
 import AlgorithmKit
+import Foundation
 
 /// One renderable row for `LabeledEquationCell` — `label`/`latex` pair, e.g. ("Worst Case", "O(n^2)").
 public struct ComplexityRow: Identifiable, Sendable {
@@ -17,11 +18,11 @@ extension AlgorithmMetadata {
   /// italic variables; `*` as a proper times sign).
   public var complexityRows: [ComplexityRow] {
     [
-      ComplexityRow(id: "best", label: "Best Case", latex: Self.toLatex(timeComplexity.best)),
+      ComplexityRow(id: "best", label: String(localized: "Best Case", bundle: .module), latex: Self.toLatex(timeComplexity.best)),
       ComplexityRow(
-        id: "average", label: "Average Complexity", latex: Self.toLatex(timeComplexity.average)),
-      ComplexityRow(id: "worst", label: "Worst Case", latex: Self.toLatex(timeComplexity.worst)),
-      ComplexityRow(id: "space", label: "Space Complexity", latex: Self.toLatex(spaceComplexity))
+        id: "average", label: String(localized: "Average Complexity", bundle: .module), latex: Self.toLatex(timeComplexity.average)),
+      ComplexityRow(id: "worst", label: String(localized: "Worst Case", bundle: .module), latex: Self.toLatex(timeComplexity.worst)),
+      ComplexityRow(id: "space", label: String(localized: "Space Complexity", bundle: .module), latex: Self.toLatex(spaceComplexity))
     ]
   }
 

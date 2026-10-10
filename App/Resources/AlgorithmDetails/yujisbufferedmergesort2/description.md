@@ -1,5 +1,3 @@
-*From Wikipedia, the free encyclopedia*
-
 Yuji's Buffered Merge Sort 2 is a recursive, in-place merge sort that never allocates a second
 array to hold the values it is merging. Ordinary merge sort needs somewhere to put the combined
 result while it is still reading from both halves it is merging, which is normally solved by
@@ -7,8 +5,7 @@ allocating an auxiliary buffer the size of the whole array. This algorithm inste
 buffer out of the very range it is sorting: at each level of recursion, it sets aside the upper
 portion of the current range, sorts that portion first using an entirely separate iterative
 routine, and then treats the now-sorted portion as a temporary buffer for merging the rest of the
-range into place. Because the "buffer" is just part of the array wearing a different hat for a
-while, and every element that moves into or out of it does so through a swap rather than an
+range into place. Because the buffer is part of the array, and every element that moves into or out of it does so through a swap rather than an
 overwrite, no element's value is ever discarded before something has taken its place, and no
 second array is ever needed. This keeps the space complexity at O(1): only a small, fixed amount
 of index bookkeeping accompanies the array itself, no matter how large the input.
@@ -34,7 +31,7 @@ take many one-at-a-time comparisons to resolve. Deciding which of the two strate
 which of two fixed memory offsets should be treated as the "active" region at each pass of the
 buffer-building step, are both handled with compact bitwise arithmetic (a bitwise XOR that toggles
 between exactly two known values) rather than an explicit branch, which keeps the bookkeeping
-cheap without changing what the algorithm actually computes.
+cheap without changing what the algorithm computes.
 
 Because the algorithm always performs the same sequence of splits, buffer-building passes, and
 merges regardless of how the input happens to be arranged, its running time does not depend on the

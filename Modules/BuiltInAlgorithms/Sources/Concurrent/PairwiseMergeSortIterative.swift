@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -12,13 +13,13 @@ import SortEngineKit
 /// `O(n log^2 n)` comparators — confirmed empirically (the ratio of measured comparisons to
 /// `n log^2 n` converges to a near-constant ~0.23–0.25 across sizes 16 through 2048, identical at
 /// every size to both `PairwiseMergeSortRecursive`'s and `PairwiseSortRecursive`'s own measured
-/// counts, despite each using a different loop/recursion shape to get there). Every comparator only
-/// ever swaps on strict `>`, and fuzzing across randomized duplicate-heavy trials found no case
-/// where two equal elements crossed paths, confirming this network is stable.
+/// counts, despite each using a different loop/recursion shape to get there). Comparators swap
+/// only on strict `>`, but identity-tracking duplicate trials show that equal elements can cross
+/// indirectly, making the network unstable.
 public struct PairwiseMergeSortIterative: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "pairwisemergesortiterative")
   public let metadata = AlgorithmMetadata(
-    displayName: "Pairwise Merge Sort (Iterative)",
+    displayName: String(localized: "Pairwise Merge Sort (Iterative)", bundle: .module),
     category: .concurrent,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -27,7 +28,7 @@ public struct PairwiseMergeSortIterative: SortAlgorithm {
     detectedGrowthModel: DetectedGrowthModel(
       family: .powerLog, coefficients: [7.84241, 1.2181], rSquared: 0.998564),
     implementationComplexity: 14,
-    stable: true,
+    stable: false,
     timeComplexity: ComplexityBounds(
       best: "O(n log^2 n)", average: "O(n log^2 n)", worst: "O(n log^2 n)"),
     spaceComplexity: "O(1)",
@@ -42,7 +43,16 @@ public struct PairwiseMergeSortIterative: SortAlgorithm {
 
     func compSwap(_ a: Int, _ b: Int) {
       guard b < end else { return }
-      if engine.compare(a, b, by: >) {
+      let shouldSwap = engine.compare(a, b, by: >)
+      engine.annotateLastOperation(
+        stageID: "compareExchange", decisionID: "pairwisemergesortiterative.networkComparator",
+        outcome: shouldSwap ? "exchange" : "keep",
+        roles: ["left": .arrayIndex(a), "right": .arrayIndex(b)],
+        explanationKey: "pairwisemergesortiterative.compareExchange",
+        explanation: shouldSwap
+          ? String(localized: "The left value exceeds the right value, so this comparator exchanges them.", bundle: .module)
+          : String(localized: "These values satisfy this comparator, so they stay in place.", bundle: .module))
+      if shouldSwap {
         engine.swap(a, b)
       }
     }

@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -22,7 +23,7 @@ import SortEngineKit
 public struct OutOfPlaceHeapSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "outofplaceheapsort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Out-of-Place Heap Sort",
+    displayName: String(localized: "Out-of-Place Heap Sort", bundle: .module),
     category: .selection,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -47,12 +48,22 @@ public struct OutOfPlaceHeapSort: SortAlgorithm {
       var j = root
       while 2 * j + 1 < size {
         if 2 * j + 2 < size {
-          j = engine.compare(2 * j + 2, 2 * j + 1, by: >) ? 2 * j + 2 : 2 * j + 1
+          j = engine.teachingCompare(
+            2 * j + 2, 2 * j + 1,
+            by: >,
+            stageID: "OutOfPlaceHeapSort.childChoice",
+            whenTrue: String(localized: "The right child is larger, so follow it in the heap.", bundle: .module),
+            whenFalse: String(localized: "The left child is at least as large, so follow it.", bundle: .module)
+          ) ? 2 * j + 2 : 2 * j + 1
         } else {
           j = 2 * j + 1
         }
       }
-      while engine.compare(root, j, by: >) {
+      while engine.teachingCompare(
+        root, j, by: >, stageID: "OutOfPlaceHeapSort.siftPosition",
+        whenTrue: String(localized: "The root is larger than this descendant, so move the landing point upward.", bundle: .module),
+        whenFalse: String(localized: "The descendant can hold the root value at this heap position.", bundle: .module)
+      ) {
         j = (j - 1) / 2
       }
       while j > root {
@@ -72,7 +83,11 @@ public struct OutOfPlaceHeapSort: SortAlgorithm {
         } else if engine.readValue(at: r) == -1 {
           engine.swap(i, l)
           i = l
-        } else if engine.compare(r, l, by: >) {
+        } else if engine.teachingCompare(
+          r, l, by: >, stageID: "OutOfPlaceHeapSort.nextLiveChild",
+          whenTrue: String(localized: "The right live child is larger, so follow it to the next heap maximum.", bundle: .module),
+          whenFalse: String(localized: "The left live child is at least as large, so follow it.", bundle: .module)
+        ) {
           engine.swap(i, r)
           i = r
         } else {
@@ -102,6 +117,14 @@ public struct OutOfPlaceHeapSort: SortAlgorithm {
       let maxValue = engine.readValue(at: 0)
       output[i] = maxValue
       engine.writeAux(outHandle, at: i, value: maxValue)
+      if engine.shouldAnnotateCurrentOperation {
+        engine.annotateLastOperation(
+          stageID: "OutOfPlaceHeapSort.extractToBuffer", outcome: "saved",
+          roles: ["buffer": .auxiliaryIndex(handle: outHandle.rawValue, index: i),
+            "maximum": .value(maxValue)],
+          explanationKey: "OutOfPlaceHeapSort.extractToBuffer",
+          explanation: String(localized: "Save the current heap maximum in its final buffered position.", bundle: .module))
+      }
       engine.setValue(0, -1)
       findNext(n)
       i -= 1
@@ -109,6 +132,13 @@ public struct OutOfPlaceHeapSort: SortAlgorithm {
 
     for idx in 0..<n {
       engine.setValue(idx, output[idx])
+      if engine.shouldAnnotateCurrentOperation {
+        engine.annotateLastOperation(
+          stageID: "OutOfPlaceHeapSort.restoreOutput", outcome: "placed",
+          roles: ["output": .arrayIndex(idx), "bufferedValue": .value(output[idx])],
+          explanationKey: "OutOfPlaceHeapSort.restoreOutput",
+          explanation: String(localized: "Copy this buffered value into its final sorted array position.", bundle: .module))
+      }
     }
     engine.deleteAuxArray(outHandle)
   }

@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -15,7 +16,7 @@ import SortEngineKit
 public struct TreeSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "treesort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Tree Sort (Unbalanced)",
+    displayName: String(localized: "Tree Sort (Unbalanced)", bundle: .module),
     category: .insertion,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -52,7 +53,13 @@ public struct TreeSort: SortAlgorithm {
       guard let node else { return Node(addPointer) }
       var current = node
       while true {
-        if engine.compare(addPointer, current.pointer, by: <) {
+        if engine.teachingCompare(
+          addPointer, current.pointer,
+          by: <,
+          stageID: "TreeSort.treeBranch",
+          whenTrue: String(localized: "The inserted value is smaller, so descend into the left tree branch.", bundle: .module),
+          whenFalse: String(localized: "The inserted value belongs in the other tree branch.", bundle: .module)
+        ) {
           guard let left = current.left else {
             current.left = Node(addPointer)
             break

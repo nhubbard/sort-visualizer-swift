@@ -1,10 +1,11 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
 public struct InsertionSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "insertionsort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Insertion Sort",
+    displayName: String(localized: "Insertion Sort", bundle: .module),
     category: .insertion,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -24,7 +25,12 @@ public struct InsertionSort: SortAlgorithm {
     guard n > 1 else { return }
     for i in 1..<n {
       var j = i
-      while j > 0 && !engine.compare(j, j - 1) {
+      while j > 0 && !engine.teachingCompare(
+        j, j - 1,
+        stageID: "InsertionSort.insertionPosition",
+        whenTrue: String(localized: "The current item is at least its neighbor, so it has reached its insertion position.", bundle: .module),
+        whenFalse: String(localized: "The current item is smaller than its neighbor, so swap it left.", bundle: .module)
+      ) {
         engine.swap(j - 1, j)
         j -= 1
       }

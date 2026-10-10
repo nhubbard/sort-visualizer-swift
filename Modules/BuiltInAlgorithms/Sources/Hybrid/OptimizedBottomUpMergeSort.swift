@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -33,7 +34,7 @@ import SortEngineKit
 public struct OptimizedBottomUpMergeSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "optimizedbottomupmergesort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Optimized Bottom-Up Merge",
+    displayName: String(localized: "Optimized Bottom-Up Merge", bundle: .module),
     category: .hybrid,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -69,7 +70,16 @@ public struct OptimizedBottomUpMergeSort: SortAlgorithm {
         var hi = i
         while lo < hi {
           let mid = lo + (hi - lo) / 2
-          if num < engine.readValue(at: mid) {
+          let insertBefore = num < engine.readValue(at: mid)
+          engine.annotateLastOperation(
+            stageID: "optimizedBottomUp.binaryInsert", decisionID: "optimizedBottomUp.binaryInsert",
+            outcome: insertBefore ? "left" : "right",
+            roles: ["candidate": .arrayIndex(mid), "heldValue": .value(num)],
+            explanationKey: "optimizedBottomUp.binaryInsert",
+            explanation: insertBefore
+              ? String(localized: "The held item is smaller, so insertion searches the left half of this run.", bundle: .module)
+              : String(localized: "The held item is at least this value, so insertion searches the right half.", bundle: .module))
+          if insertBefore {
             hi = mid
           } else {
             lo = mid + 1
@@ -78,6 +88,11 @@ public struct OptimizedBottomUpMergeSort: SortAlgorithm {
         var j = i - 1
         while j >= lo {
           engine.setValue(j + 1, engine.readValue(at: j))
+          engine.annotateLastOperation(
+            stageID: "optimizedBottomUp.shift", decisionID: "optimizedBottomUp.shift",
+            outcome: "shift", roles: ["source": .arrayIndex(j), "destination": .arrayIndex(j + 1)],
+            explanationKey: "optimizedBottomUp.shift",
+            explanation: String(localized: "This value shifts right to make room at the binary insertion point.", bundle: .module))
           j -= 1
         }
         engine.setValue(lo, num)
@@ -98,7 +113,12 @@ public struct OptimizedBottomUpMergeSort: SortAlgorithm {
         }
       }
       func lessOrEqual(_ a: Int, _ b: Int) -> Bool {
-        fromMain ? engine.compare(a, b, by: <=) : aux.values[a] <= aux.values[b]
+        fromMain ? engine.teachingCompare(
+          a, b, by: <=,
+          stageID: "OptimizedBottomUpMergeSort.merge.choose",
+          whenTrue: String(localized: "The main-array left value is no greater, so this merge takes from the left run.", bundle: .module),
+          whenFalse: String(localized: "The main-array right value is smaller, so this merge takes from the right run.", bundle: .module)
+        ) : aux.values[a] <= aux.values[b]
       }
 
       var i = lt

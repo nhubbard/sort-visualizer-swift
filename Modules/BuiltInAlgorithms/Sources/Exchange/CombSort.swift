@@ -1,10 +1,11 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
 public struct CombSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "combsort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Comb Sort",
+    displayName: String(localized: "Comb Sort", bundle: .module),
     category: .exchange,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -38,7 +39,12 @@ public struct CombSort: SortAlgorithm {
         // Strict "values[i] > values[i+gap]": engine.compare is always >=, and using it
         // as-is here would swap equal adjacent elements forever once gap settles at 1.
         // a > b  <=>  !(b >= a), i.e. !engine.compare(i + gap, i).
-        if !engine.compare(gapInt + i, i) {
+        if !engine.teachingCompare(
+          gapInt + i, i,
+          stageID: "CombSort.gapOrder",
+          whenTrue: String(localized: "The item across the gap is ordered, so no exchange is needed.", bundle: .module),
+          whenFalse: String(localized: "The gap-separated items are reversed, so exchange them.", bundle: .module)
+        ) {
           engine.swap(i, gapInt + i)
           swapped = true
         }

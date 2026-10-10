@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -41,7 +42,7 @@ import SortEngineKit
 public struct PoplarHeapSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "poplarheapsort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Poplar Heap Sort",
+    displayName: String(localized: "Poplar Heap Sort", bundle: .module),
     category: .selection,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -72,7 +73,13 @@ public struct PoplarHeapSort: SortAlgorithm {
   private func uncheckedInsertionSort(_ engine: inout RecordingEngine, _ first: Int, _ last: Int) {
     var cur = first + 1
     while cur != last {
-      if engine.compare(cur, cur - 1, by: <) {
+      if engine.teachingCompare(
+        cur, cur - 1,
+        by: <,
+        stageID: "PoplarHeapSort.adjacentOrder",
+        whenTrue: String(localized: "This item is smaller than its predecessor, so it needs a poplar-heap insertion.", bundle: .module),
+        whenFalse: String(localized: "This neighboring pair keeps its poplar-heap order.", bundle: .module)
+      ) {
         let tmp = engine.readValue(at: cur)
         var sift = cur
         var sift1 = cur - 1
@@ -102,8 +109,16 @@ public struct PoplarHeapSort: SortAlgorithm {
     var childRoot2 = firstIn + (size / 2 - 1)
     while true {
       var maxRoot = root
-      if engine.compare(maxRoot, childRoot1, by: <) { maxRoot = childRoot1 }
-      if engine.compare(maxRoot, childRoot2, by: <) { maxRoot = childRoot2 }
+      if engine.teachingCompare(
+        maxRoot, childRoot1, by: <, stageID: "PoplarHeapSort.firstChild",
+        whenTrue: String(localized: "The first child is larger, so make it the poplar root candidate.", bundle: .module),
+        whenFalse: String(localized: "The current root remains the larger candidate than the first child.", bundle: .module)
+      ) { maxRoot = childRoot1 }
+      if engine.teachingCompare(
+        maxRoot, childRoot2, by: <, stageID: "PoplarHeapSort.secondChild",
+        whenTrue: String(localized: "The second child is larger, so make it the poplar root candidate.", bundle: .module),
+        whenFalse: String(localized: "The current root candidate remains larger than the second child.", bundle: .module)
+      ) { maxRoot = childRoot2 }
       if maxRoot == root { return }
       engine.swap(root, maxRoot)
       size /= 2
@@ -125,7 +140,11 @@ public struct PoplarHeapSort: SortAlgorithm {
     while true {
       let root = it + poplarSize - 1
       if root == lastRoot { break }
-      if engine.compare(bigger, root, by: <) {
+      if engine.teachingCompare(
+        bigger, root, by: <, stageID: "PoplarHeapSort.selectNextRoot",
+        whenTrue: String(localized: "This poplar root is larger, so choose it for the next extraction.", bundle: .module),
+        whenFalse: String(localized: "The selected poplar root remains the larger extraction candidate.", bundle: .module)
+      ) {
         bigger = root
         biggerSize = poplarSize
       }

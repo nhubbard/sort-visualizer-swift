@@ -1,3 +1,4 @@
+import Foundation
 import SortEngineKit
 
 /// Scratch offset buffers `PDQSortingTemplate.partRightBranchless` needs, allocated once per
@@ -47,7 +48,12 @@ enum PDQSortingTemplate {
 
   private static func insertSort(_ engine: inout RecordingEngine, _ begin: Int, _ end: Int) {
     guard begin != end else { return }
-    for cur in (begin + 1)..<end where engine.compare(cur, cur - 1, by: <) {
+    for cur in (begin + 1)..<end where engine.teachingCompare(
+      cur, cur - 1, by: <,
+      stageID: "pdq.smallRun",
+      whenTrue: String(localized: "This adjacent pair descends, so the insertion fallback shifts the item left.", bundle: .module),
+      whenFalse: String(localized: "This adjacent pair is ordered, so the insertion fallback leaves it.", bundle: .module)
+    ) {
       let tmp = engine.readValue(at: cur)
       var sift = cur
       var siftMinusOne = cur - 1
@@ -65,7 +71,12 @@ enum PDQSortingTemplate {
   /// left-edge check.
   private static func unguardInsertSort(_ engine: inout RecordingEngine, _ begin: Int, _ end: Int) {
     guard begin != end else { return }
-    for cur in (begin + 1)..<end where engine.compare(cur, cur - 1, by: <) {
+    for cur in (begin + 1)..<end where engine.teachingCompare(
+      cur, cur - 1, by: <,
+      stageID: "pdq.insertionDecision",
+      whenTrue: String(localized: "This adjacent pair descends, so insertion shifts the current value left.", bundle: .module),
+      whenFalse: String(localized: "This pair is ordered, so insertion leaves it in place.", bundle: .module)
+    ) {
       let tmp = engine.readValue(at: cur)
       var sift = cur
       var siftMinusOne = cur - 1
@@ -87,7 +98,12 @@ enum PDQSortingTemplate {
     var limit = 0
     for cur in (begin + 1)..<end {
       if limit > partialInsertSortLimit { return false }
-      if engine.compare(cur, cur - 1, by: <) {
+      if engine.teachingCompare(
+        cur, cur - 1, by: <,
+        stageID: "pdq.insertionDecision",
+        whenTrue: String(localized: "This adjacent pair descends, so insertion shifts the current value left.", bundle: .module),
+        whenFalse: String(localized: "This pair is ordered, so insertion leaves it in place.", bundle: .module)
+      ) {
         let tmp = engine.readValue(at: cur)
         var sift = cur
         var siftMinusOne = cur - 1
@@ -106,7 +122,12 @@ enum PDQSortingTemplate {
   // MARK: - Pivot selection
 
   private static func sortTwo(_ engine: inout RecordingEngine, _ a: Int, _ b: Int) {
-    if engine.compare(b, a, by: <) {
+    if engine.teachingCompare(
+      b, a, by: <,
+      stageID: "pdq.pivotOrder",
+      whenTrue: String(localized: "The second pivot candidate is smaller, so median setup swaps this pair.", bundle: .module),
+      whenFalse: String(localized: "The pivot candidates are ordered, so median setup keeps this pair.", bundle: .module)
+    ) {
       engine.swap(a, b)
     }
   }
@@ -165,19 +186,44 @@ enum PDQSortingTemplate {
     var first = begin
     var last = end
 
-    repeat { first += 1 } while engine.compare(first, begin, by: <)
+    repeat { first += 1 } while engine.teachingCompare(
+      first, begin, by: <,
+      stageID: "pdq.partitionLeft",
+      whenTrue: String(localized: "This item is below the pivot, so the left partition scan advances.", bundle: .module),
+      whenFalse: String(localized: "This item reaches the other partition, so the left scan stops.", bundle: .module)
+    )
 
     if first - 1 == begin {
-      repeat { last -= 1 } while first < last && !engine.compare(last, begin, by: <)
+      repeat { last -= 1 } while first < last && !engine.teachingCompare(
+        last, begin, by: <,
+        stageID: "pdq.partitionRight",
+        whenTrue: String(localized: "This item is below the pivot, so the right scan stops to exchange it.", bundle: .module),
+        whenFalse: String(localized: "This item stays above the pivot, so the right scan advances.", bundle: .module)
+      )
     } else {
-      repeat { last -= 1 } while !engine.compare(last, begin, by: <)
+      repeat { last -= 1 } while !engine.teachingCompare(
+        last, begin, by: <,
+        stageID: "pdq.partitionRight",
+        whenTrue: String(localized: "This item is below the pivot, so the right scan stops to exchange it.", bundle: .module),
+        whenFalse: String(localized: "This item stays above the pivot, so the right scan advances.", bundle: .module)
+      )
     }
 
     let alreadyParted = first >= last
     while first < last {
       engine.swap(first, last)
-      repeat { first += 1 } while engine.compare(first, begin, by: <)
-      repeat { last -= 1 } while !engine.compare(last, begin, by: <)
+      repeat { first += 1 } while engine.teachingCompare(
+        first, begin, by: <,
+        stageID: "pdq.partitionLeft",
+        whenTrue: String(localized: "This item is below the pivot, so the left partition scan advances.", bundle: .module),
+        whenFalse: String(localized: "This item reaches the other partition, so the left scan stops.", bundle: .module)
+      )
+      repeat { last -= 1 } while !engine.teachingCompare(
+        last, begin, by: <,
+        stageID: "pdq.partitionRight",
+        whenTrue: String(localized: "This item is below the pivot, so the right scan stops to exchange it.", bundle: .module),
+        whenFalse: String(localized: "This item stays above the pivot, so the right scan advances.", bundle: .module)
+      )
     }
 
     let pivotPos = first - 1
@@ -193,18 +239,43 @@ enum PDQSortingTemplate {
     var first = begin
     var last = end
 
-    repeat { last -= 1 } while engine.compare(begin, last, by: <)
+    repeat { last -= 1 } while engine.teachingCompare(
+      begin, last, by: <,
+      stageID: "pdq.equalPartitionRight",
+      whenTrue: String(localized: "The pivot is below this item, so the right scan advances through larger values.", bundle: .module),
+      whenFalse: String(localized: "This item belongs with pivot-equal values, so the right scan stops.", bundle: .module)
+    )
 
     if last + 1 == end {
-      repeat { first += 1 } while first < last && !engine.compare(begin, first, by: <)
+      repeat { first += 1 } while first < last && !engine.teachingCompare(
+        begin, first, by: <,
+        stageID: "pdq.equalPartitionLeft",
+        whenTrue: String(localized: "The pivot is below this item, so the left scan stops at a larger value.", bundle: .module),
+        whenFalse: String(localized: "This item belongs with pivot-equal values, so the left scan advances.", bundle: .module)
+      )
     } else {
-      repeat { first += 1 } while !engine.compare(begin, first, by: <)
+      repeat { first += 1 } while !engine.teachingCompare(
+        begin, first, by: <,
+        stageID: "pdq.equalPartitionLeft",
+        whenTrue: String(localized: "The pivot is below this item, so the left scan stops at a larger value.", bundle: .module),
+        whenFalse: String(localized: "This item belongs with pivot-equal values, so the left scan advances.", bundle: .module)
+      )
     }
 
     while first < last {
       engine.swap(first, last)
-      repeat { last -= 1 } while engine.compare(begin, last, by: <)
-      repeat { first += 1 } while !engine.compare(begin, first, by: <)
+      repeat { last -= 1 } while engine.teachingCompare(
+        begin, last, by: <,
+        stageID: "pdq.equalPartitionRight",
+        whenTrue: String(localized: "The pivot is below this item, so the right scan advances through larger values.", bundle: .module),
+        whenFalse: String(localized: "This item belongs with pivot-equal values, so the right scan stops.", bundle: .module)
+      )
+      repeat { first += 1 } while !engine.teachingCompare(
+        begin, first, by: <,
+        stageID: "pdq.equalPartitionLeft",
+        whenTrue: String(localized: "The pivot is below this item, so the left scan stops at a larger value.", bundle: .module),
+        whenFalse: String(localized: "This item belongs with pivot-equal values, so the left scan advances.", bundle: .module)
+      )
     }
 
     let pivotPos = last
@@ -261,12 +332,27 @@ enum PDQSortingTemplate {
     var first = begin
     var last = end
 
-    repeat { first += 1 } while engine.compareValue(first, against: pivot, by: (<))
+    repeat { first += 1 } while engine.teachingCompareValue(
+      first, against: pivot, by: (<),
+      stageID: "pdq.blockPartitionLeft",
+      whenTrue: String(localized: "This item is below the held pivot, so it belongs in the left block.", bundle: .module),
+      whenFalse: String(localized: "This item is at least the held pivot, so the left scan stops.", bundle: .module)
+    )
 
     if first - 1 == begin {
-      repeat { last -= 1 } while first < last && !engine.compareValue(last, against: pivot, by: (<))
+      repeat { last -= 1 } while first < last && !engine.teachingCompareValue(
+        last, against: pivot, by: (<),
+        stageID: "pdq.blockPartitionRight",
+        whenTrue: String(localized: "This item is below the held pivot, so the right scan stops to exchange it.", bundle: .module),
+        whenFalse: String(localized: "This item is at least the held pivot, so the right scan advances.", bundle: .module)
+      )
     } else {
-      repeat { last -= 1 } while !engine.compareValue(last, against: pivot, by: (<))
+      repeat { last -= 1 } while !engine.teachingCompareValue(
+        last, against: pivot, by: (<),
+        stageID: "pdq.blockPartitionRight",
+        whenTrue: String(localized: "This item is below the held pivot, so the right scan stops to exchange it.", bundle: .module),
+        whenFalse: String(localized: "This item is at least the held pivot, so the right scan advances.", bundle: .module)
+      )
     }
 
     let alreadyParted = first >= last
@@ -286,7 +372,12 @@ enum PDQSortingTemplate {
         var it = first
         for i in 0..<blockSize {
           offsets.left[leftNum] = i
-          if !engine.compareValue(it, against: pivot, by: (<)) { leftNum += 1 }
+          if !engine.teachingCompareValue(
+            it, against: pivot, by: (<),
+            stageID: "pdq.blockClassification",
+            whenTrue: String(localized: "This block item is below the pivot, so it belongs on the left.", bundle: .module),
+            whenFalse: String(localized: "This block item is at least the pivot, so it belongs on the right.", bundle: .module)
+          ) { leftNum += 1 }
           it += 1
         }
       }
@@ -298,7 +389,12 @@ enum PDQSortingTemplate {
           i += 1
           offsets.right[rightNum] = i
           it -= 1
-          if engine.compareValue(it, against: pivot, by: (<)) { rightNum += 1 }
+          if engine.teachingCompareValue(
+            it, against: pivot, by: (<),
+            stageID: "pdq.blockClassification",
+            whenTrue: String(localized: "This block item is below the pivot, so it belongs on the left.", bundle: .module),
+            whenFalse: String(localized: "This block item is at least the pivot, so it belongs on the right.", bundle: .module)
+          ) { rightNum += 1 }
         }
       }
 
@@ -333,7 +429,12 @@ enum PDQSortingTemplate {
       var it = first
       for i in 0..<leftSize {
         offsets.left[leftNum] = i
-        if !engine.compareValue(it, against: pivot, by: (<)) { leftNum += 1 }
+        if !engine.teachingCompareValue(
+          it, against: pivot, by: (<),
+          stageID: "pdq.blockClassification",
+          whenTrue: String(localized: "This block item is below the pivot, so it belongs on the left.", bundle: .module),
+          whenFalse: String(localized: "This block item is at least the pivot, so it belongs on the right.", bundle: .module)
+        ) { leftNum += 1 }
         it += 1
       }
     }
@@ -345,7 +446,12 @@ enum PDQSortingTemplate {
         i += 1
         offsets.right[rightNum] = i
         it -= 1
-        if engine.compareValue(it, against: pivot, by: (<)) { rightNum += 1 }
+        if engine.teachingCompareValue(
+          it, against: pivot, by: (<),
+          stageID: "pdq.blockClassification",
+          whenTrue: String(localized: "This block item is below the pivot, so it belongs on the left.", bundle: .module),
+          whenFalse: String(localized: "This block item is at least the pivot, so it belongs on the right.", bundle: .module)
+        ) { rightNum += 1 }
       }
     }
 

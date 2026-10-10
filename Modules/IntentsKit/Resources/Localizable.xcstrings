@@ -1,0 +1,1546 @@
+{
+  "sourceLanguage": "en",
+  "strings": {
+    "%@": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@"
+          }
+        }
+      }
+    },
+    "Advances Sort Symphony to the next visualizer.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Avanza Sort Symphony al siguiente visualizador."
+          }
+        }
+      }
+    },
+    "Advances Sort Symphony's default shuffle by one step and returns it — chain with Run Sort to cycle through every shuffle over a long run.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Avanza una posición en la mezcla predeterminada de Sort Symphony y la devuelve. Encadénalo con Ejecutar ordenación para recorrer todas las mezclas durante una serie larga."
+          }
+        }
+      }
+    },
+    "Advances Sort Symphony's visualizer by one step and returns it — chain with Run Sort to cycle through every visualizer over a long run.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Avanza una posición en el visualizador de Sort Symphony y lo devuelve. Encadénalo con Ejecutar ordenación para recorrer todos los visualizadores durante una serie larga."
+          }
+        }
+      }
+    },
+    "Advances the array size of whichever sort is currently open in Sort Symphony.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Avanza al siguiente tamaño del arreglo de la ordenación abierta en Sort Symphony."
+          }
+        }
+      }
+    },
+    "Algorithm": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Algoritmo"
+          }
+        }
+      }
+    },
+    "Algorithm Categories": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Categorías de algoritmos"
+          }
+        }
+      }
+    },
+    "Algorithm Category": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Categoría de algoritmos"
+          }
+        }
+      }
+    },
+    "Algorithms": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Algoritmos"
+          }
+        }
+      }
+    },
+    "All Algorithms": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Todos los algoritmos"
+          }
+        }
+      }
+    },
+    "All Categories": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Todas las categorías"
+          }
+        }
+      }
+    },
+    "Array Size": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tamaño del arreglo"
+          }
+        }
+      }
+    },
+    "Array Sizes": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tamaños del arreglo"
+          }
+        }
+      }
+    },
+    "Audio": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Audio"
+          }
+        }
+      }
+    },
+    "Automation": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Automatización"
+          }
+        }
+      }
+    },
+    "Automations": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Automatizaciones"
+          }
+        }
+      }
+    },
+    "Bigger Array": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Arreglo más grande"
+          }
+        }
+      }
+    },
+    "Cancel": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cancelar"
+          }
+        }
+      }
+    },
+    "Categories": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Categorías"
+          }
+        }
+      }
+    },
+    "Category": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Categoría"
+          }
+        }
+      }
+    },
+    "Change Visualizer": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cambiar visualizador"
+          }
+        }
+      }
+    },
+    "Changes how fast Sort Symphony plays back a sort, in operations per second.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cambia la velocidad a la que Sort Symphony reproduce una ordenación, en operaciones por segundo."
+          }
+        }
+      }
+    },
+    "Changes the default array size Sort Symphony sorts — takes effect on the next run, not one already on screen.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cambia el tamaño predeterminado del arreglo que ordena Sort Symphony. Se aplica a la próxima ejecución, no a la que aparece en pantalla."
+          }
+        }
+      }
+    },
+    "Changes the default shuffle Sort Symphony scrambles the array with — takes effect on the next run, not one already on screen.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cambia la mezcla predeterminada con la que Sort Symphony desordena el arreglo. Se aplica a la próxima ejecución, no a la que aparece en pantalla."
+          }
+        }
+      }
+    },
+    "Changes which visualizer Sort Symphony draws sorts with.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cambia el visualizador con el que Sort Symphony muestra las ordenaciones."
+          }
+        }
+      }
+    },
+    "Concurrent Sorts": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Algoritmos de ordenación concurrentes"
+          }
+        }
+      }
+    },
+    "Cycle Array Size": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recorrer tamaños del arreglo"
+          }
+        }
+      }
+    },
+    "Cycle Shuffle": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recorrer mezclas"
+          }
+        }
+      }
+    },
+    "Cycle Visualizer": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recorrer visualizadores"
+          }
+        }
+      }
+    },
+    "Default Shuffle": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mezcla predeterminada"
+          }
+        }
+      }
+    },
+    "Default Size": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tamaño predeterminado"
+          }
+        }
+      }
+    },
+    "Defaults to the app's configured default shuffle.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Usa la mezcla predeterminada configurada en la app."
+          }
+        }
+      }
+    },
+    "Defaults to the app's configured default size, clamped to the algorithm's own range.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Usa el tamaño predeterminado de la app, limitado al intervalo admitido por el algoritmo."
+          }
+        }
+      }
+    },
+    "Defaults to whichever visualizer is already selected.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Usa el visualizador seleccionado."
+          }
+        }
+      }
+    },
+    "Demo": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Demostración"
+          }
+        }
+      }
+    },
+    "Distribution Sorts": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Algoritmos de ordenación por distribución"
+          }
+        }
+      }
+    },
+    "Enabled": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Activado"
+          }
+        }
+      }
+    },
+    "Every Algorithm": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Todos los algoritmos"
+          }
+        }
+      }
+    },
+    "Every Visualizer": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Todos los visualizadores"
+          }
+        }
+      }
+    },
+    "Exchange Sorts": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Algoritmos de ordenación por intercambio"
+          }
+        }
+      }
+    },
+    "Faster": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Más rápido"
+          }
+        }
+      }
+    },
+    "Filters to one category, or leave as All Categories to list every algorithm.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Filtra por una categoría o deja Todas las categorías para mostrar todos los algoritmos."
+          }
+        }
+      }
+    },
+    "Find Algorithms": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Buscar algoritmos"
+          }
+        }
+      }
+    },
+    "Find Array Sizes": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Buscar tamaños del arreglo"
+          }
+        }
+      }
+    },
+    "Find Automations": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Buscar automatizaciones"
+          }
+        }
+      }
+    },
+    "Find Categories": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Buscar categorías"
+          }
+        }
+      }
+    },
+    "Find Maximum Array Size": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Buscar tamaño máximo del arreglo"
+          }
+        }
+      }
+    },
+    "Find Shuffles": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Buscar mezclas"
+          }
+        }
+      }
+    },
+    "Find Visualizers": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Buscar visualizadores"
+          }
+        }
+      }
+    },
+    "Find algorithms in ${category}": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Buscar algoritmos en ${category}"
+          }
+        }
+      }
+    },
+    "Find array sizes for ${algorithm}": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Buscar tamaños del arreglo para ${algorithm}"
+          }
+        }
+      }
+    },
+    "Find maximum array size for ${algorithm}": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Buscar el tamaño máximo del arreglo para ${algorithm}"
+          }
+        }
+      }
+    },
+    "Finds the largest array size one algorithm supports.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Busca el tamaño de arreglo más grande que admite un algoritmo."
+          }
+        }
+      }
+    },
+    "Full Size Sweep": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Barrido completo de tamaños"
+          }
+        }
+      }
+    },
+    "Full Sweep": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Barrido completo"
+          }
+        }
+      }
+    },
+    "Get Next Shuffle": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Obtener siguiente mezcla"
+          }
+        }
+      }
+    },
+    "Get Next Visualizer": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Obtener siguiente visualizador"
+          }
+        }
+      }
+    },
+    "Halt": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Detener"
+          }
+        }
+      }
+    },
+    "How many sort operations to play back per second — higher is faster.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Número de operaciones de ordenación que se reproducen por segundo. Un valor mayor aumenta la velocidad."
+          }
+        }
+      }
+    },
+    "Hybrid Sorts": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Algoritmos de ordenación híbridos"
+          }
+        }
+      }
+    },
+    "Impractical Sorts": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Algoritmos de ordenación imprácticos"
+          }
+        }
+      }
+    },
+    "Increase Size": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aumentar tamaño"
+          }
+        }
+      }
+    },
+    "Insertion Sorts": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Algoritmos de ordenación por inserción"
+          }
+        }
+      }
+    },
+    "Largest Size": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tamaño más grande"
+          }
+        }
+      }
+    },
+    "List Algorithms": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enumerar algoritmos"
+          }
+        }
+      }
+    },
+    "Lists Sort Symphony's algorithm categories.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enumera las categorías de algoritmos de Sort Symphony."
+          }
+        }
+      }
+    },
+    "Lists Sort Symphony's registered size-sweep automations.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enumera las automatizaciones de barrido de tamaños registradas en Sort Symphony."
+          }
+        }
+      }
+    },
+    "Lists Sort Symphony's sorting algorithms, optionally filtered to one category.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enumera los algoritmos de ordenación de Sort Symphony y permite filtrar por categoría."
+          }
+        }
+      }
+    },
+    "Lists every array size one algorithm supports, the same sizes a Size Sweep automation runs through.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enumera todos los tamaños de arreglo admitidos por un algoritmo, que son los mismos que recorre un barrido de tamaños."
+          }
+        }
+      }
+    },
+    "Lists every shuffle Sort Symphony ships.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enumera todas las mezclas incluidas en Sort Symphony."
+          }
+        }
+      }
+    },
+    "Lists every visualizer Sort Symphony ships.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enumera todos los visualizadores incluidos en Sort Symphony."
+          }
+        }
+      }
+    },
+    "Max Size": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tamaño máximo"
+          }
+        }
+      }
+    },
+    "Max Size Only": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Solo tamaño máximo"
+          }
+        }
+      }
+    },
+    "Maximum Array Size": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tamaño máximo del arreglo"
+          }
+        }
+      }
+    },
+    "Maximum Size": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tamaño máximo"
+          }
+        }
+      }
+    },
+    "Merge Sorts": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Algoritmos de ordenación por mezcla"
+          }
+        }
+      }
+    },
+    "Miscellaneous Sorts": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Algoritmos de ordenación misceláneos"
+          }
+        }
+      }
+    },
+    "Mute": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Silenciar"
+          }
+        }
+      }
+    },
+    "Next Shuffle": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Siguiente mezcla"
+          }
+        }
+      }
+    },
+    "Next Size": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Siguiente tamaño"
+          }
+        }
+      }
+    },
+    "Next Visualizer": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Siguiente visualizador"
+          }
+        }
+      }
+    },
+    "No shuffles are currently available.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No hay mezclas disponibles actualmente."
+          }
+        }
+      }
+    },
+    "No sort is currently open in Sort Symphony.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No hay ninguna ordenación abierta en Sort Symphony."
+          }
+        }
+      }
+    },
+    "No visualizers are currently available.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No hay visualizadores disponibles actualmente."
+          }
+        }
+      }
+    },
+    "Play Sort": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reproducir ordenación"
+          }
+        }
+      }
+    },
+    "Playback Speed": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Velocidad de reproducción"
+          }
+        }
+      }
+    },
+    "Quick Sorts": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Algoritmos de ordenación rápida"
+          }
+        }
+      }
+    },
+    "Run ${algorithm}": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ejecutar ${algorithm}"
+          }
+        }
+      }
+    },
+    "Run ${automation} for ${algorithm}": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ejecutar ${automation} para ${algorithm}"
+          }
+        }
+      }
+    },
+    "Run Algorithm": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ejecutar algoritmo"
+          }
+        }
+      }
+    },
+    "Run Automation": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ejecutar automatización"
+          }
+        }
+      }
+    },
+    "Run Full Size Sweep": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ejecutar barrido completo de tamaños"
+          }
+        }
+      }
+    },
+    "Run Showcase": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ejecutar demostración"
+          }
+        }
+      }
+    },
+    "Run Sort": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ejecutar ordenación"
+          }
+        }
+      }
+    },
+    "Run Visualizer Showcase": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ejecutar demostración de visualizadores"
+          }
+        }
+      }
+    },
+    "Run visualizer showcase for ${algorithm}": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ejecutar demostración de visualizadores para ${algorithm}"
+          }
+        }
+      }
+    },
+    "Runs a Sort Symphony automation sweep (like Size Sweep or Max Size Only) for one algorithm and waits for it to finish.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ejecuta un barrido automatizado de Sort Symphony (como Barrido de tamaños o Solo tamaño máximo) para un algoritmo y espera a que termine."
+          }
+        }
+      }
+    },
+    "Runs a size sweep (every supported size, three times each) for every algorithm, in alphabetical order.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ejecuta un barrido de tamaños para cada algoritmo en orden alfabético. Cada tamaño admitido se ejecuta tres veces."
+          }
+        }
+      }
+    },
+    "Runs every algorithm once, in alphabetical order, at its own maximum size, cycling through every shuffle and visualizer along the way.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ejecuta cada algoritmo una vez, en orden alfabético y con su tamaño máximo, alternando las mezclas y los visualizadores."
+          }
+        }
+      }
+    },
+    "Runs one algorithm at its maximum size once per visualizer, switching visualizers only between runs.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ejecuta un algoritmo con su tamaño máximo una vez por visualizador y cambia de visualizador entre ejecuciones."
+          }
+        }
+      }
+    },
+    "Runs one sorting algorithm in Sort Symphony and waits for the full animated pass to finish.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ejecuta un algoritmo de ordenación en Sort Symphony y espera a que termine la animación."
+          }
+        }
+      }
+    },
+    "Scramble": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Desordenar"
+          }
+        }
+      }
+    },
+    "Selection Sorts": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Algoritmos de ordenación por selección"
+          }
+        }
+      }
+    },
+    "Set Default Array Size": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Definir tamaño predeterminado del arreglo"
+          }
+        }
+      }
+    },
+    "Set Default Shuffle": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Definir mezcla predeterminada"
+          }
+        }
+      }
+    },
+    "Set Playback Speed": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Definir velocidad de reproducción"
+          }
+        }
+      }
+    },
+    "Set Sound": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Configurar sonido"
+          }
+        }
+      }
+    },
+    "Set Visualizer": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Definir visualizador"
+          }
+        }
+      }
+    },
+    "Set default array size to ${size}": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Definir ${size} como tamaño predeterminado del arreglo"
+          }
+        }
+      }
+    },
+    "Set default shuffle to ${shuffle}": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Definir ${shuffle} como mezcla predeterminada"
+          }
+        }
+      }
+    },
+    "Set playback speed to ${speed} operations per second": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Definir la velocidad de reproducción en ${speed} operaciones por segundo"
+          }
+        }
+      }
+    },
+    "Set sound ${enabled}": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Configurar sonido: ${enabled}"
+          }
+        }
+      }
+    },
+    "Set visualizer to ${visualizer}": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Definir ${visualizer} como visualizador"
+          }
+        }
+      }
+    },
+    "Showcase": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Demostración"
+          }
+        }
+      }
+    },
+    "Shuffle": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mezcla"
+          }
+        }
+      }
+    },
+    "Shuffles": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mezclas"
+          }
+        }
+      }
+    },
+    "Size": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tamaño"
+          }
+        }
+      }
+    },
+    "Size Sweep": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Barrido de tamaños"
+          }
+        }
+      }
+    },
+    "Sizes": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tamaños"
+          }
+        }
+      }
+    },
+    "Slower": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Más lento"
+          }
+        }
+      }
+    },
+    "Sort": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ordenar"
+          }
+        }
+      }
+    },
+    "Sort Categories": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Categorías de ordenación"
+          }
+        }
+      }
+    },
+    "Sort Symphony": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sort Symphony"
+          }
+        }
+      }
+    },
+    "Sorting Algorithm": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Algoritmo de ordenación"
+          }
+        }
+      }
+    },
+    "Sorting Algorithms": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Algoritmos de ordenación"
+          }
+        }
+      }
+    },
+    "Sound": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sonido"
+          }
+        }
+      }
+    },
+    "Speed": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Velocidad"
+          }
+        }
+      }
+    },
+    "Speed (ops/sec)": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Velocidad (operaciones/s)"
+          }
+        }
+      }
+    },
+    "Stop": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Detener"
+          }
+        }
+      }
+    },
+    "Stop Sort": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Detener ordenación"
+          }
+        }
+      }
+    },
+    "Stops whichever run or automation sweep is currently in progress in Sort Symphony.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Detiene la ejecución o el barrido automatizado en curso en Sort Symphony."
+          }
+        }
+      }
+    },
+    "Supported Sizes": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tamaños admitidos"
+          }
+        }
+      }
+    },
+    "That algorithm isn't available anymore.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ese algoritmo ya no está disponible."
+          }
+        }
+      }
+    },
+    "That automation isn't available anymore.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Esa automatización ya no está disponible."
+          }
+        }
+      }
+    },
+    "That shuffle isn't available anymore.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Esa mezcla ya no está disponible."
+          }
+        }
+      }
+    },
+    "That visualizer isn't available anymore.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ese visualizador ya no está disponible."
+          }
+        }
+      }
+    },
+    "The algorithm to run the automation on.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Algoritmo al que se aplicará la automatización."
+          }
+        }
+      }
+    },
+    "The algorithm to run, selected exactly as if tapped in the sidebar.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Algoritmo que se ejecutará, seleccionado igual que desde la barra lateral."
+          }
+        }
+      }
+    },
+    "The algorithm to showcase, run once per visualizer at its own maximum size.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Algoritmo de la demostración. Se ejecuta una vez por visualizador con su tamaño máximo."
+          }
+        }
+      }
+    },
+    "The algorithm whose maximum array size to look up.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Algoritmo cuyo tamaño máximo de arreglo se consultará."
+          }
+        }
+      }
+    },
+    "The algorithm whose supported array sizes to list.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Algoritmo cuyos tamaños de arreglo admitidos se enumerarán."
+          }
+        }
+      }
+    },
+    "The default array size for future runs, clamped to whichever algorithm's own range when a run starts.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tamaño predeterminado del arreglo para futuras ejecuciones. Al iniciar una ejecución, se limita al intervalo admitido por el algoritmo."
+          }
+        }
+      }
+    },
+    "The default shuffle for future runs.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mezcla predeterminada para futuras ejecuciones."
+          }
+        }
+      }
+    },
+    "Turns Sort Symphony's sort playback sound on or off.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Activa o desactiva el sonido de reproducción de las ordenaciones en Sort Symphony."
+          }
+        }
+      }
+    },
+    "Unmute": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Activar sonido"
+          }
+        }
+      }
+    },
+    "Upper Bound": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Límite superior"
+          }
+        }
+      }
+    },
+    "Visualization": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Visualización"
+          }
+        }
+      }
+    },
+    "Visualizations": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Visualizaciones"
+          }
+        }
+      }
+    },
+    "Visualizer": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Visualizador"
+          }
+        }
+      }
+    },
+    "Visualizer Showcase": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Demostración de visualizadores"
+          }
+        }
+      }
+    },
+    "Visualizers": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Visualizadores"
+          }
+        }
+      }
+    },
+    "Whether sort playback sound should be on.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Indica si debe estar activado el sonido de reproducción de las ordenaciones."
+          }
+        }
+      }
+    },
+    "Which registered automation sweep to run.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Barrido automatizado registrado que se ejecutará."
+          }
+        }
+      }
+    },
+    "Which visualizer to draw sorts with.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Visualizador que mostrará las ordenaciones."
+          }
+        }
+      }
+    }
+  },
+  "version": "1.0"
+}

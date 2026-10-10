@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -22,7 +23,7 @@ import SortEngineKit
 public struct MinMaxHeapSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "minmaxheapsort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Min-Max Heap Sort",
+    displayName: String(localized: "Min-Max Heap Sort", bundle: .module),
     category: .selection,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -55,7 +56,13 @@ public struct MinMaxHeapSort: SortAlgorithm {
       var i = start
       let isGt = !isMinLevel(i)
       func beats(_ a: Int, _ b: Int) -> Bool {
-        isGt ? engine.compare(a, b, by: >) : engine.compare(a, b, by: <)
+        isGt ? engine.teachingCompare(
+          a, b,
+          by: >,
+          stageID: "MinMaxHeapSort.levelOrder",
+          whenTrue: String(localized: "The first node outranks the second for this heap level.", bundle: .module),
+          whenFalse: String(localized: "The second node outranks the first for this heap level.", bundle: .module)
+        ) : engine.compare(a, b, by: <)
       }
 
       var left = 2 * i + 1

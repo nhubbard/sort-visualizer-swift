@@ -233,9 +233,10 @@ inline ShapeGeometry resolveShapeGeometry(
         }
         case 4: { // scatterPlot
             float columnWidth = viewportSize.x / arrayCount;
-            float dotDiameter = 6.0 * scale;
+            float dotDiameter = min(6.0 * scale, min(viewportSize.x, viewportSize.y));
             float radius = dotDiameter / 2.0;
-            float centerX = index * columnWidth + columnWidth / 2.0;
+            float centerX = clamp(index * columnWidth + columnWidth / 2.0,
+                                  radius, viewportSize.x - radius);
             float centerY = radius + (viewportSize.y - 2.0 * radius) * (1.0 - normalized);
             result.origin = float2(centerX - radius, centerY - radius);
             result.size = float2(dotDiameter, dotDiameter);
@@ -243,11 +244,12 @@ inline ShapeGeometry resolveShapeGeometry(
         }
         case 5: { // waveDots
             float columnWidth = viewportSize.x / arrayCount;
-            float dotDiameter = 6.0 * scale;
+            float dotDiameter = min(6.0 * scale, min(viewportSize.x, viewportSize.y));
             float radius = dotDiameter / 2.0;
             float verticalCenter = viewportSize.y / 2.0;
             float amplitude = viewportSize.y / 2.0 - radius;
-            float centerX = index * columnWidth + columnWidth / 2.0;
+            float centerX = clamp(index * columnWidth + columnWidth / 2.0,
+                                  radius, viewportSize.x - radius);
             float centerY = verticalCenter + amplitude * sin(2.0 * M_PI_F * normalized);
             result.origin = float2(centerX - radius, centerY - radius);
             result.size = float2(dotDiameter, dotDiameter);

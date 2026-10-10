@@ -66,6 +66,16 @@ private enum LegacyLoader {
 struct AlgorithmDetailStoreTests {
   private static var testBundle: Bundle { Bundle(for: StoreTestBundleMarker.self) }
 
+  @Test func localizedDescriptionUsesRegionalFallbackAndEnglishBase() {
+    let content = AlgorithmDetailContent(
+      description: "English", codeSamples: [],
+      localizedDescriptions: ["es": "Español", "fr-CA": "Français canadien"])
+    #expect(AlgorithmDetailStore.preferredDescription(content, languages: ["es-MX"]) == "Español")
+    #expect(AlgorithmDetailStore.preferredDescription(content, languages: ["fr-CA"]) == "Français canadien")
+    #expect(AlgorithmDetailStore.preferredDescription(content, languages: ["de-DE"]) == "English")
+    #expect(AlgorithmDetailStore.preferredDescription(content, languages: ["en", "es"]) == "English")
+  }
+
   @Test func everyAlgorithmMatchesTheLegacyLoaderByteForByte() async throws {
     let store = AlgorithmDetailStore(bundle: Self.testBundle)
     let algorithmIDs = try LegacyLoader.discoverAlgorithmIDs()
@@ -95,5 +105,25 @@ struct AlgorithmDetailStoreTests {
     let store = AlgorithmDetailStore(bundle: Self.testBundle)
     let content = await store.content(for: "this-algorithm-does-not-exist")
     #expect(content == nil)
+    if case .loaded(let entry) = await store.loadState(for: "this-algorithm-does-not-exist") {
+      #expect(entry == nil)
+    } else {
+      Issue.record("An unknown algorithm is not an archive load failure")
+    }
+  }
+
+  @Test func missingArchiveReportsLoadFailure() async throws {
+    let emptyBundleURL = FileManager.default.temporaryDirectory
+      .appendingPathComponent("MissingDetails-\(UUID().uuidString).bundle", isDirectory: true)
+    try FileManager.default.createDirectory(at: emptyBundleURL, withIntermediateDirectories: true)
+    defer { try? FileManager.default.removeItem(at: emptyBundleURL) }
+
+    let emptyBundle = try #require(Bundle(url: emptyBundleURL))
+    let store = AlgorithmDetailStore(bundle: emptyBundle)
+    if case .unavailable = await store.loadState(for: "quicksort") {
+      // A broken bundle must be distinguishable from an ordinary absent algorithm entry.
+    } else {
+      Issue.record("A missing archive must report a load failure")
+    }
   }
 }

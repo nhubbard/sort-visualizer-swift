@@ -1,10 +1,11 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
 public struct SwaplessBubbleSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "swaplessbubblesort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Swapless Bubble Sort",
+    displayName: String(localized: "Swapless Bubble Sort", bundle: .module),
     category: .exchange,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -43,7 +44,13 @@ public struct SwaplessBubbleSort: SortAlgorithm {
 
       for j in 1..<i {
         let arrJ = engine.readValue(at: j)
-        if engine.compareValue(j, against: comp, by: (<)) {
+        if engine.teachingCompareValue(
+          j, against: comp,
+          by: (<),
+          stageID: "SwaplessBubbleSort.heldItemPosition",
+          whenTrue: String(localized: "This item belongs before the held value, so shift it into the open position.", bundle: .module),
+          whenFalse: String(localized: "The held value has reached its insertion boundary.", bundle: .module)
+        ) {
           // `comp` is the larger of the two: the lesser value (`array[j]`) shifts one
           // slot left, `comp` keeps being carried rightward, and `last` remembers this
           // as the rightmost point where a "swap-like" shift happened.

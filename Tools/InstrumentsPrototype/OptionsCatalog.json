@@ -1,0 +1,471 @@
+{
+  "source": "xcrun xctrace record --template NAME --show-recording-options",
+  "templates": {
+    "Activity Monitor": {
+      "exitCode": 0,
+      "options": {},
+      "stderr": ""
+    },
+    "Allocations": {
+      "exitCode": 0,
+      "options": {
+        "Allocations": {
+          "discardEventsForFreedMemory": false,
+          "discardUnrecordedDataUponStop": true,
+          "enableNSZombieDetection": false,
+          "identifyVirtualCppObjects": true,
+          "onlyTrackVMAllocations": false,
+          "recordReferenceCounts": false,
+          "recordedTypes": [
+            {
+              "action": "record",
+              "enabled": true,
+              "match": "contains",
+              "type": "*"
+            },
+            {
+              "action": "ignore",
+              "enabled": false,
+              "match": "hasPrefix",
+              "type": "NS"
+            },
+            {
+              "action": "ignore",
+              "enabled": false,
+              "match": "hasPrefix",
+              "type": "CF"
+            },
+            {
+              "action": "ignore",
+              "enabled": false,
+              "match": "hasPrefix",
+              "type": "Malloc"
+            }
+          ]
+        },
+        "Points of Interest": {
+          "excludeOSLogs": false
+        },
+        "VM Tracker": {
+          "automaticSnapshotEnabled": false,
+          "snapshotIntervalInSeconds": 3
+        }
+      },
+      "stderr": ""
+    },
+    "Animation Hitches": {
+      "exitCode": 0,
+      "options": {
+        "Hangs": {
+          "detectPriorityInversions": false,
+          "hangsThreshold": 33
+        },
+        "Time Profiler": {
+          "contextSwitchSampling": false,
+          "highFrequencySampling": false,
+          "recordKernelStacks": false,
+          "recordWaitingThreads": false
+        }
+      },
+      "stderr": ""
+    },
+    "App Launch": {
+      "exitCode": 0,
+      "options": {
+        "Time Profiler": {
+          "contextSwitchSampling": true,
+          "highFrequencySampling": false,
+          "recordKernelStacks": false,
+          "recordWaitingThreads": true
+        }
+      },
+      "stderr": ""
+    },
+    "Audio System Trace": {
+      "exitCode": 0,
+      "options": {
+        "Hangs": {
+          "detectPriorityInversions": false,
+          "hangsThreshold": 100
+        },
+        "Points of Interest": {
+          "excludeOSLogs": false
+        }
+      },
+      "stderr": ""
+    },
+    "CPU Counters": {
+      "exitCode": 0,
+      "options": {
+        "CPU Counters": {
+          "allEventsAndFormulas": [],
+          "configurationType": {
+            "guided": {}
+          },
+          "countingLevel": "EL0",
+          "pmiEventAliasOrMnemonic": "",
+          "pmiThreshold": 1000000,
+          "processBucketSize": 10,
+          "sampleByTime": true,
+          "selectedCountingMode": {
+            "analysisMode": "bottleneck",
+            "countingMode": "bottlenecks"
+          },
+          "selectedCountingModeDisplayName": "CPU Bottlenecks",
+          "useDebuggingInformation": false,
+          "useHighFrequencyForGuidedMode": false,
+          "useHighFrequencyForManualMode": false
+        },
+        "Points of Interest": {
+          "excludeOSLogs": false
+        },
+        "Time Profiler": {
+          "contextSwitchSampling": false,
+          "highFrequencySampling": false,
+          "recordKernelStacks": false,
+          "recordWaitingThreads": false
+        }
+      },
+      "stderr": ""
+    },
+    "CPU Profiler": {
+      "exitCode": 0,
+      "options": {
+        "CPU Profiler": {
+          "highFrequency": false,
+          "recordKernelCallstacks": false
+        },
+        "Hangs": {
+          "detectPriorityInversions": false,
+          "hangsThreshold": 250
+        },
+        "Points of Interest": {
+          "excludeOSLogs": false
+        }
+      },
+      "stderr": ""
+    },
+    "Core AI": {
+      "exitCode": 0,
+      "options": {
+        "Core AI": {
+          "consolidateNumericFunctionSuffixes": true
+        },
+        "Time Profiler": {
+          "contextSwitchSampling": false,
+          "highFrequencySampling": false,
+          "recordKernelStacks": false,
+          "recordWaitingThreads": false
+        }
+      },
+      "stderr": ""
+    },
+    "Data Persistence": {
+      "exitCode": 0,
+      "options": {},
+      "stderr": ""
+    },
+    "File Activity": {
+      "exitCode": 0,
+      "options": {},
+      "stderr": ""
+    },
+    "Foundation Models": {
+      "exitCode": 0,
+      "options": {},
+      "stderr": ""
+    },
+    "Game Memory": {
+      "exitCode": 0,
+      "options": {
+        "Allocations": {
+          "discardEventsForFreedMemory": false,
+          "discardUnrecordedDataUponStop": true,
+          "enableNSZombieDetection": false,
+          "identifyVirtualCppObjects": true,
+          "onlyTrackVMAllocations": false,
+          "recordReferenceCounts": false,
+          "recordedTypes": [
+            {
+              "action": "record",
+              "enabled": true,
+              "match": "contains",
+              "type": "*"
+            },
+            {
+              "action": "ignore",
+              "enabled": false,
+              "match": "hasPrefix",
+              "type": "NS"
+            },
+            {
+              "action": "ignore",
+              "enabled": false,
+              "match": "hasPrefix",
+              "type": "CF"
+            },
+            {
+              "action": "ignore",
+              "enabled": false,
+              "match": "hasPrefix",
+              "type": "Malloc"
+            }
+          ]
+        },
+        "VM Tracker": {
+          "automaticSnapshotEnabled": true,
+          "snapshotIntervalInSeconds": 3
+        }
+      },
+      "stderr": ""
+    },
+    "Game Performance": {
+      "exitCode": 0,
+      "options": {
+        "Hangs": {
+          "detectPriorityInversions": false,
+          "hangsThreshold": 100
+        },
+        "Points of Interest": {
+          "excludeOSLogs": false
+        },
+        "Time Profiler": {
+          "contextSwitchSampling": false,
+          "highFrequencySampling": false,
+          "recordKernelStacks": false,
+          "recordWaitingThreads": false
+        }
+      },
+      "stderr": ""
+    },
+    "Game Performance Overview": {
+      "exitCode": 0,
+      "options": {
+        "Metal Performance Overview": {
+          "perFrameMetrics": true,
+          "shaderCompilationMetrics": false
+        },
+        "Time Profiler": {
+          "contextSwitchSampling": false,
+          "highFrequencySampling": false,
+          "recordKernelStacks": false,
+          "recordWaitingThreads": false
+        }
+      },
+      "stderr": ""
+    },
+    "Leaks": {
+      "exitCode": 0,
+      "options": {
+        "Allocations": {
+          "discardEventsForFreedMemory": false,
+          "discardUnrecordedDataUponStop": true,
+          "enableNSZombieDetection": false,
+          "identifyVirtualCppObjects": true,
+          "onlyTrackVMAllocations": false,
+          "recordReferenceCounts": true,
+          "recordedTypes": [
+            {
+              "action": "record",
+              "enabled": true,
+              "match": "contains",
+              "type": "*"
+            },
+            {
+              "action": "ignore",
+              "enabled": false,
+              "match": "hasPrefix",
+              "type": "NS"
+            },
+            {
+              "action": "ignore",
+              "enabled": false,
+              "match": "hasPrefix",
+              "type": "CF"
+            },
+            {
+              "action": "ignore",
+              "enabled": false,
+              "match": "hasPrefix",
+              "type": "Malloc"
+            }
+          ]
+        },
+        "Leaks": {
+          "automaticSnapshotEnabled": true,
+          "snapshotIntervalInSeconds": 10
+        },
+        "Points of Interest": {
+          "excludeOSLogs": false
+        }
+      },
+      "stderr": ""
+    },
+    "Logging": {
+      "exitCode": 0,
+      "options": {
+        "os_log": {
+          "recordAllProcessesInSingleProcessMode": false
+        },
+        "os_signpost": {
+          "dynamicTracingEnabledSubsystems": [],
+          "recordAllProcessesInSingleProcessMode": false
+        }
+      },
+      "stderr": ""
+    },
+    "Metal System Trace": {
+      "exitCode": 0,
+      "options": {
+        "Hangs": {
+          "detectPriorityInversions": false,
+          "hangsThreshold": 100
+        },
+        "Time Profiler": {
+          "contextSwitchSampling": false,
+          "highFrequencySampling": false,
+          "recordKernelStacks": false,
+          "recordWaitingThreads": false
+        }
+      },
+      "stderr": ""
+    },
+    "Network": {
+      "exitCode": 0,
+      "options": {
+        "Points of Interest": {
+          "excludeOSLogs": false
+        }
+      },
+      "stderr": ""
+    },
+    "Power Profiler": {
+      "exitCode": 0,
+      "options": {
+        "Metal Performance Overview": {
+          "perFrameMetrics": true,
+          "shaderCompilationMetrics": false
+        },
+        "Time Profiler": {
+          "contextSwitchSampling": false,
+          "highFrequencySampling": false,
+          "recordKernelStacks": false,
+          "recordWaitingThreads": false
+        }
+      },
+      "stderr": ""
+    },
+    "Processor Trace": {
+      "exitCode": 0,
+      "options": {
+        "Points of Interest": {
+          "excludeOSLogs": false
+        },
+        "Processor Trace": {
+          "bufferSizeFill": 1,
+          "bufferSizeWrap": 1,
+          "decodeOnDevice": true,
+          "forceDevTrace": false,
+          "ringBufferMode": {
+            "fill": {}
+          },
+          "throttleEnabled": true
+        }
+      },
+      "stderr": ""
+    },
+    "RealityKit Trace": {
+      "exitCode": 0,
+      "options": {
+        "Hangs": {
+          "detectPriorityInversions": false,
+          "hangsThreshold": 33
+        },
+        "Time Profiler": {
+          "contextSwitchSampling": false,
+          "highFrequencySampling": false,
+          "recordKernelStacks": false,
+          "recordWaitingThreads": false
+        }
+      },
+      "stderr": ""
+    },
+    "Swift Concurrency": {
+      "exitCode": 0,
+      "options": {
+        "Hangs": {
+          "detectPriorityInversions": false,
+          "hangsThreshold": 250
+        },
+        "Points of Interest": {
+          "excludeOSLogs": false
+        },
+        "Time Profiler": {
+          "contextSwitchSampling": false,
+          "highFrequencySampling": false,
+          "recordKernelStacks": false,
+          "recordWaitingThreads": false
+        }
+      },
+      "stderr": ""
+    },
+    "SwiftUI": {
+      "exitCode": 0,
+      "options": {
+        "Hangs": {
+          "detectPriorityInversions": false,
+          "hangsThreshold": 250
+        },
+        "SwiftUI": {
+          "enableLayoutTracing": false
+        },
+        "Time Profiler": {
+          "contextSwitchSampling": false,
+          "highFrequencySampling": true,
+          "recordKernelStacks": false,
+          "recordWaitingThreads": false
+        }
+      },
+      "stderr": ""
+    },
+    "System Trace": {
+      "exitCode": 0,
+      "options": {
+        "Hangs": {
+          "detectPriorityInversions": false,
+          "hangsThreshold": 250
+        },
+        "Points of Interest": {
+          "excludeOSLogs": false
+        },
+        "Time Profiler": {
+          "contextSwitchSampling": false,
+          "highFrequencySampling": false,
+          "recordKernelStacks": false,
+          "recordWaitingThreads": false
+        }
+      },
+      "stderr": ""
+    },
+    "Time Profiler": {
+      "exitCode": 0,
+      "options": {
+        "Hangs": {
+          "detectPriorityInversions": false,
+          "hangsThreshold": 250
+        },
+        "Points of Interest": {
+          "excludeOSLogs": false
+        },
+        "Time Profiler": {
+          "contextSwitchSampling": false,
+          "highFrequencySampling": false,
+          "recordKernelStacks": false,
+          "recordWaitingThreads": false
+        }
+      },
+      "stderr": ""
+    }
+  },
+  "xcode": "27.0 (27A266a)"
+}

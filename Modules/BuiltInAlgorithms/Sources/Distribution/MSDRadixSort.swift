@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -12,7 +13,7 @@ import SortEngineKit
 public struct MSDRadixSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "msdradixsort")
   public let metadata = AlgorithmMetadata(
-    displayName: "MSD Radix Sort",
+    displayName: String(localized: "MSD Radix Sort", bundle: .module),
     category: .distribution,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -50,7 +51,17 @@ public struct MSDRadixSort: SortAlgorithm {
     // sits exactly on a power of `radix` down by one and silently drop a whole digit place).
     var maxValue = 0
     for i in 0..<n {
-      maxValue = max(maxValue, engine.readValue(at: i))
+      let candidate = engine.readValue(at: i)
+      let newMaximum = candidate > maxValue
+      engine.annotateLastOperation(
+        stageID: "digitRange", decisionID: "msdradixsort.maximum",
+        outcome: newMaximum ? "extendRange" : "keepRange",
+        roles: ["candidate": .arrayIndex(i), "maximum": .value(maxValue)],
+        explanationKey: "msdradixsort.maximum",
+        explanation: newMaximum
+          ? String(localized: "This value raises the most significant digit place to inspect.", bundle: .module)
+          : String(localized: "This value fits within the digit places already required.", bundle: .module))
+      maxValue = max(maxValue, candidate)
     }
     var highestPower = 0
     var probe = radix
@@ -65,7 +76,13 @@ public struct MSDRadixSort: SortAlgorithm {
       // One fresh "registers" bucket array per recursion frame, exactly like ArrayV.
       var buckets = [[Int]](repeating: [], count: radix)
       for i in min..<max {
-        buckets[getDigit(engine.readValue(at: i), power)].append(engine.readValue(at: i))
+        let digit = getDigit(engine.readValue(at: i), power)
+        engine.annotateLastOperation(
+          stageID: "digitScan", decisionID: "msdradixsort.classifyDigit",
+          outcome: "bucket\(digit)", roles: ["source": .arrayIndex(i)],
+          explanationKey: "msdradixsort.classifyDigit",
+          explanation: String(localized: "Digit \(digit) at this place sends the value to bucket \(digit).", bundle: .module))
+        buckets[digit].append(engine.readValue(at: i))
       }
 
       let handle = engine.createAuxArray(length: max - min)
@@ -74,7 +91,18 @@ public struct MSDRadixSort: SortAlgorithm {
       for bucket in buckets {
         for value in bucket {
           engine.writeAux(handle, at: auxIndex, value: value)
+          engine.annotateLastOperation(
+            stageID: "scratchUpdate", decisionID: "msdradixsort.scratchUpdate",
+            outcome: "update",
+            roles: ["scratch": .auxiliaryIndex(handle: handle.rawValue, index: auxIndex)],
+            explanationKey: "msdradixsort.scratchUpdate",
+            explanation: String(localized: "Copy this value into the scratch segment for its current leading digit.", bundle: .module))
           engine.setValue(writeIndex, value)
+          engine.annotateLastOperation(
+            stageID: "bucketPlacement", decisionID: "msdradixsort.bucketPlacement",
+            outcome: "place", roles: ["destination": .arrayIndex(writeIndex)],
+            explanationKey: "msdradixsort.bucketPlacement",
+            explanation: String(localized: "Digit place \(power + 1) from the right selects this value’s bucket segment.", bundle: .module))
           writeIndex += 1
           auxIndex += 1
         }

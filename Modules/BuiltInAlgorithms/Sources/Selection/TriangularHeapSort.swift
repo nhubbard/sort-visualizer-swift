@@ -1,3 +1,4 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
@@ -20,7 +21,7 @@ import SortEngineKit
 public struct TriangularHeapSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "triangularheapsort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Triangular Heap Sort",
+    displayName: String(localized: "Triangular Heap Sort", bundle: .module),
     category: .selection,
     sizeRange: 16...256,
     growthModel: OperationGrowthModel(
@@ -94,7 +95,12 @@ public struct TriangularHeapSort: SortAlgorithm {
       if left >= size { break }
       let right = left + 1
       var largest = root
-      if !engine.compare(largest, left) {
+      if !engine.teachingCompare(
+        largest, left,
+        stageID: "TriangularHeapSort.childCandidate",
+        whenTrue: String(localized: "The current heap candidate is at least as large, so keep it.", bundle: .module),
+        whenFalse: String(localized: "The child is larger, so promote it.", bundle: .module)
+      ) {
         largest = left
       }
       if right < size && !engine.compare(largest, right) {

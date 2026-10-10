@@ -3,7 +3,9 @@ import java.util.Arrays;
 public class weakheapsort {
   public static void sort(int[] arr) {
     int n = arr.length;
-    if (n <= 1) return;
+    if (n <= 1) {
+      return;
+    }
     boolean[] flags = new boolean[n];
 
     for (int i = n - 1; i > 0; i--) {

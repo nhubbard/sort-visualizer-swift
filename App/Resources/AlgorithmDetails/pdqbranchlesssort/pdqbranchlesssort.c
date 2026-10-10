@@ -1,8 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
-                 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
 
 #define INSERT_SORT_THRESHOLD 24
 #define NINTHER_THRESHOLD 128
@@ -67,9 +66,7 @@ int pdqLog(int n) {
    for negative operands, which is what the pivot-position arithmetic below
    needs at the one call site where the dividend can go negative -- this helper
    just names that intent. */
-int truncDiv(int a, int b) {
-  return a / b;
-}
+int truncDiv(int a, int b) { return a / b; }
 
 void insertSort(int arr[], int begin, int end) {
   for (int cur = begin + 1; cur < end; cur++) {

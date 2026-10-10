@@ -19,9 +19,16 @@ public struct RecordingEngine: Sendable {
 
   public private(set) var values: [Int]
   private var tape: [SortOperation] = []
+  private var teachingAnnotations: [TeachingAnnotation] = []
+  /// Keeps authored explanations distributed through long recordings without letting their
+  /// storage grow in proportion to every comparison on the tape.
+  private static let maximumTeachingAnnotations = 2_048
+  private var teachingAnnotationStride = 1
+  private var teachingAnnotationResidue = 0
   /// Counts every operation even after `operationCap` stops retaining tape entries.
   private var totalOperationCount = 0
   private let operationCap: Int
+  private var randomGenerator: ShuffleRandomGenerator
   /// Set once `tape.count` reaches `operationCap` — from that point on, `compare`/`swap`/etc.
   /// keep doing real work on `values` (so the algorithm still runs to genuine, correct
   /// completion) but stop growing `tape`, capping this run's RAM footprint and guaranteeing
@@ -57,9 +64,13 @@ public struct RecordingEngine: Sendable {
   private var comparisonKeyForTesting: (@Sendable (Int) -> Int)?
   #endif
 
-  public init(values: [Int], operationCap: Int = RecordingEngine.defaultOperationCap) {
+  public init(
+    values: [Int], operationCap: Int = RecordingEngine.defaultOperationCap,
+    randomSeed: UInt64 = UInt64.random(in: .min ... .max)
+  ) {
     self.values = values
     self.operationCap = operationCap
+    randomGenerator = ShuffleRandomGenerator(seed: randomSeed)
     #if DEBUG
     comparisonKeyForTesting = nil
     #endif
@@ -79,6 +90,20 @@ public struct RecordingEngine: Sendable {
 
   public var count: Int { values.count }
 
+  /// A reproducible random choice for shuffles. The seed belongs to the recording, so random
+  /// decisions can be regenerated without relying on process-global random state.
+  public mutating func randomIndex(in range: Range<Int>) -> Int {
+    Int.random(in: range, using: &randomGenerator)
+  }
+
+  public mutating func randomIndex(in range: ClosedRange<Int>) -> Int {
+    Int.random(in: range, using: &randomGenerator)
+  }
+
+  public mutating func randomUnitDouble() -> Double {
+    Double.random(in: 0..<1, using: &randomGenerator)
+  }
+
   private mutating func appendOp(_ op: SortOperation) {
     totalOperationCount += 1
     guard !didExceedCap else { return }
@@ -87,6 +112,48 @@ public struct RecordingEngine: Sendable {
       return
     }
     tape.append(op)
+  }
+
+  /// Whether this point in the tape is selected for a teaching annotation.
+  public var shouldAnnotateCurrentOperation: Bool {
+    !didExceedCap && tape.last?.isSignificantForPacing == true
+      && (tape.count - 1) % teachingAnnotationStride == teachingAnnotationResidue
+  }
+
+  /// Attach the algorithm's reason for its most recent real operation. Call immediately after
+  /// the comparison or write whose result is being explained.
+  public mutating func annotateLastOperation(
+    stageID: String, decisionID: String? = nil, outcome: String,
+    roles: [String: TeachingReference], explanationKey: String,
+    explanation: String? = nil
+  ) {
+    guard shouldAnnotateCurrentOperation else { return }
+    teachingAnnotations.append(TeachingAnnotation(
+      operationIndex: tape.count - 1, stageID: stageID, decisionID: decisionID,
+      outcome: outcome,
+      roles: roles, explanationKey: explanationKey, explanation: explanation))
+    while teachingAnnotations.count >= Self.maximumTeachingAnnotations {
+      let nextStride = teachingAnnotationStride * 2
+      let upperResidue = teachingAnnotationResidue + teachingAnnotationStride
+      let lowerCount = teachingAnnotations.count {
+        $0.operationIndex % nextStride == teachingAnnotationResidue
+      }
+      teachingAnnotationResidue = lowerCount >= teachingAnnotations.count - lowerCount
+        ? teachingAnnotationResidue : upperResidue
+      teachingAnnotationStride = nextStride
+      let stride = nextStride
+      let residue = teachingAnnotationResidue
+      teachingAnnotations.removeAll {
+        $0.operationIndex % stride != residue
+      }
+      if teachingAnnotations.count >= Self.maximumTeachingAnnotations,
+        stride > tape.count {
+        teachingAnnotations = teachingAnnotations.enumerated().compactMap {
+          $0.offset.isMultiple(of: 2) ? $0.element : nil
+        }
+        break
+      }
+    }
   }
 
   @discardableResult
@@ -261,12 +328,33 @@ public struct RecordingEngine: Sendable {
   /// `reversalCount`, a distinct ArrayV stat (an operation, not an element-move count). Pancake-
   /// family algorithms (`PancakeSort`/`BurntPancakeSort`) use this instead of a manual swap loop.
   public mutating func reversal(_ start: Int, _ end: Int) {
+    reverse(start, end, teaching: nil)
+  }
+
+  /// Gives every swap in a reversal its algorithm-specific reason without adding tape operations.
+  public mutating func teachingReversal(
+    _ start: Int, _ end: Int, stageID: String, explanation: String
+  ) {
+    reverse(start, end, teaching: (stageID, explanation))
+  }
+
+  private mutating func reverse(
+    _ start: Int, _ end: Int, teaching: (stageID: String, explanation: String)?
+  ) {
     appendOp(.reversal)
     reversalCount += 1
     var low = start
     var high = end
     while low < high {
       swap(low, high)
+      if let teaching, shouldAnnotateCurrentOperation {
+        annotateLastOperation(
+          stageID: teaching.stageID, outcome: "reverse",
+          roles: ["left": .arrayIndex(low), "right": .arrayIndex(high),
+            "range": .range(start..<(end + 1))],
+          explanationKey: teaching.stageID,
+          explanation: "\(teaching.explanation) Swap positions \(low + 1) and \(high + 1).")
+      }
       low += 1
       high -= 1
     }
@@ -275,6 +363,7 @@ public struct RecordingEngine: Sendable {
   public func finish() -> RecordingSummary {
     RecordingSummary(
       tape: tape,
+      teachingAnnotations: teachingAnnotations,
       totalOperationCount: totalOperationCount,
       compareCount: compareCount,
       compareValueCount: compareValueCount,
@@ -295,6 +384,7 @@ public struct RecordingEngine: Sendable {
 /// destructuring arity.
 public struct RecordingSummary: Sendable {
   public let tape: [SortOperation]
+  public let teachingAnnotations: [TeachingAnnotation]
   public let totalOperationCount: Int
   public let compareCount: Int
   /// The portion of `compareCount` that came from `compareValue` rather than `compare` -- see

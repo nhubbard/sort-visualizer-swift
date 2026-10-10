@@ -1,10 +1,11 @@
+import Foundation
 import AlgorithmKit
 import SortEngineKit
 
 public struct LessBogoSort: SortAlgorithm {
   public let id = AlgorithmID(rawValue: "lessbogosort")
   public let metadata = AlgorithmMetadata(
-    displayName: "Less Bogo Sort",
+    displayName: String(localized: "Less Bogo Sort", bundle: .module),
     category: .impractical,
     sizeRange: 4...7,
     growthModel: OperationGrowthModel(
@@ -32,7 +33,18 @@ public struct LessBogoSort: SortAlgorithm {
     guard n > 1 else { return }
 
     func isFrontMinimum(_ start: Int, _ end: Int) -> Bool {
-      for i in (start + 1)..<end where engine.compare(start, i, by: (>)) { return false }
+      for i in (start + 1)..<end {
+        let frontIsLarger = engine.compare(start, i, by: (>))
+        engine.annotateLastOperation(
+          stageID: "candidateCheck", decisionID: "lessbogosort.frontMinimum",
+          outcome: frontIsLarger ? "reject" : "continue",
+          roles: ["front": .arrayIndex(start), "candidate": .arrayIndex(i)],
+          explanationKey: "lessbogosort.frontMinimum",
+          explanation: frontIsLarger
+            ? String(localized: "A smaller value exists in this window, so the front is not its minimum.", bundle: .module)
+            : String(localized: "The front is no larger than this value, so continue checking the window.", bundle: .module))
+        if frontIsLarger { return false }
+      }
       return true
     }
 
@@ -49,7 +61,18 @@ public struct LessBogoSort: SortAlgorithm {
       while !engine.compare(j, i, by: (>)) { j -= 1 }
 
       engine.swap(i, j)
+      engine.annotateLastOperation(
+        stageID: "candidateExchange", decisionID: "lessbogosort.candidateExchange",
+        outcome: "exchange", roles: ["left": .arrayIndex(i), "right": .arrayIndex(j)],
+        explanationKey: "lessbogosort.candidateExchange",
+        explanation: String(localized: "The next permutation exchanges its pivot with a successor in the active range.", bundle: .module))
       engine.reversal(i + 1, end - 1)
+      engine.annotateLastOperation(
+        stageID: "candidateWrap", decisionID: "lessbogosort.reverseSuffix",
+        outcome: "reverse",
+        roles: ["first": .arrayIndex(i + 1), "last": .arrayIndex(end - 1)],
+        explanationKey: "lessbogosort.reverseSuffix",
+        explanation: String(localized: "Reverse this descending range to advance to the next candidate permutation.", bundle: .module))
       return true
     }
 
@@ -59,6 +82,12 @@ public struct LessBogoSort: SortAlgorithm {
           // Fully descending range, still not front-minimum (only possible when
           // n - i > 1) — wrap straight to fully ascending, which trivially is.
           engine.reversal(i, n - 1)
+          engine.annotateLastOperation(
+            stageID: "candidateWrap", decisionID: "lessbogosort.reverseSuffix",
+            outcome: "reverse",
+            roles: ["first": .arrayIndex(i), "last": .arrayIndex(n - 1)],
+            explanationKey: "lessbogosort.reverseSuffix",
+            explanation: String(localized: "Reverse this descending range to advance to the next candidate permutation.", bundle: .module))
         }
       }
     }

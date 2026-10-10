@@ -2,8 +2,7 @@
 #include <utility>
 #include <vector>
 
-int array[16] = {0, 39, 21, 62, 91, 77, 14, 23,
-                 90, 69, 51, 81, 68, 83, 32, 56};
+int array[16] = {0, 39, 21, 62, 91, 77, 14, 23, 90, 69, 51, 81, 68, 83, 32, 56};
 
 const int insertSortThreshold = 24;
 const int nintherThreshold = 128;
@@ -60,9 +59,7 @@ int pdqLog(int n) {
 // zero for negative operands, which is what the pivot-position arithmetic below
 // needs at the one call site where the dividend can go negative -- this helper
 // just names that intent.
-int truncDiv(int a, int b) {
-  return a / b;
-}
+int truncDiv(int a, int b) { return a / b; }
 
 void insertSort(int arr[], int begin, int end) {
   for (int cur = begin + 1; cur < end; cur++) {

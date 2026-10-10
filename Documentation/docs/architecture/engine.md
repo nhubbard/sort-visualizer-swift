@@ -61,6 +61,8 @@ public struct RecordingEngine: Sendable {
   public mutating func createAuxArray(length: Int) -> AuxHandle
   public mutating func writeAux(_ handle: AuxHandle, at index: Int, value: Int)
   public mutating func reversal(_ start: Int, _ end: Int)
+  public mutating func randomIndex(in range: Range<Int>) -> Int
+  public mutating func randomUnitDouble() -> Double
   public func finish() -> RecordingSummary
 }
 ```
@@ -75,6 +77,11 @@ algorithm's own choice. The algorithm controls when to retract it.
 LSD Radix's per-digit registers, bucket sort's buckets. Routing these writes through the engine,
 instead of using a plain Swift array, makes `auxWriteCount` and the visualizer's rendering of aux
 arrays possible.
+
+Shuffle randomness comes from the engine's seeded generator. `TapeFactory` chooses one seed before
+recording, passes it to the shuffle engine, and stores it as `TapeHeader.visualSeed`. Supplying the
+same seed reproduces the shuffle's values and operations; the stored tape remains the playback
+artifact.
 
 `RecordingEngine` enforces a hard operation cap (`RecordingEngine.defaultOperationCap`, 300,000).
 `SortSession` always passes the live, user-tunable `AppSettings.recordingOperationCap` instead of
@@ -105,6 +112,7 @@ public struct TapeHeader: Sendable, Codable, Equatable {
 public struct Tape: Sendable, Codable, Equatable {
   public let header: TapeHeader
   public let operations: [SortOperation]
+  public let teachingAnnotations: [TeachingAnnotation]
 }
 ```
 
@@ -118,6 +126,12 @@ public struct Tape: Sendable, Codable, Equatable {
 
 `Tape` and its contents are `Codable`. This makes binary tape export and import possible with no
 additional plumbing; see [Compression formats](../reference/compression.md).
+`teachingAnnotations` is an optional, ordered side stream whose indices point at meaningful sort
+operations. Algorithm code emits these after a decision through `RecordingEngine`; they never
+advance replay or change counters. `TapeFactory` offsets them past the shuffle phase, and archive
+payloads store them in a versioned optional trailer. Old tapes decode with an empty side stream.
+The [teaching annotation guide](../guides/teaching-graph-annotations.md) describes catalog-wide
+coverage, bounded retention, and reading-speed behavior.
 `Tape.compactedForFastPlayback()` produces a replay-only copy with cosmetic marker bookkeeping
 removed, used by fixed-duration pacing mode. `header`'s recorded stats are always copied verbatim,
 never recomputed, so this method cannot change the reported operation counts. It changes only how
@@ -184,8 +198,9 @@ Key implementation details:
 - **Two `OSSignposter` intervals separate tape mutation from dispatch.** `"TickApply"` covers tape
   mutation; `"TickDispatch"` covers fan-out to renderers and audio. These exist because a past
   performance bug was invisible in a generic Instruments trace until traced back to `play()`'s
-  internals by hand. For a replay performance issue, start with a Points of Interest capture using
-  these two spans.
+  internals by hand. They use the `PointsOfInterest` category collected by standard Time Profiler
+  and Metal System Trace templates. A new signposter is constructed for each `play()` call so a
+  trace attached after an earlier run can still see its intervals.
 
 ### `TapeFactory` (in `AlgorithmKit`, but tightly coupled to the above)
 

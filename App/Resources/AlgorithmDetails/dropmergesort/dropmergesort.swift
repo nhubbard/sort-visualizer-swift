@@ -15,7 +15,8 @@ func sort(_ array: inout [Int]) {
     while read < length {
         iteration += 1
         if iteration == length / earlyOutTestAt,
-           Double(dropped.count) > Double(read) * earlyOutDisorderFraction {
+           Double(dropped.count) > Double(read) * earlyOutDisorderFraction
+        {
             for value in dropped {
                 array[write] = value
                 write += 1
@@ -50,7 +51,7 @@ func sort(_ array: inout [Int]) {
                 }
             }
 
-            while write >= 1 && largest < array[write - 1] {
+            while write >= 1, largest < array[write - 1] {
                 write -= 1
                 backtracked += 1
             }

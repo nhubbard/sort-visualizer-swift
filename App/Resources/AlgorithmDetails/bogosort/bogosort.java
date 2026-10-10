@@ -3,20 +3,31 @@ import java.util.Arrays;
 public class bogosort {
   public static void sort(int[] a) {
     int n = a.length;
-    if (n < 2) return;
+    if (n < 2) {
+      return;
+    }
     boolean ordered = true;
-    for (int i = 1; i < n; i++)
+    for (int i = 1; i < n; i++) {
       if (a[i] < a[i - 1]) {
         ordered = false;
         break;
       }
-    if (ordered) return;
+    }
+    if (ordered) {
+      return;
+    }
     while (true) {
       int pivot = n - 2;
-      while (pivot >= 0 && a[pivot] >= a[pivot + 1]) pivot--;
-      if (pivot < 0) break;
+      while (pivot >= 0 && a[pivot] >= a[pivot + 1]) {
+        pivot--;
+      }
+      if (pivot < 0) {
+        break;
+      }
       int successor = n - 1;
-      while (a[successor] <= a[pivot]) successor--;
+      while (a[successor] <= a[pivot]) {
+        successor--;
+      }
       int held = a[pivot];
       a[pivot] = a[successor];
       a[successor] = held;

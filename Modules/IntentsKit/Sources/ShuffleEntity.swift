@@ -40,7 +40,9 @@ public struct ShuffleEntityQuery: EntityQuery, EnumerableEntityQuery {
   @MainActor
   public func allEntities() async -> [ShuffleEntity] {
     ShuffleRegistry.shared.shuffles
-      .sorted { $0.metadata.displayName < $1.metadata.displayName }
+      .sorted {
+        ($0.metadata.displayName, $0.id.rawValue) < ($1.metadata.displayName, $1.id.rawValue)
+      }
       .map(ShuffleEntity.init)
   }
 }
